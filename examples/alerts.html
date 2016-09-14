@@ -1,0 +1,60 @@
+<div ng-controller="AlertsCtrl as ctrl" class="demo-md-panel">
+
+    <md-toolbar class="md-hue-2">
+        <div class="md-toolbar-tools">
+            <md-button class="md-icon-button" aria-label="Settings" ng-disabled="true">
+                <md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
+            </md-button>
+            <h2>
+                <span>Toolbar with Disabled/Enabled Icon Buttons</span>
+            </h2>
+            <span flex></span>
+            <md-button class="md-icon-button" aria-label="Menu" ng-click="toggleRight()">
+                <md-icon md-font-icon="icon-bell-list"></md-icon>
+                <badge label="{{5}}" class="alerts-badge"></badge>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <div style="position: relative; min-height: 400px; height: 100%;">
+        <md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
+            <md-toolbar class="tbar-transparent">
+                <div class="md-toolbar-tools">
+                    <div class="new-alerts-container">
+                        <span class="new-alerts-count-box">0</span>
+                        <span class="new-alerts-label"> New Alerts </span>
+                    </div>
+                    <md-button class="btn-secondary" aria-label="Learn More">Dismiss All</md-button>
+                </div>
+            </md-toolbar>
+
+            <div class="alerts-header">
+                <span flex class="alerts-header-title">Today</span>
+                <md-button class="btn-card filter-open-button"
+                           ng-click="ctrl.showMenu($event)">
+                    <md-icon md-font-icon="icon-filter"/>
+                    Filter
+                </md-button>
+            </div>
+            <md-content>
+                <md-card>
+                    <md-card-title>
+                        <md-card-title-text>
+                            <div class="alerts-severity alerts-severity-high"></div>
+                            <div class="alerts-card-title-wrapper">
+                                <span class="alerts-card-title">Killowatt Hours Alert</span>
+                                <span class="alerts-card-time">1 am</span>
+                            </div>
+                            <span class="alerts-card-category">Power</span>
+                        </md-card-title-text>
+                    </md-card-title>
+                    <md-card-actions layout="row" layout-align="stretch">
+                        <md-button flex class="btn-card">View</md-button>
+                        <md-button flex class="btn-card">Dismiss</md-buttonflex>
+                    </md-card-actions>
+                </md-card>
+            </md-content>
+        </md-sidenav>
+    </div>
+
+</div>

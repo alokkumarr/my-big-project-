@@ -1,0 +1,78 @@
+.md-button {
+  text-transform: none;
+
+  &.md-icon-button {
+    overflow: visible;
+    font-size: 23px;
+  }
+}
+
+.md-button.@{theme-cls}.md-primary {
+  &:not([disabled]):hover {
+    background-color: @btn-primary-bg-color;
+  }
+  color: #FFFFFF;
+  background-color: #1A89D4;
+}
+
+.md-button.@{theme-cls}.btn-secondary {
+  border: @btn-secondary-border;
+  color: @btn-secondary-color;
+
+  &:not([disabled]):hover {
+    background-color: @btn-secondary-hover-color;
+  }
+}
+
+.md-button.@{theme-cls}.btn-card {
+  color: @app-font-color;
+  font-size: 16px;
+  margin: 0 !important;
+  padding: 0;
+  border-radius: 0;
+
+  &:not([disabled]):hover {
+    background-color: initial;
+    opacity: 0.75;
+  }
+}
+
+.button-group {
+  > .md-button {
+    font-size: 16px;
+    color: rgba(89, 101, 116, 0.7);
+    background-color: transparent;
+    text-transform: none;
+    min-width:100px;
+    margin: 0;
+    padding: 0 8px;
+    border-radius: 0;
+    border: 1px solid #B0BFC8;
+
+    //border-bottom-width: 1px;
+    //border-top-width: 1px;
+    //border-right-width: 1px;
+    //border-color: #B0BFC8;
+    //border-style: solid;
+
+    &:first-child {
+      border-radius: 3px 0 0 3px;
+      //border-left-width: 1px;
+    }
+
+    &:last-child {
+      border-radius: 0 3px 3px 0;
+    }
+
+    &:not([disabled]):hover {
+      background-color: rgba(193, 193, 193, 0.96);
+      color: rgba(44, 65, 164, 0.96);
+      transition: 0.3s;
+    }
+  }
+
+  .md-active {
+    background-color: #DEE4EA;
+    opacity: 1;
+  }
+}

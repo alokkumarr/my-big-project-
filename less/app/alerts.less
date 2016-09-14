@@ -1,0 +1,74 @@
+.alerts-header {
+  margin: 0 12px;
+  display: flex;
+  align-items: center;
+
+  .alerts-header-title {
+    font-size: 18px;
+    font-weight: bold;
+  }
+}
+
+.alerts-card-title-wrapper {
+  line-height: 18px;
+
+  .alerts-card-title {
+    font-weight: bold;
+    font-size: 18px;
+  }
+
+  .alerts-card-time {
+    float: right;
+  }
+}
+
+.alerts-card-time, .alerts-card-category {
+  font-size: 12px;
+}
+
+.alerts-severity {
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  top: 23px;
+  left: 6px;
+}
+
+.alerts-severity-high {
+  background-color: #E5524C;
+}
+
+.alerts-severity-medium {
+  background-color: #00B18D;
+}
+
+.alerts-severity-low {
+  background-color: #F8B514;
+}
+
+badge[data-badge-count].alerts-badge:after {
+    top: 7px;
+    right: 13px;
+}
+
+.new-alerts-container {
+  flex: 1;
+
+  .new-alerts-count-box {
+    background-color: @app-font-color;
+    border-radius: 3px;
+    min-width: 26px;
+    display: inline-block;
+    text-align: center;
+    padding: 2px;
+    font-size: 21px;
+    color: #FFFFFF;
+  }
+
+  .new-alerts-label {
+    font-weight: bold;
+    font-size: 16px;
+    color: @app-font-color;
+  }
+}
