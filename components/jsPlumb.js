@@ -155,22 +155,22 @@ angular.module('sync.components.jsPlumb', [])
             template: '<div ng-transclude></div>',
             link : function(scope, element, attrs, jsPlumbCanvas) {
                 var instance = jsPlumbCanvas.scope.jsPlumbInstance;
+                var field = scope.$parent.endpoint;
 
                 scope.jsPlumbInstance = jsPlumbCanvas.scope.jsPlumbInstance;
                 scope.uuid = attrs.uuid;
 
                 var options = {
-                    anchor:attrs.anchor,
+                    anchor: field.anchor,
                     uuid: attrs.uuid
                 };
 
                 console.log('rigging up endpoint');
 
                 $(element).addClass('_jsPlumb_endpoint');
-                $(element).addClass('endpoint_'+attrs.anchor);
+                $(element).addClass('endpoint_' + options.anchor);
 
                 var ep = instance.addEndpoint(element, scope.settings, options);
-
 
                 scope.$on('$destroy', function(){
                     instance.deleteEndpoint(ep);

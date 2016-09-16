@@ -441,86 +441,31 @@ angular.module('myApp', ['ngMaterial', 'sync.components'])
 							checked: false,
 							"sources": [
 								{
-									"uuid": 1
-								},
-								{
 									"uuid": 2,
+									"anchor": "RightMiddle",
 									"connections": [
 										{
-											"uuid": "26",
-											"mouseover": false
+											"uuid": "26"
 										}
 									]
-								}
-							],
-							"targets": [
-								{
-									"uuid": 3
-								},
-								{
-									"uuid": 4
 								}
 							]
 						},
 						{
 							name: 'Name',
-							checked: true,
-							"sources": [
-								{
-									"uuid": 5
-								},
-								{
-									"uuid": 6
-								}
-							],
-							"targets": [
-								{
-									"uuid": 7
-								},
-								{
-									"uuid": 8
-								}
-							]
+							checked: true
 						},
 						{
 							name: 'Address',
 							checked: false,
-							"sources": [
-								{
-									"uuid": 9
-								},
-								{
-									"uuid": 10
-								}
-							],
-							"targets": [
-								{
-									"uuid": 11
-								},
-								{
-									"uuid": 12
-								}
-							]
+							"sources": [],
+							"targets": []
 						},
 						{
 							name: 'Phone',
 							checked: false,
-							"sources": [
-								{
-									"uuid": 13
-								},
-								{
-									"uuid": 14
-								}
-							],
-							"targets": [
-								{
-									"uuid": 15
-								},
-								{
-									"uuid": 16
-								}
-							]
+							"sources": [],
+							"targets": []
 						}
 					],
 					"x": 86,
@@ -531,86 +476,28 @@ angular.module('myApp', ['ngMaterial', 'sync.components'])
 					fields: [
 						{
 							name: 'ID',
-							checked: false,
-							"sources": [
-								{
-									"uuid": 13
-								},
-								{
-									"uuid": 14
-								}
-							],
-							"targets": [
-								{
-									"uuid": 15
-								},
-								{
-									"uuid": 16
-								}
-							]
+							checked: false
 						},
 						{
 							name: 'Shipper',
-							checked: true,
-							"sources": [
-								{
-									"uuid": 17
-								},
-								{
-									"uuid": 18
-								}
-							],
-							"targets": [
-								{
-									"uuid": 19
-								},
-								{
-									"uuid": 20
-								}
-							]
+							checked: true
 						},
 						{
 							name: 'Total',
-							checked: false,
-							"sources": [
-								{
-									"uuid": 21
-								},
-								{
-									"uuid": 22
-								}
-							],
-							"targets": [
-								{
-									"uuid": 23
-								},
-								{
-									"uuid": 24
-								}
-							]
+							checked: false
 						},
 						{
 							name: 'Customer',
 							checked: false,
-							"sources": [
-								{
-									"uuid": 25
-								},
+							"targets": [
 								{
 									"uuid": 26,
+									"anchor": "LeftMiddle",
 									"connections": [
 										{
 											"uuid": "2"
 										}
 									]
-								}
-							],
-							"targets": [
-								{
-									"uuid": 27
-								},
-								{
-									"uuid": 28
 								}
 							]
 						}
