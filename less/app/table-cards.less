@@ -1,9 +1,27 @@
-.table-card {
+.table_window {
+  //z-index:10;
+  position:absolute;
+
   box-shadow: initial;
   background: #FFFFFF;
   border-radius: 3px;
-  padding: 14px 18px;
+  padding: 5px 18px;
   border: 1px solid #D1D3D3;
+
+  width:150px;
+
+
+  .endpoint_RightMiddle {
+    position: absolute;
+    top: 50%;
+    right: -33px;
+  }
+
+  .endpoint_LeftMiddle {
+    position:absolute;
+    top:50%;
+    left:-33px;
+  }
 
 
   .md-subheader.@{theme-cls} {
@@ -21,6 +39,7 @@
 
   md-list-item .md-list-item-inner > md-checkbox {
     margin-top: 8px;
+    margin-right: 5px;
   }
 
   md-checkbox {
@@ -30,56 +49,14 @@
 
 .endpoint_TopCenter, .endpoint_BottomCenter, .endpoint_LeftMiddle, .endpoint_RightMiddle{
   display:inline-block;
-
 }
 
-js-plumb-canvas{
-  background-image:url(../images/grid_background.gif);
-  background-repeat: repeat;
+js-plumb-canvas {
+  //background-image: url(../images/grid_background.gif);
+  //background-repeat: repeat;
   width: 500px;
   height: 500px;
   position: relative;
-  left:0;
-  top:0;
-}
-
-.table_window {
-  border:1px solid #346789;
-  box-shadow: 2px 2px 19px #aaa;
-  -o-box-shadow: 2px 2px 19px #aaa;
-  -webkit-box-shadow: 2px 2px 19px #aaa;
-  -moz-box-shadow: 2px 2px 19px #aaa;
-  -moz-border-radius:0.5em;
-  border-radius:0.5em;
-  opacity:0.8;
-  text-align:center;
-  //z-index:10;
-  position:absolute;
-  background-color:#eeeeef;
-  color:black;
-  padding:0.5em;
-  font-size:0.9em;
-  width:200px;
-
-
-  .endpoint_RightMiddle {
-    position: absolute;
-    top: 50%;
-    right: -25px;
-  }
-
-  .endpoint_LeftMiddle {
-    position:absolute;
-    top:50%;
-    left:-25px;
-  }
-}
-
-.window:hover {
-  box-shadow: 2px 2px 19px #444;
-  -o-box-shadow: 2px 2px 19px #444;
-  -webkit-box-shadow: 2px 2px 19px #444;
-  -moz-box-shadow: 2px 2px 19px #444;
-  opacity:0.6;
-  filter:alpha(opacity=60);
+  left: 0;
+  top: 0;
 }

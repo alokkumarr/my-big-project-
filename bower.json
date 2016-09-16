@@ -15,7 +15,7 @@
     "tests"
   ],
   "dependencies": {
-    "angular-material": "^1.1.0",
+    "angular-material": "^1.1.1",
     "jquery-ui": "^1.12.1",
     "jsPlumb": "^2.1.7"
   },
