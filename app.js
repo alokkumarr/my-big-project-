@@ -1,6 +1,6 @@
 
 
-angular.module('myApp', ['ngMaterial', 'sync.components', 'ngDraggable'])
+angular.module('myApp', ['ngMaterial', 'sync.components'])
 	.config(function ($mdThemingProvider) {
 		$mdThemingProvider.theme('triton')
 			.primaryPalette('blue', {
@@ -27,7 +27,7 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ngDraggable'])
 				{ name: 'table-cards', url: 'examples/table-cards.html'}
 			];
 
-		$scope.template = $scope.templates[1];
+		$scope.template = $scope.templates[7];
 
 
 		$scope.menu = menu;
@@ -372,11 +372,293 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ngDraggable'])
 		};
 	}
 
-	function TableCardsCtrl() {
-		this.toppings = [
-			{ name: 'Pepperoni', wanted: true },
-			{ name: 'Sausage', wanted: false },
-			{ name: 'Black Olives', wanted: true },
-			{ name: 'Green Peppers', wanted: false }
+	function TableCardsCtrl($scope) {
+		$scope.zoomlevel = 70;
+		$scope.pos_x = 214;
+		$scope.pos_y = 148;
+
+		$scope.targetEndpointStyle = {
+			endpoint:"Dot",
+			paintStyle:{ fillStyle:"#7AB02C",radius:11 },
+			maxConnections:-1,
+			isTarget:true,
+			dropOptions: {
+				tolerance: "touch",
+				hoverClass: "dropHover",
+				activeClass: "dragActive"
+			}
+		};
+
+		$scope.sourceEndpointStyle = {
+			endpoint:"Dot",
+			paintStyle:{
+				strokeStyle:"#7AB02C",
+				fillStyle:"transparent",
+				radius:7,
+				lineWidth:3
+			},
+			isSource:true,
+			isTarget: true,
+			maxConnections:1,
+			//connector:[ "Flowchart", { stub:[30, 30], gap:20, cornerRadius:10, alwaysRespectStubs:true } ],
+			connector: ["Bezier", { curviness: 63 } ],
+			connectorStyle:{
+				lineWidth:4,
+				strokeStyle:"#61B7CF",
+				joinstyle:"round",
+				outlineColor:"white",
+				outlineWidth:2
+			},
+			connectorHoverStyle:{
+				fillStyle:"#216477",
+				strokeStyle:"#216477"
+			},
+			dropOptions: {
+				tolerance: "touch",
+				hoverClass: "dropHover",
+				activeClass: "dragActive"
+			}
+		};
+
+		$scope.removeIndex = function(index, object){
+			object.splice(index, 1);
+		};
+
+		$scope.removeState = function(state){
+			var index = $scope.stateObjects.indexOf(state);
+			if(index !== -1){
+				$scope.stateObjects.splice(index, 1);
+			}
+		};
+
+		$scope.tableObjects =
+			[
+				{
+					"name": "Customers",
+					fields: [
+						{
+							name: 'ID',
+							checked: false,
+							"sources": [
+								{
+									"uuid": 1
+								},
+								{
+									"uuid": 2,
+									"connections": [
+										{
+											"uuid": "26",
+											"mouseover": false
+										}
+									]
+								}
+							],
+							"targets": [
+								{
+									"uuid": 3
+								},
+								{
+									"uuid": 4
+								}
+							]
+						},
+						{
+							name: 'Name',
+							checked: true,
+							"sources": [
+								{
+									"uuid": 5
+								},
+								{
+									"uuid": 6
+								}
+							],
+							"targets": [
+								{
+									"uuid": 7
+								},
+								{
+									"uuid": 8
+								}
+							]
+						},
+						{
+							name: 'Address',
+							checked: false,
+							"sources": [
+								{
+									"uuid": 9
+								},
+								{
+									"uuid": 10
+								}
+							],
+							"targets": [
+								{
+									"uuid": 11
+								},
+								{
+									"uuid": 12
+								}
+							]
+						},
+						{
+							name: 'Phone',
+							checked: false,
+							"sources": [
+								{
+									"uuid": 13
+								},
+								{
+									"uuid": 14
+								}
+							],
+							"targets": [
+								{
+									"uuid": 15
+								},
+								{
+									"uuid": 16
+								}
+							]
+						}
+					],
+					"x": 86,
+					"y": 80
+				},
+				{
+					"name": "Orders",
+					fields: [
+						{
+							name: 'ID',
+							checked: false,
+							"sources": [
+								{
+									"uuid": 13
+								},
+								{
+									"uuid": 14
+								}
+							],
+							"targets": [
+								{
+									"uuid": 15
+								},
+								{
+									"uuid": 16
+								}
+							]
+						},
+						{
+							name: 'Shipper',
+							checked: true,
+							"sources": [
+								{
+									"uuid": 17
+								},
+								{
+									"uuid": 18
+								}
+							],
+							"targets": [
+								{
+									"uuid": 19
+								},
+								{
+									"uuid": 20
+								}
+							]
+						},
+						{
+							name: 'Total',
+							checked: false,
+							"sources": [
+								{
+									"uuid": 21
+								},
+								{
+									"uuid": 22
+								}
+							],
+							"targets": [
+								{
+									"uuid": 23
+								},
+								{
+									"uuid": 24
+								}
+							]
+						},
+						{
+							name: 'Customer',
+							checked: false,
+							"sources": [
+								{
+									"uuid": 25
+								},
+								{
+									"uuid": 26,
+									"connections": [
+										{
+											"uuid": "2"
+										}
+									]
+								}
+							],
+							"targets": [
+								{
+									"uuid": 27
+								},
+								{
+									"uuid": 28
+								}
+							]
+						}
+					],
+					"x": 200,
+					"y": 200
+				}
 		];
+
+		$scope.newState = function(){
+			$scope.stateObjects.push({
+				'name': 'New State',
+				'template': 'default',
+				'sources': [
+					{ uuid: getNextUUID()},
+					{ uuid: getNextUUID()},
+				],
+				'targets': [
+					{ uuid: getNextUUID()},
+					{ uuid: getNextUUID()}
+				],
+				'x': 10,
+				'y': 10
+			});
+		};
+
+		$scope.tableConnections = [
+			{ targetUUID:2063, sourceUUID:2058  }
+		];
+
+
+
+		$scope.activeState = null;
+
+		$scope.setActiveState = function(state){
+			$scope.activeState = state;
+		};
+
+		$scope.onConnection = function(instance, connection, targetUUID, sourceUUID){
+			angular.forEach($scope.tableObjects, function(table){
+				angular.forEach(table.sources, function(source){
+					if(source.uuid == sourceUUID){
+						if(typeof source.connections === 'undefined') source.connections = [];
+						source.connections.push({'uuid': targetUUID });
+						$scope.$apply();
+					}
+				});
+			});
+
+		}
 	}

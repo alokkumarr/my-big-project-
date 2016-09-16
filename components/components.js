@@ -3,5 +3,7 @@
     angular.module('sync.components', [
         'sync.components.accordionMenu',
         'sync.components.buttonGroup',
-        'sync.components.rangeSlider']);
+        'sync.components.rangeSlider',
+        'sync.components.jsPlumb'
+    ]);
 })();
