@@ -468,8 +468,8 @@ angular.module('myApp', ['ngMaterial', 'sync.components'])
 							"targets": []
 						}
 					],
-					"x": 86,
-					"y": 80
+					"x": 4,
+					"y": 4
 				},
 				{
 					"name": "Orders",
@@ -502,8 +502,8 @@ angular.module('myApp', ['ngMaterial', 'sync.components'])
 							]
 						}
 					],
-					"x": 200,
-					"y": 200
+					"x": 346,
+					"y": 11
 				}
 		];
 
