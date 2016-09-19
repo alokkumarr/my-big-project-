@@ -24,7 +24,9 @@ angular.module('myApp', ['ngMaterial', 'sync.components'])
 				{ name: 'modals', url: 'examples/modals.html'},
 				{ name: 'analysis-card', url: 'examples/analysis-card.html'},
 				{ name: 'toolbars', url: 'examples/toolbars.html'},
-				{ name: 'table-cards', url: 'examples/table-cards.html'}
+				{ name: 'table cards', url: 'examples/table-cards.html'},
+				{ name: 'pivot grid', url: 'examples/pivotgrid.html'},
+				{ name: 'charts', url: 'examples/charts.html'}
 			];
 
 		$scope.template = $scope.templates[7];
@@ -168,7 +170,27 @@ angular.module('myApp', ['ngMaterial', 'sync.components'])
 	.controller('DropDownsCtrl', DropDownsCtrl)
 	.controller('ControlsCtrl', ControlsCtrl)
 	.controller('DialogController', DialogController)
-	.controller('TableCardsCtrl', TableCardsCtrl);
+	.controller('TableCardsCtrl', TableCardsCtrl)
+	.chart('simple', function() {
+		return {
+			chart: {
+				type: 'area'
+			},
+			xAxis: {
+				categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
+			},
+			series: [{
+				name: 'John',
+				data: [5, 3, 4, 7, 2]
+			}, {
+				name: 'Jane',
+				data: [2, -2, -3, 2, 1]
+			}, {
+				name: 'Joe',
+				data: [3, 4, 4, -2, 5]
+			}]
+		};
+	});
 
 
 	// ---- AlertsCtrl ---------------
@@ -372,6 +394,7 @@ angular.module('myApp', ['ngMaterial', 'sync.components'])
 		};
 	}
 
+	// ------ TableCardsCtrl -------
 	function TableCardsCtrl($scope) {
 		$scope.zoomlevel = 70;
 		$scope.pos_x = 214;
@@ -438,10 +461,11 @@ angular.module('myApp', ['ngMaterial', 'sync.components'])
 					fields: [
 						{
 							name: 'ID',
+							type: 'int',
 							checked: false,
 							"sources": [
 								{
-									"uuid": 2,
+									"uuid": Date.now(),
 									"anchor": "RightMiddle",
 									"connections": [
 										{
@@ -449,11 +473,14 @@ angular.module('myApp', ['ngMaterial', 'sync.components'])
 										}
 									]
 								}
-							]
+							],
+							"targets": []
 						},
 						{
 							name: 'Name',
-							checked: true
+							checked: true,
+							"sources": [],
+							"targets": []
 						},
 						{
 							name: 'Address',
@@ -476,19 +503,26 @@ angular.module('myApp', ['ngMaterial', 'sync.components'])
 					fields: [
 						{
 							name: 'ID',
-							checked: false
+							checked: false,
+							"sources": [],
+							"targets": []
 						},
 						{
 							name: 'Shipper',
-							checked: true
+							checked: true,
+							"sources": [],
+							"targets": []
 						},
 						{
 							name: 'Total',
-							checked: false
+							checked: false,
+							"sources": [],
+							"targets": []
 						},
 						{
 							name: 'Customer',
 							checked: false,
+							"sources": [],
 							"targets": [
 								{
 									"uuid": 26,
@@ -537,15 +571,62 @@ angular.module('myApp', ['ngMaterial', 'sync.components'])
 		};
 
 		$scope.onConnection = function(instance, connection, targetUUID, sourceUUID){
+
+			debugger;
+
 			angular.forEach($scope.tableObjects, function(table){
+
 				angular.forEach(table.sources, function(source){
+
 					if(source.uuid == sourceUUID){
-						if(typeof source.connections === 'undefined') source.connections = [];
+						if(typeof source.connections === 'undefined') {
+							source.connections = [];
+						}
+
 						source.connections.push({'uuid': targetUUID });
+
 						$scope.$apply();
 					}
 				});
 			});
 
 		}
+	}
+
+	function PivotGridCtrl($scope) {
+		// this.gridOptions = {
+		// 	enableFiltering: true,
+		// 	treeRowHeaderAlwaysVisible: false,
+		// 	columnDefs: [
+		// 		{ name: 'name', width: '30%' },
+		// 		{ name: 'gender',
+		// 			grouping: {
+		// 				groupPriority: 1
+		// 			},
+		// 			sort: {
+		// 				priority: 1, direction: 'asc'
+		// 			}, width: '20%',
+		// 			cellFilter: 'mapGender'
+		// 		},
+		// 		{ name: 'age', treeAggregationType: uiGridGroupingConstants.aggregation.MAX, width: '20%' },
+		// 		{ name: 'company', width: '25%' },
+		// 		{ name: 'registered', width: '40%', cellFilter: 'date', type: 'date' },
+		// 		{
+		// 			name: 'state',
+		// 			grouping: { groupPriority: 0 },
+		// 			sort: { priority: 0, direction: 'desc' },
+		// 			width: '35%',
+		// 			cellTemplate: '<div><div ng-if="!col.grouping || col.grouping.groupPriority === undefined || col.grouping.groupPriority === null || ( row.groupHeader && col.grouping.groupPriority === row.treeLevel )" class="ui-grid-cell-contents" title="TOOLTIP">{{COL_FIELD CUSTOM_FILTERS}}</div></div>' },
+		// 		{ name: 'balance',
+		// 			width: '25%',
+		// 			cellFilter: 'currency',
+		// 			treeAggregationType: uiGridGroupingConstants.aggregation.AVG, customTreeAggregationFinalizerFn: function( aggregation ) {
+		// 			aggregation.rendered = aggregation.value;
+		// 		}
+		// 		}
+		// 	],
+		// 	onRegisterApi: function( gridApi ) {
+		// 		$scope.gridApi = gridApi;
+		// 	}
+		// };
 	}

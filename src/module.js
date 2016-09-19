@@ -2,6 +2,7 @@
     'use strict';
     angular.module('sync.components', [
         'sync.components.accordionMenu',
-        'sync.components.jsPlumb'
+        'sync.components.jsPlumb',
+        'sync.components.chartkit'
     ]);
 })();

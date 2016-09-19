@@ -5,9 +5,11 @@
 
     angular.module = function() {
         var module = origModule.apply(angular, arguments);
+
         module.chart = function(name, factory) {
             return module.directive(name + 'Chart', wrapChart(name + 'Chart', factory));
         };
+
         return module;
     };
 
@@ -210,6 +212,6 @@
         }];
     }
 
-    angular.module('chartkit', []).constant('Highcharts', Highcharts);
+    angular.module('sync.components.chartkit', []).constant('Highcharts', Highcharts);
 
 })(window.angular, window.Highcharts);
