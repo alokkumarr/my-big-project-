@@ -29,7 +29,7 @@ angular.module('myApp', ['ngMaterial', 'sync.components'])
 				{ name: 'charts', url: 'examples/charts.html'}
 			];
 
-		$scope.template = $scope.templates[7];
+		$scope.template = $scope.templates[9];
 
 
 		$scope.menu = menu;
