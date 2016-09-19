@@ -21,7 +21,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-karma');
+	//grunt.loadNpmTasks('grunt-karma');
 
 	/**
 	Function that wraps everything to allow dynamically setting/changing grunt options and config later by grunt task. This init function is called once immediately (for using the default grunt options, config, and setup) and then may be called again AFTER updating grunt (command line) options.
@@ -35,9 +35,9 @@ module.exports = function(grunt) {
 		*/
 		grunt.initConfig({
 			concat: {
-				devCss: {
-					src:    [],
-					dest:   []
+				devJs: {
+					src:    ['src/components/*.js','src/module.js'],
+					dest:   'dist/lib.js'
 				}
 			},
 			jshint: {
@@ -61,7 +61,7 @@ module.exports = function(grunt) {
 				beforeconcat:   {
 					options: {
 						force:	false,
-						ignores: ['**.min.js']
+						ignores: []
 					},
 					files: {
 						src: []
@@ -71,10 +71,10 @@ module.exports = function(grunt) {
 				beforeconcatQ:   {
 					options: {
 						force:	true,
-						ignores: ['**.min.js']
+						ignores: []
 					},
 					files: {
-						src: ['**.js']
+						src: []
 					}
 				}
 			},
@@ -84,8 +84,8 @@ module.exports = function(grunt) {
 				},
 				build: {
 					files:  {},
-					src:    'module.js',
-					dest:   'module.min.js'
+					src:    ['dist/lib.js'],
+					dest:   'dist/lib.min.js'
 				}
 			},
 			less: {
@@ -102,14 +102,14 @@ module.exports = function(grunt) {
 					src: ['css/theme.css'],
 					dest: 'css/theme.min.css'
 				}
-			}/*,
-			karma: {
-				unit: {
-					configFile: publicPathRelativeRoot+'config/karma.conf.js',
-					singleRun: true,
-					browsers: ['PhantomJS']
-				}
-			}*/
+			}
+			// karma: {
+			// 	unit: {
+			// 		//configFile: publicPathRelativeRoot+'config/karma.conf.js',
+			// 		singleRun: true,
+			// 		browsers: ['PhantomJS']
+			// 	}
+			// }
 		});
 		
 		
@@ -118,8 +118,8 @@ module.exports = function(grunt) {
 		@toc 6.
 		*/
 		// Default task(s).
-		// grunt.registerTask('default', ['jshint:beforeconcat', 'less:development', 'concat:devJs', 'concat:devCss']);
-		grunt.registerTask('default', ['jshint:beforeconcatQ', 'less:development', 'cssmin', 'uglify:build']);
+		//grunt.registerTask('default', ['jshint:beforeconcat', 'less:development', 'concat:devJs', 'concat:devCss']);
+		grunt.registerTask('default', ['jshint:beforeconcatQ', 'less:development', 'cssmin', 'concat:devJs', 'uglify:build']);
 	
 	}
 	init({});		//initialize here for defaults (init may be called again later within a task)

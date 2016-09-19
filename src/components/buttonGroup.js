@@ -1,11 +1,4 @@
-/**
- * @ngdoc module
- * @name sync.components.buttonGroup
- * @description radioButton module!
- */
-angular.module('sync.components.buttonGroup', [
-        'material.core'
-    ])
+angular.module('sync.components', ['material.core'])
     .directive('mdButtonGroup', mdButtonGroupDirective);
 
 function mdButtonGroupDirective($mdUtil, $mdConstant, $mdTheming, $timeout) {

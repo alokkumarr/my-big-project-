@@ -1,6 +1,5 @@
-angular.module('sync.components.rangeSlider', [
-    'material.core'
-]).directive('rangeSlider', function () {
+angular.module('sync.components', [])
+    .directive('rangeSlider', function () {
 
     function RangeSliderController($scope) {
         if(!$scope.step){

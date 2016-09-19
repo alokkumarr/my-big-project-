@@ -30,7 +30,6 @@ angular.module('sync.components.jsPlumb', [])
             transclude: true,
             template: '<div ng-transclude></div>',
             link: function(scope, element, attr){
-
                 var instance = jsPlumb.getInstance();
                 scope.jsPlumbInstance = instance;
 
@@ -39,23 +38,28 @@ angular.module('sync.components.jsPlumb', [])
     //               console.log("connectionDrag", connection, originalEvent);
     //           });
     //
-    //           instance.bind("connectionMoved", function(params) {
-    //               console.log("connection " + params.connection.id + " was moved");
-    //           });
+              instance.bind("beforeDrop", function(info) {
+                  var target = angular.element(info.connection.target).scope().table;
+                  var source = angular.element(info.connection.source).scope().table;
+
+                  return source.uuid !== target.uuid
+              });
+
 
                 instance.bind("connection", function(info, origEvent) {
-                    if(typeof origEvent !== 'undefined' && origEvent.type == 'drop'){
-                        console.log("[connection] event in jsPlumbCanvas Directive [DRAG & DROP]", info, origEvent);
+                    if(typeof origEvent !== 'undefined' && origEvent.type == 'mouseup'){
+                        var target = angular.element(info.target).scope().endpoint;
+                        var source = angular.element(info.source).scope().endpoint;
 
-                        var targetUUID = $(info.target).attr('uuid');
-                        var sourceUUID = $(info.source).attr('uuid');
+                        target.connections.push({
+                            "uuid": source.uuid
+                        });
 
-                        scope.onConnection(instance, info.connection, targetUUID, sourceUUID);
+                        scope.apply();
 
-                        instance.detach(info.connection);
+                        //scope.onConnection(instance, info.connection, target, source);
                     }
                 });
-
 
                 $(element).css({
                     minWidth: '500px',
@@ -107,17 +111,29 @@ angular.module('sync.components.jsPlumb', [])
         return def;
     })
 
-    .directive('jsPlumbObject', function() {
+    .directive('jsPlumbObject', function($timeout) {
         var def = {
             restrict : 'E',
             require: '^jsPlumbCanvas',
             scope: {
                 stateObject: '=stateObject'
             },
+            controller: function ($scope) {
+                $scope.newEndpoint = function(anchor) {
+                    return {
+                        uuid: Date.now(),
+                        "anchor": anchor,
+                        "connections": []
+                    }
+                };
+            },
             transclude : true,
             template: '<div ng-transclude></div>',
             link : function(scope, element, attrs, jsPlumbCanvas) {
                 var instance = jsPlumbCanvas.scope.jsPlumbInstance;
+                var timer;
+                var addEndpoints;
+                var itemListXMiddle = element[0].offsetWidth / 2;
 
                 console.log('constructing object');
 
@@ -127,7 +143,6 @@ angular.module('sync.components.jsPlumb', [])
                 });
 
                 instance.draggable(element, {
-
                     drag: function (event) {
                         scope.stateObject.x = event.pos[0];
                         scope.stateObject.y = event.pos[1];
@@ -135,9 +150,31 @@ angular.module('sync.components.jsPlumb', [])
                     }
                 });
 
+                $(element).delegate( "md-list-item", "mousedown", function(event) {
+                    var element = angular.element(this);
+                    var scope = element.scope();
+                    var field = scope.field;
+
+                    timer = $timeout(function () {
+                        var anchor;
+
+                        anchor = itemListXMiddle > event.offsetX ? 'LeftMiddle' : 'RightMiddle';
+
+                        addEndpoints(field, anchor);
+                    }, 1000);
+                });
+
+                $(element).delegate( "md-list-item", "mouseup", function () {
+                    $timeout.cancel(timer);
+                });
+
                 scope.$on('$destroy', function(){
 
                 });
+
+                addEndpoints = function (field, anchor) {
+                    field.sources.push(scope.newEndpoint(anchor));
+                }
             }
         };
         return def;

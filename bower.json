@@ -17,7 +17,12 @@
   "dependencies": {
     "angular-material": "^1.1.1",
     "jquery-ui": "^1.12.1",
-    "jsPlumb": "^2.1.7"
+    "jsPlumb": "^2.1.7",
+    "angular-ui-grid": "^3.2.7",
+    "highcharts": "^4.2.6"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "resolutions": {
+    "angular": "1.5.8"
+  }
 }
