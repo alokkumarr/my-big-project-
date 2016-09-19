@@ -212,6 +212,36 @@
         }];
     }
 
-    angular.module('sync.components.chartkit', []).constant('Highcharts', Highcharts);
+    angular.module('sync.components.chartkit', [])
+        .constant('Highcharts', Highcharts)
+        .config(['Highcharts', function(Highcharts) {
+            Highcharts.setOptions({
+                colors: ['#490094', '#9A72C4', '#C8B2DF', '#006ADE', '#6AB4FF',
+                    '#B5DAFF', '#014752', '#009293', '#73C3C4', '#4CEA7C', '#9DF4B7', '#C9F9D8',
+                    '#DD5400', '#EDA173', '#F5CDB4', '#940000', '#C47373', '#DFB2B2'],
+                plotOptions: {
+                    series: {
+                        marker: {
+                            fillColor: '#FFFFFF',
+                            lineWidth: 2,
+                            lineColor: null // inherit from series
+                        }
+                    }
+                },
+                legend: {
+                    align: 'left',
+                    verticalAlign: 'top',
+                    layout: 'vertical',
+                    x: 0,
+                    y: 100
+                },
+                tooltip: {
+                    backgroundColor: '',
+                    borderWidth: 0
+                },
+                title: false,
+                credits: false
+            })
+        }]);
 
 })(window.angular, window.Highcharts);
