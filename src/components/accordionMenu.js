@@ -1,6 +1,4 @@
-angular.module('sync.components.accordionMenu', [
-        'material.core'
-    ])
+angular.module('sync.components.accordionMenu')
 .factory('menu', [
     '$location',
     '$rootScope',

@@ -1,4 +1,4 @@
-angular.module('sync.components', [])
+angular.module('sync.components')
 .directive('badge', function(){
     return {
         scope: { label: '@'},

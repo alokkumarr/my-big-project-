@@ -1,4 +1,4 @@
-angular.module('sync.components.jsPlumb', [])
+angular.module('sync.components.jsPlumb')
 
     .directive('jsPlumbCanvas', function(){
 

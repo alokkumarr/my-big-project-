@@ -1,4 +1,4 @@
-angular.module('sync.components', [])
+angular.module('sync.components')
     .directive('rangeSlider', function () {
 
     function RangeSliderController($scope) {

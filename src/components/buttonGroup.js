@@ -1,4 +1,4 @@
-angular.module('sync.components', ['material.core'])
+angular.module('sync.components')
     .directive('mdButtonGroup', mdButtonGroupDirective);
 
 function mdButtonGroupDirective($mdUtil, $mdConstant, $mdTheming, $timeout) {

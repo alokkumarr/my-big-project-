@@ -36,7 +36,7 @@ module.exports = function(grunt) {
 		grunt.initConfig({
 			concat: {
 				devJs: {
-					src:    ['src/components/*.js','src/module.js'],
+					src:    ['src/module.js', 'src/components/*.js'],
 					dest:   'dist/lib.js'
 				}
 			},

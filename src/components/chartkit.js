@@ -212,7 +212,7 @@
         }];
     }
 
-    angular.module('sync.components.chartkit', [])
+    angular.module('sync.components.chartkit')
         .constant('Highcharts', Highcharts)
         .config(['Highcharts', function(Highcharts) {
             Highcharts.setOptions({
