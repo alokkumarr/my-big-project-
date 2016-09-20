@@ -27,7 +27,8 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 				{ name: 'table cards', url: 'examples/table-cards.html'},
 				{ name: 'pivot grid', url: 'examples/pivotgrid.html'},
 				{ name: 'grid', url: 'examples/grid.html'},
-				{ name: 'charts', url: 'examples/charts.html'}
+				{ name: 'charts', url: 'examples/charts.html'},
+				{ name: 'snapshotkpi', url: 'examples/snapshotkpi.html'}
 			];
 
 		$scope.template = $scope.templates[9];
@@ -192,6 +193,46 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 				name: 'Joe',
 				data: [3, 4, 4, -2, 5]
 			}]
+		};
+	})
+	.chart('bar', function() {
+		return {
+			tooltip: {
+				enabled: false
+			},
+			chart: {
+				type: 'column',
+				spacingBottom: 2,
+				spacingTop: 2,
+				spacingLeft: 2,
+				spacingRight: 2,
+				width: null,
+				height: null
+			},
+			legend: {
+				enabled: false
+			},
+			xAxis: {
+				labels: {
+					enabled: false
+				},
+				minorTickLength: 0,
+				tickLength: 0,
+				lineWidth: 0,
+				minorGridLineWidth: 0,
+				lineColor: 'transparent'
+			},
+			yAxis: {
+				labels: {
+					enabled: false
+				},
+				endOnTick:false,
+				gridLineWidth: 0,
+				minorGridLineWidth: 0,
+				minorTickLength: 0,
+				tickLength: 0,
+				lineWidth: 0
+			}
 		};
 	});
 
