@@ -171,6 +171,7 @@ angular.module('myApp', ['ngMaterial', 'sync.components'])
 	.controller('ControlsCtrl', ControlsCtrl)
 	.controller('DialogController', DialogController)
 	.controller('TableCardsCtrl', TableCardsCtrl)
+	.controller('PivotGridCtrl', PivotGridCtrl)
 	.chart('simple', function() {
 		return {
 			chart: {
@@ -594,39 +595,20 @@ angular.module('myApp', ['ngMaterial', 'sync.components'])
 	}
 
 	function PivotGridCtrl($scope) {
-		// this.gridOptions = {
-		// 	enableFiltering: true,
-		// 	treeRowHeaderAlwaysVisible: false,
-		// 	columnDefs: [
-		// 		{ name: 'name', width: '30%' },
-		// 		{ name: 'gender',
-		// 			grouping: {
-		// 				groupPriority: 1
-		// 			},
-		// 			sort: {
-		// 				priority: 1, direction: 'asc'
-		// 			}, width: '20%',
-		// 			cellFilter: 'mapGender'
-		// 		},
-		// 		{ name: 'age', treeAggregationType: uiGridGroupingConstants.aggregation.MAX, width: '20%' },
-		// 		{ name: 'company', width: '25%' },
-		// 		{ name: 'registered', width: '40%', cellFilter: 'date', type: 'date' },
-		// 		{
-		// 			name: 'state',
-		// 			grouping: { groupPriority: 0 },
-		// 			sort: { priority: 0, direction: 'desc' },
-		// 			width: '35%',
-		// 			cellTemplate: '<div><div ng-if="!col.grouping || col.grouping.groupPriority === undefined || col.grouping.groupPriority === null || ( row.groupHeader && col.grouping.groupPriority === row.treeLevel )" class="ui-grid-cell-contents" title="TOOLTIP">{{COL_FIELD CUSTOM_FILTERS}}</div></div>' },
-		// 		{ name: 'balance',
-		// 			width: '25%',
-		// 			cellFilter: 'currency',
-		// 			treeAggregationType: uiGridGroupingConstants.aggregation.AVG, customTreeAggregationFinalizerFn: function( aggregation ) {
-		// 			aggregation.rendered = aggregation.value;
-		// 		}
-		// 		}
-		// 	],
-		// 	onRegisterApi: function( gridApi ) {
-		// 		$scope.gridApi = gridApi;
-		// 	}
-		// };
+		this.gridOptions = {
+			input: [
+				{product: "starburst", manufacturer: "Wrigley", shipper: 'Motion INC', region: 'North East', sum: 1000},
+				{product: "starburst", manufacturer: "Mars", shipper: 'Motion INC', region: 'North East', sum: 500},
+				{product: "starburst", manufacturer: "Mars", shipper: 'Motion INC', region: 'South East', sum: 300},
+				{product: "starburst", manufacturer: "Wrigley", shipper: 'GRANGER', region: 'Mid West', sum: 400},
+				{product: "starburst", manufacturer: "Wrigley", shipper: 'GRANGER', region: 'West', sum: 4000},
+				{product: "starburst", manufacturer: "Wrigley", shipper: 'GRANGER', region: 'North', sum: 4050}
+			],
+			options: {
+				rows: ["shipper", "region"],
+				cols: ["product", "manufacturer"],
+				vals: ["sum"],
+				aggregator: $.pivotUtilities.aggregators.Sum(["sum"])
+			}
+		};
 	}
