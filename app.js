@@ -1,6 +1,6 @@
 
 
-angular.module('myApp', ['ngMaterial', 'sync.components'])
+angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 	.config(function ($mdThemingProvider) {
 		$mdThemingProvider.theme('triton')
 			.primaryPalette('blue', {
@@ -26,6 +26,7 @@ angular.module('myApp', ['ngMaterial', 'sync.components'])
 				{ name: 'toolbars', url: 'examples/toolbars.html'},
 				{ name: 'table cards', url: 'examples/table-cards.html'},
 				{ name: 'pivot grid', url: 'examples/pivotgrid.html'},
+				{ name: 'grid', url: 'examples/grid.html'},
 				{ name: 'charts', url: 'examples/charts.html'}
 			];
 
@@ -172,6 +173,7 @@ angular.module('myApp', ['ngMaterial', 'sync.components'])
 	.controller('DialogController', DialogController)
 	.controller('TableCardsCtrl', TableCardsCtrl)
 	.controller('PivotGridCtrl', PivotGridCtrl)
+	.controller('GridCtrl', GridCtrl)
 	.chart('simple', function() {
 		return {
 			chart: {
@@ -611,4 +613,56 @@ angular.module('myApp', ['ngMaterial', 'sync.components'])
 				aggregator: $.pivotUtilities.aggregators.Sum(["sum"])
 			}
 		};
+	}
+
+	function GridCtrl(uiGridConstants) {
+		this.gridOptions1 = {
+			enableSorting: true,
+			columnDefs: [
+				{
+					field: 'name',
+					sort: {
+						direction: uiGridConstants.DESC,
+						priority: 1
+					}
+				},
+				{
+					field: 'gender',
+					sort: {
+						direction: uiGridConstants.ASC,
+						priority: 0
+					},
+					suppressRemoveSort: true
+				},
+				{ field: 'company', enableSorting: false  }
+			]
+		};
+
+		this.gridOptions1.data = [
+			{
+				"name": "Ethel Price",
+				"gender": "female",
+				"company": "Enersol"
+			},
+			{
+				"name": "Claudine Neal",
+				"gender": "female",
+				"company": "Sealoud"
+			},
+			{
+				"name": "Beryl Rice",
+				"gender": "female",
+				"company": "Velity"
+			},
+			{
+				"name": "Wilder Gonzales",
+				"gender": "male",
+				"company": "Geekko"
+			},
+			{
+				"name": "Georgina Schultz",
+				"gender": "female",
+				"company": "Suretech"
+			}
+		]
 	}
