@@ -206,13 +206,14 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 				spacingTop: 2,
 				spacingLeft: 2,
 				spacingRight: 2,
-				width: null,
-				height: null
+				width: 150,
+				height: 40
 			},
 			legend: {
 				enabled: false
 			},
 			xAxis: {
+				title: null,
 				labels: {
 					enabled: false
 				},
@@ -223,6 +224,7 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 				lineColor: 'transparent'
 			},
 			yAxis: {
+				title: null,
 				labels: {
 					enabled: false
 				},
@@ -232,7 +234,16 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 				minorTickLength: 0,
 				tickLength: 0,
 				lineWidth: 0
-			}
+			},
+			plotOptions: {
+				series: {
+					borderRadius: 4
+				}
+			},
+			series: [{
+				name: 'Jane',
+				data: [2, 2, 3, 7, 1]
+			}]
 		};
 	});
 
@@ -707,3 +718,4 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 			}
 		]
 	}
+

@@ -36,7 +36,11 @@ module.exports = function(grunt) {
 		grunt.initConfig({
 			concat: {
 				devJs: {
-					src:    ['src/module.js', 'src/components/*.js'],
+					src:    [
+						'src/module.js',
+						'src/components/*.js',
+						'src/highcharts.js'
+					],
 					dest:   'dist/lib.js'
 				}
 			},
