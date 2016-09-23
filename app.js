@@ -674,15 +674,13 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 				{
 					field: 'name',
 					sort: {
-						direction: uiGridConstants.DESC,
-						priority: 1
+						direction: uiGridConstants.DESC
 					}
 				},
 				{
 					field: 'gender',
 					sort: {
-						direction: uiGridConstants.ASC,
-						priority: 0
+						direction: uiGridConstants.ASC
 					},
 					suppressRemoveSort: true
 				},
