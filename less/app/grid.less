@@ -4,10 +4,15 @@
     color: #575757;
     font-size: 14px;
 
+
     .ui-grid-cell-contents {
-      padding: 0 5px;
+      padding: 0 0 0 5px;
       line-height: 36px;
     }
+  }
+
+  .ui-grid-header-cell,  .ui-grid-cell{
+    padding-right: @grid-cell-padding-right;
   }
 
   .ui-grid-column-menu-button .ui-grid-icon-angle-down {
@@ -17,5 +22,23 @@
 
   [class^="ui-grid-icon"]:before, [class*=" ui-grid-icon"]:before {
     margin-right: 0;
+  }
+
+  .ui-grid-row:nth-child(even) .ui-grid-cell {
+    background-color: #f7f9fc;
+  }
+
+  .ui-grid-top-panel {
+    background: #F3F5F8;
+  }
+
+  [role="columnheader"], .ui-grid-header-cell .sortable {
+    display: inline-flex;
+    width: 100%;
+
+    > .ui-grid-column-menu-button {
+      position: initial;
+      width: 35px;
+    }
   }
 }

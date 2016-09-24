@@ -5,11 +5,13 @@
         'material.core',
         'sync.components.accordionMenu',
         'sync.components.jsPlumb',
-        'sync.components.chartkit'
+        'sync.components.chartkit',
+        'sync.components.charts'
     ]);
 
     angular.module('sync.components.jsPlumb', []);
     angular.module('sync.components.accordionMenu', []);
     angular.module('sync.components.chartkit', []);
+    angular.module('sync.components.charts', ['sync.components.chartkit']);
 
 })();

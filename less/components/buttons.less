@@ -43,7 +43,6 @@
     color: rgba(89, 101, 116, 0.7);
     background-color: transparent;
     text-transform: none;
-    min-width:100px;
     margin: 0;
     padding: 0 8px;
     border-radius: 0;
@@ -69,6 +68,10 @@
       color: rgba(44, 65, 164, 0.96);
       transition: 0.3s;
     }
+  }
+
+  > .md-button:not(.md-icon-button) {
+    min-width:100px;
   }
 
   .md-active {

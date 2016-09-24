@@ -20,3 +20,22 @@ md-select-menu.@{theme-cls} {
   font-size: 14px !important;
   line-height: 18px;
 }
+
+.normal {
+  md-select.md-triton-theme .md-select-value {
+    background-color: #FFFFFF;
+    border-radius: 100px;
+    border: 1px solid #D9DFE9;
+    color: #6D7D94;
+    font-size: 14px;
+  }
+
+  .md-select-value, .md-select-value.md-select-placeholder {
+    margin: 8px 8px 0 0;
+    padding: 0 12px 0 12px;
+  }
+
+  md-select.md-triton-theme:not([disabled]):focus .md-select-value {
+    border-color: rgb(25,118,210);
+  }
+}

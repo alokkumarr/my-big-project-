@@ -227,13 +227,22 @@
                             lineWidth: 2,
                             lineColor: null // inherit from series
                         }
+                    },
+                    bar: {
+                        showCheckbox: true,
+                        dataLabels: {
+                            enabled: true,
+                            color: '#A4A9AD',
+                            style: {
+                                textShadow: 'none'
+                            }
+                        }
                     }
                 },
                 legend: {
                     align: 'left',
                     verticalAlign: 'top',
                     layout: 'vertical',
-                    x: 0,
                     y: 100
                 },
                 tooltip: {

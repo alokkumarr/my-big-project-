@@ -175,77 +175,7 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 	.controller('TableCardsCtrl', TableCardsCtrl)
 	.controller('PivotGridCtrl', PivotGridCtrl)
 	.controller('GridCtrl', GridCtrl)
-	.chart('simple', function() {
-		return {
-			chart: {
-				type: 'area'
-			},
-			xAxis: {
-				categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
-			},
-			series: [{
-				name: 'John',
-				data: [5, 3, 4, 7, 2]
-			}, {
-				name: 'Jane',
-				data: [2, -2, -3, 2, 1]
-			}, {
-				name: 'Joe',
-				data: [3, 4, 4, -2, 5]
-			}]
-		};
-	})
-	.chart('bar', function() {
-		return {
-			tooltip: {
-				enabled: false
-			},
-			chart: {
-				type: 'column',
-				spacingBottom: 2,
-				spacingTop: 2,
-				spacingLeft: 2,
-				spacingRight: 2,
-				width: 150,
-				height: 40
-			},
-			legend: {
-				enabled: false
-			},
-			xAxis: {
-				title: null,
-				labels: {
-					enabled: false
-				},
-				minorTickLength: 0,
-				tickLength: 0,
-				lineWidth: 0,
-				minorGridLineWidth: 0,
-				lineColor: 'transparent'
-			},
-			yAxis: {
-				title: null,
-				labels: {
-					enabled: false
-				},
-				endOnTick:false,
-				gridLineWidth: 0,
-				minorGridLineWidth: 0,
-				minorTickLength: 0,
-				tickLength: 0,
-				lineWidth: 0
-			},
-			plotOptions: {
-				series: {
-					borderRadius: 4
-				}
-			},
-			series: [{
-				name: 'Jane',
-				data: [2, 2, 3, 7, 1]
-			}]
-		};
-	});
+	.controller('ChartsCtrl', ChartsCtrl);
 
 
 	// ---- AlertsCtrl ---------------
@@ -673,6 +603,7 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 			columnDefs: [
 				{
 					field: 'name',
+                    displayName: 'long name long long long name long long',
 					sort: {
 						direction: uiGridConstants.DESC
 					}
@@ -690,7 +621,7 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 
 		this.gridOptions1.data = [
 			{
-				"name": "Ethel Price",
+				"name": "Ethel Price long long long long long ong long long long long",
 				"gender": "female",
 				"company": "Enersol"
 			},
@@ -716,4 +647,42 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 			}
 		]
 	}
+
+    function ChartsCtrl($scope, $interval, $timeout) {
+        var data = generateData(),
+            interval;
+
+        $scope.loadData = function() {
+            $scope.data = data;
+        };
+
+        $timeout(function () {
+            $scope.data = data;
+        }, 1000);
+
+        $scope.toggleRefresh = function() {
+            if (interval) {
+                $interval.cancel(interval);
+                interval = null;
+            } else {
+                interval = $interval(function() {
+                    $scope.data = generateData();
+                }, 1000);
+            }
+        };
+
+        function generateData() {
+            var series = ['John', 'Jane', 'Joe'],
+                dataPoints = 4, min = 0, max = 8,
+                result = {};
+            series.forEach(function(name) {
+                var data = [];
+                for (var i = 0; i < dataPoints; i++) {
+                    data.push(min + Math.floor(Math.random() * max));
+                }
+                result[name] = data;
+            });
+            return result;
+        }
+    }
 

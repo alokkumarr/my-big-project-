@@ -1,7 +1,7 @@
 // column-background-fill
 // ============
 //
-// Highcharts plugin for creating background fill in column charts
+// Highcharts plugin for creating background fills in column charts
 
 
 (function (H) {
@@ -11,11 +11,13 @@
 
         proceed.call(this);
 
-        H.each(this.points, function (point) {
-            var shapeArgs = point.shapeArgs;
+        if (this.options.enableFullBackgroundColor) {
+            H.each(this.points, function (point) {
+                var shapeArgs = point.shapeArgs;
 
-            point.shapeBackground = series.crispCol(shapeArgs.x, 0, shapeArgs.width, yAxisHeight);
-        });
+                point.shapeBackground = series.crispCol(shapeArgs.x, 0, shapeArgs.width, yAxisHeight);
+            });
+        }
     });
 
     H.wrap(H.seriesTypes.column.prototype, 'drawPoints', function (proceed) {
@@ -28,39 +30,43 @@
             pointAttr;
 
         // draw the columns
-        H.each(series.points, function (point) {
-            var plotY = point.plotY,
-                graphic = point.shapeBackgroundGraphic,
-                borderAttr;
 
-            if (H.isNumber(plotY) && point.y !== null) {
-                shapeArgs = point.shapeBackground;
+        if (this.options.enableFullBackgroundColor) {
 
-                borderAttr = series.borderWidth !== undefined ? {
-                    'stroke-width': series.borderWidth
-                } : {};
+            H.each(series.points, function (point) {
+                var plotY = point.plotY,
+                    graphic = point.shapeBackgroundGraphic,
+                    borderAttr;
 
-                pointAttr = point.pointAttr[point.selected ? 'select' : ''] || series.pointAttr[''];
+                if (H.isNumber(plotY) && point.y !== null) {
+                    shapeArgs = point.shapeBackground;
 
-                if (graphic) { // update
-                    stop(graphic);
-                    graphic.attr(borderAttr).attr(pointAttr)[chart.pointCount < animationLimit ? 'animate' : 'attr'](merge(shapeArgs)); // #4267
+                    borderAttr = series.borderWidth !== undefined ? {
+                        'stroke-width': series.borderWidth
+                    } : {};
 
-                } else {
-                    point.shapeBackgroundGraphic = renderer['rect'](shapeArgs)
-                        .attr(borderAttr)
-                        .attr({
-                            fill: '#f1f1f1',
-                            r: pointAttr.r
-                        })
-                        .add(point.group || series.group)
-                        .shadow(options.shadow, null, options.stacking && !options.borderRadius);
+                    pointAttr = point.pointAttr[point.selected ? 'select' : ''] || series.pointAttr[''];
+
+                    if (graphic) { // update
+                        stop(graphic);
+                        graphic.attr(borderAttr).attr(pointAttr)[chart.pointCount < animationLimit ? 'animate' : 'attr'](merge(shapeArgs)); // #4267
+
+                    } else {
+                        point.shapeBackgroundGraphic = renderer['rect'](shapeArgs)
+                            .attr(borderAttr)
+                            .attr({
+                                fill: '#f1f1f1',
+                                r: pointAttr.r
+                            })
+                            .add(point.group || series.group)
+                            .shadow(options.shadow, null, options.stacking && !options.borderRadius);
+                    }
+
+                } else if (graphic) {
+                    point.shapeBackgroundGraphic = graphic.destroy(); // #1269
                 }
-
-            } else if (graphic) {
-                point.shapeBackgroundGraphic = graphic.destroy(); // #1269
-            }
-        });
+            });
+        }
 
         proceed.call(this);
     });
