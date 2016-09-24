@@ -1,18 +1,15 @@
 .ui-grid {
   .ui-grid-cell {
-    height: 36px !important;
     color: #575757;
     font-size: 14px;
 
-
     .ui-grid-cell-contents {
-      padding: 0 0 0 5px;
-      line-height: 36px;
+      line-height: @ui-grid-row-height - 2*@ui-grid-cell-content-padding;
     }
   }
 
   .ui-grid-header-cell,  .ui-grid-cell{
-    padding-right: @grid-cell-padding-right;
+    padding-right: @ui-grid-cell-padding-right;
   }
 
   .ui-grid-column-menu-button .ui-grid-icon-angle-down {
@@ -38,7 +35,7 @@
 
     > .ui-grid-column-menu-button {
       position: initial;
-      width: 35px;
+      min-width: 35px;
     }
   }
 }

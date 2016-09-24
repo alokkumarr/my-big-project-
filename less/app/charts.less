@@ -10,11 +10,23 @@
 
 md-card.chart-card {
   md-card-header {
-    align-items: baseline;
+    align-items: center;
+
+    md-input-container {
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  .header-title {
+    flex: 1;
+    text-align: center;
+    font-weight: bold;
   }
 
   md-card-footer {
     border-top-color: #D8D8D8;
+    background-color: #F6F8FB;
   }
 
   .divider-vertical {
@@ -25,4 +37,6 @@ md-card.chart-card {
     border-left-color: rgba(0,0,0,0.12);
     height: 50px;
   }
+
+  .highcharts-container{width:100% !important; height:100% !important;}
 }

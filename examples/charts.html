@@ -1,7 +1,5 @@
-<div ng-controller="ChartsCtrl" style="margin: 5px;">
-    <!--<bar-chart style="margin: 5"></bar-chart>-->
-
-    <md-card class="chart-card" style="width: 700px; height: 600px">
+<div ng-controller="ChartsCtrl" style="margin: 5px;" ng-init="showChart = true">
+    <md-card class="chart-card" style="width: 700px;">
         <md-card-header>
             <md-input-container class="normal">
                 <md-select ng-model="armor" placeholder="Products">
@@ -11,28 +9,34 @@
                     <md-option value="plate">Plate</md-option>
                 </md-select>
             </md-input-container>
-            <span>My Chart Card Title</span>
+            <span class="header-title">My Chart Card Title</span>
             <md-button-group class="button-group" layout="row" layout-align="center center">
-                <md-button class="md-icon-button">
-                    <md-icon md-font-icon="icon-search"></md-icon>
+                <md-button class="md-icon-button" ng-click="showChart = true">
+                    <md-icon md-font-icon="icon-chart"></md-icon>
                 </md-button>
-                <md-button class="md-icon-button">
-                    <md-icon md-font-icon="icon-search"></md-icon>
+                <md-button class="md-icon-button" ng-click="showChart = false">
+                    <md-icon md-font-icon="icon-report"></md-icon>
                 </md-button>
             </md-button-group>
 
-            <md-button class="md-icon-button" aria-label="Favorite">
-                <md-icon md-font-icon="icon-bell-list"></md-icon>
+            <md-button style="margin-left: 24px" class="md-icon-button" aria-label="Favorite">
+                <md-icon md-font-icon="icon-print"></md-icon>
             </md-button>
 
             <md-button class="md-icon-button" aria-label="Favorite">
-                <md-icon md-font-icon="icon-bell-list"></md-icon>
+                <md-icon md-font-icon="icon-download"></md-icon>
             </md-button>
 
         </md-card-header>
 
         <md-card-content>
-            <line-chart data="data" style="height: 300px;"></line-chart>
+            <line-chart
+                    data="data"
+                    ng-if="showChart"
+                    style="width: 100%;height: 100%; display: inline-block;"></line-chart>
+
+            <div ng-if="!showChart" ui-grid="gridOptions"></div>
+
         </md-card-content>
 
         <md-card-footer layout="row" layout-align="space-around center">
@@ -79,5 +83,7 @@
             </md-input-container>
         </md-card-footer>
     </md-card>
+
+    <bar-chart style="margin: 5"></bar-chart>
 
 </div>

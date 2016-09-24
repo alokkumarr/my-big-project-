@@ -599,6 +599,7 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 
 	function GridCtrl(uiGridConstants) {
 		this.gridOptions1 = {
+            rowHeight:36,
 			enableSorting: true,
 			columnDefs: [
 				{
@@ -675,6 +676,7 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
             var series = ['John', 'Jane', 'Joe'],
                 dataPoints = 4, min = 0, max = 8,
                 result = {};
+
             series.forEach(function(name) {
                 var data = [];
                 for (var i = 0; i < dataPoints; i++) {
@@ -682,7 +684,41 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
                 }
                 result[name] = data;
             });
+
             return result;
         }
+
+        $scope.gridOptions = {
+            rowHeight:36,
+            data: [{
+                    name: 'John',
+                    values: data['John'].reduce(function(previousValue, currentValue) {
+                        return previousValue + currentValue;
+                    })
+                },
+                {
+                    name: 'Jane',
+                    values: data['Jane'].reduce(function(previousValue, currentValue) {
+                        return previousValue + currentValue;
+                    })
+                },
+                {
+                    name: 'Joe',
+                    values: data['Joe'].reduce(function(previousValue, currentValue) {
+                        return previousValue + currentValue;
+                    })
+                }
+            ],
+            enableSorting: false,
+            columnDefs: [
+                {
+                    field: 'name'
+                },
+                {
+                    displayName: 'fruits count',
+                    field: 'values'
+                }
+            ]
+        };
     }
 

@@ -19,6 +19,8 @@ function mdButtonGroupDirective($mdUtil, $mdConstant, $mdTheming, $timeout) {
         scope.mouseActive = false;
         scope.activeElement = null;
 
+        rgCtrl.selectNext();
+
         element
             .attr({
                 'role': 'group',
