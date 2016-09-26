@@ -63,13 +63,17 @@
     <h2 class="md-title">Filter tags as chips (with custom template).</h2>
     <p>Note: the variables <code>$chip</code> and <code>$index</code> are available in custom chip templates.</p>
 
-    <md-chips class="filter-tags" ng-model="ctrl.vegObjs" readonly="ctrl.readonly"
+    <md-chips class="filter-tags"
+              ng-model="ctrl.vegObjs"
+              readonly="ctrl.readonly"
+              placeholder="6 More Filters..."
               md-transform-chip="ctrl.newVeg($chip)" md-removable="ctrl.removable">
+
         <md-chip-template>
-        <span>
-          <strong>[{{$index}}] {{$chip.name}}</strong>
-          <em>({{$chip.type}})</em>
-        </span>
+            <span>
+              <strong>[{{$index}}] {{$chip.name}}</strong>
+              <em>({{$chip.type}})</em>
+            </span>
         </md-chip-template>
         <button md-chip-remove class="md-primary">
             <md-icon md-font-icon="icon-remove"></md-icon>
