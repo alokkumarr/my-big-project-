@@ -42,7 +42,7 @@ angular.module('sync.components.jsPlumb')
                   var target = angular.element(info.connection.target).scope().table;
                   var source = angular.element(info.connection.source).scope().table;
 
-                  return source.uuid !== target.uuid
+                  return source.name !== target.name;
               });
 
 
@@ -240,8 +240,6 @@ angular.module('sync.components.jsPlumb')
                 console.log('[directive][jsPlumbConnection] ', scope, attrs);
 
                 $timeout(function(){
-                    console.log(scope.ngModel.conn);
-
                     if(typeof jsPlumbEndpoint.connectionObjects[targetUUID] === 'undefined'){
                         jsPlumbEndpoint.connectionObjects[targetUUID] = instance.connect({
                             uuids:[

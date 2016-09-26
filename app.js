@@ -411,15 +411,19 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 			//connector:[ "Flowchart", { stub:[30, 30], gap:20, cornerRadius:10, alwaysRespectStubs:true } ],
 			connector: ["Bezier", { curviness: 63 } ],
 			connectorStyle:{
-				lineWidth:4,
-				strokeStyle:"#61B7CF",
+				lineWidth:3,
+				strokeStyle:"#B0BFC8",
 				joinstyle:"round",
 				outlineColor:"white",
 				outlineWidth:2
 			},
+            endpointStyle: {
+                lineWidth:3,
+                strokeStyle:"#B0BFC8"
+            },
 			connectorHoverStyle:{
-				fillStyle:"#216477",
-				strokeStyle:"#216477"
+				fillStyle:"#B0BFC8",
+				strokeStyle:"#B0BFC8"
 			},
 			dropOptions: {
 				tolerance: "touch",
