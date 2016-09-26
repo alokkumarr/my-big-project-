@@ -1,22 +1,52 @@
 .snapshot-card {
   .snapshot-card-title {
     flex: 1;
+    font-weight: bold;
+    font-size: 18px;
+    color: #575757;
   }
 
-  md-card-content, md-card-header {
+  md-card-content {
+    padding: 8px 16px 16px 16px;
+  }
+
+  md-card-header {
     padding: 16px;
   }
+
 
   md-card-content {
     align-items: flex-start;
     flex-direction: column;
   }
+
+  snapshot-bar-chart {
+    padding-right: 16px;
+  }
+
+  .snapshot-card-label {
+    font-size: 14px;
+    text-transform: uppercase;
+    color: #8496A0;
+    padding: 5px 0;
+  }
+
+  .snapshot-card-val {
+    font-size: 14px;
+    color: #575757;
+  }
+
+  .snapshot-card-range {
+    .snapshot-card-val {
+      margin-left: 10px;
+    }
+  }
 }
 
-.snapshot-card-value {
+.snapshot-card-big-value {
   font-size: 36px;
   line-height: 36px;
-  margin: 5px 0;
+  margin: 0 0 15px 0;
 }
 
 .alerts-card {

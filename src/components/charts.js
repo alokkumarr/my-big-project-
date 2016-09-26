@@ -101,6 +101,9 @@ angular.module('sync.components.charts')
             },
             plotOptions: {
                 series: {
+                    pointPadding: 0.1,
+                    pointWidth: 20,
+                    groupPadding: 0,
                     borderRadius: 4,
                     enableFullBackgroundColor: true
                 }

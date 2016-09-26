@@ -55,7 +55,7 @@
                         point.shapeBackgroundGraphic = renderer['rect'](shapeArgs)
                             .attr(borderAttr)
                             .attr({
-                                fill: '#f1f1f1',
+                                fill: options.barBgColor,
                                 r: pointAttr.r
                             })
                             .add(point.group || series.group)

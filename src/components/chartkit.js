@@ -221,6 +221,7 @@
                     '#DD5400', '#EDA173', '#F5CDB4', '#940000', '#C47373', '#DFB2B2'],
                 plotOptions: {
                     series: {
+                        barBgColor: '#f3f5f8',
                         showCheckbox: true,
                         marker: {
                             fillColor: '#FFFFFF',

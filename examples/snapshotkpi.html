@@ -1,11 +1,26 @@
-<md-card class="snapshot-card" style="width: 200px;">
+<md-card class="snapshot-card" style="width: 300px;">
     <md-card-header>
         <span class="snapshot-card-title">Orders</span>
         <span class="snapshot-card-title-info">20%</span>
     </md-card-header>
 
     <md-card-content>
-        <div class="snapshot-card-value">6,456,345</div>
-        <snapshot-bar-chart></snapshot-bar-chart>
+        <div class="snapshot-card-label">Today</div>
+        <div class="snapshot-card-big-value">6,456,345</div>
+        <div class="snapshot-card-label">Last 12 days</div>
+
+        <div layout="row">
+            <snapshot-bar-chart></snapshot-bar-chart>
+            <div class="snapshot-card-range">
+                <div layout-align="space-between center">
+                    <span class="snapshot-card-label">MIN</span>
+                    <span class="snapshot-card-val">1,987,340</span>
+                </div>
+                <div>
+                    <span class="snapshot-card-label">MAX</span>
+                    <span class="snapshot-card-val">8,987,340</span>
+                </div>
+            </div>
+        </div>
     </md-card-content>
 </md-card>
