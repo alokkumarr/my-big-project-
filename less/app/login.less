@@ -1,0 +1,75 @@
+.login-view {
+  background: #ffffff;
+  height:100%;
+  position: relative;
+
+  .login-background {
+    height: 100%;
+    width: 100%;
+    transform: rotateY(180deg);
+    background: #1A89D4;
+    background-image: url(../assets/alpha.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: absolute;
+    top: 0;
+    z-index: -1;
+    left: 30%;
+  }
+
+
+  .brand-logo {
+    width: 248px;
+    height: 102px;
+    margin: 10px 0;
+    zoom: 0.4;
+    background-image: url(../assets/att-logo_360.png);
+  }
+
+  .powered-logo {
+    width: 96px;
+    height: 31px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin: 0 30px 30px 0;
+    background-image: url(../assets/synchronoss_logo_360.png);
+  }
+
+  .brand-logo, .powered-logo {
+    background-repeat: no-repeat;
+  }
+
+  .login-container{
+    padding-top: 100px;
+    padding-left: 100px;
+  }
+
+  md-input-container, .login-buttons {
+    width: 250px;
+  }
+
+  .login-info {
+    font-size: 12px;
+    opacity: 0.5;
+    margin-bottom: 20px;
+  }
+
+  .login-buttons {
+    .md-button {
+      margin: 0;
+    }
+  }
+
+  h1 {
+    font-weight: normal;
+  }
+}
+
+@media screen and (min-width: 480px) {
+  .login-view {
+    .login-background {
+
+    }
+  }
+}

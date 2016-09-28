@@ -33,7 +33,8 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 
 		$scope.template = $scope.templates[9];
 
-
+		$scope.username = 'JNocturn';
+		$scope.password = 'SDFSDsdfsd';
 		$scope.menu = menu;
 		// Methods used by menuLink and menuToggle directives
 		this.isOpen = isOpen;

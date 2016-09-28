@@ -42,6 +42,21 @@ module.exports = function(grunt) {
 						'src/highcharts.js'
 					],
 					dest:   'dist/lib.js'
+				},
+				devJsLibs: {
+					src:    [
+						"bower_components/angular/angular.js",
+						"bower_components/angular-aria/angular-aria.js",
+						"bower_components/angular-animate/angular-animate.js",
+						"bower_components/angular-material/angular-material.js",
+						"bower_components/jsPlumb/dist/js/jsPlumb-2.1.7.js",
+						"bower_components/jquery/dist/jquery.min.js",
+						"bower_components/jquery-ui/jquery-ui.min.js",
+						"bower_components/highcharts/highcharts.src.js",
+						"bower_components/pivottable/dist/pivot.js",
+						"bower_components/angular-ui-grid/ui-grid.js"
+					],
+					dest:   'dist/libs.js'
 				}
 			},
 			jshint: {
@@ -123,7 +138,7 @@ module.exports = function(grunt) {
 		*/
 		// Default task(s).
 		//grunt.registerTask('default', ['jshint:beforeconcat', 'less:development', 'concat:devJs', 'concat:devCss']);
-		grunt.registerTask('default', ['jshint:beforeconcatQ', 'less:development', 'cssmin', 'concat:devJs', 'uglify:build']);
+		grunt.registerTask('default', ['jshint:beforeconcatQ', 'less:development', 'cssmin', 'concat:devJs', 'concat:devJsLibs' ,'uglify:build']);
 	
 	}
 	init({});		//initialize here for defaults (init may be called again later within a task)
