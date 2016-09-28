@@ -17,10 +17,6 @@
     border-radius: 3px;
   }
 
-  [class^="ui-grid-icon"]:before, [class*=" ui-grid-icon"]:before {
-    margin-right: 0;
-  }
-
   .ui-grid-row:nth-child(even) .ui-grid-cell {
     background-color: #f7f9fc;
   }
@@ -29,13 +25,18 @@
     background: #F3F5F8;
   }
 
-  [role="columnheader"], .ui-grid-header-cell .sortable {
-    display: inline-flex;
-    width: 100%;
-
-    > .ui-grid-column-menu-button {
-      position: initial;
-      min-width: 35px;
-    }
+  [class^="ui-grid-icon"]:before, [class*=" ui-grid-icon"]:before {
+    margin-right: 0;
   }
+
+  // Align the filter near header text
+  //[role="columnheader"], .ui-grid-header-cell .sortable {
+  //  display: inline-flex;
+  //  width: 100%;
+  //
+  //  > .ui-grid-column-menu-button {
+  //    position: initial;
+  //    min-width: 35px;
+  //  }
+  //}
 }
