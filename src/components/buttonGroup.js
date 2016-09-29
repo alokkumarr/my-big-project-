@@ -21,6 +21,17 @@ function mdButtonGroupDirective($mdUtil, $mdConstant, $mdTheming, $timeout) {
 
         rgCtrl.selectNext();
 
+        // IE doesn't support Element.matches
+        function matchesSelector(selector, element) {
+            var all = document.querySelectorAll(selector);
+            for (var i = 0; i < all.length; i++) {
+                if (all[i] === element) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         element
             .attr({
                 'role': 'group',
@@ -43,9 +54,10 @@ function mdButtonGroupDirective($mdUtil, $mdConstant, $mdTheming, $timeout) {
                 var el;
 
                 if (ev.target) {
-                    if (ev.target.matches(match)) {
+                    if (ev.target.matches ? ev.target.matches(match) : matchesSelector(match, ev.target)) {
                         el = ev.target;
-                    } else if (ev.target.parentElement.matches(match)) {
+                    } else if (ev.target.parentElement.matches ?
+                            ev.target.parentElement.matches(match) : matchesSelector(match, ev.target.parentElement)) {
                         el = ev.target.parentElement;
                     }
 

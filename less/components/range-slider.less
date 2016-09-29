@@ -106,13 +106,19 @@ md-slider.md-triton-theme.md-active .md-sign {
   width: initial;
 
   .md-thumb-text {
-    display: block;
+    display: table-cell;
   }
 }
 
-md-slider .md-sign .md-thumb-text {
-  font-size: 14px;
-  color: #FFFFFF;
+md-slider .md-sign {
+  display: table;
+
+  .md-thumb-text {
+    font-size: 14px;
+    color: #FFFFFF;
+    display: table-cell;
+    vertical-align: middle;
+  }
 }
 
 md-slider .md-sign:after {
