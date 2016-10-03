@@ -45,11 +45,23 @@
 
     </br>
 
-    <md-input-container md-no-float>
-        <label>Color</label>
-        <input type="text" ng-model="color" placeholder="placeholder">
-    </md-input-container>
-
+    <div layout-gt-xs="row">
+        <div flex-gt-xs>
+            <md-input-container>
+                <label>From</label>
+                <md-datepicker
+                        md-hide-icons="calendar"
+                        ng-model="fromDate"
+                        md-placeholder="mm/dd/yyyy"></md-datepicker>
+            </md-input-container>
+        </div>
+        <div flex-gt-xs>
+            <md-input-container md-no-float>
+                <label>Color</label>
+                <input type="text" ng-model="color" placeholder="placeholder">
+            </md-input-container>
+        </div>
+    </div>
 
     </br>
 
