@@ -12,34 +12,40 @@
     <script src="dist/lib.js"></script>
     <script src="app.js"></script>
 
-    <div layout="row" layout-align="center center">
-        <div class="login-container" layout="column" layout-align="space-around start">
-            <div class="brand-logo"></div>
+    <div layout="row" layout-align="center center" class="bg-container-wrapper">
+        <div class="bg-container" layout="row" layout-align="center center">
+            <div class="login-container" layout="column" layout-align="space-around start">
+                <div class="brand-logo"></div>
 
-            <h1>Login</h1>
+                <h1>Login</h1>
 
-            <div class="login-info">
-                <span>Use the login credentials given at time of sing up. If you don't</span>
-                </br>
-                <span>have an account yet contact your system administrator</span>
+                <div class="login-info">
+                    <span>Use the login credentials given at time of sing up. If you don't</span>
+                    </br>
+                    <span>have an account yet contact your system administrator</span>
+                </div>
+
+                <md-input-container>
+                    <label>Username</label>
+                    <input type="text" ng-model="username">
+                </md-input-container>
+                <md-input-container>
+                    <label>Password</label>
+                    <input type="password" ng-model="password">
+                </md-input-container>
+
+                <div class="login-buttons" layout="row" layout-align="space-between center">
+                    <md-button class="btn-primary" ng-click="ctrl.clickMe()">Login</md-button>
+                    <md-button class="md-primary" ng-href="/" target="_blank">Forgot Password?</md-button>
+                </div>
             </div>
-
-            <md-input-container>
-                <label>Username</label>
-                <input type="text" ng-model="username">
-            </md-input-container>
-            <md-input-container>
-                <label>Password</label>
-                <input type="password" ng-model="password">
-            </md-input-container>
-
-            <div class="login-buttons" layout="row" layout-align="space-between center">
-                <md-button class="btn-primary" ng-click="ctrl.clickMe()">Login</md-button>
-                <md-button class="md-primary" ng-href="/" target="_blank">Forgot Password?</md-button>
-            </div>
+            <div class="middle-logo-container"></div>
         </div>
+        <div class="white-container"></div>
     </div>
-    <div class="powered-logo"></div>
-    <img class="login-background" src="assets/synchronoss_login_RGB_color-white@3x.svg"></img>
+    <div class="powered-logo-container" layout="row" layout-align="center center">
+        <div class="powered-logo"></div>
+    </div>
+    <!--<img class="login-background" src="assets/synchronoss_login_RGB_color-white@3x.svg"></img>-->
 </body>
 </html>

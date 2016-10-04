@@ -26,20 +26,19 @@
   .powered-logo {
     width: 96px;
     height: 31px;
+    background-image: url(../assets/synchronoss_logo_360.png);
+  }
+
+  .powered-logo-container {
     position: absolute;
     bottom: 0;
-    left: 50%;
-    margin: 0 33px 30px 0;
-    background-image: url(../assets/synchronoss_logo_360.png);
+    left:0;
+    width: 100%;
+    margin: 0 0 30px 0;
   }
 
   .brand-logo, .powered-logo {
     background-repeat: no-repeat;
-  }
-
-  .login-container{
-    padding-top: 100px;
-    padding-left: 100px;
   }
 
   md-input-container, .login-buttons {
@@ -60,6 +59,44 @@
 
   h1 {
     font-weight: normal;
+  }
+
+  .middle-logo-container {
+    background: @login-middle-logo-color;
+    background-image: url(../assets/alpha.png);
+    background-repeat: no-repeat;
+    display: block;
+    transform: rotateY(180deg);
+    background-size: cover;
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+
+  .bg-container {
+    width: 900px;
+    height: 100%;
+    position: relative;
+  }
+
+  .bg-container-wrapper {
+    height: 100%;
+    background-color: transparent;
+    position: relative;
+  }
+
+  .white-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    z-index: -2;
   }
 }
 
