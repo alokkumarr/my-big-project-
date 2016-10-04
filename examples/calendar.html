@@ -1,0 +1,59 @@
+<div ng-controller="CalendarCtrl as ctrl" style="height: 100%;">
+
+    <md-toolbar class="app-toolbar">
+        <div class="md-toolbar-tools">
+            <span>SYMMETRA</span>
+            <span flex></span>
+            <md-button class="btn-link" aria-label="OBSERVE">OBSERVE</md-button>
+            <md-button class="btn-card" aria-label="ANALYZE">ANALYZE</md-button>
+            <md-button class="btn-card" aria-label="ALERTS">ALERTS</md-button>
+            <span flex></span>
+            <md-button class="md-icon-button" aria-label="Menu" ng-click="toggleRight()">
+                <md-icon md-font-icon="icon-bell-list"></md-icon>
+                <badge label="{{5}}" class="alerts-badge"></badge>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <div style="position: relative; min-height: 400px; height: 100%;">
+        <md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
+            <md-toolbar>
+                <div class="md-toolbar-tools">
+                    <md-button class="btn-card" aria-label="Cancel">Cancel</md-button>
+                    <md-button class="btn-primary" aria-label="Apply Filters">Apply Filters</md-button>
+                </div>
+            </md-toolbar>
+
+            <md-content>
+                <panel title="Time Range" class="time-range-panel">
+                    <div layout-gt-xs="row">
+                        <md-input-container flex-gt-xs>
+                            <label>From</label>
+                            <md-datepicker
+                                    md-hide-icons="calendar"
+                                    ng-model="fromDate"
+                                    md-placeholder="mm/dd/yyyy"></md-datepicker>
+                        </md-input-container>
+                        <div style="width: 20px;padding: 0 3px;">
+                            <div></div>
+                        </div>
+                        <md-input-container flex-gt-xs>
+                            <label>To</label>
+                            <md-datepicker
+                                    md-hide-icons="calendar"
+                                    ng-model="toDate"
+                                    md-placeholder="mm/dd/yyyy"></md-datepicker>
+                        </md-input-container>
+                    </div>
+                    <div class="time-range-shortcut-btns">
+                        <md-button class="md-primary" aria-label="1st Week">1st Week</md-button>
+                        <md-button class="md-primary" aria-label="2nd Week">2nd Week</md-button>
+                        <md-button class="md-primary" aria-label="More">More
+                            <md-icon md-font-icon="icon-Shape-Copy-2"></md-icon></md-button>
+                    </div>
+                </panel>
+            </md-content>
+        </md-sidenav>
+    </div>
+
+</div>

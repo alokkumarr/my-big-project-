@@ -1,33 +1,39 @@
-.alerts-header {
-  margin: 0 12px;
+.alerts-filter {
   display: flex;
   align-items: center;
+}
 
-  .alerts-header-title {
-    font-size: 18px;
-    font-weight: bold;
+.alerts-card {
+  font-size: @card-title-font-size;
+
+  .alerts-card-time {
+    float: right;
   }
-}
 
-.alerts-severity {
-  border-radius: 50%;
-  width: 12px;
-  height: 12px;
-  position: absolute;
-  top: 23px;
-  left: 6px;
-}
+  md-card-header {
+    position: relative;
+  }
 
-.alerts-severity-high {
-  background-color: #E5524C;
-}
+  .alerts-severity {
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    top: 23px;
+    left: -6px;
+  }
 
-.alerts-severity-medium {
-  background-color: #00B18D;
-}
+  .alerts-severity-high {
+    background-color: #E5524C;
+  }
 
-.alerts-severity-low {
-  background-color: #F8B514;
+  .alerts-severity-medium {
+    background-color: #00B18D;
+  }
+
+  .alerts-severity-low {
+    background-color: #F8B514;
+  }
 }
 
 badge[data-badge-count].alerts-badge:after {

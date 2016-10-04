@@ -11,8 +11,10 @@
   &:not([disabled]):hover {
     background-color: @btn-primary-bg-color;
   }
+
   color: #FFFFFF;
   background-color: #1A89D4;
+  margin: 0;
 }
 
 .md-button.@{theme-cls}.btn-secondary {
@@ -24,8 +26,15 @@
   }
 }
 
+.md-button.@{theme-cls}.btn-link {
+  color: @btn-link-color;
+}
+
 .md-button.@{theme-cls}.btn-card {
   color: @app-font-color;
+}
+
+.md-button.@{theme-cls}.btn-link, .md-button.@{theme-cls}.btn-card {
   font-size: 16px;
   margin: 0 !important;
   padding: 0;

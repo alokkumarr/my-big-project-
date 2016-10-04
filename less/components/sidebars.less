@@ -3,17 +3,28 @@ md-sidenav.@{theme-cls}.md-sidenav-right {
 
   md-content {
     background-color: inherit;
+    padding: 10px 12px;
   }
 
   .card-title {
     font-size: 18px;
     font-weight: bold;
   }
-}
 
-md-toolbar.@{theme-cls}.tbar-transparent {
-  &:not(.md-menu-toolbar) {
-    background-color: transparent;
+  > md-toolbar.@{theme-cls} {
+      &:not(.md-menu-toolbar) {
+        background-color: transparent;
+      }
+
+    .md-toolbar-tools {
+      justify-content: space-between;
+
+      > .md-button:last-child {
+        margin: 0;
+      }
+    }
+
+    border-bottom: 1px solid @cards-border-color;
   }
 }
 
@@ -32,7 +43,7 @@ md-sidenav {
     box-shadow: none;
     background: #FFFFFF;
     border-radius: 3px !important;
-    margin: 0 12px;
+    margin: 0;
 
     md-card-header {
       padding: 20px;

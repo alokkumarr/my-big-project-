@@ -2,9 +2,6 @@
 
     <md-toolbar class="md-hue-2">
         <div class="md-toolbar-tools">
-            <md-button class="md-icon-button" aria-label="Settings" ng-disabled="true">
-                <md-icon md-svg-icon="img/icons/menu.svg"></md-icon>
-            </md-button>
             <h2>
                 <span>Toolbar with Disabled/Enabled Icon Buttons</span>
             </h2>
@@ -27,21 +24,21 @@
                     <md-button class="btn-secondary" aria-label="Learn More">Dismiss All</md-button>
                 </div>
             </md-toolbar>
-
-            <div class="alerts-header">
-                <span flex class="alerts-header-title">Today</span>
-                <md-button class="btn-card filter-open-button"
-                           ng-click="ctrl.showMenu($event)">
-                    <md-icon md-font-icon="icon-filter"/>
-                    Filter
-                </md-button>
-            </div>
             <md-content>
+                <div class="alerts-filter">
+                    <span flex class="card-title">Today</span>
+                    <md-button class="btn-card filter-open-button"
+                               ng-click="ctrl.showMenu($event)">
+                        <md-icon md-font-icon="icon-filter"/>
+                        Filter
+                    </md-button>
+                </div>
+
                 <md-card class="alerts-card">
                     <md-card-header>
                         <div class="alerts-severity alerts-severity-high"></div>
                         <div class="alerts-card-title-wrapper">
-                            <span class="alerts-card-title">Killowatt Hours Alert</span>
+                            <span class="card-title">Killowatt Hours Alert</span>
                             <span class="alerts-card-time">1 am</span>
                         </div>
                         <div class="alerts-card-category">Power</div>

@@ -11,7 +11,6 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 			});
 
 		$mdThemingProvider.setDefaultTheme('triton');
-
 	})
 
 	.controller('MainController', function($scope, menu,  $mdDialog) {
@@ -28,10 +27,11 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 				{ name: 'pivot grid', url: 'examples/pivotgrid.html'},
 				{ name: 'grid', url: 'examples/grid.html'},
 				{ name: 'charts', url: 'examples/charts.html'},
-				{ name: 'snapshotkpi', url: 'examples/snapshotkpi.html'}
+				{ name: 'snapshotkpi', url: 'examples/snapshotkpi.html'},
+				{ name: 'calendar', url: 'examples/calendar.html'}
 			];
 
-		$scope.template = $scope.templates[9];
+		$scope.template = $scope.templates[$scope.templates.length - 1];
 
 		$scope.username = 'JNocturn';
 		$scope.password = 'SDFSDsdfsd';
@@ -69,8 +69,6 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 		function toggleOpen(section) {
 			menu.toggleSelectSection(section);
 		}
-
-
 
 		// ------------- Dialogs --------------------
 		$scope.status = '  ';
@@ -176,11 +174,12 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 	.controller('TableCardsCtrl', TableCardsCtrl)
 	.controller('PivotGridCtrl', PivotGridCtrl)
 	.controller('GridCtrl', GridCtrl)
-	.controller('ChartsCtrl', ChartsCtrl);
+	.controller('ChartsCtrl', ChartsCtrl)
+	.controller('CalendarCtrl', CalendarCtrl);
 
 
 	// ---- AlertsCtrl ---------------
-	function AlertsCtrl($scope, $timeout, $mdSidenav, $mdPanel) {
+	function AlertsCtrl($scope, $mdSidenav, $mdPanel) {
 		this._mdPanel = $mdPanel;
 
 		this.desserts = [
@@ -726,4 +725,36 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
             ]
         };
     }
+
+	function CalendarCtrl($scope, $mdSidenav, $mdPanel) {
+		this._mdPanel = $mdPanel;
+
+		this.desserts = [
+			'Apple Pie',
+			'Donut',
+			'Fudge',
+			'Cupcake',
+			'Ice Cream',
+			'Tiramisu'
+		];
+
+		this.selected = {favoriteDessert: 'Donut'};
+		this.disableParentScroll = false;
+
+		$scope.close = function () {
+			// Component lookup should always be available since we are not using `ng-if`
+			$mdSidenav('right').close();
+		};
+
+		$scope.toggleRight = buildToggler('right');
+		$scope._mdPanel = $mdPanel;
+
+		function buildToggler(navID) {
+			return function() {
+				// Component lookup should always be available since we are not using `ng-if`
+				$mdSidenav(navID)
+					.toggle();
+			}
+		}
+	}
 
