@@ -729,7 +729,6 @@ angular.module('myApp', ['ngMaterial', 'sync.components', 'ui.grid'])
 	function CalendarCtrl($scope, $mdSidenav, $mdPanel) {
 		this._mdPanel = $mdPanel;
 
-		this.selected = {favoriteDessert: 'Donut'};
 		this.disableParentScroll = false;
 
 		$scope.close = function () {
