@@ -1,0 +1,31 @@
+<js-plumb-object state-object="table" class="table_window">
+
+    <md-list>
+        <md-subheader class="md-no-sticky">
+            <md-checkbox aria-label="Toppings">{{table.name}}</md-checkbox>
+        </md-subheader>
+        <md-divider></md-divider>
+
+        <md-list-item ng-repeat="field in table.fields" class="md-no-proxy">
+
+            <md-checkbox ng-model="field.checked"></md-checkbox>
+            <span class="table-column-name"> {{ field.name }} </span>
+                <js-plumb-endpoint ng-repeat="endpoint in field.sources"
+                                   uuid="{{endpoint.uuid}}"
+                                   settings="sourceEndpointStyle">
+                    <js-plumb-connection ng-click="setActiveConnection($index)"
+                                         ng-repeat="connection in endpoint.connections"
+                                         ng-model="connection">
+                    </js-plumb-connection>
+                </js-plumb-endpoint>
+
+                <js-plumb-endpoint ng-repeat="endpoint in field.targets"
+                                   uuid="{{endpoint.uuid}}"
+                                   settings="sourceEndpointStyle">
+                </js-plumb-endpoint>
+            <!--</div>-->
+        </md-list-item>
+
+    </md-list>
+
+</js-plumb-object>

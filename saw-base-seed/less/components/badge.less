@@ -1,0 +1,21 @@
+badge {
+  //position: relative;
+
+  &[data-badge-count]:after {
+    background: #E5524C;
+    border-radius: 3px;
+    color: #fff;
+    content: attr(data-badge-count);
+    height: 14px;
+    line-height: 13px;
+    right: -6px;
+    padding: 0 3px;
+    position: absolute;
+    width: 12px;
+    text-align: center;
+    top: -4px;
+    font-size: 12px;
+    font-weight: bold;
+    font-family: 'Source Sans Pro';
+  }
+}
