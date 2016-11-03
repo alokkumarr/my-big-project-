@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html lang="en" ng-app="app" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en" ng-app="app" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en" ng-app="app" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en" ng-app="app" class="no-js"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SAW 2.0.0</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="assets/css/app.css">
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+   
+</head>
+<body>
+<h2>Synhronoss Demo</h2>
+<div class="home-section">
+    <ul class="menu-list">
+        <li><a href="#/login">Login</a></li>
+        <li><a href="#/logout">Logout</a></li>
+    </ul>
+</div>
+<div ng-view></div>
+<!-- bower:js -->
+<!-- build:js bower_components_dil/bower.components.min.js  -->
+<script src="bower_components/angular/angular.min.js"></script>
+<script src="bower_components/angular-resource/angular-resource.min.js"></script>
+<script src="bower_components/angular-route/angular-route.min.js"></script>
+ <!-- endbuild -->
+ 
+ <!-- build:js scripts/scripts.min.js  -->
+<script src="scripts/app.js"></script>
+<script src="scripts/common/login/controllers/loginCtrl.js"></script>
+<!-- endbuild -->
+
+
+</body>
+</html>

@@ -313,13 +313,13 @@ module.exports = function (grunt) {
         cwd: '<%= yeoman.app %>/assets/css',
         dest: '.tmp/assets/css',
         src: '{,*/}*.css'
-      },
+      }/*,
 	  stylesForDocs:{
 		expand: true,
         cwd: '<%= yeoman.app %>/assets/css',
         dest: './raw_docs/css',
         src: 'documentation.css'
-	  }
+	  }*/
     },
 
     // Run some tasks in parallel to speed up the build process
@@ -505,8 +505,8 @@ module.exports = function (grunt) {
     'copy:dist',
     'cssmin',
 	'useminPrepare',
-	'concat:generated',
-	'cssmin:generated',
+	//'concat:generated',
+	//'cssmin:generated',
 	'uglify:generated',
 	'rev',
 	'usemin'
@@ -521,11 +521,12 @@ module.exports = function (grunt) {
     'concurrent:dist',
     'autoprefixer',
     'copy:dist',
-	'copy:stylesForDocs',
-	'ngdocs'
+	//'copy:stylesForDocs',
+	//'ngdocs'
     //'clean'
   ]);
 
+  
   grunt.registerTask('default', [
     'devBuild'
   ]);
