@@ -15,7 +15,7 @@ import com.synchronoss.util.Utility;
 public class ExcelToJsonConvertor {
 	public String filePath;
 	public String jsonFileOutputPath;
-
+	
 	public int dispayNameColIndex;
 	public int dashboardNameColIndex;
 	public int esIndexColIndex;
@@ -23,13 +23,15 @@ public class ExcelToJsonConvertor {
 	public String [] requiredExcelColArr;
 	public String [] artifactArray;
 	public String [] dashboardNameArray;
-	private static Logger log = Logger.getLogger(ExcelToJsonConvertor.class.getName());
+	private Logger log = Logger.getLogger(ExcelToJsonConvertor.class.getName());
 	public HashMap<String, Integer> jsonColIndexMap = new HashMap<String, Integer>();
-
+	
 	public ExcelToJsonConvertor() {
+		//get various file paths
 		filePath = Utility.getPropertyValue("excelFilePath");
-		requiredExcelColArr = Utility.getPropertyValue("requiredExcelColArr").split(",");
 		jsonFileOutputPath = Utility.getPropertyValue("jsonFileOutputPath");
+		
+		requiredExcelColArr = Utility.getPropertyValue("requiredExcelColArr").split(",");
 		artifactArray = Utility.getPropertyValue("artifactArray").split(",");
 		dashboardNameArray = Utility.getPropertyValue("dashboardNames").split(",");
 	}
