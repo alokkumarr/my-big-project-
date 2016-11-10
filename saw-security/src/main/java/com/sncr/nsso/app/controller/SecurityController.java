@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.gson.Gson;
 import com.sncr.nsso.app.properties.NSSOProperties;
 import com.sncr.nsso.app.repository.UserRepository;
 import com.sncr.nsso.common.bean.LoginDetails;
@@ -126,7 +127,8 @@ public class SecurityController {
     public String doLogout(@RequestBody String ticketID) {
     	TicketHelper tHelper = new TicketHelper(userRepository);
     	logger.info("Logout process start for ticket", null, null);
-    	return tHelper.logout(ticketID);
+    	Gson gson = new Gson();
+     	return gson.toJson(tHelper.logout(ticketID));
     }
     
 
