@@ -46,7 +46,7 @@ public class SecurityController {
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
 		
-		boolean[] ret =  { true, true };//isUserAuthentic(loginDetails.getMasterLoginId(), loginDetails.getPassword());
+		boolean[] ret =  isUserAuthentic(loginDetails.getMasterLoginId(), loginDetails.getPassword());
 
 		boolean isUserAuthentic = ret[0];
 		boolean isPassWordActive = ret[1];
