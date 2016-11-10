@@ -534,31 +534,40 @@ public class UserRepositoryImpl implements UserRepository {
 					new UserRepositoryImpl.PrepareProdModFeaturePrivExtractor());
 
 			ArrayList<ProductModuleFeaturePrivileges> productModuleFeaturePrivilegesSorted = null;
+			ArrayList<ProductModuleFeature> prodModFeatrSorted = null;
+			ArrayList<ProductModules> prodModSorted = null;
 
 			for (int i = 0; i < ticketDetails.getProducts().size(); i++) {
-
+				prodModSorted = new ArrayList<ProductModules>();
 				for (int x = 0; x < prodMods.size();x++) {
 					if (ticketDetails.getProducts().get(i).getProductCode().equals(prodMods.get(x).getProdCode())) {
-
+						prodModFeatrSorted = new  ArrayList<ProductModuleFeature> ();
 						for (int y = 0; y < prodModFeatr.size();y++) {
 
-							if (prodModFeatr.get(y).getProdModCode().equals(prodMods.get(x).getProductModCode())) {
+							if (ticketDetails.getProducts().get(i).getProductCode().equals(prodModFeatr.get(y).getProdCode()) && 
+									prodModFeatr.get(y).getProdModCode().equals(prodMods.get(x).getProductModCode())) {
+								
 								productModuleFeaturePrivilegesSorted = new ArrayList<ProductModuleFeaturePrivileges>();
 								for (int z = 0; z < prodModFeatrPriv.size();z++) {
 									if (prodModFeatr.get(y).getProdModFeatureName()
 											.equals(prodModFeatrPriv.get(z).getProdModFeatrName())) {
+										
 										productModuleFeaturePrivilegesSorted.add(prodModFeatrPriv.get(z));
+										
 									}
 																	
 								}
 								prodModFeatr.get(y).setProdModFeatrPriv(productModuleFeaturePrivilegesSorted);
+								prodModFeatrSorted.add(prodModFeatr.get(y));
+								
 
 							}							
-						}
-						prodMods.get(x).setProdModFeature(prodModFeatr);
+						}						
+						prodMods.get(x).setProdModFeature(prodModFeatrSorted);
+						prodModSorted.add(prodMods.get(x));
 					}
 				}
-				ticketDetails.getProducts().get(i).setProductModules(prodMods);
+				ticketDetails.getProducts().get(i).setProductModules(prodModSorted);
 			}
 
 			if (ticketDetails != null) {
