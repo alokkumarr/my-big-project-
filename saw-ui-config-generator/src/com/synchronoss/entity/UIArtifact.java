@@ -4,10 +4,6 @@ import java.util.ArrayList;
 
 import com.google.gson.Gson;
 
-//import java.util.ArrayList;
-
-//import com.google.gson.Gson;
-
 public class UIArtifact {
 	private String displayName;
 	private String type;

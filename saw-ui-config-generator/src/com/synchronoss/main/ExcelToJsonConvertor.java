@@ -1,9 +1,12 @@
 package com.synchronoss.main;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.synchronoss.entity.UIArtifact;
@@ -12,7 +15,7 @@ import com.synchronoss.util.Utility;
 public class ExcelToJsonConvertor {
 	public String filePath;
 	public String jsonFileOutputPath;
-
+	
 	public int dispayNameColIndex;
 	public int dashboardNameColIndex;
 	public int esIndexColIndex;
@@ -20,13 +23,15 @@ public class ExcelToJsonConvertor {
 	public String [] requiredExcelColArr;
 	public String [] artifactArray;
 	public String [] dashboardNameArray;
-
+	private Logger log = Logger.getLogger(ExcelToJsonConvertor.class.getName());
 	public HashMap<String, Integer> jsonColIndexMap = new HashMap<String, Integer>();
-
+	
 	public ExcelToJsonConvertor() {
+		//get various file paths
 		filePath = Utility.getPropertyValue("excelFilePath");
-		requiredExcelColArr = Utility.getPropertyValue("requiredExcelColArr").split(",");
 		jsonFileOutputPath = Utility.getPropertyValue("jsonFileOutputPath");
+		
+		requiredExcelColArr = Utility.getPropertyValue("requiredExcelColArr").split(",");
 		artifactArray = Utility.getPropertyValue("artifactArray").split(",");
 		dashboardNameArray = Utility.getPropertyValue("dashboardNames").split(",");
 	}
@@ -52,8 +57,10 @@ public class ExcelToJsonConvertor {
 		}
 		if(valuesFound==requiredExcelColArr.length){
 			isFileValid = true;
+			log.info("File is validated");
 		}else{
-			System.out.println("File not Valid");
+			log.error("File not Valid! Either of the columns: "+Utility.getPropertyValue("requiredExcelColArr")+" not present ");
+			System.exit(1);
 		}
 		return isFileValid;
 	}
@@ -64,7 +71,12 @@ public class ExcelToJsonConvertor {
 	 */
 	public void createJsonObject(){
 		Gson gson = new Gson();
-		HashMap<Integer, HashMap<Integer, String>> excelData = Utility.readExcelFile(filePath);
+		HashMap<Integer, HashMap<Integer, String>> excelData = null;
+		try {
+			excelData = Utility.readExcelFile(filePath);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		if(validateExcelSheet(excelData.get(0))){
 			populateJsonColIndexMap(excelData.get(0));
 			excelData.remove(0);
@@ -72,7 +84,11 @@ public class ExcelToJsonConvertor {
 			for (int i = 0; i < dashboardNameArray.length; i++) {
 				String dashboardName = dashboardNameArray[i];
 				ArrayList<HashMap<Integer, String>> dashboardData = revisedData.get(dashboardName);
-				Utility.writeJsonFile(jsonFileOutputPath, dashboardName, gson.toJson(artifactListMapGenerator(dashboardData,dashboardName)));
+				try {
+					Utility.writeJsonFile(jsonFileOutputPath, dashboardName, gson.toJson(artifactListMapGenerator(dashboardData,dashboardName)));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
