@@ -1,15 +1,13 @@
 package com.synchronoss.entity;
 
-import java.util.ArrayList;
-
-import com.google.gson.Gson;
-
 public class UIArtifact {
 	private String displayName;
 	private String type;
 	private String dashboardName;
 	private String esIndexName;
 	private String esIndexColName;
+	public boolean isEnabled = true;
+	private Object displayIndex;
 	
 	public String displayName() {
 		return displayName;
@@ -41,17 +39,10 @@ public class UIArtifact {
 	public void setEsIndexColName(String esIndexColName) {
 		this.esIndexColName = esIndexColName;
 	}
-	
-	public static void test(){
-		Gson gson = new Gson();
-		ArrayList<UIArtifact> artifactArray = new ArrayList<UIArtifact>();
-		UIArtifact artifact = new UIArtifact();
-		artifact.setDisplayName("Ashish");
-		artifact.setDashboardName("Human");
-		artifact.setType("Single");
-		artifact.setEsIndexColName("ASHISH");
-		artifact.setEsIndexName("ASHISH");
-		artifactArray.add(artifact);
-		System.out.println(gson.toJson(artifactArray));
+	public Object displayIndex() {
+		return displayIndex;
+	}
+	public void setDisplayIndex(Object object) {
+		this.displayIndex = object;
 	}
 }

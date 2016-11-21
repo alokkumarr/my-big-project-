@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
@@ -19,7 +20,6 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class Utility {
-	private static String filePath = "config/config.properties";
 	
 	public static HashMap<Integer, HashMap<Integer, String>> readExcelFile(String filePath) throws IOException{
 		HashMap<Integer,HashMap<Integer, String>> rowMap = new HashMap<Integer,HashMap<Integer,String>>();
@@ -41,6 +41,8 @@ public class Utility {
 					if (cell.getCellType() == XSSFCell.CELL_TYPE_STRING)
 					{
 						cellMap.put(cell.getColumnIndex(), cell.getStringCellValue());
+					}else if(cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC){
+						cellMap.put(cell.getColumnIndex(), Integer.toString(new Double(cell.getNumericCellValue()).intValue()));
 					}
 				}
 				rowMap.put(index, cellMap);
@@ -49,7 +51,7 @@ public class Utility {
 		return rowMap;
 	}
 	
-	public static HashMap<String, String> readProperties() throws IOException{
+	public static HashMap<String, String> readProperties(String filePath) throws IOException{
 		Properties prop = new Properties();
 		InputStream input = null;
 		HashMap<String, String> configMap = new HashMap<String, String>();
@@ -62,10 +64,11 @@ public class Utility {
 		return configMap;
 	}
 	
-	public static String getPropertyValue(String key){
+	public static String getPropertyValue(String key,String filePath ){
 		HashMap<String, String> configMap;
+		String configFilePath = filePath!=null?filePath:"config/config.properties";
 		try {
-			configMap = readProperties();
+			configMap = readProperties(configFilePath);
 			if(configMap!=null){
 				return configMap.get(key);
 			}
@@ -86,12 +89,17 @@ public class Utility {
 		fileWriter.flush();
 		fileWriter.close();
 	}
-	public static void convertConsoleToFile(String filePath){
+	public static void convertConsoleToFile(String dirPath){
 		try {
-			File file = new File(filePath);
+			File directory = new File(dirPath);
+			if (!directory.exists()) {
+				directory.mkdir();
+			}
+			File file = new File(directory,"ExcelToJsonConvertor.log");
 			FileOutputStream fos = new FileOutputStream(file);
 			PrintStream fileout = new PrintStream(fos);
 			System.setOut(fileout);
+			System.out.println(new Date());
 		} catch (FileNotFoundException e) {
 			System.out.println(e);
 		}

@@ -4,36 +4,40 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.synchronoss.entity.UIArtifact;
+import com.synchronoss.entity.UIDashboard;
 import com.synchronoss.util.Utility;
+import com.synchronoss.util.Versioning;
 
 public class ExcelToJsonConvertor {
-	public String filePath;
-	public String jsonFileOutputPath;
+	private String filePath;
+	private String jsonFileOutputPath;
 	
-	public int dispayNameColIndex;
-	public int dashboardNameColIndex;
-	public int esIndexColIndex;
+	private int dispayNameColIndex;
+	private int dashboardNameColIndex;
+	private int esIndexColIndex;
+	private int displayOrderIndex;
 
-	public String [] requiredExcelColArr;
-	public String [] artifactArray;
-	public String [] dashboardNameArray;
+	private String [] requiredExcelColArr;
+	private String [] artifactArray;
+	private String [] dashboardNameArray;
 	private Logger log = Logger.getLogger(ExcelToJsonConvertor.class.getName());
-	public HashMap<String, Integer> jsonColIndexMap = new HashMap<String, Integer>();
+	private HashMap<String, Integer> jsonColIndexMap = new HashMap<String, Integer>();
+	private static String logFilePath;
 	
 	public ExcelToJsonConvertor() {
 		//get various file paths
-		filePath = Utility.getPropertyValue("excelFilePath");
-		jsonFileOutputPath = Utility.getPropertyValue("jsonFileOutputPath");
-		
-		requiredExcelColArr = Utility.getPropertyValue("requiredExcelColArr").split(",");
-		artifactArray = Utility.getPropertyValue("artifactArray").split(",");
-		dashboardNameArray = Utility.getPropertyValue("dashboardNames").split(",");
+		this.filePath = Utility.getPropertyValue("excelFilePath",null);
+		this.jsonFileOutputPath = Utility.getPropertyValue("jsonFileOutputPath",null);
+		ExcelToJsonConvertor.logFilePath = Utility.getPropertyValue("logFilePath",null);
+		this.requiredExcelColArr = Utility.getPropertyValue("requiredExcelColArr",null).split(",");
+		this.artifactArray = Utility.getPropertyValue("artifactArray",null).split(",");
 	}
 
 	/**
@@ -58,8 +62,11 @@ public class ExcelToJsonConvertor {
 		if(valuesFound==requiredExcelColArr.length){
 			isFileValid = true;
 			log.info("File is validated");
+			System.out.println("File is validated");
 		}else{
-			log.error("File not Valid! Either of the columns: "+Utility.getPropertyValue("requiredExcelColArr")+" not present ");
+			log.error("File not Valid! Either of the columns: "+requiredExcelColArr+" not present ");
+			System.out.println("File not Valid! Either of the columns: "+requiredExcelColArr+" not present ");
+			
 			System.exit(1);
 		}
 		return isFileValid;
@@ -75,20 +82,30 @@ public class ExcelToJsonConvertor {
 		try {
 			excelData = Utility.readExcelFile(filePath);
 		} catch (IOException e) {
+			log.error(e.getStackTrace());
+			System.out.println(e.getStackTrace());
 			e.printStackTrace();
 		}
 		if(validateExcelSheet(excelData.get(0))){
+			String verString = Versioning.createUpdateVersion();
 			populateJsonColIndexMap(excelData.get(0));
 			excelData.remove(0);
+			ArrayList<UIDashboard> dashboardList = createDashboardObject();
 			HashMap<String, ArrayList<HashMap<Integer, String>>> revisedData = dashboardDataSegregator(excelData);
-			for (int i = 0; i < dashboardNameArray.length; i++) {
-				String dashboardName = dashboardNameArray[i];
+			for (Iterator<UIDashboard> iterator = dashboardList.iterator(); iterator
+					.hasNext();) {
+				UIDashboard uiDashboard = (UIDashboard) iterator.next();
+				String dashboardName = uiDashboard.dashboardName();
 				ArrayList<HashMap<Integer, String>> dashboardData = revisedData.get(dashboardName);
-				try {
-					Utility.writeJsonFile(jsonFileOutputPath, dashboardName, gson.toJson(artifactListMapGenerator(dashboardData,dashboardName)));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				HashMap<String, ArrayList<UIArtifact>> map = artifactListMapGenerator(dashboardData, dashboardName);
+				uiDashboard.setData(map);
+			}
+			try {
+				Utility.writeJsonFile(jsonFileOutputPath, "MetadataDashboards_VS_"+verString, gson.toJson(dashboardList));
+			} catch (IOException e) {
+				log.error(e.getStackTrace());
+				System.out.println(e.getStackTrace());
+				e.printStackTrace();
 			}
 		}
 	}
@@ -113,6 +130,7 @@ public class ExcelToJsonConvertor {
 					artifact.setEsIndexColName(displayString.replace(" ", "_").toUpperCase());
 					artifact.setDashboardName(dashboardName);
 					artifact.setType(rowDataMap.get(colIndex));
+					artifact.setDisplayIndex(rowDataMap.get(displayOrderIndex)!=null?rowDataMap.get(displayOrderIndex):0);
 					artifactList.add(artifact);
 				}
 			}
@@ -152,6 +170,8 @@ public class ExcelToJsonConvertor {
 				esIndexColIndex = key;
 			}else if(firstRow.get(key).contains("Dashboard")){
 				dashboardNameColIndex = key;
+			}else if(firstRow.get(key).contains("Order")){
+				displayOrderIndex = key;
 			}
 		}
 		for(int i=0;i<artifactArray.length;i++){
@@ -162,8 +182,34 @@ public class ExcelToJsonConvertor {
 			}
 		}
 	}
+	public ArrayList<UIDashboard> createDashboardObject(){
+		ArrayList<UIDashboard> dashboardList = new ArrayList<UIDashboard>();
+		ArrayList<String>dashboardNameList = new ArrayList<String>();
+		String[]dashbaoardNameWithIndexArray = Utility.getPropertyValue("dashboardDisplayIndexes",null).split(",");
+		for (int i = 0; i < dashbaoardNameWithIndexArray.length; i++) {
+			String [] outerLoopStringArr = dashbaoardNameWithIndexArray[i].split("_");
+			String dashboardName = "";
+			int dashboardDisplayOrder = Integer.parseInt(outerLoopStringArr[outerLoopStringArr.length-1]);
+			for (int j = 0; j < (outerLoopStringArr.length-1); j++) {
+				if(j!=outerLoopStringArr.length-2){
+					dashboardName += outerLoopStringArr[j] + " ";
+				}else{
+					dashboardName += outerLoopStringArr[j];
+				}
+			}
+			dashboardNameList.add(dashboardName);
+			UIDashboard dashboard = new UIDashboard();
+			dashboard.setDashboardDisplayIndex(dashboardDisplayOrder);
+			dashboard.setDashboardName(dashboardName);
+			dashboardList.add(dashboard);
+		}
+		this.dashboardNameArray = dashboardNameList.toArray(new String[dashboardNameList.size()]);
+		return dashboardList;
+	}
 	public static void main(String[] args) {
-		new ExcelToJsonConvertor().createJsonObject();
+		ExcelToJsonConvertor convertor = new ExcelToJsonConvertor();
+		Utility.convertConsoleToFile(logFilePath);
+		convertor.createJsonObject();
 	}
 
 }
