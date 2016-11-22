@@ -1,0 +1,55 @@
+md-chips.filter-tags.#{$theme-cls} {
+  md-chip {
+    background-color: #FFFFFF;
+    border-radius: 100px;
+    border: 1px solid #D9DFE9;
+    color: #6D7D94;
+    font-size: 14px;
+  }
+}
+
+.filter-tags {
+  md-chip {
+    .md-chip-remove-container {
+      position: absolute;
+      right: 4px;
+      top: 4px;
+      margin-right: 0;
+      height: 24px;
+
+      button {
+        position: relative;
+        height: 24px;
+        width: 24px;
+        line-height: 30px;
+        text-align: center;
+        border: none;
+        padding: 0;
+        margin: 0;
+        transition: background 0.15s linear;
+        display: block;
+        background: transparent;
+      }
+
+      button .icon-remove {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate3d(-50%, -50%, 0);
+        color: #6D7D94;
+        fill: white;
+      }
+    }
+  }
+}
+
+md-chip.tag-chip.#{$theme-cls} {
+  height: 100%;
+  padding: 3px;
+  border-radius: 1px;
+  font-size: 11PX;
+  text-transform: capitalize;
+  color: #596574;
+  letter-spacing: 1px;
+  background-color: #DFE3EA;
+}

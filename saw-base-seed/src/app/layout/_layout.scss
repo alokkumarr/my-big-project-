@@ -1,0 +1,21 @@
+.root-container {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+}
+
+// ********************** FOOTER *******************************
+.footer-container {
+  display: flex;
+  justify-content: center;
+}
+.synchronoss-logo {
+  background-image: url($synchronoss-logo-path);
+  height: 31px;
+  width: 96px;
+  background-size: 96px 31px;
+}
