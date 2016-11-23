@@ -1,4 +1,5 @@
 import R from 'ramda';
+
 export const analysisMethods = {
   method: 'GET',
   url: '/api/analyze/methods',
@@ -12,14 +13,6 @@ export const metrics = {
   url: '/api/analyze/metrics',
   response: () => {
     return [200, getMetrics()];
-  }
-};
-
-export const fullSupport = {
-  method: 'GET',
-  url: '/api/analyze/metrics',
-  response: () => {
-    return [200, getAnalysisMethods()];
   }
 };
 

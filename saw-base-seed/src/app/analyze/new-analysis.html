@@ -17,7 +17,7 @@
                    ng-repeat="metric in $ctrl.metrics track by $index"
                    ng-model="metric.checked"
                    ng-disabled="metric.disabled"
-                   ng-change="$ctrl.onMetricChecked()"
+                   ng-change="$ctrl.onMetricToggle()"
       > {{metric.name}}</md-checkbox>
     </div>
   </div>

@@ -11,7 +11,7 @@ export class newAnalysisController {
     });
   }
 
-  onMetricChecked() {
+  onMetricToggle() {
     const supportedMethods = this.newAnalysisService.getSupportedMethods(this.metrics);
     this.metrics = this.newAnalysisService.setAvailableMetrics(this.metrics, supportedMethods);
     this.analysisMethods = this.newAnalysisService.setAvailableAnalysisMethods(this.analysisMethods, supportedMethods);
