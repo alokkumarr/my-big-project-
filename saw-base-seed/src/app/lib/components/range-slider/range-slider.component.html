@@ -1,0 +1,10 @@
+<div class="range-slider-container">
+  <div class="range-label-left">{{$ctrl.min}}</div>
+  <div class="range-slider-left">
+    <md-slider md-discrete aria-label="$ctrl.lowerValue" step="{{$ctrl.step}}" ng-model="$ctrl.lowerValue" min="{{$ctrl.min}}" max="{{$ctrl.lowerMax}}"></md-slider>
+  </div>
+  <div class="range-slider-right" ng-style="{width: $ctrl.upperWidth}">
+    <md-slider md-discrete aria-label="$ctrl.upperValue" step="{{$ctrl.step}}" ng-model="$ctrl.upperValue" min="{{$ctrl.upperMin}}" max="{{$ctrl.max}}"></md-slider>
+  </div>
+  <div class="range-label-right">{{$ctrl.max}}</div>
+</div>

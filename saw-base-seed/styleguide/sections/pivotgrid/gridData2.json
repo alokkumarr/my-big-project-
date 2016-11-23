@@ -1,0 +1,44 @@
+[
+  {
+    "product": "starburst",
+    "manufacturer": "Wrigley",
+    "shipper": "Motion INC",
+    "region": "North East",
+    "sum": 1000
+  },
+  {
+    "product": "starburst",
+    "manufacturer": "Mars",
+    "shipper": "Motion INC",
+    "region": "North East",
+    "sum": 500
+  },
+  {
+    "product": "starburst",
+    "manufacturer": "Mars",
+    "shipper": "Motion INC",
+    "region": "South East",
+    "sum": 300
+  },
+  {
+    "product": "starburst",
+    "manufacturer": "Wrigley",
+    "shipper": "GRANGER",
+    "region": "Mid West",
+    "sum": 400
+  },
+  {
+    "product": "starburst",
+    "manufacturer": "Wrigley",
+    "shipper": "GRANGER",
+    "region": "West",
+    "sum": 4000
+  },
+  {
+    "product": "starburst",
+    "manufacturer": "Wrigley",
+    "shipper": "GRANGER",
+    "region": "North",
+    "sum": 4050
+  }
+]
