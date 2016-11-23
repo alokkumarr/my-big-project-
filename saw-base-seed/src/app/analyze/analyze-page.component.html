@@ -1,7 +1,8 @@
 <div>
   <md-toolbar class="secondary-toolbar">
-    <div class="md-toolbar-tools">
+    <div class="md-toolbar-tools" layout-align="space-between center">
       <sidenav-btn target="analyze-page-sidenav"></sidenav-btn>
+      <md-button ng-click="$ctrl.openNewAnalysisModal($event)" class="btn-primary">+ Analysis</md-button>
     </div>
   </md-toolbar>
 
