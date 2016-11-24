@@ -1,0 +1,185 @@
+<div layout="row" layout-align="space-between center">
+  <div class="md-title">Order Fulfillment
+    <md-icon md-font-icon="icon-search"></md-icon>
+  </div>
+
+  <md-input-container flex="50">
+    <md-select ng-model="__a">
+      <md-option value="all" selected>All Types</md-option>
+      <md-divider></md-divider>
+      <md-radio-group ng-model="__a">
+        <md-option value="charts">
+          <md-radio-button value="charts">Charts</md-radio-button>
+        </md-option>
+        <md-option value="reports">
+          <md-radio-button value="reports">Reports</md-radio-button>
+        </md-option>
+        <md-option value="pivots">
+          <md-radio-button value="pivots">Pivots</md-radio-button>
+        </md-option>
+        <md-divider></md-divider>
+        <md-option value="scheduled">
+          <md-radio-button value="scheduled"> Scheduled</md-radio-button>
+        </md-option>
+      </md-radio-group>
+    </md-select>
+  </md-input-container>
+
+  <md-button class="btn-card">
+    + ANALYSIS
+  </md-button>
+</div>
+
+<div layout="column" layout-padding="50">
+    <md-card class="chart-card" style="width: 100%;">
+      <md-card-header>
+        <span class="header-title">My Chart Card Title</span>
+        <div layout="row">
+          <div>
+            <label>Y-Axis:</label><br>
+            <md-input-container md-no-float>
+              <md-select ng-model="revenue" placeholder="Revenue">
+                <md-option value="10000000000000">Revenue</md-option>
+              </md-select>
+            </md-input-container>
+          </div>
+
+          <div>
+            <label>Measure By:</label><br>
+            <md-input-container md-no-float>
+              <md-select ng-model="revenue" placeholder="Millions">
+                <md-option value="10000000000000">Millions</md-option>
+              </md-select>
+            </md-input-container>
+          </div>
+          <md-divider></md-divider>
+          <div>
+            <label>X-Axis:</label><br>
+            <md-input-container md-no-float>
+              <md-select ng-model="revenue" placeholder="Time">
+                <md-option value="10000000000000">Time</md-option>
+              </md-select>
+            </md-input-container>
+          </div>
+
+          <div>
+            <label>Measure By:</label><br>
+            <md-input-container md-no-float>
+              <md-select ng-model="revenue" placeholder="Month">
+                <md-option value="10000000000000">Month</md-option>
+              </md-select>
+            </md-input-container>
+          </div>
+        </div>
+
+        <md-button style="margin-left: 24px" class="md-icon-button" aria-label="Favorite">
+          <md-icon md-font-icon="icon-print"></md-icon>
+        </md-button>
+
+        <md-button class="md-icon-button" aria-label="Favorite">
+          <md-icon md-font-icon="icon-download"></md-icon>
+        </md-button>
+
+      </md-card-header>
+
+      <md-card-content>
+        <line-chart class="content-component" data="$ctrl.transactionVolumeChartData"
+                    options="$ctrl.transactionVolumeChartOptions"></line-chart>
+
+        <div class="content-component" ng-if="showGrid " ui-grid="$ctrl.gridOptions"></div>
+
+      </md-card-content>
+    </md-card>
+
+    <md-card class="chart-card" style="width: 100%;">
+      <md-button class="btn-primary" ng-click="$ctrl.refreshData()">Refresh</md-button>
+      <bar-chart data="$ctrl.barChartData" options="$ctrl.barChartOptions" style="margin: 5"></bar-chart>
+    </md-card>
+
+    <md-card class="chart-card" style="width: 100%;">
+      <area-chart data="$ctrl.areaChartData" options="$ctrl.areaChartOptions"></area-chart>
+    </md-card>
+
+    <md-card class="chart-card" style="width: 100%;">
+      <md-card-header>
+        <md-input-container class="normal">
+          <md-select ng-model="armor" placeholder="Products">
+            <md-option value="cloth">Cloth</md-option>
+            <md-option value="leather">Leather</md-option>
+            <md-option value="chain">Chainmail</md-option>
+            <md-option value="plate">Plate</md-option>
+          </md-select>
+        </md-input-container>
+        <span class="header-title">My Chart Card Title</span>
+        <md-button-group class="button-group" layout="row" layout-align="center center">
+          <md-button class="md-icon-button" ng-click="showGrid  = false">
+            <md-icon md-font-icon="icon-chart"></md-icon>
+          </md-button>
+          <md-button class="md-icon-button" ng-click="showGrid  = true">
+            <md-icon md-font-icon="icon-Table-view"></md-icon>
+          </md-button>
+        </md-button-group>
+
+        <md-button style="margin-left: 24px" class="md-icon-button" aria-label="Favorite">
+          <md-icon md-font-icon="icon-print"></md-icon>
+        </md-button>
+
+        <md-button class="md-icon-button" aria-label="Favorite">
+          <md-icon md-font-icon="icon-download"></md-icon>
+        </md-button>
+
+      </md-card-header>
+
+      <md-card-content>
+        <line-chart class="content-component" data="$ctrl.lineChartData" options="$ctrl.lineChartOptions"
+                    ng-if="!showGrid "></line-chart>
+
+        <div class="content-component" ng-if="showGrid " ui-grid="$ctrl.gridOptions"></div>
+
+      </md-card-content>
+
+      <md-card-footer layout="row" layout-align="space-around center" style="height: 100px">
+        <md-input-container>
+          <label>Armor</label>
+          <md-select ng-model="armor" placeholder="Y-Axis">
+            <md-option value="cloth">Revenue</md-option>
+            <md-option value="leather">Leather</md-option>
+            <md-option value="chain">Chainmail</md-option>
+            <md-option value="plate">Plate</md-option>
+          </md-select>
+        </md-input-container>
+
+        <md-input-container>
+          <label>Armor</label>
+          <md-select ng-model="armor" placeholder="Measure By">
+            <md-option value="cloth">Million</md-option>
+            <md-option value="leather">Leather</md-option>
+            <md-option value="chain">Chainmail</md-option>
+            <md-option value="plate">Plate</md-option>
+          </md-select>
+        </md-input-container>
+
+        <div class="divider-vertical"></div>
+
+        <md-input-container>
+          <label>Armor</label>
+          <md-select ng-model="armor" placeholder="X-Axis">
+            <md-option value="cloth">Cloth</md-option>
+            <md-option value="leather">Leather</md-option>
+            <md-option value="chain">Chainmail</md-option>
+            <md-option value="plate">Plate</md-option>
+          </md-select>
+        </md-input-container>
+
+        <md-input-container>
+          <label>Armor</label>
+          <md-select ng-model="armor" placeholder="Measure By">
+            <md-option value="cloth">Cloth</md-option>
+            <md-option value="leather">Leather</md-option>
+            <md-option value="chain">Chainmail</md-option>
+            <md-option value="plate">Plate</md-option>
+          </md-select>
+        </md-input-container>
+      </md-card-footer>
+    </md-card>
+</div>

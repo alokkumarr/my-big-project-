@@ -17,6 +17,10 @@ export function routesConfig($stateProvider, $urlRouterProvider, $locationProvid
       url: '/analyze',
       component: 'analyzePage'
     }, {
+      name: 'analyze.view',
+      url: '/:id',
+      component: 'analyzeView'
+    }, {
       name: 'alerts',
       url: '/alerts',
       component: 'alertsPage'

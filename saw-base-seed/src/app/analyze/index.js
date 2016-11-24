@@ -1,1 +1,2 @@
-export {AnalyzePageComponent} from './analyze-page.component';
+export {AnalyzePageComponent} from './analyze-page/analyze-page.component';
+export {AnalyzeViewComponent} from './analyze-view/analyze-view.component';
