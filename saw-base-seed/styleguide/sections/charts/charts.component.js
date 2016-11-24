@@ -1,11 +1,14 @@
+import values from 'lodash/values';
 import template from './charts.component.html';
 
 export const ChartsComponent = {
   template,
   controller: class ChartsController {
-    constructor($scope, $interval, $timeout) {
+    constructor($interval, $timeout, chartDateService) {
+      'ngInject';
       this.$interval = $interval;
       this.$timeout = $timeout;
+      this.chartDateService = chartDateService;
 
       this.barChartData = this.generateData();
       this.barChartOptions = {
@@ -68,9 +71,12 @@ export const ChartsComponent = {
           [11.1, 10]
         ]
       };
+
+      this.categoryViews = values(this.chartDateService.CATEGORY_VIEWS);
+
       this.transactionVolumeChartOptions = {
         xAxis: {
-          categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+          categories: this.chartDateService.getMonthlyViewCategories(false),
           startOnTick: true,
           title: {
             text: 'Months'
@@ -112,6 +118,11 @@ export const ChartsComponent = {
         Jane: [2, 2, 3, 7, 1]
       };
     }
+
+    onViewSelected(view) {
+      this.transactionVolumeChartOptions.xAxis.categories = this.chartDateService.getViewCategories(view, false);
+    }
+
     generateData() {
       const series = ['John', 'Jane', 'Joe'];
       const dataPoints = 4;

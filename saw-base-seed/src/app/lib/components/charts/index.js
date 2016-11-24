@@ -4,6 +4,7 @@ import Highcharts from 'highcharts';
 import {wrapChart} from './chartkit';
 import {highchartsConfig} from './highcharts.config';
 import {setSVGRenderer} from './chart-svg-renderer';
+import {chartDateService} from './chart-date.service';
 import {lineChart, barChart, snapshotBarChart, areaChart} from './charts';
 
 export const ChartsModule = 'components.charts';
@@ -25,6 +26,7 @@ setSVGRenderer(Highcharts);
 angular.module(ChartsModule, [])
         .constant('Highcharts', Highcharts)
         .config(highchartsConfig)
+        .factory('chartDateService', chartDateService)
         .chart('line', lineChart)
         .chart('bar', barChart)
         .chart('area', areaChart)

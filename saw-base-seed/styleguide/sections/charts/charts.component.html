@@ -24,8 +24,8 @@
       <div>
         <label>X-Axis:</label><br>
         <md-input-container md-no-float>
-          <md-select ng-model="revenue" placeholder="Time">
-            <md-option value="10000000000000">Time</md-option>
+          <md-select ng-model="$ctrl.categoryView" ng-change="$ctrl.onViewSelected($ctrl.categoryView)" placeholder="View">
+            <md-option ng-repeat="view in ::$ctrl.categoryViews track by $index" ng-value="view">{{::view}}</md-option>
           </md-select>
         </md-input-container>
       </div>

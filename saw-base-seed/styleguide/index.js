@@ -7,8 +7,8 @@ import 'angular-material';
 import 'angular-material/angular-material.css';
 import '../fonts/style.css';
 
-import themeConfig from '../src/theme';
-import routesConfig from './routes';
+import {themeConfig} from '../src/theme';
+import {routesConfig} from './routes';
 import {LibModule} from '../src/app/lib';
 
 import {StyleguideComponent} from './styleguide.component';
