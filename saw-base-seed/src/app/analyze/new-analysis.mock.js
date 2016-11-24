@@ -1,4 +1,5 @@
-import R from 'ramda';
+import range from 'lodash/range';
+import cloneDeep from 'lodash/cloneDeep';
 
 export const analysisMethods = {
   method: 'GET',
@@ -63,12 +64,12 @@ function getAnalysisMethods() {
 }
 
 function getMetrics() {
-  const metrics = R.range(1, 17).map(key => {
+  const metrics = range(1, 17).map(key => {
     return {
       name: `Metric ${key}`,
       checked: false,
       disabled: false,
-      supports: R.clone(getAnalysisMethods())
+      supports: cloneDeep(getAnalysisMethods())
     };
   });
 

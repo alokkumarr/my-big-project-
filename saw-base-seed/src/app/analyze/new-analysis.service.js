@@ -1,12 +1,16 @@
-import R from 'ramda';
-import {mapped, listOf, traversed} from 'ramda-lens';
 import intersection from 'lodash/intersection';
-
-// lenses
-const methodTypeLens = R.compose(R.lensProp('supports'), traversed, R.lensProp('children'), traversed, R.lensProp('type'));
-const methodCategoryLens = R.compose(mapped, R.lensProp('children'), mapped);
-const disabledLens = R.lensProp('disabled');
-const metricLens = mapped;
+import spread from 'lodash/spread';
+import isEmpty from 'lodash/isEmpty';
+import curry from 'lodash/curry';
+import pipe from 'lodash/fp/pipe';
+import filter from 'lodash/fp/filter';
+import map from 'lodash/fp/map';
+import flatMap from 'lodash/fp/flatMap';
+import find from 'lodash/fp/find';
+import isEqual from 'lodash/fp/isEqual';
+import some from 'lodash/fp/some';
+import set from 'lodash/fp/set';
+import get from 'lodash/fp/get';
 
 export function newAnalysisService($http) {
   'ngInject';
@@ -15,51 +19,92 @@ export function newAnalysisService($http) {
     getMethods,
     getMetrics,
     getSupportedMethods,
-    setAvailableMetrics: R.curry(setAvailableItemsWithLens)(metricLens, metricHasSupportedMethod),
-    setAvailableAnalysisMethods: R.curry(setAvailableItemsWithLens)(methodCategoryLens, IsMethodSupported)
+    setAvailableMetrics: curry(setAvailableItems)(metricMapper, metricHasSupportedMethod),
+    setAvailableAnalysisMethods: curry(setAvailableItems)(analysisMethodMapper, IsMethodSupported)
   };
 
   function getMethods() {
-    return $http.get('/api/analyze/methods').then(result => result.data);
+    return $http.get('/api/analyze/methods').then(get('data'));
   }
 
   function getMetrics() {
-    return $http.get('/api/analyze/metrics').then(result => result.data);
+    return $http.get('/api/analyze/metrics').then(get('data'));
   }
 
-  function setAvailableItemsWithLens(lens, setterFn, items, supportedMethods) {
+  /**
+   * Set the disabled attribute on an item, whether it supports the supported analysis methods
+   * - the first 2 parameters are used to make specialized functions for metrics and AnalysisMethods
+   *
+   * @param mapper(actionFn, collection) maps an arbitrary collection setting the "disabled" property
+   *        based on a checker function
+   * @param checkerFn checks if the disabled attribute should be true or false, based on
+   *        whether the current item supports the supported methods or not
+   * @param items - the collection on which we do the modifications
+   * @param supportedMethods array of supported methods (strings)
+   * @returns {*}
+   */
+  function setAvailableItems(mapperFn, checkerFn, items, supportedMethods) {
     const setDisabled = item => {
-      const nothingSelected = R.isEmpty(supportedMethods);
-      const disabledValue = nothingSelected ? false : !setterFn(item, supportedMethods);
-      return R.set(disabledLens, disabledValue, item);
+      // if there are no supported methids it's probably because no metric was selected
+      const nothingSelected = isEmpty(supportedMethods);
+      const disabledValue = nothingSelected ? false : !checkerFn(item, supportedMethods);
+      return set('disabled', disabledValue, item);
     };
 
-    return R.over(lens, setDisabled, items);
+    return mapperFn(setDisabled)(items);
+  }
+
+  /**
+   * Mapper function for the metrics collection
+   * @param actionFn
+   */
+  function metricMapper(actionFn) {
+    return map(metric => actionFn(metric));
+  }
+
+  /**
+   * Mapper function for the analysis methods collection
+   * @param actionFn
+   * @returns {*}
+   */
+  function analysisMethodMapper(actionFn) {
+    return pipe(
+      map(method => {
+        method.children = map(child => actionFn(child))(method.children);
+        return method;
+      })
+    );
   }
 
   function metricHasSupportedMethod(metric, supportedMethods) {
-    const findInSupportedTypes = type => {
-      return R.find(R.equals(type), supportedMethods);
-    };
-    const hasSupportedMethod = R.pipe(
-      listOf(methodTypeLens),
-      R.any(findInSupportedTypes)
-    );
-
-    return hasSupportedMethod(metric);
+    return pipe(
+      flatMap(get('children')),
+      map(get('type')),
+      some(type =>
+        find(isEqual(type), supportedMethods)
+      )
+    )(metric.supports);
   }
 
   function IsMethodSupported(method, supportedMethods) {
-    return R.find(R.equals(method.type), supportedMethods);
+    return find(isEqual(method.type), supportedMethods);
   }
 
+  /**
+   * Intersects all the supported methods of a collection of metrics
+   * @param metrics
+   * @returns [String] array of supported methods (strings)
+   */
   function getSupportedMethods(metrics) {
-    const getSupportedMethods = R.pipe(
-      R.filter(metric => metric.checked === true),
-      R.map(metric => listOf(methodTypeLens, metric)),
-      R.apply(intersection)
-    );
-
-    return getSupportedMethods(metrics);
+    return pipe(
+      filter(metric => metric.checked === true),
+      map(get('supports')),
+      map(supports =>
+        pipe(
+          flatMap(get('children')),
+          map(get('type'))
+        )(supports)),
+      spread(intersection)
+    )(metrics);
   }
 }
