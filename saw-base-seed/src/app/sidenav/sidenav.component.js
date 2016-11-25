@@ -9,9 +9,10 @@ export const SidenavComponent = {
     menu: '<'
   },
   controller: class SidenavController {
-    constructor($componentHandler, $mdSidenav) {
+    constructor($componentHandler, $mdSidenav, $timeout) {
       this.$componentHandler = $componentHandler;
       this.$mdSidenav = $mdSidenav;
+      this.$timeout = $timeout;
 
       this._sidenavInst = null;
     }
@@ -37,7 +38,9 @@ export const SidenavComponent = {
 
     toggleSidenav() {
       if (this._sidenavInst) {
-        this._sidenavInst.toggle();
+        this.$timeout(() => {
+          this._sidenavInst.toggle();
+        });
       }
     }
 

@@ -1,7 +1,9 @@
 import template from './analyze-view.component.html';
+import style from './analyze-view.component.scss';
 
 export const AnalyzeViewComponent = {
   template,
+  styles: [style],
   controller: class AnalyzeViewController {
     /** @ngInject */
     constructor() {

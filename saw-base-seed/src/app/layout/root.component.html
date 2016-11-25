@@ -2,13 +2,13 @@
   <header-component></header-component>
 
   <main class="main-content" style="position: relative; display: flex;">
-    <sidenav-btn target="left-side-nav"
-                 style="position: absolute; z-index: 1000; top: 18px; left: 0;"></sidenav-btn>
-
     <sidenav id="left-side-nav"
-             flex="none" style="z-index: 1001;"></sidenav>
+             flex="none"></sidenav>
 
-    <div style="width: 100%;">
+    <sidenav-btn target="left-side-nav"
+                 style="margin-top: 18px;"></sidenav-btn>
+
+    <div style="width: 100%; overflow: hidden; padding: 0 15px 30px;">
       <ui-view style="display: flex; height: 100%;"></ui-view>
     </div>
   </main>
