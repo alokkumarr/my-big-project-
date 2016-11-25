@@ -1,17 +1,5 @@
-<div>
-  <md-toolbar class="secondary-toolbar">
-    <div class="md-toolbar-tools">
-      <sidenav-btn target="analyze-page-sidenav"></sidenav-btn>
-    </div>
-  </md-toolbar>
-
-  <div layout="row">
-    <sidenav flex="none" style="height: 100%;"
-             id="analyze-page-sidenav"
-             menu="$ctrl.menu"></sidenav>
-
-    <md-content overflow="auto">
-      <ui-view flex="shrink" style="width: 100%;"></ui-view>
-    </md-content>
-  </div>
+<div layout="row" style="height: 100%;">
+  <md-content overflow="auto" style="width: 100%; padding: 0 20px !important;">
+    <ui-view></ui-view>
+  </md-content>
 </div>

@@ -32,7 +32,6 @@ md-sidenav.#{$theme-cls}.md-sidenav-right {
 
 md-sidenav.#{$theme-cls}.md-sidenav-left {
    background-color: $sidebar-left-bg-color;
-   margin-top: 49px;
 
    > md-toolbar.#{$theme-cls} {
      &:not(.md-menu-toolbar) {

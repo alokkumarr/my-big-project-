@@ -1,33 +1,39 @@
-<div layout="row" layout-align="space-between center">
-  <div class="md-title">Order Fulfillment
-    <md-icon md-font-icon="icon-search"></md-icon>
-  </div>
+<md-toolbar class="secondary-toolbar">
+  <div class="md-toolbar-tools">
+    <div class="md-title">Order Fulfillment
+      <md-icon md-font-icon="icon-search"></md-icon>
+    </div>
 
-  <md-input-container flex="50">
-    <md-select ng-model="__a">
-      <md-option value="all" selected>All Types</md-option>
-      <md-divider></md-divider>
-      <md-radio-group ng-model="__a">
-        <md-option value="charts">
-          <md-radio-button value="charts">Charts</md-radio-button>
-        </md-option>
-        <md-option value="reports">
-          <md-radio-button value="reports">Reports</md-radio-button>
-        </md-option>
-        <md-option value="pivots">
-          <md-radio-button value="pivots">Pivots</md-radio-button>
-        </md-option>
+    <md-input-container flex="50">
+      <md-select ng-model="__a">
+        <md-option value="all" selected>All Types</md-option>
         <md-divider></md-divider>
-        <md-option value="scheduled">
-          <md-radio-button value="scheduled"> Scheduled</md-radio-button>
-        </md-option>
-      </md-radio-group>
-    </md-select>
-  </md-input-container>
+        <md-radio-group ng-model="__a">
+          <md-option value="charts">
+            <md-radio-button value="charts">Charts</md-radio-button>
+          </md-option>
+          <md-option value="reports">
+            <md-radio-button value="reports">Reports</md-radio-button>
+          </md-option>
+          <md-option value="pivots">
+            <md-radio-button value="pivots">Pivots</md-radio-button>
+          </md-option>
+          <md-divider></md-divider>
+          <md-option value="scheduled">
+            <md-radio-button value="scheduled"> Scheduled</md-radio-button>
+          </md-option>
+        </md-radio-group>
+      </md-select>
+    </md-input-container>
 
-  <md-button class="btn-card">
-    + ANALYSIS
-  </md-button>
+    <md-button class="btn-card">
+      + ANALYSIS
+    </md-button>
+  </div>
+</md-toolbar>
+
+<div layout="row" layout-align="space-between center">
+
 </div>
 
 <div layout="column" layout-padding="50">

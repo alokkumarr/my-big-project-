@@ -40,5 +40,9 @@ export const SidenavComponent = {
         this._sidenavInst.toggle();
       }
     }
+
+    update(data) {
+      this.menu = data;
+    }
   }
 };
