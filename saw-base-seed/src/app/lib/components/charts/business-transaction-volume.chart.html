@@ -1,0 +1,58 @@
+<md-card class="chart-card" style="width: 1000px;">
+  <md-card-header>
+    <span class="header-title">My Chart Card Title</span>
+    <div layout="row">
+      <div>
+        <label>Y-Axis:</label><br>
+        <md-input-container md-no-float>
+          <md-select ng-model="revenue" placeholder="Revenue">
+            <md-option value="10000000000000">Revenue</md-option>
+          </md-select>
+        </md-input-container>
+      </div>
+
+      <div>
+        <label>Measure By:</label><br>
+        <md-input-container md-no-float>
+          <md-select ng-model="revenue" placeholder="Millions">
+            <md-option value="10000000000000">Millions</md-option>
+          </md-select>
+        </md-input-container>
+      </div>
+      <md-divider></md-divider>
+      <div>
+        <label>X-Axis:</label><br>
+        <md-input-container md-no-float>
+          <md-select ng-model="$ctrl.categoryView" ng-change="$ctrl.onViewSelected($ctrl.categoryView)" placeholder="View">
+            <md-option ng-repeat="view in ::$ctrl.categoryViews track by $index" ng-value="view">{{::view}}</md-option>
+          </md-select>
+        </md-input-container>
+      </div>
+
+      <div>
+        <label>Measure By:</label><br>
+        <md-input-container md-no-float>
+          <md-select ng-model="revenue" placeholder="Month">
+            <md-option value="10000000000000">Month</md-option>
+          </md-select>
+        </md-input-container>
+      </div>
+    </div>
+
+    <md-button style="margin-left: 24px" class="md-icon-button" aria-label="Favorite">
+      <md-icon md-font-icon="icon-print"></md-icon>
+    </md-button>
+
+    <md-button class="md-icon-button" aria-label="Favorite">
+      <md-icon md-font-icon="icon-download"></md-icon>
+    </md-button>
+
+  </md-card-header>
+
+  <md-card-content>
+    <chart static-options="$ctrl.transactionVolumeChartOptions.static" dynamic-options="$ctrl.transactionVolumeChartOptions.dynamic"></chart>
+
+    <div class="content-component" ng-if="showGrid " ui-grid="$ctrl.gridOptions"></div>
+
+  </md-card-content>
+</md-card>

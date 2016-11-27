@@ -1,126 +1,119 @@
-import values from 'lodash/values';
+import map from 'lodash/map';
+import sum from 'lodash/sum';
+import range from 'lodash/range';
 import template from './charts.component.html';
 
 export const ChartsComponent = {
   template,
   controller: class ChartsController {
-    constructor($interval, $timeout, chartDateService) {
+    constructor($interval, $timeout) {
       'ngInject';
       this.$interval = $interval;
       this.$timeout = $timeout;
-      this.chartDateService = chartDateService;
 
-      this.barChartData = this.generateData();
       this.barChartOptions = {
-        xAxis: {
-          categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
+        static: {
+          xAxis: {
+            categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
+          },
+          chart: {
+            type: 'bar'
+          }
+        },
+        dynamic: {
+          series: this.generateData()
         }
       };
 
-      this.lineChartData = this.generateData();
       this.lineChartOptions = {
-        xAxis: {
-          categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
-        }
-      };
-
-      this.areaChartData = {alerts: [4, 6, 5, 6.6, 4.5, 6, 8]};
-      this.areaChartOptions = {
-        xAxis: {
-          categories: ['M', 'T', 'W', 'Th', 'F', 'S', 'Su']
-        },
-        yAxis: {
-          min: 4,
-          max: 8
-        },
-        plotOptions: {
-          area: {
-            color: '#0084FF',
-            pointPlacement: 'on'
+        static: {
+          xAxis: {
+            categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
+          },
+          chart: {
+            type: 'line'
           }
         },
-        chart: {
-          height: 250
-        },
-        legend: {
-          enabled: false
-        }
-      };
-
-      this.transactionVolumeChartData = {
-        Alpha: [
-          [0.3, 5],
-          [2.1, 25],
-          [3.5, 10],
-          [4.5, 11],
-          [5.6, 6],
-          [6.5, 21],
-          [7.1, 20],
-          [7.8, 29],
-          [8.7, 35],
-          [9, 29],
-          [9.5, 5],
-          [11.1, 20]
-        ],
-        Bravo: [
-          [0.3, 2],
-          [4.8, 13],
-          [6.2, 35],
-          [8.9, 10],
-          [10.6, 22],
-          [11.1, 10]
-        ]
-      };
-
-      this.categoryViews = values(this.chartDateService.CATEGORY_VIEWS);
-
-      this.transactionVolumeChartOptions = {
-        xAxis: {
-          categories: this.chartDateService.getMonthlyViewCategories(false),
-          startOnTick: true,
-          title: {
-            text: 'Months'
-          }
-        },
-        yAxis: {
-          title: {
-            text: 'Revenue'
-          }
-        },
-        legend: {
-          align: 'right',
-          verticalAlign: 'top',
-          layout: 'vertical',
-          x: 0,
-          y: 100
-        },
-        chart: {
-          marginRight: 120
-        },
-        plotOptions: {
-          line: {
-            pointPlacement: -0.5
-          }
+        dynamic: {
+          series: this.generateData()
         }
       };
 
       this.gridOptions = {
         rowHeight: 36,
-        data: Object.keys(this.lineChartData).map(k => {
+        data: map(this.lineChartOptions.dynamic.series, series => {
           return {
-            name: k,
-            values: this.lineChartData[k].reduce((a, b) => a + b)
+            name: series.name,
+            values: sum(series.data)
           };
         })
       };
 
-      this.snapshotBarChartData = {
-        Jane: [2, 2, 3, 7, 1]
+      this.areaChartOptions = {
+        static: {
+          xAxis: {
+            categories: ['M', 'T', 'W', 'Th', 'F', 'S', 'Su']
+          },
+          yAxis: {
+            min: 4,
+            max: 8
+          },
+          plotOptions: {
+            area: {
+              color: '#0084FF',
+              pointPlacement: 'on'
+            }
+          },
+          chart: {
+            type: 'area',
+            height: 250
+          },
+          legend: {
+            enabled: false
+          }
+        },
+        dynamic: {
+          series: [{
+            name: 'Alerts',
+            data: [4, 6, 5, 6.6, 4.5, 6, 8]
+          }]
+        }
       };
-    }
 
-    onViewSelected(view) {
-      this.transactionVolumeChartOptions.xAxis.categories = this.chartDateService.getViewCategories(view, false);
+      this.chartConfig = {
+        static: {
+          // This is the Main Highcharts chart config. Any Highchart options are valid here.
+          // will be overriden by values specified below.
+          chart: {
+            type: 'bar'
+          },
+          tooltip: {
+            style: {
+              padding: 10,
+              fontWeight: 'bold'
+            }
+          },
+          xAxis: {
+            endOnTick: false,
+            minorGridLineWidth: 0,
+            minorTickLength: 0,
+            tickLength: 0,
+            lineWidth: 0,
+            categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
+          },
+          yAxis: {
+            gridLineWidth: 0,
+            labels: {
+              overflow: 'justify'
+            }
+          }
+        },
+        dynamic: {
+          series: [{
+            data: [10, 15, 12, 8, 7]
+          }]
+        }
+      };
     }
 
     generateData() {
@@ -128,17 +121,16 @@ export const ChartsComponent = {
       const dataPoints = 4;
       const min = 0;
       const max = 8;
-      const result = {};
 
-      series.forEach(name => {
-        const data = [];
-        for (let i = 0; i < dataPoints; i++) {
-          data.push(min + Math.floor(Math.random() * max));
-        }
-        result[name] = data;
+      return map(series, name => {
+        return {
+          name,
+          data: map(
+            range(1, dataPoints),
+            () => min + Math.floor(Math.random() * max)
+          )
+        };
       });
-
-      return result;
     }
 
     refreshData() {

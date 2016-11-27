@@ -1,4 +1,6 @@
-export default [{
+import chartMocks from '../../../../../styleguide/sections/charts/mocks';
+
+export default chartMocks.concat([{
   method: 'GET',
   url: '/api/menu',
   response: () => {
@@ -51,4 +53,4 @@ export default [{
       }
     ]];
   }
-}];
+}]);

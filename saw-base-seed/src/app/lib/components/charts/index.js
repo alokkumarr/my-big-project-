@@ -1,33 +1,21 @@
 import angular from 'angular';
-import Highcharts from 'highcharts';
+import Highcharts from 'highcharts/highstock';
+import 'highcharts-ng';
 
-import {wrapChart} from './chartkit';
-import {highchartsConfig} from './highcharts.config';
 import {setSVGRenderer} from './chart-svg-renderer';
-import {chartDateService} from './chart-date.service';
-import {lineChart, barChart, snapshotBarChart, areaChart} from './charts';
+import {chartComponent} from './chart.component';
+import {businessTransactionVolumeService} from './business-transaction-volume.service';
+import {businessTransactionVolumeChart} from './business-transaction-volume.chart';
 
 export const ChartsModule = 'components.charts';
 
-const origModule = angular.module;
-
-angular.module = function (...args) {
-  const module = origModule.apply(angular, args);
-
-  module.chart = (name, factory) => {
-    return module.directive(`${name}Chart`, wrapChart(`${name}Chart`, factory));
-  };
-
-  return module;
-};
-
 setSVGRenderer(Highcharts);
 
-angular.module(ChartsModule, [])
+// needed for highchart-ng
+window.Highcharts = Highcharts; // eslint-disable-line
+
+angular.module(ChartsModule, ['highcharts-ng'])
         .constant('Highcharts', Highcharts)
-        .config(highchartsConfig)
-        .factory('chartDateService', chartDateService)
-        .chart('line', lineChart)
-        .chart('bar', barChart)
-        .chart('area', areaChart)
-        .chart('snapshotBar', snapshotBarChart);
+        .factory('businessTransactionVolumeService', businessTransactionVolumeService)
+        .component('chart', chartComponent)
+        .component('businessTransactionVolumeChart', businessTransactionVolumeChart);
