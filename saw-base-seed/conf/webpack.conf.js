@@ -6,6 +6,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 
 module.exports = {
+  eslint: {
+    configFile: conf.paths.eslintDevConfig
+  },
   module: {
     preLoaders: [
       {
@@ -63,7 +66,7 @@ module.exports = {
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.NoErrorsPlugin(),
     new HtmlWebpackPlugin({
-      template: conf.path.src('index.html')
+      template: conf.path.app('index.html')
     })
   ],
   postcss: () => [autoprefixer],
@@ -73,5 +76,5 @@ module.exports = {
     path: path.join(process.cwd(), conf.paths.tmp),
     filename: 'index.js'
   },
-  entry: `./${conf.path.src('index')}`
+  entry: `./${conf.path.app('index')}`
 };

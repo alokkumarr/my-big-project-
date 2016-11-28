@@ -18,12 +18,15 @@ exports.ngModule = 'app';
  */
 exports.paths = {
   src: 'src',
+  app: path.join('src', 'app'),
+  eslintDevConfig: path.join('src', 'dev-eslint-rules.js'),
+  eslintProdConfig: path.join('src', 'prod-eslint-rules.js'),
   dist: 'dist',
   tmp: '.tmp',
   e2e: 'e2e',
   tasks: 'gulp_tasks',
-  styleguide: 'styleguide',
-  styleguideDist: path.join('styleguide', 'dist')
+  styleguide: path.join('src', 'styleguide'),
+  styleguideDist: path.join('src', 'styleguide', 'dist')
 };
 
 exports.path = {};
