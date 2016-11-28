@@ -7,7 +7,7 @@ const autoprefixer = require('autoprefixer');
 
 module.exports = {
   eslint: {
-    configFile: conf.paths.eslintProdConfig
+    configFile: conf.paths.eslintDevConfig
   },
   module: {
     preLoaders: [
