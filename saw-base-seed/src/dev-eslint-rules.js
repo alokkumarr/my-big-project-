@@ -1,5 +1,5 @@
-var defaultsDeep = require('lodash/defaultsDeep');
-var baseRules = require('./prod-eslint-rules');
+const defaultsDeep = require('lodash/defaultsDeep');
+const baseRules = require('./prod-eslint-rules');
 
 module.exports = defaultsDeep({
   rules: {

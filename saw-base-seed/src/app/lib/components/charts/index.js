@@ -1,6 +1,4 @@
 import angular from 'angular';
-import lodash from 'lodash';
-import sd from 'lodash/get';
 import Highcharts from 'highcharts';
 
 import {wrapChart} from './chartkit';
@@ -18,8 +16,6 @@ angular.module = function (...args) {
   module.chart = (name, factory) => {
     return module.directive(`${name}Chart`, wrapChart(`${name}Chart`, factory));
   };
-  console.log('something');
-  console.log('something');
   return module;
 };
 

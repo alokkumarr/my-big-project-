@@ -1,2 +1,2 @@
-var rules = require('./prod-eslint-rules');
+const rules = require('./prod-eslint-rules');
 module.exports = rules;
