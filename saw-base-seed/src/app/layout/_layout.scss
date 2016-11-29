@@ -5,17 +5,38 @@
 }
 
 .main-content {
+  display: flex;
   flex: 1;
+  position: relative;
 }
 
 // ********************** FOOTER *******************************
 .footer-container {
   display: flex;
   justify-content: center;
+  padding: 5px 0 15px;
 }
+
 .synchronoss-logo {
   background-image: url($synchronoss-logo-path);
   height: 31px;
   width: 96px;
   background-size: 96px 31px;
+}
+
+.left-side-nav {
+  &_btn {
+    margin-top: 18px;
+  }
+}
+
+.render-content {
+  width: 100%;
+  overflow: hidden;
+  padding: 0 15px 30px;
+
+  ui-view {
+    display: flex;
+    height: 100%;
+  }
 }

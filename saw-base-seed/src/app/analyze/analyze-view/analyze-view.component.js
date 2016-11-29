@@ -1,49 +1,15 @@
 import template from './analyze-view.component.html';
 import style from './analyze-view.component.scss';
 
+import 'devextreme/ui/data_grid';
+import 'devextreme/dist/css/dx.common.css';
+import 'devextreme/dist/css/dx.light.css';
+
 export const AnalyzeViewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeViewController {
-    /** @ngInject */
     constructor() {
-      this.barChartData = this.generateData();
-      this.barChartOptions = {
-        xAxis: {
-          categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
-        }
-      };
-
-      this.lineChartData = this.generateData();
-      this.lineChartOptions = {
-        xAxis: {
-          categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
-        }
-      };
-
-      this.areaChartData = {alerts: [4, 6, 5, 6.6, 4.5, 6, 8]};
-      this.areaChartOptions = {
-        xAxis: {
-          categories: ['M', 'T', 'W', 'Th', 'F', 'S', 'Su']
-        },
-        yAxis: {
-          min: 4,
-          max: 8
-        },
-        plotOptions: {
-          area: {
-            color: '#0084FF',
-            pointPlacement: 'on'
-          }
-        },
-        chart: {
-          height: 250
-        },
-        legend: {
-          enabled: false
-        }
-      };
-
       this.transactionVolumeChartData = {
         Alpha: [
           [0.3, 5],
@@ -98,37 +64,66 @@ export const AnalyzeViewComponent = {
         }
       };
 
-      this.gridOptions = {
-        rowHeight: 36,
-        data: Object.keys(this.lineChartData).map(k => {
-          return {
-            name: k,
-            values: this.lineChartData[k].reduce((a, b) => a + b)
-          };
-        })
-      };
-
-      this.snapshotBarChartData = {
-        Jane: [2, 2, 3, 7, 1]
-      };
-    }
-
-    generateData() {
-      const series = ['John', 'Jane', 'Joe'];
-      const dataPoints = 4;
-      const min = 0;
-      const max = 8;
-      const result = {};
-
-      series.forEach(name => {
-        const data = [];
-        for (let i = 0; i < dataPoints; i++) {
-          data.push(min + Math.floor(Math.random() * max));
+      this.reports = [{
+        type: 'chart',
+        title: 'Order Revenue By Customer',
+        labels: ['Orders', 'Revenue'],
+        schedule: 'Every Friday at 12:00pm',
+        chart: {
+          options: this.transactionVolumeChartOptions,
+          data: this.transactionVolumeChartData
         }
-        result[name] = data;
-      });
-
-      return result;
+      }, {
+        type: 'report',
+        title: 'Shipper Usage',
+        labels: ['Orders'],
+        schedule: 'Daily',
+        report: {
+          options: {
+            dataSource: [{
+              id: 1,
+              shipper: 'Aaron\'s Towing',
+              order: '12bc',
+              total: '$600'
+            }, {
+              id: 2,
+              shipper: 'Aaron\'s Towing',
+              order: '12bd',
+              total: '$650'
+            }, {
+              id: 3,
+              shipper: 'Aaron\'s Towing',
+              order: '12be',
+              total: '$550'
+            }, {
+              id: 4,
+              shipper: 'Aaron\'s Towing',
+              order: '12bf',
+              total: '$700'
+            }],
+            columns: ['shipper', 'order', 'total'],
+            columnAutoWidth: true,
+            showBorders: true,
+            showColumnHeaders: true,
+            showColumnLines: true,
+            showRowLines: true,
+            width: 500,
+            scrolling: {
+              mode: 'virtual'
+            },
+            sorting: {
+              mode: 'none'
+            },
+            paging: {
+              pageSize: 10
+            },
+            pager: {
+              showPageSizeSelector: true,
+              showInfo: true
+            }
+          }
+        }
+      }];
     }
   }
 };

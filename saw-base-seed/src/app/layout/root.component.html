@@ -1,15 +1,16 @@
 <div class="root-container">
   <header-component></header-component>
 
-  <main class="main-content" style="position: relative; display: flex;">
-    <sidenav id="left-side-nav"
+  <main class="main-content">
+    <sidenav class="left-side-nav"
+             id="left-side-nav"
              flex="none"></sidenav>
 
-    <sidenav-btn target="left-side-nav"
-                 style="margin-top: 18px;"></sidenav-btn>
+    <sidenav-btn class="left-side-nav_btn"
+                 target="left-side-nav"></sidenav-btn>
 
-    <div style="width: 100%; overflow: hidden; padding: 0 15px 30px;">
-      <ui-view style="display: flex; height: 100%;"></ui-view>
+    <div class="render-content">
+      <ui-view></ui-view>
     </div>
   </main>
 

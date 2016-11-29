@@ -1,3 +1,12 @@
 analyze-page {
   width: 100%;
 }
+
+.analyze-page {
+  width: 100%;
+
+  md-content {
+    width: 100%;
+    background-color: transparent;
+  }
+}
