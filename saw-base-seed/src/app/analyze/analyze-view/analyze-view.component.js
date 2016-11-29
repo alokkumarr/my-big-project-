@@ -1,3 +1,5 @@
+import angular from 'angular';
+
 import template from './analyze-view.component.html';
 import style from './analyze-view.component.scss';
 
@@ -9,7 +11,12 @@ export const AnalyzeViewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeViewController {
-    constructor() {
+    /** @ngInject */
+    constructor($log, $mdDialog, $document) {
+      this.$log = $log;
+      this.$mdDialog = $mdDialog;
+      this.$document = $document;
+
       this.transactionVolumeChartData = {
         Alpha: [
           [0.3, 5],
@@ -124,6 +131,24 @@ export const AnalyzeViewComponent = {
           }
         }
       }];
+    }
+
+    openNewAnalysisModal(ev) {
+      this.$mdDialog.show({
+        // controller: newAnalysisController,
+        // controllerAs: '$ctrl',
+        // template: newAnalysisTemplate,
+        template: '<analyze-new></analyze-new>',
+        parent: angular.element(this.$document.body),
+        targetEvent: ev,
+        clickOutsideToClose: true,
+        fullscreen: true // Only for -xs, -sm breakpoints.
+      })
+        .then(answer => {
+          this.$log.info(`You created the analysis: "${answer}".`);
+        }, () => {
+          this.$log.info('You cancelled new Analysis modal.');
+        });
     }
   }
 };

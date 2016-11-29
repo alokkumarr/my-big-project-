@@ -17,7 +17,7 @@ import {FooterComponent} from './app/layout/footer.component';
 import {SidenavComponent, SidenavBtnComponent} from './app/sidenav';
 
 import {ObservePageComponent} from './app/observe/observe-page.component';
-import {AnalyzePageComponent, AnalyzeViewComponent, AnalyzeCardComponent} from './app/analyze';
+import {AnalyzeModule} from './app/analyze';
 
 // import app modules
 import {LibModule} from './app/lib';
@@ -32,7 +32,8 @@ angular
     'ngMaterial',
     'ui.router',
     'ui.grid',
-    LibModule
+    LibModule,
+    AnalyzeModule
   ])
   .config(routesConfig)
   .config(themeConfig)
@@ -42,7 +43,4 @@ angular
   .component('home', HomeComponent)
   .component('sidenav', SidenavComponent)
   .component('sidenavBtn', SidenavBtnComponent)
-  .component('observePage', ObservePageComponent)
-  .component('analyzePage', AnalyzePageComponent)
-  .component('analyzeView', AnalyzeViewComponent)
-  .component('analyzeCard', AnalyzeCardComponent);
+  .component('observePage', ObservePageComponent);
