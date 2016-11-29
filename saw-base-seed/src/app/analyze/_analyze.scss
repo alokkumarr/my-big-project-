@@ -1,0 +1,37 @@
+.new-analysis-content {
+  overflow-y: inherit;
+  padding: 15px;
+  padding-bottom: 40px;
+
+  div.md-subhead {
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+
+  div.md-body-1 {
+    padding-bottom: 5px;
+  }
+
+  .analysis-method-container {
+    padding-bottom: 15px;
+
+    md-button-group > .md-button {
+      padding-top: 20px;
+      > md-icon {
+        font-size: 48px;
+      }
+      > p {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+.new-analysis-footer {
+  padding: 15px;
+}
+
+.new-analysis-header {
+  padding: 15px;
+}
+
