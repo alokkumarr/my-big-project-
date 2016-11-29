@@ -63,7 +63,13 @@ module.exports = {
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.NoErrorsPlugin(),
     new HtmlWebpackPlugin({
+      chunks: ['index'],
       template: conf.path.src('index.html')
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'login.html',
+      chunks: ['login'],
+      template: conf.path.login('index.html')
     })
   ],
   postcss: () => [autoprefixer],
@@ -71,7 +77,10 @@ module.exports = {
   devtool: 'eval',
   output: {
     path: path.join(process.cwd(), conf.paths.tmp),
-    filename: 'index.js'
+    filename: '[name].js'
   },
-  entry: `./${conf.path.src('index')}`
+  entry: {
+    index: `./${conf.path.src('index')}`,
+    login: `./${conf.path.login('index')}`
+  }
 };

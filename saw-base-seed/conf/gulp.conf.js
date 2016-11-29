@@ -23,7 +23,8 @@ exports.paths = {
   e2e: 'e2e',
   tasks: 'gulp_tasks',
   styleguide: 'styleguide',
-  styleguideDist: path.join('styleguide', 'dist')
+  styleguideDist: path.join('styleguide', 'dist'),
+  login: path.join('src', 'login')
 };
 
 exports.path = {};
