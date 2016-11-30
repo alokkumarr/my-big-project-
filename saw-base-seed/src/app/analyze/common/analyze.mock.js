@@ -1,15 +1,23 @@
 import range from 'lodash/range';
 import cloneDeep from 'lodash/cloneDeep';
 
-export const analysisMethods = {
+export const AnalyzeMenu = {
   method: 'GET',
-  url: '/api/analyze/methods',
+  url: '/api/menu/analyze',
   response: () => {
-    return [200, getAnalysisMethods()];
+    return [200, getMenu()];
   }
 };
 
-export const analysisMetrics = {
+export const AnalyzeMethods = {
+  method: 'GET',
+  url: '/api/analyze/methods',
+  response: () => {
+    return [200, getMethods()];
+  }
+};
+
+export const AnalyzeMetrics = {
   method: 'GET',
   url: '/api/analyze/metrics',
   response: () => {
@@ -17,7 +25,33 @@ export const analysisMetrics = {
   }
 };
 
-function getAnalysisMethods() {
+function getMenu() {
+  return [{
+    name: 'My Analyses',
+    children: [{
+      name: 'Order Fulfillment',
+      url: '/analyze/1'
+    }, {
+      name: 'Category 2',
+      url: '/analyze/2'
+    }, {
+      name: 'Category 3',
+      url: '/analyze/3'
+    }, {
+      name: 'Category 4',
+      url: '/analyze/4'
+    }, {
+      name: 'Category 5',
+      url: '/analyze/5'
+    }]
+  }, {
+    name: 'Folder 2'
+  }, {
+    name: 'Folder 3'
+  }];
+}
+
+function getMethods() {
   return [
     {
       label: 'TABLES',
@@ -69,7 +103,7 @@ function getMetrics() {
       name: `Metric ${key}`,
       checked: false,
       disabled: false,
-      supports: cloneDeep(getAnalysisMethods())
+      supports: cloneDeep(getMethods())
     };
   });
 

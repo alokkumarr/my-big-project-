@@ -59,6 +59,12 @@ module.exports = {
       }
     ]
   },
+  resolve: {
+    modules: [
+      'src/',
+      'node_modules/'
+    ]
+  },
   plugins: [
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.NoErrorsPlugin(),
