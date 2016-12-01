@@ -3,9 +3,15 @@
   min-height: 100vh;
   flex-direction: column;
 }
+.app-container {
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+}
 
 .main-content {
   flex: 1;
+  position: relative;
 }
 
 // ********************** FOOTER *******************************
@@ -18,4 +24,10 @@
   height: 31px;
   width: 96px;
   background-size: 96px 31px;
+}
+
+// used to hide sidebar on screens wider than 960px (greater than md)
+.sidebar-hider {
+  z-index: 999999;
+  background-color: white;
 }

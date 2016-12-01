@@ -1,9 +1,21 @@
-<div class="root-container">
-  <header-component></header-component>
+<div layout="row">
 
-  <main class="main-content">
-    <ui-view></ui-view>
-  </main>
+  <div flex show-gt-md class="sidebar-hider"></div>
 
-  <footer-component></footer-component>
+  <div layout-gt-md="column" class="app-container">
+    <div class="root-container">
+
+      <header-component></header-component>
+
+      <main class="main-content">
+        <ui-view></ui-view>
+      </main>
+
+      <footer-component></footer-component>
+
+    </div>
+  </div>
+
+  <div flex show-gt-md class="sidebar-hider"></div>
+
 </div>
