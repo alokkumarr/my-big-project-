@@ -3,10 +3,10 @@ import 'angular-material';
 import 'angular-material/angular-material.css';
 import '../../fonts/style.css';
 
-import {themeConfig} from '../theme';
+import {themeConfig} from '../app/theme';
 import {loginComponent} from './login.component';
 
-import '../index.scss';
+import '../app/index.scss';
 
 export const loginModule = 'login';
 

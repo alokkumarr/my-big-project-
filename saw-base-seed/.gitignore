@@ -2,7 +2,7 @@
 coverage/
 dist/
 node_modules/
-styleguide/dist/
+src/styleguide/dist/
 
 # IDEs and editors
 /.idea

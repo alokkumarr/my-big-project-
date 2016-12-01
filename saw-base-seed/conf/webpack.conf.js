@@ -6,6 +6,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 
 module.exports = {
+  eslint: {
+    configFile: conf.paths.eslintDevConfig
+  },
   module: {
     preLoaders: [
       {
@@ -64,7 +67,7 @@ module.exports = {
     new webpack.NoErrorsPlugin(),
     new HtmlWebpackPlugin({
       chunks: ['index'],
-      template: conf.path.src('index.html')
+      template: conf.path.app('index.html')
     }),
     new HtmlWebpackPlugin({
       filename: 'login.html',
@@ -80,7 +83,7 @@ module.exports = {
     filename: '[name].js'
   },
   entry: {
-    index: `./${conf.path.src('index')}`,
+    index: `./${conf.path.app('index')}`,
     login: `./${conf.path.login('index')}`
   }
 };

@@ -16,7 +16,6 @@ angular.module = function (...args) {
   module.chart = (name, factory) => {
     return module.directive(`${name}Chart`, wrapChart(`${name}Chart`, factory));
   };
-
   return module;
 };
 
