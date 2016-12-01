@@ -9,7 +9,7 @@ import {loginComponent} from './login.component';
 import '../app/index.scss';
 
 export const loginModule = 'login';
-console.log('sadsadf');
+
 angular
   .module(loginModule, [
     'ngMaterial'
