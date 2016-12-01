@@ -1,18 +1,26 @@
-<div class="root-container">
-  <header-component></header-component>
+<div layout="row">
+  <div flex show-gt-md class="sidebar-hider"></div>
 
-  <main class="main-content">
-    <sidenav class="left-side-nav"
-             id="left-side-nav"
-             flex="none"></sidenav>
+  <div layout-gt-md="column" class="app-container">
+    <div class="root-container">
+      <header-component></header-component>
 
-    <sidenav-btn class="left-side-nav_btn"
-                 target="left-side-nav"></sidenav-btn>
+      <main class="main-content">
+        <sidenav class="left-side-nav"
+                 id="left-side-nav"
+                 flex="none"></sidenav>
 
-    <div class="render-content">
-      <ui-view></ui-view>
+        <sidenav-btn class="left-side-nav_btn"
+                     target="left-side-nav"></sidenav-btn>
+
+        <div class="render-content">
+          <ui-view></ui-view>
+        </div>
+      </main>
+
+      <footer-component></footer-component>
     </div>
-  </main>
+  </div>
 
-  <footer-component></footer-component>
+  <div flex show-gt-md class="sidebar-hider"></div>
 </div>

@@ -5,7 +5,7 @@ module.exports = function () {
     server: {
       baseDir: [
         conf.paths.styleguideDist,
-        conf.paths.src
+        conf.paths.app
       ]
     },
     open: false

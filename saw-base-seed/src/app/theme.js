@@ -1,5 +1,4 @@
-import '../themes/_triton.scss';
-
+import '../../themes/_triton.scss';
 const themeName = 'triton';
 
 export function themeConfig($mdThemingProvider, $mdAriaProvider) {

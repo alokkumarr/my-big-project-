@@ -1,3 +1,9 @@
+.app-container {
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+}
+
 .root-container {
   display: flex;
   min-height: 100vh;
@@ -10,6 +16,14 @@
   position: relative;
 }
 
+// used to hide sidebar on screens wider than 1600px (greater than md)
+.sidebar-hider {
+  // the z-index of the modal-backdrop is 79
+  // the z-index of the sidenav is 60
+  z-index: 78;
+  background-color: rgb(192, 192, 192);
+}
+
 // ********************** FOOTER *******************************
 .footer-container {
   display: flex;
@@ -18,13 +32,17 @@
 }
 
 .synchronoss-logo {
-  background-image: url($synchronoss-logo-path);
+  background-image: url($powered-by-synchronoss-logo-path);
   height: 31px;
   width: 96px;
   background-size: 96px 31px;
 }
 
 .left-side-nav {
+  > .layout-row {
+    height: 100%;
+  }
+
   &_btn {
     margin-top: 18px;
   }

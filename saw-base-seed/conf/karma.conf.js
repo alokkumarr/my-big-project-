@@ -17,19 +17,19 @@ module.exports = function (config) {
     ],
     files: [
       'node_modules/es6-shim/es6-shim.js',
-      conf.path.src('index.spec.js'),
-      conf.path.src('**/*.html')
+      conf.path.app('index.spec.js'),
+      conf.path.app('**/*.html')
     ],
     preprocessors: {
-      [conf.path.src('index.spec.js')]: [
+      [conf.path.app('index.spec.js')]: [
         'webpack'
       ],
-      [conf.path.src('**/*.html')]: [
+      [conf.path.app('**/*.html')]: [
         'ng-html2js'
       ]
     },
     ngHtml2JsPreprocessor: {
-      stripPrefix: `${conf.paths.src}/`
+      stripPrefix: `${conf.paths.app}/`
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {

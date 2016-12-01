@@ -5,9 +5,11 @@ export const AnalyzeNewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeNewController {
-    constructor($mdDialog, AnalyzeService) {
+    constructor($mdDialog, $log, AnalyzeService) {
       this.$mdDialog = $mdDialog;
+      this.$log = $log;
       this.analyzeService = AnalyzeService;
+      this.selectedAnalysisMethod = '';
     }
 
     $onInit() {
@@ -27,6 +29,13 @@ export const AnalyzeNewComponent = {
 
       this.metrics = this.analyzeService.setAvailableMetrics(this.metrics, supportedMethods);
       this.methods = this.analyzeService.setAvailableAnalysisMethods(this.methods, supportedMethods);
+
+      // unselect the method, so only supported methods can be selected
+      this.selectedAnalysisMethod = '';
+    }
+
+    onAnalysisMethodSelected() {
+      this.$log.info('Selected method: ', this.selectedAnalysisMethod);
     }
 
     cancel() {

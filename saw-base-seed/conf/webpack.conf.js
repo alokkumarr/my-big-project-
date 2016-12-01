@@ -6,10 +6,13 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 
 module.exports = {
-  entry: `./${conf.path.src('index')}`,
+  entry: {
+    index: `./${conf.path.app('index')}`,
+    login: `./${conf.path.login('index')}`
+  },
   output: {
     path: path.join(process.cwd(), conf.paths.tmp),
-    filename: 'index.js'
+    filename: '[name].js'
   },
   module: {
     preLoaders: [
@@ -72,7 +75,13 @@ module.exports = {
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.NoErrorsPlugin(),
     new HtmlWebpackPlugin({
-      template: conf.path.src('index.html')
+      template: conf.path.app('index.html'),
+      chunks: ['index']
+    }),
+    new HtmlWebpackPlugin({
+      filename: 'login.html',
+      chunks: ['login'],
+      template: conf.path.login('index.html')
     }),
     new webpack.DefinePlugin({
       '__DEVELOPMENT__': process.env.NODE_ENV !== 'production'
@@ -80,5 +89,8 @@ module.exports = {
   ],
   postcss: () => [autoprefixer],
   debug: true,
-  devtool: 'eval'
+  devtool: 'eval',
+  eslint: {
+    configFile: conf.paths.eslintDevConfig
+  }
 };
