@@ -6,6 +6,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 
 module.exports = {
+  entry: `./${conf.path.src('index')}`,
+  output: {
+    path: path.join(process.cwd(), conf.paths.tmp),
+    filename: 'index.js'
+  },
   module: {
     preLoaders: [
       {
@@ -18,9 +23,7 @@ module.exports = {
     loaders: [
       {
         test: /.json$/,
-        loaders: [
-          'json'
-        ]
+        loaders: ['json']
       },
       {
         test: /\.(css|scss)$/,
@@ -70,14 +73,12 @@ module.exports = {
     new webpack.NoErrorsPlugin(),
     new HtmlWebpackPlugin({
       template: conf.path.src('index.html')
+    }),
+    new webpack.DefinePlugin({
+      '__DEVELOPMENT__': process.env.NODE_ENV !== 'production'
     })
   ],
   postcss: () => [autoprefixer],
   debug: true,
-  devtool: 'eval',
-  output: {
-    path: path.join(process.cwd(), conf.paths.tmp),
-    filename: 'index.js'
-  },
-  entry: `./${conf.path.src('index')}`
+  devtool: 'eval'
 };

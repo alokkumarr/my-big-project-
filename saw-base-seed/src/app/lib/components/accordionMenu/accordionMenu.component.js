@@ -8,8 +8,9 @@ export const AccordionMenu = {
     source: '<'
   },
   controller: class AccordionMenuCtrl {
-    /** @ngInject */
     constructor($element) {
+      'ngInject';
+
       this.$element = $element;
     }
 

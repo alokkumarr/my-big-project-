@@ -46,7 +46,6 @@ class ComponentHandler {
   }
 }
 
-/** @ngInject */
 export default () => {
   return new ComponentHandler();
 };

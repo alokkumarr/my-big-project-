@@ -5,18 +5,19 @@ export const AnalyzePageComponent = {
   template,
   styles: [style],
   controller: class AnalyzePageController {
-    /** @ngInject */
-    constructor($componentHandler, $http) {
+    constructor($componentHandler, AnalyzeService) {
+      'ngInject';
+
       this.$componentHandler = $componentHandler;
-      this.$http = $http;
+      this.AnalyzeService = AnalyzeService;
     }
 
     $onInit() {
       const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
 
-      this.$http.get('/api/menu/analyze')
-        .then(response => {
-          leftSideNav.update(response.data);
+      this.AnalyzeService.getMenu()
+        .then(data => {
+          leftSideNav.update(data);
         });
     }
   }

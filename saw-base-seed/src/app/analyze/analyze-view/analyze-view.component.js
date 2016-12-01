@@ -11,8 +11,9 @@ export const AnalyzeViewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeViewController {
-    /** @ngInject */
     constructor($log, $mdDialog, $document) {
+      'ngInject';
+
       this.$log = $log;
       this.$mdDialog = $mdDialog;
       this.$document = $document;

@@ -1,4 +1,4 @@
-import angularMocks from 'angular-mocks';
+import 'angular-mocks';
 import flatten from 'lodash/flatten';
 import values from 'lodash/values';
 
@@ -9,10 +9,7 @@ const mocks = flatten(req.keys().map(key => {
 
 class HttpMockConfig {
   constructor($httpBackend) {
-    this.angularMocks = angularMocks;
-
-    (mocks || []).forEach(item => {
-      console.log(item); // eslint-disable-line
+    mocks.forEach(item => {
       $httpBackend
         .whenRoute(item.method, item.url)
         .respond(item.response);
@@ -25,7 +22,8 @@ class HttpMockConfig {
   }
 }
 
-/** @ngInject */
 export default $httpBackend => {
+  'ngInject';
+
   return new HttpMockConfig($httpBackend);
 };

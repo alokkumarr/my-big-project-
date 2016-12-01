@@ -5,18 +5,19 @@ export const ObservePageComponent = {
   template,
   styles: [style],
   controller: class ObserverPageController {
-    /** @ngInject */
-    constructor($componentHandler, $http) {
+    constructor($componentHandler, ObserveService) {
+      'ngInject';
+
       this.$componentHandler = $componentHandler;
-      this.$http = $http;
+      this.ObserveService = ObserveService;
     }
 
     $onInit() {
       const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
 
-      this.$http.get('/api/menu/observe')
-        .then(response => {
-          leftSideNav.update(response.data);
+      this.ObserveService.getMenu()
+        .then(data => {
+          leftSideNav.update(data);
         });
     }
   }

@@ -16,12 +16,17 @@ export function AnalyzeService($http) {
   'ngInject';
 
   return {
+    getMenu,
     getMethods,
     getMetrics,
     getSupportedMethods,
     setAvailableMetrics: curry(setAvailableItems)(metricMapper, metricHasSupportedMethod),
     setAvailableAnalysisMethods: curry(setAvailableItems)(analysisMethodMapper, isMethodSupported)
   };
+
+  function getMenu() {
+    return $http.get('/api/menu/analyze').then(get('data'));
+  }
 
   function getMethods() {
     return $http.get('/api/analyze/methods').then(get('data'));

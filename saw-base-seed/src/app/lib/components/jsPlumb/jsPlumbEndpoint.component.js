@@ -9,8 +9,9 @@ export const JSPlumbEndpoint = {
     settings: '<'
   },
   controller: class JSPlumbEndpointCtrl {
-    /** @ngInject */
     constructor($element) {
+      'ngInject';
+
       this.$element = $element;
     }
 
