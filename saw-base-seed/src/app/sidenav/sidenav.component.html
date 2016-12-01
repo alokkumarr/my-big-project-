@@ -1,22 +1,25 @@
-<md-sidenav class="md-sidenav-left"
-            md-component-id="$ctrl.id"
-            md-whiteframe="4"
-            md-disable-backdrop
-            eval-attr-as-expr="mdComponentId">
-  <md-toolbar class="secondary-toolbar">
-    <div class="md-toolbar-tools">
-      <div class="company-logo"></div>
+<div layout="row">
+  <md-sidenav class="md-sidenav-left"
+              md-component-id="$ctrl.id"
+              md-whiteframe="4"
+              md-disable-backdrop
+              md-disable-scroll-target="as"
+              eval-attr-as-expr="mdComponentId">
+    <md-toolbar class="secondary-toolbar">
+      <div class="md-toolbar-tools">
+        <div class="company-logo"></div>
 
-      <span flex></span>
+        <span flex></span>
 
-      <md-button class="md-icon-button" aria-label="Menu"
-                 ng-click="$ctrl.toggleSidenav()">
-        <md-icon md-font-icon="icon-menu"></md-icon>
-      </md-button>
-    </div>
-  </md-toolbar>
+        <md-button class="md-icon-button" aria-label="Menu"
+                   ng-click="$ctrl.toggleSidenav()">
+          <md-icon md-font-icon="icon-menu"></md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
 
-  <md-content>
-    <accordion-menu source="$ctrl.menu"></accordion-menu>
-  </md-content>
-</md-sidenav>
+    <md-content>
+      <accordion-menu source="$ctrl.menu"></accordion-menu>
+    </md-content>
+  </md-sidenav>
+</div>
