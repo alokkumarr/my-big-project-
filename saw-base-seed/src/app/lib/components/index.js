@@ -4,6 +4,7 @@ import {JSPlumbCanvas, JSPlumbTable, JSPlumbEndpoint, JSPlumbConnection} from '.
 import {PanelComponent} from './panel';
 import {RangeSliderComponent} from './range-slider/range-slider.component';
 import {mdButtonGroupComponent} from './md-button-group.component';
+import {ChoiceGroupComponent} from './choice-group';
 import {ChartsModule} from './charts';
 
 export const ComponentsModule = 'ComponentsModule';
@@ -19,4 +20,5 @@ angular
   .component('jsPlumbEndpoint', JSPlumbEndpoint)
   .component('panel', PanelComponent)
   .component('rangeSlider', RangeSliderComponent)
+  .component('choiceGroup', ChoiceGroupComponent)
   .component('mdButtonGroup', mdButtonGroupComponent);

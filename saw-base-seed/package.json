@@ -15,7 +15,9 @@
     "jquery": "2.2.4",
     "jsplumb": "^2.2.5",
     "jszip": "^3.1.3",
-    "mottle": "^0.7.3"
+    "lodash": "^4.17.2",
+    "mottle": "^0.7.3",
+    "ramda-lens": "git://github.com/ramda/ramda-lens"
   },
   "devDependencies": {
     "angular-mocks": "^1.5.0-beta.2",

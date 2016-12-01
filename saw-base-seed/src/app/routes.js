@@ -1,13 +1,18 @@
-/** @ngInject */
 export function routesConfig($stateProvider, $urlRouterProvider, $locationProvider) {
+  'ngInject';
   $locationProvider.html5Mode(true).hashPrefix('!');
   $urlRouterProvider.otherwise('/');
 
   const states = [
     {
-      name: 'home',
+      name: 'index',
       url: '/',
-      component: 'home'
+      onEnter: ($state, $window) => {
+        'ngInject';
+        // this hack redirecting is only for the moment
+        // this should be done on the server
+        $window.location = `${$window.location}login.html`;
+      }
     }, {
       name: 'observe',
       url: '/observe',
@@ -18,8 +23,7 @@ export function routesConfig($stateProvider, $urlRouterProvider, $locationProvid
       component: 'analyzePage'
     }, {
       name: 'alerts',
-      url: '/alerts',
-      component: 'alertsPage'
+      url: '/alerts'
     }
   ];
 

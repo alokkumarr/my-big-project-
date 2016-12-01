@@ -17,7 +17,7 @@ import {FooterComponent} from './layout/footer.component';
 import {SidenavComponent, SidenavBtnComponent} from './sidenav';
 
 import {ObservePageComponent} from './observe/observe-page.component';
-import {AnalyzePageComponent} from './analyze';
+import {AnalyzePageComponent, newAnalysisService} from './analyze';
 
 // import app modules
 import {LibModule} from './lib';
@@ -43,4 +43,5 @@ angular
   .component('sidenav', SidenavComponent)
   .component('sidenavBtn', SidenavBtnComponent)
   .component('observePage', ObservePageComponent)
+  .factory('newAnalysisService', newAnalysisService)
   .component('analyzePage', AnalyzePageComponent);
