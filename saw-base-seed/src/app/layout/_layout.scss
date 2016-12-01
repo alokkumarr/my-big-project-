@@ -28,6 +28,8 @@
 
 // used to hide sidebar on screens wider than 960px (greater than md)
 .sidebar-hider {
-  z-index: 999999;
+  // the z-index of the modal-backdrop is 79
+  // the z-index of the sidenav is 60
+  z-index: 78;
   background-color: white;
 }
