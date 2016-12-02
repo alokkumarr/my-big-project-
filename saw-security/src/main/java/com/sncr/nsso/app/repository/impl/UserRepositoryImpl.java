@@ -70,18 +70,16 @@ public class UserRepositoryImpl implements UserRepository {
 		password = EncriptionUtil.encrypt(password).trim();
 		String pwd = password;
 		String sql = "SELECT U.PWD_MODIFIED_DATE, C.PASSWORD_EXPIRY_DAYS " + "FROM USERS U, CUSTOMERS C "
-				+ "WHERE U.USER_ID = ? AND U.ENCRYPTED_PASSWORD = ? "
-				+ " AND U.ACTIVE_STATUS_IND = '1' " + "AND U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID";
+				+ "WHERE U.USER_ID = ? AND U.ENCRYPTED_PASSWORD = ? " + " AND U.ACTIVE_STATUS_IND = '1' "
+				+ "AND U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID";
 		try {
 			PasswordDetails passwordDetails = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-	              public void setValues(PreparedStatement preparedStatement) throws
-	                SQLException {
-	                  preparedStatement.setString(1, masterLoginId);
-	                  preparedStatement.setString(2, pwd);
-	              }
-	            }, new UserRepositoryImpl.PwdDetailExtractor());
-			
-			
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, masterLoginId);
+					preparedStatement.setString(2, pwd);
+				}
+			}, new UserRepositoryImpl.PwdDetailExtractor());
+
 			if (passwordDetails != null) {
 				isAuthenticated = true;
 				if (!isPwdExpired(passwordDetails.getPwdModifiedDate(), passwordDetails.getPasswordExpiryDays())) {
@@ -91,7 +89,7 @@ public class UserRepositoryImpl implements UserRepository {
 				ret[1] = isPasswordActive;
 			}
 		} catch (Exception e) {
-			logger.error("Exception encountered while authenticating user : " + e.getMessage(), masterLoginId, null, e);
+			logger.error("Exception encountered while authenticating user : " + e.getMessage(), null, e);
 		}
 
 		return ret;
@@ -142,11 +140,10 @@ public class UserRepositoryImpl implements UserRepository {
 
 		try {
 			String userSysId = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-	              public void setValues(PreparedStatement preparedStatement) throws
-	                SQLException {
-	                  preparedStatement.setString(1, loginId);
-	              }
-	            }, new UserRepositoryImpl.StringExtractor("user_sys_id"));
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, loginId);
+				}
+			}, new UserRepositoryImpl.StringExtractor("user_sys_id"));
 
 			/*
 			 * if(userSysId == null){ return
@@ -155,13 +152,11 @@ public class UserRepositoryImpl implements UserRepository {
 
 			sql = "SELECT PH.* FROM PASSWORD_HISTORY PH WHERE PH.USER_SYS_ID=? ORDER BY PH.DATE_OF_CHANGE DESC ";
 
-			
 			message = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-	              public void setValues(PreparedStatement preparedStatement) throws
-	                SQLException {
-	                  preparedStatement.setString(1, userSysId);
-	              }
-	            }, new UserRepositoryImpl.PasswordValidator(encNewPass));
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, userSysId);
+				}
+			}, new UserRepositoryImpl.PasswordValidator(encNewPass));
 			if (message != null && message.equals("valid")) {
 				String sysId = System.currentTimeMillis() + "";
 
@@ -169,23 +164,21 @@ public class UserRepositoryImpl implements UserRepository {
 						+ " VALUES(?,?,?,SYSDATE())";
 
 				jdbcTemplate.update(sql, new PreparedStatementSetter() {
-		              public void setValues(PreparedStatement preparedStatement) throws
-		                SQLException {
-		                  preparedStatement.setString(1, sysId);
-		                  preparedStatement.setString(2, userSysId);
-		                  preparedStatement.setString(3, encNewPass);
-		              }
-		            });
+					public void setValues(PreparedStatement preparedStatement) throws SQLException {
+						preparedStatement.setString(1, sysId);
+						preparedStatement.setString(2, userSysId);
+						preparedStatement.setString(3, encNewPass);
+					}
+				});
 
 				sql = "UPDATE USERS U  SET U.ENCRYPTED_PASSWORD=? ,  "
 						+ "U.PWD_MODIFIED_DATE=SYSDATE(),U.MODIFIED_BY ='CHANGE_PASSWORD' WHERE U.USER_SYS_ID=?";
 				jdbcTemplate.update(sql, new PreparedStatementSetter() {
-		              public void setValues(PreparedStatement preparedStatement) throws
-		                SQLException {
-		                  preparedStatement.setString(1, encNewPass);
-		                  preparedStatement.setString(2, userSysId);
-		              }
-		            });
+					public void setValues(PreparedStatement preparedStatement) throws SQLException {
+						preparedStatement.setString(1, encNewPass);
+						preparedStatement.setString(2, userSysId);
+					}
+				});
 				message = null;
 				/*
 				 * sql =
@@ -194,8 +187,8 @@ public class UserRepositoryImpl implements UserRepository {
 				 */
 			}
 		} catch (Exception e) {
-			logger.error("Exception encountered while creating BO details for user " + loginId + " : " + e.getMessage(),
-					loginId, null, e);
+			logger.error("Exception encountered while creating BO details for user " + e.getMessage(), loginId, null,
+					e);
 			message = "Error encountered while changing password.";
 		}
 
@@ -211,61 +204,57 @@ public class UserRepositoryImpl implements UserRepository {
 		// update pass history
 		String encOldPass = EncriptionUtil.encrypt(oldPass).trim();
 		String encNewPass = EncriptionUtil.encrypt(newPass).trim();
-		String sql = "select u.user_sys_id" + " from users u" + " where u.user_id = ?"
-					+ " and  u.encrypted_password = ?";
+		String sql = "SELECT U.USER_SYS_ID" + " FROM USERS U" + " WHERE U.USER_ID = ?"
+				+ " and  U.ENCRYPTED_PASSWORD = ?";
 
 		try {
 			String userSysId = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-	              public void setValues(PreparedStatement preparedStatement) throws
-	                SQLException {
-	                  preparedStatement.setString(1,loginId);
-	                  preparedStatement.setString(2,encOldPass);
-	              }
-	            }, new UserRepositoryImpl.StringExtractor("user_sys_id"));
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, loginId);
+					preparedStatement.setString(2, encOldPass);
+				}
+			}, new UserRepositoryImpl.StringExtractor("user_sys_id"));
 
 			if (userSysId == null) {
 				message = "Value provided for old Password did not match.";
 				return message;
 			}
-			sql = "select ph.* from password_history ph where ph.user_sys_id=? order by ph.date_of_change desc ";
+			sql = "select PH.* from PASSWORD_HISTORY PH where PH.user_sys_id=? order by PH.DATE_OF_CHANGE desc ";
 
-			message = jdbcTemplate.query(sql,  new PreparedStatementSetter() {
-	              public void setValues(PreparedStatement preparedStatement) throws
-	                SQLException {
-	                  preparedStatement.setString(1, userSysId);
-	              }
-	            },new UserRepositoryImpl.PasswordValidator(encNewPass));
+			message = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, userSysId);
+				}
+			}, new UserRepositoryImpl.PasswordValidator(encNewPass));
 			if (message != null && message.equals("valid")) {
 				String sysId = System.currentTimeMillis() + "";
 
-				sql = "insert into password_history (PASSWORD_HISTORY_SYS_ID,USER_SYS_ID,PASSWORD,DATE_OF_CHANGE)"
+				sql = "insert into PASSWORD_HISTORY (PASSWORD_HISTORY_SYS_ID,USER_SYS_ID,PASSWORD,DATE_OF_CHANGE)"
 						+ " values(?,?,?,sysdate())";
 
 				jdbcTemplate.update(sql, new PreparedStatementSetter() {
-		              public void setValues(PreparedStatement preparedStatement) throws
-		                SQLException {
-		                  preparedStatement.setString(1,sysId);
-		                  preparedStatement.setString(2, userSysId);
-		                  preparedStatement.setString(3, encNewPass);
-		              }
-		            });
+					public void setValues(PreparedStatement preparedStatement) throws SQLException {
+						preparedStatement.setString(1, sysId);
+						preparedStatement.setString(2, userSysId);
+						preparedStatement.setString(3, encNewPass);
+					}
+				});
 
-				sql = "update users u  set u.encrypted_password=?"
-						+ " ,  u.pwd_modified_date=sysdate(),u.modified_by ='change_password' where u.user_sys_id=?";
+				sql = "update USERS U  set U.ENCRYPTED_PASSWORD=?"
+						+ " ,  U.PWD_MODIFIED_DATE=sysdate(),U.MODIFIED_BY ='change_password' where U.USER_SYS_ID=?";
 				int i = jdbcTemplate.update(sql, new PreparedStatementSetter() {
-		              public void setValues(PreparedStatement preparedStatement) throws
-		                SQLException {
-		                  preparedStatement.setString(1, encNewPass);
-		                  preparedStatement.setString(2, userSysId);
-		              }
-		            });
+					public void setValues(PreparedStatement preparedStatement) throws SQLException {
+						preparedStatement.setString(1, encNewPass);
+						preparedStatement.setString(2, userSysId);
+					}
+				});
 				if (i == 1) {
 					message = "Password Successfully Changed.";
 				}
 			}
 		} catch (Exception e) {
-			logger.error("Exception encountered while creating BO details for user " + loginId + " : " + e.getMessage(),
-					loginId, null, e);
+			logger.error("Exception encountered while creating BO details for user " + e.getMessage(), loginId, null,
+					e);
 			message = "Error encountered while changing password.";
 		}
 
@@ -294,11 +283,9 @@ public class UserRepositoryImpl implements UserRepository {
 			int[] types = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
 					Types.VARCHAR, Types.BIGINT, Types.BIGINT, Types.SMALLINT, Types.DATE, Types.VARCHAR };
 			jdbcTemplate.update(insertSql, params, types);
-			logger.info("ticket details inserted for ticketId  " + ticket.getTicketId(), ticket.getMasterLoginId(),
-					ticket.getTicketId());
+
 		} catch (Exception e) {
-			logger.error("Exception encountered while adding ticket details for user " + ticket.getMasterLoginId()
-					+ " : " + e.getMessage(), ticket.getMasterLoginId(), null, e);
+			logger.error("Exception encountered while adding ticket details for user " + e.getMessage(), null, e);
 			throw e;
 		}
 	}
@@ -318,11 +305,9 @@ public class UserRepositoryImpl implements UserRepository {
 			jdbcTemplate.update(sql);
 
 			jdbcTemplate.update(insertSql, params, types);
-			logger.info("secret code details inserted for user Id  " + userId);
 
 		} catch (Exception e) {
-			logger.error("Exception encountered while adding secret code details for user " + userId + " : "
-					+ e.getMessage(), null, e);
+			logger.error("Exception encountered while adding secret code details for user " + e.getMessage(), null, e);
 			throw e;
 		}
 	}
@@ -348,11 +333,10 @@ public class UserRepositoryImpl implements UserRepository {
 
 		try {
 			User user = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-	              public void setValues(PreparedStatement preparedStatement) throws
-	                SQLException {
-	                  preparedStatement.setString(1, masterLoginId);
-	              }
-	            }, new UserRepositoryImpl.UserCredentialsExtractor());
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, masterLoginId);
+				}
+			}, new UserRepositoryImpl.UserCredentialsExtractor());
 			if (user == null) {
 				message = "'User Name' provided is not identified in the system, please re-verify.";
 				return message;
@@ -366,23 +350,19 @@ public class UserRepositoryImpl implements UserRepository {
 			}
 
 			sql = "select ci.email from users u, user_contact uc, contact_info ci " + " where u.user_id=?"
-					+ " and u.user_sys_id=uc.user_sys_id "
-					+ " and uc.contact_info_sys_id = ci.contact_info_sys_id  ";
+					+ " and u.user_sys_id=uc.user_sys_id " + " and uc.contact_info_sys_id = ci.contact_info_sys_id  ";
 
-			String emailFrmDB = jdbcTemplate.query(sql,  new PreparedStatementSetter() {
-	              public void setValues(PreparedStatement preparedStatement) throws
-	                SQLException {
-	                  preparedStatement.setString(1, masterLoginId);
-	              }
-	            },new UserRepositoryImpl.StringExtractor("email"));
+			String emailFrmDB = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, masterLoginId);
+				}
+			}, new UserRepositoryImpl.StringExtractor("email"));
 			if (!emailFrmDB.equals(email)) {
 				message = "'Email Address' provided is not identified in the system, please re-verify.";
 				return message;
 			}
 		} catch (Exception e) {
-			logger.error(
-					"Exception encountered while resetting password for user " + masterLoginId + " : " + e.getMessage(),
-					masterLoginId, null, e);
+			logger.error("Exception encountered while resetting password for user " + e.getMessage(), null, e);
 			message = "Error encountered while resetting password.";
 		}
 		return message;
@@ -402,9 +382,8 @@ public class UserRepositoryImpl implements UserRepository {
 				message = "No user found for updating new password value.";
 			}
 		} catch (Exception e) {
-			logger.error(
-					"Exception encountered while resetting password for user " + masterLoginId + " : " + e.getMessage(),
-					masterLoginId, null, e);
+			logger.error("Exception encountered while resetting password for user " + e.getMessage(), masterLoginId,
+					null, e);
 			message = "Error encountered while updating new password value.";
 		}
 		return message;
@@ -415,16 +394,14 @@ public class UserRepositoryImpl implements UserRepository {
 		try {
 			String updateSql = "update TICKET set valid_indicator=0,inactivated_Date=sysdate(),DESCRIPTION=? where ticket_id=?";
 			jdbcTemplate.update(updateSql, new PreparedStatementSetter() {
-	              public void setValues(PreparedStatement preparedStatement) throws
-	                SQLException {
-	                  preparedStatement.setString(1, validityMessage);
-	                  preparedStatement.setString(2, ticketId);
-	              }
-	            });
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, validityMessage);
+					preparedStatement.setString(2, ticketId);
+				}
+			});
 			// logger.info("Ticket got invalidated for ticketId: " + ticketId);
 		} catch (Exception e) {
-			logger.error("Exception encountered while invalidating the ticket for ticketId:  " + ticketId + " : "
-					+ e.getMessage(), null, e);
+			logger.error("Exception encountered while invalidating the ticket" + e.getMessage(), null, e);
 			throw e;
 		}
 
@@ -453,47 +430,43 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public void prepareTicketDetails(User user) {
 		String masterLoginId = user.getMasterLoginId();
-		
-		//TO DO: Modify the below queries to form a single Query
-		
+
+		// TO DO: Modify the below queries to form a single Query
+
 		// Generic User Details
 		try {
-		String sql =  "SELECT U.USER_ID,U.FIRST_NAME,U.MIDDLE_NAME,U.LAST_NAME,C.COMPANY_NAME,C.CUSTOMER_SYS_ID,C.CUSTOMER_CODE,C.LANDING_PROD_SYS_ID,R.ROLE_NAME,R.ROLE_TYPE,R.DATA_SECURITY_KEY "
-				+ "	FROM USERS U, CUSTOMERS C, ROLES R WHERE U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID AND R.ROLE_SYS_ID=U.ROLE_SYS_ID "
-				+ "	AND C.ACTIVE_STATUS_IND = U.ACTIVE_STATUS_IND AND  U.ACTIVE_STATUS_IND = R.ACTIVE_STATUS_IND AND R.ACTIVE_STATUS_IND = 1 AND U.USER_ID=? ";
-				  TicketDetails ticketDetails = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-	              public void setValues(PreparedStatement preparedStatement) throws
-	                SQLException {
-	                  preparedStatement.setString(1, masterLoginId);
-	              }
-	            }, new UserRepositoryImpl.PrepareTicketExtractor());
+			String sql = "SELECT U.USER_ID,U.FIRST_NAME,U.MIDDLE_NAME,U.LAST_NAME,C.COMPANY_NAME,C.CUSTOMER_SYS_ID,C.CUSTOMER_CODE,C.LANDING_PROD_SYS_ID,R.ROLE_NAME,R.ROLE_TYPE,R.DATA_SECURITY_KEY "
+					+ "	FROM USERS U, CUSTOMERS C, ROLES R WHERE U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID AND R.ROLE_SYS_ID=U.ROLE_SYS_ID "
+					+ "	AND C.ACTIVE_STATUS_IND = U.ACTIVE_STATUS_IND AND  U.ACTIVE_STATUS_IND = R.ACTIVE_STATUS_IND AND R.ACTIVE_STATUS_IND = 1 AND U.USER_ID=? ";
+			TicketDetails ticketDetails = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, masterLoginId);
+				}
+			}, new UserRepositoryImpl.PrepareTicketExtractor());
 
 			// Cust - Prod
-			String sql3 =  "SELECT DISTINCT P.PRODUCT_NAME,P.PRODUCT_DESC,P.PRODUCT_CODE FROM CUSTOMER_PRODUCTS CP, PRODUCTS P "
-					+ "where CP.PRODUCT_SYS_ID = P.PRODUCT_SYS_ID AND P.ACTIVE_STATUS_IND = CP.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = 1 AND CP.CUSTOMER_SYS_ID=?";  
+			String sql3 = "SELECT DISTINCT P.PRODUCT_NAME,P.PRODUCT_DESC,P.PRODUCT_CODE FROM CUSTOMER_PRODUCTS CP, PRODUCTS P "
+					+ "where CP.PRODUCT_SYS_ID = P.PRODUCT_SYS_ID AND P.ACTIVE_STATUS_IND = CP.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = 1 AND CP.CUSTOMER_SYS_ID=?";
 
-			ticketDetails.setProducts(jdbcTemplate.query(sql3,new PreparedStatementSetter() {
-	              public void setValues(PreparedStatement preparedStatement) throws
-	                SQLException {
-	                  preparedStatement.setString(1, ticketDetails.getCustID());
-	              }
-	            }, new UserRepositoryImpl.PrepareProductExtractor()));
+			ticketDetails.setProducts(jdbcTemplate.query(sql3, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, ticketDetails.getCustID());
+				}
+			}, new UserRepositoryImpl.PrepareProductExtractor()));
 
 			// Cust - Prod - Modules
 			String sql4 = "SELECT DISTINCT P.PRODUCT_CODE, M.MODULE_NAME,M.MODULE_DESC,M.MODULE_CODE FROM USERS U, PRODUCTS P, MODULES M, "
 					+ " CUSTOMER_PRODUCTS CP, PRODUCT_MODULES PM, CUSTOMER_PRODUCT_MODULES CPM WHERE U.CUSTOMER_SYS_ID = CP.CUSTOMER_SYS_ID "
 					+ "AND  P.PRODUCT_SYS_ID = CP.PRODUCT_SYS_ID AND M.MODULE_SYS_ID = PM.MODULE_SYS_ID "
-					+ "AND CP.CUST_PROD_SYS_ID = CPM.CUST_PROD_SYS_ID AND P.ACTIVE_STATUS_IND = M.ACTIVE_STATUS_IND AND"					
+					+ "AND CP.CUST_PROD_SYS_ID = CPM.CUST_PROD_SYS_ID AND P.ACTIVE_STATUS_IND = M.ACTIVE_STATUS_IND AND"
 					+ " CP.ACTIVE_STATUS_IND = PM.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND "
 					+ " AND CPM.ACTIVE_STATUS_IND = 1 AND U.USER_ID=?";
 
-			ArrayList<ProductModules> prodMods = jdbcTemplate.query(sql4,new PreparedStatementSetter() {
-	              public void setValues(PreparedStatement preparedStatement) throws
-	                SQLException {
-	                  preparedStatement.setString(1, masterLoginId);
-	              }
-	            },
-					new UserRepositoryImpl.PrepareProdModExtractor());
+			ArrayList<ProductModules> prodMods = jdbcTemplate.query(sql4, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, masterLoginId);
+				}
+			}, new UserRepositoryImpl.PrepareProdModExtractor());
 
 			// Cust - Prod - Modules - Features
 			String sql5 = "	SELECT U.USER_SYS_ID, U.CUSTOMER_SYS_ID	,C.CUSTOMER_SYS_ID ,CP.CUST_PROD_SYS_ID,CP.CUSTOMER_SYS_ID,"
@@ -506,14 +479,12 @@ public class UserRepositoryImpl implements UserRepository {
 					+ "	ON(M.MODULE_SYS_ID=PM.MODULE_SYS_ID) WHERE U.USER_ID=? AND  CPMF.ACTIVE_STATUS_IND = 1  AND P.ACTIVE_STATUS_IND = M.ACTIVE_STATUS_IND "
 					+ "	AND CP.ACTIVE_STATUS_IND = PM.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND "
 					+ "	AND CPM.ACTIVE_STATUS_IND = CPMF.ACTIVE_STATUS_IND ";
-			
-						ArrayList<ProductModuleFeature> prodModFeatr = jdbcTemplate.query(sql5,new PreparedStatementSetter() {
-	              public void setValues(PreparedStatement preparedStatement) throws
-	                SQLException {
-	                  preparedStatement.setString(1, masterLoginId);
-	              }
-	            },
-					new UserRepositoryImpl.PrepareProdModFeatureExtractor());
+
+			ArrayList<ProductModuleFeature> prodModFeatr = jdbcTemplate.query(sql5, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, masterLoginId);
+				}
+			}, new UserRepositoryImpl.PrepareProdModFeatureExtractor());
 
 			// Roles and privileges
 			String sql2 = "SELECT DISTINCT P.PRIVILEGE_CODE, P.PRIVILEGE_NAME, P.PRIVILEGE_DESC, CPMF.FEATURE_NAME FROM USERS U, PRIVILEGES P, "
@@ -522,16 +493,15 @@ public class UserRepositoryImpl implements UserRepository {
 					+ "AND CP.CUST_PROD_SYS_ID = CPM.CUST_PROD_SYS_ID AND CPM.CUST_PROD_MOD_SYS_ID = CPMF.CUST_PROD_MOD_SYS_ID  "
 					+ " AND P.CUST_PROD_MOD_FEATURE_SYS_ID = CPMF.CUST_PROD_MOD_FEATURE_SYS_ID "
 					+ "AND RP.PRIVILEGE_SYS_ID = P.PRIVILEGE_SYS_ID AND RP.ACTIVE_STATUS_IND = P.ACTIVE_STATUS_IND AND"
-						+ " CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND AND CPM.ACTIVE_STATUS_IND = CPMF.ACTIVE_STATUS_IND "
-						+ " AND CPMF.ACTIVE_STATUS_IND = U.ACTIVE_STATUS_IND AND CPMF.ACTIVE_STATUS_IND = 1 AND U.USER_ID=? ";
+					+ " CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND AND CPM.ACTIVE_STATUS_IND = CPMF.ACTIVE_STATUS_IND "
+					+ " AND CPMF.ACTIVE_STATUS_IND = U.ACTIVE_STATUS_IND AND CPMF.ACTIVE_STATUS_IND = 1 AND U.USER_ID=? ";
 
-			ArrayList<ProductModuleFeaturePrivileges> prodModFeatrPriv = jdbcTemplate.query(sql2,new PreparedStatementSetter() {
-	              public void setValues(PreparedStatement preparedStatement) throws
-	                SQLException {
-	                  preparedStatement.setString(1, masterLoginId);
-	              }
-	            },
-					new UserRepositoryImpl.PrepareProdModFeaturePrivExtractor());
+			ArrayList<ProductModuleFeaturePrivileges> prodModFeatrPriv = jdbcTemplate.query(sql2,
+					new PreparedStatementSetter() {
+						public void setValues(PreparedStatement preparedStatement) throws SQLException {
+							preparedStatement.setString(1, masterLoginId);
+						}
+					}, new UserRepositoryImpl.PrepareProdModFeaturePrivExtractor());
 
 			ArrayList<ProductModuleFeaturePrivileges> productModuleFeaturePrivilegesSorted = null;
 			ArrayList<ProductModuleFeature> prodModFeatrSorted = null;
@@ -539,30 +509,31 @@ public class UserRepositoryImpl implements UserRepository {
 
 			for (int i = 0; i < ticketDetails.getProducts().size(); i++) {
 				prodModSorted = new ArrayList<ProductModules>();
-				for (int x = 0; x < prodMods.size();x++) {
+				for (int x = 0; x < prodMods.size(); x++) {
 					if (ticketDetails.getProducts().get(i).getProductCode().equals(prodMods.get(x).getProdCode())) {
-						prodModFeatrSorted = new  ArrayList<ProductModuleFeature> ();
-						for (int y = 0; y < prodModFeatr.size();y++) {
+						prodModFeatrSorted = new ArrayList<ProductModuleFeature>();
+						for (int y = 0; y < prodModFeatr.size(); y++) {
 
-							if (ticketDetails.getProducts().get(i).getProductCode().equals(prodModFeatr.get(y).getProdCode()) && 
-									prodModFeatr.get(y).getProdModCode().equals(prodMods.get(x).getProductModCode())) {
-								
+							if (ticketDetails.getProducts().get(i).getProductCode()
+									.equals(prodModFeatr.get(y).getProdCode())
+									&& prodModFeatr.get(y).getProdModCode()
+											.equals(prodMods.get(x).getProductModCode())) {
+
 								productModuleFeaturePrivilegesSorted = new ArrayList<ProductModuleFeaturePrivileges>();
-								for (int z = 0; z < prodModFeatrPriv.size();z++) {
+								for (int z = 0; z < prodModFeatrPriv.size(); z++) {
 									if (prodModFeatr.get(y).getProdModFeatureName()
 											.equals(prodModFeatrPriv.get(z).getProdModFeatrName())) {
-										
+
 										productModuleFeaturePrivilegesSorted.add(prodModFeatrPriv.get(z));
-										
+
 									}
-																	
+
 								}
 								prodModFeatr.get(y).setProdModFeatrPriv(productModuleFeaturePrivilegesSorted);
 								prodModFeatrSorted.add(prodModFeatr.get(y));
-								
 
-							}							
-						}						
+							}
+						}
 						prodMods.get(x).setProdModFeature(prodModFeatrSorted);
 						prodModSorted.add(prodMods.get(x));
 					}
@@ -575,8 +546,8 @@ public class UserRepositoryImpl implements UserRepository {
 			}
 
 		} catch (Exception e) {
-			logger.error("Exception encountered while preparing the Ticket Details for user " + user.getMasterLoginId()
-					+ " : " + e.getMessage(), user.getMasterLoginId(), null, e);
+			logger.error("Exception encountered while preparing the Ticket Details for user " + e.getMessage(), null,
+					e);
 		}
 	}
 
@@ -588,8 +559,7 @@ public class UserRepositoryImpl implements UserRepository {
 		try {
 			ticket = jdbcTemplate.query(sql, new UserRepositoryImpl.TicketDetailExtractor());
 		} catch (Exception e) {
-			logger.error("Exception encountered while get Ticket Details for ticketId : " + e.getMessage(), ticketId,
-					null, e);
+			logger.error("Exception encountered while get Ticket Details for ticketId : " + e.getMessage(), null, e);
 		}
 
 		return ticket;
@@ -610,7 +580,7 @@ public class UserRepositoryImpl implements UserRepository {
 			String firstName = null;
 			String lastName = null;
 			String middleName = null;
-	
+
 			while (rs.next()) {
 				ticketDetails = new TicketDetails();
 				ticketDetails.setCompName(rs.getString("company_name"));
@@ -701,7 +671,7 @@ public class UserRepositoryImpl implements UserRepository {
 		public ArrayList<ProductModuleFeature> extractData(ResultSet rs) throws SQLException, DataAccessException {
 			ProductModuleFeature productModulesFeatr = null;
 			ArrayList<ProductModuleFeature> prodModFeaList = new ArrayList<ProductModuleFeature>();
-		
+
 			while (rs.next()) {
 				productModulesFeatr = new ProductModuleFeature();
 				productModulesFeatr.setProdCode(rs.getString("product_code"));
@@ -869,19 +839,17 @@ public class UserRepositoryImpl implements UserRepository {
 	public String getUserEmailId(String userId) {
 		String message = null;
 		String sql = "select ci.email from users u, user_contact uc, contact_info ci " + " where u.user_id=?"
-				+ " and u.user_sys_id=uc.user_sys_id "
-				+ " and uc.contact_info_sys_id = ci.contact_info_sys_id  ";
+				+ " and u.user_sys_id=uc.user_sys_id " + " and uc.contact_info_sys_id = ci.contact_info_sys_id  ";
 
 		try {
 			return jdbcTemplate.query(sql, new PreparedStatementSetter() {
-	              public void setValues(PreparedStatement preparedStatement) throws
-	                SQLException {
-	                  preparedStatement.setString(1, userId);
-	              }
-	            }, new UserRepositoryImpl.EmailExtractor());
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, userId);
+				}
+			}, new UserRepositoryImpl.EmailExtractor());
 		} catch (Exception e) {
-			logger.error("Exception encountered get User Email while resetting password for user " + userId + " : "
-					+ e.getMessage(), userId, null, e);
+			logger.error("Exception encountered get User Email while resetting password for user " + e.getMessage(),
+					null, e);
 			message = "Error encountered while resetting password.";
 		}
 		return message;
