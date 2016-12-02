@@ -14,9 +14,10 @@ import {RootComponent} from './app/layout/root.component';
 import {HomeComponent} from './app/home.component';
 import {HeaderComponent} from './app/layout/header.component';
 import {FooterComponent} from './app/layout/footer.component';
-import {SidenavComponent, SidenavBtnComponent} from './app/sidenav';
+import {SidenavComponent, SidenavBtnComponent, SidenavTargetDirective} from './app/sidenav';
 
 import {ObservePageComponent} from './app/observe/observe-page.component';
+import {FilterSidenavComponent} from './app/observe/filter-sidenav.component';
 import {AnalyzePageComponent, newAnalysisService} from './app/analyze';
 
 // import app modules
@@ -40,8 +41,10 @@ angular
   .component('headerComponent', HeaderComponent)
   .component('footerComponent', FooterComponent)
   .component('home', HomeComponent)
+  .directive('sidenavTarget', SidenavTargetDirective)
   .component('sidenav', SidenavComponent)
   .component('sidenavBtn', SidenavBtnComponent)
+  .component('filterSidenav', FilterSidenavComponent)
   .component('observePage', ObservePageComponent)
   .factory('newAnalysisService', newAnalysisService)
   .component('analyzePage', AnalyzePageComponent);
