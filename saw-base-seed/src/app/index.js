@@ -14,8 +14,10 @@ import {RootComponent} from './layout/root.component';
 import {HomeComponent} from './home.component';
 import {HeaderComponent} from './layout/header.component';
 import {FooterComponent} from './layout/footer.component';
-import {SidenavComponent, SidenavBtnComponent} from './sidenav';
+import {SidenavComponent, SidenavBtnComponent, SidenavTargetDirective} from './sidenav';
 
+import {CheckboxFilterComponent, RadioFilterComponent, TimeRangeFilterComponent, PriceRangeFilterComponent, FilterGroupComponent} from './observe/filters';
+import {FilterSidenavComponent} from './observe/filter-sidenav.component';
 import {ObservePageComponent} from './observe/observe-page.component';
 import {AnalyzePageComponent, newAnalysisService} from './analyze';
 
@@ -40,8 +42,15 @@ angular
   .component('headerComponent', HeaderComponent)
   .component('footerComponent', FooterComponent)
   .component('home', HomeComponent)
+  .directive('sidenavTarget', SidenavTargetDirective)
   .component('sidenav', SidenavComponent)
   .component('sidenavBtn', SidenavBtnComponent)
+  .component('filterSidenav', FilterSidenavComponent)
+  .component('checkboxFilter', CheckboxFilterComponent)
+  .component('radioFilter', RadioFilterComponent)
+  .component('timeRangeFilter', TimeRangeFilterComponent)
+  .component('priceRangeFilter', PriceRangeFilterComponent)
+  .component('filterGroup', FilterGroupComponent)
   .component('observePage', ObservePageComponent)
   .factory('newAnalysisService', newAnalysisService)
   .component('analyzePage', AnalyzePageComponent);
