@@ -29,10 +29,16 @@ export const PriceRangeFilterComponent = {
         () => isUndefined(this.ngModel) ? this.ngModel : this.ngModel.fromPrice,
         () => isUndefined(this.ngModel) ? this.ngModel : this.ngModel.toPrice
       ], range => {
-        this.ngModelController.$setViewValue({
-          fromPrice: isUndefined(range[0]) ? MIN_PRICE : range[0],
-          toPrice: isUndefined(range[1]) ? MAX_PRICE : range[1]
-        });
+        if (isUndefined(range[0]) && isUndefined(range[1])) {
+          this.ngModelController.$setViewValue(undefined);
+        } else if (range[0] === MIN_PRICE && range[1] === MAX_PRICE) {
+          this.ngModelController.$setViewValue(undefined);
+        } else {
+          this.ngModelController.$setViewValue({
+            fromPrice: range[0],
+            toPrice: range[1]
+          });
+        }
       });
     }
 

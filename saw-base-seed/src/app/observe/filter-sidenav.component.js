@@ -1,4 +1,7 @@
 import cloneDeep from 'lodash/cloneDeep';
+import map from 'lodash/map';
+import omit from 'lodash/omit';
+
 import template from './filter-sidenav.component.html';
 
 export const OBSERVE_FILTER_SIDENAV_ID = 'observe-filter-sidenav';
@@ -11,8 +14,7 @@ export const FilterSidenavComponent = {
     ngModel: '<'
   },
   controller: class FilterSidenavController {
-    constructor($log, $mdSidenav) {
-      this.$log = $log;
+    constructor($mdSidenav) {
       this.$mdSidenav = $mdSidenav;
       this.id = OBSERVE_FILTER_SIDENAV_ID;
       this.affiliates = ['DIRECT TV', 'Red Ventures', 'ClearLink', 'All Connect', 'Q-ology', 'Acceller'];
@@ -38,12 +40,6 @@ export const FilterSidenavComponent = {
       this.appliedFilters = [];
     }
 
-    $onInit() {
-      if (this.ngModel) {
-        this.appliedFilters = cloneDeep(this.ngModel);
-      }
-    }
-
     $onChanges() {
       if (this.ngModel) {
         this.appliedFilters = cloneDeep(this.ngModel);
@@ -51,6 +47,12 @@ export const FilterSidenavComponent = {
     }
 
     onFiltersApplied() {
+      this.ngModelController.$setViewValue(cloneDeep(this.appliedFilters));
+      this.$mdSidenav(OBSERVE_FILTER_SIDENAV_ID).toggle();
+    }
+
+    clearAllFilters() {
+      this.appliedFilters = map(this.appliedFilters, filter => omit(filter, 'model'));
       this.ngModelController.$setViewValue(cloneDeep(this.appliedFilters));
       this.$mdSidenav(OBSERVE_FILTER_SIDENAV_ID).toggle();
     }

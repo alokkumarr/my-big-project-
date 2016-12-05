@@ -12,13 +12,8 @@ import {OBSERVE_FILTER_SIDENAV_ID} from './filter-sidenav.component';
 export const ObservePageComponent = {
   template,
   controller: class ObserverPageController {
-    constructor($log) {
-      'ngInject';
-      this.$log = $log;
+    constructor() {
       this.filterSidenavId = OBSERVE_FILTER_SIDENAV_ID;
-
-      this.filters = [];
-
       this.menu = [{
         name: 'Dashboard 1'
       }, {
@@ -28,13 +23,14 @@ export const ObservePageComponent = {
       }, {
         name: 'Dashboard 4'
       }];
-
+      // models of fitlers
+      this.filters = [];
+      // array of strings used fo the chips
       this.appliedFilters = [];
     }
 
     onFiltersApplied(filters) {
       this.appliedFilters = this.appliedFiltersMapper()(filters);
-      this.$log.info('filtersApplied: filters: ', this.appliedFilters);
     }
 
     onFilterRemoved() {

@@ -13,7 +13,7 @@ export const FilterGroupComponent = {
     ngModel: '<'
   },
   controller: class FilterGroupController {
-    $onInit() {
+    $onChanges() {
       if (!this.ngModel || isEmpty(this.ngModel)) {
         this.ngModel = cloneDeep(this.filters);
       }
