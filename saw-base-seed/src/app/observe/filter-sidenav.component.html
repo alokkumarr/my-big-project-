@@ -6,70 +6,14 @@
     <md-toolbar>
       <div class="md-toolbar-tools">
         <md-button sidenav-target="{{$ctrl.id}}" class="btn-card" aria-label="Cancel">Cancel</md-button>
-        <md-button class="btn-primary" aria-label="Apply Filters">Apply Filters</md-button>
+        <md-button ng-click="$ctrl.onFiltersApplied()" class="btn-primary" aria-label="Apply Filters">Apply Filters</md-button>
       </div>
     </md-toolbar>
 
     <div style="padding: 10px;">
     <md-content layout="column" layout-align="space-around">
-      <panel title="Time Range" class="time-range-panel">
-        <div layout-gt-xs="row">
-          <md-input-container flex-gt-xs>
-            <label>From</label>
-            <md-datepicker
-              md-hide-icons="calendar"
-              ng-model="fromDate"
-              md-placeholder="mm/dd/yyyy"></md-datepicker>
-          </md-input-container>
-          <div style="width: 20px;padding: 0 3px;">
-            <div></div>
-          </div>
-          <md-input-container flex-gt-xs>
-            <label>To</label>
-            <md-datepicker
-              md-hide-icons="calendar"
-              ng-model="toDate"
-              md-placeholder="mm/dd/yyyy"></md-datepicker>
-          </md-input-container>
-        </div>
-        <div class="time-range-shortcut-btns">
-          <md-button class="md-primary" aria-label="1st Week">1st Week</md-button>
-          <md-button class="md-primary" aria-label="2nd Week">2nd Week</md-button>
-          <md-button class="md-primary" aria-label="More">More
-            <md-icon md-font-icon="icon-Shape-Copy-2"></md-icon></md-button>
-        </div>
-      </panel>
 
-      <panel title="Affiliates" class="time-range-panel" style="margin-top: 10px">
-        <div layout="column" layou-align="stretch" style="padding-left: 10px">
-          <div flex ng-repeat="affiliate in ::$ctrl.affiliates track by $index">
-            <md-checkbox>
-              {{::affiliate}}
-            </md-checkbox>
-          </div>
-
-        </div>
-      </panel>
-
-      <panel title="Regions" class="time-range-panel" style="margin-top: 10px">
-          <md-radio-group>
-            <md-radio-button ng-repeat="region in ::$ctrl.regions track by $index"
-                             style="margin-left: 10px"
-                             ng-value="::region" class="md-primary">
-              {{::region}}
-            </md-radio-button>
-          </md-radio-group>
-      </panel>
-
-      <panel title="Price range" class="time-range-panel" style="margin-top: 10px">
-        <range-slider
-          lower-value="$ctrl.rangeSlider.lower"
-          upper-value="$ctrl.rangeSlider.upper"
-          min-gap="$ctrl.rangeSlider.minGap"
-          step="$ctrl.rangeSlider.step"
-          min="$ctrl.rangeSlider.min"
-          max="$ctrl.rangeSlider.max"></range-slider>
-      </panel>
+      <filter-group filters="$ctrl.filters" ng-model="$ctrl.appliedFilters"></filter-group>
 
       <md-toolbar class="secondary-toolbar">
         <div class="md-toolbar-tools" layout-align="center">

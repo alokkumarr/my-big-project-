@@ -16,6 +16,7 @@ import {HeaderComponent} from './app/layout/header.component';
 import {FooterComponent} from './app/layout/footer.component';
 import {SidenavComponent, SidenavBtnComponent, SidenavTargetDirective} from './app/sidenav';
 
+import {CheckboxFilterComponent, RadioFilterComponent, TimeRangeFilterComponent, PriceRangeFilterComponent, FilterGroupComponent} from './app/observe/filters';
 import {ObservePageComponent} from './app/observe/observe-page.component';
 import {FilterSidenavComponent} from './app/observe/filter-sidenav.component';
 import {AnalyzePageComponent, newAnalysisService} from './app/analyze';
@@ -45,6 +46,11 @@ angular
   .component('sidenav', SidenavComponent)
   .component('sidenavBtn', SidenavBtnComponent)
   .component('filterSidenav', FilterSidenavComponent)
+  .component('checkboxFilter', CheckboxFilterComponent)
+  .component('radioFilter', RadioFilterComponent)
+  .component('timeRangeFilter', TimeRangeFilterComponent)
+  .component('priceRangeFilter', PriceRangeFilterComponent)
+  .component('filterGroup', FilterGroupComponent)
   .component('observePage', ObservePageComponent)
   .factory('newAnalysisService', newAnalysisService)
   .component('analyzePage', AnalyzePageComponent);

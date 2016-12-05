@@ -1,0 +1,9 @@
+<panel title="{{::$ctrl.filter.label}}" class="time-range-panel" style="margin-top: 10px">
+  <range-slider
+    lower-value="$ctrl.ngModel.fromPrice"
+    upper-value="$ctrl.ngModel.toPrice"
+    min-gap="$ctrl.rangeSlider.minGap"
+    step="$ctrl.rangeSlider.step"
+    min="$ctrl.rangeSlider.min"
+    max="$ctrl.rangeSlider.max"></range-slider>
+</panel>
