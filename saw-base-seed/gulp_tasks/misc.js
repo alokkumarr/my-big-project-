@@ -22,8 +22,8 @@ function other() {
   const fileFilter = filter(file => file.stat.isFile());
 
   return gulp.src([
-    path.join(conf.paths.src, '/**/*'),
-    path.join(`!${conf.paths.src}`, '/**/*.{scss,js,html}')
+    path.join(conf.paths.app, '/**/*'),
+    path.join(`!${conf.paths.app}`, '/**/*.{scss,js,html}')
   ])
     .pipe(fileFilter)
     .pipe(gulp.dest(conf.paths.dist));

@@ -1,4 +1,4 @@
-import '../themes/_triton.scss';
+import '../../themes/_triton.scss';
 const themeName = 'triton';
 
 /** @ngInject */

@@ -2,7 +2,7 @@ import angular from 'angular';
 import 'angular-ui-router';
 import 'angular-material';
 import 'angular-material/angular-material.css';
-import '../fonts/style.css';
+import '../../fonts/style.css';
 import 'devextreme/integration/angular';
 import 'angular-ui-grid';
 import 'angular-ui-grid/ui-grid.css';
@@ -10,19 +10,19 @@ import 'angular-ui-grid/ui-grid.css';
 import {routesConfig} from './routes';
 import {themeConfig} from './theme';
 
-import {RootComponent} from './app/layout/root.component';
-import {HomeComponent} from './app/home.component';
-import {HeaderComponent} from './app/layout/header.component';
-import {FooterComponent} from './app/layout/footer.component';
-import {SidenavComponent, SidenavBtnComponent, SidenavTargetDirective} from './app/sidenav';
+import {RootComponent} from './layout/root.component';
+import {HomeComponent} from './home.component';
+import {HeaderComponent} from './layout/header.component';
+import {FooterComponent} from './layout/footer.component';
+import {SidenavComponent, SidenavBtnComponent, SidenavTargetDirective} from './sidenav';
 
-import {CheckboxFilterComponent, RadioFilterComponent, TimeRangeFilterComponent, PriceRangeFilterComponent, FilterGroupComponent} from './app/observe/filters';
-import {ObservePageComponent} from './app/observe/observe-page.component';
-import {FilterSidenavComponent} from './app/observe/filter-sidenav.component';
-import {AnalyzePageComponent, newAnalysisService} from './app/analyze';
+import {CheckboxFilterComponent, RadioFilterComponent, TimeRangeFilterComponent, PriceRangeFilterComponent, FilterGroupComponent} from './observe/filters';
+import {FilterSidenavComponent} from './observe/filter-sidenav.component';
+import {ObservePageComponent} from './observe/observe-page.component';
+import {AnalyzePageComponent, newAnalysisService} from './analyze';
 
 // import app modules
-import {LibModule} from './app/lib';
+import {LibModule} from './lib';
 
 import './index.scss';
 
