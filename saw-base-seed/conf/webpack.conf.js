@@ -89,7 +89,7 @@ module.exports = {
   ],
   postcss: () => [autoprefixer],
   debug: true,
-  devtool: 'eval',
+  devtool: 'eval-source-map',
   eslint: {
     configFile: conf.paths.eslintDevConfig
   }

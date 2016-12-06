@@ -6,6 +6,7 @@ module.exports = defaultsDeep({
   rules: {
     'no-console': 0,
     'angular/log': 0,
-    'no-unused-vars': 0
+    'no-unused-vars': 0,
+    'no-debugger': 0
   }
 }, baseRules);
