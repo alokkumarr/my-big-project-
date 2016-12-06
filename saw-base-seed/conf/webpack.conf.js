@@ -6,8 +6,13 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 
 module.exports = {
-  eslint: {
-    configFile: conf.paths.eslintDevConfig
+  entry: {
+    index: `./${conf.path.app('index')}`,
+    login: `./${conf.path.login('index')}`
+  },
+  output: {
+    path: path.join(process.cwd(), conf.paths.tmp),
+    filename: '[name].js'
   },
   module: {
     preLoaders: [
@@ -21,9 +26,7 @@ module.exports = {
     loaders: [
       {
         test: /.json$/,
-        loaders: [
-          'json'
-        ]
+        loaders: ['json']
       },
       {
         test: /\.(css|scss)$/,
@@ -62,28 +65,32 @@ module.exports = {
       }
     ]
   },
+  resolve: {
+    modules: [
+      'src/',
+      'node_modules/'
+    ]
+  },
   plugins: [
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.NoErrorsPlugin(),
     new HtmlWebpackPlugin({
-      chunks: ['index'],
-      template: conf.path.app('index.html')
+      template: conf.path.app('index.html'),
+      chunks: ['index']
     }),
     new HtmlWebpackPlugin({
       filename: 'login.html',
       chunks: ['login'],
       template: conf.path.login('index.html')
+    }),
+    new webpack.DefinePlugin({
+      '__DEVELOPMENT__': process.env.NODE_ENV !== 'production'
     })
   ],
   postcss: () => [autoprefixer],
   debug: true,
-  devtool: 'eval',
-  output: {
-    path: path.join(process.cwd(), conf.paths.tmp),
-    filename: '[name].js'
-  },
-  entry: {
-    index: `./${conf.path.app('index')}`,
-    login: `./${conf.path.login('index')}`
+  devtool: 'eval-source-map',
+  eslint: {
+    configFile: conf.paths.eslintDevConfig
   }
 };

@@ -12,16 +12,21 @@ import some from 'lodash/fp/some';
 import set from 'lodash/fp/set';
 import get from 'lodash/fp/get';
 
-export function newAnalysisService($http) {
+export function AnalyzeService($http) {
   'ngInject';
 
   return {
+    getMenu,
     getMethods,
     getMetrics,
     getSupportedMethods,
     setAvailableMetrics: curry(setAvailableItems)(metricMapper, metricHasSupportedMethod),
-    setAvailableAnalysisMethods: curry(setAvailableItems)(analysisMethodMapper, IsMethodSupported)
+    setAvailableAnalysisMethods: curry(setAvailableItems)(analysisMethodMapper, isMethodSupported)
   };
+
+  function getMenu() {
+    return $http.get('/api/menu/analyze').then(get('data'));
+  }
 
   function getMethods() {
     return $http.get('/api/analyze/methods').then(get('data'));
@@ -45,9 +50,10 @@ export function newAnalysisService($http) {
    */
   function setAvailableItems(mapperFn, checkerFn, items, supportedMethods) {
     const setDisabled = item => {
-      // if there are no supported methids it's probably because no metric was selected
+      // if there are no supported methods it's probably because no metric was selected
       const nothingSelected = isEmpty(supportedMethods);
       const disabledValue = nothingSelected ? false : !checkerFn(item, supportedMethods);
+
       return set('disabled', disabledValue, item);
     };
 
@@ -86,7 +92,7 @@ export function newAnalysisService($http) {
     )(metric.supports);
   }
 
-  function IsMethodSupported(method, supportedMethods) {
+  function isMethodSupported(method, supportedMethods) {
     return find(isEqual(method.type), supportedMethods);
   }
 

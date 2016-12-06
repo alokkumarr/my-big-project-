@@ -7,26 +7,34 @@ import lte from 'lodash/lte';
 import omit from 'lodash/fp/omit';
 
 import template from './observe-page.component.html';
-import {OBSERVE_FILTER_SIDENAV_ID} from './filter-sidenav.component';
+import style from './observe-page.component.scss';
+import {OBSERVE_FILTER_SIDENAV_ID} from './../filter-sidenav.component';
 
 export const ObservePageComponent = {
   template,
+  styles: [style],
   controller: class ObserverPageController {
-    constructor() {
+    constructor($componentHandler, ObserveService) {
+      'ngInject';
+
+      this.$componentHandler = $componentHandler;
+      this.ObserveService = ObserveService;
+
       this.filterSidenavId = OBSERVE_FILTER_SIDENAV_ID;
-      this.menu = [{
-        name: 'Dashboard 1'
-      }, {
-        name: 'Dashboard 2'
-      }, {
-        name: 'Dashboard 3'
-      }, {
-        name: 'Dashboard 4'
-      }];
+
       // models of fitlers
       this.filters = [];
       // array of strings used fo the chips
       this.appliedFilters = [];
+    }
+
+    $onInit() {
+      const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
+
+      this.ObserveService.getMenu()
+        .then(data => {
+          leftSideNav.update(data);
+        });
     }
 
     onFiltersApplied(filters) {

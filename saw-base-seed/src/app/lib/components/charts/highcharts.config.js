@@ -1,5 +1,6 @@
-/** @ngInject */
 export function highchartsConfig(Highcharts) {
+  'ngInject';
+
   Highcharts.setOptions({
     colors: ['#490094', '#9A72C4', '#C8B2DF', '#006ADE', '#6AB4FF',
       '#B5DAFF', '#014752', '#009293', '#73C3C4', '#4CEA7C', '#9DF4B7', '#C9F9D8',

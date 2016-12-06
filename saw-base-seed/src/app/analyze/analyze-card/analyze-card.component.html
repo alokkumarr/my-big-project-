@@ -1,0 +1,51 @@
+<md-card class="analyze-card">
+  <md-card-content layout="row">
+    <div class="analyze-card_report">
+      <div ng-switch="::$ctrl.type">
+        <div class="content-component"
+             ng-switch-when="chart">
+          <line-chart options="$ctrl.chart.options"
+                      data="$ctrl.chart.data"></line-chart>
+        </div>
+
+        <div class="content-component"
+             ng-switch-when="report">
+          <div dx-data-grid="$ctrl.report.options"></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="analyze-card_label"
+           ng-bind="::$ctrl.type | uppercase"></div>
+    </div>
+  </md-card-content>
+
+  <md-card-footer layout="row" layout-align="end start">
+    <md-card-title>
+      <md-card-title-text>
+        <span class="md-headline"
+              ng-bind="::$ctrl.title"></span>
+        <span class="md-subhead">
+            <span ng-bind="::$ctrl.getLabelsString()"></span>
+            <span>
+              <md-icon md-font-icon="icon-calendar"></md-icon>
+              <span ng-bind="::$ctrl.schedule"></span>
+            </span>
+          </span>
+      </md-card-title-text>
+    </md-card-title>
+
+    <md-card-actions layout="row" layout-align="center center">
+      <md-button>
+        <md-icon md-font-icon="icon-fork"></md-icon>
+      </md-button>
+      <md-button>
+        <md-icon md-font-icon="icon-folder"></md-icon>
+      </md-button>
+      <md-button>
+        <md-icon md-font-icon="icon-more"></md-icon>
+      </md-button>
+    </md-card-actions>
+  </md-card-footer>
+</md-card>

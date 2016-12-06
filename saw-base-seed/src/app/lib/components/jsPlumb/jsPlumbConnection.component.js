@@ -8,8 +8,9 @@ export const JSPlumbConnection = {
     settings: '<'
   },
   controller: class JSPlumbConnectionCtrl {
-    /** @ngInject */
     constructor($element, $timeout) {
+      'ngInject';
+
       this.$element = $element;
       this.$timeout = $timeout;
     }

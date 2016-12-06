@@ -1,0 +1,29 @@
+<div>
+  <filter-sidenav ng-model="$ctrl.filters"
+                  ng-change="$ctrl.onFiltersApplied($ctrl.filters)"></filter-sidenav>
+  <md-toolbar class="secondary-toolbar">
+    <div class="md-toolbar-tools" layout-align="space-between center">
+      <md-button class="btn-primary" aria-label="Filter"
+                 sidenav-target="{{$ctrl.filterSidenavId}}">
+        <md-icon md-font-icon="icon-filter"></md-icon>
+        Filter
+      </md-button>
+    </div>
+  </md-toolbar>
+  <md-content>
+    <md-chips class="filter-tags" placeholder="6 More Filters..." readonly
+              ng-if="$ctrl.appliedFilters"
+              ng-model="$ctrl.appliedFilters"
+              md-removable="true"
+              md-on-remove="$ctrl.onFilterRemoved()">
+
+      <md-chip-template>
+        <span>{{$chip}}</span>
+      </md-chip-template>
+
+      <button class="md-primary" md-chip-remove>
+        <md-icon md-font-icon="icon-remove"></md-icon>
+      </button>
+    </md-chips>
+  </md-content>
+</div>

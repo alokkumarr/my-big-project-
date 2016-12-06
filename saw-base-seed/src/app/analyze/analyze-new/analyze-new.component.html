@@ -24,7 +24,7 @@
 
   <div class="md-subhead">How would you like to analyze?</div>
   <div>
-    <div class="analysis-method-container" ng-repeat="analysisMethod in $ctrl.analysisMethods track by $index">
+    <div class="analysis-method-container" ng-repeat="analysisMethod in $ctrl.methods track by $index">
       <div class="md-body-1" flex>{{::analysisMethod.label}}</div>
       <div flex>
         <choice-group items="analysisMethod.children" ng-model="$ctrl.selectedAnalysisMethod" ng-change="$ctrl.onAnalysisMethodSelected()"></choice-group>

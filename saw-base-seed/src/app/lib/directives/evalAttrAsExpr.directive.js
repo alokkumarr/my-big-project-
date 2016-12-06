@@ -4,7 +4,6 @@ class EvalAttrAsExprDirective {
     this.priority = 9999;
   }
 
-  /** @ngInject */
   controller($scope, $attrs) {
     const attrToEval = $attrs.evalAttrAsExpr;
 

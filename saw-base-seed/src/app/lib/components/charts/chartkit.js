@@ -23,8 +23,9 @@ function walkTree(obj, cb) {
 }
 
 export function wrapChart(chartName, chartFactory) {
-  /** @ngInject */
   return function ($injector, Highcharts, $compile, $rootScope, $templateRequest, $q) {
+    'ngInject';
+
     let chartSettings = $injector.invoke(chartFactory);
     const def = removeProps(chartSettings, ['scope', 'link', 'require', 'transform']);
     const promises = [];

@@ -1,5 +1,6 @@
 export function routesConfig($stateProvider, $urlRouterProvider, $locationProvider) {
   'ngInject';
+
   $locationProvider.html5Mode(true).hashPrefix('!');
   $urlRouterProvider.otherwise('/');
 
@@ -21,6 +22,10 @@ export function routesConfig($stateProvider, $urlRouterProvider, $locationProvid
       name: 'analyze',
       url: '/analyze',
       component: 'analyzePage'
+    }, {
+      name: 'analyze.view',
+      url: '/:id',
+      component: 'analyzeView'
     }, {
       name: 'alerts',
       url: '/alerts'

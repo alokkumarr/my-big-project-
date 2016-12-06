@@ -2,9 +2,10 @@
   <md-sidenav class="md-sidenav-left"
               md-component-id="$ctrl.id"
               md-whiteframe="4"
+              md-is-locked-open="$ctrl.isOpen()"
               md-disable-backdrop
               eval-attr-as-expr="mdComponentId">
-    <md-toolbar class="secondary-toolbar">
+    <md-toolbar class="secondary-toolbar" md-sidenav-focus>
       <div class="md-toolbar-tools">
         <div class="company-logo"></div>
 
