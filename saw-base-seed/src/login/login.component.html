@@ -10,20 +10,21 @@
         </br>
         <span>have an account yet contact your system administrator</span>
       </div>
-
-      <md-input-container>
-        <label>Username</label>
-        <input type="text" ng-model="username">
-      </md-input-container>
-      <md-input-container>
-        <label>Password</label>
-        <input type="password" ng-model="password">
-      </md-input-container>
-
-      <div class="login-buttons" layout="row" layout-align="space-between center">
-        <md-button class="btn-primary" ng-click="$ctrl.login()">Login</md-button>
-        <md-button class="md-primary">Forgot Password?</md-button>
-      </div>
+      <form name="loginForm">
+        <div ng-bind="$ctrl.errorMsg" class="error-msg"> </div>
+        <md-input-container>
+          <label>Username</label>
+          <input required type="text" ng-model="$ctrl.formData.masterLoginId">
+        </md-input-container>
+        <md-input-container>
+          <label>Password</label>
+          <input required type="password" ng-model="$ctrl.formData.authpwd">
+        </md-input-container>
+        <div class="login-buttons" layout="row" layout-align="space-between center">
+          <md-button ng-disabled="loginForm.$invalid" class="btn-primary" ng-click="$ctrl.login()">Login</md-button>
+          <md-button class="md-primary">Forgot Password?</md-button>
+        </div>
+      </form>
     </div>
     <div class="middle-logo-container"></div>
   </div>

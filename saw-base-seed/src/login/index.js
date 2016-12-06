@@ -7,6 +7,8 @@ import {themeConfig} from '../app/theme';
 import {loginComponent} from './login.component';
 
 import '../app/index.scss';
+import {UserService} from './user.service';
+import {JwtService} from './jwt.service';
 
 export const loginModule = 'login';
 
@@ -15,4 +17,6 @@ angular
     'ngMaterial'
   ])
   .config(themeConfig)
+  .factory('UserService', UserService)
+  .factory('JwtService', JwtService)
   .component('loginComponent', loginComponent);

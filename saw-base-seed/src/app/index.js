@@ -21,6 +21,7 @@ import {AnalyzePageComponent, newAnalysisService} from './analyze';
 
 // import app modules
 import {LibModule} from './lib';
+import {loginModule} from '../login';
 
 import './index.scss';
 
@@ -32,7 +33,8 @@ angular
     'ngMaterial',
     'ui.router',
     'ui.grid',
-    LibModule
+    LibModule,
+    loginModule
   ])
   .config(routesConfig)
   .config(themeConfig)
