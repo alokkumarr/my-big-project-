@@ -1,0 +1,48 @@
+<div class="analyze-view">
+  <md-toolbar class="secondary-toolbar">
+    <div class="md-toolbar-tools"
+         layout-align="space-between center">
+      <div class="md-title">Order Fulfillment
+        <md-icon md-font-icon="icon-search"></md-icon>
+      </div>
+
+      <div>
+        <div class="analyze-view_switch-view">
+          <md-button>
+            <md-icon md-font-icon="icon-Table-view"></md-icon>
+          </md-button>
+          <md-button>
+            <md-icon md-font-icon="icon-card-view"></md-icon>
+          </md-button>
+        </div>
+
+        <md-input-container>
+          <md-select ng-model="__reportType">
+            <md-option value="all" selected>All Types</md-option>
+            <md-divider></md-divider>
+            <md-option value="chart">Charts</md-option>
+            <md-option value="report">Reports</md-option>
+            <md-option value="pivot">Pivots</md-option>
+            <md-divider></md-divider>
+            <md-option value="scheduled">Scheduled</md-option>
+          </md-select>
+        </md-input-container>
+      </div>
+
+      <md-button class="btn-card btn-primary"
+                 ng-click="$ctrl.openNewAnalysisModal($event)">
+        + ANALYSIS
+      </md-button>
+    </div>
+  </md-toolbar>
+
+  <div layout="column">
+    <analyze-card ng-repeat="report in $ctrl.reports | filter:{type:__reportType === 'all' ? '' : __reportType}"
+                  type="report.type"
+                  title="report.title"
+                  labels="report.labels"
+                  schedule="report.schedule"
+                  chart="report.chart"
+                  report="report.report"></analyze-card>
+  </div>
+</div>

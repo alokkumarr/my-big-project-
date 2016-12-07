@@ -1,0 +1,44 @@
+<div class="new-analysis-header" layout="row" layout-align="space-between center">
+  <div class="md-title">New Analysis</div>
+  <md-button class="btn-card">
+    <md-icon md-font-icon="icon-upload"></md-icon>
+    Upload
+  </md-button>
+</div>
+
+<md-divider></md-divider>
+
+<div class="new-analysis-content" layout="column">
+
+  <div class="md-subhead">What would you like to analyze?</div>
+  <div>
+    <div layout="row" layout-wrap>
+      <md-checkbox flex="20"
+                   ng-repeat="metric in $ctrl.metrics track by $index"
+                   ng-model="metric.checked"
+                   ng-disabled="metric.disabled"
+                   ng-change="$ctrl.onMetricToggle()">
+        {{metric.name}}</md-checkbox>
+    </div>
+  </div>
+
+  <div class="md-subhead">How would you like to analyze?</div>
+  <div>
+    <div class="analysis-method-container" ng-repeat="analysisMethod in $ctrl.methods track by $index">
+      <div class="md-body-1" flex>{{::analysisMethod.label}}</div>
+      <div flex>
+        <choice-group items="analysisMethod.children" ng-model="$ctrl.selectedAnalysisMethod" ng-change="$ctrl.onAnalysisMethodSelected()"></choice-group>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="new-analysis-footer" layout="row" layout-align="space-between center" md-whiteframe="10">
+  <md-button class="btn-primary" ng-click="$ctrl.createAnalysis()">
+    Create Analysis
+  </md-button>
+  <md-button class="btn-card" ng-click="$ctrl.cancel()">
+    Cancel
+  </md-button>
+</div>

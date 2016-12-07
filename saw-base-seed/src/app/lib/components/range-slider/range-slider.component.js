@@ -35,8 +35,9 @@ export const RangeSliderComponent = {
   },
   template: templateUrl,
   controller: class RangeSliderController {
-    /** @ngInject */
     constructor($scope) {
+      'ngInject';
+
       this.scope = $scope;
     }
 

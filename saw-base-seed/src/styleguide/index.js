@@ -5,11 +5,11 @@ import 'angular-ui-grid';
 import 'angular-ui-grid/ui-grid.css';
 import 'angular-material';
 import 'angular-material/angular-material.css';
-import '../fonts/style.css';
+import '../../fonts/style.css';
 
-import {themeConfig} from '../src/theme';
+import {themeConfig} from '../app/theme';
 import {routesConfig} from './routes';
-import {LibModule} from '../src/app/lib';
+import {LibModule} from '../app/lib';
 
 import {StyleguideComponent} from './styleguide.component';
 

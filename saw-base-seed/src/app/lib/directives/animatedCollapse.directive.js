@@ -42,7 +42,8 @@ class AnimatedCollapseDirective {
   }
 }
 
-/** @ngInject */
 export default ($mdUtil, $timeout, $parse) => {
+  'ngInject';
+
   return new AnimatedCollapseDirective($mdUtil, $timeout, $parse);
 };

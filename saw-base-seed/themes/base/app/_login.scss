@@ -18,15 +18,14 @@
   .brand-logo {
     width: 248px;
     height: 102px;
-    margin: 10px 0;
-    zoom: 0.4;
-    background-image: url(../assets/att-logo_360.png);
+    margin: 5px 0 0 -30px;
+    background-image: url($company-logo-path);
   }
 
   .powered-logo {
     width: 96px;
     height: 31px;
-    background-image: url(../assets/synchronoss_logo_360.png);
+    background-image: url($powered-by-synchronoss-logo-path);
   }
 
   .powered-logo-container {

@@ -12,8 +12,9 @@ export const JSPlumbTable = {
     settings: '<'
   },
   controller: class JSPlumbTableCtrl {
-    /** @ngInject */
     constructor($scope, $element, $timeout) {
+      'ngInject';
+
       this.$scope = $scope;
       this.$element = $element;
       this.$timeout = $timeout;

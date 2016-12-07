@@ -6,6 +6,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 
 module.exports = {
+  eslint: {
+    configFile: conf.paths.eslintDevConfig
+  },
   module: {
     preLoaders: [
       {

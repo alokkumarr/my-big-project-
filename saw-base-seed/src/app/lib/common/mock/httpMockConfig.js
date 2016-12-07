@@ -1,11 +1,15 @@
-import angularMocks from 'angular-mocks';
-import mockData from './mock';
+import 'angular-mocks';
+import flatten from 'lodash/flatten';
+import values from 'lodash/values';
+
+const req = require.context('app', true, /^(.*\.mock\.(js$))[^.]*$/igm);
+const mocks = flatten(req.keys().map(key => {
+  return values(req(key));
+}));
 
 class HttpMockConfig {
   constructor($httpBackend) {
-    this.angularMocks = angularMocks;
-
-    (mockData || []).forEach(item => {
+    mocks.forEach(item => {
       $httpBackend
         .whenRoute(item.method, item.url)
         .respond(item.response);
@@ -18,7 +22,8 @@ class HttpMockConfig {
   }
 }
 
-/** @ngInject */
 export default $httpBackend => {
+  'ngInject';
+
   return new HttpMockConfig($httpBackend);
 };

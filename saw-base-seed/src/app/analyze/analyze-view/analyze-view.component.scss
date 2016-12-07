@@ -1,0 +1,39 @@
+analyze-view {
+  width: 100%;
+}
+
+.analyze-view {
+  .md-title {
+    color: #636363;
+    font-weight: bold;
+  }
+
+  md-input-container {
+    width: 160px;
+    font-size: 16px;
+  }
+
+  &_switch-view {
+    display: inline-block;
+    margin-right: 25px;
+
+    .md-button {
+      min-width: inherit;
+      margin: 0;
+      padding: 0;
+    }
+  }
+
+  .md-select-value {
+    .md-text {
+      font-weight: bold;
+      font-size: 16px;
+    }
+  }
+
+  .btn-card {
+    background-color: #636363 !important;
+    color: #FFFFFF !important;
+    padding: 2px 15px;
+  }
+}

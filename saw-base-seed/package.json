@@ -17,6 +17,7 @@
     "jquery": "2.2.4",
     "jsplumb": "^2.2.5",
     "jszip": "^3.1.3",
+    "lodash": "^4.17.2",
     "mottle": "^0.7.3"
   },
   "devDependencies": {
@@ -52,6 +53,7 @@
     "gulp-util": "^3.0.7",
     "html-loader": "^0.4.3",
     "html-webpack-plugin": "^2.9.0",
+    "husky": "^0.11.9",
     "image-webpack-loader": "^3.0.0",
     "jasmine": "^2.4.1",
     "json-loader": "^0.5.4",
@@ -79,7 +81,8 @@
     "serve:dist": "gulp serve:dist",
     "test": "gulp test",
     "test:auto": "gulp test:auto",
-    "styleguide": "gulp styleguide"
+    "styleguide": "gulp styleguide",
+    "precommit": "eslint \"src/**/*.js\""
   },
   "eslintConfig": {
     "globals": {

@@ -1,8 +1,9 @@
-import '../themes/_triton.scss';
+import '../../themes/_triton.scss';
 const themeName = 'triton';
 
-/** @ngInject */
 export function themeConfig($mdThemingProvider, $mdAriaProvider) {
+  'ngInject';
+
   $mdThemingProvider.theme(themeName)
     .primaryPalette('blue', {
       default: '700', // by default use shade from the palette for primary intentions
