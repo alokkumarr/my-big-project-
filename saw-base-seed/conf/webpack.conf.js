@@ -76,7 +76,7 @@ module.exports = {
     new webpack.NoErrorsPlugin(),
     new HtmlWebpackPlugin({
       template: conf.path.app('index.html'),
-      chunks: ['index']
+      chunks: ['index', 'login']
     }),
     new HtmlWebpackPlugin({
       filename: 'login.html',

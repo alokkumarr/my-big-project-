@@ -78,11 +78,11 @@ module.exports = {
     new webpack.NoErrorsPlugin(),
     new HtmlWebpackPlugin({
       template: conf.path.app('index.html'),
-      chunks: ['commonVendor' ,'vendor', 'app']
+      chunks: ['login', 'commonVendor' ,'vendor', 'app']
     }),
     new HtmlWebpackPlugin({
       filename: 'login.html',
-      chunks: ['commonVendor', 'login'],
+      chunks: ['login', 'commonVendor'],
       template: conf.path.login('index.html')
     }),
     // uglifyjs introduces some wierd bugs
@@ -91,8 +91,7 @@ module.exports = {
     // }),
     new ExtractTextPlugin('index-[contenthash].css'),
     new webpack.optimize.CommonsChunkPlugin({
-      name: 'commonVendor',
-      filename: 'commonVendor.js',
+      names: ['login', 'commonVendor'],
       minChunks: Infinity
     })
   ],
