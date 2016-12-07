@@ -5,16 +5,8 @@ export const AnalyzeCardComponent = {
   template,
   styles: [style],
   bindings: {
-    type: '<',
-    title: '<',
-    labels: '<',
-    schedule: '<',
-    chart: '<',
-    report: '<'
+    metadata: '<'
   },
   controller: class AnalyzeCardController {
-    getLabelsString() {
-      return (this.labels || []).join(', ');
-    }
   }
 };
