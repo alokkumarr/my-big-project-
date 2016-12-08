@@ -1,0 +1,108 @@
+.login-view {
+  background: #F3F5F8;
+  height:100%;
+  position: relative;
+
+  .login-background {
+    height: 100%;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: absolute;
+    top: 0;
+    z-index: -1;
+    left: 0;
+  }
+
+
+  .brand-logo {
+    width: 248px;
+    height: 102px;
+    margin: 5px 0 0 -30px;
+    background-image: url($company-logo-path);
+  }
+
+  .powered-logo {
+    width: 96px;
+    height: 31px;
+    background-image: url($powered-by-synchronoss-logo-path);
+  }
+
+  .powered-logo-container {
+    position: absolute;
+    bottom: 0;
+    left:0;
+    width: 100%;
+    margin: 0 0 30px 0;
+  }
+
+  .brand-logo, .powered-logo {
+    background-repeat: no-repeat;
+  }
+
+  md-input-container, .login-buttons {
+    width: 250px;
+  }
+
+  .login-info {
+    font-size: 12px;
+    opacity: 0.5;
+    margin-bottom: 20px;
+  }
+
+  .login-buttons {
+    .md-button {
+      margin: 0;
+    }
+  }
+
+  h1 {
+    font-weight: normal;
+  }
+
+  .middle-logo-container {
+    background: $login-middle-logo-color;
+    background-image: url(../assets/alpha.png);
+    background-repeat: no-repeat;
+    display: block;
+    transform: rotateY(180deg);
+    background-size: cover;
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+
+  .bg-container {
+    width: 900px;
+    height: 100%;
+    position: relative;
+  }
+
+  .bg-container-wrapper {
+    height: 100%;
+    background-color: transparent;
+    position: relative;
+  }
+
+  .white-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    z-index: -2;
+  }
+}
+
+@media screen and (min-width: 480px) {
+  .login-view {
+    .login-background {
+
+    }
+  }
+}

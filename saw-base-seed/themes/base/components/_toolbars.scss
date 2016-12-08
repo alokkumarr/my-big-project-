@@ -1,0 +1,18 @@
+md-toolbar.#{$theme-cls}.tb-secondary:not(.md-menu-toolbar) {
+  background-color: #F6F6F6;
+  border: 1px solid  $cards-border-color;
+  color: $app-font-color;
+
+  md-icon {
+    color: $app-font-color;
+    font-size: 9px;
+  }
+}
+
+md-toolbar.#{$theme-cls}:not(.md-menu-toolbar) {
+  color: $app-font-color;
+
+  md-icon {
+    color: $app-font-color;
+  }
+}

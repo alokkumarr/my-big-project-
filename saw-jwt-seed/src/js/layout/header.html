@@ -1,0 +1,41 @@
+<nav class="navbar navbar-light">
+  <div class="container">
+
+    <a class="navbar-brand"
+     
+      ng-bind="::$ctrl.appName | lowercase">
+    </a>
+
+    <!-- Show this for logged out users -->
+    <ul class="nav navbar-nav pull-xs-right" show-authed="false">
+
+     
+      <li class="nav-item">
+       <a class="nav-link"
+          ui-sref-active="active"
+         ui-sref="app.login">
+          Sign in
+        </a>
+      </li>
+
+     
+
+
+    </ul>
+<!-- Show this for logged in users -->
+    <ul show-authed="true" class="nav navbar-nav pull-xs-right">
+
+      
+    <li class="nav-item">
+        <a class="nav-link"
+          ui-sref-active="active"
+          href=""
+          ng-click="$ctrl.logout()">
+         Log Out
+        </a>
+      </li>
+    </ul>
+
+
+  </div>
+</nav>

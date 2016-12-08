@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>war</packaging>
+    <groupId>saw-ui-seed</groupId>
+    <artifactId>saw-ui-seed</artifactId>
+    <version>SNAPSHOT-1.0</version>
+    <name>saw-ui-seed</name>
+    <description>saw-ui-seed</description>
+<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
+		<build.mode>PROD_MODE</build.mode>
+	</properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>4.2.4.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>4.2.4.RELEASE</version>
+        </dependency>
+        <!-- <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>angularjs</artifactId>
+            <version>1.4.8</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+            <version>3.3.6</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency> -->
+    </dependencies>
+    <build>
+     <plugins>
+	
+				<plugin>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>2.6.1</version>
+					<configuration>
+						<filesets>
+							<fileset>
+								<directory>target-grunt</directory>
+								<excludes>
+									<exclude>node_modules/**</exclude>
+								</excludes>
+								<followSymlinks>false</followSymlinks>
+							</fileset>
+						</filesets>
+					</configuration>
+				</plugin>
+				
+
+
+
+				<plugin>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>2.6</version>
+					<executions>
+						<execution>
+							<id>copy-resources-1</id>
+							<phase>validate</phase>
+							<goals>
+								<goal>copy-resources</goal>
+							</goals>
+							<configuration>
+								<outputDirectory>${project.basedir}/target-grunt</outputDirectory>
+								<resources>
+									<resource>
+										<directory>${project.basedir}/src/main/grunt-web</directory>
+									</resource>
+								</resources>
+							</configuration>
+						</execution>
+						<execution>
+							<id>copy-resources-2</id>
+							<phase>validate</phase>
+							<goals>
+								<goal>copy-resources</goal>
+							</goals>
+							<configuration>
+								<outputDirectory>${project.basedir}/target-grunt/static</outputDirectory>
+								<resources>
+									<resource>
+										<directory>${project.basedir}/src/main/webapp</directory>
+									</resource>
+								</resources>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+			      				
+      			<plugin>
+						<groupId>pl.allegro</groupId>
+						<artifactId>grunt-maven-plugin</artifactId>
+						<version>1.5.0</version>
+						<configuration>
+							<!-- relative to src/main/webapp/, default: static -->
+							<jsSourceDirectory>/</jsSourceDirectory>
+							
+							<!-- <gruntBuildDirectory>${project.basedir}/target-grunt/static</gruntBuildDirectory>  -->
+							<target>${build.mode}</target>
+							
+							<!-- example npm install env variable -->
+							<npmEnvironmentVar>
+								<PHANTOMJS_CDNURL>http://cnpmjs.org/downloads</PHANTOMJS_CDNURL>
+							</npmEnvironmentVar>
+					
+							<!-- example options usage to filter variables in given resource -->
+							<filteredResources>
+								<filteredResource>maven-properties.json</filteredResource>
+							</filteredResources>
+							
+							<excludedResources>
+								<excludedResource>node_modules/**</excludedResource>
+								<excludedResource>app/**</excludedResource>
+								<excludedResource>.tmp/**</excludedResource>
+								<excludedResource>build/**</excludedResource>
+							</excludedResources>
+							
+							<showColors>true</showColors>
+					
+						</configuration>
+						<executions>
+							<execution>
+								<goals>
+									<!-- <goal>create-resources</goal> -->
+									<goal>npm</goal>
+									<!-- or npm-offline if npm failure is not an option -->
+<!-- 									<goal>bower</goal> -->
+									<goal>grunt</goal>
+								</goals>
+							</execution>
+						</executions>
+				</plugin>
+		 		<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+				</plugin>
+				<plugin>
+			        <groupId>org.apache.maven.plugins</groupId>
+			        <artifactId>maven-war-plugin</artifactId>
+			        <version>2.6</version>
+			        <configuration>
+			          <!-- <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes> -->
+			          <warSourceExcludes>**</warSourceExcludes>
+			          <webResources>
+			            <resource>
+			              <!-- this is relative to the pom.xml directory -->
+			              <directory>target-grunt/build</directory>
+			              <targetPath>/</targetPath>
+			            </resource>
+			            
+			          </webResources>
+			           <packagingExcludes>WEB-INF/classes/*.properties,WEB-INF/classes/*.xml</packagingExcludes>
+			            <webXml>src\main\webapp\WEB-INF\web.xml</webXml>
+			        </configuration>
+			        
+			         
+			        
+      		</plugin>
+      		
+      	</plugins>
+			<pluginManagement>
+		<plugins>
+			<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+			<plugin>
+				<groupId>org.eclipse.m2e</groupId>
+				<artifactId>lifecycle-mapping</artifactId>
+				<version>1.0.0</version>
+				<configuration>
+					<lifecycleMappingMetadata>
+						<pluginExecutions>
+							<pluginExecution>
+								<pluginExecutionFilter>
+									<groupId>pl.allegro</groupId>
+									<artifactId>
+										grunt-maven-plugin
+									</artifactId>
+									<versionRange>
+										[1.5.0,)
+									</versionRange>
+									<goals>
+										<goal>bower</goal>
+										<goal>create-resources</goal>
+									</goals>
+								</pluginExecutionFilter>
+								<action>
+									<ignore></ignore>
+								</action>
+							</pluginExecution>
+						</pluginExecutions>
+					</lifecycleMappingMetadata>
+				</configuration>
+			</plugin>
+		</plugins>
+	</pluginManagement>
+    </build>
+
+</project>

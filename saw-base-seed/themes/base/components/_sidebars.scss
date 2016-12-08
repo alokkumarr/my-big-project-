@@ -1,0 +1,77 @@
+md-sidenav.#{$theme-cls}.md-sidenav-right {
+  background-color: $sidebar-right-bg-color;
+
+  md-content {
+    background-color: inherit;
+    padding: 10px 12px;
+    overflow: hidden;
+    overflow-y: auto;
+  }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  > md-toolbar.#{$theme-cls} {
+      &:not(.md-menu-toolbar) {
+        background-color: transparent;
+      }
+
+    .md-toolbar-tools {
+      justify-content: space-between;
+
+      > .md-button:last-child {
+        margin: 0;
+      }
+    }
+
+    border-bottom: 1px solid $cards-border-color;
+  }
+}
+
+md-sidenav.#{$theme-cls}.md-sidenav-left {
+   background-color: $sidebar-left-bg-color;
+
+   > md-toolbar.#{$theme-cls} {
+     &:not(.md-menu-toolbar) {
+       background-color: transparent;
+     }
+   }
+   md-content {
+     background-color: inherit;
+     padding: 10px 12px;
+     overflow: hidden;
+     overflow-y: auto;
+   }
+ }
+
+md-sidenav {
+  md-card-actions {
+    margin: 0;
+    border-top: $card-footer-border-top;
+
+    .md-button:not(:last-child) {
+      border-right: 1px solid $cards-border-color;
+    }
+  }
+
+  md-card {
+    box-shadow: none;
+    background: #FFFFFF;
+    border-radius: 3px !important;
+    margin: 0;
+
+    md-card-header {
+      padding: 20px;
+      display: block;
+    }
+  }
+}
+
+.company-logo {
+  background-image: url($company-logo-path);
+  height: 50px;
+  width: 130px;
+  background-size: 130px 50px;
+}

@@ -1,0 +1,42 @@
+.ui-grid {
+  .ui-grid-cell {
+    color: $ui-grid-cell-color;
+    font-size: 14px;
+
+    .ui-grid-cell-contents {
+      line-height: $ui-grid-row-height - 2*$ui-grid-cell-content-padding;
+    }
+  }
+
+  .ui-grid-header-cell,  .ui-grid-cell{
+    padding-right: $ui-grid-cell-padding-right;
+  }
+
+  .ui-grid-column-menu-button .ui-grid-icon-angle-down {
+    border: 1px solid #d4d4d4;
+    border-radius: 3px;
+  }
+
+  .ui-grid-row:nth-child(even) .ui-grid-cell {
+    background-color: #f7f9fc;
+  }
+
+  .ui-grid-top-panel {
+    background: #F3F5F8;
+  }
+
+  [class^="ui-grid-icon"]:before, [class*=" ui-grid-icon"]:before {
+    margin-right: 0;
+  }
+
+  // Align the filter near header text
+  //[role="columnheader"], .ui-grid-header-cell .sortable {
+  //  display: inline-flex;
+  //  width: 100%;
+  //
+  //  > .ui-grid-column-menu-button {
+  //    position: initial;
+  //    min-width: 35px;
+  //  }
+  //}
+}

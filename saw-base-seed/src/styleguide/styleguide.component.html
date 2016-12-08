@@ -1,0 +1,18 @@
+<md-toolbar class="app-toolbar">
+  <div class="md-toolbar-tools">
+    <md-button class="md-icon-button" aria-label="Menu" ng-click="$ctrl.toggleLeft()">
+    <md-icon md-font-icon="icon-menu"></md-icon>
+  </md-button>
+    <span>SYMMETRA</span>
+
+    <span flex></span>
+
+    <md-button class="md-icon-button" ng-click="$ctrl.toggleRight()">
+      <md-icon md-font-icon="icon-bell-list"></md-icon>
+      <badge class="alerts-badge" label="{{5}}"></badge>
+    </md-button>
+  </div>
+</md-toolbar>
+<navigation-menu></navigation-menu>
+<alerts-sidenav></alerts-sidenav>
+<ui-view></ui-view>
