@@ -1,5 +1,3 @@
-import angular from 'angular';
-
 import 'devextreme/ui/data_grid';
 import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.light.css';
@@ -238,6 +236,9 @@ export const AnalyzeViewComponent = {
       ];
     }
 
+    $onInit() {
+    }
+
     onReportTypeChange() {
       if (this.states.reportView === this.LIST_VIEW) {
         const inst = this.__gridListInstance;
@@ -252,14 +253,9 @@ export const AnalyzeViewComponent = {
 
     openNewAnalysisModal(ev) {
       this.$mdDialog.show({
-        // controller: newAnalysisController,
-        // controllerAs: '$ctrl',
-        // template: newAnalysisTemplate,
         template: '<analyze-new></analyze-new>',
-        parent: angular.element(this.$document.body),
         targetEvent: ev,
-        clickOutsideToClose: true,
-        fullscreen: true // Only for -xs, -sm breakpoints.
+        fullscreen: true
       })
         .then(answer => {
           this.$log.info(`You created the analysis: "${answer}".`);
