@@ -1,13 +1,15 @@
 import template from './analyze-new.component.html';
 import style from './analyze-new.component.scss';
+import emptyTemplate from './analyze-new-empty.html';
 
 export const AnalyzeNewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeNewController {
-    constructor($mdDialog, $log, AnalyzeService) {
+    constructor($mdDialog, $log, $document, AnalyzeService) {
       this.$mdDialog = $mdDialog;
       this.$log = $log;
+      this.$document = $document;
       this.analyzeService = AnalyzeService;
       this.selectedAnalysisMethod = '';
     }
@@ -43,7 +45,25 @@ export const AnalyzeNewComponent = {
     }
 
     createAnalysis() {
-      this.$mdDialog.hide('new Analysis');
+      // this.$mdDialog.hide();
+
+      let tpl;
+
+      switch (this.selectedAnalysisMethod) {
+        case 'table:report':
+          tpl = '<analyze-report></analyze-report>';
+          break;
+        default:
+          tpl = emptyTemplate;
+          break;
+      }
+
+      this.$mdDialog.show({
+        template: tpl,
+        autoWrap: false,
+        fullscreen: true,
+        focusOnOpen: false
+      });
     }
   }
 };

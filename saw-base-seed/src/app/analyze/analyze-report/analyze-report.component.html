@@ -1,0 +1,107 @@
+<analyze-dialog class="analyze-report-dialog">
+  <analyze-dialog-header>
+    <div layout="row">
+      <md-button class="ard_back-btn"
+                 ng-click="$parent.$ctrl.closeDialog()">
+        <md-icon md-font-icon="icon-arrow-left"></md-icon>
+      </md-button>
+
+      <div class="ard_meta" flex>
+        <div class="md-title">
+          <strong>Untitled Report</strong>
+          <label>Draft</label>
+        </div>
+        <div class="md-description">
+          <md-icon md-font-icon="icon-report"></md-icon>
+          <span>Orders</span>
+        </div>
+      </div>
+
+      <div class="ard_actions" flex>
+        <md-button>Export</md-button>
+        <md-button>Save</md-button>
+        <md-button class="btn-primary">Publish</md-button>
+      </div>
+    </div>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+    <div layout="column">
+      <div layout="row" class="ard_sub-header">
+        <span ng-if="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE">
+          Choose fields to show in your report
+        </span>
+
+        <span ng-if="$ctrl.states.sqlMode === $ctrl.QUERY_MODE">
+          SQL Query
+        </span>
+
+        <div>
+          <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.DESIGNER_MODE}"
+                     ng-click="$ctrl.states.sqlMode = $ctrl.DESIGNER_MODE">
+            <md-icon md-font-icon="icon-designer-mode"></md-icon>
+            Designer
+          </md-button>
+
+          <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.QUERY_MODE}"
+                     ng-click="$ctrl.states.sqlMode = $ctrl.QUERY_MODE">
+            <md-icon md-font-icon="icon-query-mode"></md-icon>
+            Query
+          </md-button>
+        </div>
+      </div>
+
+      <div layout="row" class="ard_canvas">
+        <div ng-if="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE">
+          <js-plumb-canvas tables="$ctrl.getSqlData().tables"
+                           settings="$ctrl.getSqlData().settings"></js-plumb-canvas>
+        </div>
+
+        <div class="ard_canvas-query"
+             ng-if="$ctrl.states.sqlMode === $ctrl.QUERY_MODE">
+          <textarea ng-model="$ctrl.data.query"></textarea>
+        </div>
+      </div>
+
+      <div layout="row" class="ard_toolbar">
+        <md-button class="ard_toolbar-expand"
+                   ng-click="$ctrl.toggleDetailsPanel()">
+          <md-icon md-font-icon="icon-expand"></md-icon>
+        </md-button>
+
+        <span class="ard_toolbar-text" flex>Report</span>
+
+        <div class="ard_toolbar-actions" flex>
+          <md-button>
+            <md-icon md-font-icon="icon-filter"></md-icon>
+            Filter
+          </md-button>
+
+          <md-button>
+            <md-icon md-font-icon="icon-sort"></md-icon>
+            Sort
+          </md-button>
+
+          <md-button>
+            <md-icon md-font-icon="icon-full-screen"></md-icon>
+            Preview
+          </md-button>
+        </div>
+      </div>
+
+      <div layout="row" class="ard_details-panel"
+           ng-if="$ctrl.states.detailsExpanded">
+        <div layout="column" class="ard_details-panel-empty"
+             ng-if="false">
+          <span>Choose fields above to preview your report.</span>
+          <md-icon md-font-icon="icon-report"></md-icon>
+        </div>
+
+        <div>
+          <div class="ard_details-grid"
+               dx-data-grid="$ctrl.getGridData()"></div>
+        </div>
+      </div>
+    </div>
+  </analyze-dialog-content>
+</analyze-dialog>

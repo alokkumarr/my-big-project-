@@ -19,6 +19,8 @@ export function AnalyzeService($http) {
     getMenu,
     getMethods,
     getMetrics,
+    getTables,
+    getDataByQuery,
     getSupportedMethods,
     setAvailableMetrics: curry(setAvailableItems)(metricMapper, metricHasSupportedMethod),
     setAvailableAnalysisMethods: curry(setAvailableItems)(analysisMethodMapper, isMethodSupported)
@@ -34,6 +36,14 @@ export function AnalyzeService($http) {
 
   function getMetrics() {
     return $http.get('/api/analyze/metrics').then(get('data'));
+  }
+
+  function getTables() {
+    return $http.get('/api/analyze/tables').then(get('data'));
+  }
+
+  function getDataByQuery() {
+    return $http.get('/api/analyze/dataByQuery').then(get('data'));
   }
 
   /**
