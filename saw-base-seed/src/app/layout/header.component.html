@@ -6,13 +6,16 @@
 
       <span flex></span>
 
-      <md-button class="btn-link" aria-label="OBSERVE"
+      <md-button ng-class="($ctrl.stateName === 'observe') ? 'btn-link' : 'btn-card'"
+                 aria-label="OBSERVE"
                  ui-sref="observe">OBSERVE
       </md-button>
-      <md-button class="btn-card" aria-label="ANALYZE"
+      <md-button ng-class="($ctrl.stateName === 'analyze') ? 'btn-link' : 'btn-card'"
+                 aria-label="ANALYZE"
                  ui-sref="analyze">ANALYZE
       </md-button>
-      <md-button class="btn-card" aria-label="ALERTS"
+      <md-button ng-class="($ctrl.stateName === 'alerts') ? 'btn-link' : 'btn-card'"
+                 aria-label="ALERTS"
                  ui-sref="alerts">ALERTS
       </md-button>
 
