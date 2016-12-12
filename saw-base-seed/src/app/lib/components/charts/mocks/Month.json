@@ -1,0 +1,112 @@
+{
+  "took": 72,
+  "timed_out": false,
+  "_shards": {
+    "total": 2,
+    "successful": 2,
+    "failed": 0
+  },
+  "hits": {
+    "total": 651072,
+    "max_score": 0,
+    "hits": [
+    ]
+  },
+  "aggregations": {
+    "filtered": {
+      "doc_count": 649629,
+      "split_by": {
+        "buckets": [
+          {
+            "key_as_string": "11-01-2015",
+            "key": 1446336000000,
+            "doc_count": 3492,
+            "Total_Order_Count": {
+              "value": 3492
+            }
+          },
+          {
+            "key_as_string": "12-01-2015",
+            "key": 1448928000000,
+            "doc_count": 23133,
+            "Total_Order_Count": {
+              "value": 23133
+            }
+          },
+          {
+            "key_as_string": "01-01-2016",
+            "key": 1451606400000,
+            "doc_count": 40814,
+            "Total_Order_Count": {
+              "value": 40814
+            }
+          },
+          {
+            "key_as_string": "02-01-2016",
+            "key": 1454284800000,
+            "doc_count": 40440,
+            "Total_Order_Count": {
+              "value": 40440
+            }
+          },
+          {
+            "key_as_string": "03-01-2016",
+            "key": 1456790400000,
+            "doc_count": 45528,
+            "Total_Order_Count": {
+              "value": 45528
+            }
+          },
+          {
+            "key_as_string": "04-01-2016",
+            "key": 1459468800000,
+            "doc_count": 72104,
+            "Total_Order_Count": {
+              "value": 72104
+            }
+          },
+          {
+            "key_as_string": "05-01-2016",
+            "key": 1462060800000,
+            "doc_count": 82585,
+            "Total_Order_Count": {
+              "value": 82585
+            }
+          },
+          {
+            "key_as_string": "06-01-2016",
+            "key": 1464739200000,
+            "doc_count": 88355,
+            "Total_Order_Count": {
+              "value": 88355
+            }
+          },
+          {
+            "key_as_string": "07-01-2016",
+            "key": 1467331200000,
+            "doc_count": 86505,
+            "Total_Order_Count": {
+              "value": 86505
+            }
+          },
+          {
+            "key_as_string": "08-01-2016",
+            "key": 1470009600000,
+            "doc_count": 94489,
+            "Total_Order_Count": {
+              "value": 94489
+            }
+          },
+          {
+            "key_as_string": "09-01-2016",
+            "key": 1472688000000,
+            "doc_count": 72184,
+            "Total_Order_Count": {
+              "value": 72184
+            }
+          }
+        ]
+      }
+    }
+  }
+}

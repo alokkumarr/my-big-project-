@@ -1,30 +1,14 @@
 import angular from 'angular';
-import Highcharts from 'highcharts';
+import Highstock from 'highcharts/highstock';
 
-import {wrapChart} from './chartkit';
-import {highchartsConfig} from './highcharts.config';
-import {setSVGRenderer} from './chart-svg-renderer';
-import {lineChart, barChart, snapshotBarChart, areaChart} from './charts';
+import {chartComponent} from './chart.component';
+import {businessTransactionVolumeService} from './business-transaction-volume.service';
+import {businessTransactionVolumeChart} from './business-transaction-volume.chart';
 
 export const ChartsModule = 'components.charts';
 
-const origModule = angular.module;
-
-angular.module = function (...args) {
-  const module = origModule.apply(angular, args);
-
-  module.chart = (name, factory) => {
-    return module.directive(`${name}Chart`, wrapChart(`${name}Chart`, factory));
-  };
-  return module;
-};
-
-setSVGRenderer(Highcharts);
-
 angular.module(ChartsModule, [])
-        .constant('Highcharts', Highcharts)
-        .config(highchartsConfig)
-        .chart('line', lineChart)
-        .chart('bar', barChart)
-        .chart('area', areaChart)
-        .chart('snapshotBar', snapshotBarChart);
+        .constant('Highstock', Highstock)
+        .factory('businessTransactionVolumeService', businessTransactionVolumeService)
+        .component('chart', chartComponent)
+        .component('businessTransactionVolumeChart', businessTransactionVolumeChart);
