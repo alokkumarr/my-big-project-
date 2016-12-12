@@ -50,9 +50,6 @@
   </md-card-header>
 
   <md-card-content>
-    <chart static-options="$ctrl.transactionVolumeChartOptions.static" dynamic-options="$ctrl.transactionVolumeChartOptions.dynamic"></chart>
-
-    <div class="content-component" ng-if="showGrid " ui-grid="$ctrl.gridOptions"></div>
-
+    <chart  class="content-component" options="$ctrl.transactionVolumeChartOptions" updater="$ctrl.updater$"></chart>
   </md-card-content>
 </md-card>

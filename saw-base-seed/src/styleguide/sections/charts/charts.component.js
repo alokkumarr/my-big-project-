@@ -12,36 +12,28 @@ export const ChartsComponent = {
       this.$timeout = $timeout;
 
       this.barChartOptions = {
-        static: {
-          xAxis: {
-            categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
-          },
-          chart: {
-            type: 'bar'
-          }
+        xAxis: {
+          categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
         },
-        dynamic: {
-          series: this.generateData()
-        }
+        chart: {
+          type: 'bar'
+        },
+        series: this.generateData()
       };
 
       this.lineChartOptions = {
-        static: {
-          xAxis: {
-            categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
-          },
-          chart: {
-            type: 'line'
-          }
+        xAxis: {
+          categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
         },
-        dynamic: {
-          series: this.generateData()
-        }
+        chart: {
+          type: 'line'
+        },
+        series: this.generateData()
       };
 
       this.gridOptions = {
         rowHeight: 36,
-        data: map(this.lineChartOptions.dynamic.series, series => {
+        data: map(this.lineChartOptions.series, series => {
           return {
             name: series.name,
             values: sum(series.data)
@@ -50,69 +42,59 @@ export const ChartsComponent = {
       };
 
       this.areaChartOptions = {
-        static: {
-          xAxis: {
-            categories: ['M', 'T', 'W', 'Th', 'F', 'S', 'Su']
-          },
-          yAxis: {
-            min: 4,
-            max: 8
-          },
-          plotOptions: {
-            area: {
-              color: '#0084FF',
-              pointPlacement: 'on'
-            }
-          },
-          chart: {
-            type: 'area',
-            height: 250
-          },
-          legend: {
-            enabled: false
+        xAxis: {
+          categories: ['M', 'T', 'W', 'Th', 'F', 'S', 'Su']
+        },
+        yAxis: {
+          min: 4,
+          max: 8
+        },
+        plotOptions: {
+          area: {
+            color: '#0084FF',
+            pointPlacement: 'on'
           }
         },
-        dynamic: {
-          series: [{
-            name: 'Alerts',
-            data: [4, 6, 5, 6.6, 4.5, 6, 8]
-          }]
-        }
+        chart: {
+          type: 'area',
+          height: 250
+        },
+        legend: {
+          enabled: false
+        },
+        series: [{
+          name: 'Alerts',
+          data: [4, 6, 5, 6.6, 4.5, 6, 8]
+        }]
       };
 
       this.chartConfig = {
-        static: {
-          // This is the Main Highcharts chart config. Any Highchart options are valid here.
-          // will be overriden by values specified below.
-          chart: {
-            type: 'bar'
-          },
-          tooltip: {
-            style: {
-              padding: 10,
-              fontWeight: 'bold'
-            }
-          },
-          xAxis: {
-            endOnTick: false,
-            minorGridLineWidth: 0,
-            minorTickLength: 0,
-            tickLength: 0,
-            lineWidth: 0,
-            categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
-          },
-          yAxis: {
-            gridLineWidth: 0,
-            labels: {
-              overflow: 'justify'
-            }
+        chart: {
+          type: 'bar'
+        },
+        tooltip: {
+          style: {
+            padding: 10,
+            fontWeight: 'bold'
           }
         },
-        dynamic: {
-          series: [{
-            data: [10, 15, 12, 8, 7]
-          }]
-        }
+        xAxis: {
+          endOnTick: false,
+          minorGridLineWidth: 0,
+          minorTickLength: 0,
+          tickLength: 0,
+          lineWidth: 0,
+          categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
+        },
+        yAxis: {
+          gridLineWidth: 0,
+          labels: {
+            overflow: 'justify'
+          }
+        },
+        series: [{
+          data: [10, 15, 12, 8, 7]
+        }]
       };
     }
 

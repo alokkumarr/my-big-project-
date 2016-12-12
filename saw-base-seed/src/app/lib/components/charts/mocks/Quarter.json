@@ -1,0 +1,56 @@
+{
+  "took": 105,
+  "timed_out": false,
+  "_shards": {
+    "total": 2,
+    "successful": 2,
+    "failed": 0
+  },
+  "hits": {
+    "total": 651072,
+    "max_score": 0,
+    "hits": [
+    ]
+  },
+  "aggregations": {
+    "filtered": {
+      "doc_count": 649629,
+      "split_by": {
+        "buckets": [
+          {
+            "key_as_string": "10-01-2015",
+            "key": 1443657600000,
+            "doc_count": 26625,
+            "Total_Order_Count": {
+              "value": 26625
+            }
+          },
+          {
+            "key_as_string": "01-01-2016",
+            "key": 1451606400000,
+            "doc_count": 126782,
+            "Total_Order_Count": {
+              "value": 126782
+            }
+          },
+          {
+            "key_as_string": "04-01-2016",
+            "key": 1459468800000,
+            "doc_count": 243044,
+            "Total_Order_Count": {
+              "value": 243044
+            }
+          },
+          {
+            "key_as_string": "07-01-2016",
+            "key": 1467331200000,
+            "doc_count": 253178,
+            "Total_Order_Count": {
+              "value": 253178
+            }
+          }
+        ]
+      }
+    }
+  }
+}

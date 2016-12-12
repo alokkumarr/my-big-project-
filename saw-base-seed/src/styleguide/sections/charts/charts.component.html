@@ -4,10 +4,10 @@
 
   <md-card class="chart-card" style="width: 700px;">
     <md-button class="btn-primary" ng-click="$ctrl.refreshData()">Refresh</md-button>
-    <chart static-options="$ctrl.barChartOptions.static" dynamic-options="$ctrl.barChartOptions.dynamic" style="margin: 5px"></chart>
+    <chart options="$ctrl.barChartOptions" style="margin: 5px"></chart>
   </md-card>
   <md-card class="chart-card" style="width: 700px;">
-    <chart static-options="$ctrl.areaChartOptions.static" dynamic-options="$ctrl.areaChartOptions.dynamic"></chart>
+    <chart options="$ctrl.areaChartOptions"></chart>
   </md-card>
 
   <md-card class="chart-card" style="width: 700px;">
@@ -41,7 +41,7 @@
     </md-card-header>
 
     <md-card-content>
-      <chart class="content-component" static-options="$ctrl.lineChartOptions.static" dynamic-options="$ctrl.lineChartOptions.dynamic" ng-if="!showGrid "></chart>
+      <chart class="content-component" options="$ctrl.lineChartOptions" ng-if="!showGrid "></chart>
 
       <div class="content-component" ng-if="showGrid " ui-grid="$ctrl.gridOptions"></div>
 
@@ -92,5 +92,5 @@
     </md-card-footer>
   </md-card>
 
-  <chart static-options="$ctrl.chartConfig.static" dynamic-options="$ctrl.chartConfig.dynamic"></chart>
+  <chart options="$ctrl.chartConfig"></chart>
 </md-content>

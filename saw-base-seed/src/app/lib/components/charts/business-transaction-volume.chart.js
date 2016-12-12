@@ -1,6 +1,17 @@
 import values from 'lodash/values';
-import set from 'lodash/set';
+import upperFirst from 'lodash/upperFirst';
+import {Subject} from 'rxjs/Subject';
+
+import {VIEWS} from './business-transaction-volume.service';
+import {UPDATE_PATHS} from './chart.component';
 import template from './business-transaction-volume.chart.html';
+
+const MAX_POINTS_ON_X_AXIS = {
+  [VIEWS.DAILY]: 32,
+  [VIEWS.WEEKLY]: 20,
+  [VIEWS.MONTHLY]: null,
+  [VIEWS.QUARTERLY]: null
+};
 
 export const businessTransactionVolumeChart = {
   template,
@@ -9,73 +20,87 @@ export const businessTransactionVolumeChart = {
       'ngInject';
       this.businessTransactionVolumeService = businessTransactionVolumeService;
 
-      this.categoryViews = values(this.businessTransactionVolumeService.VIEWS);
-      this.categoryView = businessTransactionVolumeService.VIEWS.MONTHLY;
-      this.getChartData(this.categoryView);
+      this.categoryViews = values(VIEWS);
+      this.categoryView = VIEWS.MONTHLY;
       this.transactionVolumeChartOptions = this.getChartOptions();
+      this.updater$ = new Subject();
+
+      // fetch asynch data
+      this.fetchChartData(this.categoryView);
     }
 
     onViewSelected(view) {
-      this.getChartData(view);
+      this.fetchChartData(view);
     }
 
-    getChartData(view) {
+    fetchChartData(view) {
       this.businessTransactionVolumeService.getChartData(view).then(data => {
-        this.setDynamicData(data);
+        this.setDynamicData(data, view);
       });
     }
 
-    setDynamicData(data) {
-      set(this.transactionVolumeChartOptions.dynamic, 'xAxis.categories', data.categories);
-      set(this.transactionVolumeChartOptions.dynamic.series[0], 'data', data.series);
+    setDynamicData(data, view) {
+      const xAxis = {
+        title: {
+          text: upperFirst(view)
+        },
+        max: MAX_POINTS_ON_X_AXIS[view],
+        categories: data.categories
+      };
+      const series = {
+        name: 'Revenue',
+        data: data.series
+      };
+      // updates for different paths on the Highcharts config object
+      const updates = [{
+        path: UPDATE_PATHS.SERIES,
+        data: series
+      }, {
+        path: UPDATE_PATHS.X_AXIS,
+        data: xAxis
+      }];
+
+      // push the new data to the chart
+      this.updater$.next(updates);
+    }
+
+    $onDestroy() {
+      this.updater$.complete();
     }
 
     getChartOptions() {
       return {
-        static: {
-          xAxis: {
-            title: {
-              text: 'Months'
-            }
-          },
-          yAxis: {
-            title: {
-              text: 'Revenue'
-            }
-          },
-          legend: {
-            align: 'right',
-            verticalAlign: 'top',
-            layout: 'vertical',
-            x: 0,
-            y: 100
-          },
-          chart: {
-            type: 'line',
-            marginRight: 120
-          },
-          scrollbar: {
-            enabled: true,
-            barBackgroundColor: 'gray',
-            barBorderRadius: 7,
-            barBorderWidth: 0,
-            buttonBackgroundColor: 'gray',
-            buttonBorderWidth: 0,
-            buttonArrowColor: 'yellow',
-            buttonBorderRadius: 7,
-            rifleColor: 'yellow',
-            trackBackgroundColor: 'white',
-            trackBorderWidth: 1,
-            trackBorderColor: 'silver',
-            trackBorderRadius: 7
+        navigator: {
+          adaptToUpdatedData: true
+        },
+        scrollbar: {
+          enabled: true,
+          showFull: false
+        },
+        xAxis: {
+          title: {
+            text: upperFirst(VIEWS.MONTHLY)
           }
         },
-        dynamic: {
-          series: [{
-            name: 'Data',
-            data: []
-          }]
-        }
+        yAxis: {
+          title: {
+            text: 'Revenue'
+          }
+        },
+        legend: {
+          align: 'right',
+          verticalAlign: 'top',
+          layout: 'vertical',
+          x: 0,
+          y: 100
+        },
+        chart: {
+          type: 'line'
+        },
+        series: [{
+          name: 'Data',
+          data: []
+        }]
       };
     }
   }

@@ -5,11 +5,11 @@ export const CommonModule = 'Common';
 
 const modulesDependencies = [];
 
-if (__DEVELOPMENT__) {
-  const {MockModule} = require('./mock');
+// if (__DEVELOPMENT__) {
+const {MockModule} = require('./mock');
 
-  modulesDependencies.push(MockModule);
-}
+modulesDependencies.push(MockModule);
+// }
 
 angular
   .module(CommonModule, modulesDependencies)

@@ -9,6 +9,12 @@ import zip from 'lodash/zip';
 import spread from 'lodash/spread';
 import truncate from 'lodash/truncate';
 
+export const VIEWS = {
+  DAILY: 'days',
+  WEEKLY: 'weeks',
+  MONTHLY: 'months',
+  QUARTERLY: 'quarters'
+};
 export function businessTransactionVolumeService($http) {
   'ngInject';
 
@@ -20,13 +26,6 @@ export function businessTransactionVolumeService($http) {
   const VALUE_PROPERTY = 'doc_count';
   const DATA_PATH = 'data.0.aggregations.filtered.split_by.buckets';
 
-  const VIEWS = {
-    DAILY: 'day',
-    WEEKLY: 'week',
-    MONTHLY: 'month',
-    QUARTERLY: 'quarter'
-  };
-
   // transform dates to special strings based on the design
   const TRANSFORMERS = {
     [VIEWS.DAILY]: dateToDailyView,
@@ -36,8 +35,7 @@ export function businessTransactionVolumeService($http) {
   };
 
   return {
-    getChartData,
-    VIEWS
+    getChartData
   };
 
   function getChartData(endpoint) {
