@@ -42,11 +42,17 @@ export const JSPlumbConnection = {
         overlays: [
           ['Label', {
             label: '1',
-            location: 0
+            location: 0,
+            labelStyle: {
+              color: 'white'
+            }
           }],
           ['Label', {
-            label: '&',
-            location: 1
+            label: '∞',
+            location: 1,
+            labelStyle: {
+              color: 'white'
+            }
           }],
           ['Label', {
             label: '<i class="jsp-connection-remove-icon">x</i>',

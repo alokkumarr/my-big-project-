@@ -15,6 +15,7 @@ export const FilterSidenavComponent = {
   },
   controller: class FilterSidenavController {
     constructor($mdSidenav) {
+      'ngInject';
       this.$mdSidenav = $mdSidenav;
       this.id = OBSERVE_FILTER_SIDENAV_ID;
       this.affiliates = ['DIRECT TV', 'Red Ventures', 'ClearLink', 'All Connect', 'Q-ology', 'Acceller'];

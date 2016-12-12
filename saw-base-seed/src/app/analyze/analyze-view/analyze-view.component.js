@@ -1,11 +1,9 @@
-import angular from 'angular';
-
-import template from './analyze-view.component.html';
-import style from './analyze-view.component.scss';
-
 import 'devextreme/ui/data_grid';
 import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.light.css';
+
+import template from './analyze-view.component.html';
+import style from './analyze-view.component.scss';
 
 export const AnalyzeViewComponent = {
   template,
@@ -72,78 +70,192 @@ export const AnalyzeViewComponent = {
         }
       };
 
-      this.reports = [{
-        type: 'chart',
-        title: 'Order Revenue By Customer',
-        labels: ['Orders', 'Revenue'],
-        schedule: 'Every Friday at 12:00pm',
-        chart: {
-          options: this.transactionVolumeChartOptions,
-          data: this.transactionVolumeChartData
+      this.LIST_VIEW = 'list';
+      this.CARD_VIEW = 'card';
+
+      this.states = {
+        reportView: 'card',
+        reportType: null
+      };
+
+      this.dxGridOptions = {
+        columnAutoWidth: true,
+        showColumnHeaders: true,
+        showColumnLines: false,
+        showRowLines: false,
+        showBorders: false,
+        rowAlternationEnabled: true,
+        hoverStateEnabled: true,
+        scrolling: {
+          mode: 'virtual'
+        },
+        sorting: {
+          mode: 'multiple'
+        },
+        paging: {
+          pageSize: 10
+        },
+        pager: {
+          showPageSizeSelector: true,
+          showInfo: true
+        },
+        selection: {
+          mode: 'multiple',
+          allowSelectAll: false,
+          showCheckBoxesMode: 'always'
         }
-      }, {
-        type: 'report',
-        title: 'Shipper Usage',
-        labels: ['Orders'],
-        schedule: 'Daily',
-        report: {
-          options: {
-            dataSource: [{
-              id: 1,
-              shipper: 'Aaron\'s Towing',
-              order: '12bc',
-              total: '$600'
-            }, {
-              id: 2,
-              shipper: 'Aaron\'s Towing',
-              order: '12bd',
-              total: '$650'
-            }, {
-              id: 3,
-              shipper: 'Aaron\'s Towing',
-              order: '12be',
-              total: '$550'
-            }, {
-              id: 4,
-              shipper: 'Aaron\'s Towing',
-              order: '12bf',
-              total: '$700'
-            }],
-            columns: ['shipper', 'order', 'total'],
-            columnAutoWidth: true,
-            showBorders: true,
-            showColumnHeaders: true,
-            showColumnLines: true,
-            showRowLines: true,
-            width: 500,
-            scrolling: {
-              mode: 'virtual'
+      };
+
+      this.getGridData = () => {
+        return Object.assign(this.dxGridOptions, {
+          dataSource: this.reports,
+          columns: [
+            {
+              caption: 'ID',
+              dataField: 'id',
+              allowSorting: true,
+              sortOrder: 'desc',
+              sortIndex: 0,
+              visible: false
             },
-            sorting: {
-              mode: 'none'
+            {
+              caption: 'NAME',
+              dataField: 'name',
+              alignment: 'left',
+              allowSorting: true,
+              sortOrder: 'desc',
+              sortIndex: 1,
+              width: '30%'
             },
-            paging: {
-              pageSize: 10
+            {
+              caption: 'METRICS',
+              dataField: 'metrics',
+              alignment: 'left',
+              allowSorting: true,
+              sortOrder: 'desc',
+              sortIndex: 2,
+              width: '30%'
             },
-            pager: {
-              showPageSizeSelector: true,
-              showInfo: true
+            {
+              caption: 'SCHEDULED',
+              dataField: 'scheduled',
+              alignment: 'left',
+              allowSorting: true,
+              sortOrder: 'desc',
+              sortIndex: 3,
+              width: '25%'
+            },
+            {
+              caption: 'TYPE',
+              dataField: 'type',
+              alignment: 'left',
+              allowSorting: true,
+              sortOrder: 'desc',
+              sortIndex: 4,
+              cssClass: 'analyze-view_grid_cell',
+              cellTemplate: '#gridTypeCell',
+              width: '15%'
+            }
+          ],
+          onInitialized: instance => {
+            this.__gridListInstance = instance.component;
+          }
+        });
+      };
+
+      this.filterReports = item => {
+        if (this.states.reportType !== 'all') {
+          return this.states.reportType === item.type;
+        }
+
+        return true;
+      };
+
+      this.reports = [
+        {
+          type: 'chart',
+          name: 'Order Revenue By Customer',
+          metrics: ['Orders', 'Revenue'],
+          scheduled: 'Every Friday at 12:00pm',
+          chart: {
+            options: this.transactionVolumeChartOptions,
+            data: this.transactionVolumeChartData
+          }
+        },
+        {
+          type: 'report',
+          name: 'Shipper Usage',
+          metrics: ['Orders'],
+          scheduled: 'Daily',
+          report: {
+            options: {
+              dataSource: [{
+                id: 1,
+                shipper: 'Aaron\'s Towing',
+                order: '12bc',
+                total: '$600'
+              }, {
+                id: 2,
+                shipper: 'Aaron\'s Towing',
+                order: '12bd',
+                total: '$650'
+              }, {
+                id: 3,
+                shipper: 'Aaron\'s Towing',
+                order: '12be',
+                total: '$550'
+              }, {
+                id: 4,
+                shipper: 'Aaron\'s Towing',
+                order: '12bf',
+                total: '$700'
+              }],
+              columns: ['shipper', 'order', 'total'],
+              columnAutoWidth: true,
+              showBorders: true,
+              showColumnHeaders: true,
+              showColumnLines: true,
+              showRowLines: true,
+              width: 500,
+              scrolling: {
+                mode: 'virtual'
+              },
+              sorting: {
+                mode: 'none'
+              },
+              paging: {
+                pageSize: 10
+              },
+              pager: {
+                showPageSizeSelector: true,
+                showInfo: true
+              }
             }
           }
         }
-      }];
+      ];
+    }
+
+    $onInit() {
+    }
+
+    onReportTypeChange() {
+      if (this.states.reportView === this.LIST_VIEW) {
+        const inst = this.__gridListInstance;
+
+        if (this.states.reportType === 'all') {
+          inst.clearFilter();
+        } else {
+          inst.filter(['type', '=', this.states.reportType]);
+        }
+      }
     }
 
     openNewAnalysisModal(ev) {
       this.$mdDialog.show({
-        // controller: newAnalysisController,
-        // controllerAs: '$ctrl',
-        // template: newAnalysisTemplate,
         template: '<analyze-new></analyze-new>',
-        parent: angular.element(this.$document.body),
         targetEvent: ev,
-        clickOutsideToClose: true,
-        fullscreen: true // Only for -xs, -sm breakpoints.
+        fullscreen: true
       })
         .then(answer => {
           this.$log.info(`You created the analysis: "${answer}".`);

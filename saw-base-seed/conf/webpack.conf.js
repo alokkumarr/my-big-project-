@@ -6,10 +6,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 
 module.exports = {
-  entry: {
-    index: `./${conf.path.app('index')}`,
-    login: `./${conf.path.login('index')}`
-  },
   output: {
     path: path.join(process.cwd(), conf.paths.tmp),
     filename: '[name].js'
@@ -76,17 +72,25 @@ module.exports = {
     new webpack.NoErrorsPlugin(),
     new HtmlWebpackPlugin({
       template: conf.path.app('index.html'),
-      chunks: ['index']
+      chunks: ['index', 'login']
     }),
     new HtmlWebpackPlugin({
       filename: 'login.html',
       chunks: ['login'],
       template: conf.path.login('index.html')
     }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'login',
+      minChunks: Infinity
+    }),
     new webpack.DefinePlugin({
       '__DEVELOPMENT__': process.env.NODE_ENV !== 'production'
     })
   ],
+  entry: {
+    index: `./${conf.path.app('index')}`,
+    login: `./${conf.path.login('index')}`
+  },
   postcss: () => [autoprefixer],
   debug: true,
   devtool: 'eval-source-map',

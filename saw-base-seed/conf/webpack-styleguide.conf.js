@@ -66,6 +66,9 @@ module.exports = {
     new webpack.NoErrorsPlugin(),
     new HtmlWebpackPlugin({
       template: conf.path.styleguide('index.html')
+    }),
+    new webpack.DefinePlugin({
+      '__DEVELOPMENT__': process.env.NODE_ENV !== 'production'
     })
   ],
   postcss: () => [autoprefixer],
