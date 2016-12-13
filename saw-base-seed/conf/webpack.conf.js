@@ -6,6 +6,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 
 module.exports = {
+  entry: {
+    index: `./${conf.path.app('index')}`,
+    login: `./${conf.path.login('index')}`
+  },
   output: {
     path: path.join(process.cwd(), conf.paths.tmp),
     filename: '[name].js'
@@ -87,10 +91,6 @@ module.exports = {
       '__DEVELOPMENT__': process.env.NODE_ENV !== 'production'
     })
   ],
-  entry: {
-    index: `./${conf.path.app('index')}`,
-    login: `./${conf.path.login('index')}`
-  },
   postcss: () => [autoprefixer],
   debug: true,
   devtool: 'eval-source-map',

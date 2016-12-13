@@ -19,6 +19,7 @@
     > md-icon {
       font-size: 48px;
     }
+
     > p {
       margin-bottom: 0;
     }
@@ -38,12 +39,13 @@
       transition: 0.3s;
     }
   }
+
   > .md-button.selected {
-    background-color: #deecf9;
+    background-color: #DEECF9;
   }
 
   > .md-button:not(.md-icon-button) {
-    min-width:100px;
+    min-width: 100px;
   }
 
   .md-active {

@@ -24,6 +24,7 @@ analyze-view {
         .md-container {
           display: none;
         }
+
         .md-label {
           margin: 0;
 
@@ -45,8 +46,7 @@ analyze-view {
       md-card-header {
         margin: 16px 24px;
         padding: 0 0 8px;
-
-        border-bottom: 1px solid #ccc;
+        border-bottom: 1px solid #CCC;
       }
 
       md-card-title {
@@ -70,7 +70,7 @@ analyze-view {
     width: 100% !important;
 
     &_type-label {
-      background-color: #ccc;
+      background-color: #CCC;
       padding: 3px 5px;
     }
 
@@ -90,7 +90,7 @@ analyze-view {
 
   .btn-card {
     background-color: #636363 !important;
-    color: #FFFFFF !important;
+    color: #FFF !important;
     padding: 2px 15px;
   }
 }
