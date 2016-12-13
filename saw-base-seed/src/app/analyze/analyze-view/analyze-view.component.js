@@ -16,8 +16,9 @@ export const AnalyzeViewComponent = {
       this.$mdDialog = $mdDialog;
       this.$document = $document;
 
-      this.transactionVolumeChartData = {
-        Alpha: [
+      this.transactionVolumeChartData = [{
+        name: 'Alpha',
+        data: [
           [0.3, 5],
           [2.1, 25],
           [3.5, 10],
@@ -30,8 +31,10 @@ export const AnalyzeViewComponent = {
           [9, 29],
           [9.5, 5],
           [11.1, 20]
-        ],
-        Bravo: [
+        ]
+      }, {
+        name: 'Bravo',
+        data: [
           [0.3, 2],
           [4.8, 13],
           [6.2, 35],
@@ -39,7 +42,7 @@ export const AnalyzeViewComponent = {
           [10.6, 22],
           [11.1, 10]
         ]
-      };
+      }];
       this.transactionVolumeChartOptions = {
         xAxis: {
           categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -61,13 +64,15 @@ export const AnalyzeViewComponent = {
           y: 100
         },
         chart: {
+          type: 'line',
           marginRight: 120
         },
         plotOptions: {
           line: {
             pointPlacement: -0.5
           }
-        }
+        },
+        series: this.transactionVolumeChartData
       };
 
       this.LIST_VIEW = 'list';
@@ -178,8 +183,7 @@ export const AnalyzeViewComponent = {
           metrics: ['Orders', 'Revenue'],
           scheduled: 'Every Friday at 12:00pm',
           chart: {
-            options: this.transactionVolumeChartOptions,
-            data: this.transactionVolumeChartData
+            options: this.transactionVolumeChartOptions
           }
         },
         {
