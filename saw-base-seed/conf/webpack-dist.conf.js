@@ -44,7 +44,7 @@ module.exports = {
       {
         test: /.json$/,
         loaders: [
-          'json'
+          'json-loader'
         ]
       },
       {
@@ -68,8 +68,12 @@ module.exports = {
       //   ]
       // },
       {
-        test: /\.(eot|woff|woff2|ttf|svg|png|jpg)$/,
-        loader: 'url-loader?limit=30000&name=[name]-[hash].[ext]'
+        test: /\.(eot|woff|woff2|ttf)$/,
+        loader: 'file-loader?name=fonts/[name].[ext]'
+      },
+      {
+        test: /\.(svg|png|jpg)$/,
+        loader: 'file-loader?name=img/[name].[ext]'
       }
     ]
   },
@@ -89,7 +93,7 @@ module.exports = {
     // new webpack.optimize.UglifyJsPlugin({
     //   compress: {unused: true, dead_code: true, warnings: false} // eslint-disable-line camelcase
     // }),
-    new ExtractTextPlugin('index-[contenthash].css'),
+    new ExtractTextPlugin('css/index-[contenthash].css'),
     new webpack.optimize.CommonsChunkPlugin({
       names: ['login', 'commonVendor'],
       minChunks: Infinity
@@ -98,7 +102,7 @@ module.exports = {
   postcss: () => [autoprefixer],
   output: {
     path: path.join(process.cwd(), conf.paths.dist),
-    filename: '[name]-[hash].js'
+    filename: 'js/[name]-[hash].js'
   },
   entry: {
     app: `./${conf.path.app('index')}`,
