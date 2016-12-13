@@ -16,7 +16,7 @@
     <div class="snapshot-card-label">Last 12 days</div>
 
     <div layout="row">
-      <snapshot-bar-chart data="$ctrl.snapshotBarChartData" style="margin: 5"></snapshot-bar-chart>
+      <chart static-options="$ctrl.chartOptions.static" dynamic-options="$ctrl.chartOptions.dynamic" style="margin: 5px"></chart>
       <div class="snapshot-card-range">
         <div layout-align="space-between center">
           <span class="snapshot-card-label">MIN</span>

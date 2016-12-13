@@ -35,13 +35,13 @@ public class WebSecurityConfig extends
     http.csrf().disable();
      
     http.authorizeRequests() .antMatchers(HttpMethod.OPTIONS,"**/doAuthenticate/**").permitAll()//allow CORS option calls
-      .antMatchers(HttpMethod.OPTIONS,"**/reCreateTicket/**").permitAll()//allow CORS option calls
+      .antMatchers(HttpMethod.OPTIONS,"**/auth/reCreateTicket/**").permitAll()//allow CORS option calls
       .antMatchers(HttpMethod.OPTIONS,"**/resetPassword/**").permitAll()//allow CORS option calls
       .antMatchers(HttpMethod.OPTIONS,"**/rstChangePassword/**").permitAll()//allow CORS option calls
       .antMatchers(HttpMethod.OPTIONS,"**/vfyRstPwd/**").permitAll()//allow CORS option calls
-      .antMatchers(HttpMethod.OPTIONS,"**/changePassword/**").permitAll()//allow CORS option calls
-      .antMatchers(HttpMethod.OPTIONS,"**/doLogout/**").permitAll()//allow CORS option calls
-      .antMatchers(HttpMethod.OPTIONS,"**/api/**").permitAll()//allow CORS option calls
+      .antMatchers(HttpMethod.OPTIONS,"**/auth/changePassword/**").permitAll()//allow CORS option calls
+      .antMatchers(HttpMethod.OPTIONS,"**/auth/doLogout/**").permitAll()//allow CORS option calls
+      .antMatchers(HttpMethod.OPTIONS,"**/auth/**").permitAll()//allow CORS option calls
       .antMatchers(HttpMethod.OPTIONS,"**/user/login/**").permitAll()//allow CORS option calls
       .antMatchers("/resources/**").permitAll();
   }

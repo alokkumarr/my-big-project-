@@ -11,7 +11,7 @@ const modulesDependencies = [];
 const {MockModule} = require('./mock');
 
 modulesDependencies.push(MockModule);
-// }
+//
 
 angular
   .module(CommonModule, modulesDependencies)
