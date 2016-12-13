@@ -16,7 +16,7 @@
 
       <div>
         <div layout="row" layout-wrap>
-          <md-checkbox class="ad-metric" flex="20"
+          <md-checkbox class="adc-metric" flex="20"
                        ng-repeat="metric in $ctrl.metrics track by $index"
                        ng-model="metric.checked"
                        ng-disabled="metric.disabled"
@@ -29,7 +29,7 @@
       <div class="md-subhead">How would you like to analyze?</div>
 
       <div>
-        <div class="ad-method"
+        <div class="adc-method"
              ng-repeat="method in $ctrl.methods track by $index">
           <div class="md-body-1" flex
                ng-bind="::method.label"></div>

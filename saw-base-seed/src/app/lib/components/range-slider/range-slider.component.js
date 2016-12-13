@@ -42,7 +42,7 @@ export const RangeSliderComponent = {
     }
 
     $onInit() {
-      // TODO add errors for input constraints
+      // TODO: add errors for input constraints
       if (!this.step) {
         this.step = 1;
       }

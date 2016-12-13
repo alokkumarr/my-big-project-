@@ -6,8 +6,6 @@ import '../../fonts/style.css';
 import {themeConfig} from '../app/theme';
 import {loginComponent} from './login.component';
 
-import '../app/index.scss';
-
 export const loginModule = 'login';
 
 angular

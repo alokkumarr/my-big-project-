@@ -1,6 +1,30 @@
 {
   "name": "Synchronoss",
   "version": "0.0.1",
+  "scripts": {
+    "build": "gulp",
+    "serve": "gulp serve",
+    "serve:dist": "gulp serve:dist",
+    "test": "gulp test",
+    "test:auto": "gulp test:auto",
+    "styleguide": "gulp styleguide",
+    "precommit": "eslint \"src/**/*.js\"",
+    "dist": "webpack --config conf/webpack.prod.js  --progress --profile --bail",
+    "start": "webpack-dev-server --config conf/webpack.dev.js --progress --profile"
+  },
+  "eslintConfig": {
+    "globals": {
+      "expect": true
+    },
+    "root": true,
+    "env": {
+      "browser": true,
+      "jasmine": true
+    },
+    "extends": [
+      "xo-space/esnext"
+    ]
+  },
   "dependencies": {
     "angular": "^1.5.8",
     "angular-animate": "^1.5.8",
@@ -27,7 +51,7 @@
     "babel-loader": "^6.2.0",
     "babel-plugin-istanbul": "^2.0.1",
     "babel-polyfill": "^6.7.4",
-    "babel-preset-stage-0": "^6.16.0",
+    "babel-preset-latest": "^6.16.0",
     "browser-sync": "^2.9.11",
     "browser-sync-spa": "^1.0.3",
     "css-loader": "^0.25.0",
@@ -52,6 +76,7 @@
     "gulp-util": "^3.0.7",
     "html-loader": "^0.4.3",
     "html-webpack-plugin": "^2.9.0",
+    "htmlhint-loader": "^1.0.0",
     "husky": "^0.11.9",
     "image-webpack-loader": "^3.0.0",
     "jasmine": "^2.4.1",
@@ -71,29 +96,11 @@
     "postcss-loader": "^1.1.0",
     "sass-loader": "^4.0.2",
     "style-loader": "^0.13.0",
+    "stylelint-config-standard": "^15.0.0",
+    "stylelint-loader": "^6.2.0",
+    "stylelint-webpack-plugin": "^0.4.0",
     "url-loader": "^0.5.7",
-    "webpack": "2.1.0-beta.22"
-  },
-  "scripts": {
-    "build": "gulp",
-    "serve": "gulp serve",
-    "serve:dist": "gulp serve:dist",
-    "test": "gulp test",
-    "test:auto": "gulp test:auto",
-    "styleguide": "gulp styleguide",
-    "precommit": "eslint \"src/**/*.js\""
-  },
-  "eslintConfig": {
-    "globals": {
-      "expect": true
-    },
-    "root": true,
-    "env": {
-      "browser": true,
-      "jasmine": true
-    },
-    "extends": [
-      "xo-space/esnext"
-    ]
+    "webpack": "2.1.0-beta.22",
+    "webpack-dev-server": "^1.16.2"
   }
 }

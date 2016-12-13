@@ -24,8 +24,6 @@ import {FilterSidenavComponent} from './observe/filter-sidenav.component';
 // import app modules
 import {LibModule} from './lib';
 
-import './index.scss';
-
 export const app = 'app';
 
 angular

@@ -1,11 +1,9 @@
 .jsp-table {
   position: absolute;
-
   box-shadow: initial;
   background: #FFF;
   border: 1px solid #D1D3D3;
   border-radius: 3px;
-
   width: 185px;
 
   .md-subheader.md-triton-theme {
@@ -77,14 +75,11 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-
   font-size: 20px;
   font-style: normal;
   background-color: #FFF;
-
   text-align: center;
   line-height: 16px;
-
   cursor: pointer;
 
   &:hover {
