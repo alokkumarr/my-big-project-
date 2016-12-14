@@ -23,6 +23,7 @@ import {FilterSidenavComponent} from './observe/filter-sidenav.component';
 
 // import app modules
 import {LibModule} from './lib';
+import {loginModule} from '../login';
 
 export const app = 'app';
 
@@ -34,7 +35,8 @@ angular
     'ui.grid',
     LibModule,
     AnalyzeModule,
-    ObserveModule
+    ObserveModule,
+    loginModule
   ])
   .config(routesConfig)
   .config(themeConfig)
