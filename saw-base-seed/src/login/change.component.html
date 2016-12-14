@@ -1,0 +1,33 @@
+<div layout="row" layout-align="center center" class="bg-container-wrapper">
+    <div class="bg-container" layout="row" layout-align="center center">
+        <div class="login-container" layout="column" layout-align="space-around start">
+            <div class="brand-logo"></div>
+
+            <h1>Change Password</h1>
+            <form name="changePwdForm">
+                <div ng-bind="$ctrl.errorMsg" class="error-msg"> </div>
+                <md-input-container>
+                    <label>Old Password</label>
+                    <input required type="password" ng-model="$ctrl.formData.oldPwd">
+                </md-input-container><br/>
+                <md-input-container>
+                    <label>New Password</label>
+                    <input required type="password" ng-model="$ctrl.formData.newPwd">
+                </md-input-container><br/>
+                <md-input-container>
+                    <label>Confirm New Password</label>
+                    <input required type="password" ng-model="$ctrl.formData.confNewPwd">
+                </md-input-container><br/>
+                <div class="login-buttons" layout="row" layout-align="space-between center">
+                    <md-button ng-disabled="changePwdForm.$invalid" class="btn-primary" ng-click="$ctrl.changePwd()">Change</md-button>
+                    <md-button class="btn-primary" ng-click="$ctrl.login()">Login</md-button>
+                </div>
+            </form>
+        </div>
+        <div class="middle-logo-container"></div>
+    </div>
+    <div class="white-container"></div>
+</div>
+<div class="powered-logo-container" layout="row" layout-align="center center">
+    <div class="powered-logo"></div>
+</div>
