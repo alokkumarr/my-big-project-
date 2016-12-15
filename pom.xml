@@ -8,7 +8,6 @@
   <modules>
     <!-- No POM: <module>saw-base-seed</module> -->
     <!-- No POM: <module>saw-jwt-seed</module> -->
-    <module>saw-security</module>
     <!-- Compile fails: <module>saw-ui-config-generator</module> -->
     <!-- Compile fails: <module>saw-ui-seed</module> -->
     <!-- Compile fails: <module>synchronoss-base-seed</module> -->
