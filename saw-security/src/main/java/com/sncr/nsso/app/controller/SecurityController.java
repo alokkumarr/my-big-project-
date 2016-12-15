@@ -102,7 +102,7 @@ public class SecurityController {
 	 * @param ticketID
 	 * @return
 	 */
-	@RequestMapping(value = "/doLogout", method = RequestMethod.POST)
+	@RequestMapping(value = "/auth/doLogout", method = RequestMethod.POST)
 	public String doLogout(@RequestBody String ticketID) {
 		TicketHelper tHelper = new TicketHelper(userRepository);
 		Gson gson = new Gson();
@@ -114,7 +114,7 @@ public class SecurityController {
 	 * @param changePasswordDetails
 	 * @return
 	 */
-	@RequestMapping(value = "/changePassword", method = RequestMethod.POST)
+	@RequestMapping(value = "/auth/changePassword", method = RequestMethod.POST)
 	public Valid changePassword(@RequestBody ChangePasswordDetails changePasswordDetails) {
 		Valid valid = new Valid();
 		String message = doChangePassword(changePasswordDetails);
@@ -277,7 +277,7 @@ public class SecurityController {
 	 * @param ticketId
 	 * @return
 	 */
-	@RequestMapping(value = "/reCreateTicket", method = RequestMethod.POST)
+	@RequestMapping(value = "/auth/reCreateTicket", method = RequestMethod.POST)
 	public String reCreateTicket(@RequestBody String ticketId) {
 		TicketHelper tHelper = new TicketHelper(userRepository);
 		logger.info("ReCreating process start for ticket", ticketId, null);

@@ -82,11 +82,17 @@
 			<artifactId>gson</artifactId>
 		</dependency>
 		
+<!--
+    Workaround: Disable dependency until artifact available through
+    standard Maven repositories.  Currently it does not build out of
+    the box.
+
 	<dependency>
 		<groupId>com.razor</groupId>
 		<artifactId>raw-configuration</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-	</dependency>		
+	</dependency>
+-->
 	<dependency>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-mail</artifactId>
