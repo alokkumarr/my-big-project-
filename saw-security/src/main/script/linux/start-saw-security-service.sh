@@ -1,1 +1,0 @@
-nohup java -Xms32M -Xmx2048M -Djava.net.preferIPv4Stack=true -Dspring.config.location=../../../resources/saw-security.properties -Dlogging.config=../../../resources/logback.xml -Draw.log.file=../../../logs/saw-security/saw-security -Dquartz.properties.location=../../../resources -jar ../../../dist/saw-security/saw-security.war -name saw-security &

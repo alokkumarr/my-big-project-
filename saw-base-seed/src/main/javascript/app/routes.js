@@ -6,7 +6,13 @@ export function routesConfig($stateProvider, $urlRouterProvider) {
   const states = [
     {
       name: 'index',
-      url: '/'
+      url: '/',
+      onEnter: ($state, $window) => {
+        'ngInject';
+        // this hack redirecting is only for the moment
+        // this should be done on the server
+        $window.location = `${$window.location.origin}${$window.location.pathname}login.html`;
+      }
     }, {
       name: 'observe',
       url: '/observe',
