@@ -10,6 +10,7 @@
 
 const path = require('path');
 const gutil = require('gulp-util');
+const mainJsPath = path.join('src', 'main', 'javascript');
 
 exports.ngModule = 'app';
 
@@ -17,16 +18,16 @@ exports.ngModule = 'app';
  *  The main paths of your project handle these with care
  */
 exports.paths = {
-  app: path.join('src', 'app'),
+  app: path.join(mainJsPath, 'app'),
   eslintDevConfig: path.join('src', 'dev-eslint-rules.js'),
   eslintProdConfig: path.join('src', 'prod-eslint-rules.js'),
   dist: 'dist',
   tmp: '.tmp',
   e2e: 'e2e',
   tasks: 'gulp_tasks',
-  styleguide: path.join('src', 'styleguide'),
-  styleguideDist: path.join('src', 'styleguide', 'dist'),
-  login: path.join('src', 'login')
+  styleguide: path.join(mainJsPath, 'styleguide'),
+  styleguideDist: path.join(mainJsPath, 'styleguide', 'dist'),
+  login: path.join(mainJsPath, 'login')
 };
 
 exports.path = {};
