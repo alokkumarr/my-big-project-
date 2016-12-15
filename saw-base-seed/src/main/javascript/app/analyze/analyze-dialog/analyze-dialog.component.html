@@ -1,0 +1,14 @@
+<md-dialog class="analyze-dialog" layout="column">
+  <div ng-if="$ctrl.isTranscludePresent('header')">
+    <md-toolbar class="analyze-dialog_header"
+                ng-transclude="header"></md-toolbar>
+  </div>
+
+  <md-dialog-content class="analyze-dialog_content"
+                     ng-if="$ctrl.isTranscludePresent('content')"
+                     ng-transclude="content"></md-dialog-content>
+
+  <md-dialog-actions class="analyze-dialog_footer"
+                     ng-if="$ctrl.isTranscludePresent('footer')"
+                     ng-transclude="footer"></md-dialog-actions>
+</md-dialog>

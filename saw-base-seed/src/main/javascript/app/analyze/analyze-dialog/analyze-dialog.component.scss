@@ -1,0 +1,32 @@
+.analyze-dialog {
+  max-width: 100%;
+
+  &_header {
+    analyze-dialog-header {
+      width: 100%;
+    }
+
+    .layout-row {
+      padding: 10px 25px;
+    }
+
+    &::after {
+      margin: 0;
+    }
+  }
+
+  &_content {
+    analyze-dialog-content {
+      width: 100%;
+    }
+  }
+
+  &_footer {
+    padding: 15px;
+    border-top: 1px solid #5C6670;
+
+    analyze-dialog-footer {
+      width: 100%;
+    }
+  }
+}

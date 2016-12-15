@@ -2,6 +2,9 @@ module.exports = {
   extends: [
     'angular'
   ],
+  globals: {
+    '__DEVELOPMENT__': true
+  },
   rules: {
     'angular/no-service-method': 2,
     'no-negated-condition': 0,
@@ -10,6 +13,7 @@ module.exports = {
     // setting this to max-params to 0, so it's disabled does not work because of eslints wierd merging method
     // the original rule form the angular plugin is set to ['error'] 3,
     // but that is not viable for angular dependency injection
-    'max-params': ['error', 20]
+    'max-params': ['error', 20],
+    'no-warning-comments': [0]
   }
 };

@@ -1,0 +1,15 @@
+{
+    "id-unique": true,
+    "src-not-empty": true,
+    "tagname-lowercase": true,
+    "tag-pair": true,
+    "tag-self-close": true,
+    "spec-char-escape": true,
+    "attr-value-double-quotes": true,
+    "attr-no-duplication": true,
+    "attr-unsafe-chars": true,
+    "inline-style-disabled": false,
+    "inline-script-disabled": true,
+    "id-class-ad-disabled": true,
+    "space-tab-mixed-disabled": "space2"
+}

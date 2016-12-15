@@ -37,3 +37,26 @@
 
 ## Workflow to follow
 http://nvie.com/posts/a-successful-git-branching-model/
+
+## Steps to use the Maven integrated seed in Development Environment
+ 
+   Assumption: Maven 3.x & Java 7.x is already installed in laptop 
+   
+ - Either it can be used in WebStorm IDE or in Eclipse or in STS
+ - In Eclipse you can import it as maven project, once you import it
+ - To bring up the project in local mode server, under project main directory i.e. sncr_saw/
+ - execute mvn clean install, it will inturn turn up localhost server after installing node, npm & required npm package
+
+ - In WebStorm, you can open a project & 
+ - execute npm install
+ - execute npm run serve 
+ - rest of the command whatever mentioned above 
+ 
+## How to execute Maven integrated seed along with npm & release build for production
+
+- to release the production build; goto
+- project's base folder where pom.xml exists
+- execute mvn -Pprod -Doutput=D:\Work\SAW2_0\ clean install
+   "-Doutput" : put the path where you want to produce the tar.gz file.
+- Distribution will contain the files
+ 

@@ -1,0 +1,96 @@
+analyze-view {
+  width: 100%;
+}
+
+.analyze-view {
+  .md-title {
+    color: #636363;
+    font-weight: bold;
+  }
+
+  &_switch-view {
+    md-radio-group {
+      display: inline-flex;
+
+      md-radio-button {
+        margin: 0;
+
+        &.md-checked {
+          md-icon {
+            color: #000;
+          }
+        }
+
+        .md-container {
+          display: none;
+        }
+
+        .md-label {
+          margin: 0;
+
+          md-icon {
+            text-align: center;
+          }
+        }
+      }
+    }
+  }
+
+  &_switch-type {
+    width: 160px;
+    font-size: 16px;
+  }
+
+  &_reports-list {
+    md-card {
+      md-card-header {
+        margin: 16px 24px;
+        padding: 0 0 8px;
+        border-bottom: 1px solid #CCC;
+      }
+
+      md-card-title {
+        padding: 0;
+        height: 36px;
+      }
+
+      md-card-actions {
+        .md-button {
+          min-width: 36px;
+        }
+      }
+
+      md-card-content {
+        margin-bottom: 75px;
+      }
+    }
+  }
+
+  &_grid {
+    width: 100% !important;
+
+    &_type-label {
+      background-color: #CCC;
+      padding: 3px 5px;
+    }
+
+    &_cell {
+      &:not(.dx-datagrid-action) {
+        padding: 10px !important;
+      }
+    }
+  }
+
+  .md-select-value {
+    .md-text {
+      font-weight: bold;
+      font-size: 16px;
+    }
+  }
+
+  .btn-card {
+    background-color: #636363 !important;
+    color: #FFF !important;
+    padding: 2px 15px;
+  }
+}
