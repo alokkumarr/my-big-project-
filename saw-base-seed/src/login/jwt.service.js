@@ -2,18 +2,22 @@
  * Created by ssom0002 on 12/6/2016.
  */
 import AppConstants from './app.constants';
-export class JwtService {
-  constructor($window) {
-    'ngInject';
-    this._$window = $window;
+export function JwtService($window) {
+  'ngInject';
+
+  return {
+    save,
+    get,
+    destroy
+  };
+
+  function save(token) {
+    $window.localStorage[AppConstants.jwtKey] = token;
   }
-  save(token) {
-    this._$window.localStorage[AppConstants.jwtKey] = token;
+  function get() {
+    return $window.localStorage[AppConstants.jwtKey];
   }
-  get() {
-    return this._$window.localStorage[AppConstants.jwtKey];
-  }
-  destroy() {
-    this._$window.localStorage.removeItem(AppConstants.jwtKey);
+  function destroy() {
+    $window.localStorage.removeItem(AppConstants.jwtKey);
   }
 }

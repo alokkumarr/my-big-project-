@@ -1,22 +1,28 @@
 import angular from 'angular';
 import 'angular-material';
+import 'angular-ui-router';
 import 'angular-material/angular-material.css';
 import '../../fonts/style.css';
 
 import {themeConfig} from '../app/theme';
 import {loginComponent} from './login.component';
+import {ChangeComponent} from './change.component';
 
-import '../app/index.scss';
 import {UserService} from './user.service';
 import {JwtService} from './jwt.service';
+
+import {routesConfig} from './routes';
 
 export const loginModule = 'login';
 
 angular
   .module(loginModule, [
-    'ngMaterial'
+    'ngMaterial',
+    'ui.router'
   ])
   .config(themeConfig)
+  .config(routesConfig)
   .factory('UserService', UserService)
   .factory('JwtService', JwtService)
+  .component('changeComponent', ChangeComponent)
   .component('loginComponent', loginComponent);

@@ -12,10 +12,9 @@ export const loginComponent = {
         res => {
           if (res.ticket.valid) {
             const baseUrl = this._$window.location.origin;
-            const appUrl = `${baseUrl}/observe`;
+            const appUrl = `${baseUrl}/saw-base-seed/dist/#observe`;
             this._$window.location = appUrl;
           } else {
-            console.log('fail' + res.ticket.valid);
             this.errorMsg = res.ticket.validityReason;
           }
         }
