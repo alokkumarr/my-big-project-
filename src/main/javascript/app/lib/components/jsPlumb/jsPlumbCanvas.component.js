@@ -1,22 +1,23 @@
 import 'mottle';
 import jsPlumb from 'jsplumb';
 
-import {JS_PLUMB_SETTINGS} from './settings';
 import template from './jsPlumbCanvas.component.html';
 import style from './_jsPlumbCanvas.component.scss';
+import {JS_PLUMB_DEFAULT_SETTINGS} from './settings';
 
 export const JSPlumbCanvas = {
   template,
   styles: [style],
   bindings: {
-    tables: '<'
+    tables: '<',
+    settings: '<'
   },
   controller: class JSPlumbCanvasCtrl {
     constructor($element) {
       'ngInject';
 
       this.$element = $element;
-      this.settings = JS_PLUMB_SETTINGS;
+      this.settings = this.settings || JS_PLUMB_DEFAULT_SETTINGS;
     }
 
     $postLink() {

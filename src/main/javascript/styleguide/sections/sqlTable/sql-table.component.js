@@ -68,7 +68,7 @@ export const SqlTableComponent = {
               endpoint: 'Dot',
               isSource: true,
               isTarget: true,
-              maxConnections: 1,
+              maxConnections: -1,
               connector: ['Flowchart', {
                 cornerRadius: 10
               }],

@@ -3,7 +3,10 @@ module.exports = {
     'angular'
   ],
   globals: {
-    '__DEVELOPMENT__': true
+    __DEVELOPMENT__: true
+  },
+  parserOptions: {
+    sourceType: 'module'
   },
   rules: {
     'angular/no-service-method': 2,

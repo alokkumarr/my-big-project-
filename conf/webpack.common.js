@@ -7,6 +7,7 @@ const DefinePlugin = require('webpack/lib/DefinePlugin');
 const NoErrorsPlugin = require('webpack/lib/NoErrorsPlugin');
 const OccurrenceOrderPlugin = require('webpack/lib/optimize/OccurrenceOrderPlugin');
 const StyleLintPlugin = require('stylelint-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const autoprefixer = require('autoprefixer');
 
@@ -16,22 +17,21 @@ const MODULE_DIR = 'node_modules';
  * Webpack configuration
  */
 module.exports = {
-  context: webpackHelper.root('src'),
+  context: webpackHelper.root('src/main/javascript'),
   entry: {
     app: './app/index',
     login: './login/index'
   },
   output: {
     path: webpackHelper.root('dist'),
-    filename: '[name].bundle.js',
-    chunkFilename: '[id].bundle.js'
+    filename: '[name].bundle.js'
   },
 
   debug: false,
   devtool: null,
 
   resolve: {
-    modulesDirectories: [MODULE_DIR, webpackHelper.root('src')]
+    modulesDirectories: [MODULE_DIR, webpackHelper.root('src/main/javascript')]
   },
 
   resolveLoader: {
@@ -59,29 +59,21 @@ module.exports = {
         loaders: 'json'
       },
       {
-        test: /\.(css|scss)$/,
-        loaders: [
-          'style',
-          'css',
-          'postcss',
-          'sass'
-        ]
-      },
-      {
         test: /\.js$/,
         exclude: /node_modules/,
-        loaders: [
-          'ng-annotate',
-          'babel'
-        ]
+        loaders: 'ng-annotate!babel'
       },
       {
         test: /.html$/,
         loaders: 'html'
       },
       {
-        test: /\.(eot|woff|woff2|ttf|svg|png|jpg)$/,
-        loader: 'url-loader?limit=30000&name=[name]-[hash].[ext]'
+        test: /\.(eot|woff|woff2|ttf)$/,
+        loader: 'file?name=/fonts/[name].[ext]'
+      },
+      {
+        test: /\.(png|jpg|svg)$/,
+        loader: 'file?name=/img/[name].[ext]'
       }
     ]
   },
@@ -91,7 +83,8 @@ module.exports = {
     new NoErrorsPlugin(),
     new StyleLintPlugin({
       configFile: webpackHelper.root('.stylelintrc')
-    })
+    }),
+    new ExtractTextPlugin('/css/[name]-[contenthash].css')
   ],
 
   postcss: () => {

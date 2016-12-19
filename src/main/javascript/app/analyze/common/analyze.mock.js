@@ -177,131 +177,141 @@ function getMetrics() {
 function getTables() {
   return [
     {
-      name: 'Customers',
-      fields: [{
-        name: 'Customer ID',
-        type: 'int',
-        checked: false,
-        endpoints: [{
-          uuid: 11,
-          anchor: 'RightMiddle',
-          connections: [{
-            target: 24
-          }]
-        }]
-      }, {
-        name: 'Customer Name',
-        type: 'string',
-        checked: true
-      }, {
-        name: 'Address',
-        type: 'string',
-        checked: false
-      }, {
-        name: 'Phone Number',
-        type: 'string',
-        checked: false
-      }],
-      x: 5,
-      y: 5
-    }, {
       name: 'Orders',
-      fields: [{
-        name: 'Order ID',
-        type: 'int',
-        checked: false
-      }, {
-        name: 'Shipper',
-        type: 'string',
-        checked: false,
-        endpoints: [{
-          uuid: 54,
-          anchor: 'RightMiddle',
-          connections: [{
-            source: 54
+      fields: [
+        {
+          name: 'Order ID',
+          type: 'int',
+          checked: false
+        }, {
+          name: 'Shipper',
+          type: 'string',
+          checked: false,
+          endpoints: [{
+            uuid: 54,
+            anchor: 'RightMiddle',
+            connections: [{
+              source: 54,
+              type: 'many'
+            }]
           }]
-        }]
-      }, {
-        name: 'Customer',
-        type: 'string',
-        checked: false,
-        endpoints: [{
-          uuid: 24,
-          anchor: 'LeftMiddle',
-          connections: [{
-            source: 24
+        }, {
+          name: 'Customer',
+          type: 'string',
+          checked: false,
+          endpoints: [{
+            uuid: 24,
+            anchor: 'RightMiddle',
+            connections: [{
+              source: 24,
+              type: 'many'
+            }]
           }]
-        }]
-      }, {
-        name: 'Total Price',
-        type: 'int',
-        checked: true
-      }, {
-        name: 'Warehouse',
-        type: 'string',
-        checked: false,
-        endpoints: [{
-          uuid: 84,
-          anchor: 'RightMiddle',
-          connections: [{
-            source: 84
+        }, {
+          name: 'Total Price',
+          type: 'int',
+          checked: true
+        }, {
+          name: 'Warehouse',
+          type: 'string',
+          checked: false,
+          endpoints: [{
+            uuid: 84,
+            anchor: 'RightMiddle',
+            connections: [{
+              source: 84,
+              type: 'many'
+            }]
           }]
-        }]
-      }, {
-        name: 'Address',
-        type: 'string',
-        checked: false
-      }],
-      x: 275,
-      y: 5
+        }, {
+          name: 'Address',
+          type: 'string',
+          checked: false
+        }],
+      x: 5,
+      y: 130
     }, {
       name: 'Shippers',
-      fields: [{
-        name: 'Shipper ID',
-        type: 'int',
-        checked: false,
-        endpoints: [{
-          uuid: 33,
-          anchor: 'LeftMiddle',
-          connections: [{
-            target: 54
+      fields: [
+        {
+          name: 'Shipper ID',
+          type: 'int',
+          checked: false,
+          endpoints: [{
+            uuid: 33,
+            anchor: 'LeftMiddle',
+            connections: [{
+              target: 54,
+              type: 'one'
+            }]
           }]
-        }]
-      }, {
-        name: 'Shipper Name',
-        type: 'string',
-        checked: true
-      }, {
-        name: 'Region',
-        type: 'string',
-        checked: false
-      }],
-      x: 525,
+        }, {
+          name: 'Shipper Name',
+          type: 'string',
+          checked: true
+        }, {
+          name: 'Region',
+          type: 'string',
+          checked: false
+        }],
+      x: 400,
       y: 5
     }, {
-      name: 'Warehouses',
-      fields: [{
-        name: 'Warehouse ID',
-        type: 'int',
-        checked: false,
-        endpoints: [{
-          uuid: 55,
-          anchor: 'LeftMiddle',
-          connections: [{
-            target: 84
+      name: 'Customers',
+      fields: [
+        {
+          name: 'Customer ID',
+          type: 'int',
+          checked: false,
+          endpoints: [{
+            uuid: 11,
+            anchor: 'LeftMiddle',
+            connections: [{
+              target: 24,
+              type: 'one'
+            }]
           }]
-        }]
-      }, {
-        name: 'Warehouse Name',
-        type: 'string',
-        checked: true
-      }, {
-        name: 'Warehouse Address',
-        type: 'string',
-        checked: false
-      }],
-      x: 525,
+        }, {
+          name: 'Customer Name',
+          type: 'string',
+          checked: true
+        }, {
+          name: 'Address',
+          type: 'string',
+          checked: false
+        }, {
+          name: 'Phone Number',
+          type: 'string',
+          checked: false
+        }],
+      x: 400,
       y: 200
+    }, {
+      name: 'Warehouses',
+      fields: [
+        {
+          name: 'Warehouse ID',
+          type: 'int',
+          checked: false,
+          endpoints: [{
+            uuid: 55,
+            anchor: 'LeftMiddle',
+            connections: [{
+              target: 84,
+              type: 'one'
+            }]
+          }]
+        }, {
+          name: 'Warehouse Name',
+          type: 'string',
+          checked: true
+        }, {
+          name: 'Warehouse Address',
+          type: 'string',
+          checked: false
+        }],
+      x: 350,
+      y: 420
     }];
 }
 

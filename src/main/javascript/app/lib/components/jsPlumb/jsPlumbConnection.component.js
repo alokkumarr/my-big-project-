@@ -1,3 +1,5 @@
+import find from 'lodash/find';
+
 export const JSPlumbConnection = {
   require: {
     canvas: '^jsPlumbCanvas'
@@ -34,6 +36,10 @@ export const JSPlumbConnection = {
     connect() {
       this.detach();
 
+      const source = find(this.sourceEndpoint.connections, connection => {
+        return connection.target === this.metadata.target;
+      });
+
       this.connection = this.jsPlumbInst.connect({
         uuids: [
           this.metadata.target,
@@ -41,18 +47,12 @@ export const JSPlumbConnection = {
         ],
         overlays: [
           ['Label', {
-            label: '1',
-            location: 0,
-            labelStyle: {
-              color: 'white'
-            }
+            label: this.getLabelByType(source.type),
+            location: 0
           }],
           ['Label', {
-            label: '∞',
-            location: 1,
-            labelStyle: {
-              color: 'white'
-            }
+            label: this.getLabelByType(this.metadata.type),
+            location: 1
           }],
           ['Label', {
             label: '<i class="jsp-connection-remove-icon">x</i>',
@@ -70,6 +70,14 @@ export const JSPlumbConnection = {
     detach() {
       if (this.connection) {
         this.jsPlumbInst.detach(this.connection);
+      }
+    }
+
+    getLabelByType(type) {
+      switch (type) {
+        case 'one': return '1';
+        case 'many': return '∞';
+        default: return '';
       }
     }
   }

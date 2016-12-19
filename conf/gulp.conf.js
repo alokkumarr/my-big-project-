@@ -19,8 +19,8 @@ exports.ngModule = 'app';
  */
 exports.paths = {
   app: path.join(mainJsPath, 'app'),
-  eslintDevConfig: path.join('src', 'dev-eslint-rules.js'),
-  eslintProdConfig: path.join('src', 'prod-eslint-rules.js'),
+  eslintDevConfig: path.join('conf', 'eslint-dev-rules.js'),
+  eslintProdConfig: path.join('conf', 'eslint-prod-rules.js'),
   dist: 'dist',
   tmp: '.tmp',
   e2e: 'e2e',

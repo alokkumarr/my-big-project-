@@ -68,9 +68,16 @@ analyze-report {
       }
     }
 
-    &_sub-header {
+    &_content {
+      width: 100%;
+      height: 100%;
       padding: 10px 24px;
       background-color: #F3F5F8;
+    }
+
+    &_sub-header {
+      padding-bottom: 10px;
+      margin-bottom: 10px;
       border-bottom: 1px solid #E0E4EA;
       align-items: center;
       justify-content: space-between;
@@ -124,8 +131,6 @@ analyze-report {
     }
 
     &_canvas {
-      padding: 10px 24px;
-      background-color: #F3F5F8;
       flex-grow: 1;
       overflow-y: scroll;
 

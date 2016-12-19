@@ -27,39 +27,41 @@
 
   <analyze-dialog-content>
     <div layout="column">
-      <div layout="row" class="ard_sub-header">
-        <span ng-if="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE">
-          Choose fields to show in your report
-        </span>
+      <div class="ard_content" layout="column">
+        <div layout="row" class="ard_sub-header">
+          <span ng-if="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE">
+            Choose fields to show in your report
+          </span>
 
-        <span ng-if="$ctrl.states.sqlMode === $ctrl.QUERY_MODE">
-          SQL Query
-        </span>
+          <span ng-if="$ctrl.states.sqlMode === $ctrl.QUERY_MODE">
+            SQL Query
+          </span>
 
-        <div>
-          <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.DESIGNER_MODE}"
-                     ng-click="$ctrl.states.sqlMode = $ctrl.DESIGNER_MODE">
-            <md-icon md-font-icon="icon-designer-mode"></md-icon>
-            Designer
-          </md-button>
+          <div>
+            <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.DESIGNER_MODE}"
+                       ng-click="$ctrl.states.sqlMode = $ctrl.DESIGNER_MODE">
+              <md-icon md-font-icon="icon-designer-mode"></md-icon>
+              Designer
+            </md-button>
 
-          <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.QUERY_MODE}"
-                     ng-click="$ctrl.states.sqlMode = $ctrl.QUERY_MODE">
-            <md-icon md-font-icon="icon-query-mode"></md-icon>
-            Query
-          </md-button>
-        </div>
-      </div>
-
-      <div layout="row" class="ard_canvas">
-        <div ng-if="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE">
-          <js-plumb-canvas tables="$ctrl.getSqlData().tables"
-                           settings="$ctrl.getSqlData().settings"></js-plumb-canvas>
+            <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.QUERY_MODE}"
+                       ng-click="$ctrl.states.sqlMode = $ctrl.QUERY_MODE">
+              <md-icon md-font-icon="icon-query-mode"></md-icon>
+              Query
+            </md-button>
+          </div>
         </div>
 
-        <div class="ard_canvas-query"
-             ng-if="$ctrl.states.sqlMode === $ctrl.QUERY_MODE">
-          <textarea ng-model="$ctrl.data.query"></textarea>
+        <div layout="row" class="ard_canvas">
+          <div ng-show="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE">
+            <js-plumb-canvas tables="$ctrl.getSqlData().tables"
+                             settings="$ctrl.getSqlData().settings"></js-plumb-canvas>
+          </div>
+
+          <div class="ard_canvas-query"
+               ng-show="$ctrl.states.sqlMode === $ctrl.QUERY_MODE">
+            <textarea ng-model="$ctrl.data.query"></textarea>
+          </div>
         </div>
       </div>
 

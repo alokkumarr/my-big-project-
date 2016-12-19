@@ -27,6 +27,7 @@ export const JSPlumbTable = {
 
     $postLink() {
       this.jsPlumbInst.draggable(this.$element, {
+        allowNegative: false,
         drag: event => {
           this.metadata.x = event.pos[0];
           this.metadata.y = event.pos[1];
