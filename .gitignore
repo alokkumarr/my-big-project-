@@ -1,2 +1,32 @@
-target/
-target-grunt/
+target
+node
+node_modules
+log.txt
+.tmp/
+coverage/
+dist/
+src/styleguide/dist/
+src/main/javascript/styleguide/dist/
+
+
+# IDEs and editors
+/.idea
+/.vscode
+.project
+.classpath
+*.launch
+.settings/
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage/*
+/libpeerconnection.log
+npm-debug.log
+testem.log
+/typings
+
+
+#System Files
+.DS_Store
+Thumbs.db
