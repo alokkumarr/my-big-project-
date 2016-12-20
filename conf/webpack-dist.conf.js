@@ -69,11 +69,11 @@ module.exports = {
       // },
       {
         test: /\.(eot|woff|woff2|ttf)$/,
-        loader: 'file-loader?name=fonts/[name].[ext]'
+        loader: 'file-loader?publicPath=../&name=fonts/[name].[ext]'
       },
       {
         test: /\.(svg|png|jpg)$/,
-        loader: 'file-loader?name=img/[name].[ext]'
+        loader: 'file-loader?publicPath=../&name=img/[name].[ext]'
       }
     ]
   },
@@ -82,7 +82,7 @@ module.exports = {
     new webpack.NoErrorsPlugin(),
     new HtmlWebpackPlugin({
       template: conf.path.app('index.html'),
-      chunks: ['login', 'commonVendor' ,'vendor', 'app']
+      chunks: ['login', 'commonVendor', 'vendor', 'app']
     }),
     new HtmlWebpackPlugin({
       filename: 'login.html',
