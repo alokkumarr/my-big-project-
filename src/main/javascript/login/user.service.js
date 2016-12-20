@@ -45,9 +45,7 @@ export function UserService($http, JwtService, $window) {
         JwtService.destroy();
         $http.defaults.headers.common.Authorization = 'Basic';
         if (path === 'logout') {
-          const baseUrl = this._$window.location.origin;
-          const appUrl = `${baseUrl}/login`;
-          $window.location = appUrl;
+          $window.location = `${$window.location.origin}${$window.location.pathname}login.html`;
         }
       }
     );

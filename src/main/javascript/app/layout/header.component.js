@@ -3,7 +3,7 @@ import template from './header.component.html';
 export const HeaderComponent = {
   template,
   controller: class HeaderController {
-    constructor($transitions, UserService) {
+    constructor($transitions, UserService, $window) {
       'ngInject';
       const match = {
         to: state => {
@@ -16,14 +16,13 @@ export const HeaderComponent = {
         this.stateName = state.name;
       });
       this._UserService = UserService;
+      this._$window = $window;
     }
     logout() {
       this._UserService.logout('logout');
     }
     changePwd() {
-      const baseUrl = this._$window.location.origin;
-      const appUrl = `${baseUrl}/changePwd`;
-      this._$window.location = appUrl;
+      this._$window.location = `${this._$window.location.origin}${this._$window.location.pathname}/login.html#!/changePwd`;
     }
   }
 };
