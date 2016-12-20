@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+source /etc/bda/xdfts.env || exit 
+
+echo "Remove link on current version of XDF Transport Server"
+
+rm -f ${BDA_HOME}/xdfts
+rm -f /etc/bda/xdfts.env
+
+echo "XDF Transport Server pre-remove step has been completed"

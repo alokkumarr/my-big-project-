@@ -1,0 +1,68 @@
+<configuration>
+    
+  <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel" />
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%coloredLevel - %logger - %message%n%xException</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log.dir}/app_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+			<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<!-- keep 30 days' worth of history -->
+			<maxHistory>3</maxHistory>
+			<totalSizeCap>200MB</totalSizeCap>				
+        </rollingPolicy>
+    <encoder>
+      <pattern>%date [%level] -- %logger in %thread - %message%n%xException</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="TR_SRVC" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+		<fileNamePattern>${log.dir}/bda_tr_srvc_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+		<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+		<maxFileSize>10MB</maxFileSize>
+		</timeBasedFileNamingAndTriggeringPolicy>
+		<!-- keep 30 days' worth of history -->
+		<maxHistory>3</maxHistory>
+		<totalSizeCap>200MB</totalSizeCap>				
+	</rollingPolicy>
+    <encoder>
+      <pattern>%date [%level] -- %logger in %thread - %message%n%xException</pattern>
+    </encoder>
+  </appender>
+
+ 
+    <!--
+      The logger name is typically the Java/Scala package name.
+      This configures the log level to log at for a package and its children packages.
+    -->
+  <logger name="play" level="ERROR" >
+    <appender-ref ref="FILE" />
+  </logger>
+
+  <logger name="controllers" level="ERROR" >
+    <appender-ref ref="FILE" />
+  </logger>
+
+<!--
+  <logger name="synchronoss" level="DEBUG">
+    <appender-ref ref="TR_SRVC" />
+    <appender-ref ref="STDOUT" />
+  </logger>
+-->	
+	
+  <root level="DEBUG">
+    <appender-ref ref="STDOUT" /> 
+    <appender-ref ref="FILE" />
+  </root>
+
+
+</configuration>
+
