@@ -19,6 +19,11 @@ module.exports = webpackMerge(commonConfig, {
 
   debug: true,
   devtool: 'source-map',
+  noInfo: true,
+
+  stats: {
+    colors: true
+  },
 
   module: {
     loaders: [
@@ -41,12 +46,6 @@ module.exports = webpackMerge(commonConfig, {
       filename: 'index.html',
       hash: true,
       chunks: ['app']
-    }),
-    new HtmlWebpackPlugin({
-      template: 'login/index.html',
-      filename: 'login.html',
-      hash: true,
-      chunks: ['login']
     })
   ],
 

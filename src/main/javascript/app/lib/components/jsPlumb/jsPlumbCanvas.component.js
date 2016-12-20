@@ -2,7 +2,7 @@ import 'mottle';
 import jsPlumb from 'jsplumb';
 
 import template from './jsPlumbCanvas.component.html';
-import style from './_jsPlumbCanvas.component.scss';
+import style from './jsPlumbCanvas.component.scss';
 import {JS_PLUMB_DEFAULT_SETTINGS} from './settings';
 
 export const JSPlumbCanvas = {

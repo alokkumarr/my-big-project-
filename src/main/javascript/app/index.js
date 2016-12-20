@@ -9,47 +9,33 @@ import 'angular-ui-grid/ui-grid.css';
 
 import {routesConfig} from './routes';
 import {themeConfig} from './theme';
-
-import {RootComponent} from './layout/root.component';
-import {HomeComponent} from './home.component';
-import {HeaderComponent} from './layout/header.component';
-import {FooterComponent} from './layout/footer.component';
-import {SidenavComponent, SidenavBtnComponent, SidenavTargetDirective} from './sidenav';
-
-import {ObserveModule} from './observe';
-import {AnalyzeModule} from './analyze';
-import {CheckboxFilterComponent, RadioFilterComponent, TimeRangeFilterComponent, PriceRangeFilterComponent, FilterGroupComponent} from './observe/filters';
-import {FilterSidenavComponent} from './observe/filter-sidenav.component';
-
-// import app modules
 import {LibModule} from './lib';
-import {loginModule} from '../login';
+import {LoginModule} from './modules/login';
+import {ObserveModule} from './modules/observe';
+import {AnalyzeModule} from './modules/analyze';
+import {AlertsModule} from './modules/alerts';
 
-export const app = 'app';
+import {HeaderComponent, RootComponent, FooterComponent} from './layout';
+
+import AppConfig from '../../../../appConfig';
+
+export const AppModule = 'app';
 
 angular
-  .module(app, [
+  .module(AppModule, [
     'dx',
     'ngMaterial',
     'ui.router',
     'ui.grid',
     LibModule,
-    AnalyzeModule,
+    LoginModule,
     ObserveModule,
-    loginModule
+    AnalyzeModule,
+    AlertsModule
   ])
   .config(routesConfig)
   .config(themeConfig)
+  .value('AppConfig', AppConfig)
   .component('root', RootComponent)
   .component('headerComponent', HeaderComponent)
-  .component('footerComponent', FooterComponent)
-  .component('home', HomeComponent)
-  .directive('sidenavTarget', SidenavTargetDirective)
-  .component('sidenav', SidenavComponent)
-  .component('sidenavBtn', SidenavBtnComponent)
-  .component('filterSidenav', FilterSidenavComponent)
-  .component('checkboxFilter', CheckboxFilterComponent)
-  .component('radioFilter', RadioFilterComponent)
-  .component('timeRangeFilter', TimeRangeFilterComponent)
-  .component('priceRangeFilter', PriceRangeFilterComponent)
-  .component('filterGroup', FilterGroupComponent);
+  .component('footerComponent', FooterComponent);

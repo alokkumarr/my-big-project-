@@ -9,8 +9,8 @@
     "test:auto": "gulp test:auto",
     "styleguide": "gulp styleguide",
     "precommit": "eslint \"src/**/*.js\"",
-    "dist": "webpack --config conf/webpack.prod.js  --progress --profile --bail",
-    "start": "webpack-dev-server --config conf/webpack.dev.js --progress --profile"
+    "dist": "webpack --config conf/webpack.prod.js --progress --profile --bail",
+    "start": "webpack-dev-server --config conf/webpack.dev.js"
   },
   "eslintConfig": {
     "globals": {

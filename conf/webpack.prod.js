@@ -25,18 +25,11 @@ const vendorKeys = Object.keys(pkg.dependencies).map(key => {
   return key;
 });
 
-// a common chunk plugin used in app and in login as well
-const commonVendorKeys = ['angular', 'angular-material'];
-// vendor libraries used only in app, without the libs that are in the common chunk plugin
-const appOnlyVendorKeys = vendorKeys.filter(key => gte(0, indexOf(commonVendorKeys, key)));
-
-const appChunks = ['commonVendor', 'vendor', 'app'];
-const loginChunks = ['commonVendor', 'app'];
+const appChunks = ['vendor', 'app'];
 
 module.exports = webpackMerge(commonConfig, {
   entry: {
-    commonVendor: commonVendorKeys,
-    vendor: appOnlyVendorKeys
+    vendor: vendorKeys
   },
 
   output: {
@@ -70,12 +63,9 @@ module.exports = webpackMerge(commonConfig, {
       chunks: appChunks,
       chunksSortMode: webpackHelper.sortChunks(appChunks)
     }),
-    new HtmlWebpackPlugin({
-      template: './login/index.html',
-      filename: 'login.html',
-      hash: true,
-      chunks: loginChunks,
-      chunksSortMode: webpackHelper.sortChunks(loginChunks)
+    new CommonsChunkPlugin({
+      names: ['vendor'],
+      minChunks: Infinity
     })
   ],
 

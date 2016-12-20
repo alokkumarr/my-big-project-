@@ -1,5 +1,5 @@
 import template from './jsPlumbTable.component.html';
-import style from './_jsPlumbTable.component.scss';
+import style from './jsPlumbTable.component.scss';
 
 export const JSPlumbTable = {
   template,
