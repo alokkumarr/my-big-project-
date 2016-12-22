@@ -26,14 +26,11 @@ const vendorKeys = Object.keys(pkg.dependencies).map(key => {
 });
 
 const appChunks = ['vendor', 'app'];
+const loginChunks = ['vendor', 'login'];
 
 module.exports = webpackMerge(commonConfig, {
   entry: {
     vendor: vendorKeys
-  },
-
-  output: {
-    chunkFilename: 'js/[id].bundle.js'
   },
 
   module: {
@@ -57,16 +54,23 @@ module.exports = webpackMerge(commonConfig, {
       '__DEVELOPMENT__': false
     }),
     new HtmlWebpackPlugin({
-      template: './app/index.html',
-      filename: 'index.html',
+      template: 'app/index.html',
+      filename: 'app.html',
       hash: true,
       chunks: appChunks,
       chunksSortMode: webpackHelper.sortChunks(appChunks)
     }),
-    new CommonsChunkPlugin({
-      names: ['vendor'],
-      minChunks: Infinity
-    })
+    new HtmlWebpackPlugin({
+      template: 'login/index.html',
+      filename: 'login.html',
+      hash: true,
+      chunks: loginChunks,
+      chunksSortMode: webpackHelper.sortChunks(loginChunks)
+    }),
+    // new CommonsChunkPlugin({
+    //   names: ['vendor'],
+    //   minChunks: Infinity
+    // })
   ],
 
   eslint: {

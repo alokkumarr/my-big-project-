@@ -46,6 +46,12 @@ module.exports = webpackMerge(commonConfig, {
       filename: 'index.html',
       hash: true,
       chunks: ['app']
+    }),
+    new HtmlWebpackPlugin({
+      template: 'login/index.html',
+      filename: 'login/index.html',
+      hash: true,
+      chunks: ['login']
     })
   ],
 

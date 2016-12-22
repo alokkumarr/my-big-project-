@@ -19,11 +19,12 @@ const MODULE_DIR = 'node_modules';
 module.exports = {
   context: webpackHelper.root('src/main/javascript'),
   entry: {
-    app: './app/index'
+    app: './app/index',
+    login: './login/index'
   },
   output: {
     path: webpackHelper.root('dist'),
-    filename: '[name].bundle.js'
+    filename: 'js/[name].bundle.js'
   },
 
   debug: false,
@@ -83,7 +84,7 @@ module.exports = {
     new StyleLintPlugin({
       configFile: webpackHelper.root('.stylelintrc')
     }),
-    new ExtractTextPlugin('/css/[name]-[contenthash].css')
+    new ExtractTextPlugin('css/[name]-[contenthash].css')
   ],
 
   postcss: () => {
