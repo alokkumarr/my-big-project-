@@ -1,0 +1,53 @@
+js-plumb-join-dialog {
+  display: block;
+  min-width: 450px;
+}
+
+.jsp-join-dialog {
+  &_select {
+    label {
+      padding-bottom: 5px;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+
+    md-select {
+      margin: 0;
+    }
+
+    md-select-value {
+      width: 160px;
+      padding: 5px 15px;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  &_list {
+    width: 550px;
+    padding: 0;
+    border-top: 1px solid #CCC;
+
+    md-list-item {
+      &.m-active {
+        background-color: #F7F7F7;
+      }
+
+      .md-list-item-inner {
+        padding: 10px 15px;
+      }
+    }
+
+    strong {
+      color: #000;
+    }
+  }
+
+  &_desc {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  &_icon {
+    font-size: 38px;
+  }
+}

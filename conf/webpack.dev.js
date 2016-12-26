@@ -49,7 +49,7 @@ module.exports = webpackMerge(commonConfig, {
     }),
     new HtmlWebpackPlugin({
       template: 'login/index.html',
-      filename: 'login/index.html',
+      filename: 'login.html',
       hash: true,
       chunks: ['login']
     })

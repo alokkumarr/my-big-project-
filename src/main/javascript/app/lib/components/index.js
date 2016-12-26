@@ -1,6 +1,6 @@
 import {AccordionMenu, AccordionMenuLink} from './accordionMenu';
 import {BadgeComponent} from './badge';
-import {JSPlumbCanvas, JSPlumbTable, JSPlumbEndpoint, JSPlumbConnection} from './jsPlumb';
+import {JSPlumbCanvas, JSPlumbTable, JSPlumbEndpoint, JSPlumbConnection, JSPlumbJoinLabel, JSPlumbJoinDialog} from './jsPlumb';
 import {PanelComponent} from './panel';
 import {RangeSliderComponent} from './range-slider/range-slider.component';
 import {mdButtonGroupComponent} from './md-button-group/md-button-group.component';
@@ -19,6 +19,8 @@ angular
   .component('jsPlumbTable', JSPlumbTable)
   .component('jsPlumbConnection', JSPlumbConnection)
   .component('jsPlumbEndpoint', JSPlumbEndpoint)
+  .component('jsPlumbJoinLabel', JSPlumbJoinLabel)
+  .component('jsPlumbJoinDialog', JSPlumbJoinDialog)
   .component('panel', PanelComponent)
   .component('rangeSlider', RangeSliderComponent)
   .component('choiceGroup', ChoiceGroupComponent)

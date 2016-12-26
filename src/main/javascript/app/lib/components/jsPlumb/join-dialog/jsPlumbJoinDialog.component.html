@@ -1,0 +1,108 @@
+<md-dialog class="jsp-join-dialog" layout="column">
+  <md-dialog-content class="jsp-join-dialog_content">
+
+    <div layout="row" layout-align="space-around start" layout-padding="15">
+      <div class="jsp-join-dialog_select" layout="column">
+        <label ng-bind="::$ctrl.metadata.leftTable.name"></label>
+        <md-select ng-model="::$ctrl.metadata.leftTable.field">
+          <md-option
+            ng-repeat="field in $ctrl.metadata.leftTable.fields"
+            ng-bind="::field.name"
+            ng-value="field.name"></md-option>
+        </md-select>
+      </div>
+
+      <div class="jsp-join-dialog_select" layout="column">
+        <label ng-bind="::$ctrl.metadata.rightTable.name"></label>
+        <md-select ng-model="::$ctrl.metadata.rightTable.field">
+          <md-option
+            ng-repeat="field in $ctrl.metadata.rightTable.fields"
+            ng-bind="::field.name"
+            ng-value="field.name"></md-option>
+        </md-select>
+      </div>
+    </div>
+
+    <md-list class="jsp-join-dialog_list" layout="column">
+      <!-- INNER JOIN -->
+      <md-list-item layout="row"
+                    ng-class="{'m-active': $ctrl.isOfType('inner')}"
+                    ng-click="$ctrl.setType('inner')">
+        <span class="jsp-join-dialog_icon icon-inner-join flex-20" layout="row" layout-align="start top">
+          <span class="path1"></span>
+          <span class="path2"></span>
+          <span class="path3"></span>
+        </span>
+
+        <div layout="column">
+          <strong>Inner Join</strong>
+          <span class="jsp-join-dialog_desc">Include <strong>only</strong> rows where
+            `<span ng-bind="$ctrl.metadata.leftTable.field"></span>` in the
+            `<span ng-bind="$ctrl.metadata.leftTable.name"></span>` table equals
+            `<span ng-bind="$ctrl.metadata.rightTable.field"></span>` in the
+            `<span ng-bind="$ctrl.metadata.rightTable.name"></span>` table.
+          </span>
+        </div>
+      </md-list-item>
+
+      <!-- LEFT JOIN -->
+      <md-list-item layout="row"
+                    ng-class="{'m-active': $ctrl.isOfType('left')}"
+                    ng-click="$ctrl.setType('left')">
+        <span class="jsp-join-dialog_icon icon-left-join flex-20" layout="row" layout-align="start top">
+          <span class="path1"></span>
+          <span class="path2"></span>
+          <span class="path3"></span>
+        </span>
+
+        <div layout="column">
+          <strong>Left Join</strong>
+          <span class="jsp-join-dialog_desc">Include <strong>all</strong> rows from
+            `<span ng-bind="$ctrl.metadata.leftTable.name"></span>` and <strong>only</strong> those records from
+            `<span ng-bind="$ctrl.metadata.rightTable.name"></span>` where the joined fields are equal.
+          </span>
+        </div>
+      </md-list-item>
+
+      <!-- RIGHT JOIN -->
+      <md-list-item layout="row"
+                    ng-class="{'m-active': $ctrl.isOfType('right')}"
+                    ng-click="$ctrl.setType('right')">
+        <span class="jsp-join-dialog_icon icon-right-join flex-20" layout="row" layout-align="start top">
+          <span class="path1"></span>
+          <span class="path2"></span>
+          <span class="path3"></span>
+        </span>
+
+        <div layout="column">
+          <strong>Right Join</strong>
+          <span class="jsp-join-dialog_desc">Include <strong>all</strong> rows from
+            `<span ng-bind="$ctrl.metadata.rightTable.name"></span>` and <strong>only</strong> those records from
+            `<span ng-bind="$ctrl.metadata.leftTable.name"></span>` where the joined fields are equal.
+          </span>
+        </div>
+      </md-list-item>
+    </md-list>
+
+  </md-dialog-content>
+
+  <md-dialog-actions class="jsp-join-dialog_footer">
+    <div layout="row" layout-align="space-between center" flex="auto">
+      <div>
+        <md-button class="btn-primary"
+                   ng-click="$ctrl.save()">Done
+        </md-button>
+
+        <md-button class="btn-card"
+                   ng-click="$ctrl.cancel()">Cancel
+        </md-button>
+      </div>
+
+      <md-button class="btn-card"
+                 ng-click="$ctrl.removeLink()">
+        <md-icon md-font-icon="icon-trash"></md-icon>
+        Delete Link
+      </md-button>
+    </div>
+  </md-dialog-actions>
+</md-dialog>

@@ -3,7 +3,7 @@ import jsPlumb from 'jsplumb';
 
 import template from './jsPlumbCanvas.component.html';
 import style from './jsPlumbCanvas.component.scss';
-import {JS_PLUMB_DEFAULT_SETTINGS} from './settings';
+import {JS_PLUMB_DEFAULT_SETTINGS} from '../settings';
 
 export const JSPlumbCanvas = {
   template,

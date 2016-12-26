@@ -10,11 +10,13 @@ export const JSPlumbConnection = {
     settings: '<'
   },
   controller: class JSPlumbConnectionCtrl {
-    constructor($element, $timeout) {
+    constructor($element, $timeout, $compile, $scope) {
       'ngInject';
 
       this.$element = $element;
       this.$timeout = $timeout;
+      this.$compile = $compile;
+      this.$scope = $scope;
     }
 
     $onInit() {
@@ -24,7 +26,7 @@ export const JSPlumbConnection = {
     $postLink() {
       if (this.metadata && this.sourceEndpoint) {
         this.$timeout(() => {
-          this.connect();
+          this.connect(this.metadata.target, this.sourceEndpoint.uuid);
         }, 300);
       }
     }
@@ -33,35 +35,33 @@ export const JSPlumbConnection = {
       this.detach();
     }
 
-    connect() {
+    connect(source, target) {
       this.detach();
-
-      const source = find(this.sourceEndpoint.connections, connection => {
-        return connection.target === this.metadata.target;
-      });
 
       this.connection = this.jsPlumbInst.connect({
         uuids: [
-          this.metadata.target,
-          this.sourceEndpoint.uuid
+          source,
+          target
         ],
         overlays: [
           ['Label', {
-            label: this.getLabelByType(source.type),
+            label: this.getLabelByType('one'),
             location: 0
           }],
           ['Label', {
-            label: this.getLabelByType(this.metadata.type),
+            label: this.getLabelByType('one'),
             location: 1
           }],
-          ['Label', {
-            label: '<i class="jsp-connection-remove-icon">x</i>',
-            location: 0.5,
-            events: {
-              tap: () => {
-                this.detach();
-              }
-            }
+          ['Custom', {
+            create: connection => {
+              const html = `<js-plumb-join-label connection="connection"></js-plumb-join-label>`;
+              const scope = this.$scope.$new();
+
+              scope.connection = this;
+
+              return this.$compile(html)(scope);
+            },
+            location: 0.5
           }]
         ]
       });
@@ -75,9 +75,12 @@ export const JSPlumbConnection = {
 
     getLabelByType(type) {
       switch (type) {
-        case 'one': return '1';
-        case 'many': return '∞';
-        default: return '';
+        case 'one':
+          return '1';
+        case 'many':
+          return '∞';
+        default:
+          return '';
       }
     }
   }
