@@ -7,49 +7,44 @@ import 'devextreme/integration/angular';
 import 'angular-ui-grid';
 import 'angular-ui-grid/ui-grid.css';
 
+import AppConfig from '../../../../appConfig';
+
 import {routesConfig} from './routes';
 import {themeConfig} from './theme';
+import {runConfig} from './run';
 
-import {RootComponent} from './layout/root.component';
-import {HomeComponent} from './home.component';
-import {HeaderComponent} from './layout/header.component';
-import {FooterComponent} from './layout/footer.component';
-import {SidenavComponent, SidenavBtnComponent, SidenavTargetDirective} from './sidenav';
-
-import {ObserveModule} from './observe';
-import {AnalyzeModule} from './analyze';
-import {CheckboxFilterComponent, RadioFilterComponent, TimeRangeFilterComponent, PriceRangeFilterComponent, FilterGroupComponent} from './observe/filters';
-import {FilterSidenavComponent} from './observe/filter-sidenav.component';
-
-// import app modules
 import {LibModule} from './lib';
-import {loginModule} from '../login';
+import {ObserveModule} from './modules/observe';
+import {AnalyzeModule} from './modules/analyze';
+import {AlertsModule} from './modules/alerts';
 
-export const app = 'app';
+import {HeaderComponent, RootComponent, FooterComponent} from './layout';
+
+// import from login module
+import {AuthServiceFactory} from '../login/services/auth.service';
+import {UserServiceFactory} from '../login/services/user.service';
+import {JwtServiceFactory} from '../login/services/jwt.service';
+
+export const AppModule = 'app';
 
 angular
-  .module(app, [
+  .module(AppModule, [
     'dx',
     'ngMaterial',
     'ui.router',
     'ui.grid',
     LibModule,
-    AnalyzeModule,
     ObserveModule,
-    loginModule
+    AnalyzeModule,
+    AlertsModule
   ])
   .config(routesConfig)
   .config(themeConfig)
+  .run(runConfig)
+  .value('AppConfig', AppConfig)
+  .factory('AuthService', AuthServiceFactory)
+  .factory('UserService', UserServiceFactory)
+  .factory('JwtService', JwtServiceFactory)
   .component('root', RootComponent)
   .component('headerComponent', HeaderComponent)
-  .component('footerComponent', FooterComponent)
-  .component('home', HomeComponent)
-  .directive('sidenavTarget', SidenavTargetDirective)
-  .component('sidenav', SidenavComponent)
-  .component('sidenavBtn', SidenavBtnComponent)
-  .component('filterSidenav', FilterSidenavComponent)
-  .component('checkboxFilter', CheckboxFilterComponent)
-  .component('radioFilter', RadioFilterComponent)
-  .component('timeRangeFilter', TimeRangeFilterComponent)
-  .component('priceRangeFilter', PriceRangeFilterComponent)
-  .component('filterGroup', FilterGroupComponent);
+  .component('footerComponent', FooterComponent);

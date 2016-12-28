@@ -1,0 +1,56 @@
+<header>
+  <md-toolbar class="app-toolbar">
+    <div class="md-toolbar-tools">
+      <div class="symmetra-logo"></div>
+      <span>SYMMETRA</span>
+
+      <span flex></span>
+
+      <md-button ng-class="$ctrl.isState('app.observe') ? 'btn-link' : 'btn-card'"
+                 aria-label="OBSERVE"
+                 ui-sref="app.observe">OBSERVE
+      </md-button>
+      <md-button ng-class="$ctrl.isState('app.analyze') ? 'btn-link' : 'btn-card'"
+                 aria-label="ANALYZE"
+                 ui-sref="app.analyze">ANALYZE
+      </md-button>
+      <md-button ng-class="$ctrl.isState('app.alerts') ? 'btn-link' : 'btn-card'"
+                 aria-label="ALERTS"
+                 ui-sref="app.alerts">ALERTS
+      </md-button>
+
+      <span flex></span>
+
+      <md-button class="md-icon-button" aria-label="More">
+        <md-icon md-font-icon="icon-launchpad"></md-icon>
+      </md-button>
+
+      <md-menu-bar>
+        <md-menu>
+          <md-button class="md-icon-button" aria-label="User"
+                     ng-click="$mdOpenMenu()">
+            <md-icon md-font-icon="icon-user-placeholder"></md-icon>
+          </md-button>
+          <md-menu-content>
+            <md-menu-item>
+              <md-button>Account</md-button>
+            </md-menu-item>
+            <md-menu-item>
+              <md-button ng-click="$ctrl.changePwd()">Change password</md-button>
+            </md-menu-item>
+            <md-menu-divider></md-menu-divider>
+            <md-menu-item>
+              <md-button ng-click="$ctrl.logout()">Log out</md-button>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+      </md-menu-bar>
+
+      <md-button class="md-icon-button" aria-label="Menu"
+                 ng-click="toggleRight()">
+        <md-icon md-font-icon="icon-bell-list"></md-icon>
+        <badge class="alerts-badge" label="{{5}}"></badge>
+      </md-button>
+    </div>
+  </md-toolbar>
+</header>

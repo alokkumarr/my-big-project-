@@ -7,6 +7,7 @@ const commonConfig = require('./webpack.common.js');
  */
 const DefinePlugin = require('webpack/lib/DefinePlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 /**
  * Webpack configuration
@@ -18,27 +19,44 @@ module.exports = webpackMerge(commonConfig, {
 
   debug: true,
   devtool: 'source-map',
+  noInfo: true,
+
+  stats: {
+    colors: true
+  },
+
+  module: {
+    loaders: [
+      {
+        test: /\.(css|scss)$/,
+        loaders: ExtractTextPlugin.extract({
+          fallbackLoader: 'style',
+          loader: 'css!sass!postcss'
+        })
+      }
+    ]
+  },
 
   plugins: [
     new DefinePlugin({
       '__DEVELOPMENT__': true
     }),
     new HtmlWebpackPlugin({
-      template: webpackHelper.root('src/app/index.html'),
+      template: 'app/index.html',
       filename: 'index.html',
       hash: true,
       chunks: ['app']
     }),
     new HtmlWebpackPlugin({
-      template: webpackHelper.root('src/login/index.html'),
-      filename: 'login.html',
+      template: 'login/index.html',
+      filename: 'login/index.html',
       hash: true,
       chunks: ['login']
-    }),
+    })
   ],
 
   eslint: {
-    configFile: webpackHelper.root('src/dev-eslint-rules.js')
+    configFile: webpackHelper.root('conf/eslint-dev-rules.js')
   },
 
   devServer: {
