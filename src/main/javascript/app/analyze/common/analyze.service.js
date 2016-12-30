@@ -39,11 +39,31 @@ export function AnalyzeService($http) {
   }
 
   function getTables() {
-    return $http.get('/api/analyze/tables').then(get('data'));
+    return $http.get('/api/analyze/reportArtifacts')
+      .then(get('data'))
+      .then(mapArtifactsToTables());
   }
 
   function getDataByQuery() {
     return $http.get('/api/analyze/dataByQuery').then(get('data'));
+  }
+
+  function mapArtifactsToTables() {
+    return map(artifact => {
+      return {
+        x: artifact.x,
+        y: artifact.y,
+        name: artifact._artifact_name,
+        fields: map(attribute => {
+          return {
+            name: attribute._alias_name || attribute._display_name,
+            type: attribute._type,
+            checked: attribute.checked,
+            endpoints: attribute.endpoints
+          };
+        }, artifact._artifact_attributes)
+      };
+    });
   }
 
   /**

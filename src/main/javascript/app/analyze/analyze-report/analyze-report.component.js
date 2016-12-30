@@ -141,7 +141,6 @@ export const AnalyzeReportComponent = {
           ]
         });
       };
-
       this.AnalyzeService.getTables()
         .then(data => {
           this.tables = data;

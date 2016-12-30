@@ -25,14 +25,6 @@ export const AnalyzeMetrics = {
   }
 };
 
-export const AnalyzeTables = {
-  method: 'GET',
-  url: '/api/analyze/tables',
-  response: () => {
-    return [200, getTables()];
-  }
-};
-
 export const AnalyzeDataByQuery = {
   method: 'GET',
   url: '/api/analyze/dataByQuery',
@@ -47,19 +39,19 @@ function getMenu() {
       name: 'My Analyses',
       children: [{
         name: 'Order Fulfillment',
-        url: '#/analyze/1'
+        url: '#!/analyze/1'
       }, {
         name: 'Category 2',
-        url: '#/analyze/2'
+        url: '#!/analyze/2'
       }, {
         name: 'Category 3',
-        url: '#/analyze/3'
+        url: '#!/analyze/3'
       }, {
         name: 'Category 4',
-        url: '#/analyze/4'
+        url: '#!/analyze/4'
       }, {
         name: 'Category 5',
-        url: '#/analyze/5'
+        url: '#!/analyze/5'
       }]
     }, {
       name: 'Folder 2'
@@ -172,137 +164,6 @@ function getMetrics() {
   ];
 
   return metrics;
-}
-
-function getTables() {
-  return [
-    {
-      name: 'Customers',
-      fields: [{
-        name: 'Customer ID',
-        type: 'int',
-        checked: false,
-        endpoints: [{
-          uuid: 11,
-          anchor: 'RightMiddle',
-          connections: [{
-            target: 24
-          }]
-        }]
-      }, {
-        name: 'Customer Name',
-        type: 'string',
-        checked: true
-      }, {
-        name: 'Address',
-        type: 'string',
-        checked: false
-      }, {
-        name: 'Phone Number',
-        type: 'string',
-        checked: false
-      }],
-      x: 5,
-      y: 5
-    }, {
-      name: 'Orders',
-      fields: [{
-        name: 'Order ID',
-        type: 'int',
-        checked: false
-      }, {
-        name: 'Shipper',
-        type: 'string',
-        checked: false,
-        endpoints: [{
-          uuid: 54,
-          anchor: 'RightMiddle',
-          connections: [{
-            source: 54
-          }]
-        }]
-      }, {
-        name: 'Customer',
-        type: 'string',
-        checked: false,
-        endpoints: [{
-          uuid: 24,
-          anchor: 'LeftMiddle',
-          connections: [{
-            source: 24
-          }]
-        }]
-      }, {
-        name: 'Total Price',
-        type: 'int',
-        checked: true
-      }, {
-        name: 'Warehouse',
-        type: 'string',
-        checked: false,
-        endpoints: [{
-          uuid: 84,
-          anchor: 'RightMiddle',
-          connections: [{
-            source: 84
-          }]
-        }]
-      }, {
-        name: 'Address',
-        type: 'string',
-        checked: false
-      }],
-      x: 275,
-      y: 5
-    }, {
-      name: 'Shippers',
-      fields: [{
-        name: 'Shipper ID',
-        type: 'int',
-        checked: false,
-        endpoints: [{
-          uuid: 33,
-          anchor: 'LeftMiddle',
-          connections: [{
-            target: 54
-          }]
-        }]
-      }, {
-        name: 'Shipper Name',
-        type: 'string',
-        checked: true
-      }, {
-        name: 'Region',
-        type: 'string',
-        checked: false
-      }],
-      x: 525,
-      y: 5
-    }, {
-      name: 'Warehouses',
-      fields: [{
-        name: 'Warehouse ID',
-        type: 'int',
-        checked: false,
-        endpoints: [{
-          uuid: 55,
-          anchor: 'LeftMiddle',
-          connections: [{
-            target: 84
-          }]
-        }]
-      }, {
-        name: 'Warehouse Name',
-        type: 'string',
-        checked: true
-      }, {
-        name: 'Warehouse Address',
-        type: 'string',
-        checked: false
-      }],
-      x: 525,
-      y: 200
-    }];
 }
 
 function getDataByQuery() {
