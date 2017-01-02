@@ -10,6 +10,7 @@ export class FieldModel {
     this.alias = alias;
     this.type = 'string';
     this.endpoints = [];
+    this.selected = false;
   }
 
   getName() {

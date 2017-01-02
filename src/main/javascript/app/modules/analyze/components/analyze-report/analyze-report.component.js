@@ -1,5 +1,3 @@
-import forEach from 'lodash/forEach';
-
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
 
@@ -7,8 +5,9 @@ export const AnalyzeReportComponent = {
   template,
   styles: [style],
   controller: class AnalyzeReportController {
-    constructor($componentHandler, $mdDialog, AnalyzeService) {
+    constructor($componentHandler, $mdDialog, $scope, AnalyzeService) {
       this._$mdDialog = $mdDialog;
+      this._$scope = $scope;
       this._AnalyzeService = AnalyzeService;
 
       this.DESIGNER_MODE = 'designer';
@@ -21,50 +20,6 @@ export const AnalyzeReportComponent = {
 
       this.data = {
         query: 'Select * From Orders'
-      };
-
-      this.jsPlumbOptions = {
-        endpoints: {
-          source: {
-            endpoint: 'Dot',
-            isSource: true,
-            isTarget: true,
-            maxConnections: 1,
-            connector: ['Flowchart', {
-              cornerRadius: 10
-            }],
-            endpointStyle: {
-              radius: 9,
-              stroke: '#B0BFC8',
-              strokeWidth: 3
-            },
-            connectorStyle: {
-              stroke: '#B0BFC8',
-              strokeWidth: 3,
-              outlineStroke: 'white',
-              outlineWidth: 2
-            },
-            connectorHoverStyle: {
-              stroke: '#B0BFC8'
-            },
-            endpointHoverStyle: {
-              stroke: '#B0BFC8'
-            }
-          },
-          target: {
-            endpoint: 'Dot',
-            isTarget: true,
-            maxConnections: -1,
-            endpointStyle: {
-              radius: 9,
-              stroke: '#B0BFC8',
-              strokeWidth: 3
-            },
-            endpointHoverStyle: {
-              stroke: '#B0BFC8'
-            }
-          }
-        }
       };
 
       this.dxGridOptions = {
@@ -157,38 +112,29 @@ export const AnalyzeReportComponent = {
     }
 
     initCanvas(canvas) {
+      this.canvas = canvas;
+
       this._AnalyzeService.getArtifacts()
         .then(data => {
-          forEach(data, itemA => {
-            const table = canvas.model.addTable(itemA._artifact_name);
+          this.canvas.model.precess(data);
+        });
+    }
 
-            table.setPosition(itemA._artifact_position[0], itemA._artifact_position[1]);
+    openSortModal(ev) {
+      const scope = this._$scope.$new();
 
-            forEach(itemA._artifact_attributes, itemB => {
-              const field = table.addField(itemB['_actual_col-name'], itemB._display_name, itemB._alias_name);
+      scope.model = {
+        fields: this.canvas.model.getSelectedFields(),
+        sorts: this.canvas.model.sorts
+      };
 
-              field.setType(itemB._type);
-            });
-          });
-
-          forEach(data, itemA => {
-            forEach(itemA._sql_builder.joins, itemB => {
-              const tableA = itemB.criteria[0]['table-name'];
-              const tableB = itemB.criteria[1]['table-name'];
-
-              if (tableA !== tableB) {
-                canvas.model.addJoin(itemB.type, {
-                  table: tableA,
-                  field: itemB.criteria[0]['column-name'],
-                  side: itemB.criteria[0].side
-                }, {
-                  table: tableB,
-                  field: itemB.criteria[1]['column-name'],
-                  side: itemB.criteria[1].side
-                });
-              }
-            });
-          });
+      this._$mdDialog
+        .show({
+          template: '<analyze-report-sort model="model"></analyze-report-sort>',
+          targetEvent: ev,
+          fullscreen: true,
+          skipHide: true,
+          scope: scope
         });
     }
   }

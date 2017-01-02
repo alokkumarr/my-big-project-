@@ -382,7 +382,7 @@ function getArtifacts() {
     _sql_builder: {
       _group_by_columns: [],
       _order_by_columns: [{
-        'col-name': 'Order ID',
+        'col-name': 'OrderID',
         order: 'asc'
       }],
       joins: [
@@ -458,21 +458,10 @@ function getArtifacts() {
     _sql_builder: {
       _group_by_columns: [],
       _order_by_columns: [{
-        'col-name': 'Shipper ID',
+        'col-name': 'ShipperID',
         order: 'asc'
       }],
-      joins: [{
-        type: 'inner',
-        criteria: [{
-          'table-name': '',
-          'column-name': '',
-          side: 'left'
-        }, {
-          'table-name': '',
-          'column-name': '',
-          side: 'left'
-        }]
-      }]
+      joins: []
     }
   });
 
@@ -516,21 +505,10 @@ function getArtifacts() {
     _sql_builder: {
       _group_by_columns: [],
       _order_by_columns: [{
-        'col-name': 'Customer ID',
+        'col-name': 'CustomerID',
         order: 'asc'
       }],
-      joins: [{
-        type: 'inner',
-        criteria: [{
-          'table-name': '',
-          'column-name': '',
-          side: 'left'
-        }, {
-          'table-name': '',
-          'column-name': '',
-          side: 'left'
-        }]
-      }]
+      joins: []
     }
   });
 
@@ -566,21 +544,10 @@ function getArtifacts() {
     _sql_builder: {
       _group_by_columns: [],
       _order_by_columns: [{
-        'col-name': 'Customer ID',
+        'col-name': 'WarehouseID',
         order: 'asc'
       }],
-      joins: [{
-        type: 'inner',
-        criteria: [{
-          'table-name': '',
-          'column-name': '',
-          side: 'left'
-        }, {
-          'table-name': '',
-          'column-name': '',
-          side: 'left'
-        }]
-      }]
+      joins: []
     }
   });
 

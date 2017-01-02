@@ -1,5 +1,5 @@
 <md-list>
-  <md-subheader class="md-no-sticky">
+  <md-subheader class="md-no-sticky" layout-padding>
     <span ng-bind="::$ctrl.model.name"></span>
   </md-subheader>
 
@@ -10,7 +10,7 @@
                 ng-click="$event.stopPropagation();"
                 ng-mousedown="$ctrl.onFieldMouseDown($event, field);"
                 ng-mouseup="$ctrl.onFieldMouseUp($event, field);">
-    <md-checkbox ng-model="field.checked"></md-checkbox>
+    <md-checkbox ng-model="field.selected"></md-checkbox>
 
     <span class="jsp-table-column-name"
           ng-bind="::field.getName()"></span>

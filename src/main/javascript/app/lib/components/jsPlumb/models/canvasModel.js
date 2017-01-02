@@ -1,4 +1,7 @@
 import find from 'lodash/find';
+import flatMap from 'lodash/flatMap';
+import filter from 'lodash/filter';
+import forEach from 'lodash/forEach';
 
 import {TableModel} from './tableModel';
 import {JoinModel} from './joinModel';
@@ -7,6 +10,54 @@ export class CanvasModel {
   constructor() {
     this.tables = [];
     this.joins = [];
+    this.sorts = [];
+  }
+
+  precess(data) {
+    this.tables.length = 0;
+    this.joins.length = 0;
+    this.sorts.length = 0;
+
+    forEach(data, itemA => {
+      const table = this.addTable(itemA._artifact_name);
+
+      table.setPosition(itemA._artifact_position[0], itemA._artifact_position[1]);
+
+      forEach(itemA._artifact_attributes, itemB => {
+        const field = table.addField(itemB['_actual_col-name'], itemB._display_name, itemB._alias_name);
+
+        field.setType(itemB._type);
+      });
+    });
+
+    forEach(data, itemA => {
+      forEach(itemA._sql_builder.joins, itemB => {
+        const tableA = itemB.criteria[0]['table-name'];
+        const tableB = itemB.criteria[1]['table-name'];
+
+        if (tableA !== tableB) {
+          this.addJoin(itemB.type, {
+            table: tableA,
+            field: itemB.criteria[0]['column-name'],
+            side: itemB.criteria[0].side
+          }, {
+            table: tableB,
+            field: itemB.criteria[1]['column-name'],
+            side: itemB.criteria[1].side
+          });
+        }
+      });
+
+      forEach(itemA._sql_builder._order_by_columns, itemB => {
+        const sort = this.addSort({
+          table: itemA._artifact_name,
+          field: itemB['col-name'],
+          order: itemB.order
+        });
+
+        sort.field.selected = true;
+      });
+    });
   }
 
   addTable(tableName) {
@@ -62,5 +113,22 @@ export class CanvasModel {
     if (idx !== -1) {
       this.joins.splice(idx, 1);
     }
+  }
+
+  getSelectedFields() {
+    return flatMap(this.tables, table => {
+      return filter(table.fields, field => {
+        return field.selected === true;
+      });
+    });
+  }
+
+  addSort(sortObj) {
+    sortObj.table = this.findTable(sortObj.table);
+    sortObj.field = sortObj.table && sortObj.table.findField(sortObj.field);
+
+    this.sorts.push(sortObj);
+
+    return sortObj;
   }
 }
