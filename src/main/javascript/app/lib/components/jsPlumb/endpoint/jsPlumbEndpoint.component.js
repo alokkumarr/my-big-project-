@@ -1,59 +1,54 @@
 export const JSPlumbEndpoint = {
-  require: {
-    canvas: '^jsPlumbCanvas'
-  },
   bindings: {
-    metadata: '<',
-    table: '<',
-    field: '<',
-    settings: '<'
+    model: '<'
   },
   controller: class JSPlumbEndpointCtrl {
     constructor($element) {
       'ngInject';
+      this._$element = $element;
 
-      this.$element = $element;
+      this.endpoint = null;
     }
 
     $onInit() {
-      this.jsPlumbInst = this.canvas.getInstance();
+      this.model.component = this;
+
+      this._canvas = this.model.field.table.canvas;
+      this._jsPlumbInst = this._canvas.component.getInstance();
+      this._settings = this._canvas.component.getSettings();
+
+      this.render();
     }
 
-    $postLink() {
-      if (this.metadata) {
-        this.addEndpoint(this.metadata);
-      }
+    $onDestroy() {
+      this.detach();
     }
 
-    // $onDestroy() {
-    //   this.deleteEndpoint();
-    // }
-
-    addEndpoint(metadata) {
+    render() {
       let endpointSettings;
 
-      if (this.settings && this.settings.endpoints) {
-        endpointSettings = this.settings.endpoints.source || {};
+      if (this._settings.endpoints) {
+        endpointSettings = this._settings.endpoints.source || {};
       }
 
       const options = {
-        uuid: metadata.uuid,
-        anchor: metadata.anchor,
+        uuid: this.model.getIdentifier(),
+        anchor: this.model.getAnchor(),
         connectionsDetachable: true,
         reattachConnections: true,
-        deleteEndpointsOnDetach: true
+        deleteEndpointsOnDetach: false
       };
 
-      this.$element.addClass(`jsp-endpoint-${options.anchor}`);
+      this._$element.addClass(`jsp-endpoint-${options.anchor}`);
 
-      this.endpoint = this.jsPlumbInst.addEndpoint(this.$element, endpointSettings, options);
-      this.endpoint.setParameter('instance', this);
+      this.endpoint = this._jsPlumbInst.addEndpoint(this._$element, endpointSettings, options);
+      this.endpoint.setParameter('component', this);
     }
 
-    // deleteEndpoint() {
-    //   if (this.endpoint) {
-    //     this.jsPlumbInst.deleteEndpoint(this.endpoint);
-    //   }
-    // }
+    detach() {
+      if (this.endpoint) {
+        this._jsPlumbInst.deleteEndpoint(this.endpoint);
+      }
+    }
   }
 };

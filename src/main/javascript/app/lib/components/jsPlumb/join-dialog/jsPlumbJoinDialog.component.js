@@ -5,41 +5,61 @@ export const JSPlumbJoinDialog = {
   template,
   styles: [style],
   bindings: {
-    metadata: '<'
+    model: '<'
   },
   controller: class JSPlumbJoinDialogCtrl {
     constructor($mdDialog) {
       'ngInject';
 
-      this.$mdDialog = $mdDialog;
+      this._$mdDialog = $mdDialog;
     }
 
-    $postLink() {
+    $onInit() {
+      this._connector = this.model.connector;
+      this.type = this._connector.model.type;
+      this.leftSide = this._connector.model.leftSide;
+      this.rightSide = this._connector.model.rightSide;
+      this.leftSideField = this.leftSide.field;
+      this.rightSideField = this.rightSide.field;
     }
 
-    isOfType(joinType) {
-      return this.metadata.joinType === joinType;
+    isOfType(type) {
+      return this.type === type;
     }
 
-    setType(joinType) {
-      this.metadata.joinType = joinType;
+    setType(type) {
+      this.type = type;
     }
 
     save() {
-      this.$mdDialog.hide({
-        type: 'save',
-        metadata: this.metadata
-      });
+      this._$mdDialog.hide();
+
+      let shouldRender = false;
+
+      this._connector.model.type = this.type;
+
+      if (this.leftSide.field !== this.leftSideField) {
+        this.leftSide.field = this.leftSideField;
+        shouldRender = true;
+      }
+
+      if (this.rightSide.field !== this.rightSideField) {
+        this.rightSide.field = this.rightSideField;
+        shouldRender = true;
+      }
+
+      if (shouldRender) {
+        this._connector.render();
+      }
     }
 
     cancel() {
-      this.$mdDialog.hide();
+      this._$mdDialog.hide();
     }
 
-    removeLink() {
-      this.$mdDialog.hide({
-        type: 'removeLink'
-      });
+    remove() {
+      this._$mdDialog.hide();
+      this._connector.detach();
     }
   }
 };

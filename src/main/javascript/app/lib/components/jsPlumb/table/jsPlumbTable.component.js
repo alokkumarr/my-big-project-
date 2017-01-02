@@ -1,90 +1,69 @@
+import isEmpty from 'lodash/isEmpty';
+
 import template from './jsPlumbTable.component.html';
 import style from './jsPlumbTable.component.scss';
 
 export const JSPlumbTable = {
   template,
   styles: [style],
-  require: {
-    canvas: '^jsPlumbCanvas'
-  },
   bindings: {
-    metadata: '<',
-    settings: '<'
+    model: '<'
   },
   controller: class JSPlumbTableCtrl {
     constructor($scope, $element, $timeout) {
       'ngInject';
 
-      this.$scope = $scope;
-      this.$element = $element;
-      this.$timeout = $timeout;
+      this._$scope = $scope;
+      this._$element = $element;
+      this._$timeout = $timeout;
     }
 
     $onInit() {
-      this.jsPlumbInst = this.canvas.getInstance();
+      this.model.component = this;
+
+      this._canvas = this.model.canvas;
+      this._jsPlumbInst = this._canvas.component.getInstance();
+
       this.updatePosition();
     }
 
     $postLink() {
-      this.jsPlumbInst.draggable(this.$element, {
+      this._jsPlumbInst.draggable(this._$element, {
         allowNegative: false,
         drag: event => {
-          this.metadata.x = event.pos[0];
-          this.metadata.y = event.pos[1];
-        }
-      });
-
-      this.jsPlumbInst.bind('connection', info => {
-        const sourceEndpointInst = info.sourceEndpoint.getParameter('instance');
-        const targetEndpointInst = info.targetEndpoint.getParameter('instance');
-
-        if (sourceEndpointInst && targetEndpointInst) {
-          if (sourceEndpointInst.table === targetEndpointInst.table) {
-            this.jsPlumbInst.detach(info.connection);
-          }
+          this.model.x = event.pos[0];
+          this.model.y = event.pos[1];
         }
       });
     }
 
     updatePosition() {
-      this.$element.css({
-        left: `${this.metadata.x}px`,
-        top: `${this.metadata.y}px`
+      this._$element.css({
+        left: `${this.model.x}px`,
+        top: `${this.model.y}px`
       });
     }
 
     onFieldMouseDown($event, field) {
       const itemListXMiddle = $event.target.offsetWidth / 2;
-      const anchor = itemListXMiddle > $event.offsetX ? 'LeftMiddle' : 'RightMiddle';
+      const side = itemListXMiddle > $event.offsetX ? 'left' : 'right';
 
-      this._fieldActionTimer = this.$timeout(() => {
-        this.addEndpointTo(field, anchor);
+      this._fieldActionTimer = this._$timeout(() => {
+        const endpoint = field.getEndpoint(side);
+
+        if (!endpoint) {
+          field.addEndpoint(side);
+        } else if (isEmpty(endpoint.component.endpoint.connections)) {
+          field.removeEndpoint(endpoint);
+        }
       }, 1000);
     }
 
     onFieldMouseUp() {
       if (this._fieldActionTimer) {
-        this.$timeout.cancel(this._fieldActionTimer);
+        this._$timeout.cancel(this._fieldActionTimer);
         this._fieldActionTimer = null;
       }
-    }
-
-    addEndpointTo(field, anchor) {
-      const endpoint = {
-        uuid: Date.now(),
-        anchor,
-        connections: []
-      };
-
-      if (!field.endpoints) {
-        field.endpoints = [];
-      }
-
-      field.endpoints.push(endpoint);
-
-      this.$scope.$apply();
-
-      return endpoint;
     }
   }
 };

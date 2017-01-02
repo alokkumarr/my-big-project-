@@ -5,55 +5,22 @@ export const JSPlumbJoinLabel = {
   template,
   styles: [style],
   bindings: {
-    connection: '<'
+    model: '<'
   },
   controller: class JSPlumbJoinLabelCtrl {
-    constructor($mdDialog, $scope) {
+    constructor($scope, $mdDialog) {
       'ngInject';
 
-      this.$mdDialog = $mdDialog;
-      this.$scope = $scope;
-
-      this.metadata = {
-        leftTable: {
-          name: 'Customers',
-          field: 'Customer ID',
-          fields: [{
-            name: 'Customer ID'
-          }, {
-            name: 'Customer Name'
-          }, {
-            name: 'Address'
-          }, {
-            name: 'Phone Number'
-          }]
-        },
-        rightTable: {
-          name: 'Orders',
-          field: 'Customer',
-          fields: [{
-            name: 'Order ID'
-          }, {
-            name: 'Shipper'
-          }, {
-            name: 'Customer'
-          }, {
-            name: 'Total Price'
-          }, {
-            name: 'Warehouse'
-          }, {
-            name: 'Address'
-          }]
-        },
-        joinType: this.getRelationType()
-      }
+      this._$scope = $scope;
+      this._$mdDialog = $mdDialog;
     }
 
-    $postLink() {
+    $onInit() {
+      this._connector = this.model.connector;
     }
 
     getRelationType() {
-      return (this.connectionType || 'inner').toLowerCase();
+      return this._connector.model.type.toLowerCase();
     }
 
     getRelationName() {
@@ -67,40 +34,19 @@ export const JSPlumbJoinLabel = {
     }
 
     onClick(ev) {
-      const originalMetadata = this.metadata;
-      const scope = this.$scope.$new();
+      const scope = this._$scope.$new();
 
-      scope.metadata = angular.copy(originalMetadata);
+      scope.model = {
+        connector: this._connector
+      };
 
-      this.$mdDialog
+      this._$mdDialog
         .show({
-          template: '<js-plumb-join-dialog metadata="metadata"></js-plumb-join-dialog>',
+          template: '<js-plumb-join-dialog model="model"></js-plumb-join-dialog>',
           targetEvent: ev,
           fullscreen: true,
           skipHide: true,
           scope: scope
-        })
-        .then(ev => {
-          if (!ev) {
-            return;
-          }
-
-          switch (ev.type) {
-            case 'removeLink':
-              this.connection.detach();
-              break;
-            case 'save':
-              const metadata = ev.metadata;
-
-              this.connectionType = metadata.joinType;
-
-              if (originalMetadata.leftTable.field !== metadata.leftTable.field ||
-                originalMetadata.rightTable.field !== metadata.rightTable.field) {
-                this.connection.connect();
-              }
-
-              break;
-          }
         });
     }
   }

@@ -4,6 +4,8 @@ import 'angular-ui-router';
 import 'angular-material';
 import 'angular-material/angular-material.css';
 
+import 'mottle';
+
 import 'devextreme/ui/data_grid';
 import 'devextreme/integration/angular';
 import 'devextreme/dist/css/dx.common.css';

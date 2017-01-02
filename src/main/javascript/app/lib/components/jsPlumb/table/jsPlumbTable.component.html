@@ -1,34 +1,21 @@
 <md-list>
   <md-subheader class="md-no-sticky">
-    <md-checkbox aria-label="Toppings">
-        <span ng-bind="$ctrl.metadata.name"
-              ng-click="$event.stopPropagation();"></span>
-    </md-checkbox>
+    <span ng-bind="::$ctrl.model.name"></span>
   </md-subheader>
 
   <md-divider></md-divider>
 
   <md-list-item class="md-no-proxy"
-                ng-repeat="field in $ctrl.metadata.fields"
+                ng-repeat="field in $ctrl.model.fields track by $index"
                 ng-click="$event.stopPropagation();"
                 ng-mousedown="$ctrl.onFieldMouseDown($event, field);"
                 ng-mouseup="$ctrl.onFieldMouseUp($event, field);">
     <md-checkbox ng-model="field.checked"></md-checkbox>
 
     <span class="jsp-table-column-name"
-          ng-bind="field.name"></span>
+          ng-bind="::field.getName()"></span>
 
-    <js-plumb-endpoint ng-repeat="endpoint in field.endpoints"
-                       metadata="endpoint"
-                       table="$ctrl"
-                       field="field"
-                       settings="$ctrl.settings">
-      <js-plumb-connection ng-repeat="connection in endpoint.connections"
-                           ng-if="connection.target"
-                           metadata="connection"
-                           source-endpoint="endpoint"
-                           settings="$ctrl.settings">
-      </js-plumb-connection>
-    </js-plumb-endpoint>
+    <js-plumb-endpoint ng-repeat="endpoint in field.endpoints track by endpoint.field.name"
+                       model="endpoint"></js-plumb-endpoint>
   </md-list-item>
 </md-list>

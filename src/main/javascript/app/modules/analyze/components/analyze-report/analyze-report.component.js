@@ -1,3 +1,5 @@
+import forEach from 'lodash/forEach';
+
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
 
@@ -5,9 +7,9 @@ export const AnalyzeReportComponent = {
   template,
   styles: [style],
   controller: class AnalyzeReportController {
-    constructor($mdDialog, AnalyzeService) {
-      this.$mdDialog = $mdDialog;
-      this.AnalyzeService = AnalyzeService;
+    constructor($componentHandler, $mdDialog, AnalyzeService) {
+      this._$mdDialog = $mdDialog;
+      this._AnalyzeService = AnalyzeService;
 
       this.DESIGNER_MODE = 'designer';
       this.QUERY_MODE = 'query';
@@ -89,15 +91,7 @@ export const AnalyzeReportComponent = {
         width: 800
       };
 
-      this.tables = [];
       this.metadata = [];
-
-      this.getSqlData = () => {
-        return {
-          settings: this.jsPlumbOptions,
-          tables: this.tables
-        };
-      };
 
       this.getGridData = () => {
         return Object.assign(this.dxGridOptions, {
@@ -142,27 +136,60 @@ export const AnalyzeReportComponent = {
         });
       };
 
-      this.AnalyzeService.getTables()
-        .then(data => {
-          this.tables = data;
-        });
-
-      this.AnalyzeService.getDataByQuery()
+      this._AnalyzeService.getDataByQuery()
         .then(data => {
           this.metadata = data;
         });
-    }
 
-    $onInit() {
-
+      $componentHandler.events.on('$onInstanceAdded', e => {
+        if (e.key === 'ard-canvas') {
+          this.initCanvas(e.instance);
+        }
+      });
     }
 
     cancel() {
-      this.$mdDialog.cancel();
+      this._$mdDialog.cancel();
     }
 
     toggleDetailsPanel() {
       this.states.detailsExpanded = !this.states.detailsExpanded;
+    }
+
+    initCanvas(canvas) {
+      this._AnalyzeService.getArtifacts()
+        .then(data => {
+          forEach(data, itemA => {
+            const table = canvas.model.addTable(itemA._artifact_name);
+
+            table.setPosition(itemA._artifact_position[0], itemA._artifact_position[1]);
+
+            forEach(itemA._artifact_attributes, itemB => {
+              const field = table.addField(itemB['_actual_col-name'], itemB._display_name, itemB._alias_name);
+
+              field.setType(itemB._type);
+            });
+          });
+
+          forEach(data, itemA => {
+            forEach(itemA._sql_builder.joins, itemB => {
+              const tableA = itemB.criteria[0]['table-name'];
+              const tableB = itemB.criteria[1]['table-name'];
+
+              if (tableA !== tableB) {
+                canvas.model.addJoin(itemB.type, {
+                  table: tableA,
+                  field: itemB.criteria[0]['column-name'],
+                  side: itemB.criteria[0].side
+                }, {
+                  table: tableB,
+                  field: itemB.criteria[1]['column-name'],
+                  side: itemB.criteria[1].side
+                });
+              }
+            });
+          });
+        });
     }
   }
 };

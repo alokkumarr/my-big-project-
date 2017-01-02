@@ -54,8 +54,7 @@
 
         <div layout="row" class="ard_canvas">
           <div ng-show="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE">
-            <js-plumb-canvas tables="$ctrl.getSqlData().tables"
-                             settings="$ctrl.getSqlData().settings"></js-plumb-canvas>
+            <js-plumb-canvas id="ard-canvas"></js-plumb-canvas>
           </div>
 
           <div class="ard_canvas-query"

@@ -3,22 +3,22 @@
 
     <div layout="row" layout-align="space-around start" layout-padding="15">
       <div class="jsp-join-dialog_select" layout="column">
-        <label ng-bind="::$ctrl.metadata.leftTable.name"></label>
-        <md-select ng-model="::$ctrl.metadata.leftTable.field">
+        <label ng-bind="::$ctrl.leftSide.table.name"></label>
+        <md-select ng-model="::$ctrl.leftSideField">
           <md-option
-            ng-repeat="field in $ctrl.metadata.leftTable.fields"
+            ng-repeat="field in $ctrl.leftSide.table.fields"
             ng-bind="::field.name"
-            ng-value="field.name"></md-option>
+            ng-value="field"></md-option>
         </md-select>
       </div>
 
       <div class="jsp-join-dialog_select" layout="column">
-        <label ng-bind="::$ctrl.metadata.rightTable.name"></label>
-        <md-select ng-model="::$ctrl.metadata.rightTable.field">
+        <label ng-bind="::$ctrl.rightSide.table.name"></label>
+        <md-select ng-model="::$ctrl.rightSideField">
           <md-option
-            ng-repeat="field in $ctrl.metadata.rightTable.fields"
+            ng-repeat="field in $ctrl.rightSide.table.fields"
             ng-bind="::field.name"
-            ng-value="field.name"></md-option>
+            ng-value="field"></md-option>
         </md-select>
       </div>
     </div>
@@ -37,10 +37,10 @@
         <div layout="column">
           <strong>Inner Join</strong>
           <span class="jsp-join-dialog_desc">Include <strong>only</strong> rows where
-            `<span ng-bind="$ctrl.metadata.leftTable.field"></span>` in the
-            `<span ng-bind="$ctrl.metadata.leftTable.name"></span>` table equals
-            `<span ng-bind="$ctrl.metadata.rightTable.field"></span>` in the
-            `<span ng-bind="$ctrl.metadata.rightTable.name"></span>` table.
+            `<span ng-bind="$ctrl.leftSideField.name"></span>` in the
+            `<span ng-bind="$ctrl.leftSide.table.name"></span>` table equals
+            `<span ng-bind="$ctrl.rightSideField.name"></span>` in the
+            `<span ng-bind="$ctrl.rightSide.table.name"></span>` table.
           </span>
         </div>
       </md-list-item>
@@ -58,8 +58,8 @@
         <div layout="column">
           <strong>Left Join</strong>
           <span class="jsp-join-dialog_desc">Include <strong>all</strong> rows from
-            `<span ng-bind="$ctrl.metadata.leftTable.name"></span>` and <strong>only</strong> those records from
-            `<span ng-bind="$ctrl.metadata.rightTable.name"></span>` where the joined fields are equal.
+            `<span ng-bind="$ctrl.leftSide.table.name"></span>` and <strong>only</strong> those records from
+            `<span ng-bind="$ctrl.rightSide.table.name"></span>` where the joined fields are equal.
           </span>
         </div>
       </md-list-item>
@@ -77,8 +77,8 @@
         <div layout="column">
           <strong>Right Join</strong>
           <span class="jsp-join-dialog_desc">Include <strong>all</strong> rows from
-            `<span ng-bind="$ctrl.metadata.rightTable.name"></span>` and <strong>only</strong> those records from
-            `<span ng-bind="$ctrl.metadata.leftTable.name"></span>` where the joined fields are equal.
+            `<span ng-bind="$ctrl.leftSide.table.name"></span>` and <strong>only</strong> those records from
+            `<span ng-bind="$ctrl.rightSide.table.name"></span>` where the joined fields are equal.
           </span>
         </div>
       </md-list-item>
@@ -99,7 +99,7 @@
       </div>
 
       <md-button class="btn-card"
-                 ng-click="$ctrl.removeLink()">
+                 ng-click="$ctrl.remove()">
         <md-icon md-font-icon="icon-trash"></md-icon>
         Delete Link
       </md-button>
