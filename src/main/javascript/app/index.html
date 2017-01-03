@@ -1,14 +1,14 @@
 <!doctype html>
-<html>
+<html ng-app="app" ng-cloak>
   <head>
-    <title>Synchronoss</title>
+    <base href="/"/>
+    <title ng-bind="getPageTitle()"></title>
     <meta charset="utf-8"/>
     <meta name="description" content=""/>
     <meta name="viewport" content="width=device-width"/>
     <link rel="icon" type="image/png" href="http://fountainjs.io/assets/imgs/fountain.png"/>
   </head>
-
-  <body ng-app="app" ng-cloak>
-    <root></root>
+  <body>
+    <ui-view></ui-view>
   </body>
 </html>

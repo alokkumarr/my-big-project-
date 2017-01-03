@@ -1,4 +1,4 @@
-export const JS_PLUMB_SETTINGS = {
+export const JS_PLUMB_DEFAULT_SETTINGS = {
   endpoints: {
     source: {
       endpoint: 'Dot',

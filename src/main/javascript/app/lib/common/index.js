@@ -1,4 +1,5 @@
 import angular from 'angular';
+import EventHandler from './component/eventHandler';
 import ComponentHandler from './component/componentHandler';
 
 export const CommonModule = 'Common';
@@ -15,4 +16,5 @@ modulesDependencies.push(MockModule);
 
 angular
   .module(CommonModule, modulesDependencies)
+  .factory('$eventHandler', EventHandler)
   .factory('$componentHandler', ComponentHandler);
