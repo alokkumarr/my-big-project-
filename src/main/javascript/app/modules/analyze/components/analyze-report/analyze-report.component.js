@@ -19,7 +19,7 @@ export const AnalyzeReportComponent = {
       };
 
       this.data = {
-        query: 'Select * From Orders'
+        query: ''
       };
 
       this.dxGridOptions = {
@@ -118,6 +118,14 @@ export const AnalyzeReportComponent = {
         .then(data => {
           this.canvas.model.precess(data);
         });
+    }
+
+    setSqlMode(mode) {
+      this.states.sqlMode = mode;
+
+      if (mode === this.QUERY_MODE) {
+        this.data.query = this.canvas.model.generateQuery();
+      }
     }
 
     openSortModal(ev) {

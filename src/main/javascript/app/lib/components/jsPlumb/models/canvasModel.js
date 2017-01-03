@@ -131,4 +131,48 @@ export class CanvasModel {
 
     return sortObj;
   }
+
+  generateQuery() {
+    let sql = 'SELECT ';
+
+    const fields = [];
+    const tables = [];
+
+    forEach(this.tables, (table, idx) => {
+      let hasSelectedFields = false;
+
+      forEach(table.fields, field => {
+        if (field.selected) {
+          fields.push(`t${idx}.${field.name}`);
+          hasSelectedFields = true;
+        }
+      });
+
+      if (hasSelectedFields) {
+        tables.push(`\nFROM ${table.name} as t${idx}`)
+      }
+    });
+
+    if (fields.length) {
+      sql += `\n\t${fields.join(', ')}`;
+    }
+
+    if (tables.length) {
+      sql += tables.join(', ');
+    }
+
+    const orders = [];
+
+    forEach(this.sorts, (sort) => {
+      const tableIdx = this.tables.indexOf(sort.table);
+
+      orders.push(`t${tableIdx}.${sort.field.name} ${(sort.order || 'ASC').toUpperCase()}`);
+    });
+
+    if (orders.length) {
+      sql += `\nORDER BY ${orders.join(', ')}`;
+    }
+
+    return sql;
+  }
 }

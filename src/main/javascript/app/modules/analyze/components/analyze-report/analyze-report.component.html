@@ -39,13 +39,13 @@
 
           <div>
             <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.DESIGNER_MODE}"
-                       ng-click="$ctrl.states.sqlMode = $ctrl.DESIGNER_MODE">
+                       ng-click="$ctrl.setSqlMode($ctrl.DESIGNER_MODE)">
               <md-icon md-font-icon="icon-designer-mode"></md-icon>
               Designer
             </md-button>
 
             <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.QUERY_MODE}"
-                       ng-click="$ctrl.states.sqlMode = $ctrl.QUERY_MODE">
+                       ng-click="$ctrl.setSqlMode($ctrl.QUERY_MODE)">
               <md-icon md-font-icon="icon-query-mode"></md-icon>
               Query
             </md-button>
@@ -59,7 +59,7 @@
 
           <div class="ard_canvas-query"
                ng-show="$ctrl.states.sqlMode === $ctrl.QUERY_MODE">
-            <textarea ng-model="$ctrl.data.query"></textarea>
+            <textarea ng-model="$ctrl.data.query" readonly></textarea>
           </div>
         </div>
       </div>
