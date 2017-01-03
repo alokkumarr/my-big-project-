@@ -62,7 +62,8 @@ export const AnalyzeNewComponent = {
         template: tpl,
         autoWrap: false,
         fullscreen: true,
-        focusOnOpen: false
+        focusOnOpen: false,
+        skipHide: true
       });
     }
   }

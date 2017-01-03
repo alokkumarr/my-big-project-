@@ -33,6 +33,14 @@ export const AnalyzeTables = {
   }
 };
 
+export const AnalyzeArtifacts = {
+  method: 'GET',
+  url: '/api/analyze/artifacts',
+  response: () => {
+    return [200, getArtifacts()];
+  }
+};
+
 export const AnalyzeDataByQuery = {
   method: 'GET',
   url: '/api/analyze/dataByQuery',
@@ -313,6 +321,237 @@ function getTables() {
       x: 350,
       y: 420
     }];
+}
+
+function getArtifacts() {
+  const artifacts = [];
+
+  artifacts.push({
+    _artifact_name: 'Orders',
+    _artifact_attributes: [
+      {
+        _display_name: 'Order ID',
+        '_actual_col-name': 'OrderID',
+        _alias_name: '',
+        _type: 'int',
+        _hide: false,
+        _join_eligible: false
+      },
+      {
+        _display_name: 'Shipper',
+        '_actual_col-name': 'Shipper',
+        _alias_name: '',
+        _type: 'string',
+        _hide: false,
+        _join_eligible: false
+      },
+      {
+        _display_name: 'Customer',
+        '_actual_col-name': 'Customer',
+        _alias_name: '',
+        _type: 'string',
+        _hide: false,
+        _join_eligible: false
+      },
+      {
+        _display_name: 'Total Price',
+        '_actual_col-name': 'TotalPrice',
+        _alias_name: '',
+        _type: 'int',
+        _hide: false,
+        _join_eligible: false
+      },
+      {
+        _display_name: 'Warehouse',
+        '_actual_col-name': 'Warehouse',
+        _alias_name: '',
+        _type: 'string',
+        _hide: false,
+        _join_eligible: false
+      },
+      {
+        _display_name: 'Address',
+        '_actual_col-name': 'Address',
+        _alias_name: '',
+        _type: 'string',
+        _hide: false,
+        _join_eligible: false
+      }
+    ],
+    _artifact_position: [5, 130],
+    _sql_builder: {
+      _group_by_columns: [],
+      _order_by_columns: [{
+        'col-name': 'OrderID',
+        order: 'asc'
+      }],
+      joins: [
+        {
+          type: 'inner',
+          criteria: [{
+            'table-name': 'Orders',
+            'column-name': 'Shipper',
+            side: 'right'
+          }, {
+            'table-name': 'Shippers',
+            'column-name': 'ShipperID',
+            side: 'left'
+          }]
+        },
+        {
+          type: 'inner',
+          criteria: [{
+            'table-name': 'Orders',
+            'column-name': 'Customer',
+            side: 'right'
+          }, {
+            'table-name': 'Customers',
+            'column-name': 'CustomerID',
+            side: 'left'
+          }]
+        },
+        {
+          type: 'inner',
+          criteria: [{
+            'table-name': 'Orders',
+            'column-name': 'Warehouse',
+            side: 'right'
+          }, {
+            'table-name': 'Warehouses',
+            'column-name': 'WarehouseID',
+            side: 'left'
+          }]
+        }
+      ]
+    }
+  });
+
+  artifacts.push({
+    _artifact_name: 'Shippers',
+    _artifact_attributes: [
+      {
+        _display_name: 'Shipper ID',
+        '_actual_col-name': 'ShipperID',
+        _alias_name: '',
+        _type: 'int',
+        _hide: false,
+        _join_eligible: false
+      },
+      {
+        _display_name: 'Shipper Name',
+        '_actual_col-name': 'ShipperName',
+        _alias_name: '',
+        _type: 'string',
+        _hide: false,
+        _join_eligible: false
+      },
+      {
+        _display_name: 'Region',
+        '_actual_col-name': 'Region',
+        _alias_name: '',
+        _type: 'string',
+        _hide: false,
+        _join_eligible: false
+      }
+    ],
+    _artifact_position: [400, 5],
+    _sql_builder: {
+      _group_by_columns: [],
+      _order_by_columns: [{
+        'col-name': 'ShipperID',
+        order: 'asc'
+      }],
+      joins: []
+    }
+  });
+
+  artifacts.push({
+    _artifact_name: 'Customers',
+    _artifact_attributes: [
+      {
+        _display_name: 'Customer ID',
+        '_actual_col-name': 'CustomerID',
+        _alias_name: '',
+        _type: 'int',
+        _hide: false,
+        _join_eligible: false
+      },
+      {
+        _display_name: 'Customer Name',
+        '_actual_col-name': 'CustomerName',
+        _alias_name: '',
+        _type: 'string',
+        _hide: false,
+        _join_eligible: false
+      },
+      {
+        _display_name: 'Address',
+        '_actual_col-name': 'Address',
+        _alias_name: '',
+        _type: 'string',
+        _hide: false,
+        _join_eligible: false
+      },
+      {
+        _display_name: 'Phone Number',
+        '_actual_col-name': 'PhoneNumber',
+        _alias_name: '',
+        _type: 'string',
+        _hide: false,
+        _join_eligible: false
+      }
+    ],
+    _artifact_position: [400, 200],
+    _sql_builder: {
+      _group_by_columns: [],
+      _order_by_columns: [{
+        'col-name': 'CustomerID',
+        order: 'asc'
+      }],
+      joins: []
+    }
+  });
+
+  artifacts.push({
+    _artifact_name: 'Warehouses',
+    _artifact_attributes: [
+      {
+        _display_name: 'Warehouse ID',
+        '_actual_col-name': 'WarehouseID',
+        _alias_name: '',
+        _type: 'int',
+        _hide: false,
+        _join_eligible: false
+      },
+      {
+        _display_name: 'Warehouse Name',
+        '_actual_col-name': 'WarehouseName',
+        _alias_name: '',
+        _type: 'string',
+        _hide: false,
+        _join_eligible: false
+      },
+      {
+        _display_name: 'Warehouse Address',
+        '_actual_col-name': 'WarehouseAddress',
+        _alias_name: '',
+        _type: 'string',
+        _hide: false,
+        _join_eligible: false
+      }
+    ],
+    _artifact_position: [350, 420],
+    _sql_builder: {
+      _group_by_columns: [],
+      _order_by_columns: [{
+        'col-name': 'WarehouseID',
+        order: 'asc'
+      }],
+      joins: []
+    }
+  });
+
+  return artifacts;
 }
 
 function getDataByQuery() {

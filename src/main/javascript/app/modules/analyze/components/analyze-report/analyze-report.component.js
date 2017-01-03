@@ -5,9 +5,10 @@ export const AnalyzeReportComponent = {
   template,
   styles: [style],
   controller: class AnalyzeReportController {
-    constructor($mdDialog, AnalyzeService) {
-      this.$mdDialog = $mdDialog;
-      this.AnalyzeService = AnalyzeService;
+    constructor($componentHandler, $mdDialog, $scope, AnalyzeService) {
+      this._$mdDialog = $mdDialog;
+      this._$scope = $scope;
+      this._AnalyzeService = AnalyzeService;
 
       this.DESIGNER_MODE = 'designer';
       this.QUERY_MODE = 'query';
@@ -18,51 +19,7 @@ export const AnalyzeReportComponent = {
       };
 
       this.data = {
-        query: 'Select * From Orders'
-      };
-
-      this.jsPlumbOptions = {
-        endpoints: {
-          source: {
-            endpoint: 'Dot',
-            isSource: true,
-            isTarget: true,
-            maxConnections: 1,
-            connector: ['Flowchart', {
-              cornerRadius: 10
-            }],
-            endpointStyle: {
-              radius: 9,
-              stroke: '#B0BFC8',
-              strokeWidth: 3
-            },
-            connectorStyle: {
-              stroke: '#B0BFC8',
-              strokeWidth: 3,
-              outlineStroke: 'white',
-              outlineWidth: 2
-            },
-            connectorHoverStyle: {
-              stroke: '#B0BFC8'
-            },
-            endpointHoverStyle: {
-              stroke: '#B0BFC8'
-            }
-          },
-          target: {
-            endpoint: 'Dot',
-            isTarget: true,
-            maxConnections: -1,
-            endpointStyle: {
-              radius: 9,
-              stroke: '#B0BFC8',
-              strokeWidth: 3
-            },
-            endpointHoverStyle: {
-              stroke: '#B0BFC8'
-            }
-          }
-        }
+        query: ''
       };
 
       this.dxGridOptions = {
@@ -89,15 +46,7 @@ export const AnalyzeReportComponent = {
         width: 800
       };
 
-      this.tables = [];
       this.metadata = [];
-
-      this.getSqlData = () => {
-        return {
-          settings: this.jsPlumbOptions,
-          tables: this.tables
-        };
-      };
 
       this.getGridData = () => {
         return Object.assign(this.dxGridOptions, {
@@ -142,27 +91,59 @@ export const AnalyzeReportComponent = {
         });
       };
 
-      this.AnalyzeService.getTables()
-        .then(data => {
-          this.tables = data;
-        });
-
-      this.AnalyzeService.getDataByQuery()
+      this._AnalyzeService.getDataByQuery()
         .then(data => {
           this.metadata = data;
         });
-    }
 
-    $onInit() {
-
+      $componentHandler.events.on('$onInstanceAdded', e => {
+        if (e.key === 'ard-canvas') {
+          this.initCanvas(e.instance);
+        }
+      });
     }
 
     cancel() {
-      this.$mdDialog.cancel();
+      this._$mdDialog.cancel();
     }
 
     toggleDetailsPanel() {
       this.states.detailsExpanded = !this.states.detailsExpanded;
+    }
+
+    initCanvas(canvas) {
+      this.canvas = canvas;
+
+      this._AnalyzeService.getArtifacts()
+        .then(data => {
+          this.canvas.model.precess(data);
+        });
+    }
+
+    setSqlMode(mode) {
+      this.states.sqlMode = mode;
+
+      if (mode === this.QUERY_MODE) {
+        this.data.query = this.canvas.model.generateQuery();
+      }
+    }
+
+    openSortModal(ev) {
+      const scope = this._$scope.$new();
+
+      scope.model = {
+        fields: this.canvas.model.getSelectedFields(),
+        sorts: this.canvas.model.sorts
+      };
+
+      this._$mdDialog
+        .show({
+          template: '<analyze-report-sort model="model"></analyze-report-sort>',
+          targetEvent: ev,
+          fullscreen: true,
+          skipHide: true,
+          scope: scope
+        });
     }
   }
 };

@@ -19,7 +19,7 @@ const pkg = require('../package.json');
 const vendorKeys = Object.keys(pkg.dependencies).map(key => {
   // devextreme has no index.js or a main set in package.json, so we have to manually select the main file
   if (key === 'devextreme') {
-    return path.join(key, 'client_exporter');
+    return path.join(key, 'ui', 'data_grid');
   }
 
   return key;
@@ -67,10 +67,10 @@ module.exports = webpackMerge(commonConfig, {
       chunks: loginChunks,
       chunksSortMode: webpackHelper.sortChunks(loginChunks)
     }),
-    // new CommonsChunkPlugin({
-    //   names: ['vendor'],
-    //   minChunks: Infinity
-    // })
+    new CommonsChunkPlugin({
+      names: ['vendor'],
+      minChunks: Infinity
+    })
   ],
 
   eslint: {

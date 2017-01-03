@@ -1,11 +1,17 @@
 import angular from 'angular';
 import 'angular-ui-router';
+
 import 'angular-material';
 import 'angular-material/angular-material.css';
-import '../../../../fonts/style.css';
+
+import 'mottle';
+
+import 'devextreme/ui/data_grid';
 import 'devextreme/integration/angular';
-import 'angular-ui-grid';
-import 'angular-ui-grid/ui-grid.css';
+import 'devextreme/dist/css/dx.common.css';
+import 'devextreme/dist/css/dx.light.css';
+
+import '../../../../fonts/style.css';
 
 import AppConfig from '../../../../appConfig';
 
@@ -29,10 +35,9 @@ export const AppModule = 'app';
 
 angular
   .module(AppModule, [
-    'dx',
-    'ngMaterial',
     'ui.router',
-    'ui.grid',
+    'ngMaterial',
+    'dx',
     LibModule,
     ObserveModule,
     AnalyzeModule,

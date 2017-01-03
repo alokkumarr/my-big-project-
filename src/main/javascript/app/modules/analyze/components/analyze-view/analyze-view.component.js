@@ -1,7 +1,3 @@
-import 'devextreme/ui/data_grid';
-import 'devextreme/dist/css/dx.common.css';
-import 'devextreme/dist/css/dx.light.css';
-
 import template from './analyze-view.component.html';
 import style from './analyze-view.component.scss';
 
