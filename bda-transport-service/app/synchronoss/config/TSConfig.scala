@@ -9,18 +9,9 @@ import org.slf4j.{Logger, LoggerFactory}
 object TSConfig {
 
   private val m_log: Logger = LoggerFactory.getLogger("TSConfig")
-  val conf: Config = ConfigFactory.load
+  lazy val conf: Config = ConfigFactory.load
 
-  val es_conf: Config = conf.getConfig("es")
-  val dl_conf: Config = conf.getConfig("dl")
-
-
-  m_log.debug("Read properties:")
-
-  //render.replaceAll("\"", "")
-
-
-
-
+  lazy val es_conf: Config = conf.getConfig("es")
+  lazy val dl_conf: Config = conf.getConfig("dl")
 
 }

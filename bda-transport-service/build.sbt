@@ -13,7 +13,7 @@ lazy val root = (project in file("."))
   .enablePlugins(PlayNettyServer)
   .enablePlugins(RoutesCompiler)
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.8"
 exportJars := true
 
 unmanagedBase := baseDirectory.value / "lib"

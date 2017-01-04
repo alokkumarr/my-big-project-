@@ -12,8 +12,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import org.apache.commons.httpclient.util.TimeoutController.TimeoutException
 import org.apache.http.HttpResponse
 import org.apache.http.client.HttpResponseException
-import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.{HttpGet, HttpPost}
 import org.apache.http.client.utils.URIBuilder
+import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.nio.client.{CloseableHttpAsyncClient, HttpAsyncClients}
 import org.slf4j.{Logger, LoggerFactory}
@@ -40,7 +41,7 @@ class HTTPRequest(ip:String, port:Int, timeout:Int)
     play.mvc.Results.internalServerError(res)
   }
 
-  def sendESRequest(verb: String, inxName: String, objType: String) : Result =
+  def sendESRequest(verb: String, inxName: String, objType: String, query : String) : Result =
   {
     try {
       httpClient.start()
@@ -51,12 +52,24 @@ class HTTPRequest(ip:String, port:Int, timeout:Int)
       req_builder setPort (the_port.toInt)
       req_builder setScheme ("http")
 
-      val request: HttpGet = new HttpGet(req_builder.build())
-      val future: Future[HttpResponse] = httpClient.execute(request, null)
+      m_log.debug(s"Execute ES query: ${req_builder.build().toASCIIString}" )
+
+      val future: Future[HttpResponse] =
+      if (query != null &&  !query.isEmpty ) {
+        val request: HttpGet = new HttpGet(req_builder.build())
+        httpClient.execute(request, null)
+      }
+      else{
+        val request: HttpPost = new HttpPost(req_builder.build())
+        m_log.debug(s"Add native query to request: ${query}" )
+        request.setEntity(new StringEntity(query))
+        httpClient.execute(request, null)
+      }
+
       val response: HttpResponse = future.get(timeout, TimeUnit.SECONDS)
       System.out.println("Response: " + response.getStatusLine())
       val respHandler = new BasicResponseHandler
-      play.mvc.Results.ok(respHandler.handleResponse(response))
+      return play.mvc.Results.ok(respHandler.handleResponse(response))
     }
     catch{
       case e:HttpResponseException => return handleFailure("Could not process HTTP response",  e)

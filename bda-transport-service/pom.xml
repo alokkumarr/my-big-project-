@@ -20,7 +20,7 @@
 		<Json4s.latestVersion>3.3.0</Json4s.latestVersion>
 		<play2.version>2.5.10</play2.version>
 		<play2.plugin.version>1.0.0-beta5</play2.plugin.version>
-		<play2.scala.version>2.11.6</play2.scala.version>
+		<play2.scala.version>2.11.8</play2.scala.version>
 		<mapr.client>5.2.0.39122-mapr</mapr.client>
 		<play2.json.reactive.mongo>0.11.11</play2.json.reactive.mongo>
 		<io.netty.version>4.0.36.Final</io.netty.version>
@@ -48,6 +48,11 @@
 		  <url>http://repo.typesafe.com/typesafe/releases/</url>
 		</repository>
 		<repository>
+		  <id>typesafe-snapshots</id>
+		  <url>http://repo.typesafe.com/typesafe/snapshots/</url>
+		</repository>
+<!--
+		<repository>
 		  <id>sonatype-releases</id>
 		  <url>https://oss.sonatype.org/content/repositories/releases</url>
 		</repository>
@@ -55,6 +60,7 @@
 		  <id>sonatype-snapshots</id>
 		  <url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</repository>
+-->		
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -65,29 +71,42 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-    <dependencies>
-        <dependency>
-            <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-actor_${scala.version}</artifactId>
-            <version>2.4.2</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>1.1.3</version>
-        </dependency>
-
-<!--            <version>1.0.13</version> -->
-				<dependency>
-					<groupId>ch.qos.logback</groupId>
-					<artifactId>logback-classic</artifactId>
-					<version>1.1.3</version>
-				</dependency>
+	<dependencies>
+<!--		
+libraryDependencies += "com.typesafe.akka" % "akka-actor_2.11" % "2.4-SNAPSHOT"
+libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0"
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.2"
+libraryDependencies += "com.typesafe.akka" %% "akka-slf4j" % "2.3.6"
+-->
+	<dependency>
+		<groupId>com.typesafe.akka</groupId>
+		<artifactId>akka-actor_${scala.version}</artifactId>
+		<version>2.4.16</version>
+	</dependency>
+	<dependency>
+		<groupId>com.typesafe.scala-logging</groupId>
+		<artifactId>scala-logging_${scala.version}</artifactId>
+		<version>3.1.0</version>
+	</dependency>
+	<dependency>
+		<groupId>ch.qos.logback</groupId>
+		<artifactId>logback-classic</artifactId>
+		<version>1.1.8</version>
+	</dependency>
+	<dependency>
+		<groupId>com.typesafe.akka</groupId>
+		<artifactId>akka-slf4j_${scala.version}</artifactId>
+		<version>2.4.16</version>
+	</dependency>		
+		
+<!--		
 		<dependency>
 			<groupId>org.scala-lang.modules</groupId>
 			<artifactId>scala-xml_${scala.version}</artifactId>
 			<version>1.0.1</version>
 		</dependency>
+-->		
+	
 		<dependency>
 				<groupId>com.typesafe.play</groupId>
 				<artifactId>play-test_${scala.version}</artifactId>
@@ -110,12 +129,14 @@
 			<artifactId>typetools</artifactId>
 			<version>0.4.1</version>
 		</dependency>
-		<dependency>
 		<!-- org.apache.tomcat.tomcat-servlet-api-8.0.21.jar -->
+<!-- 		
+		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-servlet-api</artifactId>
 			<version>8.0.21</version>
 		</dependency>
+-->				
 		<dependency>
 		<!-- org.yaml.snakeyaml-1.15.jar -->
 			<groupId>org.yaml</groupId>
@@ -159,61 +180,61 @@
 			<version>1.1.0</version>
 		</dependency>
 		<dependency>
-		<!-- com.typesafe.play.play-exceptions-2.5.2.jar -->
+		<!-- com.typesafe.play.play-exceptions-2.5.10.jar -->
 			<groupId>com.typesafe.play</groupId>
 			<artifactId>play-exceptions</artifactId>
 			<version>${play2.version}</version>
 		</dependency>
 		<dependency>
-		<!-- com.typesafe.play.play-functional_2.11-2.5.2.jar -->
+		<!-- com.typesafe.play.play-functional_2.11-2.5.10.jar -->
 			<groupId>com.typesafe.play</groupId>
 			<artifactId>play-functional_${scala.version}</artifactId>
 			<version>${play2.version}</version>
 		</dependency>
 		<dependency>
-		<!-- com.typesafe.play.play-iteratees_2.11-2.5.2.jar -->
+		<!-- com.typesafe.play.play-iteratees_2.11-2.5.10.jar -->
 			<groupId>com.typesafe.play</groupId>
 			<artifactId>play-iteratees_${scala.version}</artifactId>
 			<version>${play2.version}</version>
 		</dependency>
 		<dependency>
-		<!-- com.typesafe.play.play-java-ws_2.11-2.5.2.jar -->
+		<!-- com.typesafe.play.play-java-ws_2.11-2.5.10.jar -->
 			<groupId>com.typesafe.play</groupId>
 			<artifactId>play-java-ws_${scala.version}</artifactId>
 			<version>${play2.version}</version>
 		</dependency>
 		<dependency>
-		<!-- com.typesafe.play.play-java_2.11-2.5.2.jar -->
+		<!-- com.typesafe.play.play-java_2.11-2.5.10.jar -->
 			<groupId>com.typesafe.play</groupId>
 			<artifactId>play-java_${scala.version}</artifactId>
 			<version>${play2.version}</version>
 		</dependency>
 		<dependency>
-		<!-- com.typesafe.play.play-json_2.11-2.5.2.jar -->
+		<!-- com.typesafe.play.play-json_2.11-2.5.10.jar -->
 			<groupId>com.typesafe.play</groupId>
 			<artifactId>play-json_${scala.version}</artifactId>
 			<version>${play2.version}</version>
 		</dependency>
 		<dependency>
-		<!-- com.typesafe.play.play-logback_2.11-2.5.2.jar -->
+		<!-- com.typesafe.play.play-logback_2.11-2.5.10.jar -->
 			<groupId>com.typesafe.play</groupId>
 			<artifactId>play-logback_${scala.version}</artifactId>
 			<version>${play2.version}</version>
 		</dependency>
 		<dependency>
-		<!-- com.typesafe.play.play-netty-server_2.11-2.5.2.jar -->
+		<!-- com.typesafe.play.play-netty-server_2.11-2.5.10.jar -->
 			<groupId>com.typesafe.play</groupId>
 			<artifactId>play-netty-server_${scala.version}</artifactId>
 			<version>${play2.version}</version>
 		</dependency>
 		<dependency>
-		<!-- com.typesafe.play.play-server_2.11-2.5.2.jar -->
+		<!-- com.typesafe.play.play-server_2.11-2.5.10.jar -->
 			<groupId>com.typesafe.play</groupId>
 			<artifactId>play-server_${scala.version}</artifactId>
 			<version>${play2.version}</version>
 		</dependency>
 		<dependency>
-		<!-- com.typesafe.play.play-streams_2.11-2.5.2.jar -->
+		<!-- com.typesafe.play.play-streams_2.11-2.5.10.jar -->
 			<groupId>com.typesafe.play</groupId>
 			<artifactId>play-streams_${scala.version}</artifactId>
 			<version>${play2.version}</version>
@@ -237,161 +258,164 @@
 			<version>1.1.1</version>
 		</dependency>
 		<dependency>
-		<!-- io.netty.netty-3.10.4.Final.jar -->
+				<groupId>org.scala-lang</groupId>
+				<artifactId>scala-library</artifactId>
+				<version>2.11.8</version>
+		</dependency>
+		<dependency>
+				<groupId>com.typesafe.play</groupId>
+				<artifactId>play-jdbc_${scala.version}</artifactId>
+				<version>${play2.version}</version>
+		</dependency>
+		<dependency>
+				<groupId>com.typesafe.play</groupId>
+				<artifactId>play-cache_${scala.version}</artifactId>
+				<version>${play2.version}</version>
+		</dependency>
+		<dependency>
+				<groupId>org.scalatestplus.play</groupId>
+				<artifactId>scalatestplus-play_${scala.version}</artifactId>
+				<version>1.5.1</version>
+				<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty</artifactId>
 			<version>3.10.4.Final</version>
 		</dependency>
 		<dependency>
-		<!-- io.netty.netty-buffer-4.0.36.Final.jar -->
 			<groupId>io.netty</groupId>
 			<artifactId>netty-buffer</artifactId>
 			<version>${io.netty.version}</version>
 		</dependency>
 		<dependency>
-		<!-- io.netty.netty-codec-4.0.36.Final.jar -->
 			<groupId>io.netty</groupId>
 			<artifactId>netty-codec</artifactId>
 			<version>${io.netty.version}</version>
 		</dependency>
 		<dependency>
-		<!-- io.netty.netty-codec-http-4.0.36.Final.jar -->
 			<groupId>io.netty</groupId>
 			<artifactId>netty-codec-http</artifactId>
 			<version>${io.netty.version}</version>
 		</dependency>
 		<dependency>
-		<!-- io.netty.netty-common-4.0.36.Final.jar -->
 			<groupId>io.netty</groupId>
 			<artifactId>netty-common</artifactId>
 			<version>${io.netty.version}</version>
 		</dependency>
 		<dependency>
-		<!-- io.netty.netty-handler-4.0.36.Final.jar -->
 			<groupId>io.netty</groupId>
 			<artifactId>netty-handler</artifactId>
 			<version>${io.netty.version}</version>
 		</dependency>
 		<dependency>
-		<!-- io.netty.netty-transport-4.0.36.Final.jar -->
 			<groupId>io.netty</groupId>
 			<artifactId>netty-transport</artifactId>
 			<version>${io.netty.version}</version>
 		</dependency>
 		<dependency>
-		<!-- io.netty.netty-transport-native-epoll-4.0.36.Final-linux-x86_64.jar -->
 			<groupId>io.netty</groupId>
 			<artifactId>netty-transport-native-epoll</artifactId>
 			<version>${io.netty.version}</version>
 		</dependency>
+<!--		
 		<dependency>
-		<!-- javax.validation.validation-api-1.1.0.Final.jar -->
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
 			<version>1.1.0.Final</version>
 		</dependency>
 		<dependency>
-		<!-- org.springframework.spring-beans-4.1.6.RELEASE.jar -->
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
 			<version>${spring.release}</version>
 		</dependency>
 		<dependency>
-		<!-- org.springframework.spring-context-4.1.6.RELEASE.jar -->
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 			<version>${spring.release}</version>
 		</dependency>
 		<dependency>
-		<!-- org.springframework.spring-core-4.1.6.RELEASE.jar -->
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
 			<version>${spring.release}</version>
 		</dependency>
+-->
 		<dependency>
-		<!-- org.asynchttpclient.async-http-client-2.0.0.jar -->
 			<groupId>org.asynchttpclient</groupId>
 			<artifactId>async-http-client</artifactId>
 			<version>2.0.0</version>
 		</dependency>
+<!--
 		<dependency>
-		<!-- org.javassist.javassist-3.19.0-GA.jar -->
 			<groupId>org.javassist</groupId>
 			<artifactId>javassist</artifactId>
 			<version>3.19.0-GA</version>
 		</dependency>
 		<dependency>
-		<!-- oauth.signpost.signpost-commonshttp4-1.2.1.2.jar -->
-			<groupId>oauth.signpost</groupId>
+
+		<groupId>oauth.signpost</groupId>
 			<artifactId>signpost-commonshttp4</artifactId>
 			<version>1.2.1.2</version>
 		</dependency>
 		<dependency>
-		<!-- oauth.signpost.signpost-core-1.2.1.2.jar -->
-			<groupId>oauth.signpost</groupId>
+
+		<groupId>oauth.signpost</groupId>
 			<artifactId>signpost-core</artifactId>
 			<version>1.2.1.2</version>
 		</dependency>
+
 		<dependency>
-		<!-- org.hibernate.hibernate-validator-5.2.4.Final.jar -->
-			<groupId>org.hibernate</groupId>
+		<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<version>5.2.4.Final</version>
 		</dependency>
+
 		<dependency>
-		<!-- org.jboss.logging.jboss-logging-3.2.1.Final.jar -->
 			<groupId>org.jboss.logging</groupId>
 			<artifactId>jboss-logging</artifactId>
 			<version>3.2.1.Final</version>
 		</dependency>
 		<dependency>
-		<!-- com.fasterxml.classmate-1.1.0.jar -->
 			<groupId>com.fasterxml</groupId>
 			<artifactId>classmate</artifactId>
 			<version>1.1.0</version>
 		</dependency>
 		<dependency>
-		<!-- com.fasterxml.jackson.core.jackson-annotations-2.7.1.jar -->
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-annotations</artifactId>
 			<version>${jackson.core.version}</version>
 		</dependency>
 		<dependency>
-		<!-- com.fasterxml.jackson.core.jackson-core-2.7.1.jar -->
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-core</artifactId>
 			<version>${jackson.core.version}</version>
 		</dependency>
 		<dependency>
-		<!-- com.fasterxml.jackson.core.jackson-databind-2.7.1.jar -->
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>${jackson.core.version}</version>
 		</dependency>
 		<dependency>
-		<!-- com.fasterxml.jackson.datatype.jackson-datatype-jdk8-2.7.1.jar -->
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jdk8</artifactId>
 			<version>${jackson.core.version}</version>
 		</dependency>
 		<dependency>
-		<!-- com.fasterxml.jackson.datatype.jackson-datatype-jsr310-2.7.1.jar -->
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
 			<version>${jackson.core.version}</version>
 		</dependency>
 		<dependency>
-		<!-- javax.el.javax.el-api-3.0.0.jar -->
 			<groupId>javax.el</groupId>
 			<artifactId>javax.el-api</artifactId>
 			<version>3.0.0</version>
 		</dependency>
+-->		
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>4.5.2</version>
 		</dependency>		
-		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpasyncclient -->
 		<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpasyncclient</artifactId>
@@ -402,7 +426,15 @@
 				<artifactId>httpcore</artifactId>
 				<version>4.4.5</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/commons-httpclient/commons-httpclient -->
+		<dependency>
+				<groupId>commons-httpclient</groupId>
+				<artifactId>commons-httpclient</artifactId>
+				<version>3.1</version>
+		</dependency>
+		
 		<!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
+<!--
 		<dependency>
 			<groupId>commons-cli</groupId>
 			<artifactId>commons-cli</artifactId>
@@ -413,11 +445,7 @@
 			<artifactId>commons-email</artifactId>
 			<version>1.4</version>
 		</dependency>		
-		<dependency>
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>httpclient</artifactId>
-				<version>4.5.2</version>
-		</dependency>
+-->		
 		<dependency>
 		  <groupId>org.scalatest</groupId>
 		  <artifactId>scalatest_${scala.version}</artifactId>
@@ -425,9 +453,9 @@
 		  <scope>test</scope>
 		</dependency>
 		<dependency>
-            <groupId>org.scalactic</groupId>
-            <artifactId>scalactic_${scala.version}</artifactId>
-            <version>2.2.6</version>
+			<groupId>org.scalactic</groupId>
+			<artifactId>scalactic_${scala.version}</artifactId>
+			<version>2.2.6</version>
 			<scope>test</scope>
 		</dependency>
     </dependencies>

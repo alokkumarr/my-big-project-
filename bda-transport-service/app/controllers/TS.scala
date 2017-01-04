@@ -21,26 +21,64 @@ class TS extends Controller {
   def query: Result = {
 
     val ctx: Http.Context = Http.Context.current.get
+
     val header = ctx._requestHeader()
+
+    val res: ObjectNode = Json.newObject
+
+    if (header.contentType == None || header.contentType.get.equals("text/plain")){
+      if (ctx.request.body.asText == null)
+      {
+        res.put("result", "failure")
+        res.put("reason", "empty request")
+        m_log.debug(s"Empty request with text/def content type came from: ${ctx.request().host()}/${ctx.request().username()}")
+        return play.mvc.Results.badRequest(res)
+      }
+      return process(ctx.request.body.asText())
+    }
+
+    if (header.contentType.get.equals("application/x-www-form-urlencoded")){
+      if (ctx.request.body.asFormUrlEncoded() == null)
+      {
+        res.put("result", "failure")
+        res.put("reason", "empty request")
+        m_log.debug(s"Empty request with urlencoded content type came from: ${ctx.request().host()}/${ctx.request().username()}")
+        return play.mvc.Results.badRequest(res)
+      }
+      import scala.collection.JavaConversions._
+      val requestBody =  ctx.request.body.asFormUrlEncoded().mkString
+      m_log debug s"URL encoded: ${requestBody}"
+      return process(requestBody)
+    }
+
 
     if (header.contentType.get.equals("application/json") )
     {
-       return process(ctx.request.body.asJson())
-    }
-
-    if (header.contentType.get.equals("text/plain")){
-       return process(ctx.request.body.asText())
+      if (ctx.request.body.asJson == null)
+      {
+        res.put("result", "failure")
+        res.put("reason", "empty request")
+        m_log.debug(s"Empty request with app/json content type came from: ${ctx.request().host()}/${ctx.request().username()}" )
+        return play.mvc.Results.badRequest(res)
+      }
+      return process(ctx.request.body.asJson())
     }
 
     if (header.contentType.get.equals("octet/stream")){
-      return process(ctx.request.body.asBytes().toArray)
+      if (ctx.request.body.asBytes == null)
+      {
+        res.put("result", "failure")
+        res.put("reason", "empty request")
+        m_log.debug(s"Empty request with stream content type came from: ${ctx.request().host()}/${ctx.request().username()}")
+        return play.mvc.Results.badRequest(res)
+      }
+      return process(ctx.request.body.asBytes.toArray)
     }
 
-
-    val res: ObjectNode = Json.newObject
-    res.put("result", "success")
-
-    return play.mvc.Results.ok(res)
+    res.put("result", "failure")
+    res.put("reason", s"Unknown content type: ${header.contentType}")
+    m_log.debug(s"Unprocessed request: ${ctx._requestHeader.rawQueryString}")
+    return play.mvc.Results.badRequest(res)
 
   }
 
@@ -57,6 +95,8 @@ class TS extends Controller {
 
   def process(json: JsonNode): Result = {
     val res: ObjectNode = Json.newObject
+    m_log.debug("Validate and process request:  " + play.libs.Json.prettyPrint(json))
+
     val (isValid, msg) = validate(json)
     if (!isValid) {
       res.put("result", msg)
@@ -70,11 +110,12 @@ class TS extends Controller {
     val req = new HTTPRequest(eshost, esport, timeout)
     stvalue match
     {
-      case "ES" =>  return req.sendESRequest(verb.asText(), inn.asText(), ot.asText())
-      case "DL" =>  return  req.sendESRequest(verb.asText(), inn.asText(), ot.asText())
-
+      case "ES" =>  return req.sendESRequest(verb.asText(), inn.asText(), ot.asText(), q.asText())
+      case "DL" =>  return  req.sendESRequest(verb.asText(), inn.asText(), ot.asText(), q.asText())
     }
-    return play.mvc.Results.ok(res)
+    res.put("result", "failure")
+    res.put("result", "Unsupported storage type")
+    return play.mvc.Results.badRequest(res)
   }
 
   private var stvalue : String = null
@@ -103,7 +144,7 @@ class TS extends Controller {
       return (false, "Storage type (ES) requires object type")
 
     q = json.findValue("Query")
-    if (q == null || q.isObject)
+    if (q == null || !q.isObject)
       return (false, "Incorrect query")
 
     (true, "valid")

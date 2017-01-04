@@ -19,7 +19,7 @@ xdfts_env=${app_home}/conf/xdfts.env
     echo "BDA_HOME=/opt/bda"
     echo "XDFTS_HOME=/opt/bda/xdfts"
     echo "XDFTS_PORT=9100"
-    echo "declare -r XDFTS_USER=xdfts-user"
+    echo "declare -r XDFTS_USER=mapr"
     echo "declare -r XDFTS_CURRENT_HOME=${app_home}"
 } >$xdfts_env
 
