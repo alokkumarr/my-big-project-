@@ -1,0 +1,56 @@
+<div class="login-view">
+  <div class="bg-container-wrapper"
+       layout="row" layout-align="center center">
+    <div class="bg-container"
+         layout="row" layout-align="center center">
+      <div class="login-container"
+           layout="column" layout-align="space-around start">
+        <div class="brand-logo"></div>
+
+        <h1>Login</h1>
+
+        <div class="login-info">
+          <span>Use the login credentials given at time of sing up. If you don't</span>
+          <br/>
+          <span>have an account yet contact your system administrator</span>
+        </div>
+
+        <form name="loginForm" method="post">
+          <div class="error-msg"
+               ng-bind="$ctrl.states.error"></div>
+
+          <md-input-container>
+            <label>Username</label>
+            <input type="text" maxlength="30" required
+                   ng-model="$ctrl.dataHolder.username"/>
+          </md-input-container>
+          <br/>
+
+          <md-input-container>
+            <label>Password</label>
+            <input type="password" maxlength="30" required
+                   ng-model="$ctrl.dataHolder.password"/>
+          </md-input-container>
+
+          <div class="login-buttons"
+               layout="row" layout-align="space-between center">
+            <md-button class="btn-primary"
+                       ng-disabled="loginForm.$invalid"
+                       ng-click="loginForm.$valid && $ctrl.login()">Login
+            </md-button>
+
+            <md-button class="md-primary">Forgot Password?</md-button>
+          </div>
+        </form>
+      </div>
+
+      <div class="middle-logo-container"></div>
+    </div>
+    <div class="white-container"></div>
+  </div>
+
+  <div class="powered-logo-container"
+       layout="row" layout-align="center center">
+    <div class="powered-logo"></div>
+  </div>
+</div>

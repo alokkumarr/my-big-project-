@@ -1,28 +1,35 @@
 import angular from 'angular';
-import 'angular-material';
 import 'angular-ui-router';
+import 'angular-material';
 import 'angular-material/angular-material.css';
 import '../../../../fonts/style.css';
 
-import {themeConfig} from '../app/theme';
-import {loginComponent} from '../login/login.component';
-import {ChangeComponent} from './change.component';
-
-import {UserService} from '../login/user.service';
-import {JwtService} from '../login/jwt.service';
+import AppConfig from '../../../../appConfig';
 
 import {routesConfig} from './routes';
+import {themeConfig} from './theme';
+import {runConfig} from './run';
 
-export const loginModule = 'login';
+import {AuthServiceFactory} from './services/auth.service';
+import {UserServiceFactory} from './services/user.service';
+import {JwtServiceFactory} from './services/jwt.service';
+
+import {LoginComponent} from './components/login/login.component';
+import {PasswordChangeComponent} from './components/passwordChange/passwordChange.component';
+
+export const LoginModule = 'login';
 
 angular
-  .module(loginModule, [
-    'ngMaterial',
-    'ui.router'
+  .module(LoginModule, [
+    'ui.router',
+    'ngMaterial'
   ])
-  .config(themeConfig)
   .config(routesConfig)
-  .factory('UserService', UserService)
-  .factory('JwtService', JwtService)
-  .component('changeComponent', ChangeComponent)
-  .component('loginComponent', loginComponent);
+  .config(themeConfig)
+  .run(runConfig)
+  .value('AppConfig', AppConfig)
+  .factory('AuthService', AuthServiceFactory)
+  .factory('UserService', UserServiceFactory)
+  .factory('JwtService', JwtServiceFactory)
+  .component('passwordChangeComponent', PasswordChangeComponent)
+  .component('loginComponent', LoginComponent);

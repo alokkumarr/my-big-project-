@@ -1,6 +1,10 @@
+import {EventHandler} from './eventHandler';
+
 class ComponentHandler {
-  constructor() {
+  constructor($eventHandler) {
     this._instances = {};
+
+    this.events = $eventHandler;
   }
 
   register(key, instance) {
@@ -12,6 +16,11 @@ class ComponentHandler {
       }
 
       coll.push(instance);
+
+      this.events.emit('$onInstanceAdded', {
+        key,
+        instance
+      });
     }
 
     return () => {
@@ -33,6 +42,11 @@ class ComponentHandler {
             delete this._instances[key];
           }
 
+          this.events.emit('$onInstanceRemoved', {
+            key,
+            instance
+          });
+
           return true;
         }
       }
@@ -46,6 +60,7 @@ class ComponentHandler {
   }
 }
 
-export default () => {
-  return new ComponentHandler();
+export default ($eventHandler) => {
+  'ngInject';
+  return new ComponentHandler($eventHandler);
 };

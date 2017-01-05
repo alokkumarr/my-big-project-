@@ -1,27 +1,14 @@
-export function routesConfig($stateProvider, $urlRouterProvider) {
+export function routesConfig($stateProvider, $urlRouterProvider, $locationProvider) {
   'ngInject';
 
+  $locationProvider.html5Mode(true);
   $urlRouterProvider.otherwise('/');
 
   const states = [
     {
-      name: 'index',
-      url: '/'
-    }, {
-      name: 'observe',
-      url: '/observe',
-      component: 'observePage'
-    }, {
-      name: 'analyze',
-      url: '/analyze',
-      component: 'analyzePage'
-    }, {
-      name: 'analyze.view',
-      url: '/:id',
-      component: 'analyzeView'
-    }, {
-      name: 'alerts',
-      url: '/alerts'
+      name: 'app',
+      url: '/',
+      component: 'root'
     }
   ];
 
