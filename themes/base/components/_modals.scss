@@ -27,6 +27,10 @@ md-dialog {
   md-dialog-actions {
     padding: 24px;
   }
+
+  &.md-transition-in {
+    transform: none;
+  }
 }
 
 md-dialog-content {

@@ -15,7 +15,7 @@
     <span class="jsp-table-column-name"
           ng-bind="::field.getName()"></span>
 
-    <js-plumb-endpoint ng-repeat="endpoint in field.endpoints track by endpoint.field.name"
+    <js-plumb-endpoint ng-repeat="endpoint in field.endpoints track by $index"
                        model="endpoint"></js-plumb-endpoint>
   </md-list-item>
 </md-list>

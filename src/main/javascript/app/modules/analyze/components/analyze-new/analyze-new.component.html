@@ -34,9 +34,11 @@
           <div class="md-body-1" flex
                ng-bind="::method.label"></div>
           <div flex>
-            <choice-group items="method.children"
-                          ng-model="$ctrl.selectedAnalysisMethod"
-                          ng-change="$ctrl.onAnalysisMethodSelected()"></choice-group>
+            <choice-group
+              items="method.children"
+              ng-model="$ctrl.selectedAnalysisMethod"
+              ng-change="$ctrl.onAnalysisMethodSelected()">
+            </choice-group>
           </div>
         </div>
       </div>
