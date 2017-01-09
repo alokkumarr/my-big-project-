@@ -9,8 +9,8 @@ import defaults from 'lodash/defaults';
 
 import template from './report-grid.component.html';
 import style from './report-grid.component.scss';
-import renameTemplate from './rename-dialog/rename-dialog.tmpl.html';
-import {RenameDialogController} from './rename-dialog/rename-dialog.controller';
+import renameTemplate from '../rename-dialog/rename-dialog.tmpl.html';
+import {RenameDialogController} from '../rename-dialog/rename-dialog.controller';
 
 const MIN_ROWS_TO_SHOW = 5;
 const COLUMN_WIDTH = 175;
