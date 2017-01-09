@@ -11,6 +11,8 @@
     "precommit": "eslint \"src/**/*.js\"",
     "dist": "webpack --config conf/webpack.prod.js --progress --profile --bail",
     "start": "webpack-dev-server --config conf/webpack.dev.js",
+    "postinstall": "node node_modules/protractor/bin/webdriver-manager update",
+    "e2e": "protractor test/e2e/protractor.conf.js",
     "express": "node src/main/javascript/middlelayer/index.js"
   },
   "eslintConfig": {

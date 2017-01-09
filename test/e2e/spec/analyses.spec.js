@@ -12,7 +12,7 @@ describe('Analyses Tests', function () {
   });*/
 
   it('navigate to home page', function () {
-    browser.get('http://localhost:3000/observe');
+    browser.get('http://localhost:3000/');
     });
 
   it('should navigate to Analyze page', function () {
