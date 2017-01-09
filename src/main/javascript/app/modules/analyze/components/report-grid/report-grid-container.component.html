@@ -1,0 +1,7 @@
+<md-card style="padding: 20px; height:100%">
+  <div ng-if="$ctrl.modifiedData.isGroup">
+    Grouped by: <strong>{{$ctrl._ReportGridService.getGroupedBy()}}</strong>
+    <md-button ng-click="$ctrl.undoGrouping()" class="btn-card">Undo</md-button>
+  </div>
+  <report-grid-node data="$ctrl.modifiedData"></report-grid-node>
+</md-card>

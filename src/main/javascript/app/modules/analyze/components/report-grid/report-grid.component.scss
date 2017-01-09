@@ -1,0 +1,67 @@
+.ui-grid {
+  border: none;
+  font-size: 12px;
+}
+
+.ui-grid .ui-grid-header {
+  border-bottom: none;
+}
+
+.ui-grid .ui-grid-header .ui-grid-top-panel {
+  background: #FFF;
+  font-size: 16px;
+}
+
+.ui-grid .ui-grid-header .ui-grid-top-panel .ui-grid-header-cell {
+  text-align: center;
+  font-weight: initial;
+  border-right-color: transparent;
+  -webkit-transition: border-color 1s ease;
+  -moz-transition: border-color 1s ease;
+  -ms-transition: border-color 1s ease;
+  -o-transition: border-color 1s ease;
+  transition: border-color 1s ease;
+}
+
+.ui-grid .ui-grid-header .ui-grid-top-panel .ui-grid-header-cell .ui-grid-cell-contents {
+  padding: 5px 5px 4px;
+}
+
+.ui-grid .ui-grid-header .ui-grid-top-panel .ui-grid-header-cell .ui-grid-column-menu-button {
+  top: 2px;
+}
+
+.ui-grid .ui-grid-header .ui-grid-top-panel:hover .ui-grid-header-cell {
+  border-right-color: #CCC;
+}
+
+.ui-grid .ui-grid-viewport {
+  position: initial;
+}
+
+.ui-grid .ui-grid-viewport .ui-grid-canvas {
+  position: initial;
+}
+
+.ui-grid .ui-grid-viewport .ui-grid-canvas .ui-grid-row .ui-grid-cell {
+  background-color: #FFF;
+  border-right: none;
+}
+
+.ui-grid .ui-grid-viewport .ui-grid-canvas .ui-grid-row .ui-grid-cell .ui-grid-cell-contents {
+  padding: 7px;
+}
+
+.ui-grid .ui-grid-viewport .ui-grid-canvas .ui-grid-row.ui-grid-row-selected .ui-grid-cell {
+  background-color: #CDEAFF !important;
+}
+
+// hide unused disabled scrollbar
+div[role="rowgroup"].ui-grid-viewport {
+  overflow-y: auto !important;
+}
+
+// hide chips border
+md-chips-wrap.md-chips {
+  box-shadow: 0 0 !important;
+}

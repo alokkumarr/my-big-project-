@@ -47,6 +47,7 @@ export const AnalyzeReportComponent = {
       };
 
       this.metadata = [];
+      this.uiGridData = {}
 
       this.getGridData = () => {
         return Object.assign(this.dxGridOptions, {
@@ -93,6 +94,7 @@ export const AnalyzeReportComponent = {
       this._AnalyzeService.getDataByQuery()
         .then(data => {
           this.metadata = data;
+          this.uiGridData.data = data;
         });
 
       $componentHandler.events.on('$onInstanceAdded', e => {
@@ -116,6 +118,7 @@ export const AnalyzeReportComponent = {
       this._AnalyzeService.getArtifacts()
         .then(data => {
           this.canvas.model.precess(data);
+          this.uiGridData.artifacts = this.canvas.model.tables;
         });
     }
 

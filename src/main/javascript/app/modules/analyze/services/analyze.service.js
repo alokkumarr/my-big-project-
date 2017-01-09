@@ -11,6 +11,7 @@ import isEqual from 'lodash/fp/isEqual';
 import some from 'lodash/fp/some';
 import set from 'lodash/fp/set';
 import get from 'lodash/fp/get';
+import forEach from 'lodash/fp/forEach';
 
 export function AnalyzeService($http) {
   'ngInject';
@@ -19,7 +20,6 @@ export function AnalyzeService($http) {
     getMenu,
     getMethods,
     getMetrics,
-    getTables,
     getArtifacts,
     getDataByQuery,
     getSupportedMethods,
@@ -39,10 +39,8 @@ export function AnalyzeService($http) {
     return $http.get('/api/analyze/metrics').then(get('data'));
   }
 
-  function getTables() {
-    return $http.get('/api/analyze/reportArtifacts')
-      .then(get('data'))
-      .then(mapArtifactsToTables());
+  function getArtifacts() {
+    return $http.get('/api/analyze/reportArtifacts').then(get('data'));
   }
 
   function getArtifacts() {
@@ -51,24 +49,6 @@ export function AnalyzeService($http) {
 
   function getDataByQuery() {
     return $http.get('/api/analyze/dataByQuery').then(get('data'));
-  }
-
-  function mapArtifactsToTables() {
-    return map(artifact => {
-      return {
-        x: artifact.x,
-        y: artifact.y,
-        name: artifact._artifact_name,
-        fields: map(attribute => {
-          return {
-            name: attribute._alias_name || attribute._display_name,
-            type: attribute._type,
-            checked: attribute.checked,
-            endpoints: attribute.endpoints
-          };
-        }, artifact._artifact_attributes)
-      };
-    });
   }
 
   /**

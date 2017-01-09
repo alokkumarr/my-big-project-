@@ -1,6 +1,7 @@
 import angular from 'angular';
 import EventHandler from './component/eventHandler';
 import ComponentHandler from './component/componentHandler';
+import recursionHelper from './recursion-helper.service';
 
 export const CommonModule = 'Common';
 
@@ -17,4 +18,5 @@ modulesDependencies.push(MockModule);
 angular
   .module(CommonModule, modulesDependencies)
   .factory('$eventHandler', EventHandler)
+  .factory('recursionHelper', recursionHelper)
   .factory('$componentHandler', ComponentHandler);

@@ -1,0 +1,22 @@
+<div>
+  <div ng-if="$ctrl.data.isGroup">
+
+    <div ng-repeat="groupNode in $ctrl.data.groupNodes track by $index">
+      <div layout="row" layout-align="start center">
+
+        <h3>{{groupNode.groupValue}}</h3>
+
+        <md-chips>
+          <md-chip>{{groupNode.itemCount}}</md-chip>
+        </md-chips>
+
+      </div>
+      <report-grid-node data="groupNode.data"></report-grid-node>
+    </div>
+
+  </div>
+  <div ng-if="!$ctrl.data.isGroup">
+    <report-grid data="$ctrl.data"></report-grid>
+  </div>
+
+</div>
