@@ -558,55 +558,55 @@ function getDataByQuery() {
   return [
     {
       CustomerName: 'Johnson\'s Trucking',
-      TotalPrice: '$100',
+      TotalPrice: 100,
       ShipperName: 'Motion Inc.',
       WarehouseName: 'Warehouse1'
     },
     {
       CustomerName: 'Lily\'s Trucking',
-      TotalPrice: '$200',
+      TotalPrice: 200,
       ShipperName: 'Motion Inc.',
       WarehouseName: 'Warehouse1'
     },
     {
       CustomerName: 'Advanced Autos',
-      TotalPrice: '$400',
+      TotalPrice: 400,
       ShipperName: 'Motion Inc.',
       WarehouseName: 'Warehouse2'
     },
     {
       CustomerName: 'Advanced Autos',
-      TotalPrice: '$100',
+      TotalPrice: 100,
       ShipperName: 'Granger',
       WarehouseName: 'Warehouse1'
     },
     {
       CustomerName: 'Import Tuners',
-      TotalPrice: '$600',
+      TotalPrice: 600,
       ShipperName: 'Granger',
       WarehouseName: 'Warehouse1'
     },
     {
       CustomerName: 'Johnson\'s Trucking',
-      TotalPrice: '$700',
+      TotalPrice: 700,
       ShipperName: 'Granger',
       WarehouseName: 'Warehouse2'
     },
     {
       CustomerName: 'East Side Auto',
-      TotalPrice: '$400',
+      TotalPrice: 400,
       ShipperName: 'Motion Inc.',
       WarehouseName: 'Warehouse2'
     },
     {
       CustomerName: 'North Raven Auto',
-      TotalPrice: '$800',
+      TotalPrice: 800,
       ShipperName: 'Motion Inc.',
       WarehouseName: 'Warehouse1'
     },
     {
       CustomerName: 'Bloomburg Auto Shop',
-      TotalPrice: '$300',
+      TotalPrice: 300,
       ShipperName: 'Motion Inc.',
       WarehouseName: 'Warehouse5'
     }

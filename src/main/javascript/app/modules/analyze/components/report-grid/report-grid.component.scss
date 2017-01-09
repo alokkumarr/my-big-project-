@@ -56,6 +56,16 @@
   background-color: #CDEAFF !important;
 }
 
+// column footers for aggregators (sum, min max, avg)
+.ui-grid .ui-grid-footer-panel.ui-grid-footer-aggregates-row {
+  background: #FFF none;
+  border-bottom: none;
+}
+
+.ui-grid .ui-grid-footer-cell {
+  border-right: none;
+}
+
 // hide unused disabled scrollbar
 div[role="rowgroup"].ui-grid-viewport {
   overflow-y: auto !important;

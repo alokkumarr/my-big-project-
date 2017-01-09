@@ -4,6 +4,9 @@ import filter from 'lodash/fp/filter';
 import concat from 'lodash/concat';
 import head from 'lodash/head';
 import has from 'lodash/has';
+import findIndex from 'lodash/findIndex';
+import defaults from 'lodash/defaults';
+
 import template from './report-grid.component.html';
 import style from './report-grid.component.scss';
 
@@ -51,35 +54,39 @@ export const ReportGridComponent = {
 
     $onInit() {
       this.gridStyle = {
-        width: `${this.columns.length * COLUMN_WIDTH}px`
+        width: `${this.getVisibleCulomsFilter()(this.columns).length * COLUMN_WIDTH}px`
       };
       this.config = {
+        showColumnFooter: false,
         data: this.data,
         columnDefs: this.getCulomnDefs(this.columns),
         minRowsToShow: MIN_ROWS_TO_SHOW,
-        enableHorizontalScrollbar: this._uiGridConstants.scrollbars.NEVER
+        enableHorizontalScrollbar: this._uiGridConstants.scrollbars.NEVER,
+        onRegisterApi: (gridApi) => {
+            this.gridApi = gridApi;
+        }
       };
     }
 
-    resize() {
-      this.$interval(() => {
-        this.gridApi.core.handleWindowResize();
-      }, 10, 100);
-    }
     getCulomnDefs(columns) {
       return pipe(
-        filter(column => has(head(this.data), column.name)),
+        this.getVisibleCulomsFilter(),
         map(column => {
           const displayName = column.alias || column.display;
           const columnName = column.name;
           return {
             width: COLUMN_WIDTH,
             name: columnName,
+            visible: true,
             displayName,
             menuItems: this.getMenuItems(column.type, displayName, columnName)
           };
         })
       )(columns);
+    }
+
+    getVisibleCulomsFilter() {
+      return filter(column => has(head(this.data), column.name));
     }
 
     getMenuItems(type, displayName, columnName) {
@@ -88,33 +95,85 @@ export const ReportGridComponent = {
         icon: 'icon-group-by-column',
         action: () => {
           this.reporGridContainerCtrl.groupData(columnName);
-
         }
       }, {
         title: 'Rename',
-        icon: 'icon-edit'
+        icon: 'icon-edit',
+        action: () => this.renameColumn(columnName)
       }, {
         title: `Hide ${displayName}`,
-        icon: 'icon-eye-disabled'
+        icon: 'icon-eye-disabled',
+        action: () => this.hideColumn(columnName)
       }];
 
       if (type === 'int' | type === 'double') {
         menuItems = concat(menuItems, [{
           title: 'Show Sum',
-          icon: 'icon-Sum'
+          icon: 'icon-Sum',
+          action: () => this.showSum(columnName)
         }, {
           title: `Show Average`,
-          icon: 'icon-AVG'
+          icon: 'icon-AVG',
+          action: () => this.showAvg(columnName)
         }, {
           title: `Show Min`,
-          icon: 'icon-MIN'
+          icon: 'icon-MIN',
+          action: () => this.showMin(columnName)
         }, {
           title: `Show Max`,
-          icon: 'icon-MAX'
+          icon: 'icon-MAX',
+          action: () => this.showMax(columnName)
           }]);
       }
 
       return menuItems;
+    }
+
+    renameColumn(columnName) {
+      this.modifyColumnDef(columnName, {
+        displayName: 'RENAMED'
+      });
+    }
+
+    hideColumn(columnName) {
+      this.modifyColumnDef(columnName, {
+        visible: false
+      });
+    }
+
+    showMin(columnName) {
+      this.showAggregatorOnColumn(columnName, 'min');
+    }
+
+    showMax(columnName) {
+      this.showAggregatorOnColumn(columnName, 'max');
+    }
+
+    showAvg(columnName) {
+      this.showAggregatorOnColumn(columnName, 'avg');
+    }
+
+    showSum(columnName) {
+      this.showAggregatorOnColumn(columnName, 'sum');
+    }
+
+    showAggregatorOnColumn(columnName, aggregatorType) {
+      this.showColumnFooterIfHidden();
+      this.modifyColumnDef(columnName, {
+        aggregationType: this._uiGridConstants.aggregationTypes[aggregatorType]
+      });
+    }
+
+    showColumnFooterIfHidden() {
+      if (!this.config.showColumnFooter) {
+        this.config.showColumnFooter = true;
+        this.gridApi.core.notifyDataChange(this._uiGridConstants.dataChange.OPTIONS);
+      }
+    };
+
+    modifyColumnDef(columnName, modifierObj) {
+      const index = findIndex(this.config.columnDefs, columnDef => columnDef.name === columnName);
+      this.config.columnDefs[index] = defaults(modifierObj, this.config.columnDefs[index]);
     }
   }
 };
