@@ -2,7 +2,7 @@ export function routesConfig($stateProvider, $urlRouterProvider, $locationProvid
   'ngInject';
 
   $locationProvider.html5Mode(true);
-  $urlRouterProvider.otherwise('/');
+  $urlRouterProvider.otherwise('/login');
 
   const states = [
     {
@@ -20,6 +20,22 @@ export function routesConfig($stateProvider, $urlRouterProvider, $locationProvid
       data: {
         title: 'Change Password'
       }
+    },
+    {
+        name: 'preResetPassword',
+        url: '/preResetPwd',
+        component: 'passwordPreResetComponent',
+        data: {
+          title: 'Reset Password'
+        }
+    },
+    {
+        name: 'resetPassword',
+        url: '/resetPassword',
+        component: 'passwordResetComponent',
+        data: {
+          title: 'Reset Password'
+        }
     }
   ];
 
