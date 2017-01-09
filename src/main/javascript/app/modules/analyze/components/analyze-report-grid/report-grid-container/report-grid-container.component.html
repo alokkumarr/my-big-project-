@@ -2,7 +2,7 @@
   <div ng-if="$ctrl.modifiedData.isGroup"
        layout="row" layout-align="end center">
 
-    Grouped by:&nbsp; <strong>{{$ctrl._ReportGridService.getGroupedBy()}}</strong>
+    Grouped by:&nbsp; <strong>{{$ctrl.groupedBy}}</strong>
 
     <md-button ng-click="$ctrl.undoGrouping()" class="btn-card">Undo</md-button>
 
@@ -13,5 +13,5 @@
     </md-radio-group>
 
   </div>
-  <report-grid-node data="$ctrl.modifiedData" layout-mode="$ctrl.layoutMode"></report-grid-node>
+  <report-grid-node data="$ctrl.modifiedData" columns="$ctrl.columns" layout-mode="$ctrl.layoutMode"></report-grid-node>
 </md-card>

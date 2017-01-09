@@ -10,10 +10,10 @@
       </md-chips>
 
     </div>
-    <report-grid-node data="groupNode.data" layout-mode="$ctrl.layoutMode"></report-grid-node>
+    <report-grid-node data="groupNode.data" columns="$ctrl.columns" layout-mode="$ctrl.layoutMode"></report-grid-node>
   </div>
 
 </div>
 <div ng-if="!$ctrl.data.isGroup && $ctrl.layoutMode === $ctrl.LAYOUT_MODE.DETAIL">
-  <report-grid data="$ctrl.data"></report-grid>
+  <report-grid columns="$ctrl.columns" data="$ctrl.data"></report-grid>
 </div>

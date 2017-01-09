@@ -9,6 +9,8 @@ import defaults from 'lodash/defaults';
 
 import template from './report-grid.component.html';
 import style from './report-grid.component.scss';
+import renameTemplate from './rename-dialog/rename-dialog.tmpl.html';
+import {RenameDialogController} from './rename-dialog/rename-dialog.controller';
 
 const MIN_ROWS_TO_SHOW = 5;
 const COLUMN_WIDTH = 175;
@@ -20,36 +22,14 @@ export const ReportGridComponent = {
     reporGridContainerCtrl: '^reportGridContainer'
   },
   bindings: {
-    data: '<'
+    data: '<',
+    columns: '<'
   },
   controller: class ReportGridController {
-    constructor(uiGridConstants) {
+    constructor(uiGridConstants, $mdDialog) {
       'ngInject';
       this._uiGridConstants = uiGridConstants;
-      // get this data from the canvas model: checked fields
-      /* eslint-disable */
-      this.columns = [{
-        name: 'CustomerName',
-        display: 'Costumer name',
-        alias: '',
-        type: 'sring'
-      }, {
-        name: 'ShipperName',
-        display: 'Shipper name',
-        alias: '',
-        type: 'sring'
-      }, {
-        name: 'WarehouseName',
-        display: 'Warehouse name',
-        alias: '',
-        type: 'sring'
-      }, {
-        name: 'TotalPrice',
-        display: 'Total Price',
-        alias: '',
-        type: 'int'
-      }];
-      /* eslint-enable */
+      this._$mdDialog = $mdDialog;
     }
 
     $onInit() {
@@ -130,8 +110,17 @@ export const ReportGridComponent = {
     }
 
     renameColumn(columnName) {
-      this.modifyColumnDef(columnName, {
-        displayName: 'RENAMED'
+      this.openRenameModal()
+        .then(newName => {
+          // rename on grid, and grid context menu
+          const column = find(this.columns, column => column.name === columnName);
+
+          this.modifyColumnDef(columnName, {
+            displayName: newName,
+            menuItems: this.getMenuItems(column.type, newName, columnName)
+          });
+          // rename in data
+          this.reporGridContainerCtrl.rename(columnName, newName);
       });
     }
 
@@ -174,6 +163,17 @@ export const ReportGridComponent = {
     modifyColumnDef(columnName, modifierObj) {
       const index = findIndex(this.config.columnDefs, columnDef => columnDef.name === columnName);
       this.config.columnDefs[index] = defaults(modifierObj, this.config.columnDefs[index]);
+    }
+
+    openRenameModal() {
+      return this._$mdDialog
+        .show({
+          controller: RenameDialogController,
+          template: renameTemplate,
+          fullscreen: false,
+          skipHide: true,
+          clickOutsideToClose:true
+        });
     }
   }
 };

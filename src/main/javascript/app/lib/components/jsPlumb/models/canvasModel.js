@@ -14,6 +14,10 @@ export class CanvasModel {
   }
 
   precess(data) {
+    // hard coded columns to show by default
+    // these are the columns in the mock data
+    const defaultColumns = ['CustomerName', 'TotalPrice', 'ShipperName', 'WarehouseName'];
+
     this.tables.length = 0;
     this.joins.length = 0;
     this.sorts.length = 0;
@@ -27,6 +31,7 @@ export class CanvasModel {
         const field = table.addField(itemB['_actual_col-name'], itemB._display_name, itemB._alias_name);
 
         field.setType(itemB._type);
+        field.selected = Boolean(find(defaultColumns, columnName => columnName === field.name));
       });
     });
 
@@ -54,8 +59,6 @@ export class CanvasModel {
           field: itemB['col-name'],
           order: itemB.order
         });
-
-        sort.field.selected = true;
       });
     });
   }

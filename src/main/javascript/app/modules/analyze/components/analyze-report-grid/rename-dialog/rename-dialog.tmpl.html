@@ -1,0 +1,24 @@
+<analyze-dialog class="analyze-report-sort">
+  <analyze-dialog-header layout="row" layout-align="start center" flex="grow">
+    <strong>Rename Column</strong>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+    <md-input-container md-no-float class="md-block">
+      <md-icon md-font-icon="icon-edit"></md-icon>
+      <input ng-model="model.newName" type="text" placeholder="New Column Name">
+    </md-input-container>
+  </analyze-dialog-content>
+
+  <analyze-dialog-footer>
+    <div layout="row">
+      <md-button class="btn-primary"
+                 ng-click="rename(model.newName)">Rename
+      </md-button>
+
+      <md-button class="btn-card"
+                 ng-click="cancel()">Cancel
+      </md-button>
+    </div>
+  </analyze-dialog-footer>
+</analyze-dialog>

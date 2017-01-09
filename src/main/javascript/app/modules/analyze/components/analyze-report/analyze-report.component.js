@@ -1,3 +1,8 @@
+import filter from 'lodash/fp/filter';
+import flatMap from 'lodash/fp/flatMap';
+import pipe from 'lodash/fp/pipe';
+import get from 'lodash/fp/get';
+
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
 
@@ -22,79 +27,11 @@ export const AnalyzeReportComponent = {
         query: ''
       };
 
-      this.dxGridOptions = {
-        columnAutoWidth: true,
-        showColumnHeaders: true,
-        showColumnLines: false,
-        showRowLines: false,
-        showBorders: true,
-        rowAlternationEnabled: true,
-        hoverStateEnabled: true,
-        scrolling: {
-          mode: 'virtual'
-        },
-        sorting: {
-          mode: 'multiple'
-        },
-        paging: {
-          pageSize: 10
-        },
-        pager: {
-          showPageSizeSelector: true,
-          showInfo: true
-        },
-        width: 800
-      };
+      this.gridData = []
 
-      this.metadata = [];
-      this.uiGridData = {}
-
-      this.getGridData = () => {
-        return Object.assign(this.dxGridOptions, {
-          dataSource: this.metadata,
-          columns: [
-            {
-              caption: 'ID',
-              dataField: 'id',
-              allowSorting: true,
-              sortOrder: 'desc',
-              sortIndex: 0,
-              visible: false
-            },
-            {
-              caption: 'CUSTOMER NAME',
-              dataField: 'customerName',
-              alignment: 'left',
-              allowSorting: true,
-              sortOrder: 'desc',
-              sortIndex: 1,
-              width: '30%'
-            },
-            {
-              caption: 'TOTAL PRICE',
-              dataField: 'price',
-              alignment: 'left',
-              allowSorting: true,
-              sortOrder: 'desc',
-              sortIndex: 2,
-              width: '30%'
-            },
-            {
-              caption: 'NAME',
-              dataField: 'name',
-              alignment: 'left',
-              allowSorting: true,
-              sortOrder: 'desc',
-              sortIndex: 3,
-              width: '25%'
-            }
-          ]
-        });
-      };
       this._AnalyzeService.getDataByQuery()
         .then(data => {
-          this.metadata = data;
-          this.uiGridData.data = data;
+          this.gridData = data;
         });
 
       $componentHandler.events.on('$onInstanceAdded', e => {
@@ -118,8 +55,15 @@ export const AnalyzeReportComponent = {
       this._AnalyzeService.getArtifacts()
         .then(data => {
           this.canvas.model.precess(data);
-          this.uiGridData.artifacts = this.canvas.model.tables;
+          this.columns = this.getSelectedColumns(this.canvas.model.tables);
         });
+    }
+
+    getSelectedColumns(tables) {
+      return this.selectedCulomns = pipe(
+        flatMap(get('fields')),
+        filter(get('selected'))
+      )(tables);
     }
 
     setSqlMode(mode) {
