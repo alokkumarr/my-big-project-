@@ -11,6 +11,7 @@ import {AnalyzeNewComponent} from './components/analyze-new/analyze-new.componen
 import {AnalyzeReportComponent} from './components/analyze-report/analyze-report.component';
 import {AnalyzeDialogComponent} from './components/analyze-dialog/analyze-dialog.component';
 import {AnalyzeReportSortComponent} from './components/analyze-report-sort/analyze-report-sort.component';
+import {AnalyzeReportPreviewComponent} from './components/analyze-report-preview/analyze-report-preview.component';
 
 export const AnalyzeModule = 'AnalyzeModule';
 
@@ -23,4 +24,5 @@ angular.module(AnalyzeModule, [])
   .component('analyzeNew', AnalyzeNewComponent)
   .component('analyzeReport', AnalyzeReportComponent)
   .component('analyzeDialog', AnalyzeDialogComponent)
-  .component('analyzeReportSort', AnalyzeReportSortComponent);
+  .component('analyzeReportSort', AnalyzeReportSortComponent)
+  .component('analyzeReportPreview', AnalyzeReportPreviewComponent);

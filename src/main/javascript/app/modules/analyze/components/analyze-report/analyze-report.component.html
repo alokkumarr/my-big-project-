@@ -1,8 +1,8 @@
-<analyze-dialog class="analyze-report-dialog">
+<analyze-dialog control="$ctrl" class="analyze-report-dialog">
   <analyze-dialog-header>
     <div layout="row">
       <md-button class="ard_back-btn"
-                 ng-click="$parent.$ctrl.closeDialog()">
+                 ng-click="$ctrl.$dialog.closeDialog()">
         <md-icon md-font-icon="icon-arrow-left"></md-icon>
       </md-button>
 
@@ -18,9 +18,11 @@
       </div>
 
       <div class="ard_actions" flex>
-        <md-button>Export</md-button>
-        <md-button>Save</md-button>
-        <md-button class="btn-primary">Publish</md-button>
+        <md-button ng-click="$ctrl.export()">Export</md-button>
+        <md-button ng-click="$ctrl.save()">Save</md-button>
+        <md-button class="btn-primary"
+                   ng-click="$ctrl.publish()">Publish
+        </md-button>
       </div>
     </div>
   </analyze-dialog-header>
@@ -74,8 +76,13 @@
 
         <div class="ard_toolbar-actions" flex>
           <md-button>
-            <md-icon md-font-icon="icon-filter"></md-icon>
-            Filter
+            <md-icon md-font-icon="icon-description"></md-icon>
+            Description
+          </md-button>
+
+          <md-button ng-click="$ctrl.openPreviewModal($event)">
+            <md-icon md-font-icon="icon-full-screen"></md-icon>
+            Preview
           </md-button>
 
           <md-button ng-click="$ctrl.openSortModal($event)">
@@ -84,8 +91,8 @@
           </md-button>
 
           <md-button>
-            <md-icon md-font-icon="icon-full-screen"></md-icon>
-            Preview
+            <md-icon md-font-icon="icon-filter"></md-icon>
+            Filter
           </md-button>
         </div>
       </div>

@@ -11,61 +11,105 @@ export class CanvasModel {
     this.tables = [];
     this.joins = [];
     this.sorts = [];
+    this.groups = [];
+    this.filters = [];
   }
 
-  precess(data) {
+  fill(data) {
     this.tables.length = 0;
     this.joins.length = 0;
     this.sorts.length = 0;
+    this.cleanGroups();
+    this.cleanFilters();
 
     forEach(data, itemA => {
-      const table = this.addTable(itemA._artifact_name);
+      const table = this.addTable(itemA.artifact_name);
 
-      table.setPosition(itemA._artifact_position[0], itemA._artifact_position[1]);
+      table.setMeta(itemA);
+      table.setPosition(itemA.artifact_position[0], itemA.artifact_position[1]);
 
-      forEach(itemA._artifact_attributes, itemB => {
-        const field = table.addField(itemB['_actual_col-name'], itemB._display_name, itemB._alias_name);
+      forEach(itemA.artifact_attributes, itemB => {
+        const field = table.addField(itemB.column_name);
 
-        field.setType(itemB._type);
+        field.setMeta(itemB);
+        field.displayName = itemB.display_name;
+        field.alias = itemB.alias_name;
+        field.type = itemB.type;
+        field.checked = itemB.checked;
+        field.isHidden = !!itemB.hide;
+        field.isJoinEligible = !!itemB.join_eligible;
+        field.isFilterEligible = !!itemB.filter_eligible;
       });
     });
 
     forEach(data, itemA => {
-      forEach(itemA._sql_builder.joins, itemB => {
-        const tableA = itemB.criteria[0]['table-name'];
-        const tableB = itemB.criteria[1]['table-name'];
+      forEach(itemA.sql_builder.joins, itemB => {
+        const tableA = itemB.criteria[0].table_name;
+        const tableB = itemB.criteria[1].table_name;
 
         if (tableA !== tableB) {
           this.addJoin(itemB.type, {
             table: tableA,
-            field: itemB.criteria[0]['column-name'],
+            field: itemB.criteria[0].column_name,
             side: itemB.criteria[0].side
           }, {
             table: tableB,
-            field: itemB.criteria[1]['column-name'],
+            field: itemB.criteria[1].column_name,
             side: itemB.criteria[1].side
           });
         }
       });
 
-      forEach(itemA._sql_builder._order_by_columns, itemB => {
-        const sort = this.addSort({
-          table: itemA._artifact_name,
-          field: itemB['col-name'],
+      forEach(itemA.sql_builder.order_by_columns, itemB => {
+        this.addSort({
+          table: itemA.artifact_name,
+          field: itemB.column_name,
           order: itemB.order
         });
+      });
 
-        sort.field.selected = true;
+      forEach(itemA.sql_builder.group_by_columns, itemB => {
+        this.addGroup({
+          table: itemA.artifact_name,
+          field: itemB
+        });
+      });
+
+      filters: [
+        {
+          column_name: 'col2',
+          boolean_criteria: 'AND',
+          operator: '=',
+          search_conditions: [
+            'abc',
+            'def'
+          ]
+        }
+      ]
+
+      forEach(itemA.sql_builder.filters, itemB => {
+        this.addFilter({
+          table: itemA.artifact_name,
+          field: itemB.column_name,
+          booleanCriteria: itemB.boolean_criteria,
+          operator: itemB.operator,
+          searchConditions: itemB.search_conditions
+        });
       });
     });
   }
 
-  addTable(tableName) {
-    if (!tableName) {
-      return;
-    }
+  cleanGroups() {
+    this.groups.length = 0;
+  }
 
-    const table = new TableModel(this, tableName);
+  cleanFilters() {
+    this.filters.length = 0;
+  }
+
+  addTable(name) {
+    const table = new TableModel(this, name);
+
     this.tables.push(table);
 
     return table;
@@ -118,7 +162,7 @@ export class CanvasModel {
   getSelectedFields() {
     return flatMap(this.tables, table => {
       return filter(table.fields, field => {
-        return field.selected === true;
+        return field.checked;
       });
     });
   }
@@ -132,47 +176,138 @@ export class CanvasModel {
     return sortObj;
   }
 
-  generateQuery() {
-    let sql = 'SELECT ';
+  addGroup(groupObj) {
+    groupObj.table = this.findTable(groupObj.table);
+    groupObj.field = groupObj.table && groupObj.table.findField(groupObj.field);
 
-    const fields = [];
-    const tables = [];
+    this.groups.push(groupObj);
+
+    return groupObj;
+  }
+
+  removeGroup(group) {
+    const idx = this.groups.indexOf(group);
+
+    if (idx !== -1) {
+      this.groups.splice(idx, 1);
+    }
+  }
+
+  addFilter(filterObj) {
+    filterObj.table = this.findTable(filterObj.table);
+    filterObj.field = filterObj.table && filterObj.table.findField(filterObj.field);
+
+    this.filters.push(filterObj);
+
+    return filterObj;
+  }
+
+  removeFilter(filter) {
+    const idx = this.filters.indexOf(filter);
+
+    if (idx !== -1) {
+      this.filters.splice(idx, 1);
+    }
+  }
+
+  generatePayload() {
+    const tableArtifacts = [];
 
     forEach(this.tables, (table, idx) => {
-      let hasSelectedFields = false;
+      const tableArtifact = {
+        artifact_name: table.name,
+        artifact_position: [table.x, table.y],
+        artifact_attributes: [],
+        sql_builder: {
+          group_by_columns: [],
+          order_by_columns: [],
+          joins: [],
+          filters: []
+        },
+        data: []
+      }
+
+      tableArtifacts.push(tableArtifact);
 
       forEach(table.fields, field => {
-        if (field.selected) {
-          fields.push(`t${idx}.${field.name}`);
-          hasSelectedFields = true;
-        }
+        const fieldArtifact = {
+          column_name: field.meta.column_name,
+          display_name: field.meta.display_name,
+          alias_name: field.alias,
+          type: field.meta.type,
+          hide: field.isHidden,
+          join_eligible: field.meta.join_eligible,
+          filter_eligible: field.meta.filter_eligible,
+          checked: field.checked
+        };
+
+        tableArtifact.artifact_attributes.push(fieldArtifact);
       });
 
-      if (hasSelectedFields) {
-        tables.push(`\nFROM ${table.name} as t${idx}`)
-      }
+      const joins = filter(this.joins, join => {
+        return join.leftSide.table === table;
+      });
+
+      forEach(joins, join => {
+        const joinArtifact = {
+          type: join.type,
+          criteria: []
+        };
+
+        joinArtifact.criteria.push({
+          table_name: join.leftSide.table.name,
+          column_name: join.leftSide.field.name,
+          side: join.leftSide.side
+        });
+
+        joinArtifact.criteria.push({
+          table_name: join.rightSide.table.name,
+          column_name: join.rightSide.field.name,
+          side: join.rightSide.side
+        });
+
+        tableArtifact.sql_builder.joins.push(joinArtifact);
+      });
+
+      const sorts = filter(this.sorts, sort => {
+        return sort.table === table;
+      });
+
+      forEach(sorts, sort => {
+        const sortArtifact = {
+          column_name: sort.field.name,
+          order: sort.order
+        };
+
+        tableArtifact.sql_builder.order_by_columns.push(sortArtifact);
+      });
+
+      const groups = filter(this.groups, group => {
+        return group.table === table;
+      });
+
+      forEach(groups, group => {
+        tableArtifact.sql_builder.group_by_columns.push(group.field.name);
+      });
+
+      const filters = filter(this.filters, filter => {
+        return filter.table === table;
+      });
+
+      forEach(filters, filter => {
+        const filterArtifact = {
+          column_name: filter.field.name,
+          boolean_criteria: filter.booleanCriteria,
+          operator: filter.operator,
+          search_conditions: filter.searchConditions
+        };
+
+        tableArtifact.sql_builder.filters.push(filterArtifact);
+      });
     });
 
-    if (fields.length) {
-      sql += `\n\t${fields.join(', ')}`;
-    }
-
-    if (tables.length) {
-      sql += tables.join(', ');
-    }
-
-    const orders = [];
-
-    forEach(this.sorts, (sort) => {
-      const tableIdx = this.tables.indexOf(sort.table);
-
-      orders.push(`t${tableIdx}.${sort.field.name} ${(sort.order || 'ASC').toUpperCase()}`);
-    });
-
-    if (orders.length) {
-      sql += `\nORDER BY ${orders.join(', ')}`;
-    }
-
-    return sql;
+    return {
+      _artifacts: tableArtifacts
+    };
   }
 }

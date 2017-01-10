@@ -1,0 +1,26 @@
+<analyze-dialog class="analyze-report-preview">
+  <analyze-dialog-header>
+    <div class="arp-header" layout="row" layout-align="space-between center">
+      <div layout="row" layout-align="center center">
+        <md-button class="arp-header-close-btn"
+                   ng-click="$parent.$ctrl.closeDialog()">
+          <md-icon md-font-icon="icon-remove"></md-icon>
+        </md-button>
+        <div class="md-title">
+          <strong>Untitled Report</strong>
+        </div>
+      </div>
+
+      <div layout="row" layout-align="center center">
+        <md-button>Export</md-button>
+        <md-button class="btn-primary">Publish</md-button>
+      </div>
+    </div>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+    <div layout="column" layout-align="center center">
+      <md-button class="arp-load-more-btn">Load 500 More Rows</md-button>
+    </div>
+  </analyze-dialog-content>
+</analyze-dialog>

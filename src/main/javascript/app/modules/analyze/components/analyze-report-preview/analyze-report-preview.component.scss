@@ -1,0 +1,38 @@
+analyze-report-preview {
+  width: 100%;
+  height: 100%;
+}
+
+.analyze-report-preview {
+  .analyze-dialog {
+    min-height: 100%;
+    min-width: 100%;
+    background-color: #3D3D3D;
+  }
+
+  .arp {
+    &-header {
+      background-color: #3D3D3D;
+      color: #FFF;
+
+      &-close-btn {
+        min-width: 36px;
+        height: 45px;
+        margin: 0;
+
+        md-icon {
+          font-size: 40px;
+        }
+      }
+    }
+
+    &-load-more-btn {
+      width: 200px;
+      background-color: #D8D8D8;
+
+      &:hover {
+        color: #FFF;
+      }
+    }
+  }
+}

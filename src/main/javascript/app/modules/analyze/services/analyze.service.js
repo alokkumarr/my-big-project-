@@ -23,6 +23,8 @@ export function AnalyzeService($http) {
     getArtifacts,
     getDataByQuery,
     getSupportedMethods,
+    generateQuery,
+    saveReport,
     setAvailableMetrics: curry(setAvailableItems)(metricMapper, metricHasSupportedMethod),
     setAvailableAnalysisMethods: curry(setAvailableItems)(analysisMethodMapper, isMethodSupported)
   };
@@ -49,6 +51,14 @@ export function AnalyzeService($http) {
 
   function getDataByQuery() {
     return $http.get('/api/analyze/dataByQuery').then(get('data'));
+  }
+
+  function generateQuery(payload) {
+    return $http.post('/api/analyze/generateQuery', payload).then(get('data'));
+  }
+
+  function saveReport(payload) {
+    return $http.post('/api/analyze/saveReport', payload).then(get('data'));
   }
 
   /**

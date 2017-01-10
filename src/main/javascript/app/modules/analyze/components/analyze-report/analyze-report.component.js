@@ -116,7 +116,7 @@ export const AnalyzeReportComponent = {
 
       this._AnalyzeService.getArtifacts()
         .then(data => {
-          this.canvas.model.precess(data);
+          this.canvas.model.fill(data);
         });
     }
 
@@ -124,8 +124,27 @@ export const AnalyzeReportComponent = {
       this.states.sqlMode = mode;
 
       if (mode === this.QUERY_MODE) {
-        this.data.query = this.canvas.model.generateQuery();
+        this._AnalyzeService.generateQuery({})
+          .then(result => {
+            this.data.query = result.query;
+          });
       }
+    }
+
+    openPreviewModal(ev) {
+      const scope = this._$scope.$new();
+
+      scope.model = {};
+
+      this._$mdDialog
+        .show({
+          template: '<analyze-report-preview model="model"></analyze-report-preview>',
+          targetEvent: ev,
+          fullscreen: true,
+          autoWrap: false,
+          skipHide: true,
+          scope: scope
+        });
     }
 
     openSortModal(ev) {
@@ -144,6 +163,29 @@ export const AnalyzeReportComponent = {
           skipHide: true,
           scope: scope
         });
+    }
+
+    export() {
+
+    }
+
+    save() {
+      if (!this.canvas) {
+        return;
+      }
+
+      this.$dialog.showLoader();
+
+      const payload = this.canvas.model.generatePayload();
+
+      this._AnalyzeService.saveReport(payload)
+        .finally(() => {
+          this.$dialog.hideLoader();
+        });
+    }
+
+    publish() {
+
     }
   }
 };
