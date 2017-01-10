@@ -11,10 +11,6 @@ describe('Analyses Tests', function () {
     login.loginElements.loginBtn.click();
   });*/
 
-  it('navigate to home page', function () {
-    browser.get('http://localhost:3000/');
-    });
-
   it('should navigate to Analyze page', function () {
     header.headerElements.analyzeBtn.click();
     expect(browser.getCurrentUrl()).toContain('/analyze');
@@ -30,4 +26,8 @@ describe('Analyses Tests', function () {
     analyze.validateCard();
   });
 
+  it('should attempt to create a new analysis', function () {
+    analyze.analysisElems.addAnalysisBtn.click();
+    analyze.validateAnalyzeDialog();
+  });
 });
