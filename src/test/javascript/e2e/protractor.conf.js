@@ -1,3 +1,5 @@
+const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
+
 exports.config = {
   framework: 'jasmine2',
   seleniumAddress: 'http://localhost:4444/wd/hub',
@@ -17,18 +19,30 @@ exports.config = {
   },
 
   jasmineNodeOpts: {
-    isVerbose             : true,
+    isVerbose: true,
     defaultTimeoutInterval: 120000,
-    showTiming            : true,
-    includeStackTrace     : true,
-    realtimeFailure       : true,
-    showColors            : true
+    showTiming: true,
+    includeStackTrace: true,
+    realtimeFailure: true,
+    showColors: true
   },
 
   suites: {
     analyses: ['spec/analyses.spec.js']
   },
 
-  baseURL: 'http://localhost:3000'
+  onPrepare: function () {
+    jasmine.getEnv().addReporter(new SpecReporter({
+      displayStacktrace: true,
+      displaySpecDuration: true,
+      displaySuiteNumber: true
+    }));
+
+    browser.manage().timeouts().pageLoadTimeout(10000);
+    browser.manage().timeouts().implicitlyWait(10000);
+    browser.driver.manage().window().maximize();
+    browser.driver.get('http://localhost:3000');
+    browser.sleep(2000);
+  }
 
 };
