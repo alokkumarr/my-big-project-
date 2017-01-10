@@ -335,7 +335,7 @@ function getArtifacts() {
         _alias_name: '',
         _type: 'int',
         _hide: false,
-        _join_eligible: false
+        _join_eligible: true
       },
       {
         _display_name: 'Shipper',
@@ -435,7 +435,7 @@ function getArtifacts() {
         _alias_name: '',
         _type: 'int',
         _hide: false,
-        _join_eligible: false
+        _join_eligible: true
       },
       {
         _display_name: 'Shipper Name',
@@ -521,7 +521,7 @@ function getArtifacts() {
         _alias_name: '',
         _type: 'int',
         _hide: false,
-        _join_eligible: false
+        _join_eligible: true
       },
       {
         _display_name: 'Warehouse Name',
@@ -557,49 +557,58 @@ function getArtifacts() {
 function getDataByQuery() {
   return [
     {
-      customerName: 'Johnson\'s Trucking',
-      price: '$100',
-      name: 'Motion Inc.'
+      CustomerName: 'Johnson\'s Trucking',
+      TotalPrice: 100,
+      ShipperName: 'Motion Inc.',
+      WarehouseName: 'Warehouse1'
     },
     {
-      customerName: 'Lily\'s Trucking',
-      price: '$200',
-      name: 'Motion Inc.'
+      CustomerName: 'Lily\'s Trucking',
+      TotalPrice: 200,
+      ShipperName: 'Motion Inc.',
+      WarehouseName: 'Warehouse1'
     },
     {
-      customerName: 'Advanced Autos',
-      price: '$400',
-      name: 'Motion Inc.'
+      CustomerName: 'Advanced Autos',
+      TotalPrice: 400,
+      ShipperName: 'Motion Inc.',
+      WarehouseName: 'Warehouse2'
     },
     {
-      customerName: 'Advanced Autos',
-      price: '$100',
-      name: 'Granger'
+      CustomerName: 'Advanced Autos',
+      TotalPrice: 100,
+      ShipperName: 'Granger',
+      WarehouseName: 'Warehouse1'
     },
     {
-      customerName: 'Import Tuners',
-      price: '$600',
-      name: 'Granger'
+      CustomerName: 'Import Tuners',
+      TotalPrice: 600,
+      ShipperName: 'Granger',
+      WarehouseName: 'Warehouse1'
     },
     {
-      customerName: 'Johnson\'s Trucking',
-      price: '$700',
-      name: 'Granger'
+      CustomerName: 'Johnson\'s Trucking',
+      TotalPrice: 700,
+      ShipperName: 'Granger',
+      WarehouseName: 'Warehouse2'
     },
     {
-      customerName: 'East Side Auto',
-      price: '$400',
-      name: 'Motion Inc.'
+      CustomerName: 'East Side Auto',
+      TotalPrice: 400,
+      ShipperName: 'Motion Inc.',
+      WarehouseName: 'Warehouse2'
     },
     {
-      customerName: 'North Raven Auto',
-      price: '$800',
-      name: 'Motion Inc.'
+      CustomerName: 'North Raven Auto',
+      TotalPrice: 800,
+      ShipperName: 'Motion Inc.',
+      WarehouseName: 'Warehouse1'
     },
     {
-      customerName: 'Bloomburg Auto Shop',
-      price: '$300',
-      name: 'Motion Inc.'
+      CustomerName: 'Bloomburg Auto Shop',
+      TotalPrice: 300,
+      ShipperName: 'Motion Inc.',
+      WarehouseName: 'Warehouse5'
     }
   ];
 }
