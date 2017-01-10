@@ -4,7 +4,6 @@
 package com.sncr.nsso.app.controller;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.ws.mime.MimeMessage;
 
 import com.google.gson.Gson;
 import com.sncr.nsso.app.properties.NSSOProperties;
@@ -38,10 +36,6 @@ import com.sncr.nsso.common.bean.ResetValid;
 import com.sncr.nsso.common.bean.Ticket;
 import com.sncr.nsso.common.bean.User;
 import com.sncr.nsso.common.bean.Valid;
-import com.sncr.nsso.common.bean.repo.ProductModuleFeature;
-import com.sncr.nsso.common.bean.repo.ProductModuleFeaturePrivileges;
-import com.sncr.nsso.common.bean.repo.ProductModules;
-import com.sncr.nsso.common.bean.repo.Products;
 import com.sncr.nsso.common.util.TicketHelper;
 
 import io.jsonwebtoken.Jwts;
@@ -369,6 +363,19 @@ public class SecurityController {
 		}
 
 		return errorMessage;
+	}
+	
+	/**
+	 * 
+	 * @param validateToken
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/validateToken", method = RequestMethod.POST)
+	public Valid validateToken() {		
+		Valid valid = new Valid();
+		valid.setValid(true);
+		valid.setValidityMessage("Token is valid");
+		return valid;
 	}
 
 	public static void main(String[] args) {

@@ -1,6 +1,8 @@
 package com.sncr.nsso.common.bean;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -16,7 +18,8 @@ import io.jsonwebtoken.SignatureException;
 
 public class JwtFilter extends GenericFilterBean {
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void doFilter(final ServletRequest req,
                          final ServletResponse res,
                          final FilterChain chain) throws IOException, ServletException {
@@ -28,16 +31,38 @@ public class JwtFilter extends GenericFilterBean {
         }
 
         final String token = authHeader.substring(7); // The part after "Bearer "
-
+        Claims claims = null;
+        
+        
         try {
-            final Claims claims = Jwts.parser().setSigningKey("sncrsaw2")
+            claims = Jwts.parser().setSigningKey("sncrsaw2")
                 .parseClaimsJws(token).getBody();
             request.setAttribute("claims", claims);
         }
         catch (final SignatureException e) {
             throw new ServletException("Invalid token.");
         }
-
+        
+        if(!request.getRequestURI().equals("/saw-security/auth/doLogout")) {
+	        Iterator<?> it = ((Map<String, Object>) claims.get("ticket")).entrySet().iterator();
+	        Ticket ticket = new Ticket();
+	        while (it.hasNext()) {
+	            Map.Entry<String, Object> pair = (Map.Entry<String, Object>)it.next();	            
+	            if(pair.getKey().equals("validUpto")){
+	            	 ticket.setValidUpto(Long.parseLong(pair.getValue().toString()));
+	            }
+	            if(pair.getKey().equals("valid"))
+	            {
+	            	 ticket.setValid(Boolean.parseBoolean(pair.getValue().toString()));
+	            }
+	           
+	            it.remove(); // avoids a ConcurrentModificationException
+	        }
+	        if(!ticket.isValid()){
+	            throw new ServletException("Token expired");
+	        }
+        }
+              
         chain.doFilter(req, res);
     }
 
