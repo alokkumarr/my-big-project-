@@ -55,12 +55,19 @@ class UserService {
 
   changePwd(credentials) {
     const route = '/auth/changePassword';
-
+    const token = this._JwtService.get();
+    if (!token) {
+      this.errorMsg = 'Please login to change password';
+      return;
+    }
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace('-', '+').replace('_', '/');
+    const resp = angular.fromJson(this._$window.atob(base64));
     const LoginDetails = {
-      masterLoginId: angular.toJson(this._JwtService.get()).masterLoginId,
-      oldPassword: credentials.oldPwd,
-      newPassword: credentials.newPwd,
-      cnfNewPassword: credentials.confNewPwd
+      masterLoginId: resp.ticket.masterLoginId,
+      oldPassword: credentials.formData.oldPwd,
+      newPassword: credentials.formData.newPwd,
+      cnfNewPassword: credentials.formData.confNewPwd
     };
 
     this._$http.defaults.headers.common.Authorization = 'Bearer ' + this._JwtService.get();
@@ -73,6 +80,43 @@ class UserService {
 
         return res;
       });
+  }
+  
+  preResetPwd(credentials) {
+    const route = '/resetPassword';
+    const productUrl = this._$window.location.protocol + "//" + this._$window.location.host + "/resetPassword" // https://vm-att.com:7070/sncr/#/reset?rhc=hashcode
+       
+    const LoginDetails = {
+	  masterLoginId: credentials.masterLoginId,
+	  productUrl: productUrl
+    };
+    this._$http.defaults.headers.common.Authorization = 'Bearer ' + this._JwtService.get();
+    return this._$http.post(this._AppConfig.login.url + route, LoginDetails)
+	.then(res => {
+      return res;
+	});
+  }
+  
+  resetPwd(credentials) {
+	const route = '/rstChangePassword';
+	const ResetPasswordDetails = {
+	  masterLoginId : credentials.username,
+		newPassword : credentials.newPwd,
+		cnfNewPassword : credentials.confNewPwd
+	};
+	this._$http.defaults.headers.common.Authorization = 'Bearer ' + this._JwtService.get();
+	return this._$http.post(this._AppConfig.login.url + route, ResetPasswordDetails)
+	.then(res => {
+	  return res;
+	});
+  }
+  
+  verify(hashCode){   
+    const route = '/vfyRstPwd';
+	return this._$http.post(this._AppConfig.login.url + route, hashCode)
+	.then(res => {
+	  return res;
+	});
   }
 }
 

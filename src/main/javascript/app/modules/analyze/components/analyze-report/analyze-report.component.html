@@ -104,11 +104,7 @@
           <span>Choose fields above to preview your report.</span>
           <md-icon md-font-icon="icon-report"></md-icon>
         </div>
-
-        <div>
-          <div class="ard_details-grid"
-               dx-data-grid="$ctrl.getGridData()"></div>
-        </div>
+        <report-grid-container class="ard_details-grid" columns=$ctrl.columns data="$ctrl.gridData"></report-grid-container>
       </div>
     </div>
   </analyze-dialog-content>

@@ -16,6 +16,8 @@ import {JwtServiceFactory} from './services/jwt.service';
 
 import {LoginComponent} from './components/login/login.component';
 import {PasswordChangeComponent} from './components/passwordChange/passwordChange.component';
+import {PasswordPreResetComponent} from './components/passwordReset/passwordPreReset.component';
+import {PasswordResetComponent} from './components/passwordReset/passwordReset.component';
 
 export const LoginModule = 'login';
 
@@ -32,4 +34,6 @@ angular
   .factory('UserService', UserServiceFactory)
   .factory('JwtService', JwtServiceFactory)
   .component('passwordChangeComponent', PasswordChangeComponent)
+  .component('passwordPreResetComponent', PasswordPreResetComponent)
+  .component('passwordResetComponent', PasswordResetComponent)
   .component('loginComponent', LoginComponent);

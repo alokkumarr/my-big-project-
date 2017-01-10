@@ -1,0 +1,17 @@
+<md-card style="padding: 20px; height:100%">
+  <div ng-if="$ctrl.modifiedData.isGroup"
+       layout="row" layout-align="end center">
+
+    Grouped by:&nbsp; <strong>{{$ctrl.groupedBy}}</strong>
+
+    <md-button ng-click="$ctrl.undoGrouping()" class="btn-card">Undo</md-button>
+
+    <md-radio-group ng-model="$ctrl.layoutMode"
+                    layout="row" layout-align="end center">
+      <md-radio-button value="{{::$ctrl.LAYOUT_MODE.DETAIL}}">Show Each Row</md-radio-button>
+      <md-radio-button value= "{{::$ctrl.LAYOUT_MODE.SUMMARY}}">Summary View</md-radio-button>
+    </md-radio-group>
+
+  </div>
+  <report-grid-node data="$ctrl.modifiedData" columns="$ctrl.columns" layout-mode="$ctrl.layoutMode"></report-grid-node>
+</md-card>

@@ -11,6 +11,7 @@ import isEqual from 'lodash/fp/isEqual';
 import some from 'lodash/fp/some';
 import set from 'lodash/fp/set';
 import get from 'lodash/fp/get';
+import forEach from 'lodash/fp/forEach';
 
 export function AnalyzeService($http) {
   'ngInject';
@@ -19,7 +20,6 @@ export function AnalyzeService($http) {
     getMenu,
     getMethods,
     getMetrics,
-    getTables,
     getArtifacts,
     getDataByQuery,
     getSupportedMethods,
@@ -41,8 +41,8 @@ export function AnalyzeService($http) {
     return $http.get('/api/analyze/metrics').then(get('data'));
   }
 
-  function getTables() {
-    return $http.get('/api/analyze/tables').then(get('data'));
+  function getArtifacts() {
+    return $http.get('/api/analyze/reportArtifacts').then(get('data'));
   }
 
   function getArtifacts() {
