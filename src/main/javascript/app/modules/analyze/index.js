@@ -1,4 +1,6 @@
 import angular from 'angular';
+import 'angular-ui-grid';
+import 'angular-ui-grid/ui-grid.css';
 
 import {routesConfig} from './routes';
 
@@ -11,12 +13,18 @@ import {AnalyzeNewComponent} from './components/analyze-new/analyze-new.componen
 import {AnalyzeReportComponent} from './components/analyze-report/analyze-report.component';
 import {AnalyzeDialogComponent} from './components/analyze-dialog/analyze-dialog.component';
 import {AnalyzeReportSortComponent} from './components/analyze-report-sort/analyze-report-sort.component';
+import {ReportGridComponent} from './components/analyze-report-grid/report-grid/report-grid.component';
+import {ReportGridNodeComponent} from './components/analyze-report-grid/report-grid-node/report-grid-node.component';
+import {ReportGridContainerComponent} from './components/analyze-report-grid/report-grid-container/report-grid-container.component';
 
 export const AnalyzeModule = 'AnalyzeModule';
 
-angular.module(AnalyzeModule, [])
+angular.module(AnalyzeModule, ['ui.grid'])
   .config(routesConfig)
   .factory('AnalyzeService', AnalyzeService)
+  .component('reportGrid', ReportGridComponent)
+  .component('reportGridNode', ReportGridNodeComponent)
+  .component('reportGridContainer', ReportGridContainerComponent)
   .component('analyzePage', AnalyzePageComponent)
   .component('analyzeView', AnalyzeViewComponent)
   .component('analyzeCard', AnalyzeCardComponent)
