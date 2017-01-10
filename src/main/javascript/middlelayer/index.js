@@ -31,4 +31,12 @@ app.get('/changePwd', (req, res) => {
   res.render('login');
 });
 
+app.get('/preResetPwd', (req, res) => {
+	  res.render('login');
+});
+
+app.get('/resetPassword', (req, res) => {
+	  res.render('login');
+});
+
 app.listen(3000);
