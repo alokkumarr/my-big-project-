@@ -18,6 +18,7 @@ import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.BasicResponseHandler
 import org.apache.http.impl.nio.client.{CloseableHttpAsyncClient, HttpAsyncClients}
 import org.slf4j.{Logger, LoggerFactory}
+import play.api.libs.json.{JsObject, JsValue}
 import play.libs.Json
 import play.mvc.Result
 
@@ -41,13 +42,13 @@ class HTTPRequest(ip:String, port:Int, timeout:Int)
     play.mvc.Results.internalServerError(res)
   }
 
-  def sendESRequest(verb: String, inxName: String, objType: String, query : String) : Result =
+  def sendESRequest(verb: String, inxName: String, objType: Option[String], query : JsValue, source: JsValue) : Result =
   {
     try {
       httpClient.start()
       val req_builder: URIBuilder = new URIBuilder
       req_builder setCharset (Charset.forName("UTF-8"))
-      req_builder setPath ("/" + inxName + "/" + objType + "/" + verb)
+      req_builder setPath ("/" + inxName +  "/" + (if (objType != None ) objType.get + "/" else "" ) + verb)
       req_builder setHost (the_ip)
       req_builder setPort (the_port.toInt)
       req_builder setScheme ("http")
@@ -55,21 +56,25 @@ class HTTPRequest(ip:String, port:Int, timeout:Int)
       m_log.debug(s"Execute ES query: ${req_builder.build().toASCIIString}" )
 
       val future: Future[HttpResponse] =
-      if (query != null &&  !query.isEmpty ) {
+      if (query != null ) {
         val request: HttpGet = new HttpGet(req_builder.build())
         httpClient.execute(request, null)
       }
       else{
         val request: HttpPost = new HttpPost(req_builder.build())
         m_log.debug(s"Add native query to request: ${query}" )
-        request.setEntity(new StringEntity(query))
+        request.setEntity(new StringEntity( play.api.libs.json.Json.stringify(query)))
         httpClient.execute(request, null)
       }
 
       val response: HttpResponse = future.get(timeout, TimeUnit.SECONDS)
-      System.out.println("Response: " + response.getStatusLine())
+      m_log debug s"Response: ${response.getStatusLine()}"
+
       val respHandler = new BasicResponseHandler
-      return play.mvc.Results.ok(respHandler.handleResponse(response))
+      val payload =  play.api.libs.json.Json.parse(respHandler.handleResponse(response))
+
+      val res = source.as[JsObject] + ("data" -> payload.as[JsObject])
+      return play.mvc.Results.ok(play.api.libs.json.Json.stringify(res))
     }
     catch{
       case e:HttpResponseException => return handleFailure("Could not process HTTP response",  e)
