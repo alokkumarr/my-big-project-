@@ -1,12 +1,19 @@
 module.exports = {
   extends: [
+    'xo-space/esnext',
     'angular'
   ],
   globals: {
-    __DEVELOPMENT__: true
+    __DEVELOPMENT__: true,
+    expect: true
   },
   parserOptions: {
     sourceType: 'module'
+  },
+  root: true,
+  env: {
+    browser: true,
+    jasmine: true
   },
   rules: {
     'angular/no-service-method': 2,
