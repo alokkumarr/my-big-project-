@@ -1,0 +1,23 @@
+<analyze-dialog>
+  <analyze-dialog-header layout="row" layout-align="start center" flex="grow">
+    <strong>Description</strong>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+    <md-input-container class="md-block" md-no-float style="margin: 20px 20px 0 20px;">
+          <textarea ng-model="model.description" rows="5" placeholder="Describe this analysis" md-select-on-focus></textarea>
+        </md-input-container>
+  </analyze-dialog-content>
+
+  <analyze-dialog-footer>
+    <div layout="row">
+      <md-button class="btn-primary"
+                 ng-click="save(model.description)">Save Description
+      </md-button>
+
+      <md-button class="btn-card"
+                 ng-click="cancel()">Cancel
+      </md-button>
+    </div>
+  </analyze-dialog-footer>
+</analyze-dialog>

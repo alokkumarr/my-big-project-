@@ -3,6 +3,8 @@ import flatMap from 'lodash/fp/flatMap';
 import pipe from 'lodash/fp/pipe';
 import get from 'lodash/fp/get';
 
+import descriptionTemplate from '../analyze-report-description/analyze-description.tmpl.html';
+import {DescriptionController} from '../analyze-report-description/analyze-description.controller';
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
 
@@ -89,6 +91,25 @@ export const AnalyzeReportComponent = {
           fullscreen: true,
           skipHide: true,
           scope: scope
+        });
+    }
+
+    openDescriptionModal() {
+
+      return this._$mdDialog.show({
+        controller: DescriptionController,
+        template: descriptionTemplate,
+        fullscreen: false,
+        skipHide: true,
+        locals: {description: 'Description...'},
+        clickOutsideToClose:true
+      })
+    }
+
+    editDescription() {
+      this.openDescriptionModal()
+        .then(description => {
+          // console.log(description);
         });
     }
   }
