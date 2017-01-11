@@ -79,7 +79,7 @@
     </div>
 
     <!-- CARD VIEW -->
-    <div ng-switch-when="card" layout="row" layout-wrap>
+    <div ng-switch-when="card" layout="row" layout-align="space-around start" layout-wrap>
       <analyze-card flex="45" ng-repeat="report in $ctrl.reports | filter:$ctrl.filterReports"
                     metadata="report"></analyze-card>
     </div>

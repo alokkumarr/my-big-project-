@@ -49,6 +49,141 @@ export const AnalyzeDataByQuery = {
   }
 };
 
+export const Analyses = {
+  method: 'GET',
+  url: 'api/analyze/analyses',
+  response: () => {
+    return [200, getAnalyses()];
+  }
+};
+
+function getAnalyses() {
+  return [
+    {
+      type: 'chart',
+      name: 'Order Revenue By Customer',
+      metrics: ['Orders', 'Revenue'],
+      scheduled: 'Every Friday at 12:00pm',
+      chart: {
+        options: getTransactionVolumeChartOptions()
+      }
+    },
+    {
+      type: 'report',
+      name: 'Shipper Usage',
+      metrics: ['Orders'],
+      scheduled: 'Daily',
+      report: {
+        options: {
+          dataSource: [{
+            id: 1,
+            shipper: 'Aaron\'s Towing',
+            order: '12bc',
+            total: '$600'
+          }, {
+            id: 2,
+            shipper: 'Aaron\'s Towing',
+            order: '12bd',
+            total: '$650'
+          }, {
+            id: 3,
+            shipper: 'Aaron\'s Towing',
+            order: '12be',
+            total: '$550'
+          }, {
+            id: 4,
+            shipper: 'Aaron\'s Towing',
+            order: '12bf',
+            total: '$700'
+          }],
+          columns: ['shipper', 'order', 'total'],
+          columnAutoWidth: true,
+          showBorders: true,
+          showColumnHeaders: true,
+          showColumnLines: true,
+          showRowLines: true,
+          width: 400,
+          scrolling: {
+            mode: 'virtual'
+          },
+          sorting: {
+            mode: 'none'
+          },
+          paging: {
+            pageSize: 10
+          },
+          pager: {
+            showPageSizeSelector: true,
+            showInfo: true
+          }
+        }
+      }
+    }
+  ];
+}
+
+function getTransactionVolumeChartData() {
+  return [{
+  name: 'Alpha',
+  data: [
+    [0.3, 5],
+    [2.1, 25],
+    [3.5, 10],
+    [4.5, 11],
+    [5.6, 6],
+    [6.5, 21],
+    [7.1, 20],
+    [7.8, 29],
+    [8.7, 35],
+    [9, 29],
+    [9.5, 5],
+    [11.1, 20]
+  ]
+}, {
+  name: 'Bravo',
+  data: [
+    [0.3, 2],
+    [4.8, 13],
+    [6.2, 35],
+    [8.9, 10],
+    [10.6, 22],
+    [11.1, 10]
+  ]
+}];
+}
+function getTransactionVolumeChartOptions() {
+  return {
+    xAxis: {
+      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      startOnTick: true,
+      title: {
+        text: 'Months'
+      }
+    },
+    yAxis: {
+      title: {
+        text: 'Revenue'
+      }
+    },
+    legend: {
+      align: 'right',
+      verticalAlign: 'top',
+      layout: 'vertical',
+      x: 0,
+      y: 100
+    },
+    chart: {
+      type: 'line',
+      marginRight: 120
+    },
+    plotOptions: {
+      line: {
+        pointPlacement: -0.5
+      }
+    },
+    series: getTransactionVolumeChartData()
+  };
+}
 function getMenu() {
   return [
     {
