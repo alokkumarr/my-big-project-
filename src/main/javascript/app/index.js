@@ -4,6 +4,9 @@ import 'angular-ui-router';
 import 'angular-material';
 import 'angular-material/angular-material.css';
 
+import 'angular-ui-grid';
+import 'angular-ui-grid/ui-grid.css';
+
 import 'mottle';
 
 import 'devextreme/ui/data_grid';
@@ -38,6 +41,7 @@ angular
     'ui.router',
     'ngMaterial',
     'dx',
+    'ui.grid',
     LibModule,
     ObserveModule,
     AnalyzeModule,

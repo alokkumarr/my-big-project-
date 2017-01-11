@@ -1,4 +1,16 @@
+const webpackHelper = require('./webpack.helper');
+
+const MODULE_DIR = 'node_modules';
+
 module.exports = {
+  resolve: {
+    modules: [
+      MODULE_DIR,
+      webpackHelper.root('src/main/javascript')
+    ],
+    extensions: ['', '.js']
+  },
+
   module: {
     preLoaders: [
       {
@@ -11,27 +23,13 @@ module.exports = {
     loaders: [
       {
         test: /.json$/,
-        loaders: [
-          'json'
-        ]
+        loaders: 'json'
       },
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loaders: [
-          'ng-annotate',
-          'babel'
-        ]
-      },
-      {
-        test: /.html$/,
-        loaders: [
-          'html'
-        ]
+        loaders: 'ng-annotate!babel'
       }
     ]
-  },
-  plugins: [],
-  debug: true,
-  devtool: 'source-map'
+  }
 };

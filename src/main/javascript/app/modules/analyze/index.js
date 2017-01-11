@@ -1,6 +1,4 @@
 import angular from 'angular';
-import 'angular-ui-grid';
-import 'angular-ui-grid/ui-grid.css';
 
 import {routesConfig} from './routes';
 
@@ -20,7 +18,7 @@ import {ReportGridContainerComponent} from './components/analyze-report-grid/rep
 
 export const AnalyzeModule = 'AnalyzeModule';
 
-angular.module(AnalyzeModule, ['ui.grid'])
+angular.module(AnalyzeModule, [])
   .config(routesConfig)
   .factory('AnalyzeService', AnalyzeService)
   .component('reportGrid', ReportGridComponent)

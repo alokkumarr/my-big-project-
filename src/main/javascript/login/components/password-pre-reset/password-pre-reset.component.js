@@ -1,4 +1,4 @@
-import template from './passwordPreReset.component.html';
+import template from './password-pre-reset.component.html';
 
 export const PasswordPreResetComponent = {
   template,
@@ -14,8 +14,8 @@ export const PasswordPreResetComponent = {
       const token = this._JwtService.get();
       this._UserService.preResetPwd(this.dataHolder)
         .then(res => {
-           this.errorMsg = res.data.validityMessage;
-      });      
+          this.errorMsg = res.data.validityMessage;
+        });
     }
 
     login() {

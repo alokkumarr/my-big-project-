@@ -22,20 +22,20 @@ export function routesConfig($stateProvider, $urlRouterProvider, $locationProvid
       }
     },
     {
-        name: 'preResetPassword',
-        url: '/preResetPwd',
-        component: 'passwordPreResetComponent',
-        data: {
-          title: 'Reset Password'
-        }
+      name: 'preResetPassword',
+      url: '/preResetPwd',
+      component: 'passwordPreResetComponent',
+      data: {
+        title: 'Reset Password'
+      }
     },
     {
-        name: 'resetPassword',
-        url: '/resetPassword',
-        component: 'passwordResetComponent',
-        data: {
-          title: 'Reset Password'
-        }
+      name: 'resetPassword',
+      url: '/resetPassword',
+      component: 'passwordResetComponent',
+      data: {
+        title: 'Reset Password'
+      }
     }
   ];
 

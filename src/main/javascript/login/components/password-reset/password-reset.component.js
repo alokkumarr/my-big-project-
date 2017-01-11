@@ -1,4 +1,4 @@
-import template from './passwordReset.component.html';
+import template from './password-reset.component.html';
 
 export const PasswordResetComponent = {
   template,
@@ -7,25 +7,23 @@ export const PasswordResetComponent = {
       'ngInject';
       this._$window = $window;
       this._JwtService = JwtService;
-      this._UserService = UserService;     
+      this._UserService = UserService;
     }
-      
+
     $onInit() {
-      if(this._$window.location.href.indexOf('/resetPassword?rhc') != -1){
+      if (this._$window.location.href.indexOf('/resetPassword?rhc') != -1) {
         const hashCode = this._$window.location.href;
         const rhc = hashCode.split('rhc=')[1];
         const rData = {
-          rhc:rhc
+          rhc: rhc
         }
-        this._UserService.verify(rData).then(res => {          
-          if (res.data.valid)
-	      {
-        	  this.username = res.data.masterLoginID;
-	      }
-	      else
-	      {
-	         this.errorMsg = res.data.validityReason + ". Please regenerate the link once again";
-	      }
+        this._UserService.verify(rData).then(res => {
+          if (res.data.valid) {
+            this.username = res.data.masterLoginID;
+          }
+          else {
+            this.errorMsg = res.data.validityReason + ". Please regenerate the link once again";
+          }
         });
       }
     }
@@ -33,8 +31,8 @@ export const PasswordResetComponent = {
     resetPwd() {
       this._UserService.resetPwd(this)
         .then(res => {
-           this.errorMsg = res.data.validityMessage;
-      });      
+          this.errorMsg = res.data.validityMessage;
+        });
     }
 
     login() {
