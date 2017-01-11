@@ -1,3 +1,5 @@
+$chart-placeholder-path: '../../../../../../../../assets/chart-placeholder.png';
+
 .analyze-card {
   md-card-content {
     padding: 24px;
@@ -31,7 +33,15 @@
   }
 
   &_label {
+    display: inline-flex;
     background-color: #CCC;
     padding: 3px 5px;
+  }
+
+  .chart-placeholder {
+    background-image: url($chart-placeholder-path);
+    height: 159px;
+    width: 434px;
+    background-size: 434px 159px;
   }
 }
