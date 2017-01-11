@@ -1,3 +1,5 @@
+import find from 'lodash/find';
+
 export const JSPlumbConnector = {
   bindings: {
     model: '<'
@@ -37,12 +39,20 @@ export const JSPlumbConnector = {
       const rightEndpoint = rightSide.field.addEndpoint(rightSide.side);
 
       this._$timeout(() => {
-        this.connection = this._jsPlumbInst.connect({
-          uuids: [
-            leftEndpoint.getIdentifier(),
-            rightEndpoint.getIdentifier()
-          ]
-        });
+        if (!leftEndpoint.component.endpoint.isConnectedTo(rightEndpoint.component.endpoint)) {
+          this.connection = this._jsPlumbInst.connect({
+            uuids: [
+              leftEndpoint.getIdentifier(),
+              rightEndpoint.getIdentifier()
+            ]
+          });
+        } else {
+          this.connection = find(leftEndpoint.component.endpoint.connections, conn => {
+            return rightEndpoint.component.endpoint.connections.indexOf(conn) !== -1;
+          });
+        }
+
+        this.connection.setParameter('component', this);
 
         this.addJoinLabel();
       }, 300);
@@ -56,7 +66,9 @@ export const JSPlumbConnector = {
     }
 
     addOverlay(config) {
-      this.connection.addOverlay(config);
+      if (this.connection) {
+        this.connection.addOverlay(config);
+      }
     }
 
     addJoinLabel() {

@@ -14,10 +14,12 @@ export const JSPlumbCanvas = {
     id: '@'
   },
   controller: class JSPlumbCanvasCtrl {
-    constructor($componentHandler, $element) {
+    constructor($componentHandler, $eventHandler, $element, $scope) {
       'ngInject';
       this._$componentHandler = $componentHandler;
+      this._$eventHandler = $eventHandler;
       this._$element = $element;
+      this._$scope = $scope;
 
       this.model = new CanvasModel();
       this._settings = JS_PLUMB_DEFAULT_SETTINGS;
@@ -58,10 +60,52 @@ export const JSPlumbCanvas = {
             }, {
               table: targetField.table.name,
               field: targetField.name,
-              side: targetEndpointInst.model.type
+              side: targetEndpointInst.model.side
             });
+
+            this._$scope.$apply();
           }
         }
+      });
+
+      this._jsPlumbInst.bind('connectionDetached', info => {
+        const connComponent = info.connection.getParameter('component');
+
+        connComponent._canvas.removeJoin(connComponent.model);
+      });
+
+      this._jsPlumbInst.bind('connectionMoved', info => {
+        if (info.newSourceId === info.originalSourceId && info.newTargetId === info.originalTargetId) {
+          return;
+        }
+
+        const connComponent = info.connection.getParameter('component');
+
+        const type = connComponent.model.type;
+
+        connComponent._canvas.removeJoin(connComponent.model);
+
+        const sourceEndpointInst = info.newSourceEndpoint.getParameter('component');
+        const targetEndpointInst = info.newTargetEndpoint.getParameter('component');
+
+        if (sourceEndpointInst && targetEndpointInst) {
+          const sourceField = sourceEndpointInst.model.field;
+          const targetField = targetEndpointInst.model.field;
+
+          join = this.model.addJoin(type, {
+            table: sourceField.table.name,
+            field: sourceField.name,
+            side: sourceEndpointInst.model.side
+          }, {
+            table: targetField.table.name,
+            field: targetField.name,
+            side: targetEndpointInst.model.side
+          });
+
+          this._$scope.$apply();
+        }
+
+        debugger;
       });
     }
 

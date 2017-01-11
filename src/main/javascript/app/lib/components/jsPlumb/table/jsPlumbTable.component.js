@@ -45,6 +45,10 @@ export const JSPlumbTable = {
     }
 
     onFieldMouseDown($event, field) {
+      if (!field.isJoinEligible) {
+        return;
+      }
+
       const itemListXMiddle = $event.target.offsetWidth / 2;
       const side = itemListXMiddle > $event.offsetX ? 'left' : 'right';
 

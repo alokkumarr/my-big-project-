@@ -1,28 +1,26 @@
-@import "components/buttons";
-@import "components/form";
-@import "components/sidebars";
-@import "components/toolbars";
-@import "components/dropdowns";
-@import "components/left-sidenav";
-@import "components/tags";
-@import "components/range-slider";
 @import "components/badge";
-@import "components/modals";
+@import "components/buttons";
 @import "components/cards";
-@import "components/datepicker";
+@import "components/choice-group";
 @import "components/collapse";
+@import "components/datepicker";
+@import "components/dropdowns";
+@import "components/form";
+@import "components/left-sidenav";
+@import "components/modals";
+@import "components/range-slider";
+@import "components/sidebars";
+@import "components/tags";
+@import "components/toolbars";
 
 @import "app/alerts";
-@import "app/typography";
-@import "app/toolbars";
-@import "app/search";
-@import "app/table-cards";
-@import "app/grid";
 @import "app/cards";
 @import "app/charts";
+@import "app/grid";
 @import "app/icons";
+@import "app/layout";
 @import "app/login";
-
-@import "../../src/main/javascript/app/lib/components/choice-group/choice-group";
-
-@import "../../src/main/javascript/app/layout/layout";
+@import "app/search";
+@import "app/table-cards";
+@import "app/toolbars";
+@import "app/typography";

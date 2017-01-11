@@ -49,6 +49,22 @@ export const AnalyzeDataByQuery = {
   }
 };
 
+export const AnalyzeGenerateQuery = {
+  method: 'POST',
+  url: '/api/analyze/generateQuery',
+  response: () => {
+    return [200, generateQuery()];
+  }
+};
+
+export const AnalyzeSaveReport = {
+  method: 'POST',
+  url: '/api/analyze/saveReport',
+  response: () => {
+    return [200, saverReport()];
+  }
+};
+
 function getMenu() {
   return [
     {
@@ -327,226 +343,254 @@ function getArtifacts() {
   const artifacts = [];
 
   artifacts.push({
-    _artifact_name: 'Orders',
-    _artifact_attributes: [
+    artifact_name: 'Orders',
+    artifact_position: [5, 130],
+    artifact_attributes: [
       {
-        _display_name: 'Order ID',
-        '_actual_col-name': 'OrderID',
-        _alias_name: '',
-        _type: 'int',
-        _hide: false,
-        _join_eligible: true
+        display_name: 'Order ID',
+        column_name: 'OrderID',
+        alias_name: '',
+        type: 'int',
+        hide: true,
+        join_eligible: true,
+        filter_eligible: false,
+        checked: false
       },
       {
-        _display_name: 'Shipper',
-        '_actual_col-name': 'Shipper',
-        _alias_name: '',
-        _type: 'string',
-        _hide: false,
-        _join_eligible: false
+        display_name: 'Shipper',
+        column_name: 'Shipper',
+        alias_name: '',
+        type: 'int',
+        hide: false,
+        join_eligible: true,
+        filter_eligible: false,
+        checked: false
       },
       {
-        _display_name: 'Customer',
-        '_actual_col-name': 'Customer',
-        _alias_name: '',
-        _type: 'string',
-        _hide: false,
-        _join_eligible: false
+        display_name: 'Customer',
+        column_name: 'Customer',
+        alias_name: '',
+        type: 'int',
+        hide: false,
+        join_eligible: true,
+        filter_eligible: false,
+        checked: false
       },
       {
-        _display_name: 'Total Price',
-        '_actual_col-name': 'TotalPrice',
-        _alias_name: '',
-        _type: 'int',
-        _hide: false,
-        _join_eligible: false
+        display_name: 'Total Price',
+        column_name: 'TotalPrice',
+        alias_name: '',
+        type: 'int',
+        hide: false,
+        join_eligible: false,
+        filter_eligible: true,
+        checked: false
       },
       {
-        _display_name: 'Warehouse',
-        '_actual_col-name': 'Warehouse',
-        _alias_name: '',
-        _type: 'string',
-        _hide: false,
-        _join_eligible: false
+        display_name: 'Warehouse',
+        column_name: 'Warehouse',
+        alias_name: '',
+        type: 'int',
+        hide: false,
+        join_eligible: true,
+        filter_eligible: false,
+        checked: false
       },
       {
-        _display_name: 'Address',
-        '_actual_col-name': 'Address',
-        _alias_name: '',
-        _type: 'string',
-        _hide: false,
-        _join_eligible: false
+        display_name: 'Address',
+        column_name: 'Address',
+        alias_name: 'Order Address',
+        type: 'string',
+        hide: false,
+        join_eligible: false,
+        filter_eligible: false,
+        checked: false
       }
     ],
-    _artifact_position: [5, 130],
-    _sql_builder: {
-      _group_by_columns: [],
-      _order_by_columns: [{
-        'col-name': 'OrderID',
-        order: 'asc'
-      }],
+    sql_builder: {
+      group_by_columns: [],
+      order_by_columns: [],
       joins: [
         {
           type: 'inner',
           criteria: [{
-            'table-name': 'Orders',
-            'column-name': 'Shipper',
+            table_name: 'Orders',
+            column_name: 'Shipper',
             side: 'right'
           }, {
-            'table-name': 'Shippers',
-            'column-name': 'ShipperID',
+            table_name: 'Shippers',
+            column_name: 'ShipperID',
             side: 'left'
           }]
         },
         {
           type: 'inner',
           criteria: [{
-            'table-name': 'Orders',
-            'column-name': 'Customer',
+            table_name: 'Orders',
+            column_name: 'Customer',
             side: 'right'
           }, {
-            'table-name': 'Customers',
-            'column-name': 'CustomerID',
+            table_name: 'Customers',
+            column_name: 'CustomerID',
             side: 'left'
           }]
         },
         {
           type: 'inner',
           criteria: [{
-            'table-name': 'Orders',
-            'column-name': 'Warehouse',
+            table_name: 'Orders',
+            column_name: 'Warehouse',
             side: 'right'
           }, {
-            'table-name': 'Warehouses',
-            'column-name': 'WarehouseID',
+            table_name: 'Warehouses',
+            column_name: 'WarehouseID',
             side: 'left'
           }]
+        }
+      ],
+      filters: [
+        {
+          column_name: 'TotalPrice',
+          boolean_criteria: 'AND',
+          operator: '>=',
+          search_conditions: [1]
         }
       ]
     }
   });
 
   artifacts.push({
-    _artifact_name: 'Shippers',
-    _artifact_attributes: [
+    artifact_name: 'Shippers',
+    artifact_position: [400, 5],
+    artifact_attributes: [
       {
-        _display_name: 'Shipper ID',
-        '_actual_col-name': 'ShipperID',
-        _alias_name: '',
-        _type: 'int',
-        _hide: false,
-        _join_eligible: true
+        display_name: 'Shipper ID',
+        column_name: 'ShipperID',
+        alias_name: '',
+        type: 'int',
+        hide: false,
+        join_eligible: true,
+        filter_eligible: false,
+        checked: false
       },
       {
-        _display_name: 'Shipper Name',
-        '_actual_col-name': 'ShipperName',
-        _alias_name: '',
-        _type: 'string',
-        _hide: false,
-        _join_eligible: false
+        display_name: 'Shipper Name',
+        column_name: 'ShipperName',
+        alias_name: '',
+        type: 'string',
+        hide: false,
+        join_eligible: false,
+        filter_eligible: true,
+        checked: false
       },
       {
-        _display_name: 'Region',
-        '_actual_col-name': 'Region',
-        _alias_name: '',
-        _type: 'string',
-        _hide: false,
-        _join_eligible: false
+        display_name: 'Region',
+        column_name: 'Region',
+        alias_name: 'Shipper Region',
+        type: 'string',
+        hide: false,
+        join_eligible: false,
+        filter_eligible: false,
+        checked: false
       }
     ],
-    _artifact_position: [400, 5],
-    _sql_builder: {
-      _group_by_columns: [],
-      _order_by_columns: [{
-        'col-name': 'ShipperID',
-        order: 'asc'
-      }],
+    sql_builder: {
+      group_by_columns: [],
+      order_by_columns: [],
       joins: []
     }
   });
 
   artifacts.push({
-    _artifact_name: 'Customers',
-    _artifact_attributes: [
+    artifact_name: 'Customers',
+    artifact_position: [400, 200],
+    artifact_attributes: [
       {
-        _display_name: 'Customer ID',
-        '_actual_col-name': 'CustomerID',
-        _alias_name: '',
-        _type: 'int',
-        _hide: false,
-        _join_eligible: false
+        display_name: 'Customer ID',
+        column_name: 'CustomerID',
+        alias_name: '',
+        type: 'int',
+        hide: false,
+        join_eligible: true,
+        filter_eligible: false,
+        checked: false
       },
       {
-        _display_name: 'Customer Name',
-        '_actual_col-name': 'CustomerName',
-        _alias_name: '',
-        _type: 'string',
-        _hide: false,
-        _join_eligible: false
+        display_name: 'Customer Name',
+        column_name: 'CustomerName',
+        alias_name: '',
+        type: 'string',
+        hide: false,
+        join_eligible: false,
+        filter_eligible: true,
+        checked: false
       },
       {
-        _display_name: 'Address',
-        '_actual_col-name': 'Address',
-        _alias_name: '',
-        _type: 'string',
-        _hide: false,
-        _join_eligible: false
+        display_name: 'Address',
+        column_name: 'Address',
+        alias_name: 'Customer Address',
+        type: 'string',
+        hide: false,
+        join_eligible: false,
+        filter_eligible: false,
+        checked: false
       },
       {
-        _display_name: 'Phone Number',
-        '_actual_col-name': 'PhoneNumber',
-        _alias_name: '',
-        _type: 'string',
-        _hide: false,
-        _join_eligible: false
+        display_name: 'Phone Number',
+        column_name: 'PhoneNumber',
+        alias_name: 'Customer Phone Number',
+        type: 'string',
+        hide: false,
+        join_eligible: false,
+        filter_eligible: false,
+        checked: false
       }
     ],
-    _artifact_position: [400, 200],
-    _sql_builder: {
-      _group_by_columns: [],
-      _order_by_columns: [{
-        'col-name': 'CustomerID',
-        order: 'asc'
-      }],
+    sql_builder: {
+      group_by_columns: [],
+      order_by_columns: [],
       joins: []
     }
   });
 
   artifacts.push({
-    _artifact_name: 'Warehouses',
-    _artifact_attributes: [
+    artifact_name: 'Warehouses',
+    artifact_position: [350, 420],
+    artifact_attributes: [
       {
-        _display_name: 'Warehouse ID',
-        '_actual_col-name': 'WarehouseID',
-        _alias_name: '',
-        _type: 'int',
-        _hide: false,
-        _join_eligible: true
+        display_name: 'Warehouse ID',
+        column_name: 'WarehouseID',
+        alias_name: '',
+        type: 'int',
+        hide: false,
+        join_eligible: true,
+        filter_eligible: false,
+        checked: false
       },
       {
-        _display_name: 'Warehouse Name',
-        '_actual_col-name': 'WarehouseName',
-        _alias_name: '',
-        _type: 'string',
-        _hide: false,
-        _join_eligible: false
+        display_name: 'Warehouse Name',
+        column_name: 'WarehouseName',
+        alias_name: '',
+        type: 'string',
+        hide: false,
+        join_eligible: false,
+        filter_eligible: true,
+        checked: false
       },
       {
-        _display_name: 'Warehouse Address',
-        '_actual_col-name': 'WarehouseAddress',
-        _alias_name: '',
-        _type: 'string',
-        _hide: false,
-        _join_eligible: false
+        display_name: 'Warehouse Address',
+        column_name: 'WarehouseAddress',
+        alias_name: '',
+        type: 'string',
+        hide: false,
+        join_eligible: false,
+        filter_eligible: false,
+        checked: false
       }
     ],
-    _artifact_position: [350, 420],
-    _sql_builder: {
-      _group_by_columns: [],
-      _order_by_columns: [{
-        'col-name': 'WarehouseID',
-        order: 'asc'
-      }],
+    sql_builder: {
+      group_by_columns: [],
+      order_by_columns: [],
       joins: []
     }
   });
@@ -611,4 +655,16 @@ function getDataByQuery() {
       WarehouseName: 'Warehouse5'
     }
   ];
+}
+
+function generateQuery() {
+  return {
+    query: 'SELECT ORDER_NAME FROM ORDERS'
+  };
+}
+
+function saverReport() {
+  return {
+    success: true
+  };
 }
