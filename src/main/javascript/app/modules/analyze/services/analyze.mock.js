@@ -342,6 +342,7 @@ function getTables() {
 function getArtifacts() {
   const artifacts = [];
 
+  /* eslint-disable camelcase */
   artifacts.push({
     artifact_name: 'Orders',
     artifact_position: [5, 130],
@@ -594,6 +595,7 @@ function getArtifacts() {
       joins: []
     }
   });
+  /* eslint-enable camelcase */
 
   return artifacts;
 }

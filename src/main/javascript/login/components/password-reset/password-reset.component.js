@@ -11,18 +11,17 @@ export const PasswordResetComponent = {
     }
 
     $onInit() {
-      if (this._$window.location.href.indexOf('/resetPassword?rhc') != -1) {
+      if (this._$window.location.href.indexOf('/resetPassword?rhc') !== -1) {
         const hashCode = this._$window.location.href;
         const rhc = hashCode.split('rhc=')[1];
         const rData = {
-          rhc: rhc
-        }
+          rhc
+        };
         this._UserService.verify(rData).then(res => {
           if (res.data.valid) {
             this.username = res.data.masterLoginID;
-          }
-          else {
-            this.errorMsg = res.data.validityReason + ". Please regenerate the link once again";
+          } else {
+            this.errorMsg = res.data.validityReason + '. Please regenerate the link once again';
           }
         });
       }

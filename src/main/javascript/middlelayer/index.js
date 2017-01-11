@@ -7,8 +7,8 @@ const dist = path.join(process.cwd(), '/dist');
 app.set('view engine', 'html');
 app.set('views', dist);
 
-app.engine('html', function (path, options, fn) {
-  fs.readFile(path, 'utf8', function (err, data) {
+app.engine('html', (path, options, fn) => {
+  fs.readFile(path, 'utf8', (err, data) => {
     if (err) {
       return fn(err);
     }
@@ -32,11 +32,11 @@ app.get('/changePwd', (req, res) => {
 });
 
 app.get('/preResetPwd', (req, res) => {
-	  res.render('login');
+  res.render('login');
 });
 
 app.get('/resetPassword', (req, res) => {
-	  res.render('login');
+  res.render('login');
 });
 
 app.listen(3000);

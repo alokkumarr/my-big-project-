@@ -8,10 +8,13 @@ export const PasswordPreResetComponent = {
       this._$window = $window;
       this._JwtService = JwtService;
       this._UserService = UserService;
+
+      this.dataHolder = {
+        masterLoginId: null
+      };
     }
 
     resetPwd() {
-      const token = this._JwtService.get();
       this._UserService.preResetPwd(this.dataHolder)
         .then(res => {
           this.errorMsg = res.data.validityMessage;

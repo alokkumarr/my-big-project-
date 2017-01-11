@@ -22,6 +22,7 @@ export class CanvasModel {
     this.cleanGroups();
     this.cleanFilters();
 
+    /* eslint-disable camelcase */
     forEach(data, itemA => {
       const table = this.addTable(itemA.artifact_name);
 
@@ -36,9 +37,9 @@ export class CanvasModel {
         field.alias = itemB.alias_name;
         field.type = itemB.type;
         field.checked = itemB.checked;
-        field.isHidden = !!itemB.hide;
-        field.isJoinEligible = !!itemB.join_eligible;
-        field.isFilterEligible = !!itemB.filter_eligible;
+        field.isHidden = Boolean(itemB.hide);
+        field.isJoinEligible = Boolean(itemB.join_eligible);
+        field.isFilterEligible = Boolean(itemB.filter_eligible);
       });
     });
 
@@ -75,18 +76,6 @@ export class CanvasModel {
         });
       });
 
-      filters: [
-        {
-          column_name: 'col2',
-          boolean_criteria: 'AND',
-          operator: '=',
-          search_conditions: [
-            'abc',
-            'def'
-          ]
-        }
-      ]
-
       forEach(itemA.sql_builder.filters, itemB => {
         this.addFilter({
           table: itemA.artifact_name,
@@ -97,6 +86,7 @@ export class CanvasModel {
         });
       });
     });
+    /* eslint-enable camelcase */
   }
 
   cleanGroups() {
@@ -213,7 +203,8 @@ export class CanvasModel {
   generatePayload() {
     const tableArtifacts = [];
 
-    forEach(this.tables, (table, idx) => {
+    /* eslint-disable camelcase */
+    forEach(this.tables, table => {
       const tableArtifact = {
         artifact_name: table.name,
         artifact_position: [table.x, table.y],
@@ -225,7 +216,7 @@ export class CanvasModel {
           filters: []
         },
         data: []
-      }
+      };
 
       tableArtifacts.push(tableArtifact);
 
@@ -305,6 +296,7 @@ export class CanvasModel {
         tableArtifact.sql_builder.filters.push(filterArtifact);
       });
     });
+    /* eslint-enable camelcase */
 
     return {
       _artifacts: tableArtifacts

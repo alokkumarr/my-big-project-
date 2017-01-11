@@ -44,7 +44,7 @@ export const ReportGridComponent = {
         columnDefs: this.getCulomnDefs(this.columns),
         minRowsToShow: (this.settings || {}).minRowsToShow || MIN_ROWS_TO_SHOW,
         enableHorizontalScrollbar: this._uiGridConstants.scrollbars.NEVER,
-        onRegisterApi: (gridApi) => {
+        onRegisterApi: gridApi => {
           this.gridApi = gridApi;
         }
       };
@@ -161,7 +161,7 @@ export const ReportGridComponent = {
         this.config.showColumnFooter = true;
         this.gridApi.core.notifyDataChange(this._uiGridConstants.dataChange.OPTIONS);
       }
-    };
+    }
 
     modifyColumnDef(columnName, modifierObj) {
       const index = findIndex(this.config.columnDefs, columnDef => columnDef.name === columnName);

@@ -84,11 +84,11 @@ class UserService {
 
   preResetPwd(credentials) {
     const route = '/resetPassword';
-    const productUrl = this._$window.location.protocol + "//" + this._$window.location.host + "/resetPassword" // https://vm-att.com:7070/sncr/#/reset?rhc=hashcode
+    const productUrl = this._$window.location.protocol + '//' + this._$window.location.host + '/resetPassword'; // https://vm-att.com:7070/sncr/#/reset?rhc=hashcode
 
     const LoginDetails = {
       masterLoginId: credentials.masterLoginId,
-      productUrl: productUrl
+      productUrl
     };
     this._$http.defaults.headers.common.Authorization = 'Bearer ' + this._JwtService.get();
     return this._$http.post(this._AppConfig.login.url + route, LoginDetails)

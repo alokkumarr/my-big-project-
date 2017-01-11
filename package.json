@@ -5,11 +5,11 @@
     "build": "webpack --config conf/webpack.prod.js --progress --profile --bail",
     "start": "webpack-dev-server --config conf/webpack.dev.js",
     "start:prod": "webpack-dev-server --config conf/webpack.prod.js",
-    "styleguide": "webpack-dev-server --config conf/styleguide.dev.js",
+    "styleguide": "webpack-dev-server --config conf/webpack.styleguide.js",
     "test": "karma start conf/karma.conf.js --single-run",
     "test:watch": "karma start conf/karma.conf.js --watch",
     "express": "node src/main/javascript/middlelayer/index.js",
-    "pre_commit": "npm run lint",
+    "precommit": "npm run lint",
     "lint": "eslint -c .eslintrc.js --ext .js ./src",
     "lint:fix": "npm run lint -- --fix"
   },

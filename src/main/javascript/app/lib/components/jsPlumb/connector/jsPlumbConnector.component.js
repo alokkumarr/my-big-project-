@@ -82,7 +82,7 @@ export const JSPlumbConnector = {
       const el = this._$compile(html)(scope);
 
       this.addOverlay(['Custom', {
-        create: connection => {
+        create: () => {
           return el;
         },
         location: 0.5
@@ -93,4 +93,4 @@ export const JSPlumbConnector = {
       this._canvas.removeJoin(this.model);
     }
   }
-}
+};

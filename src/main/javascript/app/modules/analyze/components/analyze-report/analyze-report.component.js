@@ -113,7 +113,7 @@ export const AnalyzeReportComponent = {
           fullscreen: true,
           autoWrap: false,
           skipHide: true,
-          scope: scope
+          scope
         });
     }
 
@@ -131,7 +131,7 @@ export const AnalyzeReportComponent = {
           targetEvent: ev,
           fullscreen: true,
           skipHide: true,
-          scope: scope
+          scope
         });
     }
 
