@@ -23,7 +23,8 @@ export const ReportGridComponent = {
   },
   bindings: {
     data: '<',
-    columns: '<'
+    columns: '<',
+    settings: '<'
   },
   controller: class ReportGridController {
     constructor(uiGridConstants, $mdDialog) {
@@ -36,14 +37,15 @@ export const ReportGridComponent = {
       this.gridStyle = {
         width: `${this.getVisibleCulomsFilter()(this.columns).length * COLUMN_WIDTH}px`
       };
+
       this.config = {
         showColumnFooter: false,
         data: this.data,
         columnDefs: this.getCulomnDefs(this.columns),
-        minRowsToShow: MIN_ROWS_TO_SHOW,
+        minRowsToShow: (this.settings || {}).minRowsToShow || MIN_ROWS_TO_SHOW,
         enableHorizontalScrollbar: this._uiGridConstants.scrollbars.NEVER,
         onRegisterApi: (gridApi) => {
-            this.gridApi = gridApi;
+          this.gridApi = gridApi;
         }
       };
     }
@@ -52,8 +54,9 @@ export const ReportGridComponent = {
       return pipe(
         this.getVisibleCulomsFilter(),
         map(column => {
-          const displayName = column.alias || column.display;
+          const displayName = column.getDisplayName();
           const columnName = column.name;
+
           return {
             width: COLUMN_WIDTH,
             name: columnName,
@@ -103,7 +106,7 @@ export const ReportGridComponent = {
           title: `Show Max`,
           icon: 'icon-MAX',
           action: () => this.showMax(columnName)
-          }]);
+        }]);
       }
 
       return menuItems;
@@ -121,7 +124,7 @@ export const ReportGridComponent = {
           });
           // rename in data
           this.reporGridContainerCtrl.rename(columnName, newName);
-      });
+        });
     }
 
     hideColumn(columnName) {
@@ -172,7 +175,7 @@ export const ReportGridComponent = {
           template: renameTemplate,
           fullscreen: false,
           skipHide: true,
-          clickOutsideToClose:true
+          clickOutsideToClose: true
         });
     }
   }

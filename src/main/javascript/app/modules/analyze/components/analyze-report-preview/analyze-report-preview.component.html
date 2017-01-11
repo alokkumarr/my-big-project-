@@ -19,8 +19,17 @@
   </analyze-dialog-header>
 
   <analyze-dialog-content>
+    <report-grid-container
+      id="arp-grid-container"
+      columns="$ctrl.model.columns"
+      data="$ctrl.model.gridData"
+      settings="$ctrl.settings">
+    </report-grid-container>
+
     <div layout="column" layout-align="center center">
-      <md-button class="arp-load-more-btn">Load 500 More Rows</md-button>
+      <md-button class="arp-load-more-btn"
+                 ng-click="$ctrl.loadMore()">Load 500 More Rows
+      </md-button>
     </div>
   </analyze-dialog-content>
 </analyze-dialog>

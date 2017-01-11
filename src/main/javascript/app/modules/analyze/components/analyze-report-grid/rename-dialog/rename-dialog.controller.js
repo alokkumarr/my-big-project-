@@ -1,13 +1,13 @@
 export function RenameDialogController($scope, $mdDialog) {
   'ngInject';
 
-    $scope.model = {};
+  $scope.model = {};
 
-    $scope.cancel = () => {
-      $mdDialog.cancel();
-    };
+  $scope.cancel = () => {
+    $mdDialog.cancel();
+  };
 
-    $scope.rename = newName => {
-      $mdDialog.hide(newName);
-    };
-  }
+  $scope.rename = newName => {
+    $mdDialog.hide(newName);
+  };
+}

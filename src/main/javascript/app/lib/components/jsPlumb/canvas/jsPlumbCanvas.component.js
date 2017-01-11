@@ -14,9 +14,10 @@ export const JSPlumbCanvas = {
     id: '@'
   },
   controller: class JSPlumbCanvasCtrl {
-    constructor($componentHandler, $element, $scope) {
+    constructor($componentHandler, $eventHandler, $element, $scope) {
       'ngInject';
       this._$componentHandler = $componentHandler;
+      this._$eventHandler = $eventHandler;
       this._$element = $element;
       this._$scope = $scope;
 

@@ -15,7 +15,8 @@
           hide: false,
           join_eligible: false,
           filter_eligible: false,
-          checked: false
+          checked: false,
+          index: 0
         }
       ],
       sql_builder: {

@@ -11,7 +11,7 @@ export class FieldModel {
     this.displayName = '';
     this.alias = '';
     this.type = 'string';
-    this.checked = false;
+    this._checked = false;
     this.isHidden = false;
     this.isJoinEligible = false;
     this.isFilterEligible = false;
@@ -31,6 +31,15 @@ export class FieldModel {
 
   show() {
     this.isHidden = false;
+  }
+
+  get checked() {
+    return this._checked;
+  }
+
+  set checked(val) {
+    this._checked = val;
+    this.table.canvas.component._$eventHandler.emit('changed');
   }
 
   getIdentifier() {
