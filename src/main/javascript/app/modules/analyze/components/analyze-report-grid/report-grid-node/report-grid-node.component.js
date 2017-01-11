@@ -8,7 +8,8 @@ export const ReportGridNodeComponent = {
   bindings: {
     data: '<',
     layoutMode: '<',
-    columns: '<'
+    columns: '<',
+    settings: '<'
   },
   controller: class ReportGridNodeController {
     constructor() {

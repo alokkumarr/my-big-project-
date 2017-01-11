@@ -1,4 +1,11 @@
 <md-dialog class="analyze-dialog" layout="column">
+  <div ng-if="$ctrl.states.loader">
+    <md-backdrop class="md-menu-backdrop"></md-backdrop>
+    <div class="md-scroll-mask">
+      <md-progress-circular md-diameter="96"></md-progress-circular>
+    </div>
+  </div>
+
   <div ng-if="$ctrl.isTranscludePresent('header')">
     <md-toolbar class="analyze-dialog_header"
                 ng-transclude="header"></md-toolbar>

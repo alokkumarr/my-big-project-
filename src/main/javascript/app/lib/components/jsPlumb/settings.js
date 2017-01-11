@@ -4,7 +4,7 @@ export const JS_PLUMB_DEFAULT_SETTINGS = {
       endpoint: 'Dot',
       isSource: true,
       isTarget: true,
-      maxConnections: 1,
+      maxConnections: -1,
       connector: ['Flowchart', {
         cornerRadius: 10
       }],
