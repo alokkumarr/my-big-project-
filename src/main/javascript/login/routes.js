@@ -1,7 +1,7 @@
 export function routesConfig($stateProvider, $urlRouterProvider, $locationProvider) {
   'ngInject';
 
-  $locationProvider.html5Mode(true);
+  //$locationProvider.html5Mode(true);
   $urlRouterProvider.otherwise('/login');
 
   const states = [
@@ -41,5 +41,6 @@ export function routesConfig($stateProvider, $urlRouterProvider, $locationProvid
 
   states.forEach(state => {
     $stateProvider.state(state);
-  });
+  }); 
+  
 }

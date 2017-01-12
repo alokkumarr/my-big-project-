@@ -39,7 +39,7 @@ export const PasswordResetComponent = {
 
     login() {
       const baseUrl = this._$window.location.origin;
-      const appUrl = `${baseUrl}/login`;
+      const appUrl = `${baseUrl}/login.html`;
 
       this._$window.location = appUrl;
     }

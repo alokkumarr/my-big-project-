@@ -26,7 +26,11 @@ export const LoginComponent = {
         .then(res => {
           if (res.ticket.valid) {
             const baseUrl = this._$window.location.origin;
-            this._$window.location = baseUrl;
+            //this._$window.location = baseUrl+'/app.html';
+        	this._UserService.redirect('/app.html')
+            .then(res => {
+            	this._$window.location = baseUrl+res.data.validityMessage;            	
+            });
           } else {
             this.states.error = res.ticket.validityReason;
           }
@@ -35,5 +39,11 @@ export const LoginComponent = {
           this.states.error = 'Network Error!';
         });
     }
+    
+    reset() {
+        const baseUrl = this._$window.location.origin;
+        const appUrl = `${baseUrl}/login.html#!/preResetPwd`;
+        this._$window.location = appUrl; 
+      }
   }
 };

@@ -16,7 +16,7 @@ export const PasswordChangeComponent = {
       if (!token) {
         this.errorMsg = 'Please login to change password';
       } else {
-        this._UserService.changePwd(this.formData)
+        this._UserService.changePwd(this)
           .then(res => {
             this.errorMsg = res.data.validityMessage;
           });
@@ -25,7 +25,7 @@ export const PasswordChangeComponent = {
 
     login() {
       const baseUrl = this._$window.location.origin;
-      const appUrl = `${baseUrl}/login`;
+      const appUrl = `${baseUrl}/login.html`;
 
       this._$window.location = appUrl;
     }

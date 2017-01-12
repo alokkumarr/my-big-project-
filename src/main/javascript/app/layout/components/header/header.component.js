@@ -21,7 +21,7 @@ export const HeaderComponent = {
 
     changePwd() {
       const baseUrl = this._$window.location.origin;
-      const appUrl = `${baseUrl}/changePwd`;
+      const appUrl = `${baseUrl}/login.html#!/changePwd`;
 
       this._$window.location = appUrl;
     }
