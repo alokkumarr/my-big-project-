@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 
 /**
  * @author girija.sankar
@@ -46,5 +47,13 @@ public class WebSecurityConfig extends
       .antMatchers(HttpMethod.OPTIONS,"**/auth/validateToken/**").permitAll()//allow CORS option calls
       .antMatchers(HttpMethod.OPTIONS,"**/auth/redirect/**").permitAll()//allow CORS option calls
       .antMatchers("/resources/**").permitAll();
+  }
+  
+  public void addResourceHandlers(ResourceHandlerRegistry registry) {
+      registry.addResourceHandler("swagger-ui.html")
+        .addResourceLocations("classpath:/META-INF/resources/");
+   
+      registry.addResourceHandler("/webjars/**")
+        .addResourceLocations("classpath:/META-INF/resources/webjars/");
   }
 }

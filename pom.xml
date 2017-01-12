@@ -113,6 +113,16 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+		    <groupId>io.springfox</groupId>
+		    <artifactId>springfox-swagger2</artifactId>
+		    <version>2.4.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>io.springfox</groupId>
+		    <artifactId>springfox-swagger-ui</artifactId>
+		    <version>2.4.0</version>
+		</dependency>
 	</dependencies>
 	<build>
 
@@ -132,7 +142,7 @@
 			<groupId>com.fortify.ps.maven.plugin</groupId>
 			<artifactId>sca-maven-plugin</artifactId>
 			<version>16.11</version>
-		</plugin>				
+		</plugin>			
 	</plugins>
 	</build>
 
