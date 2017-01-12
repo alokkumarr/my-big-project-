@@ -18,10 +18,10 @@
       </div>
 
       <div class="ard_actions" flex>
-        <md-button ng-click="$ctrl.export()">Export</md-button>
+        <md-button ng-click="$ctrl.openExportModal()">Export</md-button>
         <md-button ng-click="$ctrl.openSaveModal()">Save</md-button>
         <md-button class="btn-primary"
-                   ng-click="$ctrl.publish()">Publish
+                   ng-click="$ctrl.openPublishModal()">Publish
         </md-button>
       </div>
     </div>
@@ -75,6 +75,11 @@
         <span class="ard_toolbar-text" flex>Report</span>
 
         <div class="ard_toolbar-actions" flex>
+          <md-button ng-click="$ctrl.openDescriptionModal()">
+            <md-icon md-font-icon="icon-description"></md-icon>
+            Description
+          </md-button>
+
           <md-button>
             <md-icon md-font-icon="icon-description"></md-icon>
             Description

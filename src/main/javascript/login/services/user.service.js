@@ -22,6 +22,7 @@ class UserService {
 
         // Store the user's info for easy lookup
         if (resp.ticket.valid) {
+          // this._JwtService.destroy();
           this._JwtService.set(response.data.token);
           this._$http.defaults.headers.common.Authorization = 'Bearer ' + response.data.token;
         }
@@ -41,14 +42,14 @@ class UserService {
 
     this._$http.post(this._AppConfig.login.url + route, resp.ticket.ticketId)
       .then(() => {
-        this._JwtService.destroy();
-        this._$http.defaults.headers.common.Authorization = 'Basic';
 
         if (path === 'logout') {
           const baseUrl = this._$window.location.origin;
-          const appUrl = `${baseUrl}/login`;
-
-          this._$window.location = appUrl;
+          this.redirect('/saw-base-seed/login.html').then(res => {
+            this._$window.location = baseUrl + res.data.validityMessage;
+            this._JwtService.destroy();
+            this._$http.defaults.headers.common.Authorization = 'Basic';
+          });
         }
       });
   }
@@ -84,7 +85,7 @@ class UserService {
 
   preResetPwd(credentials) {
     const route = '/resetPassword';
-    const productUrl = this._$window.location.protocol + '//' + this._$window.location.host + '/resetPassword'; // https://vm-att.com:7070/sncr/#/reset?rhc=hashcode
+    const productUrl = this._$window.location.protocol + '//' + this._$window.location.host + '/saw-base-seed/login.html#!/resetPassword'; // https://vm-att.com:7070/sncr/#/reset?rhc=hashcode
 
     const LoginDetails = {
       masterLoginId: credentials.masterLoginId,
@@ -114,6 +115,14 @@ class UserService {
   verify(hashCode) {
     const route = '/vfyRstPwd';
     return this._$http.post(this._AppConfig.login.url + route, hashCode)
+      .then(res => {
+        return res;
+      });
+  }
+
+  redirect(baseURL) {
+    const route = '/auth/redirect';
+    return this._$http.post(this._AppConfig.login.url + route, baseURL)
       .then(res => {
         return res;
       });

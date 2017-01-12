@@ -11,6 +11,9 @@ import style from './analyze-report.component.scss';
 export const AnalyzeReportComponent = {
   template,
   styles: [style],
+  bindings: {
+    analysis: '<'
+  },
   controller: class AnalyzeReportController {
     constructor($componentHandler, $mdDialog, $scope, $timeout, $log, AnalyzeService) {
       'ngInject';
@@ -326,6 +329,26 @@ export const AnalyzeReportComponent = {
         });
     }
 
+    openDescriptionModal(ev) {
+      const scope = this._$scope.$new();
+
+      scope.model = {
+        description: this.analysis.description
+      };
+
+      return this._$mdDialog.show({
+        template: '<analyze-report-description model="model"></analyze-report-description>',
+        fullscreen: false,
+        skipHide: true,
+        targetEvent: ev,
+        clickOutsideToClose: true,
+        scope
+      });
+    }
+
+    openExportModal() {
+    }
+
     openSaveModal(ev) {
       if (!this.canvas) {
         return;
@@ -358,12 +381,7 @@ export const AnalyzeReportComponent = {
         });
     }
 
-    export() {
-
-    }
-
-    publish() {
-
+    openPublishModal() {
     }
   }
 };

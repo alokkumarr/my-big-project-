@@ -20,6 +20,7 @@ export function AnalyzeService($http) {
     getMethods,
     getMetrics,
     getArtifacts,
+    getAnalyses,
     getDataByQuery,
     getSupportedMethods,
     generateQuery,
@@ -27,6 +28,10 @@ export function AnalyzeService($http) {
     setAvailableMetrics: curry(setAvailableItems)(metricMapper, metricHasSupportedMethod),
     setAvailableAnalysisMethods: curry(setAvailableItems)(analysisMethodMapper, isMethodSupported)
   };
+
+  function getAnalyses() {
+    return $http.get('api/analyze/analyses').then(get('data'));
+  }
 
   function getMenu() {
     return $http.get('/api/menu/analyze').then(get('data'));
