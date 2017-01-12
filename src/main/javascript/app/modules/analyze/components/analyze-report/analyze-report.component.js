@@ -4,14 +4,15 @@ import pipe from 'lodash/fp/pipe';
 import get from 'lodash/fp/get';
 import first from 'lodash/first';
 
-import descriptionTemplate from '../analyze-report-description/analyze-description.tmpl.html';
-import {DescriptionController} from '../analyze-report-description/analyze-description.controller';
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
 
 export const AnalyzeReportComponent = {
   template,
   styles: [style],
+  bindings: {
+    analysis: '<'
+  },
   controller: class AnalyzeReportController {
     constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService) {
       this._$componentHandler = $componentHandler;
@@ -137,22 +138,25 @@ export const AnalyzeReportComponent = {
         });
     }
 
-    openDescriptionModal() {
+    openDescriptionModal(ev) {
+      const scope = this._$scope.$new();
+
+      scope.model = {
+        description: this.analysis.description
+      };
+
       return this._$mdDialog.show({
-        controller: DescriptionController,
-        template: descriptionTemplate,
+        template: '<analyze-report-description model="model"></analyze-report-description>',
         fullscreen: false,
         skipHide: true,
-        locals: {description: 'Description...'},
-        clickOutsideToClose:true
+        targetEvent: ev,
+        clickOutsideToClose:true,
+        scope: scope
       })
     }
 
     editDescription() {
-      this.openDescriptionModal()
-        .then(description => {
-          // console.log(description);
-        });
+      this.openDescriptionModal();
     }
 
     export() {

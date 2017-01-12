@@ -6,9 +6,10 @@ export const AnalyzeNewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeNewController {
-    constructor($mdDialog, $log, $document, AnalyzeService) {
+    constructor($mdDialog, $log, $document, $scope, AnalyzeService) {
       this.$mdDialog = $mdDialog;
       this.$log = $log;
+      this._$scope = $scope;
       this.$document = $document;
       this.analyzeService = AnalyzeService;
       this.selectedAnalysisMethod = '';
@@ -46,12 +47,17 @@ export const AnalyzeNewComponent = {
 
     createAnalysis() {
       // this.$mdDialog.hide();
+      const scope = this._$scope.$new();
+
+      scope.newAnalysis = {
+        name: 'Untitled'
+      };
 
       let tpl;
 
       switch (this.selectedAnalysisMethod) {
         case 'table:report':
-          tpl = '<analyze-report></analyze-report>';
+          tpl = '<analyze-report analysis="newAnalysis"></analyze-report>';
           break;
         default:
           tpl = emptyTemplate;
@@ -63,8 +69,11 @@ export const AnalyzeNewComponent = {
         autoWrap: false,
         fullscreen: true,
         focusOnOpen: false,
-        skipHide: true
+        skipHide: true,
+        scope
       });
     }
+
+
   }
 };
