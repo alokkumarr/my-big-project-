@@ -15,6 +15,7 @@ import {AnalyzeReportPreviewComponent} from './components/analyze-report-preview
 import {ReportGridComponent} from './components/analyze-report-grid/report-grid/report-grid.component';
 import {ReportGridNodeComponent} from './components/analyze-report-grid/report-grid-node/report-grid-node.component';
 import {ReportGridContainerComponent} from './components/analyze-report-grid/report-grid-container/report-grid-container.component';
+import {AnalyzeReportSaveComponent} from './components/analyze-report-save/analyze-report-save.component';
 
 export const AnalyzeModule = 'AnalyzeModule';
 
@@ -31,4 +32,5 @@ angular.module(AnalyzeModule, [])
   .component('analyzeReport', AnalyzeReportComponent)
   .component('analyzeDialog', AnalyzeDialogComponent)
   .component('analyzeReportSort', AnalyzeReportSortComponent)
-  .component('analyzeReportPreview', AnalyzeReportPreviewComponent);
+  .component('analyzeReportPreview', AnalyzeReportPreviewComponent)
+  .component('analyzeReportSave', AnalyzeReportSaveComponent);

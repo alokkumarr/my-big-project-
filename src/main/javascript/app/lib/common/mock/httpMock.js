@@ -7,7 +7,7 @@ const mocks = flatten(req.keys().map(key => {
   return values(req(key));
 }));
 
-class HttpMockConfig {
+class HttpMock {
   constructor($httpBackend) {
     mocks.forEach(item => {
       $httpBackend
@@ -25,5 +25,5 @@ class HttpMockConfig {
 export default $httpBackend => {
   'ngInject';
 
-  return new HttpMockConfig($httpBackend);
+  return new HttpMock($httpBackend);
 };
