@@ -45,7 +45,7 @@ class UserService {
         
         if (path === 'logout') {
           const baseUrl = this._$window.location.origin;
-          this.redirect('/login.html').then(res => {
+          this.redirect('/saw-base-seed/login.html').then(res => {
           	this._$window.location = baseUrl+res.data.validityMessage;    
             this._JwtService.destroy();
             this._$http.defaults.headers.common.Authorization = 'Basic';
@@ -85,7 +85,7 @@ class UserService {
   
   preResetPwd(credentials) {
     const route = '/resetPassword';
-    const productUrl = this._$window.location.protocol + "//" + this._$window.location.host + "/login.html#!/resetPassword" // https://vm-att.com:7070/sncr/#/reset?rhc=hashcode
+    const productUrl = this._$window.location.protocol + "//" + this._$window.location.host + "/saw-base-seed/login.html#!/resetPassword" // https://vm-att.com:7070/sncr/#/reset?rhc=hashcode
        
     const LoginDetails = {
 	  masterLoginId: credentials.masterLoginId,

@@ -60,7 +60,7 @@ angular
 	         } else if((restrictedPage.indexOf($location.path()) !== -1) && $location.path() != "/login") {
 	        	 event.preventDefault();
 	        	 const baseUrl = $window.location.origin;
-	             const appUrl = `${baseUrl}/login.html`;
+	             const appUrl = `${baseUrl}/saw-base-seed/login.html`;
 	             $window.location = appUrl; 
 	         }
 	     });     		

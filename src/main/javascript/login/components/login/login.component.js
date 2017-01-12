@@ -27,7 +27,7 @@ export const LoginComponent = {
           if (res.ticket.valid) {
             const baseUrl = this._$window.location.origin;
             //this._$window.location = baseUrl+'/app.html';
-        	this._UserService.redirect('/app.html')
+        	this._UserService.redirect('/saw-base-seed/app.html')
             .then(res => {
             	this._$window.location = baseUrl+res.data.validityMessage;            	
             });
@@ -42,7 +42,7 @@ export const LoginComponent = {
     
     reset() {
         const baseUrl = this._$window.location.origin;
-        const appUrl = `${baseUrl}/login.html#!/preResetPwd`;
+        const appUrl = `${baseUrl}/saw-base-seed/login.html#!/preResetPwd`;
         this._$window.location = appUrl; 
       }
   }
