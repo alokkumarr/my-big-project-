@@ -5,7 +5,7 @@ export function routesConfig($stateProvider) {
     {
       name: 'app.analyze',
       url: 'analyze',
-      component: 'analyzePage'
+      component: 'analyzePage',
     }, {
       name: 'app.analyze.view',
       url: '/:id',
