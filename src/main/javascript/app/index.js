@@ -52,4 +52,14 @@ angular
   .factory('JwtService', JwtServiceFactory)
   .component('root', RootComponent)
   .component('headerComponent', HeaderComponent)
-  .component('footerComponent', FooterComponent);
+  .component('footerComponent', FooterComponent).run(function($rootScope, $state, JwtService, $location, $window) {
+		 var destroy = $rootScope.$on('$locationChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+			 var restrictedPage = ['/','/login','/observe','/analyse','/alerts'];         
+			 if((restrictedPage.indexOf($location.path()) !== -1) && $location.path() != "/login") {
+	        	 event.preventDefault();
+	        	 const baseUrl = $window.location.origin;
+	             const appUrl = `${baseUrl}/login.html`;
+	             $window.location = appUrl; 
+	         }
+	     });     		
+  });
