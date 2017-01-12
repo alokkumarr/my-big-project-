@@ -40,7 +40,9 @@ angular
 	 var destroy = $rootScope.$on('$locationChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
 		 var restrictedPage = ['/','/changePwd'];
          
-		 if((restrictedPage.indexOf($location.path()) !== -1) && $location.path() != "/login"){
+		 if((restrictedPage.indexOf($location.path()) !== -1)  && JwtService.get() != null) {
+     	 //todo
+         } else if((restrictedPage.indexOf($location.path()) !== -1) && $location.path() != "/login"){
         	 event.preventDefault();
         	 const baseUrl = $window.location.origin;
              const appUrl = `${baseUrl}/login.html`;
