@@ -6,16 +6,16 @@
   <md-divider></md-divider>
 
   <md-list-item class="md-no-proxy"
-                ng-repeat="field in $ctrl.model.fields track by $index"
+                ng-repeat="field in $ctrl.model.fields | filter:{isHidden:false} track by $index"
                 ng-click="$event.stopPropagation();"
                 ng-mousedown="$ctrl.onFieldMouseDown($event, field);"
                 ng-mouseup="$ctrl.onFieldMouseUp($event, field);">
-    <md-checkbox ng-model="field.selected"></md-checkbox>
+    <md-checkbox ng-model="field.checked"></md-checkbox>
 
     <span class="jsp-table-column-name"
-          ng-bind="::field.getName()"></span>
+          ng-bind="::field.getDisplayName()"></span>
 
-    <js-plumb-endpoint ng-repeat="endpoint in field.endpoints track by endpoint.field.name"
+    <js-plumb-endpoint ng-repeat="endpoint in field.endpoints track by $index"
                        model="endpoint"></js-plumb-endpoint>
   </md-list-item>
 </md-list>

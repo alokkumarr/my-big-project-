@@ -3,22 +3,43 @@ import find from 'lodash/find';
 import {EndpointModel} from './endpointModel';
 
 export class FieldModel {
-  constructor(table, name, display, alias) {
+  constructor(table, name) {
     this.table = table;
     this.name = name;
-    this.display = display;
-    this.alias = alias;
-    this.type = 'string';
+    this.meta = null;
     this.endpoints = [];
-    this.selected = false;
+    this.displayName = '';
+    this.alias = '';
+    this.type = 'string';
+    this._checked = false;
+    this.isHidden = false;
+    this.isJoinEligible = false;
+    this.isFilterEligible = false;
   }
 
-  getName() {
-    return this.alias || this.display || this.name;
+  setMeta(meta) {
+    this.meta = meta;
   }
 
-  setType(type) {
-    this.type = type;
+  getDisplayName() {
+    return this.alias || this.displayName || this.name;
+  }
+
+  hide() {
+    this.isHidden = true;
+  }
+
+  show() {
+    this.isHidden = false;
+  }
+
+  get checked() {
+    return this._checked;
+  }
+
+  set checked(val) {
+    this._checked = val;
+    this.table.canvas.component._$eventHandler.emit('changed');
   }
 
   getIdentifier() {

@@ -6,9 +6,14 @@ export class TableModel {
   constructor(canvas, name) {
     this.canvas = canvas;
     this.name = name;
+    this.meta = null;
     this.x = 0;
     this.y = 0;
     this.fields = [];
+  }
+
+  setMeta(meta) {
+    this.meta = meta;
   }
 
   setPosition(x, y) {
@@ -16,8 +21,8 @@ export class TableModel {
     this.y = y;
   }
 
-  addField(name, display, alias) {
-    const field = new FieldModel(this, name, display, alias);
+  addField(name) {
+    const field = new FieldModel(this, name);
 
     this.fields.push(field);
 

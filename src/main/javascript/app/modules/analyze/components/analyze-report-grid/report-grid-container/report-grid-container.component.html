@@ -1,17 +1,24 @@
-<md-card style="padding: 20px; height:100%">
-  <div ng-if="$ctrl.modifiedData.isGroup"
-       layout="row" layout-align="end center">
+<md-card style="padding: 20px; height:100%"
+         ng-if="$ctrl.render">
+  <div layout="row" layout-align="end center"
+       ng-if="$ctrl.modifiedData.isGroup">
+    Grouped by:&nbsp; <strong ng-bind="$ctrl.groupedBy"></strong>
 
-    Grouped by:&nbsp; <strong>{{$ctrl.groupedBy}}</strong>
+    <md-button class="btn-card"
+               ng-click="$ctrl.undoGrouping()">Undo
+    </md-button>
 
-    <md-button ng-click="$ctrl.undoGrouping()" class="btn-card">Undo</md-button>
-
-    <md-radio-group ng-model="$ctrl.layoutMode"
-                    layout="row" layout-align="end center">
-      <md-radio-button value="{{::$ctrl.LAYOUT_MODE.DETAIL}}">Show Each Row</md-radio-button>
-      <md-radio-button value= "{{::$ctrl.LAYOUT_MODE.SUMMARY}}">Summary View</md-radio-button>
+    <md-radio-group layout="row" layout-align="end center"
+                    ng-model="$ctrl.layoutMode">
+      <md-radio-button ng-value="::$ctrl.LAYOUT_MODE.DETAIL">Show Each Row</md-radio-button>
+      <md-radio-button ng-value="::$ctrl.LAYOUT_MODE.SUMMARY">Summary View</md-radio-button>
     </md-radio-group>
-
   </div>
-  <report-grid-node data="$ctrl.modifiedData" columns="$ctrl.columns" layout-mode="$ctrl.layoutMode"></report-grid-node>
+
+  <report-grid-node
+    data="$ctrl.modifiedData"
+    columns="$ctrl.columns"
+    layout-mode="$ctrl.layoutMode"
+    settings="$ctrl.settings">
+  </report-grid-node>
 </md-card>
