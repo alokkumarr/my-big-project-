@@ -85,7 +85,7 @@
 							<goal>npm</goal>
 						</goals>
 						<configuration>
-							<arguments>run serve</arguments>
+							<arguments>run start</arguments>
 						</configuration>
 					</execution>
 					
@@ -184,7 +184,7 @@
 							<goal>npm</goal>
 						</goals>
 						<configuration>
-							<arguments>run build</arguments>
+							<arguments>run dist</arguments>
 						</configuration>
 					</execution>
 			</executions>
