@@ -6,11 +6,6 @@ var analyze = require('../pages/common/analyze.po.js');
 
 describe('Analyses Tests', function () {
 
-/*  it('should login', function () {
-    //browser.sleep(2000);
-    login.loginElements.loginBtn.click();
-  });*/
-
   it('should navigate to Analyze page', function () {
     header.headerElements.analyzeBtn.click();
     expect(browser.getCurrentUrl()).toContain('/analyze');
@@ -30,4 +25,14 @@ describe('Analyses Tests', function () {
     analyze.analysisElems.addAnalysisBtn.click();
     analyze.validateAnalyzeDialog();
   });
+
+  it('should select Report table type and click Create', function () {
+    analyze.analysisElems.analyzeReportTable.click();
+    analyze.analysisElems.createAnalysisBtn.click();
+  });
+
+  it('should open the designer dialog', function () {
+    analyze.validateAnalyzeDialog();
+  });
+
 });
