@@ -51,7 +51,6 @@ public class SecurityController {
 
 	@Autowired
 	public UserRepository userRepository;
-
 	@Autowired
 	NSSOProperties nSSOProperties;
 
@@ -366,7 +365,7 @@ public class SecurityController {
 	}
 	
 	/**
-	 * 
+	 * This method return whether the token is valid or not
 	 * @param validateToken
 	 * @return
 	 */
@@ -375,9 +374,22 @@ public class SecurityController {
 		Valid valid = new Valid();
 		valid.setValid(true);
 		valid.setValidityMessage("Token is valid");
-		return valid;
+		return valid;          
 	}
 
+	/**
+	 * This method returns the validated path back to the calling application
+	 * @param path
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/redirect", method = RequestMethod.POST)
+	public Valid redirect(@RequestBody String path) {
+		Valid valid = new Valid();
+		valid.setValid(true);
+		valid.setValidityMessage(path);
+		return valid;  
+	}
+	
 	public static void main(String[] args) {
 		SecurityController sc = new SecurityController();
 		System.out.println(sc.randomString(160));

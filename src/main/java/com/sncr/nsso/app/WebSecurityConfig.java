@@ -44,6 +44,7 @@ public class WebSecurityConfig extends
       .antMatchers(HttpMethod.OPTIONS,"**/auth/**").permitAll()//allow CORS option calls
       .antMatchers(HttpMethod.OPTIONS,"**/user/login/**").permitAll()//allow CORS option calls
       .antMatchers(HttpMethod.OPTIONS,"**/auth/validateToken/**").permitAll()//allow CORS option calls
+      .antMatchers(HttpMethod.OPTIONS,"**/auth/redirect/**").permitAll()//allow CORS option calls
       .antMatchers("/resources/**").permitAll();
   }
 }

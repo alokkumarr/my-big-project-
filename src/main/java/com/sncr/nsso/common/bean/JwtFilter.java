@@ -25,6 +25,8 @@ public class JwtFilter extends GenericFilterBean {
                          final FilterChain chain) throws IOException, ServletException {
         final HttpServletRequest request = (HttpServletRequest) req;
 
+        Ticket ticket = new Ticket();
+        
         final String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new ServletException("Missing or invalid Authorization header.");
@@ -43,9 +45,10 @@ public class JwtFilter extends GenericFilterBean {
             throw new ServletException("Invalid token.");
         }
         
+        //This checks the validity of the token. logging out does not need the token to be active.
         if(!request.getRequestURI().equals("/saw-security/auth/doLogout")) {
 	        Iterator<?> it = ((Map<String, Object>) claims.get("ticket")).entrySet().iterator();
-	        Ticket ticket = new Ticket();
+	        
 	        while (it.hasNext()) {
 	            Map.Entry<String, Object> pair = (Map.Entry<String, Object>)it.next();	            
 	            if(pair.getKey().equals("validUpto")){
@@ -55,15 +58,14 @@ public class JwtFilter extends GenericFilterBean {
 	            {
 	            	 ticket.setValid(Boolean.parseBoolean(pair.getValue().toString()));
 	            }
-	           
-	            it.remove(); // avoids a ConcurrentModificationException
+	            
+	            it.remove(); 
 	        }
 	        if(!ticket.isValid()){
-	            throw new ServletException("Token expired");
+	            throw new ServletException("Token has expired. Please re-login.");
 	        }
-        }
-              
-        chain.doFilter(req, res);
+        }     
+        chain.doFilter(req, res);       
     }
 
 }
