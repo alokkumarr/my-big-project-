@@ -1,3 +1,7 @@
-/**
- * Created by vladsuciu on 12/8/16.
- */
+module.exports = {
+
+  dashboardElems: {
+
+  }
+
+};
