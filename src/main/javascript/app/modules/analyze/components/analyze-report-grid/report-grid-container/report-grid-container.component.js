@@ -3,9 +3,10 @@ import map from 'lodash/map';
 import forEach from 'lodash/forEach';
 import omit from 'lodash/fp/omit';
 import isEmpty from 'lodash/isEmpty';
-
 import find from 'lodash/find';
+
 import template from './report-grid-container.component.html';
+import style from './report-grid-container.component.scss';
 
 export const LAYOUT_MODE = {
   DETAIL: 'detail',
@@ -20,6 +21,7 @@ export const ReportGridContainerComponent = {
     columns: '<',
     settings: '<'
   },
+  styles: [style],
   controller: class ReportGridContainerController {
     constructor($componentHandler, $timeout) {
       'ngInject';

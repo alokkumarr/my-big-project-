@@ -1,7 +1,7 @@
-export function routesConfig($stateProvider, $urlRouterProvider) {
+export function routesConfig($stateProvider, $urlRouterProvider, $locationProvider) {
   'ngInject';
 
-  // $locationProvider.html5Mode(true);
+  $locationProvider.html5Mode(true);
   $urlRouterProvider.otherwise('/');
 
   const states = [

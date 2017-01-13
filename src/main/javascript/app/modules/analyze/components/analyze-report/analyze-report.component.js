@@ -51,6 +51,8 @@ export const AnalyzeReportComponent = {
     }
 
     $onInit() {
+      this.data.description = this.analysis.description || '';
+
       this.unregister = this._$componentHandler.events.on('$onInstanceAdded', e => {
         if (e.key === 'ard-canvas') {
           this.initCanvas(e.instance);
@@ -333,11 +335,15 @@ export const AnalyzeReportComponent = {
       const scope = this._$scope.$new();
 
       scope.model = {
-        description: this.analysis.description
+        description: this.data.description
       };
 
-      return this._$mdDialog.show({
-        template: '<analyze-report-description model="model"></analyze-report-description>',
+      scope.onSave = data => {
+        this.data.description = data.description;
+      };
+
+      this._$mdDialog.show({
+        template: '<analyze-report-description model="model" on-save="onSave($data)"></analyze-report-description>',
         fullscreen: false,
         skipHide: true,
         targetEvent: ev,
