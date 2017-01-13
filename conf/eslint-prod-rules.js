@@ -5,7 +5,10 @@ module.exports = {
   ],
   globals: {
     __DEVELOPMENT__: true,
-    expect: true
+    expect: true,
+    browser: true,
+    element: true,
+    by: true
   },
   parserOptions: {
     sourceType: 'module'
