@@ -25,7 +25,7 @@ src/main/javascript/styleguide/dist/
 npm-debug.log*
 testem.log
 /typings
-
+yarn.lock
 
 #System Files
 .DS_Store
