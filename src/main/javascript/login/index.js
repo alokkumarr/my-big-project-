@@ -36,4 +36,17 @@ angular
   .component('passwordChangeComponent', PasswordChangeComponent)
   .component('passwordPreResetComponent', PasswordPreResetComponent)
   .component('passwordResetComponent', PasswordResetComponent)
-  .component('loginComponent', LoginComponent);
+  .component('loginComponent', LoginComponent).run(function($rootScope, $state, JwtService, $location, $window) {
+	 var destroy = $rootScope.$on('$locationChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
+		 var restrictedPage = ['/','/changePwd'];
+         
+		 if((restrictedPage.indexOf($location.path()) !== -1)  && JwtService.get() != null) {
+     	 //todo
+         } else if((restrictedPage.indexOf($location.path()) !== -1) && $location.path() != "/login"){
+        	 event.preventDefault();
+        	 const baseUrl = $window.location.origin;
+             const appUrl = `${baseUrl}/saw-base-seed/login.html`;
+             $window.location = appUrl; 
+         }
+     });     		
+  });
