@@ -51,7 +51,13 @@ export const AnalyzeReportComponent = {
     }
 
     $onInit() {
-      this.data.description = this.analysis.name || '';
+      if (this.analysis.name) {
+        this.data.title = this.analysis.name;
+      }
+
+      if (this.analysis.description) {
+        this.data.description = this.analysis.description;
+      }
 
       this.unregister = this._$componentHandler.events.on('$onInstanceAdded', e => {
         if (e.key === 'ard-canvas') {
