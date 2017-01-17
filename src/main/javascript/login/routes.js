@@ -1,7 +1,7 @@
-export function routesConfig($stateProvider, $urlRouterProvider, $locationProvider) {
+export function routesConfig($stateProvider, $urlRouterProvider) {
   'ngInject';
 
-  //$locationProvider.html5Mode(true);
+  // $locationProvider.html5Mode(true);
   $urlRouterProvider.otherwise('/login');
 
   const states = [
@@ -22,25 +22,24 @@ export function routesConfig($stateProvider, $urlRouterProvider, $locationProvid
       }
     },
     {
-        name: 'preResetPassword',
-        url: '/preResetPwd',
-        component: 'passwordPreResetComponent',
-        data: {
-          title: 'Reset Password'
-        }
+      name: 'preResetPassword',
+      url: '/preResetPwd',
+      component: 'passwordPreResetComponent',
+      data: {
+        title: 'Reset Password'
+      }
     },
     {
-        name: 'resetPassword',
-        url: '/resetPassword',
-        component: 'passwordResetComponent',
-        data: {
-          title: 'Reset Password'
-        }
+      name: 'resetPassword',
+      url: '/resetPassword',
+      component: 'passwordResetComponent',
+      data: {
+        title: 'Reset Password'
+      }
     }
   ];
 
   states.forEach(state => {
     $stateProvider.state(state);
-  }); 
-  
+  });
 }

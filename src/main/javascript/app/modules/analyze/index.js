@@ -1,6 +1,4 @@
 import angular from 'angular';
-import 'angular-ui-grid';
-import 'angular-ui-grid/ui-grid.css';
 
 import {routesConfig} from './routes';
 
@@ -18,10 +16,11 @@ import {AnalyzeReportPreviewComponent} from './components/analyze-report-preview
 import {ReportGridComponent} from './components/analyze-report-grid/report-grid/report-grid.component';
 import {ReportGridNodeComponent} from './components/analyze-report-grid/report-grid-node/report-grid-node.component';
 import {ReportGridContainerComponent} from './components/analyze-report-grid/report-grid-container/report-grid-container.component';
+import {AnalyzeReportSaveComponent} from './components/analyze-report-save/analyze-report-save.component';
 
 export const AnalyzeModule = 'AnalyzeModule';
 
-angular.module(AnalyzeModule, ['ui.grid'])
+angular.module(AnalyzeModule, [])
   .config(routesConfig)
   .factory('AnalyzeService', AnalyzeService)
   .component('reportGrid', ReportGridComponent)
@@ -35,4 +34,5 @@ angular.module(AnalyzeModule, ['ui.grid'])
   .component('analyzeDialog', AnalyzeDialogComponent)
   .component('analyzeReportSort', AnalyzeReportSortComponent)
   .component('analyzeReportDescription', AnalyzeReportDescriptionComponent)
-  .component('analyzeReportPreview', AnalyzeReportPreviewComponent);
+  .component('analyzeReportPreview', AnalyzeReportPreviewComponent)
+  .component('analyzeReportSave', AnalyzeReportSaveComponent);

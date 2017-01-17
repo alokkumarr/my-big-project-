@@ -1,4 +1,4 @@
-import square from '../../main/javascript/square';
+import {square} from 'square';
 
 describe('The square function', () => {
   it('should square a number', () => {

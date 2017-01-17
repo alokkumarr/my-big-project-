@@ -1,4 +1,4 @@
-import template from './passwordChange.component.html';
+import template from './password-change.component.html';
 
 export const PasswordChangeComponent = {
   template,

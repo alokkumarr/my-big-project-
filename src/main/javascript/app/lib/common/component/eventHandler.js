@@ -11,7 +11,7 @@ export class EventHandler {
 
   on(eventName, fn, context) {
     if (isString(eventName) && eventName.length > 0 && isFunction(fn)) {
-      if (!this._handlers.hasOwnProperty(eventName)) {
+      if (!(eventName in this._handlers)) {
         this._handlers[eventName] = [];
       }
 
@@ -20,7 +20,7 @@ export class EventHandler {
 
       event.push(bindedFn);
 
-      return function removeHandler() {
+      return () => {
         const idx = event.indexOf(bindedFn);
 
         if (idx !== -1) {
@@ -34,7 +34,7 @@ export class EventHandler {
     const promises = [];
 
     if (isString(eventName) && eventName.length > 0) {
-      if (this._handlers.hasOwnProperty(eventName)) {
+      if (eventName in this._handlers) {
         const args = [];
 
         Array.prototype.push.apply(args, arguments);
@@ -80,7 +80,7 @@ export class EventHandler {
   }
 }
 
-export default ($q) => {
+export default $q => {
   'ngInject';
   return new EventHandler($q);
 };

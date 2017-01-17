@@ -12,6 +12,8 @@ export const AnalyzeReportPreviewComponent = {
   },
   controller: class AnalyzeReportPreviewController {
     constructor($componentHandler, $mdDialog, AnalyzeService) {
+      'ngInject';
+
       this._$componentHandler = $componentHandler;
       this._$mdDialog = $mdDialog;
       this._AnalyzeService = AnalyzeService;

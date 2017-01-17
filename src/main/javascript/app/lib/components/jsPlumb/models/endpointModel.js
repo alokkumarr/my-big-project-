@@ -15,6 +15,8 @@ export class EndpointModel {
         return 'LeftMiddle';
       case 'right':
         return 'RightMiddle';
+      default:
+        throw new Error('Can\'t identify anchor!');
     }
   }
 }

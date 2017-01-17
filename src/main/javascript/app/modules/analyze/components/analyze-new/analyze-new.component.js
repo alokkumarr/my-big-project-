@@ -7,6 +7,8 @@ export const AnalyzeNewComponent = {
   styles: [style],
   controller: class AnalyzeNewController {
     constructor($mdDialog, $log, $document, $scope, AnalyzeService) {
+      'ngInject';
+
       this.$mdDialog = $mdDialog;
       this.$log = $log;
       this._$scope = $scope;
@@ -73,7 +75,5 @@ export const AnalyzeNewComponent = {
         scope
       });
     }
-
-
   }
 };

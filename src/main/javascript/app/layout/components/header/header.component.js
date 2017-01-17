@@ -12,7 +12,7 @@ export const HeaderComponent = {
     }
 
     isState(stateName) {
-      return !!this._$state.is(stateName);
+      return Boolean(this._$state.is(stateName));
     }
 
     logout() {

@@ -1,3 +1,4 @@
+const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
 
 exports.config = {
@@ -8,7 +9,7 @@ exports.config = {
   directConnect: true,
 
   capabilities: {
-    'browserName'  : 'chrome',
+    'browserName': 'chrome',
     'chromeOptions': {
       args: [
         'incognito',
@@ -28,7 +29,9 @@ exports.config = {
   },
 
   suites: {
-    analyses: ['spec/analyses.spec.js']
+    analyses: [
+      webpackHelper.root('src/test/javascript/e2e/spec/analyses.spec.js')
+    ]
   },
 
   onPrepare: function () {
@@ -44,5 +47,4 @@ exports.config = {
     browser.driver.get('http://localhost:3000');
     browser.sleep(2000);
   }
-
 };

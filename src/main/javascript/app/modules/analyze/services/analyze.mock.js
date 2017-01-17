@@ -140,32 +140,32 @@ function getAnalyses() {
 
 function getTransactionVolumeChartData() {
   return [{
-  name: 'Alpha',
-  data: [
-    [0.3, 5],
-    [2.1, 25],
-    [3.5, 10],
-    [4.5, 11],
-    [5.6, 6],
-    [6.5, 21],
-    [7.1, 20],
-    [7.8, 29],
-    [8.7, 35],
-    [9, 29],
-    [9.5, 5],
-    [11.1, 20]
-  ]
-}, {
-  name: 'Bravo',
-  data: [
-    [0.3, 2],
-    [4.8, 13],
-    [6.2, 35],
-    [8.9, 10],
-    [10.6, 22],
-    [11.1, 10]
-  ]
-}];
+    name: 'Alpha',
+    data: [
+      [0.3, 5],
+      [2.1, 25],
+      [3.5, 10],
+      [4.5, 11],
+      [5.6, 6],
+      [6.5, 21],
+      [7.1, 20],
+      [7.8, 29],
+      [8.7, 35],
+      [9, 29],
+      [9.5, 5],
+      [11.1, 20]
+    ]
+  }, {
+    name: 'Bravo',
+    data: [
+      [0.3, 2],
+      [4.8, 13],
+      [6.2, 35],
+      [8.9, 10],
+      [10.6, 22],
+      [11.1, 10]
+    ]
+  }];
 }
 function getTransactionVolumeChartOptions() {
   return {
@@ -206,18 +206,23 @@ function getMenu() {
     {
       name: 'My Analyses',
       children: [{
+        id: 1,
         name: 'Order Fulfillment',
         url: 'analyze/1'
       }, {
+        id: 2,
         name: 'Category 2',
         url: 'analyze/2'
       }, {
+        id: 3,
         name: 'Category 3',
         url: 'analyze/3'
       }, {
+        id: 4,
         name: 'Category 4',
         url: 'analyze/4'
       }, {
+        id: 5,
         name: 'Category 5',
         url: 'analyze/5'
       }]
@@ -478,6 +483,7 @@ function getTables() {
 function getArtifacts() {
   const artifacts = [];
 
+  /* eslint-disable camelcase */
   artifacts.push({
     artifact_name: 'Orders',
     artifact_position: [5, 130],
@@ -730,6 +736,7 @@ function getArtifacts() {
       joins: []
     }
   });
+  /* eslint-enable camelcase */
 
   return artifacts;
 }
@@ -801,6 +808,6 @@ function generateQuery() {
 
 function saverReport() {
   return {
-    success: true
+    id: 10
   };
 }

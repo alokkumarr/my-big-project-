@@ -1,4 +1,5 @@
 import find from 'lodash/find';
+import isEmpty from 'lodash/isEmpty';
 
 export const JSPlumbConnector = {
   bindings: {
@@ -60,7 +61,10 @@ export const JSPlumbConnector = {
 
     detach() {
       if (this.connection) {
-        this._jsPlumbInst.detach(this.connection);
+        if (!isEmpty(this.connection.endpoints)) {
+          this._jsPlumbInst.detach(this.connection);
+        }
+
         this.connection = null;
       }
     }
@@ -82,7 +86,7 @@ export const JSPlumbConnector = {
       const el = this._$compile(html)(scope);
 
       this.addOverlay(['Custom', {
-        create: connection => {
+        create: () => {
           return el;
         },
         location: 0.5
@@ -93,4 +97,4 @@ export const JSPlumbConnector = {
       this._canvas.removeJoin(this.model);
     }
   }
-}
+};

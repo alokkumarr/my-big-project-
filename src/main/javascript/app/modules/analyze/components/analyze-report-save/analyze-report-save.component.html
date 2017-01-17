@@ -1,0 +1,43 @@
+<analyze-dialog control="$ctrl" class="analyze-report-save">
+  <analyze-dialog-header layout="row" layout-align="start center" flex="grow">
+    <strong>Save</strong>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+    <div class="ars-content" layout-padding>
+      <div layout="column">
+        <label class="field-label">My analysis category</label>
+        <md-select ng-model="::$ctrl.dataHolder.category" required>
+          <md-option
+            ng-repeat="category in $ctrl.dataHolder.categories"
+            ng-bind="::category.name"
+            ng-value="category.id"></md-option>
+        </md-select>
+      </div>
+
+      <div layout="column">
+        <label class="field-label">Report name</label>
+        <input type="text" required
+               ng-model="$ctrl.dataHolder.title"/>
+      </div>
+
+      <div layout="column">
+        <label class="field-label">Description</label>
+        <textarea rows="5" placeholder="Describe this analysis"
+                  ng-model="$ctrl.dataHolder.description"></textarea>
+      </div>
+    </div>
+  </analyze-dialog-content>
+
+  <analyze-dialog-footer>
+    <div layout="row">
+      <md-button class="btn-primary"
+                 ng-click="$ctrl.save()">Save
+      </md-button>
+
+      <md-button class="btn-card"
+                 ng-click="$ctrl.cancel()">Cancel
+      </md-button>
+    </div>
+  </analyze-dialog-footer>
+</analyze-dialog>

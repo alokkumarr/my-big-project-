@@ -12,6 +12,8 @@ export const AnalyzeReportSortComponent = {
   },
   controller: class AnalyzeReportSortController {
     constructor($mdDialog) {
+      'ngInject';
+
       this._$mdDialog = $mdDialog;
 
       this.sorts = [];

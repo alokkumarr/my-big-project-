@@ -1,38 +1,34 @@
-var login = require('../pages/common/login.po.js');
-var header = require('../pages/components/header.co.js');
-var sidenav = require('../pages/components/sidenav.co.js');
-var analyze = require('../pages/common/analyze.po.js');
+const header = require('../pages/components/header.co.js');
+const sidenav = require('../pages/components/sidenav.co.js');
+const analyze = require('../pages/common/analyze.po.js');
 
-
-describe('Analyses Tests', function () {
-
-  it('should navigate to Analyze page', function () {
+describe('Analyses Tests', () => {
+  it('should navigate to Analyze page', () => {
     header.headerElements.analyzeBtn.click();
     expect(browser.getCurrentUrl()).toContain('/analyze');
   });
 
-  it('should open the sidenav menu and go to first category', function () {
+  it('should open the sidenav menu and go to first category', () => {
     sidenav.sidenavElements.menuBtn.click();
     sidenav.sidenavElements.myAnalyses.click();
     sidenav.sidenavElements.firstCategory.click();
   });
 
-  it('should see the analysis card view', function () {
+  it('should see the analysis card view', () => {
     analyze.validateCard();
   });
 
-  it('should attempt to create a new analysis', function () {
+  it('should attempt to create a new analysis', () => {
     analyze.analysisElems.addAnalysisBtn.click();
     analyze.validateAnalyzeDialog();
   });
 
-  it('should select Report table type and click Create', function () {
+  it('should select Report table type and click Create', () => {
     analyze.analysisElems.analyzeReportTable.click();
     analyze.analysisElems.createAnalysisBtn.click();
   });
 
-  it('should open the designer dialog', function () {
+  it('should open the designer dialog', () => {
     analyze.validateAnalyzeDialog();
   });
-
 });
