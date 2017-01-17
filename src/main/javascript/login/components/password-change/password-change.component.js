@@ -3,9 +3,10 @@ import template from './password-change.component.html';
 export const PasswordChangeComponent = {
   template,
   controller: class PasswordChangeController {
-    constructor($window, JwtService, UserService) {
+    constructor($window, $state, JwtService, UserService) {
       'ngInject';
       this._$window = $window;
+      this._$state = $state;
       this._JwtService = JwtService;
       this._UserService = UserService;
     }
@@ -24,10 +25,7 @@ export const PasswordChangeComponent = {
     }
 
     login() {
-      const baseUrl = this._$window.location.origin;
-      const appUrl = `${baseUrl}/saw-base-seed/login.html`;
-
-      this._$window.location = appUrl;
+      this._$state.go('login');
     }
   }
 };

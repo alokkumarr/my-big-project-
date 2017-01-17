@@ -3,9 +3,10 @@ import template from './password-pre-reset.component.html';
 export const PasswordPreResetComponent = {
   template,
   controller: class PasswordPreResetController {
-    constructor($window, JwtService, UserService) {
+    constructor($window, $state, JwtService, UserService) {
       'ngInject';
       this._$window = $window;
+      this._$state = $state;
       this._JwtService = JwtService;
       this._UserService = UserService;
 
@@ -22,10 +23,7 @@ export const PasswordPreResetComponent = {
     }
 
     login() {
-      const baseUrl = this._$window.location.origin;
-      const appUrl = `${baseUrl}/saw-base-seed/login.html`;
-
-      this._$window.location = appUrl;
+      this._$state.go('login');
     }
   }
 };

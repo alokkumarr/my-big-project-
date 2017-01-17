@@ -39,7 +39,7 @@ module.exports = webpackMerge(commonConfig, {
         test: /\.(css|scss)$/,
         loaders: ExtractTextPlugin.extract({
           fallbackLoader: 'style',
-          loader: 'css?minify!sass!postcss'
+          loader: 'css?minimize!sass!postcss'
         })
       }
     ]
@@ -55,7 +55,8 @@ module.exports = webpackMerge(commonConfig, {
     }),
     new HtmlWebpackPlugin({
       template: 'app/index.html',
-      filename: 'app.html',
+      filename: 'index.html',
+      favicon: webpackHelper.root('assets/img/favicon.png'),
       hash: true,
       chunks: appChunks,
       chunksSortMode: webpackHelper.sortChunks(appChunks)
@@ -63,6 +64,7 @@ module.exports = webpackMerge(commonConfig, {
     new HtmlWebpackPlugin({
       template: 'login/index.html',
       filename: 'login.html',
+      favicon: webpackHelper.root('assets/img/favicon.png'),
       hash: true,
       chunks: loginChunks,
       chunksSortMode: webpackHelper.sortChunks(loginChunks)

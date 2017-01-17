@@ -1,5 +1,3 @@
-$chart-placeholder-path: '../../../../../../../../assets/chart-placeholder.png';
-
 .analyze-card {
   md-card-content {
     padding: 24px;
@@ -39,7 +37,7 @@ $chart-placeholder-path: '../../../../../../../../assets/chart-placeholder.png';
   }
 
   .chart-placeholder {
-    background-image: url($chart-placeholder-path);
+    background-image: url('~img/chart-placeholder.png');
     height: 159px;
     width: 434px;
     background-size: 434px 159px;

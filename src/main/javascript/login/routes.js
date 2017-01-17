@@ -2,12 +2,12 @@ export function routesConfig($stateProvider, $urlRouterProvider) {
   'ngInject';
 
   // $locationProvider.html5Mode(true);
-  $urlRouterProvider.otherwise('/login');
+  $urlRouterProvider.otherwise('/');
 
   const states = [
     {
       name: 'login',
-      url: '/login',
+      url: '/',
       component: 'loginComponent',
       data: {
         title: 'Login'

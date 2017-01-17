@@ -3,9 +3,10 @@ import template from './password-reset.component.html';
 export const PasswordResetComponent = {
   template,
   controller: class PasswordResetController {
-    constructor($window, JwtService, UserService) {
+    constructor($window, $state, JwtService, UserService) {
       'ngInject';
       this._$window = $window;
+      this._$state = $state;
       this._JwtService = JwtService;
       this._UserService = UserService;
     }
@@ -35,10 +36,7 @@ export const PasswordResetComponent = {
     }
 
     login() {
-      const baseUrl = this._$window.location.origin;
-      const appUrl = `${baseUrl}/saw-base-seed/login.html`;
-
-      this._$window.location = appUrl;
+      this._$state.go('login');
     }
   }
 };
