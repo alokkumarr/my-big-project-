@@ -1,12 +1,13 @@
 <!doctype html>
 <html ng-app="app" ng-cloak>
   <head>
-    <base href="/"/>
+    <script type="text/javascript">
+      document.write('<base href="' + document.location.href + '" />');
+    </script>
     <title ng-bind="getPageTitle()"></title>
     <meta charset="utf-8"/>
     <meta name="description" content=""/>
     <meta name="viewport" content="width=device-width"/>
-    <link rel="icon" type="image/png" href="http://fountainjs.io/assets/imgs/fountain.png"/>
   </head>
   <body>
     <ui-view></ui-view>

@@ -14,7 +14,7 @@ import 'devextreme/integration/angular';
 import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.light.css';
 
-import '../../../../fonts/style.css';
+import 'fonts/icomoon.css';
 
 import AppConfig from '../../../../appConfig';
 

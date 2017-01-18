@@ -4,7 +4,7 @@ import 'angular-ui-router';
 import 'angular-material';
 import 'angular-material/angular-material.css';
 
-import '../../../../fonts/style.css';
+import 'fonts/icomoon.css';
 
 import AppConfig from '../../../../appConfig';
 

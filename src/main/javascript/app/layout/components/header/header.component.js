@@ -20,10 +20,7 @@ export const HeaderComponent = {
     }
 
     changePwd() {
-      const baseUrl = this._$window.location.origin;
-      const appUrl = `${baseUrl}/saw-base-seed/login.html#!/changePwd`;
-
-      this._$window.location = appUrl;
+      this._$window.location.assign('./login#!/changePwd');
     }
   }
 };

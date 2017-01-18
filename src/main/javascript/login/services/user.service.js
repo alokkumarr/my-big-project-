@@ -1,7 +1,8 @@
 class UserService {
-  constructor($window, $http, AppConfig, JwtService) {
+  constructor($window, $http, $state, AppConfig, JwtService) {
     this._$window = $window;
     this._$http = $http;
+    this._$state = $state;
     this._AppConfig = AppConfig;
     this._JwtService = JwtService;
   }
@@ -44,12 +45,8 @@ class UserService {
       .then(() => {
 
         if (path === 'logout') {
-          const baseUrl = this._$window.location.origin;
-          this.redirect('/saw-base-seed/login.html').then(res => {
-            this._$window.location = baseUrl + res.data.validityMessage;
-            this._JwtService.destroy();
-            this._$http.defaults.headers.common.Authorization = 'Basic';
-          });
+          this._JwtService.destroy();
+          this._$state.go('login');
         }
       });
   }
@@ -85,13 +82,15 @@ class UserService {
 
   preResetPwd(credentials) {
     const route = '/resetPassword';
-    const productUrl = this._$window.location.protocol + '//' + this._$window.location.host + '/saw-base-seed/login.html#!/resetPassword'; // https://vm-att.com:7070/sncr/#/reset?rhc=hashcode
+    const productUrl = `${this._$window.location.origin}/login#!/resetPassword`;
 
     const LoginDetails = {
       masterLoginId: credentials.masterLoginId,
       productUrl
     };
+
     this._$http.defaults.headers.common.Authorization = 'Bearer ' + this._JwtService.get();
+
     return this._$http.post(this._AppConfig.login.url + route, LoginDetails)
       .then(res => {
         return res;
@@ -129,7 +128,7 @@ class UserService {
   }
 }
 
-export function UserServiceFactory($window, $http, AppConfig, JwtService) {
+export function UserServiceFactory($window, $http, $state, AppConfig, JwtService) {
   'ngInject';
-  return new UserService($window, $http, AppConfig, JwtService);
+  return new UserService($window, $http, $state, AppConfig, JwtService);
 }
