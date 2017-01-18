@@ -106,7 +106,6 @@ libraryDependencies += "com.typesafe.akka" %% "akka-slf4j" % "2.3.6"
 			<version>1.0.1</version>
 		</dependency>
 -->		
-	
 		<dependency>
 				<groupId>com.typesafe.play</groupId>
 				<artifactId>play-test_${scala.version}</artifactId>
@@ -272,6 +271,13 @@ libraryDependencies += "com.typesafe.akka" %% "akka-slf4j" % "2.3.6"
 				<artifactId>play-cache_${scala.version}</artifactId>
 				<version>${play2.version}</version>
 		</dependency>
+		<!-- Play filters-->
+		<dependency>
+			<groupId>com.typesafe.play</groupId>
+			<artifactId>filters-helpers_${scala.version}</artifactId>
+			<version>${play2.version}</version>
+		</dependency>
+	
 		<dependency>
 				<groupId>org.scalatestplus.play</groupId>
 				<artifactId>scalatestplus-play_${scala.version}</artifactId>

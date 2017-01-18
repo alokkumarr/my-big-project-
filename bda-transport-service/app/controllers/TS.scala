@@ -21,7 +21,7 @@ class TS extends Controller {
     val res: ObjectNode = Json.newObject
     res.put("result", "failure")
     res.put("reason", "empty request")
-    m_log.debug(s"Empty request with ${msg} content type came from: ${ctx.request().host()}/${ctx.request().username()}")
+    m_log.debug(s"Empty request with $msg content type came from: ${ctx.request().host()}/${ctx.request().username()}")
     play.mvc.Results.badRequest(res)
   }
 
@@ -44,19 +44,22 @@ class TS extends Controller {
                                     else {
                                         import scala.collection.JavaConversions._
                                         val requestBody =  ctx.request.body.asFormUrlEncoded().mkString
-                                        m_log debug s"URL encoded: ${requestBody}"
+                                        m_log debug s"URL encoded: $requestBody"
                                         process(requestBody)
                                     }
         case "application/json" => if (ctx.request.body.asJson == null) handleEmptyRequest("application/json")
-                                          else process(ctx.request.body.asJson.asText())
+                                          else { val body = ctx.request.body.asJson
+//                                                      m_log debug ( "App/JSON: " + body.toString)
+                                                     process(body.toString)
+                                               }
         case "octet/stream" =>  if (ctx.request.body.asBytes.toArray == null) handleEmptyRequest("octet/stream")
                                        else process(ctx.request.body.asBytes.toArray)
-        case _ => {
+        case _ =>
               res.put("result", "failure")
               res.put("reason", s"Unsupported content type: ${header.contentType}")
               m_log.debug(s"Unprocessed request: ${ctx._requestHeader.rawQueryString}")
               play.mvc.Results.badRequest(res)
-        }
+
       }
     }
   }
@@ -95,7 +98,7 @@ class TS extends Controller {
     }
     res.put("result", "failure")
     res.put("result", "Unsupported storage type")
-    return play.mvc.Results.badRequest(res)
+    play.mvc.Results.badRequest(res)
   }
 
   private var stvalue : String = null
