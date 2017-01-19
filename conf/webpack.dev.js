@@ -17,21 +17,15 @@ module.exports = webpackMerge(commonConfig, {
     sourceMapFilename: '[file].map'
   },
 
-  debug: true,
   devtool: 'source-map',
-  noInfo: true,
-
-  stats: {
-    colors: true
-  },
 
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.(css|scss)$/,
         loaders: ExtractTextPlugin.extract({
-          fallbackLoader: 'style',
-          loader: 'css!sass!postcss'
+          fallbackLoader: 'style-loader',
+          loader: 'css-loader!sass-loader!postcss-loader'
         })
       }
     ]
@@ -54,10 +48,6 @@ module.exports = webpackMerge(commonConfig, {
       chunks: ['login']
     })
   ],
-
-  eslint: {
-    configFile: webpackHelper.root('conf/eslint-dev-rules.js')
-  },
 
   devServer: {
     port: 3000,

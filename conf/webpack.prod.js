@@ -34,12 +34,12 @@ module.exports = webpackMerge(commonConfig, {
   },
 
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.(css|scss)$/,
         loaders: ExtractTextPlugin.extract({
-          fallbackLoader: 'style',
-          loader: 'css?minimize!sass!postcss'
+          fallbackLoader: 'style-loader',
+          loader: 'css-loader?minimize!sass-loader!postcss-loader'
         })
       }
     ]
@@ -73,9 +73,5 @@ module.exports = webpackMerge(commonConfig, {
       names: ['vendor'],
       minChunks: Infinity
     })
-  ],
-
-  eslint: {
-    configFile: webpackHelper.root('conf/eslint-prod-rules.js')
-  }
+  ]
 });
