@@ -7,28 +7,25 @@ module.exports = {
     modules: [
       MODULE_DIR,
       webpackHelper.root('src/main/javascript')
-    ],
-    extensions: ['', '.js']
+    ]
   },
 
   module: {
-    preLoaders: [
+    rules: [
       {
+        enforce: 'pre',
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'eslint'
-      }
-    ],
-
-    loaders: [
+        loader: 'eslint-loader'
+      },
       {
         test: /.json$/,
-        loaders: 'json'
+        loaders: 'json-loader'
       },
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loaders: 'ng-annotate!babel'
+        loaders: 'ng-annotate-loader!babel-loader'
       }
     ]
   }
