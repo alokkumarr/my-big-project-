@@ -14,7 +14,7 @@
 			<directory>${project.basedir}/target</directory>
 			<outputDirectory>/</outputDirectory>
 			<includes>
-				<include>${project.artifactId}-${project.version}</include>
+				<include>*.war</include>
 			</includes>
 		</fileSet>
 		</fileSets>
