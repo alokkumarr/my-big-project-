@@ -78,7 +78,7 @@
             </configuration>
           </execution>
 
-           <execution>
+          <execution>
             <id>npm-run-build</id>
             <goals>
               <goal>npm</goal>
@@ -87,7 +87,7 @@
               <arguments>run start</arguments>
             </configuration>
           </execution>
-          
+
           <!-- commented for not being used
           <execution>
             <id>javascript tests</id>
@@ -100,29 +100,26 @@
           </execution> -->
         </executions>
       </plugin>
-      
-	<!--    
-   	<plugin>
-		<artifactId>maven-war-plugin</artifactId>
-		<version>3.0.0</version>
-		<configuration>
 
-			<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
-			<webResources>
-				<resource>
-					<directory>dist</directory>
-					<targetPath>/</targetPath>
-				</resource>
-			</webResources>
-			<archive>
-				<manifest>
-					<addClasspath>true</addClasspath>
-				</manifest>
-			</archive>
-		</configuration>
-	</plugin> 
-	-->
-	
+      <!--
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+          <webResources>
+            <resource>
+              <directory>dist</directory>
+              <targetPath>/</targetPath>
+            </resource>
+          </webResources>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>-->
     </plugins>
   </build>
 
@@ -133,7 +130,7 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <build>
-      <finalName>${project.artifactId}-${project.version}</finalName>
+        <finalName>${project.artifactId}-${project.version}</finalName>
         <plugins>
           <plugin>
             <artifactId>maven-clean-plugin</artifactId>
@@ -210,27 +207,26 @@
             </executions>
           </plugin>
 
-	<plugin>
-		<artifactId>maven-war-plugin</artifactId>
-		<version>3.0.0</version>
-		<configuration>
+          <plugin>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>3.0.0</version>
+            <configuration>
+              <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+              <webResources>
+                <resource>
+                  <directory>dist</directory>
+                  <targetPath>/</targetPath>
+                </resource>
+              </webResources>
+              <archive>
+                <manifest>
+                  <addClasspath>true</addClasspath>
+                </manifest>
+              </archive>
+            </configuration>
+          </plugin>
 
-			<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
-			<webResources>
-				<resource>
-					<directory>dist</directory>
-					<targetPath>/</targetPath>
-				</resource>
-			</webResources>
-			<archive>
-				<manifest>
-					<addClasspath>true</addClasspath>
-				</manifest>
-			</archive>
-		</configuration>
-	</plugin>
-
-        <plugin>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
             <version>${maven.assembly.version}</version>
@@ -250,8 +246,6 @@
               </execution>
             </executions>
           </plugin>
-          
-          
         </plugins>
       </build>
     </profile>
