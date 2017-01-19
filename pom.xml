@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.synchronoss</groupId>
-  <artifactId>sncr-saw</artifactId>
+  <artifactId>bda-saw</artifactId>
   <version>2.0.0.0</version>
-  <packaging>pom</packaging>
+  <packaging>war</packaging>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <output.directory>${output}</output.directory>
@@ -78,7 +78,7 @@
             </configuration>
           </execution>
 
-          <execution>
+           <execution>
             <id>npm-run-build</id>
             <goals>
               <goal>npm</goal>
@@ -87,7 +87,7 @@
               <arguments>run start</arguments>
             </configuration>
           </execution>
-
+          
           <!-- commented for not being used
           <execution>
             <id>javascript tests</id>
@@ -100,6 +100,29 @@
           </execution> -->
         </executions>
       </plugin>
+      
+	<!--    
+   	<plugin>
+		<artifactId>maven-war-plugin</artifactId>
+		<version>3.0.0</version>
+		<configuration>
+
+			<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+			<webResources>
+				<resource>
+					<directory>dist</directory>
+					<targetPath>/</targetPath>
+				</resource>
+			</webResources>
+			<archive>
+				<manifest>
+					<addClasspath>true</addClasspath>
+				</manifest>
+			</archive>
+		</configuration>
+	</plugin> 
+	-->
+	
     </plugins>
   </build>
 
@@ -110,6 +133,7 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <build>
+      <finalName>${project.artifactId}-${project.version}</finalName>
         <plugins>
           <plugin>
             <artifactId>maven-clean-plugin</artifactId>
@@ -186,11 +210,30 @@
             </executions>
           </plugin>
 
-          <plugin>
+	<plugin>
+		<artifactId>maven-war-plugin</artifactId>
+		<version>3.0.0</version>
+		<configuration>
+
+			<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+			<webResources>
+				<resource>
+					<directory>dist</directory>
+					<targetPath>/</targetPath>
+				</resource>
+			</webResources>
+			<archive>
+				<manifest>
+					<addClasspath>true</addClasspath>
+				</manifest>
+			</archive>
+		</configuration>
+	</plugin>
+
+        <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
             <version>${maven.assembly.version}</version>
-
             <executions>
               <execution>
                 <id>sncr_saw</id>
@@ -207,6 +250,8 @@
               </execution>
             </executions>
           </plugin>
+          
+          
         </plugins>
       </build>
     </profile>
