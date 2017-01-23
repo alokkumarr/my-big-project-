@@ -4,9 +4,8 @@ node_modules
 log.txt
 .tmp/
 coverage/
+build/
 dist/
-src/styleguide/dist/
-src/main/javascript/styleguide/dist/
 
 
 # IDEs and editors

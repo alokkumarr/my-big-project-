@@ -20,12 +20,7 @@ const MODULE_DIR = 'node_modules';
  */
 module.exports = {
   context: webpackHelper.root('src/main/javascript'),
-  entry: {
-    app: './app/index',
-    login: './login/index'
-  },
   output: {
-    path: webpackHelper.root('dist'),
     filename: 'js/[name].bundle.js'
   },
 

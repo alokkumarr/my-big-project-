@@ -1,9 +1,7 @@
-const webpackMerge = require('webpack-merge');
-const indexOf = require('lodash/indexOf');
-const gte = require('lodash/gte');
 const path = require('path');
+const webpackMerge = require('webpack-merge');
 const webpackHelper = require('./webpack.helper');
-const commonConfig = require('./webpack.common.js');
+const mainConfig = require('./webpack.main.js');
 
 /**
  * Webpack Plugins
@@ -28,7 +26,7 @@ const vendorKeys = Object.keys(pkg.dependencies).map(key => {
 const appChunks = ['vendor', 'app'];
 const loginChunks = ['vendor', 'login'];
 
-module.exports = webpackMerge(commonConfig, {
+module.exports = webpackMerge(mainConfig, {
   entry: {
     vendor: vendorKeys
   },
@@ -46,7 +44,7 @@ module.exports = webpackMerge(commonConfig, {
   },
 
   plugins: [
-    new CleanWebpackPlugin(['dist'], {
+    new CleanWebpackPlugin(['build/dist'], {
       root: webpackHelper.root(),
       verbose: true
     }),

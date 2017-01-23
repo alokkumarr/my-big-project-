@@ -6,14 +6,14 @@
 
   <md-button class="md-primary" ng-click="$ctrl.clickMe()">md-primary</md-button>
 
-  </br>
+  <br/>
 
   <md-button class="btn-card">
     <md-icon md-font-icon="icon-search"></md-icon>
     Card button
   </md-button>
 
-  </br>
+  <br/>
 
   <md-button-group class="button-group" layout="row" layout-align="center center">
     <md-button>
@@ -43,7 +43,7 @@
     Disabled
   </md-checkbox>
 
-  </br>
+  <br/>
 
   <div layout-gt-xs="row">
     <div flex-gt-xs>
@@ -58,12 +58,12 @@
     <div flex-gt-xs>
       <md-input-container md-no-float>
         <label>Color</label>
-        <input type="text" ng-model="color" placeholder="placeholder">
+        <input type="text" ng-model="color" placeholder="placeholder"/>
       </md-input-container>
     </div>
   </div>
 
-  </br>
+  <br/>
 
 
   <div class="new-alerts-container">
@@ -71,7 +71,7 @@
     <span class="new-alerts-label"> New Alerts </span>
   </div>
 
-  </br>
+  <br/>
 
 
   <h2 class="md-title">Filter tags as chips (with custom template).</h2>
@@ -84,24 +84,24 @@
             md-transform-chip="$ctrl.newVeg($chip)" md-removable="$ctrl.removable">
 
     <md-chip-template>
-          <span>
-            <strong>[{{$index}}] {{$chip.name}}</strong>
-            <em>({{$chip.type}})</em>
-          </span>
+      <span>
+        <strong>[{{$index}}] {{$chip.name}}</strong>
+        <em>({{$chip.type}})</em>
+      </span>
     </md-chip-template>
     <button md-chip-remove class="md-primary">
       <md-icon md-font-icon="icon-remove"></md-icon>
     </button>
   </md-chips>
 
-  <br>
+  <br/>
 
   <md-chip class="tag-chip">Tag 1</md-chip>
   <md-chip class="tag-chip">Lacrosse</md-chip>
   <md-chip class="tag-chip">Baseball</md-chip>
 
 
-  </br>
+  <br/>
 
   <div style="width: 400px;">
     <range-slider
@@ -113,7 +113,7 @@
       max="$ctrl.rangeSlider.max"></range-slider>
   </div>
 
-  </br>
+  <br/>
 
   <md-button class="md-icon-button" aria-label="More" ng-click="toggleRight()">
     <md-icon md-font-icon="icon-launchpad"></md-icon>
@@ -127,13 +127,13 @@
     Minus
   </md-button>
 
-  </br>
+  <br/>
 
   <div class="search-input-wrapper">
     <span class="search-label">Order Fulfillment</span>
     <md-input-container md-no-float class="search-input md-block">
       <md-icon md-font-icon="icon-search"></md-icon>
-      <input type="text" placeholder="Search">
+      <input type="text" placeholder="Search"/>
     </md-input-container>
   </div>
 </md-content>

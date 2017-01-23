@@ -3,8 +3,8 @@ export function routesConfig($stateProvider) {
 
   const states = [
     {
-      name: 'app.alerts',
-      url: 'alerts'
+      name: 'alerts',
+      url: '/alerts'
     }
   ];
 

@@ -1,6 +1,6 @@
 const webpackMerge = require('webpack-merge');
 const webpackHelper = require('./webpack.helper');
-const commonConfig = require('./webpack.common.js');
+const mainConfig = require('./webpack.main.js');
 
 /**
  * Webpack Plugins
@@ -12,7 +12,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 /**
  * Webpack configuration
  */
-module.exports = webpackMerge(commonConfig, {
+module.exports = webpackMerge(mainConfig, {
   output: {
     sourceMapFilename: '[file].map'
   },
@@ -57,6 +57,6 @@ module.exports = webpackMerge(commonConfig, {
       aggregateTimeout: 300,
       poll: 1000
     },
-    outputPath: webpackHelper.root('dist')
+    outputPath: webpackHelper.root('build/dist')
   }
 });

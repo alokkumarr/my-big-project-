@@ -1,12 +1,13 @@
 export function routesConfig($stateProvider, $urlRouterProvider, $locationProvider) {
   'ngInject';
-  $locationProvider.html5Mode(true).hashPrefix('!');
+
+  $locationProvider.html5Mode(true);
   $urlRouterProvider.otherwise('/');
 
   const states = [
     {
       name: 'controls',
-      url: '/',
+      url: '/controls',
       component: 'controlsSection'
     }, {
       name: 'pivotgrid',

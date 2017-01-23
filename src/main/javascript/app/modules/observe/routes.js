@@ -3,8 +3,8 @@ export function routesConfig($stateProvider) {
 
   const states = [
     {
-      name: 'app.observe',
-      url: 'observe',
+      name: 'observe',
+      url: '/observe',
       component: 'observePage'
     }
   ];

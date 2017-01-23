@@ -1,6 +1,6 @@
 import template from './header.component.html';
 
-export const HeaderComponent = {
+export const LayoutHeaderComponent = {
   template,
   controller: class HeaderController {
     constructor($window, $transitions, $state, UserService) {
