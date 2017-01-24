@@ -1,139 +1,163 @@
 <md-content class="md-padding">
-  <md-button class="btn-primary" ng-click="$ctrl.clickMe()">Primary</md-button>
-  <md-button class="btn-secondary">Secondary</md-button>
-  <md-button md-no-ink class="btn-secondary">Secondary, md-no-ink</md-button>
-  <md-button class="btn-card">Card button</md-button>
+  <div class="controls-block">
+    <h1>Buttons</h1>
 
-  <md-button class="md-primary" ng-click="$ctrl.clickMe()">md-primary</md-button>
-
-  <br/>
-
-  <md-button class="btn-card">
-    <md-icon md-font-icon="icon-search"></md-icon>
-    Card button
-  </md-button>
-
-  <br/>
-
-  <md-button-group class="button-group" layout="row" layout-align="center center">
-    <md-button>
+    <md-button class="btn-primary">Primary</md-button>
+    <md-button class="btn-secondary">Secondary</md-button>
+    <md-button class="btn-secondary" md-no-ink>Secondary, md-no-ink</md-button>
+    <md-button class="btn-tertiary">Tertiary button</md-button>
+    <md-button class="btn-card">Card button</md-button>
+    <md-button class="md-primary">md-primary</md-button>
+    <md-button class="btn-card">
       <md-icon md-font-icon="icon-search"></md-icon>
-      Apple
+      Card button
     </md-button>
-    <md-button ng-click="$ctrl.clickMe()">Samsung</md-button>
-    <md-button>Sony</md-button>
-    <md-button>B&amp;O</md-button>
-  </md-button-group>
-
-  <md-radio-group>
-    <md-radio-button value="1" aria-label="Label 1">Label 1</md-radio-button>
-    <md-radio-button ng-model="color" ng-value="specialValue" aria-label="Green">
-      Green
-    </md-radio-button>
-  </md-radio-group>
-
-
-  <md-checkbox ng-model="isChecked" aria-label="Finished?">
-    Finished ?
-  </md-checkbox>
-  <md-checkbox md-no-ink ng-model="hasInk" aria-label="No Ink Effects">
-    No Ink Effects
-  </md-checkbox>
-  <md-checkbox ng-disabled="true" ng-model="isDisabled" aria-label="Disabled">
-    Disabled
-  </md-checkbox>
-
-  <br/>
-
-  <div layout-gt-xs="row">
-    <div flex-gt-xs>
-      <md-input-container>
-        <label>From</label>
-        <md-datepicker
-          md-hide-icons="calendar"
-          md-placeholder="mm/dd/yyyy"
-          ng-model="fromDate"></md-datepicker>
-      </md-input-container>
-    </div>
-    <div flex-gt-xs>
-      <md-input-container md-no-float>
-        <label>Color</label>
-        <input type="text" ng-model="color" placeholder="placeholder"/>
-      </md-input-container>
-    </div>
   </div>
 
-  <br/>
+  <div class="controls-block">
+    <h1>Group Buttons</h1>
 
-
-  <div class="new-alerts-container">
-    <span class="new-alerts-count-box">0</span>
-    <span class="new-alerts-label"> New Alerts </span>
+    <md-button-group class="button-group" layout="row">
+      <md-button>
+        <md-icon md-font-icon="icon-search"></md-icon>
+        Apple
+      </md-button>
+      <md-button>Samsung</md-button>
+      <md-button>Sony</md-button>
+      <md-button>B&amp;O</md-button>
+    </md-button-group>
   </div>
 
-  <br/>
+  <div class="controls-block">
+    <h1>Radio Buttons</h1>
 
-
-  <h2 class="md-title">Filter tags as chips (with custom template).</h2>
-  <p>Note: the variables <code>$chip</code> and <code>$index</code> are available in custom chip templates.</p>
-
-  <md-chips class="filter-tags"
-            ng-model="$ctrl.vegObjs"
-            readonly="$ctrl.readonly"
-            placeholder="6 More Filters..."
-            md-transform-chip="$ctrl.newVeg($chip)" md-removable="$ctrl.removable">
-
-    <md-chip-template>
-      <span>
-        <strong>[{{$index}}] {{$chip.name}}</strong>
-        <em>({{$chip.type}})</em>
-      </span>
-    </md-chip-template>
-    <button md-chip-remove class="md-primary">
-      <md-icon md-font-icon="icon-remove"></md-icon>
-    </button>
-  </md-chips>
-
-  <br/>
-
-  <md-chip class="tag-chip">Tag 1</md-chip>
-  <md-chip class="tag-chip">Lacrosse</md-chip>
-  <md-chip class="tag-chip">Baseball</md-chip>
-
-
-  <br/>
-
-  <div style="width: 400px;">
-    <range-slider
-      lower-value="$ctrl.rangeSlider.lower"
-      upper-value="$ctrl.rangeSlider.upper"
-      min-gap="$ctrl.rangeSlider.minGap"
-      step="$ctrl.rangeSlider.step"
-      min="$ctrl.rangeSlider.min"
-      max="$ctrl.rangeSlider.max"></range-slider>
+    <md-radio-group>
+      <md-radio-button value="1" aria-label="Label 1">Label 1</md-radio-button>
+      <md-radio-button ng-model="color" ng-value="specialValue" aria-label="Green">
+        Green
+      </md-radio-button>
+    </md-radio-group>
   </div>
 
-  <br/>
+  <div class="controls-block">
+    <h1>Checkboxes</h1>
 
-  <md-button class="md-icon-button" aria-label="More" ng-click="toggleRight()">
-    <md-icon md-font-icon="icon-launchpad"></md-icon>
-    <badge label="{{$ctrl.badgeCount}}"></badge>
-  </md-button>
+    <md-checkbox ng-model="isChecked" aria-label="Finished?">
+      Finished ?
+    </md-checkbox>
+    <md-checkbox md-no-ink ng-model="hasInk" aria-label="No Ink Effects">
+      No Ink Effects
+    </md-checkbox>
+    <md-checkbox ng-disabled="true" ng-model="isDisabled" aria-label="Disabled">
+      Disabled
+    </md-checkbox>
+  </div>
 
-  <md-button class="btn-secondary" aria-label="More" ng-click="$ctrl.incBadgeCount()">
-    Plus
-  </md-button>
-  <md-button class="btn-secondary" aria-label="More" ng-click="$ctrl.decBadgeCount()">
-    Minus
-  </md-button>
+  <div class="controls-block">
+    <h1>DateTime</h1>
 
-  <br/>
-
-  <div class="search-input-wrapper">
-    <span class="search-label">Order Fulfillment</span>
-    <md-input-container md-no-float class="search-input md-block">
-      <md-icon md-font-icon="icon-search"></md-icon>
-      <input type="text" placeholder="Search"/>
+    <md-input-container>
+      <label>From</label>
+      <md-datepicker
+        md-hide-icons="calendar"
+        md-placeholder="mm/dd/yyyy"
+        ng-model="fromDate"></md-datepicker>
     </md-input-container>
+  </div>
+
+  <div class="controls-block">
+    <h1>Color Picker</h1>
+
+    <md-input-container md-no-float>
+      <label>Color</label>
+      <input type="text" ng-model="color" placeholder="placeholder"/>
+    </md-input-container>
+  </div>
+
+  <div class="controls-block">
+    <h1>Alerts</h1>
+
+    <div class="new-alerts-container">
+      <span class="new-alerts-count-box">0</span>
+      <span class="new-alerts-label"> New Alerts </span>
+    </div>
+  </div>
+
+
+  <div class="controls-block">
+    <h1>Filters & Tags</h1>
+
+    <h2 class="md-title">Filter tags as chips (with custom template).</h2>
+    <p>Note: the variables <code>$chip</code> and <code>$index</code> are available in custom chip templates.</p>
+
+    <md-chips class="filter-tags"
+              ng-model="$ctrl.vegObjs"
+              readonly="$ctrl.readonly"
+              placeholder="6 More Filters..."
+              md-transform-chip="$ctrl.newVeg($chip)" md-removable="$ctrl.removable">
+
+      <md-chip-template>
+        <span>
+          <strong>[{{$index}}] {{$chip.name}}</strong>
+          <em>({{$chip.type}})</em>
+        </span>
+      </md-chip-template>
+      <button md-chip-remove class="md-primary">
+        <md-icon md-font-icon="icon-remove"></md-icon>
+      </button>
+    </md-chips>
+
+    <br/>
+
+    <md-chip class="tag-chip">Tag 1</md-chip>
+    <md-chip class="tag-chip">Lacrosse</md-chip>
+    <md-chip class="tag-chip">Baseball</md-chip>
+  </div>
+
+  <br/>
+
+  <div class="controls-block">
+    <h1>Range Slider</h1>
+
+    <div style="width: 400px;">
+      <range-slider
+        lower-value="$ctrl.rangeSlider.lower"
+        upper-value="$ctrl.rangeSlider.upper"
+        min-gap="$ctrl.rangeSlider.minGap"
+        step="$ctrl.rangeSlider.step"
+        min="$ctrl.rangeSlider.min"
+        max="$ctrl.rangeSlider.max"></range-slider>
+    </div>
+  </div>
+
+  <div class="controls-block">
+    <h1>Badge Counter</h1>
+
+    <md-button class="md-icon-button" aria-label="More"
+               ng-click="toggleRight()">
+      <md-icon md-font-icon="icon-launchpad"></md-icon>
+      <badge label="{{$ctrl.badgeCount}}"></badge>
+    </md-button>
+
+    <md-button class="btn-secondary" aria-label="More"
+               ng-click="$ctrl.incBadgeCount()">
+      Plus
+    </md-button>
+    <md-button class="btn-secondary" aria-label="More"
+               ng-click="$ctrl.decBadgeCount()">
+      Minus
+    </md-button>
+  </div>
+
+  <div class="controls-block">
+    <h1>Search input</h1>
+
+    <div class="search-input-wrapper">
+      <span class="search-label">Order Fulfillment</span>
+      <md-input-container md-no-float class="search-input md-block">
+        <md-icon md-font-icon="icon-search"></md-icon>
+        <input type="text" placeholder="Search"/>
+      </md-input-container>
+    </div>
   </div>
 </md-content>
