@@ -11,6 +11,18 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <output.directory>${output}</output.directory>
     <maven.assembly.version>2.4</maven.assembly.version>
+    <!-- RPM -->
+    <rpm.version>2</rpm.version>
+    <rpm.release>0.0</rpm.release>
+    <app.user>saw</app.user>
+    <app.group>saw</app.group>
+    <!-- must be first 2 digits from ${project.version} -->
+    <app.version>${rpm.version}.${rpm.release}</app.version>
+    <app.name>${project.artifactId}</app.name>
+    <app.nameVer>${app.name}-${app.version}</app.nameVer>
+    <app.etcDir>/etc/bda/${app.nameVer}</app.etcDir>
+    <app.optDir>/opt/bda/${app.nameVer}</app.optDir>
+    <app.varDir>/var/bda/${app.nameVer}</app.varDir>
   </properties>
 
   <build>
@@ -122,8 +134,7 @@
 		</configuration>
 	</plugin> 
 	-->
-	
-    </plugins>
+	    </plugins>
   </build>
 
   <profiles>
@@ -251,7 +262,111 @@
             </executions>
           </plugin>
           
-          
+            <!--
+              RPM build
+              -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>rpm-maven-plugin</artifactId>
+                <version>2.1.5</version>
+                <extensions>true</extensions>
+
+                <!-- RPM as Side Effect -->
+                <executions>
+                  <execution>
+                    <id>generate-rpm</id>
+                    <phase>package</phase>
+                    <goals>
+                      <goal>rpm</goal>
+                    </goals>
+                  </execution>
+                </executions>
+                <!-- executions><execution>
+                    <id>${app.name}-rpm-build</id>
+                    <phase>package</phase>
+                    <goals><goal>rpm</goal></goals>
+                </execution></executions -->
+
+                <configuration>
+                    <license>Synchronoss proprietary product</license>
+                    <distribution>SNCR XDF 2017</distribution>
+                    <needarch>false</needarch>
+                    <targetOS>i386-linux</targetOS>
+                    <group>BDA/SAW</group>
+                    <packager>BDA</packager>
+                    <name>${app.name}</name> 
+                    <!--
+                        Only applicable to a Mapping if filemode,
+                        username, AND groupname are NOT populated.
+                    -->
+                    <defaultUsername>${app.user}</defaultUsername>
+                    <defaultGroupname>${app.group}</defaultGroupname>
+                    <defaultDirmode>550</defaultDirmode>
+                    <defaultFilemode>440</defaultFilemode>
+                    <!-- A list of %define arguments -->
+                    <defineStatements><defineStatement>
+                        _unpackaged_files_terminate_build 0
+                    </defineStatement></defineStatements>
+                    <!-- RPM contents -->
+                    <mappings>
+                        <!-- Top level directories -->
+                        <mapping><directory>${app.optDir}</directory></mapping>
+                        <mapping><directory>${app.etcDir}</directory></mapping>
+                        <mapping>
+                            <!-- /var/bda/testapp-x.x -->
+                            <directory>${app.varDir}</directory>
+                            <directoryIncluded>true</directoryIncluded>
+                            <!-- dirmode>750</dirmode -->
+                            <filemode>750</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                        </mapping>
+                        <!-- env file -->
+                        <!--
+                        <mapping>
+                            <directory>${app.etcDir}</directory>
+                            <sources><source><location>src/app/testapp.env</location></source></sources>
+                            <configuration>true</configuration>
+                        </mapping>
+                      -->
+
+                        <mapping>
+                            <directory>${app.optDir}</directory>
+                            <sources>
+                                <source><location>target/bda-saw-2.0.0.0.war</location></source>
+                                <!--
+                                <source><location>...</location></source>
+                                -->
+                            </sources>
+                            <directoryIncluded>false</directoryIncluded>
+                        </mapping>
+                    </mappings>
+                    <preinstallScriptlet>
+                        <script>
+echo Pre-install is being executed
+#echo &gt;/tmp/.xdf-testapp.tmp.env '
+#export user=${app.user}
+#export group=${app.group}
+#export app_name=${app.name}
+#export app_version=${app.version}
+#export app_home=${app.optDir}
+'
+                    </script>
+                    </preinstallScriptlet>
+                    <!--
+                    <postinstallScriptlet>
+                        <scriptFile>src/install/postinstall</scriptFile>
+                        <fileEncoding>utf-8</fileEncoding>
+                    </postinstallScriptlet>
+                    <preremoveScriptlet>
+                        <scriptFile>src/install/preremove</scriptFile>
+                        <fileEncoding>utf-8</fileEncoding>
+                    </preremoveScriptlet>
+                  -->
+                </configuration>
+            </plugin>
+            <!-- RPM plugin : end -->
+
         </plugins>
       </build>
     </profile>
