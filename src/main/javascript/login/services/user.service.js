@@ -82,7 +82,7 @@ class UserService {
 
   preResetPwd(credentials) {
     const route = '/resetPassword';
-    const productUrl = `${this._$window.location.origin}/login.html#!/resetPassword`;
+    const productUrl = `${this._$window.location.href.split("/preResetPwd")[0]}/resetPassword`;
 
     const LoginDetails = {
       masterLoginId: credentials.masterLoginId,
