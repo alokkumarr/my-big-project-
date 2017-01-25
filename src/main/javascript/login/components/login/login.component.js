@@ -26,7 +26,7 @@ export const LoginComponent = {
       })
         .then(res => {
           if (res.ticket.valid) {
-            this._$window.location.assign('.');
+            this._$window.location.assign('./');
           } else {
             this.states.error = res.ticket.validityReason;
           }
