@@ -8,7 +8,6 @@ export const AnalyzeFilterContainerComponent = {
   },
   controller: class AnalyzeFilterContainerComponent {
     onOperatorSelected(value) {
-      console.log('value', value);
       this.filter.operator = value;
     }
   }
