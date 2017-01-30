@@ -28,6 +28,7 @@
   </analyze-dialog-header>
 
   <analyze-dialog-content>
+    <analyze-filter-sidenav ng-model="$ctrl.filters"></analyze-filter-sidenav>
     <div layout="column">
       <div class="ard_content" layout="column">
         <div layout="row" class="ard_sub-header">
@@ -90,7 +91,7 @@
             Sort
           </md-button>
 
-          <md-button>
+          <md-button ng-click="$ctrl.openFilterSidenav()">
             <md-icon md-font-icon="icon-filter"></md-icon>
             Filter
           </md-button>
