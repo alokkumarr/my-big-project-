@@ -1,22 +1,27 @@
 module.exports = {
   analysisElems: {
-    analyzeCard: element(by.css('.analyze-card')),
+    listView: element(by.css('[ng-value="$ctrl.LIST_VIEW"]')),
+    cardView: element(by.css('[ng-value="$ctrl.CARD_VIEW"]')),
+    newAnalyzeDialog: element(by.css('.new-analyze-dialog')),
     addAnalysisBtn: element(by.partialButtonText('ANALYSIS')),
-    analyzeDialog: element(by.css('.analyze-dialog')),
-    analyzeReportTable: element(by.xpath('//*[@id=\'dialogContent_11\']/md-dialog-content/analyze-dialog-content/div/div[4]/div[1]/div[2]/choice-group/div/button[1]')),
-    createAnalysisBtn: element(by.buttonText('Create Analysis')),
-    designerDialog: element(by.css('.analyze-dialog_content'))
+    firstMetric: element(by.xpath('//span[. = "Metric a 1"]/../..')),
+    secondMetric: element(by.xpath('//span[. = "Metric b 2"]/../..')),
+    reportTable: element(by.xpath('//p[. = "Report"]/..')),
+    pivotTable: element(by.xpath('//p[. = "Pivot"]/..')),
+    createAnalysisBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]')),
+    designerDialog: element(by.css('.ard_canvas')),
+    saveReportBtn: element(by.css('[ng-click="$ctrl.openSaveModal()"]'))
   },
 
-  validateCard() {
-    expect(this.analysisElems.analyzeCard.isPresent()).toBeTruthy();
+  validateCardView() {
+    expect(this.analysisElems.cardView.getAttribute('aria-checked')).toEqual('true');
   },
 
-  validateAnalyzeDialog() {
-    expect(this.analysisElems.analyzeDialog.isPresent()).toBeTruthy();
+  validateNewAnalyze() {
+    expect(this.analysisElems.newAnalyzeDialog.isDisplayed()).toBeTruthy();
   },
 
-  designerDialog() {
-    expect(this.analysisElems.designerDialog.isPresent()).toBeTruthy();
+  validateDesignerDialog() {
+    expect(this.analysisElems.designerDialog.isDisplayed()).toBeTruthy();
   }
 };

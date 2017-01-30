@@ -14,21 +14,30 @@ describe('Analyses Tests', () => {
     sidenav.sidenavElements.firstCategory.click();
   });
 
-  it('should see the analysis card view', () => {
-    analyze.validateCard();
+  it('should card view by default', () => {
+    analyze.validateCardView();
   });
 
   it('should attempt to create a new analysis', () => {
     analyze.analysisElems.addAnalysisBtn.click();
-    analyze.validateAnalyzeDialog();
+    analyze.validateNewAnalyze();
   });
 
-  it('should select Report table type and click Create', () => {
-    analyze.analysisElems.analyzeReportTable.click();
+  it('should verify the first metric', () => {
+    analyze.analysisElems.firstMetric.click();
+    expect(analyze.analysisElems.secondMetric.getAttribute('aria-disabled')).toEqual('true');
+    analyze.analysisElems.firstMetric.click();
+    expect(analyze.analysisElems.secondMetric.getAttribute('aria-disabled')).toEqual('false');
+
+  });
+
+  it('should select report type and proceed', () => {
+    analyze.analysisElems.reportTable.click();
     analyze.analysisElems.createAnalysisBtn.click();
+    analyze.validateDesignerDialog();
   });
 
-  it('should open the designer dialog', () => {
-    analyze.validateAnalyzeDialog();
+  it('should attempt to save the report', () => {
+    analyze.analysisElems.saveReportBtn.click();
   });
 });
