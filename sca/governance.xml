@@ -4,7 +4,7 @@
     xmlns:sncr="http://synchronoss.com/governance">
     <sncr:projectName>bda-saw-security</sncr:projectName>
     <sncr:version>1.0</sncr:version>
-    <sncr:jiraProject>SAF</sncr:jiraProject>
+    <sncr:jiraProject>SAW</sncr:jiraProject>
     <sncr:application>ServerAPI</sncr:application>
     <sncr:technologyStack>
         <sncr:technology>
