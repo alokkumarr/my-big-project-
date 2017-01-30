@@ -17,4 +17,4 @@ export const StringFilterComponent = {
       this.filter.model[item] = !this.filter.model[item];
     }
   }
-}
+};

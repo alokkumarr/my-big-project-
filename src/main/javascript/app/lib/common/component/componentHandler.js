@@ -1,5 +1,3 @@
-import {EventHandler} from './eventHandler';
-
 class ComponentHandler {
   constructor($eventHandler) {
     this._instances = {};
@@ -60,7 +58,7 @@ class ComponentHandler {
   }
 }
 
-export default ($eventHandler) => {
+export default $eventHandler => {
   'ngInject';
   return new ComponentHandler($eventHandler);
 };

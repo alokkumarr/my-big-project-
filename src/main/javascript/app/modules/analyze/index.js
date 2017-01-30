@@ -1,6 +1,4 @@
 import angular from 'angular';
-import 'angular-ui-grid';
-import 'angular-ui-grid/ui-grid.css';
 
 import {routesConfig} from './routes';
 
@@ -14,6 +12,7 @@ import {AnalyzeNewComponent} from './components/analyze-new/analyze-new.componen
 import {AnalyzeReportComponent} from './components/analyze-report/analyze-report.component';
 import {AnalyzeDialogComponent} from './components/analyze-dialog/analyze-dialog.component';
 import {AnalyzeReportSortComponent} from './components/analyze-report-sort/analyze-report-sort.component';
+import {AnalyzeReportDescriptionComponent} from './components/analyze-report-description/analyze-report-description.component';
 import {AnalyzeReportPreviewComponent} from './components/analyze-report-preview/analyze-report-preview.component';
 import {ReportGridComponent} from './components/analyze-report-grid/report-grid/report-grid.component';
 import {ReportGridNodeComponent} from './components/analyze-report-grid/report-grid-node/report-grid-node.component';
@@ -23,10 +22,11 @@ import {AnalyzeFilterGroupComponent} from './components/analyze-filter-sidenav/a
 import {AnalyzeFilterSidenavComponent} from './components/analyze-filter-sidenav/analyze-filter-sidenav.component';
 import {StringFilterComponent} from './components/analyze-filter-sidenav/filters/string-filter.component';
 import {NumberFilterComponent} from './components/analyze-filter-sidenav/filters/number-filter.component';
+import {AnalyzeReportSaveComponent} from './components/analyze-report-save/analyze-report-save.component';
 
 export const AnalyzeModule = 'AnalyzeModule';
 
-angular.module(AnalyzeModule, ['ui.grid'])
+angular.module(AnalyzeModule, [])
   .config(routesConfig)
   .factory('FilterService', FilterService)
   .factory('AnalyzeService', AnalyzeService)
@@ -45,4 +45,7 @@ angular.module(AnalyzeModule, ['ui.grid'])
   .component('stringFilter', StringFilterComponent)
   .component('numberFilter', NumberFilterComponent)
   .component('analyzeFilterSidenav', AnalyzeFilterSidenavComponent)
-  .component('analyzeReportPreview', AnalyzeReportPreviewComponent);
+  .component('analyzeReportPreview', AnalyzeReportPreviewComponent)
+  .component('analyzeReportDescription', AnalyzeReportDescriptionComponent)
+  .component('analyzeReportPreview', AnalyzeReportPreviewComponent)
+  .component('analyzeReportSave', AnalyzeReportSaveComponent);

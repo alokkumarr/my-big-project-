@@ -1,10 +1,11 @@
-<md-card class="analyze-card">
+<md-card class="analyze-card" flex="100">
   <md-card-content layout="row" layout-align="space-between start">
-    <div flex="95" class="analyze-card_report">
+    <div flex="80" class="analyze-card_report">
       <div ng-switch="::$ctrl.metadata.type">
         <div class="content-component"
              ng-switch-when="chart">
-          <chart options="$ctrl.metadata.chart.options"></chart>
+          <!--<chart options="$ctrl.metadata.chart.options"></chart>-->
+          <div class="chart-placeholder"></div>
         </div>
 
         <div class="content-component"
@@ -14,7 +15,7 @@
       </div>
     </div>
 
-    <div flex="5">
+    <div flex="10">
       <div class="analyze-card_label"
            ng-bind="::$ctrl.metadata.type | uppercase"></div>
     </div>

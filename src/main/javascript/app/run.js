@@ -1,4 +1,4 @@
-export function runConfig($rootScope, $state) {
+export function runConfig($rootScope, $state, $location, $window, JwtService) {
   'ngInject';
 
   $rootScope.getPageTitle = () => {
@@ -10,4 +10,26 @@ export function runConfig($rootScope, $state) {
 
     return 'Synchronoss';
   };
+
+  $rootScope.$on('$locationChangeSuccess', event => {
+    const restrictedPage = ['/', '/login', '/observe', '/analyse', '/alerts'];
+
+    if ((restrictedPage.indexOf($location.path()) !== -1) && angular.isDefined(JwtService.get())) {
+      // todo
+    } else if ((restrictedPage.indexOf($location.path()) !== -1) && $location.path() !== '/login') {
+      event.preventDefault();
+      $window.location.assign('./login.html');
+    }
+  });
+
+  $rootScope.$on('$stateChangeSuccess', event => {
+    const restrictedPage = ['/', '/login', '/observe', '/analyse', '/alerts'];
+
+    if ((restrictedPage.indexOf($location.path()) !== -1) && angular.isDefined(JwtService.get())) {
+      // todo
+    } else if ((restrictedPage.indexOf($location.path()) !== -1) && $location.path() !== '/login') {
+      event.preventDefault();
+      $window.location.assign('./login.html');
+    }
+  });
 }

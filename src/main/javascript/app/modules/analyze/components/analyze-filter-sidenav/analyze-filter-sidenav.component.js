@@ -1,8 +1,8 @@
 import cloneDeep from 'lodash/cloneDeep';
 import map from 'lodash/map';
 import omit from 'lodash/fp/omit';
-import set from 'lodash/fp/set'
-import pipe from 'lodash/fp/pipe'
+import set from 'lodash/fp/set';
+import pipe from 'lodash/fp/pipe';
 
 import template from './analyze-filter-sidenav.component.html';
 

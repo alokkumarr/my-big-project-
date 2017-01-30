@@ -3,9 +3,10 @@ import template from './login.component.html';
 export const LoginComponent = {
   template,
   controller: class LoginController {
-    constructor($window, UserService) {
+    constructor($window, $state, UserService) {
       'ngInject';
       this._$window = $window;
+      this._$state = $state;
       this._UserService = UserService;
 
       this.dataHolder = {
@@ -25,8 +26,7 @@ export const LoginComponent = {
       })
         .then(res => {
           if (res.ticket.valid) {
-            const baseUrl = this._$window.location.origin;
-            this._$window.location = baseUrl;
+            this._$window.location.assign('./');
           } else {
             this.states.error = res.ticket.validityReason;
           }
@@ -34,6 +34,10 @@ export const LoginComponent = {
         .catch(() => {
           this.states.error = 'Network Error!';
         });
+    }
+
+    reset() {
+      this._$state.go('preResetPassword');
     }
   }
 };

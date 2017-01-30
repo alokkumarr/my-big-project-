@@ -31,7 +31,11 @@ module.exports = {
   devtool: null,
 
   resolve: {
-    modulesDirectories: [MODULE_DIR, webpackHelper.root('src/main/javascript')]
+    modulesDirectories: [MODULE_DIR, webpackHelper.root('src/main/javascript')],
+    alias: {
+      fonts: webpackHelper.root('assets/fonts'),
+      img: webpackHelper.root('assets/img')
+    }
   },
 
   resolveLoader: {
@@ -69,11 +73,11 @@ module.exports = {
       },
       {
         test: /\.(eot|woff|woff2|ttf)$/,
-        loader: 'file?name=/fonts/[name].[ext]'
+        loader: 'file?name=fonts/[name].[ext]&publicPath=../'
       },
       {
         test: /\.(png|jpg|svg)$/,
-        loader: 'file?name=/img/[name].[ext]'
+        loader: 'file?name=img/[name].[ext]&publicPath=../'
       }
     ]
   },

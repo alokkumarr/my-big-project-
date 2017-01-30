@@ -1,6 +1,4 @@
 import jsPlumb from 'jsplumb';
-import isEmpty from 'lodash/isEmpty';
-import find from 'lodash/find';
 
 import template from './jsPlumbCanvas.component.html';
 import style from './jsPlumbCanvas.component.scss';
@@ -92,7 +90,7 @@ export const JSPlumbCanvas = {
           const sourceField = sourceEndpointInst.model.field;
           const targetField = targetEndpointInst.model.field;
 
-          join = this.model.addJoin(type, {
+          this.model.addJoin(type, {
             table: sourceField.table.name,
             field: sourceField.name,
             side: sourceEndpointInst.model.side
@@ -104,8 +102,6 @@ export const JSPlumbCanvas = {
 
           this._$scope.$apply();
         }
-
-        debugger;
       });
     }
 

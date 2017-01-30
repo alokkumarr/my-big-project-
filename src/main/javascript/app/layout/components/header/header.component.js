@@ -12,18 +12,17 @@ export const HeaderComponent = {
     }
 
     isState(stateName) {
-      return !!this._$state.is(stateName);
+      return Boolean(this._$state.is(stateName));
     }
 
     logout() {
-      this._UserService.logout('logout');
+      this._UserService.logout('logout').then(() => {
+        this._$window.location.assign('./login.html');
+      });
     }
 
     changePwd() {
-      const baseUrl = this._$window.location.origin;
-      const appUrl = `${baseUrl}/changePwd`;
-
-      this._$window.location = appUrl;
+      this._$window.location.assign('./login.html#!/changePwd');
     }
   }
 };

@@ -46,7 +46,7 @@ export const JSPlumbJoinLabel = {
           targetEvent: ev,
           fullscreen: true,
           skipHide: true,
-          scope: scope
+          scope
         });
     }
   }

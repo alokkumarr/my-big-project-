@@ -4,6 +4,9 @@ import 'angular-ui-router';
 import 'angular-material';
 import 'angular-material/angular-material.css';
 
+import 'angular-ui-grid';
+import 'angular-ui-grid/ui-grid.css';
+
 import 'mottle';
 
 import 'devextreme/ui/data_grid';
@@ -11,7 +14,7 @@ import 'devextreme/integration/angular';
 import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.light.css';
 
-import '../../../../fonts/style.css';
+import 'fonts/icomoon.css';
 
 import AppConfig from '../../../../appConfig';
 
@@ -39,6 +42,7 @@ angular
     'ui.router',
     'ngMaterial',
     'dx',
+    'ui.grid',
     LibModule,
     ObserveModule,
     AnalyzeModule,

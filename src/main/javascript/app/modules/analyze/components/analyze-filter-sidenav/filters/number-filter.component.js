@@ -10,4 +10,4 @@ export const NumberFilterComponent = {
       this.modifiers = ['Greater than', 'Lesser than', 'Equals', '>=, <=', '<>'];
     }
   }
-}
+};

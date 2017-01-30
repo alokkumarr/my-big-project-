@@ -11,7 +11,7 @@ const EVENTS = {
 export function FilterService($mdSidenav, PubSubService) {
   'ngInject';
 
-  let unRegisterFuncs = [];
+  const unRegisterFuncs = [];
 
   return {
     onOpenFilterSidenav,

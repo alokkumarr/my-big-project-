@@ -1,7 +1,7 @@
 <div layout="column">
 
   <md-input-container md-no-float>
-    <input placeholder="Filter by keyword" ng-model="$ctrl.keywordFilter">
+    <input placeholder="Filter by keyword" ng-model="$ctrl.keywordFilter"/>
   </md-input-container>
 
   <md-checkbox ng-repeat="item in $ctrl.filter.items | filter:$ctrl.keywordFilter"

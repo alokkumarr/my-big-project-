@@ -23,4 +23,4 @@ export const BinaryOptionComponent = {
       this.onChange({value: this[option]});
     }
   }
-}
+};

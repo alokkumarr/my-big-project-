@@ -1,8 +1,8 @@
 import angular from 'angular';
-import HttpMockConfig from './httpMockConfig';
+import HttpMock from './httpMock';
 
 export const MockModule = 'Mock';
 
 angular
   .module(MockModule, ['ngMockE2E'])
-  .run(HttpMockConfig);
+  .run(HttpMock);

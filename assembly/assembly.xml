@@ -11,16 +11,10 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<fileSets>
 		<fileSet>
-			<directory>dist</directory>
+			<directory>${project.basedir}/target</directory>
 			<outputDirectory>/</outputDirectory>
 			<includes>
-				 <include>**/*.*</include>
-				 <include>*.js</include>
-				 <include>*.html</include>
-				 <include>*.css</include>
-				 <include>*.png</include>
-				 <include>*.svg</include>
-				 <include>*.ttf</include>
+				<include>*.war</include>
 			</includes>
 		</fileSet>
 		</fileSets>

@@ -1,17 +1,17 @@
-import pipe from 'lodash/fp/pipe';
 import groupBy from 'lodash/groupBy';
 import map from 'lodash/map';
 import forEach from 'lodash/forEach';
 import omit from 'lodash/fp/omit';
 import isEmpty from 'lodash/isEmpty';
-
 import find from 'lodash/find';
+
 import template from './report-grid-container.component.html';
+import style from './report-grid-container.component.scss';
 
 export const LAYOUT_MODE = {
   DETAIL: 'detail',
   SUMMARY: 'summary'
-}
+};
 
 export const ReportGridContainerComponent = {
   template,
@@ -21,6 +21,7 @@ export const ReportGridContainerComponent = {
     columns: '<',
     settings: '<'
   },
+  styles: [style],
   controller: class ReportGridContainerController {
     constructor($componentHandler, $timeout) {
       'ngInject';
@@ -109,8 +110,8 @@ export const ReportGridContainerComponent = {
       return {
         isGroup: true,
         groupBy: columnName,
-        groupNodes: groupNodes
-      }
+        groupNodes
+      };
     }
   }
 };
