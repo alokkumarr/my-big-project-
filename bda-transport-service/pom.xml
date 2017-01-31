@@ -31,6 +31,7 @@
 		<rpm.version>1</rpm.version>
 		<app.user>mapr</app.user>
 		<app.group>mapr</app.group>		
+		<mpardb.version>0.98.12-mapr-1506-m7-5.0.0</mpardb.version>
 	</properties>
 	<repositories>
 		<repository>
@@ -72,12 +73,6 @@
 		</pluginRepository>
 	</pluginRepositories>
 	<dependencies>
-<!--		
-libraryDependencies += "com.typesafe.akka" % "akka-actor_2.11" % "2.4-SNAPSHOT"
-libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0"
-libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.2"
-libraryDependencies += "com.typesafe.akka" %% "akka-slf4j" % "2.3.6"
--->
 	<dependency>
 		<groupId>com.typesafe.akka</groupId>
 		<artifactId>akka-actor_${scala.version}</artifactId>
@@ -136,6 +131,7 @@ libraryDependencies += "com.typesafe.akka" %% "akka-slf4j" % "2.3.6"
 			<version>8.0.21</version>
 		</dependency>
 -->				
+
 		<dependency>
 		<!-- org.yaml.snakeyaml-1.15.jar -->
 			<groupId>org.yaml</groupId>

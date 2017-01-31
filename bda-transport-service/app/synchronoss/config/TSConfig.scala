@@ -12,6 +12,9 @@ object TSConfig {
   lazy val conf: Config = ConfigFactory.load
 
   lazy val es_conf: Config = conf.getConfig("es")
+  lazy val security_settings = conf.getConfig("security")
   lazy val dl_conf: Config = conf.getConfig("dl")
+  lazy val metadataConfig : Config = conf.getConfig("metadata")
+
 
 }
