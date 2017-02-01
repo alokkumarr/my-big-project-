@@ -7,13 +7,10 @@ export const StringFilterComponent = {
   },
   controller: class StringFilterController {
 
-    $onInit() {
+    onToggle(item) {
       if (!this.filter.model) {
         this.filter.model = {};
       }
-    }
-
-    onToggle(item) {
       this.filter.model[item] = !this.filter.model[item];
     }
   }

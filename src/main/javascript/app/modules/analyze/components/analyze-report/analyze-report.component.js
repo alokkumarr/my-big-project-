@@ -4,8 +4,11 @@ import pipe from 'lodash/fp/pipe';
 import get from 'lodash/fp/get';
 import set from 'lodash/fp/set';
 import first from 'lodash/first';
-import map from 'lodash/map';
+import map from 'lodash/fp/map';
+import find from 'lodash/find';
 import forEach from 'lodash/forEach';
+import uniq from 'lodash/uniq';
+import isEmpty from 'lodash/isEmpty';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
@@ -32,6 +35,8 @@ export const AnalyzeReportComponent = {
       this.DESIGNER_MODE = 'designer';
       this.QUERY_MODE = 'query';
 
+      this.showFiltersButton = false;
+
       this.states = {
         sqlMode: this.DESIGNER_MODE,
         detailsExpanded: false
@@ -46,12 +51,15 @@ export const AnalyzeReportComponent = {
 
       this.gridData = [];
       this.columns = [];
+      this.filters = {
+        // array of strings with the columns displayName that the filter is based on
+        selected: [],
+        // possible filters shown in the sidenav, generated from the checked columns
+        // of the jsPlumb canvas.model
+        possible: []
+      };
 
-      this._AnalyzeService.getDataByQuery()
-        .then(data => {
-          this.gridData = data;
-          this.reloadPreviewGrid();
-        });
+      this.getDataByQuery();
     }
 
     $onInit() {
@@ -71,19 +79,6 @@ export const AnalyzeReportComponent = {
           this.initCanvas(e.instance);
         }
       });
-
-      this.filters = [{
-        label: 'Affiliates',
-        type: 'string',
-        items: ['DIRECT TV', 'Red Ventures', 'ClearLink', 'All Connect', 'Q-ology', 'Acceller'],
-        model: null,
-        operator: DEFAULT_FILTER_OPERATOR
-      }, {
-        label: 'Regions',
-        type: 'number',
-        model: null,
-        operator: DEFAULT_FILTER_OPERATOR
-      }];
     }
 
     $onDestroy() {
@@ -95,21 +90,84 @@ export const AnalyzeReportComponent = {
       }
     }
 
+    // requests
+    getDataByQuery() {
+      this._AnalyzeService.getDataByQuery()
+        .then(data => {
+          this.gridData = data;
+          this.reloadPreviewGrid();
+          this.showFiltersButtonIfDataIsReady();
+        });
+    }
+
+    getArtifacts() {
+      this._AnalyzeService.getArtifacts()
+        .then(data => {
+          this.fillCanvas(data);
+          this.reloadPreviewGrid();
+          this.showFiltersButtonIfDataIsReady();
+        });
+    }
+
+    generateQuery() {
+      this._AnalyzeService.generateQuery({})
+        .then(result => {
+          this.data.query = result.query;
+        });
+    }
+
+    // end requests
+
 // filters section
     openFilterSidenav() {
-      this._FilterService.openFilterSidenav(this.filters);
+      // TODO link this to when the canvas models selected fields change
+      if (isEmpty(this.filters.selected)) {
+        this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
+      }
+
+      this._FilterService.openFilterSidenav(this.filters.possible);
+    }
+
+    showFiltersButtonIfDataIsReady() {
+      if (this.canvas && this.gridData) {
+        this.showFiltersButton = true;
+      }
     }
 
     onApplyFilters(event, filters) {
-      this.filters = filters;
+      this.filters.possible = filters;
+      this.filters.selected = pipe(
+        filter(get('model')),
+        map(get('label'))
+      )(filters);
     }
 
     onClearAllFilters() {
-      this.filters = map(this.filters, pipe(
+      this.filters.possible = map(pipe(
         set('model', null),
         set('operator', DEFAULT_FILTER_OPERATOR)
-        ));
+        ), this.filters);
+      this.filters.selected = [];
     }
+
+    onFilterRemoved(chipString) {
+      const filter = find(this.filters.possible, filter => filter.label === chipString);
+      filter.model = null;
+    }
+
+    generateFilters(selectedFields, gridData) {
+      return pipe(
+        filter(get('isFilterEligible')),
+        map(field => {
+          return {
+            label: field.alias || field.displayName,
+            name: field.name,
+            type: field.type,
+            items: field.type === 'string' ? uniq(map(get(field.name), gridData)) : null
+          };
+        }))(selectedFields);
+    }
+
 // END filters section
 
     cancel() {
@@ -123,11 +181,7 @@ export const AnalyzeReportComponent = {
     initCanvas(canvas) {
       this.canvas = canvas;
 
-      this._AnalyzeService.getArtifacts()
-        .then(data => {
-          this.fillCanvas(data);
-          this.reloadPreviewGrid();
-        });
+      this.getArtifacts();
 
       this.canvas._$eventHandler.on('changed', () => {
         this.reloadPreviewGrid();
@@ -333,10 +387,7 @@ export const AnalyzeReportComponent = {
       this.states.sqlMode = mode;
 
       if (mode === this.QUERY_MODE) {
-        this._AnalyzeService.generateQuery({})
-          .then(result => {
-            this.data.query = result.query;
-          });
+        this.generateQuery();
       }
     }
 

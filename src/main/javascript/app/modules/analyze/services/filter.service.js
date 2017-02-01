@@ -63,8 +63,4 @@ export function FilterService($mdSidenav, PubSubService) {
     PubSubService.emit(EVENTS.CLEAR_ALL_FILTERS);
     $mdSidenav(ANALYZE_FILTER_SIDENAV_ID).close();
   }
-
-  function clearFilter() {
-
-  }
 }
