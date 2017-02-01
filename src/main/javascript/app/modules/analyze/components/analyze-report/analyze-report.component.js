@@ -121,6 +121,7 @@ export const AnalyzeReportComponent = {
 // filters section
     openFilterSidenav() {
       // TODO link this to when the canvas models selected fields change
+      // TODO link filters to the report grid
       if (isEmpty(this.filters.selected)) {
         this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
       }
