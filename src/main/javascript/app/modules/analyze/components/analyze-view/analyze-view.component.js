@@ -1,6 +1,9 @@
 import template from './analyze-view.component.html';
 import style from './analyze-view.component.scss';
 
+import forEach from 'lodash/forEach';
+import $ from 'jquery';
+
 export const AnalyzeViewComponent = {
   template,
   styles: [style],

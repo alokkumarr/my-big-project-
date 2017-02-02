@@ -16,6 +16,7 @@ import {AnalyzeReportPreviewComponent} from './components/analyze-report-preview
 import {ReportGridComponent} from './components/analyze-report-grid/report-grid/report-grid.component';
 import {ReportGridNodeComponent} from './components/analyze-report-grid/report-grid-node/report-grid-node.component';
 import {ReportGridContainerComponent} from './components/analyze-report-grid/report-grid-container/report-grid-container.component';
+import {ReportRenameDialogComponent} from './components/analyze-report-grid/report-rename-dialog/report-rename-dialog.component';
 import {AnalyzeReportSaveComponent} from './components/analyze-report-save/analyze-report-save.component';
 
 export const AnalyzeModule = 'AnalyzeModule';
@@ -23,9 +24,10 @@ export const AnalyzeModule = 'AnalyzeModule';
 angular.module(AnalyzeModule, [])
   .config(routesConfig)
   .factory('AnalyzeService', AnalyzeService)
-  .component('reportGrid', ReportGridComponent)
-  .component('reportGridNode', ReportGridNodeComponent)
   .component('reportGridContainer', ReportGridContainerComponent)
+  .component('reportGridNode', ReportGridNodeComponent)
+  .component('reportGrid', ReportGridComponent)
+  .component('reportRenameDialog', ReportRenameDialogComponent)
   .component('analyzePage', AnalyzePageComponent)
   .component('analyzeView', AnalyzeViewComponent)
   .component('analyzeCard', AnalyzeCardComponent)

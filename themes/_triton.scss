@@ -51,6 +51,9 @@ $ui-grid-cell-content-padding: 5px;
 $ui-grid-cell-color: #575757;
 
 // Cards
+$card-bg-color: #FFFFFF;
+$card-shadow-color: rgba(20, 39, 54, 0.17);
+
 $cards-border-color: #D1D3D3;
 $card-footer-border-top: 1px solid $cards-border-color;
 $card-content-main-color: #575757;
@@ -64,8 +67,8 @@ $date-picker-open-background-color: #FFFFFF;
 $date-picker-selection-indicator-color: #1A89D4;
 
 // Typography
-
 $app-font-color: #5C6670;
+$link-color: #1A89D4;
 
 // Login
 
@@ -75,5 +78,9 @@ $login-middle-logo-color: #1A89D4;
 $company-logo-path: '~img/synchronoss-transparent.png';
 $symmetra-logo-path: '~img/symmetra-mark.png';
 $powered-by-synchronoss-logo-path: '~img/synchronoss_logo_360.png';
+
+// tags
+$tag-bg-color: #DFE3EA;
+$tag-text-color: #596574;
 
 @import "./base/base";

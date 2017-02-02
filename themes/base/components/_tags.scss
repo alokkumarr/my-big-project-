@@ -43,13 +43,17 @@ md-chips.filter-tags.#{$theme-cls} {
   }
 }
 
-md-chip.tag-chip.#{$theme-cls} {
-  height: 100%;
-  padding: 3px;
-  border-radius: 1px;
-  font-size: 11PX;
-  text-transform: capitalize;
-  color: #596574;
-  letter-spacing: 1px;
-  background-color: #DFE3EA;
+md-chip {
+  &.#{$theme-cls} {
+    &.tag-chip {
+      height: 100%;
+      padding: 3px;
+      border-radius: 1px;
+      font-size: 11px;
+      text-transform: capitalize;
+      letter-spacing: 1px;
+      background-color: $tag-bg-color;
+      color: $tag-text-color;
+    }
+  }
 }

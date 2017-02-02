@@ -4,6 +4,10 @@ import forEach from 'lodash/forEach';
 import omit from 'lodash/fp/omit';
 import isEmpty from 'lodash/isEmpty';
 import find from 'lodash/find';
+import isArray from 'lodash/isArray';
+import filter from 'lodash/filter';
+import assign from 'lodash/assign';
+import isUndefined from 'lodash/isUndefined';
 
 import template from './report-grid-container.component.html';
 import style from './report-grid-container.component.scss';
@@ -17,9 +21,11 @@ export const ReportGridContainerComponent = {
   template,
   bindings: {
     id: '@',
-    data: '<',
+    source: '<',
     columns: '<',
-    settings: '<'
+    settings: '<',
+    showGroupPanel: '@',
+    showViewMore: '@'
   },
   styles: [style],
   controller: class ReportGridContainerController {
@@ -28,55 +34,139 @@ export const ReportGridContainerComponent = {
       this._$componentHandler = $componentHandler;
       this._$timeout = $timeout;
 
-      this.LAYOUT_MODE = LAYOUT_MODE;
-      this.layoutMode = LAYOUT_MODE.DETAIL;
-      this.groupedBy = '';
+      this.gridNodeComponent = null;
 
-      this.render = true;
+      this.LAYOUT_MODE = LAYOUT_MODE;
+
+      this.columns = [];
+      this.sorts = [];
+      this.grouped = {
+        source: [],
+        by: [],
+        byText: () => {
+          return map(this.grouped.by, item => item.getDisplayName()).join(', ');
+        }
+      };
     }
 
     $onInit() {
       this._unregister = this._$componentHandler.register(this.id, this);
 
-      this.modifiedData = this.data;
-      // TODO add grouping data to somewhere
-      // not sure where untill final json structure
+      this.settings = assign(this.settings || {}, {
+        layoutMode: LAYOUT_MODE.DETAIL
+      });
+
+      if (!isEmpty(this.columns)) {
+        this.updateColumns(this.columns);
+      }
+
+      this.applyGrouping();
     }
 
     $onDestroy() {
       this._unregister();
     }
 
-    reload(columns, data) {
-      this.render = false;
+    setGridNodeComponent(gridNodeComponent) {
+      this.gridNodeComponent = gridNodeComponent;
 
-      this._$timeout(() => {
-        this.columns = columns;
-        this.data = data;
-        this.modifiedData = data;
-        this.render = true;
-      }, 250);
+      if (this.gridNodeComponent) {
+        this.gridNodeComponent.updateSettings({
+          layoutMode: this.settings.layoutMode
+        });
+
+        this.updateColumns();
+        this.updateSorts();
+        this.applyGrouping();
+      }
     }
 
-    groupData(columnName) {
-      this.modifiedData = this.group(this.modifiedData, columnName);
+    refreshGrid() {
+      if (this.gridNodeComponent) {
+        this.gridNodeComponent.refreshGrid();
+      }
+    }
+
+    updateColumns(columns) {
+      if (!isUndefined(columns)) {
+        this.columns = columns;
+      }
+
+      if (this.gridNodeComponent) {
+        columns = filter(this.columns, column => {
+          return column.checked && !this.isGroupedBy(column.name);
+        });
+
+        this.gridNodeComponent.updateColumns(columns);
+      }
+    }
+
+    updateSorts(sorts) {
+      if (!isUndefined(sorts)) {
+        this.sorts = sorts;
+      }
+
+      if (this.gridNodeComponent) {
+        this.gridNodeComponent.updateSorts(this.sorts);
+      }
+    }
+
+    updateSource(source) {
+      this.source = isArray(source) ? source : [];
+
+      this.applyGrouping();
+
+      if (this.gridNodeComponent) {
+        this._$timeout(() => {
+          this.gridNodeComponent.onSourceUpdate();
+        });
+      }
+    }
+
+    onLayoutModeUpdate() {
+      if (this.gridNodeComponent) {
+        this.gridNodeComponent.updateSettings({
+          layoutMode: this.settings.layoutMode
+        });
+      }
+    }
+
+    applyGrouping() {
+      this.grouped.source = this.source;
+
+      forEach(this.grouped.by, column => {
+        this.grouped.source = this.groupRecursive(this.grouped.source, column.name);
+      });
+    }
+
+    getColumnByName(columnName) {
+      return find(this.columns, column => column.name === columnName);
+    }
+
+    isGroupedBy(columnName) {
+      return Boolean(find(this.grouped.by, column => column.name === columnName));
+    }
+
+    groupByColumn(columnName) {
+      if (!this.isGroupedBy(columnName)) {
+        const column = this.getColumnByName(columnName);
+
+        if (column && column.checked) {
+          this.grouped.source = this.groupRecursive(this.grouped.source, columnName);
+          this.grouped.by.push(column);
+
+          this.updateColumns();
+        }
+      }
     }
 
     undoGrouping() {
-      this.modifiedData = this.data;
-      this.groupedBy = '';
-    }
+      if (!isEmpty(this.grouped.by)) {
+        this.grouped.by.pop();
 
-    rename(columnName, newName) {
-      const columnToRename = find(this.columns, column => column.name === columnName);
-
-      columnToRename.alias = newName;
-    }
-
-    group(data, columnName) {
-      this.groupedBy = `${this.groupedBy}${isEmpty(this.groupedBy) ? '' : ','} ${columnName}`;
-
-      return this.groupRecursive(data, columnName);
+        this.updateColumns();
+        this.applyGrouping();
+      }
     }
 
     groupRecursive(data, columnName) {
@@ -85,7 +175,7 @@ export const ReportGridContainerComponent = {
 
       if (data.isGroup) {
         forEach(data.groupNodes, groupNode => {
-          groupNode.data = this.groupRecursive(groupNode.data, columnName);
+          groupNode.source = this.groupRecursive(groupNode.source, columnName);
         });
 
         groupedData = data;
@@ -103,7 +193,7 @@ export const ReportGridContainerComponent = {
         return {
           groupValue: key,
           itemCount: val.length,
-          data: map(val, omit(columnName))
+          source: map(val, omit(columnName))
         };
       });
 
@@ -112,6 +202,30 @@ export const ReportGridContainerComponent = {
         groupBy: columnName,
         groupNodes
       };
+    }
+
+    renameColumn(columnName, alias) {
+      const column = find(this.columns, column => column.name === columnName);
+
+      if (column) {
+        column.alias = alias;
+
+        this.updateColumns();
+      }
+    }
+
+    hideColumn(columnName) {
+      const column = find(this.columns, column => column.name === columnName);
+
+      if (column && column.checked) {
+        column.checked = false;
+
+        this.updateColumns();
+      }
+    }
+
+    viewMore() {
+      return;
     }
   }
 };

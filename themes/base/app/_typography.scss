@@ -1,11 +1,36 @@
+$font-source-sans-pro: 'Source Sans Pro';
+
 @font-face {
-  font-family: 'Source Sans Pro';
+  font-family: $font-source-sans-pro;
   font-style: normal;
   font-weight: 400;
   src: local('Source Sans Pro'), local('SourceSansPro-Regular'), url(https://fonts.gstatic.com/s/sourcesanspro/v9/ODelI1aHBYDBqgeIAH2zlNHq-FFgoDNV3GTKpHwuvtI.woff) format('woff');
 }
 
 body {
+  font-family: $font-source-sans-pro;
+  font-size: 14px;
   color: $app-font-color;
-  font-family: "Source Sans Pro";
+}
+
+a {
+  font-family: $font-source-sans-pro;
+  font-size: 14px;
+  font-weight: bold;
+  color: $link-color;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.link {
+  font-family: $font-source-sans-pro;
+  font-size: 14px;
+  font-weight: bold;
+  color: $app-font-color;
+  text-decoration: none;
+  cursor: pointer;
+
+  &.m-active {
+    color: $link-color;
+  }
 }

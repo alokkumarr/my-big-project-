@@ -42,15 +42,6 @@ module.exports = {
     rules: [
       {
         enforce: 'pre',
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: 'eslint-loader',
-        options: {
-          fix: false
-        }
-      },
-      {
-        enforce: 'pre',
         test: /\.html$/,
         loader: 'htmlhint-loader'
       },

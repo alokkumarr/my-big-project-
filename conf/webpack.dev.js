@@ -22,6 +22,16 @@ module.exports = webpackMerge(mainConfig, {
   module: {
     rules: [
       {
+        enforce: 'pre',
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'eslint-loader',
+        options: {
+          fix: false,
+          configFile: webpackHelper.root('conf/eslint-dev-rules.js')
+        }
+      },
+      {
         test: /\.(css|scss)$/,
         loaders: ExtractTextPlugin.extract({
           fallbackLoader: 'style-loader',
