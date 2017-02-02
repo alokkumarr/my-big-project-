@@ -1,4 +1,16 @@
 {
+  "APPLY_FILTERS": "Apply filters",
+  "APPLY_SORT": "Apply sort",
+  "CANCEL": "Cancel",
+  "CLEAR_ALL_FILTERS": "Clear all fitlers",
+  "DESCRIPTION": "Description",
   "OK": "Ok",
-  "CANCEL": "Cancel"
+  "RENAME":"Rename",
+  "RENAME_COLUMN":"Rename Column",
+  "SAVE": "Save",
+  "SAVE_DESCRIPTION": "Save Description",
+  "SORT": "Sort",
+  "SORT_BY": "Sort by",
+  "SORT_BY_ANOTHER_COLUMN":"Sort by another column",
+  "UPLOAD": "Upload"
 }
