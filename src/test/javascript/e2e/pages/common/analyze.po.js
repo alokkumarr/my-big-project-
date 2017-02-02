@@ -10,7 +10,7 @@ module.exports = {
     pivotTable: element(by.xpath('//p[. = "Pivot"]/..')),
     createAnalysisBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]')),
     designerDialog: element(by.css('.ard_canvas')),
-    saveReportBtn: element(by.css('[ng-click="$ctrl.openSaveModal()"]'))
+    saveReportBtn: element(by.xpath('//button[. = "Save"]'))
   },
 
   validateCardView() {

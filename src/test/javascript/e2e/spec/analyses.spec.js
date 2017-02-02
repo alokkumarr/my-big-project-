@@ -28,13 +28,16 @@ describe('Analyses Tests', () => {
     expect(analyze.analysisElems.secondMetric.getAttribute('aria-disabled')).toEqual('true');
     analyze.analysisElems.firstMetric.click();
     expect(analyze.analysisElems.secondMetric.getAttribute('aria-disabled')).toEqual('false');
-
   });
 
   it('should select report type and proceed', () => {
     analyze.analysisElems.reportTable.click();
     analyze.analysisElems.createAnalysisBtn.click();
     analyze.validateDesignerDialog();
+  });
+
+  it('should add fields to report', () => {
+    analyze.analysisElems.saveReportBtn.click();
   });
 
   it('should attempt to save the report', () => {
