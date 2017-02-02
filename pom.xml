@@ -11,6 +11,18 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <output.directory>${output}</output.directory>
     <maven.assembly.version>2.4</maven.assembly.version>
+    <!-- RPM -->
+    <rpm.version>2</rpm.version>
+    <rpm.release>0.0</rpm.release>
+    <app.user>nobody</app.user>
+    <app.group>nobody</app.group>
+    <!-- must be first 2 digits from ${project.version} -->
+    <app.version>${rpm.version}.${rpm.release}</app.version>
+    <app.name>${project.artifactId}</app.name>
+    <app.nameVer>${app.name}-${app.version}</app.nameVer>
+    <app.etcDir>/etc/bda/${app.nameVer}</app.etcDir>
+    <app.optDir>/opt/bda/${app.nameVer}</app.optDir>
+    <app.varDir>/var/bda/${app.nameVer}</app.varDir>
   </properties>
 
   <build>
@@ -246,6 +258,251 @@
               </execution>
             </executions>
           </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>rpm</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <finalName>${project.artifactId}-${project.version}</finalName>
+        <plugins>
+          <plugin>
+            <artifactId>maven-clean-plugin</artifactId>
+            <version>2.6.1</version>
+            <configuration>
+              <filesets>
+                <fileset>
+                  <directory>dist</directory>
+                </fileset>
+              </filesets>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <version>1.3</version>
+            <configuration>
+              <installDirectory>${project.build.directory}</installDirectory>
+              <workingDirectory>${project.basedir}</workingDirectory>
+            </configuration>
+
+            <executions>
+              <execution>
+                <id>install_node_and_npm</id>
+                <goals>
+                  <goal>install-node-and-npm</goal>
+                </goals>
+                <configuration>
+                  <nodeVersion>v6.9.1</nodeVersion>
+                  <npmVersion>3.10.9</npmVersion>
+                </configuration>
+              </execution>
+
+              <execution>
+                <id>npm-install</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>install</arguments>
+                </configuration>
+              </execution>
+
+              <execution>
+                <id>npm-uninstall-node-sass</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>uninstall node-sass</arguments>
+                </configuration>
+              </execution>
+
+              <execution>
+                <id>npm-install-node-sass</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>install node-sass</arguments>
+                </configuration>
+              </execution>
+
+              <execution>
+                <id>npm-run-build</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>run build</arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>3.0.0</version>
+            <configuration>
+              <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+              <webResources>
+                <resource>
+                  <directory>dist</directory>
+                  <targetPath>/</targetPath>
+                </resource>
+              </webResources>
+              <archive>
+                <manifest>
+                  <addClasspath>true</addClasspath>
+                </manifest>
+              </archive>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>${maven.assembly.version}</version>
+            <executions>
+              <execution>
+                <id>sncr_saw</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${output.directory}</outputDirectory>
+                  <descriptors>
+                    <descriptor>assembly/assembly.xml</descriptor>
+                  </descriptors>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- RPM build -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>rpm-maven-plugin</artifactId>
+            <version>2.1.5</version>
+            <extensions>true</extensions>
+            <!-- RPM as Side Effect -->
+            <executions>
+              <execution>
+                <id>generate-rpm</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>rpm</goal>
+                </goals>
+              </execution>
+            </executions>
+
+            <!--
+            <executions>
+              <execution>
+                <id>${app.name}-rpm-build</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>rpm</goal>
+                </goals>
+              </execution>
+            </executions>-->
+
+            <configuration>
+              <license>Synchronoss proprietary product</license>
+              <distribution>SNCR XDF 2017</distribution>
+              <needarch>false</needarch>
+              <targetOS>i386-linux</targetOS>
+              <group>BDA/SAW</group>
+              <packager>BDA</packager>
+              <name>${app.name}</name>
+              <requires>
+                <require>tomcat &gt; 7.0</require>
+              </requires>
+              <provides>
+                <provide>${app.name}</provide>
+              </provides>
+              <!-- Only applicable to a Mapping if filemode,
+                   username, AND groupname are NOT populated. -->
+              <defaultUsername>${app.user}</defaultUsername>
+              <defaultGroupname>${app.group}</defaultGroupname>
+              <defaultDirmode>555</defaultDirmode>
+              <defaultFilemode>444</defaultFilemode>
+              <!-- A list of %define arguments -->
+              <defineStatements>
+                <defineStatement>
+                  _unpackaged_files_terminate_build 0
+                </defineStatement>
+              </defineStatements>
+              <!-- RPM contents -->
+              <mappings>
+                <!-- Top level directories -->
+                <mapping>
+                  <directory>${app.optDir}</directory>
+                </mapping>
+
+                <mapping>
+                  <directory>${app.etcDir}</directory>
+                </mapping>
+
+                <mapping>
+                  <!-- /var/bda/testapp-x.x -->
+                  <directory>${app.varDir}</directory>
+                  <directoryIncluded>true</directoryIncluded>
+                  <!-- dirmode>750</dirmode -->
+                  <filemode>750</filemode>
+                  <username>${app.user}</username>
+                  <groupname>${app.group}</groupname>
+                </mapping>
+
+                <!-- env file
+                <mapping>
+                    <directory>${app.etcDir}</directory>
+                    <sources><source><location>src/app/testapp.env</location></source></sources>
+                    <configuration>true</configuration>
+                </mapping>-->
+
+                <mapping>
+                  <directory>${app.optDir}</directory>
+                  <sources>
+                    <source>
+                      <location>target/bda-saw-2.0.0.0.war</location>
+                    </source>
+                    <!--
+                    <source><location>...</location></source>-->
+                  </sources>
+                  <directoryIncluded>false</directoryIncluded>
+                </mapping>
+              </mappings>
+              <preinstallScriptlet>
+                <script>
+                  echo ${app.nameVer} pre-install is being executed
+                  #echo &gt;/tmp/.xdf-testapp.tmp.env '
+                  #export user=${app.user}
+                  #export group=${app.group}
+                  #export app_name=${app.name}
+                  #export app_version=${app.version}
+                  #export app_home=${app.optDir}
+                  #'
+                </script>
+              </preinstallScriptlet>
+              <!--
+              <postinstallScriptlet>
+                  <scriptFile>src/install/postinstall</scriptFile>
+                  <fileEncoding>utf-8</fileEncoding>
+              </postinstallScriptlet>
+              <preremoveScriptlet>
+                  <scriptFile>src/install/preremove</scriptFile>
+                  <fileEncoding>utf-8</fileEncoding>
+              </preremoveScriptlet>-->
+            </configuration>
+          </plugin>
+          <!-- RPM plugin : end -->
         </plugins>
       </build>
     </profile>

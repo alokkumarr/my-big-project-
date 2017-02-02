@@ -18,11 +18,13 @@ export const LayoutHeaderComponent = {
     }
 
     logout() {
-      this._UserService.logout('logout');
+      this._UserService.logout('logout').then(() => {
+        this._$window.location.assign('./login.html');
+      });
     }
 
     changePwd() {
-      this._$window.location.assign('./login#!/changePwd');
+      this._$window.location.assign('./login.html#!/changePwd');
     }
   }
 };

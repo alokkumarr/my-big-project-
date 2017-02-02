@@ -41,7 +41,7 @@ class UserService {
 
     this._$http.defaults.headers.common.Authorization = 'Bearer ' + token;
 
-    this._$http.post(this._AppConfig.login.url + route, resp.ticket.ticketId)
+    return this._$http.post(this._AppConfig.login.url + route, resp.ticket.ticketId)
       .then(() => {
 
         if (path === 'logout') {
@@ -82,7 +82,7 @@ class UserService {
 
   preResetPwd(credentials) {
     const route = '/resetPassword';
-    const productUrl = `${this._$window.location.origin}/login#!/resetPassword`;
+    const productUrl = `${this._$window.location.href.split('/preResetPwd')[0]}/resetPassword`;
 
     const LoginDetails = {
       masterLoginId: credentials.masterLoginId,
