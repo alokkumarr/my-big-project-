@@ -1,0 +1,26 @@
+<div layout="row">
+  <md-sidenav class="md-sidenav-right" md-component-id="$ctrl.id" md-whiteframe="4" eval-attr-as-expr="mdComponentId">
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <md-button sidenav-target="{{$ctrl.id}}" class="btn-card" aria-label="Cancel">Cancel</md-button>
+        <md-button ng-click="$ctrl.onFiltersApplied()" class="btn-primary" aria-label="Apply Filters">Apply Filters</md-button>
+      </div>
+    </md-toolbar>
+
+    <div style="padding: 10px;">
+<md-content layout="column" layout-align="space-around">
+
+  <analyze-filter-group filters="$ctrl.filters"></analyze-filter-group>
+
+  <md-toolbar class="secondary-toolbar">
+    <div class="md-toolbar-tools" layout-align="center">
+      <md-button ng-click="$ctrl.clearAllFilters()" md-no-ink class="md-primary" aria-label="Clear all filters">
+        Clear all filters
+      </md-button>
+    </div>
+  </md-toolbar>
+</md-content>
+</div>
+
+</md-sidenav>
+</div>
