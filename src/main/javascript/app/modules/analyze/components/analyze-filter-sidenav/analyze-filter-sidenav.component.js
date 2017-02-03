@@ -17,14 +17,14 @@ export const AnalyzeFilterSidenavComponent = {
     }
 
     $onInit() {
-      this._FilterService.onOpenFilterSidenav(this.onSidenavOpen.bind(this));
+      this._FilterService.onOpenFilterSidenav(filters => this.onSidenavOpen(filters));
     }
 
     $onDestroy() {
       this._FilterService.offOpenFilterSidenav();
     }
 
-    onSidenavOpen(event, filters) {
+    onSidenavOpen(filters) {
       this.filters = map(filters, filter => {
         return pipe(
           omit('model'),

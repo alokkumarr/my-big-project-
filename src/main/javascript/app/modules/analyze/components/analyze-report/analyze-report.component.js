@@ -63,8 +63,8 @@ export const AnalyzeReportComponent = {
     }
 
     $onInit() {
-      this._FilterService.onApplyFilters(this.onApplyFilters.bind(this));
-      this._FilterService.onClearAllFilters(this.onClearAllFilters.bind(this));
+      this._FilterService.onApplyFilters(filters => this.onApplyFilters(filters));
+      this._FilterService.onClearAllFilters(() => this.onClearAllFilters());
 
       if (this.analysis.name) {
         this.data.title = this.analysis.name;
@@ -135,7 +135,7 @@ export const AnalyzeReportComponent = {
       }
     }
 
-    onApplyFilters(event, filters) {
+    onApplyFilters(filters) {
       this.filters.possible = filters;
       this.filters.selected = pipe(
         filter(get('model')),
