@@ -14,7 +14,7 @@ describe('Analyses Tests', () => {
     sidenav.sidenavElements.firstCategory.click();
   });
 
-  it('should card view by default', () => {
+  it('should display card view by default', () => {
     analyze.validateCardView();
   });
 
@@ -37,10 +37,22 @@ describe('Analyses Tests', () => {
   });
 
   it('should add fields to report', () => {
-    analyze.analysisElems.saveReportBtn.click();
+
   });
 
-  it('should attempt to save the report', () => {
+  it('should attempt to save the report and fill the details', () => {
     analyze.analysisElems.saveReportBtn.click();
+    analyze.analysisElems.reportCategory.click();
+    analyze.analysisElems.firstCategoryOption.click();
+    expect(analyze.analysisElems.reportCategory.getText()).toEqual('Order Fulfillment');
+    analyze.analysisElems.reportName.clear().sendKeys('e2e report');
+    analyze.analysisElems.reportDescription.clear().sendKeys('e2e test description');
+    analyze.analysisElems.saveReportDetails.click();
+  });
+
+  it('should change the report details accordingly ', () => {
+    expect(analyze.analysisElems.reportTitle.getText()).toEqual('e2e report');
+    analyze.analysisElems.reportDescriptionBtn.click();
+    expect(analyze.analysisElems.reportDescription.getText()).toEqual('e2e test description');
   });
 });
