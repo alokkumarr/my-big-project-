@@ -16,8 +16,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
-module.exports = function (env, opt) {
-  console.log(opt);
+module.exports = function (env) {
   const isDevelopment = env === 'development';
   const isProduction = env === 'production';
   const enableMock = true;
