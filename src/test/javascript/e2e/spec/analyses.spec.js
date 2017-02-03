@@ -53,6 +53,6 @@ describe('Analyses Tests', () => {
   it('should change the report details accordingly ', () => {
     expect(analyze.analysisElems.reportTitle.getText()).toEqual('e2e report');
     analyze.analysisElems.reportDescriptionBtn.click();
-    expect(analyze.analysisElems.reportDescription.getText()).toEqual('e2e test description');
+    expect(analyze.analysisElems.reportDescription.getAttribute('value')).toEqual('e2e test description');
   });
 });
