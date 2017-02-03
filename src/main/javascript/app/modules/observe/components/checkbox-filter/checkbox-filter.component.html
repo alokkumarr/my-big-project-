@@ -1,9 +1,7 @@
-<panel title="{{::$ctrl.filter.label}}" class="time-range-panel" style="margin-top: 10px">
-  <div layout="column" layout-align="stretch" style="padding-left: 10px">
-    <div flex ng-repeat="item in $ctrl.ngModel track by $index">
-      <md-checkbox ng-checked="item.checked" ng-click="$ctrl.onToggle(item)">
-        {{::item.label}}
-      </md-checkbox>
-    </div>
+<div layout="column" layout-align="stretch" style="padding-left: 10px">
+  <div flex ng-repeat="item in $ctrl.ngModel track by $index">
+    <md-checkbox ng-checked="item.checked" ng-click="$ctrl.onToggle(item)">
+      {{::item.label}}
+    </md-checkbox>
   </div>
-</panel>
+</div>

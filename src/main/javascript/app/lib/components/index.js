@@ -14,6 +14,7 @@ import {mdButtonGroupComponent} from './md-button-group/md-button-group.componen
 import {ChoiceGroupComponent} from './choice-group';
 import {ChartsModule} from './charts';
 import {SidenavComponent, SidenavBtnComponent} from './sidenav';
+import {BinaryOptionComponent} from './binary-option/binary-option.component';
 
 export const ComponentsModule = 'ComponentsModule';
 
@@ -33,4 +34,5 @@ angular
   .component('choiceGroup', ChoiceGroupComponent)
   .component('mdButtonGroup', mdButtonGroupComponent)
   .component('sidenav', SidenavComponent)
+  .component('binaryOption', BinaryOptionComponent)
   .component('sidenavBtn', SidenavBtnComponent);

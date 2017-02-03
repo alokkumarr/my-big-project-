@@ -20,6 +20,7 @@ import AppConfig from '../../../../appConfig';
 
 import {routesConfig} from './routes';
 import {themeConfig} from './theme';
+import {config} from './config';
 import {runConfig} from './run';
 
 import {LibModule} from './lib';
@@ -49,6 +50,7 @@ angular
   ])
   .config(routesConfig)
   .config(themeConfig)
+  .config(config)
   .run(runConfig)
   .value('AppConfig', AppConfig)
   .factory('AuthService', AuthServiceFactory)

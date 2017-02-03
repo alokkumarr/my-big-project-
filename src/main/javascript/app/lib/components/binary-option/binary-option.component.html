@@ -1,0 +1,11 @@
+<div layout="row" layout-align="end center">
+
+  <md-button ng-click="$ctrl.choose('left')"
+             ng-class="{'active': $ctrl.ngModel === $ctrl.left}"
+             class="option-button" ng-bind="::$ctrl.left"></md-button>
+
+  <md-button ng-click="$ctrl.choose('right')"
+             ng-class="{'active': $ctrl.ngModel === $ctrl.right}"
+             class="option-button" ng-bind="::$ctrl.right"></md-button>
+
+</div>

@@ -28,6 +28,7 @@
   </analyze-dialog-header>
 
   <analyze-dialog-content>
+    <analyze-filter-sidenav></analyze-filter-sidenav>
     <div layout="column">
       <div class="ard_content" layout="column">
         <div layout="row" class="ard_sub-header">
@@ -93,7 +94,7 @@
             Sort
           </md-button>
 
-          <md-button>
+          <md-button ng-if="$ctrl.showFiltersButton" ng-click="$ctrl.openFilterSidenav()">
             <md-icon md-font-icon="icon-filter"></md-icon>
             Filter
           </md-button>
@@ -106,6 +107,25 @@
              ng-show="!$ctrl.hasSelectedColumns()">
           <span>Choose fields above to preview your report.</span>
           <md-icon md-font-icon="icon-report"></md-icon>
+        </div>
+
+        <div layout="row" ng-if="$ctrl.filters.selected.length > 0">
+          <div layout="column" style="padding: 6px 20px 10px 0">
+            {{$ctrl.filters.selected.length}} Filters Applied
+            <md-button class="btn-card" ng-click="$ctrl.onClearAllFilters()">Clear all</md-button>
+          </div>
+          <md-chips class="filter-tags" readonly="true"
+                    ng-model="$ctrl.filters.selected"
+                    md-removable="true"
+                    md-on-remove="$ctrl.onFilterRemoved($chip)">
+            <md-chip-template>
+              <span>{{$chip}}</span>
+            </md-chip-template>
+
+            <button class="md-primary" md-chip-remove>
+              <md-icon md-font-icon="icon-remove"></md-icon>
+            </button>
+          </md-chips>
         </div>
 
         <report-grid-container id="ard-grid-container" class="ard_details-grid"

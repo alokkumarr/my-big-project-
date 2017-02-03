@@ -50,10 +50,9 @@ export const AnalyzeViewComponent = {
       }
     }
 
-    openNewAnalysisModal(ev) {
+    openNewAnalysisModal() {
       this.$mdDialog.show({
         template: '<analyze-new></analyze-new>',
-        targetEvent: ev,
         fullscreen: true
       })
         .then(answer => {

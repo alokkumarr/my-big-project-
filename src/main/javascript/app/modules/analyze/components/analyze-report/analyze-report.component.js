@@ -2,13 +2,19 @@ import filter from 'lodash/fp/filter';
 import flatMap from 'lodash/fp/flatMap';
 import pipe from 'lodash/fp/pipe';
 import get from 'lodash/fp/get';
+import set from 'lodash/fp/set';
 import first from 'lodash/first';
+import map from 'lodash/fp/map';
+import find from 'lodash/find';
 import forEach from 'lodash/forEach';
+import uniq from 'lodash/uniq';
+import isEmpty from 'lodash/isEmpty';
 import map from 'lodash/map';
 import clone from 'lodash/clone';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
+import {DEFAULT_FILTER_OPERATOR} from '../../services/filter.service';
 
 export const AnalyzeReportComponent = {
   template,
@@ -17,7 +23,7 @@ export const AnalyzeReportComponent = {
     analysis: '<'
   },
   controller: class AnalyzeReportController {
-    constructor($componentHandler, $mdDialog, $scope, $timeout, $log, AnalyzeService) {
+    constructor($componentHandler, $mdDialog, $scope, $timeout, $log, AnalyzeService, FilterService) {
       'ngInject';
 
       this._$componentHandler = $componentHandler;
@@ -26,9 +32,12 @@ export const AnalyzeReportComponent = {
       this._$timeout = $timeout;
       this._$log = $log;
       this._AnalyzeService = AnalyzeService;
+      this._FilterService = FilterService;
 
       this.DESIGNER_MODE = 'designer';
       this.QUERY_MODE = 'query';
+
+      this.showFiltersButton = false;
 
       this.states = {
         sqlMode: this.DESIGNER_MODE,
@@ -44,15 +53,21 @@ export const AnalyzeReportComponent = {
 
       this.gridData = [];
       this.columns = [];
+      this.filters = {
+        // array of strings with the columns displayName that the filter is based on
+        selected: [],
+        // possible filters shown in the sidenav, generated from the checked columns
+        // of the jsPlumb canvas.model
+        possible: []
+      };
 
-      this._AnalyzeService.getDataByQuery()
-        .then(data => {
-          this.gridData = data;
-          this.reloadPreviewGrid();
-        });
+      this.getDataByQuery();
     }
 
     $onInit() {
+      this._FilterService.onApplyFilters(filters => this.onApplyFilters(filters));
+      this._FilterService.onClearAllFilters(() => this.onClearAllFilters());
+
       if (this.analysis.name) {
         this.data.title = this.analysis.name;
       }
@@ -69,10 +84,94 @@ export const AnalyzeReportComponent = {
     }
 
     $onDestroy() {
+      this._FilterService.offApplyFilters();
+      this._FilterService.offClearAllFilters();
+
       if (this.unregister) {
         this.unregister();
       }
     }
+
+    // requests
+    getDataByQuery() {
+      this._AnalyzeService.getDataByQuery()
+        .then(data => {
+          this.gridData = data;
+          this.reloadPreviewGrid();
+          this.showFiltersButtonIfDataIsReady();
+        });
+    }
+
+    getArtifacts() {
+      this._AnalyzeService.getArtifacts()
+        .then(data => {
+          this.fillCanvas(data);
+          this.reloadPreviewGrid();
+          this.showFiltersButtonIfDataIsReady();
+        });
+    }
+
+    generateQuery() {
+      this._AnalyzeService.generateQuery({})
+        .then(result => {
+          this.data.query = result.query;
+        });
+    }
+
+    // end requests
+
+// filters section
+    openFilterSidenav() {
+      // TODO link this to when the canvas models selected fields change
+      // TODO link filters to the report grid
+      if (isEmpty(this.filters.selected)) {
+        this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
+      }
+
+      this._FilterService.openFilterSidenav(this.filters.possible);
+    }
+
+    showFiltersButtonIfDataIsReady() {
+      if (this.canvas && this.gridData) {
+        this.showFiltersButton = true;
+      }
+    }
+
+    onApplyFilters(filters) {
+      this.filters.possible = filters;
+      this.filters.selected = pipe(
+        filter(get('model')),
+        map(get('label'))
+      )(filters);
+    }
+
+    onClearAllFilters() {
+      this.filters.possible = map(pipe(
+        set('model', null),
+        set('operator', DEFAULT_FILTER_OPERATOR)
+        ), this.filters);
+      this.filters.selected = [];
+    }
+
+    onFilterRemoved(chipString) {
+      const filter = find(this.filters.possible, filter => filter.label === chipString);
+      filter.model = null;
+    }
+
+    generateFilters(selectedFields, gridData) {
+      return pipe(
+        filter(get('isFilterEligible')),
+        map(field => {
+          return {
+            label: field.alias || field.displayName,
+            name: field.name,
+            type: field.type,
+            items: field.type === 'string' ? uniq(map(get(field.name), gridData)) : null
+          };
+        }))(selectedFields);
+    }
+
+// END filters section
 
     cancel() {
       this._$mdDialog.cancel();
@@ -85,11 +184,7 @@ export const AnalyzeReportComponent = {
     initCanvas(canvas) {
       this.canvas = canvas;
 
-      this._AnalyzeService.getArtifacts()
-        .then(data => {
-          this.fillCanvas(data);
-          this.reloadPreviewGrid();
-        });
+      this.getArtifacts();
 
       this.canvas._$eventHandler.on('changed', () => {
         this.reloadPreviewGrid();
@@ -307,10 +402,7 @@ export const AnalyzeReportComponent = {
       this.states.sqlMode = mode;
 
       if (mode === this.QUERY_MODE) {
-        this._AnalyzeService.generateQuery({})
-          .then(result => {
-            this.data.query = result.query;
-          });
+        this.generateQuery();
       }
     }
 
