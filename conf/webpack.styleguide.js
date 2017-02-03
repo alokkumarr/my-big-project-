@@ -1,84 +1,151 @@
-const path = require('path');
-const webpackMerge = require('webpack-merge');
 const webpackHelper = require('./webpack.helper');
-const commonConfig = require('./webpack.common.js');
+const autoprefixer = require('autoprefixer');
+const chalk = require('chalk');
+const path = require('path');
+
 const pkg = require('../package.json');
 
 /**
  * Webpack Plugins
  */
 const DefinePlugin = require('webpack/lib/DefinePlugin');
+const NoEmitOnErrorsPlugin = require('webpack/lib/NoEmitOnErrorsPlugin');
+const LoaderOptionsPlugin = require('webpack/lib/LoaderOptionsPlugin');
+const StyleLintPlugin = require('stylelint-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-
-const vendorKeys = Object.keys(pkg.dependencies).map(key => {
-  // devextreme has no index.js or a main set in package.json, so we have to manually select the main file
-  if (key === 'devextreme') {
-    return path.join(key, 'ui', 'data_grid');
-  }
-
-  return key;
-});
-
-const styleGuideChunks = ['vendor', 'styleguide'];
 
 /**
  * Webpack configuration
  */
-module.exports = webpackMerge(commonConfig, {
-  entry: {
-    styleguide: './styleguide/index',
-    vendor: vendorKeys
-  },
+module.exports = () => {
+  const MODULE_DIR = 'node_modules';
 
-  output: {
-    path: webpackHelper.root('build/styleguide')
-  },
+  const vendorKeys = Object.keys(pkg.dependencies).map(key => {
+    // devextreme has no index.js or a main set in package.json, so we have to manually select the main file
+    if (key === 'devextreme') {
+      return path.join(key, 'ui', 'data_grid');
+    }
 
-  module: {
-    rules: [
-      {
-        test: /\.(css|scss)$/,
-        loaders: ExtractTextPlugin.extract({
-          fallbackLoader: 'style-loader',
-          loader: 'css-loader?minimize!sass-loader!postcss-loader'
-        })
-      }
-    ]
-  },
+    return key;
+  });
 
-  plugins: [
-    new CleanWebpackPlugin(['build/styleguide'], {
-      root: webpackHelper.root(),
-      verbose: true
-    }),
-    new DefinePlugin({
-      '__DEVELOPMENT__': false
-    }),
-    new HtmlWebpackPlugin({
-      template: 'styleguide/index.html',
-      filename: 'index.html',
-      favicon: webpackHelper.root('assets/img/favicon.png'),
-      hash: true,
-      chunks: styleGuideChunks,
-      chunksSortMode: webpackHelper.sortChunks(styleGuideChunks)
-    }),
-    new CommonsChunkPlugin({
-      names: ['vendor'],
-      minChunks: Infinity
-    })
-  ],
+  const styleGuideChunks = ['vendor', 'styleguide'];
 
-  devServer: {
-    port: 3001,
-    host: 'localhost',
-    historyApiFallback: true,
-    watchOptions: {
-      aggregateTimeout: 300,
-      poll: 1000
+  const config = {
+    context: webpackHelper.root('src/main/javascript'),
+    entry: {
+      styleguide: './styleguide/index',
+      vendor: vendorKeys
     },
-    outputPath: webpackHelper.root('build/styleguide')
-  }
-});
+    output: {
+      path: webpackHelper.root('build/styleguide'),
+      filename: 'js/[name].bundle.js'
+    },
+
+    devtool: false,
+
+    resolve: {
+      modules: [MODULE_DIR, webpackHelper.root('src/main/javascript')],
+      alias: {
+        fonts: webpackHelper.root('assets/fonts'),
+        img: webpackHelper.root('assets/img'),
+        api: webpackHelper.root('src/main/mock/api'),
+      }
+    },
+
+    resolveLoader: {
+      modules: [MODULE_DIR]
+    },
+
+    module: {
+      rules: [
+        {
+          enforce: 'pre',
+          test: /\.html$/,
+          loader: 'htmlhint-loader'
+        },
+        {
+          test: /.json$/,
+          loaders: 'json-loader'
+        },
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          loaders: 'ng-annotate-loader!babel-loader'
+        },
+        {
+          test: /.html$/,
+          loaders: 'html-loader'
+        },
+        {
+          test: /\.(css|scss)$/,
+          loaders: ExtractTextPlugin.extract({
+            fallbackLoader: 'style-loader',
+            loader: 'css-loader?minimize!sass-loader!postcss-loader'
+          })
+        },
+        {
+          test: /\.(eot|woff|woff2|ttf)$/,
+          loader: 'file-loader?name=fonts/[name].[ext]&publicPath=../'
+        },
+        {
+          test: /\.(png|jpg|svg)$/,
+          loader: 'file-loader?name=img/[name].[ext]&publicPath=../'
+        }
+      ]
+    },
+
+    plugins: [
+      new NoEmitOnErrorsPlugin(),
+      new ProgressBarPlugin({
+        format: chalk.blue.bold('   build') + ' [:bar] ' + chalk.green.bold(':percent') + ' (:elapsed seconds) ',
+        clear: false
+      }),
+      new CleanWebpackPlugin(['build/styleguide/'], {
+        root: webpackHelper.root(),
+        verbose: true
+      }),
+      new DefinePlugin({
+        '__DEVELOPMENT__': false
+      }),
+      new LoaderOptionsPlugin({
+        options: {
+          postcss: [autoprefixer]
+        }
+      }),
+      new StyleLintPlugin({
+        configFile: webpackHelper.root('.stylelintrc')
+      }),
+      new ExtractTextPlugin('css/[name].css'),
+      new HtmlWebpackPlugin({
+        template: 'styleguide/index.html',
+        filename: 'index.html',
+        favicon: webpackHelper.root('assets/img/favicon.png'),
+        hash: true,
+        chunks: styleGuideChunks,
+        chunksSortMode: webpackHelper.sortChunks(styleGuideChunks)
+      }),
+      new CommonsChunkPlugin({
+        names: ['vendor'],
+        minChunks: Infinity
+      })
+    ],
+
+    devServer: {
+      port: 3001,
+      host: 'localhost',
+      historyApiFallback: true,
+      watchOptions: {
+        aggregateTimeout: 300,
+        poll: 1000
+      },
+      outputPath: webpackHelper.root('build/styleguide')
+    }
+  };
+
+  return config;
+};

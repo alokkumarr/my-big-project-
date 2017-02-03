@@ -8,7 +8,7 @@ import isUndefined from 'lodash/isUndefined';
 import template from './report-grid.component.html';
 import style from './report-grid.component.scss';
 
-const MIN_ROWS_TO_SHOW = 5;
+// const MIN_ROWS_TO_SHOW = 5;
 const COLUMN_WIDTH = 175;
 
 export const ReportGridComponent = {
@@ -68,7 +68,7 @@ export const ReportGridComponent = {
         e.items.push({
           text: 'Rename',
           icon: 'grid-menu-item icon-edit',
-          onItemClick: params => {
+          onItemClick: () => {
             this.renameColumn(e.column);
           }
         });
@@ -76,7 +76,7 @@ export const ReportGridComponent = {
         e.items.push({
           text: `Group by ${e.column.caption}`,
           icon: 'grid-menu-item icon-group-by-column',
-          onItemClick: params => {
+          onItemClick: () => {
             this.groupByColumn(e.column);
           }
         });
@@ -84,7 +84,7 @@ export const ReportGridComponent = {
         e.items.push({
           text: `Hide ${e.column.caption}`,
           icon: 'grid-menu-item icon-eye-disabled',
-          onItemClick: params => {
+          onItemClick: () => {
             this.hideColumn(e.column);
           }
         });
@@ -95,7 +95,7 @@ export const ReportGridComponent = {
             text: `Show Sum`,
             icon: 'grid-menu-item icon-Sum m-small',
             selected: this.isColumnAggregatedBy(e.column, 'sum'),
-            onItemClick: params => {
+            onItemClick: () => {
               this.aggregateColumn(e.column, 'sum');
             }
           });
@@ -104,7 +104,7 @@ export const ReportGridComponent = {
             text: `Show Average`,
             icon: 'grid-menu-item icon-AVG m-small',
             selected: this.isColumnAggregatedBy(e.column, 'avg'),
-            onItemClick: params => {
+            onItemClick: () => {
               this.aggregateColumn(e.column, 'avg');
             }
           });
@@ -113,7 +113,7 @@ export const ReportGridComponent = {
             text: `Show Mininum`,
             icon: 'grid-menu-item icon-MIN m-small',
             selected: this.isColumnAggregatedBy(e.column, 'min'),
-            onItemClick: params => {
+            onItemClick: () => {
               this.aggregateColumn(e.column, 'min');
             }
           });
@@ -122,7 +122,7 @@ export const ReportGridComponent = {
             text: `Show Maximum`,
             icon: 'grid-menu-item icon-MAX m-small',
             selected: this.isColumnAggregatedBy(e.column, 'max'),
-            onItemClick: params => {
+            onItemClick: () => {
               this.aggregateColumn(e.column, 'max');
             }
           });

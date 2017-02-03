@@ -1,4 +1,3 @@
-import forEach from 'lodash/forEach';
 import find from 'lodash/find';
 
 import template from './analyze-report-sort.component.html';

@@ -2,9 +2,9 @@
   "name": "Synchronoss",
   "version": "0.1.0",
   "scripts": {
-    "build": "webpack --config conf/webpack.prod.js",
-    "start": "webpack-dev-server --config conf/webpack.dev.js",
-    "start:prod": "webpack-dev-server --config conf/webpack.prod.js",
+    "build": "webpack --config conf/webpack.conf.js --env production",
+    "start": "webpack-dev-server --config conf/webpack.conf.js --env development",
+    "start:prod": "webpack-dev-server --config conf/webpack.conf.js --env production",
     "styleguide": "webpack-dev-server --config conf/webpack.styleguide.js",
     "styleguide:build": "webpack --config conf/webpack.styleguide.js",
     "test": "karma start conf/karma.conf.js --single-run",
