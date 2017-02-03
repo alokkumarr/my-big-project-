@@ -1,6 +1,6 @@
 const webpackMerge = require('webpack-merge');
 const webpackHelper = require('./webpack.helper');
-const commonConfig = require('./webpack.common.js');
+const mainConfig = require('./webpack.main.js');
 
 /**
  * Webpack Plugins
@@ -12,26 +12,30 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 /**
  * Webpack configuration
  */
-module.exports = webpackMerge(commonConfig, {
+module.exports = webpackMerge(mainConfig, {
   output: {
     sourceMapFilename: '[file].map'
   },
 
-  debug: true,
   devtool: 'source-map',
-  noInfo: true,
-
-  stats: {
-    colors: true
-  },
 
   module: {
-    loaders: [
+    rules: [
+      {
+        enforce: 'pre',
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'eslint-loader',
+        options: {
+          fix: false,
+          configFile: webpackHelper.root('conf/eslint-dev-rules.js')
+        }
+      },
       {
         test: /\.(css|scss)$/,
         loaders: ExtractTextPlugin.extract({
-          fallbackLoader: 'style',
-          loader: 'css!sass!postcss'
+          fallbackLoader: 'style-loader',
+          loader: 'css-loader!sass-loader!postcss-loader'
         })
       }
     ]
@@ -55,10 +59,6 @@ module.exports = webpackMerge(commonConfig, {
     })
   ],
 
-  eslint: {
-    configFile: webpackHelper.root('conf/eslint-dev-rules.js')
-  },
-
   devServer: {
     port: 3000,
     host: 'localhost',
@@ -67,6 +67,6 @@ module.exports = webpackMerge(commonConfig, {
       aggregateTimeout: 300,
       poll: 1000
     },
-    outputPath: webpackHelper.root('dist')
+    outputPath: webpackHelper.root('build/dist')
   }
 });

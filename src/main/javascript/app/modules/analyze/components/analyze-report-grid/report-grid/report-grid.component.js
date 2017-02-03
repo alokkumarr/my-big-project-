@@ -1,16 +1,12 @@
-import map from 'lodash/fp/map';
-import pipe from 'lodash/fp/pipe';
-import filter from 'lodash/fp/filter';
-import concat from 'lodash/concat';
-import head from 'lodash/head';
-import has from 'lodash/has';
-import findIndex from 'lodash/findIndex';
-import defaults from 'lodash/defaults';
+import assign from 'lodash/assign';
+import map from 'lodash/map';
+import find from 'lodash/find';
+import forEach from 'lodash/forEach';
+import remove from 'lodash/remove';
+import isUndefined from 'lodash/isUndefined';
 
 import template from './report-grid.component.html';
 import style from './report-grid.component.scss';
-import renameTemplate from '../rename-dialog/rename-dialog.tmpl.html';
-import {RenameDialogController} from '../rename-dialog/rename-dialog.controller';
 
 const MIN_ROWS_TO_SHOW = 5;
 const COLUMN_WIDTH = 175;
@@ -18,161 +14,245 @@ const COLUMN_WIDTH = 175;
 export const ReportGridComponent = {
   template,
   style: [style],
-  require: {
-    reporGridContainerCtrl: '^reportGridContainer'
-  },
   bindings: {
-    data: '<',
-    columns: '<',
-    settings: '<'
+    reportGridContainer: '<',
+    reportGridNode: '<',
+    source: '<'
   },
   controller: class ReportGridController {
-    constructor(uiGridConstants, $mdDialog) {
+    constructor($mdDialog) {
       'ngInject';
-      this._uiGridConstants = uiGridConstants;
       this._$mdDialog = $mdDialog;
+
+      this.settings = {};
+      this.columns = [];
+      this.sorts = [];
     }
 
     $onInit() {
-      this.gridStyle = {
-        width: `${this.getVisibleCulomsFilter()(this.columns).length * COLUMN_WIDTH}px`
-      };
+      this.reportGridNode.setGridComponent(this);
 
-      this.config = {
-        showColumnFooter: false,
-        data: this.data,
-        columnDefs: this.getCulomnDefs(this.columns),
-        minRowsToShow: (this.settings || {}).minRowsToShow || MIN_ROWS_TO_SHOW,
-        enableHorizontalScrollbar: this._uiGridConstants.scrollbars.NEVER,
-        onRegisterApi: gridApi => {
-          this.gridApi = gridApi;
+      this.settings = assign(this.settings, {
+        gridConfig: {
+          onInitialized: this.onGridInitialized.bind(this),
+          onContextMenuPreparing: this.onContextMenuPreparing.bind(this),
+          columns: this.prepareGridColumns(this.columns),
+          dataSource: this.source || [],
+          columnAutoWidth: true,
+          allowColumnReordering: true,
+          allowColumnResizing: true,
+          showColumnHeaders: true,
+          showColumnLines: false,
+          showRowLines: false,
+          showBorders: false,
+          rowAlternationEnabled: true,
+          hoverStateEnabled: true,
+          scrolling: {
+            mode: 'virtual'
+          },
+          sorting: {
+            mode: 'multiple'
+          }
         }
-      };
+      });
     }
 
-    getCulomnDefs(columns) {
-      return pipe(
-        this.getVisibleCulomsFilter(),
-        map(column => {
-          const displayName = column.getDisplayName();
-          const columnName = column.name;
-
-          return {
-            width: COLUMN_WIDTH,
-            name: columnName,
-            visible: true,
-            displayName,
-            menuItems: this.getMenuItems(column.type, displayName, columnName)
-          };
-        })
-      )(columns);
+    onGridInitialized(e) {
+      this._gridInstance = e.component;
     }
 
-    getVisibleCulomsFilter() {
-      return filter(column => has(head(this.data), column.name));
-    }
+    onContextMenuPreparing(e) {
+      if (e.target === 'header') {
+        e.items = [];
 
-    getMenuItems(type, displayName, columnName) {
-      let menuItems = [{
-        title: `Group By ${displayName}`,
-        icon: 'icon-group-by-column',
-        action: () => {
-          this.reporGridContainerCtrl.groupData(columnName);
+        e.items.push({
+          text: 'Rename',
+          icon: 'grid-menu-item icon-edit',
+          onItemClick: params => {
+            this.renameColumn(e.column);
+          }
+        });
+
+        e.items.push({
+          text: `Group by ${e.column.caption}`,
+          icon: 'grid-menu-item icon-group-by-column',
+          onItemClick: params => {
+            this.groupByColumn(e.column);
+          }
+        });
+
+        e.items.push({
+          text: `Hide ${e.column.caption}`,
+          icon: 'grid-menu-item icon-eye-disabled',
+          onItemClick: params => {
+            this.hideColumn(e.column);
+          }
+        });
+
+        if (e.column.dataType === 'int' || e.column.dataType === 'double') {
+          e.items.push({
+            beginGroup: true,
+            text: `Show Sum`,
+            icon: 'grid-menu-item icon-Sum m-small',
+            selected: this.isColumnAggregatedBy(e.column, 'sum'),
+            onItemClick: params => {
+              this.aggregateColumn(e.column, 'sum');
+            }
+          });
+
+          e.items.push({
+            text: `Show Average`,
+            icon: 'grid-menu-item icon-AVG m-small',
+            selected: this.isColumnAggregatedBy(e.column, 'avg'),
+            onItemClick: params => {
+              this.aggregateColumn(e.column, 'avg');
+            }
+          });
+
+          e.items.push({
+            text: `Show Mininum`,
+            icon: 'grid-menu-item icon-MIN m-small',
+            selected: this.isColumnAggregatedBy(e.column, 'min'),
+            onItemClick: params => {
+              this.aggregateColumn(e.column, 'min');
+            }
+          });
+
+          e.items.push({
+            text: `Show Maximum`,
+            icon: 'grid-menu-item icon-MAX m-small',
+            selected: this.isColumnAggregatedBy(e.column, 'max'),
+            onItemClick: params => {
+              this.aggregateColumn(e.column, 'max');
+            }
+          });
         }
-      }, {
-        title: 'Rename',
-        icon: 'icon-edit',
-        action: () => this.renameColumn(columnName)
-      }, {
-        title: `Hide ${displayName}`,
-        icon: 'icon-eye-disabled',
-        action: () => this.hideColumn(columnName)
-      }];
-
-      if (type === 'int' | type === 'double') {
-        menuItems = concat(menuItems, [{
-          title: 'Show Sum',
-          icon: 'icon-Sum',
-          action: () => this.showSum(columnName)
-        }, {
-          title: `Show Average`,
-          icon: 'icon-AVG',
-          action: () => this.showAvg(columnName)
-        }, {
-          title: `Show Min`,
-          icon: 'icon-MIN',
-          action: () => this.showMin(columnName)
-        }, {
-          title: `Show Max`,
-          icon: 'icon-MAX',
-          action: () => this.showMax(columnName)
-        }]);
       }
-
-      return menuItems;
     }
 
-    renameColumn(columnName) {
+    updateSettings(settings) {
+      this.settings = assign(this.settings, settings);
+    }
+
+    updateColumns(columns) {
+      this.columns = columns;
+
+      if (this._gridInstance) {
+        this._gridInstance.option('columns', this.prepareGridColumns(this.columns));
+      }
+    }
+
+    prepareGridColumns(columns) {
+      return map(columns, column => {
+        return {
+          caption: column.getDisplayName(),
+          dataField: column.name,
+          dataType: column.type,
+          allowSorting: false,
+          alignment: 'left',
+          width: COLUMN_WIDTH
+        };
+      });
+    }
+
+    updateSorts(sorts) {
+      this.sorts = sorts;
+
+      if (this._gridInstance) {
+        const columns = this._gridInstance.option('columns');
+
+        let index = 0;
+
+        forEach(sorts, sort => {
+          const column = this.getColumnByName(sort.column);
+
+          if (column) {
+            column.sortIndex = index++;
+            column.sortOrder = sort.direction;
+          }
+        });
+
+        this._gridInstance.option('columns', columns);
+      }
+    }
+
+    onSourceUpdate() {
+      if (this._gridInstance) {
+        this._gridInstance.option('dataSource', this.source);
+      }
+    }
+
+    refreshGrid() {
+      if (this._gridInstance) {
+        this._gridInstance.refresh();
+      }
+    }
+
+    $onDestroy() {
+      this.reportGridNode.setGridComponent(null);
+    }
+
+    getColumnByName(columnName) {
+      const columns = this._gridInstance.option('columns');
+
+      return find(columns, column => {
+        return column.dataField === columnName;
+      });
+    }
+
+    renameColumn(gridColumn) {
       this.openRenameModal()
         .then(newName => {
-          // rename on grid, and grid context menu
-          const column = find(this.columns, column => column.name === columnName);
-
-          this.modifyColumnDef(columnName, {
-            displayName: newName,
-            menuItems: this.getMenuItems(column.type, newName, columnName)
-          });
-          // rename in data
-          this.reporGridContainerCtrl.rename(columnName, newName);
+          this.reportGridContainer.renameColumn(gridColumn.dataField, newName);
         });
     }
 
-    hideColumn(columnName) {
-      this.modifyColumnDef(columnName, {
-        visible: false
-      });
+    groupByColumn(gridColumn) {
+      this.reportGridContainer.groupByColumn(gridColumn.dataField);
     }
 
-    showMin(columnName) {
-      this.showAggregatorOnColumn(columnName, 'min');
+    hideColumn(gridColumn) {
+      this.reportGridContainer.hideColumn(gridColumn.dataField);
     }
 
-    showMax(columnName) {
-      this.showAggregatorOnColumn(columnName, 'max');
-    }
+    aggregateColumn(gridColumn, aggregatorType) {
+      const totalItems = this._gridInstance.option('summary.totalItems') || [];
 
-    showAvg(columnName) {
-      this.showAggregatorOnColumn(columnName, 'avg');
-    }
+      if (!this.isColumnAggregatedBy(gridColumn, aggregatorType)) {
+        // remove previous aggregation on column
+        remove(totalItems, item => {
+          return item.column === gridColumn.dataField;
+        });
 
-    showSum(columnName) {
-      this.showAggregatorOnColumn(columnName, 'sum');
-    }
-
-    showAggregatorOnColumn(columnName, aggregatorType) {
-      this.showColumnFooterIfHidden();
-      this.modifyColumnDef(columnName, {
-        aggregationType: this._uiGridConstants.aggregationTypes[aggregatorType]
-      });
-    }
-
-    showColumnFooterIfHidden() {
-      if (!this.config.showColumnFooter) {
-        this.config.showColumnFooter = true;
-        this.gridApi.core.notifyDataChange(this._uiGridConstants.dataChange.OPTIONS);
+        // add new aggregation to column
+        totalItems.push({
+          column: gridColumn.dataField,
+          summaryType: aggregatorType
+        });
+      } else {
+        // toggle specific aggregation on column
+        remove(totalItems, item => {
+          return item.column === gridColumn.dataField && item.summaryType === aggregatorType;
+        });
       }
+
+      this._gridInstance.option('summary.totalItems', totalItems);
     }
 
-    modifyColumnDef(columnName, modifierObj) {
-      const index = findIndex(this.config.columnDefs, columnDef => columnDef.name === columnName);
-      this.config.columnDefs[index] = defaults(modifierObj, this.config.columnDefs[index]);
+    isColumnAggregatedBy(gridColumn, aggregatorType) {
+      const totalItems = this._gridInstance.option('summary.totalItems');
+
+      const aggregatedItem = find(totalItems, item => {
+        return item.column === gridColumn.dataField && (isUndefined(aggregatorType) || item.summaryType === aggregatorType);
+      });
+
+      return Boolean(aggregatedItem);
     }
 
     openRenameModal() {
       return this._$mdDialog
         .show({
-          controller: RenameDialogController,
-          template: renameTemplate,
+          template: '<report-rename-dialog></report-rename-dialog>',
           fullscreen: false,
           skipHide: true,
           clickOutsideToClose: true

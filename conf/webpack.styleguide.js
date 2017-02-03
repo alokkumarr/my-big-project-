@@ -1,82 +1,84 @@
-const webpack = require('webpack');
-const conf = require('./gulp.conf');
 const path = require('path');
+const webpackMerge = require('webpack-merge');
+const webpackHelper = require('./webpack.helper');
+const commonConfig = require('./webpack.common.js');
+const pkg = require('../package.json');
 
+/**
+ * Webpack Plugins
+ */
+const DefinePlugin = require('webpack/lib/DefinePlugin');
+const CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const autoprefixer = require('autoprefixer');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-module.exports = {
-  eslint: {
-    configFile: conf.paths.eslintDevConfig
+const vendorKeys = Object.keys(pkg.dependencies).map(key => {
+  // devextreme has no index.js or a main set in package.json, so we have to manually select the main file
+  if (key === 'devextreme') {
+    return path.join(key, 'ui', 'data_grid');
+  }
+
+  return key;
+});
+
+const styleGuideChunks = ['vendor', 'styleguide'];
+
+/**
+ * Webpack configuration
+ */
+module.exports = webpackMerge(commonConfig, {
+  entry: {
+    styleguide: './styleguide/index',
+    vendor: vendorKeys
   },
-  module: {
-    preLoaders: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: 'eslint'
-      }
-    ],
 
-    loaders: [
-      {
-        test: /.json$/,
-        loaders: [
-          'json'
-        ]
-      },
+  output: {
+    path: webpackHelper.root('build/styleguide')
+  },
+
+  module: {
+    rules: [
       {
         test: /\.(css|scss)$/,
-        loaders: [
-          'style',
-          'css',
-          'sass',
-          'postcss'
-        ]
-      },
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loaders: [
-          'ng-annotate',
-          'babel'
-        ]
-      },
-      {
-        test: /.html$/,
-        loaders: [
-          'html'
-        ]
-      },
-      {
-        test: /\.(jpe?g|png|gif|svg)$/i,
-        loaders: [
-          'file?hash=sha512&digest=hex&name=[hash].[ext]',
-          'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false'
-        ]
-      },
-      {
-        test: /\.(eot|woff|woff2|ttf|svg|png|jpg)$/,
-        loader: 'url-loader?limit=30000&name=[name]-[hash].[ext]'
+        loaders: ExtractTextPlugin.extract({
+          fallbackLoader: 'style-loader',
+          loader: 'css-loader?minimize!sass-loader!postcss-loader'
+        })
       }
     ]
   },
+
   plugins: [
-    new webpack.optimize.OccurrenceOrderPlugin(),
-    new webpack.NoErrorsPlugin(),
-    new HtmlWebpackPlugin({
-      template: conf.path.styleguide('index.html')
+    new CleanWebpackPlugin(['build/styleguide'], {
+      root: webpackHelper.root(),
+      verbose: true
     }),
-    new webpack.DefinePlugin({
-      '__DEVELOPMENT__': process.env.NODE_ENV !== 'production'
+    new DefinePlugin({
+      '__DEVELOPMENT__': false
+    }),
+    new HtmlWebpackPlugin({
+      template: 'styleguide/index.html',
+      filename: 'index.html',
+      favicon: webpackHelper.root('assets/img/favicon.png'),
+      hash: true,
+      chunks: styleGuideChunks,
+      chunksSortMode: webpackHelper.sortChunks(styleGuideChunks)
+    }),
+    new CommonsChunkPlugin({
+      names: ['vendor'],
+      minChunks: Infinity
     })
   ],
-  postcss: () => [autoprefixer],
-  debug: true,
-  devtool: 'eval',
-  output: {
-    path: path.join(process.cwd(), conf.paths.styleguideDist),
-    filename: 'index.js'
-  },
-  entry: `./${conf.path.styleguide('index')}`
-};
+
+  devServer: {
+    port: 3001,
+    host: 'localhost',
+    historyApiFallback: true,
+    watchOptions: {
+      aggregateTimeout: 300,
+      poll: 1000
+    },
+    outputPath: webpackHelper.root('build/styleguide')
+  }
+});

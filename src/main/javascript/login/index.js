@@ -16,6 +16,8 @@ import {AuthServiceFactory} from './services/auth.service';
 import {UserServiceFactory} from './services/user.service';
 import {JwtServiceFactory} from './services/jwt.service';
 
+import {LayoutContentComponent, LayoutFooterComponent} from './layout';
+
 import {LoginComponent} from './components/login/login.component';
 import {PasswordChangeComponent} from './components/password-change/password-change.component';
 import {PasswordPreResetComponent} from './components/password-pre-reset/password-pre-reset.component';
@@ -35,6 +37,8 @@ angular
   .factory('AuthService', AuthServiceFactory)
   .factory('UserService', UserServiceFactory)
   .factory('JwtService', JwtServiceFactory)
+  .component('layoutContent', LayoutContentComponent)
+  .component('layoutFooter', LayoutFooterComponent)
   .component('passwordChangeComponent', PasswordChangeComponent)
   .component('passwordPreResetComponent', PasswordPreResetComponent)
   .component('passwordResetComponent', PasswordResetComponent)

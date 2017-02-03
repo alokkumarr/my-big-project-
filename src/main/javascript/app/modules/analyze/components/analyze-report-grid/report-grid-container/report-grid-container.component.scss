@@ -1,6 +1,22 @@
+report-grid-container {
+  width: 100%;
 
-.report-grid-card {
-  padding: 20px;
-  height: 100%;
-  margin: 0;
+  md-card {
+    height: 100%;
+    padding: 0;
+    margin: 20px;
+    overflow-x: auto;
+  }
+
+  .rgc-group-panel {
+    padding: 20px 20px 0;
+  }
+
+  .rgc-panel {
+    padding: 20px 10px;
+  }
+
+  .rgc-view-more-label {
+    text-decoration: underline;
+  }
 }

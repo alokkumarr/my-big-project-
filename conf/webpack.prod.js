@@ -1,9 +1,7 @@
-const webpackMerge = require('webpack-merge');
-const indexOf = require('lodash/indexOf');
-const gte = require('lodash/gte');
 const path = require('path');
+const webpackMerge = require('webpack-merge');
 const webpackHelper = require('./webpack.helper');
-const commonConfig = require('./webpack.common.js');
+const mainConfig = require('./webpack.main.js');
 
 /**
  * Webpack Plugins
@@ -28,25 +26,35 @@ const vendorKeys = Object.keys(pkg.dependencies).map(key => {
 const appChunks = ['vendor', 'app'];
 const loginChunks = ['vendor', 'login'];
 
-module.exports = webpackMerge(commonConfig, {
+module.exports = webpackMerge(mainConfig, {
   entry: {
     vendor: vendorKeys
   },
 
   module: {
-    loaders: [
+    rules: [
+      {
+        enforce: 'pre',
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'eslint-loader',
+        options: {
+          fix: false,
+          configFile: webpackHelper.root('conf/eslint-prod-rules.js')
+        }
+      },
       {
         test: /\.(css|scss)$/,
         loaders: ExtractTextPlugin.extract({
-          fallbackLoader: 'style',
-          loader: 'css?minimize!sass!postcss'
+          fallbackLoader: 'style-loader',
+          loader: 'css-loader?minimize!sass-loader!postcss-loader'
         })
       }
     ]
   },
 
   plugins: [
-    new CleanWebpackPlugin(['dist'], {
+    new CleanWebpackPlugin(['build/dist'], {
       root: webpackHelper.root(),
       verbose: true
     }),
@@ -73,9 +81,5 @@ module.exports = webpackMerge(commonConfig, {
       names: ['vendor'],
       minChunks: Infinity
     })
-  ],
-
-  eslint: {
-    configFile: webpackHelper.root('conf/eslint-prod-rules.js')
-  }
+  ]
 });

@@ -11,7 +11,6 @@ md-input-container.#{$theme-cls} {
   }
 }
 
-
 md-input-container .md-input {
   height: 34px;
 }
@@ -46,17 +45,18 @@ md-radio-button {
   }
 }
 
-md-checkbox {
-  &.#{$theme-cls} {
+.#{$theme-cls} {
+  & md-checkbox {
     &:not(.md-checked) {
       .md-icon {
-        border-color: #CECECE;
+        background-color: $checkbox-inactive-bg-color;
+        border: $checkbox-inactive-border;
       }
     }
 
     &.md-checked {
       .md-icon {
-        background-color: #1A89D4;
+        background-color: $checkbox-active-bg-color;
       }
     }
   }

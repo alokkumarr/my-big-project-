@@ -28,7 +28,7 @@ import {ObserveModule} from './modules/observe';
 import {AnalyzeModule} from './modules/analyze';
 import {AlertsModule} from './modules/alerts';
 
-import {HeaderComponent, RootComponent, FooterComponent} from './layout';
+import {LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent} from './layout';
 
 // import from login module
 import {AuthServiceFactory} from '../login/services/auth.service';
@@ -56,6 +56,6 @@ angular
   .factory('AuthService', AuthServiceFactory)
   .factory('UserService', UserServiceFactory)
   .factory('JwtService', JwtServiceFactory)
-  .component('root', RootComponent)
-  .component('headerComponent', HeaderComponent)
-  .component('footerComponent', FooterComponent);
+  .component('layoutHeader', LayoutHeaderComponent)
+  .component('layoutContent', LayoutContentComponent)
+  .component('layoutFooter', LayoutFooterComponent);

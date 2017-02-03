@@ -1,6 +1,13 @@
 import {AccordionMenu, AccordionMenuLink} from './accordionMenu';
 import {BadgeComponent} from './badge';
-import {JSPlumbCanvas, JSPlumbTable, JSPlumbEndpoint, JSPlumbConnector, JSPlumbJoinLabel, JSPlumbJoinDialog} from './jsPlumb';
+import {
+  JSPlumbCanvas,
+  JSPlumbTable,
+  JSPlumbEndpoint,
+  JSPlumbConnector,
+  JSPlumbJoinLabel,
+  JSPlumbJoinDialog
+} from './jsPlumb';
 import {PanelComponent} from './panel';
 import {RangeSliderComponent} from './range-slider/range-slider.component';
 import {mdButtonGroupComponent} from './md-button-group/md-button-group.component';

@@ -90,7 +90,7 @@
             </configuration>
           </execution>
 
-           <execution>
+          <execution>
             <id>npm-run-build</id>
             <goals>
               <goal>npm</goal>
@@ -99,7 +99,7 @@
               <arguments>run start</arguments>
             </configuration>
           </execution>
-          
+
           <!-- commented for not being used
           <execution>
             <id>javascript tests</id>
@@ -112,29 +112,27 @@
           </execution> -->
         </executions>
       </plugin>
-      
-	<!--    
-   	<plugin>
-		<artifactId>maven-war-plugin</artifactId>
-		<version>3.0.0</version>
-		<configuration>
 
-			<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
-			<webResources>
-				<resource>
-					<directory>dist</directory>
-					<targetPath>/</targetPath>
-				</resource>
-			</webResources>
-			<archive>
-				<manifest>
-					<addClasspath>true</addClasspath>
-				</manifest>
-			</archive>
-		</configuration>
-	</plugin> 
-	-->
-	    </plugins>
+      <!--
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+          <webResources>
+            <resource>
+              <directory>dist</directory>
+              <targetPath>/</targetPath>
+            </resource>
+          </webResources>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>-->
+    </plugins>
   </build>
 
   <profiles>
@@ -144,7 +142,7 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <build>
-      <finalName>${project.artifactId}-${project.version}</finalName>
+        <finalName>${project.artifactId}-${project.version}</finalName>
         <plugins>
           <plugin>
             <artifactId>maven-clean-plugin</artifactId>
@@ -221,27 +219,26 @@
             </executions>
           </plugin>
 
-	<plugin>
-		<artifactId>maven-war-plugin</artifactId>
-		<version>3.0.0</version>
-		<configuration>
+          <plugin>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>3.0.0</version>
+            <configuration>
+              <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+              <webResources>
+                <resource>
+                  <directory>dist</directory>
+                  <targetPath>/</targetPath>
+                </resource>
+              </webResources>
+              <archive>
+                <manifest>
+                  <addClasspath>true</addClasspath>
+                </manifest>
+              </archive>
+            </configuration>
+          </plugin>
 
-			<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
-			<webResources>
-				<resource>
-					<directory>dist</directory>
-					<targetPath>/</targetPath>
-				</resource>
-			</webResources>
-			<archive>
-				<manifest>
-					<addClasspath>true</addClasspath>
-				</manifest>
-			</archive>
-		</configuration>
-	</plugin>
-
-        <plugin>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
             <version>${maven.assembly.version}</version>
@@ -261,17 +258,17 @@
               </execution>
             </executions>
           </plugin>
-         </plugins>
+        </plugins>
       </build>
     </profile>
-	
-      <profile>
+
+    <profile>
       <id>rpm</id>
       <activation>
         <activeByDefault>false</activeByDefault>
       </activation>
       <build>
-      <finalName>${project.artifactId}-${project.version}</finalName>
+        <finalName>${project.artifactId}-${project.version}</finalName>
         <plugins>
           <plugin>
             <artifactId>maven-clean-plugin</artifactId>
@@ -348,27 +345,26 @@
             </executions>
           </plugin>
 
-	<plugin>
-		<artifactId>maven-war-plugin</artifactId>
-		<version>3.0.0</version>
-		<configuration>
+          <plugin>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>3.0.0</version>
+            <configuration>
+              <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+              <webResources>
+                <resource>
+                  <directory>dist</directory>
+                  <targetPath>/</targetPath>
+                </resource>
+              </webResources>
+              <archive>
+                <manifest>
+                  <addClasspath>true</addClasspath>
+                </manifest>
+              </archive>
+            </configuration>
+          </plugin>
 
-			<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
-			<webResources>
-				<resource>
-					<directory>dist</directory>
-					<targetPath>/</targetPath>
-				</resource>
-			</webResources>
-			<archive>
-				<manifest>
-					<addClasspath>true</addClasspath>
-				</manifest>
-			</archive>
-		</configuration>
-	</plugin>
-
-        <plugin>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
             <version>${maven.assembly.version}</version>
@@ -388,113 +384,125 @@
               </execution>
             </executions>
           </plugin>
-          
+
+          <!-- RPM build -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>rpm-maven-plugin</artifactId>
+            <version>2.1.5</version>
+            <extensions>true</extensions>
+            <!-- RPM as Side Effect -->
+            <executions>
+              <execution>
+                <id>generate-rpm</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>rpm</goal>
+                </goals>
+              </execution>
+            </executions>
+
             <!--
-              RPM build
-              -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>rpm-maven-plugin</artifactId>
-                <version>2.1.5</version>
-                <extensions>true</extensions>
-                <!-- RPM as Side Effect -->
-                <executions>
-                  <execution>
-                    <id>generate-rpm</id>
-                    <phase>package</phase>
-                    <goals>
-                      <goal>rpm</goal>
-                    </goals>
-                  </execution>
-                </executions>
-                <!-- executions><execution>
-                    <id>${app.name}-rpm-build</id>
-                    <phase>package</phase>
-                    <goals><goal>rpm</goal></goals>
-                </execution></executions -->
+            <executions>
+              <execution>
+                <id>${app.name}-rpm-build</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>rpm</goal>
+                </goals>
+              </execution>
+            </executions>-->
 
-                <configuration>
-                    <license>Synchronoss proprietary product</license>
-                    <distribution>SNCR XDF 2017</distribution>
-                    <needarch>false</needarch>
-                    <targetOS>i386-linux</targetOS>
-                    <group>BDA/SAW</group>
-                    <packager>BDA</packager>
-                    <name>${app.name}</name>
-                    <requires><require>tomcat &gt; 7.0</require></requires>
-                    <provides><provide>${app.name}</provide></provides>
+            <configuration>
+              <license>Synchronoss proprietary product</license>
+              <distribution>SNCR XDF 2017</distribution>
+              <needarch>false</needarch>
+              <targetOS>i386-linux</targetOS>
+              <group>BDA/SAW</group>
+              <packager>BDA</packager>
+              <name>${app.name}</name>
+              <requires>
+                <require>tomcat &gt; 7.0</require>
+              </requires>
+              <provides>
+                <provide>${app.name}</provide>
+              </provides>
+              <!-- Only applicable to a Mapping if filemode,
+                   username, AND groupname are NOT populated. -->
+              <defaultUsername>${app.user}</defaultUsername>
+              <defaultGroupname>${app.group}</defaultGroupname>
+              <defaultDirmode>555</defaultDirmode>
+              <defaultFilemode>444</defaultFilemode>
+              <!-- A list of %define arguments -->
+              <defineStatements>
+                <defineStatement>
+                  _unpackaged_files_terminate_build 0
+                </defineStatement>
+              </defineStatements>
+              <!-- RPM contents -->
+              <mappings>
+                <!-- Top level directories -->
+                <mapping>
+                  <directory>${app.optDir}</directory>
+                </mapping>
+
+                <mapping>
+                  <directory>${app.etcDir}</directory>
+                </mapping>
+
+                <mapping>
+                  <!-- /var/bda/testapp-x.x -->
+                  <directory>${app.varDir}</directory>
+                  <directoryIncluded>true</directoryIncluded>
+                  <!-- dirmode>750</dirmode -->
+                  <filemode>750</filemode>
+                  <username>${app.user}</username>
+                  <groupname>${app.group}</groupname>
+                </mapping>
+
+                <!-- env file
+                <mapping>
+                    <directory>${app.etcDir}</directory>
+                    <sources><source><location>src/app/testapp.env</location></source></sources>
+                    <configuration>true</configuration>
+                </mapping>-->
+
+                <mapping>
+                  <directory>${app.optDir}</directory>
+                  <sources>
+                    <source>
+                      <location>target/bda-saw-2.0.0.0.war</location>
+                    </source>
                     <!--
-                        Only applicable to a Mapping if filemode,
-                        username, AND groupname are NOT populated.
-                    -->
-                    <defaultUsername>${app.user}</defaultUsername>
-                    <defaultGroupname>${app.group}</defaultGroupname>
-                    <defaultDirmode>555</defaultDirmode>
-                    <defaultFilemode>444</defaultFilemode>
-                    <!-- A list of %define arguments -->
-                    <defineStatements><defineStatement>
-                        _unpackaged_files_terminate_build 0
-                    </defineStatement></defineStatements>
-                    <!-- RPM contents -->
-                    <mappings>
-                        <!-- Top level directories -->
-                        <mapping><directory>${app.optDir}</directory></mapping>
-                        <mapping><directory>${app.etcDir}</directory></mapping>
-                        <mapping>
-                            <!-- /var/bda/testapp-x.x -->
-                            <directory>${app.varDir}</directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <!-- dirmode>750</dirmode -->
-                            <filemode>750</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
-                        </mapping>
-                        <!-- env file -->
-                        <!--
-                        <mapping>
-                            <directory>${app.etcDir}</directory>
-                            <sources><source><location>src/app/testapp.env</location></source></sources>
-                            <configuration>true</configuration>
-                        </mapping>
-                      -->
-
-                        <mapping>
-                            <directory>${app.optDir}</directory>
-                            <sources>
-                                <source><location>target/bda-saw-2.0.0.0.war</location></source>
-                                <!--
-                                <source><location>...</location></source>
-                                -->
-                            </sources>
-                            <directoryIncluded>false</directoryIncluded>
-                        </mapping>
-                    </mappings>
-                    <preinstallScriptlet>
-                        <script>
-echo ${app.nameVer} pre-install is being executed
-#echo &gt;/tmp/.xdf-testapp.tmp.env '
-#export user=${app.user}
-#export group=${app.group}
-#export app_name=${app.name}
-#export app_version=${app.version}
-#export app_home=${app.optDir}
-#'
-                    </script>
-                    </preinstallScriptlet>
-                    <!--
-                    <postinstallScriptlet>
-                        <scriptFile>src/install/postinstall</scriptFile>
-                        <fileEncoding>utf-8</fileEncoding>
-                    </postinstallScriptlet>
-                    <preremoveScriptlet>
-                        <scriptFile>src/install/preremove</scriptFile>
-                        <fileEncoding>utf-8</fileEncoding>
-                    </preremoveScriptlet>
-                  -->
-                </configuration>
-            </plugin>
-            <!-- RPM plugin : end -->
-
+                    <source><location>...</location></source>-->
+                  </sources>
+                  <directoryIncluded>false</directoryIncluded>
+                </mapping>
+              </mappings>
+              <preinstallScriptlet>
+                <script>
+                  echo ${app.nameVer} pre-install is being executed
+                  #echo &gt;/tmp/.xdf-testapp.tmp.env '
+                  #export user=${app.user}
+                  #export group=${app.group}
+                  #export app_name=${app.name}
+                  #export app_version=${app.version}
+                  #export app_home=${app.optDir}
+                  #'
+                </script>
+              </preinstallScriptlet>
+              <!--
+              <postinstallScriptlet>
+                  <scriptFile>src/install/postinstall</scriptFile>
+                  <fileEncoding>utf-8</fileEncoding>
+              </postinstallScriptlet>
+              <preremoveScriptlet>
+                  <scriptFile>src/install/preremove</scriptFile>
+                  <fileEncoding>utf-8</fileEncoding>
+              </preremoveScriptlet>-->
+            </configuration>
+          </plugin>
+          <!-- RPM plugin : end -->
         </plugins>
       </build>
     </profile>

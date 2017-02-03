@@ -166,6 +166,12 @@ analyze-report {
         min-width: 50px;
         border-radius: 0;
         border-right: 1px solid #C4C4C4;
+
+        &.m-expanded {
+          md-icon {
+            transform: rotate(180deg);
+          }
+        }
       }
 
       &-text {
@@ -176,6 +182,7 @@ analyze-report {
 
       &-actions {
         text-align: right;
+        align-self: center;
 
         .md-button {
           border: 1px solid #E7E8E9;

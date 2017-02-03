@@ -1,17 +1,12 @@
-.analyze-card {
-  md-card-content {
-    padding: 24px;
+.saw-analyze-card {
+  .saw-ac-placeholder {
+    height: 159px;
+    width: 434px;
+    background-size: 434px 159px;
 
-    chart {
-      width: 100%;
-      height: 100%;
-      display: inline-block;
+    &.m-chart {
+      background-image: url('~img/chart-placeholder.png');
     }
-  }
-
-  md-card-footer {
-    border-left-width: 0;
-    border-right-width: 0;
   }
 
   md-card-title {
@@ -28,18 +23,5 @@
 
   &_report {
     width: 100%;
-  }
-
-  &_label {
-    display: inline-flex;
-    background-color: #CCC;
-    padding: 3px 5px;
-  }
-
-  .chart-placeholder {
-    background-image: url('~img/chart-placeholder.png');
-    height: 159px;
-    width: 434px;
-    background-size: 434px 159px;
   }
 }

@@ -1,3 +1,3 @@
-export {HeaderComponent} from './components/header/header.component';
-export {RootComponent} from './components/root/root.component';
-export {FooterComponent} from './components/footer/footer.component';
+export {LayoutHeaderComponent} from './components/header/header.component';
+export {LayoutContentComponent} from './components/content/content.component';
+export {LayoutFooterComponent} from './components/footer/footer.component';

@@ -24,7 +24,6 @@ export const AnalyzeReportPreviewComponent = {
     }
 
     $onInit() {
-      this.reloadPreviewGrid();
     }
 
     cancel() {
@@ -35,7 +34,10 @@ export const AnalyzeReportPreviewComponent = {
       const grid = first(this._$componentHandler.get('arp-grid-container'));
 
       if (grid) {
-        grid.reload(this.model.columns, this.model.gridData);
+        grid.updateColumns(this.model.columns);
+        grid.updateSorts(this.model.sorts);
+        grid.updateSource(this.model.gridData);
+        grid.refreshGrid();
       }
     }
 

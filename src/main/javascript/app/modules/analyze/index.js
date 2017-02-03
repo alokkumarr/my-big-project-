@@ -22,6 +22,7 @@ import {AnalyzeFilterGroupComponent} from './components/analyze-filter-sidenav/a
 import {AnalyzeFilterSidenavComponent} from './components/analyze-filter-sidenav/analyze-filter-sidenav.component';
 import {StringFilterComponent} from './components/analyze-filter-sidenav/filters/string-filter.component';
 import {NumberFilterComponent} from './components/analyze-filter-sidenav/filters/number-filter.component';
+import {ReportRenameDialogComponent} from './components/analyze-report-grid/report-rename-dialog/report-rename-dialog.component';
 import {AnalyzeReportSaveComponent} from './components/analyze-report-save/analyze-report-save.component';
 
 export const AnalyzeModule = 'AnalyzeModule';
@@ -30,9 +31,10 @@ angular.module(AnalyzeModule, [])
   .config(routesConfig)
   .factory('FilterService', FilterService)
   .factory('AnalyzeService', AnalyzeService)
-  .component('reportGrid', ReportGridComponent)
-  .component('reportGridNode', ReportGridNodeComponent)
   .component('reportGridContainer', ReportGridContainerComponent)
+  .component('reportGridNode', ReportGridNodeComponent)
+  .component('reportGrid', ReportGridComponent)
+  .component('reportRenameDialog', ReportRenameDialogComponent)
   .component('analyzePage', AnalyzePageComponent)
   .component('analyzeView', AnalyzeViewComponent)
   .component('analyzeCard', AnalyzeCardComponent)

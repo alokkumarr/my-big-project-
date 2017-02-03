@@ -9,6 +9,7 @@ import find from 'lodash/find';
 import forEach from 'lodash/forEach';
 import uniq from 'lodash/uniq';
 import isEmpty from 'lodash/isEmpty';
+import clone from 'lodash/clone';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
@@ -185,6 +186,10 @@ export const AnalyzeReportComponent = {
       this.getArtifacts();
 
       this.canvas._$eventHandler.on('changed', () => {
+        this.reloadPreviewGrid();
+      });
+
+      this.canvas._$eventHandler.on('sortChanged', () => {
         this.reloadPreviewGrid();
       });
     }
@@ -366,15 +371,23 @@ export const AnalyzeReportComponent = {
     }
 
     reloadPreviewGrid() {
-      this._$timeout(() => {
-        this.columns = this.getSelectedColumns(this.canvas.model.tables);
+      this.columns = this.getSelectedColumns(this.canvas.model.tables);
 
-        const grid = first(this._$componentHandler.get('ard-grid-container'));
-
-        if (grid) {
-          grid.reload(this.columns, this.gridData);
-        }
+      const sorts = map(this.canvas.model.sorts, sort => {
+        return {
+          column: sort.field.name,
+          direction: sort.order
+        };
       });
+
+      const grid = first(this._$componentHandler.get('ard-grid-container'));
+
+      if (grid) {
+        grid.updateColumns(this.columns);
+        grid.updateSorts(sorts);
+        grid.updateSource(this.gridData);
+        grid.refreshGrid();
+      }
     }
 
     getSelectedColumns(tables) {
@@ -392,12 +405,30 @@ export const AnalyzeReportComponent = {
       }
     }
 
+    hasSelectedColumns() {
+      return this.columns.length > 0;
+    }
+
+    isSortDisabled() {
+      return !this.hasSelectedColumns();
+    }
+
+    isPreviewDisabled() {
+      return !this.hasSelectedColumns();
+    }
+
     openPreviewModal(ev) {
       const scope = this._$scope.$new();
 
       scope.model = {
         gridData: this.gridData,
-        columns: this.columns
+        columns: this.columns,
+        sorts: map(this.canvas.model.sorts, sort => {
+          return {
+            column: sort.field.name,
+            direction: sort.order
+          };
+        })
       };
 
       this._$mdDialog
@@ -412,11 +443,15 @@ export const AnalyzeReportComponent = {
     }
 
     openSortModal(ev) {
+      this.states.detailsExpanded = true;
+
       const scope = this._$scope.$new();
 
       scope.model = {
         fields: this.canvas.model.getSelectedFields(),
-        sorts: this.canvas.model.sorts
+        sorts: map(this.canvas.model.sorts, sort => {
+          return clone(sort);
+        })
       };
 
       this._$mdDialog
@@ -426,6 +461,10 @@ export const AnalyzeReportComponent = {
           fullscreen: true,
           skipHide: true,
           scope
+        })
+        .then(sorts => {
+          this.canvas.model.sorts = sorts;
+          this.canvas._$eventHandler.emit('sortChanged');
         });
     }
 
