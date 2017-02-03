@@ -9,7 +9,6 @@ import find from 'lodash/find';
 import forEach from 'lodash/forEach';
 import uniq from 'lodash/uniq';
 import isEmpty from 'lodash/isEmpty';
-import map from 'lodash/map';
 import clone from 'lodash/clone';
 
 import template from './analyze-report.component.html';

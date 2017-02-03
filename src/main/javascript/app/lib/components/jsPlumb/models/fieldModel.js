@@ -17,10 +17,6 @@ export class FieldModel {
     this.isFilterEligible = false;
   }
 
-  getIdentifier() {
-    return `${this.table.name}:${this.name}`;
-  }
-
   setMeta(meta) {
     this.meta = meta;
   }
