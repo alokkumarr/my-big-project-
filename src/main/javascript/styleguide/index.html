@@ -1,15 +1,15 @@
 <!doctype html>
-<html>
+<html ng-app="styleguide" ng-cloak>
   <head>
-    <base href="/">
-    <meta charset="utf-8">
-    <title>FountainJS</title>
-    <meta name="description" content="">
-    <meta name="viewport" content="width=device-width">
-    <link rel="icon" type="image/png" href="http://fountainjs.io/assets/imgs/fountain.png"/>
+    <script type="text/javascript">
+      document.write('<base href="' + document.location.href + '" />');
+    </script>
+    <title ng-bind="getPageTitle()"></title>
+    <meta charset="utf-8"/>
+    <meta name="description" content=""/>
+    <meta name="viewport" content="width=device-width"/>
   </head>
-
-  <body ng-app="styleguideModule">
-    <styleguide></styleguide>
+  <body>
+    <root></root>
   </body>
 </html>

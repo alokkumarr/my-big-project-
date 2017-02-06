@@ -1,5 +1,5 @@
 import forEach from 'lodash/forEach';
-import clone from 'lodash/clone';
+import find from 'lodash/find';
 
 import template from './analyze-report-sort.component.html';
 import style from './analyze-report-sort.component.scss';
@@ -13,16 +13,7 @@ export const AnalyzeReportSortComponent = {
   controller: class AnalyzeReportSortController {
     constructor($mdDialog) {
       'ngInject';
-
       this._$mdDialog = $mdDialog;
-
-      this.sorts = [];
-    }
-
-    $onInit() {
-      forEach(this.model.sorts, sort => {
-        this.sorts.push(clone(sort));
-      });
     }
 
     addSort() {
@@ -30,19 +21,31 @@ export const AnalyzeReportSortComponent = {
         order: 'asc'
       };
 
-      this.sorts.push(sort);
+      this.model.sorts.push(sort);
 
       return sort;
     }
 
-    filterSortOption(item) {
+    canAddSort() {
+      return this.model.sorts.length < this.model.fields.length;
+    }
+
+    filterSortOption(sort, item) {
       switch (item.type) {
         case 'string':
         case 'int':
-          return true;
+          return sort.field === item || !this.isColumnSorted(item);
         default:
           return false;
       }
+    }
+
+    isColumnSorted(column) {
+      const sort = find(this.model.sorts, sort => {
+        return sort.field === column;
+      });
+
+      return Boolean(sort);
     }
 
     cancel() {
@@ -50,12 +53,7 @@ export const AnalyzeReportSortComponent = {
     }
 
     apply() {
-      this._$mdDialog.hide();
-      this.model.sorts.length = 0;
-
-      forEach(this.sorts, sort => {
-        this.model.sorts.push(sort);
-      });
+      this._$mdDialog.hide(this.model.sorts);
     }
   }
 };

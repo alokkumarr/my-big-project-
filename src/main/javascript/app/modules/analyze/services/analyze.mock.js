@@ -208,23 +208,23 @@ function getMenu() {
       children: [{
         id: 1,
         name: 'Order Fulfillment',
-        url: 'analyze/1'
+        url: '#!/analyze/1'
       }, {
         id: 2,
         name: 'Category 2',
-        url: 'analyze/2'
+        url: '#!/analyze/2'
       }, {
         id: 3,
         name: 'Category 3',
-        url: 'analyze/3'
+        url: '#!/analyze/3'
       }, {
         id: 4,
         name: 'Category 4',
-        url: 'analyze/4'
+        url: '#!/analyze/4'
       }, {
         id: 5,
         name: 'Category 5',
-        url: 'analyze/5'
+        url: '#!/analyze/5'
       }]
     }, {
       name: 'Folder 2'

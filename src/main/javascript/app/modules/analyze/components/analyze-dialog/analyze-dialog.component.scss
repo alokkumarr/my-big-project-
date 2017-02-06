@@ -18,6 +18,10 @@
   &_content {
     analyze-dialog-content {
       width: 100%;
+
+      > .layout-column {
+        width: 100%;
+      }
     }
 
     .field-label {

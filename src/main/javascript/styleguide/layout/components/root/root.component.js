@@ -1,8 +1,8 @@
-import template from './styleguide.component.html';
+import template from './root.component.html';
 
-export const StyleguideComponent = {
+export const RootComponent = {
   template,
-  controller: class StyleguideController {
+  controller: class RootController {
     constructor($mdPanel, $mdSidenav) {
       this.$mdPanel = $mdPanel;
       this.$mdSidenav = $mdSidenav;

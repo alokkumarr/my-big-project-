@@ -20,6 +20,7 @@ import AppConfig from '../../../../appConfig';
 
 import {routesConfig} from './routes';
 import {themeConfig} from './theme';
+import {config} from './config';
 import {runConfig} from './run';
 
 import {LibModule} from './lib';
@@ -27,7 +28,7 @@ import {ObserveModule} from './modules/observe';
 import {AnalyzeModule} from './modules/analyze';
 import {AlertsModule} from './modules/alerts';
 
-import {HeaderComponent, RootComponent, FooterComponent} from './layout';
+import {LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent} from './layout';
 
 // import from login module
 import {AuthServiceFactory} from '../login/services/auth.service';
@@ -49,11 +50,12 @@ angular
   ])
   .config(routesConfig)
   .config(themeConfig)
+  .config(config)
   .run(runConfig)
   .value('AppConfig', AppConfig)
   .factory('AuthService', AuthServiceFactory)
   .factory('UserService', UserServiceFactory)
   .factory('JwtService', JwtServiceFactory)
-  .component('root', RootComponent)
-  .component('headerComponent', HeaderComponent)
-  .component('footerComponent', FooterComponent);
+  .component('layoutHeader', LayoutHeaderComponent)
+  .component('layoutContent', LayoutContentComponent)
+  .component('layoutFooter', LayoutFooterComponent);
