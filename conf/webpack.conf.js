@@ -90,7 +90,7 @@ module.exports = function (env) {
           test: /\.(css|scss)$/,
           loader: ExtractTextPlugin.extract({
             fallback: 'style-loader',
-            use: `css-loader${isProduction ? '?minimize' : ''}!sass-loader!postcss-loader`
+            loader: `css-loader${isProduction ? '?minimize' : ''}!sass-loader!postcss-loader`
           })
         },
         {

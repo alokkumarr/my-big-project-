@@ -57,3 +57,37 @@
     background-color: #CAD3DB;
   }
 }
+
+.choice-group-nd {
+  .md-button {
+    padding: 8px;
+    border: 1px solid #B0BFC8;
+    font-size: 16px;
+    color: #596574;
+    text-align: center;
+
+    &:hover {
+      background-color: #F3F5F8;
+    }
+
+    &.selected {
+      background-color: #DEE4EA;
+      color: #596574;
+    }
+
+    [disabled] {
+      background-color: transparent;
+      color: rgba(#596574, 0.7);
+    }
+  }
+
+  &.m-large {
+    .md-button {
+      padding: 24px;
+
+      &.selected {
+        background-color: #1A89D4;
+      }
+    }
+  }
+}
