@@ -148,7 +148,7 @@ export const AnalyzeReportComponent = {
       this.filters.possible = map(pipe(
         set('model', null),
         set('operator', DEFAULT_FILTER_OPERATOR)
-        ), this.filters);
+      ), this.filters);
       this.filters.selected = [];
     }
 
@@ -418,49 +418,51 @@ export const AnalyzeReportComponent = {
     }
 
     openPreviewModal(ev) {
-      const scope = this._$scope.$new();
-
-      scope.model = {
-        gridData: this.gridData,
-        columns: this.columns,
-        sorts: map(this.canvas.model.sorts, sort => {
-          return {
-            column: sort.field.name,
-            direction: sort.order
-          };
-        })
-      };
+      const tpl = '<analyze-report-preview model="$ctrl.model"></analyze-report-preview>';
 
       this._$mdDialog
         .show({
-          template: '<analyze-report-preview model="model"></analyze-report-preview>',
+          template: tpl,
+          controller: scope => {
+            scope.$ctrl.model = {
+              gridData: this.gridData,
+              columns: this.columns,
+              sorts: map(this.canvas.model.sorts, sort => {
+                return {
+                  column: sort.field.name,
+                  direction: sort.order
+                };
+              })
+            };
+          },
+          controllerAs: '$ctrl',
           targetEvent: ev,
           fullscreen: true,
           autoWrap: false,
-          skipHide: true,
-          scope
+          multiple: true
         });
     }
 
     openSortModal(ev) {
       this.states.detailsExpanded = true;
 
-      const scope = this._$scope.$new();
-
-      scope.model = {
-        fields: this.canvas.model.getSelectedFields(),
-        sorts: map(this.canvas.model.sorts, sort => {
-          return clone(sort);
-        })
-      };
+      const tpl = '<analyze-report-sort model="$ctrl.model"></analyze-report-sort>';
 
       this._$mdDialog
         .show({
-          template: '<analyze-report-sort model="model"></analyze-report-sort>',
+          template: tpl,
+          controller: scope => {
+            scope.$ctrl.model = {
+              fields: this.canvas.model.getSelectedFields(),
+              sorts: map(this.canvas.model.sorts, sort => {
+                return clone(sort);
+              })
+            };
+          },
+          controllerAs: '$ctrl',
           targetEvent: ev,
           fullscreen: true,
-          skipHide: true,
-          scope
+          multiple: true
         })
         .then(sorts => {
           this.canvas.model.sorts = sorts;
@@ -469,23 +471,25 @@ export const AnalyzeReportComponent = {
     }
 
     openDescriptionModal(ev) {
-      const scope = this._$scope.$new();
-
-      scope.model = {
-        description: this.data.description
-      };
-
-      scope.onSave = data => {
-        this.data.description = data.description;
-      };
+      const tpl = '<analyze-report-description model="$ctrl.model" on-save="$ctrl.onSave($data)"></analyze-report-description>';
 
       this._$mdDialog.show({
-        template: '<analyze-report-description model="model" on-save="onSave($data)"></analyze-report-description>',
-        fullscreen: false,
-        skipHide: true,
+        template: tpl,
+        controller: scope => {
+          scope.$ctrl.model = {
+            description: this.data.description
+          };
+
+          scope.$ctrl.onSave = data => {
+            this.data.description = data.description;
+          };
+        },
+        controllerAs: '$ctrl',
+        autoWrap: false,
+        focusOnOpen: false,
+        multiple: true,
         targetEvent: ev,
-        clickOutsideToClose: true,
-        scope
+        clickOutsideToClose: true
       });
     }
 
@@ -497,30 +501,34 @@ export const AnalyzeReportComponent = {
         return;
       }
 
-      const scope = this._$scope.$new();
-
-      scope.model = {
-        artifacts: this.generatePayload(),
-        category: this.data.category,
-        title: this.data.title,
-        description: this.data.description
-      };
-
-      scope.onSave = data => {
-        this.data.category = data.category;
-        this.data.title = data.title;
-        this.data.description = data.description;
-
-        this._$log.log(data);
-      };
+      const tpl = '<analyze-report-save model="$ctrl.model" on-save="$ctrl.onSave($data)"></analyze-report-save>';
 
       this._$mdDialog
         .show({
-          template: '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>',
-          targetEvent: ev,
+          template: tpl,
+          controller: scope => {
+            scope.$ctrl.model = {
+              artifacts: this.generatePayload(),
+              category: this.data.category,
+              title: this.data.title,
+              description: this.data.description
+            };
+
+            scope.$ctrl.onSave = data => {
+              this.data.category = data.category;
+              this.data.title = data.title;
+              this.data.description = data.description;
+
+              this._$log.log(data);
+            };
+          },
+          controllerAs: '$ctrl',
+          autoWrap: false,
           fullscreen: true,
-          skipHide: true,
-          scope
+          focusOnOpen: false,
+          multiple: true,
+          targetEvent: ev,
+          clickOutsideToClose: true
         });
     }
 

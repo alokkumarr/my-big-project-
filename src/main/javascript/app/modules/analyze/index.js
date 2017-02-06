@@ -47,7 +47,6 @@ angular.module(AnalyzeModule, [])
   .component('stringFilter', StringFilterComponent)
   .component('numberFilter', NumberFilterComponent)
   .component('analyzeFilterSidenav', AnalyzeFilterSidenavComponent)
-  .component('analyzeReportPreview', AnalyzeReportPreviewComponent)
   .component('analyzeReportDescription', AnalyzeReportDescriptionComponent)
   .component('analyzeReportPreview', AnalyzeReportPreviewComponent)
   .component('analyzeReportSave', AnalyzeReportSaveComponent);

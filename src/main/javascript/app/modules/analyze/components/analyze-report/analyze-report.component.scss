@@ -195,7 +195,7 @@ analyze-report {
     &_details-panel {
       min-height: 40%;
       overflow-y: scroll;
-      padding: 20px 20px 0;
+      padding: 20px;
 
       &-empty {
         width: 100%;
@@ -219,10 +219,6 @@ analyze-report {
           color: #B2B2B2;
         }
       }
-    }
-
-    &_details-grid {
-      height: 100%;
     }
   }
 }

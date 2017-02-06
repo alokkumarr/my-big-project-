@@ -1,0 +1,55 @@
+[
+  {
+    "label": "TABLES",
+    "category": "table",
+    "children": [
+      {
+        "label": "Report",
+        "icon": "icon-report",
+        "type": "table:report"
+      },
+      {
+        "label": "Pivot",
+        "icon": "icon-pivot",
+        "type": "table:pivot"
+      }
+    ]
+  },
+  {
+    "label": "BAR CHARTS",
+    "category": "bar-chart",
+    "children": [
+      {
+        "label": "Bar Chart",
+        "icon": "icon-hor-bar-chart",
+        "type": "bar-chart:simple"
+      },
+      {
+        "label": "Stacked Bar Chart",
+        "icon": "icon-hor-bar-chart",
+        "type": "bar-chart:stacked"
+      },
+      {
+        "label": "Bar Chart variation",
+        "icon": "icon-hor-bar-chart",
+        "type": "bar-chart:variation"
+      }
+    ]
+  },
+  {
+    "label": "COLUMN CHARTS",
+    "category": "column-chart",
+    "children": [
+      {
+        "label": "Column Chart",
+        "icon": "icon-vert-bar-chart",
+        "type": "column-chart:simple"
+      },
+      {
+        "label": "Column Chart Var",
+        "icon": "icon-vert-bar-chart",
+        "type": "column-chart:var"
+      }
+    ]
+  }
+]
