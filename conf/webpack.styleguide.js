@@ -70,22 +70,22 @@ module.exports = () => {
         },
         {
           test: /.json$/,
-          loaders: 'json-loader'
+          loader: 'json-loader'
         },
         {
           test: /\.js$/,
           exclude: /node_modules/,
-          loaders: 'ng-annotate-loader!babel-loader'
+          loader: 'ng-annotate-loader!babel-loader'
         },
         {
           test: /.html$/,
-          loaders: 'html-loader'
+          loader: 'html-loader'
         },
         {
           test: /\.(css|scss)$/,
-          loaders: ExtractTextPlugin.extract({
-            fallbackLoader: 'style-loader',
-            loader: 'css-loader?minimize!sass-loader!postcss-loader'
+          loader: ExtractTextPlugin.extract({
+            fallback: 'style-loader',
+            use: 'css-loader?minimize!sass-loader!postcss-loader'
           })
         },
         {
@@ -142,8 +142,7 @@ module.exports = () => {
       watchOptions: {
         aggregateTimeout: 300,
         poll: 1000
-      },
-      outputPath: webpackHelper.root('build/styleguide')
+      }
     }
   };
 

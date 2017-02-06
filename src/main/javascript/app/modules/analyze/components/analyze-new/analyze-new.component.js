@@ -48,18 +48,11 @@ export const AnalyzeNewComponent = {
     }
 
     createAnalysis() {
-      // this.$mdDialog.hide();
-      const scope = this._$scope.$new();
-
-      scope.newAnalysis = {
-        name: 'Untitled'
-      };
-
       let tpl;
 
       switch (this.selectedAnalysisMethod) {
         case 'table:report':
-          tpl = '<analyze-report analysis="newAnalysis"></analyze-report>';
+          tpl = '<analyze-report analysis="$ctrl.newAnalysis"></analyze-report>';
           break;
         default:
           tpl = emptyTemplate;
@@ -68,11 +61,16 @@ export const AnalyzeNewComponent = {
 
       this.$mdDialog.show({
         template: tpl,
+        controller: scope => {
+          scope.$ctrl.newAnalysis = {
+            name: 'Untitled'
+          };
+        },
+        controllerAs: '$ctrl',
         autoWrap: false,
-        fullscreen: true,
         focusOnOpen: false,
-        skipHide: true,
-        scope
+        multiple: true,
+        clickOutsideToClose: true
       });
     }
   }

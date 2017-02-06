@@ -254,7 +254,7 @@ export const ReportGridComponent = {
         .show({
           template: '<report-rename-dialog></report-rename-dialog>',
           fullscreen: false,
-          skipHide: true,
+          multiple: true,
           clickOutsideToClose: true
         });
     }

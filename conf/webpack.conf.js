@@ -75,22 +75,22 @@ module.exports = function (env) {
         },
         {
           test: /.json$/,
-          loaders: 'json-loader'
+          loader: 'json-loader'
         },
         {
           test: /\.js$/,
           exclude: /node_modules/,
-          loaders: 'ng-annotate-loader!babel-loader'
+          loader: 'ng-annotate-loader!babel-loader'
         },
         {
           test: /.html$/,
-          loaders: 'html-loader'
+          loader: 'html-loader'
         },
         {
           test: /\.(css|scss)$/,
-          loaders: ExtractTextPlugin.extract({
-            fallbackLoader: 'style-loader',
-            loader: `css-loader${isProduction ? '?minimize' : ''}!sass-loader!postcss-loader`
+          loader: ExtractTextPlugin.extract({
+            fallback: 'style-loader',
+            use: `css-loader${isProduction ? '?minimize' : ''}!sass-loader!postcss-loader`
           })
         },
         {
@@ -124,18 +124,7 @@ module.exports = function (env) {
         configFile: webpackHelper.root('.stylelintrc')
       }),
       new ExtractTextPlugin('css/[name].css')
-    ],
-
-    devServer: isDevelopment ? {
-        port: 3000,
-        host: 'localhost',
-        historyApiFallback: true,
-        watchOptions: {
-          aggregateTimeout: 300,
-          poll: 1000
-        },
-        outputPath: webpackHelper.root('build/dist')
-      } : {}
+    ]
   };
 
   if (isDevelopment) {
@@ -152,6 +141,16 @@ module.exports = function (env) {
       hash: true,
       chunks: ['login']
     }));
+
+    conf.devServer = {
+      port: 3000,
+      host: 'localhost',
+      historyApiFallback: true,
+      watchOptions: {
+        aggregateTimeout: 300,
+        poll: 1000
+      }
+    };
   }
 
   if (isProduction) {
