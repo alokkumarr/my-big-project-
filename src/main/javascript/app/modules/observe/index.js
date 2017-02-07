@@ -1,6 +1,7 @@
 import angular from 'angular';
 
 import {routesConfig} from './routes';
+import {i18nConfig} from './i18n';
 
 import {ObserveService} from './services/observe.service';
 
@@ -16,6 +17,7 @@ export const ObserveModule = 'ObserveModule';
 
 angular.module(ObserveModule, [])
   .config(routesConfig)
+  .config(i18nConfig)
   .factory('ObserveService', ObserveService)
   .component('observePage', ObservePageComponent)
   .component('filterSidenav', FilterSidenavComponent)

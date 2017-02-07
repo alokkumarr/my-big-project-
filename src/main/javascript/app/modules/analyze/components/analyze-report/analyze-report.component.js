@@ -305,7 +305,8 @@ export const AnalyzeReportComponent = {
 
       scope.model = {
         gridData: this.gridData,
-        columns: this.columns
+        columns: this.columns,
+        title: this.data.title
       };
 
       this._$mdDialog

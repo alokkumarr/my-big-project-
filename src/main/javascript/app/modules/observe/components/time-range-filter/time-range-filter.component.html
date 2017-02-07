@@ -1,7 +1,7 @@
 <panel title="{{::$ctrl.filter.label}}" class="time-range-panel">
   <div layout-gt-xs="row">
     <md-input-container flex-gt-xs>
-      <label>From</label>
+      <label translate="FROM"></label>
       <md-datepicker
         md-hide-icons="calendar"
         ng-model="$ctrl.ngModel.fromDate" ng-change="$ctrl.onDatesSelected($ctrl.ngModel)"
@@ -11,7 +11,7 @@
       <div></div>
     </div>
     <md-input-container flex-gt-xs>
-      <label>To</label>
+      <label translate="TO"></label>
       <md-datepicker
         md-hide-icons="calendar"
         ng-model="$ctrl.ngModel.toDate" ng-change="$ctrl.onDatesSelected($ctrl.ngModel)"
@@ -19,9 +19,20 @@
     </md-input-container>
   </div>
   <div class="time-range-shortcut-btns">
-    <md-button class="md-primary" aria-label="1st Week">1st Week</md-button>
-    <md-button class="md-primary" aria-label="2nd Week">2nd Week</md-button>
-    <md-button class="md-primary" aria-label="More">More
-      <md-icon md-font-icon="icon-Shape-Copy-2"></md-icon></md-button>
+
+    <md-button class="md-primary" aria-label="1st Week"
+               translate="NTH_WEEK" translate-values="{CAT: 1}"
+               translate-interpolation="messageformat">
+    </md-button>
+
+    <md-button class="md-primary" aria-label="2nd Week"
+               translate="NTH_WEEK" translate-values="{CAT: 2}"
+               translate-interpolation="messageformat">
+    </md-button>
+
+    <md-button class="md-primary" aria-label="More" translate="MORE">
+      <md-icon md-font-icon="icon-Shape-Copy-2"></md-icon>
+    </md-button>
+
   </div>
 </panel>

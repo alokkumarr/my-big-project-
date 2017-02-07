@@ -9,19 +9,22 @@
       <div class="ard_meta" flex>
         <div class="md-title">
           <strong ng-bind="$ctrl.data.title"></strong>
-          <label>Draft</label>
+          <label translate="DRAFT"></label>
         </div>
         <div class="md-description">
           <md-icon md-font-icon="icon-report"></md-icon>
-          <span>Orders</span>
+          <span translate="ORDERS"></span>
         </div>
       </div>
 
       <div class="ard_actions" flex>
-        <md-button ng-click="$ctrl.openExportModal()">Export</md-button>
-        <md-button ng-click="$ctrl.openSaveModal()">Save</md-button>
+        <md-button ng-click="$ctrl.openExportModal()"
+                   translate="EXPORT"></md-button>
+        <md-button ng-click="$ctrl.openSaveModal()"
+                   translate="SAVE"></md-button>
         <md-button class="btn-primary"
-                   ng-click="$ctrl.openPublishModal()">Publish
+                   ng-click="$ctrl.openPublishModal()"
+                   translate="PUBLISH">
         </md-button>
       </div>
     </div>
@@ -31,25 +34,25 @@
     <div layout="column">
       <div class="ard_content" layout="column">
         <div layout="row" class="ard_sub-header">
-          <span ng-if="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE">
-            Choose fields to show in your report
+          <span ng-if="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE"
+                translate="CHOOSE_FIELDS_TO_SHOW_IN_YOUR_REPORT">
           </span>
 
-          <span ng-if="$ctrl.states.sqlMode === $ctrl.QUERY_MODE">
-            SQL Query
+          <span ng-if="$ctrl.states.sqlMode === $ctrl.QUERY_MODE"
+                translate="SQL_QUERY">
           </span>
 
           <div>
             <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.DESIGNER_MODE}"
                        ng-click="$ctrl.setSqlMode($ctrl.DESIGNER_MODE)">
               <md-icon md-font-icon="icon-designer-mode"></md-icon>
-              Designer
+              <span translate="DESIGNER"></span>
             </md-button>
 
             <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.QUERY_MODE}"
                        ng-click="$ctrl.setSqlMode($ctrl.QUERY_MODE)">
               <md-icon md-font-icon="icon-query-mode"></md-icon>
-              Query
+              <span translate="QUERY"></span>
             </md-button>
           </div>
         </div>
@@ -72,28 +75,29 @@
           <md-icon md-font-icon="icon-expand"></md-icon>
         </md-button>
 
-        <span class="ard_toolbar-text" flex>Report</span>
+        <span class="ard_toolbar-text" flex
+              translate="REPORT"></span>
 
         <div class="ard_toolbar-actions" flex>
           <md-button ng-click="$ctrl.openDescriptionModal($event)">
             <md-icon md-font-icon="icon-description"></md-icon>
-            Description
+            <span translate="DESCRIPTION"></span>
           </md-button>
 
           <md-button ng-click="$ctrl.openPreviewModal($event)"
                      ng-disabled="!$ctrl.columns.length">
             <md-icon md-font-icon="icon-full-screen"></md-icon>
-            Preview
+            <span translate="PREVIEW"></span>
           </md-button>
 
           <md-button ng-click="$ctrl.openSortModal($event)">
             <md-icon md-font-icon="icon-sort"></md-icon>
-            Sort
+            <span translate="SORT"></span>
           </md-button>
 
           <md-button>
             <md-icon md-font-icon="icon-filter"></md-icon>
-            Filter
+            <span translate="FILTER"></span>
           </md-button>
         </div>
       </div>
@@ -102,7 +106,7 @@
            ng-show="$ctrl.states.detailsExpanded">
         <div layout="column" class="ard_details-panel-empty"
              ng-show="!$ctrl.columns.length">
-          <span>Choose fields above to preview your report.</span>
+          <span translate="CHOOSE_FIELDS_ABOVE_TO_PREVIEW_YOUR_REPORT"></span>
           <md-icon md-font-icon="icon-report"></md-icon>
         </div>
 

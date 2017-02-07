@@ -7,13 +7,13 @@
           <md-icon md-font-icon="icon-remove"></md-icon>
         </md-button>
         <div class="md-title">
-          <strong>Untitled Report</strong>
+          <strong ng-bind="$ctrl.model.title"></strong>
         </div>
       </div>
 
       <div layout="row" layout-align="center center">
-        <md-button>Export</md-button>
-        <md-button class="btn-primary">Publish</md-button>
+        <md-button translate="EXPORT"></md-button>
+        <md-button class="btn-primary" translate="PUBLISH"></md-button>
       </div>
     </div>
   </analyze-dialog-header>
@@ -28,7 +28,8 @@
 
     <div layout="column" layout-align="center center">
       <md-button class="arp-load-more-btn"
-                 ng-click="$ctrl.loadMore()">Load 500 More Rows
+                 ng-click="$ctrl.loadMore()"
+                 translate="LOAD_MORE_ROWS" translate-values="{nrOfRows: $ctrl.MORE_ROWS_COUNT}">
       </md-button>
     </div>
   </analyze-dialog-content>

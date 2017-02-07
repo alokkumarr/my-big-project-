@@ -4,6 +4,8 @@ import first from 'lodash/first';
 import template from './analyze-report-preview.component.html';
 import style from './analyze-report-preview.component.scss';
 
+const MORE_ROWS_COUNT = 500;
+
 export const AnalyzeReportPreviewComponent = {
   template,
   styles: [style],
@@ -18,6 +20,8 @@ export const AnalyzeReportPreviewComponent = {
       this._$mdDialog = $mdDialog;
       this._AnalyzeService = AnalyzeService;
 
+      this.MORE_ROWS_COUNT = MORE_ROWS_COUNT;
+
       this.settings = {
         minRowsToShow: 'auto'
       };
@@ -25,6 +29,7 @@ export const AnalyzeReportPreviewComponent = {
 
     $onInit() {
       this.reloadPreviewGrid();
+      console.log('model: ', this.model);
     }
 
     cancel() {

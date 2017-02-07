@@ -1,6 +1,7 @@
 import angular from 'angular';
 
 import {routesConfig} from './routes';
+import {i18nConfig} from './i18n';
 
 import {AnalyzeService} from './services/analyze.service';
 
@@ -22,6 +23,7 @@ export const AnalyzeModule = 'AnalyzeModule';
 
 angular.module(AnalyzeModule, [])
   .config(routesConfig)
+  .config(i18nConfig)
   .factory('AnalyzeService', AnalyzeService)
   .component('reportGrid', ReportGridComponent)
   .component('reportGridNode', ReportGridNodeComponent)
