@@ -29,7 +29,6 @@ export const AnalyzeReportPreviewComponent = {
 
     $onInit() {
       this.reloadPreviewGrid();
-      console.log('model: ', this.model);
     }
 
     cancel() {
