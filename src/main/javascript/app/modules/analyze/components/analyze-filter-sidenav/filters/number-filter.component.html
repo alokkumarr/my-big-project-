@@ -1,0 +1,11 @@
+<div layout="row">
+  <md-input-container flex="60" md-no-float>
+    <md-select ng-model="$ctrl.filter.model.modifier" placeholder="Please select">
+      <md-option ng-value="modifier" ng-repeat="modifier in $ctrl.modifiers">{{::modifier}}</md-option>
+    </md-select>
+  </md-input-container>
+
+  <md-input-container flex="40">
+    <input type="number" ng-model="$ctrl.filter.model.value"/>
+  </md-input-container>
+</div>

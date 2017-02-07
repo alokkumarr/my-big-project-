@@ -2,7 +2,7 @@ import 'angular-mocks';
 import flatten from 'lodash/flatten';
 import values from 'lodash/values';
 
-const req = require.context('../../../../app', true, /^(.*\.mock\.(js$))[^.]*$/igm);
+const req = require.context('api/', true, /^(.*\.mock\.(js$))[^.]*$/igm);
 const mocks = flatten(req.keys().map(key => {
   return values(req(key));
 }));

@@ -1,7 +1,9 @@
 import template from './header.component.html';
+import style from './header.component.scss';
 
-export const HeaderComponent = {
+export const LayoutHeaderComponent = {
   template,
+  styles: [style],
   controller: class HeaderController {
     constructor($window, $transitions, $state, UserService) {
       'ngInject';

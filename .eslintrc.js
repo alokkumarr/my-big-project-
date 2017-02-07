@@ -1,1 +1,1 @@
-module.exports = require('./conf/eslint-prod-rules');
+module.exports = require('./conf/eslint-dev-rules');

@@ -1,24 +1,13 @@
-<md-card class="analyze-card" flex="100">
-  <md-card-content layout="row" layout-align="space-between start">
-    <div flex="80" class="analyze-card_report">
-      <div ng-switch="::$ctrl.metadata.type">
-        <div class="content-component"
-             ng-switch-when="chart">
-          <!--<chart options="$ctrl.metadata.chart.options"></chart>-->
-          <div class="chart-placeholder"></div>
-        </div>
+<md-card class="saw-analyze-card">
+  <md-card-header>
+    <span flex></span>
+    <md-chip class="tag-chip"
+             ng-bind="::$ctrl.metadata.type | uppercase"></md-chip>
+  </md-card-header>
 
-        <div class="content-component"
-             ng-switch-when="report">
-          <div dx-data-grid="$ctrl.metadata.report.options"></div>
-        </div>
-      </div>
-    </div>
-
-    <div flex="10">
-      <div class="analyze-card_label"
-           ng-bind="::$ctrl.metadata.type | uppercase"></div>
-    </div>
+  <md-card-content layout="row" layout-align="center center">
+    <div class="saw-ac-placeholder m-{{::$ctrl.metadata.type}}"></div>
+    <md-icon md-font-icon="icon-chart-placeholder" style="display: none;"></md-icon>
   </md-card-content>
 
   <md-card-footer layout="row" layout-align="end start">
@@ -27,23 +16,23 @@
         <span class="md-headline"
               ng-bind="::$ctrl.metadata.name"></span>
         <span class="md-subhead">
-            <span ng-bind="::($ctrl.metadata.metrics || []).join(', ')"></span>
-            <span>
-              <md-icon md-font-icon="icon-calendar"></md-icon>
-              <span ng-bind="::$ctrl.metadata.scheduled"></span>
-            </span>
+          <span ng-bind="::($ctrl.metadata.metrics || []).join(', ')"></span>
+          <span>
+            <md-icon md-font-icon="icon-calendar"></md-icon>
+            <span ng-bind="::$ctrl.metadata.scheduled"></span>
           </span>
+        </span>
       </md-card-title-text>
     </md-card-title>
 
     <md-card-actions layout="row" layout-align="center center">
-      <md-button>
+      <md-button class="md-button btn-card" aria-label="Fork">
         <md-icon md-font-icon="icon-fork"></md-icon>
       </md-button>
-      <md-button>
+      <md-button class="md-button btn-card" aria-label="Export">
         <md-icon md-font-icon="icon-folder"></md-icon>
       </md-button>
-      <md-button>
+      <md-button class="md-button btn-card" aria-label="More">
         <md-icon md-font-icon="icon-more"></md-icon>
       </md-button>
     </md-card-actions>

@@ -1,0 +1,12 @@
+<md-card class="panel-card">
+  <md-card-header>
+    <span class="card-title" ng-bind="$ctrl.filter.label"></span>
+    <span flex></span>
+    <binary-option left="AND" right="OR" ng-model="$ctrl.filter.operator" on-change="$ctrl.onOperatorSelected(value)"></binary-option>
+  </md-card-header>
+
+  <md-card-content>
+    <ng-transclude></ng-transclude>
+  </md-card-content>
+</md-card>
+<md-divider></md-divider>

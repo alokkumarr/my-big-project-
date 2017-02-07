@@ -34,19 +34,20 @@ export const JSPlumbJoinLabel = {
     }
 
     onClick(ev) {
-      const scope = this._$scope.$new();
-
-      scope.model = {
-        connector: this._connector
-      };
+      const tpl = '<js-plumb-join-dialog model="$ctrl.model"></js-plumb-join-dialog>';
 
       this._$mdDialog
         .show({
-          template: '<js-plumb-join-dialog model="model"></js-plumb-join-dialog>',
+          template: tpl,
+          controller: scope => {
+            scope.$ctrl.model = {
+              connector: this._connector
+            };
+          },
+          controllerAs: '$ctrl',
           targetEvent: ev,
           fullscreen: true,
-          skipHide: true,
-          scope
+          multiple: true
         });
     }
   }

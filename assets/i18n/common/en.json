@@ -6,6 +6,7 @@
   "CANCEL": "Cancel",
   "CHANGE_PASSWORD": "Change Password",
   "CHARTS": "Charts",
+  "CLEAR_ALL": "Clear all",
   "CLEAR_ALL_FILTERS": "Clear all fitlers",
   "DESCRIPTION": "Description",
   "DRAFT": "Draft",
@@ -17,7 +18,8 @@
   "LOAD_MORE_ROWS":"Load {{nrOfRows}} More Rows",
   "LOG_OUT":"Log out",
   "MORE": "More",
-  "NTH_WEEK": "{CAT, selectordinal, one{#st} two{#nd} few{#rd} other{#th} } Week",
+  "N_FILTERS_APPLIED": "{N, plural, one{1 Filter} other{# Filters} } Applied",
+  "NTH_WEEK": "{N, selectordinal, one{#st} two{#nd} few{#rd} other{#th} } Week",
   "OK": "Ok",
   "ORDERS": "Orders",
   "RENAME":"Rename",
@@ -37,5 +39,6 @@
   "PUBLISH": "Publish",
   "TO": "To",
   "UPLOAD": "Upload",
-  "UNDO": "Undo"
+  "UNDO": "Undo",
+  "VEW_N_MORE":"View {{value}} more"
 }

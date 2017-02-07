@@ -3,11 +3,11 @@ export function routesConfig($stateProvider) {
 
   const states = [
     {
-      name: 'app.analyze',
-      url: 'analyze',
+      name: 'analyze',
+      url: '/analyze',
       component: 'analyzePage'
     }, {
-      name: 'app.analyze.view',
+      name: 'analyze.view',
       url: '/:id',
       component: 'analyzeView'
     }

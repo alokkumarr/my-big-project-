@@ -7,20 +7,20 @@
     <md-input-container md-no-float class="md-block">
       <md-icon md-font-icon="icon-edit"></md-icon>
       <input type="text" placeholder="New Column Name"
-             ng-model="model.newName"/>
+             ng-model="$ctrl.dataHolder.newName"/>
     </md-input-container>
   </analyze-dialog-content>
 
   <analyze-dialog-footer>
     <div layout="row">
       <md-button class="btn-primary"
-                 ng-click="rename(model.newName)"
+                 ng-click="$ctrl.rename($ctrl.dataHolder.newName)"
                  translate="RENAME_REPORT">
       </md-button>
 
       <md-button class="btn-card"
-                 ng-click="cancel()"
-                 translate="CANCEL">
+                 ng-click="$ctrl.cancel()"
+                translate="CANCEL">
       </md-button>
     </div>
   </analyze-dialog-footer>

@@ -1,9 +1,12 @@
 import template from './controls.component.html';
+import style from './controls.component.scss';
 
 export const ControlsComponent = {
   template,
+  styles: [style],
   controller: class ControlsController {
     constructor() {
+      // filters & tags
       this.vegObjs = [
         {
           name: 'Broccoli',
@@ -26,10 +29,10 @@ export const ControlsComponent = {
         };
       };
 
-      this.clickMe = () => {
-        // window.alert('Should not see me');
-      };
+      this.readonly = false;
+      this.removable = true;
 
+      // range slider
       this.rangeSlider = {
         min: 0,
         max: 10,
@@ -39,10 +42,13 @@ export const ControlsComponent = {
         step: 1
       };
 
+      // badge count
       this.badgeCount = 5;
+
       this.incBadgeCount = () => {
         this.badgeCount++;
       };
+
       this.decBadgeCount = () => {
         this.badgeCount--;
       };

@@ -6,13 +6,13 @@
   <analyze-dialog-content>
     <div class="ars_sort-list">
       <div class="ars_sort-item" layout="row" layout-align="space-around center" layout-padding
-           ng-repeat="sort in $ctrl.sorts track by $index">
+           ng-repeat="sort in $ctrl.model.sorts track by $index">
         <span translate="SORT_BY"></span>
 
         <md-select ng-model="::sort.field">
           <md-option
-            ng-repeat="field in $ctrl.model.fields | filter:$ctrl.filterSortOption.bind($ctrl)"
-            ng-bind="::field.name"
+            ng-repeat="field in $ctrl.model.fields | filter:$ctrl.filterSortOption.bind($ctrl, sort)"
+            ng-bind="::field.getDisplayName()"
             ng-value="field"></md-option>
         </md-select>
 
@@ -53,7 +53,7 @@
     </div>
 
     <div layout="row" layout-padding>
-      <strong>
+      <strong ng-show="$ctrl.canAddSort()">
         <a class="ars_add-link"
            ng-click="$ctrl.addSort()"
            translate="SORT_BY_ANOTHER_COLUMN"></a>

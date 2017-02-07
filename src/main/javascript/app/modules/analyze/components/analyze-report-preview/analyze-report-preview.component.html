@@ -19,11 +19,9 @@
   </analyze-dialog-header>
 
   <analyze-dialog-content>
-    <report-grid-container
-      id="arp-grid-container"
-      columns="$ctrl.model.columns"
-      data="$ctrl.model.gridData"
-      settings="$ctrl.settings">
+    <report-grid-container id="arp-grid-container" class="ard_details-grid"
+                           source="$ctrl.model.gridData"
+                           columns="$ctrl.model.columns">
     </report-grid-container>
 
     <div layout="column" layout-align="center center">

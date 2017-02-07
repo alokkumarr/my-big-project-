@@ -1,8 +1,14 @@
-.#{$theme-cls} {
-  md-select-menu {
+md-select-menu {
+  &.#{$theme-cls} {
+    max-width: 240px;
+    max-height: 296px;
+
     md-content {
       md-option {
         height: 36px;
+        padding: 0 18px;
+        font-size: 14px;
+        line-height: 18px;
       }
 
       md-option[selected] {
