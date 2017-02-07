@@ -2,6 +2,7 @@ target
 node
 node_modules
 log.txt
+debug.log
 .tmp/
 coverage/
 build/

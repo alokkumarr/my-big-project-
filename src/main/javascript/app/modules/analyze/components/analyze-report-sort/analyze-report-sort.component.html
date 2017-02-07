@@ -1,13 +1,13 @@
 <analyze-dialog class="analyze-report-sort">
   <analyze-dialog-header layout="row" layout-align="start center" flex="grow">
-    <strong>Sort</strong>
+    <strong translate="SORT"></strong>
   </analyze-dialog-header>
 
   <analyze-dialog-content>
     <div class="ars_sort-list">
       <div class="ars_sort-item" layout="row" layout-align="space-around center" layout-padding
            ng-repeat="sort in $ctrl.model.sorts track by $index">
-        <span>Sort By</span>
+        <span translate="SORT_BY"></span>
 
         <md-select ng-model="::sort.field">
           <md-option
@@ -55,7 +55,8 @@
     <div layout="row" layout-padding>
       <strong ng-show="$ctrl.canAddSort()">
         <a class="ars_add-link"
-           ng-click="$ctrl.addSort()">+ Sort By Another Column</a>
+           ng-click="$ctrl.addSort()"
+           translate="SORT_BY_ANOTHER_COLUMN"></a>
       </strong>
     </div>
   </analyze-dialog-content>
@@ -63,11 +64,13 @@
   <analyze-dialog-footer>
     <div layout="row">
       <md-button class="btn-primary"
-                 ng-click="$ctrl.apply()">Apply Sort
+                 ng-click="$ctrl.apply()"
+                 translate="APPLY_SORT">
       </md-button>
 
       <md-button class="btn-card"
-                 ng-click="$ctrl.cancel()">Cancel
+                 ng-click="$ctrl.cancel()"
+                 translate="CANCEL">
       </md-button>
     </div>
   </analyze-dialog-footer>

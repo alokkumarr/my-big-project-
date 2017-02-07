@@ -1,7 +1,7 @@
 <md-radio-group ng-model="$ctrl.ngModel" ng-change="$ctrl.ngModelController.$setViewValue($ctrl.ngModel)">
   <md-radio-button ng-repeat="item in ::$ctrl.filter.items track by $index"
-                    style="margin-left: 10px"
-                    ng-value="::item" class="md-primary">
-    {{::item}}
-  </md-radio-button>
+                     style="margin-left: 10px" class="md-primary"
+                     ng-value="::item"
+                     ng-bind="::item">
+    </md-radio-button>
 </md-radio-group>

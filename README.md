@@ -62,3 +62,15 @@ http://nvie.com/posts/a-successful-git-branching-model/
    "-Doutput" : put the path where you want to produce the tar.gz file.
 - Distribution will contain the files
 
+## Internationalization
+
+- I18n is done with the use of [angular-translate](https://angular-translate.github.io/docs/#/guide/00_installation)
+
+- Json dictionaries for the supported languages can be found in
+assets/i18n
+- at the moment there are 4 different modules:
+  - common: fro common word in the application for example: Ok, Cancel, Rename, etc...
+  - alerts, analyze, observe, for different modules of the application
+
+- Adding a new module:
+make an i18n.js angular config file like in the other modules, and include it in the modules index.js

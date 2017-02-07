@@ -10,15 +10,18 @@
       <div layout="row" class="lh-links">
         <span class="link" aria-label="Observe"
               ui-sref="observe"
-              ui-sref-active="m-active">OBSERVE
+              ui-sref-active="m-active"
+              translate="OBSERVE">
         </span>
         <span class="link" aria-label="Analyze"
               ui-sref="analyze"
-              ui-sref-active="m-active">ANALYZE
+              ui-sref-active="m-active"
+              translate="ANALYZE">
         </span>
         <span class="link" aria-label="Alerts"
               ui-sref="alerts"
-              ui-sref-active="m-active">ALERTS
+              ui-sref-active="m-active"
+              translate="ALERTS">
         </span>
       </div>
 
@@ -38,11 +41,11 @@
                 <md-button>Account</md-button>
               </md-menu-item>
               <md-menu-item>
-                <md-button ng-click="$ctrl.changePwd()">Change password</md-button>
+                <md-button ng-click="$ctrl.changePwd()" translate="CHANGE_PASSWORD"></md-button>
               </md-menu-item>
               <md-menu-divider></md-menu-divider>
               <md-menu-item>
-                <md-button ng-click="$ctrl.logout()">Log out</md-button>
+                <md-button ng-click="$ctrl.logout()" translate="LOG_OUT"></md-button>
               </md-menu-item>
             </md-menu-content>
           </md-menu>

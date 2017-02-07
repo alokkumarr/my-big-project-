@@ -1,12 +1,13 @@
 <analyze-dialog control="$ctrl" class="analyze-report-save">
   <analyze-dialog-header layout="row" layout-align="start center" flex="grow">
-    <strong>Save</strong>
+    <strong translate="SAVE"></strong>
   </analyze-dialog-header>
 
   <analyze-dialog-content>
     <div class="ars-content" layout-padding>
       <div layout="column">
-        <label class="field-label">My analysis category</label>
+        <label class="field-label"
+               translate="MY_ANALYSIS_CATEGORY"></label>
         <md-select ng-model="::$ctrl.dataHolder.category" required>
           <md-option
             ng-repeat="category in $ctrl.dataHolder.categories"
@@ -16,13 +17,14 @@
       </div>
 
       <div layout="column">
-        <label class="field-label">Report name</label>
+        <label class="field-label"
+               translate="REPORT_NAME"></label>
         <input type="text" required
                ng-model="$ctrl.dataHolder.title"/>
       </div>
 
       <div layout="column">
-        <label class="field-label">Description</label>
+        <label class="field-label" translate="DESCRIPTION"></label>
         <textarea rows="5" placeholder="Describe this analysis"
                   ng-model="$ctrl.dataHolder.description"></textarea>
       </div>
@@ -32,11 +34,13 @@
   <analyze-dialog-footer>
     <div layout="row">
       <md-button class="btn-primary"
-                 ng-click="$ctrl.save()">Save
+                 ng-click="$ctrl.save()"
+                 translate="SAVE">
       </md-button>
 
       <md-button class="btn-card"
-                 ng-click="$ctrl.cancel()">Cancel
+                 ng-click="$ctrl.cancel()"
+                 translate="CANCEL">
       </md-button>
     </div>
   </analyze-dialog-footer>

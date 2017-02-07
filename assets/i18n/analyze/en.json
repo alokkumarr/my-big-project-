@@ -1,0 +1,18 @@
+{
+  "ANALYZE": "ANALYZE",
+  "ANALYSIS": "ANALYSIS",
+  "CREATE_ANALYSIS": "Create Analysis",
+  "CHOOSE_FIELDS_ABOVE_TO_PREVIEW_YOUR_REPORT.": "Choose fields above to preview your report.",
+  "CHOOSE_FIELDS_TO_SHOW_IN_YOUR_REPORT": "Choose fields to show in your report",
+  "DESIGNER": "Designer",
+  "HOW_WOULD_YOU_LIKE_TO_ANALYZE?": "How would you like to analyze?",
+  "MY_ANALYSIS_CATEGORY": "My analysis category",
+  "NEW_ANALYSIS": "New Analysis",
+  "NO_IMPLEMENTED_TEMPLATE_YET!": "No implemented template yet!",
+  "ORDER_FULFILLMENT": "Order Fulfillment",
+  "QUERY": "Query",
+  "REPORT_NAME": "Report name",
+  "SQL_QUERY":"SQL Query",
+  "UNTITLED_REPORT":"Untitled report",
+  "WHAT_WOULD_YOU_LIKE_TO_ANALYZE?": "What would you like to analyze?"
+}
