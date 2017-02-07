@@ -34,7 +34,7 @@ module.exports = function (env) {
     },
 
     output: {
-      path: webpackHelper.root('build/dist'),
+      path: webpackHelper.root('dist'),
       filename: 'js/[name].bundle.js',
       sourceMapFilename: isDevelopment ? '[file].map' : ''
     },
@@ -170,7 +170,7 @@ module.exports = function (env) {
 
     conf.entry.vendor = vendorKeys;
 
-    conf.plugins.push(new CleanWebpackPlugin(['build/dist/'], {
+    conf.plugins.push(new CleanWebpackPlugin(['dist/'], {
       root: webpackHelper.root(),
       verbose: true
     }));
