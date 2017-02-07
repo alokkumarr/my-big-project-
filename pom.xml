@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.synchronoss</groupId>
   <artifactId>bda-saw</artifactId>
-  <version>2.0.0.0</version>
+  <version>2.0.0-SNAPSHOT</version>
   <packaging>war</packaging>
   
   <scm>
@@ -72,7 +72,7 @@
 --> 
   <build>
     <plugins>
-      <plugin>
+	  <plugin>
         <artifactId>maven-clean-plugin</artifactId>
         <configuration>
           <filesets>
@@ -183,6 +183,7 @@
               </filesets>
             </configuration>
           </plugin>
+		  
 
           <plugin>
             <groupId>com.github.eirslett</groupId>
@@ -264,28 +265,14 @@
 						<addClasspath>true</addClasspath>
 					</manifest>
 				</archive>
-			</configuration>
+				<warName>${project.name}.war</warName>
+        	</configuration>
 	   </plugin> 
 	    <plugin>
-               <groupId>org.sonatype.plugins</groupId>
-               <artifactId>nexus-staging-maven-plugin</artifactId>
-               <version>1.5.1</version>
-               <executions>
-                  <execution>
-                     <id>default-deploy</id>
-                     <phase>deploy</phase>
-                     <goals>
-                        <goal>deploy</goal>
-                     </goals>
-                  </execution>
-               </executions>
-               <configuration>
-			      <serverId>client-releases</serverId>
-                  <nexusUrl>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases</nexusUrl>
-                  <skipStaging>true</skipStaging>
-               </configuration>
-            </plugin>
-	   
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.2</version>
+      </plugin>
      </plugins>
      </build>
     </profile>
