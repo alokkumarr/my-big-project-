@@ -1,5 +1,6 @@
 import angular from 'angular';
 
+import 'angular-sanitize';
 import 'angular-translate';
 import 'angular-translate/dist/angular-translate-loader-partial/angular-translate-loader-partial';
 import 'angular-translate/dist/angular-translate-interpolation-messageformat/angular-translate-interpolation-messageformat';
@@ -12,6 +13,7 @@ export const LibModule = 'LibModule';
 
 angular
   .module(LibModule, [
+    'ngSanitize',
     'pascalprecht.translate',
     CommonModule,
     ComponentsModule,
