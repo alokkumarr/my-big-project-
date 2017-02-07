@@ -12,6 +12,7 @@ describe('Login Tests', () => {
   });
 
   it('should be successfully logged in', () => {
+    browser.sleep(2000);
     expect(header.headerElements.symmetraLogo.isPresent()).toBeTruthy();
   });
 

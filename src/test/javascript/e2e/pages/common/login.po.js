@@ -2,7 +2,7 @@ module.exports = {
   loginElements: {
     userNameField: element(by.id('input_0')),
     passwordField: element(by.id('input_1')),
-    loginBtn: element(by.css('.e2e-login-btn')),
+    loginBtn: element(by.buttonText('Login')),
     invalidErr: element(by.css('.err-msg'))
   },
 
