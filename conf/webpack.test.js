@@ -20,12 +20,12 @@ module.exports = {
       },
       {
         test: /.json$/,
-        loaders: 'json-loader'
+        loader: 'json-loader'
       },
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loaders: 'ng-annotate-loader!babel-loader'
+        loader: 'ng-annotate-loader!babel-loader'
       }
     ]
   }
