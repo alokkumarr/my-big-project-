@@ -1,17 +1,23 @@
 <div class="report-grid-container" layout="column">
   <div class="rgc-group-panel" layout="row" layout-align="end center"
        ng-if="$ctrl.showGroupPanel === 'true' && $ctrl.grouped.by.length">
-    Grouped by:&nbsp;<strong ng-bind="$ctrl.grouped.byText()"></strong>
+
+    <span translate="GROUPED_BY"></span> :&nbsp;<strong ng-bind="$ctrl.grouped.byText()"></strong>
 
     <md-button class="btn-card"
-               ng-click="$ctrl.undoGrouping()">Undo
+               ng-click="$ctrl.undoGrouping()"
+               translate="UNDO">
     </md-button>
 
     <md-radio-group layout="row" layout-align="end center"
                     ng-model="$ctrl.settings.layoutMode"
                     ng-change="$ctrl.onLayoutModeUpdate()">
-      <md-radio-button ng-value="::$ctrl.LAYOUT_MODE.DETAIL">Show Each Row</md-radio-button>
-      <md-radio-button ng-value="::$ctrl.LAYOUT_MODE.SUMMARY">Summary View</md-radio-button>
+
+      <md-radio-button ng-value="::$ctrl.LAYOUT_MODE.DETAIL"
+                       translate="SHOW_EACH_ROW"></md-radio-button>
+      <md-radio-button ng-value="::$ctrl.LAYOUT_MODE.SUMMARY"
+                       translate="SUMMARY_VIEW"></md-radio-button>
+
     </md-radio-group>
   </div>
 
@@ -23,7 +29,10 @@
     <div class="rgc-panel"
          ng-if="$ctrl.showGroupPanel === 'true'">
       <a class="rgc-view-more-label"
-         ng-click="$ctrl.viewMore();">View 4 More</a>
+         ng-click="$ctrl.viewMore();"
+         translate="VEW_N_MORE"
+         translate-values="{value: 4}">
+      </a>
     </div>
   </md-card>
 </div>

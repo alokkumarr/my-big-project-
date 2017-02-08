@@ -1,6 +1,7 @@
 import angular from 'angular';
 
 import {routesConfig} from './routes';
+import {i18nConfig} from './i18n';
 
 import {AnalyzeService} from './services/analyze.service';
 import {FilterService} from './services/filter.service';
@@ -29,6 +30,7 @@ export const AnalyzeModule = 'AnalyzeModule';
 
 angular.module(AnalyzeModule, [])
   .config(routesConfig)
+  .config(i18nConfig)
   .factory('FilterService', FilterService)
   .factory('AnalyzeService', AnalyzeService)
   .component('reportGridContainer', ReportGridContainerComponent)

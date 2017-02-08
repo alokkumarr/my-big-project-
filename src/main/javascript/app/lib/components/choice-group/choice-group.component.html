@@ -8,6 +8,6 @@
              ng-class="{'selected': item.type === $ctrl.ngModel}"
              ng-value="item.type">
     <md-icon flex md-font-icon="{{::item.icon}}"></md-icon>
-    <p>{{::item.label}}</p>
+    <p ng-bind="::item.label"></p>
   </md-button>
 </div>

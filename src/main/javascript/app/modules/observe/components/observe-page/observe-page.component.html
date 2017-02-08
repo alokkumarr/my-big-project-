@@ -6,7 +6,7 @@
       <md-button class="btn-primary" aria-label="Filter"
                  sidenav-target="{{$ctrl.filterSidenavId}}">
         <md-icon md-font-icon="icon-filter"></md-icon>
-        Filter
+        <span translate="FILTER"></span>
       </md-button>
     </div>
   </md-toolbar>
@@ -18,7 +18,7 @@
               md-on-remove="$ctrl.onFilterRemoved()">
 
       <md-chip-template>
-        <span>{{$chip}}</span>
+        <span ng-bind="$chip"></span>
       </md-chip-template>
 
       <button class="md-primary" md-chip-remove>

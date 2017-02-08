@@ -20,6 +20,7 @@ import AppConfig from '../../../../appConfig';
 
 import {routesConfig} from './routes';
 import {themeConfig} from './theme';
+import {i18nConfig} from './i18n';
 import {config} from './config';
 import {runConfig} from './run';
 
@@ -50,6 +51,7 @@ angular
   ])
   .config(routesConfig)
   .config(themeConfig)
+  .config(i18nConfig)
   .config(config)
   .run(runConfig)
   .value('AppConfig', AppConfig)

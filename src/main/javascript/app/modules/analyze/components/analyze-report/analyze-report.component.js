@@ -427,6 +427,7 @@ export const AnalyzeReportComponent = {
             scope.$ctrl.model = {
               gridData: this.gridData,
               columns: this.columns,
+              title: this.data.title,
               sorts: map(this.canvas.model.sorts, sort => {
                 return {
                   column: sort.field.name,
