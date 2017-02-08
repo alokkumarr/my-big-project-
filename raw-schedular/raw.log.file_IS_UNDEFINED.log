@@ -1,0 +1,105 @@
+2017-02-09 17:22:05,920 INFO [main] o.s.t.c.s.DefaultTestContextBootstrapper [AbstractTestContextBootstrapper.java:256] Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+2017-02-09 17:22:05,951 INFO [main] o.s.t.c.s.DefaultTestContextBootstrapper [AbstractTestContextBootstrapper.java:182] Using TestExecutionListeners: [org.springframework.test.context.web.ServletTestExecutionListener@1cab0bfb, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@5e955596, org.springframework.test.context.support.DirtiesContextTestExecutionListener@50de0926, org.springframework.test.context.transaction.TransactionalTestExecutionListener@2473b9ce, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@60438a68]
+2017-02-09 17:22:06,354 INFO [main] c.r.RawSchedularApplicationTests [StartupInfoLogger.java:47] Starting RawSchedularApplicationTests on b8117a45eb6a with PID 173 (/data/raw-schedular/target/test-classes started by test in /data/raw-schedular)
+2017-02-09 17:22:06,355 DEBUG [main] c.r.RawSchedularApplicationTests [StartupInfoLogger.java:50] Running with Spring Boot v1.2.5.RELEASE, Spring v4.1.7.RELEASE
+2017-02-09 17:22:06,411 INFO [main] o.s.c.a.AnnotationConfigApplicationContext [AbstractApplicationContext.java:510] Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@130d63be: startup date [Thu Feb 09 17:22:06 UTC 2017]; root of context hierarchy
+2017-02-09 17:22:08,597 DEBUG [main] o.j.logging [LoggerProviders.java:33] Logging Provider: org.jboss.logging.Slf4jLoggerProvider
+2017-02-09 17:22:08,599 INFO [main] o.h.v.i.u.Version [Version.java:27] HV000001: Hibernate Validator 5.1.3.Final
+2017-02-09 17:22:08,610 DEBUG [main] o.h.v.i.e.r.DefaultTraversableResolver [DefaultTraversableResolver.java:80] Cannot find javax.persistence.Persistence on classpath. Assuming non JPA 2 environment. All properties will per default be traversable.
+2017-02-09 17:22:08,621 DEBUG [main] o.h.v.i.e.ConfigurationImpl [ConfigurationImpl.java:123] Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
+2017-02-09 17:22:08,627 DEBUG [main] o.h.v.i.e.ConfigurationImpl [ConfigurationImpl.java:145] Setting custom ConstraintValidatorFactory of type org.springframework.validation.beanvalidation.SpringConstraintValidatorFactory
+2017-02-09 17:22:08,633 DEBUG [main] o.h.v.i.e.ConfigurationImpl [ConfigurationImpl.java:159] Setting custom ParameterNameProvider of type com.sun.proxy.$Proxy30
+2017-02-09 17:22:08,639 DEBUG [main] o.h.v.i.x.ValidationXmlParser [ValidationXmlParser.java:91] Trying to load META-INF/validation.xml for XML based Validator configuration.
+2017-02-09 17:22:08,649 DEBUG [main] o.h.v.i.x.ValidationXmlParser [ValidationXmlParser.java:98] No META-INF/validation.xml found. Using annotation based configuration only.
+2017-02-09 17:22:08,861 INFO [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker [PostProcessorRegistrationDelegate.java:309] Bean 'org.springframework.jms.annotation.JmsBootstrapConfiguration' of type [class org.springframework.jms.annotation.JmsBootstrapConfiguration$$EnhancerBySpringCGLIB$$f6c7baab] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2017-02-09 17:22:09,493 DEBUG [main] c.r.s.SchedulerConfig [SchedulerConfig.java:56] com.razor.scheduler.SchedulerConfig$$EnhancerBySpringCGLIB$$e0a9dc4a loading quartzProperties starts - quartzPropertiesPath :
+2017-02-09 17:22:09,495 INFO [main] o.s.b.f.c.PropertiesFactoryBean [PropertiesLoaderSupport.java:172] Loading properties file from class path resource [quartz.properties]
+2017-02-09 17:22:09,499 DEBUG [main] c.r.s.SchedulerConfig [SchedulerConfig.java:72] com.razor.scheduler.SchedulerConfig$$EnhancerBySpringCGLIB$$e0a9dc4a loading quartzProperties ends
+2017-02-09 17:22:09,663 INFO [main] o.q.i.StdSchedulerFactory [StdSchedulerFactory.java:1184] Using default implementation for ThreadExecutor
+2017-02-09 17:22:09,683 INFO [main] o.q.c.SchedulerSignalerImpl [SchedulerSignalerImpl.java:61] Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+2017-02-09 17:22:09,685 INFO [main] o.q.c.QuartzScheduler [QuartzScheduler.java:240] Quartz Scheduler v.2.2.1 created.
+2017-02-09 17:22:10,493 INFO [main] o.s.s.q.LocalDataSourceJobStore [JobStoreSupport.java:667] Using db table-based data access locking (synchronization).
+2017-02-09 17:22:10,497 INFO [main] o.s.s.q.LocalDataSourceJobStore [JobStoreCMT.java:145] JobStoreCMT initialized.
+2017-02-09 17:22:10,498 INFO [main] o.q.c.QuartzScheduler [QuartzScheduler.java:305] Scheduler meta-data: Quartz Scheduler (v2.2.1) 'schedulerFactoryBean' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 5 threads.
+  Using job-store 'org.springframework.scheduling.quartz.LocalDataSourceJobStore' - which supports persistence. and is not clustered.
+
+2017-02-09 17:22:10,498 INFO [main] o.q.i.StdSchedulerFactory [StdSchedulerFactory.java:1339] Quartz scheduler 'schedulerFactoryBean' initialized from an externally provided properties instance.
+2017-02-09 17:22:10,499 INFO [main] o.q.i.StdSchedulerFactory [StdSchedulerFactory.java:1343] Quartz scheduler version: 2.2.1
+2017-02-09 17:22:10,499 INFO [main] o.q.c.QuartzScheduler [QuartzScheduler.java:2311] JobFactory set to: com.razor.scheduler.jobs.report.AutowiringSpringBeanJobFactory@e3994ef
+2017-02-09 17:22:10,684 DEBUG [Timer-0] o.q.u.UpdateChecker [UpdateChecker.java:54] Checking for available updated version of Quartz...
+2017-02-09 17:22:10,861 INFO [main] o.s.s.c.ThreadPoolTaskExecutor [ExecutorConfigurationSupport.java:165] Initializing ExecutorService  'metricsExecutor'
+2017-02-09 17:22:12,183 INFO [main] o.s.c.s.DefaultLifecycleProcessor [DefaultLifecycleProcessor.java:341] Starting beans in phase 2147483647
+2017-02-09 17:22:12,184 INFO [main] o.s.s.q.SchedulerFactoryBean [SchedulerFactoryBean.java:647] Starting Quartz Scheduler now
+2017-02-09 17:22:12,193 DEBUG [main] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:107] Lock 'TRIGGER_ACCESS' is desired by: main
+2017-02-09 17:22:12,207 DEBUG [main] o.q.i.j.StdRowLockSemaphore [StdRowLockSemaphore.java:92] Lock 'TRIGGER_ACCESS' is being obtained: main
+2017-02-09 17:22:12,213 DEBUG [main] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:116] Lock 'TRIGGER_ACCESS' given to: main
+2017-02-09 17:22:12,246 INFO [main] o.s.s.q.LocalDataSourceJobStore [JobStoreSupport.java:861] Freed 0 triggers from 'acquired' / 'blocked' state.
+2017-02-09 17:22:12,252 INFO [main] o.s.s.q.LocalDataSourceJobStore [JobStoreSupport.java:968] Handling 3 trigger(s) that missed their scheduled fire-time.
+2017-02-09 17:22:12,558 INFO [main] o.s.s.q.LocalDataSourceJobStore [JobStoreSupport.java:871] Recovering 0 jobs that were in-progress at the time of the last shut-down.
+2017-02-09 17:22:12,559 INFO [main] o.s.s.q.LocalDataSourceJobStore [JobStoreSupport.java:884] Recovery complete.
+2017-02-09 17:22:12,565 INFO [main] o.s.s.q.LocalDataSourceJobStore [JobStoreSupport.java:891] Removed 0 'complete' triggers.
+2017-02-09 17:22:12,576 INFO [main] o.s.s.q.LocalDataSourceJobStore [JobStoreSupport.java:896] Removed 0 stale fired job entries.
+2017-02-09 17:22:12,594 DEBUG [main] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:141] Lock 'TRIGGER_ACCESS' returned by: main
+2017-02-09 17:22:12,601 INFO [main] o.q.c.QuartzScheduler [QuartzScheduler.java:575] Scheduler schedulerFactoryBean_$_NON_CLUSTERED started.
+2017-02-09 17:22:12,776 INFO [main] c.r.RawSchedularApplicationTests [StartupInfoLogger.java:56] Started RawSchedularApplicationTests in 6.724 seconds (JVM running for 7.54)
+2017-02-09 17:22:12,802 DEBUG [main] c.r.s.s.ScheduleService [ScheduleService.java:46] com.razor.scheduler.service.ScheduleService setSimpleTrigger - JobName - 5 - JobGroup -PGI
+2017-02-09 17:22:12,814 DEBUG [main] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:107] Lock 'TRIGGER_ACCESS' is desired by: main
+2017-02-09 17:22:12,815 DEBUG [main] o.q.i.j.StdRowLockSemaphore [StdRowLockSemaphore.java:92] Lock 'TRIGGER_ACCESS' is being obtained: main
+2017-02-09 17:22:12,821 DEBUG [main] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:116] Lock 'TRIGGER_ACCESS' given to: main
+2017-02-09 17:22:12,836 DEBUG [main] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:141] Lock 'TRIGGER_ACCESS' returned by: main
+2017-02-09 17:22:12,838 DEBUG [main] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:107] Lock 'TRIGGER_ACCESS' is desired by: main
+2017-02-09 17:22:12,839 DEBUG [main] o.q.i.j.StdRowLockSemaphore [StdRowLockSemaphore.java:92] Lock 'TRIGGER_ACCESS' is being obtained: main
+2017-02-09 17:22:12,879 DEBUG [schedulerFactoryBean_QuartzSchedulerThread] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:107] Lock 'TRIGGER_ACCESS' is desired by: schedulerFactoryBean_QuartzSchedulerThread
+2017-02-09 17:22:12,880 DEBUG [schedulerFactoryBean_QuartzSchedulerThread] o.q.i.j.StdRowLockSemaphore [StdRowLockSemaphore.java:92] Lock 'TRIGGER_ACCESS' is being obtained: schedulerFactoryBean_QuartzSchedulerThread
+2017-02-09 17:22:12,885 DEBUG [main] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:116] Lock 'TRIGGER_ACCESS' given to: main
+2017-02-09 17:22:12,888 DEBUG [schedulerFactoryBean_QuartzSchedulerThread] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:116] Lock 'TRIGGER_ACCESS' given to: schedulerFactoryBean_QuartzSchedulerThread
+2017-02-09 17:22:12,948 DEBUG [schedulerFactoryBean_QuartzSchedulerThread] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:141] Lock 'TRIGGER_ACCESS' returned by: schedulerFactoryBean_QuartzSchedulerThread
+2017-02-09 17:22:12,953 DEBUG [main] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:141] Lock 'TRIGGER_ACCESS' returned by: main
+2017-02-09 17:22:12,954 DEBUG [main] c.r.s.s.ScheduleService [ScheduleService.java:56] com.razor.scheduler.service.ScheduleService setSimpleTrigger - ends
+2017-02-09 17:22:12,961 DEBUG [main] c.s.* [LogMonitor.java:17] Completed: execution(void com.razor.scheduler.service.ScheduleService.setSimpleTrigger(QuartzScheduleJobDetails))
+2017-02-09 17:22:12,961 DEBUG [main] c.r.s.s.ScheduleService [ScheduleService.java:89] User activity started here: showSummary method
+2017-02-09 17:22:12,972 ERROR [schedulerFactoryBean_QuartzSchedulerThread] o.q.c.ErrorLogger [QuartzScheduler.java:2425] An error occured instantiating job to be executed. job= 'ST-att.st.170'
+org.quartz.SchedulerException: Job instantiation failed
+	at org.springframework.scheduling.quartz.AdaptableJobFactory.newJob(AdaptableJobFactory.java:45) ~[spring-context-support-4.1.7.RELEASE.jar:4.1.7.RELEASE]
+	at org.quartz.core.JobRunShell.initialize(JobRunShell.java:127) ~[quartz-2.2.1.jar:na]
+	at org.quartz.core.QuartzSchedulerThread.run(QuartzSchedulerThread.java:375) [quartz-2.2.1.jar:na]
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'com.razor.scheduler.jobs.report.ReportDefinationJob': Injection of autowired dependencies failed; nested exception is org.springframework.beans.factory.BeanCreationException: Could not autowire field: com.razor.raw.core.jms.IQueueSender com.razor.scheduler.jobs.report.ReportDefinationJob.iQueueSender; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type [com.razor.raw.core.jms.IQueueSender] found for dependency: expected at least 1 bean which qualifies as autowire candidate for this dependency. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true), @org.springframework.beans.factory.annotation.Qualifier(value=reportRequestSender)}
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:334) ~[spring-beans-4.1.7.RELEASE.jar:4.1.7.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1210) ~[spring-beans-4.1.7.RELEASE.jar:4.1.7.RELEASE]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireBean(AbstractAutowireCapableBeanFactory.java:302) ~[spring-beans-4.1.7.RELEASE.jar:4.1.7.RELEASE]
+	at com.razor.scheduler.jobs.report.AutowiringSpringBeanJobFactory.createJobInstance(AutowiringSpringBeanJobFactory.java:21) ~[classes/:na]
+	at org.springframework.scheduling.quartz.AdaptableJobFactory.newJob(AdaptableJobFactory.java:41) ~[spring-context-support-4.1.7.RELEASE.jar:4.1.7.RELEASE]
+	... 2 common frames omitted
+Caused by: org.springframework.beans.factory.BeanCreationException: Could not autowire field: com.razor.raw.core.jms.IQueueSender com.razor.scheduler.jobs.report.ReportDefinationJob.iQueueSender; nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type [com.razor.raw.core.jms.IQueueSender] found for dependency: expected at least 1 bean which qualifies as autowire candidate for this dependency. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true), @org.springframework.beans.factory.annotation.Qualifier(value=reportRequestSender)}
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:561) ~[spring-beans-4.1.7.RELEASE.jar:4.1.7.RELEASE]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:88) ~[spring-beans-4.1.7.RELEASE.jar:4.1.7.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessPropertyValues(AutowiredAnnotationBeanPostProcessor.java:331) ~[spring-beans-4.1.7.RELEASE.jar:4.1.7.RELEASE]
+	... 6 common frames omitted
+Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type [com.razor.raw.core.jms.IQueueSender] found for dependency: expected at least 1 bean which qualifies as autowire candidate for this dependency. Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true), @org.springframework.beans.factory.annotation.Qualifier(value=reportRequestSender)}
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.raiseNoSuchBeanDefinitionException(DefaultListableBeanFactory.java:1301) ~[spring-beans-4.1.7.RELEASE.jar:4.1.7.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1047) ~[spring-beans-4.1.7.RELEASE.jar:4.1.7.RELEASE]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:942) ~[spring-beans-4.1.7.RELEASE.jar:4.1.7.RELEASE]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:533) ~[spring-beans-4.1.7.RELEASE.jar:4.1.7.RELEASE]
+	... 8 common frames omitted
+2017-02-09 17:22:12,977 DEBUG [schedulerFactoryBean_QuartzSchedulerThread] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:107] Lock 'TRIGGER_ACCESS' is desired by: schedulerFactoryBean_QuartzSchedulerThread
+2017-02-09 17:22:12,978 DEBUG [schedulerFactoryBean_QuartzSchedulerThread] o.q.i.j.StdRowLockSemaphore [StdRowLockSemaphore.java:92] Lock 'TRIGGER_ACCESS' is being obtained: schedulerFactoryBean_QuartzSchedulerThread
+2017-02-09 17:22:12,983 DEBUG [schedulerFactoryBean_QuartzSchedulerThread] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:116] Lock 'TRIGGER_ACCESS' given to: schedulerFactoryBean_QuartzSchedulerThread
+2017-02-09 17:22:12,983 INFO [schedulerFactoryBean_QuartzSchedulerThread] o.s.s.q.LocalDataSourceJobStore [JobStoreSupport.java:3079] All triggers of Job DEFAULT.170 set to ERROR state.
+2017-02-09 17:22:12,995 DEBUG [main] c.r.s.s.ScheduleService [ScheduleService.java:126] Thu Feb 09 17:22:12 UTC 2017
+2017-02-09 17:22:12,996 DEBUG [main] c.s.* [LogMonitor.java:17] Completed: execution(List com.razor.scheduler.service.ScheduleService.showSummary(String,String,int))
+2017-02-09 17:22:13,002 INFO [Thread-1] o.s.c.a.AnnotationConfigApplicationContext [AbstractApplicationContext.java:862] Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@130d63be: startup date [Thu Feb 09 17:22:06 UTC 2017]; root of context hierarchy
+2017-02-09 17:22:13,004 INFO [Thread-1] o.s.c.s.DefaultLifecycleProcessor [DefaultLifecycleProcessor.java:356] Stopping beans in phase 2147483647
+2017-02-09 17:22:13,005 INFO [Thread-1] o.q.c.QuartzScheduler [QuartzScheduler.java:613] Scheduler schedulerFactoryBean_$_NON_CLUSTERED paused.
+2017-02-09 17:22:13,008 INFO [Thread-1] o.s.s.c.ThreadPoolTaskExecutor [ExecutorConfigurationSupport.java:203] Shutting down ExecutorService 'metricsExecutor'
+2017-02-09 17:22:13,010 INFO [Thread-1] o.s.s.q.SchedulerFactoryBean [SchedulerFactoryBean.java:765] Shutting down Quartz Scheduler
+2017-02-09 17:22:13,010 INFO [Thread-1] o.q.c.QuartzScheduler [QuartzScheduler.java:694] Scheduler schedulerFactoryBean_$_NON_CLUSTERED shutting down.
+2017-02-09 17:22:13,010 INFO [Thread-1] o.q.c.QuartzScheduler [QuartzScheduler.java:613] Scheduler schedulerFactoryBean_$_NON_CLUSTERED paused.
+2017-02-09 17:22:13,010 DEBUG [schedulerFactoryBean_QuartzSchedulerThread] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:141] Lock 'TRIGGER_ACCESS' returned by: schedulerFactoryBean_QuartzSchedulerThread
+2017-02-09 17:22:13,011 DEBUG [Thread-1] o.q.s.SimpleThreadPool [SimpleThreadPool.java:328] Shutting down threadpool...
+2017-02-09 17:22:13,011 DEBUG [Thread-1] o.q.s.SimpleThreadPool [SimpleThreadPool.java:395] Shutdown of threadpool complete.
+2017-02-09 17:22:13,012 INFO [Thread-1] o.q.c.QuartzScheduler [QuartzScheduler.java:771] Scheduler schedulerFactoryBean_$_NON_CLUSTERED shutdown complete.

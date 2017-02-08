@@ -1,0 +1,63 @@
+2017-02-09 17:22:17,448 INFO [main] o.s.t.c.s.DefaultTestContextBootstrapper [AbstractTestContextBootstrapper.java:256] Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener]
+2017-02-09 17:22:17,474 INFO [main] o.s.t.c.s.DefaultTestContextBootstrapper [AbstractTestContextBootstrapper.java:182] Using TestExecutionListeners: [org.springframework.test.context.web.ServletTestExecutionListener@5e57643e, org.springframework.test.context.support.DependencyInjectionTestExecutionListener@133e16fd, org.springframework.test.context.support.DirtiesContextTestExecutionListener@51b279c9, org.springframework.test.context.transaction.TransactionalTestExecutionListener@1ad282e0, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@7f416310]
+2017-02-09 17:22:17,899 INFO [main] c.r.RawUtilityApplicationTests [StartupInfoLogger.java:47] Starting RawUtilityApplicationTests on b8117a45eb6a with PID 205 (/data/raw-utility/target/test-classes started by test in /data/raw-utility)
+2017-02-09 17:22:17,900 DEBUG [main] c.r.RawUtilityApplicationTests [StartupInfoLogger.java:50] Running with Spring Boot v1.2.5.RELEASE, Spring v4.1.7.RELEASE
+2017-02-09 17:22:17,959 INFO [main] o.s.c.a.AnnotationConfigApplicationContext [AbstractApplicationContext.java:510] Refreshing org.springframework.context.annotation.AnnotationConfigApplicationContext@1bd4fdd: startup date [Thu Feb 09 17:22:17 UTC 2017]; root of context hierarchy
+2017-02-09 17:22:20,414 DEBUG [main] o.j.logging [LoggerProviders.java:33] Logging Provider: org.jboss.logging.Slf4jLoggerProvider
+2017-02-09 17:22:20,417 INFO [main] o.h.v.i.u.Version [Version.java:27] HV000001: Hibernate Validator 5.1.3.Final
+2017-02-09 17:22:20,425 DEBUG [main] o.h.v.i.e.r.DefaultTraversableResolver [DefaultTraversableResolver.java:80] Cannot find javax.persistence.Persistence on classpath. Assuming non JPA 2 environment. All properties will per default be traversable.
+2017-02-09 17:22:20,433 DEBUG [main] o.h.v.i.e.ConfigurationImpl [ConfigurationImpl.java:123] Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
+2017-02-09 17:22:20,434 DEBUG [main] o.h.v.i.e.ConfigurationImpl [ConfigurationImpl.java:145] Setting custom ConstraintValidatorFactory of type org.springframework.validation.beanvalidation.SpringConstraintValidatorFactory
+2017-02-09 17:22:20,436 DEBUG [main] o.h.v.i.e.ConfigurationImpl [ConfigurationImpl.java:159] Setting custom ParameterNameProvider of type com.sun.proxy.$Proxy30
+2017-02-09 17:22:20,441 DEBUG [main] o.h.v.i.x.ValidationXmlParser [ValidationXmlParser.java:91] Trying to load META-INF/validation.xml for XML based Validator configuration.
+2017-02-09 17:22:20,448 DEBUG [main] o.h.v.i.x.ValidationXmlParser [ValidationXmlParser.java:98] No META-INF/validation.xml found. Using annotation based configuration only.
+2017-02-09 17:22:20,596 INFO [main] o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker [PostProcessorRegistrationDelegate.java:309] Bean 'org.springframework.jms.annotation.JmsBootstrapConfiguration' of type [class org.springframework.jms.annotation.JmsBootstrapConfiguration$$EnhancerBySpringCGLIB$$79e6000c] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2017-02-09 17:22:21,413 DEBUG [main] c.r.s.SchedulerConfig [SchedulerConfig.java:56] com.razor.scheduler.SchedulerConfig$$EnhancerBySpringCGLIB$$63c821ab loading quartzProperties starts - quartzPropertiesPath :
+2017-02-09 17:22:21,420 INFO [main] o.s.b.f.c.PropertiesFactoryBean [PropertiesLoaderSupport.java:172] Loading properties file from class path resource [quartz.properties]
+2017-02-09 17:22:21,424 DEBUG [main] c.r.s.SchedulerConfig [SchedulerConfig.java:72] com.razor.scheduler.SchedulerConfig$$EnhancerBySpringCGLIB$$63c821ab loading quartzProperties ends
+2017-02-09 17:22:21,529 INFO [main] o.q.i.StdSchedulerFactory [StdSchedulerFactory.java:1184] Using default implementation for ThreadExecutor
+2017-02-09 17:22:21,549 INFO [main] o.q.c.SchedulerSignalerImpl [SchedulerSignalerImpl.java:61] Initialized Scheduler Signaller of type: class org.quartz.core.SchedulerSignalerImpl
+2017-02-09 17:22:21,550 INFO [main] o.q.c.QuartzScheduler [QuartzScheduler.java:240] Quartz Scheduler v.2.2.1 created.
+2017-02-09 17:22:22,382 INFO [main] o.s.s.q.LocalDataSourceJobStore [JobStoreSupport.java:667] Using db table-based data access locking (synchronization).
+2017-02-09 17:22:22,385 INFO [main] o.s.s.q.LocalDataSourceJobStore [JobStoreCMT.java:145] JobStoreCMT initialized.
+2017-02-09 17:22:22,386 INFO [main] o.q.c.QuartzScheduler [QuartzScheduler.java:305] Scheduler meta-data: Quartz Scheduler (v2.2.1) 'schedulerFactoryBean' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'org.quartz.core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'org.quartz.simpl.SimpleThreadPool' - with 5 threads.
+  Using job-store 'org.springframework.scheduling.quartz.LocalDataSourceJobStore' - which supports persistence. and is not clustered.
+
+2017-02-09 17:22:22,387 INFO [main] o.q.i.StdSchedulerFactory [StdSchedulerFactory.java:1339] Quartz scheduler 'schedulerFactoryBean' initialized from an externally provided properties instance.
+2017-02-09 17:22:22,387 INFO [main] o.q.i.StdSchedulerFactory [StdSchedulerFactory.java:1343] Quartz scheduler version: 2.2.1
+2017-02-09 17:22:22,388 INFO [main] o.q.c.QuartzScheduler [QuartzScheduler.java:2311] JobFactory set to: com.razor.scheduler.jobs.report.AutowiringSpringBeanJobFactory@63b3ee82
+2017-02-09 17:22:22,551 DEBUG [Timer-0] o.q.u.UpdateChecker [UpdateChecker.java:54] Checking for available updated version of Quartz...
+2017-02-09 17:22:22,628 INFO [main] o.s.s.c.ThreadPoolTaskExecutor [ExecutorConfigurationSupport.java:165] Initializing ExecutorService  'metricsExecutor'
+2017-02-09 17:22:23,852 INFO [main] o.s.c.s.DefaultLifecycleProcessor [DefaultLifecycleProcessor.java:341] Starting beans in phase 2147483647
+2017-02-09 17:22:23,853 INFO [main] o.s.s.q.SchedulerFactoryBean [SchedulerFactoryBean.java:647] Starting Quartz Scheduler now
+2017-02-09 17:22:23,863 DEBUG [main] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:107] Lock 'TRIGGER_ACCESS' is desired by: main
+2017-02-09 17:22:23,876 DEBUG [main] o.q.i.j.StdRowLockSemaphore [StdRowLockSemaphore.java:92] Lock 'TRIGGER_ACCESS' is being obtained: main
+2017-02-09 17:22:23,882 DEBUG [main] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:116] Lock 'TRIGGER_ACCESS' given to: main
+2017-02-09 17:22:23,913 INFO [main] o.s.s.q.LocalDataSourceJobStore [JobStoreSupport.java:861] Freed 0 triggers from 'acquired' / 'blocked' state.
+2017-02-09 17:22:23,928 INFO [main] o.s.s.q.LocalDataSourceJobStore [JobStoreSupport.java:871] Recovering 0 jobs that were in-progress at the time of the last shut-down.
+2017-02-09 17:22:23,928 INFO [main] o.s.s.q.LocalDataSourceJobStore [JobStoreSupport.java:884] Recovery complete.
+2017-02-09 17:22:23,934 INFO [main] o.s.s.q.LocalDataSourceJobStore [JobStoreSupport.java:891] Removed 0 'complete' triggers.
+2017-02-09 17:22:23,944 INFO [main] o.s.s.q.LocalDataSourceJobStore [JobStoreSupport.java:896] Removed 0 stale fired job entries.
+2017-02-09 17:22:23,949 DEBUG [main] o.q.i.j.StdRowLockSemaphore [DBSemaphore.java:141] Lock 'TRIGGER_ACCESS' returned by: main
+2017-02-09 17:22:23,957 INFO [main] o.q.c.QuartzScheduler [QuartzScheduler.java:575] Scheduler schedulerFactoryBean_$_NON_CLUSTERED started.
+2017-02-09 17:22:23,975 INFO [main] c.r.RawUtilityApplicationTests [StartupInfoLogger.java:56] Started RawUtilityApplicationTests in 6.395 seconds (JVM running for 7.211)
+2017-02-09 17:22:24,008 INFO [Thread-1] o.s.c.a.AnnotationConfigApplicationContext [AbstractApplicationContext.java:862] Closing org.springframework.context.annotation.AnnotationConfigApplicationContext@1bd4fdd: startup date [Thu Feb 09 17:22:17 UTC 2017]; root of context hierarchy
+2017-02-09 17:22:24,009 INFO [Thread-1] o.s.c.s.DefaultLifecycleProcessor [DefaultLifecycleProcessor.java:356] Stopping beans in phase 2147483647
+2017-02-09 17:22:24,012 INFO [Thread-1] o.q.c.QuartzScheduler [QuartzScheduler.java:613] Scheduler schedulerFactoryBean_$_NON_CLUSTERED paused.
+2017-02-09 17:22:24,023 INFO [Thread-1] o.s.s.c.ThreadPoolTaskExecutor [ExecutorConfigurationSupport.java:203] Shutting down ExecutorService 'metricsExecutor'
+2017-02-09 17:22:24,024 INFO [Thread-1] o.s.s.q.SchedulerFactoryBean [SchedulerFactoryBean.java:765] Shutting down Quartz Scheduler
+2017-02-09 17:22:24,025 INFO [Thread-1] o.q.c.QuartzScheduler [QuartzScheduler.java:694] Scheduler schedulerFactoryBean_$_NON_CLUSTERED shutting down.
+2017-02-09 17:22:24,025 INFO [Thread-1] o.q.c.QuartzScheduler [QuartzScheduler.java:613] Scheduler schedulerFactoryBean_$_NON_CLUSTERED paused.
+2017-02-09 17:22:24,026 DEBUG [Thread-1] o.q.s.SimpleThreadPool [SimpleThreadPool.java:328] Shutting down threadpool...
+2017-02-09 17:22:24,027 DEBUG [Thread-1] o.q.s.SimpleThreadPool [SimpleThreadPool.java:395] Shutdown of threadpool complete.
+2017-02-09 17:22:24,028 INFO [Thread-1] o.q.c.QuartzScheduler [QuartzScheduler.java:771] Scheduler schedulerFactoryBean_$_NON_CLUSTERED shutdown complete.
+2017-02-09 17:22:24,037 DEBUG [schedulerFactoryBean_Worker-1] o.q.s.SimpleThreadPool [SimpleThreadPool.java:612] WorkerThread is shut down.
+2017-02-09 17:22:24,037 DEBUG [schedulerFactoryBean_Worker-4] o.q.s.SimpleThreadPool [SimpleThreadPool.java:612] WorkerThread is shut down.
+2017-02-09 17:22:24,037 DEBUG [schedulerFactoryBean_Worker-3] o.q.s.SimpleThreadPool [SimpleThreadPool.java:612] WorkerThread is shut down.
+2017-02-09 17:22:24,037 DEBUG [schedulerFactoryBean_Worker-5] o.q.s.SimpleThreadPool [SimpleThreadPool.java:612] WorkerThread is shut down.
+2017-02-09 17:22:24,037 DEBUG [schedulerFactoryBean_Worker-2] o.q.s.SimpleThreadPool [SimpleThreadPool.java:612] WorkerThread is shut down.

@@ -159,5 +159,15 @@
 		<module>saw-metadata-service</module>	
 		<module>saw-data-access</module>
 		<module>saw-transport-service</module>					
+		<module>raw-configuration</module>
+		<module>raw-core</module>
+		<module>raw-distribution</module>
+		<module>raw-download</module>
+		<module>raw-drill</module>
+		<module>raw-engine</module>
+		<module>raw-generation</module>
+		<module>raw-published</module>
+		<module>raw-schedular</module>
+		<module>raw-utility</module>
 	</modules> 
 </project>
