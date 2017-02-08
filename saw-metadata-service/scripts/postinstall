@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# Get app_home (with version number)
+source /tmp/.xdfts.tmp.env || exit
+: ${app_home:?no value}
+( cd ${app_home} ) || exit
+
+mkdir -m 755 -p /etc/bda
+
+chown -R mapr:mapr ${app_home}
+chmod 750 ${app_home}/sbin ${app_home}/conf ${app_home}/lib
+chmod 755 ${app_home} ${app_home}/var ${app_home}/var/log ${app_home}/var/run
+
+( cd /opt/bda; rm -f xdfts; ln -s $(basename ${app_home}) xdfts )
+
+xdfts_env=${app_home}/conf/xdfts.env
+
+{
+    echo "BDA_HOME=/opt/bda"
+    echo "XDFTS_HOME=/opt/bda/xdfts"
+    echo "XDFTS_PORT=9100"
+    echo "declare -r XDFTS_USER=mapr"
+    echo "declare -r XDFTS_CURRENT_HOME=${app_home}"
+} >$xdfts_env
+
+chown mapr:mapr $xdfts_env
+chmod 750 $xdfts_env
+
+rm -f /etc/bda/xdfts.env
+ln -s $xdfts_env /etc/bda/
+
+rm -f /tmp/.xdfts.tmp.env
+
+echo "Add emails in ~xdfts-user/.forward to get notifications from xdfts_runner.sh"
+grep -q 'xdfts_runner' /etc/rc.local || {
+    echo "Add line to /etc/rc.local:"
+    echo '/opt/bda/xdfts/sbin/xdfts_runner.sh &>/tmp/rc.local.xdfts_runner.log'
+}
+echo
+echo "XDF Transport Server postinstall step completed"

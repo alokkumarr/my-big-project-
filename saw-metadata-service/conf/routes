@@ -1,0 +1,16 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+GET     /               				controllers.MTSControl.index
+
+POST    /								controllers.TS.query
+
+#POST		/report						controllers.Report.createReport
+
+
+# Control interface
+
+GET     /control        		controllers.MTSControl.executeCmd(CMD:String, PARAMETERS:Option[String])
+POST    /control                controllers.MTSControl.executeExtendedCmd(CMD:String)
+
+GET     /sr             		controllers.MTSControl.sr( parameters:Option[String])
