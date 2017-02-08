@@ -1,4 +1,4 @@
-.choice-group {
+.choice-group-old {
   > .md-button {
     font-size: 16px;
     color: rgba(89, 101, 116, 0.7);
@@ -58,35 +58,62 @@
   }
 }
 
-.choice-group-nd {
-  .md-button {
-    padding: 8px;
-    border: 1px solid #B0BFC8;
-    font-size: 16px;
-    color: #596574;
-    text-align: center;
-
-    &:hover {
-      background-color: #F3F5F8;
-    }
-
-    &.selected {
-      background-color: #DEE4EA;
-      color: #596574;
-    }
-
-    [disabled] {
-      background-color: transparent;
-      color: rgba(#596574, 0.7);
-    }
-  }
-
-  &.m-large {
+.#{$theme-cls} {
+  & choice-group {
     .md-button {
-      padding: 24px;
+      padding: 8px;
+      border: 1px solid #B0BFC8;
+      border-radius: 0;
+      font-size: 16px;
+      color: #596574;
+      text-align: center;
+
+      &:hover {
+        background-color: #F3F5F8;
+      }
+
+      &:first-child {
+        border-top-left-radius: 3px;
+        border-bottom-left-radius: 3px;
+      }
+
+      &:last-child {
+        border-top-right-radius: 3px;
+        border-bottom-right-radius: 3px;
+      }
 
       &.selected {
-        background-color: #1A89D4;
+        background-color: #DEE4EA;
+        color: #596574;
+      }
+
+      [disabled] {
+        background-color: transparent;
+        color: rgba(#596574, 0.7);
+      }
+    }
+
+    &.m-large {
+      .md-button {
+        padding: 24px 18px 0px;
+
+        p {
+          margin: 0;
+        }
+
+        &.selected {
+          background-color: #1A89D4;
+          color: #FFFFFF;
+
+          md-icon {
+            color: #FFFFFF;
+          }
+        }
+
+        md-icon {
+          font-size: 48px;
+          height: 48px;
+        }
       }
     }
   }

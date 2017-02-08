@@ -1,30 +1,31 @@
 <analyze-dialog control="$ctrl" class="analyze-report-save">
   <analyze-dialog-header layout="row" layout-align="start center" flex="grow">
-    <strong>Save</strong>
+    <strong>Save Report</strong>
   </analyze-dialog-header>
 
   <analyze-dialog-content>
     <div class="ars-content" layout-padding>
+      <md-input-container class="md-block" md-no-float>
+        <label>Analysis Name</label>
+        <input type="text" placeholder="Name your analysis"
+               ng-model="$ctrl.dataHolder.title"/>
+      </md-input-container>
+
+      <md-input-container class="md-block" md-no-float>
+        <label>Analysis Description</label>
+        <textarea type="text" placeholder="Describe the analysis"
+                  ng-model="$ctrl.dataHolder.description"></textarea>
+      </md-input-container>
+
       <div layout="column">
-        <label class="field-label">My analysis category</label>
-        <md-select ng-model="::$ctrl.dataHolder.category" required>
+        <label>Analysis Category</label>
+        <md-select placeholder="Select a Category"
+                   ng-model="::$ctrl.dataHolder.category">
           <md-option
             ng-repeat="category in $ctrl.dataHolder.categories"
             ng-bind="::category.name"
             ng-value="category.id"></md-option>
         </md-select>
-      </div>
-
-      <div layout="column">
-        <label class="field-label">Report name</label>
-        <input type="text" required
-               ng-model="$ctrl.dataHolder.title"/>
-      </div>
-
-      <div layout="column">
-        <label class="field-label">Description</label>
-        <textarea rows="5" placeholder="Describe this analysis"
-                  ng-model="$ctrl.dataHolder.description"></textarea>
       </div>
     </div>
   </analyze-dialog-content>
