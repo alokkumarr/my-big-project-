@@ -124,7 +124,7 @@ module.exports = () => {
       new HtmlWebpackPlugin({
         template: 'styleguide/index.html',
         filename: 'index.html',
-        favicon: webpackHelper.root('assets/img/favicon.png'),
+        favicon: webpackHelper.root('assets/favicon/favicon.ico'),
         hash: true,
         chunks: styleGuideChunks,
         chunksSortMode: webpackHelper.sortChunks(styleGuideChunks)

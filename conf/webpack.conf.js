@@ -178,7 +178,7 @@ module.exports = function (env) {
     conf.plugins.push(new HtmlWebpackPlugin({
       template: 'app/index.html',
       filename: 'index.html',
-      favicon: webpackHelper.root('assets/img/favicon.png'),
+      favicon: webpackHelper.root('assets/favicon/favicon.ico'),
       hash: true,
       chunks: appChunks,
       chunksSortMode: webpackHelper.sortChunks(appChunks)
@@ -187,7 +187,7 @@ module.exports = function (env) {
     conf.plugins.push(new HtmlWebpackPlugin({
       template: 'login/index.html',
       filename: 'login.html',
-      favicon: webpackHelper.root('assets/img/favicon.png'),
+      favicon: webpackHelper.root('assets/favicon/favicon.ico'),
       hash: true,
       chunks: loginChunks,
       chunksSortMode: webpackHelper.sortChunks(loginChunks)
