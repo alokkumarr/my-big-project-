@@ -1,6 +1,6 @@
 [
   {
-    "name": "My Analyses",
+    "name": "Public Analyses",
     "children": [
       {
         "id": 1,
@@ -30,9 +30,6 @@
     ]
   },
   {
-    "name": "Folder 2"
-  },
-  {
-    "name": "Folder 3"
+    "name": "My Analyses"
   }
 ]
