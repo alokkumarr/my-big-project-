@@ -17,8 +17,11 @@ module.exports = {
     reportName: element(by.model('$ctrl.dataHolder.title')),
     reportDescription: element(by.model('$ctrl.dataHolder.description')),
     saveReportDetails: element(by.css('[ng-click="$ctrl.save()"]')),
-    reportDescriptionBtn: element(by.partialButtonText('Description'))
-
+    reportDescriptionBtn: element(by.partialButtonText('Description')),
+    totalPriceField: element(by.css('.e2e-Orders\\:TotalPrice')),
+    shipperNameField: element(by.css('.e2e-Shippers\\:ShipperName')),
+    customerNameField: element(by.css('.e2e-Customers\\:CustomerName')),
+    toggleDetailsPanel: element(by.css('[ng-click="$ctrl.toggleDetailsPanel()"]'))
   },
 
   validateCardView() {

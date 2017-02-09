@@ -37,7 +37,14 @@ describe('Analyses Tests', () => {
   });
 
   it('should add fields to report', () => {
+    analyze.analysisElems.totalPriceField.click();
+    analyze.analysisElems.shipperNameField.click();
+    analyze.analysisElems.customerNameField.click();
+  });
 
+  it('should see the added fields in the details panel', () => {
+    analyze.analysisElems.toggleDetailsPanel.click();
+    analyze.analysisElems.totalPriceField.click();
   });
 
   it('should attempt to save the report and fill the details', () => {
