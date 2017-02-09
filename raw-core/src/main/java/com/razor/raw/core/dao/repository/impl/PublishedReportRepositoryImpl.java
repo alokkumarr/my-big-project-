@@ -99,7 +99,7 @@ public class PublishedReportRepositoryImpl implements PublishedReportRepository{
 		logger.debug(this.getClass().getName() + " - isPublishReportExist - START -- Query : " +publishReportExist);
 		boolean flag = false;
 		Object[] params = {reportId,tenantId,productId};
-		int i = jdbcTemplate.queryForInt(publishReportExist, params);
+		int i = jdbcTemplate.queryForObject(publishReportExist, params, Integer.class);
 		if(i > 0)
 			flag =  true;
 		logger.debug(this.getClass().getName() + " - isPublishReportExist - END");

@@ -114,6 +114,14 @@
 		          </excludes>
 		        </configuration>
      		 </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.6.1</version>
+          <configuration>
+            <compilerArgument>-Xlint:all</compilerArgument>
+          </configuration>
+        </plugin>
 		</plugins>
 	</build>
 
