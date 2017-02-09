@@ -17,7 +17,6 @@
     "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
-    "angular-translate": "2.13.1",
     "angular": "1.6.1",
     "angular-animate": "1.6.1",
     "angular-aria": "1.6.1",
@@ -25,6 +24,7 @@
     "angular-messages": "1.6.1",
     "angular-mocks": "1.6.1",
     "angular-sanitize": "1.6.1",
+    "angular-translate": "2.13.1",
     "angular-ui-grid": "3.2.9",
     "angular-ui-router": "1.0.0-beta.1",
     "devextreme": "16.2.4",
