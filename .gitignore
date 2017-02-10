@@ -25,3 +25,5 @@ out/
 pom.xml.versionsBackup
 
 lib/
+
+raw.log*
