@@ -1,4 +1,14 @@
+import values from 'lodash/values';
+
 import template from './number-filter.component.html';
+
+export const OPERATORS = {
+  GREATER: 'x >',
+  LESS: 'x <',
+  EQUALS: 'x =',
+  NOT_EQUALS: 'x <>',
+  BETWEEN: '<= x <='
+};
 
 export const NumberFilterComponent = {
   template,
@@ -7,7 +17,8 @@ export const NumberFilterComponent = {
   },
   controller: class NumberFilterController {
     constructor() {
-      this.modifiers = ['Greater than', 'Lesser than', 'Equals', '>=, <=', '<>'];
+      this.OPERATORS = OPERATORS;
+      this.operators = values(OPERATORS);
     }
   }
 };

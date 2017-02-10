@@ -10,6 +10,7 @@ import forEach from 'lodash/forEach';
 import uniq from 'lodash/uniq';
 import isEmpty from 'lodash/isEmpty';
 import clone from 'lodash/clone';
+import indexOf from 'lodash/indexOf';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
@@ -51,6 +52,7 @@ export const AnalyzeReportComponent = {
       };
 
       this.gridData = [];
+      this.filteredGridData = [];
       this.columns = [];
       this.filters = {
         // array of strings with the columns displayName that the filter is based on
@@ -96,6 +98,7 @@ export const AnalyzeReportComponent = {
       this._AnalyzeService.getDataByQuery()
         .then(data => {
           this.gridData = data;
+          this.filteredGridData = data;
           this.reloadPreviewGrid();
           this.showFiltersButtonIfDataIsReady();
         });
@@ -122,7 +125,6 @@ export const AnalyzeReportComponent = {
 // filters section
     openFilterSidenav() {
       // TODO link this to when the canvas models selected fields change
-      // TODO link filters to the report grid
       if (isEmpty(this.filters.selected)) {
         this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
       }
@@ -138,10 +140,18 @@ export const AnalyzeReportComponent = {
 
     onApplyFilters(filters) {
       this.filters.possible = filters;
-      this.filters.selected = pipe(
-        filter(get('model')),
-        map(get('label'))
-      )(filters);
+      this.filters.selected = filter(get('model'))(filters);
+
+      this.filteredGridData = filter(row => {
+
+        return pipe(
+          this._FilterService.getFilterEvaluator(row),
+          this._FilterService.getEvaluatedFilterReducer()
+        )(this.filters.selected);
+
+      })(this.gridData);
+
+      this.reloadPreviewGrid();
     }
 
     onClearAllFilters() {
@@ -152,8 +162,7 @@ export const AnalyzeReportComponent = {
       this.filters.selected = [];
     }
 
-    onFilterRemoved(chipString) {
-      const filter = find(this.filters.possible, filter => filter.label === chipString);
+    onFilterRemoved(filter) {
       filter.model = null;
     }
 
@@ -165,6 +174,7 @@ export const AnalyzeReportComponent = {
             label: field.alias || field.displayName,
             name: field.name,
             type: field.type,
+            operator: DEFAULT_FILTER_OPERATOR,
             items: field.type === 'string' ? uniq(map(get(field.name), gridData)) : null
           };
         }))(selectedFields);
@@ -385,7 +395,7 @@ export const AnalyzeReportComponent = {
       if (grid) {
         grid.updateColumns(this.columns);
         grid.updateSorts(sorts);
-        grid.updateSource(this.gridData);
+        grid.updateSource(this.filteredGridData);
         grid.refreshGrid();
       }
     }

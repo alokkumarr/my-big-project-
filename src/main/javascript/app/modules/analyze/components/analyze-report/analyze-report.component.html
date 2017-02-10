@@ -125,7 +125,7 @@
                     md-removable="true"
                     md-on-remove="$ctrl.onFilterRemoved($chip)">
             <md-chip-template>
-              <span ng-bind="$chip"></span>
+              <span ng-bind="$chip.label"></span>
             </md-chip-template>
 
             <button class="md-primary" md-chip-remove>
@@ -135,7 +135,7 @@
         </div>
 
         <report-grid-container id="ard-grid-container" class="ard_details-grid" layout="row"
-                               source="$ctrl.gridData"
+                               source="$ctrl.filteredGridData"
                                columns="$ctrl.columns"
                                show-group-panel="true"
                                show-view-more="true"
