@@ -3,8 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.synchronoss</groupId>
-	<artifactId>middle-tier</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<artifactId>saw-services</artifactId>
+	<version>1.0</version>
 	<packaging>pom</packaging>
 	
 	<name>Data Processing Framework</name>
@@ -53,67 +53,65 @@
 		<commons-collections.version>3.2.1</commons-collections.version>
 		<mapr.core.version>5.2.0</mapr.core.version>		
 		<mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>		
-		<rpm.bda.root>/opt</rpm.bda.root>
+		<rpm.saw.root>/opt</rpm.saw.root>
 	</properties>
-	<dependencies>
- 		<dependency>
-			<groupId>com.mapr.hadoop</groupId>
-			<artifactId>maprfs</artifactId>
-			<version>${mapr.core.version}-mapr</version>
-			<scope>provided</scope>
-		</dependency>		 
-		<dependency>
-			<groupId>org.json</groupId>
-			<artifactId>json</artifactId>
-			<version>${json.vesion}</version>
-		</dependency> 
-		<dependency>
-				<groupId>org.apache.spark</groupId>
-				<artifactId>spark-core_2.10</artifactId>
-				<version>${spark-version}</version>
-				<scope>provided</scope> 
-		</dependency>
-		<dependency>
-		        <groupId>org.slf4j</groupId>
-		        <artifactId>slf4j-api</artifactId>
-	        	<version>${slfj.version}</version>
-		</dependency>	    
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-			<version>${slfj.version}</version>
-		</dependency>	    
-		<dependency>
-	        	<groupId>org.slf4j</groupId>
-		        <artifactId>slf4j-log4j12</artifactId>
-		        <version>${slfj.version}</version>
-		</dependency>    	
-	</dependencies>
 	<repositories>
 		<repository>
-		     <id>mapr-releases</id>
-		     <url>http://repository.mapr.com/maven/</url>
-		     <snapshots><enabled>false</enabled></snapshots>
-		     <releases><enabled>true</enabled></releases>
+			<id>maven2-repo</id>
+			<url>http://repo1.maven.apache.org/maven2</url>
 		</repository>
 		<repository>
-		  <id>typesafe-releases</id>
-		  <url>http://repo.typesafe.com/typesafe/releases/</url>
+			<id>mapr-maven</id>
+			<url>http://repository.mapr.com/maven</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
-		  <id>sonatype-releases</id>
-		  <url>https://oss.sonatype.org/content/repositories/releases</url>
+			<id>mapr-maven2</id>
+			<url>http://repository.mapr.com/nexus/content/groups/mapr-public/releases</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
-		  <id>sonatype-snapshots</id>
-		  <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<id>typesafe-releases</id>
+			<url>http://repo.typesafe.com/typesafe/releases/</url>
 		</repository>
 		<repository>
-			<id>eaio.com</id>
-			<url>http://eaio.com/maven2</url>
+			<id>typesafe-snapshots</id>
+			<url>http://repo.typesafe.com/typesafe/snapshots/</url>
+		</repository>
+		<repository>
+			<id>mapr-releases</id>
+			<url>http://repository.mapr.com/maven/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
 		</repository>
 	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>typesafe-releases-plugins</id>
+			<url>http://repo.typesafe.com/typesafe/releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 	<modules>
-		<module>bda-transport-service</module>	
+		<module>saw-common</module>	
+		<module>saw-metadata-service</module>	
+		<module>saw-business-service</module>			
+		<module>saw-transport-service</module>					
 	</modules> 
 </project>
