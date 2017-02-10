@@ -1,6 +1,8 @@
 import map from 'lodash/fp/map';
 import get from 'lodash/fp/get';
 import uniq from 'lodash/uniq';
+import transfrom from 'lodash/transform';
+import toPairs from 'lodash/fp/toPairs';
 import pipe from 'lodash/fp/pipe';
 import reduce from 'lodash/fp/reduce';
 import filter from 'lodash/fp/filter';
@@ -8,6 +10,7 @@ import isEmpty from 'lodash/isEmpty';
 import set from 'lodash/fp/set';
 import values from 'lodash/values';
 import compact from 'lodash/compact';
+import isPlainObject from 'lodash/isPlainObject';
 
 import {ANALYZE_FILTER_SIDENAV_ID} from '../components/analyze-filter-sidenav/analyze-filter-sidenav.component';
 import {OPERATORS} from '../components/analyze-filter-sidenav/filters/number-filter.component';
@@ -45,7 +48,9 @@ export function FilterService($mdSidenav, $eventHandler) {
     getSelectedFilterMapper,
     getCanvasFieldsToFiltersMapper,
     getGridDataFilter,
-    getFilterClearer
+    getFilterClearer,
+    getFrontEnd2BackEndFilterMapper,
+    getBackEnd2FrontEndFilterMapper
   };
 
   function onOpenFilterSidenav(callback) {
@@ -86,6 +91,72 @@ export function FilterService($mdSidenav, $eventHandler) {
     $eventHandler.emit(EVENTS.CLEAR_ALL_FILTERS);
     $mdSidenav(ANALYZE_FILTER_SIDENAV_ID).close();
   }
+
+  /* eslint-disable camelcase */
+  function getFrontEnd2BackEndFilterMapper() {
+    return map(filterObj => {
+      const backEndFilter = {
+        column_name: filterObj.name,
+        boolean_criteria: filterObj.operator,
+        filter_type: filterObj.type
+      };
+
+      if (filterObj.type === 'int' || filterObj.type === 'double') {
+        backEndFilter.operator = filterObj.model.operator;
+        backEndFilter.search_conditions =
+          filterObj.model.operator === OPERATORS.BETWEEN ?
+          [filterObj.model.otherValue, filterObj.model.value] :
+          [filterObj.model.value];
+
+      } else if (filterObj.type === 'string') {
+        backEndFilter.operator = null;
+        backEndFilter.search_conditions = pipe(
+          // transform the model object to an array of strings
+          toPairs,
+          // filter only the ones that are truthy
+          // in case someone checked and unchecked the checkbox
+          filter(get('1')),
+          // take only the string value
+          map(get('0'))
+        )(filterObj.model);
+      }
+
+      return backEndFilter;
+    });
+  }
+  /* eslint-enable camelcase */
+
+  /* eslint-disable camelcase */
+  function getBackEnd2FrontEndFilterMapper() {
+    return map(filter => {
+      const frontEndFilter = {
+        name: filter.column_name,
+        operator: filter.boolean_criteria,
+        type: filter.filter_type
+      };
+
+      if (filter.filter_type === 'int' || filter.filter_type === 'double') {
+        frontEndFilter.model = {
+          operator: filter.operator,
+
+          otherValue: filter.operator === OPERATORS.BETWEEN ?
+            filter.search_conditions[0] : null,
+
+          value: filter.operator === OPERATORS.BETWEEN ?
+            filter.search_conditions[1] :
+            filter.search_conditions[0]
+        };
+      } else if (filter.filter_type === 'string') {
+        // transform a string of arrays to an object with the strings as keys
+        frontEndFilter.model = transfrom(filter.search_conditions, (model, value) => {
+          model[value] = true;
+        }, {});
+      }
+
+      return frontEndFilter;
+    });
+  }
+  /* eslint-enable camelcase */
 
   function getCanvasFieldsToFiltersMapper(gridData) {
     return pipe(
