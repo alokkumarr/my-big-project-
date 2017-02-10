@@ -1,5 +1,13 @@
 import map from 'lodash/fp/map';
+import get from 'lodash/fp/get';
+import uniq from 'lodash/uniq';
+import pipe from 'lodash/fp/pipe';
 import reduce from 'lodash/fp/reduce';
+import filter from 'lodash/fp/filter';
+import isEmpty from 'lodash/isEmpty';
+import set from 'lodash/fp/set';
+import values from 'lodash/values';
+import compact from 'lodash/compact';
 
 import {ANALYZE_FILTER_SIDENAV_ID} from '../components/analyze-filter-sidenav/analyze-filter-sidenav.component';
 import {OPERATORS} from '../components/analyze-filter-sidenav/filters/number-filter.component';
@@ -33,7 +41,11 @@ export function FilterService($mdSidenav, $eventHandler) {
     applyFilters,
     clearAllFilters,
     getFilterEvaluator,
-    getEvaluatedFilterReducer
+    getEvaluatedFilterReducer,
+    getSelectedFilterMapper,
+    getCanvasFieldsToFiltersMapper,
+    getGridDataFilter,
+    getFilterClearer
   };
 
   function onOpenFilterSidenav(callback) {
@@ -75,6 +87,56 @@ export function FilterService($mdSidenav, $eventHandler) {
     $mdSidenav(ANALYZE_FILTER_SIDENAV_ID).close();
   }
 
+  function getCanvasFieldsToFiltersMapper(gridData) {
+    return pipe(
+      filter(get('isFilterEligible')),
+      map(field => {
+        return {
+          label: field.alias || field.displayName,
+          name: field.name,
+          type: field.type,
+          operator: DEFAULT_FILTER_OPERATOR,
+          items: field.type === 'string' ? uniq(map(get(field.name), gridData)) : null
+        };
+      }));
+  }
+
+  function getFilterClearer() {
+    return map(pipe(
+      set('model', null),
+      set('operator', DEFAULT_FILTER_OPERATOR)
+    ));
+  }
+
+  function getSelectedFilterMapper() {
+    return filter(filter => {
+      if (!filter.model) {
+        return false;
+      }
+
+      // can be an empty array if the filter was a string filter
+      // and the checkboxes were unchecked
+      if (isEmpty(filter.model)) {
+        return false;
+      }
+
+      // can be an object with null values
+      if (isEmpty(compact(values(filter.model)))) {
+        return false;
+      }
+      return true;
+    });
+  }
+
+  function getGridDataFilter(filters) {
+    return filter(row => {
+      return pipe(
+        getFilterEvaluator(row),
+        getEvaluatedFilterReducer()
+      )(filters);
+    });
+  }
+
   /**
    * Get the lazy filter evaluator for ever row
    */
@@ -109,7 +171,7 @@ export function FilterService($mdSidenav, $eventHandler) {
     return (evaluatedFilters => {
       // we need to know the first elements operator to tget the identity element
       // so that we don't influence the result
-      const accumulator = getIdentityElement(evaluatedFilters[0].operator);
+      const accumulator = isEmpty(evaluatedFilters) ? true : getIdentityElement(evaluatedFilters[0].operator);
 
       return reduce((accum, evaluatedFilter) => {
 

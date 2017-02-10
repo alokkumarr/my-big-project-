@@ -5,12 +5,8 @@ import get from 'lodash/fp/get';
 import set from 'lodash/fp/set';
 import first from 'lodash/first';
 import map from 'lodash/fp/map';
-import find from 'lodash/find';
 import forEach from 'lodash/forEach';
-import uniq from 'lodash/uniq';
-import isEmpty from 'lodash/isEmpty';
 import clone from 'lodash/clone';
-import indexOf from 'lodash/indexOf';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
@@ -124,12 +120,12 @@ export const AnalyzeReportComponent = {
 
 // filters section
     openFilterSidenav() {
-      // TODO link this to when the canvas models selected fields change
-      if (isEmpty(this.filters.selected)) {
-        this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
-      }
-
       this._FilterService.openFilterSidenav(this.filters.possible);
+    }
+
+    generateFiltersOnCanvasChange() {
+      this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
+      this.clearFilters();
     }
 
     showFiltersButtonIfDataIsReady() {
@@ -140,44 +136,35 @@ export const AnalyzeReportComponent = {
 
     onApplyFilters(filters) {
       this.filters.possible = filters;
-      this.filters.selected = filter(get('model'))(filters);
+      this.filters.selected = this._FilterService.getSelectedFilterMapper()(filters);
 
-      this.filteredGridData = filter(row => {
+      this.filterGridData();
+    }
 
-        return pipe(
-          this._FilterService.getFilterEvaluator(row),
-          this._FilterService.getEvaluatedFilterReducer()
-        )(this.filters.selected);
-
-      })(this.gridData);
+    filterGridData() {
+      this.filteredGridData = this._FilterService.getGridDataFilter(this.filters.selected)(this.gridData);
 
       this.reloadPreviewGrid();
     }
 
     onClearAllFilters() {
-      this.filters.possible = map(pipe(
-        set('model', null),
-        set('operator', DEFAULT_FILTER_OPERATOR)
-      ), this.filters);
+      this.clearFilters();
+    }
+
+    clearFilters() {
+      this.filters.possible = this._FilterService.getFilterClearer()(this.filters.possible);
       this.filters.selected = [];
+      this.filteredGridData = this.gridData;
+      this.reloadPreviewGrid();
     }
 
     onFilterRemoved(filter) {
       filter.model = null;
+      this.filterGridData();
     }
 
     generateFilters(selectedFields, gridData) {
-      return pipe(
-        filter(get('isFilterEligible')),
-        map(field => {
-          return {
-            label: field.alias || field.displayName,
-            name: field.name,
-            type: field.type,
-            operator: DEFAULT_FILTER_OPERATOR,
-            items: field.type === 'string' ? uniq(map(get(field.name), gridData)) : null
-          };
-        }))(selectedFields);
+      return this._FilterService.getCanvasFieldsToFiltersMapper(gridData)(selectedFields);
     }
 
 // END filters section
@@ -196,6 +183,7 @@ export const AnalyzeReportComponent = {
       this.getArtifacts();
 
       this.canvas._$eventHandler.on('changed', () => {
+        this.generateFiltersOnCanvasChange();
         this.reloadPreviewGrid();
       });
 
