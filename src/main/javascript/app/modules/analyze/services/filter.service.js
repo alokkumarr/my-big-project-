@@ -163,6 +163,7 @@ export function FilterService($mdSidenav, $eventHandler) {
       filter(get('isFilterEligible')),
       map(field => {
         return {
+          tableName: field.table.name,
           label: field.alias || field.displayName,
           name: field.name,
           type: field.type,

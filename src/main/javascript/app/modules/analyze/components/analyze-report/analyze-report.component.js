@@ -1,6 +1,7 @@
 import filter from 'lodash/fp/filter';
 import flatMap from 'lodash/fp/flatMap';
 import pipe from 'lodash/fp/pipe';
+import find from 'lodash/fp/find';
 import get from 'lodash/fp/get';
 import set from 'lodash/fp/set';
 import first from 'lodash/first';
@@ -300,9 +301,9 @@ export const AnalyzeReportComponent = {
           tableArtifact.artifact_attributes.push(fieldArtifact);
         });
 
-        const joins = filter(model.joins, join => {
+        const joins = filter(join => {
           return join.leftSide.table === table;
-        });
+        }, model.joins);
 
         forEach(joins, join => {
           const joinArtifact = {
@@ -325,9 +326,9 @@ export const AnalyzeReportComponent = {
           tableArtifact.sql_builder.joins.push(joinArtifact);
         });
 
-        const sorts = filter(model.sorts, sort => {
+        const sorts = filter(sort => {
           return sort.table === table;
-        });
+        }, model.sorts);
 
         forEach(sorts, sort => {
           const sortArtifact = {
@@ -338,32 +339,18 @@ export const AnalyzeReportComponent = {
           tableArtifact.sql_builder.order_by_columns.push(sortArtifact);
         });
 
-        const groups = filter(model.groups, group => {
+        const groups = filter(group => {
           return group.table === table;
-        });
+        }, model.groups);
 
         forEach(groups, group => {
           tableArtifact.sql_builder.group_by_columns.push(group.field.name);
         });
 
-        // const filters = filter(model.filters, filter => {
-        //   return filter.table === table;
-        // });
-
-        // forEach(filters, filter => {
-        //   const filterArtifact = {
-        //     column_name: filter.field.name,
-        //     boolean_criteria: filter.booleanCriteria,
-        //     operator: filter.operator,
-        //     search_conditions: filter.searchConditions
-        //   };
-
-        //   tableArtifact.sql_builder.filters.push(filterArtifact);
-        // });
-
-        // TODO use refactor code to use canvas filters and segment filters to each table
-        tableArtifact.sql_builder.filters = this._FilterService.getFrontEnd2BackEndFilterMapper()(this.filters.selected);
-        console.log('filters: ', tableArtifact.sql_builder.filters);
+        tableArtifact.sql_builder.filters = pipe(
+          filter(artifactFilter => artifactFilter.tableName === tableArtifact.artifact_name),
+          this._FilterService.getFrontEnd2BackEndFilterMapper()
+        )(this.filters.selected);
       });
       /* eslint-enable camelcase */
 
