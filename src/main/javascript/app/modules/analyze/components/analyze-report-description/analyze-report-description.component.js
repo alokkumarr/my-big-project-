@@ -1,7 +1,9 @@
 import template from './analyze-report-description.component.html';
+import style from './analyze-report-description.component.scss';
 
 export const AnalyzeReportDescriptionComponent = {
   template,
+  styles: [style],
   bindings: {
     model: '<',
     onSave: '&'

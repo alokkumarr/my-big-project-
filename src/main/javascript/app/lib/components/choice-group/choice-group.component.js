@@ -1,5 +1,5 @@
 import template from './choice-group.component.html';
-// import isUndefined from 'lodash/isUndefined';
+
 /**
  * A button group with big icons, acts like a radio button group
  * @bindings: {

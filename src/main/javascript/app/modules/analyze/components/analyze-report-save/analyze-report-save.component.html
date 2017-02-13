@@ -5,28 +5,27 @@
 
   <analyze-dialog-content>
     <div class="ars-content" layout-padding>
+      <md-input-container class="md-block" md-no-float>
+        <label translate="REPORT_NAME"></label>
+        <input type="text" placeholder="Name your analysis"
+               ng-model="$ctrl.model.name"/>
+      </md-input-container>
+
+      <md-input-container class="md-block" md-no-float>
+        <label translate="DESCRIPTION"></label>
+        <textarea type="text" placeholder="Describe the analysis"
+                  ng-model="$ctrl.model.description"></textarea>
+      </md-input-container>
+
       <div layout="column">
-        <label class="field-label"
-               translate="MY_ANALYSIS_CATEGORY"></label>
-        <md-select ng-model="::$ctrl.dataHolder.category" required>
+        <label translate="MY_ANALYSIS_CATEGORY"></label>
+        <md-select placeholder="Select a Category"
+                   ng-model="::$ctrl.model.category">
           <md-option
             ng-repeat="category in $ctrl.dataHolder.categories"
             ng-bind="::category.name"
             ng-value="category.id"></md-option>
         </md-select>
-      </div>
-
-      <div layout="column">
-        <label class="field-label"
-               translate="REPORT_NAME"></label>
-        <input type="text" required
-               ng-model="$ctrl.dataHolder.title"/>
-      </div>
-
-      <div layout="column">
-        <label class="field-label" translate="DESCRIPTION"></label>
-        <textarea rows="5" placeholder="Describe this analysis"
-                  ng-model="$ctrl.dataHolder.description"></textarea>
       </div>
     </div>
   </analyze-dialog-content>

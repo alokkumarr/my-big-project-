@@ -1,6 +1,6 @@
 import angular from 'angular';
-import EventHandler from './component/eventHandler';
-import ComponentHandler from './component/componentHandler';
+import EventEmitter from './utils/eventEmitter';
+import ComponentHandler from './utils/componentHandler';
 
 export const CommonModule = 'Common';
 
@@ -14,5 +14,9 @@ if (__MOCK__) {
 
 angular
   .module(CommonModule, modulesDependencies)
-  .factory('$eventHandler', EventHandler)
-  .factory('$componentHandler', ComponentHandler);
+  .factory('$eventEmitter', () => {
+    return new EventEmitter();
+  })
+  .factory('$componentHandler', () => {
+    return new ComponentHandler();
+  });

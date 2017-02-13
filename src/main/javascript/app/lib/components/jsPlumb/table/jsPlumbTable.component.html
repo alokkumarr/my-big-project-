@@ -10,7 +10,7 @@
                 ng-click="$event.stopPropagation();"
                 ng-mousedown="$ctrl.onFieldMouseDown($event, field);"
                 ng-mouseup="$ctrl.onFieldMouseUp($event, field);">
-    <md-checkbox class="e2e-{{field.getIdentifier()}}"
+    <md-checkbox ng-class="'e2e-' + field.getIdentifier()"
                  ng-model="field.checked"></md-checkbox>
 
     <span class="jsp-table-column-name"
