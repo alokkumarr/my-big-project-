@@ -8,19 +8,19 @@
       <md-input-container class="md-block" md-no-float>
         <label>Analysis Name</label>
         <input type="text" placeholder="Name your analysis"
-               ng-model="$ctrl.dataHolder.title"/>
+               ng-model="$ctrl.model.name"/>
       </md-input-container>
 
       <md-input-container class="md-block" md-no-float>
         <label>Analysis Description</label>
         <textarea type="text" placeholder="Describe the analysis"
-                  ng-model="$ctrl.dataHolder.description"></textarea>
+                  ng-model="$ctrl.model.description"></textarea>
       </md-input-container>
 
       <div layout="column">
         <label>Analysis Category</label>
         <md-select placeholder="Select a Category"
-                   ng-model="::$ctrl.dataHolder.category">
+                   ng-model="::$ctrl.model.category">
           <md-option
             ng-repeat="category in $ctrl.dataHolder.categories"
             ng-bind="::category.name"

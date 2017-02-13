@@ -55,8 +55,19 @@ analyze-view {
       }
 
       md-card-actions {
+        md-menu-bar {
+          padding: {
+            left: 0;
+            right: 0;
+          }
+        }
+
         .md-button {
-          min-width: 36px;
+          display: inline-flex;
+          min-width: 24px;
+          min-height: 24px;
+          line-height: 24px;
+          height: 24px;
         }
       }
 

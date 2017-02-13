@@ -1,2 +1,3 @@
-src/styleguide/dist/
-src/main/javascript/styleguide/dist/
+conf/
+build/
+dist/

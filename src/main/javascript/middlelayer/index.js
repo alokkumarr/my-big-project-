@@ -17,14 +17,32 @@ app.engine('html', (path, options, fn) => {
   });
 });
 
-app.use(express.static(dist));
+let logged = false;
 
 app.get('/', (req, res) => {
-  res.render('app');
+  if (!logged) {
+    res.redirect('/login');
+  } else {
+    res.render('index');
+  }
 });
 
 app.get('/login', (req, res) => {
-  res.render('login');
+  if (logged) {
+    res.redirect('/');
+  } else {
+    res.render('login');
+  }
+});
+
+app.get('/doLogin', (req, res) => {
+  logged = true;
+  res.json({logged});
+});
+
+app.get('/doLogout', (req, res) => {
+  logged = false;
+  res.json({logged});
 });
 
 app.get('/changePwd', (req, res) => {
@@ -38,5 +56,7 @@ app.get('/preResetPwd', (req, res) => {
 app.get('/resetPassword', (req, res) => {
   res.render('login');
 });
+
+app.use(express.static(dist));
 
 app.listen(3000);

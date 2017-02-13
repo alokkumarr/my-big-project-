@@ -7,7 +7,7 @@
           <md-icon md-font-icon="icon-remove"></md-icon>
         </md-button>
         <div class="md-title">
-          <strong>Untitled Report</strong>
+          <strong ng-bind="::$ctrl.model.report.name"></strong>
         </div>
       </div>
 
@@ -19,14 +19,14 @@
   </analyze-dialog-header>
 
   <analyze-dialog-content>
-    <report-grid-container id="arp-grid-container" class="ard_details-grid"
+    <report-grid-container id="arp-grid-container" class="arp_details-grid"
                            source="$ctrl.model.gridData"
                            columns="$ctrl.model.columns">
     </report-grid-container>
 
     <div layout="column" layout-align="center center">
       <md-button class="arp-load-more-btn"
-                 ng-click="$ctrl.loadMore()">Load 500 More Rows
+                 ng-click="$ctrl.loadMore()">Load <span ng-bind="$ctrl.ADD_ROWS"></span> More Rows
       </md-button>
     </div>
   </analyze-dialog-content>

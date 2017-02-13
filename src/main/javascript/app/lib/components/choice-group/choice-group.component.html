@@ -1,13 +1,11 @@
-<div class="choice-group" layout="row" layout-align="start center"
-                 ng-model="$ctrl.selectedAnalysisMethod"
-                 ng-change="$ctrl.onAnalysisMethodSelected()">
+<div class="choice-group" layout="row" layout-align="start center">
   <md-button layout="column"
              ng-repeat="item in $ctrl.items track by item.type"
-             ng-click="$ctrl.onItemSelected(item)"
-             ng-disabled="item.disabled"
              ng-class="{'selected': item.type === $ctrl.ngModel}"
-             ng-value="item.type">
+             ng-disabled="item.disabled"
+             ng-value="item.type"
+             ng-click="$ctrl.onItemSelected(item)">
     <md-icon flex md-font-icon="{{::item.icon}}"></md-icon>
-    <p>{{::item.label}}</p>
+    <p ng-bind="::item.label"></p>
   </md-button>
 </div>

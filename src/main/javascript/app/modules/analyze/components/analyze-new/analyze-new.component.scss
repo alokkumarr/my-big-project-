@@ -1,4 +1,8 @@
 .new-analyze-dialog {
+  .analyze-dialog {
+    max-width: 700px;
+  }
+
   .analyze-dialog_header {
     .layout-row {
       justify-content: space-between;

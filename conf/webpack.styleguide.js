@@ -3,8 +3,6 @@ const autoprefixer = require('autoprefixer');
 const chalk = require('chalk');
 const path = require('path');
 
-const pkg = require('../package.json');
-
 /**
  * Webpack Plugins
  */
@@ -23,6 +21,9 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
  */
 module.exports = () => {
   const MODULE_DIR = 'node_modules';
+  const BUILD_DIR = 'build/styleguide/';
+
+  const pkg = require(webpackHelper.root('package.json'));
 
   const vendorKeys = Object.keys(pkg.dependencies).map(key => {
     // devextreme has no index.js or a main set in package.json, so we have to manually select the main file
@@ -42,7 +43,7 @@ module.exports = () => {
       vendor: vendorKeys
     },
     output: {
-      path: webpackHelper.root('build/styleguide'),
+      path: webpackHelper.root(BUILD_DIR),
       filename: 'js/[name].bundle.js'
     },
 
@@ -63,13 +64,25 @@ module.exports = () => {
 
     module: {
       rules: [
+        // preloaders
+        {
+          enforce: 'pre',
+          test: /\.js$/,
+          exclude: /node_modules/,
+          loader: 'eslint-loader',
+          options: {
+            fix: false,
+            configFile: webpackHelper.root('conf/eslint-dev-rules.js')
+          }
+        },
         {
           enforce: 'pre',
           test: /\.html$/,
           loader: 'htmlhint-loader'
         },
+        // loaders
         {
-          test: /.json$/,
+          test: /\.json$/,
           loader: 'json-loader'
         },
         {
@@ -78,7 +91,7 @@ module.exports = () => {
           loader: 'ng-annotate-loader!babel-loader'
         },
         {
-          test: /.html$/,
+          test: /\.html$/,
           loader: 'html-loader'
         },
         {
@@ -102,10 +115,10 @@ module.exports = () => {
     plugins: [
       new NoEmitOnErrorsPlugin(),
       new ProgressBarPlugin({
-        format: chalk.blue.bold('   build') + ' [:bar] ' + chalk.green.bold(':percent') + ' (:elapsed seconds) ',
+        format: `${chalk.blue.bold('   build')} [:bar] ${chalk.green.bold(':percent')} (:elapsed seconds) `,
         clear: false
       }),
-      new CleanWebpackPlugin(['build/styleguide/'], {
+      new CleanWebpackPlugin([BUILD_DIR], {
         root: webpackHelper.root(),
         verbose: true
       }),

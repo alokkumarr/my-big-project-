@@ -11,19 +11,20 @@ export const AnalyzeReportPreviewComponent = {
     model: '<'
   },
   controller: class AnalyzeReportPreviewController {
-    constructor($componentHandler, $mdDialog, AnalyzeService) {
+    constructor($componentHandler, $mdDialog, $timeout, AnalyzeService) {
       'ngInject';
-
       this._$componentHandler = $componentHandler;
       this._$mdDialog = $mdDialog;
+      this._$timeout = $timeout;
       this._AnalyzeService = AnalyzeService;
 
-      this.settings = {
-        minRowsToShow: 'auto'
-      };
+      this.ADD_ROWS = 500;
     }
 
     $onInit() {
+      this._$timeout(() => {
+        this.reloadPreviewGrid();
+      });
     }
 
     cancel() {

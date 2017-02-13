@@ -1,15 +1,17 @@
-import filter from 'lodash/fp/filter';
+import fpFilter from 'lodash/fp/filter';
 import flatMap from 'lodash/fp/flatMap';
 import pipe from 'lodash/fp/pipe';
 import get from 'lodash/fp/get';
 import set from 'lodash/fp/set';
 import first from 'lodash/first';
-import map from 'lodash/fp/map';
+import fpMap from 'lodash/fp/map';
+import map from 'lodash/map';
 import find from 'lodash/find';
 import forEach from 'lodash/forEach';
 import uniq from 'lodash/uniq';
 import isEmpty from 'lodash/isEmpty';
 import clone from 'lodash/clone';
+import filter from 'lodash/filter';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
@@ -19,17 +21,17 @@ export const AnalyzeReportComponent = {
   template,
   styles: [style],
   bindings: {
-    analysis: '<'
+    model: '<',
+    mode: '@'
   },
   controller: class AnalyzeReportController {
-    constructor($componentHandler, $mdDialog, $scope, $timeout, $log, AnalyzeService, FilterService) {
+    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, FilterService) {
       'ngInject';
 
       this._$componentHandler = $componentHandler;
       this._$mdDialog = $mdDialog;
       this._$scope = $scope;
       this._$timeout = $timeout;
-      this._$log = $log;
       this._AnalyzeService = AnalyzeService;
       this._FilterService = FilterService;
 
@@ -40,14 +42,10 @@ export const AnalyzeReportComponent = {
 
       this.states = {
         sqlMode: this.DESIGNER_MODE,
+        disable: {
+          designer: false
+        },
         detailsExpanded: false
-      };
-
-      this.data = {
-        category: null,
-        title: 'Untitled Report',
-        description: '',
-        query: ''
       };
 
       this.gridData = [];
@@ -67,15 +65,11 @@ export const AnalyzeReportComponent = {
       this._FilterService.onApplyFilters(filters => this.onApplyFilters(filters));
       this._FilterService.onClearAllFilters(() => this.onClearAllFilters());
 
-      if (this.analysis.name) {
-        this.data.title = this.analysis.name;
+      if (this.mode === 'fork') {
+        this.model.id = null;
       }
 
-      if (this.analysis.description) {
-        this.data.description = this.analysis.description;
-      }
-
-      this.unregister = this._$componentHandler.events.on('$onInstanceAdded', e => {
+      this.unregister = this._$componentHandler.on('$onInstanceAdded', e => {
         if (e.key === 'ard-canvas') {
           this.initCanvas(e.instance);
         }
@@ -113,13 +107,13 @@ export const AnalyzeReportComponent = {
     generateQuery() {
       this._AnalyzeService.generateQuery({})
         .then(result => {
-          this.data.query = result.query;
+          this.model.query = result.query;
         });
     }
 
-    // end requests
+    // END requests
 
-// filters section
+    // filters section
     openFilterSidenav() {
       // TODO link this to when the canvas models selected fields change
       // TODO link filters to the report grid
@@ -139,13 +133,13 @@ export const AnalyzeReportComponent = {
     onApplyFilters(filters) {
       this.filters.possible = filters;
       this.filters.selected = pipe(
-        filter(get('model')),
-        map(get('label'))
+        fpFilter(get('model')),
+        fpMap(get('label'))
       )(filters);
     }
 
     onClearAllFilters() {
-      this.filters.possible = map(pipe(
+      this.filters.possible = fpMap(pipe(
         set('model', null),
         set('operator', DEFAULT_FILTER_OPERATOR)
       ), this.filters);
@@ -159,18 +153,18 @@ export const AnalyzeReportComponent = {
 
     generateFilters(selectedFields, gridData) {
       return pipe(
-        filter(get('isFilterEligible')),
-        map(field => {
+        fpFilter(get('isFilterEligible')),
+        fpMap(field => {
           return {
             label: field.alias || field.displayName,
             name: field.name,
             type: field.type,
-            items: field.type === 'string' ? uniq(map(get(field.name), gridData)) : null
+            items: field.type === 'string' ? uniq(fpMap(get(field.name), gridData)) : null
           };
         }))(selectedFields);
     }
 
-// END filters section
+    // END filters section
 
     cancel() {
       this._$mdDialog.cancel();
@@ -178,18 +172,29 @@ export const AnalyzeReportComponent = {
 
     toggleDetailsPanel() {
       this.states.detailsExpanded = !this.states.detailsExpanded;
+
+      if (this.states.detailsExpanded) {
+        this._$timeout(() => {
+          this.reloadPreviewGrid();
+        });
+      }
     }
 
     initCanvas(canvas) {
       this.canvas = canvas;
 
-      this.getArtifacts();
+      if (!this.model.artifacts) {
+        this.getArtifacts();
+      } else {
+        this.fillCanvas(this.model.artifacts);
+        this.reloadPreviewGrid();
+      }
 
-      this.canvas._$eventHandler.on('changed', () => {
+      this.canvas._$eventEmitter.on('changed', () => {
         this.reloadPreviewGrid();
       });
 
-      this.canvas._$eventHandler.on('sortChanged', () => {
+      this.canvas._$eventEmitter.on('sortChanged', () => {
         this.reloadPreviewGrid();
       });
     }
@@ -303,7 +308,7 @@ export const AnalyzeReportComponent = {
         });
 
         const joins = filter(model.joins, join => {
-          return join.leftSide.table === table;
+          return join.leftSide.table.name === table.name;
         });
 
         forEach(joins, join => {
@@ -365,9 +370,7 @@ export const AnalyzeReportComponent = {
       });
       /* eslint-enable camelcase */
 
-      return {
-        _artifacts: tableArtifacts
-      };
+      return tableArtifacts;
     }
 
     reloadPreviewGrid() {
@@ -393,15 +396,17 @@ export const AnalyzeReportComponent = {
     getSelectedColumns(tables) {
       return pipe(
         flatMap(get('fields')),
-        filter(get('checked'))
+        fpFilter(get('checked'))
       )(tables);
     }
 
     setSqlMode(mode) {
-      this.states.sqlMode = mode;
+      if (this.states.sqlMode !== mode) {
+        this.states.sqlMode = mode;
 
-      if (mode === this.QUERY_MODE) {
-        this.generateQuery();
+        if (mode === this.QUERY_MODE) {
+          this.generateQuery();
+        }
       }
     }
 
@@ -418,13 +423,14 @@ export const AnalyzeReportComponent = {
     }
 
     openPreviewModal(ev) {
-      const tpl = '<analyze-report-preview model="$ctrl.model"></analyze-report-preview>';
+      const tpl = '<analyze-report-preview model="model"></analyze-report-preview>';
 
       this._$mdDialog
         .show({
           template: tpl,
           controller: scope => {
-            scope.$ctrl.model = {
+            scope.model = {
+              report: this.model,
               gridData: this.gridData,
               columns: this.columns,
               sorts: map(this.canvas.model.sorts, sort => {
@@ -446,6 +452,10 @@ export const AnalyzeReportComponent = {
     openSortModal(ev) {
       this.states.detailsExpanded = true;
 
+      this._$timeout(() => {
+        this.reloadPreviewGrid();
+      });
+
       const tpl = '<analyze-report-sort model="$ctrl.model"></analyze-report-sort>';
 
       this._$mdDialog
@@ -466,22 +476,22 @@ export const AnalyzeReportComponent = {
         })
         .then(sorts => {
           this.canvas.model.sorts = sorts;
-          this.canvas._$eventHandler.emit('sortChanged');
+          this.canvas._$eventEmitter.emit('sortChanged');
         });
     }
 
     openDescriptionModal(ev) {
-      const tpl = '<analyze-report-description model="$ctrl.model" on-save="$ctrl.onSave($data)"></analyze-report-description>';
+      const tpl = '<analyze-report-description model="model" on-save="onSave($data)"></analyze-report-description>';
 
       this._$mdDialog.show({
         template: tpl,
         controller: scope => {
-          scope.$ctrl.model = {
-            description: this.data.description
+          scope.model = {
+            description: this.model.description
           };
 
-          scope.$ctrl.onSave = data => {
-            this.data.description = data.description;
+          scope.onSave = data => {
+            this.model.description = data.description;
           };
         },
         controllerAs: '$ctrl',
@@ -501,25 +511,20 @@ export const AnalyzeReportComponent = {
         return;
       }
 
-      const tpl = '<analyze-report-save model="$ctrl.model" on-save="$ctrl.onSave($data)"></analyze-report-save>';
+      this.model.artifacts = this.generatePayload();
+
+      const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
       this._$mdDialog
         .show({
           template: tpl,
           controller: scope => {
-            scope.$ctrl.model = {
-              artifacts: this.generatePayload(),
-              category: this.data.category,
-              title: this.data.title,
-              description: this.data.description
-            };
+            scope.model = clone(this.model);
 
-            scope.$ctrl.onSave = data => {
-              this.data.category = data.category;
-              this.data.title = data.title;
-              this.data.description = data.description;
-
-              this._$log.log(data);
+            scope.onSave = data => {
+              this.model.name = data.name;
+              this.model.description = data.description;
+              this.model.category = data.category;
             };
           },
           controllerAs: '$ctrl',
