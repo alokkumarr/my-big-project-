@@ -18,7 +18,7 @@ export const AnalyzeReportPreviewComponent = {
       this._$timeout = $timeout;
       this._AnalyzeService = AnalyzeService;
 
-      this.ADD_ROWS = 500;
+      this.MORE_ROWS_COUNT = 500;
     }
 
     $onInit() {

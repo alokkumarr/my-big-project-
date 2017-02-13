@@ -1,6 +1,6 @@
 <analyze-dialog class="analyze-report-description">
   <analyze-dialog-header layout="row" layout-align="start center" flex="grow">
-    <strong>Description</strong>
+    <strong TRANSLATE="DESCRIPTION"></strong>
   </analyze-dialog-header>
 
   <analyze-dialog-content>
@@ -14,11 +14,13 @@
   <analyze-dialog-footer>
     <div layout="row">
       <md-button class="btn-primary"
-                 ng-click="$ctrl.save()">Save Description
+                 ng-click="$ctrl.save()"
+                 translate="SAVE_DESCRIPTION">
       </md-button>
 
       <md-button class="btn-card"
-                 ng-click="$ctrl.cancel()">Cancel
+                 ng-click="$ctrl.cancel()"
+                 translate="CANCEL">
       </md-button>
     </div>
   </analyze-dialog-footer>

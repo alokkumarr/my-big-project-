@@ -2,7 +2,7 @@
   <md-toolbar class="secondary-toolbar">
     <div class="md-toolbar-tools"
          layout-align="space-between center">
-      <div class="md-title">Order Fulfillment
+      <div class="md-title" translate="ORDER_FULFILLMENT">
         <md-icon md-font-icon="icon-search"></md-icon>
       </div>
 
@@ -22,20 +22,20 @@
         <md-input-container class="analyze-view_switch-type">
           <md-select ng-model="$ctrl.states.reportType"
                      ng-change="$ctrl.onReportTypeChange()">
-            <md-option value="all" selected>All Types</md-option>
+            <md-option value="all" selected translate="ALL_TYPES"></md-option>
             <md-divider></md-divider>
-            <md-option value="chart">Charts</md-option>
-            <md-option value="report">Reports</md-option>
-            <md-option value="pivot">Pivots</md-option>
+            <md-option value="chart" translate="CHARTS"></md-option>
+            <md-option value="report" translate="REPORTS"></md-option>
+            <md-option value="pivot" translate="PIVOTS"></md-option>
             <md-divider></md-divider>
-            <md-option value="scheduled">Scheduled</md-option>
+            <md-option value="scheduled" translate="SCHEDULED"></md-option>
           </md-select>
         </md-input-container>
       </div>
 
       <md-button class="btn-primary"
                  ng-click="$ctrl.openNewAnalysisModal()">
-        + ANALYSIS
+        + <span translate="ANALYSIS"></span>
       </md-button>
     </div>
   </md-toolbar>
@@ -50,7 +50,7 @@
         <md-card-header layout="row" layout-align="end start">
           <md-card-title>
             <md-card-title-text>
-              <span class="md-headline">LIST</span>
+              <span class="md-headline" translate="LIST"></span>
             </md-card-title-text>
           </md-card-title>
         </md-card-header>
