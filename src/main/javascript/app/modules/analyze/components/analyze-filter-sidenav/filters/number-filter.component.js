@@ -21,7 +21,6 @@ export const NumberFilterComponent = {
     constructor() {
       if (!this.filter.model) {
         this.filter.model = {
-          operator: null, // one of the Operators constant
           value: null, // int or double
           otherValue: null // int or double
         };

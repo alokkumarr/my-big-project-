@@ -10,17 +10,18 @@ import isEmpty from 'lodash/isEmpty';
 import set from 'lodash/fp/set';
 import values from 'lodash/values';
 import compact from 'lodash/compact';
-import isPlainObject from 'lodash/isPlainObject';
+import forEach from 'lodash/forEach';
+import find from 'lodash/find';
 
 import {ANALYZE_FILTER_SIDENAV_ID} from '../components/analyze-filter-sidenav/analyze-filter-sidenav.component';
 import {OPERATORS} from '../components/analyze-filter-sidenav/filters/number-filter.component';
 
-export const DEFAULT_FILTER_OPERATOR = 'AND';
-
-export const FILTER_OPERATORS = {
+export const BOOLEAN_CRITERIA = {
   AND: 'AND',
   OR: 'OR'
 };
+
+export const DEFAULT_BOOLEAN_CRITERIA = BOOLEAN_CRITERIA.AND;
 
 const EVENTS = {
   OPEN_SIDENAV: 'OPEN_SIDENAV',
@@ -50,7 +51,8 @@ export function FilterService($mdSidenav, $eventHandler) {
     getGridDataFilter,
     getFilterClearer,
     getFrontEnd2BackEndFilterMapper,
-    getBackEnd2FrontEndFilterMapper
+    getBackEnd2FrontEndFilterMapper,
+    mergeCanvasFiltersWithPossibleFilters
   };
 
   function onOpenFilterSidenav(callback) {
@@ -94,21 +96,21 @@ export function FilterService($mdSidenav, $eventHandler) {
 
   /* eslint-disable camelcase */
   function getFrontEnd2BackEndFilterMapper() {
-    return map(filterObj => {
+    return frontEndFilter => {
       const backEndFilter = {
-        column_name: filterObj.name,
-        boolean_criteria: filterObj.operator,
-        filter_type: filterObj.type
+        column_name: frontEndFilter.name,
+        boolean_criteria: frontEndFilter.booleanCriteria,
+        filter_type: frontEndFilter.type
       };
 
-      if (filterObj.type === 'int' || filterObj.type === 'double') {
-        backEndFilter.operator = filterObj.model.operator;
+      if (frontEndFilter.type === 'int' || frontEndFilter.type === 'double') {
+        backEndFilter.operator = frontEndFilter.operator;
         backEndFilter.search_conditions =
-          filterObj.model.operator === OPERATORS.BETWEEN ?
-          [filterObj.model.otherValue, filterObj.model.value] :
-          [filterObj.model.value];
+          frontEndFilter.operator === OPERATORS.BETWEEN ?
+          [frontEndFilter.model.otherValue, frontEndFilter.model.value] :
+          [frontEndFilter.model.value];
 
-      } else if (filterObj.type === 'string') {
+      } else if (frontEndFilter.type === 'string') {
         backEndFilter.operator = null;
         backEndFilter.search_conditions = pipe(
           // transform the model object to an array of strings
@@ -118,43 +120,45 @@ export function FilterService($mdSidenav, $eventHandler) {
           filter(get('1')),
           // take only the string value
           map(get('0'))
-        )(filterObj.model);
+        )(frontEndFilter.model);
       }
 
       return backEndFilter;
-    });
+    };
   }
   /* eslint-enable camelcase */
 
   /* eslint-disable camelcase */
   function getBackEnd2FrontEndFilterMapper() {
-    return map(filter => {
+    return backEndFilter => {
       const frontEndFilter = {
-        name: filter.column_name,
-        operator: filter.boolean_criteria,
-        type: filter.filter_type
+        name: backEndFilter.column_name,
+        booleanCriteria: backEndFilter.boolean_criteria,
+        type: backEndFilter.filter_type
       };
 
-      if (filter.filter_type === 'int' || filter.filter_type === 'double') {
+      if (backEndFilter.filter_type === 'int' || backEndFilter.filter_type === 'double') {
         frontEndFilter.model = {
-          operator: filter.operator,
+          operator: backEndFilter.operator,
 
-          otherValue: filter.operator === OPERATORS.BETWEEN ?
-            filter.search_conditions[0] : null,
+          otherValue: backEndFilter.operator === OPERATORS.BETWEEN ?
+            backEndFilter.search_conditions[0] : null,
 
-          value: filter.operator === OPERATORS.BETWEEN ?
-            filter.search_conditions[1] :
-            filter.search_conditions[0]
+          value: backEndFilter.operator === OPERATORS.BETWEEN ?
+            backEndFilter.search_conditions[1] :
+            backEndFilter.search_conditions[0]
         };
-      } else if (filter.filter_type === 'string') {
+      } else if (backEndFilter.filter_type === 'string') {
         // transform a string of arrays to an object with the strings as keys
-        frontEndFilter.model = transfrom(filter.search_conditions, (model, value) => {
-          model[value] = true;
-        }, {});
+        frontEndFilter.model = transfrom(backEndFilter.search_conditions,
+          (model, value) => {
+            model[value] = true;
+          },
+        {});
       }
 
       return frontEndFilter;
-    });
+    };
   }
   /* eslint-enable camelcase */
 
@@ -167,7 +171,8 @@ export function FilterService($mdSidenav, $eventHandler) {
           label: field.alias || field.displayName,
           name: field.name,
           type: field.type,
-          operator: DEFAULT_FILTER_OPERATOR,
+          model: null,
+          booleanCriteria: DEFAULT_BOOLEAN_CRITERIA,
           items: field.type === 'string' ? uniq(map(get(field.name), gridData)) : null
         };
       }));
@@ -176,7 +181,8 @@ export function FilterService($mdSidenav, $eventHandler) {
   function getFilterClearer() {
     return map(pipe(
       set('model', null),
-      set('operator', DEFAULT_FILTER_OPERATOR)
+      set('operator', null),
+      set('booleanCriteria', DEFAULT_BOOLEAN_CRITERIA)
     ));
   }
 
@@ -222,7 +228,7 @@ export function FilterService($mdSidenav, $eventHandler) {
           break;
         case 'int':
         case 'double':
-          isValid = Boolean(isNumberValid(row[filter.name], filter.model));
+          isValid = Boolean(isNumberValid(row[filter.name], filter.model, filter.operator));
           break;
         default:
           isValid = false;
@@ -230,55 +236,66 @@ export function FilterService($mdSidenav, $eventHandler) {
       }
 
       return {
-        operator: filter.operator,
+        booleanCriteria: filter.booleanCriteria,
         value: isValid
       };
     });
   }
 
+  function mergeCanvasFiltersWithPossibleFilters(canvasFilters, possibleFilters) {
+    forEach(possibleFilters, possibleFilter => {
+      const targetCanvasFilter = find(canvasFilters, canvasFilter => (
+        possibleFilter.name === canvasFilter.name &&
+        possibleFilter.tableName === canvasFilter.table.name));
+
+      possibleFilter.operator = targetCanvasFilter.operator;
+      possibleFilter.model = targetCanvasFilter.model;
+    });
+  }
+
 /**
- * reduce the array of evaluated filters and their operators( AND | OR )
+ * reduce the array of evaluated filters and their booleanCriteria( AND | OR )
  */
   function getEvaluatedFilterReducer() {
     return (evaluatedFilters => {
-      // we need to know the first elements operator to tget the identity element
+      // we need to know the first elements booleanCriteria to get the identity element
       // so that we don't influence the result
-      const accumulator = isEmpty(evaluatedFilters) ? true : getIdentityElement(evaluatedFilters[0].operator);
+      const accumulator = isEmpty(evaluatedFilters) ? true : getIdentityElement(evaluatedFilters[0].booleanCriteria);
 
       return reduce((accum, evaluatedFilter) => {
 
-        return evaluateBoolean(accum, evaluatedFilter.operator, evaluatedFilter.value);
+        return evaluateBoolean(accum, evaluatedFilter.booleanCriteria, evaluatedFilter.value);
 
       }, accumulator)(evaluatedFilters);
     });
   }
 
-  function getIdentityElement(operator) {
-    if (operator === FILTER_OPERATORS.AND) {
+  function getIdentityElement(booleanCriteria) {
+    if (booleanCriteria === BOOLEAN_CRITERIA.AND) {
       return true;
     }
 
-    if (operator === FILTER_OPERATORS.OR) {
+    if (booleanCriteria === BOOLEAN_CRITERIA.OR) {
       return false;
     }
   }
 
-  function evaluateBoolean(a, operator, b) {
-    if (operator === FILTER_OPERATORS.AND) {
+  function evaluateBoolean(a, booleanCriteria, b) {
+    if (booleanCriteria === BOOLEAN_CRITERIA.AND) {
       return a && b;
     }
 
-    if (operator === FILTER_OPERATORS.OR) {
+    if (booleanCriteria === BOOLEAN_CRITERIA.OR) {
       return a || b;
     }
   }
 
-  function isNumberValid(number, numberFilterModel) {
+  function isNumberValid(number, numberFilterModel, operator) {
     const a = number;
     const b = numberFilterModel.value;
     const c = numberFilterModel.otherValue;
 
-    switch (numberFilterModel.operator) {
+    switch (operator) {
       case OPERATORS.GREATER:
         return a > b;
       case OPERATORS.LESS:

@@ -1,5 +1,5 @@
 import template from './analyze-filter-container.component.html';
-import {FILTER_OPERATORS} from '../../services/filter.service';
+import {BOOLEAN_CRITERIA} from '../../services/filter.service';
 
 export const AnalyzeFilterContainerComponent = {
   template,
@@ -9,10 +9,10 @@ export const AnalyzeFilterContainerComponent = {
   },
   controller: class AnalyzeFilterContainerComponent {
     constructor() {
-      this.FILTER_OPERATORS = FILTER_OPERATORS;
+      this.BOOLEAN_CRITERIA = BOOLEAN_CRITERIA;
     }
-    onOperatorSelected(value) {
-      this.filter.operator = value;
+    onBooleanCriteriaSelected(value) {
+      this.filter.booleanCriteria = value;
     }
   }
 };

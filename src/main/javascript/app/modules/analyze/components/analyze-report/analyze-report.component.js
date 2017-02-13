@@ -8,6 +8,7 @@ import first from 'lodash/first';
 import map from 'lodash/fp/map';
 import forEach from 'lodash/forEach';
 import clone from 'lodash/clone';
+import isEmpty from 'lodash/isEmpty';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
@@ -107,6 +108,11 @@ export const AnalyzeReportComponent = {
           this.fillCanvas(data);
           this.reloadPreviewGrid();
           this.showFiltersButtonIfDataIsReady();
+          this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
+          if (!isEmpty(this.canvas.model.filters)) {
+            this.filters.selected = this.canvas.filters;
+            this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.canvas.filters, this.filters.possible);
+          }
         });
     }
 
@@ -252,14 +258,8 @@ export const AnalyzeReportComponent = {
           });
         });
 
-        forEach(itemA.sql_builder.filters, itemB => {
-          model.addFilter({
-            table: itemA.artifact_name,
-            field: itemB.column_name,
-            booleanCriteria: itemB.boolean_criteria,
-            operator: itemB.operator,
-            searchConditions: itemB.search_conditions
-          });
+        forEach(itemA.sql_builder.filters, backEndFilter => {
+          model.addFilter(this._FilterService.getFrontEnd2BackEndFilterMapper()(backEndFilter));
         });
       });
       /* eslint-enable camelcase */
@@ -349,7 +349,7 @@ export const AnalyzeReportComponent = {
 
         tableArtifact.sql_builder.filters = pipe(
           filter(artifactFilter => artifactFilter.tableName === tableArtifact.artifact_name),
-          this._FilterService.getFrontEnd2BackEndFilterMapper()
+          map(this._FilterService.getFrontEnd2BackEndFilterMapper())
         )(this.filters.selected);
       });
       /* eslint-enable camelcase */
