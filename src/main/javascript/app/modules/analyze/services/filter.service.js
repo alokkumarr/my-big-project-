@@ -283,6 +283,10 @@ export function FilterService($mdSidenav, $eventHandler) {
         return a > b;
       case OPERATORS.LESS:
         return a < b;
+      case OPERATORS.GREATER_OR_EQUAL:
+        return a >= b;
+      case OPERATORS.LESS_OR_EQUAL:
+        return a <= b;
       case OPERATORS.NOT_EQUALS:
         return a !== b;
       case OPERATORS.EQUALS:
