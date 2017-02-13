@@ -7,7 +7,7 @@
           <md-icon md-font-icon="icon-remove"></md-icon>
         </md-button>
         <div class="md-title">
-          <strong ng-bind="$ctrl.model.title"></strong>
+          <strong ng-bind="::$ctrl.model.report.name"></strong>
         </div>
       </div>
 
@@ -19,7 +19,7 @@
   </analyze-dialog-header>
 
   <analyze-dialog-content>
-    <report-grid-container id="arp-grid-container" class="ard_details-grid"
+    <report-grid-container id="arp-grid-container" class="arp_details-grid"
                            source="$ctrl.model.gridData"
                            columns="$ctrl.model.columns">
     </report-grid-container>

@@ -8,7 +8,7 @@
 
       <div class="ard_meta" flex>
         <div class="md-title">
-          <strong ng-bind="$ctrl.data.title"></strong>
+          <strong ng-bind="$ctrl.model.name"></strong>
           <label translate="DRAFT"></label>
         </div>
         <div class="md-description">
@@ -32,6 +32,7 @@
 
   <analyze-dialog-content>
     <analyze-filter-sidenav></analyze-filter-sidenav>
+
     <div layout="column">
       <div class="ard_content" layout="column">
         <div layout="row" class="ard_sub-header">
@@ -45,6 +46,7 @@
 
           <div>
             <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.DESIGNER_MODE}"
+                       ng-disabled="$ctrl.states.disable.designer"
                        ng-click="$ctrl.setSqlMode($ctrl.DESIGNER_MODE)">
               <md-icon md-font-icon="icon-designer-mode"></md-icon>
               <span translate="DESIGNER"></span>
@@ -65,7 +67,7 @@
 
           <div class="ard_canvas-query"
                ng-show="$ctrl.states.sqlMode === $ctrl.QUERY_MODE">
-            <textarea ng-model="$ctrl.data.query" readonly></textarea>
+            <textarea ng-model="$ctrl.model.query" readonly></textarea>
           </div>
         </div>
       </div>
