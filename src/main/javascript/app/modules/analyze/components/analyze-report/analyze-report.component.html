@@ -105,11 +105,11 @@
         </div>
       </div>
 
-      <div layout="row" class="ard_details-panel"
+      <div layout="column" class="ard_details-panel"
            ng-if="$ctrl.states.detailsExpanded">
         <div layout="column" class="ard_details-panel-empty"
              ng-show="!$ctrl.hasSelectedColumns()">
-          <span translate="CHOOSE_FIELDS_ABOVE_TO_PREVIEW_YOUR_REPORT"></span>
+          <span translate="CHOOSE_FIELDS_ABOVE_TO_PREVIEW_YOUR_REPORT."></span>
           <md-icon md-font-icon="icon-report"></md-icon>
         </div>
 
@@ -118,7 +118,7 @@
             <span translate="N_FILTERS_APPLIED"
                   translate-values="{N: $ctrl.filters.selected.length}"
                   translate-interpolation="messageformat"></span>
-            <md-button class="btn-card" ng-click="$ctrl.onClearAllFilters()" translate="CLEAR_ALL"></md-button>
+            <md-button class="btn-tertiary" ng-click="$ctrl.onClearAllFilters()" translate="CLEAR_ALL"></md-button>
           </div>
           <md-chips class="filter-tags" readonly="true"
                     ng-model="$ctrl.filters.selected"
