@@ -1,10 +1,9 @@
 import EventEmitter from './eventEmitter';
 
-export default class ComponentHandler extends EventEmitter {
+export default class ComponentHandler {
   constructor() {
-    super();
-
     this._instances = {};
+    this._$eventEmitter = new EventEmitter();
   }
 
   register(key, instance) {
@@ -17,7 +16,7 @@ export default class ComponentHandler extends EventEmitter {
 
       coll.push(instance);
 
-      this.emit('$onInstanceAdded', {
+      this.$emit('$onInstanceAdded', {
         key,
         instance
       });
@@ -42,7 +41,7 @@ export default class ComponentHandler extends EventEmitter {
             delete this._instances[key];
           }
 
-          this.emit('$onInstanceRemoved', {
+          this.$emit('$onInstanceRemoved', {
             key,
             instance
           });
@@ -57,5 +56,13 @@ export default class ComponentHandler extends EventEmitter {
 
   get(key) {
     return (this._instances[key] || []).slice();
+  }
+
+  on(...args) {
+    return this._$eventEmitter.on.apply(this._$eventEmitter, args);
+  }
+
+  $emit(...args) {
+    this._$eventEmitter.emit.apply(this._$eventEmitter, args);
   }
 }

@@ -1,5 +1,4 @@
 import defaultsDeep from 'lodash/defaultsDeep';
-import EventEmitter from '../utils/eventEmitter';
 
 export default class AbstractComponentController {
   constructor($injector) {
