@@ -8,5 +8,37 @@ export const AnalyzeCardComponent = {
     metadata: '<'
   },
   controller: class AnalyzeCardController {
+
+    constructor($mdDialog) {
+      this._$mdDialog = $mdDialog;
+    }
+
+    openMenu($mdMenu, ev) {
+      $mdMenu.open(ev);
+    }
+
+    openPublishModal(ev) {
+      const tpl = '<analyze-publish-dialog model="$ctrl.model" on-publish="$ctrl.onPublish($data)"></analyze-publish-dialog>';
+
+      this._$mdDialog
+        .show({
+          template: tpl,
+          controllerAs: '$ctrl',
+          autoWrap: false,
+          fullscreen: true,
+          focusOnOpen: false,
+          multiple: true,
+          targetEvent: ev,
+          clickOutsideToClose: true
+        });
+    }
+
+    openPrintModal(ev) {
+
+    }
+
+    openExportModal(ev) {
+
+    }
   }
 };

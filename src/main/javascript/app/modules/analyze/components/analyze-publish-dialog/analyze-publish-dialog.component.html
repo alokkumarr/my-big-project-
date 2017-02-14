@@ -1,0 +1,55 @@
+<analyze-dialog control="$ctrl" class="analyze-report-publish">
+  <analyze-dialog-header layout="row" layout-align="start center" flex="grow">
+    <strong translate="PUBLISH_ANALYSIS"></strong>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+    <div class="ars-content" layout-padding>
+      <div class="form-container" layout="column">
+        <label class="field-label" translate="SHARED_SETTINGS"></label>
+        <div layout="row">
+
+          <md-select ng-model="::$ctrl.subject" flex="40">
+            <md-option ng-repeat="subject in $ctrl.subjects" ng-bind="::subject | translate" ng-value="subject"></md-option>
+          </md-select>
+
+          <span translate="CAN" flex="20" class="between-selects"></span>
+
+          <md-select ng-model="::$ctrl.predicate" flex="40">
+            <md-option ng-repeat="predicate in $ctrl.predicates" ng-bind="::predicate | translate" ng-value="predicate"></md-option>
+          </md-select>
+
+        </div>
+      </div>
+
+      <div class="form-container" layout="column">
+        <label translate="SCHEDULE"></label>
+        <md-radio-group ng-model="$ctrl.schedule" layout="row">
+
+          <md-radio-button ng-value="::$ctrl.scheduleOptions[0]">{{::$ctrl.scheduleOptions[0] | translate}}</md-radio-button>
+          <md-radio-button ng-value="::$ctrl.scheduleOptions[1]">{{::$ctrl.scheduleOptions[1] | translate}}</md-radio-button>
+
+        </md-radio-group>
+      </div>
+
+
+      <div class="form-container" layout="column" flex="50">
+        <label translate="EMAIL_TO_COLLABORATORS"></label>
+        <md-input-container md-no-float>
+          <input ng-model="$ctrl.email" type="email" />
+        </md-input-container>
+      </div>
+
+    </div>
+  </analyze-dialog-content>
+
+  <analyze-dialog-footer>
+    <div layout="row">
+      <md-button class="btn-primary" ng-click="$ctrl.publish()" translate="PUBLISH">
+      </md-button>
+
+      <md-button class="btn-card" ng-click="$ctrl.cancel()" translate="CANCEL">
+      </md-button>
+    </div>
+  </analyze-dialog-footer>
+</analyze-dialog>

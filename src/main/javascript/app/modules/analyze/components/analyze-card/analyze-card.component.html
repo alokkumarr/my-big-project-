@@ -26,15 +26,42 @@
     </md-card-title>
 
     <md-card-actions layout="row" layout-align="center center">
+
       <md-button class="md-button btn-card" aria-label="Fork">
         <md-icon md-font-icon="icon-fork"></md-icon>
       </md-button>
+
       <md-button class="md-button btn-card" aria-label="Export">
         <md-icon md-font-icon="icon-folder"></md-icon>
       </md-button>
       <md-button class="md-button btn-card" aria-label="More">
-        <md-icon md-font-icon="icon-more"></md-icon>
+
       </md-button>
+
+      <md-menu>
+        <md-button aria-label="More" class="md-button btn-card" ng-click="$ctrl.openMenu($mdMenu, $event)">
+          <md-icon md-font-icon="icon-more"></md-icon>
+        </md-button>
+        <md-menu-content width="4">
+          <md-menu-item>
+            <md-button ng-click="$ctrl.openPublishModal($event)">
+              Publish
+            </md-button>
+          </md-menu-item>
+          <md-menu-item>
+            <md-button ng-click="ctrl.openPrintModal($event)">
+              <md-icon md-font-icon="icon-print"></md-icon>
+              Print
+            </md-button>
+          </md-menu-item>
+          <md-menu-item>
+            <md-button ng-click="ctrl.openExportModal($event)">
+              Export
+            </md-button>
+          </md-menu-item>
+        </md-menu-content>
+      </md-menu>
+
     </md-card-actions>
   </md-card-footer>
 </md-card>

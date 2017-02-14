@@ -1,0 +1,26 @@
+.analyze-report-publish {
+  width: 550px;
+
+  md-dialog-content {
+    width: 550px;
+  }
+
+  .between-selects {
+    text-align: center;
+    line-height: 38px;
+  }
+
+  .form-container {
+    padding-top: 16px;
+
+    label {
+      font-weight: bold;
+      padding-bottom: 10px;
+    }
+
+    md-input-container {
+      margin: 0;
+    }
+  }
+}
+

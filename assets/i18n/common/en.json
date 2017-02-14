@@ -3,6 +3,7 @@
   "ALL_TYPES": "All Types",
   "APPLY_FILTERS": "Apply filters",
   "APPLY_SORT": "Apply sort",
+  "CAN": "can",
   "CANCEL": "Cancel",
   "CHANGE_PASSWORD": "Change Password",
   "CHARTS": "Charts",
@@ -28,6 +29,7 @@
   "REPORTS":"Reports",
   "SAVE": "Save",
   "SAVE_DESCRIPTION": "Save Description",
+  "SCHEDULE": "Schedule",
   "SCHEDULED": "Scheduled",
   "SHOW_EACH_ROW": "Show Each Row",
   "SORT": "Sort",
@@ -40,5 +42,6 @@
   "TO": "To",
   "UPLOAD": "Upload",
   "UNDO": "Undo",
+  "VIEW":"View",
   "VEW_N_MORE":"View {{value}} more"
 }
