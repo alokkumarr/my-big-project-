@@ -494,9 +494,6 @@ export const AnalyzeReportComponent = {
       });
     }
 
-    openExportModal() {
-    }
-
     openSaveModal(ev) {
       if (!this.canvas) {
         return;
@@ -531,9 +528,6 @@ export const AnalyzeReportComponent = {
           targetEvent: ev,
           clickOutsideToClose: true
         });
-    }
-
-    openPublishModal() {
     }
   }
 };
