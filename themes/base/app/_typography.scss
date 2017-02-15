@@ -4,19 +4,34 @@ $font-source-sans-pro: 'Source Sans Pro';
   font-family: $font-source-sans-pro;
   font-style: normal;
   font-weight: 400;
-  src: local('Source Sans Pro'), local('SourceSansPro-Regular'), url(https://fonts.gstatic.com/s/sourcesanspro/v9/ODelI1aHBYDBqgeIAH2zlNHq-FFgoDNV3GTKpHwuvtI.woff) format('woff');
+  src: local('Source Sans Pro'), local('SourceSansPro-Regular'), url(http://fonts.gstatic.com/s/sourcesanspro/v9/ODelI1aHBYDBqgeIAH2zlJbPFduIYtoLzwST68uhz_Y.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: $font-source-sans-pro;
+  font-style: normal;
+  font-weight: 600;
+  src: local('Source Sans Pro Semibold'), local('SourceSansPro-Semibold'), url(https://fonts.gstatic.com/s/sourcesanspro/v9/toadOcfmlt9b38dHJxOBGCOFnW3Jk0f09zW_Yln67Ac.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: $font-source-sans-pro;
+  font-style: normal;
+  font-weight: 700;
+  src: local('Source Sans Pro Bold'), local('SourceSansPro-Bold'), url(http://fonts.gstatic.com/s/sourcesanspro/v9/toadOcfmlt9b38dHJxOBGJkF8H8ye47wsfpWywda8og.woff2) format('woff2');
 }
 
 body {
   font-family: $font-source-sans-pro;
   font-size: 14px;
+  font-weight: 400;
   color: $app-font-color;
 }
 
 a {
   font-family: $font-source-sans-pro;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 600;
   color: $link-color;
   text-decoration: none;
   cursor: pointer;
@@ -25,7 +40,7 @@ a {
 .link {
   font-family: $font-source-sans-pro;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 600;
   color: $app-font-color;
   text-decoration: none;
   cursor: pointer;

@@ -1,16 +1,18 @@
 import template from './analyze-view.component.html';
 import style from './analyze-view.component.scss';
 
+import {Events, AnalyseTypes} from '../../consts';
+import AbstractComponentController from 'app/lib/common/components/abstractComponent';
+
 export const AnalyzeViewComponent = {
   template,
   styles: [style],
-  controller: class AnalyzeViewController {
-    constructor($log, $mdDialog, $document, AnalyzeService) {
+  controller: class AnalyzeViewController extends AbstractComponentController {
+    constructor($injector, $compile, AnalyzeService) {
       'ngInject';
+      super($injector);
 
-      this.$log = $log;
-      this.$mdDialog = $mdDialog;
-      this.$document = $document;
+      this._$compile = $compile;
       this._AnalyzeService = AnalyzeService;
 
       this.LIST_VIEW = 'list';
@@ -18,59 +20,74 @@ export const AnalyzeViewComponent = {
 
       this.states = {
         reportView: 'card',
-        reportType: null
+        reportType: 'all'
       };
+    }
 
-      this._AnalyzeService.getAnalyses()
+    $onInit() {
+      this._destroyHandler = this.on(Events.AnalysesRefresh, () => {
+        this.loadAnalyses();
+      });
+
+      this.loadAnalyses();
+    }
+
+    $onDestroy() {
+      this._destroyHandler();
+    }
+
+    loadAnalyses() {
+      this._AnalyzeService.getAnalyses(this.$state.params.id)
         .then(analyses => {
           this.reports = analyses;
         });
+    }
 
-      this.filterReports = item => {
-        if (this.states.reportType !== 'all') {
-          return this.states.reportType === item.type;
+    getGridConfig() {
+      const dataSource = this.reports || [];
+      const columns = [{
+        caption: 'NAME',
+        dataField: 'name',
+        allowSorting: true,
+        alignment: 'left',
+        width: '50%'
+      }, {
+        caption: 'METRICS',
+        dataField: 'metrics',
+        allowSorting: true,
+        alignment: 'left',
+        width: '20%',
+        calculateCellValue: rowData => {
+          return (rowData.metrics || []).join(', ');
         }
+      }, {
+        caption: 'SCHEDULED',
+        dataField: 'scheduled',
+        allowSorting: true,
+        alignment: 'left',
+        width: '15%'
+      }, {
+        caption: 'TYPE',
+        dataField: 'type',
+        allowSorting: true,
+        alignment: 'left',
+        width: '10%',
+        calculateCellValue: rowData => {
+          return (rowData.type || '').toUpperCase();
+        },
+        cellTemplate: 'typeCellTemplate'
+      }, {
+        caption: '',
+        cellTemplate: 'actionCellTemplate'
+      }];
 
-        return true;
-      };
-    }
-
-    onReportTypeChange() {
-      if (this.states.reportView === this.LIST_VIEW) {
-        const inst = this.__gridListInstance;
-
-        if (this.states.reportType === 'all') {
-          inst.clearFilter();
-        } else {
-          inst.filter(['type', '=', this.states.reportType]);
-        }
-      }
-    }
-
-    openNewAnalysisModal() {
-      this.$mdDialog.show({
-        template: '<analyze-new></analyze-new>',
-        fullscreen: true
-      })
-        .then(answer => {
-          this.$log.info(`You created the analysis: "${answer}".`);
-        }, () => {
-          this.$log.info('You cancelled new Analysis modal.');
-        });
-    }
-
-    getGridData() {
-      return Object.assign(this.getDxGridOptions(), {
-        dataSource: this.reports,
-        onInitialized: instance => {
-          this.__gridListInstance = instance.component;
-        }
-      });
-    }
-
-    getDxGridOptions() {
       return {
+        onInitialized: this.onGridInitialized.bind(this),
+        columns,
+        dataSource,
         columnAutoWidth: true,
+        allowColumnReordering: true,
+        allowColumnResizing: true,
         showColumnHeaders: true,
         showColumnLines: false,
         showRowLines: false,
@@ -89,13 +106,67 @@ export const AnalyzeViewComponent = {
         pager: {
           showPageSizeSelector: true,
           showInfo: true
-        },
-        selection: {
-          mode: 'multiple',
-          allowSelectAll: false,
-          showCheckBoxesMode: 'always'
         }
       };
+    }
+
+    onGridInitialized(e) {
+      this._gridListInstance = e.component;
+    }
+
+    countGridSelectedRows() {
+      return this._gridListInstance.getSelectedRowKeys().length;
+    }
+
+    onReportTypeChange() {
+      if (this.states.reportView === this.LIST_VIEW) {
+        if (this.states.reportType === 'all') {
+          this._gridListInstance.clearFilter();
+        } else {
+          this._gridListInstance.filter(['type', '=', this.states.reportType]);
+        }
+      }
+    }
+
+    openNewAnalysisModal() {
+      this.showDialog({
+        template: '<analyze-new></analyze-new>',
+        fullscreen: true
+      });
+    }
+
+    filterReports(item) {
+      if (this.states.reportType !== 'all') {
+        return this.states.reportType === item.type;
+      }
+
+      return true;
+    }
+
+    onCardAction(actionType, model) {
+      if (actionType === 'fork' || actionType === 'edit') {
+        this.openEditModal(actionType, model);
+      }
+    }
+
+    fork(report) {
+      this.openEditModal('fork', report);
+    }
+
+    edit(report) {
+      this.openEditModal('edit', report);
+    }
+
+    openEditModal(mode, model) {
+      if (model.type === AnalyseTypes.Report) {
+        this.showDialog({
+          template: `<analyze-report model="model" mode="${mode}"></analyze-report>`,
+          controller: scope => {
+            scope.model = model;
+          },
+          multiple: true
+        });
+      }
     }
   }
 };

@@ -35,5 +35,11 @@ analyze-report-preview {
         color: #FFF;
       }
     }
+
+    &_details-grid {
+      .report-grid-container {
+        padding: 20px;
+      }
+    }
   }
 }

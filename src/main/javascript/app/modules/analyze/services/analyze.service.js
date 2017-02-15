@@ -21,6 +21,7 @@ export function AnalyzeService($http) {
     getMetrics,
     getArtifacts,
     getAnalyses,
+    getAnalyseById,
     getDataByQuery,
     getSupportedMethods,
     generateQuery,
@@ -29,8 +30,12 @@ export function AnalyzeService($http) {
     setAvailableAnalysisMethods: curry(setAvailableItems)(analysisMethodMapper, isMethodSupported)
   };
 
-  function getAnalyses() {
-    return $http.get('api/analyze/analyses').then(get('data'));
+  function getAnalyses(category) {
+    return $http.get('api/analyze/analyses', {params: {category}}).then(get('data'));
+  }
+
+  function getAnalyseById(id) {
+    return $http.get(`api/analyze/byId/${id}`).then(get('data'));
   }
 
   function getMenu() {

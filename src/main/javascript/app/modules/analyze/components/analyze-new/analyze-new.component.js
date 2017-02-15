@@ -1,70 +1,87 @@
+import filter from 'lodash/filter';
+import map from 'lodash/map';
+
 import template from './analyze-new.component.html';
 import style from './analyze-new.component.scss';
 import emptyTemplate from './analyze-new-empty.html';
+
+import {AnalyseTypes} from '../../consts';
 
 export const AnalyzeNewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeNewController {
-    constructor($mdDialog, $log, $document, $scope, AnalyzeService) {
+    constructor($scope, $mdDialog, AnalyzeService) {
       'ngInject';
-
-      this.$mdDialog = $mdDialog;
-      this.$log = $log;
       this._$scope = $scope;
-      this.$document = $document;
-      this.analyzeService = AnalyzeService;
-      this.selectedAnalysisMethod = '';
+      this._$mdDialog = $mdDialog;
+      this._AnalyzeService = AnalyzeService;
     }
 
     $onInit() {
-      this.analyzeService.getMethods()
+      this.selectedAnalysisMethod = '';
+
+      this._AnalyzeService.getMethods()
         .then(methods => {
           this.methods = methods;
         });
 
-      this.analyzeService.getMetrics()
+      this._AnalyzeService.getMetrics()
         .then(metrics => {
           this.metrics = metrics;
         });
     }
 
     onMetricToggle() {
-      const supportedMethods = this.analyzeService.getSupportedMethods(this.metrics);
+      const supportedMethods = this._AnalyzeService.getSupportedMethods(this.metrics);
 
-      this.metrics = this.analyzeService.setAvailableMetrics(this.metrics, supportedMethods);
-      this.methods = this.analyzeService.setAvailableAnalysisMethods(this.methods, supportedMethods);
+      this.metrics = this._AnalyzeService.setAvailableMetrics(this.metrics, supportedMethods);
+      this.methods = this._AnalyzeService.setAvailableAnalysisMethods(this.methods, supportedMethods);
 
       // unselect the method, so only supported methods can be selected
       this.selectedAnalysisMethod = '';
     }
 
-    onAnalysisMethodSelected() {
-      this.$log.info('Selected method: ', this.selectedAnalysisMethod);
+    getSelectedMetrics() {
+      const metrics = filter(this.metrics, metric => {
+        return metric.checked;
+      });
+
+      return map(metrics, metric => {
+        return metric.name;
+      });
     }
 
     cancel() {
-      this.$mdDialog.cancel();
+      this._$mdDialog.cancel();
     }
 
     createAnalysis() {
       let tpl;
+      let model;
 
       switch (this.selectedAnalysisMethod) {
         case 'table:report':
-          tpl = '<analyze-report analysis="$ctrl.newAnalysis"></analyze-report>';
+          tpl = '<analyze-report model="model"></analyze-report>';
+          model = {
+            type: AnalyseTypes.Report,
+            name: 'Untitled Report',
+            description: '',
+            category: null,
+            metrics: this.getSelectedMetrics(),
+            scheduled: null,
+            artifacts: null
+          };
           break;
         default:
           tpl = emptyTemplate;
           break;
       }
 
-      this.$mdDialog.show({
+      this._$mdDialog.show({
         template: tpl,
         controller: scope => {
-          scope.$ctrl.newAnalysis = {
-            name: 'Untitled'
-          };
+          scope.model = model;
         },
         controllerAs: '$ctrl',
         autoWrap: false,
