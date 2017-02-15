@@ -34,9 +34,6 @@
       <md-button class="md-button btn-card" aria-label="Export">
         <md-icon md-font-icon="icon-folder"></md-icon>
       </md-button>
-      <md-button class="md-button btn-card" aria-label="More">
-
-      </md-button>
 
       <md-menu>
         <md-button aria-label="More" class="md-button btn-card" ng-click="$ctrl.openMenu($mdMenu, $event)">
@@ -45,18 +42,18 @@
         <md-menu-content width="4">
           <md-menu-item>
             <md-button ng-click="$ctrl.openPublishModal($event)">
-              Publish
+              <span translate="PUBLISH"></span>
             </md-button>
           </md-menu-item>
           <md-menu-item>
             <md-button ng-click="ctrl.openPrintModal($event)">
               <md-icon md-font-icon="icon-print"></md-icon>
-              Print
+              <span translate="PRINT"></span>
             </md-button>
           </md-menu-item>
           <md-menu-item>
             <md-button ng-click="ctrl.openExportModal($event)">
-              Export
+              <span translate="EXPORT"></span>
             </md-button>
           </md-menu-item>
         </md-menu-content>

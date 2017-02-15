@@ -7,7 +7,7 @@
   }
 
   .md-datepicker-input-container {
-    border: $input-border;
+    border: none;
 
     .md-datepicker-input {
       min-width: 100px;
@@ -20,8 +20,7 @@
     }
 
     .md-datepicker-triangle-button {
-      top: 8px;
-      right: 2px;
+      right: 8px;
     }
   }
 

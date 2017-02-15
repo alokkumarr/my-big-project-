@@ -1,11 +1,9 @@
 .analyze-report-publish {
-  width: 550px;
-
   md-dialog-content {
     width: 550px;
   }
 
-  .between-selects {
+  .label-inline-with-select {
     text-align: center;
     line-height: 38px;
   }
@@ -21,6 +19,22 @@
     md-input-container {
       margin: 0;
     }
+  }
+
+  .repeat-schedule-container {
+    label {
+      text-align: end;
+      padding-right: 8px;
+      padding-top: 6px;
+    }
+  }
+
+  .days-of-week-checkboxes {
+    padding-top: 6px;
+  }
+
+  .end-criteria-radio {
+    line-height: 32px;
   }
 }
 
