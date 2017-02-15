@@ -7,6 +7,8 @@ import 'angular-material/angular-material.css';
 import 'angular-ui-grid';
 import 'angular-ui-grid/ui-grid.css';
 
+import 'ng-idle';
+
 import 'mottle';
 
 import 'devextreme/ui/data_grid';
@@ -23,6 +25,7 @@ import {themeConfig} from './theme';
 import {i18nConfig} from './i18n';
 import {config} from './config';
 import {runConfig} from './run';
+import {idleConfig} from './idle';
 
 import {LibModule} from './lib';
 import {ObserveModule} from './modules/observe';
@@ -44,6 +47,7 @@ angular
     'ngMaterial',
     'dx',
     'ui.grid',
+    'ngIdle',
     LibModule,
     ObserveModule,
     AnalyzeModule,
@@ -51,6 +55,7 @@ angular
   ])
   .config(routesConfig)
   .config(themeConfig)
+  .config(idleConfig)
   .config(i18nConfig)
   .config(config)
   .run(runConfig)
