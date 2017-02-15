@@ -6,11 +6,9 @@ import set from 'lodash/fp/set';
 import first from 'lodash/first';
 import fpMap from 'lodash/fp/map';
 import map from 'lodash/map';
-import find from 'lodash/find';
 import forEach from 'lodash/forEach';
-import uniq from 'lodash/uniq';
-import isEmpty from 'lodash/isEmpty';
 import clone from 'lodash/clone';
+import isEmpty from 'lodash/isEmpty';
 import filter from 'lodash/filter';
 
 import template from './analyze-report.component.html';
@@ -49,6 +47,7 @@ export const AnalyzeReportComponent = {
       };
 
       this.gridData = [];
+      this.filteredGridData = [];
       this.columns = [];
       this.filters = {
         // array of strings with the columns displayName that the filter is based on
@@ -90,6 +89,7 @@ export const AnalyzeReportComponent = {
       this._AnalyzeService.getDataByQuery()
         .then(data => {
           this.gridData = data;
+          this.filteredGridData = data;
           this.reloadPreviewGrid();
           this.showFiltersButtonIfDataIsReady();
         });
@@ -101,6 +101,11 @@ export const AnalyzeReportComponent = {
           this.fillCanvas(data);
           this.reloadPreviewGrid();
           this.showFiltersButtonIfDataIsReady();
+          this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
+          if (!isEmpty(this.canvas.model.filters)) {
+            this.filters.selected = this.canvas.filters;
+            this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.canvas.filters, this.filters.possible);
+          }
         });
     }
 
@@ -115,13 +120,12 @@ export const AnalyzeReportComponent = {
 
     // filters section
     openFilterSidenav() {
-      // TODO link this to when the canvas models selected fields change
-      // TODO link filters to the report grid
-      if (isEmpty(this.filters.selected)) {
-        this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
-      }
-
       this._FilterService.openFilterSidenav(this.filters.possible);
+    }
+
+    generateFiltersOnCanvasChange() {
+      this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
+      this.clearFilters();
     }
 
     showFiltersButtonIfDataIsReady() {
@@ -132,36 +136,35 @@ export const AnalyzeReportComponent = {
 
     onApplyFilters(filters) {
       this.filters.possible = filters;
-      this.filters.selected = pipe(
-        fpFilter(get('model')),
-        fpMap(get('label'))
-      )(filters);
+      this.filters.selected = this._FilterService.getSelectedFilterMapper()(filters);
+
+      this.filterGridData();
+    }
+
+    filterGridData() {
+      this.filteredGridData = this._FilterService.getGridDataFilter(this.filters.selected)(this.gridData);
+
+      this.reloadPreviewGrid();
     }
 
     onClearAllFilters() {
-      this.filters.possible = fpMap(pipe(
-        set('model', null),
-        set('operator', DEFAULT_FILTER_OPERATOR)
-      ), this.filters);
-      this.filters.selected = [];
+      this.clearFilters();
     }
 
-    onFilterRemoved(chipString) {
-      const filter = find(this.filters.possible, filter => filter.label === chipString);
+    clearFilters() {
+      this.filters.possible = this._FilterService.getFilterClearer()(this.filters.possible);
+      this.filters.selected = [];
+      this.filteredGridData = this.gridData;
+      this.reloadPreviewGrid();
+    }
+
+    onFilterRemoved(filter) {
       filter.model = null;
+      this.filterGridData();
     }
 
     generateFilters(selectedFields, gridData) {
-      return pipe(
-        fpFilter(get('isFilterEligible')),
-        fpMap(field => {
-          return {
-            label: field.alias || field.displayName,
-            name: field.name,
-            type: field.type,
-            items: field.type === 'string' ? uniq(fpMap(get(field.name), gridData)) : null
-          };
-        }))(selectedFields);
+      return this._FilterService.getCanvasFieldsToFiltersMapper(gridData)(selectedFields);
     }
 
     // END filters section
@@ -191,6 +194,7 @@ export const AnalyzeReportComponent = {
       }
 
       this.canvas._$eventEmitter.on('changed', () => {
+        this.generateFiltersOnCanvasChange();
         this.reloadPreviewGrid();
       });
 
@@ -258,14 +262,8 @@ export const AnalyzeReportComponent = {
           });
         });
 
-        forEach(itemA.sql_builder.filters, itemB => {
-          model.addFilter({
-            table: itemA.artifact_name,
-            field: itemB.column_name,
-            booleanCriteria: itemB.boolean_criteria,
-            operator: itemB.operator,
-            searchConditions: itemB.search_conditions
-          });
+        forEach(itemA.sql_builder.filters, backEndFilter => {
+          model.addFilter(this._FilterService.getFrontEnd2BackEndFilterMapper()(backEndFilter));
         });
       });
       /* eslint-enable camelcase */
@@ -332,9 +330,9 @@ export const AnalyzeReportComponent = {
           tableArtifact.sql_builder.joins.push(joinArtifact);
         });
 
-        const sorts = filter(model.sorts, sort => {
+        const sorts = filter(sort => {
           return sort.table === table;
-        });
+        }, model.sorts);
 
         forEach(sorts, sort => {
           const sortArtifact = {
@@ -345,28 +343,18 @@ export const AnalyzeReportComponent = {
           tableArtifact.sql_builder.order_by_columns.push(sortArtifact);
         });
 
-        const groups = filter(model.groups, group => {
+        const groups = filter(group => {
           return group.table === table;
-        });
+        }, model.groups);
 
         forEach(groups, group => {
           tableArtifact.sql_builder.group_by_columns.push(group.field.name);
         });
 
-        const filters = filter(model.filters, filter => {
-          return filter.table === table;
-        });
-
-        forEach(filters, filter => {
-          const filterArtifact = {
-            column_name: filter.field.name,
-            boolean_criteria: filter.booleanCriteria,
-            operator: filter.operator,
-            search_conditions: filter.searchConditions
-          };
-
-          tableArtifact.sql_builder.filters.push(filterArtifact);
-        });
+        tableArtifact.sql_builder.filters = pipe(
+          filter(artifactFilter => artifactFilter.tableName === tableArtifact.artifact_name),
+          map(this._FilterService.getFrontEnd2BackEndFilterMapper())
+        )(this.filters.selected);
       });
       /* eslint-enable camelcase */
 
@@ -388,7 +376,7 @@ export const AnalyzeReportComponent = {
       if (grid) {
         grid.updateColumns(this.columns);
         grid.updateSorts(sorts);
-        grid.updateSource(this.gridData);
+        grid.updateSource(this.filteredGridData);
         grid.refreshGrid();
       }
     }

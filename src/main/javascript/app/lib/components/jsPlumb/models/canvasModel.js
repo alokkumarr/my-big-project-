@@ -118,8 +118,8 @@ export class CanvasModel {
   }
 
   addFilter(filterObj) {
-    filterObj.table = this.findTable(filterObj.table);
-    filterObj.field = filterObj.table && filterObj.table.findField(filterObj.field);
+    filterObj.table = this.findTable(filterObj.tableName);
+    filterObj.field = filterObj.table && filterObj.table.findField(filterObj.name);
 
     this.filters.push(filterObj);
 
