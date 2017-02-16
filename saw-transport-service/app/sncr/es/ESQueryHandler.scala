@@ -1,7 +1,6 @@
 package sncr.es
 
 import java.io.IOException
-import java.nio.charset.Charset
 import java.util.concurrent.{ExecutionException, Future, TimeUnit}
 
 import com.fasterxml.jackson.databind.node.ObjectNode
@@ -12,10 +11,10 @@ import org.apache.http.client.methods.{HttpGet, HttpPost}
 import org.apache.http.client.utils.URIBuilder
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.BasicResponseHandler
-import play.mvc.Result
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json.{JsObject, JsValue}
 import play.libs.Json
+import play.mvc.Result
 import sncr.metadata.MetadataDictionary
 import sncr.request.Extractor
 import sncr.saw.common.config.SAWServiceConfig
@@ -42,7 +41,7 @@ class ESQueryHandler (ext: Extractor) extends HTTPRequest {
     try {
       httpClient.start()
       val req_builder: URIBuilder = new URIBuilder
-      req_builder setCharset (Charset.forName("UTF-8"))
+//      req_builder. setCharset (Charset.forName("UTF-8"))
       req_builder setPath ("/" + inxName +  "/" + (if (objType != None ) objType.get.asInstanceOf[String] + "/" else "" ) + verb)
       req_builder setHost (es_ip)
       req_builder setPort (es_port.toInt)

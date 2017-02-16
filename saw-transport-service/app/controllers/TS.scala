@@ -8,6 +8,7 @@ import play.mvc.{Controller, Http, Result}
 import sncr.es.ESQueryHandler
 import sncr.metadata.MetadataDictionary
 import sncr.request.Extractor
+import sncr.saw.common.config.SAWServiceConfig
 import sncr.security.TokenValidator
 
 /**
@@ -87,11 +88,14 @@ class TS extends Controller {
       return play.mvc.Results.unauthorized(res)
     }
 
-    val tokenValidator  = new TokenValidator(extractor.security.get(MetadataDictionary.Token.toString).get.asInstanceOf[String])
-    if (!tokenValidator.validate)
-    {
-      res.put("result", "Provided token is invalid")
-      return play.mvc.Results.unauthorized(res)
+    val secBypass = SAWServiceConfig.security_settings.getBoolean("bypass")
+    if ( secBypass == null || !secBypass){
+      val tokenValidator  = new TokenValidator(extractor.security.get(MetadataDictionary.Token.toString).get.asInstanceOf[String])
+      if (!tokenValidator.validate)
+      {
+        res.put("result", "Provided token is invalid")
+        return play.mvc.Results.unauthorized(res)
+      }
     }
 
     val (isHeaderValid, msg2) = extractor.getDataDescriptorHeader(json)

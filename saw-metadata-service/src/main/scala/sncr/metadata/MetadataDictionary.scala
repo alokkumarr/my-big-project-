@@ -25,7 +25,14 @@ object MetadataDictionary extends Enumeration {
 
 object SearchDictionary{
 
-  val searchFields = List ("customer_Prod_module_feature_sys_id")
+  val searchFields = List ( "customer_Prod_module_feature_sys_id",
+                            "dataSecurityKey",
+                            "ticketId",
+                            "windowId",
+                            "roleType",
+                            "NodeId"
+  )
+
 
 
 }

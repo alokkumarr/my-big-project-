@@ -1,7 +1,6 @@
 package sncr.security
 
 import java.io.IOException
-import java.nio.charset.Charset
 import java.util.concurrent.{ExecutionException, Future, TimeUnit}
 
 import org.apache.commons.httpclient.util.TimeoutController.TimeoutException
@@ -49,7 +48,7 @@ class TokenValidator(token: String) extends HTTPRequest{
     try {
       httpClient.start()
       val req_builder: URIBuilder = new URIBuilder
-      req_builder setCharset (Charset.forName("UTF-8"))
+//      req_builder setCharset (Charset.forName("UTF-8"))
       //TODO:: Set path to validate token
       req_builder setPath (sec_path)
       req_builder setHost (sec_host)
