@@ -21,117 +21,22 @@
 		<mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
 	</properties>
 	<dependencies>
-	<!-- https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging-slf4j_2.10 -->
-	<dependency>
-		<groupId>com.synchronoss</groupId>
-		<artifactId>saw-common</artifactId>
-		<version>${project.version}</version>
-	</dependency>
-	<dependency>
-		<groupId>com.synchronoss</groupId>
-		<artifactId>saw-metadata-service</artifactId>
-		<version>${project.version}</version>
-	</dependency>
-	<!-- https://mvnrepository.com/artifact/com.typesafe.akka/akka-remote_2.11 -->
-	<!--dependency>
-		<groupId>com.typesafe.akka</groupId>
-		<artifactId>akka-remote_${scala.major.version}</artifactId>
-		<version>${akka.version}</version>
-	</dependency>
-	<dependency>
-		<groupId>com.typesafe.akka</groupId>
-		<artifactId>akka-actor_${scala.major.version}</artifactId>
-		<version>${akka.version}</version>
-	</dependency>
-	<dependency>
-		<groupId>com.typesafe.akka</groupId>
-		<artifactId>akka-slf4j_${scala.major.version}</artifactId>
-		<version>${akka.version}</version>
-	</dependency -->
-	<!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql_2.11 -->
-	<!-- dependency>
-		<groupId>org.apache.spark</groupId>
-		<artifactId>spark-sql_${scala.major.version}</artifactId>
-		<version>1.6.1</version>
-	</dependency -->
-	<dependency>
-		<groupId>org.apache.spark</groupId>
-		<artifactId>spark-sql_2.10</artifactId>
-		<version>1.6.1</version>
-		<scope>system</scope>
-		<systemPath>${project.basedir}/spark-lib/spark-assembly-1.6.1-hadoop2.2.0.jar</systemPath>
-	</dependency>
-
-<!-- START: Spark custom pre-built package -->
-<!--
-	<dependency>
-		<groupId>org.apache.spark</groupId>
-		<artifactId>spark-assembly</artifactId>
-		<version>1.6.1-mapr-1608-hadoop2.7.0-mapr-1607</version>
-		<scope>system</scope>
-		<systemPath>${project.basedir}/spark-lib/spark-assembly-1.6.1-mapr-1608-hadoop2.7.0-mapr-1607.jar</systemPath>
-	</dependency>
-	<dependency>
-		<groupId>org.apache.spark</groupId>
-		<artifactId>spark-catalyst_${scala.major.version}</artifactId>
-		<version>1.6.4-SNAPSHOT</version>
-		<scope>system</scope>
-		<systemPath>${project.basedir}/spark-lib/spark-catalyst_2.11-1.6.4-SNAPSHOT.jar</systemPath>
-	</dependency>
-	<dependency>
-		<groupId>org.apache.spark</groupId>
-		<artifactId>spark-core_${scala.major.version}</artifactId>
-		<version>1.6.4-SNAPSHOT</version>
-		<scope>system</scope>
-		<systemPath>${project.basedir}/spark-lib/spark-core_2.11-1.6.4-SNAPSHOT.jar</systemPath>
-	</dependency>
-	<dependency>
-		<groupId>org.apache.spark</groupId>
-		<artifactId>spark-launcher_${scala.major.version}</artifactId>
-		<version>1.6.4-SNAPSHOT</version>
-		<scope>system</scope>
-		<systemPath>${project.basedir}/spark-lib/spark-launcher_2.11-1.6.4-SNAPSHOT.jar</systemPath>
-	</dependency>
-	<dependency>
-		<groupId>org.apache.spark</groupId>
-		<artifactId>spark-network-common_${scala.major.version}</artifactId>
-		<version>1.6.4-SNAPSHOT</version>
-		<scope>system</scope>
-		<systemPath>${project.basedir}/spark-lib/spark-network-common_2.11-1.6.4-SNAPSHOT.jar</systemPath>
-	</dependency>
-	<dependency>
-		<groupId>org.apache.spark</groupId>
-		<artifactId>spark-network-shuffle_${scala.major.version}</artifactId>
-		<version>1.6.4-SNAPSHOT</version>
-		<scope>system</scope>
-		<systemPath>${project.basedir}/spark-lib/spark-network-shuffle_2.11-1.6.4-SNAPSHOT.jar</systemPath>
-	</dependency>
-	<dependency>
-		<groupId>org.apache.spark</groupId>
-		<artifactId>spark-unsafe_${scala.major.version}</artifactId>
-		<version>1.6.4-SNAPSHOT</version>
-		<scope>system</scope>
-		<systemPath>${project.basedir}/spark-lib/spark-unsafe_2.11-1.6.4-SNAPSHOT.jar</systemPath>
-	</dependency -->
-<!-- END: Spark custom pre-built package -->
-
-	<!-- dependency>
-		<groupId>org.apache.hbase</groupId>
-		<artifactId>hbase-client</artifactId>
-		<version>${maprdb.version}</version>
-	</dependency>
-
-	<dependency>
-			<groupId>org.apache.hbase</groupId>
-			<artifactId>hbase-common</artifactId>
-			<version>${maprdb.version}</version>
-	</dependency>
-	<dependency>
-		<groupId>org.apache.hadoop</groupId>
-		<artifactId>hadoop-common</artifactId>
-		<version>${mapr.hadoop.client.version}</version>
-	</dependency -->
-
+		<!-- https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging-slf4j_2.10 -->
+		<dependency>
+			<groupId>com.synchronoss</groupId>
+			<artifactId>saw-common</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss</groupId>
+			<artifactId>saw-metadata-service</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-sql_2.10</artifactId>
+			<version>1.6.1</version>
+		</dependency>
     </dependencies>
 	<build>
 		<sourceDirectory>${project.basedir}/src/main</sourceDirectory>

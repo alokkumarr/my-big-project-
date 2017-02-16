@@ -15,13 +15,11 @@
         <java.version>1.8</java.version>
         <maven.assembly.version>2.5.5</maven.assembly.version>
         <project.basedir>.</project.basedir>
-        <scala.version>2.11</scala.version>
         <Json4s.latestVersion>3.3.0</Json4s.latestVersion>
         <play2.version>2.5.10</play2.version>
         <play2.plugin.version>1.0.0-beta5</play2.plugin.version>
-        <play2.scala.version>2.11.8</play2.scala.version>
+        <play2.scala.version>2.11.7</play2.scala.version>
         <mapr.client>5.2.0.39122-mapr</mapr.client>
-        <maprdb.version>1.1.1-mapr-1602</maprdb.version>
         <play2.json.reactive.mongo>0.11.11</play2.json.reactive.mongo>
         <io.netty.version>4.0.36.Final</io.netty.version>
         <spring.release>4.1.6.RELEASE</spring.release>
@@ -45,39 +43,24 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.synchronoss</groupId>
-            <artifactId>saw-business-service</artifactId>
-            <version>${project.version}</version>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-actor_${scala.major.version}</artifactId>
+            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-actor_${scala.version}</artifactId>
-            <version>2.4.16</version>
-        </dependency>
-        <dependency>
-            <groupId>com.typesafe.scala-logging</groupId>
-            <artifactId>scala-logging_${scala.version}</artifactId>
-            <version>3.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-slf4j_${scala.version}</artifactId>
-            <version>2.4.16</version>
+            <artifactId>akka-slf4j_${scala.major.version}</artifactId>
+            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.play</groupId>
-            <artifactId>play-test_${scala.version}</artifactId>
+            <artifactId>play-test_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.reactivemongo</groupId>
-            <artifactId>reactivemongo_${scala.version}</artifactId>
+            <artifactId>reactivemongo_${scala.major.version}</artifactId>
             <version>${play2.json.reactive.mongo}</version>
         </dependency>
         <dependency>
@@ -119,7 +102,7 @@
         <dependency>
             <!-- com.typesafe.play.play-datacommons_2.11-2.5.2.jar -->
             <groupId>com.typesafe.play</groupId>
-            <artifactId>play-datacommons_${scala.version}</artifactId>
+            <artifactId>play-datacommons_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
         </dependency>
         <dependency>
@@ -137,100 +120,95 @@
         <dependency>
             <!-- com.typesafe.play.play-functional_2.11-2.5.10.jar -->
             <groupId>com.typesafe.play</groupId>
-            <artifactId>play-functional_${scala.version}</artifactId>
+            <artifactId>play-functional_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
         </dependency>
         <dependency>
             <!-- com.typesafe.play.play-iteratees_2.11-2.5.10.jar -->
             <groupId>com.typesafe.play</groupId>
-            <artifactId>play-iteratees_${scala.version}</artifactId>
+            <artifactId>play-iteratees_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
         </dependency>
         <dependency>
             <!-- com.typesafe.play.play-java-ws_2.11-2.5.10.jar -->
             <groupId>com.typesafe.play</groupId>
-            <artifactId>play-java-ws_${scala.version}</artifactId>
+            <artifactId>play-java-ws_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
         </dependency>
         <dependency>
             <!-- com.typesafe.play.play-java_2.11-2.5.10.jar -->
             <groupId>com.typesafe.play</groupId>
-            <artifactId>play-java_${scala.version}</artifactId>
+            <artifactId>play-java_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
         </dependency>
         <dependency>
             <!-- com.typesafe.play.play-json_2.11-2.5.10.jar -->
             <groupId>com.typesafe.play</groupId>
-            <artifactId>play-json_${scala.version}</artifactId>
+            <artifactId>play-json_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
         </dependency>
         <dependency>
             <!-- com.typesafe.play.play-logback_2.11-2.5.10.jar -->
             <groupId>com.typesafe.play</groupId>
-            <artifactId>play-logback_${scala.version}</artifactId>
+            <artifactId>play-logback_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
         </dependency>
         <dependency>
             <!-- com.typesafe.play.play-netty-server_2.11-2.5.10.jar -->
             <groupId>com.typesafe.play</groupId>
-            <artifactId>play-netty-server_${scala.version}</artifactId>
+            <artifactId>play-netty-server_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
         </dependency>
         <dependency>
             <!-- com.typesafe.play.play-server_2.11-2.5.10.jar -->
             <groupId>com.typesafe.play</groupId>
-            <artifactId>play-server_${scala.version}</artifactId>
+            <artifactId>play-server_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
         </dependency>
         <dependency>
             <!-- com.typesafe.play.play-streams_2.11-2.5.10.jar -->
             <groupId>com.typesafe.play</groupId>
-            <artifactId>play-streams_${scala.version}</artifactId>
+            <artifactId>play-streams_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
         </dependency>
         <dependency>
             <!-- com.typesafe.play.play-ws_2.11-2.5.2.jar -->
             <groupId>com.typesafe.play</groupId>
-            <artifactId>play-ws_${scala.version}</artifactId>
+            <artifactId>play-ws_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
         </dependency>
         <dependency>
             <!-- com.typesafe.play.play_2.11-2.5.2.jar -->
             <groupId>com.typesafe.play</groupId>
-            <artifactId>play_${scala.version}</artifactId>
+            <artifactId>play_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
         </dependency>
         <dependency>
             <!-- com.typesafe.play.twirl-api_2.11-1.1.1.jar -->
             <groupId>com.typesafe.play</groupId>
-            <artifactId>twirl-api_${scala.version}</artifactId>
+            <artifactId>twirl-api_${scala.major.version}</artifactId>
             <version>1.1.1</version>
         </dependency>
         <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>2.11.8</version>
-        </dependency>
-        <dependency>
             <groupId>com.typesafe.play</groupId>
-            <artifactId>play-jdbc_${scala.version}</artifactId>
+            <artifactId>play-jdbc_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.play</groupId>
-            <artifactId>play-cache_${scala.version}</artifactId>
+            <artifactId>play-cache_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
         </dependency>
         <!-- Play filters-->
         <dependency>
             <groupId>com.typesafe.play</groupId>
-            <artifactId>filters-helpers_${scala.version}</artifactId>
+            <artifactId>filters-helpers_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.scalatestplus.play</groupId>
-            <artifactId>scalatestplus-play_${scala.version}</artifactId>
+            <artifactId>scalatestplus-play_${scala.major.version}</artifactId>
             <version>1.5.1</version>
             <scope>test</scope>
         </dependency>
@@ -273,28 +251,6 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-transport-native-epoll</artifactId>
             <version>${io.netty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-client</artifactId>
-            <version>${maprdb.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.hbase/hbase-common -->
-        <dependency>
-            <groupId>org.apache.hbase</groupId>
-            <artifactId>hbase-common</artifactId>
-            <version>${maprdb.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.hbase/hbase -->
-        <dependency>
-            <groupId>org.json4s</groupId>
-            <artifactId>json4s-native_${scala.version}</artifactId>
-            <version>${Json4s.latestVersion}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.json4s</groupId>
-            <artifactId>json4s-jackson_${scala.version}</artifactId>
-            <version>${Json4s.latestVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.asynchttpclient</groupId>
@@ -388,18 +344,6 @@
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_${scala.version}</artifactId>
-            <version>2.2.6</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.scalactic</groupId>
-            <artifactId>scalactic_${scala.version}</artifactId>
-            <version>2.2.6</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
@@ -582,24 +526,24 @@
                     </mappings>
                     <preinstallScriptlet>
                         <script>echo Install is being prepared
-                            # Enable this part when Security will be implemented
-                            #------------------------------------------------------
-                            # Check/create saw-user user, group
-                            # getent passwd saw-user &gt;/dev/null || {
-                            # getent group saw-user &gt;/dev/null || groupadd -g 4030 saw-user
-                            # useradd -g 4030 -u 4030 saw-user
-                            # usermod -L saw-user
-                            # echo User created: saw-user
-                            #}
-                            # Check saw-user exists
-                            #getent passwd saw-user &gt;/dev/null || {
-                            # echo Unix user saw-user must exist
-                            # exit 1
-                            #}
-                            # Save versioned name to env file to be used in postinstall
-                            {
-                            echo app_home=/opt/saw/service-${rpm.version}.${rpm.release}
-                            } &gt;/tmp/.saw.tmp.env
+# Enable this part when Security will be implemented
+#------------------------------------------------------
+# Check/create saw-user user, group
+# getent passwd saw-user &gt;/dev/null || {
+# getent group saw-user &gt;/dev/null || groupadd -g 4030 saw-user
+# useradd -g 4030 -u 4030 saw-user
+# usermod -L saw-user
+# echo User created: saw-user
+#}
+# Check saw-user exists
+#getent passwd saw-user &gt;/dev/null || {
+# echo Unix user saw-user must exist
+# exit 1
+#}
+# Save versioned name to env file to be used in postinstall
+            {
+                echo app_home=/opt/saw/service-${rpm.version}.${rpm.release}
+            } &gt;/tmp/.saw-service.tmp.env
                         </script>
                     </preinstallScriptlet>
                     <postinstallScriptlet>

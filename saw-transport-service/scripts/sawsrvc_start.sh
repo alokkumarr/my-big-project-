@@ -2,7 +2,7 @@
 # Script to start local SAW_SERVICE service on given port
 
 # Command line optional argument (http.port)
-# If not specified, must be set in /etc/bda/xdfts.env file
+# If not specified, must be set in /etc/saw/service.env file
 declare SAW_SERVICE_PORT
 # Option: <SAW_SERVICE_PORT>
 

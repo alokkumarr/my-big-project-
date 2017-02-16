@@ -20,12 +20,6 @@
 		  <outputDirectory>lib</outputDirectory>
 		  <fileMode>440</fileMode>
 	  </fileSet>
-	  <fileSet>
-		  <directoryMode>750</directoryMode>
-		  <directory>${project.basedir}/../saw-business-service/target/saw-business-service-${project.version}-package/saw-business-service-${project.version}/lib</directory>
-		  <outputDirectory>lib</outputDirectory>
-		  <fileMode>440</fileMode>
-	  </fileSet>
   </fileSets>
   <dependencySets>
     <dependencySet>

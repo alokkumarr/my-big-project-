@@ -365,8 +365,8 @@ addJava "-Duser.dir=$(cd "${app_home}/.."; pwd -P)"
 
 # Middle tier specisfic
 # addJava "-Djava.security.auth.login.config=/opt/mapr/conf/mapr.login.conf"
+##:$(mapr classpath)
 app_classpath=${app_classpath}:$(mapr classpath)
-
 
 
 # java_cmd is overrode in process_args when -java-home is used

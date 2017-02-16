@@ -1,21 +1,31 @@
 package sncr.datalake
 
 import org.apache.log4j.Logger
-import org.apache.spark.sql.SQLContext
+import org.json4s.JsonAST.JValue
+import org.json4s._
+import org.json4s.native.JsonMethods._
+import sncr.metadata.MetadataObjectStructure
 
 /**
-  * Created by srya0001 on 2/10/2017.
+   Created by srya0001 on 2/10/2017.
   */
-class QueryDatalake(val sqlctx: SQLContext) {
+class QueryDatalake(val queryDescriptor: String ) {
+
   private val m_log: Logger = Logger.getLogger(classOf[QueryDatalake].getName)
 
-  def run( location: String) : String =
-  {
-      val df = sqlctx.read.load(location)
-      df.printSchema()
-      println("Row in SRC: " +  df.count)
-      df.show(10)
-      "success"
+  var qDescJson: JValue = null
+  var query : String = null
+  var metadata : String = null
+  import MetadataObjectStructure.formats
+
+  try {
+    qDescJson =  parse (queryDescriptor, false, false)
+    val query = (qDescJson \ "query").extract[String]
+    val metadata = (qDescJson \ "metadata").extract[String]
+
+  }
+  catch {
+    case x: Exception => m_log trace s"Could not parse query"
   }
 
 

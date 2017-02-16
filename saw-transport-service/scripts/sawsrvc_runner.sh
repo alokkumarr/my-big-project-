@@ -3,7 +3,7 @@
 # xdfts to be started in
 # /etc/rc.d/rc.local
 ##
-SAW_SERVICE_USER=saw-user
+SAW_SERVICE_USER=mapr
 (( $(id -u) == 0 )) && {
     echo rerun with $SAW_SERVICE_USER: "$0 $@"
     exec /bin/su $SAW_SERVICE_USER -c "$0 $@"

@@ -44,7 +44,6 @@
 		<ezmorph.version>0.8.1</ezmorph.version>
 		<amazon.s3>1.0</amazon.s3>
 		<kyro>3.0.0</kyro>
-		<scala.version>2.10</scala.version>
 		<common.lang>2.6</common.lang>
 		<json.vesion>20080701</json.vesion>		
 		<guava.version>20.0</guava.version>
@@ -52,10 +51,18 @@
 		<snappy.version>1.0.4.1</snappy.version>
 		<commons-collections.version>3.2.1</commons-collections.version>
 		<mapr.core.version>5.2.0</mapr.core.version>		
-		<mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>		
+		<mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
+		<akka.version>2.4.9</akka.version>
+		<scala.major.version>2.11</scala.major.version>
+		<scala.version>2.11.7</scala.version>
+		<Json4s.latestVersion>3.3.0</Json4s.latestVersion>
 		<rpm.saw.root>/opt</rpm.saw.root>
 	</properties>
 	<repositories>
+		<repository>
+			<id>maven2-central</id>
+			<url>http://central.maven.org/maven2/</url>
+		</repository>
 		<repository>
 			<id>maven2-repo</id>
 			<url>http://repo1.maven.apache.org/maven2</url>
@@ -99,6 +106,45 @@
 			</releases>
 		</repository>
 	</repositories>
+	<dependencies>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.1.8</version>
+		</dependency>
+		<dependency>
+			<groupId>com.typesafe.scala-logging</groupId>
+			<artifactId>scala-logging_${scala.major.version}</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>${scala.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json4s</groupId>
+			<artifactId>json4s-native_${scala.major.version}</artifactId>
+			<version>${Json4s.latestVersion}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json4s</groupId>
+			<artifactId>json4s-jackson_${scala.major.version}</artifactId>
+			<version>${Json4s.latestVersion}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.scalatest</groupId>
+			<artifactId>scalatest_${scala.major.version}</artifactId>
+			<version>2.2.6</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.scalactic</groupId>
+			<artifactId>scalactic_${scala.major.version}</artifactId>
+			<version>2.2.6</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 	<pluginRepositories>
 		<pluginRepository>
 			<id>typesafe-releases-plugins</id>
@@ -111,7 +157,7 @@
 	<modules>
 		<module>saw-common</module>	
 		<module>saw-metadata-service</module>	
-		<module>saw-business-service</module>			
+		<module>saw-data-access</module>
 		<module>saw-transport-service</module>					
 	</modules> 
 </project>
