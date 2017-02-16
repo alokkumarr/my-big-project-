@@ -15,6 +15,7 @@ object SAWServiceConfig {
   lazy val security_settings = conf.getConfig("security")
   lazy val dl_conf: Config = conf.getConfig("dl")
   lazy val metadataConfig : Config = conf.getConfig("metadata")
+  lazy val spark_conf : Config = conf.getConfig("spark")
 
 
 }

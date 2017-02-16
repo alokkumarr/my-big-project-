@@ -5,4 +5,8 @@ package sncr.saw.authorization
   */
 class Authorizarion {
 
+
+
+
+
 }
