@@ -6,7 +6,7 @@
         <artifactId>saw-services</artifactId>
         <version>1.0</version>
     </parent>
-	<artifactId>saw-business-service</artifactId>
+	<artifactId>saw-data-access</artifactId>
 	<packaging>jar</packaging>
 	<version>1.0</version>
 	<properties>
@@ -15,9 +15,6 @@
 		<java.version>1.8</java.version>
 		<maven.assembly.version>2.5.5</maven.assembly.version>
 		<project.basedir>.</project.basedir>
-		<scala.major.version>2.10</scala.major.version>
-		<scala.version>2.10.6</scala.version>
-		<Json4s.latestVersion>3.3.0</Json4s.latestVersion>
 		<mapr.client>5.2.0.39122-mapr</mapr.client>
 		<maprdb.version>1.1.1-mapr-1602</maprdb.version>
 		<jackson.core.version>2.7.1</jackson.core.version>
@@ -35,21 +32,88 @@
 		<artifactId>saw-metadata-service</artifactId>
 		<version>${project.version}</version>
 	</dependency>
-	<dependency>
-		<groupId>com.typesafe.scala-logging</groupId>
-		<artifactId>scala-logging-slf4j_${scala.major.version}</artifactId>
-		<version>2.1.2</version>
+	<!-- https://mvnrepository.com/artifact/com.typesafe.akka/akka-remote_2.11 -->
+	<!--dependency>
+		<groupId>com.typesafe.akka</groupId>
+		<artifactId>akka-remote_${scala.major.version}</artifactId>
+		<version>${akka.version}</version>
 	</dependency>
 	<dependency>
-		<groupId>ch.qos.logback</groupId>
-		<artifactId>logback-classic</artifactId>
-		<version>1.1.8</version>
+		<groupId>com.typesafe.akka</groupId>
+		<artifactId>akka-actor_${scala.major.version}</artifactId>
+		<version>${akka.version}</version>
 	</dependency>
 	<dependency>
-			<groupId>org.scala-lang</groupId>
-			<artifactId>scala-library</artifactId>
-			<version>${scala.version}</version>
+		<groupId>com.typesafe.akka</groupId>
+		<artifactId>akka-slf4j_${scala.major.version}</artifactId>
+		<version>${akka.version}</version>
+	</dependency -->
+	<!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql_2.11 -->
+	<!-- dependency>
+		<groupId>org.apache.spark</groupId>
+		<artifactId>spark-sql_${scala.major.version}</artifactId>
+		<version>1.6.1</version>
+	</dependency -->
+	<dependency>
+		<groupId>org.apache.spark</groupId>
+		<artifactId>spark-sql_2.10</artifactId>
+		<version>1.6.1</version>
+		<scope>system</scope>
+		<systemPath>${project.basedir}/spark-lib/spark-assembly-1.6.1-hadoop2.2.0.jar</systemPath>
 	</dependency>
+
+<!-- START: Spark custom pre-built package -->
+<!--
+	<dependency>
+		<groupId>org.apache.spark</groupId>
+		<artifactId>spark-assembly</artifactId>
+		<version>1.6.1-mapr-1608-hadoop2.7.0-mapr-1607</version>
+		<scope>system</scope>
+		<systemPath>${project.basedir}/spark-lib/spark-assembly-1.6.1-mapr-1608-hadoop2.7.0-mapr-1607.jar</systemPath>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.spark</groupId>
+		<artifactId>spark-catalyst_${scala.major.version}</artifactId>
+		<version>1.6.4-SNAPSHOT</version>
+		<scope>system</scope>
+		<systemPath>${project.basedir}/spark-lib/spark-catalyst_2.11-1.6.4-SNAPSHOT.jar</systemPath>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.spark</groupId>
+		<artifactId>spark-core_${scala.major.version}</artifactId>
+		<version>1.6.4-SNAPSHOT</version>
+		<scope>system</scope>
+		<systemPath>${project.basedir}/spark-lib/spark-core_2.11-1.6.4-SNAPSHOT.jar</systemPath>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.spark</groupId>
+		<artifactId>spark-launcher_${scala.major.version}</artifactId>
+		<version>1.6.4-SNAPSHOT</version>
+		<scope>system</scope>
+		<systemPath>${project.basedir}/spark-lib/spark-launcher_2.11-1.6.4-SNAPSHOT.jar</systemPath>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.spark</groupId>
+		<artifactId>spark-network-common_${scala.major.version}</artifactId>
+		<version>1.6.4-SNAPSHOT</version>
+		<scope>system</scope>
+		<systemPath>${project.basedir}/spark-lib/spark-network-common_2.11-1.6.4-SNAPSHOT.jar</systemPath>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.spark</groupId>
+		<artifactId>spark-network-shuffle_${scala.major.version}</artifactId>
+		<version>1.6.4-SNAPSHOT</version>
+		<scope>system</scope>
+		<systemPath>${project.basedir}/spark-lib/spark-network-shuffle_2.11-1.6.4-SNAPSHOT.jar</systemPath>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.spark</groupId>
+		<artifactId>spark-unsafe_${scala.major.version}</artifactId>
+		<version>1.6.4-SNAPSHOT</version>
+		<scope>system</scope>
+		<systemPath>${project.basedir}/spark-lib/spark-unsafe_2.11-1.6.4-SNAPSHOT.jar</systemPath>
+	</dependency -->
+<!-- END: Spark custom pre-built package -->
 
 	<!-- dependency>
 		<groupId>org.apache.hbase</groupId>
@@ -68,28 +132,6 @@
 		<version>${mapr.hadoop.client.version}</version>
 	</dependency -->
 
-	<dependency>
-		<groupId>org.json4s</groupId>
-		<artifactId>json4s-native_${scala.major.version}</artifactId>
-		<version>${Json4s.latestVersion}</version>
-	</dependency>
-	<dependency>
-		<groupId>org.json4s</groupId>
-		<artifactId>json4s-jackson_${scala.major.version}</artifactId>
-		<version>${Json4s.latestVersion}</version>
-	</dependency>
-	<dependency>
-	  <groupId>org.scalatest</groupId>
-	  <artifactId>scalatest_${scala.major.version}</artifactId>
-	  <version>2.2.6</version>
-	  <scope>test</scope>
-	</dependency>
-	<dependency>
-		<groupId>org.scalactic</groupId>
-		<artifactId>scalactic_${scala.major.version}</artifactId>
-		<version>2.2.6</version>
-		<scope>test</scope>
-	</dependency>
     </dependencies>
 	<build>
 		<sourceDirectory>${project.basedir}/src/main</sourceDirectory>
