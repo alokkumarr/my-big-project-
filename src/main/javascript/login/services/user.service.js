@@ -43,9 +43,8 @@ class UserService {
 
     return this._$http.post(this._AppConfig.login.url + route, resp.ticket.ticketId)
       .then(() => {
-
+        this._JwtService.destroy();
         if (path === 'logout') {
-          this._JwtService.destroy();
           this._$state.go('login');
         }
       });

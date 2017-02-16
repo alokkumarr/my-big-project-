@@ -2,7 +2,11 @@
   <md-card-header>
     <span class="card-title" ng-bind="$ctrl.filter.label"></span>
     <span flex></span>
-    <binary-option left="AND" right="OR" ng-model="$ctrl.filter.operator" on-change="$ctrl.onOperatorSelected(value)"></binary-option>
+    <binary-option left="{{::$ctrl.BOOLEAN_CRITERIA.AND}}"
+                   right="{{::$ctrl.BOOLEAN_CRITERIA.OR}}"
+                   ng-model="$ctrl.filter.booleanCriteria"
+                   on-change="$ctrl.onBooleanCriteriaSelected(value)">
+    </binary-option>
   </md-card-header>
 
   <md-card-content>

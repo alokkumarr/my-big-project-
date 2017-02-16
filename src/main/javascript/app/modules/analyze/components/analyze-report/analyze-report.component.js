@@ -1,15 +1,15 @@
-import filter from 'lodash/fp/filter';
+import fpFilter from 'lodash/fp/filter';
 import flatMap from 'lodash/fp/flatMap';
 import pipe from 'lodash/fp/pipe';
 import get from 'lodash/fp/get';
 import set from 'lodash/fp/set';
 import first from 'lodash/first';
-import map from 'lodash/fp/map';
-import find from 'lodash/find';
+import fpMap from 'lodash/fp/map';
+import map from 'lodash/map';
 import forEach from 'lodash/forEach';
-import uniq from 'lodash/uniq';
-import isEmpty from 'lodash/isEmpty';
 import clone from 'lodash/clone';
+import isEmpty from 'lodash/isEmpty';
+import filter from 'lodash/filter';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
@@ -19,17 +19,17 @@ export const AnalyzeReportComponent = {
   template,
   styles: [style],
   bindings: {
-    analysis: '<'
+    model: '<',
+    mode: '@'
   },
   controller: class AnalyzeReportController {
-    constructor($componentHandler, $mdDialog, $scope, $timeout, $log, AnalyzeService, FilterService) {
+    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, FilterService) {
       'ngInject';
 
       this._$componentHandler = $componentHandler;
       this._$mdDialog = $mdDialog;
       this._$scope = $scope;
       this._$timeout = $timeout;
-      this._$log = $log;
       this._AnalyzeService = AnalyzeService;
       this._FilterService = FilterService;
 
@@ -40,17 +40,14 @@ export const AnalyzeReportComponent = {
 
       this.states = {
         sqlMode: this.DESIGNER_MODE,
+        disable: {
+          designer: false
+        },
         detailsExpanded: false
       };
 
-      this.data = {
-        category: null,
-        title: 'Untitled Report',
-        description: '',
-        query: ''
-      };
-
       this.gridData = [];
+      this.filteredGridData = [];
       this.columns = [];
       this.filters = {
         // array of strings with the columns displayName that the filter is based on
@@ -67,15 +64,11 @@ export const AnalyzeReportComponent = {
       this._FilterService.onApplyFilters(filters => this.onApplyFilters(filters));
       this._FilterService.onClearAllFilters(() => this.onClearAllFilters());
 
-      if (this.analysis.name) {
-        this.data.title = this.analysis.name;
+      if (this.mode === 'fork') {
+        this.model.id = null;
       }
 
-      if (this.analysis.description) {
-        this.data.description = this.analysis.description;
-      }
-
-      this.unregister = this._$componentHandler.events.on('$onInstanceAdded', e => {
+      this.unregister = this._$componentHandler.on('$onInstanceAdded', e => {
         if (e.key === 'ard-canvas') {
           this.initCanvas(e.instance);
         }
@@ -96,6 +89,7 @@ export const AnalyzeReportComponent = {
       this._AnalyzeService.getDataByQuery()
         .then(data => {
           this.gridData = data;
+          this.filteredGridData = data;
           this.reloadPreviewGrid();
           this.showFiltersButtonIfDataIsReady();
         });
@@ -107,27 +101,31 @@ export const AnalyzeReportComponent = {
           this.fillCanvas(data);
           this.reloadPreviewGrid();
           this.showFiltersButtonIfDataIsReady();
+          this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
+          if (!isEmpty(this.canvas.model.filters)) {
+            this.filters.selected = this.canvas.filters;
+            this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.canvas.filters, this.filters.possible);
+          }
         });
     }
 
     generateQuery() {
       this._AnalyzeService.generateQuery({})
         .then(result => {
-          this.data.query = result.query;
+          this.model.query = result.query;
         });
     }
 
-    // end requests
+    // END requests
 
-// filters section
+    // filters section
     openFilterSidenav() {
-      // TODO link this to when the canvas models selected fields change
-      // TODO link filters to the report grid
-      if (isEmpty(this.filters.selected)) {
-        this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
-      }
-
       this._FilterService.openFilterSidenav(this.filters.possible);
+    }
+
+    generateFiltersOnCanvasChange() {
+      this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
+      this.clearFilters();
     }
 
     showFiltersButtonIfDataIsReady() {
@@ -138,39 +136,38 @@ export const AnalyzeReportComponent = {
 
     onApplyFilters(filters) {
       this.filters.possible = filters;
-      this.filters.selected = pipe(
-        filter(get('model')),
-        map(get('label'))
-      )(filters);
+      this.filters.selected = this._FilterService.getSelectedFilterMapper()(filters);
+
+      this.filterGridData();
+    }
+
+    filterGridData() {
+      this.filteredGridData = this._FilterService.getGridDataFilter(this.filters.selected)(this.gridData);
+
+      this.reloadPreviewGrid();
     }
 
     onClearAllFilters() {
-      this.filters.possible = map(pipe(
-        set('model', null),
-        set('operator', DEFAULT_FILTER_OPERATOR)
-      ), this.filters);
-      this.filters.selected = [];
+      this.clearFilters();
     }
 
-    onFilterRemoved(chipString) {
-      const filter = find(this.filters.possible, filter => filter.label === chipString);
+    clearFilters() {
+      this.filters.possible = this._FilterService.getFilterClearer()(this.filters.possible);
+      this.filters.selected = [];
+      this.filteredGridData = this.gridData;
+      this.reloadPreviewGrid();
+    }
+
+    onFilterRemoved(filter) {
       filter.model = null;
+      this.filterGridData();
     }
 
     generateFilters(selectedFields, gridData) {
-      return pipe(
-        filter(get('isFilterEligible')),
-        map(field => {
-          return {
-            label: field.alias || field.displayName,
-            name: field.name,
-            type: field.type,
-            items: field.type === 'string' ? uniq(map(get(field.name), gridData)) : null
-          };
-        }))(selectedFields);
+      return this._FilterService.getCanvasFieldsToFiltersMapper(gridData)(selectedFields);
     }
 
-// END filters section
+    // END filters section
 
     cancel() {
       this._$mdDialog.cancel();
@@ -178,18 +175,30 @@ export const AnalyzeReportComponent = {
 
     toggleDetailsPanel() {
       this.states.detailsExpanded = !this.states.detailsExpanded;
+
+      if (this.states.detailsExpanded) {
+        this._$timeout(() => {
+          this.reloadPreviewGrid();
+        });
+      }
     }
 
     initCanvas(canvas) {
       this.canvas = canvas;
 
-      this.getArtifacts();
+      if (!this.model.artifacts) {
+        this.getArtifacts();
+      } else {
+        this.fillCanvas(this.model.artifacts);
+        this.reloadPreviewGrid();
+      }
 
-      this.canvas._$eventHandler.on('changed', () => {
+      this.canvas._$eventEmitter.on('changed', () => {
+        this.generateFiltersOnCanvasChange();
         this.reloadPreviewGrid();
       });
 
-      this.canvas._$eventHandler.on('sortChanged', () => {
+      this.canvas._$eventEmitter.on('sortChanged', () => {
         this.reloadPreviewGrid();
       });
     }
@@ -253,14 +262,8 @@ export const AnalyzeReportComponent = {
           });
         });
 
-        forEach(itemA.sql_builder.filters, itemB => {
-          model.addFilter({
-            table: itemA.artifact_name,
-            field: itemB.column_name,
-            booleanCriteria: itemB.boolean_criteria,
-            operator: itemB.operator,
-            searchConditions: itemB.search_conditions
-          });
+        forEach(itemA.sql_builder.filters, backEndFilter => {
+          model.addFilter(this._FilterService.getFrontEnd2BackEndFilterMapper()(backEndFilter));
         });
       });
       /* eslint-enable camelcase */
@@ -303,7 +306,7 @@ export const AnalyzeReportComponent = {
         });
 
         const joins = filter(model.joins, join => {
-          return join.leftSide.table === table;
+          return join.leftSide.table.name === table.name;
         });
 
         forEach(joins, join => {
@@ -327,9 +330,9 @@ export const AnalyzeReportComponent = {
           tableArtifact.sql_builder.joins.push(joinArtifact);
         });
 
-        const sorts = filter(model.sorts, sort => {
+        const sorts = filter(sort => {
           return sort.table === table;
-        });
+        }, model.sorts);
 
         forEach(sorts, sort => {
           const sortArtifact = {
@@ -340,34 +343,22 @@ export const AnalyzeReportComponent = {
           tableArtifact.sql_builder.order_by_columns.push(sortArtifact);
         });
 
-        const groups = filter(model.groups, group => {
+        const groups = filter(group => {
           return group.table === table;
-        });
+        }, model.groups);
 
         forEach(groups, group => {
           tableArtifact.sql_builder.group_by_columns.push(group.field.name);
         });
 
-        const filters = filter(model.filters, filter => {
-          return filter.table === table;
-        });
-
-        forEach(filters, filter => {
-          const filterArtifact = {
-            column_name: filter.field.name,
-            boolean_criteria: filter.booleanCriteria,
-            operator: filter.operator,
-            search_conditions: filter.searchConditions
-          };
-
-          tableArtifact.sql_builder.filters.push(filterArtifact);
-        });
+        tableArtifact.sql_builder.filters = pipe(
+          filter(artifactFilter => artifactFilter.tableName === tableArtifact.artifact_name),
+          map(this._FilterService.getFrontEnd2BackEndFilterMapper())
+        )(this.filters.selected);
       });
       /* eslint-enable camelcase */
 
-      return {
-        _artifacts: tableArtifacts
-      };
+      return tableArtifacts;
     }
 
     reloadPreviewGrid() {
@@ -385,7 +376,7 @@ export const AnalyzeReportComponent = {
       if (grid) {
         grid.updateColumns(this.columns);
         grid.updateSorts(sorts);
-        grid.updateSource(this.gridData);
+        grid.updateSource(this.filteredGridData);
         grid.refreshGrid();
       }
     }
@@ -393,15 +384,17 @@ export const AnalyzeReportComponent = {
     getSelectedColumns(tables) {
       return pipe(
         flatMap(get('fields')),
-        filter(get('checked'))
+        fpFilter(get('checked'))
       )(tables);
     }
 
     setSqlMode(mode) {
-      this.states.sqlMode = mode;
+      if (this.states.sqlMode !== mode) {
+        this.states.sqlMode = mode;
 
-      if (mode === this.QUERY_MODE) {
-        this.generateQuery();
+        if (mode === this.QUERY_MODE) {
+          this.generateQuery();
+        }
       }
     }
 
@@ -418,13 +411,14 @@ export const AnalyzeReportComponent = {
     }
 
     openPreviewModal(ev) {
-      const tpl = '<analyze-report-preview model="$ctrl.model"></analyze-report-preview>';
+      const tpl = '<analyze-report-preview model="model"></analyze-report-preview>';
 
       this._$mdDialog
         .show({
           template: tpl,
           controller: scope => {
-            scope.$ctrl.model = {
+            scope.model = {
+              report: this.model,
               gridData: this.gridData,
               columns: this.columns,
               title: this.data.title,
@@ -447,6 +441,10 @@ export const AnalyzeReportComponent = {
     openSortModal(ev) {
       this.states.detailsExpanded = true;
 
+      this._$timeout(() => {
+        this.reloadPreviewGrid();
+      });
+
       const tpl = '<analyze-report-sort model="$ctrl.model"></analyze-report-sort>';
 
       this._$mdDialog
@@ -467,22 +465,22 @@ export const AnalyzeReportComponent = {
         })
         .then(sorts => {
           this.canvas.model.sorts = sorts;
-          this.canvas._$eventHandler.emit('sortChanged');
+          this.canvas._$eventEmitter.emit('sortChanged');
         });
     }
 
     openDescriptionModal(ev) {
-      const tpl = '<analyze-report-description model="$ctrl.model" on-save="$ctrl.onSave($data)"></analyze-report-description>';
+      const tpl = '<analyze-report-description model="model" on-save="onSave($data)"></analyze-report-description>';
 
       this._$mdDialog.show({
         template: tpl,
         controller: scope => {
-          scope.$ctrl.model = {
-            description: this.data.description
+          scope.model = {
+            description: this.model.description
           };
 
-          scope.$ctrl.onSave = data => {
-            this.data.description = data.description;
+          scope.onSave = data => {
+            this.model.description = data.description;
           };
         },
         controllerAs: '$ctrl',
@@ -499,25 +497,20 @@ export const AnalyzeReportComponent = {
         return;
       }
 
-      const tpl = '<analyze-report-save model="$ctrl.model" on-save="$ctrl.onSave($data)"></analyze-report-save>';
+      this.model.artifacts = this.generatePayload();
+
+      const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
       this._$mdDialog
         .show({
           template: tpl,
           controller: scope => {
-            scope.$ctrl.model = {
-              artifacts: this.generatePayload(),
-              category: this.data.category,
-              title: this.data.title,
-              description: this.data.description
-            };
+            scope.model = clone(this.model);
 
-            scope.$ctrl.onSave = data => {
-              this.data.category = data.category;
-              this.data.title = data.title;
-              this.data.description = data.description;
-
-              this._$log.log(data);
+            scope.onSave = data => {
+              this.model.name = data.name;
+              this.model.description = data.description;
+              this.model.category = data.category;
             };
           },
           controllerAs: '$ctrl',

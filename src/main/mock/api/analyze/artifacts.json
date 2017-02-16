@@ -117,16 +117,26 @@
           ]
         }
       ],
-      "filters": [
-        {
-          "column_name": "TotalPrice",
-          "boolean_criteria": "AND",
-          "operator": ">=",
-          "search_conditions": [
-            1
-          ]
-        }
-      ]
+      "filters": [{
+        "column_name": "TotalPrice",
+        "boolean_criteria": "AND",
+        "filter_type": "int",
+        "operator": "x >",
+        "search_conditions": [
+          1
+        ]
+      }, {
+        "column_name": "WarehouseName",
+        "boolean_criteria": "OR",
+        "filter_type": "string",
+        "operator": null,
+        "search_conditions": [
+          "Warehouse1",
+          "Warehouse2",
+          "Warehouse3",
+          "Warehouse5"
+        ]
+      }]
     }
   },
   {

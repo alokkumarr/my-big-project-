@@ -5,11 +5,13 @@ export const AnalyzeCardComponent = {
   template,
   styles: [style],
   bindings: {
-    metadata: '<'
+    model: '<',
+    onAction: '&'
   },
   controller: class AnalyzeCardController {
 
     constructor($mdDialog) {
+      'ngInject';
       this._$mdDialog = $mdDialog;
     }
 
@@ -34,11 +36,23 @@ export const AnalyzeCardComponent = {
     }
 
     openPrintModal(ev) {
-
     }
 
     openExportModal(ev) {
+    }
 
+    fork() {
+      this.onAction({
+        type: 'fork',
+        model: this.model
+      });
+    }
+
+    edit() {
+      this.onAction({
+        type: 'edit',
+        model: this.model
+      });
     }
   }
 };
