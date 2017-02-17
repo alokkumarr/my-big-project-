@@ -81,7 +81,7 @@ function realpath ()
 function mk_pidfile_name ()
 {
     # Use SAW_SERVICE_PORT value
-    echo xdfts.${SAW_SERVICE_PORT:?}.pid
+    echo saw.${SAW_SERVICE_PORT:?}.pid
 }
 
 ###  ------------------------------- ###
@@ -100,7 +100,7 @@ declare -r saw_service_home="${SAW_SERVICE_HOME:-$(realpath "$(dirname $THIS_FIL
 vlog xdfts_home: $saw_service_home
 ( cd $saw_service_home ) || exit
 
-declare -r pidfile_path=/var/saw/run/$(mk_pidfile_name)
+declare -r pidfile_path=/var/saw/service/run/$(mk_pidfile_name)
 vlog pidfile_path: $pidfile_path
 
 # Check pid file exists and service process with stored pid is running
@@ -135,7 +135,7 @@ declare -r lib_dir="${saw_service_home}/lib"
 vlog lib_dir: $lib_dir
 ( cd $lib_dir ) || exit
 
-declare -r log_dir="${saw_service_home}/var/log"
+declare -r log_dir="/var/saw/service/log"
 vlog log_dir: $log_dir
 ( cd $log_dir ) || exit
 

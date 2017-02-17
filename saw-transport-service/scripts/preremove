@@ -2,11 +2,11 @@
 
 source /etc/saw/service.env || exit
 
-echo "Remove link on current version of XDF Transport Server"
+echo "Remove link on current version of SAW Common Service"
 
-rm -rf ${SAW_HOME}/service/var/log/*
+rm -rf /var/saw/service/log/*
 rm -f ${SAW_HOME}/service
 rm -f /etc/saw/service.env
 
 
-echo "XDF Transport Server pre-remove step has been completed"
+echo "SAW Common Service pre-remove step has been completed"

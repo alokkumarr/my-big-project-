@@ -3,6 +3,7 @@ package sncr.request
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json._
 import sncr.metadata.MetadataDictionary
+import sncr.saw.common.config.SAWServiceConfig
 
 
 /**
@@ -19,22 +20,22 @@ class Extractor {
 
   def validateRequest(json: JsValue) : (Boolean, String) =
   {
-    val (usid_bRes , uid) = testField(json, MetadataDictionary.user_id.toString )
-    if ( !usid_bRes) return (false, "User info is missing")
-    security(MetadataDictionary.user_id.toString) = uid.get
+    val secBypass : Boolean = SAWServiceConfig.security_settings.getBoolean("bypass")
+    if ( !secBypass) {
+      val (usid_bRes, uid) = testField(json, MetadataDictionary.user_id.toString)
+      if (!usid_bRes) return (false, "User info is missing")
+      security(MetadataDictionary.user_id.toString) = uid.get
 
-    val (dsk_bRes , dsk) = testField(json,MetadataDictionary.DSK.toString)
-    if ( !dsk_bRes) return (false, "DSK is missing")
-    security(MetadataDictionary.DSK.toString) = dsk.get
+      val (dsk_bRes, dsk) = testField(json, MetadataDictionary.DSK.toString)
+      if (!dsk_bRes) return (false, "DSK is missing")
+      security(MetadataDictionary.DSK.toString) = dsk.get
 
-    val (tkn_bRes , token) = testField(json,MetadataDictionary.Token.toString)
-    if ( !tkn_bRes) return (false, "Token is missing")
-    security(MetadataDictionary.Token.toString) = token.get
-
+      val (tkn_bRes, token) = testField(json, MetadataDictionary.Token.toString)
+      if (!tkn_bRes) return (false, "Token is missing")
+      security(MetadataDictionary.Token.toString) = token.get
+    }
     (true, "SUCCESS")
   }
-
-
 
 
   def getDataDescriptorHeader(json: JsValue) : (Boolean, String) =
@@ -63,9 +64,9 @@ class Extractor {
 
     //TODO:: Strictly speaking the object type is optional in ES requests. Think about???
     val (ot_bRes, ot_value) = testField(json, "object_type")
-    val ot = if (ot_bRes) Option(ot_value.get) else None
+    val ot = if (ot_bRes) values(MetadataDictionary.object_type.toString) = ot_value.get
     m_log debug "Extracted object type: " + ot
-    values(MetadataDictionary.object_type.toString) = ot
+
 
     val (v_bRes, v_value) = testField(json, "verb")
     if (!v_bRes) return (false, "Storage type (ES) requires ES verb")

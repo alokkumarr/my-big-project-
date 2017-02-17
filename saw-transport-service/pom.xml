@@ -4,11 +4,11 @@
     <parent>
         <groupId>com.synchronoss</groupId>
         <artifactId>saw-services</artifactId>
-        <version>1.0</version>
+        <version>1.0.0</version>
     </parent>
     <artifactId>saw-transport-service</artifactId>
     <packaging>jar</packaging>
-    <version>1.0</version>
+    <version>1.0.0</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slf4j.version>1.7.21</slf4j.version>
@@ -18,15 +18,16 @@
         <Json4s.latestVersion>3.3.0</Json4s.latestVersion>
         <play2.version>2.5.10</play2.version>
         <play2.plugin.version>1.0.0-beta5</play2.plugin.version>
-        <play2.scala.version>2.11.7</play2.scala.version>
         <mapr.client>5.2.0.39122-mapr</mapr.client>
         <play2.json.reactive.mongo>0.11.11</play2.json.reactive.mongo>
         <io.netty.version>4.0.36.Final</io.netty.version>
         <spring.release>4.1.6.RELEASE</spring.release>
         <jackson.core.version>2.7.1</jackson.core.version>
         <rpm.bda.root>/opt</rpm.bda.root>
-        <rpm.release>0.0</rpm.release>
-        <rpm.version>1</rpm.version>
+        <rpm.release>1</rpm.release>
+        <rpm.version>${project.version}</rpm.version>
+        <akka.version>2.4.9</akka.version>
+        <scala.major.version>2.11</scala.major.version>
         <app.user>mapr</app.user>
         <app.group>mapr</app.group>
         <mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
@@ -51,6 +52,11 @@
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-slf4j_${scala.major.version}</artifactId>
             <version>${akka.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-stream_${scala.major.version}</artifactId>
+            <version>2.4.4</version>
         </dependency>
         <dependency>
             <groupId>com.typesafe.play</groupId>
@@ -288,63 +294,59 @@
                     <version>3.2.1.Final</version>
                 </dependency>
         -->
-                <dependency>
-                    <groupId>com.fasterxml</groupId>
-                    <artifactId>classmate</artifactId>
-                    <version>1.1.0</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-annotations</artifactId>
-                    <version>${jackson.core.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-core</artifactId>
-                    <version>${jackson.core.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-databind</artifactId>
-                    <version>${jackson.core.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.fasterxml.jackson.datatype</groupId>
-                    <artifactId>jackson-datatype-jdk8</artifactId>
-                    <version>${jackson.core.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.fasterxml.jackson.datatype</groupId>
-                    <artifactId>jackson-datatype-jsr310</artifactId>
-                    <version>${jackson.core.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>javax.el</groupId>
-                    <artifactId>javax.el-api</artifactId>
-                    <version>3.0.0</version>
-                </dependency>
-				
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.2</version>
+            <groupId>com.fasterxml</groupId>
+            <artifactId>classmate</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+            <version>${jackson.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>javax.el-api</artifactId>
+            <version>3.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpasyncclient</artifactId>
             <version>4.1.1</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore-nio -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>4.4.5</version>
+            <artifactId>httpcore-nio</artifactId>
+            <version>4.4.6</version>
         </dependency>
+
         <!-- https://mvnrepository.com/artifact/commons-httpclient/commons-httpclient -->
-        <dependency>
+        <!-- dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
-        </dependency>
+        </dependency -->
     </dependencies>
     <build>
         <sourceDirectory>${project.basedir}/app</sourceDirectory>
@@ -496,7 +498,7 @@
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/var/log</directory>
+                            <directory>/var/saw/service/log</directory>
                             <filemode>644</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
@@ -510,7 +512,7 @@
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/var/run</directory>
+                            <directory>/var/saw/service/run</directory>
                             <filemode>644</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>

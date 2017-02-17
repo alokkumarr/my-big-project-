@@ -4,7 +4,7 @@
 
 	<groupId>com.synchronoss</groupId>
 	<artifactId>saw-services</artifactId>
-	<version>1.0</version>
+	<version>1.0.0</version>
 	<packaging>pom</packaging>
 	
 	<name>Data Processing Framework</name>
@@ -52,9 +52,8 @@
 		<commons-collections.version>3.2.1</commons-collections.version>
 		<mapr.core.version>5.2.0</mapr.core.version>		
 		<mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
-		<akka.version>2.4.9</akka.version>
 		<scala.major.version>2.11</scala.major.version>
-		<scala.version>2.11.7</scala.version>
+		<scala.version>2.11.8</scala.version>
 		<Json4s.latestVersion>3.3.0</Json4s.latestVersion>
 		<rpm.saw.root>/opt</rpm.saw.root>
 	</properties>
@@ -111,6 +110,16 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>1.1.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>4.4.6</version>
 		</dependency>
 		<dependency>
 			<groupId>com.typesafe.scala-logging</groupId>

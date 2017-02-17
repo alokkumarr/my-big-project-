@@ -4,11 +4,11 @@
     <parent>
         <groupId>com.synchronoss</groupId>
         <artifactId>saw-services</artifactId>
-        <version>1.0</version>
+        <version>1.0.0</version>
     </parent>
     <artifactId>saw-common</artifactId>
     <packaging>jar</packaging>
-    <version>1.0</version>
+    <version>1.0.0</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slf4j.version>1.7.21</slf4j.version>
@@ -16,10 +16,7 @@
         <maven.assembly.version>2.5.5</maven.assembly.version>
         <project.basedir>.</project.basedir>
         <Json4s.latestVersion>3.3.0</Json4s.latestVersion>
-        <mapr.client>5.2.0.39122-mapr</mapr.client>
-        <maprdb.version>1.1.1-mapr-1602</maprdb.version>
         <jackson.core.version>2.7.1</jackson.core.version>
-        <mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
     </properties>
     <pluginRepositories>
         <pluginRepository>

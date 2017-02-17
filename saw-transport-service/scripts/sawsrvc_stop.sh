@@ -16,7 +16,7 @@ source /etc/saw/service.env || exit
 SAW_SERVICE_HOST=$(/bin/hostname -s)
 
 #
-pid_fnm=$(cd $(dirname $0)/.. ; pwd)/var/run/saw.$SAW_SERVICE_PORT.pid
+pid_fnm=/var/saw/service/run/saw.$SAW_SERVICE_PORT.pid
 [[ -s $pid_fnm ]]                           && echo FNM: $pid_fnm       &&
 pid=$( <$pid_fnm )                          && echo PID: $pid           &&
 [[ -d /proc/${pid:-000} ]]                  && echo OK: -d /proc/$pid   &&

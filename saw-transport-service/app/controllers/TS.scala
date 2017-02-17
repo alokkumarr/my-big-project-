@@ -88,13 +88,31 @@ class TS extends Controller {
       return play.mvc.Results.unauthorized(res)
     }
 
-    val secBypass = SAWServiceConfig.security_settings.getBoolean("bypass")
-    if ( secBypass == null || !secBypass){
-      val tokenValidator  = new TokenValidator(extractor.security.get(MetadataDictionary.Token.toString).get.asInstanceOf[String])
-      if (!tokenValidator.validate)
-      {
-        res.put("result", "Provided token is invalid")
-        return play.mvc.Results.unauthorized(res)
+    val secBypass : Boolean = SAWServiceConfig.security_settings.getBoolean("bypass")
+    if ( !secBypass){
+      try {
+        val tokenValidator = new TokenValidator(extractor.security.get(MetadataDictionary.Token.toString).get.asInstanceOf[String])
+        if (!tokenValidator.validate) {
+          res.put("result", "Provided token is invalid")
+          return play.mvc.Results.unauthorized(res)
+        }
+      }
+      catch {
+        case x: Exception => {
+            m_log error("Token validation could not be executed: ", x)
+            res.put("result", "Service unavailable")
+            return play.mvc.Results.unauthorized(res)
+        }
+        case tout: java.util.concurrent.TimeoutException => {
+            m_log error ("Token validation could not be executed: ", tout)
+            res.put("result", "Service unavailable")
+            return play.mvc.Results.unauthorized(res)
+        }
+        case _ : Throwable => {
+            m_log error "Token validation could not be executed: Reason unknown"
+            res.put("result", "Unknown reason")
+            return play.mvc.Results.unauthorized(res)
+        }
       }
     }
 
@@ -120,9 +138,6 @@ class TS extends Controller {
     }
 
   }
-
-
-
 
 }
 
