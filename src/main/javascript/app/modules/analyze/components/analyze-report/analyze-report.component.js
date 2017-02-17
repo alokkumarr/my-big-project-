@@ -1,10 +1,9 @@
 import fpFilter from 'lodash/fp/filter';
-import flatMap from 'lodash/fp/flatMap';
-import pipe from 'lodash/fp/pipe';
-import get from 'lodash/fp/get';
-import set from 'lodash/fp/set';
-import first from 'lodash/first';
+import fpFlatMap from 'lodash/fp/flatMap';
+import fpPipe from 'lodash/fp/pipe';
+import fpGet from 'lodash/fp/get';
 import fpMap from 'lodash/fp/map';
+import first from 'lodash/first';
 import map from 'lodash/map';
 import forEach from 'lodash/forEach';
 import clone from 'lodash/clone';
@@ -13,7 +12,6 @@ import filter from 'lodash/filter';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
-import {DEFAULT_FILTER_OPERATOR} from '../../services/filter.service';
 
 export const AnalyzeReportComponent = {
   template,
@@ -351,9 +349,9 @@ export const AnalyzeReportComponent = {
           tableArtifact.sql_builder.group_by_columns.push(group.field.name);
         });
 
-        tableArtifact.sql_builder.filters = pipe(
+        tableArtifact.sql_builder.filters = fpPipe(
           filter(artifactFilter => artifactFilter.tableName === tableArtifact.artifact_name),
-          map(this._FilterService.getFrontEnd2BackEndFilterMapper())
+          fpMap(this._FilterService.getFrontEnd2BackEndFilterMapper())
         )(this.filters.selected);
       });
       /* eslint-enable camelcase */
@@ -382,9 +380,9 @@ export const AnalyzeReportComponent = {
     }
 
     getSelectedColumns(tables) {
-      return pipe(
-        flatMap(get('fields')),
-        fpFilter(get('checked'))
+      return fpPipe(
+        fpFlatMap(fpGet('fields')),
+        fpFilter(fpGet('checked'))
       )(tables);
     }
 

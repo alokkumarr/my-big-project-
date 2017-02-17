@@ -9,6 +9,7 @@ import {
   JSPlumbJoinDialog
 } from './jsPlumb';
 import {PanelComponent} from './panel';
+import {SearchBoxComponent} from './search-box/search-box.component';
 import {RangeSliderComponent} from './range-slider/range-slider.component';
 import {mdButtonGroupComponent} from './md-button-group/md-button-group.component';
 import {ChoiceGroupComponent} from './choice-group';
@@ -30,6 +31,7 @@ angular
   .component('jsPlumbJoinLabel', JSPlumbJoinLabel)
   .component('jsPlumbJoinDialog', JSPlumbJoinDialog)
   .component('panel', PanelComponent)
+  .component('searchBox', SearchBoxComponent)
   .component('rangeSlider', RangeSliderComponent)
   .component('choiceGroup', ChoiceGroupComponent)
   .component('mdButtonGroup', mdButtonGroupComponent)
