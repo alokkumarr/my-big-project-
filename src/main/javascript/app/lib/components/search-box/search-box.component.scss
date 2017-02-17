@@ -1,0 +1,126 @@
+search-box {
+  display: inline-flex;
+
+  .search-box {
+    display: flex;
+    flex-wrap: nowrap;
+
+    md-icon.icon-search {
+      height: 30px;
+      min-height: 30px;
+      width: 30px;
+      min-width: 30px;
+      margin: 0;
+      text-align: center;
+      border: 1px solid transparent;
+      border-right-width: 0;
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px;
+      transition: 0.3s linear all;
+
+      &:hover {
+        background-color: #F6F8FB;
+        border-color: #CECECE;
+      }
+    }
+
+    input {
+      margin-left: -1px;
+      width: 0;
+      max-width: 306px;
+      height: 30px;
+      min-height: 30px;
+      padding: 0;
+      background-color: #F6F8FB;
+      color: #5C6670;
+      font-size: 12px;
+      font-weight: 600;
+      border: 0 solid #CECECE;
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+      outline: none;
+      transition: 0.3s linear all;
+    }
+
+    &.m-hovered {
+      md-icon.icon-search {
+        background-color: #F6F8FB;
+        border-color: #CECECE;
+      }
+
+      input {
+        width: 306px;
+        padding: 5px;
+        border-width: 1px;
+        border-left-width: 0;
+        transition: 0.75s linear all;
+      }
+    }
+
+    ::-webkit-input-placeholder {
+      color: #5C6670;
+      opacity: 0.55;
+      transition: opacity 0.35s ease-in-out;
+    }
+
+    :-moz-placeholder {
+      color: #5C6670;
+      opacity: 0.55;
+      transition: opacity 0.35s ease-in-out;
+    }
+
+    ::-moz-placeholder {
+      color: #5C6670;
+      opacity: 0.55;
+      transition: opacity 0.35s ease-in-out;
+    }
+
+    :-ms-input-placeholder {
+      color: #5C6670;
+      opacity: 0.55;
+      transition: opacity 0.35s ease-in-out;
+    }
+
+    /* Place Holder CSS for Hover */
+    :hover::-webkit-input-placeholder {
+      opacity: 0.75;
+      transition: opacity 0.35s ease-in-out;
+    }
+
+    :hover:-moz-placeholder {
+      opacity: 0.75;
+      transition: opacity 0.35s ease-in-out;
+    }
+
+    :hover::-moz-placeholder {
+      opacity: 0.75;
+      transition: opacity 0.35s ease-in-out;
+    }
+
+    :hover:-ms-input-placeholder {
+      opacity: 0.75;
+      transition: opacity 0.35s ease-in-out;
+    }
+
+    /* Place Holder CSS for Focus */
+    :focus::-webkit-input-placeholder {
+      opacity: 0;
+      transition: opacity 0.35s ease-in-out;
+    }
+
+    :focus:-moz-placeholder {
+      opacity: 0;
+      transition: opacity 0.35s ease-in-out;
+    }
+
+    :focus::-moz-placeholder {
+      opacity: 0;
+      transition: opacity 0.35s ease-in-out;
+    }
+
+    :focus:-ms-input-placeholder {
+      opacity: 0;
+      transition: opacity 0.35s ease-in-out;
+    }
+  }
+}

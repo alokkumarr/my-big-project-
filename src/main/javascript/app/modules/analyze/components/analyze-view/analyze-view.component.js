@@ -20,7 +20,8 @@ export const AnalyzeViewComponent = {
 
       this.states = {
         reportView: 'card',
-        reportType: 'all'
+        reportType: 'all',
+        searchTerm: ''
       };
     }
 
@@ -37,10 +38,11 @@ export const AnalyzeViewComponent = {
     }
 
     loadAnalyses() {
-      this._AnalyzeService.getAnalyses(this.$state.params.id)
-        .then(analyses => {
-          this.reports = analyses;
-        });
+      this._AnalyzeService.getAnalyses(this.$state.params.id, {
+        filter: this.states.searchTerm
+      }).then(analyses => {
+        this.reports = analyses;
+      });
     }
 
     getGridConfig() {
@@ -136,11 +138,13 @@ export const AnalyzeViewComponent = {
     }
 
     filterReports(item) {
+      let isIncluded = true;
+
       if (this.states.reportType !== 'all') {
-        return this.states.reportType === item.type;
+        isIncluded = this.states.reportType === item.type;
       }
 
-      return true;
+      return isIncluded;
     }
 
     onCardAction(actionType, model) {
