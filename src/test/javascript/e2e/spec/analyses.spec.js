@@ -52,8 +52,8 @@ describe('Analyses Tests', () => {
     analyze.analysisElems.reportCategory.click();
     analyze.analysisElems.firstCategoryOption.click();
     expect(analyze.analysisElems.reportCategory.getText()).toEqual('Order Fulfillment');
-    analyze.analysisElems.reportName.clear().sendKeys('e2e report');
-    analyze.analysisElems.reportDescription.clear().sendKeys('e2e test description');
+    analyze.analysisElems.reportNameField.clear().sendKeys('e2e report');
+    analyze.analysisElems.reportDescriptionField.clear().sendKeys('e2e test description');
     analyze.analysisElems.saveReportDetails.click();
   });
 
