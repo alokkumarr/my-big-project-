@@ -1,5 +1,3 @@
-import forEach from 'lodash/forEach';
-
 class HighlightFilter {
   static highlightText(text, term, modifiers = 'ig', className = 'highlight') {
     if (text && term) {
