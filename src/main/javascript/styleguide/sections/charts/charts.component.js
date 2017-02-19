@@ -31,16 +31,6 @@ export const ChartsComponent = {
         series: this.generateData()
       };
 
-      this.gridOptions = {
-        rowHeight: 36,
-        data: map(this.lineChartOptions.series, series => {
-          return {
-            name: series.name,
-            values: sum(series.data)
-          };
-        })
-      };
-
       this.getGridConfig = () => {
         const dataSource = map(this.lineChartOptions.series, series => {
           return {

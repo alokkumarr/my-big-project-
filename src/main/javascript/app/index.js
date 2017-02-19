@@ -27,7 +27,6 @@ import {themeConfig} from './theme';
 import {i18nConfig} from './i18n';
 import {config} from './config';
 import {runConfig} from './run';
-import {idleConfig} from './idle';
 
 import {LibModule} from './lib';
 import {ObserveModule} from './modules/observe';
@@ -58,7 +57,6 @@ angular
   ])
   .config(routesConfig)
   .config(themeConfig)
-  .config(idleConfig)
   .config(i18nConfig)
   .config(config)
   .run(runConfig)
