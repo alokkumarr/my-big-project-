@@ -4,8 +4,10 @@ import 'angular-ui-router';
 import 'angular-material';
 import 'angular-material/angular-material.css';
 
-import 'angular-ui-grid';
-import 'angular-ui-grid/ui-grid.css';
+import 'angular-sanitize';
+import 'angular-translate';
+import 'angular-translate/dist/angular-translate-loader-partial/angular-translate-loader-partial';
+import 'angular-translate/dist/angular-translate-interpolation-messageformat/angular-translate-interpolation-messageformat';
 
 import 'ng-idle';
 
@@ -44,10 +46,11 @@ export const AppModule = 'app';
 angular
   .module(AppModule, [
     'ui.router',
+    'ngSanitize',
     'ngMaterial',
-    'dx',
-    'ui.grid',
     'ngIdle',
+    'dx',
+    'pascalprecht.translate',
     LibModule,
     ObserveModule,
     AnalyzeModule,

@@ -41,6 +41,39 @@ export const ChartsComponent = {
         })
       };
 
+      this.getGridConfig = () => {
+        const dataSource = map(this.lineChartOptions.series, series => {
+          return {
+            name: series.name,
+            value: sum(series.data)
+          };
+        });
+        const columns = [{
+          caption: 'Name',
+          dataField: 'name',
+          allowSorting: true,
+          alignment: 'left'
+        }, {
+          caption: 'Value',
+          dataField: 'value',
+          allowSorting: true,
+          alignment: 'left'
+        }];
+
+        return {
+          columns,
+          dataSource,
+          columnAutoWidth: true,
+          allowColumnReordering: true,
+          allowColumnResizing: true,
+          showColumnHeaders: true,
+          showColumnLines: false,
+          showRowLines: false,
+          showBorders: false,
+          rowAlternationEnabled: true
+        };
+      };
+
       this.areaChartOptions = {
         xAxis: {
           categories: ['M', 'T', 'W', 'Th', 'F', 'S', 'Su']

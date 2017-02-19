@@ -15,11 +15,11 @@ export default class AbstractComponentController {
   }
 
   on(...args) {
-    return this.$eventEmitter.on.apply(this.$eventEmitter, args);
+    return this.$eventEmitter.on(...args);
   }
 
   emit(...args) {
-    this.$eventEmitter.emit.apply(this.$eventEmitter, args);
+    this.$eventEmitter.emit(...args);
   }
 
   showDialog(config) {
