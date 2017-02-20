@@ -58,53 +58,11 @@
 		<rpm.saw.root>/opt</rpm.saw.root>
 	</properties>
 	<repositories>
-		<repository>
-			<id>maven2-central</id>
-			<url>http://central.maven.org/maven2/</url>
-		</repository>
-		<repository>
-			<id>maven2-repo</id>
-			<url>http://repo1.maven.apache.org/maven2</url>
-		</repository>
-		<repository>
-			<id>mapr-maven</id>
-			<url>http://repository.mapr.com/maven</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>mapr-maven2</id>
-			<url>http://repository.mapr.com/nexus/content/groups/mapr-public/releases</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>typesafe-releases</id>
-			<url>http://repo.typesafe.com/typesafe/releases/</url>
-		</repository>
-		<repository>
-			<id>typesafe-snapshots</id>
-			<url>http://repo.typesafe.com/typesafe/snapshots/</url>
-		</repository>
-		<repository>
-			<id>mapr-releases</id>
-			<url>http://repository.mapr.com/maven/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository>
-	</repositories>
+    <repository>
+      <id>synchronoss</id>
+      <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+    </repository>
+  </repositories>
 	<dependencies>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
