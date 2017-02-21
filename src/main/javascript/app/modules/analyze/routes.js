@@ -10,6 +10,10 @@ export function routesConfig($stateProvider) {
       name: 'analyze.view',
       url: '/:id',
       component: 'analyzeView'
+    }, {
+      name: 'analyze.detail',
+      url: '/analysis/:id',
+      component: 'analyzeDetailView'
     }
   ];
 

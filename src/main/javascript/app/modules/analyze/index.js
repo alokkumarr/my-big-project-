@@ -8,6 +8,8 @@ import {FilterService} from './services/filter.service';
 
 import {AnalyzePageComponent} from './components/analyze-page/analyze-page.component';
 import {AnalyzeViewComponent} from './components/analyze-view/analyze-view.component';
+import {AnalyzeChartDetailComponent} from './components/analyze-detail-view/chart/analyze-chart-detail.component';
+import {AnalyzeDetailViewComponent} from './components/analyze-detail-view/analyze-detail-view.component';
 import {AnalyzeCardComponent} from './components/analyze-card/analyze-card.component';
 import {AnalyzeNewComponent} from './components/analyze-new/analyze-new.component';
 import {AnalyzeReportComponent} from './components/analyze-report/analyze-report.component';
@@ -39,6 +41,8 @@ angular.module(AnalyzeModule, [])
   .component('reportRenameDialog', ReportRenameDialogComponent)
   .component('analyzePage', AnalyzePageComponent)
   .component('analyzeView', AnalyzeViewComponent)
+  .component('analyzeChartDetail', AnalyzeChartDetailComponent)
+  .component('analyzeDetailView', AnalyzeDetailViewComponent)
   .component('analyzeCard', AnalyzeCardComponent)
   .component('analyzeNew', AnalyzeNewComponent)
   .component('analyzeReport', AnalyzeReportComponent)

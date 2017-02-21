@@ -287,3 +287,7 @@
 .icon-vert-bar-chart:before {
   content: "\e937";
 }
+
+.icon-export:before {
+  content: url(../svg/export.svg);
+}
