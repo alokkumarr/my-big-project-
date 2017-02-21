@@ -33,7 +33,6 @@ export const SearchBoxComponent = {
       this.onDocumentClick = () => {
         if (!hasClickedOnTheElement) {
           this.states.focused = false;
-
           this.$scope.$evalAsync();
         }
 

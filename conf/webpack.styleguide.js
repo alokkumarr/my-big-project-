@@ -123,7 +123,8 @@ module.exports = () => {
         verbose: true
       }),
       new DefinePlugin({
-        '__DEVELOPMENT__': false
+        '__DEVELOPMENT__': false,
+        '__MOCK__': false
       }),
       new LoaderOptionsPlugin({
         options: {

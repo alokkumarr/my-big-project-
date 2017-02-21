@@ -6,7 +6,7 @@
         <span class="md-title" translate="ORDER_FULFILLMENT"></span>
         <search-box placeholder="Search Analyses"
                     ng-model="$ctrl.states.searchTerm"
-                    on-change="$ctrl.loadAnalyses()" delay="1000"></search-box>
+                    on-change="$ctrl.applySearchFilter()" delay="1000"></search-box>
       </div>
 
       <div flex="20" layout="row" layout-align="center center">
@@ -62,9 +62,15 @@
 
         <md-card-content layout="row">
           <div dx-data-grid="$ctrl.getGridConfig()" dx-item-alias="report">
+            <div data-options="dxTemplate: { name: 'nameCellTemplate' }">
+              <span ng-bind-html="::report.value | highlight:$ctrl.states.searchTerm"></span>
+            </div>
+            <div data-options="dxTemplate: { name: 'metricsCellTemplate' }">
+              <span ng-bind-html="::report.value | highlight:$ctrl.states.searchTerm"></span>
+            </div>
             <div data-options="dxTemplate: { name: 'typeCellTemplate' }">
               <md-chip class="tag-chip">
-                <span ng-bind="::report.value"></span>
+                <span ng-bind-html="::report.value | highlight:$ctrl.states.searchTerm"></span>
               </md-chip>
             </div>
             <div data-options="dxTemplate: { name: 'actionCellTemplate' }">
@@ -102,11 +108,9 @@
 
     <!-- CARD VIEW -->
     <div ng-switch-when="card" layout="row" layout-align="start start" layout-wrap>
-      <analyze-card flex="50"
-                    ng-repeat="report in $ctrl.reports | filter:$ctrl.filterReports.bind($ctrl)"
-                    model="report" on-action="$ctrl.onCardAction(type, model)"
-                    highlight-container="$ctrl.states.searchTerm"
-                    highlight-options="gi"></analyze-card>
+      <div flex="50" ng-repeat="report in $ctrl.reports | filter:$ctrl.filterReports.bind($ctrl)">
+        <analyze-card model="report" on-action="$ctrl.onCardAction(type, model)"></analyze-card>
+      </div>
     </div>
   </div>
 </div>

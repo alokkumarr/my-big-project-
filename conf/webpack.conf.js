@@ -95,7 +95,16 @@ module.exports = function (env) {
           test: /\.(css|scss)$/,
           loader: ExtractTextPlugin.extract({
             fallback: 'style-loader',
-            use: `css-loader${isProduction ? '?minimize' : ''}!sass-loader!postcss-loader`
+            use: [
+              {
+                loader: 'css-loader',
+                options: {
+                  minimize: isProduction
+                }
+              },
+              'sass-loader',
+              'postcss-loader'
+            ]
           })
         },
         {
