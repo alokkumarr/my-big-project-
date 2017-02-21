@@ -31,14 +31,37 @@ export const ChartsComponent = {
         series: this.generateData()
       };
 
-      this.gridOptions = {
-        rowHeight: 36,
-        data: map(this.lineChartOptions.series, series => {
+      this.getGridConfig = () => {
+        const dataSource = map(this.lineChartOptions.series, series => {
           return {
             name: series.name,
-            values: sum(series.data)
+            value: sum(series.data)
           };
-        })
+        });
+        const columns = [{
+          caption: 'Name',
+          dataField: 'name',
+          allowSorting: true,
+          alignment: 'left'
+        }, {
+          caption: 'Value',
+          dataField: 'value',
+          allowSorting: true,
+          alignment: 'left'
+        }];
+
+        return {
+          columns,
+          dataSource,
+          columnAutoWidth: true,
+          allowColumnReordering: true,
+          allowColumnResizing: true,
+          showColumnHeaders: true,
+          showColumnLines: false,
+          showRowLines: false,
+          showBorders: false,
+          rowAlternationEnabled: true
+        };
       };
 
       this.areaChartOptions = {

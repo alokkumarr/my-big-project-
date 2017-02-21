@@ -38,11 +38,20 @@ export const AnalyzeViewComponent = {
     }
 
     loadAnalyses() {
-      this._AnalyzeService.getAnalyses(this.$state.params.id, {
+      return this._AnalyzeService.getAnalyses(this.$state.params.id, {
         filter: this.states.searchTerm
       }).then(analyses => {
         this.reports = analyses;
+
+        if (this.states.reportView === this.LIST_VIEW) {
+          this._gridListInstance.option('dataSource', this.reports);
+          this._gridListInstance.refresh();
+        }
       });
+    }
+
+    applySearchFilter() {
+      this.loadAnalyses();
     }
 
     getGridConfig() {
@@ -52,7 +61,8 @@ export const AnalyzeViewComponent = {
         dataField: 'name',
         allowSorting: true,
         alignment: 'left',
-        width: '50%'
+        width: '50%',
+        cellTemplate: 'nameCellTemplate'
       }, {
         caption: 'METRICS',
         dataField: 'metrics',
@@ -61,7 +71,8 @@ export const AnalyzeViewComponent = {
         width: '20%',
         calculateCellValue: rowData => {
           return (rowData.metrics || []).join(', ');
-        }
+        },
+        cellTemplate: 'metricsCellTemplate'
       }, {
         caption: 'SCHEDULED',
         dataField: 'scheduled',

@@ -41,10 +41,11 @@
     </md-card-header>
 
     <md-card-content>
-      <chart class="content-component" options="$ctrl.lineChartOptions" ng-if="!showGrid "></chart>
+      <chart class="content-component" options="$ctrl.lineChartOptions" ng-if="!showGrid"></chart>
 
-      <div class="content-component" ng-if="showGrid " ui-grid="$ctrl.gridOptions"></div>
-
+      <div class="content-component" ng-if="showGrid">
+        <div dx-data-grid="$ctrl.getGridConfig()"></div>
+      </div>
     </md-card-content>
 
     <md-card-footer layout="row" layout-align="space-around center" style="height: 100px">
