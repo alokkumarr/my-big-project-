@@ -1,5 +1,7 @@
 .#{$theme-cls} {
   & md-input-container {
+    margin: 0;
+
     label {
       font-size: $input-font-size !important;
       font-weight: 400;

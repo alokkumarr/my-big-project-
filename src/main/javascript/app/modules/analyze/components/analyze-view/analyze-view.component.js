@@ -20,7 +20,8 @@ export const AnalyzeViewComponent = {
 
       this.states = {
         reportView: 'card',
-        reportType: 'all'
+        reportType: 'all',
+        searchTerm: ''
       };
     }
 
@@ -37,10 +38,20 @@ export const AnalyzeViewComponent = {
     }
 
     loadAnalyses() {
-      this._AnalyzeService.getAnalyses(this.$state.params.id)
-        .then(analyses => {
-          this.reports = analyses;
-        });
+      return this._AnalyzeService.getAnalyses(this.$state.params.id, {
+        filter: this.states.searchTerm
+      }).then(analyses => {
+        this.reports = analyses;
+
+        if (this.states.reportView === this.LIST_VIEW) {
+          this._gridListInstance.option('dataSource', this.reports);
+          this._gridListInstance.refresh();
+        }
+      });
+    }
+
+    applySearchFilter() {
+      this.loadAnalyses();
     }
 
     getGridConfig() {
@@ -50,7 +61,8 @@ export const AnalyzeViewComponent = {
         dataField: 'name',
         allowSorting: true,
         alignment: 'left',
-        width: '50%'
+        width: '50%',
+        cellTemplate: 'nameCellTemplate'
       }, {
         caption: 'METRICS',
         dataField: 'metrics',
@@ -59,7 +71,8 @@ export const AnalyzeViewComponent = {
         width: '20%',
         calculateCellValue: rowData => {
           return (rowData.metrics || []).join(', ');
-        }
+        },
+        cellTemplate: 'metricsCellTemplate'
       }, {
         caption: 'SCHEDULED',
         dataField: 'scheduled',
@@ -136,11 +149,13 @@ export const AnalyzeViewComponent = {
     }
 
     filterReports(item) {
+      let isIncluded = true;
+
       if (this.states.reportType !== 'all') {
-        return this.states.reportType === item.type;
+        isIncluded = this.states.reportType === item.type;
       }
 
-      return true;
+      return isIncluded;
     }
 
     onCardAction(actionType, model) {

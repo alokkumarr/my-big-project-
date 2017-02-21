@@ -6,7 +6,8 @@ export const AnalyzeCardComponent = {
   styles: [style],
   bindings: {
     model: '<',
-    onAction: '&'
+    onAction: '&',
+    highlightTerm: '<'
   },
   controller: class AnalyzeCardController {
 

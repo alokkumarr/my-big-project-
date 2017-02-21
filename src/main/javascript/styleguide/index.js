@@ -4,9 +4,6 @@ import 'angular-ui-router';
 import 'angular-material';
 import 'angular-material/angular-material.css';
 
-import 'angular-ui-grid';
-import 'angular-ui-grid/ui-grid.css';
-
 import 'mottle';
 
 import 'devextreme/ui/data_grid';
@@ -28,10 +25,9 @@ import {RootComponent} from './layout';
 export const AppModule = 'styleguide';
 
 angular.module(AppModule, [
-  'dx',
-  'ngMaterial',
   'ui.router',
-  'ui.grid',
+  'ngMaterial',
+  'dx',
   LibModule,
   SectionsModule
 ])

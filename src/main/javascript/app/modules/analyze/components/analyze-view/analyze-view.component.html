@@ -2,11 +2,14 @@
   <md-toolbar class="secondary-toolbar">
     <div class="md-toolbar-tools"
          layout-align="space-between center">
-      <div class="md-title" translate="ORDER_FULFILLMENT">
-        <md-icon md-font-icon="icon-search"></md-icon>
+      <div flex="40" layout="row" layout-align="start center">
+        <span class="md-title" translate="ORDER_FULFILLMENT"></span>
+        <search-box placeholder="Search Analyses"
+                    ng-model="$ctrl.states.searchTerm"
+                    on-change="$ctrl.applySearchFilter()" delay="1000"></search-box>
       </div>
 
-      <div>
+      <div flex="20" layout="row" layout-align="center center">
         <md-input-container class="analyze-view_switch-view">
           <md-radio-group ng-model="$ctrl.states.reportView">
             <md-radio-button ng-value="$ctrl.LIST_VIEW">
@@ -33,10 +36,12 @@
         </md-input-container>
       </div>
 
-      <md-button class="btn-primary"
-                 ng-click="$ctrl.openNewAnalysisModal()">
-        + <span translate="ANALYSIS"></span>
-      </md-button>
+      <div flex="40" layout="row" layout-align="end center">
+        <md-button class="btn-primary"
+                   ng-click="$ctrl.openNewAnalysisModal()">
+          + <span translate="ANALYSIS"></span>
+        </md-button>
+      </div>
     </div>
   </md-toolbar>
 
@@ -57,9 +62,15 @@
 
         <md-card-content layout="row">
           <div dx-data-grid="$ctrl.getGridConfig()" dx-item-alias="report">
+            <div data-options="dxTemplate: { name: 'nameCellTemplate' }">
+              <span ng-bind-html="::report.value | highlight:$ctrl.states.searchTerm"></span>
+            </div>
+            <div data-options="dxTemplate: { name: 'metricsCellTemplate' }">
+              <span ng-bind-html="::report.value | highlight:$ctrl.states.searchTerm"></span>
+            </div>
             <div data-options="dxTemplate: { name: 'typeCellTemplate' }">
               <md-chip class="tag-chip">
-                <span ng-bind="::report.value"></span>
+                <span ng-bind-html="::report.value | highlight:$ctrl.states.searchTerm"></span>
               </md-chip>
             </div>
             <div data-options="dxTemplate: { name: 'actionCellTemplate' }">
@@ -97,9 +108,9 @@
 
     <!-- CARD VIEW -->
     <div ng-switch-when="card" layout="row" layout-align="start start" layout-wrap>
-      <analyze-card flex="50"
-                    ng-repeat="report in $ctrl.reports | filter:$ctrl.filterReports.bind($ctrl)"
-                    model="report" on-action="$ctrl.onCardAction(type, model)"></analyze-card>
+      <div flex="50" ng-repeat="report in $ctrl.reports | filter:$ctrl.filterReports.bind($ctrl)">
+        <analyze-card model="report" on-action="$ctrl.onCardAction(type, model)"></analyze-card>
+      </div>
     </div>
   </div>
 </div>
