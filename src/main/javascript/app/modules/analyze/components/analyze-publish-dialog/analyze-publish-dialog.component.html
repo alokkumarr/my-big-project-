@@ -33,10 +33,10 @@
         <md-radio-group ng-model="$ctrl.schedule" layout="row">
 
           <md-radio-button ng-value="::$ctrl.scheduleOptions[0]">
-            {{::$ctrl.scheduleOptions[0] | translate}}
+            <span ng-bind="::$ctrl.scheduleOptions[1] | translate"></span>
           </md-radio-button>
           <md-radio-button ng-value="::$ctrl.scheduleOptions[1]">
-            {{::$ctrl.scheduleOptions[1] | translate}}
+            <span ng-bind="::$ctrl.scheduleOptions[0] | translate"></span>
           </md-radio-button>
 
         </md-radio-group>
