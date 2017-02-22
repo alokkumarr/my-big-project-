@@ -14,7 +14,6 @@ public class EncriptionUtil {
 	public static String MESSAGE_DIGEST_ALGORITHM_MD5 = "MD5";
     public static String MESSAGE_DIGEST_ALGORITHM_SHA = "SHA";
 	private static MessageDigest messageDigest;
-	private static String DEFAULT_PASSWORD = "ShitHappens";
 
 	private static byte[] digest(String algorithm, String plainText) {
 		try {
@@ -61,10 +60,7 @@ public class EncriptionUtil {
 		return matchFlag;
 	}
 
-	public static String getDefaultPassword() {
-		return encrypt(DEFAULT_PASSWORD);
-	}
-
+	
 	/**
 	 * Used for text encryption like password. Decryption is possible with this encryption method 
 	 * @param plainText
