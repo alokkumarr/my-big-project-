@@ -12,6 +12,7 @@ import javax.xml.bind.Marshaller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 
 import com.sncr.nsso.app.repository.UserRepository;
 import com.sncr.nsso.common.bean.Ticket;
@@ -59,24 +60,25 @@ public class TicketHelper {
 
 	}
 
-	public Ticket createTicket(User user, Boolean isReCreate) throws Exception{
+	public Ticket createTicket(User user, Boolean isReCreate) throws Exception {
 		Ticket ticket = null;
-		try		{
-			if(!isReCreate){
+		try {
+			if (!isReCreate) {
 				prepareTicketDetails(user);
 			}
 			// create ticket xml
-			logger.debug(
-					"Preparing ticket for user: "+user.getMasterLoginId(),user.getMasterLoginId(),null);
+			logger.debug("Preparing ticket for user: " + user.getMasterLoginId(), user.getMasterLoginId(), null);
 			ticket = prepareTicket(user);
-			//inserting the ticket  detail into DB, commenting code to update xml in file path
+			// inserting the ticket detail into DB, commenting code to update
+			// xml in file path
 			insertTicketDetails(ticket);
-			logger.debug(
-					"Saving ticket with id : "+ticket.getTicketId()+", is DONE",null,ticket.getTicketId());
-			}
-		catch(Exception e)		{
-			logger.error(
-					"Exception  occured saving ticket with id : "+user.getLoginId(),user.getMasterLoginId(),null);
+			logger.debug("Saving ticket with id : " + ticket.getTicketId() + ", is DONE", null, ticket.getTicketId());
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;
+		} catch (Exception e) {
+			logger.error("Exception  occured saving ticket with id : " + user.getLoginId(), user.getMasterLoginId(),
+					null);
 			throw e;
 		}
 		return ticket;
@@ -95,6 +97,9 @@ public class TicketHelper {
 			userRepository.invalidateTicket(ticketId, "User Logged Out");
 			logger.info("Successfully inactivated the Ticket ticket Id: " + ticketId, null, null);
 			newTicket = "Successfully inactivated the ticket";
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;			
 		} catch (Exception e) {
 			logger.error("Exception occured while recreating the ticket: "+e.getMessage(), ticketId,  e);
 		}
@@ -113,6 +118,9 @@ public class TicketHelper {
 			newTicket = prepareTicket(oldTicket, validMins);
 			insertTicketDetails(newTicket);
 			logger.info("Successfully recreated the Ticket for master Login Id: " + newTicket.getMasterLoginId(), newTicket.getTicketId());
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;			
 		} catch (Exception e) {
 			logger.error("Exception occured while recreating the ticket: "+e.getMessage(), ticketId,  e);
 		}
@@ -126,6 +134,9 @@ public class TicketHelper {
 			logger.info("reCreateTicketChangePwd the ticket for ticket Id: " + ticketId, oldTicket.getMasterLoginId());
 			// update the ticket validity into DB
 			userRepository.invalidateTicket(ticketId, "Inactivated the ticket, inorder to change password");
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;			
 		} catch (Exception e) {
 			logger.error("Exception occured while recreating the ticket: "+e.getMessage(), ticketId,  e);
 		}
@@ -144,6 +155,9 @@ public class TicketHelper {
 			newTicket = prepareTicket(oldTicket, validMins);
 			insertTicketDetails(newTicket);
 			logger.info("Successfully created the Ticket for master Login Id: " + newTicket.getMasterLoginId(), newTicket.getTicketId());
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;			
 		} catch (Exception e) {
 			logger.error("Exception occured while recreating the ticket: "+e.getMessage(), ticketId,  e);
 		}
@@ -210,8 +224,10 @@ public class TicketHelper {
 	private void insertTicketDetails(Ticket ticket) throws Exception{
 		try{
 		userRepository.insertTicketDetails(ticket);
-		}
-		catch(Exception e){
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;			
+		} catch(Exception e){
 			logger.error("Exception occured while creating ticket for user "+ticket.getMasterLoginId(),ticket.getMasterLoginId(),null, e);
 			throw e;
 		}

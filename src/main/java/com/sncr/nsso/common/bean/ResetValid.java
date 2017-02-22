@@ -19,7 +19,14 @@ public class ResetValid implements Serializable {
 	private Boolean valid;
 	private String masterLoginID;
 	private String validityReason;
+	private String error;
 	
+	public String getError() {
+		return error;
+	}
+	public void setError(String error) {
+		this.error = error;
+	}
 	public Boolean getValid() {
 		return valid;
 	}

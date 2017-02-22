@@ -38,6 +38,15 @@ public class Ticket implements Serializable {
 	private Long createdTime;
 	private ArrayList<Products> products;
 	private String dataSecurityKey;	
+	private String error;
+
+	public String getError() {
+		return error;
+	}
+
+	public void setError(String error) {
+		this.error = error;
+	}
 
 	/**
 	 * This ticket will be valid till this time.

@@ -88,6 +88,9 @@ public class UserRepositoryImpl implements UserRepository {
 				ret[0] = isAuthenticated;
 				ret[1] = isPasswordActive;
 			}
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;			
 		} catch (Exception e) {
 			logger.error("Exception encountered while authenticating user : " + e.getMessage(), null, e);
 		}
@@ -186,6 +189,9 @@ public class UserRepositoryImpl implements UserRepository {
 				 * + loginId + "' AND RS.VALID=1"; jdbcTemplate.update(sql);
 				 */
 			}
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;			
 		} catch (Exception e) {
 			logger.error("Exception encountered while creating BO details for user " + e.getMessage(), loginId, null,
 					e);
@@ -252,6 +258,9 @@ public class UserRepositoryImpl implements UserRepository {
 					message = "Password Successfully Changed.";
 				}
 			}
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;			
 		} catch (Exception e) {
 			logger.error("Exception encountered while creating BO details for user " + e.getMessage(), loginId, null,
 					e);
@@ -284,6 +293,9 @@ public class UserRepositoryImpl implements UserRepository {
 					Types.VARCHAR, Types.BIGINT, Types.BIGINT, Types.SMALLINT, Types.DATE, Types.VARCHAR };
 			jdbcTemplate.update(insertSql, params, types);
 
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;			
 		} catch (Exception e) {
 			logger.error("Exception encountered while adding ticket details for user " + e.getMessage(), null, e);
 			throw e;
@@ -306,6 +318,9 @@ public class UserRepositoryImpl implements UserRepository {
 
 			jdbcTemplate.update(insertSql, params, types);
 
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;			
 		} catch (Exception e) {
 			logger.error("Exception encountered while adding secret code details for user " + e.getMessage(), null, e);
 			throw e;
@@ -319,6 +334,9 @@ public class UserRepositoryImpl implements UserRepository {
 					+ "' AND VALID=1";
 			return jdbcTemplate.query(sql, new UserRepositoryImpl.ResetValidityExtractor());
 			// logger.info("secret code details inserted for user Id "+ userId);
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;			
 		} catch (Exception e) {
 			logger.error("Exception encountered while validating the reset password link for random key" + randomHash
 					+ " : " + e.getMessage(), null, e);
@@ -361,6 +379,9 @@ public class UserRepositoryImpl implements UserRepository {
 				message = "'Email Address' provided is not identified in the system, please re-verify.";
 				return message;
 			}
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;			
 		} catch (Exception e) {
 			logger.error("Exception encountered while resetting password for user " + e.getMessage(), null, e);
 			message = "Error encountered while resetting password.";
@@ -381,6 +402,9 @@ public class UserRepositoryImpl implements UserRepository {
 			if (count == 0) {
 				message = "No user found for updating new password value.";
 			}
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;			
 		} catch (Exception e) {
 			logger.error("Exception encountered while resetting password for user " + e.getMessage(), masterLoginId,
 					null, e);
@@ -400,6 +424,9 @@ public class UserRepositoryImpl implements UserRepository {
 				}
 			});
 			// logger.info("Ticket got invalidated for ticketId: " + ticketId);
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;			
 		} catch (Exception e) {
 			logger.error("Exception encountered while invalidating the ticket" + e.getMessage(), null, e);
 			throw e;
@@ -545,6 +572,9 @@ public class UserRepositoryImpl implements UserRepository {
 				user.setTicketDetails(ticketDetails);
 			}
 
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;			
 		} catch (Exception e) {
 			logger.error("Exception encountered while preparing the Ticket Details for user " + e.getMessage(), null,
 					e);
@@ -558,6 +588,9 @@ public class UserRepositoryImpl implements UserRepository {
 				+ ticketId + "'";
 		try {
 			ticket = jdbcTemplate.query(sql, new UserRepositoryImpl.TicketDetailExtractor());
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;			
 		} catch (Exception e) {
 			logger.error("Exception encountered while get Ticket Details for ticketId : " + e.getMessage(), null, e);
 		}
@@ -847,6 +880,9 @@ public class UserRepositoryImpl implements UserRepository {
 					preparedStatement.setString(1, userId);
 				}
 			}, new UserRepositoryImpl.EmailExtractor());
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;			
 		} catch (Exception e) {
 			logger.error("Exception encountered get User Email while resetting password for user " + e.getMessage(),
 					null, e);
