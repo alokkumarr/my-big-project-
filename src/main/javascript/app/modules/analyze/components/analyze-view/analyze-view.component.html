@@ -1,15 +1,15 @@
 <div class="analyze-view">
   <md-toolbar class="secondary-toolbar">
     <div class="md-toolbar-tools"
-         layout-align="space-between center">
-      <div flex="40" layout="row" layout-align="start center">
-        <span class="md-title" translate="ORDER_FULFILLMENT"></span>
+         layout-align="start center">
+      <div class="analyze-view_search-panel" layout="row" layout-align="start center">
+        <span class="md-title" translate="ORDER_FULFILLMENT"></span>&nbsp;
         <search-box placeholder="Search Analyses"
                     ng-model="$ctrl.states.searchTerm"
                     on-change="$ctrl.applySearchFilter()" delay="1000"></search-box>
       </div>
 
-      <div flex="20" layout="row" layout-align="center center">
+      <div layout="row" layout-align="start center">
         <md-input-container class="analyze-view_switch-view">
           <md-radio-group ng-model="$ctrl.states.reportView">
             <md-radio-button ng-value="$ctrl.LIST_VIEW">
@@ -36,7 +36,7 @@
         </md-input-container>
       </div>
 
-      <div flex="40" layout="row" layout-align="end center">
+      <div class="analyze-view_action-panel" layout="row" layout-align="end center">
         <md-button class="btn-primary"
                    ng-click="$ctrl.openNewAnalysisModal()">
           + <span translate="ANALYSIS"></span>
@@ -109,7 +109,13 @@
     <!-- CARD VIEW -->
     <div ng-switch-when="card" layout="row" layout-align="start start" layout-wrap>
       <div flex="50" ng-repeat="report in $ctrl.reports | filter:$ctrl.filterReports.bind($ctrl)">
-        <analyze-card model="report" on-action="$ctrl.onCardAction(type, model)"></analyze-card>
+        <analyze-card model="report" on-action="$ctrl.onCardAction(type, model)"
+                      highlight-term="$ctrl.states.searchTerm"></analyze-card>
+      </div>
+
+      <div class="analyze-view_no-results"
+           ng-if="$ctrl.states.searchTerm && !$ctrl.reports.length">
+        <span translate="NO_MATCHING_RESULTS"></span>
       </div>
     </div>
   </div>

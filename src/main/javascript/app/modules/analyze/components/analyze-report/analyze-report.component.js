@@ -506,6 +506,7 @@ export const AnalyzeReportComponent = {
             scope.model = clone(this.model);
 
             scope.onSave = data => {
+              this.model.id = data.id;
               this.model.name = data.name;
               this.model.description = data.description;
               this.model.category = data.category;
