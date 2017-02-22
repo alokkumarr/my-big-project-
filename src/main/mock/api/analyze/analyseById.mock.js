@@ -2,7 +2,7 @@ import find from 'lodash/find';
 
 export const RequestMock = {
   method: 'GET',
-  url: 'api/analyze/byId/:id',
+  url: '/api/analyze/byId/:id',
   response: (method, url, data, headers, keys) => {
     const analyses = require('./analyses.json');
     const analyse = find(analyses, analyse => {

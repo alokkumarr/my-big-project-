@@ -30,11 +30,19 @@ export const AnalyzeViewComponent = {
         this.loadAnalyses();
       });
 
+      this.loadCategory();
       this.loadAnalyses();
     }
 
     $onDestroy() {
       this._destroyHandler();
+    }
+
+    loadCategory() {
+      return this._AnalyzeService.getCategory(this.$state.params.id)
+        .then(category => {
+          this.category = category;
+        });
     }
 
     loadAnalyses() {
@@ -107,6 +115,7 @@ export const AnalyzeViewComponent = {
         showBorders: false,
         rowAlternationEnabled: true,
         hoverStateEnabled: true,
+        noDataText: 'No matching results',
         scrolling: {
           mode: 'virtual'
         },
