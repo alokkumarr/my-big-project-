@@ -30,6 +30,7 @@
                  ng-click="$ctrl.fork()">
         <md-icon md-font-icon="icon-fork"></md-icon>
       </md-button>
+
       <md-button class="md-button btn-card" aria-label="Export">
         <md-icon md-font-icon="icon-folder"></md-icon>
       </md-button>
@@ -44,7 +45,23 @@
           <md-menu-content>
             <md-menu-item>
               <md-button aria-label="Edit"
-                         ng-click="$ctrl.edit()">Edit
+                         ng-click="$ctrl.edit()"
+                         translate="EDIT">
+              </md-button>
+            </md-menu-item>
+            <md-menu-item>
+              <md-button ng-click="$ctrl.openPublishModal($event)">
+                <span translate="PUBLISH"></span>
+              </md-button>
+            </md-menu-item>
+            <md-menu-item>
+              <md-button ng-click="ctrl.openPrintModal($event)">
+                <span translate="PRINT"></span>
+              </md-button>
+            </md-menu-item>
+            <md-menu-item>
+              <md-button ng-click="ctrl.openExportModal($event)">
+                <span translate="EXPORT"></span>
               </md-button>
             </md-menu-item>
           </md-menu-content>
