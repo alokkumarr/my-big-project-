@@ -1,10 +1,10 @@
-import template from './analyze-detail-view.component.html';
-import style from './analyze-detail-view.component.scss';
+import template from './analyze-executed-detail.component.html';
+import style from './analyze-executed-detail.component.scss';
 
-export const AnalyzeDetailViewComponent = {
+export const AnalyzeExecutedDetailComponent = {
   template,
   styles: [style],
-  controller: class AnalyzeDetailViewController {
+  controller: class AnalyzeExecutedDetailController {
     constructor(AnalyzeService, $state, $window) {
       'ngInject';
       this._AnalyzeService = AnalyzeService;
@@ -17,7 +17,7 @@ export const AnalyzeDetailViewComponent = {
     }
 
     loadAnalysis() {
-      this._AnalyzeService.getAnalysisById(this._$state.params.id)
+      this._AnalyzeService.getAnalysisById(this._$state.params.executedInstanceId)
         .then(analysis => {
           this.analysis = analysis;
           console.log(analysis);
