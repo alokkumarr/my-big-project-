@@ -18,6 +18,7 @@ import javax.mail.internet.MimeMultipart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,17 +58,18 @@ public class SecurityController {
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
 
-		boolean[] ret = isUserAuthentic(loginDetails.getMasterLoginId(), loginDetails.getPassword());
-
-		boolean isUserAuthentic = ret[0];
-		boolean isPassWordActive = ret[1];
+		
 		Ticket ticket = null;
 		User user = null;
 		TicketHelper tHelper = new TicketHelper(userRepository);
-		try {
-			ticket = new Ticket();
-			ticket.setMasterLoginId(loginDetails.getMasterLoginId());
-			ticket.setValid(false);
+		ticket = new Ticket();
+		ticket.setMasterLoginId(loginDetails.getMasterLoginId());
+		ticket.setValid(false);
+		try {			
+			boolean[] ret = userRepository.authenticateUser(loginDetails.getMasterLoginId(), loginDetails.getPassword());
+			
+			boolean isUserAuthentic = ret[0];
+			boolean isPassWordActive = ret[1];
 			if (isUserAuthentic) {
 				if (isPassWordActive) {
 					user = new User();
@@ -81,6 +83,12 @@ public class SecurityController {
 			} else {
 				ticket.setValidityReason("Invalid User Credentials");
 			}
+		} catch (DataAccessException de) {
+			logger.error("Exception occured creating ticket ", de, null);
+			ticket.setValidityReason("Database error. Please contact server Administrator.");
+			ticket.setError(de.getMessage());
+			return new LoginResponse(Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", ticket)
+					.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
 		} catch (Exception e) {
 			logger.error("Exception occured creating ticket ", e, null);
 			return null;
@@ -99,7 +107,11 @@ public class SecurityController {
 	public String doLogout(@RequestBody String ticketID) {
 		TicketHelper tHelper = new TicketHelper(userRepository);
 		Gson gson = new Gson();
-		return gson.toJson(tHelper.logout(ticketID));
+		try {
+		  return gson.toJson(tHelper.logout(ticketID));
+		} catch (DataAccessException de) {
+			return de.getMessage();
+		}
 	}
 
 	/**
@@ -110,50 +122,49 @@ public class SecurityController {
 	@RequestMapping(value = "/auth/changePassword", method = RequestMethod.POST)
 	public Valid changePassword(@RequestBody ChangePasswordDetails changePasswordDetails) {
 		Valid valid = new Valid();
-		String message = doChangePassword(changePasswordDetails);
 		valid.setValid(false);
-		if (message != null && message.equals("Password Successfully Changed.")) {
-			valid.setValid(true);
+		String oldPass = changePasswordDetails.getOldPassword();
+		String newPass = changePasswordDetails.getNewPassword();
+		String cnfNewPass = changePasswordDetails.getCnfNewPassword();
+		String loginId = changePasswordDetails.getMasterLoginId();
+		String message = null;
+		if (!cnfNewPass.equals(newPass)) {
+			message = "'New Password' and 'Verify password' does not match.";
+		} else if (newPass.length() < 8) {
+			message = "New password should be minimum of 8 charactar.";
+		} else if (oldPass.equals(newPass)) {
+			message = "Old password and new password should not be same.";
+		} else if (loginId.equals(newPass)) {
+			message = "User Name can't be assigned as password.";
+		}
+		Pattern pCaps = Pattern.compile("[A-Z]");
+		Matcher m = pCaps.matcher(newPass);
+		if (!m.find()) {
+			message = "Password should contain atleast 1 uppercase charactar.";
+		}
+		Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
+		m = pSpeChar.matcher(newPass);
+		if (!m.find()) {
+			message = "Password should contain atleast 1 special charactar.";
+		}
+		if (message == null) {
+			try {
+				message = userRepository.changePassword(loginId, newPass, oldPass);
+				if (message != null && message.equals("Password Successfully Changed.")) {
+					valid.setValid(true);
+				}
+
+			} catch (DataAccessException de) {
+				valid.setValidityMessage("Database error. Please contact server Administrator.");
+				valid.setError(de.getMessage());
+				return valid;
+			}
 		}
 		valid.setValidityMessage(message);
 		return valid;
 	}
 
-	/**
-	 * 
-	 * @param changePasswordDetails
-	 * @return
-	 */
-	private String doChangePassword(ChangePasswordDetails changePasswordDetails) {
-		String oldPass = changePasswordDetails.getOldPassword();
-		String newPass = changePasswordDetails.getNewPassword();
-		String cnfNewPass = changePasswordDetails.getCnfNewPassword();
-		String loginId = changePasswordDetails.getMasterLoginId();
-
-		if (!cnfNewPass.equals(newPass)) {
-			return "'New Password' and 'Verify password' does not match.";
-		} else if (newPass.length() < 8) {
-			return "New password should be minimum of 8 charactar.";
-		} else if (oldPass.equals(newPass)) {
-			return "Old password and new password should not be same.";
-		} else if (loginId.equals(newPass)) {
-			return "User Name can't be assigned as password.";
-		}
-
-		Pattern pCaps = Pattern.compile("[A-Z]");
-		Matcher m = pCaps.matcher(newPass);
-		if (!m.find()) {
-			return "Password should contain atleast 1 uppercase charactar.";
-		}
-
-		Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
-		m = pSpeChar.matcher(newPass);
-		if (!m.find()) {
-			return "Password should contain atleast 1 special charactar.";
-		}
-		return userRepository.changePassword(loginId, newPass, oldPass);
-	}
-
+	
 	/**
 	 * 
 	 * @param resetPwdDtls
@@ -164,30 +175,36 @@ public class SecurityController {
 		Valid valid = new Valid();
 		valid.setValid(false);
 		String message = null;
-
-		String eMail = userRepository.getUserEmailId(resetPwdDtls.getMasterLoginId());
-		if (eMail.equals("Invalid")) {
-			logger.error("Invalid user Id, Unable to perform Reset Password Process. error message:", null, null);
-			message = "Invalid user Id";
-		} else if (eMail.equals("no email")) {
-			logger.error("Email Id is not configured for the User", null, null);
-			message = "Email Id is not configured for the User";
-		} else {
-			Long createdTime = System.currentTimeMillis();
-			String randomString = randomString(160);
-			userRepository.insertResetPasswordDtls(resetPwdDtls.getMasterLoginId(), randomString, createdTime,
-					createdTime + (24 * 60 * 60 * 1000));
-			String resetpwdlk = resetPwdDtls.getProductUrl();
-			// resetpwdlk = resetpwdlk+"/vfyRstPwd?rhc="+randomString;
-			resetpwdlk = resetpwdlk + "?rhc=" + randomString;
-			message = sendResetMail(resetPwdDtls.getMasterLoginId(), eMail, resetpwdlk, createdTime);
-			if (message == null) {
-				valid.setValid(true);
-				message = "Mail sent successfully to " + eMail;// + ".
-																// Requesting
-																// user is " +
-																// resetPwdDtls.getMasterLoginId();
+		try {
+			String eMail = userRepository.getUserEmailId(resetPwdDtls.getMasterLoginId());
+			if (eMail.equals("Invalid")) {
+				logger.error("Invalid user Id, Unable to perform Reset Password Process. error message:", null, null);
+				message = "Invalid user Id";
+			} else if (eMail.equals("no email")) {
+				logger.error("Email Id is not configured for the User", null, null);
+				message = "Email Id is not configured for the User";
+			} else {
+				Long createdTime = System.currentTimeMillis();
+				String randomString = randomString(160);
+				userRepository.insertResetPasswordDtls(resetPwdDtls.getMasterLoginId(), randomString, createdTime,
+						createdTime + (24 * 60 * 60 * 1000));
+				String resetpwdlk = resetPwdDtls.getProductUrl();
+				// resetpwdlk = resetpwdlk+"/vfyRstPwd?rhc="+randomString;
+				resetpwdlk = resetpwdlk + "?rhc=" + randomString;
+				message = sendResetMail(resetPwdDtls.getMasterLoginId(), eMail, resetpwdlk, createdTime);
+				if (message == null) {
+					valid.setValid(true);
+					message = "Mail sent successfully to " + eMail;// + ".
+																	// Requesting
+																	// user is "
+																	// +
+																	// resetPwdDtls.getMasterLoginId();
+				}
 			}
+		} catch (DataAccessException de) {
+			valid.setValidityMessage("Database error. Please contact server Administrator.");
+			valid.setError(de.getMessage());
+			return valid;
 		}
 		valid.setValidityMessage(message);
 		return valid;
@@ -201,7 +218,16 @@ public class SecurityController {
 	@RequestMapping(value = "/vfyRstPwd", method = RequestMethod.POST)
 	public ResetValid vfyRstPwd(@RequestBody RandomHashcode randomHashcode) {
 		// P2: handle expired password scenario
-		return userRepository.validateResetPasswordDtls(randomHashcode.getRhc());
+		ResetValid rv = null; 
+		try {
+			rv = userRepository.validateResetPasswordDtls(randomHashcode.getRhc());
+		} catch (DataAccessException de) {
+			rv.setValid(false);
+			rv.setValidityReason("Database error. Please contact server Administrator.");
+			rv.setError(de.getMessage());
+			return rv;
+		}
+		return rv;
 	}
 
 	private JavaMailSender javaMailSender() {
@@ -254,12 +280,18 @@ public class SecurityController {
 		if (!m.find()) {
 			message = "Password should contain atleast 1 special charactar.";
 		}
-		if (message == null) {
-			message = userRepository.rstchangePassword(loginId, newPass);
+		try {
 			if (message == null) {
-				message = "Password Successfully Changed.";
-				valid.setValid(true);
+				message = userRepository.rstchangePassword(loginId, newPass);
+				if (message == null) {
+					message = "Password Successfully Changed.";
+					valid.setValid(true);
+				}
 			}
+		} catch (DataAccessException de) {
+			valid.setValidityMessage("Database error. Please contact server Administrator.");
+			valid.setError(de.getMessage());
+			return valid;
 		}
 		valid.setValidityMessage(message);
 		return valid;
@@ -278,10 +310,6 @@ public class SecurityController {
 				nSSOProperties.getValidityMins() != null ? Long.parseLong(nSSOProperties.getValidityMins()) : 720);
 		Gson gson = new Gson();
 		return gson.toJson(ticket);
-	}
-
-	private boolean[] isUserAuthentic(String masterLoginId, String password) {
-		return userRepository.authenticateUser(masterLoginId, password);
 	}
 
 	@SuppressWarnings("unused")
@@ -377,19 +405,7 @@ public class SecurityController {
 		return valid;          
 	}
 
-	/**
-	 * This method returns the validated path back to the calling application
-	 * @param path
-	 * @return
-	 */
-	@RequestMapping(value = "/auth/redirect", method = RequestMethod.POST)
-	public Valid redirect(@RequestBody String path) {
-		Valid valid = new Valid();
-		valid.setValid(true);
-		valid.setValidityMessage(path);
-		return valid;  
-	}
-	
+		
 	public static void main(String[] args) {
 		SecurityController sc = new SecurityController();
 		System.out.println(sc.randomString(160));
