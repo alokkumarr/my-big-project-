@@ -4,6 +4,7 @@
 package com.sncr.nsso.common.util;
 
 import java.io.StringWriter;
+import java.security.SecureRandom;
 import java.util.Random;
 
 import javax.xml.bind.JAXBContext;
@@ -180,7 +181,7 @@ public class TicketHelper {
 	
 	
 	private Ticket prepareTicket(User user) {
-		Random random = new Random();
+		SecureRandom random = new SecureRandom();
 		Ticket ticket = new Ticket();
 		String ticketId = Thread.currentThread().getId() + "_"
 				+ System.currentTimeMillis() + "_"
@@ -206,7 +207,7 @@ public class TicketHelper {
 	}
 	
 	private Ticket prepareTicket(Ticket ticket, Long validMins) {
-		Random random = new Random();
+		SecureRandom random = new SecureRandom();
 		String ticketId = Thread.currentThread().getId() + "_"
 				+ System.currentTimeMillis() + "_"
 				+ random.nextInt(Integer.MAX_VALUE);
