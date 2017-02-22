@@ -5,7 +5,7 @@ const analyses = require('./analyses.json');
 
 export const RequestMock = {
   method: 'GET',
-  url: 'api/analyze/analyses',
+  url: '/api/analyze/analyses',
   response: (method, url, data, headers, keys) => {
     const category = keys.category;
     const query = angular.fromJson(keys.query) || {};
