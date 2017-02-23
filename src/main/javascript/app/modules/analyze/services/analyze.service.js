@@ -17,6 +17,7 @@ export function AnalyzeService($http) {
 
   return {
     getMenu,
+    getCategory,
     getMethods,
     getMetrics,
     getArtifacts,
@@ -31,15 +32,19 @@ export function AnalyzeService($http) {
   };
 
   function getAnalyses(category, query) {
-    return $http.get('api/analyze/analyses', {params: {category, query}}).then(get('data'));
+    return $http.get('/api/analyze/analyses', {params: {category, query}}).then(get('data'));
   }
 
   function getAnalyseById(id) {
-    return $http.get(`api/analyze/byId/${id}`).then(get('data'));
+    return $http.get(`/api/analyze/byId/${id}`).then(get('data'));
   }
 
   function getMenu() {
     return $http.get('/api/menu/analyze').then(get('data'));
+  }
+
+  function getCategory(id) {
+    return $http.get(`/api/analyze/category/${id}`).then(get('data'));
   }
 
   function getMethods() {
