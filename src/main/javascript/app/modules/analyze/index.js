@@ -8,9 +8,9 @@ import {FilterService} from './services/filter.service';
 
 import {AnalyzePageComponent} from './components/analyze-page/analyze-page.component';
 import {AnalyzeViewComponent} from './components/analyze-view/analyze-view.component';
-import {AnalyzeExecutedListComponent} from './components/analyze-executed-list/analyze-executed-list.component';
-import {AnalyzeChartDetailComponent} from './components/analyze-executed-detail/chart/analyze-chart-detail.component';
-import {AnalyzeExecutedDetailComponent} from './components/analyze-executed-detail/analyze-executed-detail.component';
+import {AnalyzePublishedListComponent} from './components/analyze-published-list/analyze-published-list.component';
+import {AnalyzeChartDetailComponent} from './components/analyze-published-detail/chart/analyze-chart-detail.component';
+import {AnalyzePublishedDetailComponent} from './components/analyze-published-detail/analyze-published-detail.component';
 import {AnalyzeCardComponent} from './components/analyze-card/analyze-card.component';
 import {AnalyzeNewComponent} from './components/analyze-new/analyze-new.component';
 import {AnalyzeReportComponent} from './components/analyze-report/analyze-report.component';
@@ -42,9 +42,9 @@ angular.module(AnalyzeModule, [])
   .component('reportRenameDialog', ReportRenameDialogComponent)
   .component('analyzePage', AnalyzePageComponent)
   .component('analyzeView', AnalyzeViewComponent)
-  .component('analyzeExecutedList', AnalyzeExecutedListComponent)
+  .component('analyzePublishedList', AnalyzePublishedListComponent)
   .component('analyzeChartDetail', AnalyzeChartDetailComponent)
-  .component('analyzeExecutedDetail', AnalyzeExecutedDetailComponent)
+  .component('analyzePublishedDetail', AnalyzePublishedDetailComponent)
   .component('analyzeCard', AnalyzeCardComponent)
   .component('analyzeNew', AnalyzeNewComponent)
   .component('analyzeReport', AnalyzeReportComponent)

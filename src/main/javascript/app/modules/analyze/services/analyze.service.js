@@ -21,7 +21,7 @@ export function AnalyzeService($http) {
     getMetrics,
     getArtifacts,
     getAnalyses,
-    getExecutedAnalysesByAnalysisId,
+    getPublishedAnalysesByAnalysisId,
     getAnalysisById,
     getDataByQuery,
     getSupportedMethods,
@@ -35,8 +35,8 @@ export function AnalyzeService($http) {
     return $http.get('api/analyze/analyses', {params: {category}}).then(get('data'));
   }
 
-  function getExecutedAnalysesByAnalysisId(id) {
-    return $http.get(`api/analyze/executedAnalyses/${id}`).then(get('data'));
+  function getPublishedAnalysesByAnalysisId(id) {
+    return $http.get(`/api/analyze/publishedAnalyses/${id}`).then(get('data'));
   }
 
   function getAnalysisById(id) {

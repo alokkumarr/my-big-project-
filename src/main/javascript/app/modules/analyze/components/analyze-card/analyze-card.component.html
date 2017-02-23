@@ -15,11 +15,7 @@
       <md-card-title-text>
         <a class="md-headline"
            ng-bind="::$ctrl.model.name"
-           ui-sref="analyze.executedAnalises({analysisId: $ctrl.model.id})">
-        </a>
-        <a class="md-headline"
-           ng-bind="::$ctrl.model.name"
-           ui-sref="analyze.executedAnalisis({executedInstanceId: $ctrl.model.id})">
+           ui-sref="analyze.publishedList({analysisId: $ctrl.model.id})">
         </a>
         <span class="md-subhead">
           <span ng-bind="::($ctrl.model.metrics || []).join(', ')"></span>
