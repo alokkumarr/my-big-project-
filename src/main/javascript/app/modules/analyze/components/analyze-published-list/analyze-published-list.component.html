@@ -2,13 +2,12 @@
   <md-toolbar class="secondary-toolbar">
     <div class="md-toolbar-tools" layout-align="space-between center">
       <div layout="row">
-        <md-button ng-click="$ctrl._$window.history.back()" class="md-icon-button" aria-label="Back">
-          <md-icon md-font-icon="icon-arrow-left" class="back-icon"></md-icon>
+        <md-button ng-click="$ctrl._$window.history.back()" class="md-icon-button back-button" aria-label="Back">
+          <md-icon md-font-icon="icon-arrow-left"></md-icon>
         </md-button>
 
         <div style="margin-left: 16px;">
-          <div class="md-headline" ng-bind="$ctrl.analysis.name"></div>
-          <div class="md-subhead" ng-bind="$ctrl.analysis.metrics.join(', ')"></div>
+          <div class="md-headline" translate="PUBLISHED_ANALYSES"></div>
         </div>
       </div>
     </div>
@@ -23,9 +22,6 @@
             </md-button>
             <md-button class="md-button btn-card" aria-label="Print" ng-click="$ctrl.print(analysis.data)">
               <md-icon md-font-icon="icon-print"></md-icon>
-            </md-button>
-            <md-button class="md-button btn-card" aria-label="Edit" ng-click="$ctrl.edit(analysis.data)">
-              <md-icon md-font-icon="icon-edit"></md-icon>
             </md-button>
           </md-card-actions>
         </div>

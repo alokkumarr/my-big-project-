@@ -8,6 +8,10 @@ analyze-view {
     font-weight: bold;
   }
 
+  &_search-panel {
+    flex-basis: 40%;
+  }
+
   &_switch-view {
     md-radio-group {
       display: inline-flex;
@@ -39,6 +43,10 @@ analyze-view {
   &_switch-type {
     width: 160px;
     font-size: 16px;
+  }
+
+  &_action-panel {
+    margin-left: auto;
   }
 
   &_reports-list {
@@ -74,6 +82,17 @@ analyze-view {
       md-card-content {
         margin-bottom: 75px;
       }
+    }
+  }
+
+  &_no-results {
+    width: 100%;
+    color: #B2B2B2;
+    text-align: center;
+
+    span {
+      font-size: 28px;
+      word-break: break-word;
     }
   }
 

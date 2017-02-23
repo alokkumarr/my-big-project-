@@ -9,7 +9,7 @@ export function i18nConfig($translateProvider, $translatePartialLoaderProvider) 
   // the keyword dictionaries used for the dynamic modules will be added in their specific folder
   $translatePartialLoaderProvider.addPart('common');
 
-  $translateProvider.useSanitizeValueStrategy('sanitize');
+  $translateProvider.useSanitizeValueStrategy('sanitizeParameters');
 
   // this is used for for more complex dynamic variables like making word singular or plural
   // making ordinals dynamic, like: 1st, 2nd, 3rd, 4th

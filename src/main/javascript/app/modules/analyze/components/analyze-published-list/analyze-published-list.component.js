@@ -7,11 +7,12 @@ export const AnalyzePublishedListComponent = {
   template,
   // styles: [style],
   controller: class AnalyzePublishedListController {
-    constructor(AnalyzeService, $state, $window) {
+    constructor(AnalyzeService, $state, $window, dxDataGridService) {
       'ngInject';
       this._AnalyzeService = AnalyzeService;
       this._$state = $state;
       this._$window = $window;
+      this._dxDataGridService = dxDataGridService;
     }
 
     $onInit() {
@@ -22,11 +23,10 @@ export const AnalyzePublishedListComponent = {
       this._AnalyzeService.getPublishedAnalysesByAnalysisId(this._$state.params.analysisId)
         .then(analyses => {
           this.analyses = analyses;
-          console.log(analyses);
         });
     }
 
-    edit(analysis) {
+    goToAnalysis(analysis) {
       this._$state.go('analyze.publishedDetail',
         {
           publishId: analysis.PUBLISHED_ANALYSIS_ID
@@ -60,25 +60,13 @@ export const AnalyzePublishedListComponent = {
         cellTemplate: 'actionCellTemplate'
       }];
 
-      return {
+      return this._dxDataGridService.mergeWithDefaultConfig({
+        onRowClick: row => {
+          this.goToAnalysis(row.data);
+        },
         columns,
         bindingOptions: {
           dataSource: '$ctrl.analyses'
-        },
-        columnAutoWidth: true,
-        allowColumnReordering: true,
-        allowColumnResizing: true,
-        showColumnHeaders: true,
-        showColumnLines: false,
-        showRowLines: false,
-        showBorders: false,
-        rowAlternationEnabled: true,
-        hoverStateEnabled: true,
-        scrolling: {
-          mode: 'virtual'
-        },
-        sorting: {
-          mode: 'multiple'
         },
         paging: {
           pageSize: 10
@@ -87,7 +75,7 @@ export const AnalyzePublishedListComponent = {
           showPageSizeSelector: true,
           showInfo: true
         }
-      };
+      });
     }
 
   }

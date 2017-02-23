@@ -11,6 +11,16 @@
 
   md-card-title {
     padding: 0;
+
+    .md-headline {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .md-subhead {
+      font-size: 12px;
+      padding-top: 0 !important;
+    }
   }
 
   md-icon {

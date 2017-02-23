@@ -2,7 +2,7 @@
   <md-card-header>
     <span flex></span>
     <md-chip class="tag-chip"
-             ng-bind="::$ctrl.model.type | uppercase"></md-chip>
+             ng-bind-html="::$ctrl.model.type | uppercase | highlight:$ctrl.highlightTerm"></md-chip>
   </md-card-header>
 
   <md-card-content layout="row" layout-align="center center">
@@ -14,11 +14,11 @@
     <md-card-title>
       <md-card-title-text>
         <a class="md-headline"
-           ng-bind="::$ctrl.model.name"
-           ui-sref="analyze.publishedList({analysisId: $ctrl.model.id})">
+              ng-bind-html="::$ctrl.model.name | highlight:$ctrl.highlightTerm"
+              ui-sref="analyze.publishedList({analysisId: $ctrl.model.id})">
         </a>
         <span class="md-subhead">
-          <span ng-bind="::($ctrl.model.metrics || []).join(', ')"></span>
+          <span ng-bind-html="::($ctrl.model.metrics || []).join(', ') | highlight:$ctrl.highlightTerm"></span>
           <span ng-if="::$ctrl.model.scheduled">
             <md-icon md-font-icon="icon-calendar"></md-icon>
             <span ng-bind="::$ctrl.model.scheduled"></span>
@@ -32,6 +32,7 @@
                  ng-click="$ctrl.fork()">
         <md-icon md-font-icon="icon-fork"></md-icon>
       </md-button>
+
       <md-button class="md-button btn-card" aria-label="Export">
         <md-icon md-font-icon="icon-folder"></md-icon>
       </md-button>
@@ -46,7 +47,23 @@
           <md-menu-content>
             <md-menu-item>
               <md-button aria-label="Edit"
-                         ng-click="$ctrl.edit()">Edit
+                         ng-click="$ctrl.edit()"
+                         translate="EDIT">
+              </md-button>
+            </md-menu-item>
+            <md-menu-item>
+              <md-button ng-click="$ctrl.openPublishModal($event)">
+                <span translate="PUBLISH"></span>
+              </md-button>
+            </md-menu-item>
+            <md-menu-item>
+              <md-button ng-click="ctrl.openPrintModal($event)">
+                <span translate="PRINT"></span>
+              </md-button>
+            </md-menu-item>
+            <md-menu-item>
+              <md-button ng-click="ctrl.openExportModal($event)">
+                <span translate="EXPORT"></span>
               </md-button>
             </md-menu-item>
           </md-menu-content>

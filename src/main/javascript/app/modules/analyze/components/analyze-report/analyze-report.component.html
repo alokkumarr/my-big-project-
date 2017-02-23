@@ -18,13 +18,8 @@
       </div>
 
       <div class="ard_actions" flex>
-        <md-button ng-click="$ctrl.openExportModal()"
-                   translate="EXPORT"></md-button>
         <md-button ng-click="$ctrl.openSaveModal()"
-                   translate="SAVE"></md-button>
-        <md-button class="btn-primary"
-                   ng-click="$ctrl.openPublishModal()"
-                   translate="PUBLISH">
+                   translate="SAVE">
         </md-button>
       </div>
     </div>
@@ -111,7 +106,7 @@
            ng-if="$ctrl.states.detailsExpanded">
         <div layout="column" class="ard_details-panel-empty"
              ng-show="!$ctrl.hasSelectedColumns()">
-          <span translate="CHOOSE_FIELDS_ABOVE_TO_PREVIEW_YOUR_REPORT."></span>
+          <span translate="CHOOSE_FIELDS_ABOVE_TO_PREVIEW_YOUR_REPORT"></span>
           <md-icon md-font-icon="icon-report"></md-icon>
         </div>
 

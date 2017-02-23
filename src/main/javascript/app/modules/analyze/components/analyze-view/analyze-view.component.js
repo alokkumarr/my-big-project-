@@ -8,19 +8,21 @@ export const AnalyzeViewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeViewController extends AbstractComponentController {
-    constructor($injector, $compile, AnalyzeService) {
+    constructor($injector, $compile, AnalyzeService, dxDataGridService) {
       'ngInject';
       super($injector);
 
       this._$compile = $compile;
       this._AnalyzeService = AnalyzeService;
+      this._dxDataGridService = dxDataGridService;
 
       this.LIST_VIEW = 'list';
       this.CARD_VIEW = 'card';
 
       this.states = {
         reportView: 'card',
-        reportType: 'all'
+        reportType: 'all',
+        searchTerm: ''
       };
     }
 
@@ -29,6 +31,7 @@ export const AnalyzeViewComponent = {
         this.loadAnalyses();
       });
 
+      this.loadCategory();
       this.loadAnalyses();
     }
 
@@ -36,11 +39,28 @@ export const AnalyzeViewComponent = {
       this._destroyHandler();
     }
 
-    loadAnalyses() {
-      this._AnalyzeService.getAnalyses(this.$state.params.id)
-        .then(analyses => {
-          this.reports = analyses;
+    loadCategory() {
+      return this._AnalyzeService.getCategory(this.$state.params.id)
+        .then(category => {
+          this.category = category;
         });
+    }
+
+    loadAnalyses() {
+      return this._AnalyzeService.getAnalyses(this.$state.params.id, {
+        filter: this.states.searchTerm
+      }).then(analyses => {
+        this.reports = analyses;
+
+        if (this.states.reportView === this.LIST_VIEW) {
+          this._gridListInstance.option('dataSource', this.reports);
+          this._gridListInstance.refresh();
+        }
+      });
+    }
+
+    applySearchFilter() {
+      this.loadAnalyses();
     }
 
     getGridConfig() {
@@ -50,7 +70,8 @@ export const AnalyzeViewComponent = {
         dataField: 'name',
         allowSorting: true,
         alignment: 'left',
-        width: '50%'
+        width: '50%',
+        cellTemplate: 'nameCellTemplate'
       }, {
         caption: 'METRICS',
         dataField: 'metrics',
@@ -59,7 +80,8 @@ export const AnalyzeViewComponent = {
         width: '20%',
         calculateCellValue: rowData => {
           return (rowData.metrics || []).join(', ');
-        }
+        },
+        cellTemplate: 'metricsCellTemplate'
       }, {
         caption: 'SCHEDULED',
         dataField: 'scheduled',
@@ -81,25 +103,10 @@ export const AnalyzeViewComponent = {
         cellTemplate: 'actionCellTemplate'
       }];
 
-      return {
+      return this._dxDataGridService.mergeWithDefaultConfig({
         onInitialized: this.onGridInitialized.bind(this),
         columns,
         dataSource,
-        columnAutoWidth: true,
-        allowColumnReordering: true,
-        allowColumnResizing: true,
-        showColumnHeaders: true,
-        showColumnLines: false,
-        showRowLines: false,
-        showBorders: false,
-        rowAlternationEnabled: true,
-        hoverStateEnabled: true,
-        scrolling: {
-          mode: 'virtual'
-        },
-        sorting: {
-          mode: 'multiple'
-        },
         paging: {
           pageSize: 10
         },
@@ -107,7 +114,7 @@ export const AnalyzeViewComponent = {
           showPageSizeSelector: true,
           showInfo: true
         }
-      };
+      });
     }
 
     onGridInitialized(e) {
@@ -136,11 +143,13 @@ export const AnalyzeViewComponent = {
     }
 
     filterReports(item) {
+      let isIncluded = true;
+
       if (this.states.reportType !== 'all') {
-        return this.states.reportType === item.type;
+        isIncluded = this.states.reportType === item.type;
       }
 
-      return true;
+      return isIncluded;
     }
 
     onCardAction(actionType, model) {
