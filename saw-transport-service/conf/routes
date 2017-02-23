@@ -3,7 +3,8 @@
 # ~~~~
 GET     /               				controllers.MTSControl.index
 
-POST    /								controllers.TS.query
+POST    /								controllers.TS.handleRequest
+POST    /md								controllers.MD.handleRequest
 
 #POST		/report						controllers.Report.createReport
 

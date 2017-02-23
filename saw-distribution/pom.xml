@@ -3,13 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.razor</groupId>
-	<artifactId>raw-distribution</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<groupId>com.synchronoss</groupId>
+	<artifactId>saw-distribution</artifactId>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
-	<name>raw-distribution</name>
-	<description>raw-distribution-published</description>
+	<name>saw-distribution</name>
+	<description>saw-distribution-published</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -114,14 +114,14 @@
 		</dependency>
 		
 	<dependency>
-		<groupId>com.razor</groupId>
-		<artifactId>raw-configuration</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<groupId>com.synchronoss</groupId>
+		<artifactId>saw-configuration</artifactId>
+		<version>1.0.0</version>
 	</dependency>
 	<dependency>
-		<groupId>com.razor</groupId>
-		<artifactId>raw-core</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
+		<groupId>com.synchronoss</groupId>
+		<artifactId>saw-core</artifactId>
+		<version>1.0.0</version>
 	</dependency>
 	</dependencies>
 
@@ -147,9 +147,9 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>com.razor</groupId>
-				<artifactId>RAWCore</artifactId>
-				<version>0.0.1-SNAPSHOT</version>
+				<groupId>com.synchronoss</groupId>
+				<artifactId>SAWCore</artifactId>
+				<version>1.0.0</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

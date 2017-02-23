@@ -79,7 +79,7 @@ class Routes(
     PathPattern(List(StaticPart(this.prefix)))
   )
   private[this] lazy val controllers_TS_query1_invoker = createInvoker(
-    TS_0.query,
+    TS_0.handleRequest,
     HandlerDef(this.getClass.getClassLoader,
       "router",
       "controllers.TS",
@@ -154,7 +154,7 @@ class Routes(
     // @LINE:6
     case controllers_TS_query1_route(params) =>
       call { 
-        controllers_TS_query1_invoker.call(TS_0.query)
+        controllers_TS_query1_invoker.call(TS_0.handleRequest)
       }
   
     // @LINE:13

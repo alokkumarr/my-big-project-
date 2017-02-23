@@ -4,10 +4,10 @@ import org.apache.log4j.Logger
 import org.json4s.JsonAST.JValue
 import org.json4s._
 import org.json4s.native.JsonMethods._
-import sncr.metadata.MetadataObjectStructure
+import sncr.metadata.MDObjectStruct
 
 /**
-   Created by srya0001 on 2/10/2017.
+   *Created by srya0001 on 2/10/2017.
   */
 class QueryDatalake(val queryDescriptor: String ) {
 
@@ -16,7 +16,7 @@ class QueryDatalake(val queryDescriptor: String ) {
   var qDescJson: JValue = null
   var query : String = null
   var metadata : String = null
-  import MetadataObjectStructure.formats
+  import MDObjectStruct.formats
 
   try {
     qDescJson =  parse (queryDescriptor, false, false)
