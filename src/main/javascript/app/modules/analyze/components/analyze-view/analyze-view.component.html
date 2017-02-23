@@ -108,7 +108,7 @@
 
     <!-- CARD VIEW -->
     <div ng-switch-when="card" layout="row" layout-align="start start" layout-wrap>
-      <div flex="50" ng-repeat="report in $ctrl.reports | filter:$ctrl.filterReports.bind($ctrl)">
+      <div flex-md="50" ng-repeat="report in $ctrl.reports | filter:$ctrl.filterReports.bind($ctrl)">
         <analyze-card model="report" on-action="$ctrl.onCardAction(type, model)"></analyze-card>
       </div>
     </div>
