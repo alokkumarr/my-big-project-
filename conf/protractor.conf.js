@@ -9,8 +9,8 @@ exports.config = {
   directConnect: true,
 
   capabilities: {
-    'browserName': 'chrome',
-    'chromeOptions': {
+    browserName: 'chrome',
+    chromeOptions: {
       args: [
         'incognito',
         'disable-extensions',
@@ -29,12 +29,17 @@ exports.config = {
   },
 
   suites: {
+
+    authentication: [
+      webpackHelper.root('src/test/javascript/e2e/spec/login.spec.js')
+    ],
+
     analyses: [
       webpackHelper.root('src/test/javascript/e2e/spec/analyses.spec.js')
     ]
   },
 
-  onPrepare: function () {
+  onPrepare() {
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: true,
       displaySpecDuration: true,
