@@ -37,10 +37,10 @@ export const AnalyzeCardComponent = {
         });
     }
 
-    openPrintModal(ev) {
+    openPrintModal() {
     }
 
-    openExportModal(ev) {
+    openExportModal() {
     }
 
     execute() {

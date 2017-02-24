@@ -5,7 +5,6 @@ export const RequestMock = {
   url: '/api/analyze/category/:id',
   response: (method, url, data, headers, keys) => {
     const categories = require('./categories.json');
-    console.log(categories, keys.id);
     const category = find(categories, category => {
       return category.id === keys.id;
     });

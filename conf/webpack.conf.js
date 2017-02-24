@@ -18,6 +18,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
+const WebpackBuildVersion = require('./webpack.version');
+
 module.exports = function (env) {
   const isDevelopment = env === 'development';
   const isProduction = env === 'production';
@@ -216,6 +218,8 @@ module.exports = function (env) {
       sourceMap: false,
       mangle: false
     }));
+
+    conf.plugins.push(new WebpackBuildVersion('build.json'));
   }
 
   return conf;
