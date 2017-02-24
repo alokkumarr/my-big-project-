@@ -4,7 +4,7 @@
     "type": "chart",
     "name": "Order Revenue By Customer",
     "description": "Test description",
-    "category": "1",
+    "category": "11",
     "metrics": [
       "Orders",
       "Revenue"
@@ -17,7 +17,7 @@
     "type": "report",
     "name": "Shipper Usage",
     "description": "Test description",
-    "category": "1",
+    "category": "11",
     "metrics": [
       "Orders"
     ],

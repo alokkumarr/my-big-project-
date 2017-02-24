@@ -36,10 +36,10 @@ export const AnalyzeCardComponent = {
         });
     }
 
-    openPrintModal(ev) {
+    openPrintModal() {
     }
 
-    openExportModal(ev) {
+    openExportModal() {
     }
 
     fork() {

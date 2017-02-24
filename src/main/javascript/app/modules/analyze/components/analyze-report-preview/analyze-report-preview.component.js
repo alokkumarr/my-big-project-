@@ -1,4 +1,3 @@
-import concat from 'lodash/concat';
 import first from 'lodash/first';
 
 import template from './analyze-report-preview.component.html';
@@ -19,12 +18,11 @@ export const AnalyzeReportPreviewComponent = {
       this._AnalyzeService = AnalyzeService;
 
       this.MORE_ROWS_COUNT = 500;
+      this.data = [];
     }
 
     $onInit() {
-      this._$timeout(() => {
-        this.reloadPreviewGrid();
-      });
+      this.loadMore();
     }
 
     cancel() {
@@ -37,7 +35,7 @@ export const AnalyzeReportPreviewComponent = {
       if (grid) {
         grid.updateColumns(this.model.columns);
         grid.updateSorts(this.model.sorts);
-        grid.updateSource(this.model.gridData);
+        grid.updateSource(this.data);
         grid.refreshGrid();
       }
     }
@@ -45,7 +43,7 @@ export const AnalyzeReportPreviewComponent = {
     loadMore() {
       this._AnalyzeService.getDataByQuery()
         .then(data => {
-          this.model.gridData = concat(this.model.gridData, data);
+          this.data.push(...data);
           this.reloadPreviewGrid();
         });
     }

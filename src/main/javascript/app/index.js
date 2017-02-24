@@ -29,6 +29,7 @@ import {config} from './config';
 import {runConfig} from './run';
 
 import {LibModule} from './lib';
+import {CommonModule} from './modules/common';
 import {ObserveModule} from './modules/observe';
 import {AnalyzeModule} from './modules/analyze';
 import {AlertsModule} from './modules/alerts';
@@ -51,6 +52,7 @@ angular
     'dx',
     'pascalprecht.translate',
     LibModule,
+    CommonModule,
     ObserveModule,
     AnalyzeModule,
     AlertsModule
