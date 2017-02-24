@@ -45,7 +45,6 @@ export const AnalyzeChartDetailComponent = {
           data: [100, 25, 45, 100, 22]
         }]
       };
-      console.log(this.barChartOptions.series);
     }
 
     generateData() {

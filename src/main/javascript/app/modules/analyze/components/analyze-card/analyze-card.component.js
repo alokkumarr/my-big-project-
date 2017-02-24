@@ -11,9 +11,10 @@ export const AnalyzeCardComponent = {
   },
   controller: class AnalyzeCardController {
 
-    constructor($mdDialog) {
+    constructor($mdDialog, $state) {
       'ngInject';
       this._$mdDialog = $mdDialog;
+      this._$state = $state;
     }
 
     openMenu($mdMenu, ev) {
@@ -40,6 +41,14 @@ export const AnalyzeCardComponent = {
     }
 
     openExportModal(ev) {
+    }
+
+    execute() {
+      this.goToAnalysis(this.model.id);
+    }
+
+    goToAnalysis(id) {
+      this._$state.go('analyze.publishedDetail', {publishId: id});
     }
 
     fork() {

@@ -55,6 +55,12 @@ export const AnalyzePublishedListComponent = {
         alignment: 'left',
         width: '30%'
       }, {
+        caption: 'IS SCHEDULED',
+        dataField: 'IS_SCHEDULED',
+        allowSorting: true,
+        alignment: 'left',
+        width: '30%'
+      }, {
         caption: '',
         width: '30%',
         cellTemplate: 'actionCellTemplate'
