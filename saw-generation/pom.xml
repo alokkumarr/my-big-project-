@@ -3,13 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.razor</groupId>
-	<artifactId>raw-generation</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<groupId>com.synchronoss</groupId>
+	<artifactId>saw-generation</artifactId>
+	<version>1.0.0</version>
 	<packaging>war</packaging>
 
-	<name>raw-generation</name>
-	<description>raw-generation</description>
+	<name>saw-generation</name>
+	<description>saw-generation</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -119,25 +119,25 @@
         </dependency>
 
         <dependency>
-        	<groupId>com.razor</groupId>
-        	<artifactId>raw-core</artifactId>
-        	<version>0.0.1-SNAPSHOT</version>
+        	<groupId>com.synchronoss</groupId>
+        	<artifactId>saw-core</artifactId>
+        	<version>1.0.0</version>
         </dependency>
         <dependency>
-        	<groupId>com.razor</groupId>
-        	<artifactId>raw-schedular</artifactId>
-        	<version>0.0.1-SNAPSHOT</version>
+        	<groupId>com.synchronoss</groupId>
+        	<artifactId>saw-schedular</artifactId>
+        	<version>1.0.0</version>
         </dependency>
         <dependency>
-			<groupId>com.razor</groupId>
-			<artifactId>raw-drill</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>com.synchronoss</groupId>
+			<artifactId>saw-drill</artifactId>
+			<version>1.0.0</version>
 		</dependency>
 		
         <dependency>
-			<groupId>com.razor</groupId>
-			<artifactId>raw-utility</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>com.synchronoss</groupId>
+			<artifactId>saw-utility</artifactId>
+			<version>1.0.0</version>
 		</dependency>		
 	</dependencies>
 	
