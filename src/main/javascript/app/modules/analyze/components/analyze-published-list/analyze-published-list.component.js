@@ -6,6 +6,9 @@ import template from './analyze-published-list.component.html';
 export const AnalyzePublishedListComponent = {
   template,
   // styles: [style],
+  bindings: {
+    analyses: '<'
+  },
   controller: class AnalyzePublishedListController {
     constructor(AnalyzeService, $state, $window, dxDataGridService) {
       'ngInject';
@@ -13,17 +16,6 @@ export const AnalyzePublishedListComponent = {
       this._$state = $state;
       this._$window = $window;
       this._dxDataGridService = dxDataGridService;
-    }
-
-    $onInit() {
-      this.loadAnalysis();
-    }
-
-    loadAnalysis() {
-      this._AnalyzeService.getPublishedAnalysesByAnalysisId(this._$state.params.analysisId)
-        .then(analyses => {
-          this.analyses = analyses;
-        });
     }
 
     goToAnalysis(analysis) {

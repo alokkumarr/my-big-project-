@@ -15,7 +15,7 @@
       <md-card-title-text>
         <a class="md-headline"
               ng-bind-html="::$ctrl.model.name | highlight:$ctrl.highlightTerm"
-              ui-sref="analyze.publishedList({analysisId: $ctrl.model.id})">
+              ui-sref="analyze.publishedDetailLast({analysisId: $ctrl.model.id})">
         </a>
         <span class="md-subhead">
           <span ng-bind-html="::($ctrl.model.metrics || []).join(', ') | highlight:$ctrl.highlightTerm"></span>

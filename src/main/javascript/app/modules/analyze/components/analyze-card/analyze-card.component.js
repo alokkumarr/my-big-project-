@@ -11,10 +11,11 @@ export const AnalyzeCardComponent = {
   },
   controller: class AnalyzeCardController {
 
-    constructor($mdDialog, $state) {
+    constructor($mdDialog, $state, AnalyzeService) {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this._$state = $state;
+      this._AnalyzeService = AnalyzeService;
     }
 
     openMenu($mdMenu, ev) {
@@ -44,11 +45,14 @@ export const AnalyzeCardComponent = {
     }
 
     execute() {
-      this.goToAnalysis(this.model.id);
+      this._AnalyzeService.executeAnalysis()
+        .then(analysis => {
+          this.goToAnalysis(analysis.analysisId, analysis.publishedAnalysisId);
+        });
     }
 
-    goToAnalysis(id) {
-      this._$state.go('analyze.publishedDetail', {publishId: id});
+    goToAnalysis(analysisId, publishId) {
+      this._$state.go('analyze.publishedDetail', {analysisId, publishId});
     }
 
     fork() {

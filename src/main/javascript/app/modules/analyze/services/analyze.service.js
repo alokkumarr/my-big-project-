@@ -12,7 +12,7 @@ import some from 'lodash/fp/some';
 import set from 'lodash/fp/set';
 import get from 'lodash/fp/get';
 
-export function AnalyzeService($http) {
+export function AnalyzeService($http, $timeout, $q) {
   'ngInject';
 
   return {
@@ -21,7 +21,10 @@ export function AnalyzeService($http) {
     getMetrics,
     getArtifacts,
     getAnalyses,
+    getLastPublishedAnalysis,
     getPublishedAnalysesByAnalysisId,
+    getPublishedAnalysisById,
+    executeAnalysis,
     getAnalysisById,
     getDataByQuery,
     getSupportedMethods,
@@ -37,6 +40,25 @@ export function AnalyzeService($http) {
 
   function getPublishedAnalysesByAnalysisId(id) {
     return $http.get(`/api/analyze/publishedAnalyses/${id}`).then(get('data'));
+  }
+
+  function getLastPublishedAnalysis(id) {
+    return $http.get(`/api/analyze/lastPublishedAnalysis/${id}`).then(get('data'));
+  }
+
+  function getPublishedAnalysisById(id) {
+    return $http.get(`/api/analyze/publishedAnalysis/${id}`).then(get('data'));
+  }
+
+  function executeAnalysis(id) {
+    return $q((resolve, reject) => {
+      $timeout(() => {
+        resolve({
+          publishedAnalysisId: 1,
+          analysisId: 1
+        });
+      }, 0);
+    });
   }
 
   function getAnalysisById(id) {

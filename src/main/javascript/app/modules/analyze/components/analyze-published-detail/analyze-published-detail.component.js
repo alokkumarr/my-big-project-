@@ -14,13 +14,35 @@ export const AnalyzePublishedDetailComponent = {
     }
 
     $onInit() {
-      this.loadAnalysis();
+      const analysisId = this._$state.params.analysisId;
+      const publishId = this._$state.params.publishId;
+      if (publishId) {
+        this.loadAnalysisById(publishId);
+      } else {
+        // load the last published analysis
+        this.loadLastPublishedAnalysis(analysisId);
+      }
+      this.loadOtherAnalyses(analysisId);
     }
 
-    loadAnalysis() {
-      this._AnalyzeService.getAnalysisById(this._$state.params.publishId)
+    loadAnalysisById(publishId) {
+      this._AnalyzeService.getPublishedAnalysisById(publishId)
         .then(analysis => {
           this.analysis = analysis;
+        });
+    }
+
+    loadLastPublishedAnalysis(analysisId) {
+      this._AnalyzeService.getLastPublishedAnalysis(analysisId)
+        .then(analysis => {
+          this.analysis = analysis;
+        });
+    }
+
+    loadOtherAnalyses(analysisId) {
+      this._AnalyzeService.getPublishedAnalysesByAnalysisId(analysisId)
+        .then(analyses => {
+          this.analyses = analyses;
         });
     }
 

@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "analysisId": 1,
+    "forkedFrom": {
+      "publishedAnalysisId": 12,
+      "analysisName": "Order Revenue by Sector",
+      "creatorName": "Sharon Slausen"
+    },
+    "creatorName": "John Clay",
+    "type": "chart",
+    "name": "Order Revenue By Customer",
+    "description": "Test description",
+    "category": 11,
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": "Every Friday at 12:00pm",
+    "artifacts": []
+  },
+  {
+    "id": 2,
+    "analysisId": 2,
+    "type": "report",
+    "forkedFrom": {
+      "publishedAnalysisId": 16,
+      "analysisName": "Warehouse Usage",
+      "creatorName": "Sharon Slausen"
+    },
+    "creatorName": "John Clay",
+    "name": "Shipper Usage",
+    "description": "Test description",
+    "category": 11,
+    "metrics": [
+      "Orders"
+    ],
+    "scheduled": "Daily",
+    "filters": [],
+    "data": []
+  }
+]

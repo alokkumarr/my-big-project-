@@ -1,17 +1,4 @@
 <div layout="column" layout-align="space-between stretch" class="container">
-  <md-toolbar class="secondary-toolbar">
-    <div class="md-toolbar-tools" layout-align="space-between center">
-      <div layout="row">
-        <md-button ng-click="$ctrl._$window.history.back()" class="md-icon-button back-button" aria-label="Back">
-          <md-icon md-font-icon="icon-arrow-left"></md-icon>
-        </md-button>
-
-        <div style="margin-left: 16px;">
-          <div class="md-headline" translate="PUBLISHED_ANALYSES"></div>
-        </div>
-      </div>
-    </div>
-  </md-toolbar>
   <md-card>
     <md-card-content layout="row">
       <div dx-data-grid="$ctrl.getGridConfig()" dx-item-alias="analysis">
