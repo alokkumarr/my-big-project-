@@ -13,9 +13,18 @@ class AnimatedCollapseDirective {
       const isCollapsed = Boolean(newValue);
 
       this.$mdUtil.nextTick(() => {
-        this.$timeout(() => this.updateHeight(element, isCollapsed), 0, false);
+        this.$timeout(() => {
+          this.updateHeight(element, isCollapsed);
+          this.toggleClass(element, isCollapsed);
+        }, 0, false);
       }, false);
     });
+  }
+
+  toggleClass(element, isCollapsed) {
+    return isCollapsed ?
+      element.addClass('is-collapsed') :
+      element.removeClass('is-collapsed');
   }
 
   updateHeight(element, isCollapsed) {

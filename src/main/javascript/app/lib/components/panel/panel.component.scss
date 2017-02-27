@@ -1,0 +1,19 @@
+md-sidenav.md-triton-theme.md-sidenav-right {
+  background-color: #F3F5F9;
+}
+
+filter-group,
+analyze-filter-group {
+  panel,
+  analyze-filter-container {
+    md-card {
+      margin-top: 8px;
+    }
+  }
+}
+
+.is-collapsed {
+  .header-divider {
+    border-color: transparent;
+  }
+}
