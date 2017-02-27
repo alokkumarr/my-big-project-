@@ -35,7 +35,11 @@
     </div>
   </div>
 </md-toolbar>
-  <analyze-chart-detail analysis="$ctrl.analysis"></analyze-chart-detail>
+  <div ng-switch="$ctrl.analysis.type">
+    <analyze-chart-detail ng-switch-when="chart" analysis="$ctrl.analysis"></analyze-chart-detail>
+    <analyze-report-detail ng-switch-when="report" analysis="$ctrl.analysis"></analyze-report-detail>
+    <analyze-pivot-detail ng-switch-when="pivot" analysis="$ctrl.analysis"></analyze-pivot-detail>
+  </div>
   <md-card>
     <md-card-title>
       <md-card-title-text>

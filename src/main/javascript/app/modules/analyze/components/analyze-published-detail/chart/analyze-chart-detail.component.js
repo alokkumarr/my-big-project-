@@ -11,11 +11,7 @@ export const AnalyzeChartDetailComponent = {
   },
   styles: [style],
   controller: class AnalyzeChartDetailController {
-    constructor(AnalyzeService, $state, $window) {
-      'ngInject';
-      this._AnalyzeService = AnalyzeService;
-      this._$state = $state;
-      this._$window = $window;
+    constructor() {
       this.barChartOptions = {
         xAxis: {
           categories: ['A', 'B', 'C', 'D', 'E'],

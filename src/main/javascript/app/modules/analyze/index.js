@@ -9,6 +9,8 @@ import {FilterService} from './services/filter.service';
 import {AnalyzePageComponent} from './components/analyze-page/analyze-page.component';
 import {AnalyzeViewComponent} from './components/analyze-view/analyze-view.component';
 import {AnalyzePublishedListComponent} from './components/analyze-published-list/analyze-published-list.component';
+import {AnalyzeReportDetailComponent} from './components/analyze-published-detail/report/analyze-report-detail.component';
+import {AnalyzePivotDetailComponent} from './components/analyze-published-detail/pivot/analyze-pivot-detail.component';
 import {AnalyzeChartDetailComponent} from './components/analyze-published-detail/chart/analyze-chart-detail.component';
 import {AnalyzePublishedDetailComponent} from './components/analyze-published-detail/analyze-published-detail.component';
 import {AnalyzeCardComponent} from './components/analyze-card/analyze-card.component';
@@ -44,6 +46,8 @@ angular.module(AnalyzeModule, [])
   .component('analyzePage', AnalyzePageComponent)
   .component('analyzeView', AnalyzeViewComponent)
   .component('analyzePublishedList', AnalyzePublishedListComponent)
+  .component('analyzeReportDetail', AnalyzeReportDetailComponent)
+  .component('analyzePivotDetail', AnalyzePivotDetailComponent)
   .component('analyzeChartDetail', AnalyzeChartDetailComponent)
   .component('analyzePublishedDetail', AnalyzePublishedDetailComponent)
   .component('analyzeCard', AnalyzeCardComponent)
