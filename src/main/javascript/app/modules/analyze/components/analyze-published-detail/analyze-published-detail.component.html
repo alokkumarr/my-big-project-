@@ -24,12 +24,12 @@
         <span translate="PRINT"></span>
       </md-button>
 
-      <md-button class="btn-tertiary" ng-click="$ctrl.openEditModal()">
+      <md-button ng-hide="$ctrl.isPublished" class="btn-tertiary" ng-click="$ctrl.openEditModal()">
         <md-icon md-font-icon="icon-edit"></md-icon>
         <span translate="EDIT"></span>
       </md-button>
 
-      <md-button class="btn-primary" ng-click="$ctrl.openPublishModal()">
+      <md-button ng-hide="$ctrl.isPublished" class="btn-primary" ng-click="$ctrl.openPublishModal()">
         <span translate="PUBLISH"></span>
       </md-button>
     </div>
@@ -39,7 +39,7 @@
   <md-card>
     <md-card-title>
       <md-card-title-text>
-        <span class="md-title">John Clay</span>
+        <span class="md-title" ng-bind="$ctrl.analysis.creatorName"></span>
         <span class="md-subhead" ng-bind="$ctrl.analysis.scheduled"></span>
       </md-card-title-text>
     </md-card-title>
@@ -48,8 +48,11 @@
     </md-card-content>
     <md-card-footer>
       <md-icon md-font-icon="icon-fork"></md-icon>
-      Forked from <a>Order Revenue By Sector</a> By <a>Sharon Slausen</a>
+      <span translate="FORKED_FROM_ANALYSIS_BY_CREATOR"
+            translate-values="{analysis: $ctrl.analysis.forkedFrom.analysisName, creator: $ctrl.analysis.forkedFrom.creatorName}"></span>
     </md-card-footer>
   </md-card>
-  <analyze-published-list analyses="$ctrl.analyses"></analyze-published-list>
+  <panel start-collapsed="true" title="'OTHER_PUBLISHED_ANALYSES' | translate">
+    <analyze-published-list analyses="$ctrl.analyses"></analyze-published-list>
+  </panel>
 </div>

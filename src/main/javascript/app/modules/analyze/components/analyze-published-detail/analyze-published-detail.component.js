@@ -11,6 +11,7 @@ export const AnalyzePublishedDetailComponent = {
       this._$state = $state;
       this._$window = $window;
       this._$mdDialog = $mdDialog;
+      this.isPublished = true;
     }
 
     $onInit() {
@@ -29,6 +30,9 @@ export const AnalyzePublishedDetailComponent = {
       this._AnalyzeService.getPublishedAnalysisById(publishId)
         .then(analysis => {
           this.analysis = analysis;
+          if (!this.analysis.schedule) {
+            this.isPublished = false;
+          }
         });
     }
 

@@ -4,14 +4,16 @@ export const PanelComponent = {
   template,
   transclude: true,
   bindings: {
-    title: '@'
+    title: '<',
+    startCollapsed: '@'
   },
   controller: class PanelCtrl {
     constructor() {
       this.isCollapsed = false;
     }
 
-    $postLink() {
+    $onInit() {
+      this.isCollapsed = Boolean(this.startCollapsed);
     }
 
     toggle() {
