@@ -12,6 +12,7 @@ class PhantomRender {
         });
       },
       setDefaultPaperSize: () => {
+        /* eslint-disable prefer-arrow-callback */
         this.setPaperSize(e.page, {
           format: 'A4',
           orientation: 'portrait',
@@ -23,26 +24,27 @@ class PhantomRender {
             })
           }
         });
+        /* eslint-enable prefer-arrow-callback */
       }
     };
 
     phantom.create()
-      .then((instance) => {
+      .then(instance => {
         e.phantom = instance;
         return instance.createPage();
       })
-      .then((page) => {
+      .then(page => {
         e.page = page;
         return page.open(url);
       })
-      .then((status) => {
+      .then(status => {
         if (status !== 'success') {
           return Promise.reject({status});
         }
 
         callback(null, e);
       })
-      .catch((err) => {
+      .catch(err => {
         if (e.phantom) {
           e.phantom.exit();
         }

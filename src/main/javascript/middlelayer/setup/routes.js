@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const PhantomRender = require('../lib/phantomRender');
 
-module.exports = (context) => {
+module.exports = context => {
   const {app} = context;
 
   let logged = false;
@@ -80,9 +80,11 @@ module.exports = (context) => {
       result.setDefaultViewportSize();
       result.setDefaultPaperSize();
 
+      /* eslint-disable prefer-arrow-callback, no-undef */
       page.evaluate(function () {
         html_render();
       });
+      /* eslint-enable prefer-arrow-callback, no-undef */
 
       page.render(tmpPath, {
         format: 'pdf',
@@ -99,10 +101,10 @@ module.exports = (context) => {
           stream.pipe(res);
         });
 
-        stream.on('error', (err) => {
+        stream.on('error', err => {
           next(err);
         });
       });
     });
   });
-}
+};

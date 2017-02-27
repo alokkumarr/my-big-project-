@@ -9,4 +9,4 @@ context.app = express();
   require('./setup/server')
 ].forEach(item => {
   item(context);
-})
+});

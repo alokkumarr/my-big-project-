@@ -1,7 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 
-module.exports = (context) => {
+module.exports = context => {
   const {app, dist} = context;
 
   app.set('view engine', 'html');
