@@ -54,7 +54,7 @@ export function AnalyzeService($http, $timeout, $q) {
     return $q((resolve, reject) => {
       $timeout(() => {
         resolve({
-          publishedAnalysisId: 1,
+          publishedAnalysisId: 3,
           analysisId: 1
         });
       }, 0);
