@@ -1,18 +1,28 @@
 <div layout-gt-xs="row">
+  <md-icon
+    md-font-icon="icon-calendar">
+  </md-icon>
   <md-input-container flex-gt-xs>
     <label translate="FROM"></label>
     <md-datepicker
       ng-model="$ctrl.ngModel.fromDate" ng-change="$ctrl.onDatesSelected($ctrl.ngModel)"
-      md-placeholder="mm/dd/yyyy"></md-datepicker>
+      md-hide-icons="all" md-open-on-focus
+      md-placeholder="mm/dd/yyyy"
+    ></md-datepicker>
   </md-input-container>
   <div style="width: 20px;padding: 0 3px;">
     <div></div>
   </div>
+  <md-icon
+    md-font-icon="icon-calendar">
+  </md-icon>
   <md-input-container flex-gt-xs>
     <label translate="TO"></label>
     <md-datepicker
       ng-model="$ctrl.ngModel.toDate" ng-change="$ctrl.onDatesSelected($ctrl.ngModel)"
-      md-placeholder="mm/dd/yyyy"></md-datepicker>
+      md-hide-icons="all" md-open-on-focus
+      md-placeholder="mm/dd/yyyy"
+    ></md-datepicker>
   </md-input-container>
 </div>
 <div class="time-range-shortcut-btns">
