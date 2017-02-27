@@ -8,7 +8,7 @@
 
       <div class="ard_meta" flex>
         <div class="md-title">
-          <strong ng-bind="$ctrl.model.name"></strong>
+          <strong class="e2e-report-title" ng-bind="$ctrl.model.name"></strong>
           <label translate="DRAFT"></label>
         </div>
         <div class="md-description">
@@ -18,13 +18,8 @@
       </div>
 
       <div class="ard_actions" flex>
-        <md-button ng-click="$ctrl.openExportModal()"
-                   translate="EXPORT"></md-button>
         <md-button ng-click="$ctrl.openSaveModal()"
-                   translate="SAVE"></md-button>
-        <md-button class="btn-primary"
-                   ng-click="$ctrl.openPublishModal()"
-                   translate="PUBLISH">
+                   translate="SAVE">
         </md-button>
       </div>
     </div>

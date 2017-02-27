@@ -1,0 +1,131 @@
+[
+  {
+    "_id": "10",
+    "category_name": "My Analyses",
+    "module": "ANALYZE",
+    "customer_code": "ATT",
+    "data_security_key": "ATT+MCT",
+    "role_type": "ADMIN",
+    "children": [
+      {
+        "sub_category_id": "11",
+        "sub_category_name": "Order Fulfillment",
+        "list": [
+          {
+            "_id": "1",
+            "customer_product_feature_id": "feature_id_1",
+            "active": "true",
+            "artifact_name": "Order Revenue By Customer",
+            "type": "chart",
+            "description": "",
+            "scheduled": "Every Friday at 12:00pm",
+            "metric_name": "Orders, Revenue",
+            "created_by": "",
+            "created_date": "",
+            "type_id": ""
+          },
+          {
+            "_id": "2",
+            "customer_product_feature_id": "feature_id_2",
+            "active": "true",
+            "artifact_name": "Shipper Usage",
+            "type": "report",
+            "description": "",
+            "scheduled": "Daily",
+            "metric_name": "Orders",
+            "created_by": "",
+            "created_date": "",
+            "type_id": ""
+          }
+        ]
+      },
+      {
+        "sub_category_id": "12",
+        "sub_category_name": "Category 2",
+        "list": []
+      },
+      {
+        "sub_category_id": "13",
+        "sub_category_name": "Category 3",
+        "list": []
+      },
+      {
+        "sub_category_id": "14",
+        "sub_category_name": "Category 4",
+        "list": []
+      },
+      {
+        "sub_category_id": "15",
+        "sub_category_name": "Category 5",
+        "list": []
+      }
+    ]
+  },
+  {
+    "_id": "20",
+    "category_name": "Canned Analyses",
+    "module": "ANALYZE",
+    "customer_code": "ATT",
+    "data_security_key": "ATT+MCT",
+    "role_type": "ADMIN",
+    "children": [
+      {
+        "sub_category_id": "21",
+        "sub_category_name": "Category 1",
+        "list": [
+          {
+            "_id": "1",
+            "customer_product_feature_id": "feature_id_1",
+            "active": "true",
+            "artifact_name": "Order Fulfilment",
+            "type": "chart/report/Pivot/crosstab",
+            "description": "",
+            "scheduled": "",
+            "metric_name": "",
+            "created_by": "",
+            "created_date": "",
+            "type_id": ""
+          },
+          {
+            "_id": "2",
+            "customer_product_feature_id": "feature_id_2",
+            "active": "true",
+            "artifact_name": "Order Analysis",
+            "type": "chart/report/Pivot/crosstab",
+            "description": "",
+            "scheduled": "",
+            "metric_name": "",
+            "created_by": "",
+            "created_date": "",
+            "type_id": ""
+          }
+        ]
+      },
+      {
+        "sub_category_id": "22",
+        "sub_category_name": "Category 2",
+        "list": []
+      }
+    ]
+  },
+  {
+    "_id": "30",
+    "category_name": "Indirect Analyses",
+    "module": "OBSERVE",
+    "customer_code": "ATT",
+    "data_security_key": "ATT+MCT",
+    "role_type": "ADMIN",
+    "children": [
+      {
+        "sub_category_id": "31",
+        "sub_category_name": "Category 1",
+        "list": []
+      },
+      {
+        "sub_category_id": "32",
+        "sub_category_name": "Category 2",
+        "list": []
+      }
+    ]
+  }
+]

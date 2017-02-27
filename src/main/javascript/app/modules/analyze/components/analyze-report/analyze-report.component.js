@@ -417,9 +417,7 @@ export const AnalyzeReportComponent = {
           controller: scope => {
             scope.model = {
               report: this.model,
-              gridData: this.gridData,
               columns: this.columns,
-              title: this.data.title,
               sorts: map(this.canvas.model.sorts, sort => {
                 return {
                   column: sort.field.name,
@@ -428,7 +426,6 @@ export const AnalyzeReportComponent = {
               })
             };
           },
-          controllerAs: '$ctrl',
           targetEvent: ev,
           fullscreen: true,
           autoWrap: false,
@@ -443,22 +440,22 @@ export const AnalyzeReportComponent = {
         this.reloadPreviewGrid();
       });
 
-      const tpl = '<analyze-report-sort model="$ctrl.model"></analyze-report-sort>';
+      const tpl = '<analyze-report-sort model="model"></analyze-report-sort>';
 
       this._$mdDialog
         .show({
           template: tpl,
           controller: scope => {
-            scope.$ctrl.model = {
+            scope.model = {
               fields: this.canvas.model.getSelectedFields(),
               sorts: map(this.canvas.model.sorts, sort => {
                 return clone(sort);
               })
             };
           },
-          controllerAs: '$ctrl',
           targetEvent: ev,
           fullscreen: true,
+          autoWrap: false,
           multiple: true
         })
         .then(sorts => {
@@ -481,16 +478,12 @@ export const AnalyzeReportComponent = {
             this.model.description = data.description;
           };
         },
-        controllerAs: '$ctrl',
         autoWrap: false,
         focusOnOpen: false,
         multiple: true,
         targetEvent: ev,
         clickOutsideToClose: true
       });
-    }
-
-    openExportModal() {
     }
 
     openSaveModal(ev) {
@@ -509,12 +502,12 @@ export const AnalyzeReportComponent = {
             scope.model = clone(this.model);
 
             scope.onSave = data => {
+              this.model.id = data.id;
               this.model.name = data.name;
               this.model.description = data.description;
               this.model.category = data.category;
             };
           },
-          controllerAs: '$ctrl',
           autoWrap: false,
           fullscreen: true,
           focusOnOpen: false,
@@ -522,9 +515,6 @@ export const AnalyzeReportComponent = {
           targetEvent: ev,
           clickOutsideToClose: true
         });
-    }
-
-    openPublishModal() {
     }
   }
 };

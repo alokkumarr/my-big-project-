@@ -14,11 +14,11 @@ export const ObservePageComponent = {
   template,
   styles: [style],
   controller: class ObserverPageController {
-    constructor($componentHandler, ObserveService) {
+    constructor($componentHandler, MenuService) {
       'ngInject';
 
       this.$componentHandler = $componentHandler;
-      this.ObserveService = ObserveService;
+      this.MenuService = MenuService;
 
       this.filterSidenavId = OBSERVE_FILTER_SIDENAV_ID;
 
@@ -31,7 +31,7 @@ export const ObservePageComponent = {
     $onInit() {
       const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
 
-      this.ObserveService.getMenu()
+      this.MenuService.getMenu('OBSERVE')
         .then(data => {
           leftSideNav.update(data);
         });

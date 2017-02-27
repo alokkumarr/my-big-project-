@@ -14,21 +14,52 @@ describe('Analyses Tests', () => {
     sidenav.sidenavElements.firstCategory.click();
   });
 
-  it('should see the analysis card view', () => {
-    analyze.validateCard();
+  it('should display card view by default', () => {
+    analyze.validateCardView();
   });
 
   it('should attempt to create a new analysis', () => {
     analyze.analysisElems.addAnalysisBtn.click();
-    analyze.validateAnalyzeDialog();
+    analyze.validateNewAnalyze();
   });
 
-  it('should select Report table type and click Create', () => {
-    analyze.analysisElems.analyzeReportTable.click();
+  it('should verify the first metric', () => {
+    analyze.analysisElems.firstMetric.click();
+    expect(analyze.analysisElems.secondMetric.getAttribute('aria-disabled')).toEqual('true');
+    analyze.analysisElems.firstMetric.click();
+    expect(analyze.analysisElems.secondMetric.getAttribute('aria-disabled')).toEqual('false');
+  });
+
+  it('should select report type and proceed', () => {
+    analyze.analysisElems.reportTable.click();
     analyze.analysisElems.createAnalysisBtn.click();
+    analyze.validateDesignerDialog();
   });
 
-  it('should open the designer dialog', () => {
-    analyze.validateAnalyzeDialog();
+  it('should add fields to report', () => {
+    analyze.analysisElems.totalPriceField.click();
+    analyze.analysisElems.shipperNameField.click();
+    analyze.analysisElems.customerNameField.click();
+  });
+
+  it('should see the added fields in the details panel', () => {
+    analyze.analysisElems.toggleDetailsPanel.click();
+    analyze.analysisElems.totalPriceField.click();
+  });
+
+  it('should attempt to save the report and fill the details', () => {
+    analyze.analysisElems.saveReportBtn.click();
+    analyze.analysisElems.reportCategory.click();
+    analyze.analysisElems.firstCategoryOption.click();
+    expect(analyze.analysisElems.reportCategory.getText()).toEqual('Order Fulfillment');
+    analyze.analysisElems.reportNameField.clear().sendKeys('e2e report');
+    analyze.analysisElems.reportDescriptionField.clear().sendKeys('e2e test description');
+    analyze.analysisElems.saveReportDetails.click();
+  });
+
+  it('should change the report details accordingly ', () => {
+    expect(analyze.analysisElems.reportTitle.getText()).toEqual('e2e report');
+    analyze.analysisElems.reportDescriptionBtn.click();
+    expect(analyze.analysisElems.reportDescription.getAttribute('value')).toEqual('e2e test description');
   });
 });
