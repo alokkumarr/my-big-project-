@@ -6,12 +6,14 @@ import org.apache.hadoop.hbase.filter.{FilterList, SingleColumnValueFilter}
 import org.apache.hadoop.hbase.util.Bytes
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.MDObjectStruct
+import sncr.metadata.ProcessingResult._
 
 /**
   * Created by srya0001 on 2/19/2017.
   */
 trait SearchMetadata extends MetadataStore{
 
+  override val m_log: Logger = LoggerFactory.getLogger(classOf[SearchMetadata].getName)
 
   import scala.collection.JavaConversions._
   def simpleMetadataSearch(keys: Map[String, Any], condition: String) : List[Array[Byte]] =
@@ -69,6 +71,27 @@ trait SearchMetadata extends MetadataStore{
     m_log trace s"Full scan MD Nodes: ${sr.size} rows satisfied to filter: ${result.map ( new String( _ )).mkString("[", ",", "]")}"
     sr.close
     result
+  }
+
+  def selectRowKey(keys: Map[String, Any]) : (Int, String) = {
+    if (keys.contains("NodeId")) {
+      setRowKey(Bytes.toBytes(keys("NodeId").asInstanceOf[String]))
+      val msg = s" Selected Node [ ID = ${new String(rowKey)} ]"; m_log debug Success.toString + " ==> " + msg
+      (Success.id,  msg)
+    }
+    else{
+      val rowKeys = simpleMetadataSearch(keys, "and")
+      if (rowKeys != Nil) {
+        val rk = rowKeys.head
+        setRowKey(rk)
+        val msg = s"Selected Node [ ID = ${new String(rowKey)} ]"; m_log debug Success.toString + " ==> " + msg
+        (Success.id, msg )
+      }
+      else {
+        val msg = s"No row keys were selected"; m_log debug noDataFound.toString + " ==> " + msg
+        (noDataFound.id, msg)
+      }
+    }
   }
 
 

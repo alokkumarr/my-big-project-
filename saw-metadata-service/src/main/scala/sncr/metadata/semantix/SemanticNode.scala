@@ -1,9 +1,9 @@
 package sncr.metadata.semantix
 
-import com.mapr.org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.hbase.TableName
 import org.json4s.JsonAST.JValue
 import org.json4s.native.JsonMethods._
+import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.ProcessingResult._
 import sncr.metadata.semantix.SearchDictionary.searchFields
 import sncr.metadata.store.{MDNodeUtil, MetadataNode, SearchMetadata}
@@ -15,6 +15,7 @@ import sncr.saw.common.config.SAWServiceConfig
   */
 class SemanticNode(val ticket: JValue, val content_element: JValue, val module_name : String = "none") extends MetadataNode with SearchMetadata{
 
+  override val m_log: Logger = LoggerFactory.getLogger(classOf[SemanticNode].getName)
 
   import MDObjectStruct.formats
   val table = SAWServiceConfig.metadataConfig.getString("path") + "/" + tables.SemanticMetadata
@@ -41,15 +42,7 @@ class SemanticNode(val ticket: JValue, val content_element: JValue, val module_n
   {
     try {
       createNode
-      var sval : Map[String, Any] = SemanticNode.extractSearchData(ticket, content_element) + ("NodeId" -> new String(rowKey))
-      if (!module_name.equalsIgnoreCase("none")) sval = sval + ("module" -> module_name )
-      sval.keySet.foreach(k => {m_log trace s"Add search field $k with value: ${sval(k).asInstanceOf[String]}"})
-      addSearchSection (sval)
-      addSource(compact(render(content_element)))
-      if (saveNode)
-        (Success.id, s"The Semantic Node [ ${new String(rowKey)} ] has been created")
-      else
-        (Error.id, "Could not create document")
+      completeNode("has been created")
     }
     catch{
       case x: Exception => { val msg = s"Could not store node [ ID = ${new String(rowKey)} ]: "; m_log error (msg, x); ( Error.id, msg)}
@@ -58,47 +51,43 @@ class SemanticNode(val ticket: JValue, val content_element: JValue, val module_n
 
   def modifyNode(keys: Map[String, Any]) : (Int, String) =
   {
-    val (res, msg ) = selectRowKey(keys)
-    if (res != Success.id) return (res, msg)
-    retrieve.getOrElse(Map.empty)
-    setRowKey(rowKey)
-    var sval : Map[String, Any] = SemanticNode.extractSearchData(ticket, content_element) + ("NodeId" -> new String(rowKey))
-    if (!module_name.equalsIgnoreCase("none")) sval = sval + ("module" -> module_name )
+    try {
 
-    sval.keySet.foreach(k => {m_log trace s"Add search field $k with value: ${sval(k).asInstanceOf[String]}"})
-    update
-    addSearchSection (sval)
+      val (res, msg ) = selectRowKey(keys)
+      if (res != Success.id) return (res, msg)
+      retrieve.getOrElse(Map.empty)
+      setRowKey(rowKey)
+      update
+      completeNode("has been updated")
+    }
+    catch{
+      case x: Exception => { val msg = s"Could not store node [ ID = ${new String(rowKey)} ]: "; m_log error (msg, x); ( Error.id, msg)}
+    }
+  }
+
+
+
+  private def completeNode(operName : String): (Int, String) =
+  {
+    var searchValues : Map[String, Any] = SemanticNode.extractSearchData(ticket, content_element) + ("NodeId" -> new String(rowKey))
+    if (!module_name.equalsIgnoreCase("none")) searchValues = searchValues + ("module" -> module_name )
+    searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
+    addSearchSection (searchValues)
     addSource(compact(render(content_element)))
     if (saveNode)
-      (Success.id, s"The Semantic Node [ ${new String(rowKey)} ] has been updated")
+      (Success.id, s"The Semantic Node [ ${new String(rowKey)} ] $operName")
     else
-      (Error.id, "Could not update Semantic Node")
+      (Error.id, "Could not create/update Semantic Node")
   }
+
 
   def retrieveNode(keys: Map[String, Any]) : Map[String, Any] =
   {
-    val rowKeys = simpleMetadataSearch(keys, "and")
-    if (rowKeys != Nil) setRowKey(rowKeys.head) else return Map.empty
+    val (res, msg ) = selectRowKey(keys)
+    if (res != Success.id) return Map.empty
     retrieve.getOrElse(Map.empty)
   }
 
-  def selectRowKey(keys: Map[String, Any]) : (Int, String) = {
-    if (keys.contains("NodeId")) {
-      setRowKey(Bytes.toBytes(keys("NodeId").asInstanceOf[String]))
-      (Success.id,  s" Selected Node [ ID = ${new String(rowKey)} ]")
-    }
-    else{
-      val rowKeys = simpleMetadataSearch(keys, "and")
-      if (rowKeys != Nil) {
-        val rk = rowKeys.head
-        setRowKey(rk)
-        (Success.id,  s"Selected Node [ ID = ${new String(rowKey)} ]")
-      }
-      else {
-        (noDataFound.id, s"No row keys were selected")
-      }
-    }
-  }
 
   def removeNode(keys: Map[String, Any]) : (Int, String) =
   {
@@ -116,24 +105,28 @@ class SemanticNode(val ticket: JValue, val content_element: JValue, val module_n
 
 object SemanticNode
 {
+  val m_log: Logger = LoggerFactory.getLogger("SemanticNodeObject")
+
   val separator: String = "::"
-    val rowKeyRule = List(("ticket", "customer_code"),
+  val rowKeyRule = List(("ticket", "customer_code"),
                        ("contents", "module"),
                        ("contents", "type"),
                        ("ticket", "ticketId"))
 
-  def extractSearchData(ticket: JValue, content_element: JValue) : Map[String, Any] = {
-    List((content_element \ "customer_Prod_module_feature_sys_id", "customer_Prod_module_feature_sys_id"),
-      (ticket \ "userName", "userName"),
-      (ticket \ "dataSecurityKey", "dataSecurityKey"),
-      (content_element \ "type", "type"),
-      (content_element \ "metric_name", "metric_name"),
-      (ticket \ "customer_code", "customer_code"))
+  def  extractSearchData(ticket: JValue, content_element: JValue) : Map[String, Any] = {
+    List((content_element, "customer_Prod_module_feature_sys_id"),
+      (ticket, "userName"),
+      (ticket, "dataSecurityKey"),
+      (content_element, "type"),
+      (content_element, "metric_name"),
+      (ticket, "customer_code"))
       .map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, searchFields(jv._2)) )
+        m_log trace s"Field: ${jv._2}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${searchFields(jv._2)}\n, Value: $searchValue"
         if (result) jv._2 -> Option(searchValue) else jv._2 -> None
       }).filter(_._2.isDefined).map(kv => kv._1 -> kv._2.get).toMap
   }
+
 }
 
 

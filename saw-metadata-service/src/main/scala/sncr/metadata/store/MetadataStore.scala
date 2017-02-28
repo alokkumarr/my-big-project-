@@ -29,7 +29,6 @@ abstract class MetadataStore {
   else default_user
   lazy val realUser: UserGroupInformation = UserGroupInformation.createRemoteUser(user)
   UserGroupInformation.setLoginUser(realUser)
-  m_log debug "Create connection and admin object"
   hbaseConf.set("hbase.zookeeper.quorum", zQuorum)
   lazy val connection = ConnectionFactory.createConnection(hbaseConf)
   lazy val admin = connection.getAdmin
@@ -37,6 +36,8 @@ abstract class MetadataStore {
   var mdNodeStoreTable : Table = null
   var searchFields : Map[String, Any] = Map.empty
 
+  protected var rowKey: Array[Byte] = null
+  protected def setRowKey(rK: Array[Byte]): Unit = rowKey = rK
 
   def close: Unit = mdNodeStoreTable.close()
 

@@ -1,0 +1,84 @@
+{
+  "ticket":{
+    "ticketId":"28_1481019911763_2105901292",
+    "windowId":"28_1481019911763_1066874973",
+    "masterLoginId":"admin@att.com",
+    "customer_code":"ATT",
+    "userName":"Adminstrator",
+    "password":null,
+    "prodCode":"1",
+    "roleType":"Admin",
+    "createdTime":1481019911763,
+    "dataSecurityKey":"ATT_ADMIN",
+    "validUpto":1481027111763,
+    "valid":true,
+    "validityReason":"User Authenticated Successfully",
+    "validMins":20,
+    "iat":1481019912,
+    "product_modules":[{
+      "pro_code":"ST",
+      "product_mod_name":"Observe",
+      "product_mod_desc":"Observe Module",
+      "product_mod_code":"OBSV",
+      "module_url":"/observe"
+    },{
+      "pro_code":"MCT",
+      "productDesc":"Mobile Content Transfer",
+      "product_mod_name":"Alert",
+      "product_mod_desc":"Alert Module",
+      "product_mod_code":"ALERT",
+      "module_url":"/alert"
+    }],
+    "product_modules_features":[{
+      "prodCode":"ST",
+      "productModName":"Analyze",
+      "productModDesc":"Analyze Module",
+      "productModCode":"ANALYZE",
+      "prodModFeature":[{
+        "prodModFeatureName":"My Analysis",
+        "prodModFeatureDesc":"My Analysis",
+        "defaultURL":"/report",
+        "default":true,
+        "customer_Prod_module_feature_sys_id":"feature_id_1",
+        "prodModFeatrPriv":[{
+          "privName":"Report Read Write",
+          "privCode":"REPORTCATRW",
+          "privDesc":"Report Read Write",
+          "prodModFeatrName":"REPORTCAT"
+        }]
+      },{
+        
+      }]
+    }]
+  },
+  "performed_action":"update",
+  "contents":[{
+    "result":0,
+    "reason":"The Semantic Node [ ATT::analyze::report::28_1481019911763_2105901292 ] has been updated"
+  }]
+}
+{
+  "ticket":{
+    "ticketId":"28_1481019911763_2105901292",
+    "windowId":"28_1481019911763_1066874973",
+    "masterLoginId":"admin@att.com",
+    "customer_code":"ATT",
+    "userName":"Adminstrator",
+    "password":null,
+    "prodCode":"1",
+    "roleType":"Admin",
+    "createdTime":1481019911763,
+    "dataSecurityKey":"ATT_ADMIN",
+    "validUpto":1481027111763,
+    "valid":true,
+    "validityReason":"User Authenticated Successfully",
+    "validMins":20,
+    "iat":1481019912
+  },
+  "performed_action":"retrieve",
+  "contents":[{
+    "NodeId":"ATT::analyze::report::28_1481019911763_2105901292",
+    "module":"analyze",
+    "content":"{\"_id\":\"1234567890\",\"name\":\"NewCustomerModule\",\"userName\":\"admin@att.com\",\"dataSecurityKey\":\"ATT\",\"category\":\"My Analysis\",\"type\":\"report\",\"customer_Prod_module_feature_sys_id\":\"fsys1_100000\",\"metric_name\":\"Metric_name_1\",\"scheduled\":\"10:00 AM\",\"publish\":{\"sourceType\":\"EMAIL\",\"email_id\":[\"srya0001@synchronoss.com\",\"asor0002@synchronoss.com\"],\"host\":\"localhost\",\"port\":22,\"password\":\"123456789\",\"share\":{\"customer_Prod_module_feature_sys_id\":\"\"}},\"description\":\"Updated node\",\"repository\":{\"storage_type\":\"DL\",\"URL\":\"updated URL\"},\"artifacts\":[{\"artifact_name\":\"\",\"artifact_position\":[500,200],\"artifact_attributes\":[{\"column_name\":\"\",\"display_name\":\"\",\"type\":\"int|String\",\"join_elgible\":\"\",\"filter_eligible\":\"\",\"hide\":\"\",\"checked\":\"\"},{}],\"sql_builder\":{\"group_by_columns\":[],\"order_by_columns\":[],\"joins\":[{\"type\":\"inner\",\"criteria\":[{\"table_name\":\"Orders\",\"column_name\":\"Shipper\",\"side\":\"right\"},{\"table_name\":\"Shippers\",\"column_name\":\"ShipperID\",\"side\":\"left\"}]}],\"filters\":[{\"column_name\":\"TotalPrice\",\"boolean_criteria\":\"AND\",\"operator\":\">=\",\"search_conditions\":[1]}]}}]}"
+  }]
+}

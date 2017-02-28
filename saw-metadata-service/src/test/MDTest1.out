@@ -1,0 +1,513 @@
+Application home : /opt/saw/service
+Configuration dir: /opt/saw/service/conf
+Application bin: /opt/saw/service/sbin
+Library dir: /opt/saw/service/lib
+Log dir: /var/saw/service/log
+java -Dlog.dir=/var/saw/service/log -classpath /opt/saw/service/conf:/opt/saw/service/lib/aopalliance.aopalliance-1.0.jar:/opt/saw/service/lib/asm.asm-3.1.jar:/opt/saw/service/lib/ch.qos.logback.logback-classic-1.1.8.jar:/opt/saw/service/lib/ch.qos.logback.logback-core-1.1.8.jar:/opt/saw/service/lib/com.fasterxml.classmate-1.1.0.jar:/opt/saw/service/lib/com.fasterxml.jackson.core.jackson-annotations-2.6.0.jar:/opt/saw/service/lib/com.fasterxml.jackson.core.jackson-annotations-2.7.1.jar:/opt/saw/service/lib/com.fasterxml.jackson.core.jackson-core-2.6.2.jar:/opt/saw/service/lib/com.fasterxml.jackson.core.jackson-core-2.7.1.jar:/opt/saw/service/lib/com.fasterxml.jackson.core.jackson-databind-2.6.2.jar:/opt/saw/service/lib/com.fasterxml.jackson.core.jackson-databind-2.7.1.jar:/opt/saw/service/lib/com.fasterxml.jackson.datatype.jackson-datatype-jdk8-2.7.1.jar:/opt/saw/service/lib/com.fasterxml.jackson.datatype.jackson-datatype-jsr310-2.7.1.jar:/opt/saw/service/lib/com.github.stephenc.findbugs.findbugs-annotations-1.3.9-1.jar:/opt/saw/service/lib/com.google.code.findbugs.jsr305-3.0.0.jar:/opt/saw/service/lib/com.google.code.findbugs.jsr305-3.0.1.jar:/opt/saw/service/lib/com.google.code.gson.gson-2.2.4.jar:/opt/saw/service/lib/com.googlecode.usc.jdbcdslog-1.0.6.2.jar:/opt/saw/service/lib/com.google.guava.guava-12.0.1.jar:/opt/saw/service/lib/com.google.guava.guava-14.0.1.jar:/opt/saw/service/lib/com.google.guava.guava-19.0.jar:/opt/saw/service/lib/com.google.inject.extensions.guice-assistedinject-4.0.jar:/opt/saw/service/lib/com.google.inject.extensions.guice-servlet-3.0.jar:/opt/saw/service/lib/com.google.inject.guice-3.0.jar:/opt/saw/service/lib/com.google.inject.guice-4.0.jar:/opt/saw/service/lib/com.google.protobuf.protobuf-java-2.5.0.jar:/opt/saw/service/lib/com.h2database.h2-1.4.192.jar:/opt/saw/service/lib/com.jamesmurty.utils.java-xmlbuilder-0.4.jar:/opt/saw/service/lib/com.jcraft.jsch-0.1.42.jar:/opt/saw/service/lib/com.jolbox.bonecp-0.8.0.RELEASE.jar:/opt/saw/service/lib/com.mapr.hadoop.maprfs-5.2.0-mapr.jar:/opt/saw/service/lib/commons-beanutils.commons-beanutils-1.7.0.jar:/opt/saw/service/lib/commons-beanutils.commons-beanutils-core-1.8.0.jar:/opt/saw/service/lib/commons-cli.commons-cli-1.2.jar:/opt/saw/service/lib/commons-codec.commons-codec-1.10.jar:/opt/saw/service/lib/commons-codec.commons-codec-1.4.jar:/opt/saw/service/lib/commons-codec.commons-codec-1.9.jar:/opt/saw/service/lib/commons-collections.commons-collections-3.2.2.jar:/opt/saw/service/lib/commons-configuration.commons-configuration-1.6.jar:/opt/saw/service/lib/commons-daemon.commons-daemon-1.0.13.jar:/opt/saw/service/lib/commons-digester.commons-digester-1.8.jar:/opt/saw/service/lib/commons-httpclient.commons-httpclient-3.1.jar:/opt/saw/service/lib/commons-io.commons-io-2.4.jar:/opt/saw/service/lib/commons-lang.commons-lang-2.6.jar:/opt/saw/service/lib/commons-logging.commons-logging-1.1.3.jar:/opt/saw/service/lib/commons-logging.commons-logging-1.2.jar:/opt/saw/service/lib/commons-net.commons-net-3.1.jar:/opt/saw/service/lib/com.sun.jersey.contribs.jersey-guice-1.9.jar:/opt/saw/service/lib/com.sun.jersey.jersey-client-1.9.jar:/opt/saw/service/lib/com.sun.jersey.jersey-core-1.9.jar:/opt/saw/service/lib/com.sun.jersey.jersey-json-1.9.jar:/opt/saw/service/lib/com.sun.jersey.jersey-server-1.9.jar:/opt/saw/service/lib/com.sun.xml.bind.jaxb-impl-2.2.3-1.jar:/opt/saw/service/lib/com.synchronoss.saw-common-1.0.0.jar:/opt/saw/service/lib/com.synchronoss.saw-metadata-service-1.0.0.jar:/opt/saw/service/lib/com.synchronoss.saw-transport-service-1.0.0.jar:/opt/saw/service/lib/com.thoughtworks.paranamer.paranamer-2.3.jar:/opt/saw/service/lib/com.thoughtworks.paranamer.paranamer-2.8.jar:/opt/saw/service/lib/com.typesafe.akka.akka-actor_2.11-2.4.9.jar:/opt/saw/service/lib/com.typesafe.akka.akka-slf4j_2.11-2.4.9.jar:/opt/saw/service/lib/com.typesafe.akka.akka-stream_2.11-2.4.4.jar:/opt/saw/service/lib/com.typesafe.config-1.3.0.jar:/opt/saw/service/lib/com.typesafe.netty.netty-http-pipelining-1.1.4.jar:/opt/saw/service/lib/com.typesafe.netty.netty-reactive-streams-1.0.5.jar:/opt/saw/service/lib/com.typesafe.netty.netty-reactive-streams-http-1.0.8.jar:/opt/saw/service/lib/com.typesafe.play.build-link-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.filters-helpers_2.11-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.play_2.11-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.play-cache_2.11-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.play-datacommons_2.11-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.play-enhancer-1.1.0.jar:/opt/saw/service/lib/com.typesafe.play.play-exceptions-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.play-functional_2.11-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.play-iteratees_2.11-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.play-java_2.11-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.play-java-ws_2.11-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.play-jdbc_2.11-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.play-jdbc-api_2.11-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.play-json_2.11-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.play-logback_2.11-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.play-netty-server_2.11-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.play-netty-utils-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.play-server_2.11-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.play-streams_2.11-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.play-ws_2.11-2.5.10.jar:/opt/saw/service/lib/com.typesafe.play.twirl-api_2.11-1.1.1.jar:/opt/saw/service/lib/com.typesafe.scala-logging.scala-logging_2.11-3.1.0.jar:/opt/saw/service/lib/com.typesafe.ssl-config-akka_2.11-0.2.1.jar:/opt/saw/service/lib/com.typesafe.ssl-config-core_2.11-0.2.1.jar:/opt/saw/service/lib/com.zaxxer.HikariCP-2.5.1.jar:/opt/saw/service/lib/io.netty.netty-3.10.4.Final.jar:/opt/saw/service/lib/io.netty.netty-3.6.2.Final.jar:/opt/saw/service/lib/io.netty.netty-all-4.0.23.Final.jar:/opt/saw/service/lib/io.netty.netty-buffer-4.0.36.Final.jar:/opt/saw/service/lib/io.netty.netty-codec-4.0.36.Final.jar:/opt/saw/service/lib/io.netty.netty-codec-http-4.0.36.Final.jar:/opt/saw/service/lib/io.netty.netty-common-4.0.36.Final.jar:/opt/saw/service/lib/io.netty.netty-handler-4.0.36.Final.jar:/opt/saw/service/lib/io.netty.netty-transport-4.0.36.Final.jar:/opt/saw/service/lib/io.netty.netty-transport-native-epoll-4.0.36.Final.jar:/opt/saw/service/lib/io.netty.netty-transport-native-epoll-4.0.41.Final.jar:/opt/saw/service/lib/javax.activation.activation-1.1.jar:/opt/saw/service/lib/javax.el.javax.el-api-3.0.0.jar:/opt/saw/service/lib/javax.inject.javax.inject-1.jar:/opt/saw/service/lib/javax.servlet.jsp.jsp-api-2.1.jar:/opt/saw/service/lib/javax.servlet.servlet-api-2.5.jar:/opt/saw/service/lib/javax.transaction.jta-1.1.jar:/opt/saw/service/lib/javax.validation.validation-api-1.1.0.Final.jar:/opt/saw/service/lib/javax.xml.bind.jaxb-api-2.2.2.jar:/opt/saw/service/lib/javax.xml.stream.stax-api-1.0-2.jar:/opt/saw/service/lib/joda-time.joda-time-2.9.6.jar:/opt/saw/service/lib/junit.junit-4.11.jar:/opt/saw/service/lib/junit.junit-4.12.jar:/opt/saw/service/lib/log:/opt/saw/service/lib/log4j.log4j-1.2.17.jar:/opt/saw/service/lib/net.java.dev.jets3t.jets3t-0.9.0.jar:/opt/saw/service/lib/net.jodah.typetools-0.4.1.jar:/opt/saw/service/lib/net.sf.ehcache.ehcache-core-2.6.11.jar:/opt/saw/service/lib/oauth.signpost.signpost-commonshttp4-1.2.1.2.jar:/opt/saw/service/lib/oauth.signpost.signpost-core-1.2.1.2.jar:/opt/saw/service/lib/org.apache.avro.avro-1.7.6.jar:/opt/saw/service/lib/org.apache.commons.commons-compress-1.4.1.jar:/opt/saw/service/lib/org.apache.commons.commons-lang3-3.4.jar:/opt/saw/service/lib/org.apache.commons.commons-math3-3.1.1.jar:/opt/saw/service/lib/org.apache.curator.curator-client-2.7.1.jar:/opt/saw/service/lib/org.apache.curator.curator-framework-2.7.1.jar:/opt/saw/service/lib/org.apache.curator.curator-recipes-2.7.1.jar:/opt/saw/service/lib/org.apache.directory.api.api-asn1-api-1.0.0-M20.jar:/opt/saw/service/lib/org.apache.directory.api.api-util-1.0.0-M20.jar:/opt/saw/service/lib/org.apache.directory.server.apacheds-i18n-2.0.0-M15.jar:/opt/saw/service/lib/org.apache.directory.server.apacheds-kerberos-codec-2.0.0-M15.jar:/opt/saw/service/lib/org.apache.hadoop.hadoop-annotations-2.7.0-mapr-1607.jar:/opt/saw/service/lib/org.apache.hadoop.hadoop-auth-2.7.0-mapr-1602.jar:/opt/saw/service/lib/org.apache.hadoop.hadoop-auth-2.7.0-mapr-1607.jar:/opt/saw/service/lib/org.apache.hadoop.hadoop-common-2.7.0-mapr-1607.jar:/opt/saw/service/lib/org.apache.hadoop.hadoop-hdfs-2.7.0-mapr-1607.jar:/opt/saw/service/lib/org.apache.hadoop.hadoop-mapreduce-client-core-2.7.0-mapr-1607.jar:/opt/saw/service/lib/org.apache.hadoop.hadoop-yarn-api-2.7.0-mapr-1607.jar:/opt/saw/service/lib/org.apache.hadoop.hadoop-yarn-common-2.7.0-mapr-1607.jar:/opt/saw/service/lib/org.apache.hbase.hbase-annotations-1.1.1-mapr-1602.jar:/opt/saw/service/lib/org.apache.hbase.hbase-client-1.1.1-mapr-1602.jar:/opt/saw/service/lib/org.apache.hbase.hbase-common-1.1.1-mapr-1602.jar:/opt/saw/service/lib/org.apache.hbase.hbase-protocol-1.1.1-mapr-1602.jar:/opt/saw/service/lib/org.apache.htrace.htrace-core-3.1.0-incubating.jar:/opt/saw/service/lib/org.apache.httpcomponents.httpasyncclient-4.1.1.jar:/opt/saw/service/lib/org.apache.httpcomponents.httpclient-4.5.3.jar:/opt/saw/service/lib/org.apache.httpcomponents.httpcore-4.4.6.jar:/opt/saw/service/lib/org.apache.httpcomponents.httpcore-nio-4.4.6.jar:/opt/saw/service/lib/org.apache.logging.log4j.log4j-api-2.0.2.jar:/opt/saw/service/lib/org.apache.tomcat.tomcat-servlet-api-8.0.33.jar:/opt/saw/service/lib/org.apache.zookeeper.zookeeper-3.4.5-mapr-1406.jar:/opt/saw/service/lib/org.apache.zookeeper.zookeeper-3.4.5-mapr-1503.jar:/opt/saw/service/lib/org.asynchttpclient.async-http-client-2.0.0.jar:/opt/saw/service/lib/org.asynchttpclient.netty-codec-dns-2.0.0.jar:/opt/saw/service/lib/org.asynchttpclient.netty-resolver-2.0.0.jar:/opt/saw/service/lib/org.asynchttpclient.netty-resolver-dns-2.0.0.jar:/opt/saw/service/lib/org.codehaus.jackson.jackson-core-asl-1.9.13.jar:/opt/saw/service/lib/org.codehaus.jackson.jackson-jaxrs-1.8.3.jar:/opt/saw/service/lib/org.codehaus.jackson.jackson-mapper-asl-1.9.13.jar:/opt/saw/service/lib/org.codehaus.jackson.jackson-xc-1.8.3.jar:/opt/saw/service/lib/org.codehaus.jettison.jettison-1.1.jar:/opt/saw/service/lib/org.fusesource.leveldbjni.leveldbjni-all-1.8.jar:/opt/saw/service/lib/org.hamcrest.hamcrest-core-1.3.jar:/opt/saw/service/lib/org.hibernate.hibernate-validator-5.2.4.Final.jar:/opt/saw/service/lib/org.javassist.javassist-3.18.2-GA.jar:/opt/saw/service/lib/org.jboss.logging.jboss-logging-3.2.1.Final.jar:/opt/saw/service/lib/org.jboss.netty.netty-3.2.2.Final.jar:/opt/saw/service/lib/org.joda.joda-convert-1.8.1.jar:/opt/saw/service/lib/org.jruby.jcodings.jcodings-1.0.8.jar:/opt/saw/service/lib/org.jruby.joni.joni-2.1.2.jar:/opt/saw/service/lib/org.json4s.json4s-ast_2.11-3.3.0.jar:/opt/saw/service/lib/org.json4s.json4s-core_2.11-3.3.0.jar:/opt/saw/service/lib/org.json4s.json4s-jackson_2.11-3.3.0.jar:/opt/saw/service/lib/org.json4s.json4s-native_2.11-3.3.0.jar:/opt/saw/service/lib/org.json4s.json4s-scalap_2.11-3.3.0.jar:/opt/saw/service/lib/org.mortbay.jetty.jetty-6.1.26.jar:/opt/saw/service/lib/org.mortbay.jetty.jetty-util-6.1.26.jar:/opt/saw/service/lib/org.reactivemongo.reactivemongo_2.11-0.11.11.jar:/opt/saw/service/lib/org.reactivemongo.reactivemongo-bson_2.11-0.11.11.jar:/opt/saw/service/lib/org.reactivemongo.reactivemongo-bson-macros_2.11-0.11.11.jar:/opt/saw/service/lib/org.reactivemongo.reactivemongo-shaded-0.11.11.jar:/opt/saw/service/lib/org.reactivestreams.reactive-streams-1.0.0.jar:/opt/saw/service/lib/org.reflections.reflections-0.9.10.jar:/opt/saw/service/lib/org.scala-lang.modules.scala-java8-compat_2.11-0.7.0.jar:/opt/saw/service/lib/org.scala-lang.modules.scala-parser-combinators_2.11-1.0.4.jar:/opt/saw/service/lib/org.scala-lang.modules.scala-xml_2.11-1.0.1.jar:/opt/saw/service/lib/org.scala-lang.modules.scala-xml_2.11-1.0.2.jar:/opt/saw/service/lib/org.scala-lang.scala-library-2.11.8.jar:/opt/saw/service/lib/org.scala-lang.scala-reflect-2.11.1.jar:/opt/saw/service/lib/org.scala-lang.scala-reflect-2.11.7.jar:/opt/saw/service/lib/org.scala-stm.scala-stm_2.11-0.7.jar:/opt/saw/service/lib/org.slf4j.jcl-over-slf4j-1.7.21.jar:/opt/saw/service/lib/org.slf4j.jul-to-slf4j-1.7.21.jar:/opt/saw/service/lib/org.slf4j.slf4j-api-1.7.10.jar:/opt/saw/service/lib/org.slf4j.slf4j-api-1.7.16.jar:/opt/saw/service/lib/org.slf4j.slf4j-log4j12-1.7.10.jar:/opt/saw/service/lib/org.springframework.spring-beans-4.2.7.RELEASE.jar:/opt/saw/service/lib/org.springframework.spring-context-4.2.7.RELEASE.jar:/opt/saw/service/lib/org.springframework.spring-core-4.2.7.RELEASE.jar:/opt/saw/service/lib/org.tukaani.xz-1.0.jar:/opt/saw/service/lib/org.xerial.snappy.snappy-java-1.0.5.jar:/opt/saw/service/lib/org.yaml.snakeyaml-1.15.jar:/opt/saw/service/lib/tyrex.tyrex-1.0.1.jar:/opt/saw/service/lib/xerces.xercesImpl-2.11.0.jar:/opt/saw/service/lib/xerces.xercesImpl-2.9.1.jar:/opt/saw/service/lib/xml-apis.xml-apis-1.3.04.jar:/opt/saw/service/lib/xml-apis.xml-apis-1.4.01.jar:/opt/saw/service/lib/xmlenc.xmlenc-0.52.jar:/opt/mapr/conf:/opt/mapr/lib/maprbuildversion-5.2.0-mapr.jar:/opt/mapr/lib/maprfs-5.2.0-mapr.jar:/opt/mapr/lib/maprfs-diagnostic-tools-5.2.0-mapr.jar:/opt/mapr/lib/maprdb-5.2.0-mapr.jar:/opt/mapr/lib/maprdb-5.2.0-mapr-tests.jar:/opt/mapr/lib/maprdb-mapreduce-5.2.0-mapr.jar:/opt/mapr/lib/maprdb-mapreduce-5.2.0-mapr-tests.jar:/opt/mapr/lib/maprdb-shell-5.2.0-mapr.jar:/opt/mapr/lib/mapr-hbase-5.2.0-mapr.jar:/opt/mapr/lib/mapr-hbase-5.2.0-mapr-tests.jar:/opt/mapr/lib/mapr-java-utils-5.2.0-mapr-tests.jar:/opt/mapr/lib/mapr-streams-5.2.0-mapr.jar:/opt/mapr/lib/mapr-streams-5.2.0-mapr-tests.jar:/opt/mapr/lib/mapr-tools-5.2.0-mapr.jar:/opt/mapr/lib/mapr-tools-5.2.0-mapr-tests.jar:/opt/mapr/lib/slf4j-api-1.7.12.jar:/opt/mapr/lib/slf4j-log4j12-1.7.12.jar:/opt/mapr/lib/log4j-1.2.17.jar:/opt/mapr/lib/central-logging-5.2.0-mapr.jar:/opt/mapr/lib/antlr4-runtime-4.5.jar:/opt/mapr/lib/guava-14.0.1.jar:/opt/mapr/lib/jackson-annotations-2.7.2.jar:/opt/mapr/lib/jackson-core-2.7.2.jar:/opt/mapr/lib/jackson-databind-2.7.2.jar:/opt/mapr/lib/jline-2.11.jar:/opt/mapr/lib/kafka-clients-0.9.0.0-mapr-1607.jar:/opt/mapr/lib/ojai-1.1.jar:/opt/mapr/lib/ojai-mapreduce-1.1.jar:/opt/mapr/lib/protobuf-java-2.5.0.jar:/opt/mapr/lib/spring-asm-3.0.3.RELEASE.jar:/opt/mapr/lib/spring-beans-3.0.3.RELEASE.jar:/opt/mapr/lib/spring-context-3.0.3.RELEASE.jar:/opt/mapr/lib/spring-core-3.0.3.RELEASE.jar:/opt/mapr/lib/spring-expression-3.0.3.RELEASE.jar:/opt/mapr/lib/spring-shell-1.2.0.M1-mapr-1607.jar:/opt/mapr/lib/zookeeper-3.4.5-mapr-1604.jar:/opt/mapr/hadoop/hadoop-2.7.0/etc/hadoop:/opt/mapr/hadoop/hadoop-2.7.0/share/hadoop/common/lib/*:/opt/mapr/hadoop/hadoop-2.7.0/share/hadoop/common/*:/opt/mapr/hadoop/hadoop-2.7.0/share/hadoop/hdfs:/opt/mapr/hadoop/hadoop-2.7.0/share/hadoop/hdfs/lib/*:/opt/mapr/hadoop/hadoop-2.7.0/share/hadoop/hdfs/*:/opt/mapr/hadoop/hadoop-2.7.0/share/hadoop/yarn/lib/*:/opt/mapr/hadoop/hadoop-2.7.0/share/hadoop/yarn/*:/opt/mapr/hadoop/hadoop-2.7.0/share/hadoop/mapreduce/lib/*:/opt/mapr/hadoop/hadoop-2.7.0/share/hadoop/mapreduce/*:/contrib/capacity-scheduler/*.jar:/opt/mapr/lib/kvstore*.jar:/opt/mapr/lib/libprotodefs*.jar:/opt/mapr/lib/baseutils*.jar:/opt/mapr/lib/maprutil*.jar:/opt/mapr/lib/json-20080701.jar:/opt/mapr/lib/flexjson-2.1.jar sncr.metadata.MetadataUtility -t semantic -i /main/data/md/saw_CRUD_test.json -o /main/data/md/res_full_test.json
+20:10:27,846 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback.groovy]
+20:10:27,847 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback-test.xml]
+20:10:27,847 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Found resource [logback.xml] at [file:/opt/saw/service-1.0.0.1/conf/logback.xml]
+20:10:28,156 |-INFO in ch.qos.logback.core.joran.action.ConversionRuleAction - registering conversion word coloredLevel with class [play.api.libs.logback.ColoredLevel]
+20:10:28,156 |-INFO in ch.qos.logback.core.joran.action.AppenderAction - About to instantiate appender of type [ch.qos.logback.core.ConsoleAppender]
+20:10:28,159 |-INFO in ch.qos.logback.core.joran.action.AppenderAction - Naming appender as [STDOUT]
+20:10:28,167 |-INFO in ch.qos.logback.core.joran.action.NestedComplexPropertyIA - Assuming default type [ch.qos.logback.classic.encoder.PatternLayoutEncoder] for [encoder] property
+20:10:28,194 |-INFO in ch.qos.logback.core.joran.action.AppenderAction - About to instantiate appender of type [ch.qos.logback.core.rolling.RollingFileAppender]
+20:10:28,197 |-INFO in ch.qos.logback.core.joran.action.AppenderAction - Naming appender as [FILE]
+20:10:28,223 |-INFO in c.q.l.core.rolling.TimeBasedRollingPolicy@436546048 - No compression will be used
+20:10:28,224 |-INFO in c.q.l.core.rolling.TimeBasedRollingPolicy@436546048 - Will use the pattern /var/saw/service/log/app_%d{yyyy-MM-dd}.%i.log for the active file
+20:10:28,227 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@145eaa29 - The date pattern is 'yyyy-MM-dd' from file name pattern '/var/saw/service/log/app_%d{yyyy-MM-dd}.%i.log'.
+20:10:28,227 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@145eaa29 - Roll-over at midnight.
+20:10:28,231 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@145eaa29 - Setting initial period to Tue Feb 28 20:10:28 UTC 2017
+20:10:28,232 |-WARN in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@145eaa29 - SizeAndTimeBasedFNATP is deprecated. Use SizeAndTimeBasedRollingPolicy instead
+20:10:28,235 |-INFO in ch.qos.logback.core.joran.action.NestedComplexPropertyIA - Assuming default type [ch.qos.logback.classic.encoder.PatternLayoutEncoder] for [encoder] property
+20:10:28,236 |-INFO in ch.qos.logback.core.rolling.RollingFileAppender[FILE] - Active log file name: /var/saw/service/log/app_2017-02-28.0.log
+20:10:28,236 |-INFO in ch.qos.logback.core.rolling.RollingFileAppender[FILE] - File property is set to [null]
+20:10:28,238 |-INFO in ch.qos.logback.core.joran.action.AppenderAction - About to instantiate appender of type [ch.qos.logback.core.rolling.RollingFileAppender]
+20:10:28,238 |-INFO in ch.qos.logback.core.joran.action.AppenderAction - Naming appender as [TR_SRVC]
+20:10:28,240 |-INFO in c.q.l.core.rolling.TimeBasedRollingPolicy@1860250540 - No compression will be used
+20:10:28,241 |-INFO in c.q.l.core.rolling.TimeBasedRollingPolicy@1860250540 - Will use the pattern /var/saw/service/log/bda_tr_srvc_%d{yyyy-MM-dd}.%i.log for the active file
+20:10:28,242 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@55040f2f - The date pattern is 'yyyy-MM-dd' from file name pattern '/var/saw/service/log/bda_tr_srvc_%d{yyyy-MM-dd}.%i.log'.
+20:10:28,242 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@55040f2f - Roll-over at midnight.
+20:10:28,248 |-INFO in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@55040f2f - Setting initial period to Tue Feb 28 20:10:28 UTC 2017
+20:10:28,248 |-WARN in ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP@55040f2f - SizeAndTimeBasedFNATP is deprecated. Use SizeAndTimeBasedRollingPolicy instead
+20:10:28,250 |-INFO in ch.qos.logback.core.joran.action.NestedComplexPropertyIA - Assuming default type [ch.qos.logback.classic.encoder.PatternLayoutEncoder] for [encoder] property
+20:10:28,251 |-INFO in ch.qos.logback.core.rolling.RollingFileAppender[TR_SRVC] - Active log file name: /var/saw/service/log/bda_tr_srvc_2017-02-28.0.log
+20:10:28,251 |-INFO in ch.qos.logback.core.rolling.RollingFileAppender[TR_SRVC] - File property is set to [null]
+20:10:28,251 |-INFO in ch.qos.logback.classic.joran.action.LoggerAction - Setting level of logger [play] to ERROR
+20:10:28,252 |-INFO in ch.qos.logback.core.joran.action.AppenderRefAction - Attaching appender named [FILE] to Logger[play]
+20:10:28,252 |-INFO in ch.qos.logback.classic.joran.action.LoggerAction - Setting level of logger [sncr.metadata] to DEBUG
+20:10:28,253 |-INFO in ch.qos.logback.core.joran.action.AppenderRefAction - Attaching appender named [STDOUT] to Logger[sncr.metadata]
+20:10:28,253 |-INFO in ch.qos.logback.classic.joran.action.RootLoggerAction - Setting level of ROOT logger to DEBUG
+20:10:28,253 |-INFO in ch.qos.logback.core.joran.action.AppenderRefAction - Attaching appender named [STDOUT] to Logger[ROOT]
+20:10:28,253 |-INFO in ch.qos.logback.classic.joran.action.ConfigurationAction - End of configuration.
+20:10:28,254 |-INFO in ch.qos.logback.classic.joran.JoranConfigurator@4de5031f - Registering current configuration as safe fallback point
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.conf.CoreDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.util.Shell - Failed to detect a valid hadoop home directory
+java.io.IOException: Hadoop home directory  does not exist, is not a directory, or is not an absolute path.
+	at org.apache.hadoop.util.Shell.checkHadoopHome(Shell.java:313)
+	at org.apache.hadoop.util.Shell.<clinit>(Shell.java:328)
+	at org.apache.hadoop.util.StringUtils.<clinit>(StringUtils.java:80)
+	at org.apache.hadoop.fs.FileSystem$Cache$Key.<init>(FileSystem.java:2842)
+	at org.apache.hadoop.fs.FileSystem$Cache$Key.<init>(FileSystem.java:2838)
+	at org.apache.hadoop.fs.FileSystem$Cache.get(FileSystem.java:2704)
+	at org.apache.hadoop.fs.FileSystem.get(FileSystem.java:407)
+	at org.apache.hadoop.fs.FileSystem.get(FileSystem.java:172)
+	at org.apache.hadoop.fs.FileSystem.get(FileSystem.java:391)
+	at files.HFileOperations.readFile(HFileOperations.java:27)
+	at sncr.metadata.MetadataUtility.main(MetadataUtility.java:27)
+[[36mdebug[0m] - org.apache.hadoop.util.Shell - setsid exited with exit code 0
+[[36mdebug[0m] - org.apache.hadoop.metrics2.lib.MutableMetricsFactory - field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.loginSuccess with annotation @org.apache.hadoop.metrics2.annotation.Metric(about=, sampleName=Ops, always=false, type=DEFAULT, valueName=Time, value=[Rate of successful kerberos logins and latency (milliseconds)])
+[[36mdebug[0m] - org.apache.hadoop.metrics2.lib.MutableMetricsFactory - field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.loginFailure with annotation @org.apache.hadoop.metrics2.annotation.Metric(about=, sampleName=Ops, always=false, type=DEFAULT, valueName=Time, value=[Rate of failed kerberos logins and latency (milliseconds)])
+[[36mdebug[0m] - org.apache.hadoop.metrics2.lib.MutableMetricsFactory - field org.apache.hadoop.metrics2.lib.MutableRate org.apache.hadoop.security.UserGroupInformation$UgiMetrics.getGroups with annotation @org.apache.hadoop.metrics2.annotation.Metric(about=, sampleName=Ops, always=false, type=DEFAULT, valueName=Time, value=[GetGroups])
+[[36mdebug[0m] - org.apache.hadoop.metrics2.impl.MetricsSystemImpl - UgiMetrics, User and group related metrics
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.conf.CoreDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.security.UserGroupInformation - HADOOP_SECURITY_AUTHENTICATION is set to: SIMPLE
+[[36mdebug[0m] - org.apache.hadoop.security.UserGroupInformation - Login configuration entry is hadoop_simple
+[[36mdebug[0m] - org.apache.hadoop.security.UserGroupInformation - authenticationMethod from JAAS configuration:SIMPLE
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.conf.CoreDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.security.Groups -  Creating new Groups object
+[[36mdebug[0m] - org.apache.hadoop.util.NativeCodeLoader - Trying to load the custom-built native-hadoop library...
+[[36mdebug[0m] - org.apache.hadoop.util.NativeCodeLoader - Failed to load native-hadoop with error: java.lang.UnsatisfiedLinkError: no hadoop in java.library.path
+[[36mdebug[0m] - org.apache.hadoop.util.NativeCodeLoader - java.library.path=/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
+[[33mwarn[0m] - org.apache.hadoop.util.NativeCodeLoader - Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[[36mdebug[0m] - org.apache.hadoop.util.PerformanceAdvisory - Falling back to shell based
+[[36mdebug[0m] - org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback - Group mapping impl=org.apache.hadoop.security.ShellBasedUnixGroupsMapping
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.conf.CoreDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.conf.CoreDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.mapreduce.conf.MapReduceDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.yarn.conf.YarnDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.security.UserGroupInformation - HADOOP_SECURITY_AUTHENTICATION is set to: SIMPLE
+[[36mdebug[0m] - org.apache.hadoop.security.UserGroupInformation - Login configuration entry is hadoop_simple
+[[36mdebug[0m] - org.apache.hadoop.security.UserGroupInformation - authenticationMethod from JAAS configuration:SIMPLE
+[[36mdebug[0m] - org.apache.hadoop.security.Groups -  Creating new Groups object
+[[36mdebug[0m] - org.apache.hadoop.util.PerformanceAdvisory - Falling back to shell based
+[[36mdebug[0m] - org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback - Group mapping impl=org.apache.hadoop.security.ShellBasedUnixGroupsMapping
+[[36mdebug[0m] - org.apache.hadoop.security.Groups - Group mapping impl=org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback; cacheTimeout=300000; warningDeltaMs=5000
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.mapreduce.conf.MapReduceDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.yarn.conf.YarnDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.security.Groups - Group mapping impl=org.apache.hadoop.security.JniBasedUnixGroupsMappingWithFallback; cacheTimeout=300000; warningDeltaMs=5000
+[[36mdebug[0m] - org.apache.hadoop.security.login.HadoopLoginModule - Priority principal search list is [class javax.security.auth.kerberos.KerberosPrincipal]
+[[36mdebug[0m] - org.apache.hadoop.security.login.HadoopLoginModule - Additional principal search list is [class com.sun.security.auth.UnixPrincipal]
+[[36mdebug[0m] - org.apache.hadoop.security.login.HadoopLoginModule - hadoop login
+[[36mdebug[0m] - org.apache.hadoop.security.login.HadoopLoginModule - hadoop login commit
+[[36mdebug[0m] - org.apache.hadoop.security.rpcauth.RpcAuthRegistry - Added SIMPLE to registry.
+[[36mdebug[0m] - org.apache.hadoop.security.rpcauth.RpcAuthRegistry - Added KERBEROS to registry.
+[[36mdebug[0m] - org.apache.hadoop.security.rpcauth.RpcAuthRegistry - Added TOKEN to registry.
+[[36mdebug[0m] - org.apache.hadoop.security.rpcauth.RpcAuthRegistry - Added FAKE to registry.
+[[36mdebug[0m] - org.apache.hadoop.security.UserGroupInformation - Found no authentication principals in subject. Simple?
+[[36mdebug[0m] - org.apache.hadoop.security.UserGroupInformation - UGI loginUser:mapr (auth:SIMPLE)
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.conf.CoreDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.mapreduce.conf.MapReduceDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.yarn.conf.YarnDefaultProperties
+[[36mdebug[0m] - com.mapr.fs.MapRFileSystem - User Info object initialized for user mapr with user ID 10673
+[[36mdebug[0m] - com.mapr.fs.jni.MapRClient - Open: path = /main/data/md/saw_CRUD_test.json
+[[36mdebug[0m] - com.mapr.fs.Inode - >Inode Open file: /main/data/md/saw_CRUD_test.json, size: 5375, chunkSize: 268435456, fid: 2308.636262.6637196
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.conf.CoreDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.mapreduce.conf.MapReduceDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.yarn.conf.YarnDefaultProperties
+[[36mdebug[0m] - com.mapr.fs.MapRFileSystem - User Info object initialized for user mapr with user ID 10673
+[[36mdebug[0m] - com.mapr.fs.jni.MapRClient - Create: /main/data/md/res_full_test.json mode = 493 replication = 3 chunkSize = default overwrite = true
+[[36mdebug[0m] - com.mapr.fs.Inode - >Inode GetAttr: file: /main/data/md/res_full_test.json, size: 0, chunksize: 268435456, fid: 2308.636184.6637018
+Start data processing:
+ input file: /main/data/md/saw_CRUD_test.json
+Output path: /main/data/md/res_full_test.json
+[[36mdebug[0m] - SemanticMDRequestHandler - Process JSON: {"sub":"shwetha@att.com","action":"create","ticket":{"ticketId":"1","windowId":"28_1481019911763_1066874973","masterLoginId":"admin@att.com","customer_code":"ATT","userName":"Adminstrator","password":null,"prodCode":"1","roleType":"Admin","createdTime":1481019911763,"dataSecurityKey":"ATT_ADMIN","validUpto":1481027111763,"valid":true,"validityReason":"User Authenticated Successfully","validMins":20,"iat":1481019912},"_links":{"self":{"href":"/analyze/"},"next":{"href":"/analyze/report/{id}"}},"contents":{"analyze":[{"_id":"FT101","name":"NewCustomerModule","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"FT_sys01","metric_name":"Metric_name_1","scheduled":"10:00 AM","publish":{"sourceType":"EMAIL","email_id":["srya0001@synchronoss.com"],"host":"localhost","port":22,"password":"hidden","share":{"customer_Prod_module_feature_sys_id":""}},"description":"Full test node 1","repository":{"storage_type":"DL","URL":"URL1"},"artifacts":[{"artifact_name":"","artifact_position":[500,200],"artifact_attributes":[{"column_name":"","display_name":"","type":"int|String","join_elgible":"","filter_eligible":"","hide":"","checked":""},{}]}]}]}}
+[[36mdebug[0m] - SemanticMDRequestHandler - Process JSON: {"action":"update","ticket":{"ticketId":"2","windowId":"28_1481019911763_1066874973","masterLoginId":"admin@att.com","customer_code":"ATT","userName":"Adminstrator","password":null,"prodCode":"1","roleType":"Admin","createdTime":1481019911763,"dataSecurityKey":"ATT_ADMIN","validUpto":1481027111763,"valid":true,"validityReason":"User Authenticated Successfully","validMins":20,"iat":1481019912},"contents":{"keys":{"NodeId":"ATT::analyze::report::1"},"analyze":[{"_id":"FT102","name":"Full test: Updated node","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"fsys102","metric_name":"Metric_name_1","scheduled":"","publish":{"sourceType":"EMAIL","email_id":["asor0002@synchronoss.com"],"host":"host22","port":22,"password":"","share":{"customer_Prod_module_feature_sys_id":"fsys103"}},"description":"Update this node","repository":{"storage_type":"DL","URL":"No URL"},"artifacts":[{"artifact_name":"A1","artifact_position":[500,200],"artifact_attributes":[{"column_name":"C1","display_name":"D1","type":"int|String","join_elgible":"","filter_eligible":"yes","hide":"","checked":""},{}],"sql_builder":{"group_by_columns":[],"order_by_columns":[],"joins":[{"type":"inner","criteria":[{"table_name":"Orders","column_name":"Shipper","side":"right"},{"table_name":"Shippers","column_name":"ShipperID","side":"left"}]}],"filters":[{"column_name":"TotalPrice","boolean_criteria":"AND","operator":">=","search_conditions":[1]}]}}]}]}}
+[[36mdebug[0m] - SemanticMDRequestHandler - Process JSON: {"action":"retrieve","ticket":{"ticketId":"3","windowId":"28_1481019911763_1066874973","masterLoginId":"admin@att.com","customer_code":"ATT","userName":"Adminstrator","password":null,"prodCode":"1","roleType":"Admin","createdTime":1481019911763,"dataSecurityKey":"ATT_ADMIN","validUpto":1481027111763,"valid":true,"validityReason":"User Authenticated Successfully","validMins":20,"iat":1481019912},"contents":{"keys":{"NodeId":"ATT::analyze::report::1"}}}
+[[36mdebug[0m] - SemanticMDRequestHandler - Process JSON: {"action":"delete","ticket":{"ticketId":"4","windowId":"28_1481019911763_1066874973","masterLoginId":"admin@att.com","customer_code":"ATT","userName":"Adminstrator","password":null,"prodCode":"1","roleType":"Admin","createdTime":1481019911763,"dataSecurityKey":"ATT_ADMIN","validUpto":1481027111763,"valid":true,"validityReason":"User Authenticated Successfully","validMins":20,"iat":1481019912},"contents":{"keys":{"NodeId":"ATT::analyze::report::1"}}}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Validate token, action and content section
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Validate token, action and content section
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - action = create
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - action = create
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - All Content Elements => {"analyze":[{"_id":"FT101","name":"NewCustomerModule","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"FT_sys01","metric_name":"Metric_name_1","scheduled":"10:00 AM","publish":{"sourceType":"EMAIL","email_id":["srya0001@synchronoss.com"],"host":"localhost","port":22,"password":"hidden","share":{"customer_Prod_module_feature_sys_id":""}},"description":"Full test node 1","repository":{"storage_type":"DL","URL":"URL1"},"artifacts":[{"artifact_name":"","artifact_position":[500,200],"artifact_attributes":[{"column_name":"","display_name":"","type":"int|String","join_elgible":"","filter_eligible":"","hide":"","checked":""},{}]}]}]}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - All Content Elements => {"analyze":[{"_id":"FT101","name":"NewCustomerModule","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"FT_sys01","metric_name":"Metric_name_1","scheduled":"10:00 AM","publish":{"sourceType":"EMAIL","email_id":["srya0001@synchronoss.com"],"host":"localhost","port":22,"password":"hidden","share":{"customer_Prod_module_feature_sys_id":""}},"description":"Full test node 1","repository":{"storage_type":"DL","URL":"URL1"},"artifacts":[{"artifact_name":"","artifact_position":[500,200],"artifact_attributes":[{"column_name":"","display_name":"","type":"int|String","join_elgible":"","filter_eligible":"","hide":"","checked":""},{}]}]}]}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Module analyze => [{"_id":"FT101","name":"NewCustomerModule","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"FT_sys01","metric_name":"Metric_name_1","scheduled":"10:00 AM","publish":{"sourceType":"EMAIL","email_id":["srya0001@synchronoss.com"],"host":"localhost","port":22,"password":"hidden","share":{"customer_Prod_module_feature_sys_id":""}},"description":"Full test node 1","repository":{"storage_type":"DL","URL":"URL1"},"artifacts":[{"artifact_name":"","artifact_position":[500,200],"artifact_attributes":[{"column_name":"","display_name":"","type":"int|String","join_elgible":"","filter_eligible":"","hide":"","checked":""},{}]}]}]
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Module analyze => [{"_id":"FT101","name":"NewCustomerModule","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"FT_sys01","metric_name":"Metric_name_1","scheduled":"10:00 AM","publish":{"sourceType":"EMAIL","email_id":["srya0001@synchronoss.com"],"host":"localhost","port":22,"password":"hidden","share":{"customer_Prod_module_feature_sys_id":""}},"description":"Full test node 1","repository":{"storage_type":"DL","URL":"URL1"},"artifacts":[{"artifact_name":"","artifact_position":[500,200],"artifact_attributes":[{"column_name":"","display_name":"","type":"int|String","join_elgible":"","filter_eligible":"","hide":"","checked":""},{}]}]}]
+[[36mdebug[0m] - org.apache.hadoop.fs.azure.NativeAzureFileSystem - finalize() called.
+[[36mdebug[0m] - org.apache.hadoop.fs.azure.NativeAzureFileSystem - finalize() called.
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.conf.CoreDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.mapreduce.conf.MapReduceDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.yarn.conf.YarnDefaultProperties
+[[37minfo[0m] - org.apache.hadoop.hbase.client.ConnectionFactory - mapr.hbase.default.db unsetDB is neither MapRDB or HBase, set HBASE_MAPR mode since mapr client is installed.
+[[37minfo[0m] - org.apache.hadoop.hbase.client.ConnectionFactory - ConnectionFactory receives mapr.hbase.default.db(unsetDB), set clusterType(HBASE_MAPR), hbase_admin_connect_at_construction(false)
+[[37minfo[0m] - org.apache.hadoop.hbase.client.ConnectionFactory - ConnectionFactory creates a hbase connection!
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.conf.CoreDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.mapreduce.conf.MapReduceDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.yarn.conf.YarnDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.security.UserGroupInformation - PrivilegedAction as:mapr (auth:SIMPLE) from:org.apache.hadoop.hbase.client.HTable.initIfMapRTableImpl(HTable.java:496)
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Init table /main/metadata/semantic_metadata
+[[36mdebug[0m] - com.mapr.fs.MapRFileSystem - User Info object initialized for user mapr with user ID 10673
+[[36mdebug[0m] - com.mapr.fs.Inode - >Inode GetAttr: table: /main/metadata/semantic_metadata, size: 2, chunksize: 0, fid: 2308.580885.6521764
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Updating schema #families 5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_source, id=1
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_search, id=2
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_relations, id=3
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_elements, id=4
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_system, id=5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - opened table /main/metadata/semantic_metadata clustername dev_rtisJson false
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Init table /main/metadata/semantic_metadata
+[[36mdebug[0m] - com.mapr.fs.MapRFileSystem - User Info object initialized for user mapr with user ID 10673
+[[36mdebug[0m] - com.mapr.fs.Inode - >Inode GetAttr: table: /main/metadata/semantic_metadata, size: 2, chunksize: 0, fid: 2308.580885.6521764
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Updating schema #families 5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_source, id=1
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_search, id=2
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_relations, id=3
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_elements, id=4
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_system, id=5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - opened table /main/metadata/semantic_metadata clustername dev_rtisJson false
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Generated RowKey = ATT::analyze::report::1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Generated RowKey = ATT::analyze::report::1
+[[36mdebug[0m] - SemanticNodeObject - Field: customer_Prod_module_feature_sys_id, 
+Extraction result {"_id":"FT101","name":"NewCustomerModule","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"FT_sys01","metric_name":"Metric_name_1","scheduled":"10:00 AM","publish":{"sourceType":"EMAIL","email_id":["srya0001@synchronoss.com"],"host":"localhost","port":22,"password":"hidden","share":{"customer_Prod_module_feature_sys_id":""}},"description":"Full test node 1","repository":{"storage_type":"DL","URL":"URL1"},"artifacts":[{"artifact_name":"","artifact_position":[500,200],"artifact_attributes":[{"column_name":"","display_name":"","type":"int|String","join_elgible":"","filter_eligible":"","hide":"","checked":""},{}]}]},
+ Search field type: String
+, Value: FT_sys01
+[[36mdebug[0m] - SemanticNodeObject - Field: userName, 
+Extraction result {"ticketId":"1","windowId":"28_1481019911763_1066874973","masterLoginId":"admin@att.com","customer_code":"ATT","userName":"Adminstrator","password":null,"prodCode":"1","roleType":"Admin","createdTime":1481019911763,"dataSecurityKey":"ATT_ADMIN","validUpto":1481027111763,"valid":true,"validityReason":"User Authenticated Successfully","validMins":20,"iat":1481019912},
+ Search field type: String
+, Value: Adminstrator
+[[36mdebug[0m] - SemanticNodeObject - Field: dataSecurityKey, 
+Extraction result {"ticketId":"1","windowId":"28_1481019911763_1066874973","masterLoginId":"admin@att.com","customer_code":"ATT","userName":"Adminstrator","password":null,"prodCode":"1","roleType":"Admin","createdTime":1481019911763,"dataSecurityKey":"ATT_ADMIN","validUpto":1481027111763,"valid":true,"validityReason":"User Authenticated Successfully","validMins":20,"iat":1481019912},
+ Search field type: String
+, Value: ATT_ADMIN
+[[36mdebug[0m] - SemanticNodeObject - Field: type, 
+Extraction result {"_id":"FT101","name":"NewCustomerModule","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"FT_sys01","metric_name":"Metric_name_1","scheduled":"10:00 AM","publish":{"sourceType":"EMAIL","email_id":["srya0001@synchronoss.com"],"host":"localhost","port":22,"password":"hidden","share":{"customer_Prod_module_feature_sys_id":""}},"description":"Full test node 1","repository":{"storage_type":"DL","URL":"URL1"},"artifacts":[{"artifact_name":"","artifact_position":[500,200],"artifact_attributes":[{"column_name":"","display_name":"","type":"int|String","join_elgible":"","filter_eligible":"","hide":"","checked":""},{}]}]},
+ Search field type: String
+, Value: report
+[[36mdebug[0m] - SemanticNodeObject - Field: metric_name, 
+Extraction result {"_id":"FT101","name":"NewCustomerModule","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"FT_sys01","metric_name":"Metric_name_1","scheduled":"10:00 AM","publish":{"sourceType":"EMAIL","email_id":["srya0001@synchronoss.com"],"host":"localhost","port":22,"password":"hidden","share":{"customer_Prod_module_feature_sys_id":""}},"description":"Full test node 1","repository":{"storage_type":"DL","URL":"URL1"},"artifacts":[{"artifact_name":"","artifact_position":[500,200],"artifact_attributes":[{"column_name":"","display_name":"","type":"int|String","join_elgible":"","filter_eligible":"","hide":"","checked":""},{}]}]},
+ Search field type: String
+, Value: Metric_name_1
+[[36mdebug[0m] - SemanticNodeObject - Field: customer_code, 
+Extraction result {"ticketId":"1","windowId":"28_1481019911763_1066874973","masterLoginId":"admin@att.com","customer_code":"ATT","userName":"Adminstrator","password":null,"prodCode":"1","roleType":"Admin","createdTime":1481019911763,"dataSecurityKey":"ATT_ADMIN","validUpto":1481027111763,"valid":true,"validityReason":"User Authenticated Successfully","validMins":20,"iat":1481019912},
+ Search field type: String
+, Value: ATT
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Commit completed
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Commit completed
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Response: {
+  "result":0,
+  "reason":"The Semantic Node [ ATT::analyze::report::1 ] has been created"
+}
+
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Response: {
+  "result":0,
+  "reason":"The Semantic Node [ ATT::analyze::report::1 ] has been created"
+}
+
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Validate token, action and content section
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Validate token, action and content section
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - action = update
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - action = update
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - All Content Elements => {"keys":{"NodeId":"ATT::analyze::report::1"},"analyze":[{"_id":"FT102","name":"Full test: Updated node","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"fsys102","metric_name":"Metric_name_1","scheduled":"","publish":{"sourceType":"EMAIL","email_id":["asor0002@synchronoss.com"],"host":"host22","port":22,"password":"","share":{"customer_Prod_module_feature_sys_id":"fsys103"}},"description":"Update this node","repository":{"storage_type":"DL","URL":"No URL"},"artifacts":[{"artifact_name":"A1","artifact_position":[500,200],"artifact_attributes":[{"column_name":"C1","display_name":"D1","type":"int|String","join_elgible":"","filter_eligible":"yes","hide":"","checked":""},{}],"sql_builder":{"group_by_columns":[],"order_by_columns":[],"joins":[{"type":"inner","criteria":[{"table_name":"Orders","column_name":"Shipper","side":"right"},{"table_name":"Shippers","column_name":"ShipperID","side":"left"}]}],"filters":[{"column_name":"TotalPrice","boolean_criteria":"AND","operator":">=","search_conditions":[1]}]}}]}]}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - All Content Elements => {"keys":{"NodeId":"ATT::analyze::report::1"},"analyze":[{"_id":"FT102","name":"Full test: Updated node","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"fsys102","metric_name":"Metric_name_1","scheduled":"","publish":{"sourceType":"EMAIL","email_id":["asor0002@synchronoss.com"],"host":"host22","port":22,"password":"","share":{"customer_Prod_module_feature_sys_id":"fsys103"}},"description":"Update this node","repository":{"storage_type":"DL","URL":"No URL"},"artifacts":[{"artifact_name":"A1","artifact_position":[500,200],"artifact_attributes":[{"column_name":"C1","display_name":"D1","type":"int|String","join_elgible":"","filter_eligible":"yes","hide":"","checked":""},{}],"sql_builder":{"group_by_columns":[],"order_by_columns":[],"joins":[{"type":"inner","criteria":[{"table_name":"Orders","column_name":"Shipper","side":"right"},{"table_name":"Shippers","column_name":"ShipperID","side":"left"}]}],"filters":[{"column_name":"TotalPrice","boolean_criteria":"AND","operator":">=","search_conditions":[1]}]}}]}]}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Module keys => {"NodeId":"ATT::analyze::report::1"}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Module keys => {"NodeId":"ATT::analyze::report::1"}
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.conf.CoreDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.mapreduce.conf.MapReduceDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.yarn.conf.YarnDefaultProperties
+[[37minfo[0m] - org.apache.hadoop.hbase.client.ConnectionFactory - mapr.hbase.default.db unsetDB is neither MapRDB or HBase, set HBASE_MAPR mode since mapr client is installed.
+[[37minfo[0m] - org.apache.hadoop.hbase.client.ConnectionFactory - ConnectionFactory receives mapr.hbase.default.db(unsetDB), set clusterType(HBASE_MAPR), hbase_admin_connect_at_construction(false)
+[[37minfo[0m] - org.apache.hadoop.hbase.client.ConnectionFactory - ConnectionFactory creates a hbase connection!
+[[36mdebug[0m] - org.apache.hadoop.security.UserGroupInformation - PrivilegedAction as:mapr (auth:SIMPLE) from:org.apache.hadoop.hbase.client.HTable.initIfMapRTableImpl(HTable.java:496)
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Init table /main/metadata/semantic_metadata
+[[36mdebug[0m] - com.mapr.fs.MapRFileSystem - User Info object initialized for user mapr with user ID 10673
+[[36mdebug[0m] - com.mapr.fs.Inode - >Inode GetAttr: table: /main/metadata/semantic_metadata, size: 2, chunksize: 0, fid: 2308.580885.6521764
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Updating schema #families 5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_source, id=1
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_search, id=2
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_relations, id=3
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_elements, id=4
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_system, id=5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - opened table /main/metadata/semantic_metadata clustername dev_rtisJson false
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Init table /main/metadata/semantic_metadata
+[[36mdebug[0m] - com.mapr.fs.MapRFileSystem - User Info object initialized for user mapr with user ID 10673
+[[36mdebug[0m] - com.mapr.fs.Inode - >Inode GetAttr: table: /main/metadata/semantic_metadata, size: 2, chunksize: 0, fid: 2308.580885.6521764
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Updating schema #families 5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_source, id=1
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_search, id=2
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_relations, id=3
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_elements, id=4
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_system, id=5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - opened table /main/metadata/semantic_metadata clustername dev_rtisJson false
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - success ==>  Selected Node [ ID = ATT::analyze::report::1 ]
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - success ==>  Selected Node [ ID = ATT::analyze::report::1 ]
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Load row: ATT::analyze::report::1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Load row: ATT::analyze::report::1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Read node: {"_id":"FT101","name":"NewCustomerModule","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"FT_sys01","metric_name":"Metric_name_1","scheduled":"10:00 AM","publish":{"sourceType":"EMAIL","email_id":["srya0001@synchronoss.com"],"host":"localhost","port":22,"password":"hidden","share":{"customer_Prod_module_feature_sys_id":""}},"description":"Full test node 1","repository":{"storage_type":"DL","URL":"URL1"},"artifacts":[{"artifact_name":"","artifact_position":[500,200],"artifact_attributes":[{"column_name":"","display_name":"","type":"int|String","join_elgible":"","filter_eligible":"","hide":"","checked":""},{}]}]}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Read node: {"_id":"FT101","name":"NewCustomerModule","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"FT_sys01","metric_name":"Metric_name_1","scheduled":"10:00 AM","publish":{"sourceType":"EMAIL","email_id":["srya0001@synchronoss.com"],"host":"localhost","port":22,"password":"hidden","share":{"customer_Prod_module_feature_sys_id":""}},"description":"Full test node 1","repository":{"storage_type":"DL","URL":"URL1"},"artifacts":[{"artifact_name":"","artifact_position":[500,200],"artifact_attributes":[{"column_name":"","display_name":"","type":"int|String","join_elgible":"","filter_eligible":"","hide":"","checked":""},{}]}]}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Include list of search fields into result: {NodeId =>ATT::analyze::report::1,customer_Prod_module_feature_sys_id =>FT_sys01,customer_code =>ATT,dataSecurityKey =>ATT_ADMIN,metric_name =>Metric_name_1,module =>analyze,type =>report,userName =>Adminstrator}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Include list of search fields into result: {NodeId =>ATT::analyze::report::1,customer_Prod_module_feature_sys_id =>FT_sys01,customer_code =>ATT,dataSecurityKey =>ATT_ADMIN,metric_name =>Metric_name_1,module =>analyze,type =>report,userName =>Adminstrator}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: NodeId, value: ATT::analyze::report::1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: NodeId, value: ATT::analyze::report::1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: customer_Prod_module_feature_sys_id, value: FT_sys01
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: customer_Prod_module_feature_sys_id, value: FT_sys01
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: customer_code, value: ATT
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: customer_code, value: ATT
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: dataSecurityKey, value: ATT_ADMIN
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: dataSecurityKey, value: ATT_ADMIN
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: metric_name, value: Metric_name_1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: metric_name, value: Metric_name_1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: module, value: analyze
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: module, value: analyze
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: type, value: report
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: type, value: report
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: userName, value: Adminstrator
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: userName, value: Adminstrator
+[[36mdebug[0m] - SemanticNodeObject - Field: customer_Prod_module_feature_sys_id, 
+Extraction result {"NodeId":"ATT::analyze::report::1"},
+ Search field type: String
+, Value: -1
+[[36mdebug[0m] - SemanticNodeObject - Field: userName, 
+Extraction result {"ticketId":"2","windowId":"28_1481019911763_1066874973","masterLoginId":"admin@att.com","customer_code":"ATT","userName":"Adminstrator","password":null,"prodCode":"1","roleType":"Admin","createdTime":1481019911763,"dataSecurityKey":"ATT_ADMIN","validUpto":1481027111763,"valid":true,"validityReason":"User Authenticated Successfully","validMins":20,"iat":1481019912},
+ Search field type: String
+, Value: Adminstrator
+[[36mdebug[0m] - SemanticNodeObject - Field: dataSecurityKey, 
+Extraction result {"ticketId":"2","windowId":"28_1481019911763_1066874973","masterLoginId":"admin@att.com","customer_code":"ATT","userName":"Adminstrator","password":null,"prodCode":"1","roleType":"Admin","createdTime":1481019911763,"dataSecurityKey":"ATT_ADMIN","validUpto":1481027111763,"valid":true,"validityReason":"User Authenticated Successfully","validMins":20,"iat":1481019912},
+ Search field type: String
+, Value: ATT_ADMIN
+[[36mdebug[0m] - SemanticNodeObject - Field: type, 
+Extraction result {"NodeId":"ATT::analyze::report::1"},
+ Search field type: String
+, Value: -1
+[[36mdebug[0m] - SemanticNodeObject - Field: metric_name, 
+Extraction result {"NodeId":"ATT::analyze::report::1"},
+ Search field type: String
+, Value: -1
+[[36mdebug[0m] - SemanticNodeObject - Field: customer_code, 
+Extraction result {"ticketId":"2","windowId":"28_1481019911763_1066874973","masterLoginId":"admin@att.com","customer_code":"ATT","userName":"Adminstrator","password":null,"prodCode":"1","roleType":"Admin","createdTime":1481019911763,"dataSecurityKey":"ATT_ADMIN","validUpto":1481027111763,"valid":true,"validityReason":"User Authenticated Successfully","validMins":20,"iat":1481019912},
+ Search field type: String
+, Value: ATT
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Commit completed
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Commit completed
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Response: {
+  "result":0,
+  "reason":"The Semantic Node [ ATT::analyze::report::1 ] has been updated"
+}
+
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Response: {
+  "result":0,
+  "reason":"The Semantic Node [ ATT::analyze::report::1 ] has been updated"
+}
+
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Module analyze => [{"_id":"FT102","name":"Full test: Updated node","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"fsys102","metric_name":"Metric_name_1","scheduled":"","publish":{"sourceType":"EMAIL","email_id":["asor0002@synchronoss.com"],"host":"host22","port":22,"password":"","share":{"customer_Prod_module_feature_sys_id":"fsys103"}},"description":"Update this node","repository":{"storage_type":"DL","URL":"No URL"},"artifacts":[{"artifact_name":"A1","artifact_position":[500,200],"artifact_attributes":[{"column_name":"C1","display_name":"D1","type":"int|String","join_elgible":"","filter_eligible":"yes","hide":"","checked":""},{}],"sql_builder":{"group_by_columns":[],"order_by_columns":[],"joins":[{"type":"inner","criteria":[{"table_name":"Orders","column_name":"Shipper","side":"right"},{"table_name":"Shippers","column_name":"ShipperID","side":"left"}]}],"filters":[{"column_name":"TotalPrice","boolean_criteria":"AND","operator":">=","search_conditions":[1]}]}}]}]
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Module analyze => [{"_id":"FT102","name":"Full test: Updated node","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"fsys102","metric_name":"Metric_name_1","scheduled":"","publish":{"sourceType":"EMAIL","email_id":["asor0002@synchronoss.com"],"host":"host22","port":22,"password":"","share":{"customer_Prod_module_feature_sys_id":"fsys103"}},"description":"Update this node","repository":{"storage_type":"DL","URL":"No URL"},"artifacts":[{"artifact_name":"A1","artifact_position":[500,200],"artifact_attributes":[{"column_name":"C1","display_name":"D1","type":"int|String","join_elgible":"","filter_eligible":"yes","hide":"","checked":""},{}],"sql_builder":{"group_by_columns":[],"order_by_columns":[],"joins":[{"type":"inner","criteria":[{"table_name":"Orders","column_name":"Shipper","side":"right"},{"table_name":"Shippers","column_name":"ShipperID","side":"left"}]}],"filters":[{"column_name":"TotalPrice","boolean_criteria":"AND","operator":">=","search_conditions":[1]}]}}]}]
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.conf.CoreDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.mapreduce.conf.MapReduceDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.yarn.conf.YarnDefaultProperties
+[[37minfo[0m] - org.apache.hadoop.hbase.client.ConnectionFactory - mapr.hbase.default.db unsetDB is neither MapRDB or HBase, set HBASE_MAPR mode since mapr client is installed.
+[[37minfo[0m] - org.apache.hadoop.hbase.client.ConnectionFactory - ConnectionFactory receives mapr.hbase.default.db(unsetDB), set clusterType(HBASE_MAPR), hbase_admin_connect_at_construction(false)
+[[37minfo[0m] - org.apache.hadoop.hbase.client.ConnectionFactory - ConnectionFactory creates a hbase connection!
+[[36mdebug[0m] - org.apache.hadoop.security.UserGroupInformation - PrivilegedAction as:mapr (auth:SIMPLE) from:org.apache.hadoop.hbase.client.HTable.initIfMapRTableImpl(HTable.java:496)
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Init table /main/metadata/semantic_metadata
+[[36mdebug[0m] - com.mapr.fs.MapRFileSystem - User Info object initialized for user mapr with user ID 10673
+[[36mdebug[0m] - com.mapr.fs.Inode - >Inode GetAttr: table: /main/metadata/semantic_metadata, size: 2, chunksize: 0, fid: 2308.580885.6521764
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Updating schema #families 5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_source, id=1
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_search, id=2
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_relations, id=3
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_elements, id=4
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_system, id=5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - opened table /main/metadata/semantic_metadata clustername dev_rtisJson false
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Init table /main/metadata/semantic_metadata
+[[36mdebug[0m] - com.mapr.fs.MapRFileSystem - User Info object initialized for user mapr with user ID 10673
+[[36mdebug[0m] - com.mapr.fs.Inode - >Inode GetAttr: table: /main/metadata/semantic_metadata, size: 2, chunksize: 0, fid: 2308.580885.6521764
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Updating schema #families 5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_source, id=1
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_search, id=2
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_relations, id=3
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_elements, id=4
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_system, id=5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - opened table /main/metadata/semantic_metadata clustername dev_rtisJson false
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - success ==>  Selected Node [ ID = ATT::analyze::report::1 ]
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - success ==>  Selected Node [ ID = ATT::analyze::report::1 ]
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Load row: ATT::analyze::report::1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Load row: ATT::analyze::report::1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Read node: {"NodeId":"ATT::analyze::report::1"}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Read node: {"NodeId":"ATT::analyze::report::1"}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Include list of search fields into result: {NodeId =>ATT::analyze::report::1,customer_Prod_module_feature_sys_id =>FT_sys01,customer_code =>ATT,dataSecurityKey =>ATT_ADMIN,metric_name =>Metric_name_1,module =>keys,type =>report,userName =>Adminstrator}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Include list of search fields into result: {NodeId =>ATT::analyze::report::1,customer_Prod_module_feature_sys_id =>FT_sys01,customer_code =>ATT,dataSecurityKey =>ATT_ADMIN,metric_name =>Metric_name_1,module =>keys,type =>report,userName =>Adminstrator}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: NodeId, value: ATT::analyze::report::1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: NodeId, value: ATT::analyze::report::1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: customer_Prod_module_feature_sys_id, value: FT_sys01
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: customer_Prod_module_feature_sys_id, value: FT_sys01
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: customer_code, value: ATT
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: customer_code, value: ATT
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: dataSecurityKey, value: ATT_ADMIN
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: dataSecurityKey, value: ATT_ADMIN
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: metric_name, value: Metric_name_1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: metric_name, value: Metric_name_1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: module, value: keys
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: module, value: keys
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: type, value: report
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: type, value: report
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: userName, value: Adminstrator
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: userName, value: Adminstrator
+[[36mdebug[0m] - SemanticNodeObject - Field: customer_Prod_module_feature_sys_id, 
+Extraction result {"_id":"FT102","name":"Full test: Updated node","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"fsys102","metric_name":"Metric_name_1","scheduled":"","publish":{"sourceType":"EMAIL","email_id":["asor0002@synchronoss.com"],"host":"host22","port":22,"password":"","share":{"customer_Prod_module_feature_sys_id":"fsys103"}},"description":"Update this node","repository":{"storage_type":"DL","URL":"No URL"},"artifacts":[{"artifact_name":"A1","artifact_position":[500,200],"artifact_attributes":[{"column_name":"C1","display_name":"D1","type":"int|String","join_elgible":"","filter_eligible":"yes","hide":"","checked":""},{}],"sql_builder":{"group_by_columns":[],"order_by_columns":[],"joins":[{"type":"inner","criteria":[{"table_name":"Orders","column_name":"Shipper","side":"right"},{"table_name":"Shippers","column_name":"ShipperID","side":"left"}]}],"filters":[{"column_name":"TotalPrice","boolean_criteria":"AND","operator":">=","search_conditions":[1]}]}}]},
+ Search field type: String
+, Value: fsys102
+[[36mdebug[0m] - SemanticNodeObject - Field: userName, 
+Extraction result {"ticketId":"2","windowId":"28_1481019911763_1066874973","masterLoginId":"admin@att.com","customer_code":"ATT","userName":"Adminstrator","password":null,"prodCode":"1","roleType":"Admin","createdTime":1481019911763,"dataSecurityKey":"ATT_ADMIN","validUpto":1481027111763,"valid":true,"validityReason":"User Authenticated Successfully","validMins":20,"iat":1481019912},
+ Search field type: String
+, Value: Adminstrator
+[[36mdebug[0m] - SemanticNodeObject - Field: dataSecurityKey, 
+Extraction result {"ticketId":"2","windowId":"28_1481019911763_1066874973","masterLoginId":"admin@att.com","customer_code":"ATT","userName":"Adminstrator","password":null,"prodCode":"1","roleType":"Admin","createdTime":1481019911763,"dataSecurityKey":"ATT_ADMIN","validUpto":1481027111763,"valid":true,"validityReason":"User Authenticated Successfully","validMins":20,"iat":1481019912},
+ Search field type: String
+, Value: ATT_ADMIN
+[[36mdebug[0m] - SemanticNodeObject - Field: type, 
+Extraction result {"_id":"FT102","name":"Full test: Updated node","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"fsys102","metric_name":"Metric_name_1","scheduled":"","publish":{"sourceType":"EMAIL","email_id":["asor0002@synchronoss.com"],"host":"host22","port":22,"password":"","share":{"customer_Prod_module_feature_sys_id":"fsys103"}},"description":"Update this node","repository":{"storage_type":"DL","URL":"No URL"},"artifacts":[{"artifact_name":"A1","artifact_position":[500,200],"artifact_attributes":[{"column_name":"C1","display_name":"D1","type":"int|String","join_elgible":"","filter_eligible":"yes","hide":"","checked":""},{}],"sql_builder":{"group_by_columns":[],"order_by_columns":[],"joins":[{"type":"inner","criteria":[{"table_name":"Orders","column_name":"Shipper","side":"right"},{"table_name":"Shippers","column_name":"ShipperID","side":"left"}]}],"filters":[{"column_name":"TotalPrice","boolean_criteria":"AND","operator":">=","search_conditions":[1]}]}}]},
+ Search field type: String
+, Value: report
+[[36mdebug[0m] - SemanticNodeObject - Field: metric_name, 
+Extraction result {"_id":"FT102","name":"Full test: Updated node","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"fsys102","metric_name":"Metric_name_1","scheduled":"","publish":{"sourceType":"EMAIL","email_id":["asor0002@synchronoss.com"],"host":"host22","port":22,"password":"","share":{"customer_Prod_module_feature_sys_id":"fsys103"}},"description":"Update this node","repository":{"storage_type":"DL","URL":"No URL"},"artifacts":[{"artifact_name":"A1","artifact_position":[500,200],"artifact_attributes":[{"column_name":"C1","display_name":"D1","type":"int|String","join_elgible":"","filter_eligible":"yes","hide":"","checked":""},{}],"sql_builder":{"group_by_columns":[],"order_by_columns":[],"joins":[{"type":"inner","criteria":[{"table_name":"Orders","column_name":"Shipper","side":"right"},{"table_name":"Shippers","column_name":"ShipperID","side":"left"}]}],"filters":[{"column_name":"TotalPrice","boolean_criteria":"AND","operator":">=","search_conditions":[1]}]}}]},
+ Search field type: String
+, Value: Metric_name_1
+[[36mdebug[0m] - SemanticNodeObject - Field: customer_code, 
+Extraction result {"ticketId":"2","windowId":"28_1481019911763_1066874973","masterLoginId":"admin@att.com","customer_code":"ATT","userName":"Adminstrator","password":null,"prodCode":"1","roleType":"Admin","createdTime":1481019911763,"dataSecurityKey":"ATT_ADMIN","validUpto":1481027111763,"valid":true,"validityReason":"User Authenticated Successfully","validMins":20,"iat":1481019912},
+ Search field type: String
+, Value: ATT
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Commit completed
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Commit completed
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Response: {
+  "result":0,
+  "reason":"The Semantic Node [ ATT::analyze::report::1 ] has been updated"
+}
+
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Response: {
+  "result":0,
+  "reason":"The Semantic Node [ ATT::analyze::report::1 ] has been updated"
+}
+
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Validate token, action and content section
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Validate token, action and content section
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Module NodeId => "ATT::analyze::report::1"
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Module NodeId => "ATT::analyze::report::1"
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - action = retrieve
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - action = retrieve
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - All Content Elements => {"keys":{"NodeId":"ATT::analyze::report::1"}}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - All Content Elements => {"keys":{"NodeId":"ATT::analyze::report::1"}}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Search/Retrieval keys keys => {"NodeId":"ATT::analyze::report::1"}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Search/Retrieval keys keys => {"NodeId":"ATT::analyze::report::1"}
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.conf.CoreDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.mapreduce.conf.MapReduceDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.yarn.conf.YarnDefaultProperties
+[[37minfo[0m] - org.apache.hadoop.hbase.client.ConnectionFactory - mapr.hbase.default.db unsetDB is neither MapRDB or HBase, set HBASE_MAPR mode since mapr client is installed.
+[[37minfo[0m] - org.apache.hadoop.hbase.client.ConnectionFactory - ConnectionFactory receives mapr.hbase.default.db(unsetDB), set clusterType(HBASE_MAPR), hbase_admin_connect_at_construction(false)
+[[37minfo[0m] - org.apache.hadoop.hbase.client.ConnectionFactory - ConnectionFactory creates a hbase connection!
+[[36mdebug[0m] - org.apache.hadoop.security.UserGroupInformation - PrivilegedAction as:mapr (auth:SIMPLE) from:org.apache.hadoop.hbase.client.HTable.initIfMapRTableImpl(HTable.java:496)
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Init table /main/metadata/semantic_metadata
+[[36mdebug[0m] - com.mapr.fs.MapRFileSystem - User Info object initialized for user mapr with user ID 10673
+[[36mdebug[0m] - com.mapr.fs.Inode - >Inode GetAttr: table: /main/metadata/semantic_metadata, size: 2, chunksize: 0, fid: 2308.580885.6521764
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Updating schema #families 5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_source, id=1
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_search, id=2
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_relations, id=3
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_elements, id=4
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_system, id=5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - opened table /main/metadata/semantic_metadata clustername dev_rtisJson false
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Init table /main/metadata/semantic_metadata
+[[36mdebug[0m] - com.mapr.fs.MapRFileSystem - User Info object initialized for user mapr with user ID 10673
+[[36mdebug[0m] - com.mapr.fs.Inode - >Inode GetAttr: table: /main/metadata/semantic_metadata, size: 2, chunksize: 0, fid: 2308.580885.6521764
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Updating schema #families 5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_source, id=1
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_search, id=2
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_relations, id=3
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_elements, id=4
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_system, id=5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - opened table /main/metadata/semantic_metadata clustername dev_rtisJson false
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - success ==>  Selected Node [ ID = ATT::analyze::report::1 ]
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - success ==>  Selected Node [ ID = ATT::analyze::report::1 ]
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Load row: ATT::analyze::report::1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Load row: ATT::analyze::report::1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Read node: {"_id":"FT102","name":"Full test: Updated node","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"fsys102","metric_name":"Metric_name_1","scheduled":"","publish":{"sourceType":"EMAIL","email_id":["asor0002@synchronoss.com"],"host":"host22","port":22,"password":"","share":{"customer_Prod_module_feature_sys_id":"fsys103"}},"description":"Update this node","repository":{"storage_type":"DL","URL":"No URL"},"artifacts":[{"artifact_name":"A1","artifact_position":[500,200],"artifact_attributes":[{"column_name":"C1","display_name":"D1","type":"int|String","join_elgible":"","filter_eligible":"yes","hide":"","checked":""},{}],"sql_builder":{"group_by_columns":[],"order_by_columns":[],"joins":[{"type":"inner","criteria":[{"table_name":"Orders","column_name":"Shipper","side":"right"},{"table_name":"Shippers","column_name":"ShipperID","side":"left"}]}],"filters":[{"column_name":"TotalPrice","boolean_criteria":"AND","operator":">=","search_conditions":[1]}]}}]}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Read node: {"_id":"FT102","name":"Full test: Updated node","userName":"admin@att.com","dataSecurityKey":"ATT","category":"My Analysis","type":"report","customer_Prod_module_feature_sys_id":"fsys102","metric_name":"Metric_name_1","scheduled":"","publish":{"sourceType":"EMAIL","email_id":["asor0002@synchronoss.com"],"host":"host22","port":22,"password":"","share":{"customer_Prod_module_feature_sys_id":"fsys103"}},"description":"Update this node","repository":{"storage_type":"DL","URL":"No URL"},"artifacts":[{"artifact_name":"A1","artifact_position":[500,200],"artifact_attributes":[{"column_name":"C1","display_name":"D1","type":"int|String","join_elgible":"","filter_eligible":"yes","hide":"","checked":""},{}],"sql_builder":{"group_by_columns":[],"order_by_columns":[],"joins":[{"type":"inner","criteria":[{"table_name":"Orders","column_name":"Shipper","side":"right"},{"table_name":"Shippers","column_name":"ShipperID","side":"left"}]}],"filters":[{"column_name":"TotalPrice","boolean_criteria":"AND","operator":">=","search_conditions":[1]}]}}]}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Include list of search fields into result: {NodeId =>ATT::analyze::report::1,customer_Prod_module_feature_sys_id =>fsys102,customer_code =>ATT,dataSecurityKey =>ATT_ADMIN,metric_name =>Metric_name_1,module =>analyze,type =>report,userName =>Adminstrator}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Include list of search fields into result: {NodeId =>ATT::analyze::report::1,customer_Prod_module_feature_sys_id =>fsys102,customer_code =>ATT,dataSecurityKey =>ATT_ADMIN,metric_name =>Metric_name_1,module =>analyze,type =>report,userName =>Adminstrator}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: NodeId, value: ATT::analyze::report::1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: NodeId, value: ATT::analyze::report::1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: customer_Prod_module_feature_sys_id, value: fsys102
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: customer_Prod_module_feature_sys_id, value: fsys102
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: customer_code, value: ATT
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: customer_code, value: ATT
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: dataSecurityKey, value: ATT_ADMIN
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: dataSecurityKey, value: ATT_ADMIN
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: metric_name, value: Metric_name_1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: metric_name, value: Metric_name_1
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: module, value: analyze
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: module, value: analyze
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: type, value: report
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: type, value: report
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: userName, value: Adminstrator
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - Search field: userName, value: Adminstrator
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Response: {
+  "NodeId":"ATT::analyze::report::1",
+  "module":"analyze",
+  "customer_code":"ATT",
+  "metric_name":"Metric_name_1",
+  "dataSecurityKey":"ATT_ADMIN",
+  "content":"{\"_id\":\"FT102\",\"name\":\"Full test: Updated node\",\"userName\":\"admin@att.com\",\"dataSecurityKey\":\"ATT\",\"category\":\"My Analysis\",\"type\":\"report\",\"customer_Prod_module_feature_sys_id\":\"fsys102\",\"metric_name\":\"Metric_name_1\",\"scheduled\":\"\",\"publish\":{\"sourceType\":\"EMAIL\",\"email_id\":[\"asor0002@synchronoss.com\"],\"host\":\"host22\",\"port\":22,\"password\":\"\",\"share\":{\"customer_Prod_module_feature_sys_id\":\"fsys103\"}},\"description\":\"Update this node\",\"repository\":{\"storage_type\":\"DL\",\"URL\":\"No URL\"},\"artifacts\":[{\"artifact_name\":\"A1\",\"artifact_position\":[500,200],\"artifact_attributes\":[{\"column_name\":\"C1\",\"display_name\":\"D1\",\"type\":\"int|String\",\"join_elgible\":\"\",\"filter_eligible\":\"yes\",\"hide\":\"\",\"checked\":\"\"},{}],\"sql_builder\":{\"group_by_columns\":[],\"order_by_columns\":[],\"joins\":[{\"type\":\"inner\",\"criteria\":[{\"table_name\":\"Orders\",\"column_name\":\"Shipper\",\"side\":\"right\"},{\"table_name\":\"Shippers\",\"column_name\":\"ShipperID\",\"side\":\"left\"}]}],\"filters\":[{\"column_name\":\"TotalPrice\",\"boolean_criteria\":\"AND\",\"operator\":\">=\",\"search_conditions\":[1]}]}}]}",
+  "customer_Prod_module_feature_sys_id":"fsys102",
+  "type":"report",
+  "userName":"Adminstrator"
+}
+
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Response: {
+  "NodeId":"ATT::analyze::report::1",
+  "module":"analyze",
+  "customer_code":"ATT",
+  "metric_name":"Metric_name_1",
+  "dataSecurityKey":"ATT_ADMIN",
+  "content":"{\"_id\":\"FT102\",\"name\":\"Full test: Updated node\",\"userName\":\"admin@att.com\",\"dataSecurityKey\":\"ATT\",\"category\":\"My Analysis\",\"type\":\"report\",\"customer_Prod_module_feature_sys_id\":\"fsys102\",\"metric_name\":\"Metric_name_1\",\"scheduled\":\"\",\"publish\":{\"sourceType\":\"EMAIL\",\"email_id\":[\"asor0002@synchronoss.com\"],\"host\":\"host22\",\"port\":22,\"password\":\"\",\"share\":{\"customer_Prod_module_feature_sys_id\":\"fsys103\"}},\"description\":\"Update this node\",\"repository\":{\"storage_type\":\"DL\",\"URL\":\"No URL\"},\"artifacts\":[{\"artifact_name\":\"A1\",\"artifact_position\":[500,200],\"artifact_attributes\":[{\"column_name\":\"C1\",\"display_name\":\"D1\",\"type\":\"int|String\",\"join_elgible\":\"\",\"filter_eligible\":\"yes\",\"hide\":\"\",\"checked\":\"\"},{}],\"sql_builder\":{\"group_by_columns\":[],\"order_by_columns\":[],\"joins\":[{\"type\":\"inner\",\"criteria\":[{\"table_name\":\"Orders\",\"column_name\":\"Shipper\",\"side\":\"right\"},{\"table_name\":\"Shippers\",\"column_name\":\"ShipperID\",\"side\":\"left\"}]}],\"filters\":[{\"column_name\":\"TotalPrice\",\"boolean_criteria\":\"AND\",\"operator\":\">=\",\"search_conditions\":[1]}]}}]}",
+  "customer_Prod_module_feature_sys_id":"fsys102",
+  "type":"report",
+  "userName":"Adminstrator"
+}
+
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Validate token, action and content section
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Validate token, action and content section
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Module NodeId => "ATT::analyze::report::1"
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Module NodeId => "ATT::analyze::report::1"
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - action = delete
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - action = delete
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - All Content Elements => {"keys":{"NodeId":"ATT::analyze::report::1"}}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - All Content Elements => {"keys":{"NodeId":"ATT::analyze::report::1"}}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Search/Retrieval keys keys => {"NodeId":"ATT::analyze::report::1"}
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Search/Retrieval keys keys => {"NodeId":"ATT::analyze::report::1"}
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.conf.CoreDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.mapreduce.conf.MapReduceDefaultProperties
+[[36mdebug[0m] - org.apache.hadoop.conf.Configuration - Loaded org.apache.hadoop.yarn.conf.YarnDefaultProperties
+[[37minfo[0m] - org.apache.hadoop.hbase.client.ConnectionFactory - mapr.hbase.default.db unsetDB is neither MapRDB or HBase, set HBASE_MAPR mode since mapr client is installed.
+[[37minfo[0m] - org.apache.hadoop.hbase.client.ConnectionFactory - ConnectionFactory receives mapr.hbase.default.db(unsetDB), set clusterType(HBASE_MAPR), hbase_admin_connect_at_construction(false)
+[[37minfo[0m] - org.apache.hadoop.hbase.client.ConnectionFactory - ConnectionFactory creates a hbase connection!
+[[36mdebug[0m] - org.apache.hadoop.security.UserGroupInformation - PrivilegedAction as:mapr (auth:SIMPLE) from:org.apache.hadoop.hbase.client.HTable.initIfMapRTableImpl(HTable.java:496)
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Init table /main/metadata/semantic_metadata
+[[36mdebug[0m] - com.mapr.fs.MapRFileSystem - User Info object initialized for user mapr with user ID 10673
+[[36mdebug[0m] - com.mapr.fs.Inode - >Inode GetAttr: table: /main/metadata/semantic_metadata, size: 2, chunksize: 0, fid: 2308.580885.6521764
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Updating schema #families 5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_source, id=1
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_search, id=2
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_relations, id=3
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_elements, id=4
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_system, id=5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - opened table /main/metadata/semantic_metadata clustername dev_rtisJson false
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Init table /main/metadata/semantic_metadata
+[[36mdebug[0m] - com.mapr.fs.MapRFileSystem - User Info object initialized for user mapr with user ID 10673
+[[36mdebug[0m] - com.mapr.fs.Inode - >Inode GetAttr: table: /main/metadata/semantic_metadata, size: 2, chunksize: 0, fid: 2308.580885.6521764
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Updating schema #families 5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_source, id=1
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_search, id=2
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_relations, id=3
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_elements, id=4
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - Caching family name=_system, id=5
+[[36mdebug[0m] - com.mapr.fs.MapRHTable - opened table /main/metadata/semantic_metadata clustername dev_rtisJson false
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - success ==>  Selected Node [ ID = ATT::analyze::report::1 ]
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticNode - success ==>  Selected Node [ ID = ATT::analyze::report::1 ]
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Response: {
+  "result":0,
+  "reason":"Node [ ID = ATT::analyze::report::1] was successfully removed"
+}
+
+[[36mdebug[0m] - sncr.metadata.semantix.SemanticMDRequestHandler - Response: {
+  "result":0,
+  "reason":"Node [ ID = ATT::analyze::report::1] was successfully removed"
+}
+

@@ -13,11 +13,11 @@ import sncr.metadata.ProcessingResult._
   */
 trait MetadataNode extends MetadataStore {
 
-  protected[this] var rowKey: Array[Byte] = null
+  override val m_log: Logger = LoggerFactory.getLogger(classOf[MetadataNode].getName)
+
   var source : String = null
   var putOp : Put = null
 
-  protected def setRowKey(rK: Array[Byte]): Unit = rowKey = rK
 
   protected def createNode : Unit =
   {
@@ -55,7 +55,7 @@ trait MetadataNode extends MetadataStore {
       }
       mdNodeStoreTable.put(putOp)
       putOp = null
-      m_log debug s"MD Node has been created"
+      m_log debug s"Commit completed"
     }
     catch{
       case x: IOException => m_log error ( s"Could not create/update node: ${new String(rowKey)}, Reason: ", x); return false
@@ -89,7 +89,7 @@ trait MetadataNode extends MetadataStore {
       val sf : Map[String, String] = sfKeyValues.keySet().map( k =>
       { val k_s = new String(k)
         val v_s = new String(sfKeyValues.get(k))
-        m_log debug s"Search field: $k_s, value: $v_s"
+        m_log trace s"Search field: $k_s, value: $v_s"
         k_s -> v_s
       }).toMap
 
@@ -150,7 +150,7 @@ object MetadataNode{
       mdNodeStoreTable.put(putOp)
     }
     catch{
-      case x: IOException => m_log error ( s"Could not retrieve  node: ${compositeKey}, Reason: ", x); return false
+      case x: IOException => m_log error ( s"Could not retrieve  node: $compositeKey, Reason: ", x); return false
     }
     true
   }
@@ -197,7 +197,7 @@ object MetadataNode{
       }
     }
     catch{
-      case x: IOException => m_log error ( s"Could not read node: ${compositeKey}, Reason: ", x); None
+      case x: IOException => m_log error ( s"Could not read node: $compositeKey, Reason: ", x); None
     }
   }
 
@@ -209,7 +209,7 @@ object MetadataNode{
       mdNodeStoreTable.delete(delOp)
     }
     catch{
-      case x: IOException => m_log error ( s"Could not delete node: ${compositeKey}, Reason: ", x); false
+      case x: IOException => m_log error ( s"Could not delete node: $compositeKey, Reason: ", x); return false
     }
     true
   }

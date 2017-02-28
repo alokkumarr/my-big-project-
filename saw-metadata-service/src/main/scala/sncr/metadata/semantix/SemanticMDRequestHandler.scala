@@ -13,7 +13,7 @@ import sncr.metadata.ProcessingResult._
 /**
   * Created by srya0001 on 2/17/2017.
   */
-class SemanticMDRequestHandler(val docAsJson : JValue)  {
+class SemanticMDRequestHandler(val docAsJson : JValue, val compactOutput: Boolean = true)  {
 
   val m_log: Logger = LoggerFactory.getLogger(classOf[SemanticMDRequestHandler].getName)
 
@@ -42,9 +42,10 @@ class SemanticMDRequestHandler(val docAsJson : JValue)  {
     {
       case (0, _) => execute
       case (res_id: Int, r: String) => {
-        val msg = compact(render(JObject(List(JField("result", new JInt(Rejected.id)),JField("reason", new JString(r))))))
-        m_log debug "Request is not valid: " + msg
-        msg
+        val msg = render(JObject(List(JField("result", new JInt(Rejected.id)),JField("reason", new JString(r)))))
+        val response = if (compactOutput) compact(msg) else pretty(msg)
+        m_log debug "Request is not valid: " + response
+        response
       }
     }
   }
@@ -55,40 +56,49 @@ class SemanticMDRequestHandler(val docAsJson : JValue)  {
     val elements : JValue = docAsJson \ "contents"
     val ticket: JValue = docAsJson \ "ticket"
     val action = (docAsJson \ "action").extract[String].toLowerCase
+    var responses : List[JValue] = Nil
 
     m_log debug s"action = $action"
     m_log debug s"All Content Elements => " + compact(render(elements))
 
-    elements match {
-      case JObject(all_content_elements) => {
-        val responses : List[JValue] = JObject(all_content_elements)
-          .obj
-          .filter( an_element => !an_element._1.equalsIgnoreCase("keys")  )
-          .flatMap( content_element => {
-            m_log debug (s"Module ${content_element._1} => " + compact(render(content_element._2)))
-            val mn = content_element._1
-            content_element._2 match {
-              case ce: JObject => List(actionHandler(ticket, action, ce, mn ))
-              case ce: JArray => ce.arr.map(ce_ae => actionHandler(ticket, action, ce_ae, mn))
-              case _ => handleRequestIncorrect
-            }
+    action match {
+      case "create" | "update" =>
+        elements match {
+          case JObject(all_content_elements) => {
+            responses = JObject(all_content_elements)
+              .obj
+              .filter(an_element => (!an_element._1.equalsIgnoreCase("keys") || action.equalsIgnoreCase("update")) )
+              .flatMap(content_element => {
+                m_log debug (s"Module ${content_element._1} => " + compact(render(content_element._2)))
+                val mn = content_element._1
+                content_element._2 match {
+                  case ce: JObject => List(actionHandler(ticket, action, ce, mn))
+                  case ce: JArray => ce.arr.map(ce_ae => actionHandler(ticket, action, ce_ae, mn))
+                  case _ => handleRequestIncorrect
+                }
+              }
+              )
           }
-        )
-        val cnt = JField("contents", new JArray(responses))
-        val r_ticket = JField("ticket", ticket)
-        val res = JField("performed_action", new JString(action))
-        val requestResult = new JObject(List(r_ticket, res, cnt))
-        compact(render(requestResult))
-      }
-      case _  => "Request is not correct, contents must be JSON object"
-/*        if (action.equalsIgnoreCase("scan")) {
-                      val sNode = new SemanticNode(ticket, null, null)
-                      compact(render(buildResponse(sNode.scanNodes)))
-                  }
-                  else
-*/
+          case _ => return "Create/Update/Delete request is not correct, contents must be JSON object"
+        }
+      case "retrieve" | "search" | "delete" =>
+        elements match {
+          case JObject(all_content_elements) => {
+            responses = JObject(all_content_elements).obj
+              .filter(an_element => an_element._1.equalsIgnoreCase("keys"))
+              .map( an_element => {m_log debug s"Search/Retrieval keys ${an_element._1} => ${compact(render(an_element._2))}"
+                  actionHandler(ticket, action, an_element._2, "keys")
+              })
+          }
+          case _ => return "Search/Retrieval request is not correct, contents must be JSON object"
+        }
 
     }
+    val cnt = JField("contents", new JArray(responses))
+    val r_ticket = JField("ticket", ticket)
+    val res = JField("performed_action", new JString(action))
+    val requestResult = new JObject(List(r_ticket, res, cnt))
+    if (compactOutput) compact(render(requestResult)) else pretty(render(requestResult)) + "\n"
   }
 
 
@@ -102,7 +112,7 @@ class SemanticMDRequestHandler(val docAsJson : JValue)  {
       case "delete" => buildResponse(sNode.removeNode(extractKeys))
       case "update" => buildResponse(sNode.modifyNode(extractKeys))
     }
-    m_log debug s"Response: $response \n"
+    m_log debug s"Response: ${pretty(render(response))}\n"
     response
   }
 
@@ -168,13 +178,11 @@ class SemanticMDRequestHandler(val docAsJson : JValue)  {
       }
     }
     action match {
-      case "retrieve" =>
-      case "search" =>
+      case "retrieve" | "search" | "delete" =>
       {
-        if ((docAsJson \ "contents" \ "keys") == null || (docAsJson \ "contents" \ "keys").toSome.isEmpty) {
-          val msg = s"Keys list (filter) is missing or empty"
-          m_log debug Rejected.id + " ==> " + msg
-          return (Rejected.id, msg)
+        val keySection = docAsJson \ "contents" \ "keys"
+        if ( keySection == null || keySection.toSome.isEmpty) {
+          val msg = s"Keys list (filter) is missing or empty"; m_log debug Rejected.id + " ==> " + msg; return (Rejected.id, msg)
         }
 
         val all_keys = docAsJson \ "contents" \ "keys"
@@ -187,38 +195,28 @@ class SemanticMDRequestHandler(val docAsJson : JValue)  {
             })
           }
           case _ => {
-            val msg = "Incorrect request structure"
-            return (Rejected.id, msg)
+            val msg = "Incorrect request structure"; return (Rejected.id, msg)
           }
         }
         if (filteringKeys.isEmpty) {
-          val msg = s"Keys list does not have any pre-defined keys"
-          m_log debug Rejected.id + " ==> " + msg
-          return (Rejected.id, msg)
+          val msg = s"Keys list does not have any pre-defined keys"; m_log debug Rejected.id + " ==> " + msg; return (Rejected.id, msg)
         }
         (Success.id, "Success")
       }
-      case "update" =>
-      case "create" =>
+      case "update" | "create" =>
         { val elements = docAsJson \ "contents"
           elements match {
             case JObject(all_content_elements) => {
-              if (!JObject(all_content_elements).obj
-                .filter(an_element => !an_element._1.equalsIgnoreCase("keys"))
-                .forall(content_element => {
-                  m_log debug (s"Module ${content_element._1} => " + compact(render(content_element._2)))
-                  content_element._2.extractOpt.nonEmpty
-                })) {
-                val msg = s"Create and update require module description"
-                m_log debug Rejected.id + " ==> " + msg
-                return (Rejected.id, msg)
-              }
-              else
+              if(JObject(all_content_elements).obj.filter(an_element => !an_element._1.equalsIgnoreCase("keys")).nonEmpty)
                 return (Success.id, "Success")
+              else{
+                  val msg = s"Create and update require module description"
+                  m_log debug Rejected.id + " ==> " + msg
+                  return (Rejected.id, msg)
+              }
             }
             case _ => {
-              val msg = "Incorrect request structure"
-              return (Rejected.id, msg)
+              val msg = "Incorrect request structure"; return (Rejected.id, msg)
             }
         }
       }
@@ -238,14 +236,14 @@ object SemanticMDRequestHandler{
     "root" -> List("action", "contents")
   )
 
-  def getHandlerForRequest(document: String) : List[SemanticMDRequestHandler] = {
+  def getHandlerForRequest(document: String, compactOutput : Boolean) : List[SemanticMDRequestHandler] = {
     try {
       val docAsJson = parse(document, false, false)
       docAsJson.children.flatMap(reqSegment => {
         m_log.debug("Process JSON: " + compact(render(reqSegment)))
         reqSegment match {
-          case rs: JObject => List(new SemanticMDRequestHandler(rs))
-          case rs: JArray => rs.arr.map(jv => new SemanticMDRequestHandler(jv))
+          case rs: JObject => List(new SemanticMDRequestHandler(rs, compactOutput))
+          case rs: JArray => rs.arr.map(jv => new SemanticMDRequestHandler(jv, compactOutput))
           case _ => List.empty
         }
       })
@@ -257,14 +255,15 @@ object SemanticMDRequestHandler{
   }
 
   import scala.collection.JavaConversions._
-  def getHandlerForRequest4Java(document: String) : util.List[SemanticMDRequestHandler] = {
-    getHandlerForRequest(document)
+  def getHandlerForRequest4Java(document: String, compactOutput : Boolean) : util.List[SemanticMDRequestHandler] = {
+    getHandlerForRequest(document, compactOutput)
   }
 
-  def scanSemanticTable : String = {
+  def scanSemanticTable(compactOutput: Boolean) : String = {
     val srh = new SemanticMDRequestHandler( null )
     val sNode = new SemanticNode(null, null, null)
-    val result = compact(render(srh.buildResponse(sNode.scanNodes)))
+    val result = if (compactOutput) compact(render(srh.buildResponse(sNode.scanNodes)))
+                 else pretty(render(srh.buildResponse(sNode.scanNodes)))
     m_log debug result
     result
   }

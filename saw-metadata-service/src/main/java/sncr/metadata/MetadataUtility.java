@@ -31,7 +31,7 @@ public class MetadataUtility {
             System.out.println("Start data processing:\n input file: " + cl.getOptionValue('i') + "\nOutput path: " + cl.getOptionValue('o'));
             switch (mdType) {
                 case "semantic":
-                    List<SemanticMDRequestHandler> semaReqHandlers = SemanticMDRequestHandler.getHandlerForRequest4Java(inData);
+                    List<SemanticMDRequestHandler> semaReqHandlers = SemanticMDRequestHandler.getHandlerForRequest4Java(inData, false);
                     if (semaReqHandlers.isEmpty())
                     {
                         logger.error("The document is not parsable. Exit");
@@ -49,7 +49,7 @@ public class MetadataUtility {
                     });
                     break;
                 case "scan_semantic":
-                    String result = SemanticMDRequestHandler.scanSemanticTable();
+                    String result = SemanticMDRequestHandler.scanSemanticTable(false);
                     try{
                         outStream.write(result.getBytes());
                     } catch (IOException e) {
