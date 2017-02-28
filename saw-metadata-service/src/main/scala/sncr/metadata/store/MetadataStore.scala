@@ -21,18 +21,18 @@ abstract class MetadataStore {
 
   val m_log: Logger = LoggerFactory.getLogger(classOf[MetadataStore].getName)
   private val default_user = "mapr"
-  val hbaseConf = HBaseConfiguration.create
+  lazy val hbaseConf = HBaseConfiguration.create
   val zQuorum = SAWServiceConfig.metadataConfig.getString("zookeeper-quorum")
   val user = if (SAWServiceConfig.metadataConfig.getString("user") != null &&
     !SAWServiceConfig.metadataConfig.getString("user").isEmpty)
     SAWServiceConfig.metadataConfig.getString("user")
   else default_user
-  val realUser: UserGroupInformation = UserGroupInformation.createRemoteUser(user)
+  lazy val realUser: UserGroupInformation = UserGroupInformation.createRemoteUser(user)
   UserGroupInformation.setLoginUser(realUser)
   m_log debug "Create connection and admin object"
   hbaseConf.set("hbase.zookeeper.quorum", zQuorum)
-  val connection = ConnectionFactory.createConnection(hbaseConf)
-  val admin = connection.getAdmin
+  lazy val connection = ConnectionFactory.createConnection(hbaseConf)
+  lazy val admin = connection.getAdmin
 
   var mdNodeStoreTable : Table = null
   var searchFields : Map[String, Any] = Map.empty

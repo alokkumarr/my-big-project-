@@ -8,9 +8,8 @@ import org.json4s.JsonAST.JValue
 import org.json4s.native.JsonMethods._
 import play.libs.Json
 import play.mvc.Result
-import sncr.metadata.engine.ProcessingResult
-
-import scala.sncr.metadata.semantix.SemanticMDRequestHandler
+import sncr.metadata.ProcessingResult
+import sncr.metadata.semantix.SemanticMDRequestHandler
 
 /**
   * Created by srya0001 on 2/17/2017.

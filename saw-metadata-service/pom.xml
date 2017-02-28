@@ -21,6 +21,7 @@
         <maprdb.version>1.1.1-mapr-1602</maprdb.version>
         <jackson.core.version>2.7.1</jackson.core.version>
         <mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
+        <common.lang>2.6</common.lang>
     </properties>
     <dependencies>
         <dependency>
@@ -45,9 +46,14 @@
             <artifactId>hadoop-common</artifactId>
             <version>${mapr.hadoop.client.version}</version>
         </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${common.lang}</version>
+        </dependency>
     </dependencies>
     <build>
-        <sourceDirectory>${project.basedir}/src/main</sourceDirectory>
+        <!-- sourceDirectory>${project.basedir}/src/main/java</sourceDirectory -->
         <testSourceDirectory>${project.basedir}/src/test</testSourceDirectory>
         <!-- To use the plugin goals in your POM or parent POM -->
 

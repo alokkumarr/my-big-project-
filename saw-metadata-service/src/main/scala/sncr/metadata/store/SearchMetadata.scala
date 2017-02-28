@@ -1,4 +1,4 @@
-package scala.sncr.metadata.store
+package sncr.metadata.store
 
 import org.apache.hadoop.hbase.client.{Result, ResultScanner, Scan, Table}
 import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp
@@ -6,7 +6,6 @@ import org.apache.hadoop.hbase.filter.{FilterList, SingleColumnValueFilter}
 import org.apache.hadoop.hbase.util.Bytes
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.MDObjectStruct
-import sncr.metadata.store.MetadataStore
 
 /**
   * Created by srya0001 on 2/19/2017.
@@ -56,7 +55,7 @@ trait SearchMetadata extends MetadataStore{
     val sr : ResultScanner = mdNodeStoreTable.getScanner(q)
 
     val result = (for( r: Result <- sr) yield r.getRow.clone()).toList
-    m_log trace s"Found: ${sr.size} rows satisfied to filter: ${result.map ( new String( _ )).mkString("[", ",", "]")}"
+    m_log debug s"Found: ${sr.size} rows satisfied to filter: ${result.map ( new String( _ )).mkString("[", ",", "]")}"
     sr.close
     result
   }

@@ -6,6 +6,7 @@ import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.MDObjectStruct._
+import sncr.metadata.ProcessingResult._
 
 /**
   * Created by srya0001 on 2/17/2017.
@@ -54,6 +55,7 @@ trait MetadataNode extends MetadataStore {
       }
       mdNodeStoreTable.put(putOp)
       putOp = null
+      m_log debug s"MD Node has been created"
     }
     catch{
       case x: IOException => m_log error ( s"Could not create/update node: ${new String(rowKey)}, Reason: ", x); return false
@@ -67,17 +69,23 @@ trait MetadataNode extends MetadataStore {
       m_log debug s"Load row: ${new String(rowKey)}"
 
       val getOp: Get = new Get(rowKey)
+
+      //TODO:: make abstract calls, implement in each MD class separately
+      // getContentStructure
       getOp.addFamily(MDKeys(sourceSection.id))
       getOp.addFamily(MDKeys(searchSection.id))
+      //end TODO
+
+      //TODO:: make abstract calls, implement in each MD class separately
+      // extractContent
       val res = mdNodeStoreTable.get(getOp)
       if (res.isEmpty) return None
-      val content = res.getValue(MDKeys(sourceSection.id),
-                                 MDKeys(columnContent.id))
+      val content = res.getValue(MDKeys(sourceSection.id),MDKeys(columnContent.id))
       m_log debug s"Read node: ${new String(content)}"
+      //end TODO
+
       val sfKeyValues = res.getFamilyMap(MDKeys(searchSection.id))
-
       m_log debug s"Include list of search fields into result: ${sfKeyValues.keySet.toList.map(k => new String(k) + " =>" + new String(sfKeyValues(k))  ).mkString("{", ",", "}")}"
-
       val sf : Map[String, String] = sfKeyValues.keySet().map( k =>
       { val k_s = new String(k)
         val v_s = new String(sfKeyValues.get(k))
@@ -92,16 +100,23 @@ trait MetadataNode extends MetadataStore {
     }
   }
 
-  def delete : Boolean =
+  def delete : (Int, String) =
   {
     try {
+      val delGetOp: Get = new Get(rowKey)
+      val getResult = mdNodeStoreTable.get(delGetOp)
+      if (getResult.isEmpty) return (noDataFound.id, s"Node [ ID = ${new String(rowKey)}] not found" )
       val delOp: Delete = new Delete(rowKey)
       mdNodeStoreTable.delete(delOp)
     }
     catch{
-      case x: IOException => m_log error ( s"Could not delete node: ${new String(rowKey)}, Reason: ", x); return false
+      case x: IOException => {
+        val msg = s"Could not delete node: ${new String(rowKey)}, Reason: "
+        m_log error(msg, x)
+        return (Error.id, msg)
+      }
     }
-    true
+    (Success.id, s"Node [ ID = ${new String(rowKey)}] was successfully removed")
   }
 
 
@@ -111,33 +126,7 @@ trait MetadataNode extends MetadataStore {
     rowKeys.map( k => {rowKey = k; retrieve} ).filter(  _.isDefined ).map(v => v.get)
   }
 
-  def update(content: String, searchDictionary: Map[String, String]): Boolean = {
-    try {
-      val query = new Get(rowKey)
-      query.addFamily(MDKeys(sourceSection.id))
-      val res = mdNodeStoreTable.get(query)
-      if (res == null || res.isEmpty){m_log debug s"Row does not exist: ${new String(rowKey)}"; return false}
-      val data = query.getFamilyMap
-      if (res.isEmpty || data == null || data.size == 0){
-        m_log debug s"Row is empty: ${new String(rowKey)}"
-      }
-      var putOp: Put = new Put(rowKey)
-      putOp = putOp.addColumn(MDKeys(sourceSection.id),
-        MDKeys(columnContent.id),
-        Bytes.toBytes(content))
-      val sval = MDNodeUtil.extractSearchData(content, searchDictionary) + ("NodeId" -> Option(rowKey))
-      sval.keySet.foreach(k => {
-        putOp = putOp.addColumn(MDKeys(searchSection.id),
-          Bytes.toBytes(k),
-          Bytes.toBytes(sval(k).asInstanceOf[String]))
-      })
-      mdNodeStoreTable.put(putOp)
-    }
-    catch{
-      case x: IOException => m_log error ( s"Could not retrieve  node: ${new String(rowKey)}, Reason: ", x); return false
-    }
-    true
-  }
+  def update: Unit = putOp = new Put(rowKey)
 
 
  }
@@ -179,15 +168,13 @@ object MetadataNode{
       val getOp: Get = new Get(compositeKey)
       getOp.addFamily(MDKeys(sourceSection.id))
 
-      if (includeSearchFields)
-        getOp.addFamily(MDKeys(searchSection.id))
+      if (includeSearchFields) getOp.addFamily(MDKeys(searchSection.id))
 
       val res = mdNodeStoreTable.get(getOp)
 
       if (res.isEmpty) return None
 
-      val content = res.getValue(MDKeys(sourceSection.id),
-                                 MDKeys(columnContent.id))
+      val content = res.getValue(MDKeys(sourceSection.id),MDKeys(columnContent.id))
 
       m_log debug s"Read node: ${new String(content)}"
       if (includeSearchFields) {
