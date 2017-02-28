@@ -1,7 +1,7 @@
 <div layout="column" layout-align="space-between stretch" class="container">
   <md-card>
     <md-card-content layout="row">
-      <div dx-data-grid="$ctrl.getGridConfig()" dx-item-alias="analysis">
+      <div dx-data-grid="$ctrl.gridConfig" dx-item-alias="analysis">
         <div data-options="dxTemplate: { name: 'actionCellTemplate' }">
           <md-card-actions layout="row" layout-align="center center">
             <md-button class="md-button btn-card" aria-label="Export" ng-click="$ctrl.export(analysis.data)">

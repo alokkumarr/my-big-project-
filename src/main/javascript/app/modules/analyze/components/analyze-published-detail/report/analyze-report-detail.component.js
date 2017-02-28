@@ -10,32 +10,49 @@ export const AnalyzeReportDetailComponent = {
     analysis: '<'
   },
   controller: class AnalyzeReportDetailController {
-    constructor(AnalyzeService, $componentHandler) {
+    constructor(AnalyzeService, dxDataGridService) {
       this.REPORT_GRID_ID = REPORT_GRID_ID;
       this._AnalyzeService = AnalyzeService;
-      this._$componentHandler = $componentHandler;
-      this.columns = [{
-        name: 'CustomerName',
-        checked: true
+      this._dxDataGridService = dxDataGridService;
+      const columns = [{
+        caption: 'CustomerName',
+        dataField: 'CustomerName',
+        allowSorting: true,
+        alignment: 'left',
+        width: '40%'
       }, {
-        name: 'TotalPrice',
-        checked: true
+        caption: 'TotalPrice',
+        dataField: 'TotalPrice',
+        allowSorting: true,
+        alignment: 'left',
+        width: '30%'
       }, {
-        name: 'ShipperName',
-        checked: true
+        caption: 'ShipperName',
+        dataField: 'ShipperName',
+        dataType: 'date',
+        allowSorting: true,
+        alignment: 'left',
+        width: '30%'
       }, {
-        name: 'WarehouseName',
-        checked: true
+        caption: 'WarehouseName',
+        dataField: 'WarehouseName',
+        allowSorting: true,
+        alignment: 'left',
+        width: '30%'
       }];
+
+      this.gridConfig = this._dxDataGridService.mergeWithDefaultConfig({
+        columns: this.columns,
+        bindingOptions: {
+          dataSource: '$ctrl.data'
+        }
+      });
     }
 
     $onInit() {
       this._AnalyzeService.getDataByQuery()
       .then(data => {
         this.data = data;
-        const grid = first(this._$componentHandler.get(REPORT_GRID_ID));
-        grid.updateColumns(this.columns);
-        grid.updateSource(data);
       });
     }
   }

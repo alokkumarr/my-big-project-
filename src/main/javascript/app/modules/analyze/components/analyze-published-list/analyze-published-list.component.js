@@ -15,18 +15,6 @@ export const AnalyzePublishedListComponent = {
       this._AnalyzeService = AnalyzeService;
       this._$state = $state;
       this._$window = $window;
-      this._dxDataGridService = dxDataGridService;
-    }
-
-    goToAnalysis(analysis) {
-      this._$state.go('analyze.publishedDetail',
-        {
-          publishId: analysis.PUBLISHED_ANALYSIS_ID
-        }
-      );
-    }
-
-    getGridConfig() {
       const columns = [{
         caption: 'NAME',
         dataField: 'ANALYSIS_NAME',
@@ -57,8 +45,7 @@ export const AnalyzePublishedListComponent = {
         width: '30%',
         cellTemplate: 'actionCellTemplate'
       }];
-
-      return this._dxDataGridService.mergeWithDefaultConfig({
+      dxDataGridService.mergeWithDefaultConfig({
         onRowClick: row => {
           this.goToAnalysis(row.data);
         },
@@ -76,5 +63,12 @@ export const AnalyzePublishedListComponent = {
       });
     }
 
+    goToAnalysis(analysis) {
+      this._$state.go('analyze.publishedDetail',
+        {
+          publishId: analysis.PUBLISHED_ANALYSIS_ID
+        }
+      );
+    }
   }
 };
