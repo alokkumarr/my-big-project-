@@ -3,13 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.razor</groupId>
-	<artifactId>raw-drill</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<groupId>com.synchronoss</groupId>
+	<artifactId>saw-drill</artifactId>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
-	<name>raw-drill</name>
-	<description>raw-drill</description>
+	<name>saw-drill</name>
+	<description>saw-drill</description>
 
 
 	<properties>
@@ -33,9 +33,9 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>com.razor</groupId>
-			<artifactId>raw-core</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>com.synchronoss</groupId>
+			<artifactId>saw-core</artifactId>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 	<groupId>com.codahale.metrics</groupId>

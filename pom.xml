@@ -131,7 +131,7 @@
 		<module>saw-distribution</module>
 		<module>saw-download</module>
 <!--
-    Note: Disabled until Drill dependency issues resolved
+		Note: Disabled until Drill dependency issues resolved
 		<module>saw-drill</module>
 		<module>saw-engine</module>
 		<module>saw-generation</module>
