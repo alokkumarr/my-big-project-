@@ -11,7 +11,10 @@
   </md-card-title>
 
   <div layout="column" layout-align="space-between center">
-    REPORT GRID
+    <report-grid-container id="{{::$ctrl.REPORT_GRID_ID}}"
+                           source="$ctrl.data"
+                           columns="$ctrl.columns">
+    </report-grid-container>
   </div>
 </md-card>
 

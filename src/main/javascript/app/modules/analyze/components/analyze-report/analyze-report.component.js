@@ -492,7 +492,7 @@ export const AnalyzeReportComponent = {
       }
 
       this.model.artifacts = this.generatePayload();
-
+      console.log(this.model.artifacts);
       const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
       this._$mdDialog
