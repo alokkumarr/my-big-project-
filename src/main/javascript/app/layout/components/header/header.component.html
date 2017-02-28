@@ -34,6 +34,8 @@
           <md-menu>
             <md-button class="md-icon-button" aria-label="User"
                        ng-click="$mdMenu.open()">
+
+              <md-tooltip>{{ "TOOLTIP_ACCOUNT_SETTINGS" | translate }}</md-tooltip>
               <md-icon md-font-icon="icon-user-placeholder"></md-icon>
             </md-button>
             <md-menu-content>
@@ -53,6 +55,7 @@
 
         <md-button class="md-icon-button" aria-label="Menu"
                    ng-click="toggleRight()">
+          <md-tooltip>{{ "TOOLTIP_ALERTS" | translate }}</md-tooltip>
           <md-icon md-font-icon="icon-bell-list"></md-icon>
           <badge class="alerts-badge" label="{{5}}"></badge>
         </md-button>

@@ -16,7 +16,7 @@
         <span class="md-headline"
               ng-bind-html="::$ctrl.model.name | highlight:$ctrl.highlightTerm"></span>
         <span class="md-subhead">
-          <span ng-bind-html="::($ctrl.model.metrics || []).join(', ') | highlight:$ctrl.highlightTerm"></span>
+          <span ng-bind-html="::($ctrl.mkdel.metrics || []).join(', ') | highlight:$ctrl.highlightTerm"></span>
           <span ng-if="::$ctrl.model.scheduled">
             <md-icon md-font-icon="icon-calendar"></md-icon>
             <span ng-bind="::$ctrl.model.scheduled"></span>
@@ -28,10 +28,12 @@
     <md-card-actions layout="row" layout-align="center center">
       <md-button class="md-button btn-card" aria-label="Fork"
                  ng-click="$ctrl.fork()">
+        <md-tooltip>{{ "TOOLTIP_FORK_ANALYSIS" | translate }}</md-tooltip>
         <md-icon md-font-icon="icon-fork"></md-icon>
       </md-button>
 
       <md-button class="md-button btn-card" aria-label="Export">
+        <md-tooltip>{{ "TOOLTIP_EXPORT_ANALYSIS" | translate }}</md-tooltip>
         <md-icon md-font-icon="icon-folder"></md-icon>
       </md-button>
 
@@ -70,4 +72,3 @@
     </md-card-actions>
   </md-card-footer>
 </md-card>
-
