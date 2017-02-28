@@ -1,4 +1,4 @@
-package sncr.metadata.engine
+package sncr.metadata
 
 /**
   * Created by srya0001 on 2/21/2017.
