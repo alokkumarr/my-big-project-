@@ -1,10 +1,14 @@
-<div class="search-box" ng-class="{'m-hovered': $ctrl.states.hovered || $ctrl.states.focused || $ctrl.model}"
-     ng-mouseover="$ctrl.states.hovered = true"
-     ng-mouseleave="$ctrl.states.hovered = false">
-  <md-icon md-font-icon="icon-search"></md-icon>
+<div class="search-box" ng-class="{'m-search-visible': $ctrl.states.hovered || $ctrl.states.focused || $ctrl.model}">
+  <md-icon md-font-icon="icon-search"
+    ng-click="$ctrl.states.focused = true"
+  ></md-icon>
 
   <input placeholder="{{$ctrl.placeholder}}"
          ng-click="$ctrl.states.focused = true"
          ng-change="$ctrl.onModelChanged()"
          ng-model="$ctrl.model"/>
+
+  <md-icon md-font-icon="icon-close"
+    ng-click="$ctrl.states.focused = false; $ctrl.model = ''; $ctrl.onModelChanged()"
+  ></md-icon>
 </div>
