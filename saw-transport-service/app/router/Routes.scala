@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
-// @SOURCE:C:/projects/BDA/bda-middle-tier/bda-transport-service/conf/routes
-// @DATE:Thu Feb 02 14:24:46 EST 2017
+// @SOURCE:C:/projects/SAW/saw-services/saw-transport-service/conf/routes
+// @DATE:Wed Mar 01 11:53:47 EST 2017
 
 package router
 
@@ -17,25 +17,37 @@ import _root_.play.libs.F
 class Routes(
   override val errorHandler: play.api.http.HttpErrorHandler, 
   // @LINE:4
-  MTSControl_1: controllers.MTSControl,
+  MTSControl_4: controllers.MTSControl,
   // @LINE:6
-  TS_0: controllers.TS,
+  TS_3: controllers.TS,
+  // @LINE:7
+  MD_1: controllers.MD,
+  // @LINE:8
+  EXE_0: controllers.EXE,
+  // @LINE:10
+  MCT_2: controllers.MCT,
   val prefix: String
 ) extends GeneratedRouter {
 
    @javax.inject.Inject()
    def this(errorHandler: play.api.http.HttpErrorHandler,
     // @LINE:4
-    MTSControl_1: controllers.MTSControl,
+    MTSControl_4: controllers.MTSControl,
     // @LINE:6
-    TS_0: controllers.TS
-  ) = this(errorHandler, MTSControl_1, TS_0, "/")
+    TS_3: controllers.TS,
+    // @LINE:7
+    MD_1: controllers.MD,
+    // @LINE:8
+    EXE_0: controllers.EXE,
+    // @LINE:10
+    MCT_2: controllers.MCT
+  ) = this(errorHandler, MTSControl_4, TS_3, MD_1, EXE_0, MCT_2, "/")
 
   import ReverseRouteContext.empty
 
   def withPrefix(prefix: String): Routes = {
     router.RoutesPrefix.setPrefix(prefix)
-    new Routes(errorHandler, MTSControl_1, TS_0, prefix)
+    new Routes(errorHandler, MTSControl_4, TS_3, MD_1, EXE_0, MCT_2, prefix)
   }
 
   private[this] val defaultPrefix: String = {
@@ -44,7 +56,11 @@ class Routes(
 
   def documentation = List(
     ("""GET""", this.prefix, """controllers.MTSControl.index"""),
-    ("""POST""", this.prefix, """controllers.TS.query"""),
+    ("""POST""", this.prefix, """controllers.TS.handleRequest"""),
+    ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """md""", """controllers.MD.handleRequest"""),
+    ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """exe""", """controllers.EXE.handleRequest"""),
+    ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """ObjectSearch""", """controllers.MCT.handleTagRequest(LCID:String, query:Option[String])"""),
+    ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """ObjectSearch""", """controllers.MCT.extendedTagRequest(LCID:String, indexname:Option[String], objecttype:Option[String])"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """control""", """controllers.MTSControl.executeCmd(CMD:String, PARAMETERS:Option[String])"""),
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """control""", """controllers.MTSControl.executeExtendedCmd(CMD:String)"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """sr""", """controllers.MTSControl.sr(parameters:Option[String])"""),
@@ -60,7 +76,7 @@ class Routes(
     PathPattern(List(StaticPart(this.prefix)))
   )
   private[this] lazy val controllers_MTSControl_index0_invoker = createInvoker(
-    MTSControl_1.index,
+    MTSControl_4.index,
     HandlerDef(this.getClass.getClassLoader,
       "router",
       "controllers.MTSControl",
@@ -75,15 +91,15 @@ class Routes(
   )
 
   // @LINE:6
-  private[this] lazy val controllers_TS_query1_route = Route("POST",
+  private[this] lazy val controllers_TS_handleRequest1_route = Route("POST",
     PathPattern(List(StaticPart(this.prefix)))
   )
-  private[this] lazy val controllers_TS_query1_invoker = createInvoker(
-    TS_0.handleRequest,
+  private[this] lazy val controllers_TS_handleRequest1_invoker = createInvoker(
+    TS_3.handleRequest,
     HandlerDef(this.getClass.getClassLoader,
       "router",
       "controllers.TS",
-      "query",
+      "handleRequest",
       Nil,
       "POST",
       """""",
@@ -91,12 +107,80 @@ class Routes(
     )
   )
 
-  // @LINE:13
-  private[this] lazy val controllers_MTSControl_executeCmd2_route = Route("GET",
+  // @LINE:7
+  private[this] lazy val controllers_MD_handleRequest2_route = Route("POST",
+    PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("md")))
+  )
+  private[this] lazy val controllers_MD_handleRequest2_invoker = createInvoker(
+    MD_1.handleRequest,
+    HandlerDef(this.getClass.getClassLoader,
+      "router",
+      "controllers.MD",
+      "handleRequest",
+      Nil,
+      "POST",
+      """""",
+      this.prefix + """md"""
+    )
+  )
+
+  // @LINE:8
+  private[this] lazy val controllers_EXE_handleRequest3_route = Route("POST",
+    PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("exe")))
+  )
+  private[this] lazy val controllers_EXE_handleRequest3_invoker = createInvoker(
+    EXE_0.handleRequest,
+    HandlerDef(this.getClass.getClassLoader,
+      "router",
+      "controllers.EXE",
+      "handleRequest",
+      Nil,
+      "POST",
+      """""",
+      this.prefix + """exe"""
+    )
+  )
+
+  // @LINE:10
+  private[this] lazy val controllers_MCT_handleTagRequest4_route = Route("GET",
+    PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("ObjectSearch")))
+  )
+  private[this] lazy val controllers_MCT_handleTagRequest4_invoker = createInvoker(
+    MCT_2.handleTagRequest(fakeValue[String], fakeValue[Option[String]]),
+    HandlerDef(this.getClass.getClassLoader,
+      "router",
+      "controllers.MCT",
+      "handleTagRequest",
+      Seq(classOf[String], classOf[Option[String]]),
+      "GET",
+      """""",
+      this.prefix + """ObjectSearch"""
+    )
+  )
+
+  // @LINE:11
+  private[this] lazy val controllers_MCT_extendedTagRequest5_route = Route("POST",
+    PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("ObjectSearch")))
+  )
+  private[this] lazy val controllers_MCT_extendedTagRequest5_invoker = createInvoker(
+    MCT_2.extendedTagRequest(fakeValue[String], fakeValue[Option[String]], fakeValue[Option[String]]),
+    HandlerDef(this.getClass.getClassLoader,
+      "router",
+      "controllers.MCT",
+      "extendedTagRequest",
+      Seq(classOf[String], classOf[Option[String]], classOf[Option[String]]),
+      "POST",
+      """""",
+      this.prefix + """ObjectSearch"""
+    )
+  )
+
+  // @LINE:15
+  private[this] lazy val controllers_MTSControl_executeCmd6_route = Route("GET",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("control")))
   )
-  private[this] lazy val controllers_MTSControl_executeCmd2_invoker = createInvoker(
-    MTSControl_1.executeCmd(fakeValue[String], fakeValue[Option[String]]),
+  private[this] lazy val controllers_MTSControl_executeCmd6_invoker = createInvoker(
+    MTSControl_4.executeCmd(fakeValue[String], fakeValue[Option[String]]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
       "controllers.MTSControl",
@@ -108,12 +192,12 @@ class Routes(
     )
   )
 
-  // @LINE:14
-  private[this] lazy val controllers_MTSControl_executeExtendedCmd3_route = Route("POST",
+  // @LINE:16
+  private[this] lazy val controllers_MTSControl_executeExtendedCmd7_route = Route("POST",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("control")))
   )
-  private[this] lazy val controllers_MTSControl_executeExtendedCmd3_invoker = createInvoker(
-    MTSControl_1.executeExtendedCmd(fakeValue[String]),
+  private[this] lazy val controllers_MTSControl_executeExtendedCmd7_invoker = createInvoker(
+    MTSControl_4.executeExtendedCmd(fakeValue[String]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
       "controllers.MTSControl",
@@ -125,12 +209,12 @@ class Routes(
     )
   )
 
-  // @LINE:16
-  private[this] lazy val controllers_MTSControl_sr4_route = Route("GET",
+  // @LINE:18
+  private[this] lazy val controllers_MTSControl_sr8_route = Route("GET",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("sr")))
   )
-  private[this] lazy val controllers_MTSControl_sr4_invoker = createInvoker(
-    MTSControl_1.sr(fakeValue[Option[String]]),
+  private[this] lazy val controllers_MTSControl_sr8_invoker = createInvoker(
+    MTSControl_4.sr(fakeValue[Option[String]]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
       "controllers.MTSControl",
@@ -148,31 +232,55 @@ class Routes(
     // @LINE:4
     case controllers_MTSControl_index0_route(params) =>
       call { 
-        controllers_MTSControl_index0_invoker.call(MTSControl_1.index)
+        controllers_MTSControl_index0_invoker.call(MTSControl_4.index)
       }
   
     // @LINE:6
-    case controllers_TS_query1_route(params) =>
+    case controllers_TS_handleRequest1_route(params) =>
       call { 
-        controllers_TS_query1_invoker.call(TS_0.handleRequest)
+        controllers_TS_handleRequest1_invoker.call(TS_3.handleRequest)
       }
   
-    // @LINE:13
-    case controllers_MTSControl_executeCmd2_route(params) =>
+    // @LINE:7
+    case controllers_MD_handleRequest2_route(params) =>
+      call { 
+        controllers_MD_handleRequest2_invoker.call(MD_1.handleRequest)
+      }
+  
+    // @LINE:8
+    case controllers_EXE_handleRequest3_route(params) =>
+      call { 
+        controllers_EXE_handleRequest3_invoker.call(EXE_0.handleRequest)
+      }
+  
+    // @LINE:10
+    case controllers_MCT_handleTagRequest4_route(params) =>
+      call(params.fromQuery[String]("LCID", None), params.fromQuery[Option[String]]("query", None)) { (LCID, query) =>
+        controllers_MCT_handleTagRequest4_invoker.call(MCT_2.handleTagRequest(LCID, query))
+      }
+  
+    // @LINE:11
+    case controllers_MCT_extendedTagRequest5_route(params) =>
+      call(params.fromQuery[String]("LCID", None), params.fromQuery[Option[String]]("indexname", None), params.fromQuery[Option[String]]("objecttype", None)) { (LCID, indexname, objecttype) =>
+        controllers_MCT_extendedTagRequest5_invoker.call(MCT_2.extendedTagRequest(LCID, indexname, objecttype))
+      }
+  
+    // @LINE:15
+    case controllers_MTSControl_executeCmd6_route(params) =>
       call(params.fromQuery[String]("CMD", None), params.fromQuery[Option[String]]("PARAMETERS", None)) { (CMD, PARAMETERS) =>
-        controllers_MTSControl_executeCmd2_invoker.call(MTSControl_1.executeCmd(CMD, PARAMETERS))
-      }
-  
-    // @LINE:14
-    case controllers_MTSControl_executeExtendedCmd3_route(params) =>
-      call(params.fromQuery[String]("CMD", None)) { (CMD) =>
-        controllers_MTSControl_executeExtendedCmd3_invoker.call(MTSControl_1.executeExtendedCmd(CMD))
+        controllers_MTSControl_executeCmd6_invoker.call(MTSControl_4.executeCmd(CMD, PARAMETERS))
       }
   
     // @LINE:16
-    case controllers_MTSControl_sr4_route(params) =>
+    case controllers_MTSControl_executeExtendedCmd7_route(params) =>
+      call(params.fromQuery[String]("CMD", None)) { (CMD) =>
+        controllers_MTSControl_executeExtendedCmd7_invoker.call(MTSControl_4.executeExtendedCmd(CMD))
+      }
+  
+    // @LINE:18
+    case controllers_MTSControl_sr8_route(params) =>
       call(params.fromQuery[Option[String]]("parameters", None)) { (parameters) =>
-        controllers_MTSControl_sr4_invoker.call(MTSControl_1.sr(parameters))
+        controllers_MTSControl_sr8_invoker.call(MTSControl_4.sr(parameters))
       }
   }
 }

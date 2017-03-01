@@ -1,6 +1,6 @@
 import sbt.Keys._
 
-name := """BDA-Transport-Service"""
+name := """SAW-Transport-Service"""
 
 version := "1.0"
 resolvers += "MapR Maven Repository" at "http://repository.mapr.com/maven"
@@ -9,10 +9,7 @@ resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repos
 resolvers += Resolver.bintrayRepo("scalaz", "releases")
 resolvers += Resolver.bintrayRepo("megamsys", "scala")
 
-lazy val root = (project in file("."))
-  .enablePlugins(PlayJava)
-  .enablePlugins(PlayNettyServer)
-  .enablePlugins(RoutesCompiler)
+lazy val root = (project in file(".")).enablePlugins(RoutesCompiler).enablePlugins(PlayScala).enablePlugins(PlayJava).enablePlugins(PlayNettyServer)
 
 scalaVersion := "2.11.8"
 exportJars := true
@@ -22,12 +19,9 @@ unmanagedJars := Seq.empty[sbt.Attributed[java.io.File]]
 
 //Generic Java modules and libraries
 libraryDependencies ++= Seq(
-
-
   "com.mapr" % "mapr-release" % "5.1.0.37689-mapr",
   "org.reactivemongo" %% "reactivemongo-play-json" % "0.11.11",
   "ch.qos.logback" % "logback-classic" % "1.0.13"
-
 )
 
 // JUnit framework

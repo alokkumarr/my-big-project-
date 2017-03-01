@@ -1,17 +1,18 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
-GET     /               				controllers.MTSControl.index
+GET     /               controllers.MTSControl.index
 
-POST    /								controllers.TS.handleRequest
-POST    /md								controllers.MD.handleRequest
+POST    /		controllers.TS.handleRequest
+POST    /md		controllers.MD.handleRequest
+POST    /exe		controllers.EXE.handleRequest
 
-#POST		/report						controllers.Report.createReport
-
+GET     /ObjectSearch   controllers.MCT.handleTagRequest(LCID: String, query: Option[String])
+POST    /ObjectSearch 	controllers.MCT.extendedTagRequest(LCID: String, indexname: Option[String], objecttype: Option[String])
 
 # Control interface
 
-GET     /control        		controllers.MTSControl.executeCmd(CMD:String, PARAMETERS:Option[String])
-POST    /control                controllers.MTSControl.executeExtendedCmd(CMD:String)
+GET     /control        controllers.MTSControl.executeCmd(CMD:String, PARAMETERS:Option[String])
+POST    /control        controllers.MTSControl.executeExtendedCmd(CMD:String)
 
-GET     /sr             		controllers.MTSControl.sr( parameters:Option[String])
+GET     /sr             controllers.MTSControl.sr( parameters:Option[String])

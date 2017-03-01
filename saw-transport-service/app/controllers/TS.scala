@@ -83,7 +83,7 @@ class TS extends BaseServiceProvider {
       case "DL" =>  res.put("result", "success"); return play.mvc.Results.ok(res)
       case _ =>
             res.put("result", "failure")
-            res.put("result", "Unsupported storage type")
+            res.put("reason", "Unsupported storage type")
             play.mvc.Results.badRequest(res)
     }
 

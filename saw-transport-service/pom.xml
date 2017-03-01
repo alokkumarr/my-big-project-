@@ -441,11 +441,11 @@
                 </executions>
                 <configuration>
                     <license>Synchronoss proprietary product</license>
-                    <distribution>BDA Middle Tier Transport Service</distribution>
+                    <distribution>SAW Transport Service</distribution>
                     <needarch>false</needarch>
                     <targetOS>i386-linux</targetOS>
-                    <group>BDA-MT/Transport Server</group>
-                    <packager>BDA</packager>
+                    <group>SAW/Transport Server</group>
+                    <packager>SAW</packager>
                     <name>${project.artifactId}</name>
 
                     <defineStatements>
@@ -492,31 +492,17 @@
                         </mapping>
                         <mapping>
                             <directory>/var/saw/service/log</directory>
+                            <directoryIncluded>true</directoryIncluded>
                             <filemode>644</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
-                            <sources>
-                                <source>
-                                    <location>conf</location>
-                                    <includes>
-                                        <include>dummy</include>
-                                    </includes>
-                                </source>
-                            </sources>
                         </mapping>
                         <mapping>
                             <directory>/var/saw/service/run</directory>
+                            <directoryIncluded>true</directoryIncluded>
                             <filemode>644</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
-                            <sources>
-                                <source>
-                                    <location>conf</location>
-                                    <includes>
-                                        <include>dummy</include>
-                                    </includes>
-                                </source>
-                            </sources>
                         </mapping>
                     </mappings>
                     <preinstallScriptlet>

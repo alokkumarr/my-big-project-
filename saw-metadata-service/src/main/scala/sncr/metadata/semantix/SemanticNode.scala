@@ -63,7 +63,7 @@ class SemanticNode(val ticket: JValue, val content_element: JValue, val module_n
     catch{
       case x: Exception => { val msg = s"Could not store node [ ID = ${new String(rowKey)} ]: "; m_log error (msg, x); ( Error.id, msg)}
     }
-  }
+    }
 
 
 

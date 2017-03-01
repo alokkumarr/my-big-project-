@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
-// @SOURCE:C:/projects/BDA/bda-middle-tier/bda-transport-service/conf/routes
-// @DATE:Thu Feb 02 14:24:46 EST 2017
+// @SOURCE:C:/projects/SAW/saw-services/saw-transport-service/conf/routes
+// @DATE:Wed Mar 01 11:53:47 EST 2017
 
 import play.api.routing.JavaScriptReverseRoute
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
@@ -15,6 +15,76 @@ import _root_.play.libs.F
 package controllers.javascript {
   import ReverseRouteContext.empty
 
+  // @LINE:8
+  class ReverseEXE(_prefix: => String) {
+
+    def _defaultPrefix: String = {
+      if (_prefix.endsWith("/")) "" else "/"
+    }
+
+  
+    // @LINE:8
+    def handleRequest: JavaScriptReverseRoute = JavaScriptReverseRoute(
+      "controllers.EXE.handleRequest",
+      """
+        function() {
+          return _wA({method:"POST", url:"""" + _prefix + { _defaultPrefix } + """" + "exe"})
+        }
+      """
+    )
+  
+  }
+
+  // @LINE:7
+  class ReverseMD(_prefix: => String) {
+
+    def _defaultPrefix: String = {
+      if (_prefix.endsWith("/")) "" else "/"
+    }
+
+  
+    // @LINE:7
+    def handleRequest: JavaScriptReverseRoute = JavaScriptReverseRoute(
+      "controllers.MD.handleRequest",
+      """
+        function() {
+          return _wA({method:"POST", url:"""" + _prefix + { _defaultPrefix } + """" + "md"})
+        }
+      """
+    )
+  
+  }
+
+  // @LINE:10
+  class ReverseMCT(_prefix: => String) {
+
+    def _defaultPrefix: String = {
+      if (_prefix.endsWith("/")) "" else "/"
+    }
+
+  
+    // @LINE:11
+    def extendedTagRequest: JavaScriptReverseRoute = JavaScriptReverseRoute(
+      "controllers.MCT.extendedTagRequest",
+      """
+        function(LCID0,indexname1,objecttype2) {
+          return _wA({method:"POST", url:"""" + _prefix + { _defaultPrefix } + """" + "ObjectSearch" + _qS([(""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("LCID", LCID0), (""" + implicitly[QueryStringBindable[Option[String]]].javascriptUnbind + """)("indexname", indexname1), (""" + implicitly[QueryStringBindable[Option[String]]].javascriptUnbind + """)("objecttype", objecttype2)])})
+        }
+      """
+    )
+  
+    // @LINE:10
+    def handleTagRequest: JavaScriptReverseRoute = JavaScriptReverseRoute(
+      "controllers.MCT.handleTagRequest",
+      """
+        function(LCID0,query1) {
+          return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "ObjectSearch" + _qS([(""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("LCID", LCID0), (""" + implicitly[QueryStringBindable[Option[String]]].javascriptUnbind + """)("query", query1)])})
+        }
+      """
+    )
+  
+  }
+
   // @LINE:4
   class ReverseMTSControl(_prefix: => String) {
 
@@ -23,7 +93,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:16
+    // @LINE:18
     def sr: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MTSControl.sr",
       """
@@ -33,7 +103,7 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:13
+    // @LINE:15
     def executeCmd: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MTSControl.executeCmd",
       """
@@ -43,7 +113,7 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:14
+    // @LINE:16
     def executeExtendedCmd: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MTSControl.executeExtendedCmd",
       """
@@ -74,8 +144,8 @@ package controllers.javascript {
 
   
     // @LINE:6
-    def query: JavaScriptReverseRoute = JavaScriptReverseRoute(
-      "controllers.TS.query",
+    def handleRequest: JavaScriptReverseRoute = JavaScriptReverseRoute(
+      "controllers.TS.handleRequest",
       """
         function() {
           return _wA({method:"POST", url:"""" + _prefix + """"})

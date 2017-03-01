@@ -41,6 +41,7 @@ object MDObjectStruct extends Enumeration{
   val applications = Value(9, "_applications")
 
   val columnContent = Value(100, "content")
+  val columnReportParameters = Value(101, "reportParameters")
 
 
   val MDKeys = Map( sourceSection.id -> Bytes.toBytes(sourceSection.toString),
