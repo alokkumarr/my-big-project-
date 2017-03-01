@@ -16,6 +16,7 @@ export function AnalyzeService($http) {
   'ngInject';
 
   return {
+    getCategories,
     getCategory,
     getMethods,
     getMetrics,
@@ -36,6 +37,10 @@ export function AnalyzeService($http) {
 
   function getAnalyseById(id) {
     return $http.get(`/api/analyze/byId/${id}`).then(get('data'));
+  }
+
+  function getCategories() {
+    return $http.get('/api/analyze/categories').then(get('data'));
   }
 
   function getCategory(id) {
