@@ -45,7 +45,7 @@ export const AnalyzePublishedListComponent = {
         width: '30%',
         cellTemplate: 'actionCellTemplate'
       }];
-      dxDataGridService.mergeWithDefaultConfig({
+      this.gridConfig = dxDataGridService.mergeWithDefaultConfig({
         onRowClick: row => {
           this.goToAnalysis(row.data);
         },
