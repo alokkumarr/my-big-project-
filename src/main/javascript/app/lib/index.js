@@ -9,8 +9,6 @@ export const LibModule = 'LibModule';
 
 angular
   .module(LibModule, [
-    'ngSanitize',
-    'pascalprecht.translate',
     FiltersModule,
     CommonModule,
     ComponentsModule,

@@ -5,11 +5,7 @@ export function routesConfig($stateProvider) {
     {
       name: 'analyze',
       url: '/analyze',
-      component: 'analyzePage',
-      redirectTo: {
-        state: 'analyze.view',
-        params: {id: 1}
-      }
+      component: 'analyzePage'
     }, {
       name: 'analyze.view',
       url: '/:id',
