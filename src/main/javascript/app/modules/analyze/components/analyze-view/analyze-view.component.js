@@ -1,6 +1,8 @@
 import template from './analyze-view.component.html';
 import style from './analyze-view.component.scss';
 
+import {cloneDeep} from 'lodash';
+
 import {Events, AnalyseTypes} from '../../consts';
 import AbstractComponentController from 'app/lib/common/components/abstractComponent';
 
@@ -169,7 +171,8 @@ export const AnalyzeViewComponent = {
 
     onCardAction(actionType, model) {
       if (actionType === 'fork' || actionType === 'edit') {
-        this.openEditModal(actionType, model);
+        const clone = cloneDeep(model);
+        this.openEditModal(actionType, clone);
       }
     }
 
