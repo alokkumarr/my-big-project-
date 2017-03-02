@@ -1,5 +1,3 @@
-import ArrayStore from 'devextreme/data/array_store';
-
 import template from './analyze-published-list.component.html';
 // import style from './analyze-published-list.component.scss';
 

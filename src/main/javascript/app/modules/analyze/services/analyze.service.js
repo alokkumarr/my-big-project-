@@ -51,11 +51,11 @@ export function AnalyzeService($http, $timeout, $q) {
   }
 
   function executeAnalysis(id) {
-    return $q((resolve, reject) => {
+    return $q(resolve => {
       $timeout(() => {
         resolve({
           publishedAnalysisId: 3,
-          analysisId: 1
+          analysisId: id
         });
       }, 0);
     });

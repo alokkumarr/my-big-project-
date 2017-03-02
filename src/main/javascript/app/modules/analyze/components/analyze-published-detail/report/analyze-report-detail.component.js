@@ -1,5 +1,3 @@
-import first from 'lodash/first';
-
 import template from './analyze-report-detail.component.html';
 
 const REPORT_GRID_ID = 'analyze-detail-report-grid-container';
@@ -42,7 +40,7 @@ export const AnalyzeReportDetailComponent = {
       }];
 
       this.gridConfig = this._dxDataGridService.mergeWithDefaultConfig({
-        columns: this.columns,
+        columns,
         bindingOptions: {
           dataSource: '$ctrl.data'
         }
