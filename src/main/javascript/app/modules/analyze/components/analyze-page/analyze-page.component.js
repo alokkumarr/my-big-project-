@@ -5,17 +5,17 @@ export const AnalyzePageComponent = {
   template,
   styles: [style],
   controller: class AnalyzePageController {
-    constructor($componentHandler, AnalyzeService) {
+    constructor($componentHandler, MenuService) {
       'ngInject';
 
       this.$componentHandler = $componentHandler;
-      this.AnalyzeService = AnalyzeService;
+      this.MenuService = MenuService;
     }
 
     $onInit() {
       const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
 
-      this.AnalyzeService.getMenu()
+      this.MenuService.getMenu('ANALYZE')
         .then(data => {
           leftSideNav.update(data);
         });

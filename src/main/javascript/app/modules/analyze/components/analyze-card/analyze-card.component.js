@@ -5,8 +5,55 @@ export const AnalyzeCardComponent = {
   template,
   styles: [style],
   bindings: {
-    metadata: '<'
+    model: '<',
+    onAction: '&',
+    highlightTerm: '<'
   },
   controller: class AnalyzeCardController {
+
+    constructor($mdDialog) {
+      'ngInject';
+      this._$mdDialog = $mdDialog;
+    }
+
+    openMenu($mdMenu, ev) {
+      $mdMenu.open(ev);
+    }
+
+    openPublishModal(ev) {
+      const tpl = '<analyze-publish-dialog model="$ctrl.model" on-publish="$ctrl.onPublish($data)"></analyze-publish-dialog>';
+
+      this._$mdDialog
+        .show({
+          template: tpl,
+          controllerAs: '$ctrl',
+          autoWrap: false,
+          fullscreen: true,
+          focusOnOpen: false,
+          multiple: true,
+          targetEvent: ev,
+          clickOutsideToClose: true
+        });
+    }
+
+    openPrintModal() {
+    }
+
+    openExportModal() {
+    }
+
+    fork() {
+      this.onAction({
+        type: 'fork',
+        model: this.model
+      });
+    }
+
+    edit() {
+      this.onAction({
+        type: 'edit',
+        model: this.model
+      });
+    }
   }
 };

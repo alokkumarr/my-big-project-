@@ -1,12 +1,16 @@
 <div class="analyze-view">
   <md-toolbar class="secondary-toolbar">
     <div class="md-toolbar-tools"
-         layout-align="space-between center">
-      <div class="md-title" translate="ORDER_FULFILLMENT">
-        <md-icon md-font-icon="icon-search"></md-icon>
+         layout-align="start center">
+      <div class="analyze-view_search-panel" layout="row" layout-align="start center">
+        <span class="md-title"
+              ng-bind="$ctrl.category.name"></span>&nbsp;
+        <search-box placeholder="Search Analyses"
+                    ng-model="$ctrl.states.searchTerm"
+                    on-change="$ctrl.applySearchFilter()" delay="1000"></search-box>
       </div>
 
-      <div>
+      <div layout="row" layout-align="start center">
         <md-input-container class="analyze-view_switch-view">
           <md-radio-group ng-model="$ctrl.states.reportView">
             <md-radio-button ng-value="$ctrl.LIST_VIEW">
@@ -33,10 +37,12 @@
         </md-input-container>
       </div>
 
-      <md-button class="btn-primary"
-                 ng-click="$ctrl.openNewAnalysisModal()">
-        + <span translate="ANALYSIS"></span>
-      </md-button>
+      <div class="analyze-view_action-panel" layout="row" layout-align="end center">
+        <md-button class="btn-primary"
+                   ng-click="$ctrl.openNewAnalysisModal()">
+          + <span translate="ANALYSIS"></span>
+        </md-button>
+      </div>
     </div>
   </md-toolbar>
 
@@ -53,35 +59,65 @@
               <span class="md-headline" translate="LIST"></span>
             </md-card-title-text>
           </md-card-title>
-
-          <md-card-actions layout="row" layout-align="center center">
-            <md-button>
-              <md-icon md-font-icon="icon-fork"></md-icon>
-            </md-button>
-            <md-button>
-              <md-icon md-font-icon="icon-folder"></md-icon>
-            </md-button>
-            <md-button>
-              <md-icon md-font-icon="icon-more"></md-icon>
-            </md-button>
-          </md-card-actions>
         </md-card-header>
 
         <md-card-content layout="row">
-          <script id="gridTypeCell" type="text/html">
-            <span class="analyze-view_grid_type-label" ng-bind="::dxTemplateModel.text | uppercase"></span>
-          </script>
+          <div dx-data-grid="$ctrl.getGridConfig()" dx-item-alias="report">
+            <div data-options="dxTemplate: { name: 'nameCellTemplate' }">
+              <span ng-bind-html="::report.value | highlight:$ctrl.states.searchTerm"></span>
+            </div>
+            <div data-options="dxTemplate: { name: 'metricsCellTemplate' }">
+              <span ng-bind-html="::report.value | highlight:$ctrl.states.searchTerm"></span>
+            </div>
+            <div data-options="dxTemplate: { name: 'typeCellTemplate' }">
+              <md-chip class="tag-chip">
+                <span ng-bind-html="::report.value | highlight:$ctrl.states.searchTerm"></span>
+              </md-chip>
+            </div>
+            <div data-options="dxTemplate: { name: 'actionCellTemplate' }">
+              <md-card-actions layout="row" layout-align="center center">
+                <md-button class="md-button btn-card" aria-label="Fork"
+                           ng-click="$ctrl.fork(report.data)">
+                  <md-icon md-font-icon="icon-fork"></md-icon>
+                </md-button>
+                <md-button class="md-button btn-card" aria-label="Export">
+                  <md-icon md-font-icon="icon-folder"></md-icon>
+                </md-button>
 
-          <div id="analyze-view_grid" class="analyze-view_grid"
-               dx-data-grid="$ctrl.getGridData()"></div>
+                <md-menu-bar>
+                  <md-menu>
+                    <md-button class="md-button btn-card" aria-label="More"
+                               ng-click="$mdMenu.open()">
+                      <md-icon md-font-icon="icon-more"></md-icon>
+                    </md-button>
+
+                    <md-menu-content>
+                      <md-menu-item>
+                        <md-button aria-label="Edit"
+                                   ng-click="$ctrl.edit(report.data)">Edit
+                        </md-button>
+                      </md-menu-item>
+                    </md-menu-content>
+                  </md-menu>
+                </md-menu-bar>
+              </md-card-actions>
+            </div>
+          </div>
         </md-card-content>
       </md-card>
     </div>
 
     <!-- CARD VIEW -->
-    <div ng-switch-when="card" layout="row" layout-align="space-around start" layout-wrap>
-      <analyze-card flex="45" ng-repeat="report in $ctrl.reports | filter:$ctrl.filterReports"
-                    metadata="report"></analyze-card>
+    <div ng-switch-when="card" layout="row" layout-align="start start" layout-wrap>
+      <div flex-md="50" ng-repeat="report in $ctrl.reports | filter:$ctrl.filterReports.bind($ctrl)">
+        <analyze-card model="report" on-action="$ctrl.onCardAction(type, model)"
+                      highlight-term="$ctrl.states.searchTerm"></analyze-card>
+      </div>
+
+      <div class="analyze-view_no-results"
+           ng-if="$ctrl.states.searchTerm && !$ctrl.reports.length">
+        <span translate="NO_MATCHING_RESULTS"></span>
+      </div>
     </div>
   </div>
 </div>

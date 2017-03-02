@@ -1,25 +1,36 @@
-md-input-container.#{$theme-cls} {
-  .md-input {
-    background-color: $input-bg-color;
-    color: $input-color;
-    border: $input-border;
-    border-radius: $input-border-radius;
-
-    padding: $input-padding;
-    line-height: $input-line-height;
-    font-size: $input-font-size;
-  }
-}
-
-md-input-container .md-input {
-  height: 34px;
-}
-
-md-input-container.#{$theme-cls} label {
-  color: $input-label-color;
-}
-
 .#{$theme-cls} {
+  & md-input-container {
+    margin: 0;
+
+    label {
+      font-size: $input-font-size !important;
+      font-weight: 400;
+      color: $input-label-color !important;
+    }
+
+    .md-input {
+      background-color: $input-bg-color;
+      border: $input-border;
+      border-radius: 3px;
+      color: $input-color;
+      font-size: $input-font-size;
+      font-weight: 600;
+      padding: 5px;
+
+      /* Chrome/Opera/Safari */
+      ::-webkit-input-placeholder,
+        /* Firefox 19+ */
+      ::-moz-placeholder,
+        /* IE 10+ */
+      :-ms-input-placeholder,
+        /* Firefox 18- */
+      :-moz-placeholder {
+        color: $input-color;
+        opacity: 0.55;
+      }
+    }
+  }
+
   & md-checkbox {
     .md-icon {
       width: 18px;

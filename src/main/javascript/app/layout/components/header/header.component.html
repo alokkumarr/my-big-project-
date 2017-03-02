@@ -33,7 +33,7 @@
         <md-menu-bar>
           <md-menu>
             <md-button class="md-icon-button" aria-label="User"
-                       ng-click="$mdOpenMenu()">
+                       ng-click="$mdMenu.open()">
               <md-icon md-font-icon="icon-user-placeholder"></md-icon>
             </md-button>
             <md-menu-content>
@@ -53,7 +53,7 @@
 
         <md-button class="md-icon-button" aria-label="Menu"
                    ng-click="toggleRight()">
-          <md-icon md-font-icon="icon-bell-list"></md-icon>
+          <div class="alert-bell-icon"></div>
           <badge class="alerts-badge" label="{{5}}"></badge>
         </md-button>
       </div>

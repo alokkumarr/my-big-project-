@@ -1,10 +1,7 @@
-import concat from 'lodash/concat';
 import first from 'lodash/first';
 
 import template from './analyze-report-preview.component.html';
 import style from './analyze-report-preview.component.scss';
-
-const MORE_ROWS_COUNT = 500;
 
 export const AnalyzeReportPreviewComponent = {
   template,
@@ -13,21 +10,19 @@ export const AnalyzeReportPreviewComponent = {
     model: '<'
   },
   controller: class AnalyzeReportPreviewController {
-    constructor($componentHandler, $mdDialog, AnalyzeService) {
+    constructor($componentHandler, $mdDialog, $timeout, AnalyzeService) {
       'ngInject';
-
       this._$componentHandler = $componentHandler;
       this._$mdDialog = $mdDialog;
+      this._$timeout = $timeout;
       this._AnalyzeService = AnalyzeService;
 
-      this.MORE_ROWS_COUNT = MORE_ROWS_COUNT;
-
-      this.settings = {
-        minRowsToShow: 'auto'
-      };
+      this.MORE_ROWS_COUNT = 500;
+      this.data = [];
     }
 
     $onInit() {
+      this.loadMore();
     }
 
     cancel() {
@@ -40,7 +35,7 @@ export const AnalyzeReportPreviewComponent = {
       if (grid) {
         grid.updateColumns(this.model.columns);
         grid.updateSorts(this.model.sorts);
-        grid.updateSource(this.model.gridData);
+        grid.updateSource(this.data);
         grid.refreshGrid();
       }
     }
@@ -48,7 +43,7 @@ export const AnalyzeReportPreviewComponent = {
     loadMore() {
       this._AnalyzeService.getDataByQuery()
         .then(data => {
-          this.model.gridData = concat(this.model.gridData, data);
+          this.data.push(...data);
           this.reloadPreviewGrid();
         });
     }

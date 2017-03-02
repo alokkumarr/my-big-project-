@@ -1,13 +1,5 @@
-import get from 'lodash/fp/get';
-
-export function ObserveService($http) {
+export function ObserveService() {
   'ngInject';
 
-  return {
-    getMenu
-  };
-
-  function getMenu() {
-    return $http.get('/api/menu/observe').then(get('data'));
-  }
+  return {};
 }

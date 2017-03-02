@@ -1,4 +1,4 @@
-export function runConfig($rootScope, $state, $location, $window, JwtService) {
+export function runConfig($rootScope, $state, $location, $window, JwtService, Idle, UserService) {
   'ngInject';
 
   $rootScope.getPageTitle = () => {
@@ -11,7 +11,7 @@ export function runConfig($rootScope, $state, $location, $window, JwtService) {
     return 'Synchronoss';
   };
 
-  $rootScope.$on('$locationChangeSuccess', event => {
+  $rootScope.$on('$locationChangeStart', event => {
     const restrictedPage = ['/', '/login', '/observe', '/analyse', '/alerts'];
 
     if ((restrictedPage.indexOf($location.path()) !== -1) && angular.isDefined(JwtService.get())) {
@@ -22,7 +22,7 @@ export function runConfig($rootScope, $state, $location, $window, JwtService) {
     }
   });
 
-  $rootScope.$on('$stateChangeSuccess', event => {
+  $rootScope.$on('$stateChangeStart', event => {
     const restrictedPage = ['/', '/login', '/observe', '/analyse', '/alerts'];
 
     if ((restrictedPage.indexOf($location.path()) !== -1) && angular.isDefined(JwtService.get())) {
@@ -31,5 +31,10 @@ export function runConfig($rootScope, $state, $location, $window, JwtService) {
       event.preventDefault();
       $window.location.assign('./login.html');
     }
+  });
+  Idle.watch();
+  $rootScope.$on('IdleTimeout', event => {
+    event.preventDefault();
+    UserService.logout('logout');
   });
 }

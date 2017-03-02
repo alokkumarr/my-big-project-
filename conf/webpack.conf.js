@@ -9,6 +9,8 @@ const path = require('path');
 const DefinePlugin = require('webpack/lib/DefinePlugin');
 const NoEmitOnErrorsPlugin = require('webpack/lib/NoEmitOnErrorsPlugin');
 const LoaderOptionsPlugin = require('webpack/lib/LoaderOptionsPlugin');
+const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
+
 const StyleLintPlugin = require('stylelint-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
@@ -16,12 +18,15 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
+const WebpackBuildVersion = require('./webpack.version');
+
 module.exports = function (env) {
   const isDevelopment = env === 'development';
   const isProduction = env === 'production';
   const enableMock = true;
 
   const MODULE_DIR = 'node_modules';
+  const BUILD_DIR = 'dist/'
 
   /**
    * Webpack configuration
@@ -34,7 +39,7 @@ module.exports = function (env) {
     },
 
     output: {
-      path: webpackHelper.root('dist'),
+      path: webpackHelper.root(BUILD_DIR),
       filename: 'js/[name].bundle.js',
       sourceMapFilename: isDevelopment ? '[file].map' : ''
     },
@@ -56,6 +61,7 @@ module.exports = function (env) {
 
     module: {
       rules: [
+        // preloaders
         {
           enforce: 'pre',
           test: /\.js$/,
@@ -73,8 +79,9 @@ module.exports = function (env) {
           test: /\.html$/,
           loader: 'htmlhint-loader'
         },
+        // loaders
         {
-          test: /.json$/,
+          test: /\.json$/,
           loader: 'json-loader'
         },
         {
@@ -83,14 +90,23 @@ module.exports = function (env) {
           loader: 'ng-annotate-loader!babel-loader'
         },
         {
-          test: /.html$/,
+          test: /\.html$/,
           loader: 'html-loader'
         },
         {
           test: /\.(css|scss)$/,
           loader: ExtractTextPlugin.extract({
             fallback: 'style-loader',
-            loader: `css-loader${isProduction ? '?minimize' : ''}!sass-loader!postcss-loader`
+            use: [
+              {
+                loader: 'css-loader',
+                options: {
+                  minimize: isProduction
+                }
+              },
+              'sass-loader',
+              'postcss-loader'
+            ]
           })
         },
         {
@@ -107,7 +123,7 @@ module.exports = function (env) {
     plugins: [
       new NoEmitOnErrorsPlugin(),
       new ProgressBarPlugin({
-        format: chalk.blue.bold('   build') + ' [:bar] ' + chalk.green.bold(':percent') + ' (:elapsed seconds) ',
+        format: `${chalk.blue.bold('   build')} [:bar] ${chalk.green.bold(':percent')} (:elapsed seconds) `,
         clear: false
       }),
       new DefinePlugin({
@@ -154,7 +170,7 @@ module.exports = function (env) {
   }
 
   if (isProduction) {
-    const pkg = require('../package.json');
+    const pkg = require(webpackHelper.root('package.json'));
 
     const vendorKeys = Object.keys(pkg.dependencies).map(key => {
       // devextreme has no index.js or a main set in package.json, so we have to manually select the main file
@@ -170,7 +186,7 @@ module.exports = function (env) {
 
     conf.entry.vendor = vendorKeys;
 
-    conf.plugins.push(new CleanWebpackPlugin(['dist/'], {
+    conf.plugins.push(new CleanWebpackPlugin([BUILD_DIR], {
       root: webpackHelper.root(),
       verbose: true
     }));
@@ -197,6 +213,13 @@ module.exports = function (env) {
       names: ['vendor'],
       minChunks: Infinity
     }));
+
+    conf.plugins.push(new UglifyJsPlugin({
+      sourceMap: false,
+      mangle: false
+    }));
+
+    conf.plugins.push(new WebpackBuildVersion('build.json'));
   }
 
   return conf;

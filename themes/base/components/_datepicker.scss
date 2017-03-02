@@ -7,7 +7,7 @@
   }
 
   .md-datepicker-input-container {
-    border: $input-border;
+    border: none;
 
     .md-datepicker-input {
       min-width: 100px;
@@ -20,8 +20,7 @@
     }
 
     .md-datepicker-triangle-button {
-      top: 8px;
-      right: 2px;
+      right: 8px;
     }
   }
 
@@ -36,6 +35,14 @@
       .md-calendar-date-selection-indicator {
         background-color: $date-picker-selection-indicator-color !important;
       }
+    }
+  }
+  & md-input-container {
+    .md-input.md-datepicker-input {
+      background-color: transparent;
+      border: none;
+      border-bottom: 1px solid #CECECE;
+      min-width: 75px;
     }
   }
 }

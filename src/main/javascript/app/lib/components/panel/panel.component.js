@@ -1,7 +1,9 @@
 import template from './panel.component.html';
+import style from './panel.component.scss';
 
 export const PanelComponent = {
   template,
+  styles: [style],
   transclude: true,
   bindings: {
     title: '@'

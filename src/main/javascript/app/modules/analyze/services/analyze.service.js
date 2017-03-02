@@ -16,11 +16,13 @@ export function AnalyzeService($http) {
   'ngInject';
 
   return {
-    getMenu,
+    getCategories,
+    getCategory,
     getMethods,
     getMetrics,
     getArtifacts,
     getAnalyses,
+    getAnalyseById,
     getDataByQuery,
     getSupportedMethods,
     generateQuery,
@@ -29,12 +31,20 @@ export function AnalyzeService($http) {
     setAvailableAnalysisMethods: curry(setAvailableItems)(analysisMethodMapper, isMethodSupported)
   };
 
-  function getAnalyses() {
-    return $http.get('api/analyze/analyses').then(get('data'));
+  function getAnalyses(category, query) {
+    return $http.get('/api/analyze/analyses', {params: {category, query}}).then(get('data'));
   }
 
-  function getMenu() {
-    return $http.get('/api/menu/analyze').then(get('data'));
+  function getAnalyseById(id) {
+    return $http.get(`/api/analyze/byId/${id}`).then(get('data'));
+  }
+
+  function getCategories() {
+    return $http.get('/api/analyze/categories').then(get('data'));
+  }
+
+  function getCategory(id) {
+    return $http.get(`/api/analyze/category/${id}`).then(get('data'));
   }
 
   function getMethods() {

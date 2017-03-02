@@ -1,5 +1,9 @@
+import first from 'lodash/first';
+
 import template from './analyze-report-save.component.html';
 import style from './analyze-report-save.component.scss';
+
+import {Events} from '../../consts';
 
 export const AnalyzeReportSaveComponent = {
   template,
@@ -9,48 +13,45 @@ export const AnalyzeReportSaveComponent = {
     onSave: '&'
   },
   controller: class AnalyzeReportSaveController {
-    constructor($mdDialog, $timeout, AnalyzeService) {
+    constructor($mdDialog, $timeout, $eventEmitter, AnalyzeService) {
       'ngInject';
-
       this._$mdDialog = $mdDialog;
       this._$timeout = $timeout;
+      this._$eventEmitter = $eventEmitter;
       this._AnalyzeService = AnalyzeService;
 
       this.dataHolder = {
-        payload: null,
-        category: null,
-        title: '',
-        description: '',
         categories: []
       };
     }
 
     $onInit() {
-      this._AnalyzeService.getMenu()
+      this._AnalyzeService.getCategories()
         .then(response => {
-          this.dataHolder.categories = response[0].children;
+          this.dataHolder.categories = response;
+          this.setDefaultCategory();
         });
-
-      this.dataHolder.artifacts = this.model.artifacts;
-      this.dataHolder.category = this.model.category;
-      this.dataHolder.title = this.model.title;
-      this.dataHolder.description = this.model.description;
     }
 
     cancel() {
       this._$mdDialog.cancel();
     }
 
+    setDefaultCategory() {
+      if (!this.model.category) {
+        const defaultCategory = first(this.dataHolder.categories);
+
+        if (defaultCategory) {
+          this.model.category = defaultCategory.id;
+        }
+      }
+    }
+
     save() {
       this.$dialog.showLoader();
 
       this._$timeout(() => {
-        const payload = {
-          title: this.dataHolder.title,
-          description: this.dataHolder.description,
-          category: this.dataHolder.category,
-          artifacts: this.dataHolder.artifacts
-        };
+        const payload = this.model;
 
         this._AnalyzeService.saveReport(payload)
           .then(response => {
@@ -59,6 +60,8 @@ export const AnalyzeReportSaveComponent = {
             this.onSave({
               $data: payload
             });
+
+            this._$eventEmitter.emit(Events.AnalysesRefresh, payload);
 
             this.cancel();
           })

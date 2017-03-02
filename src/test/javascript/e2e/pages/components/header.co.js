@@ -1,5 +1,6 @@
 module.exports = {
   headerElements: {
-    analyzeBtn: element(by.css('[ui-sref="app.analyze"]'))
+    symmetraLogo: element(by.css('.symmetra-logo')),
+    analyzeBtn: element(by.css('[ui-sref="analyze"]'))
   }
 };

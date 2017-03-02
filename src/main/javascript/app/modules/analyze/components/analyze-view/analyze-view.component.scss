@@ -8,6 +8,10 @@ analyze-view {
     font-weight: bold;
   }
 
+  &_search-panel {
+    flex-basis: 40%;
+  }
+
   &_switch-view {
     md-radio-group {
       display: inline-flex;
@@ -41,6 +45,10 @@ analyze-view {
     font-size: 16px;
   }
 
+  &_action-panel {
+    margin-left: auto;
+  }
+
   &_reports-list {
     md-card {
       md-card-header {
@@ -55,14 +63,36 @@ analyze-view {
       }
 
       md-card-actions {
+        md-menu-bar {
+          padding: {
+            left: 0;
+            right: 0;
+          }
+        }
+
         .md-button {
-          min-width: 36px;
+          display: inline-flex;
+          min-width: 24px;
+          min-height: 24px;
+          line-height: 24px;
+          height: 24px;
         }
       }
 
       md-card-content {
         margin-bottom: 75px;
       }
+    }
+  }
+
+  &_no-results {
+    width: 100%;
+    color: #B2B2B2;
+    text-align: center;
+
+    span {
+      font-size: 28px;
+      word-break: break-word;
     }
   }
 

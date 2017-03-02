@@ -1,202 +1,393 @@
 [
   {
+    "id": "1",
     "type": "chart",
+    "chartType": "column",
     "name": "Order Revenue By Customer",
+    "description": "Test description",
+    "category": "11",
     "metrics": [
       "Orders",
       "Revenue"
     ],
     "scheduled": "Every Friday at 12:00pm",
-    "chart": {
-      "options": {
-        "xAxis": {
-          "categories": [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec"
-          ],
-          "startOnTick": true,
-          "title": {
-            "text": "Months"
-          }
-        },
-        "yAxis": {
-          "title": {
-            "text": "Revenue"
-          }
-        },
-        "legend": {
-          "align": "right",
-          "verticalAlign": "top",
-          "layout": "vertical",
-          "x": 0,
-          "y": 100
-        },
-        "chart": {
-          "type": "line",
-          "marginRight": 120
-        },
-        "plotOptions": {
-          "line": {
-            "pointPlacement": -0.5
-          }
-        },
-        "series": [
-          {
-            "name": "Alpha",
-            "data": [
-              [
-                0.3,
-                5
-              ],
-              [
-                2.1,
-                25
-              ],
-              [
-                3.5,
-                10
-              ],
-              [
-                4.5,
-                11
-              ],
-              [
-                5.6,
-                6
-              ],
-              [
-                6.5,
-                21
-              ],
-              [
-                7.1,
-                20
-              ],
-              [
-                7.8,
-                29
-              ],
-              [
-                8.7,
-                35
-              ],
-              [
-                9,
-                29
-              ],
-              [
-                9.5,
-                5
-              ],
-              [
-                11.1,
-                20
-              ]
-            ]
-          },
-          {
-            "name": "Bravo",
-            "data": [
-              [
-                0.3,
-                2
-              ],
-              [
-                4.8,
-                13
-              ],
-              [
-                6.2,
-                35
-              ],
-              [
-                8.9,
-                10
-              ],
-              [
-                10.6,
-                22
-              ],
-              [
-                11.1,
-                10
-              ]
-            ]
-          }
-        ]
-      }
-    }
+    "artifacts": []
   },
   {
+    "id": "2",
     "type": "report",
+    "chartType": null,
     "name": "Shipper Usage",
+    "description": "Test description",
+    "category": "11",
     "metrics": [
       "Orders"
     ],
     "scheduled": "Daily",
-    "report": {
-      "options": {
-        "dataSource": [
+    "artifacts": [
+      {
+        "artifact_name": "Orders",
+        "artifact_position": [
+          5,
+          130
+        ],
+        "artifact_attributes": [
           {
-            "id": 1,
-            "shipper": "Aaron's Towing",
-            "order": "12bc",
-            "total": "$600"
+            "column_name": "OrderID",
+            "display_name": "Order ID",
+            "alias_name": "",
+            "type": "int",
+            "hide": true,
+            "join_eligible": true,
+            "filter_eligible": false,
+            "checked": false
           },
           {
-            "id": 2,
-            "shipper": "Aaron's Towing",
-            "order": "12bd",
-            "total": "$650"
+            "column_name": "Shipper",
+            "display_name": "Shipper",
+            "alias_name": "",
+            "type": "int",
+            "hide": false,
+            "join_eligible": true,
+            "filter_eligible": false,
+            "checked": false
           },
           {
-            "id": 3,
-            "shipper": "Aaron's Towing",
-            "order": "12be",
-            "total": "$550"
+            "column_name": "Customer",
+            "display_name": "Customer",
+            "alias_name": "",
+            "type": "int",
+            "hide": false,
+            "join_eligible": true,
+            "filter_eligible": false,
+            "checked": false
           },
           {
-            "id": 4,
-            "shipper": "Aaron's Towing",
-            "order": "12bf",
-            "total": "$700"
+            "column_name": "TotalPrice",
+            "display_name": "Total Price",
+            "alias_name": "",
+            "type": "int",
+            "hide": false,
+            "join_eligible": false,
+            "filter_eligible": true,
+            "checked": true
+          },
+          {
+            "column_name": "Warehouse",
+            "display_name": "Warehouse",
+            "alias_name": "",
+            "type": "int",
+            "hide": false,
+            "join_eligible": true,
+            "filter_eligible": false,
+            "checked": false
+          },
+          {
+            "column_name": "Address",
+            "display_name": "Address",
+            "alias_name": "Order Address",
+            "type": "string",
+            "hide": false,
+            "join_eligible": false,
+            "filter_eligible": false,
+            "checked": false
           }
         ],
-        "columns": [
-          "shipper",
-          "order",
-          "total"
+        "sql_builder": {
+          "group_by_columns": [],
+          "order_by_columns": [],
+          "joins": [
+            {
+              "type": "inner",
+              "criteria": [
+                {
+                  "table_name": "Orders",
+                  "column_name": "Shipper",
+                  "side": "right"
+                },
+                {
+                  "table_name": "Shippers",
+                  "column_name": "ShipperID",
+                  "side": "left"
+                }
+              ]
+            },
+            {
+              "type": "inner",
+              "criteria": [
+                {
+                  "table_name": "Orders",
+                  "column_name": "Customer",
+                  "side": "right"
+                },
+                {
+                  "table_name": "Customers",
+                  "column_name": "CustomerID",
+                  "side": "left"
+                }
+              ]
+            },
+            {
+              "type": "inner",
+              "criteria": [
+                {
+                  "table_name": "Orders",
+                  "column_name": "Warehouse",
+                  "side": "right"
+                },
+                {
+                  "table_name": "Warehouses",
+                  "column_name": "WarehouseID",
+                  "side": "left"
+                }
+              ]
+            }
+          ],
+          "filters": [
+            {
+              "column_name": "TotalPrice",
+              "boolean_criteria": "AND",
+              "operator": ">=",
+              "search_conditions": [
+                1
+              ]
+            }
+          ]
+        },
+        "data": []
+      },
+      {
+        "artifact_name": "Shippers",
+        "artifact_position": [
+          400,
+          5
         ],
-        "columnAutoWidth": true,
-        "showBorders": true,
-        "showColumnHeaders": true,
-        "showColumnLines": true,
-        "showRowLines": true,
-        "width": 400,
-        "scrolling": {
-          "mode": "virtual"
+        "artifact_attributes": [
+          {
+            "column_name": "ShipperID",
+            "display_name": "Shipper ID",
+            "alias_name": "",
+            "type": "int",
+            "hide": false,
+            "join_eligible": true,
+            "filter_eligible": false,
+            "checked": false
+          },
+          {
+            "column_name": "ShipperName",
+            "display_name": "Shipper Name",
+            "alias_name": "",
+            "type": "string",
+            "hide": false,
+            "join_eligible": false,
+            "filter_eligible": true,
+            "checked": true
+          },
+          {
+            "column_name": "Region",
+            "display_name": "Region",
+            "alias_name": "Shipper Region",
+            "type": "string",
+            "hide": false,
+            "join_eligible": false,
+            "filter_eligible": false,
+            "checked": false
+          }
+        ],
+        "sql_builder": {
+          "group_by_columns": [],
+          "order_by_columns": [],
+          "joins": [],
+          "filters": []
         },
-        "sorting": {
-          "mode": "none"
+        "data": []
+      },
+      {
+        "artifact_name": "Customers",
+        "artifact_position": [
+          400,
+          200
+        ],
+        "artifact_attributes": [
+          {
+            "column_name": "CustomerID",
+            "display_name": "Customer ID",
+            "alias_name": "",
+            "type": "int",
+            "hide": false,
+            "join_eligible": true,
+            "filter_eligible": false,
+            "checked": false
+          },
+          {
+            "column_name": "CustomerName",
+            "display_name": "Customer Name",
+            "alias_name": "",
+            "type": "string",
+            "hide": false,
+            "join_eligible": false,
+            "filter_eligible": true,
+            "checked": true
+          },
+          {
+            "column_name": "Address",
+            "display_name": "Address",
+            "alias_name": "Customer Address",
+            "type": "string",
+            "hide": false,
+            "join_eligible": false,
+            "filter_eligible": false,
+            "checked": false
+          },
+          {
+            "column_name": "PhoneNumber",
+            "display_name": "Phone Number",
+            "alias_name": "Customer Phone Number",
+            "type": "string",
+            "hide": false,
+            "join_eligible": false,
+            "filter_eligible": false,
+            "checked": false
+          }
+        ],
+        "sql_builder": {
+          "group_by_columns": [],
+          "order_by_columns": [],
+          "joins": [],
+          "filters": []
         },
-        "paging": {
-          "pageSize": 10
+        "data": []
+      },
+      {
+        "artifact_name": "Warehouses",
+        "artifact_position": [
+          350,
+          420
+        ],
+        "artifact_attributes": [
+          {
+            "column_name": "WarehouseID",
+            "display_name": "Warehouse ID",
+            "alias_name": "",
+            "type": "int",
+            "hide": false,
+            "join_eligible": true,
+            "filter_eligible": false,
+            "checked": false
+          },
+          {
+            "column_name": "WarehouseName",
+            "display_name": "Warehouse Name",
+            "alias_name": "",
+            "type": "string",
+            "hide": false,
+            "join_eligible": false,
+            "filter_eligible": true,
+            "checked": true
+          },
+          {
+            "column_name": "WarehouseAddress",
+            "display_name": "Warehouse Address",
+            "alias_name": "",
+            "type": "string",
+            "hide": false,
+            "join_eligible": false,
+            "filter_eligible": false,
+            "checked": false
+          }
+        ],
+        "sql_builder": {
+          "group_by_columns": [],
+          "order_by_columns": [],
+          "joins": [],
+          "filters": []
         },
-        "pager": {
-          "showPageSizeSelector": true,
-          "showInfo": true
-        }
+        "data": []
       }
-    }
+    ]
+  },
+  {
+    "id": "3",
+    "type": "chart",
+    "chartType": "line",
+    "name": "Line chart Analysis",
+    "description": "Test description",
+    "category": "11",
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": "Every Friday at 12:00pm",
+    "artifacts": []
+  },
+  {
+    "id": "4",
+    "type": "chart",
+    "chartType": "pie",
+    "name": "Pie chart Analysis",
+    "description": "Test description",
+    "category": "11",
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": "Every Friday at 12:00pm",
+    "artifacts": []
+  },
+  {
+    "id": "5",
+    "type": "chart",
+    "chartType": "stack",
+    "name": "Stack chart Analysis",
+    "description": "Test description",
+    "category": "11",
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": "Every Friday at 12:00pm",
+    "artifacts": []
+  },
+  {
+    "id": "5",
+    "type": "chart",
+    "chartType": "scatter",
+    "name": "Scatter chart Analysis",
+    "description": "Test description",
+    "category": "11",
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": "Every Friday at 12:00pm",
+    "artifacts": []
+  },
+  {
+    "id": "5",
+    "type": "chart",
+    "chartType": "donut",
+    "name": "Donut chart Analysis",
+    "description": "Test description",
+    "category": "11",
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": "Every Friday at 12:00pm",
+    "artifacts": []
+  },
+  {
+    "id": "5",
+    "type": "chart",
+    "chartType": "bubble",
+    "name": "Bubble chart Analysis",
+    "description": "Test description",
+    "category": "11",
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": "Every Friday at 12:00pm",
+    "artifacts": []
   }
 ]

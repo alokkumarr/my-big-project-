@@ -8,4 +8,13 @@ layout-header {
       padding: 0 20px;
     }
   }
+
+  .alert-bell-icon {
+    background-image: url(~img/alert-bell.png);
+    background-size: 85% 85%;
+    background-repeat: no-repeat;
+    height: 21px;
+    width: 39px;
+    image-rendering: -webkit-optimize-contrast;
+  }
 }

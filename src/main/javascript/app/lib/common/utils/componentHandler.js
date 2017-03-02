@@ -1,8 +1,9 @@
-class ComponentHandler {
-  constructor($eventHandler) {
-    this._instances = {};
+import EventEmitter from './eventEmitter';
 
-    this.events = $eventHandler;
+export default class ComponentHandler {
+  constructor() {
+    this._instances = {};
+    this._$eventEmitter = new EventEmitter();
   }
 
   register(key, instance) {
@@ -15,7 +16,7 @@ class ComponentHandler {
 
       coll.push(instance);
 
-      this.events.emit('$onInstanceAdded', {
+      this.$emit('$onInstanceAdded', {
         key,
         instance
       });
@@ -40,7 +41,7 @@ class ComponentHandler {
             delete this._instances[key];
           }
 
-          this.events.emit('$onInstanceRemoved', {
+          this.$emit('$onInstanceRemoved', {
             key,
             instance
           });
@@ -56,9 +57,12 @@ class ComponentHandler {
   get(key) {
     return (this._instances[key] || []).slice();
   }
-}
 
-export default $eventHandler => {
-  'ngInject';
-  return new ComponentHandler($eventHandler);
-};
+  on(...args) {
+    return this._$eventEmitter.on.apply(this._$eventEmitter, args);
+  }
+
+  $emit(...args) {
+    this._$eventEmitter.emit.apply(this._$eventEmitter, args);
+  }
+}
