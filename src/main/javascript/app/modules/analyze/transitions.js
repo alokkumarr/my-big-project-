@@ -4,7 +4,7 @@ export function transitions($transitions, localStorageService, $state, $timeout)
   'ngInject';
   const key = 'lastAnalysesListId';
 
-  let firstPageLoad = false;
+  let firstPageLoad = true;
 
   $transitions.onEnter({entering: 'analyze'}, onEnterAnalyze);
   $transitions.onEnter({entering: 'analyze.view'}, onEnterAnalyzeView);
@@ -12,12 +12,12 @@ export function transitions($transitions, localStorageService, $state, $timeout)
 
   function onEnterAnalyze(transition, state) {
     firstPageLoad = true;
+    // we have to use timeout, because this listener fires when we go to a child as well
     $timeout(() => {
       if (firstPageLoad) {
         const id = localStorageService.get(key);
         if (id) {
-          // $state.go('analyze.view', {id});
-          console.log('go to: ', id);
+          $state.go('analyze.view', {id});
         }
       }
     });
@@ -27,7 +27,6 @@ export function transitions($transitions, localStorageService, $state, $timeout)
 
     const analysesId = transition.params().id;
     if (analysesId) {
-      console.log('save');
       localStorageService.set(key, analysesId);
     }
   }
