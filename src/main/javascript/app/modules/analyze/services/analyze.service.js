@@ -51,12 +51,12 @@ export function AnalyzeService($http, $timeout, $q) {
     return $http.get(`/api/analyze/publishedAnalysis/${id}`).then(get('data'));
   }
 
-  function executeAnalysis(id) {
+  function executeAnalysis(analysisId) {
     return $q(resolve => {
       $timeout(() => {
         resolve({
           publishedAnalysisId: 3,
-          analysisId: id
+          analysisId
         });
       }, 0);
     });

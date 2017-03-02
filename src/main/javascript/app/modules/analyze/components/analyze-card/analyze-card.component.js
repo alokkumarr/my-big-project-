@@ -44,8 +44,8 @@ export const AnalyzeCardComponent = {
     openExportModal() {
     }
 
-    execute() {
-      this._AnalyzeService.executeAnalysis()
+    execute(analysisId) {
+      this._AnalyzeService.executeAnalysis(analysisId)
         .then(analysis => {
           this.goToAnalysis(analysis.analysisId, analysis.publishedAnalysisId);
         });
