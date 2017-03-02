@@ -26,9 +26,9 @@ export const AnalyzeReportSaveComponent = {
     }
 
     $onInit() {
-      this._AnalyzeService.getMenu()
+      this._AnalyzeService.getCategories()
         .then(response => {
-          this.dataHolder.categories = response[0].children;
+          this.dataHolder.categories = response;
           this.setDefaultCategory();
         });
     }
