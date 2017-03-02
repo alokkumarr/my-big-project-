@@ -4,8 +4,32 @@
     width: 434px;
     background-size: 434px 159px;
 
-    &.m-chart {
-      background-image: url('~img/chart-placeholder.png');
+    &.m-chart-bubble {
+      background-image: url('~img/charts/chart-bubble.png');
+    }
+
+    &.m-chart-column {
+      background-image: url('~img/charts/chart-column.png');
+    }
+
+    &.m-chart-donut {
+      background-image: url('~img/charts/chart-donut.png');
+    }
+
+    &.m-chart-line {
+      background-image: url('~img/charts/chart-line.png');
+    }
+
+    &.m-chart-pie {
+      background-image: url('~img/charts/chart-pie.png');
+    }
+
+    &.m-chart-scatter {
+      background-image: url('~img/charts/chart-scatter.png');
+    }
+
+    &.m-chart-stack {
+      background-image: url('~img/charts/chart-stack.png');
     }
   }
 

@@ -185,3 +185,9 @@ body[dir=rtl] .menu-heading {
   line-height: 40px;
   flex: 1
 }
+
+md-sidenav {
+  &.md-sidenav-left {
+      width: $sidebar-left-width;
+  }
+}

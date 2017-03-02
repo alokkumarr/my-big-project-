@@ -37,4 +37,12 @@
       }
     }
   }
+  & md-input-container {
+    .md-input.md-datepicker-input {
+      background-color: transparent;
+      border: none;
+      border-bottom: 1px solid #CECECE;
+      min-width: 75px;
+    }
+  }
 }

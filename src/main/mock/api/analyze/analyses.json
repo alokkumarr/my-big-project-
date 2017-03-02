@@ -2,6 +2,7 @@
   {
     "id": "1",
     "type": "chart",
+    "chartType": "column",
     "name": "Order Revenue By Customer",
     "description": "Test description",
     "category": "11",
@@ -15,6 +16,7 @@
   {
     "id": "2",
     "type": "report",
+    "chartType": null,
     "name": "Shipper Usage",
     "description": "Test description",
     "category": "11",
@@ -308,6 +310,90 @@
     "id": "10",
     "type": "pivot",
     "name": "Pivot test",
+    "description": "Test description",
+    "category": "11",
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": "Every Friday at 12:00pm",
+    "artifacts": []
+  },
+  {
+    "id": "3",
+    "type": "chart",
+    "chartType": "line",
+    "name": "Line chart Analysis",
+    "description": "Test description",
+    "category": "11",
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": "Every Friday at 12:00pm",
+    "artifacts": []
+  },
+  {
+    "id": "4",
+    "type": "chart",
+    "chartType": "pie",
+    "name": "Pie chart Analysis",
+    "description": "Test description",
+    "category": "11",
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": "Every Friday at 12:00pm",
+    "artifacts": []
+  },
+  {
+    "id": "5",
+    "type": "chart",
+    "chartType": "stack",
+    "name": "Stack chart Analysis",
+    "description": "Test description",
+    "category": "11",
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": "Every Friday at 12:00pm",
+    "artifacts": []
+  },
+  {
+    "id": "5",
+    "type": "chart",
+    "chartType": "scatter",
+    "name": "Scatter chart Analysis",
+    "description": "Test description",
+    "category": "11",
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": "Every Friday at 12:00pm",
+    "artifacts": []
+  },
+  {
+    "id": "5",
+    "type": "chart",
+    "chartType": "donut",
+    "name": "Donut chart Analysis",
+    "description": "Test description",
+    "category": "11",
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": "Every Friday at 12:00pm",
+    "artifacts": []
+  },
+  {
+    "id": "5",
+    "type": "chart",
+    "chartType": "bubble",
+    "name": "Bubble chart Analysis",
     "description": "Test description",
     "category": "11",
     "metrics": [
