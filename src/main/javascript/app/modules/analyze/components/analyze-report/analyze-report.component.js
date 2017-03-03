@@ -66,6 +66,13 @@ export const AnalyzeReportComponent = {
         this.model.id = null;
       }
 
+      if (this.model.query) {
+        // give designer mode chance to load, then switch to query mode
+        this._$timeout(() => {
+          this.setSqlMode(this.QUERY_MODE);
+        }, 100);
+      }
+
       this.unregister = this._$componentHandler.on('$onInstanceAdded', e => {
         if (e.key === 'ard-canvas') {
           this.initCanvas(e.instance);
@@ -108,6 +115,9 @@ export const AnalyzeReportComponent = {
     }
 
     generateQuery() {
+      if (this.model.query) {
+        return;
+      }
       this._AnalyzeService.generateQuery({})
         .then(result => {
           this.model.query = result.query;
@@ -489,6 +499,10 @@ export const AnalyzeReportComponent = {
     openSaveModal(ev) {
       if (!this.canvas) {
         return;
+      }
+
+      if (this.states.sqlMode === this.DESIGNER_MODE) {
+        this.model.query = '';
       }
 
       this.model.artifacts = this.generatePayload();
