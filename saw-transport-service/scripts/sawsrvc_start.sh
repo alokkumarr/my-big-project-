@@ -156,7 +156,8 @@ declare -r java_args=$( echo \
     -Dhttp.port=$SAW_SERVICE_PORT \
     -Dpidfile.path=$pidfile_path \
     -Dlog.dir=${log_dir} \
-    -Duser.dir=${user_dir}
+    -Duser.dir=${user_dir} \
+    -Djava.library.path=/opt/mapr/lib
     )
 vlog java_args: $java_args
 

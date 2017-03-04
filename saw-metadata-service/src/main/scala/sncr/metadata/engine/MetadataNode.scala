@@ -1,4 +1,4 @@
-package sncr.metadata.store
+package sncr.metadata.engine
 
 import java.io.IOException
 
@@ -35,7 +35,7 @@ trait MetadataNode extends MetadataStore {
     source = content
     m_log trace s"Save the document as content CF: $source"
     putOp = putOp.addColumn(MDKeys(sourceSection.id),
-      MDKeys(columnContent.id),Bytes.toBytes(source))
+      MDKeys(columnDefinition.id),Bytes.toBytes(source))
   }
 
 
@@ -63,27 +63,35 @@ trait MetadataNode extends MetadataStore {
     true
   }
 
+
+  protected def compileDataCells:Get =
+  {
+    val getOp = new Get(rowKey)
+    // getContentStructure
+    getOp.addFamily(MDKeys(sourceSection.id))
+    getOp.addFamily(MDKeys(searchSection.id))
+    getOp
+  }
+
+  protected def getSourceData(res:Result): Any = ???
+
+/*  {
+    // extractContent
+    val content = res.getValue(MDKeys(sourceSection.id),MDKeys(columnDefinition.id))
+    m_log debug s"Read node: ${new String(content)}"
+    new String(content)
+  }
+*/
+
+
   import scala.collection.JavaConversions._
   def retrieve: Option[Map[String, Any]] = {
     try {
       m_log debug s"Load row: ${new String(rowKey)}"
-
-      val getOp: Get = new Get(rowKey)
-
-      //TODO:: make abstract calls, implement in each MD class separately
-      // getContentStructure
-      getOp.addFamily(MDKeys(sourceSection.id))
-      getOp.addFamily(MDKeys(searchSection.id))
-      //end TODO
-
-      //TODO:: make abstract calls, implement in each MD class separately
-      // extractContent
-      val res = mdNodeStoreTable.get(getOp)
-      if (res.isEmpty) return None
-      val content = res.getValue(MDKeys(sourceSection.id),MDKeys(columnContent.id))
-      m_log debug s"Read node: ${new String(content)}"
-      //end TODO
-
+      val retrieveOperation = compileDataCells
+      val res = mdNodeStoreTable.get(retrieveOperation)
+      if (res.isEmpty) return null
+      val content : Any = getSourceData(res)
       val sfKeyValues = res.getFamilyMap(MDKeys(searchSection.id))
       m_log debug s"Include list of search fields into result: ${sfKeyValues.keySet.toList.map(k => new String(k) + " =>" + new String(sfKeyValues(k))  ).mkString("{", ",", "}")}"
       val sf : Map[String, String] = sfKeyValues.keySet().map( k =>
@@ -93,7 +101,7 @@ trait MetadataNode extends MetadataStore {
         k_s -> v_s
       }).toMap
 
-      Option(sf + (columnContent.toString -> new String(content)))
+      Option(sf + (columnDefinition.toString -> content))
     }
     catch{
       case x: IOException => m_log error ( s"Could not read node: ${new String(rowKey)}, Reason: ", x); None
@@ -128,8 +136,7 @@ trait MetadataNode extends MetadataStore {
 
   def update: Unit = putOp = new Put(rowKey)
 
-
- }
+}
 
 object MetadataNode{
 
@@ -139,7 +146,7 @@ object MetadataNode{
     try {
       var putOp: Put = new Put(Bytes.toBytes(compositeKey))
       putOp = putOp.addColumn(MDKeys(sourceSection.id),
-                              MDKeys(columnContent.id),
+                              MDKeys(columnDefinition.id),
                               Bytes.toBytes(content))
       val sval = MDNodeUtil.extractSearchData(content, searchDictionary) + ("NodeId" -> Option(compositeKey))
       sval.keySet.foreach(k => {
@@ -174,7 +181,7 @@ object MetadataNode{
 
       if (res.isEmpty) return None
 
-      val content = res.getValue(MDKeys(sourceSection.id),MDKeys(columnContent.id))
+      val content = res.getValue(MDKeys(sourceSection.id),MDKeys(columnDefinition.id))
 
       m_log debug s"Read node: ${new String(content)}"
       if (includeSearchFields) {
@@ -189,11 +196,11 @@ object MetadataNode{
           k_s -> v_s
         }).toMap
 
-        Option(sf + (columnContent.toString -> new String(content)))
+        Option(sf + (columnDefinition.toString -> new String(content)))
       }
       else {
         m_log debug s"Do not Include list of search fields into result"
-        Option(Map(columnContent.toString -> new String(content)))
+        Option(Map(columnDefinition.toString -> new String(content)))
       }
     }
     catch{
@@ -225,14 +232,10 @@ object MetadataNode{
         m_log debug s"Row is empty: $compositeKey"
       }
       var putOp: Put = new Put(Bytes.toBytes(compositeKey))
-      putOp = putOp.addColumn(MDKeys(sourceSection.id),
-                              MDKeys(columnContent.id),
-        Bytes.toBytes(content))
+      putOp = putOp.addColumn(MDKeys(sourceSection.id),MDKeys(columnDefinition.id),Bytes.toBytes(content))
       val sval = MDNodeUtil.extractSearchData(content, searchDictionary) + ("NodeId" -> Option(compositeKey))
       sval.keySet.foreach(k => {
-        putOp = putOp.addColumn(MDKeys(searchSection.id),
-                                Bytes.toBytes(k),
-                                Bytes.toBytes(sval(k).asInstanceOf[String]))
+        putOp = putOp.addColumn(MDKeys(searchSection.id),Bytes.toBytes(k),Bytes.toBytes(sval(k).asInstanceOf[String]))
       })
       mdNodeStoreTable.put(putOp)
     }
@@ -241,7 +244,6 @@ object MetadataNode{
     }
     true
   }
-
 
   def loadMDNodes(mdNodeStoreTable: Table, rowKeys: List[Array[Byte]], includeSearchFields : Boolean ): List[Map[String, Any]] =
   {

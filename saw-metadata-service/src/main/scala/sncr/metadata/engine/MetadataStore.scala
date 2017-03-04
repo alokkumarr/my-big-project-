@@ -1,4 +1,4 @@
-package sncr.metadata.store
+package sncr.metadata.engine
 
 import _root_.sncr.saw.common.config.SAWServiceConfig
 import org.apache.hadoop.hbase.HBaseConfiguration

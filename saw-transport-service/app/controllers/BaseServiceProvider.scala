@@ -10,7 +10,7 @@ import play.mvc.{Controller, Http, Result}
   */
 trait BaseServiceProvider extends Controller {
 
-  val m_log: Logger = LoggerFactory.getLogger(classOf[TS].getName)
+  val m_log: Logger = LoggerFactory.getLogger(classOf[BaseServiceProvider].getName)
 
   def handleEmptyRequest( msg: String ) : Result = {
     val ctx: Http.Context = Http.Context.current.get

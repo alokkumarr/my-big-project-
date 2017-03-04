@@ -21,21 +21,21 @@ maprcli table cf create -cfname _dl_locations -path /main/metadata/datalake_meta
 maprcli table cf create -cfname _applications -path /main/metadata/datalake_metadata
 maprcli table cf create -cfname _system -path /main/metadata/datalake_metadata
 
-maprcli table create -path /main/metadata/report_metadata
-maprcli table cf create -cfname _source -path /main/metadata/report_metadata
-maprcli table cf create -cfname _search -path /main/metadata/report_metadata
-maprcli table cf create -cfname _relations -path /main/metadata/report_metadata
-maprcli table cf create -cfname _elements -path /main/metadata/report_metadata
-maprcli table cf create -cfname _objects -path /main/metadata/report_metadata
-maprcli table cf create -cfname _dl_locations -path /main/metadata/report_metadata
-maprcli table cf create -cfname _system -path /main/metadata/report_metadata
+maprcli table create -path /main/metadata/analysis_metadata
+maprcli table cf create -cfname _source -path /main/metadata/analysis_metadata
+maprcli table cf create -cfname _search -path /main/metadata/analysis_metadata
+maprcli table cf create -cfname _relations -path /main/metadata/analysis_metadata
+maprcli table cf create -cfname _elements -path /main/metadata/analysis_metadata
+maprcli table cf create -cfname _objects -path /main/metadata/analysis_metadata
+maprcli table cf create -cfname _dl_locations -path /main/metadata/analysis_metadata
+maprcli table cf create -cfname _system -path /main/metadata/analysis_metadata
 
-maprcli table create -path /main/metadata/report_results
-maprcli table cf create -cfname _source -path /main/metadata/report_results
-maprcli table cf create -cfname _search -path /main/metadata/report_results
-maprcli table cf create -cfname _report -path /main/metadata/report_results
-maprcli table cf create -cfname _objects -path /main/metadata/report_results
-maprcli table cf create -cfname _dl_locations -path /main/metadata/report_results
-maprcli table cf create -cfname _system -path /main/metadata/report_results
+maprcli table create -path /main/metadata/analysis_results
+maprcli table cf create -cfname _source -path /main/metadata/analysis_results
+maprcli table cf create -cfname _search -path /main/metadata/analysis_results
+maprcli table cf create -cfname _analysis -path /main/metadata/analysis_results
+maprcli table cf create -cfname _objects -path /main/metadata/analysis_results
+maprcli table cf create -cfname _dl_locations -path /main/metadata/analysis_results
+maprcli table cf create -cfname _system -path /main/metadata/analysis_results
 
 

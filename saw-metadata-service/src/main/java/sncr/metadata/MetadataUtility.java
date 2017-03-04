@@ -5,7 +5,8 @@ import files.HFileOperations;
 import org.apache.commons.cli.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sncr.metadata.semantix.SemanticMDRequestHandler;
+import sncr.metadata.analysis.AnalysisProvHelper;
+import sncr.metadata.ui_components.UIMDRequestHandler;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,12 +31,11 @@ public class MetadataUtility {
 
             System.out.println("Start data processing:\n input file: " + cl.getOptionValue('i') + "\nOutput path: " + cl.getOptionValue('o'));
             switch (mdType) {
-                case "semantic":
-                    List<SemanticMDRequestHandler> semaReqHandlers = SemanticMDRequestHandler.getHandlerForRequest4Java(inData, false);
+                case "ui":
+                    List<UIMDRequestHandler> semaReqHandlers = UIMDRequestHandler.getHandlerForRequest4Java(inData, false);
                     if (semaReqHandlers.isEmpty())
                     {
                         logger.error("The document is not parsable. Exit");
-                        System.out.println("The document is not parsable. Exit");
                         break;
                     }
                     semaReqHandlers.forEach (  h ->
@@ -48,14 +48,28 @@ public class MetadataUtility {
                         }
                     });
                     break;
-                case "scan_semantic":
-                    String result = SemanticMDRequestHandler.scanSemanticTable(false);
+                case "scan_ui":
+                    String result = UIMDRequestHandler.scanSemanticTable(true);
                     try{
                         outStream.write(result.getBytes());
                     } catch (IOException e) {
                         logger.error("I/O exception at attempt to write data: ", e);
                     }
                     break;
+                case "analysis":
+                    AnalysisProvHelper provision = new AnalysisProvHelper(inData);
+                    if ( !provision.requestsParsed()){
+                        logger.error("The document is not parsable. Exit");
+                        break;
+                    }
+                    result = provision.handleRequests(true);
+                    try{
+                        outStream.write(result.getBytes());
+                    } catch (IOException e) {
+                        logger.error("I/O exception at attempt to write data: ", e);
+                    }
+                    break;
+
                 default:
                     logger.error("Unsupported metadata type");
             }
@@ -79,7 +93,7 @@ public class MetadataUtility {
 
     private static CommandLine buildCMD(CommandLineHandler cli, String args[]) throws org.apache.commons.cli.ParseException {
         cli.addOptionToHandler("metadataType", true,
-               "Type of metadata object: semantic, execution, datalake, report",
+               "Type of metadata object: ui, ui_scan, analysis, datalake, report",
                "md-type",
                "t",
                 true);

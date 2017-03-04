@@ -1,4 +1,3 @@
-[
 {
    "sub": "shwetha@att.com",
    "ticket": 
@@ -19,9 +18,11 @@
    "validMins": 20,
    "iat": 1481019912
 	},
-	"contents" : {
-		"action" : "scan"
+	"contents": { 
+		"action" : "search",
+		"keys" : {
+			"module" : "analyze",
+			"type" : "chart"
+		}
 	}
-	
 }
-]	

@@ -1,4 +1,4 @@
-package sncr.metadata.store
+package sncr.metadata.engine
 
 import org.apache.hadoop.hbase.client.{Result, ResultScanner, Scan, Table}
 import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp

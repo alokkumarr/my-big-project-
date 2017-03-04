@@ -1,4 +1,4 @@
-package sncr.metadata.semantix
+package sncr.metadata.ui_components
 
 /**
   * Created by srya0001 on 2/21/2017.

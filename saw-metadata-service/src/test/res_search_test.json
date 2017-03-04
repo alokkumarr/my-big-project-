@@ -23,10 +23,11 @@
     "customer_code":"ATT",
     "metric_name":"Metric_name_1",
     "dataSecurityKey":"ATT_ADMIN",
-    "content":"{\"_id\":\"FT101\",\"name\":\"NewCustomerModule\",\"userName\":\"admin@att.com\",\"dataSecurityKey\":\"Verizon\",\"category\":\"My Analysis\",\"type\":\"chart\",\"customer_Prod_module_feature_sys_id\":\"FT_sys02\",\"metric_name\":\"Metric_name_1\",\"scheduled\":\"10:00 AM\",\"publish\":{\"sourceType\":\"EMAIL\",\"email_id\":[\"srya0001@synchronoss.com\"],\"host\":\"localhost\",\"port\":22,\"password\":\"hidden\",\"share\":{\"customer_Prod_module_feature_sys_id\":\"\"}},\"description\":\"Full test node 1\",\"repository\":{\"storage_type\":\"DL\",\"URL\":\"URL1\"},\"artifacts\":[{\"artifact_name\":\"\",\"artifact_position\":[500,200],\"artifact_attributes\":[{\"column_name\":\"\",\"display_name\":\"\",\"type\":\"int|String\",\"join_elgible\":\"\",\"filter_eligible\":\"\",\"hide\":\"\",\"checked\":\"\"},{}]}]}",
+    "content":"{\"_id\": NodeId  ,\"name\":\"NewCustomerModule\",\"userName\":\"admin@att.com\",\"dataSecurityKey\":\"Verizon\",\"category\":\"My Analysis\",\"type\":\"chart\",\"customer_Prod_module_feature_sys_id\":\"FT_sys02\",\"metric_name\":\"Metric_name_1\",\"scheduled\":\"10:00 AM\",\"publish\":{\"sourceType\":\"EMAIL\",\"email_id\":[\"srya0001@synchronoss.com\"],\"host\":\"localhost\",\"port\":22,\"password\":\"hidden\",\"share\":{\"customer_Prod_module_feature_sys_id\":\"\"}},\"description\":\"Full test node 1\",\"repository\":{\"storage_type\":\"DL\",\"URL\":\"URL1\"},\"artifacts\":[{\"artifact_name\":\"\",\"artifact_position\":[500,200],\"artifact_attributes\":[{\"column_name\":\"\",\"display_name\":\"\",\"type\":\"int|String\",\"join_elgible\":\"\",\"filter_eligible\":\"\",\"hide\":\"\",\"checked\":\"\"},{}]}]}",
     "customer_Prod_module_feature_sys_id":"FT_sys02",
     "type":"chart",
     "userName":"Adminstrator"
+		"sourceType": "EMAIL"
   },{
     "NodeId":"ATT::analyze::chart::3",
     "module":"analyze",

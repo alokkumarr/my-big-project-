@@ -9,7 +9,7 @@ import org.json4s.native.JsonMethods._
 import play.libs.Json
 import play.mvc.Result
 import sncr.metadata.ProcessingResult
-import sncr.metadata.semantix.SemanticMDRequestHandler
+import sncr.metadata.ui_components.UIMDRequestHandler
 
 /**
   * Created by srya0001 on 2/17/2017.
@@ -34,10 +34,10 @@ class MD extends BaseServiceProvider {
     m_log trace("Validate and process request:  " + compact(render(json)))
     val res: ObjectNode = Json.newObject
 
-    val handler = new SemanticMDRequestHandler(json)
+    val handler = new UIMDRequestHandler(json)
       handler.validate match {
       case (0, _) =>
-        val sn = new SemanticMDRequestHandler(json)
+        val sn = new UIMDRequestHandler(json)
         return play.mvc.Results.ok(sn.execute)
       case (res_id:Int, r:String) => res.put("reason", r );res.put("result",ProcessingResult(res_id).toString)
     }

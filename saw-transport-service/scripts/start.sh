@@ -361,6 +361,7 @@ done
 
 addJava "-Dlog.dir=${log_dir}"
 addJava "-Duser.dir=$(cd "${app_home}/.."; pwd -P)"
+addJava "-Djava.library.path=/opt/mapr/lib"
 
 
 # Middle tier specisfic
@@ -376,6 +377,8 @@ declare java_cmd=$(get_java_cmd)
 [[ -f "$script_conf_file" ]] && set -- $(loadConfigFile "$script_conf_file") "$@"
 
 [[ ! -d $log_dir ]] || mkdir -p -m 755 $log_dir
+
+#export PATH=$PATH:/opt/mapr/lib:/opt/mapr/libexp
 
 # Additinal DEV key: X^kFEdvnivVbWVv5o^9wQylyz@h4G0vPjzpX@hDkkNWSom_^iOh^1ic>]@K94mSI
 export APPLICATION_SECRET="y=5L3Lrezk1j0KsBo8K>YHR6JIxfcb=ax]0sT7m2NZHcafHZM73_=fqnNcGP8r<x"

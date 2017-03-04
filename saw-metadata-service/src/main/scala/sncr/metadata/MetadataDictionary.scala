@@ -34,14 +34,14 @@ object MDObjectStruct extends Enumeration{
   val relationsSection = Value (2, "_relations")
   val elementList = Value(3, "_elements")
   val systemProperties = Value(4, "_system")
-  val reportContent = Value(5, "_report")
+  val analysisContent = Value(5, "_analysis")
   val dataObjects = Value(6, "_objects")
   val es_explore = Value(7, "_es_explore")
   val dataLakeLocation = Value(8, "_dl_locations")
   val applications = Value(9, "_applications")
 
-  val columnContent = Value(100, "content")
-  val columnReportParameters = Value(101, "reportParameters")
+  val columnDefinition = Value(100, "content")
+  val columnAnalysisParameters = Value(101, "AnalysisParameters")
 
 
   val MDKeys = Map( sourceSection.id -> Bytes.toBytes(sourceSection.toString),
@@ -49,12 +49,12 @@ object MDObjectStruct extends Enumeration{
       relationsSection.id -> Bytes.toBytes(relationsSection.toString),
       elementList.id -> Bytes.toBytes(elementList.toString),
       systemProperties.id -> Bytes.toBytes(systemProperties.toString),
-      reportContent.id -> Bytes.toBytes(reportContent.toString),
+      analysisContent.id -> Bytes.toBytes(analysisContent.toString),
       dataObjects.id -> Bytes.toBytes(dataObjects.toString),
       es_explore.id -> Bytes.toBytes(es_explore.toString),
       dataLakeLocation.id -> Bytes.toBytes(dataLakeLocation.toString),
       applications.id -> Bytes.toBytes(applications.toString),
-      columnContent.id -> Bytes.toBytes(columnContent.toString))
+      columnDefinition.id -> Bytes.toBytes(columnDefinition.toString))
 }
 
 
@@ -62,7 +62,7 @@ object tables extends Enumeration {
 
   val SemanticMetadata = Value(0, "semantic_metadata")
   val DatalakeMetadata = Value(1, "datalake_metadata")
-  val reports = Value(2, "report_metadata")
-  val reportResults = Value(3, "report_results")
+  val AnalysisMetadata = Value(2, "report_metadata")
+  val AnalysisResults = Value(3, "report_results")
 
 }

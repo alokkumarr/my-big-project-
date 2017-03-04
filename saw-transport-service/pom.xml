@@ -477,6 +477,12 @@
                                         <include>*.sh</include>
                                     </includes>
                                 </source>
+                                <source>
+                                    <location>${project.basedir}/../saw-metadata-service/src/main/scripts</location>
+                                    <includes>
+                                        <include>*.sh</include>
+                                    </includes>
+                                </source>
                             </sources>
                         </mapping>
                         <mapping>
@@ -493,16 +499,35 @@
                         <mapping>
                             <directory>/var/saw/service/log</directory>
                             <directoryIncluded>true</directoryIncluded>
-                            <filemode>644</filemode>
+                            <filemode>755</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
                         </mapping>
                         <mapping>
                             <directory>/var/saw/service/run</directory>
                             <directoryIncluded>true</directoryIncluded>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                        </mapping>
+                        <mapping>
+                            <directory>/var/saw/service/data</directory>
+                            <directoryIncluded>true</directoryIncluded>
                             <filemode>644</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/../saw-metadata-service/src/main/resources</location>
+                                    <includes>
+                                        <include>create_ui_menu_sample.json</include>
+                                        <include>CRUD_ui_analyze_sample.json</include>
+                                        <include>update_ui_analyze_sample.json</include>
+                                        <include>search_prepare_ui_sample.json</include>
+                                        <include>search_execute_ui_sample.json</include>
+                                    </includes>
+                                </source>
+                            </sources>
                         </mapping>
                     </mappings>
                     <preinstallScriptlet>

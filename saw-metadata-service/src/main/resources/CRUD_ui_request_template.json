@@ -12,8 +12,7 @@
 
 {
  "sub": "shwetha@att.com",
- "action" : "create|modify|retrive|delete"
- 
+
  // action = 
  // create - will create new MD node per "customer code"
  // update - will update existing MD node, will return "node does not exists" if there is not MD node to update
@@ -116,8 +115,9 @@
    "customer_Prod_module_feature_sys_id" : "",  // String, filter for search 	 
    "number_of_records" : 10, 			// Int, to limit the number of records for pagination
    "from_record" : 0							// Int, start record for pagination
-	}
+	},
 
+	"action" : "create|modify|retrive|delete",
   //Module descriptor, the object is required for create, update actions
 	// Document object name defines UI object type
 	"analyze" :

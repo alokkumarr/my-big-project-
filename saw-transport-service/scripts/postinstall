@@ -9,7 +9,7 @@ mkdir -m 755 -p /etc/saw
 
 chown -R mapr:mapr ${app_home}
 chmod 750 ${app_home}/sbin ${app_home}/conf ${app_home}/lib
-chmod 755 ${app_home} /var/saw /var/saw/service /var/saw/service/log /var/saw/service/run
+chmod 755 ${app_home} /var/saw /var/saw/service /var/saw/service/log /var/saw/service/run /var/saw/service/data
 
 ( cd /opt/saw; rm -f service; ln -s $(basename ${app_home}) service )
 
