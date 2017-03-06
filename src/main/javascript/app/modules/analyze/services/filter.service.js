@@ -254,8 +254,7 @@ export function FilterService($mdSidenav, $eventEmitter) {
             possibleFilter.tableName === (tableName);
         }) || {};
 
-        possibleFilter.operator = targetCanvasFilter.operator;
-        possibleFilter.model = targetCanvasFilter.model;
+        Object.assign(possibleFilter, targetCanvasFilter);
       } catch (err) {
         console.error(err);
       }
