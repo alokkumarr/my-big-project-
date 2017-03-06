@@ -1,4 +1,4 @@
-package sncr.metadata
+package sncr.metadata.engine
 
 import java.text.SimpleDateFormat
 

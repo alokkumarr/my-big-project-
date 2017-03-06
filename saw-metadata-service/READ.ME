@@ -1,0 +1,198 @@
+
+
+SAW services deployment and usage examples
+
+1. Dev version is deployed on AWS client101:9101/md
+
+2. Integration deployment will be on OpenStack SAW servers.
+
+3. UI/Semantic service:
+
+   3.1 Create request 
+	 
+			3.1.1 Request Structure:
+			
+	     (exmaple is in /var/saw/service/data/C_ui_analyze_sample.json)
+					
+					{
+						"sub": "shwetha@att.com",
+						"ticket":
+						{
+							 "ticketId": "1", 
+							 ....
+							 "iat": 1481019912
+						},
+					"_links": {
+						"self" : {
+									"href" : "/analyze/"
+						}, 
+						"next" : {"href" : "/analyze/report/{id}"}
+						},
+					"contents": {
+						"action" : "create",
+						"analyze" :
+							[
+								{
+									"_id" : "FT101", 
+									"customer_code" : "ATT",
+									"name" : "NewCustomerModule",
+									"userName": "admin@att.com", 
+									"dataSecurityKey" : "ATT",   
+									"category" : "My Analysis",
+									"type" : "report", 
+									"customer_Prod_module_feature_sys_id" : "FT_sys01", 
+									"metric_name" : "Metric_name_1",
+									....
+								}
+							] 
+						}
+					}
+				
+				3.1.2 curl request:
+				 
+					  curl -XPOST -H "Content-Type:application/json" localhost:9101/md --data-binary @/var/saw/service/data/C_ui_analyze_sample.json
+
+				3.1.3 Response
+
+						{
+							"ticket":{
+								"ticketId":"1",
+								....
+								"iat":1481019912
+							},
+							"performed_action":"create",
+							"contents":[{
+								"result":0,
+								"reason":"The UI Node [ ATT::analyze::FT101 ] has been created"
+							}]
+						}				
+						
+						
+		3.2 Retrieve request
+
+				3.2.1 Request sample is in  /var/saw/service/data/R_ui_analyze_sample.json)
+				
+				3.2.2 curl request:
+				 
+					  curl -XPOST -H "Content-Type:application/json" localhost:9101/md --data-binary @/var/saw/service/data/R_ui_analyze_sample.json
+
+				3.2.3 Response
+
+						{
+							"ticket":{
+								"ticketId":"1",
+								....
+								"iat":1481019912
+							},
+							"performed_action":"retrieve",
+							"contents":[{
+								"NodeId":"ATT::analyze::FT101",
+								"customer_code":"ATT",
+								"metric_name":"Metric_name_1",
+								"dataSecurityKey":"ATT_ADMIN",
+								"content":"{\"_id\":\"FT101\",\"customer_code\":\"ATT\",\"name\":\"NewCustomerModule\",\"userName\":\"admin@att.com\",\"dataSecurityKey\":\"ATT\",\"category\":\"My Analysis\",\"type\":\"report\",\"customer_Prod_module_feature_sys_id\":\"FT_sys01\",\"metric_name\":\"Metric_name_1\",\"scheduled\":\"10:00 AM\",\"publish\":{\"sourceType\":\"EMAIL\",\"email_id\":[\"srya0001@synchronoss.com\"],\"host\":\"localhost\",\"port\":22,\"password\":\"hidden\",\"share\":{\"customer_Prod_module_feature_sys_id\":\"\"}},\"description\":\"Full test node 1\",\"repository\":{\"storage_type\":\"DL\",\"URL\":\"URL1\"},\"artifacts\":[{\"artifact_name\":\"\",\"artifact_position\":[500,200],\"artifact_attributes\":[{\"column_name\":\"\",\"display_name\":\"\",\"type\":\"int|String\",\"join_elgible\":\"\",\"filter_eligible\":\"\",\"hide\":\"\",\"checked\":\"\"},{}]}]}",
+								"customer_Prod_module_feature_sys_id":"FT_sys01",
+								"type":"report",
+								"item_type":"analyze",
+								"userName":"Adminstrator"
+							}]
+						}				
+   				
+		3.3 Update request
+
+				3.3.1 Request sample is in  /var/saw/service/data/U_ui_analyze_sample.json
+			
+				3.3.2 curl request:
+				 
+					  curl -XPOST -H "Content-Type:application/json" localhost:9101/md --data-binary @/var/saw/service/data/U_ui_analyze_sample.json
+
+				3.3.3 Response
+
+						{
+							"ticket":{
+								"ticketId":"1",
+								....
+								"iat":1481019912
+							},
+							"performed_action":"update",
+							"contents":[{
+								"result":0,
+								"reason":"The UI Node [ ATT::analyze::FT101 ] has been updated"
+							}]
+						}				
+						
+    3.4 Delete request
+
+				3.4.1 Request sample is in  /var/saw/service/data/D_ui_analyze_sample.json)
+				
+				3.4.2 curl request:
+				 
+					  curl -XPOST -H "Content-Type:application/json" localhost:9101/md --data-binary @/var/saw/service/data/D_ui_analyze_sample.json
+
+				3.4.3 Response
+
+						{
+							"ticket":{
+								"ticketId":"1",
+								....
+								"iat":1481019912
+							},
+							"performed_action":"delete",
+							"contents":[{
+								"result":0,
+								"reason":"Node [ ID = ATT::analyze::FT101] was successfully removed"
+							}]
+						}				
+						
+		3.5 Search request:
+
+				3.4.1 Request sample is in  /var/saw/service/data/D_ui_analyze_sample.json
+				
+				3.4.2 curl request:
+				 
+					  curl -XPOST -H "Content-Type:application/json" localhost:9101/md --data-binary @/var/saw/service/data/search_execute_ui_sample.json
+
+				3.4.3 Response
+
+						{
+							"ticket":{
+								"ticketId":"28_1481019911763_2102342349",
+								 ...
+								"iat":1481019912
+							},
+							"performed_action":"search",
+							"contents":[[{
+								"NodeId":"ATT::analyze::chart::2",
+								"module":"analyze",
+								"customer_code":"ATT",
+								"metric_name":"Metric_name_1",
+								"dataSecurityKey":"ATT_ADMIN",
+								"content":"{\"_id\":\"FT101\",\"name\":\"NewCustomerModule\",\"userName\":\"admin@att.com\",\"dataSecurityKey\":\"Verizon\",\"category\":\"My Analysis\",\"type\":\"chart\",\"customer_Prod_module_feature_sys_id\":\"FT_sys02\",\"metric_name\":\"Metric_name_1\",\"scheduled\":\"10:00 AM\",\"publish\":{\"sourceType\":\"EMAIL\",\"email_id\":[\"srya0001@synchronoss.com\"],\"host\":\"localhost\",\"port\":22,\"password\":\"hidden\",\"share\":{\"customer_Prod_module_feature_sys_id\":\"\"}},\"description\":\"Full test node 1\",\"repository\":{\"storage_type\":\"DL\",\"URL\":\"URL1\"},\"artifacts\":[{\"artifact_name\":\"\",\"artifact_position\":[500,200],\"artifact_attributes\":[{\"column_name\":\"\",\"display_name\":\"\",\"type\":\"int|String\",\"join_elgible\":\"\",\"filter_eligible\":\"\",\"hide\":\"\",\"checked\":\"\"},{}]}]}",
+								"customer_Prod_module_feature_sys_id":"FT_sys02",
+								"type":"chart",
+								"userName":"Adminstrator"
+							},{
+								"NodeId":"ATT::analyze::chart::3",
+								"module":"analyze",
+								"customer_code":"ATT",
+								"metric_name":"Metric_name_2",
+								"dataSecurityKey":"ATT_ADMIN",
+								"content":"{\"_id\":\"FT101\",\"name\":\"NewCustomerModule\",\"userName\":\"admin@att.com\",\"dataSecurityKey\":\"ATT\",\"category\":\"My Analysis\",\"type\":\"chart\",\"customer_Prod_module_feature_sys_id\":\"FT_sys03\",\"metric_name\":\"Metric_name_2\",\"scheduled\":\"10:00 AM\",\"publish\":{\"sourceType\":\"EMAIL\",\"email_id\":[\"srya0001@synchronoss.com\"],\"host\":\"localhost\",\"port\":22,\"password\":\"hidden\",\"share\":{\"customer_Prod_module_feature_sys_id\":\"\"}},\"description\":\"Full test node 1\",\"repository\":{\"storage_type\":\"DL\",\"URL\":\"URL1\"},\"artifacts\":[{\"artifact_name\":\"\",\"artifact_position\":[500,200],\"artifact_attributes\":[{\"column_name\":\"\",\"display_name\":\"\",\"type\":\"int|String\",\"join_elgible\":\"\",\"filter_eligible\":\"\",\"hide\":\"\",\"checked\":\"\"},{}]}]}",
+								"customer_Prod_module_feature_sys_id":"FT_sys03",
+								"type":"chart",
+								"userName":"Adminstrator"
+							},{
+								"NodeId":"Verizon::analyze::chart::5",
+								"module":"analyze",
+								"customer_code":"Verizon",
+								"metric_name":"Metric_name_2",
+								"dataSecurityKey":"ATT_ADMIN",
+								"content":"{\"_id\":\"FT105\",\"name\":\"NewCustomerModule\",\"userName\":\"admin@att.com\",\"dataSecurityKey\":\"ATT\",\"category\":\"My Analysis\",\"type\":\"chart\",\"customer_Prod_module_feature_sys_id\":\"FT_sys05\",\"metric_name\":\"Metric_name_2\",\"scheduled\":\"10:00 AM\",\"publish\":{\"sourceType\":\"EMAIL\",\"email_id\":[\"srya0001@synchronoss.com\"],\"host\":\"localhost\",\"port\":22,\"password\":\"hidden\",\"share\":{\"customer_Prod_module_feature_sys_id\":\"\"}},\"description\":\"Full test node 1\",\"repository\":{\"storage_type\":\"DL\",\"URL\":\"URL1\"},\"artifacts\":[{\"artifact_name\":\"\",\"artifact_position\":[500,200],\"artifact_attributes\":[{\"column_name\":\"\",\"display_name\":\"\",\"type\":\"int|String\",\"join_elgible\":\"\",\"filter_eligible\":\"\",\"hide\":\"\",\"checked\":\"\"},{}]}]}",
+								"customer_Prod_module_feature_sys_id":"FT_sys05",
+								"type":"chart",
+								"userName":"Adminstrator"
+							}
+							...
+							
+							
+							
