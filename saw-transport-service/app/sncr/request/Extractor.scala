@@ -2,7 +2,7 @@ package sncr.request
 
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json._
-import sncr.metadata.MetadataDictionary
+import sncr.metadata.engine.MetadataDictionary
 import sncr.saw.common.config.SAWServiceConfig
 
 

@@ -5,8 +5,7 @@ import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp
 import org.apache.hadoop.hbase.filter.{FilterList, SingleColumnValueFilter}
 import org.apache.hadoop.hbase.util.Bytes
 import org.slf4j.{Logger, LoggerFactory}
-import sncr.metadata.MDObjectStruct
-import sncr.metadata.ProcessingResult._
+import ProcessingResult._
 
 /**
   * Created by srya0001 on 2/19/2017.
@@ -131,7 +130,7 @@ object SearchMetadata{
       m_log debug s"Field $f = ${keys(f)}"
       val filter1 : SingleColumnValueFilter =
             new SingleColumnValueFilter(
-              MDObjectStruct.MDKeys(MDObjectStruct.searchSection.id),
+              MDObjectStruct.MDSections(MDObjectStruct.searchSection.id),
               Bytes.toBytes(f),
               CompareOp.EQUAL,
               searchFieldValue

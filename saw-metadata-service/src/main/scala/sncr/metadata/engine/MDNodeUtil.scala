@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter
 import org.json4s._
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
-import sncr.metadata.MDObjectStruct
 
 /**
   * Created by srya0001 on 2/20/2017.

@@ -362,7 +362,7 @@ done
 addJava "-Dlog.dir=${log_dir}"
 addJava "-Duser.dir=$(cd "${app_home}/.."; pwd -P)"
 addJava "-Djava.library.path=/opt/mapr/lib"
-
+addJava "-Dhadoop.home.dir=/opt/mapr/hadoop/hadoop-$(cat /opt/mapr/hadoop/hadoopversion)"
 
 # Middle tier specisfic
 # addJava "-Djava.security.auth.login.config=/opt/mapr/conf/mapr.login.conf"

@@ -15,7 +15,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json.{JsObject, JsValue}
 import play.libs.Json
 import play.mvc.Result
-import sncr.metadata.MetadataDictionary
+import sncr.metadata.engine.MetadataDictionary
 import sncr.request.Extractor
 import sncr.saw.common.config.SAWServiceConfig
 import sncr.ts.HTTPRequest

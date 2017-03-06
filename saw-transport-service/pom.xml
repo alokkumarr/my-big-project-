@@ -521,7 +521,10 @@
                                     <location>${project.basedir}/../saw-metadata-service/src/main/resources</location>
                                     <includes>
                                         <include>create_ui_menu_sample.json</include>
-                                        <include>CRUD_ui_analyze_sample.json</include>
+                                        <include>C_ui_analyze_sample.json</include>
+                                        <include>R_ui_analyze_sample.json</include>
+                                        <include>U_ui_analyze_sample.json</include>
+                                        <include>D_ui_analyze_sample.json</include>
                                         <include>update_ui_analyze_sample.json</include>
                                         <include>search_prepare_ui_sample.json</include>
                                         <include>search_execute_ui_sample.json</include>

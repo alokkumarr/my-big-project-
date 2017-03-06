@@ -7,14 +7,17 @@ import org.json4s.ParserUtil.ParseException
 import org.json4s.native.JsonMethods._
 import org.json4s.{JField => _, JNothing => _, JObject => _, JValue => _, _}
 import org.slf4j.{Logger, LoggerFactory}
-import sncr.metadata.MDObjectStruct.formats
-import sncr.metadata.ProcessingResult._
-import sncr.metadata.engine.Response
+import sncr.metadata.engine.ProcessingResult._
+import sncr.metadata.engine.{MDObjectStruct, Response}
+
+
 
 /**
   * Created by srya0001 on 2/17/2017.
   */
+import MDObjectStruct.formats
 class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true) extends Response {
+
 
   val m_log: Logger = LoggerFactory.getLogger(classOf[UIMDRequestHandler].getName)
 
@@ -58,7 +61,7 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
           case JObject(all_content_elements) => {
             responses = JObject(all_content_elements)
               .obj
-              .filter(an_element => !an_element._1.equalsIgnoreCase("keys") || action.equalsIgnoreCase("update") )
+              .filter(an_element => !an_element._1.equalsIgnoreCase("keys"))
               .flatMap(content_element => {
                 m_log debug (s"Content element ${content_element._1} => " + compact(render(content_element._2)))
                 val mn = content_element._1
@@ -75,6 +78,30 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
           }
           case _ => return "Create/Update/Delete request is not correct, contents must be JSON object"
         }
+/*
+      case "update" =>
+        elements match {
+          case JObject(all_content_elements) => {
+            responses = JObject(all_content_elements)
+              .obj
+              .filter(an_element => !an_element._1.equalsIgnoreCase("keys") )
+              .flatMap(content_element => {
+                m_log debug (s"Content element ${content_element._1} => " + compact(render(content_element._2)))
+                val mn = content_element._1
+                content_element._2 match {
+                  case ce: JObject => m_log debug "UI Item from object: " + compact(render(ce)); List(actionHandler(ticket, action, ce, mn))
+                  case ce: JArray => ce.arr.map(ce_ae => {
+                    m_log debug "UI Item, array element: " + compact(render(ce_ae))
+                    actionHandler(ticket, action, ce_ae, mn)
+                  })
+                  case _ => handleRequestIncorrect
+                }
+              }
+              )
+          }
+          case _ => return "Create/Update/Delete request is not correct, contents must be JSON object"
+        }
+*/
       case "retrieve" | "search" | "delete" =>
         elements match {
           case JObject(all_content_elements) => {
@@ -135,7 +162,7 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
     if (docAsJson == null || docAsJson.toSome.isEmpty)
       (Error.id, "Validation fails: document is empty")
 
-    val action = (docAsJson \ "contents" \ "action").extract[String].toLowerCase()
+    val action : String = (docAsJson \ "contents" \ "action").extractOpt[String].getOrElse("invalid").toLowerCase()
     if (!List("create", "update", "delete", "retrieve", "search", "scan").exists(_.equalsIgnoreCase(action))){
       val msg = s"Action is incorrect: $action"
       m_log debug Rejected.id + " ==> " + msg

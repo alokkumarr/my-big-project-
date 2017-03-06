@@ -1,12 +1,9 @@
 [
-
-
-
 	{
 	"verb" : "write",
 	"content" : {
-			"name": "ABC",
-			"description": "ABC",
+			"name": "pgidev",
+			"description": "Cost by Carrier and Call Type",
 			"tenantId": "ABC",
 			"productId": "ABC",
 			"emailId": "ABC",
@@ -15,48 +12,37 @@
 			"attachAnalysisToMail": true,
 			"isScheduled": true,
 			"outputFile": {
-					"outputFormat": "ABC",
-					"outputFileName": "ABC"
+					"outputFormat": "parquet",
+					"outputFileName": "DB"
 			},
-			
-(4,1,3,'pgidev','UA_RRM','Cost by Carrier and Call Type','Cost by Carrier and Call Type','SELECT tbl1.orig_date._xdfDate as CALL_DATE,ACCOUNT_NUMBER,VENDOR_NAME,REGION,CURRENCY,CALL_TYPE,ACCESS_TYPE,\n      ROUND((SUM(CAST(elapsed_time AS NUMERIC(9,2)))))  AS TOTAL_SWITCH_MOU ,(SUM(CAST(TOTAL_COST AS NUMERIC(19,4))))  AS Total_Cost\nFROM `data/VRUF` as tbl1 \nWHERE  tbl1.orig_date._xdfDate  Between ? \nGROUP BY VENDOR_NAME,ACCOUNT_NUMBER,REGION,tbl1.orig_date._xdfDate,CURRENCY,CALL_TYPE,ACCESS_TYPE','VIEW','Y','N','sysadmin@pgidev.com','sysadmin@pgidev.com','2015-11-13 07:20:50','2015-11-13 07:20:50',NULL),
-			
 			"analysis": {
-					"analysisId": 123,
-					"productViewsId": 123,
-					"analysisCategoryId": 123,
-					"analysisCategoryName": "ABC",
-					"tenantId": "ABC",
-					"productId": "ABC",
+					"analysisId": 4,
+					"productViewsId": 1,
+					"analysisCategoryId": 3,
+					"analysisCategoryName": "UA_RRM",
+					"tenantId": "ATT",
+					"productId": "none",
 					"analysisName": "ABC",
-					"analysisDescription": "ABC",
-					"analysisQuery": "ABC",
-					"analysisQueryType": "ABC",
-					"displayStatus": "ABC",
+					"analysisDescription": "Cost by Carrier and Call Typ",
+					"analysisQuery": "SELECT tbl1.orig_date._xdfDate as CALL_DATE,ACCOUNT_NUMBER,VENDOR_NAME,REGION,CURRENCY,CALL_TYPE,ACCESS_TYPE,\n      ROUND((SUM(CAST(elapsed_time AS NUMERIC(9,2)))))  AS TOTAL_SWITCH_MOU ,(SUM(CAST(TOTAL_COST AS NUMERIC(19,4))))  AS Total_Cost\nFROM `data/VRUF` as tbl1 \nWHERE  tbl1.orig_date._xdfDate  Between ? \nGROUP BY VENDOR_NAME,ACCOUNT_NUMBER,REGION,tbl1.orig_date._xdfDate,CURRENCY,CALL_TYPE,ACCESS_TYPE",
+					"analysisQueryType": "VIEW",
+					"displayStatus": "A",
 					"designerQuery": true,
-					"createdUser": "ABC",
-					"modifiedUser": "ABC",
-					"createdDate": "ABC",
-					"modifiedDate": "ABC",
+					"createdUser": "srya0001",
+					"modifiedUser": "srya0001",
+					"createdDate": "2015-11-13 07:20:50",
+					"modifiedDate": "2015-11-13 07:20:50",
 					"parameters": [
 							{
-(6,4,'','','orig_date','Date_Range',NULL,'Call Date','0',1),
-							
-									"defaultValue": "ABC",
-									"name": "ABC",
-									"type": "ABC",
-									"value": "ABC",
-									"display": "ABC",
+									"defaultValue": "today",
+									"name": "orig_date",
+									"type": "Date_Range",
+									"value": "",
+									"display": "Date",
 									"optional": true,
-									"index": 123,
-									"rawAnalysisId": 123,
-									"rawAnalysisParametersId": 123,
-									"lookupValue": "ABC",
-									"lookup": [
-											{
-													"value": "ABC"
-											}
-									]
+									"index": 1,
+									"rawAnalysisId": "",
+									"rawAnalysisParametersId": "",
 							}
 					],
 					"columns": [

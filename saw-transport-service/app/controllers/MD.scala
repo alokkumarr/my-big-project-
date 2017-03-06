@@ -8,7 +8,7 @@ import org.json4s.JsonAST.JValue
 import org.json4s.native.JsonMethods._
 import play.libs.Json
 import play.mvc.Result
-import sncr.metadata.ProcessingResult
+import sncr.metadata.engine.ProcessingResult
 import sncr.metadata.ui_components.UIMDRequestHandler
 
 /**

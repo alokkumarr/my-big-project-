@@ -5,7 +5,7 @@ import play.api.libs.json.JsValue
 import play.libs.Json
 import play.mvc.Result
 import sncr.es.ESQueryHandler
-import sncr.metadata.MetadataDictionary
+import sncr.metadata.engine.MetadataDictionary
 import sncr.request.Extractor
 import sncr.saw.common.config.SAWServiceConfig
 import sncr.security.TokenValidator

@@ -1,11 +1,12 @@
 package sncr.metadata.engine.relations
 
-import org.apache.hadoop.hbase.client.Get
-import sncr.metadata.engine.ProcessingResult._
-import sncr.metadata.engine.{NodeType, RelationCategory}
-import org.apache.hadoop.hbase.client._
-import sncr.metadata.engine.MDObjectStruct._
+import org.apache.hadoop.hbase.client.{Get, _}
 import org.apache.hadoop.hbase.util.Bytes
+import org.slf4j.{Logger, LoggerFactory}
+import sncr.metadata.engine.MDObjectStruct._
+import sncr.metadata.engine.ProcessingResult._
+import sncr.metadata.engine.RelationCategory
+
 import scala.collection.mutable
 
 /**
@@ -13,64 +14,76 @@ import scala.collection.mutable
   */
 trait Relation extends scala.collection.mutable.Seq[(Int, Array[Byte])] {
 
-  var nodePut : Put = null
-  var nodeGet : Get = null
+  val m_log: Logger = LoggerFactory.getLogger(classOf[Relation].getName)
 
   var relationRowID : Array[Byte] = null
   val relType = RelationCategory.RelationSimpleSet.id
   var attributes : mutable.Map[String, Any] = new mutable.HashMap[String, Any]
 
+  override def update(idx: Int, elem: (Int, Array[Byte])): Unit = this(idx) = elem
+
+  override def length: Int = this.length
+
+  override def apply(idx: Int): (Int, Array[Byte]) = this(idx)
+
+  override def iterator: Iterator[(Int, Array[Byte])] = this.iterator
 
 
-  def addRelation( rowID: Array[Byte]): Int =
+  /*  Read calls */
+
+  protected def compileRelationsCells(getCNode: Get): Get =
   {
+    // getContentStructure
+    getCNode.addFamily(MDSections(relationsSection.id))
+    getCNode.addFamily(MDSections(relationAttributesSection.id))
+    getCNode
+  }
 
+
+  import scala.collection.JavaConversions._
+  protected def getSearchFields(res:Result): Map[String, String] =
+  {
+    val sfKeyValues = res.getFamilyMap(MDSections(relationAttributesSection.id))
+    m_log debug s"Include list of search fields into result: ${sfKeyValues.keySet.toList.map(k => new String(k) + " =>" + new String(sfKeyValues(k))  ).mkString("{", ",", "}")}"
+    val sf : Map[String, String] = sfKeyValues.keySet().map( k =>
+    { val k_s = new String(k)
+      val v_s = new String(sfKeyValues.get(k))
+      m_log trace s"Search field: $k_s, value: $v_s"
+      k_s -> v_s
+    }).toMap
+    sf
+  }
+
+  def addRelation(nodeGet: Get, rowID: Array[Byte]): Get =
+  {
     nodeGet.addFamily(MDSections(systemProperties.id))
     nodeGet.addFamily(MDSections(relationsSection.id))
     nodeGet.addFamily(MDSections(relationAttributesSection.id))
-
-    if (res.isEmpty) return Error.id
-
-    Bytes.toInt(res.getValue(MDSections(systemProperties.id),MDKeys(syskey_NodeType.id)))
-    match{
-      case NodeType.RelationContentNode.id | NodeType.RelationNode.id => OperationDeclined.id
-      case _ =>
-        nodePut = new Put(relationRowID)
-        nodePut.addColumn(MDSections(systemProperties.id),MDKeys(syskey_NodeType.id), Bytes.toBytes(NodeType.RelationContentNode.id))
-        nodePut.addColumn(MDSections(systemProperties.id),MDKeys(syskey_RelCategory.id), Bytes.toBytes(RelationCategory.RelationSimpleSet.id))
-        Success.id
-    }
   }
 
 
-  /**
-    * Essentially creates relation from elements
-    * with given RowID
-    *
-    * @param elements - relations members
-    * @return
-    */
-  def connectElements(elements: List[Array[Byte]]) : Array[Byte] = {
-    this = elements
-    relationRowID
-  }
+  /* Write calls */
 
-
-  def writeRelation(rowID: Array[Byte])  : (Int, String) =
+  protected def addSearchSection( putCNode : Put, search_val : Map[String, Any]): Put =
   {
-    if (nodePut == null) nodePut = new Put(rowID)
-    relationRowID = rowID
-
-
-    (Success.id, s"The relation ${new String(rowID) } has been committed to the DB")
+    if (putCNode == null ) return null
+    search_val.keySet.foreach( k=>putCNode.addColumn(MDSections(searchSection.id),Bytes.toBytes(k), Bytes.toBytes(search_val(k).asInstanceOf[String])))
+    putCNode
   }
 
-  def readRelation(rowID: Array[Byte]) : (Int, String) =
-  {
-    if (nodeGet == null) nodeGet = new Get(rowID)
-    relationRowID = rowID
 
-    (Success.id, s"The relation ${new String(rowID) } has been read from the DB")
+  def addRelation(nodePut: Put, rowID: Array[Byte])  : Put =
+  {
+    if (nodePut == null) return null
+    relationRowID = rowID
+    nodePut
+   }
+
+  def readRelation(nodeGet : Get , rowID: Array[Byte]) : Get =
+  {
+    if (nodeGet == null) null
+    relationRowID = rowID
+    nodeGet
   }
 
 

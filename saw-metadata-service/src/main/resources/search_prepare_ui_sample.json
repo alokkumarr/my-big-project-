@@ -17,7 +17,7 @@
 		 "validityReason": "User Authenticated Successfully",
 		 "validMins": 20,
 		 "iat": 1481019912
-	}
+	},
 "contents": { 
 	"action" : "create",
 	"analyze" :

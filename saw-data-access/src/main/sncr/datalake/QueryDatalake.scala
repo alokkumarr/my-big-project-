@@ -4,7 +4,7 @@ import org.apache.log4j.Logger
 import org.json4s.JsonAST.JValue
 import org.json4s._
 import org.json4s.native.JsonMethods._
-import sncr.metadata.MDObjectStruct
+import sncr.metadata.engine.MDObjectStruct
 
 /**
    *Created by srya0001 on 2/10/2017.
