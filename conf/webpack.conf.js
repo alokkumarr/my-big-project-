@@ -17,6 +17,7 @@ const CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const WebpackBuildVersion = require('./webpack.version');
 
@@ -220,6 +221,11 @@ module.exports = function (env) {
     }));
 
     conf.plugins.push(new WebpackBuildVersion('build.json'));
+
+    conf.plugins.push(new CopyWebpackPlugin([{
+      from: webpackHelper.root('assets/i18n'),
+      to: webpackHelper.root('dist/assets/i18n')
+    }]));
   }
 
   return conf;
