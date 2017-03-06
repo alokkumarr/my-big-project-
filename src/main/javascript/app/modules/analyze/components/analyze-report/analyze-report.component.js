@@ -97,6 +97,7 @@ export const AnalyzeReportComponent = {
           this.filteredGridData = data;
           this.reloadPreviewGrid();
           this.showFiltersButtonIfDataIsReady();
+          this.canvas._$eventEmitter.emit('changed');
         });
     }
 
@@ -108,8 +109,9 @@ export const AnalyzeReportComponent = {
           this.showFiltersButtonIfDataIsReady();
           this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
           if (!isEmpty(this.canvas.model.filters)) {
-            this.filters.selected = this.canvas.filters;
-            this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.canvas.filters, this.filters.possible);
+            this.filters.selected = this.canvas.model.filters;
+            this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.canvas.model.filters, this.filters.possible);
+            this.onApplyFilters(this.filters.possible);
           }
         });
     }
@@ -133,7 +135,12 @@ export const AnalyzeReportComponent = {
 
     generateFiltersOnCanvasChange() {
       this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
-      this.clearFilters();
+      if (!isEmpty(this.canvas.model.filters)) {
+        this.filters.selected = this.canvas.model.filters;
+        this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.canvas.model.filters, this.filters.possible);
+        this.onApplyFilters(this.filters.possible);
+      }
+      // this.clearFilters();
     }
 
     showFiltersButtonIfDataIsReady() {
@@ -199,6 +206,13 @@ export const AnalyzeReportComponent = {
       } else {
         this.fillCanvas(this.model.artifacts);
         this.reloadPreviewGrid();
+        this.showFiltersButtonIfDataIsReady();
+        this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
+        if (!isEmpty(this.canvas.model.filters)) {
+          this.filters.selected = this.canvas.model.filters;
+          this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.canvas.model.filters, this.filters.possible);
+          this.onApplyFilters(this.filters.possible);
+        }
       }
 
       this.canvas._$eventEmitter.on('changed', () => {
@@ -271,7 +285,7 @@ export const AnalyzeReportComponent = {
         });
 
         forEach(itemA.sql_builder.filters, backEndFilter => {
-          model.addFilter(this._FilterService.getFrontEnd2BackEndFilterMapper()(backEndFilter));
+          model.addFilter(this._FilterService.getBackEnd2FrontEndFilterMapper()(backEndFilter));
         });
       });
       /* eslint-enable camelcase */
