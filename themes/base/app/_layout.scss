@@ -1,3 +1,5 @@
+$header-bar-height: 71px;
+
 @mixin flex-properties-for-name($name: null) {
     $flexName: 'flex';
     @if $name != null {
@@ -44,12 +46,13 @@
   display: flex;
   min-height: 100vh;
   flex-direction: column;
-}
 
-.main-content {
-  display: flex;
-  flex: 1;
-  position: relative;
+  & > .main-content {
+    display: flex;
+    flex: 1;
+    position: relative;
+    padding-top: $header-bar-height;
+  }
 }
 
 // used to hide sidebar on screens wider than 1600px (greater than md)
