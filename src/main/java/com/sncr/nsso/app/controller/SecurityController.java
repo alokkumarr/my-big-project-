@@ -242,7 +242,9 @@ public class SecurityController {
 		// mailSender.setProtocol(protocol);
 
 		mailSender.setUsername(nSSOProperties.getMailUserName());
-		mailSender.setPassword(nSSOProperties.getMailPassword());
+		if(nSSOProperties.getMailPassword().length != 0) {
+			mailSender.setPassword(new String(nSSOProperties.getMailPassword()));
+		}
 		return mailSender;
 	}
 
