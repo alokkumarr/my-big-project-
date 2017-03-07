@@ -143,6 +143,11 @@
 		<module>saw-schedular</module>
 		<module>saw-utility</module>
 		<module>saw-support</module>
+<!--
+    Note: The build fails with the error "Could not find artifact
+    ... Dalston.BUILD-SNAPSHOT", so disable module until fixed
+
 		<module>saw-composite-routing-service</module>
+-->
 	</modules> 
 </project>
