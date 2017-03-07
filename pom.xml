@@ -136,9 +136,12 @@
 		<module>saw-core</module>
 		<module>saw-distribution</module>
 		<module>saw-download</module>
+<!--
+		Note: Disabled until Drill dependency issues resolved
 		<module>saw-drill</module>
 		<module>saw-engine</module>
 		<module>saw-generation</module>
+-->
 		<module>saw-published</module>
 		<module>saw-schedular</module>
 		<module>saw-utility</module>
