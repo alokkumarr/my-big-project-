@@ -9,67 +9,9 @@ export const AnalyzePivotDetailComponent = {
   },
   controller: class AnalyzePivotDetailController {
     constructor() {
-      const gridData = [
-        {
-          id: 1,
-          region: 'North America',
-          country: 'USA',
-          city: 'New York',
-          amount: 1740,
-          date: '2013/01/06'
-        },
-        {
-          id: 2,
-          region: 'North America',
-          country: 'USA',
-          city: 'Los Angeles',
-          amount: 850,
-          date: '2013/01/13'
-        },
-        {
-          id: 3,
-          region: 'North America',
-          country: 'USA',
-          city: 'Denver',
-          amount: 2235,
-          date: '2013/01/07'
-        },
-        {
-          id: 4,
-          region: 'North America',
-          country: 'CAN',
-          city: 'Vancouver',
-          amount: 1965,
-          date: '2013/01/03'
-        },
-        {
-          id: 5,
-          region: 'North America',
-          country: 'CAN',
-          city: 'Edmonton',
-          amount: 880,
-          date: '2013/01/10'
-        },
-        {
-          id: 6,
-          region: 'South America',
-          country: 'BRA',
-          city: 'Rio de Janeiro',
-          amount: 5260,
-          date: '2013/01/17'
-        },
-        {
-          id: 7,
-          region: 'South America',
-          country: 'ARG',
-          city: 'Buenos Aires',
-          amount: 2790,
-          date: '2013/01/21'
-        }
-      ];
       this.pivotGridOptions1 = {
-        allowSortingBySummary: true,
-        allowSorting: true,
+        allowSortingBySummary: false,
+        allowSorting: false,
         allowFiltering: true,
         allowExpandAll: true,
         fieldChooser: {
@@ -105,7 +47,7 @@ export const AnalyzePivotDetailComponent = {
             format: 'currency',
             area: 'data'
           }],
-          store: gridData
+          store: this.analysis.pivot.data
         }
       };
     }
