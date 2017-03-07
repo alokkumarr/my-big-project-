@@ -80,7 +80,9 @@
                            ng-click="$ctrl.fork(report.data)">
                   <md-icon md-font-icon="icon-fork"></md-icon>
                 </md-button>
-                <md-button class="md-button btn-card" aria-label="Export">
+                <md-button class="md-button btn-card"
+                           aria-label="Execute"
+                           ng-click="$ctrl.execute(report.data.id)">
                   <md-icon md-font-icon="icon-folder"></md-icon>
                 </md-button>
 

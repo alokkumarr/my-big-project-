@@ -8,13 +8,14 @@ export const AnalyzeViewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeViewController extends AbstractComponentController {
-    constructor($injector, $compile, AnalyzeService, dxDataGridService) {
+    constructor($injector, $compile, AnalyzeService, dxDataGridService, $state) {
       'ngInject';
       super($injector);
 
       this._$compile = $compile;
       this._AnalyzeService = AnalyzeService;
       this._dxDataGridService = dxDataGridService;
+      this._$state = $state;
 
       this.LIST_VIEW = 'list';
       this.CARD_VIEW = 'card';
@@ -44,6 +45,21 @@ export const AnalyzeViewComponent = {
         .then(category => {
           this.category = category;
         });
+    }
+
+    execute(analysisId) {
+      this._AnalyzeService.executeAnalysis(analysisId)
+        .then(analysis => {
+          this.goToAnalysis(analysis.analysisId, analysis.publishedAnalysisId);
+        });
+    }
+
+    goToAnalysis(analysisId, publishId) {
+      this._$state.go('analyze.publishedDetail', {analysisId, publishId});
+    }
+
+    goToLastPublishedAnalysis(analysisId) {
+      this._$state.go('analyze.publishedDetailLast', {analysisId});
     }
 
     loadAnalyses() {
@@ -104,6 +120,9 @@ export const AnalyzeViewComponent = {
       }];
 
       return this._dxDataGridService.mergeWithDefaultConfig({
+        onRowClick: row => {
+          this.goToLastPublishedAnalysis(row.data.id);
+        },
         onInitialized: this.onGridInitialized.bind(this),
         columns,
         dataSource,
