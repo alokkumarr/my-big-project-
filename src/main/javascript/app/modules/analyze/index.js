@@ -3,6 +3,8 @@ import angular from 'angular';
 import {routesConfig} from './routes';
 import {i18nConfig} from './i18n';
 
+import {transitions} from './transitions';
+
 import {AnalyzeService} from './services/analyze.service';
 import {FilterService} from './services/filter.service';
 
@@ -30,6 +32,7 @@ import {AnalyzePublishDialogComponent} from './components/analyze-publish-dialog
 export const AnalyzeModule = 'AnalyzeModule';
 
 angular.module(AnalyzeModule, [])
+  .run(transitions)
   .config(routesConfig)
   .config(i18nConfig)
   .factory('FilterService', FilterService)

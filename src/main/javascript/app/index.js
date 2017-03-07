@@ -4,6 +4,7 @@ import 'angular-ui-router';
 import 'angular-material';
 import 'angular-material/angular-material.css';
 
+import 'angular-local-storage';
 import 'angular-sanitize';
 import 'angular-translate';
 import 'angular-translate/dist/angular-translate-loader-partial/angular-translate-loader-partial';
@@ -46,6 +47,7 @@ export const AppModule = 'app';
 angular
   .module(AppModule, [
     'ui.router',
+    'LocalStorageModule',
     'ngSanitize',
     'ngMaterial',
     'ngIdle',

@@ -28,6 +28,7 @@ a {
 
   &.m-active {
     color: $link-color;
+    pointer-events: none;
   }
 }
 
