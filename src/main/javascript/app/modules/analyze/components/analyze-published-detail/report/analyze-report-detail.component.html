@@ -11,8 +11,10 @@
   </md-card-title>
 
   <div layout="column" layout-align="space-between center">
-    <div class="report-dx-grid"
-     dx-data-grid="$ctrl.gridConfig"></div>
+      <report-grid-display-container data="$ctrl.analysis.report.data"
+                           columns="$ctrl.analysis.report.columns"
+                           groups="$ctrl.analysis.report.groupByColumns">
+      </report-grid-display-container>
   </div>
 </md-card>
 

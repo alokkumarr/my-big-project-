@@ -20,6 +20,9 @@ import {AnalyzeDialogComponent} from './components/analyze-dialog/analyze-dialog
 import {AnalyzeReportSortComponent} from './components/analyze-report-sort/analyze-report-sort.component';
 import {AnalyzeReportDescriptionComponent} from './components/analyze-report-description/analyze-report-description.component';
 import {AnalyzeReportPreviewComponent} from './components/analyze-report-preview/analyze-report-preview.component';
+import {ReportGridDisplayComponent} from './components/analyze-report-grid-display/grid/report-grid-display.component';
+import {ReportGridDisplayNodeComponent} from './components/analyze-report-grid-display/node/report-grid-display-node.component';
+import {ReportGridDisplayContainerComponent} from './components/analyze-report-grid-display/container/report-grid-display-container.component';
 import {ReportGridComponent} from './components/analyze-report-grid/report-grid/report-grid.component';
 import {ReportGridNodeComponent} from './components/analyze-report-grid/report-grid-node/report-grid-node.component';
 import {ReportGridContainerComponent} from './components/analyze-report-grid/report-grid-container/report-grid-container.component';
@@ -39,6 +42,9 @@ angular.module(AnalyzeModule, [])
   .config(i18nConfig)
   .factory('FilterService', FilterService)
   .factory('AnalyzeService', AnalyzeService)
+  .component('reportGridDisplay', ReportGridDisplayComponent)
+  .component('reportGridDisplayNode', ReportGridDisplayNodeComponent)
+  .component('reportGridDisplayContainer', ReportGridDisplayContainerComponent)
   .component('reportGridContainer', ReportGridContainerComponent)
   .component('reportGridNode', ReportGridNodeComponent)
   .component('reportGrid', ReportGridComponent)
