@@ -98,6 +98,7 @@ export const AnalyzeReportComponent = {
           this.reloadPreviewGrid();
           this.showFiltersButtonIfDataIsReady();
           this.canvas._$eventEmitter.emit('changed');
+          this.canvas._$eventEmitter.emit('sortChanged');
         });
     }
 
@@ -352,9 +353,9 @@ export const AnalyzeReportComponent = {
           tableArtifact.sql_builder.joins.push(joinArtifact);
         });
 
-        const sorts = filter(sort => {
-          return sort.table === table;
-        }, model.sorts);
+        const sorts = filter(model.sorts, sort => {
+          return sort.field.table === table;
+        });
 
         forEach(sorts, sort => {
           const sortArtifact = {
@@ -399,7 +400,12 @@ export const AnalyzeReportComponent = {
         grid.updateColumns(this.columns);
         grid.updateSorts(sorts);
         grid.updateSource(this.filteredGridData);
-        grid.refreshGrid();
+        this._$timeout(() => {
+          // Delay refreshing the grid a bit to counter
+          // aria errors from dev extreme
+          // Need to find a better fix for this
+          grid.refreshGrid();
+        }, 100);
       }
     }
 
