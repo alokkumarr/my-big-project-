@@ -62,11 +62,10 @@ export const AnalyzePublishedListComponent = {
     }
 
     goToAnalysis(analysis) {
-      this._$state.go('analyze.publishedDetail',
-        {
-          publishId: analysis.PUBLISHED_ANALYSIS_ID
-        }
-      );
+      this._$state.go('analyze.publishedDetail', {
+        publishId: analysis.PUBLISHED_ANALYSIS_ID,
+        analysisId: analysis.ANALYSIS_ID
+      });
     }
   }
 };
