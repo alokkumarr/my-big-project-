@@ -110,12 +110,12 @@
           <md-icon md-font-icon="icon-report"></md-icon>
         </div>
 
-        <div layout="row" ng-if="$ctrl.filters.selected.length > 0">
+        <div class="filter-chip-container" layout="row" ng-if="$ctrl.filters.selected.length > 0">
           <div layout="column" style="padding: 6px 20px 10px 0">
             <span translate="N_FILTERS_APPLIED"
                   translate-values="{N: $ctrl.filters.selected.length}"
                   translate-interpolation="messageformat"></span>
-            <md-button class="btn-tertiary" ng-click="$ctrl.onClearAllFilters()" translate="CLEAR_ALL"></md-button>
+            <md-button class="btn-tertiary filter-clear-all" ng-click="$ctrl.onClearAllFilters()" translate="CLEAR_ALL"></md-button>
           </div>
           <md-chips class="filter-tags" readonly="true"
                     ng-model="$ctrl.filters.selected"
