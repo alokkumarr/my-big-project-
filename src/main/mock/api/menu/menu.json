@@ -1,7 +1,7 @@
 [
   {
-    "_id": "10",
-    "category_name": "My Analyses",
+    "_id": "20",
+    "category_name": "Canned Analyses",
     "module": "ANALYZE",
     "customer_code": "ATT",
     "data_security_key": "ATT+MCT",
@@ -40,36 +40,6 @@
         ]
       },
       {
-        "sub_category_id": "12",
-        "sub_category_name": "Category 2",
-        "list": []
-      },
-      {
-        "sub_category_id": "13",
-        "sub_category_name": "Category 3",
-        "list": []
-      },
-      {
-        "sub_category_id": "14",
-        "sub_category_name": "Category 4",
-        "list": []
-      },
-      {
-        "sub_category_id": "15",
-        "sub_category_name": "Category 5",
-        "list": []
-      }
-    ]
-  },
-  {
-    "_id": "20",
-    "category_name": "Canned Analyses",
-    "module": "ANALYZE",
-    "customer_code": "ATT",
-    "data_security_key": "ATT+MCT",
-    "role_type": "ADMIN",
-    "children": [
-      {
         "sub_category_id": "21",
         "sub_category_name": "Category 1",
         "list": [
@@ -104,6 +74,36 @@
       {
         "sub_category_id": "22",
         "sub_category_name": "Category 2",
+        "list": []
+      }
+    ]
+  },
+  {
+    "_id": "10",
+    "category_name": "My Analyses",
+    "module": "ANALYZE",
+    "customer_code": "ATT",
+    "data_security_key": "ATT+MCT",
+    "role_type": "ADMIN",
+    "children": [
+      {
+        "sub_category_id": "12",
+        "sub_category_name": "Category 2",
+        "list": []
+      },
+      {
+        "sub_category_id": "13",
+        "sub_category_name": "Category 3",
+        "list": []
+      },
+      {
+        "sub_category_id": "14",
+        "sub_category_name": "Category 4",
+        "list": []
+      },
+      {
+        "sub_category_id": "15",
+        "sub_category_name": "Category 5",
         "list": []
       }
     ]
