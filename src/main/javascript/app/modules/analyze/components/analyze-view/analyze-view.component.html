@@ -40,6 +40,7 @@
       <div class="analyze-view_action-panel" layout="row" layout-align="end center">
         <md-button class="btn-primary"
                    ng-click="$ctrl.openNewAnalysisModal()">
+          <md-tooltip>{{ "TOOLTIP_NEW_ANALYSIS" | translate }}</md-tooltip>
           + <span translate="ANALYSIS"></span>
         </md-button>
       </div>
@@ -77,10 +78,13 @@
             <div data-options="dxTemplate: { name: 'actionCellTemplate' }">
               <md-card-actions layout="row" layout-align="center center">
                 <md-button class="md-button btn-card" aria-label="Fork"
-                           ng-click="$ctrl.fork(report.data)">
+                        ng-click="$ctrl.fork(report.data)">
+                  <md-tooltip>{{ "TOOLTIP_FORK_ANALYSIS" | translate }}</md-tooltip>
+
                   <md-icon md-font-icon="icon-fork"></md-icon>
                 </md-button>
                 <md-button class="md-button btn-card" aria-label="Export">
+                  <md-tooltip>{{ "TOOLTIP_EXPORT_ANALYSIS" | translate }}</md-tooltip>
                   <md-icon md-font-icon="icon-folder"></md-icon>
                 </md-button>
 
