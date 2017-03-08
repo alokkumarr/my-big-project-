@@ -201,6 +201,10 @@ analyze-report {
       .filter-chip-container {
         min-height: 60px;
 
+        span.filter-counter {
+          font-weight: 600;
+        }
+
         button.filter-clear-all {
           text-align: left;
           padding-left: 0;
