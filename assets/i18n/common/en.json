@@ -66,6 +66,9 @@
   "SUNDAY": "Sunday",
 
   "TOOLTIP_NEW_ANALYSIS": "Create new analysis",
+  "TOOLTIP_SEARCH": "Search",
+  "TOOLTIP_LIST_VIEW": "List View",
+  "TOOLTIP_CARD_VIEW": "Card View",
   "TOOLTIP_FORK_ANALYSIS": "Fork Analysis",
   "TOOLTIP_EXPORT_ANALYSIS": "Export Analysis",
   "TOOLTIP_ACCOUNT_SETTINGS": "User",
