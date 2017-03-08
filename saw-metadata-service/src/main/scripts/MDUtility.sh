@@ -14,9 +14,8 @@ echo "Application bin: $bin_dir"
 echo "Library dir: $lib_dir"
 echo "Log dir: /var/saw/service/log"
 
-/opt/mapr/bin/hadoop_version_util.sh
-export HADOOP_HOME=${hadoop_home_dir}
 
+export HADOOP_HOME=/opt/mapr/hadoop/hadoop-$(cat /opt/mapr/hadoop/hadoopversion)
 declare app_classpath="$conf_dir"
 for j in `ls $lib_dir`
 do
@@ -24,7 +23,7 @@ do
 done
 app_classpath=${app_classpath}:$(mapr classpath) 
 
-cmd="java -Dlog.dir=${log_dir} -classpath $app_classpath $app_mainclass $@"
+cmd="java -Dlog.dir=${log_dir} -Dhadoop.home.dir=${HADOOP_HOME} -classpath $app_classpath $app_mainclass $@"
 
 echo $cmd
 

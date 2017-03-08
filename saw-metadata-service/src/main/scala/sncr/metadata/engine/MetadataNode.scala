@@ -31,18 +31,11 @@ trait MetadataNode extends MetadataStore {
 /*read part*/
 
   protected def getData(res:Result): Option[Map[String, Any]]  = ???
+  protected def getHeaderData(res:Result): Option[Map[String, Any]]  = ???
   protected def compileRead(getNode: Get): Get = ???
-
-/*  {
-    // extractContent
-    val content = res.getValue(MDKeys(sourceSection.id),MDKeys(columnDefinition.id))
-    m_log debug s"Read node: ${new String(content)}"
-    new String(content)
-  }
-*/
+  protected def header(g : Get) : Get = ???
 
   def prepareRead: Get = compileRead(new Get(rowKey))
-
 
   def readCompiled( getNode: Get): Option[Map[String, Any]] = {
     try {
@@ -54,8 +47,21 @@ trait MetadataNode extends MetadataStore {
     catch{
       case x: IOException => m_log error ( s"Could not read node: ${new String(rowKey)}, Reason: ", x); None
     }
-
   }
+
+  def readHeaderOnly: Option[Map[String, Any]] = {
+    try {
+      m_log debug s"Load row header: ${new String(rowKey)}"
+      val getNodeHeader = header(new Get(rowKey))
+      val res = mdNodeStoreTable.get(getNodeHeader)
+      if (res.isEmpty) return None
+      getHeaderData(res)
+    }
+    catch{
+      case x: IOException => m_log error ( s"Could not read node header: ${new String(rowKey)}, Reason: ", x); None
+    }
+  }
+
 
   protected def saveNode(putNode : Put): Boolean = {
     try {
@@ -98,7 +104,15 @@ trait MetadataNode extends MetadataStore {
     rowKeys.map( k => {rowKey = k; readCompiled(prepareRead)} ).filter(  _.isDefined ).map(v => v.get)
   }
 
+  def loadHeaders(rowKeys: List[Array[Byte]]): List[Map[String, Any]] =
+  {
+    m_log debug s"Load ${rowKeys.size} rows"
+    rowKeys.map( k => {rowKey = k; readHeaderOnly} ).filter(  _.isDefined ).map(v => v.get)
+  }
+
   def update : Put = new Put(rowKey)
+
+
 
 }
 

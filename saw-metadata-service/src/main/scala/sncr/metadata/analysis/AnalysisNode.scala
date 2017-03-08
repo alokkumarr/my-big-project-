@@ -10,29 +10,25 @@ import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine._
 import sncr.saw.common.config.SAWServiceConfig
 
-
 /**
   * Created by srya0001 on 3/1/2017.
   */
-class AnalysisNode(val analysisNode: JValue = JNothing) extends MetadataNode
-  with SearchMetadata
-  with SourceAsJson
-  with ContentNode {
+class AnalysisNode(val analysisNode: JValue = JNothing) extends ContentNode
+  with SourceAsJson{
 //  with Relation {
 
   override def getSourceData(res: Result): JValue = super[SourceAsJson].getSourceData(res)
-
   override def compileRead(g: Get) = super[ContentNode].compileContentCells(g)
 
   override def getData(res: Result): Option[Map[String, Any]] = {
     Option(getSearchFields(res) + (key_Definition.toString -> compact(render(getSourceData(res))).replace("\\\"", "\"")))
   }
 
+
+
   override val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisNode].getName)
 
-  def this() = {
-    this(JNothing)
-  }
+  def this() = { this(JNothing) }
 
 
   import MDObjectStruct.formats
@@ -41,6 +37,8 @@ class AnalysisNode(val analysisNode: JValue = JNothing) extends MetadataNode
   val tn: TableName = TableName.valueOf(table)
   mdNodeStoreTable = connection.getTable(tn)
   this.searchFields = SearchDictionary.searchFields
+  headerDesc =  SearchDictionary.searchFields
+
 
   override protected def initRow: String = {
     val rowkey = (analysisNode \ "name").extract[String] + AnalysisNode.separator +
@@ -84,7 +82,7 @@ class AnalysisNode(val analysisNode: JValue = JNothing) extends MetadataNode
         }
       }
     }
-    (Success.id, "Node is Correct")
+    (Success.id, "Request is correct")
   }
 
   def write: (Int, String) = {
@@ -94,7 +92,7 @@ class AnalysisNode(val analysisNode: JValue = JNothing) extends MetadataNode
       val put_op = createNode(NodeType.RelationContentNode.id, ContentNodeCategory.AnalysisNode.id)
       val searchValues: Map[String, Any] = AnalysisNode.extractSearchData(analysisNode) + ("NodeId" -> new String(rowKey))
       searchValues.keySet.foreach(k => {
-        m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"
+        m_log debug s"Add search field $k with value: ${searchValues(k).toString}"
       })
       if (saveNode(addContent(put_op, compact(render(analysisNode)), searchValues)))
         (Success.id, s"The UI Node [ ${new String(rowKey)} ] ha been created")
@@ -119,9 +117,9 @@ class AnalysisNode(val analysisNode: JValue = JNothing) extends MetadataNode
       setRowKey(rowKey)
       val searchValues: Map[String, Any] = AnalysisNode.extractSearchData(analysisNode) + ("NodeId" -> new String(rowKey))
       searchValues.keySet.foreach(k => {
-        m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"
+        m_log debug s"Add search field $k with value: ${searchValues(k).toString}"
       })
-      if (saveNode(addContent(super[MetadataNode].update, compact(render(analysisNode)), searchValues)))
+      if (saveNode(addContent(super[ContentNode].update, compact(render(analysisNode)), searchValues)))
         (Success.id, s"The UI Node [ ${new String(rowKey)} ] has been updated")
       else
         (Error.id, "Could not update UI Node")
@@ -146,11 +144,6 @@ class AnalysisNode(val analysisNode: JValue = JNothing) extends MetadataNode
     if (res != Success.id) return (res, msg)
     super.delete
   }
-
-
-  def find(searchFilter: Map[String, Any]): List[Map[String, Any]] = loadNodes(simpleMetadataSearch(searchFilter, "and"))
-
-  def scan: List[Map[String, Any]] = loadNodes(scanMDNodes)
 
 }
 
@@ -191,7 +184,7 @@ object AnalysisNode{
       (analysis, "displayStatus"))
       .map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, SearchDictionary.searchFields(jv._2)) )
-        m_log debug s"Field: ${jv._2}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${SearchDictionary.searchFields(jv._2)}\n, Value: $searchValue"
+        m_log trace s"Field: ${jv._2}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${SearchDictionary.searchFields(jv._2)}\n, Value: $searchValue"
         if (result) jv._2 -> Option(searchValue) else jv._2 -> None
       }).filter(_._2.isDefined).map(kv => kv._1 -> kv._2.get).toMap
   }

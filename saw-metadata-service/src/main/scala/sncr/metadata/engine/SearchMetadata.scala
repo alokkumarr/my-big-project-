@@ -32,14 +32,15 @@ trait SearchMetadata extends MetadataStore{
     }
 
     keys.keySet.foreach( f => {
-      val searchFieldValue : Array[Byte] =
-        searchFields(f) match{
+      val searchFieldValue : Array[Byte] = MDNodeUtil.convertValue(keys(f))
+/*        searchFields(f) match{
           case "String" => Bytes.toBytes(keys(f).asInstanceOf[String])
           case "Int" => Bytes.toBytes(keys(f).asInstanceOf[Int])
           case "Long" => Bytes.toBytes(keys(f).asInstanceOf[Long])
           case "Boolean" => Bytes.toBytes(keys(f).asInstanceOf[Boolean])
           case _ => m_log error "Not supported data type"; null
         }
+*/
         m_log debug s"Field $f = ${keys(f)}"
 
       val filter1 : SingleColumnValueFilter = new SingleColumnValueFilter(
@@ -56,7 +57,7 @@ trait SearchMetadata extends MetadataStore{
     val sr : ResultScanner = mdNodeStoreTable.getScanner(q)
 
     val result = (for( r: Result <- sr) yield r.getRow.clone()).toList
-    m_log debug s"Found: ${sr.size} rows satisfied to filter: ${result.map ( new String( _ )).mkString("[", ",", "]")}"
+    m_log debug s"Found: ${result.size} rows satisfied to filter: ${result.map ( new String( _ )).mkString("[", ",", "]")}"
     sr.close
     result
   }
@@ -74,7 +75,7 @@ trait SearchMetadata extends MetadataStore{
 
   def selectRowKey(keys: Map[String, Any]) : (Int, String) = {
     if (keys.contains("NodeId")) {
-      setRowKey(Bytes.toBytes(keys("NodeId").asInstanceOf[String]))
+      setRowKey(MDNodeUtil.convertValue(keys("NodeId")))
       val msg = s" Selected Node [ ID = ${new String(rowKey)} ]"; m_log debug Success.toString + " ==> " + msg
       (Success.id,  msg)
     }

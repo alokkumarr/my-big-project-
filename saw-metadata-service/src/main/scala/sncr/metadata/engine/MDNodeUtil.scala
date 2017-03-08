@@ -3,6 +3,8 @@ package sncr.metadata.engine
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+import org.apache.hadoop.hbase.util.Bytes
+import org.json4s.JsonAST.JValue
 import org.json4s._
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
@@ -53,6 +55,40 @@ object MDNodeUtil {
     val (r, s) = extractValues(src, sf)
     m_log debug s"Search data: ${sf._1} = $s"
     if (r)  sf._1 -> Option(s) else  sf._1 -> None  }).filter( _._2.isDefined ).map(  kv => kv._1 -> kv._2.get)
+  }
+
+  def convertValue( v: Any) : Array[Byte]=
+  {
+    try {
+      v match
+      {
+        case s: String =>  Bytes.toBytes(s)
+        case i: Int => Bytes.toBytes(i)
+        case b: Boolean => Bytes.toBytes(b)
+        case l: Long => Bytes.toBytes(l)
+        case ii: Integer => Bytes.toBytes(ii)
+        case d: Double => Bytes.toBytes(d)
+
+        case s: JString =>  Bytes.toBytes(s.extract[String])
+        case i: JInt => Bytes.toBytes(i.extract[Int])
+        case b: JBool => Bytes.toBytes(b.extract[Boolean])
+        case l: JLong => Bytes.toBytes(l.extract[Long])
+        case d: JDouble => Bytes.toBytes(d.extract[Double])
+
+        case _ =>  m_log error s"Unsupported search field type: ${v.toString}"; Array.empty
+      }
+    }
+    catch {
+      case x: Exception => m_log trace s"Could not extract value for field ${v.toString}, declared type: ${v.toString}"; Array.empty
+    }
+  }
+
+  def keyExtractor(elem: JValue): Map[String, Any]  = {
+    elem match{
+      case JObject(x) => x.toMap
+      case JArray(a) => a.flatMap( array_elem => MDNodeUtil.keyExtractor(array_elem)).toMap
+      case _ => Map.empty
+    }
   }
 
 }

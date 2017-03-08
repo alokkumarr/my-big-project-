@@ -27,15 +27,20 @@ maprcli table cf create -cfname _search -path /main/metadata/analysis_metadata
 maprcli table cf create -cfname _relations -path /main/metadata/analysis_metadata
 maprcli table cf create -cfname _elements -path /main/metadata/analysis_metadata
 maprcli table cf create -cfname _objects -path /main/metadata/analysis_metadata
-maprcli table cf create -cfname _dl_locations -path /main/metadata/analysis_metadata
 maprcli table cf create -cfname _system -path /main/metadata/analysis_metadata
 
 maprcli table create -path /main/metadata/analysis_results
 maprcli table cf create -cfname _source -path /main/metadata/analysis_results
 maprcli table cf create -cfname _search -path /main/metadata/analysis_results
-maprcli table cf create -cfname _analysis -path /main/metadata/analysis_results
 maprcli table cf create -cfname _objects -path /main/metadata/analysis_results
-maprcli table cf create -cfname _dl_locations -path /main/metadata/analysis_results
 maprcli table cf create -cfname _system -path /main/metadata/analysis_results
 
 
+[mapr@client101 sbin]$ maprcli table cf list -path /main/metadata/analysis_metadata
+compressionperm  readperm  appendperm  writeperm  versionperm  minversions  maxversions  compression  ttl         inmemory  cfname      memoryperm
+u:mapr           u:mapr    u:mapr      u:mapr     u:mapr       0            1            lz4          2147483647  false     _source     u:mapr
+u:mapr           u:mapr    u:mapr      u:mapr     u:mapr       0            1            lz4          2147483647  false     _search     u:mapr
+u:mapr           u:mapr    u:mapr      u:mapr     u:mapr       0            1            lz4          2147483647  false     _relations  u:mapr
+u:mapr           u:mapr    u:mapr      u:mapr     u:mapr       0            1            lz4          2147483647  false     _elements   u:mapr
+u:mapr           u:mapr    u:mapr      u:mapr     u:mapr       0            1            lz4          2147483647  false     _objects    u:mapr
+u:mapr           u:mapr    u:mapr      u:mapr     u:mapr       0            1            lz4          2147483647  false     _system     u:mapr

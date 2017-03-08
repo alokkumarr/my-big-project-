@@ -79,8 +79,8 @@ object tables extends Enumeration {
 
   val SemanticMetadata = Value(0, "semantic_metadata")
   val DatalakeMetadata = Value(1, "datalake_metadata")
-  val AnalysisMetadata = Value(2, "report_metadata")
-  val AnalysisResults = Value(3, "report_results")
+  val AnalysisMetadata = Value(2, "analysis_metadata")
+  val AnalysisResults = Value(3, "analysis_results")
 
 }
 

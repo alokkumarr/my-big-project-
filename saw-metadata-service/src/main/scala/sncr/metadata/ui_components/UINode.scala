@@ -18,16 +18,17 @@ import org.apache.hadoop.hbase.client._
   * Created by srya0001 on 2/19/2017.
   */
 class UINode(val ticket: JValue, val content_element: JValue, val ui_item_type : String = "none")
-      extends MetadataNode
-      with ContentNode
-      with SearchMetadata
+      extends ContentNode
       with SourceAsJson {
 
   override def getSourceData(res:Result): JValue = super[SourceAsJson].getSourceData(res)
   override def compileRead(g : Get) = super[ContentNode].compileContentCells(g)
+  override def header(g : Get) = super[ContentNode].compileSearchCell(g)
+  override def getHeaderData(res:Result): Option[Map[String, Any]] = super[ContentNode].getHeaderData(res)
+
   override def getData(res:Result): Option[Map[String, Any]] =
   {
-    Option(getSearchFields(res) + (key_Definition.toString -> compact(render(getSourceData(res))).replace("\\\"","\"") ))
+    Option(getSearchFields(res) + (key_Definition.toString -> compact(render(getSourceData(res))) ))
   }
 
 
@@ -38,6 +39,7 @@ class UINode(val ticket: JValue, val content_element: JValue, val ui_item_type :
   val tn: TableName = TableName.valueOf(table)
   mdNodeStoreTable = connection.getTable(tn)
   this.searchFields = SearchDictionary.searchFields
+  headerDesc =  SearchDictionary.searchFields
 
   override def initRow : String =
   {
@@ -116,16 +118,12 @@ class UINode(val ticket: JValue, val content_element: JValue, val ui_item_type :
     delete
   }
 
-  def searchNodes(searchFilter: Map[String, Any]) : List[Map[String, Any]] = loadNodes(simpleMetadataSearch(searchFilter, "and"))
-
-  def scanNodes : List[Map[String, Any]] = loadNodes( scanMDNodes )
-
 }
 
 
 object UINode
 {
-  val m_log: Logger = LoggerFactory.getLogger("SemanticNodeObject")
+  val m_log: Logger = LoggerFactory.getLogger("UINodeObject")
 
   val separator: String = "::"
   val rowKeyRule = List("customer_code", "type", "_id")

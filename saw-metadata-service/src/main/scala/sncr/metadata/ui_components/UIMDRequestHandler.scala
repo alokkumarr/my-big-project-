@@ -129,7 +129,7 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
     val response = action match {
       case "create" => build(sNode.storeNode)
       case "retrieve" => build(sNode.retrieveNode(extractKeys))
-      case "search" => build(sNode.searchNodes(extractKeys))
+      case "search" => build(sNode.find(extractKeys))
       case "delete" => build(sNode.removeNode(extractKeys))
       case "update" => build(sNode.modifyNode(extractKeys))
     }
@@ -276,8 +276,8 @@ object UIMDRequestHandler{
   def scanSemanticTable(printPretty: Boolean) : String = {
     val srh = new UIMDRequestHandler( null )
     val sNode = new UINode(null, null, null)
-    val result = if (!printPretty) compact(render(srh.build(sNode.scanNodes)))
-                 else pretty(render(srh.build(sNode.scanNodes)))
+    val result = if (!printPretty) compact(render(srh.build(sNode.scan)))
+                 else pretty(render(srh.build(sNode.scan)))
     m_log debug result
     result
   }
