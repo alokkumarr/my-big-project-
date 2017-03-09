@@ -46,8 +46,6 @@
   "SORT_BY_ANOTHER_COLUMN": "Sort by another column",
   "STARTS_ON": "Starts on",
   "SUMMARY_VIEW": "Summary View",
-  "PREVIEW": "Preview",
-  "PRINT": "Print",
   "PIVOTS": "Pivots",
   "PLEASE_SELECT": "Please select",
   "PREVIEW": "Preview",
@@ -67,6 +65,7 @@
   "SATURDAY": "Saturday",
   "SUNDAY": "Sunday",
 
-  "TOOLTIP_ACCOUNT_SETTINGS": "User",
-  "TOOLTIP_ALERTS": "Alerts"
+  "TOOLTIP_SEARCH": "Search",
+  "TOOLTIP_LIST_VIEW": "List View",
+  "TOOLTIP_CARD_VIEW": "Card View"
 }

@@ -14,11 +14,15 @@
         <md-input-container class="analyze-view_switch-view">
           <md-radio-group ng-model="$ctrl.states.reportView">
             <md-radio-button ng-value="$ctrl.LIST_VIEW">
-              <md-icon md-font-icon="icon-Table-view"></md-icon>
+              <md-icon md-font-icon="icon-Table-view">
+                <md-tooltip>{{ "TOOLTIP_LIST_VIEW" | translate }}</md-tooltip>
+              </md-icon>
             </md-radio-button>
 
             <md-radio-button ng-value="$ctrl.CARD_VIEW">
-              <md-icon md-font-icon="icon-card-view"></md-icon>
+              <md-icon md-font-icon="icon-card-view">
+                <md-tooltip>{{ "TOOLTIP_CARD_VIEW" | translate }}</md-tooltip>
+              </md-icon>
             </md-radio-button>
           </md-radio-group>
         </md-input-container>
@@ -40,7 +44,6 @@
       <div class="analyze-view_action-panel" layout="row" layout-align="end center">
         <md-button class="btn-primary"
                    ng-click="$ctrl.openNewAnalysisModal()">
-          <md-tooltip>{{ "TOOLTIP_NEW_ANALYSIS" | translate }}</md-tooltip>
           + <span translate="ANALYSIS"></span>
         </md-button>
       </div>
