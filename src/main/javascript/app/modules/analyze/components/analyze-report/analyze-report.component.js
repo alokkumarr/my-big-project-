@@ -66,6 +66,13 @@ export const AnalyzeReportComponent = {
         this.model.id = null;
       }
 
+      if (this.model.query) {
+        // give designer mode chance to load, then switch to query mode
+        this._$timeout(() => {
+          this.setSqlMode(this.QUERY_MODE);
+        }, 100);
+      }
+
       this.unregister = this._$componentHandler.on('$onInstanceAdded', e => {
         if (e.key === 'ard-canvas') {
           this.initCanvas(e.instance);
@@ -90,6 +97,8 @@ export const AnalyzeReportComponent = {
           this.filteredGridData = data;
           this.reloadPreviewGrid();
           this.showFiltersButtonIfDataIsReady();
+          this.canvas._$eventEmitter.emit('changed');
+          this.canvas._$eventEmitter.emit('sortChanged');
         });
     }
 
@@ -101,13 +110,17 @@ export const AnalyzeReportComponent = {
           this.showFiltersButtonIfDataIsReady();
           this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
           if (!isEmpty(this.canvas.model.filters)) {
-            this.filters.selected = this.canvas.filters;
-            this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.canvas.filters, this.filters.possible);
+            this.filters.selected = this.canvas.model.filters;
+            this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.canvas.model.filters, this.filters.possible);
+            this.onApplyFilters(this.filters.possible);
           }
         });
     }
 
     generateQuery() {
+      if (this.model.query) {
+        return;
+      }
       this._AnalyzeService.generateQuery({})
         .then(result => {
           this.model.query = result.query;
@@ -123,7 +136,12 @@ export const AnalyzeReportComponent = {
 
     generateFiltersOnCanvasChange() {
       this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
-      this.clearFilters();
+      if (!isEmpty(this.canvas.model.filters)) {
+        this.filters.selected = this.canvas.model.filters;
+        this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.canvas.model.filters, this.filters.possible);
+        this.onApplyFilters(this.filters.possible);
+      }
+      // this.clearFilters();
     }
 
     showFiltersButtonIfDataIsReady() {
@@ -189,6 +207,13 @@ export const AnalyzeReportComponent = {
       } else {
         this.fillCanvas(this.model.artifacts);
         this.reloadPreviewGrid();
+        this.showFiltersButtonIfDataIsReady();
+        this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
+        if (!isEmpty(this.canvas.model.filters)) {
+          this.filters.selected = this.canvas.model.filters;
+          this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.canvas.model.filters, this.filters.possible);
+          this.onApplyFilters(this.filters.possible);
+        }
       }
 
       this.canvas._$eventEmitter.on('changed', () => {
@@ -261,7 +286,7 @@ export const AnalyzeReportComponent = {
         });
 
         forEach(itemA.sql_builder.filters, backEndFilter => {
-          model.addFilter(this._FilterService.getFrontEnd2BackEndFilterMapper()(backEndFilter));
+          model.addFilter(this._FilterService.getBackEnd2FrontEndFilterMapper()(backEndFilter));
         });
       });
       /* eslint-enable camelcase */
@@ -328,9 +353,9 @@ export const AnalyzeReportComponent = {
           tableArtifact.sql_builder.joins.push(joinArtifact);
         });
 
-        const sorts = filter(sort => {
-          return sort.table === table;
-        }, model.sorts);
+        const sorts = filter(model.sorts, sort => {
+          return sort.field.table === table;
+        });
 
         forEach(sorts, sort => {
           const sortArtifact = {
@@ -375,7 +400,12 @@ export const AnalyzeReportComponent = {
         grid.updateColumns(this.columns);
         grid.updateSorts(sorts);
         grid.updateSource(this.filteredGridData);
-        grid.refreshGrid();
+        this._$timeout(() => {
+          // Delay refreshing the grid a bit to counter
+          // aria errors from dev extreme
+          // Need to find a better fix for this
+          grid.refreshGrid();
+        }, 100);
       }
     }
 
@@ -489,6 +519,10 @@ export const AnalyzeReportComponent = {
     openSaveModal(ev) {
       if (!this.canvas) {
         return;
+      }
+
+      if (this.states.sqlMode === this.DESIGNER_MODE) {
+        this.model.query = '';
       }
 
       this.model.artifacts = this.generatePayload();

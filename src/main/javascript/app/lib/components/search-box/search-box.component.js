@@ -46,13 +46,17 @@ export const SearchBoxComponent = {
       this.$document.on('click', this.onDocumentClick);
     }
 
+    cancelSearch() {
+      this.model = '';
+      this.onModelChanged();
+      this.states.focused = false;
+    }
+
     $onDestroy() {
       this.$document.off('click', this.onDocumentClick);
     }
 
     onModelChanged() {
-      this.states.focused = true;
-
       if (this.$changeTID) {
         this.$timeout.cancel(this.$changeTID);
       }

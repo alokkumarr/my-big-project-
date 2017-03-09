@@ -24,5 +24,7 @@
   "UNTITLED_REPORT": "Untitled report",
   "WHAT_WOULD_YOU_LIKE_TO_ANALYZE": "What would you like to analyze?",
   "SAVE_REPORT": "Save Report",
-  "NO_MATCHING_RESULTS": "No matching results"
+  "TOOLTIP_NEW_ANALYSIS": "Create new analysis",
+  "TOOLTIP_FORK_ANALYSIS": "Fork Analysis",
+  "TOOLTIP_EXECUTE_ANALYSIS": "Execute Analysis"
 }

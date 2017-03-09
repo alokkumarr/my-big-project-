@@ -198,6 +198,21 @@ analyze-report {
       overflow-y: scroll;
       padding: 20px;
 
+      .filter-chip-container {
+        min-height: 60px;
+
+        span.filter-counter {
+          font-weight: 600;
+        }
+
+        button.filter-clear-all {
+          text-align: left;
+          padding-left: 0;
+          min-height: 24px;
+          line-height: 15px;
+        }
+      }
+
       &-empty {
         width: 100%;
         align-items: center;

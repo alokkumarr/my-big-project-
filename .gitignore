@@ -1,5 +1,5 @@
 target
-node
+/node
 node_modules
 log.txt
 debug.log

@@ -146,8 +146,11 @@
           "filters": [
             {
               "column_name": "TotalPrice",
+              "label": "Total Price",
+              "table_name": "Orders",
               "boolean_criteria": "AND",
-              "operator": ">=",
+              "operator": "x >=",
+              "filter_type": "int",
               "search_conditions": [
                 1
               ]
