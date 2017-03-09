@@ -16,6 +16,14 @@ public class ProductModuleFeature implements Serializable {
 	private String prodModFeatureDesc;
 	private String defaultURL;
 	
+	public String getDefaultFeature() {
+		return defaultFeature;
+	}
+	public void setDefaultFeature(String defaultFeature) {
+		this.defaultFeature = defaultFeature;
+	}
+	private String defaultFeature;
+	
 	private ArrayList<ProductModuleFeaturePrivileges> prodModFeatrPriv;
 	
 	public String getProdModFeatureName() {

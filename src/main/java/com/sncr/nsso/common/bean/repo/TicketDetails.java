@@ -20,14 +20,32 @@ public class TicketDetails implements Serializable {
 
 	private String landingProd;
 	private String custID;
+	private String custCode;
 	private String compName;
 	private String roleName;
 	private String roleType;
 	private String dataSKey;
-	private ArrayList<Products> products;
+	private ArrayList<ProductModules> productModules;
+	private ArrayList<ProductModuleFeatures> productModuleFeatures;
 
+	public String getCustCode() {
+		return custCode;
+	}
+
+	public void setCustCode(String custCode) {
+		this.custCode = custCode;
+	}
+	
 	public String getLandingProd() {
 		return landingProd;
+	}
+
+	public ArrayList<ProductModuleFeatures> getProductModuleFeatures() {
+		return productModuleFeatures;
+	}
+
+	public void setProductModuleFeatures(ArrayList<ProductModuleFeatures> productModuleFeatures) {
+		this.productModuleFeatures = productModuleFeatures;
 	}
 
 	public void setLandingProd(String landingProd) {
@@ -50,12 +68,12 @@ public class TicketDetails implements Serializable {
 		this.dataSKey = dataSKey;
 	}
 
-	public ArrayList<Products> getProducts() {
-		return products;
+	public ArrayList<ProductModules> getProductModules() {
+		return productModules;
 	}
 
-	public void setProducts(ArrayList<Products> products) {
-		this.products = products;
+	public void setProductModules(ArrayList<ProductModules> productModules) {
+		this.productModules = productModules;
 	}
 
 	/**

@@ -36,7 +36,7 @@ public class NSSOProperties {
 	
 	
 	@Value("${mail.password}")
-	private String mailPassword;
+	private byte[] mailPassword;
 	
 	
 	
@@ -120,15 +120,13 @@ public class NSSOProperties {
 		this.mailUserName = mailUserName;
 	}
 
-	public String getMailPassword() {
+	public byte[] getMailPassword() {
 		return mailPassword;
 	}
 
-	public void setMailPassword(String mailPassword) {
+	public void setMailPassword(byte[] mailPassword) {
 		this.mailPassword = mailPassword;
 	}
 
-	
-	
 	
 }
