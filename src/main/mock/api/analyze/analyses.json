@@ -310,6 +310,19 @@
     ]
   },
   {
+    "id": "10",
+    "type": "pivot",
+    "name": "Pivot test",
+    "description": "Test description",
+    "category": "11",
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": "Every Friday at 12:00pm",
+    "artifacts": []
+  },
+  {
     "id": "3",
     "type": "chart",
     "chartType": "line",

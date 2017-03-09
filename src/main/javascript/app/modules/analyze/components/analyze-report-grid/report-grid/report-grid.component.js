@@ -20,9 +20,10 @@ export const ReportGridComponent = {
     source: '<'
   },
   controller: class ReportGridController {
-    constructor($mdDialog) {
+    constructor($mdDialog, dxDataGridService) {
       'ngInject';
       this._$mdDialog = $mdDialog;
+      this._dxDataGridService = dxDataGridService;
 
       this.settings = {};
       this.columns = [];
@@ -33,27 +34,12 @@ export const ReportGridComponent = {
       this.reportGridNode.setGridComponent(this);
 
       this.settings = assign(this.settings, {
-        gridConfig: {
+        gridConfig: this._dxDataGridService.mergeWithDefaultConfig({
           onInitialized: this.onGridInitialized.bind(this),
           onContextMenuPreparing: this.onContextMenuPreparing.bind(this),
           columns: this.prepareGridColumns(this.columns),
-          dataSource: this.source || [],
-          columnAutoWidth: true,
-          allowColumnReordering: true,
-          allowColumnResizing: true,
-          showColumnHeaders: true,
-          showColumnLines: false,
-          showRowLines: false,
-          showBorders: false,
-          rowAlternationEnabled: true,
-          hoverStateEnabled: true,
-          scrolling: {
-            mode: 'virtual'
-          },
-          sorting: {
-            mode: 'multiple'
-          }
-        }
+          dataSource: this.source || []
+        })
       });
     }
 

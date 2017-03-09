@@ -83,9 +83,13 @@
 
                   <md-icon md-font-icon="icon-fork"></md-icon>
                 </md-button>
-                <md-button class="md-button btn-card" aria-label="Export">
-                  <md-tooltip>{{ "TOOLTIP_EXPORT_ANALYSIS" | translate }}</md-tooltip>
+                <md-button class="md-button btn-card"
+                           aria-label="Execute"
+                           ng-click="$ctrl.execute(report.data.id)">
                   <md-icon md-font-icon="icon-folder"></md-icon>
+                  <md-tooltip>
+                    <span translate="TOOLTIP_EXECUTE_ANALYSIS"></span>
+                  </md-tooltip>
                 </md-button>
 
                 <md-menu-bar>
@@ -113,7 +117,7 @@
 
     <!-- CARD VIEW -->
     <div ng-switch-when="card" layout="row" layout-align="start start" layout-wrap>
-      <div flex-md="50" ng-repeat="report in $ctrl.reports | filter:$ctrl.filterReports.bind($ctrl)">
+      <div flex-gt-sm="50" ng-repeat="report in $ctrl.reports | filter:$ctrl.filterReports.bind($ctrl)">
         <analyze-card model="report" on-action="$ctrl.onCardAction(type, model)"
                       highlight-term="$ctrl.states.searchTerm"></analyze-card>
       </div>

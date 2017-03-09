@@ -23,6 +23,7 @@
   "LOG_OUT": "Log out",
   "MORE": "More",
   "NEVER": "Never",
+  "NO_MATCHING_RESULTS": "No matching results",
   "N_FILTERS_APPLIED": "{N, plural, one{1 Filter} other{# Filters} } Applied",
   "NTH_WEEK": "{N, selectordinal, one{#st} two{#nd} few{#rd} other{#th} } Week",
   "OCCURENCES": "occurences",
@@ -50,6 +51,7 @@
   "PIVOTS": "Pivots",
   "PLEASE_SELECT": "Please select",
   "PREVIEW": "Preview",
+  "PRINT": "Print",
   "PUBLISH": "Publish",
   "TO": "To",
   "UPLOAD": "Upload",
@@ -65,10 +67,6 @@
   "SATURDAY": "Saturday",
   "SUNDAY": "Sunday",
 
-  "TOOLTIP_NEW_ANALYSIS": "Create new analysis",
-  "TOOLTIP_FORK_ANALYSIS": "Fork Analysis",
-  "TOOLTIP_EXPORT_ANALYSIS": "Export Analysis",
   "TOOLTIP_ACCOUNT_SETTINGS": "User",
   "TOOLTIP_ALERTS": "Alerts"
-
 }

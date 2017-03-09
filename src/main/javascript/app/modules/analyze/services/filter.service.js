@@ -29,7 +29,7 @@ const EVENTS = {
   CLEAR_ALL_FILTERS: 'CLEAR_ALL_FILTERS'
 };
 
-export function FilterService($mdSidenav, $eventEmitter) {
+export function FilterService($mdSidenav, $eventEmitter, $log) {
   'ngInject';
 
   const unRegisterFuncs = [];
@@ -256,7 +256,7 @@ export function FilterService($mdSidenav, $eventEmitter) {
 
         Object.assign(possibleFilter, targetCanvasFilter);
       } catch (err) {
-        console.error(err);
+        $log.error(err);
       }
     });
   }

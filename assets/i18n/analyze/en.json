@@ -7,12 +7,15 @@
   "DESIGNER": "Designer",
   "EMAIL_TO_COLLABORATORS": "Email to Collaborators",
   "FORK_AND_EDIT": "Fork & Edit",
+  "FORKED_FROM_ANALYSIS_BY_CREATOR": "Forked from <a>{{analysis}}</a> by <a>{{creator}}</a>",
   "HOW_WOULD_YOU_LIKE_TO_ANALYZE": "How would you like to analyze?",
   "MY_ANALYSIS_CATEGORY": "My analysis category",
   "NEW_ANALYSIS": "New Analysis",
   "NO_IMPLEMENTED_TEMPLATE_YET": "No implemented template yet!",
   "ORDER_FULFILLMENT": "Order Fulfillment",
+  "OTHER_PUBLISHED_ANALYSES": "Other Published Analyses",
   "PUBLISH_ANALYSIS": "Publish Analysis",
+  "PUBLISHED_ANALYSES": "Published Analyses",
   "PUBLISH_ONCE": "Publish Once",
   "QUERY": "Query",
   "REPORT_NAME": "Report name",
@@ -21,5 +24,7 @@
   "UNTITLED_REPORT": "Untitled report",
   "WHAT_WOULD_YOU_LIKE_TO_ANALYZE": "What would you like to analyze?",
   "SAVE_REPORT": "Save Report",
-  "NO_MATCHING_RESULTS": "No matching results"
+  "TOOLTIP_NEW_ANALYSIS": "Create new analysis",
+  "TOOLTIP_FORK_ANALYSIS": "Fork Analysis",
+  "TOOLTIP_EXECUTE_ANALYSIS": "Execute Analysis"
 }
