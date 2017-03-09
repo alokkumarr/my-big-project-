@@ -24,6 +24,7 @@ import com.sncr.nsso.common.bean.User;
 import com.sncr.nsso.common.bean.repo.PasswordDetails;
 import com.sncr.nsso.common.bean.repo.ProductModuleFeature;
 import com.sncr.nsso.common.bean.repo.ProductModuleFeaturePrivileges;
+import com.sncr.nsso.common.bean.repo.ProductModuleFeatures;
 import com.sncr.nsso.common.bean.repo.ProductModules;
 import com.sncr.nsso.common.bean.repo.Products;
 import com.sncr.nsso.common.bean.repo.TicketDetails;
@@ -312,9 +313,13 @@ public class UserRepositoryImpl implements UserRepository {
 			int[] types = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.SMALLINT, Types.BIGINT,
 					Types.BIGINT, Types.DATE };
 
-			String sql = "UPDATE RESET_PWD_DTLS RS  SET RS.VALID=0, RS.INACTIVATED_DATE=SYSDATE() WHERE RS.USER_ID='"
-					+ userId + "' AND RS.VALID=1";
-			jdbcTemplate.update(sql);
+			String sql = "UPDATE RESET_PWD_DTLS RS  SET RS.VALID=0, RS.INACTIVATED_DATE=SYSDATE() WHERE RS.USER_ID=? " +
+					" AND RS.VALID=1";
+			jdbcTemplate.update(sql, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, userId);
+				}
+			});
 
 			jdbcTemplate.update(insertSql, params, types);
 
@@ -330,9 +335,12 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public ResetValid validateResetPasswordDtls(String randomHash) {
 		try {
-			String sql = "SELECT VALID_UPTO, USER_ID FROM RESET_PWD_DTLS  WHERE RANDOM_HASHCODE='" + randomHash
-					+ "' AND VALID=1";
-			return jdbcTemplate.query(sql, new UserRepositoryImpl.ResetValidityExtractor());
+			String sql = "SELECT VALID_UPTO, USER_ID FROM RESET_PWD_DTLS  WHERE RANDOM_HASHCODE=? AND VALID=1";
+			return jdbcTemplate.query(sql, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, randomHash);
+				}
+			},new UserRepositoryImpl.ResetValidityExtractor());			
 			// logger.info("secret code details inserted for user Id "+ userId);
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
@@ -362,7 +370,7 @@ public class UserRepositoryImpl implements UserRepository {
 				message = "User is inactive, please contact administrator.";
 				return message;
 			} else if (user.getFirstName() != null && user.getFirstName() != null
-					&& !user.getFirstName().toUpperCase().equals(fName.toUpperCase())) {
+					&& !user.getFirstName().equalsIgnoreCase(fName)) {
 				message = "'First Name' provided is not identified in the system, please re-verify.";
 				return message;
 			}
@@ -469,35 +477,23 @@ public class UserRepositoryImpl implements UserRepository {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
 					preparedStatement.setString(1, masterLoginId);
 				}
-			}, new UserRepositoryImpl.PrepareTicketExtractor());
-
-			// Cust - Prod
-			String sql3 = "SELECT DISTINCT P.PRODUCT_NAME,P.PRODUCT_DESC,P.PRODUCT_CODE FROM CUSTOMER_PRODUCTS CP, PRODUCTS P "
-					+ "where CP.PRODUCT_SYS_ID = P.PRODUCT_SYS_ID AND P.ACTIVE_STATUS_IND = CP.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = 1 AND CP.CUSTOMER_SYS_ID=?";
-
-			ticketDetails.setProducts(jdbcTemplate.query(sql3, new PreparedStatementSetter() {
-				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setString(1, ticketDetails.getCustID());
-				}
-			}, new UserRepositoryImpl.PrepareProductExtractor()));
+			}, new UserRepositoryImpl.PrepareTicketExtractor());			
 
 			// Cust - Prod - Modules
-			String sql4 = "SELECT DISTINCT P.PRODUCT_CODE, M.MODULE_NAME,M.MODULE_DESC,M.MODULE_CODE FROM USERS U, PRODUCTS P, MODULES M, "
-					+ " CUSTOMER_PRODUCTS CP, PRODUCT_MODULES PM, CUSTOMER_PRODUCT_MODULES CPM WHERE U.CUSTOMER_SYS_ID = CP.CUSTOMER_SYS_ID "
-					+ "AND  P.PRODUCT_SYS_ID = CP.PRODUCT_SYS_ID AND M.MODULE_SYS_ID = PM.MODULE_SYS_ID "
-					+ "AND CP.CUST_PROD_SYS_ID = CPM.CUST_PROD_SYS_ID AND P.ACTIVE_STATUS_IND = M.ACTIVE_STATUS_IND AND"
-					+ " CP.ACTIVE_STATUS_IND = PM.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND "
-					+ " AND CPM.ACTIVE_STATUS_IND = 1 AND U.USER_ID=?";
+			String sql4 = "SELECT DISTINCT P.PRODUCT_CODE, M.MODULE_NAME, M.MODULE_DESC, M.MODULE_CODE, CPM.MODULE_URL, CPM.DEFAULT FROM CUSTOMER_PRODUCT_MODULES CPM INNER JOIN USERS U "
+					+ " ON (U.USER_ID=? AND U.CUSTOMER_SYS_ID=CPM.CUSTOMER_SYS_ID) INNER JOIN PRODUCT_MODULES PM ON (CPM.PROD_MOD_SYS_ID=PM.PROD_MOD_SYS_ID)"
+					+ " INNER JOIN PRODUCTS P ON (PM.PRODUCT_SYS_ID=P.PRODUCT_SYS_ID) INNER JOIN MODULES M ON (M.MODULE_SYS_ID=M.MODULE_SYS_ID) INNER JOIN CUSTOMERS C "
+					+ " ON (C.CUSTOMER_SYS_ID=CPM.CUSTOMER_SYS_ID)";
 
 			ArrayList<ProductModules> prodMods = jdbcTemplate.query(sql4, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
 					preparedStatement.setString(1, masterLoginId);
 				}
 			}, new UserRepositoryImpl.PrepareProdModExtractor());
-
+			ticketDetails.setProductModules(prodMods);
 			// Cust - Prod - Modules - Features
 			String sql5 = "	SELECT U.USER_SYS_ID, U.CUSTOMER_SYS_ID	,C.CUSTOMER_SYS_ID ,CP.CUST_PROD_SYS_ID,CP.CUSTOMER_SYS_ID,"
-					+ "CPMF.CUST_PROD_MOD_FEATURE_SYS_ID, P.PRODUCT_CODE ,M.MODULE_CODE	,CPMF.FEATURE_NAME	,CPMF.FEATURE_DESC	,CPMF.DEFAULT_URL "
+					+ "CPMF.CUST_PROD_MOD_FEATURE_SYS_ID, P.PRODUCT_CODE ,M.MODULE_CODE	,CPMF.FEATURE_NAME	,CPMF.FEATURE_DESC	,CPMF.DEFAULT_URL ,CPMF.DEFAULT"
 					+ "	FROM USERS U INNER JOIN  CUSTOMERS  C	ON (C.CUSTOMER_SYS_ID=U.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCTS CP"
 					+ "	ON (CP.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULES CPM"
 					+ "	ON (CPM.CUST_PROD_SYS_ID=CP.CUST_PROD_SYS_ID)	INNER JOIN CUSTOMER_PRODUCT_MODULE_FEATURES CPMF"
@@ -532,42 +528,41 @@ public class UserRepositoryImpl implements UserRepository {
 
 			ArrayList<ProductModuleFeaturePrivileges> productModuleFeaturePrivilegesSorted = null;
 			ArrayList<ProductModuleFeature> prodModFeatrSorted = null;
-			ArrayList<ProductModules> prodModSorted = null;
+			ArrayList<ProductModuleFeatures> prodModFeatrs = new ArrayList<ProductModuleFeatures>();
+			ProductModuleFeatures prodModFeatures = null;
+			for (int i = 0; i < ticketDetails.getProductModules().size(); i++) {
+				prodModFeatrSorted = new ArrayList<ProductModuleFeature>();
+				prodModFeatures = new ProductModuleFeatures();
+				for (int y = 0; y < prodModFeatr.size(); y++) {
+					if (ticketDetails.getProductModules().get(i).getProdCode()
+							.equals(prodModFeatr.get(y).getProdCode()) && prodModFeatr.get(y).getProdModCode()
+							.equals(ticketDetails.getProductModules().get(i).getProductModCode())) {
 
-			for (int i = 0; i < ticketDetails.getProducts().size(); i++) {
-				prodModSorted = new ArrayList<ProductModules>();
-				for (int x = 0; x < prodMods.size(); x++) {
-					if (ticketDetails.getProducts().get(i).getProductCode().equals(prodMods.get(x).getProdCode())) {
-						prodModFeatrSorted = new ArrayList<ProductModuleFeature>();
-						for (int y = 0; y < prodModFeatr.size(); y++) {
+						productModuleFeaturePrivilegesSorted = new ArrayList<ProductModuleFeaturePrivileges>();
+						for (int z = 0; z < prodModFeatrPriv.size(); z++) {
+							if (prodModFeatr.get(y).getProdModFeatureName()
+									.equals(prodModFeatrPriv.get(z).getProdModFeatrName())) {
 
-							if (ticketDetails.getProducts().get(i).getProductCode()
-									.equals(prodModFeatr.get(y).getProdCode())
-									&& prodModFeatr.get(y).getProdModCode()
-											.equals(prodMods.get(x).getProductModCode())) {
-
-								productModuleFeaturePrivilegesSorted = new ArrayList<ProductModuleFeaturePrivileges>();
-								for (int z = 0; z < prodModFeatrPriv.size(); z++) {
-									if (prodModFeatr.get(y).getProdModFeatureName()
-											.equals(prodModFeatrPriv.get(z).getProdModFeatrName())) {
-
-										productModuleFeaturePrivilegesSorted.add(prodModFeatrPriv.get(z));
-
-									}
-
-								}
-								prodModFeatr.get(y).setProdModFeatrPriv(productModuleFeaturePrivilegesSorted);
-								prodModFeatrSorted.add(prodModFeatr.get(y));
+								productModuleFeaturePrivilegesSorted.add(prodModFeatrPriv.get(z));
 
 							}
+
 						}
-						prodMods.get(x).setProdModFeature(prodModFeatrSorted);
-						prodModSorted.add(prodMods.get(x));
+						prodModFeatr.get(y).setProdModFeatrPriv(productModuleFeaturePrivilegesSorted);
+						prodModFeatrSorted.add(prodModFeatr.get(y));
+
 					}
 				}
-				ticketDetails.getProducts().get(i).setProductModules(prodModSorted);
-			}
+				prodModFeatures.setProdCode(ticketDetails.getProductModules().get(i).getProdCode());
+				prodModFeatures.setProdModCode(ticketDetails.getProductModules().get(i).getProductModCode());
+				prodModFeatures.setProdModDesc(ticketDetails.getProductModules().get(i).getProductModDesc());
+				prodModFeatures.setProdModFeatrPriv(prodModFeatrSorted);
+				prodModFeatures.setprodModName(ticketDetails.getProductModules().get(i).getProductModName());
+				prodModFeatrs.add(prodModFeatures);
 
+			}
+			ticketDetails.setProductModuleFeatures(prodModFeatrs);
+			
 			if (ticketDetails != null) {
 				user.setTicketDetails(ticketDetails);
 			}
@@ -584,10 +579,13 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public Ticket getTicketDetails(String ticketId) {
 		Ticket ticket = null;
-		String sql = "SELECT MASTER_LOGIN_ID, PRODUCT_CODE, ROLE_TYPE, USER_NAME, WINDOW_ID FROM TICKET WHERE TICKET_ID='"
-				+ ticketId + "'";
+		String sql = "SELECT MASTER_LOGIN_ID, PRODUCT_CODE, ROLE_TYPE, USER_NAME, WINDOW_ID FROM TICKET WHERE TICKET_ID=?";
 		try {
-			ticket = jdbcTemplate.query(sql, new UserRepositoryImpl.TicketDetailExtractor());
+			ticket = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, ticketId);
+				}
+			},new UserRepositoryImpl.TicketDetailExtractor());
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;			
@@ -618,6 +616,7 @@ public class UserRepositoryImpl implements UserRepository {
 				ticketDetails = new TicketDetails();
 				ticketDetails.setCompName(rs.getString("company_name"));
 				ticketDetails.setCustID(rs.getString("customer_sys_id"));
+				ticketDetails.setCustCode(rs.getString("customer_code"));
 				ticketDetails.setRoleType(rs.getString("role_type"));
 				ticketDetails.setRoleName(rs.getString("role_name"));
 				ticketDetails.setLandingProd(rs.getString("landing_prod_sys_id"));
@@ -641,31 +640,7 @@ public class UserRepositoryImpl implements UserRepository {
 			}
 			return ticketDetails;
 		}
-	}
-
-	private class PrepareProductExtractor implements ResultSetExtractor<ArrayList<Products>> {
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see
-		 * org.springframework.jdbc.core.ResultSetExtractor#extractData(java
-		 * .sql.ResultSet)
-		 */
-		@Override
-		public ArrayList<Products> extractData(ResultSet rs) throws SQLException, DataAccessException {
-			Products products = null;
-			ArrayList<Products> prodList = new ArrayList<Products>();
-
-			while (rs.next()) {
-				products = new Products();
-				products.setProductCode(rs.getString("product_code"));
-				products.setProductDesc(rs.getString("product_desc"));
-				products.setProductName(rs.getString("product_name"));
-				prodList.add(products);
-			}
-			return prodList;
-		}
-	}
+	}	
 
 	private class PrepareProdModExtractor implements ResultSetExtractor<ArrayList<ProductModules>> {
 		/*
@@ -686,6 +661,8 @@ public class UserRepositoryImpl implements UserRepository {
 				productModules.setProductModCode(rs.getString("module_code"));
 				productModules.setProductModDesc(rs.getString("module_desc"));
 				productModules.setProductModName(rs.getString("module_name"));
+				productModules.setModuleURL(rs.getString("module_url"));
+				productModules.setDefaultMod(rs.getString("default"));
 				prodModList.add(productModules);
 			}
 			return prodModList;
@@ -706,12 +683,13 @@ public class UserRepositoryImpl implements UserRepository {
 			ArrayList<ProductModuleFeature> prodModFeaList = new ArrayList<ProductModuleFeature>();
 
 			while (rs.next()) {
-				productModulesFeatr = new ProductModuleFeature();
+				productModulesFeatr = new ProductModuleFeature();				
+				productModulesFeatr.setProdModFeatureDesc(rs.getString("feature_desc"));
 				productModulesFeatr.setProdCode(rs.getString("product_code"));
 				productModulesFeatr.setProdModCode(rs.getString("module_code"));
-				productModulesFeatr.setProdModFeatureDesc(rs.getString("feature_desc"));
 				productModulesFeatr.setProdModFeatureName(rs.getString("feature_name"));
 				productModulesFeatr.setDefaultURL(rs.getString("default_url"));
+				productModulesFeatr.setDefaultFeature(rs.getString("default"));
 				prodModFeaList.add(productModulesFeatr);
 			}
 			return prodModFeaList;
