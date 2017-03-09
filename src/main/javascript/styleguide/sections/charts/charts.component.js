@@ -6,10 +6,11 @@ import template from './charts.component.html';
 export const ChartsComponent = {
   template,
   controller: class ChartsController {
-    constructor($interval, $timeout) {
+    constructor($interval, $timeout, dxDataGridService) {
       'ngInject';
       this.$interval = $interval;
       this.$timeout = $timeout;
+      this._dxDataGridService = dxDataGridService;
 
       this.barChartOptions = {
         xAxis: {
@@ -50,18 +51,10 @@ export const ChartsComponent = {
           alignment: 'left'
         }];
 
-        return {
+        return this._dxDataGridService.mergeWithDefaultConfig({
           columns,
-          dataSource,
-          columnAutoWidth: true,
-          allowColumnReordering: true,
-          allowColumnResizing: true,
-          showColumnHeaders: true,
-          showColumnLines: false,
-          showRowLines: false,
-          showBorders: false,
-          rowAlternationEnabled: true
-        };
+          dataSource
+        });
       };
 
       this.areaChartOptions = {

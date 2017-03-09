@@ -31,7 +31,6 @@ export const AnalyzeReportPreviewComponent = {
 
     reloadPreviewGrid() {
       const grid = first(this._$componentHandler.get('arp-grid-container'));
-
       if (grid) {
         grid.updateColumns(this.model.columns);
         grid.updateSorts(this.model.sorts);

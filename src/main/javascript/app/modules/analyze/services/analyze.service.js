@@ -12,7 +12,7 @@ import some from 'lodash/fp/some';
 import set from 'lodash/fp/set';
 import get from 'lodash/fp/get';
 
-export function AnalyzeService($http) {
+export function AnalyzeService($http, $timeout, $q) {
   'ngInject';
 
   return {
@@ -22,7 +22,11 @@ export function AnalyzeService($http) {
     getMetrics,
     getArtifacts,
     getAnalyses,
-    getAnalyseById,
+    getLastPublishedAnalysis,
+    getPublishedAnalysesByAnalysisId,
+    getPublishedAnalysisById,
+    executeAnalysis,
+    getAnalysisById,
     getDataByQuery,
     getSupportedMethods,
     generateQuery,
@@ -35,7 +39,30 @@ export function AnalyzeService($http) {
     return $http.get('/api/analyze/analyses', {params: {category, query}}).then(get('data'));
   }
 
-  function getAnalyseById(id) {
+  function getPublishedAnalysesByAnalysisId(id) {
+    return $http.get(`/api/analyze/publishedAnalyses/${id}`).then(get('data'));
+  }
+
+  function getLastPublishedAnalysis(id) {
+    return $http.get(`/api/analyze/lastPublishedAnalysis/${id}`).then(get('data'));
+  }
+
+  function getPublishedAnalysisById(id) {
+    return $http.get(`/api/analyze/publishedAnalysis/${id}`).then(get('data'));
+  }
+
+  function executeAnalysis(analysisId) {
+    return $q(resolve => {
+      $timeout(() => {
+        resolve({
+          publishedAnalysisId: 3,
+          analysisId
+        });
+      }, 0);
+    });
+  }
+
+  function getAnalysisById(id) {
     return $http.get(`/api/analyze/byId/${id}`).then(get('data'));
   }
 

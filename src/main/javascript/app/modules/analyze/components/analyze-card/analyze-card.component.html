@@ -13,8 +13,10 @@
   <md-card-footer layout="row" layout-align="end start">
     <md-card-title>
       <md-card-title-text>
-        <span class="md-headline"
-              ng-bind-html="::$ctrl.model.name | highlight:$ctrl.highlightTerm"></span>
+        <a class="md-headline"
+              ng-bind-html="::$ctrl.model.name | highlight:$ctrl.highlightTerm"
+              ui-sref="analyze.publishedDetailLast({analysisId: $ctrl.model.id})">
+        </a>
         <span class="md-subhead">
           <span ng-bind-html="::($ctrl.model.metrics || []).join(', ') | highlight:$ctrl.highlightTerm"></span>
           <span ng-if="::$ctrl.model.scheduled">
@@ -31,7 +33,9 @@
         <md-icon md-font-icon="icon-fork"></md-icon>
       </md-button>
 
-      <md-button class="md-button btn-card" aria-label="Export">
+      <md-button class="md-button btn-card"
+                 aria-label="Execute"
+                 ng-click="$ctrl.execute($ctrl.model.id)">
         <md-icon md-font-icon="icon-folder"></md-icon>
       </md-button>
 
