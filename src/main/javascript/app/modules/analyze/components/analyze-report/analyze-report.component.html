@@ -62,7 +62,7 @@
 
           <div class="ard_canvas-query"
                ng-show="$ctrl.states.sqlMode === $ctrl.QUERY_MODE">
-            <textarea ng-model="$ctrl.model.query" readonly></textarea>
+            <textarea ng-model="$ctrl.model.query"></textarea>
           </div>
         </div>
       </div>
@@ -74,7 +74,7 @@
           <md-icon md-font-icon="icon-expand"></md-icon>
         </md-button>
 
-        <span class="ard_toolbar-text" flex
+        <span class="ard_toolbar-text"
               translate="REPORT"></span>
 
         <div class="ard_toolbar-actions" flex>
@@ -110,12 +110,12 @@
           <md-icon md-font-icon="icon-report"></md-icon>
         </div>
 
-        <div layout="row" ng-if="$ctrl.filters.selected.length > 0">
+        <div class="filter-chip-container" layout="row" ng-if="$ctrl.filters.selected.length > 0">
           <div layout="column" style="padding: 6px 20px 10px 0">
-            <span translate="N_FILTERS_APPLIED"
+            <span class="filter-counter" translate="N_FILTERS_APPLIED"
                   translate-values="{N: $ctrl.filters.selected.length}"
                   translate-interpolation="messageformat"></span>
-            <md-button class="btn-tertiary" ng-click="$ctrl.onClearAllFilters()" translate="CLEAR_ALL"></md-button>
+            <md-button class="btn-tertiary filter-clear-all" ng-click="$ctrl.onClearAllFilters()" translate="CLEAR_ALL"></md-button>
           </div>
           <md-chips class="filter-tags" readonly="true"
                     ng-model="$ctrl.filters.selected"

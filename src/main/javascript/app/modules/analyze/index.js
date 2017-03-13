@@ -10,6 +10,11 @@ import {FilterService} from './services/filter.service';
 
 import {AnalyzePageComponent} from './components/analyze-page/analyze-page.component';
 import {AnalyzeViewComponent} from './components/analyze-view/analyze-view.component';
+import {AnalyzePublishedListComponent} from './components/analyze-published-list/analyze-published-list.component';
+import {AnalyzeReportDetailComponent} from './components/analyze-published-detail/report/analyze-report-detail.component';
+import {AnalyzePivotDetailComponent} from './components/analyze-published-detail/pivot/analyze-pivot-detail.component';
+import {AnalyzeChartDetailComponent} from './components/analyze-published-detail/chart/analyze-chart-detail.component';
+import {AnalyzePublishedDetailComponent} from './components/analyze-published-detail/analyze-published-detail.component';
 import {AnalyzeCardComponent} from './components/analyze-card/analyze-card.component';
 import {AnalyzeNewComponent} from './components/analyze-new/analyze-new.component';
 import {AnalyzePivotComponent} from './components/analyze-pivot/analyze-pivot.component';
@@ -18,6 +23,9 @@ import {AnalyzeDialogComponent} from './components/analyze-dialog/analyze-dialog
 import {AnalyzeReportSortComponent} from './components/analyze-report-sort/analyze-report-sort.component';
 import {AnalyzeReportDescriptionComponent} from './components/analyze-report-description/analyze-report-description.component';
 import {AnalyzeReportPreviewComponent} from './components/analyze-report-preview/analyze-report-preview.component';
+import {ReportGridDisplayComponent} from './components/analyze-report-grid-display/grid/report-grid-display.component';
+import {ReportGridDisplayNodeComponent} from './components/analyze-report-grid-display/node/report-grid-display-node.component';
+import {ReportGridDisplayContainerComponent} from './components/analyze-report-grid-display/container/report-grid-display-container.component';
 import {ReportGridComponent} from './components/analyze-report-grid/report-grid/report-grid.component';
 import {ReportGridNodeComponent} from './components/analyze-report-grid/report-grid-node/report-grid-node.component';
 import {ReportGridContainerComponent} from './components/analyze-report-grid/report-grid-container/report-grid-container.component';
@@ -38,12 +46,20 @@ angular.module(AnalyzeModule, [])
   .config(i18nConfig)
   .factory('FilterService', FilterService)
   .factory('AnalyzeService', AnalyzeService)
+  .component('reportGridDisplay', ReportGridDisplayComponent)
+  .component('reportGridDisplayNode', ReportGridDisplayNodeComponent)
+  .component('reportGridDisplayContainer', ReportGridDisplayContainerComponent)
   .component('reportGridContainer', ReportGridContainerComponent)
   .component('reportGridNode', ReportGridNodeComponent)
   .component('reportGrid', ReportGridComponent)
   .component('reportRenameDialog', ReportRenameDialogComponent)
   .component('analyzePage', AnalyzePageComponent)
   .component('analyzeView', AnalyzeViewComponent)
+  .component('analyzePublishedList', AnalyzePublishedListComponent)
+  .component('analyzeReportDetail', AnalyzeReportDetailComponent)
+  .component('analyzePivotDetail', AnalyzePivotDetailComponent)
+  .component('analyzeChartDetail', AnalyzeChartDetailComponent)
+  .component('analyzePublishedDetail', AnalyzePublishedDetailComponent)
   .component('analyzeCard', AnalyzeCardComponent)
   .component('analyzeNew', AnalyzeNewComponent)
   .component('analyzePivot', AnalyzePivotComponent)

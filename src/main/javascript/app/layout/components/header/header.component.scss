@@ -18,3 +18,14 @@ layout-header {
     image-rendering: -webkit-optimize-contrast;
   }
 }
+
+.root-container > layout-header {
+  position: fixed;
+  z-index: 10;
+  width: 100%;
+  max-width: 1600px;
+
+  .lh-toolbar {
+    background-color: white;
+  }
+}

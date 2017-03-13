@@ -29,7 +29,7 @@ const EVENTS = {
   CLEAR_ALL_FILTERS: 'CLEAR_ALL_FILTERS'
 };
 
-export function FilterService($mdSidenav, $eventEmitter) {
+export function FilterService($mdSidenav, $eventEmitter, $log) {
   'ngInject';
 
   const unRegisterFuncs = [];
@@ -99,6 +99,8 @@ export function FilterService($mdSidenav, $eventEmitter) {
     return frontEndFilter => {
       const backEndFilter = {
         column_name: frontEndFilter.name,
+        label: frontEndFilter.label,
+        table_name: frontEndFilter.tableName,
         boolean_criteria: frontEndFilter.booleanCriteria,
         filter_type: frontEndFilter.type
       };
@@ -133,14 +135,15 @@ export function FilterService($mdSidenav, $eventEmitter) {
     return backEndFilter => {
       const frontEndFilter = {
         name: backEndFilter.column_name,
+        label: backEndFilter.label,
+        tableName: backEndFilter.table_name,
         booleanCriteria: backEndFilter.boolean_criteria,
         type: backEndFilter.filter_type
       };
 
       if (backEndFilter.filter_type === 'int' || backEndFilter.filter_type === 'double') {
+        frontEndFilter.operator = backEndFilter.operator;
         frontEndFilter.model = {
-          operator: backEndFilter.operator,
-
           otherValue: backEndFilter.operator === OPERATORS.BETWEEN ?
             backEndFilter.search_conditions[0] : null,
 
@@ -167,7 +170,7 @@ export function FilterService($mdSidenav, $eventEmitter) {
       filter(get('isFilterEligible')),
       map(field => {
         return {
-          tableName: field.table.name,
+          tableName: (field.table ? field.table.name : field.tableName),
           label: field.alias || field.displayName,
           name: field.name,
           type: field.type,
@@ -244,12 +247,17 @@ export function FilterService($mdSidenav, $eventEmitter) {
 
   function mergeCanvasFiltersWithPossibleFilters(canvasFilters, possibleFilters) {
     forEach(possibleFilters, possibleFilter => {
-      const targetCanvasFilter = find(canvasFilters, canvasFilter => (
-        possibleFilter.name === canvasFilter.name &&
-        possibleFilter.tableName === canvasFilter.table.name));
+      try {
+        const targetCanvasFilter = find(canvasFilters, canvasFilter => {
+          const tableName = canvasFilter.table ? canvasFilter.table.name : canvasFilter.tableName;
+          return possibleFilter.name === canvasFilter.name &&
+            possibleFilter.tableName === (tableName);
+        }) || {};
 
-      possibleFilter.operator = targetCanvasFilter.operator;
-      possibleFilter.model = targetCanvasFilter.model;
+        Object.assign(possibleFilter, targetCanvasFilter);
+      } catch (err) {
+        $log.error(err);
+      }
     });
   }
 

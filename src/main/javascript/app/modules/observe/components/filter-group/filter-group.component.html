@@ -1,28 +1,28 @@
 <div ng-repeat="filter in $ctrl.ngModel track by $index" ng-switch on="filter.type">
 
   <div ng-switch-when="time-range">
-    <panel title="{{::filter.label}}" class="time-range-panel" style="margin-top: 10px">
+    <panel title="::filter.label" class="time-range-panel" style="margin-top: 10px">
       <time-range-filter filter="filter" ng-model="filter.model" ng-change="$ctrl.onFilterSelected()">
       </time-range-filter>
     </panel>
   </div>
 
   <div ng-switch-when="checkbox">
-    <panel title="{{::filter.label}}" class="time-range-panel" style="margin-top: 10px">
+    <panel title="::filter.label" class="time-range-panel" style="margin-top: 10px">
       <checkbox-filter filter="filter" ng-model="filter.model" ng-change="$ctrl.onFilterSelected()">
       </checkbox-filter>
     </panel>
   </div>
 
   <div ng-switch-when="radio">
-    <panel title="{{::filter.label}}" class="time-range-panel" style="margin-top: 10px">
+    <panel title="::filter.label" class="time-range-panel" style="margin-top: 10px">
       <radio-filter filter="filter" ng-model="filter.model" ng-change="$ctrl.onFilterSelected()">
       </radio-filter>
     </panel>
   </div>
 
   <div ng-switch-when="price-range">
-    <panel title="{{::filter.label}}" class="time-range-panel" style="margin-top: 10px">
+    <panel title="::filter.label" class="time-range-panel" style="margin-top: 10px">
       <price-range-filter filter="filter" ng-model="filter.model" ng-change="$ctrl.onFilterSelected()">
       </price-range-filter>
     </panel>

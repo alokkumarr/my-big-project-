@@ -146,8 +146,11 @@
           "filters": [
             {
               "column_name": "TotalPrice",
+              "label": "Total Price",
+              "table_name": "Orders",
               "boolean_criteria": "AND",
-              "operator": ">=",
+              "operator": "x >=",
+              "filter_type": "int",
               "search_conditions": [
                 1
               ]
@@ -305,6 +308,19 @@
         "data": []
       }
     ]
+  },
+  {
+    "id": "10",
+    "type": "pivot",
+    "name": "Pivot test",
+    "description": "Test description",
+    "category": "11",
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": "Every Friday at 12:00pm",
+    "artifacts": []
   },
   {
     "id": "3",

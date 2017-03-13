@@ -14,11 +14,15 @@
         <md-input-container class="analyze-view_switch-view">
           <md-radio-group ng-model="$ctrl.states.reportView">
             <md-radio-button ng-value="$ctrl.LIST_VIEW">
-              <md-icon md-font-icon="icon-Table-view"></md-icon>
+              <md-icon md-font-icon="icon-Table-view">
+                <md-tooltip>{{ "TOOLTIP_LIST_VIEW" | translate }}</md-tooltip>
+              </md-icon>
             </md-radio-button>
 
             <md-radio-button ng-value="$ctrl.CARD_VIEW">
-              <md-icon md-font-icon="icon-card-view"></md-icon>
+              <md-icon md-font-icon="icon-card-view">
+                <md-tooltip>{{ "TOOLTIP_CARD_VIEW" | translate }}</md-tooltip>
+              </md-icon>
             </md-radio-button>
           </md-radio-group>
         </md-input-container>
@@ -77,11 +81,18 @@
             <div data-options="dxTemplate: { name: 'actionCellTemplate' }">
               <md-card-actions layout="row" layout-align="center center">
                 <md-button class="md-button btn-card" aria-label="Fork"
-                           ng-click="$ctrl.fork(report.data)">
+                        ng-click="$ctrl.fork(report.data)">
+                  <md-tooltip>{{ "TOOLTIP_FORK_ANALYSIS" | translate }}</md-tooltip>
+
                   <md-icon md-font-icon="icon-fork"></md-icon>
                 </md-button>
-                <md-button class="md-button btn-card" aria-label="Export">
+                <md-button class="md-button btn-card"
+                           aria-label="Execute"
+                           ng-click="$ctrl.execute(report.data.id)">
                   <md-icon md-font-icon="icon-folder"></md-icon>
+                  <md-tooltip>
+                    <span translate="TOOLTIP_EXECUTE_ANALYSIS"></span>
+                  </md-tooltip>
                 </md-button>
 
                 <md-menu-bar>
@@ -109,7 +120,7 @@
 
     <!-- CARD VIEW -->
     <div ng-switch-when="card" layout="row" layout-align="start start" layout-wrap>
-      <div flex-md="50" ng-repeat="report in $ctrl.reports | filter:$ctrl.filterReports.bind($ctrl)">
+      <div flex-gt-sm="50" ng-repeat="report in $ctrl.reports | filter:$ctrl.filterReports.bind($ctrl)">
         <analyze-card model="report" on-action="$ctrl.onCardAction(type, model)"
                       highlight-term="$ctrl.states.searchTerm"></analyze-card>
       </div>
