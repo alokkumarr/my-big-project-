@@ -3,42 +3,214 @@
     "artifact_name": "Orders",
     "artifact_position": [
       5,
-      130
+      5
     ],
     "artifact_attributes": [
       {
-        "display_name": "Order ID",
-        "column_name": "OrderID",
+        "column_name": "ORDER_END_TIMESTAMP",
+        "display_name": "Order End Timestamp",
         "alias_name": "",
-        "type": "int",
-        "hide": true,
-        "join_eligible": true,
-        "filter_eligible": false,
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
         "checked": false
       },
       {
-        "display_name": "Shipper",
-        "column_name": "Shipper",
+        "column_name": "REC_STATE",
+        "display_name": "Rec State",
         "alias_name": "",
         "type": "int",
         "hide": false,
-        "join_eligible": true,
-        "filter_eligible": false,
+        "join_eligible": false,
+        "filter_eligible": true,
         "checked": false
       },
-      {
-        "display_name": "Customer",
-        "column_name": "Customer",
+        {
+        "column_name": "SERVICE",
+        "display_name": "Service",
         "alias_name": "",
-        "type": "int",
+        "type": "string",
         "hide": false,
-        "join_eligible": true,
-        "filter_eligible": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+          {
+        "column_name": "EXTERNAL_ORDER_NUMBER",
+        "display_name": "External Order Number",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
         "checked": false
       },
       {
-        "display_name": "Total Price",
-        "column_name": "TotalPrice",
+        "column_name": "FACT_PRODUCT_ID",
+        "display_name": "Fact Product Id",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "ENR_PARTNER",
+        "display_name": "Enr Partner",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "EVER_PENDING_INSTALL",
+        "display_name": "Ever Pending Install",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "REASON_NOTE",
+        "display_name": "Reason Note",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "CON_SMB",
+        "display_name": "Con Smb",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "CUSTOMER_TYPE",
+        "display_name": "Customer Type",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "CHANNEL",
+        "display_name": "Channel",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "START_DATE",
+        "display_name": "Start Date",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "END_DATE",
+        "display_name": "End Date",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+
+       {
+        "column_name": "UPGRADE_PRODUCT_TYPE",
+        "display_name": "Upgrade Product Type",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "BANDWIDTH_BUCKET",
+        "display_name": "Bandwidth Bucket",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "REASON_DESC",
+        "display_name": "Reason Desc",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "PARTNER",
+        "display_name": "Partner",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "AFFILIATE_DISPLAY_NAME",
+        "display_name": "Affiliate Display Name",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+
+      {
+        "column_name": "ORDER_STATUS_DATE",
+        "display_name": "Order Status Date",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "ORDER_STATUS_END_DATE",
+        "display_name": "Order Status End Date",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "ORDER_CANCELLATION_TIME",
+        "display_name": "Order Cancellation Time",
         "alias_name": "",
         "type": "int",
         "hide": false,
@@ -47,118 +219,122 @@
         "checked": false
       },
       {
-        "display_name": "Warehouse",
-        "column_name": "Warehouse",
+        "column_name": "ORDER_STATUS_START_DATE",
+        "display_name": "Order Status Start Date",
         "alias_name": "",
-        "type": "int",
-        "hide": false,
-        "join_eligible": true,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "display_name": "Address",
-        "column_name": "Address",
-        "alias_name": "Order Address",
         "type": "string",
         "hide": false,
         "join_eligible": false,
-        "filter_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "ORDER_RECEIVED_TIMESTAMP",
+        "display_name": "Order Received Timestamp",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "ORDER_RECEIVED_DATE",
+        "display_name": "Order Received Date",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "ORDER_NUMBER",
+        "display_name": "Order Number",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "ORDER_STATUS_TIME",
+        "display_name": "Order Status Time",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "ORDER_TYPE",
+        "display_name": "Order Type",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "ORDER_CLASSIFICATION",
+        "display_name": "Order Classification",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "ORDER_COMPLETION_TIME",
+        "display_name": "Order Completion Time",
+        "alias_name": "",
+        "type": "int",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "ORDER_CNT",
+        "display_name": "Order Count",
+        "alias_name": "",
+        "type": "int",
+        "hide": true,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "ORD_OM_STATUS",
+        "display_name": "Order Status",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
         "checked": false
       }
     ],
     "sql_builder": {
       "group_by_columns": [],
       "order_by_columns": [],
-      "joins": [
-        {
-          "type": "inner",
-          "criteria": [
-            {
-              "table_name": "Orders",
-              "column_name": "Shipper",
-              "side": "right"
-            },
-            {
-              "table_name": "Shippers",
-              "column_name": "ShipperID",
-              "side": "left"
-            }
-          ]
-        },
-        {
-          "type": "inner",
-          "criteria": [
-            {
-              "table_name": "Orders",
-              "column_name": "Customer",
-              "side": "right"
-            },
-            {
-              "table_name": "Customers",
-              "column_name": "CustomerID",
-              "side": "left"
-            }
-          ]
-        },
-        {
-          "type": "inner",
-          "criteria": [
-            {
-              "table_name": "Orders",
-              "column_name": "Warehouse",
-              "side": "right"
-            },
-            {
-              "table_name": "Warehouses",
-              "column_name": "WarehouseID",
-              "side": "left"
-            }
-          ]
-        }
-      ],
-      "filters": [{
-        "column_name": "TotalPrice",
-        "boolean_criteria": "AND",
-        "filter_type": "int",
-        "operator": "x >",
-        "search_conditions": [
-          1
-        ]
-      }, {
-        "column_name": "WarehouseName",
-        "boolean_criteria": "OR",
-        "filter_type": "string",
-        "operator": null,
-        "search_conditions": [
-          "Warehouse1",
-          "Warehouse2",
-          "Warehouse3",
-          "Warehouse5"
-        ]
-      }]
+      "joins": []
     }
   },
   {
-    "artifact_name": "Shippers",
+    "artifact_name": "Products",
     "artifact_position": [
-      400,
+      200,
       5
     ],
     "artifact_attributes": [
       {
-        "display_name": "Shipper ID",
-        "column_name": "ShipperID",
-        "alias_name": "",
-        "type": "int",
-        "hide": false,
-        "join_eligible": true,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "display_name": "Shipper Name",
-        "column_name": "ShipperName",
+        "column_name": "PRODUCT_STATUS_DATE",
+        "display_name": "Product Status Date",
         "alias_name": "",
         "type": "string",
         "hide": false,
@@ -167,13 +343,153 @@
         "checked": false
       },
       {
-        "display_name": "Region",
-        "column_name": "Region",
-        "alias_name": "Shipper Region",
+        "column_name": "PRODUCT_STATUS_START_DATE",
+        "display_name": "Product Status Start Date",
+        "alias_name": "",
         "type": "string",
         "hide": false,
         "join_eligible": false,
-        "filter_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "PRODUCT_STATUS_END_DATE",
+        "display_name": "Product Status End Date",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "PRODUCT_GROUP_DESC",
+        "display_name": "Product Group Desc",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "PRODUCT_GROUP_NAME",
+        "display_name": "Product Group Name",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "ENR_PRODUCT",
+        "display_name": "Enr Product",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "PRODUCT_CANCELLATION_TIME",
+        "display_name": "Product Cancellation Time",
+        "alias_name": "",
+        "type": "int",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "PRODUCT_DISPLAY_NAME",
+        "display_name": "Product Display Name",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "PRODUCT_DESC",
+        "display_name": "Product Desc",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "PRODUCT_CNT",
+        "display_name": "Product Count",
+        "alias_name": "",
+        "type": "int",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "PRODUCT_END_TIMESTAMP",
+        "display_name": "Product End Timestamp",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "PRODUCT_TYPES",
+        "display_name": "Product Types",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "PRODUCT_STATUS_TIME",
+        "display_name": "Product Status Time",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "PRODUCT_COMPLETION_TIME",
+        "display_name": "Product Completion Time",
+        "alias_name": "",
+        "type": "int",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "PRODUCT_CATEGORY",
+        "display_name": "Product Category",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "BUNDLE_TYPE",
+        "display_name": "Bundle Type",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
         "checked": false
       }
     ],
@@ -186,23 +502,13 @@
   {
     "artifact_name": "Customers",
     "artifact_position": [
-      400,
-      200
+      600,
+      5
     ],
     "artifact_attributes": [
       {
-        "display_name": "Customer ID",
-        "column_name": "CustomerID",
-        "alias_name": "",
-        "type": "int",
-        "hide": false,
-        "join_eligible": true,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "display_name": "Customer Name",
-        "column_name": "CustomerName",
+        "column_name": "STATE_NAME",
+        "display_name": "State Name",
         "alias_name": "",
         "type": "string",
         "hide": false,
@@ -211,23 +517,103 @@
         "checked": false
       },
       {
-        "display_name": "Address",
-        "column_name": "Address",
-        "alias_name": "Customer Address",
+        "column_name": "FIRST_NAME",
+        "display_name": "First Name",
+        "alias_name": "",
         "type": "string",
         "hide": false,
         "join_eligible": false,
-        "filter_eligible": false,
+        "filter_eligible": true,
         "checked": false
       },
       {
-        "display_name": "Phone Number",
-        "column_name": "PhoneNumber",
-        "alias_name": "Customer Phone Number",
+        "column_name": "LAST_NAME",
+        "display_name": "Last Name",
+        "alias_name": "",
         "type": "string",
         "hide": false,
         "join_eligible": false,
-        "filter_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "STATE_CODE",
+        "display_name": "State Code",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "REGION_GROUP",
+        "display_name": "Region Group",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "REGION",
+        "display_name": "Region",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "EMAIL_ADDRESS",
+        "display_name": "Email Address",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "HOME_PHONE",
+        "display_name": "Home Phone",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "WORK_PHONE",
+        "display_name": "Work Phone",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "ENR_LOCATION_ADDRESS",
+        "display_name": "Location Address",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "ENR_CUSTOMER_INFO",
+        "display_name": "Customer Info",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
         "checked": false
       }
     ],
@@ -238,25 +624,15 @@
     }
   },
   {
-    "artifact_name": "Warehouses",
+    "artifact_name": "Service",
     "artifact_position": [
-      350,
-      420
+      400,
+      5
     ],
     "artifact_attributes": [
       {
-        "display_name": "Warehouse ID",
-        "column_name": "WarehouseID",
-        "alias_name": "",
-        "type": "int",
-        "hide": false,
-        "join_eligible": true,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "display_name": "Warehouse Name",
-        "column_name": "WarehouseName",
+        "column_name": "SERVICE_LEVEL_DESC",
+        "display_name": "Service Level Desc",
         "alias_name": "",
         "type": "string",
         "hide": false,
@@ -265,13 +641,73 @@
         "checked": false
       },
       {
-        "display_name": "Warehouse Address",
-        "column_name": "WarehouseAddress",
+        "column_name": "SERVICE_ADDRESS1",
+        "display_name": "Service Address1",
         "alias_name": "",
         "type": "string",
         "hide": false,
         "join_eligible": false,
-        "filter_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "SERVICE_ADDRESS2",
+        "display_name": "Service Address2",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "SERVICE_STATE",
+        "display_name": "Service State",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "SERVICE_CITY",
+        "display_name": "Service City",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "SERVICE_ZIPCODE",
+        "display_name": "Service Zipcode",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "PROD_OM_STATUS",
+        "display_name": "Product Status",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "STATUS_DESC",
+        "display_name": "Status Desc",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
         "checked": false
       }
     ],
