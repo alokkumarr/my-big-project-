@@ -1,0 +1,18 @@
+<div layout="row">
+
+  <md-input-container flex="30" ng-show="$ctrl.filter.operator === $ctrl.OPERATORS.BETWEEN">
+    <input type="number" ng-model="$ctrl.filter.model.otherValue" />
+  </md-input-container>
+
+  <md-input-container flex="40" md-no-float>
+    <md-select ng-model="$ctrl.filter.operator" placeholder="{{'PLEASE_SELECT' | translate}}">
+      <md-option ng-repeat="operator in $ctrl.operators"
+                 ng-value="operator"
+                 ng-bind="::operator"></md-option>
+    </md-select>
+  </md-input-container>
+
+  <md-input-container flex="{{$ctrl.filter.operator === $ctrl.OPERATORS.BETWEEN ? 30 : 60}}">
+    <input type="number" ng-model="$ctrl.filter.model.value"/>
+  </md-input-container>
+</div>

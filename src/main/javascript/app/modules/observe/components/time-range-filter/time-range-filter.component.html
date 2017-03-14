@@ -1,0 +1,46 @@
+<div layout-gt-xs="row">
+  <md-icon
+    md-font-icon="icon-calendar">
+  </md-icon>
+  <md-input-container flex-gt-xs>
+    <label translate="FROM"></label>
+    <md-datepicker
+      ng-model="$ctrl.ngModel.fromDate" ng-change="$ctrl.onDatesSelected($ctrl.ngModel)"
+      md-hide-icons="all" md-open-on-focus
+      md-placeholder="mm/dd/yyyy"
+    ></md-datepicker>
+  </md-input-container>
+  <div style="width: 20px;padding: 0 3px;">
+    <div></div>
+  </div>
+  <md-icon
+    md-font-icon="icon-calendar">
+  </md-icon>
+  <md-input-container flex-gt-xs>
+    <label translate="TO"></label>
+    <md-datepicker
+      ng-model="$ctrl.ngModel.toDate" ng-change="$ctrl.onDatesSelected($ctrl.ngModel)"
+      md-hide-icons="all" md-open-on-focus
+      md-placeholder="mm/dd/yyyy"
+    ></md-datepicker>
+  </md-input-container>
+</div>
+<div class="time-range-shortcut-btns">
+
+  <md-button class="md-primary" aria-label="1st Week"
+             translate="NTH_WEEK"
+             translate-values="{N: 1}"
+             translate-interpolation="messageformat">
+  </md-button>
+  <md-button class="md-primary" aria-label="2nd Week"
+             translate="NTH_WEEK"
+             translate-values="{N: 2}"
+             translate-interpolation="messageformat">
+  </md-button>
+
+  <md-button class="md-primary" aria-label="More">
+    <md-icon md-font-icon="icon-Shape-Copy-2"></md-icon>
+    <span translate="MORE"></span>
+  </md-button>
+
+</div>

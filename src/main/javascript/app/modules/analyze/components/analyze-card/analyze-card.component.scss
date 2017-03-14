@@ -1,0 +1,61 @@
+.saw-analyze-card {
+  .saw-ac-placeholder {
+    height: 159px;
+    width: 434px;
+    background-size: 434px 159px;
+
+    &.m-chart-bubble {
+      background-image: url('~img/charts/chart-bubble.png');
+    }
+
+    &.m-chart-column {
+      background-image: url('~img/charts/chart-column.png');
+    }
+
+    &.m-chart-donut {
+      background-image: url('~img/charts/chart-donut.png');
+    }
+
+    &.m-chart-line {
+      background-image: url('~img/charts/chart-line.png');
+    }
+
+    &.m-chart-pie {
+      background-image: url('~img/charts/chart-pie.png');
+    }
+
+    &.m-chart-scatter {
+      background-image: url('~img/charts/chart-scatter.png');
+    }
+
+    &.m-chart-stack {
+      background-image: url('~img/charts/chart-stack.png');
+    }
+  }
+
+  md-card-title {
+    padding: 0;
+
+    .md-headline {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .md-subhead {
+      font-size: 12px;
+      padding-top: 0 !important;
+    }
+  }
+
+  md-icon {
+    text-align: center;
+  }
+
+  .md-button {
+    min-width: 35px;
+  }
+
+  &_report {
+    width: 100%;
+  }
+}

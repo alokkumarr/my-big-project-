@@ -1,45 +1,57 @@
 $theme-name: triton;
 $theme-cls: "md-#{$theme-name}-theme";
 
-
 //== Iconography
 //
 
 //Load fonts from this directory.
-$icon-font-path:          "../fonts/fonts";
+$icon-font-path: "~fonts";
 // File name for all font files.
-$icon-font-name:          "icomoon";
+$icon-font-name: "icomoon";
 
+$highlight-bg-color: yellow;
 
 // Forms
-$input-color: #5C6670;
+$checkbox-inactive-bg-color: #F6F8FB;
+$checkbox-inactive-border: 1px solid #CECECE;
+$checkbox-active-bg-color: #1A89D4;
+$checkbox-active-border: 1px solid #1A89D4;
+$checkbox-label-color: #596574;
+
+$radiobtn-iactive-bg-color: #F6F8FB;
+$radiobtn-inactive-border: 1px solid #CECECE;
+$radiobtn-active-bg-color: #1A89D4;
+$radiobtn-active-border: 1px solid #FFFFFF;
+$radiobtn-label-color: #596574;
+
 $input-bg-color: #F6F8FB;
 $input-border: 1px solid #CECECE;
-$input-border-radius: 3px;
+$input-color: #5C6670;
+$input-label-color: #8D9398;
 $input-font-size: 12px;
+
 $input-line-height: $input-font-size;
 $input-padding: 5px;
-$input-focused-border-color: rgb(25,118,210);
-
-$input-label-color: #8D9398;
-
+$input-focused-border-color: rgb(25, 118, 210);
 
 $dropdown-normal-bg-color: #F6F8FB;
 
-
 // Buttons
-$btn-primary-bg-color: rgba(26, 137, 212, 0.75);
+$btn-primary-bg-color: #1A89D4;
+$btn-primary-bg-hover-color: rgba(25, 136, 211, 0.75);
 $btn-primary-text-color: white;
 
-$btn-secondary-color: #5C6670;
+$btn-secondary-text-color: #5C6670;
+$btn-secondary-bg-hover-color: #F6F6F6;
 $btn-secondary-border: 1px solid #D1D3D3;
-$btn-secondary-hover-color: #F6F6F6;
 
-$btn-link-color: #1A89D4;
+$btn-tertiary-text-color: #1A89D4;
+$btn-card-text-color: #5C6670;
 
 // Side bars
-$sidebar-right-bg-color: #F3F5F8;
-$sidebar-left-bg-color: #F3F5F8;
+$sidebar-right-bg-color: #FFF;
+$sidebar-left-bg-color: #FFF;
+$sidebar-left-width: 240px;
 
 // Grid
 $ui-grid-cell-padding-right: 30px;
@@ -47,9 +59,11 @@ $ui-grid-row-height: 36px; // should be the same from your gridOptions. Both in 
 $ui-grid-cell-content-padding: 5px;
 $ui-grid-cell-color: #575757;
 
-
 // Cards
-$cards-border-color: #D1D3D3;
+$card-bg-color: #FFFFFF;
+$card-shadow-color: rgba(20, 39, 54, 0.17);
+
+$cards-border-color: #DBE1EB;
 $card-footer-border-top: 1px solid $cards-border-color;
 $card-content-main-color: #575757;
 $card-font-size: 12px;
@@ -62,17 +76,20 @@ $date-picker-open-background-color: #FFFFFF;
 $date-picker-selection-indicator-color: #1A89D4;
 
 // Typography
-
-$app-font-color: #5C6670;
+$app-font-color: #575757;
+$link-color: #1A89D4;
 
 // Login
 
 $login-middle-logo-color: #1A89D4;
 
 // Logos
-$company-logo-path: '../assets/synchronoss-transparent.png';
-$symmetra-logo-path: '../assets/symmetra-mark.png';
-$powered-by-synchronoss-logo-path: '../assets/synchronoss_logo_360.png';
+$company-logo-path: '~img/synchronoss-transparent.png';
+$symmetra-logo-path: '~img/symmetra-mark.png';
+$powered-by-synchronoss-logo-path: '~img/synchronoss_logo_360.png';
+
+// tags
+$tag-bg-color: #DFE3EA;
+$tag-text-color: #596574;
 
 @import "./base/base";
-

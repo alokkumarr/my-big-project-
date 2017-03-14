@@ -1,0 +1,144 @@
+<analyze-dialog control="$ctrl" class="analyze-report-dialog">
+  <analyze-dialog-header>
+    <div layout="row">
+      <md-button class="ard_back-btn"
+                 ng-click="$ctrl.$dialog.closeDialog()">
+        <md-icon md-font-icon="icon-arrow-left"></md-icon>
+      </md-button>
+
+      <div class="ard_meta" flex>
+        <div class="md-title">
+          <strong class="e2e-report-title" ng-bind="$ctrl.model.name"></strong>
+          <label translate="DRAFT"></label>
+        </div>
+        <div class="md-description">
+          <md-icon md-font-icon="icon-report"></md-icon>
+          <span translate="ORDERS"></span>
+        </div>
+      </div>
+
+      <div class="ard_actions" flex>
+        <md-button ng-click="$ctrl.openSaveModal()"
+                   translate="SAVE">
+        </md-button>
+      </div>
+    </div>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+    <analyze-filter-sidenav></analyze-filter-sidenav>
+
+    <div layout="column">
+      <div class="ard_content" layout="column">
+        <div layout="row" class="ard_sub-header">
+          <span ng-if="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE"
+                translate="CHOOSE_FIELDS_TO_SHOW_IN_YOUR_REPORT">
+          </span>
+
+          <span ng-if="$ctrl.states.sqlMode === $ctrl.QUERY_MODE"
+                translate="SQL_QUERY">
+          </span>
+
+          <div>
+            <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.DESIGNER_MODE}"
+                       ng-disabled="$ctrl.states.disable.designer"
+                       ng-click="$ctrl.setSqlMode($ctrl.DESIGNER_MODE)">
+              <md-icon md-font-icon="icon-designer-mode"></md-icon>
+              <span translate="DESIGNER"></span>
+            </md-button>
+
+            <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.QUERY_MODE}"
+                       ng-click="$ctrl.setSqlMode($ctrl.QUERY_MODE)">
+              <md-icon md-font-icon="icon-query-mode"></md-icon>
+              <span translate="QUERY"></span>
+            </md-button>
+          </div>
+        </div>
+
+        <div layout="row" class="ard_canvas">
+          <div ng-show="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE">
+            <js-plumb-canvas id="ard-canvas"></js-plumb-canvas>
+          </div>
+
+          <div class="ard_canvas-query"
+               ng-show="$ctrl.states.sqlMode === $ctrl.QUERY_MODE">
+            <textarea ng-model="$ctrl.model.query"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div layout="row" class="ard_toolbar">
+        <md-button class="ard_toolbar-expand"
+                   ng-class="{'m-expanded':$ctrl.states.detailsExpanded}"
+                   ng-click="$ctrl.toggleDetailsPanel()">
+          <md-icon md-font-icon="icon-expand"></md-icon>
+        </md-button>
+
+        <span class="ard_toolbar-text"
+              translate="REPORT"></span>
+
+        <div class="ard_toolbar-actions" flex>
+          <md-button ng-click="$ctrl.openDescriptionModal($event)">
+            <md-icon md-font-icon="icon-description"></md-icon>
+            <span translate="DESCRIPTION"></span>
+          </md-button>
+
+          <md-button ng-click="$ctrl.openPreviewModal($event)"
+                     ng-disabled="$ctrl.isPreviewDisabled()">
+            <md-icon md-font-icon="icon-full-screen"></md-icon>
+            <span translate="PREVIEW"></span>
+          </md-button>
+
+          <md-button ng-click="$ctrl.openSortModal($event)"
+                     ng-disabled="$ctrl.isSortDisabled()">
+            <md-icon md-font-icon="icon-sort"></md-icon>
+            <span translate="SORT"></span>
+          </md-button>
+
+          <md-button ng-if="$ctrl.showFiltersButton" ng-click="$ctrl.openFilterSidenav()">
+            <md-icon md-font-icon="icon-filter"></md-icon>
+            <span translate="FILTER"></span>
+          </md-button>
+        </div>
+      </div>
+
+      <div layout="column" class="ard_details-panel"
+           ng-if="$ctrl.states.detailsExpanded">
+        <div layout="column" class="ard_details-panel-empty"
+             ng-show="!$ctrl.hasSelectedColumns()">
+          <span translate="CHOOSE_FIELDS_ABOVE_TO_PREVIEW_YOUR_REPORT"></span>
+          <md-icon md-font-icon="icon-report"></md-icon>
+        </div>
+
+        <div class="filter-chip-container" layout="row" ng-if="$ctrl.filters.selected.length > 0">
+          <div layout="column" style="padding: 6px 20px 10px 0">
+            <span class="filter-counter" translate="N_FILTERS_APPLIED"
+                  translate-values="{N: $ctrl.filters.selected.length}"
+                  translate-interpolation="messageformat"></span>
+            <md-button class="btn-tertiary filter-clear-all" ng-click="$ctrl.onClearAllFilters()" translate="CLEAR_ALL"></md-button>
+          </div>
+          <md-chips class="filter-tags" readonly="true"
+                    ng-model="$ctrl.filters.selected"
+                    md-removable="true"
+                    md-on-remove="$ctrl.onFilterRemoved($chip)">
+            <md-chip-template>
+              <span ng-bind="$chip.label"></span>
+            </md-chip-template>
+
+            <button class="md-primary" md-chip-remove>
+              <md-icon md-font-icon="icon-remove"></md-icon>
+            </button>
+          </md-chips>
+        </div>
+
+        <report-grid-container id="ard-grid-container" class="ard_details-grid" layout="row"
+                               source="$ctrl.filteredGridData"
+                               columns="$ctrl.columns"
+                               show-group-panel="true"
+                               show-view-more="true"
+                               ng-show="$ctrl.columns.length">
+        </report-grid-container>
+      </div>
+    </div>
+  </analyze-dialog-content>
+</analyze-dialog>

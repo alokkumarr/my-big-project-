@@ -1,0 +1,29 @@
+<div ng-switch="!!$ctrl.source.isGroup">
+  <div class="indent"
+       ng-switch-when="true">
+    <div ng-repeat="groupNode in $ctrl.source.groupNodes track by $index">
+      <div layout="row" layout-align="start center">
+        <h3 ng-bind="groupNode.groupValue"></h3>
+
+        <md-chips>
+          <md-chip ng-bind="groupNode.itemCount"></md-chip>
+        </md-chips>
+      </div>
+
+      <report-grid-node
+        report-grid-container="$ctrl.reportGridContainer"
+        report-grid-node="$ctrl"
+        source="groupNode.source">
+      </report-grid-node>
+    </div>
+  </div>
+
+  <div ng-switch-default
+       ng-if="$ctrl.settings.layoutMode === $ctrl.LAYOUT_MODE.DETAIL">
+    <report-grid
+      report-grid-container="$ctrl.reportGridContainer"
+      report-grid-node="$ctrl"
+      source="$ctrl.source">
+    </report-grid>
+  </div>
+</div>

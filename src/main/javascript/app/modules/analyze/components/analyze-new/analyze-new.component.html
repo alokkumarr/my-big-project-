@@ -1,0 +1,60 @@
+<analyze-dialog class="new-analyze-dialog">
+  <analyze-dialog-header>
+    <div layout="row">
+      <div class="md-title" translate="NEW_ANALYSIS"></div>
+
+      <md-button class="btn-card" >
+        <md-icon md-font-icon="icon-upload"></md-icon>
+        <span translate="UPLOAD"></span>
+      </md-button>
+    </div>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+    <div layout="column">
+      <div class="md-subhead" translate="WHAT_WOULD_YOU_LIKE_TO_ANALYZE"></div>
+
+      <div>
+        <div layout="row" layout-wrap>
+          <md-checkbox class="adc-metric" flex="20"
+                       ng-repeat="metric in $ctrl.metrics track by $index"
+                       ng-model="metric.checked"
+                       ng-disabled="metric.disabled"
+                       ng-change="$ctrl.onMetricToggle()">
+            <span ng-bind="::metric.name"></span>
+          </md-checkbox>
+        </div>
+      </div>
+
+      <div class="md-subhead" translate="HOW_WOULD_YOU_LIKE_TO_ANALYZE"></div>
+
+      <div>
+        <div class="adc-method"
+             ng-repeat="method in $ctrl.methods track by $index">
+          <div class="md-body-1" flex
+               ng-bind="::method.label"></div>
+          <div flex>
+            <choice-group class="m-large"
+                          items="method.children"
+                          ng-model="$ctrl.selectedAnalysisMethod">
+            </choice-group>
+          </div>
+        </div>
+      </div>
+    </div>
+  </analyze-dialog-content>
+
+  <analyze-dialog-footer>
+    <div class="layout-row">
+      <md-button class="btn-primary"
+                 ng-disabled="!$ctrl.selectedAnalysisMethod"
+                 ng-click="$ctrl.createAnalysis()"
+                 translate="CREATE_ANALYSIS">
+      </md-button>
+
+      <md-button class="btn-card"
+                 ng-click="$ctrl.cancel()" translate="CANCEL">
+      </md-button>
+    </div>
+  </analyze-dialog-footer>
+</analyze-dialog>

@@ -1,55 +1,73 @@
 import angular from 'angular';
 import 'angular-ui-router';
+
 import 'angular-material';
 import 'angular-material/angular-material.css';
-import '../../../../fonts/style.css';
+
+import 'angular-local-storage';
+import 'angular-sanitize';
+import 'angular-translate';
+import 'angular-translate/dist/angular-translate-loader-partial/angular-translate-loader-partial';
+import 'angular-translate/dist/angular-translate-interpolation-messageformat/angular-translate-interpolation-messageformat';
+
+import 'ng-idle';
+
+import 'mottle';
+
+import 'devextreme/ui/data_grid';
 import 'devextreme/integration/angular';
-import 'angular-ui-grid';
-import 'angular-ui-grid/ui-grid.css';
+import 'devextreme/dist/css/dx.common.css';
+import 'devextreme/dist/css/dx.light.css';
+
+import 'fonts/icomoon.css';
+
+import AppConfig from '../../../../appConfig';
 
 import {routesConfig} from './routes';
 import {themeConfig} from './theme';
+import {i18nConfig} from './i18n';
+import {config} from './config';
+import {runConfig} from './run';
 
-import {RootComponent} from './layout/root.component';
-import {HomeComponent} from './home.component';
-import {HeaderComponent} from './layout/header.component';
-import {FooterComponent} from './layout/footer.component';
-import {SidenavComponent, SidenavBtnComponent, SidenavTargetDirective} from './sidenav';
-
-import {ObserveModule} from './observe';
-import {AnalyzeModule} from './analyze';
-import {CheckboxFilterComponent, RadioFilterComponent, TimeRangeFilterComponent, PriceRangeFilterComponent, FilterGroupComponent} from './observe/filters';
-import {FilterSidenavComponent} from './observe/filter-sidenav.component';
-
-// import app modules
 import {LibModule} from './lib';
-import {loginModule} from '../login';
+import {CommonModule} from './modules/common';
+import {ObserveModule} from './modules/observe';
+import {AnalyzeModule} from './modules/analyze';
+import {AlertsModule} from './modules/alerts';
 
-export const app = 'app';
+import {LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent} from './layout';
+
+// import from login module
+import {AuthServiceFactory} from '../login/services/auth.service';
+import {UserServiceFactory} from '../login/services/user.service';
+import {JwtServiceFactory} from '../login/services/jwt.service';
+
+export const AppModule = 'app';
 
 angular
-  .module(app, [
-    'dx',
-    'ngMaterial',
+  .module(AppModule, [
     'ui.router',
-    'ui.grid',
+    'LocalStorageModule',
+    'ngSanitize',
+    'ngMaterial',
+    'ngIdle',
+    'dx',
+    'pascalprecht.translate',
     LibModule,
-    AnalyzeModule,
+    CommonModule,
     ObserveModule,
-    loginModule
+    AnalyzeModule,
+    AlertsModule
   ])
   .config(routesConfig)
   .config(themeConfig)
-  .component('root', RootComponent)
-  .component('headerComponent', HeaderComponent)
-  .component('footerComponent', FooterComponent)
-  .component('home', HomeComponent)
-  .directive('sidenavTarget', SidenavTargetDirective)
-  .component('sidenav', SidenavComponent)
-  .component('sidenavBtn', SidenavBtnComponent)
-  .component('filterSidenav', FilterSidenavComponent)
-  .component('checkboxFilter', CheckboxFilterComponent)
-  .component('radioFilter', RadioFilterComponent)
-  .component('timeRangeFilter', TimeRangeFilterComponent)
-  .component('priceRangeFilter', PriceRangeFilterComponent)
-  .component('filterGroup', FilterGroupComponent);
+  .config(i18nConfig)
+  .config(config)
+  .run(runConfig)
+  .value('AppConfig', AppConfig)
+  .factory('AuthService', AuthServiceFactory)
+  .factory('UserService', UserServiceFactory)
+  .factory('JwtService', JwtServiceFactory)
+  .component('layoutHeader', LayoutHeaderComponent)
+  .component('layoutContent', LayoutContentComponent)
+  .component('layoutFooter', LayoutFooterComponent);

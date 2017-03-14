@@ -1,0 +1,65 @@
+<header>
+  <md-toolbar class="app-toolbar">
+    <div class="lh-toolbar"
+         layout="row" layout-align="space-between center">
+      <div layout="row">
+        <div class="symmetra-logo"></div>
+        <span>SYMMETRA</span>
+      </div>
+
+      <div layout="row" class="lh-links">
+        <span class="link" aria-label="Observe"
+              ui-sref="observe"
+              ui-sref-active="m-active"
+              translate="OBSERVE">
+        </span>
+        <span class="link" aria-label="Analyze"
+              ui-sref="analyze"
+              ui-sref-active="m-active"
+              translate="ANALYZE">
+        </span>
+        <span class="link" aria-label="Alerts"
+              ui-sref="alerts"
+              ui-sref-active="m-active"
+              translate="ALERTS">
+        </span>
+      </div>
+
+      <div layout="row">
+        <md-button class="md-icon-button" aria-label="More">
+          <md-icon md-font-icon="icon-launchpad"></md-icon>
+        </md-button>
+
+        <md-menu-bar>
+          <md-menu>
+            <md-button class="md-icon-button" aria-label="User"
+                       ng-click="$mdMenu.open()">
+
+              <md-tooltip>{{ "TOOLTIP_ACCOUNT_SETTINGS" | translate }}</md-tooltip>
+              <md-icon md-font-icon="icon-user-placeholder"></md-icon>
+            </md-button>
+            <md-menu-content>
+              <md-menu-item>
+                <md-button translate="ACCOUNT"></md-button>
+              </md-menu-item>
+              <md-menu-item>
+                <md-button ng-click="$ctrl.changePwd()" translate="CHANGE_PASSWORD"></md-button>
+              </md-menu-item>
+              <md-menu-divider></md-menu-divider>
+              <md-menu-item>
+                <md-button ng-click="$ctrl.logout()" translate="LOG_OUT"></md-button>
+              </md-menu-item>
+            </md-menu-content>
+          </md-menu>
+        </md-menu-bar>
+
+        <md-button class="md-icon-button" aria-label="Menu"
+                   ng-click="toggleRight()">
+          <md-tooltip>{{ "TOOLTIP_ALERTS" | translate }}</md-tooltip>
+          <div class="alert-bell-icon"></div>
+          <badge class="alerts-badge" label="{{5}}"></badge>
+        </md-button>
+      </div>
+    </div>
+  </md-toolbar>
+</header>

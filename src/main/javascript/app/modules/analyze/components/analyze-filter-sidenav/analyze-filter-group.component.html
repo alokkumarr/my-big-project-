@@ -1,0 +1,17 @@
+<div ng-repeat="filter in $ctrl.filters track by $index" ng-switch on="filter.type">
+
+  <div ng-switch-when="string">
+    <analyze-filter-container filter="filter" class="time-range-panel" style="margin-top: 10px">
+      <string-filter filter="filter">
+      </string-filter>
+    </analyze-filter-container>
+  </div>
+
+  <div ng-switch-default>
+    <analyze-filter-container filter="filter" class="time-range-panel" style="margin-top: 10px">
+      <number-filter filter="filter">
+      </number-filter>
+    </analyze-filter-container>
+  </div>
+
+</div>

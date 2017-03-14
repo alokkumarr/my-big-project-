@@ -10,23 +10,18 @@ export const chartOptions = {
         lineWidth: 2,
         lineColor: null // inherit from series
       }
-    },
-    bar: {
-      showCheckbox: true,
-      dataLabels: {
-        enabled: true,
-        color: '#A4A9AD',
-        style: {
-          textShadow: 'none'
-        }
-      }
     }
   },
   legend: {
-    align: 'left',
     verticalAlign: 'top',
     layout: 'vertical',
-    y: 100
+    y: 50,
+    padding: 30,
+    itemMarginTop: 5,
+    itemMarginBottom: 5,
+    itemStyle: {
+      lineHeight: '14px'
+    }
   },
   tooltip: {
     backgroundColor: '#293D5A',

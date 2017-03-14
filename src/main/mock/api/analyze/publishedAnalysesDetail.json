@@ -1,0 +1,538 @@
+[
+  {
+    "id": 3,
+    "analysisId": 1,
+    "forkedFrom": {
+      "publishedAnalysisId": 1,
+      "analysisName": "Order Revenue by Customer",
+      "creatorName": "John Clay"
+    },
+    "creatorName": "John Steel",
+    "createdDate":"2016-01-12 04:31:10.0",
+    "type": "chart",
+    "name": "Order Revenue By Region",
+    "description": "Now that there is the Tec-9, a crappy spray gun from South Miami. This gun is advertised as the most popular gun in American crime. Do you believe that shit? It actually says that in the little book that comes with it: the most popular gun in American crime. Like they're actually proud of that shit.",
+    "category": 11,
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": null,
+    "filters":[],
+    "data":[],
+    "artifacts": []
+  },
+  {
+    "id": 1,
+    "analysisId": 1,
+    "forkedFrom": {
+      "publishedAnalysisId": 12,
+      "analysisName": "Order Revenue by Sector",
+      "creatorName": "Sharon Slausen"
+    },
+    "creatorName": "John Clay",
+    "createdDate":"2016-01-9 04:31:10.0",
+    "type": "chart",
+    "name": "Order Revenue By Customer",
+    "description": "Look, just because I don't be givin' no man a foot massage don't make it right for Marsellus to throw Antwone into a glass motherfuckin' house, fuckin' up the way the nigger talks. Motherfucker do that shit to me, he better paralyze my ass, 'cause I'll kill the motherfucker, know what I'm sayin'?",
+    "category": 11,
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": "Every Friday at 12:00pm",
+    "filters":[],
+    "data":[],
+    "artifacts": []
+  },
+  {
+    "id": 2,
+    "analysisId": 2,
+    "type": "report",
+    "forkedFrom": {
+      "publishedAnalysisId": 16,
+      "analysisName": "Warehouse Usage",
+      "creatorName": "Sharon Slausen"
+    },
+    "creatorName": "John Clay",
+    "createdDate":"2016-01-7 04:31:10.0",
+    "name": "Shipper Usage",
+    "description": "You think water moves fast? You should see ice. It moves like it has a mind. Like it knows it killed the world once and got a taste for murder. After the avalanche, it took us a week to climb out. Now, I don't know exactly when we turned on each other, but I know that seven of us survived the slide... and only five made it out. Now we took an oath, that I'm breaking now. We said we'd say it was the snow that killed the other two, but it wasn't. Nature is lethal but it doesn't hold a candle to man.",
+    "category": 11,
+    "metrics": [
+      "Orders"
+    ],
+    "scheduled": "Daily",
+    "report": {
+      "filters": [],
+      "groupByColumns": ["WarehouseName"],
+      "orderByColumns": ["CustomerName"],
+      "columns": [{
+        "columnName": "CustomerName",
+        "type": "string",
+        "label": "Customer"
+      }, {
+        "columnName": "TotalPrice",
+        "type": "double",
+        "label": "Total price"
+      }, {
+        "columnName": "ShipperName",
+        "type": "string",
+        "label": "Shipper"
+      }, {
+        "columnName": "WarehouseName",
+        "type": "string",
+        "label": "Warehouse"
+      }],
+      "data": [{
+        "CustomerName": "Johnson's Trucking",
+        "TotalPrice": 100,
+        "ShipperName": "Motion Inc.",
+        "WarehouseName": "Warehouse1"
+      }, {
+        "CustomerName": "Lily's Trucking",
+        "TotalPrice": 200,
+        "ShipperName": "Motion Inc.",
+        "WarehouseName": "Warehouse1"
+      }, {
+        "CustomerName": "Advanced Autos",
+        "TotalPrice": 400,
+        "ShipperName": "Motion Inc.",
+        "WarehouseName": "Warehouse2"
+      }, {
+        "CustomerName": "Advanced Autos",
+        "TotalPrice": 100,
+        "ShipperName": "Granger",
+        "WarehouseName": "Warehouse1"
+      }, {
+        "CustomerName": "Import Tuners",
+        "TotalPrice": 600,
+        "ShipperName": "Granger",
+        "WarehouseName": "Warehouse1"
+      }, {
+        "CustomerName": "Johnson's Trucking",
+        "TotalPrice": 700,
+        "ShipperName": "Granger",
+        "WarehouseName": "Warehouse2"
+      }, {
+        "CustomerName": "East Side Auto",
+        "TotalPrice": 400,
+        "ShipperName": "Motion Inc.",
+        "WarehouseName": "Warehouse2"
+      }, {
+        "CustomerName": "North Raven Auto",
+        "TotalPrice": 800,
+        "ShipperName": "Motion Inc.",
+        "WarehouseName": "Warehouse1"
+      }, {
+        "CustomerName": "Bloomburg Auto Shop",
+        "TotalPrice": 300,
+        "ShipperName": "Motion Inc.",
+        "WarehouseName": "Warehouse5"
+      }]
+    }
+  },
+  {
+    "id": 30,
+    "analysisId": 10,
+    "forkedFrom": {
+      "publishedAnalysisId": 1,
+      "analysisName": "Pivot test",
+      "creatorName": "John Clay"
+    },
+    "creatorName": "John Steel",
+    "createdDate":"2016-01-12 04:31:10.0",
+    "type": "pivot",
+    "name": "Pivot test",
+    "description": "Now that there is the Tec-9, a crappy spray gun from South Miami. This gun is advertised as the most popular gun in American crime. Do you believe that shit? It actually says that in the little book that comes with it: the most popular gun in American crime. Like they're actually proud of that shit.",
+    "category": 11,
+    "metrics": [
+      "Orders",
+      "Revenue"
+    ],
+    "scheduled": "Daily",
+    "pivot":{
+      "filters": [],
+      "columns": [],
+      "data": [{
+        "id": 1,
+        "region": "North America",
+        "country": "USA",
+        "city": "New York",
+        "amount": 1740,
+        "date": "2013/01/06"
+      }, {
+        "id": 2,
+        "region": "North America",
+        "country": "USA",
+        "city": "Los Angeles",
+        "amount": 850,
+        "date": "2013/01/13"
+      }, {
+        "id": 3,
+        "region": "North America",
+        "country": "USA",
+        "city": "Denver",
+        "amount": 2235,
+        "date": "2013/01/07"
+      }, {
+        "id": 4,
+        "region": "North America",
+        "country": "CAN",
+        "city": "Vancouver",
+        "amount": 1965,
+        "date": "2013/01/03"
+      }, {
+        "id": 5,
+        "region": "North America",
+        "country": "CAN",
+        "city": "Edmonton",
+        "amount": 880,
+        "date": "2013/01/10"
+      }, {
+        "id": 6,
+        "region": "South America",
+        "country": "BRA",
+        "city": "Rio de Janeiro",
+        "amount": 5260,
+        "date": "2013/01/17"
+      }, {
+        "id": 7,
+        "region": "South America",
+        "country": "ARG",
+        "city": "Buenos Aires",
+        "amount": 2790,
+        "date": "2013/01/21"
+      }, {
+        "id": 8,
+        "region": "South America",
+        "country": "PRY",
+        "city": "Asuncion",
+        "amount": 3140,
+        "date": "2013/01/01"
+      }, {
+        "id": 9,
+        "region": "Europe",
+        "country": "GBR",
+        "city": "London",
+        "amount": 6175,
+        "date": "2013/01/24"
+      }, {
+        "id": 10,
+        "region": "Europe",
+        "country": "DEU",
+        "city": "Berlin",
+        "amount": 4575,
+        "date": "2013/01/11"
+      }, {
+        "id": 11,
+        "region": "Europe",
+        "country": "ESP",
+        "city": "Madrid",
+        "amount": 3680,
+        "date": "2013/01/12"
+      }, {
+        "id": 12,
+        "region": "Europe",
+        "country": "RUS",
+        "city": "Moscow",
+        "amount": 2260,
+        "date": "2013/01/01"
+      }, {
+        "id": 13,
+        "region": "Asia",
+        "country": "CHN",
+        "city": "Beijing",
+        "amount": 2910,
+        "date": "2013/01/26"
+      }, {
+        "id": 14,
+        "region": "Asia",
+        "country": "JPN",
+        "city": "Tokio",
+        "amount": 8400,
+        "date": "2013/01/05"
+      }, {
+        "id": 15,
+        "region": "Asia",
+        "country": "KOR",
+        "city": "Seoul",
+        "amount": 1325,
+        "date": "2013/01/14"
+      }, {
+        "id": 16,
+        "region": "Australia",
+        "country": "AUS",
+        "city": "Sydney",
+        "amount": 3920,
+        "date": "2013/01/05"
+      }, {
+        "id": 17,
+        "region": "Australia",
+        "country": "AUS",
+        "city": "Melbourne",
+        "amount": 2220,
+        "date": "2013/01/15"
+      }, {
+        "id": 18,
+        "region": "Africa",
+        "country": "ZAF",
+        "city": "Pretoria",
+        "amount": 940,
+        "date": "2013/01/01"
+      }, {
+        "id": 19,
+        "region": "Africa",
+        "country": "EGY",
+        "city": "Cairo",
+        "amount": 1630,
+        "date": "2013/01/10"
+      }, {
+        "id": 20,
+        "region": "North America",
+        "country": "CAN",
+        "city": "Edmonton",
+        "amount": 2910,
+        "date": "2013/01/23"
+      }, {
+        "id": 21,
+        "region": "North America",
+        "country": "USA",
+        "city": "Los Angeles",
+        "amount": 2600,
+        "date": "2013/01/14"
+      }, {
+        "id": 22,
+        "region": "Europe",
+        "country": "ESP",
+        "city": "Madrid",
+        "amount": 4340,
+        "date": "2013/01/26"
+      }, {
+        "id": 23,
+        "region": "Europe",
+        "country": "GBR",
+        "city": "London",
+        "amount": 6650,
+        "date": "2013/01/24"
+      }, {
+        "id": 24,
+        "region": "North America",
+        "country": "CAN",
+        "city": "Edmonton",
+        "amount": 490,
+        "date": "2013/01/22"
+      }, {
+        "id": 25,
+        "region": "North America",
+        "country": "USA",
+        "city": "New York",
+        "amount": 3390,
+        "date": "2013/01/25"
+      }, {
+        "id": 26,
+        "region": "North America",
+        "country": "USA",
+        "city": "New York",
+        "amount": 5160,
+        "date": "2013/02/20"
+      }, {
+        "id": 27,
+        "region": "North America",
+        "country": "USA",
+        "city": "Los Angeles",
+        "amount": 5750,
+        "date": "2013/02/12"
+      }, {
+        "id": 28,
+        "region": "North America",
+        "country": "USA",
+        "city": "Denver",
+        "amount": 2805,
+        "date": "2013/02/13"
+      }, {
+        "id": 29,
+        "region": "North America",
+        "country": "CAN",
+        "city": "Vancouver",
+        "amount": 2505,
+        "date": "2013/02/09"
+      }, {
+        "id": 30,
+        "region": "North America",
+        "country": "CAN",
+        "city": "Edmonton",
+        "amount": 930,
+        "date": "2013/02/04"
+      }, {
+        "id": 31,
+        "region": "South America",
+        "country": "BRA",
+        "city": "Rio de Janeiro",
+        "amount": 1240,
+        "date": "2013/02/03"
+      }, {
+        "id": 32,
+        "region": "South America",
+        "country": "ARG",
+        "city": "Buenos Aires",
+        "amount": 315,
+        "date": "2013/02/04"
+      }, {
+        "id": 33,
+        "region": "South America",
+        "country": "PRY",
+        "city": "Asuncion",
+        "amount": 2870,
+        "date": "2013/02/18"
+      }, {
+        "id": 34,
+        "region": "Europe",
+        "country": "GBR",
+        "city": "London",
+        "amount": 5150,
+        "date": "2013/02/18"
+      }, {
+        "id": 35,
+        "region": "Europe",
+        "country": "DEU",
+        "city": "Berlin",
+        "amount": 2725,
+        "date": "2013/02/20"
+      }, {
+        "id": 36,
+        "region": "Europe",
+        "country": "ESP",
+        "city": "Madrid",
+        "amount": 2840,
+        "date": "2013/02/04"
+      }, {
+        "id": 37,
+        "region": "Europe",
+        "country": "RUS",
+        "city": "Moscow",
+        "amount": 5840,
+        "date": "2013/02/13"
+      }, {
+        "id": 38,
+        "region": "Asia",
+        "country": "CHN",
+        "city": "Beijing",
+        "amount": 6750,
+        "date": "2013/02/11"
+      }, {
+        "id": 39,
+        "region": "Asia",
+        "country": "JPN",
+        "city": "Tokio",
+        "amount": 1200,
+        "date": "2013/02/03"
+      }, {
+        "id": 40,
+        "region": "Asia",
+        "country": "KOR",
+        "city": "Seoul",
+        "amount": 4550,
+        "date": "2013/02/08"
+      }, {
+        "id": 41,
+        "region": "Australia",
+        "country": "AUS",
+        "city": "Sydney",
+        "amount": 6040,
+        "date": "2013/02/17"
+      }, {
+        "id": 42,
+        "region": "Australia",
+        "country": "AUS",
+        "city": "Melbourne",
+        "amount": 2205,
+        "date": "2013/02/08"
+    }, {
+        "id": 43,
+        "region": "Africa",
+        "country": "ZAF",
+        "city": "Pretoria",
+        "amount": 990,
+        "date": "2013/02/20"
+      }, {
+        "id": 44,
+        "region": "Africa",
+        "country": "EGY",
+        "city": "Cairo",
+        "amount": 700,
+        "date": "2013/02/11"
+      }, {
+        "id": 45,
+        "region": "Australia",
+        "country": "AUS",
+        "city": "Melbourne",
+        "amount": 2325,
+        "date": "2013/02/15"
+      }, {
+        "id": 46,
+        "region": "South America",
+        "country": "ARG",
+        "city": "Buenos Aires",
+        "amount": 930,
+        "date": "2013/02/21"
+      }, {
+        "id": 47,
+        "region": "North America",
+        "country": "CAN",
+        "city": "Edmonton",
+        "amount": 1560,
+        "date": "2013/02/04"
+      }, {
+        "id": 48,
+        "region": "North America",
+        "country": "USA",
+        "city": "New York",
+        "amount": 1740,
+        "date": "2013/03/04"
+      }, {
+        "id": 49,
+        "region": "North America",
+        "country": "USA",
+        "city": "Los Angeles",
+        "amount": 3575,
+        "date": "2013/03/20"
+      }, {
+        "id": 50,
+        "region": "North America",
+        "country": "USA",
+        "city": "Denver",
+        "amount": 4500,
+        "date": "2013/03/04"
+      }, {
+        "id": 51,
+        "region": "North America",
+        "country": "CAN",
+        "city": "Vancouver",
+        "amount": 1605,
+        "date": "2013/03/17"
+      }, {
+        "id": 52,
+        "region": "North America",
+        "country": "CAN",
+        "city": "Edmonton",
+        "amount": 800,
+        "date": "2013/03/21"
+      }, {
+        "id": 53,
+        "region": "South America",
+        "country": "BRA",
+        "city": "Rio de Janeiro",
+        "amount": 640,
+        "date": "2013/03/08"
+      }, {
+        "id": 54,
+        "region": "South America",
+        "country": "ARG",
+        "city": "Buenos Aires",
+        "amount": 735,
+        "date": "2013/03/19"
+      }]
+    }
+  }
+]

@@ -1,0 +1,31 @@
+layout-header {
+  .lh-toolbar {
+    height: 70px;
+    max-height: 70px;
+    padding: 0 20px;
+
+    .link {
+      padding: 0 20px;
+    }
+  }
+
+  .alert-bell-icon {
+    background-image: url(~img/alert-bell.png);
+    background-size: 85% 85%;
+    background-repeat: no-repeat;
+    height: 21px;
+    width: 39px;
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+.root-container > layout-header {
+  position: fixed;
+  z-index: 10;
+  width: 100%;
+  max-width: 1600px;
+
+  .lh-toolbar {
+    background-color: white;
+  }
+}

@@ -1,11 +1,37 @@
-@font-face {
-  font-family: 'Source Sans Pro';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Source Sans Pro'), local('SourceSansPro-Regular'), url(https://fonts.gstatic.com/s/sourcesanspro/v9/ODelI1aHBYDBqgeIAH2zlNHq-FFgoDNV3GTKpHwuvtI.woff) format('woff');
-}
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700');
+
+$font-source-sans-pro: 'Source Sans Pro';
 
 body {
+  font-family: $font-source-sans-pro;
+  font-size: 14px;
+  font-weight: 400;
   color: $app-font-color;
-  font-family: "Source Sans Pro";
+}
+
+a {
+  font-family: $font-source-sans-pro;
+  font-size: 14px;
+  font-weight: 600;
+  color: $link-color;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.link {
+  font-family: $font-source-sans-pro;
+  font-size: 14px;
+  font-weight: 600;
+  color: $app-font-color;
+  text-decoration: none;
+  cursor: pointer;
+
+  &.m-active {
+    color: $link-color;
+    pointer-events: none;
+  }
+}
+
+.highlight {
+  background-color: $highlight-bg-color;
 }

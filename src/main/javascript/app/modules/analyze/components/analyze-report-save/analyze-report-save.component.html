@@ -1,0 +1,46 @@
+<analyze-dialog control="$ctrl" class="analyze-report-save">
+  <analyze-dialog-header layout="row" layout-align="start center" flex="grow">
+    <strong translate="SAVE_REPORT"></strong>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+    <div class="ars-content" layout-padding>
+      <md-input-container class="md-block" md-no-float>
+        <label translate="REPORT_NAME"></label>
+        <input type="text" placeholder="Name your analysis"
+               ng-model="$ctrl.model.name"/>
+      </md-input-container>
+
+      <md-input-container class="md-block" md-no-float>
+        <label translate="DESCRIPTION"></label>
+        <textarea type="text" placeholder="Describe the analysis"
+                  ng-model="$ctrl.model.description"></textarea>
+      </md-input-container>
+
+      <div layout="column">
+        <label translate="MY_ANALYSIS_CATEGORY"></label>
+        <md-select placeholder="Select a Category"
+                   ng-model="::$ctrl.model.category">
+          <md-option
+            ng-repeat="category in $ctrl.dataHolder.categories"
+            ng-bind="::category.name"
+            ng-value="category.id"></md-option>
+        </md-select>
+      </div>
+    </div>
+  </analyze-dialog-content>
+
+  <analyze-dialog-footer>
+    <div layout="row">
+      <md-button class="btn-primary"
+                 ng-click="$ctrl.save()"
+                 translate="SAVE">
+      </md-button>
+
+      <md-button class="btn-card"
+                 ng-click="$ctrl.cancel()"
+                 translate="CANCEL">
+      </md-button>
+    </div>
+  </analyze-dialog-footer>
+</analyze-dialog>

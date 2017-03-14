@@ -1,0 +1,46 @@
+.report-dx-grid {
+  max-width: 100% !important;
+  border: 1px solid #DEDEDE;
+
+  .dx-datagrid-table {
+    .dx-row {
+      height: 36px;
+
+      > td {
+        padding: 7px 30px 7px 10px;
+        vertical-align: bottom;
+      }
+
+      &.dx-header-row {
+        background-color: #F3F5F8;
+
+        > td {
+          border-bottom: none;
+        }
+      }
+
+      &.dx-data-row {
+        background-color: #FFF;
+
+        &.dx-row-alt {
+          background-color: #F7F9FC;
+        }
+      }
+    }
+  }
+}
+
+.dx-menu-items-container {
+  .grid-menu-item {
+    width: 50px;
+
+    &.m-small {
+      font-size: 12px;
+    }
+  }
+}
+
+// hide chips border
+md-chips-wrap.md-chips {
+  box-shadow: 0 0 !important;
+}

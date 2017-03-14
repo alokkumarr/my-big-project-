@@ -1,12 +1,12 @@
 target
-node
+/node
 node_modules
 log.txt
+debug.log
 .tmp/
 coverage/
+build/
 dist/
-src/styleguide/dist/
-src/main/javascript/styleguide/dist/
 
 
 # IDEs and editors
@@ -22,10 +22,11 @@ src/main/javascript/styleguide/dist/
 /connect.lock
 /coverage/*
 /libpeerconnection.log
-npm-debug.log
+npm-debug.log*
 testem.log
 /typings
-
+yarn.lock
+*~
 
 #System Files
 .DS_Store
