@@ -13,9 +13,26 @@ public class ProductModules implements Serializable {
 	private String productModName;
 	private String productModDesc;
 	private String productModCode;
-	
+	private String moduleURL;
 	private ArrayList<ProductModuleFeature> prodModFeature;
+	private String defaultMod;
+	
+	public String getDefaultMod() {
+		return defaultMod;
+	}
 
+	public void setDefaultMod(String defaultMod) {
+		this.defaultMod = defaultMod;
+	}
+
+	public String getModuleURL() {
+		return moduleURL;
+	}
+
+	public void setModuleURL(String moduleURL) {
+		this.moduleURL = moduleURL;
+	}
+	
 	public String getProdCode() {
 		return prodCode;
 	}

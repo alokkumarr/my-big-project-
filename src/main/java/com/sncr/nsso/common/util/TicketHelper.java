@@ -33,26 +33,6 @@ public class TicketHelper {
 		this.userRepository = userRepository;
 	}
 	
-	/*	public Ticket_t getTicket(String ticketId) {
-		Ticket_t ticket = null;
-		String dumpPath = ConfigurationData.getInstance().getTicketDumpLocation();
-		String fileName = dumpPath + File.separator + ticketId + ".xml";
-		try {
-			LogManager.log(LogManager.CAT_TICKET_UTIL, LogManager.LEVEL_INFO,
-					"Fetching Details for ticket with id : "+ticketId,null,ticketId);
-			JAXBContext context = JAXBContext.newInstance(Ticket_t.class);
-			final File file = new File(fileName);
-			Unmarshaller um = context.createUnmarshaller();
-			ticket = (Ticket_t) um.unmarshal(file);
-			LogManager.log(LogManager.CAT_TICKET_UTIL, LogManager.LEVEL_INFO,
-					"Got Details : "+ticket.toString(), null,ticket.getTicketId());
-		} catch (JAXBException e) {
-			LogManager.log(LogManager.CAT_TICKET_UTIL, LogManager.LEVEL_ERROR,
-					e.getMessage(),null,ticketId,e);
-		}
-		return ticket;
-	}*/
-
 	public void cleanseRepository(int preservePeriod) {
 
 	}
@@ -67,19 +47,17 @@ public class TicketHelper {
 			if (!isReCreate) {
 				prepareTicketDetails(user);
 			}
-			// create ticket xml
-			logger.debug("Preparing ticket for user: " + user.getMasterLoginId(), user.getMasterLoginId(), null);
+			// create ticket xml			
 			ticket = prepareTicket(user);
 			// inserting the ticket detail into DB, commenting code to update
 			// xml in file path
-			insertTicketDetails(ticket);
-			logger.debug("Saving ticket with id : " + ticket.getTicketId() + ", is DONE", null, ticket.getTicketId());
+			insertTicketDetails(ticket);			
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;
 		} catch (Exception e) {
-			logger.error("Exception  occured saving ticket with id : " + user.getLoginId(), user.getMasterLoginId(),
-					null);
+			logger.error("Exception  occured saving ticket with id : " + e.getMessage(),null,
+					e);
 			throw e;
 		}
 		return ticket;
@@ -96,13 +74,12 @@ public class TicketHelper {
 			//logger.info("inactivating the ticket for ticket Id: " + ticketId);
 			// update the ticket validity into DB
 			userRepository.invalidateTicket(ticketId, "User Logged Out");
-			logger.info("Successfully inactivated the Ticket ticket Id: " + ticketId, null, null);
 			newTicket = "Successfully inactivated the ticket";
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;			
 		} catch (Exception e) {
-			logger.error("Exception occured while recreating the ticket: "+e.getMessage(), ticketId,  e);
+			logger.error("Exception occured while recreating the ticket: "+e.getMessage(), null,  e);
 		}
 		return newTicket;
 	}
@@ -112,18 +89,15 @@ public class TicketHelper {
 		Ticket newTicket = null;
 		try {
 			Ticket oldTicket = userRepository.getTicketDetails(ticketId);
-			logger.info("Recreating the ticket for ticket Id: " + ticketId, oldTicket.getMasterLoginId());
 			// update the ticket validity into DB
-			userRepository.invalidateTicket(ticketId, "Ticket Expired");
-			logger.info("Got Details : " + ticketId, null, null);
+			userRepository.invalidateTicket(ticketId, "Ticket Expired");			
 			newTicket = prepareTicket(oldTicket, validMins);
 			insertTicketDetails(newTicket);
-			logger.info("Successfully recreated the Ticket for master Login Id: " + newTicket.getMasterLoginId(), newTicket.getTicketId());
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;			
 		} catch (Exception e) {
-			logger.error("Exception occured while recreating the ticket: "+e.getMessage(), ticketId,  e);
+			logger.error("Exception occured while recreating the ticket: "+e.getMessage(), null,  e);
 		}
 		return newTicket;
 	}
@@ -132,14 +106,13 @@ public class TicketHelper {
 		Ticket newTicket = null;
 		try {
 			Ticket oldTicket = userRepository.getTicketDetails(ticketId);
-			logger.info("reCreateTicketChangePwd the ticket for ticket Id: " + ticketId, oldTicket.getMasterLoginId());
 			// update the ticket validity into DB
 			userRepository.invalidateTicket(ticketId, "Inactivated the ticket, inorder to change password");
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;			
 		} catch (Exception e) {
-			logger.error("Exception occured while recreating the ticket: "+e.getMessage(), ticketId,  e);
+			logger.error("Exception occured while recreating the ticket: "+e.getMessage(), null,  e);
 		}
 		return newTicket;
 	}
@@ -149,18 +122,15 @@ public class TicketHelper {
 		Ticket newTicket = null;
 		try {
 			Ticket oldTicket = userRepository.getTicketDetails(ticketId);
-			logger.info("reCreateTicketChangePwd the ticket for ticket Id: " + ticketId, oldTicket.getMasterLoginId());
 			// update the ticket validity into DB
 			userRepository.invalidateTicket(ticketId, "Inactivated the ticket, inorder to change password");
-			logger.info("Got Details : " + ticketId, null, null);
 			newTicket = prepareTicket(oldTicket, validMins);
 			insertTicketDetails(newTicket);
-			logger.info("Successfully created the Ticket for master Login Id: " + newTicket.getMasterLoginId(), newTicket.getTicketId());
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;			
 		} catch (Exception e) {
-			logger.error("Exception occured while recreating the ticket: "+e.getMessage(), ticketId,  e);
+			logger.error("Exception occured while recreating the ticket: "+e.getMessage(), null,  e);
 		}
 		return newTicket;
 	}
@@ -201,8 +171,11 @@ public class TicketHelper {
 		ticket.setProdCode(user.getTicketDetails().getLandingProd());
 		ticket.setRoleType(user.getTicketDetails().getRoleType());
 		ticket.setUserName(user.getTicketDetails().getUserName());
-		ticket.setProducts(user.getTicketDetails().getProducts());
+		ticket.setProductModules(user.getTicketDetails().getProductModules());
+		ticket.setProductModuleFeatures(user.getTicketDetails().getProductModuleFeatures());
 		ticket.setDataSecurityKey(user.getTicketDetails().getDataSKey());
+		ticket.setCustID(user.getTicketDetails().getCustID());
+		ticket.setCustCode(user.getTicketDetails().getCustCode());
 		return ticket;
 	}
 	
@@ -229,7 +202,7 @@ public class TicketHelper {
 			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
 			throw de;			
 		} catch(Exception e){
-			logger.error("Exception occured while creating ticket for user "+ticket.getMasterLoginId(),ticket.getMasterLoginId(),null, e);
+			logger.error("Exception occured while creating ticket for user "+e.getMessage(), null, e);
 			throw e;
 		}
 	}

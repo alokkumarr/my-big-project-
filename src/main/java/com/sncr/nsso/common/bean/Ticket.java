@@ -10,7 +10,8 @@ import java.util.Date;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.sncr.nsso.common.bean.repo.Products;
+import com.sncr.nsso.common.bean.repo.ProductModuleFeatures;
+import com.sncr.nsso.common.bean.repo.ProductModules;
 import com.sncr.nsso.common.constants.SSOCommonConstants;
 
 /**
@@ -36,12 +37,39 @@ public class Ticket implements Serializable {
 	private String prodCode;
 	private String roleType;
 	private Long createdTime;
-	private ArrayList<Products> products;
+	private ArrayList<ProductModules> productModules;
+	private ArrayList<ProductModuleFeatures> productModuleFeatures;
 	private String dataSecurityKey;	
 	private String error;
+	private String custID;
+	private String custCode;
+
+	public String getCustID() {
+		return custID;
+	}
+
+	public String getCustCode() {
+		return custCode;
+	}
+
+	public void setCustCode(String custCode) {
+		this.custCode = custCode;
+	}
+
+	public void setCustID(String custID) {
+		this.custID = custID;
+	}
 
 	public String getError() {
 		return error;
+	}
+
+	public ArrayList<ProductModuleFeatures> getProductModuleFeatures() {
+		return productModuleFeatures;
+	}
+
+	public void setProductModuleFeatures(ArrayList<ProductModuleFeatures> productModuleFeatures) {
+		this.productModuleFeatures = productModuleFeatures;
 	}
 
 	public void setError(String error) {
@@ -239,12 +267,12 @@ public class Ticket implements Serializable {
 		this.userName = userName;
 	}
 
-	public ArrayList<Products> getProducts() {
-		return products;
+	public ArrayList<ProductModules> getProductModules() {
+		return productModules;
 	}
 
-	public void setProducts(ArrayList<Products> products) {
-		this.products = products;
+	public void setProductModules(ArrayList<ProductModules> productModules) {
+		this.productModules = productModules;
 	}
 
 	/**
