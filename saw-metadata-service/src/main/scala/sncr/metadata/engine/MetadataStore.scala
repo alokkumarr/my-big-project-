@@ -1,6 +1,7 @@
 package sncr.metadata.engine
 
 import _root_.sncr.saw.common.config.SAWServiceConfig
+import com.typesafe.config.Config
 import org.apache.hadoop.hbase.HBaseConfiguration
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.security.UserGroupInformation
@@ -16,16 +17,17 @@ import org.slf4j.{Logger, LoggerFactory}
   *
   *
   */
-abstract class MetadataStore {
+abstract class MetadataStore(val mdConfig: Config) {
 
+  def this() = { this(SAWServiceConfig.metadataConfig) }
 
   val m_log: Logger = LoggerFactory.getLogger(classOf[MetadataStore].getName)
   private val default_user = "mapr"
   lazy val hbaseConf = HBaseConfiguration.create
-  val zQuorum = SAWServiceConfig.metadataConfig.getString("zookeeper-quorum")
-  val user = if (SAWServiceConfig.metadataConfig.getString("user") != null &&
-    !SAWServiceConfig.metadataConfig.getString("user").isEmpty)
-    SAWServiceConfig.metadataConfig.getString("user")
+  val zQuorum = mdConfig.getString("zookeeper-quorum")
+  val user = if (mdConfig.getString("user") != null &&
+    !mdConfig.getString("user").isEmpty)
+    mdConfig.getString("user")
   else default_user
   lazy val realUser: UserGroupInformation = UserGroupInformation.createRemoteUser(user)
   UserGroupInformation.setLoginUser(realUser)
@@ -34,12 +36,13 @@ abstract class MetadataStore {
   lazy val admin = connection.getAdmin
 
   var mdNodeStoreTable : Table = null
-  var searchFields : Map[String, Any] = Map.empty
+//  var searchFields : Map[String, Any] = Map.empty
 
   protected var rowKey: Array[Byte] = null
   protected def setRowKey(rK: Array[Byte]): Unit = rowKey = rK
 
   def close: Unit = mdNodeStoreTable.close()
+  override protected def finalize(): Unit = close
 
 }
 

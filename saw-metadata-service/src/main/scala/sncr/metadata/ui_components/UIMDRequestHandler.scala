@@ -127,11 +127,11 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
   {
     val sNode = new UINode(ticket, content_element, module_name)
     val response = action match {
-      case "create" => build(sNode.storeNode)
-      case "retrieve" => build(sNode.retrieveNode(extractKeys))
+      case "create" => build(sNode.create)
+      case "retrieve" => build(sNode.read(extractKeys))
       case "search" => build(sNode.find(extractKeys))
-      case "delete" => build(sNode.removeNode(extractKeys))
-      case "update" => build(sNode.modifyNode(extractKeys))
+      case "delete" => build(sNode.delete(extractKeys))
+      case "update" => build(sNode.update(extractKeys))
     }
     m_log debug s"Response: ${pretty(render(response))}\n"
     response

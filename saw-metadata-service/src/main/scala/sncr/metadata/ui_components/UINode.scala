@@ -17,20 +17,18 @@ import org.apache.hadoop.hbase.client._
 /**
   * Created by srya0001 on 2/19/2017.
   */
-class UINode(val ticket: JValue, val content_element: JValue, val ui_item_type : String = "none")
+class UINode(val ticket: JValue, private[this] var content_element: JValue, val ui_item_type : String = "none")
       extends ContentNode
       with SourceAsJson {
 
   override def getSourceData(res:Result): JValue = super[SourceAsJson].getSourceData(res)
-  override def compileRead(g : Get) = super[ContentNode].compileContentCells(g)
-  override def header(g : Get) = super[ContentNode].compileSearchCell(g)
-  override def getHeaderData(res:Result): Option[Map[String, Any]] = super[ContentNode].getHeaderData(res)
+
+  override def compileRead(g : Get) = includeContent(g)
+
+  override def header(g : Get) = includeSearch(g)
 
   override def getData(res:Result): Option[Map[String, Any]] =
-  {
     Option(getSearchFields(res) + (key_Definition.toString -> compact(render(getSourceData(res))) ))
-  }
-
 
   override val m_log: Logger = LoggerFactory.getLogger(classOf[UINode].getName)
 
@@ -38,7 +36,6 @@ class UINode(val ticket: JValue, val content_element: JValue, val ui_item_type :
   val table = SAWServiceConfig.metadataConfig.getString("path") + "/" + tables.SemanticMetadata
   val tn: TableName = TableName.valueOf(table)
   mdNodeStoreTable = connection.getTable(tn)
-  this.searchFields = SearchDictionary.searchFields
   headerDesc =  SearchDictionary.searchFields
 
   override def initRow : String =
@@ -61,15 +58,15 @@ class UINode(val ticket: JValue, val content_element: JValue, val ui_item_type :
   }
 
 
-  def storeNode: ( Int, String )=
+  def create: ( Int, String )=
   {
     try {
-      val put_op = createNode(NodeType.ContentNode.id, ContentNodeCategory.UINode.id)
+      val put_op = createNode(NodeType.ContentNode.id, classOf[UINode].getName)
       content_element.replace(List("_id"), JString(new String (rowKey))  )
       var searchValues : Map[String, Any] = UINode.extractSearchData(ticket, content_element) + ("NodeId" -> new String(rowKey))
       if (!ui_item_type.equalsIgnoreCase("none")) searchValues = searchValues + ("item_type" -> ui_item_type )
       searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
-      if (saveNode(addContent(put_op, compact(render(content_element)), searchValues)))
+      if (commit(saveContent(put_op, compact(render(content_element)), searchValues)))
         (Success.id, s"The UI Node [ ${new String(rowKey)} ] has been created")
       else
         (Error.id, "Could not create UI Node")
@@ -80,7 +77,7 @@ class UINode(val ticket: JValue, val content_element: JValue, val ui_item_type :
     }
   }
 
-  def modifyNode(keys: Map[String, Any]) : (Int, String) =
+  def update(keys: Map[String, Any]) : (Int, String) =
   {
     try {
       val (res, msg ) = selectRowKey(keys)
@@ -91,7 +88,7 @@ class UINode(val ticket: JValue, val content_element: JValue, val ui_item_type :
       var searchValues : Map[String, Any] = UINode.extractSearchData(ticket, content_element) + ("NodeId" -> new String(rowKey))
       if (!ui_item_type.equalsIgnoreCase("none")) searchValues = searchValues + ("item_type" -> ui_item_type )
       searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
-      if (saveNode(addContent(update, compact(render(content_element)), searchValues)))
+      if (commit(saveContent(update, compact(render(content_element)), searchValues)))
         (Success.id, s"The UI Node [ ${new String(rowKey)} ] has been updated")
       else
         (Error.id, "Could not update UI Node")
@@ -99,23 +96,6 @@ class UINode(val ticket: JValue, val content_element: JValue, val ui_item_type :
     catch{
       case x: Exception => { val msg = s"Could not store node [ ID = ${new String(rowKey)} ]: "; m_log error (msg, x); ( Error.id, msg)}
     }
-  }
-
-
-
-  def retrieveNode(keys: Map[String, Any]) : Map[String, Any] =
-  {
-    val (res, msg ) = selectRowKey(keys)
-    if (res != Success.id) return Map.empty
-    readCompiled(prepareRead).getOrElse(Map.empty)
-  }
-
-
-  def removeNode(keys: Map[String, Any]) : (Int, String) =
-  {
-    val (res, msg ) = selectRowKey(keys)
-    if (res != Success.id) return (res, msg)
-    delete
   }
 
 }

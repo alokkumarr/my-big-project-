@@ -8,36 +8,28 @@ import sncr.metadata.engine.MDObjectStruct._
 /**
   * Created by srya0001 on 3/5/2017.
   */
-trait ContentNode extends SearchableNode{
+class ContentNode extends MetadataNodeCanSearch{
 
   override val m_log: Logger = LoggerFactory.getLogger(classOf[ContentNode].getName)
 
-  protected def compileContentCells(getCNode: Get): Get = compileSearchCell(getCNode.addFamily(MDSections(sourceSection.id)))
-
+  protected def includeContent(getCNode: Get): Get = includeSearch(getCNode.addFamily(MDColumnFamilies(_cf_source.id)))
 
 
 /* Writing part */
 
-  protected def addSource(putCNode : Put,  content: String): Put =
+  private def setSearchData(put_op : Put, search_val : Map[String, Any]): Put =
   {
-    if (putCNode == null ) return null
-    m_log trace s"Save the document as content CF: $content"
-    putCNode.addColumn(MDSections(sourceSection.id),MDKeys(key_Definition.id),Bytes.toBytes(content))
-    putCNode
-  }
-
-  protected def addSearchSection( putCNode : Put, search_val : Map[String, Any]): Put =
-  {
-    if (putCNode == null ) return null
-    search_val.keySet.foreach( k=>putCNode.addColumn(MDSections(searchSection.id),Bytes.toBytes(k), MDNodeUtil.convertValue(search_val(k))))
-    putCNode
+    search_val.keySet.foreach( k=> put_op.addColumn(MDColumnFamilies(_cf_search.id),Bytes.toBytes(k), MDNodeUtil.convertValue(search_val(k))))
+    put_op
   }
 
 
-  protected def addContent(put_op: Put,  content_element: String, searchValues: Map[String, Any] = Map.empty): Put =
+  protected def saveContent(put_op: Put, content_element: String, searchValues: Map[String, Any] = Map.empty): Put =
   {
-    addSearchSection (put_op, searchValues)
-    addSource(put_op, content_element)
+    if (put_op == null ) return null
+    setSearchData (put_op, searchValues)
+    m_log trace s"Save the document as content CF: $content_element"
+    put_op.addColumn(MDColumnFamilies(_cf_source.id),MDKeys(key_Definition.id),Bytes.toBytes(content_element))
   }
 
 

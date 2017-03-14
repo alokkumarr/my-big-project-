@@ -15,8 +15,8 @@ trait SourceAsJson {
 
   protected def getSourceData(res:Result): JValue =
   {
-    val content = res.getValue(MDSections(sourceSection.id),MDKeys(key_Definition.id))
-    m_log debug s"Read node: ${new String(content)}"
+    val content = res.getValue(MDColumnFamilies(_cf_source.id),MDKeys(key_Definition.id))
+    m_log debug s"Convert content of node to JSON: ${new String(content)}"
     parse(new String(content), false, false)
   }
 

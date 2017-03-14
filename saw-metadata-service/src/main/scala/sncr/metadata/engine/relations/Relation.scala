@@ -2,120 +2,103 @@ package sncr.metadata.engine.relations
 
 import org.apache.hadoop.hbase.client.{Get, _}
 import org.apache.hadoop.hbase.util.Bytes
+import org.json4s.JValue
+import org.json4s.JsonAST._
+import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.MDObjectStruct._
-import sncr.metadata.engine.ProcessingResult._
-import sncr.metadata.engine.RelationCategory
-
-import scala.collection.mutable
+import sncr.metadata.engine.{MetadataNode, RelationCategory, SearchMetadata, tables}
 
 /**
   * Created by srya0001 on 3/4/2017.
   */
-trait Relation extends scala.collection.mutable.Seq[(Int, Array[Byte])] {
+trait Relation{
 
   val m_log: Logger = LoggerFactory.getLogger(classOf[Relation].getName)
 
-  var relationRowID : Array[Byte] = null
-  val relType = RelationCategory.RelationSimpleSet.id
-  var attributes : mutable.Map[String, Any] = new mutable.HashMap[String, Any]
-
-  override def update(idx: Int, elem: (Int, Array[Byte])): Unit = this(idx) = elem
-
-  override def length: Int = this.length
-
-  override def apply(idx: Int): (Int, Array[Byte]) = this(idx)
-
-  override def iterator: Iterator[(Int, Array[Byte])] = this.iterator
+  var relType : Short = 0
+  final private[this] var elements : Array[(String, String)] = Array.empty
+  final private[this] var readNumOfElements : Short = 0
+  final private[this] var _elementsAsJSON : JValue = JNothing
 
 
   /*  Read calls */
 
-  protected def compileRelationsCells(getCNode: Get): Get =
+  protected def includeRelation(getNode: Get): Get =   getNode.addFamily(MDColumnFamilies(_cf_relations.id))
+
+  protected def getRelationData(res:Result) : JValue =
   {
-    // getContentStructure
-    getCNode.addFamily(MDSections(relationsSection.id))
-    getCNode.addFamily(MDSections(relationAttributesSection.id))
-    getCNode
+    val data = res.getValue(MDColumnFamilies(_cf_relations.id),Bytes.toBytes("_number_of_elements"))
+    readNumOfElements = if (data != null ) Bytes.toShort(data) else 0
+    val rc = res.getValue(MDColumnFamilies(_cf_relations.id),Bytes.toBytes("_relation_category"))
+    relType = if (rc != null) Bytes.toShort(rc) else 0
+    m_log debug s"# of elements: $readNumOfElements"
+    elements = (for ( i <- 0 until readNumOfElements  ) yield {
+         val t = res.getValue(MDColumnFamilies(_cf_relations.id), Bytes.toBytes(i + "_TAB"))
+         val r = res.getValue(MDColumnFamilies(_cf_relations.id), Bytes.toBytes(i + "_RID"))
+          if (t != null && r != null && t.nonEmpty && r.nonEmpty ) ( Bytes.toString(t), Bytes.toString(r))
+          else (null, null)
+    }).toArray.filter( p => p._1 != null && p._2 != null )
+    convertToJson
   }
-
-
-  import scala.collection.JavaConversions._
-  protected def getSearchFields(res:Result): Map[String, String] =
-  {
-    val sfKeyValues = res.getFamilyMap(MDSections(relationAttributesSection.id))
-    m_log debug s"Include list of search fields into result: ${sfKeyValues.keySet.toList.map(k => new String(k) + " =>" + new String(sfKeyValues(k))  ).mkString("{", ",", "}")}"
-    val sf : Map[String, String] = sfKeyValues.keySet().map( k =>
-    { val k_s = new String(k)
-      val v_s = new String(sfKeyValues.get(k))
-      m_log trace s"Search field: $k_s, value: $v_s"
-      k_s -> v_s
-    }).toMap
-    sf
-  }
-
-  def addRelation(nodeGet: Get, rowID: Array[Byte]): Get =
-  {
-    nodeGet.addFamily(MDSections(systemProperties.id))
-    nodeGet.addFamily(MDSections(relationsSection.id))
-    nodeGet.addFamily(MDSections(relationAttributesSection.id))
-  }
-
 
   /* Write calls */
 
-  protected def addSearchSection( putCNode : Put, search_val : Map[String, Any]): Put =
-  {
-    if (putCNode == null ) return null
-    search_val.keySet.foreach( k=>putCNode.addColumn(MDSections(searchSection.id),Bytes.toBytes(k), Bytes.toBytes(search_val(k).asInstanceOf[String])))
-    putCNode
-  }
-
-
-  def addRelation(nodePut: Put, rowID: Array[Byte])  : Put =
+  def saveRelation(nodePut: Put)  : Put =
   {
     if (nodePut == null) return null
-    relationRowID = rowID
+    convertToJson
+    nodePut
+      .addColumn(MDColumnFamilies(_cf_relations.id),Bytes.toBytes("_number_of_elements"), Bytes.toBytes(elements.size))
+      .addColumn(MDColumnFamilies(_cf_relations.id),Bytes.toBytes("_relation_category"), Bytes.toBytes(relType))
+      .addColumn(MDColumnFamilies(_cf_relations.id),Bytes.toBytes("_json_"), Bytes.toBytes(compact(render(_elementsAsJSON))))
+    for (i <- 0 until elements.size ) {nodePut
+      .addColumn(MDColumnFamilies(_cf_relations.id),Bytes.toBytes(i + "_TAB" ), Bytes.toBytes(elements(i)._1))
+      .addColumn(MDColumnFamilies(_cf_relations.id),Bytes.toBytes(i + "_RID" ), Bytes.toBytes(elements(i)._2))}
     nodePut
    }
 
-  def readRelation(nodeGet : Get , rowID: Array[Byte]) : Get =
+  def elementsAsJson : JValue = _elementsAsJSON
+
+
+  def loadRelatedNodes: Map[String, Option[Map[String, Any]]] = elements.map(pair => pair._2 -> MetadataNode.load(pair._1, pair._2, true)).toMap
+
+
+  def getRelatedNodes : List[(String, String)] = elements.clone().toList
+
+
+  def removeNodesFromRelation( rowKeys:List[(String, String)] ): JValue =
   {
-    if (nodeGet == null) null
-    relationRowID = rowID
-    nodeGet
+    rowKeys.foreach( rk => elements = elements.filterNot( el => rk._1.equalsIgnoreCase(el._1) && rk._2.equalsIgnoreCase(el._2)))
+    convertToJson
+  }
+
+  def addNodesToRelation(keys: Map[String, Any], systemProps:Map[String, Any]): JValue =
+  {
+    val rowIDs : List[List[(String, String)]] = tables.values.map(mdTableName => {
+      val rowID : List[Array[Byte]] = SearchMetadata.simpleSearch(mdTableName.toString, keys, systemProps, "and")
+     rowID.map( id => (mdTableName.toString, Bytes.toString(id)))
+    }).toList
+    elements = elements ++ rowIDs.flatMap( list_of_pairs => list_of_pairs )
+    convertToJson
   }
 
 
-  /**
-    * Add on attribute to relation
-    *
-    * @param k - attribute key
-    * @param v - attribute value
-    * @return - operation result
-    */
-  def addAttribute(k:String, v:Any) : Int =
+  private def convertToJson: JValue =
   {
-    attributes(k) = v
-    Success.id
+    _elementsAsJSON = null
+    val lelements = new JArray(
+      (for( i <- elements.indices ) yield JObject(List(JField( i + "_TAB", JString(elements(i)._1)),
+                                                       JField( i + "_RID", JString(elements(i)._2))))).toList)
+    _elementsAsJSON = new JObject( List(
+      ("elements" -> lelements),
+      ("_number_of_elements", JInt(readNumOfElements.toInt)),
+      ("_relation_category",  JString(RelationCategory(relType).toString))
+    ) )
+    _elementsAsJSON
   }
-
-  /**
-    * Add list of attributes
-    *
-    * @param attributes - map of key - value pairs
-    *
-    */
-  def addAttributes(attributes: Map[String, Any]) : Unit = attributes.foreach( a => addAttribute(a._1, a._2))
-
-
-
 }
 
-object Relation {
 
-
-
-}
 
 

@@ -8,35 +8,39 @@ import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.MDObjectStruct._
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine._
+import sncr.metadata.engine.relations.Relation
 import sncr.saw.common.config.SAWServiceConfig
 
 /**
   * Created by srya0001 on 3/1/2017.
   */
-class AnalysisNode(val analysisNode: JValue = JNothing) extends ContentNode
-  with SourceAsJson{
-//  with Relation {
+class AnalysisNode(private[this] var analysisNode: JValue = JNothing) extends ContentNode
+  with SourceAsJson
+  with Relation{
 
   override def getSourceData(res: Result): JValue = super[SourceAsJson].getSourceData(res)
-  override def compileRead(g: Get) = super[ContentNode].compileContentCells(g)
 
-  override def getData(res: Result): Option[Map[String, Any]] = {
-    Option(getSearchFields(res) + (key_Definition.toString -> compact(render(getSourceData(res))).replace("\\\"", "\"")))
+  override def compileRead(g: Get) = {
+    includeRelation(
+    includeContent(g))
   }
 
+  override def header(g : Get) = includeSearch(g)
 
+  override def getData(res: Result): Option[Map[String, Any]] = {
+    Option(getSearchFields(res) +
+          (key_Definition.toString -> getSourceData(res)) +
+          (key_RelationSimpleSet.toString -> getRelationData(res) )
+    )
+  }
 
   override val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisNode].getName)
-
-  def this() = { this(JNothing) }
-
 
   import MDObjectStruct.formats
 
   val table = SAWServiceConfig.metadataConfig.getString("path") + "/" + tables.AnalysisMetadata
   val tn: TableName = TableName.valueOf(table)
   mdNodeStoreTable = connection.getTable(tn)
-  this.searchFields = SearchDictionary.searchFields
   headerDesc =  SearchDictionary.searchFields
 
 
@@ -85,19 +89,22 @@ class AnalysisNode(val analysisNode: JValue = JNothing) extends ContentNode
     (Success.id, "Request is correct")
   }
 
+
   def write: (Int, String) = {
     try {
       val (result, msg) = validate
       if (result != Success.id) return (result, msg)
-      val put_op = createNode(NodeType.RelationContentNode.id, ContentNodeCategory.AnalysisNode.id)
+      val put_op = createNode(NodeType.RelationContentNode.id, classOf[AnalysisNode].getName)
       val searchValues: Map[String, Any] = AnalysisNode.extractSearchData(analysisNode) + ("NodeId" -> new String(rowKey))
       searchValues.keySet.foreach(k => {
         m_log debug s"Add search field $k with value: ${searchValues(k).toString}"
       })
-      if (saveNode(addContent(put_op, compact(render(analysisNode)), searchValues)))
-        (Success.id, s"The UI Node [ ${new String(rowKey)} ] ha been created")
+      if (commit(
+          saveRelation(
+          saveContent(put_op, compact(render(analysisNode)), searchValues))))
+          (Success.id, s"The Analysis Node [ ${new String(rowKey)} ] has been created")
       else
-        (Error.id, "Could not create UI Node")
+        (Error.id, "Could not create Analysis Node")
     }
     catch {
       case x: Exception => {
@@ -115,34 +122,24 @@ class AnalysisNode(val analysisNode: JValue = JNothing) extends ContentNode
       if (res != Success.id) return (res, msg)
       readCompiled(prepareRead).getOrElse(Map.empty)
       setRowKey(rowKey)
+
       val searchValues: Map[String, Any] = AnalysisNode.extractSearchData(analysisNode) + ("NodeId" -> new String(rowKey))
       searchValues.keySet.foreach(k => {
         m_log debug s"Add search field $k with value: ${searchValues(k).toString}"
       })
-      if (saveNode(addContent(super[ContentNode].update, compact(render(analysisNode)), searchValues)))
-        (Success.id, s"The UI Node [ ${new String(rowKey)} ] has been updated")
+      if (commit(
+          saveRelation(
+          saveContent(
+          update, compact(render(analysisNode)), searchValues))))
+        (Success.id, s"The Analysis Node [ ${new String(rowKey)} ] has been updated")
       else
-        (Error.id, "Could not update UI Node")
+        (Error.id, "Could not update Analysis Node")
     }
     catch {
       case x: Exception => {
         val msg = s"Could not store node [ ID = ${new String(rowKey)} ]: "; m_log error(msg, x); (Error.id, msg)
       }
     }
-  }
-
-
-  def read(filter: Map[String, Any]): Map[String, Any] = {
-    val (res, msg) = selectRowKey(filter)
-    if (res != Success.id) return Map.empty
-    readCompiled(prepareRead).getOrElse(Map.empty)
-  }
-
-
-  def delete(keys: Map[String, Any]): (Int, String) = {
-    val (res, msg) = selectRowKey(keys)
-    if (res != Success.id) return (res, msg)
-    super.delete
   }
 
 }

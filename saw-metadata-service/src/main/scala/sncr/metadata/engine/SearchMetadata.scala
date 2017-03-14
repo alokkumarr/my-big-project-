@@ -1,11 +1,17 @@
 package sncr.metadata.engine
 
-import org.apache.hadoop.hbase.client.{Result, ResultScanner, Scan, Table}
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
+import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.filter.CompareFilter.CompareOp
 import org.apache.hadoop.hbase.filter.{FilterList, SingleColumnValueFilter}
 import org.apache.hadoop.hbase.util.Bytes
 import org.slf4j.{Logger, LoggerFactory}
+import sncr.metadata.engine.MDObjectStruct._
 import ProcessingResult._
+import org.apache.hadoop.hbase.TableName
+
 
 /**
   * Created by srya0001 on 2/19/2017.
@@ -13,49 +19,32 @@ import ProcessingResult._
 trait SearchMetadata extends MetadataStore{
 
   override val m_log: Logger = LoggerFactory.getLogger(classOf[SearchMetadata].getName)
+  var headerDesc: Map[String, String] = null
 
   import scala.collection.JavaConversions._
   def simpleMetadataSearch(keys: Map[String, Any], condition: String) : List[Array[Byte]] =
   {
-    if (searchFields.isEmpty){
+    if (keys.isEmpty){
       m_log error "Filter/Key set is empty"
       return Nil
     }
-
     val filterList : FilterList = new FilterList( if (condition.equalsIgnoreCase("or")) FilterList.Operator.MUST_PASS_ONE else FilterList.Operator.MUST_PASS_ALL )
-
     m_log debug s"Create filter list with the following fields: ${keys.mkString("{", ",", "}")}"
-
     if (keys.keySet.isEmpty) {
       m_log error s"Filter is empty - the method should not be used"
       return Nil
     }
-
     keys.keySet.foreach( f => {
       val searchFieldValue : Array[Byte] = MDNodeUtil.convertValue(keys(f))
-/*        searchFields(f) match{
-          case "String" => Bytes.toBytes(keys(f).asInstanceOf[String])
-          case "Int" => Bytes.toBytes(keys(f).asInstanceOf[Int])
-          case "Long" => Bytes.toBytes(keys(f).asInstanceOf[Long])
-          case "Boolean" => Bytes.toBytes(keys(f).asInstanceOf[Boolean])
-          case _ => m_log error "Not supported data type"; null
-        }
-*/
-        m_log debug s"Field $f = ${keys(f)}"
-
+      m_log debug s"Field $f = ${keys(f)}"
       val filter1 : SingleColumnValueFilter = new SingleColumnValueFilter(
-        Bytes.toBytes(MDObjectStruct.searchSection.toString),
-        Bytes.toBytes(f),
-        CompareOp.EQUAL,
-        searchFieldValue)
+        Bytes.toBytes(MDObjectStruct._cf_search.toString),Bytes.toBytes(f),CompareOp.EQUAL,searchFieldValue)
         filter1.setFilterIfMissing(true)
         filterList.addFilter(filter1)
     })
-
     val q = new Scan
     q.setFilter(filterList)
     val sr : ResultScanner = mdNodeStoreTable.getScanner(q)
-
     val result = (for( r: Result <- sr) yield r.getRow.clone()).toList
     m_log debug s"Found: ${result.size} rows satisfied to filter: ${result.map ( new String( _ )).mkString("[", ",", "]")}"
     sr.close
@@ -94,50 +83,76 @@ trait SearchMetadata extends MetadataStore{
     }
   }
 
+  protected def includeSearch(getCNode: Get): Get = getCNode.addFamily(MDColumnFamilies(_cf_search.id))
+
+//  def getHeaderData(res:Result): Option[Map[String, Any]] = Option(getSearchFields(res) )
+
+  import scala.collection.JavaConversions._
+  protected def getSearchFields(res:Result): Map[String, Any] =
+  {
+    val sfKeyValues = res.getFamilyMap(MDColumnFamilies(_cf_search.id))
+    m_log debug s"Include list of search fields into result: ${sfKeyValues.keySet.toList.map(k => new String(k) + " => " + new String(sfKeyValues(k))  ).mkString("{", ",", "}")}"
+    val sf : Map[String, Any] = sfKeyValues.keySet().map( k =>
+    { val k_s = new String(k)
+      val sf_type = headerDesc(k_s)
+      val v_s = sf_type match {
+        case "String" => Bytes.toString(sfKeyValues.get(k))
+        case "Long" => Bytes.toLong(sfKeyValues.get(k))
+        case "Boolean" => Bytes.toBoolean(sfKeyValues.get(k))
+        case "Int" => Bytes.toInt(sfKeyValues.get(k))
+        case "Time" => {
+          val r = Bytes.toString(sfKeyValues.get(k))
+          val dfrm: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+          val ldt: LocalDateTime = LocalDateTime.parse(r, dfrm)
+          (true, ldt)
+        }
+
+      }
+      m_log trace s"Search field: $k_s, value: $v_s"
+      k_s -> v_s
+    }).toMap
+    sf
+  }
 
 }
 
 
 
-object SearchMetadata{
+object SearchMetadata extends MetadataStore{
 
-  val m_log: Logger = LoggerFactory.getLogger("MetadataNode")
+  override val m_log: Logger = LoggerFactory.getLogger("SearchMetadata")
 
   import scala.collection.JavaConversions._
-  def searchMetadata(mdNodeStoreTable: Table, keys: Map[String, Any], searchFields: Map[String, String], condition: String) : List[Array[Byte]] =
+  def simpleSearch(mdTableName: String, keys: Map[String, Any], systemProps: Map[String, Any], condition: String) : List[Array[Byte]] =
   {
+    val tn: TableName = TableName.valueOf(mdTableName)
+    mdNodeStoreTable = connection.getTable(tn)
+
     val filterList : FilterList = new FilterList( if (condition.equalsIgnoreCase("or")) FilterList.Operator.MUST_PASS_ONE else FilterList.Operator.MUST_PASS_ALL )
-    val filteringValues = keys.keySet.filter( searchFields.contains( _ ) )
 
-    m_log debug s"Create filter list with the following fields: ${filteringValues.mkString("{", ",", "}")}"
+    m_log debug s"Create filter list with the following fields: ${keys.keySet.mkString("{", ",", s"}")} and System properties: ${systemProps.keySet.mkString("{", ",", "}")}"
 
-    if (filteringValues.isEmpty) {
+    if (keys.isEmpty && systemProps.isEmpty ) {
       m_log error s"Filter is empty - the method should not be used"
       return null
     }
 
-    filteringValues.foreach( f => {
-      val searchFieldValue : Array[Byte] =
-        searchFields(f) match{
-          case "String" => Bytes.toBytes(keys(f).asInstanceOf[String])
-          case "Int" => Bytes.toBytes(keys(f).asInstanceOf[Int])
-          case "Long" => Bytes.toBytes(keys(f).asInstanceOf[Long])
-          case "Boolean" => Bytes.toBytes(keys(f).asInstanceOf[Boolean])
-          case _ => m_log error "Not supported data type"; null
-        }
-      m_log debug s"Field $f = ${keys(f)}"
-
-
+    keys.keySet.foreach( f => {
+      val searchFieldValue : Array[Byte] = MDNodeUtil.convertValue(keys(f))
       m_log debug s"Field $f = ${keys(f)}"
       val filter1 : SingleColumnValueFilter =
-            new SingleColumnValueFilter(
-              MDObjectStruct.MDSections(MDObjectStruct.searchSection.id),
-              Bytes.toBytes(f),
-              CompareOp.EQUAL,
-              searchFieldValue
-      )
+      new SingleColumnValueFilter(MDObjectStruct.MDColumnFamilies(MDObjectStruct._cf_search.id),Bytes.toBytes(f),CompareOp.EQUAL,searchFieldValue)
       filter1.setFilterIfMissing(true)
       filterList.addFilter(filter1)
+    })
+
+    systemProps.keySet.foreach( f => {
+      val searchFieldValue : Array[Byte] = MDNodeUtil.convertValue(systemProps(f))
+      m_log debug s"Field $f = ${systemProps(f)}"
+      val filter2 : SingleColumnValueFilter =
+        new SingleColumnValueFilter(MDObjectStruct.MDColumnFamilies(MDObjectStruct.systemProperties.id),Bytes.toBytes(f),CompareOp.EQUAL,searchFieldValue)
+      filter2.setFilterIfMissing(true)
+      filterList.addFilter(filter2)
     })
 
     val q = new Scan
@@ -147,6 +162,7 @@ object SearchMetadata{
     val result = (for( r: Result <- sr) yield r.getRow.clone()).toList
     m_log trace s"Found: ${sr.size} rows satisfied to filter: ${result.map ( new String( _ )).mkString("[", ",", "]")}"
     sr.close
+    mdNodeStoreTable.close()
     result
   }
 

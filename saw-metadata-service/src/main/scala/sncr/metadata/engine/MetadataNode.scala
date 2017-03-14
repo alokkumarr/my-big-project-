@@ -2,6 +2,7 @@ package sncr.metadata.engine
 
 import java.io.IOException
 
+import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 import org.slf4j.{Logger, LoggerFactory}
@@ -12,34 +13,51 @@ import sncr.metadata.engine.ProcessingResult._
 /**
   * Created by srya0001 on 2/17/2017.
   */
-trait MetadataNode extends MetadataStore {
+class MetadataNode extends MetadataStore {
 
   override val m_log: Logger = LoggerFactory.getLogger(classOf[MetadataNode].getName)
 
-  protected def createNode(nodeType: Int, nodeCategory: Int ): Put =
+  var nodeType :Array[Byte] = Array.empty
+  var nodeCategory :Array[Byte] = Array.empty
+
+  protected def createNode(a_nodeType: Int, a_nodeCategory: String ): Put =
   {
     rowKey = Bytes.toBytes(initRow)
+    nodeType = Bytes.toBytes(a_nodeType)
+    nodeCategory = Bytes.toBytes(a_nodeCategory)
     val putNode = new Put(rowKey)
-    putNode.addColumn(MDSections(systemProperties.id),MDKeys(syskey_NodeType.id),Bytes.toBytes(nodeType))
-             .addColumn(MDSections(systemProperties.id),MDKeys(key_Searchable.id),Bytes.toBytes(searchSection.id))
-             .addColumn(MDSections(systemProperties.id),MDKeys(syskey_NodeCategory.id),Bytes.toBytes(nodeCategory))
-    putNode
+    putNode.addColumn(MDColumnFamilies(systemProperties.id),MDKeys(syskey_NodeType.id),nodeType)
+           .addColumn(MDColumnFamilies(systemProperties.id),MDKeys(key_Searchable.id),Bytes.toBytes(_cf_search.id))
+           .addColumn(MDColumnFamilies(systemProperties.id),MDKeys(syskey_NodeCategory.id),nodeCategory)
   }
 
   protected def initRow : String = ???
 
-/*read part*/
+  /*read part*/
 
-  protected def getData(res:Result): Option[Map[String, Any]]  = ???
+
   protected def getHeaderData(res:Result): Option[Map[String, Any]]  = ???
-  protected def compileRead(getNode: Get): Get = ???
   protected def header(g : Get) : Get = ???
 
-  def prepareRead: Get = compileRead(new Get(rowKey))
+  protected def getData(res:Result): Option[Map[String, Any]]  = ???
+  protected def compileRead(getNode: Get): Get = ???
+
+  def getSystemData(res:Result): Map[String, Any]  =
+  {
+    nodeType = res.getValue(MDColumnFamilies(systemProperties.id),MDKeys(syskey_NodeType.id))
+    nodeCategory = res.getValue(MDColumnFamilies(systemProperties.id),MDKeys(syskey_NodeCategory.id))
+    val search =  res.getValue(MDColumnFamilies(systemProperties.id),MDKeys(key_Searchable.id))
+    Map( "NodeType" ->NodeType.apply(Bytes.toInt(nodeType)).toString,
+         "NodeCategory" -> Bytes.toString(nodeCategory),
+         "Searchable" -> key_Searchable.id
+       )
+  }
+
+  def prepareRead: Get = compileRead(new Get(rowKey)).addFamily(MDColumnFamilies(systemProperties.id))
 
   def readCompiled( getNode: Get): Option[Map[String, Any]] = {
     try {
-      m_log debug s"Load row: ${new String(rowKey)}"
+      m_log debug s"Load row: ${Bytes.toString(rowKey)}"
       val res = mdNodeStoreTable.get(getNode)
       if (res.isEmpty) return None
       getData(res)
@@ -51,8 +69,9 @@ trait MetadataNode extends MetadataStore {
 
   def readHeaderOnly: Option[Map[String, Any]] = {
     try {
-      m_log debug s"Load row header: ${new String(rowKey)}"
-      val getNodeHeader = header(new Get(rowKey))
+      m_log debug s"Load row header: ${Bytes.toString(rowKey)}"
+      val get = new Get(rowKey).addFamily(MDColumnFamilies(systemProperties.id))
+      val getNodeHeader = header(get)
       val res = mdNodeStoreTable.get(getNodeHeader)
       if (res.isEmpty) return None
       getHeaderData(res)
@@ -63,7 +82,7 @@ trait MetadataNode extends MetadataStore {
   }
 
 
-  protected def saveNode(putNode : Put): Boolean = {
+  protected def commit(putNode : Put): Boolean = {
     try {
       if (putNode == null){
         m_log error "Metadata node is empty"; return false
@@ -78,7 +97,7 @@ trait MetadataNode extends MetadataStore {
   }
 
 
-  def delete : (Int, String) =
+  def _delete : (Int, String) =
   {
     try {
       val delGetOp: Get = new Get(rowKey)
@@ -97,38 +116,42 @@ trait MetadataNode extends MetadataStore {
     (Success.id, s"Node [ ID = ${new String(rowKey)}] was successfully removed")
   }
 
+  protected def update : Put = new Put(rowKey)
 
-  def loadNodes(rowKeys: List[Array[Byte]]): List[Map[String, Any]] =
-  {
-    m_log debug s"Load ${rowKeys.size} rows"
-    rowKeys.map( k => {rowKey = k; readCompiled(prepareRead)} ).filter(  _.isDefined ).map(v => v.get)
+  def selectRowKey(keys: Map[String, Any]) : (Int, String) = ???
+
+
+  def read(filter: Map[String, Any]): Map[String, Any] = {
+    val (res, msg) = selectRowKey(filter)
+    if (res != Success.id) return Map.empty
+    readCompiled(prepareRead).getOrElse(Map.empty)
   }
 
-  def loadHeaders(rowKeys: List[Array[Byte]]): List[Map[String, Any]] =
-  {
-    m_log debug s"Load ${rowKeys.size} rows"
-    rowKeys.map( k => {rowKey = k; readHeaderOnly} ).filter(  _.isDefined ).map(v => v.get)
+
+  def delete(keys: Map[String, Any]): (Int, String) = {
+    val (res, msg) = selectRowKey(keys)
+    if (res != Success.id) return (res, msg)
+    _delete
   }
-
-  def update : Put = new Put(rowKey)
-
 
 
 }
 
-object MetadataNode{
+object MetadataNode extends MetadataStore{
 
-  val m_log: Logger = LoggerFactory.getLogger("MetadataNode")
+  override val m_log: Logger = LoggerFactory.getLogger("MetadataNode")
 
-  def create(mdNodeStoreTable: Table, compositeKey: String, content: String, searchDictionary: Map[String, String]): Boolean = {
+  def create(mdTableName: String, compositeKey: String, content: String, searchDictionary: Map[String, String]): Boolean = {
     try {
+      val tn: TableName = TableName.valueOf(mdTableName)
+      mdNodeStoreTable = connection.getTable(tn)
       var putOp: Put = new Put(Bytes.toBytes(compositeKey))
-      putOp = putOp.addColumn(MDSections(sourceSection.id),
+      putOp = putOp.addColumn(MDColumnFamilies(_cf_source.id),
                               MDKeys(key_Definition.id),
                               Bytes.toBytes(content))
       val sval = MDNodeUtil.extractSearchData(content, searchDictionary) + ("NodeId" -> Option(compositeKey))
       sval.keySet.foreach(k => {
-        putOp = putOp.addColumn(MDSections(searchSection.id),
+        putOp = putOp.addColumn(MDColumnFamilies(_cf_search.id),
                                 Bytes.toBytes(k),
                                 Bytes.toBytes(sval(k).asInstanceOf[String]))
       })
@@ -137,33 +160,38 @@ object MetadataNode{
     catch{
       case x: IOException => m_log error ( s"Could not retrieve  node: $compositeKey, Reason: ", x); return false
     }
+    finally mdNodeStoreTable.close()
     true
   }
 
 
-  def retrieve(mdNodeStoreTable: Table, compositeKey: String, includeSearchFields: Boolean): Option[Map[String, Any]] = {
-    retrieve(mdNodeStoreTable, Bytes.toBytes(compositeKey), includeSearchFields: Boolean)
+  def load(mdTableName: String, compositeKey: String, includeSearchFields: Boolean): Option[Map[String, Any]] = {
+    load(mdTableName, Bytes.toBytes(compositeKey), includeSearchFields: Boolean)
   }
 
+  def load(mdTableName: String, compositeKey: Array[Byte], includeSearchFields: Boolean): Option[Map[String, Any]] = {
+    val tn: TableName = TableName.valueOf(mdTableName)
+    mdNodeStoreTable = connection.getTable(tn)
+    load(mdNodeStoreTable, compositeKey, includeSearchFields )
+  }
+
+
   import scala.collection.JavaConversions._
-  def retrieve(mdNodeStoreTable: Table, compositeKey: Array[Byte], includeSearchFields: Boolean): Option[Map[String, Any]] = {
+  private def load(mdNodeStoreTable: Table, compositeKey: Array[Byte], includeSearchFields: Boolean): Option[Map[String, Any]] = {
     try {
+
       m_log debug s"Load row: ${new String(compositeKey)}"
 
       val getOp: Get = new Get(compositeKey)
-      getOp.addFamily(MDKeys(sourceSection.id))
+      getOp.addFamily(MDKeys(_cf_source.id))
 
-      if (includeSearchFields) getOp.addFamily(MDSections(searchSection.id))
-
+      if (includeSearchFields) getOp.addFamily(MDColumnFamilies(_cf_search.id))
       val res = mdNodeStoreTable.get(getOp)
-
       if (res.isEmpty) return None
-
-      val content = res.getValue(MDSections(sourceSection.id),MDKeys(key_Definition.id))
-
+      val content = res.getValue(MDColumnFamilies(_cf_source.id),MDKeys(key_Definition.id))
       m_log debug s"Read node: ${new String(content)}"
       if (includeSearchFields) {
-        val sfKeyValues = res.getFamilyMap(MDSections(searchSection.id))
+        val sfKeyValues = res.getFamilyMap(MDColumnFamilies(_cf_search.id))
 
         m_log debug s"Include list of search fields into result: ${sfKeyValues.keySet.toList.map(k => new String(k) + " =>" + new String(sfKeyValues(k))  ).mkString("{", ",", "}")}"
 
@@ -184,25 +212,30 @@ object MetadataNode{
     catch{
       case x: IOException => m_log error ( s"Could not read node: $compositeKey, Reason: ", x); None
     }
+    finally mdNodeStoreTable.close()
+
   }
 
 
-  def delete(mdNodeStoreTable: Table, compositeKey: String) : Boolean =
+  def delete(mdTableName: String, compositeKey: String) : Boolean =
   {
     try {
+      val tn: TableName = TableName.valueOf(mdTableName)
+      mdNodeStoreTable = connection.getTable(tn)
       val delOp: Delete = new Delete(Bytes.toBytes(compositeKey))
       mdNodeStoreTable.delete(delOp)
     }
     catch{
       case x: IOException => m_log error ( s"Could not delete node: $compositeKey, Reason: ", x); return false
     }
+    finally mdNodeStoreTable.close()
     true
   }
 
   def update(mdNodeStoreTable: Table, compositeKey: String, content: String, searchDictionary: Map[String, String]): Boolean = {
     try {
       val query = new Get(Bytes.toBytes(compositeKey))
-      query.addFamily(MDSections(sourceSection.id))
+      query.addFamily(MDColumnFamilies(_cf_source.id))
       val res = mdNodeStoreTable.get(query)
       if (res == null || res.isEmpty){m_log debug s"Row does not exist: ${compositeKey}"; return false}
       val data = query.getFamilyMap
@@ -210,23 +243,28 @@ object MetadataNode{
         m_log debug s"Row is empty: $compositeKey"
       }
       var putOp: Put = new Put(Bytes.toBytes(compositeKey))
-      putOp = putOp.addColumn(MDSections(sourceSection.id),MDKeys(key_Definition.id),Bytes.toBytes(content))
+      putOp = putOp.addColumn(MDColumnFamilies(_cf_source.id),MDKeys(key_Definition.id),Bytes.toBytes(content))
       val sval = MDNodeUtil.extractSearchData(content, searchDictionary) + ("NodeId" -> Option(compositeKey))
       sval.keySet.foreach(k => {
-        putOp = putOp.addColumn(MDSections(searchSection.id),Bytes.toBytes(k),Bytes.toBytes(sval(k).asInstanceOf[String]))
+        putOp = putOp.addColumn(MDColumnFamilies(_cf_search.id),Bytes.toBytes(k),Bytes.toBytes(sval(k).asInstanceOf[String]))
       })
       mdNodeStoreTable.put(putOp)
     }
     catch{
-      case x: IOException => m_log error ( s"Could not retrieve  node: ${compositeKey}, Reason: ", x); false
+      case x: IOException => m_log error ( s"Could not retrieve  node: ${compositeKey}, Reason: ", x); return false
     }
+    finally mdNodeStoreTable.close()
     true
   }
 
-  def loadMDNodes(mdNodeStoreTable: Table, rowKeys: List[Array[Byte]], includeSearchFields : Boolean ): List[Map[String, Any]] =
+  def loadMDNodes(mdTableName: String, rowKeys: List[Array[Byte]], includeSearchFields : Boolean ): List[Map[String, Any]] =
   {
     m_log debug s"Load ${rowKeys.size} rows"
-    rowKeys.map( k => retrieve(mdNodeStoreTable, k, includeSearchFields)).filter(  _.isDefined ).map(v => v.get)
+    val tn: TableName = TableName.valueOf(mdTableName)
+    mdNodeStoreTable = connection.getTable(tn)
+    val loadedNodes = rowKeys.map( k => load(mdNodeStoreTable, k, includeSearchFields)).filter(  _.isDefined ).map(v => v.get)
+    mdNodeStoreTable.close()
+    loadedNodes
   }
 
 

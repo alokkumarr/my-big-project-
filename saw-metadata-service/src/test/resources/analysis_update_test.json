@@ -3,13 +3,13 @@
 	"verb" : "update",
 	"keys" : 
 		{   
-			 "analysisId" : 7 
+			 "analysisId" : 22 
 		},	
 	"content" : {
-			"name": "updatedAnalysis",
-			"description": "Update this analysis",
-			"tenantId": "NewTenant1-NOUSE",
-			"productId": "Test",
+			"name": "updatedAnalysis-regressiontest-1",
+			"description": "Update this analysis ",
+			"tenantId": "ATT",
+			"productId": "Regression Test 1",
 			"emailId": "asor0001@synchronoss.com",
 			"publishedBy": "ABC",
 			"copyToFTP": true,
@@ -23,8 +23,8 @@
 					"analysisId": 777,
 					"productViewsId": 11,
 					"analysisCategoryId": 333,
-					"analysisCategoryName": "UA_RRM",
-					"tenantId": "NewTenant",
+					"analysisCategoryName": "UA_RRM_Updated_r1",
+					"tenantId": "ATT",
 					"productId": "OldProduct",
 					"analysisName": "Updated Analysis",
 					"analysisDescription": "Updated Analysis test",
@@ -59,8 +59,8 @@
 									"type": "Date_Range",
 									"aggregate": "N",
 									"groupBy": "Y",
-									"rawAnalysisId": 4,
-									"rawAnalysisColumnsId": 24,
+									"rawAnalysisId": 22,
+									"rawAnalysisColumnsId": 222,
 									"selected": true
 							}
 					],
