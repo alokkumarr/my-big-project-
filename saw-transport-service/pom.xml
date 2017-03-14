@@ -518,7 +518,7 @@
                             <groupname>${app.group}</groupname>
                             <sources>
                                 <source>
-                                    <location>${project.basedir}/../saw-metadata-service/src/main/resources</location>
+                                    <location>${project.basedir}/../saw-metadata-service/src/test/resources</location>
                                     <includes>
                                         <include>create_ui_menu_sample.json</include>
                                         <include>C_ui_analyze_sample.json</include>
