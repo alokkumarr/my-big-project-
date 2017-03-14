@@ -370,7 +370,7 @@ public class UserRepositoryImpl implements UserRepository {
 				message = "User is inactive, please contact administrator.";
 				return message;
 			} else if (user.getFirstName() != null && user.getFirstName() != null
-					&& !user.getFirstName().toUpperCase().equals(fName.toUpperCase())) {
+					&& !user.getFirstName().equalsIgnoreCase(fName)) {
 				message = "'First Name' provided is not identified in the system, please re-verify.";
 				return message;
 			}
