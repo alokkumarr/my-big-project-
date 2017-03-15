@@ -11,7 +11,7 @@
     "createdDate":"2016-01-12 04:31:10.0",
     "type": "chart",
     "name": "Order Revenue By Region",
-    "description": "Now that there is the Tec-9, a crappy spray gun from South Miami. This gun is advertised as the most popular gun in American crime. Do you believe that shit? It actually says that in the little book that comes with it: the most popular gun in American crime. Like they're actually proud of that shit.",
+    "description": "Donec at velit placerat, imperdiet enim ut, venenatis elit. Phasellus lacus est, gravida at ipsum eget, viverra facilisis eros. Integer blandit nisl vel placerat mattis. In porta nibh vestibulum facilisis.",
     "category": 11,
     "metrics": [
       "Orders",
@@ -34,7 +34,7 @@
     "createdDate":"2016-01-9 04:31:10.0",
     "type": "chart",
     "name": "Order Revenue By Customer",
-    "description": "Look, just because I don't be givin' no man a foot massage don't make it right for Marsellus to throw Antwone into a glass motherfuckin' house, fuckin' up the way the nigger talks. Motherfucker do that shit to me, he better paralyze my ass, 'cause I'll kill the motherfucker, know what I'm sayin'?",
+    "description": "Maecenas et ligula eros. Aliquam sodales ultrices vestibulum. Donec eu semper purus. Duis sed eros a enim posuere dignissim. Nam porta bibendum auctor. Integer sit amet sem non mauris tristique.",
     "category": 11,
     "metrics": [
       "Orders",
@@ -57,7 +57,7 @@
     "creatorName": "John Clay",
     "createdDate":"2016-01-7 04:31:10.0",
     "name": "Cable Orders",
-    "description": "You think water moves fast? You should see ice. It moves like it has a mind. Like it knows it killed the world once and got a taste for murder. After the avalanche, it took us a week to climb out. Now, I don't know exactly when we turned on each other, but I know that seven of us survived the slide... and only five made it out. Now we took an oath, that I'm breaking now. We said we'd say it was the snow that killed the other two, but it wasn't. Nature is lethal but it doesn't hold a candle to man.",
+    "description": "Nulla velit libero, interdum et commodo a, pellentesque eleifend purus. Phasellus at dui ullamcorper, mollis enim non, luctus eros. Quisque iaculis libero leo, a commodo dolor sagittis eu. Fusce sodales.",
     "category": 11,
     "metrics": [
       "Orders"
@@ -240,7 +240,7 @@
     "createdDate":"2016-01-12 04:31:10.0",
     "type": "pivot",
     "name": "Pivot test",
-    "description": "Now that there is the Tec-9, a crappy spray gun from South Miami. This gun is advertised as the most popular gun in American crime. Do you believe that shit? It actually says that in the little book that comes with it: the most popular gun in American crime. Like they're actually proud of that shit.",
+    "description": "Pellentesque varius nunc felis, in pellentesque lacus suscipit sit amet. Duis porttitor sagittis tristique. Sed sodales condimentum quam a molestie. Vivamus blandit massa lorem, non rhoncus dolor condimentum fringilla. Sed.",
     "category": 11,
     "metrics": [
       "Orders",
