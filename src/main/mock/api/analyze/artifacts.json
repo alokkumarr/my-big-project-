@@ -2,10 +2,20 @@
   {
     "artifact_name": "Orders",
     "artifact_position": [
-      5,
-      5
+      0,
+      0
     ],
     "artifact_attributes": [
+      {
+        "column_name": "ORDER_NUMBER",
+        "display_name": "Order Number",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": true,
+        "filter_eligible": true,
+        "checked": false
+      },
       {
         "column_name": "ORDER_END_TIMESTAMP",
         "display_name": "Order End Timestamp",
@@ -17,6 +27,17 @@
         "checked": false
       },
       {
+        "column_name": "CUSTOMER_ID",
+        "display_name": "Customer ID",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": true,
+        "filter_eligible": true,
+        "checked": false
+      },
+
+      {
         "column_name": "REC_STATE",
         "display_name": "Rec State",
         "alias_name": "",
@@ -26,7 +47,7 @@
         "filter_eligible": true,
         "checked": false
       },
-        {
+      {
         "column_name": "SERVICE",
         "display_name": "Service",
         "alias_name": "",
@@ -36,7 +57,7 @@
         "filter_eligible": true,
         "checked": false
       },
-          {
+      {
         "column_name": "EXTERNAL_ORDER_NUMBER",
         "display_name": "External Order Number",
         "alias_name": "",
@@ -97,6 +118,16 @@
         "checked": false
       },
       {
+        "column_name": "CUSTOMER",
+        "display_name": "Customer",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
         "column_name": "CUSTOMER_TYPE",
         "display_name": "Customer Type",
         "alias_name": "",
@@ -137,7 +168,7 @@
         "checked": false
       },
 
-       {
+      {
         "column_name": "UPGRADE_PRODUCT_TYPE",
         "display_name": "Upgrade Product Type",
         "alias_name": "",
@@ -249,16 +280,6 @@
         "checked": false
       },
       {
-        "column_name": "ORDER_NUMBER",
-        "display_name": "Order Number",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
         "column_name": "ORDER_STATUS_TIME",
         "display_name": "Order Status Time",
         "alias_name": "",
@@ -322,16 +343,82 @@
     "sql_builder": {
       "group_by_columns": [],
       "order_by_columns": [],
-      "joins": []
+      "joins": [
+        {
+          "type": "inner",
+          "criteria": [
+            {
+              "table_name": "Orders",
+              "column_name": "ORDER_NUMBER",
+              "side": "right"
+            },
+            {
+              "table_name": "Products",
+              "column_name": "ORDER_NUMBER",
+              "side": "left"
+            }
+          ]
+        },
+        {
+          "type": "inner",
+          "criteria": [
+            {
+              "table_name": "Orders",
+              "column_name": "CUSTOMER_ID",
+              "side": "right"
+            },
+            {
+              "table_name": "Customers",
+              "column_name": "CUSTOMER_ID",
+              "side": "left"
+            }
+          ]
+        },
+        {
+          "type": "inner",
+          "criteria": [
+            {
+              "table_name": "Products",
+              "column_name": "SERVICE_ID",
+              "side": "right"
+            },
+            {
+              "table_name": "Service",
+              "column_name": "SERVICE_ID",
+              "side": "left"
+            }
+          ]
+        }
+      ]
     }
   },
   {
     "artifact_name": "Products",
     "artifact_position": [
-      200,
-      5
+      500,
+      0
     ],
     "artifact_attributes": [
+      {
+        "column_name": "PRODUCT_ID",
+        "display_name": "Product ID",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "SERVICE_ID",
+        "display_name": "Service ID",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": true,
+        "filter_eligible": true,
+        "checked": false
+      },
       {
         "column_name": "PRODUCT_STATUS_DATE",
         "display_name": "Product Status Date",
@@ -339,6 +426,16 @@
         "type": "string",
         "hide": false,
         "join_eligible": false,
+        "filter_eligible": true,
+        "checked": false
+      },
+      {
+        "column_name": "ORDER_NUMBER",
+        "display_name": "Order Number",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": true,
         "filter_eligible": true,
         "checked": false
       },
@@ -502,10 +599,20 @@
   {
     "artifact_name": "Customers",
     "artifact_position": [
-      600,
-      5
+      270,
+      200
     ],
     "artifact_attributes": [
+      {
+        "column_name": "CUSTOMER_ID",
+        "display_name": "Customer ID",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": true,
+        "filter_eligible": true,
+        "checked": false
+      },
       {
         "column_name": "STATE_NAME",
         "display_name": "State Name",
@@ -626,10 +733,20 @@
   {
     "artifact_name": "Service",
     "artifact_position": [
-      400,
-      5
+      770,
+      150
     ],
     "artifact_attributes": [
+      {
+        "column_name": "SERVICE_ID",
+        "display_name": "Service ID",
+        "alias_name": "",
+        "type": "string",
+        "hide": false,
+        "join_eligible": true,
+        "filter_eligible": true,
+        "checked": false
+      },
       {
         "column_name": "SERVICE_LEVEL_DESC",
         "display_name": "Service Level Desc",
