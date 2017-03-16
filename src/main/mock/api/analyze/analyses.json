@@ -40,7 +40,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": true,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -50,7 +50,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -60,7 +60,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": true,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
 
@@ -81,7 +81,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -91,7 +91,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -101,7 +101,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -131,7 +131,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -151,7 +151,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -181,7 +181,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -191,7 +191,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
 
@@ -253,7 +253,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -263,7 +263,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -273,7 +273,7 @@
             "type": "int",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -283,7 +283,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -293,7 +293,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -303,7 +303,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": true
           },
           {
@@ -313,7 +313,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -433,7 +433,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -443,7 +443,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": true,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -453,7 +453,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -463,7 +463,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": true,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": true
           },
           {
@@ -473,7 +473,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -483,7 +483,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -563,7 +563,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -583,7 +583,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -637,7 +637,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": true,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -657,7 +657,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -667,7 +667,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -707,7 +707,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": true
           },
           {
@@ -717,7 +717,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -727,7 +727,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -737,7 +737,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -747,7 +747,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           }
         ],
@@ -771,7 +771,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": true,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -791,7 +791,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
@@ -801,7 +801,7 @@
             "type": "string",
             "hide": false,
             "join_eligible": false,
-            "filter_eligible": true,
+            "filter_eligible": false,
             "checked": false
           },
           {
