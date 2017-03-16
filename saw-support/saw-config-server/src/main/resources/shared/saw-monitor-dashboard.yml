@@ -1,0 +1,3 @@
+server:
+  context-path: /monitor
+  port: 4000

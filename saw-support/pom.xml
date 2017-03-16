@@ -9,11 +9,19 @@
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
 	
+	 <parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.2.RELEASE</version>
+		<relativePath/>
+    </parent>
+	
+	
 	<modules>
 		<module>saw-config-server</module>
 		<module>saw-discovery-server</module>
 		<module>saw-edge-server</module>
 		<module>saw-monitor-dashboard</module>
-		<module>saw-services-turbine</module>
+		<module>saw-distributed-tracer</module>
 	</modules>
 </project>

@@ -1,0 +1,63 @@
+{
+	"type":"object",
+	"$schema": "http://json-schema.org/draft-03/schema",
+	"id": "http://jsonschema.net",
+	"required":false,
+	"properties":{
+		"contents": {
+			"type":"object",
+			"id": "http://jsonschema.net/contents",
+			"required":true,
+			"properties":{
+				"action": {
+					"type":"string",
+					"id": "http://jsonschema.net/contents/action",
+					"default": "create|update|retrieve|delete",
+					"required":false
+				},
+				"alert": {
+					"type":"array",
+					"id": "http://jsonschema.net/contents/alert",
+					"required":false
+				},
+				"analyze": {
+					"type":"array",
+					"id": "http://jsonschema.net/contents/analyze",
+					"required":false
+				},
+				"keys": {
+					"type":"object",
+					"id": "http://jsonschema.net/contents/keys",
+					"required":false
+				},
+				"observe": {
+					"type":"array",
+					"id": "http://jsonschema.net/contents/observe",
+					"required":false
+				}
+			}
+		},
+		"iat": {
+			"type":"number",
+			"id": "http://jsonschema.net/iat",
+			"default":1488802893,
+			"required":true
+		},
+		"links": {
+			"type":"object",
+			"id": "http://jsonschema.net/links",
+			"required":false
+		},
+		"sub": {
+			"type":"string",
+			"id": "http://jsonschema.net/sub",
+			"default": "shwetha@frn.com",
+			"required":true
+		},
+		"ticket": {
+			"type":"object",
+			"id": "http://jsonschema.net/ticket",
+			"required":true
+		}
+	}
+}

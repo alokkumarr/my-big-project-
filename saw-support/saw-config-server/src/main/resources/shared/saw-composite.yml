@@ -1,0 +1,10 @@
+server:
+  context-path: /saw
+  port: 6000
+  
+spring:
+  sleuth:
+    sampler:
+      percentage: 0.1
+      
+  

@@ -1,0 +1,11 @@
+info:
+  component: Synchronoss Analytics Composite Service
+spring:
+  application:
+    name: saw-composite
+  cloud:
+    config:
+      uri: http://localhost:8888
+      fail-fast: true
+      password: password
+      username: user

@@ -2,12 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
+ <parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.1.RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<version>1.5.2.RELEASE</version>
+		<relativePath/>
 	</parent>
+	
+	
 	<groupId>com.synchronoss</groupId>
 	<artifactId>saw-services</artifactId>
 	<version>1.0.0</version>
@@ -27,6 +29,7 @@
   	    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- Versions of 3rd party dependencies  -->
 		<spark-version>1.6.1</spark-version>
+		<java.version>1.8</java.version>
 		<elasticsearch.version>1.7.3</elasticsearch.version>
 		<elasticsearch-spark.version>2.4.0</elasticsearch-spark.version>
 		<parquet.version>1.6.0</parquet.version>
@@ -63,27 +66,28 @@
 		<Json4s.latestVersion>3.3.0</Json4s.latestVersion>
 		<rpm.saw.root>/opt</rpm.saw.root>
 	</properties>
-	<repositories>
+<!-- 	<repositories>
     <repository>
       <id>synchronoss</id>
       <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
     </repository>
   </repositories>
-	<dependencies>
+ -->	
+  <dependencies>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.1.8</version>
+			<!--   <version>1.1.8</version> -->  
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>4.5.3</version>
+			 <!-- <version>4.5.3</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
-			<version>4.4.6</version>
+			<!-- <version>4.4.6</version> -->
 		</dependency>
 		<dependency>
 			<groupId>com.typesafe.scala-logging</groupId>
@@ -116,8 +120,14 @@
 			<artifactId>scalactic_${scala.major.version}</artifactId>
 			<version>2.2.6</version>
 			<scope>test</scope>
-		</dependency>
-	</dependencies>
+ 		</dependency>
+<!--			<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-security</artifactId>
+		</dependency>	
+ -->	
+ </dependencies>
+	
 	<pluginRepositories>
 		<pluginRepository>
 			<id>typesafe-releases-plugins</id>

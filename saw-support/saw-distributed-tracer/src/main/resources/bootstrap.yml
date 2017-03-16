@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: saw-distributed-tracer
+  cloud:
+   config:
+     uri: http://localhost:8888
+     fail-fast: true
+     password: password
+     username: user
