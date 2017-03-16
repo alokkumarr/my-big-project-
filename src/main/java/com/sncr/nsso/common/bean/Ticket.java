@@ -5,7 +5,6 @@ package com.sncr.nsso.common.bean;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

@@ -4,15 +4,12 @@
 package com.sncr.nsso.app;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.netflix.hystrix.EnableHystrix;
-import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
@@ -22,12 +19,9 @@ import com.sncr.nsso.common.bean.JwtFilter;
  * @author gsan0003
  *
  */
-@SuppressWarnings("deprecation")
-@EnableDiscoveryClient
-@EnableZuulProxy
-@EnableHystrix 
-@EnableAutoConfiguration
+
 @SpringBootApplication
+@EnableDiscoveryClient
 public class NSSOApplication extends SpringBootServletInitializer {
 
 	@Bean
@@ -59,6 +53,7 @@ public class NSSOApplication extends SpringBootServletInitializer {
 
 		// Launch the application
 		ConfigurableApplicationContext context = SpringApplication.run(NSSOApplication.class, args);
+		@SuppressWarnings("unused")
 		WebSecurityConfig config = context.getBean(WebSecurityConfig.class);
 
 	}

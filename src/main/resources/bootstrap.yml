@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: saw-security
+  cloud:
+    config:
+      uri: http://localhost:8888
+      fail-fast: true
+      password: password
+      username: user
+

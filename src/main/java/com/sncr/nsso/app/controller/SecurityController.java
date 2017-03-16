@@ -58,7 +58,9 @@ public class SecurityController {
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
 
-		
+		logger.info("Ticket will be created..");
+		logger.info("Token Expiry :" +nSSOProperties.getValidityMins());
+	
 		Ticket ticket = null;
 		User user = null;
 		TicketHelper tHelper = new TicketHelper(userRepository);

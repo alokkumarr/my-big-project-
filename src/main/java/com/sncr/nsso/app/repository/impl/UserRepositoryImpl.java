@@ -26,7 +26,6 @@ import com.sncr.nsso.common.bean.repo.ProductModuleFeature;
 import com.sncr.nsso.common.bean.repo.ProductModuleFeaturePrivileges;
 import com.sncr.nsso.common.bean.repo.ProductModuleFeatures;
 import com.sncr.nsso.common.bean.repo.ProductModules;
-import com.sncr.nsso.common.bean.repo.Products;
 import com.sncr.nsso.common.bean.repo.TicketDetails;
 import com.sncr.nsso.common.util.DateUtil;
 import com.sncr.nsso.common.util.EncriptionUtil;
