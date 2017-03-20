@@ -36,21 +36,17 @@ describe('Analyses Tests', () => {
     analyze.validateDesignerDialog();
   });
 
-  it('should add fields to report', () => {
-    analyze.analysisElems.totalPriceField.click();
-    analyze.analysisElems.shipperNameField.click();
-    analyze.analysisElems.customerNameField.click();
-  });
-
-  it('should see the added fields in the details panel', () => {
+  it('should display the added fields to report details', () => {
+    analyze.analysisElems.ordersOrderNumber.click();
+    analyze.analysisElems.customersEmail.click();
+    analyze.analysisElems.productsProductTypes.click();
+    analyze.analysisElems.serviceProductStatus.click();
     analyze.analysisElems.toggleDetailsPanel.click();
-    analyze.analysisElems.totalPriceField.click();
+    analyze.validateReportGrid();
   });
 
   it('should attempt to save the report and fill the details', () => {
     analyze.analysisElems.saveReportBtn.click();
-    analyze.analysisElems.reportCategory.click();
-    analyze.analysisElems.firstCategoryOption.click();
     expect(analyze.analysisElems.reportCategory.getText()).toEqual('Order Fulfillment');
     analyze.analysisElems.reportNameField.clear().sendKeys('e2e report');
     analyze.analysisElems.reportDescriptionField.clear().sendKeys('e2e test description');
