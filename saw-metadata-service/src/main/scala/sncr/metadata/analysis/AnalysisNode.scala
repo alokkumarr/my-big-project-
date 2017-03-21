@@ -45,9 +45,8 @@ class AnalysisNode(private[this] var analysisNode: JValue = JNothing) extends Co
 
 
   override protected def initRow: String = {
-    val rowkey = (analysisNode \ "name").extract[String] + AnalysisNode.separator +
-      (analysisNode \ "analysis" \ "analysisId").extract[String] + AnalysisNode.separator +
-      (analysisNode \ "analysis" \ "analysisCategoryId").extract[String] + AnalysisNode.separator +
+    val rowkey =
+      (analysisNode \ "analysisId").extract[String] + AnalysisNode.separator +
       System.currentTimeMillis()
     m_log debug s"Generated RowKey = $rowkey"
     rowkey
@@ -59,11 +58,6 @@ class AnalysisNode(private[this] var analysisNode: JValue = JNothing) extends Co
       case _: JValue => {
         AnalysisNode.requiredFields.keySet.foreach {
           case k@"analysis" => AnalysisNode.requiredFields(k).foreach {
-            case rf@"columns" =>
-              analysisNode \ k \ rf match {
-                case JArray(ja) => if (ja.isEmpty) (Rejected.id, "Analysis column section is empty")
-                case _ => return (Rejected.id, "Analysis column section is missing")
-              }
             case x: String =>
               val fieldValue = analysisNode \ k \ x
               if (fieldValue == null || fieldValue.extractOpt[String].isEmpty) {
@@ -161,24 +155,16 @@ object AnalysisNode{
   }
 
   val requiredFields = Map(
-    "root" -> List("name", "tenantId", "productId"),
-    "analysis" -> List( "analysisId", "productId", "analysisId", "analysisName", "columns")
+    "root" -> List("analysisId", "module", "customer_code")
   )
 
   def  extractSearchData(analysisNode: JValue) : Map[String, Any] = {
 
-    val analysis = analysisNode \ "analysis"
     List(
-      (analysisNode, "name"),
-      (analysisNode, "tenantId"),
-      (analysisNode, "productId"),
-      (analysis, "analysisId"),
-      (analysis, "analysisCategoryId"),
-      (analysis, "analysisCategoryName"),
-      (analysis, "tenantId"),
-      (analysis, "productId"),
-      (analysis, "analysisName"),
-      (analysis, "displayStatus"))
+      (analysisNode, "analysisId"),
+      (analysisNode, "module"),
+      (analysisNode, "customer_code")
+)
       .map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, SearchDictionary.searchFields(jv._2)) )
         m_log trace s"Field: ${jv._2}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${SearchDictionary.searchFields(jv._2)}\n, Value: $searchValue"
