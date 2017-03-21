@@ -6,5 +6,24 @@ spring:
   sleuth:
     sampler:
       percentage: 0.1
+
+shell:
+    auth:
+       simple:
+           user:
+               name: saw
+               password: saw
+management:
+     security:
+       enabled: false
+
+metadata:
+     url : ""       
+
+logging:
+    level:
+      com.synchronoss.saw.composite : DEBUG
+   
+      
       
   

@@ -1,63 +1,66 @@
 {
-	"type":"object",
-	"$schema": "http://json-schema.org/draft-03/schema",
-	"id": "http://jsonschema.net",
-	"required":false,
-	"properties":{
-		"contents": {
-			"type":"object",
-			"id": "http://jsonschema.net/contents",
-			"required":true,
-			"properties":{
-				"action": {
-					"type":"string",
-					"id": "http://jsonschema.net/contents/action",
-					"default": "create|update|retrieve|delete",
-					"required":false
-				},
-				"alert": {
-					"type":"array",
-					"id": "http://jsonschema.net/contents/alert",
-					"required":false
-				},
-				"analyze": {
-					"type":"array",
-					"id": "http://jsonschema.net/contents/analyze",
-					"required":false
-				},
-				"keys": {
-					"type":"object",
-					"id": "http://jsonschema.net/contents/keys",
-					"required":false
-				},
-				"observe": {
-					"type":"array",
-					"id": "http://jsonschema.net/contents/observe",
-					"required":false
-				}
-			}
-		},
-		"iat": {
-			"type":"number",
-			"id": "http://jsonschema.net/iat",
-			"default":1488802893,
-			"required":true
-		},
-		"links": {
-			"type":"object",
-			"id": "http://jsonschema.net/links",
-			"required":false
-		},
-		"sub": {
-			"type":"string",
-			"id": "http://jsonschema.net/sub",
-			"default": "shwetha@frn.com",
-			"required":true
-		},
-		"ticket": {
-			"type":"object",
-			"id": "http://jsonschema.net/ticket",
-			"required":true
-		}
-	}
+   "$schema":"http://json-schema.org/draft-04/schema#",
+   "id":"http://synchronoss.com/saw.json",
+   "properties":{
+      "contents":{
+         "id":"http://synchronoss.com/saw.json/contents",
+         "properties":{
+            "actions":{
+               "default":"create",
+               "description":"An explanation about the purpose of this instance.",
+               "enum":[
+                  "delete",
+                  "create",
+                  "update",
+                  "search"
+               ],
+               "id":"http://synchronoss.com/saw.json/contents/actions",
+               "title":"The Actions schema.",
+               "type":"string"
+            },
+            "alerts":{
+               "id":"http://synchronoss.com/saw.json/contents/alerts",
+               "items":{
+                  "description":"Allows anything, and describes nothing.",
+                  "title":"Empty schema."
+               },
+               "type":"array"
+            },
+            "analyze":{
+               "id":"http://synchronoss.com/saw.json/contents/analyze",
+               "items":{
+                  "description":"Allows anything, and describes nothing.",
+                  "title":"Empty schema."
+               },
+               "type":"array"
+            },
+            "keys":{
+               "id":"http://synchronoss.com/saw.json/contents/keys",
+               "properties":{
+                  "description":"Allows anything, and describes nothing.",
+                  "title":"Empty schema."
+               },
+               "type":"object"
+            },
+            "observe":{
+               "id":"http://synchronoss.com/saw.json/contents/observe",
+               "items":{
+                  "description":"Allows anything, and describes nothing.",
+                  "title":"Empty schema."
+               },
+               "type":"array"
+            }
+         },
+         "type":"object"
+      },
+      "links":{
+         "id":"http://synchronoss.com/saw.json/links",
+         "properties":{
+            "description":"Allows anything, and describes nothing.",
+            "title":"Empty schema."
+         },
+         "type":"object"
+      }
+   },
+   "type":"object"
 }
