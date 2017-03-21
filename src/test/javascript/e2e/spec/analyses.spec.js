@@ -45,6 +45,14 @@ describe('Analyses Tests', () => {
     analyze.validateReportGrid();
   });
 
+  it('should apply filters', () => {
+    analyze.analysisElems.reportFilterBtn.click();
+    analyze.analysisElems.filterItemInternet.click();
+    analyze.analysisElems.filterItemComplete.click();
+    analyze.analysisElems.applyFilterBtn.click();
+    analyze.validateReportFilters();
+  });
+
   it('should attempt to save the report and fill the details', () => {
     analyze.analysisElems.saveReportBtn.click();
     expect(analyze.analysisElems.reportCategory.getText()).toEqual('Order Fulfillment');

@@ -19,6 +19,11 @@ module.exports = {
     saveReportDetails: element(by.css('[ng-click="$ctrl.save()"]')),
     reportTitle: element(by.css('.e2e-report-title')),
     reportDescriptionBtn: element(by.partialButtonText('Description')),
+    reportFilterBtn: element(by.css('[ng-click="$ctrl.openFilterSidenav()"]')),
+    filterItemInternet: element(by.css('[aria-label="INTERNET"]')),
+    filterItemComplete: element(by.css('[aria-label="Complete"]')),
+    applyFilterBtn: element(by.css('[ng-click="$ctrl.onFiltersApplied()"]')),
+    filterCounter: element(by.css('.filter-counter')),
     totalPriceField: element(by.css('.e2e-Orders\\:TotalPrice')),
     shipperNameField: element(by.css('.e2e-Shippers\\:ShipperName')),
     customerNameField: element(by.css('.e2e-Customers\\:CustomerName')),
@@ -45,5 +50,9 @@ module.exports = {
 
   validateReportGrid() {
     expect(this.analysisElems.reportGridContainer.isDisplayed()).toBeTruthy();
+  },
+
+  validateReportFilters() {
+    expect(this.analysisElems.filterCounter.isDisplayed()).toBeTruthy();
   }
 };
