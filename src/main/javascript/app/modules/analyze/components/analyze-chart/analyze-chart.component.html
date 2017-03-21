@@ -1,0 +1,68 @@
+<analyze-dialog control="$ctrl" class="analyze-chart-dialog">
+  <analyze-dialog-header>
+
+    <div layout="row">
+      <md-button class="ard_back-btn"
+                 ng-click="$ctrl.$dialog.closeDialog()">
+        <md-icon md-font-icon="icon-arrow-left"></md-icon>
+      </md-button>
+
+      <div class="ard_meta" flex>
+        <div class="md-title">
+          <strong class="e2e-report-title" ng-bind="$ctrl.model.name"></strong>
+          <label translate="DRAFT"></label>
+        </div>
+        <div class="md-description">
+          <md-icon md-font-icon="icon-report"></md-icon>
+          <span translate="ORDERS"></span>
+        </div>
+      </div>
+
+      <div class="ard_actions" flex>
+        <md-button ng-click="$ctrl.openSaveModal()"
+                   translate="SAVE">
+        </md-button>
+      </div>
+    </div>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+    <analyze-chart-settings
+        settings="$ctrl.settings"
+        ng-if="$ctrl.settings"
+        on-change="$ctrl.onSettingsChanged(settings)"
+    ></analyze-chart-settings>
+    <analyze-filter-sidenav></analyze-filter-sidenav>
+    <div layout="column">
+      <md-toolbar class="secondary-toolbar chart-options-toolbar">
+        <div class="md-toolbar-tools"
+             layout-align="start center">
+          <div class="analyze-view_search-panel" layout="row" layout-align="start center">
+            <span class="md-title">Chart</span>
+          </div>
+
+          <div class="analyze-view_action-panel" layout="row" layout-align="end center">
+            <md-button ng-click="$ctrl.openDescriptionModal()">
+              <md-icon md-font-icon="icon-description"></md-icon>
+              <span translate="DESCRIPTION"></span>
+            </md-button>
+            <md-button ng-click="$ctrl.openPreviewModal()">
+              <md-icon md-font-icon="icon-full-screen"></md-icon>
+              <span translate="PREVIEW"></span>
+            </md-button>
+            <md-button ng-click="$ctrl.openFilterSidenav()">
+              <md-icon md-font-icon="icon-filter"></md-icon>
+              <span translate="FILTER"></span>
+            </md-button>
+          </div>
+        </div>
+      </md-toolbar>
+
+      <md-card class="chart-container-card">
+        <md-card-content>
+            <chart style="width: 100%" updater="$ctrl.updateChart" options="$ctrl.barChartOptions"></chart>
+        </md-card-content>
+      </md-card>
+    </div>
+  </analyze-dialog-content>
+</analyze-dialog>

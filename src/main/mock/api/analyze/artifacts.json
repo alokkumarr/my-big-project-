@@ -246,7 +246,7 @@
         "type": "int",
         "hide": false,
         "join_eligible": false,
-        "filter_eligible": false,
+        "filter_eligible": true,
         "checked": false
       },
       {

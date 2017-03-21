@@ -1,0 +1,30 @@
+<div layout="row">
+  <md-sidenav class="md-sidenav-left" md-component-id="left"
+              md-is-open="true"
+              md-disable-backdrop md-whiteframe="4">
+    <md-toolbar class="md-theme-indigo">
+      <h1 class="md-toolbar-tools">Chart Settings</h1>
+    </md-toolbar>
+
+    <md-content layout-margin>
+      <div class="axis-options">
+        <h3> Y-Axis Options </h3>
+        <md-checkbox ng-repeat="attr in $ctrl.settings.yaxis"
+                     ng-model="attr.checked"
+                     name="yaxis"
+                     ng-change="$ctrl.inputChanged()">
+          {{::attr.display_name}}
+        </md-checkbox>
+      </div>
+      <div class="axis-options">
+        <h3> X-Axis Options </h3>
+        <md-checkbox ng-repeat="attr in $ctrl.settings.xaxis"
+                     ng-model="attr.checked"
+                     name="xaxis"
+                     ng-change="$ctrl.inputChanged()">
+          {{::attr.display_name}}
+        </md-checkbox>
+      </div>
+    </md-content>
+  </md-sidenav>
+</div>

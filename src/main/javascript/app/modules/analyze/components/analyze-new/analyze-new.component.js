@@ -73,6 +73,18 @@ export const AnalyzeNewComponent = {
             artifacts: null
           };
           break;
+        case 'bar-chart:simple':
+          tpl = '<analyze-chart model="model"></analyze-chart>';
+          model = {
+            type: AnalyseTypes.Chart,
+            name: 'Untitled Chart',
+            description: '',
+            category: null,
+            metrics: this.getSelectedMetrics(),
+            scheduled: null,
+            artifacts: null
+          };
+          break;
         default:
           tpl = emptyTemplate;
           break;

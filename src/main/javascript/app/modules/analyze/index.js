@@ -36,6 +36,8 @@ import {NumberFilterComponent} from './components/analyze-filter-sidenav/filters
 import {ReportRenameDialogComponent} from './components/analyze-report-grid/report-rename-dialog/report-rename-dialog.component';
 import {AnalyzeReportSaveComponent} from './components/analyze-report-save/analyze-report-save.component';
 import {AnalyzePublishDialogComponent} from './components/analyze-publish-dialog/analyze-publish-dialog.component';
+import {AnalyzeChartComponent} from './components/analyze-chart/analyze-chart.component';
+import {AnalyzeChartSettingsComponent} from './components/analyze-chart-settings/analyze-chart-settings.component';
 
 export const AnalyzeModule = 'AnalyzeModule';
 
@@ -72,4 +74,6 @@ angular.module(AnalyzeModule, [])
   .component('analyzeReportDescription', AnalyzeReportDescriptionComponent)
   .component('analyzeReportPreview', AnalyzeReportPreviewComponent)
   .component('analyzePublishDialog', AnalyzePublishDialogComponent)
+  .component('analyzeChart', AnalyzeChartComponent)
+  .component('analyzeChartSettings', AnalyzeChartSettingsComponent)
   .component('analyzeReportSave', AnalyzeReportSaveComponent);
