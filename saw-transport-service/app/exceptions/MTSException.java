@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
  * Created by srya0001 on 4/22/2016.
  */
 public class MTSException extends RuntimeException {
-
+    private static final long serialVersionUID = 2629590022838251242L;
 
     private static ch.qos.logback.classic.Logger m_log =
             (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(MTSException.class.getName());

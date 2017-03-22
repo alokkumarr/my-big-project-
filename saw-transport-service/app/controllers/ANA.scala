@@ -15,7 +15,8 @@ import sncr.metadata.engine.ProcessingResult._
 
 class ANA extends BaseServiceProvider {
   implicit val formats = new DefaultFormats {
-    override def dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    override def dateFormatter = new SimpleDateFormat(
+      "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   }
 
   override def process(arr: Array[Byte]): Result = {
