@@ -392,8 +392,10 @@
                     <recompileMode>incremental</recompileMode>
                     <scalaCompatVersion>2.11</scalaCompatVersion>
                     <args>
+                      <arg>-unchecked</arg>
                       <arg>-deprecation</arg>
                       <arg>-feature</arg>
+                      <arg>-Xfatal-warnings</arg>
                     </args>
                     <javacArgs>
                       <javacArg>-source</javacArg>
@@ -401,6 +403,9 @@
                       <javacArg>-target</javacArg>
                       <javacArg>${java.version}</javacArg>
                       <javacArg>-Xlint:all</javacArg>
+                      <!-- Silence "bad path element" warnings until
+                           fixed upstream -->
+                      <javacArg>-Xlint:-path</javacArg>
                     </javacArgs>
                 </configuration>
             </plugin>
@@ -411,9 +416,10 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <compilerArgument>-Xlint:all</compilerArgument>
-                    <showDeprecation>true</showDeprecation>
+                    <failOnWarning>true</failOnWarning>
                     <showWarnings>true</showWarnings>
+                    <showDeprecation>true</showDeprecation>
+                    <compilerArgument>-Xlint:all</compilerArgument>
                 </configuration>
             </plugin>
             <plugin>
