@@ -1,3 +1,5 @@
+import java.net.InetAddress
+
 import play.api.test._
 import play.api.test.Helpers._
 import org.scalatestplus.play._
@@ -6,11 +8,19 @@ import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.scalatest._
 
-/* Note: By default don't run tests as they require a MapR-DB connection */
-@Ignore
-class ApplicationTest extends PlaySpec with OneAppPerSuite {
+class AnalysisTest extends PlaySpec with OneAppPerSuite {
+  def requireMapr {
+    val hostname = InetAddress.getLocalHost.toString()
+    /* Skip these tests that require a MapR-DB connection if not running
+     * in an environment with MapR-DB available */
+    if (!hostname.contains("cloud.synchronoss.net")) {
+      pending
+    }
+  }
+
   MaprHelper.addClasspath()
   "Analysis service" should {
+    requireMapr
     val id = System.currentTimeMillis - 1490100000000L
     "create analysis" in {
       /* Write analysis */
