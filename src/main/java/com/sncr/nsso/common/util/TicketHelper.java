@@ -5,7 +5,6 @@ package com.sncr.nsso.common.util;
 
 import java.io.StringWriter;
 import java.security.SecureRandom;
-import java.util.Random;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -105,6 +104,7 @@ public class TicketHelper {
 	public Ticket inactivateTicketChangePwd(String ticketId) {
 		Ticket newTicket = null;
 		try {
+			@SuppressWarnings("unused")
 			Ticket oldTicket = userRepository.getTicketDetails(ticketId);
 			// update the ticket validity into DB
 			userRepository.invalidateTicket(ticketId, "Inactivated the ticket, inorder to change password");
