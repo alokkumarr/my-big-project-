@@ -10,8 +10,8 @@ import org.scalatest._
 
 /* Test analysis service operations */
 class AnalysisTest extends PlaySpec with OneAppPerSuite {
-  /* Reference companion object to trigger static initialization */
-  AnalysisTest
+  /* Add MapR classpath to test runner */
+  MaprHelper.addClasspath
 
   "Analysis service" should {
     requireMapr
@@ -99,9 +99,4 @@ class AnalysisTest extends PlaySpec with OneAppPerSuite {
       pending
     }
   }
-}
-
-object AnalysisTest {
-  /* Add MapR classpath to test runner */
-  MaprHelper.addClasspath()
 }

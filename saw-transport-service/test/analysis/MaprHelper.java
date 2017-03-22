@@ -7,7 +7,13 @@ import java.lang.reflect.*;
  * MapR-DB client connections when running tests.
  */
 public class MaprHelper {
+    private static boolean initialized = false;
+
     public static void addClasspath() {
+        if (initialized) {
+            return;
+        }
+        initialized = true;
         try {
             /* Note: Currently the classpath entries are listed
              * explicitly below.  Consider instead executing the "mapr
