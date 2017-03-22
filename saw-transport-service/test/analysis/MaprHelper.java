@@ -75,10 +75,11 @@ public class MaprHelper {
     public static void addPath(String s) throws Exception {
         File f = new File(s);
         URI u = f.toURI();
-        URLClassLoader urlClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        URLClassLoader urlClassLoader =
+            (URLClassLoader) ClassLoader.getSystemClassLoader();
         Class<URLClassLoader> urlClass = URLClassLoader.class;
-        Method method = urlClass.getDeclaredMethod("addURL", new Class[]{URL.class});
+        Method method = urlClass.getDeclaredMethod("addURL", URL.class);
         method.setAccessible(true);
-        method.invoke(urlClassLoader, new Object[]{u.toURL()});
+        method.invoke(urlClassLoader, u.toURL());
     }
 }

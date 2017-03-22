@@ -391,6 +391,17 @@
                 <configuration>
                     <recompileMode>incremental</recompileMode>
                     <scalaCompatVersion>2.11</scalaCompatVersion>
+                    <args>
+                      <arg>-deprecation</arg>
+                      <arg>-feature</arg>
+                    </args>
+                    <javacArgs>
+                      <javacArg>-source</javacArg>
+                      <javacArg>${java.version}</javacArg>
+                      <javacArg>-target</javacArg>
+                      <javacArg>${java.version}</javacArg>
+                      <javacArg>-Xlint:all</javacArg>
+                    </javacArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -398,8 +409,11 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.6.0</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <compilerArgument>-Xlint:all</compilerArgument>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
                 </configuration>
             </plugin>
             <plugin>
@@ -592,7 +606,7 @@
               <artifactId>scalatest-maven-plugin</artifactId>
               <version>1.0</version>
               <configuration>
-                <argLine>-Dconfig.file=conf/application.conf</argLine>
+                <argLine>-Dconfig.file=conf/application.conf -Dlogger.file=conf/logback.xml</argLine>
                 <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
                 <junitxml>.</junitxml>
                 <filereports>WDF TestSuite.txt</filereports>
