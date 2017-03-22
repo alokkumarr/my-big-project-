@@ -1,4 +1,5 @@
-<configuration>
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
     
   <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel" />
 
@@ -69,11 +70,16 @@
       </logger>
     -->
 	
-  <root level="DEBUG">
+  <root level="INFO">
     <appender-ref ref="STDOUT" /> 
     <appender-ref ref="FILE" />
   </root>
 
 
+    <!-- Silence libraries that are verbose at INFO level -->
+    <logger name="akka.event" level="WARN"/>
+    <logger name="org.apache.hadoop" level="WARN"/>
+    <!-- Silence warning about loading native code -->
+    <logger name="org.apache.hadoop.util.NativeCodeLoader" level="ERROR"/>
 </configuration>
 
