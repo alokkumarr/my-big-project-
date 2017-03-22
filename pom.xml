@@ -102,7 +102,7 @@
 		<dependency>
 	       <groupId>org.springframework.cloud</groupId>
 	       <artifactId>spring-cloud-starter-zipkin</artifactId>
-	   </dependency>		
+	   </dependency>
    <!-- Distributed Tracing -->
 		
 	    <dependency>
@@ -176,8 +176,39 @@
 		    <version>2.4.0</version>
 		</dependency>
 	</dependencies>
-	<profiles>
 
+<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<finalName>${project.name}</finalName>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+			</plugin>
+						<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <compilerArgument>-Xlint:all</compilerArgument>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                </configuration>
+            </plugin>
+			
+		</plugins>
+	</build>
+
+	
+	<profiles>
 	  <profile>
 	  <id>docker</id>
 	  <build>

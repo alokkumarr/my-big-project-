@@ -16,7 +16,7 @@ public class SwaggerConfig {
     public Docket api() { 
         return new Docket(DocumentationType.SWAGGER_2)  
           .select()                                  
-          .apis(RequestHandlerSelectors.basePackage("com.synchronoss.saw.composite.controller"))              
+          .apis(RequestHandlerSelectors.basePackage("com.sncr.nsso.app.controller"))              
           .paths(PathSelectors.any())                          
           .build();         
     }
