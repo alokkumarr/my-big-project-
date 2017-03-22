@@ -1,0 +1,9 @@
+server:
+  port: 9411
+
+management:
+     security:
+       enabled: false
+  
+  
+  
