@@ -28,6 +28,7 @@ export const AnalyzeChartComponent = {
       this._FilterService = FilterService;
       this._AnalyzeService = AnalyzeService;
       this._$mdSidenav = $mdSidenav;
+      this._$mdDialog = $mdDialog;
 
       this.updateChart = new BehaviorSubject({});
       this.settings = null;
@@ -142,6 +143,28 @@ export const AnalyzeChartComponent = {
     // filters section
     openFilterSidenav() {
       this._FilterService.openFilterSidenav(this.filters.possible);
+    }
+
+    openDescriptionModal(ev) {
+      const tpl = '<analyze-report-description model="model" on-save="onSave($data)"></analyze-report-description>';
+
+      this._$mdDialog.show({
+        template: tpl,
+        controller: scope => {
+          scope.model = {
+            description: this.model.description
+          };
+
+          scope.onSave = data => {
+            this.model.description = data.description;
+          };
+        },
+        autoWrap: false,
+        focusOnOpen: false,
+        multiple: true,
+        targetEvent: ev,
+        clickOutsideToClose: true
+      });
     }
   }
 };
