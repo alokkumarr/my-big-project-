@@ -19,15 +19,8 @@ class ANA extends BaseServiceProvider {
       "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   }
 
-  override def process(arr: Array[Byte]): Result = {
-    process(new String(arr))
-  }
-
   override def process(txt: String): Result = {
-    process(parse(txt, false, false))
-  }
-
-  def process(json: JValue): Result = {
+    val json = parse(txt)
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
     val response = action match {
       case "create" => {
