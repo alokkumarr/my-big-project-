@@ -1,4 +1,4 @@
-import {map, keys, reduce, filter, uniq} from 'lodash';
+import {map, keys, clone, reduce, filter, uniq} from 'lodash';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -111,14 +111,15 @@ export const AnalyzeChartComponent = {
       this.settings = {
         type: 'bar',
         yaxis: filter(attributes, attr => attr['y-axis']),
-        xaxis: filter(attributes, attr => attr['x-axis'])
+        xaxis: filter(attributes, attr => attr['x-axis']),
+        groupBy: map(filter(attributes, attr => attr['x-axis']), clone)
       };
     }
 
     onSettingsChanged(settings) {
       // On changes to x or y axis parameters, run the new parameters
       // through filters.
-      const attributes = settings.yaxis.concat(settings.xaxis);
+      const attributes = settings.yaxis.concat(settings.xaxis).concat(settings.groupBy);
       this.filters.possible = this.generateFilters(filter(attributes, x => x.checked));
       this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.filters.selected, this.filters.possible);
       this.onApplyFilters(this.filters.possible);
@@ -149,8 +150,9 @@ export const AnalyzeChartComponent = {
     reloadChart(settings, filteredGridData) {
       const xaxis = filter(this.settings.xaxis, attr => attr.checked)[0] || {};
       const yaxis = filter(this.settings.yaxis, attr => attr.checked)[0] || {};
+      const group = filter(this.settings.groupBy, attr => attr.checked)[0] || {};
 
-      const {xCategories, ySeries} = this.gridToChart(xaxis, yaxis, filteredGridData);
+      const {xCategories, ySeries} = this.gridToChart(xaxis, yaxis, group, filteredGridData);
 
       this.updateChart.next([
         {
@@ -167,23 +169,35 @@ export const AnalyzeChartComponent = {
         },
         {
           path: 'series',
-          data: map(ySeries, s => ({name: xaxis.display_name, data: s}))
+          data: ySeries
         }
       ]);
     }
 
-    gridToChart(x, y, grid) {
-      const res = reduce(grid, (obj, row) => {
-        const category = row[x.column_name];
-        obj[category] = obj[category] || 0;
-        obj[category] += row[y.column_name];
+    gridToChart(x, y, g, grid) {
+      const defaultSeriesName = 'Series 1';
+      const categories = uniq(grid.map(row => row[x.column_name]));
+
+      const defaultSeries = () => reduce(categories, (obj, c) => {
+        obj[c] = 0;
         return obj;
       }, {});
 
-      const xCategories = keys(res);
+      const res = reduce(grid, (obj, row) => {
+        const category = row[x.column_name];
+        const series = row[g.column_name] || defaultSeriesName;
+        obj[series] = obj[series] || defaultSeries();
+        obj[series][category] += row[y.column_name];
+        return obj;
+      }, {});
+
+      const xCategories = keys(defaultSeries());
       return {
         xCategories,
-        ySeries: [xCategories.map(c => res[c])]
+        ySeries: keys(res).map(k => ({
+          name: k,
+          data: xCategories.map(c => res[k][c])
+        }))
       };
     }
 

@@ -33,8 +33,27 @@ export const chartComponent = {
       }
     }
 
+    updateSeries(series) {
+      if (!this.chart) {
+        return;
+      }
+
+      while (this.chart.series.length > 0) {
+        this.chart.series[0].remove(false);
+      }
+
+      forEach(series, s => {
+        this.chart.addSeries(s, false);
+      });
+
+    }
+
     onOptionsChartUpdate(updates) {
       forEach(updates, updateObj => {
+        // Need to handle series data differently
+        if (updateObj.path === 'series') {
+          this.updateSeries(updateObj.data);
+        }
         set(this.config, updateObj.path, updateObj.data);
       });
 
@@ -44,6 +63,7 @@ export const chartComponent = {
         this.chart = this.Highcharts.chart(this.$element[0], this.config);
       } else {
         this.chart.update(this.config);
+        this.chart.redraw();
       }
     }
   }

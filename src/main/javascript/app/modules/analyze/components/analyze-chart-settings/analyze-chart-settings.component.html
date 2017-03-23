@@ -25,6 +25,15 @@
           {{::attr.display_name}}
         </md-checkbox>
       </div>
+      <div class="axis-options">
+        <h3> Group By </h3>
+        <md-checkbox ng-repeat="attr in $ctrl.settings.groupBy"
+                     ng-model="attr.checked"
+                     name="groupBy"
+                     ng-change="$ctrl.inputChanged()">
+          {{::attr.display_name}}
+        </md-checkbox>
+      </div>
     </md-content>
   </md-sidenav>
 </div>
