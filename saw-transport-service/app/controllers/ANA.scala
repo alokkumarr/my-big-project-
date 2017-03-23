@@ -7,8 +7,10 @@ import org.json4s.JsonAST.JValue
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import play.libs.Json
-import play.mvc.{Http, Result}
+import play.mvc.{Http, Result, Results}
 
+import model.QueryBuilder
+import model.QueryException
 import sncr.metadata.analysis.AnalysisNode
 import sncr.metadata.engine.MDNodeUtil
 import sncr.metadata.engine.ProcessingResult._
@@ -75,12 +77,12 @@ class ANA extends BaseServiceProvider {
       }
     }
     val playJson = Json.parse(compact(render(response)))
-    play.mvc.Results.ok(playJson)
+    Results.ok(playJson)
   }
 
   def analysisJson(json: JValue) = {
     val analysisListJson = json \ "contents" \ "analysis"
-    analysisListJson match {
+    val analysis = analysisListJson match {
       case array: JArray => {
         if (array.arr.length > 1) {
           throw new RuntimeException("Only one element supported")
@@ -93,6 +95,8 @@ class ANA extends BaseServiceProvider {
       case _ => throw new RuntimeException(
         "Expected array: " + analysisListJson)
     }
+    val query: JValue = ("query", JString(QueryBuilder.build(analysis)))
+    analysis merge(query)
   }
 
   def executeAnalysis(analysisId: BigInt) = {
