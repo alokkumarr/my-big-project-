@@ -166,5 +166,21 @@ export const AnalyzeChartComponent = {
         clickOutsideToClose: true
       });
     }
+
+    openPreviewModal(ev) {
+      const tpl = '<analyze-chart-preview model="model"></analyze-chart-preview>';
+
+      this._$mdDialog
+        .show({
+          template: tpl,
+          controller: scope => {
+            scope.model = this.barChartOptions;
+          },
+          targetEvent: ev,
+          fullscreen: true,
+          autoWrap: false,
+          multiple: true
+        });
+    }
   }
 };
