@@ -56,6 +56,11 @@ class ANA extends BaseServiceProvider {
           case _ => throw new RuntimeException("no match")
         }
       }
+      case "execute" => {
+        val JInt(analysisId) = (json \ "contents" \ "keys")(0)
+        executeAnalysis(analysisId)
+        json
+      }
       case "delete" => {
         val analysisId = (json \ "contents" \ "keys")(0)
         val analysisNode = new AnalysisNode
@@ -88,5 +93,10 @@ class ANA extends BaseServiceProvider {
       case _ => throw new RuntimeException(
         "Expected array: " + analysisListJson)
     }
+  }
+
+  def executeAnalysis(analysisId: BigInt) = {
+    /* Placeholder for Spark SQL execution library until available */
+    1
   }
 }

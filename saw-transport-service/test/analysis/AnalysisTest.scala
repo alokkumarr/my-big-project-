@@ -35,6 +35,13 @@ class AnalysisTest extends MaprTest {
       customerCode must be ("customer-2")
     }
 
+    "execute analysis" in {
+      /* Execute previously created analysis */
+      val body = actionKeyMessage("read", id)
+      val response = sendRequest(body)
+      /* TODO */
+    }
+
     "delete analysis" in {
       /* Delete previously created analysis */
       val body = actionKeyMessage("delete", id)
