@@ -82,13 +82,18 @@ export const AnalyzeChartComponent = {
 
     $onInit() {
       this._FilterService.onApplyFilters(filters => this.onApplyFilters(filters));
-      // this._FilterService.onClearAllFilters(() => this.onClearAllFilters());
+      this._FilterService.onClearAllFilters(() => this.clearFilters());
 
       if (this.mode === 'fork') {
         this.model.id = null;
       }
 
       this.getArtifacts();
+    }
+
+    $onDestroy() {
+      this._FilterService.offApplyFilters();
+      this._FilterService.offClearAllFilters();
     }
 
     getArtifacts() {
@@ -107,16 +112,34 @@ export const AnalyzeChartComponent = {
     }
 
     fillSettings(data) {
-      const attributes = data.reduce((res, metric) => res.concat(metric.artifact_attributes), []);
+      const attributes = data.reduce((res, metric) => {
+        return res.concat(metric.artifact_attributes.map(attr => {
+          attr.tableName = metric.artifact_name;
+          return attr;
+        }));
+      }, []);
       this.settings = {
         type: 'bar',
-        yaxis: attributes,
-        xaxis: attributes
+        yaxis: attributes.filter(attr => attr['y-axis']),
+        xaxis: attributes.filter(attr => attr['x-axis'])
       };
     }
 
     onSettingsChanged(settings) {
-      this.filters.possible = this.generateFilters(settings.yaxis.filter(x => x.checked));
+      // On changes to x or y axis parameters, run the new parameters
+      // through filters.
+      const attributes = settings.yaxis.concat(settings.xaxis);
+      this.filters.possible = this.generateFilters(attributes.filter(x => x.checked));
+      this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.filters.selected, this.filters.possible);
+      this.onApplyFilters(
+        this.filters.possible
+      );
+    }
+
+    clearFilters() {
+      this.onApplyFilters(
+        this._FilterService.getFilterClearer()(this.filters.possible)
+      );
     }
 
     onApplyFilters(filters) {
@@ -124,13 +147,12 @@ export const AnalyzeChartComponent = {
       this.filters.selected = this._FilterService.getSelectedFilterMapper()(filters);
 
       this.filterGridData();
+      // reload chart here
     }
 
     filterGridData() {
       this.filteredGridData = this._FilterService.getGridDataFilter(this.filters.selected)(this.gridData);
-
-      console.log(this.gridData.length, this.filterGridData.length);
-      // reload chart here
+      console.log(this.gridData.length, this.filteredGridData.length);
     }
 
     generateFilters(selectedFields) {
