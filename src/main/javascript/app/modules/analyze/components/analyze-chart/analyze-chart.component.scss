@@ -34,6 +34,19 @@ analyze-chart {
 
   .chart-container-card {
     margin: 15px 24px;
+
+    md-card-content {
+      padding: 24px;
+    }
+
+    .md-errors-spacer {
+      display: none;
+    }
+
+    input {
+      background: transparent;
+      border-width: 0 0 1px;
+    }
   }
 
   .analyze-dialog {

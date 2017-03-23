@@ -23,6 +23,10 @@ export const AnalyzeChartComponent = {
       this.updateChart = new BehaviorSubject({});
       this.settings = null;
       this.gridData = this.filteredGridData = [];
+      this.labels = {
+        tempY: '', tempX: '', y: '', x: ''
+      };
+
       this.filters = {
         // array of strings with the columns displayName that the filter is based on
         selected: [],
@@ -35,29 +39,28 @@ export const AnalyzeChartComponent = {
 
       this.barChartOptions = {
         chart: {
-          type: 'column',
+          type: this.model.chartType || 'column',
           spacingLeft: 45,
           spacingBottom: 45,
-          width: 700
+          spacingTop: 45,
+          width: 650
         },
         legend: {
           align: 'right',
           layout: 'vertical'
         },
         series: [{
-          name: 'Data',
-          data: [100, 25, 45, 100, 22]
+          name: 'Series 1',
+          data: [0, 0, 0, 0, 0]
         }],
         xAxis: {
           categories: ['A', 'B', 'C', 'D', 'E'],
           title: {
-            text: 'Customer',
             y: 25
           }
         },
         yAxis: {
           title: {
-            text: 'Revenue (millions)',
             x: -25
           }
         }
@@ -84,6 +87,12 @@ export const AnalyzeChartComponent = {
     $onDestroy() {
       this._FilterService.offApplyFilters();
       this._FilterService.offClearAllFilters();
+    }
+
+    updateCustomLabels() {
+      this.labels.x = this.labels.tempX;
+      this.labels.y = this.labels.tempY;
+      this.reloadChart(this.settings, this.filteredGridData);
     }
 
     getArtifacts() {
@@ -157,7 +166,7 @@ export const AnalyzeChartComponent = {
       this.updateChart.next([
         {
           path: 'xAxis.title.text',
-          data: xaxis.display_name
+          data: this.labels.x || xaxis.display_name
         },
         {
           path: 'xAxis.categories',
@@ -165,7 +174,7 @@ export const AnalyzeChartComponent = {
         },
         {
           path: 'yAxis.title.text',
-          data: yaxis.display_name
+          data: this.labels.y || yaxis.display_name
         },
         {
           path: 'series',
