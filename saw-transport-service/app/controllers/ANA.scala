@@ -19,15 +19,8 @@ class ANA extends BaseServiceProvider {
       "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   }
 
-  override def process(arr: Array[Byte]): Result = {
-    process(new String(arr))
-  }
-
   override def process(txt: String): Result = {
-    process(parse(txt, false, false))
-  }
-
-  def process(json: JValue): Result = {
+    val json = parse(txt)
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
     val response = action match {
       case "create" => {
@@ -63,6 +56,11 @@ class ANA extends BaseServiceProvider {
           case _ => throw new RuntimeException("no match")
         }
       }
+      case "execute" => {
+        val JInt(analysisId) = (json \ "contents" \ "keys")(0)
+        executeAnalysis(analysisId)
+        json
+      }
       case "delete" => {
         val analysisId = (json \ "contents" \ "keys")(0)
         val analysisNode = new AnalysisNode
@@ -95,5 +93,10 @@ class ANA extends BaseServiceProvider {
       case _ => throw new RuntimeException(
         "Expected array: " + analysisListJson)
     }
+  }
+
+  def executeAnalysis(analysisId: BigInt) = {
+    /* Placeholder for Spark SQL execution library until available */
+    1
   }
 }
