@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
 // @SOURCE:/Users/markus/saw-services/saw-transport-service/conf/routes
-// @DATE:Tue Mar 21 06:52:20 EDT 2017
+// @DATE:Thu Mar 23 01:49:42 EDT 2017
 
 import play.api.routing.JavaScriptReverseRoute
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
@@ -15,28 +15,8 @@ import _root_.play.libs.F
 package controllers.javascript {
   import ReverseRouteContext.empty
 
-  // @LINE:9
-  class ReverseANA(_prefix: => String) {
-
-    def _defaultPrefix: String = {
-      if (_prefix.endsWith("/")) "" else "/"
-    }
-
-  
-    // @LINE:9
-    def handleRequest: JavaScriptReverseRoute = JavaScriptReverseRoute(
-      "controllers.ANA.handleRequest",
-      """
-        function() {
-          return _wA({method:"POST", url:"""" + _prefix + { _defaultPrefix } + """" + "analysis"})
-        }
-      """
-    )
-  
-  }
-
   // @LINE:8
-  class ReverseEXE(_prefix: => String) {
+  class ReverseANA(_prefix: => String) {
 
     def _defaultPrefix: String = {
       if (_prefix.endsWith("/")) "" else "/"
@@ -45,10 +25,10 @@ package controllers.javascript {
   
     // @LINE:8
     def handleRequest: JavaScriptReverseRoute = JavaScriptReverseRoute(
-      "controllers.EXE.handleRequest",
+      "controllers.ANA.handleRequest",
       """
         function() {
-          return _wA({method:"POST", url:"""" + _prefix + { _defaultPrefix } + """" + "exe"})
+          return _wA({method:"POST", url:"""" + _prefix + { _defaultPrefix } + """" + "analysis"})
         }
       """
     )
@@ -75,7 +55,7 @@ package controllers.javascript {
   
   }
 
-  // @LINE:11
+  // @LINE:10
   class ReverseMCT(_prefix: => String) {
 
     def _defaultPrefix: String = {
@@ -83,7 +63,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:12
+    // @LINE:11
     def extendedTagRequest: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MCT.extendedTagRequest",
       """
@@ -93,7 +73,7 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:11
+    // @LINE:10
     def handleTagRequest: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MCT.handleTagRequest",
       """
@@ -113,7 +93,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:19
+    // @LINE:18
     def sr: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MTSControl.sr",
       """
@@ -123,7 +103,7 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:16
+    // @LINE:15
     def executeCmd: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MTSControl.executeCmd",
       """
@@ -133,7 +113,7 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:17
+    // @LINE:16
     def executeExtendedCmd: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MTSControl.executeExtendedCmd",
       """
