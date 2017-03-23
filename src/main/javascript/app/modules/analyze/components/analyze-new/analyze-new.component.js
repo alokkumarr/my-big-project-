@@ -59,6 +59,7 @@ export const AnalyzeNewComponent = {
     createAnalysis() {
       let tpl;
       let model;
+      let type;
 
       switch (this.selectedAnalysisMethod) {
         case 'table:report':
@@ -73,10 +74,14 @@ export const AnalyzeNewComponent = {
             artifacts: null
           };
           break;
-        case 'bar-chart:simple':
+        case 'chart:column':
+        case 'chart:line':
+        case 'chart:stacked':
+          type = this.selectedAnalysisMethod.split(':')[1];
           tpl = '<analyze-chart model="model"></analyze-chart>';
           model = {
             type: AnalyseTypes.Chart,
+            chartType: type,
             name: 'Untitled Chart',
             description: '',
             category: null,
