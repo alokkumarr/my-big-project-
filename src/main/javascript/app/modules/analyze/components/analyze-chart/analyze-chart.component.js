@@ -1,14 +1,4 @@
-import fpFilter from 'lodash/fp/filter';
-import fpFlatMap from 'lodash/fp/flatMap';
-import fpPipe from 'lodash/fp/pipe';
-import fpGet from 'lodash/fp/get';
-import fpMap from 'lodash/fp/map';
-import first from 'lodash/first';
-import map from 'lodash/map';
-import forEach from 'lodash/forEach';
-import clone from 'lodash/clone';
-import isEmpty from 'lodash/isEmpty';
-import filter from 'lodash/filter';
+import {map, keys, reduce, filter, uniq} from 'lodash';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -113,15 +103,15 @@ export const AnalyzeChartComponent = {
 
     fillSettings(data) {
       const attributes = data.reduce((res, metric) => {
-        return res.concat(metric.artifact_attributes.map(attr => {
+        return res.concat(map(metric.artifact_attributes, attr => {
           attr.tableName = metric.artifact_name;
           return attr;
         }));
       }, []);
       this.settings = {
         type: 'bar',
-        yaxis: attributes.filter(attr => attr['y-axis']),
-        xaxis: attributes.filter(attr => attr['x-axis'])
+        yaxis: filter(attributes, attr => attr['y-axis']),
+        xaxis: filter(attributes, attr => attr['x-axis'])
       };
     }
 
@@ -129,11 +119,9 @@ export const AnalyzeChartComponent = {
       // On changes to x or y axis parameters, run the new parameters
       // through filters.
       const attributes = settings.yaxis.concat(settings.xaxis);
-      this.filters.possible = this.generateFilters(attributes.filter(x => x.checked));
+      this.filters.possible = this.generateFilters(filter(attributes, x => x.checked));
       this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.filters.selected, this.filters.possible);
-      this.onApplyFilters(
-        this.filters.possible
-      );
+      this.onApplyFilters(this.filters.possible);
     }
 
     clearFilters() {
@@ -147,19 +135,56 @@ export const AnalyzeChartComponent = {
       this.filters.selected = this._FilterService.getSelectedFilterMapper()(filters);
 
       this.filterGridData();
-      // reload chart here
+      this.reloadChart(this.settings, this.filteredGridData);
     }
 
     filterGridData() {
       this.filteredGridData = this._FilterService.getGridDataFilter(this.filters.selected)(this.gridData);
-      console.log(this.gridData.length, this.filteredGridData.length);
     }
 
     generateFilters(selectedFields) {
       return this._FilterService.getChartSetttingsToFiltersMapper(this.gridData)(selectedFields);
     }
 
-    settingsToChart(settings) {
+    reloadChart(settings, filteredGridData) {
+      const xaxis = filter(this.settings.xaxis, attr => attr.checked)[0] || {};
+      const yaxis = filter(this.settings.yaxis, attr => attr.checked)[0] || {};
+
+      const {xCategories, ySeries} = this.gridToChart(xaxis, yaxis, filteredGridData);
+
+      this.updateChart.next([
+        {
+          path: 'xAxis.title.text',
+          data: xaxis.display_name
+        },
+        {
+          path: 'xAxis.categories',
+          data: xCategories
+        },
+        {
+          path: 'yAxis.title.text',
+          data: yaxis.display_name
+        },
+        {
+          path: 'series',
+          data: map(ySeries, s => ({name: xaxis.display_name, data: s}))
+        }
+      ]);
+    }
+
+    gridToChart(x, y, grid) {
+      const res = reduce(grid, (obj, row) => {
+        const category = row[x.column_name];
+        obj[category] = obj[category] || 0;
+        obj[category] += row[y.column_name];
+        return obj;
+      }, {});
+
+      const xCategories = keys(res);
+      return {
+        xCategories,
+        ySeries: [xCategories.map(c => res[c])]
+      };
     }
 
     // filters section

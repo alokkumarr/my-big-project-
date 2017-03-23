@@ -17,10 +17,6 @@ export const AnalyzeChartSettingsComponent = {
       this._$mdSidenav = $mdSidenav;
     }
 
-    $onInit() {
-      console.log(this.settings);
-    }
-
     inputChanged() {
       this.onChange({settings: this.settings});
     }
