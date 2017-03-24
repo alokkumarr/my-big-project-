@@ -1,0 +1,4 @@
+python Data_Entry_Automation.py SAW 10.49.0.169|saw_dev|dev_user|devpass PRODUCTS E:\Product_Wise_Script\SAW\Data_Entry_Automation\table_structure_mapping.xlsx E:\Product_Wise_Script\SAW\Data_Entry_Automation\configuration.json AT&T|AT&T|AT&T|1
+
+
+python Data_Entry_Automation.py SAW 10.49.0.169|saw_dev|dev_user|devpass PRODUCTS E:\Product_Wise_Script\SAW\Data_Entry_Automation\table_structure_mapping.xlsx E:\Product_Wise_Script\SAW\Data_Entry_Automation\configuration.json AT&T|AT&T|AT&T|1

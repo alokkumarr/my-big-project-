@@ -184,6 +184,7 @@ def execute_sql(db_conx,validation_query):
 def execute_insert_sql(db_conx,insert_query):
     db_insert_conx = db_conx.cursor()
     affected_count=db_insert_conx.execute(insert_query)
+    print insert_query
     logging.warn("%d", affected_count)
     db_conx.commit()
     db_insert_conx.close()
