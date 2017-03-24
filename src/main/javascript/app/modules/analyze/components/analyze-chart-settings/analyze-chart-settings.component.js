@@ -1,7 +1,5 @@
 import template from './analyze-chart-settings.component.html';
 
-const AXIS_MAX_COUNT = 10;
-
 export const AnalyzeChartSettingsComponent = {
   template,
   bindings: {

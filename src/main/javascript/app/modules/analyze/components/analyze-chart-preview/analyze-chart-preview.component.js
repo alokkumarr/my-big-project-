@@ -1,5 +1,3 @@
-import first from 'lodash/first';
-
 import template from './analyze-chart-preview.component.html';
 // import style from './analyze-report-preview.component.scss';
 
