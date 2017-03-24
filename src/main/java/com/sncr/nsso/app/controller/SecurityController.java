@@ -99,6 +99,40 @@ public class SecurityController {
 		return new LoginResponse(Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", ticket)
 				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
 	}
+	
+	@RequestMapping(value = "/getDefaults", method = RequestMethod.POST)
+	public LoginResponse getDefaults(@RequestBody LoginDetails loginDetails) {
+
+		logger.info("Ticket will be created..");
+		logger.info("Token Expiry :" +nSSOProperties.getValidityMins());
+	
+		Ticket ticket = null;
+		User user = null;
+		TicketHelper tHelper = new TicketHelper(userRepository);
+		ticket = new Ticket();
+		ticket.setMasterLoginId(loginDetails.getMasterLoginId());
+		ticket.setValid(false);
+		try {			
+			user = new User();
+			user.setMasterLoginId(loginDetails.getMasterLoginId());
+			user.setValidMins((nSSOProperties.getValidityMins() != null
+							? Long.parseLong(nSSOProperties.getValidityMins()) : 720));
+			ticket = tHelper.createDefaultTicket(user, true);
+				
+		} catch (DataAccessException de) {
+			logger.error("Exception occured creating ticket ", de, null);
+			ticket.setValidityReason("Database error. Please contact server Administrator.");
+			ticket.setError(de.getMessage());
+			return new LoginResponse(Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", ticket)
+					.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
+		} catch (Exception e) {
+			logger.error("Exception occured creating ticket ", e, null);
+			return null;
+		}
+
+		return new LoginResponse(Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", ticket)
+				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
+	}
 
 	/**
 	 * 

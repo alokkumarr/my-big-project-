@@ -7,7 +7,7 @@ import com.sncr.nsso.common.bean.User;
 public interface UserRepository {
 	void insertTicketDetails(Ticket ticket) throws Exception;
 	boolean[] authenticateUser(String masterLoginId, String password);
-	void prepareTicketDetails(User user);
+	void prepareTicketDetails(User user, Boolean onlyDef);
 	void invalidateTicket(String ticketId, String validityMessage);
 	String verifyUserCredentials(String masterLoginId, String eMail,
 			String firstName);
