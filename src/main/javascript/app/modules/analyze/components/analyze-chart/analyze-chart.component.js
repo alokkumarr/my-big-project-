@@ -1,4 +1,4 @@
-import {map, keys, clone, reduce, filter, uniq} from 'lodash';
+import {isEmpty, map, keys, clone, reduce, filter, uniq} from 'lodash';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -12,7 +12,7 @@ export const AnalyzeChartComponent = {
     mode: '@?'
   },
   controller: class AnalyzeChartController {
-    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, FilterService, $window, $mdSidenav) {
+    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, FilterService, $mdSidenav) {
       'ngInject';
 
       this._FilterService = FilterService;
@@ -35,9 +35,11 @@ export const AnalyzeChartComponent = {
         possible: []
       };
 
-      this.getDataByQuery();
+      this.barChartOptions = this.getDefaultChartConfig();
+    }
 
-      this.barChartOptions = {
+    getDefaultChartConfig() {
+      return {
         chart: {
           type: this.model.chartType || 'column',
           spacingLeft: 45,
@@ -65,8 +67,6 @@ export const AnalyzeChartComponent = {
           }
         }
       };
-
-      $window.chartctrl = this;
     }
 
     toggleLeft() {
@@ -81,12 +81,32 @@ export const AnalyzeChartComponent = {
         this.model.id = null;
       }
 
-      this.getArtifacts();
+      this.getDataByQuery().then(() => {
+        this.initChart();
+      });
     }
 
     $onDestroy() {
       this._FilterService.offApplyFilters();
       this._FilterService.offClearAllFilters();
+    }
+
+    initChart() {
+      if (isEmpty(this.mode) || isEmpty(this.model.chart)) {
+        this.getArtifacts();
+        return;
+      }
+
+      const chart = this.model.chart;
+      this.labels.tempX = this.labels.x = chart.xAxis.label;
+      this.labels.tempY = this.labels.y = chart.yAxis.label;
+      this.settings = {
+        yaxis: chart.yAxis.artifacts,
+        xaxis: chart.xAxis.artifacts,
+        groupBy: chart.groupBy.artifacts
+      };
+      this.filters.selected = chart.filters || [];
+      this.onSettingsChanged(this.settings);
     }
 
     updateCustomLabels() {
@@ -103,7 +123,7 @@ export const AnalyzeChartComponent = {
     }
 
     getDataByQuery() {
-      this._AnalyzeService.getDataByQuery()
+      return this._AnalyzeService.getDataByQuery()
         .then(data => {
           this.gridData = data;
           this.filteredGridData = data;
@@ -118,7 +138,6 @@ export const AnalyzeChartComponent = {
         }));
       }, []);
       this.settings = {
-        type: 'bar',
         yaxis: filter(attributes, attr => attr['y-axis']),
         xaxis: filter(attributes, attr => attr['x-axis']),
         groupBy: map(filter(attributes, attr => attr['x-axis']), clone)
@@ -252,5 +271,51 @@ export const AnalyzeChartComponent = {
           multiple: true
         });
     }
+
+    generatePayload() {
+      const result = {
+        filters: this.filters.selected,
+        xAxis: {
+          label: this.labels.x,
+          artifacts: this.settings.xaxis
+        },
+        yAxis: {
+          label: this.labels.y,
+          artifacts: this.settings.yaxis
+        },
+        groupBy: {
+          artifacts: this.settings.groupBy
+        }
+      };
+      return result;
+    }
+
+    openSaveModal(ev) {
+      this.model.chart = this.generatePayload();
+
+      const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
+
+      this._$mdDialog
+        .show({
+          template: tpl,
+          controller: scope => {
+            scope.model = clone(this.model);
+
+            scope.onSave = data => {
+              this.model.id = data.id;
+              this.model.name = data.name;
+              this.model.description = data.description;
+              this.model.category = data.category;
+            };
+          },
+          autoWrap: false,
+          fullscreen: true,
+          focusOnOpen: false,
+          multiple: true,
+          targetEvent: ev,
+          clickOutsideToClose: true
+        });
+    }
   }
+
 };
