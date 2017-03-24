@@ -44,7 +44,7 @@ public class TicketHelper {
 		Ticket ticket = null;
 		try {
 			if (!isReCreate) {
-				prepareTicketDetails(user);
+				prepareTicketDetails(user, false);
 			}
 			// create ticket xml			
 			ticket = prepareTicket(user);
@@ -61,12 +61,28 @@ public class TicketHelper {
 		}
 		return ticket;
 	}
-
-	private void prepareTicketDetails(User user) {
-		userRepository.prepareTicketDetails(user);
 	
-}
+	public Ticket createDefaultTicket(User user,  Boolean onlyDef) throws Exception {
+		Ticket ticket = null;
+		try {
+			prepareTicketDetails(user, onlyDef);
+				// create ticket xml			
+				ticket = prepareTicket(user);
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;
+		} catch (Exception e) {
+			logger.error("Exception  occured saving ticket with id : " + e.getMessage(),null,
+					e);
+			throw e;
+		}
+		return ticket;
+	}
 
+	private void prepareTicketDetails(User user, Boolean onlyDef) {
+		userRepository.prepareTicketDetails(user, onlyDef);	
+	}	
+	
 	public String logout(String ticketId) {
 		String newTicket = null;
 		try {
@@ -168,14 +184,16 @@ public class TicketHelper {
 		ticket.setValidUpto(createdTime + (user.getValidMins() * 60 * 1000));
 		ticket.setValid(true);
 		ticket.setValidityReason("User Authenticated Successfully");
-		ticket.setProdCode(user.getTicketDetails().getLandingProd());
-		ticket.setRoleType(user.getTicketDetails().getRoleType());
-		ticket.setUserName(user.getTicketDetails().getUserName());
-		ticket.setProductModules(user.getTicketDetails().getProductModules());
-		ticket.setProductModuleFeatures(user.getTicketDetails().getProductModuleFeatures());
-		ticket.setDataSecurityKey(user.getTicketDetails().getDataSKey());
-		ticket.setCustID(user.getTicketDetails().getCustID());
-		ticket.setCustCode(user.getTicketDetails().getCustCode());
+		if(user.getTicketDetails() != null) {
+			ticket.setProdCode(user.getTicketDetails().getLandingProd());
+			ticket.setRoleType(user.getTicketDetails().getRoleType());
+			ticket.setUserName(user.getTicketDetails().getUserName());
+			ticket.setProductModules(user.getTicketDetails().getProductModules());
+			ticket.setProductModuleFeatures(user.getTicketDetails().getProductModuleFeatures());
+			ticket.setDataSecurityKey(user.getTicketDetails().getDataSKey());
+			ticket.setCustID(user.getTicketDetails().getCustID());
+			ticket.setCustCode(user.getTicketDetails().getCustCode());
+		}
 		return ticket;
 	}
 	
