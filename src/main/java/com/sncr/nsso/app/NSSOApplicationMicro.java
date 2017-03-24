@@ -9,6 +9,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
@@ -20,7 +21,8 @@ import com.sncr.nsso.common.bean.JwtFilter;
  */
 
 @SpringBootApplication
-public class NSSOApplication extends SpringBootServletInitializer {
+@EnableDiscoveryClient
+public class NSSOApplicationMicro extends SpringBootServletInitializer {
 
 	@Bean
 	public TomcatEmbeddedServletContainerFactory tomcatEmbeddedServletContainerFactory() {
@@ -30,7 +32,7 @@ public class NSSOApplication extends SpringBootServletInitializer {
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
 		// TODO Auto-generated method stub
-		return builder.sources(NSSOApplication.class);
+		return builder.sources(NSSOApplicationMicro.class);
 	}
 
 	@Bean
@@ -50,7 +52,7 @@ public class NSSOApplication extends SpringBootServletInitializer {
 	public static void main(String[] args) {
 
 		// Launch the application
-		ConfigurableApplicationContext context = SpringApplication.run(NSSOApplication.class, args);
+		ConfigurableApplicationContext context = SpringApplication.run(NSSOApplicationMicro.class, args);
 		@SuppressWarnings("unused")
 		WebSecurityConfig config = context.getBean(WebSecurityConfig.class);
 
