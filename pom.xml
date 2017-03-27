@@ -66,13 +66,12 @@
 		<Json4s.latestVersion>3.3.0</Json4s.latestVersion>
 		<rpm.saw.root>/opt</rpm.saw.root>
 	</properties>
-<!-- 	<repositories>
+  <repositories>
     <repository>
       <id>synchronoss</id>
       <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
     </repository>
   </repositories>
- -->	
   <dependencies>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
