@@ -1,0 +1,28 @@
+<analyze-dialog class="analyze-report-preview">
+  <analyze-dialog-header>
+    <div class="arp-header" layout="row" layout-align="space-between center">
+      <div layout="row" layout-align="center center">
+        <md-button class="arp-header-close-btn"
+                   ng-click="$parent.$ctrl.closeDialog()">
+          <md-icon md-font-icon="icon-remove"></md-icon>
+        </md-button>
+        <div class="md-title">
+          <strong ng-bind="::$ctrl.model.report.name"></strong>
+        </div>
+      </div>
+
+      <div layout="row" layout-align="center center">
+        <md-button translate="EXPORT"></md-button>
+        <md-button class="btn-primary" translate="PUBLISH"></md-button>
+      </div>
+    </div>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+      <md-card class="chart-container-card">
+        <md-card-content>
+            <chart style="width: 100%" options="$ctrl.config"></chart>
+        </md-card-content>
+      </md-card>
+  </analyze-dialog-content>
+</analyze-dialog>
