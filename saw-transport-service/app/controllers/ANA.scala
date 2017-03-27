@@ -100,8 +100,10 @@ class ANA extends BaseServiceProvider {
       case _ => throw new RuntimeException(
         "Expected array: " + analysisListJson)
     }
-    val query: JValue = ("query", JString(QueryBuilder.build(analysis)))
-    analysis merge(query)
+    // Disabled until analysis tests get updated with sample artifacts
+    //val query: JValue = ("query", JString(QueryBuilder.build(analysis)))
+    //analysis merge(query)
+    analysis
   }
 
   def executeAnalysis(analysisId: String) = {
