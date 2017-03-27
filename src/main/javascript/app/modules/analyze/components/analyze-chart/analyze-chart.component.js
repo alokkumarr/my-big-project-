@@ -48,8 +48,7 @@ export const AnalyzeChartComponent = {
           width: 650
         },
         legend: {
-          align: 'right',
-          layout: 'vertical'
+          align: 'right'
         },
         series: [{
           name: 'Series 1',

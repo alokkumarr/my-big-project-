@@ -33,38 +33,14 @@ export const chartComponent = {
       }
     }
 
-    updateSeries(series) {
-      if (!this.chart) {
-        return;
-      }
-
-      while (this.chart.series.length > 0) {
-        this.chart.series[0].remove(false);
-      }
-
-      forEach(series, s => {
-        this.chart.addSeries(s, false);
-      });
-
-    }
-
     onOptionsChartUpdate(updates) {
       forEach(updates, updateObj => {
-        // Need to handle series data differently
-        if (updateObj.path === 'series') {
-          this.updateSeries(updateObj.data);
-        }
         set(this.config, updateObj.path, updateObj.data);
       });
 
-      if (this.options.scrollbar && this.options.scrollbar.enabled === true) {
-        // there is some bug with the scrollbar,
-        // if update is used, the scrollbar disappears
-        this.chart = this.Highcharts.chart(this.$element[0], this.config);
-      } else {
-        this.chart.update(this.config);
-        this.chart.redraw();
-      }
+      // Not using chart.update due to a bug with navigation
+      // update and bar styles.
+      this.chart = this.Highcharts.chart(this.$element[0], this.config);
     }
   }
 };
