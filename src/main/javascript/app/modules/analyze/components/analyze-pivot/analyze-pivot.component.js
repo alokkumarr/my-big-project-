@@ -12,6 +12,9 @@ import compact from 'lodash/compact';
 import template from './analyze-pivot.component.html';
 import style from './analyze-pivot.component.scss';
 
+const FIELD_CHOOSER_HEIGHT = 900;
+const FIELD_CHOOSER_WIDTH = 600;
+
 export const AnalyzePivotComponent = {
   template,
   styles: [style],
@@ -27,6 +30,7 @@ export const AnalyzePivotComponent = {
       this._AnalyzeService = AnalyzeService;
 
       this.deNormalizedData = [];
+      this.normalizedData = [];
       this.dataSource = {};
       this.sorts = [];
       this.filters = {
@@ -40,41 +44,51 @@ export const AnalyzePivotComponent = {
     $onInit() {
       this._FilterService.onApplyFilters(filters => this.onApplyFilters(filters));
       this._FilterService.onClearAllFilters(() => this.onClearAllFilters());
+
       this._$timeout(() => {
         // have to repaint the grid because of the animation of the modal
         // if it's not repainted it appears smaller
         this._gridInstance.repaint();
       }, 500);
-      this._AnalyzeService.getPivotData().then(data => {
-        this.normalizedData = data;
-        this.deNormalizedData = this._PivotService.denormalizeData(data);
-        const fields = this.getFields();
-        this.dataSource = {
-          store: this.deNormalizedData,
-          fields
-        };
 
-        this._gridInstance.option('dataSource', this.dataSource);
-        this.fieldChooserOptions = {
-          texts: {
-            allFields: 'All',
-            columnFields: 'Columns',
-            dataFields: 'Data',
-            rowFields: 'Rows',
-            filterFields: 'Filter'
-          },
-          width: 500,
-          heght: 400,
-          layout: 1,
-          dataSource: this._gridInstance.getDataSource()
-        };
-      });
+      this.loadPivotData();
 
       this.pivotGridOptions = assign({
         onInitialized: e => {
           this._gridInstance = e.component;
         }
-      }, this.getPivotGridOptions());
+      }, this.getDefaultOptions());
+    }
+
+    loadPivotData() {
+      this._AnalyzeService.getPivotData().then(data => {
+        const fields = this.getFields();
+        this.normalizedData = data;
+        this.deNormalizedData = this._PivotService.denormalizeData(data);
+        this.dataSource = {
+          store: this.deNormalizedData,
+          fields
+        };
+
+        this._$timeout(() => {
+        // the field chooser is added with a delay because of the modal animation
+        // if not delayed the fieldchooser appears smaller
+          this.fieldChooserOptions = {
+            texts: {
+              allFields: 'All',
+              columnFields: 'Columns',
+              dataFields: 'Data',
+              rowFields: 'Rows'
+            },
+            width: FIELD_CHOOSER_WIDTH,
+            heght: FIELD_CHOOSER_HEIGHT,
+            layout: 1,
+            dataSource: this._gridInstance.getDataSource()
+          };
+        }, 100);
+
+        this._gridInstance.option('dataSource', this.dataSource);
+      });
     }
 
 // filters
@@ -87,7 +101,6 @@ export const AnalyzePivotComponent = {
     onApplyFilters(filters) {
       this.filters.possible = filters;
       this.filters.selected = this._FilterService.getSelectedFilterMapper()(filters);
-      console.log(this.filters);
       this.filterGridData();
     }
 
@@ -119,11 +132,6 @@ export const AnalyzePivotComponent = {
       this.filters.selected = [];
       pivotGridDataSource.load();
     }
-
-    // onFilterRemoved(filter) {
-    //   filter.model = null;
-    //   this.filterGridData();
-    // }
 // END filters
 
     getFieldToSortFieldMapper() {
@@ -220,7 +228,7 @@ export const AnalyzePivotComponent = {
             scope.model = {
               pivot: this.model,
               dataSource: this.dataSource,
-              defaultOptions: this.getPivotGridOptions(),
+              defaultOptions: this.getDefaultOptions(),
               pivotState: this._gridInstance.getDataSource().state()
             };
           },
@@ -304,14 +312,14 @@ export const AnalyzePivotComponent = {
       }];
     }
 
-    getPivotGridOptions() {
+    getDefaultOptions() {
       return {
         allowSortingBySummary: false,
         allowSorting: false,
         allowFiltering: false,
         allowExpandAll: true,
         fieldChooser: {
-          enabled: false
+          enabled: true
         },
         fieldPanel: {
           visible: true,
@@ -319,14 +327,10 @@ export const AnalyzePivotComponent = {
           showRowFields: true, // hides the row field area
           showDataFields: true, // hides the data field area
           showFilterFields: false, // hides the filter field area
-          allowFieldDragging: false,
-          texts: {
-            columnFieldArea: 'Date',
-            rowFieldArea: 'Date'
-          }
+          allowFieldDragging: false
         },
         export: {
-          enabled: true,
+          enabled: false,
           fileName: 'Sales'
         },
         dataSource: {
