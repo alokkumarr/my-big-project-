@@ -109,6 +109,12 @@
                                    ng-click="$ctrl.edit(report.data)">Edit
                         </md-button>
                       </md-menu-item>
+                      <md-menu-item>
+                        <md-button aria-label="Delete"
+                                   ng-click="$ctrl.openDeleteModal(report.data)">
+                          <span translate="DELETE" md-colors="{color: 'warn'}"></span>
+                        </md-button>
+                      </md-menu-item>
                     </md-menu-content>
                   </md-menu>
                 </md-menu-bar>
