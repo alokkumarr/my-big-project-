@@ -122,9 +122,6 @@ export const AnalyzeViewComponent = {
       }];
 
       return this._dxDataGridService.mergeWithDefaultConfig({
-        onRowClick: row => {
-          this.goToLastPublishedAnalysis(row.data.id);
-        },
         onInitialized: this.onGridInitialized.bind(this),
         columns,
         dataSource,

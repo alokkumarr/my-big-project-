@@ -67,8 +67,9 @@
 
         <md-card-content layout="row">
           <div dx-data-grid="$ctrl.getGridConfig()" dx-item-alias="report">
-            <div data-options="dxTemplate: { name: 'nameCellTemplate' }">
-              <span ng-bind-html="::report.value | highlight:$ctrl.states.searchTerm"></span>
+              <div data-options="dxTemplate: { name: 'nameCellTemplate' }" >
+                  <span class="clickable" ng-bind-html="::report.value | highlight:$ctrl.states.searchTerm"
+                        ng-click="$ctrl.goToLastPublishedAnalysis(report.data.id)"></span>
             </div>
             <div data-options="dxTemplate: { name: 'metricsCellTemplate' }">
               <span ng-bind-html="::report.value | highlight:$ctrl.states.searchTerm"></span>
