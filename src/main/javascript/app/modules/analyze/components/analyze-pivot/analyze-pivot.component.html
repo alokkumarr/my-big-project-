@@ -27,17 +27,15 @@
 
   <analyze-dialog-content>
     <analyze-filter-sidenav></analyze-filter-sidenav>
-
     <div layout="column">
-      <div layout="row" class="ard_toolbar">
-        <md-button class="ard_toolbar-expand"
-                   ng-class="{'m-expanded':$ctrl.states.detailsExpanded}"
-                   ng-click="$ctrl.toggleDetailsPanel()">
-          <md-icon md-font-icon="icon-expand"></md-icon>
-        </md-button>
 
+      <div style="height: 400px">
+        <div dx-pivot-grid-field-chooser="$ctrl.fieldChooserOptions"></div>
+      </div>
+
+      <div layout="row" class="ard_toolbar">
         <span class="ard_toolbar-text" flex
-              translate="REPORT"></span>
+              translate="PIVOT"></span>
 
         <div class="ard_toolbar-actions" flex>
           <md-button ng-click="$ctrl.openDescriptionModal($event)">
@@ -45,8 +43,7 @@
             <span translate="DESCRIPTION"></span>
           </md-button>
 
-          <md-button ng-click="$ctrl.openPreviewModal($event)"
-                     ng-disabled="$ctrl.isPreviewDisabled()">
+          <md-button ng-click="$ctrl.openPreviewModal($event)">
             <md-icon md-font-icon="icon-full-screen"></md-icon>
             <span translate="PREVIEW"></span>
           </md-button>
@@ -57,14 +54,20 @@
             <span translate="SORT"></span>
           </md-button>
 
-          <md-button ng-if="$ctrl.showFiltersButton" ng-click="$ctrl.openFilterSidenav()">
+          <md-button ng-click="$ctrl.openFilterSidenav()">
             <md-icon md-font-icon="icon-filter"></md-icon>
             <span translate="FILTER"></span>
           </md-button>
         </div>
+
       </div>
 
-      <div dx-pivot-grid="$ctrl.pivotGridOptions1"></div>
+      <md-card>
+        <md-card-content layout="column" layout-align="space-between center">
+          <div dx-pivot-grid="$ctrl.pivotGridOptions"></div>
+        </md-card-content>
+      </md-card>
+
     </div>
   </analyze-dialog-content>
 </analyze-dialog>

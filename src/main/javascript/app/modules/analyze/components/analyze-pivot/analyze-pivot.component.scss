@@ -4,6 +4,16 @@ analyze-pivot {
 }
 
 .analyze-pivot-dialog {
+  div.dx-pivotgridfieldchooser-container > div:nth-child(2) > div:first-child {
+    // hide the filter fields in dx-grid fields chooser
+    display: none;
+  }
+
+  .settings-sidenav {
+    width: 400px;
+    height: inherit;
+  }
+
   .analyze-dialog {
     min-height: 100%;
     min-width: 100%;
