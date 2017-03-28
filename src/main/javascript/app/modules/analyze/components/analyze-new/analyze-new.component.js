@@ -77,7 +77,7 @@ export const AnalyzeNewComponent = {
         case 'table:pivot':
           tpl = '<analyze-pivot model="model"></analyze-pivot>';
           model = {
-            type: AnalyseTypes.Report,
+            type: AnalyseTypes.Pivot,
             name: 'Untitled Analysis',
             description: '',
             category: null,

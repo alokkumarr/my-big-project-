@@ -203,6 +203,8 @@ export const AnalyzeViewComponent = {
         openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
       } else if (model.type === AnalyseTypes.Chart) {
         openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
+      } else if (model.type === AnalyseTypes.Pivot) {
+        openModal(`<analyze-pivot model="model" mode="${mode}"></analyze-pivot>`);
       }
     }
   }

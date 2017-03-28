@@ -70,6 +70,11 @@ export const AnalyzePivotComponent = {
           fields
         };
 
+        this._gridInstance.option('dataSource', this.dataSource);
+        if (this.model.pivotState) {
+          this._gridInstance.getDataSource().state(this.model.pivotState);
+        }
+
         this._$timeout(() => {
         // the field chooser is added with a delay because of the modal animation
         // if not delayed the fieldchooser appears smaller
@@ -86,8 +91,6 @@ export const AnalyzePivotComponent = {
             dataSource: this._gridInstance.getDataSource()
           };
         }, 100);
-
-        this._gridInstance.option('dataSource', this.dataSource);
       });
     }
 
@@ -319,7 +322,7 @@ export const AnalyzePivotComponent = {
         allowFiltering: false,
         allowExpandAll: true,
         fieldChooser: {
-          enabled: true
+          enabled: false
         },
         fieldPanel: {
           visible: true,
