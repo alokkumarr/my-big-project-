@@ -12,7 +12,7 @@
         <md-select ng-model="::sort.field">
           <md-option
             ng-repeat="field in $ctrl.model.fields | filter:$ctrl.filterSortOption.bind($ctrl, sort)"
-            ng-bind="::field.getDisplayName()"
+            ng-bind="::field.getDisplayName ? field.getDisplayName() : field.label"
             ng-value="field"></md-option>
         </md-select>
 
@@ -34,7 +34,7 @@
 
           <!-- NUMBER SORT OPTIONS -->
           <md-radio-group ng-model="sort.order" layout="row" layout-align="center center"
-                          ng-if="sort.field.type === 'int'">
+                          ng-if="sort.field.type === 'int' || sort.field.type === 'double'">
             <md-radio-button class="ars_sort-rbtn" value="asc" aria-label="Ascending">
               <div layout="column">
                 123

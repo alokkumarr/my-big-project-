@@ -4,9 +4,9 @@ import isEmpty from 'lodash/isEmpty';
 import curry from 'lodash/curry';
 import pipe from 'lodash/fp/pipe';
 import filter from 'lodash/fp/filter';
-import map from 'lodash/fp/map';
-import flatMap from 'lodash/fp/flatMap';
-import find from 'lodash/fp/find';
+import fpMap from 'lodash/fp/map';
+import fpFlatMap from 'lodash/fp/flatMap';
+import find from 'lodash/find';
 import isEqual from 'lodash/fp/isEqual';
 import some from 'lodash/fp/some';
 import set from 'lodash/fp/set';
@@ -30,6 +30,7 @@ export function AnalyzeService($http, $timeout, $q) {
     getDataByQuery,
     getSupportedMethods,
     generateQuery,
+    getPivotData,
     saveReport,
     setAvailableMetrics: curry(setAvailableItems)(metricMapper, metricHasSupportedMethod),
     setAvailableAnalysisMethods: curry(setAvailableItems)(analysisMethodMapper, isMethodSupported)
@@ -90,6 +91,10 @@ export function AnalyzeService($http, $timeout, $q) {
     return $http.get('/api/analyze/dataByQuery').then(get('data'));
   }
 
+  function getPivotData() {
+    return $http.get('/api/analyze/pivotData').then(get('data'));
+  }
+
   function generateQuery(payload) {
     return $http.post('/api/analyze/generateQuery', payload).then(get('data'));
   }
@@ -127,7 +132,7 @@ export function AnalyzeService($http, $timeout, $q) {
    * @param actionFn
    */
   function metricMapper(actionFn) {
-    return map(metric => actionFn(metric));
+    return fpMap(metric => actionFn(metric));
   }
 
   /**
@@ -137,8 +142,8 @@ export function AnalyzeService($http, $timeout, $q) {
    */
   function analysisMethodMapper(actionFn) {
     return pipe(
-      map(method => {
-        method.children = map(child => actionFn(child))(method.children);
+      fpMap(method => {
+        method.children = fpMap(child => actionFn(child))(method.children);
         return method;
       })
     );
@@ -146,8 +151,8 @@ export function AnalyzeService($http, $timeout, $q) {
 
   function metricHasSupportedMethod(metric, supportedMethods) {
     return pipe(
-      flatMap(get('children')),
-      map(get('type')),
+      fpFlatMap(get('children')),
+      fpMap(get('type')),
       some(type =>
         find(isEqual(type), supportedMethods)
       )
@@ -166,11 +171,11 @@ export function AnalyzeService($http, $timeout, $q) {
   function getSupportedMethods(metrics) {
     return pipe(
       filter(metric => metric.checked === true),
-      map(get('supports')),
-      map(supports =>
+      fpMap(get('supports')),
+      fpMap(supports =>
         pipe(
-          flatMap(get('children')),
-          map(get('type'))
+          fpFlatMap(get('children')),
+          fpMap(get('type'))
         )(supports)),
       spread(intersection)
     )(metrics);
