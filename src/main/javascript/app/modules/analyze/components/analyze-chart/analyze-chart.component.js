@@ -1,8 +1,48 @@
-import {isEmpty, map, keys, clone, reduce, filter, uniq} from 'lodash';
+import {get, isEmpty, map, keys, values, clone, reduce, filter, uniq} from 'lodash';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
 import {BehaviorSubject} from 'rxjs';
+
+const LEGEND_POSITIONING = {
+  left: {
+    name: 'left',
+    displayName: 'Left',
+    align: 'left',
+    verticalAlign: 'middle'
+  },
+  right: {
+    name: 'right',
+    displayName: 'Right',
+    align: 'right',
+    verticalAlign: 'middle'
+  },
+  top: {
+    name: 'top',
+    displayName: 'Top',
+    align: 'center',
+    verticalAlign: 'top'
+  },
+  bottom: {
+    name: 'bottom',
+    displayName: 'Bottom',
+    align: 'center',
+    verticalAlign: 'bottom'
+  }
+};
+
+const LAYOUT_POSITIONS = {
+  horizontal: {
+    name: 'horizontal',
+    displayName: 'Horizontal',
+    layout: 'horizontal'
+  },
+  vertical: {
+    name: 'vertical',
+    displayName: 'Vertical',
+    layout: 'vertical'
+  }
+};
 
 export const AnalyzeChartComponent = {
   template,
@@ -19,6 +59,15 @@ export const AnalyzeChartComponent = {
       this._AnalyzeService = AnalyzeService;
       this._$mdSidenav = $mdSidenav;
       this._$mdDialog = $mdDialog;
+
+      this.legend = {
+        align: get(this.model, 'chart.legend.align', 'right'),
+        layout: get(this.model, 'chart.legend.layout', 'vertical'),
+        options: {
+          align: values(LEGEND_POSITIONING),
+          layout: values(LAYOUT_POSITIONS)
+        }
+      };
 
       this.updateChart = new BehaviorSubject({});
       this.settings = null;
@@ -39,31 +88,29 @@ export const AnalyzeChartComponent = {
     }
 
     getDefaultChartConfig() {
+      const legendPosition = LEGEND_POSITIONING[this.legend.align];
+      const legendLayout = LAYOUT_POSITIONS[this.legend.layout];
+
       return {
         chart: {
           type: this.model.chartType || 'column',
           spacingLeft: 45,
           spacingBottom: 45,
           spacingTop: 45,
+          reflow: false,
           width: 650
         },
         legend: {
-          align: 'right'
+          align: legendPosition.align,
+          verticalAlign: legendPosition.verticalAlign,
+          layout: legendLayout.layout
         },
         series: [{
           name: 'Series 1',
           data: [0, 0, 0, 0, 0]
         }],
         xAxis: {
-          categories: ['A', 'B', 'C', 'D', 'E'],
-          title: {
-            y: 25
-          }
-        },
-        yAxis: {
-          title: {
-            x: -25
-          }
+          categories: ['A', 'B', 'C', 'D', 'E']
         }
       };
     }
@@ -106,6 +153,26 @@ export const AnalyzeChartComponent = {
       };
       this.filters.selected = chart.filters || [];
       this.onSettingsChanged(this.settings);
+    }
+
+    updateLegendPosition() {
+      const align = LEGEND_POSITIONING[this.legend.align];
+      const layout = LAYOUT_POSITIONS[this.legend.layout];
+
+      this.updateChart.next([
+        {
+          path: 'legend.align',
+          data: align.align
+        },
+        {
+          path: 'legend.verticalAlign',
+          data: align.verticalAlign
+        },
+        {
+          path: 'legend.layout',
+          data: layout.layout
+        }
+      ]);
     }
 
     updateCustomLabels() {
@@ -284,6 +351,10 @@ export const AnalyzeChartComponent = {
         },
         groupBy: {
           artifacts: this.settings.groupBy
+        },
+        legend: {
+          align: this.legend.align,
+          layout: this.legend.layout
         }
       };
       return result;
