@@ -11,6 +11,7 @@ object QueryBuilder {
           throw new QueryException("Expected exactly one artifact")
         }
         artifacts.arr(0)
+      case JNothing => return ""
       case obj => throw new QueryException("Expected array but got: " + obj)
     }
     "%s %s %s %s %s".format(
