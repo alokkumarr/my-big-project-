@@ -11,7 +11,7 @@ export const AnalyzeViewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeViewController extends AbstractComponentController {
-    constructor($injector, $compile, AnalyzeService, dxDataGridService, $state, $mdDialog) {
+    constructor($injector, $compile, AnalyzeService, dxDataGridService, $state, $mdDialog, $mdToast) {
       'ngInject';
       super($injector);
 
@@ -20,6 +20,7 @@ export const AnalyzeViewComponent = {
       this._dxDataGridService = dxDataGridService;
       this._$state = $state;
       this._$mdDialog = $mdDialog;
+      this._$mdToast = $mdToast;
 
       this.LIST_VIEW = 'list';
       this.CARD_VIEW = 'card';
@@ -194,6 +195,7 @@ export const AnalyzeViewComponent = {
         return report.id === model.id;
       });
       this.reloadDataGrid(this.reports);
+      this._$mdToast.show(this._$mdToast.simple().textContent('Analysis deleted'));
     }
 
     onCardAction(actionType, model) {
