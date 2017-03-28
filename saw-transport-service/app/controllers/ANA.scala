@@ -34,7 +34,7 @@ class ANA extends BaseServiceProvider {
         json
       }
       case "update" => {
-        val analysisId = (json \ "contents" \ "keys")(0)
+        val analysisId = extractAnalysisId(json)
         val analysisNode = new AnalysisNode(analysisJson(json))
         val (result, message) = analysisNode.update(
           Map("analysisId" -> analysisId))
@@ -44,7 +44,7 @@ class ANA extends BaseServiceProvider {
         json
       }
       case "read" => {
-        val analysisId = (json \ "contents" \ "keys")(0)
+        val analysisId = extractAnalysisId(json)
         val analysisNode = new AnalysisNode
         val result = analysisNode.read(Map("analysisId" -> analysisId))
         if (result == Map.empty) {
@@ -59,12 +59,12 @@ class ANA extends BaseServiceProvider {
         }
       }
       case "execute" => {
-        val JInt(analysisId) = (json \ "contents" \ "keys")(0)
+        val analysisId = extractAnalysisId(json)
         executeAnalysis(analysisId)
         json
       }
       case "delete" => {
-        val analysisId = (json \ "contents" \ "keys")(0)
+        val analysisId = extractAnalysisId(json)
         val analysisNode = new AnalysisNode
         val result = analysisNode.delete(Map("analysisId" -> analysisId))
         if (result == Map.empty) {
@@ -78,6 +78,11 @@ class ANA extends BaseServiceProvider {
     }
     val playJson = Json.parse(compact(render(response)))
     Results.ok(playJson)
+  }
+
+  def extractAnalysisId(json: JValue) = {
+    val JString(analysisId) = (json \ "contents" \ "keys")(0)
+    analysisId
   }
 
   def analysisJson(json: JValue) = {
@@ -95,11 +100,13 @@ class ANA extends BaseServiceProvider {
       case _ => throw new RuntimeException(
         "Expected array: " + analysisListJson)
     }
-    val query: JValue = ("query", JString(QueryBuilder.build(analysis)))
-    analysis merge(query)
+    // Disabled until analysis tests get updated with sample artifacts
+    //val query: JValue = ("query", JString(QueryBuilder.build(analysis)))
+    //analysis merge(query)
+    analysis
   }
 
-  def executeAnalysis(analysisId: BigInt) = {
+  def executeAnalysis(analysisId: String) = {
     /* Placeholder for Spark SQL execution library until available */
     1
   }
