@@ -40,6 +40,9 @@ import {AggregatorFilterComponent} from './components/analyze-filter-sidenav/fil
 import {ReportRenameDialogComponent} from './components/analyze-report-grid/report-rename-dialog/report-rename-dialog.component';
 import {AnalyzeReportSaveComponent} from './components/analyze-report-save/analyze-report-save.component';
 import {AnalyzePublishDialogComponent} from './components/analyze-publish-dialog/analyze-publish-dialog.component';
+import {AnalyzeChartComponent} from './components/analyze-chart/analyze-chart.component';
+import {AnalyzeChartSettingsComponent} from './components/analyze-chart-settings/analyze-chart-settings.component';
+import {AnalyzeChartPreviewComponent} from './components/analyze-chart-preview//analyze-chart-preview.component';
 
 export const AnalyzeModule = 'AnalyzeModule';
 
@@ -80,4 +83,7 @@ angular.module(AnalyzeModule, [])
   .component('analyzeReportDescription', AnalyzeReportDescriptionComponent)
   .component('analyzeReportPreview', AnalyzeReportPreviewComponent)
   .component('analyzePublishDialog', AnalyzePublishDialogComponent)
+  .component('analyzeChart', AnalyzeChartComponent)
+  .component('analyzeChartSettings', AnalyzeChartSettingsComponent)
+  .component('analyzeChartPreview', AnalyzeChartPreviewComponent)
   .component('analyzeReportSave', AnalyzeReportSaveComponent);

@@ -189,14 +189,20 @@ export const AnalyzeViewComponent = {
     }
 
     openEditModal(mode, model) {
-      if (model.type === AnalyseTypes.Report) {
+      const openModal = template => {
         this.showDialog({
-          template: `<analyze-report model="model" mode="${mode}"></analyze-report>`,
+          template,
           controller: scope => {
             scope.model = model;
           },
           multiple: true
         });
+      };
+
+      if (model.type === AnalyseTypes.Report) {
+        openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
+      } else if (model.type === AnalyseTypes.Chart) {
+        openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
       }
     }
   }

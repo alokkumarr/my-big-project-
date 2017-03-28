@@ -12,7 +12,7 @@ exports.config = {
     browserName: 'chrome',
     chromeOptions: {
       args: [
-        'incognito',
+        //'incognito',
         'disable-extensions',
         'disable-web-security'
       ]

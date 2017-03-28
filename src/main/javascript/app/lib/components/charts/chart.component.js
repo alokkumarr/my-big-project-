@@ -38,13 +38,9 @@ export const chartComponent = {
         set(this.config, updateObj.path, updateObj.data);
       });
 
-      if (this.options.scrollbar && this.options.scrollbar.enabled === true) {
-        // there is some bug with the scrollbar,
-        // if update is used, the scrollbar disappears
-        this.chart = this.Highcharts.chart(this.$element[0], this.config);
-      } else {
-        this.chart.update(this.config);
-      }
+      // Not using chart.update due to a bug with navigation
+      // update and bar styles.
+      this.chart = this.Highcharts.chart(this.$element[0], this.config);
     }
   }
 };

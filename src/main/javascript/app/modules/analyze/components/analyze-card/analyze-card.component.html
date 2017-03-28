@@ -19,9 +19,9 @@
         </a>
         <span class="md-subhead">
           <span ng-bind-html="::($ctrl.mkdel.metrics || []).join(', ') | highlight:$ctrl.highlightTerm"></span>
-          <span ng-if="::$ctrl.model.scheduled">
+          <span>
             <md-icon md-font-icon="icon-calendar"></md-icon>
-            <span ng-bind="::$ctrl.model.scheduled"></span>
+            <span ng-bind="::($ctrl.model.scheduled || 'No Schedule Set')"></span>
           </span>
         </span>
       </md-card-title-text>
