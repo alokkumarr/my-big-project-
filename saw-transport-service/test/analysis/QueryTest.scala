@@ -1,3 +1,5 @@
+import org.json4s.JsonAST._
+import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.FunSpec
 import org.scalatest.MustMatchers
@@ -5,104 +7,34 @@ import org.scalatest.MustMatchers
 import model.QueryBuilder
 
 class QueryTest extends FunSpec with MustMatchers {
-  describe("Report with spec") {
-    it("should have query") {
-      val query = QueryBuilder.build(parse(json))
-      query must be ("SELECT 1 FROM foo")
+  describe("Query built from analysis") {
+    it("should have SELECT and FROM") {
+      query("t") must be ("SELECT 1 FROM t")
+    }
+    it("with filters should have a WHERE clause") {
+      query("t", filters(
+        filter("", "a", ">", "1"),
+        filter("AND", "b", "<", "2"))
+      ) must be ("SELECT 1 FROM t WHERE a > 1 AND b < 2")
     }
   }
 
-  val json = """
-{
-    "artifacts": 
-    [
-        {
-            "artifact_name": "foo",
-            "artifact_position": [500, 200],
-            "artifact_attributes" : 
-            [
-                {
-                    "column_name" : "",
-                    "display_name" : "",
-                    "type" : "int|String",
-                    "join_elgible" : "",
-                    "filter_eligible" : "",
-                    "hide" : "",
-                    "checked" : ""
-                },
-                {
-                    "column_name" : "",
-                    "display_name" : "",
-                    "type" : "int|String",
-                    "join_elgible" : "",
-                    "filter_eligible" : "",
-                    "hide" : "",
-                    "checked" : ""
-                }
-            ],
-            "sql_builder": {
-                "group_by_columns": [],
-                "order_by_columns": [],
-                "joins": [
-                    {
-                        "type": "inner",
-                        "criteria": [
-                            {
-                                "table_name": "Orders",
-                                "column_name": "Shipper",
-                                "side": "right"
-                            },
-                            {
-                                "table_name": "Shippers",
-                                "column_name": "ShipperID",
-                                "side": "left"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "inner",
-                        "criteria": [
-                            {
-                                "table_name": "Orders",
-                                "column_name": "Customer",
-                                "side": "right"
-                            },
-                            {
-                                "table_name": "Customers",
-                                "column_name": "CustomerID",
-                                "side": "left"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "inner",
-                        "criteria": [
-                            {
-                                "table_name": "Orders",
-                                "column_name": "Warehouse",
-                                "side": "right"
-                            },
-                            {
-                                "table_name": "Warehouses",
-                                "column_name": "WarehouseID",
-                                "side": "left"
-                            }
-                        ]
-                    }
-                ],
-                "filters": [
-                    {
-                        "column_name": "TotalPrice",
-                        "boolean_criteria": "AND",
-                        "operator": ">=",
-                        "search_conditions": [
-                            1
-                        ]
-                    }
-                ]
-            }
-        }
-    ]
-}
-"""
+  def query(artifactName: String, objs: JObject*): String = {
+    val json: JObject = ("artifact_name", artifactName)
+    val artifact = objs.foldLeft(json)(_ merge _)
+    val analysis = ("artifacts", List(artifact))
+    QueryBuilder.build(analysis)
+  }
+
+  def filters(filters: JObject*): JObject = {
+    ("filters", filters.toList)
+  }
+
+  def filter(bool: String, name: String, operator: String, cond: String):
+      JObject = {
+    ("boolean_criteria", bool) ~
+    ("column_name", name) ~
+    ("operator", operator) ~
+    ("search_conditions", cond)
+  }
 }
