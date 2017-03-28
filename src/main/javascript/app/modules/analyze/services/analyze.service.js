@@ -3,14 +3,14 @@ import spread from 'lodash/spread';
 import isEmpty from 'lodash/isEmpty';
 import curry from 'lodash/curry';
 import pipe from 'lodash/fp/pipe';
-import filter from 'lodash/fp/filter';
+import fpFilter from 'lodash/fp/filter';
 import fpMap from 'lodash/fp/map';
 import fpFlatMap from 'lodash/fp/flatMap';
-import find from 'lodash/find';
-import isEqual from 'lodash/fp/isEqual';
-import some from 'lodash/fp/some';
-import set from 'lodash/fp/set';
-import get from 'lodash/fp/get';
+import fpFind from 'lodash/fp/find';
+import fpIsEqual from 'lodash/fp/isEqual';
+import fpSome from 'lodash/fp/some';
+import fpSet from 'lodash/fp/set';
+import fpGet from 'lodash/fp/get';
 
 export function AnalyzeService($http, $timeout, $q) {
   'ngInject';
@@ -37,19 +37,19 @@ export function AnalyzeService($http, $timeout, $q) {
   };
 
   function getAnalyses(category, query) {
-    return $http.get('/api/analyze/analyses', {params: {category, query}}).then(get('data'));
+    return $http.get('/api/analyze/analyses', {params: {category, query}}).then(fpGet('data'));
   }
 
   function getPublishedAnalysesByAnalysisId(id) {
-    return $http.get(`/api/analyze/publishedAnalyses/${id}`).then(get('data'));
+    return $http.get(`/api/analyze/publishedAnalyses/${id}`).then(fpGet('data'));
   }
 
   function getLastPublishedAnalysis(id) {
-    return $http.get(`/api/analyze/lastPublishedAnalysis/${id}`).then(get('data'));
+    return $http.get(`/api/analyze/lastPublishedAnalysis/${id}`).then(fpGet('data'));
   }
 
   function getPublishedAnalysisById(id) {
-    return $http.get(`/api/analyze/publishedAnalysis/${id}`).then(get('data'));
+    return $http.get(`/api/analyze/publishedAnalysis/${id}`).then(fpGet('data'));
   }
 
   function executeAnalysis(analysisId) {
@@ -64,43 +64,43 @@ export function AnalyzeService($http, $timeout, $q) {
   }
 
   function getAnalysisById(id) {
-    return $http.get(`/api/analyze/byId/${id}`).then(get('data'));
+    return $http.get(`/api/analyze/byId/${id}`).then(fpGet('data'));
   }
 
   function getCategories() {
-    return $http.get('/api/analyze/categories').then(get('data'));
+    return $http.get('/api/analyze/categories').then(fpGet('data'));
   }
 
   function getCategory(id) {
-    return $http.get(`/api/analyze/category/${id}`).then(get('data'));
+    return $http.get(`/api/analyze/category/${id}`).then(fpGet('data'));
   }
 
   function getMethods() {
-    return $http.get('/api/analyze/methods').then(get('data'));
+    return $http.get('/api/analyze/methods').then(fpGet('data'));
   }
 
   function getMetrics() {
-    return $http.get('/api/analyze/metrics').then(get('data'));
+    return $http.get('/api/analyze/metrics').then(fpGet('data'));
   }
 
   function getArtifacts() {
-    return $http.get('/api/analyze/artifacts').then(get('data'));
+    return $http.get('/api/analyze/artifacts').then(fpGet('data'));
   }
 
   function getDataByQuery() {
-    return $http.get('/api/analyze/dataByQuery').then(get('data'));
+    return $http.get('/api/analyze/dataByQuery').then(fpGet('data'));
   }
 
   function getPivotData() {
-    return $http.get('/api/analyze/pivotData').then(get('data'));
+    return $http.get('/api/analyze/pivotData').then(fpGet('data'));
   }
 
   function generateQuery(payload) {
-    return $http.post('/api/analyze/generateQuery', payload).then(get('data'));
+    return $http.post('/api/analyze/generateQuery', payload).then(fpGet('data'));
   }
 
   function saveReport(payload) {
-    return $http.post('/api/analyze/saveReport', payload).then(get('data'));
+    return $http.post('/api/analyze/saveReport', payload).then(fpGet('data'));
   }
 
   /**
@@ -121,7 +121,7 @@ export function AnalyzeService($http, $timeout, $q) {
       const nothingSelected = isEmpty(supportedMethods);
       const disabledValue = nothingSelected ? false : !checkerFn(item, supportedMethods);
 
-      return set('disabled', disabledValue, item);
+      return fpSet('disabled', disabledValue, item);
     };
 
     return mapperFn(setDisabled)(items);
@@ -151,16 +151,16 @@ export function AnalyzeService($http, $timeout, $q) {
 
   function metricHasSupportedMethod(metric, supportedMethods) {
     return pipe(
-      fpFlatMap(get('children')),
-      fpMap(get('type')),
-      some(type =>
-        find(isEqual(type), supportedMethods)
+      fpFlatMap(fpGet('children')),
+      fpMap(fpGet('type')),
+      fpSome(type =>
+        fpFind(fpIsEqual(type), supportedMethods)
       )
     )(metric.supports);
   }
 
   function isMethodSupported(method, supportedMethods) {
-    return find(isEqual(method.type), supportedMethods);
+    return fpFind(fpIsEqual(method.type), supportedMethods);
   }
 
   /**
@@ -170,12 +170,12 @@ export function AnalyzeService($http, $timeout, $q) {
    */
   function getSupportedMethods(metrics) {
     return pipe(
-      filter(metric => metric.checked === true),
-      fpMap(get('supports')),
+      fpFilter(metric => metric.checked === true),
+      fpMap(fpGet('supports')),
       fpMap(supports =>
         pipe(
-          fpFlatMap(get('children')),
-          fpMap(get('type'))
+          fpFlatMap(fpGet('children')),
+          fpMap(fpGet('type'))
         )(supports)),
       spread(intersection)
     )(metrics);
