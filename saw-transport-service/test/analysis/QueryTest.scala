@@ -17,6 +17,10 @@ class QueryTest extends FunSpec with MustMatchers {
         filter("AND", "b", "<", "2"))
       ) must be ("SELECT 1 FROM t WHERE a > 1 AND b < 2")
     }
+    it("with order by columns should have an ORDER BY clause") {
+      query("t", orderBy("a ASC", "b DESC")
+      ) must be ("SELECT 1 FROM t ORDER BY a ASC, b DESC")
+    }
   }
 
   def query(artifactName: String, objs: JObject*): String = {
@@ -36,5 +40,9 @@ class QueryTest extends FunSpec with MustMatchers {
     ("column_name", name) ~
     ("operator", operator) ~
     ("search_conditions", cond)
+  }
+
+  private def orderBy(name: String*) = {
+    ("order_by_columns", name)
   }
 }

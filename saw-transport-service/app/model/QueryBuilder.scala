@@ -73,6 +73,20 @@ object QueryBuilder {
   }
 
   private def buildOrderBy(analysis: JValue) = {
-    ""
+    val orderBy: List[JValue] = analysis \ "order_by_columns" match {
+      case l: JArray => l.arr
+      case JNothing => List.empty
+      case json: JValue => unexpectedElement(json)
+    }
+    if (orderBy.isEmpty) {
+      ""
+    } else {
+      "ORDER BY " + orderBy.map(_.extract[String]).mkString(", ")
+    }
+  }
+
+  private def unexpectedElement(json: JValue): Nothing = {
+    val name = json.getClass.getSimpleName
+    throw new QueryException("Unexpected element: %s".format(name))
   }
 }
