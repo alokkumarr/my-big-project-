@@ -17,6 +17,10 @@ class QueryTest extends FunSpec with MustMatchers {
         filter("AND", "b", "<", "2"))
       ) must be ("SELECT 1 FROM t WHERE a > 1 AND b < 2")
     }
+    it("with group by columns should have an GROUP BY clause") {
+      query("t", groupBy("a", "b")
+      ) must be ("SELECT 1 FROM t GROUP BY a, b")
+    }
     it("with order by columns should have an ORDER BY clause") {
       query("t", orderBy("a ASC", "b DESC")
       ) must be ("SELECT 1 FROM t ORDER BY a ASC, b DESC")
@@ -44,5 +48,9 @@ class QueryTest extends FunSpec with MustMatchers {
 
   private def orderBy(name: String*) = {
     ("order_by_columns", name)
+  }
+
+  private def groupBy(name: String*) = {
+    ("group_by_columns", name)
   }
 }

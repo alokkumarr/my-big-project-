@@ -69,7 +69,16 @@ object QueryBuilder {
   }
 
   private def buildGroupBy(analysis: JValue) = {
-    ""
+    val groupBy: List[JValue] = analysis \ "group_by_columns" match {
+      case l: JArray => l.arr
+      case JNothing => List.empty
+      case json: JValue => unexpectedElement(json)
+    }
+    if (groupBy.isEmpty) {
+      ""
+    } else {
+      "GROUP BY " + groupBy.map(_.extract[String]).mkString(", ")
+    }
   }
 
   private def buildOrderBy(analysis: JValue) = {
