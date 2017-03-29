@@ -1,0 +1,102 @@
+[
+	{
+		"node-category" : "DataObject",
+		"action" : 
+		{
+			"verb" : "create",
+			"content" :
+			{
+					"name" : "PASSENGER_DATA_2",
+					"owner" : "TEST",
+					"type" : "parquet",
+					"partition_type" : "hive",
+					"application" : "training"
+			},
+			
+			"schema" : {
+					"col_s" : { "type" : "string" },
+					"col_i" : { "type" : "integer" },
+					"col_d" : { "type" : "date" }
+			},
+			
+			"dl-location" : [ 
+				"/main/data/testapp/output/PASSENGER_DATA"
+			]
+		}
+	},
+	{
+		"node-category" : "DataObject",
+		"action" : 
+		{
+			"verb" : "create",
+			"content" :
+			{
+					"name" : "AIRSTAT_2",
+					"owner" : "TEST",
+					"type" : "parquet",
+					"partition_type" : "none",
+					"application" : "training"
+			},
+			
+			"schema" : {
+					"col_s" : { "type" : "string" },
+					"col_i" : { "type" : "integer" },
+					"col_d" : { "type" : "date" }
+			},
+			
+			"dl-location" : [ 
+				"/mapr/dev_rt/main/data/testapp/output/AIRSTAT"
+			]
+		}
+	},	
+	{
+		"node-category" : "DataObject",
+		"action" : 
+		{
+			"verb" : "create",
+			"content" :
+			{
+					"name" : "NUM_PARSING_PQ_2",
+					"owner" : "TEST",
+					"type" : "parquet",
+					"partition_type" : "none",
+					"application" : "testing"
+			},
+			
+			"schema" : {
+					"col_s" : { "type" : "string" },
+					"col_i" : { "type" : "integer" },
+					"col_d" : { "type" : "date" }
+			},
+			
+			"dl-location" : [ 
+				"/mapr/dev_rt/main/data/testapp/output/NUM_PARSING_PQ"
+			]
+		}
+	},
+	{
+		"node-category" : "DataObject",
+		"action" : 
+		{
+			"verb" : "create",
+			"content" :
+			{
+					"name" : "PT_ENERGY_CONSUMPTION_2",
+					"owner" : "TEST",
+					"type" : "parquet",
+					"partition_type" : "none",
+					"application" : "training"
+			},
+			
+			"schema" : {
+					"col_s" : { "type" : "string" },
+					"col_i" : { "type" : "integer" },
+					"col_d" : { "type" : "date" }
+			},
+			
+			"dl-location" : [ 
+				"/mapr/dev_rt/main/data/testapp/output/PT_ENERGY_CONSUMPTION"
+			]
+		}
+	}	
+]		
