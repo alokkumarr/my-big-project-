@@ -1,0 +1,18 @@
+[
+	{
+		"node-category" : "UINode"
+		"NodeId" : "Some(ATT)::Analyze::636828464806239"
+		"action" : 
+		{
+			"verb" : "read"
+		}
+	},
+	{
+		"node-category" : "UINode"
+		"NodeId" : "Some(ATT)::Analyze::636828464806239"
+		"action" : 
+		{
+			"verb" : "delete"
+		}
+	}
+]		
