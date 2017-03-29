@@ -83,7 +83,7 @@ trait Relation{
       val tableName = NodeCategoryMapper.NCM(rk._1).toString
       elements = elements.filterNot(el => tableName.equals(el._1) && rk._2.equals(el._2))
     })
-    m_log debug s"Remove nodes from relation: updated Node List = ${elements.mkString("[", ",", "]")}"
+    m_log trace s"Remove nodes from relation: updated Node List = ${elements.mkString("[", ",", "]")}"
     normarize
   }
 
@@ -91,7 +91,7 @@ trait Relation{
   {
     val tableName = NodeCategoryMapper.NCM(nodeCategory).toString
     elements = elements.filterNot( el => { m_log debug s"Table ${el._1} RowId: ${el._2}"; tableName.equals(el._1) && a_rowID.equals(el._2)} )
-    m_log debug s"Remove node from relation: Table = ${tableName}, RowID = $a_rowID, updated RowIds = ${elements.mkString("[", ",", "]")}"
+    m_log trace s"Remove node from relation: Table = ${tableName}, RowID = $a_rowID, updated RowIds = ${elements.mkString("[", ",", "]")}"
     normarize
   }
 
@@ -100,7 +100,7 @@ trait Relation{
   {
     val rowIDs : List[List[(String, String)]] = tables.values.map(mdTableName => {
       val rowID : List[Array[Byte]] = SearchMetadata.simpleSearch(mdTableName.toString, keys, systemProps, "and")
-      m_log debug s"Table: ${mdTableName.toString}, retrieved RowIds: ${rowID.map( Bytes.toString ).mkString("[", ",", "]")}"
+      m_log trace s"Table: ${mdTableName.toString}, retrieved RowIds: ${rowID.map( Bytes.toString ).mkString("[", ",", "]")}"
      rowID.map( id => (mdTableName.toString, Bytes.toString(id)))
     }).toList
     elements = elements ++ rowIDs.flatMap( list_of_pairs => list_of_pairs )
@@ -111,7 +111,7 @@ trait Relation{
   {
     val tableName = NodeCategoryMapper.NCM(nodeCategory).toString
     elements = elements ++ List((tableName, a_rowID))
-    m_log debug s"Add node to relation: Table = ${tableName}, updated RowIds = ${elements.mkString("[", ",", "]")}"
+    m_log trace s"Add node to relation: Table = ${tableName}, updated RowIds = ${elements.mkString("[", ",", "]")}"
     normarize
   }
 
@@ -120,7 +120,7 @@ trait Relation{
   {
     val tableName = NodeCategoryMapper.NCM(nodeCategory).toString
     val rowIDs : List[Array[Byte]] = SearchMetadata.simpleSearch(tableName, keys, Map.empty, "and")
-    m_log debug s"Add nodes to relation: Table = $tableName, updated RowIds = ${rowIDs.map( Bytes.toString ).mkString("[", ",", "]")}"
+    m_log trace s"Add nodes to relation: Table = $tableName, updated RowIds = ${rowIDs.map( Bytes.toString ).mkString("[", ",", "]")}"
     elements = elements ++ rowIDs.map( id => (tableName, Bytes.toString(id)))
     normarize
   }
