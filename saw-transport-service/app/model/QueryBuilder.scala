@@ -26,7 +26,19 @@ object QueryBuilder {
   }
 
   private def buildSelect(analysis: JValue) = {
-    "SELECT 1"
+    val attributes: List[JValue] = analysis \ "artifact_attributes" match {
+      case attributes: JArray => attributes.arr
+      case JNothing => throw new QueryException(
+        "At least one analysis attribute required")
+      case json: JValue => unexpectedElement(json)
+    }
+    if (attributes.size < 1)
+      throw new QueryException("At least one analysis attribute expected")
+    "SELECT " + attributes.map(column(_)).mkString(", ")
+  }
+
+  private def column(column: JValue) = {
+    (column \ "column_name").extract[String]
   }
 
   private def buildFrom(analysis: JValue) = {
