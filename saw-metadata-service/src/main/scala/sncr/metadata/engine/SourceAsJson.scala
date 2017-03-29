@@ -1,7 +1,7 @@
 package sncr.metadata.engine
 
 import org.apache.hadoop.hbase.client.Result
-import org.json4s.JsonAST.JValue
+import org.json4s.JsonAST.{JNothing, JValue}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 import MDObjectStruct._
@@ -17,8 +17,11 @@ trait SourceAsJson {
   protected def getSourceData(res:Result): (JValue, Array[Byte]) =
   {
     val content = res.getValue(MDColumnFamilies(_cf_source.id),MDKeys(key_Definition.id))
-    m_log trace s"Convert content of node to JSON: ${Bytes.toString(content)}"
-    (parse(Bytes.toString(content), false, false), content)
+    if (content != null && content.nonEmpty) {
+      m_log trace s"Convert content of node to JSON: ${Bytes.toString(content)}"
+      (parse(Bytes.toString(content), false, false), content)
+    }
+    else (JNothing, Array.emptyByteArray)
   }
 
 }
