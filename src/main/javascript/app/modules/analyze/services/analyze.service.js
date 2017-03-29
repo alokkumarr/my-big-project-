@@ -69,7 +69,7 @@ export function AnalyzeService($http, $timeout, $q) {
   }
 
   function deleteAnalysis(id) {
-    return $http.delete(`/api/analyze/byId/${id}`).then(get('data'));
+    return $http.delete(`/api/analyze/byId/${id}`).then(fpGet('data'));
   }
 
   function getCategories() {
