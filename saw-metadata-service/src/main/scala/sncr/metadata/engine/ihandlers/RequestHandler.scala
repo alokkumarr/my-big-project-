@@ -93,8 +93,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
   var dl_locations  : JArray = null
   var base_relation : JArray = null
   var keys : JObject = null
-  var ui_node_type : String = null
-  var ticket : JObject = null
+  var ui_module : String = null
   var ui : JObject = null
   var manyWI : JArray = null
   var oneWI : JObject = null
@@ -133,9 +132,8 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
   {
     nodeCategory match {
       case "UINode" => if( content == null || content.obj.isEmpty ||
-                           ticket == null || ticket.obj.isEmpty ||
                            ui == null || ui.obj.isEmpty ||
-                           ui_node_type == null || ui_node_type.isEmpty)
+                           ui_module == null || ui_module.isEmpty)
                           (Rejected.id, "Content is empty UINode creation requires content" )
 
       case "AnalysisNode" | "SemanticNode" => if( content == null || content.obj.isEmpty)
@@ -151,8 +149,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
   private def validateUpdate: (Int, String) =
   {
     nodeCategory match {
-      case "UINode" => if (content == null || content.obj.isEmpty ||
-                            ticket == null || ticket.obj.isEmpty)
+      case "UINode" => if (content == null || content.obj.isEmpty )
                         (Rejected.id, "Content is empty UINode update requires content" )
 
       case "AnalysisNode" | "SemanticNode" =>
@@ -248,10 +245,9 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
       dl_locations = (action \ "dl-locations").extractOrElse[JArray](JArray(Nil))
       base_relation = (action \ "base-relation").extractOrElse[JArray](JArray(Nil))
       keys = (action \ "keys").extractOrElse[JObject](JObject(Nil))
-      ticket = (action \ "ticket").extractOrElse[JObject](JObject(Nil))
 
       ui = (action \ "ui").extractOrElse[JObject](JObject(Nil))
-      ui_node_type = if (ui != null && ui.obj.nonEmpty)  ( ui \ "ui-node-type").extractOrElse[String]("") else ""
+      ui_module = if (ui != null && ui.obj.nonEmpty)  ( ui \ "ui-module").extractOrElse[String]("") else ""
 
       verb match {
         case "create" => validateCreate
@@ -276,7 +272,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
     }
   }
 
-  def execute: Unit =
+  def execute(): Unit =
   {
     if (manyWI != null)
       respGenerator.generate(manyWI.arr.map{ case o:JObject => executeWorkItem(o)
@@ -320,7 +316,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
     val keys = Map("NodeId" -> NodeId)
     nodeCategory match {
       case "UINode"       => {
-        val uih = new UINode(ticket, content); respGenerator.build(uih.update(keys))}
+        val uih = new UINode(content); respGenerator.build(uih.update(keys))}
       case "AnalysisNode" => {
         var ah: AnalysisNode = null
         if (content != null && content.obj.nonEmpty)
@@ -365,7 +361,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
   {
     nodeCategory match {
       case "UINode"       => {
-        val uih = new UINode(ticket, content, ui_node_type); respGenerator.build(uih.create)}
+        val uih = new UINode(content, ui_module); respGenerator.build(uih.create)}
       case "AnalysisNode" => {
         val ah = new AnalysisNode(content)
         if (base_relation.arr.nonEmpty){
@@ -462,13 +458,14 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
       case "UINode" | "AnalysisNode" | "SemanticNode" | "AnalysisResult" => respGenerator.build(Error.id, "Not supported.")
       case "DataObject"   => {
         val doh = DataObject(NodeId)
+        m_log trace s"DL location src: ${compact(render(dl_locations))}"
         if (dl_locations.arr.nonEmpty){
           dl_locations.arr.foreach{
-            case o: JString => if (verb.equalsIgnoreCase("del-dl-location")) doh.removeLocation(o.s) else doh.addLocation(o.s)
-            case _ => m_log error "Incorrect request structure: dl-location, skip it"
+            case o: JString => if (verb.equals("del-dl-location")) doh.removeLocation(o.s) else doh.addLocation(o.s)
+            case _ => m_log error "Incorrect request stru cture: dl-location, skip it"
           }
         }
-        respGenerator.build(doh.updateDLLocations)
+        respGenerator.build(doh.updateDLLocations())
       }
     }
   }
@@ -486,13 +483,11 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
     dl_locations = (action \ "dl-locations").extractOrElse[JArray](JArray(Nil))
     base_relation = (action \ "base-relation").extractOrElse[JArray](JArray(Nil))
 
-
     keys = (action \ "keys").extractOrElse[JObject](JObject(Nil))
-    ticket = (action \ "ticket").extractOrElse[JObject](JObject(Nil))
 
     ui = (action \ "ui").extractOrElse[JObject](JObject(Nil))
-    ui_node_type = if (ui != null && ui.obj.nonEmpty)
-                      ( ui \ "ui-node-type").extractOrElse[String](Fields.UNDEF_VALUE.toString)
+    ui_module = if (ui != null && ui.obj.nonEmpty)
+                      ( ui \ "ui-module").extractOrElse[String](Fields.UNDEF_VALUE.toString)
                    else Fields.UNDEF_VALUE.toString
 
     verb match{
