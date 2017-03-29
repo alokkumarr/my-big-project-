@@ -66,7 +66,19 @@ export const AnalyzeNewComponent = {
           tpl = '<analyze-report model="model"></analyze-report>';
           model = {
             type: AnalyseTypes.Report,
-            name: 'Untitled Report',
+            name: 'Untitled Analysis',
+            description: '',
+            category: null,
+            metrics: this.getSelectedMetrics(),
+            scheduled: null,
+            artifacts: null
+          };
+          break;
+        case 'table:pivot':
+          tpl = '<analyze-pivot model="model"></analyze-pivot>';
+          model = {
+            type: AnalyseTypes.Pivot,
+            name: 'Untitled Analysis',
             description: '',
             category: null,
             metrics: this.getSelectedMetrics(),

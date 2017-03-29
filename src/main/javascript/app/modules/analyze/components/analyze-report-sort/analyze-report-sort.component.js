@@ -33,6 +33,7 @@ export const AnalyzeReportSortComponent = {
       switch (item.type) {
         case 'string':
         case 'int':
+        case 'double':
           return sort.field === item || !this.isColumnSorted(item);
         default:
           return false;

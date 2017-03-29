@@ -4,7 +4,8 @@ export const Events = {
 
 export const AnalyseTypes = {
   Report: 'report',
-  Chart: 'chart'
+  Chart: 'chart',
+  Pivot: 'pivot'
 };
 
 export const LAST_ANALYSES_CATEGORY_ID = 'lastAnalysesListId';
