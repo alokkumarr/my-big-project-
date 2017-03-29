@@ -43,8 +43,7 @@ object QueryBuilder {
     analysis \ "filters" match {
       case filters: JArray => buildWhereFilters(filters.arr)
       case JNothing => ""
-      case json: JValue => throw new QueryException(
-        "Unexpected element: %s".format(json.getClass.getSimpleName))
+      case json: JValue => unexpectedElement(json)
     }
   }
 

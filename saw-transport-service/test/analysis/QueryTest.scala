@@ -27,19 +27,19 @@ class QueryTest extends FunSpec with MustMatchers {
     }
   }
 
-  def query(artifactName: String, objs: JObject*): String = {
+  private def query(artifactName: String, objs: JObject*): String = {
     val json: JObject = ("artifact_name", artifactName)
     val artifact = objs.foldLeft(json)(_ merge _)
     val analysis = ("artifacts", List(artifact))
     QueryBuilder.build(analysis)
   }
 
-  def filters(filters: JObject*): JObject = {
+  private def filters(filters: JObject*): JObject = {
     ("filters", filters.toList)
   }
 
-  def filter(bool: String, name: String, operator: String, cond: String):
-      JObject = {
+  private def filter(bool: String, name: String, operator: String,
+    cond: String): JObject = {
     ("boolean_criteria", bool) ~
     ("column_name", name) ~
     ("operator", operator) ~
