@@ -1,0 +1,18 @@
+[
+	{
+		"node-category" : "AnalysisNode",
+		"NodeId" : "PassengerDataAnalysis_IntegrationTest::1000::3::640065965408827",
+		"action" : 
+		{
+			"verb" : "read"
+		}
+	},
+	{
+		"node-category" : "DataObject",
+		"NodeId" : "PASSENGER_DATA::1490842685419",
+		"action" : 
+		{
+			"verb" : "read"
+		}
+	}
+]		
