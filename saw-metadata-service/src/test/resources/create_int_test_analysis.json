@@ -1,0 +1,94 @@
+[
+	{
+		"node-category" : "AnalysisNode",
+		"action" : 
+		{
+			"verb" : "create",
+			"content" :
+			{
+			"name": "PassengerDataAnalysis_IntegrationTest",
+			"description": "Create analysis IntegrationTest",
+			"tenantId": "Veraizon",
+			"productId": "IntegrationTest",
+			"emailId": "srya0001@synchronoss.com",
+			"publishedBy": "ABC",
+			"copyToFTP": true,
+			"attachAnalysisToMail": true,
+			"isScheduled": true,
+			"outputFile": {
+					"outputFormat": "parquet",
+					"outputFileName": "DB"
+			},
+			"analysis": {
+					"analysisId": 1000,
+					"productViewsId": 1,
+					"analysisCategoryId": 3,
+					"analysisCategoryName": "UA_RRM",
+					"tenantId": "ATT",
+					"productId": "none",
+					"analysisName": "RegressionTest1",
+					"analysisDescription": "Cost by Carrier and Call Type",
+					"analysisQuery": "select GEORegion, ActivityDate, ActivityTypeCode, GEOSummary, OperatingAirline, PublishedAirlineIATACode, Terminal, PriceCategoryCode, BoardingArea, PassengerCount from PASSENGER_DATA where GEORegion = 'Asia'"
+					"analysisQueryType": "VIEW",
+					"displayStatus": "A",
+					"designerQuery": true,
+					"createdUser": "srya0001",
+					"modifiedUser": "srya0001",
+					"createdDate": "2017-03-14 07:20:50",
+					"modifiedDate": "2017-03-14 07:20:50",
+					"columns": [
+							{
+									"align": "LEFT",
+									"label": "PASSENGERS",
+									"name": "PASSENGERS",
+									"pattern": "PASSENGERS",
+									"size": "100",
+									"type": "Number",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 102,
+									"rawAnalysisColumnsId": 100,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "SEATS",
+									"name": "SEATS",
+									"pattern": "SEATS",
+									"size": "100",
+									"type": "Number",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 102,
+									"rawAnalysisColumnsId": 101,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "DISTANCE",
+									"name": "DISTANCE",
+									"pattern": "DISTANCE",
+									"size": "100",
+									"type": "Number",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 102,
+									"rawAnalysisColumnsId": 102,
+									"selected": true
+							}							
+					],
+					"parametarised": false,
+					"scheduled": false,
+					"analysisSuperCategoryList": [
+							"ABC"
+					]
+				}
+			},
+			"base-relation" : [ 
+				{ "NodeId" : "PASSENGER_DATA::1490842685419", "node-category" : "DataObject" } 
+			]
+
+		}
+	}
+	
+]
