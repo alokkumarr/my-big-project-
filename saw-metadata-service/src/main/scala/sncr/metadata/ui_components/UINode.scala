@@ -1,7 +1,5 @@
 package sncr.metadata.ui_components
 
-import java.util.UUID
-
 import com.typesafe.config.Config
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{Result, _}
@@ -18,9 +16,13 @@ import sncr.saw.common.config.SAWServiceConfig
 /**
   * Created by srya0001 on 2/19/2017.
   */
-class UINode(private[this] val ticket: JValue, private[this] var content_element: JValue, val ui_item_type : String = Fields.UNDEF_VALUE.toString, c: Config = null)
+class UINode(private[this] var content_element: JValue, val ui_item_type : String = Fields.UNDEF_VALUE.toString, c: Config = null)
       extends ContentNode(c)
       with SourceAsJson {
+
+  private var fetchMode : Int = UINodeFetchMode.Everything.id
+
+  def setFetchMode(m: Int) = { fetchMode = m }
 
 
   def setUINodeContent : Unit = {
@@ -40,10 +42,10 @@ class UINode(private[this] val ticket: JValue, private[this] var content_element
   override protected def getData(res:Result): Option[Map[String, Any]] = {
     val (dataAsJVal, dataAsByteArray) = getSourceData(res)
     setContent(dataAsByteArray)
-    Option(getSearchFields(res) +
-//      (key_Definition.toString -> compact(render(dataAsJVal)))
-      (key_Definition.toString -> dataAsJVal)
-    )
+    if (fetchMode == UINodeFetchMode.Everything.id)
+      Option(getSearchFields(res) + (key_Definition.toString -> dataAsJVal))
+    else
+      Option(Map(key_Definition.toString -> dataAsJVal))
   }
 
   override protected val m_log: Logger = LoggerFactory.getLogger(classOf[UINode].getName)
@@ -56,19 +58,9 @@ class UINode(private[this] val ticket: JValue, private[this] var content_element
 
   override protected def initRow : String =
   {
-    val rowkey = UINode.rowKeyRule.foldLeft(new String)((z, t) => {
-      z +
-        (if (z.isEmpty) "" else MetadataDictionary.separator) +
-        (t match {
-          case "customer_code" => val cc_code = (content_element \ t).extractOpt[String]
-                        if (cc_code.isEmpty)
-                           (ticket \ t).extractOpt[String].getOrElse(Fields.UNDEF_VALUE.toString)
-                        else cc_code.get
-          case "type" => ui_item_type
-          case "_id" => val part_id = (content_element \ t).extractOpt[String]
-                        if(part_id.isDefined && part_id.nonEmpty) part_id.get else UUID.randomUUID().toString
-        })
-      })
+    val rowkey = (content_element \ "customer_code").extractOpt[String] +
+            MetadataDictionary.separator + ui_item_type +
+            MetadataDictionary.separator + System.nanoTime()
     m_log debug s"Generated RowKey = $rowkey"
     rowkey
   }
@@ -80,13 +72,13 @@ class UINode(private[this] val ticket: JValue, private[this] var content_element
       val put_op = createNode(NodeType.ContentNode.id, classOf[UINode].getName)
 
       setUINodeContent
-      var searchValues : Map[String, Any] = UINode.extractSearchData(ticket, content_element) + ("NodeId" -> new String(rowKey))
-      if (!ui_item_type.equalsIgnoreCase(Fields.UNDEF_VALUE.toString)) searchValues = searchValues + ("item_type" -> ui_item_type )
+      var searchValues : Map[String, Any] = UINode.extractSearchData(content_element) + ("NodeId" -> new String(rowKey))
+      if (!ui_item_type.equalsIgnoreCase(Fields.UNDEF_VALUE.toString)) searchValues = searchValues + ("module" -> ui_item_type )
       searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
 
 
       if (commit(saveContent(saveSearchData(put_op, searchValues))))
-        (Success.id, s"The UI Node [ ${new String(rowKey)} ] has been created")
+        (NodeCreated.id, s"${Bytes.toString(rowKey)}")
       else
         (Error.id, "Could not create UI Node")
 
@@ -101,12 +93,10 @@ class UINode(private[this] val ticket: JValue, private[this] var content_element
     try {
       val (res, msg ) = selectRowKey(keys)
       if (res != Success.id) return (res, msg)
-      val get_op = prepareRead
-      readCompiled(get_op).getOrElse(Map.empty)
-//      setRowKey(rowKey)
+      load
       setUINodeContent
-      var searchValues : Map[String, Any] = UINode.extractSearchData(ticket, content_element) + ("NodeId" -> new String(rowKey))
-      if (!ui_item_type.equalsIgnoreCase(Fields.UNDEF_VALUE.toString)) searchValues = searchValues + ("item_type" -> ui_item_type )
+      var searchValues : Map[String, Any] = UINode.extractSearchData(content_element) + ("NodeId" -> new String(rowKey))
+      if (!ui_item_type.equalsIgnoreCase(Fields.UNDEF_VALUE.toString)) searchValues = searchValues + ("module" -> ui_item_type )
       searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
 
       if (commit(saveContent(saveSearchData(update, searchValues))))
@@ -126,19 +116,15 @@ object UINode
 {
   protected val m_log: Logger = LoggerFactory.getLogger("UINodeObject")
 
-  protected val rowKeyRule = List("customer_code", "type", "_id")
-
   def apply(rowId: String) :UINode =
   {
-    val uiNode = new UINode(JNothing, JNothing, Fields.UNDEF_VALUE.toString)
+    val uiNode = new UINode(JNothing, Fields.UNDEF_VALUE.toString)
     uiNode.setRowKey(Bytes.toBytes(rowId))
     uiNode.load
     uiNode
   }
 
-
-
-  def  extractSearchData(ticket: JValue, content_element: JValue) : Map[String, Any] = {
+  def  extractSearchData( content_element: JValue) : Map[String, Any] = {
     List((content_element, "customer_Prod_module_feature_sys_id"),
       (content_element, "userName"),
       (content_element, "dataSecurityKey"),
@@ -151,6 +137,15 @@ object UINode
         if (result) jv._2 -> Option(searchValue) else jv._2 -> None
       }).filter(_._2.isDefined).map(kv => kv._1 -> kv._2.get).toMap
   }
+
+}
+
+
+object UINodeFetchMode extends Enumeration{
+
+  val Everything = Value(0, "Everything")
+  val DefinitionAndKeys = Value(1, "Definition&Keys")
+  val DefinitionOnly = Value(2, "Definition")
 
 }
 
