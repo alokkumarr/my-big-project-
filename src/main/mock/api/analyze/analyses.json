@@ -2626,7 +2626,7 @@
     "artifacts": []
   },
   {
-    "id": "5",
+    "id": "6",
     "type": "chart",
     "chartType": "scatter",
     "name": "Scatter chart Analysis",
@@ -2640,7 +2640,7 @@
     "artifacts": []
   },
   {
-    "id": "5",
+    "id": "7",
     "type": "chart",
     "chartType": "donut",
     "name": "Donut chart Analysis",
@@ -2654,7 +2654,7 @@
     "artifacts": []
   },
   {
-    "id": "5",
+    "id": "8",
     "type": "chart",
     "chartType": "bubble",
     "name": "Bubble chart Analysis",

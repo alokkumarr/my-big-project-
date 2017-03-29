@@ -22,6 +22,7 @@ export function AnalyzeService($http, $timeout, $q) {
     getMetrics,
     getArtifacts,
     getAnalyses,
+    deleteAnalysis,
     getLastPublishedAnalysis,
     getPublishedAnalysesByAnalysisId,
     getPublishedAnalysisById,
@@ -65,6 +66,10 @@ export function AnalyzeService($http, $timeout, $q) {
 
   function getAnalysisById(id) {
     return $http.get(`/api/analyze/byId/${id}`).then(fpGet('data'));
+  }
+
+  function deleteAnalysis(id) {
+    return $http.delete(`/api/analyze/byId/${id}`).then(fpGet('data'));
   }
 
   function getCategories() {
