@@ -62,9 +62,6 @@ class AnalysisNode(private[this] var analysisNode: JValue = JNothing, c: Config 
   headerDesc =  SearchDictionary.searchFields
 
 
-
-
-
   override protected def initRow: String = {
     val rowkey = (analysisNode \ "name").extract[String] + MetadataDictionary.separator +
       (analysisNode \ "analysis" \ "analysisId").extract[String] + MetadataDictionary.separator +
@@ -130,7 +127,7 @@ class AnalysisNode(private[this] var analysisNode: JValue = JNothing, c: Config 
         m_log debug s"Add search field $k with value: ${searchValues(k).toString}"
       })
       if (commit(saveRelation(saveContent(saveSearchData(put_op,searchValues)))))
-          (Success.id, s"The Analysis Node [ ${new String(rowKey)} ] has been created")
+        (NodeCreated.id, s"${Bytes.toString(rowKey)}")
       else
         (Error.id, "Could not create Analysis Node")
     }
@@ -145,9 +142,8 @@ class AnalysisNode(private[this] var analysisNode: JValue = JNothing, c: Config 
     try {
       val (res, msg) = selectRowKey(filter)
       if (res != Success.id) return (res, msg)
-      readCompiled(prepareRead).getOrElse(Map.empty)
+      load
       setDefinition
-
       val searchValues: Map[String, Any] = AnalysisNode.extractSearchData(analysisNode) + ("NodeId" -> new String(rowKey))
       searchValues.keySet.foreach(k => {
         m_log debug s"Add search field $k with value: ${searchValues(k).toString}"
