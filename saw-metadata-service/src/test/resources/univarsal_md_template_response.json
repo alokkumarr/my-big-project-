@@ -1,0 +1,50 @@
+[
+// Response:
+	{
+// Subject:	
+
+// Node ID for new nodes
+// Will be omitted for search operations
+		"node" : "<NodeID>",
+		
+// Copied from request		
+// Will be omitted for search operations
+	 	"node-category" : "UINode|Anlysis|DataObject|AnalysisResult"
+		
+// Copied from request		
+		"executed-action" : "action",
+		"executed-action-result" : "Success|Failure"
+		
+		"result" : 
+		[
+// Optional: 
+			"Node" : {
+				"NodeId" : "<Node ID>",
+// Recieved data:
+				"content" : {
+				
+				},
+				"base-relation" : [ 
+					"<NodeID of element 1>",
+					"<NodeID of element 2>",
+					...
+					"<NodeID of element N>"				
+				],
+				"dl-locations" : [
+					"<location1>", 
+					"<location2>"
+					...
+				],
+				"schema" : {
+			
+				}
+			},
+		"search-fields-values": [
+				{ "name": "<Name>", "value" : "<value>" },
+				{}
+		]
+	}, 
+// Another work-item:
+	{}
+	
+]		
