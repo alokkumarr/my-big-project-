@@ -7,10 +7,8 @@ import org.json4s.JsonAST.JValue
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import play.libs.Json
-import play.mvc.{Http, Result, Results}
+import play.mvc.{Http, Result}
 
-import model.QueryBuilder
-import model.QueryException
 import sncr.metadata.analysis.AnalysisNode
 import sncr.metadata.engine.MDNodeUtil
 import sncr.metadata.engine.ProcessingResult._
@@ -34,7 +32,7 @@ class ANA extends BaseServiceProvider {
         json
       }
       case "update" => {
-        val analysisId = extractAnalysisId(json)
+        val analysisId = (json \ "contents" \ "keys")(0)
         val analysisNode = new AnalysisNode(analysisJson(json))
         val (result, message) = analysisNode.update(
           Map("analysisId" -> analysisId))
@@ -44,7 +42,7 @@ class ANA extends BaseServiceProvider {
         json
       }
       case "read" => {
-        val analysisId = extractAnalysisId(json)
+        val analysisId = (json \ "contents" \ "keys")(0)
         val analysisNode = new AnalysisNode
         val result = analysisNode.read(Map("analysisId" -> analysisId))
         if (result == Map.empty) {
@@ -59,14 +57,14 @@ class ANA extends BaseServiceProvider {
         }
       }
       case "execute" => {
-        val analysisId = extractAnalysisId(json)
+        val JInt(analysisId) = (json \ "contents" \ "keys")(0)
         executeAnalysis(analysisId)
         json
       }
       case "delete" => {
-        val analysisId = extractAnalysisId(json)
+        val analysisId = (json \ "contents" \ "keys")(0)
         val analysisNode = new AnalysisNode
-        val result = analysisNode.delete(Map("analysisId" -> analysisId))
+        val result = analysisNode.deleteAll(Map("analysisId" -> analysisId))
         if (result == Map.empty) {
           throw new RuntimeException("Deleting failed")
         }
@@ -77,17 +75,12 @@ class ANA extends BaseServiceProvider {
       }
     }
     val playJson = Json.parse(compact(render(response)))
-    Results.ok(playJson)
-  }
-
-  def extractAnalysisId(json: JValue) = {
-    val JString(analysisId) = (json \ "contents" \ "keys")(0)
-    analysisId
+    play.mvc.Results.ok(playJson)
   }
 
   def analysisJson(json: JValue) = {
     val analysisListJson = json \ "contents" \ "analysis"
-    val analysis = analysisListJson match {
+    analysisListJson match {
       case array: JArray => {
         if (array.arr.length > 1) {
           throw new RuntimeException("Only one element supported")
@@ -100,13 +93,9 @@ class ANA extends BaseServiceProvider {
       case _ => throw new RuntimeException(
         "Expected array: " + analysisListJson)
     }
-    // Disabled until analysis tests get updated with sample artifacts
-    //val query: JValue = ("query", JString(QueryBuilder.build(analysis)))
-    //analysis merge(query)
-    analysis
   }
 
-  def executeAnalysis(analysisId: String) = {
+  def executeAnalysis(analysisId: BigInt) = {
     /* Placeholder for Spark SQL execution library until available */
     1
   }
