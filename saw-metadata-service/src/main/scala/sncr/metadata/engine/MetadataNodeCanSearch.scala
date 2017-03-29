@@ -23,7 +23,6 @@ class MetadataNodeCanSearch(c: Config = null)
     * @param searchFilter
     * @return
     */
-
   def find(searchFilter: Map[String, Any]): List[Map[String, Any]] = loadNodes(simpleMetadataSearch(searchFilter, "and"))
 
   def scan: List[Map[String, Any]] = loadNodes(scanMDNodes)
