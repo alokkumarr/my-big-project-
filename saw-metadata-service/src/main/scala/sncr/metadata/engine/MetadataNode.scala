@@ -2,6 +2,7 @@ package sncr.metadata.engine
 
 import java.io.IOException
 
+import com.typesafe.config.Config
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
@@ -13,12 +14,16 @@ import sncr.metadata.engine.ProcessingResult._
 /**
   * Created by srya0001 on 2/17/2017.
   */
-class MetadataNode extends MetadataStore {
+class MetadataNode(c: Config = null) extends MetadataStore(c) {
+  
 
-  override val m_log: Logger = LoggerFactory.getLogger(classOf[MetadataNode].getName)
+  override protected val m_log: Logger = LoggerFactory.getLogger(classOf[MetadataNode].getName)
 
-  var nodeType :Array[Byte] = Array.empty
-  var nodeCategory :Array[Byte] = Array.empty
+  protected var nodeType :Array[Byte] = Array.empty
+  protected var nodeCategory :Array[Byte] = Array.empty
+  protected var cachedData : Map[String, Any] = Map.empty
+
+  def getCachedData = cachedData
 
   protected def createNode(a_nodeType: Int, a_nodeCategory: String ): Put =
   {
@@ -53,9 +58,9 @@ class MetadataNode extends MetadataStore {
        )
   }
 
-  def prepareRead: Get = compileRead(new Get(rowKey)).addFamily(MDColumnFamilies(systemProperties.id))
+  protected def prepareRead: Get = compileRead(new Get(rowKey)).addFamily(MDColumnFamilies(systemProperties.id))
 
-  def readCompiled( getNode: Get): Option[Map[String, Any]] = {
+  protected def readCompiled( getNode: Get): Option[Map[String, Any]] = {
     try {
       m_log debug s"Load row: ${Bytes.toString(rowKey)}"
       val res = mdNodeStoreTable.get(getNode)
@@ -96,8 +101,7 @@ class MetadataNode extends MetadataStore {
     true
   }
 
-
-  def _delete : (Int, String) =
+  protected def _delete : (Int, String) =
   {
     try {
       val delGetOp: Get = new Get(rowKey)
@@ -120,17 +124,27 @@ class MetadataNode extends MetadataStore {
 
   def selectRowKey(keys: Map[String, Any]) : (Int, String) = ???
 
-
-  def read(filter: Map[String, Any]): Map[String, Any] = {
-    val (res, msg) = selectRowKey(filter)
-    if (res != Success.id) return Map.empty
-    readCompiled(prepareRead).getOrElse(Map.empty)
+  def load: Map[String, Any] = {
+    cachedData = Map.empty
+    if (rowKey == null || rowKey.length == 0) return Map.empty
+    cachedData = readCompiled(prepareRead).getOrElse(Map.empty)
+    cachedData
   }
 
 
-  def delete(keys: Map[String, Any]): (Int, String) = {
-    val (res, msg) = selectRowKey(keys)
-    if (res != Success.id) return (res, msg)
+
+  def read(filter: Map[String, Any]): Map[String, Any] = {
+    cachedData = Map.empty
+    val (res, msg) = selectRowKey(filter)
+    if (res != Success.id) return Map.empty
+    cachedData = readCompiled(prepareRead).getOrElse(Map.empty)
+    cachedData
+  }
+
+
+  def delete: (Int, String) = {
+    cachedData = Map.empty
+    if (rowKey == null || rowKey.length == 0) return (Error.id, "Row ID is not set")
     _delete
   }
 
@@ -149,7 +163,7 @@ object MetadataNode extends MetadataStore{
       putOp = putOp.addColumn(MDColumnFamilies(_cf_source.id),
                               MDKeys(key_Definition.id),
                               Bytes.toBytes(content))
-      val sval = MDNodeUtil.extractSearchData(content, searchDictionary) + ("NodeId" -> Option(compositeKey))
+      val sval = MDNodeUtil.extractSearchData(content, searchDictionary) + (Fields.NodeId.toString -> Option(compositeKey))
       sval.keySet.foreach(k => {
         putOp = putOp.addColumn(MDColumnFamilies(_cf_search.id),
                                 Bytes.toBytes(k),
@@ -165,31 +179,35 @@ object MetadataNode extends MetadataStore{
   }
 
 
-  def load(mdTableName: String, compositeKey: String, includeSearchFields: Boolean): Option[Map[String, Any]] = {
-    load(mdTableName, Bytes.toBytes(compositeKey), includeSearchFields: Boolean)
+  def loadHeader(mdTableName: String, compositeKey: String, includeSearchFields: Boolean): Option[Map[String, Any]] = {
+    loadHeader(mdTableName, Bytes.toBytes(compositeKey), includeSearchFields: Boolean)
   }
 
-  def load(mdTableName: String, compositeKey: Array[Byte], includeSearchFields: Boolean): Option[Map[String, Any]] = {
+  def loadHeader(mdTableName: String, compositeKey: Array[Byte], includeSearchFields: Boolean): Option[Map[String, Any]] = {
     val tn: TableName = TableName.valueOf(mdTableName)
     mdNodeStoreTable = connection.getTable(tn)
-    load(mdNodeStoreTable, compositeKey, includeSearchFields )
+    loadHeader(mdNodeStoreTable, compositeKey, includeSearchFields )
   }
 
 
   import scala.collection.JavaConversions._
-  private def load(mdNodeStoreTable: Table, compositeKey: Array[Byte], includeSearchFields: Boolean): Option[Map[String, Any]] = {
+  private def loadHeader(mdNodeStoreTable: Table, compositeKey: Array[Byte], includeSearchFields: Boolean): Option[Map[String, Any]] = {
     try {
 
       m_log debug s"Load row: ${new String(compositeKey)}"
 
       val getOp: Get = new Get(compositeKey)
-      getOp.addFamily(MDKeys(_cf_source.id))
-
+      getOp.addFamily(MDColumnFamilies(_cf_source.id))
+      getOp.addFamily(MDColumnFamilies(systemProperties.id))
       if (includeSearchFields) getOp.addFamily(MDColumnFamilies(_cf_search.id))
+
       val res = mdNodeStoreTable.get(getOp)
       if (res.isEmpty) return None
-      val content = res.getValue(MDColumnFamilies(_cf_source.id),MDKeys(key_Definition.id))
-      m_log debug s"Read node: ${new String(content)}"
+
+      val nodeType = Bytes.toShort(res.getValue(MDColumnFamilies(systemProperties.id),MDKeys(syskey_NodeType.id)))
+      val nodeCategory = Bytes.toString(res.getValue(MDColumnFamilies(systemProperties.id),MDKeys(syskey_NodeCategory.id)))
+
+      m_log debug s"Read node: $nodeType, Category: $nodeCategory"
       if (includeSearchFields) {
         val sfKeyValues = res.getFamilyMap(MDColumnFamilies(_cf_search.id))
 
@@ -201,12 +219,12 @@ object MetadataNode extends MetadataStore{
           m_log debug s"Search field: $k_s, value: $v_s"
           k_s -> v_s
         }).toMap
-
-        Option(sf + (key_Definition.toString -> new String(content)))
+        Option(sf + (syskey_NodeType.toString -> NodeType(nodeType).toString,
+                     syskey_NodeCategory.toString -> nodeCategory))
       }
       else {
         m_log debug s"Do not Include list of search fields into result"
-        Option(Map(key_Definition.toString -> new String(content)))
+        Option(Map("NodeType" -> NodeType(nodeType).toString))
       }
     }
     catch{
@@ -257,12 +275,12 @@ object MetadataNode extends MetadataStore{
     true
   }
 
-  def loadMDNodes(mdTableName: String, rowKeys: List[Array[Byte]], includeSearchFields : Boolean ): List[Map[String, Any]] =
+  def loadMDNodeHeader(mdTableName: String, rowKeys: List[Array[Byte]], includeSearchFields : Boolean ): List[Map[String, Any]] =
   {
     m_log debug s"Load ${rowKeys.size} rows"
     val tn: TableName = TableName.valueOf(mdTableName)
     mdNodeStoreTable = connection.getTable(tn)
-    val loadedNodes = rowKeys.map( k => load(mdNodeStoreTable, k, includeSearchFields)).filter(  _.isDefined ).map(v => v.get)
+    val loadedNodes = rowKeys.map( k => loadHeader(mdNodeStoreTable, k, includeSearchFields)).filter(  _.isDefined ).map(v => v.get)
     mdNodeStoreTable.close()
     loadedNodes
   }

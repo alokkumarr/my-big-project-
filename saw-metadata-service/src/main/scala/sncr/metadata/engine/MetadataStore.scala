@@ -17,11 +17,12 @@ import org.slf4j.{Logger, LoggerFactory}
   *
   *
   */
-abstract class MetadataStore(val mdConfig: Config) {
+abstract class MetadataStore(var mdConfig: Config) {
 
   def this() = { this(SAWServiceConfig.metadataConfig) }
+  if (mdConfig == null) mdConfig = SAWServiceConfig.metadataConfig
 
-  val m_log: Logger = LoggerFactory.getLogger(classOf[MetadataStore].getName)
+  protected val m_log: Logger = LoggerFactory.getLogger(classOf[MetadataStore].getName)
   private val default_user = "mapr"
   lazy val hbaseConf = HBaseConfiguration.create
   val zQuorum = mdConfig.getString("zookeeper-quorum")
@@ -39,10 +40,11 @@ abstract class MetadataStore(val mdConfig: Config) {
 //  var searchFields : Map[String, Any] = Map.empty
 
   protected var rowKey: Array[Byte] = null
-  protected def setRowKey(rK: Array[Byte]): Unit = rowKey = rK
+  def setRowKey(rK: Array[Byte]): Unit = { rowKey = rK }
 
   def close: Unit = mdNodeStoreTable.close()
   override protected def finalize(): Unit = close
+  protected def setConf(c: Config) : Unit = mdConfig = c
 
 }
 

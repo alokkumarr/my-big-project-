@@ -19,7 +19,7 @@ import MDObjectStruct.formats
 class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true) extends Response {
 
 
-  val m_log: Logger = LoggerFactory.getLogger(classOf[UIMDRequestHandler].getName)
+  protected override val m_log: Logger = LoggerFactory.getLogger(classOf[UIMDRequestHandler].getName)
 
 
   def handleRequestIncorrect: List[JValue] =
@@ -78,30 +78,6 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
           }
           case _ => return "Create/Update/Delete request is not correct, contents must be JSON object"
         }
-/*
-      case "update" =>
-        elements match {
-          case JObject(all_content_elements) => {
-            responses = JObject(all_content_elements)
-              .obj
-              .filter(an_element => !an_element._1.equalsIgnoreCase("keys") )
-              .flatMap(content_element => {
-                m_log debug (s"Content element ${content_element._1} => " + compact(render(content_element._2)))
-                val mn = content_element._1
-                content_element._2 match {
-                  case ce: JObject => m_log debug "UI Item from object: " + compact(render(ce)); List(actionHandler(ticket, action, ce, mn))
-                  case ce: JArray => ce.arr.map(ce_ae => {
-                    m_log debug "UI Item, array element: " + compact(render(ce_ae))
-                    actionHandler(ticket, action, ce_ae, mn)
-                  })
-                  case _ => handleRequestIncorrect
-                }
-              }
-              )
-          }
-          case _ => return "Create/Update/Delete request is not correct, contents must be JSON object"
-        }
-*/
       case "retrieve" | "search" | "delete" =>
         elements match {
           case JObject(all_content_elements) => {
@@ -130,7 +106,7 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
       case "create" => build(sNode.create)
       case "retrieve" => build(sNode.read(extractKeys))
       case "search" => build(sNode.find(extractKeys))
-      case "delete" => build(sNode.delete(extractKeys))
+      case "delete" => build(sNode.deleteAll(extractKeys))
       case "update" => build(sNode.update(extractKeys))
     }
     m_log debug s"Response: ${pretty(render(response))}\n"
@@ -170,7 +146,9 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
     }
 
     m_log debug "Validate token, action and content section"
+
     UIMDRequestHandler.requiredFields.keySet.foreach {
+/*
       case k@"ticket" => UIMDRequestHandler.requiredFields(k).foreach(rf => {
         val fieldValue = docAsJson \ k \ rf
         if (fieldValue == null || fieldValue.extractOpt[String].isEmpty) {
@@ -179,6 +157,7 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
           return (Rejected.id, msg)
         }
       })
+*/
       case k@"root" => {
         UIMDRequestHandler.requiredFields(k).foreach {
           case rf@"contents" =>
@@ -246,7 +225,6 @@ object UIMDRequestHandler{
   val m_log: Logger = LoggerFactory.getLogger("SemanticMDRequestHandler")
 
   val requiredFields = Map(
-    "ticket" -> List("ticketId", "masterLoginId","customer_code","dataSecurityKey","userName"),
     "root" -> List("contents")
   )
 

@@ -19,6 +19,7 @@ object MetadataDictionary extends Enumeration {
   val verb = Value(12, "verb")
   val query = Value(13, "query")
 
+  val separator: String = "::"
 
 }
 
@@ -48,6 +49,7 @@ object MDObjectStruct extends Enumeration{
   val key_Searchable = Value(105, "Searchable")
   val key_Schema = Value(106, "DataObject_Schema")
   val key_DL_DataLocation = Value(107, "DL_DataLocation")
+  val key_AnalysisResultObjects = Value(108, "AnalysisResultObjects")
 
 
   val MDColumnFamilies = Map(
@@ -69,7 +71,8 @@ object MDObjectStruct extends Enumeration{
     syskey_RelCategory.id -> Bytes.toBytes(syskey_RelCategory.toString),
     key_Searchable.id -> Bytes.toBytes(key_Searchable.toString),
     key_Schema.id -> Bytes.toBytes(key_Schema.toString),
-    key_DL_DataLocation.id -> Bytes.toBytes(key_DL_DataLocation.toString)
+    key_DL_DataLocation.id -> Bytes.toBytes(key_DL_DataLocation.toString),
+    key_AnalysisResultObjects.id ->  Bytes.toBytes(key_AnalysisResultObjects.toString)
   )
 
 }
@@ -82,6 +85,23 @@ object tables extends Enumeration {
   val AnalysisMetadata = Value(2, "analysis_metadata")
   val AnalysisResults = Value(3, "analysis_results")
 
+}
+
+object NodeCategoryMapper extends Enumeration {
+
+  val SemanticNode =    Value(0, "semantic_metadata")
+  val UINode =          Value(1, "semantic_metadata")
+  val AnalysisNode =    Value(2, "analysis_metadata")
+  val DataObject =      Value(3, "datalake_metadata")
+  val AnalysisResults = Value(4, "analysis_results")
+
+  val NCM = Map(
+    "UINode" -> UINode,
+    "AnalysisNode" -> AnalysisNode,
+    "SemanticNode" -> SemanticNode,
+    "DataObject" -> DataObject,
+    "AnalysisResult" -> AnalysisResults
+  )
 }
 
 
@@ -101,6 +121,16 @@ object NodeType extends Enumeration {
 
 }
 
+object Fields extends Enumeration {
+
+  val UNDEF_VALUE = Value(0, "_undefined_")
+  val NodeId = Value(1, "NodeId")
+  val NumOfLocations =  Value(2, "_number_of_locations")
+  val NumOfElements =  Value(3, "_number_of_elements")
+  val RelationCategory = Value(4, "_relation_category")
+  val ObjectDescriptor = Value(5, "_object_descriptor")
+
+}
 
 
 
