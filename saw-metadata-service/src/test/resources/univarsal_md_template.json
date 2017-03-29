@@ -1,0 +1,61 @@
+[
+// Work item 1:
+	{
+// Subject:	
+		"node" : "<NodeID>",
+		
+// Node category: one of UINode, Anlysis, DataObject, AnalysisResult, Semantic
+		"node-category" : "UINode|Anlysis|DataObject|AnalysisResult"
+		
+// Action descriptor		
+		"action" : 
+		{
+			
+	// What to do		
+				"verb" : "create|update|delete|read|search|add-element|del-element|add-dl-location|del-dl-location|execute",
+				
+	// Specific objects for node category:
+				"ticket" : {
+				
+				}
+				
+				"ui" : {
+						"ui_node_type" : "analysis"
+				},
+				
+	// UINode, Analysis, DataObject, AnalysisResult
+				"content" : {
+				
+				},
+				
+	// Analysis - anlysis is essencially Content-Relation Node
+				"base-relation" : [ 
+					{ "NodeId" : "<RowKey>", "node-category" : "DataObject" } 
+				],
+				
+	//DataObject - to make the DataObject is more structured the key dl-location was introduced
+				"dl-locations" : [
+					"<location1>", 
+					"<location2>"
+				],		
+
+	//DataObject
+				"schema" : {
+				
+				},
+				
+	// Search keys:
+			"keys" : {
+					
+			},		 
+		}
+// in future implementation:
+	"search-fields": [
+			{ "name": "<Name>", "type" : "<Type>" },
+			{}
+	]
+	}, 
+// Another work-item:
+	{}
+	
+]		
