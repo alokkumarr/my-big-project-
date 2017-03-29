@@ -1,0 +1,13 @@
+[
+	{
+		"node-category" : "DataObject",
+		"NodeId":"PASSENGER_DATA::1490643672072",
+		"action" : 
+		{
+			"verb" : "del-dl-location",
+			"dl-location" : [ 
+				"/main/data/testapp/output/PASSENGER_DATA"
+			]
+		}
+	}	
+]		
