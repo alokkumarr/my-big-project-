@@ -49,11 +49,12 @@ class MetadataNode(c: Config = null) extends MetadataStore(c) {
 
   def getSystemData(res:Result): Map[String, Any]  =
   {
-    nodeType = res.getValue(MDColumnFamilies(systemProperties.id),MDKeys(syskey_NodeType.id))
-    nodeCategory = res.getValue(MDColumnFamilies(systemProperties.id),MDKeys(syskey_NodeCategory.id))
-    val search =  res.getValue(MDColumnFamilies(systemProperties.id),MDKeys(key_Searchable.id))
-    Map( "NodeType" ->NodeType.apply(Bytes.toInt(nodeType)).toString,
-         "NodeCategory" -> Bytes.toString(nodeCategory),
+    nodeType = Option(res.getValue(MDColumnFamilies(systemProperties.id),MDKeys(syskey_NodeType.id))).getOrElse(Array.emptyByteArray)
+    nodeCategory = Option(res.getValue(MDColumnFamilies(systemProperties.id),MDKeys(syskey_NodeCategory.id))).getOrElse(Array.emptyByteArray)
+    val lnodeType =  if (nodeType != Array.emptyByteArray) try{  Bytes.toInt(nodeType) } catch{ case x: Throwable=> 0 } else 0
+    val lnodeCat=  if (nodeCategory != Array.emptyByteArray) try{  Bytes.toString(nodeCategory) } catch{ case x: Throwable=> "" } else ""
+    Map( "NodeType" -> lnodeType,
+         "NodeCategory" -> lnodeCat,
          "Searchable" -> key_Searchable.id
        )
   }
@@ -126,19 +127,18 @@ class MetadataNode(c: Config = null) extends MetadataStore(c) {
 
   def load: Map[String, Any] = {
     cachedData = Map.empty
-    if (rowKey == null || rowKey.length == 0) return Map.empty
-    cachedData = readCompiled(prepareRead).getOrElse(Map.empty)
+    if (rowKey == null || rowKey.length == 0) throw new Exception ("Row Id is not set")
+    val row = readCompiled(prepareRead)
+    if (row.isEmpty) throw new Exception (NodeDoesNotExist.toString)
+    cachedData = row.get
     cachedData
   }
 
 
-
   def read(filter: Map[String, Any]): Map[String, Any] = {
-    cachedData = Map.empty
     val (res, msg) = selectRowKey(filter)
-    if (res != Success.id) return Map.empty
-    cachedData = readCompiled(prepareRead).getOrElse(Map.empty)
-    cachedData
+    if (res != Success.id) throw new Exception ("Filter does not contain NodeId")
+    load
   }
 
 
