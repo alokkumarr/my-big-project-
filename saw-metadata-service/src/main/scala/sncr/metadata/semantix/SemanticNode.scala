@@ -11,7 +11,6 @@ import sncr.metadata.engine.MDObjectStruct.{apply => _, _}
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine._
 import sncr.metadata.engine.relations.Relation
-import sncr.metadata.ui_components.SearchDictionary.searchFields
 import sncr.metadata.ui_components.{UINode, UINodeFetchMode}
 import sncr.saw.common.config.SAWServiceConfig
 
@@ -56,7 +55,7 @@ class SemanticNode(private[this] var content_element: JValue, val ui_item_type :
   protected val table = SAWServiceConfig.metadataConfig.getString("path") + "/" + tables.SemanticMetadata
   protected val tn: TableName = TableName.valueOf(table)
   mdNodeStoreTable = connection.getTable(tn)
-  headerDesc =  SearchDictionary.searchFields
+  headerDesc =  SemanticNode.searchFields
 
   override protected def initRow : String =
   {
@@ -116,6 +115,12 @@ class SemanticNode(private[this] var content_element: JValue, val ui_item_type :
 
 object SemanticNode
 {
+  val searchFields: Map[String, String] = Map(
+    "AnalysisId" -> "String"
+  )
+
+
+
   protected val m_log: Logger = LoggerFactory.getLogger("UINodeObject")
 
   def apply(rowId: String) :UINode =
