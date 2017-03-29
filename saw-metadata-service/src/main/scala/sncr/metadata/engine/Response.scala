@@ -13,7 +13,8 @@ trait Response {
 
   protected val m_log: Logger = LoggerFactory.getLogger(classOf[Response].getName)
 
-  def build(res: (Int, String)) : JValue = new JObject(List(JField("result", new JInt(res._1)),JField("reason", new JString(res._2))))
+  def build(res: (Int, String)) : JValue = new JObject(List(JField("result", new JString(ProcessingResult(res._1).toString)),
+                                                            JField("message", new JString(res._2))))
 
   def build(data : Map[String, Any]) : JValue = {
     new JObject(data.map(d => JField(d._1, d._2 match {
