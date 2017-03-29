@@ -48,6 +48,7 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
     getEvaluatedFilterReducer,
     getSelectedFilterMapper,
     getCanvasFieldsToFiltersMapper,
+    getChartSetttingsToFiltersMapper,
     getGridDataFilter,
     getFilterClearer,
     getFrontEnd2BackEndFilterMapper,
@@ -162,6 +163,22 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
 
       return frontEndFilter;
     };
+  }
+
+  function getChartSetttingsToFiltersMapper(gridData) {
+    return pipe(
+      filter(get('filter_eligible')),
+      map(field => {
+        return {
+          tableName: (field.table ? field.table.name : field.tableName),
+          label: field.alias || field.displayName || field.display_name,
+          name: field.name || field.column_name,
+          type: field.type,
+          model: null,
+          booleanCriteria: DEFAULT_BOOLEAN_CRITERIA,
+          items: field.type === 'string' ? uniq(map(get(field.name || field.column_name), gridData)) : null
+        };
+      }));
   }
   /* eslint-enable camelcase */
 

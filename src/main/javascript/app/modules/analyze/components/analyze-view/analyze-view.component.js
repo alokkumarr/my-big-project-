@@ -1,7 +1,8 @@
 import template from './analyze-view.component.html';
 import style from './analyze-view.component.scss';
 
-import {cloneDeep} from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import remove from 'lodash/remove';
 
 import {Events, AnalyseTypes} from '../../consts';
 import AbstractComponentController from 'app/lib/common/components/abstractComponent';
@@ -10,7 +11,7 @@ export const AnalyzeViewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeViewController extends AbstractComponentController {
-    constructor($injector, $compile, AnalyzeService, dxDataGridService, $state) {
+    constructor($injector, $compile, AnalyzeService, dxDataGridService, $state, $mdDialog, $mdToast) {
       'ngInject';
       super($injector);
 
@@ -18,6 +19,8 @@ export const AnalyzeViewComponent = {
       this._AnalyzeService = AnalyzeService;
       this._dxDataGridService = dxDataGridService;
       this._$state = $state;
+      this._$mdDialog = $mdDialog;
+      this._$mdToast = $mdToast;
 
       this.LIST_VIEW = 'list';
       this.CARD_VIEW = 'card';
@@ -69,12 +72,15 @@ export const AnalyzeViewComponent = {
         filter: this.states.searchTerm
       }).then(analyses => {
         this.reports = analyses;
-
-        if (this.states.reportView === this.LIST_VIEW) {
-          this._gridListInstance.option('dataSource', this.reports);
-          this._gridListInstance.refresh();
-        }
+        this.reloadDataGrid(this.reports);
       });
+    }
+
+    reloadDataGrid(analyses) {
+      if (this.states.reportView === this.LIST_VIEW) {
+        this._gridListInstance.option('dataSource', analyses);
+        this._gridListInstance.refresh();
+      }
     }
 
     applySearchFilter() {
@@ -122,9 +128,6 @@ export const AnalyzeViewComponent = {
       }];
 
       return this._dxDataGridService.mergeWithDefaultConfig({
-        onRowClick: row => {
-          this.goToLastPublishedAnalysis(row.data.id);
-        },
         onInitialized: this.onGridInitialized.bind(this),
         columns,
         dataSource,
@@ -156,6 +159,20 @@ export const AnalyzeViewComponent = {
       }
     }
 
+    openDeleteModal(analysis) {
+      const confirm = this._$mdDialog.confirm()
+            .title('Are you sure you want to delete this analysis?')
+        .textContent('Any published analyses will also be deleted.')
+        .ok('Delete')
+        .cancel('Cancel');
+
+      this._$mdDialog.show(confirm).then(() => {
+        return this._AnalyzeService.deleteAnalysis(analysis.id);
+      }).then(data => {
+        this.onCardAction('delete', data);
+      });
+    }
+
     openNewAnalysisModal() {
       this.showDialog({
         template: '<analyze-new></analyze-new>',
@@ -173,10 +190,20 @@ export const AnalyzeViewComponent = {
       return isIncluded;
     }
 
+    removeAnalysis(model) {
+      remove(this.reports, report => {
+        return report.id === model.id;
+      });
+      this.reloadDataGrid(this.reports);
+      this._$mdToast.show(this._$mdToast.simple().textContent('Analysis deleted'));
+    }
+
     onCardAction(actionType, model) {
       if (actionType === 'fork' || actionType === 'edit') {
         const clone = cloneDeep(model);
         this.openEditModal(actionType, clone);
+      } else if (actionType === 'delete') {
+        this.removeAnalysis(model);
       }
     }
 
@@ -189,14 +216,22 @@ export const AnalyzeViewComponent = {
     }
 
     openEditModal(mode, model) {
-      if (model.type === AnalyseTypes.Report) {
+      const openModal = template => {
         this.showDialog({
-          template: `<analyze-report model="model" mode="${mode}"></analyze-report>`,
+          template,
           controller: scope => {
             scope.model = model;
           },
           multiple: true
         });
+      };
+
+      if (model.type === AnalyseTypes.Report) {
+        openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
+      } else if (model.type === AnalyseTypes.Chart) {
+        openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
+      } else if (model.type === AnalyseTypes.Pivot) {
+        openModal(`<analyze-pivot model="model" mode="${mode}"></analyze-pivot>`);
       }
     }
   }

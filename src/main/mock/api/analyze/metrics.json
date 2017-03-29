@@ -92,6 +92,22 @@
         ]
       },
       {
+        "label": "CHARTS",
+        "category": "charts",
+        "children": [
+          {
+            "label": "Column Chart",
+            "icon": "icon-vert-bar-chart",
+            "type": "chart:column"
+          },
+          {
+            "label": "Line Chart",
+            "icon": "icon-vert-bar-chart",
+            "type": "chart:line"
+          }
+        ]
+      },
+      {
         "label": "BAR CHARTS",
         "category": "bar-chart",
         "children": [

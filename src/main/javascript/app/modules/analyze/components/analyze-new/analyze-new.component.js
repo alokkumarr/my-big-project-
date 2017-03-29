@@ -59,13 +59,42 @@ export const AnalyzeNewComponent = {
     createAnalysis() {
       let tpl;
       let model;
+      let type;
 
       switch (this.selectedAnalysisMethod) {
         case 'table:report':
           tpl = '<analyze-report model="model"></analyze-report>';
           model = {
             type: AnalyseTypes.Report,
-            name: 'Untitled Report',
+            name: 'Untitled Analysis',
+            description: '',
+            category: null,
+            metrics: this.getSelectedMetrics(),
+            scheduled: null,
+            artifacts: null
+          };
+          break;
+        case 'table:pivot':
+          tpl = '<analyze-pivot model="model"></analyze-pivot>';
+          model = {
+            type: AnalyseTypes.Pivot,
+            name: 'Untitled Analysis',
+            description: '',
+            category: null,
+            metrics: this.getSelectedMetrics(),
+            scheduled: null,
+            artifacts: null
+          };
+          break;
+        case 'chart:column':
+        case 'chart:line':
+        case 'chart:stacked':
+          type = this.selectedAnalysisMethod.split(':')[1];
+          tpl = '<analyze-chart model="model"></analyze-chart>';
+          model = {
+            type: AnalyseTypes.Chart,
+            chartType: type,
+            name: 'Untitled Chart',
             description: '',
             category: null,
             metrics: this.getSelectedMetrics(),

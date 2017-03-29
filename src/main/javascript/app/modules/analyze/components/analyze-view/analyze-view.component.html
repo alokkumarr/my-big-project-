@@ -67,8 +67,9 @@
 
         <md-card-content layout="row">
           <div dx-data-grid="$ctrl.getGridConfig()" dx-item-alias="report">
-            <div data-options="dxTemplate: { name: 'nameCellTemplate' }">
-              <span ng-bind-html="::report.value | highlight:$ctrl.states.searchTerm"></span>
+              <div data-options="dxTemplate: { name: 'nameCellTemplate' }" >
+                  <span class="clickable" ng-bind-html="::report.value | highlight:$ctrl.states.searchTerm"
+                        ng-click="$ctrl.goToLastPublishedAnalysis(report.data.id)"></span>
             </div>
             <div data-options="dxTemplate: { name: 'metricsCellTemplate' }">
               <span ng-bind-html="::report.value | highlight:$ctrl.states.searchTerm"></span>
@@ -106,6 +107,12 @@
                       <md-menu-item>
                         <md-button aria-label="Edit"
                                    ng-click="$ctrl.edit(report.data)">Edit
+                        </md-button>
+                      </md-menu-item>
+                      <md-menu-item>
+                        <md-button aria-label="Delete"
+                                   ng-click="$ctrl.openDeleteModal(report.data)">
+                          <span translate="DELETE" md-colors="{color: 'warn'}"></span>
                         </md-button>
                       </md-menu-item>
                     </md-menu-content>

@@ -11,11 +11,12 @@ export const AnalyzeCardComponent = {
   },
   controller: class AnalyzeCardController {
 
-    constructor($mdDialog, $state, AnalyzeService) {
+    constructor($mdDialog, $state, AnalyzeService, $log) {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this._$state = $state;
       this._AnalyzeService = AnalyzeService;
+      this._$log = $log;
     }
 
     openMenu($mdMenu, ev) {
@@ -42,6 +43,27 @@ export const AnalyzeCardComponent = {
     }
 
     openExportModal() {
+    }
+
+    openDeleteModal() {
+      const confirm = this._$mdDialog.confirm()
+        .title('Are you sure you want to delete this analysis?')
+        .textContent('Any published analyses will also be deleted.')
+        .ok('Delete')
+        .cancel('Cancel');
+
+      this._$mdDialog.show(confirm).then(() => {
+        return this._AnalyzeService.deleteAnalysis(this.model.id);
+      }).then(data => {
+        this.onAction({
+          type: 'delete',
+          model: data
+        });
+      }, err => {
+        if (err) {
+          this._$log.error(err);
+        }
+      });
     }
 
     execute(analysisId) {

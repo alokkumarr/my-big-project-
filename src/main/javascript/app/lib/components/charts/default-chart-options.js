@@ -15,9 +15,8 @@ export const chartOptions = {
   legend: {
     verticalAlign: 'top',
     layout: 'vertical',
-    y: 50,
-    padding: 30,
     itemMarginTop: 5,
+    maxHeight: 200,
     itemMarginBottom: 5,
     itemStyle: {
       lineHeight: '14px'
