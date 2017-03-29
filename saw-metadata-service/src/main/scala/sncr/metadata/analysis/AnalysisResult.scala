@@ -109,7 +109,7 @@ class AnalysisResult(private[this] val parentAnalysisRowID : String,
       })
       val put_op = createNode(NodeType.RelationContentNode.id, classOf[AnalysisNode].getName)
       if (commit(saveObjects(saveContent(saveSearchData(put_op,searchValues)))))
-        (Success.id, s"The Analysis Result [ ${Bytes.toString(rowKey)} ] has been created")
+        (NodeCreated.id, s"${Bytes.toString(rowKey)}")
       else
         (Error.id, "Could not create Analysis Result")
     }
@@ -125,7 +125,7 @@ class AnalysisResult(private[this] val parentAnalysisRowID : String,
 
       val (res, msg) = selectRowKey(filter)
       if (res != Success.id) return (res, msg)
-      readCompiled(prepareRead).getOrElse(Map.empty)
+      load
       setDescriptor()
 
       val searchValues: Map[String, Any] = AnalysisResult.extractSearchData(descriptor) +
@@ -174,19 +174,19 @@ class AnalysisResult(private[this] val parentAnalysisRowID : String,
         val encoded_data = Base64.getEncoder.encodeToString(data)
         _o + (k  -> encoded_data)
       }
-      case _ => m_log error s"Unsupported result type ${k}"; Map.empty
+      case _ => m_log error s"Unsupported result type $k"; Map.empty
     }
 
     )
     _objects
   }
 
-  final private[this] var _objects : Map[String, Any] = Map.empty
-  final private[this] var _objects_descriptor : Map[String, String] = Map.empty
+  protected var _objects : Map[String, Any] = Map.empty
+  protected var _objects_descriptor : Map[String, String] = Map.empty
 
 
-  def addObject( ref: String, data: Any) : Unit = _objects = _objects + (ref-> data)
-  def removeObject (ref: String) : Unit = _objects = _objects - ref
+  def addObject( ref: String, data: Any) : Unit = { _objects = _objects + (ref-> data) }
+  def removeObject (ref: String) : Unit = { _objects = _objects - ref }
 
 
   def saveObjects(p: Put) : Put =
