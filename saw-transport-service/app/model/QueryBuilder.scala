@@ -4,6 +4,8 @@ import org.json4s._
 import org.json4s.JsonAST.JValue
 
 object QueryBuilder {
+  implicit val formats = DefaultFormats
+
   def build(json: JValue): String = {
     val artifact = json \ "artifacts" match {
       case artifacts: JArray =>
@@ -11,6 +13,7 @@ object QueryBuilder {
           throw new QueryException("Expected exactly one artifact")
         }
         artifacts.arr(0)
+      case JNothing => return ""
       case obj => throw new QueryException("Expected array but got: " + obj)
     }
     "%s %s %s %s %s".format(
@@ -22,11 +25,11 @@ object QueryBuilder {
     ).replaceAll("\\s+", " ").trim
   }
 
-  def buildSelect(analysis: JValue) = {
+  private def buildSelect(analysis: JValue) = {
     "SELECT 1"
   }
 
-  def buildFrom(analysis: JValue) = {
+  private def buildFrom(analysis: JValue) = {
     val table = analysis \ "artifact_name" match {
       case JString(name) => name
       case _ => throw new QueryException("Artifact name not found")
@@ -36,21 +39,40 @@ object QueryBuilder {
     "FROM %s".format(table)
   }
 
-  def buildWhere(analysis: JValue) = {
-    val list = analysis \ "filters" match {
-      case JArray(list) => list
+  private def buildWhere(analysis: JValue): String = {
+    analysis \ "filters" match {
+      case filters: JArray => buildWhereFilters(filters.arr)
       case JNothing => ""
       case json: JValue => throw new QueryException(
         "Unexpected element: %s".format(json.getClass.getSimpleName))
     }
+  }
+
+  private def buildWhereFilters(filters: List[JValue]) = {
+    if (filters.isEmpty) {
+      ""
+    } else {
+      "WHERE " + filters.map(filter(_)).mkString(" ")
+    }
+  }
+
+  private def filter(filter: JValue): String = {
+    def property(name: String) = {
+      (filter \ name).extract[String]
+    }
+    "%s %s %s %s".format(
+      property("boolean_criteria"),
+      property("column_name"),
+      property("operator"),
+      property("search_conditions")
+    )
+  }
+
+  private def buildGroupBy(analysis: JValue) = {
     ""
   }
 
-  def buildGroupBy(analysis: JValue) = {
-    ""
-  }
-
-  def buildOrderBy(analysis: JValue) = {
+  private def buildOrderBy(analysis: JValue) = {
     ""
   }
 }

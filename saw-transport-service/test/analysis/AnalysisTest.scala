@@ -5,6 +5,7 @@ class AnalysisTest extends MaprTest {
   "Analysis service" should {
     requireMapr
     val id = (System.currentTimeMillis - 1490100000000L).toString
+
     "create analysis" in {
       /* Write analysis */
       val body = actionAnalysisMessage("create", analysisJson(id))
