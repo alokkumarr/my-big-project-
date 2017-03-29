@@ -34,7 +34,6 @@ maprcli table cf create -cfname _objects -path /main/metadata/analysis_results
 maprcli table cf create -cfname _system -path /main/metadata/analysis_results
 
 
-
 [mapr@client101 sbin]$ maprcli table cf list -path /main/metadata/analysis_metadata
 compressionperm  readperm  appendperm  writeperm  versionperm  minversions  maxversions  compression  ttl         inmemory  cfname      memoryperm
 u:mapr           u:mapr    u:mapr      u:mapr     u:mapr       0            1            lz4          2147483647  false     _source     u:mapr
@@ -55,3 +54,12 @@ u:mapr           u:mapr    u:mapr      u:mapr     u:mapr       0            1   
 u:mapr           u:mapr    u:mapr      u:mapr     u:mapr       0            1            lz4          2147483647  false     _dl_locations  u:mapr
 u:mapr           u:mapr    u:mapr      u:mapr     u:mapr       0            1            lz4          2147483647  false     _applications  u:mapr
 u:mapr           u:mapr    u:mapr      u:mapr     u:mapr       0            1            lz4          2147483647  false     _system        u:mapr
+
+maprcli table cf list -path /main/metadata/analysis_results
+compressionperm  readperm  appendperm  writeperm  versionperm  minversions  maxversions  compression  ttl         inmemory  cfname    memoryperm
+u:mapr           u:mapr    u:mapr      u:mapr     u:mapr       0            1            lz4          2147483647  false     _source   u:mapr
+u:mapr           u:mapr    u:mapr      u:mapr     u:mapr       0            1            lz4          2147483647  false     _search   u:mapr
+u:mapr           u:mapr    u:mapr      u:mapr     u:mapr       0            1            lz4          2147483647  false     _objects  u:mapr
+u:mapr           u:mapr    u:mapr      u:mapr     u:mapr       0            1            lz4          2147483647  false     _system   u:mapr
+
+

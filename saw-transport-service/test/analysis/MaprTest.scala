@@ -25,18 +25,18 @@ class MaprTest extends PlaySpec with OneAppPerSuite {
   }
 
   def actionKeyAnalysisMessage(
-    action: String, key: String, analysis: JValue) = {
+    action: String, key: Long, analysis: JValue) = {
     message(("action" -> action) ~ ("keys" -> List(key)) ~
       ("analysis" -> List(analysis)))
   }
-  def analysisJson(id: String, customerCode: String = "customer-1") = {
+  def analysisJson(id: Long, customerCode: String = "customer-1") = {
     ("analysisId" -> id) ~
     ("module" -> "analyze") ~
     ("customer_code" -> customerCode) ~
     ("name" -> s"test-$id")
   }
 
-  def actionKeyMessage(action: String, id: String) = {
+  def actionKeyMessage(action: String, id: Long) = {
     message(("action" -> action) ~ ("keys" -> JArray(List(id))))
   }
 

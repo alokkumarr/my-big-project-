@@ -4,13 +4,13 @@ import org.json4s._
 class AnalysisTest extends MaprTest {
   "Analysis service" should {
     requireMapr
-    val id = (System.currentTimeMillis - 1490100000000L).toString
+    val id = System.currentTimeMillis - 1490100000000L
     "create analysis" in {
       /* Write analysis */
       val body = actionAnalysisMessage("create", analysisJson(id))
       val response = sendRequest(body)
       val analysis = (response \ "contents" \ "analysis")(0)
-      val JString(analysisId) = analysis \ "analysisId"
+      val JInt(analysisId) = analysis \ "analysisId"
       analysisId must be (id)
     }
 
@@ -20,7 +20,7 @@ class AnalysisTest extends MaprTest {
         analysisJson(id, "customer-2"))
       val response = sendRequest(body)
       val analysis = (response \ "contents" \ "analysis")(0)
-      val JString(analysisId) = analysis \ "analysisId"
+      val JInt(analysisId) = analysis \ "analysisId"
       analysisId must be (id)
     }
 
