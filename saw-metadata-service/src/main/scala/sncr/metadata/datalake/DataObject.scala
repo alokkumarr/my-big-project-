@@ -51,16 +51,18 @@ class DataObject(final private[this] var descriptor : JValue, final private[this
   private def getDataObjectSchema(res: Result): JValue =
   {
     val schemaConvertedToString = Bytes.toString(res.getValue(MDColumnFamilies(_cf_source.id),MDKeys(key_Schema.id)))
-    m_log debug s"Convert schema of Schema to JSON: ${schemaConvertedToString}"
-    schema = parse(schemaConvertedToString, false, false)
-    schema
+    if (schemaConvertedToString != null && schemaConvertedToString.nonEmpty) {
+      m_log debug s"Convert schema of Schema to JSON: ${schemaConvertedToString}"
+      schema = parse(schemaConvertedToString, false, false)
+      schema
+    }
+    else
+      JNothing
   }
 
   def getDataObjectSchemaAsString : String = compact(render(schema))
   def getDataObjectSchema : JValue = schema
-
   def setDataObjectSchemaFromString(a_schema : String ) : Unit = schema = parse(a_schema, false, false)
-
 
   override protected def getData(res: Result): Option[Map[String, Any]] = {
     val (dataAsJValue, dataAsByteArray) = getSourceData(res)
@@ -116,12 +118,10 @@ class DataObject(final private[this] var descriptor : JValue, final private[this
     try {
       val put_op = createNode(NodeType.RelationContentNode.id, classOf[DataObject].getName)
       val searchValues: Map[String, Any] = DataObject.extractSearchData(descriptor) + (Fields.NodeId.toString -> new String(rowKey))
-
       setDescriptor
-
       searchValues.keySet.foreach(k => { m_log debug s"Add search field $k with value: ${searchValues(k).toString}"})
       if (commit(saveSchema(saveDL_Locations(saveContent(saveSearchData(put_op, searchValues))))))
-        (Success.id, s"The Data Object [ ${new String(rowKey)} ] ha been created")
+        (NodeCreated.id, s"${Bytes.toString(rowKey)}")
       else
         (Error.id, "Could not create Data Object")
     }
@@ -137,9 +137,7 @@ class DataObject(final private[this] var descriptor : JValue, final private[this
     try {
       val (res, msg) = selectRowKey(filter)
       if (res != Success.id) return (res, msg)
-      readCompiled(prepareRead).getOrElse(Map.empty)
-//      setRowKey(rowKey)
-
+      load
       setDescriptor
 
       val searchValues: Map[String, Any] = DataObject.extractSearchData(descriptor) + (Fields.NodeId.toString -> new String(rowKey))
@@ -161,16 +159,18 @@ class DataObject(final private[this] var descriptor : JValue, final private[this
   protected def saveSchema(p: Put) : Put =
     p.addColumn(MDColumnFamilies(_cf_source.id), MDKeys(key_Schema.id), Bytes.toBytes(getDataObjectSchemaAsString))
 
-  private[this] var dl_locations : Array[String] = Array.empty
-  private[this] var dl_locationsAsJson : JValue = JNothing
+  protected var dl_locations : Array[String] = Array.empty
+  protected var dl_locationsAsJson : JValue = JNothing
 
   def getDLLocations = dl_locations
 
-  def convertToJson : JValue = {
+  def normalize : JValue = {
+    dl_locations = dl_locations.distinct
     dl_locationsAsJson = null
     dl_locationsAsJson = new JObject ( (for (idx <- dl_locations.indices ) yield
       JField(String.valueOf(idx),JString(dl_locations(idx)))).toList :+
       JField(Fields.NumOfLocations.toString, JInt(dl_locations.length)))
+    m_log debug s"DL Locations: ${compact(render(dl_locationsAsJson))}"
     dl_locationsAsJson
   }
 
@@ -178,8 +178,10 @@ class DataObject(final private[this] var descriptor : JValue, final private[this
   def getDL_DataLocation(res: Result): Unit  =
   {
     val n = res.getValue(MDColumnFamilies(_cf_datalakelocations.id),Bytes.toBytes(Fields.NumOfLocations.toString))
-    val _number_of_locations = if (n != null) Bytes.toShort(n) else 0
-    dl_locations = (for(i <- 0 until _number_of_locations ) yield {
+    val _number_of_locations = if (n != null)
+      try{  Bytes.toInt(n) } catch{ case x: Throwable=> 0 } else 0
+    m_log trace s"Number of locations: ${_number_of_locations}"
+    dl_locations = (for(i <- 0 until _number_of_locations ) yield  {
       val lc = res.getValue(MDColumnFamilies(_cf_datalakelocations.id), Bytes.toBytes(i))
       if (lc != null) Bytes.toString(lc) else ""}).toArray.filter( _.nonEmpty)
   }
@@ -187,32 +189,36 @@ class DataObject(final private[this] var descriptor : JValue, final private[this
   def getDLDataLocationAsJson(res: Result): JValue  =
   {
     getDL_DataLocation(res)
-    convertToJson
+    normalize
   }
 
   def saveDL_Locations(put: Put): Put =
   {
-    put.addColumn(MDColumnFamilies(_cf_datalakelocations.id), Bytes.toBytes(dl_locations.length), Bytes.toBytes(Fields.NumOfLocations.toString))
-    for ( i <- dl_locations.indices )
+    put.addColumn(MDColumnFamilies(_cf_datalakelocations.id), Bytes.toBytes(Fields.NumOfLocations.toString), Bytes.toBytes(dl_locations.length))
+    for ( i <- dl_locations.indices ) {
+      m_log trace s"Processing location $i : ${dl_locations(i)}"
       put.addColumn(MDColumnFamilies(_cf_datalakelocations.id), Bytes.toBytes(i), Bytes.toBytes(dl_locations(i)))
+    }
     put
   }
 
   def addLocation( location: String) : JValue =
   {
     dl_locations = dl_locations :+ location
-    convertToJson
+    m_log trace s"Add location: ${dl_locations.mkString("[",",","]")}"
+    normalize
   }
 
 
   def removeLocation( location: String) : JValue =
   {
     dl_locations = dl_locations.filterNot( l => l.equals(location))
-    convertToJson
+    m_log trace s"Add location: ${dl_locations.mkString("[",",","]")}"
+    normalize
   }
 
 
-  def updateSchema: (Int, String) = {
+  def updateSchema(): (Int, String) = {
     try {
       if (rowKey != null  && !rowKey.isEmpty) {
         if (commit(saveSchema(update)))
@@ -232,13 +238,13 @@ class DataObject(final private[this] var descriptor : JValue, final private[this
     }
   }
 
-  def updateDLLocations: (Int, String) = {
+  def updateDLLocations(): (Int, String) = {
     try {
       if (rowKey != null  && !rowKey.isEmpty) {
         if (commit(saveDL_Locations(update)))
           (Success.id, s"The DataObject Schema [ ID = ${Bytes.toString(rowKey)} ] has been updated")
         else
-          (Error.id, "Could not update DataObject schema element")
+          (Error.id, "Could not update DataObject datalake elements")
       }
       else
       {
