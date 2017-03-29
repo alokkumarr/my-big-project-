@@ -1,0 +1,121 @@
+[
+	{
+		"node-category" : "AnalysisNode",
+		"NodeId" : "PassengerDataAnalysis_2::101::3::465305061674178",
+		"action" : 
+		{
+			"verb" : "update",
+			"content" :
+			{
+			"name": "PassengerDataAnalysis_2",
+			"description": "Test analysis -- updated",
+			"tenantId": "ATT",
+			"productId": "Analysis",
+			"emailId": "srya0001@synchronoss.com",
+			"publishedBy": "CDF",
+			"copyToFTP": true,
+			"attachAnalysisToMail": true,
+			"isScheduled": true,
+			"outputFile": {
+					"outputFormat": "parquet",
+					"outputFileName": "DB"
+			},
+			"analysis": {
+					"analysisId": 101,
+					"productViewsId": 1,
+					"analysisCategoryId": 3,
+					"analysisCategoryName": "UA_RRM",
+					"tenantId": "ATT",
+					"productId": "none",
+					"analysisName": "RegressionTest1",
+					"analysisDescription": "Cost by Carrier and Call Type",
+					"analysisQuery": "select PASSENGERS PF2, ORIGIN P1, DEST P2, CARRIER C2, CARRIER_NAME CN2, SEATS SEATS2 from PASSENGER_DATA"
+					"analysisQueryType": "VIEW",
+					"displayStatus": "A",
+					"designerQuery": true,
+					"createdUser": "srya0001",
+					"modifiedUser": "srya0001",
+					"createdDate": "2017-03-14 07:20:50",
+					"modifiedDate": "2017-03-14 07:20:50",
+					"columns": [
+							{
+									"align": "LEFT",
+									"label": "PASSENGERS",
+									"name": "PASSENGERS",
+									"pattern": "PASSENGERS",
+									"size": "100",
+									"type": "Number",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 101,
+									"rawAnalysisColumnsId": 100,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "SEATS2",
+									"name": "SEATS2",
+									"pattern": "SEATS2",
+									"size": "100",
+									"type": "Number",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 101,
+									"rawAnalysisColumnsId": 101,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "ORIGIN",
+									"name": "ORIGIN",
+									"pattern": "ORIGIN",
+									"size": "100",
+									"type": "String",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 101,
+									"rawAnalysisColumnsId": 102,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "DEST",
+									"name": "DEST",
+									"pattern": "DEST",
+									"size": "100",
+									"type": "String",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 101,
+									"rawAnalysisColumnsId": 103,
+									"selected": true
+							}							
+							
+					],
+					"parametarised": false,
+					"scheduled": false,
+					"analysisSuperCategoryList": [
+							"ABC"
+					]
+			}
+		},
+		"base-relation" : [ 
+			{ "NodeId":"PASSENGER_DATA::1490643672072", "node-category" : "DataObject" },
+			{ "NodeId":"PASSENGER_DATA::1490643164159", "node-category" : "DataObject" },
+ 			{ "NodeId":"PASSENGER_DATA_2::1490719756029", "node-category" : "DataObject" }, 
+ 			{ "NodeId":"AIRSTAT_2::1490719756137", "node-category" : "DataObject" }, 
+ 			{ "NodeId":"NUM_PARSING_PQ_2::1490719756211", "node-category" : "DataObject" }, 
+ 			{ "NodeId":"PT_ENERGY_CONSUMPTION_2::1490719756316", "node-category" : "DataObject" },
+			{ "NodeId":"PT_ENERGY_CONSUMPTION_2::1490719756316", "node-category" : "DataObject" }
+		]
+	}
+	},
+	{
+		"node-category" : "AnalysisNode",
+		"NodeId" : "PassengerDataAnalysis_2::101::3::465305061674178",
+		"action" : 
+		{
+			"verb" : "read"
+		}
+	}
+]
