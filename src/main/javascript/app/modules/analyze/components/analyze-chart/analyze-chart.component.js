@@ -91,14 +91,16 @@ export const AnalyzeChartComponent = {
       const legendPosition = LEGEND_POSITIONING[this.legend.align];
       const legendLayout = LAYOUT_POSITIONS[this.legend.layout];
 
+      const SPACING = 45;
+
       return {
         chart: {
           type: this.model.chartType || 'column',
-          spacingLeft: 45,
-          spacingBottom: 45,
-          spacingTop: 45,
-          reflow: false,
-          width: 650
+          spacingLeft: SPACING,
+          spacingRight: SPACING,
+          spacingBottom: SPACING,
+          spacingTop: SPACING,
+          reflow: true
         },
         legend: {
           align: legendPosition.align,
