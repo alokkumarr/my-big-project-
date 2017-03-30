@@ -111,8 +111,12 @@ export const AnalyzeChartComponent = {
           name: 'Series 1',
           data: [0, 0, 0, 0, 0]
         }],
+        yAxis: {
+          title: {x: -15}
+        },
         xAxis: {
-          categories: ['A', 'B', 'C', 'D', 'E']
+          categories: ['A', 'B', 'C', 'D', 'E'],
+          title: {y: 15}
         }
       };
     }
