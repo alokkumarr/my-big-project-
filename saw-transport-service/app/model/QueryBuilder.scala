@@ -26,7 +26,19 @@ object QueryBuilder {
   }
 
   private def buildSelect(analysis: JValue) = {
-    "SELECT 1"
+    val attributes: List[JValue] = analysis \ "artifact_attributes" match {
+      case attributes: JArray => attributes.arr
+      case JNothing => throw new QueryException(
+        "At least one analysis attribute required")
+      case json: JValue => unexpectedElement(json)
+    }
+    if (attributes.size < 1)
+      throw new QueryException("At least one analysis attribute expected")
+    "SELECT " + attributes.map(column(_)).mkString(", ")
+  }
+
+  private def column(column: JValue) = {
+    (column \ "column_name").extract[String]
   }
 
   private def buildFrom(analysis: JValue) = {
@@ -43,8 +55,7 @@ object QueryBuilder {
     analysis \ "filters" match {
       case filters: JArray => buildWhereFilters(filters.arr)
       case JNothing => ""
-      case json: JValue => throw new QueryException(
-        "Unexpected element: %s".format(json.getClass.getSimpleName))
+      case json: JValue => unexpectedElement(json)
     }
   }
 
@@ -69,10 +80,33 @@ object QueryBuilder {
   }
 
   private def buildGroupBy(analysis: JValue) = {
-    ""
+    val groupBy: List[JValue] = analysis \ "group_by_columns" match {
+      case l: JArray => l.arr
+      case JNothing => List.empty
+      case json: JValue => unexpectedElement(json)
+    }
+    if (groupBy.isEmpty) {
+      ""
+    } else {
+      "GROUP BY " + groupBy.map(_.extract[String]).mkString(", ")
+    }
   }
 
   private def buildOrderBy(analysis: JValue) = {
-    ""
+    val orderBy: List[JValue] = analysis \ "order_by_columns" match {
+      case l: JArray => l.arr
+      case JNothing => List.empty
+      case json: JValue => unexpectedElement(json)
+    }
+    if (orderBy.isEmpty) {
+      ""
+    } else {
+      "ORDER BY " + orderBy.map(_.extract[String]).mkString(", ")
+    }
+  }
+
+  private def unexpectedElement(json: JValue): Nothing = {
+    val name = json.getClass.getSimpleName
+    throw new QueryException("Unexpected element: %s".format(name))
   }
 }
