@@ -210,6 +210,7 @@ export const AnalyzeChartComponent = {
         xaxis: filter(attributes, attr => attr['x-axis']),
         groupBy: map(filter(attributes, attr => attr['x-axis']), clone)
       };
+      this.reloadChart(this.settings, this.filteredGridData);
     }
 
     onSettingsChanged(settings) {
@@ -243,6 +244,11 @@ export const AnalyzeChartComponent = {
       return this._FilterService.getChartSetttingsToFiltersMapper(this.gridData)(selectedFields);
     }
 
+    hasNoData(categories) {
+      return (angular.isArray(categories) &&
+              categories[0] === 'undefined');
+    }
+
     reloadChart(settings, filteredGridData) {
       const xaxis = filter(this.settings.xaxis, attr => attr.checked)[0] || {};
       const yaxis = filter(this.settings.yaxis, attr => attr.checked)[0] || {};
@@ -257,7 +263,7 @@ export const AnalyzeChartComponent = {
         },
         {
           path: 'xAxis.categories',
-          data: xCategories
+          data: this.hasNoData(xCategories) ? ['X-Axis'] : xCategories
         },
         {
           path: 'yAxis.title.text',
