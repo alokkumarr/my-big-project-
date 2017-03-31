@@ -91,14 +91,16 @@ export const AnalyzeChartComponent = {
       const legendPosition = LEGEND_POSITIONING[this.legend.align];
       const legendLayout = LAYOUT_POSITIONS[this.legend.layout];
 
+      const SPACING = 45;
+
       return {
         chart: {
           type: this.model.chartType || 'column',
-          spacingLeft: 45,
-          spacingBottom: 45,
-          spacingTop: 45,
-          reflow: false,
-          width: 650
+          spacingLeft: SPACING,
+          spacingRight: SPACING,
+          spacingBottom: SPACING,
+          spacingTop: SPACING,
+          reflow: true
         },
         legend: {
           align: legendPosition.align,
@@ -109,8 +111,12 @@ export const AnalyzeChartComponent = {
           name: 'Series 1',
           data: [0, 0, 0, 0, 0]
         }],
+        yAxis: {
+          title: {x: -15}
+        },
         xAxis: {
-          categories: ['A', 'B', 'C', 'D', 'E']
+          categories: ['A', 'B', 'C', 'D', 'E'],
+          title: {y: 15}
         }
       };
     }
@@ -208,6 +214,7 @@ export const AnalyzeChartComponent = {
         xaxis: filter(attributes, attr => attr['x-axis']),
         groupBy: map(filter(attributes, attr => attr['x-axis']), clone)
       };
+      this.reloadChart(this.settings, this.filteredGridData);
     }
 
     onSettingsChanged(settings) {
@@ -241,6 +248,11 @@ export const AnalyzeChartComponent = {
       return this._FilterService.getChartSetttingsToFiltersMapper(this.gridData)(selectedFields);
     }
 
+    hasNoData(categories) {
+      return (angular.isArray(categories) &&
+              categories[0] === 'undefined');
+    }
+
     reloadChart(settings, filteredGridData) {
       const xaxis = filter(this.settings.xaxis, attr => attr.checked)[0] || {};
       const yaxis = filter(this.settings.yaxis, attr => attr.checked)[0] || {};
@@ -255,7 +267,7 @@ export const AnalyzeChartComponent = {
         },
         {
           path: 'xAxis.categories',
-          data: xCategories
+          data: this.hasNoData(xCategories) ? ['X-Axis'] : xCategories
         },
         {
           path: 'yAxis.title.text',

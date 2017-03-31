@@ -8,21 +8,38 @@ analyze-chart {
     background: whitesmoke;
   }
 
+  chart {
+    width: calc(100% - 48px);
+    margin: 0 auto;
+    background: white;
+    border-radius: 2px;
+    box-shadow: 0 2px 6px 0 rgba(20, 39, 54, 0.17);
+  }
+
   md-checkbox {
     width: 100%;
   }
 
   .axis-options {
-    padding: 5px 10px;
     border: 1px solid #EEE;
     border-radius: 5px;
+    min-height: 50px;
     max-height: 245px;
     overflow-y: scroll;
+    overflow-x: hidden;
+
+    .axis-option-checkboxes {
+      padding: 40px 10px 5px;
+    }
 
     h3 {
+      box-sizing: border-box;
       font-size: 16px;
+      position: fixed;
+      width: 85%;
+      background: white;
       border-bottom: 1px solid #EEE;
-      padding: 5px;
+      padding: 5px 10px;
       margin: 0 0 10px;
       font-weight: 600;
     }

@@ -29,7 +29,6 @@
   <analyze-dialog-content>
     <analyze-chart-settings
         settings="$ctrl.settings"
-        ng-if="$ctrl.settings"
         on-change="$ctrl.onSettingsChanged(settings)"
     ></analyze-chart-settings>
     <analyze-filter-sidenav></analyze-filter-sidenav>
@@ -58,10 +57,9 @@
         </div>
       </md-toolbar>
 
+      <chart updater="$ctrl.updateChart" options="$ctrl.barChartOptions"></chart>
       <md-card class="chart-container-card">
         <md-card-content>
-          <chart style="width: 100%" updater="$ctrl.updateChart" options="$ctrl.barChartOptions"></chart>
-
           <h3> Custom Axis Labels </h3>
           <div layout="row" layout-align="center">
             <md-input-container flex>
