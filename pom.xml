@@ -264,7 +264,7 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <build>
-      <finalName>${project.name}</finalName>
+      <finalName>bda-saw</finalName>
         <plugins>
           <plugin>
             <artifactId>maven-clean-plugin</artifactId>
@@ -362,7 +362,6 @@
 						<addClasspath>true</addClasspath>
 					</manifest>
 				</archive>
-				<warName>${project.name}.war</warName>
         	</configuration>
 	   </plugin> 
 	    <plugin>
