@@ -41,6 +41,7 @@ analyze-chart {
       border-bottom: 1px solid #EEE;
       padding: 5px 10px;
       margin: 0 0 10px;
+      z-index: 1;
       font-weight: 600;
     }
   }
@@ -72,12 +73,15 @@ analyze-chart {
   }
 
   analyze-chart-settings {
+    z-index: 0;
+
     & > .layout-row {
       height: 100%;
     }
 
     md-sidenav {
       position: static;
+      width: 300px;
     }
   }
 }
