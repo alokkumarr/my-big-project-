@@ -6,7 +6,6 @@ GET     /               controllers.MTSControl.index
 POST    /		controllers.TS.handleRequest
 POST    /md		controllers.MD.handleRequest
 POST    /analysis	controllers.ANA.handleRequest
-POST    /semantic	controllers.Semantic.handleRequest
 
 GET     /ObjectSearch   controllers.MCT.handleTagRequest(LCID: String, query: Option[String])
 POST    /ObjectSearch 	controllers.MCT.extendedTagRequest(LCID: String, indexname: Option[String], objecttype: Option[String])
