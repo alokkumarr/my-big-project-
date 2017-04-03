@@ -20,7 +20,7 @@ export function PivotService() {
   function traverseRecursive({keys, currentKey, node}) {
     const containerProp = getContainerProp(node);
     const container = node[containerProp];
-    keys[currentKey] = node.key_as_string ? new Date(node.key) : node.key;
+    keys[currentKey] = node.key;
     if (container) {
       // this is a node
       return flatMap(container.buckets, node => {

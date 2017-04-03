@@ -1,0 +1,23 @@
+analyze-pivot-settings {
+  h3 {
+    margin: 5px;
+    padding: 5px;
+    border-bottom: 1px solid #EEE;
+  }
+
+  .checkbox-container {
+    padding-top: 10px;
+    padding-left: 10px;
+  }
+
+  .checkbox-container:last-of-type {
+    padding-bottom: 10px;
+  }
+
+  .summary-type {
+    md-checkbox {
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+  }
+}
