@@ -168,6 +168,22 @@
         ]
       },
       {
+        "label": "CHARTS",
+        "category": "charts",
+        "children": [
+          {
+            "label": "Column Chart",
+            "icon": "icon-vert-bar-chart",
+            "type": "chart:column"
+          },
+          {
+            "label": "Line Chart",
+            "icon": "icon-vert-bar-chart",
+            "type": "chart:line"
+          }
+        ]
+      },
+      {
         "label": "BAR CHARTS",
         "category": "bar-chart",
         "children": [
@@ -224,6 +240,22 @@
             "label": "Pivot",
             "icon": "icon-pivot",
             "type": "table:pivot"
+          }
+        ]
+      },
+      {
+        "label": "CHARTS",
+        "category": "charts",
+        "children": [
+          {
+            "label": "Column Chart",
+            "icon": "icon-vert-bar-chart",
+            "type": "chart:column"
+          },
+          {
+            "label": "Line Chart",
+            "icon": "icon-vert-bar-chart",
+            "type": "chart:line"
           }
         ]
       },
@@ -288,6 +320,22 @@
         ]
       },
       {
+        "label": "CHARTS",
+        "category": "charts",
+        "children": [
+          {
+            "label": "Column Chart",
+            "icon": "icon-vert-bar-chart",
+            "type": "chart:column"
+          },
+          {
+            "label": "Line Chart",
+            "icon": "icon-vert-bar-chart",
+            "type": "chart:line"
+          }
+        ]
+      },
+      {
         "label": "BAR CHARTS",
         "category": "bar-chart",
         "children": [
@@ -348,6 +396,22 @@
         ]
       },
       {
+        "label": "CHARTS",
+        "category": "charts",
+        "children": [
+          {
+            "label": "Column Chart",
+            "icon": "icon-vert-bar-chart",
+            "type": "chart:column"
+          },
+          {
+            "label": "Line Chart",
+            "icon": "icon-vert-bar-chart",
+            "type": "chart:line"
+          }
+        ]
+      },
+      {
         "label": "BAR CHARTS",
         "category": "bar-chart",
         "children": [
@@ -404,6 +468,22 @@
             "label": "Pivot",
             "icon": "icon-pivot",
             "type": "table:pivot"
+          }
+        ]
+      },
+      {
+        "label": "CHARTS",
+        "category": "charts",
+        "children": [
+          {
+            "label": "Column Chart",
+            "icon": "icon-vert-bar-chart",
+            "type": "chart:column"
+          },
+          {
+            "label": "Line Chart",
+            "icon": "icon-vert-bar-chart",
+            "type": "chart:line"
           }
         ]
       },
