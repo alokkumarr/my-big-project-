@@ -1,19 +1,19 @@
 import 'devextreme/ui/pivot_grid';
 import forEach from 'lodash/forEach';
 import map from 'lodash/map';
+import groupBy from 'lodash/groupBy';
 import clone from 'lodash/clone';
 import fpMap from 'lodash/fp/map';
 import fpPipe from 'lodash/fp/pipe';
 import fpFilter from 'lodash/fp/filter';
 import keys from 'lodash/keys';
+import concat from 'lodash/concat';
 import assign from 'lodash/assign';
 import compact from 'lodash/compact';
+import isEmpty from 'lodash/isEmpty';
 
 import template from './analyze-pivot.component.html';
 import style from './analyze-pivot.component.scss';
-
-const FIELD_CHOOSER_HEIGHT = 900;
-const FIELD_CHOOSER_WIDTH = 600;
 
 export const AnalyzePivotComponent = {
   template,
@@ -32,6 +32,7 @@ export const AnalyzePivotComponent = {
       this.deNormalizedData = [];
       this.normalizedData = [];
       this.dataSource = {};
+      this.settings = {};
       this.sorts = [];
       this.filters = {
         possible: null,
@@ -62,42 +63,76 @@ export const AnalyzePivotComponent = {
 
     loadPivotData() {
       this._AnalyzeService.getPivotData().then(data => {
-        const fields = this.getFields();
+        if (isEmpty(this.settings)) {
+          // new analysis
+          this.fields = this.getFields();
+          this.settings = groupBy(this.fields, 'area');
+          this.hideDataFieldsOnFirstLoad();
+          this.sorts = [];
+        } else {
+          // editing existing analysis
+          this.settings = this.model.settings;
+          this.fields = concat(this.settings.row, this.settings.column, this.settings.data);
+          this.sorts = this.model.sorts || [];
+          this.applySorts(this.sorts);
+        }
         this.normalizedData = data;
         this.deNormalizedData = this._PivotService.denormalizeData(data);
         this.dataSource = {
           store: this.deNormalizedData,
-          fields
+          fields: this.fields
         };
-
+        // this.toggleColumnFields(true);
         this._gridInstance.option('dataSource', this.dataSource);
-        if (this.model.pivotState) {
-          this._gridInstance.getDataSource().state(this.model.pivotState);
-        }
+        // this.toggleColumnFields(false);
+        // this.hideColumnFields();
+      });
+    }
 
-        this._$timeout(() => {
-        // the field chooser is added with a delay because of the modal animation
-        // if not delayed the fieldchooser appears smaller
-          this.fieldChooserOptions = {
-            texts: {
-              allFields: 'All',
-              columnFields: 'Columns',
-              dataFields: 'Data',
-              rowFields: 'Rows'
-            },
-            width: FIELD_CHOOSER_WIDTH,
-            heght: FIELD_CHOOSER_HEIGHT,
-            layout: 1,
-            dataSource: this._gridInstance.getDataSource()
-          };
-        }, 100);
+    toggleColumnFields(visible) {
+      forEach(this.settings.column, column => {
+        column.visible = visible;
+      });
+    }
+
+    hideColumnFields() {
+      const pivotGridDataSource = this._gridInstance.getDataSource();
+      forEach(this.settings.column, column => {
+        pivotGridDataSource.field(column.dataField, {
+          visible: false
+        });
+      });
+      pivotGridDataSource.load();
+    }
+
+    applyFieldSettings(field) {
+      const pivotGridDataSource = this._gridInstance.getDataSource();
+      const modifierObj = {
+        visible: field.visible
+      };
+
+      if (field.area !== 'row' && field.area !== 'column') {
+        // if it's not row, or column, it should be data
+        modifierObj.summaryType = field.summaryType;
+        // setting only the visibility is not eough for hiding data fields
+        modifierObj.area = field.visible ? 'data' : null;
+      }
+
+      pivotGridDataSource.field(field.dataField, modifierObj);
+      pivotGridDataSource.load();
+    }
+
+    hideDataFieldsOnFirstLoad() {
+      // setting visible to false on datafields is not enough so we have to make them null
+      forEach(this.settings.data, datum => {
+        datum.area = null;
       });
     }
 
 // filters
     openFilterSidenav() {
       if (!this.filters.possible) {
-        this.filters.possible = this.getFieldToFilterMapper()(this.getFields());
+        this.filters.possible = this.getFieldToFilterMapper()(this.fields);
       }
       this._FilterService.openFilterSidenav(this.filters.possible);
     }
@@ -167,10 +202,20 @@ export const AnalyzePivotComponent = {
       );
     }
 
+    applySorts(sorts) {
+      const pivotGridDataSource = this._gridInstance.getDataSource();
+      forEach(sorts, sort => {
+        pivotGridDataSource.field(sort.field.dataField, {
+          sortOrder: sort.order
+        });
+      });
+      pivotGridDataSource.load();
+    }
+
     openSortModal(ev) {
       const tpl = '<analyze-report-sort model="model"></analyze-report-sort>';
       if (!this.sortFields) {
-        this.sortFields = this.getFieldToSortFieldMapper()(this.getFields());
+        this.sortFields = this.getFieldToSortFieldMapper()(this.fields);
       }
 
       this._$mdDialog
@@ -189,13 +234,7 @@ export const AnalyzePivotComponent = {
         })
         .then(sorts => {
           this.sorts = sorts;
-          const pivotGridDataSource = this._gridInstance.getDataSource();
-          forEach(sorts, sort => {
-            pivotGridDataSource.field(sort.field.dataField, {
-              sortOrder: sort.order
-            });
-          });
-          pivotGridDataSource.load();
+          this.applySorts(sorts);
         });
     }
 
@@ -231,8 +270,7 @@ export const AnalyzePivotComponent = {
             scope.model = {
               pivot: this.model,
               dataSource: this.dataSource,
-              defaultOptions: this.getDefaultOptions(),
-              pivotState: this._gridInstance.getDataSource().state()
+              defaultOptions: this.getDefaultOptions()
             };
           },
           targetEvent: ev,
@@ -244,7 +282,7 @@ export const AnalyzePivotComponent = {
 
     openSaveModal(ev) {
       this.model.sorts = this.sorts;
-      this.model.pivotState = this._gridInstance.getDataSource().state();
+      this.model.settings = this.settings;
       this.model.filters = map(this.filters.selected, this._FilterService.getFrontEnd2BackEndFilterMapper());
       const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
@@ -286,24 +324,39 @@ export const AnalyzePivotComponent = {
         width: 120,
         dataType: 'string',
         dataField: 'row_level_1',
+        areaIndex: 0,
+        visible: false,
         area: 'row'
       }, {
         caption: 'Product',
         width: 120,
         dataType: 'string',
         dataField: 'row_level_2',
+        areaIndex: 1,
+        visible: false,
         area: 'row'
       }, {
-        caption: 'Date2',
+        caption: 'Date Month',
         dataField: 'column_level_1',
-        dataType: 'date',
+        format: datum => {
+          const date = new Date(datum);
+          return `${date.getFullYear()}-${date.getMonth()}`;
+        },
+        areaIndex: 0,
         width: 120,
+        visible: false,
         area: 'column'
       }, {
-        caption: 'Date',
+        caption: 'Date Day',
         dataField: 'column_level_2',
-        dataType: 'date',
+        areaIndex: 1,
+        dataType: 'string',
+        format: datum => {
+          const date = new Date(datum);
+          return `${date.getDay()}`;
+        },
         width: 120,
+        visible: false,
         area: 'column'
       }, {
         caption: 'Total Price',
@@ -311,6 +364,7 @@ export const AnalyzePivotComponent = {
         dataType: 'double',
         summaryType: 'sum',
         format: 'currency',
+        visible: false,
         area: 'data'
       }];
     }
@@ -322,11 +376,11 @@ export const AnalyzePivotComponent = {
         allowFiltering: false,
         allowExpandAll: true,
         fieldChooser: {
-          enabled: false
+          enabled: true
         },
         fieldPanel: {
           visible: true,
-          showColumnFields: false, // hides the column field area
+          showColumnFields: true, // hides the column field area
           showRowFields: true, // hides the row field area
           showDataFields: true, // hides the data field area
           showFilterFields: false, // hides the filter field area

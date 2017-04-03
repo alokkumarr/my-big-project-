@@ -27,12 +27,8 @@
 
   <analyze-dialog-content>
     <analyze-filter-sidenav></analyze-filter-sidenav>
-    <div layout="column">
-
-      <div>
-        <div dx-pivot-grid-field-chooser="$ctrl.fieldChooserOptions"></div>
-      </div>
-
+    <analyze-pivot-settings settings="$ctrl.settings" on-change="$ctrl.applyFieldSettings(field)"></analyze-pivot-settings>
+    <div layout="column" style="overflow: auto">
       <div layout="row" class="ard_toolbar">
         <span class="ard_toolbar-text" flex
               translate="PIVOT"></span>
@@ -64,7 +60,7 @@
 
       <md-card>
         <md-card-content layout="column" layout-align="space-between center">
-          <div dx-pivot-grid="$ctrl.pivotGridOptions"></div>
+          <pivot-grid options="$ctrl.pivotGridOptions"></pivot-grid>
         </md-card-content>
       </md-card>
 
