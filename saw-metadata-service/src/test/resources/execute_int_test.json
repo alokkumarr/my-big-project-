@@ -1,0 +1,10 @@
+[
+	{
+		"node-category" : "AnalysisNode",
+		"NodeId" : "PassengerDataAnalysis_IntegrationTest::1000::3::640065965408827",
+		"action" : 
+		{
+			"verb" : "execute"
+		}
+	}
+]		

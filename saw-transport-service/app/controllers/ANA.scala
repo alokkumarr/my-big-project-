@@ -66,7 +66,7 @@ class ANA extends BaseServiceProvider {
       case "delete" => {
         val analysisId = extractAnalysisId(json)
         val analysisNode = new AnalysisNode
-        val result = analysisNode.delete(Map("analysisId" -> analysisId))
+        val result = analysisNode.deleteAll(Map("analysisId" -> analysisId))
         if (result == Map.empty) {
           throw new RuntimeException("Deleting failed")
         }

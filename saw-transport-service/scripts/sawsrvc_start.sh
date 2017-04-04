@@ -157,7 +157,7 @@ declare -r java_args=$( echo \
     -Dpidfile.path=$pidfile_path \
     -Dlog.dir=${log_dir} \
     -Duser.dir=${user_dir} \
-    -Djava.library.path=/opt/mapr/lib
+    -Djava.library.path=/opt/mapr/lib \
     -Dhadoop.home.dir=/opt/mapr/hadoop/hadoop-$(cat /opt/mapr/hadoop/hadoopversion)
     )
 vlog java_args: $java_args

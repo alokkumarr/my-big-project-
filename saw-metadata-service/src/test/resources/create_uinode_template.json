@@ -1,0 +1,61 @@
+[
+	{
+		"node-category" : "UINode",
+		"action" : 
+		{
+			"verb" : "create",
+			"content" :
+			{
+				"_id" : "", 
+				"customer_code" : "ATT",
+				"name" : "NewCustomerModule",
+				"userName": "admin@att.com", 
+				"dataSecurityKey" : "ATT",   
+				"category" : "My Analysis",
+				"type" : "report", 
+				"customer_Prod_module_feature_sys_id" : "FT_sys01", 
+				"metric_name" : "Metric_name_1",
+				"scheduled" : "10:00 AM", 
+					"publish" : {
+						"sourceType" : "EMAIL",
+						"email_id" : ["srya0001@synchronoss.com"], 
+						"host" : "localhost", 
+						"port" : 22,
+						"password" : "hidden", 
+						"share" : {
+							"customer_Prod_module_feature_sys_id": "" 
+						}
+				},  
+				"description" : "Full test node 1", 
+				"repository": 
+				{
+					"storage_type" : "DL",
+					"URL" : "URL1"
+				},
+				"artifacts": 
+				[
+					{
+					"artifact_name": "",
+					"artifact_position": [ 500,200],
+					"artifact_attributes" : 
+					[
+						{
+							"column_name" : "",
+							"display_name" : "",
+							"type" : "int|String",
+							"join_elgible" : "",
+							"filter_eligible" : "",
+							"hide" : "", 
+							"checked" : "" 
+						},
+						{}
+					]
+					}
+				]	
+			},
+			"ui" : {
+				"ui-module" : "Analyze"
+			}
+		}
+	}
+]

@@ -1,5 +1,6 @@
 package sncr.metadata.engine
 
+import java.io.IOException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -18,7 +19,7 @@ import org.apache.hadoop.hbase.TableName
   */
 trait SearchMetadata extends MetadataStore{
 
-  override val m_log: Logger = LoggerFactory.getLogger(classOf[SearchMetadata].getName)
+  override protected val m_log: Logger = LoggerFactory.getLogger(classOf[SearchMetadata].getName)
   var headerDesc: Map[String, String] = null
 
   import scala.collection.JavaConversions._
@@ -63,8 +64,8 @@ trait SearchMetadata extends MetadataStore{
   }
 
   def selectRowKey(keys: Map[String, Any]) : (Int, String) = {
-    if (keys.contains("NodeId")) {
-      setRowKey(MDNodeUtil.convertValue(keys("NodeId")))
+    if (keys.contains(Fields.NodeId.toString)) {
+      setRowKey(MDNodeUtil.convertValue(keys(Fields.NodeId.toString)))
       val msg = s" Selected Node [ ID = ${new String(rowKey)} ]"; m_log debug Success.toString + " ==> " + msg
       (Success.id,  msg)
     }
@@ -92,8 +93,8 @@ trait SearchMetadata extends MetadataStore{
   {
     val sfKeyValues = res.getFamilyMap(MDColumnFamilies(_cf_search.id))
     m_log debug s"Include list of search fields into result: ${sfKeyValues.keySet.toList.map(k => new String(k) + " => " + new String(sfKeyValues(k))  ).mkString("{", ",", "}")}"
-    val sf : Map[String, Any] = sfKeyValues.keySet().map( k =>
-    { val k_s = new String(k)
+    val sf : Map[String, Any] = sfKeyValues.keySet().filter( k => headerDesc.contains(Bytes.toString(k)) ).map( k =>
+    { val k_s = Bytes.toString(k)
       val sf_type = headerDesc(k_s)
       val v_s = sf_type match {
         case "String" => Bytes.toString(sfKeyValues.get(k))
@@ -113,6 +114,32 @@ trait SearchMetadata extends MetadataStore{
     }).toMap
     sf
   }
+
+
+  def deleteAll(keys: Map[String, Any]): (Int, String) = {
+    simpleMetadataSearch(keys, "and").foreach( rowID =>
+      try {
+        val delGetOp: Get = new Get(rowID)
+        val getResult = mdNodeStoreTable.get(delGetOp)
+        if (!getResult.isEmpty) {
+          val delOp: Delete = new Delete(rowID)
+          mdNodeStoreTable.delete(delOp)
+        }
+        else{
+          m_log error s"Node [ ID = ${Bytes.toString(rowID)}] not found"
+        }
+      }
+      catch{
+        case x: IOException => {
+          val msg = s"Could not delete node: ${Bytes.toString(rowID)} Reason: "
+          m_log error(msg, x)
+          return (Error.id, msg)
+        }
+      }
+    )
+    (Success.id, s"All found nodes  was successfully removed")
+  }
+
 
 }
 

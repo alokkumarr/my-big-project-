@@ -2,29 +2,29 @@ package sncr.metadata.ui_components
 
 import java.util
 
-import org.json4s.JsonAST.{JInt, JString, _}
+import org.json4s.JsonAST.{JString, _}
 import org.json4s.ParserUtil.ParseException
 import org.json4s.native.JsonMethods._
 import org.json4s.{JField => _, JNothing => _, JObject => _, JValue => _, _}
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.ProcessingResult._
-import sncr.metadata.engine.{MDObjectStruct, Response}
+import sncr.metadata.engine.Response
 
 
 
 /**
   * Created by srya0001 on 2/17/2017.
   */
-import MDObjectStruct.formats
+import sncr.metadata.engine.MDObjectStruct.formats
 class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true) extends Response {
 
 
-  val m_log: Logger = LoggerFactory.getLogger(classOf[UIMDRequestHandler].getName)
+  protected override val m_log: Logger = LoggerFactory.getLogger(classOf[UIMDRequestHandler].getName)
 
 
   def handleRequestIncorrect: List[JValue] =
   {
-    List(new JObject(List(JField("result", new JInt(Rejected.id)), JField("reason", new JString("Request structure is not correct")))))
+    List(new JObject(List(JField("result", JString(Rejected.toString)), JField("message", JString("Request structure is not correct")))))
   }
 
   def validateAndExecute: String = {
@@ -33,7 +33,7 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
     {
       case (0, _) => execute
       case (res_id: Int, r: String) => {
-        val msg = render(JObject(List(JField("result", new JInt(Rejected.id)),JField("reason", new JString(r)))))
+        val msg = render(JObject(List(JField("result", JString(Rejected.toString)),JField("message", JString(r)))))
         val response = if (!printPretty) compact(msg) else pretty(msg)
         m_log debug "Request is not valid: " + response
         response
@@ -45,8 +45,6 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
   def execute :String =
   {
     var elements : JValue = docAsJson \ "contents"
-
-    val ticket: JValue = docAsJson \ "ticket"
     val action = (docAsJson \ "contents" \ "action").extract[String].toLowerCase
     elements = elements.removeField( pair => pair._1.equalsIgnoreCase("action") )
 
@@ -66,10 +64,10 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
                 m_log debug (s"Content element ${content_element._1} => " + compact(render(content_element._2)))
                 val mn = content_element._1
                 content_element._2 match {
-                  case ce: JObject => m_log debug "UI Item from object: " + compact(render(ce)); List(actionHandler(ticket, action, ce, mn))
+                  case ce: JObject => m_log debug "UI Item from object: " + compact(render(ce)); List(actionHandler(action, ce, mn))
                   case ce: JArray => ce.arr.map(ce_ae => {
                             m_log debug "UI Item, array element: " + compact(render(ce_ae))
-                            actionHandler(ticket, action, ce_ae, mn)
+                            actionHandler(action, ce_ae, mn)
                   })
                   case _ => handleRequestIncorrect
                 }
@@ -78,37 +76,13 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
           }
           case _ => return "Create/Update/Delete request is not correct, contents must be JSON object"
         }
-/*
-      case "update" =>
-        elements match {
-          case JObject(all_content_elements) => {
-            responses = JObject(all_content_elements)
-              .obj
-              .filter(an_element => !an_element._1.equalsIgnoreCase("keys") )
-              .flatMap(content_element => {
-                m_log debug (s"Content element ${content_element._1} => " + compact(render(content_element._2)))
-                val mn = content_element._1
-                content_element._2 match {
-                  case ce: JObject => m_log debug "UI Item from object: " + compact(render(ce)); List(actionHandler(ticket, action, ce, mn))
-                  case ce: JArray => ce.arr.map(ce_ae => {
-                    m_log debug "UI Item, array element: " + compact(render(ce_ae))
-                    actionHandler(ticket, action, ce_ae, mn)
-                  })
-                  case _ => handleRequestIncorrect
-                }
-              }
-              )
-          }
-          case _ => return "Create/Update/Delete request is not correct, contents must be JSON object"
-        }
-*/
-      case "retrieve" | "search" | "delete" =>
+      case "read" | "search" | "delete" =>
         elements match {
           case JObject(all_content_elements) => {
             responses = JObject(all_content_elements).obj
               .filter(an_element => an_element._1.equalsIgnoreCase("keys"))
               .map( an_element => {m_log debug s"Search/Retrieval keys ${an_element._1} => ${compact(render(an_element._2))}"
-                  actionHandler(ticket, action, an_element._2, "keys")
+                  actionHandler(action, an_element._2, "keys")
               })
           }
           case _ => return "Search/Retrieval request is not correct, contents must be JSON object"
@@ -116,21 +90,26 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
 
     }
     val cnt = JField("contents", new JArray(responses))
-    val r_ticket = JField("ticket", ticket)
-    val res = JField("performed_action", new JString(action))
-    val requestResult = new JObject(List(r_ticket, res, cnt))
+    //TODO:: restructure JSON response to have
+    // "module_name" : [
+    //   { <module definition 1> },
+    //   { <module definition 2> },
+    //   { <module definition 3> },
+    //    ....
+    //  ]
+    val requestResult = new JObject(List(cnt))
     if (!printPretty) compact(render(requestResult)) else pretty(render(requestResult)) + "\n"
   }
 
 
-  private def actionHandler(ticket : JValue, action: String, content_element : JValue, module_name: String) : JValue =
+  private def actionHandler(action: String, content_element : JValue, module_name: String) : JValue =
   {
-    val sNode = new UINode(ticket, content_element, module_name)
+    val sNode = new UINode(content_element, module_name)
     val response = action match {
       case "create" => build(sNode.create)
-      case "retrieve" => build(sNode.read(extractKeys))
-      case "search" => build(sNode.find(extractKeys))
-      case "delete" => build(sNode.delete(extractKeys))
+      case "read" => sNode.setFetchMode(UINodeFetchMode.DefinitionOnly.id); build(sNode.read(extractKeys))
+      case "search" => sNode.setFetchMode(UINodeFetchMode.DefinitionOnly.id); build(sNode.find(extractKeys))
+      case "delete" => build(sNode.deleteAll(extractKeys))
       case "update" => build(sNode.update(extractKeys))
     }
     m_log debug s"Response: ${pretty(render(response))}\n"
@@ -163,22 +142,15 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
       (Error.id, "Validation fails: document is empty")
 
     val action : String = (docAsJson \ "contents" \ "action").extractOpt[String].getOrElse("invalid").toLowerCase()
-    if (!List("create", "update", "delete", "retrieve", "search", "scan").exists(_.equalsIgnoreCase(action))){
+    if (!List("create", "update", "delete", "read", "search", "scan").exists(_.equalsIgnoreCase(action))){
       val msg = s"Action is incorrect: $action"
       m_log debug Rejected.id + " ==> " + msg
       return (Rejected.id, msg)
     }
 
     m_log debug "Validate token, action and content section"
+
     UIMDRequestHandler.requiredFields.keySet.foreach {
-      case k@"ticket" => UIMDRequestHandler.requiredFields(k).foreach(rf => {
-        val fieldValue = docAsJson \ k \ rf
-        if (fieldValue == null || fieldValue.extractOpt[String].isEmpty) {
-          val msg = s"Required token field $k.$rf is missing or empty"
-          m_log debug Rejected.id + " ==> " + msg
-          return (Rejected.id, msg)
-        }
-      })
       case k@"root" => {
         UIMDRequestHandler.requiredFields(k).foreach {
           case rf@"contents" =>
@@ -192,7 +164,7 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
       }
     }
     action match {
-      case "retrieve" | "search" | "delete" =>
+      case "read" | "search" | "delete" =>
       {
         val keySection = docAsJson \ "contents" \ "keys"
         if ( keySection == null || keySection.toSome.isEmpty) {
@@ -221,7 +193,7 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
         { val elements = docAsJson \ "contents"
           elements match {
             case JObject(all_content_elements) => {
-              if(JObject(all_content_elements).obj.filter(an_element => !an_element._1.equalsIgnoreCase("keys")).nonEmpty)
+              if(JObject(all_content_elements).obj.exists(an_element => !an_element._1.equalsIgnoreCase("keys")))
                 return (Success.id, "Success")
               else{
                   val msg = s"Create and update require module description"
@@ -246,7 +218,6 @@ object UIMDRequestHandler{
   val m_log: Logger = LoggerFactory.getLogger("SemanticMDRequestHandler")
 
   val requiredFields = Map(
-    "ticket" -> List("ticketId", "masterLoginId","customer_code","dataSecurityKey","userName"),
     "root" -> List("contents")
   )
 

@@ -21,6 +21,6 @@
 		{
 				"NodeId" : "ATT::analyze::FT101"
 		},
-		"action" : "retrieve"
+		"action" : "read"
 	}
 }

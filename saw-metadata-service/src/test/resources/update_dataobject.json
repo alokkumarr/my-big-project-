@@ -1,0 +1,27 @@
+[
+	{
+		"node-category" : "DataObject",
+		"action" : 
+		{
+			"verb" : "create",
+			"content" :
+			{
+					"name" : "PASSENGER_DATA_2",
+					"owner" : "TEST",
+					"type" : "parquet",
+					"partition_type" : "hive",
+					"application" : "training"
+			},
+			
+			"schema" : {
+					"col_s" : { "type" : "string" },
+					"col_i" : { "type" : "integer" },
+					"col_d" : { "type" : "date" }
+			},
+			
+			"dl-locations" : [ 
+				"/main/data/testapp/output/PASSENGER_DATA"
+			]
+		}
+	}	
+]		

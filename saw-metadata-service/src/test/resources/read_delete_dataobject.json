@@ -1,0 +1,18 @@
+[
+	{
+		"node-category" : "DataObject"
+		"NodeId" : "PASSENGER_DATA::1490643672072"
+		"action" : 
+		{
+			"verb" : "read"
+		}
+	},
+	{
+		"node-category" : "DataObject"
+		"NodeId" : "PASSENGER_DATA::1490643672072"
+		"action" : 
+		{
+			"verb" : "delete"
+		}
+	}
+]		

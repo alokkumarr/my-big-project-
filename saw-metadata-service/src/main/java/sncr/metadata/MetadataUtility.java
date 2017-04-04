@@ -5,7 +5,10 @@ import files.HFileOperations;
 import org.apache.commons.cli.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sncr.analysis.execution.ExecutorRunner;
 import sncr.metadata.analysis.AnalysisProvHelper;
+import sncr.metadata.engine.Fields;
+import sncr.metadata.engine.ResponseConverter;
 import sncr.metadata.ui_components.UIMDRequestHandler;
 
 import java.io.IOException;
@@ -57,19 +60,41 @@ public class MetadataUtility {
                     }
                     break;
                 case "analysis":
-                    AnalysisProvHelper provision = new AnalysisProvHelper(inData);
+                    AnalysisProvHelper provision = AnalysisProvHelper.apply(inData);
                     if ( !provision.requestsParsed()){
                         logger.error("The document is not parsable. Exit");
                         break;
                     }
                     result = provision.handleRequests(true);
-                    try{
+                    try {
                         outStream.write(result.getBytes());
                     } catch (IOException e) {
                         logger.error("I/O exception at attempt to write data: ", e);
                     }
                     break;
 
+                //TODO: Move to separate class/utility
+                case "execute_analysis":
+                    ExecutorRunner er = new ExecutorRunner(1);
+                    AnalysisProvHelper exec = AnalysisProvHelper.apply(inData);
+                    if ( !exec.requestsParsed()){
+                        logger.error("The document is not parsable. Exit");
+                        break;
+                    }
+                        java.util.ArrayList<java.util.HashMap<String, Object>> headers =
+                                ResponseConverter.convertToJavaMapList(exec.handleExecuteRequest());
+                        headers.forEach( h ->
+                        {
+                            String analysisId = (String) h.get(Fields.NodeId().toString());
+                            try {
+                                er.startSQLExecutor(analysisId);
+                                String analysisResultId = er.getPredefResultRowID(analysisId);
+                                System.out.println("Execution: AnalysisID = " + analysisId + ", Result Row ID: " + analysisResultId );
+                            } catch (Exception e) {
+                                logger.error("Executing exception: ", e);
+                            }
+                        });
+                    break;
                 default:
                     logger.error("Unsupported metadata type");
             }
@@ -86,8 +111,6 @@ public class MetadataUtility {
             e.printStackTrace();
             System.exit(1);
         }
-
-
         System.exit(0);
     }
 

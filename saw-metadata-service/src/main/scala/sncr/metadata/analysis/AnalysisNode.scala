@@ -1,7 +1,9 @@
 package sncr.metadata.analysis
 
+import com.typesafe.config.Config
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{Get, Result}
+import org.apache.hadoop.hbase.util.Bytes
 import org.json4s.JsonAST.{JNothing, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
@@ -14,30 +16,46 @@ import sncr.saw.common.config.SAWServiceConfig
 /**
   * Created by srya0001 on 3/1/2017.
   */
-class AnalysisNode(private[this] var analysisNode: JValue = JNothing) extends ContentNode
+class AnalysisNode(private[this] var analysisNode: JValue = JNothing, c: Config = null) extends ContentNode(c)
   with SourceAsJson
   with Relation{
 
-  override def getSourceData(res: Result): JValue = super[SourceAsJson].getSourceData(res)
+  def setDefinition(newDefinition: String) : Unit =
+  {
+    analysisNode = parse(newDefinition, false, false)
+    setDefinition
+  }
 
-  override def compileRead(g: Get) = {
+  def setDefinition: Unit = {
+    val (result, msg) = validate
+    if (result != Success.id)
+      throw new Exception(s"Could not create Analysis Node with provided content element, reason: $result - $msg")
+    else
+      setContent(compact(render(analysisNode)))
+  }
+
+  override protected def getSourceData(res: Result): (JValue, Array[Byte]) = super[SourceAsJson].getSourceData(res)
+
+  override protected def compileRead(g: Get) = {
     includeRelation(
     includeContent(g))
   }
 
-  override def header(g : Get) = includeSearch(g)
+  override protected def header(g : Get) = includeSearch(g)
 
-  override def getData(res: Result): Option[Map[String, Any]] = {
-    Option(getSearchFields(res) +
-          (key_Definition.toString -> getSourceData(res)) +
-          (key_RelationSimpleSet.toString -> getRelationData(res) )
+  override protected def getData(res: Result): Option[Map[String, Any]] = {
+    val (dataAsJValue, dataAsByteArray) = getSourceData(res)
+    setContent(dataAsByteArray)
+    Option(getSearchFields(res) ++
+           getSystemData(res) +
+          (key_Definition.toString -> dataAsJValue) +
+          (key_RelationSimpleSet.toString -> getRelationDataAsJson(res) )
     )
   }
 
-  override val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisNode].getName)
+  override protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisNode].getName)
 
   import MDObjectStruct.formats
-
   val table = SAWServiceConfig.metadataConfig.getString("path") + "/" + tables.AnalysisMetadata
   val tn: TableName = TableName.valueOf(table)
   mdNodeStoreTable = connection.getTable(tn)
@@ -45,9 +63,10 @@ class AnalysisNode(private[this] var analysisNode: JValue = JNothing) extends Co
 
 
   override protected def initRow: String = {
-    val rowkey =
-      (analysisNode \ "analysisId").extract[String] + AnalysisNode.separator +
-      System.currentTimeMillis()
+    val rowkey = (analysisNode \ "name").extract[String] + MetadataDictionary.separator +
+      (analysisNode \ "analysis" \ "analysisId").extract[String] + MetadataDictionary.separator +
+      (analysisNode \ "analysis" \ "analysisCategoryId").extract[String] + MetadataDictionary.separator +
+      System.nanoTime()
     m_log debug s"Generated RowKey = $rowkey"
     rowkey
   }
@@ -58,23 +77,38 @@ class AnalysisNode(private[this] var analysisNode: JValue = JNothing) extends Co
       case _: JValue => {
         AnalysisNode.requiredFields.keySet.foreach {
           case k@"analysis" => AnalysisNode.requiredFields(k).foreach {
+            case rf@"columns" =>
+              analysisNode \ k \ rf match {
+                case JArray(ja) => if (ja.isEmpty) (Rejected.id, "Analysis column section is empty")
+                case _ => return (Rejected.id, "Analysis column section is missing")
+              }
             case x: String =>
               val fieldValue = analysisNode \ k \ x
               if (fieldValue == null || fieldValue.extractOpt[String].isEmpty) {
                 val msg = s"Required field $k.$x is missing or empty"
-                m_log debug Rejected.id + " ==> " + msg
+                m_log debug Rejected.id.toString + " ==> " + msg
                 return (Rejected.id, msg)
               }
           }
           case k@"root" => {
             AnalysisNode.requiredFields(k).foreach {
               rf =>
+              if (!rf.equalsIgnoreCase("outputFile")) {
                 val fieldValue = analysisNode \ rf
                 if (fieldValue == null || fieldValue.extractOpt[String].isEmpty) {
                   val msg = s"Required root field $rf is missing or empty"
-                  m_log debug Rejected.id + " ==> " + msg
+                  m_log debug Rejected.id.toString + " ==> " + msg
                   return (Rejected.id, msg)
                 }
+              }
+              else{
+                val o = analysisNode \ rf
+                if (o == null || o.extractOpt[JObject].isEmpty) {
+                  val msg = s"Required root object outputFile is missing or empty"
+                  m_log debug Rejected.id.toString + " ==> " + msg
+                  return (Rejected.id, msg)
+                }
+              }
             }
           }
         }
@@ -86,17 +120,14 @@ class AnalysisNode(private[this] var analysisNode: JValue = JNothing) extends Co
 
   def write: (Int, String) = {
     try {
-      val (result, msg) = validate
-      if (result != Success.id) return (result, msg)
       val put_op = createNode(NodeType.RelationContentNode.id, classOf[AnalysisNode].getName)
-      val searchValues: Map[String, Any] = AnalysisNode.extractSearchData(analysisNode) + ("NodeId" -> new String(rowKey))
+      setDefinition
+      val searchValues: Map[String, Any] = AnalysisNode.extractSearchData(analysisNode) + ("NodeId" -> Bytes.toString(rowKey))
       searchValues.keySet.foreach(k => {
         m_log debug s"Add search field $k with value: ${searchValues(k).toString}"
       })
-      if (commit(
-          saveRelation(
-          saveContent(put_op, compact(render(analysisNode)), searchValues))))
-          (Success.id, s"The Analysis Node [ ${new String(rowKey)} ] has been created")
+      if (commit(saveRelation(saveContent(saveSearchData(put_op,searchValues)))))
+        (NodeCreated.id, s"${Bytes.toString(rowKey)}")
       else
         (Error.id, "Could not create Analysis Node")
     }
@@ -109,62 +140,96 @@ class AnalysisNode(private[this] var analysisNode: JValue = JNothing) extends Co
 
   def update(filter: Map[String, Any]): (Int, String) = {
     try {
-      val (result, validate_msg) = validate
-      if (result != Success.id) return (result, validate_msg)
-
       val (res, msg) = selectRowKey(filter)
       if (res != Success.id) return (res, msg)
-      readCompiled(prepareRead).getOrElse(Map.empty)
-      setRowKey(rowKey)
-
+      load
+      setDefinition
       val searchValues: Map[String, Any] = AnalysisNode.extractSearchData(analysisNode) + ("NodeId" -> new String(rowKey))
       searchValues.keySet.foreach(k => {
         m_log debug s"Add search field $k with value: ${searchValues(k).toString}"
       })
-      if (commit(
-          saveRelation(
-          saveContent(
-          update, compact(render(analysisNode)), searchValues))))
+
+      if (commit(saveRelation(saveContent(saveSearchData(update,searchValues)))))
         (Success.id, s"The Analysis Node [ ${new String(rowKey)} ] has been updated")
       else
         (Error.id, "Could not update Analysis Node")
     }
     catch {
       case x: Exception => {
-        val msg = s"Could not store node [ ID = ${new String(rowKey)} ]: "; m_log error(msg, x); (Error.id, msg)
+        val msg = s"Could not update Analysis node [ ID = ${new String(rowKey)} ]: "; m_log error(msg, x); (Error.id, msg)
       }
     }
   }
+
+  def updateRelations: (Int, String) = {
+    try {
+      if (rowKey != null  && !rowKey.isEmpty) {
+        if (commit(saveRelation(update)))
+          (Success.id, s"The Analysis Node relations [ ${new String(rowKey)} ] has been updated")
+        else
+          (Error.id, "Could not update Analysis Node")
+      }
+      else
+        {
+          (Error.id, "Analysis Node should be loaded/identified first")
+        }
+    }
+    catch {
+      case x: Exception => {
+        val msg = s"Could not update Analysis node [ ID = ${new String(rowKey)} ]: "; m_log error(msg, x); (Error.id, msg)
+      }
+    }
+  }
+
 
 }
 
 object AnalysisNode{
 
 
-  val m_log: Logger = LoggerFactory.getLogger("AnalysisNodeObject")
-  val separator: String = "::"
+  protected val m_log: Logger = LoggerFactory.getLogger("AnalysisNodeObject")
 
-  def parseAnalysisJSON( src : String) : JValue =
+  def apply( src : String, rowID : String, c: Config) : AnalysisNode =
   {
     try {
-      parse(src, false, false)
+      val jv = parse(src, false, false)
+      val anNode = new AnalysisNode(jv, c)
+      if ( rowID != null && rowID.nonEmpty) anNode.setRowKey(Bytes.toBytes(rowID))
+      anNode
     }
     catch{
-      case x: Exception => m_log error s"Could not parse Analysis JSON representation"; JNothing
+      case x: Exception => m_log error s"Could not parse Analysis JSON representation"; new AnalysisNode
     }
   }
 
-  val requiredFields = Map(
-    "root" -> List("analysisId", "module", "customer_code")
+  def apply(rowId: String) :AnalysisNode =
+  {
+    val an = new AnalysisNode(JNothing, null)
+    an.setRowKey(Bytes.toBytes(rowId))
+    an.load
+    an
+  }
+
+
+  protected val requiredFields = Map(
+    "root" -> List("name", "tenantId", "productId", "outputFile"),
+    "analysis" -> List( "analysisId", "productId", "analysisId", "analysisName", "columns", "analysisQuery")
   )
 
   def  extractSearchData(analysisNode: JValue) : Map[String, Any] = {
 
+    val analysis = analysisNode \ "analysis"
     List(
-      (analysisNode, "analysisId"),
-      (analysisNode, "module"),
-      (analysisNode, "customer_code")
-)
+      (analysisNode, "name"),
+      (analysisNode, "tenantId"),
+      (analysisNode, "productId"),
+      (analysis, "analysisId"),
+      (analysis, "analysisCategoryId"),
+      (analysis, "analysisCategoryName"),
+      (analysis, "tenantId"),
+      (analysis, "productId"),
+      (analysis, "analysisName"),
+      (analysis, "displayStatus"))
       .map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, SearchDictionary.searchFields(jv._2)) )
         m_log trace s"Field: ${jv._2}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${SearchDictionary.searchFields(jv._2)}\n, Value: $searchValue"

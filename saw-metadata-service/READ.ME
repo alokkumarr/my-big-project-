@@ -206,3 +206,78 @@ SAW services deployment and usage examples
 ./MDUtility.sh -t analysis -i /main/data/md/analysis_search_updated.json -o /main/data/md/analysis_search_updated_res.json
 ./MDUtility.sh -t analysis -i /main/data/md/analysis_search2.json -o /main/data/md/analysis_res_search2.json
     							
+							
+## MD Exchage Format v2
+
+./mdcli.sh -i file:///var/saw/service/data/search_dataobject.json -o /main/test/search_do_res.json
+
+
+Response on work-item: 1 => [{
+  "application":"training",
+  "NodeId":"PASSENGER_DATA::1490643164159",
+  "name":"PASSENGER_DATA",
+  "Searchable":105,
+  "DataObject_Schema":{
+    "col_s":{
+      "type":"string"
+    },
+    "col_i":{
+      "type":"integer"
+    },
+    "col_d":{
+      "type":"date"
+    }
+  },
+  "NodeType":"RelationContentNode",
+  "content":{
+    "name":"PASSENGER_DATA",
+    "owner":"TEST",
+    "type":"json",
+    "partition_type":"parquet",
+    "application":"training"
+  },
+  "DL_DataLocation":{
+    "_number_of_locations":0
+  },
+  "NodeCategory":"sncr.metadata.datalake.DataObject",
+  "owner":"TEST"
+},{
+  "application":"training",
+  "NodeId":"PASSENGER_DATA::1490643672072",
+  "name":"PASSENGER_DATA",
+  "Searchable":105,
+  "DataObject_Schema":{
+    "col_s":{
+      "type":"string"
+    },
+    "col_i":{
+      "type":"integer"
+    },
+    "col_d":{
+      "type":"date"
+    }
+  },
+  "NodeType":"RelationContentNode",
+  "content":{
+    "name":"PASSENGER_DATA",
+    "owner":"TEST",
+    "type":"json",
+    "partition_type":"parquet",
+    "application":"training"
+  },
+  "DL_DataLocation":{
+    "_number_of_locations":0
+  },
+  "NodeCategory":"sncr.metadata.datalake.DataObject",
+  "owner":"TEST"
+}]
+
+									
+5. DataObject 									
+
+
+6. Execution
+
+
+/opt/saw/sql-executor/bin/start.sh PassengerDataAnalysis_IntegrationTest::1000::3::640065965408827 PassengerDataAnalysis_IntegrationTest::1000::3::640065965408827::688863200676048
+
