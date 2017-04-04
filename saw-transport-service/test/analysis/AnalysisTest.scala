@@ -5,12 +5,13 @@ class AnalysisTest extends MaprTest {
   "Analysis service" should {
     requireMapr
     val id = (System.currentTimeMillis - 1490100000000L).toString
+
     "create analysis" in {
       /* Write analysis */
       val body = actionAnalysisMessage("create", analysisJson(id))
       val response = sendRequest(body)
       val analysis = (response \ "contents" \ "analysis")(0)
-      val JInt(analysisId) = analysis \ "analysisId"
+      val JString(analysisId) = analysis \ "analysisId"
       analysisId must be (id)
     }
 
@@ -20,7 +21,7 @@ class AnalysisTest extends MaprTest {
         analysisJson(id, "customer-2"))
       val response = sendRequest(body)
       val analysis = (response \ "contents" \ "analysis")(0)
-      val JInt(analysisId) = analysis \ "analysisId"
+      val JString(analysisId) = analysis \ "analysisId"
       analysisId must be (id)
     }
 
