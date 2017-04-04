@@ -1,3 +1,5 @@
+import org.json4s.JsonAST._
+import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods.parse
 import org.scalatest.FunSpec
 import org.scalatest.MustMatchers
@@ -5,104 +7,58 @@ import org.scalatest.MustMatchers
 import model.QueryBuilder
 
 class QueryTest extends FunSpec with MustMatchers {
-  describe("Report with spec") {
-    it("should have query") {
-      val query = QueryBuilder.build(parse(json))
-      query must be ("SELECT 1 FROM foo")
+  describe("Query built from analysis") {
+    it("should have SELECT and FROM") {
+      query(artifactAB) must be ("SELECT a, b FROM t")
+    }
+    it("with filters should have a WHERE clause") {
+      query(artifactAB, filters(
+        filter("", "a", ">", "1"),
+        filter("AND", "b", "<", "2"))
+      ) must be ("SELECT a, b FROM t WHERE a > 1 AND b < 2")
+    }
+    it("with group by columns should have an GROUP BY clause") {
+      query(artifactAB, groupBy("a", "b")
+      ) must be ("SELECT a, b FROM t GROUP BY a, b")
+    }
+    it("with order by columns should have an ORDER BY clause") {
+      query(artifactAB, orderBy("a ASC", "b DESC")
+      ) must be ("SELECT a, b FROM t ORDER BY a ASC, b DESC")
     }
   }
 
-  val json = """
-{
-    "artifacts": 
-    [
-        {
-            "artifact_name": "foo",
-            "artifact_position": [500, 200],
-            "artifact_attributes" : 
-            [
-                {
-                    "column_name" : "",
-                    "display_name" : "",
-                    "type" : "int|String",
-                    "join_elgible" : "",
-                    "filter_eligible" : "",
-                    "hide" : "",
-                    "checked" : ""
-                },
-                {
-                    "column_name" : "",
-                    "display_name" : "",
-                    "type" : "int|String",
-                    "join_elgible" : "",
-                    "filter_eligible" : "",
-                    "hide" : "",
-                    "checked" : ""
-                }
-            ],
-            "sql_builder": {
-                "group_by_columns": [],
-                "order_by_columns": [],
-                "joins": [
-                    {
-                        "type": "inner",
-                        "criteria": [
-                            {
-                                "table_name": "Orders",
-                                "column_name": "Shipper",
-                                "side": "right"
-                            },
-                            {
-                                "table_name": "Shippers",
-                                "column_name": "ShipperID",
-                                "side": "left"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "inner",
-                        "criteria": [
-                            {
-                                "table_name": "Orders",
-                                "column_name": "Customer",
-                                "side": "right"
-                            },
-                            {
-                                "table_name": "Customers",
-                                "column_name": "CustomerID",
-                                "side": "left"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "inner",
-                        "criteria": [
-                            {
-                                "table_name": "Orders",
-                                "column_name": "Warehouse",
-                                "side": "right"
-                            },
-                            {
-                                "table_name": "Warehouses",
-                                "column_name": "WarehouseID",
-                                "side": "left"
-                            }
-                        ]
-                    }
-                ],
-                "filters": [
-                    {
-                        "column_name": "TotalPrice",
-                        "boolean_criteria": "AND",
-                        "operator": ">=",
-                        "search_conditions": [
-                            1
-                        ]
-                    }
-                ]
-            }
-        }
-    ]
-}
-"""
+  private def artifactAB = {
+    artifact("t", "a", "b")
+  }
+
+  private def query(objs: JObject*): String = {
+    val artifact = objs.reduceLeft(_ merge _)
+    val analysis = ("artifacts", List(artifact))
+    QueryBuilder.build(analysis)
+  }
+
+  private def artifact(name: String, columns: String*): JObject = {
+    ("artifact_name", name) ~
+    ("artifact_attributes", columns.map(("column_name", _)))
+  }
+
+  private def filters(filters: JObject*): JObject = {
+    ("filters", filters.toList)
+  }
+
+  private def filter(bool: String, name: String, operator: String,
+    cond: String): JObject = {
+    ("boolean_criteria", bool) ~
+    ("column_name", name) ~
+    ("operator", operator) ~
+    ("search_conditions", cond)
+  }
+
+  private def orderBy(name: String*) = {
+    ("order_by_columns", name)
+  }
+
+  private def groupBy(name: String*) = {
+    ("group_by_columns", name)
+  }
 }

@@ -2,13 +2,13 @@ package controllers
 
 import java.text.SimpleDateFormat
 
+import model.QueryBuilder
 import org.json4s._
 import org.json4s.JsonAST.JValue
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import play.libs.Json
 import play.mvc.{Http, Result}
-
 import sncr.metadata.analysis.AnalysisNode
 import sncr.metadata.engine.MDNodeUtil
 import sncr.metadata.engine.ProcessingResult._
@@ -93,6 +93,8 @@ class ANA extends BaseServiceProvider {
       case _ => throw new RuntimeException(
         "Expected array: " + analysisListJson)
     }
+    val query: JValue = ("query", JString(QueryBuilder.build(analysis)))
+    analysis merge(query)
   }
 
   def executeAnalysis(analysisId: BigInt) = {
