@@ -3,6 +3,7 @@ import style from './analyze-view.component.scss';
 
 import cloneDeep from 'lodash/cloneDeep';
 import remove from 'lodash/remove';
+import sortBy from 'lodash/sortBy';
 
 import {Events, AnalyseTypes} from '../../consts';
 import AbstractComponentController from 'app/lib/common/components/abstractComponent';
@@ -71,7 +72,7 @@ export const AnalyzeViewComponent = {
       return this._AnalyzeService.getAnalyses(this.$state.params.id, {
         filter: this.states.searchTerm
       }).then(analyses => {
-        this.reports = analyses;
+        this.reports = sortBy(analyses, analysis => -parseInt(analysis.id, 10));
         this.reloadDataGrid(this.reports);
       });
     }
