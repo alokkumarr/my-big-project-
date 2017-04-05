@@ -18,7 +18,7 @@
       </div>
 
       <div class="ard_actions" flex>
-        <md-button ng-click="$ctrl.openSaveModal()"
+        <md-button class="btn-primary" ng-click="$ctrl.openSaveModal()"
                    translate="SAVE">
         </md-button>
       </div>
@@ -27,7 +27,7 @@
 
   <analyze-dialog-content>
     <analyze-filter-sidenav></analyze-filter-sidenav>
-    <analyze-pivot-settings settings="$ctrl.settings" on-change="$ctrl.applyFieldSettings(field)"></analyze-pivot-settings>
+    <analyze-pivot-settings settings="$ctrl.settings" on-change="$ctrl.applyFieldSettings(field, action)"></analyze-pivot-settings>
     <div layout="column" style="overflow: auto">
       <div layout="row" class="ard_toolbar">
         <span class="ard_toolbar-text" flex
@@ -59,8 +59,8 @@
       </div>
 
       <md-card>
-        <md-card-content layout="column" layout-align="space-between center">
-          <pivot-grid options="$ctrl.pivotGridOptions"></pivot-grid>
+        <md-card-content layout="column">
+          <pivot-grid updater="$ctrl.pivotGridUpdater" options="$ctrl.pivotGridOptions"></pivot-grid>
         </md-card-content>
       </md-card>
 
