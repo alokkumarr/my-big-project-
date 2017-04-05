@@ -54,6 +54,7 @@ export const AnalyzePivotComponent = {
         this.normalizedData = data;
         this.deNormalizedData = this._PivotService.denormalizeData(data);
         this.fields = this.getFields();
+        this.sortFields = this.getFieldToSortFieldMapper()(this.fields);
 
         if (isEmpty(this.model.settings)) {
           // new analysis
@@ -65,7 +66,7 @@ export const AnalyzePivotComponent = {
           this.settings = this.model.settings;
           this.putSettingsDataInFields(this.settings, this.fields);
           this.filters = this.getFieldToFilterMapper()(this.fields);
-          this.sorts = this.model.sorts || [];
+          this.sorts = this.model.sorts ? this.mapBackend2FrontendSort(this.model.sorts, this.sortFields) : [];
           if (this.model.filters) {
             const selectedFilters = map(this.model.filters, this._FilterService.getBackEnd2FrontEndFilterMapper());
             // const selectedFilters = this._FilterService.getSelectedFilterMapper()(this.filters);
@@ -199,16 +200,11 @@ export const AnalyzePivotComponent = {
     }
 
     applySorts(sorts) {
-      this.pivotGridUpdater.next({
-        sorts
-      });
+      this.pivotGridUpdater.next({sorts});
     }
 
     openSortModal(ev) {
       const tpl = '<analyze-report-sort model="model"></analyze-report-sort>';
-      if (!this.sortFields) {
-        this.sortFields = this.getFieldToSortFieldMapper()(this.fields);
-      }
 
       this._$mdDialog
         .show({
@@ -272,8 +268,27 @@ export const AnalyzePivotComponent = {
         });
     }
 
+    mapBackend2FrontendSort(sorts, sortFields) {
+      return map(sorts, sort => {
+        const targetField = find(sortFields, ({dataField}) => dataField === sort.dataField);
+        return {
+          field: targetField,
+          order: sort.order
+        };
+      });
+    }
+
+    mapFrontend2BackendSort(sorts) {
+      return map(sorts, sort => {
+        return {
+          dataField: sort.field.dataField,
+          order: sort.order
+        };
+      });
+    }
+
     openSaveModal(ev) {
-      this.model.sorts = this.sorts;
+      this.model.sorts = this.mapFrontend2BackendSort(this.sorts);
       this.model.settings = this.settings;
 
       const selectedFilters = this._FilterService.getSelectedFilterMapper()(this.filters);
