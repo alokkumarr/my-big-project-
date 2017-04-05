@@ -12,14 +12,19 @@ import play.mvc.{Http, Result, Results}
 import model.QueryBuilder
 import model.QueryException
 import sncr.metadata.analysis.AnalysisNode
+import sncr.metadata.analysis.AnalysisResult
 import sncr.metadata.engine.MDNodeUtil
 import sncr.metadata.engine.ProcessingResult._
+import sncr.analysis.execution.ExecutorRunner
+import sncr.analysis.execution.ProcessExecutionResult
 
 class ANA extends BaseServiceProvider {
   implicit val formats = new DefaultFormats {
     override def dateFormatter = new SimpleDateFormat(
       "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   }
+
+  val executorRunner = new ExecutorRunner(1)
 
   override def process(txt: String): Result = {
     val json = parse(txt)
@@ -106,6 +111,13 @@ class ANA extends BaseServiceProvider {
 
   def executeAnalysis(analysisId: String) = {
     /* Placeholder for Spark SQL execution library until available */
-    1
+    executorRunner.startSQLExecutor(analysisId)
+    val status = executorRunner.waitForCompletion(analysisId, 2000)
+    if (status != ProcessExecutionResult.Success.toString) {
+      throw new RuntimeException("Process execution failed: " + status);
+    }
+    val resultId = executorRunner.getLastResult(analysisId)
+    // To be implemented when executor results are available:
+    // AnalysisResult(resultId).getData
   }
 }
