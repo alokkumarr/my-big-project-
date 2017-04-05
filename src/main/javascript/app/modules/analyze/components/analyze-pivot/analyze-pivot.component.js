@@ -6,7 +6,6 @@ import clone from 'lodash/clone';
 import fpMap from 'lodash/fp/map';
 import fpPipe from 'lodash/fp/pipe';
 import fpFilter from 'lodash/fp/filter';
-import concat from 'lodash/concat';
 import isEmpty from 'lodash/isEmpty';
 import split from 'lodash/split';
 import first from 'lodash/first';
