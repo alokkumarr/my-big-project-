@@ -9,14 +9,15 @@ import org.json4s.native.JsonMethods._
 import play.libs.Json
 import play.mvc.{Http, Result, Results}
 
-import model.QueryBuilder
-import model.QueryException
 import sncr.metadata.analysis.AnalysisNode
 import sncr.metadata.analysis.AnalysisResult
 import sncr.metadata.engine.MDNodeUtil
 import sncr.metadata.engine.ProcessingResult._
 import sncr.analysis.execution.ExecutorRunner
 import sncr.analysis.execution.ProcessExecutionResult
+
+import model.QueryBuilder
+import model.QueryException
 
 class ANA extends BaseServiceProvider {
   implicit val formats = new DefaultFormats {
