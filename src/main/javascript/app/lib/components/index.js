@@ -10,6 +10,7 @@ import {
 } from './jsPlumb';
 import {PanelComponent} from './panel';
 import {SearchBoxComponent} from './search-box/search-box.component';
+import {CollapserComponent} from './collapser/collapser.component';
 import {RangeSliderComponent} from './range-slider/range-slider.component';
 import {mdButtonGroupComponent} from './md-button-group/md-button-group.component';
 import {ChoiceGroupComponent} from './choice-group';
@@ -24,6 +25,7 @@ angular
   .component('accordionMenu', AccordionMenu)
   .component('accordionMenuLink', AccordionMenuLink)
   .component('badge', BadgeComponent)
+  .component('collapser', CollapserComponent)
   .component('jsPlumbCanvas', JSPlumbCanvas)
   .component('jsPlumbTable', JSPlumbTable)
   .component('jsPlumbConnector', JSPlumbConnector)

@@ -1,0 +1,12 @@
+<div ng-class="{'collapser-collapsed': $ctrl.isCollapsed}">
+  <div class="collapser-title"
+      layout="row">
+    <h3 ng-bind="::$ctrl.title" flex="grow"></h3>
+    <md-icon md-font-icon="icon-expand"
+            ng-click="$ctrl.toggleCollapse()">
+    </md-icon>
+  </div>
+  <div class="collapser-content">
+    <ng-transclude></ng-transclude>
+  </div>
+</div>

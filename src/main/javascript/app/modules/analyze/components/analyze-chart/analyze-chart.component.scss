@@ -20,32 +20,6 @@ analyze-chart {
     width: 100%;
   }
 
-  .axis-options {
-    border: 1px solid #EEE;
-    border-radius: 5px;
-    min-height: 50px;
-    max-height: 245px;
-    overflow-y: scroll;
-    overflow-x: hidden;
-
-    .axis-option-checkboxes {
-      padding: 40px 10px 5px;
-    }
-
-    h3 {
-      box-sizing: border-box;
-      font-size: 16px;
-      position: fixed;
-      width: 85%;
-      background: white;
-      border-bottom: 1px solid #EEE;
-      padding: 5px 10px;
-      margin: 0 0 10px;
-      z-index: 1;
-      font-weight: 600;
-    }
-  }
-
   .chart-options-toolbar::after {
     border-width: 0;
   }
