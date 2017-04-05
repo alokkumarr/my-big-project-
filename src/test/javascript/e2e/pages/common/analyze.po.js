@@ -7,10 +7,13 @@ module.exports = {
     cardTitle: element(by.binding('::$ctrl.model.name')),
     firstMetric: element(by.xpath('//span[. = "Metric a 1"]/../..')),
     secondMetric: element(by.xpath('//span[. = "Metric b 2"]/../..')),
-    reportTable: element(by.xpath('//p[. = "Report"]/..')),
-    pivotTable: element(by.xpath('//p[. = "Pivot"]/..')),
+    reportType: element(by.xpath('//p[. = "Report"]/..')),
+    pivotType: element(by.xpath('//p[. = "Pivot"]/..')),
+    columnType: element(by.xpath('//p[. = "Column Chart"]/..')),
+    lineType: element(by.xpath('//p[. = "Line Chart"]/..')),
     createAnalysisBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]')),
-    designerDialog: element(by.css('.ard_canvas')),
+    designerView: element(by.css('.ard_canvas')),
+    columnChartsView: element(by.css('.highcharts-container ')),
     saveReportBtn: element(by.xpath('//button[. = "Save"]')),
     reportCategory: element(by.model('::$ctrl.model.category')),
     reportNameField: element(by.model('$ctrl.model.name')),
@@ -44,8 +47,12 @@ module.exports = {
     expect(this.analysisElems.newAnalyzeDialog.isDisplayed()).toBeTruthy();
   },
 
-  validateDesignerDialog() {
-    expect(this.analysisElems.designerDialog.isDisplayed()).toBeTruthy();
+  validateDesignerView() {
+    expect(this.analysisElems.designerView.isDisplayed()).toBeTruthy();
+  },
+
+  validateColumnChartsView() {
+    expect(this.analysisElems.columnChartsView.isDisplayed()).toBeTruthy();
   },
 
   validateReportGrid() {
