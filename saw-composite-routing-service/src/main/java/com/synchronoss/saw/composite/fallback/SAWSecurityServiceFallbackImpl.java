@@ -1,6 +1,9 @@
 package com.synchronoss.saw.composite.fallback;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 
 import com.synchronoss.saw.composite.api.SAWSecurityServiceInterface;
 import com.synchronoss.saw.composite.exceptions.SecurityModuleSAWException;
@@ -11,41 +14,18 @@ import com.synchronoss.saw.composite.model.LoginResponse;
 import com.synchronoss.saw.composite.model.ResetPwdDtls;
 import com.synchronoss.saw.composite.model.Valid;
 
-public class SAWSecurityServiceFallbackImpl implements SAWSecurityServiceInterface{
+public class SAWSecurityServiceFallbackImpl {
 
-	@Override
-	public ResponseEntity<LoginResponse> login(LoginDetails loginDetails)
-			throws SecurityModuleSAWException, TokenMissingSAWException {
+	private static final Logger LOG = LoggerFactory.getLogger(SAWSecurityServiceFallbackImpl.class);
+
+	
+	public LoginResponse login(LoginDetails loginDetails) throws HttpClientErrorException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
-	public ResponseEntity<String> logout(String ticketID) throws SecurityModuleSAWException, TokenMissingSAWException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
-	@Override
-	public ResponseEntity<Valid> change(ChangePasswordDetails changePasswordDetails)
-			throws SecurityModuleSAWException, TokenMissingSAWException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseEntity<Valid> reset(ResetPwdDtls resetPwdDtls)
-			throws SecurityModuleSAWException, TokenMissingSAWException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseEntity<Valid> validate(LoginDetails loginDetails)
-			throws SecurityModuleSAWException, TokenMissingSAWException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 
 }
