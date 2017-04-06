@@ -1,11 +1,10 @@
 
 package com.synchronoss.saw.composite.model;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -15,86 +14,125 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonRootName;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "actions",
-    "alerts",
-    "analyze",
+    "action",
     "keys",
-    "observe"
+    "observe",
+    "analyze",
+    "alert",
+        
 })
-@Component
-public class Contents {
+@JsonRootName(value = "contents")
+public class Contents implements Serializable {
 
     /**
-     * The Actions schema.
+	 * 
+	 */
+	private static final long serialVersionUID = 499876471490845497L;
+	@JsonProperty("action")
+    private Contents.Action action;
+    /**
+     * Empty array schema.
      * <p>
-     * An explanation about the purpose of this instance.
+     * Allows ANY array but describes nothing.
      * 
      */
-    @JsonProperty("actions")
-    @JsonPropertyDescription("An explanation about the purpose of this instance.")
-    private Contents.Actions actions = Contents.Actions.fromValue("create");
-    @JsonProperty("alerts")
-    private List<Object> alerts = null;
+    @JsonProperty("alert")
+    @JsonPropertyDescription("Allows ANY array but describes nothing.")
+    private List<Object> alert = null;
+    /**
+     * Empty array schema.
+     * <p>
+     * Allows ANY array but describes nothing.
+     * 
+     */
     @JsonProperty("analyze")
+    @JsonPropertyDescription("Allows ANY array but describes nothing.")
     private List<Object> analyze = null;
+    /**
+     * Empty object schema.
+     * <p>
+     * Allows ANY object but describes nothing.
+     * 
+     */
     @JsonProperty("keys")
+    @JsonPropertyDescription("Allows ANY object but describes nothing.")
     private Keys keys;
+    /**
+     * Empty array schema.
+     * <p>
+     * Allows ANY array but describes nothing.
+     * 
+     */
     @JsonProperty("observe")
+    @JsonPropertyDescription("Allows ANY array but describes nothing.")
     private List<Object> observe = null;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    /**
-     * The Actions schema.
-     * <p>
-     * An explanation about the purpose of this instance.
-     * 
-     */
-    @JsonProperty("actions")
-    public Contents.Actions getActions() {
-        return actions;
+    @JsonProperty("action")
+    public Contents.Action getAction() {
+        return action;
     }
 
-    /**
-     * The Actions schema.
-     * <p>
-     * An explanation about the purpose of this instance.
-     * 
-     */
-    @JsonProperty("actions")
-    public void setActions(Contents.Actions actions) {
-        this.actions = actions;
+    @JsonProperty("action")
+    public void setAction(Contents.Action action) {
+        this.action = action;
     }
 
-    public Contents withActions(Contents.Actions actions) {
-        this.actions = actions;
+    public Contents withAction(Contents.Action action) {
+        this.action = action;
         return this;
     }
 
-    @JsonProperty("alerts")
-    public List<Object> getAlerts() {
-        return alerts;
+    /**
+     * Empty array schema.
+     * <p>
+     * Allows ANY array but describes nothing.
+     * 
+     */
+    @JsonProperty("alert")
+    public List<Object> getAlert() {
+        return alert;
     }
 
-    @JsonProperty("alerts")
-    public void setAlerts(List<Object> alerts) {
-        this.alerts = alerts;
+    /**
+     * Empty array schema.
+     * <p>
+     * Allows ANY array but describes nothing.
+     * 
+     */
+    @JsonProperty("alert")
+    public void setAlert(List<Object> alert) {
+        this.alert = alert;
     }
 
-    public Contents withAlerts(List<Object> alerts) {
-        this.alerts = alerts;
+    public Contents withAlert(List<Object> alert) {
+        this.alert = alert;
         return this;
     }
 
+    /**
+     * Empty array schema.
+     * <p>
+     * Allows ANY array but describes nothing.
+     * 
+     */
     @JsonProperty("analyze")
     public List<Object> getAnalyze() {
         return analyze;
     }
 
+    /**
+     * Empty array schema.
+     * <p>
+     * Allows ANY array but describes nothing.
+     * 
+     */
     @JsonProperty("analyze")
     public void setAnalyze(List<Object> analyze) {
         this.analyze = analyze;
@@ -105,11 +143,23 @@ public class Contents {
         return this;
     }
 
+    /**
+     * Empty object schema.
+     * <p>
+     * Allows ANY object but describes nothing.
+     * 
+     */
     @JsonProperty("keys")
     public Keys getKeys() {
         return keys;
     }
 
+    /**
+     * Empty object schema.
+     * <p>
+     * Allows ANY object but describes nothing.
+     * 
+     */
     @JsonProperty("keys")
     public void setKeys(Keys keys) {
         this.keys = keys;
@@ -120,11 +170,23 @@ public class Contents {
         return this;
     }
 
+    /**
+     * Empty array schema.
+     * <p>
+     * Allows ANY array but describes nothing.
+     * 
+     */
     @JsonProperty("observe")
     public List<Object> getObserve() {
         return observe;
     }
 
+    /**
+     * Empty array schema.
+     * <p>
+     * Allows ANY array but describes nothing.
+     * 
+     */
     @JsonProperty("observe")
     public void setObserve(List<Object> observe) {
         this.observe = observe;
@@ -144,30 +206,30 @@ public class Contents {
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
-    
-    
 
     public Contents withAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
         return this;
     }
+    
 
-    public enum Actions {
 
-        DELETE("delete"),
+	public enum Action {
+
         CREATE("create"),
         UPDATE("update"),
-        SEARCH("search");
+        READ("read"),
+        DELETE("delete");
         private final String value;
-        private final static Map<String, Contents.Actions> CONSTANTS = new HashMap<String, Contents.Actions>();
+        private final static Map<String, Contents.Action> CONSTANTS = new HashMap<String, Contents.Action>();
 
         static {
-            for (Contents.Actions c: values()) {
+            for (Contents.Action c: values()) {
                 CONSTANTS.put(c.value, c);
             }
         }
 
-        private Actions(String value) {
+        private Action(String value) {
             this.value = value;
         }
 
@@ -182,8 +244,8 @@ public class Contents {
         }
 
         @JsonCreator
-        public static Contents.Actions fromValue(String value) {
-            Contents.Actions constant = CONSTANTS.get(value);
+        public static Contents.Action fromValue(String value) {
+            Contents.Action constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {

@@ -1,6 +1,5 @@
 server:
-  context-path: /monitor
-  port: 4000
+  port: 8010
 
 management:
      security:

@@ -3,7 +3,6 @@ package com.synchronoss.saw.composite.exceptions;
 import java.io.FileNotFoundException;
 import java.util.Optional;
 
-import org.springframework.dao.DataAccessException;
 import org.springframework.hateoas.VndErrors;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -15,6 +14,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 /**
  * This class refers to global exception<br/>
  * handler for composite or mediation layer<br/>
+ * If any piece of code throws the below any of the exception<br>
+ * will return HATEOS complaint objects<br>
  * 
  * @author saurav.paul
  *
@@ -31,11 +32,22 @@ public class CompositeSAWControllerAdvice {
 	}
 	
 	@ResponseStatus(value = HttpStatus.BAD_GATEWAY)
-	@ExceptionHandler({DataAccessException.class, SecurityModuleSAWException.class, Exception.class})
+	@ExceptionHandler({SecurityModuleSAWException.class})
 	public VndErrors  globalException(Exception ex) {
 		return this.error(ex, ex.getLocalizedMessage());
 	}
+	
+	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+	@ExceptionHandler({ AnalyzeModuleSAWException.class, CommonModuleSAWException.class, CategoriesSAWException.class,
+		TokenMissingSAWException.class, TokenValidationSAWException.class,IllegalStateException.class,
+		Exception.class})
+	public VndErrors  badRequestException(Exception ex) {
+		return this.error(ex, ex.getLocalizedMessage());
+	}
 
+
+	
+	
 	private <E extends Exception> VndErrors error(E e, String logref) {
 		String msg = Optional.of(e.getMessage()).orElse(e.getClass().getSimpleName());
 		return new VndErrors(logref, msg);

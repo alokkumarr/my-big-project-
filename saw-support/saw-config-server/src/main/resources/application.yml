@@ -1,4 +1,8 @@
+
 spring:
+  application:
+    name: config-server
+
   cloud:
     config:
       server:
@@ -17,3 +21,11 @@ security:
   user:
     name: user
     password: password
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    
