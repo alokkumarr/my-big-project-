@@ -57,6 +57,9 @@
 
     &:not([disabled]).md-focused {
       background-color: inherit;
+      &:hover {
+        background-color: $btn-secondary-bg-hover-color;
+      }
     }
 
     &.btn-tertiary {
