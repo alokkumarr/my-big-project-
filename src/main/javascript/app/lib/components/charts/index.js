@@ -1,5 +1,6 @@
 import angular from 'angular';
 import Highstock from 'highcharts/highstock';
+import Highcharts from 'highcharts/highcharts';
 
 import {chartComponent} from './chart.component';
 import {businessTransactionVolumeService} from './business-transaction-volume.service';
@@ -9,6 +10,7 @@ export const ChartsModule = 'components.charts';
 
 angular.module(ChartsModule, [])
         .constant('Highstock', Highstock)
+        .constant('Highcharts', Highcharts)
         .factory('businessTransactionVolumeService', businessTransactionVolumeService)
         .component('chart', chartComponent)
         .component('businessTransactionVolumeChart', businessTransactionVolumeChart);
