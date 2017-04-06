@@ -55,6 +55,10 @@
       }
     }
 
+    &:not([disabled]).md-focused {
+      background-color: inherit;
+    }
+
     &.btn-tertiary {
       color: $btn-tertiary-text-color;
       border-radius: 0;
