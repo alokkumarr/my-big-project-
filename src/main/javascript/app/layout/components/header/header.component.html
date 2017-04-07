@@ -8,12 +8,12 @@
       </div>
 
       <div layout="row" class="lh-links">
-        <span class="link" aria-label="Observe"
+        <span ng-hide="$ctrl.hideObserve" class="link" aria-label="Observe"
               ui-sref="observe"
               ui-sref-active="m-active"
               translate="OBSERVE">
         </span>
-        <span class="link" aria-label="Analyze"
+        <span ng-hide="$ctrl.hideAnalyze" class="link" aria-label="Analyze"
               ui-sref="analyze"
               ui-sref-active="m-active"
               translate="ANALYZE">
