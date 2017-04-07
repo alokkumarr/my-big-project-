@@ -88,7 +88,9 @@ export const AnalyzeNewComponent = {
           break;
         case 'chart:column':
         case 'chart:line':
-        case 'chart:stacked':
+        case 'chart:stack':
+        case 'chart:pie':
+        case 'chart:donut':
           type = this.selectedAnalysisMethod.split(':')[1];
           tpl = '<analyze-chart model="model"></analyze-chart>';
           model = {
