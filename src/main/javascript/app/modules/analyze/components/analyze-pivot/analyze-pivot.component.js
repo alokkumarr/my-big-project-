@@ -15,6 +15,8 @@ import isEmpty from 'lodash/isEmpty';
 import template from './analyze-pivot.component.html';
 import style from './analyze-pivot.component.scss';
 
+import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter-sidenav/analyze-filter-sidenav.component';
+
 export const AnalyzePivotComponent = {
   template,
   styles: [style],
@@ -134,7 +136,7 @@ export const AnalyzePivotComponent = {
       if (!this.filters.possible) {
         this.filters.possible = this.getFieldToFilterMapper()(this.fields);
       }
-      this._FilterService.openFilterSidenav(this.filters.possible);
+      this._FilterService.openFilterSidenav(this.filters.possible, ANALYZE_FILTER_SIDENAV_IDS.designer);
     }
     onApplyFilters(filters) {
       this.filters.possible = filters;

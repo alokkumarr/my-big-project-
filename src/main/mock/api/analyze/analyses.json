@@ -2077,6 +2077,15 @@
         "sql_builder": {
           "group_by_columns": [],
           "order_by_columns": [],
+          "filters":[{
+            "column_name": "AFFILIATE_DISPLAY_NAME",
+            "label": "Affiliate Display Name",
+            "table_name": "Orders",
+            "boolean_criteria": "AND",
+            "filter_type": "string",
+            "operator": null,
+            "search_conditions": ["DIRECTV"]
+          }],
           "joins": [
             {
               "type": "inner",

@@ -4,6 +4,8 @@ import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
 import {BehaviorSubject} from 'rxjs';
 
+import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter-sidenav/analyze-filter-sidenav.component';
+
 const LEGEND_POSITIONING = {
   left: {
     name: 'left',
@@ -309,7 +311,7 @@ export const AnalyzeChartComponent = {
 
     // filters section
     openFilterSidenav() {
-      this._FilterService.openFilterSidenav(this.filters.possible);
+      this._FilterService.openFilterSidenav(this.filters.possible, ANALYZE_FILTER_SIDENAV_IDS.designer);
     }
 
     openDescriptionModal(ev) {

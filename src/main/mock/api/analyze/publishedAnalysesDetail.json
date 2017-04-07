@@ -64,7 +64,15 @@
     ],
     "scheduled": "Daily",
     "report": {
-      "filters": [],
+      "filters": [{
+        "column_name": "AFFILIATE_DISPLAY_NAME",
+        "label": "Affiliate Display Name",
+        "table_name": "Orders",
+        "boolean_criteria": "AND",
+        "filter_type": "string",
+        "operator": null,
+        "search_conditions": ["DIRECTV"]
+      }],
       "groupByColumns": ["PRODUCT_TYPES"],
       "orderByColumns": ["PRODUCT_DISPLAY_NAME"],
       "columns": [
