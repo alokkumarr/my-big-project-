@@ -72,21 +72,24 @@ export const AnalyzeChartComponent = {
     }
 
     initChart() {
-      if (isEmpty(this.mode) || isEmpty(this.model.chart)) {
-        this.getArtifacts();
-        return;
-      }
+      this._AnalyzeService.getArtifacts().then(artifacts => {
+        if (isEmpty(this.mode) || isEmpty(this.model.chart)) {
+          this.fillSettings(artifacts);
+          return;
+        }
 
-      const chart = this.model.chart;
-      this.labels.tempX = this.labels.x = chart.xAxis.label;
-      this.labels.tempY = this.labels.y = chart.yAxis.label;
-      this.settings = {
-        yaxis: chart.yAxis.artifacts,
-        xaxis: chart.xAxis.artifacts,
-        groupBy: chart.groupBy.artifacts
-      };
-      this.filters.selected = chart.filters || [];
-      this.onSettingsChanged(this.settings);
+        this.settings = {
+          yaxis: chart.yAxis.artifacts,
+          xaxis: chart.xAxis.artifacts,
+          groupBy: chart.groupBy.artifacts
+        };
+
+        const chart = this.model.chart;
+        this.labels.tempX = this.labels.x = get(chart, 'xAxis.title', null);
+        this.labels.tempY = this.labels.y = get(chart, 'yAxis.title', null);
+        this.filters.selected = map(chart.filters, beFilter => this._FilterService.getBackEnd2FrontEndFilterMapper()(beFilter));
+        this.onSettingsChanged(this.settings);
+      });
     }
 
     updateLegendPosition() {
@@ -115,13 +118,6 @@ export const AnalyzeChartComponent = {
       this.reloadChart(this.settings, this.filteredGridData);
     }
 
-    getArtifacts() {
-      this._AnalyzeService.getArtifacts()
-        .then(data => {
-          this.fillSettings(data);
-        });
-    }
-
     getDataByQuery() {
       return this._AnalyzeService.getDataByQuery()
         .then(data => {
@@ -137,10 +133,13 @@ export const AnalyzeChartComponent = {
           return attr;
         }));
       }, []);
+      const yaxis = filter(attributes, attr => attr.type === 'int' || attr.type === 'Int');
+      const xaxis = filter(attributes, attr => attr.type === 'string' || attr.type === 'String');
+      const groupBy = map(xaxis, clone);
       this.settings = {
-        yaxis: filter(attributes, attr => attr['y-axis']),
-        xaxis: filter(attributes, attr => attr['x-axis']),
-        groupBy: map(filter(attributes, attr => attr['x-axis']), clone)
+        yaxis,
+        xaxis,
+        groupBy
       };
       this.reloadChart(this.settings, this.filteredGridData);
     }
@@ -232,7 +231,7 @@ export const AnalyzeChartComponent = {
 
     generatePayload() {
       const result = {
-        filters: this.filters.selected,
+        filters: map(this.filters.selected, feFilter => this._FilterService.getFrontEnd2BackEndFilterMapper()(feFilter)),
         xAxis: {
           label: this.labels.x,
           artifacts: this.settings.xaxis
