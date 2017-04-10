@@ -1,6 +1,7 @@
-<div layout="row" ng-class="{'published-detail-page-filter-sidenav' : $ctrl.placement === $ctrl.ANALYZE_FILTER_SIDENAV_IDS.detailPage}">
+<div layout="row">
   <md-sidenav class="md-sidenav-right"
               md-component-id="$ctrl.id"
+              md-disable-backdrop="$ctrl.placement === $ctrl.ANALYZE_FILTER_SIDENAV_IDS.detailPage"
               md-whiteframe="4"
               eval-attr-as-expr="mdComponentId">
     <md-toolbar>

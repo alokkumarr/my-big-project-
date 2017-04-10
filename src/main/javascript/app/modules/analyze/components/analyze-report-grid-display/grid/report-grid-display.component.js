@@ -11,9 +11,11 @@ export const ReportGridDisplayComponent = {
     columns: '<'
   },
   controller: class ReportGridDisplayController {
-    constructor(dxDataGridService) {
+    constructor(dxDataGridService, FilterService) {
       'ngInject';
       this._dxDataGridService = dxDataGridService;
+      this._FilterService = FilterService;
+      this._gridInstance = null;
     }
 
     $onInit() {
@@ -28,8 +30,20 @@ export const ReportGridDisplayComponent = {
 
       this.gridConfig = this._dxDataGridService.mergeWithDefaultConfig({
         columns,
-        dataSource: this.data
+        dataSource: this.data,
+        onInitialized: this.onGridInitialized.bind(this)
       });
+    }
+
+    $onChanges() {
+      if (this._gridInstance) {
+        this._gridInstance.option('dataSource', this.data);
+        this._gridInstance.refresh();
+      }
+    }
+
+    onGridInitialized(e) {
+      this._gridInstance = e.component;
     }
   }
 };

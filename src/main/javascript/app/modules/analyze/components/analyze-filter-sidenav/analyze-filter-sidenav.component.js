@@ -5,7 +5,6 @@ import set from 'lodash/fp/set';
 import pipe from 'lodash/fp/pipe';
 
 import template from './analyze-filter-sidenav.component.html';
-import style from './analyze-filter-sidenav.component.scss';
 
 export const ANALYZE_FILTER_SIDENAV_ID = 'analyze-observe-filter-sidenav';
 export const ANALYZE_FILTER_SIDENAV_IDS = {
@@ -15,7 +14,6 @@ export const ANALYZE_FILTER_SIDENAV_IDS = {
 
 export const AnalyzeFilterSidenavComponent = {
   template,
-  styles: [style],
   bindings: {
     placement: '@'
   },

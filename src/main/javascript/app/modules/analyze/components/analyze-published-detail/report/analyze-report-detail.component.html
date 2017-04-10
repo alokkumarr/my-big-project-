@@ -13,9 +13,10 @@
   </md-card-title>
 
   <div layout="column" layout-align="space-between center">
-      <report-grid-display-container data="$ctrl.analysis.report.data"
+      <report-grid-display-container data="$ctrl.filteredGridData"
                            columns="$ctrl.analysis.report.columns"
-                           groups="$ctrl.analysis.report.groupByColumns">
+                           groups="$ctrl.analysis.report.groupByColumns"
+                           updater="$ctrl.updater">
       </report-grid-display-container>
   </div>
 </md-card>
