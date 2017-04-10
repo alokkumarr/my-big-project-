@@ -25,6 +25,11 @@
         "type": "chart:column"
       },
       {
+        "label": "Stacked Chart",
+        "icon": "icon-vert-bar-chart",
+        "type": "chart:stack"
+      },
+      {
         "label": "Line Chart",
         "icon": "icon-vert-bar-chart",
         "type": "chart:line"

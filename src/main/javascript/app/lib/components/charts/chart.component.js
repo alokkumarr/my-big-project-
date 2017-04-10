@@ -14,9 +14,9 @@ export const chartComponent = {
   },
   template: '<div></div>',
   controller: class HighChartController {
-    constructor(Highstock, $element) {
+    constructor(Highcharts, $element) {
       'ngInject';
-      this.Highcharts = Highstock;
+      this.Highcharts = Highcharts;
       this.$element = $element;
       this.chart = null;
     }

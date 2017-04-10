@@ -1,50 +1,9 @@
-import {get, isEmpty, map, keys, values, clone, reduce, filter, uniq} from 'lodash';
+import {get, isEmpty, map, values, clone, filter} from 'lodash';
+import {BehaviorSubject} from 'rxjs';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
-import {BehaviorSubject} from 'rxjs';
-
 import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter-sidenav/analyze-filter-sidenav.component';
-
-const LEGEND_POSITIONING = {
-  left: {
-    name: 'left',
-    displayName: 'Left',
-    align: 'left',
-    verticalAlign: 'middle'
-  },
-  right: {
-    name: 'right',
-    displayName: 'Right',
-    align: 'right',
-    verticalAlign: 'middle'
-  },
-  top: {
-    name: 'top',
-    displayName: 'Top',
-    align: 'center',
-    verticalAlign: 'top'
-  },
-  bottom: {
-    name: 'bottom',
-    displayName: 'Bottom',
-    align: 'center',
-    verticalAlign: 'bottom'
-  }
-};
-
-const LAYOUT_POSITIONS = {
-  horizontal: {
-    name: 'horizontal',
-    displayName: 'Horizontal',
-    layout: 'horizontal'
-  },
-  vertical: {
-    name: 'vertical',
-    displayName: 'Vertical',
-    layout: 'vertical'
-  }
-};
 
 export const AnalyzeChartComponent = {
   template,
@@ -54,11 +13,12 @@ export const AnalyzeChartComponent = {
     mode: '@?'
   },
   controller: class AnalyzeChartController {
-    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, FilterService, $mdSidenav) {
+    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, ChartService, FilterService, $mdSidenav, $window) {
       'ngInject';
 
       this._FilterService = FilterService;
       this._AnalyzeService = AnalyzeService;
+      this._ChartService = ChartService;
       this._$mdSidenav = $mdSidenav;
       this._$mdDialog = $mdDialog;
 
@@ -66,8 +26,8 @@ export const AnalyzeChartComponent = {
         align: get(this.model, 'chart.legend.align', 'right'),
         layout: get(this.model, 'chart.legend.layout', 'vertical'),
         options: {
-          align: values(LEGEND_POSITIONING),
-          layout: values(LAYOUT_POSITIONS)
+          align: values(this._ChartService.LEGEND_POSITIONING),
+          layout: values(this._ChartService.LAYOUT_POSITIONS)
         }
       };
 
@@ -86,41 +46,8 @@ export const AnalyzeChartComponent = {
         possible: []
       };
 
-      this.barChartOptions = this.getDefaultChartConfig();
-    }
-
-    getDefaultChartConfig() {
-      const legendPosition = LEGEND_POSITIONING[this.legend.align];
-      const legendLayout = LAYOUT_POSITIONS[this.legend.layout];
-
-      const SPACING = 45;
-
-      return {
-        chart: {
-          type: this.model.chartType || 'column',
-          spacingLeft: SPACING,
-          spacingRight: SPACING,
-          spacingBottom: SPACING,
-          spacingTop: SPACING,
-          reflow: true
-        },
-        legend: {
-          align: legendPosition.align,
-          verticalAlign: legendPosition.verticalAlign,
-          layout: legendLayout.layout
-        },
-        series: [{
-          name: 'Series 1',
-          data: [0, 0, 0, 0, 0]
-        }],
-        yAxis: {
-          title: {x: -15}
-        },
-        xAxis: {
-          categories: ['A', 'B', 'C', 'D', 'E'],
-          title: {y: 15}
-        }
-      };
+      this.barChartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
+      $window.chartctrl = this;
     }
 
     toggleLeft() {
@@ -164,8 +91,8 @@ export const AnalyzeChartComponent = {
     }
 
     updateLegendPosition() {
-      const align = LEGEND_POSITIONING[this.legend.align];
-      const layout = LAYOUT_POSITIONS[this.legend.layout];
+      const align = this._ChartService.LEGEND_POSITIONING[this.legend.align];
+      const layout = this._ChartService.LAYOUT_POSITIONS[this.legend.layout];
 
       this.updateChart.next([
         {
@@ -250,63 +177,15 @@ export const AnalyzeChartComponent = {
       return this._FilterService.getChartSetttingsToFiltersMapper(this.gridData)(selectedFields);
     }
 
-    hasNoData(categories) {
-      return (angular.isArray(categories) &&
-              categories[0] === 'undefined');
-    }
-
     reloadChart(settings, filteredGridData) {
-      const xaxis = filter(this.settings.xaxis, attr => attr.checked)[0] || {};
-      const yaxis = filter(this.settings.yaxis, attr => attr.checked)[0] || {};
-      const group = filter(this.settings.groupBy, attr => attr.checked)[0] || {};
+      const changes = this._ChartService.dataToChangeConfig(
+        this.model.chartType,
+        settings,
+        filteredGridData,
+        {labels: this.labels}
+      );
 
-      const {xCategories, ySeries} = this.gridToChart(xaxis, yaxis, group, filteredGridData);
-
-      this.updateChart.next([
-        {
-          path: 'xAxis.title.text',
-          data: this.labels.x || xaxis.display_name
-        },
-        {
-          path: 'xAxis.categories',
-          data: this.hasNoData(xCategories) ? ['X-Axis'] : xCategories
-        },
-        {
-          path: 'yAxis.title.text',
-          data: this.labels.y || yaxis.display_name
-        },
-        {
-          path: 'series',
-          data: ySeries
-        }
-      ]);
-    }
-
-    gridToChart(x, y, g, grid) {
-      const defaultSeriesName = 'Series 1';
-      const categories = uniq(grid.map(row => row[x.column_name]));
-
-      const defaultSeries = () => reduce(categories, (obj, c) => {
-        obj[c] = 0;
-        return obj;
-      }, {});
-
-      const res = reduce(grid, (obj, row) => {
-        const category = row[x.column_name];
-        const series = row[g.column_name] || defaultSeriesName;
-        obj[series] = obj[series] || defaultSeries();
-        obj[series][category] += row[y.column_name];
-        return obj;
-      }, {});
-
-      const xCategories = keys(defaultSeries());
-      return {
-        xCategories,
-        ySeries: keys(res).map(k => ({
-          name: k,
-          data: xCategories.map(c => res[k][c])
-        }))
-      };
+      this.updateChart.next(changes);
     }
 
     // filters section

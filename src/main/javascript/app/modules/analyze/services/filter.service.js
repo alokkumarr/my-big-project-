@@ -47,6 +47,7 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
     getFilterEvaluator,
     getEvaluatedFilterReducer,
     getSelectedFilterMapper,
+    isFilterModelNonEmpty,
     getCanvasFieldsToFiltersMapper,
     getChartSetttingsToFiltersMapper,
     getGridDataFilter,
@@ -207,23 +208,25 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
   }
 
   function getSelectedFilterMapper() {
-    return filter(filter => {
-      if (!filter.model) {
-        return false;
-      }
+    return filter(filter => isFilterModelNonEmpty(filter.model));
+  }
 
-      // can be an empty array if the filter was a string filter
-      // and the checkboxes were unchecked
-      if (isEmpty(filter.model)) {
-        return false;
-      }
+  function isFilterModelNonEmpty(model) {
+    if (!model) {
+      return false;
+    }
 
-      // can be an object with null values
-      if (isEmpty(compact(values(filter.model)))) {
-        return false;
-      }
-      return true;
-    });
+    // can be an empty array if the filter was a string filter
+    // and the checkboxes were unchecked
+    if (isEmpty(model)) {
+      return false;
+    }
+
+    // can be an object with null values
+    if (isEmpty(compact(values(model)))) {
+      return false;
+    }
+    return true;
   }
 
   function getGridDataFilter(filters) {
