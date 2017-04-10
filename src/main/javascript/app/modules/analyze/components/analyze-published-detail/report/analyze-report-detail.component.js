@@ -2,7 +2,6 @@ import isEmpty from 'lodash/isEmpty';
 import map from 'lodash/map';
 import uniq from 'lodash/uniq';
 import forEach from 'lodash/forEach';
-import {BehaviorSubject} from 'rxjs';
 
 import template from './analyze-report-detail.component.html';
 
@@ -17,7 +16,6 @@ export const AnalyzeReportDetailComponent = {
     constructor(FilterService) {
       this._FilterService = FilterService;
       this._isEmpty = isEmpty;
-      this.updater = new BehaviorSubject({});
     }
 
     $onInit() {
