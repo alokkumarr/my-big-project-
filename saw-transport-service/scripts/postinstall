@@ -18,7 +18,7 @@ service_env=${app_home}/conf/service.env
 {
     echo "SAW_HOME=/opt/saw"
     echo "SAW_SERVICE_HOME=/opt/saw/service"
-    echo "SAW_SERVICE_PORT=9100"
+    echo "SAW_SERVICE_PORT=9200"
     echo "declare -r SAW_SERVICE_USER=mapr"
     echo "declare -r SAW_SERVICE_CURRENT_HOME=${app_home}"
 } >$service_env
