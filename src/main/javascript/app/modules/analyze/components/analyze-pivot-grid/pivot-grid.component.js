@@ -79,6 +79,7 @@ export const PivotGridComponent = {
 
       pivotGridDataSource.field(field.dataField, field.modifierObj);
       pivotGridDataSource.load();
+      console.log('fields: ', pivotGridDataSource.fields());
     }
 
     updateFilters(filters) {

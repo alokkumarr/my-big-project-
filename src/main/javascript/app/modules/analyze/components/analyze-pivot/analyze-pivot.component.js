@@ -7,8 +7,6 @@ import fpMap from 'lodash/fp/map';
 import fpPipe from 'lodash/fp/pipe';
 import fpFilter from 'lodash/fp/filter';
 import isEmpty from 'lodash/isEmpty';
-import split from 'lodash/split';
-import first from 'lodash/first';
 import find from 'lodash/find';
 import fpPick from 'lodash/fp/pick';
 import {BehaviorSubject} from 'rxjs';
@@ -39,7 +37,6 @@ export const AnalyzePivotComponent = {
       this.sorts = [];
       this.filters = [];
       this.sortFields = null;
-      this._gridInstance = null;
       this.pivotGridUpdater = new BehaviorSubject({});
     }
 
@@ -54,24 +51,24 @@ export const AnalyzePivotComponent = {
       this._AnalyzeService.getPivotData().then(data => {
         this.normalizedData = data;
         this.deNormalizedData = this._PivotService.denormalizeData(data);
-        this.fields = this.getFields();
+        this.fields = this._PivotService.getFieldsFromData(this.deNormalizedData);
         this.sortFields = this.getFieldToSortFieldMapper()(this.fields);
 
         if (isEmpty(this.model.settings)) {
           // new analysis
           this.settings = this.getSettingsFromFields(this.fields);
-          this.filters = this.getFieldToFilterMapper()(this.fields);
+          this.filters = this._PivotService.getFieldToFilterMapper(this.normalizedData)(this.fields);
           this.sorts = [];
         } else {
           // editing existing analysis
           this.settings = this.model.settings;
-          this.putSettingsDataInFields(this.settings, this.fields);
-          this.filters = this.getFieldToFilterMapper()(this.fields);
+          this._PivotService.putSettingsDataInFields(this.settings, this.fields);
           this.sorts = this.model.sorts ? this.mapBackend2FrontendSort(this.model.sorts, this.sortFields) : [];
+
+          this.filters = this._PivotService.getFieldToFilterMapper(this.normalizedData)(this.fields);
           if (this.model.filters) {
             const selectedFilters = map(this.model.filters, this._FilterService.getBackEnd2FrontEndFilterMapper());
-            // const selectedFilters = this._FilterService.getSelectedFilterMapper()(this.filters);
-            this.putSelectedFilterModelsIntoFilters(this.filters, selectedFilters);
+            this._PivotService.putSelectedFilterModelsIntoFilters(this.filters, selectedFilters);
           }
         }
 
@@ -89,25 +86,13 @@ export const AnalyzePivotComponent = {
     getSettingsFromFields(fields) {
       return fpPipe(
         fpMap(fpPick(['dataField', 'checked', 'summaryType', 'caption'])),
-        fpGroupBy(field => this.getArea(field.dataField))
+        fpGroupBy(field => this._PivotService.getArea(field.dataField))
       )(fields);
-    }
-
-    putSettingsDataInFields(settings, fields) {
-      forEach(fields, field => {
-        const area = this.getArea(field.dataField);
-        const targetField = find(settings[area], ({dataField}) => {
-          return dataField === field.dataField;
-        });
-        field.area = targetField.area;
-        field.summaryType = targetField.summaryType;
-        field.checked = targetField.checked;
-      });
     }
 
     applyFieldSettings(field) {
       const modifierObj = {};
-      const area = this.getArea(field.dataField);
+      const area = this._PivotService.getArea(field.dataField);
 
       switch (area) {
         case 'row':
@@ -163,7 +148,7 @@ export const AnalyzePivotComponent = {
 
     getFieldToSortFieldMapper() {
       return fpPipe(
-        fpFilter(field => this.getArea(field.dataField) === 'row'),
+        fpFilter(field => this._PivotService.getArea(field.dataField) === 'row'),
         fpMap(field => {
           return {
             type: field.dataType,
@@ -172,32 +157,6 @@ export const AnalyzePivotComponent = {
           };
         })
       );
-    }
-
-    getFieldToFilterMapper() {
-      return fpPipe(
-        fpFilter(field => this.getArea(field.dataField) === 'row'),
-        fpMap(field => {
-          return {
-            name: field.dataField,
-            type: field.dataType,
-            items: field.dataType === 'string' ?
-            this._PivotService.getUniquesFromNormalizedData(this.normalizedData, field.dataField) :
-            null,
-            label: field.caption,
-            model: null
-          };
-        })
-      );
-    }
-
-    putSelectedFilterModelsIntoFilters(filters, selectedFilters) {
-      forEach(filters, filter => {
-        const targetFilter = find(selectedFilters, ({name}) => name === filter.name);
-        if (targetFilter && this._FilterService.isFilterModelNonEmpty(targetFilter.model)) {
-          filter.model = targetFilter.model;
-        }
-      });
     }
 
     applySorts(sorts) {
@@ -316,62 +275,6 @@ export const AnalyzePivotComponent = {
           targetEvent: ev,
           clickOutsideToClose: true
         });
-    }
-
-    getFields() {
-      // const obj = deNormalizedData[0];
-      // const objKeys = keys(obj);
-      // const fields = map(objKeys, key => {
-      //   return {
-      //     caption: key,
-      //     dataField: key,
-      //     width: 120,
-      //     area: this.getArea(key),
-      //     format: key.includes('price') ? 'currency' : null
-      //   };
-      // });
-      return [{
-        caption: 'Affiliate Name',
-        width: 120,
-        dataType: 'string',
-        dataField: 'row_level_1'
-      }, {
-        caption: 'Product',
-        width: 120,
-        dataType: 'string',
-        dataField: 'row_level_2'
-      }, {
-        caption: 'Date Month',
-        dataField: 'column_level_1',
-        format: datum => {
-          const date = new Date(datum);
-          return `${date.getFullYear()}-${date.getMonth()}`;
-        },
-        width: 120
-      }, {
-        caption: 'Date Day',
-        dataField: 'column_level_2',
-        dataType: 'string',
-        format: datum => {
-          const date = new Date(datum);
-          return `${date.getDay()}`;
-        },
-        width: 120
-      }, {
-        caption: 'Total Price',
-        dataField: 'total_price',
-        dataType: 'double',
-        summaryType: 'sum',
-        format: 'currency'
-      }];
-    }
-
-    getArea(key) {
-      const area = first(split(key, '_'));
-      if (area !== 'row' && area !== 'column') {
-        return 'data';
-      }
-      return area;
     }
   }
 };

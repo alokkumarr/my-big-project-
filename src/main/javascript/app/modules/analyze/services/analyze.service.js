@@ -31,7 +31,7 @@ export function AnalyzeService($http, $timeout, $q) {
     getDataByQuery,
     getSupportedMethods,
     generateQuery,
-    getPivotData,
+    getNewPivotAnalysis,
     saveReport,
     setAvailableMetrics: curry(setAvailableItems)(metricMapper, metricHasSupportedMethod),
     setAvailableAnalysisMethods: curry(setAvailableItems)(analysisMethodMapper, isMethodSupported)
@@ -96,8 +96,8 @@ export function AnalyzeService($http, $timeout, $q) {
     return $http.get('/api/analyze/dataByQuery').then(fpGet('data'));
   }
 
-  function getPivotData() {
-    return $http.get('/api/analyze/pivotData').then(fpGet('data'));
+  function getNewPivotAnalysis() {
+    return $http.get('/api/analyze/newPivotAnalysis').then(fpGet('data'));
   }
 
   function generateQuery(payload) {
