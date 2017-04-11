@@ -8,6 +8,7 @@ import {transitions} from './transitions';
 import {AnalyzeService} from './services/analyze.service';
 import {FilterService} from './services/filter.service';
 import {PivotService} from './services/pivot.service';
+import {ChartService} from './services/chart.service';
 
 import {AnalyzePageComponent} from './components/analyze-page/analyze-page.component';
 import {AnalyzeViewComponent} from './components/analyze-view/analyze-view.component';
@@ -54,6 +55,7 @@ angular.module(AnalyzeModule, [])
   .factory('FilterService', FilterService)
   .factory('AnalyzeService', AnalyzeService)
   .factory('PivotService', PivotService)
+  .factory('ChartService', ChartService)
   .component('reportGridDisplay', ReportGridDisplayComponent)
   .component('reportGridDisplayNode', ReportGridDisplayNodeComponent)
   .component('reportGridDisplayContainer', ReportGridDisplayContainerComponent)
