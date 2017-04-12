@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.sncr</groupId>
+    <artifactId>saw-security</artifactId>
+    <version>2.0.0</version>
+    <packaging>rpm</packaging>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.2.RELEASE</version>
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <start-class>com.sncr.nsso.app.NSSOApplication</start-class>
+        <commons.io.version>2.4</commons.io.version>
+        <jjwt.version>0.6.0</jjwt.version>
+        <spring-security.version>4.0.2.RELEASE</spring-security.version>
+        
+        <prod.release>0</prod.release>
+        <project.release>${prod.release}</project.release>
+        
+        <rpm.version>${project.version}</rpm.version>
+        <rpm.release>${project.release}</rpm.release>
+        <app.name>${project.artifactId}</app.name>
+        <app.version>${rpm.version}</app.version>
+        <app.release>${rpm.release}</app.release>
+        <app.nameVer>${app.name}-${app.version}</app.nameVer>
+        
+        <!-- Directories -->
+        <app.optParDir>/opt/bda</app.optParDir>
+        <app.optDir>${app.optParDir}/${app.nameVer}</app.optDir>
+        <app.varDir>/var/bda</app.varDir>
+        <app.etcDir>/etc/bda</app.etcDir>
+        
+        <app.user>saw</app.user>
+        <app.group>saw</app.group>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Camden.SR5</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <!-- org.springframework.context.* -->
+            <!-- org.springframework.web.filter -->
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+        </dependency>
+        <dependency>
+            <!-- springfox.documentation.* -->
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+        <dependency>
+            <!-- javax.servlet -->
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <!--  javax.mail -->
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+        </dependency>
+        <dependency>
+            <!-- org.springframework.web.* -->
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>
+        <dependency>
+            <!-- io.jsonwebtoken -->
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.7.0</version>
+        </dependency>
+        <dependency>
+            <!-- org.springframework.dao -->
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.spring-dao</artifactId>
+            <version>2.0.8_1</version>
+        </dependency>
+        <dependency>
+            <!-- com.google.gson -->
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.0</version>
+        </dependency>
+        <dependency>
+            <!-- org.springframework.cloud.context.config.annotation -->
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-context</artifactId>
+            <version>1.2.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <!-- org.apache.tomcat.util.codec.binary -->
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-util</artifactId>
+            <version>8.0.33</version>
+        </dependency>
+        <dependency>
+            <!-- org.springframework.jdbc.datasource -->
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.spring-jdbc</artifactId>
+            <version>4.3.7.RELEASE_1</version>
+        </dependency>
+        <dependency>
+            <!-- org.springframework.security.config.annotation.web.builders -->
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.spring-security-config</artifactId>
+            <version>4.2.2.RELEASE_1</version>
+        </dependency>
+        <dependency>
+            <!-- org.springframework.security.web.header.writers -->
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+            <!-- version>4.0.1.RELEASE</version -->
+        </dependency>
+        <dependency>
+            <!-- org.springframework.boot.autoconfigure -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <!-- version>1.2.8.RELEASE</version -->
+        </dependency>
+        <dependency>
+            <!-- org.springframework.boggot.builder -->
+            <!-- org.springframework.boot.context.embedded.tomcat -->
+            <!-- org.springframework.boot.web.servlet -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+            <version>1.5.2.RELEASE</version>
+            <!-- version>1.4.5.RELEASE</version -->
+        </dependency>
+        <dependency>
+            <!-- org.springframework.cloud.client.discovery -->
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-commons</artifactId>
+            <version>1.1.4.RELEASE</version>
+        </dependency>
+        <dependency>
+            <!-- org.apache.log4j.Logger -->
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>1.5.11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>	    
+
+    <build>
+        <defaultGoal>package</defaultGoal>
+        <plugins>
+            <!--
+              How do I create a JAR containing the classes in my webapp?
+              http://maven.apache.org/plugins/maven-war-plugin/faq.html#attached
+            -->
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <attachClasses>true</attachClasses>
+                    <archive>
+                        <manifest>
+                            <!-- Specify the main class here -->
+                            <mainClass>com.sncr.nsso.app.NSSOApplication</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            
+            <!-- Codehaus rpm plugin -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>rpm-maven-plugin</artifactId>
+                <version>2.1.5</version>
+                <extensions>true</extensions>
+                
+                <configuration>
+                    <license>Synchronoss proprietary product</license>
+                    <distribution>Saw Security</distribution>
+                    <needarch>false</needarch>
+                    <targetOS>i386-linux</targetOS>
+                    <group>Saw Security</group>
+                    <packager>BDA</packager>
+                    <name>${project.artifactId}</name>
+                    <defineStatements>
+                        <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
+                    </defineStatements>
+                    <mappings>
+                       <!-- <mapping>
+                             TBD: Softlink creation. To be verified 
+                            <directory>${app.optParDir}</directory>
+                            <sources>
+                                <softlinkSource>
+                                    <location>${app.nameVer}</location>
+                                </softlinkSource>
+                            </sources> 
+                        </mapping>-->
+<!--                        <mapping>
+                            <directory>
+                                ${app.optDir}/bin
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/bin</location>
+                                    <includes>
+                                        <include>*.sh</include>
+                                    </includes>
+                                </source>
+                                <source>
+                                    <location>${project.basedir}/bin/appl_info</location>
+                                    <filter>true</filter>
+                                </source>
+                                 TBD 
+                                <source>
+                                    <location>${project.basedir}/src/main/script/linux</location>
+                                    <includes>
+                                        <include>*.sh</include>
+                                    </includes>
+                                </source>
+                            </sources>
+                        </mapping>-->
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/conf
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/src/main/resources</location>
+                                    <includes>
+                                        <include>application.properties</include>
+                                    </includes>
+                                </source>
+                                <source>
+                                    <location>${project.basedir}/src/main/resources/config</location>
+                                    <includes>
+                                        <include>bootstrap.yml</include>
+                                    </includes>
+                                </source>
+                                <source>
+                                    <!-- TBD: Source for log.config -->
+                                </source>
+                            </sources>
+                            
+<!--                            <sources>
+                                <source>
+                                     TBD: Not sure yet 
+                                    <location>${project.basedir}/conf</location>
+                                </source>
+                            </sources>-->
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/lib
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/target</location>
+                                    <includes>
+                                        <include>*.war</include>
+                                        <include>*.jar</include>
+                                    </includes>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/db
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/db/setup
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/Database/Source</location>\
+                                    <includes>
+                                        <include>Initial_Setup.py</include>
+                                        <include>Object_Creation.py</include>
+                                    </includes>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/db/setup/conf
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                            <sources>
+                                <!-- TBD: All source files -->
+                                
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/db/sql <!-- TBD: Decide on Initial setup directory -->
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/Database/Source/INITIAL_SETUP</location>
+                                </source>
+                            </sources>
+                        </mapping>
+                        
+                        
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/db/entry
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/Database/Source/Data_Entry_Automation</location>
+                                    <filter>true</filter>
+                                    <includes>
+<!--                                        <include>table_structure_mapping.csv</include>  TBD: File not there yet -->
+                                        <include>Data_Entry_Automation.py</include>
+                                        <include>Data_Entry_Automation_Utilities.py</include>
+                                    </includes>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/db/entry/conf
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/Database/Source/Data_Entry_Automation</location>
+                                    <filter>true</filter>
+                                    <includes>
+                                        <include>configuration.json</include>
+                                    </includes>
+                                </source>
+                            </sources>
+                        </mapping>
+                        
+                        <mapping>
+                            <directory>
+                                ${app.varDir}/${app.name}
+                            </directory>
+                        </mapping>
+                    </mappings>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
