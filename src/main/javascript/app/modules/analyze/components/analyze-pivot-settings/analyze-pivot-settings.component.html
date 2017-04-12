@@ -13,7 +13,7 @@
       <h3> Rows </h3>
       <div class="checkbox-container" layout="column">
         <md-checkbox ng-repeat="row in $ctrl.settings.row"
-                      ng-model="row.checked"
+                      ng-model="row.visible"
                       name="row"
                       ng-change="$ctrl.inputChanged(row)">
           {{::row.caption}}
@@ -25,7 +25,7 @@
       <h3> Columns </h3>
       <div class="checkbox-container" layout="column">
         <md-checkbox ng-repeat="column in $ctrl.settings.column"
-                      ng-model="column.checked"
+                      ng-model="column.visible"
                       name="column"
                       ng-change="$ctrl.inputChanged(column)">
           {{::column.caption}}
@@ -40,14 +40,14 @@
              layout="row"
              layout-align="space-around center"
              class="summary-type">
-          <md-checkbox ng-model="data.checked"
+          <md-checkbox ng-model="data.visible"
                        name="data"
                        ng-change="$ctrl.inputChanged(data)">
             {{::data.caption}}
           </md-checkbox>
           <md-select ng-model="data.summaryType"
                      ng-change="$ctrl.inputChanged(data)"
-                     ng-disabled="!data.checked">
+                     ng-disabled="!data.visible">
             <md-option ng-repeat="summaryType in $ctrl.summaryTypes"
                        ng-value="summaryType"
                        ng-bind="::summaryType">

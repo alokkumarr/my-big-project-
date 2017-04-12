@@ -9,6 +9,17 @@ import fpPipe from 'lodash/fp/pipe';
 import fpFilter from 'lodash/fp/filter';
 import split from 'lodash/split';
 import first from 'lodash/first';
+import fpMapKeys from 'lodash/fp/mapKeys';
+import fpOmit from 'lodash/fp/omit';
+import invert from 'lodash/invert';
+
+const FRONT_2_BACK_PIVOT_FIELD_PAIRS = {
+  caption: 'displayName',
+  dataType: 'type',
+  dataField: 'columnName'
+};
+
+const BACK_2_FRONT_PIVOT_FIELD_PAIRS = invert(FRONT_2_BACK_PIVOT_FIELD_PAIRS);
 
 export function PivotService(FilterService) {
   'ngInject';
@@ -16,15 +27,33 @@ export function PivotService(FilterService) {
   return {
     denormalizeData,
     getUniquesFromNormalizedData,
-    getFieldsFromData,
     putSettingsDataInFields,
     putSelectedFilterModelsIntoFilters,
     getFieldToFilterMapper,
-    getArea
+    getArea,
+    getFrontend2BackendFieldMapper,
+    getBackend2FrontendFieldMapper
   };
 
   function denormalizeData(normalizedData) {
     return flatMap(normalizedData, node => traverseRecursive({keys: {}, currentKey: 'row_level_1', node}));
+  }
+
+  function getFrontend2BackendFieldMapper() {
+    return fpMap(fpPipe(
+      fpOmit(['areaIndex', '_initProperties', 'selector', 'format', 'allowExpandAll', 'allowFiltering', 'allowSorting', 'allowSortingBySummary']),
+      fpMapKeys(key => {
+        const newKey = FRONT_2_BACK_PIVOT_FIELD_PAIRS[key];
+        return newKey || key;
+      })
+    ));
+  }
+
+  function getBackend2FrontendFieldMapper() {
+    return fpMap(fpMapKeys(key => {
+      const newKey = BACK_2_FRONT_PIVOT_FIELD_PAIRS[key];
+      return newKey || key;
+    }));
   }
 
 /* eslint-disable camelcase */
@@ -121,53 +150,5 @@ export function PivotService(FilterService) {
       return 'data';
     }
     return area;
-  }
-
-  function getFieldsFromData() {
-      // const obj = deNormalizedData[0];
-      // const objKeys = keys(obj);
-      // const fields = map(objKeys, key => {
-      //   return {
-      //     caption: key,
-      //     dataField: key,
-      //     width: 120,
-      //     area: this.getArea(key),
-      //     format: key.includes('price') ? 'currency' : null
-      //   };
-      // });
-    return [{
-      caption: 'Affiliate Name',
-      width: 120,
-      dataType: 'string',
-      dataField: 'row_level_1'
-    }, {
-      caption: 'Product',
-      width: 120,
-      dataType: 'string',
-      dataField: 'row_level_2'
-    }, {
-      caption: 'Date Month',
-      dataField: 'column_level_1',
-      format: datum => {
-        const date = new Date(datum);
-        return `${date.getFullYear()}-${date.getMonth()}`;
-      },
-      width: 120
-    }, {
-      caption: 'Date Day',
-      dataField: 'column_level_2',
-      dataType: 'string',
-      format: datum => {
-        const date = new Date(datum);
-        return `${date.getDay()}`;
-      },
-      width: 120
-    }, {
-      caption: 'Total Price',
-      dataField: 'total_price',
-      dataType: 'double',
-      summaryType: 'sum',
-      format: 'currency'
-    }];
   }
 }

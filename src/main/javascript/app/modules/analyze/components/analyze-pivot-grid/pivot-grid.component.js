@@ -10,7 +10,8 @@ import template from './pivot-grid.component.html';
 export const PivotGridComponent = {
   template,
   bindings: {
-    updater: '<'
+    updater: '<',
+    sendFields: '&'
   },
   controller: class PivotGridController {
     constructor($timeout, $translate, FilterService) {
@@ -65,6 +66,7 @@ export const PivotGridComponent = {
       updates.field && this.updateField(updates.field);
       updates.filters && this.updateFilters(updates.filters);
       updates.sorts && this.updateSorts(updates.sorts);
+      updates.onSave && this.sendFields({fields: this._gridInstance.getDataSource().fields()});
       /* eslint-disable no-unused-expressions */
 
       this.replaceWarningLables();
@@ -79,7 +81,6 @@ export const PivotGridComponent = {
 
       pivotGridDataSource.field(field.dataField, field.modifierObj);
       pivotGridDataSource.load();
-      console.log('fields: ', pivotGridDataSource.fields());
     }
 
     updateFilters(filters) {
