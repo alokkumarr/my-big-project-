@@ -46,7 +46,7 @@ public class CustomDriverManagerDataSource extends DriverManagerDataSource {
 	 * @return
 	 */
 	public static String base64Decode(String token) {
-		String key = "Saw12345Saw12345"; // 128 bit key
+		String key = "SawSecurity12345"; // 128 bit key
 		String initVector = "RandomInitVector"; // 16 bytes IV
 		byte[] original = null;
 		try {

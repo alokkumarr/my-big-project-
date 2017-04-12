@@ -17,7 +17,7 @@ public class EncryptPassword {
 		if (pwd.length == 1) {
 			String password = pwd[0];
 
-			String key = "Saw12345Saw12345"; // 128 bit key
+			String key = "SawSecurity12345"; // 128 bit key
 			String initVector = "RandomInitVector"; // 16 bytes IV
 			try {
 				IvParameterSpec iv = new IvParameterSpec(initVector.getBytes("UTF-8"));
