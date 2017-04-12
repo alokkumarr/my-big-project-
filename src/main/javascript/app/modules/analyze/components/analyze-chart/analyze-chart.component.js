@@ -1,4 +1,4 @@
-import {get, isEmpty, map, values, clone, filter} from 'lodash';
+import {findIndex, forEach, get, isEmpty, map, values, clone, filter} from 'lodash';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -72,21 +72,23 @@ export const AnalyzeChartComponent = {
     }
 
     initChart() {
-      if (isEmpty(this.mode) || isEmpty(this.model.chart)) {
-        this.getArtifacts();
-        return;
-      }
+      this._AnalyzeService.getArtifacts().then(artifacts => {
+        if (isEmpty(this.mode) || isEmpty(this.model.chart)) {
+          this.fillSettings(artifacts);
+          return;
+        }
 
-      const chart = this.model.chart;
-      this.labels.tempX = this.labels.x = chart.xAxis.label;
-      this.labels.tempY = this.labels.y = chart.yAxis.label;
-      this.settings = {
-        yaxis: chart.yAxis.artifacts,
-        xaxis: chart.xAxis.artifacts,
-        groupBy: chart.groupBy.artifacts
-      };
-      this.filters.selected = chart.filters || [];
-      this.onSettingsChanged(this.settings);
+        this.fillSettings(artifacts, this.model.artifacts);
+
+        const chart = this.model.chart;
+        this.labels.tempX = this.labels.x = get(chart, 'xAxis.title', null);
+        this.labels.tempY = this.labels.y = get(chart, 'yAxis.title', null);
+        this.filters.selected = map(
+          chart.filters,
+          beFilter => this._FilterService.getBackEnd2FrontEndFilterMapper()(beFilter)
+        );
+        this.onSettingsChanged(this.settings);
+      });
     }
 
     updateLegendPosition() {
@@ -109,17 +111,21 @@ export const AnalyzeChartComponent = {
       ]);
     }
 
+    mergeArtifactsWithSettings(artifacts, record) {
+      const id = findIndex(artifacts, a => {
+        return a.column_name === record.column_name &&
+        a.tableName === (record.tableName || record.table_name);
+      });
+
+      record.checked = true;
+      artifacts.splice(id, 1, record);
+      return artifacts;
+    }
+
     updateCustomLabels() {
       this.labels.x = this.labels.tempX;
       this.labels.y = this.labels.tempY;
       this.reloadChart(this.settings, this.filteredGridData);
-    }
-
-    getArtifacts() {
-      this._AnalyzeService.getArtifacts()
-        .then(data => {
-          this.fillSettings(data);
-        });
     }
 
     getDataByQuery() {
@@ -130,17 +136,34 @@ export const AnalyzeChartComponent = {
         });
     }
 
-    fillSettings(data) {
-      const attributes = data.reduce((res, metric) => {
+    fillSettings(artifacts, settings = []) {
+      /* Flatten the artifacts into a single array */
+      const attributes = artifacts.reduce((res, metric) => {
         return res.concat(map(metric.artifact_attributes, attr => {
           attr.tableName = metric.artifact_name;
           return attr;
         }));
       }, []);
+
+      /* Based on data type, divide the artifacts between axes. */
+      const yaxis = filter(attributes, attr => attr.type === 'int' || attr.type === 'Int');
+      const xaxis = filter(attributes, attr => attr.type === 'string' || attr.type === 'String');
+      const groupBy = map(xaxis, clone);
+
+      forEach(settings, selection => {
+        if (selection['x-axis'] === true) {
+          this.mergeArtifactsWithSettings(xaxis, selection);
+        } else if (selection['y-axis'] === true) {
+          this.mergeArtifactsWithSettings(yaxis, selection);
+        } else if (selection['z-axis'] === true) {
+          this.mergeArtifactsWithSettings(groupBy, selection);
+        }
+      });
+
       this.settings = {
-        yaxis: filter(attributes, attr => attr['y-axis']),
-        xaxis: filter(attributes, attr => attr['x-axis']),
-        groupBy: map(filter(attributes, attr => attr['x-axis']), clone)
+        yaxis,
+        xaxis,
+        groupBy
       };
       this.reloadChart(this.settings, this.filteredGridData);
     }
@@ -230,30 +253,40 @@ export const AnalyzeChartComponent = {
         });
     }
 
-    generatePayload() {
-      const result = {
-        filters: this.filters.selected,
-        xAxis: {
-          label: this.labels.x,
-          artifacts: this.settings.xaxis
-        },
-        yAxis: {
-          label: this.labels.y,
-          artifacts: this.settings.yaxis
-        },
-        groupBy: {
-          artifacts: this.settings.groupBy
-        },
+    getSelectedSettingsFor(axis, artifacts) {
+      const id = findIndex(artifacts, a => a.checked === true);
+      if (id >= 0) {
+        artifacts[id][axis] = true;
+      }
+      return artifacts[id];
+    }
+
+    generatePayload(source) {
+      const result = clone(source);
+      result.chart = {
+        filters: map(
+          this.filters.selected,
+          feFilter => this._FilterService.getFrontEnd2BackEndFilterMapper()(feFilter)
+        ),
+        xAxis: {title: this.labels.x},
+        yAxis: {title: this.labels.y},
         legend: {
           align: this.legend.align,
           layout: this.legend.layout
         }
       };
+
+      result.artifacts = filter([
+        this.getSelectedSettingsFor('x-axis', this.settings.xaxis),
+        this.getSelectedSettingsFor('y-axis', this.settings.yaxis),
+        this.getSelectedSettingsFor('z-axis', this.settings.groupBy)
+      ], x => x);
+
       return result;
     }
 
     openSaveModal(ev) {
-      this.model.chart = this.generatePayload();
+      const payload = this.generatePayload(this.model);
 
       const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
@@ -261,7 +294,7 @@ export const AnalyzeChartComponent = {
         .show({
           template: tpl,
           controller: scope => {
-            scope.model = clone(this.model);
+            scope.model = payload;
 
             scope.onSave = data => {
               this.model.id = data.id;
