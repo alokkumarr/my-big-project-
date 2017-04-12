@@ -63,7 +63,7 @@ public class NSSOApplication extends SpringBootServletInitializer {
 		String prcessDetails = ManagementFactory.getRuntimeMXBean().getName();
         try {
         	// TODO dummy path for now
-			Files.write(Paths.get("/opt/product/dev/saw-deploy"), prcessDetails.split("@")[0].getBytes() );
+			Files.write(Paths.get("/var/bda/saw-security/run/saw-security.pid"), prcessDetails.split("@")[0].getBytes() );
 		} catch (IOException e) {
 			// TODO handle the exception
 			e.printStackTrace();
