@@ -1,3 +1,5 @@
+import omit from 'lodash/omit';
+import fpMap from 'lodash/fp/map';
 import fpGet from 'lodash/fp/get';
 
 export function AnalyzeService($http, $timeout, $q) {
@@ -19,11 +21,20 @@ export function AnalyzeService($http, $timeout, $q) {
     generateQuery,
     getNewPivotAnalysis,
     saveReport,
-    getSemanticLayerData
+    getSemanticLayerData,
+    chartBe2Fe,
+    chartFe2Be
   };
 
   function getAnalyses(category, query) {
-    return $http.get('/api/analyze/analyses', {params: {category, query}}).then(fpGet('data'));
+    return $http.get('/api/analyze/analyses', {params: {category, query}})
+      .then(fpGet('data'))
+      .then(fpMap(analysis => {
+        if (analysis.type === 'chart') {
+          return chartBe2Fe(analysis);
+        }
+        return analysis;
+      }));
   }
 
   function getPublishedAnalysesByAnalysisId(id) {
@@ -91,5 +102,22 @@ export function AnalyzeService($http, $timeout, $q) {
 
   function getSemanticLayerData() {
     return $http.get('/api/analyze/semanticLayerData').then(fpGet('data'));
+  }
+
+  /**
+   * Converts chart type analysis from backend
+   * to a format usable on front-end
+   */
+  function chartBe2Fe(source) {
+    const result = omit(source, ['_id', 'chart_type', 'plot_variant']);
+    result.id = source._id || source.id;
+    result.chartType = source.chart_type || source.chartType;
+    result.plotVariant = source.plot_variant || source.plotVariant;
+
+    return result;
+  }
+
+  function chartFe2Be() {
+    // TODO
   }
 }

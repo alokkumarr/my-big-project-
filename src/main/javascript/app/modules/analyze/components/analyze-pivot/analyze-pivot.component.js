@@ -54,9 +54,7 @@ export const AnalyzePivotComponent = {
     }
 
     prepareFields(artifactAttributes) {
-      console.log('artifactAttributes: ', artifactAttributes);
       this.fields = this._PivotService.getBackend2FrontendFieldMapper()(artifactAttributes);
-      console.log('fields: ', this.fields);
       // this.hideInvisibleDataFields(this.fields);
 
       this.settings = this.getSettingsFromFields(this.fields);
@@ -266,7 +264,6 @@ export const AnalyzePivotComponent = {
       });
 
       this.model.artifactAttributes = this._PivotService.getFrontend2BackendFieldMapper()(this.fieldsToSave);
-      console.log(this.model.artifactAttributes);
 
       const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
