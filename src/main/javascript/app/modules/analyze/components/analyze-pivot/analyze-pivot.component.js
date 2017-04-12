@@ -9,6 +9,7 @@ import fpFilter from 'lodash/fp/filter';
 import find from 'lodash/find';
 import fpPick from 'lodash/fp/pick';
 import take from 'lodash/take';
+import isEmpty from 'lodash/isEmpty';
 import {BehaviorSubject} from 'rxjs';
 
 import template from './analyze-pivot.component.html';
@@ -44,12 +45,19 @@ export const AnalyzePivotComponent = {
       this._FilterService.onApplyFilters(filters => this.onApplyFilters(filters));
       this._FilterService.onClearAllFilters(() => this.onClearAllFilters());
 
-      this.loadPivotData();
+      if (!isEmpty(this.model.metric)) {
+        this.prepareFields(this.model.metric.artifacts[0].columns);
+        // if it's a pivot analysis we're only interested in the first artifact
+      }
+
+      // this.loadPivotData();
     }
 
     prepareFields(artifactAttributes) {
+      console.log('artifactAttributes: ', artifactAttributes);
       this.fields = this._PivotService.getBackend2FrontendFieldMapper()(artifactAttributes);
-      this.hideInvisibleDataFields(this.fields);
+      console.log('fields: ', this.fields);
+      // this.hideInvisibleDataFields(this.fields);
 
       this.settings = this.getSettingsFromFields(this.fields);
 
@@ -62,8 +70,6 @@ export const AnalyzePivotComponent = {
       this._AnalyzeService.getNewPivotAnalysis().then(newPivot => {
         this.normalizedData = newPivot.data;
         this.deNormalizedData = this._PivotService.denormalizeData(newPivot.data);
-
-        this.prepareFields(this.model.artifactAttributes || newPivot.artifactAttributes);
 
         this.pivotGridUpdater.next({
           dataSource: {
@@ -85,8 +91,8 @@ export const AnalyzePivotComponent = {
 
     getSettingsFromFields(fields) {
       return fpPipe(
-        fpMap(fpPick(['dataField', 'visible', 'summaryType', 'caption'])),
-        fpGroupBy(field => this._PivotService.getArea(field.dataField))
+        fpMap(fpPick(['dataField', 'visible', 'summaryType', 'caption', 'area'])),
+        fpGroupBy('area')
       )(fields);
     }
 
