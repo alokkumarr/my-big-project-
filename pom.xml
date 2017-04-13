@@ -205,15 +205,17 @@
                         <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
                     </defineStatements>
                     <mappings>
-<!--                        <mapping>
-                             TBD: Softlink creation. To be verified 
+                        <mapping>
+                            <!-- Create softlink for app directory -->
                             <directory>${app.optParDir}</directory>
                             <sources>
                                 <softlinkSource>
+                                    <!-- ln -s <location> <destination> -->
                                     <location>${app.nameVer}</location>
+                                    <destination>${app.name}</destination>
                                 </softlinkSource>
-                            </sources> 
-                        </mapping>-->
+                            </sources>
+                        </mapping>
                         <mapping>
                             <directory>
                                 ${app.optDir}/bin
