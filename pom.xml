@@ -178,7 +178,7 @@
                     <archive>
                         <manifest>
                             <!-- Specify the main class here -->
-                            <mainClass>com.sncr.nsso.app.NSSOApplication</mainClass>
+                            <mainClass>com.sncr.nsso.common.util.EncryptPassword </mainClass>
                         </manifest>
                     </archive>
                 </configuration>
