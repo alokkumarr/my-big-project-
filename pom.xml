@@ -34,7 +34,7 @@
         <!-- Directories -->
         <app.optParDir>/opt/bda</app.optParDir>
         <app.optDir>${app.optParDir}/${app.nameVer}</app.optDir>
-        <app.varDir>/var/bda</app.varDir>
+        <app.varDir>/var/bda/${app.name}</app.varDir>
         <app.etcDir>/etc/bda</app.etcDir>
         
         <app.user>saw</app.user>
@@ -190,6 +190,14 @@
                 <artifactId>rpm-maven-plugin</artifactId>
                 <version>2.1.5</version>
                 <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>generate-rpm</id>
+                        <goals>
+                            <goal>rpm</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 
                 <configuration>
                     <license>Synchronoss proprietary product</license>
@@ -203,7 +211,7 @@
                         <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
                     </defineStatements>
                     <mappings>
-                       <!-- <mapping>
+<!--                        <mapping>
                              TBD: Softlink creation. To be verified 
                             <directory>${app.optParDir}</directory>
                             <sources>
@@ -212,33 +220,14 @@
                                 </softlinkSource>
                             </sources> 
                         </mapping>-->
-<!--                        <mapping>
+                        <mapping>
                             <directory>
                                 ${app.optDir}/bin
                             </directory>
                             <filemode>755</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
-                            <sources>
-                                <source>
-                                    <location>${project.basedir}/bin</location>
-                                    <includes>
-                                        <include>*.sh</include>
-                                    </includes>
-                                </source>
-                                <source>
-                                    <location>${project.basedir}/bin/appl_info</location>
-                                    <filter>true</filter>
-                                </source>
-                                 TBD 
-                                <source>
-                                    <location>${project.basedir}/src/main/script/linux</location>
-                                    <includes>
-                                        <include>*.sh</include>
-                                    </includes>
-                                </source>
-                            </sources>
-                        </mapping>-->
+                        </mapping>
                         <mapping>
                             <directory>
                                 ${app.optDir}/conf
@@ -246,30 +235,6 @@
                             <filemode>755</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
-                            <sources>
-                                <source>
-                                    <location>${project.basedir}/src/main/resources</location>
-                                    <includes>
-                                        <include>application.properties</include>
-                                    </includes>
-                                </source>
-                                <source>
-                                    <location>${project.basedir}/src/main/resources/config</location>
-                                    <includes>
-                                        <include>bootstrap.yml</include>
-                                    </includes>
-                                </source>
-                                <source>
-                                    <!-- TBD: Source for log.config -->
-                                </source>
-                            </sources>
-                            
-<!--                            <sources>
-                                <source>
-                                     TBD: Not sure yet 
-                                    <location>${project.basedir}/conf</location>
-                                </source>
-                            </sources>-->
                         </mapping>
                         <mapping>
                             <directory>
@@ -278,15 +243,6 @@
                             <filemode>755</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
-                            <sources>
-                                <source>
-                                    <location>${project.basedir}/target</location>
-                                    <includes>
-                                        <include>*.war</include>
-                                        <include>*.jar</include>
-                                    </includes>
-                                </source>
-                            </sources>
                         </mapping>
                         <mapping>
                             <directory>
@@ -303,15 +259,6 @@
                             <filemode>755</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
-                            <sources>
-                                <source>
-                                    <location>${project.basedir}/Database/Source</location>\
-                                    <includes>
-                                        <include>Initial_Setup.py</include>
-                                        <include>Object_Creation.py</include>
-                                    </includes>
-                                </source>
-                            </sources>
                         </mapping>
                         <mapping>
                             <directory>
@@ -320,10 +267,6 @@
                             <filemode>755</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
-                            <sources>
-                                <!-- TBD: All source files -->
-                                
-                            </sources>
                         </mapping>
                         <mapping>
                             <directory>
@@ -332,11 +275,6 @@
                             <filemode>755</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
-                            <sources>
-                                <source>
-                                    <location>${project.basedir}/Database/Source/INITIAL_SETUP</location>
-                                </source>
-                            </sources>
                         </mapping>
                         
                         
@@ -347,17 +285,6 @@
                             <filemode>755</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
-                            <sources>
-                                <source>
-                                    <location>${project.basedir}/Database/Source/Data_Entry_Automation</location>
-                                    <filter>true</filter>
-                                    <includes>
-<!--                                        <include>table_structure_mapping.csv</include>  TBD: File not there yet -->
-                                        <include>Data_Entry_Automation.py</include>
-                                        <include>Data_Entry_Automation_Utilities.py</include>
-                                    </includes>
-                                </source>
-                            </sources>
                         </mapping>
                         <mapping>
                             <directory>
@@ -366,21 +293,29 @@
                             <filemode>755</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
-                            <sources>
-                                <source>
-                                    <location>${project.basedir}/Database/Source/Data_Entry_Automation</location>
-                                    <filter>true</filter>
-                                    <includes>
-                                        <include>configuration.json</include>
-                                    </includes>
-                                </source>
-                            </sources>
                         </mapping>
                         
+                        <!-- var directory for saw security (/var/bda/saw-security) -->
                         <mapping>
                             <directory>
-                                ${app.varDir}/${app.name}
+                                ${app.varDir}
                             </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                        </mapping>
+                        
+                        <!-- 
+                            etc directory for saw security (/var/bda/saw-security)
+                            Place saw-secirity.vars in this directory
+                        -->
+                        <mapping>
+                            <directory>
+                                ${app.etcDir}
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
                         </mapping>
                     </mappings>
                 </configuration>
