@@ -60,7 +60,7 @@
 
       <md-card>
         <md-card-content layout="column">
-          <pivot-grid updater="$ctrl.pivotGridUpdater" options="$ctrl.pivotGridOptions"></pivot-grid>
+          <pivot-grid updater="$ctrl.pivotGridUpdater" send-fields="$ctrl.onGetFields(fields)"></pivot-grid>
         </md-card-content>
       </md-card>
 

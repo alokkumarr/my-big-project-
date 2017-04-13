@@ -1,8 +1,9 @@
+import {BehaviorSubject} from 'rxjs';
 import {findIndex, forEach, get, isEmpty, map, values, clone, filter} from 'lodash';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
-import {BehaviorSubject} from 'rxjs';
+import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter-sidenav/analyze-filter-sidenav.component';
 
 export const AnalyzeChartComponent = {
   template,
@@ -212,7 +213,7 @@ export const AnalyzeChartComponent = {
 
     // filters section
     openFilterSidenav() {
-      this._FilterService.openFilterSidenav(this.filters.possible);
+      this._FilterService.openFilterSidenav(this.filters.possible, ANALYZE_FILTER_SIDENAV_IDS.designer);
     }
 
     openDescriptionModal(ev) {
