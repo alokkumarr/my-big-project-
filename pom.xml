@@ -175,12 +175,6 @@
                 <version>3.0.0</version>
                 <configuration>
                     <attachClasses>true</attachClasses>
-                    <archive>
-                        <manifest>
-                            <!-- Specify the main class here -->
-                            <mainClass>com.sncr.nsso.common.util.CcodeUtil</mainClass>
-                        </manifest>
-                    </archive>
                 </configuration>
             </plugin>
             
