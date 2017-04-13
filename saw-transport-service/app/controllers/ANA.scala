@@ -33,7 +33,7 @@ class ANA extends BaseServiceProvider {
       case "create" => {
         val analysisNode = new AnalysisNode(analysisJson(json))
         val (result, message) = analysisNode.write
-        if (result != Success.id) {
+        if (result != NodeCreated.id) {
           throw new RuntimeException("Writing failed: " + message)
         }
         json
