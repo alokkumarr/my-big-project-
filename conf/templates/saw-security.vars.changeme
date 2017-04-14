@@ -1,0 +1,10 @@
+# This is vars file for simpcomp XDF application
+# To be copied to /etc/bda/simpcomp.vars
+
+db.init.email = CHANGEME # email in Initail_Setup.py
+# Old CLI:
+# Please enter SQL DB Info in the format - Server|DB|User|Password
+db.init.server = CHANGEME
+db.init.name   = CHANGEME
+db.init.user   = CHANGEME
+db.init.password = CHANGEME
