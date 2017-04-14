@@ -28,7 +28,10 @@ import com.sncr.nsso.common.bean.JwtFilter;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class NSSOApplication extends SpringBootServletInitializer {
-
+	
+	private static String pid = ManagementFactory.getRuntimeMXBean().getName().split("@")[0];
+	private static final String pidPath = "/var/bda/saw-security/run/saw-security.pid";
+	
 	@Bean
 	public TomcatEmbeddedServletContainerFactory tomcatEmbeddedServletContainerFactory() {
 		return new TomcatEmbeddedServletContainerFactory();
@@ -36,7 +39,6 @@ public class NSSOApplication extends SpringBootServletInitializer {
 
 	@Override
 	protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
-		// TODO Auto-generated method stub
 		return builder.sources(NSSOApplication.class);
 	}
 
@@ -55,18 +57,14 @@ public class NSSOApplication extends SpringBootServletInitializer {
 	 * return builder.sources(NSSOApplication.class); }
 	 */
 	public static void main(String[] args) {
-
+		try {        	
+			Files.write(Paths.get(pidPath), pid.getBytes());
+		} catch (IOException e) {			
+			e.printStackTrace();
+		} 
 		// Launch the application
 		ConfigurableApplicationContext context = SpringApplication.run(NSSOApplication.class, args);
 		@SuppressWarnings("unused")
-		WebSecurityConfig config = context.getBean(WebSecurityConfig.class);
-		String prcessDetails = ManagementFactory.getRuntimeMXBean().getName();
-        try {
-        	// TODO dummy path for now
-			Files.write(Paths.get("/var/bda/saw-security/run/saw-security.pid"), prcessDetails.split("@")[0].getBytes() );
-		} catch (IOException e) {
-			// TODO handle the exception
-			e.printStackTrace();
-		} 
+		WebSecurityConfig config = context.getBean(WebSecurityConfig.class);        
 	}
 }
