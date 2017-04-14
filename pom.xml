@@ -1,427 +1,331 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.sncr</groupId>
-	<artifactId>saw-security</artifactId>
-	<version>0.0.1</version>
-	<packaging>war</packaging>
-	
-<parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>1.5.2.RELEASE</version>
-</parent>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.sncr</groupId>
+    <artifactId>saw-security</artifactId>
+    <version>2.0.0</version>
+    <packaging>war</packaging>
 
-<properties>
-        <docker.plugin.version>0.4.13</docker.plugin.version>
-		<docker.image.prefix>saw-scnr</docker.image.prefix>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.8</java.version>
-		<start-class>com.sncr.nsso.app.NSSOApplication</start-class>
-		<commons.io.version>2.4</commons.io.version>
-    	<jjwt.version>0.6.0</jjwt.version>
-      <spring-security.version>4.0.2.RELEASE</spring-security.version>
-</properties>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.2.RELEASE</version>
+    </parent>
 
-<!-- 	
-<repositories>
-	 <repository>
-	      <id>synchronoss</id>
-	      <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
-	 </repository>
-	</repositories>
- -->	
- 
- <dependencyManagement>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>1.8</java.version>
+        <start-class>com.sncr.nsso.app.NSSOApplication</start-class>
+        <commons.io.version>2.4</commons.io.version>
+        <jjwt.version>0.6.0</jjwt.version>
+        <spring-security.version>4.0.2.RELEASE</spring-security.version>
+        
+        <prod.release>0</prod.release>
+        <project.release>${prod.release}</project.release>
+        
+        <rpm.version>${project.version}</rpm.version>
+        <rpm.release>${project.release}</rpm.release>
+        <app.name>${project.artifactId}</app.name>
+        <app.version>${rpm.version}</app.version>
+        <app.release>${rpm.release}</app.release>
+        <app.nameVer>${app.name}-${app.version}</app.nameVer>
+        
+        <!-- Directories -->
+        <app.optParDir>/opt/bda</app.optParDir>
+        <app.optDir>${app.optParDir}/${app.nameVer}</app.optDir>
+        <app.varDir>/var/bda/${app.name}</app.varDir>
+        <app.etcDir>/etc/bda</app.etcDir>
+        
+        <app.user>saw</app.user>
+        <app.group>saw</app.group>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Camden.SR5</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-dependencies</artifactId>
-            <version>Camden.SR5</version>
-            <type>pom</type>
-            <scope>import</scope>
+            <!-- org.springframework.context.* -->
+            <!-- org.springframework.web.filter -->
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
         </dependency>
-    </dependencies>
-</dependencyManagement>
- 
- <dependencies>	    
+        <dependency>
+            <!-- springfox.documentation.* -->
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+        <dependency>
+            <!-- javax.servlet -->
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <!--  javax.mail -->
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+        </dependency>
+        <dependency>
+            <!-- org.springframework.web.* -->
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>
+        <dependency>
+            <!-- io.jsonwebtoken -->
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.7.0</version>
+        </dependency>
+        <dependency>
+            <!-- org.springframework.dao -->
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.spring-dao</artifactId>
+            <version>2.0.8_1</version>
+        </dependency>
+        <dependency>
+            <!-- com.google.gson -->
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.0</version>
+        </dependency>
+        <dependency>
+            <!-- org.springframework.cloud.context.config.annotation -->
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-context</artifactId>
+            <version>1.2.0.RELEASE</version>
+        </dependency>
+        <dependency>
+            <!-- org.apache.tomcat.util.codec.binary -->
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-util</artifactId>
+            <version>8.0.33</version>
+        </dependency>
+        <dependency>
+            <!-- org.springframework.jdbc.datasource -->
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.spring-jdbc</artifactId>
+            <version>4.3.7.RELEASE_1</version>
+        </dependency>
+        <dependency>
+            <!-- org.springframework.security.config.annotation.web.builders -->
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.spring-security-config</artifactId>
+            <version>4.2.2.RELEASE_1</version>
+        </dependency>
+        <dependency>
+            <!-- org.springframework.security.web.header.writers -->
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+            <!-- version>4.0.1.RELEASE</version -->
+        </dependency>
+        <dependency>
+            <!-- org.springframework.boot.autoconfigure -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <!-- version>1.2.8.RELEASE</version -->
+        </dependency>
+        <dependency>
+            <!-- org.springframework.boggot.builder -->
+            <!-- org.springframework.boot.context.embedded.tomcat -->
+            <!-- org.springframework.boot.web.servlet -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+            <version>1.5.2.RELEASE</version>
+            <!-- version>1.4.5.RELEASE</version -->
+        </dependency>
+        <dependency>
+            <!-- org.springframework.cloud.client.discovery -->
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-commons</artifactId>
+            <version>1.1.4.RELEASE</version>
+        </dependency>
+        <dependency>
+            <!-- org.apache.log4j.Logger -->
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+            <version>1.5.11</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-rest</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jdbc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-tomcat</artifactId>
-		</dependency>
+    </dependencies>	    
 
-        <dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web-services</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.mariadb.jdbc</groupId>
-    		<artifactId>mariadb-java-client</artifactId>
-    	</dependency>
-		
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-web</artifactId>
-		</dependency>	
-		
-<!--  	    <dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-config-client</artifactId>
-		</dependency>
- --> 			
-		
-	<!-- Distributed Tracing -->
-		<dependency>
-	       <groupId>org.springframework.cloud</groupId>
-	       <artifactId>spring-cloud-starter-zipkin</artifactId>
-	   </dependency>
-   <!-- Distributed Tracing -->
-		
-	    <dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-remote-shell</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jolokia</groupId>
-			<artifactId>jolokia-core</artifactId>
-		</dependency>
-			
-    <!-- 		
-       <dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-			<version>1.4</version>
-		</dependency> 
-	-->
-	
-	<dependency>
-		<groupId>org.springframework</groupId>
-		<artifactId>spring-context-support</artifactId>
-	</dependency>
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-		</dependency>
-		
-<!--
-    Workaround: Disable dependency until artifact available through
-    standard Maven repositories.  Currently it does not build out of
-    the box.
-
-	<dependency>
-		<groupId>com.razor</groupId>
-		<artifactId>raw-configuration</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-	</dependency>
--->
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-mail</artifactId>
-	</dependency>
-	    <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-            <version>${jjwt.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-		    <groupId>io.springfox</groupId>
-		    <artifactId>springfox-swagger2</artifactId>
-		    <version>2.4.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>io.springfox</groupId>
-		    <artifactId>springfox-swagger-ui</artifactId>
-		    <version>2.4.0</version>
-		</dependency>
-	</dependencies>
-
-<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<finalName>${project.name}</finalName>
-				</configuration>
-			</plugin>
-<!-- 			<plugin>
-				<groupId>pl.project13.maven</groupId>
-				<artifactId>git-commit-id-plugin</artifactId>
-			</plugin>
- -->						<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+    <build>
+        <defaultGoal>package</defaultGoal>
+        <plugins>
+            <!--
+              How do I create a JAR containing the classes in my webapp?
+              http://maven.apache.org/plugins/maven-war-plugin/faq.html#attached
+            -->
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.0.0</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <compilerArgument>-Xlint:all</compilerArgument>
-                    <showDeprecation>true</showDeprecation>
-                    <showWarnings>true</showWarnings>
+                    <attachClasses>true</attachClasses>
                 </configuration>
             </plugin>
-			
-		</plugins>
-	</build>
-
-	
-	<profiles>
-	  <profile>
-	  <id>docker</id>
-	  <build>
-        <plugins>
-        	<plugin>
-				<groupId>pl.project13.maven</groupId>
-				<artifactId>git-commit-id-plugin</artifactId>
-				<configuration>
-					<dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
-				</configuration>
-			</plugin>
-            <plugin>
             
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+            <!-- Codehaus rpm plugin -->
             <plugin>
-                <groupId>com.spotify</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>${docker.plugin.version}</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>rpm-maven-plugin</artifactId>
+                <version>2.1.5</version>
+                <extensions>true</extensions>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <id>generate-rpm</id>
                         <goals>
-                            <goal>build</goal>
+                            <goal>rpm</goal>
                         </goals>
                     </execution>
                 </executions>
+                
                 <configuration>
-                    <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
-                    <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
-                    <resources>
-                        <resource>
-                            <targetPath>/</targetPath>
-                            <directory>${project.build.directory}</directory>
-                            <include>${project.build.finalName}.jar</include>
-                        </resource>
-                    </resources>
+                    <license>Synchronoss proprietary product</license>
+                    <distribution>Saw Security</distribution>
+                    <needarch>false</needarch>
+                    <targetOS>i386-linux</targetOS>
+                    <group>Saw Security</group>
+                    <packager>BDA</packager>
+                    <name>${project.artifactId}</name>
+                    <defineStatements>
+                        <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
+                    </defineStatements>
+                    <mappings>
+                        <mapping>
+                            <!-- Create softlink for app directory -->
+                            <directory>${app.optParDir}</directory>
+                            <sources>
+                                <softlinkSource>
+                                    <!-- ln -s <location> <destination> -->
+                                    <location>${app.nameVer}</location>
+                                    <destination>${app.name}</destination>
+                                </softlinkSource>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/bin
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/conf
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/lib
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/target</location>
+                                    <includes>
+                                        <include>*.war</include>
+                                        <include>*.jar</include>
+                                    </includes>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/db
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/db/setup
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/db/setup/conf
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/db/sql <!-- TBD: Decide on Initial setup directory -->
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                        </mapping>
+                        
+                        
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/db/entry
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/db/entry/conf
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                        </mapping>
+                        
+                        <!-- var directory for saw security (/var/bda/saw-security) -->
+                        <mapping>
+                            <directory>
+                                ${app.varDir}
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                        </mapping>
+                        
+                        <!-- 
+                            etc directory for saw security (/var/bda/saw-security)
+                            Place saw-secirity.vars in this directory
+                        -->
+                        <mapping>
+                            <directory>
+                                ${app.etcDir}
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                        </mapping>
+                    </mappings>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-	  </profile>
-	  <profile>
-	  <id>microservice</id>
- 		<dependencies>	    
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-rest</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jdbc</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-tomcat</artifactId>
-		</dependency>
 
-        <dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web-services</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.mariadb.jdbc</groupId>
-    		<artifactId>mariadb-java-client</artifactId>
-    	</dependency>
-		
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-web</artifactId>
-		</dependency>	
-		
- 	    <dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-config-client</artifactId>
-		</dependency>
- 			
-	    <dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-eureka</artifactId>
-		</dependency>
-		
-	<!-- Distributed Tracing -->
-		<dependency>
-	       <groupId>org.springframework.cloud</groupId>
-	       <artifactId>spring-cloud-starter-zipkin</artifactId>
-	   </dependency>
-   <!-- Distributed Tracing -->
-		
-	    <dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-remote-shell</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jolokia</groupId>
-			<artifactId>jolokia-core</artifactId>
-		</dependency>
-			
-    <!-- 		
-       <dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-			<version>1.4</version>
-		</dependency> 
-	-->
-	
-	<dependency>
-		<groupId>org.springframework</groupId>
-		<artifactId>spring-context-support</artifactId>
-	</dependency>
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-		</dependency>
-		
-<!--
-    Workaround: Disable dependency until artifact available through
-    standard Maven repositories.  Currently it does not build out of
-    the box.
-
-	<dependency>
-		<groupId>com.razor</groupId>
-		<artifactId>raw-configuration</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-	</dependency>
--->
-	<dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-mail</artifactId>
-	</dependency>
-	    <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-            <version>${jjwt.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-		    <groupId>io.springfox</groupId>
-		    <artifactId>springfox-swagger2</artifactId>
-		    <version>2.4.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>io.springfox</groupId>
-		    <artifactId>springfox-swagger-ui</artifactId>
-		    <version>2.4.0</version>
-		</dependency>
-	</dependencies>
-	
-	
-<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<finalName>${project.name}</finalName>
-					<mainClass>com.sncr.nsso.app.NSSOApplicationMicro</mainClass>
-				</configuration>
-			</plugin>
-<!-- 			<plugin>
-				<groupId>pl.project13.maven</groupId>
-				<artifactId>git-commit-id-plugin</artifactId>
-			</plugin>
- -->						<plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <compilerArgument>-Xlint:all</compilerArgument>
-                    <showDeprecation>true</showDeprecation>
-                    <showWarnings>true</showWarnings>
-                </configuration>
-            </plugin>
-			
-		</plugins>
-	</build>
-	  
-	  </profile>
-	  
-	  </profiles>
 </project>
