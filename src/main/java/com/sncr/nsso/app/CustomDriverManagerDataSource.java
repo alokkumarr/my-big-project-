@@ -5,6 +5,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+import com.sncr.nsso.common.util.CcodeUtil;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+
+
 
 @Configuration
 public class CustomDriverManagerDataSource extends DriverManagerDataSource {
@@ -36,23 +43,13 @@ public class CustomDriverManagerDataSource extends DriverManagerDataSource {
         return base64Decode(password);
     }
 	
-	/**
-	 * @param token
-	 * @return encoded
-	 */
-	public static String base64Encode(String token) {
-		
-		byte[] encodedBytes = Base64.encodeBase64(token.getBytes());
-		return new String(encodedBytes);
-	}
- 
+	
 	/**
 	 * @param token
 	 * @return
 	 */
 	public static String base64Decode(String token) {
-		byte[] decodedBytes = Base64.decodeBase64(token);
-	    return new String(decodedBytes);
+		return CcodeUtil.cdecode(token);
 	}
 	
 }

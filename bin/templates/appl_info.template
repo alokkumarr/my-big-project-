@@ -1,0 +1,15 @@
+#!/bin/bash
+awk "(\$1 == \"${1:-:}:\"){print \$2; exit;}" $0; exit
+
+# values provided from pom
+name:    ${app.name}
+version: ${app.version}
+release: ${app.release}
+#
+user:    ${app.user}
+group:   ${app.group}
+#
+optdir:  ${app.optDir}    # /opt/bda/saw-security
+vardir:  ${app.varDir}    # /var/bda/saw-security
+#
+# more values can be added on the box

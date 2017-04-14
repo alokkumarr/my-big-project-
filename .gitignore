@@ -1,1 +1,28 @@
+# ignore all files under directories
+arch/
+out/
+log/
 target/
+wrk/
+
+# ignore all files stating with _
+_*
+
+# ignore all files ending with ~
+*~
+
+# ignore all others
+*.class
+*.pyc
+.classpath
+.project
+.cache
+.settings
+.idea
+.m2
+.vagrant
+.yum
+.bash_history
+*.iml
+*.bak
+pom.xml.versionsBackup
