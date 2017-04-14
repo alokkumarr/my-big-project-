@@ -73,5 +73,6 @@ md-sidenav {
   background-image: url($company-logo-path);
   height: 50px;
   width: 130px;
-  background-size: 130px 50px;
+  background-size: contain;
+  background-repeat: no-repeat;
 }

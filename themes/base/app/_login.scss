@@ -17,7 +17,9 @@
   .brand-logo {
     width: 248px;
     height: 102px;
-    margin: 5px 0 0 -30px;
+    margin: 0 auto;
+    background-size: contain;
+    background-repeat: no-repeat;
     background-image: url($company-logo-path);
   }
 
@@ -40,12 +42,16 @@
   }
 
   md-input-container, .login-buttons {
-    width: 250px;
+    width: 100%;
+  }
+
+  md-input-container label {
+    font-size: 18px;
   }
 
   .login-info {
-    font-size: 12px;
-    opacity: 0.5;
+    font-size: 14px;
+    opacity: 0.75;
     margin-bottom: 20px;
   }
 
@@ -64,8 +70,7 @@
   }
 
   .middle-logo-container {
-    background: $login-middle-logo-color;
-    background-image: url('~img/alpha.png');
+    background: white;;
     background-repeat: no-repeat;
     display: block;
     transform: rotateY(180deg);
