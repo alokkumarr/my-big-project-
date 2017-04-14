@@ -18,7 +18,7 @@ jar_fls=( $lib_dir/saw-security*.jar )
 
 # Initialize Java args vars
 jar_fnm="${jar_fls[0]}"
-main_kl=com.sncr.nsso.common.util.CcodeUtil.main
+main_kl=com.sncr.nsso.common.util.CcodeUtil
 
 # Run java main class
 java -cp $jar_fnm $main_kl "$@"
