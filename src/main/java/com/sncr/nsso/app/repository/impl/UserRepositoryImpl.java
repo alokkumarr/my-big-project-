@@ -27,8 +27,9 @@ import com.sncr.nsso.common.bean.repo.ProductModuleFeaturePrivileges;
 import com.sncr.nsso.common.bean.repo.ProductModuleFeatures;
 import com.sncr.nsso.common.bean.repo.ProductModules;
 import com.sncr.nsso.common.bean.repo.TicketDetails;
+import com.sncr.nsso.common.util.CcodeUtil;
 import com.sncr.nsso.common.util.DateUtil;
-import com.sncr.nsso.common.util.EncriptionUtil;
+
 
 /**
  * This class is used to do CRUD operations on the oracle data base having nsso
@@ -67,7 +68,7 @@ public class UserRepositoryImpl implements UserRepository {
 		boolean isPasswordActive = false;
 		boolean[] ret = { false, false };
 
-		password = EncriptionUtil.encrypt(password).trim();
+		password = CcodeUtil.cencode(password).trim();
 		String pwd = password;
 		String sql = "SELECT U.PWD_MODIFIED_DATE, C.PASSWORD_EXPIRY_DAYS " + "FROM USERS U, CUSTOMERS C "
 				+ "WHERE U.USER_ID = ? AND U.ENCRYPTED_PASSWORD = ? " + " AND U.ACTIVE_STATUS_IND = '1' "
@@ -137,7 +138,7 @@ public class UserRepositoryImpl implements UserRepository {
 		// if new pass is != last 5 in pass history
 		// change the pass
 		// update pass history
-		String encNewPass = EncriptionUtil.encrypt(newPass).trim();
+		String encNewPass = CcodeUtil.cencode(newPass).trim();
 		String sql = "SELECT U.USER_SYS_ID FROM USERS U, CONTACT_INFO C, USER_CONTACT UC WHERE  U.USER_SYS_ID = UC.USER_SYS_ID "
 				+ "AND UC.CONTACT_INFO_SYS_ID=C.CONTACT_INFO_SYS_ID AND U.USER_ID = ?";
 
@@ -208,8 +209,8 @@ public class UserRepositoryImpl implements UserRepository {
 		// if new pass is != last 5 in pass history
 		// change the pass
 		// update pass history
-		String encOldPass = EncriptionUtil.encrypt(oldPass).trim();
-		String encNewPass = EncriptionUtil.encrypt(newPass).trim();
+		String encOldPass = CcodeUtil.cencode(oldPass).trim();
+		String encNewPass = CcodeUtil.cencode(newPass).trim();
 		String sql = "SELECT U.USER_SYS_ID" + " FROM USERS U" + " WHERE U.USER_ID = ?"
 				+ " and  U.ENCRYPTED_PASSWORD = ?";
 
@@ -855,11 +856,6 @@ public class UserRepositoryImpl implements UserRepository {
 			}
 			return "valid";
 		}
-
-	}
-
-	public static void main(String[] args) {
-		System.out.println(EncriptionUtil.encrypt("Newuser1!"));
 
 	}
 
