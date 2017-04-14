@@ -13,6 +13,7 @@ _*
 
 # ignore all others
 *.class
+*.pyc
 .classpath
 .project
 .cache
