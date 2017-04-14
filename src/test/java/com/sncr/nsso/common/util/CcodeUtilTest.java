@@ -17,7 +17,7 @@ public class CcodeUtilTest {
 		
 		String encryptedPassword = CcodeUtil.cencode(password);
 		String password_Actual = CcodeUtil.cdecode(encryptedPassword);
-		String encrypted_Actual = CcodeUtil.cdecode(password_Actual);
+		String encrypted_Actual = CcodeUtil.cencode(password_Actual);
 		
 		assertEquals(password, password_Actual);		
 		assertEquals(encryptedPassword, encrypted_Actual);
