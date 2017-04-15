@@ -1,6 +1,5 @@
 package sncr.metadata.semantix
 
-import com.typesafe.config.Config
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{Result, _}
 import org.apache.hadoop.hbase.util.Bytes
@@ -17,8 +16,8 @@ import sncr.saw.common.config.SAWServiceConfig
 /**
   * Created by srya0001 on 2/19/2017.
   */
-class SemanticNode(private[this] var content_element: JValue, val ui_item_type : String = Fields.UNDEF_VALUE.toString, c: Config = null)
-      extends ContentNode(c)
+class SemanticNode(private var content_element: JValue, val ui_item_type : String = Fields.UNDEF_VALUE.toString)
+      extends ContentNode
       with Relation
       with SourceAsJson {
 

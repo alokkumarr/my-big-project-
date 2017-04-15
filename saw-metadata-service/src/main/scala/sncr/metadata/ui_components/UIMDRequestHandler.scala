@@ -246,7 +246,7 @@ object UIMDRequestHandler{
 
   def scanSemanticTable(printPretty: Boolean) : String = {
     val srh = new UIMDRequestHandler( null )
-    val sNode = new UINode(null, null, null)
+    val sNode = new UINode(null, null)
     val result = if (!printPretty) compact(render(srh.build(sNode.scan)))
                  else pretty(render(srh.build(sNode.scan)))
     m_log debug result

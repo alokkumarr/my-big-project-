@@ -2,15 +2,18 @@ package sncr.metadata.engine.ihandlers
 
 import java.io.OutputStream
 
+import org.apache.hadoop.hbase.util.Bytes
 import org.json4s.JsonAST._
 import org.json4s.native.JsonMethods._
 import org.json4s.{JArray, JString}
 import org.slf4j.{Logger, LoggerFactory}
-import sncr.analysis.execution.ExecutorRunner
-import sncr.metadata.analysis.{AnalysisNode, AnalysisResult}
+import sncr.analysis.execution.ExecutionTaskHandler
+import sncr.metadata.analysis.{AnalysisExecutionHandler, AnalysisNode, AnalysisResult}
 import sncr.metadata.datalake.DataObject
+import sncr.metadata.engine.MDObjectStruct.{apply => _, _}
 import sncr.metadata.engine.ProcessingResult._
-import sncr.metadata.engine.{Fields, MetadataNodeCanSearch}
+import sncr.metadata.engine.SearchMetadata.simpleSearch
+import sncr.metadata.engine._
 import sncr.metadata.ui_components.UINode
 
 
@@ -212,6 +215,10 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
       (Success.id, "Verb/Action is good")
   }
 
+  private def validateList: (Int, String) =
+  {
+      (Success.id, "Verb/Action is good")
+  }
 
   def validateWorkItem(wi: JObject): (Integer, String) = {
     try {
@@ -260,6 +267,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
         case "add-dl-location" => validateDLLoc
         case "del-dl-location" => validateDLLoc
         case "execute" => validateExecute
+        case "list" => validateList
       }
       (Success.id, "Work item is OK")
     }
@@ -281,19 +289,49 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
       respGenerator.generate(List(executeWorkItem(oneWI)))
   }
 
+
+  private def convertKeys : Map[String, Any] =
+    keys.obj.map( e =>
+    { e._1 -> (e._2 match{
+      case s:JString => s.s
+      case i:JInt    => i.num.intValue()
+      case b:JBool => b.value
+    })} ).toMap
+
   private def executeExecute: JValue =
   {
-    val er: ExecutorRunner = new ExecutorRunner(1)
+    val keys2 : Map[String, Any] = convertKeys
+    val systemKeys : Map[String, Any] = Map.empty   //( syskey_NodeCategory.toString -> classOf[AnalysisNode].getName )
+    val er: ExecutionTaskHandler = new ExecutionTaskHandler(1)
     try {
-      er.startSQLExecutor(NodeId)
-      val analysisResultId: String = er.getPredefResultRowID(NodeId)
-      val msg = "Execution: AnalysisID = " + NodeId + ", Result Row ID: " + analysisResultId
+      m_log debug s"Execute search keys: ${keys2.mkString("{",",","}")}"
 
-      val msg2 = er.waitForCompletion(NodeId, 10000)
-      respGenerator.build((Success.id, msg + ",  Execution result: " + msg2))
+      val search = simpleSearch(tables.AnalysisMetadata.toString, keys2, systemKeys, "and")
+      val rowKey = Bytes.toString(search.head)
+      val analysisNode = AnalysisNode(rowKey)
+      if ( analysisNode.getCachedData == null || analysisNode.getCachedData.isEmpty)
+          throw new Exception("Could not find analysis node with provided search keys.")
+
+      val analysisId : String =
+        analysisNode.getCachedData("analysisId") match{
+          case i:Int => String.valueOf(i)
+          case s:String => s
+          case _ => throw new Exception("Inappropriate type/value of analysis ID")
+        }
+
+      val aeh: AnalysisExecutionHandler = new AnalysisExecutionHandler(rowKey, analysisId)
+      er.startSQLExecutor(aeh)
+      val analysisResultId: String = er.getPredefResultRowID(analysisId)
+      m_log debug s"Predefined result ID: $analysisResultId"
+
+      er.waitForCompletion(analysisId, aeh.getWaitTime)
+      val msg = "Execution: AnalysisID = " + analysisId + ", Result Row ID: " + analysisResultId
+      aeh.handleResult(outStream)
+      respGenerator.build((Success.id, msg + ",  Execution result: " + aeh.getStatus))
     }
     catch {
-      case e: Exception => val msg = s"Executing exception: ${e.getMessage}"; m_log error msg; respGenerator.build((Error.id, msg))
+      case e: Exception =>
+          val msg = s"Execution exception: ${e.getMessage}"; m_log error (msg, e); respGenerator.build((Error.id, msg))
       }
   }
 
@@ -305,7 +343,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
       case "UINode"       => val uih = UINode(NodeId); respGenerator.build(uih.getCachedData)
       case "AnalysisNode" => val ah = AnalysisNode(NodeId); respGenerator.build(ah.getCachedData)
       case "DataObject"   => val doh = DataObject(NodeId); respGenerator.build(doh.getCachedData)
-      case "AnalysisResult"   => val arh = AnalysisResult(NodeId); respGenerator.build(arh.getCachedData)
+      case "AnalysisResult"   => val arh = AnalysisResult(null, NodeId); respGenerator.build(arh.getCachedData)
       case "SemanticNode" => respGenerator.build(Error.id, "Not implemented")
       case _ => respGenerator.build(Error.id, "Not supported")
     }
@@ -339,8 +377,9 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
         respGenerator.build(ah.update(keys))
       }
       case "DataObject" => {
-        val doh = new DataObject(if (content == null || content.obj.isEmpty) JNothing else content,
-                                 if (schema == null || schema.obj.isEmpty) JNothing else schema)
+        val doh = DataObject(NodeId)
+        if (content != null && content.obj.nonEmpty) doh.setDescriptor(content)
+        if (schema != null && schema.obj.nonEmpty) doh.setSchema(schema)
         if (dl_locations.arr.nonEmpty){
           dl_locations.arr.foreach{
             case o: JString => doh.addLocation(o.s)
@@ -353,6 +392,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
       case "SemanticNode" => respGenerator.build(Error.id, "Not implemented")
       case _ => respGenerator.build(Error.id, "Not supported")
     }
+
   }
 
 
@@ -396,19 +436,37 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
 
   private def search: JValue =
   {
-    val keys2 : Map[String, Any] = keys.obj.map( e => e._1 -> e._2).toMap
-    var handler : MetadataNodeCanSearch = null
-    nodeCategory match {
-      case "UINode"       => handler = UINode(NodeId)
-      case "AnalysisNode" => handler = AnalysisNode(NodeId)
-      case "DataObject"   => handler = DataObject(NodeId)
-      case "AnalysisResult" => handler = AnalysisResult(NodeId)
+    val keys2 : Map[String, Any] = convertKeys
+    val (nodeCategoryValue, table_name) = nodeCategory match {
+      case "UINode"       => (classOf[UINode].getName, tables.SemanticMetadata.toString)
+      case "AnalysisNode" => (classOf[AnalysisNode].getName, tables.AnalysisMetadata.toString)
+      case "DataObject"   => (classOf[DataObject].getName, tables.DatalakeMetadata.toString)
+      case "AnalysisResult" => (classOf[AnalysisResult].getName, tables.AnalysisResults.toString)
       case "SemanticNode" => return respGenerator.build(Error.id, "Not implemented")
       case _ => return respGenerator.build(Error.id, "Not supported")
     }
-    val rowKeys = handler.simpleMetadataSearch(keys2,"and")
-    respGenerator.build(handler.loadNodes(rowKeys))
+    val systemKeys = Map( syskey_NodeCategory.toString -> nodeCategoryValue)
+    val rowKeys = SearchMetadata.simpleSearch(table_name, keys2, systemKeys, "and")
+    val headers = MetadataNode.loadMDNodeHeader(table_name, rowKeys, true)
+    respGenerator.build(headers)
   }
+
+
+  private def list: JValue =
+  {
+    val table_name = nodeCategory match {
+      case "UINode"       => tables.SemanticMetadata.toString
+      case "AnalysisNode" => tables.AnalysisMetadata.toString
+      case "DataObject"   => tables.DatalakeMetadata.toString
+      case "AnalysisResult" => tables.AnalysisResults.toString
+      case "SemanticNode" => return respGenerator.build(Error.id, "Not implemented")
+      case _ => return respGenerator.build(Error.id, "Not supported")
+    }
+    val rowKeyes = SearchMetadata.scanMDNodes(table_name)
+//    val headers = MetadataNode.loadMDNodeHeader(table_name, rowKeyes, true)
+    respGenerator.build(rowKeyes)
+  }
+
 
   private def updateRelation(): JValue =
   {
@@ -447,7 +505,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
     case "UINode"       => val uih = UINode(NodeId); respGenerator.build(uih.delete)
     case "AnalysisNode" => val ah = AnalysisNode(NodeId); respGenerator.build(ah.delete)
     case "DataObject"   => val doh = DataObject(NodeId); respGenerator.build(doh.delete)
-    case "AnalysisResult"   => val arh = AnalysisResult(NodeId); respGenerator.build(arh.delete)
+    case "AnalysisResult"   => val arh = AnalysisResult(null, NodeId); respGenerator.build(arh.delete)
     case "SemanticNode" => respGenerator.build(Error.id, "Not implemented")
     case _ => respGenerator.build(Error.id, "Not supported.")
   }
@@ -462,7 +520,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
         if (dl_locations.arr.nonEmpty){
           dl_locations.arr.foreach{
             case o: JString => if (verb.equals("del-dl-location")) doh.removeLocation(o.s) else doh.addLocation(o.s)
-            case _ => m_log error "Incorrect request stru cture: dl-location, skip it"
+            case _ => m_log error "Incorrect request structure: dl-location, skip it"
           }
         }
         respGenerator.build(doh.updateDLLocations())
@@ -499,6 +557,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
       case "add-element" | "del-element"          => updateRelation()
       case "add-dl-location" | "del-dl-location"  => updateDLLoc()
       case "execute"                              => executeExecute
+      case "list"   => list
       case _ => m_log error s"Internal error, unknown verb => $verb"; JObject(Nil)
     }
   }

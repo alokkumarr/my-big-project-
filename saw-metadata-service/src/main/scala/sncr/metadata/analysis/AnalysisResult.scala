@@ -2,7 +2,6 @@ package sncr.metadata.analysis
 
 import java.util.{Base64, UUID}
 
-import com.typesafe.config.Config
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{Get, Put, Result}
 import org.apache.hadoop.hbase.util.Bytes
@@ -19,13 +18,11 @@ import sncr.saw.common.config.SAWServiceConfig
   * Created by srya0001 on 3/10/2017.
   */
 
-class AnalysisResult(private[this] val parentAnalysisRowID : String,
-                     private[this] var descriptor : JValue = null,
-                     predefRowKey : String = null,
-                     c: Config = null)
-  extends ContentNode(c) with SourceAsJson
+class AnalysisResult(private val parentAnalysisRowID : String,
+                     private var descriptor : JValue = null,
+                     private val predefRowKey : String = null)
+  extends ContentNode with SourceAsJson
 {
-
 
 
   def setDescriptor() : Unit = {
@@ -45,9 +42,6 @@ class AnalysisResult(private[this] val parentAnalysisRowID : String,
   }
 
 
-
-  if (predefRowKey != null && predefRowKey.nonEmpty) setRowKey(Bytes.toBytes(predefRowKey))
-
   override def compileRead(g: Get) = {
     includeContent(g)
     g.addFamily(MDColumnFamilies(_cf_objects.id))
@@ -63,25 +57,23 @@ class AnalysisResult(private[this] val parentAnalysisRowID : String,
              (key_Definition.toString -> dataAsJValue) ++  objects)
   }
 
-  override protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisNode].getName)
+  override protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisResult].getName)
 
   protected val table = SAWServiceConfig.metadataConfig.getString("path") + "/" + tables.AnalysisResults
   protected val tn: TableName = TableName.valueOf(table)
   mdNodeStoreTable = connection.getTable(tn)
-
+  headerDesc =  AnalysisResult.searchFields
 
   override protected def initRow: String = {
 
-    if (descriptor != JNothing) {
-      val nodeID = (descriptor \ Fields.NodeId.toString).extract[String]
-      if (nodeID.nonEmpty) rowKey = Bytes.toBytes(nodeID)
-      return nodeID
+    if (predefRowKey != null && predefRowKey.nonEmpty)
+      predefRowKey
+    else{
+      val urid = UUID.randomUUID()
+      rowKey = Bytes.toBytes(urid.toString)
+      m_log debug s"Generated RowKey = ${urid.toString}"
+      urid.toString
     }
-
-    val urid = UUID.randomUUID()
-    rowKey = Bytes.toBytes(urid.toString)
-    m_log debug s"Generated RowKey = ${urid.toString}"
-    urid.toString
   }
 
   protected def validate: (Int, String) = {
@@ -102,12 +94,13 @@ class AnalysisResult(private[this] val parentAnalysisRowID : String,
   def create: (Int, String) = {
     try {
       setDescriptor()
+      val put_op = createNode(NodeType.ContentNode.id, classOf[AnalysisResult].getName)
+
       val searchValues: Map[String, Any] = AnalysisResult.extractSearchData(descriptor) +
        (Fields.NodeId.toString -> Bytes.toString(rowKey)) + ("AnalysisNodeId" -> parentAnalysisRowID)
       searchValues.keySet.foreach(k => {
         m_log debug s"Add search field $k with value: ${searchValues(k).toString}"
       })
-      val put_op = createNode(NodeType.RelationContentNode.id, classOf[AnalysisNode].getName)
       if (commit(saveObjects(saveContent(saveSearchData(put_op,searchValues)))))
         (NodeCreated.id, s"${Bytes.toString(rowKey)}")
       else
@@ -125,7 +118,6 @@ class AnalysisResult(private[this] val parentAnalysisRowID : String,
 
       val (res, msg) = selectRowKey(filter)
       if (res != Success.id) return (res, msg)
-      load
       setDescriptor()
 
       val searchValues: Map[String, Any] = AnalysisResult.extractSearchData(descriptor) +
@@ -151,18 +143,18 @@ class AnalysisResult(private[this] val parentAnalysisRowID : String,
   def getObjects(res: Result): Map[String, Any]  =
   {
     val _objectDescriptorAsString = Bytes.toString(res.getValue(MDColumnFamilies(_cf_objects.id),Bytes.toBytes(Fields.ObjectDescriptor.toString)))
-    val _objectDescriptorAsJson = parse(_objectDescriptorAsString, false, false)
+      val _objectDescriptorAsJson = parse(_objectDescriptorAsString, false, false)
     _objects_descriptor = _objectDescriptorAsJson.foldField[Map[String, String]](Map.empty)(
 //      (ob:Map[String, String], f:JField) => ob ++ Map(f._1 -> f._2.extract[String]) )
         (ob, f) => ob ++ Map(f._1 -> f._2.extract[String]) )
 
     _objects  = _objects_descriptor.keySet.foldLeft[Map[String, Any]](Map.empty)((_o, k) => _objects_descriptor(k) match{
-      case  "Location" => {
+      case  "location" => {
           val location = Bytes.toString(res.getValue(MDColumnFamilies(_cf_objects.id),Bytes.toBytes(k)))
           m_log debug s"Object is external and should be loaded outside of app."
           _o + (k -> location)
       }
-      case "JSON" => {
+      case "json" => {
         val data = Bytes.toString(res.getValue(MDColumnFamilies(_cf_objects.id),Bytes.toBytes(k)))
         val json = parse(data, false, false)
         m_log debug s"Object is stored inline, in JSON format"
@@ -195,8 +187,8 @@ class AnalysisResult(private[this] val parentAnalysisRowID : String,
     _objects.keySet.foreach( ref => {
         val ob : Any = _objects(ref)
         val _data = ob match{
-          case s: String => _objects_descriptor = _objects_descriptor + (ref -> "Location"); Bytes.toBytes(s)
-          case v: JValue => _objects_descriptor = _objects_descriptor + (ref -> "JSON"); Bytes.toBytes(compact(render(v)))
+          case s: String => _objects_descriptor = _objects_descriptor + (ref -> "location"); Bytes.toBytes(s)
+          case v: JValue => _objects_descriptor = _objects_descriptor + (ref -> "json"); Bytes.toBytes(compact(render(v)))
           case b: Array[Byte] => _objects_descriptor = _objects_descriptor + (ref -> "binary"); b
           case _ => m_log error s"Unsupported analysis result type: ${Bytes.toString(rowKey)}, Analysis ID: $parentAnalysisRowID ."; null
         }
@@ -213,44 +205,36 @@ class AnalysisResult(private[this] val parentAnalysisRowID : String,
 
 object AnalysisResult{
 
-  def apply(rowId: String, c: Config) :AnalysisResult =
-  {
-    val anRes = new AnalysisResult(Fields.UNDEF_VALUE.toString, null, rowId, c)
-    anRes.load
-    anRes
-  }
 
-  def apply(rowId: String) :AnalysisResult =
-  {
-    val anRes = new AnalysisResult(Fields.UNDEF_VALUE.toString, null, rowId)
-    anRes.load
-    anRes
-  }
 
-  def apply(c: Config, predefrowId: String) :AnalysisResult =
+  def apply(parentRowId: String, rowId: String) :AnalysisResult =
   {
-    val anRes = new AnalysisResult(Fields.UNDEF_VALUE.toString, null, predefrowId, c)
+    val anRes = new AnalysisResult(parentRowId, null, null)
+    anRes.setRowKey(Bytes.toBytes(rowId))
+    anRes.load
     anRes
   }
 
   protected val m_log: Logger = LoggerFactory.getLogger("AnalysisResultObject")
 
-  val searchFields = Map ("result" -> "String",
+  val searchFields = Map ("name" -> "String",
                           "NodeId" -> "String",
-                          "AnalysisNodeId" -> "String",
-                          "execution_timestamp" -> "Time",
-                          "data_location" -> "String")
+                          "analysisId" -> "String",
+                          "execution_timestamp" -> "String",
+                          "execution_result" -> "String",
+                          "analysisName" -> "String")
   protected val requiredFields = List ("result", "execution_timestamp","data_location", "exported", "format" )
 
   def  extractSearchData(analysisResult: JValue) : Map[String, Any] = {
 
-    //TODO::Create proper list when interface is ready
     List(
-      (analysisResult, "result"),
+      (analysisResult, "name"),
+      (analysisResult, "analysisName"),
       (analysisResult, "execution_timestamp"),
-      (analysisResult, "data_location")
+      (analysisResult, "execution_result"),
+      (analysisResult, "analysisId")
       ).map(jv => {
-        val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, SearchDictionary.searchFields(jv._2)) )
+        val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, searchFields(jv._2)) )
         m_log trace s"Field: ${jv._2}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${searchFields(jv._2)}\n, Value: $searchValue"
         if (result) jv._2 -> Option(searchValue) else jv._2 -> None
       }).filter(_._2.isDefined).map(kv => kv._1 -> kv._2.get).toMap

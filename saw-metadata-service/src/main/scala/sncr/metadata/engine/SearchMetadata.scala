@@ -12,6 +12,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.MDObjectStruct._
 import ProcessingResult._
 import org.apache.hadoop.hbase.TableName
+import sncr.saw.common.config.SAWServiceConfig
 
 
 /**
@@ -66,7 +67,7 @@ trait SearchMetadata extends MetadataStore{
   def selectRowKey(keys: Map[String, Any]) : (Int, String) = {
     if (keys.contains(Fields.NodeId.toString)) {
       setRowKey(MDNodeUtil.convertValue(keys(Fields.NodeId.toString)))
-      val msg = s" Selected Node [ ID = ${new String(rowKey)} ]"; m_log debug Success.toString + " ==> " + msg
+      val msg = s"Selected Node [ ID = ${new String(rowKey)} ]"; m_log debug Success.toString + " ==> " + msg
       (Success.id,  msg)
     }
     else{
@@ -152,7 +153,7 @@ object SearchMetadata extends MetadataStore{
   import scala.collection.JavaConversions._
   def simpleSearch(mdTableName: String, keys: Map[String, Any], systemProps: Map[String, Any], condition: String) : List[Array[Byte]] =
   {
-    val tn: TableName = TableName.valueOf(mdTableName)
+    val tn: TableName = TableName.valueOf(SAWServiceConfig.metadataConfig.getString("path") + "/" + mdTableName)
     mdNodeStoreTable = connection.getTable(tn)
 
     val filterList : FilterList = new FilterList( if (condition.equalsIgnoreCase("or")) FilterList.Operator.MUST_PASS_ONE else FilterList.Operator.MUST_PASS_ALL )
@@ -187,11 +188,18 @@ object SearchMetadata extends MetadataStore{
     val sr : ResultScanner = mdNodeStoreTable.getScanner(q)
 
     val result = (for( r: Result <- sr) yield r.getRow.clone()).toList
-    m_log trace s"Found: ${sr.size} rows satisfied to filter: ${result.map ( new String( _ )).mkString("[", ",", "]")}"
+    m_log debug s"Found: ${sr.size} rows satisfied to filter: ${result.map ( new String( _ )).mkString("[", ",", "]")}"
     sr.close
     mdNodeStoreTable.close()
     result
   }
+
+  def scanMDNodes(mdNodeStoreTableName: String): List[Array[Byte]] = {
+    val tn: TableName = TableName.valueOf(SAWServiceConfig.metadataConfig.getString("path") + "/" + mdNodeStoreTableName)
+    val mdNodeStoreTable2 = connection.getTable(tn)
+    scanMDNodes(mdNodeStoreTable2)
+  }
+
 
 
   import scala.collection.JavaConversions._

@@ -31,8 +31,11 @@ public class ExecutionTaskHandler {
         if (sqlExecutors.size() >= capacity)
             throw new Exception("SQL Executor service out of capacity, please wait");
 
-        ExecuteAnalysis ea = new ExecuteAnalysis(ah.getAnalysisId());
+        ExecutionTask ea = new ExecutionTask(ah.getAnalysisId(), ah.sqlExecInputFilename(), ah.resultExecOutputFile());
         executionHandler.put(ah.getAnalysisId(), ah);
+        String resultId = ea.getPredefinedRowID();
+        ah.setPreDefinedResultKey(resultId);
+        ah.generateJobDescription(resultId);
         FutureTask<String> sqlTask = (FutureTask<String>) executorService.submit(ea);
         sqlExecutors.put(ah.getAnalysisId(), sqlTask);
     }
@@ -57,13 +60,11 @@ public class ExecutionTaskHandler {
                     res = sqlExecutors.remove(analysisId).get();
                 }
                 aeh.setResult(res);
-                cleanup(aeh);
                 return ProcessExecutionResult.Success.name();
             }
             else {
                 if (sqlTask.isCancelled()) {
                     m_log.debug("The task [ Analysis ID: " + analysisId + " ] was cancelled");
-                    cleanup(aeh);
                     return ProcessExecutionResult.Cancelled.name();
                 }
                 else {
@@ -73,15 +74,12 @@ public class ExecutionTaskHandler {
             }
         } catch (InterruptedException e) {
             m_log.error("The task [ Analysis ID: " + analysisId + " ] was interrupted", e);
-            cleanup(aeh);
             return ProcessExecutionResult.InterruptedException.name();
         } catch (ExecutionException e) {
             m_log.error("The task [ Analysis ID: " + analysisId + " ] has thrown execution exception", e);
-            cleanup(aeh);
             return ProcessExecutionResult.ExecutionException.name();
         } catch (TimeoutException e) {
             m_log.error("Timeout has occurred at attempt get result for the task [ Analysis ID: " + analysisId + " ]", e);
-            cleanup(aeh);
             return ProcessExecutionResult.Timeout.name();
         }
     }
@@ -96,32 +94,32 @@ public class ExecutionTaskHandler {
 
         try {
             Future<String> sqlTask = sqlExecutors.get(analysisId);
+            String res = "";
             while (!sqlTask.isDone() &&
                    !sqlTask.isCancelled())
             {
-                m_log.debug("Wait for result: " + waittime * 1000 + " sec");
-                sqlTask.wait(waittime);
+                m_log.trace("Wait for result: " + waittime  + " sec");
+                Thread.sleep(500);
             }
-            String res = sqlExecutors.remove(analysisId).get();
+            res = sqlTask.get(waittime, TimeUnit.SECONDS);
+            sqlExecutors.remove(analysisId);
             aeh.setResult(res);
-            cleanup(aeh);
+            m_log.debug("Result ===> " + res);
             return aeh;
         } catch (InterruptedException e) {
             m_log.error("The task [ Analysis ID: " + analysisId + " ] was interrupted", e);
             aeh.setResult(ProcessExecutionResult.InterruptedException.name());
-            cleanup(aeh);
             return aeh;
         } catch (ExecutionException e) {
             m_log.error("The task [ Analysis ID: " + analysisId + " ] has thrown execution exception", e);
             aeh.setResult(ProcessExecutionResult.ExecutionException.name());
-            cleanup(aeh);
+            return aeh;
+        } catch (TimeoutException e) {
+            m_log.error("The task [ Analysis ID: " + analysisId + " ] has thrown timeout exception", e);
             return aeh;
         }
     }
 
-    private void cleanup(AnalysisExecutionHandler analysisExecutionHandler) {
-        analysisExecutionHandler.removeFiles();
-    }
 
     public AnalysisExecutionHandler cancel(String analysisId, long timeout)
     {

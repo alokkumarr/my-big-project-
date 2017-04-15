@@ -2,20 +2,20 @@ package sncr.metadata.engine
 
 import java.io.IOException
 
-import com.typesafe.config.Config
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.util.Bytes
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.MDObjectStruct._
 import sncr.metadata.engine.ProcessingResult._
+import sncr.saw.common.config.SAWServiceConfig
 
 
 /**
   * Created by srya0001 on 2/17/2017.
   */
-class MetadataNode(c: Config = null) extends MetadataStore(c) {
-  
+class MetadataNode extends MetadataStore
+{
 
   override protected val m_log: Logger = LoggerFactory.getLogger(classOf[MetadataNode].getName)
 
@@ -126,11 +126,13 @@ class MetadataNode(c: Config = null) extends MetadataStore(c) {
   def selectRowKey(keys: Map[String, Any]) : (Int, String) = ???
 
   def load: Map[String, Any] = {
+    m_log debug s"Load row by rowId: ${Bytes.toString(rowKey)}"
     cachedData = Map.empty
     if (rowKey == null || rowKey.length == 0) throw new Exception ("Row Id is not set")
     val row = readCompiled(prepareRead)
     if (row.isEmpty) throw new Exception (NodeDoesNotExist.toString)
     cachedData = row.get
+    m_log trace s"Cache data: ${cachedData.mkString("{", ", ","}")}"
     cachedData
   }
 
@@ -156,9 +158,10 @@ object MetadataNode extends MetadataStore{
   override val m_log: Logger = LoggerFactory.getLogger("MetadataNode")
 
   def create(mdTableName: String, compositeKey: String, content: String, searchDictionary: Map[String, String]): Boolean = {
+    var lmdNodeStoreTable : Table = null
     try {
       val tn: TableName = TableName.valueOf(mdTableName)
-      mdNodeStoreTable = connection.getTable(tn)
+      lmdNodeStoreTable = connection.getTable(tn)
       var putOp: Put = new Put(Bytes.toBytes(compositeKey))
       putOp = putOp.addColumn(MDColumnFamilies(_cf_source.id),
                               MDKeys(key_Definition.id),
@@ -169,12 +172,13 @@ object MetadataNode extends MetadataStore{
                                 Bytes.toBytes(k),
                                 Bytes.toBytes(sval(k).asInstanceOf[String]))
       })
-      mdNodeStoreTable.put(putOp)
+      lmdNodeStoreTable.put(putOp)
     }
     catch{
       case x: IOException => m_log error ( s"Could not retrieve  node: $compositeKey, Reason: ", x); return false
+      case t : Throwable =>  m_log error ( s"Unexpected problem occurred:  $compositeKey, Reason: ", t); return false
     }
-    finally mdNodeStoreTable.close()
+    finally lmdNodeStoreTable.close()
     true
   }
 
@@ -184,14 +188,14 @@ object MetadataNode extends MetadataStore{
   }
 
   def loadHeader(mdTableName: String, compositeKey: Array[Byte], includeSearchFields: Boolean): Option[Map[String, Any]] = {
-    val tn: TableName = TableName.valueOf(mdTableName)
-    mdNodeStoreTable = connection.getTable(tn)
-    loadHeader(mdNodeStoreTable, compositeKey, includeSearchFields )
+    val tn: TableName = TableName.valueOf( SAWServiceConfig.metadataConfig.getString("path") + "/" + mdTableName)
+    val lmdNodeStoreTable = connection.getTable(tn)
+    loadHeader(lmdNodeStoreTable, compositeKey, includeSearchFields )
   }
 
 
   import scala.collection.JavaConversions._
-  private def loadHeader(mdNodeStoreTable: Table, compositeKey: Array[Byte], includeSearchFields: Boolean): Option[Map[String, Any]] = {
+  private def loadHeader(a_mdNodeStoreTable: Table, compositeKey: Array[Byte], includeSearchFields: Boolean): Option[Map[String, Any]] = {
     try {
 
       m_log debug s"Load row: ${new String(compositeKey)}"
@@ -201,7 +205,7 @@ object MetadataNode extends MetadataStore{
       getOp.addFamily(MDColumnFamilies(systemProperties.id))
       if (includeSearchFields) getOp.addFamily(MDColumnFamilies(_cf_search.id))
 
-      val res = mdNodeStoreTable.get(getOp)
+      val res = a_mdNodeStoreTable.get(getOp)
       if (res.isEmpty) return None
 
       val nodeType = Bytes.toShort(res.getValue(MDColumnFamilies(systemProperties.id),MDKeys(syskey_NodeType.id)))
@@ -228,25 +232,29 @@ object MetadataNode extends MetadataStore{
       }
     }
     catch{
-      case x: IOException => m_log error ( s"Could not read node: $compositeKey, Reason: ", x); None
+      case io: IOException => m_log error ( s"Could not read node: ${Bytes.toString(compositeKey)}, Reason: ", io); None
+      case e: Exception => m_log error ( s"Node can be corrupted: ${Bytes.toString(compositeKey)}, Reason: ", e); None
+      case t : Throwable =>  m_log error ( s"Unexpected problem occurred:  ${Bytes.toString(compositeKey)}, Reason: ", t); None
     }
-    finally mdNodeStoreTable.close()
+    finally a_mdNodeStoreTable.close()
 
   }
 
 
   def delete(mdTableName: String, compositeKey: String) : Boolean =
   {
+    var lmdNodeStoreTable : Table = null
     try {
-      val tn: TableName = TableName.valueOf(mdTableName)
-      mdNodeStoreTable = connection.getTable(tn)
+      val tn: TableName = TableName.valueOf(SAWServiceConfig.metadataConfig.getString("path") + "/" + mdTableName)
+      lmdNodeStoreTable = connection.getTable(tn)
       val delOp: Delete = new Delete(Bytes.toBytes(compositeKey))
-      mdNodeStoreTable.delete(delOp)
+      lmdNodeStoreTable.delete(delOp)
     }
     catch{
       case x: IOException => m_log error ( s"Could not delete node: $compositeKey, Reason: ", x); return false
+      case t : Throwable =>  m_log error ( s"Unexpected problem occurred:  $compositeKey, Reason: ", t); return false
     }
-    finally mdNodeStoreTable.close()
+    finally lmdNodeStoreTable.close()
     true
   }
 
@@ -255,7 +263,7 @@ object MetadataNode extends MetadataStore{
       val query = new Get(Bytes.toBytes(compositeKey))
       query.addFamily(MDColumnFamilies(_cf_source.id))
       val res = mdNodeStoreTable.get(query)
-      if (res == null || res.isEmpty){m_log debug s"Row does not exist: ${compositeKey}"; return false}
+      if (res == null || res.isEmpty){m_log debug s"Row does not exist: $compositeKey"; return false}
       val data = query.getFamilyMap
       if (res.isEmpty || data == null || data.size == 0){
         m_log debug s"Row is empty: $compositeKey"
@@ -269,7 +277,8 @@ object MetadataNode extends MetadataStore{
       mdNodeStoreTable.put(putOp)
     }
     catch{
-      case x: IOException => m_log error ( s"Could not retrieve  node: ${compositeKey}, Reason: ", x); return false
+      case x: IOException => m_log error ( s"Could not retrieve  node: $compositeKey, Reason: ", x); return false
+      case t : Throwable =>  m_log error ( s"Unexpected problem occurred:  $compositeKey, Reason: ", t ); return false
     }
     finally mdNodeStoreTable.close()
     true
@@ -277,11 +286,12 @@ object MetadataNode extends MetadataStore{
 
   def loadMDNodeHeader(mdTableName: String, rowKeys: List[Array[Byte]], includeSearchFields : Boolean ): List[Map[String, Any]] =
   {
-    m_log debug s"Load ${rowKeys.size} rows"
-    val tn: TableName = TableName.valueOf(mdTableName)
-    mdNodeStoreTable = connection.getTable(tn)
-    val loadedNodes = rowKeys.map( k => loadHeader(mdNodeStoreTable, k, includeSearchFields)).filter(  _.isDefined ).map(v => v.get)
-    mdNodeStoreTable.close()
+    m_log debug s"Load ${rowKeys.size} rows from table $mdTableName"
+    val tn: TableName = TableName.valueOf(SAWServiceConfig.metadataConfig.getString("path") + "/" +  mdTableName)
+    val lmdNodeStoreTable = connection.getTable(tn)
+    m_log debug s"Table name: $lmdNodeStoreTable.getName"
+    val loadedNodes = rowKeys.map( k => loadHeader(lmdNodeStoreTable, k, includeSearchFields)).filter(  _.isDefined ).map(v => v.get)
+    lmdNodeStoreTable.close()
     loadedNodes
   }
 

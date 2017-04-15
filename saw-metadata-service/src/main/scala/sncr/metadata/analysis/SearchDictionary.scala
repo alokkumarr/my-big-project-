@@ -10,7 +10,7 @@ object SearchDictionary {
     "name" -> "String",
     "tenantId" -> "String",
     "productId"-> "String",
-    "analysisId"-> "Int",
+    "analysisId"-> "String",
     "analysisCategoryId"-> "Int",
     "analysisCategoryName"-> "String",
     "tenantId"-> "String",
