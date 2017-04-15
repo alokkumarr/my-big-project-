@@ -11,24 +11,24 @@ import java.util.concurrent.Callable;
 /**
  * Created by srya0001 on 3/18/2017.
  */
-public class ExecuteAnalysis implements Callable<String> {
+public class ExecutionTask implements Callable<String> {
 
-    protected static final Logger m_log = LoggerFactory.getLogger(ExecuteAnalysis.class.getName());
+    protected static final Logger m_log = LoggerFactory.getLogger(ExecutionTask.class.getName());
     private String predefRowID;
-    private String executorLocation = "/opt/saw/sql-executor/bin/start.sh";
+    private String executorLocation = "/opt/saw/sql-executor/bin/run.sh";
     private String analysisId;
 
-    ExecuteAnalysis(String analysisID ){
+    ExecutionTask(String analysisID ){
         predefRowID = analysisID + "::" + System.nanoTime();
         analysisId = analysisID;
     }
 
-    ExecuteAnalysis(String predefResultRowID,  String analysisID ){
+    ExecutionTask(String predefResultRowID, String analysisID ){
         predefRowID = predefResultRowID;
         analysisId = analysisID;
     }
 
-    public void resetSQLExecutorLocation(String newLoc) {  executorLocation = newLoc; }
+    public void setSQLExecutorLocation(String newLoc) {  executorLocation = newLoc; }
 
     public String getPredefinedRowID(){ return predefRowID; }
 
