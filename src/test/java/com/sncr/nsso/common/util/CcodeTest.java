@@ -14,9 +14,9 @@ public class CcodeTest {
     public void test() {
         
         String password = "$#!some38.Very*coMpleX-p=@ss^0rD~";
-        System.out.print("PW:"+password+"::\n");
+        //System.out.print("PW:"+password+"::\n");
         String encryptedPassword = Ccode.cencode(password);
-        System.out.print("EP:"+encryptedPassword+"::\n");
+        //System.out.print("EP:"+encryptedPassword+"::\n");
 
         String password_Actual   = Ccode.cdecode(encryptedPassword);
         assertEquals(password, password_Actual);        
