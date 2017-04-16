@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
-import com.sncr.nsso.common.util.CcodeUtil;
+import com.sncr.nsso.common.util.Ccode;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -49,7 +49,7 @@ public class CustomDriverManagerDataSource extends DriverManagerDataSource {
 	 * @return
 	 */
 	public static String base64Decode(String token) {
-		return CcodeUtil.cdecode(token);
+		return Ccode.cdecode(token);
 	}
 	
 }
