@@ -8,16 +8,28 @@ exports.config = {
   allScriptsTimeout: 500000,
   directConnect: true,
 
-  capabilities: {
-    browserName: 'chrome',
-    chromeOptions: {
-      args: [
-        //'incognito',
-        'disable-extensions',
-        'disable-web-security'
-      ]
+  multiCapabilities: [
+    /*{
+      shardTestFiles: true
+    },*/
+
+    {
+      'browserName': 'chrome',
+       chromeOptions: {
+        args: [
+          //'incognito',
+          'disable-extensions',
+          'disable-web-security'
+        ]
+      }
+    },
+
+    {
+      'browseName': 'firefox'
     }
-  },
+  ],
+
+  maxSessions: 2,
 
   jasmineNodeOpts: {
     isVerbose: true,
