@@ -2,7 +2,8 @@ info:
   component: Synchronoss Analytics Composite Service
 spring:
   application:
-    name: saw-composite
+    name: saw-composite-service
+    
   cloud:
     config:
       fail-fast: true
@@ -17,8 +18,5 @@ spring:
         service-id:  config-server
         enabled:  false
       uri: http://localhost:8888
-  activemq:
-    broker-url: 
 
-      
-
+    

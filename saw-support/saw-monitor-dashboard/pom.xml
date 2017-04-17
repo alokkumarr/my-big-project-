@@ -23,7 +23,7 @@
 			<artifactId>spring-cloud-config-client</artifactId>
 		</dependency>
 
-		<!-- Combine from multiple instances -->
+		<!-- Combine from multiple instances 
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-turbine-stream</artifactId>
@@ -32,6 +32,7 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-stream-rabbit</artifactId>
 		</dependency>
+		-->
 		<!-- Combine from multiple instances -->
 
 		<dependency>

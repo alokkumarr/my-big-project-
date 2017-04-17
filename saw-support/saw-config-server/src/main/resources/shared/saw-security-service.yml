@@ -11,8 +11,8 @@ mail:
     subject: 'Request for Reset Password '
     username: ''
 server:
-    address: 127.0.0.1
-    context-path: /saw-security
+    address: 127.0.0.1 
+    context-path: /saw-security-service
     port: 9000
     tomcat:
         compressableMimeTypes: application/json
@@ -45,5 +45,29 @@ shell:
                password: saw
 management:
      security:
-       enabled: false   
+       enabled: false
+     shell:
+       ssh:
+         port: 2002
+     
+endpoints:
+  restart:
+    enabled: true
+  shutdown:
+    enabled: true
+  health:
+    sensitive: false  
+      
+eureka:
+  instance:
+    statusPageUrlPath: ${management.context-path}/info
+    healthCheckUrlPath: ${management.context-path}/health
+  client:
+    healthcheck:
+       enabled: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/    
+   
+      
+              
         

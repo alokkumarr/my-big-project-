@@ -5,33 +5,35 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
-import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.client.RestTemplate;
 
 
 
+// TODO : Enable Edge Sever with Zuul
+// TODO : Enable Feign client later once base service is ready, the request shall hostname:port/serviceId/actualContextPath
 @SpringBootApplication
-@EnableDiscoveryClient
+//@EnableZuulProxy
+//@EnableFeignClients
 @EnableCircuitBreaker
-@EnableZuulProxy
-@ComponentScan("com.synchronoss.saw.composite")
+@EnableEurekaClient
 public class SAWCompositeServiceApplication {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SAWCompositeServiceApplication.class);
 	
 	@Bean
-	@LoadBalanced
-    public RestTemplate restTemplate() {
+    //@LoadBalanced
+    RestTemplate restTemplate() {
         return new RestTemplate();
     }
+
+	
 	public static void main(String[] args) {
 		ConfigurableApplicationContext ctx = SpringApplication.run(SAWCompositeServiceApplication.class, args);
         LOG.info(ctx.getApplicationName() + " has started.");
+        
 	}
 
 }

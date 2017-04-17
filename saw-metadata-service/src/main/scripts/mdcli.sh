@@ -3,7 +3,7 @@
 source /etc/saw/service.env || exit 1
 
 declare -r app_mainclass="sncr.metadata.MetadataCLI"
-declare -r lib_dir=${SAW_SERVICE_HOME}/lib2
+declare -r lib_dir=${SAW_SERVICE_HOME}/lib
 declare -r conf_dir=${SAW_SERVICE_HOME}/conf
 declare -r log_dir=/var/saw/service/log
 declare -r bin_dir=${SAW_SERVICE_HOME}/sbin
