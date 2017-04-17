@@ -9,7 +9,7 @@ export function AnalyzeService($http, $timeout, $q) {
   'ngInject';
 
   let _menuResolver = null;
-  const _menu = new Promise((resolve, reject) => {
+  const _menu = new Promise(resolve => {
     _menuResolver = resolve;
   });
 
