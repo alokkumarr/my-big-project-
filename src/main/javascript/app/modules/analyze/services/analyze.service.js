@@ -1,9 +1,17 @@
 import omit from 'lodash/omit';
 import fpMap from 'lodash/fp/map';
 import fpGet from 'lodash/fp/get';
+import filter from 'lodash/filter';
+import find from 'lodash/find';
+import flatMap from 'lodash/flatMap';
 
 export function AnalyzeService($http, $timeout, $q) {
   'ngInject';
+
+  let _menuResolver = null;
+  const _menu = new Promise((resolve, reject) => {
+    _menuResolver = resolve;
+  });
 
   return {
     getCategories,
@@ -23,8 +31,43 @@ export function AnalyzeService($http, $timeout, $q) {
     saveReport,
     getSemanticLayerData,
     chartBe2Fe,
-    chartFe2Be
+    chartFe2Be,
+    updateMenu,
+    getAnalysesFor
   };
+
+  function updateMenu(menu) {
+    _menuResolver(menu);
+  }
+
+  function getAnalysesFor(subCategoryId, opts = {}) {
+    /* Wait until the menu has been loaded. The menu payload contains the
+       analyses list from which we'll load the result for this function. */
+    return _menu.then(menu => {
+      const subCategories = flatMap(menu, category => category.children);
+      const subCategory = find(subCategories, sc => sc.id === subCategoryId);
+      let items = fpGet('data.list', subCategory) || [];
+
+      if (fpGet('filter', opts)) {
+        items = searchAnalyses(items, opts.filter);
+      }
+
+      return items;
+    });
+  }
+
+  function searchAnalyses(analyses, searchTerm) {
+    const term = searchTerm.toUpperCase();
+    const matchIn = item => {
+      return (item || '').toUpperCase().indexOf(term) !== -1;
+    };
+
+    return filter(analyses, item => {
+      return matchIn(item.name) ||
+        matchIn(item.type) ||
+        matchIn(item.metricName);
+    });
+  }
 
   function getAnalyses(category, query) {
     return $http.get('/api/analyze/analyses', {params: {category, query}})
@@ -69,11 +112,16 @@ export function AnalyzeService($http, $timeout, $q) {
   }
 
   function getCategories() {
-    return $http.get('/api/analyze/categories').then(fpGet('data'));
+    return _menu;
   }
 
   function getCategory(id) {
-    return $http.get(`/api/analyze/category/${id}`).then(fpGet('data'));
+    /* Wait until the menu has been loaded. The menu payload contains the
+       analyses list from which we'll load the result for this function. */
+    return _menu.then(menu => {
+      const subCategories = flatMap(menu, category => category.children);
+      return find(subCategories, sc => sc.id === id);
+    });
   }
 
   function getMethods() {

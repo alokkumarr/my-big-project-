@@ -12,15 +12,16 @@ export function MenuService($http) {
       .then(response => {
         return map(response.data, item => {
           const obj = {
-            name: item.category_name,
+            id: item.id,
+            name: item.categoryName,
             data: item
           };
 
           obj.children = map(item.children, child => {
             return {
-              id: child.sub_category_id,
-              name: child.sub_category_name,
-              url: `#!/${item.module.toLowerCase()}/${child.sub_category_id}`,
+              id: child.subCategoryId,
+              name: child.subCategoryName,
+              url: `#!/${item.module.toLowerCase()}/${child.subCategoryId}`,
               data: child
             };
           });

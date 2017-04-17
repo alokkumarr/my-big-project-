@@ -69,7 +69,7 @@ export const AnalyzeViewComponent = {
     }
 
     loadAnalyses() {
-      return this._AnalyzeService.getAnalyses(this.$state.params.id, {
+      return this._AnalyzeService.getAnalysesFor(this.$state.params.id, {
         filter: this.states.searchTerm
       }).then(analyses => {
         this.reports = sortBy(analyses, analysis => -parseInt(analysis.id, 10));
@@ -104,7 +104,8 @@ export const AnalyzeViewComponent = {
         alignment: 'left',
         width: '20%',
         calculateCellValue: rowData => {
-          return (rowData.metrics || []).join(', ');
+          return rowData.metricName ||
+            (rowData.metrics || []).join(', ');
         },
         cellTemplate: 'metricsCellTemplate'
       }, {
