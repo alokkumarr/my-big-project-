@@ -141,6 +141,11 @@ function appIsUp
 # start
 declare FG_EXECJ=
 DRYRUN=${DRYRUN:-}
+dry_exit() {
+    rc=${1:-1}
+    log exit on previous error
+    [[ $DRYRUN ]] || exit $rc
+}
 let WAIT_SECS=${WAIT_SECS:-0}
 appl_start() {
     appIsUp && {
@@ -149,18 +154,18 @@ appl_start() {
     }
     ### Start Application Instance
     log starting "'$APPL_NAME'"
-    # TODO
+    #
     optdir=$(appl_info optdir)
     libdir=$optdir/lib
-    ( cd $libdir ) || exit
+    ( cd $libdir ) || dry_exit
 
     confdir=$optdir/conf
-    ( cd $confdir ) || exit
+    ( cd $confdir ) || dry_exit
 
-    ( <$confdir/saw-security.properties ) || exit
+    ( <$confdir/saw-security.properties ) || dry_exit
 
     war_fnm=( $libdir/saw-security*.war )
-    ( <${war_fnm[0]} ) || exit
+    ( <${war_fnm[0]} ) || dry_exit
 
     java_args=(
         -Xms32M -Xmx2048M
@@ -173,11 +178,12 @@ appl_start() {
         -name saw-security
         )
     exec_cmd="java ${java_args[@]}"
-    vlog CMD: "$exec_cmd"
     [[ $DRYRUN ]] && {
-        vlog DRYRUN exit
+        log CMD: "$exec_cmd"
+        log DRYRUN exit
         exit 0
     }
+    vlog CMD: "$exec_cmd"
     START_LOG=$LOG_DIR/start-$APPL_NAME.log
     vlog START_LOG: $START_LOG
     /bin/rm -f $PID_FILE
