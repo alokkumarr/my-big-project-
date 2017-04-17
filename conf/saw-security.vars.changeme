@@ -1,0 +1,13 @@
+# This is vars file for saw-security application
+# To be copied to /etc/bda/saw-security.vars
+#
+# db/setup/Initial_Setup.py parameters
+# email in Initail_Setup.py
+db.init.email=CHANGEME
+# Old CLI:
+# Please enter SQL DB Info in the format - Server|DB|User|Password
+db.init.server=CHANGEME
+db.init.name=CHANGEME
+db.init.user=CHANGEME
+db.init.password=CHANGEME
+#
