@@ -1,3 +1,5 @@
+#!/bin/env python
+
 import shutil
 import sys
 import os
@@ -14,14 +16,79 @@ import logging
 # Author- Saurav Panda
 # Date- 21/07/2015
 # Purpose Initial Setup for RAW
-err_msg = ""
 
+# This script name from command line
+cmd_arg = sys.argv[0]
+# This script directory
+cmd_dir = os.path.dirname(os.path.abspath(cmd_arg))
+
+###########################################################
+# Usage:
+# Initial_Setup.py [--vars]
+# If --vars specified - read params from /etc/bda/saw-security.vars file,
+# otherwise read them from terminal
+
+##
+# Special file names
+VARS_FNM = "/etc/bda/saw-security.vars"
+#LOG_DIR  = "/var/bda/saw-security/log"
+
+use_vars_file = False
+if (len(sys.argv) > 1) and (sys.argv[1] == "--vars"):
+    use_vars_file = True
+    print "Read params from: ", VARS_FNM, "\n"
+
+#sys.exit(0)
+
+#
+## Console inputs:
+# "Please enter Email ID to which notifications are to be sent: 
+# Please enter SQL DB Info in the format - Server|DB|User|Password
+## Parameters read from saw-security.vars:
+# db.init.email
+# db.init.server
+# db.init.name
+# db.init.user
+# db.init.password
+
+# Read parameters and their values from the VARS file
+def read_vars_file( vars_fnm  ):
+    #logger.debug("in read_vars_file")
+    if not os.path.isfile(vars_fnm):
+        raise Exception("Vars file not found: '%s'" % vars_fnm)
+    vars_dict = {}
+    #logger.info("open vars file %s", vars_fnm)
+    with open(vars_fnm) as f:
+        for s in f:
+            s = re.sub(r"\s*#.*$","",s)
+            if not ("=" in s):
+                continue
+            s = s.strip()
+            s = re.sub(r"\s*=\s*","=",s)
+            vv = s.split("=",1)
+            #logger.debug("%s = %s", vv[0], vv[1])
+            vars_dict[vv[0]] = vv[1]
+    f.close()
+    #logger.debug("vars count: %d", len(vars_dict))
+    #logger.debug("out read_vars_file")
+    return vars_dict
+
+vars_dict = None
+if use_vars_file:
+    vars_dict = read_vars_file( VARS_FNM )
+    print "VARS:", vars_dict
+
+# 
 # Validate length of customer after taking input from console
 customer = "SAW"
 
 # email = "saurav.panda@razorsight.com"
 
-email = raw_input("Please enter Email ID to which notifications are to be sent: ")
+if use_vars_file:
+    email = vars_dict['db.init.email']
+    print "Email ID to which notifications are to be sent:", email
+else:
+    email = raw_input("Please enter Email ID to which notifications are to be sent: ")
 
 # Validate Email ID format. email.username@company.com & email@company.com are valid email ID's
 m = re.search('^[a-zA-Z0-9]+[\.\-\_]?[a-zA-Z0-9]+[\@]+[a-zA-Z0-9]+[\.co]+[a-zA-Z0-9]?',email)
@@ -34,7 +101,10 @@ else:
 
 email_subject = "%s Initial DB Deployment" %(customer)
 
-proc_folder = raw_input("Please give the Absolute path of Initial Setup folder  : ")
+#os.path.dirname(os.path.abspath(cmd_arg))
+
+#proc_folder = raw_input("Please give the Absolute path of Initial Setup folder  : ")
+proc_folder = cmd_dir # Kiran, please confirm
 #secondary_path= os.getcwd()
 #proc_folder = os.path.join(secondary_path,"INITIAL_SETUP")
 
@@ -45,16 +115,26 @@ else:
 
 # db_info = "vm-dwhdevblr|DEPLOY_AUTO_TEST|TRUE"
 
-
-
 sql_server_type = "MYSQL"
 
 sql_cmd_bat_file = ''
 
-db_conn_type = ''
+#db_conn_type = ''
+db_conn_type = "FALSE"
 
-if sql_server_type == "MYSQL":
-    
+#if sql_server_type == "MYSQL":
+
+if use_vars_file:
+    db_server = vars_dict['db.init.server']
+    db_name = vars_dict['db.init.name']
+    db_user = vars_dict['db.init.user']
+    db_password = vars_dict['db.init.password']
+    #
+    db_info = "%s|%s|%s|%s" % (db_server,db_name,db_user,db_password)
+    print "SQL DB Info in the format Server|DB|User|Password:"
+    print "%s|%s|%s|***" % (db_server,db_name,db_user)
+else:
+
     db_info = raw_input("""
     Please enter SQL DB Info in the format - Server|DB|User|Password.    
     *****************************************************************
@@ -69,34 +149,25 @@ if sql_server_type == "MYSQL":
     db_user = "NOTREQUIRED" # Initialize DB User Name variable to dummy value
     db_password = "NOTREQUIRED" # Initialize DB Password variable to dummy value
 
-    db_conn_type = "FALSE"
-
     if db_conn_type == "FALSE":
         db_user = sql_str_list[2]
         db_password = sql_str_list[3]
 
-    if db_conn_type == "FALSE":
-        try:
-            cnxn = MySQLdb.connect(db_server,db_user,db_password,db_name) # MYSQL Server Authentication
-            #cnxn = MySQLdb.connect(DRIVER='com.mysql.jdbc.Driver',SERVER=db_server,DATABASE=db_name,UID=db_user,PWD=db_password, autocommit=True) # MYSQL Server Authentication
-            
-        except:
-            raise Exception("PARAMETER ISSUE:Please verify DB parameters provided.")
-    else:
-        try:
-            #cnxn = MySQLdb.connect(db_server,db_user,db_password,db_name) # MYSQL Server Authentication
-            cnxn = MySQLdb.connect(DRIVER='com.mysql.jdbc.Driver',SERVER=db_server,DATABASE=db_name,Trusted_Connection="yes", autocommit=True) # Windows Authentication
-        except:
-            raise Exception("PARAMETER ISSUE:Please verify DB parameters provided.")
+if db_conn_type == "FALSE":
+    try:
+        cnxn = MySQLdb.connect(db_server,db_user,db_password,db_name) # MYSQL Server Authentication
+        #cnxn = MySQLdb.connect(DRIVER='com.mysql.jdbc.Driver',SERVER=db_server,DATABASE=db_name,UID=db_user,PWD=db_password, autocommit=True) # MYSQL Server Authentication
+        
+    except:
+        raise Exception("PARAMETER ISSUE:Please verify DB parameters provided.")
+else:
+    try:
+        #cnxn = MySQLdb.connect(db_server,db_user,db_password,db_name) # MYSQL Server Authentication
+        cnxn = MySQLdb.connect(DRIVER='com.mysql.jdbc.Driver',SERVER=db_server,DATABASE=db_name,Trusted_Connection="yes", autocommit=True) # Windows Authentication
+    except:
+        raise Exception("PARAMETER ISSUE:Please verify DB parameters provided.")
 
-    print "SQL DB Info validated.\n"
-
-    sql_cmd_bat_file = os.path.join(proc_folder,"SQL_Script_Execution.bat")
-
-    #if os.path.isfile(sql_cmd_bat_file):
-     #   print "Batch file to execute SQL files is present.\n"
-    #else:
-     #   print "Batch file to execute SQL files is not present.\n"
+print "SQL DB Info validated.\n"
 
 # If logs folder exists on the processing folder, rename it with current date appended as string & then re-create logs folder with appropriate branches underneath
 log_folder = os.path.join(proc_folder,"logs")
