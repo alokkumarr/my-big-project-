@@ -135,7 +135,7 @@ class AnalysisExecutionHandler(val nodeId : String, val analysisId: String) {
     *
     * @param out
     */
-  def handleResult(out: OutputStream) : Unit =
+  def handleResult(out: OutputStream = null) : Unit =
   {
       val readData: String = HFileOperations.readFile(resultExecOutputFile)
       if (readData == null || readData.isEmpty)
