@@ -105,3 +105,10 @@ for tfn in $APPL_HOME/conf/templates/* ; do
         echo "# $APPL_NAME conf file created: $conf_file"
     }
 done
+
+echo '#-------------------------'
+echo '# Execute DB Initial Setup'
+$APPL_HOME/db/setup/Initial_Setup.py
+
+exit
+

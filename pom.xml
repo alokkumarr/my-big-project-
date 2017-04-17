@@ -21,6 +21,7 @@
         <jjwt.version>0.6.0</jjwt.version>
         <spring-security.version>4.0.2.RELEASE</spring-security.version>
         
+        <!-- to be specified in command line -->
         <prod.release>0</prod.release>
         <project.release>${prod.release}</project.release>
         
@@ -206,6 +207,14 @@
                     </defineStatements>
                     <mappings>
                         <mapping>
+                            <directory>
+                                ${app.optDir}/bin
+                            </directory>
+                            <filemode>755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                        </mapping>
+                        <mapping>
                             <!-- Create softlink for app directory -->
                             <directory>${app.optParDir}</directory>
                             <sources>
@@ -215,14 +224,6 @@
                                     <destination>${app.name}</destination>
                                 </softlinkSource>
                             </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>
-                                ${app.optDir}/bin
-                            </directory>
-                            <filemode>755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
                         </mapping>
                         <mapping>
                             <directory>
@@ -323,6 +324,39 @@
                             <groupname>${app.group}</groupname>
                         </mapping>
                     </mappings>
+
+                    <preinstallScriptlet>
+                        <script>
+echo pre-install started: ${app.nameVer}
+echo check saw:saw user exists
+getent passwd ${app.user} || {
+    echo error: no such user: ${app.user}
+    exit 1
+}
+getent group ${app.group} || {
+    echo error: no such group: ${app.group}
+    exit 1
+}
+
+echo check /etc/bda/${app.name}.vars can be read
+( &lt;/etc/bda/${app.name}.vars ) || exit 1
+echo pre-install completed: ${app.nameVer}
+                        </script>
+                    </preinstallScriptlet>
+                    <postinstallScriptlet>
+                        <script>
+echo post-install starting: ${app.nameVer}
+${app.optDir}/bin/conf_init
+echo post-install complete: ${app.nameVer}
+                        </script>
+                    </postinstallScriptlet>
+                    <preremoveScriptlet>
+                        <script>
+echo pre-remove starting: ${app.nameVer}
+# keep conf files in conf/ dir
+echo pre-remove completed: ${app.nameVer}
+                        </script>
+                    </preremoveScriptlet> 
                 </configuration>
             </plugin>
         </plugins>
