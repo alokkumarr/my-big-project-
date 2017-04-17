@@ -70,13 +70,26 @@ public class Ccode {
     }
     
     public static void main(String[] args) {
-        
+
+        int rc = 0;
+        String res = null;
+        boolean chkres = false;
         if (args.length == 1) {
             String password = args[0];
-            System.out.print(cencode(password));
+            res = cencode(password);
+            chkres = true;
         } else if (args.length == 2) {
             String encryptedPassword = args[0];
-            System.out.print(cdecode(encryptedPassword));
+            res = cdecode(encryptedPassword);
+            chkres = true;
         }
+        if( chkres ) {
+            if( res == null ) {
+                rc = 1;
+            } else {
+                System.out.print(res);
+            }
+        }
+        System.exit(rc);
     }
 }
