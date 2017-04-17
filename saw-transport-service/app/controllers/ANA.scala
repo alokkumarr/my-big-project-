@@ -1,6 +1,7 @@
 package controllers
 
 import java.text.SimpleDateFormat
+import java.util.UUID
 
 import org.json4s._
 import org.json4s.JsonAST.JValue
@@ -30,12 +31,18 @@ class ANA extends BaseServiceProvider {
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
     val response = action match {
       case "create" => {
-        val analysisNode = new AnalysisNode(analysisJson(json))
+        val analysisId: JValue = ("analysisId", UUID.randomUUID.toString)
+        val analysis = analysisJson(json).merge(analysisId)
+        val analysisNode = new AnalysisNode(analysis)
         val (result, message) = analysisNode.write
         if (result != NodeCreated.id) {
           throw new RuntimeException("Writing failed: " + message)
         }
-        json
+        val withId: JObject = ("contents", ("analyze", JArray(List(analysis))))
+        json match {
+          case obj: JObject => obj ~ withId
+          case _ => throw new RuntimeException("Not object: " + json)
+        }
       }
       case "update" => {
         val analysisId = extractAnalysisId(json)
