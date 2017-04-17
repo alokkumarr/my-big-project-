@@ -10,8 +10,7 @@ class AnalysisTest extends MaprTest {
       /* Write analysis */
       val body = actionAnalysisMessage("create", analysisJson(id))
       val response = sendRequest(body)
-      val analysis = (response \ "contents" \ "analyze")(0)
-      val JString(analysisId) = analysis \ "analysisId"
+      val JString(analysisId) = analyze(response) \ "analysisId"
       analysisId must be (id)
     }
 
@@ -20,8 +19,7 @@ class AnalysisTest extends MaprTest {
       val body = actionKeyAnalysisMessage("update", id,
         analysisJson(id, "customer-2"))
       val response = sendRequest(body)
-      val analysis = (response \ "contents" \ "analyze")(0)
-      val JString(analysisId) = analysis \ "analysisId"
+      val JString(analysisId) = analyze(response) \ "analysisId"
       analysisId must be (id)
     }
 
@@ -29,7 +27,7 @@ class AnalysisTest extends MaprTest {
       /* Read back previously created analysis */
       val body = actionKeyMessage("read", id)
       val response = sendRequest(body)
-      val analysis = (response \ "contents" \ "analyze")(0)
+      val analysis = analyze(response)
       val JString(name) = analysis \ "name"
       name must be (s"test-$id")
       val JString(customerCode) = analysis \ "customer_code"
@@ -50,5 +48,9 @@ class AnalysisTest extends MaprTest {
       val JString(action) = response \ "contents" \ "action"
       action must be ("delete")
     }
+  }
+
+  def analyze(response: JValue): JValue = {
+    (response \ "contents" \ "analyze")(0)
   }
 }
