@@ -1,5 +1,6 @@
 #!/bin/bash
 # Crypt code argument
+[[ $DEBUG ]] && set -vx
 
 # Command directory is our anchor
 cmd_dir=$(dirname $0)
@@ -16,9 +17,11 @@ jar_fls=( $lib_dir/saw-security*.jar )
 # Check '*' was expanded into existing file name
 ( <${jar_fls[0]} ) || exit
 
-# Initialize Java args vars
+# Initialize Java args
 jar_fnm="${jar_fls[0]}"
-main_kl=com.sncr.nsso.common.util.CcodeUtil
+[[ $(uname -s) = CYGWIN* ]] && jar_fnm=$(cygpath -w "$jar_fnm")
+main_kl=com.sncr.nsso.common.util.Ccode
 
 # Run java main class
 java -cp $jar_fnm $main_kl "$@"
+exit $?
