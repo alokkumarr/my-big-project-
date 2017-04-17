@@ -8,16 +8,14 @@ import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import play.libs.Json
 import play.mvc.{Http, Result, Results}
-
-import sncr.metadata.analysis.AnalysisNode
-import sncr.metadata.analysis.AnalysisResult
-import sncr.metadata.engine.MDNodeUtil
+import sncr.metadata.analysis.{AnalysisExecutionHandler, AnalysisNode, AnalysisResult}
+import sncr.metadata.engine.{MDNodeUtil, tables}
 import sncr.metadata.engine.ProcessingResult._
-import sncr.analysis.execution.ExecutorRunner
-import sncr.analysis.execution.ProcessExecutionResult
-
+import sncr.analysis.execution.{AnalysisExecutionRunner, ExecutionTaskHandler, ProcessExecutionResult}
 import model.QueryBuilder
 import model.QueryException
+import org.apache.hadoop.hbase.util.Bytes
+import sncr.metadata.engine.SearchMetadata._
 
 class ANA extends BaseServiceProvider {
   implicit val formats = new DefaultFormats {
@@ -25,7 +23,7 @@ class ANA extends BaseServiceProvider {
       "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   }
 
-  val executorRunner = new ExecutorRunner(1)
+  val executorRunner = new ExecutionTaskHandler(1)
 
   override def process(txt: String): Result = {
     val json = parse(txt)
@@ -112,13 +110,32 @@ class ANA extends BaseServiceProvider {
 
   def executeAnalysis(analysisId: String) = {
     /* Placeholder for Spark SQL execution library until available */
-    executorRunner.startSQLExecutor(analysisId)
-    val status = executorRunner.waitForCompletion(analysisId, 2000)
-    if (status != ProcessExecutionResult.Success.toString) {
-      throw new RuntimeException("Process execution failed: " + status);
+
+    //Create keys to filter records.
+    val keys2 : Map[String, Any] = Map ("analysisId" -> analysisId)
+    val systemKeys : Map[String, Any] = Map.empty   //( syskey_NodeCategory.toString -> classOf[AnalysisNode].getName )
+    // Create executor service
+    val er: ExecutionTaskHandler = new ExecutionTaskHandler(1)
+    try {
+      val search = simpleSearch(tables.AnalysisMetadata.toString, keys2, systemKeys, "and")
+      val rowKey = Bytes.toString(search.head)
+      val analysisNode = AnalysisNode(rowKey)
+      if ( analysisNode.getCachedData == null || analysisNode.getCachedData.isEmpty)
+        throw new Exception("Could not find analysis node with provided analysis ID.")
+      val aeh: AnalysisExecutionHandler = new AnalysisExecutionHandler(rowKey, analysisId)
+
+      //Start executing Spark SQL
+      er.startSQLExecutor(aeh)
+      val analysisResultId: String = er.getPredefResultRowID(analysisId)
+      er.waitForCompletion(analysisId, aeh.getWaitTime)
+      val msg = "Execution: AnalysisID = " + analysisId + ", Result Row ID: " + analysisResultId
+      // Handle result
+      aeh.handleResult()
+      m_log debug msg
     }
-    val resultId = executorRunner.getLastResult(analysisId)
-    // To be implemented when executor results are available:
-    // AnalysisResult(resultId).getData
+    catch {
+      case e: Exception => val msg = s"Execution exception: ${e.getMessage}"; m_log error (msg, e)
+    }
+
   }
 }

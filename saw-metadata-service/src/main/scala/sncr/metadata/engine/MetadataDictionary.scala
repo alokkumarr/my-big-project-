@@ -1,7 +1,5 @@
 package sncr.metadata.engine
 
-import java.text.SimpleDateFormat
-
 import org.apache.hadoop.hbase.util.Bytes
 import org.json4s.DefaultFormats
 
@@ -26,9 +24,12 @@ object MetadataDictionary extends Enumeration {
 
 object MDObjectStruct extends Enumeration{
 
-  implicit val formats = new DefaultFormats {
+  implicit val formats = DefaultFormats
+/*
+  {
     override def dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   }
+*/
 
   val _cf_source = Value (0, "_source")
   val _cf_search = Value (1, "_search")

@@ -1,6 +1,5 @@
 package sncr.metadata.ui_components
 
-import com.typesafe.config.Config
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{Result, _}
 import org.apache.hadoop.hbase.util.Bytes
@@ -16,8 +15,8 @@ import sncr.saw.common.config.SAWServiceConfig
 /**
   * Created by srya0001 on 2/19/2017.
   */
-class UINode(private[this] var content_element: JValue, val ui_item_type : String = Fields.UNDEF_VALUE.toString, c: Config = null)
-      extends ContentNode(c)
+class UINode(private var content_element: JValue, val ui_item_type : String = Fields.UNDEF_VALUE.toString)
+      extends ContentNode
       with SourceAsJson {
 
   private var fetchMode : Int = UINodeFetchMode.Everything.id
@@ -93,7 +92,6 @@ class UINode(private[this] var content_element: JValue, val ui_item_type : Strin
     try {
       val (res, msg ) = selectRowKey(keys)
       if (res != Success.id) return (res, msg)
-      load
       setUINodeContent
       var searchValues : Map[String, Any] = UINode.extractSearchData(content_element) + ("NodeId" -> new String(rowKey))
       if (!ui_item_type.equalsIgnoreCase(Fields.UNDEF_VALUE.toString)) searchValues = searchValues + ("module" -> ui_item_type )

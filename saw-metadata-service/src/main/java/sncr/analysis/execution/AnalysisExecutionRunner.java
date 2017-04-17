@@ -5,8 +5,8 @@ import files.HFileOperations;
 import org.apache.commons.cli.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sncr.metadata.analysis.AnalysisExecutionHandler;
 import sncr.metadata.analysis.AnalysisProvHelper;
-import sncr.metadata.engine.Fields;
 import sncr.metadata.engine.ResponseConverter;
 
 import java.io.OutputStream;
@@ -27,7 +27,7 @@ public class AnalysisExecutionRunner {
             String inData = HFileOperations.readFile(cl.getOptionValue('a'));
             OutputStream outStream = HFileOperations.writeToFile(cl.getOptionValue('o'));
             System.out.println("Start data processing:\n input analysis ID: " + cl.getOptionValue('a') + "\nOutput path: " + cl.getOptionValue('o'));
-            ExecutorRunner er = new ExecutorRunner(1);
+            ExecutionTaskHandler er = new ExecutionTaskHandler(1);
             AnalysisProvHelper exec = AnalysisProvHelper.apply(inData);
             if ( !exec.requestsParsed()){
                 logger.error("The document is not parsable. Exit");
@@ -36,15 +36,24 @@ public class AnalysisExecutionRunner {
                     ResponseConverter.convertToJavaMapList(exec.handleExecuteRequest());
             headers.forEach( h ->
             {
-                String analysisId = (String) h.get(Fields.NodeId().toString());
+                String analysisId = (String) h.get("analysisId");
+                String nodeId = (String) h.get("NodeId");
+                if (analysisId == null || analysisId.isEmpty())
+                {
+                    System.err.println("Could not get analysisID from retrieved result. Skip analysisID = " + analysisId);
+                    return;
+                }
+                AnalysisExecutionHandler aeh = new AnalysisExecutionHandler(nodeId, analysisId);
                 try {
-                    er.startSQLExecutor(analysisId);
+                    er.startSQLExecutor(aeh);
                     String analysisResultId = er.getPredefResultRowID(analysisId);
-                    System.out.println("Execution: AnalysisID = " + analysisId + ", Result Row ID: " + analysisResultId );
+                    er.waitForCompletion(analysisId, aeh.getWaitTime());
+                    aeh.handleResult(outStream);
+                    logger.debug("Execution: AnalysisID = " + analysisId + ", Result Row ID: " + analysisResultId );
                 } catch (Exception e) {
                     logger.error("Executing exception: ", e);
                 }
-                });
+            });
             if (outStream != null ) {
                 outStream.flush();
                 outStream.close();

@@ -99,4 +99,16 @@ public class HFileOperations {
         }
     }
 
+    public static void deleteFile(String file) throws FileNotFoundException {
+        FileSystem fs;
+        try {
+            Path path = new Path(file);
+            Configuration conf = new Configuration();
+            fs = FileSystem.get(path.toUri(), conf);
+            fs.delete(path, true);
+        } catch (IOException e) {
+            throw new FileNotFoundException("Cannot get file status on provided locations:" + e);
+        }
+    }
+
 }

@@ -1,6 +1,5 @@
 package sncr.metadata.analysis
 
-import com.typesafe.config.Config
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{Get, Result}
 import org.apache.hadoop.hbase.util.Bytes
@@ -16,7 +15,7 @@ import sncr.saw.common.config.SAWServiceConfig
 /**
   * Created by srya0001 on 3/1/2017.
   */
-class AnalysisNode(private[this] var analysisNode: JValue = JNothing, c: Config = null) extends ContentNode(c)
+class AnalysisNode(private var analysisNode: JValue = JNothing) extends ContentNode
   with SourceAsJson
   with Relation{
 
@@ -141,7 +140,6 @@ class AnalysisNode(private[this] var analysisNode: JValue = JNothing, c: Config 
     try {
       val (res, msg) = selectRowKey(filter)
       if (res != Success.id) return (res, msg)
-      load
       setDefinition
       val searchValues: Map[String, Any] = AnalysisNode.extractSearchData(analysisNode) + ("NodeId" -> new String(rowKey))
       searchValues.keySet.foreach(k => {
@@ -188,11 +186,11 @@ object AnalysisNode{
 
   protected val m_log: Logger = LoggerFactory.getLogger("AnalysisNodeObject")
 
-  def apply( src : String, rowID : String, c: Config) : AnalysisNode =
+  def apply( src : String, rowID : String) : AnalysisNode =
   {
     try {
       val jv = parse(src, false, false)
-      val anNode = new AnalysisNode(jv, c)
+      val anNode = new AnalysisNode(jv)
       if ( rowID != null && rowID.nonEmpty) anNode.setRowKey(Bytes.toBytes(rowID))
       anNode
     }
@@ -203,9 +201,10 @@ object AnalysisNode{
 
   def apply(rowId: String) :AnalysisNode =
   {
-    val an = new AnalysisNode(JNothing, null)
+    val an = new AnalysisNode(JNothing)
     an.setRowKey(Bytes.toBytes(rowId))
     an.load
+    m_log debug s"Analysis node has been loaded: $rowId"
     an
   }
 
