@@ -57,7 +57,7 @@ class ANA extends BaseServiceProvider {
         result("content") match {
           case content: JValue => {
             json merge(
-              ("contents", ("analysis", JArray(List(content)))) ~ (".", "."))
+              ("contents", ("analyze", JArray(List(content)))) ~ (".", "."))
           }
           case _ => throw new RuntimeException("no match")
         }
@@ -90,7 +90,7 @@ class ANA extends BaseServiceProvider {
   }
 
   def analysisJson(json: JValue) = {
-    val analysisListJson = json \ "contents" \ "analysis"
+    val analysisListJson = json \ "contents" \ "analyze"
     val analysis = analysisListJson match {
       case array: JArray => {
         if (array.arr.length > 1) {
