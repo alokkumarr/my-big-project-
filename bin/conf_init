@@ -6,6 +6,7 @@
 #   calculate encrypted value for 'ds.cpass' vars parameter;
 # - create application configuration file(s) from template(s)
 #   in conf/templates;
+# - execute DB initial seturp script: $APPL_HOME/db/setup/Initial_Setup.py
 # The script is executed as root during post-install phase
 # of application rpm installation.
 # Required files:
@@ -111,4 +112,3 @@ echo '# Execute DB Initial Setup'
 $APPL_HOME/db/setup/Initial_Setup.py
 
 exit
-
