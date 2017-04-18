@@ -1,7 +1,8 @@
 import org.json4s._
+import org.scalatest.CancelAfterFailure
 
 /* Test analysis service operations */
-class AnalysisTest extends MaprTest {
+class AnalysisTest extends MaprTest with CancelAfterFailure {
   "Analysis service" should {
     requireMapr
     var id: String = null
