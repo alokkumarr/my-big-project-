@@ -180,8 +180,9 @@ export const AnalyzeViewComponent = {
         this.showDialog({
           controller: scope => {
             scope.metrics = metrics;
+            scope.subCategory = this.$state.params.id;
           },
-          template: '<analyze-new metrics="metrics"></analyze-new>',
+          template: '<analyze-new metrics="metrics" sub-category="{{::subCategory}}"></analyze-new>',
           fullscreen: true
         });
       });

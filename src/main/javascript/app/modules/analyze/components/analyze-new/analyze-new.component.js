@@ -11,7 +11,8 @@ import {AnalyseTypes} from '../../consts';
 export const AnalyzeNewComponent = {
   template,
   bindings: {
-    metrics: '<'
+    metrics: '<',
+    subCategory: '@'
   },
   styles: [style],
   controller: class AnalyzeNewController {
@@ -66,7 +67,7 @@ export const AnalyzeNewComponent = {
             type: AnalyseTypes.Report,
             name: 'Untitled Analysis',
             description: '',
-            category: null,
+            category: this.subCategory,
             metric: this.selectedMetric,
             scheduled: null,
             artifacts: null
@@ -78,7 +79,7 @@ export const AnalyzeNewComponent = {
             type: AnalyseTypes.Pivot,
             name: 'Untitled Analysis',
             description: '',
-            category: null,
+            category: this.subCategory,
             metric: this.selectedMetric,
             scheduled: null,
             artifacts: null
@@ -96,7 +97,7 @@ export const AnalyzeNewComponent = {
             chartType: type,
             name: 'Untitled Chart',
             description: '',
-            category: null,
+            category: this.subCategory,
             metric: this.selectedMetric,
             scheduled: null,
             artifacts: null
