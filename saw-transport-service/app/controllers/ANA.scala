@@ -31,18 +31,19 @@ class ANA extends BaseServiceProvider {
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
     val response = action match {
       case "create" => {
-        val analysisId: JValue = ("analysisId", UUID.randomUUID.toString)
-        val analysis = analysisJson(json).merge(analysisId)
+        val analysis: JValue = ("analysisId", UUID.randomUUID.toString) ~
+        ("module", "analyze") ~
+        ("customer_code", "customer-1") ~
+        ("name", "test")
         val analysisNode = new AnalysisNode(analysis)
         val (result, message) = analysisNode.write
         if (result != NodeCreated.id) {
           throw new RuntimeException("Writing failed: " + message)
         }
-        val withId: JObject = ("contents", ("analyze", JArray(List(analysis))))
-        json match {
-          case obj: JObject => obj ~ withId
-          case _ => throw new RuntimeException("Not object: " + json)
-        }
+        ("ticket" -> JObject()) ~
+        ("_links" -> JObject()) ~
+        ("contents" -> (
+          "analyze", JArray(List(analysis))))
       }
       case "update" => {
         val analysisId = extractAnalysisId(json)

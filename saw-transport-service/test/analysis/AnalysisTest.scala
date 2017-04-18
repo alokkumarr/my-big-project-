@@ -9,7 +9,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
 
     "create analysis" in {
       /* Write analysis */
-      val body = actionAnalysisMessage("create", analysisJson())
+      val body = actionKeyMessage("create", "semantic-123")
       val response = sendRequest(body)
       val JString(analysisId) = analyze(response) \ "analysisId"
       id = analysisId
