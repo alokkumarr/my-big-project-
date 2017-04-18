@@ -1,133 +1,153 @@
-[
-   {
-      "id":"main_cat_123456785421",
-      "categoryName":"My Analyses",
-      "module":"ANALYZE",
-      "customerCode":"ATT",
-      "dataSecurityKey":"20170612ATT",
-      "roleType":"ADMIN",
-      "children":[
-         {
+{
+  "contents" :
+  {
+    "analyze":
+    [
+      {
+        "id":"main_cat_123456785421",
+        "categoryName":"My Analyses",
+        "module":"ANALYZE",
+        "customerCode":"ATT",
+        "dataSecurityKey":"20170612ATT",
+        "roleType":"ADMIN",
+        "children":[
+          {
             "subCategoryId":"sub_cat_123456785421",
             "subCategoryName":"Optimization",
             "list":[
-               {
-                  "id":"sub_cat_123456785421_Optimization",
-                  "name": "Order Revenue by Customers",
-                  "customerProductFeatureId":"feature_menu_item_1",
-                  "active":"true",
-                  "artifactName":"",
-                  "type":"chart",
-                  "chartType": "column",
-                  "description":"This report is sample 1",
-                  "scheduled":"Every Friday at 9 AM",
-                  "metricName":"Incident_Analysis",
-                  "createdBy":"saurav.paul@synchronoss.com",
-                  "createdDate":"02-11-2017",
-                  "typeId":"analyses_report_345678"
-               },
-               {
-                  "id":"sub_cat_123456785431_Optimization",
-                  "name": "Incident density by States",
-                  "customerProductFeatureId":"feature_menu_item_2",
-                  "active":"true",
-                  "artifactName":"",
-                  "type":"report",
-                  "description":"This report is sample 2",
-                  "scheduled":"Every Wednesday at 10 AM",
-                  "metricName":"Incident_Analysis",
-                  "createdBy":"saurav.paul@synchronoss.com",
-                  "createdDate":"02-14-2017",
-                  "typeId":""
-               }
+              {
+                "id":"sub_cat_123456785421_Optimization",
+                "name": "Order Revenue by Customers",
+                "customerProductFeatureId":"feature_menu_item_1",
+                "active":"true",
+                "artifactName":"",
+                "type":"chart",
+                "chartType": "column",
+                "description":"This is chart sample",
+                "scheduled":"Every Friday at 9 AM",
+                "metricName":"Incident_Analysis",
+                "createdBy":"saurav.paul@synchronoss.com",
+                "createdDate":"02-11-2017",
+                "typeId":"analyses_chart_345674"
+              },
+              {
+                "id":"sub_cat_123456785431_Optimization",
+                "name": "Incident density by States",
+                "customerProductFeatureId":"feature_menu_item_2",
+                "active":"true",
+                "artifactName":"",
+                "type":"report",
+                "description":"This is tabular sample",
+                "scheduled":"Every Wednesday at 10 AM",
+                "metricName":"Incident_Analysis",
+                "createdBy":"saurav.paul@synchronoss.com",
+                "createdDate":"02-14-2017",
+                "typeId":"analyses_report_345674"
+              },
+              {
+                "id":"sub_cat_123456785432_Optimization",
+                "name": "Sample Pivot Analysis",
+                "customerProductFeatureId":"feature_menu_item_2",
+                "active":"true",
+                "artifactName":"",
+                "type":"pivot",
+                "description":"This is pivot sample",
+                "scheduled":"Every Wednesday at 10 AM",
+                "metricName":"Incident_Analysis",
+                "createdBy":"saurav.paul@synchronoss.com",
+                "createdDate":"02-14-2017",
+                "typeId":"analyses_pivot_345675"
+              }
             ]
-         }
-      ]
-   },
-   {
-      "id":"main_cat_123456785422",
-      "categoryName":"Canned Analyses",
-      "module":"ANALYZE",
-      "customerCode":"ATT",
-      "dataSecurityKey":"20170612ATT",
-      "roleType":"ADMIN",
-      "children":[
-         {
+          }
+        ]
+      },
+      {
+        "id":"main_cat_123456785422",
+        "categoryName":"Canned Analyses",
+        "module":"ANALYZE",
+        "customerCode":"ATT",
+        "dataSecurityKey":"20170612ATT",
+        "roleType":"ADMIN",
+        "children":[
+          {
             "subCategoryId":"sub_cat_123456785422",
             "subCategoryName":"Public Optimization",
             "list":[
-               {
-                  "id":"sub_cat_123456785421_Public_Optimization",
-                  "name": "Cable Orders",
-                  "customerProductFeatureId":"feature_menu_item_1",
-                  "active":"true",
-                  "artifactName":"",
-                  "type":"report",
-                  "description":"This report is sample 1",
-                  "scheduled":"Every Friday at 9 AM",
-                  "metricName":"Campaigne",
-                  "createdBy":"saurav.paul@synchronoss.com",
-                  "createdDate":"02-11-2017",
-                  "typeId":""
-               },
-               {
-                  "id":"sub_cat_123456785431_Public_Optimization",
-                  "name": "Service Requests",
-                  "customerProductFeatureId":"feature_menu_item_2",
-                  "active":"true",
-                  "artifactName":"",
-                  "type":"report",
-                  "description":"This report is sample 2",
-                  "scheduled":"Every Wednesday at 10 AM",
-                  "metricName":"Campaigne",
-                  "createdBy":"saurav.paul@synchronoss.com",
-                  "createdDate":"02-14-2017",
-                  "typeId":""
-               }
+              {
+                "id":"sub_cat_123456785421_Public_Optimization",
+                "name": "Cable Orders",
+                "customerProductFeatureId":"feature_menu_item_1",
+                "active":"true",
+                "artifactName":"",
+                "type":"report",
+                "description":"This report is sample 1",
+                "scheduled":"Every Friday at 9 AM",
+                "metricName":"Campaigne",
+                "createdBy":"saurav.paul@synchronoss.com",
+                "createdDate":"02-11-2017",
+                "typeId":""
+              },
+              {
+                "id":"sub_cat_123456785431_Public_Optimization",
+                "name": "Service Requests",
+                "customerProductFeatureId":"feature_menu_item_2",
+                "active":"true",
+                "artifactName":"",
+                "type":"report",
+                "description":"This report is sample 2",
+                "scheduled":"Every Wednesday at 10 AM",
+                "metricName":"Campaigne",
+                "createdBy":"saurav.paul@synchronoss.com",
+                "createdDate":"02-14-2017",
+                "typeId":""
+              }
             ]
-         }
-      ]
-   },
-   {
-      "id":"main_cat_123456785422",
-      "categoryName":"Indirect Analyses",
-      "module":"OBSERVE",
-      "customerCode":"TMOBILE",
-      "dataSecurityKey":"20170413TMOBILE",
-      "roleType":"ADMIN",
-      "children":[
-         {
+          }
+        ]
+      },
+      {
+        "id":"main_cat_123456785422",
+        "categoryName":"Indirect Analyses",
+        "module":"OBSERVE",
+        "customerCode":"TMOBILE",
+        "dataSecurityKey":"20170413TMOBILE",
+        "roleType":"ADMIN",
+        "children":[
+          {
             "subCategoryId":"sub_cat_123456785421",
             "subCategoryName":"Order Analysis",
             "list":[
-               {
-                  "id":"1",
-                  "customerProductFeatureId":"dashboard_featureid_1",
-                  "active":"true",
-                  "artifactName":"Order Analysis",
-                  "type":"dashboard",
-                  "description":"This dashboard is sample dashboard",
-                  "scheduled":"",
-                  "metricName":"",
-                  "createdBy":"saurav.paul@synchronoss.com",
-                  "createdDate":"03-03-2017",
-                  "typeId":"dashboard_artifactid"
-               },
-               {
-                  "id":"2",
-                  "customerProductFeatureId":"dashboard_featureid_2",
-                  "active":"true",
-                  "artifactName":"Operation Analyses",
-                  "type":"dashboard",
-                  "description":"This dashboard is sample dashboard",
-                  "scheduled":"",
-                  "metricName":"",
-                  "createdBy":"saurav.paul@synchronoss.com",
-                  "createdDate":"03-03-2017",
-                  "typeId":"dashboard_artifactid"
-               }
+              {
+                "id":"1",
+                "customerProductFeatureId":"dashboard_featureid_1",
+                "active":"true",
+                "artifactName":"Order Analysis",
+                "type":"dashboard",
+                "description":"This dashboard is sample dashboard",
+                "scheduled":"",
+                "metricName":"",
+                "createdBy":"saurav.paul@synchronoss.com",
+                "createdDate":"03-03-2017",
+                "typeId":"dashboard_artifactid"
+              },
+              {
+                "id":"2",
+                "customerProductFeatureId":"dashboard_featureid_2",
+                "active":"true",
+                "artifactName":"Operation Analyses",
+                "type":"dashboard",
+                "description":"This dashboard is sample dashboard",
+                "scheduled":"",
+                "metricName":"",
+                "createdBy":"saurav.paul@synchronoss.com",
+                "createdDate":"03-03-2017",
+                "typeId":"dashboard_artifactid"
+              }
             ]
-         }
-      ]
-   }
-]
+          }
+        ]
+      }
+    ]
+  }
+}

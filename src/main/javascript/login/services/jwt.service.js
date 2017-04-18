@@ -1,3 +1,5 @@
+import get from 'lodash/get';
+
 class JwtService {
   constructor($window, AppConfig) {
     this._$window = $window;
@@ -14,6 +16,28 @@ class JwtService {
 
   destroy() {
     this._$window.localStorage.removeItem(this._AppConfig.login.jwtKey);
+  }
+
+  /* Returs the parsed json object from the jwt token */
+  getTokenObj() {
+    const base64Url = this.get().split('.')[1];
+    const base64 = base64Url.replace('-', '+').replace('_', '/');
+    return angular.fromJson(this._$window.atob(base64));
+  }
+
+  /* Bootstraps request structure with necessary auth data */
+  getRequestParams() {
+    const token = this.getTokenObj();
+    return {
+      data: [],
+      links: {},
+      contents: {
+        keys: {
+          customerCode: get(token, 'ticket.custCode'),
+          dataSecurityKey: get(token, 'ticket.dataSecurityKey')
+        }
+      }
+    };
   }
 }
 
