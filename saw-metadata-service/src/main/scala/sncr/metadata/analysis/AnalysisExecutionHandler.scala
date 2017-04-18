@@ -155,7 +155,7 @@ class AnalysisExecutionHandler(val nodeId : String, val analysisId: String) {
       if (nodeExists) resultNode.delete
 
       val analysisName = (definition \ "name").extract[String]
-      val analysisId = (definition \ "analysis" \ "analysisId").extract[String]
+      val analysisId = (definition \ "analysis" \ "id").extract[String]
 
     status = ( jsonResult \ "status" ).extract[String]
 
@@ -176,7 +176,7 @@ class AnalysisExecutionHandler(val nodeId : String, val analysisId: String) {
 
         descriptor = new JObject(List(
           JField("name", JString(analysisName)),
-          JField("analysisId", JString(analysisId)),
+          JField("id", JString(analysisId)),
           JField("analysisName", JString(analysisName)),
           JField("sql", JString(sql)),
           JField("execution_result", JString(result)),
@@ -191,7 +191,7 @@ class AnalysisExecutionHandler(val nodeId : String, val analysisId: String) {
         val errorMsg = (jsonResult \ "errorMessage").extract[String]
         descriptor = new JObject(List(
           JField("name", JString(analysisName)),
-          JField("analysisId", JString(analysisId)),
+          JField("id", JString(analysisId)),
           JField("analysisName", JString(analysisName)),
           JField("sql", JString(sql)),
           JField("execution_result", JString(status)),

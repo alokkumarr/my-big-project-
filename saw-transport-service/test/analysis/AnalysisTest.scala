@@ -11,7 +11,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       /* Write analysis */
       val body = actionKeyMessage("create", "semantic-123")
       val response = sendRequest(body)
-      val JString(analysisId) = analyze(response) \ "analysisId"
+      val JString(analysisId) = analyze(response) \ "id"
       id = analysisId
     }
 
@@ -20,7 +20,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       val body = actionKeyAnalysisMessage("update", id,
         analysisJson(id, "customer-2"))
       val response = sendRequest(body)
-      val JString(analysisId) = analyze(response) \ "analysisId"
+      val JString(analysisId) = analyze(response) \ "id"
       analysisId must be (id)
     }
 

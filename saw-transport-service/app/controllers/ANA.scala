@@ -31,7 +31,7 @@ class ANA extends BaseServiceProvider {
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
     val response = action match {
       case "create" => {
-        val analysis: JValue = ("analysisId", UUID.randomUUID.toString) ~
+        val analysis: JValue = ("id", UUID.randomUUID.toString) ~
         ("module", "analyze") ~
         ("customer_code", "customer-1") ~
         ("name", "test")
@@ -49,7 +49,7 @@ class ANA extends BaseServiceProvider {
         val analysisId = extractAnalysisId(json)
         val analysisNode = new AnalysisNode(analysisJson(json))
         val (result, message) = analysisNode.update(
-          Map("analysisId" -> analysisId))
+          Map("id" -> analysisId))
         if (result != Success.id) {
           throw new RuntimeException("Updating failed: " + message)
         }
@@ -58,7 +58,7 @@ class ANA extends BaseServiceProvider {
       case "read" => {
         val analysisId = extractAnalysisId(json)
         val analysisNode = new AnalysisNode
-        val result = analysisNode.read(Map("analysisId" -> analysisId))
+        val result = analysisNode.read(Map("id" -> analysisId))
         if (result == Map.empty) {
           throw new RuntimeException("Reading failed")
         }
@@ -78,7 +78,7 @@ class ANA extends BaseServiceProvider {
       case "delete" => {
         val analysisId = extractAnalysisId(json)
         val analysisNode = new AnalysisNode
-        val result = analysisNode.deleteAll(Map("analysisId" -> analysisId))
+        val result = analysisNode.deleteAll(Map("id" -> analysisId))
         if (result == Map.empty) {
           throw new RuntimeException("Deleting failed")
         }
@@ -120,7 +120,7 @@ class ANA extends BaseServiceProvider {
     /* Placeholder for Spark SQL execution library until available */
 
     //Create keys to filter records.
-    val keys2 : Map[String, Any] = Map ("analysisId" -> analysisId)
+    val keys2 : Map[String, Any] = Map ("id" -> analysisId)
     val systemKeys : Map[String, Any] = Map.empty   //( syskey_NodeCategory.toString -> classOf[AnalysisNode].getName )
     // Create executor service
     val er: ExecutionTaskHandler = new ExecutionTaskHandler(1)

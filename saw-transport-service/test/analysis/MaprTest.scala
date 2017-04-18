@@ -32,7 +32,7 @@ class MaprTest extends PlaySpec with OneAppPerSuite {
   }
 
   def analysisJson(id: String = null, customerCode: String = "customer-1") = {
-    val idJson: JValue = if (id != null) ("analysisId" -> id) else JNothing
+    val idJson: JValue = if (id != null) ("id" -> id) else JNothing
     (("module" -> "analyze") ~
       ("customer_code" -> customerCode) ~
       ("name" -> s"test-$id")).merge(idJson)

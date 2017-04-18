@@ -63,7 +63,7 @@ class AnalysisNode(private var analysisNode: JValue = JNothing) extends ContentN
 
   override protected def initRow: String = {
     val rowkey =
-      (analysisNode \ "analysisId").extract[String] + MetadataDictionary.separator +
+      (analysisNode \ "id").extract[String] + MetadataDictionary.separator +
       System.nanoTime()
     m_log debug s"Generated RowKey = $rowkey"
     rowkey
@@ -210,13 +210,13 @@ object AnalysisNode{
 
 
   protected val requiredFields = Map(
-    "root" -> List("analysisId", "module", "customer_code")
+    "root" -> List("id", "module", "customer_code")
   )
 
   def  extractSearchData(analysisNode: JValue) : Map[String, Any] = {
 
     List(
-      (analysisNode, "analysisId"),
+      (analysisNode, "id"),
       (analysisNode, "module"),
       (analysisNode, "customer_code"))
       .map(jv => {
