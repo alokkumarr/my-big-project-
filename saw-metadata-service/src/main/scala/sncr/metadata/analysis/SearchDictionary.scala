@@ -7,9 +7,9 @@ object SearchDictionary {
 
   val searchFields =
     Map(
-    "analysisId" -> "String",
+    "id" -> "String",
     "module" -> "String",
-    "customer_code" -> "String",
+    "customerCode" -> "String",
     "name" -> "String",
     "tenantId" -> "String",
     "productId"-> "String",

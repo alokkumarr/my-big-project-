@@ -219,7 +219,7 @@ object AnalysisResult{
 
   val searchFields = Map ("name" -> "String",
                           "NodeId" -> "String",
-                          "analysisId" -> "String",
+                          "id" -> "String",
                           "execution_timestamp" -> "String",
                           "execution_result" -> "String",
                           "analysisName" -> "String")
@@ -232,7 +232,7 @@ object AnalysisResult{
       (analysisResult, "analysisName"),
       (analysisResult, "execution_timestamp"),
       (analysisResult, "execution_result"),
-      (analysisResult, "analysisId")
+      (analysisResult, "id")
       ).map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, searchFields(jv._2)) )
         m_log trace s"Field: ${jv._2}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${searchFields(jv._2)}\n, Value: $searchValue"

@@ -18,6 +18,6 @@ object SearchDictionary{
         "from_record" -> "Int",
         "NodeId" -> "String",
         "metric_name" -> "String",
-        "customer_code" -> "String")
+        "customerCode" -> "String")
 
 }
