@@ -167,7 +167,8 @@ appl_start() {
 
     war_fnm=( $libdir/*saw-security*.war )
     # use first file only
-    ( <${war_fnm[0]} ) || dry_exit
+    war_file=${war_fnm[0]}
+    ( <${war_file} ) || dry_exit
 
     java_args=(
         -Xms32M -Xmx2048M
@@ -175,7 +176,7 @@ appl_start() {
         -Dspring.config.location=$confdir/application.properties
         -Dlogging.config=$confdir/logback.xml
         -Draw.log.file=$LOG_DIR
-        -Dquartz.properties.location=$confidr
+        -Dquartz.properties.location=$confdir
         -jar $war_file
         -name saw-security
         )
@@ -193,7 +194,7 @@ appl_start() {
     # Run in foreground
     if [[ $FG_EXECJ ]] ; then
         vlog 'run in foreground'
-        eval $exec_cmd </dev/null &>$START_LOG
+        exec $exec_cmd </dev/null &>$START_LOG
         echo never gets here
     fi 
     # Start service in daemon mode
