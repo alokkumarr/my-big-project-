@@ -26,7 +26,7 @@ class MaprTest extends PlaySpec with OneAppPerSuite {
 
   def actionKeyAnalysisMessage(
     action: String, id: String, analysis: JValue) = {
-    val key: JObject = ("_id", id)
+    val key: JObject = ("id", id)
     message(("action" -> action) ~ ("keys" -> List(key)) ~
       ("analyze" -> List(analysis)))
   }
@@ -39,7 +39,7 @@ class MaprTest extends PlaySpec with OneAppPerSuite {
   }
 
   def actionKeyMessage(action: String, id: String) = {
-    val key: JObject = ("_id", id)
+    val key: JObject = ("id", id)
     message(("action" -> action) ~ ("keys" -> JArray(List(key))))
   }
 
