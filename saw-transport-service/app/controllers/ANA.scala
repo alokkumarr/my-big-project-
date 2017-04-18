@@ -92,7 +92,7 @@ class ANA extends BaseServiceProvider {
   }
 
   def extractAnalysisId(json: JValue) = {
-    val JString(analysisId) = (json \ "contents" \ "keys")(0)
+    val JString(analysisId) = (json \ "contents" \ "keys")(0) \ "_id"
     analysisId
   }
 
