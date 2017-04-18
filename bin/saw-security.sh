@@ -15,6 +15,7 @@ Usage:
     $CMD_ARG [--verbose] [ status:DFLT / start [--fg] / stop ]
 Env vars:
     VERBOSE=1
+    DRYRUN=1
 "
     exit ${1:-0}
 }
@@ -162,15 +163,16 @@ appl_start() {
     confdir=$optdir/conf
     ( cd $confdir ) || dry_exit
 
-    ( <$confdir/saw-security.properties ) || dry_exit
+    ( <$confdir/application.properties ) || dry_exit
 
-    war_fnm=( $libdir/saw-security*.war )
+    war_fnm=( $libdir/*saw-security*.war )
+    # use first file only
     ( <${war_fnm[0]} ) || dry_exit
 
     java_args=(
         -Xms32M -Xmx2048M
         -Djava.net.preferIPv4Stack=true
-        -Dspring.config.location=$confdir/saw-security.properties
+        -Dspring.config.location=$confdir/application.properties
         -Dlogging.config=$confdir/logback.xml
         -Draw.log.file=$LOG_DIR
         -Dquartz.properties.location=$confidr
@@ -215,20 +217,26 @@ appl_start() {
         }
     done
     log "OK: '$APPL_NAME' started, PID: $APPL_PID"
+    exit 0
 }
 
 # stop
 appl_stop() {
     if appIsUp ; then
         let cc=0
-        while [[ -d /proc/$APPL_PID ]] ; do
+        while true ; do
+            [[ -d /proc/$APPL_PID ]] || break
             let cc=cc+1
             (( cc > 10 )) && {
                 vlog too many kill attempts: $cc
                 break
             }
             vlog "[$cc]" executing kill $APPL_PID
-            kill $APPL_PID || break
+            [[ $DRYRUN ]] && {
+                vlog DRYRUN exit
+                exit 0
+            }
+            [[ -d /proc/$APPL_PID ]] && kill $APPL_PID
             sleep 0.01
         done
         [[ -d /proc/$APPL_PID ]] && {

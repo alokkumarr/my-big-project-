@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sncr</groupId>
-    <artifactId>saw-security</artifactId>
-    <version>2.0.0</version>
+    <artifactId>bda-saw-security</artifactId>
+    <version>2.0_dev</version>
     <packaging>war</packaging>
 
     <parent>
@@ -28,7 +28,7 @@
         
         <rpm.version>${project.version}</rpm.version>
         <rpm.release>${project.release}</rpm.release>
-        <app.name>${project.artifactId}</app.name>
+        <app.name>saw-security</app.name> <!-- ${project.artifactId} -->
         <app.version>${rpm.version}</app.version>
         <app.release>${rpm.release}</app.release>
         <app.nameVer>${app.name}-${app.version}</app.nameVer>
@@ -244,6 +244,15 @@
                         </mapping>
                         <mapping>
                             <directory>
+                                ${app.optDir}/conf/templates
+                            </directory>
+                            <directoryIncluded>true</directoryIncluded>
+                            <filemode>0755</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                        </mapping>
+                        <mapping>
+                            <directory>
                                 ${app.optDir}/lib
                             </directory>
                             <directoryIncluded>true</directoryIncluded>
@@ -358,11 +367,9 @@
                                     </includes>
                                 </source>
                                 <source>
-                                    <location>${project.basedir}/bin/templates</location>
+                                    <location>bin/templates/appl_info.template</location>
+                                    <destination>appl_info</destination>
                                     <filter>true</filter>
-                                    <includes>
-                                        <include>appl_info.template</include>
-                                    </includes>
                                 </source>
                             </sources>
                         </mapping>
@@ -371,13 +378,28 @@
                                 ${app.optDir}/conf
                             </directory>
                             <filemode>0444</filemode>
+                            <!-- final version, not template -->
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/conf</location>
+                                    <includes>
+                                        <include>logback.xml</include>
+                                    </includes>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/conf/templates
+                            </directory>
+                            <filemode>0444</filemode>
+                            <!-- templates -->
                             <sources>
                                 <source>
                                     <location>${project.basedir}/conf/templates</location>
                                     <includes>
-                                        <include>application.properties</include>  <!-- TBD: Name not decided yet --> 
+                                        <include>application.properties</include>
                                         <include>bootstrap.yml</include>
-                                        <include>logback.xml</include>
                                         <include>saw-security.yml</include>
                                     </includes>
                                 </source>
@@ -472,12 +494,14 @@
                         <script>
 echo pre-install started: ${app.nameVer}
 echo check saw:saw user exists
-getent passwd ${app.user} || {
-    echo error: no such user: ${app.user}
-    exit 1
-}
 getent group ${app.group} || {
     echo error: no such group: ${app.group}
+    # groupadd -g 5100 saw
+    exit 1
+}
+getent passwd ${app.user} || {
+    echo error: no such user: ${app.user}
+    # useradd -g 5100 -u 5100 saw
     exit 1
 }
 
@@ -496,7 +520,11 @@ echo post-install complete: ${app.nameVer}
                     <preremoveScriptlet>
                         <script>
 echo pre-remove starting: ${app.nameVer}
-# keep conf files in conf/ dir
+echo remove files generated from templates
+( set -x
+  rm -f ${app.optDir}/bin/appl_init
+  rm -f ${app.optDir}/conf/{application.properties,bootstrap.yml,saw-security.yml}
+  )
 echo pre-remove completed: ${app.nameVer}
                         </script>
                     </preremoveScriptlet> 

@@ -12,7 +12,7 @@ lib_dir=$( cd $cmd_dir/../lib ; pwd )
 
 # Get absolute file names of Jar file
 # Must be the only name
-jar_fls=( $lib_dir/saw-security*.jar )
+jar_fls=( $lib_dir/*saw-security*.jar )
 
 # Check '*' was expanded into existing file name
 ( <${jar_fls[0]} ) || exit

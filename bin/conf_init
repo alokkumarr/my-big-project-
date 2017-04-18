@@ -108,7 +108,9 @@ for tfn in $APPL_HOME/conf/templates/* ; do
 done
 
 echo '#-------------------------'
-echo '# Execute DB Initial Setup'
-$APPL_HOME/db/setup/Initial_Setup.py
+echo '# Manual step required to'
+echo '# execute DB Initial Setup'
+echo sudo $APPL_HOME/db/setup/Initial_Setup.py --vars
+echo '#-------------------------'
 
 exit
