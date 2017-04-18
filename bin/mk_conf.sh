@@ -41,8 +41,8 @@ errout "# Generated $(date +'%D %T') by $CMD"
 shopt -s extglob
 
 subs_name() {
-    sn=${1:?arg missing}
-    sv=${2:?arg missing}
+    sn=${1:?parameter name arg missing}
+    sv=${2:?parameter value arg missing}
     # replace placeholders
     nstr=${INP_STR//\$\{:$sn:\}/$sv}
     #
@@ -68,8 +68,9 @@ subs_vars() {
 
         # extract name and value
         sn=${s%%=*} 
+        : ${sn:?parameter name missing before =}
         sv=${s#*=}
-
+        : ${sv:?"parameter value after '$sn=' missing"}
         subs_name "$sn" "$sv"
     done < $vars_file
 }

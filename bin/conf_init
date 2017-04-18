@@ -79,7 +79,7 @@ ds_cpass_val=
     # Calc pass crypto
     ( $APPL_HOME/bin/ccode.sh ) || exit
     db_cenc_pass=$($APPL_HOME/bin/ccode.sh "$db_init_pass")
-    ds_cpass_val='ds.cpass='"$db_cenc_pass"
+    ds_cpass_val='db.cpass='"$db_cenc_pass"
     echo '# pass crypto created'
 }
 
@@ -92,25 +92,32 @@ for tfn in $APPL_HOME/conf/templates/* ; do
     xarg=
     [[ $bfn = application.properties ]] && xarg="$ds_cpass_val"
     mk_conf $conf_tmpl $vars_file "$xarg" >$conf_file || {
+        # remove empty file
+        [[ -s $conf_file ]] || rm -f $conf_file
         echo "
-****************************************
+***************************************
 * ERROR creating configuration file:
 * $conf_file
-* Check contents and fix manually.
-****************************************
+* Check contents of files:
+*   template: $conf_tmpl
+*   vars: $vars_file
+* and fix manually by excuting command:
+=======================================
+\$ $APPL_HOME/bin/mk_conf.sh $conf_tmpl $vars_file $xarg >$conf_file
+=======================================
 "
     }
-    [[ -f $conf_file ]] && {
+    [[ -s $conf_file ]] && {
         chown $APPL_USER:$APPL_GROUP $conf_file &&
         chmod 0644 $conf_file
         echo "# $APPL_NAME conf file created: $conf_file"
     }
 done
 
-echo '#-------------------------'
+echo '========================================'
 echo '# Manual step required to'
 echo '# execute DB Initial Setup'
 echo sudo $APPL_HOME/db/setup/Initial_Setup.py --vars
-echo '#-------------------------'
+echo '========================================'
 
 exit
