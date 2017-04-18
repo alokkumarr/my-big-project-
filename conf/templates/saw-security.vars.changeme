@@ -1,0 +1,31 @@
+# This is vars file for saw-security application
+# To be copied to /etc/bda/saw-security.vars
+#
+# db/setup/Initial_Setup.py parameters
+# email in Initail_Setup.py
+db.init.email=CHANGEME
+# Old CLI:
+# Please enter SQL DB Info in the format - Server|DB|User|Password
+db.init.server=CHANGEME # jdbc:mariadb://10.49.0.169:3306/saw_test_2
+db.init.name=CHANGEME # dev_user
+db.init.user=CHANGEME # devpass
+db.init.password=CHANGEME # org.mariadb.jdbc.Driver
+
+#Tomcat port|server address|context-path
+server.port=CHANGEME # 9000
+server.address=CHANGEME # 127.0.0.1
+server.context-path=CHANGEME # /saw-security
+
+#Ticket Validity in Mins 
+ticket.validity.mins=CHANGEME # 120
+
+#mail properties
+mail.protocol=CHANGEME # smtp
+mail.host=CHANGEME # outgoing.sncrcorp.net
+mail.port=CHANGEME # 25
+mail.smtp.auth=CHANGEME # false
+mail.smtp.starttls.enable=CHANGEME # false
+mail.username=CHANGEME #
+mail.password=CHANGEME #
+mail.from=CHANGEME # helpdesk@synchronoss.com
+mail.subject=CHANGEME # Request for Reset Password
