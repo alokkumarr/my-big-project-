@@ -215,17 +215,6 @@
                             <groupname>${app.group}</groupname>
                         </mapping>
                         <mapping>
-                            <!-- Create softlink for app directory -->
-                            <directory>${app.optParDir}</directory>
-                            <sources>
-                                <softlinkSource>
-                                    <!-- ln -s <location> <destination> -->
-                                    <location>${app.nameVer}</location>
-                                    <destination>${app.name}</destination>
-                                </softlinkSource>
-                            </sources>
-                        </mapping>
-                        <mapping>
                             <directory>
                                 ${app.optDir}/conf
                             </directory>
@@ -240,15 +229,6 @@
                             <filemode>755</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
-                            <sources>
-                                <source>
-                                    <location>${project.basedir}/target</location>
-                                    <includes>
-                                        <include>*.war</include>
-                                        <include>*.jar</include>
-                                    </includes>
-                                </source>
-                            </sources>
                         </mapping>
                         <mapping>
                             <directory>
@@ -268,21 +248,12 @@
                         </mapping>
                         <mapping>
                             <directory>
-                                ${app.optDir}/db/setup/conf
+                                ${app.optDir}/db/setup/sql
                             </directory>
                             <filemode>755</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
                         </mapping>
-                        <mapping>
-                            <directory>
-                                ${app.optDir}/db/sql <!-- TBD: Decide on Initial setup directory -->
-                            </directory>
-                            <filemode>755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
-                        </mapping>
-                        
                         
                         <mapping>
                             <directory>
@@ -322,6 +293,119 @@
                             <filemode>755</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
+                        </mapping>
+                        
+                        <!-- Directory sources -->
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/bin
+                            </directory>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/bin</location>
+                                    <includes>
+                                        <include>saw-security-runner.sh</include>
+                                        <include>saw-security.sh</include>
+                                        <include>conf_init</include>
+                                        <include>mk_conf.sh</include>
+                                        <include>appl_info</include>
+                                    </includes>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/conf
+                            </directory>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/conf/templates</location>
+                                    <includes>
+                                        <include>application.properties</include>  <!-- TBD: Name not decided yet --> 
+                                        <include>bootstrap.yml</include>
+                                        <include>logback.xml</include>
+                                        <include>saw-security.yml</include>
+                                    </includes>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/lib
+                            </directory>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/target</location>
+                                    <includes>
+                                        <include>*.war</include>
+                                        <include>*.jar</include>
+                                    </includes>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/db/setup
+                            </directory>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/db/setup</location>
+                                    <includes>
+                                        <include>*.py</include>
+                                    </includes>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/db/setup/sql
+                            </directory>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/db/setup/INITIAL_SETUP</location>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/db/entry
+                            </directory>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/db/entry</location>
+                                    <includes>
+                                        <include>table_structure_mapping.csv</include> 
+                                        <include>Data_Entry_Automation.py</include>
+                                        <include>Data_Entry_Automation_Utilities.py</include>
+                                        <include>calling_script</include>
+                                    </includes>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>
+                                ${app.optDir}/db/entry/conf
+                            </directory>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/db/entry/conf</location>
+                                    <includes>
+                                        <include>configuration.json</include>
+                                    </includes>
+                                </source>
+                            </sources>
+                        </mapping>
+                        
+                         <!--Create softlink for app directory--> 
+                        <mapping>
+                            <directory>${app.optParDir}</directory>
+                            <sources>
+                                <softlinkSource>
+                                     <!--ln -s <location> <destination>--> 
+                                    <location>${app.nameVer}</location>
+                                    <destination>${app.name}</destination>
+                                </softlinkSource>
+                            </sources>
                         </mapping>
                     </mappings>
 
