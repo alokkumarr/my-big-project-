@@ -1,6 +1,7 @@
 package controllers
 
 import java.text.SimpleDateFormat
+import java.util.UUID
 
 import org.json4s._
 import org.json4s.JsonAST.JValue
@@ -30,12 +31,19 @@ class ANA extends BaseServiceProvider {
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
     val response = action match {
       case "create" => {
-        val analysisNode = new AnalysisNode(analysisJson(json))
+        val analysis: JValue = ("analysisId", UUID.randomUUID.toString) ~
+        ("module", "analyze") ~
+        ("customer_code", "customer-1") ~
+        ("name", "test")
+        val analysisNode = new AnalysisNode(analysis)
         val (result, message) = analysisNode.write
         if (result != NodeCreated.id) {
           throw new RuntimeException("Writing failed: " + message)
         }
-        json
+        ("ticket" -> JObject()) ~
+        ("_links" -> JObject()) ~
+        ("contents" -> (
+          "analyze", JArray(List(analysis))))
       }
       case "update" => {
         val analysisId = extractAnalysisId(json)
@@ -57,7 +65,7 @@ class ANA extends BaseServiceProvider {
         result("content") match {
           case content: JValue => {
             json merge(
-              ("contents", ("analysis", JArray(List(content)))) ~ (".", "."))
+              ("contents", ("analyze", JArray(List(content)))) ~ (".", "."))
           }
           case _ => throw new RuntimeException("no match")
         }
@@ -85,12 +93,12 @@ class ANA extends BaseServiceProvider {
   }
 
   def extractAnalysisId(json: JValue) = {
-    val JString(analysisId) = (json \ "contents" \ "keys")(0)
+    val JString(analysisId) = (json \ "contents" \ "keys")(0) \ "_id"
     analysisId
   }
 
   def analysisJson(json: JValue) = {
-    val analysisListJson = json \ "contents" \ "analysis"
+    val analysisListJson = json \ "contents" \ "analyze"
     val analysis = analysisListJson match {
       case array: JArray => {
         if (array.arr.length > 1) {
