@@ -31,7 +31,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       val analysis = analyze(response)
       val JString(name) = analysis \ "name"
       name must be (s"test-$id")
-      val JString(customerCode) = analysis \ "customer_code"
+      val JString(customerCode) = analysis \ "customerCode"
       customerCode must be ("customer-2")
     }
 

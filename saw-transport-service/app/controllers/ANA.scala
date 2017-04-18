@@ -33,7 +33,7 @@ class ANA extends BaseServiceProvider {
       case "create" => {
         val analysis: JValue = ("id", UUID.randomUUID.toString) ~
         ("module", "analyze") ~
-        ("customer_code", "customer-1") ~
+        ("customerCode", "customer-1") ~
         ("name", "test")
         val analysisNode = new AnalysisNode(analysis)
         val (result, message) = analysisNode.write

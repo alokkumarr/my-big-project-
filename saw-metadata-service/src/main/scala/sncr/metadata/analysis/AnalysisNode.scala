@@ -210,7 +210,7 @@ object AnalysisNode{
 
 
   protected val requiredFields = Map(
-    "root" -> List("id", "module", "customer_code")
+    "root" -> List("id", "module", "customerCode")
   )
 
   def  extractSearchData(analysisNode: JValue) : Map[String, Any] = {
@@ -218,7 +218,7 @@ object AnalysisNode{
     List(
       (analysisNode, "id"),
       (analysisNode, "module"),
-      (analysisNode, "customer_code"))
+      (analysisNode, "customerCode"))
       .map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, SearchDictionary.searchFields(jv._2)) )
         m_log trace s"Field: ${jv._2}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${SearchDictionary.searchFields(jv._2)}\n, Value: $searchValue"
