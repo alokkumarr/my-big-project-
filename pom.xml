@@ -512,6 +512,10 @@ getent passwd ${app.user} || {
 
 echo check /etc/bda/${app.name}.vars can be read
 ( &lt;/etc/bda/${app.name}.vars ) || exit 1
+
+echo check Python module with "'import MySQLdb'"
+( python -c 'import MySQLdb' ) || exit 1
+
 echo pre-install completed: ${app.nameVer}
                         </script>
                     </preinstallScriptlet>
