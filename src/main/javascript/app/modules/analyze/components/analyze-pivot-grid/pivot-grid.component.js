@@ -2,8 +2,10 @@ import forEach from 'lodash/forEach';
 import assign from 'lodash/assign';
 import values from 'lodash/values';
 import mapValues from 'lodash/mapValues';
-import keys from 'lodash/keys';
-import compact from 'lodash/compact';
+import fpPipe from 'lodash/fp/pipe';
+import fpFilter from 'lodash/fp/filter';
+import fpMap from 'lodash/fp/map';
+import fpToPairs from 'lodash/fp/toPairs';
 
 import template from './pivot-grid.component.html';
 
@@ -88,7 +90,11 @@ export const PivotGridComponent = {
 
       forEach(filters, filter => {
         if (this._FilterService.isFilterModelNonEmpty(filter.model)) {
-          const filterValues = compact(keys(filter.model));
+          const filterValues = fpPipe(
+            fpToPairs,
+            fpFilter(pair => pair[1]),
+            fpMap(pair => pair[0])
+          )(filter.model);
           pivotGridDataSource.field(filter.name, {
             filterType: 'include',
             filterValues

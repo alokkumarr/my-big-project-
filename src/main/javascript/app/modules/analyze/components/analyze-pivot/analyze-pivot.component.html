@@ -31,17 +31,17 @@
                             field-chooser-options="$ctrl.fieldChooserOptions">
     </analyze-pivot-settings>
 
-    <div layout="column" style="overflow: auto">
+    <div layout="column">
       <div layout="row" class="ard_toolbar" layou="space-between">
 
-        <md-button ng-click="$ctrl.toggleSettingsSidenav()">
+        <md-button ng-click="$ctrl.toggleSettingsSidenav()" flex="5">
           <md-icon md-font-icon="icon-menu"></md-icon>
         </md-button>
 
-        <span class="ard_toolbar-text" flex
+        <span class="ard_toolbar-text" flex="25"
               translate="PIVOT"></span>
 
-        <div class="ard_toolbar-actions" flex>
+        <div class="ard_toolbar-actions" flex="70">
           <md-button class="btn-primary" ng-click="$ctrl.onRefreshData()">
             <span translate="REFRESH_DATA"></span>
           </md-button>

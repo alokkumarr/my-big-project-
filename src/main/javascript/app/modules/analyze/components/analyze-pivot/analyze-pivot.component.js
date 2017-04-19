@@ -274,7 +274,6 @@ export const AnalyzePivotComponent = {
         fpMap(this._FilterService.getFrontEnd2BackEndFilterMapper())
       )(this.filters);
       this.model.sorts = this.mapFrontend2BackendSort(this.sorts);
-
       const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
       this._$mdDialog

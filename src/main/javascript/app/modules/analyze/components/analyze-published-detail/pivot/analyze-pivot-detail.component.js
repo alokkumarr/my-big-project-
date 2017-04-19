@@ -1,5 +1,8 @@
 import 'devextreme/ui/pivot_grid';
 import isEmpty from 'lodash/isEmpty';
+import map from 'lodash/map';
+import forEach from 'lodash/forEach';
+import find from 'lodash/find';
 import {BehaviorSubject} from 'rxjs';
 
 import template from './analyze-pivot-detail.component.html';
@@ -20,12 +23,17 @@ export const AnalyzePivotDetailComponent = {
     }
 
     $onInit() {
+      this._FilterService.onApplyFilters(filters => this.onApplyFilters(filters));
+      this._FilterService.onClearAllFilters(() => this.onClearAllFilters());
+
       const pivot = this.analysis.pivot;
-      const artifactAttributes = pivot.artifacts[0].artifactAttributes;
+      const artifactAttributes = pivot.artifacts[0].columns;
 
       this.fields = this._PivotService.getBackend2FrontendFieldMapper()(artifactAttributes);
       this.deNormalizedData = this._PivotService.denormalizeData(pivot.data, this.fields);
-      this.filters = this._PivotService.mapFieldsToFilters(pivot.data, this.fields);
+      this.filters = this.getFilters(pivot.data, this.fields, pivot.filters);
+
+      this.openFilterSidenav();
 
       this.pivotGridUpdater.next({
         dataSource: {
@@ -35,18 +43,33 @@ export const AnalyzePivotDetailComponent = {
       });
     }
 
+    getFilters(data, fields, pivotFilters) {
+      const filters = this._PivotService.mapFieldsToFilters(data, fields);
+      const selectedFilters = map(pivotFilters, this._FilterService.getBackEnd2FrontEndFilterMapper());
+
+      forEach(selectedFilters, selectedFilter => {
+        const targetFitler = find(filters, ({name}) => name === selectedFilter.name);
+        selectedFilter.items = targetFitler.items;
+      });
+      return selectedFilters;
+    }
+
     openFilterSidenav() {
       this._FilterService.openFilterSidenav(this.filters, ANALYZE_FILTER_SIDENAV_IDS.detailPage);
     }
 
     onApplyFilters(filters) {
       this.filters = filters;
-      this.filteredGridData = this._FilterService.getGridDataFilter(this.filters)(this.analysis.pivot.data);
+      this.pivotGridUpdater.next({
+        filters: this.filters
+      });
     }
 
     onClearAllFilters() {
       this.filters = this._FilterService.getFilterClearer()(this.filters);
-      this.filteredGridData = this.analysis.pivot.data;
+      this.pivotGridUpdater.next({
+        filters: this.filters
+      });
     }
   }
 };

@@ -40,7 +40,7 @@ export function PivotService(FilterService) {
 
   function getFrontend2BackendFieldMapper() {
     return fpMap(fpPipe(
-      // fpOmit(['_initProperties', 'selector', 'format']),
+      fpOmit(['_initProperties', 'selector', 'format']),
       fpMapKeys(key => {
         const newKey = FRONT_2_BACK_PIVOT_FIELD_PAIRS[key];
         return newKey || key;
