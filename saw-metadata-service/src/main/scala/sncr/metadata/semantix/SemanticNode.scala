@@ -1,6 +1,5 @@
 package sncr.metadata.semantix
 
-import com.typesafe.config.Config
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{Result, _}
 import org.apache.hadoop.hbase.util.Bytes
@@ -11,16 +10,19 @@ import sncr.metadata.engine.MDObjectStruct.{apply => _, _}
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine._
 import sncr.metadata.engine.relations.Relation
-import sncr.metadata.ui_components.{UINode, UINodeFetchMode}
+import sncr.metadata.ui_components.UINodeFetchMode
 import sncr.saw.common.config.SAWServiceConfig
 
 /**
   * Created by srya0001 on 2/19/2017.
   */
-class SemanticNode(private[this] var content_element: JValue, val ui_item_type : String = Fields.UNDEF_VALUE.toString, c: Config = null)
-      extends ContentNode(c)
+class SemanticNode(private var content_element: JValue,
+                   private val predefRowKey : String = null)
+      extends ContentNode
       with Relation
       with SourceAsJson {
+
+  override protected val m_log: Logger = LoggerFactory.getLogger(classOf[SemanticNode].getName)
 
   private var fetchMode : Int = UINodeFetchMode.Everything.id
 
@@ -36,7 +38,7 @@ class SemanticNode(private[this] var content_element: JValue, val ui_item_type :
 
   override protected def getSourceData(res:Result): (JValue, Array[Byte]) = super[SourceAsJson].getSourceData(res)
 
-  override protected def compileRead(g : Get) = includeRelation(includeContent(g))
+  override protected def compileRead(g : Get) = includeRelation(includeContent(includeSearch(g)))
 
   override protected def header(g : Get) = includeRelation(includeSearch(g))
 
@@ -49,39 +51,38 @@ class SemanticNode(private[this] var content_element: JValue, val ui_item_type :
       Option(Map(key_Definition.toString -> dataAsJVal))
   }
 
-  override protected val m_log: Logger = LoggerFactory.getLogger(classOf[UINode].getName)
-
   import MDObjectStruct.formats
   protected val table = SAWServiceConfig.metadataConfig.getString("path") + "/" + tables.SemanticMetadata
   protected val tn: TableName = TableName.valueOf(table)
   mdNodeStoreTable = connection.getTable(tn)
   headerDesc =  SemanticNode.searchFields
 
-  override protected def initRow : String =
-  {
-    val rowkey = (content_element \ "customer_code").extractOpt[String] +
-            MetadataDictionary.separator + ui_item_type +
-            MetadataDictionary.separator + System.nanoTime()
-    m_log debug s"Generated RowKey = $rowkey"
-    rowkey
+  override protected def initRow : String = {
+    if (predefRowKey == null || predefRowKey.isEmpty) {
+      val rowkey = (content_element \ "customer_code").extractOpt[String] +
+        MetadataDictionary.separator + System.nanoTime()
+      m_log debug s"Generated RowKey = $rowkey"
+      rowkey
+    }
+    else{
+      predefRowKey
+    }
   }
 
 
   def create: ( Int, String )=
   {
     try {
-      val put_op = createNode(NodeType.ContentNode.id, classOf[UINode].getName)
+      val put_op = createNode(NodeType.ContentNode.id, classOf[SemanticNode].getName)
 
       setSemanticNodeContent
-      var searchValues : Map[String, Any] = UINode.extractSearchData(content_element) + ("NodeId" -> new String(rowKey))
-      if (!ui_item_type.equalsIgnoreCase(Fields.UNDEF_VALUE.toString)) searchValues = searchValues + ("module" -> ui_item_type )
+      val searchValues : Map[String, Any] = SemanticNode.extractSearchData(content_element) + ("NodeId" -> new String(rowKey))
       searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
-
 
       if (commit(saveContent(saveSearchData(put_op, searchValues))))
         (NodeCreated.id, s"${Bytes.toString(rowKey)}")
       else
-        (Error.id, "Could not create UI Node")
+        (Error.id, "Could not create Semantic Node")
 
     }
     catch{
@@ -94,16 +95,14 @@ class SemanticNode(private[this] var content_element: JValue, val ui_item_type :
     try {
       val (res, msg ) = selectRowKey(keys)
       if (res != Success.id) return (res, msg)
-      load
       setSemanticNodeContent
-      var searchValues : Map[String, Any] = UINode.extractSearchData(content_element) + ("NodeId" -> new String(rowKey))
-      if (!ui_item_type.equalsIgnoreCase(Fields.UNDEF_VALUE.toString)) searchValues = searchValues + ("module" -> ui_item_type )
+      val searchValues : Map[String, Any] = SemanticNode.extractSearchData(content_element) + ("NodeId" -> new String(rowKey))
       searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
 
-      if (commit(saveContent(saveSearchData(update, searchValues))))
-        (Success.id, s"The UI Node [ ${new String(rowKey)} ] has been updated")
+      if (commit(saveRelation(saveContent(saveSearchData(update, searchValues)))))
+        (Success.id, s"The Semantic Node [ ${new String(rowKey)} ] has been updated")
       else
-        (Error.id, "Could not update UI Node")
+        (Error.id, "Could not update Semantic Node")
     }
     catch{
       case x: Exception => { val msg = s"Could not store node [ ID = ${new String(rowKey)} ]: "; m_log error (msg, x); ( Error.id, msg)}
@@ -116,28 +115,25 @@ class SemanticNode(private[this] var content_element: JValue, val ui_item_type :
 object SemanticNode
 {
   val searchFields: Map[String, String] = Map(
-    "AnalysisId" -> "String"
+    "customer_code" -> "String",
+    "metric_name" -> "String"
   )
 
 
 
-  protected val m_log: Logger = LoggerFactory.getLogger("UINodeObject")
+  protected val m_log: Logger = LoggerFactory.getLogger("SemanticNodeObject")
 
-  def apply(rowId: String) :UINode =
+  def apply(rowId: String) :SemanticNode =
   {
-    val uiNode = new UINode(JNothing, Fields.UNDEF_VALUE.toString)
-    uiNode.setRowKey(Bytes.toBytes(rowId))
-    uiNode.load
-    uiNode
+    val semNode = new SemanticNode(JNothing, null)
+    semNode.setRowKey(Bytes.toBytes(rowId))
+    semNode.load
+    semNode
   }
 
   def  extractSearchData( content_element: JValue) : Map[String, Any] = {
-    List((content_element, "customer_Prod_module_feature_sys_id"),
-      (content_element, "userName"),
-      (content_element, "dataSecurityKey"),
-      (content_element, "type"),
-      (content_element, "metric_name"),
-      (content_element, "customer_code"))
+    List((content_element, "metric_name"),
+        (content_element, "customer_code"))
       .map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, searchFields(jv._2)) )
         m_log trace s"Field: ${jv._2}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${searchFields(jv._2)}\n, Value: $searchValue"

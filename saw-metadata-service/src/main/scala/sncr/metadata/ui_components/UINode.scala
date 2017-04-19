@@ -1,6 +1,5 @@
 package sncr.metadata.ui_components
 
-import com.typesafe.config.Config
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{Result, _}
 import org.apache.hadoop.hbase.util.Bytes
@@ -10,14 +9,13 @@ import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.MDObjectStruct.{apply => _, _}
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine._
-import sncr.metadata.ui_components.SearchDictionary.searchFields
 import sncr.saw.common.config.SAWServiceConfig
 
 /**
   * Created by srya0001 on 2/19/2017.
   */
-class UINode(private[this] var content_element: JValue, val ui_item_type : String = Fields.UNDEF_VALUE.toString, c: Config = null)
-      extends ContentNode(c)
+class UINode(private[this] var content: JValue, val ui_item_type : String = Fields.UNDEF_VALUE.toString)
+      extends ContentNode
       with SourceAsJson {
 
   private var fetchMode : Int = UINodeFetchMode.Everything.id
@@ -26,12 +24,25 @@ class UINode(private[this] var content_element: JValue, val ui_item_type : Strin
 
 
   def setUINodeContent : Unit = {
-    if (content_element != JNothing) {
-      content_element.replace(List("_id"), JString(new String(rowKey)))
-      setContent(compact(render(content_element)))
+    if (content != JNothing) {
+      content.replace(List("id"), JString(new String(rowKey)))
+      setContent(compact(render(content)))
     }
   }
 
+  def buildSearchData : Map[String, Any] = {
+    var searchValues : Map[String, Any] =
+    UINode.extractSearchData(content) + ("NodeId" -> new String(rowKey))
+    val moduleName: String = ui_item_type match {
+      case "analyze" | "observe" | "alert" => ui_item_type
+      case "menu" => (content \ "module").extractOrElse[String]("unknown").toLowerCase
+      case _ => "undefined"
+    }
+    if (!ui_item_type.equalsIgnoreCase(Fields.UNDEF_VALUE.toString))
+      searchValues = searchValues + ( "type" -> ui_item_type ) + ( "module" -> moduleName )
+    searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
+    searchValues
+  }
 
   override protected def getSourceData(res:Result): (JValue, Array[Byte]) = super[SourceAsJson].getSourceData(res)
 
@@ -54,11 +65,11 @@ class UINode(private[this] var content_element: JValue, val ui_item_type : Strin
   protected val table = SAWServiceConfig.metadataConfig.getString("path") + "/" + tables.SemanticMetadata
   protected val tn: TableName = TableName.valueOf(table)
   mdNodeStoreTable = connection.getTable(tn)
-  headerDesc =  SearchDictionary.searchFields
+  headerDesc =  UINode.searchFields
 
   override protected def initRow : String =
   {
-    val rowkey = (content_element \ "customer_code").extractOpt[String] +
+    val rowkey = (content \ "customerCode").extractOrElse[String]("UNDEF") +
             MetadataDictionary.separator + ui_item_type +
             MetadataDictionary.separator + System.nanoTime()
     m_log debug s"Generated RowKey = $rowkey"
@@ -72,12 +83,7 @@ class UINode(private[this] var content_element: JValue, val ui_item_type : Strin
       val put_op = createNode(NodeType.ContentNode.id, classOf[UINode].getName)
 
       setUINodeContent
-      var searchValues : Map[String, Any] = UINode.extractSearchData(content_element) + ("NodeId" -> new String(rowKey))
-      if (!ui_item_type.equalsIgnoreCase(Fields.UNDEF_VALUE.toString)) searchValues = searchValues + ("module" -> ui_item_type )
-      searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
-
-
-      if (commit(saveContent(saveSearchData(put_op, searchValues))))
+      if (commit(saveContent(saveSearchData(put_op, buildSearchData))))
         (NodeCreated.id, s"${Bytes.toString(rowKey)}")
       else
         (Error.id, "Could not create UI Node")
@@ -95,11 +101,7 @@ class UINode(private[this] var content_element: JValue, val ui_item_type : Strin
       if (res != Success.id) return (res, msg)
       load
       setUINodeContent
-      var searchValues : Map[String, Any] = UINode.extractSearchData(content_element) + ("NodeId" -> new String(rowKey))
-      if (!ui_item_type.equalsIgnoreCase(Fields.UNDEF_VALUE.toString)) searchValues = searchValues + ("module" -> ui_item_type )
-      searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
-
-      if (commit(saveContent(saveSearchData(update, searchValues))))
+      if (commit(saveContent(saveSearchData(update, buildSearchData))))
         (Success.id, s"The UI Node [ ${new String(rowKey)} ] has been updated")
       else
         (Error.id, "Could not update UI Node")
@@ -116,6 +118,22 @@ object UINode
 {
   protected val m_log: Logger = LoggerFactory.getLogger("UINodeObject")
 
+  val searchFields =
+    Map(
+      "customer_Prod_module_feature_sys_id" -> "String",
+      "module" -> "String",
+      "userName" -> "String",
+      "dataSecurityKey" -> "String",
+      "type" -> "String",
+      "number_of_records" -> "Int",
+      "from_record" -> "Int",
+      "NodeId" -> "String",
+      "roleType" -> "String",
+      "metric_name" -> "String",
+      "customerCode" -> "String")
+
+  val UIArtifacts = List("menu", "analyze", "observe", "alert")
+
   def apply(rowId: String) :UINode =
   {
     val uiNode = new UINode(JNothing, Fields.UNDEF_VALUE.toString)
@@ -130,7 +148,8 @@ object UINode
       (content_element, "dataSecurityKey"),
       (content_element, "type"),
       (content_element, "metric_name"),
-      (content_element, "customer_code"))
+      (content_element, "customerCode"),
+      (content_element, "roleType"))
       .map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, searchFields(jv._2)) )
         m_log trace s"Field: ${jv._2}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${searchFields(jv._2)}\n, Value: $searchValue"

@@ -29,6 +29,7 @@ trait Response {
 
   def build(data : List[Map[String, Any]]) : JValue = new JArray(data.map(d => build(d)))
 
+
 }
 
 
