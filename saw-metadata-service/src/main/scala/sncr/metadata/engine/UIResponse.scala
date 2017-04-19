@@ -12,9 +12,6 @@ trait UIResponse extends Response {
 
     override protected val m_log: Logger = LoggerFactory.getLogger(classOf[UIResponse].getName)
 
-
-    override def build(data : List[Map[String, Any]]) : JValue = new JArray(data.map(d => build(d)))
-
     import MDObjectStruct.formats
     private def remap(remappingAttr: String, data : List[Map[String, Any]]) : List[JObject] = {
       data.map(d => {
