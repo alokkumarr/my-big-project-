@@ -25,7 +25,5 @@ mail.host=CHANGEME # outgoing.sncrcorp.net
 mail.port=CHANGEME # 25
 mail.smtp.auth=CHANGEME # false
 mail.smtp.starttls.enable=CHANGEME # false
-mail.username=CHANGEME #
-mail.password=CHANGEME #
 mail.from=CHANGEME # helpdesk@synchronoss.com
 mail.subject=CHANGEME # Request for Reset Password
