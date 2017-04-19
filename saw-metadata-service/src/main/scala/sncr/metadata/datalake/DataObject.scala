@@ -1,6 +1,5 @@
 package sncr.metadata.datalake
 
-import com.typesafe.config.Config
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{Get, Put, Result}
 import org.apache.hadoop.hbase.util.Bytes
@@ -15,9 +14,13 @@ import sncr.saw.common.config.SAWServiceConfig
 /**
   * Created by srya0001 on 3/4/2017.
   */
-class DataObject(final private[this] var descriptor : JValue, final private[this] var schema : JValue = JNothing, c: Config = null)
-  extends ContentNode(c)
+class DataObject(final private var descriptor : JValue, final private var schema : JValue = JNothing)
+  extends ContentNode
   with SourceAsJson{
+
+
+  def setSchema(newSchema: JObject) = schema = newSchema
+
 
   def setDescriptor : Unit = {
     if (descriptor != JNothing) {
@@ -35,6 +38,7 @@ class DataObject(final private[this] var descriptor : JValue, final private[this
     setDescriptor
   }
 
+  def setDescriptor(newDescriptor : JValue): Unit = descriptor = newDescriptor
 
   def this() = { this(JNothing, JNothing) }
 
@@ -52,7 +56,7 @@ class DataObject(final private[this] var descriptor : JValue, final private[this
   {
     val schemaConvertedToString = Bytes.toString(res.getValue(MDColumnFamilies(_cf_source.id),MDKeys(key_Schema.id)))
     if (schemaConvertedToString != null && schemaConvertedToString.nonEmpty) {
-      m_log debug s"Convert schema of Schema to JSON: ${schemaConvertedToString}"
+      m_log debug s"Convert schema to JSON: $schemaConvertedToString"
       schema = parse(schemaConvertedToString, false, false)
       schema
     }
@@ -137,7 +141,7 @@ class DataObject(final private[this] var descriptor : JValue, final private[this
     try {
       val (res, msg) = selectRowKey(filter)
       if (res != Success.id) return (res, msg)
-      load
+//      load
       setDescriptor
 
       val searchValues: Map[String, Any] = DataObject.extractSearchData(descriptor) + (Fields.NodeId.toString -> new String(rowKey))
@@ -266,12 +270,12 @@ object DataObject{
 
 
 
-  def apply(d: String, s: String, c: Config = null) :DataObject =
+  def apply(d: String, s: String) :DataObject =
   {
     try {
       val descriptor = parse(d, false, false)
       val schema = parse(s, false, false)
-      new DataObject(descriptor, schema, c)
+      new DataObject(descriptor, schema)
     }
     catch{
       case x: Exception => m_log error s"Could not parse Data object JSON document"; new DataObject()

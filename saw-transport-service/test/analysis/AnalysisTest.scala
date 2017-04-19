@@ -1,18 +1,18 @@
 import org.json4s._
+import org.scalatest.CancelAfterFailure
 
 /* Test analysis service operations */
-class AnalysisTest extends MaprTest {
+class AnalysisTest extends MaprTest with CancelAfterFailure {
   "Analysis service" should {
     requireMapr
-    val id = (System.currentTimeMillis - 1490100000000L).toString
+    var id: String = null
 
     "create analysis" in {
       /* Write analysis */
-      val body = actionAnalysisMessage("create", analysisJson(id))
+      val body = actionKeyMessage("create", "semantic-123")
       val response = sendRequest(body)
-      val analysis = (response \ "contents" \ "analysis")(0)
-      val JString(analysisId) = analysis \ "analysisId"
-      analysisId must be (id)
+      val JString(analysisId) = analyze(response) \ "id"
+      id = analysisId
     }
 
     "update analysis" in {
@@ -20,8 +20,7 @@ class AnalysisTest extends MaprTest {
       val body = actionKeyAnalysisMessage("update", id,
         analysisJson(id, "customer-2"))
       val response = sendRequest(body)
-      val analysis = (response \ "contents" \ "analysis")(0)
-      val JString(analysisId) = analysis \ "analysisId"
+      val JString(analysisId) = analyze(response) \ "id"
       analysisId must be (id)
     }
 
@@ -29,10 +28,10 @@ class AnalysisTest extends MaprTest {
       /* Read back previously created analysis */
       val body = actionKeyMessage("read", id)
       val response = sendRequest(body)
-      val analysis = (response \ "contents" \ "analysis")(0)
+      val analysis = analyze(response)
       val JString(name) = analysis \ "name"
       name must be (s"test-$id")
-      val JString(customerCode) = analysis \ "customer_code"
+      val JString(customerCode) = analysis \ "customerCode"
       customerCode must be ("customer-2")
     }
 
@@ -50,5 +49,9 @@ class AnalysisTest extends MaprTest {
       val JString(action) = response \ "contents" \ "action"
       action must be ("delete")
     }
+  }
+
+  def analyze(response: JValue): JValue = {
+    (response \ "contents" \ "analyze")(0)
   }
 }

@@ -21,23 +21,26 @@ class MaprTest extends PlaySpec with OneAppPerSuite {
   }
 
   def actionAnalysisMessage(action: String, analysis: JValue) = {
-    message(("action" -> action) ~ ("analysis" -> List(analysis)))
+    message(("action" -> action) ~ ("analyze" -> List(analysis)))
   }
 
   def actionKeyAnalysisMessage(
-    action: String, key: String, analysis: JValue) = {
+    action: String, id: String, analysis: JValue) = {
+    val key: JObject = ("id", id)
     message(("action" -> action) ~ ("keys" -> List(key)) ~
-      ("analysis" -> List(analysis)))
+      ("analyze" -> List(analysis)))
   }
-  def analysisJson(id: String, customerCode: String = "customer-1") = {
-    ("analysisId" -> id) ~
-    ("module" -> "analyze") ~
-    ("customer_code" -> customerCode) ~
-    ("name" -> s"test-$id")
+
+  def analysisJson(id: String = null, customerCode: String = "customer-1") = {
+    val idJson: JValue = if (id != null) ("id" -> id) else JNothing
+    (("module" -> "analyze") ~
+      ("customerCode" -> customerCode) ~
+      ("name" -> s"test-$id")).merge(idJson)
   }
 
   def actionKeyMessage(action: String, id: String) = {
-    message(("action" -> action) ~ ("keys" -> JArray(List(id))))
+    val key: JObject = ("id", id)
+    message(("action" -> action) ~ ("keys" -> JArray(List(key))))
   }
 
   def message(contents: JValue) = {

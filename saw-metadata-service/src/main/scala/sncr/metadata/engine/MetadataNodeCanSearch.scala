@@ -1,17 +1,15 @@
 package sncr.metadata.engine
 
-import com.typesafe.config.Config
 import org.apache.hadoop.hbase.client.{Get, Result}
 import org.slf4j.{Logger, LoggerFactory}
 
 /**
   * Created by srya0001 on 3/7/2017.
   */
-class MetadataNodeCanSearch(c: Config = null)
-  extends MetadataNode(c)
+class MetadataNodeCanSearch
+  extends MetadataNode
   with SearchMetadata
 {
-  if (c != null) super[SearchMetadata].setConf(c)
 
   override protected val m_log: Logger = LoggerFactory.getLogger(classOf[MetadataNodeCanSearch].getName)
   override def selectRowKey(keys: Map[String, Any]) : (Int, String) = super[SearchMetadata].selectRowKey(keys)

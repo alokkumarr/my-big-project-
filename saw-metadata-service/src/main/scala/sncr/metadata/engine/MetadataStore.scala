@@ -17,19 +17,19 @@ import org.slf4j.{Logger, LoggerFactory}
   *
   *
   */
-abstract class MetadataStore(var mdConfig: Config) {
+abstract class MetadataStore{
 
-  def this() = { this(SAWServiceConfig.metadataConfig) }
-  if (mdConfig == null) mdConfig = SAWServiceConfig.metadataConfig
-
+  var mdConfig : Config = SAWServiceConfig.metadataConfig
   protected val m_log: Logger = LoggerFactory.getLogger(classOf[MetadataStore].getName)
   private val default_user = "mapr"
+
   lazy val hbaseConf = HBaseConfiguration.create
   val zQuorum = mdConfig.getString("zookeeper-quorum")
   val user = if (mdConfig.getString("user") != null &&
     !mdConfig.getString("user").isEmpty)
     mdConfig.getString("user")
   else default_user
+
   lazy val realUser: UserGroupInformation = UserGroupInformation.createRemoteUser(user)
   UserGroupInformation.setLoginUser(realUser)
   hbaseConf.set("hbase.zookeeper.quorum", zQuorum)
@@ -44,7 +44,6 @@ abstract class MetadataStore(var mdConfig: Config) {
 
   def close: Unit = mdNodeStoreTable.close()
   override protected def finalize(): Unit = close
-  protected def setConf(c: Config) : Unit = mdConfig = c
 
 }
 

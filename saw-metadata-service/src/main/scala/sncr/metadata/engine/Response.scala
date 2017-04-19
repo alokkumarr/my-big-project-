@@ -1,6 +1,7 @@
 package sncr.metadata.engine
 
 
+import com.mapr.org.apache.hadoop.hbase.util.Bytes
 import org.json4s.JsonAST.{JArray, JBool, JLong, JNothing, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
@@ -27,7 +28,11 @@ trait Response {
     })).toList)
   }
 
-  def build(data : List[Map[String, Any]]) : JValue = new JArray(data.map(d => build(d)))
+  def build(data : List[Any]) : JValue = new JArray(data.map {
+    case d@(m: Map[String, Any]) => build(m)
+    case d@(a: Array[Byte]) => JString(Bytes.toString(a))
+  })
+
 
 
 }

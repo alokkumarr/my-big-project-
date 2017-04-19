@@ -135,9 +135,9 @@ trait Relation{
       (for( i <- elements.indices ) yield JObject(List(JField( i + "_TAB", JString(elements(i)._1)),
                                                        JField( i + "_RID", JString(elements(i)._2))))).toList)
     _elementsAsJSON = new JObject( List(
-      ("elements" -> lelements),
-      (Fields.NumOfElements.toString, JInt(readNumOfElements.toInt)),
-      (Fields.RelationCategory.toString,  JString(RelationCategory(relType).toString))
+      "elements" -> lelements,
+      JField(Fields.NumOfElements.toString, JInt(readNumOfElements)),
+      JField(Fields.RelationCategory.toString,  JString(RelationCategory(relType).toString))
     ) )
     m_log debug s"Converted relation: ${compact(render(_elementsAsJSON))}"
     _elementsAsJSON

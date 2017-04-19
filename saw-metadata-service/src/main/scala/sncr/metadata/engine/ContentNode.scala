@@ -1,6 +1,5 @@
 package sncr.metadata.engine
 
-import com.typesafe.config.Config
 import org.apache.hadoop.hbase.client.{Get, Put}
 import org.apache.hadoop.hbase.util.Bytes
 import org.slf4j.{Logger, LoggerFactory}
@@ -9,7 +8,7 @@ import sncr.metadata.engine.MDObjectStruct._
 /**
   * Created by srya0001 on 3/5/2017.
   */
-class ContentNode(c: Config = null) extends MetadataNodeCanSearch(c){
+class ContentNode extends MetadataNodeCanSearch{
 
   override protected val m_log: Logger = LoggerFactory.getLogger(classOf[ContentNode].getName)
 

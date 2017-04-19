@@ -14,7 +14,7 @@ import sncr.saw.common.config.SAWServiceConfig
 /**
   * Created by srya0001 on 2/19/2017.
   */
-class UINode(private[this] var content: JValue, val ui_item_type : String = Fields.UNDEF_VALUE.toString)
+class UINode(private var content: JValue, val ui_item_type : String = Fields.UNDEF_VALUE.toString)
       extends ContentNode
       with SourceAsJson {
 
@@ -99,7 +99,6 @@ class UINode(private[this] var content: JValue, val ui_item_type : String = Fiel
     try {
       val (res, msg ) = selectRowKey(keys)
       if (res != Success.id) return (res, msg)
-      load
       setUINodeContent
       if (commit(saveContent(saveSearchData(update, buildSearchData))))
         (Success.id, s"The UI Node [ ${new String(rowKey)} ] has been updated")
