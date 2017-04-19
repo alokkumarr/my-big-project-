@@ -1,6 +1,5 @@
 import 'devextreme/ui/pivot_grid';
 import isEmpty from 'lodash/isEmpty';
-import forEach from 'lodash/forEach';
 import {BehaviorSubject} from 'rxjs';
 
 import template from './analyze-pivot-detail.component.html';
@@ -22,15 +21,11 @@ export const AnalyzePivotDetailComponent = {
 
     $onInit() {
       const pivot = this.analysis.pivot;
+      const artifactAttributes = pivot.artifacts[0].artifactAttributes;
 
-      this.deNormalizedData = this._PivotService.denormalizeData(pivot.data);
-
-      this.fields = pivot.artifactAttributes;
-      this.fields = forEach(pivot.artifactAttributes, field => {
-        field.caption = field.displayName;
-        field.dataField = field.columnName;
-        field.dataType = field.type;
-      });
+      this.fields = this._PivotService.getBackend2FrontendFieldMapper()(artifactAttributes);
+      this.deNormalizedData = this._PivotService.denormalizeData(pivot.data, this.fields);
+      this.filters = this._PivotService.mapFieldsToFilters(pivot.data, this.fields);
 
       this.pivotGridUpdater.next({
         dataSource: {

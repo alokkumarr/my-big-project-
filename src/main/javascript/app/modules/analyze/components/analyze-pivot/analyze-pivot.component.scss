@@ -195,10 +195,14 @@ analyze-pivot {
         text-align: right;
         align-self: center;
 
-        .md-button {
+        .md-button.action {
           border: 1px solid #E7E8E9;
           background-color: #F8F8F8;
           color: #898989;
+
+          &[disabled] {
+            color: #B2B2B2;
+          }
         }
       }
     }

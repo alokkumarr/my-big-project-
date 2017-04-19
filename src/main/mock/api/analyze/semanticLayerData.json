@@ -41,10 +41,10 @@
           "type": "string",
           "joinEligible": true,
           "filterEligible": false,
-          "area" : "column",
+          "area" : null,
           "displayFolder" : "Folder_2",
-          "visible": false,
-          "allowFiltering" : true
+          "visible": true,
+          "allowFiltering" : false
         },
         {
           "columnName": "CUSTOMER_ID",
@@ -53,10 +53,10 @@
           "type": "string",
           "joinEligible": true,
           "filterEligible": false,
-          "area" : "column",
+          "area" : null,
           "displayFolder" : "Folder_2",
-          "visible": false,
-          "allowFiltering" : true
+          "visible": true,
+          "allowFiltering" : false
         },
         {
         "columnName": "FACT_PRODUCT_ID",
@@ -65,10 +65,10 @@
         "type": "string",
         "joinEligible": false,
         "filterEligible": false,
-        "area" : "column",
+        "area" : null,
         "displayFolder" : "Folder_2",
-        "visible": false,
-        "allowFiltering" : true
+        "visible": true,
+        "allowFiltering" : false
       },
       {
         "columnName": "ENR_PARTNER",
@@ -77,10 +77,10 @@
         "type": "string",
         "joinEligible": false,
         "filterEligible": true,
-        "area" : "column",
+        "area" : null,
         "displayFolder" : "Folder_2",
-        "visible": false,
-        "allowFiltering" : true
+        "visible": true,
+        "allowFiltering" : false
       },
       {
         "columnName": "AFFILIATE_displayName",
@@ -92,22 +92,36 @@
         "joinEligible": false,
         "filterEligible": true,
         "checked": false,
-        "area" : "row",
+        "area" : null,
         "displayFolder" : "Folder_2",
-        "visible": false,
-        "allowFiltering" : true
+        "visible": true,
+        "allowFiltering" : false
       },
       {
-        "columnName": "ORDER_RECEIVED_DATE",
-        "displayName": "Order Received Date",
+        "columnName": "ORDER_RECEIVED_DATE_MOTNH",
+        "displayName": "Order Received MONTH",
         "aliasName": "",
-        "type": "string",
         "joinEligible": false,
         "filterEligible": false,
-        "area" : "row",
+        "area" : null,
         "displayFolder" : "Folder_1",
-        "visible": false,
-        "allowFiltering" : true
+        "visible": true,
+        "allowFiltering" : false,
+        "type": "date",
+        "groupInterval":"month"
+      },
+      {
+        "columnName": "ORDER_RECEIVED_DATE_DAY",
+        "displayName": "Order Received DAY",
+        "aliasName": "",
+        "joinEligible": false,
+        "filterEligible": false,
+        "area" : null,
+        "displayFolder" : "Folder_1",
+        "visible": true,
+        "allowFiltering" : false,
+        "type": "date",
+        "groupInterval":"day"
       },
       {
         "columnName": "ORDER_COMPLETION_TIME",
@@ -116,10 +130,10 @@
         "type": "int",
         "joinEligible": false,
         "filterEligible": true,
-        "area" : "row",
+        "area" : null,
         "displayFolder" : "Folder_1",
-        "visible": false,
-        "allowFiltering" : true
+        "visible": true,
+        "allowFiltering" : false
       },
       {
         "columnName": "REASON_DESC",
@@ -128,10 +142,10 @@
         "type": "string",
         "joinEligible": false,
         "filterEligible": true,
-        "area" : "row",
+        "area" : null,
         "displayFolder" : "Folder_1",
-        "visible": false,
-        "allowFiltering" : true
+        "visible": true,
+        "allowFiltering" : false
       },
       {
         "columnName": "ORDER_CANCELLATION_TIME",
@@ -140,10 +154,10 @@
         "type": "int",
         "joinEligible": false,
         "filterEligible": true,
-        "area" : "row",
+        "area" : null,
         "displayFolder" : "Folder_1",
-        "visible": false,
-        "allowFiltering" : true
+        "visible": true,
+        "allowFiltering" : false
       },
       {
         "columnName": "ORDER_TYPE",
@@ -152,10 +166,10 @@
         "type": "string",
         "joinEligible": false,
         "filterEligible": true,
-        "area" : "column",
+        "area" : null,
         "displayFolder" : "Folder_1",
-        "visible": false,
-        "allowFiltering" : true
+        "visible": true,
+        "allowFiltering" : false
       },
       {
         "columnName": "ORD_OM_STATUS",
@@ -163,10 +177,10 @@
         "aliasName": "",
         "joinEligible": false,
         "filterEligible": true,
-        "area" : "row",
+        "area" : null,
         "displayFolder" : "Folder_1",
-        "visible": false,
-        "allowFiltering" : true
+        "visible": true,
+        "allowFiltering" : false
       },
       {
         "columnName": "REGION",
@@ -175,10 +189,10 @@
         "type": "string",
         "joinEligible": false,
         "filterEligible": true,
-        "area" : "row",
+        "area" : null,
         "displayFolder" : "Folder_1",
-        "visible": false,
-        "allowFiltering" : true
+        "visible": true,
+        "allowFiltering" : false
       },
       {
         "columnName": "total_price",
@@ -187,9 +201,9 @@
         "type": "double",
         "joinEligible": false,
         "filterEligible": false,
-        "area" : "data",
-        "visible": false,
-        "allowFiltering" : true
+        "area" : null,
+        "visible": true,
+        "allowFiltering" : false
       }
       ]
     }

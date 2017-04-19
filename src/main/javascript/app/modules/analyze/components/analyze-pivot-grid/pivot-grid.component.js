@@ -66,7 +66,7 @@ export const PivotGridComponent = {
       updates.field && this.updateField(updates.field);
       updates.filters && this.updateFilters(updates.filters);
       updates.sorts && this.updateSorts(updates.sorts);
-      updates.onSave && this.sendFields({fields: this._gridInstance.getDataSource().fields()});
+      updates.getFields && this.sendFields({fields: this._gridInstance.getDataSource().fields()});
       /* eslint-disable no-unused-expressions */
 
       this.replaceWarningLables();
@@ -118,7 +118,7 @@ export const PivotGridComponent = {
         allowSortingBySummary: false,
         allowSorting: false,
         allowFiltering: false,
-        allowExpandAll: true,
+        allowExpandAll: false,
         fieldChooser: {
           enabled: false
         },

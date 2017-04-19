@@ -19,11 +19,11 @@ export function AnalyzeService($http, $timeout, $q) {
     getAnalysisById,
     getDataByQuery,
     generateQuery,
-    getNewPivotAnalysis,
     saveReport,
     getSemanticLayerData,
     chartBe2Fe,
-    chartFe2Be
+    chartFe2Be,
+    getPivotData
   };
 
   function getAnalyses(category, query) {
@@ -88,8 +88,8 @@ export function AnalyzeService($http, $timeout, $q) {
     return $http.get('/api/analyze/dataByQuery').then(fpGet('data'));
   }
 
-  function getNewPivotAnalysis() {
-    return $http.get('/api/analyze/newPivotAnalysis').then(fpGet('data'));
+  function getPivotData() {
+    return $http.get('/api/analyze/pivotData').then(fpGet('data'));
   }
 
   function generateQuery(payload) {
