@@ -1,5 +1,3 @@
-#!/bin/env python
-
 import shutil
 import sys
 import os
@@ -13,15 +11,22 @@ import traceback
 import subprocess
 import Object_Creation
 import logging
-# Author- Saurav Panda
-# Date- 21/07/2015
-# Purpose Initial Setup for RAW
-
-# This script name from command line
 cmd_arg = sys.argv[0]
-# This script directory
 cmd_dir = os.path.dirname(os.path.abspath(cmd_arg))
+sys.path.insert(0, os.path.dirname(os.path.abspath(cmd_dir)))
+import bda_init
 
+# Author - Vinnie Ganesh
+#        - Kiran PS
+# Date- 
+# Purpose Initial Setup for SAW
+
+log1 = bda_init.get_logger()
+log1.debug("Starting the initial python script")
+log1.info("Reading the pyton script location")
+log1.debug("get the saw security vars file path")
+
+#vars_file_path="/mapr/bda_lab_batch/dl.dev/app/saw/etc/bda/saw-security.vars"
 ###########################################################
 # Usage:
 # Initial_Setup.py [--vars]
@@ -38,52 +43,30 @@ if (len(sys.argv) > 1) and (sys.argv[1] == "--vars"):
     use_vars_file = True
     print "Read params from: ", VARS_FNM, "\n"
 
-#sys.exit(0)
-
-#
-## Console inputs:
-# "Please enter Email ID to which notifications are to be sent: 
-# Please enter SQL DB Info in the format - Server|DB|User|Password
-## Parameters read from saw-security.vars:
-# db.init.email
-# db.init.server
-# db.init.name
-# db.init.user
-# db.init.password
-
-# Read parameters and their values from the VARS file
-def read_vars_file( vars_fnm  ):
-    #logger.debug("in read_vars_file")
-    if not os.path.isfile(vars_fnm):
-        raise Exception("Vars file not found: '%s'" % vars_fnm)
-    vars_dict = {}
-    #logger.info("open vars file %s", vars_fnm)
-    with open(vars_fnm) as f:
-        for s in f:
-            s = re.sub(r"\s*#.*$","",s)
-            if not ("=" in s):
-                continue
-            s = s.strip()
-            s = re.sub(r"\s*=\s*","=",s)
-            vv = s.split("=",1)
-            #logger.debug("%s = %s", vv[0], vv[1])
-            vars_dict[vv[0]] = vv[1]
-    f.close()
-    #logger.debug("vars count: %d", len(vars_dict))
-    #logger.debug("out read_vars_file")
-    return vars_dict
-
+log1.debug("checking the vars file is present or not")
 vars_dict = None
 if use_vars_file:
-    vars_dict = read_vars_file( VARS_FNM )
+    log1.debug("Start reading the vars file")
+    vars_dict = bda_init.read_vars_file( VARS_FNM )
     print "VARS:", vars_dict
 
-# 
+
+log1.debug("validating the vars file data ")
+if not len(vars_dict) > 0:
+   print "The vars file does not have data"
+   log1.debug("The vars file does not have data")
+ 
+err_msg = ""
+
+#get the current directory
+log1.info("Get the absolute path of initial setup parent directory")
+cur_dir=os.path.dirname(os.path.realpath(__file__))
+
 # Validate length of customer after taking input from console
 customer = "SAW"
 
-# email = "saurav.panda@razorsight.com"
-
+# email = "kiran.ps2@synchronoss.com"
+log1.info("Get value for Email Address from the vars file")
 if use_vars_file:
     email = vars_dict['db.init.email']
     print "Email ID to which notifications are to be sent:", email
@@ -101,45 +84,33 @@ else:
 
 email_subject = "%s Initial DB Deployment" %(customer)
 
-#os.path.dirname(os.path.abspath(cmd_arg))
+#read the config json file path
+log1.info("get the abolute path for sql directory")
+proc_folder = os.path.join(cur_dir, "sql")
 
-#proc_folder = raw_input("Please give the Absolute path of Initial Setup folder  : ")
-proc_folder = cmd_dir # Kiran, please confirm
 #secondary_path= os.getcwd()
 #proc_folder = os.path.join(secondary_path,"INITIAL_SETUP")
 
+log1.debug("checking the sql folder exists or not ")
 if os.path.exists(proc_folder):
     print "Processing folder path validated: '%s'. \n" %(proc_folder)
+    log1.debug(str(proc_folder)+" directory is present")
 else:
     raise Exception("PARAMETER ISSUE:Please verify the path provided.")
 
 # db_info = "vm-dwhdevblr|DEPLOY_AUTO_TEST|TRUE"
 
+
+
 sql_server_type = "MYSQL"
 
 sql_cmd_bat_file = ''
 
-#db_conn_type = ''
-db_conn_type = "FALSE"
+db_conn_type = ''
 
-#if sql_server_type == "MYSQL":
-
-if use_vars_file:
-    db_server = vars_dict['db.init.server']
-    db_name = vars_dict['db.init.name']
-    db_user = vars_dict['db.init.user']
-    db_password = vars_dict['db.init.password']
-    #
-    db_info = "%s|%s|%s|%s" % (db_server,db_name,db_user,db_password)
-    print "SQL DB Info in the format Server|DB|User|Password:"
-    print "%s|%s|%s|***" % (db_server,db_name,db_user)
-else:
-
-    db_info = raw_input("""
-    Please enter SQL DB Info in the format - Server|DB|User|Password.    
-    *****************************************************************
-    
-    Enter SQL DB Info as indicated above: """)
+if sql_server_type == "MYSQL":
+    log1.debug("Get the server|database name| user| password details from vars file")
+    db_info=str(vars_dict['db.init.server'])+'|'+str(vars_dict['db.init.dbname'])+'|'+str(vars_dict['db.init.user'])+'|'+str(vars_dict['db.init.password'])
 
     sql_str_list = db_info.split("|")
 
@@ -149,25 +120,34 @@ else:
     db_user = "NOTREQUIRED" # Initialize DB User Name variable to dummy value
     db_password = "NOTREQUIRED" # Initialize DB Password variable to dummy value
 
+    db_conn_type = "FALSE"
+
     if db_conn_type == "FALSE":
         db_user = sql_str_list[2]
         db_password = sql_str_list[3]
 
-if db_conn_type == "FALSE":
-    try:
-        cnxn = MySQLdb.connect(db_server,db_user,db_password,db_name) # MYSQL Server Authentication
-        #cnxn = MySQLdb.connect(DRIVER='com.mysql.jdbc.Driver',SERVER=db_server,DATABASE=db_name,UID=db_user,PWD=db_password, autocommit=True) # MYSQL Server Authentication
-        
-    except:
-        raise Exception("PARAMETER ISSUE:Please verify DB parameters provided.")
-else:
-    try:
-        #cnxn = MySQLdb.connect(db_server,db_user,db_password,db_name) # MYSQL Server Authentication
-        cnxn = MySQLdb.connect(DRIVER='com.mysql.jdbc.Driver',SERVER=db_server,DATABASE=db_name,Trusted_Connection="yes", autocommit=True) # Windows Authentication
-    except:
-        raise Exception("PARAMETER ISSUE:Please verify DB parameters provided.")
+    if db_conn_type == "FALSE":
+        try:
+            cnxn = MySQLdb.connect(db_server,db_user,db_password,db_name) # MYSQL Server Authentication
+            #cnxn = MySQLdb.connect(DRIVER='com.mysql.jdbc.Driver',SERVER=db_server,DATABASE=db_name,UID=db_user,PWD=db_password, autocommit=True) # MYSQL Server Authentication
+            
+        except:
+            raise Exception("PARAMETER ISSUE:Please verify DB parameters provided.")
+    else:
+        try:
+            #cnxn = MySQLdb.connect(db_server,db_user,db_password,db_name) # MYSQL Server Authentication
+            cnxn = MySQLdb.connect(DRIVER='com.mysql.jdbc.Driver',SERVER=db_server,DATABASE=db_name,Trusted_Connection="yes", autocommit=True) # Windows Authentication
+        except:
+            raise Exception("PARAMETER ISSUE:Please verify DB parameters provided.")
 
-print "SQL DB Info validated.\n"
+    log1.info("Database details were validated")
+
+    sql_cmd_bat_file = os.path.join(proc_folder,"SQL_Script_Execution.bat")
+
+    #if os.path.isfile(sql_cmd_bat_file):
+     #   print "Batch file to execute SQL files is present.\n"
+    #else:
+     #   print "Batch file to execute SQL files is not present.\n"
 
 # If logs folder exists on the processing folder, rename it with current date appended as string & then re-create logs folder with appropriate branches underneath
 log_folder = os.path.join(proc_folder,"logs")
@@ -178,7 +158,7 @@ if os.path.exists(log_folder):
     shutil.copytree(log_folder,log_folder_dt)
     shutil.rmtree(log_folder)
     
-
+log1.info("Started creating the required folders for logging")
 os.makedirs(os.path.join(log_folder,"TABLES"))
 os.makedirs(os.path.join(log_folder,"SEQUENCES"))
 os.makedirs(os.path.join(log_folder,"VIEWS"))
@@ -291,6 +271,7 @@ else:
         chk_sp_exec_method = 'Order based on file'
 
     # Check if Initial Setup table is already present. If not, create again with appropriate static data
+    log1.debug("Check if Initial Setup table is already present. If not, create again with appropriate static data")
     querystring = """ SELECT count(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME ='RS_HL_INITIAL_SETUP' and TABLE_SCHEMA = '%s' """%(db_name) # Check for table in the system table repository
     cur = cnxn.cursor()
     cur.execute(querystring)
@@ -300,7 +281,8 @@ else:
     if cnt == 1:
         mail_msg= "Object Creation Structure already exists. Please use fresh database for initial setup."
         RSMailer.mail(email_subject,email,mail_msg)  
-    else: 
+    else:
+        log1.debug("started executing the create and insert script for RS_HL_INITIAL_SETUP table")
         querystring1 = """CREATE TABLE RS_HL_INITIAL_SETUP
                             (
                                 OBJECT_NAME  VARCHAR(100)
@@ -309,6 +291,7 @@ else:
                             );""" 
         cur1 = cnxn.cursor()
         print querystring1
+        log1.debug(querystring1)
         cur1.execute(querystring1)
         cur1.close()
 
@@ -316,6 +299,7 @@ else:
         cur2_data = cnxn.cursor()
         cur2_data.execute(querystring2)
         print querystring2
+        log1.debug(querystring2)
         cnxn.commit()
         cur2_data.close()
 
@@ -323,6 +307,7 @@ else:
         cur3_data = cnxn.cursor()
         cur3_data.execute(querystring3)
         print querystring3
+        log1.debug(querystring3)
         cnxn.commit()
         cur3_data.close()
 
@@ -330,6 +315,7 @@ else:
         cur4_data = cnxn.cursor()
         cur4_data.execute(querystring4)
         print querystring4
+        log1.debug(querystring4)
         cnxn.commit()
         cur4_data.close()
 
@@ -337,6 +323,7 @@ else:
         cur5_data = cnxn.cursor()
         cur5_data.execute(querystring5)
         print querystring5
+        log1.debug(querystring5)
         cnxn.commit()
         cur5_data.close()
 
@@ -344,6 +331,7 @@ else:
         cur6_data = cnxn.cursor()
         cur6_data.execute(querystring6)
         print querystring6
+        log1.debug(querystring6)
         cnxn.commit()
         cur6_data.close()
 
@@ -351,6 +339,7 @@ else:
         cur7_data = cnxn.cursor()
         cur7_data.execute(querystring7)
         print querystring7
+        log1.debug(querystring7)
         cnxn.commit()
         cur7_data.close()
 
@@ -358,6 +347,7 @@ else:
         cur8_data = cnxn.cursor()
         cur8_data.execute(querystring8)
         print querystring8
+        log1.debug(querystring8)
         cnxn.commit()
         cur8_data.close()
 
@@ -365,6 +355,7 @@ else:
         cur9_data = cnxn.cursor()
         cur9_data.execute(querystring9)
         print querystring9
+        log1.debug(querystring9)
         cnxn.commit()
         cur9_data.close()
 
@@ -372,6 +363,7 @@ else:
         cur10_data = cnxn.cursor()
         cur10_data.execute(querystring10)
         print querystring10
+        log1.debug(querystring10)
         cnxn.commit()
         cur10_data.close()
 
@@ -379,6 +371,7 @@ else:
     obj_name_list = ['TABLES', 'SEQUENCES', 'INDEXES', 'CONSTRAINTS', 'FUNCTIONS', 'SYNONYMS', 'VIEWS', 'PROCEDURES', 'TRIGGERS']
 
     # Check if scripts have been executed before for any object type
+    log1.debug("Checking if scripts have been executed before for any object type")
     for obj_name in obj_name_list: # Loop on object type
         querystring2 = """ SELECT 
                               OBJECT_VALUE
@@ -390,20 +383,18 @@ else:
         print querystring2
         cur2.execute(querystring2)
         obj_exec_check = cur2.fetchone()[0]
-        print obj_exec_check
-        print "above is the validation value"
 
         # if obj_exec_check == 1: # If object value is 1, scripts have executed fully for that object type
             # print "%s "%(obj_name)
         if obj_exec_check == 0:
-            print "Started executing %s scripts" %(obj_name)
+            log1.debug("Started executing %s scripts" %(obj_name))
 
             obj_proc_folder = os.path.join(proc_folder,obj_name) # Move directory control to the relevant object type folder
 
             if os.path.exists(obj_proc_folder): # Check if folder actually exists
                 
                 os.chdir(obj_proc_folder)
-
+                log1.debug("Started execution of table creation script")
                 if obj_name == 'TABLES' and chk_tab_exec_method == 'Order based on file':
                     f1 = open(chk_tab_sql_file,'rU')
                     for line in f1:
@@ -413,8 +404,10 @@ else:
                         Object_Creation.init_setp_obj(customer, proc_folder, obj_proc_folder, file2, log_folder, obj_name, sql_server_type, email, email_subject, sql_cmd_bat_file, db_info, db_conn_type, others_log_file_folder)
                         
                     f1.close()
+                    log1.debug("Completed execution of table creation script")
 
                 elif obj_name == 'CONSTRAINTS' and chk_view_exec_method == 'Order based on file':
+                    log1.debug("Started execution of Constraints creation script")
                     f1 = open(chk_constraints_sql_file,'rU')
                     for line in f1:
                         data_vw_obj = line.strip()
@@ -423,8 +416,10 @@ else:
                         Object_Creation.init_setp_obj(customer, proc_folder, obj_proc_folder, file2, log_folder, obj_name, sql_server_type, email, email_subject, sql_cmd_bat_file, db_info, db_conn_type, others_log_file_folder)
                     
                     f1.close()
+                    log1.debug("Completed execution of Constraints creation script")
 
-                elif obj_name == 'PROCEDURES' and chk_sp_exec_method == 'Order based on file':                    
+                elif obj_name == 'PROCEDURES' and chk_sp_exec_method == 'Order based on file':
+                    log1.debug("Started execution of Procedures creation script")
                     f1 = open(chk_sp_sql_file,'rU')
                     for line in f1:
                         data_sp_obj = line.strip()
@@ -433,6 +428,7 @@ else:
                         Object_Creation.init_setp_obj(customer, proc_folder, obj_proc_folder, file2, log_folder, obj_name, sql_server_type, email, email_subject, sql_cmd_bat_file, db_info, db_conn_type, others_log_file_folder)
                     
                     f1.close()
+                    log1.debug("Completed execution of Procedures creation script")
                 else:
                 
                     for file2 in glob.glob('*.[sS][qQ][lL]*'): # Loop on all SQL files in the folder
@@ -453,6 +449,7 @@ else:
 
             else:
                 print "%s folder does not exist." % (obj_name) # The specified object type folder is not present
+                log1.debug("%s folder does not exist." % (obj_name))
                 raise Exception("Folder does not exist")
 
     querystring_succ_chk = " SELECT COUNT(DISTINCT OBJECT_VALUE) FROM RS_HL_INITIAL_SETUP" # Take the number of records with success value in initial setup table & compare with known value
@@ -462,22 +459,25 @@ else:
     cur5.close()
 
     if succ_cnt == 1:
-        print "All deployment objects created successfully"
+        log1.debug("All deployment objects created successfully")
        
     else:
+        log1.debug("All deployment objects not created successfully")
         raise Exception("All deployment objects not created successfully")  
 
     # Start Static data insertion deployment
+    log1.debug("Start Static data insertion deployment")
 
     data_folder = os.path.join(proc_folder,"DATA")
 
     # Check for existence for Static data insertion check repository. Create table if not present & add values.
-
+    log1.debug("Check for existence for Static data insertion check repository. Create table if not present & add values")
     querystring_dt_chk = """SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME ='RS_HL_STATICTBL' and TABLE_SCHEMA = '%s' """%(db_name) 
     cur6 = cnxn.cursor()
     cur6.execute(querystring_dt_chk)
     dt_chk_cnt = cur6.fetchone()[0]
 
+    log1.debug("create RS_HL_STATICTBL if not present")
     if dt_chk_cnt == 0:
         querystring_dt_ins = """ CREATE TABLE RS_HL_STATICTBL
                             (
@@ -491,11 +491,11 @@ else:
         cur7 = cnxn.cursor()
         cur7.execute(querystring_dt_ins)
         cur7.close()
-
-        querystring_static = """INSERT INTO RS_HL_STATICTBL (TABLE_NAME,TABLE_VALUE,EXEC_ORDER)   VALUES('STATIC_DATA',0,1); """
+        log1.debug("insert the static data record to RS_HL_STATICTBL table")
+        querystring_static = """INSERT INTO RS_HL_STATICTBL (TABLE_NAME,TABLE_VALUE,EXEC_ORDER)   VALUES('STATIC_DATA',1,1); """
         curl_st_data = cnxn.cursor()
         curl_st_data.execute(querystring_static)
-        print querystring_static
+        log1.debug(querystring_static)
         cnxn.commit()
         curl_st_data.close()
     querystring_dt_chk1 = """select COUNT(TABLE_VALUE) from RS_HL_STATICTBL WHERE TABLE_VALUE=1""" 
@@ -504,15 +504,16 @@ else:
     dt_chk_cnt1 = cur11.fetchone()[0]
     cur11.close
     if dt_chk_cnt1 == 1:
-	print "STATIC DATA scripts are already executed."
-	mail_msg = """ Scripts Deployment failed in  script execution. STATIC DATA scripts are already executed.""" 	
-	RSMailer.mail(email_subject,email,mail_msg)
-	raise Exception(mail_msg)
+	log1.debug("STATIC DATA scripts are already executed")
+	mail_msg = """ Scripts Deployment failed in  script execution. STATIC DATA scripts are already executed."""
+	log1.debug("Scripts Deployment failed in  script execution. STATIC DATA scripts are already executed")
+	#RSMailer.mail(email_subject,email,mail_msg)
+	#raise Exception(mail_msg)
     if os.path.exists(data_folder): # Check for existence of data folder
 
 
         data_app_folder = data_folder
-
+        log1.debug("check if the STATIC_DATA.SQL file exists or not in the given directory")
         data_app_file = os.path.join(data_folder,"STATIC_DATA.SQL") # Check for SQL file which contains the names of static data files required for application to run. Also, check for number of records in file
 	if (not os.path.exists(data_app_file)):
 	    data_app_file = os.path.join(data_folder,"STATIC_DATA.sql")
@@ -527,7 +528,7 @@ else:
             f.close()
             dt_exec_check=0
             if i == 0:
-                print "App Static data config file does not contain any records"
+                log1.debug("App Static data config file does not contain any records")
             else:
 
                 if os.path.exists(data_app_folder):
@@ -545,7 +546,7 @@ else:
                             if (os.path.exists(app_stat_dt_file)):
 
                                 # Execute the static data SQL file which will insert data into the required table & log errors if any into the log file configured above
-                                
+                                log1.debug("Execute the static data SQL file which will insert data into the required table & log errors if any into the log file configured above")
                                 sqlQuery = ''
 
                                 err_str_data = ''
@@ -570,6 +571,7 @@ else:
                                                 outfile.close()
                                                 
                                                 mail_msg = """%s Scripts Deployment failed in '%s' script execution""" % (customer,app_stat_dt_file)
+                                                log1.debug("""%s Scripts Deployment failed in '%s' script execution""" % (customer,app_stat_dt_file))
                                                 RSMailer.mail(email_subject,email,mail_msg,app_stat_dt_log_file)
                                                 raise Exception(mail_msg)
                                             
@@ -583,6 +585,7 @@ else:
                             
                             else:
                                 mail_msg = "'%s' data insertion file not present" %app_stat_dt_file
+                                log1.debug("'%s' data insertion file not present" %app_stat_dt_file)
                                 RSMailer.mail(email_subject,email,mail_msg)
                                 raise Exception(mail_msg)
                         dt_exec_check=1    
@@ -601,9 +604,10 @@ else:
                     	
                     f1.close()                      
                 else:
-                    print "App Data folder not present"
+                    log1.debug("App Data folder not present")
         else:
             mail_msg = "App Static data config file not present"
+            log1.debug("App Static data config file not present")
             RSMailer.mail(email_subject,email,mail_msg)
             raise Exception(mail_msg)
         
@@ -623,6 +627,7 @@ else:
             
             if i3 == 0:
                 print "Config Static data config file does not contain any records"
+                log1.debug("Config Static data config file does not contain any records")
             else:
                 if os.path.exists(data_cfg_folder):
                     f2 = open(data_cfg_file,'rU')
@@ -642,14 +647,15 @@ else:
                             cur9.execute(querystring_cfg_ins_chk)
                             cfg_dt_exec_check = cur9.fetchone()[0]
                         except:
-                            mail_msg = """ Please check CONFIG_DATA config file """ 
+                            mail_msg = """ Please check CONFIG_DATA config file """
+                            log1.debug(""" Please check CONFIG_DATA config file """)
                             RSMailer.mail(email_subject,email,mail_msg)
                             raise Exception(mail_msg)
                         
                         cur9.close()
 
                         if cfg_dt_exec_check == 1: 
-                            print "%s data insertion script already executed in the specified database" %cfg_data_obj
+                            log1.debug("%s data insertion script already executed in the specified database" %cfg_data_obj)
                         else:
                          
                             cfg_stat_dt_file = os.path.join(data_cfg_folder,cfg_data_obj+".SQL")
@@ -683,6 +689,7 @@ else:
                                                 outfile.close()
                                                 
                                                 mail_msg = """%s Scripts Deployment failed in '%s' script execution""" % (customer,cfg_stat_dt_file)
+                                                log1.debug("""%s Scripts Deployment failed in '%s' script execution""" % (customer,cfg_stat_dt_file))
                                                 RSMailer.mail(email_subject,email,mail_msg,cfg_stat_dt_log_file)
                                                 raise Exception(mail_msg)
                                             
@@ -696,6 +703,7 @@ else:
                             
                             else:
                                 mail_msg = "'%s' data insertion file not present" %cfg_stat_dt_file
+                                log1.debug("'%s' data insertion file not present" %cfg_stat_dt_file)
                                 RSMailer.mail(email_subject,email,mail_msg)
                                 raise Exception(mail_msg)
                             
@@ -714,13 +722,14 @@ else:
                                 
                     f2.close()
                 else:
-                    print "Config Data folder not present"
+                    log1.debug("Config Data folder not present")
         else:
             mail_msg = "Config Static data config file not present"
+            log1.debug("Config Static data config file not present")
             # RSMailer.mail(email_subject,email,mail_msg)
             # raise Exception(mail_msg)
     else:
-        print "Data folder not present"
+        log1.debug("Data folder not present")
 
     # In the below query, a count of 2 indicates that only success value is present in both object creation as well as static data insertion metadata tables & hence the process is successful
 
@@ -746,13 +755,13 @@ else:
 
     if tot_prc_chk_cnt == 2:
         mail_msg = "%s deployment completed successfully" %customer
+        log1.debug("%s deployment completed successfully" %customer)
         print mail_msg
         RSMailer.mail(email_subject,email,mail_msg)
     else:
         mail_msg = "%s deployment not completed successfully" %customer
         print mail_msg
+        log1.debug("%s deployment not completed successfully" %customer)
         RSMailer.mail(email_subject,email,mail_msg)
 
     cur10.close()    
-
-

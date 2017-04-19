@@ -1,5 +1,4 @@
 import os
-from xlrd import open_workbook
 import sys
 import json
 import logging
@@ -27,31 +26,20 @@ import MySQLdb
 #
 ################################################################################
 def get_excel_file_data(node_name,excel_file_path,excel_sheet_name):
-    print "inside function"
-    print excel_sheet_name
-    strting_row=0
-    wb = open_workbook(excel_file_path)
-
-    excel_sheet_flag = 0
-    for s in wb.sheets():
-        print 'The Processing Sheet Name is ::' + s.name
-        # check if the sheet is expected sheet given by the user
-        if excel_sheet_name.upper() == s.name.upper():
-            keys = [s.cell(0, col_index).value for col_index in xrange(s.ncols)]
-
-            dict_list = []
-            for row_index in xrange(1, s.nrows):
-                d = {keys[col_index]: s.cell(row_index, col_index).value
-                     for col_index in xrange(s.ncols)}
-                dict_list.append(d)
-
-            excel_sheet_flag = 1
+    file = open(excel_file_path, 'rw')
+    header=file.readline().split(',')
+    reader = file.read().splitlines()
+    dict_list=[]
+    for i,row in enumerate(reader):
+        if i==0:
+            continue
         else:
-            print "The " + s.name + " is not the Expected Excel Sheet Name"
-            # exit with a error code as 14 if it did not fine the expected sheet name
-    if excel_sheet_flag == 0:
-        msg = "  The " + excel_sheet_name + " Sheet does not exist in the given " + excel_file_path + " excel file"
-        logging.exception(msg)
+            row_data={}
+            col_data=row.split(',') 
+            for j,col_value in enumerate(col_data):
+                row_data[header[j].strip()]=col_value.strip()
+            dict_list.append(row_data)
+    file.close()
     return dict_list
 ################################################################################
 
@@ -92,12 +80,11 @@ def validate_node_name(config_file_column_name,source_excel_data,node_name,requi
         if row[config_file_column_name].upper()==node_name.upper():
             validation_flag = 1
             table_name_column = row[table_name]
-            if row[required_input_column_name]==1:
+            if row[required_input_column_name]=='1':
                 columns_cnt=columns_cnt+1
                 input_required_columns.append(row[column_name])
-            if row[required_input_column_name]==0 and row[insert_required_column]==1 and row[default_value] <> '':
+            if row[required_input_column_name]=='0' and row[insert_required_column]=='1' and row[default_value] <> '':
                 default_column_values[row[column_name]]=row[default_value]
-
     return validation_flag,columns_cnt,table_name_column,input_required_columns,default_column_values
 ################################################################################
 
@@ -261,13 +248,14 @@ def check_split_by_column_data(db_conx,row,final_inserting_data_dict):
             split_col_data=final_inserting_data_dict[col_name].split(',')
             split_col_name= row['split_data_mapping']['split_values']
             if len(split_col_name) <> len(split_col_data):
-                print "th Split column data and column names list are not same"
+                print "The Spilted column data and column names list are not same"
                 sys.exit(14)
             for cnt,col in enumerate(split_col_name):
                 split_dict[col] = split_col_data[cnt]
     final_inst_with_split_data=final_inserting_data_dict
     if len(split_dict) >=1:
         final_inst_with_split_data=get_final_inserting_data(final_inserting_data_dict,split_dict)
+    print final_inst_with_split_data
     return final_inst_with_split_data
 
 ################################################################################

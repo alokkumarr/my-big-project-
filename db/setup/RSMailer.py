@@ -32,6 +32,7 @@ def mail(subject, fromEmail, textMessage, file_name = ''):
         msg.attach(attachFile)
         
     s = smtplib.SMTP()
-    s.connect("razormail.razorsight.com")
+    s.connect("outgoing.sncrcorp.net","25")
+    print s
     s.sendmail(fromEmail, fromEmail, msg.as_string())
     s.close()
