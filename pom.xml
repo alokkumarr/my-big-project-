@@ -27,6 +27,11 @@
         <project.release>${prod.release}</project.release>
         
         <rpm.version>${project.version}</rpm.version>
+        
+        <!-- 
+            Release version number cannot be removed optionally.
+            Solution for this will be rename the rpm once obtained from build
+        -->
         <rpm.release>${project.release}</rpm.release>
         <app.name>saw-security</app.name> <!-- ${project.artifactId} -->
         <app.version>${rpm.version}</app.version>
