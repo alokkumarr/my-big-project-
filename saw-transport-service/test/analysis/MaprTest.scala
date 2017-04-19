@@ -43,9 +43,7 @@ class MaprTest extends PlaySpec with OneAppPerSuite {
     message(("action" -> action) ~ ("keys" -> JArray(List(key))))
   }
 
-  def message(contents: JValue) = {
-    ("ticket" -> JObject()) ~
-    ("_links" -> JObject()) ~
+  def message(contents: JValue): JObject = {
     ("contents" -> contents)
   }
 
