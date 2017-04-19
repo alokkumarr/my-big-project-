@@ -31,19 +31,18 @@ class ANA extends BaseServiceProvider {
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
     val response = action match {
       case "create" => {
-        val analysis: JValue = ("id", UUID.randomUUID.toString) ~
-        ("module", "analyze") ~
-        ("customerCode", "customer-1") ~
-        ("name", "test")
-        val analysisNode = new AnalysisNode(analysis)
+        val templateId = extractAnalysisId(json)
+        val idJson: JObject = ("id", UUID.randomUUID.toString)
+        val mergeJson = contentsAnalyze(
+          readAnalysisNode(templateId).merge(idJson))
+        val responseJson = json merge mergeJson
+        val analysisJson = (responseJson \ "contents" \ "analyze")(0)
+        val analysisNode = new AnalysisNode(analysisJson)
         val (result, message) = analysisNode.write
         if (result != NodeCreated.id) {
           throw new RuntimeException("Writing failed: " + message)
         }
-        ("ticket" -> JObject()) ~
-        ("_links" -> JObject()) ~
-        ("contents" -> (
-          "analyze", JArray(List(analysis))))
+        responseJson
       }
       case "update" => {
         val analysisId = extractAnalysisId(json)
@@ -57,18 +56,7 @@ class ANA extends BaseServiceProvider {
       }
       case "read" => {
         val analysisId = extractAnalysisId(json)
-        val analysisNode = new AnalysisNode
-        val result = analysisNode.read(Map("id" -> analysisId))
-        if (result == Map.empty) {
-          throw new RuntimeException("Reading failed")
-        }
-        result("content") match {
-          case content: JValue => {
-            json merge(
-              ("contents", ("analyze", JArray(List(content)))) ~ (".", "."))
-          }
-          case _ => throw new RuntimeException("no match")
-        }
+        json merge contentsAnalyze(readAnalysisNode(analysisId))
       }
       case "execute" => {
         val analysisId = extractAnalysisId(json)
@@ -114,6 +102,30 @@ class ANA extends BaseServiceProvider {
     }
     val query: JValue = ("query", JString(QueryBuilder.build(analysis)))
     analysis merge(query)
+  }
+
+  private def readAnalysisNode(analysisId: String): JObject = {
+    /* If the analysis ID is given as "_static" return a static analysis
+     * template that is used to bootstrap tests when the semantic
+     * database is empty */
+    if (analysisId == "_static") {
+      return ("module", "analyze") ~
+      ("customerCode", "static") ~
+      ("name", "static")
+    }
+    val analysisNode = new AnalysisNode
+    val result = analysisNode.read(Map("id" -> analysisId))
+    if (result == Map.empty) {
+      throw new RuntimeException("Reading failed")
+    }
+    result("content") match {
+      case content: JObject => content
+      case _ => throw new RuntimeException("no match")
+    }
+  }
+
+  private def contentsAnalyze(analysis: JObject): JObject = {
+    ("contents", ("analyze", JArray(List(analysis))))
   }
 
   def executeAnalysis(analysisId: String) = {
