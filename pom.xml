@@ -446,7 +446,7 @@
                             <filemode>0444</filemode>
                             <sources>
                                 <source>
-                                    <location>${project.basedir}/db/setup/INITIAL_SETUP</location>
+                                    <location>${project.basedir}/db/setup/sql</location>
                                 </source>
                             </sources>
                         </mapping>
