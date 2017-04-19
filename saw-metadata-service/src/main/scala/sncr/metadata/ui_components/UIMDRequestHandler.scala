@@ -8,7 +8,7 @@ import org.json4s.native.JsonMethods._
 import org.json4s.{JField => _, JNothing => _, JObject => _, JValue => _, _}
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.ProcessingResult._
-import sncr.metadata.engine.Response
+import sncr.metadata.engine.UIResponse
 
 
 
@@ -16,7 +16,7 @@ import sncr.metadata.engine.Response
   * Created by srya0001 on 2/17/2017.
   */
 import sncr.metadata.engine.MDObjectStruct.formats
-class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true) extends Response {
+class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true) extends UIResponse {
 
 
   protected override val m_log: Logger = LoggerFactory.getLogger(classOf[UIMDRequestHandler].getName)
@@ -62,12 +62,12 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
               .filter(an_element => !an_element._1.equalsIgnoreCase("keys"))
               .flatMap(content_element => {
                 m_log debug (s"Content element ${content_element._1} => " + compact(render(content_element._2)))
-                val mn = content_element._1
+                val moduleName = content_element._1
                 content_element._2 match {
-                  case ce: JObject => m_log debug "UI Item from object: " + compact(render(ce)); List(actionHandler(action, ce, mn))
+                  case ce: JObject => m_log debug "UI Item from object: " + compact(render(ce)); List(actionHandler(action, ce, moduleName))
                   case ce: JArray => ce.arr.map(ce_ae => {
                             m_log debug "UI Item, array element: " + compact(render(ce_ae))
-                            actionHandler(action, ce_ae, mn)
+                            actionHandler(action, ce_ae, moduleName)
                   })
                   case _ => handleRequestIncorrect
                 }
@@ -82,23 +82,22 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
             responses = JObject(all_content_elements).obj
               .filter(an_element => an_element._1.equalsIgnoreCase("keys"))
               .map( an_element => {m_log debug s"Search/Retrieval keys ${an_element._1} => ${compact(render(an_element._2))}"
-                  actionHandler(action, an_element._2, "keys")
+                  val genRes = actionHandler(action, an_element._2, "keys")
+                  genRes match{
+                    case r:JObject => r
+                    case a:JArray => a
+                    case _ => return "Error! Incorrect response"
+
+                  }
               })
           }
           case _ => return "Search/Retrieval request is not correct, contents must be JSON object"
         }
 
     }
-    val cnt = JField("contents", new JArray(responses))
-    //TODO:: restructure JSON response to have
-    // "module_name" : [
-    //   { <module definition 1> },
-    //   { <module definition 2> },
-    //   { <module definition 3> },
-    //    ....
-    //  ]
-    val requestResult = new JObject(List(cnt))
-    if (!printPretty) compact(render(requestResult)) else pretty(render(requestResult)) + "\n"
+
+    val cnt = new JField ("contents", new JArray(responses))
+    if (!printPretty) compact(render(JObject(List(cnt)))) else pretty(render(JObject(List(cnt)))) + "\n"
   }
 
 
@@ -107,8 +106,8 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
     val sNode = new UINode(content_element, module_name)
     val response = action match {
       case "create" => build(sNode.create)
-      case "read" => sNode.setFetchMode(UINodeFetchMode.DefinitionOnly.id); build(sNode.read(extractKeys))
-      case "search" => sNode.setFetchMode(UINodeFetchMode.DefinitionOnly.id); build(sNode.find(extractKeys))
+      case "read" => sNode.setFetchMode(UINodeFetchMode.Everything.id); build_ui("type", sNode.read(extractKeys))
+      case "search" => sNode.setFetchMode(UINodeFetchMode.Everything.id); build_ui("type", sNode.find(extractKeys))
       case "delete" => build(sNode.deleteAll(extractKeys))
       case "update" => build(sNode.update(extractKeys))
     }
@@ -121,14 +120,14 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
   {
     val filter_values : Map[String, JValue]  = (docAsJson \ "contents" \ "keys"
      match{
-        case JObject(keyList) => keyList.filter( kf => SearchDictionary.searchFields.contains( kf._1) )
+        case JObject(keyList) => keyList.filter( kf => UINode.searchFields.contains( kf._1) )
         case _ => Map.empty
      }).toList.toMap
 
     m_log trace s"Extracted keys: ${filter_values.mkString("{", ", ", "}")}"
 
     filter_values.map(key_values =>
-      SearchDictionary.searchFields(key_values._1) match {
+      UINode.searchFields(key_values._1) match {
         case "String"  => key_values._1 -> key_values._2.extract[String]
         case "Int"     => key_values._1 -> key_values._2.extract[Int]
         case "Long"    => key_values._1 -> key_values._2.extract[Long]
@@ -175,7 +174,7 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
         var filteringKeys: List[JValue] = Nil
         all_keys match {
           case JObject(keys) => {
-            filteringKeys = JObject(keys).obj.filter(k => SearchDictionary.searchFields.contains(k._1)).map(a_key => {
+            filteringKeys = JObject(keys).obj.filter(k => UINode.searchFields.contains(k._1)).map(a_key => {
               m_log debug (s"Module ${a_key._1} => " + compact(render(a_key._2)))
               a_key._2
             })
