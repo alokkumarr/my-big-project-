@@ -420,7 +420,6 @@
                                     <includes>
                                         <include>application.properties</include>
                                         <include>bootstrap.yml</include>
-                                        <include>saw-security.yml</include>
                                     </includes>
                                 </source>
                             </sources>
