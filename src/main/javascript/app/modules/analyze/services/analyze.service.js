@@ -26,6 +26,7 @@ export function AnalyzeService($http, $timeout, $q) {
     executeAnalysis,
     getAnalysisById,
     getDataByQuery,
+    getDataBySettings,
     generateQuery,
     getNewPivotAnalysis,
     saveReport,
@@ -130,6 +131,15 @@ export function AnalyzeService($http, $timeout, $q) {
 
   function getArtifacts() {
     return $http.get('/api/analyze/artifacts').then(fpGet('data'));
+  }
+
+  function getDataBySettings(model) {
+    const payload = {data: [], links: [], contents: {
+      action: 'execute',
+      keys: [{id: model.id, module: 'analyze', type: model.type}],
+      analyze: [model]
+    }};
+    return $http.post('/api/analyze/apply', payload).then(fpGet('data.data'));
   }
 
   function getDataByQuery() {

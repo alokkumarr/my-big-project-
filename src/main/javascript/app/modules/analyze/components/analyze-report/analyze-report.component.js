@@ -9,11 +9,14 @@ import forEach from 'lodash/forEach';
 import clone from 'lodash/clone';
 import isEmpty from 'lodash/isEmpty';
 import filter from 'lodash/filter';
+import assign from 'lodash/assign';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
 
 import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter-sidenav/analyze-filter-sidenav.component';
+
+const DEBOUNCE_INTERVAL = 500; // milliseconds
 
 export const AnalyzeReportComponent = {
   template,
@@ -32,6 +35,7 @@ export const AnalyzeReportComponent = {
       this._$timeout = $timeout;
       this._AnalyzeService = AnalyzeService;
       this._FilterService = FilterService;
+      this._reloadTimer = null;
 
       this.DESIGNER_MODE = 'designer';
       this.QUERY_MODE = 'query';
@@ -56,8 +60,6 @@ export const AnalyzeReportComponent = {
         // of the jsPlumb canvas.model
         possible: []
       };
-
-      this.getDataByQuery();
     }
 
     $onInit() {
@@ -89,19 +91,11 @@ export const AnalyzeReportComponent = {
       if (this.unregister) {
         this.unregister();
       }
-    }
 
-    // requests
-    getDataByQuery() {
-      this._AnalyzeService.getDataByQuery()
-        .then(data => {
-          this.gridData = data;
-          this.filteredGridData = data;
-          this.reloadPreviewGrid();
-          this.showFiltersButtonIfDataIsReady();
-          this.canvas._$eventEmitter.emit('changed');
-          this.canvas._$eventEmitter.emit('sortChanged');
-        });
+      if (this._reloadTimer) {
+        this._$timeout.cancel(this._reloadTimer);
+        this._reloadTimer = null;
+      }
     }
 
     getArtifacts() {
@@ -156,13 +150,7 @@ export const AnalyzeReportComponent = {
       this.filters.possible = filters;
       this.filters.selected = this._FilterService.getSelectedFilterMapper()(filters);
 
-      this.filterGridData();
-    }
-
-    filterGridData() {
-      this.filteredGridData = this._FilterService.getGridDataFilter(this.filters.selected)(this.gridData);
-
-      this.reloadPreviewGrid();
+      this.reloadPreviewGrid(true);
     }
 
     onClearAllFilters() {
@@ -173,12 +161,12 @@ export const AnalyzeReportComponent = {
       this.filters.possible = this._FilterService.getFilterClearer()(this.filters.possible);
       this.filters.selected = [];
       this.filteredGridData = this.gridData;
-      this.reloadPreviewGrid();
+      this.reloadPreviewGrid(true);
     }
 
     onFilterRemoved(filter) {
       filter.model = null;
-      this.filterGridData();
+      this.reloadPreviewGrid(true);
     }
 
     generateFilters(selectedFields, gridData) {
@@ -220,11 +208,11 @@ export const AnalyzeReportComponent = {
 
       this.canvas._$eventEmitter.on('changed', () => {
         this.generateFiltersOnCanvasChange();
-        this.reloadPreviewGrid();
+        this.reloadPreviewGrid(true);
       });
 
       this.canvas._$eventEmitter.on('sortChanged', () => {
-        this.reloadPreviewGrid();
+        this.reloadPreviewGrid(true);
       });
     }
 
@@ -295,25 +283,27 @@ export const AnalyzeReportComponent = {
     }
 
     generatePayload() {
-      const model = this.canvas.model;
-      const tableArtifacts = [];
-
       /* eslint-disable camelcase */
+      const model = this.canvas.model;
+      const result = {
+        artifacts: [],
+        sql_builder: {
+          group_by_columns: [],
+          order_by_columns: [],
+          joins: [],
+          filters: []
+        }
+      };
+
       forEach(model.tables, table => {
         const tableArtifact = {
           artifact_name: table.name,
           artifact_position: [table.x, table.y],
           artifact_attributes: [],
-          sql_builder: {
-            group_by_columns: [],
-            order_by_columns: [],
-            joins: [],
-            filters: []
-          },
           data: []
         };
 
-        tableArtifacts.push(tableArtifact);
+        result.artifacts.push(tableArtifact);
 
         forEach(table.fields, field => {
           const fieldArtifact = {
@@ -352,7 +342,7 @@ export const AnalyzeReportComponent = {
             side: join.rightSide.side
           });
 
-          tableArtifact.sql_builder.joins.push(joinArtifact);
+          result.sql_builder.joins.push(joinArtifact);
         });
 
         const sorts = filter(model.sorts, sort => {
@@ -361,53 +351,79 @@ export const AnalyzeReportComponent = {
 
         forEach(sorts, sort => {
           const sortArtifact = {
+            table_name: tableArtifact.artifact_name,
             column_name: sort.field.name,
             order: sort.order
           };
 
-          tableArtifact.sql_builder.order_by_columns.push(sortArtifact);
+          result.sql_builder.order_by_columns.push(sortArtifact);
         });
 
-        const groups = filter(group => {
+        const groups = filter(model.groups, group => {
           return group.table === table;
-        }, model.groups);
+        });
 
         forEach(groups, group => {
-          tableArtifact.sql_builder.group_by_columns.push(group.field.name);
+          result.sql_builder.group_by_columns.push(group.field.name);
         });
 
-        tableArtifact.sql_builder.filters = fpPipe(
-          filter(artifactFilter => artifactFilter.tableName === tableArtifact.artifact_name),
-          fpMap(this._FilterService.getFrontEnd2BackEndFilterMapper())
-        )(this.filters.selected);
+        result.sql_builder.filters = result.sql_builder.filters.concat(fpMap(
+          this._FilterService.getFrontEnd2BackEndFilterMapper(),
+          fpFilter(
+            artifactFilter => artifactFilter.tableName === tableArtifact.artifact_name,
+            this.filters.selected
+          )
+        ));
       });
       /* eslint-enable camelcase */
 
-      return tableArtifacts;
+      return result;
+    }
+
+    refreshGridData(cb) {
+      this.model = assign(this.model, this.generatePayload());
+      this._AnalyzeService.getDataBySettings(clone(this.model))
+        .then(cb);
     }
 
     reloadPreviewGrid() {
-      this.columns = this.getSelectedColumns(this.canvas.model.tables);
+      const doReload = () => {
+        return this._$timeout(() => {
+          this._reloadTimer = null;
+          this.columns = this.getSelectedColumns(this.canvas.model.tables);
 
-      const sorts = map(this.canvas.model.sorts, sort => {
-        return {
-          column: sort.field.name,
-          direction: sort.order
-        };
-      });
+          const sorts = map(this.canvas.model.sorts, sort => {
+            return {
+              column: sort.field.name,
+              direction: sort.order
+            };
+          });
 
-      const grid = first(this._$componentHandler.get('ard-grid-container'));
+          this.refreshGridData(data => {
+            this.filteredGridData = this.gridData = data;
+            this.showFiltersButtonIfDataIsReady();
+            const grid = first(this._$componentHandler.get('ard-grid-container'));
 
-      if (grid) {
-        grid.updateColumns(this.columns);
-        grid.updateSorts(sorts);
-        grid.updateSource(this.filteredGridData);
-        this._$timeout(() => {
-          // Delay refreshing the grid a bit to counter
-          // aria errors from dev extreme
-          // Need to find a better fix for this
-          grid.refreshGrid();
-        }, 100);
+            if (grid) {
+              grid.updateColumns(this.columns);
+              grid.updateSorts(sorts);
+              grid.updateSource(this.filteredGridData);
+              this._$timeout(() => {
+                // Delay refreshing the grid a bit to counter
+                // aria errors from dev extreme
+                // Need to find a better fix for this
+                grid.refreshGrid();
+              }, 100);
+            }
+          });
+        }, DEBOUNCE_INTERVAL);
+      };
+
+      if (this._reloadTimer) {
+        this._$timeout.cancel(this._reloadTimer);
+        this._reloadTimer = doReload();
+      } else {
+        this._reloadTimer = doReload();
       }
     }
 
@@ -527,7 +543,7 @@ export const AnalyzeReportComponent = {
         this.model.query = '';
       }
 
-      this.model.artifacts = this.generatePayload();
+      this.model = assign(this.model, this.generatePayload());
       const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
       this._$mdDialog
