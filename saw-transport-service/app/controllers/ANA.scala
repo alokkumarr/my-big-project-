@@ -33,8 +33,10 @@ class ANA extends BaseServiceProvider {
       case "create" => {
         val templateId = extractAnalysisId(json)
         val idJson: JObject = ("id", UUID.randomUUID.toString)
+        val analysisType = extractKey(json, "analysisType")
+        val typeJson: JObject = ("type", analysisType)
         val mergeJson = contentsAnalyze(
-          readAnalysisNode(templateId).merge(idJson))
+          readAnalysisNode(templateId).merge(idJson).merge(typeJson))
         val responseJson = json merge mergeJson
         val analysisJson = (responseJson \ "contents" \ "analyze")(0)
         val analysisNode = new AnalysisNode(analysisJson)
@@ -81,8 +83,12 @@ class ANA extends BaseServiceProvider {
   }
 
   def extractAnalysisId(json: JValue) = {
-    val JString(analysisId) = (json \ "contents" \ "keys")(0) \ "id"
-    analysisId
+    extractKey(json, "id")
+  }
+
+  private def extractKey(json: JValue, property: String) = {
+    val JString(value) = (json \ "contents" \ "keys")(0) \ property
+    value
   }
 
   def analysisJson(json: JValue) = {
