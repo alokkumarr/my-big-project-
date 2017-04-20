@@ -46,9 +46,11 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
 
     "execute analysis" in {
       /* Execute previously created analysis */
-      val body = actionKeyMessage("read", id)
-      val response = sendRequest(body)
-      /* TODO */
+      val body = actionKeyMessage("execute", id)
+      val analysis = analyze(sendRequest(body))
+      /* Note: Currently the result is just the static mock */
+      val JInt(value) = (analysis \ "data")(0) \ "foo"
+      value must be (1)
     }
 
     "delete analysis" in {
