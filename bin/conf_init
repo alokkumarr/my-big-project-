@@ -117,7 +117,7 @@ done
 echo '========================================'
 echo '# Manual step required to'
 echo '# execute DB Initial Setup'
-echo sudo $APPL_HOME/db/setup/Initial_Setup.py --vars
+echo sudo python $APPL_HOME/db/setup/Initial_Setup.py --vars
 echo '========================================'
 
 exit

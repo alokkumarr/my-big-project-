@@ -457,7 +457,7 @@
                             <directory>
                                 ${app.optDir}/db/setup
                             </directory>
-                            <filemode>0555</filemode>
+                            <filemode>0444</filemode>
                             <sources>
                                 <source>
                                     <location>${project.basedir}/db/setup</location>
