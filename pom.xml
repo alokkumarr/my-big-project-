@@ -546,8 +546,7 @@ echo post-install complete: ${app.nameVer}
 echo pre-remove starting: ${app.nameVer}
 echo remove files generated from templates
 ( set -x
-  rm -f ${app.optDir}/bin/appl_init
-  rm -f ${app.optDir}/conf/{application.properties,bootstrap.yml,saw-security.yml}
+  rm -f ${app.optDir}/conf/{application.properties,bootstrap.yml}
   )
 echo pre-remove completed: ${app.nameVer}
                         </script>
