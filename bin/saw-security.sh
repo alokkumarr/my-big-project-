@@ -175,7 +175,7 @@ appl_start() {
         -Djava.net.preferIPv4Stack=true
         -Dspring.config.location=$confdir/application.properties
         -Dlogging.config=$confdir/logback.xml
-        -Dsaw.log.file=$LOG_DIR
+        -Dsaw.log.file=$LOG_DIR/saw-security
         -Dquartz.properties.location=$confdir
         -jar $war_file
         -name saw-security
