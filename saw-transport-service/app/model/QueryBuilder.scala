@@ -9,9 +9,7 @@ object QueryBuilder {
   def build(json: JValue): String = {
     val artifact = json \ "artifacts" match {
       case artifacts: JArray =>
-        if (artifacts.arr.length != 1) {
-          throw new QueryException("Expected exactly one artifact")
-        }
+        /* TODO: Implement support for multiple artifacts */
         artifacts.arr(0)
       case JNothing => return ""
       case obj => throw new QueryException("Expected array but got: " + obj)
