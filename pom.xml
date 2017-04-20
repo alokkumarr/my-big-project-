@@ -442,6 +442,20 @@
                         </mapping>
                         <mapping>
                             <directory>
+                                ${app.optDir}/db
+                            </directory>
+                            <filemode>0555</filemode>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/db</location>
+                                    <includes>
+                                        <include>bda_init.py</include>
+                                    </includes>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>
                                 ${app.optDir}/db/setup
                             </directory>
                             <filemode>0555</filemode>
