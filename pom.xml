@@ -247,120 +247,44 @@
                         <!-- home dir -->
                         <mapping>
                             <directory>${app.optDir}</directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>0755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.optDir}/bin
-                            </directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>0755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
+                            <directory>${app.optDir}/bin</directory>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.optDir}/conf
-                            </directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>0755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
+                            <directory>${app.optDir}/conf</directory>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.optDir}/conf/templates
-                            </directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>0755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
+                            <directory>${app.optDir}/conf/templates</directory>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.optDir}/lib
-                            </directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>0755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
+                            <directory>${app.optDir}/lib</directory>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.optDir}/db
-                            </directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>0755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
+                            <directory>${app.optDir}/db</directory>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.optDir}/db/setup
-                            </directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>0755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
+                            <directory>${app.optDir}/db/setup</directory>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.optDir}/db/setup/sql
-                            </directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>0755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
+                            <directory>${app.optDir}/db/setup/sql</directory>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.optDir}/db/entry
-                            </directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>0755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
+                            <directory>${app.optDir}/db/entry</directory>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.optDir}/db/entry/conf
-                            </directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>0755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
+                            <directory>${app.optDir}/db/entry/conf</directory>
                         </mapping>
                         
                         <!-- var directory for saw security (/var/bda/saw-security) -->
                         <mapping>
-                            <directory>
-                                ${app.varDir}
-                            </directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>0755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
+                            <directory>${app.varDir}</directory>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.varDir}/log
-                            </directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>0755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
+                            <directory>${app.varDir}/log</directory>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.varDir}/run
-                            </directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>0755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
+                            <directory>${app.varDir}/run</directory>
                         </mapping>
                         
                         <!-- 
@@ -368,21 +292,20 @@
                             Place saw-secirity.vars in this directory
                         -->
                         <mapping>
-                            <directory>
-                                ${app.etcDir}
-                            </directory>
+                            <directory>${app.etcDir}</directory>
+                            <!--
                             <filemode>0755</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
+                            -->
                         </mapping>
                         
                         <!-- Directory files -->
                         <!-- Executable files --> 
                         <mapping>
-                            <directory>
-                                ${app.optDir}/bin
-                            </directory>
+                            <directory>${app.optDir}/bin</directory>
                             <filemode>0555</filemode>
+                            <directoryIncluded>false</directoryIncluded>
                             <sources>
                                 <source>
                                     <location>${project.basedir}/bin</location>
@@ -402,25 +325,16 @@
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.optDir}/conf
-                            </directory>
-                            <filemode>0444</filemode>
+                            <directory>${app.optDir}/conf</directory>
                             <!-- final version, not template -->
                             <sources>
-                                <source>
-                                    <location>${project.basedir}/conf</location>
-                                    <includes>
-                                        <include>logback.xml</include>
-                                    </includes>
-                                </source>
+                                <source><location>
+                                    ${project.basedir}/conf/logback.xml
+                                </location></source>
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.optDir}/conf/templates
-                            </directory>
-                            <filemode>0444</filemode>
+                            <directory>${app.optDir}/conf/templates</directory>
                             <!-- templates -->
                             <sources>
                                 <source>
@@ -433,10 +347,7 @@
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.optDir}/lib
-                            </directory>
-                            <filemode>0444</filemode>
+                            <directory>${app.optDir}/lib</directory>
                             <sources>
                                 <source>
                                     <location>${project.basedir}/target</location>
@@ -448,24 +359,15 @@
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.optDir}/db
-                            </directory>
-                            <filemode>0444</filemode>
+                            <directory>${app.optDir}/db</directory>
                             <sources>
-                                <source>
-                                    <location>${project.basedir}/db</location>
-                                    <includes>
-                                        <include>bda_init.py</include>
-                                    </includes>
-                                </source>
+                                <source><location>
+                                    ${project.basedir}/db/bda_init.py
+                                </location></source>
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.optDir}/db/setup
-                            </directory>
-                            <filemode>0444</filemode>
+                            <directory>${app.optDir}/db/setup</directory>
                             <sources>
                                 <source>
                                     <location>${project.basedir}/db/setup</location>
@@ -476,10 +378,7 @@
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.optDir}/db/setup/sql
-                            </directory>
-                            <filemode>0444</filemode>
+                            <directory>${app.optDir}/db/setup/sql</directory>
                             <sources>
                                 <source>
                                     <location>${project.basedir}/db/setup/sql</location>
@@ -487,10 +386,7 @@
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.optDir}/db/entry
-                            </directory>
-                            <filemode>0444</filemode>
+                            <directory>${app.optDir}/db/entry</directory>
                             <sources>
                                 <source>
                                     <location>${project.basedir}/db/entry</location>
@@ -498,23 +394,16 @@
                                         <include>table_structure_mapping.csv</include> 
                                         <include>Data_Entry_Automation.py</include>
                                         <include>Data_Entry_Automation_Utilities.py</include>
-                                        <include>calling_script</include>
                                     </includes>
                                 </source>
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>
-                                ${app.optDir}/db/entry/conf
-                            </directory>
-                            <filemode>0444</filemode>
+                            <directory>${app.optDir}/db/entry/conf</directory>
                             <sources>
-                                <source>
-                                    <location>${project.basedir}/db/entry/conf</location>
-                                    <includes>
-                                        <include>configuration.json</include>
-                                    </includes>
-                                </source>
+                                <source><location>
+                                    ${project.basedir}/db/entry/conf/configuration.json
+                                </location></source>
                             </sources>
                         </mapping>
                         
