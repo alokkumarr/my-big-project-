@@ -78,8 +78,7 @@ export const AnalyzeReportComponent = {
       }
 
       this.unregister = this._$componentHandler.on('$onInstanceAdded', e => {
-        this._AnalyzeService.createAnalysis(this.model).then(data => {
-          const analysis = fpGet('contents.analyze.[0]', data);
+        this._AnalyzeService.createAnalysis(this.model.artifactsId, 'report').then(analysis => {
           this.model = assign(this.model, analysis);
 
           if (e.key === 'ard-canvas') {

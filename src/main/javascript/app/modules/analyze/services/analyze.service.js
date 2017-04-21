@@ -134,14 +134,6 @@ export function AnalyzeService($http, $timeout, $q) {
     return $http.get('/api/analyze/artifacts').then(fpGet('data'));
   }
 
-  function createAnalysis(model) {
-    const payload = {data: [], links: [], contents: {
-      action: 'read',
-      keys: [{id: model.id, module: 'analyze', type: 'semantic'}]
-    }};
-    return $http.post('/api/analyze/create', payload).then(fpGet('data'));
-  }
-
   function getDataBySettings(model) {
     const payload = {data: [], links: [], contents: {
       action: 'execute',
@@ -171,17 +163,17 @@ export function AnalyzeService($http, $timeout, $q) {
     return $http.get('/api/analyze/semanticLayerData').then(fpGet('data'));
   }
 
-  function createAnalysis(metricId) {
+  function createAnalysis(metricId, type) {
     const payload = {
       action: 'read',
       keys: [{
         type: 'semantic',
-        analysisType: 'pivot',
+        analysisType: type,
         module: 'analyze',
         id: metricId
       }]
     };
-    return $http.post('/api/analyze/createAnalysis', payload).then(fpGet('data'));
+    return $http.post('/api/analyze/createAnalysis', payload).then(fpGet('data.contents.analyze.[0]'));
   }
 
   /**

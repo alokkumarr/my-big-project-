@@ -1,5 +1,3 @@
-import get from 'lodash/get';
-
 class JwtService {
   constructor($window, AppConfig) {
     this._$window = $window;
@@ -27,7 +25,7 @@ class JwtService {
 
   /* Bootstraps request structure with necessary auth data */
   getRequestParams() {
-    const token = this.getTokenObj();
+    // const token = this.getTokenObj();
     return {
       contents: {
         keys: {
