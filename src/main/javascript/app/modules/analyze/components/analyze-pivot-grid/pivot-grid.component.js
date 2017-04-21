@@ -8,9 +8,11 @@ import fpMap from 'lodash/fp/map';
 import fpToPairs from 'lodash/fp/toPairs';
 
 import template from './pivot-grid.component.html';
+import style from './pivot-grid.component.scss';
 
 export const PivotGridComponent = {
   template,
+  styles: [style],
   bindings: {
     updater: '<',
     sendFields: '&'
@@ -121,7 +123,9 @@ export const PivotGridComponent = {
 
     getDefaultOptions() {
       return {
+        rowHeaderLayout: 'tree',
         allowSortingBySummary: false,
+        showBorders: true,
         allowSorting: false,
         allowFiltering: false,
         allowExpandAll: false,

@@ -87,11 +87,19 @@ export const AnalyzePivotComponent = {
       });
 
       this.fieldChooserOptions = {
+        onContentReady: e => {
+          this.gridIsntance = e.component;
+        },
         dataSource,
         layout: 1,
         width: 400,
         height: 800
       };
+
+      // repaint the field chooser so it fills the cointainer
+      this._$timeout(() => {
+        this.gridIsntance.repaint();
+      }, 400);
 
       this.pivotGridUpdater.next({
         dataSource
