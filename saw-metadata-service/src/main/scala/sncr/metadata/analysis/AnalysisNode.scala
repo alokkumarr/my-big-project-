@@ -62,9 +62,7 @@ class AnalysisNode(private var analysisNode: JValue = JNothing) extends ContentN
 
 
   override protected def initRow: String = {
-    val rowkey =
-      (analysisNode \ "id").extract[String] + MetadataDictionary.separator +
-      System.nanoTime()
+    val rowkey = (analysisNode \ "id").extract[String]
     m_log debug s"Generated RowKey = $rowkey"
     rowkey
   }
