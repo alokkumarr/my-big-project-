@@ -2,17 +2,32 @@ package sncr.metadata.ui_components
 
 import java.util
 
-import org.json4s.JsonAST.{JString, _}
+import org.json4s.JsonAST.{JNull, JObject, JString, _}
 import org.json4s.ParserUtil.ParseException
 import org.json4s.native.JsonMethods._
 import org.json4s.{JField => _, JNothing => _, JObject => _, JValue => _, _}
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.ProcessingResult._
-import sncr.metadata.engine.UIResponse
+import sncr.metadata.engine.{MDNodeUtil, ProcessingResult, UIResponse}
+
+import scala.collection.mutable
 
 
 
 /**
+  * The class designed to process UI2MD Rest requests.
+  * The class knows the structure of request, how to validate part of
+  * the request and execute provided action.
+  * The usage id following:
+  *  - create UIMDRequestHandler
+  *   - if (validate._1 == Success.id) execute
+  *  or
+  *   - validateAndExecute
+  *
+  * If validate was not called before execute - the request won't be processed.
+  * The execute method rejects a requests indicating that request was not validated.
+  * Execute and validateAndExecute returns response to be sent to client as String
+  * in JSON format.
   * Created by srya0001 on 2/17/2017.
   */
 import sncr.metadata.engine.MDObjectStruct.formats
@@ -21,12 +36,26 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
 
   protected override val m_log: Logger = LoggerFactory.getLogger(classOf[UIMDRequestHandler].getName)
 
+  var elements : JValue= null
+  var keys :  Map[String, Any] = Map.empty
 
-  def handleRequestIncorrect: List[JValue] =
-  {
+  /**
+    * Create response for incorrect request
+    *
+    * @return
+    */
+  private def handleRequestIncorrect: List[JValue] =
     List(new JObject(List(JField("result", JString(Rejected.toString)), JField("message", JString("Request structure is not correct")))))
-  }
 
+
+  /**
+    * The main method of the class does:
+    * - pre-processing
+    * - validation
+    * if a request is valid - execute the request
+    *
+    * @return
+    */
   def validateAndExecute: String = {
 
     validate match
@@ -41,190 +70,247 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
     }
   }
 
+  private var action : String = null
+  private val moduleDesc : mutable.HashMap[String, Map[String, List[JValue]]] = new mutable.HashMap[String, Map[String, List[JValue]]]
 
+  def testUIComponent(uicomp: JObject) : Boolean = UINode.remappingAttributes.forall( attr => (uicomp \ attr ).extractOpt[String].nonEmpty)
+
+  /**
+    * Required to build Hash map of processed objects
+    *
+    * @param moduleName
+    * @param o
+    * @return
+    */
+  private def extractUIComponents(moduleName: String, o: JObject): Map[String, List[JValue]] =
+  {
+    //Assume one-level structure
+    val node_type = (o \ "type").extractOpt[String]
+    val test_module = (o \ "module").extractOpt[String]
+
+    if (node_type.isEmpty) {
+      //Try two-level structure:
+      o.obj.map(content_element => {
+        m_log trace s"Raw UI Component ==> ${content_element}"
+        m_log trace s"UI Component:  ${content_element._1} => " + compact(render(content_element._2))
+        val compType = content_element._1
+        content_element._2 match {
+          case ce: JObject =>
+            if (!testUIComponent(ce)) throw new Exception ("Mandatory attributes are missing")
+            m_log trace s"UI Item from object: ${ce.obj.mkString("{", ",", "}")}"
+            (compType, List(ce))
+          case ce: JArray =>
+            m_log trace s"UI Item, array element: ${ce.arr.mkString("[", ",", "]")}"
+            if (ce.arr.forall{ case uicomp:JObject => testUIComponent(uicomp); case _ => false })
+                throw new Exception ("Mandatory attributes are missing in one of UI component in the request, reject whole request")
+            (compType, ce.arr)
+          case _ => throw new Exception(s"UI Component cannot be processed: ${compact(render(content_element._2))} or request structure is not corect")
+        }
+      }
+      ).toMap[String, List[JValue]]
+    }
+    else if(node_type.nonEmpty && test_module.nonEmpty) Map((node_type.get, List(o)))
+    else throw new Exception(s"Incorrect request structure: could not determine UI component type")
+  }
+
+  private def mergeUIComponents(headKey : String,
+                                mainMap : mutable.HashMap[String, Map[String, List[JValue]]],
+                                tail: Map[String, List[JValue]]) : Map[String, List[JValue]] = {
+    if (mainMap.contains(headKey)) {
+      val temp: Map[String, List[JValue]] = mainMap(headKey)
+      return (temp.toSeq ++ tail.toSeq).groupBy { case (uiComp, uiCompContent) => uiComp
+      }.mapValues(uic => uic.flatMap { case (uiComp, uiCompContent) => uiCompContent }.toList)
+    }
+    tail
+  }
+
+
+  /**
+    * Pre-processing a request:
+    * - extracts content and builds 2 level map:
+    *    * module
+    *      ** ui type
+    * - extracts keys and converts key values
+    * - extracts action
+    */
+  private def preProcessRequest() : Unit = {
+
+    if (docAsJson == null || docAsJson.toSome.isEmpty)
+      throw new Exception("Source doc is null or empty")
+
+    if (elements != null ) return
+    elements = docAsJson \ "contents"
+    m_log trace s"All Content Elements => " + compact(render(elements))
+
+    action = (docAsJson \ "contents" \ "action").extractOpt[String].getOrElse("invalid").toLowerCase()
+    m_log debug s"action = $action"
+    elements = elements.removeField( pair => pair._1.equalsIgnoreCase("action") )
+    keys = extractKeys
+    elements = elements.removeField( pair => pair._1.equalsIgnoreCase("keys") )
+
+    UINode.UIModules.foreach( moduleName => elements \ moduleName match {
+      case o: JObject  =>  moduleDesc(moduleName) =  mergeUIComponents(moduleName, moduleDesc, extractUIComponents(moduleName, o))
+      case a: JArray   => a.arr.foreach {
+        case ao: JObject => moduleDesc(moduleName) = mergeUIComponents(moduleName, moduleDesc, extractUIComponents(moduleName, ao))
+
+        case _ => m_log error "Unknown request array-element found"
+        }
+      case JNothing | JNull  =>
+      case _  => m_log error s"Unknown request element found ${elements \ moduleName }"
+    })
+
+    m_log debug s"Pre-processing result: ${moduleDesc.mkString}"
+
+  }
+
+  var validated = false
+
+  /**
+    * Validates requests, if a request malformed, incorrectly structured or does not have
+    * required parts - rejects the requests
+    *
+    * @return (result as Int, Explanation as String)
+    */
+  def validate : (Int, String ) = {
+    if (docAsJson == null || docAsJson.toSome.isEmpty)
+      (Error.id, "Validation fails: document is empty")
+
+    preProcessRequest()
+
+    if (!List("create", "update", "delete", "read", "search", "scan").exists(_.equalsIgnoreCase(action))){
+      val msg = s"Action is incorrect: $action"
+      m_log error Rejected.id + " ==> " + msg
+      return (Rejected.id, msg)
+    }
+    m_log debug "Validate action and content section"
+    action match {
+      case "read" | "search" | "delete" =>
+      {
+        if ( keys == null || keys.isEmpty) {
+          val msg = s"Keys list (filter) is missing or empty"; m_log debug Rejected.id + " ==> " + msg; return (Rejected.id, msg)
+        }
+        if (!keys.keySet.forall(k => UINode.searchFields.contains(k))){
+          val msg = s"Keys list has keys that are not defined as searchable! "; m_log debug Rejected.id + " ==> " + msg; return (Rejected.id, msg)
+        }
+        (Success.id, "Success")
+      }
+      case "update" | "create" =>
+      {
+        if (!UINode.UIModules.exists( uic => ( elements \ uic ).extractOpt[JObject].isDefined) &&
+          !UINode.UIModules.exists( uic => ( elements \ uic ).extractOpt[JArray].isDefined)) {
+          val msg = s"At least one content element is required"
+          m_log debug Rejected.id + " ==> " + msg
+          return (Rejected.id, msg)
+        }
+
+      }
+    }
+    validated = true
+    (Success.id, "Success")
+  }
+
+
+  /**
+    * Executes the requests, return response as String in JSON format.
+    * A request must be validated before calling this method.
+    *
+    * @return
+    */
   def execute :String =
   {
-    var elements : JValue = docAsJson \ "contents"
-    val action = (docAsJson \ "contents" \ "action").extract[String].toLowerCase
-    elements = elements.removeField( pair => pair._1.equalsIgnoreCase("action") )
-
+    if (!validated) return "Internal error: Request has not been validated!"
     var responses : List[JValue] = Nil
-
-    m_log debug s"action = $action"
-    m_log debug s"All Content Elements => " + compact(render(elements))
 
     action match {
       case "create" | "update" =>
-        elements match {
-          case JObject(all_content_elements) => {
-            responses = JObject(all_content_elements)
-              .obj
-              .filter(an_element => !an_element._1.equalsIgnoreCase("keys"))
-              .flatMap(content_element => {
-                m_log debug (s"Content element ${content_element._1} => " + compact(render(content_element._2)))
-                val moduleName = content_element._1
-                content_element._2 match {
-                  case ce: JObject => m_log debug "UI Item from object: " + compact(render(ce)); List(actionHandler(action, ce, moduleName))
-                  case ce: JArray => ce.arr.map(ce_ae => {
-                            m_log debug "UI Item, array element: " + compact(render(ce_ae))
-                            actionHandler(action, ce_ae, moduleName)
-                  })
-                  case _ => handleRequestIncorrect
-                }
-              }
-              )
-          }
-          case _ => return "Create/Update/Delete request is not correct, contents must be JSON object"
-        }
-      case "read" | "search" | "delete" =>
-        elements match {
-          case JObject(all_content_elements) => {
-            responses = JObject(all_content_elements).obj
-              .filter(an_element => an_element._1.equalsIgnoreCase("keys"))
-              .map( an_element => {m_log debug s"Search/Retrieval keys ${an_element._1} => ${compact(render(an_element._2))}"
-                  val genRes = actionHandler(action, an_element._2, "keys")
-                  genRes match{
-                    case r:JObject => r
-                    case a:JArray => a
-                    case _ => return "Error! Incorrect response"
-
-                  }
-              })
-          }
-          case _ => return "Search/Retrieval request is not correct, contents must be JSON object"
-        }
-
+        moduleDesc.keySet.foreach( moduleName => {
+          val UIComponents: Map[String, List[JValue]] = moduleDesc(moduleName)
+          responses = responses ++ UIComponents.keySet.flatMap(
+            UIComponent => {
+              val content_elements = UIComponents(UIComponent)
+              content_elements.map(element => actionHandler(action, element, moduleName, UIComponent))
+            }
+          )
+        })
+      case "read" | "search" | "delete" => responses = responses :+ actionHandler(action, null, null, null)
     }
 
-    val cnt = new JField ("contents", new JArray(responses))
+    var cnt : JField = null
+    if (responses.nonEmpty &&
+        responses.head.extractOpt[JObject].isDefined &&
+        responses.head.extract[JObject].obj.nonEmpty)
+      cnt = new JField ("contents", new JArray(responses))
+    else
+      cnt = new JField ("result", JString(ProcessingResult.noDataFound.toString))
     if (!printPretty) compact(render(JObject(List(cnt)))) else pretty(render(JObject(List(cnt)))) + "\n"
   }
 
 
-  private def actionHandler(action: String, content_element : JValue, module_name: String) : JValue =
+  /**
+    * Internal function, execute a piece of request
+    *
+    * @param action
+    * @param content_element
+    * @param module_name
+    * @param ui_comp_type
+    * @return
+    */
+  private def actionHandler(action: String, content_element : JValue, module_name: String, ui_comp_type: String) : JValue =
   {
-    val sNode = new UINode(content_element, module_name)
+    m_log debug "Execute action: " + action
+    val sNode = new UINode(content_element, module_name, ui_comp_type)
     val response = action match {
       case "create" => build(sNode.create)
-      case "read" => sNode.setFetchMode(UINodeFetchMode.Everything.id); build_ui("type", sNode.read(extractKeys))
-      case "search" => sNode.setFetchMode(UINodeFetchMode.Everything.id); build_ui("type", sNode.find(extractKeys))
-      case "delete" => build(sNode.deleteAll(extractKeys))
-      case "update" => build(sNode.update(extractKeys))
+      case "read" => sNode.setFetchMode(UINodeFetchMode.Everything.id); build_ui(sNode.read(keys))
+      case "search" => sNode.setFetchMode(UINodeFetchMode.Everything.id); build_ui(sNode.find(keys))
+      case "delete" => build(sNode.deleteAll(keys))
+      case "update" => build(sNode.update(keys))
     }
     m_log debug s"Response: ${pretty(render(response))}\n"
     response
   }
 
 
-  def extractKeys : Map[String, Any] =
+  /**
+    *  Internal function, extracts keys for reading and searching objects and converts their values from JSON to lang types.
+    *
+    * @return
+    */
+  private def extractKeys : Map[String, Any] =
   {
-    val filter_values : Map[String, JValue]  = (docAsJson \ "contents" \ "keys"
-     match{
-        case JObject(keyList) => keyList.filter( kf => UINode.searchFields.contains( kf._1) )
-        case _ => Map.empty
-     }).toList.toMap
+    val keysJValue : JValue = docAsJson \ "contents" \ "keys"
+    if (keysJValue == null || keysJValue == JNothing) return Map.empty
 
-    m_log trace s"Extracted keys: ${filter_values.mkString("{", ", ", "}")}"
+    m_log trace s"Keys:$keysJValue ==> ${compact(render(keysJValue))}"
+    val lkeys = MDNodeUtil.extractKeysAsJValue(keysJValue)
 
-    filter_values.map(key_values =>
+    m_log trace s"Extracted keys: ${lkeys.mkString("{", ",", "}")}"
+    lkeys.map(key_values => {
       UINode.searchFields(key_values._1) match {
         case "String"  => key_values._1 -> key_values._2.extract[String]
         case "Int"     => key_values._1 -> key_values._2.extract[Int]
         case "Long"    => key_values._1 -> key_values._2.extract[Long]
         case "Boolean" => key_values._1 -> key_values._2.extract[Boolean]
-      })
+      }})
+
   }
 
-  def validate : (Int, String ) = {
-
-    if (docAsJson == null || docAsJson.toSome.isEmpty)
-      (Error.id, "Validation fails: document is empty")
-
-    val action : String = (docAsJson \ "contents" \ "action").extractOpt[String].getOrElse("invalid").toLowerCase()
-    if (!List("create", "update", "delete", "read", "search", "scan").exists(_.equalsIgnoreCase(action))){
-      val msg = s"Action is incorrect: $action"
-      m_log debug Rejected.id + " ==> " + msg
-      return (Rejected.id, msg)
-    }
-
-    m_log debug "Validate token, action and content section"
-
-    UIMDRequestHandler.requiredFields.keySet.foreach {
-      case k@"root" => {
-        UIMDRequestHandler.requiredFields(k).foreach {
-          case rf@"contents" =>
-            val fieldValue = docAsJson \ rf
-            if (fieldValue == null || !fieldValue.isInstanceOf[JObject] || fieldValue.toSome.isEmpty) {
-              val msg = s"Required object $k.$rf is missing or empty"
-              m_log debug Rejected.id + " ==> " + msg
-              return (Rejected.id, msg)
-            }
-        }
-      }
-    }
-    action match {
-      case "read" | "search" | "delete" =>
-      {
-        val keySection = docAsJson \ "contents" \ "keys"
-        if ( keySection == null || keySection.toSome.isEmpty) {
-          val msg = s"Keys list (filter) is missing or empty"; m_log debug Rejected.id + " ==> " + msg; return (Rejected.id, msg)
-        }
-
-        val all_keys = docAsJson \ "contents" \ "keys"
-        var filteringKeys: List[JValue] = Nil
-        all_keys match {
-          case JObject(keys) => {
-            filteringKeys = JObject(keys).obj.filter(k => UINode.searchFields.contains(k._1)).map(a_key => {
-              m_log debug (s"Module ${a_key._1} => " + compact(render(a_key._2)))
-              a_key._2
-            })
-          }
-          case _ => {
-            val msg = "Incorrect request structure"; return (Rejected.id, msg)
-          }
-        }
-        if (filteringKeys.isEmpty) {
-          val msg = s"Keys list does not have any pre-defined keys"; m_log debug Rejected.id + " ==> " + msg; return (Rejected.id, msg)
-        }
-        (Success.id, "Success")
-      }
-      case "update" | "create" =>
-        { val elements = docAsJson \ "contents"
-          elements match {
-            case JObject(all_content_elements) => {
-              if(JObject(all_content_elements).obj.exists(an_element => !an_element._1.equalsIgnoreCase("keys")))
-                return (Success.id, "Success")
-              else{
-                  val msg = s"Create and update require module description"
-                  m_log debug Rejected.id + " ==> " + msg
-                  return (Rejected.id, msg)
-              }
-            }
-            case _ => {
-              val msg = "Incorrect request structure"; return (Rejected.id, msg)
-            }
-        }
-      }
-    }
-    (Success.id, "Success")
-  }
 
 }
 
 
+/**
+  * UI2MD Utility object
+  */
 object UIMDRequestHandler{
 
   val m_log: Logger = LoggerFactory.getLogger("SemanticMDRequestHandler")
-
-  val requiredFields = Map(
-    "root" -> List("contents")
-  )
 
   def getHandlerForRequest(document: String, printPretty: Boolean) : List[UIMDRequestHandler] = {
     try {
       val docAsJson = parse(document, false, false)
       docAsJson.children.flatMap(reqSegment => {
-        m_log.debug("Process JSON: " + compact(render(reqSegment)))
+        m_log trace "Process JSON: " + compact(render(reqSegment))
         reqSegment match {
           case rs: JObject => List(new UIMDRequestHandler(rs, printPretty))
           case rs: JArray => rs.arr.map(jv => new UIMDRequestHandler(jv, printPretty))

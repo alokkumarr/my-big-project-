@@ -3,7 +3,6 @@ package sncr.metadata.engine
 import org.json4s.JsonAST.{JArray, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
-import sncr.metadata.ui_components.UINode
 
 /**
   * Created by srya0001 on 4/18/2017.
@@ -12,10 +11,19 @@ trait UIResponse extends Response {
 
     override protected val m_log: Logger = LoggerFactory.getLogger(classOf[UIResponse].getName)
 
+
     import MDObjectStruct.formats
-    private def remap(remappingAttr: String, data : List[Map[String, Any]]) : List[JObject] = {
-      data.map(d => {
-          m_log debug s"Content to re-map:   ${d.mkString("{", ", ", "}")}"
+    /**
+    * Internal function re-structures response:
+    * from flat list of Maps, each map is a node to
+      * "module_name": { "type" : {} }
+    * @param data
+    * @return Map - restructured response
+    */
+    private def remap(data : List[Map[String, Any]]) : Map[String, List[JObject]] = {
+      val remappedData = new scala.collection.mutable.HashMap[String, List[JObject]]
+      data.foreach(d => {
+          m_log trace s"Content to re-map:   ${d.mkString("{", ", ", "}")}"
           if (d.contains("content")) {
           val content: JValue =
           d("content") match {
@@ -25,47 +33,48 @@ trait UIResponse extends Response {
               m_log error m
               JObject(Nil)
           }
-          val contentType = if (d.contains(remappingAttr)) d(remappingAttr).asInstanceOf[String] else (content \ remappingAttr).extractOrElse[String]("UNDEF_" + remappingAttr)
+          val contentType = if (d.contains("type")) d("type").asInstanceOf[String] else (content \ "type").extractOrElse[String]("UNDEF_type")
+          val module = if (d.contains("module")) d("module").asInstanceOf[String] else (content \ "module").extractOrElse[String]("UNDEF_module")
           val res = JObject((contentType, content))
-          m_log debug s"Remapped object: ${pretty(render(res))}"
-          res
+          val intermRes :List[JObject] = if (remappedData.contains(module)) remappedData(module) :+ res else List(res)
+          remappedData(module) = intermRes
+          m_log trace s"Remapped object: ${pretty(render(res))}"
         }
         else {
           val m = "Error: No content to re-map"; m_log error m
-          JObject(Nil)
         }
       })
+      remappedData.toMap
     }
 
-    def build_ui(remappingAttr: String, data : List[Map[String, Any]] ) : JObject = {
-      val lo: List[JObject] = remap(remappingAttr, data)
-      val genArtList: List[String] = UINode.UIArtifacts :+ ("UNDEF_" + remappingAttr)
-      JObject(genArtList.map( contentType =>
-        JField(contentType , JArray(lo.map( o => ( o \ contentType ).extractOpt[JValue]).filter(e => {e.isDefined && e.nonEmpty} ).map(_.get))))
-        .filter( e => {
-          e._2 match{
-            case JArray(a) => { m_log debug s"Check array element: ${e._1} => ${a.mkString("{", ",", "}")}, size = ${a.size}"; a.nonEmpty && a(0) != JNothing }
-            case JObject(o) => { m_log debug s"Check object: ${e._1} => ${compact(render(e._2))}"; o.nonEmpty }
-            case _ => false
-          }
-        })
+  /**
+    * The method process search operation output
+    * @param data - list of nodes retrieved from MDDB
+    * @return - a response wrapped into a single JSON object
+    */
+    def build_ui(data : List[Map[String, Any]] ) : JObject = {
+      val moduleMap: Map[String, List[JObject]] = remap(data)
+      JObject(moduleMap.keySet.map( moduleName => {
+        val moduleUIComponents : List[JObject] = moduleMap(moduleName)
+          JField(moduleName, JArray(moduleUIComponents))
+        }).toList
       )
     }
 
-  def build_ui(remappingAttr: String, data : Map[String, Any] ) : JObject = {
-    val lo: List[JObject] = remap(remappingAttr, List(data))
-    val genArtList: List[String] = UINode.UIArtifacts :+ ("UNDEF_" + remappingAttr)
-    if (lo.isEmpty) return JObject(JField("result", JString("Node not found")))
-    val onlyNode = lo.head
-    val o = genArtList.map( contentType => {
-      val onlyNodeContent = (onlyNode \ contentType).extractOpt[JValue]
-      if (onlyNodeContent.isDefined)
-        JField(contentType, onlyNodeContent.get)
-      else
-        JField(contentType, JNothing)
-      }
-    ).filter( _._2 != JNothing)
-    JObject(o)
+  /**
+    * The method is designed to process output of read operation - expecting ONLY ONE node
+    * @param data - read node
+    * @return - response as a single JObject
+    */
+  def build_ui(data : Map[String, Any] ) : JObject = {
+    val remappedData: Map[String, List[JObject]] = remap(List(data))
+    if (remappedData.isEmpty) return JObject(JField("result", JString("Node not found")))
+    if (remappedData.size > 1) return JObject(JField("result", JString("More than one node found with different module")))
+    val theOnlyNode_ModuleName = remappedData.keysIterator.next()
+    val nodeToResponse : List[JObject] = remappedData(theOnlyNode_ModuleName)
+    if (nodeToResponse.size > 1)  return JObject(JField("result", JString(s"More than one node found in one module: $theOnlyNode_ModuleName")))
+    if (nodeToResponse.isEmpty)  return JObject(JField("result", JString(s"Internal error: empty list for module: $theOnlyNode_ModuleName")))
+    JObject(JField(theOnlyNode_ModuleName, nodeToResponse.head))
   }
 
 }

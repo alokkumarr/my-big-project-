@@ -3,7 +3,7 @@ package sncr.metadata.ui_components
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{Result, _}
 import org.apache.hadoop.hbase.util.Bytes
-import org.json4s.JsonAST.{JNothing, JString, JValue}
+import org.json4s.JsonAST._
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.MDObjectStruct.{apply => _, _}
@@ -14,7 +14,9 @@ import sncr.saw.common.config.SAWServiceConfig
 /**
   * Created by srya0001 on 2/19/2017.
   */
-class UINode(private var content: JValue, val ui_item_type : String = Fields.UNDEF_VALUE.toString)
+class UINode(private var content: JValue,
+             private var module_name : String = Fields.UNDEF_VALUE.toString,
+             private var ui_comp_type: String = Fields.UNDEF_VALUE.toString)
       extends ContentNode
       with SourceAsJson {
 
@@ -22,24 +24,16 @@ class UINode(private var content: JValue, val ui_item_type : String = Fields.UND
 
   def setFetchMode(m: Int) = { fetchMode = m }
 
-
   def setUINodeContent : Unit = {
     if (content != JNothing) {
-      content.replace(List("id"), JString(new String(rowKey)))
+      content = content.replace(List("id"), JString(Bytes.toString(rowKey)))
       setContent(compact(render(content)))
     }
   }
 
   def buildSearchData : Map[String, Any] = {
-    var searchValues : Map[String, Any] =
-    UINode.extractSearchData(content) + ("NodeId" -> new String(rowKey))
-    val moduleName: String = ui_item_type match {
-      case "analyze" | "observe" | "alert" => ui_item_type
-      case "menu" => (content \ "module").extractOrElse[String]("unknown").toLowerCase
-      case _ => "undefined"
-    }
-    if (!ui_item_type.equalsIgnoreCase(Fields.UNDEF_VALUE.toString))
-      searchValues = searchValues + ( "type" -> ui_item_type ) + ( "module" -> moduleName )
+    var searchValues : Map[String, Any] = UINode.extractSearchData(content) + (Fields.NodeId.toString -> new String(rowKey))
+    searchValues = searchValues + ( "in_type" -> ui_comp_type ) + ( "in_module" -> module_name )
     searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
     searchValues
   }
@@ -62,7 +56,7 @@ class UINode(private var content: JValue, val ui_item_type : String = Fields.UND
   override protected val m_log: Logger = LoggerFactory.getLogger(classOf[UINode].getName)
 
   import MDObjectStruct.formats
-  protected val table = SAWServiceConfig.metadataConfig.getString("path") + "/" + tables.SemanticMetadata
+  protected val table = SAWServiceConfig.metadataConfig.getString("path") + "/" + tables.UIMetadata
   protected val tn: TableName = TableName.valueOf(table)
   mdNodeStoreTable = connection.getTable(tn)
   headerDesc =  UINode.searchFields
@@ -70,7 +64,8 @@ class UINode(private var content: JValue, val ui_item_type : String = Fields.UND
   override protected def initRow : String =
   {
     val rowkey = (content \ "customerCode").extractOrElse[String]("UNDEF") +
-            MetadataDictionary.separator + ui_item_type +
+            MetadataDictionary.separator + module_name +
+            MetadataDictionary.separator + ui_comp_type +
             MetadataDictionary.separator + System.nanoTime()
     m_log debug s"Generated RowKey = $rowkey"
     rowkey
@@ -80,6 +75,7 @@ class UINode(private var content: JValue, val ui_item_type : String = Fields.UND
   def create: ( Int, String )=
   {
     try {
+
       val put_op = createNode(NodeType.ContentNode.id, classOf[UINode].getName)
 
       setUINodeContent
@@ -126,16 +122,18 @@ object UINode
       "type" -> "String",
       "number_of_records" -> "Int",
       "from_record" -> "Int",
-      "NodeId" -> "String",
+      "id" -> "String",
       "roleType" -> "String",
       "metric_name" -> "String",
       "customerCode" -> "String")
 
-  val UIArtifacts = List("menu", "analyze", "observe", "alert")
+  val UIModules = List("analyze", "observe", "alert")
+  val remappingAttributes =  List("module", "type")
+
 
   def apply(rowId: String) :UINode =
   {
-    val uiNode = new UINode(JNothing, Fields.UNDEF_VALUE.toString)
+    val uiNode = new UINode(JNothing, null, null)
     uiNode.setRowKey(Bytes.toBytes(rowId))
     uiNode.load
     uiNode

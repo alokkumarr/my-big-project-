@@ -31,13 +31,13 @@ public class ExecutionTaskHandler {
         if (sqlExecutors.size() >= capacity)
             throw new Exception("SQL Executor service out of capacity, please wait");
 
-        ExecutionTask ea = new ExecutionTask(ah.getAnalysisId(), ah.sqlExecInputFilename(), ah.resultExecOutputFile());
-        executionHandler.put(ah.getAnalysisId(), ah);
+        ExecutionTask ea = new ExecutionTask(ah.getRowID(), ah.sqlExecInputFilename(), ah.resultExecOutputFile());
+        executionHandler.put(ah.getRowID(), ah);
         String resultId = ea.getPredefinedRowID();
         ah.setPreDefinedResultKey(resultId);
         ah.generateJobDescription(resultId);
         FutureTask<String> sqlTask = (FutureTask<String>) executorService.submit(ea);
-        sqlExecutors.put(ah.getAnalysisId(), sqlTask);
+        sqlExecutors.put(ah.getRowID(), sqlTask);
     }
 
     public String checkStatusAndUpdate(String analysisId, long timeout)

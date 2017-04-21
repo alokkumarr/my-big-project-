@@ -33,13 +33,17 @@ class MD extends BaseServiceProvider {
   def process(json: JValue): Result = {
     m_log trace("Validate and process request:  " + compact(render(json)))
     val res: ObjectNode = Json.newObject
-
-    val handler = new UIMDRequestHandler(json)
+    try {
+      val handler = new UIMDRequestHandler(json)
       handler.validate match {
-      case (0, _) =>
-        val sn = new UIMDRequestHandler(json)
-        return play.mvc.Results.ok(sn.execute)
-      case (res_id:Int, r:String) => res.put("reason", r );res.put("result",ProcessingResult(res_id).toString)
+        case (0, _) =>
+          return play.mvc.Results.ok(handler.execute)
+        case (res_id: Int, r: String) => res.put("reason", r); res.put("result", ProcessingResult(res_id).toString)
+      }
+    }
+    catch{
+      case e:Exception => val msg = e.getMessage
+        res.put("reason", msg); res.put("result", ProcessingResult.Rejected.toString)
     }
     play.mvc.Results.ok(res)
   }

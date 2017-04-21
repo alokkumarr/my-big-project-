@@ -85,6 +85,7 @@ object tables extends Enumeration {
   val DatalakeMetadata = Value(1, "datalake_metadata")
   val AnalysisMetadata = Value(2, "analysis_metadata")
   val AnalysisResults = Value(3, "analysis_results")
+  val UIMetadata = Value(4, "ui_metadata")
 
 }
 
@@ -125,7 +126,7 @@ object NodeType extends Enumeration {
 object Fields extends Enumeration {
 
   val UNDEF_VALUE = Value(0, "_undefined_")
-  val NodeId = Value(1, "NodeId")
+  val NodeId = Value(1, "id")
   val NumOfLocations =  Value(2, "_number_of_locations")
   val NumOfElements =  Value(3, "_number_of_elements")
   val RelationCategory = Value(4, "_relation_category")

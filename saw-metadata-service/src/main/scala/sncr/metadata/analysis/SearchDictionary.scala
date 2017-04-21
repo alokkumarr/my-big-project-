@@ -18,8 +18,7 @@ object SearchDictionary {
     "tenantId"-> "String",
     "productId"-> "String",
     "analysisName"-> "String",
-    "displayStatus"-> "String",
-    "NodeId" -> "String"
+    "displayStatus"-> "String"
     )
 
 

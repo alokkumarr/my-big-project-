@@ -139,7 +139,7 @@ class MetadataNode extends MetadataStore
 
   def read(filter: Map[String, Any]): Map[String, Any] = {
     val (res, msg) = selectRowKey(filter)
-    if (res != Success.id) throw new Exception ("Filter does not contain NodeId")
+    if (res != Success.id) throw new Exception ("Filter does not contain Node Id")
     load
   }
 
@@ -270,7 +270,7 @@ object MetadataNode extends MetadataStore{
       }
       var putOp: Put = new Put(Bytes.toBytes(compositeKey))
       putOp = putOp.addColumn(MDColumnFamilies(_cf_source.id),MDKeys(key_Definition.id),Bytes.toBytes(content))
-      val sval = MDNodeUtil.extractSearchData(content, searchDictionary) + ("NodeId" -> Option(compositeKey))
+      val sval = MDNodeUtil.extractSearchData(content, searchDictionary) + (Fields.NodeId.toString -> Option(compositeKey))
       sval.keySet.foreach(k => {
         putOp = putOp.addColumn(MDColumnFamilies(_cf_search.id),Bytes.toBytes(k),Bytes.toBytes(sval(k).asInstanceOf[String]))
       })

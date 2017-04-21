@@ -54,7 +54,6 @@ class AnalysisProvHelper(var requests: JValue) extends Response {
           case "search"       => val anh = new AnalysisNode;  build(anh.find(keys))
           case "delete"       => val anh = new AnalysisNode;  build(anh.deleteAll(keys))
           case "scan"         => val anh = new AnalysisNode;  build(anh.scan)
-          case "list-headers" | "execute" =>  val anh = new AnalysisNode;  build(anh.listHeaders(keys))
           case "none"         => JObject(  JField("result", JInt(Rejected.id)), JField("reason", JString("Incorrect verb")))
         }
       }
