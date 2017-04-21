@@ -52,7 +52,7 @@ class ANA extends BaseServiceProvider {
         val analysisNode = new AnalysisNode(analysisJson)
         val (result, message) = analysisNode.write
         if (result != NodeCreated.id) {
-          throw new RuntimeException("Writing failed: " + message)
+          throw new ClientException("Writing failed: " + message)
         }
         responseJson
       }
@@ -62,7 +62,7 @@ class ANA extends BaseServiceProvider {
         val (result, message) = analysisNode.update(
           Map("id" -> analysisId))
         if (result != Success.id) {
-          throw new RuntimeException("Updating failed: " + message)
+          throw new ClientException("Updating failed: " + message)
         }
         json
       }
@@ -80,12 +80,12 @@ class ANA extends BaseServiceProvider {
         val analysisNode = new AnalysisNode
         val result = analysisNode.deleteAll(Map("id" -> analysisId))
         if (result == Map.empty) {
-          throw new RuntimeException("Deleting failed")
+          throw new ClientException("Deleting failed")
         }
         json
       }
       case _ => {
-        throw new RuntimeException("Unknown action: " + action)
+        throw new ClientException("Unknown action: " + action)
       }
     }
     Results.ok(playJson(response))
@@ -114,14 +114,14 @@ class ANA extends BaseServiceProvider {
     val analysis = analysisListJson match {
       case array: JArray => {
         if (array.arr.length > 1) {
-          throw new RuntimeException("Only one element supported")
+          throw new ClientException("Only one element supported")
         }
         if (array.arr.length == 0) {
-          throw new RuntimeException("No element to write found")
+          throw new ClientException("No element to write found")
         }
         array.arr(0)
       }
-      case _ => throw new RuntimeException(
+      case _ => throw new ClientException(
         "Expected array: " + analysisListJson)
     }
     val query: JValue = ("query", JString(QueryBuilder.build(analysis)))
@@ -140,7 +140,7 @@ class ANA extends BaseServiceProvider {
     val analysisNode = AnalysisNode(analysisId)
     analysisNode.getCachedData("content") match {
       case content: JObject => content
-      case _ => throw new RuntimeException("no match")
+      case _ => throw new ClientException("no match")
     }
   }
 
