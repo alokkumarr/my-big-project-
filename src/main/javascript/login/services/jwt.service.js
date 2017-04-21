@@ -29,12 +29,10 @@ class JwtService {
   getRequestParams() {
     const token = this.getTokenObj();
     return {
-      data: [],
-      links: {},
       contents: {
         keys: {
-          customerCode: get(token, 'ticket.custCode'),
-          dataSecurityKey: get(token, 'ticket.dataSecurityKey')
+          customerCode: 'ATT'
+          // dataSecurityKey: get(token, 'ticket.dataSecurityKey')
         }
       }
     };

@@ -3,8 +3,10 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import filter from 'lodash/filter';
 
-export function MenuService($http, JwtService) {
+export function MenuService($http, JwtService, AppConfig) {
   'ngInject';
+
+  const url = AppConfig.api.url;
 
   return {
     getMenu
@@ -15,17 +17,17 @@ export function MenuService($http, JwtService) {
 
     set(params, 'contents.action', 'search');
     set(params, 'contents.keys.type', 'menu');
-    set(params, 'contents.keys.module', moduleName.toLowerCase());
+    set(params, 'contents.keys.module', moduleName.toUpperCase());
 
     return params;
   }
 
   function getMenu(moduleName) {
     moduleName = moduleName.toUpperCase();
-    return $http.post(`/api/menu`, getRequestParams(moduleName))
+    return $http.post(url, getRequestParams(moduleName))
       .then(response => {
         const menu = filter(
-          get(response, `data.contents.${moduleName.toLowerCase()}`),
+          get(response, `data.contents.[0].${moduleName.toUpperCase()}`),
           category => category.module === moduleName
         );
         return map(menu, item => {
