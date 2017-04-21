@@ -119,12 +119,8 @@ class ANA extends BaseServiceProvider {
       ("customerCode", "static") ~
       ("name", "static")
     }
-    val analysisNode = new AnalysisNode
-    val result = analysisNode.read(Map("id" -> analysisId))
-    if (result == Map.empty) {
-      throw new RuntimeException("Reading failed")
-    }
-    result("content") match {
+    val analysisNode = AnalysisNode(analysisId)
+    analysisNode.getCachedData("content") match {
       case content: JObject => content
       case _ => throw new RuntimeException("no match")
     }
