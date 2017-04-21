@@ -133,6 +133,14 @@ export function AnalyzeService($http, $timeout, $q) {
     return $http.get('/api/analyze/artifacts').then(fpGet('data'));
   }
 
+  function createAnalysis(model) {
+    const payload = {data: [], links: [], contents: {
+      action: 'read',
+      keys: [{id: model.id, module: 'analyze', type: 'semantic'}]
+    }};
+    return $http.post('/api/analyze/create', payload).then(fpGet('data'));
+  }
+
   function getDataBySettings(model) {
     const payload = {data: [], links: [], contents: {
       action: 'execute',
