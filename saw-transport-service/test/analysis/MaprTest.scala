@@ -38,9 +38,11 @@ class MaprTest extends PlaySpec with OneAppPerSuite {
       ("name" -> s"test-$id")).merge(idJson)
   }
 
-  def actionKeyMessage(action: String, id: String) = {
-    val key: JObject = ("id", id)
-    message(("action" -> action) ~ ("keys" -> JArray(List(key))))
+  def actionKeyMessage(action: String, id: String,
+    keyAdditionalJson: JObject = JObject()) = {
+    val idJson: JObject = ("id", id)
+    val keyJson: JObject = idJson.merge(keyAdditionalJson)
+    message(("action" -> action) ~ ("keys" -> JArray(List(keyJson))))
   }
 
   def message(contents: JValue): JObject = {

@@ -1,6 +1,7 @@
 import org.json4s._
-import org.scalatest.CancelAfterFailure
+import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
+import org.scalatest.CancelAfterFailure
 
 /* Test analysis service operations */
 class AnalysisTest extends MaprTest with CancelAfterFailure {
@@ -9,19 +10,25 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
     var id: String = null
 
     "create analysis" in {
+      val typeJson: JObject = ("analysisType", "report")
+
       /* Create semantic analysis template using the built-in "_static"
        * ID */
-      val templateResponse = sendRequest(actionKeyMessage("create", "_static"))
+      val templateResponse = sendRequest(
+        actionKeyMessage("create", "_static", typeJson))
       val JString(semanticId: String) = analyze(templateResponse) \ "id"
 
       /* Write analysis */
-      val response = sendRequest(actionKeyMessage("create", semanticId))
+      val response = sendRequest(
+        actionKeyMessage("create", semanticId, typeJson))
       val JString(analysisId) = analyze(response) \ "id"
       analysisId must not be ("_static")
       id = analysisId
 
       val JString(name) = analyze(response) \ "name"
       name must be ("static")
+      val JString(analysisType) = analyze(response) \ "type"
+      analysisType must be ("report")
     }
 
     "update analysis" in {
@@ -46,9 +53,11 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
 
     "execute analysis" in {
       /* Execute previously created analysis */
-      val body = actionKeyMessage("read", id)
-      val response = sendRequest(body)
-      /* TODO */
+      val body = actionKeyMessage("execute", id)
+      val analysis = analyze(sendRequest(body))
+      /* Note: Currently the result is just the static mock */
+      val JInt(value) = (analysis \ "data")(0) \ "foo"
+      value must be (1)
     }
 
     "delete analysis" in {

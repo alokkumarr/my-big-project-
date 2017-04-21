@@ -33,8 +33,10 @@ class ANA extends BaseServiceProvider {
       case "create" => {
         val templateId = extractAnalysisId(json)
         val idJson: JObject = ("id", UUID.randomUUID.toString)
+        val analysisType = extractKey(json, "analysisType")
+        val typeJson: JObject = ("type", analysisType)
         val mergeJson = contentsAnalyze(
-          readAnalysisNode(templateId).merge(idJson))
+          readAnalysisNode(templateId).merge(idJson).merge(typeJson))
         val responseJson = json merge mergeJson
         val analysisJson = (responseJson \ "contents" \ "analyze")(0)
         val analysisNode = new AnalysisNode(analysisJson)
@@ -60,8 +62,8 @@ class ANA extends BaseServiceProvider {
       }
       case "execute" => {
         val analysisId = extractAnalysisId(json)
-        executeAnalysis(analysisId)
-        json
+        val data = executeAnalysis(analysisId)
+        json merge contentsAnalyze(("data", data))
       }
       case "delete" => {
         val analysisId = extractAnalysisId(json)
@@ -81,8 +83,12 @@ class ANA extends BaseServiceProvider {
   }
 
   def extractAnalysisId(json: JValue) = {
-    val JString(analysisId) = (json \ "contents" \ "keys")(0) \ "id"
-    analysisId
+    extractKey(json, "id")
+  }
+
+  private def extractKey(json: JValue, property: String) = {
+    val JString(value) = (json \ "contents" \ "keys")(0) \ property
+    value
   }
 
   def analysisJson(json: JValue) = {
@@ -128,8 +134,12 @@ class ANA extends BaseServiceProvider {
     ("contents", ("analyze", JArray(List(analysis))))
   }
 
-  def executeAnalysis(analysisId: String) = {
-    /* Placeholder for Spark SQL execution library until available */
+  def executeAnalysis(analysisId: String): JValue = {
+    /* TODO: Until analysis and executor changes are finished, return a
+     * static mock of execution results */
+    if (true) {
+      return List(("foo", 1))
+    }
 
     //Create keys to filter records.
     val keys2 : Map[String, Any] = Map ("id" -> analysisId)
@@ -156,6 +166,7 @@ class ANA extends BaseServiceProvider {
     catch {
       case e: Exception => val msg = s"Execution exception: ${e.getMessage}"; m_log error (msg, e)
     }
-
+    /* TODO: Return empty result until integrated */
+    List()
   }
 }
