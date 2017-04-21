@@ -12,7 +12,7 @@ object QueryBuilder {
         /* TODO: Implement support for multiple artifacts */
         artifacts.arr(0)
       case JNothing => return ""
-      case obj => throw new QueryException("Expected array but got: " + obj)
+      case obj => throw new ClientException("Expected array but got: " + obj)
     }
     "%s %s %s %s %s".format(
       buildSelect(artifact),
@@ -26,12 +26,12 @@ object QueryBuilder {
   private def buildSelect(analysis: JValue) = {
     val attributes: List[JValue] = analysis \ "artifact_attributes" match {
       case attributes: JArray => attributes.arr
-      case JNothing => throw new QueryException(
+      case JNothing => throw new ClientException(
         "At least one analysis attribute required")
       case json: JValue => unexpectedElement(json)
     }
     if (attributes.size < 1)
-      throw new QueryException("At least one analysis attribute expected")
+      throw new ClientException("At least one analysis attribute expected")
     "SELECT " + attributes.map(column(_)).mkString(", ")
   }
 
@@ -42,10 +42,10 @@ object QueryBuilder {
   private def buildFrom(analysis: JValue) = {
     val table = analysis \ "artifact_name" match {
       case JString(name) => name
-      case _ => throw new QueryException("Artifact name not found")
+      case _ => throw new ClientException("Artifact name not found")
     }
     if (table.trim().length == 0)
-      throw new QueryException("Artifact name cannot be empty")
+      throw new ClientException("Artifact name cannot be empty")
     "FROM %s".format(table)
   }
 
@@ -105,6 +105,6 @@ object QueryBuilder {
 
   private def unexpectedElement(json: JValue): Nothing = {
     val name = json.getClass.getSimpleName
-    throw new QueryException("Unexpected element: %s".format(name))
+    throw new ClientException("Unexpected element: %s".format(name))
   }
 }
