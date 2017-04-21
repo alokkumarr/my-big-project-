@@ -14,7 +14,7 @@ import sncr.metadata.engine.{MDNodeUtil, tables}
 import sncr.metadata.engine.ProcessingResult._
 import sncr.analysis.execution.{AnalysisExecutionRunner, ExecutionTaskHandler, ProcessExecutionResult}
 import model.QueryBuilder
-import model.QueryException
+import model.ClientException
 import org.apache.hadoop.hbase.util.Bytes
 import sncr.metadata.engine.SearchMetadata._
 
@@ -27,6 +27,14 @@ class ANA extends BaseServiceProvider {
   val executorRunner = new ExecutionTaskHandler(1)
 
   override def process(txt: String): Result = {
+    try {
+      doProcess(txt)
+    } catch {
+      case ClientException(message) => userError(message)
+    }
+  }
+
+  private def doProcess(txt: String): Result = {
     val json = parse(txt)
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
     val response = action match {
@@ -44,7 +52,7 @@ class ANA extends BaseServiceProvider {
         val analysisNode = new AnalysisNode(analysisJson)
         val (result, message) = analysisNode.write
         if (result != NodeCreated.id) {
-          throw new RuntimeException("Writing failed: " + message)
+          throw new ClientException("Writing failed: " + message)
         }
         responseJson
       }
@@ -54,7 +62,7 @@ class ANA extends BaseServiceProvider {
         val (result, message) = analysisNode.update(
           Map("id" -> analysisId))
         if (result != Success.id) {
-          throw new RuntimeException("Updating failed: " + message)
+          throw new ClientException("Updating failed: " + message)
         }
         json
       }
@@ -72,16 +80,24 @@ class ANA extends BaseServiceProvider {
         val analysisNode = new AnalysisNode
         val result = analysisNode.deleteAll(Map("id" -> analysisId))
         if (result == Map.empty) {
-          throw new RuntimeException("Deleting failed")
+          throw new ClientException("Deleting failed")
         }
         json
       }
       case _ => {
-        throw new RuntimeException("Unknown action: " + action)
+        throw new ClientException("Unknown action: " + action)
       }
     }
-    val playJson = Json.parse(compact(render(response)))
-    Results.ok(playJson)
+    Results.ok(playJson(response))
+  }
+
+  private def userError(message: String): Result = {
+    val response: JObject = ("error", ("message", message))
+    Results.badRequest(playJson(response))
+  }
+
+  private def playJson(json: JValue) = {
+    Json.parse(compact(render(json)))
   }
 
   def extractAnalysisId(json: JValue) = {
@@ -98,14 +114,14 @@ class ANA extends BaseServiceProvider {
     val analysis = analysisListJson match {
       case array: JArray => {
         if (array.arr.length > 1) {
-          throw new RuntimeException("Only one element supported")
+          throw new ClientException("Only one element supported")
         }
         if (array.arr.length == 0) {
-          throw new RuntimeException("No element to write found")
+          throw new ClientException("No element to write found")
         }
         array.arr(0)
       }
-      case _ => throw new RuntimeException(
+      case _ => throw new ClientException(
         "Expected array: " + analysisListJson)
     }
     val query: JValue = ("query", JString(QueryBuilder.build(analysis)))
@@ -124,7 +140,7 @@ class ANA extends BaseServiceProvider {
     val analysisNode = AnalysisNode(analysisId)
     analysisNode.getCachedData("content") match {
       case content: JObject => content
-      case _ => throw new RuntimeException("no match")
+      case _ => throw new ClientException("no match")
     }
   }
 
