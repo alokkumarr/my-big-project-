@@ -2,13 +2,17 @@ import forEach from 'lodash/forEach';
 import assign from 'lodash/assign';
 import values from 'lodash/values';
 import mapValues from 'lodash/mapValues';
-import keys from 'lodash/keys';
-import compact from 'lodash/compact';
+import fpPipe from 'lodash/fp/pipe';
+import fpFilter from 'lodash/fp/filter';
+import fpMap from 'lodash/fp/map';
+import fpToPairs from 'lodash/fp/toPairs';
 
 import template from './pivot-grid.component.html';
+import style from './pivot-grid.component.scss';
 
 export const PivotGridComponent = {
   template,
+  styles: [style],
   bindings: {
     updater: '<',
     sendFields: '&'
@@ -66,7 +70,7 @@ export const PivotGridComponent = {
       updates.field && this.updateField(updates.field);
       updates.filters && this.updateFilters(updates.filters);
       updates.sorts && this.updateSorts(updates.sorts);
-      updates.onSave && this.sendFields({fields: this._gridInstance.getDataSource().fields()});
+      updates.getFields && this.sendFields({fields: this._gridInstance.getDataSource().fields()});
       /* eslint-disable no-unused-expressions */
 
       this.replaceWarningLables();
@@ -88,7 +92,11 @@ export const PivotGridComponent = {
 
       forEach(filters, filter => {
         if (this._FilterService.isFilterModelNonEmpty(filter.model)) {
-          const filterValues = compact(keys(filter.model));
+          const filterValues = fpPipe(
+            fpToPairs,
+            fpFilter(pair => pair[1]),
+            fpMap(pair => pair[0])
+          )(filter.model);
           pivotGridDataSource.field(filter.name, {
             filterType: 'include',
             filterValues
@@ -115,10 +123,12 @@ export const PivotGridComponent = {
 
     getDefaultOptions() {
       return {
+        rowHeaderLayout: 'tree',
         allowSortingBySummary: false,
+        showBorders: true,
         allowSorting: false,
         allowFiltering: false,
-        allowExpandAll: true,
+        allowExpandAll: false,
         fieldChooser: {
           enabled: false
         },

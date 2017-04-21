@@ -20,4 +20,24 @@ analyze-pivot-settings {
       margin-bottom: 8px;
     }
   }
+
+  md-sidenav.pivot-settings {
+    width: 420px;
+    max-width: 420px;
+  }
+
+  md-toolbar::after {
+    content: none;
+  }
+
+  md-toolbar.settings-toolbar {
+    min-height: 50px;
+    border-top: 1px solid #C4C4C4;
+    border-bottom: 1px solid #C4C4C4;
+    background-color: #F5F5F5 !important;
+
+    p {
+      margin: 0;
+    }
+  }
 }

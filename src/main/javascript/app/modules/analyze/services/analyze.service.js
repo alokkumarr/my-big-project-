@@ -29,12 +29,12 @@ export function AnalyzeService($http, $timeout, $q) {
     getDataByQuery,
     getDataBySettings,
     generateQuery,
-    getNewPivotAnalysis,
     saveReport,
     getSemanticLayerData,
     chartBe2Fe,
     chartFe2Be,
     updateMenu,
+    getPivotData,
     getAnalysesFor
   };
 
@@ -155,8 +155,8 @@ export function AnalyzeService($http, $timeout, $q) {
     return $http.get('/api/analyze/dataByQuery').then(fpGet('data'));
   }
 
-  function getNewPivotAnalysis() {
-    return $http.get('/api/analyze/newPivotAnalysis').then(fpGet('data'));
+  function getPivotData() {
+    return $http.get('/api/analyze/pivotData').then(fpGet('data'));
   }
 
   function generateQuery(payload) {
@@ -169,6 +169,19 @@ export function AnalyzeService($http, $timeout, $q) {
 
   function getSemanticLayerData() {
     return $http.get('/api/analyze/semanticLayerData').then(fpGet('data'));
+  }
+
+  function createAnalysis(metricId) {
+    const payload = {
+      action: 'read',
+      keys: [{
+        type: 'semantic',
+        analysisType: 'pivot',
+        module: 'analyze',
+        id: metricId
+      }]
+    };
+    return $http.post('/api/analyze/createAnalysis', payload).then(fpGet('data'));
   }
 
   /**

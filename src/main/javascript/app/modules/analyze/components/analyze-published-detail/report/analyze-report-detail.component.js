@@ -28,6 +28,8 @@ export const AnalyzeReportDetailComponent = {
         filter.items = items;
       });
       this.filteredGridData = this._FilterService.getGridDataFilter(this.filters)(this.analysis.report.data);
+
+      this.openFilterSidenav();
     }
 
     openFilterSidenav() {
