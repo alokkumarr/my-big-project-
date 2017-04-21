@@ -6,8 +6,6 @@ import org.apache.commons.cli.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sncr.metadata.analysis.AnalysisExecutionHandler;
-import sncr.metadata.analysis.AnalysisProvHelper;
-import sncr.metadata.engine.ResponseConverter;
 
 import java.io.OutputStream;
 
@@ -24,35 +22,20 @@ public class AnalysisExecutionRunner {
         CommandLineHandler cli = new CommandLineHandler();
         try{
             CommandLine cl  = buildCMD(cli, args);
-            String inData = HFileOperations.readFile(cl.getOptionValue('a'));
+            String id = cl.getOptionValue('a');
             OutputStream outStream = HFileOperations.writeToFile(cl.getOptionValue('o'));
-            System.out.println("Start data processing:\n input analysis ID: " + cl.getOptionValue('a') + "\nOutput path: " + cl.getOptionValue('o'));
+            System.out.println("Start data processing:\n input analysis ID: " + cl.getOptionValue('i') + "\nOutput path: " + cl.getOptionValue('o'));
             ExecutionTaskHandler er = new ExecutionTaskHandler(1);
-            AnalysisProvHelper exec = AnalysisProvHelper.apply(inData);
-            if ( !exec.requestsParsed()){
-                logger.error("The document is not parsable. Exit");
+            AnalysisExecutionHandler aeh = new AnalysisExecutionHandler(id);
+            try {
+                er.startSQLExecutor(aeh);
+                String analysisResultId = er.getPredefResultRowID(id);
+                er.waitForCompletion(id, aeh.getWaitTime());
+                aeh.handleResult(outStream);
+                logger.debug("Execution: Analysis ID = " + id + ", Result Row ID: " + analysisResultId );
+            } catch (Exception e) {
+                logger.error("Executing exception: ", e);
             }
-            java.util.ArrayList<java.util.HashMap<String, Object>> headers =
-                    ResponseConverter.convertToJavaMapList(exec.handleExecuteRequest());
-            headers.forEach( h ->
-            {
-                String nodeId = (String) h.get("NodeId");
-                if (nodeId == null || nodeId.isEmpty())
-                {
-                    System.err.println("Could not get Analysis ID from retrieved result. Skip analysisID = " + nodeId);
-                    return;
-                }
-                AnalysisExecutionHandler aeh = new AnalysisExecutionHandler(nodeId);
-                try {
-                    er.startSQLExecutor(aeh);
-                    String analysisResultId = er.getPredefResultRowID(nodeId);
-                    er.waitForCompletion(nodeId, aeh.getWaitTime());
-                    aeh.handleResult(outStream);
-                    logger.debug("Execution: Analysis ID = " + nodeId + ", Result Row ID: " + analysisResultId );
-                } catch (Exception e) {
-                    logger.error("Executing exception: ", e);
-                }
-            });
             if (outStream != null ) {
                 outStream.flush();
                 outStream.close();

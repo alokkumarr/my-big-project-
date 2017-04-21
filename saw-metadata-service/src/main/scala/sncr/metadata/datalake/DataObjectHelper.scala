@@ -3,7 +3,7 @@ package sncr.metadata.datalake
 import org.json4s._
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
-import sncr.metadata.analysis.{AnalysisNode, AnalysisProvHelper}
+import sncr.metadata.analysis.AnalysisNode
 import sncr.metadata.engine.MDObjectStruct.formats
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine.{MDNodeUtil, Response}
@@ -55,10 +55,10 @@ object DataObjectHelper{
 
   val m_log: Logger = LoggerFactory.getLogger("DataObjectCHelper")
 
-  def apply(source: String): AnalysisProvHelper = {
+  def apply(source: String): DataObjectHelper = {
     try {
       val requests = parse(source, false, false)
-      new AnalysisProvHelper( requests )
+      new DataObjectHelper( requests )
     }
     catch {
       case x: Throwable => m_log error("Could not parse request: ", x); throw x
