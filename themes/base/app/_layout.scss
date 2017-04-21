@@ -74,7 +74,8 @@ $header-bar-height: 71px;
   background-image: url($powered-by-synchronoss-logo-path);
   height: 31px;
   width: 96px;
-  background-size: 96px 31px;
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 
 .left-side-nav {

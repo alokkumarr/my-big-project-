@@ -8,6 +8,10 @@ md-sidenav.md-sidenav-left {
 md-sidenav {
   height: 100%;
 
+  .sidebar-header {
+    font-weight: 700;
+  }
+
   .secondary-toolbar {
     height: 75px;
     justify-content: center;
