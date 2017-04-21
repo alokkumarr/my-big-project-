@@ -27,6 +27,8 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
 
       val JString(name) = analyze(response) \ "name"
       name must be ("static")
+      val JString(sId) = analyze(response) \ "semanticId"
+      sId must be (semanticId)
       val JString(analysisType) = analyze(response) \ "type"
       analysisType must be ("report")
     }

@@ -31,12 +31,14 @@ class ANA extends BaseServiceProvider {
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
     val response = action match {
       case "create" => {
-        val templateId = extractAnalysisId(json)
+        val semanticId = extractAnalysisId(json)
+        val semanticIdJson: JObject = ("semanticId", semanticId)
         val idJson: JObject = ("id", UUID.randomUUID.toString)
         val analysisType = extractKey(json, "analysisType")
         val typeJson: JObject = ("type", analysisType)
         val mergeJson = contentsAnalyze(
-          readAnalysisNode(templateId).merge(idJson).merge(typeJson))
+          readAnalysisNode(semanticId)
+            merge(idJson).merge(semanticIdJson).merge(typeJson))
         val responseJson = json merge mergeJson
         val analysisJson = (responseJson \ "contents" \ "analyze")(0)
         val analysisNode = new AnalysisNode(analysisJson)
