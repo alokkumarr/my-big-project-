@@ -1,9 +1,10 @@
 [
  {
-  "_id" : "semantic_data_345679234",
-  "data_security_key" : "20170612ATT",
-  "metric_name" : "Orders  (Only Order view)",
-  "customer_code" : "ATT",
+  "id" : "semantic_data_345679234",
+  "dataSecurityKey" : "20170612ATT",
+  "type" : "semantic",
+  "metricName" : "Orders  (Only Order view)",
+  "customerCode" : "ATT",
   "disabled" : "false",
   "checked" : "false",
   "supports":
@@ -23,167 +24,18 @@
   ],
   "repository":
   {
-    "storage_type" : "ES",
+    "storageType" : "ES",
     "index_name" : "demo_order_latest_prc_batch",
     "type" : "order",
     "URL" : "https://sncradmin:xuw3dUraHapret@razorinsights-trial.razorsight.com/esuat/"
-  },
-  "artifacts":
-  [
-    {
-    "artifact_name": "Orders",
-    "columns" :
-      [
-        {
-          "columnName": "ORDER_NUMBER",
-          "displayName": "Order Number",
-          "type": "string",
-          "joinEligible": true,
-          "filterEligible": false,
-          "area" : null,
-          "displayFolder" : "Folder_2",
-          "allowFiltering" : false
-        },
-        {
-          "columnName": "CUSTOMER_ID",
-          "displayName": "Customer ID",
-          "type": "string",
-          "joinEligible": true,
-          "filterEligible": false,
-          "area" : null,
-          "displayFolder" : "Folder_2",
-          "allowFiltering" : false
-        },
-        {
-        "columnName": "FACT_PRODUCT_ID",
-        "displayName": "Product Id",
-        "type": "string",
-        "joinEligible": false,
-        "filterEligible": false,
-        "area" : null,
-        "displayFolder" : "Folder_2",
-        "allowFiltering" : false
-      },
-      {
-        "columnName": "ENR_PARTNER",
-        "displayName": "Partner",
-        "type": "string",
-        "joinEligible": false,
-        "filterEligible": true,
-        "area" : null,
-        "displayFolder" : "Folder_2",
-        "allowFiltering" : false
-      },
-      {
-        "columnName": "AFFILIATE_displayName",
-        "displayName": "Affiliate",
-        "type": "string",
-        "joinEligible": false,
-        "filterEligible": true,
-        "checked": false,
-        "area" : null,
-        "displayFolder" : "Folder_2",
-        "allowFiltering" : false
-      },
-      {
-        "columnName": "ORDER_RECEIVED_DATE_MOTNH",
-        "displayName": "Order Received MONTH",
-        "joinEligible": false,
-        "filterEligible": false,
-        "area" : null,
-        "displayFolder" : "Folder_1",
-        "allowFiltering" : false,
-        "type": "date",
-        "groupInterval":"month"
-      },
-      {
-        "columnName": "ORDER_RECEIVED_DATE_DAY",
-        "displayName": "Order Received DAY",
-        "joinEligible": false,
-        "filterEligible": false,
-        "area" : null,
-        "displayFolder" : "Folder_1",
-        "allowFiltering" : false,
-        "type": "date",
-        "groupInterval":"day"
-      },
-      {
-        "columnName": "ORDER_COMPLETION_TIME",
-        "displayName": "Order Completion Time",
-        "type": "int",
-        "joinEligible": false,
-        "filterEligible": true,
-        "area" : null,
-        "displayFolder" : "Folder_1",
-        "allowFiltering" : false
-      },
-      {
-        "columnName": "REASON_DESC",
-        "displayName": "Order Cancel Reason",
-        "type": "string",
-        "joinEligible": false,
-        "filterEligible": true,
-        "area" : null,
-        "displayFolder" : "Folder_1",
-        "allowFiltering" : false
-      },
-      {
-        "columnName": "ORDER_CANCELLATION_TIME",
-        "displayName": "Order Cancellation Time",
-        "type": "int",
-        "joinEligible": false,
-        "filterEligible": true,
-        "area" : null,
-        "displayFolder" : "Folder_1",
-        "allowFiltering" : false
-      },
-      {
-        "columnName": "ORDER_TYPE",
-        "displayName": "Order Type",
-        "type": "string",
-        "joinEligible": false,
-        "filterEligible": true,
-        "area" : null,
-        "displayFolder" : "Folder_1",
-        "allowFiltering" : false
-      },
-      {
-        "columnName": "ORD_OM_STATUS",
-        "displayName": "Order Status",
-        "joinEligible": false,
-        "filterEligible": true,
-        "area" : null,
-        "displayFolder" : "Folder_1",
-        "allowFiltering" : false
-      },
-      {
-        "columnName": "REGION",
-        "displayName": "Region",
-        "type": "string",
-        "joinEligible": false,
-        "filterEligible": true,
-        "area" : null,
-        "displayFolder" : "Folder_1",
-        "allowFiltering" : false
-      },
-      {
-        "columnName": "total_price",
-        "displayName": "Total Price",
-        "type": "double",
-        "joinEligible": false,
-        "filterEligible": false,
-        "area" : null,
-        "allowFiltering" : false
-      }
-      ]
-    }
-  ]
+  }
 },
  {
-  "_id" : "semantic_data_345679235",
-  "data_security_key" : "20170612ATT",
-  "metric_name" : "Products  (Only product view)",
-  "customer_code" : "ATT",
+  "id" : "semantic_data_345679235",
+  "dataSecurityKey" : "20170612ATT",
+  "type" : "semantic",
+  "metricName" : "Products  (Only product view)",
+  "customerCode" : "ATT",
   "disabled" : "false",
   "checked" : "false",
   "supports":
@@ -203,76 +55,18 @@
   ],
   "repository":
   {
-    "storage_type" : "ES",
+    "storageType" : "ES",
     "index_name" : "demo_order_latest_prc_batch",
     "type" : "order",
     "URL" : "https://sncradmin:xuw3dUraHapret@razorinsights-trial.razorsight.com/esuat/"
-  },
-  "artifacts":
-  [
-    {
-    "artifact_name": "Products",
-    "columns" :
-    [
-      {
-        "column_name": "PRODUCT_ID",
-        "display_name": "Product ID",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "PRODUCT_DISPLAY_NAME",
-        "display_name": "Product Name",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": true
-      },
-      {
-        "column_name": "PRODUCT_DESC",
-        "display_name": "Product Description",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": true
-      },
-      {
-        "column_name": "PRODUCT_TYPES",
-        "display_name": "Product Type",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": true
-
-      },
-      {
-        "column_name": "PRODUCT_COMPLETION_TIME",
-        "display_name": "Product Completion Time",
-        "alias_name": "",
-        "type": "int",
-        "join_eligible": false,
-        "filter_eligible": true
-      },
-      {
-        "column_name": "BUNDLE_TYPE",
-        "display_name": "Product Bundle",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": true
-
-      }
-      ]
-    }
-    ]
+  }
 },
  {
-  "_id" : "semantic_data_345679236",
-  "data_security_key" : "20170612ATT",
-  "metric_name" : "Customers (Only customer view)",
-  "customer_code" : "ATT",
+  "id" : "semantic_data_345679236",
+  "dataSecurityKey" : "20170612ATT",
+  "type" : "semantic",
+  "metricName" : "Customers (Only customer view)",
+  "customerCode" : "ATT",
   "disabled" : "false",
   "checked" : "false",
   "supports":
@@ -292,93 +86,18 @@
   ],
   "repository":
   {
-    "storage_type" : "ES",
+    "storageType" : "ES",
     "index_name" : "demo_order_latest_prc_batch",
     "type" : "order",
     "URL" : "https://sncradmin:xuw3dUraHapret@razorinsights-trial.razorsight.com/esuat/"
-  },
-  "artifacts":
-  [
-    {
-    "artifact_name": "Customers",
-    "columns" :
-    [
-      {
-        "column_name": "CUSTOMER_ID",
-        "display_name": "Customer ID",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": true,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "STATE_NAME",
-        "display_name": "Customer State",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": true
-      },
-      {
-        "column_name": "FIRST_NAME",
-        "display_name": "First Name",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "LAST_NAME",
-        "display_name": "Last Name",
-        "alias_name": "",
-        "type": "string",
-        "x-axis": true,
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "HOME_PHONE",
-        "display_name": "Home Phone",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-        },
-      {
-        "column_name": "WORK_PHONE",
-        "display_name": "Work Phone",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "ENR_LOCATION_ADDRESS",
-        "display_name": "Location Address",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "ENR_CUSTOMER_INFO",
-        "display_name": "Customer Info",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      }
-      ]
-    }
-    ]
+  }
 },
  {
-  "_id" : "semantic_data_345679237",
-  "data_security_key" : "20170612ATT",
-  "metric_name" : "Orders and Products (Order and product view)",
-  "customer_code" : "ATT",
+  "id" : "semantic_data_345679237",
+  "dataSecurityKey" : "20170612ATT",
+  "type" : "semantic",
+  "metricName" : "Orders and Products (Order and product view)",
+  "customerCode" : "ATT",
   "disabled" : "false",
   "checked" : "false",
   "supports":
@@ -398,149 +117,18 @@
   ],
   "repository":
   {
-    "storage_type" : "ES",
+    "storageType" : "ES",
     "index_name" : "demo_order_latest_prc_batch",
     "type" : "order",
     "URL" : "https://sncradmin:xuw3dUraHapret@razorinsights-trial.razorsight.com/esuat/"
-  },
-  "artifacts":
-  [
-    {
-    "artifact_name": "Orders",
-    "columns" :
-    [
-      {
-        "column_name": "CUSTOMER_ID",
-        "display_name": "Customer ID",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": true,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "STATE_NAME",
-        "display_name": "Customer State",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": true
-      },
-      {
-        "column_name": "FIRST_NAME",
-        "display_name": "First Name",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "LAST_NAME",
-        "display_name": "Last Name",
-        "alias_name": "",
-        "type": "string",
-        "x-axis": true,
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "HOME_PHONE",
-        "display_name": "Home Phone",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-        },
-      {
-        "column_name": "WORK_PHONE",
-        "display_name": "Work Phone",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "ENR_LOCATION_ADDRESS",
-        "display_name": "Location Address",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "ENR_CUSTOMER_INFO",
-        "display_name": "Customer Info",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      }
-      ]
-    },
-    {
-    "artifact_name": "Products",
-    "columns" :
-    [
-      {
-        "column_name": "PRODUCT_ID",
-        "display_name": "Product ID",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "PRODUCT_DISPLAY_NAME",
-        "display_name": "Product Name",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": true
-      },
-      {
-        "column_name": "PRODUCT_DESC",
-        "display_name": "Product Description",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": true
-      },
-      {
-        "column_name": "PRODUCT_TYPES",
-        "display_name": "Product Type",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": true
-
-      },
-      {
-        "column_name": "PRODUCT_COMPLETION_TIME",
-        "display_name": "Product Completion Time",
-        "alias_name": "",
-        "type": "int",
-        "join_eligible": false,
-        "filter_eligible": true
-      },
-      {
-        "column_name": "BUNDLE_TYPE",
-        "display_name": "Product Bundle",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": true
-
-      }
-      ]
-    }
-    ]
+  }
 },
  {
-  "_id" : "semantic_data_345679238",
-  "data_security_key" : "20170612ATT",
-  "metric_name" : "Orders, Products and Customers (All views)",
-  "customer_code" : "ATT",
+  "id" : "semantic_data_345679238",
+  "dataSecurityKey" : "20170612ATT",
+  "type" : "semantic",
+  "metricName" : "Orders, Products and Customers (All views)",
+  "customerCode" : "ATT",
   "disabled" : "false",
   "checked" : "false",
   "supports":
@@ -560,215 +148,10 @@
   ],
   "repository":
   {
-    "storage_type" : "ES",
+    "storageType" : "ES",
     "index_name" : "demo_order_latest_prc_batch",
     "type" : "order",
     "URL" : "https://sncradmin:xuw3dUraHapret@razorinsights-trial.razorsight.com/esuat/"
-  },
-  "artifacts":
-  [
-    {
-    "artifact_name": "Orders",
-    "columns" :
-    [
-      {
-        "column_name": "CUSTOMER_ID",
-        "display_name": "Customer ID",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": true,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "STATE_NAME",
-        "display_name": "Customer State",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": true
-      },
-      {
-        "column_name": "FIRST_NAME",
-        "display_name": "First Name",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "LAST_NAME",
-        "display_name": "Last Name",
-        "alias_name": "",
-        "type": "string",
-        "x-axis": true,
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "HOME_PHONE",
-        "display_name": "Home Phone",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-        },
-      {
-        "column_name": "WORK_PHONE",
-        "display_name": "Work Phone",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "ENR_LOCATION_ADDRESS",
-        "display_name": "Location Address",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "ENR_CUSTOMER_INFO",
-        "display_name": "Customer Info",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      }
-      ]
-    },
-    {
-    "artifact_name": "Products",
-    "columns" :
-    [
-      {
-        "column_name": "PRODUCT_ID",
-        "display_name": "Product ID",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "PRODUCT_DISPLAY_NAME",
-        "display_name": "Product Name",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": true
-      },
-      {
-        "column_name": "PRODUCT_DESC",
-        "display_name": "Product Description",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": true
-      },
-      {
-        "column_name": "PRODUCT_TYPES",
-        "display_name": "Product Type",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": true
-
-      },
-      {
-        "column_name": "PRODUCT_COMPLETION_TIME",
-        "display_name": "Product Completion Time",
-        "alias_name": "",
-        "type": "int",
-        "join_eligible": false,
-        "filter_eligible": true
-      },
-      {
-        "column_name": "BUNDLE_TYPE",
-        "display_name": "Product Bundle",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": true
-
-      }
-      ]
-    },
-    {
-    "artifact_name": "Customers",
-    "columns" :
-    [
-      {
-        "column_name": "CUSTOMER_ID",
-        "display_name": "Customer ID",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": true,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "STATE_NAME",
-        "display_name": "Customer State",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": true
-      },
-      {
-        "column_name": "FIRST_NAME",
-        "display_name": "First Name",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "LAST_NAME",
-        "display_name": "Last Name",
-        "alias_name": "",
-        "type": "string",
-        "x-axis": true,
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "HOME_PHONE",
-        "display_name": "Home Phone",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-        },
-      {
-        "column_name": "WORK_PHONE",
-        "display_name": "Work Phone",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "ENR_LOCATION_ADDRESS",
-        "display_name": "Location Address",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      },
-      {
-        "column_name": "ENR_CUSTOMER_INFO",
-        "display_name": "Customer Info",
-        "alias_name": "",
-        "type": "string",
-        "join_eligible": false,
-        "filter_eligible": false
-      }
-      ]
-    }
-    ]
+  }
 }
 ]

@@ -23,7 +23,8 @@ export function AnalyzeService($http, $timeout, $q) {
     getSemanticLayerData,
     chartBe2Fe,
     chartFe2Be,
-    getPivotData
+    getPivotData,
+    createAnalysis
   };
 
   function getAnalyses(category, query) {
@@ -102,6 +103,19 @@ export function AnalyzeService($http, $timeout, $q) {
 
   function getSemanticLayerData() {
     return $http.get('/api/analyze/semanticLayerData').then(fpGet('data'));
+  }
+
+  function createAnalysis(metricId) {
+    const payload = {
+      action: 'read',
+      keys: [{
+        type: 'semantic',
+        analysisType: 'pivot',
+        module: 'analyze',
+        id: metricId
+      }]
+    };
+    return $http.post('/api/analyze/createAnalysis', payload).then(fpGet('data'));
   }
 
   /**
