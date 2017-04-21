@@ -292,7 +292,7 @@ object DataObject{
   }
 
 
-  val searchFields = Map("name" -> "String", "owner" -> "String", "application" -> "String", "NodeId" -> "String")
+  val searchFields = Map("name" -> "String", "owner" -> "String", "application" -> "String", "id" -> "String")
 
   val requiredFields = List("name", "type", "owner", "partition_type")
 

@@ -36,20 +36,19 @@ public class AnalysisExecutionRunner {
                     ResponseConverter.convertToJavaMapList(exec.handleExecuteRequest());
             headers.forEach( h ->
             {
-                String analysisId = (String) h.get("analysisId");
                 String nodeId = (String) h.get("NodeId");
-                if (analysisId == null || analysisId.isEmpty())
+                if (nodeId == null || nodeId.isEmpty())
                 {
-                    System.err.println("Could not get analysisID from retrieved result. Skip analysisID = " + analysisId);
+                    System.err.println("Could not get Analysis ID from retrieved result. Skip analysisID = " + nodeId);
                     return;
                 }
-                AnalysisExecutionHandler aeh = new AnalysisExecutionHandler(nodeId, analysisId);
+                AnalysisExecutionHandler aeh = new AnalysisExecutionHandler(nodeId);
                 try {
                     er.startSQLExecutor(aeh);
-                    String analysisResultId = er.getPredefResultRowID(analysisId);
-                    er.waitForCompletion(analysisId, aeh.getWaitTime());
+                    String analysisResultId = er.getPredefResultRowID(nodeId);
+                    er.waitForCompletion(nodeId, aeh.getWaitTime());
                     aeh.handleResult(outStream);
-                    logger.debug("Execution: AnalysisID = " + analysisId + ", Result Row ID: " + analysisResultId );
+                    logger.debug("Execution: Analysis ID = " + nodeId + ", Result Row ID: " + analysisResultId );
                 } catch (Exception e) {
                     logger.error("Executing exception: ", e);
                 }

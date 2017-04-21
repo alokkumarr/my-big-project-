@@ -1,7 +1,7 @@
 {
 	"contents": {
 		"keys": {
-			"NodeId": "ATT::analyze::FT101"
+			"id": "ATT::analyze::FT101"
 		},
 		"action": "read"
 	}

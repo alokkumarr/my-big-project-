@@ -338,7 +338,7 @@ declare -r app_home="$(realpath "$(dirname "$real_script_path")")"
 # TODO - Check whether this is ok in cygwin...
 declare -r lib_dir="$(realpath "${app_home}/../lib")"
 declare -r conf_dir="$(realpath "${app_home}/../conf")"
-declare -r log_dir="$(realpath "${app_home}/../var/log")"
+declare -r log_dir="$(realpath "/var/saw/service/log")"
 
 APPLICATION_HOME=$(cd "${app_home}/.."; pwd -P)
 export APPLICATION_HOME

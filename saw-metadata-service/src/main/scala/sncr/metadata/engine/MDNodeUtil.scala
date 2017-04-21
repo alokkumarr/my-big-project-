@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 import org.apache.hadoop.hbase.util.Bytes
-import org.json4s.JsonAST.JValue
+import org.json4s.JsonAST.{JBool, JInt, JLong, JValue}
 import org.json4s._
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
@@ -14,7 +14,7 @@ import org.slf4j.{Logger, LoggerFactory}
   */
 object MDNodeUtil {
 
-  val m_log: Logger = LoggerFactory.getLogger("MDNodeUtil")
+  val m_log: Logger = LoggerFactory.getLogger("sncr.metadata.MDNodeUtil")
   import MDObjectStruct.formats
 
 
@@ -90,5 +90,23 @@ object MDNodeUtil {
       case _ => Map.empty
     }
   }
+
+  def extractKeysAsJValue(elem: JValue): Map[String, JValue]  = {
+    elem match{
+      case x: JObject => x.obj.toMap
+      case a: JArray => a.arr.flatMap( array_elem => MDNodeUtil.extractKeysAsJValue(array_elem)).toMap
+      case _ => Map.empty
+    }
+  }
+
+  def convertKeys(keys : Map[String, JValue]) : Map[String, Any] =
+    keys.map( e =>
+    { e._1 -> (e._2 match{
+      case s:JString => s.s
+      case i:JInt    => i.num.intValue()
+      case b:JBool   => b.value
+      case l:JLong   =>  l.num
+      case _ => null
+    })})
 
 }

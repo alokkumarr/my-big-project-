@@ -76,7 +76,7 @@ class SemanticNode(private var content_element: JValue,
       val put_op = createNode(NodeType.ContentNode.id, classOf[SemanticNode].getName)
 
       setSemanticNodeContent
-      val searchValues : Map[String, Any] = SemanticNode.extractSearchData(content_element) + ("NodeId" -> new String(rowKey))
+      val searchValues : Map[String, Any] = SemanticNode.extractSearchData(content_element) + (Fields.NodeId.toString -> new String(rowKey))
       searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
 
       if (commit(saveContent(saveSearchData(put_op, searchValues))))
@@ -96,7 +96,7 @@ class SemanticNode(private var content_element: JValue,
       val (res, msg ) = selectRowKey(keys)
       if (res != Success.id) return (res, msg)
       setSemanticNodeContent
-      val searchValues : Map[String, Any] = SemanticNode.extractSearchData(content_element) + ("NodeId" -> new String(rowKey))
+      val searchValues : Map[String, Any] = SemanticNode.extractSearchData(content_element) + (Fields.NodeId.toString -> new String(rowKey))
       searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
 
       if (commit(saveRelation(saveContent(saveSearchData(update, searchValues)))))

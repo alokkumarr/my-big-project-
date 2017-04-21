@@ -15,11 +15,12 @@ import sncr.metadata.engine.MDObjectStruct._
 import sncr.metadata.engine.{Fields, MetadataDictionary}
 import sncr.saw.common.config.SAWServiceConfig
 
-class AnalysisExecutionHandler(val nodeId : String, val analysisId: String) {
+class AnalysisExecutionHandler(val nodeId : String) {
 
   var status: String = "Unknown"
 
   def getStatus: String = status
+  def getRowID : String = nodeId
 
   val dfrm: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
   val ldt: LocalDateTime = LocalDateTime.now()
@@ -28,16 +29,15 @@ class AnalysisExecutionHandler(val nodeId : String, val analysisId: String) {
   protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisExecutionHandler].getName)
   private val conf: Config = SAWServiceConfig.spark_conf
 
-  def getAnalysisId = analysisId
+
   var analysisResultNodeID: String = null
 
   private val inlineDSLimitBytes: Int = conf.getInt("sql-executor.inline-data-store-limit-bytes")
   private val inlineDSLimitRows: Int = conf.getInt("sql-executor.inline-data-store-limit-rows")
 
-  m_log debug s"Process execution with node: $nodeId and analysis id = $analysisId"
 
-  val sqlExecInputFilename = conf.getString("sql-executor.input-file-location") + Path.SEPARATOR + analysisId.replace(MetadataDictionary.separator, "-") + "_" + System.nanoTime() + ".in"
-  val resultExecOutputFile = conf.getString("sql-executor.result-file-location") + Path.SEPARATOR + analysisId.replace(MetadataDictionary.separator, "-") + "_" + System.nanoTime() + ".out"
+  val sqlExecInputFilename = conf.getString("sql-executor.input-file-location") + Path.SEPARATOR + nodeId.replace(MetadataDictionary.separator, "-") + "_" + System.nanoTime() + ".in"
+  val resultExecOutputFile = conf.getString("sql-executor.result-file-location") + Path.SEPARATOR + nodeId.replace(MetadataDictionary.separator, "-") + "_" + System.nanoTime() + ".out"
 
   def getWaitTime : Int = conf.getInt("sql-executor.wait-time")
 
