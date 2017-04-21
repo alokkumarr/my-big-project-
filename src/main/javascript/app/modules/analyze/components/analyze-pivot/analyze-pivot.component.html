@@ -27,30 +27,43 @@
 
   <analyze-dialog-content>
     <analyze-filter-sidenav></analyze-filter-sidenav>
-    <analyze-pivot-settings settings="$ctrl.settings" on-change="$ctrl.applyFieldSettings(field, action)"></analyze-pivot-settings>
-    <div layout="column" style="overflow: auto">
-      <div layout="row" class="ard_toolbar">
-        <span class="ard_toolbar-text" flex
+    <analyze-pivot-settings on-apply-field-settings="$ctrl.onApplyFieldSettings()"
+                            field-chooser-options="$ctrl.fieldChooserOptions">
+    </analyze-pivot-settings>
+
+    <div layout="column">
+      <div layout="row" class="ard_toolbar" layou="space-between">
+
+        <md-button ng-click="$ctrl.toggleSettingsSidenav()" flex="5">
+          <md-icon md-font-icon="icon-menu"></md-icon>
+        </md-button>
+
+        <span class="ard_toolbar-text" flex="25"
               translate="PIVOT"></span>
 
-        <div class="ard_toolbar-actions" flex>
-          <md-button ng-click="$ctrl.openDescriptionModal($event)">
+        <div class="ard_toolbar-actions" flex="70">
+          <md-button class="btn-primary" ng-click="$ctrl.onRefreshData()">
+            <span translate="REFRESH_DATA"></span>
+          </md-button>
+
+          <md-button class="action" ng-click="$ctrl.openDescriptionModal($event)">
             <md-icon md-font-icon="icon-description"></md-icon>
             <span translate="DESCRIPTION"></span>
           </md-button>
 
-          <md-button ng-click="$ctrl.openPreviewModal($event)">
+          <md-button class="action" ng-click="$ctrl.openPreviewModal($event)">
             <md-icon md-font-icon="icon-full-screen"></md-icon>
             <span translate="PREVIEW"></span>
           </md-button>
 
-          <md-button ng-click="$ctrl.openSortModal($event)"
-                     ng-disabled="$ctrl.isSortDisabled()">
+          <md-button class="action" ng-click="$ctrl.openSortModal($event)"
+                     ng-disabled="!$ctrl.sortFields">
             <md-icon md-font-icon="icon-sort"></md-icon>
             <span translate="SORT"></span>
           </md-button>
 
-          <md-button ng-click="$ctrl.openFilterSidenav()">
+          <md-button class="action" ng-click="$ctrl.openFilterSidenav()"
+                     ng-disabled="!$ctrl.filters">
             <md-icon md-font-icon="icon-filter"></md-icon>
             <span translate="FILTER"></span>
           </md-button>
@@ -63,7 +76,6 @@
           <pivot-grid updater="$ctrl.pivotGridUpdater" send-fields="$ctrl.onGetFields(fields)"></pivot-grid>
         </md-card-content>
       </md-card>
-
     </div>
   </analyze-dialog-content>
 </analyze-dialog>

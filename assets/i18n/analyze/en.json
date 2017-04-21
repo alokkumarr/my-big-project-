@@ -1,6 +1,7 @@
 {
   "ANALYZE": "ANALYZE",
   "ANALYSIS": "ANALYSIS",
+  "APPLY_SETTINGS": "Apply settings",
   "CREATE_ANALYSIS": "Create Analysis",
   "CHOOSE_FIELDS_ABOVE_TO_PREVIEW_YOUR_REPORT": "Choose fields above to preview your report.",
   "CHOOSE_FIELDS_TO_SHOW_IN_YOUR_REPORT": "Choose fields to show in your report",
@@ -14,6 +15,7 @@
   "NO_IMPLEMENTED_TEMPLATE_YET": "No implemented template yet!",
   "ORDER_FULFILLMENT": "Order Fulfillment",
   "OTHER_PUBLISHED_ANALYSES": "Other Published Analyses",
+  "PIVOT_SETTINGS": "Pivot Settings",
   "PUBLISH_ANALYSIS": "Publish Analysis",
   "PUBLISHED_ANALYSES": "Published Analyses",
   "PUBLISH_ONCE": "Publish Once",

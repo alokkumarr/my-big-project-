@@ -91,7 +91,6 @@ $header-bar-height: 71px;
 .render-content {
   width: 100%;
   overflow: hidden;
-  padding: 0 15px 30px;
 
   ui-view {
     display: flex;
