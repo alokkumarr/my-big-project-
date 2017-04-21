@@ -14,7 +14,7 @@ import sncr.metadata.engine.{MDNodeUtil, tables}
 import sncr.metadata.engine.ProcessingResult._
 import sncr.analysis.execution.{AnalysisExecutionRunner, ExecutionTaskHandler, ProcessExecutionResult}
 import model.QueryBuilder
-import model.QueryException
+import model.ClientException
 import org.apache.hadoop.hbase.util.Bytes
 import sncr.metadata.engine.SearchMetadata._
 
@@ -27,6 +27,14 @@ class ANA extends BaseServiceProvider {
   val executorRunner = new ExecutionTaskHandler(1)
 
   override def process(txt: String): Result = {
+    try {
+      doProcess(txt)
+    } catch {
+      case ClientException(message) => userError(message)
+    }
+  }
+
+  private def doProcess(txt: String): Result = {
     val json = parse(txt)
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
     val response = action match {
@@ -80,8 +88,16 @@ class ANA extends BaseServiceProvider {
         throw new RuntimeException("Unknown action: " + action)
       }
     }
-    val playJson = Json.parse(compact(render(response)))
-    Results.ok(playJson)
+    Results.ok(playJson(response))
+  }
+
+  private def userError(message: String): Result = {
+    val response: JObject = ("error", ("message", message))
+    Results.badRequest(playJson(response))
+  }
+
+  private def playJson(json: JValue) = {
+    Json.parse(compact(render(json)))
   }
 
   def extractAnalysisId(json: JValue) = {
