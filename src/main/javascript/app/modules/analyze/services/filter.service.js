@@ -99,23 +99,23 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
   function getFrontEnd2BackEndFilterMapper() {
     return frontEndFilter => {
       const backEndFilter = {
-        column_name: frontEndFilter.name,
+        columnName: frontEndFilter.name,
         label: frontEndFilter.label,
-        table_name: frontEndFilter.tableName,
-        boolean_criteria: frontEndFilter.booleanCriteria,
-        filter_type: frontEndFilter.type
+        tableName: frontEndFilter.tableName,
+        booleanCriteria: frontEndFilter.booleanCriteria,
+        filterType: frontEndFilter.type
       };
 
       if (frontEndFilter.type === 'int' || frontEndFilter.type === 'double') {
         backEndFilter.operator = frontEndFilter.operator;
-        backEndFilter.search_conditions =
+        backEndFilter.searchConditions =
           frontEndFilter.operator === OPERATORS.BETWEEN ?
           [frontEndFilter.model.otherValue, frontEndFilter.model.value] :
           [frontEndFilter.model.value];
 
       } else if (frontEndFilter.type === 'string') {
         backEndFilter.operator = null;
-        backEndFilter.search_conditions = pipe(
+        backEndFilter.searchConditions = pipe(
           // transform the model object to an array of strings
           toPairs,
           // filter only the ones that are truthy
@@ -135,26 +135,26 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
   function getBackEnd2FrontEndFilterMapper() {
     return backEndFilter => {
       const frontEndFilter = {
-        name: backEndFilter.column_name,
+        name: backEndFilter.columnName,
         label: backEndFilter.label,
-        tableName: backEndFilter.table_name,
-        booleanCriteria: backEndFilter.boolean_criteria,
-        type: backEndFilter.filter_type
+        tableName: backEndFilter.tableName,
+        booleanCriteria: backEndFilter.booleanCriteria,
+        type: backEndFilter.filterType
       };
 
-      if (backEndFilter.filter_type === 'int' || backEndFilter.filter_type === 'double') {
+      if (backEndFilter.filterType === 'int' || backEndFilter.filterType === 'double') {
         frontEndFilter.operator = backEndFilter.operator;
         frontEndFilter.model = {
           otherValue: backEndFilter.operator === OPERATORS.BETWEEN ?
-            backEndFilter.search_conditions[0] : null,
+            backEndFilter.searchConditions[0] : null,
 
           value: backEndFilter.operator === OPERATORS.BETWEEN ?
-            backEndFilter.search_conditions[1] :
-            backEndFilter.search_conditions[0]
+            backEndFilter.searchConditions[1] :
+            backEndFilter.searchConditions[0]
         };
-      } else if (backEndFilter.filter_type === 'string') {
+      } else if (backEndFilter.filterType === 'string') {
         // transform a string of arrays to an object with the strings as keys
-        frontEndFilter.model = transfrom(backEndFilter.search_conditions,
+        frontEndFilter.model = transfrom(backEndFilter.searchConditions,
           (model, value) => {
             model[value] = true;
           },
@@ -167,16 +167,16 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
 
   function getChartSetttingsToFiltersMapper(gridData) {
     return pipe(
-      filter(get('filter_eligible')),
+      filter(get('filterEligible')),
       map(field => {
         return {
           tableName: (field.table ? field.table.name : field.tableName),
-          label: field.alias || field.displayName || field.display_name,
-          name: field.name || field.column_name,
+          label: field.alias || field.displayName || field.displayName,
+          name: field.name || field.columnName,
           type: field.type,
           model: null,
           booleanCriteria: DEFAULT_BOOLEAN_CRITERIA,
-          items: field.type === 'string' ? uniq(map(get(field.name || field.column_name), gridData)) : null
+          items: field.type === 'string' ? uniq(map(get(field.name || field.columnName), gridData)) : null
         };
       }));
   }

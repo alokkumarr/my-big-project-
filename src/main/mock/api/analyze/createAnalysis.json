@@ -35,8 +35,8 @@
           {
             "artifactName": "Orders",
             "artifactPosition": [
-              500,
-              400
+              0,
+              0
             ],
             "artifactAttributes": [
               {
@@ -46,8 +46,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": true,
-                "filterEigible": false,
+                "joinEligible": true,
+                "filterEligible": false,
                 "checked": false
               },
               {
@@ -57,8 +57,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": true,
-                "filterEigible": false,
+                "joinEligible": true,
+                "filterEligible": false,
                 "checked": false
               },
 
@@ -69,8 +69,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": false,
+                "joinEligible": false,
+                "filterEligible": false,
                 "checked": false
               },
               {
@@ -80,8 +80,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": true,
+                "joinEligible": false,
+                "filterEligible": true,
                 "checked": false
               },
               {
@@ -91,8 +91,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": true,
+                "joinEligible": false,
+                "filterEligible": true,
                 "checked": false
               },
 
@@ -103,8 +103,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": false,
+                "joinEligible": false,
+                "filterEligible": false,
                 "checked": false
               },
               {
@@ -114,8 +114,8 @@
                 "type": "int",
                 "yAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": true,
+                "joinEligible": false,
+                "filterEligible": true,
                 "checked": false
               },
               {
@@ -125,8 +125,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": true,
+                "joinEligible": false,
+                "filterEligible": true,
                 "checked": false
               },
               {
@@ -136,8 +136,8 @@
                 "type": "int",
                 "yAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": true,
+                "joinEligible": false,
+                "filterEligible": true,
                 "checked": false
               },
               {
@@ -147,8 +147,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": true,
+                "joinEligible": false,
+                "filterEligible": true,
                 "checked": false
               },
               {
@@ -158,8 +158,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": true,
+                "joinEligible": false,
+                "filterEligible": true,
                 "checked": false
               },
               {
@@ -169,8 +169,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": true,
+                "joinEligible": false,
+                "filterEligible": true,
                 "checked": false
               }
 
@@ -178,9 +178,9 @@
 
 
             ],
-            "sql_builder": {
-              "group_by_columns": [],
-              "order_by_columns": [],
+            "sqlBuilder": {
+              "groupByColumns": [],
+              "orderByColumns": [],
               "joins": [
                 {
                   "type": "inner",
@@ -238,14 +238,25 @@
             ],
             "artifactAttributes": [
               {
+                "columnName": "ORDER_NUMBER",
+                "displayName": "Order Number",
+                "aliasName": "",
+                "type": "string",
+                "xAxis": true,
+                "hide": false,
+                "joinEligible": true,
+                "filterEligible": false,
+                "checked": false
+              },
+              {
                 "columnName": "PRODUCTid",
                 "displayName": "Product ID",
                 "aliasName": "",
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": false,
+                "joinEligible": false,
+                "filterEligible": false,
                 "checked": false
               },
               {
@@ -255,8 +266,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": true,
+                "joinEligible": false,
+                "filterEligible": true,
                 "checked": false
               },
               {
@@ -266,8 +277,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": true,
+                "joinEligible": false,
+                "filterEligible": true,
                 "checked": false
               },
               {
@@ -277,8 +288,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": true,
+                "joinEligible": false,
+                "filterEligible": true,
                 "checked": false
               },
               {
@@ -288,8 +299,8 @@
                 "type": "int",
                 "yAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": true,
+                "joinEligible": false,
+                "filterEligible": true,
                 "checked": false
               },
               {
@@ -299,14 +310,14 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": true,
+                "joinEligible": false,
+                "filterEligible": true,
                 "checked": false
               }
             ],
-            "sql_builder": {
-              "group_by_columns": [],
-              "order_by_columns": [],
+            "sqlBuilder": {
+              "groupByColumns": [],
+              "orderByColumns": [],
               "joins": []
             }
           },
@@ -324,8 +335,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": true,
-                "filterEigible": false,
+                "joinEligible": true,
+                "filterEligible": false,
                 "checked": false
               },
               {
@@ -335,8 +346,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": true,
+                "joinEligible": false,
+                "filterEligible": true,
                 "checked": false
               },
               {
@@ -346,8 +357,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": false,
+                "joinEligible": false,
+                "filterEligible": false,
                 "checked": false
               },
               {
@@ -357,8 +368,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": false,
+                "joinEligible": false,
+                "filterEligible": false,
                 "checked": false
               },
               {
@@ -368,8 +379,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": true,
-                "joinEigible": false,
-                "filterEigible": false,
+                "joinEligible": false,
+                "filterEligible": false,
                 "checked": false
               },
               {
@@ -379,8 +390,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": true,
-                "joinEigible": false,
-                "filterEigible": false,
+                "joinEligible": false,
+                "filterEligible": false,
                 "checked": false
               },
               {
@@ -390,8 +401,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": false,
-                "joinEigible": false,
-                "filterEigible": false,
+                "joinEligible": false,
+                "filterEligible": false,
                 "checked": false
               },
               {
@@ -401,8 +412,8 @@
                 "type": "string",
                 "xAxis": true,
                 "hide": true,
-                "joinEigible": false,
-                "filterEigible": false,
+                "joinEligible": false,
+                "filterEligible": false,
                 "checked": false
               }
             ],

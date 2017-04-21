@@ -14,6 +14,7 @@ export function AnalyzeService($http, $timeout, $q) {
   });
 
   return {
+    createAnalysis,
     getCategories,
     getCategory,
     getMethods,

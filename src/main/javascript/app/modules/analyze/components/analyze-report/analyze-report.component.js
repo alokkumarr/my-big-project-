@@ -78,9 +78,14 @@ export const AnalyzeReportComponent = {
       }
 
       this.unregister = this._$componentHandler.on('$onInstanceAdded', e => {
-        if (e.key === 'ard-canvas') {
-          this.initCanvas(e.instance);
-        }
+        this._AnalyzeService.createAnalysis(this.model).then(data => {
+          const analysis = fpGet('contents.analyze.[0]', data);
+          this.model = assign(this.model, analysis);
+
+          if (e.key === 'ard-canvas') {
+            this.initCanvas(e.instance);
+          }
+        });
       });
     }
 
@@ -223,59 +228,59 @@ export const AnalyzeReportComponent = {
 
       /* eslint-disable camelcase */
       forEach(data, itemA => {
-        const table = model.addTable(itemA.artifact_name);
+        const table = model.addTable(itemA.artifactName);
 
         table.setMeta(itemA);
-        table.setPosition(itemA.artifact_position[0], itemA.artifact_position[1]);
+        table.setPosition(itemA.artifactPosition[0], itemA.artifactPosition[1]);
 
-        forEach(itemA.artifact_attributes, itemB => {
-          const field = table.addField(itemB.column_name);
+        forEach(itemA.artifactAttributes, itemB => {
+          const field = table.addField(itemB.columnName);
 
           field.setMeta(itemB);
-          field.displayName = itemB.display_name;
-          field.alias = itemB.alias_name;
+          field.displayName = itemB.displayName;
+          field.alias = itemB.aliasName;
           field.type = itemB.type;
           field.checked = itemB.checked;
           field.isHidden = Boolean(itemB.hide);
-          field.isJoinEligible = Boolean(itemB.join_eligible);
-          field.isFilterEligible = Boolean(itemB.filter_eligible);
+          field.isJoinEligible = Boolean(itemB.joinEligible);
+          field.isFilterEligible = Boolean(itemB.filterEligible);
         });
       });
 
       forEach(data, itemA => {
-        forEach(itemA.sql_builder.joins, itemB => {
-          const tableA = itemB.criteria[0].table_name;
-          const tableB = itemB.criteria[1].table_name;
+        forEach(itemA.sqlBuilder.joins, itemB => {
+          const tableA = itemB.criteria[0].tableName;
+          const tableB = itemB.criteria[1].tableName;
 
           if (tableA !== tableB) {
             model.addJoin(itemB.type, {
               table: tableA,
-              field: itemB.criteria[0].column_name,
+              field: itemB.criteria[0].columnName,
               side: itemB.criteria[0].side
             }, {
               table: tableB,
-              field: itemB.criteria[1].column_name,
+              field: itemB.criteria[1].columnName,
               side: itemB.criteria[1].side
             });
           }
         });
 
-        forEach(itemA.sql_builder.order_by_columns, itemB => {
+        forEach(itemA.sqlBuilder.orderByColumns, itemB => {
           model.addSort({
-            table: itemA.artifact_name,
-            field: itemB.column_name,
+            table: itemA.artifactName,
+            field: itemB.columnName,
             order: itemB.order
           });
         });
 
-        forEach(itemA.sql_builder.group_by_columns, itemB => {
+        forEach(itemA.sqlBuilder.groupByColumns, itemB => {
           model.addGroup({
-            table: itemA.artifact_name,
+            table: itemA.artifactName,
             field: itemB
           });
         });
 
-        forEach(itemA.sql_builder.filters, backEndFilter => {
+        forEach(itemA.sqlBuilder.filters, backEndFilter => {
           model.addFilter(this._FilterService.getBackEnd2FrontEndFilterMapper()(backEndFilter));
         });
       });
@@ -287,9 +292,9 @@ export const AnalyzeReportComponent = {
       const model = this.canvas.model;
       const result = {
         artifacts: [],
-        sql_builder: {
-          group_by_columns: [],
-          order_by_columns: [],
+        sqlBuilder: {
+          groupByColumns: [],
+          orderByColumns: [],
           joins: [],
           filters: []
         }
@@ -297,9 +302,9 @@ export const AnalyzeReportComponent = {
 
       forEach(model.tables, table => {
         const tableArtifact = {
-          artifact_name: table.name,
-          artifact_position: [table.x, table.y],
-          artifact_attributes: [],
+          artifactName: table.name,
+          artifactPosition: [table.x, table.y],
+          artifactAttributes: [],
           data: []
         };
 
@@ -307,17 +312,17 @@ export const AnalyzeReportComponent = {
 
         forEach(table.fields, field => {
           const fieldArtifact = {
-            column_name: field.meta.column_name,
-            display_name: field.meta.display_name,
-            alias_name: field.alias,
+            columnName: field.meta.columnName,
+            displayName: field.meta.displayName,
+            aliasName: field.alias,
             type: field.meta.type,
             hide: field.isHidden,
-            join_eligible: field.meta.join_eligible,
-            filter_eligible: field.meta.filter_eligible,
+            joinEligible: field.meta.joinEligible,
+            filterEligible: field.meta.filterEligible,
             checked: field.checked
           };
 
-          tableArtifact.artifact_attributes.push(fieldArtifact);
+          tableArtifact.artifactAttributes.push(fieldArtifact);
         });
 
         const joins = filter(model.joins, join => {
@@ -331,18 +336,18 @@ export const AnalyzeReportComponent = {
           };
 
           joinArtifact.criteria.push({
-            table_name: join.leftSide.table.name,
-            column_name: join.leftSide.field.name,
+            tableName: join.leftSide.table.name,
+            columnName: join.leftSide.field.name,
             side: join.leftSide.side
           });
 
           joinArtifact.criteria.push({
-            table_name: join.rightSide.table.name,
-            column_name: join.rightSide.field.name,
+            tableName: join.rightSide.table.name,
+            columnName: join.rightSide.field.name,
             side: join.rightSide.side
           });
 
-          result.sql_builder.joins.push(joinArtifact);
+          result.sqlBuilder.joins.push(joinArtifact);
         });
 
         const sorts = filter(model.sorts, sort => {
@@ -351,12 +356,12 @@ export const AnalyzeReportComponent = {
 
         forEach(sorts, sort => {
           const sortArtifact = {
-            table_name: tableArtifact.artifact_name,
-            column_name: sort.field.name,
+            tableName: tableArtifact.artifactName,
+            columnName: sort.field.name,
             order: sort.order
           };
 
-          result.sql_builder.order_by_columns.push(sortArtifact);
+          result.sqlBuilder.orderByColumns.push(sortArtifact);
         });
 
         const groups = filter(model.groups, group => {
@@ -364,13 +369,13 @@ export const AnalyzeReportComponent = {
         });
 
         forEach(groups, group => {
-          result.sql_builder.group_by_columns.push(group.field.name);
+          result.sqlBuilder.groupByColumns.push(group.field.name);
         });
 
-        result.sql_builder.filters = result.sql_builder.filters.concat(fpMap(
+        result.sqlBuilder.filters = result.sqlBuilder.filters.concat(fpMap(
           this._FilterService.getFrontEnd2BackEndFilterMapper(),
           fpFilter(
-            artifactFilter => artifactFilter.tableName === tableArtifact.artifact_name,
+            artifactFilter => artifactFilter.tableName === tableArtifact.artifactName,
             this.filters.selected
           )
         ));
