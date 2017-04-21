@@ -1,13 +1,17 @@
 import omit from 'lodash/omit';
+import forEach from 'lodash/forEach';
+import set from 'lodash/set';
 import fpMap from 'lodash/fp/map';
 import fpGet from 'lodash/fp/get';
 import filter from 'lodash/filter';
 import find from 'lodash/find';
 import flatMap from 'lodash/flatMap';
 
-export function AnalyzeService($http, $timeout, $q) {
+export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
   'ngInject';
 
+  const MODULE_NAME = 'ANALYZE';
+  const url = AppConfig.api.url;
   let _menuResolver = null;
   const _menu = new Promise(resolve => {
     _menuResolver = resolve;
@@ -40,6 +44,17 @@ export function AnalyzeService($http, $timeout, $q) {
 
   function updateMenu(menu) {
     _menuResolver(menu);
+  }
+
+  function getRequestParams(params = []) {
+    const reqParams = JwtService.getRequestParams();
+
+    set(reqParams, 'contents.keys.module', MODULE_NAME);
+    forEach(params, tuple => {
+      set(reqParams, tuple[0], tuple[1]);
+    });
+
+    return reqParams;
   }
 
   function getAnalysesFor(subCategoryId, opts = {}) {
@@ -160,7 +175,11 @@ export function AnalyzeService($http, $timeout, $q) {
   }
 
   function getSemanticLayerData() {
-    return $http.get('/api/analyze/semanticLayerData').then(fpGet('data'));
+    const params = getRequestParams([
+      ['contents.action', 'search'],
+      ['contents.keys.type', 'semantic']
+    ]);
+    return $http.post(url, params).then(fpGet(`data.contents.[0].${MODULE_NAME}`));
   }
 
   function createAnalysis(metricId, type) {
