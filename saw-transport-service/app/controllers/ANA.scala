@@ -119,18 +119,12 @@ class ANA extends BaseServiceProvider {
   def executeAnalysis(analysisId: String) = {
     /* Placeholder for Spark SQL execution library until available */
 
-    //Create keys to filter records.
-    val keys2 : Map[String, Any] = Map ("id" -> analysisId)
-    val systemKeys : Map[String, Any] = Map.empty   //( syskey_NodeCategory.toString -> classOf[AnalysisNode].getName )
-    // Create executor service
     val er: ExecutionTaskHandler = new ExecutionTaskHandler(1)
     try {
-      val search = simpleSearch(tables.AnalysisMetadata.toString, keys2, systemKeys, "and")
-      val rowKey = Bytes.toString(search.head)
-      val analysisNode = AnalysisNode(rowKey)
+      val analysisNode = AnalysisNode(analysisId)
       if ( analysisNode.getCachedData == null || analysisNode.getCachedData.isEmpty)
         throw new Exception("Could not find analysis node with provided analysis ID.")
-      val aeh: AnalysisExecutionHandler = new AnalysisExecutionHandler(rowKey, analysisId)
+      val aeh: AnalysisExecutionHandler = new AnalysisExecutionHandler(analysisId)
 
       //Start executing Spark SQL
       er.startSQLExecutor(aeh)
