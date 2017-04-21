@@ -13,6 +13,7 @@ export const SidenavComponent = {
       this.$componentHandler = $componentHandler;
       this.$mdSidenav = $mdSidenav;
       this.$timeout = $timeout;
+      this._moduleName = '';
 
       this._sidenavInst = null;
     }
@@ -44,7 +45,15 @@ export const SidenavComponent = {
       }
     }
 
-    update(data) {
+    getMenuHeader() {
+      return {
+        analyze: 'Analyses',
+        observe: 'Dashboards'
+      }[this._moduleName.toLowerCase()] || '';
+    }
+
+    update(data, moduleName = '') {
+      this._moduleName = moduleName;
       this.menu = data;
     }
   }
