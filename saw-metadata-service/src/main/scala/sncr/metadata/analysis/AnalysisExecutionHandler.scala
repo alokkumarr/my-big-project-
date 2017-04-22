@@ -154,10 +154,10 @@ class AnalysisExecutionHandler(val nodeId : String) {
       }
       if (nodeExists) resultNode.delete
 
-      val analysisName = (definition \ "name").extract[String]
-      val analysisId = (definition \ "analysis" \ "id").extract[String]
+      val analysisName = (definition \ "name").extractOpt[String]
+      val analysisId = (definition \ "id").extractOpt[String]
 
-    status = ( jsonResult \ "status" ).extract[String]
+      status = ( jsonResult \ "status" ).extract[String]
 
       var descriptor : JObject = null
 
@@ -175,9 +175,9 @@ class AnalysisExecutionHandler(val nodeId : String) {
         }
 
         descriptor = new JObject(List(
-          JField("name", JString(analysisName)),
-          JField("id", JString(analysisId)),
-          JField("analysisName", JString(analysisName)),
+          JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+          JField("id", JString(analysisId.get)),
+          JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
           JField("sql", JString(sql)),
           JField("execution_result", JString(result)),
           JField("execution_timestamp", JString(timestamp)),
@@ -190,9 +190,9 @@ class AnalysisExecutionHandler(val nodeId : String) {
       else{
         val errorMsg = (jsonResult \ "errorMessage").extract[String]
         descriptor = new JObject(List(
-          JField("name", JString(analysisName)),
-          JField("id", JString(analysisId)),
-          JField("analysisName", JString(analysisName)),
+          JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+          JField("id", JString(analysisId.get)),
+          JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
           JField("sql", JString(sql)),
           JField("execution_result", JString(status)),
           JField("execution_timestamp", JString(timestamp)),
