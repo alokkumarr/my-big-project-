@@ -23,8 +23,6 @@ class AnalysisExecutionHandler(val nodeId : String) {
   def getRowID : String = nodeId
 
   val dfrm: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-  val ldt: LocalDateTime = LocalDateTime.now()
-  val timestamp: String = ldt.format(dfrm)
 
   protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisExecutionHandler].getName)
   private val conf: Config = SAWServiceConfig.spark_conf
@@ -137,78 +135,83 @@ class AnalysisExecutionHandler(val nodeId : String) {
     */
   def handleResult(out: OutputStream = null) : Unit =
   {
-      val readData: String = HFileOperations.readFile(resultExecOutputFile)
-      if (readData == null || readData.isEmpty)
-        throw new Exception("Could not read SparkSQL Executor result file/ file is empty")
+    val readData: String = HFileOperations.readFile(resultExecOutputFile)
+    if (readData == null || readData.isEmpty)
+      throw new Exception("Could not read SparkSQL Executor result file/ file is empty")
 
-      val jsonResult = parse(readData, false, false)
+    val jsonResult = parse(readData, false, false)
 
-      var nodeExists = false
-      try {
-        m_log debug s"Remove result: " + analysisResultNodeID
-        resultNode = AnalysisResult(nodeId, analysisResultNodeID)
-        nodeExists = true
-      }
-      catch{
-        case e : Exception => m_log debug("Tried to load node: ", e)
-      }
-      if (nodeExists) resultNode.delete
+    var nodeExists = false
+    try {
+      m_log debug s"Remove result: " + analysisResultNodeID
+      resultNode = AnalysisResult(nodeId, analysisResultNodeID)
+      nodeExists = true
+    }
+    catch{
+      case e : Exception => m_log debug("Tried to load node: ", e)
+    }
+    if (nodeExists) resultNode.delete
 
-      val analysisName = (definition \ "name").extract[String]
-      val analysisId = (definition \ "analysis" \ "id").extract[String]
+    val analysisName = (definition \ "name").extractOpt[String]
+    val analysisId = (definition \ "id").extractOpt[String]
 
     status = ( jsonResult \ "status" ).extract[String]
 
-      var descriptor : JObject = null
+    var descriptor : JObject = null
 
-      if (status.equalsIgnoreCase("success")) {
-        val schema : (String, JValue) = jsonResult \ "schema" match{
-          case o: JObject => JField("schema", o)
-          case _ => JField("schema", JString("ERROR! Could not extract schema"))
-        }
+    val ldt: LocalDateTime = LocalDateTime.now()
+    val timestamp: String = ldt.format(dfrm)
 
+    var schema : JValue = JNothing
+    if (status.equalsIgnoreCase("success")) {
 
-        val (finalOutputType, finalOutputLocation )= (jsonResult \ "outputTo").extract[String] match {
-          case "inline" => ("json", "inline")
-          case "hdfs" => (outputType, outputLocation)
-          case _ => ("unknown", "unknown")
-        }
+    schema = jsonResult \ "schema" match{
+      case o: JObject =>  o
+      case _ => JObject(JField("metadata", JString("ERROR! Could not extract schema")))
+    }
 
-        descriptor = new JObject(List(
-          JField("name", JString(analysisName)),
-          JField("id", JString(analysisId)),
-          JField("analysisName", JString(analysisName)),
-          JField("sql", JString(sql)),
-          JField("execution_result", JString(result)),
-          JField("execution_timestamp", JString(timestamp)),
-          schema,
-          JField("outputType", JString(finalOutputType)),
-          JField("outputLocation", JString(finalOutputLocation))
-        ))
-        m_log debug s"Create result: with content: ${compact(render(descriptor))}"
+      val (finalOutputType, finalOutputLocation )= (jsonResult \ "outputTo").extract[String] match {
+        case "inline" => ("json", "inline")
+        case "hdfs" => (outputType, outputLocation)
+        case _ => ("unknown", "unknown")
       }
-      else{
-        val errorMsg = (jsonResult \ "errorMessage").extract[String]
-        descriptor = new JObject(List(
-          JField("name", JString(analysisName)),
-          JField("id", JString(analysisId)),
-          JField("analysisName", JString(analysisName)),
-          JField("sql", JString(sql)),
-          JField("execution_result", JString(status)),
-          JField("execution_timestamp", JString(timestamp)),
-          JField("error_message", JString(errorMsg))
-        ))
-      }
+
+      descriptor = new JObject(List(
+        JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+        JField("id", JString(analysisId.get)),
+        JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+        JField("sql", JString(sql)),
+        JField("execution_result", JString(result)),
+        JField("execution_timestamp", JString(timestamp)),
+        JField("outputType", JString(finalOutputType)),
+        JField("outputLocation", JString(finalOutputLocation))
+      ))
+      m_log debug s"Create result: with content: ${compact(render(descriptor))}"
+    }
+    else{
+      val errorMsg = (jsonResult \ "errorMessage").extract[String]
+      descriptor = new JObject(List(
+        JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+        JField("id", JString(analysisId.get)),
+        JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+        JField("sql", JString(sql)),
+        JField("execution_result", JString(status)),
+        JField("execution_timestamp", JString(timestamp)),
+        JField("error_message", JString(errorMsg))
+      ))
+    }
+
     var descriptorPrintable: JValue = null
     resultNode = new AnalysisResult(nodeId,descriptor, analysisResultNodeID)
+
     if (status.equalsIgnoreCase("success")) {
 
       (jsonResult \ "outputTo").extract[String] match {
         case "inline" =>
           jsonResult \ "data" match {
-            case x: JArray => resultNode.addObject("data", x)
+            case x: JArray => resultNode.addObject("data", x, schema)
               descriptorPrintable = descriptor ++ x
-            case o: JObject => resultNode.addObject("data", o)
+            case o: JObject => resultNode.addObject("data", o, schema)
               descriptorPrintable = descriptor ++ o
             case _ => m_log error "Inline data misrepresented"
           }
@@ -218,7 +221,7 @@ class AnalysisExecutionHandler(val nodeId : String) {
           if (!oLoc.equals(outputLocation)) throw new Exception(s"Inconsistency found between Spark SQL Executor and analysis node: $oLoc vs $outputLocation")
           val oType = (jsonResult \ "outputType").extract[String]
           if (!oType.equals(outputType)) throw new Exception(s"Inconsistency found between Spark SQL Executor and analysis node: $oType vs $outputType")
-          resultNode.addObject("dataLocation", oLoc)
+          resultNode.addObject("dataLocation", oLoc, schema)
           descriptorPrintable = new JObject(descriptor.obj ::: List(("dataLocation", JString(oLoc))))
 
         case _ => m_log warn "Data descriptor/data section not found" //throw new Exception("Unsupported data/output type found!")
