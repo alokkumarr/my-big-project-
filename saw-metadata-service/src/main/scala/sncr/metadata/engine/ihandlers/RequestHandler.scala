@@ -296,24 +296,18 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
   {
     val er: ExecutionTaskHandler = new ExecutionTaskHandler(1)
     try {
+      m_log debug s"Analysis ID: $id"
       val analysisNode = AnalysisNode(id)
       if ( analysisNode.getCachedData == null || analysisNode.getCachedData.isEmpty)
           throw new Exception("Could not find analysis node with provided search keys.")
 
-      val analysisId : String =
-        analysisNode.getCachedData("analysisId") match{
-          case i:Int => String.valueOf(i)
-          case s:String => s
-          case _ => throw new Exception("Inappropriate type/value of analysis ID")
-        }
-
       val aeh: AnalysisExecutionHandler = new AnalysisExecutionHandler(id)
       er.startSQLExecutor(aeh)
-      val analysisResultId: String = er.getPredefResultRowID(analysisId)
+      val analysisResultId: String = er.getPredefResultRowID(id)
       m_log debug s"Predefined result ID: $analysisResultId"
 
-      er.waitForCompletion(analysisId, aeh.getWaitTime)
-      val msg = "Execution: AnalysisID = " + analysisId + ", Result Row ID: " + analysisResultId
+      er.waitForCompletion(id, aeh.getWaitTime)
+      val msg = "Execution: AnalysisID = " + id + ", Result Row ID: " + analysisResultId
       aeh.handleResult(outStream)
       respGenerator.build((Success.id, msg + ",  Execution result: " + aeh.getStatus))
     }
@@ -349,18 +343,17 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
           ah = new AnalysisNode(content)
         else
           ah = new AnalysisNode
-        if (base_relation.arr.nonEmpty) {
+          m_log debug s"Raw DO list: $base_relation"
           base_relation.arr.foreach {
-            case o: JObject => {
-              val lNodeID = (o \ "id").extractOrElse[String]("")
-              val lNodeCategory = (o \ "node-category").extractOrElse[String]("")
-              if (lNodeID.nonEmpty && lNodeCategory.nonEmpty) {
-                val rels = ah.addNodeToRelation(lNodeID, lNodeCategory)
-                m_log debug s"Nodes: ${compact(render(rels))}"
-              }
+          case o: JObject => {
+            val lNodeID = (o \ "id").extractOrElse[String]("")
+            val lNodeCategory = (o \ "node-category").extractOrElse[String]("")
+            if (lNodeID.nonEmpty && lNodeCategory.nonEmpty) {
+              val rels = ah.addNodeToRelation(lNodeID, lNodeCategory)
+              m_log debug s"Nodes: ${compact(render(rels))}"
             }
-            case _ => m_log error "Incorrect request structure: base-relation entry, skip it"
           }
+          case _ => m_log error "Incorrect request structure: base-relation entry, skip it"
         }
         respGenerator.build(ah.update(keys))
       }
@@ -392,18 +385,17 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
         val uih = new UINode(content, ui_module, ui_type); respGenerator.build(uih.create)}
       case "AnalysisNode" => {
         val ah = new AnalysisNode(content)
-        if (base_relation.arr.nonEmpty){
-          base_relation.arr.foreach {
-            case o: JObject => {
-              val lNodeID = (o \ "id").extractOrElse[String]("")
-              val lNodeCategory = (o \ "node-category").extractOrElse[String]("")
-              if (lNodeID.nonEmpty && lNodeCategory.nonEmpty) {
-                val rels = ah.addNodeToRelation(lNodeID, lNodeCategory)
-                m_log debug s"Nodes: ${compact(render(rels))}"
-              }
+        m_log debug s"Raw Rels: ${base_relation}"
+        base_relation.arr.foreach {
+          case o: JObject => {
+            val lNodeID = (o \ "id").extractOrElse[String]("")
+            val lNodeCategory = (o \ "node-category").extractOrElse[String]("")
+            if (lNodeID.nonEmpty && lNodeCategory.nonEmpty) {
+              val rels = ah.addNodeToRelation(lNodeID, lNodeCategory)
+              m_log debug s"Nodes: ${compact(render(rels))}"
             }
-            case _ => m_log error "Incorrect request structure: base-relation entry, skip it"
           }
+          case _ => m_log error "Incorrect request structure: base-relation entry, skip it"
         }
         respGenerator.build(ah.write)
       }

@@ -73,7 +73,7 @@ class UIMDRequestHandler(val docAsJson : JValue, val printPretty: Boolean = true
   private var action : String = null
   private val moduleDesc : mutable.HashMap[String, Map[String, List[JValue]]] = new mutable.HashMap[String, Map[String, List[JValue]]]
 
-  def testUIComponent(uicomp: JObject) : Boolean = UINode.remappingAttributes.forall( attr => (uicomp \ attr ).extractOpt[String].nonEmpty)
+  def testUIComponent(uicomp: JObject) : Boolean = UINode.mandatoryAttributes.forall(attr => (uicomp \ attr ).extractOpt[String].nonEmpty)
 
   /**
     * Required to build Hash map of processed objects
