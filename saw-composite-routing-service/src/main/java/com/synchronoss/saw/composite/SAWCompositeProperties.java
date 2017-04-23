@@ -11,7 +11,7 @@ public class SAWCompositeProperties {
 	@Value("${metadata.url}")
 	private String metaDataURL;
 	
-	@Value("${execution.url}")
+	@Value("${analysis.url}")
 	private String executionDataURL;
 
 	@Value("${semantic.url}")
@@ -20,7 +20,7 @@ public class SAWCompositeProperties {
 	@Value("${metadata.context}")
 	private String metaDataContext;
 	
-	@Value("${execution.context}")
+	@Value("${analysis.context}")
 	private String executionDataContext;
 
 	@Value("${semantic.context}")

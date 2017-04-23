@@ -8,8 +8,10 @@
                   "create",
                   "update",
                   "read",
-                  "delete"
-               ],
+                  "delete",
+                  "search",
+                  "execute"
+              ],
                "type":"string"
             },
             "alert":{
@@ -25,7 +27,10 @@
             "keys":{
                "description":"Allows ANY object but describes nothing.",
                "title":"Empty object schema.",
-               "type":"object"
+               "type": "array",
+  				"items": {
+    				"type": "object"
+    				}
             },
             "observe":{
                "description":"Allows ANY array but describes nothing.",

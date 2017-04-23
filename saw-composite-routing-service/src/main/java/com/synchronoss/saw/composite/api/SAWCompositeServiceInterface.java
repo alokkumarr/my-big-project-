@@ -4,12 +4,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.synchronoss.saw.composite.exceptions.AnalyzeModuleSAWException;
-import com.synchronoss.saw.composite.exceptions.CategoriesSAWException;
 import com.synchronoss.saw.composite.exceptions.CommonModuleSAWException;
 import com.synchronoss.saw.composite.exceptions.JSONValidationSAWException;
-import com.synchronoss.saw.composite.model.Payload;
-
-import rx.Single;
+import com.synchronoss.saw.composite.model.RoutingPayload;
 
 /**
  * This interface will define the specification<br/>
@@ -21,22 +18,18 @@ public interface SAWCompositeServiceInterface {
 	
 	
 	
-	public Single<ResponseEntity<Payload>> defaultAnalyze(@RequestBody Payload payload) throws AnalyzeModuleSAWException, JSONValidationSAWException;
+	public RoutingPayload menuItems(@RequestBody RoutingPayload payload) throws CommonModuleSAWException, JSONValidationSAWException;
+	
+	public RoutingPayload newAnalysis(@RequestBody RoutingPayload payload) throws AnalyzeModuleSAWException, JSONValidationSAWException;
 
-	public ResponseEntity<Payload> menuItems(@RequestBody Payload payload) throws CommonModuleSAWException, JSONValidationSAWException;
+	public RoutingPayload createAnalysis(@RequestBody RoutingPayload payload) throws AnalyzeModuleSAWException, JSONValidationSAWException;
 	
-	public ResponseEntity<Payload> newAnalysis(@RequestBody Payload payload) throws AnalyzeModuleSAWException, JSONValidationSAWException;
-
-	public ResponseEntity<Payload> createAnalysis(@RequestBody Payload payload) throws AnalyzeModuleSAWException, JSONValidationSAWException;
+	public ResponseEntity<RoutingPayload> saveAnalysis(@RequestBody RoutingPayload RoutingPayload) throws AnalyzeModuleSAWException, JSONValidationSAWException;
 	
-	public ResponseEntity<Payload> listOfCategories(@RequestBody Payload payload) throws CategoriesSAWException, JSONValidationSAWException;
-
-	public ResponseEntity<Payload> saveAnalysis(@RequestBody Payload payload) throws AnalyzeModuleSAWException, JSONValidationSAWException;
+	public ResponseEntity<RoutingPayload> applySort(@RequestBody RoutingPayload payload) throws AnalyzeModuleSAWException, JSONValidationSAWException;
 	
-	public ResponseEntity<Payload> applySort(@RequestBody Payload payload) throws AnalyzeModuleSAWException, JSONValidationSAWException;
+	public ResponseEntity<RoutingPayload> applyfiter(@RequestBody RoutingPayload payload) throws AnalyzeModuleSAWException, JSONValidationSAWException;
 	
-	public ResponseEntity<Payload> applyfiter(@RequestBody Payload payload) throws AnalyzeModuleSAWException, JSONValidationSAWException;
-	
-	public ResponseEntity<Payload> analyzeByType(@RequestBody Payload payload) throws AnalyzeModuleSAWException, JSONValidationSAWException;
+	public ResponseEntity<RoutingPayload> analyzeByType(@RequestBody RoutingPayload payload) throws AnalyzeModuleSAWException, JSONValidationSAWException;
 }
 
