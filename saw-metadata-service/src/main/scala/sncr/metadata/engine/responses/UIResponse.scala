@@ -1,8 +1,9 @@
-package sncr.metadata.engine
+package sncr.metadata.engine.responses
 
 import org.json4s.JsonAST.{JArray, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
+import sncr.metadata.engine.MDObjectStruct
 
 /**
   * Created by srya0001 on 4/18/2017.
@@ -20,8 +21,8 @@ trait UIResponse extends Response {
     * @param data
     * @return Map - restructured response
     */
-    private def remap(data : List[Map[String, Any]]) : Map[String, List[JObject]] = {
-      val remappedData = new scala.collection.mutable.HashMap[String, List[JObject]]
+    private def remap(data : List[Map[String, Any]]) : Map[String, List[JValue]] = {
+      val remappedData = new scala.collection.mutable.HashMap[String, List[JValue]]
       data.foreach(d => {
           m_log trace s"Content to re-map:   ${d.mkString("{", ", ", "}")}"
           if (d.contains("content")) {
@@ -33,12 +34,10 @@ trait UIResponse extends Response {
               m_log error m
               JObject(Nil)
           }
-          val contentType = if (d.contains("type")) d("type").asInstanceOf[String] else (content \ "type").extractOrElse[String]("UNDEF_type")
           val module = if (d.contains("module")) d("module").asInstanceOf[String] else (content \ "module").extractOrElse[String]("UNDEF_module")
-          val res = JObject((contentType, content))
-          val intermRes :List[JObject] = if (remappedData.contains(module)) remappedData(module) :+ res else List(res)
+          val intermRes :List[JValue] = if (remappedData.contains(module)) remappedData(module) :+ content else List(content)
           remappedData(module) = intermRes
-          m_log trace s"Remapped object: ${pretty(render(res))}"
+          m_log debug s"Remapped object: ${pretty(render(content))}"
         }
         else {
           val m = "Error: No content to re-map"; m_log error m
@@ -52,10 +51,10 @@ trait UIResponse extends Response {
     * @param data - list of nodes retrieved from MDDB
     * @return - a response wrapped into a single JSON object
     */
-    def build_ui(data : List[Map[String, Any]] ) : JObject = {
-      val moduleMap: Map[String, List[JObject]] = remap(data)
+    def build_ui(data : List[Map[String, Any]] ) : JValue = {
+      val moduleMap: Map[String, List[JValue]] = remap(data)
       JObject(moduleMap.keySet.map( moduleName => {
-        val moduleUIComponents : List[JObject] = moduleMap(moduleName)
+        val moduleUIComponents : List[JValue] = moduleMap(moduleName)
           JField(moduleName, JArray(moduleUIComponents))
         }).toList
       )
@@ -66,12 +65,12 @@ trait UIResponse extends Response {
     * @param data - read node
     * @return - response as a single JObject
     */
-  def build_ui(data : Map[String, Any] ) : JObject = {
-    val remappedData: Map[String, List[JObject]] = remap(List(data))
+  def build_ui(data : Map[String, Any] ) : JValue = {
+    val remappedData: Map[String, List[JValue]] = remap(List(data))
     if (remappedData.isEmpty) return JObject(JField("result", JString("Node not found")))
     if (remappedData.size > 1) return JObject(JField("result", JString("More than one node found with different module")))
     val theOnlyNode_ModuleName = remappedData.keysIterator.next()
-    val nodeToResponse : List[JObject] = remappedData(theOnlyNode_ModuleName)
+    val nodeToResponse : List[JValue] = remappedData(theOnlyNode_ModuleName)
     if (nodeToResponse.size > 1)  return JObject(JField("result", JString(s"More than one node found in one module: $theOnlyNode_ModuleName")))
     if (nodeToResponse.isEmpty)  return JObject(JField("result", JString(s"Internal error: empty list for module: $theOnlyNode_ModuleName")))
     JObject(JField(theOnlyNode_ModuleName, nodeToResponse.head))

@@ -1,5 +1,4 @@
-package sncr.metadata.engine
-
+package sncr.metadata.engine.responses
 
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
 import org.json4s.JsonAST.{JArray, JBool, JLong, JNothing, _}
