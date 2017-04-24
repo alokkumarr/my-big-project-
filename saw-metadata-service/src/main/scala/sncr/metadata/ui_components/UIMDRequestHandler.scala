@@ -2,7 +2,7 @@ package sncr.metadata.ui_components
 
 import java.util
 
-import org.json4s.JsonAST.{JObject, JString, _}
+import org.json4s.JsonAST.{JNull, JObject, JString, _}
 import org.json4s.ParserUtil.ParseException
 import org.json4s.native.JsonMethods._
 import org.json4s.{JField => _, JNothing => _, JObject => _, JValue => _, _}
@@ -38,7 +38,6 @@ class UIMDRequestHandler(a_docAsJson : JValue, a_printPretty: Boolean = true)
 
 
   override def testUIComponent(uicomp: JObject) : Boolean = UINode.mandatoryAttributes.forall(attr => (uicomp \ attr ).extractOpt[String].nonEmpty)
-
 
   /**
     * Validates requests, if a request malformed, incorrectly structured or does not have
