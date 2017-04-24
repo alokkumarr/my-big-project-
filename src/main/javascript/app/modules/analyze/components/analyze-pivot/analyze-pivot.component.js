@@ -5,15 +5,18 @@ import clone from 'lodash/clone';
 import fpMap from 'lodash/fp/map';
 import fpPipe from 'lodash/fp/pipe';
 import fpFilter from 'lodash/fp/filter';
-import keys from 'lodash/keys';
-import assign from 'lodash/assign';
-import compact from 'lodash/compact';
+import find from 'lodash/find';
+import take from 'lodash/take';
+import isEmpty from 'lodash/isEmpty';
+import omit from 'lodash/omit';
+import {BehaviorSubject} from 'rxjs';
+import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 
 import template from './analyze-pivot.component.html';
 import style from './analyze-pivot.component.scss';
 
-const FIELD_CHOOSER_HEIGHT = 900;
-const FIELD_CHOOSER_WIDTH = 600;
+import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter-sidenav/analyze-filter-sidenav.component';
+import {ANALYZE_PIVOT_SETTINGS_SIDENAV_ID} from '../analyze-pivot-settings/analyze-pivot-settings.component';
 
 export const AnalyzePivotComponent = {
   template,
@@ -22,8 +25,10 @@ export const AnalyzePivotComponent = {
     model: '<'
   },
   controller: class AnalyzePivotController {
-    constructor($mdDialog, $timeout, PivotService, AnalyzeService, FilterService) {
+    constructor($mdDialog, $timeout, PivotService, AnalyzeService, FilterService, $mdSidenav) {
+      'ngInject';
       this._$mdDialog = $mdDialog;
+      this._$mdSidenav = $mdSidenav;
       this._PivotService = PivotService;
       this._$timeout = $timeout;
       this._FilterService = FilterService;
@@ -33,90 +38,115 @@ export const AnalyzePivotComponent = {
       this.normalizedData = [];
       this.dataSource = {};
       this.sorts = [];
-      this.filters = {
-        possible: null,
-        selected: null
-      };
+      this.filters = null;
       this.sortFields = null;
-      this._gridInstance = null;
+      this.pivotGridUpdater = new BehaviorSubject({});
     }
 
     $onInit() {
       this._FilterService.onApplyFilters(filters => this.onApplyFilters(filters));
       this._FilterService.onClearAllFilters(() => this.onClearAllFilters());
 
+      if (isEmpty(this.model.artifacts)) {
+        // new analysis
+        this._AnalyzeService.createAnalysis(this.model.artifactsId)
+          .then(analysis => {
+            this.prepareFields(analysis.artifacts[0].artifactAttributes);
+            this.toggleSettingsSidenav();
+          });
+        // if it's a pivot analysis we're only interested in the first artifact
+      } else {
+        // edit existing analysis
+        this.prepareFields(this.model.artifacts[0].artifactAttributes);
+        this.loadPivotData().then(() => {
+          this.filters = this._PivotService.mapFieldsToFilters(this.normalizedData, this.fields);
+          const selectedFilters = map(this.model.filters, this._FilterService.getBackEnd2FrontEndFilterMapper());
+          this.mergeSelectedFiltersWithFilters(selectedFilters, this.filters);
+          this.sortFields = this.getFieldToSortFieldMapper()(this.fields);
+          this.sorts = this.mapBackend2FrontendSort(this.model.sorts, this.sortFields);
+        });
+      }
+    }
+
+    mergeSelectedFiltersWithFilters(selectedFilters, filters) {
+      forEach(selectedFilters, selectedFilter => {
+        const targetFilter = find(filters, ({name}) => name === selectedFilter.name);
+        targetFilter.model = selectedFilter.model;
+      });
+    }
+
+    onApplyFieldSettings() {
+      this.sortFields = this.getFieldToSortFieldMapper()(this.fields);
+    }
+
+    prepareFields(artifactAttributes) {
+      this.fields = this._PivotService.getBackend2FrontendFieldMapper()(artifactAttributes);
+
+      const dataSource = new PivotGridDataSource({
+        fields: this.fields
+      });
+
+      this.fieldChooserOptions = {
+        onContentReady: e => {
+          this.gridIsntance = e.component;
+        },
+        dataSource,
+        layout: 1,
+        width: 400,
+        height: 800
+      };
+
+      // repaint the field chooser so it fills the cointainer
       this._$timeout(() => {
-        // have to repaint the grid because of the animation of the modal
-        // if it's not repainted it appears smaller
-        this._gridInstance.repaint();
-      }, 500);
+        this.gridIsntance.repaint();
+      }, 400);
 
+      this.pivotGridUpdater.next({
+        dataSource
+      });
+    }
+
+    toggleSettingsSidenav() {
+      this._$mdSidenav(ANALYZE_PIVOT_SETTINGS_SIDENAV_ID).toggle();
+    }
+
+    onRefreshData() {
+      this.updateFields();
       this.loadPivotData();
-
-      this.pivotGridOptions = assign({
-        onInitialized: e => {
-          this._gridInstance = e.component;
-        }
-      }, this.getDefaultOptions());
     }
 
     loadPivotData() {
-      this._AnalyzeService.getPivotData().then(data => {
-        const fields = this.getFields();
-        this.normalizedData = data;
-        this.deNormalizedData = this._PivotService.denormalizeData(data);
-        this.dataSource = {
-          store: this.deNormalizedData,
-          fields
-        };
+      return this._AnalyzeService.getPivotData().then(pivotData => {
+        this.normalizedData = pivotData;
+        this.deNormalizedData = this._PivotService.denormalizeData(pivotData, this.fields);
 
-        this._gridInstance.option('dataSource', this.dataSource);
-        if (this.model.pivotState) {
-          this._gridInstance.getDataSource().state(this.model.pivotState);
+        if (isEmpty(this.filters)) {
+          this.filters = this._PivotService.mapFieldsToFilters(this.normalizedData, this.fields);
         }
 
-        this._$timeout(() => {
-        // the field chooser is added with a delay because of the modal animation
-        // if not delayed the fieldchooser appears smaller
-          this.fieldChooserOptions = {
-            texts: {
-              allFields: 'All',
-              columnFields: 'Columns',
-              dataFields: 'Data',
-              rowFields: 'Rows'
-            },
-            width: FIELD_CHOOSER_WIDTH,
-            heght: FIELD_CHOOSER_HEIGHT,
-            layout: 1,
-            dataSource: this._gridInstance.getDataSource()
-          };
-        }, 100);
+        this.pivotGridUpdater.next({
+          dataSource: {
+            store: this.deNormalizedData,
+            fields: this.fields
+          }
+        });
       });
     }
 
 // filters
     openFilterSidenav() {
-      if (!this.filters.possible) {
-        this.filters.possible = this.getFieldToFilterMapper()(this.getFields());
-      }
-      this._FilterService.openFilterSidenav(this.filters.possible);
+      this._FilterService.openFilterSidenav(this.filters, ANALYZE_FILTER_SIDENAV_IDS.designer);
     }
+
     onApplyFilters(filters) {
-      this.filters.possible = filters;
-      this.filters.selected = this._FilterService.getSelectedFilterMapper()(filters);
+      this.filters = filters;
       this.filterGridData();
     }
 
     filterGridData() {
-      const pivotGridDataSource = this._gridInstance.getDataSource();
-      forEach(this.filters.selected, filter => {
-        const filterValues = compact(keys(filter.model));
-        pivotGridDataSource.field(filter.name, {
-          filterType: 'include',
-          filterValues
-        });
+      this.pivotGridUpdater.next({
+        filters: this.filters
       });
-      pivotGridDataSource.load();
     }
 
     onClearAllFilters() {
@@ -124,22 +154,16 @@ export const AnalyzePivotComponent = {
     }
 
     clearFilters() {
-      const pivotGridDataSource = this._gridInstance.getDataSource();
-      this.filters.possible = this._FilterService.getFilterClearer()(this.filters.possible);
-      forEach(this.filters.selected, filter => {
-        pivotGridDataSource.field(filter.name, {
-          filterType: null,
-          filterValues: null
-        });
+      forEach(this.filters, filter => {
+        filter.model = null;
       });
-      this.filters.selected = [];
-      pivotGridDataSource.load();
+      this.filterGridData();
     }
 // END filters
 
     getFieldToSortFieldMapper() {
       return fpPipe(
-        fpFilter(field => field.area === 'row'),
+        fpFilter(field => field.dataType !== 'date' && field.area === 'row'),
         fpMap(field => {
           return {
             type: field.dataType,
@@ -150,28 +174,12 @@ export const AnalyzePivotComponent = {
       );
     }
 
-    getFieldToFilterMapper() {
-      return fpPipe(
-        fpFilter(field => field.area === 'row'),
-        fpMap(field => {
-          return {
-            name: field.dataField,
-            type: field.dataType,
-            items: field.dataType === 'string' ?
-            this._PivotService.getUniquesFromNormalizedData(this.normalizedData, field.dataField) :
-            null,
-            label: field.caption,
-            model: null
-          };
-        })
-      );
+    applySorts(sorts) {
+      this.pivotGridUpdater.next({sorts});
     }
 
     openSortModal(ev) {
       const tpl = '<analyze-report-sort model="model"></analyze-report-sort>';
-      if (!this.sortFields) {
-        this.sortFields = this.getFieldToSortFieldMapper()(this.getFields());
-      }
 
       this._$mdDialog
         .show({
@@ -189,13 +197,7 @@ export const AnalyzePivotComponent = {
         })
         .then(sorts => {
           this.sorts = sorts;
-          const pivotGridDataSource = this._gridInstance.getDataSource();
-          forEach(sorts, sort => {
-            pivotGridDataSource.field(sort.field.dataField, {
-              sortOrder: sort.order
-            });
-          });
-          pivotGridDataSource.load();
+          this.applySorts(sorts);
         });
     }
 
@@ -231,8 +233,7 @@ export const AnalyzePivotComponent = {
             scope.model = {
               pivot: this.model,
               dataSource: this.dataSource,
-              defaultOptions: this.getDefaultOptions(),
-              pivotState: this._gridInstance.getDataSource().state()
+              defaultOptions: this.getDefaultOptions()
             };
           },
           targetEvent: ev,
@@ -242,17 +243,53 @@ export const AnalyzePivotComponent = {
         });
     }
 
+    mapBackend2FrontendSort(sorts, sortFields) {
+      return map(sorts, sort => {
+        const targetField = find(sortFields, ({dataField}) => dataField === sort.dataField);
+        return {
+          field: targetField,
+          order: sort.order
+        };
+      });
+    }
+
+    mapFrontend2BackendSort(sorts) {
+      return map(sorts, sort => {
+        return {
+          dataField: sort.field.dataField,
+          order: sort.order
+        };
+      });
+    }
+
+    onGetFields(fields) {
+      // pivotgrid adds some other fields in plus, so we have to take only the real ones
+      this.fieldsToSave = take(fields, this.fields.length);
+    }
+
+    updateFields() {
+      this.pivotGridUpdater.next({
+        getFields: true
+      });
+    }
+
     openSaveModal(ev) {
-      this.model.sorts = this.sorts;
-      this.model.pivotState = this._gridInstance.getDataSource().state();
-      this.model.filters = map(this.filters.selected, this._FilterService.getFrontEnd2BackEndFilterMapper());
+      this.updateFields();
+
+      this.model.artifacts = [{artifactAttributes: this._PivotService.getFrontend2BackendFieldMapper()(this.fieldsToSave)}];
+
+      this.model.filters = fpPipe(
+        this._FilterService.getSelectedFilterMapper(),
+        fpMap(this._FilterService.getFrontEnd2BackEndFilterMapper())
+      )(this.filters);
+      this.model.sorts = this.mapFrontend2BackendSort(this.sorts);
       const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
       this._$mdDialog
         .show({
           template: tpl,
           controller: scope => {
-            scope.model = clone(this.model);
+            scope.model = clone(omit(this.model, 'metric'));
 
             scope.onSave = data => {
               this.model.id = data.id;
@@ -267,89 +304,6 @@ export const AnalyzePivotComponent = {
           targetEvent: ev,
           clickOutsideToClose: true
         });
-    }
-
-    getFields() {
-      // const obj = deNormalizedData[0];
-      // const objKeys = keys(obj);
-      // const fields = map(objKeys, key => {
-      //   return {
-      //     caption: key,
-      //     dataField: key,
-      //     width: 120,
-      //     area: this.getArea(key),
-      //     format: key.includes('price') ? 'currency' : null
-      //   };
-      // });
-      return [{
-        caption: 'Affiliate Name',
-        width: 120,
-        dataType: 'string',
-        dataField: 'row_level_1',
-        area: 'row'
-      }, {
-        caption: 'Product',
-        width: 120,
-        dataType: 'string',
-        dataField: 'row_level_2',
-        area: 'row'
-      }, {
-        caption: 'Date2',
-        dataField: 'column_level_1',
-        dataType: 'date',
-        width: 120,
-        area: 'column'
-      }, {
-        caption: 'Date',
-        dataField: 'column_level_2',
-        dataType: 'date',
-        width: 120,
-        area: 'column'
-      }, {
-        caption: 'Total Price',
-        dataField: 'total_price',
-        dataType: 'double',
-        summaryType: 'sum',
-        format: 'currency',
-        area: 'data'
-      }];
-    }
-
-    getDefaultOptions() {
-      return {
-        allowSortingBySummary: false,
-        allowSorting: false,
-        allowFiltering: false,
-        allowExpandAll: true,
-        fieldChooser: {
-          enabled: false
-        },
-        fieldPanel: {
-          visible: true,
-          showColumnFields: false, // hides the column field area
-          showRowFields: true, // hides the row field area
-          showDataFields: true, // hides the data field area
-          showFilterFields: false, // hides the filter field area
-          allowFieldDragging: false
-        },
-        export: {
-          enabled: false,
-          fileName: 'Sales'
-        },
-        dataSource: {
-          store: [],
-          fields: []
-        }
-      };
-    }
-
-    getArea(key) {
-      if (key.includes('row_level')) {
-        return 'row';
-      } else if (key.includes('column_level')) {
-        return 'column';
-      }
-      return 'data';
     }
   }
 };

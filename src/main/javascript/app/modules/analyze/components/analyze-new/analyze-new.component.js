@@ -1,5 +1,6 @@
-import filter from 'lodash/filter';
-import map from 'lodash/map';
+import set from 'lodash/set';
+import forEach from 'lodash/forEach';
+import find from 'lodash/find';
 
 import template from './analyze-new.component.html';
 import style from './analyze-new.component.scss';
@@ -9,6 +10,9 @@ import {AnalyseTypes} from '../../consts';
 
 export const AnalyzeNewComponent = {
   template,
+  bindings: {
+    metrics: '<'
+  },
   styles: [style],
   controller: class AnalyzeNewController {
     constructor($scope, $mdDialog, AnalyzeService) {
@@ -25,30 +29,24 @@ export const AnalyzeNewComponent = {
         .then(methods => {
           this.methods = methods;
         });
-
-      this._AnalyzeService.getMetrics()
-        .then(metrics => {
-          this.metrics = metrics;
-        });
     }
 
-    onMetricToggle() {
-      const supportedMethods = this._AnalyzeService.getSupportedMethods(this.metrics);
-
-      this.metrics = this._AnalyzeService.setAvailableMetrics(this.metrics, supportedMethods);
-      this.methods = this._AnalyzeService.setAvailableAnalysisMethods(this.methods, supportedMethods);
-
+    onMetricSelected() {
+      this.setAvailableAnalysisMethods(this.methods, this.selectedMetric.supports);
       // unselect the method, so only supported methods can be selected
       this.selectedAnalysisMethod = '';
     }
 
-    getSelectedMetrics() {
-      const metrics = filter(this.metrics, metric => {
-        return metric.checked;
-      });
+    setAvailableAnalysisMethods(methods, supportedMethods) {
+      forEach(methods, methodCategory => {
+        const supportedMethodCategory = find(supportedMethods, ({category}) => category === methodCategory.category);
 
-      return map(metrics, metric => {
-        return metric.name;
+        forEach(methodCategory.children, method => {
+          const isSupported = supportedMethodCategory ?
+            find(supportedMethodCategory.children, ({type}) => type === method.type) :
+            false;
+          set(method, 'disabled', !isSupported);
+        });
       });
     }
 
@@ -69,7 +67,7 @@ export const AnalyzeNewComponent = {
             name: 'Untitled Analysis',
             description: '',
             category: null,
-            metrics: this.getSelectedMetrics(),
+            metric: this.selectedMetric,
             scheduled: null,
             artifacts: null
           };
@@ -81,14 +79,16 @@ export const AnalyzeNewComponent = {
             name: 'Untitled Analysis',
             description: '',
             category: null,
-            metrics: this.getSelectedMetrics(),
+            metric: this.selectedMetric,
             scheduled: null,
             artifacts: null
           };
           break;
         case 'chart:column':
         case 'chart:line':
-        case 'chart:stacked':
+        case 'chart:stack':
+        case 'chart:pie':
+        case 'chart:donut':
           type = this.selectedAnalysisMethod.split(':')[1];
           tpl = '<analyze-chart model="model"></analyze-chart>';
           model = {
@@ -97,7 +97,7 @@ export const AnalyzeNewComponent = {
             name: 'Untitled Chart',
             description: '',
             category: null,
-            metrics: this.getSelectedMetrics(),
+            metric: this.selectedMetric,
             scheduled: null,
             artifacts: null
           };

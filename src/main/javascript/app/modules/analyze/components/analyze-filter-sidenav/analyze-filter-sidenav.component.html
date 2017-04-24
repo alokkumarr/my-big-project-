@@ -1,9 +1,15 @@
 <div layout="row">
-  <md-sidenav class="md-sidenav-right" md-component-id="$ctrl.id" md-whiteframe="4" eval-attr-as-expr="mdComponentId">
+  <md-sidenav class="md-sidenav-right"
+              md-component-id="$ctrl.id"
+              md-disable-backdrop="$ctrl.placement === $ctrl.ANALYZE_FILTER_SIDENAV_IDS.detailPage"
+              md-whiteframe="4"
+              eval-attr-as-expr="mdComponentId">
     <md-toolbar>
       <div class="md-toolbar-tools">
-        <md-button sidenav-target="{{$ctrl.id}}" class="btn-card" aria-label="Cancel">Cancel</md-button>
-        <md-button ng-click="$ctrl.onFiltersApplied()" class="btn-primary" aria-label="Apply Filters">Apply Filters</md-button>
+        <md-button sidenav-target="{{$ctrl.id}}" class="btn-card" aria-label="Cancel" translate="CANCEL"></md-button>
+        <md-button ng-click="$ctrl.onFiltersApplied()" class="btn-primary" aria-label="Apply Filters">
+          <span translate="APPLY_FILTERS"></span>
+        </md-button>
       </div>
     </md-toolbar>
 
@@ -15,7 +21,7 @@
   <md-toolbar class="secondary-toolbar">
     <div class="md-toolbar-tools" layout-align="center">
       <md-button ng-click="$ctrl.clearAllFilters()" md-no-ink class="md-primary" aria-label="Clear all filters">
-        Clear all filters
+        <span translate="CLEAR_ALL_FILTERS"></span>
       </md-button>
     </div>
   </md-toolbar>

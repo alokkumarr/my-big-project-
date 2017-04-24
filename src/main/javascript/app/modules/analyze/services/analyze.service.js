@@ -1,15 +1,5 @@
-import intersection from 'lodash/intersection';
-import spread from 'lodash/spread';
-import isEmpty from 'lodash/isEmpty';
-import curry from 'lodash/curry';
-import pipe from 'lodash/fp/pipe';
-import fpFilter from 'lodash/fp/filter';
+import omit from 'lodash/omit';
 import fpMap from 'lodash/fp/map';
-import fpFlatMap from 'lodash/fp/flatMap';
-import fpFind from 'lodash/fp/find';
-import fpIsEqual from 'lodash/fp/isEqual';
-import fpSome from 'lodash/fp/some';
-import fpSet from 'lodash/fp/set';
 import fpGet from 'lodash/fp/get';
 
 export function AnalyzeService($http, $timeout, $q) {
@@ -19,7 +9,6 @@ export function AnalyzeService($http, $timeout, $q) {
     getCategories,
     getCategory,
     getMethods,
-    getMetrics,
     getArtifacts,
     getAnalyses,
     deleteAnalysis,
@@ -29,16 +18,24 @@ export function AnalyzeService($http, $timeout, $q) {
     executeAnalysis,
     getAnalysisById,
     getDataByQuery,
-    getSupportedMethods,
     generateQuery,
-    getPivotData,
     saveReport,
-    setAvailableMetrics: curry(setAvailableItems)(metricMapper, metricHasSupportedMethod),
-    setAvailableAnalysisMethods: curry(setAvailableItems)(analysisMethodMapper, isMethodSupported)
+    getSemanticLayerData,
+    chartBe2Fe,
+    chartFe2Be,
+    getPivotData,
+    createAnalysis
   };
 
   function getAnalyses(category, query) {
-    return $http.get('/api/analyze/analyses', {params: {category, query}}).then(fpGet('data'));
+    return $http.get('/api/analyze/analyses', {params: {category, query}})
+      .then(fpGet('data'))
+      .then(fpMap(analysis => {
+        if (analysis.type === 'chart') {
+          return chartBe2Fe(analysis);
+        }
+        return analysis;
+      }));
   }
 
   function getPublishedAnalysesByAnalysisId(id) {
@@ -84,10 +81,6 @@ export function AnalyzeService($http, $timeout, $q) {
     return $http.get('/api/analyze/methods').then(fpGet('data'));
   }
 
-  function getMetrics() {
-    return $http.get('/api/analyze/metrics').then(fpGet('data'));
-  }
-
   function getArtifacts() {
     return $http.get('/api/analyze/artifacts').then(fpGet('data'));
   }
@@ -108,81 +101,37 @@ export function AnalyzeService($http, $timeout, $q) {
     return $http.post('/api/analyze/saveReport', payload).then(fpGet('data'));
   }
 
-  /**
-   * Set the disabled attribute on an item, whether it supports the supported analysis methods
-   * - the first 2 parameters are used to make specialized functions for metrics and AnalysisMethods
-   *
-   * @param mapper(actionFn, collection) maps an arbitrary collection setting the "disabled" property
-   *        based on a checker function
-   * @param checkerFn checks if the disabled attribute should be true or false, based on
-   *        whether the current item supports the supported methods or not
-   * @param items - the collection on which we do the modifications
-   * @param supportedMethods array of supported methods (strings)
-   * @returns {*}
-   */
-  function setAvailableItems(mapperFn, checkerFn, items, supportedMethods) {
-    const setDisabled = item => {
-      // if there are no supported methods it's probably because no metric was selected
-      const nothingSelected = isEmpty(supportedMethods);
-      const disabledValue = nothingSelected ? false : !checkerFn(item, supportedMethods);
+  function getSemanticLayerData() {
+    return $http.get('/api/analyze/semanticLayerData').then(fpGet('data'));
+  }
 
-      return fpSet('disabled', disabledValue, item);
+  function createAnalysis(metricId) {
+    const payload = {
+      action: 'read',
+      keys: [{
+        type: 'semantic',
+        analysisType: 'pivot',
+        module: 'analyze',
+        id: metricId
+      }]
     };
-
-    return mapperFn(setDisabled)(items);
+    return $http.post('/api/analyze/createAnalysis', payload).then(fpGet('data'));
   }
 
   /**
-   * Mapper function for the metrics collection
-   * @param actionFn
+   * Converts chart type analysis from backend
+   * to a format usable on front-end
    */
-  function metricMapper(actionFn) {
-    return fpMap(metric => actionFn(metric));
+  function chartBe2Fe(source) {
+    const result = omit(source, ['_id', 'chart_type', 'plot_variant']);
+    result.id = source._id || source.id;
+    result.chartType = source.chart_type || source.chartType;
+    result.plotVariant = source.plot_variant || source.plotVariant;
+
+    return result;
   }
 
-  /**
-   * Mapper function for the analysis methods collection
-   * @param actionFn
-   * @returns {*}
-   */
-  function analysisMethodMapper(actionFn) {
-    return pipe(
-      fpMap(method => {
-        method.children = fpMap(child => actionFn(child))(method.children);
-        return method;
-      })
-    );
-  }
-
-  function metricHasSupportedMethod(metric, supportedMethods) {
-    return pipe(
-      fpFlatMap(fpGet('children')),
-      fpMap(fpGet('type')),
-      fpSome(type =>
-        fpFind(fpIsEqual(type), supportedMethods)
-      )
-    )(metric.supports);
-  }
-
-  function isMethodSupported(method, supportedMethods) {
-    return fpFind(fpIsEqual(method.type), supportedMethods);
-  }
-
-  /**
-   * Intersects all the supported methods of a collection of metrics
-   * @param metrics
-   * @returns [String] array of supported methods (strings)
-   */
-  function getSupportedMethods(metrics) {
-    return pipe(
-      fpFilter(metric => metric.checked === true),
-      fpMap(fpGet('supports')),
-      fpMap(supports =>
-        pipe(
-          fpFlatMap(fpGet('children')),
-          fpMap(fpGet('type'))
-        )(supports)),
-      spread(intersection)
-    )(metrics);
+  function chartFe2Be() {
+    // TODO
   }
 }

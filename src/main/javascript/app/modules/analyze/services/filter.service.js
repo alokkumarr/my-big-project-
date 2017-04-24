@@ -13,7 +13,6 @@ import compact from 'lodash/compact';
 import forEach from 'lodash/forEach';
 import find from 'lodash/find';
 
-import {ANALYZE_FILTER_SIDENAV_ID} from '../components/analyze-filter-sidenav/analyze-filter-sidenav.component';
 import {OPERATORS} from '../components/analyze-filter-sidenav/filters/number-filter.component';
 
 export const BOOLEAN_CRITERIA = {
@@ -47,6 +46,7 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
     getFilterEvaluator,
     getEvaluatedFilterReducer,
     getSelectedFilterMapper,
+    isFilterModelNonEmpty,
     getCanvasFieldsToFiltersMapper,
     getChartSetttingsToFiltersMapper,
     getGridDataFilter,
@@ -80,19 +80,19 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
     unRegisterFuncs[EVENTS.CLEAR_ALL_FILTERS]();
   }
 
-  function openFilterSidenav(payload) {
+  function openFilterSidenav(payload, sidenavId) {
     $eventEmitter.emit(EVENTS.OPEN_SIDENAV, payload);
-    $mdSidenav(ANALYZE_FILTER_SIDENAV_ID).open();
+    $mdSidenav(sidenavId).open();
   }
 
-  function applyFilters(payload) {
+  function applyFilters(payload, sidenavId) {
     $eventEmitter.emit(EVENTS.APPLY_FILTERS, payload);
-    $mdSidenav(ANALYZE_FILTER_SIDENAV_ID).close();
+    $mdSidenav(sidenavId).close();
   }
 
-  function clearAllFilters() {
+  function clearAllFilters(sidenavId) {
     $eventEmitter.emit(EVENTS.CLEAR_ALL_FILTERS);
-    $mdSidenav(ANALYZE_FILTER_SIDENAV_ID).close();
+    $mdSidenav(sidenavId).close();
   }
 
   /* eslint-disable camelcase */
@@ -207,23 +207,25 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
   }
 
   function getSelectedFilterMapper() {
-    return filter(filter => {
-      if (!filter.model) {
-        return false;
-      }
+    return filter(filter => isFilterModelNonEmpty(filter.model));
+  }
 
-      // can be an empty array if the filter was a string filter
-      // and the checkboxes were unchecked
-      if (isEmpty(filter.model)) {
-        return false;
-      }
+  function isFilterModelNonEmpty(model) {
+    if (!model) {
+      return false;
+    }
 
-      // can be an object with null values
-      if (isEmpty(compact(values(filter.model)))) {
-        return false;
-      }
-      return true;
-    });
+    // can be an empty array if the filter was a string filter
+    // and the checkboxes were unchecked
+    if (isEmpty(model)) {
+      return false;
+    }
+
+    // can be an object with null values
+    if (isEmpty(compact(values(model)))) {
+      return false;
+    }
+    return true;
   }
 
   function getGridDataFilter(filters) {

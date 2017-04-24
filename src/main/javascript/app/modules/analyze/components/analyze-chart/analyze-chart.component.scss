@@ -8,24 +8,16 @@ analyze-chart {
     background: whitesmoke;
   }
 
-  md-checkbox {
-    width: 100%;
+  chart {
+    width: calc(100% - 48px);
+    margin: 0 auto;
+    background: white;
+    border-radius: 2px;
+    box-shadow: 0 2px 6px 0 rgba(20, 39, 54, 0.17);
   }
 
-  .axis-options {
-    padding: 5px 10px;
-    border: 1px solid #EEE;
-    border-radius: 5px;
-    max-height: 245px;
-    overflow-y: scroll;
-
-    h3 {
-      font-size: 16px;
-      border-bottom: 1px solid #EEE;
-      padding: 5px;
-      margin: 0 0 10px;
-      font-weight: 600;
-    }
+  md-checkbox {
+    width: 100%;
   }
 
   .chart-options-toolbar::after {
@@ -55,12 +47,15 @@ analyze-chart {
   }
 
   analyze-chart-settings {
+    z-index: 0;
+
     & > .layout-row {
       height: 100%;
     }
 
     md-sidenav {
       position: static;
+      width: 300px;
     }
   }
 }

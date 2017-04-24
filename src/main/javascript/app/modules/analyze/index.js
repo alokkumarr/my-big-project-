@@ -8,6 +8,7 @@ import {transitions} from './transitions';
 import {AnalyzeService} from './services/analyze.service';
 import {FilterService} from './services/filter.service';
 import {PivotService} from './services/pivot.service';
+import {ChartService} from './services/chart.service';
 
 import {AnalyzePageComponent} from './components/analyze-page/analyze-page.component';
 import {AnalyzeViewComponent} from './components/analyze-view/analyze-view.component';
@@ -18,7 +19,9 @@ import {AnalyzeChartDetailComponent} from './components/analyze-published-detail
 import {AnalyzePublishedDetailComponent} from './components/analyze-published-detail/analyze-published-detail.component';
 import {AnalyzeCardComponent} from './components/analyze-card/analyze-card.component';
 import {AnalyzeNewComponent} from './components/analyze-new/analyze-new.component';
+import {AnalyzePivotSettingsComponent} from './components/analyze-pivot-settings/analyze-pivot-settings.component';
 import {AnalyzePivotPreviewComponent} from './components/analyze-pivot-preview/analyze-pivot-preview.component';
+import {PivotGridComponent} from './components/analyze-pivot-grid/pivot-grid.component';
 import {AnalyzePivotComponent} from './components/analyze-pivot/analyze-pivot.component';
 import {AnalyzeReportComponent} from './components/analyze-report/analyze-report.component';
 import {AnalyzeDialogComponent} from './components/analyze-dialog/analyze-dialog.component';
@@ -36,7 +39,6 @@ import {AnalyzeFilterGroupComponent} from './components/analyze-filter-sidenav/a
 import {AnalyzeFilterSidenavComponent} from './components/analyze-filter-sidenav/analyze-filter-sidenav.component';
 import {StringFilterComponent} from './components/analyze-filter-sidenav/filters/string-filter.component';
 import {NumberFilterComponent} from './components/analyze-filter-sidenav/filters/number-filter.component';
-import {AggregatorFilterComponent} from './components/analyze-filter-sidenav/filters/aggregator-filter.component';
 import {ReportRenameDialogComponent} from './components/analyze-report-grid/report-rename-dialog/report-rename-dialog.component';
 import {AnalyzeReportSaveComponent} from './components/analyze-report-save/analyze-report-save.component';
 import {AnalyzePublishDialogComponent} from './components/analyze-publish-dialog/analyze-publish-dialog.component';
@@ -53,6 +55,7 @@ angular.module(AnalyzeModule, [])
   .factory('FilterService', FilterService)
   .factory('AnalyzeService', AnalyzeService)
   .factory('PivotService', PivotService)
+  .factory('ChartService', ChartService)
   .component('reportGridDisplay', ReportGridDisplayComponent)
   .component('reportGridDisplayNode', ReportGridDisplayNodeComponent)
   .component('reportGridDisplayContainer', ReportGridDisplayContainerComponent)
@@ -69,7 +72,9 @@ angular.module(AnalyzeModule, [])
   .component('analyzePublishedDetail', AnalyzePublishedDetailComponent)
   .component('analyzeCard', AnalyzeCardComponent)
   .component('analyzeNew', AnalyzeNewComponent)
+  .component('analyzePivotSettings', AnalyzePivotSettingsComponent)
   .component('analyzePivotPreview', AnalyzePivotPreviewComponent)
+  .component('pivotGrid', PivotGridComponent)
   .component('analyzePivot', AnalyzePivotComponent)
   .component('analyzeReport', AnalyzeReportComponent)
   .component('analyzeDialog', AnalyzeDialogComponent)
@@ -78,7 +83,6 @@ angular.module(AnalyzeModule, [])
   .component('analyzeFilterGroup', AnalyzeFilterGroupComponent)
   .component('stringFilter', StringFilterComponent)
   .component('numberFilter', NumberFilterComponent)
-  .component('aggregatorFilter', AggregatorFilterComponent)
   .component('analyzeFilterSidenav', AnalyzeFilterSidenavComponent)
   .component('analyzeReportDescription', AnalyzeReportDescriptionComponent)
   .component('analyzeReportPreview', AnalyzeReportPreviewComponent)

@@ -1,48 +1,9 @@
-import {get, isEmpty, map, keys, values, clone, reduce, filter, uniq} from 'lodash';
+import {BehaviorSubject} from 'rxjs';
+import {findIndex, forEach, get, isEmpty, map, values, clone, filter} from 'lodash';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
-import {BehaviorSubject} from 'rxjs';
-
-const LEGEND_POSITIONING = {
-  left: {
-    name: 'left',
-    displayName: 'Left',
-    align: 'left',
-    verticalAlign: 'middle'
-  },
-  right: {
-    name: 'right',
-    displayName: 'Right',
-    align: 'right',
-    verticalAlign: 'middle'
-  },
-  top: {
-    name: 'top',
-    displayName: 'Top',
-    align: 'center',
-    verticalAlign: 'top'
-  },
-  bottom: {
-    name: 'bottom',
-    displayName: 'Bottom',
-    align: 'center',
-    verticalAlign: 'bottom'
-  }
-};
-
-const LAYOUT_POSITIONS = {
-  horizontal: {
-    name: 'horizontal',
-    displayName: 'Horizontal',
-    layout: 'horizontal'
-  },
-  vertical: {
-    name: 'vertical',
-    displayName: 'Vertical',
-    layout: 'vertical'
-  }
-};
+import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter-sidenav/analyze-filter-sidenav.component';
 
 export const AnalyzeChartComponent = {
   template,
@@ -52,11 +13,12 @@ export const AnalyzeChartComponent = {
     mode: '@?'
   },
   controller: class AnalyzeChartController {
-    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, FilterService, $mdSidenav) {
+    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, ChartService, FilterService, $mdSidenav, $window) {
       'ngInject';
 
       this._FilterService = FilterService;
       this._AnalyzeService = AnalyzeService;
+      this._ChartService = ChartService;
       this._$mdSidenav = $mdSidenav;
       this._$mdDialog = $mdDialog;
 
@@ -64,8 +26,8 @@ export const AnalyzeChartComponent = {
         align: get(this.model, 'chart.legend.align', 'right'),
         layout: get(this.model, 'chart.legend.layout', 'vertical'),
         options: {
-          align: values(LEGEND_POSITIONING),
-          layout: values(LAYOUT_POSITIONS)
+          align: values(this._ChartService.LEGEND_POSITIONING),
+          layout: values(this._ChartService.LAYOUT_POSITIONS)
         }
       };
 
@@ -84,35 +46,8 @@ export const AnalyzeChartComponent = {
         possible: []
       };
 
-      this.barChartOptions = this.getDefaultChartConfig();
-    }
-
-    getDefaultChartConfig() {
-      const legendPosition = LEGEND_POSITIONING[this.legend.align];
-      const legendLayout = LAYOUT_POSITIONS[this.legend.layout];
-
-      return {
-        chart: {
-          type: this.model.chartType || 'column',
-          spacingLeft: 45,
-          spacingBottom: 45,
-          spacingTop: 45,
-          reflow: false,
-          width: 650
-        },
-        legend: {
-          align: legendPosition.align,
-          verticalAlign: legendPosition.verticalAlign,
-          layout: legendLayout.layout
-        },
-        series: [{
-          name: 'Series 1',
-          data: [0, 0, 0, 0, 0]
-        }],
-        xAxis: {
-          categories: ['A', 'B', 'C', 'D', 'E']
-        }
-      };
+      this.barChartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
+      $window.chartctrl = this;
     }
 
     toggleLeft() {
@@ -138,26 +73,28 @@ export const AnalyzeChartComponent = {
     }
 
     initChart() {
-      if (isEmpty(this.mode) || isEmpty(this.model.chart)) {
-        this.getArtifacts();
-        return;
-      }
+      this._AnalyzeService.getArtifacts().then(artifacts => {
+        if (isEmpty(this.mode) || isEmpty(this.model.chart)) {
+          this.fillSettings(artifacts);
+          return;
+        }
 
-      const chart = this.model.chart;
-      this.labels.tempX = this.labels.x = chart.xAxis.label;
-      this.labels.tempY = this.labels.y = chart.yAxis.label;
-      this.settings = {
-        yaxis: chart.yAxis.artifacts,
-        xaxis: chart.xAxis.artifacts,
-        groupBy: chart.groupBy.artifacts
-      };
-      this.filters.selected = chart.filters || [];
-      this.onSettingsChanged(this.settings);
+        this.fillSettings(artifacts, this.model.artifacts);
+
+        const chart = this.model.chart;
+        this.labels.tempX = this.labels.x = get(chart, 'xAxis.title', null);
+        this.labels.tempY = this.labels.y = get(chart, 'yAxis.title', null);
+        this.filters.selected = map(
+          chart.filters,
+          beFilter => this._FilterService.getBackEnd2FrontEndFilterMapper()(beFilter)
+        );
+        this.onSettingsChanged(this.settings);
+      });
     }
 
     updateLegendPosition() {
-      const align = LEGEND_POSITIONING[this.legend.align];
-      const layout = LAYOUT_POSITIONS[this.legend.layout];
+      const align = this._ChartService.LEGEND_POSITIONING[this.legend.align];
+      const layout = this._ChartService.LAYOUT_POSITIONS[this.legend.layout];
 
       this.updateChart.next([
         {
@@ -175,17 +112,21 @@ export const AnalyzeChartComponent = {
       ]);
     }
 
+    mergeArtifactsWithSettings(artifacts, record) {
+      const id = findIndex(artifacts, a => {
+        return a.column_name === record.column_name &&
+        a.tableName === (record.tableName || record.table_name);
+      });
+
+      record.checked = true;
+      artifacts.splice(id, 1, record);
+      return artifacts;
+    }
+
     updateCustomLabels() {
       this.labels.x = this.labels.tempX;
       this.labels.y = this.labels.tempY;
       this.reloadChart(this.settings, this.filteredGridData);
-    }
-
-    getArtifacts() {
-      this._AnalyzeService.getArtifacts()
-        .then(data => {
-          this.fillSettings(data);
-        });
     }
 
     getDataByQuery() {
@@ -196,18 +137,36 @@ export const AnalyzeChartComponent = {
         });
     }
 
-    fillSettings(data) {
-      const attributes = data.reduce((res, metric) => {
+    fillSettings(artifacts, settings = []) {
+      /* Flatten the artifacts into a single array */
+      const attributes = artifacts.reduce((res, metric) => {
         return res.concat(map(metric.artifact_attributes, attr => {
           attr.tableName = metric.artifact_name;
           return attr;
         }));
       }, []);
+
+      /* Based on data type, divide the artifacts between axes. */
+      const yaxis = filter(attributes, attr => attr.type === 'int' || attr.type === 'Int');
+      const xaxis = filter(attributes, attr => attr.type === 'string' || attr.type === 'String');
+      const groupBy = map(xaxis, clone);
+
+      forEach(settings, selection => {
+        if (selection['x-axis'] === true) {
+          this.mergeArtifactsWithSettings(xaxis, selection);
+        } else if (selection['y-axis'] === true) {
+          this.mergeArtifactsWithSettings(yaxis, selection);
+        } else if (selection['z-axis'] === true) {
+          this.mergeArtifactsWithSettings(groupBy, selection);
+        }
+      });
+
       this.settings = {
-        yaxis: filter(attributes, attr => attr['y-axis']),
-        xaxis: filter(attributes, attr => attr['x-axis']),
-        groupBy: map(filter(attributes, attr => attr['x-axis']), clone)
+        yaxis,
+        xaxis,
+        groupBy
       };
+      this.reloadChart(this.settings, this.filteredGridData);
     }
 
     onSettingsChanged(settings) {
@@ -242,62 +201,19 @@ export const AnalyzeChartComponent = {
     }
 
     reloadChart(settings, filteredGridData) {
-      const xaxis = filter(this.settings.xaxis, attr => attr.checked)[0] || {};
-      const yaxis = filter(this.settings.yaxis, attr => attr.checked)[0] || {};
-      const group = filter(this.settings.groupBy, attr => attr.checked)[0] || {};
+      const changes = this._ChartService.dataToChangeConfig(
+        this.model.chartType,
+        settings,
+        filteredGridData,
+        {labels: this.labels}
+      );
 
-      const {xCategories, ySeries} = this.gridToChart(xaxis, yaxis, group, filteredGridData);
-
-      this.updateChart.next([
-        {
-          path: 'xAxis.title.text',
-          data: this.labels.x || xaxis.display_name
-        },
-        {
-          path: 'xAxis.categories',
-          data: xCategories
-        },
-        {
-          path: 'yAxis.title.text',
-          data: this.labels.y || yaxis.display_name
-        },
-        {
-          path: 'series',
-          data: ySeries
-        }
-      ]);
-    }
-
-    gridToChart(x, y, g, grid) {
-      const defaultSeriesName = 'Series 1';
-      const categories = uniq(grid.map(row => row[x.column_name]));
-
-      const defaultSeries = () => reduce(categories, (obj, c) => {
-        obj[c] = 0;
-        return obj;
-      }, {});
-
-      const res = reduce(grid, (obj, row) => {
-        const category = row[x.column_name];
-        const series = row[g.column_name] || defaultSeriesName;
-        obj[series] = obj[series] || defaultSeries();
-        obj[series][category] += row[y.column_name];
-        return obj;
-      }, {});
-
-      const xCategories = keys(defaultSeries());
-      return {
-        xCategories,
-        ySeries: keys(res).map(k => ({
-          name: k,
-          data: xCategories.map(c => res[k][c])
-        }))
-      };
+      this.updateChart.next(changes);
     }
 
     // filters section
     openFilterSidenav() {
-      this._FilterService.openFilterSidenav(this.filters.possible);
+      this._FilterService.openFilterSidenav(this.filters.possible, ANALYZE_FILTER_SIDENAV_IDS.designer);
     }
 
     openDescriptionModal(ev) {
@@ -338,30 +254,40 @@ export const AnalyzeChartComponent = {
         });
     }
 
-    generatePayload() {
-      const result = {
-        filters: this.filters.selected,
-        xAxis: {
-          label: this.labels.x,
-          artifacts: this.settings.xaxis
-        },
-        yAxis: {
-          label: this.labels.y,
-          artifacts: this.settings.yaxis
-        },
-        groupBy: {
-          artifacts: this.settings.groupBy
-        },
+    getSelectedSettingsFor(axis, artifacts) {
+      const id = findIndex(artifacts, a => a.checked === true);
+      if (id >= 0) {
+        artifacts[id][axis] = true;
+      }
+      return artifacts[id];
+    }
+
+    generatePayload(source) {
+      const result = clone(source);
+      result.chart = {
+        filters: map(
+          this.filters.selected,
+          feFilter => this._FilterService.getFrontEnd2BackEndFilterMapper()(feFilter)
+        ),
+        xAxis: {title: this.labels.x},
+        yAxis: {title: this.labels.y},
         legend: {
           align: this.legend.align,
           layout: this.legend.layout
         }
       };
+
+      result.artifacts = filter([
+        this.getSelectedSettingsFor('x-axis', this.settings.xaxis),
+        this.getSelectedSettingsFor('y-axis', this.settings.yaxis),
+        this.getSelectedSettingsFor('z-axis', this.settings.groupBy)
+      ], x => x);
+
       return result;
     }
 
     openSaveModal(ev) {
-      this.model.chart = this.generatePayload();
+      const payload = this.generatePayload(this.model);
 
       const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
@@ -369,7 +295,7 @@ export const AnalyzeChartComponent = {
         .show({
           template: tpl,
           controller: scope => {
-            scope.model = clone(this.model);
+            scope.model = payload;
 
             scope.onSave = data => {
               this.model.id = data.id;

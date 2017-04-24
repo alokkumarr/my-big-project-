@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.synchronoss.bdasaw</groupId>
+  <groupId>com.synchronoss</groupId>
   <artifactId>bda-saw</artifactId>
   <version>2.0.0-SNAPSHOT</version>
   <packaging>war</packaging>
@@ -264,7 +264,7 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <build>
-      <finalName>${project.name}</finalName>
+      <finalName>bda-saw</finalName>
         <plugins>
           <plugin>
             <artifactId>maven-clean-plugin</artifactId>
@@ -362,7 +362,6 @@
 						<addClasspath>true</addClasspath>
 					</manifest>
 				</archive>
-				<warName>${project.name}.war</warName>
         	</configuration>
 	   </plugin> 
 	    <plugin>

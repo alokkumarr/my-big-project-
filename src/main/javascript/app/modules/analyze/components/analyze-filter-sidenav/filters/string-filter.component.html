@@ -4,7 +4,7 @@
     <input placeholder="Filter by keyword" ng-model="$ctrl.keywordFilter"/>
   </md-input-container>
 
-  <md-checkbox ng-repeat="item in $ctrl.filter.items | filter:$ctrl.keywordFilter"
+  <md-checkbox ng-repeat="item in $ctrl.filter.items | filter:$ctrl.keywordFilter track by $index"
                ng-click="$ctrl.onToggle(item)"
                ng-checked="$ctrl.filter.model[item]"
                style="margin-left: 5px;">{{item}}</md-checkbox>

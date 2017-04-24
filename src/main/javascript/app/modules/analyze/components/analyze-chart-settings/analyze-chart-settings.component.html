@@ -7,39 +7,30 @@
     </md-toolbar>
 
     <md-content layout-margin>
-      <div class="axis-options">
-        <h3> Y-Axis Options </h3>
-        <div class="axis-option-checkboxes">
-          <md-checkbox ng-repeat="attr in $ctrl.settings.yaxis"
-                       ng-model="attr.checked"
-                       name="yaxis"
-                       ng-change="$ctrl.inputChanged()">
-            {{::attr.display_name}}
-          </md-checkbox>
-        </div>
-      </div>
-      <div class="axis-options">
-        <h3> X-Axis Options </h3>
-        <div class="axis-option-checkboxes">
-          <md-checkbox ng-repeat="attr in $ctrl.settings.xaxis"
-                       ng-model="attr.checked"
-                       name="xaxis"
-                       ng-change="$ctrl.inputChanged()">
-            {{::attr.display_name}}
-          </md-checkbox>
-        </div>
-      </div>
-      <div class="axis-options">
-        <h3> Group By </h3>
-        <div class="axis-option-checkboxes">
-          <md-checkbox ng-repeat="attr in $ctrl.settings.groupBy"
-                       ng-model="attr.checked"
-                       name="groupBy"
-                       ng-change="$ctrl.inputChanged()">
-            {{::attr.display_name}}
-          </md-checkbox>
-        </div>
-      </div>
+      <collapser title="Y-Axis Options">
+        <md-checkbox ng-repeat="attr in $ctrl.settings.yaxis"
+                    ng-model="attr.checked"
+                    name="yaxis"
+                    ng-change="$ctrl.inputChanged()">
+          {{::attr.display_name}}
+        </md-checkbox>
+      </collapser>
+      <collapser title="X-Axis Options">
+        <md-checkbox ng-repeat="attr in $ctrl.settings.xaxis"
+                    ng-model="attr.checked"
+                    name="xaxis"
+                    ng-change="$ctrl.inputChanged()">
+          {{::attr.display_name}}
+        </md-checkbox>
+      </collapser>
+      <collapser title="Group By">
+        <md-checkbox ng-repeat="attr in $ctrl.settings.groupBy"
+                    ng-model="attr.checked"
+                    name="groupBy"
+                    ng-change="$ctrl.inputChanged()">
+          {{::attr.display_name}}
+        </md-checkbox>
+      </collapser>
     </md-content>
   </md-sidenav>
 </div>
