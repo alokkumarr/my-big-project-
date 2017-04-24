@@ -4,7 +4,7 @@
 # /etc/rc.d/rc.local
 ##
 # NB: hardcoded user name
-APPL_USER=saw 
+APPL_USER=saw
 (( $(id -u) == 0 )) && {
     echo rerun with $APPL_USER: "$0 $@"
     exec /bin/su $APPL_USER -c "$0 $@"
@@ -12,7 +12,8 @@ APPL_USER=saw
     exit 1
 }
 
-CMD=${0##*/}    # strip dir/
+CMD_ARG="$0"
+CMD=${CMD_ARG##*/}    # strip dir/
 BAS=${CMD%.sh}  # strip .sh
 APPL_NAME=saw-security
 
@@ -22,7 +23,7 @@ usage() {
     echo "  $CMD CONT_LOOP - continuosly start $APPL_NAME in foreground"
     exit
 }
-[[ ${1:x} =~ --?[hH] ]] && usage
+[[ ${1:-x} =~ --?[hH] ]] && usage
 
 APPL_HOME=/opt/bda/$APPL_NAME # soft link
 ( cd $APPL_HOME ) || exit
@@ -40,7 +41,7 @@ tms() { date +'%s'      ; }
 
 # Top level run
 (( $# < 1 )) && {
-    logdir=$( appl_info vardir )
+    vardir=$( appl_info vardir )
     ( cd $vardir ) || exit
     log=$vardir/log/$BAS.log
     # Backup log file
@@ -55,7 +56,7 @@ tms() { date +'%s'      ; }
         exec </dev/null
         # first log record
         echo "$(dtz) - started: $0"
-        # start runner loop
+        echo "# starting runner loop"
         $0 CONT_LOOP "$@" &
         )
     exit 0
@@ -67,6 +68,8 @@ tms() { date +'%s'      ; }
 let cnt=0
 let tm_beg=0
 echo $(dtz) INFO.001 - $APPL_NAME runner loop started
+APPL_CMD=${APPL_HOME}/bin/$APPL_NAME.sh
+echo APPL_CMD=$APPL_CMD
 #
 while : ; do
     let ++cnt
@@ -74,25 +77,29 @@ while : ; do
     let tm_beg=$(tms)
     # start service in foreground
     # pid will be printed in log
-    /bin/sh -xc "let pid=\$\$; exec ${APPL_HOME}/bin/$APPL_HOME.sh start --fg"
+    /bin/sh -xc "let pid=\$\$; exec $APPL_CMD start --fg"
     rc=$?
     let tm_end=$(tms)
     let ss_run=$((tm_end-tm_beg))
-    echo $(dtz) - ended: ${APPL_HOME}/bin/$APPL_HOME.sh, rc=$rc, dt=${ss_run}s
+    echo $(dtz) - ended: $APPL_CMD, rc=$rc, dt=${ss_run}s
     # Restart if was running for more than 10 min
     (( ss_run > 600 )) && {
         let cnt=0
         cat <<EEOOMM2
 $(dtz) WARNING - $APPL_NAME service stopped after ${ss_run}s, restarting
+
 EEOOMM2
         sleep 1
         continue
     }
     # check was started more than 3 times
     (( cnt > 2 )) && {
+        echo
         echo $(dtz) ERROR - short running $APPL_NAME service was restarted $cnt times;
-        echo Restart limit exceeded, $CMD exiting.
-        echo Fix the $APPL_NAME problem and restart $CMD manually.
+        echo Restart limit exceeded.  Check log files in /var/bda/$APPL_NAME/log/.
+        echo Fix the $APPL_NAME problem and restart runner manually:
+        echo "$ sudo $CMD_ARG"
+        echo Exiting
         #
         exit 1
     }
@@ -101,6 +108,7 @@ EEOOMM2
 $(dtz) WARNING.004 - restarting $APPL_NAME after short run,
 short run count: $cnt, limit: 3;
 Fix the $APPL_NAME restart reason to avoid manual restart.
+
 EEOOMM4
     # wait 10 sec before restart
     sleep 10
@@ -114,4 +122,4 @@ exit -1
 # lines to be added to /etc/rc.local
 ###
 # start BDA saw-security server
-/opt/bda/saw-security/bin/saw-security_runner.sh &>/tmp/rc.local.saw-security_runner.log 
+( /opt/bda/saw-security/bin/saw-security-runner.sh &>/tmp/rc.local.saw-security-runner.log & )
