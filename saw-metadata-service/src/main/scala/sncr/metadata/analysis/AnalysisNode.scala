@@ -129,7 +129,7 @@ class AnalysisNode(private var analysisNode: JValue = JNothing) extends ContentN
     }
     catch {
       case x: Exception => {
-        val msg = s"Could not store node [ ID = ${new String(rowKey)} ]: "; m_log error(msg, x); (Error.id, msg)
+        val msg = s"Could not store node [ ID = ${Bytes.toString(rowKey)} ]: "; m_log error(msg, x); (Error.id, msg)
       }
     }
   }
@@ -208,7 +208,7 @@ object AnalysisNode{
 
 
   protected val requiredFields = Map(
-    "root" -> List("id", "module", "customerCode")
+    "root" -> List("id")
   )
 
   def  extractSearchData(analysisNode: JValue) : Map[String, Any] = {

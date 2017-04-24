@@ -33,7 +33,7 @@ class UINode(private var content: JValue,
 
   def buildSearchData : Map[String, Any] = {
     var searchValues : Map[String, Any] = UINode.extractSearchData(content) + (Fields.NodeId.toString -> new String(rowKey))
-    searchValues = searchValues + ( "in_type" -> ui_comp_type ) + ( "in_module" -> module_name )
+    searchValues = searchValues + ( "request_type" -> ui_comp_type ) + ( "request_module" -> module_name )
     searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
     searchValues
   }
@@ -77,7 +77,6 @@ class UINode(private var content: JValue,
     try {
 
       val put_op = createNode(NodeType.ContentNode.id, classOf[UINode].getName)
-
       setUINodeContent
       if (commit(saveContent(saveSearchData(put_op, buildSearchData))))
         (NodeCreated.id, s"${Bytes.toString(rowKey)}")
@@ -111,7 +110,7 @@ class UINode(private var content: JValue,
 
 object UINode
 {
-  protected val m_log: Logger = LoggerFactory.getLogger("UINodeObject")
+  protected val m_log: Logger = LoggerFactory.getLogger("sncr.metadata.ui_components.UINodeObject")
 
   val searchFields =
     Map(
@@ -125,10 +124,12 @@ object UINode
       "id" -> "String",
       "roleType" -> "String",
       "metric_name" -> "String",
-      "customerCode" -> "String")
+      "customerCode" -> "String",
+      "request_module" -> "String",
+      "request_type" -> "String")
 
   val UIModules = List("analyze", "observe", "alert")
-  val remappingAttributes =  List("module", "type")
+  val mandatoryAttributes =  List("module", "type", "customerCode")
 
 
   def apply(rowId: String) :UINode =
@@ -146,7 +147,8 @@ object UINode
       (content_element, "type"),
       (content_element, "metric_name"),
       (content_element, "customerCode"),
-      (content_element, "roleType"))
+      (content_element, "roleType"),
+      (content_element, "module"))
       .map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, searchFields(jv._2)) )
         m_log trace s"Field: ${jv._2}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${searchFields(jv._2)}\n, Value: $searchValue"
