@@ -141,8 +141,18 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
 
       case "AnalysisNode" | "SemanticNode" => if( content == null || content.obj.isEmpty)
                           (Rejected.id, "Content is empty Analysis/Semantic node creation requires content" )
-      case "DataObject"     => if( content == null || content.obj.isEmpty )
-                          (Rejected.id, "Content and/or DataLake Locations are empty DataObject creation requires content and locations" )
+      case "DataObject"     => {
+        if (content == null || content.obj.isEmpty)
+          (Rejected.id, "Content and/or DataLake Locations are empty DataObject creation requires content and locations")
+        try {
+          val dataObject = new DataObject(content)
+          dataObject.validate
+        }
+        catch{
+          case e:Throwable => (Rejected.id, "Update data object does not exist or cannot be loaded")
+        }
+
+      }
       case "AnalysisResult" =>  (Rejected.id, "The creation verb is not supported for this category" )
       case _ =>  (Rejected.id, s"Internal error: $nodeCategory")
     }
@@ -159,9 +169,17 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
         if( content == null || content.obj.isEmpty )
           (Rejected.id, "Content is empty Analysis/Semantic node creation requires content" )
 
-      case "DataObject" => if( (content == null || content.obj.isEmpty) &&
-                               (schema == null || dl_locations.arr.isEmpty) )
-                               (Rejected.id, "Content and/or DataObject schema are empty DataObject update requires content and/or schema " )
+      case "DataObject" => {
+        if ((content == null || content.obj.isEmpty) &&
+           (schema == null || dl_locations.arr.isEmpty))
+           return (Rejected.id, "Content and/or DataObject schema are empty DataObject update requires content and/or schema ")
+        try {
+          DataObject(id).setDescriptor(content)
+        }
+        catch{
+          case e:Throwable => (Rejected.id, "Update data object does not exist or cannot be loaded")
+        }
+      }
 
       case "AnalysisResult" =>  (Rejected.id, "The update verb is not supported for this category" )
 

@@ -12,24 +12,34 @@ import sncr.metadata.engine.{MDNodeUtil, _}
 import sncr.saw.common.config.SAWServiceConfig
 
 /**
-  * Created by srya0001 on 3/4/2017.
+  * The class provides access and handling to DataLake data objects.
+  * There are three type of data objects:
+  * - Data Sources (ds)
+  * - Temporary/Intermediate data objects (tmp)
+  * - Enriched data objects (edo)
+  * They must have a description.
+  * The following properties must be defined in data object description:
+  * - partition type: { none| hive| drill}
+  * - product: product that DO belongs to.
+  * - storageType : { parquet| maprdb | json| csv| }
+  * - displayName - UI attribute, display name of data object.
   */
 class DataObject(final private var descriptor : JValue, final private var schema : JValue = JNothing)
   extends ContentNode
   with SourceAsJson{
 
-
   def setSchema(newSchema: JObject) = schema = newSchema
 
-
   def setDescriptor : Unit = {
-    if (descriptor != JNothing) {
+    if (descriptor != null && descriptor != JNothing) {
       val (result, msg) = validate
       if (result != Success.id)
         throw new Exception(s"Could not create Data Object with provided descriptor, reason: $result - $msg")
       else
         setContent(compact(render(descriptor)))
     }
+    else
+      throw new Exception(s"Could not create Data Object with provided descriptor, descriptor is null or empty")
   }
 
   def setDescriptor(newDescriptor : String): Unit =
@@ -38,7 +48,10 @@ class DataObject(final private var descriptor : JValue, final private var schema
     setDescriptor
   }
 
-  def setDescriptor(newDescriptor : JValue): Unit = descriptor = newDescriptor
+  def setDescriptor(newDescriptor : JValue): Unit = {
+    descriptor = newDescriptor
+    setDescriptor
+  }
 
   def this() = { this(JNothing, JNothing) }
 
@@ -49,8 +62,6 @@ class DataObject(final private var descriptor : JValue, final private var schema
 
   protected override def compileRead(g: Get) = includeLocations(
                                      includeContent(g))
-
-//  final private[this] var schemaConvertedToString: String = compact(render(schema))
 
   private def getDataObjectSchema(res: Result): JValue =
   {
@@ -92,12 +103,16 @@ class DataObject(final private var descriptor : JValue, final private var schema
 
 
   override protected def initRow: String = {
-    val rowkey = (descriptor \ "name").extract[String] + MetadataDictionary.separator +  System.currentTimeMillis()
+    val id = (descriptor \ "id").extractOpt[String]
+    if (id.isDefined) return id.get
+    val rowkey = (descriptor \ "name").extract[String] + MetadataDictionary.separator +
+    (descriptor \ "type").extract[String] + MetadataDictionary.separator +
+    System.currentTimeMillis()
     m_log debug s"Generated RowKey = $rowkey"
     rowkey
   }
 
-  protected def validate: (Int, String) = {
+  def validate: (Int, String) = {
     descriptor match {
       case null | JNothing => (Rejected.id, "Empty node, does not apply for requested operation")
       case _: JValue => {
@@ -141,7 +156,6 @@ class DataObject(final private var descriptor : JValue, final private var schema
     try {
       val (res, msg) = selectRowKey(filter)
       if (res != Success.id) return (res, msg)
-//      load
       setDescriptor
 
       val searchValues: Map[String, Any] = DataObject.extractSearchData(descriptor) + (Fields.NodeId.toString -> new String(rowKey))
@@ -292,15 +306,22 @@ object DataObject{
   }
 
 
-  val searchFields = Map("name" -> "String", "owner" -> "String", "application" -> "String", "id" -> "String")
+  val searchFields = Map(
+    "name" -> "String",
+    "type" -> "String",
+    "customerCode" -> "String",
+    "product" -> "String",
+    "id" -> "String")
 
-  val requiredFields = List("name", "type", "owner", "partition_type")
+  val requiredFields = List("name", "type", "product", "partitionType", "storageType", "displayName", "description" )
 
   def extractSearchData(descriptor: JValue) : Map[String, Any] = {
     List(
       (descriptor, ("name", "String")),
-      (descriptor, ("owner", "String")),
-      (descriptor, ("application", "String"))
+      (descriptor, ("type", "String")),
+      (descriptor, ("product", "String")),
+      (descriptor, ("customerCode", "String")),
+      (descriptor, ("id", "String"))
      ).map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2._1, jv._2._2))
         m_log trace s"Field: ${jv._2._1}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${jv._2._2}\n, Value: $searchValue"

@@ -1,5 +1,7 @@
 package sncr.metadata.semantix
 
+import java.util.UUID
+
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{Result, _}
 import org.apache.hadoop.hbase.util.Bytes
@@ -9,29 +11,30 @@ import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.MDObjectStruct.{apply => _, _}
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine._
-import sncr.metadata.engine.relations.Relation
-import sncr.metadata.ui_components.UINodeFetchMode
+import sncr.metadata.engine.relations.BetaRelation
 import sncr.saw.common.config.SAWServiceConfig
 
 /**
   * Created by srya0001 on 2/19/2017.
   */
-class SemanticNode(private var content_element: JValue,
+class SemanticNode(private var metricDescriptor: JValue,
+                   private val scope: String = SemanticNode.defScope,
                    private val predefRowKey : String = null)
       extends ContentNode
-      with Relation
+      with BetaRelation
       with SourceAsJson {
 
   override protected val m_log: Logger = LoggerFactory.getLogger(classOf[SemanticNode].getName)
 
-  private var fetchMode : Int = UINodeFetchMode.Everything.id
-
-  def setFetchMode(m: Int) = { fetchMode = m }
-
-  def setSemanticNodeContent : Unit = {
-    if (content_element != JNothing) {
-      content_element.replace(List("_id"), JString(new String(rowKey)))
-      setContent(compact(render(content_element)))
+  def setSemanticNodeContent() : Unit = {
+    if (metricDescriptor != null && metricDescriptor != JNothing) {
+      val (result, msg) = validate
+      if (result != Success.id)
+        throw new Exception(s"Could not create Semantic Node with provided descriptor, reason: $result - $msg")
+      else {
+        metricDescriptor = metricDescriptor.replace(List("id"), JString(new String(rowKey)))
+        setContent(compact(render(metricDescriptor)))
+      }
     }
   }
 
@@ -45,13 +48,11 @@ class SemanticNode(private var content_element: JValue,
   override protected def getData(res:Result): Option[Map[String, Any]] = {
     val (dataAsJVal, dataAsByteArray) = getSourceData(res)
     setContent(dataAsByteArray)
-    if (fetchMode == UINodeFetchMode.Everything.id)
-      Option(getSearchFields(res) + (key_Definition.toString -> dataAsJVal))
-    else
-      Option(Map(key_Definition.toString -> dataAsJVal))
+    scope match{
+      case "node" => Option(getSearchFields(res) + (key_Definition.toString -> dataAsJVal))
+      case "relation" => Option(Map(key_Definition.toString -> dataAsJVal))
+    }
   }
-
-  import MDObjectStruct.formats
   protected val table = SAWServiceConfig.metadataConfig.getString("path") + "/" + tables.SemanticMetadata
   protected val tn: TableName = TableName.valueOf(table)
   mdNodeStoreTable = connection.getTable(tn)
@@ -59,8 +60,7 @@ class SemanticNode(private var content_element: JValue,
 
   override protected def initRow : String = {
     if (predefRowKey == null || predefRowKey.isEmpty) {
-      val rowkey = (content_element \ "customer_code").extractOpt[String] +
-        MetadataDictionary.separator + System.nanoTime()
+      val rowkey = UUID.randomUUID().toString
       m_log debug s"Generated RowKey = $rowkey"
       rowkey
     }
@@ -75,8 +75,8 @@ class SemanticNode(private var content_element: JValue,
     try {
       val put_op = createNode(NodeType.ContentNode.id, classOf[SemanticNode].getName)
 
-      setSemanticNodeContent
-      val searchValues : Map[String, Any] = SemanticNode.extractSearchData(content_element) + (Fields.NodeId.toString -> new String(rowKey))
+      setSemanticNodeContent()
+      val searchValues : Map[String, Any] = SemanticNode.extractSearchData(metricDescriptor) + (Fields.NodeId.toString -> new String(rowKey))
       searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
 
       if (commit(saveContent(saveSearchData(put_op, searchValues))))
@@ -95,8 +95,8 @@ class SemanticNode(private var content_element: JValue,
     try {
       val (res, msg ) = selectRowKey(keys)
       if (res != Success.id) return (res, msg)
-      setSemanticNodeContent
-      val searchValues : Map[String, Any] = SemanticNode.extractSearchData(content_element) + (Fields.NodeId.toString -> new String(rowKey))
+      setSemanticNodeContent()
+      val searchValues : Map[String, Any] = SemanticNode.extractSearchData(metricDescriptor) + (Fields.NodeId.toString -> new String(rowKey))
       searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
 
       if (commit(saveRelation(saveContent(saveSearchData(update, searchValues)))))
@@ -109,16 +109,35 @@ class SemanticNode(private var content_element: JValue,
     }
   }
 
+
+  def validate: (Int, String) = {
+    metricDescriptor match {
+      case null | JNothing => (Rejected.id, "Empty node, does not apply for requested operation")
+      case _: JValue => {
+        SemanticNode.requiredFields.foreach { f =>
+          if ((metricDescriptor \ f).extract[String].isEmpty) {
+            val msg = s"Required field $f is missing or empty"
+            m_log debug Rejected.id + " ==> " + msg
+            return (Rejected.id, msg)
+          }
+        }
+      }
+    }
+    (Success.id, "Request is correct")
+  }
+
+
 }
 
 
 object SemanticNode
 {
   val searchFields: Map[String, String] = Map(
-    "customer_code" -> "String",
+    "customerCode" -> "String",
     "metric_name" -> "String"
   )
 
+  val requiredFields = List("id", "supports", "repository", "artifacts")
 
 
   protected val m_log: Logger = LoggerFactory.getLogger("SemanticNodeObject")
@@ -133,13 +152,17 @@ object SemanticNode
 
   def  extractSearchData( content_element: JValue) : Map[String, Any] = {
     List((content_element, "metric_name"),
-        (content_element, "customer_code"))
+        (content_element, "customerCode"))
       .map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, searchFields(jv._2)) )
         m_log trace s"Field: ${jv._2}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${searchFields(jv._2)}\n, Value: $searchValue"
         if (result) jv._2 -> Option(searchValue) else jv._2 -> None
       }).filter(_._2.isDefined).map(kv => kv._1 -> kv._2.get).toMap
   }
+
+  val defScope = "node"
+  val scopes = List("node", "relation")
+
 
 }
 

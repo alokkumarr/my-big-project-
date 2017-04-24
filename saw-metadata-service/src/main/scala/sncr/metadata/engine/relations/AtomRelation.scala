@@ -16,7 +16,7 @@ trait AtomRelation{
 
   protected val m_log: Logger = LoggerFactory.getLogger(classOf[AtomRelation].getName)
 
-  var relType : Int = RelationCategory.RelationSimpleSet.id
+  protected var relType : Int = RelationCategory.AtomicRelation.id
   protected var elements : Array[(String, String)] = Array.empty
   protected var readNumOfElements : Int = 0
   protected var _elementsAsJSON : JValue = JNothing
@@ -29,7 +29,7 @@ trait AtomRelation{
   protected def getRelationDataAsJson(res:Result) : JValue =
   {
     getRelationData(res)
-    normarize
+    normalize
   }
 
   protected def getRelationData(res:Result) : Unit =
@@ -54,7 +54,7 @@ trait AtomRelation{
   def saveRelation(nodePut: Put)  : Put =
   {
     if (nodePut == null) return null
-    normarize
+    normalize
     nodePut
       .addColumn(MDColumnFamilies(_cf_relations.id),Bytes.toBytes(Fields.NumOfElements.toString), Bytes.toBytes(elements.length))
       .addColumn(MDColumnFamilies(_cf_relations.id),Bytes.toBytes(Fields.RelationCategory.toString), Bytes.toBytes(relType))
@@ -68,13 +68,7 @@ trait AtomRelation{
    }
 
   def elementsAsJson : JValue = _elementsAsJSON
-
-
-  def loadRelatedNodeHeaders: Map[String, Option[Map[String, Any]]] = elements.map(pair => pair._2 -> MetadataNode.loadHeader(pair._1, pair._2, true)).toMap
-
-
   def getRelatedNodes : List[(String, String)] = elements.clone().toList
-
 
 
   def removeNodesFromRelation( rowKeys:List[(String, String)] ): JValue =
@@ -84,7 +78,7 @@ trait AtomRelation{
       elements = elements.filterNot(el => tableName.equals(el._1) && rk._2.equals(el._2))
     })
     m_log trace s"Remove nodes from relation: updated Node List = ${elements.mkString("[", ",", "]")}"
-    normarize
+    normalize
   }
 
   def removeNodeFromRelation(a_rowID : String, nodeCategory: String): JValue =
@@ -92,7 +86,7 @@ trait AtomRelation{
     val tableName = NodeCategoryMapper.NCM(nodeCategory).toString
     elements = elements.filterNot( el => { m_log debug s"Table ${el._1} RowId: ${el._2}"; tableName.equals(el._1) && a_rowID.equals(el._2)} )
     m_log trace s"Remove node from relation: Table = ${tableName}, RowID = $a_rowID, updated RowIds = ${elements.mkString("[", ",", "]")}"
-    normarize
+    normalize
   }
 
 
@@ -104,7 +98,7 @@ trait AtomRelation{
      rowID.map( id => (mdTableName.toString, Bytes.toString(id)))
     }).toList
     elements = elements ++ rowIDs.flatMap( list_of_pairs => list_of_pairs )
-    normarize
+    normalize
   }
 
   def addNodeToRelation(a_rowID : String, nodeCategory: String): JValue =
@@ -112,7 +106,7 @@ trait AtomRelation{
     val tableName = NodeCategoryMapper.NCM(nodeCategory).toString
     elements = elements ++ List((tableName, a_rowID))
     m_log trace s"Add node to relation: Table = ${tableName}, updated RowIds = ${elements.mkString("[", ",", "]")}"
-    normarize
+    normalize
   }
 
 
@@ -122,11 +116,11 @@ trait AtomRelation{
     val rowIDs : List[Array[Byte]] = SearchMetadata.simpleSearch(tableName, keys, Map.empty, "and")
     m_log trace s"Add nodes to relation: Table = $tableName, updated RowIds = ${rowIDs.map( Bytes.toString ).mkString("[", ",", "]")}"
     elements = elements ++ rowIDs.map( id => (tableName, Bytes.toString(id)))
-    normarize
+    normalize
   }
 
 
-  private def normarize: JValue =
+  protected def normalize: JValue =
   {
     elements = elements.distinct
     readNumOfElements = elements.length

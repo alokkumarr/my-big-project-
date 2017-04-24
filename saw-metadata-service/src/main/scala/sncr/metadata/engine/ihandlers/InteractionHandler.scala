@@ -36,17 +36,8 @@ class InteractionHandler(val docAsJson : JValue, val printPretty: Boolean = true
 
   protected override val m_log: Logger = LoggerFactory.getLogger(classOf[UIMDRequestHandler].getName)
 
-  var elements : JValue= null
-  var keys :  Map[String, Any] = Map.empty
-
-  /**
-    * Create response for incorrect request
-    *
-    * @return
-    */
-  private def handleRequestIncorrect: List[JValue] =
-    List(new JObject(List(JField("result", JString(Rejected.toString)), JField("message", JString("Request structure is not correct")))))
-
+  protected var elements : JValue= null
+  protected var keys :  Map[String, Any] = Map.empty
 
   /**
     * The main method of the class does:
