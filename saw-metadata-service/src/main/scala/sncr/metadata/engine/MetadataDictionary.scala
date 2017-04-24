@@ -131,6 +131,7 @@ object Fields extends Enumeration {
   val NumOfElements =  Value(3, "_number_of_elements")
   val RelationCategory = Value(4, "_relation_category")
   val ObjectDescriptor = Value(5, "_object_descriptor")
+  val ObjectMetadata = Value(6, "_object_metadata")
 
 }
 
