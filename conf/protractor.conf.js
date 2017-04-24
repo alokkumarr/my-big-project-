@@ -3,18 +3,16 @@ const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
 
 exports.config = {
   framework: 'jasmine2',
+  //chromeDriver: '../node_modules/chromedriver/bin/chromedriver',
   seleniumAddress: 'http://localhost:4444/wd/hub',
   getPageTimeout: 60000,
   allScriptsTimeout: 500000,
-  directConnect: true,
+  //directConnect: true,
 
   multiCapabilities: [
-    /*{
-      shardTestFiles: true
-    },*/
 
     {
-      'browserName': 'chrome',
+      browserName: 'chrome',
        chromeOptions: {
         args: [
           //'incognito',
@@ -25,11 +23,11 @@ exports.config = {
     },
 
     {
-      'browseName': 'firefox'
+      browserName: 'firefox'
     }
   ],
 
-  maxSessions: 2,
+  //maxSessions: 2,
 
   jasmineNodeOpts: {
     isVerbose: true,
