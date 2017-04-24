@@ -1,0 +1,96 @@
+{
+  "id" : "analyses_chart_345674", 
+  "name" : "Order Fulfilment", 
+  "active" : "true",
+  "type" : "report", 
+  "metricName" : "Order Analysis", 
+  "scheduled" : "0 0 12 1/1 * ? *", 
+  "publish" : 
+  {
+      "sourceType" : "EMAIL",
+		  "emailid" : ["saurav.paul@synchronoss.com", "suren.nathan@synchronoss.com"], 
+		  "host" : "exchange.outlook.com/OWA", 
+		  "port" : 22, 
+		  "password" : "Gryqzaec1234YH" 
+		  
+  },
+  "edit" : true, 
+  "query" : "{\"size\":0,\"aggs\":{\"filtered\":{\"filter\":{\"bool\":{\"must\":[{\"terms\":{\"REGION\":[\"SouthWest\",\"East\"]}}]}},\"aggs\":{\"row_level_1\":{\"terms\":{\"field\":\"AFFILIATE_DISPLAY_NAME.raw\",\"size\":0},\"aggs\":{\"row_level_2\":{\"terms\":{\"field\":\"FACT_PRODUCT_ID\",\"size\":0},\"aggs\":{\"column_level_1\":{\"date_histogram\":{\"field\":\"ORDER_CANCELLATION_TIME\",\"interval\":\"hour\"}}}}}}}}}}", 
+  "description" : "This is a report sample 1", 
+          "repository": 
+              {
+                "storageType" : "ES",
+                "indexName" : "demo_order_latest_prc_batch",
+                "type" : "order",
+                "URL" : "https://sncradmin:xuw3dUraHapret@razorinsights-trial.razorsight.com/esuat/"
+              },
+  
+  "metrics": [
+    "Orders",
+    "Revenue"
+  ],
+  "chart": {
+    "filters": [
+      {
+        "column_name": "ENR_PARTNER",
+        "label": "Enr Partner",
+        "table_name": "Orders",
+        "boolean_criteria": "AND",
+        "filter_type": "string",
+        "operator": null,
+        "search_conditions": [
+          "REDVEN",
+          "DIRECTV",
+          "MOVEAROO",
+          "QOLOGY"
+        ]
+      }
+    ],
+    "xAxis": {
+      "title": "Custom X"
+    },
+    "yAxis": {
+      "title": "Custom Y"
+    },
+    "legend": {
+      "align": "right",
+      "layout": "vertical"
+    }
+  },
+  
+  "artifacts": [
+    {
+      "column_name": "ENR_PARTNER",
+      "display_name": "Enr Partner",
+      "alias_name": "",
+      "type": "string",
+      "x-axis": true,
+      "hide": false,
+      "join_eligible": false,
+      "filter_eligible": true,
+      "tableName": "Orders"
+    },
+    {
+      "column_name": "ORDER_COMPLETION_TIME",
+      "display_name": "Order Completion Time",
+      "alias_name": "",
+      "type": "int",
+      "hide": false,
+      "join_eligible": false,
+      "filter_eligible": true,
+      "y-axis": true,
+      "tableName": "Orders"
+    },
+    {
+      "column_name": "SERVICE_STATE",
+      "display_name": "Service State",
+      "alias_name": "",
+      "type": "string",
+      "hide": false,
+      "join_eligible": false,
+      "filter_eligible": true,
+      "z-axis": true,
+      "tableName": "Service"
+    }
+  ]
+}

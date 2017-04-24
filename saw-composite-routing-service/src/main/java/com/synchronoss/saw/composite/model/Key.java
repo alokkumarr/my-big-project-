@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
 
 })
-public class Keys {
+public class Key {
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -35,7 +35,7 @@ public class Keys {
         this.additionalProperties.put(name, value);
     }
 
-    public Keys withAdditionalProperty(String name, Object value) {
+    public Key withAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
         return this;
     }
