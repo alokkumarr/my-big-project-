@@ -133,8 +133,7 @@ class AnalysisExecutionHandler(val nodeId : String) {
     *
     * @param out
     */
-  def handleResult(out: OutputStream = null) : Unit =
-  {
+  def handleResult(out: OutputStream = null) : Unit = {
     val readData: String = HFileOperations.readFile(resultExecOutputFile)
     if (readData == null || readData.isEmpty)
       throw new Exception("Could not read SparkSQL Executor result file/ file is empty")
@@ -147,30 +146,30 @@ class AnalysisExecutionHandler(val nodeId : String) {
       resultNode = AnalysisResult(nodeId, analysisResultNodeID)
       nodeExists = true
     }
-    catch{
-      case e : Exception => m_log debug("Tried to load node: ", e)
+    catch {
+      case e: Exception => m_log debug("Tried to load node: ", e)
     }
     if (nodeExists) resultNode.delete
 
     val analysisName = (definition \ "name").extractOpt[String]
     val analysisId = (definition \ "id").extractOpt[String]
 
-    status = ( jsonResult \ "status" ).extract[String]
+    status = (jsonResult \ "status").extract[String]
 
-    var descriptor : JObject = null
+    var descriptor: JObject = null
 
     val ldt: LocalDateTime = LocalDateTime.now()
     val timestamp: String = ldt.format(dfrm)
-
     var schema : JValue = JNothing
+
     if (status.equalsIgnoreCase("success")) {
 
-    schema = jsonResult \ "schema" match{
-      case o: JObject =>  o
-      case _ => JObject(JField("metadata", JString("ERROR! Could not extract schema")))
-    }
+      schema  = jsonResult \ "schema" match {
+        case o: JObject => o
+        case _ => JObject(JField("schema", JString("ERROR! Could not extract schema")))
+      }
 
-      val (finalOutputType, finalOutputLocation )= (jsonResult \ "outputTo").extract[String] match {
+      val (finalOutputType, finalOutputLocation) = (jsonResult \ "outputTo").extract[String] match {
         case "inline" => ("json", "inline")
         case "hdfs" => (outputType, outputLocation)
         case _ => ("unknown", "unknown")
@@ -188,7 +187,7 @@ class AnalysisExecutionHandler(val nodeId : String) {
       ))
       m_log debug s"Create result: with content: ${compact(render(descriptor))}"
     }
-    else{
+    else {
       val errorMsg = (jsonResult \ "errorMessage").extract[String]
       descriptor = new JObject(List(
         JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
@@ -202,8 +201,7 @@ class AnalysisExecutionHandler(val nodeId : String) {
     }
 
     var descriptorPrintable: JValue = null
-    resultNode = new AnalysisResult(nodeId,descriptor, analysisResultNodeID)
-
+    resultNode = new AnalysisResult(nodeId, descriptor, analysisResultNodeID)
     if (status.equalsIgnoreCase("success")) {
 
       (jsonResult \ "outputTo").extract[String] match {
@@ -227,21 +225,20 @@ class AnalysisExecutionHandler(val nodeId : String) {
         case _ => m_log warn "Data descriptor/data section not found" //throw new Exception("Unsupported data/output type found!")
       }
     }
-    else
-    {
+    else {
       descriptorPrintable = descriptor
     }
 
     val (res, msg) = resultNode.create
     m_log info s"Analysis result creation: $res ==> $msg"
-
-    if( out != null) {
+    if (out != null) {
       out.write(pretty(render(descriptorPrintable)).getBytes())
       out.flush()
     }
     m_log debug "Result node: " + pretty(render(descriptorPrintable))
     removeFiles()
   }
+
 
   def getPreDefinedResultKey : String = analysisResultNodeID
 

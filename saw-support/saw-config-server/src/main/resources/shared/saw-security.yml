@@ -12,7 +12,7 @@ mail:
     username: ''
 server:
     address: 127.0.0.1 
-    context-path: /saw-security-service
+    context-path: /saw-security
     port: 9000
     tomcat:
         compressableMimeTypes: application/json
@@ -27,7 +27,7 @@ spring:
         testOnConnect: true
         testOnReturn: true
         testWhileIdle: true
-        url: jdbc:mariadb://10.49.0.169:3306/saw_dev
+        url: jdbc:mariadb://10.49.0.169:3306/saw_test_2
         username: dev_user
         validationQuery: SELECT 1
     sleuth:
