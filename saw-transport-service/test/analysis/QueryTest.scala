@@ -27,13 +27,31 @@ class QueryTest extends FunSpec with MustMatchers {
     }
   }
 
+  describe("Query built from analysis with multiple artifacts") {
+    it("should list all columns in SELECT and all tables in FROM clause") {
+      queryTwo(artifactT)(artifactU) must be (
+        "SELECT t.a, t.b, u.c, u.d FROM t, u")
+    }
+  }
+
   private def artifactAB = {
     artifact("t", "a", "b")
+  }
+
+  private def artifactU = {
+    artifact("u", "c", "d")
   }
 
   private def query(objs: JObject*): String = {
     val artifact = objs.reduceLeft(_ merge _)
     val analysis = ("artifacts", List(artifact))
+    QueryBuilder.build(analysis)
+  }
+
+  private def queryTwo(objs1: JObject*)(objs2: JObject*): String = {
+    val artifact1 = objs1.reduceLeft(_ merge _)
+    val artifact2 = objs2.reduceLeft(_ merge _)
+    val analysis = ("artifacts", List(artifact1, artifact2))
     QueryBuilder.build(analysis)
   }
 
