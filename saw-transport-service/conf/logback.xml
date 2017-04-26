@@ -70,6 +70,8 @@
       </logger>
     -->
 	
+  <logger name="test" level="${log.test.level:-INFO}"/>
+
   <root level="INFO">
     <appender-ref ref="STDOUT" /> 
     <appender-ref ref="FILE" />

@@ -4,12 +4,15 @@ import org.json4s._
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.scalatestplus.play._
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.test._
 import play.api.test.Helpers._
 
 class MaprTest extends PlaySpec with OneAppPerSuite {
   /* Add MapR classpath to test runner */
   MaprHelper.addClasspath
+
+  val log: Logger = LoggerFactory.getLogger("test")
 
   def requireMapr {
     val hostname = InetAddress.getLocalHost.getHostName()
@@ -50,10 +53,12 @@ class MaprTest extends PlaySpec with OneAppPerSuite {
   }
 
   def sendRequest(body: JValue) = {
+    log.trace("Request: " + pretty(render(body)))
     val headers = FakeHeaders(Seq("Content-type" -> "application/json"))
     val Some(response) = route(
       FakeApplication(), FakeRequest(
         POST, "/analysis", headers, pretty(render(body))))
+    log.trace("Response: " + pretty(render(parse(contentAsString(response)))))
     status(response) mustBe OK
     contentType(response) mustBe Some("application/json")
     parse(contentAsString(response))
