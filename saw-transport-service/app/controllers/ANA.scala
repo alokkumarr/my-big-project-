@@ -45,9 +45,9 @@ class ANA extends BaseServiceProvider {
         val idJson: JObject = ("id", UUID.randomUUID.toString)
         val analysisType = extractKey(json, "analysisType")
         val typeJson: JObject = ("type", analysisType)
+        val semanticJson = readSemanticJson(semanticId)
         val mergeJson = contentsAnalyze(
-          readSemanticNode(semanticId)
-            merge(idJson).merge(semanticIdJson).merge(typeJson))
+          semanticJson.merge(idJson).merge(semanticIdJson).merge(typeJson))
         val responseJson = json merge mergeJson
         val analysisJson = (responseJson \ "contents" \ "analyze")(0)
         val analysisNode = new AnalysisNode(analysisJson)
@@ -69,7 +69,7 @@ class ANA extends BaseServiceProvider {
       }
       case "read" => {
         val analysisId = extractAnalysisId(json)
-        json merge contentsAnalyze(readAnalysisNode(analysisId))
+        json merge contentsAnalyze(readAnalysisJson(analysisId))
       }
       case "execute" => {
         val analysisId = extractAnalysisId(json)
@@ -129,7 +129,7 @@ class ANA extends BaseServiceProvider {
     analysis merge(query)
   }
 
-  private def readAnalysisNode
+  private def readAnalysisJson
     (analysisId: String, semantic: Boolean = false): JObject = {
     /* If the analysis ID is given as "_static" return a static analysis
      * template that is used to bootstrap tests when the semantic
@@ -140,8 +140,7 @@ class ANA extends BaseServiceProvider {
       ("name", "static")
     }
     val analysisNode = if (semantic) {
-      // TODO: Replace with SemanticNode when available
-      UINode(analysisId)
+      readSemanticNode(analysisId)
     } else {
       AnalysisNode(analysisId)
     }
@@ -151,8 +150,13 @@ class ANA extends BaseServiceProvider {
     }
   }
 
-  private def readSemanticNode(semanticId: String): JObject = {
-    readAnalysisNode(semanticId, true)
+  private def readSemanticJson(semanticId: String): JObject = {
+    readAnalysisJson(semanticId, true)
+  }
+
+  private def readSemanticNode(semanticId: String): UINode = {
+    // TODO: Replace with SemanticNode when available
+    UINode(semanticId)
   }
 
   private def contentsAnalyze(analysis: JObject): JObject = {
