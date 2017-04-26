@@ -459,6 +459,10 @@ echo post-install complete: ${app.nameVer}
                     <preremoveScriptlet>
                         <script>
 echo pre-remove starting: ${app.nameVer}
+echo remove files in log/, run/ subdirs in ${app.varDir}
+( set -x
+  rm -f ${app.varDir}/{log,run}/*
+  )
 echo remove files generated from templates
 ( set -x
   rm -f ${app.optDir}/conf/{application.properties,bootstrap.yml}
