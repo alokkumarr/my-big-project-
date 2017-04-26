@@ -15,7 +15,7 @@ class MaprTest extends PlaySpec with OneAppPerSuite {
     val hostname = InetAddress.getLocalHost.getHostName()
     /* Skip these tests that require a MapR-DB connection if not running
      * in an environment with MapR-DB available */
-    if (!hostname.contains("cloud.synchronoss.net")) {
+    if (!hostname.contains("vacum-np.sncrcorp.net")) {
       pending
     }
   }
