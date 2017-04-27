@@ -6,7 +6,7 @@ import org.scalatest.MustMatchers
 
 import model.QueryBuilder
 
-class QueryTest extends FunSpec with MustMatchers {
+class QueryBuilderTest extends FunSpec with MustMatchers {
   describe("Query built from analysis") {
     it("should have SELECT and FROM") {
       query(artifactT) must be ("SELECT t.a, t.b FROM t")
