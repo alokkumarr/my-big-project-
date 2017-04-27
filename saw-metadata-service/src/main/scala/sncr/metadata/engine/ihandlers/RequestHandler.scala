@@ -12,6 +12,9 @@ import sncr.metadata.datalake.DataObject
 import sncr.metadata.engine.MDObjectStruct.{apply => _, _}
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine._
+import sncr.metadata.engine.context.SelectModels
+import sncr.metadata.engine.relations.SimpleRelation
+import sncr.metadata.semantix.SemanticNode
 import sncr.metadata.ui_components.UINode
 
 
@@ -344,25 +347,26 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
       case "AnalysisNode" => val ah = AnalysisNode(id); respGenerator.build(ah.getCachedData)
       case "DataObject"   => val doh = DataObject(id); respGenerator.build(doh.getCachedData)
       case "AnalysisResult"   => val arh = AnalysisResult(null, id); respGenerator.build(arh.getCachedData)
-      case "SemanticNode" => respGenerator.build(Error.id, "Not implemented")
+      case "SemanticNode" =>  val sh = SemanticNode(id, SelectModels.relation.id); respGenerator.build(sh.getCachedData)
       case _ => respGenerator.build(Error.id, "Not supported")
     }
   }
 
-  private def update: JValue =
-  {
+  private def update: JValue = {
     val keys = Map("id" -> id)
     nodeCategory match {
-      case "UINode"       => {
-        val uih = new UINode(content, ui_module, ui_type); respGenerator.build(uih.update(keys))}
+      case "UINode" => {
+        val uih = new UINode(content, ui_module, ui_type);
+        respGenerator.build(uih.update(keys))
+      }
       case "AnalysisNode" => {
         var ah: AnalysisNode = null
         if (content != null && content.obj.nonEmpty)
           ah = new AnalysisNode(content)
         else
           ah = new AnalysisNode
-          m_log debug s"Raw DO list: $base_relation"
-          base_relation.arr.foreach {
+        m_log debug s"Raw DO list: $base_relation"
+        base_relation.arr.foreach {
           case o: JObject => {
             val lNodeID = (o \ "id").extractOrElse[String]("")
             val lNodeCategory = (o \ "node-category").extractOrElse[String]("")
@@ -379,19 +383,36 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
         val doh = DataObject(id)
         if (content != null && content.obj.nonEmpty) doh.setDescriptor(content)
         if (schema != null && schema.obj.nonEmpty) doh.setSchema(schema)
-        if (dl_locations.arr.nonEmpty){
-          dl_locations.arr.foreach{
+        if (dl_locations.arr.nonEmpty) {
+          dl_locations.arr.foreach {
             case o: JString => doh.addLocation(o.s)
             case _ => m_log error "Incorrect location: skip it"
           }
         }
         respGenerator.build(doh.update(keys))
       }
-
-      case "SemanticNode" => respGenerator.build(Error.id, "Not implemented")
+      case "SemanticNode" => {
+        var snh: SemanticNode = null
+        if (content != null && content.obj.nonEmpty)
+          snh = new SemanticNode(content)
+        else
+          snh = new SemanticNode
+        m_log debug s"Raw DO list: $base_relation"
+        base_relation.arr.foreach {
+          case o: JObject => {
+            val lNodeID = (o \ "id").extractOrElse[String]("")
+            val lNodeCategory = (o \ "node-category").extractOrElse[String]("")
+            if (lNodeID.nonEmpty && lNodeCategory.nonEmpty) {
+              val rels = snh.addNodeToRelation(lNodeID, lNodeCategory)
+              m_log debug s"Nodes: ${compact(render(rels))}"
+            }
+          }
+          case _ => m_log error "Incorrect request structure: base-relation entry, skip it"
+        }
+        respGenerator.build(snh.update(keys))
+      }
       case _ => respGenerator.build(Error.id, "Not supported")
     }
-
   }
 
 
@@ -427,7 +448,23 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
         }
         respGenerator.build(doh.create)
       }
-      case "SemanticNode" => respGenerator.build(Error.id, "Not implemented")
+      case "SemanticNode" =>
+        {
+            val snh = new SemanticNode(content)
+            m_log debug s"Raw DO list: $base_relation"
+            base_relation.arr.foreach {
+              case o: JObject => {
+                val lNodeID = (o \ "id").extractOrElse[String]("")
+                val lNodeCategory = (o \ "node-category").extractOrElse[String]("")
+                if (lNodeID.nonEmpty && lNodeCategory.nonEmpty) {
+                  val rels = snh.addNodeToRelation(lNodeID, lNodeCategory)
+                  m_log debug s"Nodes: ${compact(render(rels))}"
+                }
+              }
+              case _ => m_log error "Incorrect request structure: base-relation entry, skip it"
+            }
+            respGenerator.build(snh.create)
+          }
       case _ => respGenerator.build(Error.id, "Not supported")
     }
   }
@@ -440,7 +477,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
       case "AnalysisNode" => (classOf[AnalysisNode].getName, tables.AnalysisMetadata.toString)
       case "DataObject"   => (classOf[DataObject].getName, tables.DatalakeMetadata.toString)
       case "AnalysisResult" => (classOf[AnalysisResult].getName, tables.AnalysisResults.toString)
-      case "SemanticNode" => return respGenerator.build(Error.id, "Not implemented")
+      case "SemanticNode" => (classOf[SemanticNode].getName, tables.SemanticMetadata.toString)
       case _ => return respGenerator.build(Error.id, "Not supported")
     }
     val systemKeys = Map( syskey_NodeCategory.toString -> nodeCategoryValue)
@@ -457,7 +494,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
       case "AnalysisNode" => tables.AnalysisMetadata.toString
       case "DataObject"   => tables.DatalakeMetadata.toString
       case "AnalysisResult" => tables.AnalysisResults.toString
-      case "SemanticNode" => return respGenerator.build(Error.id, "Not implemented")
+      case "SemanticNode" => tables.SemanticMetadata.toString
       case _ => return respGenerator.build(Error.id, "Not supported")
     }
     val rowKeyes = SearchMetadata.scanMDNodes(table_name)
@@ -465,34 +502,41 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
   }
 
 
+  private def manageRelations[T <: SimpleRelation ]( ah : T  ) : Unit = {
+    if (base_relation.arr.nonEmpty) {
+      base_relation.arr.foreach {
+        case o: JObject => {
+          val lNodeID = (o \ "id").extractOrElse[String]("")
+          val lNodeCategory = (o \ "node-category").extractOrElse[String]("")
+          if (lNodeID.nonEmpty && lNodeCategory.nonEmpty) {
+            verb match {
+              case "add-element" =>
+                val relation = ah.addNodeToRelation(lNodeID, lNodeCategory)
+                m_log debug s"Nodes: ${compact(render(relation))}"
+              case "del-element" =>
+                val relation = ah.removeNodeFromRelation(lNodeID, lNodeCategory)
+                m_log debug s"Nodes: ${compact(render(relation))}"
+            }
+          }
+        }
+        case _ => m_log error "Incorrect request structure: base-relation entry"
+      }
+    }
+  }
+
   private def updateRelation(): JValue =
   {
-    val keys = Map("id" -> id)
     nodeCategory match {
       case "AnalysisNode" => {
         val ah = AnalysisNode(id)
-        if (base_relation.arr.nonEmpty) {
-          base_relation.arr.foreach {
-            case o: JObject => {
-              val lNodeID = (o \ "id").extractOrElse[String]("")
-              val lNodeCategory = (o \ "node-category").extractOrElse[String]("")
-              if (lNodeID.nonEmpty && lNodeCategory.nonEmpty) {
-                verb match {
-                  case "add-element" =>
-                    val relation = ah.addNodeToRelation(lNodeID, lNodeCategory)
-                    m_log debug s"Nodes: ${compact(render(relation))}"
-                  case "del-element" =>
-                    val relation = ah.removeNodeFromRelation(lNodeID, lNodeCategory)
-                    m_log debug s"Nodes: ${compact(render(relation))}"
-                }
-              }
-            }
-            case _ => m_log error "Incorrect request structure: base-relation entry"
-          }
-        }
+        manageRelations(ah)
         respGenerator.build(ah.updateRelations)
       }
-      case "SemanticNode" => respGenerator.build(Error.id, "Not implemented")
+      case "SemanticNode" => {
+        val ah = SemanticNode(id)
+        manageRelations(ah)
+        respGenerator.build(ah.updateRelations)
+      }
       case _ => respGenerator.build(Error.id, "Not supported.")
     }
   }
@@ -503,7 +547,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
     case "AnalysisNode" => val ah = AnalysisNode(id); respGenerator.build(ah.delete)
     case "DataObject"   => val doh = DataObject(id); respGenerator.build(doh.delete)
     case "AnalysisResult"   => val arh = AnalysisResult(null, id); respGenerator.build(arh.delete)
-    case "SemanticNode" => respGenerator.build(Error.id, "Not implemented")
+    case "SemanticNode" => val snh = AnalysisNode(id); respGenerator.build(snh.delete)
     case _ => respGenerator.build(Error.id, "Not supported.")
   }
 

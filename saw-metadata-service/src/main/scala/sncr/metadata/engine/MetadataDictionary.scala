@@ -37,7 +37,7 @@ object MDObjectStruct extends Enumeration{
 
   val key_Definition = Value(100, "content")
   val key_RelationSimpleSet = Value(101, "AtomicRelation")
-  val key_EnrichedContentRelation = Value(102, "BetaRelation")
+  val key_CategorizedRelation = Value(102, "BetaRelation")
 
   val syskey_NodeType = Value(200, "NodeType")
   val syskey_NodeCategory = Value(201, "NodeCategory")
@@ -89,10 +89,11 @@ object tables extends Enumeration {
 object NodeCategoryMapper extends Enumeration {
 
   val SemanticNode =    Value(0, "semantic_metadata")
-  val UINode =          Value(1, "semantic_metadata")
+  val DataObject =      Value(1, "datalake_metadata")
   val AnalysisNode =    Value(2, "analysis_metadata")
-  val DataObject =      Value(3, "datalake_metadata")
-  val AnalysisResults = Value(4, "analysis_results")
+  val AnalysisResults = Value(3, "analysis_results")
+  val UINode =          Value(4, "ui_metadata")
+
 
   val NCM = Map(
     "UINode" -> UINode,
@@ -107,8 +108,8 @@ object NodeCategoryMapper extends Enumeration {
 object RelationCategory extends Enumeration {
 
   val UndefinedRelation = Value(0, "_undefined_")
-  val BetaRelation = Value(MDObjectStruct.key_EnrichedContentRelation.id, MDObjectStruct.key_EnrichedContentRelation.toString)
-  val AtomicRelation = Value(MDObjectStruct.key_RelationSimpleSet.id, MDObjectStruct.key_RelationSimpleSet.toString)
+  val CategorizedRelation = Value(MDObjectStruct.key_CategorizedRelation.id, MDObjectStruct.key_CategorizedRelation.toString)
+  val SimpleRelation = Value(MDObjectStruct.key_RelationSimpleSet.id, MDObjectStruct.key_RelationSimpleSet.toString)
 
 }
 

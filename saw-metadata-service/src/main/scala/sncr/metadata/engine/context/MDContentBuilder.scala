@@ -22,8 +22,7 @@ trait MDContentBuilder extends SourceAsJson{
       (attr._1, attributeVal)
     }).filter(entry => entry._2 != JNothing)
     val r = JObject(builtCnt.map(entry => JField(entry._1, entry._2)))
-    m_log debug s"Header result: ${pretty(render(r))}"
-
+    m_log trace s"Header result: ${pretty(render(r))}"
     r
   }
 

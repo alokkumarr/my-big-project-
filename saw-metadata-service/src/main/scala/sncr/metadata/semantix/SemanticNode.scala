@@ -6,23 +6,24 @@ import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{Result, _}
 import org.apache.hadoop.hbase.util.Bytes
 import org.json4s.JsonAST._
+import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.MDObjectStruct.{apply => _, _}
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine._
 import sncr.metadata.engine.context.{MDContentBuilder, SelectModels}
-import sncr.metadata.engine.relations.BetaRelation
+import sncr.metadata.engine.relations.CategorizedRelation
 import sncr.saw.common.config.SAWServiceConfig
 
 /**
   * Created by srya0001 on 2/19/2017.
   */
-class SemanticNode(private var metricDescriptor: JValue,
+class SemanticNode(private var metricDescriptor: JValue = JNothing,
                    private val select: Int = SelectModels.node.id,
                    private val predefRowKey : String = null)
       extends ContentNode
-      with BetaRelation
+      with CategorizedRelation
       with MDContentBuilder {
 
   override protected val m_log: Logger = LoggerFactory.getLogger(classOf[SemanticNode].getName)
@@ -42,19 +43,23 @@ class SemanticNode(private var metricDescriptor: JValue,
 
   override protected def getSourceData(res:Result): (JValue, Array[Byte]) = super[MDContentBuilder].getSourceData(res)
 
-  override protected def compileRead(g : Get) = includeRelation(includeContent(includeSearch(g)))
+  override protected def compileRead(g : Get) =
+    select match {
+      case 2 | 4 => includeContent(includeSearch(g))
+      case 1 | 3 => includeRelation(includeContent(includeSearch(g)))
+      case _ => includeContent(g)
+    }
 
-  override protected def header(g : Get) = includeRelation(includeSearch(g))
-
+  override protected def header(g : Get) = includeSearch(g)
 
   override protected def getData(res:Result): Option[Map[String, Any]] = {
     val (dataAsJVal, dataAsByteArray) = getSourceData(res)
     setContent(dataAsByteArray)
+    m_log debug s"Select model: ${SelectModels(select)}"
     select match{
-      case 2 => Option(getSearchFields(res) + (key_Definition.toString -> dataAsJVal))
-      case 3 => Option(getSearchFields(res) + (key_Definition.toString -> dataAsJVal) +
-                                             (key_EnrichedContentRelation.toString -> collectRelationData(res))
-                                             )
+      case 2|4 => Option(getSearchFields(res) + (key_Definition.toString -> dataAsJVal))
+      case 1|3 => getRelationData(res); Option(getSearchFields(res) +
+                (key_Definition.toString -> (dataAsJVal ++ JField("repository", collectRelationData(res)))))
       case 0 => Option(Map(key_Definition.toString -> headerAsJVal(dataAsJVal)))
     }
   }
@@ -115,6 +120,25 @@ class SemanticNode(private var metricDescriptor: JValue,
     }
   }
 
+  def updateRelations(): (Int, String) = {
+    try {
+      if (rowKey != null  && !rowKey.isEmpty) {
+        if (commit(saveRelation(update)))
+          (Success.id, s"The Semantic Node relations [ ${Bytes.toString(rowKey)} ] has been updated")
+        else
+          (Error.id, "Could not update Semantic Node")
+      }
+      else
+      {
+        (Error.id, "Semantic Node should be loaded/identified first")
+      }
+    }
+    catch {
+      case x: Exception => {
+        val msg = s"Could not update Semantic node [ ID = ${Bytes.toString(rowKey)} ]: "; m_log error(msg, x); (Error.id, msg)
+      }
+    }
+  }
 
   def validate: (Int, String) = {
     metricDescriptor match {
@@ -154,14 +178,14 @@ object SemanticNode
     "id" -> "String"
   )
 
-  val requiredFields = List("id", "supports", "repository", "artifacts")
+  val requiredFields = List("id", "supports", "artifacts")
 
 
   protected val m_log: Logger = LoggerFactory.getLogger("SemanticNodeObject")
 
-  def apply(rowId: String) :SemanticNode =
+  def apply(rowId: String, selectId : Int = 2) :SemanticNode =
   {
-    val semNode = new SemanticNode(JNothing, SelectModels.node.id)
+    val semNode = new SemanticNode(JNothing, selectId)
     semNode.setRowKey(Bytes.toBytes(rowId))
     semNode.load
     semNode

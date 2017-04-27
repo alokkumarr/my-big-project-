@@ -8,6 +8,7 @@ import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.MDObjectStruct._
 import sncr.metadata.engine.ProcessingResult._
+import sncr.metadata.engine.context.MDContentBuilder
 import sncr.metadata.engine.{MDNodeUtil, _}
 import sncr.saw.common.config.SAWServiceConfig
 
@@ -26,7 +27,7 @@ import sncr.saw.common.config.SAWServiceConfig
   */
 class DataObject(final private var descriptor : JValue, final private var schema : JValue = JNothing)
   extends ContentNode
-  with SourceAsJson{
+  with MDContentBuilder{
 
   def setSchema(newSchema: JObject) = schema = newSchema
 
@@ -56,7 +57,7 @@ class DataObject(final private var descriptor : JValue, final private var schema
   def this() = { this(JNothing, JNothing) }
 
 
-  override def getSourceData(res: Result): (JValue, Array[Byte]) = super[SourceAsJson].getSourceData(res)
+  override def getSourceData(res: Result): (JValue, Array[Byte]) = super[MDContentBuilder].getSourceData(res)
 
   protected def includeLocations(get: Get): Get = get.addFamily(MDColumnFamilies(_cf_datalakelocations.id))
 
@@ -274,6 +275,18 @@ class DataObject(final private var descriptor : JValue, final private var schema
         val msg = s"Could not update DataObject DL locations [ ID = ${Bytes.toString(rowKey)} ]: "; m_log error(msg, x); (Error.id, msg)
       }
     }
+  }
+
+  import sncr.metadata.engine.MDObjectStruct.formats
+  def buildSemanticNodeModel: JObject =
+  {
+     val do_data : JValue = getCachedData(key_Definition.toString).asInstanceOf[JValue]
+     val EnrichedDataObjectId = JField("EnrichedDataObjectId", JString(Bytes.toString(rowKey)))
+     val displayName = JField("displayName", JString((do_data \ "displayName").extractOrElse[String]("undefined")))
+     val EnrichedDataObjectName = JField("EnrichedDataObjectName", JString((do_data \ "name").extractOrElse[String]("undefined")))
+     val description = JField("description", JString((do_data \ "description").extractOrElse[String]("undefined")))
+     val lastUpdatedTimestamp = JField("lastUpdatedTimestamp", JString((do_data \ "lastUpdatedTimestamp").extractOrElse[String]("undefined")))
+     JObject( List(EnrichedDataObjectId, displayName,EnrichedDataObjectName, description, lastUpdatedTimestamp ))
   }
 
 }

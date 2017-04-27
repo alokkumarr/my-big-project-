@@ -12,11 +12,11 @@ import sncr.metadata.engine._
 /**
   * Created by srya0001 on 3/4/2017.
   */
-trait AtomRelation{
+trait SimpleRelation{
 
-  protected val m_log: Logger = LoggerFactory.getLogger(classOf[AtomRelation].getName)
+  protected val m_log: Logger = LoggerFactory.getLogger(classOf[SimpleRelation].getName)
 
-  protected var relType : Int = RelationCategory.AtomicRelation.id
+  protected var relType : Int = RelationCategory.SimpleRelation.id
   protected var elements : Array[(String, String)] = Array.empty
   protected var readNumOfElements : Int = 0
   protected var _elementsAsJSON : JValue = JNothing
