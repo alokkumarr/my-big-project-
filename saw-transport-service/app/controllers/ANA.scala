@@ -51,6 +51,12 @@ class ANA extends BaseServiceProvider {
         val responseJson = json merge mergeJson
         val analysisJson = (responseJson \ "contents" \ "analyze")(0)
         val analysisNode = new AnalysisNode(analysisJson)
+        val semanticNode = readSemanticNode(semanticId)
+        for ((category, id) <- semanticNode.getRelatedNodes) {
+          if (category == "DataObject") {
+            analysisNode.addNodeToRelation(id, category)
+          }
+        }
         val (result, message) = analysisNode.write
         if (result != NodeCreated.id) {
           throw new ClientException("Writing failed: " + message)
