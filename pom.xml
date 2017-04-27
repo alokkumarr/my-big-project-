@@ -463,6 +463,10 @@ echo remove files in log/, run/ subdirs in ${app.varDir}
 ( set -x
   rm -f ${app.varDir}/{log,run}/*
   )
+echo remove python compiled files
+( set -x
+  rm -f ${app.optDir}/db/*.pyc ${app.optDir}/db/*/*.pyc
+  )
 echo remove files generated from templates
 ( set -x
   rm -f ${app.optDir}/conf/{application.properties,bootstrap.yml}
