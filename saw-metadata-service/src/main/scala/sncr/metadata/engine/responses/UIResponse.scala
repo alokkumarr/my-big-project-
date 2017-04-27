@@ -1,8 +1,9 @@
-package sncr.metadata.engine
+package sncr.metadata.engine.responses
 
 import org.json4s.JsonAST.{JArray, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
+import sncr.metadata.engine.MDObjectStruct
 
 /**
   * Created by srya0001 on 4/18/2017.

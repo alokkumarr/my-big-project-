@@ -1,10 +1,10 @@
-package sncr.metadata.engine
-
+package sncr.metadata.engine.responses
 
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
 import org.json4s.JsonAST.{JArray, JBool, JLong, JNothing, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
+import sncr.metadata.engine.ProcessingResult
 
 
 /**

@@ -3,8 +3,8 @@ package sncr.metadata.engine.ihandlers
 import java.io.OutputStream
 
 import org.json4s.JValue
-import sncr.metadata.engine.Response
 import org.json4s.native.JsonMethods._
+import sncr.metadata.engine.responses.Response
 
 /**
   * Created by srya0001 on 3/20/2017.

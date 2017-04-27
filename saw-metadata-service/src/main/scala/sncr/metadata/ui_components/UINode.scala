@@ -128,7 +128,6 @@ object UINode
       "request_module" -> "String",
       "request_type" -> "String")
 
-  val UIModules = List("analyze", "observe", "alert")
   val mandatoryAttributes =  List("module", "type", "customerCode")
 
 

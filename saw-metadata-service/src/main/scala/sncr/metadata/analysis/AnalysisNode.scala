@@ -9,7 +9,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.MDObjectStruct._
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine._
-import sncr.metadata.engine.relations.Relation
+import sncr.metadata.engine.relations.SimpleRelation
 import sncr.saw.common.config.SAWServiceConfig
 
 /**
@@ -17,7 +17,7 @@ import sncr.saw.common.config.SAWServiceConfig
   */
 class AnalysisNode(private var analysisNode: JValue = JNothing) extends ContentNode
   with SourceAsJson
-  with Relation{
+  with SimpleRelation{
 
   def setDefinition(newDefinition: String) : Unit =
   {
@@ -156,7 +156,7 @@ class AnalysisNode(private var analysisNode: JValue = JNothing) extends ContentN
     }
   }
 
-  def updateRelations: (Int, String) = {
+  def updateRelations(): (Int, String) = {
     try {
       if (rowKey != null  && !rowKey.isEmpty) {
         if (commit(saveRelation(update)))
