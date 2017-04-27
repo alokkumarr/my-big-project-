@@ -60,6 +60,7 @@ export const AnalyzeNewComponent = {
       let model;
       let type;
 
+      const metricId = (this.selectedMetric || {}).id;
       switch (this.selectedAnalysisMethod) {
         case 'table:report':
           tpl = '<analyze-report model="model"></analyze-report>';
@@ -68,9 +69,8 @@ export const AnalyzeNewComponent = {
             name: 'Untitled Analysis',
             description: '',
             category: this.subCategory,
-            metric: this.selectedMetric,
-            scheduled: null,
-            artifacts: null
+            semanticId: metricId,
+            scheduled: null
           };
           break;
         case 'table:pivot':
@@ -80,9 +80,8 @@ export const AnalyzeNewComponent = {
             name: 'Untitled Analysis',
             description: '',
             category: this.subCategory,
-            metric: this.selectedMetric,
-            scheduled: null,
-            artifacts: null
+            semanticId: this.selectedMetric,
+            scheduled: null
           };
           break;
         case 'chart:column':
@@ -98,9 +97,8 @@ export const AnalyzeNewComponent = {
             name: 'Untitled Chart',
             description: '',
             category: this.subCategory,
-            metric: this.selectedMetric,
-            scheduled: null,
-            artifacts: null
+            semanticId: this.selectedMetric,
+            scheduled: null
           };
           break;
         default:

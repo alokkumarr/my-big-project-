@@ -56,13 +56,13 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
      Example of @params:
      [
        ['contents.action', 'update'],
-       ['contents.keys.id', '1234556']
+       ['contents.keys.[0].id', '1234556']
      ]
      */
   function getRequestParams(params = []) {
     const reqParams = JwtService.getRequestParams();
 
-    set(reqParams, 'contents.keys.module', MODULE_NAME);
+    set(reqParams, 'contents.keys.[0].module', MODULE_NAME);
     forEach(params, tuple => {
       set(reqParams, tuple[0], tuple[1]);
     });
@@ -168,6 +168,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
       keys: [{id: model.id, module: 'analyze', type: model.type}],
       analyze: [model]
     }};
+
     return $http.post('/api/analyze/apply', payload).then(fpGet('data.data'));
   }
 
@@ -197,16 +198,13 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
   }
 
   function createAnalysis(metricId, type) {
-    const payload = {
-      action: 'read',
-      keys: [{
-        type: 'semantic',
-        analysisType: type,
-        module: 'analyze',
-        id: metricId
-      }]
-    };
-    return $http.post('/api/analyze/createAnalysis', payload).then(fpGet('data.contents.analyze.[0]'));
+    const params = getRequestParams([
+      ['contents.action', 'create'],
+      ['contents.keys.[0].id', 'ATT::analyze::semantic::10300083164142186'],
+      ['contents.keys.[0].analysisType', type]
+    ]);
+    const url = 'http://mapr-dev01.sncrbda.dev.vacum-np.sncrcorp.net:9200/analysis';
+    return $http.post(url, params).then(fpGet('data.contents.analyze.[0]'));
   }
 
   /**

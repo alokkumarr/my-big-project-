@@ -1,3 +1,4 @@
+import defaultsDeep from 'lodash/defaultsDeep';
 import fpFilter from 'lodash/fp/filter';
 import fpFlatMap from 'lodash/fp/flatMap';
 import fpPipe from 'lodash/fp/pipe';
@@ -36,6 +37,11 @@ export const AnalyzeReportComponent = {
       this._AnalyzeService = AnalyzeService;
       this._FilterService = FilterService;
       this._reloadTimer = null;
+      this._modelLoaded = null;
+
+      this._modelPromise = new Promise(resolve => {
+        this._modelLoaded = resolve;
+      });
 
       this.DESIGNER_MODE = 'designer';
       this.QUERY_MODE = 'query';
@@ -77,14 +83,29 @@ export const AnalyzeReportComponent = {
         }, 100);
       }
 
-      this.unregister = this._$componentHandler.on('$onInstanceAdded', e => {
-        this._AnalyzeService.createAnalysis(this.model.artifactsId, 'report').then(analysis => {
-          this.model = assign(this.model, analysis);
-
-          if (e.key === 'ard-canvas') {
-            this.initCanvas(e.instance);
+      this._AnalyzeService.createAnalysis(this.model.semanticId, 'report').then(analysis => {
+        this.model = defaultsDeep(this.model, {
+          id: analysis.id,
+          metric: analysis.metric,
+          metricName: analysis.metricName,
+          artifacts: analysis.artifacts,
+          sqlBuilder: {
+            filters: [],
+            joins: [],
+            groupByColumns: [],
+            orderByColumns: []
           }
         });
+
+        this._modelLoaded(true);
+      });
+
+      this.unregister = this._$componentHandler.on('$onInstanceAdded', e => {
+        if (e.key === 'ard-canvas') {
+          this._modelPromise.then(() => {
+            this.initCanvas(e.instance);
+          });
+        }
       });
     }
 
@@ -229,10 +250,12 @@ export const AnalyzeReportComponent = {
       forEach(data, itemA => {
         const table = model.addTable(itemA.artifactName);
 
+        itemA.artifactPosition = itemA.artifactPosition || [0, 0];
+
         table.setMeta(itemA);
         table.setPosition(itemA.artifactPosition[0], itemA.artifactPosition[1]);
 
-        forEach(itemA.artifactAttributes, itemB => {
+        forEach(itemA.artifactAttributes || itemA.columns, itemB => {
           const field = table.addField(itemB.columnName);
 
           field.setMeta(itemB);
@@ -246,42 +269,40 @@ export const AnalyzeReportComponent = {
         });
       });
 
-      forEach(data, itemA => {
-        forEach(itemA.sqlBuilder.joins, itemB => {
-          const tableA = itemB.criteria[0].tableName;
-          const tableB = itemB.criteria[1].tableName;
+      forEach(this.model.sqlBuilder.joins, itemB => {
+        const tableA = itemB.criteria[0].tableName;
+        const tableB = itemB.criteria[1].tableName;
 
-          if (tableA !== tableB) {
-            model.addJoin(itemB.type, {
-              table: tableA,
-              field: itemB.criteria[0].columnName,
-              side: itemB.criteria[0].side
-            }, {
-              table: tableB,
-              field: itemB.criteria[1].columnName,
-              side: itemB.criteria[1].side
-            });
-          }
-        });
-
-        forEach(itemA.sqlBuilder.orderByColumns, itemB => {
-          model.addSort({
-            table: itemA.artifactName,
-            field: itemB.columnName,
-            order: itemB.order
+        if (tableA !== tableB) {
+          model.addJoin(itemB.type, {
+            table: tableA,
+            field: itemB.criteria[0].columnName,
+            side: itemB.criteria[0].side
+          }, {
+            table: tableB,
+            field: itemB.criteria[1].columnName,
+            side: itemB.criteria[1].side
           });
-        });
+        }
+      });
 
-        forEach(itemA.sqlBuilder.groupByColumns, itemB => {
-          model.addGroup({
-            table: itemA.artifactName,
-            field: itemB
-          });
+      forEach(this.model.sqlBuilder.orderByColumns, itemB => {
+        model.addSort({
+          table: itemB.tableName,
+          field: itemB.columnName,
+          order: itemB.order
         });
+      });
 
-        forEach(itemA.sqlBuilder.filters, backEndFilter => {
-          model.addFilter(this._FilterService.getBackEnd2FrontEndFilterMapper()(backEndFilter));
+      forEach(this.model.sqlBuilder.groupByColumns, itemB => {
+        model.addGroup({
+          table: itemB.tableName,
+          field: itemB
         });
+      });
+
+      forEach(this.model.sqlBuilder.filters, backEndFilter => {
+        model.addFilter(this._FilterService.getBackEnd2FrontEndFilterMapper()(backEndFilter));
       });
       /* eslint-enable camelcase */
     }

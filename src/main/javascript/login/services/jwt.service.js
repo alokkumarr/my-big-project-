@@ -28,10 +28,10 @@ class JwtService {
     // const token = this.getTokenObj();
     return {
       contents: {
-        keys: {
+        keys: [{
           customerCode: 'ATT'
           // dataSecurityKey: get(token, 'ticket.dataSecurityKey')
-        }
+        }]
       }
     };
   }
