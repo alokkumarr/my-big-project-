@@ -9,20 +9,20 @@ import model.QueryBuilder
 class QueryTest extends FunSpec with MustMatchers {
   describe("Query built from analysis") {
     it("should have SELECT and FROM") {
-      query(artifactAB) must be ("SELECT t.a, t.b FROM t")
+      query(artifactT) must be ("SELECT t.a, t.b FROM t")
     }
     it("with filters should have a WHERE clause") {
-      query(artifactAB, filters(
+      query(artifactT, filters(
         filter("", "t.a", ">", "1"),
         filter("AND", "t.b", "<", "2"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a > 1 AND t.b < 2")
     }
     it("with group by columns should have an GROUP BY clause") {
-      query(artifactAB, groupBy("t.a", "t.b")
+      query(artifactT, groupBy("t.a", "t.b")
       ) must be ("SELECT t.a, t.b FROM t GROUP BY t.a, t.b")
     }
     it("with order by columns should have an ORDER BY clause") {
-      query(artifactAB, orderBy("t.a ASC", "t.b DESC")
+      query(artifactT, orderBy("t.a ASC", "t.b DESC")
       ) must be ("SELECT t.a, t.b FROM t ORDER BY t.a ASC, t.b DESC")
     }
   }
@@ -34,7 +34,7 @@ class QueryTest extends FunSpec with MustMatchers {
     }
   }
 
-  private def artifactAB = {
+  private def artifactT = {
     artifact("t", "a", "b")
   }
 
