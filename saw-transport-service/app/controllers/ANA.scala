@@ -13,6 +13,7 @@ import sncr.metadata.analysis.{AnalysisExecutionHandler, AnalysisNode, AnalysisR
 import sncr.metadata.engine.{MDNodeUtil, tables}
 import sncr.metadata.engine.ProcessingResult._
 import sncr.analysis.execution.{AnalysisExecutionRunner, ExecutionTaskHandler, ProcessExecutionResult}
+import sncr.metadata.ui_components.UINode
 import model.QueryBuilder
 import model.ClientException
 import org.apache.hadoop.hbase.util.Bytes
@@ -45,7 +46,7 @@ class ANA extends BaseServiceProvider {
         val analysisType = extractKey(json, "analysisType")
         val typeJson: JObject = ("type", analysisType)
         val mergeJson = contentsAnalyze(
-          readAnalysisNode(semanticId)
+          readSemanticNode(semanticId)
             merge(idJson).merge(semanticIdJson).merge(typeJson))
         val responseJson = json merge mergeJson
         val analysisJson = (responseJson \ "contents" \ "analyze")(0)
@@ -128,7 +129,8 @@ class ANA extends BaseServiceProvider {
     analysis merge(query)
   }
 
-  private def readAnalysisNode(analysisId: String): JObject = {
+  private def readAnalysisNode
+    (analysisId: String, semantic: Boolean = false): JObject = {
     /* If the analysis ID is given as "_static" return a static analysis
      * template that is used to bootstrap tests when the semantic
      * database is empty */
@@ -137,11 +139,20 @@ class ANA extends BaseServiceProvider {
       ("customerCode", "static") ~
       ("name", "static")
     }
-    val analysisNode = AnalysisNode(analysisId)
+    val analysisNode = if (semantic) {
+      // TODO: Replace with SemanticNode when available
+      UINode(analysisId)
+    } else {
+      AnalysisNode(analysisId)
+    }
     analysisNode.getCachedData("content") match {
       case content: JObject => content
       case _ => throw new ClientException("no match")
     }
+  }
+
+  private def readSemanticNode(semanticId: String): JObject = {
+    readAnalysisNode(semanticId, true)
   }
 
   private def contentsAnalyze(analysis: JObject): JObject = {
