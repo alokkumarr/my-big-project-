@@ -226,8 +226,8 @@ appl_stop() {
     if appIsUp ; then
         let cc=0
         while true ; do
-            [[ -d /proc/$APPL_PID ]] || break
             let cc=cc+1
+            vlog kill count updated: cc=$cc
             (( cc > 10 )) && {
                 vlog too many kill attempts: $cc
                 break
@@ -237,12 +237,16 @@ appl_stop() {
                 vlog DRYRUN exit
                 exit 0
             }
-            [[ -d /proc/$APPL_PID ]] && kill $APPL_PID
-            sleep 0.01
+            kill $APPL_PID &>/dev/null
+            sleep 0.2
+            appIsUp || break
         done
         [[ -d /proc/$APPL_PID ]] && {
+            appIsUp &&
             error "failed to stop '$APPL_NAME', PID: $APPL_PID"
         }
+        vlog removing pid file: $PID_FILE
+        rm -f $PID_FILE
     fi
     log "OK: '$APPL_NAME' stopped"
     exit 0
