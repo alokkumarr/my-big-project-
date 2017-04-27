@@ -18,7 +18,8 @@ export function MenuService($http, JwtService, AppConfig) {
     set(params, 'contents.action', 'search');
     set(params, 'contents.select', 'headers');
     set(params, 'contents.context', 'UI');
-    set(params, 'contents.keys.module', moduleName.toUpperCase());
+    set(params, 'contents.keys.[0].module', moduleName.toUpperCase());
+    set(params, 'contents.keys.[0].type', 'menu');
 
     return params;
   }
