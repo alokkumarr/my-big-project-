@@ -13,7 +13,7 @@ import sncr.metadata.analysis.{AnalysisExecutionHandler, AnalysisNode, AnalysisR
 import sncr.metadata.engine.{MDNodeUtil, tables}
 import sncr.metadata.engine.ProcessingResult._
 import sncr.analysis.execution.{AnalysisExecutionRunner, ExecutionTaskHandler, ProcessExecutionResult}
-import sncr.metadata.ui_components.UINode
+import sncr.metadata.semantix.SemanticNode
 import model.QueryBuilder
 import model.ClientException
 import org.apache.hadoop.hbase.util.Bytes
@@ -154,9 +154,8 @@ class ANA extends BaseServiceProvider {
     readAnalysisJson(semanticId, true)
   }
 
-  private def readSemanticNode(semanticId: String): UINode = {
-    // TODO: Replace with SemanticNode when available
-    UINode(semanticId)
+  private def readSemanticNode(semanticId: String): SemanticNode = {
+    SemanticNode(semanticId)
   }
 
   private def contentsAnalyze(analysis: JObject): JObject = {
