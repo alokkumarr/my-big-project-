@@ -2,14 +2,14 @@ package sncr.metadata.ui_components
 
 import java.util
 
-import org.json4s.JsonAST.{JNull, JObject, JString, _}
+import org.json4s.JsonAST.{JObject, JString, _}
 import org.json4s.ParserUtil.ParseException
 import org.json4s.native.JsonMethods._
 import org.json4s.{JField => _, JNothing => _, JObject => _, JValue => _, _}
 import org.slf4j.{Logger, LoggerFactory}
-import sncr.metadata.engine.ProcessingResult
+import sncr.metadata.engine.{MDNodeUtil, ProcessingResult}
 import sncr.metadata.engine.ProcessingResult._
-import sncr.metadata.engine.ihandlers.InteractionHandler
+import sncr.metadata.engine.ihandlers.RequestProcessor
 
 
 
@@ -30,10 +30,10 @@ import sncr.metadata.engine.ihandlers.InteractionHandler
   * Created by srya0001 on 2/17/2017.
   */
 import sncr.metadata.engine.MDObjectStruct.formats
-class UIMDRequestHandler(a_docAsJson : JValue, a_printPretty: Boolean = true)
-  extends InteractionHandler(a_docAsJson, a_printPretty) {
+class UIMDRequestProcessor(a_docAsJson : JValue, a_printPretty: Boolean = true)
+  extends RequestProcessor(a_docAsJson, a_printPretty) {
 
-  protected override val m_log: Logger = LoggerFactory.getLogger(classOf[UIMDRequestHandler].getName)
+  protected override val m_log: Logger = LoggerFactory.getLogger(classOf[UIMDRequestProcessor].getName)
 
 
 
@@ -56,7 +56,8 @@ class UIMDRequestHandler(a_docAsJson : JValue, a_printPretty: Boolean = true)
       m_log error Rejected.id + " ==> " + msg
       return (Rejected.id, msg)
     }
-    m_log debug "Validate action and content section"
+    m_log debug "Validate context, action and content element section"
+
     action match {
       case "read" | "search" | "delete" =>
       {
@@ -70,8 +71,8 @@ class UIMDRequestHandler(a_docAsJson : JValue, a_printPretty: Boolean = true)
       }
       case "update" | "create" =>
       {
-        if (!UINode.UIModules.exists( uic => ( elements \ uic ).extractOpt[JObject].isDefined) &&
-          !UINode.UIModules.exists( uic => ( elements \ uic ).extractOpt[JArray].isDefined)) {
+        if (!RequestProcessor.modules.exists( uic => ( elements \ uic ).extractOpt[JObject].isDefined) &&
+          !RequestProcessor.modules.exists( uic => ( elements \ uic ).extractOpt[JArray].isDefined)) {
           val msg = s"At least one content element is required"
           m_log debug Rejected.id + " ==> " + msg
           return (Rejected.id, msg)
@@ -144,24 +145,51 @@ class UIMDRequestHandler(a_docAsJson : JValue, a_printPretty: Boolean = true)
     response
   }
 
+
+  /**
+    *  Internal function, extracts keys for reading and searching objects and converts their values from JSON to lang types.
+    *
+    * @return
+    */
+  override protected def extractKeys : Map[String, Any] =
+  {
+    val keysJValue : JValue = elements \ "keys"
+    if (keysJValue == null || keysJValue == JNothing) return Map.empty
+
+    m_log trace s"Keys:$keysJValue ==> ${compact(render(keysJValue))}"
+    val lkeys = MDNodeUtil.extractKeysAsJValue(keysJValue)
+
+    m_log trace s"Extracted keys: ${lkeys.mkString("{", ",", "}")}"
+    lkeys.map(key_values => {
+      UINode.searchFields(key_values._1) match {
+        case "String"  => key_values._1 -> key_values._2.extract[String]
+        case "Int"     => key_values._1 -> key_values._2.extract[Int]
+        case "Long"    => key_values._1 -> key_values._2.extract[Long]
+        case "Boolean" => key_values._1 -> key_values._2.extract[Boolean]
+      }})
+
+  }
+
+
+
 }
 
 
 /**
   * UI2MD Utility object
   */
-object UIMDRequestHandler{
+object UIMDRequestProcessor{
 
   val m_log: Logger = LoggerFactory.getLogger("sncr.metadata.ui_components.UIMDRequestHandler")
 
-  def getHandlerForRequest(document: String, printPretty: Boolean) : List[UIMDRequestHandler] = {
+  def getHandlerForRequest(document: String, printPretty: Boolean) : List[UIMDRequestProcessor] = {
     try {
       val docAsJson = parse(document, false, false)
       docAsJson.children.flatMap(reqSegment => {
         m_log trace "Process JSON: " + compact(render(reqSegment))
         reqSegment match {
-          case rs: JObject => List(new UIMDRequestHandler(rs, printPretty))
-          case rs: JArray => rs.arr.map(jv => new UIMDRequestHandler(jv, printPretty))
+          case rs: JObject => List(new UIMDRequestProcessor(rs, printPretty))
+          case rs: JArray => rs.arr.map(jv => new UIMDRequestProcessor(jv, printPretty))
           case _ => List.empty
         }
       })
@@ -173,12 +201,12 @@ object UIMDRequestHandler{
   }
 
   import scala.collection.JavaConversions._
-  def getHandlerForRequest4Java(document: String, printPretty: Boolean) : util.List[UIMDRequestHandler] = {
+  def getHandlerForRequest4Java(document: String, printPretty: Boolean) : util.List[UIMDRequestProcessor] = {
     getHandlerForRequest(document, printPretty)
   }
 
   def scanSemanticTable(printPretty: Boolean) : String = {
-    val srh = new UIMDRequestHandler( null )
+    val srh = new UIMDRequestProcessor( null )
     val sNode = new UINode(null, null)
     val result = if (!printPretty) compact(render(srh.build(sNode.scan)))
                  else pretty(render(srh.build(sNode.scan)))

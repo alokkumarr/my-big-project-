@@ -5,12 +5,13 @@ import java.util.UUID
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{Result, _}
 import org.apache.hadoop.hbase.util.Bytes
-import org.json4s.JsonAST.{JNothing, JString, JValue}
+import org.json4s.JsonAST._
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.MDObjectStruct.{apply => _, _}
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine._
+import sncr.metadata.engine.context.{MDContentBuilder, SelectModels}
 import sncr.metadata.engine.relations.BetaRelation
 import sncr.saw.common.config.SAWServiceConfig
 
@@ -18,11 +19,11 @@ import sncr.saw.common.config.SAWServiceConfig
   * Created by srya0001 on 2/19/2017.
   */
 class SemanticNode(private var metricDescriptor: JValue,
-                   private val scope: String = SemanticNode.defScope,
+                   private val select: Int = SelectModels.node.id,
                    private val predefRowKey : String = null)
       extends ContentNode
       with BetaRelation
-      with SourceAsJson {
+      with MDContentBuilder {
 
   override protected val m_log: Logger = LoggerFactory.getLogger(classOf[SemanticNode].getName)
 
@@ -39,20 +40,25 @@ class SemanticNode(private var metricDescriptor: JValue,
   }
 
 
-  override protected def getSourceData(res:Result): (JValue, Array[Byte]) = super[SourceAsJson].getSourceData(res)
+  override protected def getSourceData(res:Result): (JValue, Array[Byte]) = super[MDContentBuilder].getSourceData(res)
 
   override protected def compileRead(g : Get) = includeRelation(includeContent(includeSearch(g)))
 
   override protected def header(g : Get) = includeRelation(includeSearch(g))
 
+
   override protected def getData(res:Result): Option[Map[String, Any]] = {
     val (dataAsJVal, dataAsByteArray) = getSourceData(res)
     setContent(dataAsByteArray)
-    scope match{
-      case "node" => Option(getSearchFields(res) + (key_Definition.toString -> dataAsJVal))
-      case "relation" => Option(Map(key_Definition.toString -> dataAsJVal))
+    select match{
+      case 2 => Option(getSearchFields(res) + (key_Definition.toString -> dataAsJVal))
+      case 3 => Option(getSearchFields(res) + (key_Definition.toString -> dataAsJVal) +
+                                             (key_EnrichedContentRelation.toString -> collectRelationData(res))
+                                             )
+      case 0 => Option(Map(key_Definition.toString -> headerAsJVal(dataAsJVal)))
     }
   }
+
   protected val table = SAWServiceConfig.metadataConfig.getString("path") + "/" + tables.SemanticMetadata
   protected val tn: TableName = TableName.valueOf(table)
   mdNodeStoreTable = connection.getTable(tn)
@@ -79,7 +85,7 @@ class SemanticNode(private var metricDescriptor: JValue,
       val searchValues : Map[String, Any] = SemanticNode.extractSearchData(metricDescriptor) + (Fields.NodeId.toString -> new String(rowKey))
       searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
 
-      if (commit(saveContent(saveSearchData(put_op, searchValues))))
+      if (commit(saveRelation(saveContent(saveSearchData(put_op, searchValues)))))
         (NodeCreated.id, s"${Bytes.toString(rowKey)}")
       else
         (Error.id, "Could not create Semantic Node")
@@ -114,14 +120,20 @@ class SemanticNode(private var metricDescriptor: JValue,
     metricDescriptor match {
       case null | JNothing => (Rejected.id, "Empty node, does not apply for requested operation")
       case _: JValue => {
-        SemanticNode.requiredFields.foreach { f =>
-          if ((metricDescriptor \ f).extract[String].isEmpty) {
-            val msg = s"Required field $f is missing or empty"
+        if (SemanticNode.requiredFields.exists( p = field =>
+          metricDescriptor \ field match {
+            case a: JArray => a.arr.isEmpty
+            case o: JObject => o.obj.isEmpty
+            case s: JString => s.s.isEmpty
+            case _ => true
+          }
+          ))
+          {
+            val msg = s"Required field is missing or empty"
             m_log debug Rejected.id + " ==> " + msg
             return (Rejected.id, msg)
           }
         }
-      }
     }
     (Success.id, "Request is correct")
   }
@@ -134,7 +146,12 @@ object SemanticNode
 {
   val searchFields: Map[String, String] = Map(
     "customerCode" -> "String",
-    "metric_name" -> "String"
+    "metricName" -> "String",
+    "type" -> "String",
+    "metric" -> "String",
+    "module" -> "String",
+    "dataSecurityKey" -> "String",
+    "id" -> "String"
   )
 
   val requiredFields = List("id", "supports", "repository", "artifacts")
@@ -144,15 +161,19 @@ object SemanticNode
 
   def apply(rowId: String) :SemanticNode =
   {
-    val semNode = new SemanticNode(JNothing, null)
+    val semNode = new SemanticNode(JNothing, SelectModels.node.id)
     semNode.setRowKey(Bytes.toBytes(rowId))
     semNode.load
     semNode
   }
 
   def  extractSearchData( content_element: JValue) : Map[String, Any] = {
-    List((content_element, "metric_name"),
-        (content_element, "customerCode"))
+    List((content_element, "metricName"),
+         (content_element, "metric"),
+         (content_element, "type"),
+         (content_element, "dataSecurityKey"),
+         (content_element, "customerCode"),
+         (content_element, "module"))
       .map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, searchFields(jv._2)) )
         m_log trace s"Field: ${jv._2}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${searchFields(jv._2)}\n, Value: $searchValue"
@@ -160,8 +181,7 @@ object SemanticNode
       }).filter(_._2.isDefined).map(kv => kv._1 -> kv._2.get).toMap
   }
 
-  val defScope = "node"
-  val scopes = List("node", "relation")
+
 
 
 }

@@ -48,6 +48,7 @@ object MDObjectStruct extends Enumeration{
   val key_DL_DataLocation = Value(302, "DL_DataLocation")
   val key_AnalysisResultObjects = Value(303, "AnalysisResultObjects")
 
+  val key_Header = Value(400, "Header")
 
   val MDColumnFamilies = Map(
       _cf_source.id -> Bytes.toBytes(_cf_source.toString),
@@ -133,5 +134,14 @@ object Fields extends Enumeration {
 }
 
 
+object Contexts extends Enumeration {
 
+  val UndefContext = Value(0, "_undefined_")
+  val UIContexts = Value(1, "UI")
+  val SemanticContext = Value(2, "Semantic")
+  val DataObjectContext = Value(3, "DataObject")
+  val AnalysisContext = Value(4, "Analysis")
+
+
+}
 

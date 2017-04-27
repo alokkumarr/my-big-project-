@@ -4,9 +4,10 @@ import org.json4s.JsonAST.{JArray, JField, JObject, JValue}
 import org.json4s._
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
-import sncr.metadata.engine.{MDObjectStruct, ProcessingResult}
+import sncr.metadata.engine.{MDNodeUtil, ProcessingResult}
 import sncr.metadata.engine.ProcessingResult._
-import sncr.metadata.engine.ihandlers.InteractionHandler
+import sncr.metadata.engine.context.SelectModels
+import sncr.metadata.engine.ihandlers.RequestProcessor
 import sncr.metadata.ui_components.UINode
 
 
@@ -19,19 +20,12 @@ import sncr.metadata.ui_components.UINode
   * Then executed it and packs operation result into JSON response.
   */
 
-import MDObjectStruct.formats
-class SemanticInteractionHandler (a_docAsJson : JValue, a_printPretty: Boolean = true)
-  extends InteractionHandler(a_docAsJson : JValue, a_printPretty) {
-  protected override val m_log: Logger = LoggerFactory.getLogger(classOf[SemanticInteractionHandler].getName)
+import sncr.metadata.engine.MDObjectStruct.formats
+class SemanticRequestProcessor(a_docAsJson : JValue, a_printPretty: Boolean = true)
+  extends RequestProcessor(a_docAsJson : JValue, a_printPretty) {
+  protected override val m_log: Logger = LoggerFactory.getLogger(classOf[SemanticRequestProcessor].getName)
 
-  override def testUIComponent(uicomp: JObject) : Boolean = SemanticInteractionHandler.mandatoryAttributes.forall(attr => (uicomp \ attr ).extractOpt[String].nonEmpty)
-
-  protected var scope : String = SemanticNode.defScope
-
-  private def nextStepPreProcessor() : Unit =
-  {
-    scope = (docAsJson \ "contents" \ "scope").extractOrElse(scope)
-  }
+  override def testUIComponent(uicomp: JObject) : Boolean = SemanticRequestProcessor.mandatoryAttributes.forall(attr => (uicomp \ attr ).extractOpt[String].nonEmpty)
 
   /**
     * Validates requests, if a request malformed, incorrectly structured or does not have
@@ -44,14 +38,14 @@ class SemanticInteractionHandler (a_docAsJson : JValue, a_printPretty: Boolean =
       (Error.id, "Validation fails: document is empty")
 
     preProcessRequest()
-    nextStepPreProcessor()
 
-    if (!SemanticInteractionHandler.verbs.exists(_.equalsIgnoreCase(action))){
+    if (!SemanticRequestProcessor.verbs.exists(_.equalsIgnoreCase(action))){
       val msg = s"Action is incorrect: $action"
       m_log error Rejected.id + " ==> " + msg
       return (Rejected.id, msg)
     }
     m_log debug "Validate action and content section"
+
     action match {
       case "read" | "search" | "delete" =>
       {
@@ -65,8 +59,8 @@ class SemanticInteractionHandler (a_docAsJson : JValue, a_printPretty: Boolean =
       }
       case "update" | "create" =>
       {
-        if (!UINode.UIModules.exists( uic => ( elements \ uic ).extractOpt[JObject].isDefined) &&
-          !UINode.UIModules.exists( uic => ( elements \ uic ).extractOpt[JArray].isDefined)) {
+        if (!RequestProcessor.modules.exists( uic => ( elements \ uic ).extractOpt[JObject].isDefined) &&
+          !RequestProcessor.modules.exists( uic => ( elements \ uic ).extractOpt[JArray].isDefined)) {
           val msg = s"At least one content element is required"
           m_log debug Rejected.id + " ==> " + msg
           return (Rejected.id, msg)
@@ -89,6 +83,8 @@ class SemanticInteractionHandler (a_docAsJson : JValue, a_printPretty: Boolean =
   {
     if (!validated) return "Internal error: Request has not been validated!"
     var responses : List[JValue] = Nil
+
+    select = if (select == SelectModels.everything.id) SelectModels.relation.id else select
 
     action match {
       case "create" | "update" =>
@@ -125,8 +121,8 @@ class SemanticInteractionHandler (a_docAsJson : JValue, a_printPretty: Boolean =
     */
   private def actionHandler(action: String, semantic_definition : JValue, module_name: String ) : JValue =
   {
-    m_log debug "Execute action: " + action
-    val sNode = new SemanticNode(semantic_definition, module_name, scope)
+    m_log debug s"Execute: $action select content: $select"
+    val sNode = new SemanticNode(semantic_definition, select)
     val response = action match {
       case "create" => build(sNode.create)
       case "read" =>   build_ui(sNode.read(keys))
@@ -138,11 +134,35 @@ class SemanticInteractionHandler (a_docAsJson : JValue, a_printPretty: Boolean =
     response
   }
 
+  /**
+    *  Internal function, extracts keys for reading and searching objects and converts their values from JSON to lang types.
+    *
+    * @return
+    */
+  override protected def extractKeys : Map[String, Any] =
+  {
+    val keysJValue : JValue = elements \ "keys"
+    if (keysJValue == null || keysJValue == JNothing) return Map.empty
+
+    m_log trace s"Keys:$keysJValue ==> ${compact(render(keysJValue))}"
+    val lkeys = MDNodeUtil.extractKeysAsJValue(keysJValue)
+
+    m_log trace s"Extracted keys: ${lkeys.mkString("{", ",", "}")}"
+    lkeys.map(key_values => {
+      SemanticNode.searchFields(key_values._1) match {
+        case "String"  => key_values._1 -> key_values._2.extract[String]
+        case "Int"     => key_values._1 -> key_values._2.extract[Int]
+        case "Long"    => key_values._1 -> key_values._2.extract[Long]
+        case "Boolean" => key_values._1 -> key_values._2.extract[Boolean]
+      }})
+
+  }
+
 
 }
 
 
-object SemanticInteractionHandler
+object SemanticRequestProcessor
 {
 
   val verbs = List("create", "update", "delete", "read", "search", "scan")

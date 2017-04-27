@@ -4,10 +4,9 @@ import org.json4s.JsonAST.{JNull, JObject, JString, _}
 import org.json4s.native.JsonMethods._
 import org.json4s.{JField => _, JNothing => _, JObject => _, JValue => _, _}
 import org.slf4j.{Logger, LoggerFactory}
-import sncr.metadata.engine.MDNodeUtil
 import sncr.metadata.engine.ProcessingResult._
+import sncr.metadata.engine.context.SelectModels
 import sncr.metadata.engine.responses.UIResponse
-import sncr.metadata.ui_components.{UIMDRequestHandler, UINode}
 
 import scala.collection.mutable
 
@@ -31,10 +30,10 @@ import scala.collection.mutable
   */
 import sncr.metadata.engine.MDObjectStruct.formats
 
-class InteractionHandler(val docAsJson : JValue, val printPretty: Boolean = true) extends UIResponse {
+class RequestProcessor(val docAsJson : JValue, val printPretty: Boolean = true) extends UIResponse {
 
 
-  protected override val m_log: Logger = LoggerFactory.getLogger(classOf[UIMDRequestHandler].getName)
+  protected override val m_log: Logger = LoggerFactory.getLogger(classOf[RequestProcessor].getName)
 
   protected var elements : JValue= null
   protected var keys :  Map[String, Any] = Map.empty
@@ -95,7 +94,7 @@ class InteractionHandler(val docAsJson : JValue, val printPretty: Boolean = true
             if (ce.arr.forall{ case uicomp:JObject => testUIComponent(uicomp); case _ => false })
                 throw new Exception ("Mandatory attributes are missing in one of UI component in the request, reject whole request")
             (compType, ce.arr)
-          case _ => throw new Exception(s"UI Component cannot be processed: ${compact(render(content_element._2))} or request structure is not corect")
+          case _ => throw new Exception(s"UI Component cannot be processed: ${compact(render(content_element._2))} or request structure is not correct")
         }
       }
       ).toMap[String, List[JValue]]
@@ -116,6 +115,7 @@ class InteractionHandler(val docAsJson : JValue, val printPretty: Boolean = true
   }
 
 
+  var select : Int = 1
   /**
     * Pre-processing a request:
     * - extracts content and builds 2 level map:
@@ -136,10 +136,19 @@ class InteractionHandler(val docAsJson : JValue, val printPretty: Boolean = true
     action = (docAsJson \ "contents" \ "action").extractOpt[String].getOrElse("invalid").toLowerCase()
     m_log debug s"action = $action"
     elements = elements.removeField( pair => pair._1.equalsIgnoreCase("action") )
+
     keys = extractKeys
     elements = elements.removeField( pair => pair._1.equalsIgnoreCase("keys") )
+    elements = elements.removeField( pair => pair._1.equalsIgnoreCase("context") )
 
-    UINode.UIModules.foreach( moduleName => elements \ moduleName match {
+
+    val selectStr = (docAsJson \ "contents" \ "select").extractOpt[String].getOrElse(SelectModels.everything.toString)
+    select = SelectModels.withName(selectStr).id
+    m_log debug s"select = $selectStr"
+    elements = elements.removeField( pair => pair._1.equalsIgnoreCase("select") )
+
+
+    RequestProcessor.modules.foreach( moduleName => elements \ moduleName match {
       case o: JObject  =>  moduleDesc(moduleName) =  mergeUIComponents(moduleName, moduleDesc, extractUIComponents(moduleName, o))
       case a: JArray   => a.arr.foreach {
         case ao: JObject => moduleDesc(moduleName) = mergeUIComponents(moduleName, moduleDesc, extractUIComponents(moduleName, ao))
@@ -174,31 +183,12 @@ class InteractionHandler(val docAsJson : JValue, val printPretty: Boolean = true
   def execute :String = ???
 
 
-  /**
-    *  Internal function, extracts keys for reading and searching objects and converts their values from JSON to lang types.
-    *
-    * @return
-    */
-  protected def extractKeys : Map[String, Any] =
-  {
-    val keysJValue : JValue = docAsJson \ "contents" \ "keys"
-    if (keysJValue == null || keysJValue == JNothing) return Map.empty
+  protected def extractKeys : Map[String, Any] = ???
 
-    m_log trace s"Keys:$keysJValue ==> ${compact(render(keysJValue))}"
-    val lkeys = MDNodeUtil.extractKeysAsJValue(keysJValue)
+}
 
-    m_log trace s"Extracted keys: ${lkeys.mkString("{", ",", "}")}"
-    lkeys.map(key_values => {
-      UINode.searchFields(key_values._1) match {
-        case "String"  => key_values._1 -> key_values._2.extract[String]
-        case "Int"     => key_values._1 -> key_values._2.extract[Int]
-        case "Long"    => key_values._1 -> key_values._2.extract[Long]
-        case "Boolean" => key_values._1 -> key_values._2.extract[Boolean]
-      }})
-
-  }
-
-
+object RequestProcessor{
+  val modules = List("analyze", "observe", "alert")
 }
 
 

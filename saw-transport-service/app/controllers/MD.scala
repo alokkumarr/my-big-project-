@@ -8,8 +8,10 @@ import org.json4s.JsonAST.JValue
 import org.json4s.native.JsonMethods._
 import play.libs.Json
 import play.mvc.Result
-import sncr.metadata.engine.ProcessingResult
-import sncr.metadata.ui_components.UIMDRequestHandler
+import sncr.metadata.engine.{Contexts, ProcessingResult}
+import sncr.metadata.engine.ihandlers.RequestProcessor
+import sncr.metadata.semantix.SemanticRequestProcessor
+import sncr.metadata.ui_components.UIMDRequestProcessor
 
 /**
   * Created by srya0001 on 2/17/2017.
@@ -34,7 +36,14 @@ class MD extends BaseServiceProvider {
     m_log trace("Validate and process request:  " + compact(render(json)))
     val res: ObjectNode = Json.newObject
     try {
-      val handler = new UIMDRequestHandler(json)
+
+      val context = (json \ "contents" \ "context").extractOpt[String].getOrElse(Contexts.UndefContext.toString)
+      var handler : RequestProcessor = null
+      context match{
+        case "UI" => handler = new UIMDRequestProcessor(json)
+        case "Semantic" =>  handler = new SemanticRequestProcessor(json)
+        case _ => res.put("reason", "Request context is undefined"); res.put("result", "failure"); return play.mvc.Results.ok(res)
+      }
       handler.validate match {
         case (0, _) =>
           return play.mvc.Results.ok(handler.execute)

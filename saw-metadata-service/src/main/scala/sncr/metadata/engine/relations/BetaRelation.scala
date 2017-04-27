@@ -1,8 +1,8 @@
 package sncr.metadata.engine.relations
 
-import org.apache.hadoop.hbase.client.{Put, Result}
+import org.apache.hadoop.hbase.client.Result
 import org.apache.hadoop.hbase.util.Bytes
-import org.json4s.JsonAST.{JArray, JInt, JObject}
+import org.json4s.JsonAST.{JArray, JInt, JObject, JValue}
 import org.json4s._
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
@@ -18,6 +18,14 @@ trait BetaRelation extends AtomRelation with BetaProducers{
   override protected val m_log: Logger = LoggerFactory.getLogger(classOf[BetaRelation].getName)
 
   relType = RelationCategory.BetaRelation.id
+
+
+//TODO::
+  def collectRelationData(res: Result): JValue =
+  {
+
+    JNothing
+  }
 
   override protected def getRelationData(res:Result) : Unit =
   {
@@ -39,23 +47,6 @@ trait BetaRelation extends AtomRelation with BetaProducers{
     }).toArray.filter( p => p._1 != null && p._2 != null )
   }
 
-  /* Write calls */
-
-  override def saveRelation(nodePut: Put)  : Put =
-  {
-    if (nodePut == null) return null
-    normalize
-    nodePut
-      .addColumn(MDColumnFamilies(_cf_relations.id),Bytes.toBytes(Fields.NumOfElements.toString), Bytes.toBytes(elements.length))
-      .addColumn(MDColumnFamilies(_cf_relations.id),Bytes.toBytes(Fields.RelationCategory.toString), Bytes.toBytes(relType))
-      .addColumn(MDColumnFamilies(_cf_relations.id),Bytes.toBytes("_json_"), Bytes.toBytes(compact(render(_elementsAsJSON))))
-    m_log debug s"Saved values: # of nodes: ${elements.length}, Relation category:  ${relType}"
-    for (i <- 0 until elements.length ) {nodePut
-      .addColumn(MDColumnFamilies(_cf_relations.id),Bytes.toBytes(i + "_TAB" ), Bytes.toBytes(elements(i)._1))
-      .addColumn(MDColumnFamilies(_cf_relations.id),Bytes.toBytes(i + "_RID" ), Bytes.toBytes(elements(i)._2))
-      m_log debug s"Processing pair: ${i}_TAB => ${elements(i)._1},  ${i}_RID => ${elements(i)._2}" }
-    nodePut
-  }
 
   import MDObjectStruct.formats
   override protected def normalize: JValue =
