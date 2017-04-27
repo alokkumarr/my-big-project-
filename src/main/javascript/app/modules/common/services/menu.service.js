@@ -16,7 +16,8 @@ export function MenuService($http, JwtService, AppConfig) {
     const params = JwtService.getRequestParams();
 
     set(params, 'contents.action', 'search');
-    set(params, 'contents.keys.type', 'menu');
+    set(params, 'contents.select', 'headers');
+    set(params, 'contents.context', 'UI');
     set(params, 'contents.keys.module', moduleName.toUpperCase());
 
     return params;

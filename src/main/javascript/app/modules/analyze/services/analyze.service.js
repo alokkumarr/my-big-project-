@@ -46,6 +46,19 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
     _menuResolver(menu);
   }
 
+  /* getRequestParams will generate the base structure and auto-fill it
+     with fields common across all request.
+
+     The argument @params is an array of tuples containing properties
+     to add to this base structure, and follow lodash's @set method
+     argument format.
+
+     Example of @params:
+     [
+       ['contents.action', 'update'],
+       ['contents.keys.id', '1234556']
+     ]
+     */
   function getRequestParams(params = []) {
     const reqParams = JwtService.getRequestParams();
 
@@ -177,7 +190,8 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
   function getSemanticLayerData() {
     const params = getRequestParams([
       ['contents.action', 'search'],
-      ['contents.keys.type', 'semantic']
+      ['contents.select', 'headers'],
+      ['contents.context', 'Semantic']
     ]);
     return $http.post(url, params).then(fpGet(`data.contents.[0].${MODULE_NAME}`));
   }
