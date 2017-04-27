@@ -1,7 +1,7 @@
 package sncr.metadata.engine.context
 
-import org.json4s.JField
-import org.json4s.JsonAST._
+
+import org.json4s.JsonAST.{JField, _}
 import org.json4s.native.JsonMethods._
 import sncr.metadata.engine.SourceAsJson
 
@@ -26,6 +26,14 @@ trait MDContentBuilder extends SourceAsJson{
     r
   }
 
+  def mergeIntoOneJObject(src: JValue, key: String, appndx: JValue): JValue =
+  {
+    src match {
+      case x:JObject => JObject(x.obj :+ (key, appndx))
+      case a: JArray => JArray( a.arr :+ appndx)
+      case _ => src
+    }
+  }
 
 }
 

@@ -6,7 +6,6 @@ import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{Result, _}
 import org.apache.hadoop.hbase.util.Bytes
 import org.json4s.JsonAST._
-import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.MDObjectStruct.{apply => _, _}
@@ -59,7 +58,7 @@ class SemanticNode(private var metricDescriptor: JValue = JNothing,
     select match{
       case 2|4 => Option(getSearchFields(res) + (key_Definition.toString -> dataAsJVal))
       case 1|3 => getRelationData(res); Option(getSearchFields(res) +
-                (key_Definition.toString -> (dataAsJVal ++ JField("repository", collectRelationData(res)))))
+                (key_Definition.toString -> mergeIntoOneJObject(dataAsJVal, "repository", collectRelationData(res))))
       case 0 => Option(Map(key_Definition.toString -> headerAsJVal(dataAsJVal)))
     }
   }
