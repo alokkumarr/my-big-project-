@@ -63,10 +63,10 @@ class AnalysisExecutionHandler(val nodeId : String) {
 
   m_log debug s"Check definition before extracting value ==> ${pretty(render(definition))}"
 
-  val sql = ( definition \ "analysis" \ "analysisQuery").extractOrElse[String]("")
+  val sql = ( definition \ "query").extractOrElse[String]("")
   val outputType = ( definition \ "outputFile" \ "outputFormat").extractOrElse[String]("")
   val outputLocation = ( definition \ "outputFile" \ "outputFileName").extractOrElse[String]("")
-  val targetName = (definition \ "name").extract[String] + "_" + objectCount
+  val targetName = (definition \ "metricName").extract[String] + "_" + objectCount
 
   if (sql.isEmpty || outputType.isEmpty || outputLocation.isEmpty  )
     throw new Exception("Invalid Analysis object, one of the attribute is null/empty: SQL, outputType, outputLocation")
