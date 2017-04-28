@@ -31,7 +31,11 @@ class ANA extends BaseServiceProvider {
     try {
       doProcess(txt)
     } catch {
-      case ClientException(message) => userError(message)
+      case ClientException(message) => userErrorResponse(message)
+      case e: Exception => {
+        m_log.error("Internal server error", e)
+        serverErrorResponse(e.getMessage())
+      }
     }
   }
 
@@ -98,9 +102,14 @@ class ANA extends BaseServiceProvider {
     Results.ok(playJson(response))
   }
 
-  private def userError(message: String): Result = {
+  private def userErrorResponse(message: String): Result = {
     val response: JObject = ("error", ("message", message))
     Results.badRequest(playJson(response))
+  }
+
+  private def serverErrorResponse(message: String): Result = {
+    val response: JObject = ("error", ("message", message))
+    Results.internalServerError(playJson(response))
   }
 
   private def playJson(json: JValue) = {
