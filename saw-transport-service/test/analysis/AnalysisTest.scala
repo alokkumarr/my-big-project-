@@ -10,23 +10,17 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
     var id: String = null
 
     "create analysis" in {
+      /* Create analysis using analysis template preloaded into MapR-DB */
+      val semanticId = "c7a32609-2940-4492-afcc-5548b5e5a040"
       val typeJson: JObject = ("analysisType", "report")
-
-      /* Create semantic analysis template using the built-in "_static"
-       * ID */
-      val templateResponse = sendRequest(
-        actionKeyMessage("create", "_static", typeJson))
-      val JString(semanticId: String) = analyze(templateResponse) \ "id"
-
-      /* Write analysis */
       val response = sendRequest(
         actionKeyMessage("create", semanticId, typeJson))
       val JString(analysisId) = analyze(response) \ "id"
-      analysisId must not be ("_static")
+      analysisId must not be (semanticId)
+      /* Save analysis ID for use by subsequent tests */
       id = analysisId
-
-      val JString(name) = analyze(response) \ "name"
-      name must be ("static")
+      val JString(name) = analyze(response) \ "metricName"
+      name must be ("MCT Events aggregated by session (view - 2)")
       val JString(sId) = analyze(response) \ "semanticId"
       sId must be (semanticId)
       val JString(analysisType) = analyze(response) \ "type"
