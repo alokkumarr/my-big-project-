@@ -10,6 +10,7 @@ import org.json4s.native.JsonMethods._
 import play.libs.Json
 import play.mvc.{Http, Result, Results}
 import sncr.metadata.analysis.{AnalysisExecutionHandler, AnalysisNode, AnalysisResult}
+import sncr.metadata.engine.context.SelectModels
 import sncr.metadata.engine.{MDNodeUtil, tables}
 import sncr.metadata.engine.ProcessingResult._
 import sncr.analysis.execution.{AnalysisExecutionRunner, ExecutionTaskHandler, ProcessExecutionResult}
@@ -170,7 +171,7 @@ class ANA extends BaseServiceProvider {
   }
 
   private def readSemanticNode(semanticId: String): SemanticNode = {
-    SemanticNode(semanticId)
+    SemanticNode(semanticId, SelectModels.relation.id)
   }
 
   private def contentsAnalyze(analysis: JObject): JObject = {
