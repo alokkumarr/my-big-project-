@@ -24,13 +24,13 @@ object QueryBuilder {
   private def buildSelect(artifacts: List[JValue]) = {
     "SELECT " + artifacts.map((artifact: JValue) => {
       val artifactName = (artifact \ "artifactName").extract[String]
-      val attributes: List[JValue] = artifact \ "artifact_attributes" match {
-        case attributes: JArray => attributes.arr
+      val columns: List[JValue] = artifact \ "columns" match {
+        case columns: JArray => columns.arr
         case json: JValue => unexpectedElement(json)
       }
-      if (attributes.size < 1)
-        throw new ClientException("At least one artifact attribute expected")
-      attributes.map(column(artifactName, _)).mkString(", ")
+      if (columns.size < 1)
+        throw new ClientException("At least one artifact column expected")
+      columns.map(column(artifactName, _)).mkString(", ")
     }).mkString(", ")
   }
 
