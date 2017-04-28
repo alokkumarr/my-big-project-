@@ -1,0 +1,26 @@
+[
+	{
+		"node-category" : "DataObject",
+		"id" : "MCT_SESSION::parquet::1493147228655"
+		"action" : 
+		{
+			"verb" : "del-dl-location",
+			"dl-locations" : [ 
+				"/mapr/bda_lab_batch/dl.dev/data/mct/output/MCT_SESSION"
+			]
+		}
+	},
+		{
+		"node-category" : "DataObject",
+		"id" : "MCT_SESSION::parquet::1493147228655"
+		"action" : 
+		{
+			"verb" : "add-dl-location",
+			"dl-locations" : [ 
+				"/dl.dev/data/mct/output/MCT_SESSION"
+			]
+		}
+	}
+
+]
+		

@@ -1,0 +1,28 @@
+[
+	{
+		"node-category" : "DataObject",
+		"id" : "MCT_SESSION::parquet::1493147228655"
+		"action" : 
+		{
+			"verb" : "read"
+		}
+	},
+	{
+		"node-category" : "DataObject",
+		"id" : "MCT_ERROR_SUMMARY::parquet::1493327662500"
+		"action" : 
+		{
+			"verb" : "read"
+		}
+	},
+	{
+		"node-category" : "DataObject",
+		"id" : "MCT_CONTENT_SUMMARY::parquet::1493327719520"
+		"action" : 
+		{
+			"verb" : "read"
+		}
+	}	
+
+]
+		
