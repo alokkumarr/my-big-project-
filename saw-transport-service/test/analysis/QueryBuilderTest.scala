@@ -56,8 +56,8 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
   }
 
   private def artifact(name: String, columns: String*): JObject = {
-    ("artifact_name", name) ~
-    ("artifact_attributes", columns.map(("column_name", _)))
+    ("artifactName", name) ~
+    ("columns", columns.map(("columnName", _)))
   }
 
   private def filters(filters: JObject*): JObject = {
@@ -66,17 +66,17 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
 
   private def filter(bool: String, name: String, operator: String,
     cond: String): JObject = {
-    ("boolean_criteria", bool) ~
-    ("column_name", name) ~
+    ("booleanCriteria", bool) ~
+    ("columnName", name) ~
     ("operator", operator) ~
-    ("search_conditions", cond)
+    ("searchConditions", cond)
   }
 
   private def orderBy(name: String*) = {
-    ("order_by_columns", name)
+    ("orderByColumns", name)
   }
 
   private def groupBy(name: String*) = {
-    ("group_by_columns", name)
+    ("groupByColumns", name)
   }
 }
