@@ -25,11 +25,6 @@ object MetadataDictionary extends Enumeration {
 object MDObjectStruct extends Enumeration{
 
   implicit val formats = DefaultFormats
-/*
-  {
-    override def dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-  }
-*/
 
   val _cf_source = Value (0, "_source")
   val _cf_search = Value (1, "_search")
@@ -41,17 +36,19 @@ object MDObjectStruct extends Enumeration{
   val _cf_applications = Value(9, "_applications")
 
   val key_Definition = Value(100, "content")
-  val key_RelationSimpleSet = Value(101, "RelationSimpleSet")
+  val key_RelationSimpleSet = Value(101, "AtomicRelation")
+  val key_CategorizedRelation = Value(102, "BetaRelation")
 
-  val syskey_NodeType = Value(102, "NodeType")
-  val syskey_NodeCategory = Value(103, "NodeCategory")
-  val syskey_RelCategory = Value(104, "RelCategory")
+  val syskey_NodeType = Value(200, "NodeType")
+  val syskey_NodeCategory = Value(201, "NodeCategory")
+  val syskey_RelCategory = Value(202, "RelCategory")
 
-  val key_Searchable = Value(105, "Searchable")
-  val key_Schema = Value(106, "DataObject_Schema")
-  val key_DL_DataLocation = Value(107, "DL_DataLocation")
-  val key_AnalysisResultObjects = Value(108, "AnalysisResultObjects")
+  val key_Searchable = Value(300, "Searchable")
+  val key_Schema = Value(301, "DataObject_Schema")
+  val key_DL_DataLocation = Value(302, "DL_DataLocation")
+  val key_AnalysisResultObjects = Value(303, "AnalysisResultObjects")
 
+  val key_Header = Value(400, "Header")
 
   val MDColumnFamilies = Map(
       _cf_source.id -> Bytes.toBytes(_cf_source.toString),
@@ -92,10 +89,11 @@ object tables extends Enumeration {
 object NodeCategoryMapper extends Enumeration {
 
   val SemanticNode =    Value(0, "semantic_metadata")
-  val UINode =          Value(1, "semantic_metadata")
+  val DataObject =      Value(1, "datalake_metadata")
   val AnalysisNode =    Value(2, "analysis_metadata")
-  val DataObject =      Value(3, "datalake_metadata")
-  val AnalysisResults = Value(4, "analysis_results")
+  val AnalysisResults = Value(3, "analysis_results")
+  val UINode =          Value(4, "ui_metadata")
+
 
   val NCM = Map(
     "UINode" -> UINode,
@@ -110,7 +108,8 @@ object NodeCategoryMapper extends Enumeration {
 object RelationCategory extends Enumeration {
 
   val UndefinedRelation = Value(0, "_undefined_")
-  val RelationSimpleSet = Value(MDObjectStruct.key_RelationSimpleSet.id, MDObjectStruct.key_RelationSimpleSet.toString)
+  val CategorizedRelation = Value(MDObjectStruct.key_CategorizedRelation.id, MDObjectStruct.key_CategorizedRelation.toString)
+  val SimpleRelation = Value(MDObjectStruct.key_RelationSimpleSet.id, MDObjectStruct.key_RelationSimpleSet.toString)
 
 }
 
@@ -131,9 +130,19 @@ object Fields extends Enumeration {
   val NumOfElements =  Value(3, "_number_of_elements")
   val RelationCategory = Value(4, "_relation_category")
   val ObjectDescriptor = Value(5, "_object_descriptor")
+  val ObjectMetadata = Value(6, "_object_metadata")
 
 }
 
 
+object Contexts extends Enumeration {
 
+  val UndefContext = Value(0, "_undefined_")
+  val UIContexts = Value(1, "UI")
+  val SemanticContext = Value(2, "Semantic")
+  val DataObjectContext = Value(3, "DataObject")
+  val AnalysisContext = Value(4, "Analysis")
+
+
+}
 

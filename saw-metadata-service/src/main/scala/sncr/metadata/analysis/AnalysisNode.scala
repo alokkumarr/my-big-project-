@@ -9,7 +9,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.MDObjectStruct._
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine._
-import sncr.metadata.engine.relations.Relation
+import sncr.metadata.engine.relations.SimpleRelation
 import sncr.saw.common.config.SAWServiceConfig
 
 /**
@@ -17,7 +17,7 @@ import sncr.saw.common.config.SAWServiceConfig
   */
 class AnalysisNode(private var analysisNode: JValue = JNothing) extends ContentNode
   with SourceAsJson
-  with Relation{
+  with SimpleRelation{
 
   def setDefinition(newDefinition: String) : Unit =
   {
@@ -58,7 +58,7 @@ class AnalysisNode(private var analysisNode: JValue = JNothing) extends ContentN
   val table = SAWServiceConfig.metadataConfig.getString("path") + "/" + tables.AnalysisMetadata
   val tn: TableName = TableName.valueOf(table)
   mdNodeStoreTable = connection.getTable(tn)
-  headerDesc =  SearchDictionary.searchFields
+  headerDesc =  AnalysisNode.searchFields
 
 
   override protected def initRow: String = {
@@ -118,7 +118,7 @@ class AnalysisNode(private var analysisNode: JValue = JNothing) extends ContentN
     try {
       val put_op = createNode(NodeType.RelationContentNode.id, classOf[AnalysisNode].getName)
       setDefinition
-      val searchValues: Map[String, Any] = AnalysisNode.extractSearchData(analysisNode) + ("NodeId" -> Bytes.toString(rowKey))
+      val searchValues: Map[String, Any] = AnalysisNode.extractSearchData(analysisNode) + (Fields.NodeId.toString -> Bytes.toString(rowKey))
       searchValues.keySet.foreach(k => {
         m_log debug s"Add search field $k with value: ${searchValues(k).toString}"
       })
@@ -129,7 +129,7 @@ class AnalysisNode(private var analysisNode: JValue = JNothing) extends ContentN
     }
     catch {
       case x: Exception => {
-        val msg = s"Could not store node [ ID = ${new String(rowKey)} ]: "; m_log error(msg, x); (Error.id, msg)
+        val msg = s"Could not store node [ ID = ${Bytes.toString(rowKey)} ]: "; m_log error(msg, x); (Error.id, msg)
       }
     }
   }
@@ -139,7 +139,7 @@ class AnalysisNode(private var analysisNode: JValue = JNothing) extends ContentN
       val (res, msg) = selectRowKey(filter)
       if (res != Success.id) return (res, msg)
       setDefinition
-      val searchValues: Map[String, Any] = AnalysisNode.extractSearchData(analysisNode) + ("NodeId" -> new String(rowKey))
+      val searchValues: Map[String, Any] = AnalysisNode.extractSearchData(analysisNode) + (Fields.NodeId.toString -> Bytes.toString(rowKey))
       searchValues.keySet.foreach(k => {
         m_log debug s"Add search field $k with value: ${searchValues(k).toString}"
       })
@@ -156,7 +156,7 @@ class AnalysisNode(private var analysisNode: JValue = JNothing) extends ContentN
     }
   }
 
-  def updateRelations: (Int, String) = {
+  def updateRelations(): (Int, String) = {
     try {
       if (rowKey != null  && !rowKey.isEmpty) {
         if (commit(saveRelation(update)))
@@ -206,9 +206,24 @@ object AnalysisNode{
     an
   }
 
+  val searchFields =
+    Map(
+      "id" -> "String",
+      "module" -> "String",
+      "customerCode" -> "String",
+      "name" -> "String",
+      "tenantId" -> "String",
+      "productId"-> "String",
+      "analysisCategoryId"-> "Int",
+      "analysisCategoryName"-> "String",
+      "tenantId"-> "String",
+      "productId"-> "String",
+      "analysisName"-> "String",
+      "displayStatus"-> "String"
+    )
 
   protected val requiredFields = Map(
-    "root" -> List("id", "module", "customerCode")
+    "root" -> List("id")
   )
 
   def  extractSearchData(analysisNode: JValue) : Map[String, Any] = {
@@ -218,8 +233,8 @@ object AnalysisNode{
       (analysisNode, "module"),
       (analysisNode, "customerCode"))
       .map(jv => {
-        val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, SearchDictionary.searchFields(jv._2)) )
-        m_log trace s"Field: ${jv._2}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${SearchDictionary.searchFields(jv._2)}\n, Value: $searchValue"
+        val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, searchFields(jv._2)) )
+        m_log trace s"Field: ${jv._2}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${searchFields(jv._2)}\n, Value: $searchValue"
         if (result) jv._2 -> Option(searchValue) else jv._2 -> None
       }).filter(_._2.isDefined).map(kv => kv._1 -> kv._2.get).toMap
   }

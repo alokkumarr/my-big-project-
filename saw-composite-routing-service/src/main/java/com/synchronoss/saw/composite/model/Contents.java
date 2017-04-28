@@ -60,8 +60,8 @@ public class Contents implements Serializable {
      * 
      */
     @JsonProperty("keys")
-    @JsonPropertyDescription("Allows ANY object but describes nothing.")
-    private Keys keys;
+    @JsonPropertyDescription("Allows ANY array but describes nothing.")
+    private List<Key> keys = null;
     /**
      * Empty array schema.
      * <p>
@@ -150,7 +150,7 @@ public class Contents implements Serializable {
      * 
      */
     @JsonProperty("keys")
-    public Keys getKeys() {
+    public List<Key> getKeys() {
         return keys;
     }
 
@@ -161,11 +161,11 @@ public class Contents implements Serializable {
      * 
      */
     @JsonProperty("keys")
-    public void setKeys(Keys keys) {
+    public void setKeys(List<Key> keys) {
         this.keys = keys;
     }
 
-    public Contents withKeys(Keys keys) {
+    public Contents withKeys(List<Key> keys) {
         this.keys = keys;
         return this;
     }
@@ -219,7 +219,10 @@ public class Contents implements Serializable {
         CREATE("create"),
         UPDATE("update"),
         READ("read"),
-        DELETE("delete");
+        DELETE("delete"),
+		SEARCH("search"),
+		EXECUTE("execute");
+		
         private final String value;
         private final static Map<String, Contents.Action> CONSTANTS = new HashMap<String, Contents.Action>();
 

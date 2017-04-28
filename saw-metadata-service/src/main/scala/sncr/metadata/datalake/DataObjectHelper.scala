@@ -6,7 +6,8 @@ import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.analysis.AnalysisNode
 import sncr.metadata.engine.MDObjectStruct.formats
 import sncr.metadata.engine.ProcessingResult._
-import sncr.metadata.engine.{MDNodeUtil, Response}
+import sncr.metadata.engine.MDNodeUtil
+import sncr.metadata.engine.responses.Response
 
 /**
   * Created by srya0001 on 3/3/2017.
@@ -53,7 +54,7 @@ class DataObjectHelper(var requests: JValue) extends Response {
 
 object DataObjectHelper{
 
-  val m_log: Logger = LoggerFactory.getLogger("DataObjectCHelper")
+  val m_log: Logger = LoggerFactory.getLogger("DataObjectHelper")
 
   def apply(source: String): DataObjectHelper = {
     try {

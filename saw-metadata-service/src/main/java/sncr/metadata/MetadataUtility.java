@@ -6,7 +6,7 @@ import org.apache.commons.cli.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sncr.metadata.analysis.AnalysisProvHelper;
-import sncr.metadata.ui_components.UIMDRequestHandler;
+import sncr.metadata.ui_components.UIMDRequestProcessor;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -32,7 +32,7 @@ public class MetadataUtility {
             System.out.println("Start data processing:\n input file: " + cl.getOptionValue('i') + "\nOutput path: " + cl.getOptionValue('o'));
             switch (mdType) {
                 case "ui":
-                    List<UIMDRequestHandler> semaReqHandlers = UIMDRequestHandler.getHandlerForRequest4Java(inData, false);
+                    List<UIMDRequestProcessor> semaReqHandlers = UIMDRequestProcessor.getHandlerForRequest4Java(inData, false);
                     if (semaReqHandlers.isEmpty())
                     {
                         logger.error("The document is not parsable. Exit");
@@ -49,7 +49,7 @@ public class MetadataUtility {
                     });
                     break;
                 case "scan_ui":
-                    String result = UIMDRequestHandler.scanSemanticTable(true);
+                    String result = UIMDRequestProcessor.scanSemanticTable(true);
                     try{
                         outStream.write(result.getBytes());
                     } catch (IOException e) {

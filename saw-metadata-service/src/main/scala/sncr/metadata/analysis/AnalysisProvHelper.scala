@@ -3,9 +3,10 @@ package sncr.metadata.analysis
 import org.json4s._
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
-import sncr.metadata.engine.{MDNodeUtil, MDObjectStruct, Response}
+import sncr.metadata.engine.{MDNodeUtil, MDObjectStruct}
 import sncr.metadata.engine.ProcessingResult._
 import MDObjectStruct.formats
+import sncr.metadata.engine.responses.Response
 
 /**
   * Created by srya0001 on 3/3/2017.

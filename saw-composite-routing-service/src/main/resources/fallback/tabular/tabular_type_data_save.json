@@ -1,0 +1,294 @@
+  [
+    {
+  "_id" : "analyses_report_345674", 
+  "name" : "Order Fulfilment", 
+  "active" : "true",
+  "type" : "report", 
+  "metric_name" : "Orders, Products and Customers (All views)", 
+  "scheduled" : "0 0 12 1/1 * ? *", 
+  "publish" : 
+  {
+      "sourceType" : "EMAIL",
+		  "email_id" : ["saurav.paul@synchronoss.com", "suren.nathan@synchronoss.com"], 
+		  "host" : "exchange.outlook.com/OWA", 
+		  "port" : 22, 
+		  "password" : "Gryqzaec1234YH" 
+		  
+  },
+  "edit" : false, 
+  "query" : "SELECT ENR_LOCATION_ADDRESS, ENR_CUSTOMER_INFO FROM Orders, Products, Customers Where Orders.ORDER_ID=Products.ORDER_ID", 
+  "description" : "", 
+  "repository": 
+  {
+    "storage_type" : "RDBMS",
+    "URL" : "jdbc:mysql://172.31.10.47:3306/rawdev?autoReconnect=true",
+    "username" : "XXXX",
+    "password" : "XXXX"
+  },
+  
+  "artifacts": 
+    [
+    {
+    "artifact_name": "Orders",
+    "columns" : 
+    [
+      {
+        "column_name": "CUSTOMER_ID",
+        "display_name": "Customer ID",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": true,
+        "filter_eligible": false
+      },
+      {
+        "column_name": "STATE_NAME",
+        "display_name": "Customer State",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "column_name": "FIRST_NAME",
+        "display_name": "First Name",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": false,
+        "filter_eligible": false
+      },
+      {
+        "column_name": "LAST_NAME",
+        "display_name": "Last Name",
+        "alias_name": "",
+        "type": "string",
+        "x-axis": true,
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": false,
+        "checked": true
+      },
+      {
+        "column_name": "HOME_PHONE",
+        "display_name": "Home Phone",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": false,
+        "filter_eligible": false,
+        "checked": true
+        },
+      {
+        "column_name": "WORK_PHONE",
+        "display_name": "Work Phone",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": false,
+        "filter_eligible": false,
+        "checked": true
+      },
+      {
+        "column_name": "ENR_LOCATION_ADDRESS",
+        "display_name": "Location Address",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": false,
+        "filter_eligible": false,
+        "checked": true
+      },
+      {
+        "column_name": "ENR_CUSTOMER_INFO",
+        "display_name": "Customer Info",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": false,
+        "filter_eligible": false,
+        "checked": true
+      }
+      ]
+    },
+    {
+    "artifact_name": "Products",
+    "columns" : 
+    [
+      {
+        "column_name": "PRODUCT_ID",
+        "display_name": "Product ID",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": false,
+        "filter_eligible": false
+      },
+      {
+        "column_name": "PRODUCT_DISPLAY_NAME",
+        "display_name": "Product Name",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": true
+      },
+      {
+        "column_name": "PRODUCT_DESC",
+        "display_name": "Product Description",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "column_name": "PRODUCT_TYPES",
+        "display_name": "Product Type",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": true
+
+      },
+      {
+        "column_name": "PRODUCT_COMPLETION_TIME",
+        "display_name": "Product Completion Time",
+        "alias_name": "",
+        "type": "int",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "column_name": "BUNDLE_TYPE",
+        "display_name": "Product Bundle",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": false,
+        "filter_eligible": true,
+        "checked": true
+
+      }
+      ]
+    },
+    {
+    "artifact_name": "Customers",
+    "columns" : 
+    [
+      {
+        "column_name": "CUSTOMER_ID",
+        "display_name": "Customer ID",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": true,
+        "filter_eligible": false
+       
+      },
+      {
+        "column_name": "STATE_NAME",
+        "display_name": "Customer State",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "column_name": "FIRST_NAME",
+        "display_name": "First Name",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": false,
+        "filter_eligible": false
+      },
+      {
+        "column_name": "LAST_NAME",
+        "display_name": "Last Name",
+        "alias_name": "",
+        "type": "string",
+        "x-axis": true,
+        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": false,
+        "checked": false
+      },
+      {
+        "column_name": "HOME_PHONE",
+        "display_name": "Home Phone",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": false,
+        "filter_eligible": false
+        },
+      {
+        "column_name": "WORK_PHONE",
+        "display_name": "Work Phone",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": false,
+        "filter_eligible": false
+      },
+      {
+        "column_name": "ENR_LOCATION_ADDRESS",
+        "display_name": "Location Address",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": false,
+        "filter_eligible": false
+      },
+      {
+        "column_name": "ENR_CUSTOMER_INFO",
+        "display_name": "Customer Info",
+        "alias_name": "",
+        "type": "string",
+        "join_eligible": false,
+        "filter_eligible": false
+      }
+      ]
+    }
+    ],
+        "sql_builder": {
+      "group_by_columns": [],
+      "order_by_columns": [],
+      "joins": [
+        {
+          "type": "inner",
+          "criteria": [
+            {
+              "table_name": "Orders",
+              "column_name": "ORDER_NUMBER",
+              "side": "right"
+            },
+            {
+              "table_name": "Products",
+              "column_name": "ORDER_NUMBER",
+              "side": "left"
+            }
+          ]
+        },
+        {
+          "type": "inner",
+          "criteria": [
+            {
+              "table_name": "Orders",
+              "column_name": "CUSTOMER_ID",
+              "side": "right"
+            },
+            {
+              "table_name": "Customers",
+              "column_name": "CUSTOMER_ID",
+              "side": "left"
+            }
+          ]
+        },
+        {
+          "type": "inner",
+          "criteria": [
+            {
+              "table_name": "Products",
+              "column_name": "CUSTOMER_ID",
+              "side": "right"
+            },
+            {
+              "table_name": "Customers",
+              "column_name": "CUSTOMER_ID",
+              "side": "left"
+            }
+          ]
+        }
+      ]
+    }
+}
+  ]
