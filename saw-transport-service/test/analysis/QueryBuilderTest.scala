@@ -6,34 +6,52 @@ import org.scalatest.MustMatchers
 
 import model.QueryBuilder
 
-class QueryTest extends FunSpec with MustMatchers {
+class QueryBuilderTest extends FunSpec with MustMatchers {
   describe("Query built from analysis") {
     it("should have SELECT and FROM") {
-      query(artifactAB) must be ("SELECT a, b FROM t")
+      query(artifactT) must be ("SELECT t.a, t.b FROM t")
     }
     it("with filters should have a WHERE clause") {
-      query(artifactAB, filters(
-        filter("", "a", ">", "1"),
-        filter("AND", "b", "<", "2"))
-      ) must be ("SELECT a, b FROM t WHERE a > 1 AND b < 2")
+      query(artifactT, filters(
+        filter("", "t.a", ">", "1"),
+        filter("AND", "t.b", "<", "2"))
+      ) must be ("SELECT t.a, t.b FROM t WHERE t.a > 1 AND t.b < 2")
     }
     it("with group by columns should have an GROUP BY clause") {
-      query(artifactAB, groupBy("a", "b")
-      ) must be ("SELECT a, b FROM t GROUP BY a, b")
+      query(artifactT, groupBy("t.a", "t.b")
+      ) must be ("SELECT t.a, t.b FROM t GROUP BY t.a, t.b")
     }
     it("with order by columns should have an ORDER BY clause") {
-      query(artifactAB, orderBy("a ASC", "b DESC")
-      ) must be ("SELECT a, b FROM t ORDER BY a ASC, b DESC")
+      query(artifactT, orderBy("t.a ASC", "t.b DESC")
+      ) must be ("SELECT t.a, t.b FROM t ORDER BY t.a ASC, t.b DESC")
     }
   }
 
-  private def artifactAB = {
+  describe("Query built from analysis with multiple artifacts") {
+    it("should list all columns in SELECT and all tables in FROM clause") {
+      queryTwo(artifactT)(artifactU) must be (
+        "SELECT t.a, t.b, u.c, u.d FROM t, u")
+    }
+  }
+
+  private def artifactT = {
     artifact("t", "a", "b")
+  }
+
+  private def artifactU = {
+    artifact("u", "c", "d")
   }
 
   private def query(objs: JObject*): String = {
     val artifact = objs.reduceLeft(_ merge _)
     val analysis = ("artifacts", List(artifact))
+    QueryBuilder.build(analysis)
+  }
+
+  private def queryTwo(objs1: JObject*)(objs2: JObject*): String = {
+    val artifact1 = objs1.reduceLeft(_ merge _)
+    val artifact2 = objs2.reduceLeft(_ merge _)
+    val analysis = ("artifacts", List(artifact1, artifact2))
     QueryBuilder.build(analysis)
   }
 
