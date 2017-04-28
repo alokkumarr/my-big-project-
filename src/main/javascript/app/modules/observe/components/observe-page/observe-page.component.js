@@ -33,7 +33,7 @@ export const ObservePageComponent = {
 
       this.MenuService.getMenu('OBSERVE')
         .then(data => {
-          leftSideNav.update(data);
+          leftSideNav.update(data, 'OBSERVE');
         });
     }
 

@@ -175,9 +175,14 @@ export const AnalyzeViewComponent = {
     }
 
     openNewAnalysisModal() {
-      this.showDialog({
-        template: '<analyze-new></analyze-new>',
-        fullscreen: true
+      this._AnalyzeService.getSemanticLayerData().then(metrics => {
+        this.showDialog({
+          controller: scope => {
+            scope.metrics = metrics;
+          },
+          template: '<analyze-new metrics="metrics"></analyze-new>',
+          fullscreen: true
+        });
       });
     }
 

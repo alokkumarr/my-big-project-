@@ -13,6 +13,8 @@ import filter from 'lodash/filter';
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
 
+import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter-sidenav/analyze-filter-sidenav.component';
+
 export const AnalyzeReportComponent = {
   template,
   styles: [style],
@@ -131,7 +133,7 @@ export const AnalyzeReportComponent = {
 
     // filters section
     openFilterSidenav() {
-      this._FilterService.openFilterSidenav(this.filters.possible);
+      this._FilterService.openFilterSidenav(this.filters.possible, ANALYZE_FILTER_SIDENAV_IDS.designer);
     }
 
     generateFiltersOnCanvasChange() {

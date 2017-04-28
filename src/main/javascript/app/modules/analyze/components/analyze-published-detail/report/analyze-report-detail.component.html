@@ -4,16 +4,19 @@
       <span class="md-title" ng-bind="::$ctrl.analysis.name"></span>
     </md-card-title-text>
 
-    <md-button class="btn-tertiary">
+    <md-button class="btn-tertiary"
+               ng-click="$ctrl.openFilterSidenav()"
+               ng-disabled="$ctrl._isEmpty($ctrl.analysis.report.filters)">
       <md-icon md-font-icon="icon-filter"></md-icon>
       <span translate="FILTER"></span>
     </md-button>
   </md-card-title>
 
   <div layout="column" layout-align="space-between center">
-      <report-grid-display-container data="$ctrl.analysis.report.data"
+      <report-grid-display-container data="$ctrl.filteredGridData"
                            columns="$ctrl.analysis.report.columns"
-                           groups="$ctrl.analysis.report.groupByColumns">
+                           groups="$ctrl.analysis.report.groupByColumns"
+                           updater="$ctrl.updater">
       </report-grid-display-container>
   </div>
 </md-card>

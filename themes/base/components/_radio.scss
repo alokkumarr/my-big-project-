@@ -1,0 +1,15 @@
+md-radio-button {
+  div.md-label {
+    vertical-align: top;
+    height: 100%;
+    display: table;
+
+    span {
+      display: table-cell;
+      vertical-align: middle;
+      font-size: 14px;
+      font-weight: 600;
+      color: #596574;
+    }
+  }
+}

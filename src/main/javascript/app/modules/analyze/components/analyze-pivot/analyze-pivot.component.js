@@ -1,20 +1,22 @@
 import 'devextreme/ui/pivot_grid';
 import forEach from 'lodash/forEach';
 import map from 'lodash/map';
-import fpGroupBy from 'lodash/fp/groupBy';
 import clone from 'lodash/clone';
 import fpMap from 'lodash/fp/map';
 import fpPipe from 'lodash/fp/pipe';
 import fpFilter from 'lodash/fp/filter';
-import isEmpty from 'lodash/isEmpty';
-import split from 'lodash/split';
-import first from 'lodash/first';
 import find from 'lodash/find';
-import fpPick from 'lodash/fp/pick';
+import take from 'lodash/take';
+import isEmpty from 'lodash/isEmpty';
+import omit from 'lodash/omit';
 import {BehaviorSubject} from 'rxjs';
+import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 
 import template from './analyze-pivot.component.html';
 import style from './analyze-pivot.component.scss';
+
+import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter-sidenav/analyze-filter-sidenav.component';
+import {ANALYZE_PIVOT_SETTINGS_SIDENAV_ID} from '../analyze-pivot-settings/analyze-pivot-settings.component';
 
 export const AnalyzePivotComponent = {
   template,
@@ -23,8 +25,10 @@ export const AnalyzePivotComponent = {
     model: '<'
   },
   controller: class AnalyzePivotController {
-    constructor($mdDialog, $timeout, PivotService, AnalyzeService, FilterService) {
+    constructor($mdDialog, $timeout, PivotService, AnalyzeService, FilterService, $mdSidenav) {
+      'ngInject';
       this._$mdDialog = $mdDialog;
+      this._$mdSidenav = $mdSidenav;
       this._PivotService = PivotService;
       this._$timeout = $timeout;
       this._FilterService = FilterService;
@@ -33,11 +37,9 @@ export const AnalyzePivotComponent = {
       this.deNormalizedData = [];
       this.normalizedData = [];
       this.dataSource = {};
-      this.settings = {};
       this.sorts = [];
-      this.filters = [];
+      this.filters = null;
       this.sortFields = null;
-      this._gridInstance = null;
       this.pivotGridUpdater = new BehaviorSubject({});
     }
 
@@ -45,95 +47,95 @@ export const AnalyzePivotComponent = {
       this._FilterService.onApplyFilters(filters => this.onApplyFilters(filters));
       this._FilterService.onClearAllFilters(() => this.onClearAllFilters());
 
+      if (isEmpty(this.model.artifacts)) {
+        // new analysis
+        this._AnalyzeService.createAnalysis(this.model.artifactsId)
+          .then(analysis => {
+            this.prepareFields(analysis.artifacts[0].artifactAttributes);
+            this.toggleSettingsSidenav();
+          });
+        // if it's a pivot analysis we're only interested in the first artifact
+      } else {
+        // edit existing analysis
+        this.prepareFields(this.model.artifacts[0].artifactAttributes);
+        this.loadPivotData().then(() => {
+          this.filters = this._PivotService.mapFieldsToFilters(this.normalizedData, this.fields);
+          const selectedFilters = map(this.model.filters, this._FilterService.getBackEnd2FrontEndFilterMapper());
+          this.mergeSelectedFiltersWithFilters(selectedFilters, this.filters);
+          this.sortFields = this.getFieldToSortFieldMapper()(this.fields);
+          this.sorts = this.mapBackend2FrontendSort(this.model.sorts, this.sortFields);
+        });
+      }
+    }
+
+    mergeSelectedFiltersWithFilters(selectedFilters, filters) {
+      forEach(selectedFilters, selectedFilter => {
+        const targetFilter = find(filters, ({name}) => name === selectedFilter.name);
+        targetFilter.model = selectedFilter.model;
+      });
+    }
+
+    onApplyFieldSettings() {
+      this.sortFields = this.getFieldToSortFieldMapper()(this.fields);
+    }
+
+    prepareFields(artifactAttributes) {
+      this.fields = this._PivotService.getBackend2FrontendFieldMapper()(artifactAttributes);
+
+      const dataSource = new PivotGridDataSource({
+        fields: this.fields
+      });
+
+      this.fieldChooserOptions = {
+        onContentReady: e => {
+          this.gridIsntance = e.component;
+        },
+        dataSource,
+        layout: 1,
+        width: 400,
+        height: 800
+      };
+
+      // repaint the field chooser so it fills the cointainer
+      this._$timeout(() => {
+        this.gridIsntance.repaint();
+      }, 400);
+
+      this.pivotGridUpdater.next({
+        dataSource
+      });
+    }
+
+    toggleSettingsSidenav() {
+      this._$mdSidenav(ANALYZE_PIVOT_SETTINGS_SIDENAV_ID).toggle();
+    }
+
+    onRefreshData() {
+      this.updateFields();
       this.loadPivotData();
     }
 
     loadPivotData() {
-      this._AnalyzeService.getPivotData().then(data => {
-        this.normalizedData = data;
-        this.deNormalizedData = this._PivotService.denormalizeData(data);
-        this.fields = this.getFields();
-        this.sortFields = this.getFieldToSortFieldMapper()(this.fields);
+      return this._AnalyzeService.getPivotData().then(pivotData => {
+        this.normalizedData = pivotData;
+        this.deNormalizedData = this._PivotService.denormalizeData(pivotData, this.fields);
 
-        if (isEmpty(this.model.settings)) {
-          // new analysis
-          this.settings = this.getSettingsFromFields(this.fields);
-          this.filters = this.getFieldToFilterMapper()(this.fields);
-          this.sorts = [];
-        } else {
-          // editing existing analysis
-          this.settings = this.model.settings;
-          this.putSettingsDataInFields(this.settings, this.fields);
-          this.filters = this.getFieldToFilterMapper()(this.fields);
-          this.sorts = this.model.sorts ? this.mapBackend2FrontendSort(this.model.sorts, this.sortFields) : [];
-          if (this.model.filters) {
-            const selectedFilters = map(this.model.filters, this._FilterService.getBackEnd2FrontEndFilterMapper());
-            // const selectedFilters = this._FilterService.getSelectedFilterMapper()(this.filters);
-            this.putSelectedFilterModelsIntoFilters(this.filters, selectedFilters);
-          }
+        if (isEmpty(this.filters)) {
+          this.filters = this._PivotService.mapFieldsToFilters(this.normalizedData, this.fields);
         }
 
         this.pivotGridUpdater.next({
           dataSource: {
             store: this.deNormalizedData,
             fields: this.fields
-          },
-          sorts: this.sorts,
-          filters: this.filters
+          }
         });
-      });
-    }
-
-    getSettingsFromFields(fields) {
-      return fpPipe(
-        fpMap(fpPick(['dataField', 'checked', 'summaryType', 'caption'])),
-        fpGroupBy(field => this.getArea(field.dataField))
-      )(fields);
-    }
-
-    putSettingsDataInFields(settings, fields) {
-      forEach(fields, field => {
-        const area = this.getArea(field.dataField);
-        const targetField = find(settings[area], ({dataField}) => {
-          return dataField === field.dataField;
-        });
-        field.area = targetField.area;
-        field.summaryType = targetField.summaryType;
-        field.checked = targetField.checked;
-      });
-    }
-
-    applyFieldSettings(field) {
-      const modifierObj = {};
-      const area = this.getArea(field.dataField);
-
-      switch (area) {
-        case 'row':
-        case 'column':
-          modifierObj.area = field.checked ? area : null;
-          break;
-        case 'data':
-        default:
-          // if it's not row, or column, it should be data
-          modifierObj.summaryType = field.summaryType;
-          // setting only the visibility is not eough for hiding data fields
-          modifierObj.area = field.checked ? 'data' : null;
-          break;
-      }
-
-      field.area = modifierObj.area;
-
-      this.pivotGridUpdater.next({
-        field: {
-          dataField: field.dataField,
-          modifierObj
-        }
       });
     }
 
 // filters
     openFilterSidenav() {
-      this._FilterService.openFilterSidenav(this.filters);
+      this._FilterService.openFilterSidenav(this.filters, ANALYZE_FILTER_SIDENAV_IDS.designer);
     }
 
     onApplyFilters(filters) {
@@ -161,7 +163,7 @@ export const AnalyzePivotComponent = {
 
     getFieldToSortFieldMapper() {
       return fpPipe(
-        fpFilter(field => this.getArea(field.dataField) === 'row'),
+        fpFilter(field => field.dataType !== 'date' && field.area === 'row'),
         fpMap(field => {
           return {
             type: field.dataType,
@@ -170,32 +172,6 @@ export const AnalyzePivotComponent = {
           };
         })
       );
-    }
-
-    getFieldToFilterMapper() {
-      return fpPipe(
-        fpFilter(field => this.getArea(field.dataField) === 'row'),
-        fpMap(field => {
-          return {
-            name: field.dataField,
-            type: field.dataType,
-            items: field.dataType === 'string' ?
-            this._PivotService.getUniquesFromNormalizedData(this.normalizedData, field.dataField) :
-            null,
-            label: field.caption,
-            model: null
-          };
-        })
-      );
-    }
-
-    putSelectedFilterModelsIntoFilters(filters, selectedFilters) {
-      forEach(filters, filter => {
-        const targetFilter = find(selectedFilters, ({name}) => name === filter.name);
-        if (targetFilter && this._FilterService.isFilterModelNonEmpty(targetFilter.model)) {
-          filter.model = targetFilter.model;
-        }
-      });
     }
 
     applySorts(sorts) {
@@ -286,20 +262,34 @@ export const AnalyzePivotComponent = {
       });
     }
 
+    onGetFields(fields) {
+      // pivotgrid adds some other fields in plus, so we have to take only the real ones
+      this.fieldsToSave = take(fields, this.fields.length);
+    }
+
+    updateFields() {
+      this.pivotGridUpdater.next({
+        getFields: true
+      });
+    }
+
     openSaveModal(ev) {
+      this.updateFields();
+
+      this.model.artifacts = [{artifactAttributes: this._PivotService.getFrontend2BackendFieldMapper()(this.fieldsToSave)}];
+
+      this.model.filters = fpPipe(
+        this._FilterService.getSelectedFilterMapper(),
+        fpMap(this._FilterService.getFrontEnd2BackEndFilterMapper())
+      )(this.filters);
       this.model.sorts = this.mapFrontend2BackendSort(this.sorts);
-      this.model.settings = this.settings;
-
-      const selectedFilters = this._FilterService.getSelectedFilterMapper()(this.filters);
-      this.model.filters = map(selectedFilters, this._FilterService.getFrontEnd2BackEndFilterMapper());
-
       const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
       this._$mdDialog
         .show({
           template: tpl,
           controller: scope => {
-            scope.model = clone(this.model);
+            scope.model = clone(omit(this.model, 'metric'));
 
             scope.onSave = data => {
               this.model.id = data.id;
@@ -314,62 +304,6 @@ export const AnalyzePivotComponent = {
           targetEvent: ev,
           clickOutsideToClose: true
         });
-    }
-
-    getFields() {
-      // const obj = deNormalizedData[0];
-      // const objKeys = keys(obj);
-      // const fields = map(objKeys, key => {
-      //   return {
-      //     caption: key,
-      //     dataField: key,
-      //     width: 120,
-      //     area: this.getArea(key),
-      //     format: key.includes('price') ? 'currency' : null
-      //   };
-      // });
-      return [{
-        caption: 'Affiliate Name',
-        width: 120,
-        dataType: 'string',
-        dataField: 'row_level_1'
-      }, {
-        caption: 'Product',
-        width: 120,
-        dataType: 'string',
-        dataField: 'row_level_2'
-      }, {
-        caption: 'Date Month',
-        dataField: 'column_level_1',
-        format: datum => {
-          const date = new Date(datum);
-          return `${date.getFullYear()}-${date.getMonth()}`;
-        },
-        width: 120
-      }, {
-        caption: 'Date Day',
-        dataField: 'column_level_2',
-        dataType: 'string',
-        format: datum => {
-          const date = new Date(datum);
-          return `${date.getDay()}`;
-        },
-        width: 120
-      }, {
-        caption: 'Total Price',
-        dataField: 'total_price',
-        dataType: 'double',
-        summaryType: 'sum',
-        format: 'currency'
-      }];
-    }
-
-    getArea(key) {
-      const area = first(split(key, '_'));
-      if (area !== 'row' && area !== 'column') {
-        return 'data';
-      }
-      return area;
     }
   }
 };

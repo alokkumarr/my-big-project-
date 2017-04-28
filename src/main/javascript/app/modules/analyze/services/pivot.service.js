@@ -3,28 +3,87 @@ import keys from 'lodash/keys';
 import find from 'lodash/find';
 import flatMap from 'lodash/flatMap';
 import uniq from 'lodash/uniq';
+import forEach from 'lodash/forEach';
+import fpMap from 'lodash/fp/map';
+import fpPipe from 'lodash/fp/pipe';
+import fpFilter from 'lodash/fp/filter';
+import split from 'lodash/split';
+import first from 'lodash/first';
+import fpMapKeys from 'lodash/fp/mapKeys';
+import fpOmit from 'lodash/fp/omit';
+import invert from 'lodash/invert';
+import fpGroupBy from 'lodash/fp/groupBy';
+import sortBy from 'lodash/sortBy';
+import last from 'lodash/last';
 
-export function PivotService() {
+const FRONT_2_BACK_PIVOT_FIELD_PAIRS = {
+  caption: 'displayName',
+  dataType: 'type',
+  dataField: 'columnName'
+};
+
+const BACK_2_FRONT_PIVOT_FIELD_PAIRS = invert(FRONT_2_BACK_PIVOT_FIELD_PAIRS);
+
+export function PivotService(FilterService) {
   'ngInject';
 
   return {
     denormalizeData,
-    getUniquesFromNormalizedData
+    getUniquesFromNormalizedData,
+    putSettingsDataInFields,
+    putSelectedFilterModelsIntoFilters,
+    mapFieldsToFilters,
+    getArea,
+    getFrontend2BackendFieldMapper,
+    getBackend2FrontendFieldMapper
   };
 
-  function denormalizeData(normalizedData) {
-    return flatMap(normalizedData, node => traverseRecursive({keys: {}, currentKey: 'row_level_1', node}));
+  function getFrontend2BackendFieldMapper() {
+    return fpMap(fpPipe(
+      fpOmit(['_initProperties', 'selector', 'format']),
+      fpMapKeys(key => {
+        const newKey = FRONT_2_BACK_PIVOT_FIELD_PAIRS[key];
+        return newKey || key;
+      })
+    ));
+  }
+
+  function getBackend2FrontendFieldMapper() {
+    return fpMap(fpMapKeys(key => {
+      const newKey = BACK_2_FRONT_PIVOT_FIELD_PAIRS[key];
+      return newKey || key;
+    }));
+  }
+
+  function denormalizeData(normalizedData, fields) {
+    const groupedFields = getGroupedFields(fields);
+    return flatMap(normalizedData, node => traverseRecursive({groupedFields, keys: {}, currentKey: 'row_level_1', node}));
+  }
+
+  function getGroupedFields(fields) {
+    return fpPipe(
+      fpFilter(({area}) => area === 'row' || area === 'column' || area === 'data'),
+      fpGroupBy('area'),
+      sortGroupedFieldsByAreaIndex
+    )(fields);
+  }
+
+  function sortGroupedFieldsByAreaIndex(groupedFields) {
+    groupedFields.row = sortBy(groupedFields.row, 'areaIndex');
+    groupedFields.column = sortBy(groupedFields.column, 'areaIndex');
+    groupedFields.data = sortBy(groupedFields.data, 'areaIndex');
+    return groupedFields;
   }
 
 /* eslint-disable camelcase */
-  function traverseRecursive({keys, currentKey, node}) {
+  function traverseRecursive({groupedFields, keys, currentKey, node}) {
     const containerProp = getContainerProp(node);
     const container = node[containerProp];
-    keys[currentKey] = node.key;
+    keys[getFieldNameFromCurrentKey(groupedFields, currentKey)] = node.key;
     if (container) {
       // this is a node
       return flatMap(container.buckets, node => {
-        return traverseRecursive({keys, currentKey: containerProp, node});
+        return traverseRecursive({groupedFields, keys, currentKey: containerProp, node});
       });
     }
     // this is a leaf
@@ -34,20 +93,27 @@ export function PivotService() {
   }
   /* eslint-enable camelcase */
 
-  function getUniquesFromNormalizedData(data, targetKey) {
-    return uniq(flatMap(data, node => traverseRec({currentKey: 'row_level_1', targetKey, node})));
+  function getFieldNameFromCurrentKey(groupedFields, key) {
+    const index = parseInt(last(split(key, '_')), 10);
+    return groupedFields[getArea(key)][index - 1].dataField;
+  }
+
+  function getUniquesFromNormalizedData(data, targetKey, groupedFields) {
+    return uniq(flatMap(data, node => traverseRec({groupedFields, currentKey: 'row_level_1', targetKey, node})));
   }
 
   /* eslint-disable camelcase */
-  function traverseRec({currentKey, targetKey, node}) {
+  function traverseRec({groupedFields, currentKey, targetKey, node}) {
     const containerProp = getContainerProp(node);
     const container = node[containerProp];
-    const isInTargetContainer = currentKey === targetKey;
+    const currentFieldKey = getFieldNameFromCurrentKey(groupedFields, currentKey);
+
+    const isInTargetContainer = currentFieldKey === targetKey;
 
     if (!isInTargetContainer) {
       // this is a node
       return flatMap(container.buckets, node => {
-        return traverseRec({currentKey: containerProp, targetKey, node});
+        return traverseRec({groupedFields, currentKey: containerProp, targetKey, node});
       });
     }
     // it's in target container
@@ -64,5 +130,52 @@ export function PivotService() {
     return find(objKeys, key => {
       return key.includes('column_level') || key.includes('row_level');
     });
+  }
+
+  function putSettingsDataInFields(settings, fields) {
+    forEach(fields, field => {
+      const area = this.getArea(field.dataField);
+      const targetField = find(settings[area], ({dataField}) => {
+        return dataField === field.dataField;
+      });
+      field.area = targetField.area;
+      field.summaryType = targetField.summaryType;
+      field.checked = targetField.checked;
+    });
+  }
+
+  function putSelectedFilterModelsIntoFilters(filters, selectedFilters) {
+    forEach(filters, filter => {
+      const targetFilter = find(selectedFilters, ({name}) => name === filter.name);
+      if (targetFilter && FilterService.isFilterModelNonEmpty(targetFilter.model)) {
+        filter.model = targetFilter.model;
+      }
+    });
+  }
+
+  function mapFieldsToFilters(data, fields) {
+    const groupedFields = getGroupedFields(fields);
+    return fpPipe(
+      fpFilter(field => field.area === 'row' && field.dataType === 'string'),
+      fpMap(field => {
+        return {
+          name: field.dataField,
+          type: field.dataType,
+          items: field.dataType === 'string' ?
+          getUniquesFromNormalizedData(data, field.dataField, groupedFields) :
+          null,
+          label: field.caption,
+          model: null
+        };
+      })
+    )(fields);
+  }
+
+  function getArea(key) {
+    const area = first(split(key, '_'));
+    if (area !== 'row' && area !== 'column') {
+      return 'data';
+    }
+    return area;
   }
 }

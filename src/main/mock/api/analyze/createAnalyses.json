@@ -1,0 +1,173 @@
+[{
+  "id" : "analyses_report_345674", 
+  "name" : "Order Fulfilment", 
+  "active" : "true",
+  "type" : "pivot", 
+  "metricName" : "Order Analysis", 
+  "scheduled" : "0 0 12 1/1 * ? *", 
+  "publish" : 
+  {
+      "sourceType" : "EMAIL",
+		  "emailid" : ["saurav.paul@synchronoss.com", "suren.nathan@synchronoss.com"], 
+		  "host" : "exchange.outlook.com/OWA", 
+		  "port" : 22, 
+		  "password" : "Gryqzaec1234YH" 
+		  
+  },
+  "query" : "", 
+  "description" : "", 
+  "repository": 
+  {
+    "storageType" : "RDBMS",
+    "URL" : "jdbc:mysql://172.31.10.47:3306/rawdev?autoReconnect=true",
+    "username" : "xxxx",
+    "password" : "XXXXXXX"
+  },
+  
+  "artifacts": [{
+    "artifactName": "Orders",
+    "artifactAttributes": [
+        {
+          "columnName": "ORDER_NUMBER",
+          "displayName": "Order Number",
+          "type": "string",
+          "joinEligible": true,
+          "filterEligible": false,
+          "area" : null,
+          "displayFolder" : "Folder_2",
+          "allowFiltering" : false
+        },
+        {
+          "columnName": "CUSTOMER_ID",
+          "displayName": "Customer ID",
+          "type": "string",
+          "joinEligible": true,
+          "filterEligible": false,
+          "area" : null,
+          "displayFolder" : "Folder_2",
+          "allowFiltering" : false
+        },
+        {
+        "columnName": "FACT_PRODUCT_ID",
+        "displayName": "Product Id",
+        "type": "string",
+        "joinEligible": false,
+        "filterEligible": false,
+        "area" : null,
+        "displayFolder" : "Folder_2",
+        "allowFiltering" : false
+      },
+      {
+        "columnName": "ENR_PARTNER",
+        "displayName": "Partner",
+        "type": "string",
+        "joinEligible": false,
+        "filterEligible": true,
+        "area" : null,
+        "displayFolder" : "Folder_2",
+        "allowFiltering" : false
+      },
+      {
+        "columnName": "AFFILIATE_displayName",
+        "displayName": "Affiliate",
+        "type": "string",
+        "joinEligible": false,
+        "filterEligible": true,
+        "checked": false,
+        "area" : null,
+        "displayFolder" : "Folder_2",
+        "allowFiltering" : false
+      },
+      {
+        "columnName": "ORDER_RECEIVED_DATE_MOTNH",
+        "displayName": "Order Received MONTH",
+        "joinEligible": false,
+        "filterEligible": false,
+        "area" : null,
+        "displayFolder" : "Folder_1",
+        "allowFiltering" : false,
+        "type": "date",
+        "groupInterval":"month"
+      },
+      {
+        "columnName": "ORDER_RECEIVED_DATE_DAY",
+        "displayName": "Order Received DAY",
+        "joinEligible": false,
+        "filterEligible": false,
+        "area" : null,
+        "displayFolder" : "Folder_1",
+        "allowFiltering" : false,
+        "type": "date",
+        "groupInterval":"day"
+      },
+      {
+        "columnName": "ORDER_COMPLETION_TIME",
+        "displayName": "Order Completion Time",
+        "type": "int",
+        "joinEligible": false,
+        "filterEligible": true,
+        "area" : null,
+        "displayFolder" : "Folder_1",
+        "allowFiltering" : false
+      },
+      {
+        "columnName": "REASON_DESC",
+        "displayName": "Order Cancel Reason",
+        "type": "string",
+        "joinEligible": false,
+        "filterEligible": true,
+        "area" : null,
+        "displayFolder" : "Folder_1",
+        "allowFiltering" : false
+      },
+      {
+        "columnName": "ORDER_CANCELLATION_TIME",
+        "displayName": "Order Cancellation Time",
+        "type": "int",
+        "joinEligible": false,
+        "filterEligible": true,
+        "area" : null,
+        "displayFolder" : "Folder_1",
+        "allowFiltering" : false
+      },
+      {
+        "columnName": "ORDER_TYPE",
+        "displayName": "Order Type",
+        "type": "string",
+        "joinEligible": false,
+        "filterEligible": true,
+        "area" : null,
+        "displayFolder" : "Folder_1",
+        "allowFiltering" : false
+      },
+      {
+        "columnName": "ORD_OM_STATUS",
+        "displayName": "Order Status",
+        "joinEligible": false,
+        "filterEligible": true,
+        "area" : null,
+        "displayFolder" : "Folder_1",
+        "allowFiltering" : false
+      },
+      {
+        "columnName": "REGION",
+        "displayName": "Region",
+        "type": "string",
+        "joinEligible": false,
+        "filterEligible": true,
+        "area" : null,
+        "displayFolder" : "Folder_1",
+        "allowFiltering" : false
+      },
+      {
+        "columnName": "total_price",
+        "displayName": "Total Price",
+        "type": "double",
+        "joinEligible": false,
+        "filterEligible": false,
+        "area" : null,
+        "allowFiltering" : false
+      }
+      ]
+  }]
+}]

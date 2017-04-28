@@ -1,61 +1,12 @@
-<md-sidenav class="md-sidenav-left"
-            style="width: 350px;"
-            md-component-id="left"
-            md-is-locked-open="true"
-            md-disable-backdrop md-whiteframe="4">
-  <md-toolbar class="md-theme-indigo">
-    <h1 class="md-toolbar-tools">Pivot Settings</h1>
+<md-sidenav class="md-sidenav-left pivot-settings"
+            md-component-id="{{$ctrl.ANALYZE_PIVOT_SETTINGS_SIDENAV_ID}}"
+            md-whiteframe="4">
+  <md-toolbar class="settings-toolbar" layout="row" layout-align="space-around center">
+    <p class="md-headline" translate="PIVOT_SETTINGS"></p>
+    <md-button class="md-button btn-primary" ng-click="$ctrl.applySettings()" translate="APPLY_SETTINGS"></md-button>
   </md-toolbar>
 
   <md-content layout-margin>
-
-    <md-card md-whiteframe="2">
-      <h3> Rows </h3>
-      <div class="checkbox-container" layout="column">
-        <md-checkbox ng-repeat="row in $ctrl.settings.row"
-                      ng-model="row.checked"
-                      name="row"
-                      ng-change="$ctrl.inputChanged(row)">
-          {{::row.caption}}
-        </md-checkbox>
-      </div>
-    </md-card>
-
-    <md-card md-whiteframe="2">
-      <h3> Columns </h3>
-      <div class="checkbox-container" layout="column">
-        <md-checkbox ng-repeat="column in $ctrl.settings.column"
-                      ng-model="column.checked"
-                      name="column"
-                      ng-change="$ctrl.inputChanged(column)">
-          {{::column.caption}}
-        </md-checkbox>
-      </div>
-    </md-card>
-
-    <md-card md-whiteframe="2">
-      <h3> Data </h3>
-      <div class="checkbox-container" layout="column">
-        <div ng-repeat="data in $ctrl.settings.data"
-             layout="row"
-             layout-align="space-around center"
-             class="summary-type">
-          <md-checkbox ng-model="data.checked"
-                       name="data"
-                       ng-change="$ctrl.inputChanged(data)">
-            {{::data.caption}}
-          </md-checkbox>
-          <md-select ng-model="data.summaryType"
-                     ng-change="$ctrl.inputChanged(data)"
-                     ng-disabled="!data.checked">
-            <md-option ng-repeat="summaryType in $ctrl.summaryTypes"
-                       ng-value="summaryType"
-                       ng-bind="::summaryType">
-            </md-option>
-          </md-select>
-        </div>
-      </div>
-    </md-card>
-
+    <div dx-pivot-grid-field-chooser="$ctrl.fieldChooserOptions"></div>
   </md-content>
 </md-sidenav>
