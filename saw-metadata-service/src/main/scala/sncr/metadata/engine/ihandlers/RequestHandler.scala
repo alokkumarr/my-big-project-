@@ -546,8 +546,8 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
     case "UINode"       => val uih = UINode(id); respGenerator.build(uih.delete)
     case "AnalysisNode" => val ah = AnalysisNode(id); respGenerator.build(ah.delete)
     case "DataObject"   => val doh = DataObject(id); respGenerator.build(doh.delete)
-    case "AnalysisResult"   => val arh = AnalysisResult(null, id); respGenerator.build(arh.delete)
-    case "SemanticNode" => val snh = AnalysisNode(id); respGenerator.build(snh.delete)
+    case "AnalysisResult" => val arh = AnalysisResult(null, id); respGenerator.build(arh.delete)
+    case "SemanticNode" => val snh = SemanticNode(id); respGenerator.build(snh.delete)
     case _ => respGenerator.build(Error.id, "Not supported.")
   }
 
