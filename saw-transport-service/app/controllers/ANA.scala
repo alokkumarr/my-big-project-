@@ -150,14 +150,6 @@ class ANA extends BaseServiceProvider {
 
   private def readAnalysisJson
     (analysisId: String, semantic: Boolean = false): JObject = {
-    /* If the analysis ID is given as "_static" return a static analysis
-     * template that is used to bootstrap tests when the semantic
-     * database is empty */
-    if (analysisId == "_static") {
-      return ("module", "analyze") ~
-      ("customerCode", "static") ~
-      ("name", "static")
-    }
     val analysisNode = if (semantic) {
       readSemanticNode(analysisId)
     } else {

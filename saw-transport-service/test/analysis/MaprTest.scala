@@ -40,13 +40,6 @@ class MaprTest extends PlaySpec with OneAppPerSuite with DefaultAwaitTimeout {
       ("analyze" -> List(analysis)))
   }
 
-  def analysisJson(id: String = null, customerCode: String = "customer-1") = {
-    val idJson: JValue = if (id != null) ("id" -> id) else JNothing
-    (("module" -> "analyze") ~
-      ("customerCode" -> customerCode) ~
-      ("name" -> s"test-$id")).merge(idJson)
-  }
-
   def actionKeyMessage(action: String, id: String,
     keyAdditionalJson: JObject = JObject()) = {
     val idJson: JObject = ("id", id)
