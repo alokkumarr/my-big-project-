@@ -23,24 +23,24 @@ object QueryBuilder {
 
   private def buildSelect(artifacts: List[JValue]) = {
     "SELECT " + artifacts.map((artifact: JValue) => {
-      val artifactName = (artifact \ "artifact_name").extract[String]
-      val attributes: List[JValue] = artifact \ "artifact_attributes" match {
-        case attributes: JArray => attributes.arr
+      val artifactName = (artifact \ "artifactName").extract[String]
+      val columns: List[JValue] = artifact \ "columns" match {
+        case columns: JArray => columns.arr
         case json: JValue => unexpectedElement(json)
       }
-      if (attributes.size < 1)
-        throw new ClientException("At least one artifact attribute expected")
-      attributes.map(column(artifactName, _)).mkString(", ")
+      if (columns.size < 1)
+        throw new ClientException("At least one artifact column expected")
+      columns.map(column(artifactName, _)).mkString(", ")
     }).mkString(", ")
   }
 
   private def column(artifactName: String, column: JValue) = {
-    artifactName + "." + (column \ "column_name").extract[String]
+    artifactName + "." + (column \ "columnName").extract[String]
   }
 
   private def buildFrom(artifacts: List[JValue]) = {
     "FROM " + artifacts.map((artifact: JValue) => {
-      val table = artifact \ "artifact_name" match {
+      val table = artifact \ "artifactName" match {
         case JString(name) => name
         case _ => throw new ClientException("Artifact name not found")
       }
@@ -71,15 +71,15 @@ object QueryBuilder {
       (filter \ name).extract[String]
     }
     "%s %s %s %s".format(
-      property("boolean_criteria"),
-      property("column_name"),
+      property("booleanCriteria"),
+      property("columnName"),
       property("operator"),
-      property("search_conditions")
+      property("searchConditions")
     )
   }
 
   private def buildGroupBy(artifacts: JValue) = {
-    val groupBy: List[JValue] = artifacts \ "group_by_columns" match {
+    val groupBy: List[JValue] = artifacts \ "groupByColumns" match {
       case l: JArray => l.arr
       case JNothing => List.empty
       case json: JValue => unexpectedElement(json)
@@ -92,7 +92,7 @@ object QueryBuilder {
   }
 
   private def buildOrderBy(artifacts: JValue) = {
-    val orderBy: List[JValue] = artifacts \ "order_by_columns" match {
+    val orderBy: List[JValue] = artifacts \ "orderByColumns" match {
       case l: JArray => l.arr
       case JNothing => List.empty
       case json: JValue => unexpectedElement(json)
