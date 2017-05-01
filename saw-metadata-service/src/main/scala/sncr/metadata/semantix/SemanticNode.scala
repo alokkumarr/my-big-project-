@@ -20,10 +20,13 @@ import sncr.saw.common.config.SAWServiceConfig
   */
 class SemanticNode(private var metricDescriptor: JValue = JNothing,
                    private val select: Int = SelectModels.node.id,
-                   private val predefRowKey : String = null)
+                   private val predefRowKey : String = null,
+                   markNoRelationExist : Boolean = true)
       extends ContentNode
       with CategorizedRelation
       with MDContentBuilder {
+
+  loadedFlag = markNoRelationExist
 
   override protected val m_log: Logger = LoggerFactory.getLogger(classOf[SemanticNode].getName)
 
@@ -39,6 +42,11 @@ class SemanticNode(private var metricDescriptor: JValue = JNothing,
     }
   }
 
+  def setSemanticNodeContent( newContent: JValue) : Unit =
+  {
+    metricDescriptor = newContent
+    setSemanticNodeContent()
+  }
 
   override protected def getSourceData(res:Result): (JValue, Array[Byte]) = super[MDContentBuilder].getSourceData(res)
 
@@ -57,8 +65,8 @@ class SemanticNode(private var metricDescriptor: JValue = JNothing,
     m_log debug s"Select model: ${SelectModels(select)}"
     select match{
       case 2|4 => Option(getSearchFields(res) + (key_Definition.toString -> dataAsJVal))
-      case 1|3 => getRelationData(res); Option(getSearchFields(res) +
-                (key_Definition.toString -> mergeIntoOneJObject(dataAsJVal, "repository", collectRelationData(res))))
+      case 1|3 => getRelationDataAsJson(res); Option(getSearchFields(res) +
+                (key_Definition.toString -> mergeIntoOneJObject(dataAsJVal, "repository", collectRelationData)))
       case 0 => Option(Map(key_Definition.toString -> headerAsJVal(dataAsJVal)))
     }
   }
@@ -106,6 +114,8 @@ class SemanticNode(private var metricDescriptor: JValue = JNothing,
       val (res, msg ) = selectRowKey(keys)
       if (res != Success.id) return (res, msg)
       setSemanticNodeContent()
+      if (!loadedFlag)
+        loadAndNormalizeRelation[SemanticNode](this)
       val searchValues : Map[String, Any] = SemanticNode.extractSearchData(metricDescriptor) + (Fields.NodeId.toString -> new String(rowKey))
       searchValues.keySet.foreach(k => {m_log debug s"Add search field $k with value: ${searchValues(k).asInstanceOf[String]}"})
 
@@ -122,6 +132,8 @@ class SemanticNode(private var metricDescriptor: JValue = JNothing,
   def updateRelations(): (Int, String) = {
     try {
       if (rowKey != null  && !rowKey.isEmpty) {
+        if (!loadedFlag)
+          loadAndNormalizeRelation[SemanticNode](this)
         if (commit(saveRelation(update)))
           (Success.id, s"The Semantic Node relations [ ${Bytes.toString(rowKey)} ] has been updated")
         else
@@ -184,7 +196,7 @@ object SemanticNode
 
   def apply(rowId: String, selectId : Int = 2) :SemanticNode =
   {
-    val semNode = new SemanticNode(JNothing, selectId)
+    val semNode = new SemanticNode(JNothing, selectId, null, false)
     semNode.setRowKey(Bytes.toBytes(rowId))
     semNode.load
     semNode

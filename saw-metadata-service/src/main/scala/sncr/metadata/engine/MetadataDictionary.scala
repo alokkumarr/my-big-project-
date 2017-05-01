@@ -109,7 +109,7 @@ object RelationCategory extends Enumeration {
 
   val UndefinedRelation = Value(0, "_undefined_")
   val CategorizedRelation = Value(MDObjectStruct.key_CategorizedRelation.id, MDObjectStruct.key_CategorizedRelation.toString)
-  val SimpleRelation = Value(MDObjectStruct.key_RelationSimpleSet.id, MDObjectStruct.key_RelationSimpleSet.toString)
+  val BaseRelation = Value(MDObjectStruct.key_RelationSimpleSet.id, MDObjectStruct.key_RelationSimpleSet.toString)
 
 }
 
