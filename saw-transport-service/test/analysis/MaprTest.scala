@@ -1,5 +1,6 @@
 import java.net.InetAddress
 
+import akka.util.Timeout
 import org.json4s._
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
@@ -7,10 +8,15 @@ import org.scalatestplus.play._
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.test._
 import play.api.test.Helpers._
+import scala.concurrent.duration._
 
-class MaprTest extends PlaySpec with OneAppPerSuite {
+class MaprTest extends PlaySpec with OneAppPerSuite with DefaultAwaitTimeout {
   /* Add MapR classpath to test runner */
   MaprHelper.addClasspath
+
+  /* Increase the default timeout to allow Spark SQL execution requests
+   * to complete.  The default of 20 seconds is too little.  */
+  override implicit def defaultAwaitTimeout: Timeout = 300.seconds
 
   val log: Logger = LoggerFactory.getLogger("test")
 
