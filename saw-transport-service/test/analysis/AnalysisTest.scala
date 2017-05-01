@@ -8,6 +8,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
   "Analysis service" should {
     requireMapr
     var id: String = null
+    var analysis: JValue = null
 
     "create analysis" in {
       /* Create analysis using analysis template preloaded into MapR-DB */
@@ -20,31 +21,32 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       /* Save analysis ID for use by subsequent tests */
       id = analysisId
       val JString(name) = analyze(response) \ "metricName"
-      name must be ("MCT Events aggregated by session (view - 2)")
+      name must be ("MCT Session")
       val JString(sId) = analyze(response) \ "semanticId"
       sId must be (semanticId)
       val JString(analysisType) = analyze(response) \ "type"
       analysisType must be ("report")
     }
 
-    "update analysis" in {
-      /* Update previously created analysis */
-      val body = actionKeyAnalysisMessage("update", id,
-        analysisJson(id, "customer-2"))
-      val response = sendRequest(body)
-      val JString(analysisId) = analyze(response) \ "id"
-      analysisId must be (id)
-    }
-
     "read analysis" in {
       /* Read back previously created analysis */
       val body = actionKeyMessage("read", id)
-      val response = sendRequest(body)
-      val analysis = analyze(response)
-      val JString(name) = analysis \ "name"
-      name must be (s"test-$id")
-      val JString(customerCode) = analysis \ "customerCode"
-      customerCode must be ("customer-2")
+      analysis = analyze(sendRequest(body))
+      val JString(metricName) = analysis \ "metricName"
+      metricName must be ("MCT Session")
+    }
+
+    "update analysis" in {
+      /* Update previously created analysis */
+      val checkedJson: JValue = ("checked", "true")
+      analysis = analysis.merge(checkedJson)
+      val queryJson: JValue = ("query", "SELECT 1") ~ ("outputFile",
+        ("outputFormat", "json") ~ ("outputFileName", "test.json"))
+      analysis = analysis.merge(queryJson)
+      val body = actionKeyAnalysisMessage("update", id, analysis)
+      analysis = analyze(sendRequest(body))
+      val JString(analysisId) = analysis \ "id"
+      analysisId must be (id)
     }
 
     "execute analysis" in {

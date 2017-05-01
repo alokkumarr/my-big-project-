@@ -53,17 +53,19 @@ class MaprTest extends PlaySpec with OneAppPerSuite {
   }
 
   def sendRequest(body: JValue) = {
-    log.trace("Request: " + pretty(render(body)))
+    log.trace("Request: " + shortMessage(pretty(render(body))))
     val headers = FakeHeaders(Seq("Content-type" -> "application/json"))
     val Some(response) = route(
       FakeApplication(), FakeRequest(
         POST, "/analysis", headers, pretty(render(body))))
     val responseLog = pretty(render(parse(contentAsString(response))))
-    val responseLogShort = responseLog.substring(
-      0, Math.min(responseLog.length(), 500))
-    log.trace("Response: " + responseLogShort)
+    log.trace("Response: " + shortMessage(responseLog))
     status(response) mustBe OK
     contentType(response) mustBe Some("application/json")
     parse(contentAsString(response))
+  }
+
+  private def shortMessage(message: String) = {
+    message.substring(0, Math.min(message.length(), 500))
   }
 }
