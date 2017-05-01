@@ -47,7 +47,8 @@ class ANA extends BaseServiceProvider {
       case "create" => {
         val semanticId = extractAnalysisId(json)
         val semanticIdJson: JObject = ("semanticId", semanticId)
-        val idJson: JObject = ("id", UUID.randomUUID.toString)
+        val analysisId = UUID.randomUUID.toString
+        val idJson: JObject = ("id", analysisId)
         val analysisType = extractKey(json, "analysisType")
         val typeJson: JObject = ("type", analysisType)
         val semanticJson = readSemanticJson(semanticId)
@@ -70,7 +71,8 @@ class ANA extends BaseServiceProvider {
       }
       case "update" => {
         val analysisId = extractAnalysisId(json)
-        val analysisNode = new AnalysisNode(analysisJson(json))
+        val analysisNode = AnalysisNode(analysisId)
+        analysisNode.setDefinition(analysisJson(json))
         val (result, message) = analysisNode.update(
           Map("id" -> analysisId))
         if (result != Success.id) {
