@@ -24,6 +24,8 @@ class MetadataNode extends MetadataStore
   protected var cachedData : Map[String, Any] = Map.empty
 
   def getCachedData = cachedData
+  def getTable = mdNodeStoreTable
+
 
   protected def createNode(a_nodeType: Int, a_nodeCategory: String ): Put =
   {
@@ -37,8 +39,6 @@ class MetadataNode extends MetadataStore
   }
 
   protected def initRow : String = ???
-
-  /*read part*/
 
 
   protected def getHeaderData(res:Result): Option[Map[String, Any]]  = ???
@@ -155,7 +155,7 @@ class MetadataNode extends MetadataStore
 
 object MetadataNode extends MetadataStore{
 
-  override val m_log: Logger = LoggerFactory.getLogger("MetadataNode")
+  override val m_log: Logger = LoggerFactory.getLogger("sncr.metadata.MetadataNode")
 
   def create(mdTableName: String, compositeKey: String, content: String, searchDictionary: Map[String, String]): Boolean = {
     var lmdNodeStoreTable : Table = null

@@ -41,6 +41,7 @@ abstract class MetadataStore{
 
   protected var rowKey: Array[Byte] = null
   def setRowKey(rK: Array[Byte]): Unit = { rowKey = rK }
+  def getRowKey = rowKey
 
   def close: Unit = mdNodeStoreTable.close()
   override protected def finalize(): Unit = close

@@ -13,9 +13,10 @@ import sncr.metadata.engine.MDObjectStruct.{apply => _, _}
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine._
 import sncr.metadata.engine.context.SelectModels
-import sncr.metadata.engine.relations.SimpleRelation
+import sncr.metadata.engine.relations.BaseRelation
 import sncr.metadata.semantix.SemanticNode
 import sncr.metadata.ui_components.UINode
+import org.apache.hadoop.hbase.util.Bytes
 
 
 /*
@@ -360,11 +361,9 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
         respGenerator.build(uih.update(keys))
       }
       case "AnalysisNode" => {
-        var ah: AnalysisNode = null
+        val ah = AnalysisNode(id)
         if (content != null && content.obj.nonEmpty)
-          ah = new AnalysisNode(content)
-        else
-          ah = new AnalysisNode
+          ah.setDefinition(content)
         m_log debug s"Raw DO list: $base_relation"
         base_relation.arr.foreach {
           case o: JObject => {
@@ -392,11 +391,9 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
         respGenerator.build(doh.update(keys))
       }
       case "SemanticNode" => {
-        var snh: SemanticNode = null
+        val snh: SemanticNode = SemanticNode(id, 3)
         if (content != null && content.obj.nonEmpty)
-          snh = new SemanticNode(content)
-        else
-          snh = new SemanticNode
+          snh.setSemanticNodeContent(content)
         m_log debug s"Raw DO list: $base_relation"
         base_relation.arr.foreach {
           case o: JObject => {
@@ -482,8 +479,24 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
     }
     val systemKeys = Map( syskey_NodeCategory.toString -> nodeCategoryValue)
     val rowKeys = SearchMetadata.simpleSearch(table_name, keys2, systemKeys, "and")
-    val headers = MetadataNode.loadMDNodeHeader(table_name, rowKeys, true)
-    respGenerator.build(headers)
+    val nodes = rowKeys.map( rowKey => {
+      val rowID = Bytes.toString(rowKey)
+      try {
+        nodeCategory match {
+          case "UINode" => UINode(rowID).getCachedData
+          case "AnalysisNode" => AnalysisNode(rowID).getCachedData
+          case "DataObject" => DataObject(rowID).getCachedData
+          case "AnalysisResult" => AnalysisNode(rowID).getCachedData
+          case "SemanticNode" => SemanticNode(rowID).getCachedData
+          case _ => return respGenerator.build(Error.id, "Not supported")
+        }
+    }
+    catch{
+      case e: Exception => m_log error s"Could load data for row key $rowID, continue"
+      case x: Throwable => m_log error "Unrecoverable error occurred - cancel processing"; return JNothing
+    }
+    })
+    respGenerator.build(nodes)
   }
 
 
@@ -502,7 +515,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
   }
 
 
-  private def manageRelations[T <: SimpleRelation ]( ah : T  ) : Unit = {
+  private def manageRelations[T <: BaseRelation ](ah : T  ) : Unit = {
     if (base_relation.arr.nonEmpty) {
       base_relation.arr.foreach {
         case o: JObject => {
@@ -533,7 +546,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
         respGenerator.build(ah.updateRelations)
       }
       case "SemanticNode" => {
-        val ah = SemanticNode(id)
+        val ah = SemanticNode(id, 3)
         manageRelations(ah)
         respGenerator.build(ah.updateRelations)
       }

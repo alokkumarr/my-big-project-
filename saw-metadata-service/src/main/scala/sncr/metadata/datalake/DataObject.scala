@@ -29,7 +29,7 @@ class DataObject(final private var descriptor : JValue, final private var schema
   extends ContentNode
   with MDContentBuilder{
 
-  def setSchema(newSchema: JObject) = schema = newSchema
+  def setSchema(newSchema: JObject) = { schema = newSchema }
 
   def setDescriptor : Unit = {
     if (descriptor != null && descriptor != JNothing) {

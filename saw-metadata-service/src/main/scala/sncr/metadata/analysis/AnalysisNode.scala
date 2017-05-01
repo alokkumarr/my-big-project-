@@ -9,15 +9,23 @@ import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.MDObjectStruct._
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine._
-import sncr.metadata.engine.relations.SimpleRelation
+import sncr.metadata.engine.relations.BaseRelation
 import sncr.saw.common.config.SAWServiceConfig
 
 /**
   * Created by srya0001 on 3/1/2017.
   */
-class AnalysisNode(private var analysisNode: JValue = JNothing) extends ContentNode
+class AnalysisNode(private var analysisNode: JValue = JNothing, markNoRelationExist : Boolean = true) extends ContentNode
   with SourceAsJson
-  with SimpleRelation{
+  with BaseRelation{
+
+  loadedFlag = markNoRelationExist
+
+  def setDefinition(newDefinition: JValue) : Unit =
+  {
+    analysisNode = newDefinition
+    setDefinition
+  }
 
   def setDefinition(newDefinition: String) : Unit =
   {
@@ -139,6 +147,8 @@ class AnalysisNode(private var analysisNode: JValue = JNothing) extends ContentN
       val (res, msg) = selectRowKey(filter)
       if (res != Success.id) return (res, msg)
       setDefinition
+      if (!loadedFlag)
+        loadAndNormalizeRelation[AnalysisNode](this)
       val searchValues: Map[String, Any] = AnalysisNode.extractSearchData(analysisNode) + (Fields.NodeId.toString -> Bytes.toString(rowKey))
       searchValues.keySet.foreach(k => {
         m_log debug s"Add search field $k with value: ${searchValues(k).toString}"
@@ -159,6 +169,8 @@ class AnalysisNode(private var analysisNode: JValue = JNothing) extends ContentN
   def updateRelations(): (Int, String) = {
     try {
       if (rowKey != null  && !rowKey.isEmpty) {
+        if (!loadedFlag)
+          loadAndNormalizeRelation[AnalysisNode](this)
         if (commit(saveRelation(update)))
           (Success.id, s"The Analysis Node relations [ ${new String(rowKey)} ] has been updated")
         else
@@ -199,7 +211,7 @@ object AnalysisNode{
 
   def apply(rowId: String) :AnalysisNode =
   {
-    val an = new AnalysisNode(JNothing)
+    val an = new AnalysisNode(JNothing, false)
     an.setRowKey(Bytes.toBytes(rowId))
     an.load
     m_log debug s"Analysis node has been loaded: $rowId"

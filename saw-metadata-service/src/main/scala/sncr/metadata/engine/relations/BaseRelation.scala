@@ -12,19 +12,18 @@ import sncr.metadata.engine._
 /**
   * Created by srya0001 on 3/4/2017.
   */
-trait SimpleRelation{
+trait BaseRelation{
 
-  protected val m_log: Logger = LoggerFactory.getLogger(classOf[SimpleRelation].getName)
+  protected val m_log: Logger = LoggerFactory.getLogger(classOf[BaseRelation].getName)
 
-  protected var relType : Int = RelationCategory.SimpleRelation.id
+  protected var relType : Int = RelationCategory.BaseRelation.id
   protected var elements : Array[(String, String)] = Array.empty
   protected var readNumOfElements : Int = 0
   protected var _elementsAsJSON : JValue = JNothing
+  var loadedFlag = false
 
 
-  /*  Read calls */
-
-  protected def includeRelation(getNode: Get): Get =   getNode.addFamily(MDColumnFamilies(_cf_relations.id))
+  protected def includeRelation(getNode: Get): Get =  getNode.addFamily(MDColumnFamilies(_cf_relations.id))
 
   protected def getRelationDataAsJson(res:Result) : JValue =
   {
@@ -32,7 +31,17 @@ trait SimpleRelation{
     normalize
   }
 
-  protected def getRelationData(res:Result) : Unit =
+  def loadAndNormalizeRelation[A <: MetadataNode](parentNode : A) : Unit =
+  {
+    if (loadedFlag) return
+    val updateGet = new Get(parentNode.getRowKey)
+    updateGet.addFamily(MDColumnFamilies(_cf_relations.id))
+    val res = parentNode.getTable.get(updateGet)
+    getRelationData(res)
+    normalize
+  }
+
+  private def getRelationData(res:Result) : Unit =
   {
     val data = res.getValue(MDColumnFamilies(_cf_relations.id),Bytes.toBytes(Fields.NumOfElements.toString))
     readNumOfElements = if (data != null ) Bytes.toInt(data) else 0
@@ -40,7 +49,8 @@ trait SimpleRelation{
     relType = if (rc != null)
           try{  Bytes.toInt(rc) } catch{ case x: Throwable=> 0 } else 0
     m_log debug s"# of elements: $readNumOfElements"
-    elements = (for ( i <- 0 until readNumOfElements  ) yield {
+    loadedFlag = true
+    elements = elements ++ (for ( i <- 0 until readNumOfElements  ) yield {
          val t = res.getValue(MDColumnFamilies(_cf_relations.id), Bytes.toBytes(i + "_TAB"))
          val r = res.getValue(MDColumnFamilies(_cf_relations.id), Bytes.toBytes(i + "_RID"))
           m_log debug s"Processing pair: ${i}_TAB => ${Bytes.toString(t)},  ${i}_RID => ${Bytes.toString(r)}"
@@ -70,19 +80,9 @@ trait SimpleRelation{
   def elementsAsJson : JValue = _elementsAsJSON
   def getRelatedNodes : List[(String, String)] = elements.clone().toList
 
-
-  def removeNodesFromRelation( rowKeys:List[(String, String)] ): JValue =
-  {
-    rowKeys.foreach( rk => {
-      val tableName = NodeCategoryMapper.NCM(rk._1).toString
-      elements = elements.filterNot(el => tableName.equals(el._1) && rk._2.equals(el._2))
-    })
-    m_log trace s"Remove nodes from relation: updated Node List = ${elements.mkString("[", ",", "]")}"
-    normalize
-  }
-
   def removeNodeFromRelation(a_rowID : String, nodeCategory: String): JValue =
   {
+    verifyIntegrity
     val tableName = NodeCategoryMapper.NCM(nodeCategory).toString
     elements = elements.filterNot( el => { m_log debug s"Table ${el._1} RowId: ${el._2}"; tableName.equals(el._1) && a_rowID.equals(el._2)} )
     m_log trace s"Remove node from relation: Table = ${tableName}, RowID = $a_rowID, updated RowIds = ${elements.mkString("[", ",", "]")}"
@@ -90,35 +90,14 @@ trait SimpleRelation{
   }
 
 
-  def addNodesToRelation(keys: Map[String, Any], systemProps:Map[String, Any]): JValue =
-  {
-    val rowIDs : List[List[(String, String)]] = tables.values.map(mdTableName => {
-      val rowID : List[Array[Byte]] = SearchMetadata.simpleSearch(mdTableName.toString, keys, systemProps, "and")
-      m_log trace s"Table: ${mdTableName.toString}, retrieved RowIds: ${rowID.map( Bytes.toString ).mkString("[", ",", "]")}"
-     rowID.map( id => (mdTableName.toString, Bytes.toString(id)))
-    }).toList
-    elements = elements ++ rowIDs.flatMap( list_of_pairs => list_of_pairs )
-    normalize
-  }
-
   def addNodeToRelation(a_rowID : String, nodeCategory: String): JValue =
   {
+    verifyIntegrity
     val tableName = NodeCategoryMapper.NCM(nodeCategory).toString
     elements = elements ++ List((tableName, a_rowID))
     m_log trace s"Add node to relation: Table = ${tableName}, updated RowIds = ${elements.mkString("[", ",", "]")}"
     normalize
   }
-
-
-  def addNodesToRelation(keys: Map[String, Any], nodeCategory: String): JValue =
-  {
-    val tableName = NodeCategoryMapper.NCM(nodeCategory).toString
-    val rowIDs : List[Array[Byte]] = SearchMetadata.simpleSearch(tableName, keys, Map.empty, "and")
-    m_log trace s"Add nodes to relation: Table = $tableName, updated RowIds = ${rowIDs.map( Bytes.toString ).mkString("[", ",", "]")}"
-    elements = elements ++ rowIDs.map( id => (tableName, Bytes.toString(id)))
-    normalize
-  }
-
 
   protected def normalize: JValue =
   {
@@ -136,6 +115,11 @@ trait SimpleRelation{
     m_log debug s"Converted relation: ${compact(render(_elementsAsJSON))}"
     _elementsAsJSON
   }
+
+
+  protected def verifyIntegrity : Unit = if ( !loadedFlag ) throw new Exception( "Relation cannot be changed without loading them first")
+
+
 }
 
 
