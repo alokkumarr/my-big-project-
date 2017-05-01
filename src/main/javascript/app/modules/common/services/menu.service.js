@@ -26,7 +26,7 @@ export function MenuService($http, JwtService, AppConfig) {
 
   function getMenu(moduleName) {
     moduleName = moduleName.toUpperCase();
-    return $http.post(url, getRequestParams(moduleName))
+    return $http.post(`${url}/md`, getRequestParams(moduleName))
       .then(response => {
         const menu = filter(
           get(response, `data.contents.[0].${moduleName.toUpperCase()}`),

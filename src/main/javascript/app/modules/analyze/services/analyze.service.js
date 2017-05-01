@@ -163,13 +163,13 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
   }
 
   function getDataBySettings(model) {
-    const payload = {data: [], links: [], contents: {
-      action: 'execute',
-      keys: [{id: model.id, module: 'analyze', type: model.type}],
-      analyze: [model]
-    }};
-
-    return $http.post('/api/analyze/apply', payload).then(fpGet('data.data'));
+    const payload = getRequestParams([
+      ['contents.action', 'execute'],
+      ['contents.keys.[0].id', model.id],
+      ['contents.keys.[0].type', model.type],
+      ['contents.analyze', [model]]
+    ]);
+    return $http.post(`${url}/analysis`, payload).then(fpGet(`data.contents.[0].${MODULE_NAME}.[1]`));
   }
 
   function getDataByQuery() {
@@ -184,8 +184,15 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
     return $http.post('/api/analyze/generateQuery', payload).then(fpGet('data'));
   }
 
-  function saveReport(payload) {
-    return $http.post('/api/analyze/saveReport', payload).then(fpGet('data'));
+  function saveReport(model) {
+    model.saved = true;
+    const payload = getRequestParams([
+      ['contents.action', 'update'],
+      ['contents.keys.[0].id', model.id],
+      ['contents.keys.[0].type', model.type],
+      ['contents.analyze', [model]]
+    ]);
+    return $http.post(`${url}/analysis`, payload).then(fpGet(`data.contents.[0].${MODULE_NAME}.[0]`));
   }
 
   function getSemanticLayerData() {
@@ -194,17 +201,16 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
       ['contents.select', 'headers'],
       ['contents.context', 'Semantic']
     ]);
-    return $http.post(url, params).then(fpGet(`data.contents.[0].${MODULE_NAME}`));
+    return $http.post(`${url}/md`, params).then(fpGet(`data.contents.[0].${MODULE_NAME}`));
   }
 
   function createAnalysis(metricId, type) {
     const params = getRequestParams([
       ['contents.action', 'create'],
-      ['contents.keys.[0].id', 'ATT::analyze::semantic::10300083164142186'],
+      ['contents.keys.[0].id', metricId],
       ['contents.keys.[0].analysisType', type]
     ]);
-    const url = 'http://mapr-dev01.sncrbda.dev.vacum-np.sncrcorp.net:9200/analysis';
-    return $http.post(url, params).then(fpGet('data.contents.analyze.[0]'));
+    return $http.post(`${url}/analysis`, params).then(fpGet('data.contents.analyze.[0]'));
   }
 
   /**

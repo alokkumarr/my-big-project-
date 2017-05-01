@@ -255,7 +255,7 @@ export const AnalyzeReportComponent = {
         table.setMeta(itemA);
         table.setPosition(itemA.artifactPosition[0], itemA.artifactPosition[1]);
 
-        forEach(itemA.artifactAttributes || itemA.columns, itemB => {
+        forEach(itemA.columns, itemB => {
           const field = table.addField(itemB.columnName);
 
           field.setMeta(itemB);
@@ -324,7 +324,7 @@ export const AnalyzeReportComponent = {
         const tableArtifact = {
           artifactName: table.name,
           artifactPosition: [table.x, table.y],
-          artifactAttributes: [],
+          columns: [],
           data: []
         };
 
@@ -342,7 +342,7 @@ export const AnalyzeReportComponent = {
             checked: field.checked
           };
 
-          tableArtifact.artifactAttributes.push(fieldArtifact);
+          tableArtifact.columns.push(fieldArtifact);
         });
 
         const joins = filter(model.joins, join => {
