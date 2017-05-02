@@ -14,7 +14,7 @@ public enum EntityType {
 
 	public EntityType find(EntityType val) {
 		return Arrays.stream(EntityType.values()).filter(e -> e.s.equals(val.name())).reduce((t1, t2) -> t1)
-				.orElseThrow(() -> {
+				.<IllegalArgumentException>orElseThrow(() -> {
 					throw new IllegalStateException(String.format("Unsupported type %s.", val));
 				});
 	}
