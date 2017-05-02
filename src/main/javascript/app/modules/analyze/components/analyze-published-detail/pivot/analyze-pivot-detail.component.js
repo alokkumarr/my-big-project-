@@ -3,7 +3,7 @@ import isEmpty from 'lodash/isEmpty';
 import map from 'lodash/map';
 import forEach from 'lodash/forEach';
 import find from 'lodash/find';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import template from './analyze-pivot-detail.component.html';
 import {ANALYZE_FILTER_SIDENAV_IDS} from '../../analyze-filter-sidenav/analyze-filter-sidenav.component';

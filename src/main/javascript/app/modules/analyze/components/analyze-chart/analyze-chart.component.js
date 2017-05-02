@@ -1,5 +1,12 @@
-import {BehaviorSubject} from 'rxjs';
-import {findIndex, forEach, get, isEmpty, map, values, clone, filter} from 'lodash';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import findIndex from 'lodash/findIndex';
+import forEach from 'lodash/forEach';
+import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
+import map from 'lodash/map';
+import values from 'lodash/values';
+import clone from 'lodash/clone';
+import filter from 'lodash/filter';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
