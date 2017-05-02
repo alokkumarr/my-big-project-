@@ -10,7 +10,7 @@ import com.synchronoss.querybuilder.model.ColumnField;
 import com.synchronoss.querybuilder.model.DataField;
 import com.synchronoss.querybuilder.model.RowField;
 
-class AllFieldsAvailable {
+class AllFieldsAvailablePivot {
 
 	public static SearchSourceBuilder allFieldsAvailable(List<RowField> rowfield, List<ColumnField> columnFields, 
 			List<DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)

@@ -25,7 +25,7 @@ import com.synchronoss.querybuilder.model.RowField;
 import com.synchronoss.querybuilder.model.Sort;
 import com.synchronoss.querybuilder.model.SqlBuilder;
 
-public class MainTestClass {
+public class PivotMainSampleClass {
 
 	public static void main(String[] args) throws JsonProcessingException, IOException 
 	{
@@ -33,7 +33,8 @@ public class MainTestClass {
 		objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
 		
 		// This is the entry point for /analysis service as JSONString not as file
-		JsonNode objectNode = objectMapper.readTree(new File("C:\\Users\\saurav.paul\\Desktop\\Sergey\\pivot_type_data.json"));
+		//JsonNode objectNode = objectMapper.readTree(new File("C:\\Users\\saurav.paul\\Desktop\\Sergey\\pivot_type_data.json"));
+		JsonNode objectNode = objectMapper.readTree(new File(args[0]));
 		JsonNode sqlNode = objectNode.get("sqlBuilder");
 		SqlBuilder sqlBuilderNode = objectMapper.treeToValue(sqlNode, SqlBuilder.class);
 	    int size = 0;
@@ -111,7 +112,7 @@ public class MainTestClass {
 	    	 ((columnFields !=null && columnFields.size()<=5) && 
 	    			 ((dataFields !=null && dataFields.size()<=5))) )
     	{
-	      searchSourceBuilder = AllFieldsAvailable.allFieldsAvailable(rowfield, columnFields, dataFields, searchSourceBuilder, boolQueryBuilder);
+	      searchSourceBuilder = AllFieldsAvailablePivot.allFieldsAvailable(rowfield, columnFields, dataFields, searchSourceBuilder, boolQueryBuilder);
 	    } // end of rowField, columnField & dataField
 	    else 
 	    {

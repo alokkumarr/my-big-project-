@@ -1,5 +1,7 @@
 package com.synchronoss.querybuilder;
 
+import java.io.IOException;
+
 public class SAWElasticSearchQueryBuilder {
 
 	/**
@@ -20,10 +22,10 @@ public class SAWElasticSearchQueryBuilder {
 				? new SAWChartTypeElasticSearchQueryBuilder(jsonString).buildQuery()
 				: new SAWChartTypeElasticSearchQueryBuilder(jsonString).buildQuery();
 		}
-		catch (IllegalStateException exception)
+		catch (IllegalStateException|IOException exception)
 		{
-			throw new AssertionError("Type not supported");
-		}
+			throw new AssertionError("Type not supported :" + exception.getMessage());
+		} 
 				return query;
 	}
 
