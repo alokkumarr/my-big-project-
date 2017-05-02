@@ -4,6 +4,6 @@ export default {
     jwtKey: 'jwtToken'
   },
   api: {
-    url: 'http://mapr-dev01.sncrbda.dev.vacum-np.sncrcorp.net:9200'
+    url: 'http://mapr-dev02.sncrbda.dev.vacum-np.sncrcorp.net:9200'
   }
 };
