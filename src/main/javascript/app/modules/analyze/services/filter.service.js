@@ -28,6 +28,8 @@ const EVENTS = {
   CLEAR_ALL_FILTERS: 'CLEAR_ALL_FILTERS'
 };
 
+const NUMBER_TYPES = ['int', 'integer', 'double', 'long', 'timestamp'];
+
 export function FilterService($mdSidenav, $eventEmitter, $log) {
   'ngInject';
 
@@ -106,7 +108,7 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
         filterType: frontEndFilter.type
       };
 
-      if (frontEndFilter.type === 'int' || frontEndFilter.type === 'double') {
+      if (NUMBER_TYPES.indexOf(frontEndFilter.type) >= 0) {
         backEndFilter.operator = frontEndFilter.operator;
         backEndFilter.searchConditions =
           frontEndFilter.operator === OPERATORS.BETWEEN ?
@@ -142,7 +144,7 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
         type: backEndFilter.filterType
       };
 
-      if (backEndFilter.filterType === 'int' || backEndFilter.filterType === 'double') {
+      if (NUMBER_TYPES.indexOf(backEndFilter.type) >= 0) {
         frontEndFilter.operator = backEndFilter.operator;
         frontEndFilter.model = {
           otherValue: backEndFilter.operator === OPERATORS.BETWEEN ?
@@ -249,6 +251,9 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
           isValid = Boolean(filter.model[row[filter.name]]);
           break;
         case 'int':
+        case 'integer':
+        case 'long':
+        case 'timestamp':
         case 'double':
           isValid = Boolean(isNumberValid(row[filter.name], filter.model, filter.operator));
           break;
