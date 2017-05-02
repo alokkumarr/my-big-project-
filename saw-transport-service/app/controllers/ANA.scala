@@ -73,13 +73,14 @@ class ANA extends BaseServiceProvider {
       case "update" => {
         val analysisId = extractAnalysisId(json)
         val analysisNode = AnalysisNode(analysisId)
-        analysisNode.setDefinition(analysisJson(json))
+        val responseJson = analysisJson(json)
+        analysisNode.setDefinition(responseJson)
         val (result, message) = analysisNode.update(
           Map("id" -> analysisId))
         if (result != Success.id) {
           throw new ClientException("Updating failed: " + message)
         }
-        json
+        json merge contentsAnalyze(responseJson)
       }
       case "read" => {
         val analysisId = extractAnalysisId(json)
@@ -129,7 +130,7 @@ class ANA extends BaseServiceProvider {
     value
   }
 
-  def analysisJson(json: JValue) = {
+  def analysisJson(json: JValue): JObject = {
     val analysisListJson = json \ "contents" \ "analyze"
     val analysis = analysisListJson match {
       case array: JArray => {
@@ -139,13 +140,19 @@ class ANA extends BaseServiceProvider {
         if (array.arr.length == 0) {
           throw new ClientException("No element to write found")
         }
-        array.arr(0)
+        array.arr(0) match {
+          case obj: JObject => obj
+          case obj: JValue => throw new ClientException(
+            "Expected object: " + obj)
+        }
       }
       case _ => throw new ClientException(
         "Expected array: " + analysisListJson)
     }
-    val query: JValue = ("query", JString(QueryBuilder.build(analysis)))
-    analysis merge(query)
+    val queryJson: JObject = ("query", JString(QueryBuilder.build(analysis))) ~
+    ("outputFile",
+      ("outputFormat", "json") ~ ("outputFileName", "test.json"))
+    analysis merge(queryJson)
   }
 
   private def readAnalysisJson
@@ -188,6 +195,10 @@ class ANA extends BaseServiceProvider {
     val resultLog = shortMessage(pretty(render(resultJson)).substring(0, 500))
     m_log.trace("Spark SQL executor result: {}", resultLog)
     (resultJson match {
+      case obj: JObject => {
+        m_log.error("Execution failed: {}", pretty(render(obj)))
+        throw new RuntimeException("Spark SQL execution failed, see log for details")
+      }
       case JArray(result) => result.arr
       case value: JValue => throw new RuntimeException(
         "Expected array: " + value)

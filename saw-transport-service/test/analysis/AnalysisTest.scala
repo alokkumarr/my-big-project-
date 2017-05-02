@@ -40,9 +40,6 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       /* Update previously created analysis */
       val checkedJson: JValue = ("checked", "true")
       analysis = analysis.merge(checkedJson)
-      val queryJson: JValue = ("query", "SELECT 1") ~ ("outputFile",
-        ("outputFormat", "json") ~ ("outputFileName", "test.json"))
-      analysis = analysis.merge(queryJson)
       val body = actionKeyAnalysisMessage("update", id, analysis)
       analysis = analyze(sendRequest(body))
       val JString(analysisId) = analysis \ "id"
