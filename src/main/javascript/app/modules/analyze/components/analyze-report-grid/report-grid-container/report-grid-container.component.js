@@ -21,6 +21,7 @@ export const ReportGridContainerComponent = {
   template,
   bindings: {
     id: '@',
+    eventEmitter: '<',
     source: '<',
     columns: '<',
     settings: '<',
@@ -157,6 +158,7 @@ export const ReportGridContainerComponent = {
 
           this.updateColumns();
         }
+        this.eventEmitter.emit('groupingChanged', this.grouped.by);
       }
     }
 
@@ -166,6 +168,7 @@ export const ReportGridContainerComponent = {
 
         this.updateColumns();
         this.applyGrouping();
+        this.eventEmitter.emit('groupingChanged', this.grouped.by);
       }
     }
 

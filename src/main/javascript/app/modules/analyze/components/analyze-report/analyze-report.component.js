@@ -123,21 +123,6 @@ export const AnalyzeReportComponent = {
       }
     }
 
-    getArtifacts() {
-      this._AnalyzeService.getArtifacts()
-        .then(data => {
-          this.fillCanvas(data);
-          this.reloadPreviewGrid();
-          this.showFiltersButtonIfDataIsReady();
-          this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
-          if (!isEmpty(this.canvas.model.filters)) {
-            this.filters.selected = this.canvas.model.filters;
-            this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.canvas.model.filters, this.filters.possible);
-            this.onApplyFilters(this.filters.possible);
-          }
-        });
-    }
-
     generateQuery() {
       if (this.model.query) {
         return;
@@ -218,7 +203,7 @@ export const AnalyzeReportComponent = {
       this.canvas = canvas;
 
       if (!this.model.artifacts) {
-        this.getArtifacts();
+        this.model.artifacts = [];
       } else {
         this.fillCanvas(this.model.artifacts);
         this.reloadPreviewGrid();
@@ -238,6 +223,31 @@ export const AnalyzeReportComponent = {
 
       this.canvas._$eventEmitter.on('sortChanged', () => {
         this.reloadPreviewGrid(true);
+      });
+
+      this.canvas._$eventEmitter.on('groupingChanged', groups => {
+        this.addGroupColumns(groups);
+        this.reloadPreviewGrid(true);
+      });
+    }
+
+    /* NOTE: This will clear existing groups from model.
+       Make sure you supply the entire new groups array
+       as argument. */
+    addGroupColumns(groups) {
+      if (!angular.isArray(groups)) {
+        groups = [groups];
+      }
+
+      const model = this.canvas.model;
+
+      model.clearGroups();
+
+      forEach(groups, group => {
+        model.addGroup({
+          table: group.table.name,
+          field: group.name
+        });
       });
     }
 
@@ -264,7 +274,7 @@ export const AnalyzeReportComponent = {
           field.type = itemB.type;
           field.checked = itemB.checked;
           field.isHidden = Boolean(itemB.hide);
-          field.isJoinEligible = Boolean(itemB.joinEligible);
+          field.isJoinEligible = true; // Boolean(itemB.joinEligible);
           field.isFilterEligible = Boolean(itemB.filterEligible);
         });
       });
@@ -297,7 +307,7 @@ export const AnalyzeReportComponent = {
       forEach(this.model.sqlBuilder.groupByColumns, itemB => {
         model.addGroup({
           table: itemB.tableName,
-          field: itemB
+          field: itemB.columnName
         });
       });
 
@@ -389,7 +399,10 @@ export const AnalyzeReportComponent = {
         });
 
         forEach(groups, group => {
-          result.sqlBuilder.groupByColumns.push(group.field.name);
+          result.sqlBuilder.groupByColumns.push({
+            tableName: group.table.name,
+            columnName: group.field.name
+          });
         });
 
         result.sqlBuilder.filters = result.sqlBuilder.filters.concat(fpMap(
