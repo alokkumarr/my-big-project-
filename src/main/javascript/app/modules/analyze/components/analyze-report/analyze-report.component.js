@@ -253,6 +253,8 @@ export const AnalyzeReportComponent = {
 
     fillCanvas(data) {
       const model = this.canvas.model;
+      let defaultArtifactX = 0;
+      const defaultSpacing = 300; // canvas pixels
 
       model.clear();
 
@@ -260,7 +262,12 @@ export const AnalyzeReportComponent = {
       forEach(data, itemA => {
         const table = model.addTable(itemA.artifactName);
 
-        itemA.artifactPosition = itemA.artifactPosition || [0, 0];
+        if (!itemA.artifactPosition) {
+          itemA.artifactPosition = [defaultArtifactX, 0];
+          defaultArtifactX += defaultSpacing;
+        } else {
+          defaultArtifactX += itemA.artifactPosition[0] + defaultSpacing;
+        }
 
         table.setMeta(itemA);
         table.setPosition(itemA.artifactPosition[0], itemA.artifactPosition[1]);
