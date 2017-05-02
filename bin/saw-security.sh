@@ -91,6 +91,11 @@ function error {
     vlog "exit 1"
     exit 1
 }
+function warning {
+    msg="warning: $@"
+    echo 1>&2 "$msg"
+    vlog "$msg"
+}
 ###
 # Verbose print
 VLOG_FNM=/dev/null
@@ -221,13 +226,14 @@ appl_start() {
     exit 0
 }
 
-# stop
+# stop: try to with kill SIGTERM for 5 secs,
+# after that print WARNING and kill -9
 appl_stop() {
     if appIsUp ; then
         let cc=0
         while true ; do
-            [[ -d /proc/$APPL_PID ]] || break
             let cc=cc+1
+            vlog kill count updated: cc=$cc
             (( cc > 10 )) && {
                 vlog too many kill attempts: $cc
                 break
@@ -237,12 +243,18 @@ appl_stop() {
                 vlog DRYRUN exit
                 exit 0
             }
-            [[ -d /proc/$APPL_PID ]] && kill $APPL_PID
-            sleep 0.01
+            kill $APPL_PID &>/dev/null
+            sleep 0.5
+            appIsUp || break
         done
-        [[ -d /proc/$APPL_PID ]] && {
-            error "failed to stop '$APPL_NAME', PID: $APPL_PID"
+        [[ -d /proc/$APPL_PID ]] &&{
+            warning "failed to stop '$APPL_NAME', PID:$APPL_PID with SIGTERM"
+            kill -9 $APPL_PID &>/dev/null
+            warning "using kill -9 $APPL_PID"
+            appIsUp && error "failed to stop '$APPL_NAME' with kill -9"
         }
+        vlog removing pid file: $PID_FILE
+        rm -f $PID_FILE
     fi
     log "OK: '$APPL_NAME' stopped"
     exit 0

@@ -5,9 +5,11 @@
 # email in Initail_Setup.py
 db.init.email=CHANGEME
 # Old CLI:
-# Please enter SQL DB Info in the format - Server|DB|User|Password
-db.init.server=CHANGEME # jdbc:mariadb://10.49.0.169:3306/saw_test_2
-db.init.dbname=CHANGEME # org.mariadb.jdbc.Driver
+# Please enter SQL DB Info in the format - Server|dbname|url|driverclass|User|Password
+db.init.server=10.49.0.169 # 10.49.0.169
+db.init.dbname=saw_test_2 # saw_test_2
+db.init.url=jdbc:mariadb://10.49.0.169:3306/saw_test_2 # jdbc:mariadb://10.49.0.169:3306/saw_test_2
+db.init.dcname=org.mariadb.jdbc.Driver # org.mariadb.jdbc.Driver
 db.init.user=CHANGEME # dev_user
 db.init.password=CHANGEME # devpass
 

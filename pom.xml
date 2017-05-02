@@ -48,7 +48,7 @@
         <app.group>saw</app.group>
     </properties>
 
-    <dependencyManagement>
+<!--     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -59,13 +59,14 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
+ -->
     <dependencies>
-        <dependency>
+<!--         
+		<dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-rest</artifactId>
         </dependency>
-
+ -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-jdbc</artifactId>
@@ -96,7 +97,7 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-        <dependency>
+<!--         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-zipkin</artifactId>
         </dependency>
@@ -110,7 +111,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-remote-shell</artifactId>
         </dependency>
-
+ -->
         <dependency>
             <groupId>org.jolokia</groupId>
             <artifactId>jolokia-core</artifactId>
@@ -122,8 +123,9 @@
         </dependency>
 
         <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>    
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.3.2</version>    
         </dependency>
 
         <dependency>
@@ -462,6 +464,10 @@ echo pre-remove starting: ${app.nameVer}
 echo remove files in log/, run/ subdirs in ${app.varDir}
 ( set -x
   rm -f ${app.varDir}/{log,run}/*
+  )
+echo remove python compiled files
+( set -x
+  rm -f ${app.optDir}/db/*.pyc ${app.optDir}/db/*/*.pyc
   )
 echo remove files generated from templates
 ( set -x
