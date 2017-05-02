@@ -126,7 +126,7 @@ class SAWPivotTypeElasticSearchQueryBuilder {
 	    	 ((columnFields !=null && columnFields.size()<=5) && 
 	    			 ((dataFields !=null && dataFields.size()<=5))) )
     	{
-	      searchSourceBuilder = AllFieldsAvailable.allFieldsAvailable(rowfield, columnFields, dataFields, searchSourceBuilder, boolQueryBuilder);
+	      searchSourceBuilder = AllFieldsAvailablePivot.allFieldsAvailable(rowfield, columnFields, dataFields, searchSourceBuilder, boolQueryBuilder);
 	    } // end of rowField, columnField & dataField
 	    else 
 	    {

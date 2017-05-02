@@ -9,6 +9,8 @@ import org.elasticsearch.search.aggregations.bucket.histogram.Histogram.Order;
 
 import com.synchronoss.querybuilder.model.ColumnField;
 import com.synchronoss.querybuilder.model.DataField;
+import com.synchronoss.querybuilder.model.GroupBy;
+import com.synchronoss.querybuilder.model.SplitBy;
 
 public class QueryBuilderUtil {
 	
@@ -66,6 +68,26 @@ public class QueryBuilderUtil {
  		return aggregationBuilder;
  	}
  
-	
+ 	/**
+ 	 * This aggregation framework
+ 	 * @param splitBy
+ 	 * @return
+ 	 */
+	public static AggregationBuilder aggregationBuilderChart(SplitBy splitBy)
+	{
+		AggregationBuilder aggregationBuilder = null;
+		
+		if (splitBy.getType().equals("date"))
+		{
+			aggregationBuilder = AggregationBuilders.
+					dateHistogram("split_by").field(splitBy.getColumnName()).
+					dateHistogramInterval(groupInterval(splitBy.getGroupInterval())).order(Order.KEY_ASC);
+		}
+		else 
+		{
+			aggregationBuilder = AggregationBuilders.terms("split_by").field(splitBy.getColumnName());
+		}
+		return aggregationBuilder;
+	}	
 	
 }

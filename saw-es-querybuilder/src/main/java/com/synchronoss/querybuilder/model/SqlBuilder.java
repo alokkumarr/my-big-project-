@@ -12,86 +12,107 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-    "filters",
-    "sort",
-    "rowFields",
-    "columnFields",
-    "dataFields"
-})
+@JsonPropertyOrder({ "filters", "sort", "rowFields", "columnFields", "dataFields", "groupBy", "splitBy" })
 public class SqlBuilder {
 
-    @JsonProperty("filters")
-    private List<Filter> filters = null;
-    @JsonProperty("sort")
-    private List<Sort> sort = null;
-    @JsonProperty("rowFields")
-    private List<RowField> rowFields = null;
-    @JsonProperty("columnFields")
-    private List<ColumnField> columnFields = null;
-    @JsonProperty("dataFields")
-    private List<DataField> dataFields = null;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+	@JsonProperty("filters")
+	private List<Filter> filters = null;
+	@JsonProperty("sort")
+	private List<Sort> sort = null;
+	@JsonProperty("rowFields")
+	private List<RowField> rowFields = null;
+	@JsonProperty("columnFields")
+	private List<ColumnField> columnFields = null;
+	@JsonProperty("dataFields")
+	private List<DataField> dataFields = null;
 
-    @JsonProperty("filters")
-    public List<Filter> getFilters() {
-        return filters;
-    }
+	@JsonProperty("groupBy")
+	private GroupBy groupBy;
 
-    @JsonProperty("filters")
-    public void setFilters(List<Filter> filters) {
-        this.filters = filters;
-    }
+	@JsonProperty("splitBy")
+	private SplitBy splitBy;
 
-    @JsonProperty("sort")
-    public List<Sort> getSort() {
-        return sort;
-    }
+	@JsonProperty("groupBy")
+	public GroupBy getGroupBy() {
+		return groupBy;
+	}
 
-    @JsonProperty("sort")
-    public void setSort(List<Sort> sort) {
-        this.sort = sort;
-    }
+	@JsonProperty("groupBy")
+	public void setGroupBy(GroupBy groupBy) {
+		this.groupBy = groupBy;
+	}
 
-    @JsonProperty("rowFields")
-    public List<RowField> getRowFields() {
-        return rowFields;
-    }
+	@JsonProperty("splitBy")
+	public SplitBy getSplitBy() {
+		return splitBy;
+	}
 
-    @JsonProperty("rowFields")
-    public void setRowFields(List<RowField> rowFields) {
-        this.rowFields = rowFields;
-    }
+	@JsonProperty("splitBy")
+	public void setSplitBy(SplitBy splitBy) {
+		this.splitBy = splitBy;
+	}
 
-    @JsonProperty("columnFields")
-    public List<ColumnField> getColumnFields() {
-        return columnFields;
-    }
+	@JsonIgnore
+	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("columnFields")
-    public void setColumnFields(List<ColumnField> columnFields) {
-        this.columnFields = columnFields;
-    }
+	@JsonProperty("filters")
+	public List<Filter> getFilters() {
+		return filters;
+	}
 
-    @JsonProperty("dataFields")
-    public List<DataField> getDataFields() {
-        return dataFields;
-    }
+	@JsonProperty("filters")
+	public void setFilters(List<Filter> filters) {
+		this.filters = filters;
+	}
 
-    @JsonProperty("dataFields")
-    public void setDataFields(List<DataField> dataFields) {
-        this.dataFields = dataFields;
-    }
+	@JsonProperty("sort")
+	public List<Sort> getSort() {
+		return sort;
+	}
 
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
+	@JsonProperty("sort")
+	public void setSort(List<Sort> sort) {
+		this.sort = sort;
+	}
 
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
+	@JsonProperty("rowFields")
+	public List<RowField> getRowFields() {
+		return rowFields;
+	}
+
+	@JsonProperty("rowFields")
+	public void setRowFields(List<RowField> rowFields) {
+		this.rowFields = rowFields;
+	}
+
+	@JsonProperty("columnFields")
+	public List<ColumnField> getColumnFields() {
+		return columnFields;
+	}
+
+	@JsonProperty("columnFields")
+	public void setColumnFields(List<ColumnField> columnFields) {
+		this.columnFields = columnFields;
+	}
+
+	@JsonProperty("dataFields")
+	public List<DataField> getDataFields() {
+		return dataFields;
+	}
+
+	@JsonProperty("dataFields")
+	public void setDataFields(List<DataField> dataFields) {
+		this.dataFields = dataFields;
+	}
+
+	@JsonAnyGetter
+	public Map<String, Object> getAdditionalProperties() {
+		return this.additionalProperties;
+	}
+
+	@JsonAnySetter
+	public void setAdditionalProperty(String name, Object value) {
+		this.additionalProperties.put(name, value);
+	}
 
 }
