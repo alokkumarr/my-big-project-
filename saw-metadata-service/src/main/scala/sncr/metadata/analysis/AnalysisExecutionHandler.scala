@@ -151,7 +151,7 @@ class AnalysisExecutionHandler(val nodeId : String) {
     }
     if (nodeExists) resultNode.delete
 
-    val analysisName = (definition \ "name").extractOpt[String]
+    val analysisName = (definition \ "metricName").extractOpt[String]
     val analysisId = (definition \ "id").extractOpt[String]
 
     status = (jsonResult \ "status").extract[String]

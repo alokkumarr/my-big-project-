@@ -1,5 +1,6 @@
 package controllers
 
+import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.UUID
 
@@ -47,7 +48,8 @@ class ANA extends BaseServiceProvider {
       case "create" => {
         val semanticId = extractAnalysisId(json)
         val semanticIdJson: JObject = ("semanticId", semanticId)
-        val idJson: JObject = ("id", UUID.randomUUID.toString)
+        val analysisId = UUID.randomUUID.toString
+        val idJson: JObject = ("id", analysisId)
         val analysisType = extractKey(json, "analysisType")
         val typeJson: JObject = ("type", analysisType)
         val semanticJson = readSemanticJson(semanticId)
@@ -70,7 +72,8 @@ class ANA extends BaseServiceProvider {
       }
       case "update" => {
         val analysisId = extractAnalysisId(json)
-        val analysisNode = new AnalysisNode(analysisJson(json))
+        val analysisNode = AnalysisNode(analysisId)
+        analysisNode.setDefinition(analysisJson(json))
         val (result, message) = analysisNode.update(
           Map("id" -> analysisId))
         if (result != Success.id) {
@@ -179,32 +182,27 @@ class ANA extends BaseServiceProvider {
   }
 
   def executeAnalysis(analysisId: String): JValue = {
-    /* TODO: Until analysis and executor changes are finished, return a
-     * static mock of execution results */
-    if (true) {
-      return List(("foo", 1))
-    }
-
+    val analysisNode = AnalysisNode(analysisId)
+    if (analysisNode.getCachedData == null || analysisNode.getCachedData.isEmpty)
+      throw new Exception("Could not find analysis node with provided analysis ID")
     val er: ExecutionTaskHandler = new ExecutionTaskHandler(1)
-    try {
-      val analysisNode = AnalysisNode(analysisId)
-      if ( analysisNode.getCachedData == null || analysisNode.getCachedData.isEmpty)
-        throw new Exception("Could not find analysis node with provided analysis ID.")
-      val aeh: AnalysisExecutionHandler = new AnalysisExecutionHandler(analysisId)
+    val aeh: AnalysisExecutionHandler = new AnalysisExecutionHandler(analysisId)
+    er.startSQLExecutor(aeh)
+    val analysisResultId: String = er.getPredefResultRowID(analysisId)
+    er.waitForCompletion(analysisId, aeh.getWaitTime)
+    val out = new ByteArrayOutputStream()
+    aeh.handleResult(out)
+    val resultJson = parse(new String(out.toByteArray()))
+    val resultLog = shortMessage(pretty(render(resultJson)).substring(0, 500))
+    m_log.trace("Spark SQL executor result: {}", resultLog)
+    (resultJson match {
+      case JArray(result) => result.arr
+      case value: JValue => throw new RuntimeException(
+        "Expected array: " + value)
+    }).drop(1)
+  }
 
-      //Start executing Spark SQL
-      er.startSQLExecutor(aeh)
-      val analysisResultId: String = er.getPredefResultRowID(analysisId)
-      er.waitForCompletion(analysisId, aeh.getWaitTime)
-      val msg = "Execution: AnalysisID = " + analysisId + ", Result Row ID: " + analysisResultId
-      // Handle result
-      aeh.handleResult()
-      m_log debug msg
-    }
-    catch {
-      case e: Exception => val msg = s"Execution exception: ${e.getMessage}"; m_log error (msg, e)
-    }
-    /* TODO: Return empty result until integrated */
-    List()
+  private def shortMessage(message: String) = {
+    message.substring(0, Math.min(message.length(), 1500))
   }
 }

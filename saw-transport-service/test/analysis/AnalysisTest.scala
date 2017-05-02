@@ -54,8 +54,8 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       val body = actionKeyMessage("execute", id)
       val analysis = analyze(sendRequest(body))
       /* Note: Currently the result is just the static mock */
-      val JInt(value) = (analysis \ "data")(0) \ "foo"
-      value must be (1)
+      val JString(value) = (analysis \ "data")(0) \ "SESSION_ID"
+      value must be ("0025D642-5ED9-49DE-96B5-6F643DFDBB1F")
     }
 
     "delete analysis" in {
