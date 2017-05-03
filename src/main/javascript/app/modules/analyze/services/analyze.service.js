@@ -202,13 +202,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
 
   function saveReport(model) {
     model.saved = true;
-    const payload = getRequestParams([
-      ['contents.action', 'update'],
-      ['contents.keys.[0].id', model.id],
-      ['contents.keys.[0].type', model.type],
-      ['contents.analyze', [model]]
-    ]);
-    return $http.post(`${url}/analysis`, payload).then(fpGet(`data.contents.[0].${MODULE_NAME}.[0]`));
+    return updateAnalysis(model);
   }
 
   function getSemanticLayerData() {
