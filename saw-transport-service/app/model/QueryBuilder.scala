@@ -9,15 +9,20 @@ object QueryBuilder {
   def build(json: JValue): String = {
     val artifacts = json \ "artifacts" match {
       case artifacts: JArray => artifacts.arr
-      case JNothing => return ""
+      case JNothing => List()
+      case obj: JValue => unexpectedElement(obj)
+    }
+    val sqlBuilder = json \ "sqlBuilder" match {
+      case obj: JObject => obj
+      case JNothing => JObject()
       case obj: JValue => unexpectedElement(obj)
     }
     "%s %s %s %s %s".format(
       buildSelect(artifacts),
       buildFrom(artifacts),
-      buildWhere(artifacts(0)),
-      buildGroupBy(artifacts(0)),
-      buildOrderBy(artifacts(0))
+      buildWhere(sqlBuilder),
+      buildGroupBy(sqlBuilder),
+      buildOrderBy(sqlBuilder)
     ).replaceAll("\\s+", " ").trim
   }
 
@@ -50,36 +55,34 @@ object QueryBuilder {
     }).mkString(", ")
   }
 
-  private def buildWhere(artifacts: JValue): String = {
-    artifacts \ "filters" match {
-      case filters: JArray => buildWhereFilters(filters.arr)
-      case JNothing => ""
+  private def buildWhere(sqlBuilder: JObject): String = {
+    val filters = sqlBuilder \ "filters" match {
+      case filters: JArray => filters.arr
+      case JNothing => return ""
       case json: JValue => unexpectedElement(json)
     }
-  }
-
-  private def buildWhereFilters(filters: List[JValue]) = {
     if (filters.isEmpty) {
       ""
     } else {
-      "WHERE " + filters.map(filter(_)).mkString(" ")
+      "WHERE " + filters.map(buildWhereElement(_)).mkString(" ")
     }
   }
 
-  private def filter(filter: JValue): String = {
+  private def buildWhereElement(filter: JValue): String = {
     def property(name: String) = {
       (filter \ name).extract[String]
     }
-    "%s %s %s %s".format(
+    "%s %s.%s %s %s".format(
       property("booleanCriteria"),
+      property("tableName"),
       property("columnName"),
       property("operator"),
       property("searchConditions")
     )
   }
 
-  private def buildGroupBy(artifacts: JValue) = {
-    val groupBy: List[JValue] = artifacts \ "groupByColumns" match {
+  private def buildGroupBy(sqlBuilder: JObject) = {
+    val groupBy: List[JValue] = sqlBuilder \ "groupByColumns" match {
       case l: JArray => l.arr
       case JNothing => List.empty
       case json: JValue => unexpectedElement(json)
@@ -87,12 +90,22 @@ object QueryBuilder {
     if (groupBy.isEmpty) {
       ""
     } else {
-      "GROUP BY " + groupBy.map(_.extract[String]).mkString(", ")
+      "GROUP BY " + groupBy.map(buildGroupByElement(_)).mkString(", ")
     }
   }
 
-  private def buildOrderBy(artifacts: JValue) = {
-    val orderBy: List[JValue] = artifacts \ "orderByColumns" match {
+  private def buildGroupByElement(groupBy: JValue): String = {
+    def property(name: String) = {
+      (groupBy \ name).extract[String]
+    }
+    "%s.%s".format(
+      property("tableName"),
+      property("columnName")
+    )
+  }
+
+  private def buildOrderBy(sqlBuilder: JObject) = {
+    val orderBy: List[JValue] = sqlBuilder \ "orderByColumns" match {
       case l: JArray => l.arr
       case JNothing => List.empty
       case json: JValue => unexpectedElement(json)
@@ -100,8 +113,19 @@ object QueryBuilder {
     if (orderBy.isEmpty) {
       ""
     } else {
-      "ORDER BY " + orderBy.map(_.extract[String]).mkString(", ")
+      "ORDER BY " + orderBy.map(buildOrderByElement(_)).mkString(", ")
     }
+  }
+
+  private def buildOrderByElement(orderBy: JValue): String = {
+    def property(name: String) = {
+      (orderBy \ name).extract[String]
+    }
+    "%s.%s %s".format(
+      property("tableName"),
+      property("columnName"),
+      property("order")
+    )
   }
 
   private def unexpectedElement(json: JValue): Nothing = {

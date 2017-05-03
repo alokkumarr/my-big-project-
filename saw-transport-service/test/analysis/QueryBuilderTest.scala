@@ -9,27 +9,31 @@ import model.QueryBuilder
 class QueryBuilderTest extends FunSpec with MustMatchers {
   describe("Query built from analysis") {
     it("should have SELECT and FROM") {
-      query(artifactT) must be ("SELECT t.a, t.b FROM t")
+      query(artifactT)() must be ("SELECT t.a, t.b FROM t")
     }
     it("with filters should have a WHERE clause") {
-      query(artifactT, filters(
-        filter("", "t.a", ">", "1"),
-        filter("AND", "t.b", "<", "2"))
+      query(artifactT)(filters(
+        filter("", "t", "a", ">", "1"),
+        filter("AND", "t", "b", "<", "2"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a > 1 AND t.b < 2")
     }
     it("with group by columns should have an GROUP BY clause") {
-      query(artifactT, groupBy("t.a", "t.b")
+      val groupByA = groupByColumn("t", "a")
+      val groupByB = groupByColumn("t", "b")
+      query(artifactT)(groupBy(groupByA, groupByB)
       ) must be ("SELECT t.a, t.b FROM t GROUP BY t.a, t.b")
     }
     it("with order by columns should have an ORDER BY clause") {
-      query(artifactT, orderBy("t.a ASC", "t.b DESC")
+      val orderByA = orderByColumn("t", "a", "ASC")
+      val orderByB = orderByColumn("t", "b", "DESC")
+      query(artifactT)(orderBy(orderByA, orderByB)
       ) must be ("SELECT t.a, t.b FROM t ORDER BY t.a ASC, t.b DESC")
     }
   }
 
   describe("Query built from analysis with multiple artifacts") {
     it("should list all columns in SELECT and all tables in FROM clause") {
-      queryTwo(artifactT)(artifactU) must be (
+      query(artifactT, artifactU)() must be (
         "SELECT t.a, t.b, u.c, u.d FROM t, u")
     }
   }
@@ -42,17 +46,11 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     artifact("u", "c", "d")
   }
 
-  private def query(objs: JObject*): String = {
-    val artifact = objs.reduceLeft(_ merge _)
-    val analysis = ("artifacts", List(artifact))
-    QueryBuilder.build(analysis)
-  }
-
-  private def queryTwo(objs1: JObject*)(objs2: JObject*): String = {
-    val artifact1 = objs1.reduceLeft(_ merge _)
-    val artifact2 = objs2.reduceLeft(_ merge _)
-    val analysis = ("artifacts", List(artifact1, artifact2))
-    QueryBuilder.build(analysis)
+  private def query(artifacts: JObject*)(sqlBuilders: JObject*): String = {
+    val sqlBuilderJson = if (sqlBuilders.isEmpty)
+      JObject() else sqlBuilders.reduceLeft(_ merge _)
+    QueryBuilder.build(("artifacts", artifacts) ~
+      ("sqlBuilder", sqlBuilderJson))
   }
 
   private def artifact(name: String, columns: String*): JObject = {
@@ -64,19 +62,32 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     ("filters", filters.toList)
   }
 
-  private def filter(bool: String, name: String, operator: String,
-    cond: String): JObject = {
+  private def filter(bool: String, tableName: String, columnName: String,
+    operator: String, cond: String): JObject = {
     ("booleanCriteria", bool) ~
-    ("columnName", name) ~
+    ("tableName", tableName) ~
+    ("columnName", columnName) ~
     ("operator", operator) ~
     ("searchConditions", cond)
   }
 
-  private def orderBy(name: String*) = {
-    ("orderByColumns", name)
+  private def orderBy(columns: JObject*) = {
+    ("orderByColumns", columns)
   }
 
-  private def groupBy(name: String*) = {
-    ("groupByColumns", name)
+  private def orderByColumn(tableName: String, columnName: String,
+    order: String) = {
+    ("tableName", tableName) ~
+    ("columnName", columnName) ~
+    ("order", order)
+  }
+
+  private def groupBy(columns: JObject*) = {
+    ("groupByColumns", columns)
+  }
+
+  private def groupByColumn(tableName: String, columnName: String) = {
+    ("tableName", tableName) ~
+    ("columnName", columnName)
   }
 }

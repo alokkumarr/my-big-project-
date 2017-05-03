@@ -192,7 +192,7 @@ class ANA extends BaseServiceProvider {
     val out = new ByteArrayOutputStream()
     aeh.handleResult(out)
     val resultJson = parse(new String(out.toByteArray()))
-    val resultLog = shortMessage(pretty(render(resultJson)).substring(0, 500))
+    val resultLog = shortMessage(pretty(render(resultJson)))
     m_log.trace("Spark SQL executor result: {}", resultLog)
     (resultJson match {
       case obj: JObject => {
