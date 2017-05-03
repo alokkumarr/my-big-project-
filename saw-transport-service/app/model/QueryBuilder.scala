@@ -56,19 +56,49 @@ object QueryBuilder {
   }
 
   private def buildWhere(sqlBuilder: JObject): String = {
-    val filters = sqlBuilder \ "filters" match {
-      case filters: JArray => filters.arr
-      case JNothing => return ""
+    val joins = (sqlBuilder \ "joins" match {
+      case joins: JArray => joins.arr
+      case JNothing => List()
       case json: JValue => unexpectedElement(json)
-    }
-    if (filters.isEmpty) {
+    }).map(buildWhereJoinElement(_))
+    val filters = (sqlBuilder \ "filters" match {
+      case filters: JArray => filters.arr
+      case JNothing => List()
+      case json: JValue => unexpectedElement(json)
+    }).map(buildWhereFilterElement(_))
+    val conditions = (joins ++ filters)
+    if (conditions.isEmpty) {
       ""
     } else {
-      "WHERE " + filters.map(buildWhereElement(_)).mkString(" ")
+      "WHERE " + conditions.mkString(" ")
     }
   }
 
-  private def buildWhereElement(filter: JValue): String = {
+  private def buildWhereJoinElement(join: JValue): String = {
+    def property(name: String) = {
+      (join \ name)
+    }
+    if (property("type").extract[String] != "inner") {
+      throw new RuntimeException(
+        "Join type not implemented: " + property("type"))
+    }
+    val criteria = property("criteria") match {
+      case criteria: JArray => criteria.arr
+      case value: JValue => unexpectedElement(value)
+    }
+    if (criteria.length != 2) {
+      throw new ClientException(
+        "Expected criteria to have exactly two elements: " + criteria)
+    }
+    "%s.%s = %s.%s".format(
+      (criteria(0) \ "tableName").extract[String],
+      (criteria(0) \ "columnName").extract[String],
+      (criteria(1) \ "tableName").extract[String],
+      (criteria(1) \ "columnName").extract[String]
+    )
+  }
+
+  private def buildWhereFilterElement(filter: JValue): String = {
     def property(name: String) = {
       (filter \ name).extract[String]
     }

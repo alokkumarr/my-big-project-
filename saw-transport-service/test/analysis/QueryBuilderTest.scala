@@ -11,23 +11,28 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     it("should have SELECT and FROM") {
       query(artifactT)() must be ("SELECT t.a, t.b FROM t")
     }
-    it("with filters should have a WHERE clause") {
+    it("with joins should have a WHERE clause with join conditions") {
+      query(artifactT, artifactU)(joins(
+        join("inner", "t", "a", "u", "c"))
+      ) must be ("SELECT t.a, t.b, u.c, u.d FROM t, u WHERE t.a = u.c")
+    }
+    it("with filters should have a WHERE clause with filter conditions") {
       query(artifactT)(filters(
         filter("", "t", "a", ">", "1"),
         filter("AND", "t", "b", "<", "2"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a > 1 AND t.b < 2")
-    }
-    it("with group by columns should have an GROUP BY clause") {
-      val groupByA = groupByColumn("t", "a")
-      val groupByB = groupByColumn("t", "b")
-      query(artifactT)(groupBy(groupByA, groupByB)
-      ) must be ("SELECT t.a, t.b FROM t GROUP BY t.a, t.b")
     }
     it("with order by columns should have an ORDER BY clause") {
       val orderByA = orderByColumn("t", "a", "ASC")
       val orderByB = orderByColumn("t", "b", "DESC")
       query(artifactT)(orderBy(orderByA, orderByB)
       ) must be ("SELECT t.a, t.b FROM t ORDER BY t.a ASC, t.b DESC")
+    }
+    it("with group by columns should have an GROUP BY clause") {
+      val groupByA = groupByColumn("t", "a")
+      val groupByB = groupByColumn("t", "b")
+      query(artifactT)(groupBy(groupByA, groupByB)
+      ) must be ("SELECT t.a, t.b FROM t GROUP BY t.a, t.b")
     }
   }
 
@@ -56,6 +61,18 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
   private def artifact(name: String, columns: String*): JObject = {
     ("artifactName", name) ~
     ("columns", columns.map(("columnName", _)))
+  }
+
+  private def joins(joins: JObject*): JObject = {
+    ("joins", joins.toList)
+  }
+
+  private def join(joinType: String, table1Name: String, column1Name: String,
+    table2Name: String, column2Name: String): JObject = {
+    ("type", joinType) ~
+    ("criteria", JArray(List(
+      ("tableName", table1Name) ~ ("columnName", column1Name),
+      ("tableName", table2Name) ~ ("columnName", column2Name))))
   }
 
   private def filters(filters: JObject*): JObject = {
