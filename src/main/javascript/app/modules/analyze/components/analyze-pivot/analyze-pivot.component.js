@@ -9,7 +9,7 @@ import find from 'lodash/find';
 import take from 'lodash/take';
 import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 
 import template from './analyze-pivot.component.html';
