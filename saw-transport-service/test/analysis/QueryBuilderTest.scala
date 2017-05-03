@@ -98,7 +98,7 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     ("tableName", tableName) ~
     ("columnName", columnName) ~
     ("operator", operator) ~
-    ("searchConditions", cond)
+    ("searchConditions", JArray(List(cond)))
   }
 
   private def orderBy(columns: JObject*) = {

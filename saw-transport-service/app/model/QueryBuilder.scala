@@ -109,12 +109,20 @@ object QueryBuilder {
     def property(name: String) = {
       (filter \ name).extract[String]
     }
-    "%s %s.%s %s %s".format(
+    val operator = property("operator")
+    val searchCondition = ((filter \ "searchConditions") match {
+      case array: JArray => array.arr
+      case value: JValue => unexpectedElement(value)
+    }).map(_.extract[String])
+    val condition = if (operator.toLowerCase == "between")
+      "BETWEEN %s AND %s".format(searchCondition(0), searchCondition(1))
+    else
+      "%s %s".format(operator, searchCondition(0))
+    "%s %s.%s %s".format(
       property("booleanCriteria"),
       property("tableName"),
       property("columnName"),
-      property("operator"),
-      property("searchConditions")
+      condition
     )
   }
 
