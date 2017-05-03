@@ -162,14 +162,30 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
     return $http.get('/api/analyze/artifacts').then(fpGet('data'));
   }
 
-  function getDataBySettings(model) {
+  function updateAnalysis(model) {
+    const payload = getRequestParams([
+      ['contents.action', 'update'],
+      ['contents.keys.[0].id', model.id],
+      ['contents.keys.[0].type', model.type],
+      ['contents.analyze', [model]]
+    ]);
+    return $http.post(`${url}/analysis`, payload).then(fpGet(`data.contents.analyze.[0]`));
+  }
+
+  function applyAnalysis(model) {
     const payload = getRequestParams([
       ['contents.action', 'execute'],
       ['contents.keys.[0].id', model.id],
       ['contents.keys.[0].type', model.type],
       ['contents.analyze', [model]]
     ]);
-    return $http.post(`${url}/analysis`, payload).then(fpGet(`data.contents.[0].${MODULE_NAME}.[1]`));
+    return $http.post(`${url}/analysis`, payload).then(fpGet(`data.contents.analyze.[1].data`));
+  }
+
+  function getDataBySettings(model) {
+    return updateAnalysis(model).then(() => {
+      return applyAnalysis(model);
+    });
   }
 
   function getDataByQuery() {
