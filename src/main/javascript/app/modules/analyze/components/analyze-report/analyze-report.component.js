@@ -206,7 +206,6 @@ export const AnalyzeReportComponent = {
         this.model.artifacts = [];
       } else {
         this.fillCanvas(this.model.artifacts);
-        this.reloadPreviewGrid();
         this.showFiltersButtonIfDataIsReady();
         this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
         if (!isEmpty(this.canvas.model.filters)) {
@@ -431,7 +430,24 @@ export const AnalyzeReportComponent = {
         .then(cb);
     }
 
-    reloadPreviewGrid() {
+    applyDataToGrid(columns, sorts, data) {
+      this.showFiltersButtonIfDataIsReady();
+      const grid = first(this._$componentHandler.get('ard-grid-container'));
+
+      if (grid) {
+        grid.updateColumns(columns);
+        grid.updateSorts(sorts);
+        grid.updateSource(data);
+        this._$timeout(() => {
+          // Delay refreshing the grid a bit to counter
+          // aria errors from dev extreme
+          // Need to find a better fix for this
+          grid.refreshGrid();
+        }, 100);
+      }
+    }
+
+    reloadPreviewGrid(refresh = false) {
       const doReload = () => {
         return this._$timeout(() => {
           this._reloadTimer = null;
@@ -444,23 +460,21 @@ export const AnalyzeReportComponent = {
             };
           });
 
-          this.refreshGridData(data => {
-            this.filteredGridData = this.gridData = data;
-            this.showFiltersButtonIfDataIsReady();
-            const grid = first(this._$componentHandler.get('ard-grid-container'));
+          if (!refresh) {
+            this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
+            return;
+          }
 
-            if (grid) {
-              grid.updateColumns(this.columns);
-              grid.updateSorts(sorts);
-              grid.updateSource(this.filteredGridData);
-              this._$timeout(() => {
-                // Delay refreshing the grid a bit to counter
-                // aria errors from dev extreme
-                // Need to find a better fix for this
-                grid.refreshGrid();
-              }, 100);
-            }
-          });
+          if (this.columns.length === 0) {
+            this.filteredGridData = this.gridData = [];
+            this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
+          } else {
+            this.refreshGridData(data => {
+              this.filteredGridData = this.gridData = data;
+              this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
+            });
+          }
+
         }, DEBOUNCE_INTERVAL);
       };
 
@@ -530,7 +544,7 @@ export const AnalyzeReportComponent = {
       this.states.detailsExpanded = true;
 
       this._$timeout(() => {
-        this.reloadPreviewGrid();
+        this.reloadPreviewGrid(false);
       });
 
       const tpl = '<analyze-report-sort model="model"></analyze-report-sort>';
