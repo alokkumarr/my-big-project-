@@ -1,7 +1,9 @@
 package model
 
 import org.json4s._
+import org.json4s.JsonDSL._
 import org.json4s.JsonAST.JValue
+import org.json4s.native.JsonMethods._
 
 object QueryBuilder {
   implicit val formats = DefaultFormats
@@ -68,16 +70,26 @@ object QueryBuilder {
       case JNothing => List()
       case json: JValue => unexpectedElement(json)
     }).map(buildWhereJoinElement(_))
-    val filters = (sqlBuilder \ "filters" match {
+    val filters = ((sqlBuilder \ "filters" match {
       case filters: JArray => filters.arr
       case JNothing => List()
       case json: JValue => unexpectedElement(json)
+    }) match {
+      case Nil => Nil
+      case x :: xs => unsetBooleanCriteria(x) :: xs
     }).map(buildWhereFilterElement(_))
     val conditions = (joins ++ filters)
     if (conditions.isEmpty) {
       ""
     } else {
       "WHERE " + conditions.mkString(" ")
+    }
+  }
+
+  private def unsetBooleanCriteria(filter: JValue) = {
+    filter match {
+      case obj: JObject => obj merge(("booleanCriteria", "") : JObject)
+      case value: JValue => unexpectedElement(value)
     }
   }
 

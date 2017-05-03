@@ -25,7 +25,7 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     }
     it("with filters should have a WHERE clause with filter conditions") {
       query(artifactT)(filters(
-        filter("", "t", "a", ">", "1"),
+        filter("AND", "t", "a", ">", "1"),
         filter("AND", "t", "b", "<", "2"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a > 1 AND t.b < 2")
     }
