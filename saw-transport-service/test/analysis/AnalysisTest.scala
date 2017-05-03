@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 import org.json4s._
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
@@ -5,6 +7,11 @@ import org.scalatest.CancelAfterFailure
 
 /* Test analysis service operations */
 class AnalysisTest extends MaprTest with CancelAfterFailure {
+  implicit val formats = new DefaultFormats {
+    override def dateFormatter = new SimpleDateFormat(
+      "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+  }
+
   "Analysis service" should {
     requireMapr
     var id: String = null
@@ -40,9 +47,16 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       /* Update previously created analysis */
       val checkedJson: JValue = ("checked", "true")
       analysis = analysis.merge(checkedJson)
-      val queryJson: JValue = ("query", "SELECT 1") ~ ("outputFile",
-        ("outputFormat", "json") ~ ("outputFileName", "test.json"))
-      analysis = analysis.merge(queryJson)
+      /* Set columns to checked to ensure there are at least some selected
+       * columns for the query builder */
+      analysis = analysis.transform {
+        case column: JObject => {
+          if ((column \ "aliasName").extractOrElse[String]("none") != "none")
+            column ~ ("checked", true)
+          else
+            column
+        }
+      }
       val body = actionKeyAnalysisMessage("update", id, analysis)
       analysis = analyze(sendRequest(body))
       val JString(analysisId) = analysis \ "id"

@@ -29,8 +29,8 @@ trait BaseServiceProvider extends Controller {
 
     val res: ObjectNode = Json.newObject
 
-    header.contentType match
-    {
+    m_log.trace("Request: {} {}", ctx.request, ctx.request.body.asJson: Any)
+    val response = header.contentType match {
       case None  => if (ctx.request.body.asText == null) handleEmptyRequest("text/plain")
       else process(ctx.request.body.asText())
       case _ =>  header.contentType.get match {
@@ -56,6 +56,8 @@ trait BaseServiceProvider extends Controller {
 
       }
     }
+    m_log.trace("Response: {} {}", response.status, response.headers)
+    response
   }
 
   def process(arr: Array[Byte]): Result = ???
