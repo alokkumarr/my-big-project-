@@ -27,7 +27,7 @@ object QueryBuilder {
   }
 
   private def buildSelect(artifacts: List[JValue]) = {
-    "SELECT " + artifacts.map((artifact: JValue) => {
+    val columnElements = artifacts.map((artifact: JValue) => {
       val artifactName = (artifact \ "artifactName").extract[String]
       val columns: List[JValue] = artifact \ "columns" match {
         case columns: JArray => columns.arr
@@ -35,8 +35,15 @@ object QueryBuilder {
       }
       if (columns.size < 1)
         throw new ClientException("At least one artifact column expected")
-      columns.map(column(artifactName, _)).mkString(", ")
-    }).mkString(", ")
+      columns.filter(columnChecked(_)).map(column(artifactName, _)).mkString(", ")
+    }).filter(_ != "")
+    if (columnElements.isEmpty)
+      throw ClientException("Expected at least one checked column")
+    "SELECT " + columnElements.mkString(", ")
+  }
+
+  private def columnChecked(column: JValue) = {
+    (column \ "checked").extractOrElse[Boolean](false) == true
   }
 
   private def column(artifactName: String, column: JValue) = {

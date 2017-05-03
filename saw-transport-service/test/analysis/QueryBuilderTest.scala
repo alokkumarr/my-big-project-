@@ -11,6 +11,13 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     it("should have SELECT and FROM") {
       query(artifactT)() must be ("SELECT t.a, t.b FROM t")
     }
+    it("should only have checked columns in SELECT") {
+      query(artifactU)() must be ("SELECT u.c, u.d FROM u")
+    }
+    it("should only have checked columns from first table in SELECT") {
+      query(artifactT, artifactV)(
+      ) must be ("SELECT t.a, t.b FROM t, v")
+    }
     it("with joins should have a WHERE clause with join conditions") {
       query(artifactT, artifactU)(joins(
         join("inner", "t", "a", "u", "c"))
@@ -44,11 +51,15 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
   }
 
   private def artifactT = {
-    artifact("t", "a", "b")
+    artifact("t")("a", "b")()
   }
 
   private def artifactU = {
-    artifact("u", "c", "d")
+    artifact("u")("c", "d")("e", "f")
+  }
+
+  private def artifactV = {
+    artifact("v")()("g", "h")
   }
 
   private def query(artifacts: JObject*)(sqlBuilders: JObject*): String = {
@@ -58,9 +69,11 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
       ("sqlBuilder", sqlBuilderJson))
   }
 
-  private def artifact(name: String, columns: String*): JObject = {
+  private def artifact(name: String)(columns: String*)(
+    uncheckedColumns: String*): JObject = {
     ("artifactName", name) ~
-    ("columns", columns.map(("columnName", _)))
+    ("columns", columns.map(("columnName", _) ~ ("checked", true)) ++
+      uncheckedColumns.map(("columnName", _) ~ ("checked", false)))
   }
 
   private def joins(joins: JObject*): JObject = {
