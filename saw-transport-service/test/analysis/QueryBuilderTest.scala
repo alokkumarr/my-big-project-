@@ -23,6 +23,12 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
         join("inner", "t", "a", "u", "c"))
       ) must be ("SELECT t.a, t.b, u.c, u.d FROM t, u WHERE t.a = u.c")
     }
+    it("with joins and filters should have a WHERE clause with join and filter conditions") {
+      query(artifactT, artifactU)(
+        joins(join("inner", "t", "a", "u", "c")),
+        filters(filter("number", "AND", "t", "a", ">", "1"))
+      ) must be ("SELECT t.a, t.b, u.c, u.d FROM t, u WHERE t.a = u.c AND t.a > 1")
+    }
     it("with number filter should have a WHERE clause with condition") {
       query(artifactT)(filters(filter("number", "AND", "t", "a", ">", "1"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a > 1")

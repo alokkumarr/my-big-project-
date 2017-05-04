@@ -86,12 +86,12 @@ object QueryBuilder {
       case Nil => Nil
       case x :: xs => unsetBooleanCriteria(x) :: xs
     }).map(buildWhereFilterElement(_))
-    val conditions = (joins ++ filters)
-    if (conditions.isEmpty) {
+    val conditions = List(joins.mkString(" AND "), filters.mkString(" ")).
+      filter(_.length > 0)
+    if (conditions.isEmpty)
       ""
-    } else {
-      "WHERE " + conditions.mkString(" ")
-    }
+    else
+      "WHERE " + conditions.mkString(" AND ")
   }
 
   private def unsetBooleanCriteria(filter: JValue) = {
