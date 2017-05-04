@@ -1,7 +1,0 @@
-server:
-  port: 8010
-
-management:
-     security:
-       enabled: false
-  
