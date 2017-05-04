@@ -145,6 +145,14 @@ object QueryBuilder {
       case "string" => {
         "IN (" + searchCondition.map("'" + _ + "'").mkString(", ") + ")"
       }
+      case "date" => {
+        val operator = property("operator")
+        if (operator.toLowerCase == "between")
+          "BETWEEN TO_DATE('%s') AND TO_DATE('%s')".format(
+            searchCondition(0), searchCondition(1))
+        else
+          throw new ClientException("Unknown date filter operator: " + operator)
+      }
       case obj: String => throw ClientException("Unknown filter type: " + obj)
     }
     "%s %s.%s %s".format(
