@@ -1,6 +1,0 @@
-version: '2'
-services:
-  saw-config-server:
-    build: saw-config-server
-    ports:
-      - 8888:8888
