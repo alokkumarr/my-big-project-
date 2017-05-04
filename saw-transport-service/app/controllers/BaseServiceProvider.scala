@@ -1,6 +1,7 @@
 package controllers
 
 import com.fasterxml.jackson.databind.node.ObjectNode
+import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 import play.libs.Json
 import play.mvc.{Controller, Http, Result}
@@ -29,7 +30,7 @@ trait BaseServiceProvider extends Controller {
 
     val res: ObjectNode = Json.newObject
 
-    m_log.trace("Request: {} {}", ctx.request, ctx.request.body.asJson: Any)
+    m_log.trace("Request: {} {}", ctx.request, Json.prettyPrint(ctx.request.body.asJson): Any)
     val response = header.contentType match {
       case None  => if (ctx.request.body.asText == null) handleEmptyRequest("text/plain")
       else process(ctx.request.body.asText())
