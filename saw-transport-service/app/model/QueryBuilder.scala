@@ -1,7 +1,9 @@
 package model
 
 import org.json4s._
+import org.json4s.JsonDSL._
 import org.json4s.JsonAST.JValue
+import org.json4s.native.JsonMethods._
 
 object QueryBuilder {
   implicit val formats = DefaultFormats
@@ -51,7 +53,7 @@ object QueryBuilder {
   }
 
   private def buildFrom(artifacts: List[JValue]) = {
-    "FROM " + artifacts.map((artifact: JValue) => {
+    "FROM " + artifacts.filter(isArtifactChecked).map((artifact: JValue) => {
       val table = artifact \ "artifactName" match {
         case JString(name) => name
         case _ => throw new ClientException("Artifact name not found")
@@ -62,22 +64,40 @@ object QueryBuilder {
     }).mkString(", ")
   }
 
+  private def isArtifactChecked(artifact: JValue): Boolean = {
+      val columns: List[JValue] = artifact \ "columns" match {
+        case columns: JArray => columns.arr
+        case json: JValue => unexpectedElement(json)
+      }
+      columns.filter(columnChecked(_)).length > 0
+  }
+
   private def buildWhere(sqlBuilder: JObject): String = {
     val joins = (sqlBuilder \ "joins" match {
       case joins: JArray => joins.arr
       case JNothing => List()
       case json: JValue => unexpectedElement(json)
     }).map(buildWhereJoinElement(_))
-    val filters = (sqlBuilder \ "filters" match {
+    val filters = ((sqlBuilder \ "filters" match {
       case filters: JArray => filters.arr
       case JNothing => List()
       case json: JValue => unexpectedElement(json)
+    }) match {
+      case Nil => Nil
+      case x :: xs => unsetBooleanCriteria(x) :: xs
     }).map(buildWhereFilterElement(_))
     val conditions = (joins ++ filters)
     if (conditions.isEmpty) {
       ""
     } else {
       "WHERE " + conditions.mkString(" ")
+    }
+  }
+
+  private def unsetBooleanCriteria(filter: JValue) = {
+    filter match {
+      case obj: JObject => obj merge(("booleanCriteria", "") : JObject)
+      case value: JValue => unexpectedElement(value)
     }
   }
 
@@ -109,15 +129,32 @@ object QueryBuilder {
     def property(name: String) = {
       (filter \ name).extract[String]
     }
-    val operator = property("operator")
     val searchCondition = ((filter \ "searchConditions") match {
       case array: JArray => array.arr
       case value: JValue => unexpectedElement(value)
     }).map(_.extract[String])
-    val condition = if (operator.toLowerCase == "between")
-      "BETWEEN %s AND %s".format(searchCondition(0), searchCondition(1))
-    else
-      "%s %s".format(operator, searchCondition(0))
+
+    val condition = property("filterType") match {
+      case "number" => {
+        val operator = property("operator")
+        if (operator.toLowerCase == "between")
+          "BETWEEN %s AND %s".format(searchCondition(0), searchCondition(1))
+        else
+          "%s %s".format(operator, searchCondition(0))
+      }
+      case "string" => {
+        "IN (" + searchCondition.map("'" + _ + "'").mkString(", ") + ")"
+      }
+      case "date" => {
+        val operator = property("operator")
+        if (operator.toLowerCase == "between")
+          "BETWEEN TO_DATE('%s') AND TO_DATE('%s')".format(
+            searchCondition(0), searchCondition(1))
+        else
+          throw new ClientException("Unknown date filter operator: " + operator)
+      }
+      case obj: String => throw ClientException("Unknown filter type: " + obj)
+    }
     "%s %s.%s %s".format(
       property("booleanCriteria"),
       property("tableName"),

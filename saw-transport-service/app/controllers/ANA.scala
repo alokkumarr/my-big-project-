@@ -197,7 +197,9 @@ class ANA extends BaseServiceProvider {
     (resultJson match {
       case obj: JObject => {
         m_log.error("Execution failed: {}", pretty(render(obj)))
-        throw new RuntimeException("Spark SQL execution failed, see log for details")
+        throw new RuntimeException(
+          "Spark SQL execution failed: " +
+            (obj \ "error_message").extractOrElse[String]("none"))
       }
       case JArray(result) => result.arr
       case value: JValue => throw new RuntimeException(

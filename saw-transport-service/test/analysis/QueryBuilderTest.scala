@@ -14,19 +14,39 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     it("should only have checked columns in SELECT") {
       query(artifactU)() must be ("SELECT u.c, u.d FROM u")
     }
-    it("should only have checked columns from first table in SELECT") {
+    it("should only have tables with checked columns in FROM") {
       query(artifactT, artifactV)(
-      ) must be ("SELECT t.a, t.b FROM t, v")
+      ) must be ("SELECT t.a, t.b FROM t")
     }
     it("with joins should have a WHERE clause with join conditions") {
       query(artifactT, artifactU)(joins(
         join("inner", "t", "a", "u", "c"))
       ) must be ("SELECT t.a, t.b, u.c, u.d FROM t, u WHERE t.a = u.c")
     }
-    it("with filters should have a WHERE clause with filter conditions") {
+    it("with number filter should have a WHERE clause with condition") {
+      query(artifactT)(filters(filter("number", "AND", "t", "a", ">", "1"))
+      ) must be ("SELECT t.a, t.b FROM t WHERE t.a > 1")
+    }
+    it("with number between filter should have a WHERE clause with BETWEEN") {
+      query(artifactT)(filters(filter(
+        "number", "AND", "t", "a", "between", "1", "2"))
+      ) must be ("SELECT t.a, t.b FROM t WHERE t.a BETWEEN 1 AND 2")
+    }
+    it("with string filter should have a WHERE clause with condition") {
+      query(artifactT)(filters(filter(
+        "string", "AND", "t", "a", null, "abc", "def"))
+      ) must be ("SELECT t.a, t.b FROM t WHERE t.a IN ('abc', 'def')")
+    }
+    it("with date between filter should have a WHERE clause with BETWEEN") {
+      query(artifactT)(filters(filter(
+        "date", "AND", "t", "a", "between", "2017-01-01", "2017-01-02"))
+      ) must be ("SELECT t.a, t.b FROM t WHERE t.a BETWEEN " +
+        "TO_DATE('2017-01-01') AND TO_DATE('2017-01-02')")
+    }
+    it("with two filters should have a WHERE clause with one AND") {
       query(artifactT)(filters(
-        filter("", "t", "a", ">", "1"),
-        filter("AND", "t", "b", "<", "2"))
+        filter("number", "AND", "t", "a", ">", "1"),
+        filter("number", "AND", "t", "b", "<", "2"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a > 1 AND t.b < 2")
     }
     it("with order by columns should have an ORDER BY clause") {
@@ -92,13 +112,14 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     ("filters", filters.toList)
   }
 
-  private def filter(bool: String, tableName: String, columnName: String,
-    operator: String, cond: String): JObject = {
+  private def filter(filterType: String, bool: String, tableName: String,
+    columnName: String, operator: String, conditions: String*): JObject = {
+    ("filterType", filterType) ~
     ("booleanCriteria", bool) ~
     ("tableName", tableName) ~
     ("columnName", columnName) ~
     ("operator", operator) ~
-    ("searchConditions", JArray(List(cond)))
+    ("searchConditions", JArray(conditions.map(JString(_)).toList))
   }
 
   private def orderBy(columns: JObject*) = {
