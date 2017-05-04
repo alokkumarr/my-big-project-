@@ -53,7 +53,7 @@ object QueryBuilder {
   }
 
   private def buildFrom(artifacts: List[JValue]) = {
-    "FROM " + artifacts.map((artifact: JValue) => {
+    "FROM " + artifacts.filter(isArtifactChecked).map((artifact: JValue) => {
       val table = artifact \ "artifactName" match {
         case JString(name) => name
         case _ => throw new ClientException("Artifact name not found")
@@ -62,6 +62,14 @@ object QueryBuilder {
         throw new ClientException("Artifact name cannot be empty")
       table
     }).mkString(", ")
+  }
+
+  private def isArtifactChecked(artifact: JValue): Boolean = {
+      val columns: List[JValue] = artifact \ "columns" match {
+        case columns: JArray => columns.arr
+        case json: JValue => unexpectedElement(json)
+      }
+      columns.filter(columnChecked(_)).length > 0
   }
 
   private def buildWhere(sqlBuilder: JObject): String = {

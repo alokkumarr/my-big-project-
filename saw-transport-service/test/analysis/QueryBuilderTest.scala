@@ -14,9 +14,9 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     it("should only have checked columns in SELECT") {
       query(artifactU)() must be ("SELECT u.c, u.d FROM u")
     }
-    it("should only have checked columns from first table in SELECT") {
+    it("should only have tables with checked columns in FROM") {
       query(artifactT, artifactV)(
-      ) must be ("SELECT t.a, t.b FROM t, v")
+      ) must be ("SELECT t.a, t.b FROM t")
     }
     it("with joins should have a WHERE clause with join conditions") {
       query(artifactT, artifactU)(joins(
