@@ -66,6 +66,8 @@ export const AnalyzeReportComponent = {
         // of the jsPlumb canvas.model
         possible: []
       };
+
+      this._unregisterCanvasHandlers = [];
     }
 
     $onInit() {
@@ -121,6 +123,11 @@ export const AnalyzeReportComponent = {
         this._$timeout.cancel(this._reloadTimer);
         this._reloadTimer = null;
       }
+
+      /* Unregister all the canvas's eventemitter handlers */
+      forEach(this._unregisterCanvasHandlers, unRegister => {
+        unRegister();
+      });
     }
 
     generateQuery() {
@@ -215,23 +222,27 @@ export const AnalyzeReportComponent = {
         }
       }
 
-      this.canvas._$eventEmitter.on('changed', () => {
-        this.generateFiltersOnCanvasChange();
-        this.reloadPreviewGrid(true);
-      });
+      this._unregisterCanvasHandlers = this._unregisterCanvasHandlers.concat([
 
-      this.canvas._$eventEmitter.on('sortChanged', () => {
-        this.reloadPreviewGrid(true);
-      });
+        this.canvas._$eventEmitter.on('changed', () => {
+          this.generateFiltersOnCanvasChange();
+          this.reloadPreviewGrid(true);
+        }),
 
-      this.canvas._$eventEmitter.on('groupingChanged', groups => {
-        this.addGroupColumns(groups);
-        this.reloadPreviewGrid(true);
-      });
+        this.canvas._$eventEmitter.on('sortChanged', () => {
+          this.reloadPreviewGrid(true);
+        }),
 
-      this.canvas._$eventEmitter.on('joinChanged', () => {
-        this.reloadPreviewGrid(true);
-      });
+        this.canvas._$eventEmitter.on('groupingChanged', groups => {
+          this.addGroupColumns(groups);
+          this.reloadPreviewGrid(true);
+        }),
+
+        this.canvas._$eventEmitter.on('joinChanged', () => {
+          this.reloadPreviewGrid(true);
+        })
+
+      ]);
     }
 
     /* NOTE: This will clear existing groups from model.
