@@ -23,10 +23,19 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
         join("inner", "t", "a", "u", "c"))
       ) must be ("SELECT t.a, t.b, u.c, u.d FROM t, u WHERE t.a = u.c")
     }
-    it("with filters should have a WHERE clause with filter conditions") {
+    it("with number filter should have a WHERE clause with condition") {
+      query(artifactT)(filters(filter("number", "AND", "t", "a", ">", "1"))
+      ) must be ("SELECT t.a, t.b FROM t WHERE t.a > 1")
+    }
+    it("with string filter should have a WHERE clause with condition") {
+      query(artifactT)(filters(filter(
+        "string", "AND", "t", "a", null, "abc", "def"))
+      ) must be ("SELECT t.a, t.b FROM t WHERE t.a IN ('abc', 'def')")
+    }
+    it("with two filters should have a WHERE clause with one AND") {
       query(artifactT)(filters(
-        filter("AND", "t", "a", ">", "1"),
-        filter("AND", "t", "b", "<", "2"))
+        filter("number", "AND", "t", "a", ">", "1"),
+        filter("number", "AND", "t", "b", "<", "2"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a > 1 AND t.b < 2")
     }
     it("with order by columns should have an ORDER BY clause") {
@@ -92,13 +101,14 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     ("filters", filters.toList)
   }
 
-  private def filter(bool: String, tableName: String, columnName: String,
-    operator: String, cond: String): JObject = {
+  private def filter(filterType: String, bool: String, tableName: String,
+    columnName: String, operator: String, conditions: String*): JObject = {
+    ("filterType", filterType) ~
     ("booleanCriteria", bool) ~
     ("tableName", tableName) ~
     ("columnName", columnName) ~
     ("operator", operator) ~
-    ("searchConditions", JArray(List(cond)))
+    ("searchConditions", JArray(conditions.map(JString(_)).toList))
   }
 
   private def orderBy(columns: JObject*) = {
