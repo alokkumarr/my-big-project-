@@ -5,11 +5,16 @@ import style from './jsPlumbCanvas.component.scss';
 import {JS_PLUMB_DEFAULT_SETTINGS} from '../settings';
 import {CanvasModel} from '../models/canvasModel';
 
+const EVENTS = {
+  JOIN_CHANGED: 'joinChanged'
+};
+
 export const JSPlumbCanvas = {
   template,
   styles: [style],
   bindings: {
-    id: '@'
+    id: '@',
+    onChange: '&'
   },
   controller: class JSPlumbCanvasCtrl {
     constructor($componentHandler, $eventEmitter, $element, $scope) {
@@ -62,6 +67,10 @@ export const JSPlumbCanvas = {
             });
 
             this._$scope.$apply();
+            this.onChange({
+              name: EVENTS.JOIN_CHANGED,
+              params: {}
+            });
           }
         }
       });
@@ -70,6 +79,10 @@ export const JSPlumbCanvas = {
         const connComponent = info.connection.getParameter('component');
 
         connComponent._canvas.removeJoin(connComponent.model);
+        this.onChange({
+          name: EVENTS.JOIN_CHANGED,
+          params: {}
+        });
       });
 
       this._jsPlumbInst.bind('connectionMoved', info => {
@@ -101,7 +114,18 @@ export const JSPlumbCanvas = {
           });
 
           this._$scope.$apply();
+          this.onChange({
+            name: EVENTS.JOIN_CHANGED,
+            params: {}
+          });
         }
+      });
+    }
+
+    joinChanged(params) {
+      this.onChange({
+        name: EVENTS.JOIN_CHANGED,
+        params
       });
     }
 

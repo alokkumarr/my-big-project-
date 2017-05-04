@@ -228,6 +228,10 @@ export const AnalyzeReportComponent = {
         this.addGroupColumns(groups);
         this.reloadPreviewGrid(true);
       });
+
+      this.canvas._$eventEmitter.on('joinChanged', () => {
+        this.reloadPreviewGrid(true);
+      });
     }
 
     /* NOTE: This will clear existing groups from model.
@@ -538,6 +542,14 @@ export const AnalyzeReportComponent = {
           autoWrap: false,
           multiple: true
         });
+    }
+
+    updateJoins(name, obj) {
+      if (name !== 'joinChanged') {
+        return;
+      }
+
+      this.canvas._$eventEmitter.emit('joinChanged', obj);
     }
 
     openSortModal(ev) {

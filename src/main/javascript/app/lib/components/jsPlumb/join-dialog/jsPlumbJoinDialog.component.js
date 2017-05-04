@@ -5,7 +5,8 @@ export const JSPlumbJoinDialog = {
   template,
   styles: [style],
   bindings: {
-    model: '<'
+    model: '<',
+    onChange: '&'
   },
   controller: class JSPlumbJoinDialogCtrl {
     constructor($mdDialog) {
@@ -21,6 +22,8 @@ export const JSPlumbJoinDialog = {
       this.rightSide = this._connector.model.rightSide;
       this.leftSideField = this.leftSide.field;
       this.rightSideField = this.rightSide.field;
+
+      this._oldType = this.type;
     }
 
     isOfType(type) {
@@ -50,6 +53,10 @@ export const JSPlumbJoinDialog = {
 
       if (shouldRender) {
         this._connector.render();
+      }
+
+      if (this._oldType !== this.type) {
+        this.onChange({params: {}});
       }
     }
 
