@@ -139,6 +139,7 @@ class AnalysisExecutionHandler(val nodeId : String) {
       throw new Exception("Could not read SparkSQL Executor result file/ file is empty")
 
     val jsonResult = parse(readData, false, false)
+    m_log.trace("Execution result: {}", shortMessage(pretty(render(jsonResult))))
 
     var nodeExists = false
     try {
@@ -263,4 +264,7 @@ class AnalysisExecutionHandler(val nodeId : String) {
     removeFiles()
   }
 
+  private def shortMessage(message: String) = {
+    message.substring(0, Math.min(message.length(), 2000))
+  }
 }
