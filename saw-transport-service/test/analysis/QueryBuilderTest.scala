@@ -18,16 +18,27 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
       query(artifactT, artifactV)(
       ) must be ("SELECT t.a, t.b FROM t")
     }
-    it("with joins should have a WHERE clause with join conditions") {
+    it("with inner join should have a FROM clause with an inner join") {
       query(artifactT, artifactU)(joins(
         join("inner", "t", "a", "u", "c"))
-      ) must be ("SELECT t.a, t.b, u.c, u.d FROM t, u WHERE t.a = u.c")
+      ) must be ("SELECT t.a, t.b, u.c, u.d FROM t INNER JOIN u ON (t.a = u.c)")
     }
-    it("with joins and filters should have a WHERE clause with join and filter conditions") {
-      query(artifactT, artifactU)(
-        joins(join("inner", "t", "a", "u", "c")),
-        filters(filter("double", "AND", "t", "a", ">", "1"))
-      ) must be ("SELECT t.a, t.b, u.c, u.d FROM t, u WHERE t.a = u.c AND t.a > 1")
+    it("with left join should have a FROM clause with a left join") {
+      query(artifactT, artifactU)(joins(
+        join("left", "t", "a", "u", "c"))
+      ) must be ("SELECT t.a, t.b, u.c, u.d FROM t LEFT JOIN u ON (t.a = u.c)")
+    }
+    it("with right join should have a FROM clause with a right join") {
+      query(artifactT, artifactU)(joins(
+        join("right", "t", "a", "u", "c"))
+      ) must be ("SELECT t.a, t.b, u.c, u.d FROM t RIGHT JOIN u ON (t.a = u.c)")
+    }
+    it("with multiple joins should have a FROM clause with chained joins") {
+      query(artifactT, artifactU, artifactV)(joins(
+        join("inner", "t", "a", "u", "c"),
+        join("inner", "u", "c", "v", "g"))
+      ) must be ("SELECT t.a, t.b, u.c, u.d FROM " +
+        "t INNER JOIN u ON (t.a = u.c) INNER JOIN v ON (u.c = v.g)")
     }
     it("with integer filter should have a WHERE clause with condition") {
       query(artifactT)(filters(filter("integer", "AND", "t", "a", ">", "1"))
