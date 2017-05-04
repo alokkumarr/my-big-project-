@@ -27,6 +27,11 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
       query(artifactT)(filters(filter("number", "AND", "t", "a", ">", "1"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a > 1")
     }
+    it("with number between filter should have a WHERE clause with BETWEEN") {
+      query(artifactT)(filters(filter(
+        "number", "AND", "t", "a", "between", "1", "2"))
+      ) must be ("SELECT t.a, t.b FROM t WHERE t.a BETWEEN 1 AND 2")
+    }
     it("with string filter should have a WHERE clause with condition") {
       query(artifactT)(filters(filter(
         "string", "AND", "t", "a", null, "abc", "def"))
