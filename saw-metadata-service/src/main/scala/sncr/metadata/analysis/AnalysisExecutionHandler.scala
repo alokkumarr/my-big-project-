@@ -169,7 +169,7 @@ class AnalysisExecutionHandler(val nodeId : String) {
         case _ => JObject(JField("schema", JString("ERROR! Could not extract schema")))
       }
 
-      val (finalOutputType, finalOutputLocation) = (jsonResult \ "outputTo").extract[String] match {
+      val (finalOutputType, finalOutputLocation) = (jsonResult \ "outputTo").extractOrElse[String]("inline") match {
         case "inline" => ("json", "inline")
         case "hdfs" => (outputType, outputLocation)
         case _ => ("unknown", "unknown")
@@ -204,13 +204,21 @@ class AnalysisExecutionHandler(val nodeId : String) {
     resultNode = new AnalysisResult(nodeId, descriptor, analysisResultNodeID)
     if (status.equalsIgnoreCase("success")) {
 
-      (jsonResult \ "outputTo").extract[String] match {
+      (jsonResult \ "outputTo").extractOrElse[String]("inline") match {
         case "inline" =>
           jsonResult \ "data" match {
             case x: JArray => resultNode.addObject("data", x, schema)
               descriptorPrintable = descriptor ++ x
             case o: JObject => resultNode.addObject("data", o, schema)
               descriptorPrintable = descriptor ++ o
+            case JNothing => {
+              /* When the "data" property is missing, as it can be if the Spark SQL
+               * Executor sees the query result has zero rows, default
+               * to an empty array to represent the result */
+              val data = JArray(List())
+              resultNode.addObject("data", data, schema)
+              descriptorPrintable = descriptor ++ data
+            }
             case _ => m_log error "Inline data misrepresented"
           }
 
