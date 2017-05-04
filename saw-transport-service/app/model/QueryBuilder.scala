@@ -135,7 +135,7 @@ object QueryBuilder {
     }).map(_.extract[String])
 
     val condition = property("filterType") match {
-      case "number" => {
+      case "integer" | "long" | "double" => {
         val operator = property("operator")
         if (operator.toLowerCase == "between")
           "BETWEEN %s AND %s".format(searchCondition(0), searchCondition(1))

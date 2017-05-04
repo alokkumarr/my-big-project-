@@ -26,16 +26,16 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     it("with joins and filters should have a WHERE clause with join and filter conditions") {
       query(artifactT, artifactU)(
         joins(join("inner", "t", "a", "u", "c")),
-        filters(filter("number", "AND", "t", "a", ">", "1"))
+        filters(filter("double", "AND", "t", "a", ">", "1"))
       ) must be ("SELECT t.a, t.b, u.c, u.d FROM t, u WHERE t.a = u.c AND t.a > 1")
     }
-    it("with number filter should have a WHERE clause with condition") {
-      query(artifactT)(filters(filter("number", "AND", "t", "a", ">", "1"))
+    it("with integer filter should have a WHERE clause with condition") {
+      query(artifactT)(filters(filter("integer", "AND", "t", "a", ">", "1"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a > 1")
     }
-    it("with number between filter should have a WHERE clause with BETWEEN") {
+    it("with long between filter should have a WHERE clause with BETWEEN") {
       query(artifactT)(filters(filter(
-        "number", "AND", "t", "a", "between", "1", "2"))
+        "long", "AND", "t", "a", "between", "1", "2"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a BETWEEN 1 AND 2")
     }
     it("with string filter should have a WHERE clause with condition") {
@@ -51,8 +51,8 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     }
     it("with two filters should have a WHERE clause with one AND") {
       query(artifactT)(filters(
-        filter("number", "AND", "t", "a", ">", "1"),
-        filter("number", "AND", "t", "b", "<", "2"))
+        filter("double", "AND", "t", "a", ">", "1"),
+        filter("double", "AND", "t", "b", "<", "2"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a > 1 AND t.b < 2")
     }
     it("with order by columns should have an ORDER BY clause") {
