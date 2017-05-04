@@ -142,13 +142,6 @@
 		<module>saw-metadata-service</module>	
 		<module>saw-data-access</module>
 		<module>saw-transport-service</module>					
-		<module>saw-support</module>
 		<module>saw-es-querybuilder</module>
-<!--
-    Note: The build fails with the error "Could not find artifact
-    ... Dalston.BUILD-SNAPSHOT", so disable module until fixed
-
-		<module>saw-composite-routing-service</module>
--->
 	</modules> 
 </project>
