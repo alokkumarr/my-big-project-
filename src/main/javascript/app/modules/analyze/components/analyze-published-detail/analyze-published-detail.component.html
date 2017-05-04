@@ -14,7 +14,7 @@
   </div>
 
     <div>
-      <md-button class="btn-tertiary" ng-click="$ctrl.openExportModal()">
+      <md-button class="btn-tertiary" ng-click="$ctrl.exportData()">
         <md-icon md-font-icon="icon-export"></md-icon>
         <span translate="EXPORT"></span>
       </md-button>
@@ -36,9 +36,9 @@
   </div>
 </md-toolbar>
   <div ng-switch="$ctrl.analysis.type">
-    <analyze-chart-detail ng-switch-when="chart" analysis="$ctrl.analysis"></analyze-chart-detail>
-    <analyze-report-detail ng-switch-when="report" analysis="$ctrl.analysis"></analyze-report-detail>
-    <analyze-pivot-detail ng-switch-when="pivot" analysis="$ctrl.analysis"></analyze-pivot-detail>
+    <analyze-chart-detail ng-switch-when="chart" analysis="$ctrl.analysis" requester="$ctrl.requester"></analyze-chart-detail>
+    <analyze-report-detail ng-switch-when="report" analysis="$ctrl.analysis" requester="$ctrl.requester"></analyze-report-detail>
+    <analyze-pivot-detail ng-switch-when="pivot" analysis="$ctrl.analysis" requester="$ctrl.requester"></analyze-pivot-detail>
   </div>
   <md-card>
     <md-card-title>

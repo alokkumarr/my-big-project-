@@ -10,7 +10,8 @@ import {ANALYZE_FILTER_SIDENAV_IDS} from '../../analyze-filter-sidenav/analyze-f
 export const AnalyzeReportDetailComponent = {
   template,
   bindings: {
-    analysis: '<'
+    analysis: '<',
+    requester: '<'
   },
   controller: class AnalyzeReportDetailController {
     constructor(FilterService) {

@@ -71,9 +71,14 @@ export const PivotGridComponent = {
       updates.filters && this.updateFilters(updates.filters);
       updates.sorts && this.updateSorts(updates.sorts);
       updates.getFields && this.sendFields({fields: this._gridInstance.getDataSource().fields()});
+      updates.export && this.exportToExcel();
       /* eslint-disable no-unused-expressions */
 
       this.replaceWarningLables();
+    }
+
+    exportToExcel() {
+      this._gridInstance.exportToExcel();
     }
 
     updateDataSource(dataSource) {
@@ -141,7 +146,7 @@ export const PivotGridComponent = {
           allowFieldDragging: false
         },
         export: {
-          enabled: false,
+          enabled: true,
           fileName: 'Sales'
         },
         dataSource: {
