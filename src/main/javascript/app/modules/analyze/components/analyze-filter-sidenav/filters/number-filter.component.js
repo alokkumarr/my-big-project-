@@ -1,15 +1,17 @@
 import values from 'lodash/values';
+import get from 'lodash/get';
+import find from 'lodash/find';
 
 import template from './number-filter.component.html';
 
 export const OPERATORS = {
-  GREATER: 'x >',
-  LESS: 'x <',
-  GREATER_OR_EQUAL: 'x >=',
-  LESS_OR_EQUAL: 'x <=',
-  EQUALS: 'x =',
-  NOT_EQUALS: 'x <>',
-  BETWEEN: '<= x <='
+  GREATER: {value: '>', shortName: 'GT', hint: 'Greater than'},
+  LESS: {value: '<', shortName: 'LT', hint: 'Less than'},
+  GREATER_OR_EQUAL: {value: '>=', shortName: 'GTE', hint: 'Greater than or equal to'},
+  LESS_OR_EQUAL: {value: '<=', shortName: 'LTE', hint: 'Less than or equal to'},
+  EQUALS: {value: '=', shortName: 'EQ', hint: 'Equal to'},
+  NOT_EQUALS: {value: '<>', shortName: 'NEQ', hint: 'Not equal to'},
+  BETWEEN: {value: 'between', shortName: 'BTW', hint: 'BETWEEN'}
 };
 
 export const NumberFilterComponent = {
@@ -26,8 +28,20 @@ export const NumberFilterComponent = {
         };
       }
 
+      if (!this.filter.operator) {
+        this.filter.operator = OPERATORS.EQUALS.value;
+      }
+
       this.OPERATORS = OPERATORS;
       this.operators = values(OPERATORS);
+    }
+
+    hintFor(operator) {
+      return get(
+        find(this.operators, op => op.value === operator),
+        'hint',
+        null
+      );
     }
   }
 };

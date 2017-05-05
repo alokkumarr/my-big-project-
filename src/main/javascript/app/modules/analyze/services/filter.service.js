@@ -109,9 +109,10 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
       };
 
       if (NUMBER_TYPES.indexOf(frontEndFilter.type) >= 0) {
+        backEndFilter.filterType = 'number';
         backEndFilter.operator = frontEndFilter.operator;
         backEndFilter.searchConditions =
-          frontEndFilter.operator === OPERATORS.BETWEEN ?
+          frontEndFilter.operator === OPERATORS.BETWEEN.value ?
           [frontEndFilter.model.otherValue, frontEndFilter.model.value] :
           [frontEndFilter.model.value];
 
@@ -147,10 +148,10 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
       if (NUMBER_TYPES.indexOf(backEndFilter.type) >= 0) {
         frontEndFilter.operator = backEndFilter.operator;
         frontEndFilter.model = {
-          otherValue: backEndFilter.operator === OPERATORS.BETWEEN ?
+          otherValue: backEndFilter.operator === OPERATORS.BETWEEN.value ?
             backEndFilter.searchConditions[0] : null,
 
-          value: backEndFilter.operator === OPERATORS.BETWEEN ?
+          value: backEndFilter.operator === OPERATORS.BETWEEN.value ?
             backEndFilter.searchConditions[1] :
             backEndFilter.searchConditions[0]
         };
@@ -328,19 +329,19 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
     const c = numberFilterModel.otherValue;
 
     switch (operator) {
-      case OPERATORS.GREATER:
+      case OPERATORS.GREATER.value:
         return a > b;
-      case OPERATORS.LESS:
+      case OPERATORS.LESS.value:
         return a < b;
-      case OPERATORS.GREATER_OR_EQUAL:
+      case OPERATORS.GREATER_OR_EQUAL.value:
         return a >= b;
-      case OPERATORS.LESS_OR_EQUAL:
+      case OPERATORS.LESS_OR_EQUAL.value:
         return a <= b;
-      case OPERATORS.NOT_EQUALS:
+      case OPERATORS.NOT_EQUALS.value:
         return a !== b;
-      case OPERATORS.EQUALS:
+      case OPERATORS.EQUALS.value:
         return a === b;
-      case OPERATORS.BETWEEN:
+      case OPERATORS.BETWEEN.value:
         return c <= a && a <= b;
       default:
         return false;
