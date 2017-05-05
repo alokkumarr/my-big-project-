@@ -9,8 +9,6 @@ import isArray from 'lodash/isArray';
 import reduce from 'lodash/reduce';
 import join from 'lodash/join';
 import json2csv from 'json2csv';
-import {saveAs} from 'file-saver';
-import Blob from 'blob';
 
 import template from './report-grid-display-container.component.html';
 import style from './report-grid-display-container.component.scss';
@@ -30,8 +28,9 @@ export const ReportGridDisplayContainerComponent = {
   },
   styles: [style],
   controller: class ReportGridDisplayContainerController {
-    constructor() {
+    constructor(fileService) {
       'ngInject';
+      this._fileService = fileService;
       this.LAYOUT_MODE = LAYOUT_MODE;
     }
 
@@ -53,8 +52,7 @@ export const ReportGridDisplayContainerComponent = {
     }
 
     onExport() {
-      const blob = new Blob([this.groupData2CSV(this.groupedData)], {type: 'text/csv;charset=utf-8'});
-      saveAs(blob, 'export.csv');
+      this._fileService.exportCSV(this.groupData2CSV(this.groupedData));
     }
 
     groupData2CSV(data) {
