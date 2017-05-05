@@ -45,7 +45,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
 
     "update analysis" in {
       /* Update previously created analysis */
-      val checkedJson: JValue = ("checked", "true")
+      val checkedJson: JValue = ("saved", "true")
       analysis = analysis.merge(checkedJson)
       /* Set columns to checked to ensure there are at least some selected
        * columns for the query builder */
@@ -64,12 +64,24 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
     }
 
     "execute analysis" in {
-      /* Execute previously created analysis */
+      /* Execute previously updated analysis */
       val body = actionKeyMessage("execute", id)
-      val analysis = analyze(sendRequest(body))
-      /* Note: Currently the result is just the static mock */
-      val JString(value) = (analysis \ "data")(0) \ "SESSION_ID"
+      val response = analyze(sendRequest(body))
+      val JString(value) = (response \ "data")(0) \ "SESSION_ID"
       value must be ("0025D642-5ED9-49DE-96B5-6F643DFDBB1F")
+    }
+
+    "execute analysis with manual query" in {
+      /* Update previously executed analysis */
+      val manualJson: JValue = ("queryManual", "SELECT 1 AS a")
+      analysis = analyze(sendRequest(
+        actionKeyAnalysisMessage("update", id,
+          analysis.merge(manualJson))))
+      /* Execute updated analysis */
+      val body = actionKeyMessage("execute", id)
+      val response = analyze(sendRequest(body))
+      val JInt(value) = (response \ "data")(0) \ "a"
+      value must be (1)
     }
 
     "delete analysis" in {

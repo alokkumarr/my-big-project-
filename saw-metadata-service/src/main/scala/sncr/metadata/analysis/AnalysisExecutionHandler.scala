@@ -63,7 +63,8 @@ class AnalysisExecutionHandler(val nodeId : String) {
 
   m_log debug s"Check definition before extracting value ==> ${pretty(render(definition))}"
 
-  val sql = ( definition \ "query").extractOrElse[String]("")
+  val sqlManual = (definition \ "queryManual").extractOrElse[String]("")
+  val sql = if (sqlManual != "") sqlManual else (definition \ "query").extractOrElse[String]("")
   val outputType = ( definition \ "outputFile" \ "outputFormat").extractOrElse[String]("")
   val outputLocation = ( definition \ "outputFile" \ "outputFileName").extractOrElse[String]("")
   val targetName = (definition \ "metricName").extract[String] + "_" + objectCount
