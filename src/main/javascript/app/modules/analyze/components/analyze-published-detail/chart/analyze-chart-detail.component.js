@@ -7,7 +7,8 @@ import style from './analyze-chart-detail.component.scss';
 export const AnalyzeChartDetailComponent = {
   template,
   bindings: {
-    analysis: '<'
+    analysis: '<',
+    requester: '<'
   },
   styles: [style],
   controller: class AnalyzeChartDetailController {
@@ -41,6 +42,20 @@ export const AnalyzeChartDetailComponent = {
           data: [100, 25, 45, 100, 22]
         }]
       };
+    }
+
+    $onInit() {
+      this.requester.subscribe(requests => this.request(requests));
+    }
+
+    request(requests) {
+      /* eslint-disable no-unused-expressions */
+      requests.export && this.onExport();
+      /* eslint-disable no-unused-expressions */
+    }
+
+    onExport() {
+      // TODO export data
     }
 
     generateData() {
