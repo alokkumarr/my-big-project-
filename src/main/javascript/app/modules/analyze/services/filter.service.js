@@ -7,9 +7,9 @@ import pipe from 'lodash/fp/pipe';
 import reduce from 'lodash/fp/reduce';
 import filter from 'lodash/fp/filter';
 import isEmpty from 'lodash/isEmpty';
+import isNumber from 'lodash/isNumber';
 import set from 'lodash/fp/set';
 import values from 'lodash/values';
-import compact from 'lodash/compact';
 import forEach from 'lodash/forEach';
 import find from 'lodash/find';
 
@@ -225,7 +225,7 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
     }
 
     // can be an object with null values
-    if (isEmpty(compact(values(model)))) {
+    if (isEmpty(filter(x => isNumber(x) || Boolean(x), values(model)))) {
       return false;
     }
     return true;
