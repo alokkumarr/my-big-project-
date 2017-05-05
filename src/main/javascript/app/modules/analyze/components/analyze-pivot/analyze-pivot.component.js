@@ -81,18 +81,23 @@ export const AnalyzePivotComponent = {
       this.settingsModified = true;
     }
 
+    setDataSource(store, fields) {
+      this.dataSource = new PivotGridDataSource({store, fields});
+      this.pivotGridUpdater.next({
+        dataSource: this.dataSource
+      });
+      this.fieldChooserIsntance.option({
+        dataSource: this.dataSource
+      });
+    }
+
     prepareFields(artifactAttributes) {
       this.fields = this._PivotService.getBackend2FrontendFieldMapper()(artifactAttributes);
-
-      this.dataSource = new PivotGridDataSource({
-        fields: this.fields
-      });
 
       this.fieldChooserOptions = {
         onContentReady: e => {
           this.fieldChooserIsntance = e.component;
         },
-        dataSource: this.dataSource,
         layout: 1,
         width: 400,
         height: 800
@@ -100,12 +105,9 @@ export const AnalyzePivotComponent = {
 
       // repaint the field chooser so it fills the cointainer
       this._$timeout(() => {
+        this.setDataSource(this.dataSource.store, this.fields);
         this.fieldChooserIsntance.repaint();
       }, 400);
-
-      this.pivotGridUpdater.next({
-        dataSource: this.dataSource
-      });
     }
 
     toggleSettingsSidenav() {
@@ -127,12 +129,7 @@ export const AnalyzePivotComponent = {
         }
         this.dataSource.store = this.deNormalizedData;
 
-        this.pivotGridUpdater.next({
-          dataSource: {
-            fields: this.fields,
-            store: this.dataSource.store
-          }
-        });
+        this.setDataSource(this.dataSource.store, this.fields);
         this.settingsModified = false;
       });
     }

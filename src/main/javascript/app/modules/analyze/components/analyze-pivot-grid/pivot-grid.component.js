@@ -2,7 +2,6 @@ import forEach from 'lodash/forEach';
 import assign from 'lodash/assign';
 import values from 'lodash/values';
 import mapValues from 'lodash/mapValues';
-import unSet from 'lodash/unSet';
 import fpPipe from 'lodash/fp/pipe';
 import fpFilter from 'lodash/fp/filter';
 import fpMap from 'lodash/fp/map';
