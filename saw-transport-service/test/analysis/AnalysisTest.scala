@@ -82,6 +82,11 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
   }
 
   def analyze(response: JValue): JValue = {
-    (response \ "contents" \ "analyze")(0)
+    val analyzes = (response \ "contents" \ "analyze") match {
+      case array: JArray => array.arr
+      case obj: JValue => throw new RuntimeException("Expected JArray: " + obj)
+    }
+    analyzes.length must be (1)
+    analyzes(0)
   }
 }

@@ -80,7 +80,10 @@ class ANA extends BaseServiceProvider {
         if (result != Success.id) {
           throw new ClientException("Updating failed: " + message)
         }
-        json merge contentsAnalyze(responseJson)
+        json.removeField({
+          case JField("analyze", JArray(_)) => true
+          case _ => false
+        }).merge(contentsAnalyze(responseJson))
       }
       case "read" => {
         val analysisId = extractAnalysisId(json)
