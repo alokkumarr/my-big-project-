@@ -6,7 +6,7 @@ import fpMap from 'lodash/fp/map';
 import fpPipe from 'lodash/fp/pipe';
 import fpFilter from 'lodash/fp/filter';
 import find from 'lodash/find';
-import take from 'lodash/take';
+import filter from 'lodash/filter';
 import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
@@ -41,6 +41,7 @@ export const AnalyzePivotComponent = {
       this.filters = null;
       this.sortFields = null;
       this.pivotGridUpdater = new BehaviorSubject({});
+      this.settingsModified = false;
     }
 
     $onInit() {
@@ -77,20 +78,21 @@ export const AnalyzePivotComponent = {
 
     onApplyFieldSettings() {
       this.sortFields = this.getFieldToSortFieldMapper()(this.fields);
+      this.settingsModified = true;
     }
 
     prepareFields(artifactAttributes) {
       this.fields = this._PivotService.getBackend2FrontendFieldMapper()(artifactAttributes);
 
-      const dataSource = new PivotGridDataSource({
+      this.dataSource = new PivotGridDataSource({
         fields: this.fields
       });
 
       this.fieldChooserOptions = {
         onContentReady: e => {
-          this.gridIsntance = e.component;
+          this.fieldChooserIsntance = e.component;
         },
-        dataSource,
+        dataSource: this.dataSource,
         layout: 1,
         width: 400,
         height: 800
@@ -98,11 +100,11 @@ export const AnalyzePivotComponent = {
 
       // repaint the field chooser so it fills the cointainer
       this._$timeout(() => {
-        this.gridIsntance.repaint();
+        this.fieldChooserIsntance.repaint();
       }, 400);
 
       this.pivotGridUpdater.next({
-        dataSource
+        dataSource: this.dataSource
       });
     }
 
@@ -123,13 +125,15 @@ export const AnalyzePivotComponent = {
         if (isEmpty(this.filters)) {
           this.filters = this._PivotService.mapFieldsToFilters(this.normalizedData, this.fields);
         }
+        this.dataSource.store = this.deNormalizedData;
 
         this.pivotGridUpdater.next({
           dataSource: {
-            store: this.deNormalizedData,
-            fields: this.fields
+            fields: this.fields,
+            store: this.dataSource.store
           }
         });
+        this.settingsModified = false;
       });
     }
 
@@ -147,6 +151,7 @@ export const AnalyzePivotComponent = {
       this.pivotGridUpdater.next({
         filters: this.filters
       });
+      this.settingsModified = true;
     }
 
     onClearAllFilters() {
@@ -176,6 +181,7 @@ export const AnalyzePivotComponent = {
 
     applySorts(sorts) {
       this.pivotGridUpdater.next({sorts});
+      this.settingsModified = true;
     }
 
     openSortModal(ev) {
@@ -225,6 +231,7 @@ export const AnalyzePivotComponent = {
 
     openPreviewModal(ev) {
       const tpl = '<analyze-pivot-preview model="model"></analyze-pivot-preview>';
+      this.updateFields();
 
       this._$mdDialog
         .show({
@@ -232,8 +239,10 @@ export const AnalyzePivotComponent = {
           controller: scope => {
             scope.model = {
               pivot: this.model,
-              dataSource: this.dataSource,
-              defaultOptions: this.getDefaultOptions()
+              dataSource: {
+                store: this.dataSource.store,
+                fields: this.fields
+              }
             };
           },
           targetEvent: ev,
@@ -264,7 +273,8 @@ export const AnalyzePivotComponent = {
 
     onGetFields(fields) {
       // pivotgrid adds some other fields in plus, so we have to take only the real ones
-      this.fieldsToSave = take(fields, this.fields.length);
+      this.fields = fields;
+      this.fieldsToSave = filter(fields, 'area');
     }
 
     updateFields() {
