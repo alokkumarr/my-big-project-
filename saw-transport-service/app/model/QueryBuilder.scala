@@ -163,7 +163,10 @@ object QueryBuilder {
     )
   }
 
-  private def buildGroupBy(sqlBuilder: JObject) = {
+  private def buildGroupBy(sqlBuilder: JObject): String = {
+    if (true)
+      /* Note: Group by disabled until aggregate functions implemented */
+      return ""
     val groupBy: List[JValue] = sqlBuilder \ "groupByColumns" match {
       case l: JArray => l.arr
       case JNothing => List.empty

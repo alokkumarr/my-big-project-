@@ -61,12 +61,15 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
       query(artifactT)(orderBy(orderByA, orderByB)
       ) must be ("SELECT t.a, t.b FROM t ORDER BY t.a ASC, t.b DESC")
     }
+    /*
+    // Note: Disabled until aggregate functions implemented
     it("with group by columns should have an GROUP BY clause") {
       val groupByA = groupByColumn("t", "a")
       val groupByB = groupByColumn("t", "b")
       query(artifactT)(groupBy(groupByA, groupByB)
       ) must be ("SELECT t.a, t.b FROM t GROUP BY t.a, t.b")
     }
+     */
   }
 
   describe("Query built from analysis with multiple artifacts") {
