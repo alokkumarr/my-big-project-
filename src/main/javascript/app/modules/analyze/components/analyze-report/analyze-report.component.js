@@ -149,10 +149,8 @@ export const AnalyzeReportComponent = {
 
     generateFiltersOnCanvasChange() {
       this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
-      if (!isEmpty(this.canvas.model.filters)) {
-        this.filters.selected = this.canvas.model.filters;
-        this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.canvas.model.filters, this.filters.possible);
-        this.onApplyFilters(this.filters.possible);
+      if (!isEmpty(this.filters.selected)) {
+        this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.filters.selected, this.filters.possible);
       }
       // this.clearFilters();
     }
@@ -225,7 +223,6 @@ export const AnalyzeReportComponent = {
       this._unregisterCanvasHandlers = this._unregisterCanvasHandlers.concat([
 
         this.canvas._$eventEmitter.on('changed', () => {
-          this.generateFiltersOnCanvasChange();
           this.reloadPreviewGrid(true);
         }),
 
@@ -482,10 +479,12 @@ export const AnalyzeReportComponent = {
 
           if (this.columns.length === 0) {
             this.filteredGridData = this.gridData = [];
+            this.generateFiltersOnCanvasChange();
             this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
           } else {
             this.refreshGridData(data => {
               this.filteredGridData = this.gridData = data;
+              this.generateFiltersOnCanvasChange(); // update filters with new data
               this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
             });
           }
