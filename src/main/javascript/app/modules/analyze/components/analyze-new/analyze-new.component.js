@@ -70,6 +70,7 @@ export const AnalyzeNewComponent = {
             description: '',
             category: this.subCategory,
             semanticId: metricId,
+            metricName: this.selectedMetric.name,
             scheduled: null
           };
           break;
