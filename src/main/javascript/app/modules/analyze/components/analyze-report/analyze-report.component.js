@@ -151,6 +151,7 @@ export const AnalyzeReportComponent = {
       this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
       if (!isEmpty(this.filters.selected)) {
         this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.filters.selected, this.filters.possible);
+        this.filters.selected = this._FilterService.getSelectedFilterMapper()(this.filters.possible);
       }
       // this.clearFilters();
     }
