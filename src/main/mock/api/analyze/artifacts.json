@@ -1,837 +1,1050 @@
 [
   {
-    "artifact_name": "Orders",
-    "artifact_position": [
-      0,
-      0
-    ],
+    "artifact_name": "MCT_SESSION",
+    "artifact_position": [0, 0],
     "artifact_attributes": [
       {
-        "column_name": "ORDER_NUMBER",
-        "display_name": "Order Number",
+        "name": "TRANSFER_END_TS",
+        "column_name": "TRANSFER_END_TS",
+        "display_name": "Transfer End TS",
         "alias_name": "",
+        "table": "MCT_SESSION",
         "type": "string",
-        "hide": false,
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SOURCE_CARRIER_ID",
+        "column_name": "SOURCE_CARRIER_ID",
+        "display_name": "Source Carrier Id",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "type": "string",
         "join_eligible": true,
-        "filter_eligible": false,
-        "checked": false
+        "filter_eligible": true
       },
       {
-        "column_name": "ORDER_END_TIMESTAMP",
-        "display_name": "Order End Timestamp",
-        "alias_name": "",
+        "name": "SOURCE_MANUFACTURER",
         "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "CUSTOMER_ID",
-        "display_name": "Customer ID",
+        "column_name": "SOURCE_MANUFACTURER",
+        "display_name": "Source Manufacturer",
         "alias_name": "",
-        "type": "string",
-        "hide": false,
+        "table": "MCT_SESSION",
         "join_eligible": true,
-        "filter_eligible": false,
-        "checked": false
+        "filter_eligible": true
       },
-
       {
-        "column_name": "REC_STATE",
-        "display_name": "Rec State",
-        "alias_name": "",
+        "name": "SIZE_BUCKET_SORT",
         "type": "int",
-        "hide": false,
+        "column_name": "SIZE_BUCKET_SORT",
+        "display_name": "Size Bucket Sort",
+        "alias_name": "",
+        "table": "MCT_SESSION",
         "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
+        "filter_eligible": true
       },
       {
-        "column_name": "SERVICE",
-        "display_name": "Service",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "EXTERNAL_ORDER_NUMBER",
-        "display_name": "External Order Number",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "FACT_PRODUCT_ID",
-        "display_name": "Fact Product Id",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "ENR_PARTNER",
-        "display_name": "Enr Partner",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "EVER_PENDING_INSTALL",
-        "display_name": "Ever Pending Install",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "REASON_NOTE",
-        "display_name": "Reason Note",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "CON_SMB",
-        "display_name": "Con Smb",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "CUSTOMER",
-        "display_name": "Customer",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "CUSTOMER_TYPE",
-        "display_name": "Customer Type",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "CHANNEL",
-        "display_name": "Channel",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "START_DATE",
-        "display_name": "Start Date",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "END_DATE",
-        "display_name": "End Date",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-
-      {
-        "column_name": "UPGRADE_PRODUCT_TYPE",
-        "display_name": "Upgrade Product Type",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "BANDWIDTH_BUCKET",
-        "display_name": "Bandwidth Bucket",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "REASON_DESC",
-        "display_name": "Reason Desc",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "PARTNER",
-        "display_name": "Partner",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "AFFILIATE_DISPLAY_NAME",
-        "display_name": "Affiliate Display Name",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-
-      {
-        "column_name": "ORDER_STATUS_DATE",
-        "display_name": "Order Status Date",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "ORDER_STATUS_END_DATE",
-        "display_name": "Order Status End Date",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "ORDER_CANCELLATION_TIME",
-        "display_name": "Order Cancellation Time",
-        "alias_name": "",
+        "name": "AVAILABLE_ITEMS",
         "type": "int",
-        "hide": false,
+        "column_name": "AVAILABLE_ITEMS",
+        "display_name": "Available Items",
+        "alias_name": "",
+        "table": "MCT_SESSION",
         "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
+        "filter_eligible": true
       },
       {
-        "column_name": "ORDER_STATUS_START_DATE",
-        "display_name": "Order Status Start Date",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "ORDER_RECEIVED_TIMESTAMP",
-        "display_name": "Order Received Timestamp",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "ORDER_RECEIVED_DATE",
-        "display_name": "Order Received Date",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "ORDER_STATUS_TIME",
-        "display_name": "Order Status Time",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "ORDER_TYPE",
-        "display_name": "Order Type",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "ORDER_CLASSIFICATION",
-        "display_name": "Order Classification",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "ORDER_COMPLETION_TIME",
-        "display_name": "Order Completion Time",
-        "alias_name": "",
+        "name": "TRANSFER_SECONDS",
         "type": "int",
-        "hide": false,
+        "column_name": "TRANSFER_SECONDS",
+        "display_name": "Transfer Seconds",
+        "alias_name": "",
+        "table": "MCT_SESSION",
         "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
+        "filter_eligible": true
       },
       {
-        "column_name": "ORDER_CNT",
-        "display_name": "Order Count",
-        "alias_name": "",
-        "type": "int",
-        "hide": true,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "ORD_OM_STATUS",
-        "display_name": "Order Status",
-        "alias_name": "",
+        "name": "SESSION_ID",
         "type": "string",
-        "hide": false,
+        "column_name": "SESSION_ID",
+        "display_name": "Session Id",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": true,
+        "filter_eligible": true
+      },
+      {
+        "name": "TRANSFER_ITEMS",
+        "type": "int",
+        "column_name": "TRANSFER_ITEMS",
+        "display_name": "Transfer Items",
+        "alias_name": "",
+        "table": "MCT_SESSION",
         "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
+        "filter_eligible": true
+      },
+      {
+        "name": "DURATION_BUCKET_SORT",
+        "type": "int",
+        "column_name": "DURATION_BUCKET_SORT",
+        "display_name": "Duration Bucket Sort",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SOURCE_MODEL",
+        "type": "string",
+        "column_name": "SOURCE_MODEL",
+        "display_name": "Source Model",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": true,
+        "filter_eligible": true
+      },
+      {
+        "name": "TARGET_ACTIVECARRIERID",
+        "type": "string",
+        "column_name": "TARGET_ACTIVECARRIERID",
+        "display_name": "Target Active Carrier Id",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": true,
+        "filter_eligible": true
+      },
+      {
+        "name": "LINK_SPEED",
+        "type": "int",
+        "column_name": "LINK_SPEED",
+        "display_name": "Link Speed",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TRANSFER_BYTES",
+        "type": "int",
+        "column_name": "TRANSFER_BYTES",
+        "display_name": "Transfer Bytes",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "HAS_MUSIC",
+        "type": "string",
+        "column_name": "HAS_MUSIC",
+        "display_name": "Has Music",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SELECTED_ITEMS",
+        "type": "int",
+        "column_name": "SELECTED_ITEMS",
+        "display_name": "Selected Items",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "AVAILABLE_BYTES",
+        "type": "int",
+        "column_name": "AVAILABLE_BYTES",
+        "display_name": "Available Bytes",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "FAILED_ITEMS",
+        "type": "int",
+        "column_name": "FAILED_ITEMS",
+        "display_name": "Failed Items",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SOURCE_DEVICE_ID",
+        "type": "string",
+        "column_name": "SOURCE_DEVICE_ID",
+        "display_name": "Source Device Id",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": true,
+        "filter_eligible": true
+      },
+      {
+        "name": "ERROR_COUNT",
+        "type": "int",
+        "column_name": "ERROR_COUNT",
+        "display_name": "Error Count",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SOURCE_INTERNALVERSION",
+        "type": "string",
+        "column_name": "SOURCE_INTERNALVERSION",
+        "display_name": "Source Internal Version",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "HAS_DOCUMENTS",
+        "type": "string",
+        "column_name": "HAS_DOCUMENTS",
+        "display_name": "Has Documents",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "HAS_MESSAGES",
+        "type": "string",
+        "column_name": "HAS_MESSAGES",
+        "display_name": "Has Messages",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "OPCO",
+        "type": "string",
+        "column_name": "OPCO",
+        "display_name": "OPCO",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": true,
+        "filter_eligible": true
+      },
+      {
+        "name": "SESSION_STATUS",
+        "type": "string",
+        "column_name": "SESSION_STATUS",
+        "display_name": "Session Status",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TARGET_MANUFACTURER",
+        "type": "string",
+        "column_name": "TARGET_MANUFACTURER",
+        "display_name": "Target Manufacturer",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TARGET_OS",
+        "type": "string",
+        "column_name": "TARGET_OS",
+        "display_name": "Target OS",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SELECTED_BYTES",
+        "type": "int",
+        "column_name": "SELECTED_BYTES",
+        "display_name": "Selected Bytes",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TARGET_APP_VERSION",
+        "type": "string",
+        "column_name": "TARGET_APP_VERSION",
+        "display_name": "Target App Version",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TRANSFER_METHOD",
+        "type": "string",
+        "column_name": "TRANSFER_METHOD",
+        "display_name": "Transfer Method",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SUMMARY_TYPE",
+        "type": "string",
+        "column_name": "SUMMARY_TYPE",
+        "display_name": "Summary Type",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "HAS_CALL_LOGS",
+        "type": "string",
+        "column_name": "HAS_CALL_LOGS",
+        "display_name": "Has Call Logs",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TARGET_INTERNALVERSION",
+        "type": "string",
+        "column_name": "TARGET_INTERNALVERSION",
+        "display_name": "Target Internal Version",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SERVER_TIMESTAMP",
+        "type": "string",
+        "column_name": "SERVER_TIMESTAMP",
+        "display_name": "Server Timestamp",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SOURCE_APP_VERSION",
+        "type": "string",
+        "column_name": "SOURCE_APP_VERSION",
+        "display_name": "Source App Version",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "HAS_IMAGES",
+        "type": "string",
+        "column_name": "HAS_IMAGES",
+        "display_name": "Has Images",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "AVAILABLE_MB",
+        "type": "int",
+        "column_name": "AVAILABLE_MB",
+        "display_name": "Available (MB)",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "MSISDN",
+        "type": "string",
+        "column_name": "MSISDN",
+        "display_name": "MSISDN",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "HAS_OTHER",
+        "type": "string",
+        "column_name": "HAS_OTHER",
+        "display_name": "Has Other",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SERVER_MONTH",
+        "type": "string",
+        "column_name": "SERVER_MONTH",
+        "display_name": "Server Month",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TARGET_MODEL",
+        "type": "string",
+        "column_name": "TARGET_MODEL",
+        "display_name": "Target Model",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "QUARATINE_CODE",
+        "type": "int",
+        "column_name": "QUARATINE_CODE",
+        "display_name": "Quaratine Code",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TARGET_DEVICE_ID",
+        "type": "string",
+        "column_name": "TARGET_DEVICE_ID",
+        "display_name": "Target Device Id",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": true,
+        "filter_eligible": true
+      },
+      {
+        "name": "SOURCE_OS",
+        "type": "string",
+        "column_name": "SOURCE_OS",
+        "display_name": "Source OS",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "LINK_TYPE",
+        "type": "string",
+        "column_name": "LINK_TYPE",
+        "display_name": "Link Type",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TARGET_CARRIER_ID",
+        "type": "string",
+        "column_name": "TARGET_CARRIER_ID",
+        "display_name": "Target Carrier Id",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": true,
+        "filter_eligible": true
+      },
+      {
+        "name": "IMSI",
+        "type": "string",
+        "column_name": "IMSI",
+        "display_name": "IMSI",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": true,
+        "filter_eligible": true
+      },
+      {
+        "name": "TRANSFER_LOCATION",
+        "type": "string",
+        "column_name": "TRANSFER_LOCATION",
+        "display_name": "Transfer Location",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SIZE_BUCKET",
+        "type": "string",
+        "column_name": "SIZE_BUCKET",
+        "display_name": "Size Bucket",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SSID",
+        "type": "string",
+        "column_name": "SSID",
+        "display_name": "SSID",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": true,
+        "filter_eligible": true
+      },
+      {
+        "name": "ICCID",
+        "type": "string",
+        "column_name": "ICCID",
+        "display_name": "ICCID",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": true,
+        "filter_eligible": true
+      },
+      {
+        "name": "HAS_VIDEOS",
+        "type": "string",
+        "column_name": "HAS_VIDEOS",
+        "display_name": "Has Videos",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TRANSFER_MINUTES",
+        "type": "int",
+        "column_name": "TRANSFER_MINUTES",
+        "display_name": "Transfer Minutes",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "DURATION_BUCKET",
+        "type": "string",
+        "column_name": "DURATION_BUCKET",
+        "display_name": "Duration Bucket",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "HAS_CONTACTS",
+        "type": "string",
+        "column_name": "HAS_CONTACTS",
+        "display_name": "Has Contacts",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "IMEI",
+        "type": "string",
+        "column_name": "IMEI",
+        "display_name": "IMEI",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": true,
+        "filter_eligible": true
+      },
+      {
+        "name": "CHANNEL_WIDTH",
+        "type": "int",
+        "column_name": "CHANNEL_WIDTH",
+        "display_name": "Channel Width",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SOURCE_ACTIVECARRIERID",
+        "type": "string",
+        "column_name": "SOURCE_ACTIVECARRIERID",
+        "display_name": "Source_Active Carrier Id",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": true,
+        "filter_eligible": true
+      },
+      {
+        "name": "TIME_LINE_DAYS",
+        "type": "string",
+        "column_name": "TIME_LINE_DAYS",
+        "display_name": "Time Line Days",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "FAILED_BYTES",
+        "type": "int",
+        "column_name": "FAILED_BYTES",
+        "display_name": "Failed Bytes",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SOURCE_TIMEZONE",
+        "type": "string",
+        "column_name": "SOURCE_TIMEZONE",
+        "display_name": "Source Timezone",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TRANSFER_START_TS",
+        "type": "string",
+        "column_name": "TRANSFER_START_TS",
+        "display_name": "Transfer Start TS",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TRANSFER_MB",
+        "type": "int",
+        "column_name": "TRANSFER_MB",
+        "display_name": "Transfer (MB)",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "FAILED_MB",
+        "type": "int",
+        "column_name": "FAILED_MB",
+        "display_name": "Failed (MB)",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TARGET_TIMEZONE",
+        "type": "string",
+        "column_name": "TARGET_TIMEZONE",
+        "display_name": "Target Timezone",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "IN_STORE_TRANSFER",
+        "type": "string",
+        "column_name": "IN_STORE_TRANSFER",
+        "display_name": "InStore Transfer",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "FATAL_ERROR_FLAG",
+        "type": "string",
+        "column_name": "FATAL_ERROR_FLAG",
+        "display_name": "Fatal Error Flag",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TRANSFER_TYPE",
+        "type": "string",
+        "column_name": "TRANSFER_TYPE",
+        "display_name": "Transfer Type",
+        "alias_name": "",
+        "table": "MCT_SESSION",
+        "join_eligible": false,
+        "filter_eligible": true
       }
     ],
     "sql_builder": {
-      "group_by_columns": [],
-      "order_by_columns": [],
       "joins": [
         {
           "type": "inner",
           "criteria": [
             {
-              "table_name": "Orders",
-              "column_name": "ORDER_NUMBER",
+              "table_name": "MCT_SESSION",
+              "column_name": "SESSION_ID",
               "side": "right"
             },
             {
-              "table_name": "Products",
-              "column_name": "ORDER_NUMBER",
-              "side": "left"
-            }
-          ]
-        },
-        {
-          "type": "inner",
-          "criteria": [
-            {
-              "table_name": "Orders",
-              "column_name": "CUSTOMER_ID",
-              "side": "right"
-            },
-            {
-              "table_name": "Customers",
-              "column_name": "CUSTOMER_ID",
-              "side": "left"
-            }
-          ]
-        },
-        {
-          "type": "inner",
-          "criteria": [
-            {
-              "table_name": "Products",
-              "column_name": "SERVICE_ID",
-              "side": "right"
-            },
-            {
-              "table_name": "Service",
-              "column_name": "SERVICE_ID",
+              "table_name": "MCT_CONTENT_SUMMARY",
+              "column_name": "SESSION_ID",
               "side": "left"
             }
           ]
         }
-      ]
+      ],
+      "group_by_columns": [],
+      "order_by_columns": []
     }
   },
   {
-    "artifact_name": "Products",
-    "artifact_position": [
-      500,
-      0
-    ],
+    "artifact_name": "MCT_CONTENT_SUMMARY",
+    "artifact_position": [300, 0],
     "artifact_attributes": [
       {
-        "column_name": "PRODUCT_ID",
-        "display_name": "Product ID",
-        "alias_name": "",
+        "name": "SUMMARY_TYPE",
         "type": "string",
-        "hide": false,
+        "column_name": "SUMMARY_TYPE",
+        "display_name": "Summary Type",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
         "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
+        "filter_eligible": true
       },
       {
-        "column_name": "SERVICE_ID",
-        "display_name": "Service ID",
-        "alias_name": "",
+        "name": "SESSION_ID",
         "type": "string",
-        "hide": false,
+        "column_name": "SESSION_ID",
+        "display_name": "Session Id",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
         "join_eligible": true,
-        "filter_eligible": false,
-        "checked": false
+        "filter_eligible": true
       },
       {
-        "column_name": "PRODUCT_STATUS_DATE",
-        "display_name": "Product Status Date",
-        "alias_name": "",
+        "name": "OPCO",
         "type": "string",
-        "hide": false,
+        "column_name": "OPCO",
+        "display_name": "OPCO",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
         "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
+        "filter_eligible": true
       },
       {
-        "column_name": "ORDER_NUMBER",
-        "display_name": "Order Number",
+        "name": "SERVER_DIM_DATE",
+        "type": "date",
+        "column_name": "SERVER_DIM_DATE",
+        "display_name": "Server Dim Date",
         "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": true,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "PRODUCT_STATUS_START_DATE",
-        "display_name": "Product Status Start Date",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
+        "table": "MCT_CONTENT_SUMMARY",
         "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
+        "filter_eligible": true
       },
       {
-        "column_name": "PRODUCT_STATUS_END_DATE",
-        "display_name": "Product Status End Date",
-        "alias_name": "",
+        "name": "TARGET_OS",
         "type": "string",
-        "hide": false,
+        "column_name": "TARGET_OS",
+        "display_name": "Target OS",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
         "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
+        "filter_eligible": true
       },
       {
-        "column_name": "PRODUCT_GROUP_DESC",
-        "display_name": "Product Group Desc",
-        "alias_name": "",
+        "name": "TARGET_APP_VERSION",
         "type": "string",
-        "hide": false,
+        "column_name": "TARGET_APP_VERSION",
+        "display_name": "Target App. Version",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
         "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
+        "filter_eligible": true
       },
       {
-        "column_name": "PRODUCT_GROUP_NAME",
-        "display_name": "Product Group Name",
-        "alias_name": "",
+        "name": "TARGET_MANUFACTURER",
         "type": "string",
-        "hide": false,
+        "column_name": "TARGET_MANUFACTURER",
+        "display_name": "Target Manufacturer",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
         "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
+        "filter_eligible": true
       },
       {
-        "column_name": "ENR_PRODUCT",
-        "display_name": "Enr Product",
-        "alias_name": "",
+        "name": "TARGET_MODEL",
         "type": "string",
-        "hide": false,
+        "column_name": "TARGET_MODEL",
+        "display_name": "Target Model",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
         "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
+        "filter_eligible": true
       },
       {
-        "column_name": "PRODUCT_CANCELLATION_TIME",
-        "display_name": "Product Cancellation Time",
+        "name": "SOURCE_OS",
+        "type": "string",
+        "column_name": "SOURCE_OS",
+        "display_name": "Source OS",
         "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SOURCE_APP_VERSION",
+        "type": "string",
+        "column_name": "SOURCE_APP_VERSION",
+        "display_name": "Source App. Version",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SOURCE_MANUFACTURER",
+        "type": "string",
+        "column_name": "SOURCE_MANUFACTURER",
+        "display_name": "Source Manufacturer",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SOURCE_MODEL",
+        "type": "string",
+        "column_name": "SOURCE_MODEL",
+        "display_name": "Source Model",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "FATAL_ERROR_FLAG",
+        "type": "string",
+        "column_name": "FATAL_ERROR_FLAG",
+        "display_name": "Fatal Error Flag",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SESSION_STATUS",
+        "type": "string",
+        "column_name": "SESSION_STATUS",
+        "display_name": "Session Status",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TRANSFER_LOCATION",
+        "type": "string",
+        "column_name": "TRANSFER_LOCATION",
+        "display_name": "Transfer Location",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "QUARATINE_CODE",
         "type": "int",
-        "hide": false,
+        "column_name": "QUARATINE_CODE",
+        "display_name": "Quaratine Code",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
         "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
+        "filter_eligible": true
       },
       {
-        "column_name": "PRODUCT_DISPLAY_NAME",
-        "display_name": "Product Display Name",
-        "alias_name": "",
+        "name": "CONTENT_CLASS",
         "type": "string",
-        "hide": false,
+        "column_name": "CONTENT_CLASS",
+        "display_name": "Content Class",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
         "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
+        "filter_eligible": true
       },
       {
-        "column_name": "PRODUCT_DESC",
-        "display_name": "Product Desc",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "PRODUCT_CNT",
-        "display_name": "Product Count",
-        "alias_name": "",
+        "name": "AVAILABLE_ITEMS",
         "type": "int",
-        "hide": false,
+        "column_name": "AVAILABLE_ITEMS",
+        "display_name": "Available Items",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
         "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
+        "filter_eligible": true
       },
       {
-        "column_name": "PRODUCT_END_TIMESTAMP",
-        "display_name": "Product End Timestamp",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "PRODUCT_TYPES",
-        "display_name": "Product Types",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "PRODUCT_STATUS_TIME",
-        "display_name": "Product Status Time",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "PRODUCT_COMPLETION_TIME",
-        "display_name": "Product Completion Time",
-        "alias_name": "",
+        "name": "SELECTED_ITEMS",
         "type": "int",
-        "hide": false,
+        "column_name": "SELECTED_ITEMS",
+        "display_name": "Selected Items",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
         "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
+        "filter_eligible": true
       },
       {
-        "column_name": "PRODUCT_CATEGORY",
-        "display_name": "Product Category",
+        "name": "TRANSFER_ITEMS",
+        "type": "int",
+        "column_name": "TRANSFER_ITEMS",
+        "display_name": "Transfer Items",
         "alias_name": "",
-        "type": "string",
-        "hide": false,
+        "table": "MCT_CONTENT_SUMMARY",
         "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
+        "filter_eligible": true
       },
       {
-        "column_name": "BUNDLE_TYPE",
-        "display_name": "Bundle Type",
+        "name": "FAILED_ITEMS",
+        "type": "int",
+        "column_name": "FAILED_ITEMS",
+        "display_name": "Failed Items",
         "alias_name": "",
-        "type": "string",
-        "hide": false,
+        "table": "MCT_CONTENT_SUMMARY",
         "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
+        "filter_eligible": true
+      },
+      {
+        "name": "AVAILABLE_BYTES",
+        "type": "int",
+        "column_name": "AVAILABLE_BYTES",
+        "display_name": "Available Bytes",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "AVAILABLE_MB",
+        "type": "int",
+        "column_name": "AVAILABLE_MB",
+        "display_name": "Available MB",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SELECTED_BYTES",
+        "type": "int",
+        "column_name": "SELECTED_BYTES",
+        "display_name": "Selected Bytes",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SELECTED_MB",
+        "type": "int",
+        "column_name": "SELECTED_MB",
+        "display_name": "Selected MB",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TRANSFER_BYTES",
+        "type": "int",
+        "column_name": "TRANSFER_BYTES",
+        "display_name": "Transfer Bytes",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TRANSFER_MB",
+        "type": "int",
+        "column_name": "TRANSFER_MB",
+        "display_name": "Transfer MB",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "FAILED_BYTES",
+        "type": "int",
+        "column_name": "FAILED_BYTES",
+        "display_name": "Failed Bytes",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "FAILED_MB",
+        "type": "int",
+        "column_name": "FAILED_MB",
+        "display_name": "Failed MB",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SERVER_TIMESTAMP",
+        "type": "timestamp",
+        "column_name": "SERVER_TIMESTAMP",
+        "display_name": "Server Timestamp",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "SSID",
+        "type": "string",
+        "column_name": "SSID",
+        "display_name": "SSID",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "CANCEL_FLAG",
+        "type": "string",
+        "column_name": "CANCEL_FLAG",
+        "display_name": "Cancel Flag",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TRANSFER_MONTH_ID",
+        "type": "int",
+        "column_name": "TRANSFER_MONTH_ID",
+        "display_name": "Transfer Month",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
+      },
+      {
+        "name": "TRANSFER_DATE_ID",
+        "type": "int",
+        "column_name": "TRANSFER_DATE_ID",
+        "display_name": "Transfer Date",
+        "alias_name": "",
+        "table": "MCT_CONTENT_SUMMARY",
+        "join_eligible": false,
+        "filter_eligible": true
       }
     ],
     "sql_builder": {
+      "joins": [],
       "group_by_columns": [],
-      "order_by_columns": [],
-      "joins": []
-    }
-  },
-  {
-    "artifact_name": "Customers",
-    "artifact_position": [
-      270,
-      200
-    ],
-    "artifact_attributes": [
-      {
-        "column_name": "CUSTOMER_ID",
-        "display_name": "Customer ID",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": true,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "STATE_NAME",
-        "display_name": "State Name",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "FIRST_NAME",
-        "display_name": "First Name",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "LAST_NAME",
-        "display_name": "Last Name",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "STATE_CODE",
-        "display_name": "State Code",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "REGION_GROUP",
-        "display_name": "Region Group",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "REGION",
-        "display_name": "Region",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "EMAIL_ADDRESS",
-        "display_name": "Email Address",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "HOME_PHONE",
-        "display_name": "Home Phone",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "WORK_PHONE",
-        "display_name": "Work Phone",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "ENR_LOCATION_ADDRESS",
-        "display_name": "Location Address",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "ENR_CUSTOMER_INFO",
-        "display_name": "Customer Info",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      }
-    ],
-    "sql_builder": {
-      "group_by_columns": [],
-      "order_by_columns": [],
-      "joins": []
-    }
-  },
-  {
-    "artifact_name": "Service",
-    "artifact_position": [
-      770,
-      150
-    ],
-    "artifact_attributes": [
-      {
-        "column_name": "SERVICE_ID",
-        "display_name": "Service ID",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": true,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "SERVICE_LEVEL_DESC",
-        "display_name": "Service Level Desc",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "SERVICE_ADDRESS1",
-        "display_name": "Service Address1",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "SERVICE_ADDRESS2",
-        "display_name": "Service Address2",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": false,
-        "checked": false
-      },
-      {
-        "column_name": "SERVICE_STATE",
-        "display_name": "Service State",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "SERVICE_CITY",
-        "display_name": "Service City",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "SERVICE_ZIPCODE",
-        "display_name": "Service Zipcode",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "PROD_OM_STATUS",
-        "display_name": "Product Status",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      },
-      {
-        "column_name": "STATUS_DESC",
-        "display_name": "Status Desc",
-        "alias_name": "",
-        "type": "string",
-        "hide": false,
-        "join_eligible": false,
-        "filter_eligible": true,
-        "checked": false
-      }
-    ],
-    "sql_builder": {
-      "group_by_columns": [],
-      "order_by_columns": [],
-      "joins": []
+      "order_by_columns": []
     }
   }
 ]
