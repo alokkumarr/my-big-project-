@@ -38,7 +38,9 @@ export const AnalyzeReportDetailComponent = {
     }
 
     openFilterSidenav() {
-      this._FilterService.openFilterSidenav(this.filters, ANALYZE_FILTER_SIDENAV_IDS.detailPage);
+      if (!isEmpty(this.filters)) {
+        this._FilterService.openFilterSidenav(this.filters, ANALYZE_FILTER_SIDENAV_IDS.detailPage);
+      }
     }
 
     onApplyFilters(filters) {

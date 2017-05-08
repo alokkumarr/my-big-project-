@@ -4,6 +4,7 @@ import uniq from 'lodash/uniq';
 import forEach from 'lodash/forEach';
 import values from 'lodash/values';
 import filter from 'lodash/filter';
+import isEmpty from 'lodash/isEmpty';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import template from './analyze-chart-detail.component.html';
@@ -75,7 +76,9 @@ export const AnalyzeChartDetailComponent = {
     }
 
     openFilterSidenav() {
-      this._FilterService.openFilterSidenav(this.filters, ANALYZE_FILTER_SIDENAV_IDS.detailPage);
+      if (!isEmpty(this.filters)) {
+        this._FilterService.openFilterSidenav(this.filters, ANALYZE_FILTER_SIDENAV_IDS.detailPage);
+      }
     }
 
     $onDestroy() {
