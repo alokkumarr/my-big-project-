@@ -20,7 +20,7 @@ export const RequestMock = {
           lastPublishedAnalysis.report.data = require('./dataByQuery.json');
           break;
         case 'pivot':
-          lastPublishedAnalysis.pivot.data = require('./pivotData.json');
+          lastPublishedAnalysis.pivot.data = require('./pivotData.json').aggregations.filtered.row_level_1;
           break;
         case 'chart':
         default:
