@@ -38,10 +38,10 @@
     "scheduled": "Every Friday at 12:00pm",
     "artifacts": [
       {
-        "name": "TARGET_OS",
+        "name": "SOURCE_MANUFACTURER",
         "type": "string",
-        "column_name": "TARGET_OS",
-        "display_name": "Target OS",
+        "column_name": "SOURCE_MANUFACTURER",
+        "display_name": "Source Manufacturer",
         "alias_name": "",
         "table": "MCT_SESSION",
         "join_eligible": false,
@@ -64,10 +64,10 @@
         "y-axis": true
       },
       {
-        "name": "SOURCE_MANUFACTURER",
+        "name": "TARGET_OS",
         "type": "string",
-        "column_name": "SOURCE_MANUFACTURER",
-        "display_name": "Source Manufacturer",
+        "column_name": "TARGET_OS",
+        "display_name": "Target OS",
         "alias_name": "",
         "table": "MCT_SESSION",
         "join_eligible": true,
