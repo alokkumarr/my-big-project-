@@ -10,16 +10,18 @@ import fpFilter from 'lodash/fp/filter';
 import split from 'lodash/split';
 import first from 'lodash/first';
 import fpMapKeys from 'lodash/fp/mapKeys';
+import fpMapValues from 'lodash/fp/mapValues';
 import fpOmit from 'lodash/fp/omit';
 import invert from 'lodash/invert';
 import fpGroupBy from 'lodash/fp/groupBy';
 import sortBy from 'lodash/sortBy';
 import last from 'lodash/last';
+import mapValues from 'lodash/mapValues';
 
 const FRONT_2_BACK_PIVOT_FIELD_PAIRS = {
   caption: 'displayName',
-  dataType: 'type',
-  dataField: 'columnName'
+  dataField: 'columnName',
+  summaryType: 'aggregate'
 };
 
 const BACK_2_FRONT_PIVOT_FIELD_PAIRS = invert(FRONT_2_BACK_PIVOT_FIELD_PAIRS);
@@ -39,25 +41,41 @@ export function PivotService(FilterService) {
   };
 
   function getFrontend2BackendFieldMapper() {
-    return fpMap(fpPipe(
-      fpOmit(['_initProperties', 'selector', 'format']),
-      fpMapKeys(key => {
-        const newKey = FRONT_2_BACK_PIVOT_FIELD_PAIRS[key];
-        return newKey || key;
-      })
-    ));
+    return fpMap(
+      fpPipe(
+        fpMapKeys(key => {
+          const newKey = FRONT_2_BACK_PIVOT_FIELD_PAIRS[key];
+          return newKey || key;
+        }),
+        fpOmit(['_initProperties', 'selector', 'dataType'])
+      )
+    );
   }
 
   function getBackend2FrontendFieldMapper() {
-    return fpMap(fpMapKeys(key => {
-      const newKey = BACK_2_FRONT_PIVOT_FIELD_PAIRS[key];
-      return newKey || key;
-    }));
+    return fpPipe(
+      fpMap(bEField => {
+        switch (bEField.type) {
+          case 'int':
+          case 'double':
+          case 'long':
+            bEField.dataType = 'number';
+            break;
+          default:
+            bEField.dataType = bEField.type;
+        }
+        return bEField;
+      }),
+      fpMap(fpMapKeys(key => {
+        const newKey = BACK_2_FRONT_PIVOT_FIELD_PAIRS[key];
+        return newKey || key;
+      }))
+    );
   }
 
   function denormalizeData(normalizedData, fields) {
     const groupedFields = getGroupedFields(fields);
-    return flatMap(normalizedData, node => traverseRecursive({groupedFields, keys: {}, currentKey: 'row_level_1', node}));
+    return flatMap(normalizedData.buckets, node => denormalizeRecursive({groupedFields, keys: {}, currentKey: 'row_level_1', node}));
   }
 
   function getGroupedFields(fields) {
@@ -76,20 +94,21 @@ export function PivotService(FilterService) {
   }
 
 /* eslint-disable camelcase */
-  function traverseRecursive({groupedFields, keys, currentKey, node}) {
+  function denormalizeRecursive({groupedFields, keys, currentKey, node}) {
     const containerProp = getContainerProp(node);
     const container = node[containerProp];
     keys[getFieldNameFromCurrentKey(groupedFields, currentKey)] = node.key;
     if (container) {
       // this is a node
       return flatMap(container.buckets, node => {
-        return traverseRecursive({groupedFields, keys, currentKey: containerProp, node});
+        return denormalizeRecursive({groupedFields, keys, currentKey: containerProp, node});
       });
     }
     // this is a leaf
-    return assign({
-      total_price: node.total_price.value
-    }, keys);
+    return assign(
+      mapValues(node, 'value'),
+      keys
+    );
   }
   /* eslint-enable camelcase */
 
@@ -99,7 +118,7 @@ export function PivotService(FilterService) {
   }
 
   function getUniquesFromNormalizedData(data, targetKey, groupedFields) {
-    return uniq(flatMap(data, node => traverseRec({groupedFields, currentKey: 'row_level_1', targetKey, node})));
+    return uniq(flatMap(data.buckets, node => traverseRec({groupedFields, currentKey: 'row_level_1', targetKey, node})));
   }
 
   /* eslint-disable camelcase */
