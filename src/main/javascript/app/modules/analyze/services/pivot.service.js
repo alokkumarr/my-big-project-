@@ -10,7 +10,6 @@ import fpFilter from 'lodash/fp/filter';
 import split from 'lodash/split';
 import first from 'lodash/first';
 import fpMapKeys from 'lodash/fp/mapKeys';
-import fpMapValues from 'lodash/fp/mapValues';
 import fpOmit from 'lodash/fp/omit';
 import invert from 'lodash/invert';
 import fpGroupBy from 'lodash/fp/groupBy';
