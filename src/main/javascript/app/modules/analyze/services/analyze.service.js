@@ -90,7 +90,7 @@ export function AnalyzeService($http, $timeout, $q) {
   }
 
   function getPivotData() {
-    return $http.get('/api/analyze/pivotData').then(fpGet('data'));
+    return $http.get('/api/analyze/pivotData').then(fpGet('data.aggregations.filtered.row_level_1'));
   }
 
   function generateQuery(payload) {

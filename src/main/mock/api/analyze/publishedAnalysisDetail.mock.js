@@ -11,6 +11,18 @@ export const RequestMock = {
     });
 
     if (publishedAnalysis) {
+      switch (publishedAnalysis.type) {
+        case 'report':
+          publishedAnalysis.report.data = require('./dataByQuery.json');
+          break;
+        case 'pivot':
+          publishedAnalysis.pivot.data = require('./pivotData.json');
+          break;
+        case 'chart':
+        default:
+          publishedAnalysis.chart.data = require('./dataByQuery.json');
+          break;
+      }
       return [200, publishedAnalysis];
     }
 

@@ -51,13 +51,13 @@ export const AnalyzePivotComponent = {
         // new analysis
         this._AnalyzeService.createAnalysis(this.model.artifactsId)
           .then(analysis => {
-            this.prepareFields(analysis.artifacts[0].artifactAttributes);
+            this.prepareFields(analysis.artifacts[0].columns);
             this.toggleSettingsSidenav();
           });
         // if it's a pivot analysis we're only interested in the first artifact
       } else {
         // edit existing analysis
-        this.prepareFields(this.model.artifacts[0].artifactAttributes);
+        this.prepareFields(this.model.artifacts[0].columns);
         this.loadPivotData().then(() => {
           this.filters = this._PivotService.mapFieldsToFilters(this.normalizedData, this.fields);
           const selectedFilters = map(this.model.filters, this._FilterService.getBackEnd2FrontEndFilterMapper());
@@ -276,7 +276,7 @@ export const AnalyzePivotComponent = {
     openSaveModal(ev) {
       this.updateFields();
 
-      this.model.artifacts = [{artifactAttributes: this._PivotService.getFrontend2BackendFieldMapper()(this.fieldsToSave)}];
+      this.model.artifacts = [{columns: this._PivotService.getFrontend2BackendFieldMapper()(this.fieldsToSave)}];
 
       this.model.filters = fpPipe(
         this._FilterService.getSelectedFilterMapper(),

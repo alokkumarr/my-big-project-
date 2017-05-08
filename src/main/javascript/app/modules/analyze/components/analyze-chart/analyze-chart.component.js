@@ -53,7 +53,7 @@ export const AnalyzeChartComponent = {
         possible: []
       };
 
-      this.barChartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
+      this.chartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
       $window.chartctrl = this;
     }
 
@@ -252,7 +252,7 @@ export const AnalyzeChartComponent = {
         .show({
           template: tpl,
           controller: scope => {
-            scope.model = this.barChartOptions;
+            scope.model = this.chartOptions;
           },
           targetEvent: ev,
           fullscreen: true,

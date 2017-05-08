@@ -34,6 +34,7 @@ export const AnalyzeReportSortComponent = {
         case 'string':
         case 'int':
         case 'double':
+        case 'long':
           return sort.field === item || !this.isColumnSorted(item);
         default:
           return false;
