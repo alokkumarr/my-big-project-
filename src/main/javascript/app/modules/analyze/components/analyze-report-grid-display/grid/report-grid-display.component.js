@@ -1,4 +1,5 @@
 import map from 'lodash/map';
+import take from 'lodash/take';
 
 import template from './report-grid-display.component.html';
 
@@ -27,6 +28,8 @@ export const ReportGridDisplayComponent = {
           width: COLUMN_WIDTH
         };
       });
+
+      this.data = take(this.data, 20);
 
       this.gridConfig = this._dxDataGridService.mergeWithDefaultConfig({
         columns,

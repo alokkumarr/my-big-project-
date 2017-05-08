@@ -63,14 +63,16 @@ export const AnalyzePivotDetailComponent = {
       const selectedFilters = map(pivotFilters, this._FilterService.getBackEnd2FrontEndFilterMapper());
 
       forEach(selectedFilters, selectedFilter => {
-        const targetFitler = find(filters, ({name}) => name === selectedFilter.name);
-        selectedFilter.items = targetFitler.items;
+        const targetFilter = find(filters, ({name}) => name === selectedFilter.name);
+        selectedFilter.items = targetFilter.items;
       });
       return selectedFilters;
     }
 
     openFilterSidenav() {
-      this._FilterService.openFilterSidenav(this.filters, ANALYZE_FILTER_SIDENAV_IDS.detailPage);
+      if (!isEmpty(this.filters)) {
+        this._FilterService.openFilterSidenav(this.filters, ANALYZE_FILTER_SIDENAV_IDS.detailPage);
+      }
     }
 
     onApplyFilters(filters) {
@@ -85,6 +87,11 @@ export const AnalyzePivotDetailComponent = {
       this.pivotGridUpdater.next({
         filters: this.filters
       });
+    }
+
+    $onDestroy() {
+      this._FilterService.offApplyFilters();
+      this._FilterService.offClearAllFilters();
     }
   }
 };

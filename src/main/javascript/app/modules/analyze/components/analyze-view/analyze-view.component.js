@@ -201,7 +201,11 @@ export const AnalyzeViewComponent = {
         return report.id === model.id;
       });
       this.reloadDataGrid(this.reports);
-      this._$mdToast.show(this._$mdToast.simple().textContent('Analysis deleted'));
+      this._$mdToast.show({
+        template: '<md-toast><span>Analysis Deleted</span></md-toast>',
+        position: 'bottom left',
+        toastClass: 'toast-primary'
+      });
     }
 
     onCardAction(actionType, model) {

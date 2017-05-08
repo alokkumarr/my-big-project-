@@ -1,5 +1,5 @@
 export const chartOptions = {
-  colors: ['#490094', '#9A72C4', '#C8B2DF', '#006ADE', '#6AB4FF',
+  colors: ['#0375bf', '#4c9fd2', '#bfdcef', '#490094', '#9A72C4', '#C8B2DF', '#006ADE', '#6AB4FF',
     '#B5DAFF', '#014752', '#009293', '#73C3C4', '#4CEA7C', '#9DF4B7', '#C9F9D8',
     '#DD5400', '#EDA173', '#F5CDB4', '#940000', '#C47373', '#DFB2B2'],
   plotOptions: {
