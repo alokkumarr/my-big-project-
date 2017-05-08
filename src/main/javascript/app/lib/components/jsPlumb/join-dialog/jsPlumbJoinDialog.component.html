@@ -7,7 +7,7 @@
         <md-select ng-model="::$ctrl.leftSideField">
           <md-option
             ng-repeat="field in $ctrl.leftSide.table.fields | filter:{isJoinEligible:true}"
-            ng-bind="::field.name"
+            ng-bind="::field.displayName"
             ng-value="field"></md-option>
         </md-select>
       </div>
@@ -17,7 +17,7 @@
         <md-select ng-model="::$ctrl.rightSideField">
           <md-option
             ng-repeat="field in $ctrl.rightSide.table.fields | filter:{isJoinEligible:true}"
-            ng-bind="::field.name"
+            ng-bind="::field.displayName"
             ng-value="field"></md-option>
         </md-select>
       </div>
