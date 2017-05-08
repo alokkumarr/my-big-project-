@@ -732,7 +732,7 @@
       },
       {
         "name": "SERVER_DIM_DATE",
-        "type": "date",
+        "type": "string",
         "column_name": "SERVER_DIM_DATE",
         "display_name": "Server Dim Date",
         "alias_name": "",
