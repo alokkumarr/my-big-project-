@@ -115,7 +115,7 @@
         },
         "creatorName": "John Clay",
         "createdDate": "2016-01-7 04:31:10.0",
-        "name": "Cable Orders",
+        "name": "Transfered Data in MB",
         "description": "Nulla velit libero, interdum et commodo a, pellentesque eleifend purus. Phasellus at dui ullamcorper, mollis enim non, luctus eros. Quisque iaculis libero leo, a commodo dolor sagittis eu. Fusce sodales.",
         "category": 11,
         "metrics": [
@@ -123,30 +123,13 @@
         ],
         "scheduled": "Daily",
         "report": {
-            "filters": [
-                {
-                    "column_name": "AFFILIATE_DISPLAY_NAME",
-                    "label": "Affiliate Display Name",
-                    "table_name": "Orders",
-                    "boolean_criteria": "AND",
-                    "filter_type": "string",
-                    "operator": null,
-                    "search_conditions": [
-                        "DIRECTV"
-                    ]
-                }
-            ],
-            "groupByColumns": [
-                "PRODUCT_TYPES",
-                "STATE_CODE"
-            ],
-            "orderByColumns": [
-                "PRODUCT_DISPLAY_NAME"
-            ],
+            "filters": [],
+            "groupByColumns": [],
+            "orderByColumns": [],
             "columns": [
                 {
-                    "columnName": "SOURCE_MANUFACTURER",
-                    "label": "Source Manufacturer",
+                    "columnName": "TARGET_MANUFACTURER",
+                    "label": "TARGET Manufacturer",
                     "type": "string"
                 },
                 {
@@ -155,13 +138,23 @@
                     "type": "int"
                 },
                 {
-                    "columnName": "TARGET_OS",
-                    "label": "Target OS",
+                    "columnName": "TARGET_MODEL",
+                    "label": "Target Model",
                     "type": "string"
                 },
                 {
-                    "columnName": "TARGET_MODEL",
-                    "label": "Target Model",
+                    "columnName": "TRANSFER_MB",
+                    "label": "Transfer (MB)",
+                    "type": "string"
+                },
+                {
+                    "columnName": "TRANSFER_TYPE",
+                    "label": "Transfer Type",
+                    "type": "string"
+                },
+                {
+                    "columnName": "TRANSFER_LOCATION",
+                    "label": "Transfer Location",
                     "type": "string"
                 }
             ]

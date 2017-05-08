@@ -14,7 +14,8 @@
   </div>
 
     <div>
-      <md-button class="btn-tertiary" ng-click="$ctrl.exportData()">
+      <md-button class="btn-tertiary" ng-click="$ctrl.exportData()"
+                 ng-disabled="$ctrl.analysis.type === 'chart'">
         <md-icon md-font-icon="icon-export"></md-icon>
         <span translate="EXPORT"></span>
       </md-button>

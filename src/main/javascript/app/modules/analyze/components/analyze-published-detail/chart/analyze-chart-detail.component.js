@@ -111,7 +111,9 @@ export const AnalyzeChartDetailComponent = {
     }
 
     onExport() {
-      // TODO export data
+      this.chartUpdater.next({
+        export: true
+      });
     }
 
     setFilterItems(filters, data) {
