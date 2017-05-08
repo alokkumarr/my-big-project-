@@ -56,11 +56,15 @@ export const ReportGridDisplayContainerComponent = {
     }
 
     groupData2CSV(data) {
+      if (isArray(data)) {
+        return json2csv({data, fields: keys(data[0])});
+      }
       const dataForCSV = this.groupData2CSVRecursive({node: data, groupValues: []});
       const csv = reduce(dataForCSV, (aggregator, datum) => {
         aggregator.push(`\n${join(datum.groupValues, '->')}\n\n${json2csv({data: datum.data, fields: datum.fields})}`);
         return aggregator;
       }, []);
+
       return join(csv, '\n');
     }
 
