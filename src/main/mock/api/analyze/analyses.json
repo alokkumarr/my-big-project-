@@ -25,10 +25,10 @@
         }
       ],
       "xAxis": {
-        "title": "Custom X"
+        "title": "Source Manufacturer"
       },
       "yAxis": {
-        "title": "Custom Y"
+        "title": "Available Items"
       },
       "legend": {
         "align": "top",

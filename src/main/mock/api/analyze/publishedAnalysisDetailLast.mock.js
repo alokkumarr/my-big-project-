@@ -15,6 +15,18 @@ export const RequestMock = {
     });
 
     if (lastPublishedAnalysis) {
+      switch (lastPublishedAnalysis.type) {
+        case 'report':
+          lastPublishedAnalysis.report.data = require('./dataByQuery.json');
+          break;
+        case 'pivot':
+          lastPublishedAnalysis.pivot.data = require('./pivotData.json');
+          break;
+        case 'chart':
+        default:
+          lastPublishedAnalysis.chart.data = require('./dataByQuery.json');
+          break;
+      }
       return [200, lastPublishedAnalysis];
     }
 
