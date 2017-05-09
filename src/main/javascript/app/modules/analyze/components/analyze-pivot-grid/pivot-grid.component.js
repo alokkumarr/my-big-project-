@@ -71,9 +71,14 @@ export const PivotGridComponent = {
       updates.filters && this.updateFilters(updates.filters);
       updates.sorts && this.updateSorts(updates.sorts);
       updates.getFields && this.sendFields({fields: this._gridInstance.getDataSource().fields()});
+      updates.export && this.exportToExcel();
       /* eslint-disable no-unused-expressions */
 
       this.replaceWarningLables();
+    }
+
+    exportToExcel() {
+      this._gridInstance.exportToExcel();
     }
 
     updateDataSource(dataSource) {
@@ -113,6 +118,16 @@ export const PivotGridComponent = {
 
     updateSorts(sorts) {
       const pivotGridDataSource = this._gridInstance.getDataSource();
+
+      // reset other sorts
+      forEach(pivotGridDataSource.fields(), field => {
+        if (field.sortOrder) {
+          pivotGridDataSource.field(field.dataField, {
+            sortOrder: null
+          });
+        }
+      });
+
       forEach(sorts, sort => {
         pivotGridDataSource.field(sort.field.dataField, {
           sortOrder: sort.order
@@ -142,7 +157,7 @@ export const PivotGridComponent = {
         },
         export: {
           enabled: false,
-          fileName: 'Sales'
+          fileName: 'export'
         },
         dataSource: {
           store: [],

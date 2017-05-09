@@ -29,7 +29,7 @@ export const ReportGridDisplayComponent = {
         };
       });
 
-      this.data = take(this.data, 20);
+      this.data = take(this.data, 30);
 
       this.gridConfig = this._dxDataGridService.mergeWithDefaultConfig({
         columns,

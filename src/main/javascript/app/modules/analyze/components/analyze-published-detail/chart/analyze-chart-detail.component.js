@@ -14,7 +14,8 @@ import {ANALYZE_FILTER_SIDENAV_IDS} from '../../analyze-filter-sidenav/analyze-f
 export const AnalyzeChartDetailComponent = {
   template,
   bindings: {
-    analysis: '<'
+    analysis: '<',
+    requester: '<'
   },
   styles: [style],
   controller: class AnalyzeChartDetailController {
@@ -30,6 +31,7 @@ export const AnalyzeChartDetailComponent = {
     $onInit() {
       this._FilterService.onApplyFilters(filters => this.onApplyFilters(filters));
       this._FilterService.onClearAllFilters(() => this.onClearAllFilters());
+      this.requester.subscribe(requests => this.request(requests));
 
       const artifacts = this.analysis.chart.artifacts;
       const yaxis = filter(artifacts, 'y-axis');
@@ -100,6 +102,18 @@ export const AnalyzeChartDetailComponent = {
 
     filterGridData() {
       this.filteredData = this._FilterService.getGridDataFilter(this.filters)(this.data);
+    }
+
+    request(requests) {
+      /* eslint-disable no-unused-expressions */
+      requests.export && this.onExport();
+      /* eslint-disable no-unused-expressions */
+    }
+
+    onExport() {
+      this.chartUpdater.next({
+        export: true
+      });
     }
 
     setFilterItems(filters, data) {

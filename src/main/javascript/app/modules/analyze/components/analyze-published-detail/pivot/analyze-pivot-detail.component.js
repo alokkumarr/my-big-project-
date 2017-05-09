@@ -11,7 +11,8 @@ import {ANALYZE_FILTER_SIDENAV_IDS} from '../../analyze-filter-sidenav/analyze-f
 export const AnalyzePivotDetailComponent = {
   template,
   bindings: {
-    analysis: '<'
+    analysis: '<',
+    requester: '<'
   },
   controller: class AnalyzePivotDetailController {
     constructor(FilterService, PivotService) {
@@ -25,6 +26,8 @@ export const AnalyzePivotDetailComponent = {
     $onInit() {
       this._FilterService.onApplyFilters(filters => this.onApplyFilters(filters));
       this._FilterService.onClearAllFilters(() => this.onClearAllFilters());
+
+      this.requester.subscribe(requests => this.request(requests));
 
       const pivot = this.analysis.pivot;
       const artifactAttributes = pivot.artifacts[0].columns;
@@ -40,6 +43,18 @@ export const AnalyzePivotDetailComponent = {
           store: this.deNormalizedData,
           fields: this.fields
         }
+      });
+    }
+
+    request(requests) {
+      /* eslint-disable no-unused-expressions */
+      requests.export && this.onExport();
+      /* eslint-disable no-unused-expressions */
+    }
+
+    onExport() {
+      this.pivotGridUpdater.next({
+        export: true
       });
     }
 

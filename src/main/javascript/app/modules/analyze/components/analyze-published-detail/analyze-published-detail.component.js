@@ -1,3 +1,5 @@
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+
 import template from './analyze-published-detail.component.html';
 import style from './analyze-published-detail.component.scss';
 
@@ -16,6 +18,7 @@ export const AnalyzePublishedDetailComponent = {
       this.isPublished = true;
 
       this.ANALYZE_FILTER_SIDENAV_IDS = ANALYZE_FILTER_SIDENAV_IDS;
+      this.requester = new BehaviorSubject({});
     }
 
     $onInit() {
@@ -28,6 +31,12 @@ export const AnalyzePublishedDetailComponent = {
         this.loadLastPublishedAnalysis(analysisId);
       }
       this.loadOtherAnalyses(analysisId);
+    }
+
+    exportData() {
+      this.requester.next({
+        export: true
+      });
     }
 
     loadAnalysisById(publishId) {
