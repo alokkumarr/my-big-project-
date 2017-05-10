@@ -28,10 +28,14 @@ export const chartComponent = {
 
       // if we have an updater$ observable, subscribe to it
       if (this.updater$) {
-        this.updater$.subscribe({
+        this.subscription = this.updater$.subscribe({
           next: this.onOptionsChartUpdate.bind(this)
         });
       }
+    }
+
+    $onDestroy() {
+      this.subscription.unsubscribe();
     }
 
     onOptionsChartUpdate(updates) {

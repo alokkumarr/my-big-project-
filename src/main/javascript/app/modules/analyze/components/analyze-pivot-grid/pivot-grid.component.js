@@ -35,7 +35,6 @@ export const PivotGridComponent = {
     }
 
     $onInit() {
-
       this.pivotGridOptions = assign({
         onInitialized: e => {
           this._gridInstance = e.component;
@@ -46,9 +45,13 @@ export const PivotGridComponent = {
         // have to repaint the grid because of the animation of the modal
         // if it's not repainted it appears smaller
         this._gridInstance.repaint();
-        this.updater.subscribe(updates => this.update(updates));
+        this.subscription = this.updater.subscribe(updates => this.update(updates));
         this.replaceWarningLables();
       }, 500);
+    }
+
+    $onDestroy() {
+      this.subscription.unsubscribe();
     }
 
     replaceWarningLables() {

@@ -199,6 +199,13 @@ export const AnalyzeChartComponent = {
       this.reloadChart(this.settings, this.filteredGridData);
     }
 
+    onFilterRemoved(filter) {
+      filter.model = null;
+      this.filters.selected = this._FilterService.getSelectedFilterMapper()(this.filters.possible);
+      this.filterGridData();
+      this.reloadChart(this.settings, this.filteredGridData);
+    }
+
     filterGridData() {
       this.filteredGridData = this._FilterService.getGridDataFilter(this.filters.selected)(this.gridData);
     }

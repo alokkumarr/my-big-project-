@@ -8,6 +8,7 @@ import reduce from 'lodash/fp/reduce';
 import filter from 'lodash/fp/filter';
 import isEmpty from 'lodash/isEmpty';
 import set from 'lodash/fp/set';
+import unset from 'lodash/fp/unset';
 import values from 'lodash/values';
 import compact from 'lodash/compact';
 import forEach from 'lodash/forEach';
@@ -70,14 +71,17 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
 
   function offOpenFilterSidenav() {
     unRegisterFuncs[EVENTS.OPEN_SIDENAV]();
+    unset(unRegisterFuncs, EVENTS.OPEN_SIDENAV);
   }
 
   function offApplyFilters() {
     unRegisterFuncs[EVENTS.APPLY_FILTERS]();
+    unset(unRegisterFuncs, EVENTS.APPLY_FILTERS);
   }
 
   function offClearAllFilters() {
     unRegisterFuncs[EVENTS.CLEAR_ALL_FILTERS]();
+    unset(unRegisterFuncs, EVENTS.CLEAR_ALL_FILTERS);
   }
 
   function openFilterSidenav(payload, sidenavId) {
