@@ -41,6 +41,7 @@
 
           <div>
             <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.DESIGNER_MODE}"
+                       class="mode-selector"
                        ng-disabled="$ctrl.states.disable.designer"
                        ng-click="$ctrl.setSqlMode($ctrl.DESIGNER_MODE)">
               <md-icon md-font-icon="icon-designer-mode"></md-icon>
@@ -48,9 +49,20 @@
             </md-button>
 
             <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.QUERY_MODE}"
+                       class="mode-selector"
                        ng-click="$ctrl.setSqlMode($ctrl.QUERY_MODE)">
               <md-icon md-font-icon="icon-query-mode"></md-icon>
               <span translate="QUERY"></span>
+            </md-button>
+
+          <md-button ng-click="$ctrl.openDescriptionModal($event)">
+            <md-icon md-font-icon="icon-description"></md-icon>
+            <span translate="DESCRIPTION"></span>
+          </md-button>
+
+            <md-button ng-if="$ctrl.showFiltersButton" ng-click="$ctrl.openFilterSidenav()">
+              <md-icon md-font-icon="icon-filter"></md-icon>
+              <span translate="FILTER"></span>
             </md-button>
           </div>
         </div>
@@ -78,9 +90,9 @@
               translate="REPORT"></span>
 
         <div class="ard_toolbar-actions" flex>
-          <md-button ng-click="$ctrl.openDescriptionModal($event)">
-            <md-icon md-font-icon="icon-description"></md-icon>
-            <span translate="DESCRIPTION"></span>
+          <md-button ng-click="$ctrl.refreshGridData()"
+                     ng-class="{'btn-primary': $ctrl.analysisChanged}" >
+            <span translate="REFRESH_DATA"></span>
           </md-button>
 
           <md-button ng-click="$ctrl.openPreviewModal($event)"
@@ -93,11 +105,6 @@
                      ng-disabled="$ctrl.isSortDisabled()">
             <md-icon md-font-icon="icon-sort"></md-icon>
             <span translate="SORT"></span>
-          </md-button>
-
-          <md-button ng-if="$ctrl.showFiltersButton" ng-click="$ctrl.openFilterSidenav()">
-            <md-icon md-font-icon="icon-filter"></md-icon>
-            <span translate="FILTER"></span>
           </md-button>
         </div>
       </div>

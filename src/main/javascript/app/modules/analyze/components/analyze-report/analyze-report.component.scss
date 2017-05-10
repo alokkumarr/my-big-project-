@@ -107,15 +107,14 @@ analyze-report {
         }
       }
 
-      .md-button {
+      .md-button.mode-selector {
         margin: 0;
         border: 1px solid #C4C4C4;
-        color: #AFAFAF;
+        color: #707070;
         font-size: 15px;
 
         &.m-active {
           background-color: #DADADA;
-          color: #707070;
         }
 
         &:nth-child(1) {
@@ -186,7 +185,7 @@ analyze-report {
         text-align: right;
         align-self: center;
 
-        .md-button {
+        .md-button:not(.btn-primary) {
           border: 1px solid #E7E8E9;
           background-color: #F8F8F8;
           color: #898989;
