@@ -6,7 +6,7 @@ import find from 'lodash/find';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import template from './analyze-pivot-detail.component.html';
-import {ANALYZE_FILTER_SIDENAV_IDS} from '../../analyze-filter-sidenav/analyze-filter-sidenav.component';
+import {ANALYZE_FILTER_SIDENAV_IDS} from '../../analyze-filter/analyze-filter-sidenav.component';
 
 export const AnalyzePivotDetailComponent = {
   template,

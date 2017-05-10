@@ -68,11 +68,13 @@
             <span translate="FILTER"></span>
           </md-button>
         </div>
-
       </div>
-
       <md-card>
         <md-card-content layout="column">
+          <filter-chips filters="$ctrl.filters"
+                        on-clear-all-filters="$ctrl.onClearAllFilters()"
+                        on-filter-removed="$ctrl.onFilterRemoved(chip)">
+          </filter-chips>
           <pivot-grid updater="$ctrl.pivotGridUpdater" send-fields="$ctrl.onGetFields(fields)"></pivot-grid>
         </md-card-content>
       </md-card>

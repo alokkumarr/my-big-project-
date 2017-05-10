@@ -5,7 +5,7 @@ import forEach from 'lodash/forEach';
 
 import template from './analyze-report-detail.component.html';
 
-import {ANALYZE_FILTER_SIDENAV_IDS} from '../../analyze-filter-sidenav/analyze-filter-sidenav.component';
+import {ANALYZE_FILTER_SIDENAV_IDS} from '../../analyze-filter/analyze-filter-sidenav.component';
 
 export const AnalyzeReportDetailComponent = {
   template,

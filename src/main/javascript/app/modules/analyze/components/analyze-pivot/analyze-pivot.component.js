@@ -15,7 +15,7 @@ import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 import template from './analyze-pivot.component.html';
 import style from './analyze-pivot.component.scss';
 
-import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter-sidenav/analyze-filter-sidenav.component';
+import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter/analyze-filter-sidenav.component';
 import {ANALYZE_PIVOT_SETTINGS_SIDENAV_ID} from '../analyze-pivot-settings/analyze-pivot-settings.component';
 
 export const AnalyzePivotComponent = {
@@ -159,6 +159,11 @@ export const AnalyzePivotComponent = {
       forEach(this.filters, filter => {
         filter.model = null;
       });
+      this.filterGridData();
+    }
+
+    onFilterRemoved(filter) {
+      filter.model = null;
       this.filterGridData();
     }
 // END filters

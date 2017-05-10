@@ -13,7 +13,7 @@ import filter from 'lodash/filter';
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
 
-import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter-sidenav/analyze-filter-sidenav.component';
+import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter/analyze-filter-sidenav.component';
 
 export const AnalyzeReportComponent = {
   template,

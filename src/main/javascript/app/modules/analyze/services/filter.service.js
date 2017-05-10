@@ -13,7 +13,7 @@ import compact from 'lodash/compact';
 import forEach from 'lodash/forEach';
 import find from 'lodash/find';
 
-import {OPERATORS} from '../components/analyze-filter-sidenav/filters/number-filter.component';
+import {OPERATORS} from '../components/analyze-filter/filters/number-filter.component';
 
 export const BOOLEAN_CRITERIA = {
   AND: 'AND',
