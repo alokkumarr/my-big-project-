@@ -12,10 +12,21 @@
     </md-button>
   </md-card-title>
 
-  <div layout="column" layout-align="space-between center">
-    <div class="chart-card">
-      <chart updater="$ctrl.chartUpdater" options="$ctrl.chartOptions"></chart>
+  <md-card-content>
+
+    <div layout="column" layout-align="space-between start">
+      <filter-chips filters="$ctrl.filters.selected"
+                    on-clear-all-filters="$ctrl.onClearAllFilters()"
+                    on-filter-removed="$ctrl.onFilterRemoved(chip)">
+      </filter-chips>
     </div>
-  </div>
+
+    <div layout="column" layout-align="space-between center">
+      <div class="chart-card">
+        <chart updater="$ctrl.chartUpdater" options="$ctrl.chartOptions"></chart>
+      </div>
+    </div>
+
+  </md-card-content>
 </md-card>
 

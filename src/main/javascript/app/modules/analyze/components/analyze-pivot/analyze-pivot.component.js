@@ -330,7 +330,9 @@ export const AnalyzePivotComponent = {
           targetEvent: ev,
           clickOutsideToClose: true
         }).then(successfullySaved => {
-          this.onAnalysisSaved(successfullySaved);
+          if (successfullySaved) {
+            this.onAnalysisSaved(successfullySaved);
+          }
         });
     }
 
