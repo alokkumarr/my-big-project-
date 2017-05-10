@@ -1,7 +1,6 @@
-import assign from 'lodash/assign';
-
 import template from './analyze-pivot-preview.component.html';
 import style from './analyze-pivot-preview.component.scss';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 export const AnalyzePivotPreviewComponent = {
   template,
@@ -14,21 +13,13 @@ export const AnalyzePivotPreviewComponent = {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this._$timeout = $timeout;
+      this.pivotGridUpdater = new BehaviorSubject({});
     }
 
     $onInit() {
-      this.pivotGridOptions = assign({
-        onInitialized: e => {
-          this._gridInstance = e.component;
-        }
-      }, this.model.defaultOptions);
-
-      this._$timeout(() => {
-        // have to repaint the grid because of the animation of the modal
-        // if it's not repainted it appears smaller
-        this._gridInstance.option('dataSource', this.model.dataSource);
-        this._gridInstance.getDataSource().state(this.model.pivotState);
-      }, 500);
+      this.pivotGridUpdater.next({
+        dataSource: this.model.dataSource
+      });
     }
 
     cancel() {

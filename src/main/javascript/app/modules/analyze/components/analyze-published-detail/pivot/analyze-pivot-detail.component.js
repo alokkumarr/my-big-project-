@@ -3,7 +3,7 @@ import isEmpty from 'lodash/isEmpty';
 import map from 'lodash/map';
 import forEach from 'lodash/forEach';
 import find from 'lodash/find';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import template from './analyze-pivot-detail.component.html';
 import {ANALYZE_FILTER_SIDENAV_IDS} from '../../analyze-filter-sidenav/analyze-filter-sidenav.component';
@@ -11,7 +11,8 @@ import {ANALYZE_FILTER_SIDENAV_IDS} from '../../analyze-filter-sidenav/analyze-f
 export const AnalyzePivotDetailComponent = {
   template,
   bindings: {
-    analysis: '<'
+    analysis: '<',
+    requester: '<'
   },
   controller: class AnalyzePivotDetailController {
     constructor(FilterService, PivotService) {
@@ -25,6 +26,8 @@ export const AnalyzePivotDetailComponent = {
     $onInit() {
       this._FilterService.onApplyFilters(filters => this.onApplyFilters(filters));
       this._FilterService.onClearAllFilters(() => this.onClearAllFilters());
+
+      this.requester.subscribe(requests => this.request(requests));
 
       const pivot = this.analysis.pivot;
       const artifactAttributes = pivot.artifacts[0].columns;
@@ -43,19 +46,33 @@ export const AnalyzePivotDetailComponent = {
       });
     }
 
+    request(requests) {
+      /* eslint-disable no-unused-expressions */
+      requests.export && this.onExport();
+      /* eslint-disable no-unused-expressions */
+    }
+
+    onExport() {
+      this.pivotGridUpdater.next({
+        export: true
+      });
+    }
+
     getFilters(data, fields, pivotFilters) {
       const filters = this._PivotService.mapFieldsToFilters(data, fields);
       const selectedFilters = map(pivotFilters, this._FilterService.getBackEnd2FrontEndFilterMapper());
 
       forEach(selectedFilters, selectedFilter => {
-        const targetFitler = find(filters, ({name}) => name === selectedFilter.name);
-        selectedFilter.items = targetFitler.items;
+        const targetFilter = find(filters, ({name}) => name === selectedFilter.name);
+        selectedFilter.items = targetFilter.items;
       });
       return selectedFilters;
     }
 
     openFilterSidenav() {
-      this._FilterService.openFilterSidenav(this.filters, ANALYZE_FILTER_SIDENAV_IDS.detailPage);
+      if (!isEmpty(this.filters)) {
+        this._FilterService.openFilterSidenav(this.filters, ANALYZE_FILTER_SIDENAV_IDS.detailPage);
+      }
     }
 
     onApplyFilters(filters) {
@@ -70,6 +87,11 @@ export const AnalyzePivotDetailComponent = {
       this.pivotGridUpdater.next({
         filters: this.filters
       });
+    }
+
+    $onDestroy() {
+      this._FilterService.offApplyFilters();
+      this._FilterService.offClearAllFilters();
     }
   }
 };

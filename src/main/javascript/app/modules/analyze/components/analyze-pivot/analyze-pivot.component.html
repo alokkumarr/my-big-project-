@@ -42,7 +42,7 @@
               translate="PIVOT"></span>
 
         <div class="ard_toolbar-actions" flex="70">
-          <md-button class="btn-primary" ng-click="$ctrl.onRefreshData()">
+          <md-button ng-class="$ctrl.settingsModified ? 'btn-primary' : 'action'" ng-click="$ctrl.onRefreshData()">
             <span translate="REFRESH_DATA"></span>
           </md-button>
 

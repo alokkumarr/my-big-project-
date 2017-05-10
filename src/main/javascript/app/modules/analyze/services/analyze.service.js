@@ -193,7 +193,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
   }
 
   function getPivotData() {
-    return $http.get('/api/analyze/pivotData').then(fpGet('data'));
+    return $http.get('/api/analyze/pivotData').then(fpGet('data.aggregations.filtered.row_level_1'));
   }
 
   function generateQuery(payload) {

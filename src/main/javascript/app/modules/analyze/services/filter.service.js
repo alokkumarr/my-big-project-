@@ -253,9 +253,9 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
           break;
         case 'int':
         case 'integer':
-        case 'long':
         case 'timestamp':
         case 'double':
+        case 'long':
           isValid = Boolean(isNumberValid(row[filter.name], filter.model, filter.operator));
           break;
         default:

@@ -201,7 +201,7 @@ export const AnalyzeReportComponent = {
       if (this.states.detailsExpanded) {
         this._$timeout(() => {
           this.reloadPreviewGrid();
-        });
+        }, 500);
       }
     }
 

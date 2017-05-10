@@ -10,7 +10,8 @@ import {ANALYZE_FILTER_SIDENAV_IDS} from '../../analyze-filter-sidenav/analyze-f
 export const AnalyzeReportDetailComponent = {
   template,
   bindings: {
-    analysis: '<'
+    analysis: '<',
+    requester: '<'
   },
   controller: class AnalyzeReportDetailController {
     constructor(FilterService) {
@@ -32,8 +33,15 @@ export const AnalyzeReportDetailComponent = {
       this.openFilterSidenav();
     }
 
+    $onDestroy() {
+      this._FilterService.offApplyFilters();
+      this._FilterService.offClearAllFilters();
+    }
+
     openFilterSidenav() {
-      this._FilterService.openFilterSidenav(this.filters, ANALYZE_FILTER_SIDENAV_IDS.detailPage);
+      if (!isEmpty(this.filters)) {
+        this._FilterService.openFilterSidenav(this.filters, ANALYZE_FILTER_SIDENAV_IDS.detailPage);
+      }
     }
 
     onApplyFilters(filters) {

@@ -4,7 +4,9 @@
       <span class="md-title" ng-bind="::$ctrl.analysis.name"></span>
     </md-card-title-text>
 
-    <md-button class="btn-tertiary">
+    <md-button class="btn-tertiary"
+               ng-click="$ctrl.openFilterSidenav()"
+               ng-disabled="$ctrl._isEmpty($ctrl.analysis.chart.filters)">
       <md-icon md-font-icon="icon-filter"></md-icon>
       <span translate="FILTER"></span>
     </md-button>
@@ -12,7 +14,7 @@
 
   <div layout="column" layout-align="space-between center">
     <div class="chart-card">
-      <chart style="width: 100%" options="$ctrl.barChartOptions"></chart>
+      <chart updater="$ctrl.chartUpdater" options="$ctrl.chartOptions"></chart>
     </div>
   </div>
 </md-card>
