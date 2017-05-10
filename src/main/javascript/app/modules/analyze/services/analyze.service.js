@@ -183,8 +183,10 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
   }
 
   function getDataBySettings(model) {
-    return updateAnalysis(model).then(() => {
-      return applyAnalysis(model);
+    return updateAnalysis(model).then(analysis => {
+      return applyAnalysis(model).then(data => {
+        return {analysis, data};
+      });
     });
   }
 

@@ -483,8 +483,9 @@ export const AnalyzeReportComponent = {
             this.generateFiltersOnCanvasChange();
             this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
           } else {
-            this.refreshGridData(data => {
+            this.refreshGridData(({analysis, data}) => {
               this.filteredGridData = this.gridData = data;
+              this.model.query = analysis.query;
               this.generateFiltersOnCanvasChange(); // update filters with new data
               this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
             });

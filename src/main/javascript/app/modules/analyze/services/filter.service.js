@@ -109,7 +109,6 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
       };
 
       if (NUMBER_TYPES.indexOf(frontEndFilter.type) >= 0) {
-        backEndFilter.filterType = 'number';
         backEndFilter.operator = frontEndFilter.operator;
         backEndFilter.searchConditions =
           frontEndFilter.operator === OPERATORS.BETWEEN.value ?
