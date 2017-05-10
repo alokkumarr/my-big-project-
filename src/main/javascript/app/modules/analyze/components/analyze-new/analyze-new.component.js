@@ -50,10 +50,6 @@ export const AnalyzeNewComponent = {
       });
     }
 
-    cancel() {
-      this._$mdDialog.cancel();
-    }
-
     createAnalysis() {
       let tpl;
       let model;
@@ -117,6 +113,10 @@ export const AnalyzeNewComponent = {
         focusOnOpen: false,
         multiple: true,
         clickOutsideToClose: true
+      }).then(successfullySaved => {
+        if (successfullySaved) {
+          this.$dialog.hide(successfullySaved);
+        }
       });
     }
   }

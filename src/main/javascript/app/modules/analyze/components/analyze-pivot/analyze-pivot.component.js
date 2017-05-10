@@ -310,7 +310,13 @@ export const AnalyzePivotComponent = {
           multiple: true,
           targetEvent: ev,
           clickOutsideToClose: true
+        }).then(successfullySaved => {
+          this.onAnalysisSaved(successfullySaved);
         });
+    }
+
+    onAnalysisSaved(successfullySaved) {
+      this.$dialog.hide(successfullySaved);
     }
   }
 };

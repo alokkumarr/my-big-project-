@@ -1,4 +1,4 @@
-<analyze-dialog class="new-analyze-dialog">
+<analyze-dialog control="$ctrl" class="new-analyze-dialog">
   <analyze-dialog-header>
     <div layout="row">
       <div class="md-title" translate="NEW_ANALYSIS"></div>
@@ -51,7 +51,7 @@
       </md-button>
 
       <md-button class="btn-card"
-                 ng-click="$ctrl.cancel()" translate="CANCEL">
+                 ng-click="$ctrl.$dialog.hide()" translate="CANCEL">
       </md-button>
     </div>
   </analyze-dialog-footer>

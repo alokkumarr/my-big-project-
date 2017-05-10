@@ -184,12 +184,7 @@ export const AnalyzeReportComponent = {
     generateFilters(selectedFields, gridData) {
       return this._FilterService.getCanvasFieldsToFiltersMapper(gridData)(selectedFields);
     }
-
     // END filters section
-
-    cancel() {
-      this._$mdDialog.cancel();
-    }
 
     toggleDetailsPanel() {
       this.states.detailsExpanded = !this.states.detailsExpanded;
@@ -549,7 +544,13 @@ export const AnalyzeReportComponent = {
           multiple: true,
           targetEvent: ev,
           clickOutsideToClose: true
+        }).then(successfullySaved => {
+          this.onAnalysisSaved(successfullySaved);
         });
+    }
+
+    onAnalysisSaved(successfullySaved) {
+      this.$dialog.hide(successfullySaved);
     }
   }
 };
