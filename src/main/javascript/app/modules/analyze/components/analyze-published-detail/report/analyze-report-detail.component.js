@@ -15,6 +15,7 @@ export const AnalyzeReportDetailComponent = {
   },
   controller: class AnalyzeReportDetailController {
     constructor(FilterService) {
+      'ngInject';
       this._FilterService = FilterService;
       this._isEmpty = isEmpty;
       this.filters = {};
