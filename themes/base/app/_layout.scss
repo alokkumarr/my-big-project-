@@ -43,6 +43,7 @@ $header-bar-height: 71px;
 }
 
 .root-container {
+  position: relative;
   display: flex;
   min-height: 100vh;
   flex-direction: column;
