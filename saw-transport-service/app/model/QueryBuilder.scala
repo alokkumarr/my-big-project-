@@ -21,7 +21,7 @@ object QueryBuilder {
     }
     "%s %s %s %s %s".format(
       buildSelect(artifacts),
-      buildFrom(artifacts),
+      buildFrom(artifacts, sqlBuilder),
       buildWhere(sqlBuilder),
       buildGroupBy(sqlBuilder),
       buildOrderBy(sqlBuilder)
@@ -52,8 +52,49 @@ object QueryBuilder {
     artifactName + "." + (column \ "columnName").extract[String]
   }
 
-  private def buildFrom(artifacts: List[JValue]) = {
-    "FROM " + artifacts.filter(isArtifactChecked).map((artifact: JValue) => {
+  private def buildFrom(artifacts: List[JValue], sqlBuilder: JObject) = {
+    val joins = buildFromJoins(sqlBuilder)
+    "FROM " + (if (joins.length > 0) joins else
+      buildFromArtifacts(artifacts).mkString(", "))
+  }
+
+  private def buildFromJoins(sqlBuilder: JObject) = {
+    (sqlBuilder \ "joins" match {
+      case joins: JArray => joins.arr
+      case JNothing => List()
+      case json: JValue => unexpectedElement(json)
+    }).foldLeft("")(buildOnJoin)
+  }
+
+  private def buildOnJoin(seed: String, join: JValue): String = {
+    def property(name: String) = {
+      (join \ name)
+    }
+    val joinType = property("type").extract[String]
+    if (!List("inner", "left", "right").contains(joinType)) {
+      throw new RuntimeException("Join type not implemented: " + joinType)
+    }
+    val criteria = property("criteria") match {
+      case criteria: JArray => criteria.arr
+      case value: JValue => unexpectedElement(value)
+    }
+    if (criteria.length != 2) {
+      throw new ClientException(
+        "Expected criteria to have exactly two elements: " + criteria)
+    }
+    "%s %s JOIN %s ON (%s.%s = %s.%s)".format(
+      (if (seed == "") (criteria(0) \ "tableName").extract[String] else seed),
+      joinType.toUpperCase,
+      (criteria(1) \ "tableName").extract[String],
+      (criteria(0) \ "tableName").extract[String],
+      (criteria(0) \ "columnName").extract[String],
+      (criteria(1) \ "tableName").extract[String],
+      (criteria(1) \ "columnName").extract[String]
+    )
+  }
+
+  private def buildFromArtifacts(artifacts: List[JValue]) = {
+    artifacts.filter(isArtifactChecked).map((artifact: JValue) => {
       val table = artifact \ "artifactName" match {
         case JString(name) => name
         case _ => throw new ClientException("Artifact name not found")
@@ -61,7 +102,7 @@ object QueryBuilder {
       if (table.trim().length == 0)
         throw new ClientException("Artifact name cannot be empty")
       table
-    }).mkString(", ")
+    })
   }
 
   private def isArtifactChecked(artifact: JValue): Boolean = {
@@ -73,11 +114,6 @@ object QueryBuilder {
   }
 
   private def buildWhere(sqlBuilder: JObject): String = {
-    val joins = (sqlBuilder \ "joins" match {
-      case joins: JArray => joins.arr
-      case JNothing => List()
-      case json: JValue => unexpectedElement(json)
-    }).map(buildWhereJoinElement(_))
     val filters = ((sqlBuilder \ "filters" match {
       case filters: JArray => filters.arr
       case JNothing => List()
@@ -86,12 +122,10 @@ object QueryBuilder {
       case Nil => Nil
       case x :: xs => unsetBooleanCriteria(x) :: xs
     }).map(buildWhereFilterElement(_))
-    val conditions = List(joins.mkString(" AND "), filters.mkString(" ")).
-      filter(_.length > 0)
-    if (conditions.isEmpty)
+    if (filters.isEmpty)
       ""
     else
-      "WHERE " + conditions.mkString(" AND ")
+      "WHERE " + filters.mkString(" ")
   }
 
   private def unsetBooleanCriteria(filter: JValue) = {
@@ -99,30 +133,6 @@ object QueryBuilder {
       case obj: JObject => obj merge(("booleanCriteria", "") : JObject)
       case value: JValue => unexpectedElement(value)
     }
-  }
-
-  private def buildWhereJoinElement(join: JValue): String = {
-    def property(name: String) = {
-      (join \ name)
-    }
-    if (property("type").extract[String] != "inner") {
-      throw new RuntimeException(
-        "Join type not implemented: " + property("type"))
-    }
-    val criteria = property("criteria") match {
-      case criteria: JArray => criteria.arr
-      case value: JValue => unexpectedElement(value)
-    }
-    if (criteria.length != 2) {
-      throw new ClientException(
-        "Expected criteria to have exactly two elements: " + criteria)
-    }
-    "%s.%s = %s.%s".format(
-      (criteria(0) \ "tableName").extract[String],
-      (criteria(0) \ "columnName").extract[String],
-      (criteria(1) \ "tableName").extract[String],
-      (criteria(1) \ "columnName").extract[String]
-    )
   }
 
   private def buildWhereFilterElement(filter: JValue): String = {
