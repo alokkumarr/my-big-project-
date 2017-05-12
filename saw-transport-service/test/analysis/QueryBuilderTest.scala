@@ -72,15 +72,31 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
       query(artifactT)(orderBy(orderByA, orderByB)
       ) must be ("SELECT t.a, t.b FROM t ORDER BY t.a ASC, t.b DESC")
     }
-    /*
-    // Note: Disabled until aggregate functions implemented
-    it("with group by columns should have an GROUP BY clause") {
-      val groupByA = groupByColumn("t", "a")
-      val groupByB = groupByColumn("t", "b")
-      query(artifactT)(groupBy(groupByA, groupByB)
-      ) must be ("SELECT t.a, t.b FROM t GROUP BY t.a, t.b")
+  }
+
+  describe("Query built from analysis with group by") {
+    it("with sum should have aggregate function in FROM clause") {
+      query(artifactT)(groupBy(groupByColumn("t", "b", "sum"))
+      ) must be ("SELECT t.a, SUM(t.b) FROM t GROUP BY t.a")
     }
-     */
+    it("with avg should have aggregate function in FROM clause") {
+      query(artifactT)(groupBy(groupByColumn("t", "b", "avg"))
+      ) must be ("SELECT t.a, AVG(t.b) FROM t GROUP BY t.a")
+    }
+    it("with min should have aggregate function in FROM clause") {
+      query(artifactT)(groupBy(groupByColumn("t", "b", "min"))
+      ) must be ("SELECT t.a, MIN(t.b) FROM t GROUP BY t.a")
+    }
+    it("with max should have aggregate function in FROM clause") {
+      query(artifactT)(groupBy(groupByColumn("t", "b", "max"))
+      ) must be ("SELECT t.a, MAX(t.b) FROM t GROUP BY t.a")
+    }
+    it("with multiple columns should have aggregates in FROM clause") {
+      query(artifactW)(groupBy(
+        groupByColumn("w", "g", "min"),
+        groupByColumn("w", "h", "max"))
+      ) must be ("SELECT MIN(w.g), MAX(w.h), w.i FROM w GROUP BY w.i")
+    }
   }
 
   describe("Query built from analysis with multiple artifacts") {
@@ -100,6 +116,10 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
 
   private def artifactV = {
     artifact("v")()("g", "h")
+  }
+
+  private def artifactW = {
+    artifact("w")("g", "h", "i")()
   }
 
   private def query(artifacts: JObject*)(sqlBuilders: JObject*): String = {
@@ -157,8 +177,10 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     ("groupByColumns", columns)
   }
 
-  private def groupByColumn(tableName: String, columnName: String) = {
+  private def groupByColumn(tableName: String, columnName: String,
+    function: String) = {
     ("tableName", tableName) ~
-    ("columnName", columnName)
+    ("columnName", columnName) ~
+    ("function", function)
   }
 }
