@@ -20,28 +20,45 @@ object QueryBuilder {
       case obj: JValue => unexpectedElement(obj)
     }
     "%s %s %s %s %s".format(
-      buildSelect(artifacts),
+      buildSelect(artifacts, sqlBuilder),
       buildFrom(artifacts, sqlBuilder),
       buildWhere(sqlBuilder),
-      buildGroupBy(sqlBuilder),
+      buildGroupBy(artifacts, sqlBuilder),
       buildOrderBy(sqlBuilder)
     ).replaceAll("\\s+", " ").trim
   }
 
-  private def buildSelect(artifacts: List[JValue]) = {
-    val columnElements = artifacts.map((artifact: JValue) => {
-      val artifactName = (artifact \ "artifactName").extract[String]
-      val columns: List[JValue] = artifact \ "columns" match {
-        case columns: JArray => columns.arr
-        case json: JValue => unexpectedElement(json)
+  private def buildSelect(artifacts: List[JValue], sqlBuilder: JObject) = {
+    "SELECT " + buildSelectColumns(artifacts).map(
+      columnAggregate(sqlBuilder, _)).mkString(", ")
+  }
+
+  def columnAggregate(sqlBuilder: JObject, column: String): String = {
+    val groupBy = extractArray(sqlBuilder, "groupByColumns")
+    groupBy.find(buildGroupByElement(_) == column) match {
+      case Some(groupBy) => {
+        val function = (groupBy \ "function").extract[String]
+        if (!List("sum", "avg", "min", "max").contains(function)) {
+          throw new RuntimeException(
+            "Group by function not implemented: " + function)
+        }
+        "%s(%s)".format(function.toUpperCase, column)
       }
+      case None => column
+    }
+  }
+
+  private def buildSelectColumns(artifacts: List[JValue]) = {
+    val columnElements = artifacts.flatMap((artifact: JValue) => {
+      val artifactName = (artifact \ "artifactName").extract[String]
+      val columns = extractArray(artifact, "columns")
       if (columns.size < 1)
         throw new ClientException("At least one artifact column expected")
-      columns.filter(columnChecked(_)).map(column(artifactName, _)).mkString(", ")
-    }).filter(_ != "")
+      columns.filter(columnChecked(_)).map(column(artifactName, _))
+    })
     if (columnElements.isEmpty)
       throw ClientException("Expected at least one checked column")
-    "SELECT " + columnElements.mkString(", ")
+    columnElements
   }
 
   private def columnChecked(column: JValue) = {
@@ -173,19 +190,15 @@ object QueryBuilder {
     )
   }
 
-  private def buildGroupBy(sqlBuilder: JObject): String = {
-    if (true)
-      /* Note: Group by disabled until aggregate functions implemented */
-      return ""
-    val groupBy: List[JValue] = sqlBuilder \ "groupByColumns" match {
-      case l: JArray => l.arr
-      case JNothing => List.empty
-      case json: JValue => unexpectedElement(json)
-    }
+  private def buildGroupBy(
+    artifacts: List[JValue], sqlBuilder: JObject): String = {
+    val groupBy = extractArray(sqlBuilder, "groupByColumns")
     if (groupBy.isEmpty) {
       ""
     } else {
-      "GROUP BY " + groupBy.map(buildGroupByElement(_)).mkString(", ")
+      val selectColumns = buildSelectColumns(artifacts).toSet
+      val groupByColumns = groupBy.map(buildGroupByElement(_)).toSet
+      "GROUP BY " + (selectColumns -- groupByColumns).mkString(", ")
     }
   }
 
@@ -221,6 +234,14 @@ object QueryBuilder {
       property("columnName"),
       property("order")
     )
+  }
+
+  def extractArray(json: JValue, name: String): List[JValue] = {
+    json \ name match {
+      case l: JArray => l.arr
+      case JNothing => List.empty
+      case json: JValue => unexpectedElement(json)
+    }
   }
 
   private def unexpectedElement(json: JValue): Nothing = {
