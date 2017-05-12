@@ -43,21 +43,17 @@ export const chartComponent = {
         forEach(updates, updateObj => {
           set(this.config, updateObj.path, updateObj.data);
         });
+        // Not using chart.update due to a bug with navigation
+        // update and bar styles.
+        this.chart = this.Highcharts.chart(this.$element[0], this.config);
       }
-
-      // Not using chart.update due to a bug with navigation
-      // update and bar styles.
-      this.chart = this.Highcharts.chart(this.$element[0], this.config);
     }
 
     onExport() {
-      // TODO investigate
-      // this.chart.exportChart is not a function despite importing the exporting and offline-exporting modules
-
-      // this.chart.exportChart({
-      //   type: 'application/pdf',
-      //   filename: 'my-pdf'
-      // });
+      this.chart.exportChartLocal({
+        type: 'application/pdf',
+        filename: 'chart'
+      });
     }
   }
 };
