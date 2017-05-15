@@ -6,6 +6,7 @@ import fpGet from 'lodash/fp/get';
 import fpMap from 'lodash/fp/map';
 import first from 'lodash/first';
 import map from 'lodash/map';
+import keys from 'lodash/keys';
 import forEach from 'lodash/forEach';
 import clone from 'lodash/clone';
 import isEmpty from 'lodash/isEmpty';
@@ -437,6 +438,23 @@ export const AnalyzeReportComponent = {
       return result;
     }
 
+    getColumns(columnNames = []) {
+      const fields = fpFlatMap(table => table.fields, this.canvas.model.tables);
+
+      return fpFilter(field => columnNames.indexOf(field.name) >= 0, fields);
+    }
+
+    onSaveQuery(analysis) {
+      this._AnalyzeService.getDataBySettings(clone(analysis))
+        .then(({analysis, data}) => {
+          this.filteredGridData = this.gridData = data;
+          this.model.query = analysis.queryManual || analysis.query;
+
+          const columnNames = keys(fpGet('[0]', data));
+          this.applyDataToGrid(this.getColumns(columnNames), [], this.filteredGridData);
+        });
+    }
+
     refreshGridData() {
       this.model = assign(this.model, this.generatePayload());
 
@@ -450,7 +468,7 @@ export const AnalyzeReportComponent = {
       this._AnalyzeService.getDataBySettings(clone(this.model))
         .then(({analysis, data}) => {
           this.filteredGridData = this.gridData = data;
-          this.model.query = analysis.query;
+          this.model.query = analysis.queryManual || analysis.query;
           this.generateFiltersOnCanvasChange(); // update filters with new data
           this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
           this.analysisChanged = false;
