@@ -87,14 +87,6 @@
 
                   <md-icon md-font-icon="icon-fork"></md-icon>
                 </md-button>
-                <md-button class="md-button btn-card"
-                           aria-label="Execute"
-                           ng-click="$ctrl.execute(report.data.id)">
-                  <md-icon md-font-icon="icon-folder"></md-icon>
-                  <md-tooltip>
-                    <span translate="TOOLTIP_EXECUTE_ANALYSIS"></span>
-                  </md-tooltip>
-                </md-button>
 
                 <md-menu-bar>
                   <md-menu>
@@ -105,8 +97,15 @@
 
                     <md-menu-content>
                       <md-menu-item>
+                        <md-button aria-label="Execute"
+                                   ng-click="$ctrl.execute(report.data.id)"
+                                   translate="EXECUTE">
+                        </md-button>
+                      </md-menu-item>
+                      <md-menu-item>
                         <md-button aria-label="Edit"
-                                   ng-click="$ctrl.edit(report.data)">Edit
+                                   ng-click="$ctrl.edit(report.data)"
+                                   translate="EDIT">
                         </md-button>
                       </md-menu-item>
                       <md-menu-item>
