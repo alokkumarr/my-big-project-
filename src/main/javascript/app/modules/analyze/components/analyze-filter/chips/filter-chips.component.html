@@ -1,0 +1,20 @@
+<div class="filter-chip-container" layout="row" ng-if="$ctrl.filters.length > 0">
+  <div layout="column" style="padding: 6px 20px 10px 0">
+    <span class="filter-counter" translate="N_FILTERS_APPLIED"
+          translate-values="{N: $ctrl.filters.length}"
+          translate-interpolation="messageformat"></span>
+    <md-button class="btn-tertiary filter-clear-all" ng-click="$ctrl.onClearAllFilters()" translate="CLEAR_ALL"></md-button>
+  </div>
+  <md-chips class="filter-tags" readonly="true"
+            ng-model="$ctrl.filters"
+            md-removable="true"
+            md-on-remove="$ctrl.onFilterRemoved({chip: $chip})">
+    <md-chip-template>
+      <span ng-bind="$chip.label"></span>
+    </md-chip-template>
+
+    <button class="md-primary" md-chip-remove>
+      <md-icon md-font-icon="icon-remove"></md-icon>
+    </button>
+  </md-chips>
+</div>

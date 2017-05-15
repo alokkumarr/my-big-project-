@@ -2,7 +2,7 @@
   <analyze-dialog-header>
     <div layout="row">
       <md-button class="ard_back-btn"
-                 ng-click="$ctrl.$dialog.closeDialog()">
+                 ng-click="$ctrl.$dialog.hide()">
         <md-icon md-font-icon="icon-arrow-left"></md-icon>
       </md-button>
 
@@ -68,11 +68,13 @@
             <span translate="FILTER"></span>
           </md-button>
         </div>
-
       </div>
-
       <md-card>
         <md-card-content layout="column">
+          <filter-chips filters="$ctrl.filters.selected"
+                        on-clear-all-filters="$ctrl.onClearAllFilters()"
+                        on-filter-removed="$ctrl.onFilterRemoved(chip)">
+          </filter-chips>
           <pivot-grid updater="$ctrl.pivotGridUpdater" send-fields="$ctrl.onGetFields(fields)"></pivot-grid>
         </md-card-content>
       </md-card>

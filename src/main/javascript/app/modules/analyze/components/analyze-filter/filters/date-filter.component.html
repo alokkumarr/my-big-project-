@@ -1,0 +1,27 @@
+<div layout-gt-xs="row">
+  <md-icon
+    md-font-icon="icon-calendar">
+  </md-icon>
+  <md-input-container md-no-float flex-gt-xs>
+    <label translate="FROM"></label>
+    <md-datepicker
+      ng-model="$ctrl.filter.model.fromDate"
+      md-hide-icons="all" md-open-on-focus
+      md-placeholder="mm/dd/yyyy"
+    ></md-datepicker>
+  </md-input-container>
+  <div style="width: 20px;padding: 0 3px;">
+    <div></div>
+  </div>
+  <md-icon
+    md-font-icon="icon-calendar">
+  </md-icon>
+  <md-input-container md-no-float flex-gt-xs>
+    <label translate="TO"></label>
+    <md-datepicker
+      ng-model="$ctrl.filter.model.toDate"
+      md-hide-icons="all" md-open-on-focus
+      md-placeholder="mm/dd/yyyy"
+    ></md-datepicker>
+  </md-input-container>
+</div>
