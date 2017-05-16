@@ -46,10 +46,6 @@ export const AnalyzeReportSaveComponent = {
         });
     }
 
-    cancel() {
-      this._$mdDialog.cancel();
-    }
-
     setDefaultCategory() {
       if (!this.model.category) {
         const defaultCategory = first(this.dataHolder.categories);
@@ -58,6 +54,10 @@ export const AnalyzeReportSaveComponent = {
           this.model.category = defaultCategory.id;
         }
       }
+    }
+
+    hide() {
+      this.$dialog.hide();
     }
 
     save() {
@@ -76,7 +76,9 @@ export const AnalyzeReportSaveComponent = {
 
             this._$eventEmitter.emit(Events.AnalysesRefresh, payload);
 
-            this.cancel();
+            // if saved successfully
+            this.$dialog.hide(true);
+            // use this.$dialog.cancel(); on error
           })
           .finally(() => {
             this.$dialog.hideLoader();

@@ -42,8 +42,12 @@ export const AnalyzeDialogComponent = {
       this.states.loader = false;
     }
 
-    closeDialog() {
-      this.$mdDialog.hide();
+    cancel(payload) {
+      this.$mdDialog.cancel(payload);
+    }
+
+    hide(payload) {
+      this.$mdDialog.hide(payload);
     }
   }
 };

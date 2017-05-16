@@ -16,7 +16,7 @@ import assign from 'lodash/assign';
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
 
-import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter-sidenav/analyze-filter-sidenav.component';
+import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter/analyze-filter-sidenav.component';
 
 const DEBOUNCE_INTERVAL = 500; // milliseconds
 
@@ -189,12 +189,7 @@ export const AnalyzeReportComponent = {
     generateFilters(selectedFields, gridData) {
       return this._FilterService.getCanvasFieldsToFiltersMapper(gridData)(selectedFields);
     }
-
     // END filters section
-
-    cancel() {
-      this._$mdDialog.cancel();
-    }
 
     toggleDetailsPanel() {
       this.states.detailsExpanded = !this.states.detailsExpanded;
@@ -675,7 +670,15 @@ export const AnalyzeReportComponent = {
           multiple: true,
           targetEvent: ev,
           clickOutsideToClose: true
+        }).then(successfullySaved => {
+          if (successfullySaved) {
+            this.onAnalysisSaved(successfullySaved);
+          }
         });
+    }
+
+    onAnalysisSaved(successfullySaved) {
+      this.$dialog.hide(successfullySaved);
     }
   }
 };

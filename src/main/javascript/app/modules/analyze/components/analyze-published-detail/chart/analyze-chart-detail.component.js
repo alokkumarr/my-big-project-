@@ -8,7 +8,7 @@ import isEmpty from 'lodash/isEmpty';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import template from './analyze-chart-detail.component.html';
-import {ANALYZE_FILTER_SIDENAV_IDS} from '../../analyze-filter-sidenav/analyze-filter-sidenav.component';
+import {ANALYZE_FILTER_SIDENAV_IDS} from '../../analyze-filter/analyze-filter-sidenav.component';
 
 export const AnalyzeChartDetailComponent = {
   template,
@@ -24,6 +24,7 @@ export const AnalyzeChartDetailComponent = {
       this._FilterService = FilterService;
       this._$timeout = $timeout;
       this.chartUpdater = new BehaviorSubject({});
+      this.filters = {};
     }
 
     $onInit() {
@@ -42,11 +43,12 @@ export const AnalyzeChartDetailComponent = {
         groupBy
       };
 
-      this.filters = map(this.analysis.chart.filters, this._FilterService.getBackEnd2FrontEndFilterMapper());
+      this.filters.possible = map(this.analysis.chart.filters, this._FilterService.getBackEnd2FrontEndFilterMapper());
+      this.filters.selected = this._FilterService.getSelectedFilterMapper()(this.filters.possible);
       this.data = this.analysis.chart.data;
       this.filterGridData();
 
-      this.setFilterItems(this.filters, this.data);
+      this.setFilterItems(this.filters.possible, this.data);
 
       this.legend = {
         align: get(this.analysis, 'chart.legend.align', 'right'),
@@ -76,8 +78,8 @@ export const AnalyzeChartDetailComponent = {
     }
 
     openFilterSidenav() {
-      if (!isEmpty(this.filters)) {
-        this._FilterService.openFilterSidenav(this.filters, ANALYZE_FILTER_SIDENAV_IDS.detailPage);
+      if (!isEmpty(this.filters.possible)) {
+        this._FilterService.openFilterSidenav(this.filters.possible, ANALYZE_FILTER_SIDENAV_IDS.detailPage);
       }
     }
 
@@ -87,19 +89,28 @@ export const AnalyzeChartDetailComponent = {
     }
 
     onApplyFilters(filters) {
-      this.filters = filters;
+      this.filters.possible = filters;
+      this.filters.selected = this._FilterService.getSelectedFilterMapper()(this.filters.possible);
       this.filterGridData();
       this.updateChart();
     }
 
     onClearAllFilters() {
-      this.filters = this._FilterService.getFilterClearer()(this.filters);
+      this.filters.possible = this._FilterService.getFilterClearer()(this.filters.possible);
+      this.filters.selected = [];
       this.filteredData = this.data;
       this.updateChart();
     }
 
+    onFilterRemoved(filter) {
+      filter.model = null;
+      this.filters.selected = this._FilterService.getSelectedFilterMapper()(this.filters.possible);
+      this.filterGridData();
+      this.updateChart();
+    }
+
     filterGridData() {
-      this.filteredData = this._FilterService.getGridDataFilter(this.filters)(this.data);
+      this.filteredData = this._FilterService.getGridDataFilter(this.filters.selected)(this.data);
     }
 
     request(requests) {

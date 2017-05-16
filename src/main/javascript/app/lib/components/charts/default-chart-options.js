@@ -12,6 +12,9 @@ export const chartOptions = {
       }
     }
   },
+  exporting: {
+    enabled: false
+  },
   legend: {
     verticalAlign: 'top',
     layout: 'vertical',
@@ -34,6 +37,8 @@ export const chartOptions = {
       fontSize: '16px'
     }
   },
-  title: false,
+  title: {
+    text: ''
+  },
   credits: false
 };

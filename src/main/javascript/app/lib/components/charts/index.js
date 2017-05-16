@@ -2,15 +2,17 @@ import angular from 'angular';
 import Highstock from 'highcharts/highstock';
 import Highcharts from 'highcharts/highcharts';
 
-// import 'highcharts/modules/exporting';
-// import 'highcharts/modules/offline-exporting';
-// import 'highcharts/highcharts-more';
+import exporting from 'highcharts/modules/exporting';
+import offlineExporting from 'highcharts/modules/offline-exporting';
 
 import {chartComponent} from './chart.component';
 import {businessTransactionVolumeService} from './business-transaction-volume.service';
 import {businessTransactionVolumeChart} from './business-transaction-volume.chart';
 
 export const ChartsModule = 'components.charts';
+
+exporting(Highcharts);
+offlineExporting(Highcharts);
 
 angular.module(ChartsModule, [])
         .constant('Highstock', Highstock)

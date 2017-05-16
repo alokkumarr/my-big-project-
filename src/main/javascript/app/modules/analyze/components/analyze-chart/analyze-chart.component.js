@@ -10,7 +10,7 @@ import filter from 'lodash/filter';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
-import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter-sidenav/analyze-filter-sidenav.component';
+import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter/analyze-filter-sidenav.component';
 
 export const AnalyzeChartComponent = {
   template,
@@ -199,6 +199,13 @@ export const AnalyzeChartComponent = {
       this.reloadChart(this.settings, this.filteredGridData);
     }
 
+    onFilterRemoved(filter) {
+      filter.model = null;
+      this.filters.selected = this._FilterService.getSelectedFilterMapper()(this.filters.possible);
+      this.filterGridData();
+      this.reloadChart(this.settings, this.filteredGridData);
+    }
+
     filterGridData() {
       this.filteredGridData = this._FilterService.getGridDataFilter(this.filters.selected)(this.gridData);
     }
@@ -317,7 +324,15 @@ export const AnalyzeChartComponent = {
           multiple: true,
           targetEvent: ev,
           clickOutsideToClose: true
+        }).then(successfullySaved => {
+          if (successfullySaved) {
+            this.onAnalysisSaved(successfullySaved);
+          }
         });
+    }
+
+    onAnalysisSaved(successfullySaved) {
+      this.$dialog.hide(successfullySaved);
     }
   }
 

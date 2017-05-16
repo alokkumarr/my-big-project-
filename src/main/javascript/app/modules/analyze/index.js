@@ -35,11 +35,13 @@ import {ReportGridDisplayContainerComponent} from './components/analyze-report-g
 import {ReportGridComponent} from './components/analyze-report-grid/report-grid/report-grid.component';
 import {ReportGridNodeComponent} from './components/analyze-report-grid/report-grid-node/report-grid-node.component';
 import {ReportGridContainerComponent} from './components/analyze-report-grid/report-grid-container/report-grid-container.component';
-import {AnalyzeFilterContainerComponent} from './components/analyze-filter-sidenav/analyze-filter-container.component';
-import {AnalyzeFilterGroupComponent} from './components/analyze-filter-sidenav/analyze-filter-group.component';
-import {AnalyzeFilterSidenavComponent} from './components/analyze-filter-sidenav/analyze-filter-sidenav.component';
-import {StringFilterComponent} from './components/analyze-filter-sidenav/filters/string-filter.component';
-import {NumberFilterComponent} from './components/analyze-filter-sidenav/filters/number-filter.component';
+import {AnalyzeFilterContainerComponent} from './components/analyze-filter/analyze-filter-container.component';
+import {AnalyzeFilterGroupComponent} from './components/analyze-filter/analyze-filter-group.component';
+import {AnalyzeFilterSidenavComponent} from './components/analyze-filter/analyze-filter-sidenav.component';
+import {StringFilterComponent} from './components/analyze-filter/filters/string-filter.component';
+import {NumberFilterComponent} from './components/analyze-filter/filters/number-filter.component';
+import {DateFilterComponent} from './components/analyze-filter/filters/date-filter.component';
+import {FilterChipsComponent} from './components/analyze-filter/chips/filter-chips.component';
 import {ReportRenameDialogComponent} from './components/analyze-report-grid/report-rename-dialog/report-rename-dialog.component';
 import {AnalyzeReportSaveComponent} from './components/analyze-report-save/analyze-report-save.component';
 import {AnalyzePublishDialogComponent} from './components/analyze-publish-dialog/analyze-publish-dialog.component';
@@ -85,6 +87,8 @@ angular.module(AnalyzeModule, [])
   .component('analyzeFilterGroup', AnalyzeFilterGroupComponent)
   .component('stringFilter', StringFilterComponent)
   .component('numberFilter', NumberFilterComponent)
+  .component('dateFilter', DateFilterComponent)
+  .component('filterChips', FilterChipsComponent)
   .component('analyzeFilterSidenav', AnalyzeFilterSidenavComponent)
   .component('analyzeReportDescription', AnalyzeReportDescriptionComponent)
   .component('analyzeReportPreview', AnalyzeReportPreviewComponent)
