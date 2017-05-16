@@ -17,6 +17,10 @@ export const LayoutHeaderComponent = {
       this.hideAnalyze = true;
 
       const token = this._JwtService.get();
+      if (!token) {
+        $window.location.assign('/login.html');
+        return;
+      }
       const base64Url = token.split('.')[1];
       const base64 = base64Url.replace('-', '+').replace('_', '/');
       const resp = angular.fromJson(this._$window.atob(base64));

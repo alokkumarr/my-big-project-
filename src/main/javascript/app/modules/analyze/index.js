@@ -24,6 +24,7 @@ import {AnalyzePivotPreviewComponent} from './components/analyze-pivot-preview/a
 import {PivotGridComponent} from './components/analyze-pivot-grid/pivot-grid.component';
 import {AnalyzePivotComponent} from './components/analyze-pivot/analyze-pivot.component';
 import {AnalyzeReportComponent} from './components/analyze-report/analyze-report.component';
+import {AnalyzeReportQueryComponent} from './components/analyze-report-query/analyze-report-query.component';
 import {AnalyzeDialogComponent} from './components/analyze-dialog/analyze-dialog.component';
 import {AnalyzeReportSortComponent} from './components/analyze-report-sort/analyze-report-sort.component';
 import {AnalyzeReportDescriptionComponent} from './components/analyze-report-description/analyze-report-description.component';
@@ -79,6 +80,7 @@ angular.module(AnalyzeModule, [])
   .component('pivotGrid', PivotGridComponent)
   .component('analyzePivot', AnalyzePivotComponent)
   .component('analyzeReport', AnalyzeReportComponent)
+  .component('analyzeReportQuery', AnalyzeReportQueryComponent)
   .component('analyzeDialog', AnalyzeDialogComponent)
   .component('analyzeReportSort', AnalyzeReportSortComponent)
   .component('analyzeFilterContainer', AnalyzeFilterContainerComponent)

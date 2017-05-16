@@ -50,7 +50,7 @@ export const AnalyzePivotComponent = {
 
       if (isEmpty(this.model.artifacts)) {
         // new analysis
-        this._AnalyzeService.createAnalysis(this.model.artifactsId)
+        this._AnalyzeService.createAnalysis(this.model.artifactsId, 'pivot')
           .then(analysis => {
             this.prepareFields(analysis.artifacts[0].columns);
             this.toggleSettingsSidenav();

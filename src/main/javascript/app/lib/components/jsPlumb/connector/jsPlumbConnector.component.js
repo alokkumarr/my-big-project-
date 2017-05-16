@@ -3,7 +3,8 @@ import isEmpty from 'lodash/isEmpty';
 
 export const JSPlumbConnector = {
   bindings: {
-    model: '<'
+    model: '<',
+    onChange: '&'
   },
   controller: class JSPlumbConnectionCtrl {
     constructor($timeout, $compile, $scope) {
@@ -76,11 +77,15 @@ export const JSPlumbConnector = {
     }
 
     addJoinLabel() {
-      const html = `<js-plumb-join-label model="model"></js-plumb-join-label>`;
+      const html = `<js-plumb-join-label model="model" on-change="joinChanged(params)"></js-plumb-join-label>`;
       const scope = this._$scope.$new();
 
       scope.model = {
         connector: this
+      };
+
+      scope.joinChanged = params => {
+        this.onChange({params});
       };
 
       const el = this._$compile(html)(scope);

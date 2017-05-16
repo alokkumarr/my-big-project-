@@ -1,105 +1,130 @@
-[{
-  "id":"2015f73a-8491-4f97-8867-121c7e99fc61",
-  "dataSecurityKey":"empty",
-  "type":"semantic",
-  "metric":"MCT Error",
-  "metricName":"MCT Error",
-  "customerCode":"ATT",
-  "disabled":"false",
-  "checked":"false",
-  "supports":[{
-    "label":"TABLES",
-    "category":"table",
-    "children":[{
-      "type":"table:report"
-    }, {
-      "type":"table:pivot"
-    }]
-  }, {
-    "label":"CHARTS",
-    "category":"charts",
-    "children":[{
-      "type":"chart:column"
-    },{
-      "type":"chart:line"
-    },{
-      "type":"chart:stack"
-    }]
-  }],
-  "module":"ANALYZE"
-},{
-  "id":"635b64be-ee90-4770-a058-e48272153455",
-  "dataSecurityKey":"empty",
-  "type":"semantic",
-  "metric":"MCT Content",
-  "metricName":"MCT Content",
-  "customerCode":"ATT",
-  "disabled":"false",
-  "checked":"false",
-  "supports":[{
-    "label":"TABLES",
-    "category":"table",
-    "children":[{
-      "type":"table:report"
-    }, {
-      "type":"table:pivot"
-    }]
-  }, {
-    "label":"CHARTS",
-    "category":"charts",
-    "children":[{
-      "type":"chart:column"
-    },{
-      "type":"chart:line"
-    },{
-      "type":"chart:stack"
-    }]
-  }],
-  "module":"ANALYZE"
-},{
-  "id":"c7a32609-2940-4492-afcc-5548b5e5a040",
-  "dataSecurityKey":"empty",
-  "type":"semantic",
-  "metric":"MCT Session",
-  "metricName":"MCT Session",
-  "customerCode":"ATT",
-  "disabled":"false",
-  "checked":"false",
-  "supports":[{
-    "label":"TABLES",
-    "category":"table",
-    "children":[{
-      "type":"table:report"
-    }, {
-      "type":"table:pivot"
-    }]
-  }, {
-    "label":"CHARTS",
-    "category":"charts",
-    "children":[{
-      "type":"chart:column"
-    },{
-      "type":"chart:line"
-    },{
-      "type":"chart:stack"
-    }]
-  }],
-  "module":"ANALYZE"
-},{
-  "id":"da561e07-4260-4d5e-b1d4-e04e4b8c6f0b",
-  "dataSecurityKey":"",
-  "type":"semantic",
-  "metric":"MCT Session & Content",
-  "metricName":"MCT Session & Content",
-  "customerCode":"ATT",
-  "disabled":"false",
-  "checked":"false",
-  "supports":[{
-    "label":"TABLES",
-    "category":"table",
-    "children":[{
-      "type":"table:report"
-    }]
-  }],
-  "module":"ANALYZE"
-}]
+{
+  "data" : [],
+  "links" : {},
+  "contents" : [{
+    "analyze" :
+    [
+      {
+        "id" : "semantic_data_345679234",
+        "dataSecurityKey" : "20170612ATT",
+        "type" : "semantic",
+        "metricName" : "MCT Error",
+        "customerCode" : "ATT",
+        "disabled" : "false",
+        "checked" : "false",
+        "supports":
+        [
+          {
+            "label": "TABLES",
+            "category": "table",
+            "children": [
+              {
+                "type": "table:report"
+              },
+              {
+                "type": "table:pivot"
+              }
+            ]
+          }
+        ],
+        "repository":
+        {
+          "storageType" : "ES",
+          "indexName" : "demo_order_latest_prc_batch",
+          "type" : "order",
+          "URL" : "https://sncradmin:xuw3dUraHapret@razorinsights-trial.razorsight.com/esuat/"
+        }
+      },
+      {
+        "id" : "semantic_data_345679235",
+        "dataSecurityKey" : "20170612ATT",
+        "type" : "semantic",
+        "metricName" : "MCT Session",
+        "customerCode" : "ATT",
+        "disabled" : "false",
+        "checked" : "false",
+        "supports":
+        [
+          {
+            "label": "TABLES",
+            "category": "table",
+            "children": [
+              {
+                "type": "table:report"
+              },
+              {
+                "type": "table:pivot"
+              }
+            ]
+          }
+        ],
+        "repository":
+        {
+          "storageType" : "ES",
+          "index_name" : "demo_order_latest_prc_batch",
+          "type" : "order",
+          "URL" : "https://sncradmin:xuw3dUraHapret@razorinsights-trial.razorsight.com/esuat/"
+        }
+      },
+      {
+        "id" : "semantic_data_345679236",
+        "dataSecurityKey" : "20170612ATT",
+        "type" : "semantic",
+        "metricName" : "MCT Content",
+        "customerCode" : "ATT",
+        "disabled" : "false",
+        "checked" : "false",
+        "supports":
+        [
+          {
+            "label": "TABLES",
+            "category": "table",
+            "children": [
+              {
+                "type": "table:report"
+              },
+              {
+                "type": "table:pivot"
+              }
+            ]
+          }
+        ],
+        "repository":
+        {
+          "storageType" : "ES",
+          "index_name" : "demo_order_latest_prc_batch",
+          "type" : "order",
+          "URL" : "https://sncradmin:xuw3dUraHapret@razorinsights-trial.razorsight.com/esuat/"
+        }
+      },
+      {
+        "id" : "semantic_data_345679237",
+        "dataSecurityKey" : "20170612ATT",
+        "type" : "semantic",
+        "metricName" : "MCT Session & Content Summary",
+        "customerCode" : "ATT",
+        "disabled" : "false",
+        "checked" : "false",
+        "supports":
+        [
+          {
+            "label": "TABLES",
+            "category": "table",
+            "children": [
+              {
+                "type": "table:report"
+              }
+            ]
+          }
+        ],
+        "repository":
+        {
+          "storageType" : "ES",
+          "index_name" : "demo_order_latest_prc_batch",
+          "type" : "order",
+          "URL" : "https://sncradmin:xuw3dUraHapret@razorinsights-trial.razorsight.com/esuat/"
+        }
+      }
+    ]
+  }]
+}

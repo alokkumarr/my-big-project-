@@ -14,6 +14,10 @@
   .md-subheader {
     .md-subheader-inner {
       padding: 0;
+
+      & * {
+        overflow-wrap: break-word;
+      }
     }
 
     md-checkbox {
