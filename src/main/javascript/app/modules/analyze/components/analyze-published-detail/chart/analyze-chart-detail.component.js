@@ -8,7 +8,6 @@ import isEmpty from 'lodash/isEmpty';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import template from './analyze-chart-detail.component.html';
-import style from './analyze-chart-detail.component.scss';
 import {ANALYZE_FILTER_SIDENAV_IDS} from '../../analyze-filter-sidenav/analyze-filter-sidenav.component';
 
 export const AnalyzeChartDetailComponent = {
@@ -17,7 +16,6 @@ export const AnalyzeChartDetailComponent = {
     analysis: '<',
     requester: '<'
   },
-  styles: [style],
   controller: class AnalyzeChartDetailController {
     constructor(ChartService, FilterService, $timeout) {
       'ngInject';
