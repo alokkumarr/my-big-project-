@@ -29,6 +29,8 @@ class SAWChartTypeElasticSearchQueryBuilder {
 	
 	String jsonString;
 
+	SearchSourceBuilder searchSourceBuilder;
+	
 	public SAWChartTypeElasticSearchQueryBuilder(String jsonString) 
 	{
 		super();
@@ -161,7 +163,22 @@ class SAWChartTypeElasticSearchQueryBuilder {
 		    	}
 		    }	    
 		   
+		setSearchSourceBuilder(searchSourceBuilder);    
 		query = searchSourceBuilder.toString();    
 		return query;
 	}
+	
+	
+	
+	void setSearchSourceBuilder(SearchSourceBuilder searchSourceBuilder) {
+		this.searchSourceBuilder = searchSourceBuilder;
+	}
+
+	public SearchSourceBuilder getSearchSourceBuilder() throws JsonProcessingException, IOException 
+	{
+		buildQuery();
+		return searchSourceBuilder;
+	}
+
+	
 }

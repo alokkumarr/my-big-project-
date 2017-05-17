@@ -28,6 +28,7 @@ import com.synchronoss.querybuilder.model.SqlBuilder;
 class SAWPivotTypeElasticSearchQueryBuilder {
 
 	String jsonString;
+	SearchSourceBuilder searchSourceBuilder;
 
 	public SAWPivotTypeElasticSearchQueryBuilder(String jsonString) 
 	{
@@ -89,6 +90,7 @@ class SAWPivotTypeElasticSearchQueryBuilder {
 			boolQueryBuilder.must(item);
 		});
 	   searchSourceBuilder.query(boolQueryBuilder);
+	   
 	   
 	   
 	    List<RowField> rowfield = sqlBuilderNode.getRowFields();
@@ -160,12 +162,17 @@ class SAWPivotTypeElasticSearchQueryBuilder {
 		    }
 	    }
 	    // Generated Query
+	    setSearchSourceBuilder(searchSourceBuilder);
 	    query = searchSourceBuilder.toString();
 		return query;
 	}
-	
-	
-	
-	
 
+	public SearchSourceBuilder getSearchSourceBuilder() throws JsonProcessingException, IOException {
+		buildQuery();
+		return searchSourceBuilder;
+	}
+
+	void setSearchSourceBuilder(SearchSourceBuilder searchSourceBuilder) {
+		this.searchSourceBuilder = searchSourceBuilder;
+	}
 }

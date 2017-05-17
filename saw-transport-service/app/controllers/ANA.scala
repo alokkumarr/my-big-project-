@@ -52,6 +52,8 @@ class ANA extends BaseServiceProvider {
         val idJson: JObject = ("id", analysisId)
         val analysisType = extractKey(json, "analysisType")
         val typeJson: JObject = ("type", analysisType)
+        
+        
         val semanticJson = readSemanticJson(semanticId)
         val mergeJson = contentsAnalyze(
           semanticJson.merge(idJson).merge(semanticIdJson).merge(typeJson))
@@ -187,6 +189,8 @@ class ANA extends BaseServiceProvider {
     val analysisNode = AnalysisNode(analysisId)
     if (analysisNode.getCachedData == null || analysisNode.getCachedData.isEmpty)
       throw new Exception("Could not find analysis node with provided analysis ID")
+   
+    // This is the part of report type starts here
     val er: ExecutionTaskHandler = new ExecutionTaskHandler(1)
     val aeh: AnalysisExecutionHandler = new AnalysisExecutionHandler(analysisId)
     er.startSQLExecutor(aeh)
@@ -204,6 +208,8 @@ class ANA extends BaseServiceProvider {
           "Spark SQL execution failed: " +
             (obj \ "error_message").extractOrElse[String]("none"))
       }
+    // This is the end of report type ends here
+      
       case JArray(result) => result.arr
       case value: JValue => throw new RuntimeException(
         "Expected array: " + value)
