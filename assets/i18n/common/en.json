@@ -71,5 +71,7 @@
 
   "TOOLTIP_SEARCH": "Search",
   "TOOLTIP_LIST_VIEW": "List View",
-  "TOOLTIP_CARD_VIEW": "Card View"
+  "TOOLTIP_CARD_VIEW": "Card View",
+
+  "ERROR_OOPS_SERVER": "Oops, it looks like something went wrong with the server, if you see this message regularly, please contact customer support."
 }
