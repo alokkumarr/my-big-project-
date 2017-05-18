@@ -27,6 +27,7 @@ import {routesConfig} from './routes';
 import {themeConfig} from './theme';
 import {i18nConfig} from './i18n';
 import {config} from './config';
+import {interceptor} from './http-interceptor';
 import {runConfig} from './run';
 
 import {LibModule} from './lib';
@@ -63,6 +64,7 @@ angular
   .config(themeConfig)
   .config(i18nConfig)
   .config(config)
+  .config(interceptor)
   .run(runConfig)
   .value('AppConfig', AppConfig)
   .factory('AuthService', AuthServiceFactory)

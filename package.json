@@ -25,6 +25,7 @@
     "angular-messages": "1.6.2",
     "angular-mocks": "1.6.2",
     "angular-sanitize": "1.6.2",
+    "angular-toastr": "^2.1.1",
     "angular-translate": "2.13.1",
     "angular-ui-router": "1.0.0-beta.1",
     "blob": "0.0.4",

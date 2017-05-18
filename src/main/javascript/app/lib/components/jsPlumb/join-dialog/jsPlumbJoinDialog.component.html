@@ -35,13 +35,13 @@
         </span>
 
         <div layout="column">
-          <strong>Inner Join</strong>
-          <span class="jsp-join-dialog_desc">Include <strong>only</strong> rows where
-            `<span ng-bind="$ctrl.leftSideField.name"></span>` in the
-            `<span ng-bind="$ctrl.leftSide.table.name"></span>` table equals
-            `<span ng-bind="$ctrl.rightSideField.name"></span>` in the
-            `<span ng-bind="$ctrl.rightSide.table.name"></span>` table.
-          </span>
+          <strong translate="INNER_JOIN"></strong>
+          <span class="jsp-join-dialog_desc"
+                translate="INNER_JOIN_DESCRIPTION"
+                translate-values="{leftField: $ctrl.leftSideField.name,
+                                   leftTable: $ctrl.leftSide.table.name,
+                                   rightField: $ctrl.rightSideField.name,
+                                   rightTable: $ctrl.rightSide.table.name}"></span>
         </div>
       </md-list-item>
 
@@ -56,11 +56,11 @@
         </span>
 
         <div layout="column">
-          <strong>Left Join</strong>
-          <span class="jsp-join-dialog_desc">Include <strong>all</strong> rows from
-            `<span ng-bind="$ctrl.leftSide.table.name"></span>` and <strong>only</strong> those records from
-            `<span ng-bind="$ctrl.rightSide.table.name"></span>` where the joined fields are equal.
-          </span>
+          <strong translate="LEFT_JOIN"></strong>
+          <span class="jsp-join-dialog_desc"
+                translate="LEFT_JOIN_DESCRIPTION"
+                translate-values="{leftTable: $ctrl.leftSide.table.name,
+                                   rightTable: $ctrl.rightSide.table.name}"></span>
         </div>
       </md-list-item>
 
@@ -75,11 +75,11 @@
         </span>
 
         <div layout="column">
-          <strong>Right Join</strong>
-          <span class="jsp-join-dialog_desc">Include <strong>all</strong> rows from
-            `<span ng-bind="$ctrl.rightSide.table.name"></span>` and <strong>only</strong> those records from
-            `<span ng-bind="$ctrl.leftSide.table.name"></span>` where the joined fields are equal.
-          </span>
+          <strong translate="RIGHT_JOIN"></strong>
+          <span class="jsp-join-dialog_desc"
+                translate="RIGHT_JOIN_DESCRIPTION"
+                translate-values="{leftTable: $ctrl.leftSide.table.name,
+                                   rightTable: $ctrl.rightSide.table.name}"></span>
         </div>
       </md-list-item>
     </md-list>
@@ -90,11 +90,13 @@
     <div layout="row" layout-align="space-between center" flex="auto">
       <div>
         <md-button class="btn-primary"
-                   ng-click="$ctrl.save()">Done
+                   ng-click="$ctrl.save()">
+          <span translate="DONE"></span>
         </md-button>
 
         <md-button class="btn-card"
-                   ng-click="$ctrl.cancel()">Cancel
+                   ng-click="$ctrl.cancel()">
+          <span translate="CANCEL"></span>
         </md-button>
       </div>
 
