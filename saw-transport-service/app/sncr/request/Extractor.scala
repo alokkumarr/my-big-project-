@@ -19,17 +19,9 @@ class Extractor {
 
   def validateRequest(json: JsValue) : (Boolean, String) =
   {
-    val (usid_bRes, uid) = testField(json, MetadataDictionary.user_id.toString)
-    if (!usid_bRes) return (false, "User info is missing")
-    security(MetadataDictionary.user_id.toString) = uid.get
-
     val (dsk_bRes, dsk) = testField(json, MetadataDictionary.DSK.toString)
     if (!dsk_bRes) return (false, "DSK is missing")
     security(MetadataDictionary.DSK.toString) = dsk.get
-
-    val (tkn_bRes, token) = testField(json, MetadataDictionary.Token.toString)
-    if (!tkn_bRes) return (false, "Token is missing")
-    security(MetadataDictionary.Token.toString) = token.get
     (true, "SUCCESS")
   }
 
