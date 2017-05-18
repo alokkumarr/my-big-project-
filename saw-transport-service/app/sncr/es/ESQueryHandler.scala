@@ -33,12 +33,16 @@ class ESQueryHandler (ext: Extractor) extends HTTPRequest {
 
   def esRequest( source : JsValue) : Result =
   {
-    val es_ip = SAWServiceConfig.es_conf.getString("host")
-    val es_port = SAWServiceConfig.es_conf.getInt("port")
-    val timeout = SAWServiceConfig.es_conf.getInt("timeout")
-    val uname = SAWServiceConfig.es_conf.getString("username")
-    val pswd = SAWServiceConfig.es_conf.getString("password")
+    val es_protocol = if (SAWServiceConfig.es_conf.hasPath("protocol")) SAWServiceConfig.es_conf.getString("protocol") else "http"
 
+    val es_ip = SAWServiceConfig.es_conf.getString("host")
+
+    val es_port = if (SAWServiceConfig.es_conf.hasPath("port")) Option(SAWServiceConfig.es_conf.getInt("port")) else None
+
+    val timeout = SAWServiceConfig.es_conf.getInt("timeout")
+
+    val uname = if (SAWServiceConfig.es_conf.hasPath("username")) Option(SAWServiceConfig.es_conf.getString("username")) else None
+    val pswd = if (SAWServiceConfig.es_conf.hasPath("password")) Option(SAWServiceConfig.es_conf.getString("password")) else None
 
     val res: ObjectNode = Json.newObject
     res.put("result", "failure")
@@ -53,12 +57,16 @@ class ESQueryHandler (ext: Extractor) extends HTTPRequest {
     try {
       httpClient.start()
       val req_builder: URIBuilder = new URIBuilder
-//      req_builder. setCharset (Charset.forName("UTF-8"))
       req_builder setPath ("/" + inxName +  "/" + (if (objType != null ) objType + "/" else "" ) + verb)
       req_builder setHost es_ip
-      req_builder setPort es_port.toInt
-      req_builder setScheme "http"
-      req_builder.setUserInfo(uname, pswd)
+
+      if (es_port.isDefined ) req_builder setPort es_port.get
+      req_builder setScheme es_protocol
+
+      if (uname.isDefined && uname.nonEmpty && pswd.isDefined && pswd.nonEmpty)
+        req_builder.setUserInfo(uname.get, pswd.get)
+      else
+        m_log.debug( "Username and/or password is not set - skip authentication settings" )
 
       m_log.debug(s"Execute ES query: ${req_builder.build().toASCIIString}" )
 
