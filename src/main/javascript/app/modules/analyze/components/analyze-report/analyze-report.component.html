@@ -60,7 +60,9 @@
             <span translate="DESCRIPTION"></span>
           </md-button>
 
-            <md-button ng-if="$ctrl.showFiltersButton && !$ctrl.model.edit" ng-click="$ctrl.openFilterSidenav()">
+            <md-button ng-if="$ctrl.showFiltersButton && !$ctrl.model.edit"
+                       ng-show="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE"
+                       ng-click="$ctrl.openFilterSidenav()">
               <md-icon md-font-icon="icon-filter"></md-icon>
               <span translate="FILTER"></span>
             </md-button>
@@ -94,6 +96,7 @@
         <div class="ard_toolbar-actions" flex>
           <md-button ng-click="$ctrl.refreshGridData()"
                      ng-if="!$ctrl.model.edit"
+                     ng-show="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE"
                      ng-class="{'btn-primary': $ctrl.analysisChanged}" >
             <span translate="REFRESH_DATA"></span>
           </md-button>
@@ -106,6 +109,7 @@
 
           <md-button ng-click="$ctrl.openSortModal($event)"
                      ng-if="!$ctrl.model.edit"
+                     ng-show="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE"
                      ng-disabled="$ctrl.isSortDisabled()">
             <md-icon md-font-icon="icon-sort"></md-icon>
             <span translate="SORT"></span>
