@@ -37,7 +37,7 @@
         <div class="md-toolbar-tools"
              layout-align="start center">
           <div class="analyze-view_search-panel" layout="row" layout-align="start center">
-            <span class="md-title">Chart</span>
+            <span class="md-title" translate="CHART"></span>
           </div>
 
           <div class="analyze-view_action-panel" layout="row" layout-align="end center">
@@ -64,14 +64,14 @@
                         on-clear-all-filters="$ctrl.onClearAllFilters()"
                         on-filter-removed="$ctrl.onFilterRemoved(chip)">
           </filter-chips>
-          <h3> Custom Axis Labels </h3>
+          <h3 translate="CUSTOM_AXIS_LABELS"></h3>
           <div layout="row" layout-align="center">
             <md-input-container flex>
-                <label>Custom Y-Axis Label</label>
+                <label translate="CUSTOM_Y_AXIS_LABEL"></label>
                 <input ng-model="$ctrl.labels.tempY"/>
             </md-input-container>
             <md-input-container flex>
-                <label>Custom X-Axis Label</label>
+                <label translate="CUSTOM_X_AXIS_LABEL"></label>
                 <input ng-model="$ctrl.labels.tempX"/>
             </md-input-container>
             <md-button flex="nogrow" class="btn-primary" ng-click="$ctrl.updateCustomLabels()">
@@ -79,16 +79,16 @@
             </md-button>
           </div>
 
-          <h3> Legend Options </h3>
+          <h3 translate="LEGEND_OPTIONS"></h3>
           <div layout="row" layout-align="center">
             <md-input-container flex>
-              <label>Position</label>
+              <label translate="POSITION"></label>
               <md-select ng-model="$ctrl.legend.align" ng-change="$ctrl.updateLegendPosition()">
                 <md-option ng-repeat="position in $ctrl.legend.options.align" ng-value="position.name" ng-bind="::position.displayName"></md-option>
               </md-select>
             </md-input-container>
             <md-input-container flex>
-              <label>Layout</label>
+              <label translate="LAYOUT"></label>
               <md-select ng-model="$ctrl.legend.layout" ng-change="$ctrl.updateLegendPosition()">
                 <md-option ng-repeat="position in $ctrl.legend.options.layout" ng-value="position.name" ng-bind="::position.displayName"></md-option>
               </md-select>

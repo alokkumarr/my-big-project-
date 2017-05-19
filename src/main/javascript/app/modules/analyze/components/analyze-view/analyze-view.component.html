@@ -15,13 +15,13 @@
           <md-radio-group ng-model="$ctrl.states.reportView">
             <md-radio-button ng-value="$ctrl.LIST_VIEW">
               <md-icon md-font-icon="icon-Table-view">
-                <md-tooltip>{{ "TOOLTIP_LIST_VIEW" | translate }}</md-tooltip>
+                <md-tooltip ng-bind="'TOOLTIP_LIST_VIEW' | translate"></md-tooltip>
               </md-icon>
             </md-radio-button>
 
             <md-radio-button ng-value="$ctrl.CARD_VIEW">
               <md-icon md-font-icon="icon-card-view">
-                <md-tooltip>{{ "TOOLTIP_CARD_VIEW" | translate }}</md-tooltip>
+                <md-tooltip ng-bind="'TOOLTIP_CARD_VIEW' | translate"></md-tooltip>
               </md-icon>
             </md-radio-button>
           </md-radio-group>
@@ -83,7 +83,7 @@
               <md-card-actions layout="row" layout-align="center center">
                 <md-button class="md-button btn-card" aria-label="Fork"
                         ng-click="$ctrl.fork(report.data)">
-                  <md-tooltip>{{ "TOOLTIP_FORK_ANALYSIS" | translate }}</md-tooltip>
+                  <md-tooltip ng-bind="'TOOLTIP_FORK_ANALYSIS' | translate"></md-tooltip>
 
                   <md-icon md-font-icon="icon-fork"></md-icon>
                 </md-button>

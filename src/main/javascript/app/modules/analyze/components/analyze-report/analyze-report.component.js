@@ -261,7 +261,7 @@ export const AnalyzeReportComponent = {
 
     fillCanvas(data) {
       const model = this.canvas.model;
-      let defaultArtifactX = 0;
+      let defaultArtifactX = 20;
       const defaultSpacing = 300; // canvas pixels
 
       model.clear();
@@ -289,7 +289,11 @@ export const AnalyzeReportComponent = {
           field.type = itemB.type;
           field.checked = itemB.checked;
           field.isHidden = Boolean(itemB.hide);
-          field.isJoinEligible = true; // Boolean(itemB.joinEligible);
+          field.isJoinEligible = Boolean(itemB.joinEligible);
+          if (field.isJoinEligible) {
+            field.addEndpoint('right');
+            field.addEndpoint('left');
+          }
           field.isFilterEligible = Boolean(itemB.filterEligible);
         });
       });
