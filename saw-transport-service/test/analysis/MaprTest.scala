@@ -36,15 +36,18 @@ class MaprTest extends PlaySpec with OneAppPerSuite with DefaultAwaitTimeout {
   def actionKeyAnalysisMessage(
     action: String, id: String, analysis: JValue) = {
     val key: JObject = ("id", id)
-    message(("action" -> action) ~ ("keys" -> List(key)) ~
-      ("analyze" -> List(analysis)))
+    actionKeysMessage(action, key, ("analyze" -> List(analysis)) : JObject)
   }
 
   def actionKeyMessage(action: String, id: String,
     keyAdditionalJson: JObject = JObject()) = {
-    val idJson: JObject = ("id", id)
-    val keyJson: JObject = idJson.merge(keyAdditionalJson)
-    message(("action" -> action) ~ ("keys" -> JArray(List(keyJson))))
+    val keys: JObject = ("id", id)
+    actionKeysMessage(action, keys ~ keyAdditionalJson)
+  }
+
+  def actionKeysMessage(action: String, keys: JObject,
+    more: JObject = JObject()) = {
+    message(("action" -> action) ~ ("keys" -> JArray(List(keys))) ~ more)
   }
 
   def message(contents: JValue): JObject = {

@@ -220,4 +220,9 @@ class ANA extends BaseServiceProvider {
   private def shortMessage(message: String) = {
     message.substring(0, Math.min(message.length(), 1500))
   }
+
+  private def unexpectedElement(expected: String, obj: JValue): Nothing = {
+    val name = obj.getClass.getSimpleName
+    throw new RuntimeException("Expected %s but got: %s".format(expected, name))
+  }
 }

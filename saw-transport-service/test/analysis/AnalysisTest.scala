@@ -93,12 +93,25 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
     }
   }
 
-  def analyze(response: JValue): JValue = {
+  private def analyze(response: JValue): JValue = {
     val analyzes = (response \ "contents" \ "analyze") match {
       case array: JArray => array.arr
       case obj: JValue => throw new RuntimeException("Expected JArray: " + obj)
     }
     analyzes.length must be (1)
     analyzes(0)
+  }
+
+  private def extractArray(json: JValue, name: String): List[JValue] = {
+    json \ name match {
+      case l: JArray => l.arr
+      case JNothing => List.empty
+      case json: JValue => unexpectedElement(json)
+    }
+  }
+
+  private def unexpectedElement(json: JValue): Nothing = {
+    val name = json.getClass.getSimpleName
+    fail("Unexpected element: %s".format(name))
   }
 }
