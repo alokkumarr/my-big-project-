@@ -123,6 +123,7 @@ class ANA extends BaseServiceProvider {
   }
 
   private def playJson(json: JValue) = {
+    m_log.trace("Response body: {}", pretty(render(json)))
     Json.parse(compact(render(json)))
   }
 
