@@ -91,6 +91,13 @@ class ANA extends BaseServiceProvider {
         val analysisId = extractAnalysisId(json)
         json merge contentsAnalyze(readAnalysisJson(analysisId))
       }
+      case "search" => {
+        val keys = (json \ "contents" \ "keys")(0) match {
+          case keys: JObject => keys
+          case obj => throw new ClientException("Expected object, got: " + obj)
+        }
+        json merge contentsAnalyze(searchAnalysisJson(keys))
+      }
       case "execute" => {
         val analysisId = extractAnalysisId(json)
         val data = executeAnalysis(analysisId)
@@ -182,8 +189,24 @@ class ANA extends BaseServiceProvider {
     SemanticNode(semanticId, SelectModels.relation.id)
   }
 
+  private def searchAnalysisJson
+    (keys: JObject, semantic: Boolean = false): List[JObject] = {
+    val analysisNode = new AnalysisNode
+    val search = keys.extract[Map[String, Any]]
+    analysisNode.find(search).map {
+      _("content") match {
+        case obj: JObject => obj
+        case obj: JValue => unexpectedElement("object", obj)
+      }
+    }
+  }
+
   private def contentsAnalyze(analysis: JObject): JObject = {
-    ("contents", ("analyze", JArray(List(analysis))))
+    contentsAnalyze(List(analysis))
+  }
+
+  private def contentsAnalyze(analyses: List[JObject]): JObject = {
+    ("contents", ("analyze", JArray(analyses)))
   }
 
   def executeAnalysis(analysisId: String): JValue = {

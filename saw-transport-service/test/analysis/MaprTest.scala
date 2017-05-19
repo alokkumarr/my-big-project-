@@ -60,9 +60,12 @@ class MaprTest extends PlaySpec with OneAppPerSuite with DefaultAwaitTimeout {
     val Some(response) = route(
       FakeApplication(), FakeRequest(
         POST, "/analysis", headers, pretty(render(body))))
-    val responseLog = pretty(render(parse(contentAsString(response))))
+    val responseString = contentAsString(response)
+    val responseLog = pretty(render(parse(responseString)))
     log.trace("Response: " + shortMessage(responseLog))
-    status(response) mustBe OK
+    withClue("Response: " + responseString) {
+      status(response) mustBe OK
+    }
     contentType(response) mustBe Some("application/json")
     parse(contentAsString(response))
   }
