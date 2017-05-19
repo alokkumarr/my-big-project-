@@ -52,7 +52,7 @@
 								"aliasName": "",
 								"table" : "MCT_SESSION",
 								"type": "string",
-								"joinEligible": true,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SOURCE_MANUFACTURER",
@@ -61,7 +61,7 @@
 								"displayName": "Source Manufacturer",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEligible": true,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SIZE_BUCKET_SORT",
@@ -115,7 +115,7 @@
 								"displayName": "Source Model",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEligible": true,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TARGET_ACTIVECARRIERID",
@@ -124,7 +124,7 @@
 								"displayName": "Target Active Carrier Id",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEligible": true,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "LINK_SPEED",
@@ -187,7 +187,7 @@
 								"displayName": "Source Device Id",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEligible": true,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "ERROR_COUNT",
@@ -232,7 +232,7 @@
 								"displayName": "OPCO",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEligible": true,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SESSION_STATUS",
@@ -403,7 +403,7 @@
 								"displayName": "Target Device Id",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEligible": true,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SOURCE_OS",
@@ -430,7 +430,7 @@
 								"displayName": "Target Carrier Id",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEligible": true,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "IMSI",
@@ -439,7 +439,7 @@
 								"displayName": "IMSI",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEligible": true,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TRANSFER_LOCATION",
@@ -466,7 +466,7 @@
 								"displayName": "SSID",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEligible": true,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "ICCID",
@@ -475,7 +475,7 @@
 								"displayName": "ICCID",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEligible": true,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "HAS_VIDEOS",
@@ -520,7 +520,7 @@
 								"displayName": "IMEI",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEligible": true,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "CHANNEL_WIDTH",
@@ -538,7 +538,7 @@
 								"displayName": "Source_Active Carrier Id",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEligible": true,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TIME_LINE_DAYS",
