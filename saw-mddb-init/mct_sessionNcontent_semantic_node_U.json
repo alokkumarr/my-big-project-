@@ -44,7 +44,7 @@
 								"aliasName": "",
 								"table" : "MCT_SESSION",
 								"type": "string",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SOURCE_CARRIER_ID",
@@ -53,7 +53,7 @@
 								"aliasName": "",
 								"table" : "MCT_SESSION",
 								"type": "string",
-								"joinEigible": true,
+								"joinEligible": true,
 								"filterEligible": true
 							}, {
 								"name" : "SOURCE_MANUFACTURER",
@@ -62,7 +62,7 @@
 								"displayName": "Source Manufacturer",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": true,
+								"joinEligible": true,
 								"filterEligible": true
 							}, {
 								"name" : "SIZE_BUCKET_SORT",
@@ -71,7 +71,7 @@
 								"displayName": "Size Bucket Sort",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "AVAILABLE_ITEMS",
@@ -80,7 +80,7 @@
 								"displayName": "Available Items",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TRANSFER_SECONDS",
@@ -89,7 +89,7 @@
 								"displayName": "Transfer Seconds",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TRANSFER_ITEMS",
@@ -98,7 +98,7 @@
 								"displayName": "Transfer Items",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "DURATION_BUCKET_SORT",
@@ -107,7 +107,7 @@
 								"displayName": "Duration Bucket Sort",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SOURCE_MODEL",
@@ -116,7 +116,7 @@
 								"displayName": "Source Model",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": true,
+								"joinEligible": true,
 								"filterEligible": true
 							}, {
 								"name" : "TARGET_ACTIVECARRIERID",
@@ -125,7 +125,7 @@
 								"displayName": "Target Active Carrier Id",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": true,
+								"joinEligible": true,
 								"filterEligible": true
 							}, {
 								"name" : "LINK_SPEED",
@@ -134,7 +134,7 @@
 								"displayName": "Link Speed",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TRANSFER_BYTES",
@@ -143,7 +143,7 @@
 								"displayName": "Transfer Bytes",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "HAS_MUSIC",
@@ -152,7 +152,7 @@
 								"displayName": "Has Music",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SELECTED_ITEMS",
@@ -161,7 +161,7 @@
 								"displayName": "Selected Items",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "AVAILABLE_BYTES",
@@ -170,7 +170,7 @@
 								"displayName": "Available Bytes",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "FAILED_ITEMS",
@@ -179,7 +179,7 @@
 								"displayName": "Failed Items",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SOURCE_DEVICE_ID",
@@ -188,7 +188,7 @@
 								"displayName": "Source Device Id",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": true,
+								"joinEligible": true,
 								"filterEligible": true
 							}, {
 								"name" : "ERROR_COUNT",
@@ -197,7 +197,7 @@
 								"displayName": "Error Count",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SOURCE_INTERNALVERSION",
@@ -206,7 +206,7 @@
 								"displayName": "Source Internal Version",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "HAS_DOCUMENTS",
@@ -215,7 +215,7 @@
 								"displayName": "Has Documents",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "HAS_MESSAGES",
@@ -224,7 +224,7 @@
 								"displayName": "Has Messages",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "OPCO",
@@ -233,7 +233,7 @@
 								"displayName": "OPCO",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": true,
+								"joinEligible": true,
 								"filterEligible": true
 							}, {
 								"name" : "SESSION_STATUS",
@@ -242,7 +242,7 @@
 								"displayName": "Session Status",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TARGET_MANUFACTURER",
@@ -251,7 +251,7 @@
 								"displayName": "Target Manufacturer",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TARGET_OS",
@@ -260,7 +260,7 @@
 								"displayName": "Target OS",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SELECTED_BYTES",
@@ -269,7 +269,7 @@
 								"displayName": "Selected Bytes",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TARGET_APP_VERSION",
@@ -278,7 +278,7 @@
 								"displayName": "Target App Version",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TRANSFER_METHOD",
@@ -287,7 +287,7 @@
 								"displayName": "Transfer Method",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SUMMARY_TYPE",
@@ -296,7 +296,7 @@
 								"displayName": "Summary Type",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "HAS_CALL_LOGS",
@@ -305,7 +305,7 @@
 								"displayName": "Has Call Logs",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TARGET_INTERNALVERSION",
@@ -314,7 +314,7 @@
 								"displayName": "Target Internal Version",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SERVER_TIMESTAMP",
@@ -323,7 +323,7 @@
 								"displayName": "Server Timestamp",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SOURCE_APP_VERSION",
@@ -332,7 +332,7 @@
 								"displayName": "Source App Version",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "HAS_IMAGES",
@@ -341,7 +341,7 @@
 								"displayName": "Has Images",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "AVAILABLE_MB",
@@ -350,7 +350,7 @@
 								"displayName": "Available (MB)",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "MSISDN",
@@ -359,7 +359,7 @@
 								"displayName": "MSISDN",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "HAS_OTHER",
@@ -368,7 +368,7 @@
 								"displayName": "Has Other",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SERVER_MONTH",
@@ -377,7 +377,7 @@
 								"displayName": "Server Month",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TARGET_MODEL",
@@ -386,7 +386,7 @@
 								"displayName": "Target Model",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "QUARATINE_CODE",
@@ -395,7 +395,7 @@
 								"displayName": "Quaratine Code",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TARGET_DEVICE_ID",
@@ -404,7 +404,7 @@
 								"displayName": "Target Device Id",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": true,
+								"joinEligible": true,
 								"filterEligible": true
 							}, {
 								"name" : "SOURCE_OS",
@@ -413,7 +413,7 @@
 								"displayName": "Source OS",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "LINK_TYPE",
@@ -422,7 +422,7 @@
 								"displayName": "Link Type",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TARGET_CARRIER_ID",
@@ -431,7 +431,7 @@
 								"displayName": "Target Carrier Id",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": true,
+								"joinEligible": true,
 								"filterEligible": true
 							}, {
 								"name" : "IMSI",
@@ -440,7 +440,7 @@
 								"displayName": "IMSI",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": true,
+								"joinEligible": true,
 								"filterEligible": true
 							}, {
 								"name" : "TRANSFER_LOCATION",
@@ -449,7 +449,7 @@
 								"displayName": "Transfer Location",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SIZE_BUCKET",
@@ -458,7 +458,7 @@
 								"displayName": "Size Bucket",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SSID",
@@ -467,7 +467,7 @@
 								"displayName": "SSID",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": true,
+								"joinEligible": true,
 								"filterEligible": true
 							}, {
 								"name" : "ICCID",
@@ -476,7 +476,7 @@
 								"displayName": "ICCID",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": true,
+								"joinEligible": true,
 								"filterEligible": true
 							}, {
 								"name" : "HAS_VIDEOS",
@@ -485,7 +485,7 @@
 								"displayName": "Has Videos",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TRANSFER_MINUTES",
@@ -494,7 +494,7 @@
 								"displayName": "Transfer Minutes",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "DURATION_BUCKET",
@@ -503,7 +503,7 @@
 								"displayName": "Duration Bucket",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "HAS_CONTACTS",
@@ -512,7 +512,7 @@
 								"displayName": "Has Contacts",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "IMEI",
@@ -521,7 +521,7 @@
 								"displayName": "IMEI",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": true,
+								"joinEligible": true,
 								"filterEligible": true
 							}, {
 								"name" : "CHANNEL_WIDTH",
@@ -530,7 +530,7 @@
 								"displayName": "Channel Width",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SOURCE_ACTIVECARRIERID",
@@ -539,7 +539,7 @@
 								"displayName": "Source_Active Carrier Id",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": true,
+								"joinEligible": true,
 								"filterEligible": true
 							}, {
 								"name" : "TIME_LINE_DAYS",
@@ -548,7 +548,7 @@
 								"displayName": "Time Line Days",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "FAILED_BYTES",
@@ -557,7 +557,7 @@
 								"displayName": "Failed Bytes",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SOURCE_TIMEZONE",
@@ -566,7 +566,7 @@
 								"displayName": "Source Timezone",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TRANSFER_START_TS",
@@ -575,7 +575,7 @@
 								"displayName": "Transfer Start TS",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TRANSFER_MB",
@@ -584,7 +584,7 @@
 								"displayName": "Transfer (MB)",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "FAILED_MB",
@@ -593,7 +593,7 @@
 								"displayName": "Failed (MB)",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TARGET_TIMEZONE",
@@ -602,7 +602,7 @@
 								"displayName": "Target Timezone",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "IN_STORE_TRANSFER",
@@ -611,7 +611,7 @@
 								"displayName": "InStore Transfer",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "FATAL_ERROR_FLAG",
@@ -620,7 +620,7 @@
 								"displayName": "Fatal Error Flag",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TRANSFER_TYPE",
@@ -629,7 +629,7 @@
 								"displayName": "Transfer Type",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SESSION_ID",
@@ -638,7 +638,7 @@
 								"displayName": "Session Id",
 								"aliasName": "",
 								"table" : "MCT_SESSION",
-								"joinEigible": true,
+								"joinEligible": true,
 								"filterEligible": true
 							} 
 						]
@@ -654,7 +654,7 @@
 								"displayName": "Summary Type",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SESSION_ID",
@@ -663,7 +663,7 @@
 								"displayName": "Session Id",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": true,
+								"joinEligible": true,
 								"filterEligible": true
 							}, {
 								"name" : "OPCO",
@@ -672,7 +672,7 @@
 								"displayName": "OPCO",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SERVER_DIM_DATE",
@@ -681,7 +681,7 @@
 								"displayName": "Server Dim Date",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TARGET_OS",
@@ -690,7 +690,7 @@
 								"displayName": "Target OS",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TARGET_APP_VERSION",
@@ -699,7 +699,7 @@
 								"displayName": "Target App. Version",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TARGET_MANUFACTURER",
@@ -708,7 +708,7 @@
 								"displayName": "Target Manufacturer",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TARGET_MODEL",
@@ -717,7 +717,7 @@
 								"displayName": "Target Model",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SOURCE_OS",
@@ -726,7 +726,7 @@
 								"displayName": "Source OS",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SOURCE_APP_VERSION",
@@ -735,7 +735,7 @@
 								"displayName": "Source App. Version",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SOURCE_MANUFACTURER",
@@ -744,7 +744,7 @@
 								"displayName": "Source Manufacturer",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SOURCE_MODEL",
@@ -753,7 +753,7 @@
 								"displayName": "Source Model",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "FATAL_ERROR_FLAG",
@@ -762,7 +762,7 @@
 								"displayName": "Fatal Error Flag",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SESSION_STATUS",
@@ -771,7 +771,7 @@
 								"displayName": "Session Status",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TRANSFER_LOCATION",
@@ -780,7 +780,7 @@
 								"displayName": "Transfer Location",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "QUARATINE_CODE",
@@ -789,7 +789,7 @@
 								"displayName": "Quaratine Code",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "CONTENT_CLASS",
@@ -798,7 +798,7 @@
 								"displayName": "Content Class",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "AVAILABLE_ITEMS",
@@ -807,7 +807,7 @@
 								"displayName": "Available Items",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SELECTED_ITEMS",
@@ -816,7 +816,7 @@
 								"displayName": "Selected Items",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TRANSFER_ITEMS",
@@ -825,7 +825,7 @@
 								"displayName": "Transfer Items",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "FAILED_ITEMS",
@@ -834,7 +834,7 @@
 								"displayName": "Failed Items",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "AVAILABLE_BYTES",
@@ -843,7 +843,7 @@
 								"displayName": "Available Bytes",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "AVAILABLE_MB",
@@ -852,7 +852,7 @@
 								"displayName": "Available MB",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SELECTED_BYTES",
@@ -861,7 +861,7 @@
 								"displayName": "Selected Bytes",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SELECTED_MB",
@@ -870,7 +870,7 @@
 								"displayName": "Selected MB",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TRANSFER_BYTES",
@@ -879,7 +879,7 @@
 								"displayName": "Transfer Bytes",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TRANSFER_MB",
@@ -888,7 +888,7 @@
 								"displayName": "Transfer MB",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "FAILED_BYTES",
@@ -897,7 +897,7 @@
 								"displayName": "Failed Bytes",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "FAILED_MB",
@@ -906,7 +906,7 @@
 								"displayName": "Failed MB",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SERVER_TIMESTAMP",
@@ -915,7 +915,7 @@
 								"displayName": "Server Timestamp",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "SSID",
@@ -924,7 +924,7 @@
 								"displayName": "SSID",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "CANCEL_FLAG",
@@ -933,7 +933,7 @@
 								"displayName": "Cancel Flag",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TRANSFER_MONTH_ID",
@@ -942,7 +942,7 @@
 								"displayName": "Transfer Month",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}, {
 								"name" : "TRANSFER_DATE_ID",
@@ -951,7 +951,7 @@
 								"displayName": "Transfer Date",
 								"aliasName": "",
 								"table" : "MCT_CONTENT_SUMMARY",
-								"joinEigible": false,
+								"joinEligible": false,
 								"filterEligible": true
 							}										
 						]
