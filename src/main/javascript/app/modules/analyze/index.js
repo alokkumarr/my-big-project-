@@ -12,6 +12,8 @@ import {ChartService} from './services/chart.service';
 
 import {AnalyzePageComponent} from './components/analyze-page/analyze-page.component';
 import {AnalyzeViewComponent} from './components/analyze-view/analyze-view.component';
+import {AnalyzeCardsViewComponent} from './components/analyze-view/card/analyze-cards-view.component';
+import {AnalyzeListViewComponent} from './components/analyze-view/list/analyze-list-view.component';
 import {AnalyzePublishedListComponent} from './components/analyze-published-list/analyze-published-list.component';
 import {AnalyzeReportDetailComponent} from './components/analyze-published-detail/report/analyze-report-detail.component';
 import {AnalyzePivotDetailComponent} from './components/analyze-published-detail/pivot/analyze-pivot-detail.component';
@@ -68,6 +70,8 @@ angular.module(AnalyzeModule, [])
   .component('reportRenameDialog', ReportRenameDialogComponent)
   .component('analyzePage', AnalyzePageComponent)
   .component('analyzeView', AnalyzeViewComponent)
+  .component('analyzeCardsView', AnalyzeCardsViewComponent)
+  .component('analyzeListView', AnalyzeListViewComponent)
   .component('analyzePublishedList', AnalyzePublishedListComponent)
   .component('analyzeReportDetail', AnalyzeReportDetailComponent)
   .component('analyzePivotDetail', AnalyzePivotDetailComponent)
