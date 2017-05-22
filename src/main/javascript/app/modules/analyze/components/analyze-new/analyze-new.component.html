@@ -45,7 +45,7 @@
   <analyze-dialog-footer>
     <div class="layout-row">
       <md-button class="btn-primary"
-                 ng-disabled="!$ctrl.selectedAnalysisMethod"
+                 ng-disabled="!$ctrl.selectedAnalysisMethod || !$ctrl.selectedMetric"
                  ng-click="$ctrl.createAnalysis()"
                  translate="CREATE_ANALYSIS">
       </md-button>
