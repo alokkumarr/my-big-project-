@@ -26,4 +26,15 @@ public class BuilderUtil
 		SqlBuilder sqlBuilderNode = objectMapper.treeToValue(sqlNode, SqlBuilder.class);
 		return sqlBuilderNode;
 	}
+	
+	public static JsonNode getRepositoryNodeTree (String jsonString, String node) throws JsonProcessingException, IOException
+	
+	{
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+		JsonNode objectNode = objectMapper.readTree(jsonString);
+		JsonNode repository = objectNode.get(node);
+        return repository;
+		
+	}
 }

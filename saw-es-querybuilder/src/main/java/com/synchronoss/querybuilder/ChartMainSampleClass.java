@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.synchronoss.SAWElasticTransportService;
 import com.synchronoss.querybuilder.model.DataField;
 import com.synchronoss.querybuilder.model.Filter;
 import com.synchronoss.querybuilder.model.GroupBy;
@@ -32,10 +33,12 @@ public class ChartMainSampleClass {
 	{
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-		
+		System.setProperty("host", "10.48.72.74");
+		System.setProperty("port", "9300");
+
 		// This is the entry point for /analysis service as JSONString not as file
-		//JsonNode objectNode = objectMapper.readTree(new File("C:\\Users\\saurav.paul\\Desktop\\Sergey\\chart_type_data.json"));
-		JsonNode objectNode = objectMapper.readTree(new File(args[0]));
+		JsonNode objectNode = objectMapper.readTree(new File("C:\\Users\\saurav.paul\\Desktop\\Sergey\\chart_type_data.json"));
+		//JsonNode objectNode = objectMapper.readTree(new File(args[0]));
 		JsonNode sqlNode = objectNode.get("sqlBuilder");
 		SqlBuilder sqlBuilderNode = objectMapper.treeToValue(sqlNode, SqlBuilder.class);
 	    int size = 0;
@@ -145,8 +148,15 @@ public class ChartMainSampleClass {
 	    	{
 				searchSourceBuilder = GroupByAndFieldsAvailableChart.allFieldsAvailable(groupBy, dataFields, searchSourceBuilder, boolQueryBuilder);
 	    	}
-	    }	    
+	    }	
+	    String query = searchSourceBuilder.toString();
 	    System.out.println(searchSourceBuilder.toString());
+	    System.setProperty("url", "http://mapr-dev02.sncrbda.dev.vacum-np.sncrcorp.net:9200/");
+	      //SAWElasticTransportService.executeReturnAsString(query, objectNode.toString(), "some", "xssds", "login");
+	      
+		String response = SAWElasticSearchQueryExecutor.executeReturnAsString(searchSourceBuilder, objectNode.toString());
+		System.out.println(response);
+
 			   
 	}
 
