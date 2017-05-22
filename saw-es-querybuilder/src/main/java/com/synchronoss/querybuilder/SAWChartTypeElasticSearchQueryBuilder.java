@@ -25,160 +25,148 @@ import com.synchronoss.querybuilder.model.SqlBuilder;
  * @author saurav.paul
  */
 class SAWChartTypeElasticSearchQueryBuilder {
-	 
-	
-	String jsonString;
 
-	SearchSourceBuilder searchSourceBuilder;
-	
-	public SAWChartTypeElasticSearchQueryBuilder(String jsonString) 
-	{
-		super();
-		assert (this.jsonString == null && this.jsonString.trim().equals("")); 
-		this.jsonString = jsonString;
-	}
 
-	public String getJsonString() {
-		return jsonString;
-	}
+  String jsonString;
 
-	/**
-	 * This method is used to generate the query to build elastic search query for<br/>
-	 * chart data set 
-	 * @return query
-	 * @throws IOException 
-	 * @throws JsonProcessingException 
-	 */
-	public String buildQuery() throws JsonProcessingException, IOException 
-	{
+  SearchSourceBuilder searchSourceBuilder;
 
-		String query = null;
-		SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTree(getJsonString(), "sqlBuilder");
-	    int size = 0;
-	    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-	    searchSourceBuilder.size(size);
+  public SAWChartTypeElasticSearchQueryBuilder(String jsonString) {
+    super();
+    assert (this.jsonString == null && this.jsonString.trim().equals(""));
+    this.jsonString = jsonString;
+  }
 
-		   // The below block adding the sort block
-		   List<Sort> sortNode =  sqlBuilderNode.getSort();
-		   for (Sort item : sortNode )
-		   {
-				SortOrder sortOrder = item.getOrder().equals
-						(SortOrder.ASC.name())? SortOrder.ASC : SortOrder.DESC;
-				FieldSortBuilder sortBuilder = SortBuilders.fieldSort(item.getColumnName()).order(sortOrder);
-				searchSourceBuilder.sort(sortBuilder);
-		   }
-		   
-		   // The below block adding filter block 
-		   List<Filter> filters = sqlBuilderNode.getFilters();
-		   List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
-		   for (Filter item : filters)
-		   {
-				if (item.getType().equals("date"))
-				{
-					RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-					rangeQueryBuilder.lte(item.getRange().getLte());
-					rangeQueryBuilder.gte(item.getRange().getGte());
-					builder.add(rangeQueryBuilder);
-				}
-				else 
-				{
-					TermsQueryBuilder termsQueryBuilder = new TermsQueryBuilder(item.getColumnName(), item.getValue());
-					builder.add(termsQueryBuilder);
-				}
-		   }
-		   final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-		   builder.forEach(item->
-			{
-				boolQueryBuilder.must(item);
-			});
-		   searchSourceBuilder.query(boolQueryBuilder);
+  public String getJsonString() {
+    return jsonString;
+  }
 
-		    GroupBy groupBy = sqlBuilderNode.getGroupBy();
-		    SplitBy splitBy = sqlBuilderNode.getSplitBy();
-		    List<DataField> dataFields = sqlBuilderNode.getDataFields();
+  /**
+   * This method is used to generate the query to build elastic search query for<br/>
+   * chart data set
+   * 
+   * @return query
+   * @throws IOException
+   * @throws JsonProcessingException
+   */
+  public String buildQuery() throws JsonProcessingException, IOException {
 
-		    
-		      
-		    
-		    
-		    // Use case I: The below block is only when groupBy is available
-		    if (groupBy!=null)
-		    {
-		    	if (splitBy ==null && dataFields.isEmpty())
-		    	{
-					searchSourceBuilder = searchSourceBuilder.query(boolQueryBuilder)
-			        .aggregation(AggregationBuilders.terms("group_by").field(groupBy.getColumnName()));
-		    	}
-		    }
+    String query = null;
+    SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTree(getJsonString(), "sqlBuilder");
+    int size = 0;
+    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    searchSourceBuilder.size(size);
 
-		 // Use case II: The below block is only when groupBy is available & columnBy is available
-		    if (groupBy!=null && splitBy!=null)
-		    {
-		    	if (dataFields.isEmpty())
-		    	{
-					searchSourceBuilder = searchSourceBuilder.query(boolQueryBuilder)
-			        .aggregation(AggregationBuilders.terms("group_by").field(groupBy.getColumnName())
-			        		.subAggregation(QueryBuilderUtil.aggregationBuilderChart(splitBy)));
-		    	}
-		    }
+    // The below block adding the sort block
+    List<Sort> sortNode = sqlBuilderNode.getSort();
+    for (Sort item : sortNode) {
+      SortOrder sortOrder =
+          item.getOrder().equals(SortOrder.ASC.name()) ? SortOrder.ASC : SortOrder.DESC;
+      FieldSortBuilder sortBuilder = SortBuilders.fieldSort(item.getColumnName()).order(sortOrder);
+      searchSourceBuilder.sort(sortBuilder);
+    }
 
-		    
-		 // Use case III: The below block is only when groupBy, splitBy are available
+    // The below block adding filter block
+    List<Filter> filters = sqlBuilderNode.getFilters();
+    List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
+    for (Filter item : filters) {
+      if (item.getType().equals("date")) {
+        RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+        rangeQueryBuilder.lte(item.getRange().getLte());
+        rangeQueryBuilder.gte(item.getRange().getGte());
+        builder.add(rangeQueryBuilder);
+      } else {
+        TermsQueryBuilder termsQueryBuilder =
+            new TermsQueryBuilder(item.getColumnName(), item.getValue());
+        builder.add(termsQueryBuilder);
+      }
+    }
+    final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+    builder.forEach(item -> {
+      boolQueryBuilder.must(item);
+    });
+    searchSourceBuilder.query(boolQueryBuilder);
 
-		    if (groupBy!=null && splitBy!=null)
-		    {
-		    	if (!(dataFields.isEmpty()))
-		    	{
-					searchSourceBuilder = AllFieldsAvailableChart.allFieldsAvailable(groupBy, splitBy, dataFields, searchSourceBuilder, boolQueryBuilder);
-		    	}
-		    }
+    GroupBy groupBy = sqlBuilderNode.getGroupBy();
+    SplitBy splitBy = sqlBuilderNode.getSplitBy();
+    List<DataField> dataFields = sqlBuilderNode.getDataFields();
 
-		 // Use case IV: The below block is only when splitBy are available
 
-		    if (splitBy!=null)
-		    {
-		    	if (groupBy ==null && dataFields.isEmpty())
-		    	{
-					searchSourceBuilder = searchSourceBuilder.query(boolQueryBuilder)
-			        .aggregation(QueryBuilderUtil.aggregationBuilderChart(splitBy));
-		    	}
-		    }
 
-		 // Use case V: The below block is only when splitBy & dataField are available
-		    if (splitBy!=null)
-		    {
-		    	if (groupBy ==null && !(dataFields.isEmpty()))
-		    	{
-					searchSourceBuilder = SpiltByAndDataFieldsAvailableChart.allFieldsAvailable(splitBy, dataFields, searchSourceBuilder, boolQueryBuilder);
-		    	}
-		    }	    
+    // Use case I: The below block is only when groupBy is available
+    if (groupBy != null) {
+      if (splitBy == null && dataFields.isEmpty()) {
+        searchSourceBuilder =
+            searchSourceBuilder.query(boolQueryBuilder).aggregation(
+                AggregationBuilders.terms("group_by").field(groupBy.getColumnName()));
+      }
+    }
 
-		 // Use case VI: The below block is only when groupBy & dataField are available
+    // Use case II: The below block is only when groupBy is available & columnBy is available
+    if (groupBy != null && splitBy != null) {
+      if (dataFields.isEmpty()) {
+        searchSourceBuilder =
+            searchSourceBuilder.query(boolQueryBuilder).aggregation(
+                AggregationBuilders.terms("group_by").field(groupBy.getColumnName())
+                    .subAggregation(QueryBuilderUtil.aggregationBuilderChart(splitBy)));
+      }
+    }
 
-		    if (groupBy!=null)
-		    {
-		    	if (splitBy ==null && !(dataFields.isEmpty()))
-		    	{
-					searchSourceBuilder = GroupByAndFieldsAvailableChart.allFieldsAvailable(groupBy, dataFields, searchSourceBuilder, boolQueryBuilder);
-		    	}
-		    }	    
-		   
-		setSearchSourceBuilder(searchSourceBuilder);    
-		query = searchSourceBuilder.toString();    
-		return query;
-	}
-	
-	
-	
-	void setSearchSourceBuilder(SearchSourceBuilder searchSourceBuilder) {
-		this.searchSourceBuilder = searchSourceBuilder;
-	}
 
-	public SearchSourceBuilder getSearchSourceBuilder() throws JsonProcessingException, IOException 
-	{
-		buildQuery();
-		return searchSourceBuilder;
-	}
+    // Use case III: The below block is only when groupBy, splitBy are available
 
-	
+    if (groupBy != null && splitBy != null) {
+      if (!(dataFields.isEmpty())) {
+        searchSourceBuilder =
+            AllFieldsAvailableChart.allFieldsAvailable(groupBy, splitBy, dataFields,
+                searchSourceBuilder, boolQueryBuilder);
+      }
+    }
+
+    // Use case IV: The below block is only when splitBy are available
+
+    if (splitBy != null) {
+      if (groupBy == null && dataFields.isEmpty()) {
+        searchSourceBuilder =
+            searchSourceBuilder.query(boolQueryBuilder).aggregation(
+                QueryBuilderUtil.aggregationBuilderChart(splitBy));
+      }
+    }
+
+    // Use case V: The below block is only when splitBy & dataField are available
+    if (splitBy != null) {
+      if (groupBy == null && !(dataFields.isEmpty())) {
+        searchSourceBuilder =
+            SpiltByAndDataFieldsAvailableChart.allFieldsAvailable(splitBy, dataFields,
+                searchSourceBuilder, boolQueryBuilder);
+      }
+    }
+
+    // Use case VI: The below block is only when groupBy & dataField are available
+
+    if (groupBy != null) {
+      if (splitBy == null && !(dataFields.isEmpty())) {
+        searchSourceBuilder =
+            GroupByAndFieldsAvailableChart.allFieldsAvailable(groupBy, dataFields,
+                searchSourceBuilder, boolQueryBuilder);
+      }
+    }
+
+    setSearchSourceBuilder(searchSourceBuilder);
+    query = searchSourceBuilder.toString();
+    return query;
+  }
+
+
+
+  void setSearchSourceBuilder(SearchSourceBuilder searchSourceBuilder) {
+    this.searchSourceBuilder = searchSourceBuilder;
+  }
+
+  public SearchSourceBuilder getSearchSourceBuilder() throws JsonProcessingException, IOException {
+    buildQuery();
+    return searchSourceBuilder;
+  }
+
+
 }

@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.synchronoss.SAWElasticTransportService;
 import com.synchronoss.querybuilder.model.DataField;
 import com.synchronoss.querybuilder.model.Filter;
 import com.synchronoss.querybuilder.model.GroupBy;
@@ -148,9 +149,13 @@ public class ChartMainSampleClass {
 				searchSourceBuilder = GroupByAndFieldsAvailableChart.allFieldsAvailable(groupBy, dataFields, searchSourceBuilder, boolQueryBuilder);
 	    	}
 	    }	
-	      System.out.println(searchSourceBuilder.toString());
-		  // String response = SAWElasticSearchQueryExecutor.executeReturnAsString(searchSourceBuilder, objectNode.toString());
-		  //System.out.println(response);
+	    String query = searchSourceBuilder.toString();
+	    System.out.println(searchSourceBuilder.toString());
+	    System.setProperty("url", "http://mapr-dev02.sncrbda.dev.vacum-np.sncrcorp.net:9200/");
+	      //SAWElasticTransportService.executeReturnAsString(query, objectNode.toString(), "some", "xssds", "login");
+	      
+		String response = SAWElasticSearchQueryExecutor.executeReturnAsString(searchSourceBuilder, objectNode.toString());
+		System.out.println(response);
 
 			   
 	}
