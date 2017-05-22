@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.common.base.Preconditions;
+//import com.google.common.base.Preconditions;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -72,13 +72,13 @@ public class SAWElasticTransportService {
       String userName, String moduleName) throws JsonProcessingException, IOException
 
   {
-    Preconditions.checkArgument(query != null && !query.trim().equals(""), "query cannot be null");
+ /*   Preconditions.checkArgument(query != null && !query.trim().equals(""), "query cannot be null");
     Preconditions.checkArgument(jsonString != null && !jsonString.trim().equals(""),
         "jsonString cannot be null");
     Preconditions.checkArgument(dsk != null && !dsk.trim().equals(""), "dsk cannot be null");
     Preconditions.checkArgument(userName != null && !userName.trim().equals(""),
         "userName cannot be null");
-    ObjectMapper objectMapper = new ObjectMapper();
+ */   ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     ESProxy response = execute(query, jsonString, dsk, userName, moduleName);
     // JsonNode esResponse = objectMapper.readTree(response.toString());
