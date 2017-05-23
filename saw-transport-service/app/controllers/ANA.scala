@@ -91,6 +91,13 @@ class ANA extends BaseServiceProvider {
         val analysisId = extractAnalysisId(json)
         json merge contentsAnalyze(readAnalysisJson(analysisId))
       }
+      case "search" => {
+        val keys = (json \ "contents" \ "keys")(0) match {
+          case keys: JObject => keys
+          case obj => throw new ClientException("Expected object, got: " + obj)
+        }
+        json merge contentsAnalyze(searchAnalysisJson(keys))
+      }
       case "execute" => {
         val analysisId = extractAnalysisId(json)
         val data = executeAnalysis(analysisId)
@@ -123,6 +130,7 @@ class ANA extends BaseServiceProvider {
   }
 
   private def playJson(json: JValue) = {
+    m_log.trace("Response body: {}", pretty(render(json)))
     Json.parse(compact(render(json)))
   }
 
@@ -154,7 +162,12 @@ class ANA extends BaseServiceProvider {
       case _ => throw new ClientException(
         "Expected array: " + analysisListJson)
     }
-    val queryJson: JObject = ("query", JString(QueryBuilder.build(analysis))) ~
+    val query = (analysis \ "queryManual") match {
+      case JNothing => QueryBuilder.build(analysis)
+      case obj: JString => ""
+      case obj => unexpectedElement("string", obj)
+    }
+    val queryJson: JObject = ("query", JString(query)) ~
     ("outputFile",
       ("outputFormat", "json") ~ ("outputFileName", "test.json"))
     analysis merge(queryJson)
@@ -181,8 +194,24 @@ class ANA extends BaseServiceProvider {
     SemanticNode(semanticId, SelectModels.relation.id)
   }
 
+  private def searchAnalysisJson
+    (keys: JObject, semantic: Boolean = false): List[JObject] = {
+    val analysisNode = new AnalysisNode
+    val search = keys.extract[Map[String, Any]]
+    analysisNode.find(search).map {
+      _("content") match {
+        case obj: JObject => obj
+        case obj: JValue => unexpectedElement("object", obj)
+      }
+    }
+  }
+
   private def contentsAnalyze(analysis: JObject): JObject = {
-    ("contents", ("analyze", JArray(List(analysis))))
+    contentsAnalyze(List(analysis))
+  }
+
+  private def contentsAnalyze(analyses: List[JObject]): JObject = {
+    ("contents", ("analyze", JArray(analyses)))
   }
 
   def executeAnalysis(analysisId: String): JValue = {
@@ -218,5 +247,10 @@ class ANA extends BaseServiceProvider {
 
   private def shortMessage(message: String) = {
     message.substring(0, Math.min(message.length(), 1500))
+  }
+
+  private def unexpectedElement(expected: String, obj: JValue): Nothing = {
+    val name = obj.getClass.getSimpleName
+    throw new RuntimeException("Expected %s but got: %s".format(expected, name))
   }
 }

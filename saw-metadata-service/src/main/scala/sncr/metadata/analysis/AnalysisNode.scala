@@ -226,8 +226,7 @@ object AnalysisNode{
       "name" -> "String",
       "tenantId" -> "String",
       "productId"-> "String",
-      "analysisCategoryId"-> "Int",
-      "analysisCategoryName"-> "String",
+      "categoryId"-> "String",
       "tenantId"-> "String",
       "productId"-> "String",
       "analysisName"-> "String",
@@ -243,6 +242,7 @@ object AnalysisNode{
     List(
       (analysisNode, "id"),
       (analysisNode, "module"),
+      (analysisNode, "categoryId"),
       (analysisNode, "customerCode"))
       .map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, searchFields(jv._2)) )
