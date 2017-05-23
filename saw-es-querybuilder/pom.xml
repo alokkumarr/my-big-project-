@@ -25,18 +25,22 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- <dependency> <groupId>org.elasticsearch.client</groupId> <artifactId>x-pack-transport</artifactId> 
-			<version>${es.version}</version> </dependency> -->
+		<dependency>
+			<groupId>org.elasticsearch.client</groupId>
+			<artifactId>x-pack-transport</artifactId>
+			<version>${es.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
 
+ 		
 		<dependency>
 			<groupId>org.elasticsearch.client</groupId>
 			<artifactId>transport</artifactId>
-			<version>5.4.0</version>
+			<version>${es.version}</version>
 		</dependency>
 
 		<dependency>
@@ -72,10 +76,19 @@
 
 	</dependencies>
 
-	<!-- <repositories> <repository> <id>elasticsearch-releases</id> <url>https://artifacts.elastic.co/maven</url> 
-		<releases> <enabled>true</enabled> </releases> <snapshots> <enabled>false</enabled> 
-		</snapshots> </repository> </repositories> -->
-	<build>
+<!-- 	<repositories>
+		<repository>
+			<id>elasticsearch-releases</id>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/service/local/repositories/ext-releases/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+ -->	<build>
 		<plugins>
 
 			<plugin>
