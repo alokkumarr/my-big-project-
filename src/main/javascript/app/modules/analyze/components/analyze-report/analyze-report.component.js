@@ -10,6 +10,7 @@ import keys from 'lodash/keys';
 import forEach from 'lodash/forEach';
 import clone from 'lodash/clone';
 import isEmpty from 'lodash/isEmpty';
+import sortBy from 'lodash/sortBy';
 import filter from 'lodash/filter';
 import assign from 'lodash/assign';
 
@@ -280,7 +281,10 @@ export const AnalyzeReportComponent = {
         table.setMeta(itemA);
         table.setPosition(itemA.artifactPosition[0], itemA.artifactPosition[1]);
 
-        forEach(itemA.columns, itemB => {
+        /* Show join eligible fields on top for easy access */
+        const sortedForJoin = sortBy(itemA.columns, c => !c.joinEligible);
+
+        forEach(sortedForJoin, itemB => {
           const field = table.addField(itemB.columnName);
 
           field.setMeta(itemB);
