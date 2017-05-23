@@ -28,7 +28,7 @@ export const AnalyzeViewComponent = {
 
       this.states = {
         reportView: 'card',
-        reportType: 'all',
+        analysisType: 'all',
         searchTerm: ''
       };
       this.updater = new Subject();
@@ -47,8 +47,8 @@ export const AnalyzeViewComponent = {
       this._destroyHandler();
     }
 
-    onReportTypeChange() {
-      this.updater.next({reportType: this.states.reportType});
+    onAnalysisTypeChange() {
+      this.updater.next({analysisType: this.states.analysisType});
     }
 
     loadCategory() {
@@ -70,7 +70,7 @@ export const AnalyzeViewComponent = {
       return this._AnalyzeService.getAnalysesFor(this.$state.params.id, {
         filter: this.states.searchTerm
       }).then(analyses => {
-        this.reports = sortBy(analyses, analysis => -parseInt(analysis.id, 10));
+        this.analyses = sortBy(analyses, analysis => -parseInt(analysis.id, 10));
       });
     }
 
@@ -92,7 +92,7 @@ export const AnalyzeViewComponent = {
     }
 
     removeAnalysis(model) {
-      remove(this.reports, report => {
+      remove(this.analyses, report => {
         return report.id === model.id;
       });
       this._$mdToast.show({

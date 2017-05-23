@@ -3,8 +3,8 @@ import template from './analyze-list-view.component.html';
 export const AnalyzeListViewComponent = {
   template,
   bindings: {
-    reports: '<',
-    reportType: '<',
+    analyses: '<',
+    analysisType: '<',
     filter: '<',
     onAction: '&',
     searchTerm: '<',
@@ -27,23 +27,23 @@ export const AnalyzeListViewComponent = {
       this.updaterSubscribtion.unsubscribe();
     }
 
-    onUpdate({reportType}) {
+    onUpdate({analysisType}) {
       /* eslint-disable */
-      reportType && this.onUpdateReportType(reportType);
+      analysisType && this.onUpdateAnalysisType(analysisType);
       /* eslint-enable */
     }
 
-    onUpdateReportType(reportType) {
-      if (reportType === 'all') {
+    onUpdateAnalysisType(analysisType) {
+      if (analysisType === 'all') {
         this._gridListInstance.clearFilter();
       } else {
-        this._gridListInstance.filter(['type', '=', reportType]);
+        this._gridListInstance.filter(['type', '=', analysisType]);
       }
     }
 
     onGridInitialized(e) {
       this._gridListInstance = e.component;
-      this.onUpdateReportType(this.reportType);
+      this.onUpdateAnalysisType(this.analysisType);
     }
 
     fork(analysis) {
@@ -73,7 +73,7 @@ export const AnalyzeListViewComponent = {
     }
 
     getGridConfig() {
-      const dataSource = this.reports || [];
+      const dataSource = this.analyses || [];
       const columns = [{
         caption: 'NAME',
         dataField: 'name',

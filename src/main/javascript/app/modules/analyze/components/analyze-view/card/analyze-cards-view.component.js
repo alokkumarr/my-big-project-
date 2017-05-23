@@ -3,8 +3,8 @@ import template from './analyze-cards-view.component.html';
 export const AnalyzeCardsViewComponent = {
   template,
   bindings: {
-    reports: '<',
-    reportType: '<',
+    analyses: '<',
+    analysisType: '<',
     filter: '<',
     onAction: '&',
     searchTerm: '<'
@@ -21,8 +21,8 @@ export const AnalyzeCardsViewComponent = {
     filterReports(item) {
       let isIncluded = true;
 
-      if (this.reportType !== 'all') {
-        isIncluded = this.reportType === item.type;
+      if (this.analysisType !== 'all') {
+        isIncluded = this.analysisType === item.type;
       }
 
       return isIncluded;

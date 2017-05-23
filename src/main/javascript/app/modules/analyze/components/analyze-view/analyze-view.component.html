@@ -28,8 +28,8 @@
         </md-input-container>
 
         <md-input-container class="analyze-view_switch-type">
-          <md-select ng-model="$ctrl.states.reportType"
-                     ng-change="$ctrl.onReportTypeChange()">
+          <md-select ng-model="$ctrl.states.analysisType"
+                     ng-change="$ctrl.onAnalysisTypeChange()">
             <md-option value="all" selected translate="ALL_TYPES"></md-option>
             <md-divider></md-divider>
             <md-option value="chart" translate="CHARTS"></md-option>
@@ -55,10 +55,10 @@
 
     <!-- LIST VIEW -->
 
-    <div class="analyze-view_reports-list"
+    <div class="analyze-view_analyses-list"
          ng-switch-when="list">
-      <analyze-list-view reports="$ctrl.reports"
-                         report-type="$ctrl.states.reportType"
+      <analyze-list-view analyses="$ctrl.analyses"
+                         analysis-type="$ctrl.states.analysisType"
                          updater="$ctrl.updater"
                          on-action="$ctrl.onCardAction(type, model)"
                          search-term="$ctrl.states.searchTerm">
@@ -71,8 +71,8 @@
       <analyze-cards-view layout="row"
                           layout-align="start start"
                           layout-wrap
-                          reports="$ctrl.reports"
-                          report-type="$ctrl.states.reportType"
+                          analyses="$ctrl.analyses"
+                          analysis-type="$ctrl.states.analysisType"
                           filter="$ctrl.filterReports"
                           on-action="$ctrl.onCardAction(type, model)"
                           search-term="$ctrl.states.searchTerm">
