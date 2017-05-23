@@ -1,8 +1,9 @@
 [
   {
     "node-category": "SemanticNode",
+    "id": "635b64be-ee90-4770-a058-e48272153455",
     "action": {
-      "verb": "create",
+      "verb": "update",
       "content": {
         "id": "mct_content_semantic_object",
         "dataSecurityKey": "empty",
@@ -30,6 +31,11 @@
             ]
           }
         ],
+        "repository": {
+          "storageType":"ES",
+          "indexName":"mct_data",
+          "type":"content_type"
+        },
         "artifacts": [
           {
             "artifactName": "MCT_CONTENT_SUMMARY",

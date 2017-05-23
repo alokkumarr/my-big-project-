@@ -14,23 +14,9 @@
     },
     {
         "node-category": "SemanticNode",
-        "id": "2d5d53a4-ad78-4e4c-9990-e3facee3fb93",
-        "action": {
-            "verb": "read"
-        }
-    },
-    {
-        "node-category": "SemanticNode",
         "id": "635b64be-ee90-4770-a058-e48272153455",
         "action": {
             "verb": "read"
-        }
-    },
-    {
-        "node-category": "SemanticNode",
-        "id": "6e4a7ff5-2f47-487c-93e8-7d3f16636baf",
-        "action": {
-            "verb": "delete"
         }
     },
     {
