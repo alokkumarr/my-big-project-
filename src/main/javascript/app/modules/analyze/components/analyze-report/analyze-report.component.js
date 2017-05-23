@@ -13,6 +13,7 @@ import isEmpty from 'lodash/isEmpty';
 import sortBy from 'lodash/sortBy';
 import filter from 'lodash/filter';
 import assign from 'lodash/assign';
+import uniqBy from 'lodash/uniqBy';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
@@ -445,7 +446,15 @@ export const AnalyzeReportComponent = {
     getColumns(columnNames = []) {
       const fields = fpFlatMap(table => table.fields, this.canvas.model.tables);
 
-      return fpFilter(field => columnNames.indexOf(field.name) >= 0, fields);
+      const columns = uniqBy(
+        fpFilter(field => columnNames.indexOf(field.name) >= 0, fields),
+        column => column.name
+      );
+
+      return map(columns, col => {
+        col.checked = true;
+        return col;
+      });
     }
 
     onSaveQuery(analysis) {
@@ -456,7 +465,8 @@ export const AnalyzeReportComponent = {
           this.model.query = analysis.queryManual || analysis.query;
 
           const columnNames = keys(fpGet('[0]', data));
-          this.applyDataToGrid(this.getColumns(columnNames), [], this.filteredGridData);
+          this.columns = this.getColumns(columnNames);
+          this.applyDataToGrid(this.columns, [], this.filteredGridData);
           this.showProgress = false;
         }, () => {
           this.showProgress = false;
