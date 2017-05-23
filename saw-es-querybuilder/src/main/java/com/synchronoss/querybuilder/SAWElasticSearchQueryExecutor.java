@@ -1,14 +1,23 @@
 package com.synchronoss.querybuilder;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 import org.apache.logging.log4j.Logger;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.logging.ESLoggerFactory;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.xpack.client.PreBuiltXPackTransportClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.synchronoss.BuilderUtil;
 
 /**
  * This class will be used to get the query executed into designated<br/>
@@ -21,7 +30,7 @@ public class SAWElasticSearchQueryExecutor {
 
 
 
-  /*private static SearchResponse execute(SearchSourceBuilder searchSourceBuilder, String jsonString)
+  private static SearchResponse execute(SearchSourceBuilder searchSourceBuilder, String jsonString)
       throws JsonProcessingException, IOException
 
   {
@@ -56,7 +65,7 @@ public class SAWElasticSearchQueryExecutor {
     }
 
     return response;
-  }*/
+  }
 
   /**
    * 
@@ -72,10 +81,10 @@ public class SAWElasticSearchQueryExecutor {
   {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-   // SearchResponse response = execute(searchSourceBuilder, jsonString);
-   // JsonNode esResponse = objectMapper.readTree(response.toString());
-    return null; 
-        //esResponse.get("aggregations").toString();
+   SearchResponse response = execute(searchSourceBuilder, jsonString);
+   JsonNode esResponse = objectMapper.readTree(response.toString());
+    return 
+        esResponse.get("aggregations").toString();
 
   }
 

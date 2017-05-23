@@ -160,7 +160,7 @@ public class PivotMainSampleClass {
 		    	throw new IllegalArgumentException("Pivot in column/data fields wise are allowed until five levels. Please verify & recreate your request.");
 		    }
 	    }
-	    
+	    System.out.println(searchSourceBuilder.toString()); 
 	   String response = SAWElasticSearchQueryExecutor.executeReturnAsString(searchSourceBuilder, objectNode.toString());
 	    System.out.println(response);
 			   
