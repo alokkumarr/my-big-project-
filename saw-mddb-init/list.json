@@ -1,0 +1,50 @@
+[
+    {
+        "node-category": "SemanticNode",
+        "action": {
+            "verb": "list"
+        }
+    },
+    {
+        "node-category": "SemanticNode",
+        "id": "2015f73a-8491-4f97-8867-121c7e99fc61",
+        "action": {
+            "verb": "read"
+        }
+    },
+    {
+        "node-category": "SemanticNode",
+        "id": "2d5d53a4-ad78-4e4c-9990-e3facee3fb93",
+        "action": {
+            "verb": "read"
+        }
+    },
+    {
+        "node-category": "SemanticNode",
+        "id": "635b64be-ee90-4770-a058-e48272153455",
+        "action": {
+            "verb": "read"
+        }
+    },
+    {
+        "node-category": "SemanticNode",
+        "id": "6e4a7ff5-2f47-487c-93e8-7d3f16636baf",
+        "action": {
+            "verb": "delete"
+        }
+    },
+    {
+        "node-category": "SemanticNode",
+        "id": "c7a32609-2940-4492-afcc-5548b5e5a040",
+        "action": {
+            "verb": "read"
+        }
+    },
+    {
+        "node-category": "SemanticNode",
+        "id": "da561e07-4260-4d5e-b1d4-e04e4b8c6f0b"
+        "action": {
+            "verb": "read"
+        }
+    },
+]
