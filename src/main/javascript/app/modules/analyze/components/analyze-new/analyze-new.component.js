@@ -25,6 +25,7 @@ export const AnalyzeNewComponent = {
 
     $onInit() {
       this.selectedAnalysisMethod = '';
+      this.selectedMetric = null;
 
       this._AnalyzeService.getMethods()
         .then(methods => {
