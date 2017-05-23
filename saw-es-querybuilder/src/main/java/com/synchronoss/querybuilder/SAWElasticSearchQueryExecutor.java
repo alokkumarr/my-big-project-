@@ -36,6 +36,9 @@ public class SAWElasticSearchQueryExecutor {
   {
     String host = System.getProperty("host");
     int port = Integer.parseInt(System.getProperty("port"));
+    String username = System.getProperty("username");// elastic
+    String password = System.getProperty("password"); // xuw3dUraHapret
+    String clusterName = System.getProperty("cluster"); // "sncr-salesdemo"
     SearchResponse response = null;
     TransportClient client = null;
     JsonNode repository = BuilderUtil.getRepositoryNodeTree(jsonString, "repository");
@@ -50,8 +53,8 @@ public class SAWElasticSearchQueryExecutor {
               .put("client.transport.sniff", false).put("transport.tcp.compress", true)
               .put("cluster.name", "sncr-salesdemo")
               .put("xpack.security.transport.ssl.enabled", false)
-              .put("request.headers.X-Found-Cluster", "sncr-salesdemo")
-              .put("xpack.security.user", "elastic:xuw3dUraHapret").build())
+              .put("request.headers.X-Found-Cluster", clusterName)
+              .put("xpack.security.user", username+ ":"+ password).build())
               .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), port));
 
       response =
