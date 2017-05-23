@@ -1,3 +1,5 @@
+@import "themes/base/colors";
+
 analyze-pivot-settings {
   h3 {
     margin: 5px;
@@ -39,5 +41,11 @@ analyze-pivot-settings {
     p {
       margin: 0;
     }
+  }
+
+  .dx-pivotgridfieldchooser span.dx-area-caption {
+    color: $primary-blue-b2;
+    font-size: 16px;
+    font-weight: bold;
   }
 }
