@@ -1,3 +1,5 @@
+@import "themes/base/colors";
+
 .jsp-table {
   position: absolute;
   box-shadow: initial;
@@ -14,6 +16,7 @@
   .md-subheader {
     .md-subheader-inner {
       padding: 0;
+      color: $primary-blue-b2;
 
       & * {
         overflow-wrap: break-word;
