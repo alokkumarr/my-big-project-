@@ -3,17 +3,20 @@ analyze-chart {
   height: 100%;
 }
 
+chart {
+  width: calc(100% - 48px);
+  margin: 0 auto;
+  background: white;
+}
+
 .analyze-chart-dialog {
   analyze-dialog-content {
     background: whitesmoke;
   }
 
   chart {
-    width: calc(100% - 48px);
-    margin: 0 auto;
-    background: white;
-    border-radius: 2px;
     box-shadow: 0 2px 6px 0 rgba(20, 39, 54, 0.17);
+    border-radius: 2px;
   }
 
   md-checkbox {

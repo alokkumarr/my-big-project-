@@ -30,17 +30,8 @@
     <md-card-actions layout="row" layout-align="center center">
       <md-button class="md-button btn-card" aria-label="Fork"
                  ng-click="$ctrl.fork()">
-        <md-tooltip><span translate="TOOLTIP_FORK_ANALYSIS"></span></md-tooltip>
+        <md-tooltip ng-bind="'TOOLTIP_FORK_ANALYSIS' | translate"></md-tooltip>
         <md-icon md-font-icon="icon-fork"></md-icon>
-      </md-button>
-
-      <md-button class="md-button btn-card"
-                 aria-label="Execute"
-                 ng-click="$ctrl.execute($ctrl.model.id)">
-        <md-icon md-font-icon="icon-folder"></md-icon>
-        <md-tooltip>
-          <span translate="TOOLTIP_EXECUTE_ANALYSIS"></span>
-        </md-tooltip>
       </md-button>
 
       <md-menu-bar>
@@ -51,6 +42,12 @@
           </md-button>
 
           <md-menu-content>
+            <md-menu-item>
+              <md-button aria-label="Execute"
+                         ng-click="$ctrl.execute($ctrl.model.id)"
+                         translate="EXECUTE">
+              </md-button>
+            </md-menu-item>
             <md-menu-item>
               <md-button aria-label="Edit"
                          ng-click="$ctrl.edit()"

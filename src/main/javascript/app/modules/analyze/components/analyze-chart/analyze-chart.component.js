@@ -1,9 +1,16 @@
-import {BehaviorSubject} from 'rxjs';
-import {findIndex, forEach, get, isEmpty, map, values, clone, filter} from 'lodash';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import findIndex from 'lodash/findIndex';
+import forEach from 'lodash/forEach';
+import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
+import map from 'lodash/map';
+import values from 'lodash/values';
+import clone from 'lodash/clone';
+import filter from 'lodash/filter';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
-import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter-sidenav/analyze-filter-sidenav.component';
+import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter/analyze-filter-sidenav.component';
 
 export const AnalyzeChartComponent = {
   template,
@@ -46,7 +53,7 @@ export const AnalyzeChartComponent = {
         possible: []
       };
 
-      this.barChartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
+      this.chartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
       $window.chartctrl = this;
     }
 
@@ -192,6 +199,13 @@ export const AnalyzeChartComponent = {
       this.reloadChart(this.settings, this.filteredGridData);
     }
 
+    onFilterRemoved(filter) {
+      filter.model = null;
+      this.filters.selected = this._FilterService.getSelectedFilterMapper()(this.filters.possible);
+      this.filterGridData();
+      this.reloadChart(this.settings, this.filteredGridData);
+    }
+
     filterGridData() {
       this.filteredGridData = this._FilterService.getGridDataFilter(this.filters.selected)(this.gridData);
     }
@@ -245,7 +259,7 @@ export const AnalyzeChartComponent = {
         .show({
           template: tpl,
           controller: scope => {
-            scope.model = this.barChartOptions;
+            scope.model = this.chartOptions;
           },
           targetEvent: ev,
           fullscreen: true,
@@ -310,7 +324,15 @@ export const AnalyzeChartComponent = {
           multiple: true,
           targetEvent: ev,
           clickOutsideToClose: true
+        }).then(successfullySaved => {
+          if (successfullySaved) {
+            this.onAnalysisSaved(successfullySaved);
+          }
         });
+    }
+
+    onAnalysisSaved(successfullySaved) {
+      this.$dialog.hide(successfullySaved);
     }
   }
 

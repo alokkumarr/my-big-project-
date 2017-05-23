@@ -1,4 +1,6 @@
 import first from 'lodash/first';
+import find from 'lodash/find';
+import some from 'lodash/some';
 
 import template from './analyze-report-save.component.html';
 import style from './analyze-report-save.component.scss';
@@ -28,13 +30,20 @@ export const AnalyzeReportSaveComponent = {
     $onInit() {
       this._AnalyzeService.getCategories()
         .then(response => {
-          this.dataHolder.categories = response;
+          /* Find the category folder the current sub category
+             belongs to */
+          const category = find(response, category => {
+            return some(
+              category.children,
+              subCategory => subCategory.id === this.model.category
+            );
+          }) || first(response);
+
+          category.children = category.children || [];
+
+          this.dataHolder.categories = category.children;
           this.setDefaultCategory();
         });
-    }
-
-    cancel() {
-      this._$mdDialog.cancel();
     }
 
     setDefaultCategory() {
@@ -45,6 +54,10 @@ export const AnalyzeReportSaveComponent = {
           this.model.category = defaultCategory.id;
         }
       }
+    }
+
+    hide() {
+      this.$dialog.hide();
     }
 
     save() {
@@ -63,7 +76,9 @@ export const AnalyzeReportSaveComponent = {
 
             this._$eventEmitter.emit(Events.AnalysesRefresh, payload);
 
-            this.cancel();
+            // if saved successfully
+            this.$dialog.hide(true);
+            // use this.$dialog.cancel(); on error
           })
           .finally(() => {
             this.$dialog.hideLoader();

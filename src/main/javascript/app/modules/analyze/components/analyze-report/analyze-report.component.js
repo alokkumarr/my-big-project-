@@ -1,3 +1,4 @@
+import defaultsDeep from 'lodash/defaultsDeep';
 import fpFilter from 'lodash/fp/filter';
 import fpFlatMap from 'lodash/fp/flatMap';
 import fpPipe from 'lodash/fp/pipe';
@@ -5,15 +6,19 @@ import fpGet from 'lodash/fp/get';
 import fpMap from 'lodash/fp/map';
 import first from 'lodash/first';
 import map from 'lodash/map';
+import keys from 'lodash/keys';
 import forEach from 'lodash/forEach';
 import clone from 'lodash/clone';
 import isEmpty from 'lodash/isEmpty';
 import filter from 'lodash/filter';
+import assign from 'lodash/assign';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
 
-import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter-sidenav/analyze-filter-sidenav.component';
+import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter/analyze-filter-sidenav.component';
+
+const DEBOUNCE_INTERVAL = 500; // milliseconds
 
 export const AnalyzeReportComponent = {
   template,
@@ -32,6 +37,12 @@ export const AnalyzeReportComponent = {
       this._$timeout = $timeout;
       this._AnalyzeService = AnalyzeService;
       this._FilterService = FilterService;
+      this._reloadTimer = null;
+      this._modelLoaded = null;
+
+      this._modelPromise = new Promise(resolve => {
+        this._modelLoaded = resolve;
+      });
 
       this.DESIGNER_MODE = 'designer';
       this.QUERY_MODE = 'query';
@@ -57,7 +68,7 @@ export const AnalyzeReportComponent = {
         possible: []
       };
 
-      this.getDataByQuery();
+      this._unregisterCanvasHandlers = [];
     }
 
     $onInit() {
@@ -75,9 +86,28 @@ export const AnalyzeReportComponent = {
         }, 100);
       }
 
+      this._AnalyzeService.createAnalysis(this.model.semanticId, 'report').then(analysis => {
+        this.model = defaultsDeep(this.model, {
+          id: analysis.id,
+          metric: analysis.metric,
+          metricName: analysis.metricName,
+          artifacts: analysis.artifacts,
+          sqlBuilder: {
+            filters: [],
+            joins: [],
+            groupByColumns: [],
+            orderByColumns: []
+          }
+        });
+
+        this._modelLoaded(true);
+      });
+
       this.unregister = this._$componentHandler.on('$onInstanceAdded', e => {
         if (e.key === 'ard-canvas') {
-          this.initCanvas(e.instance);
+          this._modelPromise.then(() => {
+            this.initCanvas(e.instance);
+          });
         }
       });
     }
@@ -89,34 +119,16 @@ export const AnalyzeReportComponent = {
       if (this.unregister) {
         this.unregister();
       }
-    }
 
-    // requests
-    getDataByQuery() {
-      this._AnalyzeService.getDataByQuery()
-        .then(data => {
-          this.gridData = data;
-          this.filteredGridData = data;
-          this.reloadPreviewGrid();
-          this.showFiltersButtonIfDataIsReady();
-          this.canvas._$eventEmitter.emit('changed');
-          this.canvas._$eventEmitter.emit('sortChanged');
-        });
-    }
+      if (this._reloadTimer) {
+        this._$timeout.cancel(this._reloadTimer);
+        this._reloadTimer = null;
+      }
 
-    getArtifacts() {
-      this._AnalyzeService.getArtifacts()
-        .then(data => {
-          this.fillCanvas(data);
-          this.reloadPreviewGrid();
-          this.showFiltersButtonIfDataIsReady();
-          this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
-          if (!isEmpty(this.canvas.model.filters)) {
-            this.filters.selected = this.canvas.model.filters;
-            this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.canvas.model.filters, this.filters.possible);
-            this.onApplyFilters(this.filters.possible);
-          }
-        });
+      /* Unregister all the canvas's eventemitter handlers */
+      forEach(this._unregisterCanvasHandlers, unRegister => {
+        unRegister();
+      });
     }
 
     generateQuery() {
@@ -138,10 +150,9 @@ export const AnalyzeReportComponent = {
 
     generateFiltersOnCanvasChange() {
       this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
-      if (!isEmpty(this.canvas.model.filters)) {
-        this.filters.selected = this.canvas.model.filters;
-        this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.canvas.model.filters, this.filters.possible);
-        this.onApplyFilters(this.filters.possible);
+      if (!isEmpty(this.filters.selected)) {
+        this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.filters.selected, this.filters.possible);
+        this.filters.selected = this._FilterService.getSelectedFilterMapper()(this.filters.possible);
       }
       // this.clearFilters();
     }
@@ -156,13 +167,7 @@ export const AnalyzeReportComponent = {
       this.filters.possible = filters;
       this.filters.selected = this._FilterService.getSelectedFilterMapper()(filters);
 
-      this.filterGridData();
-    }
-
-    filterGridData() {
-      this.filteredGridData = this._FilterService.getGridDataFilter(this.filters.selected)(this.gridData);
-
-      this.reloadPreviewGrid();
+      this.reloadPreviewGrid(true);
     }
 
     onClearAllFilters() {
@@ -173,23 +178,18 @@ export const AnalyzeReportComponent = {
       this.filters.possible = this._FilterService.getFilterClearer()(this.filters.possible);
       this.filters.selected = [];
       this.filteredGridData = this.gridData;
-      this.reloadPreviewGrid();
+      this.reloadPreviewGrid(true);
     }
 
     onFilterRemoved(filter) {
       filter.model = null;
-      this.filterGridData();
+      this.reloadPreviewGrid(true);
     }
 
     generateFilters(selectedFields, gridData) {
       return this._FilterService.getCanvasFieldsToFiltersMapper(gridData)(selectedFields);
     }
-
     // END filters section
-
-    cancel() {
-      this._$mdDialog.cancel();
-    }
 
     toggleDetailsPanel() {
       this.states.detailsExpanded = !this.states.detailsExpanded;
@@ -197,7 +197,7 @@ export const AnalyzeReportComponent = {
       if (this.states.detailsExpanded) {
         this._$timeout(() => {
           this.reloadPreviewGrid();
-        });
+        }, 500);
       }
     }
 
@@ -205,10 +205,9 @@ export const AnalyzeReportComponent = {
       this.canvas = canvas;
 
       if (!this.model.artifacts) {
-        this.getArtifacts();
+        this.model.artifacts = [];
       } else {
         this.fillCanvas(this.model.artifacts);
-        this.reloadPreviewGrid();
         this.showFiltersButtonIfDataIsReady();
         this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
         if (!isEmpty(this.canvas.model.filters)) {
@@ -218,116 +217,161 @@ export const AnalyzeReportComponent = {
         }
       }
 
-      this.canvas._$eventEmitter.on('changed', () => {
-        this.generateFiltersOnCanvasChange();
-        this.reloadPreviewGrid();
-      });
+      this._unregisterCanvasHandlers = this._unregisterCanvasHandlers.concat([
 
-      this.canvas._$eventEmitter.on('sortChanged', () => {
-        this.reloadPreviewGrid();
+        this.canvas._$eventEmitter.on('changed', () => {
+          this.reloadPreviewGrid(true);
+        }),
+
+        this.canvas._$eventEmitter.on('sortChanged', () => {
+          this.reloadPreviewGrid(true);
+        }),
+
+        this.canvas._$eventEmitter.on('groupingChanged', groups => {
+          this.addGroupColumns(groups);
+          this.reloadPreviewGrid(true);
+        }),
+
+        this.canvas._$eventEmitter.on('joinChanged', () => {
+          this.reloadPreviewGrid(true);
+        })
+
+      ]);
+    }
+
+    /* NOTE: This will clear existing groups from model.
+       Make sure you supply the entire new groups array
+       as argument. */
+    addGroupColumns(groups) {
+      if (!angular.isArray(groups)) {
+        groups = [groups];
+      }
+
+      const model = this.canvas.model;
+
+      model.clearGroups();
+
+      forEach(groups, group => {
+        model.addGroup({
+          table: group.table.name,
+          field: group.name
+        });
       });
     }
 
     fillCanvas(data) {
       const model = this.canvas.model;
+      let defaultArtifactX = 20;
+      const defaultSpacing = 300; // canvas pixels
 
       model.clear();
 
       /* eslint-disable camelcase */
       forEach(data, itemA => {
-        const table = model.addTable(itemA.artifact_name);
+        const table = model.addTable(itemA.artifactName);
+
+        if (!itemA.artifactPosition) {
+          itemA.artifactPosition = [defaultArtifactX, 0];
+          defaultArtifactX += defaultSpacing;
+        } else {
+          defaultArtifactX += itemA.artifactPosition[0] + defaultSpacing;
+        }
 
         table.setMeta(itemA);
-        table.setPosition(itemA.artifact_position[0], itemA.artifact_position[1]);
+        table.setPosition(itemA.artifactPosition[0], itemA.artifactPosition[1]);
 
-        forEach(itemA.artifact_attributes, itemB => {
-          const field = table.addField(itemB.column_name);
+        forEach(itemA.columns, itemB => {
+          const field = table.addField(itemB.columnName);
 
           field.setMeta(itemB);
-          field.displayName = itemB.display_name;
-          field.alias = itemB.alias_name;
+          field.displayName = itemB.displayName;
+          field.alias = itemB.aliasName;
           field.type = itemB.type;
           field.checked = itemB.checked;
           field.isHidden = Boolean(itemB.hide);
-          field.isJoinEligible = Boolean(itemB.join_eligible);
-          field.isFilterEligible = Boolean(itemB.filter_eligible);
+          field.isJoinEligible = Boolean(itemB.joinEligible);
+          if (field.isJoinEligible) {
+            field.addEndpoint('right');
+            field.addEndpoint('left');
+          }
+          field.isFilterEligible = Boolean(itemB.filterEligible);
         });
       });
 
-      forEach(data, itemA => {
-        forEach(itemA.sql_builder.joins, itemB => {
-          const tableA = itemB.criteria[0].table_name;
-          const tableB = itemB.criteria[1].table_name;
+      forEach(this.model.sqlBuilder.joins, itemB => {
+        const tableA = itemB.criteria[0].tableName;
+        const tableB = itemB.criteria[1].tableName;
 
-          if (tableA !== tableB) {
-            model.addJoin(itemB.type, {
-              table: tableA,
-              field: itemB.criteria[0].column_name,
-              side: itemB.criteria[0].side
-            }, {
-              table: tableB,
-              field: itemB.criteria[1].column_name,
-              side: itemB.criteria[1].side
-            });
-          }
-        });
-
-        forEach(itemA.sql_builder.order_by_columns, itemB => {
-          model.addSort({
-            table: itemA.artifact_name,
-            field: itemB.column_name,
-            order: itemB.order
+        if (tableA !== tableB) {
+          model.addJoin(itemB.type, {
+            table: tableA,
+            field: itemB.criteria[0].columnName,
+            side: itemB.criteria[0].side
+          }, {
+            table: tableB,
+            field: itemB.criteria[1].columnName,
+            side: itemB.criteria[1].side
           });
-        });
+        }
+      });
 
-        forEach(itemA.sql_builder.group_by_columns, itemB => {
-          model.addGroup({
-            table: itemA.artifact_name,
-            field: itemB
-          });
+      forEach(this.model.sqlBuilder.orderByColumns, itemB => {
+        model.addSort({
+          table: itemB.tableName,
+          field: itemB.columnName,
+          order: itemB.order
         });
+      });
 
-        forEach(itemA.sql_builder.filters, backEndFilter => {
-          model.addFilter(this._FilterService.getBackEnd2FrontEndFilterMapper()(backEndFilter));
+      forEach(this.model.sqlBuilder.groupByColumns, itemB => {
+        model.addGroup({
+          table: itemB.tableName,
+          field: itemB.columnName
         });
+      });
+
+      forEach(this.model.sqlBuilder.filters, backEndFilter => {
+        model.addFilter(this._FilterService.getBackEnd2FrontEndFilterMapper()(backEndFilter));
       });
       /* eslint-enable camelcase */
     }
 
     generatePayload() {
-      const model = this.canvas.model;
-      const tableArtifacts = [];
-
       /* eslint-disable camelcase */
+      const model = this.canvas.model;
+      const result = {
+        artifacts: [],
+        sqlBuilder: {
+          groupByColumns: [],
+          orderByColumns: [],
+          joins: [],
+          filters: []
+        }
+      };
+
       forEach(model.tables, table => {
         const tableArtifact = {
-          artifact_name: table.name,
-          artifact_position: [table.x, table.y],
-          artifact_attributes: [],
-          sql_builder: {
-            group_by_columns: [],
-            order_by_columns: [],
-            joins: [],
-            filters: []
-          },
+          artifactName: table.name,
+          artifactPosition: [table.x, table.y],
+          columns: [],
           data: []
         };
 
-        tableArtifacts.push(tableArtifact);
+        result.artifacts.push(tableArtifact);
 
         forEach(table.fields, field => {
           const fieldArtifact = {
-            column_name: field.meta.column_name,
-            display_name: field.meta.display_name,
-            alias_name: field.alias,
+            columnName: field.meta.columnName,
+            displayName: field.meta.displayName,
+            aliasName: field.alias,
             type: field.meta.type,
             hide: field.isHidden,
-            join_eligible: field.meta.join_eligible,
-            filter_eligible: field.meta.filter_eligible,
+            joinEligible: field.meta.joinEligible,
+            filterEligible: field.meta.filterEligible,
             checked: field.checked
           };
 
-          tableArtifact.artifact_attributes.push(fieldArtifact);
+          tableArtifact.columns.push(fieldArtifact);
         });
 
         const joins = filter(model.joins, join => {
@@ -341,18 +385,18 @@ export const AnalyzeReportComponent = {
           };
 
           joinArtifact.criteria.push({
-            table_name: join.leftSide.table.name,
-            column_name: join.leftSide.field.name,
+            tableName: join.leftSide.table.name,
+            columnName: join.leftSide.field.name,
             side: join.leftSide.side
           });
 
           joinArtifact.criteria.push({
-            table_name: join.rightSide.table.name,
-            column_name: join.rightSide.field.name,
+            tableName: join.rightSide.table.name,
+            columnName: join.rightSide.field.name,
             side: join.rightSide.side
           });
 
-          tableArtifact.sql_builder.joins.push(joinArtifact);
+          result.sqlBuilder.joins.push(joinArtifact);
         });
 
         const sorts = filter(model.sorts, sort => {
@@ -361,33 +405,57 @@ export const AnalyzeReportComponent = {
 
         forEach(sorts, sort => {
           const sortArtifact = {
-            column_name: sort.field.name,
+            tableName: tableArtifact.artifactName,
+            columnName: sort.field.name,
             order: sort.order
           };
 
-          tableArtifact.sql_builder.order_by_columns.push(sortArtifact);
+          result.sqlBuilder.orderByColumns.push(sortArtifact);
         });
 
-        const groups = filter(group => {
+        const groups = filter(model.groups, group => {
           return group.table === table;
-        }, model.groups);
+        });
 
         forEach(groups, group => {
-          tableArtifact.sql_builder.group_by_columns.push(group.field.name);
+          result.sqlBuilder.groupByColumns.push({
+            tableName: group.table.name,
+            columnName: group.field.name
+          });
         });
 
-        tableArtifact.sql_builder.filters = fpPipe(
-          filter(artifactFilter => artifactFilter.tableName === tableArtifact.artifact_name),
-          fpMap(this._FilterService.getFrontEnd2BackEndFilterMapper())
-        )(this.filters.selected);
+        result.sqlBuilder.filters = result.sqlBuilder.filters.concat(fpMap(
+          this._FilterService.getFrontEnd2BackEndFilterMapper(),
+          fpFilter(
+            artifactFilter => artifactFilter.tableName === tableArtifact.artifactName,
+            this.filters.selected
+          )
+        ));
       });
       /* eslint-enable camelcase */
 
-      return tableArtifacts;
+      return result;
     }
 
-    reloadPreviewGrid() {
-      this.columns = this.getSelectedColumns(this.canvas.model.tables);
+    getColumns(columnNames = []) {
+      const fields = fpFlatMap(table => table.fields, this.canvas.model.tables);
+
+      return fpFilter(field => columnNames.indexOf(field.name) >= 0, fields);
+    }
+
+    onSaveQuery(analysis) {
+      this._AnalyzeService.getDataBySettings(clone(analysis))
+        .then(({analysis, data}) => {
+          this.filteredGridData = this.gridData = data;
+          this.model.query = analysis.queryManual || analysis.query;
+
+          const columnNames = keys(fpGet('[0]', data));
+          this.applyDataToGrid(this.getColumns(columnNames), [], this.filteredGridData);
+        });
+    }
+
+    refreshGridData() {
+      this.model = assign(this.model, this.generatePayload());
 
       const sorts = map(this.canvas.model.sorts, sort => {
         return {
@@ -396,18 +464,67 @@ export const AnalyzeReportComponent = {
         };
       });
 
+      this._AnalyzeService.getDataBySettings(clone(this.model))
+        .then(({analysis, data}) => {
+          this.filteredGridData = this.gridData = data;
+          this.model.query = analysis.queryManual || analysis.query;
+          this.generateFiltersOnCanvasChange(); // update filters with new data
+          this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
+          this.analysisChanged = false;
+        });
+    }
+
+    applyDataToGrid(columns, sorts, data) {
+      this.showFiltersButtonIfDataIsReady();
       const grid = first(this._$componentHandler.get('ard-grid-container'));
 
       if (grid) {
-        grid.updateColumns(this.columns);
+        grid.updateColumns(columns);
         grid.updateSorts(sorts);
-        grid.updateSource(this.filteredGridData);
+        grid.updateSource(data);
         this._$timeout(() => {
           // Delay refreshing the grid a bit to counter
           // aria errors from dev extreme
           // Need to find a better fix for this
           grid.refreshGrid();
         }, 100);
+      }
+    }
+
+    reloadPreviewGrid(refresh = false) {
+      const doReload = () => {
+        return this._$timeout(() => {
+          this._reloadTimer = null;
+          this.columns = this.getSelectedColumns(this.canvas.model.tables);
+
+          const sorts = map(this.canvas.model.sorts, sort => {
+            return {
+              column: sort.field.name,
+              direction: sort.order
+            };
+          });
+
+          if (!refresh) {
+            this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
+            return;
+          }
+
+          if (this.columns.length === 0) {
+            this.filteredGridData = this.gridData = [];
+            this.generateFiltersOnCanvasChange();
+            this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
+          } else {
+            this.analysisChanged = true;
+          }
+
+        }, DEBOUNCE_INTERVAL);
+      };
+
+      if (this._reloadTimer) {
+        this._$timeout.cancel(this._reloadTimer);
+        this._reloadTimer = doReload();
+      } else {
+        this._reloadTimer = doReload();
       }
     }
 
@@ -465,11 +582,19 @@ export const AnalyzeReportComponent = {
         });
     }
 
+    updateJoins(name, obj) {
+      if (name !== 'joinChanged') {
+        return;
+      }
+
+      this.canvas._$eventEmitter.emit('joinChanged', obj);
+    }
+
     openSortModal(ev) {
       this.states.detailsExpanded = true;
 
       this._$timeout(() => {
-        this.reloadPreviewGrid();
+        this.reloadPreviewGrid(false);
       });
 
       const tpl = '<analyze-report-sort model="model"></analyze-report-sort>';
@@ -527,7 +652,7 @@ export const AnalyzeReportComponent = {
         this.model.query = '';
       }
 
-      this.model.artifacts = this.generatePayload();
+      this.model = assign(this.model, this.generatePayload());
       const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
       this._$mdDialog
@@ -549,7 +674,15 @@ export const AnalyzeReportComponent = {
           multiple: true,
           targetEvent: ev,
           clickOutsideToClose: true
+        }).then(successfullySaved => {
+          if (successfullySaved) {
+            this.onAnalysisSaved(successfullySaved);
+          }
         });
+    }
+
+    onAnalysisSaved(successfullySaved) {
+      this.$dialog.hide(successfullySaved);
     }
   }
 };

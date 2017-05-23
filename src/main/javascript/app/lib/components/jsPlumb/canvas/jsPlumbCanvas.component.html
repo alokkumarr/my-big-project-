@@ -3,4 +3,6 @@
                 model="table"></js-plumb-table>
 
 <js-plumb-connector ng-repeat="join in $ctrl.model.joins"
-                     model="join"></js-plumb-connector>
+                    model="join"
+                    on-change="$ctrl.joinChanged(params)"
+></js-plumb-connector>

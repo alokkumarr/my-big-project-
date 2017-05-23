@@ -107,15 +107,14 @@ analyze-report {
         }
       }
 
-      .md-button {
+      .md-button.mode-selector {
         margin: 0;
         border: 1px solid #C4C4C4;
-        color: #AFAFAF;
+        color: #707070;
         font-size: 15px;
 
         &.m-active {
           background-color: #DADADA;
-          color: #707070;
         }
 
         &:nth-child(1) {
@@ -186,33 +185,23 @@ analyze-report {
         text-align: right;
         align-self: center;
 
-        .md-button {
+        .md-button:not(.btn-primary) {
           border: 1px solid #E7E8E9;
           background-color: #F8F8F8;
           color: #898989;
+        }
+
+        .md-button:last-child {
+          margin-right: 8px;
         }
       }
     }
 
     &_details-panel {
       min-height: 40%;
+      max-height: 50%;
       overflow-y: scroll;
       padding: 20px;
-
-      .filter-chip-container {
-        min-height: 60px;
-
-        span.filter-counter {
-          font-weight: 600;
-        }
-
-        button.filter-clear-all {
-          text-align: left;
-          padding-left: 0;
-          min-height: 24px;
-          line-height: 15px;
-        }
-      }
 
       &-empty {
         width: 100%;

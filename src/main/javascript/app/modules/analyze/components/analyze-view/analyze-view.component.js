@@ -69,7 +69,7 @@ export const AnalyzeViewComponent = {
     }
 
     loadAnalyses() {
-      return this._AnalyzeService.getAnalyses(this.$state.params.id, {
+      return this._AnalyzeService.getAnalysesFor(this.$state.params.id, {
         filter: this.states.searchTerm
       }).then(analyses => {
         this.reports = sortBy(analyses, analysis => -parseInt(analysis.id, 10));
@@ -104,7 +104,8 @@ export const AnalyzeViewComponent = {
         alignment: 'left',
         width: '20%',
         calculateCellValue: rowData => {
-          return (rowData.metrics || []).join(', ');
+          return rowData.metricName ||
+            (rowData.metrics || []).join(', ');
         },
         cellTemplate: 'metricsCellTemplate'
       }, {
@@ -179,8 +180,9 @@ export const AnalyzeViewComponent = {
         this.showDialog({
           controller: scope => {
             scope.metrics = metrics;
+            scope.subCategory = this.$state.params.id;
           },
-          template: '<analyze-new metrics="metrics"></analyze-new>',
+          template: '<analyze-new metrics="metrics" sub-category="{{::subCategory}}"></analyze-new>',
           fullscreen: true
         });
       });
@@ -201,7 +203,11 @@ export const AnalyzeViewComponent = {
         return report.id === model.id;
       });
       this.reloadDataGrid(this.reports);
-      this._$mdToast.show(this._$mdToast.simple().textContent('Analysis deleted'));
+      this._$mdToast.show({
+        template: '<md-toast><span>Analysis Deleted</span></md-toast>',
+        position: 'bottom left',
+        toastClass: 'toast-primary'
+      });
     }
 
     onCardAction(actionType, model) {

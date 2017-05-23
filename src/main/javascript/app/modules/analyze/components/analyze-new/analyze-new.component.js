@@ -11,7 +11,8 @@ import {AnalyseTypes} from '../../consts';
 export const AnalyzeNewComponent = {
   template,
   bindings: {
-    metrics: '<'
+    metrics: '<',
+    subCategory: '@'
   },
   styles: [style],
   controller: class AnalyzeNewController {
@@ -50,15 +51,12 @@ export const AnalyzeNewComponent = {
       });
     }
 
-    cancel() {
-      this._$mdDialog.cancel();
-    }
-
     createAnalysis() {
       let tpl;
       let model;
       let type;
 
+      const metricId = (this.selectedMetric || {}).id;
       switch (this.selectedAnalysisMethod) {
         case 'table:report':
           tpl = '<analyze-report model="model"></analyze-report>';
@@ -66,10 +64,10 @@ export const AnalyzeNewComponent = {
             type: AnalyseTypes.Report,
             name: 'Untitled Analysis',
             description: '',
-            category: null,
-            metric: this.selectedMetric,
-            scheduled: null,
-            artifacts: null
+            category: this.subCategory,
+            semanticId: metricId,
+            metricName: this.selectedMetric.name,
+            scheduled: null
           };
           break;
         case 'table:pivot':
@@ -78,10 +76,9 @@ export const AnalyzeNewComponent = {
             type: AnalyseTypes.Pivot,
             name: 'Untitled Analysis',
             description: '',
-            category: null,
-            metric: this.selectedMetric,
-            scheduled: null,
-            artifacts: null
+            category: this.subCategory,
+            semanticId: this.selectedMetric,
+            scheduled: null
           };
           break;
         case 'chart:column':
@@ -96,10 +93,9 @@ export const AnalyzeNewComponent = {
             chartType: type,
             name: 'Untitled Chart',
             description: '',
-            category: null,
-            metric: this.selectedMetric,
-            scheduled: null,
-            artifacts: null
+            category: this.subCategory,
+            semanticId: this.selectedMetric,
+            scheduled: null
           };
           break;
         default:
@@ -117,6 +113,10 @@ export const AnalyzeNewComponent = {
         focusOnOpen: false,
         multiple: true,
         clickOutsideToClose: true
+      }).then(successfullySaved => {
+        if (successfullySaved) {
+          this.$dialog.hide(successfullySaved);
+        }
       });
     }
   }

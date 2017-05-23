@@ -9,16 +9,19 @@
   "CHANGE_PASSWORD": "Change Password",
   "CHARTS": "Charts",
   "CLEAR_ALL": "Clear all",
-  "CLEAR_ALL_FILTERS": "Clear all fitlers",
+  "CLEAR_ALL_FILTERS": "Clear all filters",
   "DESCRIPTION": "Description",
+  "DONE": "Done",
   "DRAFT": "Draft",
   "EDIT": "Edit",
   "DELETE": "Delete",
   "ENDS": "Ends",
   "EXPORT": "Export",
+  "EXECUTE": "Execute",
   "FILTER": "Filter",
   "FROM": "From",
   "GROUPED_BY": "Grouped by",
+  "LAYOUT": "Layout",
   "LIST": "LIST",
   "LOAD_MORE_ROWS": "Load {{nrOfRows}} More Rows",
   "LOG_OUT": "Log out",
@@ -48,9 +51,11 @@
   "SORT_BY": "Sort by",
   "SORT_BY_ANOTHER_COLUMN": "Sort by another column",
   "STARTS_ON": "Starts on",
+  "SUBMIT": "Submit",
   "SUMMARY_VIEW": "Summary View",
   "PIVOTS": "Pivots",
   "PLEASE_SELECT": "Please select",
+  "POSITION": "Position",
   "PREVIEW": "Preview",
   "PRINT": "Print",
   "PUBLISH": "Publish",
@@ -70,5 +75,7 @@
 
   "TOOLTIP_SEARCH": "Search",
   "TOOLTIP_LIST_VIEW": "List View",
-  "TOOLTIP_CARD_VIEW": "Card View"
+  "TOOLTIP_CARD_VIEW": "Card View",
+
+  "ERROR_OOPS_SERVER": "Oops, it looks like something went wrong with the server, if you see this message regularly, please contact customer support."
 }

@@ -6,7 +6,6 @@ import pipe from 'lodash/fp/pipe';
 
 import template from './analyze-filter-sidenav.component.html';
 
-export const ANALYZE_FILTER_SIDENAV_ID = 'analyze-observe-filter-sidenav';
 export const ANALYZE_FILTER_SIDENAV_IDS = {
   designer: 'analyze-observe-filter-sidenav-designer',
   detailPage: 'analyze-observe-filter-sidenav-detail-page'
@@ -18,13 +17,20 @@ export const AnalyzeFilterSidenavComponent = {
     placement: '@'
   },
   controller: class AnalyzeFilterSidenavController {
-    constructor(FilterService) {
+    constructor(FilterService, $element, $document) {
       'ngInject';
+      this._$element = $element;
+      this._$document = $document;
       this._FilterService = FilterService;
       this.ANALYZE_FILTER_SIDENAV_IDS = ANALYZE_FILTER_SIDENAV_IDS;
     }
 
     $onInit() {
+      if (this.placement === ANALYZE_FILTER_SIDENAV_IDS.detailPage) {
+        const elem = this._$element.detach();
+        this._$document[0].querySelector('div.root-container').append(elem[0]);
+      }
+
       this.id = this.placement === ANALYZE_FILTER_SIDENAV_IDS.detailPage ?
           ANALYZE_FILTER_SIDENAV_IDS.detailPage : ANALYZE_FILTER_SIDENAV_IDS.designer;
 
@@ -33,6 +39,9 @@ export const AnalyzeFilterSidenavComponent = {
 
     $onDestroy() {
       this._FilterService.offOpenFilterSidenav();
+      if (this.placement === ANALYZE_FILTER_SIDENAV_IDS.detailPage) {
+        this._$element.remove();
+      }
     }
 
     onSidenavOpen(filters) {

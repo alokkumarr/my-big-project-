@@ -5,7 +5,8 @@ export const JSPlumbJoinLabel = {
   template,
   styles: [style],
   bindings: {
-    model: '<'
+    model: '<',
+    onChange: '&'
   },
   controller: class JSPlumbJoinLabelCtrl {
     constructor($scope, $mdDialog) {
@@ -34,7 +35,7 @@ export const JSPlumbJoinLabel = {
     }
 
     onClick(ev) {
-      const tpl = '<js-plumb-join-dialog model="$ctrl.model"></js-plumb-join-dialog>';
+      const tpl = '<js-plumb-join-dialog model="$ctrl.model" on-change="$ctrl.joinChanged(params)"></js-plumb-join-dialog>';
 
       this._$mdDialog
         .show({
@@ -42,6 +43,10 @@ export const JSPlumbJoinLabel = {
           controller: scope => {
             scope.$ctrl.model = {
               connector: this._connector
+            };
+
+            scope.$ctrl.joinChanged = params => {
+              this.onChange({params});
             };
           },
           controllerAs: '$ctrl',

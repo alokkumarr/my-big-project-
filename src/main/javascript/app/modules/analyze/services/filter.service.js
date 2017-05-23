@@ -7,13 +7,14 @@ import pipe from 'lodash/fp/pipe';
 import reduce from 'lodash/fp/reduce';
 import filter from 'lodash/fp/filter';
 import isEmpty from 'lodash/isEmpty';
+import isNumber from 'lodash/isNumber';
 import set from 'lodash/fp/set';
+import unset from 'lodash/fp/unset';
 import values from 'lodash/values';
-import compact from 'lodash/compact';
 import forEach from 'lodash/forEach';
 import find from 'lodash/find';
 
-import {OPERATORS} from '../components/analyze-filter-sidenav/filters/number-filter.component';
+import {OPERATORS} from '../components/analyze-filter/filters/number-filter.component';
 
 export const BOOLEAN_CRITERIA = {
   AND: 'AND',
@@ -27,6 +28,8 @@ const EVENTS = {
   APPLY_FILTERS: 'APPLY_FILTERS',
   CLEAR_ALL_FILTERS: 'CLEAR_ALL_FILTERS'
 };
+
+const NUMBER_TYPES = ['int', 'integer', 'double', 'long', 'timestamp'];
 
 export function FilterService($mdSidenav, $eventEmitter, $log) {
   'ngInject';
@@ -70,14 +73,17 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
 
   function offOpenFilterSidenav() {
     unRegisterFuncs[EVENTS.OPEN_SIDENAV]();
+    unset(unRegisterFuncs, EVENTS.OPEN_SIDENAV);
   }
 
   function offApplyFilters() {
     unRegisterFuncs[EVENTS.APPLY_FILTERS]();
+    unset(unRegisterFuncs, EVENTS.APPLY_FILTERS);
   }
 
   function offClearAllFilters() {
     unRegisterFuncs[EVENTS.CLEAR_ALL_FILTERS]();
+    unset(unRegisterFuncs, EVENTS.CLEAR_ALL_FILTERS);
   }
 
   function openFilterSidenav(payload, sidenavId) {
@@ -99,23 +105,23 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
   function getFrontEnd2BackEndFilterMapper() {
     return frontEndFilter => {
       const backEndFilter = {
-        column_name: frontEndFilter.name,
+        columnName: frontEndFilter.name,
         label: frontEndFilter.label,
-        table_name: frontEndFilter.tableName,
-        boolean_criteria: frontEndFilter.booleanCriteria,
-        filter_type: frontEndFilter.type
+        tableName: frontEndFilter.tableName,
+        booleanCriteria: frontEndFilter.booleanCriteria,
+        filterType: frontEndFilter.type
       };
 
-      if (frontEndFilter.type === 'int' || frontEndFilter.type === 'double') {
+      if (NUMBER_TYPES.indexOf(frontEndFilter.type) >= 0) {
         backEndFilter.operator = frontEndFilter.operator;
-        backEndFilter.search_conditions =
-          frontEndFilter.operator === OPERATORS.BETWEEN ?
+        backEndFilter.searchConditions =
+          frontEndFilter.operator === OPERATORS.BETWEEN.value ?
           [frontEndFilter.model.otherValue, frontEndFilter.model.value] :
           [frontEndFilter.model.value];
 
       } else if (frontEndFilter.type === 'string') {
         backEndFilter.operator = null;
-        backEndFilter.search_conditions = pipe(
+        backEndFilter.searchConditions = pipe(
           // transform the model object to an array of strings
           toPairs,
           // filter only the ones that are truthy
@@ -135,26 +141,26 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
   function getBackEnd2FrontEndFilterMapper() {
     return backEndFilter => {
       const frontEndFilter = {
-        name: backEndFilter.column_name,
+        name: backEndFilter.columnName,
         label: backEndFilter.label,
-        tableName: backEndFilter.table_name,
-        booleanCriteria: backEndFilter.boolean_criteria,
-        type: backEndFilter.filter_type
+        tableName: backEndFilter.tableName,
+        booleanCriteria: backEndFilter.booleanCriteria,
+        type: backEndFilter.filterType
       };
 
-      if (backEndFilter.filter_type === 'int' || backEndFilter.filter_type === 'double') {
+      if (NUMBER_TYPES.indexOf(backEndFilter.type) >= 0) {
         frontEndFilter.operator = backEndFilter.operator;
         frontEndFilter.model = {
-          otherValue: backEndFilter.operator === OPERATORS.BETWEEN ?
-            backEndFilter.search_conditions[0] : null,
+          otherValue: backEndFilter.operator === OPERATORS.BETWEEN.value ?
+            backEndFilter.searchConditions[0] : null,
 
-          value: backEndFilter.operator === OPERATORS.BETWEEN ?
-            backEndFilter.search_conditions[1] :
-            backEndFilter.search_conditions[0]
+          value: backEndFilter.operator === OPERATORS.BETWEEN.value ?
+            backEndFilter.searchConditions[1] :
+            backEndFilter.searchConditions[0]
         };
-      } else if (backEndFilter.filter_type === 'string') {
+      } else if (backEndFilter.filterType === 'string') {
         // transform a string of arrays to an object with the strings as keys
-        frontEndFilter.model = transfrom(backEndFilter.search_conditions,
+        frontEndFilter.model = transfrom(backEndFilter.searchConditions,
           (model, value) => {
             model[value] = true;
           },
@@ -167,16 +173,16 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
 
   function getChartSetttingsToFiltersMapper(gridData) {
     return pipe(
-      filter(get('filter_eligible')),
+      filter(get('filterEligible')),
       map(field => {
         return {
           tableName: (field.table ? field.table.name : field.tableName),
-          label: field.alias || field.displayName || field.display_name,
-          name: field.name || field.column_name,
+          label: field.alias || field.displayName || field.displayName,
+          name: field.name || field.columnName,
           type: field.type,
           model: null,
           booleanCriteria: DEFAULT_BOOLEAN_CRITERIA,
-          items: field.type === 'string' ? uniq(map(get(field.name || field.column_name), gridData)) : null
+          items: field.type === 'string' ? uniq(map(get(field.name || field.columnName), gridData)) : null
         };
       }));
   }
@@ -222,7 +228,7 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
     }
 
     // can be an object with null values
-    if (isEmpty(compact(values(model)))) {
+    if (isEmpty(filter(x => isNumber(x) || Boolean(x), values(model)))) {
       return false;
     }
     return true;
@@ -249,7 +255,10 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
           isValid = Boolean(filter.model[row[filter.name]]);
           break;
         case 'int':
+        case 'integer':
+        case 'timestamp':
         case 'double':
+        case 'long':
           isValid = Boolean(isNumberValid(row[filter.name], filter.model, filter.operator));
           break;
         default:
@@ -323,19 +332,19 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
     const c = numberFilterModel.otherValue;
 
     switch (operator) {
-      case OPERATORS.GREATER:
+      case OPERATORS.GREATER.value:
         return a > b;
-      case OPERATORS.LESS:
+      case OPERATORS.LESS.value:
         return a < b;
-      case OPERATORS.GREATER_OR_EQUAL:
+      case OPERATORS.GREATER_OR_EQUAL.value:
         return a >= b;
-      case OPERATORS.LESS_OR_EQUAL:
+      case OPERATORS.LESS_OR_EQUAL.value:
         return a <= b;
-      case OPERATORS.NOT_EQUALS:
+      case OPERATORS.NOT_EQUALS.value:
         return a !== b;
-      case OPERATORS.EQUALS:
+      case OPERATORS.EQUALS.value:
         return a === b;
-      case OPERATORS.BETWEEN:
+      case OPERATORS.BETWEEN.value:
         return c <= a && a <= b;
       default:
         return false;

@@ -2,7 +2,7 @@
   <analyze-dialog-header>
     <div layout="row">
       <md-button class="ard_back-btn"
-                 ng-click="$ctrl.$dialog.closeDialog()">
+                 ng-click="$ctrl.$dialog.hide()">
         <md-icon md-font-icon="icon-arrow-left"></md-icon>
       </md-button>
 
@@ -13,7 +13,7 @@
         </div>
         <div class="md-description">
           <md-icon md-font-icon="icon-report"></md-icon>
-          <span translate="ORDERS"></span>
+          <span ng-bind="::$ctrl.model.metricName"></span>
         </div>
       </div>
 
@@ -41,28 +41,42 @@
 
           <div>
             <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.DESIGNER_MODE}"
-                       ng-disabled="$ctrl.states.disable.designer"
+                       class="mode-selector"
+                       ng-disabled="$ctrl.states.disable.designer || $ctrl.model.edit"
                        ng-click="$ctrl.setSqlMode($ctrl.DESIGNER_MODE)">
               <md-icon md-font-icon="icon-designer-mode"></md-icon>
               <span translate="DESIGNER"></span>
             </md-button>
 
             <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.QUERY_MODE}"
+                       class="mode-selector"
                        ng-click="$ctrl.setSqlMode($ctrl.QUERY_MODE)">
               <md-icon md-font-icon="icon-query-mode"></md-icon>
               <span translate="QUERY"></span>
+            </md-button>
+
+          <md-button ng-click="$ctrl.openDescriptionModal($event)">
+            <md-icon md-font-icon="icon-description"></md-icon>
+            <span translate="DESCRIPTION"></span>
+          </md-button>
+
+            <md-button ng-if="$ctrl.showFiltersButton && !$ctrl.model.edit" ng-click="$ctrl.openFilterSidenav()">
+              <md-icon md-font-icon="icon-filter"></md-icon>
+              <span translate="FILTER"></span>
             </md-button>
           </div>
         </div>
 
         <div layout="row" class="ard_canvas">
           <div ng-show="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE">
-            <js-plumb-canvas id="ard-canvas"></js-plumb-canvas>
+            <js-plumb-canvas id="ard-canvas" on-change="$ctrl.updateJoins(name, params)"></js-plumb-canvas>
           </div>
 
           <div class="ard_canvas-query"
                ng-show="$ctrl.states.sqlMode === $ctrl.QUERY_MODE">
-            <textarea ng-model="$ctrl.model.query"></textarea>
+            <analyze-report-query model="$ctrl.model"
+                                  on-save="$ctrl.onSaveQuery(analysis)">
+            </analyze-report-query>
           </div>
         </div>
       </div>
@@ -78,9 +92,10 @@
               translate="REPORT"></span>
 
         <div class="ard_toolbar-actions" flex>
-          <md-button ng-click="$ctrl.openDescriptionModal($event)">
-            <md-icon md-font-icon="icon-description"></md-icon>
-            <span translate="DESCRIPTION"></span>
+          <md-button ng-click="$ctrl.refreshGridData()"
+                     ng-if="!$ctrl.model.edit"
+                     ng-class="{'btn-primary': $ctrl.analysisChanged}" >
+            <span translate="REFRESH_DATA"></span>
           </md-button>
 
           <md-button ng-click="$ctrl.openPreviewModal($event)"
@@ -90,14 +105,10 @@
           </md-button>
 
           <md-button ng-click="$ctrl.openSortModal($event)"
+                     ng-if="!$ctrl.model.edit"
                      ng-disabled="$ctrl.isSortDisabled()">
             <md-icon md-font-icon="icon-sort"></md-icon>
             <span translate="SORT"></span>
-          </md-button>
-
-          <md-button ng-if="$ctrl.showFiltersButton" ng-click="$ctrl.openFilterSidenav()">
-            <md-icon md-font-icon="icon-filter"></md-icon>
-            <span translate="FILTER"></span>
           </md-button>
         </div>
       </div>
@@ -110,29 +121,14 @@
           <md-icon md-font-icon="icon-report"></md-icon>
         </div>
 
-        <div class="filter-chip-container" layout="row" ng-if="$ctrl.filters.selected.length > 0">
-          <div layout="column" style="padding: 6px 20px 10px 0">
-            <span class="filter-counter" translate="N_FILTERS_APPLIED"
-                  translate-values="{N: $ctrl.filters.selected.length}"
-                  translate-interpolation="messageformat"></span>
-            <md-button class="btn-tertiary filter-clear-all" ng-click="$ctrl.onClearAllFilters()" translate="CLEAR_ALL"></md-button>
-          </div>
-          <md-chips class="filter-tags" readonly="true"
-                    ng-model="$ctrl.filters.selected"
-                    md-removable="true"
-                    md-on-remove="$ctrl.onFilterRemoved($chip)">
-            <md-chip-template>
-              <span ng-bind="$chip.label"></span>
-            </md-chip-template>
-
-            <button class="md-primary" md-chip-remove>
-              <md-icon md-font-icon="icon-remove"></md-icon>
-            </button>
-          </md-chips>
-        </div>
+        <filter-chips filters="$ctrl.filters.selected"
+                      on-clear-all-filters="$ctrl.onClearAllFilters()"
+                      on-filter-removed="$ctrl.onFilterRemoved(chip)">
+        </filter-chips>
 
         <report-grid-container id="ard-grid-container" class="ard_details-grid" layout="row"
                                source="$ctrl.filteredGridData"
+                               event-emitter="$ctrl.canvas._$eventEmitter"
                                columns="$ctrl.columns"
                                show-group-panel="true"
                                show-view-more="true"

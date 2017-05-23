@@ -6,16 +6,16 @@ import fpMap from 'lodash/fp/map';
 import fpPipe from 'lodash/fp/pipe';
 import fpFilter from 'lodash/fp/filter';
 import find from 'lodash/find';
-import take from 'lodash/take';
+import filter from 'lodash/filter';
 import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 
 import template from './analyze-pivot.component.html';
 import style from './analyze-pivot.component.scss';
 
-import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter-sidenav/analyze-filter-sidenav.component';
+import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter/analyze-filter-sidenav.component';
 import {ANALYZE_PIVOT_SETTINGS_SIDENAV_ID} from '../analyze-pivot-settings/analyze-pivot-settings.component';
 
 export const AnalyzePivotComponent = {
@@ -38,9 +38,10 @@ export const AnalyzePivotComponent = {
       this.normalizedData = [];
       this.dataSource = {};
       this.sorts = [];
-      this.filters = null;
+      this.filters = {};
       this.sortFields = null;
       this.pivotGridUpdater = new BehaviorSubject({});
+      this.settingsModified = false;
     }
 
     $onInit() {
@@ -49,23 +50,29 @@ export const AnalyzePivotComponent = {
 
       if (isEmpty(this.model.artifacts)) {
         // new analysis
-        this._AnalyzeService.createAnalysis(this.model.artifactsId)
+        this._AnalyzeService.createAnalysis(this.model.artifactsId, 'pivot')
           .then(analysis => {
-            this.prepareFields(analysis.artifacts[0].artifactAttributes);
+            this.prepareFields(analysis.artifacts[0].columns);
             this.toggleSettingsSidenav();
           });
         // if it's a pivot analysis we're only interested in the first artifact
       } else {
         // edit existing analysis
-        this.prepareFields(this.model.artifacts[0].artifactAttributes);
+        this.prepareFields(this.model.artifacts[0].columns);
         this.loadPivotData().then(() => {
-          this.filters = this._PivotService.mapFieldsToFilters(this.normalizedData, this.fields);
+          this.filters.possible = this._PivotService.mapFieldsToFilters(this.normalizedData, this.fields);
+          this.filters.selected = [];
           const selectedFilters = map(this.model.filters, this._FilterService.getBackEnd2FrontEndFilterMapper());
-          this.mergeSelectedFiltersWithFilters(selectedFilters, this.filters);
+          this.mergeSelectedFiltersWithFilters(selectedFilters, this.filters.possible);
           this.sortFields = this.getFieldToSortFieldMapper()(this.fields);
           this.sorts = this.mapBackend2FrontendSort(this.model.sorts, this.sortFields);
         });
       }
+    }
+
+    $onDestroy() {
+      this._FilterService.offApplyFilters();
+      this._FilterService.offClearAllFilters();
     }
 
     mergeSelectedFiltersWithFilters(selectedFilters, filters) {
@@ -77,20 +84,26 @@ export const AnalyzePivotComponent = {
 
     onApplyFieldSettings() {
       this.sortFields = this.getFieldToSortFieldMapper()(this.fields);
+      this.settingsModified = true;
+    }
+
+    setDataSource(store, fields) {
+      this.dataSource = new PivotGridDataSource({store, fields});
+      this.pivotGridUpdater.next({
+        dataSource: this.dataSource
+      });
+      this.fieldChooserIsntance.option({
+        dataSource: this.dataSource
+      });
     }
 
     prepareFields(artifactAttributes) {
       this.fields = this._PivotService.getBackend2FrontendFieldMapper()(artifactAttributes);
 
-      const dataSource = new PivotGridDataSource({
-        fields: this.fields
-      });
-
       this.fieldChooserOptions = {
         onContentReady: e => {
-          this.gridIsntance = e.component;
+          this.fieldChooserIsntance = e.component;
         },
-        dataSource,
         layout: 1,
         width: 400,
         height: 800
@@ -98,12 +111,9 @@ export const AnalyzePivotComponent = {
 
       // repaint the field chooser so it fills the cointainer
       this._$timeout(() => {
-        this.gridIsntance.repaint();
+        this.setDataSource(this.dataSource.store, this.fields);
+        this.fieldChooserIsntance.repaint();
       }, 400);
-
-      this.pivotGridUpdater.next({
-        dataSource
-      });
     }
 
     toggleSettingsSidenav() {
@@ -120,44 +130,55 @@ export const AnalyzePivotComponent = {
         this.normalizedData = pivotData;
         this.deNormalizedData = this._PivotService.denormalizeData(pivotData, this.fields);
 
-        if (isEmpty(this.filters)) {
-          this.filters = this._PivotService.mapFieldsToFilters(this.normalizedData, this.fields);
+        if (isEmpty(this.filters.possible)) {
+          this.filters.possible = this._PivotService.mapFieldsToFilters(this.normalizedData, this.fields);
+          this.filters.selected = [];
         }
+        this.dataSource.store = this.deNormalizedData;
 
-        this.pivotGridUpdater.next({
-          dataSource: {
-            store: this.deNormalizedData,
-            fields: this.fields
-          }
-        });
+        this.setDataSource(this.dataSource.store, this.fields);
+        this.settingsModified = false;
       });
     }
 
 // filters
     openFilterSidenav() {
-      this._FilterService.openFilterSidenav(this.filters, ANALYZE_FILTER_SIDENAV_IDS.designer);
+      this._FilterService.openFilterSidenav(this.filters.possible, ANALYZE_FILTER_SIDENAV_IDS.designer);
     }
 
     onApplyFilters(filters) {
-      this.filters = filters;
+      this.filters.possible = filters;
+      this.filters.selected = this.getSelectedFilters();
       this.filterGridData();
     }
 
     filterGridData() {
       this.pivotGridUpdater.next({
-        filters: this.filters
+        filters: this.filters.possible
       });
+      this.settingsModified = true;
     }
 
     onClearAllFilters() {
       this.clearFilters();
+      this.filters.selected = [];
     }
 
     clearFilters() {
-      forEach(this.filters, filter => {
+      forEach(this.filters.possible, filter => {
         filter.model = null;
       });
       this.filterGridData();
+    }
+
+    onFilterRemoved(filter) {
+      filter.model = null;
+      this.filters.selected = this.getSelectedFilters();
+      this.filterGridData();
+    }
+
+    getSelectedFilters() {
+      return this._FilterService.getSelectedFilterMapper()(this.filters.possible);
     }
 // END filters
 
@@ -176,6 +197,7 @@ export const AnalyzePivotComponent = {
 
     applySorts(sorts) {
       this.pivotGridUpdater.next({sorts});
+      this.settingsModified = true;
     }
 
     openSortModal(ev) {
@@ -225,6 +247,7 @@ export const AnalyzePivotComponent = {
 
     openPreviewModal(ev) {
       const tpl = '<analyze-pivot-preview model="model"></analyze-pivot-preview>';
+      this.updateFields();
 
       this._$mdDialog
         .show({
@@ -232,8 +255,10 @@ export const AnalyzePivotComponent = {
           controller: scope => {
             scope.model = {
               pivot: this.model,
-              dataSource: this.dataSource,
-              defaultOptions: this.getDefaultOptions()
+              dataSource: {
+                store: this.dataSource.store,
+                fields: this.fields
+              }
             };
           },
           targetEvent: ev,
@@ -264,7 +289,8 @@ export const AnalyzePivotComponent = {
 
     onGetFields(fields) {
       // pivotgrid adds some other fields in plus, so we have to take only the real ones
-      this.fieldsToSave = take(fields, this.fields.length);
+      this.fields = fields;
+      this.fieldsToSave = filter(fields, 'area');
     }
 
     updateFields() {
@@ -276,12 +302,12 @@ export const AnalyzePivotComponent = {
     openSaveModal(ev) {
       this.updateFields();
 
-      this.model.artifacts = [{artifactAttributes: this._PivotService.getFrontend2BackendFieldMapper()(this.fieldsToSave)}];
+      this.model.artifacts = [{columns: this._PivotService.getFrontend2BackendFieldMapper()(this.fieldsToSave)}];
 
       this.model.filters = fpPipe(
         this._FilterService.getSelectedFilterMapper(),
         fpMap(this._FilterService.getFrontEnd2BackEndFilterMapper())
-      )(this.filters);
+      )(this.filters.possible);
       this.model.sorts = this.mapFrontend2BackendSort(this.sorts);
       const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
@@ -303,7 +329,15 @@ export const AnalyzePivotComponent = {
           multiple: true,
           targetEvent: ev,
           clickOutsideToClose: true
+        }).then(successfullySaved => {
+          if (successfullySaved) {
+            this.onAnalysisSaved(successfullySaved);
+          }
         });
+    }
+
+    onAnalysisSaved(successfullySaved) {
+      this.$dialog.hide(successfullySaved);
     }
   }
 };
