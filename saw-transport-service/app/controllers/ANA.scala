@@ -162,7 +162,12 @@ class ANA extends BaseServiceProvider {
       case _ => throw new ClientException(
         "Expected array: " + analysisListJson)
     }
-    val queryJson: JObject = ("query", JString(QueryBuilder.build(analysis))) ~
+    val query = (analysis \ "queryManual") match {
+      case JNothing => QueryBuilder.build(analysis)
+      case obj: JString => ""
+      case obj => unexpectedElement("string", obj)
+    }
+    val queryJson: JObject = ("query", JString(query)) ~
     ("outputFile",
       ("outputFormat", "json") ~ ("outputFileName", "test.json"))
     analysis merge(queryJson)

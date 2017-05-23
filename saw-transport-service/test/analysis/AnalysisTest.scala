@@ -106,7 +106,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       val manualJson: JValue = ("queryManual", "SELECT 1 AS a")
       analysis = analyze(sendRequest(
         actionKeyAnalysisMessage("update", id,
-          analysis.merge(manualJson))))
+          checkColumns(analysis.merge(manualJson), false))))
       /* Execute updated analysis */
       val body = actionKeyMessage("execute", id)
       val response = analyze(sendRequest(body))
@@ -140,13 +140,13 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
     }
   }
 
-  private def checkColumns(analysis: JValue): JValue = {
+  private def checkColumns(analysis: JValue, value: Boolean = true): JValue = {
     /* Set columns to checked to ensure there are at least some selected
      * columns for the query builder */
     analysis.transform {
       case column: JObject => {
         if ((column \ "aliasName").extractOrElse[String]("none") != "none")
-          column ~ ("checked", true)
+          column ~ ("checked", value)
         else
           column
       }
