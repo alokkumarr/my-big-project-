@@ -10,6 +10,7 @@ import keys from 'lodash/keys';
 import forEach from 'lodash/forEach';
 import clone from 'lodash/clone';
 import isEmpty from 'lodash/isEmpty';
+import sortBy from 'lodash/sortBy';
 import filter from 'lodash/filter';
 import assign from 'lodash/assign';
 
@@ -39,6 +40,7 @@ export const AnalyzeReportComponent = {
       this._FilterService = FilterService;
       this._reloadTimer = null;
       this._modelLoaded = null;
+      this.showProgress = false;
 
       this._modelPromise = new Promise(resolve => {
         this._modelLoaded = resolve;
@@ -280,7 +282,10 @@ export const AnalyzeReportComponent = {
         table.setMeta(itemA);
         table.setPosition(itemA.artifactPosition[0], itemA.artifactPosition[1]);
 
-        forEach(itemA.columns, itemB => {
+        /* Show join eligible fields on top for easy access */
+        const sortedForJoin = sortBy(itemA.columns, c => !c.joinEligible);
+
+        forEach(sortedForJoin, itemB => {
           const field = table.addField(itemB.columnName);
 
           field.setMeta(itemB);
@@ -444,6 +449,7 @@ export const AnalyzeReportComponent = {
     }
 
     onSaveQuery(analysis) {
+      this.showProgress = true;
       this._AnalyzeService.getDataBySettings(clone(analysis))
         .then(({analysis, data}) => {
           this.filteredGridData = this.gridData = data;
@@ -451,10 +457,14 @@ export const AnalyzeReportComponent = {
 
           const columnNames = keys(fpGet('[0]', data));
           this.applyDataToGrid(this.getColumns(columnNames), [], this.filteredGridData);
+          this.showProgress = false;
+        }, () => {
+          this.showProgress = false;
         });
     }
 
     refreshGridData() {
+      this.showProgress = true;
       this.model = assign(this.model, this.generatePayload());
 
       const sorts = map(this.canvas.model.sorts, sort => {
@@ -471,6 +481,9 @@ export const AnalyzeReportComponent = {
           this.generateFiltersOnCanvasChange(); // update filters with new data
           this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
           this.analysisChanged = false;
+          this.showProgress = false;
+        }, () => {
+          this.showProgress = false;
         });
     }
 
