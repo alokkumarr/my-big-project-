@@ -4,6 +4,7 @@ import style from './analyze-view.component.scss';
 import cloneDeep from 'lodash/cloneDeep';
 import remove from 'lodash/remove';
 import sortBy from 'lodash/sortBy';
+import {Subject} from 'rxjs/Subject';
 
 import {Events, AnalyseTypes} from '../../consts';
 import AbstractComponentController from 'app/lib/common/components/abstractComponent';
@@ -12,13 +13,12 @@ export const AnalyzeViewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeViewController extends AbstractComponentController {
-    constructor($injector, $compile, AnalyzeService, dxDataGridService, $state, $mdDialog, $mdToast) {
+    constructor($injector, $compile, AnalyzeService, $state, $mdDialog, $mdToast) {
       'ngInject';
       super($injector);
 
       this._$compile = $compile;
       this._AnalyzeService = AnalyzeService;
-      this._dxDataGridService = dxDataGridService;
       this._$state = $state;
       this._$mdDialog = $mdDialog;
       this._$mdToast = $mdToast;
@@ -28,9 +28,10 @@ export const AnalyzeViewComponent = {
 
       this.states = {
         reportView: 'card',
-        reportType: 'all',
+        analysisType: 'all',
         searchTerm: ''
       };
+      this.updater = new Subject();
     }
 
     $onInit() {
@@ -46,17 +47,14 @@ export const AnalyzeViewComponent = {
       this._destroyHandler();
     }
 
+    onAnalysisTypeChange() {
+      this.updater.next({analysisType: this.states.analysisType});
+    }
+
     loadCategory() {
       return this._AnalyzeService.getCategory(this.$state.params.id)
         .then(category => {
           this.category = category;
-        });
-    }
-
-    execute(analysisId) {
-      this._AnalyzeService.executeAnalysis(analysisId)
-        .then(analysis => {
-          this.goToAnalysis(analysis.analysisId, analysis.publishedAnalysisId);
         });
     }
 
@@ -72,107 +70,12 @@ export const AnalyzeViewComponent = {
       return this._AnalyzeService.getAnalysesFor(this.$state.params.id, {
         filter: this.states.searchTerm
       }).then(analyses => {
-        this.reports = sortBy(analyses, analysis => -parseInt(analysis.id, 10));
-        this.reloadDataGrid(this.reports);
+        this.analyses = sortBy(analyses, analysis => -parseInt(analysis.id, 10));
       });
-    }
-
-    reloadDataGrid(analyses) {
-      if (this.states.reportView === this.LIST_VIEW) {
-        this._gridListInstance.option('dataSource', analyses);
-        this._gridListInstance.refresh();
-      }
     }
 
     applySearchFilter() {
       this.loadAnalyses();
-    }
-
-    getGridConfig() {
-      const dataSource = this.reports || [];
-      const columns = [{
-        caption: 'NAME',
-        dataField: 'name',
-        allowSorting: true,
-        alignment: 'left',
-        width: '50%',
-        cellTemplate: 'nameCellTemplate'
-      }, {
-        caption: 'METRICS',
-        dataField: 'metrics',
-        allowSorting: true,
-        alignment: 'left',
-        width: '20%',
-        calculateCellValue: rowData => {
-          return rowData.metricName ||
-            (rowData.metrics || []).join(', ');
-        },
-        cellTemplate: 'metricsCellTemplate'
-      }, {
-        caption: 'SCHEDULED',
-        dataField: 'scheduled',
-        allowSorting: true,
-        alignment: 'left',
-        width: '15%'
-      }, {
-        caption: 'TYPE',
-        dataField: 'type',
-        allowSorting: true,
-        alignment: 'left',
-        width: '10%',
-        calculateCellValue: rowData => {
-          return (rowData.type || '').toUpperCase();
-        },
-        cellTemplate: 'typeCellTemplate'
-      }, {
-        caption: '',
-        cellTemplate: 'actionCellTemplate'
-      }];
-
-      return this._dxDataGridService.mergeWithDefaultConfig({
-        onInitialized: this.onGridInitialized.bind(this),
-        columns,
-        dataSource,
-        paging: {
-          pageSize: 10
-        },
-        pager: {
-          showPageSizeSelector: true,
-          showInfo: true
-        }
-      });
-    }
-
-    onGridInitialized(e) {
-      this._gridListInstance = e.component;
-    }
-
-    countGridSelectedRows() {
-      return this._gridListInstance.getSelectedRowKeys().length;
-    }
-
-    onReportTypeChange() {
-      if (this.states.reportView === this.LIST_VIEW) {
-        if (this.states.reportType === 'all') {
-          this._gridListInstance.clearFilter();
-        } else {
-          this._gridListInstance.filter(['type', '=', this.states.reportType]);
-        }
-      }
-    }
-
-    openDeleteModal(analysis) {
-      const confirm = this._$mdDialog.confirm()
-            .title('Are you sure you want to delete this analysis?')
-        .textContent('Any published analyses will also be deleted.')
-        .ok('Delete')
-        .cancel('Cancel');
-
-      this._$mdDialog.show(confirm).then(() => {
-        return this._AnalyzeService.deleteAnalysis(analysis.id);
-      }).then(data => {
-        this.onCardAction('delete', data);
-      });
     }
 
     openNewAnalysisModal() {
@@ -188,21 +91,10 @@ export const AnalyzeViewComponent = {
       });
     }
 
-    filterReports(item) {
-      let isIncluded = true;
-
-      if (this.states.reportType !== 'all') {
-        isIncluded = this.states.reportType === item.type;
-      }
-
-      return isIncluded;
-    }
-
     removeAnalysis(model) {
-      remove(this.reports, report => {
+      remove(this.analyses, report => {
         return report.id === model.id;
       });
-      this.reloadDataGrid(this.reports);
       this._$mdToast.show({
         template: '<md-toast><span>Analysis Deleted</span></md-toast>',
         position: 'bottom left',
@@ -210,21 +102,64 @@ export const AnalyzeViewComponent = {
       });
     }
 
-    onCardAction(actionType, model) {
-      if (actionType === 'fork' || actionType === 'edit') {
-        const clone = cloneDeep(model);
-        this.openEditModal(actionType, clone);
-      } else if (actionType === 'delete') {
-        this.removeAnalysis(model);
+    /* ACTIONS */
+
+    onCardAction(actionType, payload) {
+      switch (actionType) {
+        case 'fork':
+        case 'edit': {
+          const clone = cloneDeep(payload);
+          this.openEditModal(actionType, clone);
+          break;
+        }
+        case 'delete':
+          this.removeAnalysis(payload);
+          break;
+        case 'execute':
+          this.execute(payload);
+          break;
+        case 'view':
+          this.view(payload);
+          break;
+        case 'export':
+          this.export(payload);
+          break;
+        case 'print':
+          this.print(payload);
+          break;
+        default:
       }
     }
 
-    fork(report) {
-      this.openEditModal('fork', report);
+    export() {
     }
 
-    edit(report) {
-      this.openEditModal('edit', report);
+    print() {
+    }
+
+    view(analysisId) {
+      this.goToLastPublishedAnalysis(analysisId);
+    }
+
+    execute(analysisId) {
+      this._AnalyzeService.executeAnalysis(analysisId)
+        .then(analysis => {
+          this.goToAnalysis(analysis.analysisId, analysis.publishedAnalysisId);
+        });
+    }
+
+    openDeleteModal(analysis) {
+      const confirm = this._$mdDialog.confirm()
+        .title('Are you sure you want to delete this analysis?')
+        .textContent('Any published analyses will also be deleted.')
+        .ok('Delete')
+        .cancel('Cancel');
+
+      this._$mdDialog.show(confirm).then(() => {
+        return this._AnalyzeService.deleteAnalysis(analysis.id);
+      }).then(data => {
+        this.onCardAction('delete', data);
+      });
     }
 
     openEditModal(mode, model) {
@@ -238,12 +173,17 @@ export const AnalyzeViewComponent = {
         });
       };
 
-      if (model.type === AnalyseTypes.Report) {
-        openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
-      } else if (model.type === AnalyseTypes.Chart) {
-        openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
-      } else if (model.type === AnalyseTypes.Pivot) {
-        openModal(`<analyze-pivot model="model" mode="${mode}"></analyze-pivot>`);
+      switch (model.type) {
+        case AnalyseTypes.Report:
+          openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
+          break;
+        case AnalyseTypes.Chart:
+          openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
+          break;
+        case AnalyseTypes.Pivot:
+          openModal(`<analyze-pivot model="model" mode="${mode}"></analyze-pivot>`);
+          break;
+        default:
       }
     }
   }

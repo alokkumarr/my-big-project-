@@ -11,10 +11,9 @@ export const AnalyzeCardComponent = {
   },
   controller: class AnalyzeCardController {
 
-    constructor($mdDialog, $state, AnalyzeService, $log) {
+    constructor($mdDialog, AnalyzeService, $log) {
       'ngInject';
       this._$mdDialog = $mdDialog;
-      this._$state = $state;
       this._AnalyzeService = AnalyzeService;
       this._$log = $log;
     }
@@ -39,12 +38,6 @@ export const AnalyzeCardComponent = {
         });
     }
 
-    openPrintModal() {
-    }
-
-    openExportModal() {
-    }
-
     openDeleteModal() {
       const confirm = this._$mdDialog.confirm()
         .title('Are you sure you want to delete this analysis?')
@@ -67,14 +60,10 @@ export const AnalyzeCardComponent = {
     }
 
     execute(analysisId) {
-      this._AnalyzeService.executeAnalysis(analysisId)
-        .then(analysis => {
-          this.goToAnalysis(analysis.analysisId, analysis.publishedAnalysisId);
-        });
-    }
-
-    goToAnalysis(analysisId, publishId) {
-      this._$state.go('analyze.publishedDetail', {analysisId, publishId});
+      this.onAction({
+        type: 'execute',
+        model: analysisId
+      });
     }
 
     fork() {
@@ -87,6 +76,20 @@ export const AnalyzeCardComponent = {
     edit() {
       this.onAction({
         type: 'edit',
+        model: this.model
+      });
+    }
+
+    print() {
+      this.onAction({
+        type: 'print',
+        model: this.model
+      });
+    }
+
+    export() {
+      this.onAction({
+        type: 'export',
         model: this.model
       });
     }
