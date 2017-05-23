@@ -2,9 +2,8 @@
   <md-card-header>
     <span flex></span>
     <md-chip class="tag-chip"
-             ng-bind-html="::$ctrl.model.type | uppercase | highlight:$ctrl.highlightTerm"></md-chip>
+             ng-bind-html="$ctrl.model.type | uppercase | highlight:$ctrl.highlightTerm"></md-chip>
   </md-card-header>
-
   <md-card-content layout="row" layout-align="center center">
     <div class="saw-ac-placeholder m-{{::$ctrl.model.type}}{{::$ctrl.model.chartType ? '-'+$ctrl.model.chartType : ''}}"></div>
     <md-icon md-font-icon="icon-chart-placeholder" style="display: none;"></md-icon>
@@ -14,7 +13,7 @@
     <md-card-title>
       <md-card-title-text>
         <a class="md-headline"
-              ng-bind-html="::$ctrl.model.name | highlight:$ctrl.highlightTerm"
+              ng-bind-html="$ctrl.model.name | highlight:$ctrl.highlightTerm"
               ui-sref="analyze.publishedDetailLast({analysisId: $ctrl.model.id})">
         </a>
         <span class="md-subhead">

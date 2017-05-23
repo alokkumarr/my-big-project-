@@ -47,6 +47,10 @@ export const AnalyzeViewComponent = {
       this._destroyHandler();
     }
 
+    onReportTypeChange() {
+      this.updater.next({reportType: this.states.reportType});
+    }
+
     loadCategory() {
       return this._AnalyzeService.getCategory(this.$state.params.id)
         .then(category => {

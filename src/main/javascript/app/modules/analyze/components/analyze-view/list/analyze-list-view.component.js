@@ -16,29 +16,34 @@ export const AnalyzeListViewComponent = {
       this._dxDataGridService = dxDataGridService;
 
       this._gridListInstance = null;
-      this.onUpdate = this.onUpdate.bind(this);
     }
 
     $onInit() {
       this.gridConfig = this.getGridConfig();
-      this.updaterSubscribtion = this.updater.subscribe(this.onUpdate);
+      this.updaterSubscribtion = this.updater.subscribe(update => this.onUpdate(update));
     }
 
     $onDestroy() {
       this.updaterSubscribtion.unsubscribe();
     }
 
-    onUpdate() {
-      console.log('new filter');
+    onUpdate({reportType}) {
+      /* eslint-disable */
+      reportType && this.onUpdateReportType(reportType);
+      /* eslint-enable */
+    }
+
+    onUpdateReportType(reportType) {
+      if (reportType === 'all') {
+        this._gridListInstance.clearFilter();
+      } else {
+        this._gridListInstance.filter(['type', '=', reportType]);
+      }
     }
 
     onGridInitialized(e) {
       this._gridListInstance = e.component;
-      if (this.reportType === 'all') {
-        this._gridListInstance.clearFilter();
-      } else {
-        this._gridListInstance.filter(['type', '=', this.states.reportType]);
-      }
+      this.onUpdateReportType(this.reportType);
     }
 
     fork(analysis) {

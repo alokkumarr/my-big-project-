@@ -13,13 +13,13 @@ import {ChartService} from './services/chart.service';
 import {AnalyzePageComponent} from './components/analyze-page/analyze-page.component';
 import {AnalyzeViewComponent} from './components/analyze-view/analyze-view.component';
 import {AnalyzeCardsViewComponent} from './components/analyze-view/card/analyze-cards-view.component';
+import {AnalyzeCardComponent} from './components/analyze-view/card/analyze-card.component';
 import {AnalyzeListViewComponent} from './components/analyze-view/list/analyze-list-view.component';
 import {AnalyzePublishedListComponent} from './components/analyze-published-list/analyze-published-list.component';
 import {AnalyzeReportDetailComponent} from './components/analyze-published-detail/report/analyze-report-detail.component';
 import {AnalyzePivotDetailComponent} from './components/analyze-published-detail/pivot/analyze-pivot-detail.component';
 import {AnalyzeChartDetailComponent} from './components/analyze-published-detail/chart/analyze-chart-detail.component';
 import {AnalyzePublishedDetailComponent} from './components/analyze-published-detail/analyze-published-detail.component';
-import {AnalyzeCardComponent} from './components/analyze-card/analyze-card.component';
 import {AnalyzeNewComponent} from './components/analyze-new/analyze-new.component';
 import {AnalyzePivotSettingsComponent} from './components/analyze-pivot-settings/analyze-pivot-settings.component';
 import {AnalyzePivotPreviewComponent} from './components/analyze-pivot-preview/analyze-pivot-preview.component';
@@ -71,13 +71,13 @@ angular.module(AnalyzeModule, [])
   .component('analyzePage', AnalyzePageComponent)
   .component('analyzeView', AnalyzeViewComponent)
   .component('analyzeCardsView', AnalyzeCardsViewComponent)
+  .component('analyzeCard', AnalyzeCardComponent)
   .component('analyzeListView', AnalyzeListViewComponent)
   .component('analyzePublishedList', AnalyzePublishedListComponent)
   .component('analyzeReportDetail', AnalyzeReportDetailComponent)
   .component('analyzePivotDetail', AnalyzePivotDetailComponent)
   .component('analyzeChartDetail', AnalyzeChartDetailComponent)
   .component('analyzePublishedDetail', AnalyzePublishedDetailComponent)
-  .component('analyzeCard', AnalyzeCardComponent)
   .component('analyzeNew', AnalyzeNewComponent)
   .component('analyzePivotSettings', AnalyzePivotSettingsComponent)
   .component('analyzePivotPreview', AnalyzePivotPreviewComponent)

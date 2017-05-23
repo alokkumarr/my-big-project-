@@ -14,11 +14,11 @@
                   ng-click="$ctrl.goToLastPublishedAnalysis(report.data.id)"></span>
       </div>
       <div data-options="dxTemplate: { name: 'metricsCellTemplate' }">
-        <span ng-bind-html="::report.value | highlight:$ctrl.searchTerm"></span>
+        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>
       </div>
       <div data-options="dxTemplate: { name: 'typeCellTemplate' }">
         <md-chip class="tag-chip">
-          <span ng-bind-html="::report.value | highlight:$ctrl.searchTerm"></span>
+          <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>
         </md-chip>
       </div>
       <div data-options="dxTemplate: { name: 'actionCellTemplate' }">
