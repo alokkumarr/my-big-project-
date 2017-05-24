@@ -3,7 +3,7 @@
     "node-category": "SemanticNode",
     "id": "da561e07-4260-4d5e-b1d4-e04e4b8c6f0b",
     "action": {
-      "verb": "create",
+      "verb": "update",
       "content": {
         "id": "mct_session_semantic_object",
         "dataSecurityKey": "",
@@ -16,11 +16,18 @@
         "checked": "false",
         "supports": [
           {
-            "label": "TABLES",
+            "label": "TABLES", 
             "category": "table",
             "children": [
               {
+                "label": "Report", 
+                "icon": "icon-report", 
                 "type": "table:report"
+              },
+              {
+                "label": "Pivot",
+                "icon": "icon-pivot",
+                "type": "table:pivot"
               }
             ]
           }
