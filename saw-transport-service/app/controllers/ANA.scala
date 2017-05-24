@@ -19,7 +19,9 @@ import model.QueryBuilder
 import model.ClientException
 import org.apache.hadoop.hbase.util.Bytes
 import sncr.metadata.engine.SearchMetadata._
-import com.synchronoss._
+import com.synchronoss.querybuilder.SAWElasticSearchQueryExecutor
+import com.synchronoss.querybuilder.EntityType
+import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder
 
 class ANA extends BaseServiceProvider {
   implicit val formats = new DefaultFormats {
@@ -228,14 +230,16 @@ class ANA extends BaseServiceProvider {
     if ( typeInfo.equals("pivot") ){
       val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json), json);
-      m_log.trace("pivot dataset: {}", data)
-      return data
+      val myArray = data.asInstanceOf[JArray]
+      m_log.trace("pivot dataset: {}", myArray)
+      return myArray.arr
     }
     if ( typeInfo.equals("chart") ){
       val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json), json);
-      m_log.trace("chart dataset: {}", data)
-      return data
+      val myArray = data.asInstanceOf[JArray]
+      m_log.trace("chart dataset: {}", myArray)
+      return myArray.arr
     }
     else {
     // This is the part of report type starts here
