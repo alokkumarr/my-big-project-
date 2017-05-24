@@ -20,16 +20,13 @@ import sncr.request.Extractor
 import sncr.saw.common.config.SAWServiceConfig
 import sncr.ts.HTTPRequest
 
+
 /**
   * Created by srya0001 on 1/27/2017.
   */
 class ESQueryHandler (ext: Extractor) extends HTTPRequest {
 
   override val m_log: Logger = LoggerFactory.getLogger(classOf[ESQueryHandler].getName)
-
-//  val uname = "elastic"
-//  val pswd = "xuw3dUraHapret"
-
 
   def esRequest( source : JsValue) : Result =
   {
@@ -68,17 +65,23 @@ class ESQueryHandler (ext: Extractor) extends HTTPRequest {
       else
         m_log.debug( "Username and/or password is not set - skip authentication settings" )
 
-      m_log.debug(s"Execute ES query: ${req_builder.build().toASCIIString}" )
+      m_log.debug(s"Execute ES query: ${req_builder.build().toASCIIString} \n Query: ${if(query == null)"n/a" else query}" )
 
       val future: Future[HttpResponse] =
-        if (query != null ) {
+        if (query == null ) {
           val request: HttpGet = new HttpGet(req_builder.build())
           httpClient.execute(request, null)
         }
         else{
+
+          var query2 = play.api.libs.json.Json.stringify(query).replace("\\n", "").replace("\\\"", "\"")
+          query2 = if (query2.startsWith("\"")) query2.substring(1) else query2
+          query2 = if (query2.endsWith("\"")) query2.substring(0,query2.length-1) else query2
+
+          m_log.debug(s"Native query to request: $query" )
+          m_log debug s"Add clean query to request: $query2"
           val request: HttpPost = new HttpPost(req_builder.build())
-          m_log.debug(s"Add native query to request: $query" )
-          request.setEntity(new StringEntity( play.api.libs.json.Json.stringify(query)))
+          request.setEntity(new StringEntity(query2))
           httpClient.execute(request, null)
         }
 
