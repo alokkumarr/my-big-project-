@@ -16,12 +16,12 @@
         "checked": "false",
         "supports": [
           {
-            "label": "TABLES", 
+            "label": "TABLES",
             "category": "table",
             "children": [
               {
-                "label": "Report", 
-                "icon": "icon-report", 
+                "label": "Report",
+                "icon": "icon-report",
                 "type": "table:report"
               },
               {
@@ -32,43 +32,27 @@
             ]
           },
           {
-            "label": "BAR CHARTS", 
-            "category": "bar-chart",
-            "children": [
-              {
-                "label": "Bar Chart",
-                "icon": "icon-hor-bar-chart", 
-                "type": "bar-chart:simple"
-              },
-              {
-                "label": "Stacked Bar Chart",
-                "icon": "icon-hor-bar-chart",
-                "type": "bar-chart:stacked"
-              },
-              {
-                "label": "Bar Chart variation",
-                "icon": "icon-hor-bar-chart",
-                "type": "bar-chart:variation"
-              }
-            ]
-          },
-          {
-            "label": "COLUMN CHARTS",
-            "category": "column-chart",
+            "label": "CHARTS",
+            "category": "charts",
             "children": [
               {
                 "label": "Column Chart",
                 "icon": "icon-vert-bar-chart",
-                "type": "column-chart:simple"
+                "type": "chart:column"
               },
               {
-                "label": "Column Chart Var",
+                "label": "Stacked Chart",
                 "icon": "icon-vert-bar-chart",
-                "type": "column-chart:var"
+                "type": "chart:stack"
+              },
+              {
+                "label": "Line Chart",
+                "icon": "icon-vert-bar-chart",
+                "type": "chart:line"
               }
             ]
           }
-        ],
+        ]
         "repository": {
           "storageType":"ES",
           "indexName":"mct_data",
