@@ -75,39 +75,26 @@ object QueryBuilder {
       buildFromArtifacts(artifacts).mkString(", "))
   }
 
-  private def buildFromJoins(sqlBuilder: JObject) = {
-    (sqlBuilder \ "joins" match {
-      case joins: JArray => joins.arr
-      case JNothing => List()
-      case json: JValue => unexpectedElement(json)
-    }).foldLeft("")(buildOnJoin)
+  private def buildFromJoins(sqlBuilder: JObject): String = {
+    extractArray(sqlBuilder, "joins") match {
+      case Nil => ""
+      case joins: List[JValue] => {
+        JoinRelation.toSQL(buildJoinTree(joins.map(JoinRelation(_))))
+      }
+    }
   }
 
-  private def buildOnJoin(seed: String, join: JValue): String = {
-    def property(name: String) = {
-      (join \ name)
-    }
-    val joinType = property("type").extract[String]
-    if (!List("inner", "left", "right").contains(joinType)) {
-      throw new RuntimeException("Join type not implemented: " + joinType)
-    }
-    val criteria = property("criteria") match {
-      case criteria: JArray => criteria.arr
-      case value: JValue => unexpectedElement(value)
-    }
-    if (criteria.length != 2) {
-      throw new ClientException(
-        "Expected criteria to have exactly two elements: " + criteria)
-    }
-    "%s %s JOIN %s ON (%s.%s = %s.%s)".format(
-      (if (seed == "") (criteria(0) \ "tableName").extract[String] else seed),
-      joinType.toUpperCase,
-      (criteria(1) \ "tableName").extract[String],
-      (criteria(0) \ "tableName").extract[String],
-      (criteria(0) \ "columnName").extract[String],
-      (criteria(1) \ "tableName").extract[String],
-      (criteria(1) \ "columnName").extract[String]
-    )
+  private def buildJoinTree(joins: List[JoinRelation]) = {
+    joins.reduceLeft((a, b) => {
+      val left = b.left.relations.toSet
+      val prev = a.relations.toSet
+      if (!left.subsetOf(prev)) {
+        throw new ClientException(
+          "Left side of join must exist in preceding joins: " +
+            "%s is not subset of %s".format(left, prev))
+      }
+      new JoinRelation(a.left, b, a.joinType, a.leftColumn, a.rightColumn)
+    })
   }
 
   private def buildFromArtifacts(artifacts: List[JValue]) = {
@@ -244,8 +231,72 @@ object QueryBuilder {
     }
   }
 
-  private def unexpectedElement(json: JValue): Nothing = {
+  def unexpectedElement(json: JValue): Nothing = {
     val name = json.getClass.getSimpleName
     throw new ClientException("Unexpected element: %s".format(name))
+  }
+}
+
+trait Relation {
+  def relations: List[String]
+  def joinTerms: List[String]
+  def conditions: List[String]
+}
+
+case class TableRelation(name: String) extends Relation {
+  override def relations = List(name)
+  override def joinTerms = List(name)
+  override def conditions = List()
+}
+
+case class JoinRelation(
+  left: Relation, right: Relation, joinType: String,
+  leftColumn: String, rightColumn: String) extends Relation {
+  override def relations = {
+    left.relations ++ right.relations
+  }
+
+  override def joinTerms = {
+    val join = joinType.toUpperCase + " JOIN"
+    left.joinTerms ++ List(join) ++ right.joinTerms
+  }
+
+  override def conditions = {
+    val condition = "%s = %s".format(leftColumn, rightColumn)
+    left.conditions ++ List(condition) ++ right.conditions
+  }
+}
+
+object JoinRelation {
+  implicit val formats = DefaultFormats
+
+  def apply(json: JValue): JoinRelation = {
+    def property(name: String) = {
+      (json \ name)
+    }
+    val joinType = property("type").extract[String]
+    if (!List("inner", "left", "right").contains(joinType)) {
+      throw new RuntimeException("Join type not implemented: " + joinType)
+    }
+    val criteria = property("criteria") match {
+      case criteria: JArray => criteria.arr
+      case value: JValue => QueryBuilder.unexpectedElement(value)
+    }
+    if (criteria.length != 2) {
+      throw new ClientException(
+        "Expected criteria to have exactly two elements: " + criteria)
+    }
+    val leftTable = (criteria(0) \ "tableName").extract[String]
+    val leftColumn = (criteria(0) \ "columnName").extract[String]
+    val rightTable = (criteria(1) \ "tableName").extract[String]
+    val rightColumn = (criteria(1) \ "columnName").extract[String]
+    new JoinRelation(
+      new TableRelation(leftTable), new TableRelation(rightTable),
+      joinType, leftTable + "." + leftColumn, rightTable + "." + rightColumn)
+  }
+
+  def toSQL(join: JoinRelation) = {
+    "%s ON (%s)".format(
+      join.joinTerms.mkString(" "), join.conditions.mkString(" AND "))
   }
 }
