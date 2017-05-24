@@ -16,18 +16,13 @@
         "checked": "false",
         "supports": [
           {
-            "label": "TABLES", 
+            "label": "TABLES",
             "category": "table",
             "children": [
               {
-                "label": "Report", 
-                "icon": "icon-report", 
+                "label": "Report",
+                "icon": "icon-report",
                 "type": "table:report"
-              },
-              {
-                "label": "Pivot",
-                "icon": "icon-pivot",
-                "type": "table:pivot"
               }
             ]
           }
