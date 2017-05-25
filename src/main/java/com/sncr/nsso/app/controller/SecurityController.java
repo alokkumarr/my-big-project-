@@ -478,6 +478,7 @@ public class SecurityController {
 			valid.setValid(false);
 			valid.setValidityMessage("Error. Please contact server Administrator.");
 			valid.setError(e.getMessage());
+			return valid;
 		}
 		return valid;
 	}
@@ -512,6 +513,7 @@ public class SecurityController {
 			valid.setValid(false);
 			valid.setValidityMessage("Error. Please contact server Administrator.");
 			valid.setError(e.getMessage());
+			return valid;
 		}
 		return valid;
 	}
@@ -545,6 +547,7 @@ public class SecurityController {
 			valid.setValid(false);
 			valid.setValidityMessage("Error. Please contact server Administrator.");
 			valid.setError(e.getMessage());
+			return valid;
 		}
 		return valid;
 	}
