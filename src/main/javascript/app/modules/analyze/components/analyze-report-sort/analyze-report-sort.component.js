@@ -25,6 +25,10 @@ export const AnalyzeReportSortComponent = {
       return sort;
     }
 
+    deleteSort(sort, id) {
+      this.model.sorts.splice(id, 1);
+    }
+
     canAddSort() {
       return this.model.sorts.length < this.model.fields.length;
     }
