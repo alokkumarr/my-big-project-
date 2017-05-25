@@ -50,7 +50,6 @@ class Extractor {
     if (stv.equalsIgnoreCase("ES") && (inn == null || inn.isEmpty))
       return (false, "Storage type (ES) requires correct index name")
 
-    //TODO:: Strictly speaking the object type is optional in ES requests. Think about???
     val (ot_bRes, ot_value) = testField(json, "object_type")
     val ot = if (ot_bRes) values(MetadataDictionary.object_type.toString) = ot_value.get
     m_log debug "Extracted object type: " + ot
