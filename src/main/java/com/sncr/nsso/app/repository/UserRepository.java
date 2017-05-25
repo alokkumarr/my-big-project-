@@ -1,5 +1,7 @@
 package com.sncr.nsso.app.repository;
 
+import com.sncr.nsso.common.bean.Analysis;
+import com.sncr.nsso.common.bean.AnalysisSummaryList;
 import com.sncr.nsso.common.bean.ResetValid;
 import com.sncr.nsso.common.bean.Ticket;
 import com.sncr.nsso.common.bean.User;
@@ -19,4 +21,8 @@ public interface UserRepository {
 	void insertResetPasswordDtls(String userId, String randomHash,
 			Long createdTime, long validUpto);
 	ResetValid validateResetPasswordDtls(String randomHash);
+	boolean createAnalysis (Analysis analysis);
+	boolean updateAnalysis(Analysis analysis);
+	boolean deleteAnalysis(Analysis analysis);
+	AnalysisSummaryList getAnalysisByFeatureID (Long featureId);
 }

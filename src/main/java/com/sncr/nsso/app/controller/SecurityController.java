@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,6 +30,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.Gson;
 import com.sncr.nsso.app.properties.NSSOProperties;
 import com.sncr.nsso.app.repository.UserRepository;
+import com.sncr.nsso.common.bean.Analysis;
+import com.sncr.nsso.common.bean.AnalysisPrivilegeSummary;
+import com.sncr.nsso.common.bean.AnalysisSummary;
+import com.sncr.nsso.common.bean.AnalysisSummaryList;
 import com.sncr.nsso.common.bean.ChangePasswordDetails;
 import com.sncr.nsso.common.bean.LoginDetails;
 import com.sncr.nsso.common.bean.RandomHashcode;
@@ -442,11 +447,122 @@ public class SecurityController {
 		valid.setValidityMessage("Token is valid");
 		return valid;          
 	}
-
-		
+	/**
+	 * 
+	 * @param analysis
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/analysis/createAnalysis", method = RequestMethod.POST)
+	public Valid createAnalysis(@RequestBody Analysis analysis) {
+		Valid valid = new Valid();
+		try {
+			if (!analysis.getAnalysisName().isEmpty() && analysis.getAnalysisId() != null
+					&& analysis.getFeatureId() != null && !analysis.getUserId().isEmpty()) {
+				if (userRepository.createAnalysis(analysis)) {
+					valid.setValid(true);
+					valid.setValidityMessage("Analysis created successfully");
+				} else {
+					valid.setValid(false);
+					valid.setError("Analysis not created");
+				}
+			} else {
+				valid.setValid(false);
+				valid.setError("Mandatory request params are missing");
+			}
+		} catch (DataAccessException de) {		
+			valid.setValid(false);
+			valid.setValidityMessage("Database error. Please contact server Administrator.");
+			valid.setError(de.getMessage());
+			return valid;
+		} catch (Exception e) {
+			valid.setValid(false);
+			valid.setValidityMessage("Error. Please contact server Administrator.");
+			valid.setError(e.getMessage());
+		}
+		return valid;
+	}
+	/**
+	 * 
+	 * @param analysis
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/analysis/updateAnalysis", method = RequestMethod.POST)
+	public Valid updateAnalysis(@RequestBody Analysis analysis) {		
+		Valid valid = new Valid();
+		try {
+			if (!analysis.getAnalysisName().isEmpty() && analysis.getAnalysisId() != null
+					&& analysis.getFeatureId() != null && !analysis.getUserId().isEmpty()) {
+				if (userRepository.updateAnalysis(analysis)) {
+					valid.setValid(true);
+					valid.setValidityMessage("Analysis is updated successfully");
+				} else {
+					valid.setValid(false);
+					valid.setError("Analysis could not be updated");
+				}
+			} else {
+				valid.setValid(false);
+				valid.setError("Mandatory request params are missing");
+			}
+		} catch (DataAccessException de) {
+			valid.setValid(false);
+			valid.setValidityMessage("Database error. Please contact server Administrator.");
+			valid.setError(de.getMessage());
+			return valid;
+		} catch (Exception e) {
+			valid.setValid(false);
+			valid.setValidityMessage("Error. Please contact server Administrator.");
+			valid.setError(e.getMessage());
+		}
+		return valid;
+	}
+	/**
+	 * 
+	 * @param analysis
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/analysis/deleteAnalysis", method = RequestMethod.POST)
+	public Valid deleteAnalysis(@RequestBody Analysis analysis) {
+		Valid valid = new Valid();
+		try {
+			if (analysis.getAnalysisId() != null) {
+				if (userRepository.deleteAnalysis(analysis)) {
+					valid.setValid(true);
+					valid.setValidityMessage("Analysis deleted successfully");
+				} else {
+					valid.setValid(false);
+					valid.setError("Analysis could not be deleted");
+				}
+			} else {
+				valid.setValid(false);
+				valid.setError("Mandatory request params are missing");
+			}
+		} catch (DataAccessException de) {
+			valid.setValid(false);
+			valid.setValidityMessage("Database error. Please contact server Administrator.");
+			valid.setError(de.getMessage());
+			return valid;
+		} catch (Exception e) {
+			valid.setValid(false);
+			valid.setValidityMessage("Error. Please contact server Administrator.");
+			valid.setError(e.getMessage());
+		}
+		return valid;
+	}
+	/**
+	 * 
+	 * @param featureId
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/analysis/getAnalysisByFeatureId/{featureId}", method = RequestMethod.GET)
+	public AnalysisSummaryList getAnalysisByFeatureID(@PathVariable("featureId")Long featureId) {				
+		return userRepository.getAnalysisByFeatureID(featureId);		          
+	}
+	/**
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		SecurityController sc = new SecurityController();
 		System.out.println(sc.randomString(160));
 	}
-
 }
