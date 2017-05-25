@@ -33,6 +33,7 @@ public class PivotMainSampleClass {
 		objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
 		System.setProperty("host", "10.48.72.74");
 		System.setProperty("port", "9300");
+		System.setProperty("cluster", "sncr-salesdemo");
 		
 		// This is the entry point for /analysis service as JSONString not as file
 		JsonNode objectNode = objectMapper.readTree(new File("C:\\Users\\saurav.paul\\Desktop\\Sergey\\pivot_type_data.json"));
@@ -161,8 +162,8 @@ public class PivotMainSampleClass {
 		    }
 	    }
 	    System.out.println(searchSourceBuilder.toString()); 
-	   String response = SAWElasticSearchQueryExecutor.executeReturnAsString(searchSourceBuilder, objectNode.toString());
-	    System.out.println(response);
+	   String response[] = SAWElasticSearchQueryExecutor.executeReturnAsString(searchSourceBuilder, objectNode.toString());
+	    System.out.println(response[0]);
 			   
 	}
 

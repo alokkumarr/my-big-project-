@@ -3,7 +3,6 @@ package controllers
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.UUID
-
 import org.json4s._
 import org.json4s.JsonAST.JValue
 import org.json4s.JsonDSL._
@@ -20,6 +19,9 @@ import model.QueryBuilder
 import model.ClientException
 import org.apache.hadoop.hbase.util.Bytes
 import sncr.metadata.engine.SearchMetadata._
+import com.synchronoss.querybuilder.SAWElasticSearchQueryExecutor
+import com.synchronoss.querybuilder.EntityType
+import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder
 
 class ANA extends BaseServiceProvider {
   implicit val formats = new DefaultFormats {
@@ -215,10 +217,33 @@ class ANA extends BaseServiceProvider {
   }
 
   def executeAnalysis(analysisId: String): JValue = {
+ 
+    // reading the JSON extract type
+    val analysisJSON = readAnalysisJson(analysisId);
+    val analysisType = (analysisJSON \ "type");
     val analysisNode = AnalysisNode(analysisId)
     if (analysisNode.getCachedData == null || analysisNode.getCachedData.isEmpty)
       throw new Exception("Could not find analysis node with provided analysis ID")
-   
+    // check the type
+    val typeInfo = analysisType.extract[String];
+    println("TypeInfo :" + typeInfo);
+    val json = render(analysisJSON).toString();
+    println("Json for ElasticSearch:" + json);
+    if ( typeInfo.equals("pivot") ){
+      val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
+          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json), json);
+      val myArray = data.asInstanceOf[JArray]
+      m_log.trace("pivot dataset: {}", myArray)
+      return myArray.arr
+    }
+    if ( typeInfo.equals("chart") ){
+      val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
+          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json), json);
+      val myArray = data.asInstanceOf[JArray]
+      m_log.trace("chart dataset: {}", myArray)
+      return myArray.arr
+    }
+    else {
     // This is the part of report type starts here
     val er: ExecutionTaskHandler = new ExecutionTaskHandler(1)
     val aeh: AnalysisExecutionHandler = new AnalysisExecutionHandler(analysisId)
@@ -229,6 +254,7 @@ class ANA extends BaseServiceProvider {
     aeh.handleResult(out)
     val resultJson = parse(new String(out.toByteArray()))
     val resultLog = shortMessage(pretty(render(resultJson)))
+    
     m_log.trace("Spark SQL executor result: {}", resultLog)
     (resultJson match {
       case obj: JObject => {
@@ -237,12 +263,12 @@ class ANA extends BaseServiceProvider {
           "Spark SQL execution failed: " +
             (obj \ "error_message").extractOrElse[String]("none"))
       }
-    // This is the end of report type ends here
-      
       case JArray(result) => result.arr
       case value: JValue => throw new RuntimeException(
         "Expected array: " + value)
     }).drop(1)
+    // This is the end of report type ends here
+    }
   }
 
   private def shortMessage(message: String) = {
@@ -253,4 +279,8 @@ class ANA extends BaseServiceProvider {
     val name = obj.getClass.getSimpleName
     throw new RuntimeException("Expected %s but got: %s".format(expected, name))
   }
+
+  
+
+
 }

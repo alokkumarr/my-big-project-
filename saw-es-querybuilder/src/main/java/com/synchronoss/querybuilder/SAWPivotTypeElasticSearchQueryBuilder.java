@@ -93,7 +93,7 @@ class SAWPivotTypeElasticSearchQueryBuilder {
 
     // Use case I: The below block is only when column & Data Field is not empty & row field is
     // empty
-    if ((rowfield.isEmpty() && rowfield.size() == 0)) {
+    if ( (rowfield.isEmpty() && rowfield.size() == 0)) {
       if ((columnFields != null && columnFields.size() <= 5)
           && (dataFields != null && dataFields.size() <= 5)) {
         searchSourceBuilder =
