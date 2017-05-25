@@ -10,8 +10,10 @@ import keys from 'lodash/keys';
 import forEach from 'lodash/forEach';
 import clone from 'lodash/clone';
 import isEmpty from 'lodash/isEmpty';
+import sortBy from 'lodash/sortBy';
 import filter from 'lodash/filter';
 import assign from 'lodash/assign';
+import uniqBy from 'lodash/uniqBy';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
@@ -39,6 +41,7 @@ export const AnalyzeReportComponent = {
       this._FilterService = FilterService;
       this._reloadTimer = null;
       this._modelLoaded = null;
+      this.showProgress = false;
 
       this._modelPromise = new Promise(resolve => {
         this._modelLoaded = resolve;
@@ -280,7 +283,10 @@ export const AnalyzeReportComponent = {
         table.setMeta(itemA);
         table.setPosition(itemA.artifactPosition[0], itemA.artifactPosition[1]);
 
-        forEach(itemA.columns, itemB => {
+        /* Show join eligible fields on top for easy access */
+        const sortedForJoin = sortBy(itemA.columns, c => !c.joinEligible);
+
+        forEach(sortedForJoin, itemB => {
           const field = table.addField(itemB.columnName);
 
           field.setMeta(itemB);
@@ -440,21 +446,35 @@ export const AnalyzeReportComponent = {
     getColumns(columnNames = []) {
       const fields = fpFlatMap(table => table.fields, this.canvas.model.tables);
 
-      return fpFilter(field => columnNames.indexOf(field.name) >= 0, fields);
+      const columns = uniqBy(
+        fpFilter(field => columnNames.indexOf(field.name) >= 0, fields),
+        column => column.name
+      );
+
+      return map(columns, col => {
+        col.checked = true;
+        return col;
+      });
     }
 
     onSaveQuery(analysis) {
+      this.showProgress = true;
       this._AnalyzeService.getDataBySettings(clone(analysis))
         .then(({analysis, data}) => {
           this.filteredGridData = this.gridData = data;
           this.model.query = analysis.queryManual || analysis.query;
 
           const columnNames = keys(fpGet('[0]', data));
-          this.applyDataToGrid(this.getColumns(columnNames), [], this.filteredGridData);
+          this.columns = this.getColumns(columnNames);
+          this.applyDataToGrid(this.columns, [], this.filteredGridData);
+          this.showProgress = false;
+        }, () => {
+          this.showProgress = false;
         });
     }
 
     refreshGridData() {
+      this.showProgress = true;
       this.model = assign(this.model, this.generatePayload());
 
       const sorts = map(this.canvas.model.sorts, sort => {
@@ -471,6 +491,9 @@ export const AnalyzeReportComponent = {
           this.generateFiltersOnCanvasChange(); // update filters with new data
           this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
           this.analysisChanged = false;
+          this.showProgress = false;
+        }, () => {
+          this.showProgress = false;
         });
     }
 

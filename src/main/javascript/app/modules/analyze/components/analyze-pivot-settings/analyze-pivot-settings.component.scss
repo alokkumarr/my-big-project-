@@ -48,4 +48,19 @@ analyze-pivot-settings {
     font-size: 16px;
     font-weight: bold;
   }
+
+  .dx-checkbox-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    background-color: #FFF;
+  }
+
+  .dx-checkbox-checked .dx-checkbox-icon {
+    color: white;
+    font-size: 13px;
+    background-color: $primary-blue-b2;
+    text-align: center;
+    font-weight: bold;
+  }
 }
