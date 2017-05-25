@@ -26,6 +26,7 @@ import com.sncr.nsso.common.bean.repo.ProductModuleFeature;
 import com.sncr.nsso.common.bean.repo.ProductModuleFeaturePrivileges;
 import com.sncr.nsso.common.bean.repo.ProductModuleFeatures;
 import com.sncr.nsso.common.bean.repo.ProductModules;
+import com.sncr.nsso.common.bean.repo.Products;
 import com.sncr.nsso.common.bean.repo.TicketDetails;
 import com.sncr.nsso.common.util.Ccode;
 import com.sncr.nsso.common.util.DateUtil;
@@ -288,7 +289,7 @@ public class UserRepositoryImpl implements UserRepository {
 					+ "values (?,?,?,?,?,?,?,?,?,sysdate(),sysdate(),?,?)";
 			// ticket.setRoleType("Basic");
 			Object[] params = new Object[] { ticket.getTicketId(), ticket.getWindowId(), ticket.getMasterLoginId(),
-					ticket.getUserName(), ticket.getProdCode(), ticket.getRoleType(), ticket.getCreatedTime(),
+					ticket.getUserName(), ticket.getDefaultProdID(), ticket.getRoleType(), ticket.getCreatedTime(),
 					ticket.getValidUpto(), isValid, null, ticket.getValidityReason() };
 			int[] types = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
 					Types.VARCHAR, Types.BIGINT, Types.BIGINT, Types.SMALLINT, Types.DATE, Types.VARCHAR };
@@ -470,7 +471,7 @@ public class UserRepositoryImpl implements UserRepository {
 
 		// Generic User Details
 		try {
-			String sql = "SELECT U.USER_ID,U.FIRST_NAME,U.MIDDLE_NAME,U.LAST_NAME,C.COMPANY_NAME,C.CUSTOMER_SYS_ID,C.CUSTOMER_CODE,C.LANDING_PROD_SYS_ID,R.ROLE_NAME,R.ROLE_TYPE,R.DATA_SECURITY_KEY "
+			String sql = "SELECT U.USER_ID,U.FIRST_NAME,U.MIDDLE_NAME,U.LAST_NAME,C.COMPANY_NAME,C.CUSTOMER_SYS_ID,C.CUSTOMER_CODE,C.LANDING_PROD_SYS_ID,R.ROLE_CODE,R.ROLE_TYPE,R.DATA_SECURITY_KEY "
 					+ "	FROM USERS U, CUSTOMERS C, ROLES R WHERE U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID AND R.ROLE_SYS_ID=U.ROLE_SYS_ID "
 					+ "	AND C.ACTIVE_STATUS_IND = U.ACTIVE_STATUS_IND AND  U.ACTIVE_STATUS_IND = R.ACTIVE_STATUS_IND AND R.ACTIVE_STATUS_IND = 1 AND U.USER_ID=? ";
 			TicketDetails ticketDetails = jdbcTemplate.query(sql, new PreparedStatementSetter() {
@@ -479,50 +480,70 @@ public class UserRepositoryImpl implements UserRepository {
 				}
 			}, new UserRepositoryImpl.PrepareTicketExtractor());			
 
+			// Cust - Prod
+			String sql3 = "SELECT DISTINCT P.PRODUCT_NAME,P.PRODUCT_DESC,P.PRODUCT_CODE,P.PRODUCT_SYS_ID,PV.PRIVILEGE_CODE FROM CUSTOMER_PRODUCTS CP JOIN PRODUCTS P "
+					+ " ON(CP.PRODUCT_SYS_ID = P.PRODUCT_SYS_ID) JOIN `PRIVILEGES` PV ON(CP.CUST_PROD_SYS_ID=PV.CUST_PROD_SYS_ID) "
+					+ " JOIN ROLES R ON(R.ROLE_SYS_ID=PV.ROLE_SYS_ID) where CP.PRODUCT_SYS_ID = P.PRODUCT_SYS_ID AND P.ACTIVE_STATUS_IND = CP.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = 1 AND "
+					+ " PV.ACTIVE_STATUS_IND=1 AND PV.CUST_PROD_MOD_SYS_ID=0 AND R.ACTIVE_STATUS_IND = 1 AND CP.CUSTOMER_SYS_ID=? AND R.ROLE_CODE=?";
+
+			ticketDetails.setProducts(jdbcTemplate.query(sql3, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, ticketDetails.getCustID());
+					preparedStatement.setString(2, ticketDetails.getRoleCode());
+				}
+			}, new UserRepositoryImpl.PrepareProductExtractor()));
+
+			
+			
 			// Cust - Prod - Modules
-			String sql4 = "SELECT P.PRODUCT_CODE, M.MODULE_NAME, M.MODULE_DESC, M.MODULE_CODE, CPM.MODULE_URL, CPM.DEFAULT FROM CUSTOMER_PRODUCT_MODULES CPM"
+			String sql4 = "SELECT DISTINCT P.PRODUCT_CODE, M.MODULE_NAME, M.MODULE_DESC, M.MODULE_CODE, CPM.MODULE_URL, CPM.DEFAULT, CPM.CUST_PROD_MOD_SYS_ID, PV.PRIVILEGE_CODE FROM CUSTOMER_PRODUCT_MODULES CPM"
 					+ " INNER JOIN USERS U ON (U.CUSTOMER_SYS_ID=CPM.CUSTOMER_SYS_ID) INNER JOIN PRODUCT_MODULES PM ON (CPM.PROD_MOD_SYS_ID=PM.PROD_MOD_SYS_ID)"
 					+ " INNER JOIN CUSTOMER_PRODUCTS CP ON (CP.CUST_PROD_SYS_ID=CPM.CUST_PROD_SYS_ID) INNER JOIN CUSTOMERS C ON (C.CUSTOMER_SYS_ID=CP.CUSTOMER_SYS_ID)"
-					+ " INNER JOIN MODULES M ON (M.MODULE_SYS_ID=PM.MODULE_SYS_ID) INNER JOIN PRODUCTS P ON (PM.PRODUCT_SYS_ID=P.PRODUCT_SYS_ID)"
-					+ " WHERE upper(U.USER_ID)=?";
+					+ " INNER JOIN MODULES M ON (M.MODULE_SYS_ID=PM.MODULE_SYS_ID) INNER JOIN PRODUCTS P ON (PM.PRODUCT_SYS_ID=P.PRODUCT_SYS_ID) JOIN `PRIVILEGES` PV ON(CP.CUST_PROD_SYS_ID=PV.CUST_PROD_SYS_ID AND CPM.CUST_PROD_MOD_SYS_ID=PV.CUST_PROD_MOD_SYS_ID) "
+					+ " JOIN ROLES R ON(R.ROLE_SYS_ID=PV.ROLE_SYS_ID) "
+					+ " WHERE upper(U.USER_ID)=? AND P.ACTIVE_STATUS_IND = CP.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = 1 AND PV.ACTIVE_STATUS_IND=1 AND PV.CUST_PROD_MOD_FEATURE_SYS_ID=0"
+					+ " AND C.ACTIVE_STATUS_IND=1 AND P.ACTIVE_STATUS_IND=1 AND M.ACTIVE_STATUS_IND=1 AND R.ROLE_CODE=? AND R.ACTIVE_STATUS_IND = 1";
 			
-			if(onlyDef){
+			/**if(onlyDef){
 				sql4 = sql4 + " AND CPM.DEFAULT = 1";
-			}
+			}**/
 
 			ArrayList<ProductModules> prodMods = jdbcTemplate.query(sql4, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
 					preparedStatement.setString(1, masterLoginId);
+					preparedStatement.setString(2, ticketDetails.getRoleCode());
 				}
 			}, new UserRepositoryImpl.PrepareProdModExtractor());
 			if(prodMods != null) {
-			ticketDetails.setProductModules(prodMods);
+			//ticketDetails.setProductModules(prodMods);
 			// Cust - Prod - Modules - Features
-			String sql5 = "SELECT U.USER_SYS_ID, U.CUSTOMER_SYS_ID ,C.CUSTOMER_SYS_ID ,CP.CUST_PROD_SYS_ID,CP.CUSTOMER_SYS_ID, CPMF.CUST_PROD_MOD_FEATURE_SYS_ID "
-					+ ", P.PRODUCT_CODE ,M.MODULE_CODE ,CPMF.FEATURE_NAME,CPMF.FEATURE_DESC,CPMF.DEFAULT_URL ,CPMF.DEFAULT FROM USERS U "
+			String sql5 = "SELECT DISTINCT U.USER_SYS_ID, U.CUSTOMER_SYS_ID ,C.CUSTOMER_SYS_ID ,CP.CUST_PROD_SYS_ID,CP.CUSTOMER_SYS_ID, CPMF.CUST_PROD_MOD_FEATURE_SYS_ID,CPMF.FEATURE_TYPE, PV.PRIVILEGE_CODE "
+					+ ", P.PRODUCT_CODE ,M.MODULE_CODE ,CPMF.FEATURE_NAME,CPMF.FEATURE_DESC,CPMF.FEATURE_CODE,CPMF.DEFAULT_URL ,CPMF.DEFAULT FROM USERS U "
 					+ "INNER JOIN CUSTOMERS  C ON (C.CUSTOMER_SYS_ID=U.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCTS CP ON (CP.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID) "
 					+ "INNER JOIN CUSTOMER_PRODUCT_MODULES CPM ON (CPM.CUST_PROD_SYS_ID=CP.CUST_PROD_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULE_FEATURES CPMF "
 					+ "ON (CPMF.CUST_PROD_MOD_SYS_ID=CPM.CUST_PROD_MOD_SYS_ID) INNER JOIN PRODUCTS P ON (P.PRODUCT_SYS_ID=CP.PRODUCT_SYS_ID) INNER JOIN "
 					+ "PRODUCT_MODULES PM ON (PM.PROD_MOD_SYS_ID=CPM.PROD_MOD_SYS_ID) INNER JOIN MODULES M ON(M.MODULE_SYS_ID=PM.MODULE_SYS_ID) "
-					+ "INNER JOIN ROLES R ON(R.ROLE_SYS_ID=U.ROLE_SYS_ID) INNER JOIN `PRIVILEGES` PV "
-					+ "ON (CPMF.CUST_PROD_MOD_FEATURE_SYS_ID=PV.CUST_PROD_MOD_FEATURE_SYS_ID) INNER JOIN ROLE_PRIVILEGES RP "
-					+ "ON(RP.ROLE_SYS_ID=R.ROLE_SYS_ID AND RP.PRIVILEGE_SYS_ID=PV.PRIVILEGE_SYS_ID) WHERE UPPER(U.USER_ID)= ? " 
+					+ "INNER JOIN `PRIVILEGES` PV "
+					+ "ON (CPMF.CUST_PROD_MOD_FEATURE_SYS_ID=PV.CUST_PROD_MOD_FEATURE_SYS_ID) INNER JOIN ROLES R ON(R.ROLE_SYS_ID=U.ROLE_SYS_ID AND R.ROLE_SYS_ID=PV.ROLE_SYS_ID) "
+					+ " WHERE UPPER(U.USER_ID)= ? " 
 					+ "AND CPMF.ACTIVE_STATUS_IND = 1  AND P.ACTIVE_STATUS_IND = M.ACTIVE_STATUS_IND AND "
 					+ "CP.ACTIVE_STATUS_IND = PM.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND "
-					+ "AND CPM.ACTIVE_STATUS_IND = CPMF.ACTIVE_STATUS_IND";
+					+ "AND CPM.ACTIVE_STATUS_IND = CPMF.ACTIVE_STATUS_IND AND R.ROLE_CODE=? AND R.ACTIVE_STATUS_IND = 1 "
+					+ "AND PV.ANALYSIS_SYS_ID=0";
 
 			
-			if(onlyDef){
+			/**if(onlyDef){
 				sql5 = sql5 + " AND CPM.DEFAULT = 1 AND CPMF.DEFAULT = 1";
-			}
+			}**/
 			ArrayList<ProductModuleFeature> prodModFeatr = jdbcTemplate.query(sql5, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
 					preparedStatement.setString(1, masterLoginId);
+					preparedStatement.setString(2, ticketDetails.getRoleCode());
 				}
 			}, new UserRepositoryImpl.PrepareProdModFeatureExtractor());
 
 			// Roles and privileges
-			String sql2 = "SELECT DISTINCT P.PRIVILEGE_CODE, P.PRIVILEGE_NAME, P.PRIVILEGE_DESC, CPMF.FEATURE_NAME FROM CUSTOMER_PRODUCT_MODULE_FEATURES CPMF "
+			/**String sql2 = "SELECT DISTINCT P.PRIVILEGE_CODE, P.PRIVILEGE_NAME, P.PRIVILEGE_DESC, CPMF.FEATURE_NAME FROM CUSTOMER_PRODUCT_MODULE_FEATURES CPMF "
 					+ "INNER JOIN `PRIVILEGES` P ON (P.CUST_PROD_MOD_FEATURE_SYS_ID = CPMF.CUST_PROD_MOD_FEATURE_SYS_ID) INNER JOIN "
 					+ "ROLE_PRIVILEGES RP ON(RP.PRIVILEGE_SYS_ID = P.PRIVILEGE_SYS_ID AND RP.ACTIVE_STATUS_IND = P.ACTIVE_STATUS_IND) "
 					+ "INNER JOIN CUSTOMER_PRODUCT_MODULES CPM ON(CPM.CUST_PROD_MOD_SYS_ID = CPMF.CUST_PROD_MOD_SYS_ID) INNER JOIN "
@@ -543,7 +564,7 @@ public class UserRepositoryImpl implements UserRepository {
 						}
 					}, new UserRepositoryImpl.PrepareProdModFeaturePrivExtractor());
 
-			ArrayList<ProductModuleFeaturePrivileges> productModuleFeaturePrivilegesSorted = null;
+			/**ArrayList<ProductModuleFeaturePrivileges> productModuleFeaturePrivilegesSorted = null;
 			ArrayList<ProductModuleFeature> prodModFeatrSorted = null;
 			ArrayList<ProductModuleFeatures> prodModFeatrs = new ArrayList<ProductModuleFeatures>();
 			ProductModuleFeatures prodModFeatures = null;
@@ -578,7 +599,79 @@ public class UserRepositoryImpl implements UserRepository {
 				prodModFeatrs.add(prodModFeatures);
 
 			}
-			ticketDetails.setProductModuleFeatures(prodModFeatrs);
+			ticketDetails.setProductModuleFeatures(prodModFeatrs);**/
+			ArrayList<ProductModuleFeature> productModuleFeatureParentSorted = null;
+			ArrayList<ProductModuleFeature> productModuleFeatureChildSorted = null;
+			ArrayList<ProductModuleFeature> prodModFeatrSorted = null;
+			ArrayList<ProductModuleFeature> prodModFeatrChildSorted = null;
+				ArrayList<ProductModules> prodModSorted = null;
+				for (int i = 0; i < ticketDetails.getProducts().size(); i++) {
+					prodModSorted = new ArrayList<ProductModules>();
+					for (int x = 0; x < prodMods.size(); x++) {
+						if (ticketDetails.getProducts().get(i).getProductCode().equals(prodMods.get(x).getProdCode())) {
+							prodModFeatrSorted = new ArrayList<ProductModuleFeature>();
+							productModuleFeatureParentSorted = new ArrayList<ProductModuleFeature>();
+							productModuleFeatureChildSorted = new ArrayList<ProductModuleFeature>();
+							for (int y = 0; y < prodModFeatr.size(); y++) {
+								if (prodModFeatr.get(y).getProdModFeatureType().split("_")[0].equals("PARENT")) {
+									productModuleFeatureParentSorted.add(prodModFeatr.get(y));
+								} else if (prodModFeatr.get(y).getProdModFeatureType().split("_")[0].equals("CHILD")) {
+									productModuleFeatureChildSorted.add(prodModFeatr.get(y));
+								}
+							}
+
+							for (int y = 0; y < productModuleFeatureParentSorted.size(); y++) {
+								prodModFeatrChildSorted = new ArrayList<ProductModuleFeature>();
+								for (int z = 0; z < productModuleFeatureChildSorted.size(); z++) {
+									if (productModuleFeatureParentSorted.get(y).getProdModFeatureType().split("_")[1]
+											.equals(productModuleFeatureChildSorted.get(z).getProdModFeatureType()
+													.split("_")[1])) {
+										prodModFeatrChildSorted.add(productModuleFeatureChildSorted.get(z));
+									}
+
+								}
+								productModuleFeatureParentSorted.get(y)
+										.setProductModuleSubFeatures(prodModFeatrChildSorted);
+							}
+
+							for (int y = 0; y < productModuleFeatureParentSorted.size(); y++) {
+
+								if (ticketDetails.getProducts().get(i).getProductCode()
+										.equals(productModuleFeatureParentSorted.get(y).getProdCode())
+										&& productModuleFeatureParentSorted.get(y).getProdModCode()
+												.equals(prodMods.get(x).getProductModCode())) {
+
+									/**
+									 * productModuleFeaturePrivilegesSorted =
+									 * new
+									 * ArrayList<ProductModuleFeaturePrivileges>
+									 * (); for (int z = 0; z <
+									 * prodModFeatrPriv.size(); z++) { if
+									 * (prodModFeatr.get(y).
+									 * getProdModFeatureName()
+									 * .equals(prodModFeatrPriv.get(z).
+									 * getProdModFeatrName())) {
+									 * 
+									 * productModuleFeaturePrivilegesSorted.add(
+									 * prodModFeatrPriv.get(z));
+									 * 
+									 * }
+									 * 
+									 * }
+									 * prodModFeatr.get(y).setProdModFeatrPriv(
+									 * productModuleFeaturePrivilegesSorted);
+									 **/
+									prodModFeatrSorted.add(productModuleFeatureParentSorted.get(y));
+
+								}
+							}
+							prodMods.get(x).setProdModFeature(prodModFeatrSorted);
+							prodModSorted.add(prodMods.get(x));
+						}
+					}
+					ticketDetails.getProducts().get(i).setProductModules(prodModSorted);
+				}
+
 			}
 			if (ticketDetails != null) {
 				user.setTicketDetails(ticketDetails);
@@ -636,7 +729,7 @@ public class UserRepositoryImpl implements UserRepository {
 				ticketDetails.setCustID(rs.getString("customer_sys_id"));
 				ticketDetails.setCustCode(rs.getString("customer_code"));
 				ticketDetails.setRoleType(rs.getString("role_type"));
-				ticketDetails.setRoleName(rs.getString("role_name"));
+				ticketDetails.setRoleCode(rs.getString("role_code"));
 				ticketDetails.setLandingProd(rs.getString("landing_prod_sys_id"));
 				ticketDetails.setDataSKey(rs.getString("data_security_key"));
 				if (firstName == null) {
@@ -660,6 +753,32 @@ public class UserRepositoryImpl implements UserRepository {
 		}
 	}	
 
+	private class PrepareProductExtractor implements ResultSetExtractor<ArrayList<Products>> {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.springframework.jdbc.core.ResultSetExtractor#extractData(java
+		 * .sql.ResultSet)
+		 */
+		@Override
+		public ArrayList<Products> extractData(ResultSet rs) throws SQLException, DataAccessException {
+			Products products = null;
+			ArrayList<Products> prodList = new ArrayList<Products>();
+
+			while (rs.next()) {
+				products = new Products();
+				products.setProductCode(rs.getString("product_code"));
+				products.setProductDesc(rs.getString("product_desc"));
+				products.setProductName(rs.getString("product_name"));
+				products.setProductID(rs.getString("product_sys_id"));
+				products.setPrivilegeCode(rs.getLong("privilege_code"));
+				prodList.add(products);
+			}
+			return prodList;
+		}
+	}
+
 	private class PrepareProdModExtractor implements ResultSetExtractor<ArrayList<ProductModules>> {
 		/*
 		 * (non-Javadoc)
@@ -679,8 +798,10 @@ public class UserRepositoryImpl implements UserRepository {
 				productModules.setProductModCode(rs.getString("module_code"));
 				productModules.setProductModDesc(rs.getString("module_desc"));
 				productModules.setProductModName(rs.getString("module_name"));
+				productModules.setProductModID(rs.getString("cust_prod_mod_sys_id"));
 				productModules.setModuleURL(rs.getString("module_url"));
 				productModules.setDefaultMod(rs.getString("default"));
+				productModules.setPrivilegeCode(rs.getLong("privilege_code"));
 				prodModList.add(productModules);
 			}
 			return prodModList;
@@ -706,8 +827,12 @@ public class UserRepositoryImpl implements UserRepository {
 				productModulesFeatr.setProdCode(rs.getString("product_code"));
 				productModulesFeatr.setProdModCode(rs.getString("module_code"));
 				productModulesFeatr.setProdModFeatureName(rs.getString("feature_name"));
+				productModulesFeatr.setProdModFeatrCode(rs.getString("feature_code"));
 				productModulesFeatr.setDefaultURL(rs.getString("default_url"));
 				productModulesFeatr.setDefaultFeature(rs.getString("default"));
+				productModulesFeatr.setPrivilegeCode(rs.getLong("privilege_code"));
+				productModulesFeatr.setProdModFeatureID(rs.getLong("cust_prod_mod_feature_sys_id"));
+				productModulesFeatr.setProdModFeatureType(rs.getString("feature_type"));
 				prodModFeaList.add(productModulesFeatr);
 			}
 			return prodModFeaList;
@@ -825,7 +950,7 @@ public class UserRepositoryImpl implements UserRepository {
 			if (rs.next()) {
 				ticket = new Ticket();
 				ticket.setMasterLoginId(rs.getString("MASTER_LOGIN_ID"));
-				ticket.setProdCode(rs.getString("PRODUCT_CODE"));
+				ticket.setDefaultProdID(rs.getString("PRODUCT_CODE"));
 				ticket.setRoleType(rs.getString("ROLE_TYPE"));
 				ticket.setUserName(rs.getString("USER_NAME"));
 				ticket.setWindowId(rs.getString("WINDOW_ID"));

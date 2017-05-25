@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.sncr.nsso.common.bean.repo.ProductModuleFeatures;
 import com.sncr.nsso.common.bean.repo.ProductModules;
+import com.sncr.nsso.common.bean.repo.Products;
 import com.sncr.nsso.common.constants.SSOCommonConstants;
 
 /**
@@ -33,15 +34,31 @@ public class Ticket implements Serializable {
 	private String masterLoginId;
 	private String userName;
 	private String password;
-	private String prodCode;
+	private String defaultProdID;
+	private String roleCode;
 	private String roleType;
-	private Long createdTime;
-	private ArrayList<ProductModules> productModules;
-	private ArrayList<ProductModuleFeatures> productModuleFeatures;
+	private Long createdTime;	
 	private String dataSecurityKey;	
 	private String error;
 	private String custID;
 	private String custCode;
+	private ArrayList<Products> products;	
+
+	public String getRoleCode() {
+		return roleCode;
+	}
+
+	public void setRoleCode(String roleCode) {
+		this.roleCode = roleCode;
+	}
+
+	public ArrayList<Products> getProducts() {
+		return products;
+	}
+
+	public void setProducts(ArrayList<Products> products) {
+		this.products = products;
+	}
 
 	public String getCustID() {
 		return custID;
@@ -63,14 +80,7 @@ public class Ticket implements Serializable {
 		return error;
 	}
 
-	public ArrayList<ProductModuleFeatures> getProductModuleFeatures() {
-		return productModuleFeatures;
-	}
-
-	public void setProductModuleFeatures(ArrayList<ProductModuleFeatures> productModuleFeatures) {
-		this.productModuleFeatures = productModuleFeatures;
-	}
-
+	
 	public void setError(String error) {
 		this.error = error;
 	}
@@ -98,18 +108,12 @@ public class Ticket implements Serializable {
 	}
 	
 	
-	/**
-	 * @return the prodCode
-	 */
-	public String getProdCode() {
-		return prodCode;
+	public String getDefaultProdID() {
+		return defaultProdID;
 	}
 
-	/**
-	 * @param prodCode the prodCode to set
-	 */
-	public void setProdCode(String prodCode) {
-		this.prodCode = prodCode;
+	public void setDefaultProdID(String defaultProdID) {
+		this.defaultProdID = defaultProdID;
 	}
 
 	/**
@@ -120,7 +124,7 @@ public class Ticket implements Serializable {
 		sb.append("Ticket Id = " + ticketId + "\n");
 		sb.append("Master Login Id = " + masterLoginId + "\n");
 		sb.append("User Name = " + userName + "\n");
-		sb.append("Product Code = " + prodCode + "\n");
+		sb.append("Product Code = " + defaultProdID + "\n");
 		sb.append("Role Type = " + roleType + "\n");
 		sb.append("createdTime = " + createdTime + "\n");
 		sb.append("validUpto = " + validUpto + "\n");
@@ -264,14 +268,6 @@ public class Ticket implements Serializable {
 	 */
 	public void setUserName(String userName) {
 		this.userName = userName;
-	}
-
-	public ArrayList<ProductModules> getProductModules() {
-		return productModules;
-	}
-
-	public void setProductModules(ArrayList<ProductModules> productModules) {
-		this.productModules = productModules;
 	}
 
 	/**

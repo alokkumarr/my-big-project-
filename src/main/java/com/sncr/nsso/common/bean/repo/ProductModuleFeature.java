@@ -15,16 +15,44 @@ public class ProductModuleFeature implements Serializable {
 	private String prodModFeatureName;
 	private String prodModFeatureDesc;
 	private String defaultURL;
+	private long privilegeCode;
+	private long prodModFeatureID;
+	private String prodModFeatureType;
+	private String defaultFeature;	
+	private String prodModFeatrCode;
+	private ArrayList<ProductModuleFeature> ProductModuleSubFeatures;
 	
+		
+	public ArrayList<ProductModuleFeature> getProductModuleSubFeatures() {
+		return ProductModuleSubFeatures;
+	}
+	public void setProductModuleSubFeatures(ArrayList<ProductModuleFeature> productModuleSubFeatures) {
+		ProductModuleSubFeatures = productModuleSubFeatures;
+	}
+	public String getProdModFeatureType() {
+		return prodModFeatureType;
+	}
+	public void setProdModFeatureType(String prodModFeatureType) {
+		this.prodModFeatureType = prodModFeatureType;
+	}
+	public long getProdModFeatureID() {
+		return prodModFeatureID;
+	}
+	public void setProdModFeatureID(long prodModFeatureID) {
+		this.prodModFeatureID = prodModFeatureID;
+	}
+	public long getPrivilegeCode() {
+		return privilegeCode;
+	}
+	public void setPrivilegeCode(long privilegeCode) {
+		this.privilegeCode = privilegeCode;
+	}
 	public String getDefaultFeature() {
 		return defaultFeature;
 	}
 	public void setDefaultFeature(String defaultFeature) {
 		this.defaultFeature = defaultFeature;
 	}
-	private String defaultFeature;
-	
-	private ArrayList<ProductModuleFeaturePrivileges> prodModFeatrPriv;
 	
 	public String getProdModFeatureName() {
 		return prodModFeatureName;
@@ -56,11 +84,12 @@ public class ProductModuleFeature implements Serializable {
 	public void setProdModCode(String prodModCode) {
 		this.prodModCode = prodModCode;
 	}
-	public ArrayList<ProductModuleFeaturePrivileges> getProdModFeatrPriv() {
-		return prodModFeatrPriv;
+	public String getProdModFeatrCode() {
+		return prodModFeatrCode;
 	}
-	public void setProdModFeatrPriv(ArrayList<ProductModuleFeaturePrivileges> prodModFeatrPriv) {
-		this.prodModFeatrPriv = prodModFeatrPriv;
+	public void setProdModFeatrCode(String prodModFeatrCode) {
+		this.prodModFeatrCode = prodModFeatrCode;
 	}
+	
 	
 }

@@ -13,10 +13,30 @@ public class ProductModules implements Serializable {
 	private String productModName;
 	private String productModDesc;
 	private String productModCode;
-	private String moduleURL;
-	private ArrayList<ProductModuleFeature> prodModFeature;
+	private String productModID;
+	private String moduleURL;	
 	private String defaultMod;
+	private long privilegeCode;
+	private ArrayList<ProductModuleFeature> prodModFeature;
 	
+	
+		
+	public String getProductModID() {
+		return productModID;
+	}
+
+	public void setProductModID(String productModID) {
+		this.productModID = productModID;
+	}
+
+	public long getPrivilegeCode() {
+		return privilegeCode;
+	}
+
+	public void setPrivilegeCode(long privilegeCode) {
+		this.privilegeCode = privilegeCode;
+	}
+
 	public String getDefaultMod() {
 		return defaultMod;
 	}

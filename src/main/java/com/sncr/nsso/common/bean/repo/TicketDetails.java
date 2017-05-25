@@ -22,11 +22,11 @@ public class TicketDetails implements Serializable {
 	private String custID;
 	private String custCode;
 	private String compName;
-	private String roleName;
+	private String roleCode;
 	private String roleType;
 	private String dataSKey;
-	private ArrayList<ProductModules> productModules;
-	private ArrayList<ProductModuleFeatures> productModuleFeatures;
+	private ArrayList<Products> products;
+	
 
 	public String getCustCode() {
 		return custCode;
@@ -40,14 +40,7 @@ public class TicketDetails implements Serializable {
 		return landingProd;
 	}
 
-	public ArrayList<ProductModuleFeatures> getProductModuleFeatures() {
-		return productModuleFeatures;
-	}
-
-	public void setProductModuleFeatures(ArrayList<ProductModuleFeatures> productModuleFeatures) {
-		this.productModuleFeatures = productModuleFeatures;
-	}
-
+	
 	public void setLandingProd(String landingProd) {
 		this.landingProd = landingProd;
 	}
@@ -68,13 +61,7 @@ public class TicketDetails implements Serializable {
 		this.dataSKey = dataSKey;
 	}
 
-	public ArrayList<ProductModules> getProductModules() {
-		return productModules;
-	}
-
-	public void setProductModules(ArrayList<ProductModules> productModules) {
-		this.productModules = productModules;
-	}
+	
 
 	/**
 	 * @return the userName
@@ -109,16 +96,16 @@ public class TicketDetails implements Serializable {
 	/**
 	 * @return the roleName
 	 */
-	public String getRoleName() {
-		return roleName;
+	public String getRoleCode() {
+		return roleCode;
 	}
 
 	/**
 	 * @param roleName
 	 *            the roleName to set
 	 */
-	public void setRoleName(String roleName) {
-		this.roleName = roleName;
+	public void setRoleCode(String roleCode) {
+		this.roleCode = roleCode;
 	}
 
 	/**
@@ -136,4 +123,11 @@ public class TicketDetails implements Serializable {
 		this.roleType = roleType;
 	}
 
+	public ArrayList<Products> getProducts() {
+		return products;
+	}
+
+	public void setProducts(ArrayList<Products> products) {
+		this.products = products;
+	}
 }
