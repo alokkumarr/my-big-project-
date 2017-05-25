@@ -226,7 +226,9 @@ class ANA extends BaseServiceProvider {
       throw new Exception("Could not find analysis node with provided analysis ID")
     // check the type
     val typeInfo = analysisType.extract[String];
-    val json = analysisJSON.extract[String];
+    println("TypeInfo :" + typeInfo);
+    val json = render(analysisJSON).toString();
+    println("Json for ElasticSearch:" + json);
     if ( typeInfo.equals("pivot") ){
       val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json), json);

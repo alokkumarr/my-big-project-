@@ -163,7 +163,7 @@ public class PivotMainSampleClass {
 	    }
 	    System.out.println(searchSourceBuilder.toString()); 
 	   String response[] = SAWElasticSearchQueryExecutor.executeReturnAsString(searchSourceBuilder, objectNode.toString());
-	    System.out.println(response);
+	    System.out.println(response[0]);
 			   
 	}
 

@@ -147,7 +147,7 @@ public class ChartMainSampleClass {
     // SAWElasticTransportService.executeReturnAsString(query, objectNode.toString(), "some",
     // "xssds", "login");
     String[] response = SAWElasticSearchQueryExecutor.executeReturnAsString(searchSourceBuilder, objectNode.toString());
-    System.out.println(response);
+    System.out.println(response[0]);
     
 
   }
