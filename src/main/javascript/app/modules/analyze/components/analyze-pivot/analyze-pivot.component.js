@@ -8,7 +8,10 @@ import fpFilter from 'lodash/fp/filter';
 import find from 'lodash/find';
 import filter from 'lodash/filter';
 import isEmpty from 'lodash/isEmpty';
+import assign from 'lodash/assign';
 import omit from 'lodash/omit';
+import fpGroupBy from 'lodash/fp/groupBy';
+import fpMapValues from 'lodash/fp/mapValues';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 
@@ -50,8 +53,9 @@ export const AnalyzePivotComponent = {
 
       if (isEmpty(this.model.artifacts)) {
         // new analysis
-        this._AnalyzeService.createAnalysis(this.model.artifactsId, 'pivot')
+        this._AnalyzeService.createAnalysis(this.model.semanticId, this.model.type)
           .then(analysis => {
+            console.log('analysis: ', analysis);
             this.prepareFields(analysis.artifacts[0].columns);
             this.toggleSettingsSidenav();
           });
@@ -126,19 +130,25 @@ export const AnalyzePivotComponent = {
     }
 
     loadPivotData() {
-      return this._AnalyzeService.getPivotData().then(pivotData => {
-        this.normalizedData = pivotData;
-        this.deNormalizedData = this._PivotService.denormalizeData(pivotData, this.fields);
+      const model = this.getModel();
+      console.log('load model: ', this.getModel());
+      this._AnalyzeService.getDataBySettings(clone(model))
+        .then(({analysis, data}) => {
+          console.log(analysis, data);
+        });
+      // return this._AnalyzeService.getPivotData().then(pivotData => {
+      //   this.normalizedData = pivotData;
+      //   this.deNormalizedData = this._PivotService.denormalizeData(pivotData, this.fields);
 
-        if (isEmpty(this.filters.possible)) {
-          this.filters.possible = this._PivotService.mapFieldsToFilters(this.normalizedData, this.fields);
-          this.filters.selected = [];
-        }
-        this.dataSource.store = this.deNormalizedData;
+      //   if (isEmpty(this.filters.possible)) {
+      //     this.filters.possible = this._PivotService.mapFieldsToFilters(this.normalizedData, this.fields);
+      //     this.filters.selected = [];
+      //   }
+      //   this.dataSource.store = this.deNormalizedData;
 
-        this.setDataSource(this.dataSource.store, this.fields);
-        this.settingsModified = false;
-      });
+      //   this.setDataSource(this.dataSource.store, this.fields);
+      //   this.settingsModified = false;
+      // });
     }
 
 // filters
@@ -299,23 +309,45 @@ export const AnalyzePivotComponent = {
       });
     }
 
-    openSaveModal(ev) {
+    getModel() {
       this.updateFields();
+      return assign(this.model, {
+        artifacts: [{
+          columns: this._PivotService.getFrontend2BackendFieldMapper()(this.fieldsToSave)
+        }],
+        sqlBuilder: this.getSqlBuilder()
+      });
+    }
 
-      this.model.artifacts = [{columns: this._PivotService.getFrontend2BackendFieldMapper()(this.fieldsToSave)}];
+    getSqlBuilder() {
+      const groupedFields = fpPipe(
+        fpGroupBy('area'),
+        fpMapValues(
+          fpMap('dataField')
+        ),
+      )(this.fieldsToSave);
 
-      this.model.filters = fpPipe(
-        this._FilterService.getSelectedFilterMapper(),
-        fpMap(this._FilterService.getFrontEnd2BackEndFilterMapper())
-      )(this.filters.possible);
-      this.model.sorts = this.mapFrontend2BackendSort(this.sorts);
+      return {
+        filters: fpPipe(
+          this._FilterService.getSelectedFilterMapper(),
+          fpMap(this._FilterService.getFrontEnd2BackEndFilterMapper())
+        )(this.filters.possible),
+        sorts: this.mapFrontend2BackendSort(this.sorts),
+        rowFields: groupedFields.row,
+        columnFields: groupedFields.column,
+        dataFields: groupedFields.data
+      };
+    }
+
+    openSaveModal(ev) {
+      const model = this.getModel();
       const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
       this._$mdDialog
         .show({
           template: tpl,
           controller: scope => {
-            scope.model = clone(omit(this.model, 'metric'));
+            scope.model = clone(omit(model, 'metric'));
 
             scope.onSave = data => {
               this.model.id = data.id;

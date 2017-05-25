@@ -86,7 +86,7 @@ export const AnalyzeReportComponent = {
         }, 100);
       }
 
-      this._AnalyzeService.createAnalysis(this.model.semanticId, 'report').then(analysis => {
+      this._AnalyzeService.createAnalysis(this.model.semanticId, this.model.type).then(analysis => {
         this.model = defaultsDeep(this.model, {
           id: analysis.id,
           metric: analysis.metric,
