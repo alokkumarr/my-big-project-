@@ -185,11 +185,11 @@ public class TicketHelper {
 		ticket.setValid(true);
 		ticket.setValidityReason("User Authenticated Successfully");
 		if(user.getTicketDetails() != null) {
-			ticket.setProdCode(user.getTicketDetails().getLandingProd());
+			ticket.setDefaultProdID(user.getTicketDetails().getLandingProd());
+			ticket.setRoleCode(user.getTicketDetails().getRoleCode());
 			ticket.setRoleType(user.getTicketDetails().getRoleType());
 			ticket.setUserName(user.getTicketDetails().getUserName());
-			ticket.setProductModules(user.getTicketDetails().getProductModules());
-			ticket.setProductModuleFeatures(user.getTicketDetails().getProductModuleFeatures());
+			ticket.setProducts(user.getTicketDetails().getProducts());			
 			ticket.setDataSecurityKey(user.getTicketDetails().getDataSKey());
 			ticket.setCustID(user.getTicketDetails().getCustID());
 			ticket.setCustCode(user.getTicketDetails().getCustCode());

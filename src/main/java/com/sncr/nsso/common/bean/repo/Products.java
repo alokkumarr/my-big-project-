@@ -10,9 +10,29 @@ public class Products implements Serializable {
 	
 	private String productName;
 	private String productDesc;
-	private String productCode;
-	
+	private String productCode;	
+	private String productID;
+	private long privilegeCode;
 	private ArrayList<ProductModules> productModules;
+	
+	public String getProductID() {
+		return productID;
+	}
+
+	public void setProductID(String productID) {
+		this.productID = productID;
+	}
+
+	public long getPrivilegeCode() {
+		return privilegeCode;
+	}
+
+	public void setPrivilegeCode(long privilegeCode) {
+		this.privilegeCode = privilegeCode;
+	}
+
+	
+	
 
 	public String getProductName() {
 		return productName;
