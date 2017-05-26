@@ -54,7 +54,7 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-log4j12</artifactId>
               </exclusion>
-               <exclusion>
+<!--            <exclusion>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-api</artifactId>
               </exclusion>
@@ -62,11 +62,10 @@
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-core</artifactId>
               </exclusion>
-               <exclusion>
+ -->               <exclusion>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-slf4j-impl</artifactId>
               </exclusion>
-              
             </exclusions>
         </dependency>
         
@@ -446,7 +445,10 @@
                     <failOnWarning>true</failOnWarning>
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
-                    <compilerArgument>-Xlint:all</compilerArgument>
+                    <compilerArgs>
+	                    <arg>-Xlint:all</arg>
+	  					<arg>-proc:none</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>

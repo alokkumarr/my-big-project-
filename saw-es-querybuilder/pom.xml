@@ -24,7 +24,7 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
-       <dependency>
+		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 			<version>${jackson.version}</version>
@@ -65,7 +65,7 @@
 			<version>${lombok.version}</version>
 		</dependency>
 	</dependencies>
- <build>
+	<build>
 		<plugins>
 
 			<plugin>
@@ -77,7 +77,37 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-
-		</plugins>
+<!-- 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.4.1</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<relocations>
+								<relocation>
+									<pattern>org.apache.logging</pattern>
+									<shadedPattern>my.elasticsearch.logging</shadedPattern>
+								</relocation>
+								<relocation>
+									<pattern>org.slf4j</pattern>
+									<shadedPattern>my.elasticsearch.slf4j</shadedPattern>
+								</relocation>
+							
+							</relocations>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer" />
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+ -->		
+   </plugins>
 	</build>
 </project>
