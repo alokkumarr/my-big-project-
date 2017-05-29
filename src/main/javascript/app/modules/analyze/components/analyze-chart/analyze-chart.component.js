@@ -215,7 +215,7 @@ export const AnalyzeChartComponent = {
 
     filterGridData() {
       const payload = this.generatePayload(this.model);
-      return this._AnalyzeService.getDataBySettings(payload).then(data => {
+      return this._AnalyzeService.getDataBySettings(payload).then(({analysis, data}) => {
         this.gridData = this.filteredGridData = data;
       });
     }
