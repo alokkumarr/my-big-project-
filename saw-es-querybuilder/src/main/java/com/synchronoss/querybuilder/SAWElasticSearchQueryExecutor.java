@@ -4,17 +4,14 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.logging.ESLoggerFactory;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
-
+import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -35,7 +32,7 @@ import com.synchronoss.querybuilder.model.SqlBuilder;
  * @author saurav.paul
  */
 public class SAWElasticSearchQueryExecutor {
-  public static Logger logger = ESLoggerFactory.getLogger(SAWElasticSearchQueryExecutor.class);
+  public static org.slf4j.Logger logger = LoggerFactory.getLogger(SAWElasticSearchQueryExecutor.class);
 
 
 
