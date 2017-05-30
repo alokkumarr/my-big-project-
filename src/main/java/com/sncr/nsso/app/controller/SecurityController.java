@@ -487,7 +487,7 @@ public class SecurityController {
 	 * @param analysis
 	 * @return
 	 */
-	@RequestMapping(value = "/auth/analysis/updateAnalysis", method = RequestMethod.POST)
+	@RequestMapping(value = "/auth/analysis/update", method = RequestMethod.POST)
 	public Valid updateAnalysis(@RequestBody Analysis analysis) {		
 		Valid valid = new Valid();
 		try {
@@ -522,7 +522,7 @@ public class SecurityController {
 	 * @param analysis
 	 * @return
 	 */
-	@RequestMapping(value = "/auth/analysis/deleteAnalysis", method = RequestMethod.POST)
+	@RequestMapping(value = "/auth/analysis/delete", method = RequestMethod.POST)
 	public Valid deleteAnalysis(@RequestBody Analysis analysis) {
 		Valid valid = new Valid();
 		try {
@@ -556,7 +556,7 @@ public class SecurityController {
 	 * @param featureId
 	 * @return
 	 */
-	@RequestMapping(value = "/auth/analysis/getAnalysisByFeatureId/{featureId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/auth/analysis/fetch/{featureId}", method = RequestMethod.GET)
 	public AnalysisSummaryList getAnalysisByFeatureID(@PathVariable("featureId")Long featureId) {				
 		return userRepository.getAnalysisByFeatureID(featureId);		          
 	}
