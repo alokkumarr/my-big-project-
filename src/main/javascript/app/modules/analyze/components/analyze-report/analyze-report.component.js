@@ -688,7 +688,7 @@ export const AnalyzeReportComponent = {
               this.model.id = data.id;
               this.model.name = data.name;
               this.model.description = data.description;
-              this.model.category = data.category;
+              this.model.categoryId = data.categoryId;
             };
           },
           autoWrap: false,
