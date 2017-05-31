@@ -5,6 +5,7 @@ import org.json4s._
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.scalatest.CancelAfterFailure
+import play.api.test.Helpers.GET
 
 /* Test analysis service operations */
 class AnalysisTest extends MaprTest with CancelAfterFailure {
@@ -104,6 +105,14 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       val response = analyze(sendRequest(body))
       val JInt(value) = (response \ "data")(0) \ "a"
       value must be (1)
+    }
+
+    "list analysis results" in {
+      /* List results of previously executed analysis */
+      val body = actionKeyMessage("read", id)
+      val response = sendFullRequest(GET, "/analysis/%s/results".format(id))
+      val results = extractArray(response, "results")
+      results.length must be (2)
     }
 
     "delete analysis" in {

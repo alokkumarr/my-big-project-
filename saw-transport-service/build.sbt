@@ -21,7 +21,9 @@ unmanagedJars := Seq.empty[sbt.Attributed[java.io.File]]
 libraryDependencies ++= Seq(
   "com.mapr" % "mapr-release" % "5.1.0.37689-mapr",
   "org.reactivemongo" %% "reactivemongo-play-json" % "0.11.11",
-  "ch.qos.logback" % "logback-classic" % "1.0.13"
+  "ch.qos.logback" % "logback-classic" % "1.0.13",
+  "org.elasticsearch.client" % "transport" % "5.3.0",
+  "org.apache.logging.log4j" % "log4j-api" % "2.7"
 )
 
 // JUnit framework
