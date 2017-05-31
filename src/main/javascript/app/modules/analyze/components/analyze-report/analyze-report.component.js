@@ -82,29 +82,38 @@ export const AnalyzeReportComponent = {
         this.model.id = null;
       }
 
-      if (this.model.query) {
+      if (this.model.edit) {
         // give designer mode chance to load, then switch to query mode
         this._$timeout(() => {
           this.setSqlMode(this.QUERY_MODE);
         }, 100);
       }
 
-      this._AnalyzeService.createAnalysis(this.model.semanticId, 'report').then(analysis => {
-        this.model = defaultsDeep(this.model, {
-          id: analysis.id,
-          metric: analysis.metric,
-          metricName: analysis.metricName,
-          artifacts: analysis.artifacts,
-          sqlBuilder: {
-            filters: [],
-            joins: [],
-            groupByColumns: [],
-            orderByColumns: []
-          }
-        });
-
+      if (this.mode === 'edit') {
         this._modelLoaded(true);
-      });
+      } else {
+        this._AnalyzeService.createAnalysis(this.model.semanticId, 'report').then(analysis => {
+          this.model = defaultsDeep(this.model, {
+            id: analysis.id,
+            metric: analysis.metric,
+            metricName: analysis.metricName
+          });
+
+          if (this.mode !== 'fork') {
+            this.model = defaultsDeep(this.model, {
+              artifacts: analysis.artifacts,
+              sqlBuilder: {
+                filters: [],
+                joins: [],
+                groupByColumns: [],
+                orderByColumns: []
+              }
+            });
+          }
+
+          this._modelLoaded(true);
+        });
+      }
 
       this.unregister = this._$componentHandler.on('$onInstanceAdded', e => {
         if (e.key === 'ard-canvas') {
@@ -561,11 +570,10 @@ export const AnalyzeReportComponent = {
     setSqlMode(mode) {
       if (this.states.sqlMode !== mode) {
         this.states.sqlMode = mode;
-
-        if (mode === this.QUERY_MODE) {
-          this.generateQuery();
-        }
       }
+
+      this.model.query = this.model.query || this.model.queryManual;
+
     }
 
     hasSelectedColumns() {
