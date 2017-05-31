@@ -218,7 +218,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
   function createAnalysis(metricId, type) {
     const params = getRequestParams([
       ['contents.action', 'create'],
-      ['contents.keys.[0].id', metricId],
+      ['contents.keys.[0].id', metricId || 'c7a32609-2940-4492-afcc-5548b5e5a040'],
       ['contents.keys.[0].analysisType', type]
     ]);
     return $http.post(`${url}/analysis`, params).then(fpGet('data.contents.analyze.[0]'));
