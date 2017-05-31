@@ -6,7 +6,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 public class SAWElasticSearchQueryBuilder {
 
-  //public static org.apache.logging.log4j.Logger logger = ESLoggerFactory.getLogger(SAWElasticSearchQueryBuilder.class);
+  
   /**
    * This method will generate the Elastic Search Query based<br/>
    * on the {@link EntityType}
