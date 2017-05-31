@@ -74,15 +74,14 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
     /* Wait until the menu has been loaded. The menu payload contains the
        analyses list from which we'll load the result for this function. */
     return _menu.then(menu => {
-      const subCategories = flatMap(menu, category => category.children);
-      const subCategory = find(subCategories, sc => sc.id === subCategoryId);
-      let items = fpGet('data.list', subCategory) || [];
 
-      if (fpGet('filter', opts)) {
-        items = searchAnalyses(items, opts.filter);
-      }
-
-      return items;
+      const payload = getRequestParams([
+        ['contents.action', 'search'],
+        ['contents.keys.[0].categoryId', subCategoryId]
+      ]);
+      return $http.post(`${url}/analysis`, payload).then(fpGet('data.contents.analyze'));
+    }).then(analyses => {
+      return analyses.slice(0, 10);
     });
   }
 
