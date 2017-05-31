@@ -71,13 +71,17 @@ export const AnalyzeChartComponent = {
       this._FilterService.onClearAllFilters(() => this.clearFilters());
 
       if (this.mode === 'fork') {
-        this.model.id = null;
+        delete this.model.id;
       }
 
-      this._AnalyzeService.createAnalysis(this.model.artifactsId, 'chart').then(analysis => {
-        this.model = assign(this.model, analysis);
+      if (this.mode === 'edit') {
         this.initChart();
-      });
+      } else {
+        this._AnalyzeService.createAnalysis(this.model.artifactsId, 'chart').then(analysis => {
+          this.model = assign(analysis, this.model);
+          this.initChart();
+        });
+      }
     }
 
     $onDestroy() {

@@ -18,28 +18,29 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
   });
 
   return {
-    createAnalysis,
-    getCategories,
-    getCategory,
-    getMethods,
-    getArtifacts,
-    getAnalyses,
-    deleteAnalysis,
-    getLastPublishedAnalysis,
-    getPublishedAnalysesByAnalysisId,
-    getPublishedAnalysisById,
-    executeAnalysis,
-    getAnalysisById,
-    getDataByQuery,
-    getDataBySettings,
-    generateQuery,
-    saveReport,
-    getSemanticLayerData,
     chartBe2Fe,
     chartFe2Be,
-    updateMenu,
+    createAnalysis,
+    deleteAnalysis,
+    executeAnalysis,
+    generateQuery,
+    getAnalyses,
+    getAnalysesFor,
+    getAnalysisById,
+    getArtifacts,
+    getCategories,
+    getCategory,
+    getDataByQuery,
+    getDataBySettings,
+    getLastPublishedAnalysis,
+    getMethods,
     getPivotData,
-    getAnalysesFor
+    getPublishedAnalysesByAnalysisId,
+    getPublishedAnalysisById,
+    getSemanticLayerData,
+    saveReport,
+    searchAnalyses,
+    updateMenu
   };
 
   function updateMenu(menu) {
@@ -70,10 +71,10 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
     return reqParams;
   }
 
-  function getAnalysesFor(subCategoryId, opts = {}) {
+  function getAnalysesFor(subCategoryId/* , opts = {} */) {
     /* Wait until the menu has been loaded. The menu payload contains the
        analyses list from which we'll load the result for this function. */
-    return _menu.then(menu => {
+    return _menu.then(() => {
 
       const payload = getRequestParams([
         ['contents.action', 'search'],
