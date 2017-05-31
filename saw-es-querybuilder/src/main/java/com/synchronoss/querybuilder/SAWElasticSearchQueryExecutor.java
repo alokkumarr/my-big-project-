@@ -33,7 +33,7 @@ import com.synchronoss.querybuilder.model.SqlBuilder;
  * @author saurav.paul
  */
 public class SAWElasticSearchQueryExecutor {
-  public static org.apache.logging.log4j.Logger logger = ESLoggerFactory.getLogger(SAWElasticSearchQueryExecutor.class);
+  
 
 
 
@@ -42,13 +42,13 @@ public class SAWElasticSearchQueryExecutor {
 
   {
     String host = System.getProperty("host");
-    logger.info("HOST", host);
+   // logger.info("HOST", host);
     int port = Integer.parseInt(System.getProperty("port"));
-    logger.info("Port", port);
+   // logger.info("Port", port);
     // String username = System.getProperty("username");// elastic
     // String password = System.getProperty("password"); // xuw3dUraHapret
     String clusterName = System.getProperty("cluster"); // "sncr-salesdemo"
-    logger.info("clusterName", clusterName);
+    //logger.info("clusterName", clusterName);
     SearchResponse response = null;
     TransportClient client = null;
     JsonNode repository = BuilderUtil.getRepositoryNodeTree(jsonString, "repository");
