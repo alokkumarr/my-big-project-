@@ -44,6 +44,8 @@ import {StringFilterComponent} from './components/analyze-filter/filters/string-
 import {NumberFilterComponent} from './components/analyze-filter/filters/number-filter.component';
 import {DateFilterComponent} from './components/analyze-filter/filters/date-filter.component';
 import {FilterChipsComponent} from './components/analyze-filter/chips/filter-chips.component';
+import {AnalyzeFilterRowComponent} from './components/analyze-filter/row/analyze-filter-row.component';
+import {AnalyzeFilterModalComponent} from './components/analyze-filter/modal/analyze-filter-modal.component';
 import {ReportRenameDialogComponent} from './components/analyze-report-grid/report-rename-dialog/report-rename-dialog.component';
 import {AnalyzeReportSaveComponent} from './components/analyze-report-save/analyze-report-save.component';
 import {AnalyzePublishDialogComponent} from './components/analyze-publish-dialog/analyze-publish-dialog.component';
@@ -93,6 +95,8 @@ angular.module(AnalyzeModule, [])
   .component('numberFilter', NumberFilterComponent)
   .component('dateFilter', DateFilterComponent)
   .component('filterChips', FilterChipsComponent)
+  .component('analyzeFilterRow', AnalyzeFilterRowComponent)
+  .component('analyzeFilterModal', AnalyzeFilterModalComponent)
   .component('analyzeFilterSidenav', AnalyzeFilterSidenavComponent)
   .component('analyzeReportDescription', AnalyzeReportDescriptionComponent)
   .component('analyzeReportPreview', AnalyzeReportPreviewComponent)

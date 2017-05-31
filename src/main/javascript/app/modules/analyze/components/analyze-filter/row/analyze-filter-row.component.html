@@ -1,0 +1,45 @@
+<div layout="row" layout-align="center stretch">
+  <md-checkbox flex="10" ng-disabled="!$ctrl.filter.column.filterEligible"
+               ng-model="$ctrl.filter.column.isRuntimeFilter">
+  </md-checkbox>
+  <md-autocomplete md-items="column in $ctrl.artifact.columns | filter:$ctrl.searchText"
+                   placeholder="Select filter"
+                   md-search-text="$ctrl.searchText"
+                   md-selected-item="$ctrl.filter.column"
+                   md-item-text="column.displayName"
+                   md-min-length="0"
+                   flex="40"
+                   md-selected-item-change="$ctrl.onArtifactChange(column)">
+    <md-item-template>
+      <span md-highlight-text="$ctrl.searchText" md-highlight-flags="^i" >{{column.displayName}}</span>
+    </md-item-template>
+    <md-not-found>
+      No Columns were found
+    </md-not-found>
+  </md-autocomplete>
+
+  <div flex="50" ng-switch on="$ctrl.filter.column.type">
+
+    <div ng-switch-when="string" style="text-align: center;">
+      <string-filter on-change="$ctrl.onFilterChange(model)" model="$ctrl.filter.model">
+      </string-filter>
+    </div>
+
+    <div ng-switch-when="date" style="text-align: center;">
+      <date-filter on-change="$ctrl.onFilterChange(model)" model="$ctrl.filter.model">
+      </date-filter>
+    </div>
+
+    <div ng-switch-when="int|double|integer|long"
+         ng-switch-when-separator="|"
+         style="text-align: center;">
+      <number-filter on-change="$ctrl.onFilterChange(model)" model="$ctrl.filter.model">
+      </number-filter>
+    </div>
+
+    <div ng-switch-default style="text-align: center;">
+      <p>select an artifact</p>
+    </div>
+
+  </div>
+</div>

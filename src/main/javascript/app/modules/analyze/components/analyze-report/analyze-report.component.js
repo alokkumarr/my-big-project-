@@ -9,7 +9,7 @@ import map from 'lodash/map';
 import keys from 'lodash/keys';
 import forEach from 'lodash/forEach';
 import clone from 'lodash/clone';
-import isEmpty from 'lodash/isEmpty';
+import cloneDeep from 'lodash/cloneDeep';
 import sortBy from 'lodash/sortBy';
 import filter from 'lodash/filter';
 import assign from 'lodash/assign';
@@ -17,8 +17,6 @@ import uniqBy from 'lodash/uniqBy';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
-
-import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter/analyze-filter-sidenav.component';
 
 const DEBOUNCE_INTERVAL = 500; // milliseconds
 
@@ -63,21 +61,12 @@ export const AnalyzeReportComponent = {
       this.gridData = [];
       this.filteredGridData = [];
       this.columns = [];
-      this.filters = {
-        // array of strings with the columns displayName that the filter is based on
-        selected: [],
-        // possible filters shown in the sidenav, generated from the checked columns
-        // of the jsPlumb canvas.model
-        possible: []
-      };
+      this.filters = {};
 
       this._unregisterCanvasHandlers = [];
     }
 
     $onInit() {
-      this._FilterService.onApplyFilters(filters => this.onApplyFilters(filters));
-      this._FilterService.onClearAllFilters(() => this.onClearAllFilters());
-
       if (this.mode === 'fork') {
         this.model.id = null;
       }
@@ -116,9 +105,6 @@ export const AnalyzeReportComponent = {
     }
 
     $onDestroy() {
-      this._FilterService.offApplyFilters();
-      this._FilterService.offClearAllFilters();
-
       if (this.unregister) {
         this.unregister();
       }
@@ -147,19 +133,6 @@ export const AnalyzeReportComponent = {
     // END requests
 
     // filters section
-    openFilterSidenav() {
-      this._FilterService.openFilterSidenav(this.filters.possible, ANALYZE_FILTER_SIDENAV_IDS.designer);
-    }
-
-    generateFiltersOnCanvasChange() {
-      this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
-      if (!isEmpty(this.filters.selected)) {
-        this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.filters.selected, this.filters.possible);
-        this.filters.selected = this._FilterService.getSelectedFilterMapper()(this.filters.possible);
-      }
-      // this.clearFilters();
-    }
-
     showFiltersButtonIfDataIsReady() {
       if (this.canvas && this.gridData) {
         this.showFiltersButton = true;
@@ -167,30 +140,18 @@ export const AnalyzeReportComponent = {
     }
 
     onApplyFilters(filters) {
-      this.filters.possible = filters;
-      this.filters.selected = this._FilterService.getSelectedFilterMapper()(filters);
-
-      this.reloadPreviewGrid(true);
+      if (filters) {
+        this.filters = filters;
+      }
     }
 
     onClearAllFilters() {
-      this.clearFilters();
+      this.filters = {};
     }
 
-    clearFilters() {
-      this.filters.possible = this._FilterService.getFilterClearer()(this.filters.possible);
-      this.filters.selected = [];
-      this.filteredGridData = this.gridData;
-      this.reloadPreviewGrid(true);
-    }
-
-    onFilterRemoved(filter) {
+    onFilterRemoved(filter, index) {
+      console.log(index);
       filter.model = null;
-      this.reloadPreviewGrid(true);
-    }
-
-    generateFilters(selectedFields, gridData) {
-      return this._FilterService.getCanvasFieldsToFiltersMapper(gridData)(selectedFields);
     }
     // END filters section
 
@@ -212,12 +173,6 @@ export const AnalyzeReportComponent = {
       } else {
         this.fillCanvas(this.model.artifacts);
         this.showFiltersButtonIfDataIsReady();
-        this.filters.possible = this.generateFilters(this.canvas.model.getSelectedFields(), this.gridData);
-        if (!isEmpty(this.canvas.model.filters)) {
-          this.filters.selected = this.canvas.model.filters;
-          this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.canvas.model.filters, this.filters.possible);
-          this.onApplyFilters(this.filters.possible);
-        }
       }
 
       this._unregisterCanvasHandlers = this._unregisterCanvasHandlers.concat([
@@ -578,6 +533,21 @@ export const AnalyzeReportComponent = {
 
     isPreviewDisabled() {
       return !this.hasSelectedColumns();
+    }
+
+    openFiltersModal(ev) {
+      const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts"></analyze-filter-modal>';
+      this._$mdDialog.show({
+        template: tpl,
+        controller: scope => {
+          scope.filters = cloneDeep(this.filters);
+          scope.artifacts = this.model.artifacts;
+        },
+        targetEvent: ev,
+        fullscreen: true,
+        autoWrap: false,
+        multiple: true
+      }).then(this.onApplyFilters);
     }
 
     openPreviewModal(ev) {
