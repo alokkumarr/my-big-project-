@@ -6,6 +6,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 public class SAWElasticSearchQueryBuilder {
 
+  
   /**
    * This method will generate the Elastic Search Query based<br/>
    * on the {@link EntityType}
@@ -41,6 +42,8 @@ public class SAWElasticSearchQueryBuilder {
    */
   public SearchSourceBuilder getSearchSourceBuilder(EntityType type, String jsonString)
       throws AssertionError {
+    //logger.info("JSONString", jsonString);
+    //logger.info("EntityType : ", type.toString());
     SearchSourceBuilder query = null;
     try {
       assert (type.find(type) == null);

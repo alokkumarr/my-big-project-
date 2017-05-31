@@ -1,7 +1,6 @@
 package com.synchronoss;
 
 import java.io.IOException;
-import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
