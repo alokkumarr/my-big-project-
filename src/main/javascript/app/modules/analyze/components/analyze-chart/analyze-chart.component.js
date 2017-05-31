@@ -46,6 +46,8 @@ export const AnalyzeChartComponent = {
       this.updateChart = new BehaviorSubject({});
       this.settings = null;
       this.gridData = this.filteredGridData = [];
+      this.showProgress = false;
+      this.analysisChanged = false;
       this.labels = {
         tempY: '', tempX: '', y: '', x: ''
       };
@@ -201,23 +203,26 @@ export const AnalyzeChartComponent = {
       this.filters.possible = filters;
       this.filters.selected = this._FilterService.getSelectedFilterMapper()(filters);
 
-      this.filterGridData().then(() => {
+      this.analysisChanged = true;
+    }
+
+    refreshChartData() {
+      this.showProgress = true;
+      const payload = this.generatePayload(this.model);
+      return this._AnalyzeService.getDataBySettings(payload).then(({data}) => {
+        this.gridData = this.filteredGridData = data || this.filteredGridData;
+        this.analysisChanged = false;
+        this.showProgress = false;
         this.reloadChart(this.settings, this.filteredGridData);
+      }, () => {
+        this.showProgress = false;
       });
     }
 
     onFilterRemoved(filter) {
       filter.model = null;
       this.filters.selected = this._FilterService.getSelectedFilterMapper()(this.filters.possible);
-      this.filterGridData();
-      this.reloadChart(this.settings, this.filteredGridData);
-    }
-
-    filterGridData() {
-      const payload = this.generatePayload(this.model);
-      return this._AnalyzeService.getDataBySettings(payload).then(({data}) => {
-        this.gridData = this.filteredGridData = data;
-      });
+      this.analysisChanged = true;
     }
 
     generateFilters(selectedFields) {
