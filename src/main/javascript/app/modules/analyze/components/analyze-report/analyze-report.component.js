@@ -4,6 +4,7 @@ import fpFlatMap from 'lodash/fp/flatMap';
 import fpPipe from 'lodash/fp/pipe';
 import fpGet from 'lodash/fp/get';
 import fpMap from 'lodash/fp/map';
+import fpToPairs from 'lodash/fp/toPairs';
 import first from 'lodash/first';
 import map from 'lodash/map';
 import keys from 'lodash/keys';
@@ -62,6 +63,7 @@ export const AnalyzeReportComponent = {
       this.filteredGridData = [];
       this.columns = [];
       this.filters = {};
+      this.filterChips = [];
 
       this._unregisterCanvasHandlers = [];
     }
@@ -142,6 +144,10 @@ export const AnalyzeReportComponent = {
     onApplyFilters(filters) {
       if (filters) {
         this.filters = filters;
+        this.filterChips = fpPipe(
+          fpToPairs,
+          fpFlatMap(pair => pair[1])
+        );
       }
     }
 
