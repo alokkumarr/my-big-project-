@@ -5,6 +5,7 @@ import clone from 'lodash/clone';
 import fpMap from 'lodash/fp/map';
 import fpPipe from 'lodash/fp/pipe';
 import fpFilter from 'lodash/fp/filter';
+import fpPick from 'lodash/fp/pick';
 import find from 'lodash/find';
 import filter from 'lodash/filter';
 import isEmpty from 'lodash/isEmpty';
@@ -55,7 +56,7 @@ export const AnalyzePivotComponent = {
         // new analysis
         this._AnalyzeService.createAnalysis(this.model.semanticId, this.model.type)
           .then(analysis => {
-            console.log('analysis: ', analysis);
+            this.model.id = analysis.id;
             this.prepareFields(analysis.artifacts[0].columns);
             this.toggleSettingsSidenav();
           });
@@ -323,7 +324,12 @@ export const AnalyzePivotComponent = {
       const groupedFields = fpPipe(
         fpGroupBy('area'),
         fpMapValues(
-          fpMap('dataField')
+          fpMap(field => {
+            return {
+              type: field.type,
+              columnName: field.dataField
+            };
+          })
         ),
       )(this.fieldsToSave);
 
@@ -347,7 +353,7 @@ export const AnalyzePivotComponent = {
         .show({
           template: tpl,
           controller: scope => {
-            scope.model = clone(omit(model, 'metric'));
+            scope.model = clone(model);
 
             scope.onSave = data => {
               this.model.id = data.id;
