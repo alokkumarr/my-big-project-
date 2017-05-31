@@ -84,6 +84,14 @@
 			<artifactId>transport</artifactId>
 			<version>${es.version}</version>
 		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch -->
+<dependency>
+    <groupId>org.elasticsearch</groupId>
+    <artifactId>elasticsearch</artifactId>
+    <version>${es.version}</version>
+</dependency>
+		
 
 
         <dependency>
