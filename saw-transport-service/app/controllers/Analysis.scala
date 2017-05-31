@@ -23,7 +23,7 @@ import com.synchronoss.querybuilder.SAWElasticSearchQueryExecutor
 import com.synchronoss.querybuilder.EntityType
 import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder
 
-class ANA extends BaseController {
+class Analysis extends BaseController {
   val executorRunner = new ExecutionTaskHandler(1)
 
   def process: Result = {
