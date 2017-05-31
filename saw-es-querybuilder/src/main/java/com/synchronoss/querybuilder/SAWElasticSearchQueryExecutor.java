@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.logging.ESLoggerFactory;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -33,7 +33,7 @@ import com.synchronoss.querybuilder.model.SqlBuilder;
  * @author saurav.paul
  */
 public class SAWElasticSearchQueryExecutor {
-  
+  public static org.apache.logging.log4j.Logger logger = ESLoggerFactory.getLogger(SAWElasticSearchQueryExecutor.class);
 
 
 
@@ -42,10 +42,13 @@ public class SAWElasticSearchQueryExecutor {
 
   {
     String host = System.getProperty("host");
+    logger.info("HOST", host);
     int port = Integer.parseInt(System.getProperty("port"));
+    logger.info("Port", port);
     // String username = System.getProperty("username");// elastic
     // String password = System.getProperty("password"); // xuw3dUraHapret
     String clusterName = System.getProperty("cluster"); // "sncr-salesdemo"
+    logger.info("clusterName", clusterName);
     SearchResponse response = null;
     TransportClient client = null;
     JsonNode repository = BuilderUtil.getRepositoryNodeTree(jsonString, "repository");

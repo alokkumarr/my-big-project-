@@ -2,10 +2,12 @@ package com.synchronoss.querybuilder;
 
 import java.io.IOException;
 
+import org.elasticsearch.common.logging.ESLoggerFactory;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 public class SAWElasticSearchQueryBuilder {
 
+  public static org.apache.logging.log4j.Logger logger = ESLoggerFactory.getLogger(SAWElasticSearchQueryBuilder.class);
   /**
    * This method will generate the Elastic Search Query based<br/>
    * on the {@link EntityType}
@@ -41,6 +43,8 @@ public class SAWElasticSearchQueryBuilder {
    */
   public SearchSourceBuilder getSearchSourceBuilder(EntityType type, String jsonString)
       throws AssertionError {
+    logger.info("JSONString", jsonString);
+    logger.info("EntityType : ", type.toString());
     SearchSourceBuilder query = null;
     try {
       assert (type.find(type) == null);
