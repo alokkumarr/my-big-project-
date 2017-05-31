@@ -35,8 +35,8 @@ export const AnalyzeChartComponent = {
       this._$mdDialog = $mdDialog;
 
       this.legend = {
-        align: get(this.model, 'chart.legend.align', 'right'),
-        layout: get(this.model, 'chart.legend.layout', 'vertical'),
+        align: get(this.model, 'legend.align', 'right'),
+        layout: get(this.model, 'legend.layout', 'vertical'),
         options: {
           align: values(this._ChartService.LEGEND_POSITIONING),
           layout: values(this._ChartService.LAYOUT_POSITIONS)
@@ -94,9 +94,8 @@ export const AnalyzeChartComponent = {
         return;
       }
 
-      const chart = this.model.chart;
-      this.labels.tempX = this.labels.x = get(chart, 'xAxis.title', null);
-      this.labels.tempY = this.labels.y = get(chart, 'yAxis.title', null);
+      this.labels.tempX = this.labels.x = get(this.model, 'xAxis.title', null);
+      this.labels.tempY = this.labels.y = get(this.model, 'yAxis.title', null);
       this.filters.selected = map(
         get(this.model, 'sqlBuilder.filters', []),
         beFilter => this._FilterService.getBackEnd2FrontEndFilterMapper()(beFilter)
@@ -299,17 +298,17 @@ export const AnalyzeChartComponent = {
         feFilter => this._FilterService.getFrontEnd2BackEndFilterMapper()(feFilter)
       ));
 
+      const y = find(this.settings.yaxis, x => x.checked);
+
+      delete result.supports;
       set(result, 'sqlBuilder.groupBy', find(this.settings.xaxis, x => x.checked));
       set(result, 'sqlBuilder.splitBy', find(this.settings.groupBy, x => x.checked));
-      set(result, 'dataColumns', [find(this.settings.yaxis, x => x.checked)]);
-
-      set(result, 'chart', {
-        xAxis: {title: this.labels.x},
-        yAxis: {title: this.labels.y},
-        legend: {
-          align: this.legend.align,
-          layout: this.legend.layout
-        }
+      set(result, 'sqlBuilder.dataFields', [assign({aggregate: 'sum'}, y)]);
+      set(result, 'xAxis', {title: this.labels.x});
+      set(result, 'yAxis', {title: this.labels.y});
+      set(result, 'legend', {
+        align: this.legend.align,
+        layout: this.legend.layout
       });
 
       return result;
