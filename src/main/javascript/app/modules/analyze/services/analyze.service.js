@@ -150,7 +150,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
        analyses list from which we'll load the result for this function. */
     return _menu.then(menu => {
       const subCategories = flatMap(menu, category => category.children);
-      return find(subCategories, sc => sc.id === id);
+      return find(subCategories, sc => sc.id.toString() === id);
     });
   }
 
