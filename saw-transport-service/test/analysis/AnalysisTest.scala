@@ -5,6 +5,7 @@ import org.json4s._
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.scalatest.CancelAfterFailure
+import play.api.test.Helpers.GET
 
 /* Test analysis service operations */
 class AnalysisTest extends MaprTest with CancelAfterFailure {
@@ -21,7 +22,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
 
     "create analysis" in {
       /* Create analysis using analysis template preloaded into MapR-DB */
-      val semanticId = "c7a32609-2940-4492-afcc-5548b5e5a040"
+      val semanticId = "da561e07-4260-4d5e-b1d4-e04e4b8c6f0b"
       val typeJson: JObject = ("analysisType", "report")
       val response = sendRequest(
         actionKeyMessage("create", semanticId, typeJson))
@@ -30,7 +31,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       /* Save analysis ID for use by subsequent tests */
       id = analysisId
       val JString(name) = analyze(response) \ "metricName"
-      name must be ("MCT Session")
+      name must be ("MCT Events aggregated by session (view)")
       val JString(sId) = analyze(response) \ "semanticId"
       sId must be (semanticId)
       val JString(analysisType) = analyze(response) \ "type"
@@ -42,7 +43,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       val body = actionKeyMessage("read", id)
       analysis = analyze(sendRequest(body))
       val JString(metricName) = analysis \ "metricName"
-      metricName must be ("MCT Session")
+      metricName must be ("MCT Events aggregated by session (view)")
     }
 
     "update analysis" in {
@@ -51,14 +52,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
         ("saved", "true") ~ ("categoryId", categoryId))
       /* Set columns to checked to ensure there are at least some selected
        * columns for the query builder */
-      analysis = analysis.transform {
-        case column: JObject => {
-          if ((column \ "aliasName").extractOrElse[String]("none") != "none")
-            column ~ ("checked", true)
-          else
-            column
-        }
-      }
+      analysis = checkColumns(analysis, "TRANSFER_END_TS")
       val body = actionKeyAnalysisMessage("update", id, analysis)
       analysis = analyze(sendRequest(body))
       val JString(analysisId) = analysis \ "id"
@@ -71,19 +65,19 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
         "search", ("categoryId", categoryId): JObject)
       analysis = analyze(sendRequest(body))
       val JString(metricName) = analysis \ "metricName"
-      metricName must be ("MCT Session")
+      metricName must be ("MCT Events aggregated by session (view)")
     }
 
     "search multiple analyses by category" in {
       /* Create a second analysis */
-      val semanticId = "c7a32609-2940-4492-afcc-5548b5e5a040"
+      val semanticId = "da561e07-4260-4d5e-b1d4-e04e4b8c6f0b"
       val typeJson: JObject = ("analysisType", "report")
       val secondAnalysis = analyze(sendRequest(
         actionKeyMessage("create", semanticId, typeJson)))
       val JString(secondAnalysisId) = secondAnalysis \ "id"
       /* Update analysis with category */
       val updatedAnalysis = checkColumns(secondAnalysis.merge(
-        ("saved", "true") ~ ("categoryId", categoryId)))
+        ("saved", "true") ~ ("categoryId", categoryId)), "TRANSFER_END_TS")
       analyze(sendRequest(actionKeyAnalysisMessage(
         "update", secondAnalysisId, updatedAnalysis)))
       /* Search for both analyses */
@@ -97,21 +91,28 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       /* Execute previously updated analysis */
       val body = actionKeyMessage("execute", id)
       val response = analyze(sendRequest(body))
-      val JString(value) = (response \ "data")(0) \ "SESSION_ID"
-      value must be ("0025D642-5ED9-49DE-96B5-6F643DFDBB1F")
+      val JString(value) = (response \ "data")(0) \ "TRANSFER_END_TS"
+      value must be ("21-DEC-16 11.14.05.000000 AM")
     }
 
     "execute analysis with manual query" in {
       /* Update previously executed analysis */
       val manualJson: JValue = ("queryManual", "SELECT 1 AS a")
       analysis = analyze(sendRequest(
-        actionKeyAnalysisMessage("update", id,
-          checkColumns(analysis.merge(manualJson), false))))
+        actionKeyAnalysisMessage("update", id, analysis.merge(manualJson))))
       /* Execute updated analysis */
       val body = actionKeyMessage("execute", id)
       val response = analyze(sendRequest(body))
       val JInt(value) = (response \ "data")(0) \ "a"
       value must be (1)
+    }
+
+    "list analysis results" in {
+      /* List results of previously executed analysis */
+      val body = actionKeyMessage("read", id)
+      val response = sendFullRequest(GET, "/analysis/%s/results".format(id))
+      val results = extractArray(response, "results")
+      results.length must be (2)
     }
 
     "delete analysis" in {
@@ -140,12 +141,14 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
     }
   }
 
-  private def checkColumns(analysis: JValue, value: Boolean = true): JValue = {
+  private def checkColumns(analysis: JValue, columName: String,
+    value: Boolean = true): JValue = {
     /* Set columns to checked to ensure there are at least some selected
      * columns for the query builder */
     analysis.transform {
       case column: JObject => {
-        if ((column \ "aliasName").extractOrElse[String]("none") != "none")
+        if ((column \ "aliasName").extractOrElse[String]("none") != "none" &&
+          (column \ "columnName").extract[String] == "TRANSFER_END_TS")
           column ~ ("checked", value)
         else
           column

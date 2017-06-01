@@ -5,7 +5,8 @@ GET     /               controllers.MTSControl.index
 
 POST    /		controllers.TS.handleRequest
 POST    /md		controllers.MD.handleRequest
-POST    /analysis	controllers.ANA.handleRequest
+POST    /analysis	controllers.Analysis.process
+GET     /analysis/:analysisId/results	controllers.AnalysisResults.list(analysisId: String)
 POST    /semantic	controllers.Semantic.handleRequest
 
 GET     /ObjectSearch   controllers.MCT.handleTagRequest(LCID: String, query: Option[String])

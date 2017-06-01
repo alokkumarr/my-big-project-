@@ -23,30 +23,16 @@ import com.synchronoss.querybuilder.SAWElasticSearchQueryExecutor
 import com.synchronoss.querybuilder.EntityType
 import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder
 
-class ANA extends BaseServiceProvider {
-  implicit val formats = new DefaultFormats {
-    override def dateFormatter = new SimpleDateFormat(
-      "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-  }
-
+class Analysis extends BaseController {
   val executorRunner = new ExecutionTaskHandler(1)
 
-  override def process(txt: String): Result = {
-    try {
-      doProcess(txt)
-    } catch {
-      case ClientException(message) => userErrorResponse(message)
-      case e: Exception => {
-        m_log.error("Internal server error", e)
-        serverErrorResponse(e.getMessage())
-      }
-    }
+  def process: Result = {
+    handle(doProcess)
   }
 
-  private def doProcess(txt: String): Result = {
-    val json = parse(txt)
+  private def doProcess(json: JValue): JValue = {
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
-    val response = action match {
+    action match {
       case "create" => {
         val semanticId = extractAnalysisId(json)
         val semanticIdJson: JObject = ("semanticId", semanticId)
@@ -118,22 +104,6 @@ class ANA extends BaseServiceProvider {
         throw new ClientException("Unknown action: " + action)
       }
     }
-    Results.ok(playJson(response))
-  }
-
-  private def userErrorResponse(message: String): Result = {
-    val response: JObject = ("error", ("message", message))
-    Results.badRequest(playJson(response))
-  }
-
-  private def serverErrorResponse(message: String): Result = {
-    val response: JObject = ("error", ("message", message))
-    Results.internalServerError(playJson(response))
-  }
-
-  private def playJson(json: JValue) = {
-    m_log.trace("Response body: {}", pretty(render(json)))
-    Json.parse(compact(render(json)))
   }
 
   def extractAnalysisId(json: JValue) = {
@@ -268,17 +238,4 @@ class ANA extends BaseServiceProvider {
     // This is the end of report type ends here
     }
   }
-
-  private def shortMessage(message: String) = {
-    message.substring(0, Math.min(message.length(), 1500))
-  }
-
-  private def unexpectedElement(expected: String, obj: JValue): Nothing = {
-    val name = obj.getClass.getSimpleName
-    throw new RuntimeException("Expected %s but got: %s".format(expected, name))
-  }
-
-  
-
-
 }
