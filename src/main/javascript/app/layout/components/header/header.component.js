@@ -6,13 +6,14 @@ export const LayoutHeaderComponent = {
   template,
   styles: [style],
   controller: class HeaderController {
-    constructor($window, $transitions, $state, UserService, JwtService) {
+    constructor($window, $transitions, $state, UserService, JwtService, $rootScope) {
       'ngInject';
       this._$window = $window;
       this._$transitions = $transitions;
       this._$state = $state;
       this._UserService = UserService;
       this._JwtService = JwtService;
+      this._$rootScope = $rootScope;
 
       this.hideObserve = true;
       this.hideAnalyze = true;
@@ -30,6 +31,10 @@ export const LayoutHeaderComponent = {
           this.hideAnalyze = false;
         }
       }
+    }
+
+    get showProgress() {
+      return this._$rootScope.showProgress;
     }
 
     isState(stateName) {
