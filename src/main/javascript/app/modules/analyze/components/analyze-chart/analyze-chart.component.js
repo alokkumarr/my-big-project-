@@ -35,8 +35,8 @@ export const AnalyzeChartComponent = {
       this._$mdDialog = $mdDialog;
 
       this.legend = {
-        align: get(this.model, 'chart.legend.align', 'right'),
-        layout: get(this.model, 'chart.legend.layout', 'vertical'),
+        align: get(this.model, 'legend.align', 'right'),
+        layout: get(this.model, 'legend.layout', 'vertical'),
         options: {
           align: values(this._ChartService.LEGEND_POSITIONING),
           layout: values(this._ChartService.LAYOUT_POSITIONS)
@@ -46,6 +46,8 @@ export const AnalyzeChartComponent = {
       this.updateChart = new BehaviorSubject({});
       this.settings = null;
       this.gridData = this.filteredGridData = [];
+      this.showProgress = false;
+      this.analysisChanged = false;
       this.labels = {
         tempY: '', tempX: '', y: '', x: ''
       };
@@ -96,9 +98,8 @@ export const AnalyzeChartComponent = {
         return;
       }
 
-      const chart = this.model.chart;
-      this.labels.tempX = this.labels.x = get(chart, 'xAxis.title', null);
-      this.labels.tempY = this.labels.y = get(chart, 'yAxis.title', null);
+      this.labels.tempX = this.labels.x = get(this.model, 'xAxis.title', null);
+      this.labels.tempY = this.labels.y = get(this.model, 'yAxis.title', null);
       this.filters.selected = map(
         get(this.model, 'sqlBuilder.filters', []),
         beFilter => this._FilterService.getBackEnd2FrontEndFilterMapper()(beFilter)
@@ -205,23 +206,26 @@ export const AnalyzeChartComponent = {
       this.filters.possible = filters;
       this.filters.selected = this._FilterService.getSelectedFilterMapper()(filters);
 
-      this.filterGridData().then(() => {
+      this.analysisChanged = true;
+    }
+
+    refreshChartData() {
+      this.showProgress = true;
+      const payload = this.generatePayload(this.model);
+      return this._AnalyzeService.getDataBySettings(payload).then(({data}) => {
+        this.gridData = this.filteredGridData = data || this.filteredGridData;
+        this.analysisChanged = false;
+        this.showProgress = false;
         this.reloadChart(this.settings, this.filteredGridData);
+      }, () => {
+        this.showProgress = false;
       });
     }
 
     onFilterRemoved(filter) {
       filter.model = null;
       this.filters.selected = this._FilterService.getSelectedFilterMapper()(this.filters.possible);
-      this.filterGridData();
-      this.reloadChart(this.settings, this.filteredGridData);
-    }
-
-    filterGridData() {
-      const payload = this.generatePayload(this.model);
-      return this._AnalyzeService.getDataBySettings(payload).then(({data}) => {
-        this.gridData = this.filteredGridData = data;
-      });
+      this.analysisChanged = true;
     }
 
     generateFilters(selectedFields) {
@@ -298,17 +302,17 @@ export const AnalyzeChartComponent = {
         feFilter => this._FilterService.getFrontEnd2BackEndFilterMapper()(feFilter)
       ));
 
+      const y = find(this.settings.yaxis, x => x.checked);
+
+      delete result.supports;
       set(result, 'sqlBuilder.groupBy', find(this.settings.xaxis, x => x.checked));
       set(result, 'sqlBuilder.splitBy', find(this.settings.groupBy, x => x.checked));
-      set(result, 'dataColumns', [find(this.settings.yaxis, x => x.checked)]);
-
-      set(result, 'chart', {
-        xAxis: {title: this.labels.x},
-        yAxis: {title: this.labels.y},
-        legend: {
-          align: this.legend.align,
-          layout: this.legend.layout
-        }
+      set(result, 'sqlBuilder.dataFields', [assign({aggregate: 'sum'}, y)]);
+      set(result, 'xAxis', {title: this.labels.x});
+      set(result, 'yAxis', {title: this.labels.y});
+      set(result, 'legend', {
+        align: this.legend.align,
+        layout: this.legend.layout
       });
 
       return result;
