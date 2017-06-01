@@ -1,3 +1,5 @@
+import get from 'lodash/get';
+
 export function runConfig($rootScope, $state, $location, $window, JwtService, Idle, UserService) {
   'ngInject';
 
@@ -13,18 +15,16 @@ export function runConfig($rootScope, $state, $location, $window, JwtService, Id
 
   $rootScope.$on('$locationChangeStart', event => {
     const restrictedPage = ['/', '/login', '/observe', '/analyze', '/alerts'];
-    const token = JwtService.get();
+    const token = JwtService.getTokenObj();
 
-    if ((restrictedPage.indexOf($location.path()) !== -1) && angular.isDefined(token)) {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace('-', '+').replace('_', '/');
-      const resp = angular.fromJson($window.atob(base64));
+    if ((restrictedPage.indexOf($location.path()) !== -1) && token) {
+      const product = get(token, 'ticket.products.[0]');
       let hideObserve = true;
       let hideAnalyze = true;
-      for (let i = 0; i < resp.ticket.productModules.length; i++) {
-        if (resp.ticket.productModules[i].productModCode === 'OBSRV00001') {
+      for (let i = 0; i < product.productModules.length; i++) {
+        if (product.productModules[i].productModCode === 'OBSRV00001') {
           hideObserve = false;
-        } else if (resp.ticket.productModules[i].productModCode === 'ANLYS00001') {
+        } else if (product.productModules[i].productModCode === 'ANLYS00001') {
           hideAnalyze = false;
         }
       }
@@ -40,17 +40,15 @@ export function runConfig($rootScope, $state, $location, $window, JwtService, Id
 
   $rootScope.$on('$stateChangeStart', event => {
     const restrictedPage = ['/', '/login', '/observe', '/analyze', '/alerts'];
-    const token = JwtService.get();
-    if ((restrictedPage.indexOf($location.path()) !== -1) && angular.isDefined(token)) {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace('-', '+').replace('_', '/');
-      const resp = angular.fromJson($window.atob(base64));
+    const token = JwtService.getTokenObj();
+    if ((restrictedPage.indexOf($location.path()) !== -1) && token) {
+      const product = get(token, 'ticket.products.[0]');
       let hideObserve = true;
       let hideAnalyze = true;
-      for (let i = 0; i < resp.ticket.productModules.length; i++) {
-        if (resp.ticket.productModules[i].productModCode === 'OBSRV00001') {
+      for (let i = 0; i < product.productModules.length; i++) {
+        if (product.productModules[i].productModCode === 'OBSRV00001') {
           hideObserve = false;
-        } else if (resp.ticket.productModules[i].productModCode === 'ANLYS00001') {
+        } else if (product.productModules[i].productModCode === 'ANLYS00001') {
           hideAnalyze = false;
         }
       }

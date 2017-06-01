@@ -1,3 +1,4 @@
+import get from 'lodash/get';
 import template from './header.component.html';
 import style from './header.component.scss';
 
@@ -16,19 +17,16 @@ export const LayoutHeaderComponent = {
       this.hideObserve = true;
       this.hideAnalyze = true;
 
-      const token = this._JwtService.get();
+      const token = this._JwtService.getTokenObj();
       if (!token) {
         $window.location.assign('/login.html');
         return;
       }
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace('-', '+').replace('_', '/');
-      const resp = angular.fromJson(this._$window.atob(base64));
-
-      for (let i = 0; i < resp.ticket.productModules.length; i++) {
-        if (resp.ticket.productModules[i].productModCode === 'OBSRV00001') {
+      const product = get(token, 'ticket.products.[0]');
+      for (let i = 0; i < product.productModules.length; i++) {
+        if (product.productModules[i].productModCode === 'OBSRV00001') {
           this.hideObserve = false;
-        } else if (resp.ticket.productModules[i].productModCode === 'ANLYS00001') {
+        } else if (product.productModules[i].productModCode === 'ANLYS00001') {
           this.hideAnalyze = false;
         }
       }
