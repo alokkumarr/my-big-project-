@@ -42,8 +42,6 @@ public class SAWElasticSearchQueryBuilder {
    */
   public SearchSourceBuilder getSearchSourceBuilder(EntityType type, String jsonString)
       throws AssertionError {
-    //logger.info("JSONString", jsonString);
-    //logger.info("EntityType : ", type.toString());
     SearchSourceBuilder query = null;
     try {
       assert (type.find(type) == null);

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
@@ -42,16 +41,11 @@ public class SAWElasticSearchQueryExecutor {
 
   {
     String host = System.getProperty("host");
-   // logger.info("HOST", host);
     int port = Integer.parseInt(System.getProperty("port"));
-   // logger.info("Port", port);
-    // String username = System.getProperty("username");// elastic
-    // String password = System.getProperty("password"); // xuw3dUraHapret
     String clusterName = System.getProperty("cluster"); // "sncr-salesdemo"
-    //logger.info("clusterName", clusterName);
     SearchResponse response = null;
     TransportClient client = null;
-    JsonNode repository = BuilderUtil.getRepositoryNodeTree(jsonString, "repository");
+    JsonNode repository = BuilderUtil.getRepositoryNodeTree(jsonString, "esRepository");
     String indexName = repository.get("indexName").asText();
     String type = repository.get("type").textValue();
 
