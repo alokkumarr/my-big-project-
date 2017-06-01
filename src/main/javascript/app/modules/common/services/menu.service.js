@@ -1,55 +1,55 @@
 import map from 'lodash/map';
 import get from 'lodash/get';
-import set from 'lodash/set';
-import filter from 'lodash/filter';
+import find from 'lodash/find';
 
-export function MenuService($http, JwtService, AppConfig) {
+export function MenuService($q, JwtService) {
   'ngInject';
-
-  const url = AppConfig.api.url;
 
   return {
     getMenu
   };
 
-  function getRequestParams(moduleName) {
-    const params = JwtService.getRequestParams();
-
-    set(params, 'contents.action', 'search');
-    set(params, 'contents.select', 'headers');
-    set(params, 'contents.context', 'UI');
-    set(params, 'contents.keys.[0].module', moduleName.toUpperCase());
-    set(params, 'contents.keys.[0].type', 'menu');
-
-    return params;
-  }
-
   function getMenu(moduleName) {
+    const token = JwtService.getTokenObj();
+    const deferred = $q.defer();
+
+    const error = (desc = 'Error occurred while getting menu.') => {
+      deferred.reject(desc);
+      return deferred.promise;
+    };
+
+    if (!token) {
+      return error('Auth token not found');
+    }
+
     moduleName = moduleName.toUpperCase();
-    return $http.post(`${url}/md`, getRequestParams(moduleName))
-      .then(response => {
-        const menu = filter(
-          get(response, `data.contents.[0].${moduleName.toUpperCase()}`),
-          category => category.module === moduleName
-        );
-        return map(menu, item => {
-          const obj = {
-            id: item.id,
-            name: item.categoryName,
-            data: item
-          };
 
-          obj.children = map(item.children, child => {
-            return {
-              id: child.subCategoryId,
-              name: child.subCategoryName,
-              url: `#!/${item.module.toLowerCase()}/${child.subCategoryId}`,
-              data: child
-            };
-          });
+    const product = get(token, 'ticket.products.[0]');
+    const module = find(product.productModules, module => module.productModName === moduleName);
 
-          return obj;
-        });
+    if (!module) {
+      return error('Module name not found');
+    }
+
+    deferred.resolve(map(module.prodModFeature, feature => {
+      const obj = {
+        id: feature.prodModFeatureID,
+        name: feature.prodModFeatureDesc || feature.prodModFeatureName,
+        data: feature
+      };
+
+      obj.children = map(feature.productModuleSubFeatures, subfeature => {
+        return {
+          id: subfeature.prodModFeatureID,
+          name: subfeature.prodModFeatureDesc || subfeature.prodModFeatureName,
+          url: `#!/${moduleName.toLowerCase()}/${subfeature.prodModFeatureID}`,
+          data: subfeature
+        };
       });
+
+      return obj;
+    }));
+
+    return deferred.promise;
   }
 }
