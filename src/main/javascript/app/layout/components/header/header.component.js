@@ -15,14 +15,7 @@ export const LayoutHeaderComponent = {
       this._JwtService = JwtService;
       this._$rootScope = $rootScope;
 
-      this.hideObserve = true;
-      this.hideAnalyze = true;
-
       const token = this._JwtService.getTokenObj();
-      if (!token) {
-        $window.location.assign('/login.html');
-        return;
-      }
       const product = get(token, 'ticket.products.[0]');
       this.modules = product.productModules;
     }

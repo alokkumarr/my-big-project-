@@ -1,6 +1,10 @@
 import get from 'lodash/get';
+import toLower from 'lodash/toLower';
+import map from 'lodash/map';
+import some from 'lodash/some';
+import startsWith from 'lodash/startsWith';
 
-export function runConfig($rootScope, $state, $location, $window, JwtService, Idle, UserService) {
+export function runConfig($rootScope, $state, $location, $window, JwtService, Idle, UserService, $transitions, $log) {
   'ngInject';
 
   $rootScope.getPageTitle = () => {
@@ -13,54 +17,31 @@ export function runConfig($rootScope, $state, $location, $window, JwtService, Id
     return 'Synchronoss';
   };
 
-  $rootScope.$on('$locationChangeStart', event => {
-    const restrictedPage = ['/', '/login', '/observe', '/analyze', '/alerts'];
+  $transitions.onStart({}, trans => {
+    const toState = trans.to().name;
     const token = JwtService.getTokenObj();
 
-    if ((restrictedPage.indexOf($location.path()) !== -1) && token) {
-      const product = get(token, 'ticket.products.[0]');
-      let hideObserve = true;
-      let hideAnalyze = true;
-      for (let i = 0; i < product.productModules.length; i++) {
-        if (product.productModules[i].productModCode === 'OBSRV00001') {
-          hideObserve = false;
-        } else if (product.productModules[i].productModCode === 'ANLYS00001') {
-          hideAnalyze = false;
-        }
-      }
-      if ((hideObserve && ($location.path().indexOf('/observe') !== -1)) || (hideAnalyze && ($location.path().indexOf('/analyze') !== -1))) {
-        event.preventDefault();
-        $window.location.assign('./');
-      }
-    } else if ((restrictedPage.indexOf($location.path()) !== -1) && $location.path().indexOf('/login') === -1) {
-      event.preventDefault();
+    /* If no token present, send to login */
+    if (!startsWith(toState, 'login') && !token) {
       $window.location.assign('./login.html');
+      return false; // this technically doesn't matter, since we're changing the location itself, still...
     }
+
+    const modules = map(
+      get(token, 'ticket.products.[0].productModules'),
+      module => toLower(module.productModName)
+    );
+
+    /* See if the state we're going to is in the list of supported modules */
+    const allowed = some(modules, moduleName => startsWith(toState, moduleName));
+
+    if (!allowed) {
+      $log.error(new Error(`Privilege to access ${toState} not present.`));
+    }
+
+    return allowed;
   });
 
-  $rootScope.$on('$stateChangeStart', event => {
-    const restrictedPage = ['/', '/login', '/observe', '/analyze', '/alerts'];
-    const token = JwtService.getTokenObj();
-    if ((restrictedPage.indexOf($location.path()) !== -1) && token) {
-      const product = get(token, 'ticket.products.[0]');
-      let hideObserve = true;
-      let hideAnalyze = true;
-      for (let i = 0; i < product.productModules.length; i++) {
-        if (product.productModules[i].productModCode === 'OBSRV00001') {
-          hideObserve = false;
-        } else if (product.productModules[i].productModCode === 'ANLYS00001') {
-          hideAnalyze = false;
-        }
-      }
-      if ((hideObserve && ($location.path().indexOf('/observe') !== -1)) || (hideAnalyze && ($location.path().indexOf('/analyze') !== -1))) {
-        event.preventDefault();
-        $window.location.assign('./');
-      }
-    } else if ((restrictedPage.indexOf($location.path()) !== -1) && $location.path().indexOf('/login') === -1) {
-      event.preventDefault();
-      $window.location.assign('./login.html');
-    }
-  });
   Idle.watch();
   $rootScope.$on('IdleTimeout', event => {
     event.preventDefault();
