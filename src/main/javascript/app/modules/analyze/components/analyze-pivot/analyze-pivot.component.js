@@ -56,6 +56,12 @@ export const AnalyzePivotComponent = {
         // new analysis
         this._AnalyzeService.createAnalysis(this.model.semanticId, this.model.type)
           .then(analysis => {
+            this.model = assign(this.model, analysis);
+            this.model.repository = {
+              storageType: 'ES',
+              indexName: 'mct_data',
+              type: 'session_type'
+            };
             this.model.id = analysis.id;
             this.prepareFields(analysis.artifacts[0].columns);
             this.toggleSettingsSidenav();
