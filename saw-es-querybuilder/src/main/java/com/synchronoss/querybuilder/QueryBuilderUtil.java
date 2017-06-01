@@ -31,6 +31,10 @@ public class QueryBuilderUtil {
 	
 			}
 		}
+		else 
+		{
+          aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(columnField.getColumnName());
+		}
 		
 		return aggregationBuilder;
 	}
