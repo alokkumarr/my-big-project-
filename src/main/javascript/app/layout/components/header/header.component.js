@@ -24,13 +24,7 @@ export const LayoutHeaderComponent = {
         return;
       }
       const product = get(token, 'ticket.products.[0]');
-      for (let i = 0; i < product.productModules.length; i++) {
-        if (product.productModules[i].productModCode === 'OBSRV00001') {
-          this.hideObserve = false;
-        } else if (product.productModules[i].productModCode === 'ANLYS00001') {
-          this.hideAnalyze = false;
-        }
-      }
+      this.modules = product.productModules;
     }
 
     get showProgress() {
