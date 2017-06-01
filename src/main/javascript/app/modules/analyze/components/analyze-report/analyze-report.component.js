@@ -10,8 +10,10 @@ import keys from 'lodash/keys';
 import forEach from 'lodash/forEach';
 import clone from 'lodash/clone';
 import isEmpty from 'lodash/isEmpty';
+import sortBy from 'lodash/sortBy';
 import filter from 'lodash/filter';
 import assign from 'lodash/assign';
+import uniqBy from 'lodash/uniqBy';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
@@ -39,6 +41,7 @@ export const AnalyzeReportComponent = {
       this._FilterService = FilterService;
       this._reloadTimer = null;
       this._modelLoaded = null;
+      this.showProgress = false;
 
       this._modelPromise = new Promise(resolve => {
         this._modelLoaded = resolve;
@@ -92,10 +95,10 @@ export const AnalyzeReportComponent = {
           metric: analysis.metric,
           metricName: analysis.metricName,
           artifacts: analysis.artifacts,
+          groupByColumns: [],
           sqlBuilder: {
             filters: [],
             joins: [],
-            groupByColumns: [],
             orderByColumns: []
           }
         });
@@ -220,6 +223,7 @@ export const AnalyzeReportComponent = {
       this._unregisterCanvasHandlers = this._unregisterCanvasHandlers.concat([
 
         this.canvas._$eventEmitter.on('changed', () => {
+          this.canvas.model.updateFields();
           this.reloadPreviewGrid(true);
         }),
 
@@ -280,7 +284,10 @@ export const AnalyzeReportComponent = {
         table.setMeta(itemA);
         table.setPosition(itemA.artifactPosition[0], itemA.artifactPosition[1]);
 
-        forEach(itemA.columns, itemB => {
+        /* Show join eligible fields on top for easy access */
+        const sortedForJoin = sortBy(itemA.columns, c => !c.joinEligible);
+
+        forEach(sortedForJoin, itemB => {
           const field = table.addField(itemB.columnName);
 
           field.setMeta(itemB);
@@ -323,7 +330,7 @@ export const AnalyzeReportComponent = {
         });
       });
 
-      forEach(this.model.sqlBuilder.groupByColumns, itemB => {
+      forEach(this.model.groupByColumns, itemB => {
         model.addGroup({
           table: itemB.tableName,
           field: itemB.columnName
@@ -341,8 +348,8 @@ export const AnalyzeReportComponent = {
       const model = this.canvas.model;
       const result = {
         artifacts: [],
+        groupByColumns: [],
         sqlBuilder: {
-          groupByColumns: [],
           orderByColumns: [],
           joins: [],
           filters: []
@@ -418,7 +425,7 @@ export const AnalyzeReportComponent = {
         });
 
         forEach(groups, group => {
-          result.sqlBuilder.groupByColumns.push({
+          result.groupByColumns.push({
             tableName: group.table.name,
             columnName: group.field.name
           });
@@ -440,21 +447,35 @@ export const AnalyzeReportComponent = {
     getColumns(columnNames = []) {
       const fields = fpFlatMap(table => table.fields, this.canvas.model.tables);
 
-      return fpFilter(field => columnNames.indexOf(field.name) >= 0, fields);
+      const columns = uniqBy(
+        fpFilter(field => columnNames.indexOf(field.name) >= 0, fields),
+        column => column.name
+      );
+
+      return map(columns, col => {
+        col.checked = true;
+        return col;
+      });
     }
 
     onSaveQuery(analysis) {
+      this.showProgress = true;
       this._AnalyzeService.getDataBySettings(clone(analysis))
         .then(({analysis, data}) => {
           this.filteredGridData = this.gridData = data;
           this.model.query = analysis.queryManual || analysis.query;
 
           const columnNames = keys(fpGet('[0]', data));
-          this.applyDataToGrid(this.getColumns(columnNames), [], this.filteredGridData);
+          this.columns = this.getColumns(columnNames);
+          this.applyDataToGrid(this.columns, [], [], this.filteredGridData);
+          this.showProgress = false;
+        }, () => {
+          this.showProgress = false;
         });
     }
 
     refreshGridData() {
+      this.showProgress = true;
       this.model = assign(this.model, this.generatePayload());
 
       const sorts = map(this.canvas.model.sorts, sort => {
@@ -464,17 +485,24 @@ export const AnalyzeReportComponent = {
         };
       });
 
+      const groups = map(this.canvas.model.groups, group => (
+        {column: group.field.name, table: group.table.name}
+      ));
+
       this._AnalyzeService.getDataBySettings(clone(this.model))
         .then(({analysis, data}) => {
           this.filteredGridData = this.gridData = data;
           this.model.query = analysis.queryManual || analysis.query;
           this.generateFiltersOnCanvasChange(); // update filters with new data
-          this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
+          this.applyDataToGrid(this.columns, sorts, groups, this.filteredGridData);
           this.analysisChanged = false;
+          this.showProgress = false;
+        }, () => {
+          this.showProgress = false;
         });
     }
 
-    applyDataToGrid(columns, sorts, data) {
+    applyDataToGrid(columns, sorts, groups, data) {
       this.showFiltersButtonIfDataIsReady();
       const grid = first(this._$componentHandler.get('ard-grid-container'));
 
@@ -482,6 +510,7 @@ export const AnalyzeReportComponent = {
         grid.updateColumns(columns);
         grid.updateSorts(sorts);
         grid.updateSource(data);
+        forEach(groups, group => grid.groupByColumn(group.column, false));
         this._$timeout(() => {
           // Delay refreshing the grid a bit to counter
           // aria errors from dev extreme
@@ -504,15 +533,22 @@ export const AnalyzeReportComponent = {
             };
           });
 
+          const groups = map(this.canvas.model.groups, group => {
+            return {
+              column: group.field.name,
+              table: group.table.name
+            };
+          });
+
           if (!refresh) {
-            this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
+            this.applyDataToGrid(this.columns, sorts, groups, this.filteredGridData);
             return;
           }
 
           if (this.columns.length === 0) {
             this.filteredGridData = this.gridData = [];
             this.generateFiltersOnCanvasChange();
-            this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
+            this.applyDataToGrid(this.columns, sorts, groups, this.filteredGridData);
           } else {
             this.analysisChanged = true;
           }
