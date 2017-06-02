@@ -1,5 +1,7 @@
 package com.sncr.nsso.app.repository;
 
+import java.util.List;
+
 import com.sncr.nsso.common.bean.Analysis;
 import com.sncr.nsso.common.bean.AnalysisSummaryList;
 import com.sncr.nsso.common.bean.ResetValid;
@@ -25,4 +27,5 @@ public interface UserRepository {
 	boolean updateAnalysis(Analysis analysis);
 	boolean deleteAnalysis(Analysis analysis);
 	AnalysisSummaryList getAnalysisByFeatureID (Long featureId);
+	List<User> getUsers(Long customerId);
 }

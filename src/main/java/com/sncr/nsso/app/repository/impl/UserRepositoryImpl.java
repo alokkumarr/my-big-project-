@@ -370,7 +370,7 @@ public class UserRepositoryImpl implements UserRepository {
 			if (user == null) {
 				message = "'User Name' provided is not identified in the system, please re-verify.";
 				return message;
-			} else if (user.getActiveStatusInd() == 0) {
+			} else if (user.getActiveStatusInd().equals("Inactive")) {
 				message = "User is inactive, please contact administrator.";
 				return message;
 			} else if (user.getFirstName() != null && user.getFirstName() != null
@@ -898,7 +898,11 @@ public class UserRepositoryImpl implements UserRepository {
 				firstName = rs.getString("first_name") != null ? rs.getString("first_name").trim()
 						: rs.getString("first_name");
 				user.setFirstName(firstName);
-				user.setActiveStatusInd(rs.getInt("active_status_ind"));
+				if(rs.getInt("ACTIVE_STATUS_ID") == 1){
+					user.setActiveStatusInd("Active");			
+				} else {
+					user.setActiveStatusInd("Inactive");		
+				}
 			}
 			return user;
 		}
@@ -1142,4 +1146,50 @@ public class UserRepositoryImpl implements UserRepository {
 		return true;
 	}
 
+	@Override
+	public ArrayList<User> getUsers(Long customerId) {
+		ArrayList<User> userList = null;
+		String sql = "SELECT U.USER_SYS_ID, U.USER_ID, U.EMAIL, R.ROLE_NAME,  U.CUSTOMER_SYS_ID, U.FIRST_NAME, U.MIDDLE_NAME, U.LAST_NAME,"
+				+ " U.ACTIVE_STATUS_IND FROM USERS U, ROLES R WHERE U.CUSTOMER_SYS_ID = R.CUSTOMER_SYS_ID AND U.CUSTOMER_SYS_ID=?";
+		try {
+			userList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setLong(1, customerId);
+				}
+			}, new UserRepositoryImpl.UserDetailExtractor());
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;
+		} catch (Exception e) {
+			logger.error("Exception encountered while get Ticket Details for ticketId : " + e.getMessage(), null, e);
+		}
+
+		return userList;
+	}
+	
+	public class UserDetailExtractor implements ResultSetExtractor<ArrayList<User>> {
+
+		@Override
+		public ArrayList<User> extractData(ResultSet rs) throws SQLException, DataAccessException {
+			User user = null;
+			ArrayList<User> userList = new ArrayList<User>();
+			if (rs.next()) {
+				user = new User();				
+				user.setMasterLoginId(rs.getString("USER_ID"));
+				user.setUserId(rs.getString("USER_SYS_ID"));
+				user.setEmail(rs.getString("EMAIL"));
+				user.setRoleName(rs.getString("ROLE_NAME"));
+				user.setFirstName(rs.getString("FIRST_NAME"));
+				user.setLastName(rs.getString("LAST_NAME"));
+				if(rs.getInt("ACTIVE_STATUS_IND") == 1){
+					user.setActiveStatusInd("Active");			
+				} else {
+					user.setActiveStatusInd("Inactive");		
+				}
+								
+				userList.add(user);
+			}
+			return userList;
+		}
+	}
 }
