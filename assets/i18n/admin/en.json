@@ -1,0 +1,10 @@
+{
+  "USER":"USER",
+  "ADMIN":"Admin",
+  "CUST_NAME": "Customer : {{customer}}",
+  "USERS_MGMT_LIST":"User Management",
+  
+  "TOOLTIP_ADD_USER":"Add User",  
+  "TOOLTIP_EDIT_USER":"Edit User",
+  "TOOLTIP_DELETE_USER":"Delete User"
+}
