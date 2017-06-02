@@ -24,13 +24,8 @@ export const LayoutHeaderComponent = {
       const base64Url = token.split('.')[1];
       const base64 = base64Url.replace('-', '+').replace('_', '/');
       const resp = angular.fromJson(this._$window.atob(base64));
-
-      for (let i = 0; i < resp.ticket.productModules.length; i++) {
-        if (resp.ticket.productModules[i].productModCode === 'OBSRV00001') {
-          this.hideObserve = false;
-        } else if (resp.ticket.productModules[i].productModCode === 'ANLYS00001') {
-          this.hideAnalyze = false;
-        }
+      if (resp.ticket.roleType === 'ADMIN') {
+        this.showAdmin = true;
       }
     }
 
@@ -43,9 +38,11 @@ export const LayoutHeaderComponent = {
         this._$window.location.assign('./login.html');
       });
     }
-
     changePwd() {
       this._$window.location.assign('./login.html#!/changePwd');
+    }
+    admin() {
+      this._$state.go('admin');
     }
   }
 };

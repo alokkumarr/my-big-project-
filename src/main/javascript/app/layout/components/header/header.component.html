@@ -44,6 +44,9 @@
               <md-menu-item>
                 <md-button ng-click="$ctrl.changePwd()" translate="CHANGE_PASSWORD"></md-button>
               </md-menu-item>
+              <md-menu-item ng-if="$ctrl.showAdmin">
+                <md-button ng-click="$ctrl.admin()" translate="ADMIN"></md-button>
+              </md-menu-item>
               <md-menu-divider></md-menu-divider>
               <md-menu-item>
                 <md-button ng-click="$ctrl.logout()" translate="LOG_OUT"></md-button>
