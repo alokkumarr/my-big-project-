@@ -1,4 +1,6 @@
 import java.net.InetAddress
+import scala.concurrent.Future
+import scala.concurrent.duration._
 
 import akka.util.Timeout
 import org.json4s._
@@ -6,9 +8,9 @@ import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.scalatestplus.play._
 import org.slf4j.{Logger, LoggerFactory}
+import play.api.mvc.Result
 import play.api.test._
 import play.api.test.Helpers._
-import scala.concurrent.duration._
 
 class MaprTest extends PlaySpec with OneAppPerSuite with DefaultAwaitTimeout {
   /* Add MapR classpath to test runner */
@@ -55,21 +57,29 @@ class MaprTest extends PlaySpec with OneAppPerSuite with DefaultAwaitTimeout {
   }
 
   def sendRequest(body: JValue) = {
-    val headers = FakeHeaders(Seq("Content-type" -> "application/json"))
-    sendFullRequest(POST, "/analysis", headers, pretty(render(body)))
+    sendPostRequest(body)
   }
 
-  def sendFullRequest(method: String, uri: String,
-    headers: FakeHeaders = FakeHeaders(), body: String = "") = {
-    log.trace("Request: {} {}", method, uri: Any)
-    if (body.length > 0) {
-      log.trace("Body: {}", shortMessage(body))
-    }
-    val Some(response) = route(
-      FakeApplication(), FakeRequest(method, uri, headers, body))
+  def sendGetRequest(uri: String) = {
+    val request = FakeRequest(GET, uri)
+    log.trace("Request: {} {}", request.method, request.uri: Any)
+    handleResponse(route(FakeApplication(), request))
+  }
+
+  def sendPostRequest(body: JValue) = {
+    val headers = FakeHeaders(Seq("Content-type" -> "application/json"))
+    val bodyString = pretty(render(body))
+    log.trace("Request body: {}", shortMessage(bodyString))
+    val request = FakeRequest(POST, "/analysis", headers, bodyString)
+    log.trace("Request: {} {}", request.method, request.uri: Any)
+    handleResponse(route(FakeApplication(), request))
+  }
+
+  def handleResponse(responseOption: Option[Future[Result]]) = {
+    val Some(response) = responseOption
     val responseString = contentAsString(response)
     val responseLog = pretty(render(parse(responseString)))
-    log.trace("Response: " + shortMessage(responseLog))
+    log.trace("Response body: " + shortMessage(responseLog))
     withClue("Response: " + responseString) {
       status(response) mustBe OK
     }
