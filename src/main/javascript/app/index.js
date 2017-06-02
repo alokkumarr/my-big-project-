@@ -35,6 +35,7 @@ import {CommonModule} from './modules/common';
 import {ObserveModule} from './modules/observe';
 import {AnalyzeModule} from './modules/analyze';
 import {AlertsModule} from './modules/alerts';
+import {AdminModule} from './modules/admin';
 
 import {LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent} from './layout';
 
@@ -58,7 +59,8 @@ angular
     CommonModule,
     ObserveModule,
     AnalyzeModule,
-    AlertsModule
+    AlertsModule,
+    AdminModule
   ])
   .config(routesConfig)
   .config(themeConfig)

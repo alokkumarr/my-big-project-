@@ -82,29 +82,38 @@ export const AnalyzeReportComponent = {
         this.model.id = null;
       }
 
-      if (this.model.query) {
+      if (this.model.edit) {
         // give designer mode chance to load, then switch to query mode
         this._$timeout(() => {
           this.setSqlMode(this.QUERY_MODE);
         }, 100);
       }
 
-      this._AnalyzeService.createAnalysis(this.model.semanticId, this.model.type).then(analysis => {
-        this.model = defaultsDeep(this.model, {
-          id: analysis.id,
-          metric: analysis.metric,
-          metricName: analysis.metricName,
-          artifacts: analysis.artifacts,
-          sqlBuilder: {
-            filters: [],
-            joins: [],
-            groupByColumns: [],
-            orderByColumns: []
-          }
-        });
-
+      if (this.mode === 'edit') {
         this._modelLoaded(true);
-      });
+      } else {
+        this._AnalyzeService.createAnalysis(this.model.semanticId, 'report').then(analysis => {
+          this.model = defaultsDeep(this.model, {
+            id: analysis.id,
+            metric: analysis.metric,
+            metricName: analysis.metricName
+          });
+
+          if (this.mode !== 'fork') {
+            this.model = defaultsDeep(this.model, {
+              artifacts: analysis.artifacts,
+              groupByColumns: [],
+              sqlBuilder: {
+                filters: [],
+                joins: [],
+                orderByColumns: []
+              }
+            });
+          }
+
+          this._modelLoaded(true);
+        });
+      }
 
       this.unregister = this._$componentHandler.on('$onInstanceAdded', e => {
         if (e.key === 'ard-canvas') {
@@ -223,6 +232,7 @@ export const AnalyzeReportComponent = {
       this._unregisterCanvasHandlers = this._unregisterCanvasHandlers.concat([
 
         this.canvas._$eventEmitter.on('changed', () => {
+          this.canvas.model.updateFields();
           this.reloadPreviewGrid(true);
         }),
 
@@ -329,7 +339,7 @@ export const AnalyzeReportComponent = {
         });
       });
 
-      forEach(this.model.sqlBuilder.groupByColumns, itemB => {
+      forEach(this.model.groupByColumns, itemB => {
         model.addGroup({
           table: itemB.tableName,
           field: itemB.columnName
@@ -347,8 +357,8 @@ export const AnalyzeReportComponent = {
       const model = this.canvas.model;
       const result = {
         artifacts: [],
+        groupByColumns: [],
         sqlBuilder: {
-          groupByColumns: [],
           orderByColumns: [],
           joins: [],
           filters: []
@@ -424,7 +434,7 @@ export const AnalyzeReportComponent = {
         });
 
         forEach(groups, group => {
-          result.sqlBuilder.groupByColumns.push({
+          result.groupByColumns.push({
             tableName: group.table.name,
             columnName: group.field.name
           });
@@ -466,7 +476,7 @@ export const AnalyzeReportComponent = {
 
           const columnNames = keys(fpGet('[0]', data));
           this.columns = this.getColumns(columnNames);
-          this.applyDataToGrid(this.columns, [], this.filteredGridData);
+          this.applyDataToGrid(this.columns, [], [], this.filteredGridData);
           this.showProgress = false;
         }, () => {
           this.showProgress = false;
@@ -484,12 +494,16 @@ export const AnalyzeReportComponent = {
         };
       });
 
+      const groups = map(this.canvas.model.groups, group => (
+        {column: group.field.name, table: group.table.name}
+      ));
+
       this._AnalyzeService.getDataBySettings(clone(this.model))
         .then(({analysis, data}) => {
           this.filteredGridData = this.gridData = data;
           this.model.query = analysis.queryManual || analysis.query;
           this.generateFiltersOnCanvasChange(); // update filters with new data
-          this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
+          this.applyDataToGrid(this.columns, sorts, groups, this.filteredGridData);
           this.analysisChanged = false;
           this.showProgress = false;
         }, () => {
@@ -497,7 +511,7 @@ export const AnalyzeReportComponent = {
         });
     }
 
-    applyDataToGrid(columns, sorts, data) {
+    applyDataToGrid(columns, sorts, groups, data) {
       this.showFiltersButtonIfDataIsReady();
       const grid = first(this._$componentHandler.get('ard-grid-container'));
 
@@ -505,6 +519,7 @@ export const AnalyzeReportComponent = {
         grid.updateColumns(columns);
         grid.updateSorts(sorts);
         grid.updateSource(data);
+        forEach(groups, group => grid.groupByColumn(group.column, false));
         this._$timeout(() => {
           // Delay refreshing the grid a bit to counter
           // aria errors from dev extreme
@@ -527,15 +542,22 @@ export const AnalyzeReportComponent = {
             };
           });
 
+          const groups = map(this.canvas.model.groups, group => {
+            return {
+              column: group.field.name,
+              table: group.table.name
+            };
+          });
+
           if (!refresh) {
-            this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
+            this.applyDataToGrid(this.columns, sorts, groups, this.filteredGridData);
             return;
           }
 
           if (this.columns.length === 0) {
             this.filteredGridData = this.gridData = [];
             this.generateFiltersOnCanvasChange();
-            this.applyDataToGrid(this.columns, sorts, this.filteredGridData);
+            this.applyDataToGrid(this.columns, sorts, groups, this.filteredGridData);
           } else {
             this.analysisChanged = true;
           }
@@ -561,11 +583,10 @@ export const AnalyzeReportComponent = {
     setSqlMode(mode) {
       if (this.states.sqlMode !== mode) {
         this.states.sqlMode = mode;
-
-        if (mode === this.QUERY_MODE) {
-          this.generateQuery();
-        }
       }
+
+      this.model.query = this.model.query || this.model.queryManual;
+
     }
 
     hasSelectedColumns() {
@@ -688,7 +709,7 @@ export const AnalyzeReportComponent = {
               this.model.id = data.id;
               this.model.name = data.name;
               this.model.description = data.description;
-              this.model.category = data.category;
+              this.model.categoryId = data.categoryId;
             };
           },
           autoWrap: false,

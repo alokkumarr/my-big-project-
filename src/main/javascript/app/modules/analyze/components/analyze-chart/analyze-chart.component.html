@@ -24,6 +24,7 @@
         </md-button>
       </div>
     </div>
+    <md-progress-linear ng-show="$ctrl.showProgress" md-mode="indeterminate"></md-progress-linear>
   </analyze-dialog-header>
 
   <analyze-dialog-content>
@@ -41,6 +42,10 @@
           </div>
 
           <div class="analyze-view_action-panel" layout="row" layout-align="end center">
+            <md-button ng-click="$ctrl.refreshChartData()"
+                       ng-class="{'btn-primary': $ctrl.analysisChanged}" >
+              <span translate="REFRESH_DATA"></span>
+            </md-button>
             <md-button ng-click="$ctrl.openDescriptionModal($event)">
               <md-icon md-font-icon="icon-description"></md-icon>
               <span translate="DESCRIPTION"></span>

@@ -91,6 +91,13 @@ export class CanvasModel {
     });
   }
 
+  /* Removes sorts and groups for fields that aren't selected anymore. */
+  updateFields() {
+    const fields = this.getSelectedFields();
+    this.sorts = filter(this.sorts, sort => fields.indexOf(sort.field) >= 0);
+    this.groups = filter(this.groups, group => fields.indexOf(group.field) >= 0);
+  }
+
   addSort(sortObj) {
     sortObj.table = this.findTable(sortObj.table);
     sortObj.field = sortObj.table && sortObj.table.findField(sortObj.field);
