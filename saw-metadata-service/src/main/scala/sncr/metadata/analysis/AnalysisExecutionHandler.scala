@@ -240,7 +240,7 @@ class AnalysisExecutionHandler(val nodeId : String) {
     }
 
     val (res, msg) = resultNode.create
-    m_log info s"Analysis result creation: $res ==> $msg"
+    m_log debug s"Analysis result creation: $res ==> $msg"
     if (out != null) {
       out.write(pretty(render(descriptorPrintable)).getBytes())
       out.flush()

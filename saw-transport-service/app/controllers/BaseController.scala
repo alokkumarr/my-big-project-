@@ -31,23 +31,29 @@ class BaseController extends Controller {
   private def handleResponse(process: JValue => JValue): Result = {
     val ctx: Http.Context = Http.Context.current.get
     val header = ctx._requestHeader()
-    log.trace("Request: {} {}", ctx.request,
-      Json.prettyPrint(ctx.request.body.asJson): Any)
-    val body = header.contentType match {
-      case None => throw new ClientException(
-        "Content-type header is missing")
-      case _ => header.contentType.get match {
-        case "application/json" => {
-          val body = ctx.request.body.asJson
-          if (body == null) {
-            throw new ClientException("Request body is empty")
+    log.trace("Request: {} {} {}", ctx.request.method, ctx.request.uri,
+      Json.prettyPrint(ctx.request.body.asJson))
+    val body = ctx.request.method match {
+      case "GET" => JObject()
+      case "POST" =>
+        header.contentType match {
+          case None => throw new ClientException(
+            "Content-type header is missing")
+          case _ => header.contentType.get match {
+            case "application/json" => {
+              val body = ctx.request.body.asJson
+              if (body == null) {
+                throw new ClientException("Request body is empty")
+              }
+              parse(body.toString)
+            }
+            case "text/plain" => ("body", ctx.request.body.asText) : JObject
+            case contentType => throw new ClientException(
+              "Unhandled content type: " + contentType)
           }
-          parse(body.toString)
         }
-        case "text/plain" => ("body", ctx.request.body.asText) : JObject
-        case contentType => throw new ClientException(
-          "Unhandled content type: " + contentType)
-      }
+      case method => throw new ClientException(
+        "Unhandled method: " + method)
     }
     try {
       Results.ok(playJson(process(body)))
