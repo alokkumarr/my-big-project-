@@ -65,7 +65,7 @@ export const AnalyzeNewComponent = {
             type: AnalyseTypes.Report,
             name: 'Untitled Analysis',
             description: '',
-            category: this.subCategory,
+            categoryId: this.subCategory,
             semanticId: metricId,
             metricName: this.selectedMetric.name,
             scheduled: null
@@ -77,7 +77,7 @@ export const AnalyzeNewComponent = {
             type: AnalyseTypes.Pivot,
             name: 'Untitled Analysis',
             description: '',
-            category: this.subCategory,
+            categoryId: this.subCategory,
             semanticId: this.selectedMetric,
             scheduled: null
           };
@@ -94,7 +94,7 @@ export const AnalyzeNewComponent = {
             chartType: type,
             name: 'Untitled Chart',
             description: '',
-            category: this.subCategory,
+            categoryId: this.subCategory,
             semanticId: this.selectedMetric,
             scheduled: null
           };
