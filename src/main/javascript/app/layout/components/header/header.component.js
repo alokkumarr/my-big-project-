@@ -17,7 +17,7 @@ export const LayoutHeaderComponent = {
 
       const token = this._JwtService.getTokenObj();
       const product = get(token, 'ticket.products.[0]');
-      this.modules = product.productModules;      
+      this.modules = product.productModules;
     }
 
     get showProgress() {
@@ -36,10 +36,6 @@ export const LayoutHeaderComponent = {
 
     changePwd() {
       this._$window.location.assign('./login.html#!/changePwd');
-    }
-
-    admin() {
-      this._$state.go('admin');
     }
   }
 };
