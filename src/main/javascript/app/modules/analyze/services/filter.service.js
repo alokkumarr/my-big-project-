@@ -56,6 +56,8 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
     getFilterClearer,
     getFrontEnd2BackEndFilterMapper,
     getBackEnd2FrontEndFilterMapper,
+    frontend2BackendFilter,
+    backend2FrontendFilter,
     mergeCanvasFiltersWithPossibleFilters
   };
 
@@ -133,6 +135,31 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
       }
 
       return backEndFilter;
+    };
+  }
+
+  function frontend2BackendFilter() {
+    return frontendFilter => {
+      const column = frontendFilter.column;
+      return {
+        columnName: column.columnName,
+        tableName: column.table,
+        booleanCriteria: frontendFilter.booleanCriteria,
+        model: frontendFilter.model
+      };
+    };
+  }
+
+  function backend2FrontendFilter(artifacts) {
+    return backendFilter => {
+      const artifact = find(artifacts,
+        ({artifactName}) => artifactName === backendFilter.tableName);
+      const column = find(artifact.columns,
+        ({columnName}) => columnName === backendFilter.columnName);
+      return {
+        column,
+        model: backendFilter.model
+      };
     };
   }
   /* eslint-enable camelcase */

@@ -8,9 +8,9 @@
   <md-chips class="filter-tags" readonly="true"
             ng-model="$ctrl.filters"
             md-removable="true"
-            md-on-remove="$ctrl.onFilterRemoved({chip: $chip, index: $index})">
+            md-on-remove="$ctrl.onFilterRemoved({index: $index})">
     <md-chip-template>
-      <span ng-bind="$chip.label"></span>
+      <span ng-bind="$chip.column.alias || $chip.column.displayName"></span>
     </md-chip-template>
 
     <button class="md-primary" md-chip-remove>

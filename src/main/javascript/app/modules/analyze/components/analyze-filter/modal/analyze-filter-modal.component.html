@@ -3,7 +3,7 @@
     <strong translate="FILTERS"></strong>
   </analyze-dialog-header>
 
-  <analyze-dialog-content style="width: 750px;" layout="column">
+  <analyze-dialog-content style="width: 850px;" layout="column">
     <md-card ng-repeat="artifact in $ctrl.artifacts track by artifact.artifactName">
       <md-card-header>
         <md-card-header-text ng-bind="artifact.artifactName"></md-card-header-text>
@@ -12,7 +12,8 @@
         <analyze-filter-row ng-repeat="filter in $ctrl.filters[artifact.artifactName] track by $index"
                             filter="filter"
                             on-change="$ctrl.onFilterChange(filter, artifact.artifactName, $index)"
-                            artifact="artifact">
+                            artifact="artifact"
+                            analysis-type="{{::$ctrl.analysisType}}">
         </analyze-filter-row>
 
         <md-button class="md-icon-button"
@@ -29,7 +30,7 @@
   <analyze-dialog-footer>
     <div layout="row">
       <md-button class="btn-primary"
-                 ng-click="$ctrl.$dialog.hide($ctrl.filters)"
+                 ng-click="$ctrl.onApplyFilters()"
                  translate="APPLY_FILTERS">
       </md-button>
 

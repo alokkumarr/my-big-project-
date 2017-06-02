@@ -3,8 +3,6 @@ import fpFilter from 'lodash/fp/filter';
 import fpFlatMap from 'lodash/fp/flatMap';
 import fpPipe from 'lodash/fp/pipe';
 import fpGet from 'lodash/fp/get';
-import fpMap from 'lodash/fp/map';
-import fpToPairs from 'lodash/fp/toPairs';
 import first from 'lodash/first';
 import map from 'lodash/map';
 import keys from 'lodash/keys';
@@ -62,7 +60,7 @@ export const AnalyzeReportComponent = {
       this.gridData = [];
       this.filteredGridData = [];
       this.columns = [];
-      this.filters = {};
+      this.filters = [];
       this.filterChips = [];
 
       this._unregisterCanvasHandlers = [];
@@ -144,20 +142,15 @@ export const AnalyzeReportComponent = {
     onApplyFilters(filters) {
       if (filters) {
         this.filters = filters;
-        this.filterChips = fpPipe(
-          fpToPairs,
-          fpFlatMap(pair => pair[1])
-        );
       }
     }
 
     onClearAllFilters() {
-      this.filters = {};
+      this.filters = [];
     }
 
-    onFilterRemoved(filter, index) {
-      console.log(index);
-      filter.model = null;
+    onFilterRemoved(index) {
+      this.filters.splice(index, 1);
     }
     // END filters section
 
@@ -298,7 +291,7 @@ export const AnalyzeReportComponent = {
       });
 
       forEach(this.model.sqlBuilder.filters, backEndFilter => {
-        model.addFilter(this._FilterService.getBackEnd2FrontEndFilterMapper()(backEndFilter));
+        model.addFilter(this._FilterService.backend2FrontendFilter(this.model.artifacts)(backEndFilter));
       });
       /* eslint-enable camelcase */
     }
@@ -390,16 +383,9 @@ export const AnalyzeReportComponent = {
             columnName: group.field.name
           });
         });
-
-        result.sqlBuilder.filters = result.sqlBuilder.filters.concat(fpMap(
-          this._FilterService.getFrontEnd2BackEndFilterMapper(),
-          fpFilter(
-            artifactFilter => artifactFilter.tableName === tableArtifact.artifactName,
-            this.filters.selected
-          )
-        ));
       });
       /* eslint-enable camelcase */
+      result.sqlBuilder.filters = map(this.filters, this._FilterService.frontend2BackendFilter());
 
       return result;
     }
@@ -553,7 +539,7 @@ export const AnalyzeReportComponent = {
         fullscreen: true,
         autoWrap: false,
         multiple: true
-      }).then(this.onApplyFilters);
+      }).then(this.onApplyFilters.bind(this));
     }
 
     openPreviewModal(ev) {
@@ -652,6 +638,7 @@ export const AnalyzeReportComponent = {
       }
 
       this.model = assign(this.model, this.generatePayload());
+      console.log('model: ', this.model);
       const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
       this._$mdDialog

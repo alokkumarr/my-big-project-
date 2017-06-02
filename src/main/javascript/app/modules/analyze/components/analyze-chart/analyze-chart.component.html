@@ -31,7 +31,6 @@
         settings="$ctrl.settings"
         on-change="$ctrl.onSettingsChanged(settings)"
     ></analyze-chart-settings>
-    <analyze-filter-sidenav></analyze-filter-sidenav>
     <div layout="column">
       <md-toolbar class="secondary-toolbar chart-options-toolbar">
         <div class="md-toolbar-tools"
@@ -49,7 +48,7 @@
               <md-icon md-font-icon="icon-full-screen"></md-icon>
               <span translate="PREVIEW"></span>
             </md-button>
-            <md-button ng-click="$ctrl.openFilterSidenav()">
+            <md-button ng-click="$ctrl.openFiltersModal()">
               <md-icon md-font-icon="icon-filter"></md-icon>
               <span translate="FILTER"></span>
             </md-button>
@@ -60,9 +59,9 @@
       <chart updater="$ctrl.updateChart" options="$ctrl.chartOptions"></chart>
       <md-card class="chart-container-card">
         <md-card-content layout="column">
-          <filter-chips filters="$ctrl.filters.selected"
+          <filter-chips filters="$ctrl.filters"
                         on-clear-all-filters="$ctrl.onClearAllFilters()"
-                        on-filter-removed="$ctrl.onFilterRemoved(chip)">
+                        on-filter-removed="$ctrl.onFilterRemoved(index)">
           </filter-chips>
           <h3 translate="CUSTOM_AXIS_LABELS"></h3>
           <div layout="row" layout-align="center">
