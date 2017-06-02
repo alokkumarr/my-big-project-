@@ -18,6 +18,11 @@ export const LayoutHeaderComponent = {
       const token = this._JwtService.getTokenObj();
       const product = get(token, 'ticket.products.[0]');
       this.modules = product.productModules;
+	  
+	  const roleType = get(token, 'ticket.roleType');
+      if (roleType === 'ADMIN') {
+        this.showAdmin = true;
+      }
     }
 
     get showProgress() {
