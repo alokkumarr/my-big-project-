@@ -41,6 +41,7 @@ import com.sncr.nsso.common.bean.ResetPwdDtls;
 import com.sncr.nsso.common.bean.ResetValid;
 import com.sncr.nsso.common.bean.Ticket;
 import com.sncr.nsso.common.bean.User;
+import com.sncr.nsso.common.bean.UsersList;
 import com.sncr.nsso.common.bean.Valid;
 import com.sncr.nsso.common.util.TicketHelper;
 
@@ -559,6 +560,34 @@ public class SecurityController {
 	@RequestMapping(value = "/auth/analysis/fetch/{featureId}", method = RequestMethod.GET)
 	public AnalysisSummaryList getAnalysisByFeatureID(@PathVariable("featureId")Long featureId) {				
 		return userRepository.getAnalysisByFeatureID(featureId);		          
+	}
+	
+	/**
+	 * 
+	 * @param customerId
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/users/fetch", method = RequestMethod.POST)
+	public UsersList getUsers(@RequestBody Long customerId) {
+		UsersList userList = null;
+		try {
+			if (customerId != null) {
+				userList = new UsersList();
+				userList.setUsers(userRepository.getUsers(customerId));
+				userList.setValid(true);
+			} 
+		} catch (DataAccessException de) {			
+			userList.setValid(false);
+			userList.setValidityMessage("Database error. Please contact server Administrator.");
+			userList.setError(de.getMessage());		
+			return userList;
+		} catch (Exception e) {			
+			userList.setValid(false);
+			userList.setValidityMessage("Error. Please contact server Administrator.");
+			userList.setError(e.getMessage());			
+			return userList;
+		}
+		return userList;
 	}
 	/**
 	 * 

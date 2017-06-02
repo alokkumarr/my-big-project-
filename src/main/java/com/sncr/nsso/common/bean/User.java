@@ -22,49 +22,67 @@ public class User implements Serializable {
 	public User() {
 	}
 
-	/**
-	 * login id of the user
-	 */
+	private String userId;
 	private String loginId;
-	/**
-	 * master login id of the user.
-	 */
-	private String masterLoginId;
-	
-	private Integer activeStatusInd;
-	private String firstName;
-	
-	private String productName;
-	
-	private TicketDetails ticketDetails;
-	
-	/**
-	 * Full name of the user.
-	 */
+	private String masterLoginId;	
+	private String activeStatusInd;
+	private String firstName;	
+	private String lastName;
+	private String middleName;
+	private String productName;	
+	private TicketDetails ticketDetails = null;
 	private String userName;
-	/**
-	 * User role name
-	 * 
-	 * @return
-	 */
-	private String roleName;
-	
-	private String userType;;
-	
-	
+	private String roleName;	
+	private String userType;
+	private String email;
+	private String status;	
 	private Long validMins;
-	/**
-	 * @return the userType
-	 */
+	
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getMiddleName() {
+		return middleName;
+	}
+
+	public void setMiddleName(String middleName) {
+		this.middleName = middleName;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
 	public String getUserType() {
 		return userType;
 	}
 
-
-
-	/**
-	 * @param userType the userType to set
-	 */
 	public void setUserType(String userType) {
 		this.userType = userType;
 	}
@@ -148,7 +166,7 @@ public class User implements Serializable {
 	/**
 	 * @return the activeStatusInd
 	 */
-	public Integer getActiveStatusInd() {
+	public String getActiveStatusInd() {
 		return activeStatusInd;
 	}
 
@@ -157,7 +175,7 @@ public class User implements Serializable {
 	/**
 	 * @param activeStatusInd the activeStatusInd to set
 	 */
-	public void setActiveStatusInd(Integer activeStatusInd) {
+	public void setActiveStatusInd(String activeStatusInd) {
 		this.activeStatusInd = activeStatusInd;
 	}
 
