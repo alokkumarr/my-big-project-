@@ -162,15 +162,6 @@ export function PivotService(FilterService) {
     });
   }
 
-  function putSelectedFilterModelsIntoFilters(filters, selectedFilters) {
-    forEach(filters, filter => {
-      const targetFilter = find(selectedFilters, ({name}) => name === filter.name);
-      if (targetFilter && FilterService.isFilterModelNonEmpty(targetFilter.model)) {
-        filter.model = targetFilter.model;
-      }
-    });
-  }
-
   function mapFieldsToFilters(data, fields) {
     const groupedFields = getGroupedFields(fields);
     return fpPipe(

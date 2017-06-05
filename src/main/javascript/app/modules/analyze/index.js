@@ -37,9 +37,6 @@ import {ReportGridDisplayContainerComponent} from './components/analyze-report-g
 import {ReportGridComponent} from './components/analyze-report-grid/report-grid/report-grid.component';
 import {ReportGridNodeComponent} from './components/analyze-report-grid/report-grid-node/report-grid-node.component';
 import {ReportGridContainerComponent} from './components/analyze-report-grid/report-grid-container/report-grid-container.component';
-import {AnalyzeFilterContainerComponent} from './components/analyze-filter/analyze-filter-container.component';
-import {AnalyzeFilterGroupComponent} from './components/analyze-filter/analyze-filter-group.component';
-import {AnalyzeFilterSidenavComponent} from './components/analyze-filter/analyze-filter-sidenav.component';
 import {StringFilterComponent} from './components/analyze-filter/filters/string-filter.component';
 import {NumberFilterComponent} from './components/analyze-filter/filters/number-filter.component';
 import {DateFilterComponent} from './components/analyze-filter/filters/date-filter.component';
@@ -89,15 +86,12 @@ angular.module(AnalyzeModule, [])
   .component('analyzeReportQuery', AnalyzeReportQueryComponent)
   .component('analyzeDialog', AnalyzeDialogComponent)
   .component('analyzeReportSort', AnalyzeReportSortComponent)
-  .component('analyzeFilterContainer', AnalyzeFilterContainerComponent)
-  .component('analyzeFilterGroup', AnalyzeFilterGroupComponent)
   .component('stringFilter', StringFilterComponent)
   .component('numberFilter', NumberFilterComponent)
   .component('dateFilter', DateFilterComponent)
   .component('filterChips', FilterChipsComponent)
   .component('analyzeFilterRow', AnalyzeFilterRowComponent)
   .component('analyzeFilterModal', AnalyzeFilterModalComponent)
-  .component('analyzeFilterSidenav', AnalyzeFilterSidenavComponent)
   .component('analyzeReportDescription', AnalyzeReportDescriptionComponent)
   .component('analyzeReportPreview', AnalyzeReportPreviewComponent)
   .component('analyzePublishDialog', AnalyzePublishDialogComponent)
