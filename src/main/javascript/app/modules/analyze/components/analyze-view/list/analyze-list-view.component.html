@@ -10,8 +10,9 @@
   <md-card-content layout="row">
     <div dx-data-grid="$ctrl.gridConfig" dx-item-alias="report">
         <div data-options="dxTemplate: { name: 'nameCellTemplate' }" >
-          <span class="clickable" ng-bind-html="::report.value | highlight:$ctrl.searchTerm"
-                  ng-click="$ctrl.goToLastPublishedAnalysis(report.data.id)"></span>
+          <span class="clickable"
+                ng-bind-html="::report.value | highlight:$ctrl.searchTerm"
+                ui-sref="analyze.publishedDetail({analysisId: report.data.id, analysis: report.data})"></span>
 
           <md-chip class="tag-chip status-chip"
                    translate="STATUS_EXECUTING"
