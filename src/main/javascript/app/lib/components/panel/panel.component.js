@@ -15,7 +15,7 @@ export const PanelComponent = {
     }
 
     $onInit() {
-      this.isCollapsed = Boolean(this.startCollapsed);
+      this.isCollapsed = this.startCollapsed === 'true';
     }
 
     toggle() {

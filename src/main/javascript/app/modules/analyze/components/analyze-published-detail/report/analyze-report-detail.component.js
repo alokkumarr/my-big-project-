@@ -25,13 +25,13 @@ export const AnalyzeReportDetailComponent = {
       this._FilterService.onApplyFilters(filters => this.onApplyFilters(filters));
       this._FilterService.onClearAllFilters(() => this.onClearAllFilters());
 
-      this.filters.possible = map(this.analysis.report.filters, this._FilterService.getBackEnd2FrontEndFilterMapper());
+      this.filters.possible = map(this.analysis.sqlBuilder.filters, this._FilterService.getBackEnd2FrontEndFilterMapper());
       this.filters.selected = this._FilterService.getSelectedFilterMapper()(this.filters.possible);
       forEach(this.filters.possible, filter => {
-        const items = uniq(map(this.analysis.report.data, datum => datum[filter.name]));
+        const items = uniq(map(this.analysis.data || [], datum => datum[filter.name]));
         filter.items = items;
       });
-      this.filteredGridData = this._FilterService.getGridDataFilter(this.filters.possible)(this.analysis.report.data);
+      this.filteredGridData = this._FilterService.getGridDataFilter(this.filters.possible)(this.analysis.data || []);
 
       this.openFilterSidenav();
     }

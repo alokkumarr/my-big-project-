@@ -22,6 +22,10 @@ export const AnalyzeCardComponent = {
       $mdMenu.open(ev);
     }
 
+    showExecutingFlag() {
+      return this._AnalyzeService.isExecuting(this.model.id);
+    }
+
     openPublishModal(ev) {
       const tpl = '<analyze-publish-dialog model="$ctrl.model" on-publish="$ctrl.onPublish($data)"></analyze-publish-dialog>';
 
@@ -59,10 +63,10 @@ export const AnalyzeCardComponent = {
       });
     }
 
-    execute(analysisId) {
+    execute() {
       this.onAction({
         type: 'execute',
-        model: analysisId
+        model: this.model
       });
     }
 
