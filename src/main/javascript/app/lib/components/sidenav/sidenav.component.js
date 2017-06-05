@@ -48,7 +48,8 @@ export const SidenavComponent = {
     getMenuHeader() {
       return {
         analyze: 'Analyses',
-        observe: 'Dashboards'
+        observe: 'Dashboards',
+        admin: 'Manage'
       }[this._moduleName.toLowerCase()] || '';
     }
 

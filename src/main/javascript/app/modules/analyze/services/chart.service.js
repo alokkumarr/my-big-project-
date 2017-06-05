@@ -127,16 +127,16 @@ export function ChartService() {
 
   const gridToPie = (x, y, g, grid) => {
     const result = {
-      name: x.display_name,
+      name: x.displayName,
       colorByPoint: true,
       data: []
     };
 
-    const defaultSeriesName = 'Series 1';
+    const defaultSeriesName = x ? x.displayName : 'Series 1';
     const series = reduce(grid, (obj, row) => {
-      const category = row[x.column_name] || defaultSeriesName;
+      const category = row[x.columnName] || defaultSeriesName;
       obj[category] = obj[category] || 0;
-      obj[category] += row[y.column_name];
+      obj[category] += row[y.columnName];
       return obj;
     }, {});
 
@@ -153,8 +153,8 @@ export function ChartService() {
   };
 
   const gridToChart = (x, y, g, grid) => {
-    const defaultSeriesName = 'Series 1';
-    const categories = uniq(grid.map(row => row[x.column_name]));
+    const defaultSeriesName = x ? x.displayName : 'Series 1';
+    const categories = uniq(grid.map(row => row[x.columnName]));
 
     const defaultSeries = () => reduce(categories, (obj, c) => {
       obj[c] = 0;
@@ -162,10 +162,10 @@ export function ChartService() {
     }, {});
 
     const res = reduce(grid, (obj, row) => {
-      const category = row[x.column_name];
-      const series = row[g.column_name] || defaultSeriesName;
+      const category = row[x.columnName];
+      const series = row[g.columnName] || defaultSeriesName;
       obj[series] = obj[series] || defaultSeries();
-      obj[series][category] += row[y.column_name];
+      obj[series][category] += row[y.columnName];
       return obj;
     }, {});
 
@@ -205,11 +205,11 @@ export function ChartService() {
     return changes.concat([
       {
         path: 'xAxis.title.text',
-        data: get(opts, 'labels.x', xaxis.display_name)
+        data: get(opts, 'labels.x', xaxis.displayName) || xaxis.displayName
       },
       {
         path: 'yAxis.title.text',
-        data: get(opts, 'labels.y', yaxis.display_name)
+        data: get(opts, 'labels.y', yaxis.displayName) || yaxis.displayName
       }
     ]);
   };

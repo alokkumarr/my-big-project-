@@ -13,7 +13,7 @@ export const AnalyzeViewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeViewController extends AbstractComponentController {
-    constructor($injector, $compile, AnalyzeService, $state, $mdDialog, $mdToast) {
+    constructor($injector, $compile, AnalyzeService, $state, $mdDialog, $mdToast, $rootScope) {
       'ngInject';
       super($injector);
 
@@ -22,6 +22,7 @@ export const AnalyzeViewComponent = {
       this._$state = $state;
       this._$mdDialog = $mdDialog;
       this._$mdToast = $mdToast;
+      this._$rootScope = $rootScope;
 
       this.LIST_VIEW = 'list';
       this.CARD_VIEW = 'card';
@@ -58,19 +59,23 @@ export const AnalyzeViewComponent = {
         });
     }
 
-    goToAnalysis(analysisId, publishId) {
-      this._$state.go('analyze.publishedDetail', {analysisId, publishId});
+    goToAnalysis(analysis) {
+      this._$state.go('analyze.publishedDetail', {analysisId: analysis.id, analysis});
     }
 
-    goToLastPublishedAnalysis(analysisId) {
-      this._$state.go('analyze.publishedDetailLast', {analysisId});
+    goToLastPublishedAnalysis(analysis) {
+      this.goToAnalysis(analysis);
     }
 
     loadAnalyses() {
+      this._$rootScope.showProgress = true;
       return this._AnalyzeService.getAnalysesFor(this.$state.params.id, {
         filter: this.states.searchTerm
       }).then(analyses => {
         this.analyses = sortBy(analyses, analysis => -parseInt(analysis.id, 10));
+        this._$rootScope.showProgress = false;
+      }).catch(() => {
+        this._$rootScope.showProgress = false;
       });
     }
 
@@ -79,7 +84,9 @@ export const AnalyzeViewComponent = {
     }
 
     openNewAnalysisModal() {
+      this._$rootScope.showProgress = true;
       this._AnalyzeService.getSemanticLayerData().then(metrics => {
+        this._$rootScope.showProgress = false;
         this.showDialog({
           controller: scope => {
             scope.metrics = metrics;
@@ -88,6 +95,8 @@ export const AnalyzeViewComponent = {
           template: '<analyze-new metrics="metrics" sub-category="{{::subCategory}}"></analyze-new>',
           fullscreen: true
         });
+      }).catch(() => {
+        this._$rootScope.showProgress = false;
       });
     }
 
@@ -141,11 +150,9 @@ export const AnalyzeViewComponent = {
       this.goToLastPublishedAnalysis(analysisId);
     }
 
-    execute(analysisId) {
-      this._AnalyzeService.executeAnalysis(analysisId)
-        .then(analysis => {
-          this.goToAnalysis(analysis.analysisId, analysis.publishedAnalysisId);
-        });
+    execute(analysis) {
+      this._AnalyzeService.executeAnalysis(analysis);
+      this.goToAnalysis(analysis);
     }
 
     openDeleteModal(analysis) {

@@ -47,11 +47,11 @@ export const AnalyzeReportSaveComponent = {
     }
 
     setDefaultCategory() {
-      if (!this.model.category) {
+      if (!this.model.categoryId) {
         const defaultCategory = first(this.dataHolder.categories);
 
         if (defaultCategory) {
-          this.model.category = defaultCategory.id;
+          this.model.categoryId = defaultCategory.id;
         }
       }
     }

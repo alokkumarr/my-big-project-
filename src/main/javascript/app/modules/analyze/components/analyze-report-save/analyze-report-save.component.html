@@ -20,7 +20,7 @@
       <div layout="column">
         <label translate="MY_ANALYSIS_CATEGORY"></label>
         <md-select placeholder="Select a Category"
-                   ng-model="::$ctrl.model.category">
+                   ng-model="::$ctrl.model.categoryId">
           <md-option
             ng-repeat="category in $ctrl.dataHolder.categories"
             ng-bind="::category.name"

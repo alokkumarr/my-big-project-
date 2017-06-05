@@ -1,3 +1,5 @@
+import get from 'lodash/get';
+
 class JwtService {
   constructor($window, AppConfig) {
     this._$window = $window;
@@ -18,6 +20,12 @@ class JwtService {
 
   /* Returs the parsed json object from the jwt token */
   getTokenObj() {
+    const token = this.get();
+
+    if (!token) {
+      return null;
+    }
+
     const base64Url = this.get().split('.')[1];
     const base64 = base64Url.replace('-', '+').replace('_', '/');
     return angular.fromJson(this._$window.atob(base64));
@@ -34,6 +42,15 @@ class JwtService {
         }]
       }
     };
+  }
+
+  _isRole(token, role) {
+    const roleType = get(token, 'ticket.roleType');
+    return roleType === role;
+  }
+
+  isAdmin(token) {
+    return this._isRole(token, 'ADMIN');
   }
 }
 

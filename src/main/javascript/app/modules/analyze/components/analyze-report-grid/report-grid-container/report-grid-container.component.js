@@ -148,7 +148,7 @@ export const ReportGridContainerComponent = {
       return Boolean(find(this.grouped.by, column => column.name === columnName));
     }
 
-    groupByColumn(columnName) {
+    groupByColumn(columnName, emit = true) {
       if (!this.isGroupedBy(columnName)) {
         const column = this.getColumnByName(columnName);
 
@@ -158,7 +158,10 @@ export const ReportGridContainerComponent = {
 
           this.updateColumns();
         }
-        this.eventEmitter.emit('groupingChanged', this.grouped.by);
+
+        if (emit) {
+          this.eventEmitter.emit('groupingChanged', this.grouped.by);
+        }
       }
     }
 

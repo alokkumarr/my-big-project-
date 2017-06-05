@@ -1,4 +1,5 @@
 import omit from 'lodash/omit';
+import keys from 'lodash/keys';
 import forEach from 'lodash/forEach';
 import set from 'lodash/set';
 import fpMap from 'lodash/fp/map';
@@ -7,7 +8,7 @@ import filter from 'lodash/filter';
 import find from 'lodash/find';
 import flatMap from 'lodash/flatMap';
 
-export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
+export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toastMessage, $translate) {
   'ngInject';
 
   const MODULE_NAME = 'ANALYZE';
@@ -17,33 +18,45 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
     _menuResolver = resolve;
   });
 
+  /* Maintains a list of analyses being executed.
+     Allows showing of execution badge across pages and possibly block
+     executions until current ones get completed */
+  const _executingAnalyses = {};
+
   return {
-    createAnalysis,
-    getCategories,
-    getCategory,
-    getMethods,
-    getArtifacts,
-    getAnalyses,
-    deleteAnalysis,
-    getLastPublishedAnalysis,
-    getPublishedAnalysesByAnalysisId,
-    getPublishedAnalysisById,
-    executeAnalysis,
-    getAnalysisById,
-    getDataByQuery,
-    getDataBySettings,
-    generateQuery,
-    saveReport,
-    getSemanticLayerData,
     chartBe2Fe,
     chartFe2Be,
-    updateMenu,
+    createAnalysis,
+    deleteAnalysis,
+    executeAnalysis,
+    generateQuery,
+    getAnalyses,
+    getAnalysesFor,
+    getAnalysisById,
+    getArtifacts,
+    getCategories,
+    getCategory,
+    getDataByQuery,
+    getDataBySettings,
+    getLastPublishedAnalysis,
+    getMethods,
     getPivotData,
-    getAnalysesFor
+    getPublishedAnalysesByAnalysisId,
+    getPublishedAnalysisById,
+    getSemanticLayerData,
+    isExecuting,
+    readAnalysis,
+    saveReport,
+    searchAnalyses,
+    updateMenu
   };
 
   function updateMenu(menu) {
     _menuResolver(menu);
+  }
+
+  function isExecuting(analysisId) {
+    return Boolean(_executingAnalyses[analysisId]);
   }
 
   /* getRequestParams will generate the base structure and auto-fill it
@@ -70,19 +83,18 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
     return reqParams;
   }
 
-  function getAnalysesFor(subCategoryId, opts = {}) {
+  function getAnalysesFor(subCategoryId/* , opts = {} */) {
     /* Wait until the menu has been loaded. The menu payload contains the
        analyses list from which we'll load the result for this function. */
-    return _menu.then(menu => {
-      const subCategories = flatMap(menu, category => category.children);
-      const subCategory = find(subCategories, sc => sc.id === subCategoryId);
-      let items = fpGet('data.list', subCategory) || [];
+    return _menu.then(() => {
 
-      if (fpGet('filter', opts)) {
-        items = searchAnalyses(items, opts.filter);
-      }
-
-      return items;
+      const payload = getRequestParams([
+        ['contents.action', 'search'],
+        ['contents.keys.[0].categoryId', subCategoryId]
+      ]);
+      return $http.post(`${url}/analysis`, payload).then(fpGet('data.contents.analyze'));
+    }).then(analyses => {
+      return analyses.slice(0, 10);
     });
   }
 
@@ -111,7 +123,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
   }
 
   function getPublishedAnalysesByAnalysisId(id) {
-    return $http.get(`/api/analyze/publishedAnalyses/${id}`).then(fpGet('data'));
+    return $http.get(`${url}/analysis/${id}/results`).then(fpGet(`data.results`));
   }
 
   function getLastPublishedAnalysis(id) {
@@ -122,15 +134,39 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
     return $http.get(`/api/analyze/publishedAnalysis/${id}`).then(fpGet('data'));
   }
 
-  function executeAnalysis(analysisId) {
-    return $q(resolve => {
-      $timeout(() => {
-        resolve({
-          publishedAnalysisId: 3,
-          analysisId
-        });
-      }, 0);
-    });
+  function readAnalysis(analysisId) {
+    const payload = getRequestParams([
+      ['contents.action', 'read'],
+      ['contents.keys.[0].id', analysisId]
+    ]);
+    return $http.post(`${url}/analysis`, payload).then(fpGet(`data.contents.analyze.[0]`));
+  }
+
+  function executeAnalysis(model) {
+    const deferred = $q.defer();
+    const isOngoingExecution = keys(_executingAnalyses).length > 0;
+
+    if (isOngoingExecution) {
+      $translate('ERROR_ANALYSIS_ALREADY_EXECUTING').then(msg => {
+        toastMessage.error(msg);
+        deferred.reject(msg);
+      });
+
+    } else {
+      $translate('INFO_ANALYSIS_SUBMITTED').then(msg => {
+        toastMessage.info(msg);
+      });
+      _executingAnalyses[model.id] = true;
+      applyAnalysis(model).then(analysis => {
+        delete _executingAnalyses[model.id];
+        deferred.resolve(analysis);
+      }, err => {
+        delete _executingAnalyses[model.id];
+        deferred.reject(err);
+      });
+    }
+
+    return deferred.promise;
   }
 
   function getAnalysisById(id) {
@@ -150,7 +186,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
        analyses list from which we'll load the result for this function. */
     return _menu.then(menu => {
       const subCategories = flatMap(menu, category => category.children);
-      return find(subCategories, sc => sc.id === id);
+      return find(subCategories, sc => sc.id.toString() === id);
     });
   }
 
@@ -219,7 +255,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
   function createAnalysis(metricId, type) {
     const params = getRequestParams([
       ['contents.action', 'create'],
-      ['contents.keys.[0].id', metricId],
+      ['contents.keys.[0].id', metricId || 'c7a32609-2940-4492-afcc-5548b5e5a040'],
       ['contents.keys.[0].analysisType', type]
     ]);
     return $http.post(`${url}/analysis`, params).then(fpGet('data.contents.analyze.[0]'));

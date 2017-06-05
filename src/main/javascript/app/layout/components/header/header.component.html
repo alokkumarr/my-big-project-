@@ -7,20 +7,11 @@
       </div>
 
       <div layout="row" class="lh-links">
-        <span ng-hide="$ctrl.hideObserve" class="link" aria-label="Observe"
-              ui-sref="observe"
+        <span ng-repeat="module in $ctrl.modules"
+              class="link" aria-label="{{::module.productModName}}"
+              ui-sref="{{::module.productModName.toLowerCase()}}"
               ui-sref-active="m-active"
-              translate="OBSERVE">
-        </span>
-        <span ng-hide="$ctrl.hideAnalyze" class="link" aria-label="Analyze"
-              ui-sref="analyze"
-              ui-sref-active="m-active"
-              translate="ANALYZE">
-        </span>
-        <span class="link" aria-label="Alerts"
-              ui-sref="alerts"
-              ui-sref-active="m-active"
-              translate="ALERTS">
+              translate="{{::module.productModName}}">
         </span>
       </div>
 
@@ -44,6 +35,9 @@
               <md-menu-item>
                 <md-button ng-click="$ctrl.changePwd()" translate="CHANGE_PASSWORD"></md-button>
               </md-menu-item>
+              <md-menu-item ng-if="$ctrl.showAdmin">
+                <md-button ui-sref="admin" translate="ADMIN"></md-button>
+              </md-menu-item>
               <md-menu-divider></md-menu-divider>
               <md-menu-item>
                 <md-button ng-click="$ctrl.logout()" translate="LOG_OUT"></md-button>
@@ -60,5 +54,6 @@
         </md-button>
       </div>
     </div>
+    <md-progress-linear ng-show="$ctrl.showProgress" md-mode="indeterminate"></md-progress-linear>
   </md-toolbar>
 </header>
