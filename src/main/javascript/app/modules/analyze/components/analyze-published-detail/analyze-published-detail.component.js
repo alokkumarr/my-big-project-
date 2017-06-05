@@ -41,6 +41,12 @@ export const AnalyzePublishedDetailComponent = {
       return this.analysis && this._AnalyzeService.isExecuting(this.analysis.id);
     }
 
+    executeAnalysis() {
+      if (this.analysis) {
+        this._AnalyzeService.executeAnalysis(this.analysis);
+      }
+    }
+
     exportData() {
       this.requester.next({
         export: true
