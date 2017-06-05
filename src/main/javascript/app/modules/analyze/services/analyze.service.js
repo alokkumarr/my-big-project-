@@ -18,28 +18,29 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
   });
 
   return {
-    createAnalysis,
-    getCategories,
-    getCategory,
-    getMethods,
-    getArtifacts,
-    getAnalyses,
-    deleteAnalysis,
-    getLastPublishedAnalysis,
-    getPublishedAnalysesByAnalysisId,
-    getPublishedAnalysisById,
-    executeAnalysis,
-    getAnalysisById,
-    getDataByQuery,
-    getDataBySettings,
-    generateQuery,
-    saveReport,
-    getSemanticLayerData,
     chartBe2Fe,
     chartFe2Be,
-    updateMenu,
+    createAnalysis,
+    deleteAnalysis,
+    executeAnalysis,
+    generateQuery,
+    getAnalyses,
+    getAnalysesFor,
+    getAnalysisById,
+    getArtifacts,
+    getCategories,
+    getCategory,
+    getDataByQuery,
+    getDataBySettings,
+    getLastPublishedAnalysis,
+    getMethods,
     getPivotData,
-    getAnalysesFor
+    getPublishedAnalysesByAnalysisId,
+    getPublishedAnalysisById,
+    getSemanticLayerData,
+    saveReport,
+    searchAnalyses,
+    updateMenu
   };
 
   function updateMenu(menu) {
@@ -70,19 +71,18 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
     return reqParams;
   }
 
-  function getAnalysesFor(subCategoryId, opts = {}) {
+  function getAnalysesFor(subCategoryId/* , opts = {} */) {
     /* Wait until the menu has been loaded. The menu payload contains the
        analyses list from which we'll load the result for this function. */
-    return _menu.then(menu => {
-      const subCategories = flatMap(menu, category => category.children);
-      const subCategory = find(subCategories, sc => sc.id === subCategoryId);
-      let items = fpGet('data.list', subCategory) || [];
+    return _menu.then(() => {
 
-      if (fpGet('filter', opts)) {
-        items = searchAnalyses(items, opts.filter);
-      }
-
-      return items;
+      const payload = getRequestParams([
+        ['contents.action', 'search'],
+        ['contents.keys.[0].categoryId', subCategoryId]
+      ]);
+      return $http.post(`${url}/analysis`, payload).then(fpGet('data.contents.analyze'));
+    }).then(analyses => {
+      return analyses.slice(0, 10);
     });
   }
 
@@ -150,7 +150,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
        analyses list from which we'll load the result for this function. */
     return _menu.then(menu => {
       const subCategories = flatMap(menu, category => category.children);
-      return find(subCategories, sc => sc.id === id);
+      return find(subCategories, sc => sc.id.toString() === id);
     });
   }
 
@@ -219,7 +219,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
   function createAnalysis(metricId, type) {
     const params = getRequestParams([
       ['contents.action', 'create'],
-      ['contents.keys.[0].id', metricId],
+      ['contents.keys.[0].id', metricId || 'c7a32609-2940-4492-afcc-5548b5e5a040'],
       ['contents.keys.[0].analysisType', type]
     ]);
     return $http.post(`${url}/analysis`, params).then(fpGet('data.contents.analyze.[0]'));

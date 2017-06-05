@@ -1,0 +1,11 @@
+md-progress-linear.#{$theme-cls} {
+  height: 2px;
+
+  .md-bar {
+    background-color: $primary-blue-b2;
+  }
+
+  .md-container {
+    height: 2px;
+  }
+}

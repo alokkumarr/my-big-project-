@@ -29,7 +29,7 @@ const EVENTS = {
   CLEAR_ALL_FILTERS: 'CLEAR_ALL_FILTERS'
 };
 
-const NUMBER_TYPES = ['int', 'integer', 'double', 'long', 'timestamp'];
+export const NUMBER_TYPES = ['int', 'integer', 'double', 'long', 'timestamp'];
 
 export function FilterService($mdSidenav, $eventEmitter, $log) {
   'ngInject';

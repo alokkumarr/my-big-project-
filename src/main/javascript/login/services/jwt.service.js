@@ -18,6 +18,12 @@ class JwtService {
 
   /* Returs the parsed json object from the jwt token */
   getTokenObj() {
+    const token = this.get();
+
+    if (!token) {
+      return null;
+    }
+
     const base64Url = this.get().split('.')[1];
     const base64 = base64Url.replace('-', '+').replace('_', '/');
     return angular.fromJson(this._$window.atob(base64));
