@@ -11,9 +11,10 @@ export const AnalyzeListViewComponent = {
     updater: '<'
   },
   controller: class AnalyzeListViewController {
-    constructor(dxDataGridService) {
+    constructor(dxDataGridService, AnalyzeService) {
       'ngInject';
       this._dxDataGridService = dxDataGridService;
+      this._AnalyzeService = AnalyzeService;
 
       this._gridListInstance = null;
     }
@@ -21,6 +22,10 @@ export const AnalyzeListViewComponent = {
     $onInit() {
       this.gridConfig = this.getGridConfig();
       this.updaterSubscribtion = this.updater.subscribe(update => this.onUpdate(update));
+    }
+
+    showExecutingFlag(analysisId) {
+      return analysisId && this._AnalyzeService.isExecuting(analysisId);
     }
 
     $onDestroy() {
@@ -53,10 +58,10 @@ export const AnalyzeListViewComponent = {
       });
     }
 
-    execute(analysisId) {
+    execute(analysis) {
       this.onAction({
         type: 'execute',
-        model: analysisId
+        model: analysis
       });
     }
 
