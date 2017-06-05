@@ -23,6 +23,7 @@ export const AnalyzePublishedListComponent = {
         caption: 'DATE',
         dataField: 'finished',
         dataType: 'date',
+        sortOrder: 'desc',
         format: 'shortDateShortTime',
         allowSorting: true,
         alignment: 'left',

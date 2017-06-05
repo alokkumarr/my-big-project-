@@ -28,6 +28,7 @@
   "PUBLISHED_ANALYSES": "Published Analyses",
   "PUBLISH_ONCE": "Publish Once",
   "QUERY": "Query",
+  "STATUS_EXECUTING": "EXECUTING",
   "REPORT_NAME": "Analysis name",
   "RIGHT_JOIN": "Right Join",
   "RIGHT_JOIN_DESCRIPTION": "Include <strong>all</strong> rows from `{{rightTable}}` and <strong>only</strong> those records from `{{leftTable}}` where the joined fields are equal.",

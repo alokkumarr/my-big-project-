@@ -7,9 +7,12 @@
           <md-icon md-font-icon="icon-arrow-left"></md-icon>
         </md-button>
 
-        <div style="margin-left: 16px;">
-          <div class="md-headline" ng-bind="$ctrl.analysis.name"></div>
-          <div class="md-subhead" ng-bind="$ctrl.analysis.metrics.join(', ')"></div>
+        <div style="margin-left: 16px;" flex>
+          <div class="md-headline">
+            <span ng-bind="$ctrl.analysis.name"></span>
+            <label ng-if="$ctrl.showExecutingFlag()" translate="STATUS_EXECUTING"></label>
+          </div>
+          <div class="md-subhead" ng-bind="$ctrl.analysis.metrics"></div>
         </div>
       </div>
 

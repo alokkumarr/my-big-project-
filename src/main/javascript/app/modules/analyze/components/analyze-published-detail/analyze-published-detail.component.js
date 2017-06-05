@@ -37,6 +37,10 @@ export const AnalyzePublishedDetailComponent = {
       }
     }
 
+    showExecutingFlag() {
+      return this.analysis && this._AnalyzeService.isExecuting(this.analysis.id);
+    }
+
     exportData() {
       this.requester.next({
         export: true

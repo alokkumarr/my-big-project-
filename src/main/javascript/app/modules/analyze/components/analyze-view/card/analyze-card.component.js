@@ -22,6 +22,10 @@ export const AnalyzeCardComponent = {
       $mdMenu.open(ev);
     }
 
+    showExecutingFlag() {
+      return this._AnalyzeService.isExecuting(this.model.id);
+    }
+
     openPublishModal(ev) {
       const tpl = '<analyze-publish-dialog model="$ctrl.model" on-publish="$ctrl.onPublish($data)"></analyze-publish-dialog>';
 

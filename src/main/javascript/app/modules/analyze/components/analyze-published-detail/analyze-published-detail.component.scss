@@ -1,7 +1,18 @@
+@import "themes/base/colors";
+
 analyze-published-detail {
   width: 100%;
 
   .container {
     width: 100%;
+  }
+
+  label {
+    padding: 0 2px;
+    font-size: 11px;
+    text-transform: uppercase;
+    background-color: $secondary-orange;
+    color: $primary-white;
+    vertical-align: top;
   }
 }

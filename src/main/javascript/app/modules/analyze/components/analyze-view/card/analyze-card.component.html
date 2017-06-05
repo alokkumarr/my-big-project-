@@ -1,6 +1,9 @@
 <md-card class="saw-analyze-card">
   <md-card-header>
     <span flex></span>
+    <md-chip class="tag-chip status-chip"
+             ng-if="$ctrl.showExecutingFlag()"
+             translate="STATUS_EXECUTING"></md-chip>
     <md-chip class="tag-chip"
              ng-bind-html="$ctrl.model.type | uppercase | highlight:$ctrl.highlightTerm"></md-chip>
   </md-card-header>
