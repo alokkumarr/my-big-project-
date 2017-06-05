@@ -1,3 +1,5 @@
+import get from 'lodash/get';
+
 class JwtService {
   constructor($window, AppConfig) {
     this._$window = $window;
@@ -40,6 +42,15 @@ class JwtService {
         }]
       }
     };
+  }
+
+  _isRole(token, role) {
+    const roleType = get(token, 'ticket.roleType');
+    return roleType === role;
+  }
+
+  isAdmin(token) {
+    return this._isRole(token, 'ADMIN');
   }
 }
 
