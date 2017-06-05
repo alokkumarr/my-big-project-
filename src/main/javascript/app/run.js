@@ -27,6 +27,11 @@ export function runConfig($rootScope, $state, $location, $window, JwtService, Id
       return false; // this technically doesn't matter, since we're changing the location itself, still...
     }
 
+    /* Allow admin users to visit admin pages */
+    if (JwtService.isAdmin(token) && startsWith(toState, 'admin')) {
+      return true;
+    }
+
     const modules = map(
       get(token, 'ticket.products.[0].productModules'),
       module => toLower(module.productModName)
