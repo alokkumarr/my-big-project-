@@ -1,14 +1,9 @@
 import map from 'lodash/fp/map';
-import get from 'lodash/fp/get';
-import uniq from 'lodash/uniq';
-import pipe from 'lodash/fp/pipe';
 import reduce from 'lodash/fp/reduce';
 import filter from 'lodash/fp/filter';
 import isEmpty from 'lodash/isEmpty';
 import isNumber from 'lodash/isNumber';
-import set from 'lodash/fp/set';
 import values from 'lodash/values';
-import forEach from 'lodash/forEach';
 import find from 'lodash/find';
 
 import {OPERATORS} from '../components/analyze-filter/filters/number-filter.component';
@@ -20,21 +15,15 @@ export const BOOLEAN_CRITERIA = {
 
 export const DEFAULT_BOOLEAN_CRITERIA = BOOLEAN_CRITERIA.AND;
 
-export function FilterService($mdSidenav, $eventEmitter, $log) {
+export function FilterService() {
   'ngInject';
 
   return {
     getFilterEvaluator,
     getEvaluatedFilterReducer,
-    getSelectedFilterMapper,
     isFilterModelNonEmpty,
-    getCanvasFieldsToFiltersMapper,
-    getChartSetttingsToFiltersMapper,
-    getGridDataFilter,
-    getFilterClearer,
     frontend2BackendFilter,
-    backend2FrontendFilter,
-    mergeCanvasFiltersWithPossibleFilters
+    backend2FrontendFilter
   };
 
   function frontend2BackendFilter() {

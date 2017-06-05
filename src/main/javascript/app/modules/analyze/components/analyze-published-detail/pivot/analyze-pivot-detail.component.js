@@ -1,5 +1,6 @@
 import 'devextreme/ui/pivot_grid';
 import isEmpty from 'lodash/isEmpty';
+import map from 'lodash/map';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import template from './analyze-pivot-detail.component.html';

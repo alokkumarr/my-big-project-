@@ -25,14 +25,13 @@ const FRONT_2_BACK_PIVOT_FIELD_PAIRS = {
 
 const BACK_2_FRONT_PIVOT_FIELD_PAIRS = invert(FRONT_2_BACK_PIVOT_FIELD_PAIRS);
 
-export function PivotService(FilterService) {
+export function PivotService() {
   'ngInject';
 
   return {
     denormalizeData,
     getUniquesFromNormalizedData,
     putSettingsDataInFields,
-    putSelectedFilterModelsIntoFilters,
     mapFieldsToFilters,
     getArea,
     getFrontend2BackendFieldMapper,
