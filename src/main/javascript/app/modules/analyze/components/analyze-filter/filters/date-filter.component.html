@@ -5,10 +5,13 @@
   <md-input-container md-no-float flex-gt-xs>
     <label translate="FROM"></label>
     <md-datepicker
-      ng-model="$ctrl.tempModel.from"
+      required
+      md-max-date="$ctrl.tempModel.lte"
+      ng-model="$ctrl.tempModel.gte"
       ng-change="$ctrl.onModelChange()"
       md-hide-icons="all" md-open-on-focus
       md-placeholder="mm/dd/yyyy"
+
     ></md-datepicker>
   </md-input-container>
   <div style="width: 20px;padding: 0 3px;">
@@ -20,7 +23,9 @@
   <md-input-container md-no-float flex-gt-xs>
     <label translate="TO"></label>
     <md-datepicker
-      ng-model="$ctrl.tempModel.to"
+      required
+      md-min-date="$ctrl.tempModel.gte"
+      ng-model="$ctrl.tempModel.lte"
       ng-change="$ctrl.onModelChange()"
       md-hide-icons="all" md-open-on-focus
       md-placeholder="mm/dd/yyyy"

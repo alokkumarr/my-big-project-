@@ -14,10 +14,10 @@
         </analyze-filter-row>
 
           <md-checkbox class="md-secondary"
-                       ng-disabled="!filter.column.filterEligible"
-                       ng-model="filter.isRuntimeFilter"
-                       ng-change="$ctrl.onRuntimeToggle(filter)">
-            Runtime?
+                      ng-disabled="!filter.column.filterEligible"
+                      ng-model="filter.isRuntimeFilter"
+                      ng-change="$ctrl.onRuntimeToggle(filter)">
+            <span translate="IS_RUNTIME"></span>
           </md-checkbox>
 
           <binary-option ng-if="$ctrl.analysisType === 'report'"
@@ -30,8 +30,8 @@
           </binary-option>
 
         <md-button class="md-icon-button md-secondary"
-                   aria-label="Remove"
-                   ng-click="$ctrl.onRemoveFilter($index, artifact.artifactName)">
+                  aria-label="Remove"
+                  ng-click="$ctrl.onRemoveFilter($index, artifact.artifactName)">
           <md-icon md-font-icon="icon-close"></md-icon>
         </md-button>
 

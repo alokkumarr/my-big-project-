@@ -15,15 +15,18 @@
   "HOW_WOULD_YOU_LIKE_TO_ANALYZE": "How would you like to analyze?",
   "INNER_JOIN": "Inner Join",
   "INNER_JOIN_DESCRIPTION":"Include <strong>only</strong> rows where `{{leftField}}` in the `{{leftTable}}` table equals `{{rightField}}` in the `{{rightTable}}` table.",
+  "IS_RUNTIME":"Runtime?",
   "LEFT_JOIN": "Left Join",
   "LEFT_JOIN_DESCRIPTION": "Include <strong>all</strong> rows from `{{leftTable}}` and <strong>only</strong> those records from `{{rightTable}}` where the joined fields are equal.",
   "LEGEND_OPTIONS": "Legend Options",
   "MY_ANALYSIS_CATEGORY": "My analysis category",
   "NEW_ANALYSIS": "New Analysis",
+  "NO_COLUMNS_FOUND": "No Columns were found",
   "NO_IMPLEMENTED_TEMPLATE_YET": "No implemented template yet!",
   "ORDER_FULFILLMENT": "Order Fulfillment",
   "OTHER_PUBLISHED_ANALYSES": "Other Published Analyses",
   "PIVOT_SETTINGS": "Pivot Settings",
+  "PLEASE_SELECT_AN_ARTIFACT": "Please Select an Artifact",
   "PUBLISH_ANALYSIS": "Publish Analysis",
   "PUBLISHED_ANALYSES": "Published Analyses",
   "PUBLISH_ONCE": "Publish Once",
@@ -41,5 +44,6 @@
   "SAVE_REPORT": "Save Analysis",
   "TOOLTIP_NEW_ANALYSIS": "Create new analysis",
   "TOOLTIP_FORK_ANALYSIS": "Fork Analysis",
-  "TOOLTIP_EXECUTE_ANALYSIS": "Execute Analysis"
+  "TOOLTIP_EXECUTE_ANALYSIS": "Execute Analysis",
+  "ERROR_FILL_IN_REQUIRED_FILTER_MODELS": "Please fill in all models, or mark filter as runtime filter!"
 }

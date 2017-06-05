@@ -9,8 +9,8 @@ export const DateFilterComponent = {
   controller: class DateFilterController {
     $onInit() {
       this.tempModel = this.model || {
-        to: '',
-        from: ''
+        gte: '',
+        lte: ''
       };
     }
 

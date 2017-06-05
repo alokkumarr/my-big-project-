@@ -3,6 +3,8 @@ import isEmpty from 'lodash/isEmpty';
 import toPairs from 'lodash/toPairs';
 import fromPairs from 'lodash/fromPairs';
 import forOwn from 'lodash/forOwn';
+import forEach from 'lodash/forEach';
+import remove from 'lodash/remove';
 import flatten from 'lodash/flatten';
 import fpPipe from 'lodash/fp/pipe';
 import fpMap from 'lodash/fp/map';
@@ -17,7 +19,9 @@ export const AnalyzeFilterModalComponent = {
     artifacts: '<'
   },
   controller: class AnalyzeFlterModalController {
-    constructor() {
+    constructor(toastMessage, $translate) {
+      this._toastMessage = toastMessage;
+      this._$translate = $translate;
       this.BOOLEAN_CRITERIA = BOOLEAN_CRITERIA;
     }
 
@@ -59,9 +63,36 @@ export const AnalyzeFilterModalComponent = {
     }
 
     onApplyFilters() {
-      const flattenedFilters = this.unGroupFilters(this.filters);
+      if (this.areFiltersValid(this.filters)) {
+        this.removeEmptyFilters(this.filters);
+        const flattenedFilters = this.unGroupFilters(this.filters);
+        this.$dialog.hide(flattenedFilters);
+      } else {
+        this._$translate('ERROR_FILL_IN_REQUIRED_FILTER_MODELS').then(message => {
+          this._toastMessage.error(message);
+        });
+      }
+    }
 
-      this.$dialog.hide(flattenedFilters);
+    areFiltersValid(filters) {
+      let isValid = true;
+      forOwn(filters, artifactFilters => {
+        forEach(artifactFilters, filter => {
+          if (filter.column && !filter.model && !filter.isRuntimeFilter) {
+            isValid = false;
+          }
+        });
+      });
+
+      return isValid;
+    }
+
+    removeEmptyFilters(filters) {
+      forOwn(filters, artifactFilters => {
+        remove(artifactFilters, filter => {
+          return !filter.column;
+        });
+      });
     }
 
     onBooleanCriteriaSelected(filter, value) {
