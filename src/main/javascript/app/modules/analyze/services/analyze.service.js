@@ -1,4 +1,5 @@
 import omit from 'lodash/omit';
+import keys from 'lodash/keys';
 import forEach from 'lodash/forEach';
 import set from 'lodash/set';
 import fpMap from 'lodash/fp/map';
@@ -7,7 +8,7 @@ import filter from 'lodash/filter';
 import find from 'lodash/find';
 import flatMap from 'lodash/flatMap';
 
-export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
+export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toastMessage, $translate) {
   'ngInject';
 
   const MODULE_NAME = 'ANALYZE';
@@ -142,15 +143,30 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
   }
 
   function executeAnalysis(model) {
-    _executingAnalyses[model.id] = true;
+    const deferred = $q.defer();
+    const isOngoingExecution = keys(_executingAnalyses).length > 0;
 
-    return applyAnalysis(model).then(analysis => {
-      delete _executingAnalyses[model.id];
-      return analysis;
-    }, err => {
-      delete _executingAnalyses[model.id];
-      throw err;
-    });
+    if (isOngoingExecution) {
+      $translate('ERROR_ANALYSIS_ALREADY_EXECUTING').then(msg => {
+        toastMessage.error(msg);
+        deferred.reject(msg);
+      });
+
+    } else {
+      $translate('INFO_ANALYSIS_SUBMITTED').then(msg => {
+        toastMessage.info(msg);
+      });
+      _executingAnalyses[model.id] = true;
+      applyAnalysis(model).then(analysis => {
+        delete _executingAnalyses[model.id];
+        deferred.resolve(analysis);
+      }, err => {
+        delete _executingAnalyses[model.id];
+        deferred.reject(err);
+      });
+    }
+
+    return deferred.promise;
   }
 
   function getAnalysisById(id) {

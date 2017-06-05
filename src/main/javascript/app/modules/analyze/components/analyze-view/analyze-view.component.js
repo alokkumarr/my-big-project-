@@ -151,10 +151,8 @@ export const AnalyzeViewComponent = {
     }
 
     execute(analysis) {
-      this._AnalyzeService.executeAnalysis(analysis)
-        .then(() => {
-          this.goToAnalysis(analysis);
-        });
+      this._AnalyzeService.executeAnalysis(analysis);
+      this.goToAnalysis(analysis);
     }
 
     openDeleteModal(analysis) {
