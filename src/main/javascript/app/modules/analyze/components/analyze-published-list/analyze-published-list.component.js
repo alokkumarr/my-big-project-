@@ -14,34 +14,25 @@ export const AnalyzePublishedListComponent = {
       this._$state = $state;
       this._$window = $window;
       const columns = [{
-        caption: 'NAME',
-        dataField: 'ANALYSIS_NAME',
+        caption: 'ID',
+        dataField: 'id',
         allowSorting: true,
         alignment: 'left',
         width: '40%'
       }, {
-        caption: 'CREATED BY',
-        dataField: 'CREATED_USER',
-        allowSorting: true,
-        alignment: 'left',
-        width: '30%'
-      }, {
         caption: 'DATE',
-        dataField: 'CREATED_DATE',
+        dataField: 'finished',
         dataType: 'date',
+        format: 'shortDateShortTime',
         allowSorting: true,
         alignment: 'left',
         width: '30%'
       }, {
-        caption: 'IS SCHEDULED',
-        dataField: 'IS_SCHEDULED',
+        caption: 'STATUS',
+        dataField: 'status',
         allowSorting: true,
         alignment: 'left',
         width: '30%'
-      }, {
-        caption: '',
-        width: '30%',
-        cellTemplate: 'actionCellTemplate'
       }];
       this.gridConfig = dxDataGridService.mergeWithDefaultConfig({
         onRowClick: row => {

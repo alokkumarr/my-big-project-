@@ -59,10 +59,10 @@ export const AnalyzeCardComponent = {
       });
     }
 
-    execute(analysisId) {
+    execute() {
       this.onAction({
         type: 'execute',
-        model: analysisId
+        model: this.model
       });
     }
 

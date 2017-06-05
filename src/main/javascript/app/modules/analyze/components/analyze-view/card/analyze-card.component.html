@@ -14,7 +14,7 @@
       <md-card-title-text>
         <a class="md-headline"
               ng-bind-html="$ctrl.model.name | highlight:$ctrl.highlightTerm"
-              ui-sref="analyze.publishedDetailLast({analysisId: $ctrl.model.id})">
+              ui-sref="analyze.publishedDetail({analysisId: $ctrl.model.id, analysis: $ctrl.model})">
         </a>
         <span class="md-subhead">
           <span ng-bind-html="::($ctrl.mkdel.metrics || []).join(', ') | highlight:$ctrl.highlightTerm"></span>
@@ -43,7 +43,7 @@
           <md-menu-content>
             <md-menu-item>
               <md-button aria-label="Execute"
-                         ng-click="$ctrl.execute($ctrl.model.id)"
+                         ng-click="$ctrl.execute()"
                          translate="EXECUTE">
               </md-button>
             </md-menu-item>

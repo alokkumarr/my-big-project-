@@ -59,12 +59,12 @@ export const AnalyzeViewComponent = {
         });
     }
 
-    goToAnalysis(analysisId, publishId) {
-      this._$state.go('analyze.publishedDetail', {analysisId, publishId});
+    goToAnalysis(analysis) {
+      this._$state.go('analyze.publishedDetail', {analysisId: analysis.id, analysis});
     }
 
-    goToLastPublishedAnalysis(analysisId) {
-      this._$state.go('analyze.publishedDetailLast', {analysisId});
+    goToLastPublishedAnalysis(analysis) {
+      this.goToAnalysis(analysis);
     }
 
     loadAnalyses() {
@@ -150,10 +150,10 @@ export const AnalyzeViewComponent = {
       this.goToLastPublishedAnalysis(analysisId);
     }
 
-    execute(analysisId) {
-      this._AnalyzeService.executeAnalysis(analysisId)
-        .then(analysis => {
-          this.goToAnalysis(analysis.analysisId, analysis.publishedAnalysisId);
+    execute(analysis) {
+      this._AnalyzeService.executeAnalysis(analysis)
+        .then(() => {
+          this.goToAnalysis(analysis);
         });
     }
 

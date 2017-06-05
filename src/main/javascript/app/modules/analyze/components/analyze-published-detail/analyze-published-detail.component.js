@@ -23,14 +23,18 @@ export const AnalyzePublishedDetailComponent = {
 
     $onInit() {
       const analysisId = this._$state.params.analysisId;
-      const publishId = this._$state.params.publishId;
-      if (publishId) {
-        this.loadAnalysisById(publishId);
+      const analysis = this._$state.params.analysis;
+      if (analysis) {
+        this.analysis = analysis;
+        if (!this.analysis.schedule) {
+          this.isPublished = false;
+        }
+        this.loadExecutedAnalyses(analysisId);
       } else {
-        // load the last published analysis
-        this.loadLastPublishedAnalysis(analysisId);
+        this.loadAnalysisById(analysisId).then(() => {
+          this.loadExecutedAnalyses(analysisId);
+        });
       }
-      this.loadOtherAnalyses(analysisId);
     }
 
     exportData() {
@@ -39,8 +43,8 @@ export const AnalyzePublishedDetailComponent = {
       });
     }
 
-    loadAnalysisById(publishId) {
-      this._AnalyzeService.getPublishedAnalysisById(publishId)
+    loadAnalysisById(analysisId) {
+      return this._AnalyzeService.readAnalysis(analysisId)
         .then(analysis => {
           this.analysis = analysis;
           if (!this.analysis.schedule) {
@@ -56,7 +60,7 @@ export const AnalyzePublishedDetailComponent = {
         });
     }
 
-    loadOtherAnalyses(analysisId) {
+    loadExecutedAnalyses(analysisId) {
       this._AnalyzeService.getPublishedAnalysesByAnalysisId(analysisId)
         .then(analyses => {
           this.analyses = analyses;

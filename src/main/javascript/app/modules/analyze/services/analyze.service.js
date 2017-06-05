@@ -17,6 +17,11 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
     _menuResolver = resolve;
   });
 
+  /* Maintains a list of analyses being executed.
+     Allows showing of execution badge across pages and possibly block
+     executions until current ones get completed */
+  const _executingAnalyses = {};
+
   return {
     chartBe2Fe,
     chartFe2Be,
@@ -38,6 +43,8 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
     getPublishedAnalysesByAnalysisId,
     getPublishedAnalysisById,
     getSemanticLayerData,
+    isExecuting,
+    readAnalysis,
     saveReport,
     searchAnalyses,
     updateMenu
@@ -45,6 +52,10 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
 
   function updateMenu(menu) {
     _menuResolver(menu);
+  }
+
+  function isExecuting(analysisId) {
+    return Boolean(_executingAnalyses[analysisId]);
   }
 
   /* getRequestParams will generate the base structure and auto-fill it
@@ -111,7 +122,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
   }
 
   function getPublishedAnalysesByAnalysisId(id) {
-    return $http.get(`/api/analyze/publishedAnalyses/${id}`).then(fpGet('data'));
+    return $http.get(`${url}/analysis/${id}/results`).then(fpGet(`data.results`));
   }
 
   function getLastPublishedAnalysis(id) {
@@ -122,14 +133,23 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService) {
     return $http.get(`/api/analyze/publishedAnalysis/${id}`).then(fpGet('data'));
   }
 
-  function executeAnalysis(analysisId) {
-    return $q(resolve => {
-      $timeout(() => {
-        resolve({
-          publishedAnalysisId: 3,
-          analysisId
-        });
-      }, 0);
+  function readAnalysis(analysisId) {
+    const payload = getRequestParams([
+      ['contents.action', 'read'],
+      ['contents.keys.[0].id', analysisId]
+    ]);
+    return $http.post(`${url}/analysis`, payload).then(fpGet(`data.contents.analyze.[0]`));
+  }
+
+  function executeAnalysis(model) {
+    _executingAnalyses[model.id] = true;
+
+    return applyAnalysis(model).then(analysis => {
+      delete _executingAnalyses[model.id];
+      return analysis;
+    }, err => {
+      delete _executingAnalyses[model.id];
+      throw err;
     });
   }
 
