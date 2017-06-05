@@ -4,27 +4,47 @@
   </analyze-dialog-header>
 
   <analyze-dialog-content style="width: 850px;" layout="column">
-    <md-card ng-repeat="artifact in $ctrl.artifacts track by artifact.artifactName">
-      <md-card-header>
-        <md-card-header-text ng-bind="artifact.artifactName"></md-card-header-text>
-      </md-card-header>
-      <md-card-content>
-        <analyze-filter-row ng-repeat="filter in $ctrl.filters[artifact.artifactName] track by $index"
-                            filter="filter"
+    <md-list ng-repeat="artifact in $ctrl.artifacts track by artifact.artifactName">
+      <md-subheader class="md-no-sticky">{{artifact.artifactName}}</md-subheader>
+      <md-list-item ng-repeat="filter in $ctrl.filters[artifact.artifactName] track by $index"
+                    class="md-no-proxy">
+        <analyze-filter-row filter="filter"
                             on-change="$ctrl.onFilterChange(filter, artifact.artifactName, $index)"
-                            artifact="artifact"
-                            analysis-type="{{::$ctrl.analysisType}}">
+                            artifact="artifact">
         </analyze-filter-row>
 
+          <md-checkbox class="md-secondary"
+                       ng-disabled="!filter.column.filterEligible"
+                       ng-model="filter.isRuntimeFilter"
+                       ng-change="$ctrl.onRuntimeToggle(filter)">
+            Runtime?
+          </md-checkbox>
+
+          <binary-option ng-if="$ctrl.analysisType === 'report'"
+                        left="{{::$ctrl.BOOLEAN_CRITERIA.AND}}"
+                        right="{{::$ctrl.BOOLEAN_CRITERIA.OR}}"
+                        class="md-secondary"
+                        ng-model="filter.booleanCriteria"
+                        style="align-self: baseline; padding: 5px;"
+                        on-change="$ctrl.onBooleanCriteriaSelected(filter, value)">
+          </binary-option>
+
+        <md-button class="md-icon-button md-secondary"
+                   aria-label="Remove"
+                   ng-click="$ctrl.onRemoveFilter($index, artifact.artifactName)">
+          <md-icon md-font-icon="icon-close"></md-icon>
+        </md-button>
+
+      </md-list-item>
+      <md-list-item>
         <md-button class="md-icon-button"
                     aria-label="Add Filter"
                     ng-click="$ctrl.addFilter(artifact.artifactName)">
           <md-icon md-font-icon="icon-plus"></md-icon>
         </md-button>
-
-      </md-card-content>
-    </md-card>
-
+      </md-list-item>
+      <md-divider></md-divider>
+    </md-list>
   </analyze-dialog-content>
 
   <analyze-dialog-footer>

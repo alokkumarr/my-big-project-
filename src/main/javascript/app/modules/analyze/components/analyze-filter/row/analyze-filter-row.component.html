@@ -1,24 +1,10 @@
 <div layout="row" layout-align="space-between stretch">
-
-  <md-checkbox flex="5" ng-disabled="!$ctrl.filter.column.filterEligible"
-               ng-model="$ctrl.filter.column.isRuntimeFilter">
-  </md-checkbox>
-
-  <binary-option flex="15" ng-if="$ctrl.analysisType === 'report'"
-                 left="{{::$ctrl.BOOLEAN_CRITERIA.AND}}"
-                 right="{{::$ctrl.BOOLEAN_CRITERIA.OR}}"
-                 ng-model="$ctrl.filter.booleanCriteria"
-                 style="align-self: baseline; padding: 5px;"
-                 on-change="$ctrl.onBooleanCriteriaSelected(value)">
-  </binary-option>
-
   <md-autocomplete md-items="column in $ctrl.artifact.columns | filter:$ctrl.searchText"
                    placeholder="Select filter"
                    md-search-text="$ctrl.searchText"
                    md-selected-item="$ctrl.filter.column"
                    md-item-text="column.displayName"
                    md-min-length="0"
-                   flex="35"
                    md-selected-item-change="$ctrl.onArtifactChange(column)">
     <md-item-template>
       <span md-highlight-text="$ctrl.searchText" md-highlight-flags="^i" >{{column.displayName}}</span>
@@ -28,7 +14,9 @@
     </md-not-found>
   </md-autocomplete>
 
-  <div flex="{{$ctrl.analysisType === 'report' ? 35 : 50}}" ng-switch on="$ctrl.filter.column.type">
+  <div ng-switch on="$ctrl.filter.column.type"
+        ng-if="!$ctrl.filter.isRuntimeFilter"
+       style="padding-left: 10px;">
 
     <div ng-switch-when="string" style="text-align: center;">
       <string-filter on-change="$ctrl.onFilterChange(model)" model="$ctrl.filter.model">

@@ -638,7 +638,7 @@ export const AnalyzeReportComponent = {
       }
 
       this.model = assign(this.model, this.generatePayload());
-      console.log('model: ', this.model);
+      console.log('filters: ', angular.toJson(this.model.sqlBuilder.filters));
       const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
       this._$mdDialog

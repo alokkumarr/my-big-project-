@@ -3,7 +3,8 @@ import template from './date-filter.component.html';
 export const DateFilterComponent = {
   template,
   bindings: {
-    model: '<'
+    model: '<',
+    onChange: '&'
   },
   controller: class DateFilterController {
     $onInit() {

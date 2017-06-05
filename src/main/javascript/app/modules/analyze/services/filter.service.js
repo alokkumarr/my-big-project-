@@ -141,11 +141,14 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
   function frontend2BackendFilter() {
     return frontendFilter => {
       const column = frontendFilter.column;
+
       return {
-        columnName: column.columnName,
+        type: column.type,
+        model: frontendFilter.model,
         tableName: column.table,
+        columnName: column.columnName,
         booleanCriteria: frontendFilter.booleanCriteria,
-        model: frontendFilter.model
+        isRuntimeFilter: frontendFilter.isRuntimeFilter
       };
     };
   }
@@ -154,11 +157,15 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
     return backendFilter => {
       const artifact = find(artifacts,
         ({artifactName}) => artifactName === backendFilter.tableName);
+
       const column = find(artifact.columns,
         ({columnName}) => columnName === backendFilter.columnName);
+
       return {
         column,
-        model: backendFilter.model
+        model: backendFilter.model,
+        booleanCriteria: backendFilter.booleanCriteria,
+        isRuntimeFilter: backendFilter.isRuntimeFilter
       };
     };
   }
