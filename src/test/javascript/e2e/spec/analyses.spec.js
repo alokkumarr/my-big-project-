@@ -23,11 +23,8 @@ describe('Report Analysis Tests', () => {
     analyze.validateNewAnalyze();
   });
 
-  it('should verify the first metric', () => {
-    analyze.analysisElems.firstMetric.click();
-    expect(analyze.analysisElems.secondMetric.getAttribute('aria-disabled')).toEqual('true');
-    analyze.analysisElems.firstMetric.click();
-    expect(analyze.analysisElems.secondMetric.getAttribute('aria-disabled')).toEqual('false');
+  it('should select the Events metric', () => {
+    analyze.analysisElems.eventsMetric.click();
   });
 
   it('should select Report type and proceed', () => {
@@ -36,12 +33,11 @@ describe('Report Analysis Tests', () => {
     analyze.validateDesignerView();
   });
 
-  it('should display the added fields to report details', () => {
-    analyze.analysisElems.ordersOrderNumber.click();
-    analyze.analysisElems.customersEmail.click();
-    analyze.analysisElems.productsProductTypes.click();
-    analyze.analysisElems.serviceProductStatus.click();
+  it('should add fields and see the results', () => {
+    analyze.analysisElems.sessionIdField.click();
     analyze.analysisElems.toggleDetailsPanel.click();
+    analyze.analysisElems.refreshDataBtn.click();
+    browser.wait(10000);
     analyze.validateReportGrid();
   });
 
