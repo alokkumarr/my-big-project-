@@ -6,7 +6,6 @@ import org.apache.commons.cli.CommandLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
-import sncr.metadata.engine.ProcessingResult;
 import sncr.metadata.engine.ihandlers.RequestHandler;
 
 import java.io.OutputStream;
@@ -30,8 +29,10 @@ public class MetadataCLI {
             RequestHandler requestHandler = new RequestHandler(inData, outStream);
             Tuple2<Integer, String> validation_result = requestHandler.validate();
 
-            if (validation_result._1() != ProcessingResult.Success().id())
-                System.out.println("Result: " + validation_result._2() + " ==> " + validation_result._2());
+            if (validation_result._1() != 0) {
+                System.out.println("Result: " + validation_result._1() + " ==> " + validation_result._2());
+                System.exit(1);
+            }
             else
             {
                 requestHandler.execute();

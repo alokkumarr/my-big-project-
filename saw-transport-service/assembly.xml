@@ -20,6 +20,12 @@
 		  <outputDirectory>lib</outputDirectory>
 		  <fileMode>440</fileMode>
 	  </fileSet>
+	  <fileSet>
+		  <directoryMode>750</directoryMode>
+		  <directory>${project.basedir}/../saw-data-access/target/saw-data-access-${project.version}-package/saw-data-access-${project.version}/lib</directory>
+		  <outputDirectory>lib</outputDirectory>
+		  <fileMode>440</fileMode>
+	  </fileSet>
   </fileSets>
   <dependencySets>
     <dependencySet>

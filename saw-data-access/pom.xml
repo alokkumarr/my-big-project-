@@ -17,8 +17,8 @@
 		<project.basedir>.</project.basedir>
 		<mapr.client>5.2.0.39122-mapr</mapr.client>
 		<maprdb.version>1.1.1-mapr-1602</maprdb.version>
-		<jackson.core.version>2.7.1</jackson.core.version>
 		<mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
+		<spark-version>2.1.0</spark-version>
 	</properties>
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging-slf4j_2.10 -->
@@ -33,11 +33,38 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-sql_2.10</artifactId>
-			<version>1.6.1</version>
+			<groupId>com.synchronoss</groupId>
+			<artifactId>saw-metadata-service</artifactId>
+			<version>${project.version}</version>
 		</dependency>
-    </dependencies>
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-core_${scala.major.version}</artifactId>
+			<version>${spark-version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson.core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-scala_2.11</artifactId>
+			<version>${jackson.core.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-sql_${scala.major.version}</artifactId>
+			<version>${spark-version}</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 	<build>
 		<sourceDirectory>${project.basedir}/src/main</sourceDirectory>
 		<testSourceDirectory>${project.basedir}/src/test</testSourceDirectory>
@@ -75,10 +102,10 @@
 				<recompileMode>incremental</recompileMode>
 			</configuration>
 		</plugin>
-	<!-- Assembly plugin -->
+	<!-- Assembly plugin 1: collect artifacts to DIR fro future RPM -->
 		<plugin>
 			<artifactId>maven-assembly-plugin</artifactId>
-			<version>2.5.5</version>
+			<version>3.0.0</version>
 			<executions>
 				<execution>
 				  <phase>package</phase>
@@ -89,14 +116,53 @@
 			</executions>
 			<configuration>
 				<tarLongFileMode>posix</tarLongFileMode>
-				<outputDirectory>${output.directory}</outputDirectory>
+				<outputDirectory>${project.basedir}/target</outputDirectory>
 				<descriptors>
 				  <descriptor>${project.basedir}/assembly.xml</descriptor>
 				</descriptors>
 			</configuration>
 		</plugin>
-		<!-- Assembly plugin : end -->	
-			
-		</plugins>
+		<!-- Assembly plugin : end -->
+		<!-- Assembly plugin 2: Packs artifact to *.tar.gz account for standalone usage -->
+		<plugin>
+			<artifactId>maven-assembly-plugin</artifactId>
+			<version>3.0.0</version>
+			<executions>
+				<execution>
+					<phase>package</phase>
+					<goals>
+						<goal>single</goal>
+					</goals>
+				</execution>
+			</executions>
+			<configuration>
+				<tarLongFileMode>posix</tarLongFileMode>
+				<outputDirectory>${project.basedir}/target</outputDirectory>
+				<descriptors>
+					<descriptor>${project.basedir}/assembly_standalone.xml</descriptor>
+				</descriptors>
+			</configuration>
+		</plugin>
+		<!-- Assembly plugin 2: end -->
+		<!-- Assembly plugin 3: Build Jar with dependencies -->
+		<plugin>
+			<artifactId>maven-assembly-plugin</artifactId>
+			<version>3.0.0</version>
+			<executions>
+				<execution>
+					<phase>package</phase>
+					<goals>
+						<goal>single</goal>
+					</goals>
+				</execution>
+			</executions>
+			<configuration>
+				<descriptorRefs>
+					<descriptorRef>jar-with-dependencies</descriptorRef>
+				</descriptorRefs>
+			</configuration>
+		</plugin>
+		<!-- Assembly plugin 3: end -->
+	</plugins>
 	</build>
 </project>

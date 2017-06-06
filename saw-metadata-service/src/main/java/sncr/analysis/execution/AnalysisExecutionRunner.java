@@ -22,7 +22,7 @@ public class AnalysisExecutionRunner {
         CommandLineHandler cli = new CommandLineHandler();
         try{
             CommandLine cl  = buildCMD(cli, args);
-            String id = cl.getOptionValue('a');
+            String id = cl.getOptionValue('i');
             OutputStream outStream = HFileOperations.writeToFile(cl.getOptionValue('o'));
             System.out.println("Start data processing:\n input analysis ID: " + cl.getOptionValue('i') + "\nOutput path: " + cl.getOptionValue('o'));
             ExecutionTaskHandler er = new ExecutionTaskHandler(1);

@@ -263,7 +263,7 @@ class DataObject(final private var descriptor : JValue, final private var schema
         if (commit(saveDL_Locations(update)))
           (Success.id, s"The DataObject Schema [ ID = ${Bytes.toString(rowKey)} ] has been updated")
         else
-          (Error.id, "Could not update DataObject datalake elements")
+          (Error.id, "Could not update DataObject sncr.datalake elements")
       }
       else
       {
@@ -295,7 +295,13 @@ object DataObject{
 
   val m_log: Logger = LoggerFactory.getLogger("DataObject")
 
-
+  /**
+    * Use this apply method to produce DataObjectNode from descriptor represented as string
+    * and schema as string.
+    * @param d - descriptor
+    * @param s - DataObject schema
+    * @return - Constructed DataObject node
+    */
 
   def apply(d: String, s: String) :DataObject =
   {
@@ -309,6 +315,11 @@ object DataObject{
     }
   }
 
+  /**
+    * This apply method is to be used to load existing data object
+    * @param rowId - row ID
+    * @return  - constructed and loaded DataObject
+    */
   def apply(rowId: String) :DataObject =
   {
     val dobj = new DataObject

@@ -2,6 +2,7 @@ package sncr.metadata.engine.ihandlers
 
 import java.io.OutputStream
 
+import org.apache.hadoop.hbase.util.Bytes
 import org.json4s.JsonAST._
 import org.json4s.native.JsonMethods._
 import org.json4s.{JArray, JString}
@@ -13,10 +14,9 @@ import sncr.metadata.engine.MDObjectStruct.{apply => _, _}
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine._
 import sncr.metadata.engine.context.SelectModels
-import sncr.metadata.engine.relations.BaseRelation
+import sncr.metadata.engine.relations.CategorizedRelation
 import sncr.metadata.semantix.SemanticNode
 import sncr.metadata.ui_components.UINode
-import org.apache.hadoop.hbase.util.Bytes
 
 
 /*
@@ -87,7 +87,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
       requestJ = parse(request, false, false)
   }
   catch{
-    case t: Throwable => throw new Exception("Request is not parsable")
+    case t: Throwable => { m_log.error("Native exceptions", t);   throw new Exception("Request is not parsable")}
   }
   var nodeCategory: String = null
   var id : String = null
@@ -149,13 +149,14 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
         if (content == null || content.obj.isEmpty)
           (Rejected.id, "Content and/or DataLake Locations are empty DataObject creation requires content and locations")
         try {
-          val dataObject = new DataObject(content)
-          dataObject.validate
+          val dataObject = new DataObject(content, schema)
+          val (res, msg) = dataObject.validate
+          if (res != ProcessingResult.Success.id)
+            return (res, msg)
         }
         catch{
-          case e:Throwable => (Rejected.id, "Update data object does not exist or cannot be loaded")
+          case e:Throwable => {m_log.error("Native exception:", e); (Rejected.id, "Could not create DataObject from request")}
         }
-
       }
       case "AnalysisResult" =>  (Rejected.id, "The creation verb is not supported for this category" )
       case _ =>  (Rejected.id, s"Internal error: $nodeCategory")
@@ -515,7 +516,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
   }
 
 
-  private def manageRelations[T <: BaseRelation ](ah : T  ) : Unit = {
+  private def manageRelations(ah : CategorizedRelation) : Unit = {
     if (base_relation.arr.nonEmpty) {
       base_relation.arr.foreach {
         case o: JObject => {

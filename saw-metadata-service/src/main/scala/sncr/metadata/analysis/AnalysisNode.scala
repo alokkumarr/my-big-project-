@@ -9,15 +9,30 @@ import org.slf4j.{Logger, LoggerFactory}
 import sncr.metadata.engine.MDObjectStruct._
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine._
-import sncr.metadata.engine.relations.BaseRelation
+import sncr.metadata.engine.relations.CategorizedRelation
 import sncr.saw.common.config.SAWServiceConfig
 
 /**
-  * Created by srya0001 on 3/1/2017.
+  * AnalysisNode is base node to store User analytical queries and associated with them objects.
+  * The class provides basic functionality to:
+  * - create
+  * - update
+  * - read
+  * Node data and manipulate with associated DataObjects. Constructor accepts descriptor as JValue
+  * and flag that indicates if relation for this node exists in MDDB.
+  * By default the app considers created node as new one, means there is not relations associated with the node
+  * The main reason of limitation is: The relation to DataObject is based on BaseRelation,
+  * that does not have any enforcement mechanism.
+  * Because of this reason, it is strongly recommended to use apply method with RowID to read existing row (AnalysisNode)
+  * and native constructor should used only in case new AnalysisNode is being created.
+  * Nevertheless, the native constructor should be used for existing AnalysisNode also,
+  * with condition that markNoRelationExist should be FALSE, to indicate that relation may exist and should be loaded, see:
+  * loadAndNormalizeRelation[AnalysisNode](this) calls.
   */
+
 class AnalysisNode(private var analysisNode: JValue = JNothing, markNoRelationExist : Boolean = true) extends ContentNode
   with SourceAsJson
-  with BaseRelation{
+  with CategorizedRelation{
 
   loadedFlag = markNoRelationExist
 
@@ -189,6 +204,7 @@ class AnalysisNode(private var analysisNode: JValue = JNothing, markNoRelationEx
   }
 
 
+
 }
 
 object AnalysisNode{
@@ -217,6 +233,8 @@ object AnalysisNode{
     m_log debug s"Analysis node has been loaded: $rowId"
     an
   }
+
+
 
   val searchFields =
     Map(

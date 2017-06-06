@@ -79,7 +79,7 @@ trait BaseRelation{
 
   def elementsAsJson : JValue = _elementsAsJSON
   def getRelatedNodes : List[(String, String)] = elements.clone().toList
-
+/*
   def removeNodeFromRelation(a_rowID : String, nodeCategory: String): JValue =
   {
     verifyIntegrity
@@ -98,7 +98,7 @@ trait BaseRelation{
     m_log trace s"Add node to relation: Table = ${tableName}, updated RowIds = ${elements.mkString("[", ",", "]")}"
     normalize
   }
-
+*/
   protected def normalize: JValue =
   {
     elements = elements.distinct

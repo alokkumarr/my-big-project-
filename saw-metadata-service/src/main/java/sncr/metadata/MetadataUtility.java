@@ -90,7 +90,7 @@ public class MetadataUtility {
 
     private static CommandLine buildCMD(CommandLineHandler cli, String args[]) throws org.apache.commons.cli.ParseException {
         cli.addOptionToHandler("metadataType", true,
-               "Type of metadata object: ui, ui_scan, analysis, datalake, report",
+               "Type of metadata object: ui, ui_scan, analysis, sncr.datalake, report",
                "md-type",
                "t",
                 true);
