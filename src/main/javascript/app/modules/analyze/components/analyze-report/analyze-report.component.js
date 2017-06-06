@@ -183,6 +183,10 @@ export const AnalyzeReportComponent = {
         this.showFiltersButtonIfDataIsReady();
       }
 
+      if (this.mode) {
+        this.reloadPreviewGrid(true);
+      }
+
       this._unregisterCanvasHandlers = this._unregisterCanvasHandlers.concat([
 
         this.canvas._$eventEmitter.on('changed', () => {
