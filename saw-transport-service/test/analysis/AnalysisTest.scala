@@ -33,6 +33,9 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       name must be ("MCT Events aggregated by session (view)")
       val JString(sId) = analyze(response) \ "semanticId"
       sId must be (semanticId)
+      val createdTimestamp = (analyze(response) \ "createdTimestamp")
+        .extract[Long]
+      createdTimestamp must be > 1490000000000L;
       val JString(analysisType) = analyze(response) \ "type"
       analysisType must be ("report")
     }
