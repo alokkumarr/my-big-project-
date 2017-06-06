@@ -109,11 +109,11 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       value must be (1)
     }
 
-    "list analysis results" in {
+    "list analysis executions" in {
+      //cancel("Skip slow test dependency")
       /* List results of previously executed analysis */
-      val body = actionKeyMessage("read", id)
-      val response = sendGetRequest("/analysis/%s/results".format(id))
-      val results = extractArray(response, "results")
+      val response = sendGetRequest("/analysis/%s/executions".format(id))
+      val results = extractArray(response, "executions")
       results.length must be (2)
     }
 

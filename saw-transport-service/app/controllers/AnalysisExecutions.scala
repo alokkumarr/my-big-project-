@@ -9,12 +9,12 @@ import play.mvc.{Http, Result, Results}
 
 import sncr.metadata.analysis.AnalysisResult
 
-class AnalysisResults extends BaseController {
+class AnalysisExecutions extends BaseController {
   def list(analysisId: String): Result = {
     handle(json => {
       val analysisResults = new AnalysisResult("")
       val search = Map("analysisId" -> analysisId)
-      val results = analysisResults.find(search).map(result => {
+      val execution = analysisResults.find(search).map(result => {
         result("content") match {
           case obj: JObject => {
             val status = (obj \ "execution_result").extract[String] match {
@@ -28,7 +28,8 @@ class AnalysisResults extends BaseController {
           case obj: JValue => unexpectedElement("object", obj)
         }
       })
-      ("results", results) : JValue
+      /* Note: Keep "results" property for API backwards compatibility */
+      ("execution", execution) ~ ("results", execution) : JValue
     })
   }
 }
