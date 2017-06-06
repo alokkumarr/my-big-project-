@@ -94,7 +94,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
       ]);
       return $http.post(`${url}/analysis`, payload).then(fpGet('data.contents.analyze'));
     }).then(analyses => {
-      return analyses.slice(0, 10);
+      return analyses;
     });
   }
 
