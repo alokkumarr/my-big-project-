@@ -16,6 +16,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
   "Analysis service" should {
     requireMapr
     var id: String = null
+    var executionId: String = null
     var analysis: JValue = null
     val categoryId = UUID.randomUUID.toString
 
@@ -113,8 +114,17 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       //cancel("Skip slow test dependency")
       /* List results of previously executed analysis */
       val response = sendGetRequest("/analysis/%s/executions".format(id))
-      val results = extractArray(response, "executions")
+      val results = extractArray(response, "execution")
       results.length must be (2)
+      executionId = (results(0) \ "id").extract[String]
+    }
+
+    "get analysis execution data" in {
+      /* Get execution data of previously executed analysis */
+      val response = sendGetRequest("/analysis/%s/executions/%s/data"
+        .format(id, executionId))
+      val data = extractArray(response, "data")
+      data.length must be (3)
     }
 
     "delete analysis" in {

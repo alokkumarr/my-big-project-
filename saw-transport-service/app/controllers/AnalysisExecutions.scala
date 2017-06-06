@@ -2,7 +2,7 @@ package controllers
 
 import java.text.SimpleDateFormat
 
-import org.json4s.JsonAST.{JObject, JValue, JString}
+import org.json4s.JsonAST.{JArray, JObject, JString, JValue}
 import org.json4s.JsonDSL._
 import play.libs.Json
 import play.mvc.{Http, Result, Results}
@@ -30,6 +30,15 @@ class AnalysisExecutions extends BaseController {
       })
       /* Note: Keep "results" property for API backwards compatibility */
       ("execution", execution) ~ ("results", execution) : JValue
+    })
+  }
+
+  def getExecutionData(analysisId: String, executionId: String): Result = {
+    handle(json => {
+      /* Note: Static placeholder data until fully implemented */
+      val row: JObject = ("column1", "value1") ~ ("column2", "value2")
+      val data: JArray = List(row, row, row)
+      ("data", data) : JValue
     })
   }
 }
