@@ -35,7 +35,7 @@ export const AnalyzeReportSaveComponent = {
           const category = find(response, category => {
             return some(
               category.children,
-              subCategory => subCategory.id === this.model.category
+              subCategory => subCategory.id.toString() === this.model.categoryId.toString()
             );
           }) || first(response);
 
