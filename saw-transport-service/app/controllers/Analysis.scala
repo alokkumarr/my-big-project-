@@ -198,18 +198,19 @@ class Analysis extends BaseController {
       throw new Exception("Could not find analysis node with provided analysis ID")
     // check the type
     val typeInfo = analysisType.extract[String];
-    val json = render(analysisJSON).toString();
+    val json = compact(render(analysisJSON));
+    m_log.trace("json dataset: {}", json);
     if ( typeInfo.equals("pivot") ){
       val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json), json);
-      val myArray = data.asInstanceOf[JArray]
+      val myArray = parse(data);
       m_log.trace("pivot dataset: {}", myArray)
       return myArray.arr
     }
     if ( typeInfo.equals("chart") ){
       val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json), json);
-      val myArray = data.asInstanceOf[JArray]
+      val myArray = parse(data);
       m_log.trace("chart dataset: {}", myArray)
       return myArray.arr
     }
