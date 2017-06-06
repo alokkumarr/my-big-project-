@@ -128,7 +128,7 @@ export const AnalyzePivotComponent = {
         template: tpl,
         controller: scope => {
           scope.filters = cloneDeep(this.filters);
-          scope.artifacts = this.model.artifacts;
+          scope.artifacts = this.artifacts;
         },
         targetEvent: ev,
         fullscreen: true,
