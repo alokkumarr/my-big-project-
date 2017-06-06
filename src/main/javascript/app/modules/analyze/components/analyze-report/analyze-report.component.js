@@ -58,7 +58,6 @@ export const AnalyzeReportComponent = {
       };
 
       this.gridData = [];
-      this.filteredGridData = [];
       this.columns = [];
       this.filters = [];
       this.filterChips = [];
@@ -418,12 +417,12 @@ export const AnalyzeReportComponent = {
       this.showProgress = true;
       this._AnalyzeService.getDataBySettings(clone(analysis))
         .then(({analysis, data}) => {
-          this.filteredGridData = this.gridData = data;
+          this.gridData = data;
           this.model.query = analysis.queryManual || analysis.query;
 
           const columnNames = keys(fpGet('[0]', data));
           this.columns = this.getColumns(columnNames);
-          this.applyDataToGrid(this.columns, [], [], this.filteredGridData);
+          this.applyDataToGrid(this.columns, [], [], this.gridData);
           this.showProgress = false;
         }, () => {
           this.showProgress = false;
@@ -447,10 +446,9 @@ export const AnalyzeReportComponent = {
 
       this._AnalyzeService.getDataBySettings(clone(this.model))
         .then(({analysis, data}) => {
-          this.filteredGridData = this.gridData = data;
+          this.gridData = data;
           this.model.query = analysis.queryManual || analysis.query;
-          this.generateFiltersOnCanvasChange(); // update filters with new data
-          this.applyDataToGrid(this.columns, sorts, groups, this.filteredGridData);
+          this.applyDataToGrid(this.columns, sorts, groups, this.gridData);
           this.analysisChanged = false;
           this.showProgress = false;
         }, () => {
@@ -497,14 +495,13 @@ export const AnalyzeReportComponent = {
           });
 
           if (!refresh) {
-            this.applyDataToGrid(this.columns, sorts, groups, this.filteredGridData);
+            this.applyDataToGrid(this.columns, sorts, groups, this.gridData);
             return;
           }
 
           if (this.columns.length === 0) {
-            this.filteredGridData = this.gridData = [];
-            this.generateFiltersOnCanvasChange();
-            this.applyDataToGrid(this.columns, sorts, groups, this.filteredGridData);
+            this.gridData = [];
+            this.applyDataToGrid(this.columns, sorts, groups, this.gridData);
           } else {
             this.analysisChanged = true;
           }
