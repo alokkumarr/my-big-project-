@@ -25,14 +25,13 @@ const FRONT_2_BACK_PIVOT_FIELD_PAIRS = {
 
 const BACK_2_FRONT_PIVOT_FIELD_PAIRS = invert(FRONT_2_BACK_PIVOT_FIELD_PAIRS);
 
-export function PivotService(FilterService) {
+export function PivotService() {
   'ngInject';
 
   return {
     denormalizeData,
     getUniquesFromNormalizedData,
     putSettingsDataInFields,
-    putSelectedFilterModelsIntoFilters,
     mapFieldsToFilters,
     getArea,
     getFrontend2BackendFieldMapper,
@@ -159,15 +158,6 @@ export function PivotService(FilterService) {
       field.area = targetField.area;
       field.summaryType = targetField.summaryType;
       field.checked = targetField.checked;
-    });
-  }
-
-  function putSelectedFilterModelsIntoFilters(filters, selectedFilters) {
-    forEach(filters, filter => {
-      const targetFilter = find(selectedFilters, ({name}) => name === filter.name);
-      if (targetFilter && FilterService.isFilterModelNonEmpty(targetFilter.model)) {
-        filter.model = targetFilter.model;
-      }
     });
   }
 

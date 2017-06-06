@@ -3,8 +3,6 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import template from './analyze-published-detail.component.html';
 import style from './analyze-published-detail.component.scss';
 
-import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter/analyze-filter-sidenav.component';
-
 export const AnalyzePublishedDetailComponent = {
   template,
   styles: [style],
@@ -17,7 +15,6 @@ export const AnalyzePublishedDetailComponent = {
       this._$mdDialog = $mdDialog;
       this.isPublished = true;
 
-      this.ANALYZE_FILTER_SIDENAV_IDS = ANALYZE_FILTER_SIDENAV_IDS;
       this.requester = new BehaviorSubject({});
     }
 
