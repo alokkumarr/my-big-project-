@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
 // @SOURCE:saw-services/saw-transport-service/conf/routes
-// @DATE:Wed May 31 23:49:50 EDT 2017
+// @DATE:Tue Jun 06 15:58:00 EDT 2017
 
 import play.api.routing.JavaScriptReverseRoute
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
@@ -15,7 +15,7 @@ import _root_.play.libs.F
 package controllers.javascript {
   import ReverseRouteContext.empty
 
-  // @LINE:8
+  // @LINE:14
   class ReverseAnalysis(_prefix: => String) {
 
     def _defaultPrefix: String = {
@@ -23,7 +23,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:8
+    // @LINE:14
     def process: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.Analysis.process",
       """
@@ -35,7 +35,7 @@ package controllers.javascript {
   
   }
 
-  // @LINE:10
+  // @LINE:22
   class ReverseSemantic(_prefix: => String) {
 
     def _defaultPrefix: String = {
@@ -43,7 +43,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:10
+    // @LINE:22
     def handleRequest: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.Semantic.handleRequest",
       """
@@ -55,7 +55,7 @@ package controllers.javascript {
   
   }
 
-  // @LINE:7
+  // @LINE:10
   class ReverseMD(_prefix: => String) {
 
     def _defaultPrefix: String = {
@@ -63,7 +63,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:7
+    // @LINE:10
     def handleRequest: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MD.handleRequest",
       """
@@ -75,7 +75,7 @@ package controllers.javascript {
   
   }
 
-  // @LINE:12
+  // @LINE:24
   class ReverseMCT(_prefix: => String) {
 
     def _defaultPrefix: String = {
@@ -83,7 +83,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:13
+    // @LINE:25
     def extendedTagRequest: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MCT.extendedTagRequest",
       """
@@ -93,7 +93,7 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:12
+    // @LINE:24
     def handleTagRequest: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MCT.handleTagRequest",
       """
@@ -113,7 +113,7 @@ package controllers.javascript {
     }
 
   
-    // @LINE:20
+    // @LINE:32
     def sr: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MTSControl.sr",
       """
@@ -123,7 +123,7 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:17
+    // @LINE:29
     def executeCmd: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MTSControl.executeCmd",
       """
@@ -133,7 +133,7 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:18
+    // @LINE:30
     def executeExtendedCmd: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.MTSControl.executeExtendedCmd",
       """
@@ -155,20 +155,34 @@ package controllers.javascript {
   
   }
 
-  // @LINE:9
-  class ReverseAnalysisResults(_prefix: => String) {
+  // @LINE:15
+  class ReverseAnalysisExecutions(_prefix: => String) {
 
     def _defaultPrefix: String = {
       if (_prefix.endsWith("/")) "" else "/"
     }
 
   
-    // @LINE:9
+    // @LINE:15
     def list: JavaScriptReverseRoute = JavaScriptReverseRoute(
-      "controllers.AnalysisResults.list",
+      "controllers.AnalysisExecutions.list",
       """
         function(analysisId0) {
-          return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "analysis/" + (""" + implicitly[PathBindable[String]].javascriptUnbind + """)("analysisId", encodeURIComponent(analysisId0)) + "/results"})
+        
+          if (true) {
+            return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "analysis/" + (""" + implicitly[PathBindable[String]].javascriptUnbind + """)("analysisId", encodeURIComponent(analysisId0)) + "/executions"})
+          }
+        
+        }
+      """
+    )
+  
+    // @LINE:18
+    def getExecutionData: JavaScriptReverseRoute = JavaScriptReverseRoute(
+      "controllers.AnalysisExecutions.getExecutionData",
+      """
+        function(analysisId0,executionId1) {
+          return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "analysis/" + (""" + implicitly[PathBindable[String]].javascriptUnbind + """)("analysisId", encodeURIComponent(analysisId0)) + "/executions/" + (""" + implicitly[PathBindable[String]].javascriptUnbind + """)("executionId", encodeURIComponent(executionId1)) + "/data"})
         }
       """
     )

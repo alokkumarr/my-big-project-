@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
 // @SOURCE:saw-services/saw-transport-service/conf/routes
-// @DATE:Wed May 31 23:49:50 EDT 2017
+// @DATE:Tue Jun 06 15:58:00 EDT 2017
 
 package controllers;
 
@@ -14,7 +14,7 @@ public class routes {
   public static final controllers.ReverseMD MD = new controllers.ReverseMD(RoutesPrefix.byNamePrefix());
   public static final controllers.ReverseMCT MCT = new controllers.ReverseMCT(RoutesPrefix.byNamePrefix());
   public static final controllers.ReverseMTSControl MTSControl = new controllers.ReverseMTSControl(RoutesPrefix.byNamePrefix());
-  public static final controllers.ReverseAnalysisResults AnalysisResults = new controllers.ReverseAnalysisResults(RoutesPrefix.byNamePrefix());
+  public static final controllers.ReverseAnalysisExecutions AnalysisExecutions = new controllers.ReverseAnalysisExecutions(RoutesPrefix.byNamePrefix());
   public static final controllers.ReverseTS TS = new controllers.ReverseTS(RoutesPrefix.byNamePrefix());
 
   public static class javascript {
@@ -24,7 +24,7 @@ public class routes {
     public static final controllers.javascript.ReverseMD MD = new controllers.javascript.ReverseMD(RoutesPrefix.byNamePrefix());
     public static final controllers.javascript.ReverseMCT MCT = new controllers.javascript.ReverseMCT(RoutesPrefix.byNamePrefix());
     public static final controllers.javascript.ReverseMTSControl MTSControl = new controllers.javascript.ReverseMTSControl(RoutesPrefix.byNamePrefix());
-    public static final controllers.javascript.ReverseAnalysisResults AnalysisResults = new controllers.javascript.ReverseAnalysisResults(RoutesPrefix.byNamePrefix());
+    public static final controllers.javascript.ReverseAnalysisExecutions AnalysisExecutions = new controllers.javascript.ReverseAnalysisExecutions(RoutesPrefix.byNamePrefix());
     public static final controllers.javascript.ReverseTS TS = new controllers.javascript.ReverseTS(RoutesPrefix.byNamePrefix());
   }
 

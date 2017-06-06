@@ -2,6 +2,7 @@ package controllers
 
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.util.UUID
 import org.json4s._
 import org.json4s.JsonAST.JValue
@@ -35,7 +36,8 @@ class Analysis extends BaseController {
     action match {
       case "create" => {
         val semanticId = extractAnalysisId(json)
-        val semanticIdJson: JObject = ("semanticId", semanticId)
+        val instanceJson: JObject = ("semanticId", semanticId) ~
+        ("createdTimestamp", Instant.now().toEpochMilli())
         val analysisId = UUID.randomUUID.toString
         val idJson: JObject = ("id", analysisId)
         val analysisType = extractKey(json, "analysisType")
@@ -44,7 +46,7 @@ class Analysis extends BaseController {
         
         val semanticJson = readSemanticJson(semanticId)
         val mergeJson = contentsAnalyze(
-          semanticJson.merge(idJson).merge(semanticIdJson).merge(typeJson))
+          semanticJson.merge(idJson).merge(instanceJson).merge(typeJson))
         val responseJson = json merge mergeJson
         val analysisJson = (responseJson \ "contents" \ "analyze")(0)
         val analysisNode = new AnalysisNode(analysisJson)

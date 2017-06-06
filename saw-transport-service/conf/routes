@@ -4,9 +4,21 @@
 GET     /               controllers.MTSControl.index
 
 POST    /		controllers.TS.handleRequest
+
+# Metadata Service
+
 POST    /md		controllers.MD.handleRequest
-POST    /analysis	controllers.Analysis.process
-GET     /analysis/:analysisId/results	controllers.AnalysisResults.list(analysisId: String)
+
+# Analysis Service
+
+POST    /analysis                         controllers.Analysis.process
+GET     /analysis/:analysisId/executions  controllers.AnalysisExecutions.list(analysisId: String)
+# Note: Keep for API backwards compatibility, remove in future
+GET     /analysis/:analysisId/results     controllers.AnalysisExecutions.list(analysisId: String)
+GET     /analysis/:analysisId/executions/:executionId/data  controllers.AnalysisExecutions.getExecutionData(analysisId: String, executionId: String)
+
+# Semantic
+
 POST    /semantic	controllers.Semantic.handleRequest
 
 GET     /ObjectSearch   controllers.MCT.handleTagRequest(LCID: String, query: Option[String])
