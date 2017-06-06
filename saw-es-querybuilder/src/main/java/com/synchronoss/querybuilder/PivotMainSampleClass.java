@@ -18,6 +18,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.synchronoss.SAWElasticTransportService;
 import com.synchronoss.querybuilder.model.ColumnField;
 import com.synchronoss.querybuilder.model.DataField;
 import com.synchronoss.querybuilder.model.Filter;
@@ -161,9 +162,10 @@ public class PivotMainSampleClass {
 		    	throw new IllegalArgumentException("Pivot in column/data fields wise are allowed until five levels. Please verify & recreate your request.");
 		    }
 	    }
-	    System.out.println(searchSourceBuilder.toString()); 
-	   String response[] = SAWElasticSearchQueryExecutor.executeReturnAsString(searchSourceBuilder, objectNode.toString());
-	    System.out.println(response[0]);
+	    System.setProperty("url", "http://mapr-dev02.sncrbda.dev.vacum-np.sncrcorp.net:9200/");
+	    String response = SAWElasticTransportService.
+	        executeReturnAsString(searchSourceBuilder.toString(), objectNode.toString(), "some", "xssds", "login");
+	    System.out.println(response);
 			   
 	}
 
