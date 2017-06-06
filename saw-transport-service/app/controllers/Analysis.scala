@@ -205,14 +205,14 @@ class Analysis extends BaseController {
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json), json);
       val myArray = parse(data);
       m_log.trace("pivot dataset: {}", myArray)
-      return myArray.arr
+      return myArray
     }
     if ( typeInfo.equals("chart") ){
       val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json), json);
       val myArray = parse(data);
       m_log.trace("chart dataset: {}", myArray)
-      return myArray.arr
+      return myArray
     }
     else {
     // This is the part of report type starts here
