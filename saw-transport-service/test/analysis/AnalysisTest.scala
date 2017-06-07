@@ -124,7 +124,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       val response = sendGetRequest("/analysis/%s/executions/%s/data"
         .format(id, executionId))
       val data = extractArray(response, "data")
-      data.length must be (3)
+      data.length must be (10)
     }
 
     "delete analysis" in {
