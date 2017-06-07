@@ -6,6 +6,7 @@ export const UsersListViewComponent = {
   bindings: {
     users: '<',
     customer: '<',
+    onAction: '&',
     searchTerm: '<'
   },
   controller: class UsersListViewController {
@@ -32,6 +33,20 @@ export const UsersListViewComponent = {
 
     onGridInitialized(e) {
       this._gridListInstance = e.component;
+    }
+
+    openDeleteModal(user) {
+      this.onAction({
+        type: 'delete',
+        model: user
+      });
+    }
+
+    openEditModal(user) {
+      this.onAction({
+        type: 'edit',
+        model: user
+      });
     }
 
     getGridConfig() {
