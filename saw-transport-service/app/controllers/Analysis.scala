@@ -2,8 +2,8 @@ package controllers
 
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.util.UUID
-
 import org.json4s._
 import org.json4s.JsonAST.JValue
 import org.json4s.JsonDSL._
@@ -20,41 +20,33 @@ import model.QueryBuilder
 import model.ClientException
 import org.apache.hadoop.hbase.util.Bytes
 import sncr.metadata.engine.SearchMetadata._
+import com.synchronoss.querybuilder.SAWElasticSearchQueryExecutor
+import com.synchronoss.querybuilder.EntityType
+import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder
 
-class ANA extends BaseServiceProvider {
-  implicit val formats = new DefaultFormats {
-    override def dateFormatter = new SimpleDateFormat(
-      "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-  }
-
+class Analysis extends BaseController {
   val executorRunner = new ExecutionTaskHandler(1)
 
-  override def process(txt: String): Result = {
-    try {
-      doProcess(txt)
-    } catch {
-      case ClientException(message) => userErrorResponse(message)
-      case e: Exception => {
-        m_log.error("Internal server error", e)
-        serverErrorResponse(e.getMessage())
-      }
-    }
+  def process: Result = {
+    handle(doProcess)
   }
 
-  private def doProcess(txt: String): Result = {
-    val json = parse(txt)
+  private def doProcess(json: JValue): JValue = {
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
-    val response = action match {
+    action match {
       case "create" => {
         val semanticId = extractAnalysisId(json)
-        val semanticIdJson: JObject = ("semanticId", semanticId)
+        val instanceJson: JObject = ("semanticId", semanticId) ~
+        ("createdTimestamp", Instant.now().toEpochMilli())
         val analysisId = UUID.randomUUID.toString
         val idJson: JObject = ("id", analysisId)
         val analysisType = extractKey(json, "analysisType")
         val typeJson: JObject = ("type", analysisType)
+        
+        
         val semanticJson = readSemanticJson(semanticId)
         val mergeJson = contentsAnalyze(
-          semanticJson.merge(idJson).merge(semanticIdJson).merge(typeJson))
+          semanticJson.merge(idJson).merge(instanceJson).merge(typeJson))
         val responseJson = json merge mergeJson
         val analysisJson = (responseJson \ "contents" \ "analyze")(0)
         val analysisNode = new AnalysisNode(analysisJson)
@@ -89,6 +81,13 @@ class ANA extends BaseServiceProvider {
         val analysisId = extractAnalysisId(json)
         json merge contentsAnalyze(readAnalysisJson(analysisId))
       }
+      case "search" => {
+        val keys = (json \ "contents" \ "keys")(0) match {
+          case keys: JObject => keys
+          case obj => throw new ClientException("Expected object, got: " + obj)
+        }
+        json merge contentsAnalyze(searchAnalysisJson(keys))
+      }
       case "execute" => {
         val analysisId = extractAnalysisId(json)
         val data = executeAnalysis(analysisId)
@@ -107,21 +106,6 @@ class ANA extends BaseServiceProvider {
         throw new ClientException("Unknown action: " + action)
       }
     }
-    Results.ok(playJson(response))
-  }
-
-  private def userErrorResponse(message: String): Result = {
-    val response: JObject = ("error", ("message", message))
-    Results.badRequest(playJson(response))
-  }
-
-  private def serverErrorResponse(message: String): Result = {
-    val response: JObject = ("error", ("message", message))
-    Results.internalServerError(playJson(response))
-  }
-
-  private def playJson(json: JValue) = {
-    Json.parse(compact(render(json)))
   }
 
   def extractAnalysisId(json: JValue) = {
@@ -152,7 +136,12 @@ class ANA extends BaseServiceProvider {
       case _ => throw new ClientException(
         "Expected array: " + analysisListJson)
     }
-    val queryJson: JObject = ("query", JString(QueryBuilder.build(analysis))) ~
+    val query = (analysis \ "queryManual") match {
+      case JNothing => QueryBuilder.build(analysis)
+      case obj: JString => ""
+      case obj => unexpectedElement("string", obj)
+    }
+    val queryJson: JObject = ("query", JString(query)) ~
     ("outputFile",
       ("outputFormat", "json") ~ ("outputFileName", "test.json"))
     analysis merge(queryJson)
@@ -179,14 +168,53 @@ class ANA extends BaseServiceProvider {
     SemanticNode(semanticId, SelectModels.relation.id)
   }
 
+  private def searchAnalysisJson
+    (keys: JObject, semantic: Boolean = false): List[JObject] = {
+    val analysisNode = new AnalysisNode
+    val search = keys.extract[Map[String, Any]]
+    analysisNode.find(search).map {
+      _("content") match {
+        case obj: JObject => obj
+        case obj: JValue => unexpectedElement("object", obj)
+      }
+    }
+  }
+
   private def contentsAnalyze(analysis: JObject): JObject = {
-    ("contents", ("analyze", JArray(List(analysis))))
+    contentsAnalyze(List(analysis))
+  }
+
+  private def contentsAnalyze(analyses: List[JObject]): JObject = {
+    ("contents", ("analyze", JArray(analyses)))
   }
 
   def executeAnalysis(analysisId: String): JValue = {
+ 
+    // reading the JSON extract type
+    val analysisJSON = readAnalysisJson(analysisId);
+    val analysisType = (analysisJSON \ "type");
     val analysisNode = AnalysisNode(analysisId)
     if (analysisNode.getCachedData == null || analysisNode.getCachedData.isEmpty)
       throw new Exception("Could not find analysis node with provided analysis ID")
+    // check the type
+    val typeInfo = analysisType.extract[String];
+    val json = render(analysisJSON).toString();
+    if ( typeInfo.equals("pivot") ){
+      val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
+          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json), json);
+      val myArray = data.asInstanceOf[JArray]
+      m_log.trace("pivot dataset: {}", myArray)
+      return myArray.arr
+    }
+    if ( typeInfo.equals("chart") ){
+      val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
+          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json), json);
+      val myArray = data.asInstanceOf[JArray]
+      m_log.trace("chart dataset: {}", myArray)
+      return myArray.arr
+    }
+    else {
+    // This is the part of report type starts here
     val er: ExecutionTaskHandler = new ExecutionTaskHandler(1)
     val aeh: AnalysisExecutionHandler = new AnalysisExecutionHandler(analysisId)
     er.startSQLExecutor(aeh)
@@ -196,6 +224,7 @@ class ANA extends BaseServiceProvider {
     aeh.handleResult(out)
     val resultJson = parse(new String(out.toByteArray()))
     val resultLog = shortMessage(pretty(render(resultJson)))
+    
     m_log.trace("Spark SQL executor result: {}", resultLog)
     (resultJson match {
       case obj: JObject => {
@@ -208,9 +237,7 @@ class ANA extends BaseServiceProvider {
       case value: JValue => throw new RuntimeException(
         "Expected array: " + value)
     }).drop(1)
-  }
-
-  private def shortMessage(message: String) = {
-    message.substring(0, Math.min(message.length(), 1500))
+    // This is the end of report type ends here
+    }
   }
 }

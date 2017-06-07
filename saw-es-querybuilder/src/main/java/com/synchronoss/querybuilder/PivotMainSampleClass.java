@@ -31,10 +31,13 @@ public class PivotMainSampleClass {
 	{
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+		System.setProperty("host", "10.48.72.74");
+		System.setProperty("port", "9300");
+		System.setProperty("cluster", "sncr-salesdemo");
 		
 		// This is the entry point for /analysis service as JSONString not as file
-		//JsonNode objectNode = objectMapper.readTree(new File("C:\\Users\\saurav.paul\\Desktop\\Sergey\\pivot_type_data.json"));
-		JsonNode objectNode = objectMapper.readTree(new File(args[0]));
+		JsonNode objectNode = objectMapper.readTree(new File("C:\\Users\\saurav.paul\\Desktop\\Sergey\\pivot_type_data.json"));
+		//JsonNode objectNode = objectMapper.readTree(new File(args[0]));
 		JsonNode sqlNode = objectNode.get("sqlBuilder");
 		SqlBuilder sqlBuilderNode = objectMapper.treeToValue(sqlNode, SqlBuilder.class);
 	    int size = 0;
@@ -158,9 +161,9 @@ public class PivotMainSampleClass {
 		    	throw new IllegalArgumentException("Pivot in column/data fields wise are allowed until five levels. Please verify & recreate your request.");
 		    }
 	    }
-	    
-	    
-	    System.out.println(searchSourceBuilder.toString());
+	    System.out.println(searchSourceBuilder.toString()); 
+	   String response[] = SAWElasticSearchQueryExecutor.executeReturnAsString(searchSourceBuilder, objectNode.toString());
+	    System.out.println(response[0]);
 			   
 	}
 

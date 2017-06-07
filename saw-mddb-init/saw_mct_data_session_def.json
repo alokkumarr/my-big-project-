@@ -1,81 +1,682 @@
 {
-  "numberOfColumns" : 66,
-  "header" : true,
-	"appendColumns" : true,
-  "type" : "delimited",
-  "line" :  {
-	  "quoteChar" : "x22",
-    "sourceCellSeparator" : "|",
-    "cell" : [
-      {"name":  "SUMMARY_TYPE",  			      "origin" : {"index" : 0 },  "destinationColumnIndex" :0 ,  "format" : {"type": "string"}},
-      {"name":  "OPCO", 				  		      "origin" : {"index" : 1 },  "destinationColumnIndex" :1 ,  "format" : {"type": "string"}},
-      {"name":  "SERVER_MONTH",			        "origin" : {"index" : 2 },  "destinationColumnIndex" :2 ,  "format" : {"type": "string"}},
-      {"name":  "SOURCE_MANUFACTURER",      "origin" : {"index" : 3 },  "destinationColumnIndex" :3 ,  "format" : {"type": "string"}},
-      {"name":  "TARGET_MANUFACTURER",      "origin" : {"index" : 4 },  "destinationColumnIndex" :4 ,  "format" : {"type": "string"}},
-      {"name":  "SOURCE_MODEL",  			      "origin" : {"index" : 5 },  "destinationColumnIndex" :5 ,  "format" : {"type": "string"}},
-      {"name":  "TARGET_MODEL",  			      "origin" : {"index" : 6 },  "destinationColumnIndex" :6 ,  "format" : {"type": "string"}},
-      {"name":  "SOURCE_OS",  				      "origin" : {"index" : 7 },  "destinationColumnIndex" :7 ,  "format" : {"type": "string"}},
-      {"name":  "TARGET_OS",  				      "origin" : {"index" : 8 },  "destinationColumnIndex" :8 ,  "format" : {"type": "string"}},
-      {"name":  "FATAL_ERROR_FLAG",		      "origin" : {"index" : 9 }, "destinationColumnIndex"  :9 ,  "format" : {"type": "string"}},
-      {"name":  "SESSION_STATUS",  		      "origin" : {"index" : 10}, "destinationColumnIndex"  :10,  "format" : {"type": "string"}},
-			{"name":  "TRANSFER_LOCATION",	      "origin" : {"index" : 11}, "destinationColumnIndex"  :11,  "format" : {"type": "string"}},
-      {"name":  "QUARATINE_CODE",  		      "origin" : {"index" : 12}, "destinationColumnIndex"  :12,  "format" : {"type": "integer"}},
-			{"name":  "AVAILABLE_ITEMS", 		      "origin" : {"index" : 13}, "destinationColumnIndex"  :13,  "format" : {"type": "integer"}},
-      {"name":  "SELECTED_ITEMS",  		      "origin" : {"index" : 14}, "destinationColumnIndex"  :14,  "format" : {"type": "integer"}},
-			{"name":  "TRANSFER_ITEMS",  		      "origin" : {"index" : 15}, "destinationColumnIndex"  :15,  "format" : {"type": "integer"}},
-      {"name":  "FAILED_ITEMS",    		      "origin" : {"index" : 16}, "destinationColumnIndex"  :16,  "format" : {"type": "integer"}},
-			{"name":  "AVAILABLE_BYTES", 		      "origin" : {"index" : 17}, "destinationColumnIndex"  :17,  "format" : {"type": "decimal"}},
-      {"name":  "AVAILABLE_MB",    		      "origin" : {"index" : 18}, "destinationColumnIndex"  :18,  "format" : {"type": "decimal"}},
-      {"name":  "SELECTED_BYTES",   	      "origin" : {"index" : 19}, "destinationColumnIndex"  :19,  "format" : {"type": "decimal"}},
-      {"name":  "TRANSFER_BYTES",    	      "origin" : {"index" : 20}, "destinationColumnIndex"  :20,  "format" : {"type": "decimal"}},
-      {"name":  "TRANSFER_MB",  			      "origin" : {"index" : 21}, "destinationColumnIndex"  :21,  "format" : {"type": "decimal"}},
-      {"name":  "FAILED_BYTES",    		      "origin" : {"index" : 22}, "destinationColumnIndex"  :22,  "format" : {"type": "decimal"}},
-			{"name":  "FAILED_MB",  			        "origin" : {"index" : 23}, "destinationColumnIndex"  :23,  "format" : {"type": "decimal"}},
-      {"name":  "TRANSFER_MINUTES",  	      "origin" : {"index" : 24}, "destinationColumnIndex"  :24,  "format" : {"type": "decimal"}},
-      {"name":  "TRANSFER_SECONDS",  	      "origin" : {"index" : 25}, "destinationColumnIndex"  :25,  "format" : {"type": "decimal"}},
-      {"name":  "ERROR_COUNT",  			      "origin" : {"index" : 26}, "destinationColumnIndex"  :26,  "format" : {"type": "integer"}},			
-			{"name":  "TARGET_APP_VERSION",       "origin" : {"index" : 27}, "destinationColumnIndex"  :27,  "format" : {"type": "string"}},
-      {"name":  "SOURCE_APP_VERSION",       "origin" : {"index" : 28}, "destinationColumnIndex"  :28,  "format" : {"type": "string"}},
-      {"name":  "SESSION_ID",  				      "origin" : {"index" : 29}, "destinationColumnIndex"  :29,  "format" : {"type": "string"}},
-      {"name":  "HAS_DOCUMENTS",  	        "origin" : {"index" : 30}, "destinationColumnIndex"  :30,  "format" : {"type": "string"}},
-      {"name":  "HAS_CONTACTS",  		        "origin" : {"index" : 31}, "destinationColumnIndex"  :31,  "format" : {"type": "string"}},
-      {"name":  "HAS_IMAGES",  			        "origin" : {"index" : 32}, "destinationColumnIndex"  :32,  "format" : {"type": "string"}},
-      {"name":  "HAS_MESSAGES",  		        "origin" : {"index" : 33}, "destinationColumnIndex"  :33,  "format" : {"type": "string"}},
-      {"name":  "HAS_MUSIC",  			        "origin" : {"index" : 34}, "destinationColumnIndex"  :34,  "format" : {"type": "string"}},
-      {"name":  "HAS_VIDEOS",  			        "origin" : {"index" : 35}, "destinationColumnIndex"  :35,  "format" : {"type": "string"}},
-      {"name":  "HAS_CALL_LOGS",  	        "origin" : {"index" : 36}, "destinationColumnIndex"  :36,  "format" : {"type": "string"}},
-			{"name":  "HAS_OTHER",  			        "origin" : {"index" : 37}, "destinationColumnIndex"  :37,  "format" : {"type": "string"}},
-      {"name":  "TARGET_CARRIER_ID", 	      "origin" : {"index" : 38}, "destinationColumnIndex"  :38,  "format" : {"type": "string"}},
-      {"name":  "TARGET_ACTIVECARRIERID",   "origin" : {"index" : 39}, "destinationColumnIndex"  :39,  "format" : {"type": "string"}},
-      {"name":  "TARGET_INTERNALVERSION",   "origin" : {"index" : 40}, "destinationColumnIndex"  :40,  "format" : {"type": "string"}},
-      {"name":  "TARGET_DEVICE_ID",  			  "origin" : {"index" : 41}, "destinationColumnIndex"  :41,  "format" : {"type": "string"}},
-      {"name":  "TARGET_TIMEZONE",    			"origin" : {"index" : 42}, "destinationColumnIndex"  :42,  "format" : {"type": "string"}},
-      {"name":  "SOURCE_CARRIER_ID",    		"origin" : {"index" : 43}, "destinationColumnIndex"  :43,  "format" : {"type": "string"}},
-      {"name":  "SOURCE_ACTIVECARRIERID",   "origin" : {"index" : 44}, "destinationColumnIndex"  :44,  "format" : {"type": "string"}},
-      {"name":  "SOURCE_INTERNALVERSION",   "origin" : {"index" : 45}, "destinationColumnIndex"  :45,  "format" : {"type": "string"}},
-      {"name":  "SOURCE_DEVICE_ID",   			"origin" : {"index" : 46}, "destinationColumnIndex"  :46,  "format" : {"type": "string"}},
-      {"name":  "SOURCE_TIMEZONE",   				"origin" : {"index" : 47}, "destinationColumnIndex"  :47,  "format" : {"type": "string"}},
-			{"name":  "ICCID",   							    "origin" : {"index" : 48}, "destinationColumnIndex"  :48,  "format" : {"type": "string"}},
-			{"name":  "IMEI",   							    "origin" : {"index" : 49}, "destinationColumnIndex"  :49,  "format" : {"type": "string"}},
-			{"name":  "IMSI",   							    "origin" : {"index" : 50}, "destinationColumnIndex"  :51,  "format" : {"type": "string"}},			
-			{"name":  "MSISDN",   						    "origin" : {"index" : 51}, "destinationColumnIndex"  :52,  "format" : {"type": "string"}},
-			{"name":  "TRANSFER_METHOD",  		    "origin" : {"index" : 52}, "destinationColumnIndex"  :53,  "format" : {"type": "string"}},
-			{"name":  "TRANSFER_TYPE",   			    "origin" : {"index" : 53}, "destinationColumnIndex"  :54,  "format" : {"type": "string"}},
-			{"name":  "TIME_LINE_DAYS",   		    "origin" : {"index" : 54}, "destinationColumnIndex"  :55,  "format" : {"type": "string"}},
-			{"name":  "SERVER_TIMESTAMP",   	    "origin" : {"index" : 55}, "destinationColumnIndex"  :56,  "format" : {"type": "string"}},
-			{"name":  "TRANSFER_END_TS",   		    "origin" : {"index" : 56}, "destinationColumnIndex"  :57,  "format" : {"type": "string"}},
-			{"name":  "TRANSFER_START_TS",   	    "origin" : {"index" : 57}, "destinationColumnIndex"  :58,  "format" : {"type": "string"}},
-			{"name":  "IN_STORE_TRANSFER",   	    "origin" : {"index" : 58}, "destinationColumnIndex"  :59,  "format" : {"type": "string"}},
-			{"name":  "CHANNEL_WIDTH",   			    "origin" : {"index" : 59}, "destinationColumnIndex"  :60,  "format" : {"type": "decimal"}},
-      {"name":  "LINK_SPEED",   				    "origin" : {"index" : 60}, "destinationColumnIndex"  :61,  "format" : {"type": "decimal"}},
-      {"name":  "LINK_TYPE",   					    "origin" : {"index" : 61}, "destinationColumnIndex"  :62,  "format" : {"type": "string"}},
-      {"name":  "SSID",   							    "origin" : {"index" : 62}, "destinationColumnIndex"  :63,  "format" : {"type": "string"}},
-      {"name":  "SIZE_BUCKET",		  		    "origin" : {"index" : 63}, "destinationColumnIndex"  :64,  "format" : {"type": "string"}},
-      {"name":  "SIZE_BUCKET_SORT",   	    "origin" : {"index" : 64}, "destinationColumnIndex"  :65,  "format" : {"type": "decimal"}},
-      {"name":  "DURATION_BUCKET",   		    "origin" : {"index" : 65}, "destinationColumnIndex"  :66,  "format" : {"type": "string"}},
-      {"name":  "DURATION_BUCKET_SORT",     "origin" : {"index" : 66}, "destinationColumnIndex"  :67,  "format" : {"type": "decimal"}}
-    ]									
-  }  
-}    
-
-
+  "numberOfColumns": 66,
+  "header": true,
+  "appendColumns": true,
+  "type": "delimited",
+  "line": {
+    "quoteChar": "x22",
+    "sourceCellSeparator": "|",
+    "cell": [
+      {
+        "name": "SUMMARY_TYPE",
+        "origin": {
+          "index": 0
+        },
+        "destinationColumnIndex": 0,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "OPCO",
+        "origin": {
+          "index": 1
+        },
+        "destinationColumnIndex": 1,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "SERVER_MONTH",
+        "origin": {
+          "index": 2
+        },
+        "destinationColumnIndex": 2,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "SOURCE_MANUFACTURER",
+        "origin": {
+          "index": 3
+        },
+        "destinationColumnIndex": 3,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "TARGET_MANUFACTURER",
+        "origin": {
+          "index": 4
+        },
+        "destinationColumnIndex": 4,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "SOURCE_MODEL",
+        "origin": {
+          "index": 5
+        },
+        "destinationColumnIndex": 5,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "TARGET_MODEL",
+        "origin": {
+          "index": 6
+        },
+        "destinationColumnIndex": 6,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "SOURCE_OS",
+        "origin": {
+          "index": 7
+        },
+        "destinationColumnIndex": 7,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "TARGET_OS",
+        "origin": {
+          "index": 8
+        },
+        "destinationColumnIndex": 8,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "FATAL_ERROR_FLAG",
+        "origin": {
+          "index": 9
+        },
+        "destinationColumnIndex": 9,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "SESSION_STATUS",
+        "origin": {
+          "index": 10
+        },
+        "destinationColumnIndex": 10,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "TRANSFER_LOCATION",
+        "origin": {
+          "index": 11
+        },
+        "destinationColumnIndex": 11,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "QUARATINE_CODE",
+        "origin": {
+          "index": 12
+        },
+        "destinationColumnIndex": 12,
+        "format": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "AVAILABLE_ITEMS",
+        "origin": {
+          "index": 13
+        },
+        "destinationColumnIndex": 13,
+        "format": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "SELECTED_ITEMS",
+        "origin": {
+          "index": 14
+        },
+        "destinationColumnIndex": 14,
+        "format": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "TRANSFER_ITEMS",
+        "origin": {
+          "index": 15
+        },
+        "destinationColumnIndex": 15,
+        "format": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "FAILED_ITEMS",
+        "origin": {
+          "index": 16
+        },
+        "destinationColumnIndex": 16,
+        "format": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "AVAILABLE_BYTES",
+        "origin": {
+          "index": 17
+        },
+        "destinationColumnIndex": 17,
+        "format": {
+          "type": "decimal"
+        }
+      },
+      {
+        "name": "AVAILABLE_MB",
+        "origin": {
+          "index": 18
+        },
+        "destinationColumnIndex": 18,
+        "format": {
+          "type": "decimal"
+        }
+      },
+      {
+        "name": "SELECTED_BYTES",
+        "origin": {
+          "index": 19
+        },
+        "destinationColumnIndex": 19,
+        "format": {
+          "type": "decimal"
+        }
+      },
+      {
+        "name": "TRANSFER_BYTES",
+        "origin": {
+          "index": 20
+        },
+        "destinationColumnIndex": 20,
+        "format": {
+          "type": "decimal"
+        }
+      },
+      {
+        "name": "TRANSFER_MB",
+        "origin": {
+          "index": 21
+        },
+        "destinationColumnIndex": 21,
+        "format": {
+          "type": "decimal"
+        }
+      },
+      {
+        "name": "FAILED_BYTES",
+        "origin": {
+          "index": 22
+        },
+        "destinationColumnIndex": 22,
+        "format": {
+          "type": "decimal"
+        }
+      },
+      {
+        "name": "FAILED_MB",
+        "origin": {
+          "index": 23
+        },
+        "destinationColumnIndex": 23,
+        "format": {
+          "type": "decimal"
+        }
+      },
+      {
+        "name": "TRANSFER_MINUTES",
+        "origin": {
+          "index": 24
+        },
+        "destinationColumnIndex": 24,
+        "format": {
+          "type": "decimal"
+        }
+      },
+      {
+        "name": "TRANSFER_SECONDS",
+        "origin": {
+          "index": 25
+        },
+        "destinationColumnIndex": 25,
+        "format": {
+          "type": "decimal"
+        }
+      },
+      {
+        "name": "ERROR_COUNT",
+        "origin": {
+          "index": 26
+        },
+        "destinationColumnIndex": 26,
+        "format": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "TARGET_APP_VERSION",
+        "origin": {
+          "index": 27
+        },
+        "destinationColumnIndex": 27,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "SOURCE_APP_VERSION",
+        "origin": {
+          "index": 28
+        },
+        "destinationColumnIndex": 28,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "SESSION_ID",
+        "origin": {
+          "index": 29
+        },
+        "destinationColumnIndex": 29,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "HAS_DOCUMENTS",
+        "origin": {
+          "index": 30
+        },
+        "destinationColumnIndex": 30,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "HAS_CONTACTS",
+        "origin": {
+          "index": 31
+        },
+        "destinationColumnIndex": 31,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "HAS_IMAGES",
+        "origin": {
+          "index": 32
+        },
+        "destinationColumnIndex": 32,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "HAS_MESSAGES",
+        "origin": {
+          "index": 33
+        },
+        "destinationColumnIndex": 33,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "HAS_MUSIC",
+        "origin": {
+          "index": 34
+        },
+        "destinationColumnIndex": 34,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "HAS_VIDEOS",
+        "origin": {
+          "index": 35
+        },
+        "destinationColumnIndex": 35,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "HAS_CALL_LOGS",
+        "origin": {
+          "index": 36
+        },
+        "destinationColumnIndex": 36,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "HAS_OTHER",
+        "origin": {
+          "index": 37
+        },
+        "destinationColumnIndex": 37,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "TARGET_CARRIER_ID",
+        "origin": {
+          "index": 38
+        },
+        "destinationColumnIndex": 38,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "TARGET_ACTIVECARRIERID",
+        "origin": {
+          "index": 39
+        },
+        "destinationColumnIndex": 39,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "TARGET_INTERNALVERSION",
+        "origin": {
+          "index": 40
+        },
+        "destinationColumnIndex": 40,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "TARGET_DEVICE_ID",
+        "origin": {
+          "index": 41
+        },
+        "destinationColumnIndex": 41,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "TARGET_TIMEZONE",
+        "origin": {
+          "index": 42
+        },
+        "destinationColumnIndex": 42,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "SOURCE_CARRIER_ID",
+        "origin": {
+          "index": 43
+        },
+        "destinationColumnIndex": 43,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "SOURCE_ACTIVECARRIERID",
+        "origin": {
+          "index": 44
+        },
+        "destinationColumnIndex": 44,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "SOURCE_INTERNALVERSION",
+        "origin": {
+          "index": 45
+        },
+        "destinationColumnIndex": 45,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "SOURCE_DEVICE_ID",
+        "origin": {
+          "index": 46
+        },
+        "destinationColumnIndex": 46,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "SOURCE_TIMEZONE",
+        "origin": {
+          "index": 47
+        },
+        "destinationColumnIndex": 47,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "ICCID",
+        "origin": {
+          "index": 48
+        },
+        "destinationColumnIndex": 48,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "IMEI",
+        "origin": {
+          "index": 49
+        },
+        "destinationColumnIndex": 49,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "IMSI",
+        "origin": {
+          "index": 50
+        },
+        "destinationColumnIndex": 51,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "MSISDN",
+        "origin": {
+          "index": 51
+        },
+        "destinationColumnIndex": 52,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "TRANSFER_METHOD",
+        "origin": {
+          "index": 52
+        },
+        "destinationColumnIndex": 53,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "TRANSFER_TYPE",
+        "origin": {
+          "index": 53
+        },
+        "destinationColumnIndex": 54,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "TIME_LINE_DAYS",
+        "origin": {
+          "index": 54
+        },
+        "destinationColumnIndex": 55,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "SERVER_TIMESTAMP",
+        "origin": {
+          "index": 55
+        },
+        "destinationColumnIndex": 56,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "TRANSFER_END_TS",
+        "origin": {
+          "index": 56
+        },
+        "destinationColumnIndex": 57,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "TRANSFER_START_TS",
+        "origin": {
+          "index": 57
+        },
+        "destinationColumnIndex": 58,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "IN_STORE_TRANSFER",
+        "origin": {
+          "index": 58
+        },
+        "destinationColumnIndex": 59,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "CHANNEL_WIDTH",
+        "origin": {
+          "index": 59
+        },
+        "destinationColumnIndex": 60,
+        "format": {
+          "type": "decimal"
+        }
+      },
+      {
+        "name": "LINK_SPEED",
+        "origin": {
+          "index": 60
+        },
+        "destinationColumnIndex": 61,
+        "format": {
+          "type": "decimal"
+        }
+      },
+      {
+        "name": "LINK_TYPE",
+        "origin": {
+          "index": 61
+        },
+        "destinationColumnIndex": 62,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "SSID",
+        "origin": {
+          "index": 62
+        },
+        "destinationColumnIndex": 63,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "SIZE_BUCKET",
+        "origin": {
+          "index": 63
+        },
+        "destinationColumnIndex": 64,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "SIZE_BUCKET_SORT",
+        "origin": {
+          "index": 64
+        },
+        "destinationColumnIndex": 65,
+        "format": {
+          "type": "decimal"
+        }
+      },
+      {
+        "name": "DURATION_BUCKET",
+        "origin": {
+          "index": 65
+        },
+        "destinationColumnIndex": 66,
+        "format": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "DURATION_BUCKET_SORT",
+        "origin": {
+          "index": 66
+        },
+        "destinationColumnIndex": 67,
+        "format": {
+          "type": "decimal"
+        }
+      }
+    ]
+  }
+}

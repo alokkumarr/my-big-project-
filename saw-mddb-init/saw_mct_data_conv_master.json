@@ -1,61 +1,70 @@
 {
-"application":{
-	"parameters":[
-	],
-	"inputOutput":{
-		"dataArchiveLocation" : "maprfs:///dl.dev/data/mct/archives",
-		"dataInputLocation" : "maprfs:///dl.dev/data/mct/input",
-		"dataOutputLocation" : "maprfs:///dl.dev/data/mct/output",
-		"objectDefinitionsLocation" : "/opt/bda/apps/sawdemo/conf/objects",
-		"rejectedDataOutputLocation" : "maprfs:///dl.dev/data/mct/rejected",
-		"resultLocation" : "/opt/bda/apps/sawdemo/result",
-		"temporaryLocation" : "maprfs:///dl.dev/data/mct/tmp"
-	},
-	"dataObjects":[
-	{
-		"name"   : "MCT_SESSION",
-		"parser" : {
-			"parseType"          : "delimited",
-			"objectDefinition"   : "saw_mct_data_session_def.json",
-			"filemask"           : "mct_tmo_session.txt"
-		},
-		"transformer": {
-			"outputType" : "parquet",
-			"createTemporaryDataset" : false
-		}
-	}
-	]
-},
-"system" : [ {
-	"key" : "driver.memory",
-	"value" : "2g"
-	}, {
-	"key" : "spark.executor.memory",
-	"value" : "2g"
-	}, {
-	"key" : "spark.cores.max",
-	"value" : "2"
-	}, {
-	"key" : "spark.master",
-	"value" : "spark://mapr-dev03.sncrbda.dev.vacum-np.sncrcorp.net:7077"
-	}, {
-	"key" : "maprfs_location",
-	"value" : "/mapr/dev_rt"
-	}, {
-	"key" : "drill.url",
-	"value" : "http://172.31.10.154:8047"
-	}, {
-	"key" : "drill.dsn",
-	"value" : "MapR_Drill_DSN"
-	}, {
-	"key" : "es.nodes",
-	"value" : "rtesap201"
-	}, {
-	"key" : "es.port",
-	"value" : "9200"
-	}, {
-	"key" : "es.cluster.name",
-	"value" : "rtesapcluster"
-	}
- ]
+  "application": {
+    "parameters": [],
+    "inputOutput": {
+      "dataArchiveLocation": "maprfs:///dl.dev/data/mct/archives",
+      "dataInputLocation": "maprfs:///dl.dev/data/mct/input",
+      "dataOutputLocation": "maprfs:///dl.dev/data/mct/output",
+      "objectDefinitionsLocation": "/opt/bda/apps/sawdemo/conf/objects",
+      "rejectedDataOutputLocation": "maprfs:///dl.dev/data/mct/rejected",
+      "resultLocation": "/opt/bda/apps/sawdemo/result",
+      "temporaryLocation": "maprfs:///dl.dev/data/mct/tmp"
+    },
+    "dataObjects": [
+      {
+        "name": "MCT_SESSION",
+        "parser": {
+          "parseType": "delimited",
+          "objectDefinition": "saw_mct_data_session_def.json",
+          "filemask": "mct_tmo_session.txt"
+        },
+        "transformer": {
+          "outputType": "parquet",
+          "createTemporaryDataset": false
+        }
+      }
+    ]
+  },
+  "system": [
+    {
+      "key": "driver.memory",
+      "value": "2g"
+    },
+    {
+      "key": "spark.executor.memory",
+      "value": "2g"
+    },
+    {
+      "key": "spark.cores.max",
+      "value": "2"
+    },
+    {
+      "key": "spark.master",
+      "value": "spark://mapr-dev03.sncrbda.dev.vacum-np.sncrcorp.net:7077"
+    },
+    {
+      "key": "maprfs_location",
+      "value": "/mapr/dev_rt"
+    },
+    {
+      "key": "drill.url",
+      "value": "http://172.31.10.154:8047"
+    },
+    {
+      "key": "drill.dsn",
+      "value": "MapR_Drill_DSN"
+    },
+    {
+      "key": "es.nodes",
+      "value": "rtesap201"
+    },
+    {
+      "key": "es.port",
+      "value": "9200"
+    },
+    {
+      "key": "es.cluster.name",
+      "value": "rtesapcluster"
+    }
+  ]
 }

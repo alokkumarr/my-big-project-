@@ -6,10 +6,8 @@ import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram.Order;
-
 import com.synchronoss.querybuilder.model.ColumnField;
 import com.synchronoss.querybuilder.model.DataField;
-import com.synchronoss.querybuilder.model.GroupBy;
 import com.synchronoss.querybuilder.model.SplitBy;
 
 public class QueryBuilderUtil {
@@ -32,6 +30,10 @@ public class QueryBuilderUtil {
 						dateHistogramInterval(groupInterval(columnField.getGroupInterval())).order(Order.KEY_ASC);
 	
 			}
+		}
+		else 
+		{
+          aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(columnField.getColumnName());
 		}
 		
 		return aggregationBuilder;
