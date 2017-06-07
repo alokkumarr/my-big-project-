@@ -7,7 +7,7 @@ export const UserNewComponent = {
   template,
   bindings: {
     roles: '<',
-    userList: '='
+    onSave: '&'
   },
   styles: [style],
   controller: class UserNewController {
@@ -49,14 +49,13 @@ export const UserNewComponent = {
         this.response = response;
         if (this.response.valid) {
           this._$rootScope.showProgress = false;
-          this.userList = this.response.users;
           this.$dialog.hide(true);
           this._$mdToast.show({
             template: '<md-toast><span> User is successfully added </md-toast>',
             position: 'bottom left',
             toastClass: 'toast-primary'
           });
-          this._$state.go('admin');
+          this.onSave({users: this.response.users});
         } else {
           this._$rootScope.showProgress = false;
           this._$mdToast.show({

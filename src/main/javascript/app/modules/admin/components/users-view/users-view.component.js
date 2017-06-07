@@ -1,6 +1,7 @@
 import template from './users-view.component.html';
 import style from './users-view.component.scss';
 import AbstractComponentController from 'app/lib/common/components/abstractComponent';
+import {Subject} from 'rxjs/Subject';
 
 export const UsersViewComponent = {
   template,
@@ -18,6 +19,7 @@ export const UsersViewComponent = {
       this._$mdToast = $mdToast;
       this._JwtService = JwtService;
       this._$rootScope = $rootScope;
+      this.updater = new Subject();
       this.admin = {};
       this.states = {
         searchTerm: ''
@@ -70,9 +72,11 @@ export const UsersViewComponent = {
           this.showDialog({
             controller: scope => {
               scope.roles = this.response.roles;
-              scope.userList = this.userList;
+              scope.onSaveAction = users => {
+                this.updater.next({users});
+              };
             },
-            template: '<user-new roles="roles" user-list="userList"></user-new>',
+            template: '<user-new roles="roles" on-save="onSaveAction(users)"></user-new>',
             fullscreen: false
           });
         } else {
