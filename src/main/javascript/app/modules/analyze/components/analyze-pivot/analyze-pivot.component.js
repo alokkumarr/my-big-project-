@@ -4,16 +4,12 @@ import clone from 'lodash/clone';
 import fpMap from 'lodash/fp/map';
 import fpPipe from 'lodash/fp/pipe';
 import fpFilter from 'lodash/fp/filter';
-import fpPick from 'lodash/fp/pick';
 import find from 'lodash/find';
 import filter from 'lodash/filter';
 import isEmpty from 'lodash/isEmpty';
-<<<<<<< HEAD
 import assign from 'lodash/assign';
-=======
+import unset from 'lodash/unset';
 import cloneDeep from 'lodash/cloneDeep';
->>>>>>> develop
-import omit from 'lodash/omit';
 import fpGroupBy from 'lodash/fp/groupBy';
 import fpMapValues from 'lodash/fp/mapValues';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
@@ -56,7 +52,6 @@ export const AnalyzePivotComponent = {
         // new analysis
         this._AnalyzeService.createAnalysis(this.model.semanticId, this.model.type)
           .then(analysis => {
-<<<<<<< HEAD
             this.model = assign(this.model, analysis);
             this.model.repository = {
               storageType: 'ES',
@@ -64,9 +59,7 @@ export const AnalyzePivotComponent = {
               type: 'session_type'
             };
             this.model.id = analysis.id;
-=======
             this.artifacts = analysis.artifacts;
->>>>>>> develop
             this.prepareFields(analysis.artifacts[0].columns);
             this.toggleSettingsSidenav();
           });
@@ -129,7 +122,6 @@ export const AnalyzePivotComponent = {
 
     loadPivotData() {
       const model = this.getModel();
-      console.log('load model: ', this.getModel());
       this._AnalyzeService.getDataBySettings(clone(model))
         .then(({analysis, data}) => {
           console.log(analysis, data);
@@ -299,12 +291,14 @@ export const AnalyzePivotComponent = {
 
     getModel() {
       this.updateFields();
-      return assign(this.model, {
+      const model = assign(this.model, {
         artifacts: [{
           columns: this._PivotService.getFrontend2BackendFieldMapper()(this.fieldsToSave)
         }],
         sqlBuilder: this.getSqlBuilder()
       });
+      unset(model, 'supports');
+      return model;
     }
 
     getSqlBuilder() {
@@ -321,10 +315,7 @@ export const AnalyzePivotComponent = {
       )(this.fieldsToSave);
 
       return {
-        filters: fpPipe(
-          this._FilterService.getSelectedFilterMapper(),
-          fpMap(this._FilterService.getFrontEnd2BackEndFilterMapper())
-        )(this.filters.possible),
+        filters: map(this.filters, this._FilterService.frontend2BackendFilter()),
         sorts: this.mapFrontend2BackendSort(this.sorts),
         rowFields: groupedFields.row,
         columnFields: groupedFields.column,
@@ -332,13 +323,10 @@ export const AnalyzePivotComponent = {
       };
     }
 
-<<<<<<< HEAD
     openSaveModal(ev) {
       const model = this.getModel();
-=======
-      this.model.filters = map(this.filters, this._FilterService.frontend2BackendFilter());
-      this.model.sorts = this.mapFrontend2BackendSort(this.sorts);
->>>>>>> develop
+      // this.model.filters = map(this.filters, this._FilterService.frontend2BackendFilter());
+      // this.model.sorts = this.mapFrontend2BackendSort(this.sorts);
       const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
       this._$mdDialog
