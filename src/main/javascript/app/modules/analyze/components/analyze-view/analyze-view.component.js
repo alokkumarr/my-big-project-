@@ -73,6 +73,7 @@ export const AnalyzeViewComponent = {
         filter: this.states.searchTerm
       }).then(analyses => {
         this.analyses = sortBy(analyses, analysis => -parseInt(analysis.id, 10));
+        this.updater.next({analyses});
         this._$rootScope.showProgress = false;
       }).catch(() => {
         this._$rootScope.showProgress = false;
