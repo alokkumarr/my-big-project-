@@ -5,8 +5,13 @@ export function toastMessageService(toastr) {
   'ngInject';
 
   return {
-    error
+    error,
+    info
   };
+
+  function info(msg) {
+    toastr.info(msg);
+  }
 
   function error(msg) {
     toastr.error(msg);

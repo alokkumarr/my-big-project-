@@ -1,5 +1,4 @@
 import 'devextreme/ui/pivot_grid';
-import forEach from 'lodash/forEach';
 import map from 'lodash/map';
 import clone from 'lodash/clone';
 import fpMap from 'lodash/fp/map';
@@ -9,7 +8,11 @@ import fpPick from 'lodash/fp/pick';
 import find from 'lodash/find';
 import filter from 'lodash/filter';
 import isEmpty from 'lodash/isEmpty';
+<<<<<<< HEAD
 import assign from 'lodash/assign';
+=======
+import cloneDeep from 'lodash/cloneDeep';
+>>>>>>> develop
 import omit from 'lodash/omit';
 import fpGroupBy from 'lodash/fp/groupBy';
 import fpMapValues from 'lodash/fp/mapValues';
@@ -19,7 +22,6 @@ import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 import template from './analyze-pivot.component.html';
 import style from './analyze-pivot.component.scss';
 
-import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter/analyze-filter-sidenav.component';
 import {ANALYZE_PIVOT_SETTINGS_SIDENAV_ID} from '../analyze-pivot-settings/analyze-pivot-settings.component';
 
 export const AnalyzePivotComponent = {
@@ -42,20 +44,19 @@ export const AnalyzePivotComponent = {
       this.normalizedData = [];
       this.dataSource = {};
       this.sorts = [];
-      this.filters = {};
+      this.filters = [];
       this.sortFields = null;
       this.pivotGridUpdater = new BehaviorSubject({});
       this.settingsModified = false;
+      this.artifacts = [];
     }
 
     $onInit() {
-      this._FilterService.onApplyFilters(filters => this.onApplyFilters(filters));
-      this._FilterService.onClearAllFilters(() => this.onClearAllFilters());
-
       if (isEmpty(this.model.artifacts)) {
         // new analysis
         this._AnalyzeService.createAnalysis(this.model.semanticId, this.model.type)
           .then(analysis => {
+<<<<<<< HEAD
             this.model = assign(this.model, analysis);
             this.model.repository = {
               storageType: 'ES',
@@ -63,34 +64,24 @@ export const AnalyzePivotComponent = {
               type: 'session_type'
             };
             this.model.id = analysis.id;
+=======
+            this.artifacts = analysis.artifacts;
+>>>>>>> develop
             this.prepareFields(analysis.artifacts[0].columns);
             this.toggleSettingsSidenav();
           });
         // if it's a pivot analysis we're only interested in the first artifact
       } else {
         // edit existing analysis
-        this.prepareFields(this.model.artifacts[0].columns);
+        this.artifacts = this.model.artifacts;
+        this.prepareFields(this.artifacts[0].columns);
         this.loadPivotData().then(() => {
-          this.filters.possible = this._PivotService.mapFieldsToFilters(this.normalizedData, this.fields);
-          this.filters.selected = [];
-          const selectedFilters = map(this.model.filters, this._FilterService.getBackEnd2FrontEndFilterMapper());
-          this.mergeSelectedFiltersWithFilters(selectedFilters, this.filters.possible);
+          this.filters = map(this.model.filters,
+            this._FilterService.backend2FrontendFilter(this.model.artifacts));
           this.sortFields = this.getFieldToSortFieldMapper()(this.fields);
           this.sorts = this.mapBackend2FrontendSort(this.model.sorts, this.sortFields);
         });
       }
-    }
-
-    $onDestroy() {
-      this._FilterService.offApplyFilters();
-      this._FilterService.offClearAllFilters();
-    }
-
-    mergeSelectedFiltersWithFilters(selectedFilters, filters) {
-      forEach(selectedFilters, selectedFilter => {
-        const targetFilter = find(filters, ({name}) => name === selectedFilter.name);
-        targetFilter.model = selectedFilter.model;
-      });
     }
 
     onApplyFieldSettings() {
@@ -159,43 +150,33 @@ export const AnalyzePivotComponent = {
     }
 
 // filters
-    openFilterSidenav() {
-      this._FilterService.openFilterSidenav(this.filters.possible, ANALYZE_FILTER_SIDENAV_IDS.designer);
+    openFiltersModal(ev) {
+      const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts"></analyze-filter-modal>';
+      this._$mdDialog.show({
+        template: tpl,
+        controller: scope => {
+          scope.filters = cloneDeep(this.filters);
+          scope.artifacts = this.artifacts;
+        },
+        targetEvent: ev,
+        fullscreen: true,
+        autoWrap: false,
+        multiple: true
+      }).then(this.onApplyFilters.bind(this));
     }
 
     onApplyFilters(filters) {
-      this.filters.possible = filters;
-      this.filters.selected = this.getSelectedFilters();
-      this.filterGridData();
-    }
-
-    filterGridData() {
-      this.pivotGridUpdater.next({
-        filters: this.filters.possible
-      });
-      this.settingsModified = true;
+      if (filters) {
+        this.filters = filters;
+      }
     }
 
     onClearAllFilters() {
-      this.clearFilters();
-      this.filters.selected = [];
+      this.filters = [];
     }
 
-    clearFilters() {
-      forEach(this.filters.possible, filter => {
-        filter.model = null;
-      });
-      this.filterGridData();
-    }
-
-    onFilterRemoved(filter) {
-      filter.model = null;
-      this.filters.selected = this.getSelectedFilters();
-      this.filterGridData();
-    }
-
-    getSelectedFilters() {
-      return this._FilterService.getSelectedFilterMapper()(this.filters.possible);
+    onFilterRemoved(index) {
+      this.filters.splice(index, 1);
     }
 // END filters
 
@@ -351,8 +332,13 @@ export const AnalyzePivotComponent = {
       };
     }
 
+<<<<<<< HEAD
     openSaveModal(ev) {
       const model = this.getModel();
+=======
+      this.model.filters = map(this.filters, this._FilterService.frontend2BackendFilter());
+      this.model.sorts = this.mapFrontend2BackendSort(this.sorts);
+>>>>>>> develop
       const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
       this._$mdDialog

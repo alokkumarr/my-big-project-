@@ -1,18 +1,26 @@
 <div layout="row">
 
+  <md-input-container flex="30" ng-show="$ctrl.tempModel.operator === $ctrl.OPERATORS.BETWEEN.value">
+    <input required
+           type="number"
+           ng-model="$ctrl.tempModel.otherValue"
+           ng-change="$ctrl.onModelChange()" />
+  </md-input-container>
+
   <md-input-container flex="40" md-no-float>
-    <md-select ng-model="$ctrl.filter.operator" placeholder="{{'PLEASE_SELECT' | translate}}">
+    <md-select ng-model="$ctrl.tempModel.operator"
+               placeholder="{{'PLEASE_SELECT' | translate}}"
+               ng-change="$ctrl.onModelChange()">
       <md-option ng-repeat="operator in $ctrl.operators"
                  ng-value="operator.value"
                  ng-bind="::operator.shortName"></md-option>
     </md-select>
   </md-input-container>
 
-  <md-input-container flex="30" ng-show="$ctrl.filter.operator === $ctrl.OPERATORS.BETWEEN.value">
-    <input type="number" ng-model="$ctrl.filter.model.otherValue" />
-  </md-input-container>
-
-  <md-input-container flex="{{$ctrl.filter.operator === $ctrl.OPERATORS.BETWEEN.value ? 30 : 60}}">
-    <input type="number" ng-model="$ctrl.filter.model.value"/>
+  <md-input-container flex="{{$ctrl.tempModel.operator === $ctrl.OPERATORS.BETWEEN.value ? 30 : 60}}">
+    <input required
+           type="number"
+           ng-model="$ctrl.tempModel.value"
+           ng-change="$ctrl.onModelChange()" />
   </md-input-container>
 </div>

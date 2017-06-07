@@ -1,21 +1,19 @@
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import findIndex from 'lodash/findIndex';
+import find from 'lodash/find';
+import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
+import assign from 'lodash/assign';
+import map from 'lodash/map';
+import values from 'lodash/values';
+import clone from 'lodash/clone';
+import filter from 'lodash/filter';
+import set from 'lodash/set';
+import cloneDeep from 'lodash/cloneDeep';
 import {NUMBER_TYPES} from '../../services/filter.service';
-import {
-  assign,
-  findIndex,
-  find,
-  get,
-  set,
-  isEmpty,
-  map,
-  values,
-  clone,
-  filter
-} from 'lodash';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
-import {ANALYZE_FILTER_SIDENAV_IDS} from '../analyze-filter/analyze-filter-sidenav.component';
 
 export const AnalyzeChartComponent = {
   template,
@@ -52,13 +50,7 @@ export const AnalyzeChartComponent = {
         tempY: '', tempX: '', y: '', x: ''
       };
 
-      this.filters = {
-        // array of strings with the columns displayName that the filter is based on
-        selected: [],
-        // possible filters shown in the sidenav, generated from the checked columns
-        // of the jsPlumb canvas.model
-        possible: []
-      };
+      this.filters = [];
 
       this.chartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
       $window.chartctrl = this;
@@ -69,9 +61,6 @@ export const AnalyzeChartComponent = {
     }
 
     $onInit() {
-      this._FilterService.onApplyFilters(filters => this.onApplyFilters(filters));
-      this._FilterService.onClearAllFilters(() => this.clearFilters());
-
       if (this.mode === 'fork') {
         delete this.model.id;
       }
@@ -86,11 +75,6 @@ export const AnalyzeChartComponent = {
       }
     }
 
-    $onDestroy() {
-      this._FilterService.offApplyFilters();
-      this._FilterService.offClearAllFilters();
-    }
-
     initChart() {
       this.fillSettings(this.model.artifacts, this.model);
 
@@ -102,7 +86,7 @@ export const AnalyzeChartComponent = {
       this.labels.tempY = this.labels.y = get(this.model, 'yAxis.title', null);
       this.filters.selected = map(
         get(this.model, 'sqlBuilder.filters', []),
-        beFilter => this._FilterService.getBackEnd2FrontEndFilterMapper()(beFilter)
+        this._FilterService.backend2FrontendFilter()
       );
       this.onSettingsChanged(this.settings);
     }
@@ -187,26 +171,18 @@ export const AnalyzeChartComponent = {
       this.reloadChart(this.settings, this.filteredGridData);
     }
 
-    onSettingsChanged(settings) {
-      // On changes to x or y axis parameters, run the new parameters
-      // through filters.
-      const attributes = settings.yaxis.concat(settings.xaxis).concat(settings.groupBy);
-      this.filters.possible = this.generateFilters(filter(attributes, x => x.checked));
-      this._FilterService.mergeCanvasFiltersWithPossibleFilters(this.filters.selected, this.filters.possible);
-      this.onApplyFilters(this.filters.possible);
+    clearFilters() {
+      this.filters = [];
     }
 
-    clearFilters() {
-      this.onApplyFilters(
-        this._FilterService.getFilterClearer()(this.filters.possible)
-      );
+    onFilterRemoved(index) {
+      this.filters.splice(index, 1);
     }
 
     onApplyFilters(filters) {
-      this.filters.possible = filters;
-      this.filters.selected = this._FilterService.getSelectedFilterMapper()(filters);
-
-      this.analysisChanged = true;
+      if (filters) {
+        this.filters = filters;
+      }
     }
 
     refreshChartData() {
@@ -222,14 +198,19 @@ export const AnalyzeChartComponent = {
       });
     }
 
-    onFilterRemoved(filter) {
-      filter.model = null;
-      this.filters.selected = this._FilterService.getSelectedFilterMapper()(this.filters.possible);
-      this.analysisChanged = true;
-    }
-
-    generateFilters(selectedFields) {
-      return this._FilterService.getChartSetttingsToFiltersMapper(this.gridData)(selectedFields);
+    openFiltersModal(ev) {
+      const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts"></analyze-filter-modal>';
+      this._$mdDialog.show({
+        template: tpl,
+        controller: scope => {
+          scope.filters = cloneDeep(this.filters);
+          scope.artifacts = this.model.artifacts;
+        },
+        targetEvent: ev,
+        fullscreen: true,
+        autoWrap: false,
+        multiple: true
+      }).then(this.onApplyFilters.bind(this));
     }
 
     reloadChart(settings, filteredGridData) {
@@ -244,10 +225,6 @@ export const AnalyzeChartComponent = {
     }
 
     // filters section
-    openFilterSidenav() {
-      this._FilterService.openFilterSidenav(this.filters.possible, ANALYZE_FILTER_SIDENAV_IDS.designer);
-    }
-
     openDescriptionModal(ev) {
       const tpl = '<analyze-report-description model="model" on-save="onSave($data)"></analyze-report-description>';
 
@@ -299,7 +276,7 @@ export const AnalyzeChartComponent = {
 
       set(result, 'sqlBuilder.filters', map(
         this.filters.selected,
-        feFilter => this._FilterService.getFrontEnd2BackEndFilterMapper()(feFilter)
+        this._FilterService.frontend2BackendFilter()
       ));
 
       const y = find(this.settings.yaxis, x => x.checked);
