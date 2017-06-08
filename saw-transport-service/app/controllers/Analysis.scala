@@ -209,6 +209,7 @@ class Analysis extends BaseController {
     val typeInfo = analysisType.extract[String];
     val json = compact(render(analysisJSON));
     m_log.trace("json dataset: {}", json);
+    m_log.trace("type: {}", typeInfo);
     if ( typeInfo.equals("pivot") ){
       val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json), json);
