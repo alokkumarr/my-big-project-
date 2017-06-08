@@ -5,7 +5,8 @@ export const UserEditComponent = {
   template,
   bindings: {
     roles: '<',
-    user: '<'
+    user: '<',
+    onUpdate: '&'
   },
   styles: [style],
   controller: class UserNewController {
@@ -49,6 +50,7 @@ export const UserEditComponent = {
             position: 'bottom left',
             toastClass: 'toast-primary'
           });
+          this.onUpdate({users: this.response.users});
         } else {
           this._$rootScope.showProgress = false;
           this._$mdToast.show({

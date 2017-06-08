@@ -132,7 +132,7 @@ export const UsersViewComponent = {
     }
 
     openEditModal(user) {
-      this.editUser = user;
+      const editUser = user;
       this._$rootScope.showProgress = true;
       this.UsersManagementService.getRoles(this.resp.ticket.custID, this._JwtService.get()).then(response => {
         this.response = response;
@@ -141,10 +141,12 @@ export const UsersViewComponent = {
           this.showDialog({
             controller: scope => {
               scope.roles = this.response.roles;
-              scope.user = this.editUser;
-              scope.userList = this.userList;
+              scope.user = editUser;
+              scope.onUpdateAction = users => {
+                this.updater.next({users});
+              };
             },
-            template: '<user-edit roles="roles" user="user" ></user-edit>',
+            template: '<user-edit roles="roles" user="user" on-update="onUpdateAction(users)" ></user-edit>',
             fullscreen: false
           });
         } else {
