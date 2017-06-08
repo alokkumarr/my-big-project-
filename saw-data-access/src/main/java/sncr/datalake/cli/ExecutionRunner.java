@@ -33,9 +33,10 @@ public class ExecutionRunner {
             String execResId = cl.getOptionValue('r');
 
             OutputStream outStream = HFileOperations.writeToFile(cl.getOptionValue('o'));
-            out.println("Start data processing:\n input analysis ID: " + cl.getOptionValue('i') + "\nOutput path: " + cl.getOptionValue('o'));
+            out.println("Start data processing...  \nOutput path: " + cl.getOptionValue('o'));
 
             if (analysis_id != null && !analysis_id.isEmpty()) {
+                System.out.println("Execute: \nAnalysis node id: " + analysis_id);
                 AnalysisNode an = AnalysisNode.apply(analysis_id);
                 AnalysisNodeExecution ane = new AnalysisNodeExecution(an, true, execResId);
                 ane.executeAndSave(outStream, rowLimit);
@@ -47,12 +48,19 @@ public class ExecutionRunner {
                 if (sql == null || sql.isEmpty()) {
                     throw new Exception(ErrorCodes.IncorrectExecutionCall().toString() + ": Semantic layer execution requires SQL");
                 }
+                System.out.println("Execute: \nSemantic node id: " + semantic_id + "\nSQL: " + sql);
                 SemanticNode sn = SemanticNode.apply(semantic_id, SelectModels.everything().id());
                 sncr.datalake.handlers.SemanticNodeExecution sne = new sncr.datalake.handlers.SemanticNodeExecution(sn, true);
-                sne.executeSQL(sql, rowLimit);
-                String result = sne.getDataSampleAsString(sne.metric());
-                if (outStream != null)
-                    outStream.write(result.getBytes());
+                sne.loadObjects();
+                if (sne.executeSQL(sql, rowLimit) == 0) {
+                    String result = sne.getDataSampleAsString(sne.metric());
+                    if (outStream != null)
+                        outStream.write(result.getBytes());
+                }
+                else{
+                    System.err.println("ERROR: Could not execute SQL " + sql);
+                }
+
             }
             if (outStream != null ) {
                 outStream.flush();

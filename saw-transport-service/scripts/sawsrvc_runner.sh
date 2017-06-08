@@ -89,7 +89,7 @@ while : ; do
     echo $(dtz) - starting: sawsrvc_start.sh, cnt=$cnt
     let tm_beg=$(tms)
     # will use SAW_SERVICE_PORT from /etc/saw/service.env
-    /bin/sh -xc "let pid=\$\$; exec ${SAW_SERVICE_HOME}/sbin/sawsrvc_start.sh --fxj"
+    /bin/sh -xc "let pid=\$\$; exec ${SAW_SERVICE_HOME}/bin/sawsrvc_start.sh --fxj"
     rc=$?
     let tm_end=$(tms)
     let ss_run=$((tm_end-tm_beg))
@@ -133,4 +133,4 @@ exit -1
 # lines to be added to /etc/rc.local
 ###
 # start SAW front end server
-/opt/saw/service/sbin/sawsrvc_runner.sh &>/tmp/rc.local.saw_service_runner.log
+/opt/saw/service/bin/sawsrvc_runner.sh &>/tmp/rc.local.saw_service_runner.log

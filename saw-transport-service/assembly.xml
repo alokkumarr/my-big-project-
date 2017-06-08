@@ -22,8 +22,11 @@
 	  </fileSet>
 	  <fileSet>
 		  <directoryMode>750</directoryMode>
-		  <directory>${project.basedir}/../saw-data-access/target/saw-data-access-${project.version}-package/saw-data-access-${project.version}/lib</directory>
-		  <outputDirectory>lib</outputDirectory>
+		  <directory>${project.basedir}/../saw-data-access/target</directory>
+		  <outputDirectory>sparklib</outputDirectory>
+		  <includes>
+			  <include>saw-data-access-${project.version}-jar-with-dependencies.jar</include>
+		  </includes>
 		  <fileMode>440</fileMode>
 	  </fileSet>
   </fileSets>

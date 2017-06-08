@@ -1,7 +1,5 @@
 package sncr.datalake.handlers
 
-import java.util
-
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
 import org.apache.hadoop.fs.Path
 import org.json4s.JsonAST.JValue
@@ -18,7 +16,7 @@ import sncr.metadata.semantix.SemanticNode
   */
 class SemanticNodeExecution(val sn : SemanticNode, cacheIt : Boolean = false ) extends DLSession with HasDataObject[SemanticNodeExecution]{
 
-  override protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisNodeExecution].getName)
+  override protected val m_log: Logger = LoggerFactory.getLogger(classOf[SemanticNodeExecution].getName)
 
   if (sn.getCachedData.isEmpty) throw new DAException(ErrorCodes.NodeDoesNotExist, "SemanticNode")
   if (sn.getRelatedNodes.isEmpty) throw new DAException(ErrorCodes.DataObjectNotFound, "SemanticNode")
@@ -31,22 +29,8 @@ class SemanticNodeExecution(val sn : SemanticNode, cacheIt : Boolean = false ) e
     throw new DAException(ErrorCodes.InvalidAnalysisNode, s"Definition not found, Row ID: ${Bytes.toString(sn.getRowKey)}")
 
 //  if (cacheIt) DLSession.pinToCache(this)
-
-  def executeSQL(sql : String) : Int =
-  {
-    val ldesc: JValue = dSemanticRaw.get match {
-      case x: JValue => x
-      case s: String => parse(s, false, false)
-    }
-    val name = (ldesc \ "metricName").extractOpt[String]
-    if (name.isEmpty)
-      throw new DAException(ErrorCodes.InvalidAnalysisNode, s"Metric Name attribute not found, Row ID: ${Bytes.toString(sn.getRowKey)}")
-    execute(name.get, sql)
-  }
-
   dataObjects = sn.loadRelationElements.map( _.asInstanceOf[DataObject])
-
-  if (dataObjects.isEmpty) throw new DAException(ErrorCodes.DataObjectNotLoaded, "AnalysisNode")
+  if (dataObjects.isEmpty) throw new DAException(ErrorCodes.DataObjectNotLoaded, "SemanticNode")
 
   //if (cacheIt) DLSession.pinToCache(this)
 
@@ -69,7 +53,7 @@ class SemanticNodeExecution(val sn : SemanticNode, cacheIt : Boolean = false ) e
   var isDataLoaded = false
 
   /**
-    * Specific to AnalysisNode method to load data objects
+    * Specific to SemanticNode method to load data objects
     */
   def loadObjects() =
     m_log debug "Start loading objects!"
@@ -87,15 +71,9 @@ class SemanticNodeExecution(val sn : SemanticNode, cacheIt : Boolean = false ) e
     * @param limit - number of rows to return, it should be less or equal value configured in application configuration file.
     * @return
     */
-  def executeSQL(sql : String, limit : Int = DLConfiguration.rowLimit): java.util.List[util.Map[String, (String, Object)]] = {
-    lastSQLExecRes = execute(metric, sql, limit)
-    if (lastSQLExecRes == 0) {
-      getData(metric)
-    }
-    else {
-      m_log error "Could not execute SQL, see underlying exception"
-      null
-    }
+  def executeSQL(sql : String, limit : Int = DLConfiguration.rowLimit): Int = {
+    m_log debug s"Execute SQL: $sql for metric: $metric"
+    lastSQLExecRes = execute(metric, sql, limit); lastSQLExecRes
   }
 
 }

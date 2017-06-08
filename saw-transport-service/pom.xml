@@ -521,7 +521,20 @@
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/sbin</directory>
+                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/sparklib</directory>
+                            <filemode>440</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                            <sources>
+                                <source>
+                                    <location>
+                                        target/${project.artifactId}-${project.version}-package/${project.artifactId}-${project.version}/sparklib
+                                    </location>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/bin</directory>
                             <filemode>750</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>

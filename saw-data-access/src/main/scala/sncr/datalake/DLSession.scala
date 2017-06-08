@@ -109,18 +109,19 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     * @param viewName - temp view/table name
     * @param sql  - statement to execute
     * @param limit - return max number of rows
-    * @return - record set as java Map
+    * @return - result indicator
     */
 
   protected def execute(viewName: String, sql: String, limit: Int = DLConfiguration.rowLimit) : Int = {
     try {
+      m_log debug s"Execute SQL: $sql, view name: $viewName"
       val newDf = sparkSession.sql(sql)
       newDf.createOrReplaceTempView(viewName)
 
       if (loadedData.get(viewName).isDefined) loadedData -= viewName
       if (nativeloadedData.get(viewName).isDefined) nativeloadedData -= viewName
 
-      val data = DLSession.convert(newDf, DLConfiguration.rowLimit)
+      val data = DLSession.convert(newDf, limit)
       loadedData += (viewName -> data)
       nativeloadedData += (viewName -> newDf)
       lastUsed = System.currentTimeMillis

@@ -66,7 +66,7 @@
 		</dependency>
 	</dependencies>
 	<build>
-		<sourceDirectory>${project.basedir}/src/main</sourceDirectory>
+		<sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
 		<testSourceDirectory>${project.basedir}/src/test</testSourceDirectory>
 	<plugins>
 		<plugin>
@@ -102,8 +102,8 @@
 				<recompileMode>incremental</recompileMode>
 			</configuration>
 		</plugin>
-	<!-- Assembly plugin 1: collect artifacts to DIR fro future RPM -->
-		<plugin>
+	<!-- /* NOT USED - SHOULD BE REMOVED IN FUTURE */ Assembly plugin 1: collect artifacts to DIR for future RPM -->
+		<!-- plugin>
 			<artifactId>maven-assembly-plugin</artifactId>
 			<version>3.0.0</version>
 			<executions>
@@ -121,7 +121,7 @@
 				  <descriptor>${project.basedir}/assembly.xml</descriptor>
 				</descriptors>
 			</configuration>
-		</plugin>
+		</plugin -->
 		<!-- Assembly plugin : end -->
 		<!-- Assembly plugin 2: Packs artifact to *.tar.gz account for standalone usage -->
 		<plugin>
