@@ -1,8 +1,9 @@
-package com.sncr.nsso.common.bean;
+package com.sncr.nsso.common.bean.repo.analysis;
 
 import java.io.Serializable;
 import java.util.List;
-import com.sncr.nsso.common.bean.AnalysisSummary;
+
+import com.sncr.nsso.common.bean.repo.analysis.AnalysisSummary;
 
 public class AnalysisSummaryList implements Serializable{
 

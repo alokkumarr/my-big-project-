@@ -30,10 +30,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.Gson;
 import com.sncr.nsso.app.properties.NSSOProperties;
 import com.sncr.nsso.app.repository.UserRepository;
-import com.sncr.nsso.common.bean.Analysis;
-import com.sncr.nsso.common.bean.AnalysisPrivilegeSummary;
-import com.sncr.nsso.common.bean.AnalysisSummary;
-import com.sncr.nsso.common.bean.AnalysisSummaryList;
 import com.sncr.nsso.common.bean.ChangePasswordDetails;
 import com.sncr.nsso.common.bean.LoginDetails;
 import com.sncr.nsso.common.bean.RandomHashcode;
@@ -41,8 +37,12 @@ import com.sncr.nsso.common.bean.ResetPwdDtls;
 import com.sncr.nsso.common.bean.ResetValid;
 import com.sncr.nsso.common.bean.Ticket;
 import com.sncr.nsso.common.bean.User;
-import com.sncr.nsso.common.bean.UsersList;
 import com.sncr.nsso.common.bean.Valid;
+import com.sncr.nsso.common.bean.repo.admin.DeleteUser;
+import com.sncr.nsso.common.bean.repo.admin.RolesDropDownList;
+import com.sncr.nsso.common.bean.repo.admin.UsersList;
+import com.sncr.nsso.common.bean.repo.analysis.Analysis;
+import com.sncr.nsso.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.nsso.common.util.TicketHelper;
 
 import io.jsonwebtoken.Jwts;
@@ -569,13 +569,15 @@ public class SecurityController {
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/users/fetch", method = RequestMethod.POST)
 	public UsersList getUsers(@RequestBody Long customerId) {
-		UsersList userList = null;
+		UsersList userList = new UsersList();
 		try {
 			if (customerId != null) {
-				userList = new UsersList();
 				userList.setUsers(userRepository.getUsers(customerId));
 				userList.setValid(true);
-			} 
+			} else {
+				userList.setValid(false);
+				userList.setError("Mandatory request params are missing");
+			}
 		} catch (DataAccessException de) {			
 			userList.setValid(false);
 			userList.setValidityMessage("Database error. Please contact server Administrator.");
@@ -588,6 +590,167 @@ public class SecurityController {
 			return userList;
 		}
 		return userList;
+	}
+	
+	/**
+	 * 
+	 * @param user
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/users/add", method = RequestMethod.POST)
+	public UsersList addUser(@RequestBody User user) {
+		UsersList userList = new UsersList();
+		Valid valid = null;
+		try {
+			if (user != null) {
+				valid = userRepository.addUser(user);
+				if(valid.getValid()) {
+					userList.setUsers(userRepository.getUsers(user.getCustomerId()));
+					userList.setValid(true);
+				} else {
+					userList.setValid(false);
+					userList.setValidityMessage("User could not be added. "+ valid.getError());
+				}				
+			} else {
+				userList.setValid(false);
+				userList.setValidityMessage("Mandatory request params are missing");
+			}
+		} catch (DataAccessException de) {			
+			userList.setValid(false);
+			userList.setValidityMessage("Database error. Please contact server Administrator.");
+			userList.setError(de.getMessage());		
+			return userList;
+		} catch (Exception e) {			
+			userList.setValid(false);
+			userList.setValidityMessage("Error. Please contact server Administrator.");
+			userList.setError(e.getMessage());			
+			return userList;
+		}
+		return userList;
+	}
+	
+	/**
+	 * 
+	 * @param user
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/users/edit", method = RequestMethod.POST)
+	public UsersList updateUser(@RequestBody User user) {
+		UsersList userList = new UsersList();
+		try {
+			if (user != null) {
+				userList.setValid(true);
+				if(user.getPassword() != null){
+					if(user.getPassword().length() < 8) {
+						userList.setValidityMessage("New password should be minimum of 8 charactar.");
+						userList.setValid(false);
+					} else if (user.getMasterLoginId().equals(user.getPassword())) {
+						userList.setValidityMessage("User Name can't be assigned as password.");
+						userList.setValid(false);
+					}
+					Pattern pCaps = Pattern.compile("[A-Z]");
+					Matcher m = pCaps.matcher(user.getPassword());
+					if (!m.find()) {
+						userList.setValidityMessage("Password should contain atleast 1 uppercase charactar.");
+						userList.setValid(false);
+					}
+					Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
+					m = pSpeChar.matcher(user.getPassword());
+					if (!m.find()) {
+						userList.setValidityMessage("Password should contain atleast 1 special charactar.");
+						userList.setValid(false);
+					}
+				}				
+				if(userList.getValid()) {
+					if(userRepository.updateUser(user)) {
+						userList.setUsers(userRepository.getUsers(user.getCustomerId()));
+						userList.setValid(true);
+					} else {
+						userList.setValid(false);
+						userList.setValidityMessage("User could not be edited.");
+					}	
+				}							
+			} else {
+				userList.setValid(false);
+				userList.setError("Mandatory request params are missing");
+			}
+		} catch (DataAccessException de) {			
+			userList.setValid(false);
+			userList.setValidityMessage("Database error. Please contact server Administrator.");
+			userList.setError(de.getMessage());		
+			return userList;
+		} catch (Exception e) {			
+			userList.setValid(false);
+			userList.setValidityMessage("Error. Please contact server Administrator.");
+			userList.setError(e.getMessage());			
+			return userList;
+		}
+		return userList;
+	}
+	
+	/**
+	 * 
+	 * @param user
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/users/delete", method = RequestMethod.POST)
+	public UsersList deleteUser(@RequestBody DeleteUser deleteUser) {
+		UsersList userList = new UsersList();
+		try {
+			if (deleteUser.getUserId() != null && deleteUser.getCustomerId() != null && deleteUser.getMasterLoginId() != null) {
+				if(userRepository.deleteUser(deleteUser.getUserId(), deleteUser.getMasterLoginId())) {
+					userList.setUsers(userRepository.getUsers(deleteUser.getCustomerId()));
+					userList.setValid(true);
+				} else {
+					userList.setValid(false);
+					userList.setValidityMessage("User could not be deleted.");
+				}				
+			} else {
+				userList.setValid(false);
+				userList.setError("Mandatory request params are missing");
+			}
+		} catch (DataAccessException de) {			
+			userList.setValid(false);
+			userList.setValidityMessage("Database error. Please contact server Administrator.");
+			userList.setError(de.getMessage());		
+			return userList;
+		} catch (Exception e) {			
+			userList.setValid(false);
+			userList.setValidityMessage("Error. Please contact server Administrator.");
+			userList.setError(e.getMessage());			
+			return userList;
+		}
+		return userList;
+	}
+	
+	/**
+	 * 
+	 * @param user
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/dropdown/getRoles", method = RequestMethod.POST)
+	public RolesDropDownList getRoles(@RequestBody Long customerId) {
+		RolesDropDownList  roles =  new RolesDropDownList();
+		try {
+			if (customerId != null) {				
+				roles.setRoles(userRepository.getRolesDropDownList(customerId));
+				roles.setValid(true);
+			} else {
+				roles.setValid(false);
+				roles.setError("Mandatory request params are missing");
+			}
+		} catch (DataAccessException de) {			
+			roles.setValid(false);
+			roles.setValidityMessage("Database error. Please contact server Administrator.");
+			roles.setError(de.getMessage());		
+			return roles;
+		} catch (Exception e) {			
+			roles.setValid(false);
+			roles.setValidityMessage("Error. Please contact server Administrator.");
+			roles.setError(e.getMessage());			
+			return roles;
+		}
+		return roles;
 	}
 	/**
 	 * 

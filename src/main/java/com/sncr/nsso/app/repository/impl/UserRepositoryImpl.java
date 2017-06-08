@@ -14,24 +14,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 
 import com.sncr.nsso.app.repository.UserRepository;
-import com.sncr.nsso.common.bean.Analysis;
-import com.sncr.nsso.common.bean.AnalysisSummary;
-import com.sncr.nsso.common.bean.AnalysisSummaryList;
 import com.sncr.nsso.common.bean.ResetValid;
+import com.sncr.nsso.common.bean.Role;
 import com.sncr.nsso.common.bean.Ticket;
 import com.sncr.nsso.common.bean.User;
+import com.sncr.nsso.common.bean.Valid;
 import com.sncr.nsso.common.bean.repo.PasswordDetails;
 import com.sncr.nsso.common.bean.repo.ProductModuleFeature;
 import com.sncr.nsso.common.bean.repo.ProductModuleFeaturePrivileges;
 import com.sncr.nsso.common.bean.repo.ProductModules;
 import com.sncr.nsso.common.bean.repo.Products;
 import com.sncr.nsso.common.bean.repo.TicketDetails;
+import com.sncr.nsso.common.bean.repo.analysis.Analysis;
+import com.sncr.nsso.common.bean.repo.analysis.AnalysisSummary;
+import com.sncr.nsso.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.nsso.common.util.Ccode;
 import com.sncr.nsso.common.util.DateUtil;
 
@@ -1149,8 +1152,8 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public ArrayList<User> getUsers(Long customerId) {
 		ArrayList<User> userList = null;
-		String sql = "SELECT U.USER_SYS_ID, U.USER_ID, U.EMAIL, R.ROLE_NAME,  U.CUSTOMER_SYS_ID, U.FIRST_NAME, U.MIDDLE_NAME, U.LAST_NAME,"
-				+ " U.ACTIVE_STATUS_IND FROM USERS U, ROLES R WHERE U.CUSTOMER_SYS_ID = R.CUSTOMER_SYS_ID AND U.CUSTOMER_SYS_ID=?";
+		String sql = "SELECT U.USER_SYS_ID, U.USER_ID, U.EMAIL, R.ROLE_NAME, R.ROLE_SYS_ID,  U.CUSTOMER_SYS_ID, U.FIRST_NAME, U.MIDDLE_NAME, U.LAST_NAME,"
+				+ " U.ACTIVE_STATUS_IND FROM USERS U, ROLES R WHERE U.CUSTOMER_SYS_ID = R.CUSTOMER_SYS_ID AND U.ROLE_SYS_ID = R.ROLE_SYS_ID AND U.CUSTOMER_SYS_ID=?";
 		try {
 			userList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
@@ -1173,14 +1176,17 @@ public class UserRepositoryImpl implements UserRepository {
 		public ArrayList<User> extractData(ResultSet rs) throws SQLException, DataAccessException {
 			User user = null;
 			ArrayList<User> userList = new ArrayList<User>();
-			if (rs.next()) {
+			while (rs.next()) {
 				user = new User();				
 				user.setMasterLoginId(rs.getString("USER_ID"));
-				user.setUserId(rs.getString("USER_SYS_ID"));
+				user.setUserId(rs.getLong("USER_SYS_ID"));
 				user.setEmail(rs.getString("EMAIL"));
 				user.setRoleName(rs.getString("ROLE_NAME"));
+				user.setRoleId(rs.getLong("ROLE_SYS_ID"));
 				user.setFirstName(rs.getString("FIRST_NAME"));
 				user.setLastName(rs.getString("LAST_NAME"));
+				user.setMiddleName(rs.getString("MIDDLE_NAME"));
+				user.setCustomerId(rs.getLong("CUSTOMER_SYS_ID"));
 				if(rs.getInt("ACTIVE_STATUS_IND") == 1){
 					user.setActiveStatusInd("Active");			
 				} else {
@@ -1190,6 +1196,132 @@ public class UserRepositoryImpl implements UserRepository {
 				userList.add(user);
 			}
 			return userList;
+		}
+	}
+
+	@Override
+	public Valid addUser(User user) {
+		Valid valid = new Valid();
+		String sql = "INSERT INTO USERS (USER_ID, EMAIL, ROLE_SYS_ID, CUSTOMER_SYS_ID, ENCRYPTED_PASSWORD, "
+				+ "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY ) "
+				+ "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE(), ? ); ";
+		try {
+			jdbcTemplate.update(sql, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, user.getMasterLoginId());
+					preparedStatement.setString(2, user.getEmail());					
+					preparedStatement.setLong(3, user.getRoleId());
+					preparedStatement.setLong(4, user.getCustomerId());
+					preparedStatement.setString(5, Ccode.cencode("Sawsyncnewuser1!").trim());
+					preparedStatement.setString(6, user.getFirstName());
+					preparedStatement.setString(7, user.getMiddleName());
+					preparedStatement.setString(8, user.getLastName());
+					preparedStatement.setString(9, user.getActiveStatusInd());
+					preparedStatement.setString(10, user.getMasterLoginId());
+				}
+			});			
+		} catch (DuplicateKeyException e) {
+			logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);	
+			valid.setValid(false);
+			valid.setError("User already Exists!");
+			return valid;
+		} catch (Exception e) {
+			logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);	
+			valid.setValid(false);
+			valid.setError(e.getMessage());
+			return valid;
+		}
+		valid.setValid(true);
+		return valid;
+	}
+	
+	@Override
+	public boolean updateUser(User user) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("UPDATE USERS SET EMAIL = ?, ROLE_SYS_ID = ? ");
+		if(user.getPassword() != null) {
+			sql.append(",ENCRYPTED_PASSWORD = '"+Ccode.cencode(user.getPassword()).trim()+"'");
+			sql.append(",PWD_MODIFIED_DATE = SYSDATE()");
+		}
+				
+		sql.append(",FIRST_NAME = ?, MIDDLE_NAME = ?, LAST_NAME = ?, ACTIVE_STATUS_IND = ?,"
+				+ " MODIFIED_DATE = SYSDATE(), MODIFIED_BY = ? WHERE USER_SYS_ID = ?");
+				
+		
+		
+		try {
+			jdbcTemplate.update(sql.toString(), new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {					
+					preparedStatement.setString(1, user.getEmail());
+					preparedStatement.setLong(2, user.getRoleId());					
+					preparedStatement.setString(3, user.getFirstName());
+					preparedStatement.setString(4, user.getMiddleName());
+					preparedStatement.setString(5, user.getLastName());
+					preparedStatement.setInt(6, Integer.parseInt(user.getActiveStatusInd()));
+					preparedStatement.setString(7, user.getMasterLoginId());
+					preparedStatement.setLong(8, user.getUserId());
+				}
+			});			
+		} catch (Exception e) {
+			logger.error("Exception encountered while updating user " + e.getMessage(), null, e);	
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
+	public boolean deleteUser(Long userId, String masterLoginId) {
+		String sql = "UPDATE USERS SET ACTIVE_STATUS_IND = 0, INACTIVATED_DATE=SYSDATE(), INACTIVATED_BY=?  "
+				+ " WHERE USER_SYS_ID = ?";
+		try {
+			jdbcTemplate.update(sql, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, masterLoginId);
+					preparedStatement.setLong(2, userId);
+					
+				}
+			});			
+		} catch (Exception e) {
+			logger.error("Exception encountered while deleting user " + e.getMessage(), null, e);	
+			return false;
+		}
+		return true;
+	}
+	
+	@Override
+	public List<Role> getRolesDropDownList(Long customerId) {
+		ArrayList<Role> rolesList = null;
+		String sql = "SELECT R.ROLE_SYS_ID, R.ROLE_NAME FROM ROLES R "
+				+ " WHERE R.CUSTOMER_SYS_ID = ? AND ACTIVE_STATUS_IND=1;";
+		try {
+			rolesList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setLong(1, customerId);
+				}
+			}, new UserRepositoryImpl.rolesDDDetailExtractor());
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;
+		} catch (Exception e) {
+			logger.error("Exception encountered while get Ticket Details for ticketId : " + e.getMessage(), null, e);
+		}
+
+		return rolesList;
+	}
+	
+	public class rolesDDDetailExtractor implements ResultSetExtractor<ArrayList<Role>> {
+
+		@Override
+		public ArrayList<Role> extractData(ResultSet rs) throws SQLException, DataAccessException {
+			Role role = null;
+			ArrayList<Role> roleList = new ArrayList<Role>();
+			while (rs.next()) {
+				role = new Role();				
+				role.setRoleName(rs.getString("ROLE_NAME"));
+				role.setRoleId(rs.getLong("ROLE_SYS_ID"));				
+				roleList.add(role);
+			}
+			return roleList;
 		}
 	}
 }

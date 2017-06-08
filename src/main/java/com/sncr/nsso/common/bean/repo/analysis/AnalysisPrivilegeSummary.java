@@ -1,4 +1,4 @@
-package com.sncr.nsso.common.bean;
+package com.sncr.nsso.common.bean.repo.analysis;
 
 import java.io.Serializable;
 
