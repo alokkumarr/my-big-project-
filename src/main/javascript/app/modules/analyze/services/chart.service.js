@@ -1,6 +1,5 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
-import uniq from 'lodash/uniq';
 import map from 'lodash/map';
 import reduce from 'lodash/reduce';
 import keys from 'lodash/keys';

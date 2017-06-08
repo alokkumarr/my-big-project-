@@ -1,5 +1,6 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import findIndex from 'lodash/findIndex';
+import forEach from 'lodash/forEach';
 import find from 'lodash/find';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
@@ -78,7 +79,7 @@ export const AnalyzeChartComponent = {
     initChart() {
       this.fillSettings(this.model.artifacts, this.model);
 
-      if (isEmpty(this.mode) || isEmpty(this.model.chart)) {
+      if (isEmpty(this.mode)) {
         return;
       }
 
@@ -112,15 +113,10 @@ export const AnalyzeChartComponent = {
     }
 
     mergeArtifactsWithSettings(artifacts, record) {
-      const id = findIndex(artifacts, a => {
-        return a.columnName === record.columnName &&
-        a.tableName === record.tableName;
+      forEach(artifacts, a => {
+        a.checked = a.columnName === record.columnName &&
+          a.tableName === record.tableName;
       });
-
-      if (id >= 0) {
-        record.checked = true;
-        artifacts.splice(id, 1, record);
-      }
 
       return artifacts;
     }
@@ -160,7 +156,7 @@ export const AnalyzeChartComponent = {
       const groupBy = map(xaxis, clone);
 
       this.mergeArtifactsWithSettings(xaxis, get(model, 'sqlBuilder.groupBy', {}));
-      this.mergeArtifactsWithSettings(yaxis, get(model, 'dataColumns.[0]', {}));
+      this.mergeArtifactsWithSettings(yaxis, get(model, 'sqlBuilder.dataFields.[0]', {}));
       this.mergeArtifactsWithSettings(groupBy, get(model, 'sqlBuilder.splitBy', {}));
 
       this.settings = {
@@ -169,6 +165,10 @@ export const AnalyzeChartComponent = {
         groupBy
       };
       this.reloadChart(this.settings, this.filteredGridData);
+    }
+
+    onSettingsChanged() {
+      this.analysisChanged = true;
     }
 
     clearFilters() {
