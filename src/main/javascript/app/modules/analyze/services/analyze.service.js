@@ -97,7 +97,11 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     });
   }
 
-  function searchAnalyses(analyses, searchTerm) {
+  function searchAnalyses(analyses, searchTerm = '') {
+    if (!searchTerm) {
+      return analyses;
+    }
+
     const term = searchTerm.toUpperCase();
     const matchIn = item => {
       return (item || '').toUpperCase().indexOf(term) !== -1;
