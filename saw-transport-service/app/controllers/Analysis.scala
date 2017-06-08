@@ -136,6 +136,10 @@ class Analysis extends BaseController {
       case _ => throw new ClientException(
         "Expected array: " + analysisListJson)
     }
+    
+    val analysisType = (analysisListJson \ "type");
+    val typeInfo = analysisType.extract[String];
+    if ( typeInfo.equals("report") ){
     val query = (analysis \ "queryManual") match {
       case JNothing => QueryBuilder.build(analysis)
       case obj: JString => ""
@@ -144,7 +148,12 @@ class Analysis extends BaseController {
     val queryJson: JObject = ("query", JString(query)) ~
     ("outputFile",
       ("outputFormat", "json") ~ ("outputFileName", "test.json"))
-    analysis merge(queryJson)
+     return analysis merge(queryJson)
+    }
+    else 
+    {
+     return analysis
+    }
   }
 
   private def readAnalysisJson
