@@ -1,6 +1,7 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
 import uniq from 'lodash/uniq';
+import map from 'lodash/map';
 import reduce from 'lodash/reduce';
 import keys from 'lodash/keys';
 import forEach from 'lodash/forEach';
@@ -152,22 +153,41 @@ export function ChartService() {
     ];
   };
 
-  const gridToChart = (x, y, g, grid) => {
+  const gridToChart = (x, y, l, data) => {
     const defaultSeriesName = x ? x.displayName : 'Series 1';
-    const categories = uniq(grid.map(row => row[x.columnName]));
 
-    const defaultSeries = () => reduce(categories, (obj, c) => {
-      obj[c] = 0;
+    const categories = map(
+      get(data, 'group_by.buckets'),
+      bucket => bucket.key
+    );
+
+    const defaultSeries = () => reduce(categories, (obj, cat) => {
+      obj[cat] = 0;
       return obj;
     }, {});
 
-    const res = reduce(grid, (obj, row) => {
-      const category = row[x.columnName];
-      const series = row[g.columnName] || defaultSeriesName;
-      obj[series] = obj[series] || defaultSeries();
-      obj[series][category] += row[y.columnName];
-      return obj;
-    }, {});
+    /* Produces an object where each key is a unique value for @l column.
+       The corresponding value is another object, where each key value pair
+       is a value for @x column, and @y.
+       */
+    const res = reduce(
+      get(data, 'group_by.buckets'),
+      (obj, bucket) => {
+        forEach(
+          get(bucket, 'split_by.buckets', [{
+            key: defaultSeriesName,
+            [y.columnName]: {value: get(bucket[y.columnName], 'value', 0)}
+          }]),
+          subBucket => {
+            obj[subBucket.key] = obj[subBucket.key] || defaultSeries();
+            obj[subBucket.key][bucket.key] = subBucket[y.columnName].value;
+          }
+        );
+
+        return obj;
+      },
+      {}
+    );
 
     const xCategories = keys(defaultSeries());
     return [
