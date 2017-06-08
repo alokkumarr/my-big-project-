@@ -24,7 +24,7 @@ public class SAWElasticSearchQueryBuilder {
 
       query =
           type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString)
-              .buildQuery() : new SAWChartTypeElasticSearchQueryBuilder(jsonString).buildQuery();
+              .buildQuery() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString).buildQuery();
     } catch (IllegalStateException | IOException exception) {
       throw new AssertionError("Type not supported :" + exception.getMessage());
     }
@@ -49,7 +49,7 @@ public class SAWElasticSearchQueryBuilder {
 
       query =
           type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString)
-              .getSearchSourceBuilder() : new SAWChartTypeElasticSearchQueryBuilder(jsonString)
+              .getSearchSourceBuilder() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString)
               .getSearchSourceBuilder();
     } catch (IllegalStateException | IOException exception) {
       throw new AssertionError("Type not supported :" + exception.getMessage());
