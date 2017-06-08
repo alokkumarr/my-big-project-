@@ -1,5 +1,4 @@
 import omit from 'lodash/omit';
-import keys from 'lodash/keys';
 import forEach from 'lodash/forEach';
 import set from 'lodash/set';
 import fpMap from 'lodash/fp/map';
@@ -98,7 +97,11 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     });
   }
 
-  function searchAnalyses(analyses, searchTerm) {
+  function searchAnalyses(analyses, searchTerm = '') {
+    if (!searchTerm) {
+      return analyses;
+    }
+
     const term = searchTerm.toUpperCase();
     const matchIn = item => {
       return (item || '').toUpperCase().indexOf(term) !== -1;
@@ -144,9 +147,8 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
 
   function executeAnalysis(model) {
     const deferred = $q.defer();
-    const isOngoingExecution = keys(_executingAnalyses).length > 0;
 
-    if (isOngoingExecution) {
+    if (_executingAnalyses[model.id]) {
       $translate('ERROR_ANALYSIS_ALREADY_EXECUTING').then(msg => {
         toastMessage.error(msg);
         deferred.reject(msg);
