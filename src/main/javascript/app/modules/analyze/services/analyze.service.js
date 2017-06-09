@@ -44,6 +44,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     getPublishedAnalysisById,
     getSemanticLayerData,
     isExecuting,
+    publishAnalysis,
     readAnalysis,
     saveReport,
     searchAnalyses,
@@ -169,6 +170,13 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     }
 
     return deferred.promise;
+  }
+
+  function publishAnalysis(model) {
+    return updateAnalysis(model).then(analysis => {
+      executeAnalysis(model);
+      return analysis;
+    });
   }
 
   function getAnalysisById(id) {
