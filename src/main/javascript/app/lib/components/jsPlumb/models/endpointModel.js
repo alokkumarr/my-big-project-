@@ -6,7 +6,7 @@ export class EndpointModel {
   }
 
   getIdentifier() {
-    return this.field.getIdentifier();
+    return `${this.field.getIdentifier()}:${this.side}`;
   }
 
   getAnchor() {

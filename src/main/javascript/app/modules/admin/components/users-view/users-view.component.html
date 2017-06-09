@@ -8,7 +8,7 @@
                     on-change="$ctrl.applySearchFilter()" delay="1000"></search-box>
       </div>
       <div class="users-view_action-panel" layout="row" layout-align="end center">
-        <md-button class="btn-primary" ng-click="">
+        <md-button class="btn-primary" ng-click="$ctrl.openNewUserModal()">
           <md-tooltip ng-bind="'TOOLTIP_ADD_USER' | translate"></md-tooltip>
           + <span translate="USER"></span>
         </md-button>
@@ -16,9 +16,11 @@
     </div>
   </md-toolbar>
   <div class="users-view_users-list">
-    <users-list-view 
+    <users-list-view id="user-grid-dir"
       users="$ctrl.userList"
+      updater="$ctrl.updater"
       customer="$ctrl.custCode"
+      on-action="$ctrl.onCardAction(type, model)"
       searchTerm="$ctrl.states.searchTerm">
     </users-list-view>
   </div>

@@ -5,7 +5,9 @@ export const UsersListViewComponent = {
   template,
   bindings: {
     users: '<',
+    updater: '<',
     customer: '<',
+    onAction: '&',
     searchTerm: '<'
   },
   controller: class UsersListViewController {
@@ -17,12 +19,23 @@ export const UsersListViewComponent = {
 
     $onInit() {
       this.gridConfig = this.getGridConfig();
+      this.updaterSubscribtion = this.updater.subscribe(update => this.onUpdate(update));
     }
 
     $onChanges(changedObj) {
       if (!isUndefined(changedObj.users.currentValue)) {
         this.reloadDataGrid(changedObj.users.currentValue);
       }
+    }
+
+    $onDestroy() {
+      this.updaterSubscribtion.unsubscribe();
+    }
+
+    onUpdate({users}) {
+      /* eslint-disable */
+      users && this.reloadDataGrid(users);
+      /* eslint-enable */
     }
 
     reloadDataGrid(users) {
@@ -32,6 +45,20 @@ export const UsersListViewComponent = {
 
     onGridInitialized(e) {
       this._gridListInstance = e.component;
+    }
+
+    openDeleteModal(user) {
+      this.onAction({
+        type: 'delete',
+        model: user
+      });
+    }
+
+    openEditModal(user) {
+      this.onAction({
+        type: 'edit',
+        model: user
+      });
     }
 
     getGridConfig() {

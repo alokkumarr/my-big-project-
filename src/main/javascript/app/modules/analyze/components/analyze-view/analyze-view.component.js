@@ -3,7 +3,6 @@ import style from './analyze-view.component.scss';
 
 import cloneDeep from 'lodash/cloneDeep';
 import remove from 'lodash/remove';
-import sortBy from 'lodash/sortBy';
 import {Subject} from 'rxjs/Subject';
 
 import {Events, AnalyseTypes} from '../../consts';
@@ -23,6 +22,7 @@ export const AnalyzeViewComponent = {
       this._$mdDialog = $mdDialog;
       this._$mdToast = $mdToast;
       this._$rootScope = $rootScope;
+      this._analysisCache = [];
 
       this.LIST_VIEW = 'list';
       this.CARD_VIEW = 'card';
@@ -72,7 +72,8 @@ export const AnalyzeViewComponent = {
       return this._AnalyzeService.getAnalysesFor(this.$state.params.id, {
         filter: this.states.searchTerm
       }).then(analyses => {
-        this.analyses = sortBy(analyses, analysis => -parseInt(analysis.id, 10));
+        this._analysisCache = this.analyses = analyses;
+        this.updater.next({analyses});
         this._$rootScope.showProgress = false;
       }).catch(() => {
         this._$rootScope.showProgress = false;
@@ -80,7 +81,8 @@ export const AnalyzeViewComponent = {
     }
 
     applySearchFilter() {
-      this.loadAnalyses();
+      this.analyses = this._AnalyzeService.searchAnalyses(this._analysisCache, this.states.searchTerm);
+      this.updater.next({analyses: this.analyses});
     }
 
     openNewAnalysisModal() {

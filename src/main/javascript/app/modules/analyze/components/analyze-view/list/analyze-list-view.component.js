@@ -32,9 +32,10 @@ export const AnalyzeListViewComponent = {
       this.updaterSubscribtion.unsubscribe();
     }
 
-    onUpdate({analysisType}) {
+    onUpdate({analysisType, analyses}) {
       /* eslint-disable */
       analysisType && this.onUpdateAnalysisType(analysisType);
+      analyses && this.reloadDataGrid(analyses);
       /* eslint-enable */
     }
 
