@@ -1,3 +1,5 @@
+import clone from 'lodash/clone';
+
 import template from './analyze-list-view.component.html';
 
 export const AnalyzeListViewComponent = {
@@ -11,8 +13,9 @@ export const AnalyzeListViewComponent = {
     updater: '<'
   },
   controller: class AnalyzeListViewController {
-    constructor(dxDataGridService, AnalyzeService) {
+    constructor($mdDialog, dxDataGridService, AnalyzeService) {
       'ngInject';
+      this._$mdDialog = $mdDialog;
       this._dxDataGridService = dxDataGridService;
       this._AnalyzeService = AnalyzeService;
 
@@ -56,6 +59,32 @@ export const AnalyzeListViewComponent = {
       this.onAction({
         type: 'fork',
         model: analysis
+      });
+    }
+
+    openPublishModal(model) {
+      const tpl = '<analyze-publish-dialog model="model" on-publish="onPublish(model)"></analyze-publish-dialog>';
+
+      this._$mdDialog
+        .show({
+          template: tpl,
+          controllerAs: '$ctrl',
+          controller: scope => {
+            scope.model = clone(model);
+            scope.onPublish = this.publish.bind(this);
+          },
+          autoWrap: false,
+          fullscreen: true,
+          focusOnOpen: false,
+          multiple: true,
+          clickOutsideToClose: true
+        });
+    }
+
+    publish(model) {
+      this.onAction({
+        type: 'publish',
+        model
       });
     }
 
