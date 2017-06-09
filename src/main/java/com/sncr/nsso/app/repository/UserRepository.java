@@ -2,11 +2,13 @@ package com.sncr.nsso.app.repository;
 
 import java.util.List;
 
-import com.sncr.nsso.common.bean.Analysis;
-import com.sncr.nsso.common.bean.AnalysisSummaryList;
 import com.sncr.nsso.common.bean.ResetValid;
+import com.sncr.nsso.common.bean.Role;
 import com.sncr.nsso.common.bean.Ticket;
 import com.sncr.nsso.common.bean.User;
+import com.sncr.nsso.common.bean.Valid;
+import com.sncr.nsso.common.bean.repo.analysis.Analysis;
+import com.sncr.nsso.common.bean.repo.analysis.AnalysisSummaryList;
 
 public interface UserRepository {
 	void insertTicketDetails(Ticket ticket) throws Exception;
@@ -28,4 +30,8 @@ public interface UserRepository {
 	boolean deleteAnalysis(Analysis analysis);
 	AnalysisSummaryList getAnalysisByFeatureID (Long featureId);
 	List<User> getUsers(Long customerId);
+	Valid addUser(User user);
+	boolean updateUser(User user);
+	boolean deleteUser(Long userId, String masterLoginId);
+	List<Role> getRolesDropDownList(Long customerId);
 }

@@ -16,7 +16,7 @@ public class TicketDetails implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 7546190895561288031L;
-	private String userName;
+	private String userFullName;
 
 	private String landingProd;
 	private String custID;
@@ -25,8 +25,18 @@ public class TicketDetails implements Serializable {
 	private String roleCode;
 	private String roleType;
 	private String dataSKey;
+	private Long userId;
 	private ArrayList<Products> products;
 	
+	
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 
 	public String getCustCode() {
 		return custCode;
@@ -66,16 +76,16 @@ public class TicketDetails implements Serializable {
 	/**
 	 * @return the userName
 	 */
-	public String getUserName() {
-		return userName;
+	public String getUserFullName() {
+		return userFullName;
 	}
 
 	/**
 	 * @param userName
 	 *            the userName to set
 	 */
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUserFullName(String userFullName) {
+		this.userFullName = userFullName;
 	}
 
 	/**

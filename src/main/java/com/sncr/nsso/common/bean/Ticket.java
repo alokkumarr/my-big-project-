@@ -32,8 +32,7 @@ public class Ticket implements Serializable {
 	private String ticketId;
 	private String windowId;
 	private String masterLoginId;
-	private String userName;
-	private String password;
+	private String userFullName;
 	private String defaultProdID;
 	private String roleCode;
 	private String roleType;
@@ -42,8 +41,16 @@ public class Ticket implements Serializable {
 	private String error;
 	private String custID;
 	private String custCode;
+	private Long userId;
 	private ArrayList<Products> products;	
 
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 	public String getRoleCode() {
 		return roleCode;
 	}
@@ -123,7 +130,7 @@ public class Ticket implements Serializable {
 		StringBuffer sb = new StringBuffer();
 		sb.append("Ticket Id = " + ticketId + "\n");
 		sb.append("Master Login Id = " + masterLoginId + "\n");
-		sb.append("User Name = " + userName + "\n");
+		sb.append("User Name = " + userFullName + "\n");
 		sb.append("Product Code = " + defaultProdID + "\n");
 		sb.append("Role Type = " + roleType + "\n");
 		sb.append("createdTime = " + createdTime + "\n");
@@ -132,14 +139,7 @@ public class Ticket implements Serializable {
 		return sb.toString();
 	}
 
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
+	
 	@XmlElement(name = SSOCommonConstants.TICKET_ID)  
 	public String getTicketId() {
 		return ticketId;
@@ -259,15 +259,15 @@ public class Ticket implements Serializable {
 	/**
 	 * @return the userName
 	 */
-	public String getUserName() {
-		return userName;
+	public String getUserFullName() {
+		return userFullName;
 	}
 
 	/**
 	 * @param userName the userName to set
 	 */
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUserFullName(String userFullName) {
+		this.userFullName = userFullName;
 	}
 
 	/**

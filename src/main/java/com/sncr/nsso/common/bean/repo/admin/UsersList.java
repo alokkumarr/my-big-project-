@@ -1,6 +1,8 @@
-package com.sncr.nsso.common.bean;
+package com.sncr.nsso.common.bean.repo.admin;
 
 import java.util.List;
+
+import com.sncr.nsso.common.bean.User;
 
 public class UsersList {
 

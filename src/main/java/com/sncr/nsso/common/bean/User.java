@@ -22,7 +22,7 @@ public class User implements Serializable {
 	public User() {
 	}
 
-	private String userId;
+	private Long userId;
 	private String loginId;
 	private String masterLoginId;	
 	private String activeStatusInd;
@@ -34,10 +34,37 @@ public class User implements Serializable {
 	private String userName;
 	private String roleName;	
 	private String userType;
+	private Long roleId;
 	private String email;
 	private String status;	
 	private Long validMins;
+	private Long customerId;
+	private String password;
 	
+	
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public Long getRoleId() {
+		return roleId;
+	}
+
+	public void setRoleId(Long roleId) {
+		this.roleId = roleId;
+	}
+
+	public Long getCustomerId() {
+		return customerId;
+	}
+
+	public void setCustomerId(Long customerId) {
+		this.customerId = customerId;
+	}
 
 	public String getLastName() {
 		return lastName;
@@ -55,11 +82,11 @@ public class User implements Serializable {
 		this.middleName = middleName;
 	}
 
-	public String getUserId() {
+	public Long getUserId() {
 		return userId;
 	}
 
-	public void setUserId(String userId) {
+	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
 
