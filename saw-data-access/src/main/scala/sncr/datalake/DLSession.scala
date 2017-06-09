@@ -2,6 +2,7 @@ package sncr.datalake
 
 import java.util
 import java.util.UUID
+
 import org.slf4j.{Logger, LoggerFactory}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
@@ -9,6 +10,7 @@ import org.json4s.JsonAST.{JString, _}
 import org.json4s.native.JsonMethods._
 import sncr.datalake.engine.CacheManagement
 import sncr.datalake.exceptions.{DAException, ErrorCodes}
+import sncr.metadata.engine.ProcessingResult
 
 import scala.collection.mutable
 
@@ -50,6 +52,7 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     * Please note:
     * - loadedData contains data samples
     * - nativeloadedData
+    *
     * @param name - Data Object Name
     * @param location - location to load Data Object from
     * @param format - Format
@@ -77,8 +80,14 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     nativeloadedData += (name -> df)
   }
 
-  def getData(doName : String) : java.util.List[java.util.Map[String, (String, Object)]]
-      = { lastUsed = System.currentTimeMillis; loadedData(doName) }
+  def getData(doName : String) : java.util.List[java.util.Map[String, (String, Object)]] = {
+    lastUsed = System.currentTimeMillis
+    val data = loadedData.get(doName)
+    if (data.isDefined)
+      return data.get
+    else
+      null
+  }
 
   /**
     * Returns all data - TAKES LONG TIME,  this function materialized data from Dataset
@@ -86,9 +95,15 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     * @param doName
     * @return
     */
-  def getAllData(doName : String) : java.util.List[java.util.Map[String, (String, Object)]] = {
+  def getAllData(doName : String) : util.Iterator[java.util.Map[String, (String, Object)]] =
+  {
     lastUsed = System.currentTimeMillis
-    DLSession.convert(nativeloadedData(doName).collect(), nativeloadedData(doName).dtypes)
+    val alldata = DLSession.convert(nativeloadedData(doName).collect(), nativeloadedData(doName).dtypes)
+    val data = loadedData.get(doName)
+    if (data.isDefined)
+      alldata.iterator()
+    else
+      null
   }
 
 
@@ -104,15 +119,14 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
   }
 
   /**
-    * The function executes statement and register it as @param viewName
-    *
+    * The function executes statement, registers it as @param viewName
+    * and load data sample to data cache
     * @param viewName - temp view/table name
     * @param sql  - statement to execute
     * @param limit - return max number of rows
     * @return - result indicator
     */
-
-  protected def execute(viewName: String, sql: String, limit: Int = DLConfiguration.rowLimit) : Int = {
+  protected def executeAndGetData(viewName: String, sql: String, limit: Int = DLConfiguration.rowLimit) : (Integer, String) = {
     try {
       m_log debug s"Execute SQL: $sql, view name: $viewName"
       val newDf = sparkSession.sql(sql)
@@ -125,26 +139,50 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
       loadedData += (viewName -> data)
       nativeloadedData += (viewName -> newDf)
       lastUsed = System.currentTimeMillis
-      0
-    }catch {
-      case x: Throwable => m_log.error(s"Could not execute SQL for view/object $viewName", x); -1
     }
+    catch{
+      case x: Throwable => {
+        val m = s"Could not execute SQL for view/object $viewName"
+        m_log.error(m, x)
+
+        return ( ProcessingResult.Error.id, m + ": " + x.getMessage)
+      }
+    }
+    (ProcessingResult.Success.id, "Success")
   }
+
+  protected def execute(viewName: String, sql: String) : (Integer, String) = {
+    try {
+      m_log debug s"Execute SQL: $sql, view name: $viewName"
+      val newDf = sparkSession.sql(sql)
+      newDf.createOrReplaceTempView(viewName)
+      lastUsed = System.currentTimeMillis
+    }
+    catch{
+      case x: Throwable => {
+        val m = s"Could not execute SQL for view/object $viewName"
+        m_log.error(m, x)
+
+        return ( ProcessingResult.Error.id, m + ": " + x.getMessage)
+      }
+    }
+    (ProcessingResult.Success.id, "Success")
+  }
+
 
   /**
     * Save data object with doName into location in given format
-    *
     * @param doName - data object name
     * @param location - location
     * @param format - output format: parquet, json
     */
-  def saveData(doName : String, location: String, format : String): Unit = {
+  def saveData(doName : String, location: String, format : String): (Int, String) = {
     val df1 = nativeloadedData(doName)
     val df = df1.coalesce(1)
     format match {
-      case "parquet" => df.write.parquet(location)
-      case "json" => df.write.json(location)
-      case _ =>  throw new DAException(ErrorCodes.UnsupportedFormat, format )
+      case "parquet" => df.write.parquet(location); (ProcessingResult.Success.id, "Data have been successfully saved as parquet file")
+      case "json" => df.write.json(location); (ProcessingResult.Success.id, "Data have been successfully saved as parquet file")
+      case _ =>  (ProcessingResult.Success.id,  ErrorCodes.UnsupportedFormat + ": " + format )
     }
   }
 
@@ -166,6 +204,7 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
   /**
     * Convenience method that returns JValue from loaded data sample
     * The method can be used as example how to iterate over returned dataset.
+    *
     * @param dobj
     * @return
     */
@@ -225,6 +264,9 @@ object DLSession
   def pinToCache[T<:DLSession](session: T) : Unit = this.synchronized {cManager.init;  sessions(session.getId) = session }
   def removeFromCache(sessionId: String ): Unit = this.synchronized{sessions -= sessionId}
   def getSession[T<:DLSession](sessionId: String ): DLSession = sessions(sessionId)
+
+  //TODO:: Essentially this call materializes Dataset, it needs to be investigated to choose optimal approcah
+  //to bing data ffrom datalake
   def convert(df: DataFrame, limit: Int): util.List[util.Map[String, (String, Object)]] =  convert(df.head(limit), df.dtypes)
 
   DLConfiguration.initSpark()

@@ -49,7 +49,7 @@ class TS extends BaseServiceProvider {
     val req = new ESQueryHandler(extractor)
     stv match
     {
-      case "ES" =>  req.esRequest(json)
+      case "ES" =>  req.handleRequest(json)
       case "DL" =>  res.put("result", "success"); return play.mvc.Results.ok(res)
       case _ =>
             res.put("result", "failure")

@@ -28,7 +28,7 @@ class ESQueryHandler (ext: Extractor) extends HTTPRequest {
 
   override val m_log: Logger = LoggerFactory.getLogger(classOf[ESQueryHandler].getName)
 
-  def esRequest( source : JsValue) : Result =
+  def handleRequest(source : JsValue) : Result =
   {
     val es_protocol = if (SAWServiceConfig.es_conf.hasPath("protocol")) SAWServiceConfig.es_conf.getString("protocol") else "http"
 

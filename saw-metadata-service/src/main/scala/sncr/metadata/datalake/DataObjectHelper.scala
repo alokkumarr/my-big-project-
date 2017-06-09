@@ -36,7 +36,7 @@ class DataObjectHelper(var requests: JValue) extends Response {
         verb match {
           case "write"        => val doh = new DataObject(content);  build(doh.create)
           case "read"         => val doh = new DataObject;  build(doh.read(keys))
-          case "update"       => val doh = new DataObject(content);  build(doh.update(keys))
+          case "update"       => val doh = new DataObject(content);  build(doh.update())
           case "search"       => val doh = new DataObject;  build(doh.find(keys))
           case "delete"       => val doh = new DataObject;  build(doh.deleteAll(keys))
           case "scan"         => val doh = new DataObject;  build(doh.scan)

@@ -3,8 +3,9 @@ package sncr.datalake.cli;
 import cmd.CommandLineHandler;
 import files.HFileOperations;
 import org.apache.commons.cli.CommandLine;
+import scala.Tuple2;
 import sncr.datalake.exceptions.ErrorCodes;
-import sncr.datalake.handlers.AnalysisNodeExecution;
+import sncr.datalake.handlers.AnalysisNodeExecutionHelper;
 import sncr.metadata.analysis.AnalysisNode;
 import sncr.metadata.engine.context.SelectModels;
 import sncr.metadata.semantix.SemanticNode;
@@ -38,7 +39,7 @@ public class ExecutionRunner {
             if (analysis_id != null && !analysis_id.isEmpty()) {
                 System.out.println("Execute: \nAnalysis node id: " + analysis_id);
                 AnalysisNode an = AnalysisNode.apply(analysis_id);
-                AnalysisNodeExecution ane = new AnalysisNodeExecution(an, true, execResId);
+                AnalysisNodeExecutionHelper ane = new AnalysisNodeExecutionHelper(an, true, execResId);
                 ane.executeAndSave(outStream, rowLimit);
                 ane.printSample(outStream);
             }else
@@ -50,9 +51,10 @@ public class ExecutionRunner {
                 }
                 System.out.println("Execute: \nSemantic node id: " + semantic_id + "\nSQL: " + sql);
                 SemanticNode sn = SemanticNode.apply(semantic_id, SelectModels.everything().id());
-                sncr.datalake.handlers.SemanticNodeExecution sne = new sncr.datalake.handlers.SemanticNodeExecution(sn, true);
+                sncr.datalake.handlers.SemanticNodeExecutionHelper sne = new sncr.datalake.handlers.SemanticNodeExecutionHelper(sn, true);
                 sne.loadObjects();
-                if (sne.executeSQL(sql, rowLimit) == 0) {
+                Tuple2<Integer, String> res = sne.executeSQL(sql, rowLimit);
+                if ( res._1() == 0) {
                     String result = sne.getDataSampleAsString(sne.metric());
                     if (outStream != null)
                         outStream.write(result.getBytes());

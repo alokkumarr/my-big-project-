@@ -14,9 +14,9 @@ import sncr.metadata.semantix.SemanticNode
 /**
   * Created by srya0001 on 5/18/2017.
   */
-class SemanticNodeExecution(val sn : SemanticNode, cacheIt : Boolean = false ) extends DLSession with HasDataObject[SemanticNodeExecution]{
+class SemanticNodeExecutionHelper(val sn : SemanticNode, cacheIt : Boolean = false ) extends DLSession with HasDataObject[SemanticNodeExecutionHelper]{
 
-  override protected val m_log: Logger = LoggerFactory.getLogger(classOf[SemanticNodeExecution].getName)
+  override protected val m_log: Logger = LoggerFactory.getLogger(classOf[SemanticNodeExecutionHelper].getName)
 
   if (sn.getCachedData.isEmpty) throw new DAException(ErrorCodes.NodeDoesNotExist, "SemanticNode")
   if (sn.getRelatedNodes.isEmpty) throw new DAException(ErrorCodes.DataObjectNotFound, "SemanticNode")
@@ -46,7 +46,7 @@ class SemanticNodeExecution(val sn : SemanticNode, cacheIt : Boolean = false ) e
   m_log debug s"Check definition before extracting value ==> ${pretty(render(definition))}"
 
   val metric = (definition \ "metric").extractOrElse[String]("")
-  val outputLocation = SemanticNodeExecution.getUserSpecificPath(metric) + "-" + id
+  val outputLocation = SemanticNodeExecutionHelper.getUserSpecificPath(metric) + "-" + id
 
   var lastSQLExecRes = -1
   var execResult : java.util.List[java.util.Map[String, (String, Object)]] = null
@@ -66,19 +66,24 @@ class SemanticNodeExecution(val sn : SemanticNode, cacheIt : Boolean = false ) e
     case t:Throwable =>   t.printStackTrace(); m_log error (s"Could not load data for semantic node: ${Bytes.toString(sn.getRowKey)}, unexpected exception: ", t)
   }
 
+  var lastSQLExecMessage : String = null
+
   /**
     * Base method to execute SQL statement
+    *
     * @param limit - number of rows to return, it should be less or equal value configured in application configuration file.
     * @return
     */
-  def executeSQL(sql : String, limit : Int = DLConfiguration.rowLimit): Int = {
+  def executeSQL(sql : String, limit : Int = DLConfiguration.rowLimit): (Integer, String) = {
     m_log debug s"Execute SQL: $sql for metric: $metric"
-    lastSQLExecRes = execute(metric, sql, limit); lastSQLExecRes
+    val ( llastSQLExecRes, llastSQLExecMessage) = executeAndGetData(metric, sql, limit)
+    lastSQLExecRes = llastSQLExecRes; lastSQLExecMessage = llastSQLExecMessage
+    ( lastSQLExecRes, lastSQLExecMessage)
   }
 
 }
 
-object SemanticNodeExecution{
+object SemanticNodeExecutionHelper{
 
   //TODO:: The function is to be replaced with another one to construct user ( tenant ) specific path
   def getUserSpecificPath(outputLocation: String): String = {
@@ -86,5 +91,5 @@ object SemanticNodeExecution{
   }
 
 
-  def apply( rowId: String, cacheIt: Boolean = false) : SemanticNodeExecution = { val an = SemanticNode(rowId); new SemanticNodeExecution(an,cacheIt) }
+  def apply( rowId: String, cacheIt: Boolean = false) : SemanticNodeExecutionHelper = { val an = SemanticNode(rowId); new SemanticNodeExecutionHelper(an,cacheIt) }
 }

@@ -153,12 +153,9 @@ class DataObject(final private var descriptor : JValue, final private var schema
   }
 
 
-  def update(filter: Map[String, Any]): (Int, String) = {
+  def update(filter: Map[String, Any] = null): (Int, String) = {
     try {
-      val (res, msg) = selectRowKey(filter)
-      if (res != Success.id) return (res, msg)
       setDescriptor
-
       val searchValues: Map[String, Any] = DataObject.extractSearchData(descriptor) + (Fields.NodeId.toString -> new String(rowKey))
       searchValues.keySet.foreach(k => {
         m_log debug s"Add search field $k with value: ${searchValues(k).toString}"
@@ -333,9 +330,13 @@ object DataObject{
   val searchFields = Map(
     "name" -> "String",
     "type" -> "String",
-    "customerCode" -> "String",
     "product" -> "String",
-    "id" -> "String")
+    "customerCode" -> "String",
+    "id" -> "String",
+    "category" -> "String",
+    "storageType" -> "String",
+    "displayName" -> "String"
+  )
 
   val requiredFields = List("name", "type", "product", "partitionType", "storageType", "displayName", "description" )
 
@@ -345,7 +346,10 @@ object DataObject{
       (descriptor, ("type", "String")),
       (descriptor, ("product", "String")),
       (descriptor, ("customerCode", "String")),
-      (descriptor, ("id", "String"))
+      (descriptor, ("id", "String")),
+      (descriptor, ("category", "String")),
+      (descriptor, ("storageType", "String")),
+      (descriptor, ("displayName", "String"))
      ).map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2._1, jv._2._2))
         m_log trace s"Field: ${jv._2._1}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${jv._2._2}\n, Value: $searchValue"

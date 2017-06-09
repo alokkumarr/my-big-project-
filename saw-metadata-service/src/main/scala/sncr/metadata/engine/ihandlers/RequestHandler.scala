@@ -389,7 +389,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
             case _ => m_log error "Incorrect location: skip it"
           }
         }
-        respGenerator.build(doh.update(keys))
+        respGenerator.build(doh.update())
       }
       case "SemanticNode" => {
         val snh: SemanticNode = SemanticNode(id, 3)

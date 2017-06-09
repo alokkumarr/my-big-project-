@@ -203,6 +203,23 @@ class AnalysisNode(private var analysisNode: JValue = JNothing, markNoRelationEx
     }
   }
 
+  /**
+    * Deletes the analysis execution results
+    */
+  def deleteAnalysisResults() : Unit = {
+    val id = Bytes.toString(rowKey)
+    val keys = Map("analysisId" -> id)
+    val analysisResult = new AnalysisResult(id)
+    val rowIDs = analysisResult.simpleMetadataSearch(keys, "and")
+    rowIDs.foreach( rowId => {
+      val rowIdStr = Bytes.toString(rowId)
+      val ar = AnalysisResult(id, rowIdStr)
+      ar.deleteObjects
+      ar.delete
+    }
+    )
+  }
+
 
 
 }
@@ -210,7 +227,7 @@ class AnalysisNode(private var analysisNode: JValue = JNothing, markNoRelationEx
 object AnalysisNode{
 
 
-  protected val m_log: Logger = LoggerFactory.getLogger("AnalysisNodeObject")
+  protected val m_log: Logger = LoggerFactory.getLogger("sncr.metadata.analysis.AnalysisNodeObject")
 
   def apply( src : String, rowID : String) : AnalysisNode =
   {
