@@ -188,11 +188,12 @@ public class TicketHelper {
 			ticket.setDefaultProdID(user.getTicketDetails().getLandingProd());
 			ticket.setRoleCode(user.getTicketDetails().getRoleCode());
 			ticket.setRoleType(user.getTicketDetails().getRoleType());
-			ticket.setUserName(user.getTicketDetails().getUserName());
+			ticket.setUserFullName(user.getTicketDetails().getUserFullName());
 			ticket.setProducts(user.getTicketDetails().getProducts());			
 			ticket.setDataSecurityKey(user.getTicketDetails().getDataSKey());
 			ticket.setCustID(user.getTicketDetails().getCustID());
 			ticket.setCustCode(user.getTicketDetails().getCustCode());
+			ticket.setUserId(user.getTicketDetails().getUserId());
 		}
 		return ticket;
 	}

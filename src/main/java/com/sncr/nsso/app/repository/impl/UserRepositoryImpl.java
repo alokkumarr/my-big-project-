@@ -295,7 +295,7 @@ public class UserRepositoryImpl implements UserRepository {
 					+ "values (?,?,?,?,?,?,?,?,?,sysdate(),sysdate(),?,?)";
 			// ticket.setRoleType("Basic");
 			Object[] params = new Object[] { ticket.getTicketId(), ticket.getWindowId(), ticket.getMasterLoginId(),
-					ticket.getUserName(), ticket.getDefaultProdID(), ticket.getRoleType(), ticket.getCreatedTime(),
+					ticket.getUserFullName(), ticket.getDefaultProdID(), ticket.getRoleType(), ticket.getCreatedTime(),
 					ticket.getValidUpto(), isValid, null, ticket.getValidityReason() };
 			int[] types = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
 					Types.VARCHAR, Types.BIGINT, Types.BIGINT, Types.SMALLINT, Types.DATE, Types.VARCHAR };
@@ -477,7 +477,7 @@ public class UserRepositoryImpl implements UserRepository {
 
 		// Generic User Details
 		try {
-			String sql = "SELECT U.USER_ID,U.FIRST_NAME,U.MIDDLE_NAME,U.LAST_NAME,C.COMPANY_NAME,C.CUSTOMER_SYS_ID,C.CUSTOMER_CODE,C.LANDING_PROD_SYS_ID,R.ROLE_CODE,R.ROLE_TYPE,R.DATA_SECURITY_KEY "
+			String sql = "SELECT U.USER_ID,U.USER_SYS_ID,U.FIRST_NAME,U.MIDDLE_NAME,U.LAST_NAME,C.COMPANY_NAME,C.CUSTOMER_SYS_ID,C.CUSTOMER_CODE,C.LANDING_PROD_SYS_ID,R.ROLE_CODE,R.ROLE_TYPE,R.DATA_SECURITY_KEY "
 					+ "	FROM USERS U, CUSTOMERS C, ROLES R WHERE U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID AND R.ROLE_SYS_ID=U.ROLE_SYS_ID "
 					+ "	AND C.ACTIVE_STATUS_IND = U.ACTIVE_STATUS_IND AND  U.ACTIVE_STATUS_IND = R.ACTIVE_STATUS_IND AND R.ACTIVE_STATUS_IND = 1 AND U.USER_ID=? ";
 			TicketDetails ticketDetails = jdbcTemplate.query(sql, new PreparedStatementSetter() {
@@ -756,6 +756,7 @@ public class UserRepositoryImpl implements UserRepository {
 				ticketDetails.setRoleCode(rs.getString("role_code"));
 				ticketDetails.setLandingProd(rs.getString("landing_prod_sys_id"));
 				ticketDetails.setDataSKey(rs.getString("data_security_key"));
+				ticketDetails.setUserId(rs.getLong("user_sys_id"));
 				if (firstName == null) {
 					firstName = rs.getString("first_name");
 					lastName = rs.getString("last_name");
@@ -771,7 +772,7 @@ public class UserRepositoryImpl implements UserRepository {
 				if (lastName != null) {
 					name = name + " " + (lastName != null ? lastName.trim() : lastName);
 				}
-				ticketDetails.setUserName(name);
+				ticketDetails.setUserFullName(name);
 			}
 			return ticketDetails;
 		}
@@ -980,7 +981,7 @@ public class UserRepositoryImpl implements UserRepository {
 				ticket.setMasterLoginId(rs.getString("MASTER_LOGIN_ID"));
 				ticket.setDefaultProdID(rs.getString("PRODUCT_CODE"));
 				ticket.setRoleType(rs.getString("ROLE_TYPE"));
-				ticket.setUserName(rs.getString("USER_NAME"));
+				ticket.setUserFullName(rs.getString("USER_NAME"));
 				ticket.setWindowId(rs.getString("WINDOW_ID"));
 			}
 			return ticket;
