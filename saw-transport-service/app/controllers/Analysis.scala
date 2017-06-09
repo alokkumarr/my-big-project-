@@ -136,6 +136,10 @@ class Analysis extends BaseController {
       case _ => throw new ClientException(
         "Expected array: " + analysisListJson)
     }
+    
+    val analysisType = (analysisListJson \ "type");
+    val typeInfo = analysisType.extract[String];
+    if ( typeInfo.equals("report") ){
     val query = (analysis \ "queryManual") match {
       case JNothing => QueryBuilder.build(analysis)
       case obj: JString => ""
@@ -144,7 +148,12 @@ class Analysis extends BaseController {
     val queryJson: JObject = ("query", JString(query)) ~
     ("outputFile",
       ("outputFormat", "json") ~ ("outputFileName", "test.json"))
-    analysis merge(queryJson)
+     return analysis merge(queryJson)
+    }
+    else 
+    {
+     return analysis
+    }
   }
 
   private def readAnalysisJson
@@ -198,20 +207,22 @@ class Analysis extends BaseController {
       throw new Exception("Could not find analysis node with provided analysis ID")
     // check the type
     val typeInfo = analysisType.extract[String];
-    val json = render(analysisJSON).toString();
+    val json = compact(render(analysisJSON));
+    m_log.trace("json dataset: {}", json);
+    m_log.trace("type: {}", typeInfo);
     if ( typeInfo.equals("pivot") ){
       val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json), json);
-      val myArray = data.asInstanceOf[JArray]
+      val myArray = parse(data);
       m_log.trace("pivot dataset: {}", myArray)
-      return myArray.arr
+      return myArray
     }
     if ( typeInfo.equals("chart") ){
       val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json), json);
-      val myArray = data.asInstanceOf[JArray]
+      val myArray = parse(data);
       m_log.trace("chart dataset: {}", myArray)
-      return myArray.arr
+      return myArray
     }
     else {
     // This is the part of report type starts here

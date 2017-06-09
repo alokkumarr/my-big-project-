@@ -1,16 +1,11 @@
 package com.synchronoss.querybuilder;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -20,6 +15,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.BuilderUtil;
+import com.synchronoss.SAWElasticTransportService;
 import com.synchronoss.querybuilder.model.ColumnField;
 import com.synchronoss.querybuilder.model.DataField;
 import com.synchronoss.querybuilder.model.RowField;
@@ -36,7 +32,7 @@ public class SAWElasticSearchQueryExecutor {
 
 
 
-  private static SearchResponse execute(SearchSourceBuilder searchSourceBuilder, String jsonString)
+ /* private static SearchResponse execute(SearchSourceBuilder searchSourceBuilder, String jsonString)
       throws JsonProcessingException, IOException
 
   {
@@ -59,14 +55,14 @@ public class SAWElasticSearchQueryExecutor {
               .build()).addTransportAddress(new InetSocketTransportAddress(InetAddress
               .getByName(host), port));
 
-      /*
+      
        * client = new PreBuiltTransportClient( Settings.builder()
        * .put("client.transport.nodes_sampler_interval", "5s") .put("client.transport.sniff",
        * false).put("transport.tcp.compress", true) .put("cluster.name", "sncr-salesdemo")
        * .put("xpack.security.transport.ssl.enabled", false) .put("request.headers.X-Found-Cluster",
        * clusterName) .put("xpack.security.user", username+ ":"+ password).build())
        * .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(host), port));
-       */
+       
       response =
           client.prepareSearch(indexName).setTypes(type)
               .setSearchType(SearchType.DFS_QUERY_THEN_FETCH).setSource(searchSourceBuilder).get();
@@ -79,7 +75,7 @@ public class SAWElasticSearchQueryExecutor {
 
     return response;
   }
-
+*/
   /**
    * 
    * @param searchSourceBuilder
@@ -88,19 +84,10 @@ public class SAWElasticSearchQueryExecutor {
    * @throws JsonProcessingException
    * @throws IOException
    */
-  public static String[] executeReturnAsString(SearchSourceBuilder searchSourceBuilder,
-      String jsonString) throws JsonProcessingException, IOException {
+  public static String executeReturnAsString(SearchSourceBuilder searchSourceBuilder, String jsonString) throws JsonProcessingException, IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    SearchResponse response = execute(searchSourceBuilder, jsonString);
-    JsonNode esResponse = objectMapper.readTree(response.toString());
-    //System.out.println(response.getAggregations().getProperty("column_level_1"));
-    //InternalDateHistogram internalDateHistogram = (InternalDateHistogram) response.getAggregations().getProperty("column_level_1");
-    //System.out.println(internalDateHistogram.getBuckets().get(0).getAggregations().get("max_transfer").getMetaData());
-    String arr[] = new String[1];
-    arr[0] = esResponse.get("aggregations").toString();
-    return arr;
-
+    return SAWElasticTransportService.executeReturnAsString(searchSourceBuilder.toString(), jsonString, "some", "system", "analyze");
   }
 
   /**
@@ -115,7 +102,8 @@ public class SAWElasticSearchQueryExecutor {
       String jsonString) throws JsonProcessingException, IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    SearchResponse response = execute(searchSourceBuilder, jsonString);
+    SearchResponse response = null;
+        //execute(searchSourceBuilder, jsonString);
    
     JsonNode esResponse = objectMapper.readTree(response.toString());
     List<String> flattenDataList = new ArrayList<String>();

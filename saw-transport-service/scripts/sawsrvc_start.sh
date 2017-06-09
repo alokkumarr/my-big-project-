@@ -163,6 +163,7 @@ declare -r java_args=$( echo \
     -Dpidfile.path=$pidfile_path \
     -Dlog.dir=${log_dir} \
     -Duser.dir=${user_dir} \
+    -Durl=http://mapr-dev02.sncrbda.dev.vacum-np.sncrcorp.net:9200/ \
     -Djava.library.path=/opt/mapr/lib \
     -Dhadoop.home.dir=/opt/mapr/hadoop/hadoop-$(cat /opt/mapr/hadoop/hadoopversion)
     )

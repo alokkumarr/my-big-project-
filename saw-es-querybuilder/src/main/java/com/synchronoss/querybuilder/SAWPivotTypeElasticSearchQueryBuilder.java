@@ -55,6 +55,10 @@ class SAWPivotTypeElasticSearchQueryBuilder {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.size(size);
 
+    if (sqlBuilderNode.getSort() == null && sqlBuilderNode.getFilters()==null)
+    {
+      throw new NullPointerException("Please add sort[] & filter[] block.It can be empty but these blocks are important.");
+    }
     // The below block adding the sort block
     List<Sort> sortNode = sqlBuilderNode.getSort();
     for (Sort item : sortNode) {
