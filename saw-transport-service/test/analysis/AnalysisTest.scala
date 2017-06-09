@@ -39,6 +39,10 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       createdTimestamp must be > 1490000000000L;
       val JString(analysisType) = analyze(response) \ "type"
       analysisType must be ("report")
+      val JInt(userId) = analyze(response) \ "userId"
+      userId must be (1)
+      val JString(userFullName) = analyze(response) \ "userFullName"
+      userFullName must be ("SAW Admin")
     }
 
     "read analysis" in {
