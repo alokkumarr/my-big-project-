@@ -306,17 +306,34 @@ export const AnalyzePivotComponent = {
         fpGroupBy('area'),
         fpMapValues(
           fpMap(field => {
-            return {
+            console.log('field: ', field);
+            const backendField = {
               type: field.type,
               columnName: field.dataField
             };
+            if (field.aggregate) {
+              backendField.aggregate = field.aggregate;
+            }
+            return backendField;
           })
         ),
       )(this.fieldsToSave);
 
+      groupedFields.data = map(groupedFields.data, field => {
+        return assign(field, {
+          name: 'sum_mb',
+          aggregate: 'sum'
+        });
+      });
+      groupedFields.column = map(groupedFields.column, field => {
+        return assign(field, {
+          groupInterval: 'month'
+        });
+      });
+
       return {
         filters: map(this.filters, this._FilterService.frontend2BackendFilter()),
-        sorts: this.mapFrontend2BackendSort(this.sorts),
+        sort: this.mapFrontend2BackendSort(this.sorts),
         rowFields: groupedFields.row,
         columnFields: groupedFields.column,
         dataFields: groupedFields.data

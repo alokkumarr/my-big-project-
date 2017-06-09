@@ -1,6 +1,9 @@
 import forEach from 'lodash/forEach';
 import assign from 'lodash/assign';
 import values from 'lodash/values';
+import fpSortBy from 'lodash/fp/sortBy';
+import find from 'lodash/find';
+import isEmpty from 'lodash/isEmpty';
 import mapValues from 'lodash/mapValues';
 import fpPipe from 'lodash/fp/pipe';
 import fpFilter from 'lodash/fp/filter';
@@ -9,19 +12,47 @@ import fpToPairs from 'lodash/fp/toPairs';
 
 import template from './pivot-grid.component.html';
 import style from './pivot-grid.component.scss';
+import summaryChooserTpl from './pivot-summary-chooser.component.html';
+
+const SUMMARY_TYPES = [{
+  label: 'Sum',
+  value: 'sum',
+  icon: 'icon-Sum'
+}, {
+  label: 'Average',
+  value: 'avg',
+  icon: 'icon-AVG'
+}, {
+  label: 'Mininum',
+  value: 'min',
+  icon: 'icon-MIN'
+}, {
+  label: 'Maximum',
+  value: 'max',
+  icon: 'icon-MAX'
+}, {
+  label: 'Count',
+  value: 'count',
+  icon: 'icon-group-by-column'
+}];
+
+const DEFAULT_SUMMARY_TYPE = SUMMARY_TYPES[0];
 
 export const PivotGridComponent = {
   template,
   styles: [style],
   bindings: {
     updater: '<',
-    sendFields: '&'
+    sendFields: '&',
+    mode: '@'
   },
   controller: class PivotGridController {
-    constructor($timeout, $translate, FilterService) {
+    constructor($timeout, $translate, FilterService, $compile, $scope) {
       'ngInject';
       this._$translate = $translate;
       this._$timeout = $timeout;
+      this._$compile = $compile;
+      this._$scope = $scope;
       this._FilterService = FilterService;
       this.warnings = {
         'Drop Data Fields Here': 'SELECT_DATA_FIELDS',
@@ -41,6 +72,12 @@ export const PivotGridComponent = {
         }
       }, this.getDefaultOptions());
 
+      if (this.mode === 'designer') {
+        this.pivotGridOptions.onContentReady = () => {
+          this.addSummaryChooserToDataFields();
+        };
+      }
+
       this._$timeout(() => {
         // have to repaint the grid because of the animation of the modal
         // if it's not repainted it appears smaller
@@ -54,6 +91,58 @@ export const PivotGridComponent = {
       this.subscription.unsubscribe();
     }
 
+    addSummaryChooserToDataFields() {
+      /* eslint-disable */
+      this._$timeout(() => {
+        const dataFields = this.getDataFields();
+        if (isEmpty(dataFields)) {
+          return;
+        }
+        let dataFieldNodesContainer = angular.element(document
+          .querySelector('.dx-pivotgridfieldchooser-container .dx-col:nth-child(2) .dx-area:last-child div[group=data] div.dx-scrollable-content div.dx-area-field-container'));
+        const dataFieldNodes = Array.from(dataFieldNodesContainer[0].childNodes);
+
+        forEach(dataFieldNodes, (dataFieldNode, key) => {
+          const dataField = dataFields[key];
+          const fieldLabel = angular.element(dataFieldNode)[0].firstChild.innerText;
+
+          angular.element(angular.element(dataFieldNode)[0].firstChild).css({
+            display: 'inline',
+            verticalAlign:'middle'
+          });
+          if (!dataField.summaryType) {
+            dataField.summaryType = DEFAULT_SUMMARY_TYPE.value;
+          }
+          angular.element(dataFieldNode).append(this.getSummaryChooserMenu(dataField));
+        });
+        this._$scope.$apply();
+      });
+      /* eslint-enable */
+    }
+
+    getSummaryChooserMenu(dataField) {
+      const scope = this._$scope.$new(true);
+      scope.SUMMARY_TYPES = SUMMARY_TYPES;
+      scope.dataField = dataField;
+      scope.selectedSummaryType = find(SUMMARY_TYPES,
+        summaryType => dataField.summaryType === summaryType.value);
+
+      scope.openMenu = ($mdMenu, ev) => {
+        $mdMenu.open(ev);
+      };
+
+      scope.selectSummaryType = (summaryType, dataField) => {
+        const pivotGridDataSource = this._gridInstance.getDataSource();
+
+        scope.selectedSummaryType = summaryType;
+        pivotGridDataSource.field(dataField.name, {
+          summaryType: summaryType.value
+        });
+
+      };
+      return this._$compile(summaryChooserTpl)(scope);
+    }
+
     replaceWarningLables() {
       this._$timeout(() => {
         /* eslint-disable angular/document-service */
@@ -65,6 +154,14 @@ export const PivotGridComponent = {
         });
         /* eslint-enable angular/document-service */
       });
+    }
+
+    getDataFields() {
+      const pivotGridDataSource = this._gridInstance.getDataSource();
+      return fpPipe(
+        fpFilter(field => field.area === 'data'),
+        fpSortBy('areaIndex')
+      )(pivotGridDataSource.fields());
     }
 
     update(updates) {

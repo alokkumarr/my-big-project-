@@ -1,0 +1,15 @@
+<md-menu style="display: inline;">
+  <md-button aria-label="Open phone interactions menu" class="md-icon-button" ng-click="openMenu($mdMenu, $event)">
+    <md-icon md-menu-origin md-font-icon="{{selectedSummaryType.icon}}"></md-icon>
+  </md-button>
+  <md-menu-content width="4">
+    <md-menu-item ng-repeat="summaryType in SUMMARY_TYPES track by summaryType.value">
+      <md-button ng-click="selectSummaryType(summaryType, dataField)" style="font-size: 14px;">
+        <md-icon md-font-icon="{{::summaryType.icon}}" style="font-size: 14px;" md-menu-align-target></md-icon>
+        {{summaryType.label}}
+      </md-button>
+    </md-menu-item>
+  </md-menu-content>
+</md-menu>
+
+

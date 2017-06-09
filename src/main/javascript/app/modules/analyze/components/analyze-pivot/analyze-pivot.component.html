@@ -74,7 +74,9 @@
                         on-clear-all-filters="$ctrl.onClearAllFilters()"
                         on-filter-removed="$ctrl.onFilterRemoved(index)">
           </filter-chips>
-          <pivot-grid updater="$ctrl.pivotGridUpdater" send-fields="$ctrl.onGetFields(fields)"></pivot-grid>
+          <pivot-grid updater="$ctrl.pivotGridUpdater"
+                      send-fields="$ctrl.onGetFields(fields)"
+                      mode="designer"></pivot-grid>
         </md-card-content>
       </md-card>
     </div>
