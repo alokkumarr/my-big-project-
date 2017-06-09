@@ -23,6 +23,7 @@ export const AnalyzeFilterModalComponent = {
       this._toastMessage = toastMessage;
       this._$translate = $translate;
       this.BOOLEAN_CRITERIA = BOOLEAN_CRITERIA;
+      this.filterBooleanCriteria = DEFAULT_BOOLEAN_CRITERIA;
     }
 
     $onInit() {
