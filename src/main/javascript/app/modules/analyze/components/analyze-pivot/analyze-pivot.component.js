@@ -125,20 +125,12 @@ export const AnalyzePivotComponent = {
       this._AnalyzeService.getDataBySettings(clone(model))
         .then(({analysis, data}) => {
           console.log(analysis, data);
+          this.normalizedData = data;
+          this.deNormalizedData = this._PivotService.denormalizeData(data, this.fields);
+          this.dataSource.store = this.deNormalizedData;
+          this.setDataSource(this.dataSource.store, this.fields);
+          this.settingsModified = false;
         });
-      // return this._AnalyzeService.getPivotData().then(pivotData => {
-      //   this.normalizedData = pivotData;
-      //   this.deNormalizedData = this._PivotService.denormalizeData(pivotData, this.fields);
-
-      //   if (isEmpty(this.filters.possible)) {
-      //     this.filters.possible = this._PivotService.mapFieldsToFilters(this.normalizedData, this.fields);
-      //     this.filters.selected = [];
-      //   }
-      //   this.dataSource.store = this.deNormalizedData;
-
-      //   this.setDataSource(this.dataSource.store, this.fields);
-      //   this.settingsModified = false;
-      // });
     }
 
 // filters
@@ -306,7 +298,6 @@ export const AnalyzePivotComponent = {
         fpGroupBy('area'),
         fpMapValues(
           fpMap(field => {
-            console.log('field: ', field);
             const backendField = {
               type: field.type,
               columnName: field.dataField
