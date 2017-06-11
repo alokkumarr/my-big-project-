@@ -1,9 +1,8 @@
-<div layout-gt-xs="row">
+<div layout="row" layout-align="center center">
   <md-icon
     md-font-icon="icon-calendar">
   </md-icon>
-  <md-input-container md-no-float flex-gt-xs>
-    <label translate="FROM"></label>
+  <md-input-container flex-gt-xs>
     <md-datepicker
       required
       md-max-date="$ctrl.tempModel.lte"
@@ -14,14 +13,13 @@
 
     ></md-datepicker>
   </md-input-container>
-  <div style="width: 20px;padding: 0 3px;">
-    <div></div>
+  <div style="width: 20px;padding: 0 3px; transform: rotate(180deg);">
+    <i class="icon-arrow-left"></i>
   </div>
   <md-icon
     md-font-icon="icon-calendar">
   </md-icon>
-  <md-input-container md-no-float flex-gt-xs>
-    <label translate="TO"></label>
+  <md-input-container flex-gt-xs>
     <md-datepicker
       required
       md-min-date="$ctrl.tempModel.gte"

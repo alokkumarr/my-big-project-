@@ -5,6 +5,7 @@
                    md-selected-item="$ctrl.filter.column"
                    md-item-text="column.displayName"
                    md-min-length="0"
+                   style="width: 200px;"
                    md-selected-item-change="$ctrl.onArtifactChange(column)">
     <md-item-template>
       <span md-highlight-text="$ctrl.searchText" md-highlight-flags="^i" >{{column.displayName}}</span>

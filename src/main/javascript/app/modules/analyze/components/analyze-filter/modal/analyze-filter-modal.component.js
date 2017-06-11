@@ -31,6 +31,12 @@ export const AnalyzeFilterModalComponent = {
       // and the boolean criteria should be shown
       this.analysisType = this.artifacts.length > 1 ? 'report' : '';
 
+      if (!isEmpty(this.filters)) {
+        this.filterBooleanCriteria = this.filters[0].booleanCriteria;
+      } else {
+        this.filterBooleanCriteria = DEFAULT_BOOLEAN_CRITERIA;
+      }
+
       this.filters = this.groupFilters(this.filters);
       forOwn(this.filters, artifactFilters => {
         if (isEmpty(artifactFilters)) {
@@ -54,7 +60,7 @@ export const AnalyzeFilterModalComponent = {
         isRuntimeFilter: false
       };
       if (this.analysisType === 'report') {
-        newFilter.booleanCriteria = DEFAULT_BOOLEAN_CRITERIA;
+        newFilter.booleanCriteria = this.filterBooleanCriteria;
       }
       filtersArray.push(newFilter);
     }
@@ -96,8 +102,13 @@ export const AnalyzeFilterModalComponent = {
       });
     }
 
-    onBooleanCriteriaSelected(filter, value) {
-      filter.booleanCriteria = value;
+    onBooleanCriteriaSelected(value) {
+      this.filterBooleanCriteria = value;
+      forOwn(this.filters, artifactFilters => {
+        forEach(artifactFilters, filter => {
+          filter.booleanCriteria = value;
+        });
+      });
     }
 
     onRuntimeToggle(filter) {
