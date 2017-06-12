@@ -45,7 +45,7 @@ export const UserNewComponent = {
       } else {
         this.user.activeStatusInd = 0;
       }
-      this._UsersManagementService.saveUser(this.user, this._JwtService.get()).then(response => {
+      this._UsersManagementService.saveUser(this.user).then(response => {
         this.response = response;
         if (this.response.valid) {
           this._$rootScope.showProgress = false;

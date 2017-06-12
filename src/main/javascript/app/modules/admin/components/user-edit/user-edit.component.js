@@ -10,12 +10,11 @@ export const UserEditComponent = {
   },
   styles: [style],
   controller: class UserNewController {
-    constructor($scope, $mdDialog, UsersManagementService, JwtService, $rootScope, $mdToast, $componentHandler) {
+    constructor($scope, $mdDialog, UsersManagementService, $rootScope, $mdToast, $componentHandler) {
       'ngInject';
       this._$scope = $scope;
       this._$mdDialog = $mdDialog;
       this._UsersManagementService = UsersManagementService;
-      this._JwtService = JwtService;
       this._$rootScope = $rootScope;
       this._$mdToast = $mdToast;
       this._$componentHandler = $componentHandler;
@@ -40,7 +39,7 @@ export const UserEditComponent = {
       } else {
         eUser.activeStatusInd = 0;
       }
-      this._UsersManagementService.updateUser(eUser, this._JwtService.get()).then(response => {
+      this._UsersManagementService.updateUser(eUser).then(response => {
         this.response = response;
         if (this.response.valid) {
           this._$rootScope.showProgress = false;
