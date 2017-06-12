@@ -24,7 +24,7 @@ export const AnalyzeChartComponent = {
     mode: '@?'
   },
   controller: class AnalyzeChartController {
-    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, ChartService, FilterService, $mdSidenav, $window) {
+    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, ChartService, FilterService, $mdSidenav) {
       'ngInject';
 
       this._FilterService = FilterService;
@@ -32,6 +32,7 @@ export const AnalyzeChartComponent = {
       this._ChartService = ChartService;
       this._$mdSidenav = $mdSidenav;
       this._$mdDialog = $mdDialog;
+      this._$timeout = $timeout;
 
       this.legend = {
         align: get(this.model, 'legend.align', 'right'),
@@ -54,7 +55,6 @@ export const AnalyzeChartComponent = {
       this.filters = [];
 
       this.chartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
-      $window.chartctrl = this;
     }
 
     toggleLeft() {
@@ -90,6 +90,9 @@ export const AnalyzeChartComponent = {
         this._FilterService.backend2FrontendFilter()
       );
       this.onSettingsChanged();
+      this._$timeout(() => {
+        this.updateLegendPosition();
+      });
     }
 
     updateLegendPosition() {
