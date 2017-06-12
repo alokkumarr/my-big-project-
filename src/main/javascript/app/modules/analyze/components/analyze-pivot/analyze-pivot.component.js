@@ -124,10 +124,11 @@ export const AnalyzePivotComponent = {
       const model = this.getModel();
       this._AnalyzeService.getDataBySettings(clone(model))
         .then(({analysis, data}) => {
-          console.log(analysis, data);
           this.normalizedData = data;
+          console.log(data);
           this.deNormalizedData = this._PivotService.denormalizeData(data, this.fields);
           this.dataSource.store = this.deNormalizedData;
+          console.log(analysis, this.deNormalizedData);
           this.setDataSource(this.dataSource.store, this.fields);
           this.settingsModified = false;
         });
@@ -312,8 +313,7 @@ export const AnalyzePivotComponent = {
 
       groupedFields.data = map(groupedFields.data, field => {
         return assign(field, {
-          name: 'sum_mb',
-          aggregate: 'sum'
+          name: 'sum_mb'
         });
       });
       groupedFields.column = map(groupedFields.column, field => {
