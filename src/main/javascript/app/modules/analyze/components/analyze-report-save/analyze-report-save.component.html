@@ -21,10 +21,12 @@
         <label translate="MY_ANALYSIS_CATEGORY"></label>
         <md-select placeholder="Select a Category"
                    ng-model="::$ctrl.model.categoryId">
-          <md-option
-            ng-repeat="category in $ctrl.dataHolder.categories"
-            ng-bind="::category.name"
-            ng-value="category.id"></md-option>
+          <md-optgroup ng-repeat="category in $ctrl.dataHolder" label="{{::category.name}}">
+            <md-option
+              ng-repeat="subCategory in category.children"
+              ng-bind="::subCategory.name"
+              ng-value="subCategory.id"></md-option>
+          </md-optgroup>
         </md-select>
       </div>
     </div>

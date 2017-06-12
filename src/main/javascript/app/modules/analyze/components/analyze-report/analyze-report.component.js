@@ -164,8 +164,12 @@ export const AnalyzeReportComponent = {
     }
     // END filters section
 
-    toggleDetailsPanel() {
-      this.states.detailsExpanded = !this.states.detailsExpanded;
+    toggleDetailsPanel(forceOpen) {
+      if (forceOpen === true || forceOpen === false) {
+        this.states.detailsExpanded = forceOpen;
+      } else {
+        this.states.detailsExpanded = !this.states.detailsExpanded;
+      }
 
       if (this.states.detailsExpanded) {
         this._$timeout(() => {
@@ -457,6 +461,7 @@ export const AnalyzeReportComponent = {
           this.applyDataToGrid(this.columns, sorts, groups, this.gridData);
           this.analysisChanged = false;
           this.showProgress = false;
+          this.toggleDetailsPanel(true);
         }, () => {
           this.showProgress = false;
         });

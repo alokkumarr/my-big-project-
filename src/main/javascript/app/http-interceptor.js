@@ -19,5 +19,22 @@ export function interceptor($httpProvider) {
       }
     };
   });
+
+  /* Add jwt auth token to all requests if present */
+  $httpProvider.interceptors.push(function authInterceptor($injector) {
+    'ngInject';
+    const JwtService = $injector.get('JwtService');
+    const token = JwtService.get();
+
+    return {
+      request: function (config) {
+        if (token) {
+          config.headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        return config;
+      }
+    };
+  });
   /* eslint-enable */
 }
