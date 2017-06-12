@@ -24,16 +24,9 @@ export const UsersViewComponent = {
       this.states = {
         searchTerm: ''
       };
-      const token = this._JwtService.get();
-      if (!token) {
-        $window.location.assign('/login.html');
-        return;
-      }
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace('-', '+').replace('_', '/');
-      this.resp = angular.fromJson(this._$window.atob(base64));
+      this.resp = this._JwtService.getTokenObj();
       this._$rootScope.showProgress = true;
-      this.UsersManagementService.getActiveUsersList(this.resp.ticket.custID, token).then(admin => {
+      this.UsersManagementService.getActiveUsersList(this.resp.ticket.custID).then(admin => {
         this.admin = admin;
         if (this.admin.valid) {
           this.userList = this.admin.users;
@@ -65,7 +58,7 @@ export const UsersViewComponent = {
     }
     openNewUserModal() {
       this._$rootScope.showProgress = true;
-      this.UsersManagementService.getRoles(this.resp.ticket.custID, this._JwtService.get()).then(response => {
+      this.UsersManagementService.getRoles(this.resp.ticket.custID).then(response => {
         this.response = response;
         if (this.response.valid) {
           this._$rootScope.showProgress = false;
@@ -94,7 +87,6 @@ export const UsersViewComponent = {
 
     openDeleteModal(user) {
       this.user = user;
-      const token = this._JwtService.get();
       const tokenCustId = this.resp.ticket.custID;
       const tokenMasterLoginId = this.resp.ticket.masterLoginId;
       const userObj = {
@@ -110,7 +102,7 @@ export const UsersViewComponent = {
 
       this._$mdDialog.show(confirm).then(() => {
         this._$rootScope.showProgress = true;
-        return this.UsersManagementService.deleteUser(userObj, token);
+        return this.UsersManagementService.deleteUser(userObj);
       }).then(data => {
         if (data.valid) {
           this._$rootScope.showProgress = false;
@@ -134,7 +126,7 @@ export const UsersViewComponent = {
     openEditModal(user) {
       const editUser = user;
       this._$rootScope.showProgress = true;
-      this.UsersManagementService.getRoles(this.resp.ticket.custID, this._JwtService.get()).then(response => {
+      this.UsersManagementService.getRoles(this.resp.ticket.custID).then(response => {
         this.response = response;
         if (this.response.valid) {
           this._$rootScope.showProgress = false;
