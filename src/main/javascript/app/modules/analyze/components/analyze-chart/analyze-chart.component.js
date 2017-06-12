@@ -89,7 +89,7 @@ export const AnalyzeChartComponent = {
         get(this.model, 'sqlBuilder.filters', []),
         this._FilterService.backend2FrontendFilter()
       );
-      this.onSettingsChanged(this.settings);
+      this.onSettingsChanged();
     }
 
     updateLegendPosition() {
