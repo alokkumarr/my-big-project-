@@ -26,7 +26,8 @@ class MaprTest extends PlaySpec with OneAppPerSuite with DefaultAwaitTimeout {
     val hostname = InetAddress.getLocalHost.getHostName()
     /* Skip these tests that require a MapR-DB connection if not running
      * in an environment with MapR-DB available */
-    if (!hostname.contains("vacum-np.sncrcorp.net")) {
+    if (!(hostname.contains("vacum-np.sncrcorp.net")
+      || hostname.contains("velocity-va.sncrcorp.net"))) {
       pending
     }
   }
