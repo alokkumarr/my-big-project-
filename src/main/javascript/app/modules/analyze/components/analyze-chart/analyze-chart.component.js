@@ -89,7 +89,7 @@ export const AnalyzeChartComponent = {
         get(this.model, 'sqlBuilder.filters', []),
         this._FilterService.backend2FrontendFilter()
       );
-      this.onSettingsChanged(this.settings);
+      this.onSettingsChanged();
     }
 
     updateLegendPosition() {
@@ -173,15 +173,18 @@ export const AnalyzeChartComponent = {
 
     clearFilters() {
       this.filters = [];
+      this.analysisChanged = true;
     }
 
     onFilterRemoved(index) {
       this.filters.splice(index, 1);
+      this.analysisChanged = true;
     }
 
     onApplyFilters(filters) {
       if (filters) {
         this.filters = filters;
+        this.analysisChanged = true;
       }
     }
 

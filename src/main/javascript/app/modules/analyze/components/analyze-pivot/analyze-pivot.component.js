@@ -140,15 +140,18 @@ export const AnalyzePivotComponent = {
     onApplyFilters(filters) {
       if (filters) {
         this.filters = filters;
+        this.settingsModified = true;
       }
     }
 
     onClearAllFilters() {
       this.filters = [];
+      this.settingsModified = true;
     }
 
     onFilterRemoved(index) {
       this.filters.splice(index, 1);
+      this.settingsModified = true;
     }
 // END filters
 

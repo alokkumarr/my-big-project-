@@ -7,8 +7,9 @@
            ng-change="$ctrl.onModelChange()" />
   </md-input-container>
 
-  <md-input-container flex="40" md-no-float>
+  <md-input-container md-no-float style="width: 100px">
     <md-select ng-model="$ctrl.tempModel.operator"
+               style="width: 100px"
                placeholder="{{'PLEASE_SELECT' | translate}}"
                ng-change="$ctrl.onModelChange()">
       <md-option ng-repeat="operator in $ctrl.operators"
