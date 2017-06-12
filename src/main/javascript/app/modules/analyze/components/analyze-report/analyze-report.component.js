@@ -60,7 +60,6 @@ export const AnalyzeReportComponent = {
       this.gridData = [];
       this.columns = [];
       this.filters = [];
-      this.filterChips = [];
 
       this._unregisterCanvasHandlers = [];
     }
@@ -150,15 +149,18 @@ export const AnalyzeReportComponent = {
     onApplyFilters(filters) {
       if (filters) {
         this.filters = filters;
+        this.analysisChanged = true;
       }
     }
 
     onClearAllFilters() {
       this.filters = [];
+      this.analysisChanged = true;
     }
 
     onFilterRemoved(index) {
       this.filters.splice(index, 1);
+      this.analysisChanged = true;
     }
     // END filters section
 
@@ -625,6 +627,7 @@ export const AnalyzeReportComponent = {
         .then(sorts => {
           this.canvas.model.sorts = sorts;
           this.canvas._$eventEmitter.emit('sortChanged');
+          this.analysisChanged = true;
         });
     }
 

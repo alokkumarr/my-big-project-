@@ -173,15 +173,18 @@ export const AnalyzeChartComponent = {
 
     clearFilters() {
       this.filters = [];
+      this.analysisChanged = true;
     }
 
     onFilterRemoved(index) {
       this.filters.splice(index, 1);
+      this.analysisChanged = true;
     }
 
     onApplyFilters(filters) {
       if (filters) {
         this.filters = filters;
+        this.analysisChanged = true;
       }
     }
 
