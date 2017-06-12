@@ -1,3 +1,5 @@
+import clone from 'lodash/clone';
+
 import template from './analyze-card.component.html';
 import style from './analyze-card.component.scss';
 
@@ -27,12 +29,16 @@ export const AnalyzeCardComponent = {
     }
 
     openPublishModal(ev) {
-      const tpl = '<analyze-publish-dialog model="$ctrl.model" on-publish="$ctrl.onPublish($data)"></analyze-publish-dialog>';
+      const tpl = '<analyze-publish-dialog model="model" on-publish="onPublish(model)"></analyze-publish-dialog>';
 
       this._$mdDialog
         .show({
           template: tpl,
           controllerAs: '$ctrl',
+          controller: scope => {
+            scope.model = clone(this.model);
+            scope.onPublish = this.publish.bind(this);
+          },
           autoWrap: false,
           fullscreen: true,
           focusOnOpen: false,
@@ -60,6 +66,13 @@ export const AnalyzeCardComponent = {
         if (err) {
           this._$log.error(err);
         }
+      });
+    }
+
+    publish(model) {
+      this.onAction({
+        type: 'publish',
+        model
       });
     }
 

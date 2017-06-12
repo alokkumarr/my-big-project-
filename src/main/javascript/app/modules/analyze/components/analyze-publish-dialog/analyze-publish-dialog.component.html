@@ -6,25 +6,18 @@
   <analyze-dialog-content>
     <div class="ars-content" layout-padding>
       <div class="form-container" layout="column">
-        <label class="field-label" translate="SHARED_SETTINGS"></label>
+        <label class="field-label" translate="PUBLISH_LOCATION"></label>
         <div layout="row">
 
-          <md-select ng-model="::$ctrl.subject" flex="30">
-            <md-option ng-repeat="subject in $ctrl.subjects"
-                       ng-bind="::subject | translate"
-                       ng-value="subject">
-            </md-option>
+          <md-select placeholder="Select a Category"
+                    ng-model="::$ctrl.model.categoryId">
+            <md-optgroup ng-repeat="category in $ctrl.dataHolder" label="{{::category.name}}">
+              <md-option
+                ng-repeat="subCategory in category.children"
+                ng-bind="::subCategory.name"
+                ng-value="subCategory.id"></md-option>
+            </md-optgroup>
           </md-select>
-
-          <span translate="CAN" flex="10" class="label-inline-with-select"></span>
-
-          <md-select ng-model="::$ctrl.predicate" flex="20">
-            <md-option ng-repeat="predicate in $ctrl.predicates"
-                       ng-bind="::predicate | translate"
-                       ng-value="predicate">
-            </md-option>
-          </md-select>
-
         </div>
       </div>
 

@@ -56,6 +56,24 @@
                   </md-button>
                 </md-menu-item>
                 <md-menu-item>
+                  <md-button aria-label="Publish"
+                              ng-click="$ctrl.openPublishModal(report.data)"
+                              translate="PUBLISH">
+                  </md-button>
+                </md-menu-item>
+                <md-menu-item>
+                  <md-button aria-label="Print"
+                              ng-click="$ctrl.print(report.data)"
+                              translate="PRINT">
+                  </md-button>
+                </md-menu-item>
+                <md-menu-item>
+                  <md-button aria-label="Export"
+                              ng-click="$ctrl.export(report.data)"
+                              translate="EXPORT">
+                  </md-button>
+                </md-menu-item>
+                <md-menu-item>
                   <md-button aria-label="Delete"
                               ng-click="$ctrl.openDeleteModal(report.data)">
                     <span translate="DELETE" md-colors="{color: 'warn'}"></span>

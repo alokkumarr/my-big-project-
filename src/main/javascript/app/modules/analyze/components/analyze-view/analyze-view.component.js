@@ -126,6 +126,9 @@ export const AnalyzeViewComponent = {
         case 'delete':
           this.removeAnalysis(payload);
           break;
+        case 'publish':
+          this.publish(payload);
+          break;
         case 'execute':
           this.execute(payload);
           break;
@@ -146,6 +149,16 @@ export const AnalyzeViewComponent = {
     }
 
     print() {
+    }
+
+    publish(model) {
+      this._$rootScope.showProgress = true;
+      this._AnalyzeService.publishAnalysis(model).then(() => {
+        this._$rootScope.showProgress = false;
+        this._$state.go('analyze.view', {id: model.categoryId});
+      }, () => {
+        this._$rootScope.showProgress = false;
+      });
     }
 
     view(analysisId) {
