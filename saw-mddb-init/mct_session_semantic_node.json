@@ -63,7 +63,7 @@
                 "displayName": "Transfer End TS",
                 "aliasName": "",
                 "table": "MCT_SESSION",
-                "type": "string",
+                "type": "date",
                 "joinEligible": false,
                 "filterEligible": true
               },
@@ -89,7 +89,7 @@
               },
               {
                 "name": "SIZE_BUCKET_SORT",
-                "type": "double",
+                "type": "string",
                 "columnName": "SIZE_BUCKET_SORT.keyword",
                 "displayName": "Size Bucket Sort",
                 "aliasName": "",
@@ -109,7 +109,7 @@
               },
               {
                 "name": "TRANSFER_SECONDS",
-                "type": "double",
+                "type": "float",
                 "columnName": "TRANSFER_SECONDS",
                 "displayName": "Transfer Seconds",
                 "aliasName": "",
@@ -129,7 +129,7 @@
               },
               {
                 "name": "DURATION_BUCKET_SORT",
-                "type": "double",
+                "type": "string",
                 "columnName": "DURATION_BUCKET_SORT",
                 "displayName": "Duration Bucket Sort",
                 "aliasName": "",
@@ -159,7 +159,7 @@
               },
               {
                 "name": "LINK_SPEED",
-                "type": "double",
+                "type": "long",
                 "columnName": "LINK_SPEED",
                 "displayName": "Link Speed",
                 "aliasName": "",
@@ -169,7 +169,7 @@
               },
               {
                 "name": "TRANSFER_BYTES",
-                "type": "double",
+                "type": "long",
                 "columnName": "TRANSFER_BYTES",
                 "displayName": "Transfer Bytes",
                 "aliasName": "",
@@ -199,7 +199,7 @@
               },
               {
                 "name": "AVAILABLE_BYTES",
-                "type": "double",
+                "type": "long",
                 "columnName": "AVAILABLE_BYTES",
                 "displayName": "Available Bytes",
                 "aliasName": "",
@@ -270,7 +270,7 @@
               {
                 "name": "OPCO",
                 "type": "string",
-                "columnName": "OPCO",
+                "columnName": "OPCO.keyword",
                 "displayName": "OPCO",
                 "aliasName": "",
                 "table": "MCT_SESSION",
@@ -309,7 +309,7 @@
               },
               {
                 "name": "SELECTED_BYTES",
-                "type": "double",
+                "type": "long",
                 "columnName": "SELECTED_BYTES",
                 "displayName": "Selected Bytes",
                 "aliasName": "",
@@ -360,7 +360,7 @@
               {
                 "name": "TARGET_INTERNALVERSION",
                 "type": "string",
-                "columnName": "TARGET_INTERNALVERSION",
+                "columnName": "TARGET_INTERNALVERSION.keyword",
                 "displayName": "Target Internal Version",
                 "aliasName": "",
                 "table": "MCT_SESSION",
@@ -399,7 +399,7 @@
               },
               {
                 "name": "AVAILABLE_MB",
-                "type": "double",
+                "type": "float",
                 "columnName": "AVAILABLE_MB",
                 "displayName": "Available (MB)",
                 "aliasName": "",
@@ -420,7 +420,7 @@
               {
                 "name": "HAS_OTHER",
                 "type": "string",
-                "columnName": "HAS_OTHER",
+                "columnName": "HAS_OTHER.keyword",
                 "displayName": "Has Other",
                 "aliasName": "",
                 "table": "MCT_SESSION",
@@ -559,7 +559,7 @@
               },
               {
                 "name": "TRANSFER_MINUTES",
-                "type": "double",
+                "type": "float",
                 "columnName": "TRANSFER_MINUTES",
                 "displayName": "Transfer Minutes",
                 "aliasName": "",
@@ -599,7 +599,7 @@
               },
               {
                 "name": "CHANNEL_WIDTH",
-                "type": "double",
+                "type": "long",
                 "columnName": "CHANNEL_WIDTH",
                 "displayName": "Channel Width",
                 "aliasName": "",
@@ -629,7 +629,7 @@
               },
               {
                 "name": "FAILED_BYTES",
-                "type": "double",
+                "type": "long",
                 "columnName": "FAILED_BYTES",
                 "displayName": "Failed Bytes",
                 "aliasName": "",
@@ -659,7 +659,7 @@
               },
               {
                 "name": "TRANSFER_MB",
-                "type": "double",
+                "type": "float",
                 "columnName": "TRANSFER_MB",
                 "displayName": "Transfer (MB)",
                 "aliasName": "",
@@ -669,7 +669,7 @@
               },
               {
                 "name": "FAILED_MB",
-                "type": "double",
+                "type": "float",
                 "columnName": "FAILED_MB",
                 "displayName": "Failed (MB)",
                 "aliasName": "",
@@ -700,7 +700,7 @@
               {
                 "name": "FATAL_ERROR_FLAG",
                 "type": "string",
-                "columnName": "FATAL_ERROR_FLAG",
+                "columnName": "FATAL_ERROR_FLAG.keyword",
                 "displayName": "Fatal Error Flag",
                 "aliasName": "",
                 "table": "MCT_SESSION",

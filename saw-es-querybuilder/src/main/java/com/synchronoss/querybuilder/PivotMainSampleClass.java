@@ -163,6 +163,7 @@ public class PivotMainSampleClass {
 		    }
 	    }
 	    System.setProperty("url", "http://mapr-dev02.sncrbda.dev.vacum-np.sncrcorp.net:9200/");
+	    System.out.println(searchSourceBuilder.toString());
 	    String response = SAWElasticTransportService.
 	        executeReturnAsString(searchSourceBuilder.toString(), objectNode.toString(), "some", "xssds", "login");
 	    System.out.println(response);

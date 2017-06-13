@@ -143,6 +143,7 @@ public class ChartMainSampleClass {
       }
     }
     String query = searchSourceBuilder.toString();
+    System.out.println(query);
     System.setProperty("url", "http://mapr-dev02.sncrbda.dev.vacum-np.sncrcorp.net:9200/");
     String response = SAWElasticTransportService.
         executeReturnAsString(query, objectNode.toString(), "some", "xssds", "login");

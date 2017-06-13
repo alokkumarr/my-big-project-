@@ -38,6 +38,7 @@
                   "timestamp",
                   "long",
                   "double",
+                  "float"
                   "int",
                   "string"
                 ],
@@ -100,7 +101,7 @@
                 "enum":[
                   "long",
                   "string",
-                  "int", "double", "date" ,"timestamp"
+                  "int", "double", "date" ,"timestamp", "float"
                 ],
                 "id":"/properties/filters/items/properties/type",
                 "type":"string"
@@ -135,7 +136,8 @@
                   "long",
                   "double",
                   "int",
-                  "string"
+                  "string",
+                  "float"
                 ],
                 "id":"/properties/sqlBuilder/properties/sort/items/properties/type",
                 "type":"string"
@@ -164,7 +166,8 @@
                   "long",
                   "double",
                   "int",
-                  "string"
+                  "string",
+                  "float"
                 ],
                 "id":"/properties/sqlBuilder/groupBy/properties/type",
                 "type":"string"
@@ -193,7 +196,8 @@
                   "long",
                   "double",
                   "int",
-                  "string"
+                  "string",
+                  "float"
                 ],
                 "id":"/properties/sqlBuilder/groupBy/properties/type",
                 "type":"string"
