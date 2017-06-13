@@ -65,25 +65,12 @@
 		<rpm.saw.root>/opt</rpm.saw.root>
 	</properties>
   <repositories>
- 	 <repository>
-		  <id>maven2-repo</id>
-		  <url>http://repo1.maven.apache.org/maven2</url>
-	</repository>
-	<repository>
-	  <id>typesafe-releases</id>
-	  <url>http://repo.typesafe.com/typesafe/releases/</url>
-	</repository>
-	  <repository>
-		  <id>sonatype-releases</id>
-		  <url>https://oss.sonatype.org/content/repositories/releases</url>
-	  </repository>
-	  <repository>
-		  <id>synchronoss</id>
-		  <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
-	  </repository>
-	  </repositories>
-
-	  <dependencies>
+   <repository>
+    <id>synchronoss</id>
+      <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+    </repository>
+  </repositories>
+  <dependencies>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
