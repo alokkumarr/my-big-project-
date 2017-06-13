@@ -190,6 +190,7 @@ public class DataField {
         TIMESTAMP("timestamp"),
         LONG("long"),
         DOUBLE("double"),
+        FLOAT("float"),
         INT("int"),
         STRING("string");
         private final String value;
