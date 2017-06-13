@@ -449,8 +449,8 @@
               },
               {
                 "name": "QUARATINE_CODE",
-                "type": "long",
-                "columnName": "QUARATINE_CODE",
+                "type": "string",
+                "columnName": "QUARATINE_CODE.keyword",
                 "displayName": "Quaratine Code",
                 "aliasName": "",
                 "table": "MCT_SESSION",
