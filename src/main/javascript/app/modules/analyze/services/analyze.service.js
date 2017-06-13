@@ -37,6 +37,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     getCategory,
     getDataByQuery,
     getDataBySettings,
+    getExecutionData,
     getLastPublishedAnalysis,
     getMethods,
     getPivotData,
@@ -127,7 +128,11 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
   }
 
   function getPublishedAnalysesByAnalysisId(id) {
-    return $http.get(`${url}/analysis/${id}/results`).then(fpGet(`data.results`));
+    return $http.get(`${url}/analysis/${id}/executions`).then(fpGet(`data.execution`));
+  }
+
+  function getExecutionData(analysisId, executionId) {
+    return $http.get(`${url}/analysis/${analysisId}/executions/${executionId}/data`).then(fpGet(`data.data`));
   }
 
   function getLastPublishedAnalysis(id) {

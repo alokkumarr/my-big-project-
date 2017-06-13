@@ -26,9 +26,11 @@ export const AnalyzePublishedDetailComponent = {
         if (!this.analysis.schedule) {
           this.isPublished = false;
         }
+        this.loadExecutionData();
         this.loadExecutedAnalyses(analysisId);
       } else {
         this.loadAnalysisById(analysisId).then(() => {
+          this.loadExecutionData();
           this.loadExecutedAnalyses(analysisId);
         });
       }
@@ -48,6 +50,15 @@ export const AnalyzePublishedDetailComponent = {
       this.requester.next({
         export: true
       });
+    }
+
+    loadExecutionData() {
+      const executionId = this._$state.params.executionId;
+      if (executionId) {
+        this._AnalyzeService.getExecutionData(this.analysis.id, executionId).then(data => {
+          this.requester.next({data});
+        });
+      }
     }
 
     loadAnalysisById(analysisId) {

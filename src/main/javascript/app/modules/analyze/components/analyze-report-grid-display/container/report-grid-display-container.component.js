@@ -94,12 +94,16 @@ export const ReportGridDisplayContainerComponent = {
 
     getGroupLabels(groups, columns) {
       return map(groups, group => {
-        const targetColumns = find(columns, column => column.columnName === group);
-        return targetColumns.label;
+        const targetColumns = find(columns, column => column.columnName === group.columnName);
+        return targetColumns.aliasName || targetColumns.displayName;
       });
     }
 
     groupData(data, groups) {
+      if (!data) {
+        return [];
+      }
+
       let groupedData = data;
       forEach(groups, group => {
         groupedData = this.groupRecursive(groupedData, group);
@@ -107,7 +111,7 @@ export const ReportGridDisplayContainerComponent = {
       return groupedData;
     }
 
-    groupArray(array, columnName) {
+    groupArray(array, {columnName}) {
       const groupedObj = groupBy(array, columnName);
       const nodes = map(groupedObj, (val, key) => {
         return {
@@ -124,14 +128,14 @@ export const ReportGridDisplayContainerComponent = {
       };
     }
 
-    groupRecursive(data, columnName) {
+    groupRecursive(data, group) {
       let groupedData = data;
       if (data.isGroup) {
         data.nodes = forEach(data.nodes, node => {
-          node.data = this.groupRecursive(node.data, columnName);
+          node.data = this.groupRecursive(node.data, group);
         });
       } else {
-        groupedData = this.groupArray(data, columnName);
+        groupedData = this.groupArray(data, group);
       }
       return groupedData;
     }
