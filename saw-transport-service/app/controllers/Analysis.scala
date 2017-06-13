@@ -31,19 +31,25 @@ class Analysis extends BaseController {
     handle(doProcess)
   }
 
-  private def doProcess(json: JValue): JValue = {
+  private def doProcess(json: JValue, ticket: Option[Ticket]): JValue = {
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
     action match {
       case "create" => {
         val semanticId = extractAnalysisId(json)
+        val (userId: Integer, userFullName: String) = ticket match {
+          case None => throw new ClientException(
+            "Valid JWT not found in Authorization header")
+          case Some(ticket) =>
+            (ticket.userId, ticket.userFullName)
+        }
         val instanceJson: JObject = ("semanticId", semanticId) ~
-        ("createdTimestamp", Instant.now().toEpochMilli())
+        ("createdTimestamp", Instant.now().toEpochMilli()) ~
+        ("userId", userId.asInstanceOf[Number].longValue) ~
+        ("userFullName", userFullName)
         val analysisId = UUID.randomUUID.toString
         val idJson: JObject = ("id", analysisId)
         val analysisType = extractKey(json, "analysisType")
         val typeJson: JObject = ("type", analysisType)
-        
-        
         val semanticJson = readSemanticJson(semanticId)
         val mergeJson = contentsAnalyze(
           semanticJson.merge(idJson).merge(instanceJson).merge(typeJson))

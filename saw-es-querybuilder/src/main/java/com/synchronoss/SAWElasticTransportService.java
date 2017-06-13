@@ -13,9 +13,13 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.synchronoss.querybuilder.model.ESProxy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class SAWElasticTransportService {
+  private static final Logger logger = LoggerFactory.getLogger(
+      SAWElasticTransportService.class.getName());
  
   private static String execute(String query, String jsonString, String dsk, String username,
     String moduleName) throws JsonProcessingException, IOException{
@@ -39,10 +43,13 @@ public class SAWElasticTransportService {
     mapper.disable(SerializationFeature.INDENT_OUTPUT);
     RequestBody body = RequestBody.create(JSON, mapper.writeValueAsBytes(esProxy));
     Request req = new Request.Builder().post(body).url(url).build();
+    logger.trace("Elasticsearch request: {}", req);
     Response response = client.newCall(req).execute();
+    logger.trace("Elasticsearch response: {}", response);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    JsonNode esResponse = objectMapper.readTree(response.body().string());
+    String responseString = response.body().string();
+    JsonNode esResponse = objectMapper.readTree(responseString);
     JsonNode finalResponse = objectMapper.readTree(esResponse.get("data").toString());
     return finalResponse.get("aggregations").toString();
   }

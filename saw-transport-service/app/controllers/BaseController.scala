@@ -1,7 +1,11 @@
 package controllers
 
 import java.text.SimpleDateFormat
+import java.security.Key;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.crypto.MacProvider;
 import org.json4s._
 import org.json4s.JsonAST.JValue
 import org.json4s.JsonDSL._
@@ -22,17 +26,21 @@ class BaseController extends Controller {
       "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
   }
 
-  protected def handle(process: JValue => JValue): Result = {
+  protected def handle(
+    process: (JValue, Option[Ticket]) => JValue): Result = {
     val response = handleResponse(process)
     log.trace("Response: {} {}", response.status, response.headers)
     response
   }
 
-  private def handleResponse(process: JValue => JValue): Result = {
+  private def handleResponse(
+    process: (JValue, Option[Ticket]) => JValue): Result = {
     val ctx: Http.Context = Http.Context.current.get
     val header = ctx._requestHeader()
-    log.trace("Request: {} {} {}", ctx.request.method, ctx.request.uri,
-      Json.prettyPrint(ctx.request.body.asJson))
+    log.trace("Request: {} {}", ctx.request.method, ctx.request.uri : Any)
+    log.trace("Request headers: {}", ctx.request.headers)
+    log.trace("Request body: {}", Json.prettyPrint(ctx.request.body.asJson))
+    val ticket = getTicket(ctx.request.getHeader("Authorization"))
     val body = ctx.request.method match {
       case "GET" => JObject()
       case "POST" =>
@@ -56,12 +64,35 @@ class BaseController extends Controller {
         "Unhandled method: " + method)
     }
     try {
-      Results.ok(playJson(process(body)))
+      Results.ok(playJson(process(body, ticket)))
     } catch {
       case ClientException(message) => userErrorResponse(message)
       case e: Exception => {
         log.error("Internal server error", e)
         serverErrorResponse(e.getMessage())
+      }
+    }
+  }
+
+  private def getTicket(header: String): Option[Ticket] = {
+    header match {
+      case null => None
+      case value => {
+        val head = "Bearer "
+        if (value.startsWith(head)) {
+          val key = "sncrsaw2"
+          val token = value.substring(head.length)
+          val body = Jwts.parser().setSigningKey(key)
+            .parseClaimsJws(token).getBody()
+          val ticket = body.get("ticket")
+            .asInstanceOf[java.util.Map[String, Object]]
+          Some(Ticket(
+            ticket.get("userId").asInstanceOf[Integer],
+            ticket.get("userFullName").asInstanceOf[String]))
+        } else {
+          log.info("Unrecognized Authorization header: " + value)
+          None
+        }
       }
     }
   }
@@ -91,3 +122,5 @@ class BaseController extends Controller {
       "Expected %s but got: %s".format(expected, name))
   }
 }
+
+case class Ticket(userId: Integer, userFullName: String)

@@ -21,14 +21,14 @@ class AnalysisExecutions extends BaseController {
       ("finished", obj \ "execution_timestamp") ~
       ("status", status)
     })
-    handle(json => {
+    handle((json, ticket) => {
       /* Note: Keep "results" property for API backwards compatibility */
       ("execution", execution) ~ ("results", execution) : JValue
     })
   }
 
   def getExecutionData(analysisId: String, executionId: String): Result = {
-    handle(json => {
+    handle((json, ticket) => {
       val result = AnalysisResult(analysisId, executionId)
       val content = result.getCachedData("content") match {
         case obj: JObject => obj
