@@ -23,8 +23,8 @@ import sncr.metadata.ui_components.UINode
 import sncr.metadata.engine.MDObjectStruct.formats
 class SemanticRequestProcessor(a_docAsJson : JValue, a_printPretty: Boolean = true)
   extends RequestProcessor(a_docAsJson : JValue, a_printPretty) {
-  protected override val m_log: Logger = LoggerFactory.getLogger(classOf[SemanticRequestProcessor].getName)
 
+  protected override val m_log: Logger = LoggerFactory.getLogger(classOf[SemanticRequestProcessor].getName)
   override def testUIComponent(uicomp: JObject) : Boolean = SemanticRequestProcessor.mandatoryAttributes.forall(attr => (uicomp \ attr ).extractOpt[String].nonEmpty)
 
   /**

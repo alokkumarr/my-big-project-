@@ -108,9 +108,17 @@ class SemanticNode(private var metricDescriptor: JValue = JNothing,
     }
   }
 
-  def update(keys: Map[String, Any]) : (Int, String) =
+  /**
+    * The update method is to be used on existing and loaded SemanticNode.
+    *
+    * @param keys
+    * @return
+    */
+
+  def update(keys: Map[String, Any] = null) : (Int, String) =
   {
     try {
+      //TODO::Clean it up in JIRA-473
       val (res, msg ) = selectRowKey(keys)
       if (res != Success.id) return (res, msg)
       setSemanticNodeContent()
@@ -194,6 +202,11 @@ object SemanticNode
 
   protected val m_log: Logger = LoggerFactory.getLogger("SemanticNodeObject")
 
+  /**
+    * This apply method is to be used to load existing SemanticNode
+    * @param rowId - row ID
+    * @return  - constructed and loaded SemanticNode
+    */
   def apply(rowId: String, selectId : Int = 2) :SemanticNode =
   {
     val semNode = new SemanticNode(JNothing, selectId, null, false)

@@ -153,12 +153,9 @@ class DataObject(final private var descriptor : JValue, final private var schema
   }
 
 
-  def update(filter: Map[String, Any]): (Int, String) = {
+  def update(filter: Map[String, Any] = null): (Int, String) = {
     try {
-      val (res, msg) = selectRowKey(filter)
-      if (res != Success.id) return (res, msg)
       setDescriptor
-
       val searchValues: Map[String, Any] = DataObject.extractSearchData(descriptor) + (Fields.NodeId.toString -> new String(rowKey))
       searchValues.keySet.foreach(k => {
         m_log debug s"Add search field $k with value: ${searchValues(k).toString}"
@@ -263,7 +260,7 @@ class DataObject(final private var descriptor : JValue, final private var schema
         if (commit(saveDL_Locations(update)))
           (Success.id, s"The DataObject Schema [ ID = ${Bytes.toString(rowKey)} ] has been updated")
         else
-          (Error.id, "Could not update DataObject datalake elements")
+          (Error.id, "Could not update DataObject sncr.datalake elements")
       }
       else
       {
@@ -295,7 +292,13 @@ object DataObject{
 
   val m_log: Logger = LoggerFactory.getLogger("DataObject")
 
-
+  /**
+    * Use this apply method to produce DataObjectNode from descriptor represented as string
+    * and schema as string.
+    * @param d - descriptor
+    * @param s - DataObject schema
+    * @return - Constructed DataObject node
+    */
 
   def apply(d: String, s: String) :DataObject =
   {
@@ -309,6 +312,11 @@ object DataObject{
     }
   }
 
+  /**
+    * This apply method is to be used to load existing data object
+    * @param rowId - row ID
+    * @return  - constructed and loaded DataObject
+    */
   def apply(rowId: String) :DataObject =
   {
     val dobj = new DataObject
@@ -322,9 +330,13 @@ object DataObject{
   val searchFields = Map(
     "name" -> "String",
     "type" -> "String",
-    "customerCode" -> "String",
     "product" -> "String",
-    "id" -> "String")
+    "customerCode" -> "String",
+    "id" -> "String",
+    "category" -> "String",
+    "storageType" -> "String",
+    "displayName" -> "String"
+  )
 
   val requiredFields = List("name", "type", "product", "partitionType", "storageType", "displayName", "description" )
 
@@ -334,7 +346,10 @@ object DataObject{
       (descriptor, ("type", "String")),
       (descriptor, ("product", "String")),
       (descriptor, ("customerCode", "String")),
-      (descriptor, ("id", "String"))
+      (descriptor, ("id", "String")),
+      (descriptor, ("category", "String")),
+      (descriptor, ("storageType", "String")),
+      (descriptor, ("displayName", "String"))
      ).map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2._1, jv._2._2))
         m_log trace s"Field: ${jv._2._1}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${jv._2._2}\n, Value: $searchValue"

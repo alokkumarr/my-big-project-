@@ -19,6 +19,7 @@ maprcli table cf create -cfname _system -path /main/metadata/datalake_metadata
 maprcli table cf create -cfname _search -path /main/metadata/datalake_metadata
 maprcli table cf create -cfname _source -path /main/metadata/datalake_metadata
 maprcli table cf create -cfname _dl_locations -path /main/metadata/datalake_metadata
+maprcli table cf create -cfname _parent_relations -path /main/metadata/datalake_metadata
 
 maprcli table create -path /main/metadata/analysis_metadata
 maprcli table cf create -cfname _system -path /main/metadata/analysis_metadata

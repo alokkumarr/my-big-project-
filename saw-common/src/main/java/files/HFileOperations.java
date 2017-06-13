@@ -9,15 +9,13 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 /**
  * Created by srya0001 on 2/23/2017.
  */
 public class HFileOperations {
+
 
     public static String readFile(String fileName) throws FileNotFoundException {
         FileSystem fs;
@@ -110,5 +108,30 @@ public class HFileOperations {
             throw new FileNotFoundException("Cannot get file status on provided locations:" + e);
         }
     }
+
+    public static String[] listJarFiles(String directoryLocation, final String fileExtension) {
+        String[] jarFiles = null;
+        File jars = new File(directoryLocation);
+        if(jars.isDirectory()){
+            if (jars.isDirectory()) {
+                if (jars.listFiles().length > 0) {
+                    jarFiles = jars.list(new FilenameFilter() {
+                        @Override
+                        public boolean accept(File dir, String name) {
+                            boolean jarIndicator = false;
+                            if (name.endsWith(fileExtension)) {
+                                jarIndicator = true;
+                            }
+                            return jarIndicator;
+                        }
+                    });
+                }
+            }
+        } else {
+            throw new IllegalArgumentException(directoryLocation +" location which has been provided is not directory.");
+        }
+        return jarFiles;
+    }
+
 
 }

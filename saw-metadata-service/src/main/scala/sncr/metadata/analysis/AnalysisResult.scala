@@ -2,6 +2,7 @@ package sncr.metadata.analysis
 
 import java.util.{Base64, UUID}
 
+import files.HFileOperations
 import org.apache.hadoop.hbase.TableName
 import org.apache.hadoop.hbase.client.{Get, Put, Result}
 import org.apache.hadoop.hbase.util.Bytes
@@ -113,13 +114,8 @@ class AnalysisResult(private val parentAnalysisRowID : String,
     }
   }
 
-  def update(filter: Map[String, Any]): (Int, String) = {
+  def update(filer : Map[String, Any] = null): (Int, String) = {
     try {
-
-      val (res, msg) = selectRowKey(filter)
-      if (res != Success.id) return (res, msg)
-      setDescriptor()
-
       val searchValues: Map[String, Any] = AnalysisResult.extractSearchData(descriptor) +
         (Fields.NodeId.toString -> Bytes.toString(rowKey)) + ("analysisId" -> parentAnalysisRowID)
       searchValues.keySet.foreach(k => {
@@ -197,6 +193,17 @@ class AnalysisResult(private val parentAnalysisRowID : String,
     _objects_schema = _objects_schema - ref
   }
 
+  def deleteObjects : Unit ={
+    _objects_descriptor.foreach( desc => {
+      desc._2 match {
+        case "location" => val p = _objects(desc._1).asInstanceOf[String]
+          m_log debug s"Removing file at location $p, reference: ${desc._1}"
+          HFileOperations.deleteFile(p)
+        case _ => m_log trace s"Clean up is not required for object: ${desc._1}"
+      }
+    })
+  }
+
 
   def saveObjects(p: Put) : Put =
   {
@@ -237,20 +244,23 @@ object AnalysisResult{
   protected val m_log: Logger = LoggerFactory.getLogger("AnalysisResultObject")
 
   val searchFields = Map ("name" -> "String",
-                          "NodeId" -> "String",
                           "id" -> "String",
-                          "execution_timestamp" -> "String",
+                          "execution_start_ts" -> "Long",
+                          "execution_end_ts" -> "Long",
                           "execution_result" -> "String",
-                          "analysisName" -> "String")
-  protected val requiredFields = List ("result", "execution_timestamp","data_location", "exported", "format" )
+                          "analysisName" -> "String",
+                          "outputType" -> "String")
+  protected val requiredFields = List ( "execution_start_ts","outputLocation", "outputType", "analysisId" )
 
   def  extractSearchData(analysisResult: JValue) : Map[String, Any] = {
 
     List(
       (analysisResult, "name"),
       (analysisResult, "analysisName"),
-      (analysisResult, "execution_timestamp"),
+      (analysisResult, "execution_start_ts"),
+      (analysisResult, "execution_end_ts"),
       (analysisResult, "execution_result"),
+      (analysisResult, "outputType"),
       (analysisResult, "id")
       ).map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, searchFields(jv._2)) )
@@ -258,6 +268,9 @@ object AnalysisResult{
         if (result) jv._2 -> Option(searchValue) else jv._2 -> None
       }).filter(_._2.isDefined).map(kv => kv._1 -> kv._2.get).toMap
   }
+
+
+
 
 }
 

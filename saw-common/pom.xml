@@ -16,7 +16,6 @@
         <maven.assembly.version>2.5.5</maven.assembly.version>
         <project.basedir>.</project.basedir>
         <Json4s.latestVersion>3.3.0</Json4s.latestVersion>
-        <jackson.core.version>2.7.1</jackson.core.version>
         <mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
     </properties>
     <pluginRepositories>
@@ -64,7 +63,6 @@
 
     </dependencies>
     <build>
-        <testSourceDirectory>${project.basedir}/src/test</testSourceDirectory>
         <!-- To define the plugin version in your parent POM -->
         <plugins>
             <plugin>

@@ -347,7 +347,7 @@ declare -r app_mainclass="play.core.server.ProdServerStart"
 
 echo "APPLICATION_HOME : $APPLICATION_HOME"
 echo "Configuration dir: $conf_dir"
-echo "Application bin: $app_home"
+echo "Application home: $app_home"
 echo "Library dir: $lib_dir"
 echo "Log dir: $log_dir"
 

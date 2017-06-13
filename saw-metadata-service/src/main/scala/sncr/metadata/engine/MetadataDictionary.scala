@@ -15,6 +15,10 @@ object MetadataDictionary extends Enumeration {
   val verb = Value(12, "verb")
   val query = Value(13, "query")
 
+  val analysisId = Value(100, "analysis_id")
+  val semanticId = Value(101, "semantic_id")
+  val dataObjectId = Value(102, "dataobject_id")
+
   val separator: String = "::"
 
 }

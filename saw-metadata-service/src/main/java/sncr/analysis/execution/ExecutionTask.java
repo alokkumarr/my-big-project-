@@ -31,14 +31,7 @@ public class ExecutionTask implements Callable<String> {
         outputFile = outFile;
     }
 
-    ExecutionTask(String predefResultRowID, String analysisID, String inpFile, String outFile ){
-        predefRowID = predefResultRowID;
-        analysisId = analysisID;
-        inputFile = inpFile;
-        outputFile = outFile;
-    }
 
-    public void setSQLExecutorLocation(String newLoc) {  executorLocation = newLoc; }
 
     public String getPredefinedRowID(){ return predefRowID; }
 

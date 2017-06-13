@@ -22,7 +22,6 @@
         <play2.json.reactive.mongo>0.11.11</play2.json.reactive.mongo>
         <io.netty.version>4.0.36.Final</io.netty.version>
         <spring.release>4.1.6.RELEASE</spring.release>
-        <jackson.core.version>2.7.1</jackson.core.version>
         <rpm.bda.root>/opt</rpm.bda.root>
         <rpm.release>1</rpm.release>
         <rpm.version>${project.version}</rpm.version>
@@ -522,7 +521,20 @@
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/sbin</directory>
+                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/sparklib</directory>
+                            <filemode>440</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                            <sources>
+                                <source>
+                                    <location>
+                                        target/${project.artifactId}-${project.version}-package/${project.artifactId}-${project.version}/sparklib
+                                    </location>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/bin</directory>
                             <filemode>750</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
@@ -535,6 +547,12 @@
                                 </source>
                                 <source>
                                     <location>${project.basedir}/../saw-metadata-service/src/main/scripts</location>
+                                    <includes>
+                                        <include>*.sh</include>
+                                    </includes>
+                                </source>
+                                <source>
+                                    <location>${project.basedir}/../saw-data-access/src/main/scripts</location>
                                     <includes>
                                         <include>*.sh</include>
                                     </includes>

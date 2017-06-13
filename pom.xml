@@ -44,9 +44,7 @@
 		<maven.compile.version>2.3.2</maven.compile.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<jackson.databind>2.4.1.3</jackson.databind>
-		<jackson.core>2.4.1.1</jackson.core>
-		<jackson.annotation>2.4.0</jackson.annotation>
+		<jackson.core.version>2.8.7</jackson.core.version>
 		<http.version>4.3.4</http.version>
 		<log4j.version>1.2.17</log4j.version>
 		<slfj.version>1.7.6</slfj.version>
@@ -72,7 +70,6 @@
       <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
     </repository>
   </repositories>
-
   <dependencies>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>

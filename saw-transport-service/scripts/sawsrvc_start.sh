@@ -146,7 +146,13 @@ declare lib_classpath=$(
     print join(":", map { realpath($_) } glob($ARGV[0] . "/*"))' \
     $lib_dir
   )
+
+for j in `ls /opt/mapr/spark/spark-current/jars/*.jar`; do
+ app_classpath=${app_classpath}:"${j}"
+done
+
 lib_classpath=${lib_classpath}:$(mapr classpath)
+
 	
 declare -r app_classpath="$conf_dir:$lib_classpath"
 vlog app_classpath: $app_classpath
@@ -181,6 +187,8 @@ vlog "EXEC_CMD: $exec_cmd"
 
 # Additinal DEV key: X^kFEdvnivVbWVv5o^9wQylyz@h4G0vPjzpX@hDkkNWSom_^iOh^1ic>]@K94mSI
 export APPLICATION_SECRET="y=5L3Lrezk1j0KsBo8K>YHR6JIxfcb=ax]0sT7m2NZHcafHZM73_=fqnNcGP8r<x"
+export SAW_EXECUTOR_HOME=${saw_service_home}
+
 if [[ $VERBOSE ]] ; then
   elog=$log_dir/$(date +%y%m%dT%H%M%S).xdfts-$SAW_SERVICE_PORT.elog
   vlog EXECLOG: $elog

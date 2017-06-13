@@ -19,7 +19,6 @@
         <Json4s.latestVersion>3.3.0</Json4s.latestVersion>
         <mapr.client>5.2.0.39122-mapr</mapr.client>
         <maprdb.version>1.1.1-mapr-1602</maprdb.version>
-        <jackson.core.version>2.7.1</jackson.core.version>
         <mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
         <common.lang>2.6</common.lang>
     </properties>
