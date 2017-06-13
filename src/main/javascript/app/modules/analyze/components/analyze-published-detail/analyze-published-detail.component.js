@@ -1,4 +1,5 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import get from 'lodash/get';
 
 import template from './analyze-published-detail.component.html';
 import style from './analyze-published-detail.component.scss';
@@ -13,6 +14,7 @@ export const AnalyzePublishedDetailComponent = {
       this._$state = $state;
       this._$window = $window;
       this._$mdDialog = $mdDialog;
+      this._executionId = $state.params.executionId;
       this.isPublished = true;
 
       this.requester = new BehaviorSubject({});
@@ -53,9 +55,8 @@ export const AnalyzePublishedDetailComponent = {
     }
 
     loadExecutionData() {
-      const executionId = this._$state.params.executionId;
-      if (executionId) {
-        this._AnalyzeService.getExecutionData(this.analysis.id, executionId).then(data => {
+      if (this._executionId) {
+        this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId).then(data => {
           this.requester.next({data});
         });
       }
@@ -71,17 +72,20 @@ export const AnalyzePublishedDetailComponent = {
         });
     }
 
-    loadLastPublishedAnalysis(analysisId) {
-      this._AnalyzeService.getLastPublishedAnalysis(analysisId)
-        .then(analysis => {
-          this.analysis = analysis;
-        });
+    /* If data for a particular execution is not requested,
+       load data from the most recent execution */
+    loadLastPublishedAnalysis() {
+      if (!this._executionId) {
+        this._executionId = get(this.analyses, '[0].id', null);
+        this.loadExecutionData();
+      }
     }
 
     loadExecutedAnalyses(analysisId) {
       this._AnalyzeService.getPublishedAnalysesByAnalysisId(analysisId)
         .then(analyses => {
           this.analyses = analyses;
+          this.loadLastPublishedAnalysis();
         });
     }
 

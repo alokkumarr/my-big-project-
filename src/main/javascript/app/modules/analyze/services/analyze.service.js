@@ -2,6 +2,7 @@ import omit from 'lodash/omit';
 import forEach from 'lodash/forEach';
 import set from 'lodash/set';
 import fpMap from 'lodash/fp/map';
+import fpSortBy from 'lodash/fp/sortBy';
 import fpGet from 'lodash/fp/get';
 import filter from 'lodash/filter';
 import find from 'lodash/find';
@@ -128,7 +129,9 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
   }
 
   function getPublishedAnalysesByAnalysisId(id) {
-    return $http.get(`${url}/analysis/${id}/executions`).then(fpGet(`data.execution`));
+    return $http.get(`${url}/analysis/${id}/executions`)
+      .then(fpGet(`data.execution`))
+      .then(fpSortBy([obj => -Date.parse(obj.finished)]));
   }
 
   function getExecutionData(analysisId, executionId) {
