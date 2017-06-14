@@ -3,6 +3,8 @@ import findIndex from 'lodash/findIndex';
 import forEach from 'lodash/forEach';
 import find from 'lodash/find';
 import get from 'lodash/get';
+import sortBy from 'lodash/sortBy';
+import flatMap from 'lodash/flatMap';
 import isEmpty from 'lodash/isEmpty';
 import assign from 'lodash/assign';
 import map from 'lodash/map';
@@ -140,12 +142,14 @@ export const AnalyzeChartComponent = {
 
     fillSettings(artifacts, model) {
       /* Flatten the artifacts into a single array */
-      const attributes = artifacts.reduce((res, metric) => {
-        return res.concat(map(metric.columns, attr => {
+      let attributes = flatMap(artifacts, metric => {
+        return map(metric.columns, attr => {
           attr.tableName = metric.artifactName;
           return attr;
-        }));
-      }, []);
+        });
+      });
+
+      attributes = sortBy(attributes, [attr => attr.columnName]);
 
       /* Based on data type, divide the artifacts between axes. */
       const yaxis = filter(attributes, attr => (
