@@ -27,7 +27,10 @@ export const UserNewComponent = {
       const custId = parseInt(get(this._JwtService.getTokenObj(), 'ticket.custID'), 10);
       this.user = {
         activeStatusInd: 'Active',
-        customerId: custId
+        customerId: custId,
+        masterLoginId: '',
+        firstName: '',
+        lastName: ''
       };
       this.statuses = [{
         ind: 'Active',
@@ -38,6 +41,9 @@ export const UserNewComponent = {
       }];
     }
 
+    addToUserId(firstName, lastName) {
+      this.user.masterLoginId = firstName + '.' + lastName;
+    }
     createUser() {
       this._$rootScope.showProgress = true;
       if (this.user.activeStatusInd === 'Active') {
