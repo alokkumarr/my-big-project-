@@ -5,11 +5,11 @@ import fpMap from 'lodash/fp/map';
 import fpPipe from 'lodash/fp/pipe';
 import fpFilter from 'lodash/fp/filter';
 import find from 'lodash/find';
-import filter from 'lodash/filter';
 import isEmpty from 'lodash/isEmpty';
 import assign from 'lodash/assign';
 import unset from 'lodash/unset';
 import cloneDeep from 'lodash/cloneDeep';
+import sortBy from 'lodash/sortBy';
 import fpGroupBy from 'lodash/fp/groupBy';
 import fpMapValues from 'lodash/fp/mapValues';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
@@ -18,7 +18,7 @@ import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 import template from './analyze-pivot.component.html';
 import style from './analyze-pivot.component.scss';
 
-import {ANALYZE_PIVOT_SETTINGS_SIDENAV_ID} from '../analyze-pivot-settings/analyze-pivot-settings.component';
+import {DATE_TYPES} from '../../consts';
 
 export const AnalyzePivotComponent = {
   template,
@@ -43,8 +43,9 @@ export const AnalyzePivotComponent = {
       this.filters = [];
       this.sortFields = null;
       this.pivotGridUpdater = new BehaviorSubject({});
+      this.settingsReciever = new BehaviorSubject({});
       this.settingsModified = false;
-      this.artifacts = [];
+      this.artifactColumns = [];
     }
 
     $onInit() {
@@ -53,32 +54,34 @@ export const AnalyzePivotComponent = {
         this._AnalyzeService.createAnalysis(this.model.semanticId, this.model.type)
           .then(analysis => {
             this.model = assign(this.model, analysis);
-            this.model.repository = {
-              storageType: 'ES',
-              indexName: 'mct_data',
-              type: 'session_type'
-            };
             this.model.id = analysis.id;
-            this.artifacts = analysis.artifacts;
-            this.prepareFields(analysis.artifacts[0].columns);
+            this.artifactColumns = sortBy(analysis.artifacts[0].columns, 'displayName');
+            this.prepareFields(this.artifactColumns);
             this.toggleSettingsSidenav();
           });
         // if it's a pivot analysis we're only interested in the first artifact
       } else {
         // edit existing analysis
-        this.artifacts = this.model.artifacts;
-        this.prepareFields(this.artifacts[0].columns);
+        this.artifactColumns = sortBy(this.model.artifacts[0].columns, 'displayName');
+        this.prepareFields(this.artifactColumns);
         this.loadPivotData().then(() => {
           this.filters = map(this.model.filters,
             this._FilterService.backend2FrontendFilter(this.model.artifacts));
-          this.sortFields = this.getFieldToSortFieldMapper()(this.fields);
+          this.sortFields = this.getFieldToSortFieldMapper()(
+            this._PivotService.artifactColumns2PivotFields()(this.artifactColumns)
+          );
           this.sorts = this.mapBackend2FrontendSort(this.model.sorts, this.sortFields);
         });
       }
     }
 
-    onApplyFieldSettings() {
-      this.sortFields = this.getFieldToSortFieldMapper()(this.fields);
+    onApplySettings(columns) {
+      console.log('old columns: ', this.artifactColumns);
+      this.artifactColumns = columns;
+      console.log('new columns: ', columns);
+      this.sortFields = this.getFieldToSortFieldMapper()(
+        this._PivotService.artifactColumns2PivotFields()(this.artifactColumns)
+      );
       this.settingsModified = true;
     }
 
@@ -87,32 +90,21 @@ export const AnalyzePivotComponent = {
       this.pivotGridUpdater.next({
         dataSource: this.dataSource
       });
-      this.fieldChooserIsntance.option({
-        dataSource: this.dataSource
-      });
     }
 
-    prepareFields(artifactAttributes) {
-      this.fields = this._PivotService.getBackend2FrontendFieldMapper()(artifactAttributes);
-
-      this.fieldChooserOptions = {
-        onContentReady: e => {
-          this.fieldChooserIsntance = e.component;
-        },
-        layout: 1,
-        width: 400,
-        height: 800
-      };
-
-      // repaint the field chooser so it fills the cointainer
+    prepareFields(artifactColumns) {
       this._$timeout(() => {
-        this.setDataSource(this.dataSource.store, this.fields);
-        this.fieldChooserIsntance.repaint();
+        this.setDataSource(this.dataSource.store, this._PivotService.artifactColumns2PivotFields()(artifactColumns));
       }, 400);
     }
 
     toggleSettingsSidenav() {
-      this._$mdSidenav(ANALYZE_PIVOT_SETTINGS_SIDENAV_ID).toggle();
+      this.settingsReciever.next({
+        eventName: 'open',
+        payload: {
+          artifactColumns: this.artifactColumns
+        }
+      });
     }
 
     onRefreshData() {
@@ -126,10 +118,12 @@ export const AnalyzePivotComponent = {
         .then(({analysis, data}) => {
           this.normalizedData = data;
           console.log(data);
-          this.deNormalizedData = this._PivotService.denormalizeData(data, this.fields);
+          this.deNormalizedData = this._PivotService.denormalizeData(data,
+            this._PivotService.artifactColumns2PivotFields()(this.artifactColumns));
           this.dataSource.store = this.deNormalizedData;
           console.log(analysis, this.deNormalizedData);
-          this.setDataSource(this.dataSource.store, this.fields);
+          this.setDataSource(this.dataSource.store,
+            this._PivotService.artifactColumns2PivotFields()(this.artifactColumns));
           this.settingsModified = false;
         });
     }
@@ -167,7 +161,7 @@ export const AnalyzePivotComponent = {
 
     getFieldToSortFieldMapper() {
       return fpPipe(
-        fpFilter(field => field.dataType !== 'date' && field.area === 'row'),
+        fpFilter(field => !DATE_TYPES.includes(field.dataType)),
         fpMap(field => {
           return {
             type: field.dataType,
@@ -240,7 +234,7 @@ export const AnalyzePivotComponent = {
               pivot: this.model,
               dataSource: {
                 store: this.dataSource.store,
-                fields: this.fields
+                fields: this._PivotService.artifactColumns2PivotFields()(this.artifactColumns)
               }
             };
           },
@@ -270,12 +264,6 @@ export const AnalyzePivotComponent = {
       });
     }
 
-    onGetFields(fields) {
-      // pivotgrid adds some other fields in plus, so we have to take only the real ones
-      this.fields = fields;
-      this.fieldsToSave = filter(fields, 'area');
-    }
-
     updateFields() {
       this.pivotGridUpdater.next({
         getFields: true
@@ -283,10 +271,9 @@ export const AnalyzePivotComponent = {
     }
 
     getModel() {
-      this.updateFields();
       const model = assign(this.model, {
         artifacts: [{
-          columns: this._PivotService.getFrontend2BackendFieldMapper()(this.fieldsToSave)
+          columns: this.artifactColumns
         }],
         sqlBuilder: this.getSqlBuilder()
       });
@@ -296,26 +283,23 @@ export const AnalyzePivotComponent = {
 
     getSqlBuilder() {
       const groupedFields = fpPipe(
+        fpFilter('area'),
         fpGroupBy('area'),
         fpMapValues(
           fpMap(field => {
             const backendField = {
               type: field.type,
-              columnName: field.dataField
+              columnName: field.columnName
             };
-            if (field.aggregate) {
+            if (field.area === 'data') {
               backendField.aggregate = field.aggregate;
+              backendField.name = `${field.aggregate}_${field.columnName}`;
+
             }
             return backendField;
           })
         ),
-      )(this.fieldsToSave);
-
-      groupedFields.data = map(groupedFields.data, field => {
-        return assign(field, {
-          name: 'sum_mb'
-        });
-      });
+      )(this.artifactColumns);
       groupedFields.column = map(groupedFields.column, field => {
         return assign(field, {
           groupInterval: 'month'

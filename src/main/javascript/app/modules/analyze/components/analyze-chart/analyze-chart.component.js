@@ -11,7 +11,7 @@ import clone from 'lodash/clone';
 import filter from 'lodash/filter';
 import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
-import {NUMBER_TYPES} from '../../services/filter.service';
+import {NUMBER_TYPES} from '../../consts';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';

@@ -49,5 +49,10 @@
   "TOOLTIP_NEW_ANALYSIS": "Create new analysis",
   "TOOLTIP_FORK_ANALYSIS": "Fork Analysis",
   "TOOLTIP_EXECUTE_ANALYSIS": "Execute Analysis",
+  "TOOLTIP_PIVOT_AREA": "Pivot area",
+  "TOOLTIP_AGGREGATE_TYPE": "Aggregate type",
+  "TOOLTIP_NUMBER_TYPE": "Number",
+  "TOOLTIP_STRING_TYPE": "String",
+  "TOOLTIP_DATE_TYPE": "Date",
   "ERROR_FILL_IN_REQUIRED_FILTER_MODELS": "Please fill in all models, or mark filter as runtime filter!"
 }

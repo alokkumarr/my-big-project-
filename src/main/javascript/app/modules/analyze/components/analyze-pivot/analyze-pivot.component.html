@@ -26,8 +26,8 @@
   </analyze-dialog-header>
 
   <analyze-dialog-content>
-    <analyze-pivot-settings on-apply-field-settings="$ctrl.onApplyFieldSettings()"
-                            field-chooser-options="$ctrl.fieldChooserOptions">
+    <analyze-pivot-settings on-apply-settings="$ctrl.onApplySettings(columns)"
+                            reciever="$ctrl.settingsReciever">
     </analyze-pivot-settings>
 
     <div layout="column">

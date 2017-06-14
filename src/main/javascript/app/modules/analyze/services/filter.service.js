@@ -13,8 +13,6 @@ export const BOOLEAN_CRITERIA = {
   OR: 'OR'
 };
 
-export const NUMBER_TYPES = ['int', 'integer', 'double', 'long', 'timestamp'];
-
 export const DEFAULT_BOOLEAN_CRITERIA = BOOLEAN_CRITERIA.AND;
 
 export function FilterService() {

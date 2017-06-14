@@ -7,7 +7,7 @@ import isUndefined from 'lodash/isUndefined';
 
 import template from './report-grid.component.html';
 import style from './report-grid.component.scss';
-import {NUMBER_TYPES} from '../../../services/filter.service';
+import {NUMBER_TYPES} from '../../../consts';
 
 // const MIN_ROWS_TO_SHOW = 5;
 const COLUMN_WIDTH = 175;
