@@ -27,6 +27,10 @@
   color: white;
 }
 
+md-menu-bar {
+  display: inline-block;
+}
+
 .#{$theme-cls} {
   &.md-button {
     border-radius: 3px;

@@ -15,4 +15,14 @@ analyze-published-detail {
     color: $primary-white;
     vertical-align: top;
   }
+
+  .prompt-execution-container {
+    padding: 50px;
+    text-align: center;
+    font-size: 14px;
+
+    button.md-button {
+      margin-top: 15px;
+    }
+  }
 }
