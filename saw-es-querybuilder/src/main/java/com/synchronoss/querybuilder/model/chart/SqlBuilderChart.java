@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
     "sqlBuilder"
 })
-public class ChartBuilderPivot {
+public class SqlBuilderChart {
 
     @JsonProperty("sqlBuilder")
     private SqlBuilder sqlBuilder;

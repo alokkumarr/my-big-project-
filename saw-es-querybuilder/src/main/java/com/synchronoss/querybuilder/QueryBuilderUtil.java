@@ -7,9 +7,6 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram.Order;
 
-import com.synchronoss.querybuilder.model.DataField;
-import com.synchronoss.querybuilder.model.SplitBy;
-
 public class QueryBuilderUtil {
 	
 	public static AggregationBuilder aggregationBuilder (com.synchronoss.querybuilder.model.pivot.ColumnField columnField, 
@@ -71,11 +68,11 @@ public class QueryBuilderUtil {
  		return aggregationBuilder;
  	}
 
-    public static AggregationBuilder aggregationBuilderDataFieldChart(DataField data)
+    public static AggregationBuilder aggregationBuilderDataFieldChart(com.synchronoss.querybuilder.model.chart.DataField data)
 
     {
         AggregationBuilder aggregationBuilder = null;
-            switch (data.getAggregate().trim())
+            switch (data.getAggregate().value())
             {
             case "sum" : aggregationBuilder = AggregationBuilders.sum(data.getName()).field(data.getColumnName()); break;
             case "avg" : aggregationBuilder = AggregationBuilders.avg(data.getName()).field(data.getColumnName()); break;
@@ -93,7 +90,7 @@ public class QueryBuilderUtil {
  	 * @param splitBy
  	 * @return
  	 */
-	public static AggregationBuilder aggregationBuilderChart(SplitBy splitBy)
+	public static AggregationBuilder aggregationBuilderChart(com.synchronoss.querybuilder.model.chart.SplitBy splitBy)
 	{
 		AggregationBuilder aggregationBuilder = null;
 		
@@ -101,7 +98,7 @@ public class QueryBuilderUtil {
 		{
 			aggregationBuilder = AggregationBuilders.
 					dateHistogram("split_by").field(splitBy.getColumnName()).
-					dateHistogramInterval(groupInterval(splitBy.getGroupInterval())).order(Order.KEY_ASC);
+					dateHistogramInterval(groupInterval(splitBy.getGroupInterval().value())).order(Order.KEY_ASC);
 		}
 		else 
 		{
