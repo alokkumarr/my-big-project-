@@ -3,24 +3,21 @@ package com.synchronoss.querybuilder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.synchronoss.BuilderUtil;
-import com.synchronoss.querybuilder.model.ColumnField;
-import com.synchronoss.querybuilder.model.DataField;
-import com.synchronoss.querybuilder.model.Filter;
-import com.synchronoss.querybuilder.model.RowField;
-import com.synchronoss.querybuilder.model.Sort;
-import com.synchronoss.querybuilder.model.SqlBuilder;
+import com.synchronoss.querybuilder.model.chart.Filter.Type;
+import com.synchronoss.querybuilder.model.pivot.Model.Operator;
+import com.synchronoss.querybuilder.model.pivot.SqlBuilder;
+import com.synchronoss.querybuilder.model.pivot.SqlBuilder.BooleanCriteria;
 
 /**
  * @author saurav.paul
@@ -54,14 +51,13 @@ class SAWPivotTypeElasticSearchQueryBuilder {
     int size = 0;
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.size(size);
-
-    if (sqlBuilderNode.getSort() == null && sqlBuilderNode.getFilters()==null)
-    {
-      throw new NullPointerException("Please add sort[] & filter[] block.It can be empty but these blocks are important.");
+    if (sqlBuilderNode.getSorts() == null && sqlBuilderNode.getFilters() == null) {
+      throw new NullPointerException(
+          "Please add sort[] & filter[] block.It can be empty but these blocks are important.");
     }
     // The below block adding the sort block
-    List<Sort> sortNode = sqlBuilderNode.getSort();
-    for (Sort item : sortNode) {
+    List<com.synchronoss.querybuilder.model.pivot.Sort> sortNode = sqlBuilderNode.getSorts();
+    for (com.synchronoss.querybuilder.model.pivot.Sort item : sortNode) {
       SortOrder sortOrder =
           item.getOrder().equals(SortOrder.ASC.name()) ? SortOrder.ASC : SortOrder.DESC;
       FieldSortBuilder sortBuilder = SortBuilders.fieldSort(item.getColumnName()).order(sortOrder);
@@ -69,35 +65,65 @@ class SAWPivotTypeElasticSearchQueryBuilder {
     }
 
     // The below block adding filter block
-    List<Filter> filters = sqlBuilderNode.getFilters();
+    // The below block adding filter block
+    final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();;
+    if (sqlBuilderNode.getBooleanCriteria() !=null){
+    List<com.synchronoss.querybuilder.model.pivot.Filter> filters = sqlBuilderNode.getFilters();
     List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
-    for (Filter item : filters) {
-      if (item.getType().equals("date")) {
+    for (com.synchronoss.querybuilder.model.pivot.Filter item : filters) {
+      if (item.getType().equals(Type.DATE) || item.getType().equals(Type.TIMESTAMP)) {
         RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-        rangeQueryBuilder.lte(item.getRange().getLte());
-        rangeQueryBuilder.gte(item.getRange().getGte());
+        rangeQueryBuilder.lte(item.getModel().getLte());
+        rangeQueryBuilder.gte(item.getModel().getGte());
         builder.add(rangeQueryBuilder);
-      } else {
+      }
+      if (item.getType().equals(Type.STRING)) {
         TermsQueryBuilder termsQueryBuilder =
-            new TermsQueryBuilder(item.getColumnName(), item.getValue());
+            new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
         builder.add(termsQueryBuilder);
       }
+      if ((item.getType().equals(Type.DOUBLE) || item.getType().equals(Type.INT))
+          || item.getType().equals(Type.FLOAT)) {
+        if (item.getModel().getOperator().equals(Operator.BTW)) {
+          RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+          rangeQueryBuilder.lte(item.getModel().getOtherValue());
+          rangeQueryBuilder.gte(item.getModel().getValue());
+          builder.add(rangeQueryBuilder);
+        }
+        if (item.getModel().getOperator().equals(Operator.EQ)) {
+          TermQueryBuilder termQueryBuilder =
+              new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
+          builder.add(termQueryBuilder);
+        }
+        if (item.getModel().getOperator().equals(Operator.NEQ)) {
+          BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
+          boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
+              .getValue()));
+          builder.add(boolQueryBuilderIn);
+        }
+      }
     }
-    final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-    builder.forEach(item -> {
-      boolQueryBuilder.must(item);
-    });
+    if (sqlBuilderNode.getBooleanCriteria().equals(BooleanCriteria.AND)) {
+      builder.forEach(item -> {
+        boolQueryBuilder.must(item);
+      });
+    } else {
+      builder.forEach(item -> {
+        boolQueryBuilder.should(item);
+      });
+    }
     searchSourceBuilder.query(boolQueryBuilder);
-
-
-
-    List<RowField> rowfield = sqlBuilderNode.getRowFields();
-    List<ColumnField> columnFields = sqlBuilderNode.getColumnFields();
-    List<DataField> dataFields = sqlBuilderNode.getDataFields();
+   }
+    List<com.synchronoss.querybuilder.model.pivot.RowField> rowfield =
+        sqlBuilderNode.getRowFields();
+    List<com.synchronoss.querybuilder.model.pivot.ColumnField> columnFields =
+        sqlBuilderNode.getColumnFields();
+    List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields =
+        sqlBuilderNode.getDataFields();
 
     // Use case I: The below block is only when column & Data Field is not empty & row field is
     // empty
-    if ( (rowfield.isEmpty() && rowfield.size() == 0)) {
+    if ((rowfield.isEmpty() && rowfield.size() == 0)) {
       if ((columnFields != null && columnFields.size() <= 5)
           && (dataFields != null && dataFields.size() <= 5)) {
         searchSourceBuilder =

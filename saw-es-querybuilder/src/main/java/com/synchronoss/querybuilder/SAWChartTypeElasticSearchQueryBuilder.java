@@ -52,7 +52,7 @@ class SAWChartTypeElasticSearchQueryBuilder {
   public String buildQuery() throws JsonProcessingException, IOException {
 
     String query = null;
-    SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTree(getJsonString(), "sqlBuilder");
+    SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTreeChart(getJsonString(), "sqlBuilder");
     int size = 0;
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.size(size);

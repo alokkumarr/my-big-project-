@@ -2,98 +2,101 @@
 package com.synchronoss.querybuilder.model.pivot;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "booleanCriteria",
     "operator",
     "value",
     "otherValue",
     "gte",
-    "lte"
+    "lte",
+    "modelValues"
 })
 public class Model {
 
-    @JsonProperty("booleanCriteria")
-    private Object booleanCriteria;
     @JsonProperty("operator")
-    private Object operator;
+    private Model.Operator operator;
     @JsonProperty("value")
-    private Object value;
+    private Integer value;
     @JsonProperty("otherValue")
-    private Object otherValue;
+    private Integer otherValue;
     @JsonProperty("gte")
-    private Object gte;
+    private Integer gte;
     @JsonProperty("lte")
-    private Object lte;
+    private Integer lte;
+    @JsonProperty("modelValues")
+    private List<Object> modelValues = null;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("booleanCriteria")
-    public Object getBooleanCriteria() {
-        return booleanCriteria;
-    }
-
-    @JsonProperty("booleanCriteria")
-    public void setBooleanCriteria(Object booleanCriteria) {
-        this.booleanCriteria = booleanCriteria;
-    }
-
     @JsonProperty("operator")
-    public Object getOperator() {
+    public Model.Operator getOperator() {
         return operator;
     }
 
     @JsonProperty("operator")
-    public void setOperator(Object operator) {
+    public void setOperator(Model.Operator operator) {
         this.operator = operator;
     }
 
     @JsonProperty("value")
-    public Object getValue() {
+    public Integer getValue() {
         return value;
     }
 
     @JsonProperty("value")
-    public void setValue(Object value) {
+    public void setValue(Integer value) {
         this.value = value;
     }
 
     @JsonProperty("otherValue")
-    public Object getOtherValue() {
+    public Integer getOtherValue() {
         return otherValue;
     }
 
     @JsonProperty("otherValue")
-    public void setOtherValue(Object otherValue) {
+    public void setOtherValue(Integer otherValue) {
         this.otherValue = otherValue;
     }
 
     @JsonProperty("gte")
-    public Object getGte() {
+    public Integer getGte() {
         return gte;
     }
 
     @JsonProperty("gte")
-    public void setGte(Object gte) {
+    public void setGte(Integer gte) {
         this.gte = gte;
     }
 
     @JsonProperty("lte")
-    public Object getLte() {
+    public Integer getLte() {
         return lte;
     }
 
     @JsonProperty("lte")
-    public void setLte(Object lte) {
+    public void setLte(Integer lte) {
         this.lte = lte;
+    }
+
+    @JsonProperty("modelValues")
+    public List<Object> getModelValues() {
+        return modelValues;
+    }
+
+    @JsonProperty("modelValues")
+    public void setModelValues(List<Object> modelValues) {
+        this.modelValues = modelValues;
     }
 
     @JsonAnyGetter
@@ -104,6 +107,50 @@ public class Model {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    public enum Operator {
+
+        GT("GT"),
+        LT("LT"),
+        GTE("GTE"),
+        LTE("LTE"),
+        EQ("EQ"),
+        NEQ("NEQ"),
+        BTW("BTW");
+        private final String value;
+        private final static Map<String, Model.Operator> CONSTANTS = new HashMap<String, Model.Operator>();
+
+        static {
+            for (Model.Operator c: values()) {
+                CONSTANTS.put(c.value, c);
+            }
+        }
+
+        private Operator(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
+
+        @JsonValue
+        public String value() {
+            return this.value;
+        }
+
+        @JsonCreator
+        public static Model.Operator fromValue(String value) {
+            Model.Operator constant = CONSTANTS.get(value);
+            if (constant == null) {
+                throw new IllegalArgumentException(value);
+            } else {
+                return constant;
+            }
+        }
+
     }
 
 }

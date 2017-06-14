@@ -6,13 +6,9 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import com.synchronoss.querybuilder.model.ColumnField;
-import com.synchronoss.querybuilder.model.DataField;
-import com.synchronoss.querybuilder.model.RowField;
-
 class RowFieldsAvailable {
 
-	public static SearchSourceBuilder rowFieldsAvailable(List<RowField> rowfield, List<ColumnField> columnFields, List<DataField> dataFields,
+	public static SearchSourceBuilder rowFieldsAvailable(List<com.synchronoss.querybuilder.model.pivot.RowField> rowfield, List<com.synchronoss.querybuilder.model.pivot.ColumnField> columnFields, List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields,
 			 SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	{
 	    	if (rowfield.size()==1)

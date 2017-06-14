@@ -21,7 +21,7 @@ class SpiltByAndDataFieldsAvailableChart {
 
             .aggregation(
                 QueryBuilderUtil.aggregationBuilderChart(splitBy).subAggregation(
-                    QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0))));
+                    QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0))));
 
       } // end of dataFields.size()==1
 
@@ -33,9 +33,9 @@ class SpiltByAndDataFieldsAvailableChart {
                     QueryBuilderUtil
                         .aggregationBuilderChart(splitBy)
                         .subAggregation(
-                            QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
+                            QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
                         .subAggregation(
-                            QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1))));
+                            QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1))));
 
       } // end of dataFields.size()==2
 
@@ -47,11 +47,11 @@ class SpiltByAndDataFieldsAvailableChart {
                     QueryBuilderUtil
                         .aggregationBuilderChart(splitBy)
                         .subAggregation(
-                            QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
+                            QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
                         .subAggregation(
-                            QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
+                            QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
                         .subAggregation(
-                            QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2))));
+                            QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2))));
 
       }// end of dataFields.size()==3
 
@@ -63,13 +63,13 @@ class SpiltByAndDataFieldsAvailableChart {
                     QueryBuilderUtil
                         .aggregationBuilderChart(splitBy)
                         .subAggregation(
-                            QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
+                            QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
                         .subAggregation(
-                            QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
+                            QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
                         .subAggregation(
-                            QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
+                            QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))
                         .subAggregation(
-                            QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(3))));
+                            QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(3))));
 
       } // end of dataFields.size()==4
 
@@ -81,15 +81,15 @@ class SpiltByAndDataFieldsAvailableChart {
                     QueryBuilderUtil
                         .aggregationBuilderChart(splitBy)
                         .subAggregation(
-                            QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
+                            QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
                         .subAggregation(
-                            QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
+                            QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
                         .subAggregation(
-                            QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
+                            QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))
                         .subAggregation(
-                            QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(3)))
+                            QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(3)))
                         .subAggregation(
-                            QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(4))));
+                            QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(4))));
       } // end of dataFields.size()==5
     } else {
       throw new IllegalArgumentException("dataField size is greater than 5 levels");

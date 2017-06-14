@@ -1,6 +1,7 @@
 package com.synchronoss;
 
 import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,15 +18,25 @@ public class BuilderUtil
 	 * @throws JsonProcessingException
 	 * @throws IOException
 	 */
-	public static SqlBuilder getNodeTree (String jsonString, String node) throws JsonProcessingException, IOException
+	public static com.synchronoss.querybuilder.model.pivot.SqlBuilder getNodeTree (String jsonString, String node) throws JsonProcessingException, IOException
 	{
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
 		JsonNode objectNode = objectMapper.readTree(jsonString);
 		JsonNode sqlNode = objectNode.get(node);
-		SqlBuilder sqlBuilderNode = objectMapper.treeToValue(sqlNode, SqlBuilder.class);
+		com.synchronoss.querybuilder.model.pivot.SqlBuilder sqlBuilderNode = objectMapper.treeToValue(sqlNode, com.synchronoss.querybuilder.model.pivot.SqlBuilder.class);
 		return sqlBuilderNode;
 	}
+
+    public static SqlBuilder getNodeTreeChart(String jsonString, String node) throws JsonProcessingException, IOException
+    {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        JsonNode objectNode = objectMapper.readTree(jsonString);
+        JsonNode sqlNode = objectNode.get(node);
+        SqlBuilder sqlBuilderNode = objectMapper.treeToValue(sqlNode, SqlBuilder.class);
+        return sqlBuilderNode;
+    }
 	
 	public static JsonNode getRepositoryNodeTree (String jsonString, String node) throws JsonProcessingException, IOException
 	

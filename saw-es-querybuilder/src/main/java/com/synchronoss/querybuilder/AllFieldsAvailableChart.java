@@ -22,7 +22,7 @@ class AllFieldsAvailableChart {
 				searchSourceBuilder = searchSourceBuilder.query(boolQueryBuilder)
 				                        .aggregation(AggregationBuilders.terms("group_by").field(groupBy.getColumnName())
 				        		        .subAggregation(QueryBuilderUtil.aggregationBuilderChart(splitBy)
-				        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0))
+				        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0))
 				        						
 				        						)));
 
@@ -33,8 +33,8 @@ class AllFieldsAvailableChart {
 				searchSourceBuilder = searchSourceBuilder.query(boolQueryBuilder)
 						                .aggregation(AggregationBuilders.terms("group_by").field(groupBy.getColumnName())
 				        		        .subAggregation(QueryBuilderUtil.aggregationBuilderChart(splitBy)
-				        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-				        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))));
+				        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
+				        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))));
 
 	    	} // end of dataFields.size()==2
 	    	
@@ -43,9 +43,9 @@ class AllFieldsAvailableChart {
 				searchSourceBuilder = searchSourceBuilder.query(boolQueryBuilder)
 						        .aggregation(AggregationBuilders.terms("group_by").field(groupBy.getColumnName())
 		        		        .subAggregation(QueryBuilderUtil.aggregationBuilderChart(splitBy)
-		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
+		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
+		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
+		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))
 		        				
 		        		        		));
 	    		
@@ -56,10 +56,10 @@ class AllFieldsAvailableChart {
 				searchSourceBuilder = searchSourceBuilder.query(boolQueryBuilder)
 						        .aggregation(AggregationBuilders.terms("group_by").field(groupBy.getColumnName())
 		        		        .subAggregation(QueryBuilderUtil.aggregationBuilderChart(splitBy)
-		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
-		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(3)))		
+		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
+		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
+		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))
+		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(3)))		
 		        						));
 
 	    	} // end of dataFields.size()==4
@@ -69,11 +69,11 @@ class AllFieldsAvailableChart {
 				searchSourceBuilder = searchSourceBuilder.query(boolQueryBuilder)
 						        .aggregation(AggregationBuilders.terms("group_by").field(groupBy.getColumnName())
 		        		        .subAggregation(QueryBuilderUtil.aggregationBuilderChart(splitBy)
-		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
-		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(3)))
-		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(4)))
+		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
+		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
+		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))
+		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(3)))
+		        				.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(4)))
 		        				));
 	    	} // end of dataFields.size()==5
 		}
