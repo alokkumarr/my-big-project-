@@ -6,13 +6,14 @@ import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram.Order;
-import com.synchronoss.querybuilder.model.ColumnField;
+
 import com.synchronoss.querybuilder.model.DataField;
 import com.synchronoss.querybuilder.model.SplitBy;
 
 public class QueryBuilderUtil {
 	
-	public static AggregationBuilder aggregationBuilder (ColumnField columnField, List<DataField> dataField, String aggregationName)
+	public static AggregationBuilder aggregationBuilder (com.synchronoss.querybuilder.model.pivot.ColumnField columnField, 
+	    List<com.synchronoss.querybuilder.model.pivot.DataField> dataField, String aggregationName)
 
 	{
 		AggregationBuilder aggregationBuilder = null;
@@ -21,13 +22,13 @@ public class QueryBuilderUtil {
 		{
 			aggregationBuilder = AggregationBuilders.
 					dateHistogram(aggregationName).field(columnField.getColumnName()).
-					dateHistogramInterval(groupInterval(columnField.getGroupInterval())).order(Order.KEY_ASC);
+					dateHistogramInterval(groupInterval(columnField.getGroupInterval().name())).order(Order.KEY_ASC);
 			
 			if (!(dataField.isEmpty())&& dataField.size()>0)
 			{
 				aggregationBuilder = AggregationBuilders.
 						dateHistogram(aggregationName).field(columnField.getColumnName()).
-						dateHistogramInterval(groupInterval(columnField.getGroupInterval())).order(Order.KEY_ASC);
+						dateHistogramInterval(groupInterval(columnField.getGroupInterval().name())).order(Order.KEY_ASC);
 	
 			}
 		}
@@ -54,11 +55,11 @@ public class QueryBuilderUtil {
     	    return histogramInterval;
      }	
      
- 	public static AggregationBuilder aggregationBuilderDataField(DataField data)
+ 	public static AggregationBuilder aggregationBuilderDataField(com.synchronoss.querybuilder.model.pivot.DataField data)
 
  	{
  		AggregationBuilder aggregationBuilder = null;
- 			switch (data.getAggregate().trim())
+ 			switch (data.getAggregate().value())
  			{
  			case "sum" : aggregationBuilder = AggregationBuilders.sum(data.getName()).field(data.getColumnName()); break;
  			case "avg" : aggregationBuilder = AggregationBuilders.avg(data.getName()).field(data.getColumnName()); break;
@@ -69,7 +70,24 @@ public class QueryBuilderUtil {
  		
  		return aggregationBuilder;
  	}
- 
+
+    public static AggregationBuilder aggregationBuilderDataFieldChart(DataField data)
+
+    {
+        AggregationBuilder aggregationBuilder = null;
+            switch (data.getAggregate().trim())
+            {
+            case "sum" : aggregationBuilder = AggregationBuilders.sum(data.getName()).field(data.getColumnName()); break;
+            case "avg" : aggregationBuilder = AggregationBuilders.avg(data.getName()).field(data.getColumnName()); break;
+            case "min" : aggregationBuilder = AggregationBuilders.min(data.getName()).field(data.getColumnName()); break;
+            case "max" : aggregationBuilder = AggregationBuilders.max(data.getName()).field(data.getColumnName()); break;
+            case "count" : aggregationBuilder = AggregationBuilders.count(data.getName()).field(data.getColumnName()); break;
+            }
+        
+        return aggregationBuilder;
+    }
+ 	
+ 	
  	/**
  	 * This aggregation framework
  	 * @param splitBy

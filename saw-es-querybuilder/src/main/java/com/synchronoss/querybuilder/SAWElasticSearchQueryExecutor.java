@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -102,12 +100,10 @@ public class SAWElasticSearchQueryExecutor {
       String jsonString) throws JsonProcessingException, IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
-    SearchResponse response = null;
-        //execute(searchSourceBuilder, jsonString);
-   
-    JsonNode esResponse = objectMapper.readTree(response.toString());
+    //SearchResponse response = null;
+    //JsonNode esResponse = objectMapper.readTree(response.toString());
     List<String> flattenDataList = new ArrayList<String>();
-    SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTree(jsonString, "sqlBuilder");
+    SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTreeChart(jsonString, "sqlBuilder");
 
     List<RowField> rowfield = sqlBuilderNode.getRowFields();
     List<ColumnField> columnFields = sqlBuilderNode.getColumnFields();

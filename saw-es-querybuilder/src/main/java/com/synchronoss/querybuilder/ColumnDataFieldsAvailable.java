@@ -5,14 +5,10 @@ import java.util.List;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import com.synchronoss.querybuilder.model.ColumnField;
-import com.synchronoss.querybuilder.model.DataField;
-import com.synchronoss.querybuilder.model.RowField;
-
 class ColumnDataFieldsAvailable {
 
-	public static SearchSourceBuilder columnDataFieldsAvailable(List<RowField> rowfield, List<ColumnField> columnFields, 
-			List<DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
+	public static SearchSourceBuilder columnDataFieldsAvailable(List<com.synchronoss.querybuilder.model.pivot.RowField> rowfield, List<com.synchronoss.querybuilder.model.pivot.ColumnField> columnFields, 
+			List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	{
 	    	if (columnFields.size()==1)
 	    	{
@@ -45,8 +41,8 @@ class ColumnDataFieldsAvailable {
 	
 	
 	
-	private static SearchSourceBuilder columnDataFieldsAvailableRowFieldOne(List<RowField> rowfield, List<ColumnField> columnFields, 
-			List<DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
+	private static SearchSourceBuilder columnDataFieldsAvailableRowFieldOne(List<com.synchronoss.querybuilder.model.pivot.RowField> rowfield, List<com.synchronoss.querybuilder.model.pivot.ColumnField> columnFields, 
+			List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	{
 	
 		if (columnFields.size()==1)
@@ -107,8 +103,8 @@ class ColumnDataFieldsAvailable {
 		return searchSourceBuilder;
 	}
 	
-	private static SearchSourceBuilder columnDataFieldsAvailableRowFieldTwo(List<RowField> rowfield, List<ColumnField> columnFields, 
-			List<DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
+	private static SearchSourceBuilder columnDataFieldsAvailableRowFieldTwo(List<com.synchronoss.querybuilder.model.pivot.RowField> rowfield, List<com.synchronoss.querybuilder.model.pivot.ColumnField> columnFields, 
+			List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	{
 	
 		if (columnFields.size()==2)
@@ -173,8 +169,8 @@ class ColumnDataFieldsAvailable {
 		return searchSourceBuilder;
 	}
 	
-	private static SearchSourceBuilder columnDataFieldsAvailableRowFieldThree(List<RowField> rowfield, List<ColumnField> columnFields, 
-			List<DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
+	private static SearchSourceBuilder columnDataFieldsAvailableRowFieldThree(List<com.synchronoss.querybuilder.model.pivot.RowField> rowfield, List<com.synchronoss.querybuilder.model.pivot.ColumnField> columnFields, 
+			List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	{
 	
 		if (columnFields.size()==3)
@@ -244,8 +240,8 @@ class ColumnDataFieldsAvailable {
 		return searchSourceBuilder;
 	}
 
-	private static SearchSourceBuilder columnDataFieldsAvailableRowFieldFour(List<RowField> rowfield, List<ColumnField> columnFields, 
-			List<DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
+	private static SearchSourceBuilder columnDataFieldsAvailableRowFieldFour(List<com.synchronoss.querybuilder.model.pivot.RowField> rowfield, List<com.synchronoss.querybuilder.model.pivot.ColumnField> columnFields, 
+			List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	{
 	
 		if (columnFields.size()==4)
@@ -320,8 +316,9 @@ class ColumnDataFieldsAvailable {
 		return searchSourceBuilder;
 	}
 	
-	private static SearchSourceBuilder columnDataAvailableRowFieldFive(List<RowField> rowfield, List<ColumnField> columnFields, 
-			List<DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
+	private static SearchSourceBuilder columnDataAvailableRowFieldFive(List<com.synchronoss.querybuilder.model.pivot.RowField> rowfield, 
+	    List<com.synchronoss.querybuilder.model.pivot.ColumnField> columnFields, 
+			List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	{
 	
 		if (columnFields.size()==5)

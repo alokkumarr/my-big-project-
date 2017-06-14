@@ -7,8 +7,6 @@ import java.util.List;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
@@ -19,12 +17,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.SAWElasticTransportService;
-import com.synchronoss.querybuilder.model.ColumnField;
-import com.synchronoss.querybuilder.model.DataField;
-import com.synchronoss.querybuilder.model.Filter;
-import com.synchronoss.querybuilder.model.RowField;
-import com.synchronoss.querybuilder.model.Sort;
-import com.synchronoss.querybuilder.model.SqlBuilder;
+import com.synchronoss.querybuilder.model.pivot.SqlBuilder;
 
 public class PivotMainSampleClass {
 
@@ -46,8 +39,8 @@ public class PivotMainSampleClass {
 	    searchSourceBuilder.size(size);
 	   
 	   // The below block adding the sort block
-	   List<Sort> sortNode =  sqlBuilderNode.getSort();
-	   for (Sort item : sortNode )
+	   List<com.synchronoss.querybuilder.model.pivot.Sort> sortNode =  sqlBuilderNode.getSorts();
+	   for (com.synchronoss.querybuilder.model.pivot.Sort item : sortNode )
 	   {
 			SortOrder sortOrder = item.getOrder().equals
 					(SortOrder.ASC.name())? SortOrder.ASC : SortOrder.DESC;
@@ -56,11 +49,11 @@ public class PivotMainSampleClass {
 	   }
 	   
 	   // The below block adding filter block 
-	   List<Filter> filters = sqlBuilderNode.getFilters();
+	   List<com.synchronoss.querybuilder.model.pivot.Filter> filters = sqlBuilderNode.getFilters();
 	   List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
-	   for (Filter item : filters)
+	   for (com.synchronoss.querybuilder.model.pivot.Filter item : filters)
 	   {
-			if (item.getType().equals("date"))
+/*			if (item.getType().equals("date"))
 			{
 				RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
 				rangeQueryBuilder.lte(item.getRange().getLte());
@@ -72,7 +65,7 @@ public class PivotMainSampleClass {
 				TermsQueryBuilder termsQueryBuilder = new TermsQueryBuilder(item.getColumnName(), item.getValue());
 				builder.add(termsQueryBuilder);
 			}
-	   }
+*/	   }
 	   final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
 	   builder.forEach(item->
 		{
@@ -80,10 +73,12 @@ public class PivotMainSampleClass {
 		});
 	   searchSourceBuilder.query(boolQueryBuilder);
 	   
+	   
+	   
 	   // The below block adding only if row level & column level aggregation is available
-	    List<RowField> rowfield = sqlBuilderNode.getRowFields();
-	    List<ColumnField> columnFields = sqlBuilderNode.getColumnFields();
-	    List<DataField> dataFields = sqlBuilderNode.getDataFields();
+	    List<com.synchronoss.querybuilder.model.pivot.RowField> rowfield = sqlBuilderNode.getRowFields();
+	    List<com.synchronoss.querybuilder.model.pivot.ColumnField> columnFields = sqlBuilderNode.getColumnFields();
+	    List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields = sqlBuilderNode.getDataFields();
 
 	    // Use case I: The below block is only when column & Data Field is not empty & row field is empty
 	    if ( (rowfield.isEmpty() && rowfield.size()==0)) 
