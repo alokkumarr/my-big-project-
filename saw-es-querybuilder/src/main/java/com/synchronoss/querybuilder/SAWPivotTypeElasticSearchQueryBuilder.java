@@ -3,18 +3,21 @@ package com.synchronoss.querybuilder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.synchronoss.BuilderUtil;
+import com.synchronoss.querybuilder.model.chart.Filter.Type;
+import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 import com.synchronoss.querybuilder.model.pivot.SqlBuilder;
-import com.synchronoss.querybuilder.model.pivot.SqlBuilderPivot;
+import com.synchronoss.querybuilder.model.pivot.SqlBuilder.BooleanCriteria;
 
 /**
  * @author saurav.paul
@@ -62,24 +65,55 @@ class SAWPivotTypeElasticSearchQueryBuilder {
     }
 
     // The below block adding filter block
+    // The below block adding filter block
+    final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();;
+    if (sqlBuilderNode.getBooleanCriteria() !=null){
     List<com.synchronoss.querybuilder.model.pivot.Filter> filters = sqlBuilderNode.getFilters();
     List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
     for (com.synchronoss.querybuilder.model.pivot.Filter item : filters) {
-      /*
-       * if (item.getType().equals("date")) { RangeQueryBuilder rangeQueryBuilder = new
-       * RangeQueryBuilder(item.getColumnName()); rangeQueryBuilder.lte(item.getRange().getLte());
-       * rangeQueryBuilder.gte(item.getRange().getGte()); builder.add(rangeQueryBuilder); } else {
-       * TermsQueryBuilder termsQueryBuilder = new TermsQueryBuilder(item.getColumnName(),
-       * item.getValue()); builder.add(termsQueryBuilder); }
-       */}
-    final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-    builder.forEach(item -> {
-      boolQueryBuilder.must(item);
-    });
+      if (item.getType().equals(Type.DATE) || item.getType().equals(Type.TIMESTAMP)) {
+        RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+        rangeQueryBuilder.lte(item.getModel().getLte());
+        rangeQueryBuilder.gte(item.getModel().getGte());
+        builder.add(rangeQueryBuilder);
+      }
+      if (item.getType().equals(Type.STRING)) {
+        TermsQueryBuilder termsQueryBuilder =
+            new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+        builder.add(termsQueryBuilder);
+      }
+      if ((item.getType().equals(Type.DOUBLE) || item.getType().equals(Type.INT))
+          || item.getType().equals(Type.FLOAT)) {
+        if (item.getModel().getOperator().equals(Operator.BTW)) {
+          RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+          rangeQueryBuilder.lte(item.getModel().getOtherValue());
+          rangeQueryBuilder.gte(item.getModel().getValue());
+          builder.add(rangeQueryBuilder);
+        }
+        if (item.getModel().getOperator().equals(Operator.EQ)) {
+          TermQueryBuilder termQueryBuilder =
+              new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
+          builder.add(termQueryBuilder);
+        }
+        if (item.getModel().getOperator().equals(Operator.NEQ)) {
+          BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
+          boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
+              .getValue()));
+          builder.add(boolQueryBuilderIn);
+        }
+      }
+    }
+    if (sqlBuilderNode.getBooleanCriteria().equals(BooleanCriteria.AND)) {
+      builder.forEach(item -> {
+        boolQueryBuilder.must(item);
+      });
+    } else {
+      builder.forEach(item -> {
+        boolQueryBuilder.should(item);
+      });
+    }
     searchSourceBuilder.query(boolQueryBuilder);
-
-
-
+   }
     List<com.synchronoss.querybuilder.model.pivot.RowField> rowfield =
         sqlBuilderNode.getRowFields();
     List<com.synchronoss.querybuilder.model.pivot.ColumnField> columnFields =

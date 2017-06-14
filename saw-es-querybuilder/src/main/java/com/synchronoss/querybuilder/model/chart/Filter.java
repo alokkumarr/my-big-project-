@@ -14,7 +14,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "booleanCriteria",
     "columnName",
     "isRuntimeFilter",
     "model",
@@ -23,8 +22,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 })
 public class Filter {
 
-    @JsonProperty("booleanCriteria")
-    private Filter.BooleanCriteria booleanCriteria;
     @JsonProperty("columnName")
     private String columnName;
     @JsonProperty("isRuntimeFilter")
@@ -37,16 +34,6 @@ public class Filter {
     private Filter.Type type;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
-    @JsonProperty("booleanCriteria")
-    public Filter.BooleanCriteria getBooleanCriteria() {
-        return booleanCriteria;
-    }
-
-    @JsonProperty("booleanCriteria")
-    public void setBooleanCriteria(Filter.BooleanCriteria booleanCriteria) {
-        this.booleanCriteria = booleanCriteria;
-    }
 
     @JsonProperty("columnName")
     public String getColumnName() {
@@ -108,45 +95,6 @@ public class Filter {
         this.additionalProperties.put(name, value);
     }
 
-    public enum BooleanCriteria {
-
-        OR("OR"),
-        AND("AND");
-        private final String value;
-        private final static Map<String, Filter.BooleanCriteria> CONSTANTS = new HashMap<String, Filter.BooleanCriteria>();
-
-        static {
-            for (Filter.BooleanCriteria c: values()) {
-                CONSTANTS.put(c.value, c);
-            }
-        }
-
-        private BooleanCriteria(String value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return this.value;
-        }
-
-        @JsonValue
-        public String value() {
-            return this.value;
-        }
-
-        @JsonCreator
-        public static Filter.BooleanCriteria fromValue(String value) {
-            Filter.BooleanCriteria constant = CONSTANTS.get(value);
-            if (constant == null) {
-                throw new IllegalArgumentException(value);
-            } else {
-                return constant;
-            }
-        }
-
-    }
-
     public enum IsRuntimeFilter {
 
         FALSE(false),
@@ -188,7 +136,8 @@ public class Filter {
         INT("int"),
         DOUBLE("double"),
         DATE("date"),
-        TIMESTAMP("timestamp");
+        TIMESTAMP("timestamp"),
+        FLOAT("float");
         private final String value;
         private final static Map<String, Filter.Type> CONSTANTS = new HashMap<String, Filter.Type>();
 
