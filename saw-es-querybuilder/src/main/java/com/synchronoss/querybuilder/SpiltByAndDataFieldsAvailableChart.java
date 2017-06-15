@@ -5,12 +5,9 @@ import java.util.List;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import com.synchronoss.querybuilder.model.DataField;
-import com.synchronoss.querybuilder.model.SplitBy;
-
 class SpiltByAndDataFieldsAvailableChart {
 
-  public static SearchSourceBuilder allFieldsAvailable(SplitBy splitBy, List<DataField> dataFields,
+  public static SearchSourceBuilder allFieldsAvailable(com.synchronoss.querybuilder.model.chart.SplitBy splitBy, List<com.synchronoss.querybuilder.model.chart.DataField> dataFields,
       SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 
   {

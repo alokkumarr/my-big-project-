@@ -38,7 +38,7 @@
                   "timestamp",
                   "long",
                   "double",
-                  "float"
+                  "float",
                   "int",
                   "string"
                 ],
@@ -56,19 +56,20 @@
           },
           "type":"array"
         },
+        "booleanCriteria":{
+                    "enum":[
+                      "AND",
+                      "OR"
+                    ],
+                    "id":"/properties/filters/model/properties/booleanCriteria",
+                    "type":"string"
+                  },
         "filters":{
           "id":"/properties/filters",
           "items":{
             "id":"/properties/filters/items",
             "properties":{
-              "booleanCriteria":{
-                "enum":[
-                  "OR",
-                  "AND"
-                ],
-                "id":"/properties/filters/items/properties/booleanCriteria",
-                "type":"string"
-              },
+              
               "columnName":{
                 "id":"/properties/filters/items/properties/columnName",
                 "type":"string"
@@ -82,14 +83,42 @@
                 "type":"boolean"
               },
               "model":{
-                  "properties":{
-                      "booleanCriteria":{},
-                      "operator" : {},
-                      "value" : {},
-                      "otherValue" : {},
-                      "gte" : {},
-                      "lte" : {}
+                "properties":{
+                  "operator":{
+                    "enum":[
+                      "GT",
+                      "LT",
+                      "GTE",
+                      "LTE",
+                      "EQ",
+                      "NEQ",
+                      "BTW"
+                    ],
+                    "id":"/properties/filters/model/properties/booleanCriteria",
+                    "type":"string"
                   },
+                  "value":{
+                    "id":"/properties/filters/model/properties/value",
+                    "type":"integer"
+                  },
+                  "otherValue":{
+                    "id":"/properties/filters/model/properties/otherValue",
+                    "type":"integer"
+                  },
+                  "gte":{
+                    "id":"/properties/filters/model/properties/gte",
+                    "type":"integer"
+                  },
+                  "lte":{
+                    "id":"/properties/filters/model/properties/lte",
+                    "type":"integer"
+                  },
+                  "modelValues" : 
+                  {
+                    "id":"/properties/filters/model/properties/modelValues",
+                    "type":"array"
+                  }
+                },
                 "id":"/properties/filters/items/properties/model",
                 "type":"object"
               },
@@ -101,13 +130,16 @@
                 "enum":[
                   "long",
                   "string",
-                  "int", "double", "date" ,"timestamp", "float"
+                  "int",
+                  "double",
+                  "date",
+                  "timestamp",
+                  "float"
                 ],
                 "id":"/properties/filters/items/properties/type",
                 "type":"string"
               }
             },
-            
             "type":"object"
           },
           "type":"array"
@@ -179,7 +211,20 @@
               "name":{
                 "id":"/properties/sqlBuilder/groupBy/properties/name",
                 "type":"string"
+              },
+              "groupInterval":{
+                "enum":[
+                  "year",
+                  "month",
+                  "day",
+                  "quarter",
+                  "hour",
+                  "week"
+                ],
+                "id":"/properties/sqlBuilder/properties/columnFields/items/properties/groupInterval",
+                "type":"string"
               }
+              
             }
         },
         "splitBy" : {
@@ -208,6 +253,18 @@
               },
               "name":{
                 "id":"/properties/sqlBuilder/groupBy/properties/name",
+                "type":"string"
+              },
+              "groupInterval":{
+                "enum":[
+                  "year",
+                  "month",
+                  "day",
+                  "quarter",
+                  "hour",
+                  "week"
+                ],
+                "id":"/properties/sqlBuilder/properties/columnFields/items/properties/groupInterval",
                 "type":"string"
               }
       },

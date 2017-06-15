@@ -29,15 +29,7 @@
                 "id":"/properties/sqlBuilder/properties/columnFields/items/properties/groupInterval",
                 "type":"string"
               },
-			  "booleanCriteria":{
-                "enum":[
-                  "OR",
-                  "AND"
-                ],
-                "id":"/properties/filters/items/properties/booleanCriteria",
-                "type":"string"
-              },
-              "type":{
+			  "type":{
                 "enum":[
                   "date",
                   "timestamp",
@@ -107,6 +99,14 @@
           },
           "type":"array"
         },
+        "booleanCriteria":{
+                "enum":[
+                  "OR",
+                  "AND"
+                ],
+                "id":"/properties/filters/items/properties/booleanCriteria",
+                "type":"string"
+              },
         "filters":{
           "id":"/properties/filters",
           "items":{

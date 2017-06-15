@@ -4,7 +4,6 @@ package com.synchronoss.querybuilder.model.chart;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -14,12 +13,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "dataFields",
-    "filters",
     "booleanCriteria",
+    "filters",
     "sorts",
     "groupBy",
     "splitBy",
@@ -30,6 +28,8 @@ public class SqlBuilder {
 
     @JsonProperty("dataFields")
     private List<DataField> dataFields = null;
+    @JsonProperty("booleanCriteria")
+    private SqlBuilder.BooleanCriteria booleanCriteria;
     @JsonProperty("filters")
     private List<Filter> filters = null;
     @JsonProperty("sorts")
@@ -42,8 +42,6 @@ public class SqlBuilder {
     private Object required;
     @JsonProperty("type")
     private Object type;
-    @JsonProperty("booleanCriteria")
-    private SqlBuilder.BooleanCriteria booleanCriteria;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -55,6 +53,16 @@ public class SqlBuilder {
     @JsonProperty("dataFields")
     public void setDataFields(List<DataField> dataFields) {
         this.dataFields = dataFields;
+    }
+
+    @JsonProperty("booleanCriteria")
+    public SqlBuilder.BooleanCriteria getBooleanCriteria() {
+        return booleanCriteria;
+    }
+
+    @JsonProperty("booleanCriteria")
+    public void setBooleanCriteria(SqlBuilder.BooleanCriteria booleanCriteria) {
+        this.booleanCriteria = booleanCriteria;
     }
 
     @JsonProperty("filters")
@@ -70,14 +78,6 @@ public class SqlBuilder {
     @JsonProperty("sorts")
     public List<Sort> getSorts() {
         return sorts;
-    }
-    @JsonProperty("booleanCriteria")
-    public SqlBuilder.BooleanCriteria getBooleanCriteria() {
-      return booleanCriteria;
-    }
-    @JsonProperty("booleanCriteria")
-    public void setBooleanCriteria(SqlBuilder.BooleanCriteria booleanCriteria) {
-      this.booleanCriteria = booleanCriteria;
     }
 
     @JsonProperty("sorts")
@@ -137,41 +137,41 @@ public class SqlBuilder {
 
     public enum BooleanCriteria {
 
-      OR("OR"),
-      AND("AND");
-      private final String value;
-      private final static Map<String, SqlBuilder.BooleanCriteria> CONSTANTS = new HashMap<String, SqlBuilder.BooleanCriteria>();
+        AND("AND"),
+        OR("OR");
+        private final String value;
+        private final static Map<String, SqlBuilder.BooleanCriteria> CONSTANTS = new HashMap<String, SqlBuilder.BooleanCriteria>();
 
-      static {
-          for (SqlBuilder.BooleanCriteria c: values()) {
-              CONSTANTS.put(c.value, c);
-          }
-      }
+        static {
+            for (SqlBuilder.BooleanCriteria c: values()) {
+                CONSTANTS.put(c.value, c);
+            }
+        }
 
-      private BooleanCriteria(String value) {
-          this.value = value;
-      }
+        private BooleanCriteria(String value) {
+            this.value = value;
+        }
 
-      @Override
-      public String toString() {
-          return this.value;
-      }
+        @Override
+        public String toString() {
+            return this.value;
+        }
 
-      @JsonValue
-      public String value() {
-          return this.value;
-      }
+        @JsonValue
+        public String value() {
+            return this.value;
+        }
 
-      @JsonCreator
-      public static SqlBuilder.BooleanCriteria fromValue(String value) {
-          SqlBuilder.BooleanCriteria constant = CONSTANTS.get(value);
-          if (constant == null) {
-              throw new IllegalArgumentException(value);
-          } else {
-              return constant;
-          }
-      }
+        @JsonCreator
+        public static SqlBuilder.BooleanCriteria fromValue(String value) {
+            SqlBuilder.BooleanCriteria constant = CONSTANTS.get(value);
+            if (constant == null) {
+                throw new IllegalArgumentException(value);
+            } else {
+                return constant;
+            }
+        }
 
-  }
-    
+    }
+
 }

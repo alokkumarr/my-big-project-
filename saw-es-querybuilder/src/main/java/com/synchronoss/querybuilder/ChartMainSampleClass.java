@@ -8,6 +8,7 @@ import java.util.List;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -20,12 +21,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.SAWElasticTransportService;
-import com.synchronoss.querybuilder.model.DataField;
-import com.synchronoss.querybuilder.model.Filter;
-import com.synchronoss.querybuilder.model.GroupBy;
-import com.synchronoss.querybuilder.model.Sort;
-import com.synchronoss.querybuilder.model.SplitBy;
-import com.synchronoss.querybuilder.model.SqlBuilder;
+import com.synchronoss.querybuilder.model.chart.Filter.Type;
+import com.synchronoss.querybuilder.model.pivot.Model.Operator;
+import com.synchronoss.querybuilder.model.pivot.SqlBuilder.BooleanCriteria;
 
 public class ChartMainSampleClass {
 
@@ -45,44 +43,72 @@ public class ChartMainSampleClass {
             "C:\\Users\\saurav.paul\\Desktop\\Sergey\\chart_type_data.json"));
     // JsonNode objectNode = objectMapper.readTree(new File(args[0]));
     JsonNode sqlNode = objectNode.get("sqlBuilder");
-    SqlBuilder sqlBuilderNode = objectMapper.treeToValue(sqlNode, SqlBuilder.class);
+    com.synchronoss.querybuilder.model.chart.SqlBuilder sqlBuilderNode = objectMapper.treeToValue(sqlNode, com.synchronoss.querybuilder.model.chart.SqlBuilder.class);
     int size = 0;
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.size(size);
 
     // The below block adding the sort block
-    List<Sort> sortNode = sqlBuilderNode.getSort();
-    for (Sort item : sortNode) {
+    List<com.synchronoss.querybuilder.model.chart.Sort> sortNode = sqlBuilderNode.getSorts();
+    for (com.synchronoss.querybuilder.model.chart.Sort item : sortNode) {
       SortOrder sortOrder =
-          item.getOrder().equals(SortOrder.ASC.name()) ? SortOrder.ASC : SortOrder.DESC;
+          item.getOrder().name().equals(SortOrder.ASC.name()) ? SortOrder.ASC : SortOrder.DESC;
       FieldSortBuilder sortBuilder = SortBuilders.fieldSort(item.getColumnName()).order(sortOrder);
       searchSourceBuilder.sort(sortBuilder);
     }
 
     // The below block adding filter block
-    List<Filter> filters = sqlBuilderNode.getFilters();
+    final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();;
+    if (sqlBuilderNode.getBooleanCriteria() !=null){
+    List<com.synchronoss.querybuilder.model.chart.Filter> filters = sqlBuilderNode.getFilters();
     List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
-    for (Filter item : filters) {
-      if (item.getType().equals("date")) {
+    for (com.synchronoss.querybuilder.model.chart.Filter item : filters) {
+      if (item.getType().value().equals(Type.DATE.value()) || item.getType().value().equals(Type.TIMESTAMP.value())) {
         RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-        rangeQueryBuilder.lte(item.getRange().getLte());
-        rangeQueryBuilder.gte(item.getRange().getGte());
+        rangeQueryBuilder.lte(item.getModel().getLte());
+        rangeQueryBuilder.gte(item.getModel().getGte());
         builder.add(rangeQueryBuilder);
-      } else {
+      }
+      if (item.getType().value().equals(Type.STRING.value())) {
         TermsQueryBuilder termsQueryBuilder =
-            new TermsQueryBuilder(item.getColumnName(), item.getValue());
+            new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
         builder.add(termsQueryBuilder);
       }
+      if ((item.getType().value().equals(Type.DOUBLE.value()) || item.getType().value().equals(Type.INT.value()))
+          || item.getType().value().equals(Type.FLOAT.value())) {
+        if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
+          RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+          rangeQueryBuilder.lte(item.getModel().getOtherValue());
+          rangeQueryBuilder.gte(item.getModel().getValue());
+          builder.add(rangeQueryBuilder);
+        }
+        if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
+          TermQueryBuilder termQueryBuilder =
+              new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
+          builder.add(termQueryBuilder);
+        }
+        if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
+          BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
+          boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
+              .getValue()));
+          builder.add(boolQueryBuilderIn);
+        }
+      }
     }
-    final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-    builder.forEach(item -> {
-      boolQueryBuilder.must(item);
-    });
+    if (sqlBuilderNode.getBooleanCriteria().value().equals(BooleanCriteria.AND.value())) {
+      builder.forEach(item -> {
+        boolQueryBuilder.must(item);
+      });
+    } else {
+      builder.forEach(item -> {
+        boolQueryBuilder.should(item);
+      });
+    }
     searchSourceBuilder.query(boolQueryBuilder);
-
-    GroupBy groupBy = sqlBuilderNode.getGroupBy();
-    SplitBy splitBy = sqlBuilderNode.getSplitBy();
-    List<DataField> dataFields = sqlBuilderNode.getDataFields();
+   }
+    com.synchronoss.querybuilder.model.chart.GroupBy groupBy = sqlBuilderNode.getGroupBy();
+    com.synchronoss.querybuilder.model.chart.SplitBy splitBy = sqlBuilderNode.getSplitBy();
+    List<com.synchronoss.querybuilder.model.chart.DataField> dataFields = sqlBuilderNode.getDataFields();
 
     // Use case I: The below block is only when groupBy is available
     if (groupBy != null) {
@@ -143,7 +169,7 @@ public class ChartMainSampleClass {
       }
     }
     String query = searchSourceBuilder.toString();
-    //System.out.println(query);
+    System.out.println(query);
     System.setProperty("url", "http://mapr-dev02.sncrbda.dev.vacum-np.sncrcorp.net:9200/");
     String response = SAWElasticTransportService.
         executeReturnAsString(query, objectNode.toString(), "some", "xssds", "login");

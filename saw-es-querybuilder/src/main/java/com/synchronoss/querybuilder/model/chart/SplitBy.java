@@ -17,7 +17,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
     "columnName",
     "type",
     "tableName",
-    "name"
+    "name",
+    "groupInterval"
 })
 public class SplitBy {
 
@@ -29,6 +30,8 @@ public class SplitBy {
     private String tableName;
     @JsonProperty("name")
     private String name;
+    @JsonProperty("groupInterval")
+    private SplitBy.GroupInterval groupInterval;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -72,6 +75,16 @@ public class SplitBy {
         this.name = name;
     }
 
+    @JsonProperty("groupInterval")
+    public SplitBy.GroupInterval getGroupInterval() {
+        return groupInterval;
+    }
+
+    @JsonProperty("groupInterval")
+    public void setGroupInterval(SplitBy.GroupInterval groupInterval) {
+        this.groupInterval = groupInterval;
+    }
+
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -82,6 +95,49 @@ public class SplitBy {
         this.additionalProperties.put(name, value);
     }
 
+    public enum GroupInterval {
+
+        YEAR("year"),
+        MONTH("month"),
+        DAY("day"),
+        QUARTER("quarter"),
+        HOUR("hour"),
+        WEEK("week");
+        private final String value;
+        private final static Map<String, SplitBy.GroupInterval> CONSTANTS = new HashMap<String, SplitBy.GroupInterval>();
+
+        static {
+            for (SplitBy.GroupInterval c: values()) {
+                CONSTANTS.put(c.value, c);
+            }
+        }
+
+        private GroupInterval(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
+
+        @JsonValue
+        public String value() {
+            return this.value;
+        }
+
+        @JsonCreator
+        public static SplitBy.GroupInterval fromValue(String value) {
+            SplitBy.GroupInterval constant = CONSTANTS.get(value);
+            if (constant == null) {
+                throw new IllegalArgumentException(value);
+            } else {
+                return constant;
+            }
+        }
+
+    }
+
     public enum Type {
 
         DATE("date"),
@@ -89,7 +145,8 @@ public class SplitBy {
         LONG("long"),
         DOUBLE("double"),
         INT("int"),
-        STRING("string");
+        STRING("string"),
+        FLOAT("float");
         private final String value;
         private final static Map<String, SplitBy.Type> CONSTANTS = new HashMap<String, SplitBy.Type>();
 

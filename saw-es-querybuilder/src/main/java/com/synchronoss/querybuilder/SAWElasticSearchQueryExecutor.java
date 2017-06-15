@@ -14,10 +14,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.synchronoss.BuilderUtil;
 import com.synchronoss.SAWElasticTransportService;
-import com.synchronoss.querybuilder.model.ColumnField;
-import com.synchronoss.querybuilder.model.DataField;
-import com.synchronoss.querybuilder.model.RowField;
-import com.synchronoss.querybuilder.model.SqlBuilder;
 
 /**
  * This class will be used to get the query executed into designated<br/>
@@ -103,11 +99,11 @@ public class SAWElasticSearchQueryExecutor {
     //SearchResponse response = null;
     //JsonNode esResponse = objectMapper.readTree(response.toString());
     List<String> flattenDataList = new ArrayList<String>();
-    SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTreeChart(jsonString, "sqlBuilder");
+    com.synchronoss.querybuilder.model.pivot.SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTree(jsonString, "sqlBuilder");
 
-    List<RowField> rowfield = sqlBuilderNode.getRowFields();
-    List<ColumnField> columnFields = sqlBuilderNode.getColumnFields();
-    List<DataField> dataFields = sqlBuilderNode.getDataFields();
+    List<com.synchronoss.querybuilder.model.pivot.RowField> rowfield = sqlBuilderNode.getRowFields();
+    List<com.synchronoss.querybuilder.model.pivot.ColumnField> columnFields = sqlBuilderNode.getColumnFields();
+    List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields = sqlBuilderNode.getDataFields();
     JsonNodeFactory factory = JsonNodeFactory.instance;
     // Use case I: The below block is only when column & Data Field is not empty & row field is
     // empty

@@ -48,7 +48,7 @@ public class PivotMainSampleClass {
     List<com.synchronoss.querybuilder.model.pivot.Sort> sortNode = sqlBuilderNode.getSorts();
     for (com.synchronoss.querybuilder.model.pivot.Sort item : sortNode) {
       SortOrder sortOrder =
-          item.getOrder().equals(SortOrder.ASC.name()) ? SortOrder.ASC : SortOrder.DESC;
+          item.getOrder().name().equals(SortOrder.ASC.name()) ? SortOrder.ASC : SortOrder.DESC;
       FieldSortBuilder sortBuilder = SortBuilders.fieldSort(item.getColumnName()).order(sortOrder);
       searchSourceBuilder.sort(sortBuilder);
     }
@@ -59,31 +59,31 @@ public class PivotMainSampleClass {
     List<com.synchronoss.querybuilder.model.pivot.Filter> filters = sqlBuilderNode.getFilters();
     List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
     for (com.synchronoss.querybuilder.model.pivot.Filter item : filters) {
-      if (item.getType().equals(Type.DATE) || item.getType().equals(Type.TIMESTAMP)) {
+      if (item.getType().value().equals(Type.DATE.value()) || item.getType().value().equals(Type.TIMESTAMP.value())) {
         RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
         rangeQueryBuilder.lte(item.getModel().getLte());
         rangeQueryBuilder.gte(item.getModel().getGte());
         builder.add(rangeQueryBuilder);
       }
-      if (item.getType().equals(Type.STRING)) {
+      if (item.getType().value().equals(Type.STRING.value())) {
         TermsQueryBuilder termsQueryBuilder =
             new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
         builder.add(termsQueryBuilder);
       }
-      if ((item.getType().equals(Type.DOUBLE) || item.getType().equals(Type.INT))
-          || item.getType().equals(Type.FLOAT)) {
-        if (item.getModel().getOperator().equals(Operator.BTW)) {
+      if ((item.getType().value().equals(Type.DOUBLE.value()) || item.getType().value().equals(Type.INT.value()))
+          || item.getType().value().equals(Type.FLOAT.value())) {
+        if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
           RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
           rangeQueryBuilder.lte(item.getModel().getOtherValue());
           rangeQueryBuilder.gte(item.getModel().getValue());
           builder.add(rangeQueryBuilder);
         }
-        if (item.getModel().getOperator().equals(Operator.EQ)) {
+        if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
           TermQueryBuilder termQueryBuilder =
               new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
           builder.add(termQueryBuilder);
         }
-        if (item.getModel().getOperator().equals(Operator.NEQ)) {
+        if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
           BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
           boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
               .getValue()));
@@ -91,7 +91,7 @@ public class PivotMainSampleClass {
         }
       }
     }
-    if (sqlBuilderNode.getBooleanCriteria().equals(BooleanCriteria.AND)) {
+    if (sqlBuilderNode.getBooleanCriteria().value().equals(BooleanCriteria.AND.value())) {
       builder.forEach(item -> {
         boolQueryBuilder.must(item);
       });

@@ -6,13 +6,10 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import com.synchronoss.querybuilder.model.DataField;
-import com.synchronoss.querybuilder.model.GroupBy;
-
 class GroupByAndFieldsAvailableChart {
 
-	public static SearchSourceBuilder allFieldsAvailable(GroupBy groupBy, 
-			List<DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
+	public static SearchSourceBuilder allFieldsAvailable(com.synchronoss.querybuilder.model.chart.GroupBy groupBy, 
+			List<com.synchronoss.querybuilder.model.chart.DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	
 	{
 		if (!dataFields.isEmpty() && dataFields.size() <=5){
