@@ -96,7 +96,22 @@ class Analysis extends BaseController {
       }
       case "execute" => {
         val analysisId = extractAnalysisId(json)
-        val data = executeAnalysis(analysisId)
+        /* Extract runtime filters from request body */
+        val runtimeFilters = (json \ "contents" \ "runtimeFilters") match {
+          case JNothing => List.empty
+          case array: JArray => array.arr
+          case obj => unexpectedElement("array", obj)
+        }
+        /* If runtime filters were provided, build a query based on those */
+        val queryRuntime = if (runtimeFilters.size > 0) {
+          val analysis = readAnalysisJson(analysisId) ~
+            ("runtimeFilters", runtimeFilters)
+          QueryBuilder.build(analysis, true)
+        } else {
+          null
+        }
+        /* Execute analysis and return result data */
+        val data = executeAnalysis(analysisId, queryRuntime)
         json merge contentsAnalyze(("data", data))
       }
       case "delete" => {
@@ -203,7 +218,7 @@ class Analysis extends BaseController {
     ("contents", ("analyze", JArray(analyses)))
   }
 
-  def executeAnalysis(analysisId: String): JValue = {
+  def executeAnalysis(analysisId: String, queryRuntime: String): JValue = {
  
     // reading the JSON extract type
     val analysisJSON = readAnalysisJson(analysisId);
@@ -233,7 +248,7 @@ class Analysis extends BaseController {
     else {
     // This is the part of report type starts here
     val er: ExecutionTaskHandler = new ExecutionTaskHandler(1)
-    val aeh: AnalysisExecutionHandler = new AnalysisExecutionHandler(analysisId)
+    val aeh: AnalysisExecutionHandler = new AnalysisExecutionHandler(analysisId, queryRuntime)
     er.startSQLExecutor(aeh)
     val analysisResultId: String = er.getPredefResultRowID(analysisId)
     er.waitForCompletion(analysisId, aeh.getWaitTime)

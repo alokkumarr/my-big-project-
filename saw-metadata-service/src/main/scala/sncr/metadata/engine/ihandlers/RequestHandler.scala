@@ -324,7 +324,7 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
       if ( analysisNode.getCachedData == null || analysisNode.getCachedData.isEmpty)
           throw new Exception("Could not find analysis node with provided search keys.")
 
-      val aeh: AnalysisExecutionHandler = new AnalysisExecutionHandler(id)
+      val aeh: AnalysisExecutionHandler = new AnalysisExecutionHandler(id, null)
       er.startSQLExecutor(aeh)
       val analysisResultId: String = er.getPredefResultRowID(id)
       m_log debug s"Predefined result ID: $analysisResultId"
