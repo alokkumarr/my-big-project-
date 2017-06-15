@@ -15,23 +15,21 @@
 		ng-model="$ctrl.editUser.firstName" required/> </md-input-container>
   <md-input-container flex> <label
 		translate="USER_MIDDLE_NAME_LABEL"></label> <input
-		ng-model="$ctrl.editUser.middleName" required/> </md-input-container>
+		ng-model="$ctrl.editUser.middleName" /> </md-input-container>
   <md-input-container flex> <label
 		translate="USER_LAST_NAME_LABEL"></label> <input
 		ng-model="$ctrl.editUser.lastName" required/> </md-input-container>
   <md-input-container flex> <label
 		translate="USER_ID_LABEL"></label> <input
 		ng-model="$ctrl.editUser.masterLoginId" 
-		ng-pattern="/[A-Z0-9._%+-]+@[A-Z0-9.-]+.com/igm"
 		required/> </md-input-container>
   <md-input-container flex> <label
-		translate="USER_EMAIL_LABEL"></label> <input
+		translate="USER_EMAIL_LABEL"></label> <input type="email"
 		ng-model="$ctrl.editUser.email" 
-		ng-pattern="/[A-Z0-9._%+-]+@[A-Z0-9.-]+.com/igm"
 		required/> </md-input-container>
   <md-input-container flex> <label
-		translate="USER_PASSWORD_LABEL"></label> <input
-		ng-model="$ctrl.editUser.password" /> 
+		translate="USER_PASSWORD_LABEL"></label> <input type="password"
+		ng-model="$ctrl.editUser.password" placeholder="********"/> 
 </md-input-container>
   <md-input-container flex class="padding-for-container"> <label
 		translate="USER_ACTIVE_LABEL"></label> <md-select
@@ -46,6 +44,4 @@
 </div>
 </form>
 </div>
-</user-dialog-content> <user-dialog-footer>
-
-</user-dialog-footer> </user-dialog>
+</user-dialog-content> </user-dialog>

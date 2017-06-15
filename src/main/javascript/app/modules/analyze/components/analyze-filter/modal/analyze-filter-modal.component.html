@@ -1,11 +1,22 @@
 <analyze-dialog control="$ctrl" class="analyze-filters">
-  <analyze-dialog-header layout="row" layout-align="start center" flex="grow">
+  <analyze-dialog-header layout="row" layout-align="space-between center" flex="grow">
     <strong translate="FILTERS"></strong>
+    <div layout="row" layout-align="end center">
+      <span>Join Filters criteria by: </span>
+      <binary-option ng-if="$ctrl.analysisType === 'report'"
+                        left="{{::$ctrl.BOOLEAN_CRITERIA.AND}}"
+                        right="{{::$ctrl.BOOLEAN_CRITERIA.OR}}"
+                        ng-model="$ctrl.filterBooleanCriteria"
+                        style="align-self: baseline; padding: 5px;"
+                        on-change="$ctrl.onBooleanCriteriaSelected(value)">
+      </binary-option>
+    </div>
   </analyze-dialog-header>
 
   <analyze-dialog-content style="width: 850px;" layout="column">
     <md-list ng-repeat="artifact in $ctrl.artifacts track by artifact.artifactName">
       <md-subheader class="md-no-sticky">{{artifact.artifactName}}</md-subheader>
+      <md-divider style="padding-bottom: 10px"></md-divider>
       <md-list-item ng-repeat="filter in $ctrl.filters[artifact.artifactName] track by $index"
                     class="md-no-proxy">
         <analyze-filter-row filter="filter"
@@ -19,15 +30,6 @@
                       ng-change="$ctrl.onRuntimeToggle(filter)">
             <span translate="IS_RUNTIME"></span>
           </md-checkbox>
-
-          <binary-option ng-if="$ctrl.analysisType === 'report'"
-                        left="{{::$ctrl.BOOLEAN_CRITERIA.AND}}"
-                        right="{{::$ctrl.BOOLEAN_CRITERIA.OR}}"
-                        class="md-secondary"
-                        ng-model="filter.booleanCriteria"
-                        style="align-self: baseline; padding: 5px;"
-                        on-change="$ctrl.onBooleanCriteriaSelected(filter, value)">
-          </binary-option>
 
         <md-button class="md-icon-button md-secondary"
                   aria-label="Remove"
