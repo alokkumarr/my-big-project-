@@ -2,7 +2,8 @@
   .saw-ac-placeholder {
     height: 159px;
     width: 434px;
-    background-size: 434px 159px;
+    background-size: contain;
+    background-repeat: no-repeat;
 
     &.m-report {
       background-image: url('~img/charts/report.png');
