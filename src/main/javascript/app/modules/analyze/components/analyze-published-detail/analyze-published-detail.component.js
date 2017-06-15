@@ -12,13 +12,14 @@ export const AnalyzePublishedDetailComponent = {
   template,
   styles: [style],
   controller: class AnalyzePublishedDetailController extends AbstractComponentController {
-    constructor($injector, AnalyzeService, $state, $rootScope, $mdDialog) {
+    constructor($injector, AnalyzeService, $state, $rootScope, $mdDialog, $window) {
       'ngInject';
       super($injector);
 
       this._AnalyzeService = AnalyzeService;
       this._$state = $state;
       this._$rootScope = $rootScope;
+      this._$window = $window; // used for going back from the template
       this._$mdDialog = $mdDialog;
       this._executionId = $state.params.executionId;
       this.isPublished = true;
