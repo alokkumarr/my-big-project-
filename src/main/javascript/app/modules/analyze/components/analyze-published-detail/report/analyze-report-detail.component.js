@@ -2,6 +2,7 @@ import isEmpty from 'lodash/isEmpty';
 import map from 'lodash/map';
 import flatMap from 'lodash/flatMap';
 import filter from 'lodash/filter';
+import keys from 'lodash/keys';
 
 import template from './analyze-report-detail.component.html';
 
@@ -21,10 +22,26 @@ export const AnalyzeReportDetailComponent = {
 
     $onInit() {
       this.filters = map(this.analysis.sqlBuilder.filters, this._FilterService.backend2FrontendFilter());
-      this.columns = flatMap(this.analysis.artifacts, table => {
-        return filter(table.columns, column => column.checked);
-      });
+      this.columns = this._getColumns(this.analysis);
       this.dataSubscription = this.requester.subscribe(options => this.onData(options));
+    }
+
+    _getColumns(analysis, data = []) {
+      if (!analysis.edit) {
+        return flatMap(analysis.artifacts, table => {
+          return filter(table.columns, column => column.checked);
+        });
+      }
+
+      if (data.length > 0) {
+        return map(keys(data[0]), col => ({
+          label: col,
+          columnName: col,
+          type: 'string'
+        }));
+      }
+
+      return this.columns;
     }
 
     $onDestroy() {
@@ -37,6 +54,7 @@ export const AnalyzeReportDetailComponent = {
       }
 
       this.gridData = data;
+      this.columns = this._getColumns(this.analysis, data);
     }
     // TODO runtime filters in SAW-634
 

@@ -94,7 +94,7 @@ export const ReportGridDisplayContainerComponent = {
 
     getGroupLabels(groups, columns) {
       return map(groups, group => {
-        const targetColumns = find(columns, column => column.columnName === group.columnName);
+        const targetColumns = find(columns, column => column.columnName === group.columnName) || {};
         return targetColumns.aliasName || targetColumns.displayName;
       });
     }
