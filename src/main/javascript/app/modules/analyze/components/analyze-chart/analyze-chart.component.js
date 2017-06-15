@@ -11,7 +11,7 @@ import clone from 'lodash/clone';
 import filter from 'lodash/filter';
 import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
-import {NUMBER_TYPES} from '../../services/filter.service';
+import {NUMBER_TYPES, DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -71,6 +71,7 @@ export const AnalyzeChartComponent = {
       } else {
         this._AnalyzeService.createAnalysis(this.model.artifactsId, 'chart').then(analysis => {
           this.model = assign(analysis, this.model);
+          set(this.model, 'sqlBuilder.booleanCriteria', DEFAULT_BOOLEAN_CRITERIA.value);
           this.initChart();
         });
       }
@@ -85,7 +86,7 @@ export const AnalyzeChartComponent = {
 
       this.labels.tempX = this.labels.x = get(this.model, 'xAxis.title', null);
       this.labels.tempY = this.labels.y = get(this.model, 'yAxis.title', null);
-      this.filters.selected = map(
+      this.filters = map(
         get(this.model, 'sqlBuilder.filters', []),
         this._FilterService.backend2FrontendFilter()
       );
@@ -181,10 +182,13 @@ export const AnalyzeChartComponent = {
       this.analysisChanged = true;
     }
 
-    onApplyFilters(filters) {
+    onApplyFilters({filters, filterBooleanCriteria}) {
       if (filters) {
         this.filters = filters;
         this.analysisChanged = true;
+      }
+      if (filterBooleanCriteria) {
+        this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;
       }
     }
 
@@ -202,12 +206,13 @@ export const AnalyzeChartComponent = {
     }
 
     openFiltersModal(ev) {
-      const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts"></analyze-filter-modal>';
+      const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria"></analyze-filter-modal>';
       this._$mdDialog.show({
         template: tpl,
         controller: scope => {
           scope.filters = cloneDeep(this.filters);
           scope.artifacts = this.model.artifacts;
+          scope.booleanCriteria = this.model.sqlBuilder.booleanCriteria;
         },
         targetEvent: ev,
         fullscreen: true,
@@ -278,7 +283,7 @@ export const AnalyzeChartComponent = {
       const result = clone(source);
 
       set(result, 'sqlBuilder.filters', map(
-        this.filters.selected,
+        this.filters,
         this._FilterService.frontend2BackendFilter()
       ));
 
@@ -289,6 +294,7 @@ export const AnalyzeChartComponent = {
       set(result, 'sqlBuilder.groupBy', find(this.settings.xaxis, x => x.checked));
       set(result, 'sqlBuilder.splitBy', find(this.settings.groupBy, x => x.checked));
       set(result, 'sqlBuilder.dataFields', [assign({aggregate: 'sum'}, y)]);
+      set(result, 'sqlBuilder.booleanCriteria', this.model.sqlBuilder.booleanCriteria);
       set(result, 'xAxis', {title: this.labels.x});
       set(result, 'yAxis', {title: this.labels.y});
       set(result, 'legend', {
