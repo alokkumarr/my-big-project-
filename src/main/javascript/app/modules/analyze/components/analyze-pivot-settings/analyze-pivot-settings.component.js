@@ -167,8 +167,8 @@ export const AnalyzePivotSettingsComponent = {
       }
     }
 
-    onSelectSummaryType(aggregateType, artifactColumn) {
-      artifactColumn.aggregate = aggregateType;
+    onSelectAggregateType(aggregateType, artifactColumn) {
+      artifactColumn.aggregate = aggregateType.value;
     }
 
     inputChanged(field) {

@@ -157,7 +157,7 @@ export const PivotGridComponent = {
           showRowFields: true, // hides the row field area
           showDataFields: true, // hides the data field area
           showFilterFields: false, // hides the filter field area
-          allowFieldDragging: false
+          allowFieldDragging: true
         },
         export: {
           enabled: false,

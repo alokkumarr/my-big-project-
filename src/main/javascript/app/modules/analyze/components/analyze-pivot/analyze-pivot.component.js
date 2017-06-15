@@ -79,10 +79,10 @@ export const AnalyzePivotComponent = {
       console.log('old columns: ', this.artifactColumns);
       this.artifactColumns = columns;
       console.log('new columns: ', columns);
-      this.sortFields = this.getFieldToSortFieldMapper()(
-        this._PivotService.artifactColumns2PivotFields()(this.artifactColumns)
-      );
+      const pivotFields = this._PivotService.artifactColumns2PivotFields()(this.artifactColumns);
+      this.sortFields = this.getFieldToSortFieldMapper()(pivotFields);
       this.settingsModified = true;
+      this.setDataSource(this.dataSource.store, pivotFields);
     }
 
     setDataSource(store, fields) {
@@ -289,7 +289,7 @@ export const AnalyzePivotComponent = {
             };
             if (field.area === 'data') {
               backendField.aggregate = field.aggregate;
-              // backendField.name = `${field.aggregate}_${field.columnName}`;
+              // name field is needed for the elastic search request
               backendField.name = field.columnName;
             }
             return backendField;
