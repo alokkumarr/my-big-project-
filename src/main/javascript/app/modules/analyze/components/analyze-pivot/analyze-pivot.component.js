@@ -108,7 +108,6 @@ export const AnalyzePivotComponent = {
     }
 
     onRefreshData() {
-      this.updateFields();
       this.loadPivotData();
     }
 
@@ -264,12 +263,6 @@ export const AnalyzePivotComponent = {
       });
     }
 
-    updateFields() {
-      this.pivotGridUpdater.next({
-        getFields: true
-      });
-    }
-
     getModel() {
       const model = assign(this.model, {
         artifacts: [{
@@ -283,7 +276,7 @@ export const AnalyzePivotComponent = {
 
     getSqlBuilder() {
       const groupedFields = fpPipe(
-        fpFilter('area'),
+        fpFilter(field => field.checked && field.area),
         fpGroupBy('area'),
         fpMapValues(
           fpMap(field => {
@@ -293,8 +286,8 @@ export const AnalyzePivotComponent = {
             };
             if (field.area === 'data') {
               backendField.aggregate = field.aggregate;
-              backendField.name = `${field.aggregate}_${field.columnName}`;
-
+              // backendField.name = `${field.aggregate}_${field.columnName}`;
+              backendField.name = field.columnName;
             }
             return backendField;
           })

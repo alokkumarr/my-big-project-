@@ -41,7 +41,7 @@ export function PivotService() {
 
   function artifactColumns2PivotFields() {
     return fpPipe(
-      fpFilter('area'),
+      fpFilter(field => field.checked && field.area),
       fpMap(artifactColumn => {
         switch (artifactColumn.type) {
           case 'int':

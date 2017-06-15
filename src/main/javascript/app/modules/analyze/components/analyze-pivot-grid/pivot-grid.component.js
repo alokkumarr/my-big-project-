@@ -1,7 +1,6 @@
 import forEach from 'lodash/forEach';
 import assign from 'lodash/assign';
 import values from 'lodash/values';
-import fpSortBy from 'lodash/fp/sortBy';
 import mapValues from 'lodash/mapValues';
 import fpPipe from 'lodash/fp/pipe';
 import fpFilter from 'lodash/fp/filter';
@@ -16,7 +15,6 @@ export const PivotGridComponent = {
   styles: [style],
   bindings: {
     updater: '<',
-    sendFields: '&',
     mode: '@'
   },
   controller: class PivotGridController {
@@ -77,7 +75,6 @@ export const PivotGridComponent = {
       updates.field && this.updateField(updates.field);
       updates.filters && this.updateFilters(updates.filters);
       updates.sorts && this.updateSorts(updates.sorts);
-      updates.getFields && this.sendFields({fields: this._gridInstance.getDataSource().fields()});
       updates.export && this.exportToExcel();
       /* eslint-disable no-unused-expressions */
 
