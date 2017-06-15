@@ -12,22 +12,24 @@
 		ng-bind="::role.roleName"></md-option> </md-select> </md-input-container>
   <md-input-container flex> <label
 		translate="USER_FIRST_NAME_LABEL"></label> <input name="firstName"
-		ng-model="$ctrl.user.firstName" required/> </md-input-container>
+		ng-model="$ctrl.user.firstName" ng-change="$ctrl.addToUserId($ctrl.user.firstName, $ctrl.user.lastName)" required/> </md-input-container>
   <md-input-container flex> <label
 		translate="USER_MIDDLE_NAME_LABEL"></label> <input
-		ng-model="$ctrl.user.middleName" required/> </md-input-container>
+		ng-model="$ctrl.user.middleName"/> </md-input-container>
   <md-input-container flex> <label
 		translate="USER_LAST_NAME_LABEL"></label> <input
-		ng-model="$ctrl.user.lastName" required/> </md-input-container>
+		ng-model="$ctrl.user.lastName" ng-change="$ctrl.addToUserId($ctrl.user.firstName, $ctrl.user.lastName)" required/> </md-input-container>
   <md-input-container flex> <label
 		translate="USER_ID_LABEL"></label> <input name="masterLoginId"
-		ng-model="$ctrl.user.masterLoginId" 
-		ng-pattern="/[A-Z0-9._%+-]+@[A-Z0-9.-]+.com/igm"
+		ng-model="$ctrl.user.masterLoginId"
 		required/> </md-input-container>
   <md-input-container flex> <label
-		translate="USER_EMAIL_LABEL"></label> <input name="email"
-		ng-model="$ctrl.user.email" 
-		ng-pattern="/[A-Z0-9._%+-]+@[A-Z0-9.-]+.com/igm"
+		translate="USER_PASSWORD_LABEL"></label> <input type="password"
+		ng-model="$ctrl.user.password" required/> 
+  </md-input-container>
+  <md-input-container flex> <label
+		translate="USER_EMAIL_LABEL"></label> <input name="email" type="email"
+		ng-model="$ctrl.user.email"
 		required/> </md-input-container>
   <md-input-container flex  class="padding-for-container"> <label
 		translate="USER_ACTIVE_LABEL"></label> <md-select
@@ -42,6 +44,4 @@
 </div>
 </form>
 </div>
-</user-dialog-content> <user-dialog-footer>
-
-</user-dialog-footer> </user-dialog>
+</user-dialog-content>  </user-dialog>

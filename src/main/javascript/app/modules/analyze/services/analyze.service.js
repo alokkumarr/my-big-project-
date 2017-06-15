@@ -1,7 +1,6 @@
 import omit from 'lodash/omit';
 import forEach from 'lodash/forEach';
 import set from 'lodash/set';
-import fpMap from 'lodash/fp/map';
 import fpSortBy from 'lodash/fp/sortBy';
 import fpGet from 'lodash/fp/get';
 import filter from 'lodash/filter';
@@ -30,7 +29,6 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     deleteAnalysis,
     executeAnalysis,
     generateQuery,
-    getAnalyses,
     getAnalysesFor,
     getAnalysisById,
     getArtifacts,
@@ -94,10 +92,10 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
         ['contents.action', 'search'],
         ['contents.keys.[0].categoryId', subCategoryId]
       ]);
-      return $http.post(`${url}/analysis`, payload).then(fpGet('data.contents.analyze'));
-    }).then(analyses => {
-      return analyses;
-    });
+      return $http.post(`${url}/analysis`, payload);
+    })
+      .then(fpGet('data.contents.analyze'))
+      .then(fpSortBy([analysis => -(analysis.createdTimestamp || 0)]));
   }
 
   function searchAnalyses(analyses, searchTerm = '') {
@@ -115,17 +113,6 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
         matchIn(item.type) ||
         matchIn(item.metricName);
     });
-  }
-
-  function getAnalyses(category, query) {
-    return $http.get('/api/analyze/analyses', {params: {category, query}})
-      .then(fpGet('data'))
-      .then(fpMap(analysis => {
-        if (analysis.type === 'chart') {
-          return chartBe2Fe(analysis);
-        }
-        return analysis;
-      }));
   }
 
   function getPublishedAnalysesByAnalysisId(id) {
