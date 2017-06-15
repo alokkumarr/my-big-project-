@@ -8,12 +8,15 @@ import remove from 'lodash/remove';
 import flatten from 'lodash/flatten';
 import fpPipe from 'lodash/fp/pipe';
 import fpMap from 'lodash/fp/map';
+import map from 'lodash/map';
 
 import template from './analyze-filter-modal.component.html';
+import style from './analyze-filter-modal.component.scss';
 import {DEFAULT_BOOLEAN_CRITERIA, BOOLEAN_CRITERIA} from '../../../services/filter.service';
 
 export const AnalyzeFilterModalComponent = {
   template,
+  styles: [style],
   bindings: {
     filters: '<',
     artifacts: '<'
@@ -23,10 +26,10 @@ export const AnalyzeFilterModalComponent = {
       this._toastMessage = toastMessage;
       this._$translate = $translate;
       this.BOOLEAN_CRITERIA = BOOLEAN_CRITERIA;
-      this.filterBooleanCriteria = DEFAULT_BOOLEAN_CRITERIA;
     }
 
     $onInit() {
+      this.translateBooleanCriteria();
       // there is 1 special case when the analysis type is report
       // and the boolean criteria should be shown
       this.analysisType = this.artifacts.length > 1 ? 'report' : '';
@@ -34,7 +37,7 @@ export const AnalyzeFilterModalComponent = {
       if (!isEmpty(this.filters)) {
         this.filterBooleanCriteria = this.filters[0].booleanCriteria;
       } else {
-        this.filterBooleanCriteria = DEFAULT_BOOLEAN_CRITERIA;
+        this.filterBooleanCriteria = DEFAULT_BOOLEAN_CRITERIA.value;
       }
 
       this.filters = this.groupFilters(this.filters);
@@ -43,6 +46,14 @@ export const AnalyzeFilterModalComponent = {
           this.pushNewFilter(artifactFilters);
         }
         return artifactFilters;
+      });
+    }
+
+    translateBooleanCriteria() {
+      this._$translate(map(this.BOOLEAN_CRITERIA, 'label')).then(translations => {
+        forEach(this.BOOLEAN_CRITERIA, criteria => {
+          criteria.label = translations[criteria.label];
+        });
       });
     }
 
@@ -102,11 +113,10 @@ export const AnalyzeFilterModalComponent = {
       });
     }
 
-    onBooleanCriteriaSelected(value) {
-      this.filterBooleanCriteria = value;
+    onBooleanCriteriaSelected() {
       forOwn(this.filters, artifactFilters => {
         forEach(artifactFilters, filter => {
-          filter.booleanCriteria = value;
+          filter.booleanCriteria = this.filterBooleanCriteria;
         });
       });
     }

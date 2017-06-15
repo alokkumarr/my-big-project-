@@ -1,4 +1,4 @@
-<div layout="row" layout-align="space-between stretch">
+<div layout="column" layout-gt-sm="row" layout-align="space-between stretch">
   <md-autocomplete md-items="column in $ctrl.artifact.columns | filter:$ctrl.searchText"
                    placeholder="Select filter"
                    md-search-text="$ctrl.searchText"
@@ -39,7 +39,7 @@
     </div>
 
     <div ng-switch-default style="text-align: center;">
-      <p style="height: 30px;" translate="PLEASE_SELECT_AN_ARTIFACT"></p>
+      <p style="height: 30px; padding-right: 10px; padding-left: 10px;" translate="PLEASE_SELECT_AN_ARTIFACT"></p>
     </div>
 
   </div>

@@ -2,7 +2,9 @@
   "ACCOUNT": "Account",
   "ADMIN":"Admin",
   "AFTER": "After",
+  "ALL": "All",
   "ALL_TYPES": "All Types",
+  "ANY": "Any",
   "APPLY_FILTERS": "Apply filters",
   "APPLY_SORT": "Apply sort",
   "CAN": "can",
@@ -77,6 +79,6 @@
   "TOOLTIP_SEARCH": "Search",
   "TOOLTIP_LIST_VIEW": "List View",
   "TOOLTIP_CARD_VIEW": "Card View",
-  
+
   "ERROR_OOPS_SERVER": "Oops, it looks like something went wrong with the server, if you see this message regularly, please contact customer support."
 }

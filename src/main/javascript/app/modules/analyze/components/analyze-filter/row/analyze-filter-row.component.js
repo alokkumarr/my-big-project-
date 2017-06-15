@@ -17,6 +17,7 @@ export const AnalyzeFilterRowComponent = {
       if (column) {
         this.filter.column = column;
         this.onChange({filter: this.filter});
+        this.filter.model = null;
       }
     }
 

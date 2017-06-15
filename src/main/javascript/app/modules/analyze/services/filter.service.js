@@ -8,14 +8,17 @@ import find from 'lodash/find';
 
 import {OPERATORS} from '../components/analyze-filter/filters/number-filter.component';
 
-export const BOOLEAN_CRITERIA = {
-  AND: 'AND',
-  OR: 'OR'
-};
+export const BOOLEAN_CRITERIA = [{
+  label: 'ALL',
+  value: 'AND'
+}, {
+  label: 'ANY',
+  value: 'OR'
+}];
 
 export const NUMBER_TYPES = ['int', 'integer', 'double', 'long', 'timestamp'];
 
-export const DEFAULT_BOOLEAN_CRITERIA = BOOLEAN_CRITERIA.AND;
+export const DEFAULT_BOOLEAN_CRITERIA = BOOLEAN_CRITERIA[0];
 
 export function FilterService() {
   'ngInject';
@@ -126,21 +129,21 @@ export function FilterService() {
   }
 
   function getIdentityElement(booleanCriteria) {
-    if (booleanCriteria === BOOLEAN_CRITERIA.AND) {
+    if (booleanCriteria === BOOLEAN_CRITERIA[0]) {
       return true;
     }
 
-    if (booleanCriteria === BOOLEAN_CRITERIA.OR) {
+    if (booleanCriteria === BOOLEAN_CRITERIA[1]) {
       return false;
     }
   }
 
   function evaluateBoolean(a, booleanCriteria, b) {
-    if (booleanCriteria === BOOLEAN_CRITERIA.AND) {
+    if (booleanCriteria === BOOLEAN_CRITERIA[0]) {
       return a && b;
     }
 
-    if (booleanCriteria === BOOLEAN_CRITERIA.OR) {
+    if (booleanCriteria === BOOLEAN_CRITERIA[1]) {
       return a || b;
     }
   }
