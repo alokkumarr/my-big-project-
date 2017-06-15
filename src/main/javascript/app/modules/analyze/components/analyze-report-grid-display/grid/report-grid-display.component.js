@@ -20,14 +20,7 @@ export const ReportGridDisplayComponent = {
     }
 
     $onInit() {
-      const columns = map(this.columns, column => {
-        return {
-          caption: column.label,
-          dataField: column.columnName,
-          dataType: column.type,
-          width: COLUMN_WIDTH
-        };
-      });
+      const columns = this._getDxColumns(this.columns);
 
       this.data = take(this.data, 30);
 
@@ -38,9 +31,22 @@ export const ReportGridDisplayComponent = {
       });
     }
 
+    _getDxColumns(columns) {
+      return map(columns, column => {
+        return {
+          caption: column.aliasName || column.displayName,
+          dataField: column.columnName,
+          dataType: column.type,
+          width: COLUMN_WIDTH
+        };
+      });
+    }
+
     $onChanges() {
       if (this._gridInstance) {
+        const columns = this._getDxColumns(this.columns);
         this._gridInstance.option('dataSource', this.data);
+        this._gridInstance.option('columns', columns);
         this._gridInstance.refresh();
       }
     }
