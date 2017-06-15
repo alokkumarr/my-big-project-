@@ -16,6 +16,7 @@ import uniqBy from 'lodash/uniqBy';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
+import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
 
 const DEBOUNCE_INTERVAL = 500; // milliseconds
 
@@ -91,6 +92,7 @@ export const AnalyzeReportComponent = {
               artifacts: analysis.artifacts,
               groupByColumns: [],
               sqlBuilder: {
+                booleanCriteria: DEFAULT_BOOLEAN_CRITERIA.value,
                 filters: [],
                 joins: [],
                 orderByColumns: []
@@ -146,10 +148,13 @@ export const AnalyzeReportComponent = {
       }
     }
 
-    onApplyFilters(filters) {
+    onApplyFilters({filters, filterBooleanCriteria}) {
       if (filters) {
         this.filters = filters;
         this.analysisChanged = true;
+      }
+      if (filterBooleanCriteria) {
+        this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;
       }
     }
 
@@ -322,6 +327,7 @@ export const AnalyzeReportComponent = {
         artifacts: [],
         groupByColumns: [],
         sqlBuilder: {
+          booleanCriteria: this.model.sqlBuilder.booleanCriteria,
           orderByColumns: [],
           joins: [],
           filters: []
@@ -557,12 +563,13 @@ export const AnalyzeReportComponent = {
     }
 
     openFiltersModal(ev) {
-      const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts"></analyze-filter-modal>';
+      const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria"></analyze-filter-modal>';
       this._$mdDialog.show({
         template: tpl,
         controller: scope => {
           scope.filters = cloneDeep(this.filters);
           scope.artifacts = this.model.artifacts;
+          scope.booleanCriteria = this.model.sqlBuilder.booleanCriteria;
         },
         targetEvent: ev,
         fullscreen: true,

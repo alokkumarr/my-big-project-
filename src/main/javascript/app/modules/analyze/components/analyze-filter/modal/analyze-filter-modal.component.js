@@ -12,14 +12,15 @@ import map from 'lodash/map';
 
 import template from './analyze-filter-modal.component.html';
 import style from './analyze-filter-modal.component.scss';
-import {DEFAULT_BOOLEAN_CRITERIA, BOOLEAN_CRITERIA} from '../../../services/filter.service';
+import {BOOLEAN_CRITERIA} from '../../../services/filter.service';
 
 export const AnalyzeFilterModalComponent = {
   template,
   styles: [style],
   bindings: {
     filters: '<',
-    artifacts: '<'
+    artifacts: '<',
+    filterBooleanCriteria: '<'
   },
   controller: class AnalyzeFlterModalController {
     constructor(toastMessage, $translate) {
@@ -33,12 +34,6 @@ export const AnalyzeFilterModalComponent = {
       // there is 1 special case when the analysis type is report
       // and the boolean criteria should be shown
       this.analysisType = this.artifacts.length > 1 ? 'report' : '';
-
-      if (!isEmpty(this.filters)) {
-        this.filterBooleanCriteria = this.filters[0].booleanCriteria;
-      } else {
-        this.filterBooleanCriteria = DEFAULT_BOOLEAN_CRITERIA.value;
-      }
 
       this.filters = this.groupFilters(this.filters);
       forOwn(this.filters, artifactFilters => {
@@ -70,9 +65,6 @@ export const AnalyzeFilterModalComponent = {
         model: null,
         isRuntimeFilter: false
       };
-      if (this.analysisType === 'report') {
-        newFilter.booleanCriteria = this.filterBooleanCriteria;
-      }
       filtersArray.push(newFilter);
     }
 
@@ -84,7 +76,10 @@ export const AnalyzeFilterModalComponent = {
       if (this.areFiltersValid(this.filters)) {
         this.removeEmptyFilters(this.filters);
         const flattenedFilters = this.unGroupFilters(this.filters);
-        this.$dialog.hide(flattenedFilters);
+        this.$dialog.hide({
+          filterBooleanCriteria: this.filterBooleanCriteria,
+          filters: flattenedFilters
+        });
       } else {
         this._$translate('ERROR_FILL_IN_REQUIRED_FILTER_MODELS').then(message => {
           this._toastMessage.error(message);
@@ -109,14 +104,6 @@ export const AnalyzeFilterModalComponent = {
       forOwn(filters, artifactFilters => {
         remove(artifactFilters, filter => {
           return !filter.column;
-        });
-      });
-    }
-
-    onBooleanCriteriaSelected() {
-      forOwn(this.filters, artifactFilters => {
-        forEach(artifactFilters, filter => {
-          filter.booleanCriteria = this.filterBooleanCriteria;
         });
       });
     }

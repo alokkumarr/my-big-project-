@@ -1,8 +1,7 @@
 <analyze-dialog control="$ctrl" class="analyze-filters">
   <analyze-dialog-header layout="row" layout-align="space-between center" flex="grow">
     <strong translate="FILTERS"></strong>
-    <md-select ng-model="$ctrl.filterBooleanCriteria"
-               ng-change="$ctrl.onBooleanCriteriaSelected()">
+    <md-select ng-model="$ctrl.filterBooleanCriteria">
       <md-option ng-repeat="booleanCriteria in $ctrl.BOOLEAN_CRITERIA"
                  ng-value="booleanCriteria.value">
         {{::booleanCriteria.label}}

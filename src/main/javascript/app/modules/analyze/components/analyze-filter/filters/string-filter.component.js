@@ -16,7 +16,7 @@ export const StringFilterComponent = {
     }
 
     $onInit() {
-      this.keywords = this.model || [];
+      this.keywords = this.model || {modelValues: []};
     }
   }
 };

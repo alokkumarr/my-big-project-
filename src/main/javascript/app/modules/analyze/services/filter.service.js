@@ -40,7 +40,6 @@ export function FilterService() {
         model: frontendFilter.model,
         tableName: column.table,
         columnName: column.columnName,
-        booleanCriteria: frontendFilter.booleanCriteria,
         isRuntimeFilter: frontendFilter.isRuntimeFilter
       };
     };
@@ -57,7 +56,6 @@ export function FilterService() {
       return {
         column,
         model: backendFilter.model,
-        booleanCriteria: backendFilter.booleanCriteria,
         isRuntimeFilter: backendFilter.isRuntimeFilter
       };
     };
