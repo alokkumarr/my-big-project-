@@ -110,6 +110,8 @@ const GROUP_INTERVALS = [{
   value: 'dayOfWeek'
 }];
 
+const DEFAULT_GROUP_INTERVAL = GROUP_INTERVALS[0];
+
 const DEFAULT_AREA_TYPE = AREA_TYPES[0];
 const AREA_TYPES_OBJ = fpPipe(
   fpGroupBy('value'),
@@ -185,6 +187,9 @@ export const AnalyzePivotSettingsComponent = {
     onChecked(artifactColumn) {
       if (!artifactColumn.area) {
         artifactColumn.area = DEFAULT_AREA_TYPE.value;
+        if (this.DATE_TYPES.includes(artifactColumn.area)) {
+          artifactColumn.groupInterval = DEFAULT_GROUP_INTERVAL.value;
+        }
       }
     }
 
