@@ -1,19 +1,12 @@
 @import "themes/base/colors";
 
 analyze-pivot-settings {
+  z-index: 0;
+
   h3 {
     margin: 5px;
     padding: 5px;
     border-bottom: 1px solid #EEE;
-  }
-
-  .checkbox-container {
-    padding-top: 10px;
-    padding-left: 10px;
-  }
-
-  .checkbox-container:last-of-type {
-    padding-bottom: 10px;
   }
 
   .summary-type {
@@ -23,9 +16,13 @@ analyze-pivot-settings {
     }
   }
 
-  md-sidenav.pivot-settings {
-    width: 420px;
-    max-width: 420px;
+  & > .layout-row {
+    height: 100%;
+  }
+
+  md-sidenav {
+    position: static;
+    width: 300px;
   }
 
   md-toolbar::after {

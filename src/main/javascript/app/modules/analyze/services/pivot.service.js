@@ -35,8 +35,31 @@ export function PivotService() {
     mapFieldsToFilters,
     getArea,
     getFrontend2BackendFieldMapper,
-    getBackend2FrontendFieldMapper
+    getBackend2FrontendFieldMapper,
+    artifactColumns2PivotFields
   };
+
+  function artifactColumns2PivotFields() {
+    return fpPipe(
+      fpFilter(field => field.checked && field.area),
+      fpMap(artifactColumn => {
+        switch (artifactColumn.type) {
+          case 'int':
+          case 'double':
+          case 'long':
+            artifactColumn.dataType = 'number';
+            break;
+          default:
+            artifactColumn.dataType = artifactColumn.type;
+        }
+        return artifactColumn;
+      }),
+      fpMap(fpMapKeys(key => {
+        const newKey = BACK_2_FRONT_PIVOT_FIELD_PAIRS[key];
+        return newKey || key;
+      }))
+    );
+  }
 
   function getFrontend2BackendFieldMapper() {
     return fpMap(
@@ -73,7 +96,7 @@ export function PivotService() {
 
   function denormalizeData(normalizedData, fields) {
     const groupedFields = getGroupedFields(fields);
-    return flatMap(normalizedData.buckets, node => denormalizeRecursive({groupedFields, keys: {}, currentKey: 'row_level_1', node}));
+    return flatMap(normalizedData.row_level_1.buckets, node => denormalizeRecursive({groupedFields, keys: {}, currentKey: 'row_level_1', node}));
   }
 
   function getGroupedFields(fields) {

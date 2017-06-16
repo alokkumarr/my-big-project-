@@ -71,7 +71,7 @@ export const AnalyzeChartComponent = {
       if (this.mode === 'edit') {
         this.initChart();
       } else {
-        this._AnalyzeService.createAnalysis(this.model.artifactsId, 'chart').then(analysis => {
+        this._AnalyzeService.createAnalysis(this.model.semanticId, 'chart').then(analysis => {
           this.model = assign(analysis, this.model);
           set(this.model, 'sqlBuilder.booleanCriteria', DEFAULT_BOOLEAN_CRITERIA.value);
           this.initChart();
