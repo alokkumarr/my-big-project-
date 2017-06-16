@@ -1,18 +1,27 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import get from 'lodash/get';
+import clone from 'lodash/clone';
+
+import {AnalyseTypes} from '../../consts';
 
 import template from './analyze-published-detail.component.html';
 import style from './analyze-published-detail.component.scss';
+import AbstractComponentController from 'app/lib/common/components/abstractComponent';
 
 export const AnalyzePublishedDetailComponent = {
   template,
   styles: [style],
-  controller: class AnalyzePublishedDetailController {
-    constructor(AnalyzeService, $state, $window, $mdDialog) {
+  controller: class AnalyzePublishedDetailController extends AbstractComponentController {
+    constructor($injector, AnalyzeService, $state, $rootScope, $mdDialog, $window) {
       'ngInject';
+      super($injector);
+
       this._AnalyzeService = AnalyzeService;
       this._$state = $state;
-      this._$window = $window;
+      this._$rootScope = $rootScope;
+      this._$window = $window; // used for going back from the template
       this._$mdDialog = $mdDialog;
+      this._executionId = $state.params.executionId;
       this.isPublished = true;
 
       this.requester = new BehaviorSubject({});
@@ -26,9 +35,11 @@ export const AnalyzePublishedDetailComponent = {
         if (!this.analysis.schedule) {
           this.isPublished = false;
         }
+        this.loadExecutionData();
         this.loadExecutedAnalyses(analysisId);
       } else {
         this.loadAnalysisById(analysisId).then(() => {
+          this.loadExecutionData();
           this.loadExecutedAnalyses(analysisId);
         });
       }
@@ -50,6 +61,14 @@ export const AnalyzePublishedDetailComponent = {
       });
     }
 
+    loadExecutionData() {
+      if (this._executionId) {
+        this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId).then(data => {
+          this.requester.next({data});
+        });
+      }
+    }
+
     loadAnalysisById(analysisId) {
       return this._AnalyzeService.readAnalysis(analysisId)
         .then(analysis => {
@@ -60,35 +79,68 @@ export const AnalyzePublishedDetailComponent = {
         });
     }
 
-    loadLastPublishedAnalysis(analysisId) {
-      this._AnalyzeService.getLastPublishedAnalysis(analysisId)
-        .then(analysis => {
-          this.analysis = analysis;
-        });
+    /* If data for a particular execution is not requested,
+       load data from the most recent execution */
+    loadLastPublishedAnalysis() {
+      if (!this._executionId) {
+        this._executionId = get(this.analyses, '[0].id', null);
+        this.loadExecutionData();
+      }
     }
 
     loadExecutedAnalyses(analysisId) {
       this._AnalyzeService.getPublishedAnalysesByAnalysisId(analysisId)
         .then(analyses => {
           this.analyses = analyses;
+          this.loadLastPublishedAnalysis();
         });
     }
 
-    openPublishModal(ev) {
-      const tpl = '<analyze-publish-dialog model="$ctrl.analysis" on-publish="$ctrl.onPublish($data)"></analyze-publish-dialog>';
-
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controllerAs: '$ctrl',
-          autoWrap: false,
-          fullscreen: true,
-          focusOnOpen: false,
-          multiple: true,
-          targetEvent: ev,
-          clickOutsideToClose: true
+    openEditModal(mode) {
+      const openModal = template => {
+        this.showDialog({
+          template,
+          controller: scope => {
+            scope.model = clone(this.analysis);
+          },
+          multiple: true
         });
+      };
+
+      switch (this.analysis.type) {
+        case AnalyseTypes.Report:
+          openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
+          break;
+        case AnalyseTypes.Chart:
+          openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
+          break;
+        case AnalyseTypes.Pivot:
+          openModal(`<analyze-pivot model="model" mode="${mode}"></analyze-pivot>`);
+          break;
+        default:
+      }
     }
 
+    publish(model) {
+      this._$rootScope.showProgress = true;
+      this._AnalyzeService.publishAnalysis(model).then(() => {
+        this._$rootScope.showProgress = false;
+      }, () => {
+        this._$rootScope.showProgress = false;
+      });
+    }
+
+    openPublishModal() {
+      const template = '<analyze-publish-dialog model="model" on-publish="onPublish(model)"></analyze-publish-dialog>';
+
+      this.showDialog({
+        template,
+        controller: scope => {
+          scope.model = clone(this.analysis);
+          scope.onPublish = this.publish.bind(this);
+        },
+        multiple: true
+      });
+    }
   }
 };

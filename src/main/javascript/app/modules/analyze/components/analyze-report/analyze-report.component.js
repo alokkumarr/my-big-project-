@@ -84,6 +84,7 @@ export const AnalyzeReportComponent = {
           this.model = defaultsDeep(this.model, {
             id: analysis.id,
             metric: analysis.metric,
+            createdTimestamp: analysis.createdTimestamp,
             metricName: analysis.metricName
           });
 
@@ -262,7 +263,10 @@ export const AnalyzeReportComponent = {
         table.setPosition(itemA.artifactPosition[0], itemA.artifactPosition[1]);
 
         /* Show join eligible fields on top for easy access */
-        const sortedForJoin = sortBy(itemA.columns, c => !c.joinEligible);
+        const sortedForJoin = sortBy(itemA.columns, [
+          c => !c.joinEligible,
+          c => c.columnName
+        ]);
 
         forEach(sortedForJoin, itemB => {
           const field = table.addField(itemB.columnName);

@@ -24,6 +24,7 @@
   "NEW_ANALYSIS": "New Analysis",
   "NO_COLUMNS_FOUND": "No Columns were found",
   "NO_IMPLEMENTED_TEMPLATE_YET": "No implemented template yet!",
+  "NO_PREVIOUS_EXECUTION": "This analysis hasn't been been executed yet. Execute it now?",
   "ORDER_FULFILLMENT": "Order Fulfillment",
   "OTHER_PUBLISHED_ANALYSES": "Previous Versions",
   "PIVOT_SETTINGS": "Pivot Settings",

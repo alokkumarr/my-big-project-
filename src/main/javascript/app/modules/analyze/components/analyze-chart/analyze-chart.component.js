@@ -3,6 +3,8 @@ import findIndex from 'lodash/findIndex';
 import forEach from 'lodash/forEach';
 import find from 'lodash/find';
 import get from 'lodash/get';
+import sortBy from 'lodash/sortBy';
+import flatMap from 'lodash/flatMap';
 import isEmpty from 'lodash/isEmpty';
 import assign from 'lodash/assign';
 import map from 'lodash/map';
@@ -24,7 +26,7 @@ export const AnalyzeChartComponent = {
     mode: '@?'
   },
   controller: class AnalyzeChartController {
-    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, ChartService, FilterService, $mdSidenav, $window) {
+    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, ChartService, FilterService, $mdSidenav) {
       'ngInject';
 
       this._FilterService = FilterService;
@@ -32,6 +34,7 @@ export const AnalyzeChartComponent = {
       this._ChartService = ChartService;
       this._$mdSidenav = $mdSidenav;
       this._$mdDialog = $mdDialog;
+      this._$timeout = $timeout;
 
       this.legend = {
         align: get(this.model, 'legend.align', 'right'),
@@ -54,7 +57,6 @@ export const AnalyzeChartComponent = {
       this.filters = [];
 
       this.chartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
-      $window.chartctrl = this;
     }
 
     toggleLeft() {
@@ -91,6 +93,9 @@ export const AnalyzeChartComponent = {
         this._FilterService.backend2FrontendFilter()
       );
       this.onSettingsChanged();
+      this._$timeout(() => {
+        this.updateLegendPosition();
+      });
     }
 
     updateLegendPosition() {
@@ -138,12 +143,14 @@ export const AnalyzeChartComponent = {
 
     fillSettings(artifacts, model) {
       /* Flatten the artifacts into a single array */
-      const attributes = artifacts.reduce((res, metric) => {
-        return res.concat(map(metric.columns, attr => {
+      let attributes = flatMap(artifacts, metric => {
+        return map(metric.columns, attr => {
           attr.tableName = metric.artifactName;
           return attr;
-        }));
-      }, []);
+        });
+      });
+
+      attributes = sortBy(attributes, [attr => attr.columnName]);
 
       /* Based on data type, divide the artifacts between axes. */
       const yaxis = filter(attributes, attr => (
