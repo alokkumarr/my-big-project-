@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.BuilderUtil;
 import com.synchronoss.SAWElasticTransportService;
 
@@ -91,9 +92,10 @@ public class SAWElasticSearchQueryExecutor {
    * @return
    * @throws JsonProcessingException
    * @throws IOException
+   * @throws ProcessingException 
    */
   public static String[] executeReturnAsflateString(SearchSourceBuilder searchSourceBuilder,
-      String jsonString) throws JsonProcessingException, IOException {
+      String jsonString) throws JsonProcessingException, IOException, ProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     //SearchResponse response = null;

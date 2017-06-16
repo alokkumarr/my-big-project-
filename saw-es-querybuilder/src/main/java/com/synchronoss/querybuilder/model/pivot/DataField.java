@@ -190,9 +190,9 @@ public class DataField {
         TIMESTAMP("timestamp"),
         LONG("long"),
         DOUBLE("double"),
-        FLOAT("float"),
         INT("int"),
-        STRING("string");
+        STRING("string"),
+        FLOAT("float");
         private final String value;
         private final static Map<String, DataField.Type> CONSTANTS = new HashMap<String, DataField.Type>();
 

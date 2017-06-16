@@ -3,6 +3,7 @@ package com.synchronoss.querybuilder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
@@ -12,7 +13,9 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.BuilderUtil;
 import com.synchronoss.querybuilder.model.chart.Filter.Type;
 import com.synchronoss.querybuilder.model.pivot.Model.Operator;
@@ -44,8 +47,9 @@ class SAWPivotTypeElasticSearchQueryBuilder {
    * @return query
    * @throws IOException
    * @throws JsonProcessingException
+   * @throws ProcessingException 
    */
-  public String buildQuery() throws JsonProcessingException, IOException {
+  public String buildQuery() throws JsonProcessingException, IOException, ProcessingException {
     String query = null;
     SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTree(getJsonString(), "sqlBuilder");
     int size = 0;
@@ -70,31 +74,35 @@ class SAWPivotTypeElasticSearchQueryBuilder {
     List<com.synchronoss.querybuilder.model.pivot.Filter> filters = sqlBuilderNode.getFilters();
     List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
     for (com.synchronoss.querybuilder.model.pivot.Filter item : filters) {
-      if (item.getType().value().equals(Type.DATE.value()) || item.getType().value().equals(Type.TIMESTAMP.value())) {
+      if (item.getType().value().toLowerCase().equals(Type.DATE.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.TIMESTAMP.value().toLowerCase())) {
         RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
         rangeQueryBuilder.lte(item.getModel().getLte());
         rangeQueryBuilder.gte(item.getModel().getGte());
+        if(item.getModel().getFormat()!=null)
+        {
+          rangeQueryBuilder.format(item.getModel().getFormat());
+        }
         builder.add(rangeQueryBuilder);
       }
-      if (item.getType().value().equals(Type.STRING.value())) {
+      if (item.getType().value().toLowerCase().equals(Type.STRING.value().toLowerCase())) {
         TermsQueryBuilder termsQueryBuilder =
             new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
         builder.add(termsQueryBuilder);
       }
-      if ((item.getType().value().equals(Type.DOUBLE.value()) || item.getType().value().equals(Type.INT.value()))
-          || item.getType().value().equals(Type.FLOAT.value())) {
+      if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
+          || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase())) {
         if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
           RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
           rangeQueryBuilder.lte(item.getModel().getOtherValue());
           rangeQueryBuilder.gte(item.getModel().getValue());
           builder.add(rangeQueryBuilder);
         }
-        if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
+        if (item.getModel().getOperator().value().toLowerCase().equals(Operator.EQ.value().toLowerCase())) {
           TermQueryBuilder termQueryBuilder =
               new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
           builder.add(termQueryBuilder);
         }
-        if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
+        if (item.getModel().getOperator().value().toLowerCase().equals(Operator.NEQ.value().toLowerCase())) {
           BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
           boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
               .getValue()));
@@ -102,7 +110,7 @@ class SAWPivotTypeElasticSearchQueryBuilder {
         }
       }
     }
-    if (sqlBuilderNode.getBooleanCriteria().value().equals(BooleanCriteria.AND.value())) {
+    if (sqlBuilderNode.getBooleanCriteria().value().toLowerCase().equals(BooleanCriteria.AND.value().toLowerCase())) {
       builder.forEach(item -> {
         boolQueryBuilder.must(item);
       });
@@ -195,7 +203,7 @@ class SAWPivotTypeElasticSearchQueryBuilder {
     return query;
   }
 
-  public SearchSourceBuilder getSearchSourceBuilder() throws JsonProcessingException, IOException {
+  public SearchSourceBuilder getSearchSourceBuilder() throws JsonProcessingException, IOException, ProcessingException {
     buildQuery();
     return searchSourceBuilder;
   }

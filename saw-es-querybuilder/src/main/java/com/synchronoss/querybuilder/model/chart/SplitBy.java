@@ -22,8 +22,18 @@ import com.fasterxml.jackson.annotation.JsonValue;
 })
 public class SplitBy {
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("columnName")
     private String columnName;
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("type")
     private SplitBy.Type type;
     @JsonProperty("tableName")
@@ -35,21 +45,41 @@ public class SplitBy {
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("columnName")
     public String getColumnName() {
         return columnName;
     }
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("columnName")
     public void setColumnName(String columnName) {
         this.columnName = columnName;
     }
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("type")
     public SplitBy.Type getType() {
         return type;
     }
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("type")
     public void setType(SplitBy.Type type) {
         this.type = type;

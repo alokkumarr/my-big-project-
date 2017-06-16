@@ -15,15 +15,19 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
+    "booleanCriteria",
     "operator",
     "value",
     "otherValue",
     "gte",
     "lte",
+    "format",
     "modelValues"
 })
 public class Model {
 
+    @JsonProperty("booleanCriteria")
+    private Model.BooleanCriteria booleanCriteria;
     @JsonProperty("operator")
     private Model.Operator operator;
     @JsonProperty("value")
@@ -31,13 +35,25 @@ public class Model {
     @JsonProperty("otherValue")
     private Integer otherValue;
     @JsonProperty("gte")
-    private Integer gte;
+    private String gte;
     @JsonProperty("lte")
-    private Integer lte;
+    private String lte;
+    @JsonProperty("format")
+    private String format;
     @JsonProperty("modelValues")
     private List<Object> modelValues = null;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
+    @JsonProperty("booleanCriteria")
+    public Model.BooleanCriteria getBooleanCriteria() {
+        return booleanCriteria;
+    }
+
+    @JsonProperty("booleanCriteria")
+    public void setBooleanCriteria(Model.BooleanCriteria booleanCriteria) {
+        this.booleanCriteria = booleanCriteria;
+    }
 
     @JsonProperty("operator")
     public Model.Operator getOperator() {
@@ -70,23 +86,33 @@ public class Model {
     }
 
     @JsonProperty("gte")
-    public Integer getGte() {
+    public String getGte() {
         return gte;
     }
 
     @JsonProperty("gte")
-    public void setGte(Integer gte) {
+    public void setGte(String gte) {
         this.gte = gte;
     }
 
     @JsonProperty("lte")
-    public Integer getLte() {
+    public String getLte() {
         return lte;
     }
 
     @JsonProperty("lte")
-    public void setLte(Integer lte) {
+    public void setLte(String lte) {
         this.lte = lte;
+    }
+
+    @JsonProperty("format")
+    public String getFormat() {
+        return format;
+    }
+
+    @JsonProperty("format")
+    public void setFormat(String format) {
+        this.format = format;
     }
 
     @JsonProperty("modelValues")
@@ -107,6 +133,45 @@ public class Model {
     @JsonAnySetter
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
+    }
+
+    public enum BooleanCriteria {
+
+        AND("AND"),
+        OR("OR");
+        private final String value;
+        private final static Map<String, Model.BooleanCriteria> CONSTANTS = new HashMap<String, Model.BooleanCriteria>();
+
+        static {
+            for (Model.BooleanCriteria c: values()) {
+                CONSTANTS.put(c.value, c);
+            }
+        }
+
+        private BooleanCriteria(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
+
+        @JsonValue
+        public String value() {
+            return this.value;
+        }
+
+        @JsonCreator
+        public static Model.BooleanCriteria fromValue(String value) {
+            Model.BooleanCriteria constant = CONSTANTS.get(value);
+            if (constant == null) {
+                throw new IllegalArgumentException(value);
+            } else {
+                return constant;
+            }
+        }
+
     }
 
     public enum Operator {

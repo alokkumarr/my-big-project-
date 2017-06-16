@@ -1,4 +1,4 @@
-package com.synchronoss.querybuilder.model;
+package com.synchronoss;
 
 import java.util.HashMap;
 import java.util.Map;

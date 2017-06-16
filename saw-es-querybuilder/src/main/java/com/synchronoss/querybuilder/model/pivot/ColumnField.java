@@ -149,7 +149,8 @@ public class ColumnField {
         LONG("long"),
         DOUBLE("double"),
         INT("int"),
-        STRING("string");
+        STRING("string"),
+        FLOAT("float");
         private final String value;
         private final static Map<String, ColumnField.Type> CONSTANTS = new HashMap<String, ColumnField.Type>();
 

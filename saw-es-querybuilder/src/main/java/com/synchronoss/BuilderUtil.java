@@ -1,11 +1,17 @@
 package com.synchronoss;
 
+import java.io.File;
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jackson.JsonLoader;
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.github.fge.jsonschema.core.report.ProcessingReport;
+import com.github.fge.jsonschema.main.JsonSchemaFactory;
+import com.github.fge.jsonschema.main.JsonValidator;
 
 public class BuilderUtil 
 {
@@ -16,24 +22,54 @@ public class BuilderUtil
 	 * @return
 	 * @throws JsonProcessingException
 	 * @throws IOException
+	 * @throws ProcessingException 
 	 */
-	public static com.synchronoss.querybuilder.model.pivot.SqlBuilder getNodeTree (String jsonString, String node) throws JsonProcessingException, IOException
+	public static com.synchronoss.querybuilder.model.pivot.SqlBuilder getNodeTree (String jsonString, String node) throws JsonProcessingException, IOException, ProcessingException
 	{
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
 		JsonNode objectNode = objectMapper.readTree(jsonString);
 		JsonNode sqlNode = objectNode.get(node);
-		com.synchronoss.querybuilder.model.pivot.SqlBuilder sqlBuilderNode = objectMapper.treeToValue(sqlNode, com.synchronoss.querybuilder.model.pivot.SqlBuilder.class);
+		// schema validation block starts here
+        String json = "{ \"sqlBuilder\" :" + sqlNode.toString() + "}";
+        JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
+        JsonValidator validator = factory.getValidator();
+        final JsonNode data = JsonLoader.fromString(json);
+        final JsonNode schema = JsonLoader.fromFile(new File(BuilderUtil.class.getResource("/com/synchronoss/"
+            + "querybuilder/model/pivot/pivot_querybuilder_schema.json").getFile()));
+        ProcessingReport report = validator.validate(schema, data);
+        if (report.isSuccess() == false) {
+          throw new ProcessingException(report.toString());
+        }
+        // schema validation block ends here
+		com.synchronoss.querybuilder.model.pivot.SqlBuilder sqlBuilderNode = 
+		    objectMapper.treeToValue(sqlNode, com.synchronoss.querybuilder.model.pivot.SqlBuilder.class);
 		return sqlBuilderNode;
 	}
 
-    public static com.synchronoss.querybuilder.model.chart.SqlBuilder getNodeTreeChart(String jsonString, String node) throws JsonProcessingException, IOException
+    public static com.synchronoss.querybuilder.model.chart.SqlBuilder getNodeTreeChart(String jsonString, String node) 
+        throws JsonProcessingException, IOException, ProcessingException
     {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
         JsonNode objectNode = objectMapper.readTree(jsonString);
         JsonNode sqlNode = objectNode.get(node);
-        com.synchronoss.querybuilder.model.chart.SqlBuilder sqlBuilderNode = objectMapper.treeToValue(sqlNode, com.synchronoss.querybuilder.model.chart.SqlBuilder.class);
+        // schema validation block starts here
+        String json = "{ \"sqlBuilder\" :" + sqlNode.toString() + "}";
+        JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
+        JsonValidator validator = factory.getValidator();
+        final JsonNode data = JsonLoader.fromString(json);
+        final JsonNode schema = JsonLoader.fromFile(new File(BuilderUtil.class.getResource("/com/synchronoss/"
+            + "querybuilder/model/chart/chart_querybuilder_schema.json").getFile()));
+        ProcessingReport report = validator.validate(schema, data);
+        if (report.isSuccess() == false) {
+          throw new ProcessingException(report.toString());
+        }
+        // schema validation block ends here
+        JsonNode objectNode1 = objectMapper.readTree(json);
+        com.synchronoss.querybuilder.model.chart.SqlBuilderChart sqlBuilderNodeChart =
+            objectMapper.treeToValue(objectNode1, com.synchronoss.querybuilder.model.chart.SqlBuilderChart.class);
+        com.synchronoss.querybuilder.model.chart.SqlBuilder sqlBuilderNode = sqlBuilderNodeChart.getSqlBuilder();
         return sqlBuilderNode;
     }
 	
