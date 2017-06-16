@@ -57,6 +57,16 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       /* Update previously created analysis */
       analysis = analysis.merge(
         ("saved", "true") ~ ("categoryId", categoryId))
+      /* Add a runtime filter for use in subsequent executions */
+      analysis = analysis.merge(("sqlBuilder", ("filters", List(
+        ("type", "string") ~
+          ("tableName", "MCT_SESSION") ~
+          ("columnName", "TRANSFER_END_TS") ~
+          /* Because the query normally returns rows, intentionally use filter
+           * that doesn't match any rows to ensure filter is in
+           * effect */
+          ("model", ("modelValues", List("nonexistent"))) ~
+          ("isRuntimeFilter", true)))): JObject)
       /* Set columns to checked to ensure there are at least some selected
        * columns for the query builder */
       analysis = checkColumns(analysis, "TRANSFER_END_TS")
@@ -94,26 +104,18 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       analyses.length must be (2)
     }
 
-    "execute analysis" in {
+    "execute non-interactive analysis" in {
       /* Execute previously updated analysis */
-      val body = actionKeyMessage("execute", id)
+      val body = actionKeyAnalysisMessage("execute", id,
+        analysis.merge(("executionType", "scheduled"): JObject))
       val response = analyze(sendRequest(body))
       val JString(value) = (response \ "data")(0) \ "TRANSFER_END_TS"
       value must be ("21-DEC-16 11.14.05.000000 AM")
     }
 
-    "execute analysis with runtime filters" in {
+    "execute interactive analysis with runtime filters" in {
       /* Execute existing analysis with runtime filters*/
-      val runtimeFiltersJson: JObject = ("runtimeFilters", List(
-        ("type", "string") ~
-          ("tableName", "MCT_SESSION") ~
-          ("columnName", "TRANSFER_END_TS") ~
-          /* Because the query normally returns rows, intentionally use filter
-           * that doesn't match any rows to ensure filter is in
-           * effect */
-          ("model", ("modelValues", List("nonexistent"))) ~
-          ("isRuntimeFilter", true)))
-      val body = actionKeysMessage("execute", ("id", id), runtimeFiltersJson)
+      val body = actionKeyAnalysisMessage("execute", id, analysis)
       val response = analyze(sendRequest(body))
       /* Expect zero rows in result because runtime filter is designed to
        * rejects all rows */
@@ -126,7 +128,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       analysis = analyze(sendRequest(
         actionKeyAnalysisMessage("update", id, analysis.merge(manualJson))))
       /* Execute updated analysis */
-      val body = actionKeyMessage("execute", id)
+      val body = actionKeyAnalysisMessage("execute", id, analysis)
       val response = analyze(sendRequest(body))
       val JInt(value) = (response \ "data")(0) \ "a"
       value must be (1)

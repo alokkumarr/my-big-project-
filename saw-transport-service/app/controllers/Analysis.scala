@@ -96,23 +96,15 @@ class Analysis extends BaseController {
       }
       case "execute" => {
         val analysisId = extractAnalysisId(json)
-        /* Extract runtime filters from request body */
-        val runtimeFilters = (json \ "contents" \ "runtimeFilters") match {
-          case JNothing => List.empty
-          case array: JArray => array.arr
-          case obj => unexpectedElement("array", obj)
-        }
-        /* If runtime filters were provided, build a query based on those */
-        val queryRuntime = if (runtimeFilters.size > 0) {
-          val analysis = readAnalysisJson(analysisId) ~
-            ("runtimeFilters", runtimeFilters)
-          QueryBuilder.build(analysis, true)
-        } else {
-          null
-        }
+        val analysis = analysisJson(json)
+        /* Build query based on analysis supplied in request body */
+        val executionType = (analysis \ "executionType")
+          .extractOrElse[String]("interactive")
+        val runtime = (executionType == "interactive")
+        val queryRuntime = QueryBuilder.build(analysis, runtime)
         /* Execute analysis and return result data */
         val data = executeAnalysis(analysisId, queryRuntime)
-        json merge contentsAnalyze(("data", data))
+        contentsAnalyze(("data", data))
       }
       case "delete" => {
         val analysisId = extractAnalysisId(json)
