@@ -1,8 +1,8 @@
-users-view {
+roles-view {
   width: 100%;
 }
 
-.users-view {
+.roles-view {
   .md-title {
     color: #636363;
     font-weight: bold;
@@ -16,7 +16,7 @@ users-view {
     margin-left: auto;
   }
 
-  &_users-list {
+  &_roles-list {
     md-card {
       md-card-header {
         margin: 16px 24px;

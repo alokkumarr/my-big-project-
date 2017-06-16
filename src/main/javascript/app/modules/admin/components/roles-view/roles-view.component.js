@@ -1,19 +1,19 @@
-import template from './users-view.component.html';
-import style from './users-view.component.scss';
+import template from './roles-view.component.html';
+import style from './roles-view.component.scss';
 import AbstractComponentController from 'app/lib/common/components/abstractComponent';
 import {Subject} from 'rxjs/Subject';
 import {AdminMenuData} from '../../consts';
 
-export const UsersViewComponent = {
+export const RolesViewComponent = {
   template,
   styles: [style],
-  controller: class UsersViewPageController extends AbstractComponentController {
-    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, UsersManagementService, $window, $rootScope) {
+  controller: class RolesViewPageController extends AbstractComponentController {
+    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, RolesManagementService, $window, $rootScope) {
       'ngInject';
       super($injector);
       this._$compile = $compile;
       this.$componentHandler = $componentHandler;
-      this.UsersManagementService = UsersManagementService;
+      this.RolesManagementService = RolesManagementService;
       this._$window = $window;
       this._$state = $state;
       this._$mdDialog = $mdDialog;
@@ -21,16 +21,14 @@ export const UsersViewComponent = {
       this._JwtService = JwtService;
       this._$rootScope = $rootScope;
       this.updater = new Subject();
-      this.admin = {};
-      this.states = {
-        searchTerm: ''
-      };
       this.resp = this._JwtService.getTokenObj();
+      this.custID = this.resp.ticket.custID;
+      this.custCode = this.resp.ticket.custCode;
       this._$rootScope.showProgress = true;
-      this.UsersManagementService.getActiveUsersList(this.resp.ticket.custID).then(admin => {
+      this.RolesManagementService.getActiveRolesList(this.custID).then(admin => {
         this.admin = admin;
         if (this.admin.valid) {
-          this.userList = this.admin.users;
+          this.rolesList = this.admin.roles;
           this._$rootScope.showProgress = false;
         } else {
           this._$rootScope.showProgress = false;
@@ -40,28 +38,30 @@ export const UsersViewComponent = {
             toastClass: 'toast-primary'
           });
         }
+      }).catch(() => {
+        this._$rootScope.showProgress = false;
       });
-      this.custCode = this.resp.ticket.custCode;
+      this.roleTypes = [];
     }
     $onInit() {
       const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
       leftSideNav.update(AdminMenuData, 'ADMIN');
     }
-    openNewUserModal() {
+    openNewRoleModal() {
       this._$rootScope.showProgress = true;
-      this.UsersManagementService.getRoles(this.resp.ticket.custID).then(response => {
+      this.RolesManagementService.getRoleTypes().then(response => {
         this.response = response;
         if (this.response.valid) {
           this._$rootScope.showProgress = false;
           this.showDialog({
             controller: scope => {
-              scope.roles = this.response.roles;
-              scope.onSaveAction = users => {
-                this.updater.next({users});
+              scope.roleTypes = this.response.roles;
+              scope.onSaveAction = roles => {
+                this.updater.next({roles});
               };
             },
-            template: '<user-new roles="roles" on-save="onSaveAction(users)"></user-new>',
-            fullscreen: false
+            template: '<role-new role-types="roleTypes" on-save="onSaveAction(roles)"></role-new>',
+            fullscreen: true
           });
         } else {
           this._$rootScope.showProgress = false;
@@ -76,30 +76,29 @@ export const UsersViewComponent = {
       });
     }
 
-    openDeleteModal(user) {
-      this.user = user;
-      const tokenCustId = this.resp.ticket.custID;
+    openDeleteModal(role) {
+      this.role = role;
+      const tokenCustId = parseInt(this.resp.ticket.custID, 10);
       const tokenMasterLoginId = this.resp.ticket.masterLoginId;
-      const userObj = {
-        userId: user.userId,
+      const roleObj = {
+        roleId: role.roleSysId,
         customerId: tokenCustId,
         masterLoginId: tokenMasterLoginId
       };
       const confirm = this._$mdDialog.confirm()
-        .title('Are you sure you want to delete this user?')
-        .textContent('User ID :' + this.user.masterLoginId)
+        .title('Are you sure you want to delete this role?')
+        .textContent('Role Name : ' + this.role.roleName)
         .ok('Delete')
         .cancel('Cancel');
-
       this._$mdDialog.show(confirm).then(() => {
         this._$rootScope.showProgress = true;
-        return this.UsersManagementService.deleteUser(userObj);
+        return this.RolesManagementService.deleteRole(roleObj);
       }).then(data => {
         if (data.valid) {
           this._$rootScope.showProgress = false;
-          this.userList = data.users;
+          this.rolesList = data.roles;
           this._$mdToast.show({
-            template: '<md-toast><span> User is successfully inactivated </md-toast>',
+            template: '<md-toast><span> Role is successfully inactivated </md-toast>',
             position: 'bottom left',
             toastClass: 'toast-primary'
           });
@@ -114,23 +113,23 @@ export const UsersViewComponent = {
       });
     }
 
-    openEditModal(user) {
-      const editUser = {};
-      angular.merge(editUser, user);
+    openEditModal(role) {
+      const editRole = {};
+      angular.merge(editRole, role);
       this._$rootScope.showProgress = true;
-      this.UsersManagementService.getRoles(this.resp.ticket.custID).then(response => {
+      this.RolesManagementService.getRoleTypes().then(response => {
         this.response = response;
         if (this.response.valid) {
           this._$rootScope.showProgress = false;
           this.showDialog({
             controller: scope => {
               scope.roles = this.response.roles;
-              scope.user = editUser;
-              scope.onUpdateAction = users => {
-                this.updater.next({users});
+              scope.role = editRole;
+              scope.onUpdateAction = roles => {
+                this.updater.next({roles});
               };
             },
-            template: '<user-edit roles="roles" user="user" on-update="onUpdateAction(users)" ></user-edit>',
+            template: '<role-edit role-types="roles" edit-role="role" on-update="onUpdateAction(roles)" ></role-edit>',
             fullscreen: false
           });
         } else {
@@ -146,7 +145,7 @@ export const UsersViewComponent = {
       });
     }
 
-    onCardAction(actionType, payload) {
+    onRoleAction(actionType, payload) {
       switch (actionType) {
         case 'delete':
           this.openDeleteModal(payload);
