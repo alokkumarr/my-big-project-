@@ -292,7 +292,7 @@ export const AnalyzeChartComponent = {
       const y = find(this.settings.yaxis, x => x.checked);
 
       delete result.supports;
-      set(result, 'sqlBuilder.sort', []);
+      set(result, 'sqlBuilder.sorts', []);
       set(result, 'sqlBuilder.groupBy', find(this.settings.xaxis, x => x.checked));
       set(result, 'sqlBuilder.splitBy', find(this.settings.groupBy, x => x.checked));
       set(result, 'sqlBuilder.dataFields', [assign({aggregate: 'sum'}, y)]);
