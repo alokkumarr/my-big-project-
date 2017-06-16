@@ -4,6 +4,7 @@ import fpMapValues from 'lodash/fp/mapValues';
 import cloneDeep from 'lodash/cloneDeep';
 import forEach from 'lodash/forEach';
 import filter from 'lodash/filter';
+import map from 'lodash/map';
 
 import template from './analyze-pivot-settings.component.html';
 import style from './analyze-pivot-settings.component.scss';
@@ -155,7 +156,7 @@ export const AnalyzePivotSettingsComponent = {
     }
 
     $onInit() {
-      this._$translate(GROUP_INTERVALS).then(translations => {
+      this._$translate(map(GROUP_INTERVALS, 'label')).then(translations => {
         forEach(GROUP_INTERVALS, groupInterval => {
           groupInterval.label = translations[groupInterval.label];
         });

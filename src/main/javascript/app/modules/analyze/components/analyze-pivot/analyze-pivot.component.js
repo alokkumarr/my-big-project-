@@ -110,7 +110,7 @@ export const AnalyzePivotComponent = {
     loadPivotData() {
       const model = this.getModel();
       this._AnalyzeService.getDataBySettings(clone(model))
-        .then(({analysis, data}) => {
+        .then(({data}) => {
           this.normalizedData = data;
           this.deNormalizedData = this._PivotService.denormalizeData(data,
             this._PivotService.artifactColumns2PivotFields()(this.artifactColumns));
