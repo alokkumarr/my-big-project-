@@ -185,6 +185,9 @@ export const AnalyzeViewComponent = {
     }
 
     openEditModal(mode, model) {
+      if (mode === 'fork') {
+        model.name += ' Copy';
+      }
       const openModal = template => {
         this.showDialog({
           template,
