@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+
 public class SAWElasticSearchQueryBuilder {
 
   
@@ -15,8 +17,9 @@ public class SAWElasticSearchQueryBuilder {
    * @param jsonString
    * @return query
    * @throws AssertionError
+   * @throws ProcessingException 
    */
-  public String getQuery(EntityType type, String jsonString) throws AssertionError {
+  public String getQuery(EntityType type, String jsonString) throws AssertionError, ProcessingException {
     String query = null;
     try {
       assert (type.find(type) == null);
@@ -51,7 +54,7 @@ public class SAWElasticSearchQueryBuilder {
           type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString)
               .getSearchSourceBuilder() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString)
               .getSearchSourceBuilder();
-    } catch (IllegalStateException | IOException exception) {
+    } catch (IllegalStateException | IOException | ProcessingException exception) {
       throw new AssertionError("Type not supported :" + exception.getMessage());
     }
     return query;

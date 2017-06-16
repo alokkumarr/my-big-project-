@@ -16,16 +16,31 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 })
 public class SqlBuilderChart {
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("sqlBuilder")
     private SqlBuilder sqlBuilder;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("sqlBuilder")
     public SqlBuilder getSqlBuilder() {
         return sqlBuilder;
     }
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("sqlBuilder")
     public void setSqlBuilder(SqlBuilder sqlBuilder) {
         this.sqlBuilder = sqlBuilder;

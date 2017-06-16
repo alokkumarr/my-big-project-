@@ -255,7 +255,7 @@
           "type":"array"
         }
     },
-      "required":["sort","filters", "dataFields"]
+      "required":["sorts","filters", "dataFields"]
     }
   },
   "required":["sqlBuilder"]

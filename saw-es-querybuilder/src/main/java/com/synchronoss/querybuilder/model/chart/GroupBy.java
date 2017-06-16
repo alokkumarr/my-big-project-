@@ -22,8 +22,18 @@ import com.fasterxml.jackson.annotation.JsonValue;
 })
 public class GroupBy {
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("columnName")
     private String columnName;
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("type")
     private GroupBy.Type type;
     @JsonProperty("tableName")
@@ -35,21 +45,41 @@ public class GroupBy {
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("columnName")
     public String getColumnName() {
         return columnName;
     }
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("columnName")
     public void setColumnName(String columnName) {
         this.columnName = columnName;
     }
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("type")
     public GroupBy.Type getType() {
         return type;
     }
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("type")
     public void setType(GroupBy.Type type) {
         this.type = type;

@@ -26,6 +26,11 @@ public class Filter {
     private String columnName;
     @JsonProperty("isRuntimeFilter")
     private Filter.IsRuntimeFilter isRuntimeFilter;
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("model")
     private Model model;
     @JsonProperty("tableName")
@@ -55,11 +60,21 @@ public class Filter {
         this.isRuntimeFilter = isRuntimeFilter;
     }
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("model")
     public Model getModel() {
         return model;
     }
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("model")
     public void setModel(Model model) {
         this.model = model;

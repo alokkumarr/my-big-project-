@@ -26,6 +26,11 @@ public class SqlBuilder {
 
     @JsonProperty("columnFields")
     private List<ColumnField> columnFields = null;
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("dataFields")
     private List<DataField> dataFields = null;
     @JsonProperty("booleanCriteria")
@@ -54,11 +59,21 @@ public class SqlBuilder {
         this.columnFields = columnFields;
     }
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("dataFields")
     public List<DataField> getDataFields() {
         return dataFields;
     }
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("dataFields")
     public void setDataFields(List<DataField> dataFields) {
         this.dataFields = dataFields;

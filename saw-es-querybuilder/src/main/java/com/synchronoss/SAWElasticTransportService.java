@@ -12,7 +12,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
-import com.synchronoss.querybuilder.model.ESProxy;
+import com.synchronoss.ESProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

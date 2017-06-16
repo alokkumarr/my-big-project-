@@ -93,7 +93,8 @@ public class RowField {
         LONG("long"),
         DOUBLE("double"),
         INT("int"),
-        STRING("string");
+        STRING("string"),
+        FLOAT("float");
         private final String value;
         private final static Map<String, RowField.Type> CONSTANTS = new HashMap<String, RowField.Type>();
 

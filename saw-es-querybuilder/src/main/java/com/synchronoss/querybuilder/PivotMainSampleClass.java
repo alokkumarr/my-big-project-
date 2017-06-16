@@ -14,19 +14,24 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jackson.JsonLoader;
+import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import com.github.fge.jsonschema.core.report.ProcessingReport;
+import com.github.fge.jsonschema.main.JsonSchemaFactory;
+import com.github.fge.jsonschema.main.JsonValidator;
 import com.synchronoss.SAWElasticTransportService;
 import com.synchronoss.querybuilder.model.chart.Filter.Type;
 import com.synchronoss.querybuilder.model.pivot.Model.Operator;
-import com.synchronoss.querybuilder.model.pivot.SqlBuilder;
 import com.synchronoss.querybuilder.model.pivot.SqlBuilder.BooleanCriteria;
 
 public class PivotMainSampleClass {
 
-  public static void main(String[] args) throws JsonProcessingException, IOException {
+  public static void main(String[] args) throws JsonProcessingException, IOException, ProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     System.setProperty("host", "10.48.72.74");
@@ -38,8 +43,24 @@ public class PivotMainSampleClass {
         objectMapper.readTree(new File(
             "C:\\Users\\saurav.paul\\Desktop\\Sergey\\pivot_type_data.json"));
     // JsonNode objectNode = objectMapper.readTree(new File(args[0]));
-    JsonNode sqlNode = objectNode.get("sqlBuilder");
-    SqlBuilder sqlBuilderNode = objectMapper.treeToValue(sqlNode, SqlBuilder.class);
+    String json = "{ \"sqlBuilder\" :" + objectNode.get("sqlBuilder").toString() + "}";
+    JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
+    JsonValidator validator = factory.getValidator();
+    final JsonNode data = JsonLoader.fromString(json);
+    final JsonNode schema =
+        JsonLoader.fromFile(new File(PivotMainSampleClass.class.getResource(
+            "/com/synchronoss/querybuilder/model/pivot/pivot_querybuilder_schema.json").getFile()));
+    ProcessingReport report = validator.validate(schema, data);
+    if (report.isSuccess() == false) {
+      throw new ProcessingException(report.toString());
+    }
+    JsonNode objectNode1 = objectMapper.readTree(json);
+    com.synchronoss.querybuilder.model.pivot.SqlBuilderPivot sqlBuilderNodeChart =
+        objectMapper.treeToValue(objectNode1,
+            com.synchronoss.querybuilder.model.pivot.SqlBuilderPivot.class);
+    com.synchronoss.querybuilder.model.pivot.SqlBuilder sqlBuilderNode =
+        sqlBuilderNodeChart.getSqlBuilder();
+
     int size = 0;
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.size(size);
