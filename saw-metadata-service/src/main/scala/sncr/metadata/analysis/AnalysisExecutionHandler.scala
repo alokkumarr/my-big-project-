@@ -15,7 +15,7 @@ import sncr.metadata.engine.MDObjectStruct._
 import sncr.metadata.engine.{Fields, MetadataDictionary}
 import sncr.saw.common.config.SAWServiceConfig
 
-class AnalysisExecutionHandler(val nodeId : String) {
+class AnalysisExecutionHandler(val nodeId : String, sqlRuntime: String) {
 
   var status: String = "Unknown"
 
@@ -64,11 +64,13 @@ class AnalysisExecutionHandler(val nodeId : String) {
   m_log debug s"Check definition before extracting value ==> ${pretty(render(definition))}"
 
   val sqlManual = (definition \ "queryManual").extractOrElse[String]("")
-  val sql = if (sqlManual != "") sqlManual else (definition \ "query").extractOrElse[String]("")
+  val sqlDefinition = (definition \ "query").extractOrElse[String]("")
+  val sql = if (sqlManual != "") sqlManual else if (sqlRuntime != null) sqlRuntime else sqlDefinition
   val outputType = ( definition \ "outputFile" \ "outputFormat").extractOrElse[String]("")
   val outputLocation = ( definition \ "outputFile" \ "outputFileName").extractOrElse[String]("")
   val targetName = (definition \ "metricName").extract[String] + "_" + objectCount
 
+  m_log debug s"SQL: $sql"
   if (sql.isEmpty || outputType.isEmpty || outputLocation.isEmpty  )
     throw new Exception("Invalid Analysis object, one of the attribute is null/empty: SQL, outputType, outputLocation")
   else

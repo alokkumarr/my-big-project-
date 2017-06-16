@@ -102,6 +102,24 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       value must be ("21-DEC-16 11.14.05.000000 AM")
     }
 
+    "execute analysis with runtime filters" in {
+      /* Execute existing analysis with runtime filters*/
+      val runtimeFiltersJson: JObject = ("runtimeFilters", List(
+        ("filterType", "string") ~
+          ("booleanCriteria", "AND") ~
+          ("tableName", "MCT_SESSION") ~
+          ("columnName", "TRANSFER_END_TS") ~
+          /* Because the query normally returns rows, intentionally use filter
+           * that doesn't match any rows to ensure filter is in
+           * effect */
+          ("searchConditions", JArray(List("nonexistent")))))
+      val body = actionKeysMessage("execute", ("id", id), runtimeFiltersJson)
+      val response = analyze(sendRequest(body))
+      /* Expect zero rows in result because runtime filter is designed to
+       * rejects all rows */
+      extractArray(response, "data").length must be (0)
+    }
+
     "execute analysis with manual query" in {
       /* Update previously executed analysis */
       val manualJson: JValue = ("queryManual", "SELECT 1 AS a")
@@ -115,11 +133,12 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
     }
 
     "list analysis executions" in {
-      //cancel("Skip slow test dependency")
       /* List results of previously executed analysis */
       val response = sendGetRequest("/analysis/%s/executions".format(id))
       val results = extractArray(response, "execution")
-      results.length must be (2)
+      /* There are three executions in the preceding tests, so the results
+       * list should contain three elements */
+      results.length must be (3)
       executionId = (results(0) \ "id").extract[String]
     }
 

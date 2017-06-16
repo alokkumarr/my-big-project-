@@ -26,7 +26,7 @@ public class AnalysisExecutionRunner {
             OutputStream outStream = HFileOperations.writeToFile(cl.getOptionValue('o'));
             System.out.println("Start data processing:\n input analysis ID: " + cl.getOptionValue('i') + "\nOutput path: " + cl.getOptionValue('o'));
             ExecutionTaskHandler er = new ExecutionTaskHandler(1);
-            AnalysisExecutionHandler aeh = new AnalysisExecutionHandler(id);
+            AnalysisExecutionHandler aeh = new AnalysisExecutionHandler(id, null);
             try {
                 er.startSQLExecutor(aeh);
                 String analysisResultId = er.getPredefResultRowID(id);

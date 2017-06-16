@@ -8,7 +8,7 @@ import org.json4s.native.JsonMethods._
 object QueryBuilder {
   implicit val formats = DefaultFormats
 
-  def build(json: JValue): String = {
+  def build(json: JValue, runtime: Boolean = false): String = {
     val artifacts = json \ "artifacts" match {
       case artifacts: JArray => artifacts.arr
       case JNothing => List()
@@ -19,10 +19,19 @@ object QueryBuilder {
       case JNothing => JObject()
       case obj: JValue => unexpectedElement(obj)
     }
+    val runtimeFilters = if (runtime) {
+      json \ "runtimeFilters" match {
+        case JNothing => List.empty
+        case obj: JArray => obj.arr
+        case obj => unexpectedElement(obj)
+      }
+    } else {
+      List.empty
+    }
     "%s %s %s %s %s".format(
       buildSelect(artifacts, sqlBuilder),
       buildFrom(artifacts, sqlBuilder),
-      buildWhere(sqlBuilder),
+      buildWhere(sqlBuilder, runtimeFilters),
       buildGroupBy(artifacts, sqlBuilder),
       buildOrderBy(sqlBuilder)
     ).replaceAll("\\s+", " ").trim
@@ -117,12 +126,14 @@ object QueryBuilder {
       columns.filter(columnChecked(_)).length > 0
   }
 
-  private def buildWhere(sqlBuilder: JObject): String = {
-    val filters = ((sqlBuilder \ "filters" match {
+  private def buildWhere(
+    sqlBuilder: JObject, runtimeFilters: List[JValue]): String = {
+    val sqlBuilderFilters = (sqlBuilder \ "filters") match {
       case filters: JArray => filters.arr
       case JNothing => List()
       case json: JValue => unexpectedElement(json)
-    }) match {
+    }
+    val filters = ((sqlBuilderFilters ++ runtimeFilters) match {
       case Nil => Nil
       case x :: xs => unsetBooleanCriteria(x) :: xs
     }).map(buildWhereFilterElement(_))
