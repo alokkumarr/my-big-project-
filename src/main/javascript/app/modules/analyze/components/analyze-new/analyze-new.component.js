@@ -56,8 +56,9 @@ export const AnalyzeNewComponent = {
       let tpl;
       let model;
       let type;
+      const semanticId = this.selectedMetric.id;
+      const metricName = this.selectedMetric.metricName;
 
-      const metricId = (this.selectedMetric || {}).id;
       switch (this.selectedAnalysisMethod) {
         case 'table:report':
           tpl = '<analyze-report model="model"></analyze-report>';
@@ -66,8 +67,8 @@ export const AnalyzeNewComponent = {
             name: 'Untitled Analysis',
             description: '',
             categoryId: this.subCategory,
-            semanticId: metricId,
-            metricName: this.selectedMetric.name,
+            semanticId,
+            metricName,
             scheduled: null
           };
           break;
@@ -78,7 +79,7 @@ export const AnalyzeNewComponent = {
             name: 'Untitled Analysis',
             description: '',
             categoryId: this.subCategory,
-            semanticId: this.selectedMetric,
+            semanticId,
             scheduled: null
           };
           break;
@@ -93,9 +94,10 @@ export const AnalyzeNewComponent = {
             type: AnalyseTypes.Chart,
             chartType: type,
             name: 'Untitled Chart',
+            metricName,
+            semanticId,
             description: '',
             categoryId: this.subCategory,
-            semanticId: this.selectedMetric,
             scheduled: null
           };
           break;

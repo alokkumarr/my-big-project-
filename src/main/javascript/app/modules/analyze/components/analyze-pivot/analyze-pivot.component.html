@@ -26,8 +26,8 @@
   </analyze-dialog-header>
 
   <analyze-dialog-content>
-    <analyze-pivot-settings on-apply-field-settings="$ctrl.onApplyFieldSettings()"
-                            field-chooser-options="$ctrl.fieldChooserOptions">
+    <analyze-pivot-settings on-apply-settings="$ctrl.onApplySettings(columns)"
+                            reciever="$ctrl.settingsReciever">
     </analyze-pivot-settings>
 
     <div layout="column">
@@ -40,7 +40,7 @@
         <span class="ard_toolbar-text" flex="25"
               translate="PIVOT"></span>
 
-        <div class="ard_toolbar-actions" flex="70">
+        <div class="ard_toolbar-actions" flex="70" layot="row" layout-wrap>
           <md-button ng-class="$ctrl.settingsModified ? 'btn-primary' : 'action'" ng-click="$ctrl.onRefreshData()">
             <span translate="REFRESH_DATA"></span>
           </md-button>
@@ -74,7 +74,8 @@
                         on-clear-all-filters="$ctrl.onClearAllFilters()"
                         on-filter-removed="$ctrl.onFilterRemoved(index)">
           </filter-chips>
-          <pivot-grid updater="$ctrl.pivotGridUpdater" send-fields="$ctrl.onGetFields(fields)"></pivot-grid>
+          <pivot-grid updater="$ctrl.pivotGridUpdater"
+                      mode="designer"></pivot-grid>
         </md-card-content>
       </md-card>
     </div>

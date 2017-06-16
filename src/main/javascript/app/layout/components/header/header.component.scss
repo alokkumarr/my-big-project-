@@ -21,7 +21,9 @@ layout-header {
 
 .root-container > layout-header {
   position: fixed;
-  z-index: 10;
+  // the z-index of the modal-backdrop is 79
+  // the z-index of the sidenav is 60
+  z-index: 70;
   width: 100%;
   max-width: 1600px;
 

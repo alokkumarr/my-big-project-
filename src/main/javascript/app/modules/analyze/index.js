@@ -21,6 +21,7 @@ import {AnalyzePivotDetailComponent} from './components/analyze-published-detail
 import {AnalyzeChartDetailComponent} from './components/analyze-published-detail/chart/analyze-chart-detail.component';
 import {AnalyzePublishedDetailComponent} from './components/analyze-published-detail/analyze-published-detail.component';
 import {AnalyzeNewComponent} from './components/analyze-new/analyze-new.component';
+import {pivotAreaTypeFilter} from './filters/pivot-area-type.filter';
 import {AnalyzePivotSettingsComponent} from './components/analyze-pivot-settings/analyze-pivot-settings.component';
 import {AnalyzePivotPreviewComponent} from './components/analyze-pivot-preview/analyze-pivot-preview.component';
 import {PivotGridComponent} from './components/analyze-pivot-grid/pivot-grid.component';
@@ -56,6 +57,7 @@ angular.module(AnalyzeModule, [])
   .run(transitions)
   .config(routesConfig)
   .config(i18nConfig)
+  .filter('pivotAreaTypeFilter', pivotAreaTypeFilter)
   .factory('FilterService', FilterService)
   .factory('AnalyzeService', AnalyzeService)
   .factory('PivotService', PivotService)
