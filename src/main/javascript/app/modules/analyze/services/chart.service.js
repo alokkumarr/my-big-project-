@@ -89,7 +89,7 @@ export function ChartService() {
 
     const config = {
       chart: {
-        type: type || 'column',
+        type: (type === 'line' ? 'spline' : type) || 'column',
         spacingLeft: SPACING,
         spacingRight: SPACING,
         spacingBottom: SPACING,

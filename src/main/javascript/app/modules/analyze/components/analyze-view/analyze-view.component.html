@@ -12,7 +12,7 @@
 
       <div layout="row" layout-align="start center">
         <md-input-container class="analyze-view_switch-view">
-          <md-radio-group ng-model="$ctrl.states.reportView">
+          <md-radio-group ng-model="$ctrl.states.reportView" ng-change="$ctrl.onReportViewChange()">
             <md-radio-button ng-value="$ctrl.LIST_VIEW">
               <md-icon md-font-icon="icon-Table-view">
                 <md-tooltip ng-bind="'TOOLTIP_LIST_VIEW' | translate"></md-tooltip>
