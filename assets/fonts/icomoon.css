@@ -40,6 +40,12 @@
   content: "\e93b";
 }
 
+.icon-Count:before {
+  content: "#";
+  font-size: 26px;
+  font-weight: bolder;
+}
+
 .icon-Table-view:before {
   content: "\e933";
 }
@@ -302,4 +308,14 @@
 
 .icon-data:before {
   content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAARElEQVQoz2P4z4AfMhClIOE/NkiSAl+ooG8CQwKIzwChEQpQlGBXgKYEwxeoSrB6k7ACfFYkYPgDXQGKdAItQpKi2AQAaDQFJxj4SdQAAAAASUVORK5CYII=);
+}
+
+.icon-string-type:before {
+  content: 'abc';
+  font-weight: bolder;
+}
+
+.icon-number-type:before {
+  content: '123';
+  font-weight: bolder;
 }

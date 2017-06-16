@@ -296,7 +296,7 @@ export const AnalyzePivotComponent = {
 
       return {
         filters: map(this.filters, this._FilterService.frontend2BackendFilter()),
-        sort: this.mapFrontend2BackendSort(this.sorts),
+        sorts: this.mapFrontend2BackendSort(this.sorts),
         rowFields: groupedFields.row,
         columnFields: groupedFields.column,
         dataFields: groupedFields.data
