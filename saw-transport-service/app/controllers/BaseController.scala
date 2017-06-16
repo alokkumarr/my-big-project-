@@ -108,7 +108,9 @@ class BaseController extends Controller {
   }
 
   protected def serverErrorResponse(message: String): Result = {
-    val response: JObject = ("error", ("message", message))
+    val response: JObject = ("error",
+      ("type", "internal-server-error") ~
+      ("message", message))
     Results.internalServerError(playJson(response))
   }
 
