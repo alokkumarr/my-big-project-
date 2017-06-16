@@ -11,6 +11,8 @@
   "CHARTS": "Charts",
   "CLEAR_ALL": "Clear all",
   "CLEAR_ALL_FILTERS": "Clear all filters",
+  "DAY": "Day",
+  "DAY_OF_WEEK": "Day of week",
   "DESCRIPTION": "Description",
   "DONE": "Done",
   "DRAFT": "Draft",
@@ -26,6 +28,7 @@
   "LIST": "LIST",
   "LOAD_MORE_ROWS": "Load {{nrOfRows}} More Rows",
   "LOG_OUT": "Log out",
+  "MONTH": "Month",
   "MORE": "More",
   "NEVER": "Never",
   "NO_MATCHING_RESULTS": "No matching results",
@@ -60,11 +63,13 @@
   "PREVIEW": "Preview",
   "PRINT": "Print",
   "PUBLISH": "Publish",
+  "QUARTER": "Quarter",
   "TO": "To",
   "UPLOAD": "Upload",
   "UNDO": "Undo",
   "VIEW": "View",
   "VEW_N_MORE": "View {{value}} more",
+  "YEAR": "Year",
 
   "MONDAY": "Monday",
   "TUESDAY": "Tuesday",
@@ -77,6 +82,6 @@
   "TOOLTIP_SEARCH": "Search",
   "TOOLTIP_LIST_VIEW": "List View",
   "TOOLTIP_CARD_VIEW": "Card View",
-  
+
   "ERROR_OOPS_SERVER": "Oops, it looks like something went wrong with the server, if you see this message regularly, please contact customer support."
 }

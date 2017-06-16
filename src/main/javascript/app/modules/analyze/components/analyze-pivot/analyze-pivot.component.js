@@ -67,21 +67,17 @@ export const AnalyzePivotComponent = {
         this.loadPivotData().then(() => {
           this.filters = map(this.model.filters,
             this._FilterService.backend2FrontendFilter(this.model.artifacts));
-          this.sortFields = this.getFieldToSortFieldMapper()(
-            this._PivotService.artifactColumns2PivotFields()(this.artifactColumns)
-          );
+          this.sortFields = this.getArtifactColumns2SortFieldMapper()(this.artifactColumns);
           this.sorts = this.mapBackend2FrontendSort(this.model.sorts, this.sortFields);
         });
       }
     }
 
     onApplySettings(columns) {
-      console.log('old columns: ', this.artifactColumns);
       this.artifactColumns = columns;
-      console.log('new columns: ', columns);
-      const pivotFields = this._PivotService.artifactColumns2PivotFields()(this.artifactColumns);
-      this.sortFields = this.getFieldToSortFieldMapper()(pivotFields);
+      this.sortFields = this.getArtifactColumns2SortFieldMapper()(this.artifactColumns);
       this.settingsModified = true;
+      const pivotFields = this._PivotService.artifactColumns2PivotFields()(this.artifactColumns);
       this.setDataSource(this.dataSource.store, pivotFields);
     }
 
@@ -161,14 +157,16 @@ export const AnalyzePivotComponent = {
     }
 // END filters
 
-    getFieldToSortFieldMapper() {
+    getArtifactColumns2SortFieldMapper() {
       return fpPipe(
-        fpFilter(field => !DATE_TYPES.includes(field.dataType)),
-        fpMap(field => {
+        fpFilter(artifactColumn => artifactColumn.checked &&
+          (artifactColumn.area === 'row' || artifactColumn.area === 'column')),
+        fpFilter(artifactColumn => !DATE_TYPES.includes(artifactColumn.dataType)),
+        fpMap(artifactColumn => {
           return {
-            type: field.dataType,
-            dataField: field.dataField,
-            label: field.caption
+            type: artifactColumn.type,
+            dataField: artifactColumn.columnName,
+            label: artifactColumn.alias || artifactColumn.displayName
           };
         })
       );
@@ -226,7 +224,6 @@ export const AnalyzePivotComponent = {
 
     openPreviewModal(ev) {
       const tpl = '<analyze-pivot-preview model="model"></analyze-pivot-preview>';
-      this.updateFields();
 
       this._$mdDialog
         .show({
@@ -296,11 +293,6 @@ export const AnalyzePivotComponent = {
           })
         ),
       )(this.artifactColumns);
-      groupedFields.column = map(groupedFields.column, field => {
-        return assign(field, {
-          groupInterval: 'month'
-        });
-      });
 
       return {
         filters: map(this.filters, this._FilterService.frontend2BackendFilter()),
@@ -313,8 +305,6 @@ export const AnalyzePivotComponent = {
 
     openSaveModal(ev) {
       const model = this.getModel();
-      // this.model.filters = map(this.filters, this._FilterService.frontend2BackendFilter());
-      // this.model.sorts = this.mapFrontend2BackendSort(this.sorts);
       const tpl = '<analyze-report-save model="model" on-save="onSave($data)"></analyze-report-save>';
 
       this._$mdDialog

@@ -2,9 +2,11 @@ import fpGroupBy from 'lodash/fp/groupBy';
 import fpPipe from 'lodash/fp/pipe';
 import fpMapValues from 'lodash/fp/mapValues';
 import cloneDeep from 'lodash/cloneDeep';
+import forEach from 'lodash/forEach';
 
 import template from './analyze-pivot-settings.component.html';
 import style from './analyze-pivot-settings.component.scss';
+import {DATE_TYPES} from '../../consts';
 
 export const ANALYZE_PIVOT_SETTINGS_SIDENAV_ID = 'ANALYZE_PIVOT_SETTINGS_SIDENAV_ID';
 
@@ -91,6 +93,23 @@ const ARTIFACT_ICON_TYPES_OBJ = {
   }
 };
 
+const GROUP_INTERVALS = [{
+  label: 'YEAR',
+  value: 'year'
+}, {
+  label: 'QUARTER',
+  value: 'quarter'
+}, {
+  label: 'MONTH',
+  value: 'month'
+}, {
+  label: 'DAY',
+  value: 'day'
+}, {
+  label: 'DAY_OF_WEEK',
+  value: 'dayOfWeek'
+}];
+
 const DEFAULT_AREA_TYPE = AREA_TYPES[0];
 const AREA_TYPES_OBJ = fpPipe(
   fpGroupBy('value'),
@@ -105,7 +124,7 @@ export const AnalyzePivotSettingsComponent = {
     reciever: '<'
   },
   controller: class AnalyzePivotSettingsController {
-    constructor(AnalyzeService, FilterService, $mdSidenav) {
+    constructor(AnalyzeService, FilterService, $mdSidenav, $translate) {
       'ngInject';
       // TODO filter possible areas based on column type
       this.AGGREGATE_TYPES = AGGREGATE_TYPES;
@@ -116,16 +135,26 @@ export const AnalyzePivotSettingsComponent = {
       this.AREA_TYPES_OBJ = AREA_TYPES_OBJ;
       this.DEFAULT_AREA_TYPE = DEFAULT_AREA_TYPE;
 
+      this.GROUP_INTERVALS = GROUP_INTERVALS;
+
       this.ARTIFACT_ICON_TYPES_OBJ = ARTIFACT_ICON_TYPES_OBJ;
 
       this.ANALYZE_PIVOT_SETTINGS_SIDENAV_ID = ANALYZE_PIVOT_SETTINGS_SIDENAV_ID;
 
+      this.DATE_TYPES = DATE_TYPES;
+
       this._FilterService = FilterService;
       this._AnalyzeService = AnalyzeService;
       this._$mdSidenav = $mdSidenav;
+      this._$translate = $translate;
     }
 
     $onInit() {
+      this._$translate(GROUP_INTERVALS).then(translations => {
+        forEach(GROUP_INTERVALS, groupInterval => {
+          groupInterval.label = translations[groupInterval.label];
+        });
+      });
       this.subscribtion = this.reciever.subscribe(event => this.onRecieve(event));
     }
 
@@ -169,6 +198,10 @@ export const AnalyzePivotSettingsComponent = {
 
     onSelectAggregateType(aggregateType, artifactColumn) {
       artifactColumn.aggregate = aggregateType.value;
+    }
+
+    onSelectGroupInterval(groupInterval, artifactColumn) {
+      artifactColumn.groupInterval = groupInterval.value;
     }
 
     inputChanged(field) {
