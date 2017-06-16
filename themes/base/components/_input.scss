@@ -8,3 +8,9 @@
   font-size: $input-font-size;
   height: 34px;
 }
+
+md-input-container {
+  .md-input.ng-invalid.ng-dirty {
+    padding: 5px;
+  }
+}

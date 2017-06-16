@@ -1,4 +1,4 @@
-<div flex-gt-sm="50" ng-repeat="report in $ctrl.analyses | filter:$ctrl.filterReports">
+<div flex-gt-md="33" flex-md="50" flex="100" ng-repeat="report in $ctrl.analyses | filter:$ctrl.filterReports">
   <analyze-card model="report" on-action="$ctrl.onCardAction(type, model)"
                 highlight-term="$ctrl.searchTerm"></analyze-card>
 </div>
@@ -7,4 +7,3 @@
       ng-if="$ctrl.searchTerm && !$ctrl.analyses.length">
   <span translate="NO_MATCHING_RESULTS"></span>
 </div>
-

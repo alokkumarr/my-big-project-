@@ -83,6 +83,7 @@ export const AnalyzeReportComponent = {
           this.model = defaultsDeep(this.model, {
             id: analysis.id,
             metric: analysis.metric,
+            createdTimestamp: analysis.createdTimestamp,
             metricName: analysis.metricName
           });
 

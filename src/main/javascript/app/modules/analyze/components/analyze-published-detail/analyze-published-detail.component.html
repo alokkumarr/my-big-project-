@@ -17,29 +17,58 @@
       </div>
 
       <div>
-        <md-button class="btn-tertiary" ng-click="$ctrl.executeAnalysis()">
-          <md-icon md-font-icon="icon-upload"></md-icon>
-          <span translate="EXECUTE"></span>
-        </md-button>
 
-        <md-button class="btn-tertiary" ng-click="$ctrl.exportData()">
-          <md-icon md-font-icon="icon-export"></md-icon>
-          <span translate="EXPORT"></span>
-        </md-button>
+        <md-menu-bar>
+          <md-menu>
+            <md-button class="md-icon-button" aria-label="More"
+                       ng-click="$mdMenu.open()">
+              <md-icon md-font-icon="icon-more"></md-icon>
+            </md-button>
 
-        <md-button class="btn-tertiary" ng-click="$ctrl.openPrintModal()">
-          <md-icon md-font-icon="icon-print"></md-icon>
-          <span translate="PRINT"></span>
-        </md-button>
-
-        <md-button ng-hide="$ctrl.isPublished" class="btn-tertiary" ng-click="$ctrl.openEditModal()">
-          <md-icon md-font-icon="icon-edit"></md-icon>
-          <span translate="EDIT"></span>
-        </md-button>
+            <md-menu-content>
+              <md-menu-item>
+                <md-button aria-label="Execute"
+                          ng-click="$ctrl.executeAnalysis()"
+                          translate="EXECUTE">
+                </md-button>
+              </md-menu-item>
+              <md-menu-item>
+                <md-button aria-label="Fork"
+                           ng-if="::$ctrl.analysis"
+                           ng-click="$ctrl.openEditModal('fork')"
+                           translate="FORK_AND_EDIT">
+                </md-button>
+              </md-menu-item>
+              <md-menu-item>
+                <md-button aria-label="Edit"
+                           ng-if="::$ctrl.analysis"
+                           ng-click="$ctrl.openEditModal('edit')"
+                           translate="EDIT">
+                </md-button>
+              </md-menu-item>
+              <md-menu-item>
+                <md-button ng-click="$ctrl.exportData()">
+                  <span translate="EXPORT"></span>
+                </md-button>
+              </md-menu-item>
+              <md-menu-item>
+                <md-button ng-click="ctrl.openPrintModal()">
+                  <span translate="PRINT"></span>
+                </md-button>
+              </md-menu-item>
+              <md-menu-item>
+                <md-button ng-click="$ctrl.openDeleteModal()">
+                  <span translate="DELETE" md-colors="{color: 'warn'}"></span>
+                </md-button>
+              </md-menu-item>
+            </md-menu-content>
+          </md-menu>
+        </md-menu-bar>
 
         <md-button ng-hide="$ctrl.isPublished" class="btn-primary" ng-click="$ctrl.openPublishModal()">
           <span translate="PUBLISH"></span>
         </md-button>
+
       </div>
     </div>
   </md-toolbar>
@@ -64,7 +93,16 @@
             translate-values="{analysis: $ctrl.analysis.forkedFrom.analysisName, creator: $ctrl.analysis.forkedFrom.creatorName}"></span>
     </md-card-footer>
   </md-card>
-  <panel start-collapsed="false" title="'OTHER_PUBLISHED_ANALYSES' | translate">
-    <analyze-published-list analyses="$ctrl.analyses"></analyze-published-list>
+  <panel start-collapsed="false" ng-if="$ctrl.analyses" title="'OTHER_PUBLISHED_ANALYSES' | translate">
+    <div class="prompt-execution-container" ng-if="!$ctrl.analyses.length">
+      <span translate="NO_PREVIOUS_EXECUTION"></span>
+      <div>
+        <md-button class="btn-primary" ng-click="$ctrl.executeAnalysis()">
+          <span translate="EXECUTE"></span>
+        </md-button>
+      </div>
+    </div>
+
+    <analyze-published-list ng-if="$ctrl.analyses.length" analysis="$ctrl.analysis" analyses="$ctrl.analyses"></analyze-published-list>
   </panel>
 </div>
