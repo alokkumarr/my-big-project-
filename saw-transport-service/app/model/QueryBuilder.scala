@@ -128,25 +128,25 @@ object QueryBuilder {
 
   private def buildWhere(
     sqlBuilder: JObject, runtimeFilters: List[JValue]): String = {
-    val sqlBuilderFilters = (sqlBuilder \ "filters") match {
+    val sqlBuilderFilters = ((sqlBuilder \ "filters") match {
       case filters: JArray => filters.arr
       case JNothing => List()
       case json: JValue => unexpectedElement(json)
-    }
-    val filters = ((sqlBuilderFilters ++ runtimeFilters) match {
-      case Nil => Nil
-      case x :: xs => unsetBooleanCriteria(x) :: xs
-    }).map(buildWhereFilterElement(_))
-    if (filters.isEmpty)
+    }).filter((filter: JValue) => {
+      !(filter \ "isRuntimeFilter").extract[Boolean]
+    })
+    val filters = (sqlBuilderFilters ++ runtimeFilters).map(
+      buildWhereFilterElement(_))
+    if (filters.isEmpty) {
       ""
-    else
-      "WHERE " + filters.mkString(" ")
-  }
-
-  private def unsetBooleanCriteria(filter: JValue) = {
-    filter match {
-      case obj: JObject => obj merge(("booleanCriteria", "") : JObject)
-      case value: JValue => unexpectedElement(value)
+    } else {
+      val booleanCriteria = (
+        sqlBuilder \ "booleanCriteria").extractOrElse[String]("and").toLowerCase
+      if (!List("and", "or").contains(booleanCriteria)) {
+        throw new RuntimeException(
+          "Unrecognized boolean criteria: " + booleanCriteria)
+      }
+      "WHERE " + filters.mkString(" " + booleanCriteria.toUpperCase + " ")
     }
   }
 
@@ -154,38 +154,44 @@ object QueryBuilder {
     def property(name: String) = {
       (filter \ name).extract[String]
     }
-    val searchCondition = ((filter \ "searchConditions") match {
-      case array: JArray => array.arr
-      case value: JValue => unexpectedElement(value)
-    }).map(_.extract[String])
-
-    val condition = property("filterType") match {
-      case "integer" | "long" | "double" => {
-        val operator = property("operator")
-        if (operator.toLowerCase == "between")
-          "BETWEEN %s AND %s".format(searchCondition(0), searchCondition(1))
-        else
-          "%s %s".format(operator, searchCondition(0))
+    def subProperty(name: String, subname: String) = {
+      (filter \ name \ subname).extract[String]
+    }
+    val condition = property("type") match {
+      case "int" | "long" | "float" | "double" => {
+        val operator = subProperty("model", "operator").toLowerCase
+        val value = subProperty("model", "value")
+        if (operator == "btw") {
+          val otherValue = subProperty("model", "otherValue")
+          "BETWEEN %s AND %s".format(value, otherValue)
+        } else {
+          val operatorSql = operator match {
+            case "gt" => ">"
+            case "lt" => "<"
+            case "gte" => ">="
+            case "lte" => "<="
+            case "eq" => "="
+            case "neq" => "!="
+            case obj => unexpectedElement("Operator: " + obj)
+          }
+          "%s %s".format(operatorSql, value)
+        }
       }
       case "string" => {
-        "IN (" + searchCondition.map("'" + _ + "'").mkString(", ") + ")"
+         val modelValues = ((filter \ "model" \ "modelValues") match {
+           case array: JArray => array.arr
+           case obj => unexpectedElement("Model values: " + obj)
+         }).map(_.extract[String])
+        "IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
       }
-      case "date" => {
-        val operator = property("operator")
-        if (operator.toLowerCase == "between")
-          "BETWEEN TO_DATE('%s') AND TO_DATE('%s')".format(
-            searchCondition(0), searchCondition(1))
-        else
-          throw new ClientException("Unknown date filter operator: " + operator)
+      case "date" | "timestamp" => {
+        val lte = subProperty("model", "lte")
+        val gte = subProperty("model", "gte")
+        "BETWEEN TO_DATE('%s') AND TO_DATE('%s')".format(lte, gte)
       }
       case obj: String => throw ClientException("Unknown filter type: " + obj)
     }
-    "%s %s.%s %s".format(
-      property("booleanCriteria"),
-      property("tableName"),
-      property("columnName"),
-      condition
-    )
+    "%s.%s %s".format(property("tableName"), property("columnName"), condition)
   }
 
   private def buildGroupBy(

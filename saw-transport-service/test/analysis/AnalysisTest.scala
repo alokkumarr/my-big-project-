@@ -105,14 +105,14 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
     "execute analysis with runtime filters" in {
       /* Execute existing analysis with runtime filters*/
       val runtimeFiltersJson: JObject = ("runtimeFilters", List(
-        ("filterType", "string") ~
-          ("booleanCriteria", "AND") ~
+        ("type", "string") ~
           ("tableName", "MCT_SESSION") ~
           ("columnName", "TRANSFER_END_TS") ~
           /* Because the query normally returns rows, intentionally use filter
            * that doesn't match any rows to ensure filter is in
            * effect */
-          ("searchConditions", JArray(List("nonexistent")))))
+          ("model", ("modelValues", List("nonexistent"))) ~
+          ("isRuntimeFilter", true)))
       val body = actionKeysMessage("execute", ("id", id), runtimeFiltersJson)
       val response = analyze(sendRequest(body))
       /* Expect zero rows in result because runtime filter is designed to

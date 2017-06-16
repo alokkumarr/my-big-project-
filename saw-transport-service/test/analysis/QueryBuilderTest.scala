@@ -1,3 +1,5 @@
+import org.json4s.native.JsonMethods._
+
 import org.json4s.JsonAST._
 import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods.parse
@@ -41,30 +43,48 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
         "t INNER JOIN u INNER JOIN v ON (t.a = u.c AND u.c = v.g)")
     }
     it("with integer filter should have a WHERE clause with condition") {
-      query(artifactT)(filters(filter("integer", "AND", "t", "a", ">", "1"))
+      query(artifactT)(filters("AND", filterBinary("int", "t", "a", "gt", "1"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a > 1")
     }
+    it("with long filter should have a WHERE clause with condition") {
+      query(artifactT)(filters("AND", filterBinary("long", "t", "a", "lt", "1"))
+      ) must be ("SELECT t.a, t.b FROM t WHERE t.a < 1")
+    }
+    it("with float filter should have a WHERE clause with condition") {
+      query(artifactT)(filters("AND", filterBinary("float", "t", "a", "eq", "1.0"))
+      ) must be ("SELECT t.a, t.b FROM t WHERE t.a = 1.0")
+    }
+    it("with double filter should have a WHERE clause with condition") {
+      query(artifactT)(filters("AND", filterBinary("double", "t", "a", "neq", "1.0"))
+      ) must be ("SELECT t.a, t.b FROM t WHERE t.a != 1.0")
+    }
     it("with long between filter should have a WHERE clause with BETWEEN") {
-      query(artifactT)(filters(filter(
-        "long", "AND", "t", "a", "between", "1", "2"))
+      query(artifactT)(filters("AND", filterBinary(
+        "long", "t", "a", "btw", "1", "2"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a BETWEEN 1 AND 2")
     }
     it("with string filter should have a WHERE clause with condition") {
-      query(artifactT)(filters(filter(
-        "string", "AND", "t", "a", null, "abc", "def"))
+      query(artifactT)(filters("AND", filterString(
+        "string", "t", "a", "abc", "def"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a IN ('abc', 'def')")
     }
     it("with date between filter should have a WHERE clause with BETWEEN") {
-      query(artifactT)(filters(filter(
-        "date", "AND", "t", "a", "between", "2017-01-01", "2017-01-02"))
+      query(artifactT)(filters("AND", filterDate(
+        "date", "t", "a", "2017-01-01", "2017-01-02"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a BETWEEN " +
         "TO_DATE('2017-01-01') AND TO_DATE('2017-01-02')")
     }
-    it("with two filters should have a WHERE clause with one AND") {
-      query(artifactT)(filters(
-        filter("double", "AND", "t", "a", ">", "1"),
-        filter("double", "AND", "t", "b", "<", "2"))
-      ) must be ("SELECT t.a, t.b FROM t WHERE t.a > 1 AND t.b < 2")
+    it("with timestamp between filter should have a WHERE clause with BETWEEN") {
+      query(artifactT)(filters("AND", filterDate(
+        "timestamp", "t", "a", "2017-01-01T00:00:00Z", "2017-01-02T00:00:00Z"))
+      ) must be ("SELECT t.a, t.b FROM t WHERE t.a BETWEEN " +
+        "TO_DATE('2017-01-01T00:00:00Z') AND TO_DATE('2017-01-02T00:00:00Z')")
+    }
+    it("with two filters should have a WHERE clause with one OR") {
+      query(artifactT)(filters("OR",
+        filterBinary("float", "t", "a", "gte", "1"),
+        filterBinary("double", "t", "b", "lte", "2"))
+      ) must be ("SELECT t.a, t.b FROM t WHERE t.a >= 1 OR t.b <= 2")
     }
     it("with order by columns should have an ORDER BY clause") {
       val orderByA = orderByColumn("t", "a", "ASC")
@@ -148,18 +168,47 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
       ("tableName", table2Name) ~ ("columnName", column2Name))))
   }
 
-  private def filters(filters: JObject*): JObject = {
+  private def filters(bool: String, filters: JObject*): JObject = {
+    ("booleanCriteria", bool) ~
     ("filters", filters.toList)
   }
 
-  private def filter(filterType: String, bool: String, tableName: String,
-    columnName: String, operator: String, conditions: String*): JObject = {
-    ("filterType", filterType) ~
-    ("booleanCriteria", bool) ~
+  private def filterCommon(filterType: String, tableName: String,
+    columnName: String, operator: String): JObject = {
+    val operatorJson: JObject = if (operator != null) {
+      ("operator", operator)
+    } else {
+      JObject()
+    }
+    ("type", filterType) ~
     ("tableName", tableName) ~
     ("columnName", columnName) ~
-    ("operator", operator) ~
-    ("searchConditions", JArray(conditions.map(JString(_)).toList))
+    ("model", operatorJson) ~
+    ("isRuntimeFilter", false)
+  }
+
+  private def filterBinary(filterType: String, tableName: String,
+    columnName: String, operator: String, value: String,
+    otherValue: String = null): JObject = {
+    val otherValueJson: JObject = if (otherValue != null) {
+      ("otherValue", otherValue)
+    } else {
+      JObject()
+    }
+    filterCommon(filterType, tableName, columnName, operator).merge(
+      ("model", ("value", value) ~ otherValueJson): JObject)
+  }
+
+  private def filterString(filterType: String, tableName: String,
+    columnName: String, values: String*): JObject = {
+    filterCommon(filterType, tableName, columnName, null).merge(
+      ("model", ("modelValues", JArray(values.map(JString(_)).toList))): JObject)
+  }
+
+  private def filterDate(filterType: String, tableName: String,
+    columnName: String, lte: String, gte: String): JObject = {
+    filterCommon(filterType, tableName, columnName, null).merge(
+      ("model", ("lte", lte) ~ ("gte", gte)): JObject)
   }
 
   private def orderBy(columns: JObject*) = {
