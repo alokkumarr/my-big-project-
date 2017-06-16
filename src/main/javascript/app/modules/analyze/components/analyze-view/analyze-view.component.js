@@ -12,7 +12,7 @@ export const AnalyzeViewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeViewController extends AbstractComponentController {
-    constructor($injector, $compile, AnalyzeService, $state, $mdDialog, $mdToast, $rootScope) {
+    constructor($injector, $compile, AnalyzeService, $state, $mdDialog, $mdToast, $rootScope, localStorageService) {
       'ngInject';
       super($injector);
 
@@ -20,6 +20,7 @@ export const AnalyzeViewComponent = {
       this._AnalyzeService = AnalyzeService;
       this._$state = $state;
       this._$mdDialog = $mdDialog;
+      this._localStorageService = localStorageService;
       this._$mdToast = $mdToast;
       this._$rootScope = $rootScope;
       this._analysisCache = [];
@@ -27,8 +28,12 @@ export const AnalyzeViewComponent = {
       this.LIST_VIEW = 'list';
       this.CARD_VIEW = 'card';
 
+      const savedView = localStorageService.get('analyseReportView');
+
       this.states = {
-        reportView: 'card',
+        reportView: [this.LIST_VIEW, this.CARD_VIEW].indexOf(savedView) >= 0 ?
+          savedView :
+          this.CARD_VIEW,
         analysisType: 'all',
         searchTerm: ''
       };
@@ -46,6 +51,10 @@ export const AnalyzeViewComponent = {
 
     $onDestroy() {
       this._destroyHandler();
+    }
+
+    onReportViewChange() {
+      this._localStorageService.set('analyseReportView', this.states.reportView);
     }
 
     onAnalysisTypeChange() {
@@ -185,6 +194,9 @@ export const AnalyzeViewComponent = {
     }
 
     openEditModal(mode, model) {
+      if (mode === 'fork') {
+        model.name += ' Copy';
+      }
       const openModal = template => {
         this.showDialog({
           template,

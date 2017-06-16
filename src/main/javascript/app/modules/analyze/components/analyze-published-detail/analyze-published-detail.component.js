@@ -101,7 +101,11 @@ export const AnalyzePublishedDetailComponent = {
         this.showDialog({
           template,
           controller: scope => {
-            scope.model = clone(this.analysis);
+            const model = clone(this.analysis);
+            if (mode === 'fork') {
+              model.name += ' Copy';
+            }
+            scope.model = model;
           },
           multiple: true
         });
