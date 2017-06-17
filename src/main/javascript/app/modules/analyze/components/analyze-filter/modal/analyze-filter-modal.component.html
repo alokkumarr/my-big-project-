@@ -1,39 +1,38 @@
 <analyze-dialog control="$ctrl" class="analyze-filters">
   <analyze-dialog-header layout="row" layout-align="space-between center" flex="grow">
     <strong translate="FILTERS"></strong>
-    <div layout="row" layout-align="end center">
-      <span>Join Filters criteria by: </span>
-      <binary-option ng-if="$ctrl.analysisType === 'report'"
-                        left="{{::$ctrl.BOOLEAN_CRITERIA.AND}}"
-                        right="{{::$ctrl.BOOLEAN_CRITERIA.OR}}"
-                        ng-model="$ctrl.filterBooleanCriteria"
-                        style="align-self: baseline; padding: 5px;"
-                        on-change="$ctrl.onBooleanCriteriaSelected(value)">
-      </binary-option>
-    </div>
+    <md-select ng-model="$ctrl.filterBooleanCriteria">
+      <md-option ng-repeat="booleanCriteria in $ctrl.BOOLEAN_CRITERIA"
+                 ng-value="booleanCriteria.value">
+        {{::booleanCriteria.label}}
+      </md-option>
+    </md-select>
   </analyze-dialog-header>
 
-  <analyze-dialog-content style="width: 850px;" layout="column">
+  <analyze-dialog-content layout="column">
     <md-list ng-repeat="artifact in $ctrl.artifacts track by artifact.artifactName">
       <md-subheader class="md-no-sticky">{{artifact.artifactName}}</md-subheader>
       <md-divider style="padding-bottom: 10px"></md-divider>
       <md-list-item ng-repeat="filter in $ctrl.filters[artifact.artifactName] track by $index"
-                    class="md-no-proxy">
+                    class="md-no-proxy"
+                    layout="row"
+                    layout-align="space-between start">
         <analyze-filter-row filter="filter"
                             on-change="$ctrl.onFilterChange(filter, artifact.artifactName, $index)"
-                            artifact="artifact">
+                            artifact="artifact"
+                            style="padding-right: 10px;">
         </analyze-filter-row>
 
-          <md-checkbox class="md-secondary"
-                      ng-disabled="!filter.column.filterEligible"
-                      ng-model="filter.isRuntimeFilter"
-                      ng-change="$ctrl.onRuntimeToggle(filter)">
-            <span translate="IS_RUNTIME"></span>
-          </md-checkbox>
+        <md-checkbox class="md-secondary"
+                     ng-disabled="!filter.column.filterEligible"
+                     ng-model="filter.isRuntimeFilter"
+                     ng-change="$ctrl.onRuntimeToggle(filter)">
+          <span translate="PROMPT"></span>
+        </md-checkbox>
 
         <md-button class="md-icon-button md-secondary"
-                  aria-label="Remove"
-                  ng-click="$ctrl.onRemoveFilter($index, artifact.artifactName)">
+                   aria-label="Remove"
+                   ng-click="$ctrl.onRemoveFilter($index, artifact.artifactName)">
           <md-icon md-font-icon="icon-close"></md-icon>
         </md-button>
 

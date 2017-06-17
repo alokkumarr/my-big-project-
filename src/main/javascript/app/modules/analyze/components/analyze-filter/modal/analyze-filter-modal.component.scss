@@ -1,0 +1,12 @@
+analyze-filter-modal {
+  md-list-item {
+    &::before {
+      content: none;
+    }
+
+    > div.md-secondary-container {
+      margin: 0;
+      align-self: baseline;
+    }
+  }
+}
