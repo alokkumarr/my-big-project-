@@ -149,7 +149,7 @@ export const AnalyzeReportComponent = {
       }
     }
 
-    onApplyFilters({filters, filterBooleanCriteria}) {
+    onApplyFilters({filters, filterBooleanCriteria} = {}) {
       if (filters) {
         this.filters = filters;
         this.analysisChanged = true;

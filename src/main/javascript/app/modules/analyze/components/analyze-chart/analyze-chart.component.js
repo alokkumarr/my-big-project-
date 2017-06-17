@@ -189,7 +189,7 @@ export const AnalyzeChartComponent = {
       this.analysisChanged = true;
     }
 
-    onApplyFilters({filters, filterBooleanCriteria}) {
+    onApplyFilters({filters, filterBooleanCriteria} = {}) {
       if (filters) {
         this.filters = filters;
         this.analysisChanged = true;
