@@ -252,6 +252,10 @@ export const AnalyzeReportComponent = {
 
       /* eslint-disable camelcase */
       forEach(data, itemA => {
+        forEach(itemA.columns, column => {
+          column.table = itemA.artifactName;
+        });
+
         const table = model.addTable(itemA.artifactName);
 
         if (!itemA.artifactPosition) {
@@ -323,6 +327,8 @@ export const AnalyzeReportComponent = {
       forEach(this.model.sqlBuilder.filters, backEndFilter => {
         model.addFilter(this._FilterService.backend2FrontendFilter(this.model.artifacts)(backEndFilter));
       });
+
+      this.filters = model.filters;
       /* eslint-enable camelcase */
     }
 
@@ -354,6 +360,7 @@ export const AnalyzeReportComponent = {
           const fieldArtifact = {
             columnName: field.meta.columnName,
             displayName: field.meta.displayName,
+            table: table.name,
             aliasName: field.alias,
             type: field.meta.type,
             hide: field.isHidden,
