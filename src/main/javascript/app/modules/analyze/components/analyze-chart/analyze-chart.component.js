@@ -13,7 +13,9 @@ import clone from 'lodash/clone';
 import filter from 'lodash/filter';
 import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
-import {NUMBER_TYPES, DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
+import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
+
+import {ENTRY_MODES, NUMBER_TYPES} from '../../consts';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -64,12 +66,13 @@ export const AnalyzeChartComponent = {
     }
 
     $onInit() {
-      if (this.mode === 'fork') {
+      if (this.mode === ENTRY_MODES.FORK) {
         delete this.model.id;
       }
 
-      if (this.mode === 'edit') {
+      if (this.mode === ENTRY_MODES.EDIT) {
         this.initChart();
+        this.refreshChartData();
       } else {
         this._AnalyzeService.createAnalysis(this.model.semanticId, 'chart').then(analysis => {
           this.model = assign(analysis, this.model);
