@@ -19,19 +19,10 @@ object QueryBuilder {
       case JNothing => JObject()
       case obj: JValue => unexpectedElement(obj)
     }
-    val runtimeFilters = if (runtime) {
-      json \ "runtimeFilters" match {
-        case JNothing => List.empty
-        case obj: JArray => obj.arr
-        case obj => unexpectedElement(obj)
-      }
-    } else {
-      List.empty
-    }
     "%s %s %s %s %s".format(
       buildSelect(artifacts, sqlBuilder),
       buildFrom(artifacts, sqlBuilder),
-      buildWhere(sqlBuilder, runtimeFilters),
+      buildWhere(sqlBuilder, runtime),
       buildGroupBy(artifacts, sqlBuilder),
       buildOrderBy(sqlBuilder)
     ).replaceAll("\\s+", " ").trim
@@ -126,17 +117,14 @@ object QueryBuilder {
       columns.filter(columnChecked(_)).length > 0
   }
 
-  private def buildWhere(
-    sqlBuilder: JObject, runtimeFilters: List[JValue]): String = {
-    val sqlBuilderFilters = ((sqlBuilder \ "filters") match {
+  private def buildWhere(sqlBuilder: JObject, runtime: Boolean): String = {
+    val filters = ((sqlBuilder \ "filters") match {
       case filters: JArray => filters.arr
       case JNothing => List()
       case json: JValue => unexpectedElement(json)
     }).filter((filter: JValue) => {
-      !(filter \ "isRuntimeFilter").extract[Boolean]
-    })
-    val filters = (sqlBuilderFilters ++ runtimeFilters).map(
-      buildWhereFilterElement(_))
+      !(filter \ "isRuntimeFilter").extract[Boolean] || runtime
+    }).map(buildWhereFilterElement)
     if (filters.isEmpty) {
       ""
     } else {

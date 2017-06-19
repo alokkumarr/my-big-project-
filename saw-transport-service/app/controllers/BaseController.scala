@@ -66,10 +66,13 @@ class BaseController extends Controller {
     try {
       Results.ok(playJson(process(body, ticket)))
     } catch {
-      case ClientException(message) => userErrorResponse(message)
+      case e: ClientException => {
+        log.debug("Client error", e)
+        clientErrorResponse(e.getMessage)
+      }
       case e: Exception => {
         log.error("Internal server error", e)
-        serverErrorResponse(e.getMessage())
+        serverErrorResponse(e.getMessage)
       }
     }
   }
@@ -102,7 +105,7 @@ class BaseController extends Controller {
     Json.parse(compact(render(json)))
   }
 
-  protected def userErrorResponse(message: String): Result = {
+  protected def clientErrorResponse(message: String): Result = {
     val response: JObject = ("error", ("message", message))
     Results.badRequest(playJson(response))
   }
