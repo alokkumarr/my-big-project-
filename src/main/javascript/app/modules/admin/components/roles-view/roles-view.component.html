@@ -1,0 +1,27 @@
+<div class="roles-view">
+  <md-toolbar class="secondary-toolbar">
+    <div class="md-toolbar-tools" layout-align="start center">
+      <div class="roles-view_search-panel" layout="row" layout-align="start center">
+        <span class="md-title" translate="ROLES_MGMT_LIST"></span>&nbsp;
+        <search-box placeholder="Search Role"
+                    ng-model="$ctrl.states.searchTerm"
+                    on-change="$ctrl.applySearchFilter()" delay="1000"></search-box>
+      </div>
+      <div class="roles-view_action-panel" layout="row" layout-align="end center">
+        <md-button class="btn-primary" ng-click="$ctrl.openNewRoleModal()">
+          <md-tooltip ng-bind="'TOOLTIP_ADD_ROLE' | translate"></md-tooltip>
+          + <span translate="ROLE"></span>
+        </md-button>
+      </div>      
+    </div>
+  </md-toolbar>
+  <div class="roles-view_roles-list">
+    <roles-list-view
+      roles="$ctrl.rolesList"
+      updater="$ctrl.updater"
+      customer="$ctrl.custCode"
+      on-action="$ctrl.onRoleAction(type, model)"
+      searchTerm="$ctrl.states.searchTerm">
+    </roles-list-view>
+  </div>
+</div>

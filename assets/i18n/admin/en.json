@@ -3,10 +3,17 @@
   "ADMIN":"Admin",
   "CUST_NAME": "Customer : {{customer}}",
   "USERS_MGMT_LIST":"User Management",
+  "ROLES_MGMT_LIST":"Role Management",
+  
   "NEW_USER":"Add New User",
   "CREATE_USER":"Save User",
   "EDIT_USER":"Edit User",
   "UPDATE_USER":"Update",
+  
+  "NEW_ROLE":"Add New Role",
+  "CREATE_ROLE":"Save Role",
+  "EDIT_ROLE":"Edit Role",
+  "UPDATE_ROLE":"Update",
   
   "USER_FIRST_NAME_LABEL":"First Name",
   "USER_MIDDLE_NAME_LABEL":"Middle Name",
@@ -17,9 +24,22 @@
   "USER_ACTIVE_LABEL":"Status",
   "USER_PASSWORD_LABEL":"Password",
   
+  "ROLE_NAME_LABEL":"Role Name",
+  "ROLE_DESC_LABEL":"Description",
+  "ROLE_DSK_LABEL":"DSK",
+  "ROLE_MY_ANAY_LABEL":"My Analysis",
+  "ROLE_TYPE_LABEL":"Role Type",
+  "ROLE_ACTIVE_LABEL":"Status",
+  
+  "TOOLTIP_ADD_ROLE":"Add Role",
+  "TOOLTIP_DELETE_ROLE":"Delete Role",
+  "TOOLTIP_EDIT_ROLE":"Edit Role",
+  "TOOLTIP_VIEW_ROLE_PRIL":"View Privileges",
+  
   "TOOLTIP_ADD_USER":"Add User",  
   "TOOLTIP_EDIT_USER":"Edit User",
   "TOOLTIP_DELETE_USER":"Delete User",
   
-  "NO_IMPLEMENTED_TEMPLATE_YET": "No implemented template yet!"
+  "NO_IMPLEMENTED_TEMPLATE_YET": "No implemented template yet!",
+  "TOOLTIP_ROLE_ANAS_MSG":"Automatically create default privileges to the My Analyses category for any user assigned to this Role. At least one privilege per Role is needed for application access."
 }

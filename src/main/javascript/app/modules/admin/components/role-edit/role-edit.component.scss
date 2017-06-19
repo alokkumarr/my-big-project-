@@ -1,0 +1,88 @@
+.edit-role-dialog {
+  .role-dialog {
+    width: 500px;
+  }
+
+  .role-dialog_header {
+    .layout-row {
+      justify-content: space-between;
+    }
+
+    .md-title {
+      line-height: 36px;
+    }
+
+    .md-button {
+      margin-right: 0;
+    }
+  }
+
+  .role-dialog_content {
+    padding: 15px;
+
+    .md-subhead {
+      padding: 15px 0;
+    }
+
+    .md-body-1 {
+      padding-bottom: 5px;
+    }
+
+    .adc-method {
+      padding-bottom: 15px;
+
+      .md-button {
+        margin-left: -1px;
+      }
+    }
+
+    input {
+      background: transparent;
+      border-width: 0 0 1px;
+    }
+
+    md-input-container {
+      width: 100%;
+    }
+  }
+
+  .role-dialog_footer {
+    .layout-row {
+      justify-content: space-between;
+    }
+  }
+}
+
+.padding-for-container {
+  padding-bottom: 20px;
+}
+
+.button-pull-right {
+  position: absolute;
+  right: 15px;
+}
+
+.input-checkbox-container {
+  padding-bottom: 20px;
+  font-size: 12px !important;
+  font-weight: 400;
+  color: #737373 !important;
+  padding-left: 6px;
+}
+
+.label-padding {
+  padding-right: 10px;
+}
+
+.md-button-icon {
+  display: inline-flex;
+  min-width: 24px;
+  min-height: 24px;
+  line-height: 24px;
+  height: 24px;
+  margin: 0 !important;
+}
+
+md-checkbox {
+  width: 20px !important;
+}
