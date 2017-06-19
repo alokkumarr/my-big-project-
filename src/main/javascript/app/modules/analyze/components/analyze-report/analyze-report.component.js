@@ -18,6 +18,8 @@ import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
 
+import {ENTRY_MODES} from '../../consts';
+
 const DEBOUNCE_INTERVAL = 500; // milliseconds
 
 export const AnalyzeReportComponent = {
@@ -66,7 +68,7 @@ export const AnalyzeReportComponent = {
     }
 
     $onInit() {
-      if (this.mode === 'fork') {
+      if (this.mode === ENTRY_MODES.FORK) {
         this.model.id = null;
       }
 
@@ -77,7 +79,7 @@ export const AnalyzeReportComponent = {
         }, 100);
       }
 
-      if (this.mode === 'edit') {
+      if (this.mode === ENTRY_MODES.EDIT) {
         this._modelLoaded(true);
       } else {
         this._AnalyzeService.createAnalysis(this.model.semanticId, 'report').then(analysis => {
@@ -88,7 +90,7 @@ export const AnalyzeReportComponent = {
             metricName: analysis.metricName
           });
 
-          if (this.mode !== 'fork') {
+          if (this.mode !== ENTRY_MODES.FORK) {
             this.model = defaultsDeep(this.model, {
               artifacts: analysis.artifacts,
               groupByColumns: [],

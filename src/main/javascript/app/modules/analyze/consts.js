@@ -8,6 +8,11 @@ export const AnalyseTypes = {
   Pivot: 'pivot'
 };
 
+export const ENTRY_MODES = {
+  EDIT: 'edit',
+  FORK: 'fork'
+};
+
 export const LAST_ANALYSES_CATEGORY_ID = 'lastAnalysesListId';
 
 export const NUMBER_TYPES = ['int', 'integer', 'double', 'long', 'float'];
