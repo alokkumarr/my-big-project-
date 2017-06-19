@@ -65,7 +65,9 @@ export const AnalyzePivotComponent = {
               this.model.sqlBuilder = {booleanCriteria: DEFAULT_BOOLEAN_CRITERIA.value};
             } else {
               this.settingsModified = true;
+              this.initExistingSettings();
             }
+
             this.artifacts = [{
               artifactName: this.model.artifacts[0].artifactName,
               columns: sortBy(this.model.artifacts[0].columns, 'displayName')
@@ -81,14 +83,19 @@ export const AnalyzePivotComponent = {
           columns: sortBy(this.model.artifacts[0].columns, 'displayName')
         }];
         this.prepareFields(this.artifacts[0].columns);
-        this.loadPivotData().then(() => {
+        this.initExistingSettings();
+
+        this.loadPivotData().finally(() => {
           this.toggleSettingsSidenav();
-          this.filters = map(this.model.filters,
-            this._FilterService.backend2FrontendFilter(this.model.artifacts));
-          this.sortFields = this.getArtifactColumns2SortFieldMapper()(this.artifacts[0].columns);
-          this.sorts = this.mapBackend2FrontendSort(this.model.sorts, this.sortFields);
         });
       }
+    }
+
+    initExistingSettings() {
+      this.filters = map(this.model.sqlBuilder.filters,
+                         this._FilterService.backend2FrontendFilter(this.model.artifacts));
+      this.sortFields = this.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
+      this.sorts = this.mapBackend2FrontendSort(this.model.sqlBuilder.sorts, this.sortFields);
     }
 
     toggleSettingsSidenav() {
@@ -321,6 +328,7 @@ export const AnalyzePivotComponent = {
     getModel() {
       const model = assign(this.model, {
         artifacts: [{
+          artifactName: this.artifacts[0].artifactName,
           columns: this.artifacts[0].columns
         }],
         sqlBuilder: this.getSqlBuilder()
