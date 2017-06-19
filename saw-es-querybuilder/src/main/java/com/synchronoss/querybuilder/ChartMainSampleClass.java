@@ -53,7 +53,7 @@ public class ChartMainSampleClass {
     final JsonNode data = JsonLoader.fromString(json);
     final JsonNode schema =
         JsonLoader.fromFile(new File(ChartMainSampleClass.class.getResource(
-            "/com/synchronoss/querybuilder/model/chart/chart_querybuilder_schema.json").getFile()));
+            "/schema/chart_querybuilder_schema.json").getFile()));
     ProcessingReport report = validator.validate(schema, data);
     if (report.isSuccess() == false) {
       throw new ProcessingException(report.toString());
