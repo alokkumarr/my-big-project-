@@ -105,7 +105,7 @@ export const RolesViewComponent = {
         } else {
           this._$rootScope.showProgress = false;
           this._$mdToast.show({
-            template: '<md-toast><span>' + this.response.validityMessage + '</md-toast>',
+            template: '<md-toast><span>' + data.validityMessage + '</md-toast>',
             position: 'bottom left',
             toastClass: 'toast-primary'
           });
