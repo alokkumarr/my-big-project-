@@ -20,6 +20,7 @@ import sncr.saw.common.config.SAWServiceConfig
 object DLConfiguration {
 
   private val logger: Logger = LoggerFactory.getLogger("sncr.datalake.DLConfiguration")
+  private var initialized: Boolean = false
 
   def getConfig: Configuration = DLConfiguration.config
   def getSC: SparkContext = DLConfiguration.ctx
@@ -71,6 +72,7 @@ object DLConfiguration {
     */
 
   def initSpark(): Unit = {
+    if (initialized) return
     logger info s"Spark settings: \n Master: ${cfg.getString ("master")} \n Worker memory: ${cfg.getString ("executor.memory")} \n  Cores: ${cfg.getString ("cores.max")} \n Driver memory: ${cfg.getString ("driver.memory")} "
     sparkConf = new SparkConf()
     sparkConf.setAppName ("SAW-DataAccess")
@@ -82,6 +84,7 @@ object DLConfiguration {
     sparkConf.set ("spark.sql.inMemoryColumnarStorage.batchSize", String.valueOf (rowLimit) )
     ctx = SparkContext.getOrCreate(sparkConf)
     jarFiles.foreach(f => ctx.addJar( jarLocation + Path.SEPARATOR + f))
+    initialized = true
   }
 }
 

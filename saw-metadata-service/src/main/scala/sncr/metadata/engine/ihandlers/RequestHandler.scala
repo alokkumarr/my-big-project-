@@ -493,8 +493,8 @@ class RequestHandler(private[this] var request: String, outStream: OutputStream 
         }
     }
     catch{
-      case e: Exception => m_log error s"Could load data for row key $rowID, continue"
-      case x: Throwable => m_log error "Unrecoverable error occurred - cancel processing"; return JNothing
+      case e: Exception => m_log error (s"Could not load data for row key $rowID, continue", e); return JNothing
+      case x: Throwable => m_log error ("Unrecoverable error occurred - cancel processing", x); return JNothing
     }
     })
     respGenerator.build(nodes)

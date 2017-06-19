@@ -3,12 +3,13 @@ package sncr.datalake.handlers
 import java.io.OutputStream
 import java.lang.Long
 import java.time.format.DateTimeFormatter
+import java.util
 import java.util.UUID
 
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
 import com.typesafe.config.Config
 import org.apache.hadoop.fs.Path
-import org.json4s.JsonAST._
+import org.json4s.JsonAST.{JObject, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.datalake.exceptions.{DAException, ErrorCodes}
@@ -177,9 +178,9 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
 
     resultNode.addObject("dataLocation", outputLocation, getSchema(analysis))
     resultNode.update()
-    val descriptorPrintable = new JObject(resultNodeDescriptor.obj ::: List(("dataLocation", JString(outputLocation))))
 
     if (out != null) {
+      val descriptorPrintable = new JObject(resultNodeDescriptor.obj ::: List(("dataLocation", JString(outputLocation))))
       out.write(pretty(render(descriptorPrintable)).getBytes())
       out.flush()
     }
@@ -263,10 +264,11 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
     (res, msg)
   }
 
-
 }
 
 object AnalysisNodeExecutionHelper{
+
+  protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisNodeExecutionHelper].getName)
 
   //TODO:: The function is to be replaced with another one to construct user ( tenant ) specific path
   def getUserSpecificPath(outputLocation: String): String = {
@@ -274,5 +276,42 @@ object AnalysisNodeExecutionHelper{
   }
 
   def apply( rowId: String, cacheIt: Boolean = false) : AnalysisNodeExecutionHelper = { val an = AnalysisNode(rowId); new AnalysisNodeExecutionHelper(an, cacheIt)}
+  def convertJsonToList(value: JValue): util.List[util.Map[String, (String, Object)]] =
+  {
+    value match {
+      case a:JArray =>
+      case o:JObject => //convertJsonToList(o.obj.)
+      case _ => { val l = List(Map("data-conversion-error" -> ("result", new Object))) }
+    }
+   null
+  }
+
+  def loadAnalysisResult(id: String): util.List[util.Map[String, (String, Object)]] =
+  {
+    DLConfiguration.initSpark()
+    val dlsession = new DLSession("SAW-TS-Show-AnalysisResult")
+    val resultNode = AnalysisResult(null, id)
+    //    resultNodeDescriptor = resultNode.getCachedData(MDObjectStruct.key_Definition.toString)
+    val od = resultNode.getObjectDescriptors
+    if (od.isEmpty)
+    {
+      m_log debug s"Nothing to load, return null"
+      return null
+    }
+    val onlyKey = od.keysIterator.next()
+    val rawdata = resultNode.getObject(onlyKey)
+    if (rawdata.isDefined) {
+      od(onlyKey) match {
+        case "json" => convertJsonToList(rawdata.get.asInstanceOf[JValue])
+        case "location" => {
+          dlsession.loadObject(onlyKey, rawdata.get.asInstanceOf[String], "parquet", DLConfiguration.rowLimit)
+          dlsession.getData(onlyKey)
+        }
+        case "binary" => throw new Exception("Loading binary data not supported yet")
+      }
+    }
+    else null
+  }
+
 
 }

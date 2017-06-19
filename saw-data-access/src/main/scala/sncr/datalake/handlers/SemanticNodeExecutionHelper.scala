@@ -81,6 +81,8 @@ class SemanticNodeExecutionHelper(val sn : SemanticNode, cacheIt : Boolean = fal
     ( lastSQLExecRes, lastSQLExecMessage)
   }
 
+  def getData : java.util.List[java.util.Map[String, (String, Object)]] = getData(metric)
+
 }
 
 object SemanticNodeExecutionHelper{

@@ -130,6 +130,8 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     try {
       m_log debug s"Execute SQL: $sql, view name: $viewName"
       val newDf = sparkSession.sql(sql)
+
+
       newDf.createOrReplaceTempView(viewName)
 
       if (loadedData.get(viewName).isDefined) loadedData -= viewName
@@ -266,7 +268,7 @@ object DLSession
   def getSession[T<:DLSession](sessionId: String ): DLSession = sessions(sessionId)
 
   //TODO:: Essentially this call materializes Dataset, it needs to be investigated to choose optimal approcah
-  //to bing data ffrom datalake
+  //to bing data from datalake
   def convert(df: DataFrame, limit: Int): util.List[util.Map[String, (String, Object)]] =  convert(df.head(limit), df.dtypes)
 
   DLConfiguration.initSpark()
