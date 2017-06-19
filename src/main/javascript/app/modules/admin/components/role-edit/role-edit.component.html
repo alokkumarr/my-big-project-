@@ -21,14 +21,6 @@
 		ng-model="$ctrl.editRole.roleType" required> <md-option
 		ng-repeat="roleType in $ctrl.roleTypes" ng-value="roleType.roleName"
 		ng-bind="::roleType.roleName"></md-option> </md-select> </md-input-container>
-  <div class="input-checkbox-container" flex> <label class="label-padding"
-		translate="ROLE_MY_ANAY_LABEL"></label> <md-checkbox type="checkbox"
-		ng-model="$ctrl.editRole.myAnalysis" ></md-checkbox>
-    <md-button class="md-button-icon btn-card" aria-label="popmsg" ng-disabled="">
-            <md-tooltip ng-bind="'TOOLTIP_ROLE_ANAS_MSG' | translate"></md-tooltip>
-            <md-icon md-font-icon="icon-bell"></md-icon>
-          </md-button>
-  </div>
   <div class="layout-row">
     <md-button class="btn-primary" ng-disabled="editRoleForm.$invalid"
       ng-click="$ctrl.updateRole()"
