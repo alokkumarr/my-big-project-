@@ -48,24 +48,10 @@ export const AnalyzeCardComponent = {
         });
     }
 
-    openDeleteModal() {
-      const confirm = this._$mdDialog.confirm()
-        .title('Are you sure you want to delete this analysis?')
-        .textContent('Any published analyses will also be deleted.')
-        .ok('Delete')
-        .cancel('Cancel');
-
-      this._$mdDialog.show(confirm).then(() => {
-        return this._AnalyzeService.deleteAnalysis(this.model.id);
-      }).then(data => {
-        this.onAction({
-          type: 'delete',
-          model: data
-        });
-      }, err => {
-        if (err) {
-          this._$log.error(err);
-        }
+    remove() {
+      this.onAction({
+        type: 'delete',
+        model: this.model
       });
     }
 

@@ -178,8 +178,18 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     return $http.get(`/api/analyze/byId/${id}`).then(fpGet('data'));
   }
 
-  function deleteAnalysis(id) {
-    return $http.delete(`/api/analyze/byId/${id}`).then(fpGet('data'));
+  function deleteAnalysis(model) {
+    if (!JwtService.hasPrivilege('DELETE', {
+      subCategoryId: model.categoryId,
+      creatorId: model.userId
+    })) {
+      return $q.reject(new Error('Access denied.'));
+    }
+    const payload = getRequestParams([
+      ['contents.action', 'delete'],
+      ['contents.keys.[0].id', model.id]
+    ]);
+    return $http.post(`${url}/analysis`, payload);
   }
 
   function getCategories() {

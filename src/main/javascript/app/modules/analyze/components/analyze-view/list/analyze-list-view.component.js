@@ -55,6 +55,13 @@ export const AnalyzeListViewComponent = {
       this.onUpdateAnalysisType(this.analysisType);
     }
 
+    remove(analysis) {
+      this.onAction({
+        type: 'delete',
+        model: analysis
+      });
+    }
+
     fork(analysis) {
       this.onAction({
         type: 'fork',
