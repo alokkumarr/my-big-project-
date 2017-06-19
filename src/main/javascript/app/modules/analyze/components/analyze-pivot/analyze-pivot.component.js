@@ -23,13 +23,14 @@ import template from './analyze-pivot.component.html';
 import style from './analyze-pivot.component.scss';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
 
-import {DATE_TYPES} from '../../consts';
+import {DATE_TYPES, ENTRY_MODES} from '../../consts';
 
 export const AnalyzePivotComponent = {
   template,
   styles: [style],
   bindings: {
-    model: '<'
+    model: '<',
+    mode: '@?'
   },
   controller: class AnalyzePivotController {
     constructor($mdDialog, $timeout, PivotService, AnalyzeService, FilterService, $mdSidenav) {
@@ -54,16 +55,20 @@ export const AnalyzePivotComponent = {
     }
 
     $onInit() {
-      if (isEmpty(this.model.artifacts)) {
+      if (isEmpty(this.model.artifacts) || this.mode === ENTRY_MODES.FORK) {
         // new analysis
         this._AnalyzeService.createAnalysis(this.model.semanticId, this.model.type)
           .then(analysis => {
-            this.model = assign(this.model, analysis);
             this.model.id = analysis.id;
-            this.model.sqlBuilder = {booleanCriteria: DEFAULT_BOOLEAN_CRITERIA.value};
+            if (this.mode !== ENTRY_MODES.FORK) {
+              this.model = assign(this.model, analysis);
+              this.model.sqlBuilder = {booleanCriteria: DEFAULT_BOOLEAN_CRITERIA.value};
+            } else {
+              this.settingsModified = true;
+            }
             this.artifacts = [{
-              artifactName: analysis.artifacts[0].artifactName,
-              columns: sortBy(analysis.artifacts[0].columns, 'displayName')
+              artifactName: this.model.artifacts[0].artifactName,
+              columns: sortBy(this.model.artifacts[0].columns, 'displayName')
             }];
             this.prepareFields(this.artifacts[0].columns);
             this.toggleSettingsSidenav();
@@ -77,6 +82,7 @@ export const AnalyzePivotComponent = {
         }];
         this.prepareFields(this.artifacts[0].columns);
         this.loadPivotData().then(() => {
+          this.toggleSettingsSidenav();
           this.filters = map(this.model.filters,
             this._FilterService.backend2FrontendFilter(this.model.artifacts));
           this.sortFields = this.getArtifactColumns2SortFieldMapper()(this.artifacts[0].columns);
@@ -157,7 +163,7 @@ export const AnalyzePivotComponent = {
 
     loadPivotData() {
       const model = this.getModel();
-      this._AnalyzeService.getDataBySettings(clone(model))
+      return this._AnalyzeService.getDataBySettings(clone(model))
         .then(({data}) => {
           const fields = this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns);
           this.normalizedData = data;
