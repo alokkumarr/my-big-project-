@@ -7,6 +7,7 @@ import com.sncr.nsso.common.bean.Role;
 import com.sncr.nsso.common.bean.Ticket;
 import com.sncr.nsso.common.bean.User;
 import com.sncr.nsso.common.bean.Valid;
+import com.sncr.nsso.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.nsso.common.bean.repo.analysis.Analysis;
 import com.sncr.nsso.common.bean.repo.analysis.AnalysisSummaryList;
 
@@ -34,4 +35,9 @@ public interface UserRepository {
 	boolean updateUser(User user);
 	boolean deleteUser(Long userId, String masterLoginId);
 	List<Role> getRolesDropDownList(Long customerId);
+	List<RoleDetails> getRoles(Long customerId);
+	List<Role> getRoletypesDropDownList();
+	Valid addRole(RoleDetails role);
+	boolean deleteRole(Long roleId, String masterLoginId);
+	boolean updateRole(RoleDetails role);
 }

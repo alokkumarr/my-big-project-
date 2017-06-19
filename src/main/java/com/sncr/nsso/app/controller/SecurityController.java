@@ -38,9 +38,12 @@ import com.sncr.nsso.common.bean.ResetValid;
 import com.sncr.nsso.common.bean.Ticket;
 import com.sncr.nsso.common.bean.User;
 import com.sncr.nsso.common.bean.Valid;
+import com.sncr.nsso.common.bean.repo.admin.DeleteRole;
 import com.sncr.nsso.common.bean.repo.admin.DeleteUser;
 import com.sncr.nsso.common.bean.repo.admin.RolesDropDownList;
+import com.sncr.nsso.common.bean.repo.admin.RolesList;
 import com.sncr.nsso.common.bean.repo.admin.UsersList;
+import com.sncr.nsso.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.nsso.common.bean.repo.analysis.Analysis;
 import com.sncr.nsso.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.nsso.common.util.TicketHelper;
@@ -578,16 +581,12 @@ public class SecurityController {
 				userList.setValid(false);
 				userList.setError("Mandatory request params are missing");
 			}
-		} catch (DataAccessException de) {			
-			userList.setValid(false);
-			userList.setValidityMessage("Database error. Please contact server Administrator.");
-			userList.setError(de.getMessage());		
-			return userList;
 		} catch (Exception e) {			
 			userList.setValid(false);
-			userList.setValidityMessage("Error. Please contact server Administrator.");
-			userList.setError(e.getMessage());			
-			return userList;
+		    String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+		    userList.setValidityMessage(message + " Please contact server Administrator");
+		    userList.setError(e.getMessage());
+		    return userList;
 		}
 		return userList;
 	}
@@ -601,42 +600,6 @@ public class SecurityController {
 	public UsersList addUser(@RequestBody User user) {
 		UsersList userList = new UsersList();
 		Valid valid = null;
-		try {
-			if (user != null) {
-				valid = userRepository.addUser(user);
-				if(valid.getValid()) {
-					userList.setUsers(userRepository.getUsers(user.getCustomerId()));
-					userList.setValid(true);
-				} else {
-					userList.setValid(false);
-					userList.setValidityMessage("User could not be added. "+ valid.getError());
-				}				
-			} else {
-				userList.setValid(false);
-				userList.setValidityMessage("Mandatory request params are missing");
-			}
-		} catch (DataAccessException de) {			
-			userList.setValid(false);
-			userList.setValidityMessage("Database error. Please contact server Administrator.");
-			userList.setError(de.getMessage());		
-			return userList;
-		} catch (Exception e) {			
-			userList.setValid(false);
-			userList.setValidityMessage("Error. Please contact server Administrator.");
-			userList.setError(e.getMessage());			
-			return userList;
-		}
-		return userList;
-	}
-	
-	/**
-	 * 
-	 * @param user
-	 * @return
-	 */
-	@RequestMapping(value = "/auth/admin/cust/manage/users/edit", method = RequestMethod.POST)
-	public UsersList updateUser(@RequestBody User user) {
-		UsersList userList = new UsersList();
 		try {
 			if (user != null) {
 				userList.setValid(true);
@@ -660,7 +623,65 @@ public class SecurityController {
 						userList.setValidityMessage("Password should contain atleast 1 special charactar.");
 						userList.setValid(false);
 					}
-				}				
+				} else {					
+					userList.setValid(false);
+				}
+				if(userList.getValid()) {
+					valid = userRepository.addUser(user);
+					if(valid.getValid()) {
+						userList.setUsers(userRepository.getUsers(user.getCustomerId()));
+						userList.setValid(true);
+					} else {
+						userList.setValid(false);
+						userList.setValidityMessage("User could not be added. "+ valid.getError());
+					}				
+				} 
+			} else {
+				userList.setValid(false);
+				userList.setValidityMessage("Mandatory request params are missing");
+			}
+		} catch (Exception e) {			
+			userList.setValid(false);
+		    String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+		    userList.setValidityMessage(message + " Please contact server Administrator");
+		    userList.setError(e.getMessage());
+		    return userList;
+		}
+		return userList;
+	}
+	
+	/**
+	 * 
+	 * @param user
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/users/edit", method = RequestMethod.POST)
+	public UsersList updateUser(@RequestBody User user) {
+		UsersList userList = new UsersList();
+		try {
+			if (user != null) {
+				userList.setValid(true);
+				if(user.getPassword() != null){
+					if(user.getPassword().length() < 8) {
+						userList.setValidityMessage("New password should be minimum of 8 character.");
+						userList.setValid(false);
+					} else if (user.getMasterLoginId().equals(user.getPassword())) {
+						userList.setValidityMessage("User Name can't be assigned as password.");
+						userList.setValid(false);
+					}
+					Pattern pCaps = Pattern.compile("[A-Z]");
+					Matcher m = pCaps.matcher(user.getPassword());
+					if (!m.find()) {
+						userList.setValidityMessage("Password should contain atleast 1 uppercase character.");
+						userList.setValid(false);
+					}
+					Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
+					m = pSpeChar.matcher(user.getPassword());
+					if (!m.find()) {
+						userList.setValidityMessage("Password should contain atleast 1 special character.");
+						userList.setValid(false);
+					}
+				} 				
 				if(userList.getValid()) {
 					if(userRepository.updateUser(user)) {
 						userList.setUsers(userRepository.getUsers(user.getCustomerId()));
@@ -674,16 +695,12 @@ public class SecurityController {
 				userList.setValid(false);
 				userList.setError("Mandatory request params are missing");
 			}
-		} catch (DataAccessException de) {			
-			userList.setValid(false);
-			userList.setValidityMessage("Database error. Please contact server Administrator.");
-			userList.setError(de.getMessage());		
-			return userList;
 		} catch (Exception e) {			
 			userList.setValid(false);
-			userList.setValidityMessage("Error. Please contact server Administrator.");
-			userList.setError(e.getMessage());			
-			return userList;
+		    String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+		    userList.setValidityMessage(message + " Please contact server Administrator");
+		    userList.setError(e.getMessage());
+		    return userList;
 		}
 		return userList;
 	}
@@ -709,16 +726,12 @@ public class SecurityController {
 				userList.setValid(false);
 				userList.setError("Mandatory request params are missing");
 			}
-		} catch (DataAccessException de) {			
-			userList.setValid(false);
-			userList.setValidityMessage("Database error. Please contact server Administrator.");
-			userList.setError(de.getMessage());		
-			return userList;
 		} catch (Exception e) {			
 			userList.setValid(false);
-			userList.setValidityMessage("Error. Please contact server Administrator.");
-			userList.setError(e.getMessage());			
-			return userList;
+		    String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+		    userList.setValidityMessage(message + " Please contact server Administrator");
+		    userList.setError(e.getMessage());
+		    return userList;
 		}
 		return userList;
 	}
@@ -739,18 +752,157 @@ public class SecurityController {
 				roles.setValid(false);
 				roles.setError("Mandatory request params are missing");
 			}
-		} catch (DataAccessException de) {			
-			roles.setValid(false);
-			roles.setValidityMessage("Database error. Please contact server Administrator.");
-			roles.setError(de.getMessage());		
-			return roles;
 		} catch (Exception e) {			
 			roles.setValid(false);
-			roles.setValidityMessage("Error. Please contact server Administrator.");
-			roles.setError(e.getMessage());			
-			return roles;
+		    String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+		    roles.setValidityMessage(message + " Please contact server Administrator");
+		    roles.setError(e.getMessage());
+		    return roles;
 		}
 		return roles;
+	}
+	
+	/**
+	 * 
+	 * @param customerId
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/roles/fetch", method = RequestMethod.POST)
+	public RolesList getRolesDetails(@RequestBody Long customerId) {
+		RolesList roleList = new RolesList();
+		try {
+			if (customerId != null) {
+				roleList.setRoles(userRepository.getRoles(customerId));
+				roleList.setValid(true);
+			} else {
+				roleList.setValid(false);
+				roleList.setError("Mandatory request params are missing");
+			}
+		} catch (Exception e) {
+			roleList.setValid(false);
+		    String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+		    roleList.setValidityMessage(message + " Please contact server Administrator");
+		    roleList.setError(e.getMessage());
+		    return roleList;
+		}
+
+		return roleList;
+	}
+	
+	/**
+	 * 
+	 * @param user
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/dropdown/getRoleTypes", method = RequestMethod.POST)
+	public RolesDropDownList getRoles() {
+		RolesDropDownList  roles =  new RolesDropDownList();
+		try {					
+				roles.setRoles(userRepository.getRoletypesDropDownList());
+				roles.setValid(true);			
+		} catch (Exception e) {
+			roles.setValid(false);
+		    String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+		    roles.setValidityMessage(message + " Please contact server Administrator");
+		    roles.setError(e.getMessage());
+		    return roles;
+		}
+		return roles;
+	}
+	
+	/**
+	 * 
+	 * @param user
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/roles/add", method = RequestMethod.POST)
+	public RolesList addRole(@RequestBody RoleDetails role) {
+		RolesList roleList = new RolesList();
+		Valid valid = null;
+		try {
+			if (role != null) {
+				valid = userRepository.addRole(role);
+				if(valid.getValid()) {
+					roleList.setRoles(userRepository.getRoles(role.getCustSysId()));
+					roleList.setValid(true);
+				} else {
+					roleList.setValid(false);
+					roleList.setValidityMessage("Role could not be added. "+ valid.getError());
+				}				
+			} else {
+				roleList.setValid(false);
+				roleList.setValidityMessage("Mandatory request params are missing");
+			}
+		} catch (Exception e) {			
+			roleList.setValid(false);
+		    String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+		    roleList.setValidityMessage(message + " Please contact server Administrator");
+		    roleList.setError(e.getMessage());
+		    return roleList;
+		}
+		return roleList;
+	}
+	
+	/**
+	 * 
+	 * @param user
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/roles/delete", method = RequestMethod.POST)
+	public RolesList deleteUser(@RequestBody DeleteRole deleteRole) {
+		RolesList roleList = new RolesList();
+		try {
+			if (deleteRole.getRoleId() != null && deleteRole.getCustomerId() != null && deleteRole.getMasterLoginId() != null) {
+				if(userRepository.deleteRole(deleteRole.getRoleId(), deleteRole.getMasterLoginId())) {
+					roleList.setRoles(userRepository.getRoles(deleteRole.getCustomerId()));
+					roleList.setValid(true);
+				} else {
+					roleList.setValid(false);
+					roleList.setValidityMessage("Role could not be deleted.");
+				}				
+			} else {
+				roleList.setValid(false);
+				roleList.setError("Mandatory request params are missing");
+			}
+		} catch (Exception e) {			
+			roleList.setValid(false);
+		    String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+		    roleList.setValidityMessage(message + " Please contact server Administrator");
+		    roleList.setError(e.getMessage());
+		    return roleList;
+		}
+		return roleList;
+	}
+	
+	/**
+	 * 
+	 * @param user
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/roles/edit", method = RequestMethod.POST)
+	public RolesList editRole(@RequestBody RoleDetails role) {
+		RolesList roleList = new RolesList();
+		try {
+			if (role != null) {				 
+				if(userRepository.updateRole(role)) {
+					roleList.setRoles(userRepository.getRoles(role.getCustSysId()));
+					roleList.setValid(true);
+				} else {
+					roleList.setValid(false);
+					roleList.setValidityMessage("Role could not be updated. ");
+				}				
+			} else {
+				roleList.setValid(false);
+				roleList.setValidityMessage("Mandatory request params are missing");
+			}
+		} catch (Exception e) {			
+			roleList.setValid(false);
+		    String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+		    roleList.setValidityMessage(message + " Please contact server Administrator");
+		    roleList.setError(e.getMessage());
+		    return roleList;
+		}
+		return roleList;
 	}
 	/**
 	 * 
