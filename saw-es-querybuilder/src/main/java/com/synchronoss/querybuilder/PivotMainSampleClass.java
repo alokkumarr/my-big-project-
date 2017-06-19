@@ -49,7 +49,7 @@ public class PivotMainSampleClass {
     final JsonNode data = JsonLoader.fromString(json);
     final JsonNode schema =
         JsonLoader.fromFile(new File(PivotMainSampleClass.class.getResource(
-            "/com/synchronoss/querybuilder/model/pivot/pivot_querybuilder_schema.json").getFile()));
+            "/schema/pivot_querybuilder_schema.json").getFile()));
     ProcessingReport report = validator.validate(schema, data);
     if (report.isSuccess() == false) {
       throw new ProcessingException(report.toString());
