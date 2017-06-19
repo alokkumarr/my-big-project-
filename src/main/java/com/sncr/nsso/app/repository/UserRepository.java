@@ -40,4 +40,6 @@ public interface UserRepository {
 	Valid addRole(RoleDetails role);
 	boolean deleteRole(Long roleId, String masterLoginId);
 	boolean updateRole(RoleDetails role);
+	boolean checkUserExists(Long roleId);
+	boolean checkPrivExists(Long roleId);
 }
