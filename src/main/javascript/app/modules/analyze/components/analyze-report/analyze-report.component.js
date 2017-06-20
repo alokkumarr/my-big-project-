@@ -87,6 +87,8 @@ export const AnalyzeReportComponent = {
             id: analysis.id,
             metric: analysis.metric,
             createdTimestamp: analysis.createdTimestamp,
+            userId: analysis.userId,
+            userFullName: analysis.userFullName,
             metricName: analysis.metricName
           });
 
