@@ -13,6 +13,7 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.synchronoss.ESProxy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +23,7 @@ public class SAWElasticTransportService {
       SAWElasticTransportService.class.getName());
  
   private static String execute(String query, String jsonString, String dsk, String username,
-    String moduleName) throws JsonProcessingException, IOException{
+    String moduleName) throws JsonProcessingException, IOException, NullPointerException{
     String url = System.getProperty("url");
     JsonNode repository = BuilderUtil.getRepositoryNodeTree(jsonString, "esRepository");
     String indexName = repository.get("indexName").asText();
@@ -50,6 +51,10 @@ public class SAWElasticTransportService {
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     String responseString = response.body().string();
     JsonNode esResponse = objectMapper.readTree(responseString);
+    if (esResponse.get("data") == null)
+    {
+      throw new NullPointerException("Data is not available based on provided query criteria");
+    }
     JsonNode finalResponse = objectMapper.readTree(esResponse.get("data").toString());
     return finalResponse.get("aggregations").toString();
   }
@@ -63,7 +68,7 @@ public class SAWElasticTransportService {
    * @throws IOException
    */
   public static String executeReturnAsString(String query, String jsonString, String dsk,
-      String userName, String moduleName) throws JsonProcessingException, IOException
+      String userName, String moduleName) throws JsonProcessingException, IOException, NullPointerException
 
   {
     ObjectMapper objectMapper = new ObjectMapper();

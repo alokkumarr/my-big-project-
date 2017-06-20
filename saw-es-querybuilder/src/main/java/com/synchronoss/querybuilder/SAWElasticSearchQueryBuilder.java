@@ -19,7 +19,7 @@ public class SAWElasticSearchQueryBuilder {
    * @throws AssertionError
    * @throws ProcessingException 
    */
-  public String getQuery(EntityType type, String jsonString) throws AssertionError, ProcessingException {
+  public String getQuery(EntityType type, String jsonString) throws IllegalArgumentException, ProcessingException {
     String query = null;
     try {
       assert (type.find(type) == null);
@@ -28,8 +28,8 @@ public class SAWElasticSearchQueryBuilder {
       query =
           type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString)
               .buildQuery() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString).buildQuery();
-    } catch (IllegalStateException | IOException exception) {
-      throw new AssertionError("Type not supported :" + exception.getMessage());
+    } catch (IllegalStateException | IOException | NullPointerException exception) {
+      throw new IllegalArgumentException(exception.getMessage());
     }
     return query;
   }
@@ -44,7 +44,7 @@ public class SAWElasticSearchQueryBuilder {
    * @throws AssertionError
    */
   public SearchSourceBuilder getSearchSourceBuilder(EntityType type, String jsonString)
-      throws AssertionError {
+      throws IllegalArgumentException {
     SearchSourceBuilder query = null;
     try {
       assert (type.find(type) == null);
@@ -55,7 +55,7 @@ public class SAWElasticSearchQueryBuilder {
               .getSearchSourceBuilder() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString)
               .getSearchSourceBuilder();
     } catch (IllegalStateException | IOException | ProcessingException exception) {
-      throw new AssertionError("Type not supported :" + exception.getMessage());
+      throw new IllegalArgumentException("Type not supported :" + exception.getMessage());
     }
     return query;
   }
