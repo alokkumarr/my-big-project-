@@ -14,7 +14,7 @@ export function UsersManagementService($http, AppConfig) {
     return $http.post(`${loginUrl}/auth/admin/cust/manage/users/fetch`, customerId).then(fpGet('data'));
   }
   function getRoles(customerId) {
-    return $http.post(`${loginUrl}/auth/admin/cust/manage/dropdown/getRoles`, customerId).then(fpGet('data'));
+    return $http.post(`${loginUrl}/auth/admin/cust/manage/roles/list`, customerId).then(fpGet('data'));
   }
   function saveUser(user) {
     return $http.post(`${loginUrl}/auth/admin/cust/manage/users/add`, user).then(fpGet('data'));
