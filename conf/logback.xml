@@ -8,7 +8,7 @@
         </encoder>
     </appender>
 	<springProfile name="staging">
-		<logger name="com.sncr.nsso.*" level="INFO" />
+		<logger name="com.sncr.saw.security.*" level="INFO" />
 		<logger name="org.springframework.*">
 			<level value="ERROR" />
 		</logger>
