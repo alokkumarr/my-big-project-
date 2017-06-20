@@ -92,7 +92,7 @@ public class RowField {
         TIMESTAMP("timestamp"),
         LONG("long"),
         DOUBLE("double"),
-        INT("int"),
+        INT("integer"),
         STRING("string"),
         FLOAT("float");
         private final String value;

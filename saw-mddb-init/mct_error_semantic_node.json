@@ -60,7 +60,7 @@
               {
                 "name": "SUMMARY_TYPE",
                 "type": "string",
-                "columnName": "SUMMARY_TYPE",
+                "columnName": "SUMMARY_TYPE.keyword",
                 "displayName": "Summary Type",
                 "aliasName": "",
                 "table": "MCT_ERROR_SUMMARY",
@@ -70,7 +70,7 @@
               {
                 "name": "SESSION_ID",
                 "type": "string",
-                "columnName": "SESSION_ID",
+                "columnName": "SESSION_ID.keyword",
                 "displayName": "Session Id",
                 "aliasName": "",
                 "table": "MCT_ERROR_SUMMARY",
@@ -80,7 +80,7 @@
               {
                 "name": "OPCO",
                 "type": "string",
-                "columnName": "OPCO",
+                "columnName": "OPCO.keyword",
                 "displayName": "OPCO",
                 "aliasName": "",
                 "table": "MCT_ERROR_SUMMARY",
@@ -89,8 +89,8 @@
               },
               {
                 "name": "SERVER_DIM_DATE",
-                "type": "date",
-                "columnName": "SERVER_DIM_DATE",
+                "type": "string",
+                "columnName": "SERVER_DIM_DATE.keyword",
                 "displayName": "Server Dim Date",
                 "aliasName": "",
                 "table": "MCT_ERROR_SUMMARY",
@@ -100,7 +100,7 @@
               {
                 "name": "TARGET_OS",
                 "type": "string",
-                "columnName": "TARGET_OS",
+                "columnName": "TARGET_OS.keyword",
                 "displayName": "Target OS",
                 "aliasName": "",
                 "table": "MCT_ERROR_SUMMARY",
@@ -110,7 +110,7 @@
               {
                 "name": "TARGET_APP_VERSION",
                 "type": "string",
-                "columnName": "TARGET_APP_VERSION",
+                "columnName": "TARGET_APP_VERSION.keyword",
                 "displayName": "Target App. Version",
                 "aliasName": "",
                 "table": "MCT_ERROR_SUMMARY",
@@ -120,7 +120,7 @@
               {
                 "name": "TARGET_MANUFACTURER",
                 "type": "string",
-                "columnName": "TARGET_MANUFACTURER",
+                "columnName": "TARGET_MANUFACTURER.keyword",
                 "displayName": "Target Manufacturer",
                 "aliasName": "",
                 "table": "MCT_ERROR_SUMMARY",
@@ -130,7 +130,7 @@
               {
                 "name": "TARGET_MODEL",
                 "type": "string",
-                "columnName": "TARGET_MODEL",
+                "columnName": "TARGET_MODEL.keyword",
                 "displayName": "Target Model",
                 "aliasName": "",
                 "table": "MCT_ERROR_SUMMARY",
@@ -140,7 +140,7 @@
               {
                 "name": "SOURCE_OS",
                 "type": "string",
-                "columnName": "SOURCE_OS",
+                "columnName": "SOURCE_OS.keyword",
                 "displayName": "Source OS",
                 "aliasName": "",
                 "table": "MCT_ERROR_SUMMARY",
@@ -150,7 +150,7 @@
               {
                 "name": "SOURCE_APP_VERSION",
                 "type": "string",
-                "columnName": "SOURCE_APP_VERSION",
+                "columnName": "SOURCE_APP_VERSION.keyword",
                 "displayName": "Source App. Version",
                 "aliasName": "",
                 "table": "MCT_ERROR_SUMMARY",
@@ -160,7 +160,7 @@
               {
                 "name": "SOURCE_MANUFACTURER",
                 "type": "string",
-                "columnName": "SOURCE_MANUFACTURER",
+                "columnName": "SOURCE_MANUFACTURER.keyword",
                 "displayName": "Source Manufacturer",
                 "aliasName": "",
                 "table": "MCT_ERROR_SUMMARY",
@@ -170,7 +170,7 @@
               {
                 "name": "SOURCE_MODEL",
                 "type": "string",
-                "columnName": "SOURCE_MODEL",
+                "columnName": "SOURCE_MODEL.keyword",
                 "displayName": "Source Model",
                 "aliasName": "",
                 "table": "MCT_ERROR_SUMMARY",
@@ -180,7 +180,7 @@
               {
                 "name": "SESSION_STATUS",
                 "type": "string",
-                "columnName": "SESSION_STATUS",
+                "columnName": "SESSION_STATUS.keyword",
                 "displayName": "Session Status",
                 "aliasName": "",
                 "table": "MCT_ERROR_SUMMARY",
@@ -188,29 +188,9 @@
                 "filterEligible": true
               },
               {
-                "name": "ERROR_STATUS",
-                "type": "string",
-                "columnName": "ERROR_STATUS",
-                "displayName": "Error Status",
-                "aliasName": "",
-                "table": "MCT_ERROR_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
-                "name": "TRANSFER_LOCATION",
-                "type": "string",
-                "columnName": "TRANSFER_LOCATION",
-                "displayName": "Transfer Location",
-                "aliasName": "",
-                "table": "MCT_ERROR_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
                 "name": "QUARATINE_CODE",
-                "type": "integer",
-                "columnName": "QUARATINE_CODE",
+                "type": "string",
+                "columnName": "QUARATINE_CODE.keyword",
                 "displayName": "Quaratine Code",
                 "aliasName": "",
                 "table": "MCT_ERROR_SUMMARY",
@@ -219,7 +199,7 @@
               },
               {
                 "name": "ERROR_CODE",
-                "type": "string",
+                "type": "long",
                 "columnName": "ERROR_CODE",
                 "displayName": "Error Code",
                 "aliasName": "",
@@ -240,38 +220,8 @@
               {
                 "name": "ERROR_DESC",
                 "type": "string",
-                "columnName": "ERROR_DESC",
+                "columnName": "ERROR_DESC.keyword",
                 "displayName": "Error Desc",
-                "aliasName": "",
-                "table": "MCT_ERROR_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
-                "name": "ERROR_TIMESTAMP",
-                "type": "timestamp",
-                "columnName": "ERROR_TIMESTAMP",
-                "displayName": "Error Timestamp",
-                "aliasName": "",
-                "table": "MCT_ERROR_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
-                "name": "SERVER_TIMESTAMP",
-                "type": "timestamp",
-                "columnName": "SERVER_TIMESTAMP",
-                "displayName": "Server Timestamp",
-                "aliasName": "",
-                "table": "MCT_ERROR_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
-                "name": "TRANSFER_MONTH_ID",
-                "type": "integer",
-                "columnName": "TRANSFER_MONTH_ID",
-                "displayName": "Transfer Month",
                 "aliasName": "",
                 "table": "MCT_ERROR_SUMMARY",
                 "joinEligible": false,

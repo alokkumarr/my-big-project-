@@ -90,7 +90,8 @@ class SAWPivotTypeElasticSearchQueryBuilder {
         builder.add(termsQueryBuilder);
       }
       if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
-          || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase())) {
+          || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) 
+      {
         if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
           RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
           rangeQueryBuilder.lte(item.getModel().getOtherValue());

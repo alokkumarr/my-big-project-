@@ -148,7 +148,7 @@ public class Filter {
 
         LONG("long"),
         STRING("string"),
-        INT("int"),
+        INT("integer"),
         DOUBLE("double"),
         DATE("date"),
         TIMESTAMP("timestamp"),

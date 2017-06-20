@@ -60,7 +60,7 @@
               {
                 "name": "SUMMARY_TYPE",
                 "type": "string",
-                "columnName": "SUMMARY_TYPE",
+                "columnName": "SUMMARY_TYPE.keyword",
                 "displayName": "Summary Type",
                 "aliasName": "",
                 "table": "MCT_CONTENT_SUMMARY",
@@ -70,7 +70,7 @@
               {
                 "name": "SESSION_ID",
                 "type": "string",
-                "columnName": "SESSION_ID",
+                "columnName": "SESSION_ID.keyword",
                 "displayName": "Session ID",
                 "aliasName": "",
                 "table": "MCT_CONTENT_SUMMARY",
@@ -79,8 +79,8 @@
               },
               {
                 "name": "SERVER_DIM_DATE",
-                "type": "date",
-                "columnName": "SERVER_DIM_DATE",
+                "type": "string",
+                "columnName": "SERVER_DIM_DATE.keyword",
                 "displayName": "Server Date",
                 "aliasName": "",
                 "table": "MCT_CONTENT_SUMMARY",
@@ -90,7 +90,7 @@
               {
                 "name": "TARGET_OS",
                 "type": "string",
-                "columnName": "TARGET_OS",
+                "columnName": "TARGET_OS.keyword",
                 "displayName": "Target OS",
                 "aliasName": "",
                 "table": "MCT_CONTENT_SUMMARY",
@@ -100,7 +100,7 @@
               {
                 "name": "TARGET_APP_VERSION",
                 "type": "string",
-                "columnName": "TARGET_APP_VERSION",
+                "columnName": "TARGET_APP_VERSION.keyword",
                 "displayName": "Target App. Version",
                 "aliasName": "",
                 "table": "MCT_CONTENT_SUMMARY",
@@ -110,18 +110,8 @@
               {
                 "name": "TARGET_MANUFACTURER",
                 "type": "string",
-                "columnName": "TARGET_MANUFACTURER",
+                "columnName": "TARGET_MANUFACTURER.keyword",
                 "displayName": "Target Manufacturer",
-                "aliasName": "",
-                "table": "MCT_CONTENT_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
-                "name": "TARGET_MODEL",
-                "type": "string",
-                "columnName": "TARGET_MODEL",
-                "displayName": "Target Model",
                 "aliasName": "",
                 "table": "MCT_CONTENT_SUMMARY",
                 "joinEligible": false,
@@ -130,18 +120,8 @@
               {
                 "name": "SOURCE_OS",
                 "type": "string",
-                "columnName": "SOURCE_OS",
+                "columnName": "SOURCE_OS.keyword",
                 "displayName": "Source OS",
-                "aliasName": "",
-                "table": "MCT_CONTENT_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
-                "name": "SOURCE_APP_VERSION",
-                "type": "string",
-                "columnName": "SOURCE_APP_VERSION",
-                "displayName": "Source App. Version",
                 "aliasName": "",
                 "table": "MCT_CONTENT_SUMMARY",
                 "joinEligible": false,
@@ -150,28 +130,8 @@
               {
                 "name": "SOURCE_MANUFACTURER",
                 "type": "string",
-                "columnName": "SOURCE_MANUFACTURER",
+                "columnName": "SOURCE_MANUFACTURER.keyword",
                 "displayName": "Source Manufacturer",
-                "aliasName": "",
-                "table": "MCT_CONTENT_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
-                "name": "SOURCE_MODEL",
-                "type": "string",
-                "columnName": "SOURCE_MODEL",
-                "displayName": "Source Model",
-                "aliasName": "",
-                "table": "MCT_CONTENT_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
-                "name": "FATAL_ERROR_FLAG",
-                "type": "string",
-                "columnName": "FATAL_ERROR_FLAG",
-                "displayName": "Fatal Error Flag",
                 "aliasName": "",
                 "table": "MCT_CONTENT_SUMMARY",
                 "joinEligible": false,
@@ -188,38 +148,8 @@
                 "filterEligible": true
               },
               {
-                "name": "TRANSFER_LOCATION",
-                "type": "string",
-                "columnName": "TRANSFER_LOCATION",
-                "displayName": "Transfer Location",
-                "aliasName": "",
-                "table": "MCT_CONTENT_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
-                "name": "QUARATINE_CODE",
-                "type": "integer",
-                "columnName": "QUARATINE_CODE",
-                "displayName": "Quaratine Code",
-                "aliasName": "",
-                "table": "MCT_CONTENT_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
-                "name": "CONTENT_CLASS",
-                "type": "string",
-                "columnName": "CONTENT_CLASS",
-                "displayName": "Content Class",
-                "aliasName": "",
-                "table": "MCT_CONTENT_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
                 "name": "AVAILABLE_ITEMS",
-                "type": "double",
+                "type": "long",
                 "columnName": "AVAILABLE_ITEMS",
                 "displayName": "Available Items",
                 "aliasName": "",
@@ -229,7 +159,7 @@
               },
               {
                 "name": "SELECTED_ITEMS",
-                "type": "double",
+                "type": "long",
                 "columnName": "SELECTED_ITEMS",
                 "displayName": "Selected Items",
                 "aliasName": "",
@@ -239,7 +169,7 @@
               },
               {
                 "name": "TRANSFER_ITEMS",
-                "type": "double",
+                "type": "long",
                 "columnName": "TRANSFER_ITEMS",
                 "displayName": "Transfer Items",
                 "aliasName": "",
@@ -249,7 +179,7 @@
               },
               {
                 "name": "FAILED_ITEMS",
-                "type": "double",
+                "type": "long",
                 "columnName": "FAILED_ITEMS",
                 "displayName": "Failed Items",
                 "aliasName": "",
@@ -259,7 +189,7 @@
               },
               {
                 "name": "AVAILABLE_BYTES",
-                "type": "double",
+                "type": "long",
                 "columnName": "AVAILABLE_BYTES",
                 "displayName": "Available Bytes",
                 "aliasName": "",
@@ -269,7 +199,7 @@
               },
               {
                 "name": "AVAILABLE_MB",
-                "type": "double",
+                "type": "float",
                 "columnName": "AVAILABLE_MB",
                 "displayName": "Available MB",
                 "aliasName": "",
@@ -279,7 +209,7 @@
               },
               {
                 "name": "SELECTED_BYTES",
-                "type": "double",
+                "type": "long",
                 "columnName": "SELECTED_BYTES",
                 "displayName": "Selected Bytes",
                 "aliasName": "",
@@ -288,18 +218,8 @@
                 "filterEligible": true
               },
               {
-                "name": "SELECTED_MB",
-                "type": "double",
-                "columnName": "SELECTED_MB",
-                "displayName": "Selected MB",
-                "aliasName": "",
-                "table": "MCT_CONTENT_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
                 "name": "TRANSFER_BYTES",
-                "type": "double",
+                "type": "long",
                 "columnName": "TRANSFER_BYTES",
                 "displayName": "Transfer Bytes",
                 "aliasName": "",
@@ -309,7 +229,7 @@
               },
               {
                 "name": "TRANSFER_MB",
-                "type": "double",
+                "type": "float",
                 "columnName": "TRANSFER_MB",
                 "displayName": "Transfer MB",
                 "aliasName": "",
@@ -319,7 +239,7 @@
               },
               {
                 "name": "FAILED_BYTES",
-                "type": "double",
+                "type": "long",
                 "columnName": "FAILED_BYTES",
                 "displayName": "Failed Bytes",
                 "aliasName": "",
@@ -329,59 +249,9 @@
               },
               {
                 "name": "FAILED_MB",
-                "type": "double",
+                "type": "float",
                 "columnName": "FAILED_MB",
                 "displayName": "Failed MB",
-                "aliasName": "",
-                "table": "MCT_CONTENT_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
-                "name": "SERVER_TIMESTAMP",
-                "type": "timestamp",
-                "columnName": "SERVER_TIMESTAMP",
-                "displayName": "Server Timestamp",
-                "aliasName": "",
-                "table": "MCT_CONTENT_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
-                "name": "SSID",
-                "type": "string",
-                "columnName": "SSID",
-                "displayName": "SSID",
-                "aliasName": "",
-                "table": "MCT_CONTENT_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
-                "name": "CANCEL_FLAG",
-                "type": "string",
-                "columnName": "CANCEL_FLAG",
-                "displayName": "Cancel Flag",
-                "aliasName": "",
-                "table": "MCT_CONTENT_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
-                "name": "TRANSFER_MONTH_ID",
-                "type": "integer",
-                "columnName": "TRANSFER_MONTH_ID",
-                "displayName": "Transfer Month",
-                "aliasName": "",
-                "table": "MCT_CONTENT_SUMMARY",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
-                "name": "TRANSFER_DATE_ID",
-                "type": "integer",
-                "columnName": "TRANSFER_DATE_ID",
-                "displayName": "Transfer Date",
                 "aliasName": "",
                 "table": "MCT_CONTENT_SUMMARY",
                 "joinEligible": false,
