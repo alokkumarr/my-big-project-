@@ -9,13 +9,14 @@ export function interceptor($httpProvider) {
         // causes a circular dependency with $http
         const generalErrorMsgKey = 'ERROR_OOPS_SERVER';
         const toastMessage = $injector.get('toastMessage');
+        const $q = $injector.get('$q');
         const $translate = $injector.get('$translate');
 
         $translate(generalErrorMsgKey).then(generalErrorMsg => {
           toastMessage.error(generalErrorMsg);
         });
 
-        return error;
+        return $q.reject(error);
       }
     };
   });

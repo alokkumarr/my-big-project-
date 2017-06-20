@@ -12,7 +12,7 @@ export const AnalyzeViewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeViewController extends AbstractComponentController {
-    constructor($injector, $compile, AnalyzeService, $state, $mdDialog, $mdToast, $rootScope, localStorageService) {
+    constructor($injector, $compile, AnalyzeService, $state, $mdDialog, toastMessage, $rootScope, localStorageService) {
       'ngInject';
       super($injector);
 
@@ -21,7 +21,7 @@ export const AnalyzeViewComponent = {
       this._$state = $state;
       this._$mdDialog = $mdDialog;
       this._localStorageService = localStorageService;
-      this._$mdToast = $mdToast;
+      this._toastMessage = toastMessage;
       this._$rootScope = $rootScope;
       this._analysisCache = [];
 
@@ -112,13 +112,33 @@ export const AnalyzeViewComponent = {
     }
 
     removeAnalysis(model) {
-      remove(this.analyses, report => {
-        return report.id === model.id;
+      this._$rootScope.showProgress = true;
+      this._AnalyzeService.deleteAnalysis(model).then(() => {
+        remove(this.analyses, report => {
+          return report.id === model.id;
+        });
+        this.updater.next({analyses: this.analyses});
+        this._$rootScope.showProgress = false;
+        this._toastMessage.info('Analysis deleted.');
+      }, err => {
+        this._$rootScope.showProgress = false;
+        this._toastMessage.error(err.message || 'Analysis not deleted.');
       });
-      this._$mdToast.show({
-        template: '<md-toast><span>Analysis Deleted</span></md-toast>',
-        position: 'bottom left',
-        toastClass: 'toast-primary'
+    }
+
+    openDeleteModal(model) {
+      const confirm = this._$mdDialog.confirm()
+            .title('Are you sure you want to delete this analysis?')
+        .textContent('Any published analyses will also be deleted.')
+        .ok('Delete')
+        .cancel('Cancel');
+
+      this._$mdDialog.show(confirm).then(() => {
+        this.removeAnalysis(model);
+      }, err => {
+        if (err) {
+          this._$log.error(err);
+        }
       });
     }
 
@@ -133,7 +153,7 @@ export const AnalyzeViewComponent = {
           break;
         }
         case 'delete':
-          this.removeAnalysis(payload);
+          this.openDeleteModal(payload);
           break;
         case 'publish':
           this.publish(payload);
@@ -177,20 +197,6 @@ export const AnalyzeViewComponent = {
     execute(analysis) {
       this._AnalyzeService.executeAnalysis(analysis);
       this.goToAnalysis(analysis);
-    }
-
-    openDeleteModal(analysis) {
-      const confirm = this._$mdDialog.confirm()
-        .title('Are you sure you want to delete this analysis?')
-        .textContent('Any published analyses will also be deleted.')
-        .ok('Delete')
-        .cancel('Cancel');
-
-      this._$mdDialog.show(confirm).then(() => {
-        return this._AnalyzeService.deleteAnalysis(analysis.id);
-      }).then(data => {
-        this.onCardAction('delete', data);
-      });
     }
 
     openEditModal(mode, model) {

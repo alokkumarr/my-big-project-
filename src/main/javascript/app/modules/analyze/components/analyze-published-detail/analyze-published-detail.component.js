@@ -12,13 +12,14 @@ export const AnalyzePublishedDetailComponent = {
   template,
   styles: [style],
   controller: class AnalyzePublishedDetailController extends AbstractComponentController {
-    constructor($injector, AnalyzeService, $state, $rootScope, $mdDialog, $window) {
+    constructor($injector, AnalyzeService, $state, $rootScope, $mdDialog, $window, toastMessage) {
       'ngInject';
       super($injector);
 
       this._AnalyzeService = AnalyzeService;
       this._$state = $state;
       this._$rootScope = $rootScope;
+      this._toastMessage = toastMessage;
       this._$window = $window; // used for going back from the template
       this._$mdDialog = $mdDialog;
       this._executionId = $state.params.executionId;
@@ -94,6 +95,34 @@ export const AnalyzePublishedDetailComponent = {
           this.analyses = analyses;
           this.loadLastPublishedAnalysis();
         });
+    }
+
+    removeAnalysis(model) {
+      const category = model.categoryId;
+      this._$rootScope.showProgress = true;
+      this._AnalyzeService.deleteAnalysis(model).then(() => {
+        this._toastMessage.info('Analysis deleted.');
+        this._$state.go('analyze.view', {id: category});
+      }, err => {
+        this._$rootScope.showProgress = false;
+        this._toastMessage.error(err.message || 'Analysis not deleted.');
+      });
+    }
+
+    openDeleteModal() {
+      const confirm = this._$mdDialog.confirm()
+            .title('Are you sure you want to delete this analysis?')
+            .textContent('Any published analyses will also be deleted.')
+        .ok('Delete')
+        .cancel('Cancel');
+
+      this._$mdDialog.show(confirm).then(() => {
+        this.removeAnalysis(this.analysis);
+      }, err => {
+        if (err) {
+          this._$log.error(err);
+        }
+      });
     }
 
     openEditModal(mode) {
