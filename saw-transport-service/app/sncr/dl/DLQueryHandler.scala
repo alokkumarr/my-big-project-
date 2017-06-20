@@ -7,6 +7,8 @@ import java.util.concurrent.ExecutionException
 import com.fasterxml.jackson.databind.node.ObjectNode
 import org.apache.commons.httpclient.util.TimeoutController.TimeoutException
 import org.apache.http.client.HttpResponseException
+import org.apache.spark.sql
+import org.apache.spark.sql.execution
 import org.json4s.JsonAST.{JBool, JLong, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
@@ -14,7 +16,7 @@ import play.api.libs.json.JsValue
 import play.libs.Json
 import play.mvc.Result
 import sncr.datalake.DLSession
-import sncr.datalake.engine.{Analysis, ExecutionType}
+import sncr.datalake.engine.{Analysis, AnalysisExecution, ExecutionType}
 import sncr.datalake.handlers.{AnalysisNodeExecutionHelper, HasDataObject, SemanticNodeExecutionHelper}
 import sncr.metadata.datalake.DataObject
 import sncr.metadata.engine.MetadataDictionary
@@ -55,16 +57,19 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
                                 ext.values.get(MetadataDictionary.query.toString).get.asInstanceOf[JsValue]
                               else null
 
+    val numOfRec : Int = Integer.parseInt(if (ext.values.contains(MetadataDictionary.numberOfRecords.toString))
+                        ext.values.get(MetadataDictionary.numberOfRecords.toString).get.asInstanceOf[String]
+                      else "100")
 
     try {
       verb match {
-        case "execute" => {
+        case "preview" => {
 
           if (analysisId != null) {
 
             val analysis = new Analysis(analysisId)
-            val execution = analysis.execute(ExecutionType.preview)
-            res.put("result", s"Created execution id: ${execution.id}")
+            val execution = analysis.executeAndWait(ExecutionType.preview)
+            res.put("result", s"Created execution id: ${execution.getId}")
 
 
             //TODO:: Should be uncommented when Spark 2.2.0 will be available, See https://issues.apache.org/jira/browse/SPARK-13747
@@ -80,9 +85,9 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
             if (resultData != null)
               res.put("data", processResult(resultData))
             else {
-              m_log debug s"Exec code: ${execution.executionCode}, message: ${execution.executionMessage}"
-              res.put("result", execution.executionCode)
-              res.put("reason", execution.executionMessage)
+              m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}"
+              res.put("result", execution.getExecCode)
+              res.put("reason", execution.getExecMessage)
             }
 
           }
@@ -98,7 +103,7 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
             m_log debug s"Execute query: $q"
             val sm = SemanticNode(semanticId, SelectModels.everything.id)
             val snh = new SemanticNodeExecutionHelper(sm, true)
-            snh.executeSQL(q)
+            snh.executeSQL(q, numOfRec)
             val data = snh.getData
             if (data != null) res.put("data", processResult(data))
             else {
@@ -140,26 +145,71 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
           }
 
           val analysis = new Analysis(analysisId)
-          val execution = analysis.execute(ExecutionType.onetime)
-          res.put("result", s"Created execution id: ${execution.id}")
-
-
-          //TODO:: Should be uncommented when Spark 2.2.0 will be available, See https://issues.apache.org/jira/browse/SPARK-13747
-          /*
-            m_log debug s"Execution has been started, get data via future"
-            val f = execution.getData
-            Await.result(f,  Duration(30, "seconds")); m_log debug "Execution result: " + f.value
-            f onSuccess { case _ => m_log info "Request was successfully processed"; if (f.value.get.get != null ) res.put( "data", processResult(f.value.get.get))}
-            f onFailure { case _ => m_log error "Could not process request: " + f.value }
-          */
-
+          val execution = analysis.executeAndWait(ExecutionType.onetime)
+          res.put("result", s"Created execution id: ${execution.getId}")
           val resultData = execution.fetchData
           if (resultData != null)
             res.put("data", processResult(resultData))
           else {
-            m_log debug s"Exec code: ${execution.executionCode}, message: ${execution.executionMessage}"
-            res.put("result", execution.executionCode)
-            res.put("reason", execution.executionMessage)
+            m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}"
+            res.put("result", execution.getExecCode)
+            res.put("reason", execution.getExecMessage)
+          }
+        }
+        case "execute" => {
+          if (analysisId != null) {
+            if (DLQueryHandler.storedExecutors.contains(analysisId))
+            {
+              var msg = s"Request for Analysis ID: $analysisId is still being executed"
+               if(DLQueryHandler.storedResults(analysisId).isDone ||
+                  DLQueryHandler.storedResults(analysisId).isCancelled) {
+                 msg = s"Request for Analysis ID: $analysisId has been completed"
+                 res.put("result", "COMPLETED")
+               }
+              else
+                 res.put("result", "IN_PROGRESS")
+              m_log debug msg
+              res.put("reason", msg)
+              return play.mvc.Results.ok(res)
+            }
+            val analysis = new Analysis(analysisId)
+            synchronized{  DLQueryHandler.storedExecutors += (analysisId -> analysis) }
+            val future = analysis.execute(ExecutionType.onetime)
+            synchronized{ DLQueryHandler.storedResults += ( analysisId -> future ) }
+          }
+          else if (semanticId != null) {
+            //TODO::To be implemented
+          }
+        }
+        case "exec-complete" =>
+          {
+            if (analysisId != null) {
+              if (DLQueryHandler.storedExecutors.contains(analysisId))
+              {
+                val data = DLQueryHandler.storedResults(analysisId).get
+                val analysis = DLQueryHandler.storedExecutors(analysisId)
+                val execution = analysis.exec
+                res.put("result_id", s"Created execution id: ${execution.getId}")
+                if (data != null) {
+                  res.put("data", processResult(data))
+                }
+                m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}"
+                res.put("result", execution.getExecCode)
+                res.put("reason", execution.getExecMessage)
+                synchronized {DLQueryHandler.storedExecutors -= analysisId}
+                synchronized {DLQueryHandler.storedResults -= analysisId}
+              }
+            }
+          }
+        case "exec-cancel" =>
+        {
+          if (analysisId != null) {
+            if (DLQueryHandler.storedExecutors.contains(analysisId))
+            {
+              DLQueryHandler.storedResults(analysisId).cancel(true)
+              synchronized{DLQueryHandler.storedExecutors -= analysisId}
+              synchronized{DLQueryHandler.storedResults -= analysisId}
+            }
           }
         }
         case "none" =>
@@ -208,5 +258,13 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
     ).toList)))
 
   }
+
+}
+
+object DLQueryHandler{
+
+  var storedResults : Map[String, java.util.concurrent.Future[java.util.List[java.util.Map[String, (String, Object)]]]] = Map.empty
+  var storedExecutors : Map[String, Analysis] = Map.empty
+
 
 }

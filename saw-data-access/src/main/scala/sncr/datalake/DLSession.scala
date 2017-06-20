@@ -3,11 +3,11 @@ package sncr.datalake
 import java.util
 import java.util.UUID
 
-import org.slf4j.{Logger, LoggerFactory}
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 import org.json4s.JsonAST.{JString, _}
 import org.json4s.native.JsonMethods._
+import org.slf4j.{Logger, LoggerFactory}
 import sncr.datalake.engine.CacheManagement
 import sncr.datalake.exceptions.{DAException, ErrorCodes}
 import sncr.metadata.engine.ProcessingResult
@@ -46,6 +46,10 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     */
   private var nativeloadedData : Map[String, DataFrame] = Map.empty
 
+  /**
+    * nativeloadedData - scala collection contains native Spark dataset (Dataframe[Row])
+    */
+  protected var dataIterator : Map[String, java.util.Iterator[java.util.HashMap[String, (String, Object)]]] = Map.empty
 
   /**
     * Load Data Object with name into memory, remove loaded object if it already exists.
@@ -90,24 +94,6 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
   }
 
   /**
-    * Returns all data - TAKES LONG TIME,  this function materialized data from Dataset
-    *
-    * @param doName
-    * @return
-    */
-  def getAllData(doName : String) : util.Iterator[java.util.Map[String, (String, Object)]] =
-  {
-    lastUsed = System.currentTimeMillis
-    val alldata = DLSession.convert(nativeloadedData(doName).collect(), nativeloadedData(doName).dtypes)
-    val data = loadedData.get(doName)
-    if (data.isDefined)
-      alldata.iterator()
-    else
-      null
-  }
-
-
-  /**
     * Extracts schema from underlying Dataset
     *
     * @param doName - Data Object name
@@ -121,6 +107,7 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
   /**
     * The function executes statement, registers it as @param viewName
     * and load data sample to data cache
+    *
     * @param viewName - temp view/table name
     * @param sql  - statement to execute
     * @param limit - return max number of rows
@@ -130,10 +117,7 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     try {
       m_log debug s"Execute SQL: $sql, view name: $viewName"
       val newDf = sparkSession.sql(sql)
-
-
       newDf.createOrReplaceTempView(viewName)
-
       if (loadedData.get(viewName).isDefined) loadedData -= viewName
       if (nativeloadedData.get(viewName).isDefined) nativeloadedData -= viewName
 
@@ -153,12 +137,22 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     (ProcessingResult.Success.id, "Success")
   }
 
+  /**
+    * The function executes statement, registers it as @param viewName
+    * BUT it does not load data to data cache
+    *
+    * @param viewName - temp view/table name
+    * @param sql  - statement to execute
+    * @return - result indicator
+    */
   protected def execute(viewName: String, sql: String) : (Integer, String) = {
-    try {
-      m_log debug s"Execute SQL: $sql, view name: $viewName"
-      val newDf = sparkSession.sql(sql)
-      newDf.createOrReplaceTempView(viewName)
-      lastUsed = System.currentTimeMillis
+    try{
+    m_log debug s"Execute SQL: $sql, view name: $viewName"
+    val newDf = sparkSession.sql(sql)
+    newDf.createOrReplaceTempView(viewName)
+    if (nativeloadedData.get(viewName).isDefined) nativeloadedData -= viewName
+    nativeloadedData += (viewName -> newDf)
+    lastUsed = System.currentTimeMillis
     }
     catch{
       case x: Throwable => {
@@ -173,7 +167,53 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
 
 
   /**
+    * The method materializes Dataset on local machine to Iterator.
+    * It could be a preview data (data sample) or
+    * It could be entire data file - BE CAREFUL
+    * To materialize entire data file - skip limit parameter.
+    *
+    * @param viewName
+    * @param limit
+    */
+  protected def materializeDataToIterator(viewName: String, limit: Int = 0) : Unit =
+  {
+    if (nativeloadedData.get(viewName).isEmpty) {
+      m_log error ("Attempt to materialize non-existing dataset")
+      return
+    }
+    if (dataIterator.get(viewName).isDefined) dataIterator -= viewName
+    if (limit > 0)
+      dataIterator += ( (viewName) -> convertToIterator(nativeloadedData(viewName).head(limit),nativeloadedData(viewName).dtypes))
+    else
+      dataIterator += ( (viewName) -> convertToIterator(nativeloadedData(viewName).collect,nativeloadedData(viewName).dtypes))
+  }
+
+  /**
+    * The method materializes Dataset on local machine as list of Maps.
+    * It could be a preview data (data sample) or
+    * It could be entire data file - BE CAREFUL
+    * To materialize entire data file - skip limit parameter.
+    *
+    * @param viewName
+    * @param limit
+    */
+  protected def materializeDataToList(viewName: String, limit: Int = 0) : Unit = {
+    if (nativeloadedData.get(viewName).isEmpty) {
+      m_log error "Attempt to materialize non-existing dataset"
+      return
+    }
+    if (loadedData.get(viewName).isDefined) loadedData -= viewName
+    if (dataIterator.get(viewName).isDefined) dataIterator -= viewName
+    val data= (if (limit > 0)  DLSession.convert(nativeloadedData.get(viewName).get, limit)
+         else DLSession.convert(nativeloadedData.get(viewName).get.collect, nativeloadedData.get(viewName).get.dtypes))
+    loadedData += (viewName -> data)
+  }
+
+
+
+  /**
     * Save data object with doName into location in given format
+    *
     * @param doName - data object name
     * @param location - location
     * @param format - output format: parquet, json
@@ -236,6 +276,17 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
 
   def getDataSampleAsString(dobj: String) : String = pretty(render(getDataSampleAsJSON(dobj)))
 
+  def convertToIterator(rows : Array[Row], dtypes: Array[(String, String)]): java.util.Iterator[util.HashMap[String, (String, Object)]] = {
+    rows.map( r => {
+      val dataHashMap = new util.HashMap[String, (String, Object)]()
+      val rowTypeAndValue = r.toSeq.zip(dtypes)
+      rowTypeAndValue.foreach(colTyped => {
+        dataHashMap.put(colTyped._2._1, (colTyped._2._2, colTyped._1.asInstanceOf[Object]))
+      })
+      dataHashMap
+    }).toIterator
+  }
+
 
 }
 
@@ -267,7 +318,7 @@ object DLSession
   def removeFromCache(sessionId: String ): Unit = this.synchronized{sessions -= sessionId}
   def getSession[T<:DLSession](sessionId: String ): DLSession = sessions(sessionId)
 
-  //TODO:: Essentially this call materializes Dataset, it needs to be investigated to choose optimal approcah
+  //TODO:: Essentially this call materializes Dataset, it needs to be investigated to choose optimal approach
   //to bing data from datalake
   def convert(df: DataFrame, limit: Int): util.List[util.Map[String, (String, Object)]] =  convert(df.head(limit), df.dtypes)
 

@@ -1,5 +1,8 @@
 package sncr.datalake.engine
 
+import java.util
+import java.util.concurrent.{ExecutorService, Executors, Future}
+
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.datalake.engine.ExecutionType.ExecutionType
@@ -12,18 +15,33 @@ class Analysis(val analysisId : String) {
 
   protected val m_log: Logger = LoggerFactory.getLogger(classOf[Analysis].getName)
   val an = AnalysisNode(analysisId)
+
+  private val executor : ExecutorService = Executors.newFixedThreadPool(1)
+  private var task     : Future[util.List[util.Map[String, (String, Object)]]] = null
+
+
   /**
     * start execution of an analysis and return an execution object immediately; store the "type" parameter in
     * the execution object, but no need for the Spark SQL executor to do anything with it
     */
 
-  def execute(execType: ExecutionType) : AnalysisExecution =
+  def executeAndWait(execType: ExecutionType) : AnalysisExecution =
   {
     m_log debug s"Execute analysis as ${execType.toString}"
     val analysisExecution = new AnalysisExecution(an, execType)
-    analysisExecution.startExecution( !(execType == ExecutionType.preview))
+    analysisExecution.startExecution( execType)
     analysisExecution
   }
+
+  var exec :AsynchAnalysisExecWithList = null
+  def execute(execType: ExecutionType) : Future[util.List[util.Map[String, (String, Object)]]] =
+  {
+    m_log debug s"Asynchronously execute analysis as ${execType.toString}"
+    exec = new AsynchAnalysisExecWithList(an, execType)
+    task = executor.submit(exec)
+    task
+  }
+
 
   /**
     * Returns the list of executions for that analysis
@@ -42,6 +60,13 @@ class Analysis(val analysisId : String) {
       val analysisExecution = new AnalysisExecution(an, ExecutionType.onetime)
       analysisExecution
   }
+
+
+  override def finalize: Unit =
+  {
+    executor.shutdown()
+  }
+
 
 }
 

@@ -20,14 +20,14 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
   protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisExecution].getName)
 
 
-  var analysisNodeExecution : AnalysisNodeExecutionHelper = null
-  var id : String = null
-  var executionMessage : String = null
-  var executionCode : Integer = -1
-  var status : ExecutionStatus = ExecutionStatus.INIT
-  var startTS : java.lang.Long = null
+  protected var analysisNodeExecution : AnalysisNodeExecutionHelper = null
+  protected var id : String = null
+  protected var executionMessage : String = null
+  protected var executionCode : Integer = -1
+  protected var status : ExecutionStatus = ExecutionStatus.INIT
+  protected var startTS : java.lang.Long = null
 
-  def startExecution( persist: Boolean) : Unit =
+  def startExecution( execType: ExecutionType ) : Unit =
   {
     try {
       analysisNodeExecution = new AnalysisNodeExecutionHelper(an)
@@ -38,12 +38,22 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
       startTS = analysisNodeExecution.getStartTS
       m_log debug s"Loaded objects, Started TS: $startTS "
       status = ExecutionStatus.IN_PROGRESS
-      analysisNodeExecution.executeSQL()
-      if (persist){
-        analysisNodeExecution.createAnalysisResult(null, null)
-        status = ExecutionStatus.COMPLETED
-      }
 
+      execType match {
+        case ExecutionType.scheduled => {
+          analysisNodeExecution.executeSQLNoDataLoad()
+          analysisNodeExecution.createAnalysisResult(null, null)
+        }
+        case ExecutionType.onetime => {
+          analysisNodeExecution.executeSQLNoDataLoad()
+          analysisNodeExecution.getAllData
+        }
+        case ExecutionType.preview => {
+          analysisNodeExecution.executeSQL()
+          analysisNodeExecution.getPreview()
+        }
+      }
+      status = ExecutionStatus.COMPLETED
     }
     catch{
       case t: Throwable => {
@@ -53,7 +63,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
         m_log error (s"Could not start execution: ", t)
       }
     }
-    executionMessage = "success";
+    executionMessage = "success"
     executionCode = ProcessingResult.Success.id
   }
 
@@ -105,6 +115,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
 
   /**
     * Returns the rows of the query execution result
+    *
     * @return List<Map<…>> data structure
     */
   def fetchData : java.util.List[java.util.Map[String, (String, Object)]] = {
@@ -113,6 +124,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
 
   /**
     * Returns the rows of the query execution result
+    *
     * @return List<Map<…>> data structure
     */
   def loadExecution(id : String) : java.util.List[java.util.Map[String, (String, Object)]] = {

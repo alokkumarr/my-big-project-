@@ -100,7 +100,9 @@ class Extractor {
                     MetadataDictionary.semanticId.toString,
                     MetadataDictionary.dataObjectId.toString,
                     MetadataDictionary.verb.toString,
-                    MetadataDictionary.analysisResult.toString)
+                    MetadataDictionary.analysisResult.toString,
+                    MetadataDictionary.numberOfRecords.toString
+    )
 
     ids.foreach( idType => {
     val (bRes, v) = testField(json, idType); if (bRes) {

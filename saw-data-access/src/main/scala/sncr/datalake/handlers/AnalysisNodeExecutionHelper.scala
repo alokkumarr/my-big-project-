@@ -95,9 +95,9 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
   var lastSQLExecMessage : String = null
 
   /**
-    * Wrapper for base method to execute SQL statement
+    * Wrapper for base method to execute SQL statement and load (materialize) limited amount of data
     *
-    * @param limit - number of rows to return, it should be less or equal value configured in application configuration file.
+    * @param limit - number of rows to materialize, it should be less or equal value configured in application configuration file.
     * @return
     */
   def executeSQL(limit : Int = DLConfiguration.rowLimit): (Integer, String) = {
@@ -106,15 +106,25 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
     (lastSQLExecRes, lastSQLExecMessage)
   }
 
+  /**
+    * Wrapper for base method to execute SQL statement, the method does not materialized data
+    *
+    * @param limit - number of rows to return, it should be less or equal value configured in application configuration file.
+    * @return
+    */
+  def executeSQLNoDataLoad(limit : Int = DLConfiguration.rowLimit): (Integer, String) = {
+    val (llastSQLExecRes, llastSQLExecMessage) = execute(analysis, sql)
+    lastSQLExecRes = llastSQLExecRes; lastSQLExecMessage = llastSQLExecMessage
+    (lastSQLExecRes, lastSQLExecMessage)
+  }
 
   def getExecutionData :java.util.List[java.util.Map[String, (String, Object)]] = getData(analysis)
 
-  /**
-    * Wrapper around base method that combines SQL execution and new data object saving to appropriate location
-    *
-    * @param rl - rows limit , it should be less or equal value configured in application configuration file.
-    */
-  def executeAndSave(rl: Int) : Unit = _executeAndSave(null, rl)
+
+  def getAllData : Unit =  materializeDataToList(analysis)
+  def getIterator : Unit =  materializeDataToIterator(analysis)
+
+  def getPreview(limit: Int = DLConfiguration.rowLimit) : Unit =  materializeDataToList(analysis, limit )
 
   /**
     * Wrapper around base method that combines SQL execution and new data object saving to appropriate location
@@ -124,14 +134,6 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
     *            can be used for debugging
     */
   def executeAndSave(out: OutputStream, rl: Int) : Unit = _executeAndSave(out, rl)
-
-  /**
-    * Wrapper around base method that combines SQL execution and new data object saving to appropriate location
-    *
-    * @param out - Hadoop output stream is used to print AnalysisResult descriptor into it.
-    *            can be used for debugging
-    */
-  def executeAndSave(out: OutputStream ) : Unit = _executeAndSave(out, DLConfiguration.rowLimit)
 
 
   /**
@@ -150,6 +152,9 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
     executeSQL(rowLim)
     createAnalysisResult(resId, out)
   }
+
+  def getDataIterator : java.util.Iterator[java.util.HashMap[String, (String, Object)]] = dataIterator(analysis)
+
 
   def printSample(out: OutputStream) : Unit =
   {
