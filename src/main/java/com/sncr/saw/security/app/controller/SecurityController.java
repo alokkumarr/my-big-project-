@@ -311,7 +311,7 @@ public class SecurityController {
 		if (!cnfNewPass.equals(newPass)) {
 			message = "'New Password' and 'Verify password' does not match.";
 		} else if (newPass.length() < 8) {
-			message = "New password should be minimum of 8 charactar.";
+			message = "New password should be minimum of 8 character.";
 		} else if (loginId.equals(newPass)) {
 			message = "User Name can't be assigned as password.";
 		}
@@ -319,13 +319,13 @@ public class SecurityController {
 		Pattern pCaps = Pattern.compile("[A-Z]");
 		Matcher m = pCaps.matcher(newPass);
 		if (!m.find()) {
-			message = "Password should contain atleast 1 uppercase charactar.";
+			message = "Password should contain atleast 1 uppercase character.";
 		}
 
 		Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
 		m = pSpeChar.matcher(newPass);
 		if (!m.find()) {
-			message = "Password should contain atleast 1 special charactar.";
+			message = "Password should contain atleast 1 special character.";
 		}
 		try {
 			if (message == null) {
@@ -610,7 +610,7 @@ public class SecurityController {
 				userList.setValid(true);
 				if (user.getPassword() != null) {
 					if (user.getPassword().length() < 8) {
-						userList.setValidityMessage("New password should be minimum of 8 charactar.");
+						userList.setValidityMessage("New password should be minimum of 8 character.");
 						userList.setValid(false);
 					} else if (user.getMasterLoginId().equals(user.getPassword())) {
 						userList.setValidityMessage("User Name can't be assigned as password.");
@@ -619,13 +619,13 @@ public class SecurityController {
 					Pattern pCaps = Pattern.compile("[A-Z]");
 					Matcher m = pCaps.matcher(user.getPassword());
 					if (!m.find()) {
-						userList.setValidityMessage("Password should contain atleast 1 uppercase charactar.");
+						userList.setValidityMessage("Password should contain atleast 1 uppercase character.");
 						userList.setValid(false);
 					}
 					Pattern pSpeChar = Pattern.compile("[~!@#$%^&*?<>]");
 					m = pSpeChar.matcher(user.getPassword());
 					if (!m.find()) {
-						userList.setValidityMessage("Password should contain atleast 1 special charactar.");
+						userList.setValidityMessage("Password should contain atleast 1 special character.");
 						userList.setValid(false);
 					}
 				} else {
