@@ -33,11 +33,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.synchronoss</groupId>
-			<artifactId>saw-metadata-service</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.spark</groupId>
 			<artifactId>spark-core_${scala.major.version}</artifactId>
 			<version>${spark-version}</version>
@@ -145,6 +140,7 @@
 		</plugin>
 		<!-- Assembly plugin 2: end -->
 		<!-- Assembly plugin 3: Build Jar with dependencies -->
+<!--
 		<plugin>
 			<artifactId>maven-assembly-plugin</artifactId>
 			<version>3.0.0</version>
@@ -162,6 +158,7 @@
 				</descriptorRefs>
 			</configuration>
 		</plugin>
+-->
 		<!-- Assembly plugin 3: end -->
 	</plugins>
 	</build>
