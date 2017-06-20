@@ -23,6 +23,9 @@ import sncr.metadata.engine.SearchMetadata._
 import com.synchronoss.querybuilder.SAWElasticSearchQueryExecutor
 import com.synchronoss.querybuilder.EntityType
 import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder
+import java.time.format.DateTimeFormatter
+import java.time.LocalDateTime
+import sncr.metadata.engine.{Fields, MetadataDictionary}
 
 class Analysis extends BaseController {
   val executorRunner = new ExecutionTaskHandler(1)
@@ -216,6 +219,15 @@ class Analysis extends BaseController {
     val analysisJSON = readAnalysisJson(analysisId);
     val analysisType = (analysisJSON \ "type");
     val analysisNode = AnalysisNode(analysisId)
+    
+    val dfrm: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    val analysisName = (analysisJSON \ "metricName").extractOpt[String]
+    var descriptor: JObject = null
+    val ldt: LocalDateTime = LocalDateTime.now()
+    val timestamp: String = ldt.format(dfrm)
+    var schema : JValue = JNothing
+    
+    
     if (analysisNode.getCachedData == null || analysisNode.getCachedData.isEmpty)
       throw new Exception("Could not find analysis node with provided analysis ID")
     // check the type
@@ -234,6 +246,56 @@ class Analysis extends BaseController {
       val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json), json);
       val myArray = parse(data);
+      var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
+      // The below block is for execution result to store
+		if (data !=null){
+		    var nodeExists = false
+		    try {
+		      m_log debug s"Remove result: " + analysisResultNodeID
+		      resultNode = AnalysisResult(analysisId, analysisResultNodeID)
+		      nodeExists = true
+		    }
+		    catch {
+		      case e: Exception => m_log debug("Tried to load node: ", e)
+		    }
+		    if (nodeExists) resultNode.delete
+		
+		schema  = JObject(JField("schema", JString("Does not need int the case of the Chart")))
+		descriptor = new JObject(List(
+        JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+        JField("id", JString(analysisId.get)),
+        JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+        JField("execution_result", JString(result)),
+        JField("execution_timestamp", JString(timestamp))
+      ))
+      m_log debug s"Create result: with content: ${compact(render(descriptor))}"
+		}
+		else 
+			{
+			val errorMsg = "There is no result for query criteria";
+	        descriptor = new JObject(List(
+	        JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+	        JField("id", JString(analysisId)),
+	        JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+	        JField("execution_result", JString("empty body")),
+	        JField("execution_timestamp", JString(timestamp)),
+	        JField("error_message", JString(errorMsg))
+	      ))
+     	}
+      
+      	var descriptorPrintable: JValue = null
+	    resultNode = new AnalysisResult(analysisId, descriptor, analysisResultNodeID)
+		if (data !=null)
+		{
+			resultNode.addObject("data", myArray, schema);
+			val (res, msg) = resultNode.create;
+	    	m_log debug s"Analysis result creation: $res ==> $msg"
+		}
+		else 
+		{
+		  descriptorPrintable = descriptor
+	    }	   
+      
       m_log.trace("chart dataset: {}", myArray)
       return myArray
     }
