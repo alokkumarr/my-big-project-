@@ -72,7 +72,17 @@
       </div>
     </div>
   </md-toolbar>
-  <div ng-switch="$ctrl.analysis.type">
+  <md-card  ng-if="$ctrl.analyses && !$ctrl.analyses.length">
+    <div class="prompt-execution-container">
+      <span translate="NO_PREVIOUS_EXECUTION"></span>
+      <div>
+        <md-button class="btn-primary" ng-click="$ctrl.executeAnalysis()">
+          <span translate="EXECUTE"></span>
+        </md-button>
+      </div>
+    </div>
+  </md-card>
+  <div ng-switch="$ctrl.analysis.type" ng-if="$ctrl.analyses.length">
     <analyze-chart-detail ng-switch-when="chart" analysis="$ctrl.analysis" requester="$ctrl.requester"></analyze-chart-detail>
     <analyze-report-detail ng-switch-when="report" analysis="$ctrl.analysis" requester="$ctrl.requester"></analyze-report-detail>
     <analyze-pivot-detail ng-switch-when="pivot" analysis="$ctrl.analysis" requester="$ctrl.requester"></analyze-pivot-detail>
@@ -98,15 +108,6 @@
     -->
   </md-card>
   <panel start-collapsed="false" ng-if="$ctrl.analyses" title="'OTHER_PUBLISHED_ANALYSES' | translate">
-    <div class="prompt-execution-container" ng-if="!$ctrl.analyses.length">
-      <span translate="NO_PREVIOUS_EXECUTION"></span>
-      <div>
-        <md-button class="btn-primary" ng-click="$ctrl.executeAnalysis()">
-          <span translate="EXECUTE"></span>
-        </md-button>
-      </div>
-    </div>
-
     <analyze-published-list ng-if="$ctrl.analyses.length" analysis="$ctrl.analysis" analyses="$ctrl.analyses"></analyze-published-list>
   </panel>
 </div>
