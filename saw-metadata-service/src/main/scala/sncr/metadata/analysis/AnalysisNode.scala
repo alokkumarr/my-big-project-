@@ -212,10 +212,16 @@ class AnalysisNode(private var analysisNode: JValue = JNothing, markNoRelationEx
     val analysisResult = new AnalysisResult(id)
     val rowIDs = analysisResult.simpleMetadataSearch(keys, "and")
     rowIDs.foreach( rowId => {
-      val rowIdStr = Bytes.toString(rowId)
-      val ar = AnalysisResult(id, rowIdStr)
-      ar.deleteObjects
-      ar.delete
+      try {
+        val rowIdStr = Bytes.toString(rowId)
+        val ar = AnalysisResult(id, rowIdStr)
+        ar.deleteObjects
+        ar.delete
+        m_log debug s"Removed analysis result for node $id, result ID: ${Bytes.toString(rowId)} ]"
+      }
+      catch{
+        case x: Throwable => m_log.error(s"Could not remove data object [Row ID : $rowId ]", x)
+      }
     }
     )
   }

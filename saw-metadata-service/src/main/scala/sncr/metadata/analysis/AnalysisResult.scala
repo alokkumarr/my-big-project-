@@ -199,7 +199,7 @@ class AnalysisResult(private val parentAnalysisRowID : String,
         case "location" => val p = _objects(desc._1).asInstanceOf[String]
           m_log debug s"Removing file at location $p, reference: ${desc._1}"
           HFileOperations.deleteFile(p)
-        case _ => m_log trace s"Clean up is not required for object: ${desc._1}"
+        case _ => m_log debug s"Clean up is not required for object: ${desc._1} -> ${desc._2}"
       }
     })
   }

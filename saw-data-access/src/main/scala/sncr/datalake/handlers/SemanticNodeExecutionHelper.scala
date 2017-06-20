@@ -52,6 +52,9 @@ class SemanticNodeExecutionHelper(val sn : SemanticNode, cacheIt : Boolean = fal
   var execResult : java.util.List[java.util.Map[String, (String, Object)]] = null
   var isDataLoaded = false
 
+  var startTS : java.lang.Long = System.currentTimeMillis()
+  var finishedTS: Long =  System.currentTimeMillis()
+
   /**
     * Specific to SemanticNode method to load data objects
     */

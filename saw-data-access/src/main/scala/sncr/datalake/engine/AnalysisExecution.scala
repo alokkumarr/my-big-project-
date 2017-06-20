@@ -26,8 +26,9 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
   protected var executionCode : Integer = -1
   protected var status : ExecutionStatus = ExecutionStatus.INIT
   protected var startTS : java.lang.Long = null
+  protected var finishTS : java.lang.Long = null
 
-  def startExecution( execType: ExecutionType ) : Unit =
+  def startExecution: Unit =
   {
     try {
       analysisNodeExecution = new AnalysisNodeExecutionHelper(an)
@@ -35,10 +36,10 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
       m_log debug s"Started execution, result ID: $id"
       status = ExecutionStatus.STARTED
       analysisNodeExecution.loadObjects()
+      analysisNodeExecution.setStartTime
       startTS = analysisNodeExecution.getStartTS
       m_log debug s"Loaded objects, Started TS: $startTS "
       status = ExecutionStatus.IN_PROGRESS
-
       execType match {
         case ExecutionType.scheduled => {
           analysisNodeExecution.executeSQLNoDataLoad()
@@ -53,6 +54,8 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
           analysisNodeExecution.getPreview()
         }
       }
+      analysisNodeExecution.setFinishTime
+      finishTS = analysisNodeExecution.finishedTS
       status = ExecutionStatus.COMPLETED
     }
     catch{
@@ -95,12 +98,12 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
   /**
     * Returns execution start timestamp as milliseconds since epoch
     */
-  def getStartedTimestamp : java.lang.Long = analysisNodeExecution.startTS
+  def getStartedTimestamp : java.lang.Long =  if (startTS == null ) -1L else startTS
 
   /**
     * Returns execution finished timestamp as milliseconds since epoch
     */
-  def getFinishedTimestamp : java.lang.Long = analysisNodeExecution.finishedTS
+  def getFinishedTimestamp : java.lang.Long = if (finishTS == null ) -1L else finishTS
 
   /**
     * Returns Futute with the query execution result

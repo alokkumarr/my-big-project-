@@ -93,6 +93,16 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
       null
   }
 
+
+  def getDataset(doName : String) : Dataset[Row] = {
+    lastUsed = System.currentTimeMillis
+    val data = nativeloadedData.get(doName)
+    if (data.isDefined)
+      return data.get
+    else
+      null
+  }
+
   /**
     * Extracts schema from underlying Dataset
     *

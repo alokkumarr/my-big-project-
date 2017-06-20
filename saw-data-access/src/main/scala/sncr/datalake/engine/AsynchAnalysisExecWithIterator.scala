@@ -11,7 +11,7 @@ import sncr.metadata.engine.ProcessingResult
 /**
   * Created by srya0001 on 6/19/2017.
   */
-class AsynchAnalysisExecWithIterator(an: AnalysisNode, execType : ExecutionType, val executionType: ExecutionType)
+class AsynchAnalysisExecWithIterator(an: AnalysisNode, execType : ExecutionType)
   extends AnalysisExecution(an, execType)
   with Callable[java.util.Iterator[java.util.HashMap[String, (String, Object)]]] {
 
@@ -20,7 +20,7 @@ class AsynchAnalysisExecWithIterator(an: AnalysisNode, execType : ExecutionType,
   override def call(): java.util.Iterator[java.util.HashMap[String, (String, Object)]] =
   {
     try {
-      startExecution(executionType)
+      startExecution
       if (status == ExecutionStatus.COMPLETED){
          return analysisNodeExecution.getDataIterator
       }

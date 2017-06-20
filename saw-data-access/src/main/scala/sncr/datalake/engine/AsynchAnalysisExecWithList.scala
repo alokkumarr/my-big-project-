@@ -20,7 +20,7 @@ class AsynchAnalysisExecWithList(an: AnalysisNode, execType : ExecutionType)
     override def call(): java.util.List[java.util.Map[String, (String, Object)]] =
     {
       try {
-        startExecution(execType)
+        startExecution
         if (status == ExecutionStatus.COMPLETED){
           m_log debug "Execution completed successfully"
           fetchData

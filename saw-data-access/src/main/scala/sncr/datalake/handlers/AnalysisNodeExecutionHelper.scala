@@ -27,6 +27,9 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
   override protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisNodeExecutionHelper].getName)
   resId = if (resId == null || resId.isEmpty) UUID.randomUUID().toString else resId
 
+  def setFinishTime = { finishedTS =  System.currentTimeMillis() }
+  def setStartTime = { startTS =  System.currentTimeMillis() }
+
   if (an.getCachedData.isEmpty) throw new DAException(ErrorCodes.NodeDoesNotExist, "AnalysisNode")
   if (an.getRelatedNodes.isEmpty) throw new DAException(ErrorCodes.DataObjectNotFound, "AnalysisNode")
 
@@ -76,7 +79,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
   var execResult : java.util.List[java.util.Map[String, (String, Object)]] = null
   var isDataLoaded = false
   var startTS : java.lang.Long = System.currentTimeMillis()
-  var finishedTS: Long = null
+  var finishedTS: Long =  System.currentTimeMillis()
   /**
     * Specific to AnalysisNode method to load data objects
     */
@@ -228,7 +231,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
       return (lastSQLExecRes, m)
     }
 
-    if (getData(analysis) == null) throw new DAException( ErrorCodes.NoResultToSave, analysis)
+    if (getDataset(analysis) == null) throw new DAException( ErrorCodes.NoResultToSave, analysis)
 
     var nodeExists = false
     try {

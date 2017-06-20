@@ -7,8 +7,8 @@ import java.util.concurrent.ExecutionException
 import com.fasterxml.jackson.databind.node.ObjectNode
 import org.apache.commons.httpclient.util.TimeoutController.TimeoutException
 import org.apache.http.client.HttpResponseException
-import org.apache.spark.sql
-import org.apache.spark.sql.execution
+import org.apache.spark.sql.catalyst
+import org.apache.spark.sql.catalyst.analysis
 import org.json4s.JsonAST.{JBool, JLong, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
@@ -16,7 +16,7 @@ import play.api.libs.json.JsValue
 import play.libs.Json
 import play.mvc.Result
 import sncr.datalake.DLSession
-import sncr.datalake.engine.{Analysis, AnalysisExecution, ExecutionType}
+import sncr.datalake.engine.{Analysis, ExecutionType}
 import sncr.datalake.handlers.{AnalysisNodeExecutionHelper, HasDataObject, SemanticNodeExecutionHelper}
 import sncr.metadata.datalake.DataObject
 import sncr.metadata.engine.MetadataDictionary
@@ -84,12 +84,14 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
             val resultData = execution.fetchData
             if (resultData != null)
               res.put("data", processResult(resultData))
-            else {
-              m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}"
-              res.put("result", execution.getExecCode)
-              res.put("reason", execution.getExecMessage)
-            }
+            else
+              res.put("data", "no data found")
 
+            m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}"
+            res.put("result", execution.getExecCode)
+            res.put("reason", execution.getExecMessage)
+            res.put("start" , execution.getStartedTimestamp)
+            res.put("finished" , execution.getFinishedTimestamp)
           }
           else if (semanticId != null) {
 
@@ -105,12 +107,15 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
             val snh = new SemanticNodeExecutionHelper(sm, true)
             snh.executeSQL(q, numOfRec)
             val data = snh.getData
-            if (data != null) res.put("data", processResult(data))
-            else {
-              m_log debug s"Exec-code: ${snh.lastSQLExecRes}, message: ${snh.lastSQLExecMessage}"
-              res.put("result", snh.lastSQLExecRes)
-              res.put("reason", snh.lastSQLExecMessage)
-            }
+
+            if (data != null)
+              res.put("data", processResult(data))
+            else
+              res.put("data", "no data found")
+
+            m_log debug s"Exec-code: ${snh.lastSQLExecRes}, message: ${snh.lastSQLExecMessage}"
+            res.put("result", snh.lastSQLExecRes)
+            res.put("reason", snh.lastSQLExecMessage)
           }
         }
         case "show" => {
@@ -136,38 +141,58 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
             res.put("reason", result)
           }
         }
-        case "save-exec" => {
-
+        case "execute" => {
           if (analysisId == null) {
             res.put("result", "failed")
             res.put("reason", "save-exec is supported only for Analysis, set analysis ID")
             return play.mvc.Results.badRequest(res)
           }
-
           val analysis = new Analysis(analysisId)
           val execution = analysis.executeAndWait(ExecutionType.onetime)
-          res.put("result", s"Created execution id: ${execution.getId}")
           val resultData = execution.fetchData
-          if (resultData != null)
+          if (resultData != null){
             res.put("data", processResult(resultData))
-          else {
-            m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}"
-            res.put("result", execution.getExecCode)
-            res.put("reason", execution.getExecMessage)
           }
+          else{
+            res.put("data", "no data found")
+          }
+          m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}"
+          res.put("result", execution.getExecCode)
+          res.put("reason", execution.getExecMessage)
+          res.put("start" , analysis.getStartTS )
+          res.put("finished" , analysis.getFinishedTS )
         }
-        case "execute" => {
+        case "exec-save" => {
+          if (analysisId == null) {
+            res.put("result", "failed")
+            res.put("reason", "save-exec is supported only for Analysis, set analysis ID")
+            return play.mvc.Results.badRequest(res)
+          }
+          val analysis = new Analysis(analysisId)
+          val execution = analysis.executeAndWait(ExecutionType.scheduled)
+          res.put("execution_id", s"${execution.getId}")
+          m_log debug s"Created execution ID: ${execution.getId}"
+          m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}"
+          res.put("result", execution.getExecCode)
+          res.put("reason", execution.getExecMessage)
+          res.put("start" , analysis.getStartTS )
+          res.put("finished" , analysis.getFinishedTS )
+        }
+        case "exec-asynch" => {
           if (analysisId != null) {
             if (DLQueryHandler.storedExecutors.contains(analysisId))
             {
               var msg = s"Request for Analysis ID: $analysisId is still being executed"
-               if(DLQueryHandler.storedResults(analysisId).isDone ||
-                  DLQueryHandler.storedResults(analysisId).isCancelled) {
+               if(DLQueryHandler.storedResults(analysisId).isDone) {
                  msg = s"Request for Analysis ID: $analysisId has been completed"
                  res.put("result", "COMPLETED")
                }
-              else
+               else if (DLQueryHandler.storedResults(analysisId).isCancelled) {
+                 res.put("result", "CANCELED")
+               }
+              else{
                  res.put("result", "IN_PROGRESS")
+               }
               m_log debug msg
               res.put("reason", msg)
               return play.mvc.Results.ok(res)
@@ -176,9 +201,14 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
             synchronized{  DLQueryHandler.storedExecutors += (analysisId -> analysis) }
             val future = analysis.execute(ExecutionType.onetime)
             synchronized{ DLQueryHandler.storedResults += ( analysisId -> future ) }
+            res.put("result", "STARTED")
+            res.put("reason", analysis.getStatus)
+            res.put("start" , analysis.getStartTS )
+            res.put("finished" , analysis.getFinishedTS )
           }
+          //TODO:: Implement functionality for Semantic layer execution
           else if (semanticId != null) {
-            //TODO::To be implemented
+            res.put("result", "Not implemented yet")
           }
         }
         case "exec-complete" =>
@@ -188,34 +218,69 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
               {
                 val data = DLQueryHandler.storedResults(analysisId).get
                 val analysis = DLQueryHandler.storedExecutors(analysisId)
+                synchronized {DLQueryHandler.storedExecutors -= analysisId}
+                synchronized {DLQueryHandler.storedResults -= analysisId}
                 val execution = analysis.exec
-                res.put("result_id", s"Created execution id: ${execution.getId}")
-                if (data != null) {
+                if (data != null)
                   res.put("data", processResult(data))
-                }
+                else
+                  res.put("data", "no data found")
+
                 m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}"
                 res.put("result", execution.getExecCode)
                 res.put("reason", execution.getExecMessage)
-                synchronized {DLQueryHandler.storedExecutors -= analysisId}
-                synchronized {DLQueryHandler.storedResults -= analysisId}
               }
+              else{
+                res.put("result", "analysis does not exist")
+                res.put("reason", s"Cannot complete request, analysis [ID = $analysisId] was not executed.")
+              }
+            }
+            //TODO:: Implement functionality for Semantic layer execution
+            else if (semanticId != null)
+            {
+              res.put("result", "Not implemented yet")
             }
           }
         case "exec-cancel" =>
         {
           if (analysisId != null) {
-            if (DLQueryHandler.storedExecutors.contains(analysisId))
-            {
+            if (DLQueryHandler.storedExecutors.contains(analysisId)){
               DLQueryHandler.storedResults(analysisId).cancel(true)
               synchronized{DLQueryHandler.storedExecutors -= analysisId}
               synchronized{DLQueryHandler.storedResults -= analysisId}
+              res.put("result", "request canceled")
+              res.put("reason", "")
+            }
+            else{
+              res.put("result", "analysis does not exist")
+              res.put("reason", s"Cannot cancel request, analysis [ID = $analysisId] was not executed.")
             }
           }
+          //TODO:: Implement functionality for Semantic layer execution
+          else if (semanticId != null)
+          {
+             res.put("result", "Not implemented yet")
+          }
         }
+        case "delete" =>
+        {
+          if (analysisId != null ) {
+            val analysis = new Analysis(analysisId)
+            analysis.delete
+            res.put("result", "success")
+            res.put("reason", s"All results related to analysis ID [ $analysisId] have been removed.")
+          }
+          else {
+            res.put("result", "failed")
+            res.put("reason", "A verb requires Analysis ID")
+            return play.mvc.Results.badRequest(res)
+          }
+        }
+
         case "none" =>
         {
           res.put("result", "failed")
-          res.put("reason", "A verb must be provided: execute, show or save-exec")
+          res.put("reason", "A verb must be provided: preview, execute, show, exec-asynch, exec-complete, exec-cancel, exec-save")
           return play.mvc.Results.badRequest(res)
         }
       }

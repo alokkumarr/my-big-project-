@@ -18,6 +18,14 @@ class Analysis(val analysisId : String) {
 
   private val executor : ExecutorService = Executors.newFixedThreadPool(1)
   private var task     : Future[util.List[util.Map[String, (String, Object)]]] = null
+  private var status : String = ExecutionStatus.STARTED.toString
+  private var startTS : Long = 0
+  private var finishedTS : Long = 0
+
+  def getStatus = status
+  def getStartTS = startTS
+  def getFinishedTS = finishedTS
+
 
 
   /**
@@ -29,7 +37,9 @@ class Analysis(val analysisId : String) {
   {
     m_log debug s"Execute analysis as ${execType.toString}"
     val analysisExecution = new AnalysisExecution(an, execType)
-    analysisExecution.startExecution( execType)
+    startTS = analysisExecution.getStartedTimestamp
+    analysisExecution.startExecution
+    finishedTS = analysisExecution.getFinishedTimestamp
     analysisExecution
   }
 
@@ -39,9 +49,10 @@ class Analysis(val analysisId : String) {
     m_log debug s"Asynchronously execute analysis as ${execType.toString}"
     exec = new AsynchAnalysisExecWithList(an, execType)
     task = executor.submit(exec)
+    startTS = exec.getStartedTimestamp
+    status = exec.getStatus.toString
     task
   }
-
 
   /**
     * Returns the list of executions for that analysis
@@ -61,11 +72,7 @@ class Analysis(val analysisId : String) {
       analysisExecution
   }
 
-
-  override def finalize: Unit =
-  {
-    executor.shutdown()
-  }
+  override def finalize: Unit = executor.shutdown()
 
 
 }
