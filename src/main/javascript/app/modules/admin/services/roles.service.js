@@ -14,7 +14,7 @@ export function RolesManagementService($http, AppConfig) {
     return $http.post(`${loginUrl}/auth/admin/cust/manage/roles/fetch`, customerId).then(fpGet('data'));
   }
   function getRoleTypes() {
-    return $http.post(`${loginUrl}/auth/admin/cust/manage/dropdown/getRoleTypes`).then(fpGet('data'));
+    return $http.post(`${loginUrl}/auth/admin/cust/manage/roles/types/list`).then(fpGet('data'));
   }
   function saveRole(role) {
     return $http.post(`${loginUrl}/auth/admin/cust/manage/roles/add`, role).then(fpGet('data'));
