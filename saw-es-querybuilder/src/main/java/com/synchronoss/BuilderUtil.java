@@ -35,11 +35,11 @@ public class BuilderUtil
         JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
         JsonValidator validator = factory.getValidator();
         final JsonNode data = JsonLoader.fromString(json);
-        final JsonNode schema = JsonLoader.fromFile(new File(BuilderUtil.class.getResource("/schema/pivot_querybuilder_schema.json").getFile()));
-        ProcessingReport report = validator.validate(schema, data);
-        if (report.isSuccess() == false) {
-          throw new ProcessingException(report.toString());
-        }
+        //final JsonNode schema = JsonLoader.fromFile(new File(BuilderUtil.class.getResource("/schema/pivot_querybuilder_schema.json").getFile()));
+        //ProcessingReport report = validator.validate(schema, data);
+        //if (report.isSuccess() == false) {
+          //throw new ProcessingException(report.toString());
+        //}
         // schema validation block ends here
 		com.synchronoss.querybuilder.model.pivot.SqlBuilder sqlBuilderNode = 
 		    objectMapper.treeToValue(sqlNode, com.synchronoss.querybuilder.model.pivot.SqlBuilder.class);
@@ -58,11 +58,11 @@ public class BuilderUtil
         JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
         JsonValidator validator = factory.getValidator();
         final JsonNode data = JsonLoader.fromString(json);
-        final JsonNode schema = JsonLoader.fromFile(new File(BuilderUtil.class.getResource("/schema/chart_querybuilder_schema.json").getFile()));
-        ProcessingReport report = validator.validate(schema, data);
-        if (report.isSuccess() == false) {
-          throw new ProcessingException(report.toString());
-        }
+        //final JsonNode schema = JsonLoader.fromFile(new File(BuilderUtil.class.getResource("/schema/chart_querybuilder_schema.json").getFile()));
+        //ProcessingReport report = validator.validate(schema, data);
+        //if (report.isSuccess() == false) {
+        //  throw new ProcessingException(report.toString());
+       // }
         // schema validation block ends here
         JsonNode objectNode1 = objectMapper.readTree(json);
         com.synchronoss.querybuilder.model.chart.SqlBuilderChart sqlBuilderNodeChart =
