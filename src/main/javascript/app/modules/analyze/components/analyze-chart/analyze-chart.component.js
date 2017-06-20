@@ -93,7 +93,7 @@ export const AnalyzeChartComponent = {
       this.labels.tempY = this.labels.y = get(this.model, 'yAxis.title', null);
       this.filters = map(
         get(this.model, 'sqlBuilder.filters', []),
-        this._FilterService.backend2FrontendFilter()
+        this._FilterService.backend2FrontendFilter(this.model.artifacts)
       );
       this.onSettingsChanged();
       this._$timeout(() => {

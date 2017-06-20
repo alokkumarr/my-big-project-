@@ -6,37 +6,37 @@ import template from './number-filter.component.html';
 
 export const OPERATORS = {
   GREATER: {
-    value: '>',
+    value: 'gt',
     shortName: 'GT',
     hint: 'Greater than'
   },
   LESS: {
-    value: '<',
+    value: 'lt',
     shortName: 'LT',
     hint: 'Less than'
   },
   GREATER_OR_EQUAL: {
-    value: '>=',
+    value: 'gte',
     shortName: 'GTE',
     hint: 'Greater than or equal to'
   },
   LESS_OR_EQUAL: {
-    value: '<=',
+    value: 'lte',
     shortName: 'LTE',
     hint: 'Less than or equal to'
   },
   EQUALS: {
-    value: '=',
+    value: 'eq',
     shortName: 'EQ',
     hint: 'Equal to'
   },
   NOT_EQUALS: {
-    value: '<>',
+    value: 'neq',
     shortName: 'NEQ',
     hint: 'Not equal to'
   },
   BETWEEN: {
-    value: 'between',
+    value: 'btw',
     shortName: 'BTW',
     hint: 'BETWEEN'
   }

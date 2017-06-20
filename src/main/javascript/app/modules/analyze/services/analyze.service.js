@@ -220,7 +220,10 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
       ['contents.keys.[0].type', model.type],
       ['contents.analyze', [model]]
     ]);
-    return $http.post(`${url}/analysis`, payload).then(fpGet(`data.contents.analyze.[1].data`));
+    return $http.post(`${url}/analysis`, payload).then(resp => {
+      return fpGet(`data.contents.analyze.[1].data`, resp) ||
+        fpGet(`data.contents.analyze.[0].data`, resp);
+    });
   }
 
   function getDataBySettings(model) {

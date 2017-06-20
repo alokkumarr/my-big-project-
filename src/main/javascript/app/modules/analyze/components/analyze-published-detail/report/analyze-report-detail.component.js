@@ -21,7 +21,7 @@ export const AnalyzeReportDetailComponent = {
     }
 
     $onInit() {
-      this.filters = map(this.analysis.sqlBuilder.filters, this._FilterService.backend2FrontendFilter());
+      this.filters = map(this.analysis.sqlBuilder.filters, this._FilterService.backend2FrontendFilter(this.analysis.artifacts));
       this.columns = this._getColumns(this.analysis);
       this.dataSubscription = this.requester.subscribe(options => this.onData(options));
     }
