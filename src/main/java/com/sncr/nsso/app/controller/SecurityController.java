@@ -747,7 +747,7 @@ public class SecurityController {
 	 * @param user
 	 * @return
 	 */
-	@RequestMapping(value = "/auth/admin/cust/manage/dropdown/getRoles", method = RequestMethod.POST)
+	@RequestMapping(value = "/auth/admin/cust/manage/roles/list ", method = RequestMethod.POST)
 	public RolesDropDownList getRoles(@RequestBody Long customerId) {
 		RolesDropDownList roles = new RolesDropDownList();
 		try {
@@ -800,7 +800,7 @@ public class SecurityController {
 	 * @param user
 	 * @return
 	 */
-	@RequestMapping(value = "/auth/admin/cust/manage/dropdown/getRoleTypes", method = RequestMethod.POST)
+	@RequestMapping(value = "/auth/admin/cust/manage/roles/types/list", method = RequestMethod.POST)
 	public RolesDropDownList getRoles() {
 		RolesDropDownList roles = new RolesDropDownList();
 		try {
