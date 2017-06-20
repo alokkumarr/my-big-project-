@@ -20,7 +20,7 @@ jar_fls=( $lib_dir/*saw-security*.jar )
 # Initialize Java args
 jar_fnm="${jar_fls[0]}"
 [[ $(uname -s) = CYGWIN* ]] && jar_fnm=$(cygpath -w "$jar_fnm")
-main_kl=com.sncr.nsso.common.util.Ccode
+main_kl=com.sncr.saw.security.common.util.Ccode
 
 # Run java main class
 java -cp $jar_fnm $main_kl "$@"
