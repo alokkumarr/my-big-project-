@@ -88,37 +88,76 @@ public class ChartMainSampleClass {
       List<com.synchronoss.querybuilder.model.chart.Filter> filters = sqlBuilderNode.getFilters();
       List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
       for (com.synchronoss.querybuilder.model.chart.Filter item : filters) {
-        if (item.getType().value().equals(Type.DATE.value())
-            || item.getType().value().equals(Type.TIMESTAMP.value())) {
-          RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-          rangeQueryBuilder.lte(item.getModel().getLte());
-          rangeQueryBuilder.gte(item.getModel().getGte());
-          builder.add(rangeQueryBuilder);
-        }
-        if (item.getType().value().equals(Type.STRING.value())) {
-          TermsQueryBuilder termsQueryBuilder =
-              new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-          builder.add(termsQueryBuilder);
-        }
-        if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
-            || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) 
-        {
-          if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
+        if (!item.getIsRuntimeFilter().value()) {
+          if (item.getType().value().equals(Type.DATE.value())
+              || item.getType().value().equals(Type.TIMESTAMP.value())) {
             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            rangeQueryBuilder.lte(item.getModel().getOtherValue());
-            rangeQueryBuilder.gte(item.getModel().getValue());
+            rangeQueryBuilder.lte(item.getModel().getLte());
+            rangeQueryBuilder.gte(item.getModel().getGte());
             builder.add(rangeQueryBuilder);
           }
-          if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
-            TermQueryBuilder termQueryBuilder =
-                new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
-            builder.add(termQueryBuilder);
+          if (item.getType().value().equals(Type.STRING.value())) {
+            TermsQueryBuilder termsQueryBuilder =
+                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+            builder.add(termsQueryBuilder);
           }
-          if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
-            BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
-            boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
-                .getValue()));
-            builder.add(boolQueryBuilderIn);
+          if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item
+              .getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
+              || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase())
+              || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) {
+            if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
+              RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+              rangeQueryBuilder.lte(item.getModel().getOtherValue());
+              rangeQueryBuilder.gte(item.getModel().getValue());
+              builder.add(rangeQueryBuilder);
+            }
+            if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
+              TermQueryBuilder termQueryBuilder =
+                  new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
+              builder.add(termQueryBuilder);
+            }
+            if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
+              BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
+              boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
+                  .getValue()));
+              builder.add(boolQueryBuilderIn);
+            }
+          }
+        }
+        if (item.getIsRuntimeFilter().value() && item.getModel() != null) {
+          if (item.getType().value().equals(Type.DATE.value())
+              || item.getType().value().equals(Type.TIMESTAMP.value())) {
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.lte(item.getModel().getLte());
+            rangeQueryBuilder.gte(item.getModel().getGte());
+            builder.add(rangeQueryBuilder);
+          }
+          if (item.getType().value().equals(Type.STRING.value())) {
+            TermsQueryBuilder termsQueryBuilder =
+                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+            builder.add(termsQueryBuilder);
+          }
+          if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item
+              .getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
+              || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase())
+              || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) {
+            if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
+              RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+              rangeQueryBuilder.lte(item.getModel().getOtherValue());
+              rangeQueryBuilder.gte(item.getModel().getValue());
+              builder.add(rangeQueryBuilder);
+            }
+            if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
+              TermQueryBuilder termQueryBuilder =
+                  new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
+              builder.add(termQueryBuilder);
+            }
+            if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
+              BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
+              boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
+                  .getValue()));
+              builder.add(boolQueryBuilderIn);
+            }
           }
         }
       }
