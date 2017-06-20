@@ -226,6 +226,7 @@ class Analysis extends BaseController {
     val ldt: LocalDateTime = LocalDateTime.now()
     val timestamp: String = ldt.format(dfrm)
     var schema : JValue = JNothing
+    var resultNode: AnalysisResult = null
     
     
     if (analysisNode.getCachedData == null || analysisNode.getCachedData.isEmpty)
