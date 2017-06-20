@@ -240,6 +240,57 @@ class Analysis extends BaseController {
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json), json);
       val myArray = parse(data);
       m_log.trace("pivot dataset: {}", myArray)
+      
+      var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
+      // The below block is for execution result to store
+		if (data !=null){
+		    var nodeExists = false
+		    try {
+		      m_log debug s"Remove result: " + analysisResultNodeID
+		      resultNode = AnalysisResult(analysisId, analysisResultNodeID)
+		      nodeExists = true
+		    }
+		    catch {
+		      case e: Exception => m_log debug("Tried to load node: ", e)
+		    }
+		    if (nodeExists) resultNode.delete
+		
+		schema  = JObject(JField("schema", JString("Does not need int the case of the Chart")))
+		descriptor = new JObject(List(
+        JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+        JField("id", JString(analysisId.get)),
+        JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+        JField("execution_result", JString(result)),
+        JField("execution_timestamp", JString(timestamp))
+      ))
+      m_log debug s"Create result: with content: ${compact(render(descriptor))}"
+		}
+		else 
+			{
+			val errorMsg = "There is no result for query criteria";
+	        descriptor = new JObject(List(
+	        JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+	        JField("id", JString(analysisId)),
+	        JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+	        JField("execution_result", JString("empty body")),
+	        JField("execution_timestamp", JString(timestamp)),
+	        JField("error_message", JString(errorMsg))
+	      ))
+     	}
+      
+      	var descriptorPrintable: JValue = null
+	    resultNode = new AnalysisResult(analysisId, descriptor, analysisResultNodeID)
+		if (data !=null)
+		{
+			resultNode.addObject("data", myArray, schema);
+			val (res, msg) = resultNode.create;
+	    	m_log debug s"Analysis result creation: $res ==> $msg"
+		}
+		else 
+		{
+		  descriptorPrintable = descriptor
+	    }	   
+      
       return myArray
     }
     if ( typeInfo.equals("chart") ){
