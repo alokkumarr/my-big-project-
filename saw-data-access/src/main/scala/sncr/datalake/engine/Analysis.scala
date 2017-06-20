@@ -37,8 +37,8 @@ class Analysis(val analysisId : String) {
   {
     m_log debug s"Execute analysis as ${execType.toString}"
     val analysisExecution = new AnalysisExecution(an, execType)
-    startTS = analysisExecution.getStartedTimestamp
     analysisExecution.startExecution
+    startTS = analysisExecution.getStartedTimestamp
     finishedTS = analysisExecution.getFinishedTimestamp
     analysisExecution
   }
