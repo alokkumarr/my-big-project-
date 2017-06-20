@@ -80,18 +80,22 @@
   <md-card>
     <md-card-title>
       <md-card-title-text>
-        <span class="md-title" ng-bind="$ctrl.analysis.creatorName"></span>
+        <span class="md-title" ng-bind="$ctrl.analysis.userFullName | changeCase:'title'"></span>
         <span class="md-subhead" ng-bind="$ctrl.analysis.scheduled"></span>
       </md-card-title-text>
     </md-card-title>
     <md-card-content>
-      <p ng-bind="$ctrl.analysis.description"></p>
+      <div class="row">
+        <p ng-bind="$ctrl.analysis.description"></p>
+      </div>
     </md-card-content>
-    <md-card-footer>
-      <md-icon md-font-icon="icon-fork"></md-icon>
-      <span translate="FORKED_FROM_ANALYSIS_BY_CREATOR"
-            translate-values="{analysis: $ctrl.analysis.forkedFrom.analysisName, creator: $ctrl.analysis.forkedFrom.creatorName}"></span>
-    </md-card-footer>
+    <!--
+      <md-card-footer>
+        <md-icon md-font-icon="icon-fork"></md-icon>
+        <span translate="FORKED_FROM_ANALYSIS_BY_CREATOR"
+              translate-values="{analysis: $ctrl.analysis.forkedFrom.analysisName, creator: $ctrl.analysis.forkedFrom.creatorName}"></span>
+      </md-card-footer>
+    -->
   </md-card>
   <panel start-collapsed="false" ng-if="$ctrl.analyses" title="'OTHER_PUBLISHED_ANALYSES' | translate">
     <div class="prompt-execution-container" ng-if="!$ctrl.analyses.length">
