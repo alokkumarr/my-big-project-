@@ -213,6 +213,9 @@ class Analysis extends BaseController {
     ("contents", ("analyze", JArray(analyses)))
   }
 
+  var result: String = null
+  def setResult(r: String): Unit = result = r
+ 
   def executeAnalysis(analysisId: String, queryRuntime: String): JValue = {
  
     // reading the JSON extract type
@@ -259,7 +262,7 @@ class Analysis extends BaseController {
 		schema  = JObject(JField("schema", JString("Does not need int the case of the Chart")))
 		descriptor = new JObject(List(
         JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-        JField("id", JString(analysisId.get)),
+        JField("id", JString(analysisId)),
         JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
         JField("execution_result", JString(result)),
         JField("execution_timestamp", JString(timestamp))
