@@ -318,7 +318,7 @@ class Analysis extends BaseController {
 		schema  = JObject(JField("schema", JString("Does not need int the case of the Chart")))
 		descriptor = new JObject(List(
         JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-        JField("id", JString(analysisId.get)),
+        JField("id", JString(analysisId)),
         JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
         JField("execution_result", JString(result)),
         JField("execution_timestamp", JString(timestamp))
