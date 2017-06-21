@@ -24,4 +24,9 @@ To deploy the system to the shared development environment run:
 
     ./deploy
 
-Also see development [deployment](doc/README.md) notes.
+Also see development [deployment](deploy/README.md) notes.
+
+# Operations
+
+See the [operations guide](doc/operations.md) for details about
+operations and monitoring.
