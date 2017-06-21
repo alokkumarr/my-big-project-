@@ -2,6 +2,7 @@
   <md-autocomplete md-items="column in $ctrl.artifact.columns | filter:$ctrl.searchText"
                    placeholder="Select filter"
                    md-search-text="$ctrl.searchText"
+                   ng-disabled="$ctrl.isRuntime"
                    md-selected-item="$ctrl.filter.column"
                    md-item-text="column.displayName"
                    md-min-length="0"
