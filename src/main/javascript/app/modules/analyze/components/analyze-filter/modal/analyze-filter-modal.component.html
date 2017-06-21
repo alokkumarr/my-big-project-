@@ -1,7 +1,7 @@
 <analyze-dialog control="$ctrl" class="analyze-filters">
   <analyze-dialog-header layout="row" layout-align="space-between center" flex="grow">
     <strong translate="FILTERS"></strong>
-    <md-select ng-model="$ctrl.filterBooleanCriteria">
+    <md-select ng-hide="::$ctrl.isRuntime" ng-model="$ctrl.filterBooleanCriteria">
       <md-option ng-repeat="booleanCriteria in $ctrl.BOOLEAN_CRITERIA"
                  ng-value="booleanCriteria.value">
         {{::booleanCriteria.label}}
@@ -18,12 +18,14 @@
                     layout="row"
                     layout-align="space-between start">
         <analyze-filter-row filter="filter"
+                            runtime="$ctrl.isRuntime"
                             on-change="$ctrl.onFilterChange(filter, artifact.artifactName, $index)"
                             artifact="artifact"
                             style="padding-right: 10px;">
         </analyze-filter-row>
 
         <md-checkbox class="md-secondary"
+                     ng-hide="::$ctrl.isRuntime"
                      ng-disabled="!filter.column.filterEligible"
                      ng-model="filter.isRuntimeFilter"
                      ng-change="$ctrl.onRuntimeToggle(filter)">
@@ -31,13 +33,14 @@
         </md-checkbox>
 
         <md-button class="md-icon-button md-secondary"
+                   ng-hide="::$ctrl.isRuntime"
                    aria-label="Remove"
                    ng-click="$ctrl.onRemoveFilter($index, artifact.artifactName)">
           <md-icon md-font-icon="icon-close"></md-icon>
         </md-button>
 
       </md-list-item>
-      <md-list-item>
+      <md-list-item ng-hide="::$ctrl.isRuntime">
         <md-button class="md-icon-button"
                     aria-label="Add Filter"
                     ng-click="$ctrl.addFilter(artifact.artifactName)">

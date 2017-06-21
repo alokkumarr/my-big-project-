@@ -20,6 +20,7 @@ export const AnalyzeFilterModalComponent = {
   bindings: {
     filters: '<',
     artifacts: '<',
+    isRuntime: '<?runtime',
     filterBooleanCriteria: '<'
   },
   controller: class AnalyzeFlterModalController {

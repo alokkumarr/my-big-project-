@@ -15,7 +15,7 @@
   </md-autocomplete>
 
   <div ng-switch on="$ctrl.filter.column.type"
-        ng-if="!$ctrl.filter.isRuntimeFilter"
+        ng-if="!$ctrl.filter.isRuntimeFilter || $ctrl.isRuntime"
        style="padding-left: 10px;">
 
     <div ng-switch-when="string" style="text-align: center;">
