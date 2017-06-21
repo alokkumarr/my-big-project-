@@ -566,6 +566,7 @@
                                         <include>*.sh</include>
                                     </includes>
                                 </source>
+                                
                                 <source>
                                     <location>${project.basedir}/../saw-data-access/src/main/scripts</location>
                                     <includes>
@@ -582,6 +583,20 @@
                             <sources>
                                 <source>
                                     <location>conf</location>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/schema</directory>
+                            <filemode>644</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                            <sources>
+                                <source>
+                                    <location>${project.basedir}/../json-schema</location>
+                                       <includes>
+                                        <include>*.json</include>
+                                    </includes>
                                 </source>
                             </sources>
                         </mapping>

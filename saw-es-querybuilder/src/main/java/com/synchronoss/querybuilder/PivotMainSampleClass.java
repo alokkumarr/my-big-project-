@@ -37,19 +37,20 @@ public class PivotMainSampleClass {
     System.setProperty("host", "10.48.72.74");
     System.setProperty("port", "9300");
     System.setProperty("cluster", "sncr-salesdemo");
+    System.setProperty("schema.pivot", "D:\\Work\\SAW2_0\\saw-services\\saw-es-querybuilder\\src\\main\\resources\\schema\\chart_querybuilder_schema.json");
 
     // This is the entry point for /analysis service as JSONString not as file
     JsonNode objectNode =
         objectMapper.readTree(new File(
             "C:\\Users\\saurav.paul\\Desktop\\Sergey\\pivot_type_data.json"));
+    String pivot = System.getProperty("schema.pivot");
     // JsonNode objectNode = objectMapper.readTree(new File(args[0]));
     String json = "{ \"sqlBuilder\" :" + objectNode.get("sqlBuilder").toString() + "}";
     JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
     JsonValidator validator = factory.getValidator();
     final JsonNode data = JsonLoader.fromString(json);
     final JsonNode schema =
-        JsonLoader.fromFile(new File(PivotMainSampleClass.class.getResource(
-            "/schema/pivot_querybuilder_schema.json").getFile()));
+        JsonLoader.fromFile(new File(pivot));
     ProcessingReport report = validator.validate(schema, data);
     if (report.isSuccess() == false) {
       throw new ProcessingException(report.toString());

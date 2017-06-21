@@ -39,12 +39,13 @@ public class ChartMainSampleClass {
     System.setProperty("host", "10.48.72.74");
     System.setProperty("port", "9300");
     System.setProperty("cluster", "sncr-salesdemo");
-
+    System.setProperty("schema.chart", "D:\\Work\\SAW2_0\\saw-services\\saw-es-querybuilder\\src\\main\\resources\\schema\\chart_querybuilder_schema.json");
 
     // This is the entry point for /analysis service as JSONString not as file
     JsonNode objectNode =
         objectMapper.readTree(new File(
             "C:\\Users\\saurav.paul\\Desktop\\Sergey\\chart_type_data.json"));
+    String chart = System.getProperty("schema.chart");
     // JsonNode objectNode = objectMapper.readTree(new File(args[0]));
 
     String json = "{ \"sqlBuilder\" :" + objectNode.get("sqlBuilder").toString() + "}";
@@ -52,8 +53,7 @@ public class ChartMainSampleClass {
     JsonValidator validator = factory.getValidator();
     final JsonNode data = JsonLoader.fromString(json);
     final JsonNode schema =
-        JsonLoader.fromFile(new File(ChartMainSampleClass.class.getResource(
-            "/schema/chart_querybuilder_schema.json").getFile()));
+        JsonLoader.fromFile(new File(chart));
     ProcessingReport report = validator.validate(schema, data);
     if (report.isSuccess() == false) {
       throw new ProcessingException(report.toString());
