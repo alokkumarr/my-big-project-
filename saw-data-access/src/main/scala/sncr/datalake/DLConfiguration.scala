@@ -57,6 +57,7 @@ object DLConfiguration {
   val jarLocation = cfg.getString ("sql-executor.jar-location")
   val commonLocation = cfg.getString ("sql-executor.output-location")
   val semanticLayerTempLocation = cfg.getString ("sql-executor.semantic-layer-tmp-location")
+  val defaultOutputType = cfg.getString ("sql-executor.output-type")
 
   val jarFiles = HFileOperations.listJarFiles(jarLocation, ".jar")
   logger debug s"Attach to Spark job the following jar files: ${jarFiles.mkString("[", ", ", "]")}"

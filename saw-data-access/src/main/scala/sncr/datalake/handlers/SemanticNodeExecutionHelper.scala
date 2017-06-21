@@ -43,7 +43,7 @@ class SemanticNodeExecutionHelper(val sn : SemanticNode, cacheIt : Boolean = fal
         throw new Exception(m)
     }
 
-  m_log debug s"Check definition before extracting value ==> ${pretty(render(definition))}"
+  m_log trace s"Check definition before extracting value ==> ${pretty(render(definition))}"
 
   val metric = (definition \ "metric").extractOrElse[String]("")
   val outputLocation = SemanticNodeExecutionHelper.getUserSpecificPath(metric) + "-" + id

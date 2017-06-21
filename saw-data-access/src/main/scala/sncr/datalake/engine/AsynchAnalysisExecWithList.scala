@@ -23,7 +23,7 @@ class AsynchAnalysisExecWithList(an: AnalysisNode, execType : ExecutionType)
         startExecution
         if (status == ExecutionStatus.COMPLETED){
           m_log debug "Execution completed successfully"
-          fetchData
+          getAllData
         }
         else {
           m_log debug s"Execution status: ${status.toString}"

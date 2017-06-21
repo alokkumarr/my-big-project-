@@ -117,12 +117,23 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
   }
 
   /**
-    * Returns the rows of the query execution result
+    * Returns all rows of execution result
     *
     * @return List<Map<…>> data structure
     */
-  def fetchData : java.util.List[java.util.Map[String, (String, Object)]] = {
-      analysisNodeExecution.getExecutionData
+  def getAllData : java.util.List[java.util.Map[String, (String, Object)]] = {
+    analysisNodeExecution.getAllData
+    analysisNodeExecution.getExecutionData
+  }
+
+  /**
+    * Returns all rows of execution result
+    *
+    * @return List<Map<…>> data structure
+    */
+  def getPreview(limit:Int) : java.util.List[java.util.Map[String, (String, Object)]] = {
+    analysisNodeExecution.getPreview(limit)
+    analysisNodeExecution.getExecutionData
   }
 
   /**

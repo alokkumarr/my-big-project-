@@ -12,6 +12,7 @@ import org.apache.hadoop.fs.Path
 import org.json4s.JsonAST.{JObject, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
+import sncr.datalake.engine.ExecutionStatus
 import sncr.datalake.exceptions.{DAException, ErrorCodes}
 import sncr.datalake.{DLConfiguration, DLSession}
 import sncr.metadata.analysis.{AnalysisNode, AnalysisResult}
@@ -27,8 +28,8 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
   override protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisNodeExecutionHelper].getName)
   resId = if (resId == null || resId.isEmpty) UUID.randomUUID().toString else resId
 
-  def setFinishTime = { finishedTS =  System.currentTimeMillis() }
-  def setStartTime = { startTS =  System.currentTimeMillis() }
+  def setFinishTime = { finishedTS =  System.currentTimeMillis }
+  def setStartTime = { startTS =  System.currentTimeMillis }
 
   if (an.getCachedData.isEmpty) throw new DAException(ErrorCodes.NodeDoesNotExist, "AnalysisNode")
   if (an.getRelatedNodes.isEmpty) throw new DAException(ErrorCodes.DataObjectNotFound, "AnalysisNode")
@@ -61,18 +62,26 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
   var resultNode: AnalysisResult = null
   var resultNodeDescriptor: JObject = null
 
-  m_log debug s"Check definition before extracting value ==> ${pretty(render(definition))}"
+  m_log trace s"Check definition before extracting value ==> ${pretty(render(definition))}"
 
   val sqlManual = (definition \ "queryManual").extractOrElse[String]("")
-  val analysis = (definition \ "analysis").extractOrElse[String]("")
-  val sql = if (sqlManual != "") sqlManual else (definition \ "query").extractOrElse[String]("")
-  val outputType = ( definition \ "outputFile" \ "outputFormat").extractOrElse[String]("")
-  val initOutputLocation = ( definition \ "outputFile" \ "outputFileName").extractOrElse[String]("")
+  val metricName = (definition \ "metricName").extractOrElse[String]("")
+  val analysisKey = "AN_" + System.currentTimeMillis()
 
-  if (sql.isEmpty || outputType.isEmpty || initOutputLocation.isEmpty || analysis.isEmpty )
-    throw new Exception("Invalid Analysis object, one of the attribute is null/empty: SQL, outputType, outputLocation")
-  else
-    m_log debug s"Analysis executions parameters, type : $outputType, \n output filename:  $initOutputLocation, \n sql => $sql"
+  val sql = if (sqlManual != "") sqlManual else (definition \ "query").extractOrElse[String]("")
+
+// ----------- SAW-880 -------------------------------
+//TODO:: Modify it, see SAW-880, item 11
+//  val outputType = ( definition \ "outputFile" \ "outputFormat").extractOrElse[String](DLConfiguration.defaultOutputType)
+//  val initOutputLocation = ( definition \ "outputFile" \ "outputFileName").extractOrElse[String](DLConfiguration.commonLocation)
+  val outputType = DLConfiguration.defaultOutputType
+  val initOutputLocation = DLConfiguration.commonLocation
+// ----------- SAW-880 -------------------------------
+
+  m_log debug s" Analysis: $metricName, \n Output location: $initOutputLocation \n Output type: $outputType, \n SQL: $sql"
+
+  if (sql.isEmpty || metricName.isEmpty || outputType.isEmpty || initOutputLocation.isEmpty)
+    throw new Exception("Invalid Analysis object, one of the attribute is null/empty: SQL query, analysis attribute")
 
   val outputLocation = AnalysisNodeExecutionHelper.getUserSpecificPath(initOutputLocation) + "-" + resId
   var lastSQLExecRes = -1
@@ -104,7 +113,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
     * @return
     */
   def executeSQL(limit : Int = DLConfiguration.rowLimit): (Integer, String) = {
-    val (llastSQLExecRes, llastSQLExecMessage) = executeAndGetData(analysis, sql, limit)
+    val (llastSQLExecRes, llastSQLExecMessage) = executeAndGetData(analysisKey, sql, limit)
     lastSQLExecRes = llastSQLExecRes; lastSQLExecMessage = llastSQLExecMessage
     (lastSQLExecRes, lastSQLExecMessage)
   }
@@ -116,18 +125,18 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
     * @return
     */
   def executeSQLNoDataLoad(limit : Int = DLConfiguration.rowLimit): (Integer, String) = {
-    val (llastSQLExecRes, llastSQLExecMessage) = execute(analysis, sql)
+    val (llastSQLExecRes, llastSQLExecMessage) = execute(analysisKey, sql)
     lastSQLExecRes = llastSQLExecRes; lastSQLExecMessage = llastSQLExecMessage
     (lastSQLExecRes, lastSQLExecMessage)
   }
 
-  def getExecutionData :java.util.List[java.util.Map[String, (String, Object)]] = getData(analysis)
+  def getExecutionData :java.util.List[java.util.Map[String, (String, Object)]] = getData(analysisKey)
 
 
-  def getAllData : Unit =  materializeDataToList(analysis)
-  def getIterator : Unit =  materializeDataToIterator(analysis)
+  def getAllData : Unit =  materializeDataToList(analysisKey)
+  def getIterator : Unit =  materializeDataToIterator(analysisKey)
 
-  def getPreview(limit: Int = DLConfiguration.rowLimit) : Unit =  materializeDataToList(analysis, limit )
+  def getPreview(limit: Int = DLConfiguration.rowLimit) : Unit =  materializeDataToList(analysisKey, limit )
 
   /**
     * Wrapper around base method that combines SQL execution and new data object saving to appropriate location
@@ -156,7 +165,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
     createAnalysisResult(resId, out)
   }
 
-  def getDataIterator : java.util.Iterator[java.util.HashMap[String, (String, Object)]] = dataIterator(analysis)
+  def getDataIterator : java.util.Iterator[java.util.HashMap[String, (String, Object)]] = dataIterator(analysisKey)
 
 
   def printSample(out: OutputStream) : Unit =
@@ -167,7 +176,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
       return
     }
 
-    val sample = getDataSampleAsString(analysis)
+    val sample = getDataSampleAsString(analysisKey)
     if (out != null && sample != null)
       out.write(sample.getBytes)
   }
@@ -182,9 +191,16 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
   def createAnalysisResult(resId: String = null, out: OutputStream = null): Unit = {
 
     createAnalysisResultHeader(resId)
-    saveData(analysis, outputLocation, outputType)
+    saveData(analysisKey, outputLocation, outputType)
+    finishedTS = System.currentTimeMillis
+    val newDescriptor = JObject (resultNodeDescriptor.obj ++ List(
+      JField("execution_finish_ts", JLong(finishedTS)),
+      JField("exec-code", JLong(lastSQLExecRes)),
+      JField("exec-msg", JString(lastSQLExecMessage))
+    ))
+    resultNode.setDescriptor(compact(render(newDescriptor)))
 
-    resultNode.addObject("dataLocation", outputLocation, getSchema(analysis))
+    resultNode.addObject("dataLocation", outputLocation, getSchema(analysisKey))
     resultNode.update()
 
     if (out != null) {
@@ -202,8 +218,16 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
     *
     */
   def completeAnalysisResult: Unit = {
-    saveData(analysis, outputLocation, outputType)
-    resultNode.addObject("dataLocation", outputLocation, getSchema(analysis))
+    saveData(analysisKey, outputLocation, outputType)
+    finishedTS = System.currentTimeMillis
+    val newDescriptor = JObject (resultNodeDescriptor.obj ++ List(
+      JField("execution_finish_ts", JLong(finishedTS)),
+      JField("exec-code", JLong(lastSQLExecRes)),
+      JField("exec-msg", JString(lastSQLExecMessage))
+    ))
+    resultNode.setDescriptor(compact(render(newDescriptor)))
+
+    resultNode.addObject("dataLocation", outputLocation, getSchema(analysisKey))
     resultNode.update()
   }
 
@@ -231,7 +255,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
       return (lastSQLExecRes, m)
     }
 
-    if (getDataset(analysis) == null) throw new DAException( ErrorCodes.NoResultToSave, analysis)
+    if (getDataset(analysisKey) == null) throw new DAException( ErrorCodes.NoResultToSave, analysisKey)
 
     var nodeExists = false
     try {
@@ -279,9 +303,7 @@ object AnalysisNodeExecutionHelper{
   protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisNodeExecutionHelper].getName)
 
   //TODO:: The function is to be replaced with another one to construct user ( tenant ) specific path
-  def getUserSpecificPath(outputLocation: String): String = {
-     DLConfiguration.commonLocation + Path.SEPARATOR + outputLocation
-  }
+  def getUserSpecificPath(outputLocation: String): String = outputLocation
 
   def apply( rowId: String, cacheIt: Boolean = false) : AnalysisNodeExecutionHelper = { val an = AnalysisNode(rowId); new AnalysisNodeExecutionHelper(an, cacheIt)}
   def convertJsonToList(value: JValue): util.List[util.Map[String, (String, Object)]] =

@@ -81,7 +81,7 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
             f onFailure { case _ => m_log error "Could not process request: " + f.value }
     */
 
-            val resultData = execution.fetchData
+            val resultData = execution.getAllData
             if (resultData != null)
               res.put("data", processResult(resultData))
             else
@@ -149,7 +149,7 @@ class DLQueryHandler (val ext: Extractor) extends TSResponse{
           }
           val analysis = new Analysis(analysisId)
           val execution = analysis.executeAndWait(ExecutionType.onetime)
-          val resultData = execution.fetchData
+          val resultData = execution.getAllData
           if (resultData != null){
             res.put("data", processResult(resultData))
           }

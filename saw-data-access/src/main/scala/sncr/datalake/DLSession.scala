@@ -213,9 +213,8 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
       return
     }
     if (loadedData.get(viewName).isDefined) loadedData -= viewName
-    if (dataIterator.get(viewName).isDefined) dataIterator -= viewName
-    val data= (if (limit > 0)  DLSession.convert(nativeloadedData.get(viewName).get, limit)
-         else DLSession.convert(nativeloadedData.get(viewName).get.collect, nativeloadedData.get(viewName).get.dtypes))
+    val data= if (limit > 0) DLSession.convert(nativeloadedData.get(viewName).get, limit)
+    else DLSession.convert(nativeloadedData.get(viewName).get.collect, nativeloadedData.get(viewName).get.dtypes)
     loadedData += (viewName -> data)
   }
 
