@@ -1,0 +1,3 @@
+[saw-services]
+# Use mapr-dev02 for now as it has the Spark SQL Executor installed
+mapr-dev02.sncrbda.dev.vacum-np.sncrcorp.net
