@@ -6,7 +6,7 @@ import template from './analyze-new.component.html';
 import style from './analyze-new.component.scss';
 import emptyTemplate from './analyze-new-empty.html';
 
-import {AnalyseTypes} from '../../consts';
+import {AnalyseTypes, ENTRY_MODES} from '../../consts';
 
 export const AnalyzeNewComponent = {
   template,
@@ -58,10 +58,11 @@ export const AnalyzeNewComponent = {
       let type;
       const semanticId = this.selectedMetric.id;
       const metricName = this.selectedMetric.metricName;
+      const mode = ENTRY_MODES.NEW;
 
       switch (this.selectedAnalysisMethod) {
         case 'table:report':
-          tpl = '<analyze-report model="model"></analyze-report>';
+          tpl = `<analyze-report model="model" mode="${mode}"></analyze-report>`;
           model = {
             type: AnalyseTypes.Report,
             name: 'Untitled Analysis',
@@ -73,7 +74,7 @@ export const AnalyzeNewComponent = {
           };
           break;
         case 'table:pivot':
-          tpl = '<analyze-pivot model="model"></analyze-pivot>';
+          tpl = `<analyze-pivot model="model" mode="${mode}"></analyze-pivot>`;
           model = {
             type: AnalyseTypes.Pivot,
             name: 'Untitled Analysis',
@@ -89,7 +90,7 @@ export const AnalyzeNewComponent = {
         case 'chart:pie':
         case 'chart:donut':
           type = this.selectedAnalysisMethod.split(':')[1];
-          tpl = '<analyze-chart model="model"></analyze-chart>';
+          tpl = `<analyze-chart model="model" mode="${mode}"></analyze-chart>`;
           model = {
             type: AnalyseTypes.Chart,
             chartType: type,

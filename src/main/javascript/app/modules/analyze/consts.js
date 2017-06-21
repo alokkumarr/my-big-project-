@@ -10,7 +10,8 @@ export const AnalyseTypes = {
 
 export const ENTRY_MODES = {
   EDIT: 'edit',
-  FORK: 'fork'
+  FORK: 'fork',
+  NEW: 'new'
 };
 
 export const LAST_ANALYSES_CATEGORY_ID = 'lastAnalysesListId';
