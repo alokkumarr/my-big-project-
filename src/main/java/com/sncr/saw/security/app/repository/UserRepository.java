@@ -32,14 +32,14 @@ public interface UserRepository {
 	AnalysisSummaryList getAnalysisByFeatureID (Long featureId);
 	List<User> getUsers(Long customerId);
 	Valid addUser(User user);
-	boolean updateUser(User user);
+	Valid updateUser(User user);
 	boolean deleteUser(Long userId, String masterLoginId);
 	List<Role> getRolesDropDownList(Long customerId);
 	List<RoleDetails> getRoles(Long customerId);
 	List<Role> getRoletypesDropDownList();
 	Valid addRole(RoleDetails role);
 	boolean deleteRole(Long roleId, String masterLoginId);
-	boolean updateRole(RoleDetails role);
+	Valid updateRole(RoleDetails role);
 	boolean checkUserExists(Long roleId);
 	boolean checkPrivExists(Long roleId);
 }

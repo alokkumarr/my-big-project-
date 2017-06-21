@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
@@ -1225,6 +1226,11 @@ public class UserRepositoryImpl implements UserRepository {
 			valid.setValid(false);
 			valid.setError("User already Exists!");
 			return valid;
+		} catch (DataIntegrityViolationException de) {
+			logger.error("Exception encountered while creating a new user " + de.getMessage(), null, de);
+			valid.setValid(false);
+			valid.setError("Please enter valid input in the field(s)");
+			return valid;
 		} catch (Exception e) {
 			logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
 			valid.setValid(false);
@@ -1236,7 +1242,8 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public boolean updateUser(User user) {
+	public Valid updateUser(User user) {
+		Valid valid = new Valid();
 		StringBuffer sql = new StringBuffer();
 		sql.append("UPDATE USERS SET EMAIL = ?, ROLE_SYS_ID = ? ");
 		if (user.getPassword() != null) {
@@ -1260,11 +1267,19 @@ public class UserRepositoryImpl implements UserRepository {
 					preparedStatement.setLong(8, user.getUserId());
 				}
 			});
+		} catch (DataIntegrityViolationException de) {
+			logger.error("Exception encountered while creating a new user " + de.getMessage(), null, de);
+			valid.setValid(false);
+			valid.setError("Please enter valid input in the field(s)");
+			return valid;
 		} catch (Exception e) {
-			logger.error("Exception encountered while updating user " + e.getMessage(), null, e);
-			return false;
+			logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
+			valid.setValid(false);
+			valid.setError(e.getMessage());
+			return valid;
 		}
-		return true;
+		valid.setValid(true);
+		return valid;
 	}
 
 	@Override
@@ -1608,6 +1623,11 @@ public class UserRepositoryImpl implements UserRepository {
 			valid.setValid(false);
 			valid.setError("User already Exists!");
 			return valid;
+		} catch (DataIntegrityViolationException de) {
+			logger.error("Exception encountered while creating a new user " + de.getMessage(), null, de);
+			valid.setValid(false);
+			valid.setError("Please enter valid input in the field(s)");
+			return valid;
 		} catch (Exception e) {
 			logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
 			valid.setValid(false);
@@ -1743,8 +1763,9 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public boolean updateRole(RoleDetails role) {
+	public Valid updateRole(RoleDetails role) {
 		StringBuffer sql = new StringBuffer();
+		Valid valid = new Valid();
 		sql.append("UPDATE ROLES SET CUSTOMER_SYS_ID = ?, ROLE_NAME = ?, ROLE_CODE = ?, ROLE_DESC=?, ROLE_TYPE=?, "
 				+ " ACTIVE_STATUS_IND=?, MODIFIED_DATE = SYSDATE(), MODIFIED_BY = ?, DATA_SECURITY_KEY = ? WHERE ROLE_SYS_ID = ?");
 		StringBuffer roleCode = new StringBuffer();
@@ -1766,10 +1787,14 @@ public class UserRepositoryImpl implements UserRepository {
 			});
 
 		} catch (Exception e) {
-			logger.error("Exception encountered while updating role " + e.getMessage(), null, e);
-			return false;
+			valid.setValid(false);
+			String message = (e instanceof DataIntegrityViolationException) ? "Please enter valid input in the field(s)." : "Error. Please contact server Administrator";
+			valid.setValidityMessage(message);
+			valid.setError(e.getMessage());
+			return valid;
 		}
-		return true;
+		valid.setValid(true);
+		return valid;
 	}
 
 	@Override

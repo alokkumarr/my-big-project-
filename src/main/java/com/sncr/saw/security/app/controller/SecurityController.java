@@ -636,10 +636,7 @@ public class SecurityController {
 					if (valid.getValid()) {
 						userList.setUsers(userRepository.getUsers(user.getCustomerId()));
 						userList.setValid(true);
-					} else {
-						userList.setValid(false);
-						userList.setValidityMessage("User could not be added. " + valid.getError());
-					}
+					} 
 				}
 			} else {
 				userList.setValid(false);
@@ -663,6 +660,7 @@ public class SecurityController {
 	@RequestMapping(value = "/auth/admin/cust/manage/users/edit", method = RequestMethod.POST)
 	public UsersList updateUser(@RequestBody User user) {
 		UsersList userList = new UsersList();
+		Valid valid = null;
 		try {
 			if (user != null) {
 				userList.setValid(true);
@@ -688,13 +686,11 @@ public class SecurityController {
 					}
 				}
 				if (userList.getValid()) {
-					if (userRepository.updateUser(user)) {
+					valid = userRepository.updateUser(user);
+					if (valid.getValid()) {
 						userList.setUsers(userRepository.getUsers(user.getCustomerId()));
 						userList.setValid(true);
-					} else {
-						userList.setValid(false);
-						userList.setValidityMessage("User could not be edited.");
-					}
+					} 
 				}
 			} else {
 				userList.setValid(false);
@@ -873,10 +869,7 @@ public class SecurityController {
 					if (userRepository.deleteRole(deleteRole.getRoleId(), deleteRole.getMasterLoginId())) {
 						roleList.setRoles(userRepository.getRoles(deleteRole.getCustomerId()));
 						roleList.setValid(true);
-					} else {
-						roleList.setValid(false);
-						roleList.setValidityMessage("Role could not be deleted.");
-					}
+					} 
 				}
 			} else {
 				roleList.setValid(false);
@@ -900,15 +893,14 @@ public class SecurityController {
 	@RequestMapping(value = "/auth/admin/cust/manage/roles/edit", method = RequestMethod.POST)
 	public RolesList editRole(@RequestBody RoleDetails role) {
 		RolesList roleList = new RolesList();
+		Valid valid = null;
 		try {
 			if (role != null) {
-				if (userRepository.updateRole(role)) {
+				valid = userRepository.updateRole(role);
+				if (valid.getValid()) {
 					roleList.setRoles(userRepository.getRoles(role.getCustSysId()));
 					roleList.setValid(true);
-				} else {
-					roleList.setValid(false);
-					roleList.setValidityMessage("Role could not be updated. ");
-				}
+				} 
 			} else {
 				roleList.setValid(false);
 				roleList.setValidityMessage("Mandatory request params are missing");
