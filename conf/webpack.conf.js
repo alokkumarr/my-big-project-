@@ -47,7 +47,7 @@ module.exports = function (env) {
       sourceMapFilename: isDevelopment ? '[file].map' : ''
     },
 
-    devtool: isDevelopment ? 'eval-source-map' : false,
+    devtool: isDevelopment ? 'source-map' : false,
 
     resolve: {
       modules: [MODULE_DIR, webpackHelper.root('src/main/javascript')],

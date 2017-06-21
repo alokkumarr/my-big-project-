@@ -47,8 +47,14 @@ export function FilterService() {
 
   function backend2FrontendFilter(artifacts) {
     return backendFilter => {
-      const artifact = find(artifacts,
-        ({artifactName}) => artifactName === backendFilter.tableName);
+      // for some reason in th edit screen the artofactName is not present in the artifact object
+      // and the target artifact cannot be found
+      // this is a temporary solution for pivot and chart types
+      // TODO undo this modification after consulting with backend
+      const artifact = artifacts.length > 1 ?
+        find(artifacts,
+          ({artifactName}) => artifactName === backendFilter.tableName) :
+        artifacts[0];
 
       const column = find(artifact.columns,
         ({columnName}) => columnName === backendFilter.columnName);

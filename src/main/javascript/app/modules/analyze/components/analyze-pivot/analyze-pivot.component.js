@@ -55,47 +55,54 @@ export const AnalyzePivotComponent = {
     }
 
     $onInit() {
-      if (isEmpty(this.model.artifacts) || this.mode === ENTRY_MODES.FORK) {
-        // new analysis
-        this._AnalyzeService.createAnalysis(this.model.semanticId, this.model.type)
-          .then(analysis => {
-            this.model.id = analysis.id;
-            if (this.mode !== ENTRY_MODES.FORK) {
-              this.model = assign(this.model, analysis);
-              this.model.sqlBuilder = {booleanCriteria: DEFAULT_BOOLEAN_CRITERIA.value};
-            } else {
-              this.settingsModified = true;
-              this.initExistingSettings();
-            }
+      switch (this.mode) {
+        case ENTRY_MODES.NEW:
+          this.loadNewAnalysis();
+          break;
+        case ENTRY_MODES.EDIT:
+        case ENTRY_MODES.FORK:
+          this.loadExistingAnalysis();
+          break;
+        default:
+          break;
+      }
+      this.artifacts = this.getSortedArtifacts(this.model.artifacts);
+    }
 
-            this.artifacts = [{
-              artifactName: this.model.artifacts[0].artifactName,
-              columns: sortBy(this.model.artifacts[0].columns, 'displayName')
-            }];
-            this.prepareFields(this.artifacts[0].columns);
-            this.toggleSettingsSidenav();
-          });
-        // if it's a pivot analysis we're only interested in the first artifact
-      } else {
-        // edit existing analysis
-        this.artifacts = [{
-          artifactName: this.model.artifacts[0].artifactName,
-          columns: sortBy(this.model.artifacts[0].columns, 'displayName')
-        }];
-        this.prepareFields(this.artifacts[0].columns);
-        this.initExistingSettings();
-
-        this.loadPivotData().finally(() => {
+    loadNewAnalysis() {
+      this._AnalyzeService.createAnalysis(this.model.semanticId, this.model.type)
+        .then(analysis => {
+          this.initModel(this.model, analysis);
+          this.settingsModified = true;
           this.toggleSettingsSidenav();
         });
-      }
+    }
+
+    initModel(model, analysis) {
+      this.model.id = analysis.id;
+      this.model = assign(this.model, analysis);
+      this.model.sqlBuilder = {booleanCriteria: DEFAULT_BOOLEAN_CRITERIA.value};
+    }
+
+    loadExistingAnalysis() {
+      this.initExistingSettings();
+      this.loadPivotData().finally(() => {
+        this.toggleSettingsSidenav();
+      });
     }
 
     initExistingSettings() {
       this.filters = map(this.model.sqlBuilder.filters,
-                         this._FilterService.backend2FrontendFilter(this.model.artifacts));
+                         this._FilterService.backend2FrontendFilter(this.artifacts));
       this.sortFields = this.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
       this.sorts = this.mapBackend2FrontendSort(this.model.sqlBuilder.sorts, this.sortFields);
+    }
+
+    getSortedArtifacts(artifacts) {
+      return [{
+        artifactName: artifacts[0].artifactName,
+        columns: sortBy(artifacts[0].columns, 'displayName')
+      }];
     }
 
     toggleSettingsSidenav() {
@@ -156,12 +163,6 @@ export const AnalyzePivotComponent = {
       });
 
       return {transformedStore, transFormedFields: fields};
-    }
-
-    prepareFields(artifactColumns) {
-      this._$timeout(() => {
-        this.setDataSource(this.dataSource.store, this._PivotService.artifactColumns2PivotFields()(artifactColumns));
-      }, 400);
     }
 
     onRefreshData() {
