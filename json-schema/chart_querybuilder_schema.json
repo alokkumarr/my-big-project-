@@ -37,7 +37,7 @@
                   "long",
                   "double",
                   "float",
-                  "int",
+                  "integer",
                   "string"
                 ],
                 "id": "/properties/sqlBuilder/properties/dataFields/items/properties/type",
@@ -130,7 +130,7 @@
                 "enum": [
                   "long",
                   "string",
-                  "int",
+                  "integer",
                   "double",
                   "date",
                   "timestamp",
@@ -170,7 +170,7 @@
                   "timestamp",
                   "long",
                   "double",
-                  "int",
+                  "integer",
                   "string",
                   "float"
                 ],
@@ -200,7 +200,7 @@
                 "timestamp",
                 "long",
                 "double",
-                "int",
+                "integer",
                 "string",
                 "float"
               ],
@@ -247,7 +247,7 @@
                 "timestamp",
                 "long",
                 "double",
-                "int",
+                "integer",
                 "string",
                 "float"
               ],
