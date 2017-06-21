@@ -35,7 +35,8 @@ public class BuilderUtil
         JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
         JsonValidator validator = factory.getValidator();
         final JsonNode data = JsonLoader.fromString(json);
-        final JsonNode schema = JsonLoader.fromFile(new File(BuilderUtil.class.getResource("/schema/pivot_querybuilder_schema.json").getFile()));
+        String pivot = System.getProperty("schema.pivot");
+        final JsonNode schema = JsonLoader.fromFile(new File(pivot));
         ProcessingReport report = validator.validate(schema, data);
         if (report.isSuccess() == false) {
           throw new ProcessingException(report.toString());
@@ -57,8 +58,9 @@ public class BuilderUtil
         String json = "{ \"sqlBuilder\" :" + sqlNode.toString() + "}";
         JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
         JsonValidator validator = factory.getValidator();
+        String chart = System.getProperty("schema.chart");
         final JsonNode data = JsonLoader.fromString(json);
-        final JsonNode schema = JsonLoader.fromFile(new File(BuilderUtil.class.getResource("/schema/chart_querybuilder_schema.json").getFile()));
+        final JsonNode schema = JsonLoader.fromFile(new File(chart));
         ProcessingReport report = validator.validate(schema, data);
         if (report.isSuccess() == false) {
           throw new ProcessingException(report.toString());
