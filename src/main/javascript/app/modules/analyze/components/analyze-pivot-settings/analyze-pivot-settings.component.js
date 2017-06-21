@@ -1,7 +1,6 @@
 import fpGroupBy from 'lodash/fp/groupBy';
 import fpPipe from 'lodash/fp/pipe';
 import fpMapValues from 'lodash/fp/mapValues';
-import cloneDeep from 'lodash/cloneDeep';
 import forEach from 'lodash/forEach';
 import filter from 'lodash/filter';
 import map from 'lodash/map';
@@ -36,7 +35,7 @@ const AGGREGATE_TYPES = [{
   icon: 'icon-Count'
 }];
 
-const DEFAULT_SUMMARY_TYPE = AGGREGATE_TYPES[0];
+const DEFAULT_AGGREGATE_TYPE = AGGREGATE_TYPES[0];
 const AGGREGATE_TYPES_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
@@ -127,7 +126,7 @@ export const AnalyzePivotSettingsComponent = {
   styles: [style],
   bindings: {
     onApplySettings: '&',
-    reciever: '<'
+    artifactColumns: '<'
   },
   controller: class AnalyzePivotSettingsController {
     constructor(AnalyzeService, FilterService, $mdSidenav, $translate) {
@@ -135,7 +134,7 @@ export const AnalyzePivotSettingsComponent = {
       // TODO filter possible areas based on column type
       this.AGGREGATE_TYPES = AGGREGATE_TYPES;
       this.AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
-      this.DEFAULT_SUMMARY_TYPE = DEFAULT_SUMMARY_TYPE;
+      this.DEFAULT_AGGREGATE_TYPE = DEFAULT_AGGREGATE_TYPE;
 
       this.AREA_TYPES = AREA_TYPES;
       this.AREA_TYPES_OBJ = AREA_TYPES_OBJ;
@@ -161,22 +160,6 @@ export const AnalyzePivotSettingsComponent = {
           groupInterval.label = translations[groupInterval.label];
         });
       });
-      this.subscribtion = this.reciever.subscribe(event => this.onRecieve(event));
-    }
-
-    $onDestroy() {
-      this.subscribtion.unsubscribe();
-    }
-
-    onRecieve(event) {
-      if (event.eventName === 'open') {
-        this.onOpenSidenav(event.payload.artifactColumns);
-      }
-    }
-
-    onOpenSidenav(artifactColumns) {
-      this._$mdSidenav(ANALYZE_PIVOT_SETTINGS_SIDENAV_ID).open();
-      this.artifactColumns = cloneDeep(artifactColumns);
     }
 
     openMenu($mdMenu, ev) {
@@ -184,14 +167,14 @@ export const AnalyzePivotSettingsComponent = {
     }
 
     applySettings(artifactColumns) {
-      this._$mdSidenav(ANALYZE_PIVOT_SETTINGS_SIDENAV_ID).close();
+      // this._$mdSidenav(ANALYZE_PIVOT_SETTINGS_SIDENAV_ID).close();
       this.onApplySettings({columns: artifactColumns});
     }
 
     onChecked(artifactColumn) {
       if (!artifactColumn.area) {
         artifactColumn.area = DEFAULT_AREA_TYPE.value;
-        if (this.DATE_TYPES.includes(artifactColumn.area)) {
+        if (DATE_TYPES.includes(artifactColumn.type)) {
           artifactColumn.groupInterval = DEFAULT_GROUP_INTERVAL.value;
         }
       }
@@ -213,7 +196,7 @@ export const AnalyzePivotSettingsComponent = {
       artifactColumn.area = area;
 
       if (artifactColumn.area === 'data' && !artifactColumn.aggregate) {
-        artifactColumn.aggregate = DEFAULT_SUMMARY_TYPE.value;
+        artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
       }
     }
 

@@ -15,6 +15,7 @@ import invert from 'lodash/invert';
 import fpGroupBy from 'lodash/fp/groupBy';
 import sortBy from 'lodash/sortBy';
 import last from 'lodash/last';
+import omit from 'lodash/omit';
 import mapValues from 'lodash/mapValues';
 
 const FRONT_2_BACK_PIVOT_FIELD_PAIRS = {
@@ -126,8 +127,10 @@ export function PivotService() {
       });
     }
     // this is a leaf
+    // these props are added by elastic search, and are of no use in the UI
+    const propsToOmit = ['doc_count', 'key', 'key_as_string'];
     return assign(
-      mapValues(node, 'value'),
+      mapValues(omit(node, propsToOmit), 'value'),
       keys
     );
   }
