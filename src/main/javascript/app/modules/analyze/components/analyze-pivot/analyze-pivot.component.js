@@ -226,16 +226,15 @@ export const AnalyzePivotComponent = {
     }
 
     applyDefaultsBasedOnAreaChange(artifactColumn) {
-      if (DATE_TYPES.includes(artifactColumn.type)) {
-        if (!artifactColumn.groupInterval) {
-          artifactColumn.groupInterval = DEFAULT_GROUP_INTERVAL.value;
-        }
+      if (DATE_TYPES.includes(artifactColumn.type) &&
+          !artifactColumn.groupInterval) {
+
+        artifactColumn.groupInterval = DEFAULT_GROUP_INTERVAL.value;
       }
-      if (artifactColumn.type === 'data' &&
-        NUMBER_TYPES.icludes(artifactColumn.type)) {
-        if (!artifactColumn.aggregate) {
-          artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
-        }
+      if (artifactColumn.area === 'data' &&
+          NUMBER_TYPES.includes(artifactColumn.type) &&
+          !artifactColumn.aggregate) {
+        artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
       }
     }
 

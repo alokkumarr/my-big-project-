@@ -35,7 +35,7 @@ const AGGREGATE_TYPES = [{
   icon: 'icon-Count'
 }];
 
-const DEFAULT_AGGREGATE_TYPE = AGGREGATE_TYPES[0];
+export const DEFAULT_AGGREGATE_TYPE = AGGREGATE_TYPES[0];
 const AGGREGATE_TYPES_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
@@ -54,6 +54,12 @@ const AREA_TYPES = [{
   value: 'data',
   icon: 'icon-data'
 }];
+
+const DEFAULT_AREA_TYPE = AREA_TYPES[0];
+const AREA_TYPES_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(AREA_TYPES);
 
 const NUMBER_ICON = 'icon-number-type';
 const DATE_ICON = 'icon-calendar';
@@ -113,13 +119,7 @@ const GROUP_INTERVALS = [{
   value: 'dayOfWeek'
 }];
 
-const DEFAULT_GROUP_INTERVAL = GROUP_INTERVALS[2];
-
-const DEFAULT_AREA_TYPE = AREA_TYPES[0];
-const AREA_TYPES_OBJ = fpPipe(
-  fpGroupBy('value'),
-  fpMapValues(v => v[0])
-)(AREA_TYPES);
+export const DEFAULT_GROUP_INTERVAL = GROUP_INTERVALS[2];
 
 export const AnalyzePivotSettingsComponent = {
   template,
@@ -166,23 +166,16 @@ export const AnalyzePivotSettingsComponent = {
       $mdMenu.open(ev);
     }
 
-    applySettings(artifactColumns) {
-      // this._$mdSidenav(ANALYZE_PIVOT_SETTINGS_SIDENAV_ID).close();
-      this.onApplySettings({columns: artifactColumns});
-    }
-
     onChecked(artifactColumn) {
       if (!artifactColumn.area) {
         artifactColumn.area = DEFAULT_AREA_TYPE.value;
-        if (DATE_TYPES.includes(artifactColumn.type)) {
-          artifactColumn.groupInterval = DEFAULT_GROUP_INTERVAL.value;
-        }
       }
       if (!this.canBeChecked(artifactColumn)) {
         artifactColumn.checked = false;
         artifactColumn.area = null;
-        artifactColumn.groupInterval = null;
+        return;
       }
+      this.onApplySettings({columns: this.artifactColumns});
     }
 
     canBeChecked(artifactColumn) {
@@ -194,22 +187,17 @@ export const AnalyzePivotSettingsComponent = {
 
     onSelectAreaType(area, artifactColumn) {
       artifactColumn.area = area;
-
-      if (artifactColumn.area === 'data' && !artifactColumn.aggregate) {
-        artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
-      }
+      this.onApplySettings({columns: this.artifactColumns});
     }
 
     onSelectAggregateType(aggregateType, artifactColumn) {
       artifactColumn.aggregate = aggregateType.value;
+      this.onApplySettings({columns: this.artifactColumns});
     }
 
     onSelectGroupInterval(groupInterval, artifactColumn) {
       artifactColumn.groupInterval = groupInterval.value;
-    }
-
-    inputChanged(field) {
-      this.onChange({field});
+      this.onApplySettings({columns: this.artifactColumns});
     }
   }
 };
