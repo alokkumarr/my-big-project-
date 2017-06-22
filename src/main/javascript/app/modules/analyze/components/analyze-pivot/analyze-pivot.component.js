@@ -13,6 +13,8 @@ import cloneDeep from 'lodash/cloneDeep';
 import sortBy from 'lodash/sortBy';
 import forEach from 'lodash/forEach';
 import fpGroupBy from 'lodash/fp/groupBy';
+import groupBy from 'lodash/groupBy';
+import values from 'lodash/values';
 import fpMapValues from 'lodash/fp/mapValues';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
@@ -25,7 +27,7 @@ import style from './analyze-pivot.component.scss';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
 import {DEFAULT_AGGREGATE_TYPE, DEFAULT_GROUP_INTERVAL} from '../analyze-pivot-settings/analyze-pivot-settings.component';
 
-import {DATE_TYPES, NUMBER_TYPES, ENTRY_MODES} from '../../consts';
+import {DATE_TYPES, NUMBER_TYPES, ENTRY_MODES, MAX_POSSIBLE_FIELDS_OF_SAME_AREA} from '../../consts';
 
 export const AnalyzePivotComponent = {
   template,
@@ -35,7 +37,7 @@ export const AnalyzePivotComponent = {
     mode: '@?'
   },
   controller: class AnalyzePivotController {
-    constructor($mdDialog, $timeout, PivotService, AnalyzeService, FilterService, $mdSidenav) {
+    constructor($mdDialog, $timeout, PivotService, AnalyzeService, FilterService, $mdSidenav, toastMessage, $translate) {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this._$mdSidenav = $mdSidenav;
@@ -43,6 +45,8 @@ export const AnalyzePivotComponent = {
       this._$timeout = $timeout;
       this._FilterService = FilterService;
       this._AnalyzeService = AnalyzeService;
+      this._toastMessage = toastMessage;
+      this._$translate = $translate;
 
       this.deNormalizedData = [];
       this.normalizedData = [];
@@ -53,6 +57,7 @@ export const AnalyzePivotComponent = {
       this.pivotGridUpdater = new BehaviorSubject({});
       this.settingsModified = false;
       this.artifacts = [];
+      this.backupColumns = [];
     }
 
     $onInit() {
@@ -215,6 +220,7 @@ export const AnalyzePivotComponent = {
         return;
       }
       const selectedArtifactColumns = filter(this.artifacts[0].columns, 'checked');
+
       forEach(selectedArtifactColumns, artifactColumn => {
         const targetField = find(fields, ({dataField}) => {
           return dataField === artifactColumn.columnName;
@@ -223,6 +229,15 @@ export const AnalyzePivotComponent = {
         artifactColumn.area = targetField.area;
         this.applyDefaultsBasedOnAreaChange(artifactColumn);
       });
+
+      if (this.checkValidStates(selectedArtifactColumns)) {
+
+        this.backupColumns = cloneDeep(this.artifacts[0].columns);
+      } else if (!isEmpty(this.backupColumns)) {
+        this.artifacts[0].columns = this.backupColumns;
+        const pivotFields = this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns);
+        this.setDataSource(this.dataSource.store, pivotFields);
+      }
     }
 
     applyDefaultsBasedOnAreaChange(artifactColumn) {
@@ -236,6 +251,46 @@ export const AnalyzePivotComponent = {
           !artifactColumn.aggregate) {
         artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
       }
+    }
+
+    checkValidStates(artifactColumns) {
+      const grouped = groupBy(artifactColumns, 'area');
+      let valid = true;
+      const errors = [];
+      const interpolationValues = {
+        fieldNr: MAX_POSSIBLE_FIELDS_OF_SAME_AREA
+      };
+
+      if (grouped.column && grouped.column.length > MAX_POSSIBLE_FIELDS_OF_SAME_AREA) {
+        errors[0] = 'ERROR_PIVOT_MAX_FIELDS';
+        interpolationValues.area = 'column';
+        valid = false;
+      }
+      if (grouped.row && grouped.row.length > MAX_POSSIBLE_FIELDS_OF_SAME_AREA) {
+        errors[0] = 'ERROR_PIVOT_MAX_FIELDS';
+        interpolationValues.area = 'row';
+        valid = false;
+      }
+      if (grouped.data && grouped.data.length > MAX_POSSIBLE_FIELDS_OF_SAME_AREA) {
+        errors[0] = 'ERROR_PIVOT_MAX_FIELDS';
+        interpolationValues.area = 'data';
+        valid = false;
+      }
+
+      forEach(grouped.data, dataColumn => {
+        if (!NUMBER_TYPES.includes(dataColumn.type)) {
+          errors[1] = 'ERROR_PIVOT_DATA_FIELD';
+          valid = false;
+        }
+      });
+
+      if (!valid) {
+        this._$translate(errors, interpolationValues).then(translations => {
+          this._toastMessage.error(values(translations).join('\n'));
+        });
+      }
+
+      return valid;
     }
 
     getArtifactColumns2SortFieldMapper() {

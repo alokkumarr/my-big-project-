@@ -7,11 +7,9 @@ import map from 'lodash/map';
 
 import template from './analyze-pivot-settings.component.html';
 import style from './analyze-pivot-settings.component.scss';
-import {DATE_TYPES} from '../../consts';
+import {DATE_TYPES, MAX_POSSIBLE_FIELDS_OF_SAME_AREA} from '../../consts';
 
 export const ANALYZE_PIVOT_SETTINGS_SIDENAV_ID = 'ANALYZE_PIVOT_SETTINGS_SIDENAV_ID';
-
-const MAX_POSSIBLE_FILEDS_OF_SAME_AREA = 5;
 
 const AGGREGATE_TYPES = [{
   label: 'Sum',
@@ -181,8 +179,8 @@ export const AnalyzePivotSettingsComponent = {
     canBeChecked(artifactColumn) {
       // only 5 fields of the same type can be selected at a time
       const columnsWithSameArea = filter(this.artifactColumns,
-        ({area}) => artifactColumn.checked && (artifactColumn.area === area));
-      return columnsWithSameArea.length <= MAX_POSSIBLE_FILEDS_OF_SAME_AREA;
+        ({area, checked}) => checked && (artifactColumn.area === area));
+      return columnsWithSameArea.length <= MAX_POSSIBLE_FIELDS_OF_SAME_AREA;
     }
 
     onSelectAreaType(area, artifactColumn) {
