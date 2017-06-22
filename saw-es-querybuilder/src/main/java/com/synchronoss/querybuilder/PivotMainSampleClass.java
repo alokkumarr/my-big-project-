@@ -254,6 +254,20 @@ public class PivotMainSampleClass {
             "Pivot in column/data fields wise are allowed until five levels. Please verify & recreate your request.");
       }
     }
+    
+    // Use case VII: The below block is only when data Field is not empty
+    // empty
+    if ((columnFields.isEmpty() && columnFields.size() == 0) && (rowfield.isEmpty() && rowfield.size() == 0)) 
+    {
+      if  (dataFields != null && dataFields.size() <= 5)
+      {
+       searchSourceBuilder = OnlyDataFieldsAvailable.dataFieldsAvailable(dataFields, searchSourceBuilder, boolQueryBuilder);
+      } else {
+        throw new IllegalArgumentException(
+            "In Pivot data fields wise are allowed until five levels. Please verify & recreate your request.");
+      }
+    }
+    
     System.setProperty("url", "http://mapr-dev02.sncrbda.dev.vacum-np.sncrcorp.net:9200/");
     System.out.println(searchSourceBuilder.toString());
     String response =
