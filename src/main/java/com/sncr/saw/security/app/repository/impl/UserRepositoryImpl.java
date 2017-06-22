@@ -1224,7 +1224,7 @@ public class UserRepositoryImpl implements UserRepository {
 		} catch (DuplicateKeyException e) {
 			logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
 			valid.setValid(false);
-			valid.setError("User already Exists!");
+			valid.setError("User cannot be added. User ID already Exists!");
 			return valid;
 		} catch (DataIntegrityViolationException de) {
 			logger.error("Exception encountered while creating a new user " + de.getMessage(), null, de);
@@ -1621,7 +1621,7 @@ public class UserRepositoryImpl implements UserRepository {
 		} catch (DuplicateKeyException e) {
 			logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
 			valid.setValid(false);
-			valid.setError("User already Exists!");
+			valid.setError("Role Name already Exists for this Customer!");
 			return valid;
 		} catch (DataIntegrityViolationException de) {
 			logger.error("Exception encountered while creating a new user " + de.getMessage(), null, de);
@@ -1786,6 +1786,11 @@ public class UserRepositoryImpl implements UserRepository {
 				}
 			});
 
+		} catch (DuplicateKeyException e) {
+			logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
+			valid.setValid(false);
+			valid.setError("Role Name already Exists for this Customer!");
+			return valid;
 		} catch (Exception e) {
 			valid.setValid(false);
 			String message = (e instanceof DataIntegrityViolationException) ? "Please enter valid input in the field(s)." : "Error. Please contact server Administrator";

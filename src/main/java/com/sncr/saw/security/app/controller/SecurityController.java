@@ -636,7 +636,10 @@ public class SecurityController {
 					if (valid.getValid()) {
 						userList.setUsers(userRepository.getUsers(user.getCustomerId()));
 						userList.setValid(true);
-					} 
+					} else {
+						userList.setValid(false);
+						userList.setValidityMessage(valid.getError());
+					}
 				}
 			} else {
 				userList.setValid(false);
@@ -690,7 +693,10 @@ public class SecurityController {
 					if (valid.getValid()) {
 						userList.setUsers(userRepository.getUsers(user.getCustomerId()));
 						userList.setValid(true);
-					} 
+					} else {
+						userList.setValid(false);
+						userList.setValidityMessage(valid.getError());
+					}
 				}
 			} else {
 				userList.setValid(false);
@@ -900,7 +906,10 @@ public class SecurityController {
 				if (valid.getValid()) {
 					roleList.setRoles(userRepository.getRoles(role.getCustSysId()));
 					roleList.setValid(true);
-				} 
+				} else {
+					roleList.setValid(false);
+					roleList.setValidityMessage(valid.getError());
+				}
 			} else {
 				roleList.setValid(false);
 				roleList.setValidityMessage("Mandatory request params are missing");
