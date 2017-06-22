@@ -1,18 +1,15 @@
 import fpGroupBy from 'lodash/fp/groupBy';
 import fpPipe from 'lodash/fp/pipe';
 import fpMapValues from 'lodash/fp/mapValues';
-import cloneDeep from 'lodash/cloneDeep';
 import forEach from 'lodash/forEach';
 import filter from 'lodash/filter';
 import map from 'lodash/map';
 
 import template from './analyze-pivot-settings.component.html';
 import style from './analyze-pivot-settings.component.scss';
-import {DATE_TYPES} from '../../consts';
+import {DATE_TYPES, MAX_POSSIBLE_FIELDS_OF_SAME_AREA} from '../../consts';
 
 export const ANALYZE_PIVOT_SETTINGS_SIDENAV_ID = 'ANALYZE_PIVOT_SETTINGS_SIDENAV_ID';
-
-const MAX_POSSIBLE_FILEDS_OF_SAME_AREA = 5;
 
 const AGGREGATE_TYPES = [{
   label: 'Sum',
@@ -36,7 +33,7 @@ const AGGREGATE_TYPES = [{
   icon: 'icon-Count'
 }];
 
-const DEFAULT_SUMMARY_TYPE = AGGREGATE_TYPES[0];
+export const DEFAULT_AGGREGATE_TYPE = AGGREGATE_TYPES[0];
 const AGGREGATE_TYPES_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
@@ -55,6 +52,12 @@ const AREA_TYPES = [{
   value: 'data',
   icon: 'icon-data'
 }];
+
+const DEFAULT_AREA_TYPE = AREA_TYPES[0];
+const AREA_TYPES_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(AREA_TYPES);
 
 const NUMBER_ICON = 'icon-number-type';
 const DATE_ICON = 'icon-calendar';
@@ -114,20 +117,14 @@ const GROUP_INTERVALS = [{
   value: 'dayOfWeek'
 }];
 
-const DEFAULT_GROUP_INTERVAL = GROUP_INTERVALS[2];
-
-const DEFAULT_AREA_TYPE = AREA_TYPES[0];
-const AREA_TYPES_OBJ = fpPipe(
-  fpGroupBy('value'),
-  fpMapValues(v => v[0])
-)(AREA_TYPES);
+export const DEFAULT_GROUP_INTERVAL = GROUP_INTERVALS[2];
 
 export const AnalyzePivotSettingsComponent = {
   template,
   styles: [style],
   bindings: {
     onApplySettings: '&',
-    reciever: '<'
+    artifactColumns: '<'
   },
   controller: class AnalyzePivotSettingsController {
     constructor(AnalyzeService, FilterService, $mdSidenav, $translate) {
@@ -135,7 +132,7 @@ export const AnalyzePivotSettingsComponent = {
       // TODO filter possible areas based on column type
       this.AGGREGATE_TYPES = AGGREGATE_TYPES;
       this.AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
-      this.DEFAULT_SUMMARY_TYPE = DEFAULT_SUMMARY_TYPE;
+      this.DEFAULT_AGGREGATE_TYPE = DEFAULT_AGGREGATE_TYPE;
 
       this.AREA_TYPES = AREA_TYPES;
       this.AREA_TYPES_OBJ = AREA_TYPES_OBJ;
@@ -161,72 +158,44 @@ export const AnalyzePivotSettingsComponent = {
           groupInterval.label = translations[groupInterval.label];
         });
       });
-      this.subscribtion = this.reciever.subscribe(event => this.onRecieve(event));
-    }
-
-    $onDestroy() {
-      this.subscribtion.unsubscribe();
-    }
-
-    onRecieve(event) {
-      if (event.eventName === 'open') {
-        this.onOpenSidenav(event.payload.artifactColumns);
-      }
-    }
-
-    onOpenSidenav(artifactColumns) {
-      this._$mdSidenav(ANALYZE_PIVOT_SETTINGS_SIDENAV_ID).open();
-      this.artifactColumns = cloneDeep(artifactColumns);
     }
 
     openMenu($mdMenu, ev) {
       $mdMenu.open(ev);
     }
 
-    applySettings(artifactColumns) {
-      this._$mdSidenav(ANALYZE_PIVOT_SETTINGS_SIDENAV_ID).close();
-      this.onApplySettings({columns: artifactColumns});
-    }
-
     onChecked(artifactColumn) {
       if (!artifactColumn.area) {
         artifactColumn.area = DEFAULT_AREA_TYPE.value;
-        if (this.DATE_TYPES.includes(artifactColumn.area)) {
-          artifactColumn.groupInterval = DEFAULT_GROUP_INTERVAL.value;
-        }
       }
       if (!this.canBeChecked(artifactColumn)) {
         artifactColumn.checked = false;
         artifactColumn.area = null;
-        artifactColumn.groupInterval = null;
+        return;
       }
+      this.onApplySettings({columns: this.artifactColumns});
     }
 
     canBeChecked(artifactColumn) {
       // only 5 fields of the same type can be selected at a time
       const columnsWithSameArea = filter(this.artifactColumns,
-        ({area}) => artifactColumn.checked && (artifactColumn.area === area));
-      return columnsWithSameArea.length <= MAX_POSSIBLE_FILEDS_OF_SAME_AREA;
+        ({area, checked}) => checked && (artifactColumn.area === area));
+      return columnsWithSameArea.length <= MAX_POSSIBLE_FIELDS_OF_SAME_AREA;
     }
 
     onSelectAreaType(area, artifactColumn) {
       artifactColumn.area = area;
-
-      if (artifactColumn.area === 'data' && !artifactColumn.aggregate) {
-        artifactColumn.aggregate = DEFAULT_SUMMARY_TYPE.value;
-      }
+      this.onApplySettings({columns: this.artifactColumns});
     }
 
     onSelectAggregateType(aggregateType, artifactColumn) {
       artifactColumn.aggregate = aggregateType.value;
+      this.onApplySettings({columns: this.artifactColumns});
     }
 
     onSelectGroupInterval(groupInterval, artifactColumn) {
       artifactColumn.groupInterval = groupInterval.value;
-    }
-
-    inputChanged(field) {
-      this.onChange({field});
+      this.onApplySettings({columns: this.artifactColumns});
     }
   }
 };
