@@ -25,26 +25,26 @@ export const RoleEditComponent = {
 
     $onInit() {
       this.statuses = [{
-        ind: 'Active',
+        ind: 1,
         name: 'ACTIVE'
       }, {
-        ind: 'Inactive',
+        ind: 0,
         name: 'INACTIVE'
       }];
       const custCode = get(this._JwtService.getTokenObj(), 'ticket.custCode');
       const userId = get(this._JwtService.getTokenObj(), 'ticket.masterLoginId');
       this.editRole.masterLoginId = userId;
       this.editRole.customerCode = custCode;
+      if (this.editRole.activeStatusInd === 'Active') {
+        this.editRole.activeStatusInd = 1;
+      } else {
+        this.editRole.activeStatusInd = 0;
+      }
     }
 
     updateRole() {
       this._$rootScope.showProgress = true;
       const eRole = this.editRole;
-      if (this.editRole.activeStatusInd === 'Active') {
-        eRole.activeStatusInd = 1;
-      } else {
-        eRole.activeStatusInd = 0;
-      }
       this._RolesManagementService.updateRole(eRole).then(response => {
         this.response = response;
         if (this.response.valid) {
@@ -64,6 +64,8 @@ export const RoleEditComponent = {
             toastClass: 'toast-primary'
           });
         }
+      }).catch(() => {
+        this._$rootScope.showProgress = false;
       });
     }
   }

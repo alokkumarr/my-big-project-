@@ -22,11 +22,16 @@ export const UserEditComponent = {
     }
 
     $onInit() {
+      if (this.user.activeStatusInd === 'Active') {
+        this.user.activeStatusInd = 1;
+      } else {
+        this.user.activeStatusInd = 0;
+      }
       this.statuses = [{
-        ind: 'Active',
+        ind: 1,
         name: 'ACTIVE'
       }, {
-        ind: 'Inactive',
+        ind: 0,
         name: 'INACTIVE'
       }];
     }
@@ -34,11 +39,6 @@ export const UserEditComponent = {
     updateUser() {
       this._$rootScope.showProgress = true;
       const eUser = this.editUser;
-      if (this.editUser.activeStatusInd === 'Active') {
-        eUser.activeStatusInd = 1;
-      } else {
-        eUser.activeStatusInd = 0;
-      }
       this._UsersManagementService.updateUser(eUser).then(response => {
         this.response = response;
         if (this.response.valid) {
@@ -58,6 +58,8 @@ export const UserEditComponent = {
             toastClass: 'toast-primary'
           });
         }
+      }).catch(() => {
+        this._$rootScope.showProgress = false;
       });
     }
   }
