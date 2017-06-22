@@ -588,7 +588,7 @@
                         </mapping>
                         <mapping>
                             <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/schema</directory>
-                            <filemode>644</filemode>
+                            <filemode>750</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
                             <sources>
