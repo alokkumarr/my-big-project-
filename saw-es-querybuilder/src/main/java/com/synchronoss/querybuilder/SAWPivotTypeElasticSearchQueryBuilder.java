@@ -234,6 +234,36 @@ class SAWPivotTypeElasticSearchQueryBuilder {
             "Pivot in column wise are allowed until five levels. Please verify & recreate your request.");
       }
     }
+    
+    // Use case VI: The below block is only when column & Data Field is not empty & row field is
+    // empty
+    if ((columnFields.isEmpty() && columnFields.size() == 0)) {
+      if ((rowfield != null && rowfield.size() <= 5)
+          && (dataFields != null && dataFields.size() <= 5)) {
+        searchSourceBuilder =
+            RowDataFieldsAvailable.rowDataFieldsAvailable(rowfield, columnFields, dataFields,
+                searchSourceBuilder, boolQueryBuilder);
+      } else {
+        throw new IllegalArgumentException(
+            "Pivot in column/data fields wise are allowed until five levels. Please verify & recreate your request.");
+      }
+    }
+    
+    // Use case VII: The below block is only when data Field is not empty
+    // empty
+    if ((columnFields.isEmpty() && columnFields.size() == 0) && (rowfield.isEmpty() && rowfield.size() == 0)) 
+    {
+      if  (dataFields != null && dataFields.size() <= 5)
+      {
+       searchSourceBuilder = OnlyDataFieldsAvailable.dataFieldsAvailable(dataFields, searchSourceBuilder, boolQueryBuilder);
+      } else {
+        throw new IllegalArgumentException(
+            "In Pivot data fields wise are allowed until five levels. Please verify & recreate your request.");
+      }
+    }
+
+    
+    
     // Generated Query
     setSearchSourceBuilder(searchSourceBuilder);
     query = searchSourceBuilder.toString();
