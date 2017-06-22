@@ -75,14 +75,14 @@ export const RolesListViewComponent = {
         dataField: 'roleType',
         allowSorting: true,
         alignment: 'left',
-        width: '20%',
+        width: '10%',
         cellTemplate: 'roleTypeCellTemplate'
       }, {
         caption: 'ROLE DESCRIPTION',
         dataField: 'roleDesc',
         allowSorting: true,
         alignment: 'left',
-        width: '20%',
+        width: '30%',
         cellTemplate: 'roleCodeCellTemplate'
       }, {
         caption: 'DSK',
