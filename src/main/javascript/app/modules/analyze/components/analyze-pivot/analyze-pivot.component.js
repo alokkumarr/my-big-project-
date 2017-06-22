@@ -11,6 +11,7 @@ import unset from 'lodash/unset';
 import filter from 'lodash/filter';
 import cloneDeep from 'lodash/cloneDeep';
 import sortBy from 'lodash/sortBy';
+import fpSortBy from 'lodash/fp/sortBy';
 import forEach from 'lodash/forEach';
 import fpGroupBy from 'lodash/fp/groupBy';
 import groupBy from 'lodash/groupBy';
@@ -119,7 +120,6 @@ export const AnalyzePivotComponent = {
     }
 
     setDataSource(store, fields) {
-      console.log('fields: ', fields);
       this.dataSource = new PivotGridDataSource({store, fields});
       this.pivotGridUpdater.next({
         dataSource: this.dataSource
@@ -234,6 +234,7 @@ export const AnalyzePivotComponent = {
 
         this.backupColumns = cloneDeep(this.artifacts[0].columns);
       } else if (!isEmpty(this.backupColumns)) {
+
         this.artifacts[0].columns = this.backupColumns;
         const pivotFields = this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns);
         this.setDataSource(this.dataSource.store, pivotFields);
@@ -286,7 +287,9 @@ export const AnalyzePivotComponent = {
 
       if (!valid) {
         this._$translate(errors, interpolationValues).then(translations => {
-          this._toastMessage.error(values(translations).join('\n'));
+          this._toastMessage.error(values(translations).join('\n'), '', {
+            timeOut: 3000
+          });
         });
       }
 
@@ -414,6 +417,7 @@ export const AnalyzePivotComponent = {
     getSqlBuilder() {
       const groupedFields = fpPipe(
         fpFilter(field => field.checked && field.area),
+        fpSortBy('areaIndex'),
         fpGroupBy('area'),
         fpMapValues(
           fpMap(field => {
