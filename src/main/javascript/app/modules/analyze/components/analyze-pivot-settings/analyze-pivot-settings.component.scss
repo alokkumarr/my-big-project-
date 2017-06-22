@@ -3,6 +3,15 @@
 analyze-pivot-settings {
   z-index: 0;
 
+  & > .layout-row {
+    height: 100%;
+  }
+
+  md-sidenav {
+    position: static;
+    width: 300px;
+  }
+
   h3 {
     margin: 5px;
     padding: 5px;
@@ -14,19 +23,6 @@ analyze-pivot-settings {
       margin-top: 8px;
       margin-bottom: 8px;
     }
-  }
-
-  & > .layout-row {
-    height: 100%;
-  }
-
-  md-sidenav {
-    position: static;
-    width: 300px;
-  }
-
-  md-toolbar::after {
-    content: none;
   }
 
   md-toolbar.settings-toolbar {

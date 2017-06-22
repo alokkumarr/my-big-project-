@@ -1,14 +1,11 @@
 <div layout="row">
-  <md-sidenav class="pivot-settings"
+  <md-sidenav md-component-id="{{$ctrl.ANALYZE_PIVOT_SETTINGS_SIDENAV_ID}}"
               md-is-open="true"
               md-disable-backdrop
-              md-component-id="{{$ctrl.ANALYZE_PIVOT_SETTINGS_SIDENAV_ID}}"
               md-whiteframe="4">
-    <md-toolbar class="settings-toolbar" layout="row" layout-align="space-around center">
-      <p class="md-headline" translate="PIVOT_SETTINGS"></p>
+    <md-toolbar class="md-theme-indigo">
+      <h1 class="md-toolbar-tools" translate="PIVOT_SETTINGS"></h1>
     </md-toolbar>
-    <div layout="column"
-         style="height: calc(100% - 50px); overflow: auto">
       <md-list>
 
       <md-subheader class="md-no-sticky">
@@ -95,6 +92,5 @@
 
       </md-list-item>
     </md-list>
-    </div>
   </md-sidenav>
 </div>
