@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
 // @SOURCE:saw-services/saw-transport-service/conf/routes
-// @DATE:Tue Jun 06 15:58:00 EDT 2017
+// @DATE:Mon Jun 26 04:00:36 EDT 2017
 
 package router
 
@@ -24,11 +24,11 @@ class Routes(
   MD_2: controllers.MD,
   // @LINE:14
   Analysis_1: controllers.Analysis,
-  // @LINE:15
+  // @LINE:17
   AnalysisExecutions_5: controllers.AnalysisExecutions,
-  // @LINE:22
+  // @LINE:26
   Semantic_0: controllers.Semantic,
-  // @LINE:24
+  // @LINE:28
   MCT_3: controllers.MCT,
   val prefix: String
 ) extends GeneratedRouter {
@@ -43,11 +43,11 @@ class Routes(
     MD_2: controllers.MD,
     // @LINE:14
     Analysis_1: controllers.Analysis,
-    // @LINE:15
+    // @LINE:17
     AnalysisExecutions_5: controllers.AnalysisExecutions,
-    // @LINE:22
+    // @LINE:26
     Semantic_0: controllers.Semantic,
-    // @LINE:24
+    // @LINE:28
     MCT_3: controllers.MCT
   ) = this(errorHandler, MTSControl_6, TS_4, MD_2, Analysis_1, AnalysisExecutions_5, Semantic_0, MCT_3, "/")
 
@@ -66,10 +66,12 @@ class Routes(
     ("""GET""", this.prefix, """controllers.MTSControl.index"""),
     ("""POST""", this.prefix, """controllers.TS.handleRequest"""),
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """md""", """controllers.MD.handleRequest"""),
+    ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis""", """controllers.Analysis.list(view:String)"""),
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis""", """controllers.Analysis.process"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis/""" + "$" + """analysisId<[^/]+>/executions""", """controllers.AnalysisExecutions.list(analysisId:String)"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis/""" + "$" + """analysisId<[^/]+>/results""", """controllers.AnalysisExecutions.list(analysisId:String)"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis/""" + "$" + """analysisId<[^/]+>/executions/""" + "$" + """executionId<[^/]+>/data""", """controllers.AnalysisExecutions.getExecutionData(analysisId:String, executionId:String)"""),
+    ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis/""" + "$" + """analysisId<[^/]+>/executions""", """controllers.AnalysisExecutions.execute(analysisId:String)"""),
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """semantic""", """controllers.Semantic.handleRequest"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """ObjectSearch""", """controllers.MCT.handleTagRequest(LCID:String, query:Option[String])"""),
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """ObjectSearch""", """controllers.MCT.extendedTagRequest(LCID:String, indexname:Option[String], objecttype:Option[String])"""),
@@ -137,10 +139,27 @@ class Routes(
   )
 
   // @LINE:14
-  private[this] lazy val controllers_Analysis_process3_route = Route("POST",
+  private[this] lazy val controllers_Analysis_list3_route = Route("GET",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("analysis")))
   )
-  private[this] lazy val controllers_Analysis_process3_invoker = createInvoker(
+  private[this] lazy val controllers_Analysis_list3_invoker = createInvoker(
+    Analysis_1.list(fakeValue[String]),
+    HandlerDef(this.getClass.getClassLoader,
+      "router",
+      "controllers.Analysis",
+      "list",
+      Seq(classOf[String]),
+      "GET",
+      """""",
+      this.prefix + """analysis"""
+    )
+  )
+
+  // @LINE:15
+  private[this] lazy val controllers_Analysis_process4_route = Route("POST",
+    PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("analysis")))
+  )
+  private[this] lazy val controllers_Analysis_process4_invoker = createInvoker(
     Analysis_1.process,
     HandlerDef(this.getClass.getClassLoader,
       "router",
@@ -153,11 +172,11 @@ class Routes(
     )
   )
 
-  // @LINE:15
-  private[this] lazy val controllers_AnalysisExecutions_list4_route = Route("GET",
+  // @LINE:17
+  private[this] lazy val controllers_AnalysisExecutions_list5_route = Route("GET",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("analysis/"), DynamicPart("analysisId", """[^/]+""",true), StaticPart("/executions")))
   )
-  private[this] lazy val controllers_AnalysisExecutions_list4_invoker = createInvoker(
+  private[this] lazy val controllers_AnalysisExecutions_list5_invoker = createInvoker(
     AnalysisExecutions_5.list(fakeValue[String]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
@@ -170,11 +189,11 @@ class Routes(
     )
   )
 
-  // @LINE:17
-  private[this] lazy val controllers_AnalysisExecutions_list5_route = Route("GET",
+  // @LINE:19
+  private[this] lazy val controllers_AnalysisExecutions_list6_route = Route("GET",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("analysis/"), DynamicPart("analysisId", """[^/]+""",true), StaticPart("/results")))
   )
-  private[this] lazy val controllers_AnalysisExecutions_list5_invoker = createInvoker(
+  private[this] lazy val controllers_AnalysisExecutions_list6_invoker = createInvoker(
     AnalysisExecutions_5.list(fakeValue[String]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
@@ -187,11 +206,11 @@ class Routes(
     )
   )
 
-  // @LINE:18
-  private[this] lazy val controllers_AnalysisExecutions_getExecutionData6_route = Route("GET",
+  // @LINE:20
+  private[this] lazy val controllers_AnalysisExecutions_getExecutionData7_route = Route("GET",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("analysis/"), DynamicPart("analysisId", """[^/]+""",true), StaticPart("/executions/"), DynamicPart("executionId", """[^/]+""",true), StaticPart("/data")))
   )
-  private[this] lazy val controllers_AnalysisExecutions_getExecutionData6_invoker = createInvoker(
+  private[this] lazy val controllers_AnalysisExecutions_getExecutionData7_invoker = createInvoker(
     AnalysisExecutions_5.getExecutionData(fakeValue[String], fakeValue[String]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
@@ -205,10 +224,27 @@ class Routes(
   )
 
   // @LINE:22
-  private[this] lazy val controllers_Semantic_handleRequest7_route = Route("POST",
+  private[this] lazy val controllers_AnalysisExecutions_execute8_route = Route("POST",
+    PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("analysis/"), DynamicPart("analysisId", """[^/]+""",true), StaticPart("/executions")))
+  )
+  private[this] lazy val controllers_AnalysisExecutions_execute8_invoker = createInvoker(
+    AnalysisExecutions_5.execute(fakeValue[String]),
+    HandlerDef(this.getClass.getClassLoader,
+      "router",
+      "controllers.AnalysisExecutions",
+      "execute",
+      Seq(classOf[String]),
+      "POST",
+      """""",
+      this.prefix + """analysis/""" + "$" + """analysisId<[^/]+>/executions"""
+    )
+  )
+
+  // @LINE:26
+  private[this] lazy val controllers_Semantic_handleRequest9_route = Route("POST",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("semantic")))
   )
-  private[this] lazy val controllers_Semantic_handleRequest7_invoker = createInvoker(
+  private[this] lazy val controllers_Semantic_handleRequest9_invoker = createInvoker(
     Semantic_0.handleRequest,
     HandlerDef(this.getClass.getClassLoader,
       "router",
@@ -221,11 +257,11 @@ class Routes(
     )
   )
 
-  // @LINE:24
-  private[this] lazy val controllers_MCT_handleTagRequest8_route = Route("GET",
+  // @LINE:28
+  private[this] lazy val controllers_MCT_handleTagRequest10_route = Route("GET",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("ObjectSearch")))
   )
-  private[this] lazy val controllers_MCT_handleTagRequest8_invoker = createInvoker(
+  private[this] lazy val controllers_MCT_handleTagRequest10_invoker = createInvoker(
     MCT_3.handleTagRequest(fakeValue[String], fakeValue[Option[String]]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
@@ -238,11 +274,11 @@ class Routes(
     )
   )
 
-  // @LINE:25
-  private[this] lazy val controllers_MCT_extendedTagRequest9_route = Route("POST",
+  // @LINE:29
+  private[this] lazy val controllers_MCT_extendedTagRequest11_route = Route("POST",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("ObjectSearch")))
   )
-  private[this] lazy val controllers_MCT_extendedTagRequest9_invoker = createInvoker(
+  private[this] lazy val controllers_MCT_extendedTagRequest11_invoker = createInvoker(
     MCT_3.extendedTagRequest(fakeValue[String], fakeValue[Option[String]], fakeValue[Option[String]]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
@@ -255,11 +291,11 @@ class Routes(
     )
   )
 
-  // @LINE:29
-  private[this] lazy val controllers_MTSControl_executeCmd10_route = Route("GET",
+  // @LINE:33
+  private[this] lazy val controllers_MTSControl_executeCmd12_route = Route("GET",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("control")))
   )
-  private[this] lazy val controllers_MTSControl_executeCmd10_invoker = createInvoker(
+  private[this] lazy val controllers_MTSControl_executeCmd12_invoker = createInvoker(
     MTSControl_6.executeCmd(fakeValue[String], fakeValue[Option[String]]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
@@ -272,11 +308,11 @@ class Routes(
     )
   )
 
-  // @LINE:30
-  private[this] lazy val controllers_MTSControl_executeExtendedCmd11_route = Route("POST",
+  // @LINE:34
+  private[this] lazy val controllers_MTSControl_executeExtendedCmd13_route = Route("POST",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("control")))
   )
-  private[this] lazy val controllers_MTSControl_executeExtendedCmd11_invoker = createInvoker(
+  private[this] lazy val controllers_MTSControl_executeExtendedCmd13_invoker = createInvoker(
     MTSControl_6.executeExtendedCmd(fakeValue[String]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
@@ -289,11 +325,11 @@ class Routes(
     )
   )
 
-  // @LINE:32
-  private[this] lazy val controllers_MTSControl_sr12_route = Route("GET",
+  // @LINE:36
+  private[this] lazy val controllers_MTSControl_sr14_route = Route("GET",
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("sr")))
   )
-  private[this] lazy val controllers_MTSControl_sr12_invoker = createInvoker(
+  private[this] lazy val controllers_MTSControl_sr14_invoker = createInvoker(
     MTSControl_6.sr(fakeValue[Option[String]]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
@@ -328,15 +364,15 @@ class Routes(
       }
   
     // @LINE:14
-    case controllers_Analysis_process3_route(params) =>
-      call { 
-        controllers_Analysis_process3_invoker.call(Analysis_1.process)
+    case controllers_Analysis_list3_route(params) =>
+      call(params.fromQuery[String]("view", None)) { (view) =>
+        controllers_Analysis_list3_invoker.call(Analysis_1.list(view))
       }
   
     // @LINE:15
-    case controllers_AnalysisExecutions_list4_route(params) =>
-      call(params.fromPath[String]("analysisId", None)) { (analysisId) =>
-        controllers_AnalysisExecutions_list4_invoker.call(AnalysisExecutions_5.list(analysisId))
+    case controllers_Analysis_process4_route(params) =>
+      call { 
+        controllers_Analysis_process4_invoker.call(Analysis_1.process)
       }
   
     // @LINE:17
@@ -345,46 +381,58 @@ class Routes(
         controllers_AnalysisExecutions_list5_invoker.call(AnalysisExecutions_5.list(analysisId))
       }
   
-    // @LINE:18
-    case controllers_AnalysisExecutions_getExecutionData6_route(params) =>
+    // @LINE:19
+    case controllers_AnalysisExecutions_list6_route(params) =>
+      call(params.fromPath[String]("analysisId", None)) { (analysisId) =>
+        controllers_AnalysisExecutions_list6_invoker.call(AnalysisExecutions_5.list(analysisId))
+      }
+  
+    // @LINE:20
+    case controllers_AnalysisExecutions_getExecutionData7_route(params) =>
       call(params.fromPath[String]("analysisId", None), params.fromPath[String]("executionId", None)) { (analysisId, executionId) =>
-        controllers_AnalysisExecutions_getExecutionData6_invoker.call(AnalysisExecutions_5.getExecutionData(analysisId, executionId))
+        controllers_AnalysisExecutions_getExecutionData7_invoker.call(AnalysisExecutions_5.getExecutionData(analysisId, executionId))
       }
   
     // @LINE:22
-    case controllers_Semantic_handleRequest7_route(params) =>
+    case controllers_AnalysisExecutions_execute8_route(params) =>
+      call(params.fromPath[String]("analysisId", None)) { (analysisId) =>
+        controllers_AnalysisExecutions_execute8_invoker.call(AnalysisExecutions_5.execute(analysisId))
+      }
+  
+    // @LINE:26
+    case controllers_Semantic_handleRequest9_route(params) =>
       call { 
-        controllers_Semantic_handleRequest7_invoker.call(Semantic_0.handleRequest)
+        controllers_Semantic_handleRequest9_invoker.call(Semantic_0.handleRequest)
       }
   
-    // @LINE:24
-    case controllers_MCT_handleTagRequest8_route(params) =>
+    // @LINE:28
+    case controllers_MCT_handleTagRequest10_route(params) =>
       call(params.fromQuery[String]("LCID", None), params.fromQuery[Option[String]]("query", None)) { (LCID, query) =>
-        controllers_MCT_handleTagRequest8_invoker.call(MCT_3.handleTagRequest(LCID, query))
-      }
-  
-    // @LINE:25
-    case controllers_MCT_extendedTagRequest9_route(params) =>
-      call(params.fromQuery[String]("LCID", None), params.fromQuery[Option[String]]("indexname", None), params.fromQuery[Option[String]]("objecttype", None)) { (LCID, indexname, objecttype) =>
-        controllers_MCT_extendedTagRequest9_invoker.call(MCT_3.extendedTagRequest(LCID, indexname, objecttype))
+        controllers_MCT_handleTagRequest10_invoker.call(MCT_3.handleTagRequest(LCID, query))
       }
   
     // @LINE:29
-    case controllers_MTSControl_executeCmd10_route(params) =>
+    case controllers_MCT_extendedTagRequest11_route(params) =>
+      call(params.fromQuery[String]("LCID", None), params.fromQuery[Option[String]]("indexname", None), params.fromQuery[Option[String]]("objecttype", None)) { (LCID, indexname, objecttype) =>
+        controllers_MCT_extendedTagRequest11_invoker.call(MCT_3.extendedTagRequest(LCID, indexname, objecttype))
+      }
+  
+    // @LINE:33
+    case controllers_MTSControl_executeCmd12_route(params) =>
       call(params.fromQuery[String]("CMD", None), params.fromQuery[Option[String]]("PARAMETERS", None)) { (CMD, PARAMETERS) =>
-        controllers_MTSControl_executeCmd10_invoker.call(MTSControl_6.executeCmd(CMD, PARAMETERS))
+        controllers_MTSControl_executeCmd12_invoker.call(MTSControl_6.executeCmd(CMD, PARAMETERS))
       }
   
-    // @LINE:30
-    case controllers_MTSControl_executeExtendedCmd11_route(params) =>
+    // @LINE:34
+    case controllers_MTSControl_executeExtendedCmd13_route(params) =>
       call(params.fromQuery[String]("CMD", None)) { (CMD) =>
-        controllers_MTSControl_executeExtendedCmd11_invoker.call(MTSControl_6.executeExtendedCmd(CMD))
+        controllers_MTSControl_executeExtendedCmd13_invoker.call(MTSControl_6.executeExtendedCmd(CMD))
       }
   
-    // @LINE:32
-    case controllers_MTSControl_sr12_route(params) =>
+    // @LINE:36
+    case controllers_MTSControl_sr14_route(params) =>
       call(params.fromQuery[Option[String]]("parameters", None)) { (parameters) =>
-        controllers_MTSControl_sr12_invoker.call(MTSControl_6.sr(parameters))
+        controllers_MTSControl_sr14_invoker.call(MTSControl_6.sr(parameters))
       }
   }
 }
