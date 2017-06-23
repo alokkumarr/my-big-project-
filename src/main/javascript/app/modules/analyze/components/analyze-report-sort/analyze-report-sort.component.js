@@ -2,6 +2,7 @@ import find from 'lodash/find';
 
 import template from './analyze-report-sort.component.html';
 import style from './analyze-report-sort.component.scss';
+import {DATE_TYPES, NUMBER_TYPES} from '../../consts';
 
 export const AnalyzeReportSortComponent = {
   template,
@@ -13,6 +14,8 @@ export const AnalyzeReportSortComponent = {
     constructor($mdDialog) {
       'ngInject';
       this._$mdDialog = $mdDialog;
+      this.NUMBER_TYPES = NUMBER_TYPES;
+      this.DATE_TYPES = DATE_TYPES;
     }
 
     addSort() {
@@ -34,15 +37,12 @@ export const AnalyzeReportSortComponent = {
     }
 
     filterSortOption(sort, item) {
-      switch (item.type) {
-        case 'string':
-        case 'int':
-        case 'double':
-        case 'long':
-          return sort.field === item || !this.isColumnSorted(item);
-        default:
-          return false;
+      if (item.type === 'string' ||
+          NUMBER_TYPES.includes(item.type) ||
+          DATE_TYPES.includes(item.type)) {
+        return sort.field === item || !this.isColumnSorted(item);
       }
+      return false;
     }
 
     isColumnSorted(column) {

@@ -34,7 +34,7 @@
 
           <!-- NUMBER SORT OPTIONS -->
           <md-radio-group ng-model="sort.order" layout="row" layout-align="center center"
-                          ng-if="sort.field.type === 'int' || sort.field.type === 'double' || sort.field.type === 'long'">
+                          ng-if="$ctrl.NUMBER_TYPES.includes(sort.field.type)">
             <md-radio-button class="ars_sort-rbtn" value="asc" aria-label="Ascending">
               <div layout="column">
                 123
@@ -45,6 +45,25 @@
               <div layout="column">
                 321
                 <md-icon md-font-icon="icon-arrow-left" class="ars_arrow"></md-icon>
+              </div>
+            </md-radio-button>
+          </md-radio-group>
+
+          <!-- DATE SORT OPTIONS -->
+          <md-radio-group ng-model="sort.order" layout="row" layout-align="center center"
+                          ng-if="$ctrl.DATE_TYPES.includes(sort.field.type)">
+            <md-radio-button class="ars_sort-rbtn" value="asc" aria-label="Ascending">
+              <div layout="column">
+                Jan
+                <md-icon md-font-icon="icon-arrow-left" class="ars_arrow"></md-icon>
+                Dec
+              </div>
+            </md-radio-button>
+            <md-radio-button class="ars_sort-rbtn" value="desc" aria-label="Descending">
+              <div layout="column">
+                Dec
+                <md-icon md-font-icon="icon-arrow-left" class="ars_arrow"></md-icon>
+                Jan
               </div>
             </md-radio-button>
           </md-radio-group>
