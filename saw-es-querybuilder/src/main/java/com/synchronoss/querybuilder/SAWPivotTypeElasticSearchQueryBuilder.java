@@ -88,13 +88,36 @@ class SAWPivotTypeElasticSearchQueryBuilder {
               new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
           builder.add(termsQueryBuilder);
         }
-        if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
-            || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) 
-        {
+        
+        if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item
+            .getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
+            || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase())
+            || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) {
+          
           if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
             rangeQueryBuilder.lte(item.getModel().getOtherValue());
             rangeQueryBuilder.gte(item.getModel().getValue());
+            builder.add(rangeQueryBuilder);
+          }
+          if (item.getModel().getOperator().value().equals(Operator.GT.value())) {
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.gt(item.getModel().getValue());
+            builder.add(rangeQueryBuilder);
+          }
+          if (item.getModel().getOperator().value().equals(Operator.GTE.value())) {
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.gte(item.getModel().getValue());
+            builder.add(rangeQueryBuilder);
+          }
+          if (item.getModel().getOperator().value().equals(Operator.LT.value())) {
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.lt(item.getModel().getValue());
+            builder.add(rangeQueryBuilder);
+          }
+          if (item.getModel().getOperator().value().equals(Operator.LTE.value())) {
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.lte(item.getModel().getValue());
             builder.add(rangeQueryBuilder);
           }
           if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
@@ -109,6 +132,7 @@ class SAWPivotTypeElasticSearchQueryBuilder {
             builder.add(boolQueryBuilderIn);
           }
         }
+        
      }
       if (item.getIsRuntimeFilter().value() && item.getModel()!=null)
       {
