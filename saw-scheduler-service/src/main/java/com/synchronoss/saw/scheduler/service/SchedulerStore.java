@@ -7,6 +7,7 @@ import com.mapr.db.Table;
 import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
 public class SchedulerStore implements AutoCloseable {
     @Value("${saw-maprdb-table-home}")
@@ -22,7 +23,7 @@ public class SchedulerStore implements AutoCloseable {
     }
 
     public SchedulerStore() {
-        String path = getTablePath()
+        String path = getTablePath();
         boolean exists = MapRDB.tableExists(path);
         table = !exists ? MapRDB.createTable(path) : MapRDB.getTable(path);
     }
