@@ -173,7 +173,11 @@ export const AnalyzePivotComponent = {
           this.deNormalizedData = this._PivotService.denormalizeData(data, fields);
           this.deNormalizedData = this.takeOutKeywordFromData(this.deNormalizedData);
           this.dataSource.store = this.deNormalizedData;
-          this.setDataSource(this.dataSource.store, fields);
+          this.dataSource = new PivotGridDataSource({store: this.dataSource.store, fields});
+          this.pivotGridUpdater.next({
+            dataSource: this.dataSource,
+            sorts: this.sorts
+          });
         });
     }
 
@@ -300,7 +304,7 @@ export const AnalyzePivotComponent = {
       return fpPipe(
         fpFilter(artifactColumn => artifactColumn.checked &&
           (artifactColumn.area === 'row' || artifactColumn.area === 'column')),
-        fpFilter(artifactColumn => !DATE_TYPES.includes(artifactColumn.dataType)),
+        // fpFilter(artifactColumn => !DATE_TYPES.includes(artifactColumn.dataType)),
         fpMap(artifactColumn => {
           return {
             type: artifactColumn.type,
@@ -396,7 +400,8 @@ export const AnalyzePivotComponent = {
     mapFrontend2BackendSort(sorts) {
       return map(sorts, sort => {
         return {
-          dataField: sort.field.dataField,
+          columnName: sort.field.dataField,
+          type: sort.field.type,
           order: sort.order
         };
       });
