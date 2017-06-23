@@ -24,13 +24,15 @@
       </string-filter>
     </div>
 
-    <div ng-switch-when="date" style="text-align: center;">
+    <div ng-switch-when="date|timestamp"
+         ng-switch-when-separator="|"
+         style="text-align: center;">
       <date-filter on-change="$ctrl.onFilterChange(model)"
                    model="$ctrl.filter.model">
       </date-filter>
     </div>
 
-    <div ng-switch-when="int|double|integer|long"
+    <div ng-switch-when="int|double|integer|long|float"
          ng-switch-when-separator="|"
          style="text-align: center;">
       <number-filter on-change="$ctrl.onFilterChange(model)"
