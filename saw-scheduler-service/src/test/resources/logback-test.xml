@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Note: Use logback-test.xml because not all tests might be loading
+    a Spring context and application.properties
+-->
 <configuration>
   <include resource="org/springframework/boot/logging/logback/base.xml" />
-  <logger name="org.springframework" level="INFO"/>
+  <logger name="org.springframework" level="WARN"/>
 </configuration>
