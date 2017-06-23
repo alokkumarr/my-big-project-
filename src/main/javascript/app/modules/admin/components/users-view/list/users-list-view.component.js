@@ -64,7 +64,7 @@ export const UsersListViewComponent = {
     getGridConfig() {
       const dataSource = this.users || [];
       const columns = [{
-        caption: 'USER ID',
+        caption: 'LOGIN ID',
         dataField: 'masterLoginId',
         allowSorting: true,
         alignment: 'left',

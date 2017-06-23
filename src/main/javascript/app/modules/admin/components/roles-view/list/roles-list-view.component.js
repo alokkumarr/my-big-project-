@@ -75,32 +75,25 @@ export const RolesListViewComponent = {
         dataField: 'roleType',
         allowSorting: true,
         alignment: 'left',
-        width: '10%',
+        width: '20%',
         cellTemplate: 'roleTypeCellTemplate'
       }, {
         caption: 'ROLE DESCRIPTION',
         dataField: 'roleDesc',
         allowSorting: true,
         alignment: 'left',
-        width: '30%',
+        width: '35%',
         cellTemplate: 'roleCodeCellTemplate'
-      }, {
-        caption: 'DSK',
-        dataField: 'dsk',
-        allowSorting: true,
-        alignment: 'left',
-        width: '15%',
-        cellTemplate: 'dskCellTemplate'
       }, {
         caption: 'STATUS',
         dataField: 'activeStatusInd',
         allowSorting: true,
         alignment: 'left',
-        width: '10%',
+        width: '13%',
         cellTemplate: 'statusCellTemplate'
       }, {
         caption: '',
-        width: '5%',
+        width: '2%',
         cellTemplate: 'actionCellTemplate'
       }];
 
