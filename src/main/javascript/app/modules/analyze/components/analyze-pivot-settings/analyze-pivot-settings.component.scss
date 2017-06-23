@@ -25,15 +25,12 @@ analyze-pivot-settings {
     }
   }
 
-  md-toolbar.settings-toolbar {
-    min-height: 50px;
-    border-top: 1px solid #C4C4C4;
-    border-bottom: 1px solid #C4C4C4;
-    background-color: #F5F5F5 !important;
+  md-toolbar {
+    min-height: 0;
+  }
 
-    p {
-      margin: 0;
-    }
+  .md-subheader-content .md-errors-spacer {
+    display: none;
   }
 
   .dx-pivotgridfieldchooser span.dx-area-caption {
