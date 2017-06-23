@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# Generate routes for Play framework
+#
+# The original implementation of the SAW Transport Service did
+# unfortunately not integrate the Play framework well with the Maven
+# build.  So use this script to automate route updating until this
+# module is migrated to Java and Spring Framework.
+#
+set -eu
+
+check_command() {
+    local command=$1
+    if ! command -v $command > /dev/null; then
+        echo "Error: Command '$command' must be installed"
+        exit 1
+    fi
+}
+check_command mvn
+check_command sbt
+
+# Build dependencies required while generating route files
+cd $(dirname $0)/..
+mvn -q -pl saw-metadata-service,saw-es-querybuilder -am package
+
+cd saw-transport-service
+
+# Remove old generated files
+cont=app/controllers
+rm -rf $cont/routes.java $cont/ReverseRoutes.scala $cont/javascript app/router
+
+# Copy over libraries required while generating route files
+mkdir -p lib
+dirs="saw-common saw-metadata-service saw-es-querybuilder"
+for dir in $dirs; do
+    cp ../$dir/target/*.jar lib
+done
+
+# Generate route files
+sbt compile
+
+# Copy generated route files into place
+cp -r target/scala-2.11/routes/main/* app
