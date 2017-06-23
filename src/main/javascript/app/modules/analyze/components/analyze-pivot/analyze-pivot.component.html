@@ -64,7 +64,8 @@
           </md-button>
         </div>
       </div>
-      <md-card>
+      <md-card layout="row"
+               style="max-width: calc(100vw - 333px); overflow: auto;">
         <md-card-content layout="column">
           <filter-chips filters="$ctrl.filters"
                         on-clear-all-filters="$ctrl.onClearAllFilters()"
