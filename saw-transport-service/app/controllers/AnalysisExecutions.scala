@@ -52,4 +52,12 @@ class AnalysisExecutions extends BaseController {
       }
     })
   }
+
+  def execute(analysisId: String): Result = {
+    handle((json, ticket) => {
+      val analysisController = new Analysis
+      analysisController.executeAnalysis(analysisId)
+      JObject()
+    })
+  }
 }

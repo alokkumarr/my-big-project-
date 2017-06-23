@@ -261,7 +261,7 @@ class Analysis extends BaseController {
   var result: String = null
   def setResult(r: String): Unit = result = r
  
-  def executeAnalysis(analysisId: String, queryRuntime: String): JValue = {
+  def executeAnalysis(analysisId: String, queryRuntime: String = null): JValue = {
  
     // reading the JSON extract type
     val analysisJSON = readAnalysisJson(analysisId);
