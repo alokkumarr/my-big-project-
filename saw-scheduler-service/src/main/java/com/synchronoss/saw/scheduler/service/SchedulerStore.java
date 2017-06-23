@@ -1,26 +1,31 @@
-package com.synchronoss.saw.scheduler;
+package com.synchronoss.saw.scheduler.service;
+
+import java.time.Instant;
 
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
 import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.time.Instant;
+import org.springframework.beans.factory.annotation.Value;
 
 public class SchedulerStore implements AutoCloseable {
-    public static final String TABLE_PATH = "/tmp/saw-scheduler-service";
+    @Value("${saw-maprdb-table-home}")
+    private String tableHome;
 
     private final static String LAST_EXECUTION_ID = "lastExecutionId";
-    private final Logger log = LoggerFactory.getLogger(
-        SchedulerStore.class.getName());
+    private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
     private Table table;
 
+    private String getTablePath() {
+        return tableHome + "/saw-scheduler-execution";
+    }
+
     public SchedulerStore() {
-        boolean exists = MapRDB.tableExists(TABLE_PATH);
-        table = !exists ?
-            MapRDB.createTable(TABLE_PATH) : MapRDB.getTable(TABLE_PATH);
+        String path = getTablePath();
+        boolean exists = MapRDB.tableExists(path);
+        table = !exists ? MapRDB.createTable(path) : MapRDB.getTable(path);
     }
 
     public String getLastExecutionId(String analysisId) {
