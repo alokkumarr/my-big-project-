@@ -18,7 +18,7 @@
   "USER_FIRST_NAME_LABEL":"First Name",
   "USER_MIDDLE_NAME_LABEL":"Middle Name",
   "USER_LAST_NAME_LABEL":"Last Name",
-  "USER_ID_LABEL":"User Id",
+  "USER_ID_LABEL":"Login Id",
   "USER_EMAIL_LABEL":"Email",
   "USER_ROLES_LABEL":"Role",
   "USER_ACTIVE_LABEL":"Status",
