@@ -24,6 +24,17 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <!--
+            Workaround: Spring Boot Test gives "Found multiple
+            occurrences of org.json.JSONObject on the class path" path
+            so exclude duplicate transitive dependency
+        -->
+        <exclusion>
+          <groupId>com.vaadin.external.google</groupId>
+          <artifactId>android-json</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.mapr.db</groupId>
@@ -61,6 +72,11 @@
           <showDepreciation>true</showDepreciation>
           <showWarnings>true</showWarnings>
           <compilerArgument>-Xlint:all</compilerArgument>
+          <!-- 
+               Workaround: Silence "No processor claimed any of these
+               annotations" warnings from Spring annotations
+          -->
+          <compilerArgument>-Xlint:-processing</compilerArgument>
         </configuration>
       </plugin>
       <plugin>
