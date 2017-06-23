@@ -129,8 +129,13 @@ class Analysis extends BaseController {
   }
 
   private def extractKey(json: JValue, property: String) = {
-    val JString(value) = (json \ "contents" \ "keys")(0) \ property
-    value
+    try {
+      val JString(value) = (json \ "contents" \ "keys")(0) \ property
+      value
+    } catch {
+      case e: Exception =>
+        throw new ClientException("Analysis ID not found in keys property")
+    }
   }
 
   def analysisJson(json: JValue): JObject = {

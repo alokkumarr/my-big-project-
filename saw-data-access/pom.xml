@@ -136,28 +136,14 @@
 				<descriptors>
 					<descriptor>${project.basedir}/assembly_standalone.xml</descriptor>
 				</descriptors>
-			</configuration>
-		</plugin>
-		<!-- Assembly plugin 2: end -->
-		<!-- Assembly plugin 3: Build Jar with dependencies -->
-		<plugin>
-			<artifactId>maven-assembly-plugin</artifactId>
-			<version>3.0.0</version>
-			<executions>
-				<execution>
-					<phase>package</phase>
-					<goals>
-						<goal>single</goal>
-					</goals>
-				</execution>
-			</executions>
-			<configuration>
+				<!-- Assembly plugin 3: Build Jar with dependencies -->
 				<descriptorRefs>
 					<descriptorRef>jar-with-dependencies</descriptorRef>
 				</descriptorRefs>
+				<!-- Assembly plugin 3: end -->
 			</configuration>
 		</plugin>
-		<!-- Assembly plugin 3: end -->
+		<!-- Assembly plugin 2: end -->
 	</plugins>
 	</build>
 </project>
