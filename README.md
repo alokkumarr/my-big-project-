@@ -4,19 +4,10 @@ This is the SAW Services source code repository.  SAW Services are
 back-end microservices that provide REST API for the SAW front-end
 user interface.
 
-# Building and running tests
+# Development
 
-To build and run tests do the following:
-
-1. Install Java and Maven
-
-2. Run the project unit tests using Maven:
-
-        $ mvn test
-
-3. Run the project integration tests using Maven:
-
-        $ mvn verify
+Start by reading the [development guide](doc/development.md) which
+describes how to build and test the project.
 
 # Deploying
 
