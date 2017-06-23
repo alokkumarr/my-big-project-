@@ -58,7 +58,7 @@ export const NumberFilterComponent = {
       this.tempModel = this.model || {
         value: null, // int or double
         otherValue: null, // int or double
-        operator: OPERATORS.EQUALS.value
+        operator: OPERATORS.EQUALS.shortName
       };
     }
 

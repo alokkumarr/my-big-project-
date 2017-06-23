@@ -1,12 +1,6 @@
 <analyze-dialog control="$ctrl" class="analyze-filters">
   <analyze-dialog-header layout="row" layout-align="space-between center" flex="grow">
     <strong translate="FILTERS"></strong>
-    <md-select ng-model="$ctrl.filterBooleanCriteria">
-      <md-option ng-repeat="booleanCriteria in $ctrl.BOOLEAN_CRITERIA"
-                 ng-value="booleanCriteria.value">
-        {{::booleanCriteria.label}}
-      </md-option>
-    </md-select>
   </analyze-dialog-header>
 
   <analyze-dialog-content layout="column">
@@ -49,11 +43,20 @@
   </analyze-dialog-content>
 
   <analyze-dialog-footer>
-    <div layout="row">
-      <md-button class="btn-primary"
+    <div layout="row" layout-align="space-between">
+      <div layout="row" layout-align="start center">
+        <md-button class="btn-primary"
                  ng-click="$ctrl.onApplyFilters()"
                  translate="APPLY_FILTERS">
       </md-button>
+      <md-select ng-model="$ctrl.filterBooleanCriteria" style="width: 100px;">
+        <md-option ng-repeat="booleanCriteria in $ctrl.BOOLEAN_CRITERIA"
+                  ng-value="booleanCriteria.value">
+          {{::booleanCriteria.label}}
+        </md-option>
+      </md-select>
+      <span translate="OF_THE_FILTERS_ARE_TRUE"></span>
+      </div>
 
       <md-button class="btn-card"
                  ng-click="$ctrl.$dialog.hide()"
