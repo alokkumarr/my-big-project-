@@ -163,8 +163,29 @@ export const AnalyzePivotComponent = {
       this.loadPivotData();
     }
 
+    checkModelValidity(model) {
+      let isValid = true;
+      const errors = [];
+
+      if (isEmpty(model.sqlBuilder.dataFields)) {
+        isValid = false;
+        errors[0] = 'ERROR_PIVOT_DATA_FIELD_REQUIRED';
+      }
+      if (!isValid) {
+        this._$translate(errors).then(translations => {
+          this._toastMessage.error(values(translations).join('\n'), '', {
+            timeOut: 3000
+          });
+        });
+      }
+      return isValid;
+    }
+
     loadPivotData() {
       const model = this.getModel();
+      if (!this.checkModelValidity(model)) {
+        return;
+      }
       return this._AnalyzeService.getDataBySettings(clone(model))
         .then(({data}) => {
           const fields = this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns);

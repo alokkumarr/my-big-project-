@@ -57,5 +57,6 @@
   "TOOLTIP_DATE_TYPE": "Date",
   "ERROR_FILL_IN_REQUIRED_FILTER_MODELS": "Please fill in all models, or mark filter as runtime filter!",
   "ERROR_PIVOT_MAX_FIELDS": "You cannot have more than {{fieldNr}} fields in the {{area}} area!",
-  "ERROR_PIVOT_DATA_FIELD": "Only fields of type number are allowed in the data area!"
+  "ERROR_PIVOT_DATA_FIELD": "Only fields of type number are allowed in the data area!",
+  "ERROR_PIVOT_DATA_FIELD_REQUIRED": "You need to have at least one field in the data area!"
 }
