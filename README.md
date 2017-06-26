@@ -7,7 +7,8 @@ user interface.
 # Development
 
 Start by reading the [development guide](doc/development.md) which
-describes how to build and test the project.
+describes how to build and test the project.  Also see
+the [design guide](doc/design.md) which describes the system design.
 
 # Deploying
 
