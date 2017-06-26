@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,13 +30,13 @@ public class AnalysisServiceImpl implements AnalysisService {
     }
 
     public void executeAnalysis(String analysisId) {
-        String url = analysisUrl + "/" + analysisId + "/executions";
+        AnalysisExecution execution = ImmutableAnalysisExecution.builder()
+            .type("scheduled").build();
+        String url = analysisUrl + "/{analysisId}/executions";
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(
-            org.springframework.http.MediaType.APPLICATION_JSON);
-        String body = "{type: \"scheduled\"}";
-        HttpEntity<String> entity = new HttpEntity<>(body, headers);
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.postForObject(url, entity, String.class);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<AnalysisExecution> entity = new HttpEntity<>(
+            execution, headers);
+        restTemplate.postForObject(url, entity, String.class, analysisId);
     }
 }

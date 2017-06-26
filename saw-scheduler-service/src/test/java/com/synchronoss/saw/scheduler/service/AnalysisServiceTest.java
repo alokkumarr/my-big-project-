@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Arrays;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -30,37 +31,36 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
     "saw-analysis-service-url=http://localhost/analysis",
 })
 public class AnalysisServiceTest {
+    private static final String ANALYSIS_ID = "123";
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
-
     @Value("${saw-analysis-service-url}")
     private String analysisUrl;
-
     @Autowired
     private AnalysisService service;
-
     @Autowired
     private MockRestServiceServer server;
-
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
     public void testAnalysisSchedules() throws Exception {
-        String json = objectMapper.writeValueAsString(mockSchedules());
-        log.trace("Mock schedules JSON: {}", json);
+        /* Set up mock response */
+        String json = objectMapper.writeValueAsString(getMockSchedules());
+        log.trace("Mock analysis schedules JSON: {}", json);
         server.expect(requestTo(analysisUrl + "-schedules"))
             .andRespond(withSuccess(json, MediaType.APPLICATION_JSON));
+        /* Get analysis schedules */
         List<AnalysisSchedule> schedules = service.getAnalysisSchedules();
         assertThat(schedules).hasSize(1);
         AnalysisSchedule schedule = schedules.get(0);
-        assertThat(schedule.analysisId()).isEqualTo("123");
+        assertThat(schedule.analysisId()).isEqualTo(ANALYSIS_ID);
         assertThat(schedule.repeatUnit()).isEqualTo("weekly");
     }
 
-    private AnalysisSchedule[] mockSchedules() {
+    private AnalysisSchedule[] getMockSchedules() {
         return new AnalysisSchedule[] {
             ImmutableAnalysisSchedule.builder()
-            .analysisId("123")
+            .analysisId(ANALYSIS_ID)
             .repeatUnit("weekly")
             .repeatInterval(1)
             .repeatOnDaysOfWeek(
@@ -75,5 +75,16 @@ public class AnalysisServiceTest {
                 .build())
             .build()
         };
+    }
+
+    @Test
+    public void testAnalysisExecute() {
+        /* Set up mock response */
+        String json = "{}";
+        log.trace("Mock execute analysis JSON: {}", json);
+        server.expect(requestTo(analysisUrl + "/123/executions"))
+            .andRespond(withSuccess(json, MediaType.APPLICATION_JSON));
+        /* Execute analysis */
+        service.executeAnalysis(ANALYSIS_ID);
     }
 }

@@ -23,7 +23,9 @@ libraryDependencies ++= Seq(
   "org.reactivemongo" %% "reactivemongo-play-json" % "0.11.11",
   "ch.qos.logback" % "logback-classic" % "1.0.13",
   "org.elasticsearch.client" % "transport" % "5.3.0",
-  "org.apache.logging.log4j" % "log4j-api" % "2.7"
+  "org.apache.logging.log4j" % "log4j-api" % "2.7",
+  "io.jsonwebtoken" % "jjwt" % "0.7.0",
+  "com.github.fge" % "json-schema-validator" % "2.2.6"
 )
 
 // JUnit framework
