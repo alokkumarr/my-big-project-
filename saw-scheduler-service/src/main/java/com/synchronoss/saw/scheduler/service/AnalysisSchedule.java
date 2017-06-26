@@ -13,7 +13,7 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableAnalysisSchedule.class)
 @JsonDeserialize(as = ImmutableAnalysisSchedule.class)
 interface AnalysisSchedule {
-    String analysisId();
+    String id();
     String repeatUnit();
     Integer repeatInterval();
     DaysOfWeek repeatOnDaysOfWeek();

@@ -56,7 +56,10 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
     "update analysis" in {
       /* Update previously created analysis */
       analysis = analysis.merge(
-        ("saved", "true") ~ ("categoryId", categoryId))
+        ("saved", "true") ~
+          ("categoryId", categoryId) ~
+          ("schedule", ("repeatUnit", "daily") ~
+            ("repeatInterval", 1)))
       /* Add a runtime filter for use in subsequent executions */
       analysis = analysis.merge(("sqlBuilder", ("filters", List(
         ("type", "string") ~
@@ -102,6 +105,17 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
         "search", ("categoryId", categoryId): JObject)
       val analyses = extractArray(sendRequest(body) \ "contents", "analyze")
       analyses.length must be (2)
+    }
+
+    "list analysis schedules" in {
+      /* List results of previously updated analysis */
+      val response = sendGetRequest("/analysis?view=schedule")
+      val results = extractArray(response, "analyses")
+      /* Ensure the previously updated analysis with a schedule exists among
+       * the analyses with a schedule set */
+      results.exists(analysis => {
+        (analysis \ "id").extract[String] == id
+      }) must be (true)
     }
 
     "execute non-interactive analysis" in {
