@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 /**
- * Analysis schedule representation used when requesting schedules
- * from Analysis Service.
+ * Analysis schedule view representation used when requesting
+ * schedules from Analysis Service.
  */
 @Value.Immutable
 @Value.Enclosing
@@ -14,9 +14,17 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableAnalysisSchedule.class)
 interface AnalysisSchedule {
     String id();
-    String repeatUnit();
-    Integer repeatInterval();
-    DaysOfWeek repeatOnDaysOfWeek();
+    Schedule schedule();
+
+    @Value.Immutable
+    @JsonSerialize(as = ImmutableAnalysisSchedule.Schedule.class)
+    @JsonDeserialize(as = ImmutableAnalysisSchedule.Schedule.class)
+    interface Schedule {
+        String repeatUnit();
+        Integer repeatInterval();
+        DaysOfWeek repeatOnDaysOfWeek();
+
+    }
 
     @Value.Immutable
     @JsonSerialize(as = ImmutableAnalysisSchedule.DaysOfWeek.class)

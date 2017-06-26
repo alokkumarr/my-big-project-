@@ -54,24 +54,27 @@ public class AnalysisServiceTest {
         assertThat(analyses).hasSize(1);
         AnalysisSchedule schedule = analyses.get(0);
         assertThat(schedule.id()).isEqualTo(ANALYSIS_ID);
-        assertThat(schedule.repeatUnit()).isEqualTo("weekly");
+        assertThat(schedule.schedule().repeatUnit()).isEqualTo("weekly");
     }
 
     private AnalysisSchedule[] getMockAnalyses() {
         return new AnalysisSchedule[] {
             ImmutableAnalysisSchedule.builder()
             .id(ANALYSIS_ID)
-            .repeatUnit("weekly")
-            .repeatInterval(1)
-            .repeatOnDaysOfWeek(
-                ImmutableAnalysisSchedule.DaysOfWeek.builder()
-                .sunday(false)
-                .monday(true)
-                .tuesday(false)
-                .wednesday(false)
-                .thursday(false)
-                .friday(false)
-                .saturday(false)
+            .schedule(
+                ImmutableAnalysisSchedule.Schedule.builder()
+                .repeatUnit("weekly")
+                .repeatInterval(1)
+                .repeatOnDaysOfWeek(
+                    ImmutableAnalysisSchedule.DaysOfWeek.builder()
+                    .sunday(false)
+                    .monday(true)
+                    .tuesday(false)
+                    .wednesday(false)
+                    .thursday(false)
+                    .friday(false)
+                    .saturday(false)
+                    .build())
                 .build())
             .build()
         };
