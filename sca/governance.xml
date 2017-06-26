@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sncr:governance
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:sncr="http://synchronoss.com/governance">
+    <sncr:projectName>bda-realtime</sncr:projectName>
+    <sncr:version>1.0</sncr:version>
+    <sncr:jiraProject>RTI</sncr:jiraProject>
+    <sncr:application>ServerAPI</sncr:application>
+    <sncr:technologyStack>
+        <sncr:technology>
+            <sncr:name>java</sncr:name>
+            <sncr:version>8</sncr:version>
+            <sncr:type>language</sncr:type>
+        </sncr:technology>
+    </sncr:technologyStack>
+    <sncr:risk>
+        <sncr:lifespan>5+Years</sncr:lifespan>
+        <sncr:accessibility>Secured</sncr:accessibility>
+    </sncr:risk>
+</sncr:governance>

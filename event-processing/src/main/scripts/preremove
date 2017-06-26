@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# source /etc/bda/rtps.env || exit 
+
+echo "Remove link on current version of RealTime Processing Server"
+
+rm -f /opt/bda/rtps
+rm -f /etc/bda/rtps.env
+
+echo "RealTime Processing Server pre-remove step has been successfully completed"

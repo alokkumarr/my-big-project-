@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+source /tmp/.rtps.tmp.env || exit
+
+mkdir -m 755 -p /etc/bda
+
+chown -R ${user}:${group} ${app_home}
+chmod 750 ${app_home}/sbin ${app_home}/conf ${app_home}/lib 
+chmod 755 ${app_home}
+chmod 755 /var/bda/rtps /var/bda/rtps/log 
+
+echo ${app_version} >${app_home}/app.version
+chmod 444 ${app_home}/app.version
+
+( cd /opt/bda; rm -f rtps; ln -s $(basename ${app_home}) rtps )
+
+{
+echo "RTPS_HOME=/opt/bda/rtps"
+echo "RTPS_CURRENT_VERSION=${app_home}"
+} > ${app_home}/conf/rtps.env
+
+chown ${user}:${group} ${app_home}/conf/rtps.env
+chmod 750 ${app_home}/conf/rtps.env
+
+rm -f /etc/bda/rtps.env
+ln -s /opt/bda/rtps/conf/rtps.env /etc/bda/
+
+#sed -e "s~<app_home>~${app_home}~g" ${app_home}/conf/log4j.properties > ${app_home}/conf/log4j.properties.1
+#mv ${app_home}/conf/log4j.properties.1 ${app_home}/conf/log4j.properties
+#chown ${user}:${group} ${app_home}/conf/log4j.properties
+
+rm -f /tmp/.rtps.tmp.env
+
+echo "RealTime Processing Server post-install step completed"

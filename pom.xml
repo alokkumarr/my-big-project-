@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.synchronoss</groupId>
+  <artifactId>bda-rtps</artifactId>
+  <version>2.0.0_dev</version>
+  <packaging>pom</packaging>
+  <properties>
+    <!--
+      default value here,
+      can be specified outside with -Dprod.release=RRR
+    -->
+    <prod.release>0_g0000_wip</prod.release>
+    <!-- use prod.release property -->
+    <project.release>${prod.release}</project.release>
+    <!-- RPM properties -->
+    <rpm.version>${project.version}</rpm.version>
+    <rpm.release>${project.release}</rpm.release>
+    <spark-version>1.6.1</spark-version>
+    <es-spark-version>5.1.2</es-spark-version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <repositories>
+    <repository>
+      <id>mapr-maven</id>
+      <url>http://repository.mapr.com/maven</url>
+      <releases><enabled>true</enabled></releases>
+      <snapshots><enabled>false</enabled></snapshots>
+    </repository>
+  </repositories>
+  <modules>
+    <!-- RTPS -->
+    <module>rt-streaming-common</module>
+    <module>event-processing</module>
+  </modules>
+</project>
