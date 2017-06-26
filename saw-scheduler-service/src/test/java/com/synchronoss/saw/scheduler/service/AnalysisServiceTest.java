@@ -45,22 +45,22 @@ public class AnalysisServiceTest {
     @Test
     public void testAnalysisSchedules() throws Exception {
         /* Set up mock response */
-        String json = objectMapper.writeValueAsString(getMockSchedules());
+        String json = objectMapper.writeValueAsString(getMockAnalyses());
         log.trace("Mock analysis schedules JSON: {}", json);
-        server.expect(requestTo(analysisUrl + "-schedules"))
+        server.expect(requestTo(analysisUrl + "?view=schedule"))
             .andRespond(withSuccess(json, MediaType.APPLICATION_JSON));
         /* Get analysis schedules */
-        List<AnalysisSchedule> schedules = service.getAnalysisSchedules();
-        assertThat(schedules).hasSize(1);
-        AnalysisSchedule schedule = schedules.get(0);
-        assertThat(schedule.analysisId()).isEqualTo(ANALYSIS_ID);
+        List<AnalysisSchedule> analyses = service.getAnalysisSchedules();
+        assertThat(analyses).hasSize(1);
+        AnalysisSchedule schedule = analyses.get(0);
+        assertThat(schedule.id()).isEqualTo(ANALYSIS_ID);
         assertThat(schedule.repeatUnit()).isEqualTo("weekly");
     }
 
-    private AnalysisSchedule[] getMockSchedules() {
+    private AnalysisSchedule[] getMockAnalyses() {
         return new AnalysisSchedule[] {
             ImmutableAnalysisSchedule.builder()
-            .analysisId(ANALYSIS_ID)
+            .id(ANALYSIS_ID)
             .repeatUnit("weekly")
             .repeatInterval(1)
             .repeatOnDaysOfWeek(

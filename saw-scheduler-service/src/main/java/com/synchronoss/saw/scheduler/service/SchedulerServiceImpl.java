@@ -35,20 +35,20 @@ public class SchedulerServiceImpl implements SchedulerService, CommandLineRunner
         /* Get the list of analyses that have a schedule for the given
          * execution type, for example hourly or daily, from the
          * Analysis Service */
-        List<AnalysisSchedule> schedules = analysisService.
+        List<AnalysisSchedule> analyses = analysisService.
             getAnalysisSchedules();
         try (SchedulerStore store = new SchedulerStore()) {
             log.info("Processing analyses");
-            for (AnalysisSchedule schedule : schedules) {
-                processAnalysis(store, executionId, schedule);
+            for (AnalysisSchedule analysis : analyses) {
+                processAnalysis(store, executionId, analysis);
             }
         }
-        log.info("Finished processing schedules");
+        log.info("Finished processing analyses");
     }
 
     private void processAnalysis(
-        SchedulerStore store, String executionId, AnalysisSchedule schedule) {
-        String analysisId = schedule.analysisId();
+        SchedulerStore store, String executionId, AnalysisSchedule analysis) {
+        String analysisId = analysis.id();
         log.info("Process analysis: {}", analysisId);
         /* Get the last execution ID from the persistent store */
         String lastExecutionId = store.getLastExecutionId(analysisId);
