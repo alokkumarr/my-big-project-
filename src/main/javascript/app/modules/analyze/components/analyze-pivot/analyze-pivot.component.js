@@ -7,6 +7,7 @@ import fpFilter from 'lodash/fp/filter';
 import find from 'lodash/find';
 import isEmpty from 'lodash/isEmpty';
 import assign from 'lodash/assign';
+import defaults from 'lodash/defaults';
 import unset from 'lodash/unset';
 import filter from 'lodash/filter';
 import cloneDeep from 'lodash/cloneDeep';
@@ -68,8 +69,10 @@ export const AnalyzePivotComponent = {
           this.loadNewAnalysis();
           break;
         case ENTRY_MODES.EDIT:
-        case ENTRY_MODES.FORK:
           this.loadExistingAnalysis();
+          break;
+        case ENTRY_MODES.FORK:
+          this.loadForkedAnalysis();
           break;
         default:
           break;
@@ -97,6 +100,18 @@ export const AnalyzePivotComponent = {
       this.artifacts = this.getSortedArtifacts(this.model.artifacts);
       this.artifacts[0].columns = this.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
       this.loadPivotData();
+    }
+
+    loadForkedAnalysis() {
+      this._AnalyzeService.createAnalysis(this.model.semanticId, this.model.type)
+        .then(analysis => {
+          this.model = defaults(this.model, analysis);
+          this.model.id = analysis.id;
+          this.settingsModified = true;
+          this.artifacts = this.getSortedArtifacts(this.model.artifacts);
+          this.artifacts[0].columns = this.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
+          this.loadPivotData();
+        });
     }
 
     initExistingSettings() {
