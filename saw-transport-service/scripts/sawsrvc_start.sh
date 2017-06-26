@@ -165,6 +165,8 @@ declare -r java_args=$( echo \
     -Duser.dir=${user_dir} \
     -Durl=http://mapr-dev02.sncrbda.dev.vacum-np.sncrcorp.net:9200/ \
     -Djava.library.path=/opt/mapr/lib \
+    -Dschema.pivot=/opt/saw/service-1.0.0.1/schema/chart_querybuilder_schema.json \
+    -Dschema.chart=/opt/saw/service-1.0.0.1/schema/pivot_querybuilder_schema.json \
     -Dhadoop.home.dir=/opt/mapr/hadoop/hadoop-$(cat /opt/mapr/hadoop/hadoopversion)
     )
 vlog java_args: $java_args
