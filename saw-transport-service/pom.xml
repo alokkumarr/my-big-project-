@@ -24,8 +24,7 @@
         <spring.release>4.1.6.RELEASE</spring.release>
         <rpm.bda.root>/opt</rpm.bda.root>
         <rpm.release>1</rpm.release>
-        <!-- <rpm.version>${project.version}</rpm.version> -->
-        <rpm.version>1.0.1</rpm.version>
+        <rpm.version>${project.version}</rpm.version>
         <akka.version>2.4.9</akka.version>
         <scala.major.version>2.11</scala.major.version>
         <app.user>mapr</app.user>
@@ -524,7 +523,7 @@
                     </defineStatements>
                     <mappings>
                         <mapping>
-                            <directory>${rpm.saw.root}/saw-trial/service-${rpm.version}.${rpm.release}/lib</directory>
+                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/lib</directory>
                             <filemode>440</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
@@ -537,7 +536,7 @@
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>${rpm.saw.root}/saw-trial/service-${rpm.version}.${rpm.release}/sparklib</directory>
+                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/sparklib</directory>
                             <filemode>440</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
@@ -550,7 +549,7 @@
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>${rpm.saw.root}/saw-trial/service-${rpm.version}.${rpm.release}/bin</directory>
+                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/bin</directory>
                             <filemode>750</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
@@ -577,7 +576,7 @@
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>${rpm.saw.root}/saw-trial/service-${rpm.version}.${rpm.release}/conf</directory>
+                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/conf</directory>
                             <filemode>644</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
@@ -588,7 +587,7 @@
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>${rpm.saw.root}/saw-trial/service-${rpm.version}.${rpm.release}/schema</directory>
+                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/schema</directory>
                             <filemode>750</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
@@ -602,21 +601,21 @@
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>/var/saw-trial/service/log</directory>
+                            <directory>/var/saw/service/log</directory>
                             <directoryIncluded>true</directoryIncluded>
                             <filemode>755</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
                         </mapping>
                         <mapping>
-                            <directory>/var/saw-trial/service/run</directory>
+                            <directory>/var/saw/service/run</directory>
                             <directoryIncluded>true</directoryIncluded>
                             <filemode>755</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
                         </mapping>
                         <mapping>
-                            <directory>/var/saw-trial/service/data</directory>
+                            <directory>/var/saw/service/data</directory>
                             <directoryIncluded>true</directoryIncluded>
                             <filemode>644</filemode>
                             <username>${app.user}</username>
@@ -656,7 +655,7 @@
 #}
 # Save versioned name to env file to be used in postinstall
             {
-                echo app_home=/opt/saw-trial/service-${rpm.version}.${rpm.release}
+                echo app_home=/opt/saw/service-${rpm.version}.${rpm.release}
             } &gt;/tmp/.saw-service.tmp.env
                         </script>
                     </preinstallScriptlet>
