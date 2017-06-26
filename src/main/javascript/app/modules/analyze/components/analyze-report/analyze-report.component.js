@@ -83,7 +83,7 @@ export const AnalyzeReportComponent = {
         this._modelLoaded(true);
       } else {
         this._AnalyzeService.createAnalysis(this.model.semanticId, 'report').then(analysis => {
-          this.model = defaultsDeep(this.model, {
+          this.model = assign(this.model, {
             id: analysis.id,
             metric: analysis.metric,
             createdTimestamp: analysis.createdTimestamp,
