@@ -270,7 +270,7 @@ class Analysis extends BaseController {
         JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
         JField("id", JString(analysisId)),
         JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-        JField("execution_result", JString("sucess")),
+        JField("execution_result", JString("success")),
         JField("execution_timestamp", JString(timestamp))
       ))
       m_log debug s"Create result: with content: ${compact(render(descriptor))}"
@@ -326,7 +326,7 @@ class Analysis extends BaseController {
         JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
         JField("id", JString(analysisId)),
         JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-        JField("execution_result", JString("sucess")),
+        JField("execution_result", JString("success")),
         JField("execution_timestamp", JString(timestamp))
       ))
       m_log debug s"Create result: with content: ${compact(render(descriptor))}"
