@@ -1,0 +1,71 @@
+# This is the main configuration file for the application.
+
+play.crypto.secret="changeme"
+play.crypto.secret=${?APPLICATION_SECRET}
+
+# Port must be passed to play as CMD parameter, THERE IS NO DEFAULT VALUE
+http.port=9100
+
+play.i18n.langs = [ "en" ]
+play.modules.enabled += "play.modules.swagger.SwaggerModule"
+
+mapping = [
+
+###
+# Server sends messages (from events) to applications;
+# each target application must be configured by populating
+# application specific object below;
+###
+    {
+      # Charter.SmartCare application specific parameters
+		
+      app_key = ${:app.key:} # app.key=Charter.SmartCare
+      
+      streams_1 = [
+        {
+            topic = ${:streams_1.topic:} # streams_1.topic=data1
+            queue = ${:streams_1.queue:} # streams_1.queue=bda/data/streams/charter-sc1
+        }
+      ]
+      streams_2 = [
+        {
+            topic = ${:streams_2.topic:} # streams_2.topic=data1
+            queue = ${:streams_2.queue:} # streams_2.queue=bda/data/streams/charter-sc2
+        }
+      ]
+
+      class = ${:app.class:} # app.class=synchronoss.handlers.charter.smartcare.CharterEventHandler
+
+			# came from kafka
+    	bootstrap.servers= "localhost:9092"
+      batch.size=16384
+      key.serializer=${:key.serializer:} # key.serializer=org.apache.kafka.common.serialization.StringSerializer
+      value.serializer=${:value.serializer:} # value.serializer=org.apache.kafka.common.serialization.StringSerializer
+      block.on.buffer.full=true
+			timeout.ms=30000
+    }
+####
+    
+]
+
+stream.file.location=/var/bda/rtis/run/stream.${http.port}.dump
+
+# Waiting time on send call to Kafka/MapR Streams client 
+stream.send.timeout = 60
+
+api.version="1.2"
+swagger.api.info.title="Syncronoss Real Time Ingestion Service API 1.0"
+swagger.api.info.description="Syncronoss RTI is designed to accept events and crash reports in countly formats, please see  http://count.ly"
+swagger.api.info.termsOfServiceUrl="http://termsOfServiceUrl"
+swagger.api.info.contact="Suren.Nathan@synchronoss.com"
+swagger.api.info.license="TBD"
+swagger.api.info.licenseUrl="TBD"
+swagger.api.basepath="/"
+swagger.api.host="TBS"
+
+# example swagger authorisation filter
+swagger.filter="security.AuthorisationFilter"
+swagger.api.info.modelClasses = [ synchronoss.data.countly.model.BaseEvent ]
+
+# Max request size ~64K (from netty)
+play.server.netty.maxInitialLineLength=65536

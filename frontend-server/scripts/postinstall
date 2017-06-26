@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+# Get app_home (with version number)
+source /tmp/.rtis.tmp.env || exit
+: ${app_home:?no value}
+( cd ${app_home} ) || exit
+
+mkdir -p -m 755 /etc/bda
+
+chown -R rtis-user:rtis-user ${app_home}
+chmod 750 ${app_home}/sbin ${app_home}/conf ${app_home}/conf/templates ${app_home}/lib
+chmod 755 ${app_home} /var/bda/rtis /var/bda/rtis/log /var/bda/rtis/run
+
+( cd /opt/bda; rm -f rtis; ln -s $(basename ${app_home}) rtis )
+
+rtis_env=${app_home}/conf/rtis.env
+{
+    echo "BDA_HOME=/opt/bda"
+    echo "RTIS_HOME=/opt/bda/rtis"
+    echo "RTIS_PORT=9100"
+    echo "declare -r RTIS_USER=rtis-user"
+    echo "declare -r RTIS_CURRENT_HOME=${app_home}"
+} >$rtis_env
+
+chown rtis-user:rtis-user $rtis_env
+chmod 640 $rtis_env
+
+rm -f /etc/bda/rtis.env
+ln -s $rtis_env /etc/bda/
+
+rm -f /tmp/.rtis.tmp.env
+
+grep -q 'rtis_runner' /etc/rc.local || {
+    echo "Add line to /etc/rc.local:"
+    echo '/opt/bda/rtis/sbin/rtis_runner.sh &>/tmp/rc.local.rtis_runner.log'
+}
+echo "Manually add emails in ~rtis-user/.forward to get notifications from rtis_runner.sh"
+echo
+
+echo '# Generate application.conf file from template and cluster.vars'
+app_conf_fnm=/opt/bda/rtis/conf/application.conf
+mk_conf_log=/var/bda/rtis/log/mk_application.conf.log
+ok_rc=OK
+bash -xc >$app_conf_fnm 2>$mk_conf_log "
+( </etc/bda/cluster.vars ) &&
+cd ${app_home}/conf &&
+../sbin/mk_conf.sh templates/application.conf.template /etc/bda/cluster.vars" || {
+    rc=
+    echo "*** ERROR in mk_conf.sh, see log file: $mk_conf_log"
+    echo "    fix the problem and create valid /opt/bda/rtis/conf/application.conf"
+} 
+[[ $ok_rc ]] && {
+    chown rtis-user:rtis-user $app_conf_fnm
+    chmod 640 $app_conf_fnm
+    echo "File created: $app_conf_fnm, see log in $mk_conf_log"
+}
+
+echo "RealTime Ingestion Server postinstall step completed"

@@ -1,0 +1,665 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.synchronoss</groupId>
+        <artifactId>bda-rtis</artifactId>
+        <version>2.0.0_dev</version>
+    </parent>
+    <artifactId>bda-rt-frontend-server</artifactId>
+    <packaging>jar</packaging>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Application -->
+        <app.user>rtis-user</app.user>
+        <app.group>rtis-user</app.group>
+        <app.name>rtis</app.name>
+        <app.verRel>${rpm.version}-${rpm.release}</app.verRel>
+        <app.nameVer>${app.name}-${app.verRel}</app.nameVer>
+        <app.optDir>/opt/bda/${app.nameVer}</app.optDir>
+        <app.varDir>/var/bda/${app.name}</app.varDir>
+        <!-- Local properties, required for RTIS only -->
+        <slf4j.version>1.7.21</slf4j.version>
+        <java.version>1.8</java.version>
+        <maven.assembly.version>2.5.5</maven.assembly.version>
+        <project.basedir>.</project.basedir>
+        <scala.version>2.11</scala.version>
+        <Json4s.latestVersion>3.3.0</Json4s.latestVersion>
+        <play2.version>2.5.2</play2.version>
+        <play2.plugin.version>1.0.0-beta5</play2.plugin.version>
+        <play2.scala.version>2.11.6</play2.scala.version>
+        <kafka.mapr.client>0.9.0.0-mapr-1607</kafka.mapr.client>
+        <mapr.client>5.1.0.37689-mapr</mapr.client>
+        <play2.json.reactive.mongo>0.11.11</play2.json.reactive.mongo>
+        <io.netty.version>4.0.36.Final</io.netty.version>
+        <spring.release>4.1.6.RELEASE</spring.release>
+        <jackson.core.version>2.7.1</jackson.core.version>
+    </properties>
+    <repositories>
+        <repository>
+            <id>maven2-repo</id>
+            <url>http://repo1.maven.apache.org/maven2</url>
+        </repository>
+        <repository>
+            <id>typesafe-releases</id>
+            <url>http://repo.typesafe.com/typesafe/releases/</url>
+        </repository>
+        <repository>
+            <id>sonatype-releases</id>
+            <url>https://oss.sonatype.org/content/repositories/releases</url>
+        </repository>
+        <repository>
+            <id>sonatype-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
+    <!--pluginRepositories><pluginRepository><id>typesafe-releases-plugins</id><url>http://repo.typesafe.com/typesafe/releases/</url><snapshots><enabled>false</enabled></snapshots></pluginRepository></pluginRepositories-->
+    <dependencies>
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-actor_${scala.version}</artifactId>
+            <version>2.4.2</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>1.0.13</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.0.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang.modules</groupId>
+            <artifactId>scala-xml_${scala.version}</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play-test_${scala.version}</artifactId>
+            <version>${play2.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.reactivemongo</groupId>
+            <artifactId>reactivemongo_${scala.version}</artifactId>
+            <version>${play2.json.reactive.mongo}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json4s</groupId>
+            <artifactId>json4s-native_${scala.version}</artifactId>
+            <version>${Json4s.latestVersion}</version>
+        </dependency>
+        <dependency>
+            <!-- net.jodah.typetools-0.4.1.jar -->
+            <groupId>net.jodah</groupId>
+            <artifactId>typetools</artifactId>
+            <version>0.4.1</version>
+        </dependency>
+        <dependency>
+            <!-- org.apache.tomcat.tomcat-servlet-api-8.0.21.jar -->
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-servlet-api</artifactId>
+            <version>8.0.21</version>
+        </dependency>
+        <dependency>
+            <!-- org.yaml.snakeyaml-1.15.jar -->
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.15</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.config-1.3.0.jar -->
+            <groupId>com.typesafe</groupId>
+            <artifactId>config</artifactId>
+            <version>1.3.0</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.netty.netty-http-pipelining-1.1.4.jar -->
+            <groupId>com.typesafe.netty</groupId>
+            <artifactId>netty-http-pipelining</artifactId>
+            <version>1.1.4</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.netty.netty-reactive-streams-1.0.5.jar -->
+            <groupId>com.typesafe.netty</groupId>
+            <artifactId>netty-reactive-streams</artifactId>
+            <version>1.0.5</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.play.build-link-2.5.2.jar -->
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>build-link</artifactId>
+            <version>${play2.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.play.play-datacommons_2.11-2.5.2.jar -->
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play-datacommons_${scala.version}</artifactId>
+            <version>${play2.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.play.play-enhancer-1.1.0.jar -->
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play-enhancer</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.play.play-exceptions-2.5.2.jar -->
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play-exceptions</artifactId>
+            <version>${play2.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.play.play-functional_2.11-2.5.2.jar -->
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play-functional_${scala.version}</artifactId>
+            <version>${play2.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.play.play-iteratees_2.11-2.5.2.jar -->
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play-iteratees_${scala.version}</artifactId>
+            <version>${play2.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.play.play-java-ws_2.11-2.5.2.jar -->
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play-java-ws_${scala.version}</artifactId>
+            <version>${play2.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.play.play-java_2.11-2.5.2.jar -->
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play-java_${scala.version}</artifactId>
+            <version>${play2.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.play.play-json_2.11-2.5.2.jar -->
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play-json_${scala.version}</artifactId>
+            <version>${play2.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.play.play-logback_2.11-2.5.2.jar -->
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play-logback_${scala.version}</artifactId>
+            <version>${play2.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.play.play-netty-server_2.11-2.5.2.jar -->
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play-netty-server_${scala.version}</artifactId>
+            <version>${play2.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.play.play-server_2.11-2.5.2.jar -->
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play-server_${scala.version}</artifactId>
+            <version>${play2.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.play.play-streams_2.11-2.5.2.jar -->
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play-streams_${scala.version}</artifactId>
+            <version>${play2.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.play.play-ws_2.11-2.5.2.jar -->
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play-ws_${scala.version}</artifactId>
+            <version>${play2.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.play.play_2.11-2.5.2.jar -->
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>play_${scala.version}</artifactId>
+            <version>${play2.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.typesafe.play.twirl-api_2.11-1.1.1.jar -->
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>twirl-api_${scala.version}</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <!-- io.netty.netty-3.10.4.Final.jar -->
+            <groupId>io.netty</groupId>
+            <artifactId>netty</artifactId>
+            <version>3.10.4.Final</version>
+        </dependency>
+        <dependency>
+            <!-- io.netty.netty-buffer-4.0.36.Final.jar -->
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <version>${io.netty.version}</version>
+        </dependency>
+        <dependency>
+            <!-- io.netty.netty-codec-4.0.36.Final.jar -->
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec</artifactId>
+            <version>${io.netty.version}</version>
+        </dependency>
+        <dependency>
+            <!-- io.netty.netty-codec-http-4.0.36.Final.jar -->
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-http</artifactId>
+            <version>${io.netty.version}</version>
+        </dependency>
+        <dependency>
+            <!-- io.netty.netty-common-4.0.36.Final.jar -->
+            <groupId>io.netty</groupId>
+            <artifactId>netty-common</artifactId>
+            <version>${io.netty.version}</version>
+        </dependency>
+        <dependency>
+            <!-- io.netty.netty-handler-4.0.36.Final.jar -->
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler</artifactId>
+            <version>${io.netty.version}</version>
+        </dependency>
+        <dependency>
+            <!-- io.netty.netty-transport-4.0.36.Final.jar -->
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport</artifactId>
+            <version>${io.netty.version}</version>
+        </dependency>
+        <dependency>
+            <!-- io.netty.netty-transport-native-epoll-4.0.36.Final-linux-x86_64.jar -->
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-epoll</artifactId>
+            <version>${io.netty.version}</version>
+        </dependency>
+        <dependency>
+            <!-- javax.validation.validation-api-1.1.0.Final.jar -->
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>1.1.0.Final</version>
+        </dependency>
+        <dependency>
+            <!-- org.springframework.spring-beans-4.1.6.RELEASE.jar -->
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${spring.release}</version>
+        </dependency>
+        <dependency>
+            <!-- org.springframework.spring-context-4.1.6.RELEASE.jar -->
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.release}</version>
+        </dependency>
+        <dependency>
+            <!-- org.springframework.spring-core-4.1.6.RELEASE.jar -->
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring.release}</version>
+        </dependency>
+        <dependency>
+            <!-- org.asynchttpclient.async-http-client-2.0.0.jar -->
+            <groupId>org.asynchttpclient</groupId>
+            <artifactId>async-http-client</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+        <dependency>
+            <!-- org.javassist.javassist-3.19.0-GA.jar -->
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.19.0-GA</version>
+        </dependency>
+        <dependency>
+            <!-- oauth.signpost.signpost-commonshttp4-1.2.1.2.jar -->
+            <groupId>oauth.signpost</groupId>
+            <artifactId>signpost-commonshttp4</artifactId>
+            <version>1.2.1.2</version>
+        </dependency>
+        <dependency>
+            <!-- oauth.signpost.signpost-core-1.2.1.2.jar -->
+            <groupId>oauth.signpost</groupId>
+            <artifactId>signpost-core</artifactId>
+            <version>1.2.1.2</version>
+        </dependency>
+        <dependency>
+            <!-- org.hibernate.hibernate-validator-5.2.4.Final.jar -->
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>5.2.4.Final</version>
+        </dependency>
+        <dependency>
+            <!-- org.jboss.logging.jboss-logging-3.2.1.Final.jar -->
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <version>3.2.1.Final</version>
+        </dependency>
+        <dependency>
+            <!-- com.fasterxml.classmate-1.1.0.jar -->
+            <groupId>com.fasterxml</groupId>
+            <artifactId>classmate</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <!-- com.fasterxml.jackson.core.jackson-annotations-2.7.1.jar -->
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.core.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.fasterxml.jackson.core.jackson-core-2.7.1.jar -->
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.core.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.fasterxml.jackson.core.jackson-databind-2.7.1.jar -->
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.core.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.fasterxml.jackson.datatype.jackson-datatype-jdk8-2.7.1.jar -->
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jdk8</artifactId>
+            <version>${jackson.core.version}</version>
+        </dependency>
+        <dependency>
+            <!-- com.fasterxml.jackson.datatype.jackson-datatype-jsr310-2.7.1.jar -->
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.core.version}</version>
+        </dependency>
+        <dependency>
+            <!-- javax.el.javax.el-api-3.0.0.jar -->
+            <groupId>javax.el</groupId>
+            <artifactId>javax.el-api</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>${kafka.mapr.client}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mapr.streams</groupId>
+            <artifactId>mapr-streams</artifactId>
+            <version>${mapr.client}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.synchronoss</groupId>
+            <artifactId>bda-rt-data-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-email</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_${scala.version}</artifactId>
+            <version>2.2.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scalactic</groupId>
+            <artifactId>scalactic_${scala.version}</artifactId>
+            <version>2.2.6</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-jaxrs</artifactId>
+            <version>1.5.8</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-scala-module</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.typesafe.play/routes-compiler_2.11 -->
+        <dependency>
+            <groupId>com.typesafe.play</groupId>
+            <artifactId>routes-compiler_2.11</artifactId>
+            <version>2.5.4</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-parser</artifactId>
+            <version>1.0.16</version>
+        </dependency>
+    </dependencies>
+    <build>
+        <sourceDirectory>${project.basedir}/app</sourceDirectory>
+        <testSourceDirectory>${project.basedir}/test</testSourceDirectory>
+        <!-- To define the plugin version in your parent POM -->
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>rpm-maven-plugin</artifactId>
+                    <version>2.1.5</version>
+                    <extensions>true</extensions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <!-- To use the plugin goals in your POM or parent POM -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.google.code.play2-maven-plugin</groupId>
+                <artifactId>play2-maven-plugin</artifactId>
+                <version>${play2.plugin.version}</version>
+                <extensions>true</extensions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.google.code.play2-maven-plugin</groupId>
+                        <artifactId>play2-provider-play22</artifactId>
+                        <version>${play2.plugin.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <!-- Assembly plugin -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5.5</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <tarLongFileMode>posix</tarLongFileMode>
+                    <outputDirectory>${output.directory}</outputDirectory>
+                    <descriptors>
+                        <descriptor>${project.basedir}/assembly.xml</descriptor>
+                    </descriptors>
+                </configuration>
+            </plugin>
+            <!-- Assembly plugin : end -->
+            <!-- RPM plugin -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>rpm-maven-plugin</artifactId>
+                <version>2.1.5</version>
+                <executions>
+                    <execution>
+                        <id>rtis-rpm</id>
+                        <goals>
+                            <goal>rpm</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <license>Synchronoss proprietary product</license>
+                    <distribution>Real Time Ingestion Service</distribution>
+                    <needarch>false</needarch>
+                    <targetOS>i386-linux</targetOS>
+                    <group>RTIS/FrontEnd Server</group>
+                    <packager>BDA</packager>
+                    <name>${project.artifactId}</name>
+                    <!-- -->
+                    <defaultUsername>${app.user}</defaultUsername>
+                    <defaultGroupname>${app.group}</defaultGroupname>
+                    <defaultDirmode>550</defaultDirmode>
+                    <defaultFilemode>440</defaultFilemode>
+                    <!-- -->
+                    <defineStatements>
+                        <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
+                    </defineStatements>
+                    <!-- -->
+                    <mappings>
+                        <mapping>
+                            <directory>${app.optDir}/lib</directory>
+                            <filemode>440</filemode>
+                            <sources>
+                                <source>
+                                    <location>target/${project.artifactId}-${project.version}-package/${project.artifactId}-${project.version}/lib</location>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>${app.optDir}/sbin</directory>
+                            <filemode>750</filemode>
+                            <sources>
+                                <source>
+                                    <location>scripts</location>
+                                    <includes>
+                                        <include>*.sh</include>
+                                    </includes>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>${app.optDir}/conf</directory>
+                            <filemode>644</filemode>
+                            <sources>
+                                <source>
+                                    <location>conf</location>
+                                    <includes>
+                                        <include>routes</include>
+                                        <include>logback.xml</include>
+                                    </includes>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>${app.optDir}/conf/templates</directory>
+                            <filemode>644</filemode>
+                            <sources>
+                                <source>
+                                    <location>conf/templates</location>
+                                    <includes>
+                                        <include>application.conf.template</include>
+                                        <include>cluster.vars.changeme</include>
+                                    </includes>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <!-- /var/bda -->
+                        <mapping>
+                            <!-- writable dir only -->
+                            <directory>${app.varDir}</directory>
+                            <directoryIncluded>true</directoryIncluded>
+                            <!-- dirmode>750</dirmode -->
+                            <filemode>750</filemode>
+                        </mapping>
+                        <mapping>
+                            <!-- writable dir only -->
+                            <directory>${app.varDir}/log</directory>
+                            <directoryIncluded>true</directoryIncluded>
+                            <filemode>750</filemode>
+                            <configuration>noreplace</configuration>
+                        </mapping>
+                        <mapping>
+                            <!-- writable dir only -->
+                            <directory>${app.varDir}/run</directory>
+                            <directoryIncluded>true</directoryIncluded>
+                            <filemode>750</filemode>
+                        </mapping>
+                    </mappings>
+                    <preinstallScriptlet>
+                        <script>echo Install is being prepared
+echo Check /etc/bda/cluster.vars can be read
+( &lt;/etc/bda/cluster.vars ) || exit 1
+
+# Check/create rtis-user user, group
+getent passwd rtis-user &gt;/dev/null || {
+    getent group rtis-user &gt;/dev/null || groupadd -g 4020 rtis-user
+    useradd -g 4020 -u 4020 rtis-user
+    usermod -L rtis-user 
+    echo User created: rtis-user
+}
+
+# Check rtis-user exists
+getent passwd rtis-user &gt;/dev/null || {
+    echo Unix user rtis-user must exist
+    exit 1
+}
+# Save versioned name to env file to be used in postinstall
+{
+    echo app_home=${app.optDir}
+    echo app_version=${app.verRel}      
+} &gt;/tmp/.rtis.tmp.env
+                        </script>
+                    </preinstallScriptlet>
+                    <postinstallScriptlet>
+                        <scriptFile>scripts/postinstall</scriptFile>
+                        <fileEncoding>utf-8</fileEncoding>
+                    </postinstallScriptlet>
+                    <preremoveScriptlet>
+                        <scriptFile>scripts/preremove</scriptFile>
+                        <fileEncoding>utf-8</fileEncoding>
+                    </preremoveScriptlet>
+                </configuration>
+            </plugin>
+            <!-- RPM plugin : end -->
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>3.2.2</version>
+                <executions>
+                    <execution>
+                        <id>scala-compile-first</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>scala-test-compile</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <recompileMode>incremental</recompileMode>
+                </configuration>
+            </plugin>
+            <!--                        
+        <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-deploy-plugin</artifactId><version>2.8.2</version><configuration><skip>false</skip></configuration></plugin>-->
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,18 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+GET     /                controllers.Application.index
+GET     /i               controllers.Application.i
+POST    /i               controllers.Application.iPost
+
+#Generic event handler
+POST    /publishevent    controllers.GenericHandler.event(APP_KEY:String, APP_VERSION:String, APP_MODULE:String, EVENT_ID:String, EVENT_DATE:String,EVENT_TYPE:Option[String], payload:Option[String])
+
+# Swagger - Root Resources Listing
+GET     /api-docs        controllers.ApiHelpController.getResources
+
+# Control interface
+
+GET     /control        controllers.RTISControl.executeCmd(CMD:String, PARAMETERS:Option[String])
+POST    /control        controllers.RTISControl.executeExtendedCmd(CMD:String)
+GET     /sr             controllers.RTISControl.sr( parameters:Option[String])

@@ -1,0 +1,171 @@
+<configuration>
+    
+  <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel" />
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%coloredLevel - %logger - %message%n%xException</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log.dir}/app_%d{yyyy-MM-dd}.${http.port}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+			<maxFileSize>10MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+			<!-- keep 30 days' worth of history -->
+			<maxHistory>3</maxHistory>
+			<totalSizeCap>200MB</totalSizeCap>				
+        </rollingPolicy>
+    <encoder>
+      <pattern>%date [%level] -- %logger in %thread - %message%n%xException</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="RT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+		<fileNamePattern>${log.dir}/rt_%d{yyyy-MM-dd}.${http.port}.%i.log</fileNamePattern>
+		<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+		<maxFileSize>10MB</maxFileSize>
+		</timeBasedFileNamingAndTriggeringPolicy>
+		<!-- keep 30 days' worth of history -->
+		<maxHistory>3</maxHistory>
+		<totalSizeCap>200MB</totalSizeCap>				
+	</rollingPolicy>
+    <encoder>
+      <pattern>%date [%level] -- %logger in %thread - %message%n%xException</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+		<fileNamePattern>${log.dir}/errors_%d{yyyy-MM-dd}.${http.port}.%i.log</fileNamePattern>
+		<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+		<maxFileSize>10MB</maxFileSize>
+		</timeBasedFileNamingAndTriggeringPolicy>
+		<!-- keep 30 days' worth of history -->
+		<maxHistory>3</maxHistory>
+		<totalSizeCap>200MB</totalSizeCap>				
+	</rollingPolicy>
+    <encoder>
+      <pattern>%date [%level] -- %logger in %thread - %message%n%xException</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="COUNTLY_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+		<fileNamePattern>${log.dir}/countly_%d{yyyy-MM-dd}.${http.port}.%i.log</fileNamePattern>
+		<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+		<maxFileSize>10MB</maxFileSize>
+		</timeBasedFileNamingAndTriggeringPolicy>
+		<!-- keep 30 days' worth of history -->
+		<maxHistory>3</maxHistory>
+		<totalSizeCap>200MB</totalSizeCap>				
+	</rollingPolicy>
+    <encoder>
+      <pattern>%date [%level] -- %logger in %thread - %message%n%xException</pattern>
+    </encoder>
+  </appender>
+
+
+	<appender name="CHARTER_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+			<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+					<fileNamePattern>${log.dir}/charter_%d{yyyy-MM-dd}.${http.port}.%i.log</fileNamePattern>
+					<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+							<maxFileSize>10MB</maxFileSize>
+					</timeBasedFileNamingAndTriggeringPolicy>
+					<!-- keep 30 days' worth of history -->
+					<maxHistory>3</maxHistory>
+					<totalSizeCap>200MB</totalSizeCap>
+			</rollingPolicy>
+			<encoder>
+					<pattern>%date [%level] -- %logger in %thread - %message%n%xException</pattern>
+			</encoder>
+	</appender>
+
+  <appender name="REJECTED_REQUESTS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+		<fileNamePattern>${log.dir}/rejected_requests_%d{yyyy-MM-dd}.${http.port}.%i.log</fileNamePattern>
+		<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+		<maxFileSize>10MB</maxFileSize>
+		</timeBasedFileNamingAndTriggeringPolicy>
+		<!-- keep 30 days' worth of history -->
+		<maxHistory>3</maxHistory>
+		<totalSizeCap>200MB</totalSizeCap>				
+	</rollingPolicy>
+    <encoder>
+      <pattern>%date [%level] -- %logger in %thread - %message%n%xException</pattern>
+    </encoder>
+  </appender>
+
+    <!--
+      The logger name is typically the Java/Scala package name.
+      This configures the log level to log at for a package and its children packages.
+    -->
+  <logger name="play" level="ERROR" >
+    <appender-ref ref="FILE" />
+  </logger>
+	
+  <logger name="controllers" level="DEBUG" >
+    <appender-ref ref="RT_FILE" />
+  </logger>
+
+	<logger name="controllers.RTISControl" level="DEBUG" >
+			<appender-ref ref="RT_FILE" />
+			<!--    <appender-ref ref="STDOUT" /> -->
+	</logger>
+
+	<logger name="controllers.GenericHandler" level="DEBUG" >
+			<appender-ref ref="RT_FILE" />
+	</logger>
+
+  <logger name="mapr.streaming" level="DEBUG">
+    <appender-ref ref="RT_FILE" />
+  </logger>
+
+  <logger name="mapr.streaming.EventHandler" level="TRACE">
+    <appender-ref ref="RT_FILE" />
+  </logger>
+
+    <logger name="mapr.streaming.EventSender" level="DEBUG">
+        <appender-ref ref="RT_FILE" />
+    </logger>
+
+	<logger name="controllers.GenericHandler" level="DEBUG" >
+			<appender-ref ref="RT_FILE" />
+	</logger>
+		
+		
+  <logger name="exceptions" level="ERROR">
+    <appender-ref ref="ERROR_FILE" />
+  </logger>
+
+  <logger name="RejectedRequests" level="TRACE">
+    <appender-ref ref="REJECTED_REQUESTS" />
+  </logger>
+
+  <logger name="synchronoss.handlers.countly" level="ERROR">
+    <appender-ref ref="COUNTLY_FILE" />
+  </logger>
+	
+  <logger name="synchronoss.handlers.countly.CountlyGenericBridge" level="TRACE">
+    <appender-ref ref="COUNTLY_FILE" />
+  </logger>
+
+  <logger name="synchronoss.handlers.charter.smartcare.CharterEventHandler" level="DEBUG">
+    <appender-ref ref="CHARTER_FILE" />
+  </logger>
+	
+  <logger name="play.modules.swagger" level="ERROR">
+    <appender-ref ref="FILE" />
+  </logger>
+  
+  <root level="DEBUG">
+<!--    <appender-ref ref="STDOUT" />  -->
+    <appender-ref ref="FILE" />
+  </root>
+
+
+</configuration>
+
