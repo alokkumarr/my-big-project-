@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.synchronoss</groupId>
         <artifactId>saw-services</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.0</version>
     </parent>
     <artifactId>saw-transport-service</artifactId>
     <packaging>jar</packaging>
@@ -24,7 +24,8 @@
         <spring.release>4.1.6.RELEASE</spring.release>
         <rpm.bda.root>/opt</rpm.bda.root>
         <rpm.release>1</rpm.release>
-        <rpm.version>${project.version}</rpm.version>
+        <!-- <rpm.version>${project.version}</rpm.version> -->
+        <rpm.version>1.0.1</rpm.version>
         <akka.version>2.4.9</akka.version>
         <scala.major.version>2.11</scala.major.version>
         <app.user>mapr</app.user>
