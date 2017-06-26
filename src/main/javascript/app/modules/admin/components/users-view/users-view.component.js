@@ -40,6 +40,8 @@ export const UsersViewComponent = {
             toastClass: 'toast-primary'
           });
         }
+      }).catch(() => {
+        this._$rootScope.showProgress = false;
       });
       this.custCode = this.resp.ticket.custCode;
     }
@@ -87,7 +89,7 @@ export const UsersViewComponent = {
       };
       const confirm = this._$mdDialog.confirm()
         .title('Are you sure you want to delete this user?')
-        .textContent('User ID :' + this.user.masterLoginId)
+        .textContent('User ID : ' + this.user.masterLoginId)
         .ok('Delete')
         .cancel('Cancel');
 

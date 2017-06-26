@@ -15,7 +15,8 @@ export const PivotGridComponent = {
   styles: [style],
   bindings: {
     updater: '<',
-    mode: '@'
+    mode: '@',
+    onContentReady: '&'
   },
   controller: class PivotGridController {
     constructor($timeout, $translate, FilterService, $compile, $scope) {
@@ -40,6 +41,10 @@ export const PivotGridComponent = {
       this.pivotGridOptions = assign({
         onInitialized: e => {
           this._gridInstance = e.component;
+        },
+        onContentReady: () => {
+          const fields = this._gridInstance.getDataSource().fields();
+          this.onContentReady({fields});
         }
       }, this.getDefaultOptions());
 

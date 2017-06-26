@@ -10,3 +10,12 @@ analyze-filter-modal {
     }
   }
 }
+
+.md-select-menu-container.select-container-class {
+  width: 111px;
+  min-width: 0 !important;
+
+  md-select-menu {
+    overflow: hidden;
+  }
+}

@@ -25,6 +25,7 @@
   "NO_COLUMNS_FOUND": "No Columns were found",
   "NO_IMPLEMENTED_TEMPLATE_YET": "No implemented template yet!",
   "NO_PREVIOUS_EXECUTION": "This analysis hasn't been been executed yet. Execute it now?",
+  "OF_THE_FILTERS_ARE_TRUE": "of the filters are true",
   "ORDER_FULFILLMENT": "Order Fulfillment",
   "OTHER_PUBLISHED_ANALYSES": "Previous Versions",
   "PIVOT_SETTINGS": "Pivot Settings",
@@ -55,5 +56,8 @@
   "TOOLTIP_NUMBER_TYPE": "Number",
   "TOOLTIP_STRING_TYPE": "String",
   "TOOLTIP_DATE_TYPE": "Date",
-  "ERROR_FILL_IN_REQUIRED_FILTER_MODELS": "Please fill in all models, or mark filter as runtime filter!"
+  "ERROR_FILL_IN_REQUIRED_FILTER_MODELS": "Please fill in all models, or mark filter as runtime filter!",
+  "ERROR_PIVOT_MAX_FIELDS": "You cannot have more than {{fieldNr}} fields in the {{area}} area!",
+  "ERROR_PIVOT_DATA_FIELD": "Only fields of type number are allowed in the data area!",
+  "ERROR_PIVOT_DATA_FIELD_REQUIRED": "You need to have at least one field in the data area!"
 }

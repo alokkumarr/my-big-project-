@@ -9,10 +9,13 @@ import flatten from 'lodash/flatten';
 import fpPipe from 'lodash/fp/pipe';
 import fpMap from 'lodash/fp/map';
 import map from 'lodash/map';
+import unset from 'lodash/unset';
 
 import template from './analyze-filter-modal.component.html';
 import style from './analyze-filter-modal.component.scss';
 import {BOOLEAN_CRITERIA} from '../../../services/filter.service';
+import {OPERATORS} from '../filters/number-filter.component';
+import {NUMBER_TYPES} from '../../../consts';
 
 export const AnalyzeFilterModalComponent = {
   template,
@@ -77,6 +80,7 @@ export const AnalyzeFilterModalComponent = {
       if (this.areFiltersValid(this.filters)) {
         this.removeEmptyFilters(this.filters);
         const flattenedFilters = this.unGroupFilters(this.filters);
+        this.cleanFilters(flattenedFilters);
         this.$dialog.hide({
           filterBooleanCriteria: this.filterBooleanCriteria,
           filters: flattenedFilters
@@ -86,6 +90,15 @@ export const AnalyzeFilterModalComponent = {
           this._toastMessage.error(message);
         });
       }
+    }
+
+    cleanFilters(filters) {
+      forEach(filters, filter => {
+        if (NUMBER_TYPES.includes(filter.column.type) &&
+            filter.model.operator !== OPERATORS.BETWEEN.shortName) {
+          unset(filter.model, 'otherValue');
+        }
+      });
     }
 
     areFiltersValid(filters) {

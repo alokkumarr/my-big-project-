@@ -33,10 +33,10 @@ export const UserNewComponent = {
         lastName: ''
       };
       this.statuses = [{
-        ind: 'Active',
+        ind: 1,
         name: 'ACTIVE'
       }, {
-        ind: 'Inactive',
+        ind: 0,
         name: 'INACTIVE'
       }];
     }
@@ -46,11 +46,6 @@ export const UserNewComponent = {
     }
     createUser() {
       this._$rootScope.showProgress = true;
-      if (this.user.activeStatusInd === 'Active') {
-        this.user.activeStatusInd = 1;
-      } else {
-        this.user.activeStatusInd = 0;
-      }
       this._UsersManagementService.saveUser(this.user).then(response => {
         this.response = response;
         if (this.response.valid) {
@@ -70,6 +65,8 @@ export const UserNewComponent = {
             toastClass: 'toast-primary'
           });
         }
+      }).catch(() => {
+        this._$rootScope.showProgress = false;
       });
     }
   }

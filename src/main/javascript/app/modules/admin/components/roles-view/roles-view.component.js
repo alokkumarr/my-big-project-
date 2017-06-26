@@ -98,7 +98,7 @@ export const RolesViewComponent = {
           this._$rootScope.showProgress = false;
           this.rolesList = data.roles;
           this._$mdToast.show({
-            template: '<md-toast><span> Role is successfully inactivated </md-toast>',
+            template: '<md-toast><span> Role is successfully deleted </md-toast>',
             position: 'bottom left',
             toastClass: 'toast-primary'
           });

@@ -1,16 +1,12 @@
 <div layout="row">
-  <md-sidenav class="pivot-settings"
+  <md-sidenav md-component-id="{{$ctrl.ANALYZE_PIVOT_SETTINGS_SIDENAV_ID}}"
               md-is-open="true"
               md-disable-backdrop
-              md-component-id="{{$ctrl.ANALYZE_PIVOT_SETTINGS_SIDENAV_ID}}"
               md-whiteframe="4">
-    <md-toolbar class="settings-toolbar" layout="row" layout-align="space-around center">
-      <p class="md-headline" translate="PIVOT_SETTINGS"></p>
-      <md-button class="md-button btn-primary" ng-click="$ctrl.applySettings($ctrl.artifactColumns)" translate="APPLY_SETTINGS"></md-button>
+    <md-toolbar class="md-theme-indigo">
+      <h1 class="md-toolbar-tools" translate="PIVOT_SETTINGS"></h1>
     </md-toolbar>
-    <div layout="column"
-         style="height: calc(100% - 50px); overflow: auto">
-      <md-list>
+      <md-list style="padding-top: 0;">
 
       <md-subheader class="md-no-sticky">
         <md-input-container md-no-float class="md-block">
@@ -56,7 +52,7 @@
         </md-menu>
 
         <md-menu class="md-secondary" ng-show="artifactColumn.checked && artifactColumn.area === 'data'">
-          <md-button aria-label="SUMMARY_TYPE"
+          <md-button aria-label="TOOLTIP_AGGREGATE_TYPE"
                     class="md-icon-button"
                     ng-click="$ctrl.openMenu($mdMenu, $event)">
             <md-icon md-menu-origin
@@ -96,6 +92,5 @@
 
       </md-list-item>
     </md-list>
-    </div>
   </md-sidenav>
 </div>

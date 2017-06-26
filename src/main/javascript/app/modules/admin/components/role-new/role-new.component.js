@@ -34,20 +34,15 @@ export const RoleNewComponent = {
         myAnalysis: true
       };
       this.statuses = [{
-        ind: 'Active',
+        ind: 1,
         name: 'ACTIVE'
       }, {
-        ind: 'Inactive',
+        ind: 0,
         name: 'INACTIVE'
       }];
     }
     createRole() {
       this._$rootScope.showProgress = true;
-      if (this.role.activeStatusInd === 'Active') {
-        this.role.activeStatusInd = 1;
-      } else {
-        this.role.activeStatusInd = 0;
-      }
       this._RolesManagementService.saveRole(this.role).then(response => {
         this.response = response;
         if (this.response.valid) {
@@ -67,6 +62,8 @@ export const RoleNewComponent = {
             toastClass: 'toast-primary'
           });
         }
+      }).catch(() => {
+        this._$rootScope.showProgress = false;
       });
     }
   }

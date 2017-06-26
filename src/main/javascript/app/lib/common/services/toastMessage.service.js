@@ -13,7 +13,7 @@ export function toastMessageService(toastr) {
     toastr.info(msg);
   }
 
-  function error(msg) {
-    toastr.error(msg);
+  function error(msg, title, options) {
+    toastr.error(msg, title, options);
   }
 }

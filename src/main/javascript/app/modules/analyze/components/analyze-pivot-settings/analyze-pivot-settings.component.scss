@@ -3,6 +3,15 @@
 analyze-pivot-settings {
   z-index: 0;
 
+  & > .layout-row {
+    height: 100%;
+  }
+
+  md-sidenav {
+    position: static;
+    width: 300px;
+  }
+
   h3 {
     margin: 5px;
     padding: 5px;
@@ -16,28 +25,12 @@ analyze-pivot-settings {
     }
   }
 
-  & > .layout-row {
-    height: 100%;
+  md-toolbar {
+    min-height: 0;
   }
 
-  md-sidenav {
-    position: static;
-    width: 300px;
-  }
-
-  md-toolbar::after {
-    content: none;
-  }
-
-  md-toolbar.settings-toolbar {
-    min-height: 50px;
-    border-top: 1px solid #C4C4C4;
-    border-bottom: 1px solid #C4C4C4;
-    background-color: #F5F5F5 !important;
-
-    p {
-      margin: 0;
-    }
+  .md-subheader-content .md-errors-spacer {
+    display: none;
   }
 
   .dx-pivotgridfieldchooser span.dx-area-caption {

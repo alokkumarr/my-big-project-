@@ -13,7 +13,7 @@
         </div>
         <div class="md-description">
           <md-icon md-font-icon="icon-report"></md-icon>
-          <span translate="ORDERS"></span>
+          <span ng-bind="::$ctrl.model.metricName"></span>
         </div>
       </div>
 
@@ -23,19 +23,16 @@
         </md-button>
       </div>
     </div>
+    <md-progress-linear ng-show="$ctrl.showProgress" md-mode="indeterminate"></md-progress-linear>
   </analyze-dialog-header>
 
   <analyze-dialog-content>
     <analyze-pivot-settings on-apply-settings="$ctrl.onApplySettings(columns)"
-                            reciever="$ctrl.settingsReciever">
+                            artifact-columns="$ctrl.artifacts[0].columns">
     </analyze-pivot-settings>
 
     <div layout="column">
       <div layout="row" class="ard_toolbar" layou="space-between">
-
-        <md-button ng-click="$ctrl.toggleSettingsSidenav()" flex="5">
-          <md-icon md-font-icon="icon-menu"></md-icon>
-        </md-button>
 
         <span class="ard_toolbar-text" flex="25"
               translate="PIVOT"></span>
@@ -68,14 +65,16 @@
           </md-button>
         </div>
       </div>
-      <md-card>
+      <md-card layout="row"
+               style="max-width: calc(100vw - 333px); overflow: auto;">
         <md-card-content layout="column">
           <filter-chips filters="$ctrl.filters"
                         on-clear-all-filters="$ctrl.onClearAllFilters()"
                         on-filter-removed="$ctrl.onFilterRemoved(index)">
           </filter-chips>
           <pivot-grid updater="$ctrl.pivotGridUpdater"
-                      mode="designer"></pivot-grid>
+                      mode="designer"
+                      on-content-ready="$ctrl.onPivotContentReady(fields)"></pivot-grid>
         </md-card-content>
       </md-card>
     </div>

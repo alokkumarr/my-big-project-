@@ -7,7 +7,9 @@
 <form name="newRoleForm" method="post">
   <md-input-container flex> <label
 		translate="ROLE_NAME_LABEL"></label> <input name="roleName"
-		ng-model="$ctrl.role.roleName" required/> </md-input-container>
+		ng-model="$ctrl.role.roleName" 
+		ng-pattern="/^[a-zA-Z\s]*$/"
+		required/> </md-input-container>
   <md-input-container flex> <label
 		translate="ROLE_DESC_LABEL"></label> <input name="roleDesc"
 		ng-model="$ctrl.role.roleDesc" /> </md-input-container>
