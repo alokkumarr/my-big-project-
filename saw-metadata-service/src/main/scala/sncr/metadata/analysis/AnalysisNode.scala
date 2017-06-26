@@ -265,7 +265,8 @@ object AnalysisNode{
       "tenantId"-> "String",
       "productId"-> "String",
       "analysisName"-> "String",
-      "displayStatus"-> "String"
+      "displayStatus"-> "String",
+      "isScheduled"-> "String"
     )
 
   protected val requiredFields = Map(
@@ -278,7 +279,8 @@ object AnalysisNode{
       (analysisNode, "id"),
       (analysisNode, "module"),
       (analysisNode, "categoryId"),
-      (analysisNode, "customerCode"))
+      (analysisNode, "customerCode"),
+      (analysisNode, "isScheduled"))
       .map(jv => {
         val (result, searchValue) = MDNodeUtil.extractValues(jv._1, (jv._2, searchFields(jv._2)) )
         m_log trace s"Field: ${jv._2}, \nSource JSON: ${compact(render(jv._1))},\n Search field type: ${searchFields(jv._2)}\n, Value: $searchValue"

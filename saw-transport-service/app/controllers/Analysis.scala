@@ -30,6 +30,43 @@ import sncr.metadata.engine.{Fields, MetadataDictionary}
 class Analysis extends BaseController {
   val executorRunner = new ExecutionTaskHandler(1)
 
+  /**
+    * List analyses.  At the moment only used by scheduler to list
+    * analyses that are scheduled.
+    */
+  def list(view: String): Result = {
+    handle((json, ticket) => {
+      if (view == "schedule") {
+        listSchedules
+      } else {
+        throw new ClientException("Unknown view: " + view)
+      }
+    })
+  }
+
+  private def listSchedules: JObject = {
+    val analysisNode = new AnalysisNode
+    val search = Map[String, Any]("isScheduled" -> "true")
+    /* Get all analyses */
+    val analyses = analysisNode.find(search).map {
+      _("content") match {
+        case obj: JObject => obj
+        case obj: JValue => unexpectedElement("object", obj)
+      }
+    }.filter(analysis => {
+      /* Filter out those that have an schedule set */
+      (analysis \ "schedule") match {
+        case obj: JObject => true
+        case _ => false
+      }
+    }).map(analysis => {
+      /* Return only schedule view */
+      ("id", (analysis \ "id")) ~
+      ("schedule", (analysis \ "schedule"))
+    })
+    ("analyses", analyses)
+  }
+
   def process: Result = {
     handle(doProcess)
   }
@@ -140,7 +177,7 @@ class Analysis extends BaseController {
 
   def analysisJson(json: JValue): JObject = {
     val analysisListJson = json \ "contents" \ "analyze"
-    val analysis = analysisListJson match {
+    val analysisJson = analysisListJson match {
       case array: JArray => {
         if (array.arr.length > 1) {
           throw new ClientException("Only one element supported")
@@ -157,7 +194,10 @@ class Analysis extends BaseController {
       case _ => throw new ClientException(
         "Expected array: " + analysisListJson)
     }
-    
+    val analysis = (analysisJson \ "schedule") match {
+      case obj: JObject => analysisJson ~ ("isScheduled", "true")
+      case _ => analysisJson ~ ("isScheduled", "false")
+    }
     val analysisType = (analysisListJson \ "type");
     val typeInfo = analysisType.extract[String];
     if ( typeInfo.equals("report") ){
@@ -221,7 +261,7 @@ class Analysis extends BaseController {
   var result: String = null
   def setResult(r: String): Unit = result = r
  
-  def executeAnalysis(analysisId: String, queryRuntime: String): JValue = {
+  def executeAnalysis(analysisId: String, queryRuntime: String = null): JValue = {
  
     // reading the JSON extract type
     val analysisJSON = readAnalysisJson(analysisId);
