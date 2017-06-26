@@ -59,6 +59,7 @@ export const AnalyzePivotComponent = {
       this.settingsModified = false;
       this.artifacts = [];
       this.backupColumns = [];
+      this.showProgress = false;
     }
 
     $onInit() {
@@ -95,6 +96,7 @@ export const AnalyzePivotComponent = {
       this.initExistingSettings();
       this.artifacts = this.getSortedArtifacts(this.model.artifacts);
       this.artifacts[0].columns = this.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
+      this.loadPivotData();
     }
 
     initExistingSettings() {
@@ -186,6 +188,7 @@ export const AnalyzePivotComponent = {
       if (!this.checkModelValidity(model)) {
         return;
       }
+      this.showProgress = true;
       return this._AnalyzeService.getDataBySettings(clone(model))
         .then(({data}) => {
           const fields = this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns);
@@ -199,6 +202,10 @@ export const AnalyzePivotComponent = {
             dataSource: this.dataSource,
             sorts: this.sorts
           });
+          this.showProgress = false;
+        })
+        .catch(() => {
+          this.showProgress = false;
         });
     }
 
@@ -241,7 +248,7 @@ export const AnalyzePivotComponent = {
 // END filters
 
     onPivotContentReady(fields) {
-      if (isEmpty(this.artifacts)) {
+      if (isEmpty(this.artifacts) || isEmpty(fields)) {
         return;
       }
       const selectedArtifactColumns = filter(this.artifacts[0].columns, 'checked');
@@ -410,7 +417,7 @@ export const AnalyzePivotComponent = {
 
     mapBackend2FrontendSort(sorts, sortFields) {
       return map(sorts, sort => {
-        const targetField = find(sortFields, ({dataField}) => dataField === sort.dataField);
+        const targetField = find(sortFields, ({dataField}) => dataField === sort.columnName);
         return {
           field: targetField,
           order: sort.order
