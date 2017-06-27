@@ -17,8 +17,14 @@ import org.springframework.stereotype.Component;
 public class SchedulerServiceImpl implements SchedulerService, CommandLineRunner {
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
-    @Autowired
     private AnalysisService analysisService;
+    private SchedulerStore schedulerStore;
+
+    public SchedulerServiceImpl(
+        AnalysisService analysisService, SchedulerStore schedulerStore) {
+        this.analysisService = analysisService;
+        this.schedulerStore = schedulerStore;
+    }
 
     public void run(String... args) {
         log.info("Starting");
@@ -37,11 +43,9 @@ public class SchedulerServiceImpl implements SchedulerService, CommandLineRunner
          * Analysis Service */
         List<AnalysisSchedule> analyses = analysisService.
             getAnalysisSchedules();
-        try (SchedulerStore store = new SchedulerStore()) {
-            log.info("Processing analyses");
-            for (AnalysisSchedule analysis : analyses) {
-                processAnalysis(store, executionId, analysis);
-            }
+        log.info("Processing analyses");
+        for (AnalysisSchedule analysis : analyses) {
+            processAnalysis(schedulerStore, executionId, analysis);
         }
         log.info("Finished processing analyses");
     }
