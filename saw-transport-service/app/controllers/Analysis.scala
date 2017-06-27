@@ -135,13 +135,19 @@ class Analysis extends BaseController {
         json merge contentsAnalyze(searchAnalysisJson(keys))
       }
       case "execute" => {
-        val analysisId = extractAnalysisId(json)
-        val analysis = analysisJson(json)
-        /* Build query based on analysis supplied in request body */
-        val executionType = (analysis \ "executionType")
-          .extractOrElse[String]("interactive")
-        val runtime = (executionType == "interactive")
-        val queryRuntime = QueryBuilder.build(analysis, runtime)
+        val analysisId = extractAnalysisId(json);
+        val analysis = analysisJson(json);
+        val analysisType = (analysis \ "type");
+        var queryRuntime;
+    	val typeInfo = analysisType.extract[String];
+    	if ( typeInfo.equals("report"))
+    	{
+	        /* Build query based on analysis supplied in request body */
+	        val executionType = (analysis \ "executionType")
+	          .extractOrElse[String]("interactive")
+	        val runtime = (executionType == "interactive")
+	        queryRuntime = QueryBuilder.build(analysis, runtime)
+        }
         /* Execute analysis and return result data */
         val data = executeAnalysis(analysisId, queryRuntime)
         contentsAnalyze(("data", data))
