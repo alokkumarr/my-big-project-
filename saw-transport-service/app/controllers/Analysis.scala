@@ -138,7 +138,7 @@ class Analysis extends BaseController {
         val analysisId = extractAnalysisId(json);
         val analysis = analysisJson(json);
         val analysisType = (analysis \ "type");
-        var queryRuntime;
+        var queryRuntime : String = "";
     	val typeInfo = analysisType.extract[String];
     	if ( typeInfo.equals("report"))
     	{
