@@ -41,8 +41,7 @@ public class SchedulerServiceImpl implements SchedulerService, CommandLineRunner
         /* Get the list of analyses that have a schedule for the given
          * execution type, for example hourly or daily, from the
          * Analysis Service */
-        List<AnalysisSchedule> analyses = analysisService.
-            getAnalysisSchedules();
+        AnalysisSchedule[] analyses = analysisService.getAnalysisSchedules();
         log.info("Processing analyses");
         for (AnalysisSchedule analysis : analyses) {
             processAnalysis(schedulerStore, executionId, analysis);
