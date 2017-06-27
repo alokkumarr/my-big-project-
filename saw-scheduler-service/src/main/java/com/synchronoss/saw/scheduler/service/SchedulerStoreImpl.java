@@ -9,9 +9,9 @@ import org.ojai.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-@Component
+@Repository
 public class SchedulerStoreImpl implements SchedulerStore {
     @Value("${saw-maprdb-table-home}")
     private String tableHome;
