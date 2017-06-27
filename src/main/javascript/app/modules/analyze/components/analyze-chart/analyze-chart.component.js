@@ -20,6 +20,16 @@ import {ENTRY_MODES, NUMBER_TYPES} from '../../consts';
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
 
+const BAR_COLUMN_OPTIONS = [{
+  label: 'TOOLTIP_BAR_CHART',
+  type: 'bar',
+  icon: 'icon-hor-bar-chart'
+}, {
+  label: 'TOOLTIP_COLUMN_CHART',
+  type: 'column',
+  icon: 'icon-vert-bar-chart'
+}];
+
 export const AnalyzeChartComponent = {
   template,
   styles: [style],
@@ -37,6 +47,7 @@ export const AnalyzeChartComponent = {
       this._$mdSidenav = $mdSidenav;
       this._$mdDialog = $mdDialog;
       this._$timeout = $timeout;
+      this.BAR_COLUMN_OPTIONS = BAR_COLUMN_OPTIONS;
 
       this.legend = {
         align: get(this.model, 'legend.align', 'right'),
@@ -59,6 +70,8 @@ export const AnalyzeChartComponent = {
       this.filters = [];
 
       this.chartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
+
+      this.barColumnChoice = '';
     }
 
     toggleLeft() {
@@ -66,6 +79,9 @@ export const AnalyzeChartComponent = {
     }
 
     $onInit() {
+      const chartType = this.model.chartType;
+      this.barColumnChoice = ['bar', 'column'].includes(chartType) ? chartType : '';
+
       if (this.mode === ENTRY_MODES.FORK) {
         delete this.model.id;
       }
@@ -99,6 +115,18 @@ export const AnalyzeChartComponent = {
       this._$timeout(() => {
         this.updateLegendPosition();
       });
+    }
+
+    toggleBarColumn() {
+      if (this.model.chartType === 'bar') {
+        this.model.chartType = 'column';
+      } else if (this.model.chartType === 'column') {
+        this.model.chartType = 'bar';
+      }
+      this.updateChart.next([{
+        path: 'chart.type',
+        data: this.model.chartType
+      }]);
     }
 
     updateLegendPosition() {

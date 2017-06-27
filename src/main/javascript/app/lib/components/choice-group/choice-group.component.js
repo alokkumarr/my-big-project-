@@ -1,4 +1,5 @@
 import template from './choice-group.component.html';
+import style from './choice-group.component.scss';
 
 /**
  * A button group with big icons, acts like a radio button group
@@ -14,14 +15,20 @@ import template from './choice-group.component.html';
  */
 export const ChoiceGroupComponent = {
   template,
+  styles: [style],
   require: {
     ngModelCtrl: 'ngModel'
   },
   bindings: {
     items: '<',
-    ngModel: '<'
+    ngModel: '<',
+    size: '@',
+    iconOnly: '@'
   },
   controller: class ChoiceGroupController {
+    $onInit() {
+      this.sizeClass = `size-${this.size || 'm'}`;
+    }
     onItemSelected(item) {
       this.ngModelCtrl.$setViewValue(item.type);
       this.ngModel = item.type;

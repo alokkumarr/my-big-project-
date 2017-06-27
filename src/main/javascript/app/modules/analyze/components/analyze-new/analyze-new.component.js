@@ -44,9 +44,13 @@ export const AnalyzeNewComponent = {
         const supportedMethodCategory = find(supportedMethods, ({category}) => category === methodCategory.category);
 
         forEach(methodCategory.children, method => {
-          const isSupported = supportedMethodCategory ?
+          let isSupported = supportedMethodCategory ?
             find(supportedMethodCategory.children, ({type}) => type === method.type) :
             false;
+          // TODO remove when backend ads support
+          if (method.type === 'chart:bar') {
+            isSupported = true;
+          }
           set(method, 'disabled', !isSupported);
         });
       });
@@ -85,6 +89,7 @@ export const AnalyzeNewComponent = {
           };
           break;
         case 'chart:column':
+        case 'chart:bar':
         case 'chart:line':
         case 'chart:stack':
         case 'chart:pie':
