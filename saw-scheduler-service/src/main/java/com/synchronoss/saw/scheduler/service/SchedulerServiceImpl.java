@@ -1,5 +1,6 @@
 package com.synchronoss.saw.scheduler.service;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -19,11 +20,14 @@ public class SchedulerServiceImpl implements SchedulerService, CommandLineRunner
 
     private AnalysisService analysisService;
     private SchedulerStore schedulerStore;
+    private Clock clock;
 
     public SchedulerServiceImpl(
-        AnalysisService analysisService, SchedulerStore schedulerStore) {
+        AnalysisService analysisService, SchedulerStore schedulerStore,
+        Clock clock) {
         this.analysisService = analysisService;
         this.schedulerStore = schedulerStore;
+        this.clock = clock;
     }
 
     public void run(String... args) {
@@ -97,7 +101,7 @@ public class SchedulerServiceImpl implements SchedulerService, CommandLineRunner
             throw new IllegalArgumentException(
                 "Unknown execution type: " + type);
         }
-        ZonedDateTime date = ZonedDateTime.now();
+        ZonedDateTime date = ZonedDateTime.now(clock);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         return String.format(
             "%s-%s", type.toUpperCase(), date.format(formatter));
