@@ -4,8 +4,6 @@
     title: SAW Scheduler Service
     module: saw-scheduler-service
     jar: /opt/{{module}}/{{module}}.jar
-    run: "sudo -u mapr java -jar {{jar}} "
-    log: "2>&1 | logger -t {{module}}"
   tasks:
     # Workaround: Copy plain files until the module has RPM packaging
     - name: Prepare {{title}} directory
@@ -15,19 +13,9 @@
       copy:
         src: ../{{module}}/target/{{module}}-1.0.0-exec.jar
         dest: "{{jar}}"
-    # Add hourly, daily and weekly launchers
-    - name: Install {{title}} hourly launcher
-      copy:
-        content: "{{run}} hourly {{log}}"
-        dest: "/etc/cron.hourly/{{module}}-hourly"
-        mode: a+x
+    # Add daily launcher
     - name: Install {{title}} daily launcher
       copy:
-        content: "{{run}} daily {{log}}"
+        content: "sudo -u mapr java -jar {{jar}} 2>&1 | logger -t {{module}}\n"
         dest: "/etc/cron.daily/{{module}}-daily"
-        mode: a+x
-    - name: Install {{title}} weekly launcher
-      copy:
-        content: "{{run}} weekly {{log}}"
-        dest: "/etc/cron.weekly/{{module}}-weekly"
         mode: a+x
