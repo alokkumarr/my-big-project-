@@ -33,4 +33,7 @@
     <module>rt-streaming-common</module>
     <module>event-processing</module>
   </modules>
+  <build>
+    <defaultGoal>package</defaultGoal>
+  </build>
 </project>
