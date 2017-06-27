@@ -1,21 +1,17 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import findIndex from 'lodash/findIndex';
-import forEach from 'lodash/forEach';
 import find from 'lodash/find';
 import get from 'lodash/get';
-import sortBy from 'lodash/sortBy';
-import flatMap from 'lodash/flatMap';
 import isEmpty from 'lodash/isEmpty';
 import assign from 'lodash/assign';
 import map from 'lodash/map';
 import values from 'lodash/values';
 import clone from 'lodash/clone';
-import filter from 'lodash/filter';
 import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
 
-import {ENTRY_MODES, NUMBER_TYPES} from '../../consts';
+import {ENTRY_MODES} from '../../consts';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -83,7 +79,8 @@ export const AnalyzeChartComponent = {
     }
 
     initChart() {
-      this.fillSettings(this.model.artifacts, this.model);
+      this.settings = this._ChartService.fillSettings(this.model.artifacts, this.model);
+      this.reloadChart(this.settings, this.filteredGridData);
 
       if (isEmpty(this.mode)) {
         return;
@@ -121,15 +118,6 @@ export const AnalyzeChartComponent = {
       ]);
     }
 
-    mergeArtifactsWithSettings(artifacts, record) {
-      forEach(artifacts, a => {
-        a.checked = a.columnName === record.columnName &&
-          a.tableName === record.tableName;
-      });
-
-      return artifacts;
-    }
-
     updateCustomLabels() {
       this.labels.x = this.labels.tempX;
       this.labels.y = this.labels.tempY;
@@ -142,40 +130,6 @@ export const AnalyzeChartComponent = {
           this.gridData = data;
           this.filteredGridData = data;
         });
-    }
-
-    fillSettings(artifacts, model) {
-      /* Flatten the artifacts into a single array */
-      let attributes = flatMap(artifacts, metric => {
-        return map(metric.columns, attr => {
-          attr.tableName = metric.artifactName;
-          return attr;
-        });
-      });
-
-      attributes = sortBy(attributes, [attr => attr.columnName]);
-
-      /* Based on data type, divide the artifacts between axes. */
-      const yaxis = filter(attributes, attr => (
-        attr.columnName &&
-        NUMBER_TYPES.indexOf(attr.type) >= 0
-      ));
-      const xaxis = filter(attributes, attr => (
-        attr.columnName &&
-        (attr.type === 'string' || attr.type === 'String')
-      ));
-      const groupBy = map(xaxis, clone);
-
-      this.mergeArtifactsWithSettings(xaxis, get(model, 'sqlBuilder.groupBy', {}));
-      this.mergeArtifactsWithSettings(yaxis, get(model, 'sqlBuilder.dataFields.[0]', {}));
-      this.mergeArtifactsWithSettings(groupBy, get(model, 'sqlBuilder.splitBy', {}));
-
-      this.settings = {
-        yaxis,
-        xaxis,
-        groupBy
-      };
-      this.reloadChart(this.settings, this.filteredGridData);
     }
 
     onSettingsChanged() {
