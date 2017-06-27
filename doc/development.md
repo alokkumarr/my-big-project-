@@ -24,3 +24,13 @@ To regenerate SAW Transport Service route files:
 
 Note: This is a workaround until the SAW Transport Service has been
 migrated to Java and Spring Framework.
+
+# Updating sample semantic metadata in SAW Metadata Service
+
+To load the sample semantic metadata JSON files into the SAW Metadata
+Service:
+
+        $ saw-mddb-init/update
+        
+The sample semantic metdata JSON files themselves are in the
+`saw-mddb-init` directory.
