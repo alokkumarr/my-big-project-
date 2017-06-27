@@ -35,6 +35,7 @@ class AnalysisExecutions extends BaseController {
       }
       val data = result.getCachedData("data") match {
         case obj: JArray => obj
+        case obj: JObject => obj
       }
       ("data", data) : JValue
     })

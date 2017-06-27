@@ -284,7 +284,8 @@ class Analysis extends BaseController {
     val json = compact(render(analysisJSON));
     m_log.trace("json dataset: {}", json);
     m_log.trace("type: {}", typeInfo);
-    if ( typeInfo.equals("pivot") ){
+    if ( typeInfo.equals("pivot") )
+    {
       val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json), json);
       val myArray = parse(data);
@@ -309,7 +310,7 @@ class Analysis extends BaseController {
         JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
         JField("id", JString(analysisId)),
         JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-        JField("execution_result", JString(result)),
+        JField("execution_result", JString("success")),
         JField("execution_timestamp", JString(timestamp))
       ))
       m_log debug s"Create result: with content: ${compact(render(descriptor))}"
@@ -321,7 +322,7 @@ class Analysis extends BaseController {
 	        JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
 	        JField("id", JString(analysisId)),
 	        JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-	        JField("execution_result", JString("empty body")),
+	        JField("execution_result", JString("no result")),
 	        JField("execution_timestamp", JString(timestamp)),
 	        JField("error_message", JString(errorMsg))
 	      ))
@@ -365,7 +366,7 @@ class Analysis extends BaseController {
         JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
         JField("id", JString(analysisId)),
         JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-        JField("execution_result", JString(result)),
+        JField("execution_result", JString("success")),
         JField("execution_timestamp", JString(timestamp))
       ))
       m_log debug s"Create result: with content: ${compact(render(descriptor))}"
@@ -377,7 +378,7 @@ class Analysis extends BaseController {
 	        JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
 	        JField("id", JString(analysisId)),
 	        JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
-	        JField("execution_result", JString("empty body")),
+	        JField("execution_result", JString("no result")),
 	        JField("execution_timestamp", JString(timestamp)),
 	        JField("error_message", JString(errorMsg))
 	      ))
