@@ -20,7 +20,8 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     public AnalysisSchedule[] getAnalysisSchedules() {
         String url = analysisUrl + "?view=schedule";
-        return restTemplate.getForObject(url, AnalysisSchedule[].class);
+        return restTemplate.getForObject(url, AnalysisSchedulesResponse.class)
+            .analyses();
     }
 
     public void executeAnalysis(String analysisId) {

@@ -1,10 +1,11 @@
 package com.synchronoss.saw.scheduler.service;
 
 import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,7 +16,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SchedulerServiceImpl implements SchedulerService, CommandLineRunner {
+public class SchedulerServiceImpl
+    implements SchedulerService, CommandLineRunner {
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
     private AnalysisService analysisService;
@@ -32,78 +34,126 @@ public class SchedulerServiceImpl implements SchedulerService, CommandLineRunner
 
     public void run(String... args) {
         log.info("Starting");
-        processSchedules("daily");
-        processSchedules("weekly");
+        processSchedules();
         log.info("Finished");
     }
 
-    public void processSchedules(String type) {
-        log.info("Starting to process schedules of type: {}", type);
-        log.info("Type: {}", type);
-        String executionId = getCurrentExecutionId(type);
-        log.info("Execution ID: {}", executionId);
+    public void processSchedules() {
+        log.info("Starting to process analyses");
+        String periodId = getCurrentPeriodId();
+        log.info("Current period ID: {}", periodId);
         /* Get the list of analyses that have a schedule for the given
          * execution type, for example hourly or daily, from the
          * Analysis Service */
         AnalysisSchedule[] analyses = analysisService.getAnalysisSchedules();
         log.info("Processing analyses");
         for (AnalysisSchedule analysis : analyses) {
-            processAnalysis(schedulerStore, executionId, analysis);
+            processAnalysis(analysis, periodId);
         }
         log.info("Finished processing analyses");
     }
 
     private void processAnalysis(
-        SchedulerStore store, String executionId, AnalysisSchedule analysis) {
+        AnalysisSchedule analysis, String periodId) {
         String analysisId = analysis.id();
         log.info("Process analysis: {}", analysisId);
-        /* Get the last execution ID from the persistent store */
-        String lastExecutionId = store.getLastExecutionId(analysisId);
-        boolean execute = false;
-        log.info("Last execution ID: {}",
-                 lastExecutionId == null ? "not found" : lastExecutionId);
-        if (executionId == null) {
-            /* If analysis has never been executed before, execute it
-             * for the first time now */
-            execute = true;
-            log.info("Execute: {}, because never executed before", execute);
-        } else {
-            /* If analysis has previously been executed, execute it
-             * only if the current invocation is for a new period.
-             * This mechanism of comparing execution IDs ensures that
-             * an analysis is executed only once within each
-             * period.  */
-            execute = (!executionId.equals(lastExecutionId));
-            log.info("Execute: {}, by comparing execution IDs", execute);
+        /* If analysis has already been executed in this period, skip */
+        if (analysisAlreadyExecutedInPeriod(analysisId, periodId)) {
+            log.info("Analysis already executed in current period, skipping");
+            return;
         }
-        if (execute) {
-            /* Post execute request to Analysis Service */
+        /* If analysis is scheduled for execution in this period,
+         * execute */
+        if (analysisScheduledForExecutionInPeriod(analysis, periodId)) {
+            /* Send execute request to Analysis Service */
+            log.info("Execute analysis");
             analysisService.executeAnalysis(analysisId);
-            /* Store the last execution ID to prevent from executing a
-             * further times during the same period */
-            log.info("Set last execution ID: {}", executionId);
-            store.setLastExecutionId(analysisId, executionId);
+            /* Store the last executed period ID to prevent from
+             * executing multiple times during the same period */
+            log.info("Set last executed period ID");
+            schedulerStore.setLastExecutedPeriodId(analysisId, periodId);
         }
     }
 
     /**
-     * Calculate an execution ID that identifies the current period
-     * which can be used to ensure that an analysis is only executed
-     * once within the period
+     * Return true if analysis has already been executed within the
+     * given time period
      */
-    private String getCurrentExecutionId(String type) {
-        String pattern = null;
-        if (type.equals("daily")) {
-            pattern = "yyyyMMdd";
-        } else if (type.equals("hourly")) {
-            pattern = "yyyyMMddHH";
-        } else {
-            throw new IllegalArgumentException(
-                "Unknown execution type: " + type);
+    private boolean analysisAlreadyExecutedInPeriod(
+        String analysisId, String periodId) {
+        String lastPeriodId = schedulerStore.getLastExecutedPeriodId(analysisId);
+        log.info("Last executed period ID: {}",
+                 lastPeriodId == null ? "not found" : lastPeriodId);
+        if (lastPeriodId == null) {
+            /* If analysis has never been executed before, execute it
+             * for the first time now */
+            log.info("Already executed: false, because not executed before");
+            return false;
         }
-        ZonedDateTime date = ZonedDateTime.now(clock);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
-        return String.format(
-            "%s-%s", type.toUpperCase(), date.format(formatter));
+        boolean alreadyExecuted = lastPeriodId.equals(periodId);
+        log.info("Already executed: {}, by comparing last executed " +
+                 "period ID", alreadyExecuted);
+        return alreadyExecuted;
+    }
+
+    /**
+     * Return true if analysis should be executed in the given time
+     * period according to its schedule
+     */
+    private boolean analysisScheduledForExecutionInPeriod(
+        AnalysisSchedule analysis, String periodId) {
+        AnalysisSchedule.Schedule schedule = analysis.schedule();
+        String repeatUnit = schedule.repeatUnit().toLowerCase();
+        if (repeatUnit.equals("daily")) {
+            return daysSinceEpoch() % schedule.repeatInterval() == 0;
+        } else if (repeatUnit.equals("weekly")) {
+            if (weeksSinceEpoch() % schedule.repeatInterval() == 0) {
+                ZonedDateTime zdt = ZonedDateTime.now(clock);
+                AnalysisSchedule.DaysOfWeek days =
+                    schedule.repeatOnDaysOfWeek();
+                switch (zdt.getDayOfWeek()) {
+                case SUNDAY: return days.sunday();
+                case MONDAY: return days.monday();
+                case TUESDAY: return days.tuesday();
+                case WEDNESDAY: return days.wednesday();
+                case THURSDAY: return days.thursday();
+                case FRIDAY: return days.friday();
+                case SATURDAY: return days.saturday();
+                default:
+                    throw new RuntimeException("Unknown day of week");
+                }
+            }
+            return false;
+        } else {
+            log.warn("Unknown repeat unit: {}", schedule.repeatUnit());
+            return false;
+        }
+    }
+
+    /**
+     * Get time period ID for the current period
+     * 
+     * The period ID is used to track when an analysis was last
+     * executed to ensure that it is only executed once within each
+     * period.  Currently periods are one day long.
+     */
+    private String getCurrentPeriodId() {
+        return String.format("DAY-%d", daysSinceEpoch());
+    }
+
+    private long daysSinceEpoch() {
+        return ChronoUnit.DAYS.between(getEpoch(), getNow());
+    }
+
+    private long weeksSinceEpoch() {
+        return ChronoUnit.WEEKS.between(getEpoch(), getNow());
+    }
+
+    private Temporal getEpoch() {
+        return Instant.ofEpochMilli(0).atZone(ZoneOffset.UTC);
+    }
+
+    private Temporal getNow() {
+        return ZonedDateTime.now(clock);
     }
 }

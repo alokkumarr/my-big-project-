@@ -6,7 +6,7 @@ import org.immutables.value.Value;
 
 /**
  * Analysis schedule view representation used when requesting
- * schedules from Analysis Service.
+ * schedules from Analysis Service
  */
 @Value.Immutable
 @Value.Enclosing
@@ -19,10 +19,21 @@ interface AnalysisSchedule {
     @Value.Immutable
     @JsonSerialize(as = ImmutableAnalysisSchedule.Schedule.class)
     @JsonDeserialize(as = ImmutableAnalysisSchedule.Schedule.class)
-    interface Schedule {
-        String repeatUnit();
-        Integer repeatInterval();
-        DaysOfWeek repeatOnDaysOfWeek();
+    abstract class Schedule {
+        abstract String repeatUnit();
+        abstract Integer repeatInterval();
+        @Value.Default
+        DaysOfWeek repeatOnDaysOfWeek() {
+            return ImmutableAnalysisSchedule.DaysOfWeek.builder()
+                .sunday(false)
+                .monday(false)
+                .tuesday(false)
+                .wednesday(false)
+                .thursday(false)
+                .friday(false)
+                .saturday(false)
+                .build();
+        }
 
     }
 
@@ -38,4 +49,11 @@ interface AnalysisSchedule {
         boolean saturday();
         boolean sunday();
     }
+}
+
+@Value.Immutable
+@JsonSerialize(as = ImmutableAnalysisSchedulesResponse.class)
+@JsonDeserialize(as = ImmutableAnalysisSchedulesResponse.class)
+interface AnalysisSchedulesResponse {
+    AnalysisSchedule[] analyses();
 }
