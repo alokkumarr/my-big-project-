@@ -1,6 +1,7 @@
 package com.synchronoss.saw.scheduler.service;
 
 import java.time.Instant;
+import javax.annotation.PostConstruct;
 
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
@@ -24,7 +25,10 @@ public class SchedulerStoreImpl implements SchedulerStore {
         return tableHome + "/saw-scheduler-execution";
     }
 
-    public SchedulerStoreImpl() {
+    public SchedulerStoreImpl() {}
+
+    @PostConstruct
+    public void init() {
         String path = getTablePath();
         boolean exists = MapRDB.tableExists(path);
         table = !exists ? MapRDB.createTable(path) : MapRDB.getTable(path);
