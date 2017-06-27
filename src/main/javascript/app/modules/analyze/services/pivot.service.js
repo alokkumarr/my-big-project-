@@ -1,5 +1,9 @@
 import assign from 'lodash/assign';
 import keys from 'lodash/keys';
+import isEmpty from 'lodash/isEmpty';
+import map from 'lodash/map';
+import mapKeys from 'lodash/mapKeys';
+import isString from 'lodash/isString';
 import find from 'lodash/find';
 import flatMap from 'lodash/flatMap';
 import uniq from 'lodash/uniq';
@@ -37,6 +41,8 @@ export function PivotService() {
     getArea,
     getFrontend2BackendFieldMapper,
     getBackend2FrontendFieldMapper,
+    takeOutKeywordFromData,
+    takeOutKeywordFromArtifactColumns,
     artifactColumns2PivotFields
   };
 
@@ -72,6 +78,39 @@ export function PivotService() {
         fpOmit(['_initProperties', 'selector', 'dataType'])
       )
     );
+  }
+
+  /**
+   * The string type artifact columns' columnNames, have a .keyword at the end
+   * // which triggers some kind of bug in pivot grid, so they have to be removed
+   */
+  function takeOutKeywordFromData(store) {
+    if (isEmpty(store)) {
+      return store;
+    }
+    return map(store, dataObj => {
+      return mapKeys(dataObj, (v, key) => {
+        if (isString(key)) {
+          const split = key.split('.');
+          if (split[1] === 'keyword') {
+            return split[0];
+          }
+        }
+        return key;
+      });
+    });
+  }
+
+  function takeOutKeywordFromArtifactColumns(artifactColumns) {
+    forEach(artifactColumns, artifactColumn => {
+      if (artifactColumn.columnName && artifactColumn.type === 'string') {
+        const split = artifactColumn.columnName.split('.');
+        if (split[1] === 'keyword') {
+          artifactColumn.columnName = split[0];
+        }
+      }
+    });
+    return artifactColumns;
   }
 
   function getBackend2FrontendFieldMapper() {

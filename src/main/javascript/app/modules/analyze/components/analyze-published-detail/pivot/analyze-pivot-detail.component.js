@@ -1,7 +1,7 @@
 import 'devextreme/ui/pivot_grid';
 import isEmpty from 'lodash/isEmpty';
-import map from 'lodash/map';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 
 import template from './analyze-pivot-detail.component.html';
 
@@ -18,34 +18,43 @@ export const AnalyzePivotDetailComponent = {
       this._PivotService = PivotService;
       this._FilterService = FilterService;
       this.pivotGridUpdater = new BehaviorSubject({});
-      this.filters = [];
+      this.dataSource = {};
     }
 
     $onInit() {
 
+      this.fields = this._PivotService.artifactColumns2PivotFields()(this.analysis.artifacts[0].columns);
       this.requester.subscribe(requests => this.request(requests));
+    }
 
-      const pivot = this.analysis.pivot;
-      const artifactAttributes = pivot.artifacts[0].columns;
-
-      this.fields = this._PivotService.getBackend2FrontendFieldMapper()(artifactAttributes);
-      this.deNormalizedData = this._PivotService.denormalizeData(pivot.data, this.fields);
-      this.filters = map(pivot.filters, this._FilterService.backend2FrontendFilter(pivot.artifacts));
-      // TODO runtime filters in SAW-634
-
-      this.openFilterSidenav();
-
+    setDataSource(store, fields) {
+      this.dataSource = new PivotGridDataSource({store, fields});
       this.pivotGridUpdater.next({
-        dataSource: {
-          store: this.deNormalizedData,
-          fields: this.fields
-        }
+        dataSource: this.dataSource
       });
     }
 
-    request(requests) {
+    updatePivot() {
+      this.deNormalizedData = this._PivotService.denormalizeData(this.normalizedData, this.fields);
+      this.deNormalizedData = this._PivotService.takeOutKeywordFromData(this.deNormalizedData);
+      this.dataSource.store = this.deNormalizedData;
+      this.dataSource = new PivotGridDataSource({store: this.dataSource.store, fields: this.fields});
+      this.pivotGridUpdater.next({
+        dataSource: this.dataSource,
+        sorts: this.sorts
+      });
+    }
+
+    request({data, exports}) {
       /* eslint-disable no-unused-expressions */
-      requests.export && this.onExport();
+      exports && this.onExport();
+
+      if (!data) {
+        return;
+      }
+
+      this.normalizedData = data;
+      this.updatePivot();
       /* eslint-disable no-unused-expressions */
     }
 

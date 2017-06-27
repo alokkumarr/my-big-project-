@@ -7,6 +7,7 @@ import fpFilter from 'lodash/fp/filter';
 import find from 'lodash/find';
 import isEmpty from 'lodash/isEmpty';
 import assign from 'lodash/assign';
+import defaults from 'lodash/defaults';
 import unset from 'lodash/unset';
 import filter from 'lodash/filter';
 import cloneDeep from 'lodash/cloneDeep';
@@ -19,9 +20,6 @@ import values from 'lodash/values';
 import fpMapValues from 'lodash/fp/mapValues';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
-
-import mapKeys from 'lodash/mapKeys';
-import isString from 'lodash/isString';
 
 import template from './analyze-pivot.component.html';
 import style from './analyze-pivot.component.scss';
@@ -68,8 +66,10 @@ export const AnalyzePivotComponent = {
           this.loadNewAnalysis();
           break;
         case ENTRY_MODES.EDIT:
-        case ENTRY_MODES.FORK:
           this.loadExistingAnalysis();
+          break;
+        case ENTRY_MODES.FORK:
+          this.loadForkedAnalysis();
           break;
         default:
           break;
@@ -82,7 +82,7 @@ export const AnalyzePivotComponent = {
           this.initModel(analysis);
           this.settingsModified = true;
           this.artifacts = this.getSortedArtifacts(this.model.artifacts);
-          this.artifacts[0].columns = this.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
+          this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
         });
     }
 
@@ -95,8 +95,20 @@ export const AnalyzePivotComponent = {
     loadExistingAnalysis() {
       this.initExistingSettings();
       this.artifacts = this.getSortedArtifacts(this.model.artifacts);
-      this.artifacts[0].columns = this.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
+      this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
       this.loadPivotData();
+    }
+
+    loadForkedAnalysis() {
+      this._AnalyzeService.createAnalysis(this.model.semanticId, this.model.type)
+        .then(analysis => {
+          this.model = defaults(this.model, analysis);
+          this.model.id = analysis.id;
+          this.settingsModified = true;
+          this.artifacts = this.getSortedArtifacts(this.model.artifacts);
+          this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
+          this.loadPivotData();
+        });
     }
 
     initExistingSettings() {
@@ -126,39 +138,6 @@ export const AnalyzePivotComponent = {
       this.pivotGridUpdater.next({
         dataSource: this.dataSource
       });
-    }
-
-    /**
-     * The string type artifact columns' columnNames, have a .keyword at the end
-     * // which triggers some kind of bug in pivot grid, so they have to be removed
-     */
-    takeOutKeywordFromData(store) {
-      if (isEmpty(store)) {
-        return store;
-      }
-      return map(store, dataObj => {
-        return mapKeys(dataObj, (v, key) => {
-          if (isString(key)) {
-            const split = key.split('.');
-            if (split[1] === 'keyword') {
-              return split[0];
-            }
-          }
-          return key;
-        });
-      });
-    }
-
-    takeOutKeywordFromArtifactColumns(artifactColumns) {
-      forEach(artifactColumns, artifactColumn => {
-        if (artifactColumn.columnName && artifactColumn.type === 'string') {
-          const split = artifactColumn.columnName.split('.');
-          if (split[1] === 'keyword') {
-            artifactColumn.columnName = split[0];
-          }
-        }
-      });
-      return artifactColumns;
     }
 
     onRefreshData() {
@@ -195,7 +174,7 @@ export const AnalyzePivotComponent = {
           this.normalizedData = data;
           this.settingsModified = false;
           this.deNormalizedData = this._PivotService.denormalizeData(data, fields);
-          this.deNormalizedData = this.takeOutKeywordFromData(this.deNormalizedData);
+          this.deNormalizedData = this._PivotService.takeOutKeywordFromData(this.deNormalizedData);
           this.dataSource.store = this.deNormalizedData;
           this.dataSource = new PivotGridDataSource({store: this.dataSource.store, fields});
           this.pivotGridUpdater.next({
