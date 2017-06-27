@@ -42,4 +42,7 @@
     <module>rt-data-model</module>
     <module>frontend-server</module>
   </modules>
+  <build>
+    <defaultGoal>package</defaultGoal>
+  </build>
 </project>
