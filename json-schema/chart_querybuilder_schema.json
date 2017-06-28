@@ -140,9 +140,6 @@
                 "type": "string"
               }
             },
-            "required": [
-              "model"
-            ],
             "type": "object"
           },
           "type": "array"

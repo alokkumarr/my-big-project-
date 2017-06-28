@@ -183,8 +183,7 @@
                   "id":"/properties/filters/items/properties/type",
                   "type":"string"
               }
-            },
-            "required" : ["model"]
+            }
           },
           "type":"array"
         },
