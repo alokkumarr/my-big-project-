@@ -35,6 +35,10 @@ done as follows:
 Note: This is a workaround until the SAW Transport Service has been
 migrated to Java and Spring Framework.
 
+The generated files pattern can be found in the
+`saw-transport-service/generate-routes` script near the `rm -rf`
+command.
+
 # Updating sample semantic metadata in SAW Metadata Service
 
 To load the sample semantic metadata JSON files into the SAW Metadata
