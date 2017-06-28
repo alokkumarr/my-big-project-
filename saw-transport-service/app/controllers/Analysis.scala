@@ -201,8 +201,8 @@ class Analysis extends BaseController {
         "Expected array: " + analysisListJson)
     }
     val analysis = (analysisJson \ "schedule") match {
-      case obj: JObject => analysisJson ~ ("isScheduled", "true")
-      case _ => analysisJson ~ ("isScheduled", "false")
+      case obj: JObject => updateField(analysisJson, "isScheduled", "true")
+      case _ => updateField(analysisJson, "isScheduled", "false")
     }
     val analysisType = (analysisListJson \ "type");
     val typeInfo = analysisType.extract[String];
@@ -432,5 +432,15 @@ class Analysis extends BaseController {
     }).drop(1)
     // This is the end of report type ends here
     }
+  }
+
+  private def updateField(json: JObject, name: String, value: JValue) = {
+    ((json removeField {
+      case JField(fieldName, _) => fieldName == name
+      case _ => false
+    }) match {
+      case obj: JObject => obj
+      case obj => throw new RuntimeException("Unsupported type: " + obj)
+    }) ~ (name, value)
   }
 }
