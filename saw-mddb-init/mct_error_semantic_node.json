@@ -104,8 +104,8 @@
               },
               {
                 "name": "SERVER_DIM_DATE",
-                "type": "string",
-                "columnName": "SERVER_DIM_DATE.keyword",
+                "type": "timestamp",
+                "columnName": "DER_SERVER_DIM_DATE",
                 "displayName": "Server Dim Date",
                 "aliasName": "",
                 "table": "MCT_ERROR_SUMMARY",
