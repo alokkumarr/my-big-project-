@@ -21,15 +21,23 @@ is provided by Synchronoss operations:
 Execute the following steps to install SAW Services in the
 environment:
 
-1. ...
+1. Install the SAW Metadata Service by...
+
+2. Install the SAW Scheduler Service by copying the
+   `saw-scheduler-service.jar` file to
+   `/opt/saw-scheduler-service/saw-scheduler-service.jar` on one of
+   the SAW nodes.  Additionally create an executable file
+   `saw-scheduler-service-daily` with the following content:
+
+        sudo -u mapr java -jar /opt/saw-scheduler-service/saw-scheduler-service.jar 2>&1 | logger -t saw-scheduler-service
 
 # Upgrading
 
-Execute the following steps to upgrade an existing SAW Services
-deployment to a newer version:
-
-1. ...
+To upgrade an existing SAW Services installation, follow the same
+steps as for installing an entirely new environments.
 
 # Logs
 
-The application logs...
+The application logs are found in `/var/log/messages`.  For now the
+SAW Metadata Service does not use syslog and instead logs into
+`/var/saw/service/log`.

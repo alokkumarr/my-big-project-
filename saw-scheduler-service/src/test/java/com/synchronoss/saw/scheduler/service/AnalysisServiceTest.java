@@ -45,7 +45,7 @@ public class AnalysisServiceTest {
     @Test
     public void testAnalysisSchedules() throws Exception {
         /* Set up mock response */
-        String json = objectMapper.writeValueAsString(getMockAnalyses());
+        String json = objectMapper.writeValueAsString(mockAnalysisResponse());
         log.trace("Mock analysis schedules JSON: {}", json);
         server.expect(requestTo(analysisUrl + "?view=schedule"))
             .andRespond(withSuccess(json, MediaType.APPLICATION_JSON));
@@ -57,9 +57,8 @@ public class AnalysisServiceTest {
         assertThat(schedule.schedule().repeatUnit()).isEqualTo("weekly");
     }
 
-    private AnalysisSchedule[] getMockAnalyses() {
-        return new AnalysisSchedule[] {
-            ImmutableAnalysisSchedule.builder()
+    private AnalysisSchedulesResponse mockAnalysisResponse() {
+        AnalysisSchedule analysis = ImmutableAnalysisSchedule.builder()
             .id(ANALYSIS_ID)
             .schedule(
                 ImmutableAnalysisSchedule.Schedule.builder()
@@ -76,8 +75,9 @@ public class AnalysisServiceTest {
                     .saturday(false)
                     .build())
                 .build())
-            .build()
-        };
+            .build();
+        return ImmutableAnalysisSchedulesResponse.builder()
+            .analyses(new AnalysisSchedule[] {analysis}).build();
     }
 
     @Test

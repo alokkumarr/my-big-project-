@@ -1,7 +1,8 @@
 package com.synchronoss.saw.scheduler.service;
 
 interface SchedulerStore extends AutoCloseable {
-    String getLastExecutionId(String analysisId);
-    void setLastExecutionId(String analysisId, String lastExecutionId);
+    String getLastExecutedPeriodId(String analysisId);
+    void setLastExecutedPeriodId(
+        String analysisId, String lastExecutedPeriodId);
     void close();
 }

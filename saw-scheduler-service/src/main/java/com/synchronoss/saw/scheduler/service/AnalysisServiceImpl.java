@@ -5,10 +5,10 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-@Service
+@Component
 public class AnalysisServiceImpl implements AnalysisService {
     @Value("${saw-analysis-service-url}")
     private String analysisUrl;
@@ -20,7 +20,8 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     public AnalysisSchedule[] getAnalysisSchedules() {
         String url = analysisUrl + "?view=schedule";
-        return restTemplate.getForObject(url, AnalysisSchedule[].class);
+        return restTemplate.getForObject(url, AnalysisSchedulesResponse.class)
+            .analyses();
     }
 
     public void executeAnalysis(String analysisId) {
