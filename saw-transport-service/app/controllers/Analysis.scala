@@ -271,7 +271,7 @@ class Analysis extends BaseController {
  	var json: String = "";
  	var typeInfo : String = "";
  	var analysisJSON : JObject = null;
- 	m_log.info("json dataset: {}", reqJSON);
+ 	m_log.trace("json dataset: {}", reqJSON);
     val analysis = analysisJson(reqJSON); // reading from request body
     val executionType = (analysis \ "executionType");
     if (executionType == "preview" || executionType == "scheduled"){
