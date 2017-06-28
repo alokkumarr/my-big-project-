@@ -213,6 +213,7 @@ export function ChartService() {
      various chart types */
   const dataCustomizer = {
     column: gridToChart,
+    bar: gridToChart,
     line: gridToChart,
     spline: gridToChart,
     stack: gridToChart,
