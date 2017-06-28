@@ -1,0 +1,292 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {},
+  "id": "http://example.com/example.json",
+  "properties": {
+    "sqlBuilder": {
+      "id": "/properties/sqlBuilder",
+      "properties": {
+        "dataFields": {
+          "id": "/properties/sqlBuilder/properties/dataFields",
+          "items": {
+            "id": "/properties/sqlBuilder/properties/dataFields/items",
+            "properties": {
+              "aggregate": {
+                "enum": [
+                  "avg",
+                  "sum",
+                  "min",
+                  "max",
+                  "count"
+                ],
+                "id": "/properties/sqlBuilder/properties/dataFields/items/properties/aggregate",
+                "type": "string"
+              },
+              "columnName": {
+                "id": "/properties/sqlBuilder/properties/dataFields/items/properties/columnName",
+                "type": "string"
+              },
+              "name": {
+                "id": "/properties/sqlBuilder/properties/dataFields/items/properties/name",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "date",
+                  "timestamp",
+                  "long",
+                  "double",
+                  "float",
+                  "integer",
+                  "string"
+                ],
+                "id": "/properties/sqlBuilder/properties/dataFields/items/properties/type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "aggregate",
+              "columnName",
+              "type",
+              "name"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "booleanCriteria": {
+          "enum": [
+            "AND",
+            "OR"
+          ],
+          "id": "/properties/filters/model/properties/booleanCriteria",
+          "type": "string"
+        },
+        "filters": {
+          "id": "/properties/filters",
+          "items": {
+            "id": "/properties/filters/items",
+            "properties": {
+              "columnName": {
+                "id": "/properties/filters/items/properties/columnName",
+                "type": "string"
+              },
+              "isRuntimeFilter": {
+                "enum": [
+                  false,
+                  true
+                ],
+                "id": "/properties/filters/items/properties/isRuntimeFilter",
+                "type": "boolean"
+              },
+              "model": {
+                "properties": {
+                  "operator": {
+                    "enum": [
+                      "GT",
+                      "LT",
+                      "GTE",
+                      "LTE",
+                      "EQ",
+                      "NEQ",
+                      "BTW"
+                    ],
+                    "id": "/properties/filters/model/properties/booleanCriteria",
+                    "type": "string"
+                  },
+                  "value": {
+                    "id": "/properties/filters/model/properties/value",
+                    "type": "integer"
+                  },
+                  "otherValue": {
+                    "id": "/properties/filters/model/properties/otherValue",
+                    "type": "integer"
+                  },
+                  "gte": {
+                    "id": "/properties/filters/model/properties/gte",
+                    "type": "string"
+                  },
+                  "lte": {
+                    "id": "/properties/filters/model/properties/lte",
+                    "type": "string"
+                  },
+                  "format": {
+                    "id": "/properties/filters/model/properties/format",
+                    "type": "string"
+                  },
+                  "modelValues": {
+                    "id": "/properties/filters/model/properties/modelValues",
+                    "type": "array"
+                  }
+                },
+                "id": "/properties/filters/items/properties/model",
+                "type": "object"
+              },
+              "tableName": {
+                "id": "/properties/filters/items/properties/tableName",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "long",
+                  "string",
+                  "integer",
+                  "double",
+                  "date",
+                  "timestamp",
+                  "float"
+                ],
+                "id": "/properties/filters/items/properties/type",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "sorts": {
+          "id": "/properties/sqlBuilder/properties/sort",
+          "items": {
+            "id": "/properties/sqlBuilder/properties/sort/items",
+            "properties": {
+              "columnName": {
+                "id": "/properties/sqlBuilder/properties/sort/items/properties/columnName",
+                "type": "string"
+              },
+              "order": {
+                "enum": [
+                  "desc",
+                  "asc"
+                ],
+                "id": "/properties/sqlBuilder/properties/sort/items/properties/order",
+                "type": "string"
+              },
+              "type": {
+                "enum": [
+                  "date",
+                  "timestamp",
+                  "long",
+                  "double",
+                  "integer",
+                  "string",
+                  "float"
+                ],
+                "id": "/properties/sqlBuilder/properties/sort/items/properties/type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "columnName",
+              "type",
+              "order"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "groupBy": {
+          "id": "/properties/sqlBuilder/properties/sort/items",
+          "properties": {
+            "columnName": {
+              "id": "/properties/sqlBuilder/properties/sort/items/properties/columnName",
+              "type": "string"
+            },
+            "type": {
+              "enum": [
+                "date",
+                "timestamp",
+                "long",
+                "double",
+                "integer",
+                "string",
+                "float"
+              ],
+              "id": "/properties/sqlBuilder/groupBy/properties/type",
+              "type": "string"
+            },
+            "tableName": {
+              "id": "/properties/sqlBuilder/groupBy/properties/tableName",
+              "type": "string"
+            },
+            "name": {
+              "id": "/properties/sqlBuilder/groupBy/properties/name",
+              "type": "string"
+            },
+            "groupInterval": {
+              "enum": [
+                "year",
+                "month",
+                "day",
+                "quarter",
+                "hour",
+                "week"
+              ],
+              "id": "/properties/sqlBuilder/properties/columnFields/items/properties/groupInterval",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "columnName"
+          ],
+          "type": "object"
+        },
+        "splitBy": {
+          "id": "/properties/sqlBuilder/properties/splitBy/items",
+          "properties": {
+            "columnName": {
+              "id": "/properties/sqlBuilder/properties/sort/items/properties/columnName",
+              "type": "string"
+            },
+            "type": {
+              "enum": [
+                "date",
+                "timestamp",
+                "long",
+                "double",
+                "integer",
+                "string",
+                "float"
+              ],
+              "id": "/properties/sqlBuilder/groupBy/properties/type",
+              "type": "string"
+            },
+            "tableName": {
+              "id": "/properties/sqlBuilder/groupBy/properties/tableName",
+              "type": "string"
+            },
+            "name": {
+              "id": "/properties/sqlBuilder/groupBy/properties/name",
+              "type": "string"
+            },
+            "groupInterval": {
+              "enum": [
+                "year",
+                "month",
+                "day",
+                "quarter",
+                "hour",
+                "week"
+              ],
+              "id": "/properties/sqlBuilder/properties/columnFields/items/properties/groupInterval",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "columnName"
+          ],
+          "type": "object"
+        }
+      },
+      "required": [
+        "sorts",
+        "filters",
+        "dataFields"
+      ]
+    }
+  },
+  "required": [
+    "sqlBuilder"
+  ]
+}
