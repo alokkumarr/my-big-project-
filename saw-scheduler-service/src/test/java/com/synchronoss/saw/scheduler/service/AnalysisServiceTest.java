@@ -50,9 +50,9 @@ public class AnalysisServiceTest {
         server.expect(requestTo(analysisUrl + "?view=schedule"))
             .andRespond(withSuccess(json, MediaType.APPLICATION_JSON));
         /* Get analysis schedules */
-        List<AnalysisSchedule> analyses = service.getAnalysisSchedules();
+        AnalysisSchedule[] analyses = service.getAnalysisSchedules();
         assertThat(analyses).hasSize(1);
-        AnalysisSchedule schedule = analyses.get(0);
+        AnalysisSchedule schedule = analyses[0];
         assertThat(schedule.id()).isEqualTo(ANALYSIS_ID);
         assertThat(schedule.schedule().repeatUnit()).isEqualTo("weekly");
     }

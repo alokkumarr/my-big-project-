@@ -12,12 +12,12 @@ object QueryBuilder {
     val artifacts = json \ "artifacts" match {
       case artifacts: JArray => artifacts.arr
       case JNothing => List()
-      case obj: JValue => unexpectedElement(obj)
+      case obj: JValue => unexpectedElement(obj, "array", "artifacts")
     }
     val sqlBuilder = json \ "sqlBuilder" match {
       case obj: JObject => obj
       case JNothing => JObject()
-      case obj: JValue => unexpectedElement(obj)
+      case obj: JValue => unexpectedElement(obj, "object", "sqlBuilder")
     }
     "%s %s %s %s %s".format(
       buildSelect(artifacts, sqlBuilder),
@@ -112,7 +112,7 @@ object QueryBuilder {
   private def isArtifactChecked(artifact: JValue): Boolean = {
       val columns: List[JValue] = artifact \ "columns" match {
         case columns: JArray => columns.arr
-        case json: JValue => unexpectedElement(json)
+        case json: JValue => unexpectedElement(json, "array", "columns")
       }
       columns.filter(columnChecked(_)).length > 0
   }
@@ -121,7 +121,7 @@ object QueryBuilder {
     val filters = ((sqlBuilder \ "filters") match {
       case filters: JArray => filters.arr
       case JNothing => List()
-      case json: JValue => unexpectedElement(json)
+      case json: JValue => unexpectedElement(json, "array", "filters")
     }).filter((filter: JValue) => {
       !(filter \ "isRuntimeFilter").extract[Boolean] || runtime
     }).map(buildWhereFilterElement)
@@ -160,7 +160,7 @@ object QueryBuilder {
             case "lte" => "<="
             case "eq" => "="
             case "neq" => "!="
-            case obj => unexpectedElement("Operator: " + obj)
+            case obj => throw new ClientException("Unknown operator: " + obj)
           }
           "%s %s".format(operatorSql, value)
         }
@@ -168,7 +168,7 @@ object QueryBuilder {
       case "string" => {
          val modelValues = ((filter \ "model" \ "modelValues") match {
            case array: JArray => array.arr
-           case obj => unexpectedElement("Model values: " + obj)
+           case obj => unexpectedElement(obj, "array", "modelValues")
          }).map(_.extract[String])
         "IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
       }
@@ -208,7 +208,7 @@ object QueryBuilder {
     val orderBy: List[JValue] = sqlBuilder \ "orderByColumns" match {
       case l: JArray => l.arr
       case JNothing => List.empty
-      case json: JValue => unexpectedElement(json)
+      case json: JValue => unexpectedElement(json, "array", "orderByColumns")
     }
     if (orderBy.isEmpty) {
       ""
@@ -232,13 +232,16 @@ object QueryBuilder {
     json \ name match {
       case l: JArray => l.arr
       case JNothing => List.empty
-      case json: JValue => unexpectedElement(json)
+      case json: JValue => unexpectedElement(json, "array", name)
     }
   }
 
-  def unexpectedElement(json: JValue): Nothing = {
+  def unexpectedElement(
+    json: JValue, expected: String, location: String): Nothing = {
     val name = json.getClass.getSimpleName
-    throw new ClientException("Unexpected element: %s".format(name))
+    throw new ClientException(
+      "Unexpected element: %s, expected %s, at %s".format(
+        name, expected, location))
   }
 }
 
@@ -285,7 +288,8 @@ object JoinRelation {
     }
     val criteria = property("criteria") match {
       case criteria: JArray => criteria.arr
-      case value: JValue => QueryBuilder.unexpectedElement(value)
+      case value: JValue => QueryBuilder.unexpectedElement(
+        value, "array", "criteria")
     }
     if (criteria.length != 2) {
       throw new ClientException(

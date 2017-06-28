@@ -1,5 +1,6 @@
 package com.synchronoss.saw.scheduler.service;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -17,8 +18,17 @@ import org.springframework.stereotype.Component;
 public class SchedulerServiceImpl implements SchedulerService, CommandLineRunner {
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
-    @Autowired
     private AnalysisService analysisService;
+    private SchedulerStore schedulerStore;
+    private Clock clock;
+
+    public SchedulerServiceImpl(
+        AnalysisService analysisService, SchedulerStore schedulerStore,
+        Clock clock) {
+        this.analysisService = analysisService;
+        this.schedulerStore = schedulerStore;
+        this.clock = clock;
+    }
 
     public void run(String... args) {
         log.info("Starting");
@@ -35,13 +45,10 @@ public class SchedulerServiceImpl implements SchedulerService, CommandLineRunner
         /* Get the list of analyses that have a schedule for the given
          * execution type, for example hourly or daily, from the
          * Analysis Service */
-        List<AnalysisSchedule> analyses = analysisService.
-            getAnalysisSchedules();
-        try (SchedulerStore store = new SchedulerStore()) {
-            log.info("Processing analyses");
-            for (AnalysisSchedule analysis : analyses) {
-                processAnalysis(store, executionId, analysis);
-            }
+        AnalysisSchedule[] analyses = analysisService.getAnalysisSchedules();
+        log.info("Processing analyses");
+        for (AnalysisSchedule analysis : analyses) {
+            processAnalysis(schedulerStore, executionId, analysis);
         }
         log.info("Finished processing analyses");
     }
@@ -94,7 +101,7 @@ public class SchedulerServiceImpl implements SchedulerService, CommandLineRunner
             throw new IllegalArgumentException(
                 "Unknown execution type: " + type);
         }
-        ZonedDateTime date = ZonedDateTime.now();
+        ZonedDateTime date = ZonedDateTime.now(clock);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         return String.format(
             "%s-%s", type.toUpperCase(), date.format(formatter));

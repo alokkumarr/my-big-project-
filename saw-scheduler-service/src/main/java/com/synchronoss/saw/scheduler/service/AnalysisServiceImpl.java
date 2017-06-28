@@ -1,9 +1,5 @@
 package com.synchronoss.saw.scheduler.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
@@ -22,11 +18,9 @@ public class AnalysisServiceImpl implements AnalysisService {
         restTemplate = restTemplateBuilder.build();
     }
 
-    public List<AnalysisSchedule> getAnalysisSchedules() {
+    public AnalysisSchedule[] getAnalysisSchedules() {
         String url = analysisUrl + "?view=schedule";
-        AnalysisSchedule[] schedules = restTemplate.getForObject(
-            url, AnalysisSchedule[].class);
-        return Arrays.asList(schedules);
+        return restTemplate.getForObject(url, AnalysisSchedule[].class);
     }
 
     public void executeAnalysis(String analysisId) {
