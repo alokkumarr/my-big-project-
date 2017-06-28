@@ -15,6 +15,7 @@ import sncr.analysis.execution.ExecutionTaskHandler
 import sncr.datalake.DLConfiguration
 import sncr.datalake.engine.ExecutionType
 import sncr.metadata.analysis.AnalysisNode
+import sncr.metadata.analysis.AnalysisResult
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine.context.SelectModels
 import sncr.metadata.semantix.SemanticNode
