@@ -7,10 +7,11 @@ import assign from 'lodash/assign';
 import map from 'lodash/map';
 import values from 'lodash/values';
 import clone from 'lodash/clone';
-import filter from 'lodash/filter';
 import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
-import {NUMBER_TYPES} from '../../services/filter.service';
+import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
+
+import {ENTRY_MODES} from '../../consts';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -23,7 +24,7 @@ export const AnalyzeChartComponent = {
     mode: '@?'
   },
   controller: class AnalyzeChartController {
-    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, ChartService, FilterService, $mdSidenav, $window) {
+    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, ChartService, FilterService, $mdSidenav) {
       'ngInject';
 
       this._FilterService = FilterService;
@@ -31,6 +32,7 @@ export const AnalyzeChartComponent = {
       this._ChartService = ChartService;
       this._$mdSidenav = $mdSidenav;
       this._$mdDialog = $mdDialog;
+      this._$timeout = $timeout;
 
       this.legend = {
         align: get(this.model, 'legend.align', 'right'),
@@ -53,7 +55,6 @@ export const AnalyzeChartComponent = {
       this.filters = [];
 
       this.chartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
-      $window.chartctrl = this;
     }
 
     toggleLeft() {
@@ -61,34 +62,40 @@ export const AnalyzeChartComponent = {
     }
 
     $onInit() {
-      if (this.mode === 'fork') {
+      if (this.mode === ENTRY_MODES.FORK) {
         delete this.model.id;
       }
 
-      if (this.mode === 'edit') {
+      if (this.mode === ENTRY_MODES.EDIT) {
         this.initChart();
+        this.refreshChartData();
       } else {
-        this._AnalyzeService.createAnalysis(this.model.artifactsId, 'chart').then(analysis => {
+        this._AnalyzeService.createAnalysis(this.model.semanticId, 'chart').then(analysis => {
           this.model = assign(analysis, this.model);
+          set(this.model, 'sqlBuilder.booleanCriteria', DEFAULT_BOOLEAN_CRITERIA.value);
           this.initChart();
         });
       }
     }
 
     initChart() {
-      this.fillSettings(this.model.artifacts, this.model);
+      this.settings = this._ChartService.fillSettings(this.model.artifacts, this.model);
+      this.reloadChart(this.settings, this.filteredGridData);
 
-      if (isEmpty(this.mode) || isEmpty(this.model.chart)) {
+      if (isEmpty(this.mode)) {
         return;
       }
 
       this.labels.tempX = this.labels.x = get(this.model, 'xAxis.title', null);
       this.labels.tempY = this.labels.y = get(this.model, 'yAxis.title', null);
-      this.filters.selected = map(
+      this.filters = map(
         get(this.model, 'sqlBuilder.filters', []),
-        this._FilterService.backend2FrontendFilter()
+        this._FilterService.backend2FrontendFilter(this.model.artifacts)
       );
-      this.onSettingsChanged(this.settings);
+      this.onSettingsChanged();
+      this._$timeout(() => {
+        this.updateLegendPosition();
+      });
     }
 
     updateLegendPosition() {
@@ -111,20 +118,6 @@ export const AnalyzeChartComponent = {
       ]);
     }
 
-    mergeArtifactsWithSettings(artifacts, record) {
-      const id = findIndex(artifacts, a => {
-        return a.columnName === record.columnName &&
-        a.tableName === record.tableName;
-      });
-
-      if (id >= 0) {
-        record.checked = true;
-        artifacts.splice(id, 1, record);
-      }
-
-      return artifacts;
-    }
-
     updateCustomLabels() {
       this.labels.x = this.labels.tempX;
       this.labels.y = this.labels.tempY;
@@ -139,49 +132,27 @@ export const AnalyzeChartComponent = {
         });
     }
 
-    fillSettings(artifacts, model) {
-      /* Flatten the artifacts into a single array */
-      const attributes = artifacts.reduce((res, metric) => {
-        return res.concat(map(metric.columns, attr => {
-          attr.tableName = metric.artifactName;
-          return attr;
-        }));
-      }, []);
-
-      /* Based on data type, divide the artifacts between axes. */
-      const yaxis = filter(attributes, attr => (
-        attr.columnName &&
-        NUMBER_TYPES.indexOf(attr.type) >= 0
-      ));
-      const xaxis = filter(attributes, attr => (
-        attr.columnName &&
-        (attr.type === 'string' || attr.type === 'String')
-      ));
-      const groupBy = map(xaxis, clone);
-
-      this.mergeArtifactsWithSettings(xaxis, get(model, 'sqlBuilder.groupBy', {}));
-      this.mergeArtifactsWithSettings(yaxis, get(model, 'dataColumns.[0]', {}));
-      this.mergeArtifactsWithSettings(groupBy, get(model, 'sqlBuilder.splitBy', {}));
-
-      this.settings = {
-        yaxis,
-        xaxis,
-        groupBy
-      };
-      this.reloadChart(this.settings, this.filteredGridData);
+    onSettingsChanged() {
+      this.analysisChanged = true;
     }
 
     clearFilters() {
       this.filters = [];
+      this.analysisChanged = true;
     }
 
     onFilterRemoved(index) {
       this.filters.splice(index, 1);
+      this.analysisChanged = true;
     }
 
-    onApplyFilters(filters) {
+    onApplyFilters({filters, filterBooleanCriteria} = {}) {
       if (filters) {
         this.filters = filters;
+        this.analysisChanged = true;
+      }
+      if (filterBooleanCriteria) {
+        this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;
       }
     }
 
@@ -199,12 +170,13 @@ export const AnalyzeChartComponent = {
     }
 
     openFiltersModal(ev) {
-      const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts"></analyze-filter-modal>';
+      const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria"></analyze-filter-modal>';
       this._$mdDialog.show({
         template: tpl,
         controller: scope => {
           scope.filters = cloneDeep(this.filters);
           scope.artifacts = this.model.artifacts;
+          scope.booleanCriteria = this.model.sqlBuilder.booleanCriteria;
         },
         targetEvent: ev,
         fullscreen: true,
@@ -275,16 +247,18 @@ export const AnalyzeChartComponent = {
       const result = clone(source);
 
       set(result, 'sqlBuilder.filters', map(
-        this.filters.selected,
+        this.filters,
         this._FilterService.frontend2BackendFilter()
       ));
 
       const y = find(this.settings.yaxis, x => x.checked);
 
       delete result.supports;
+      set(result, 'sqlBuilder.sorts', []);
       set(result, 'sqlBuilder.groupBy', find(this.settings.xaxis, x => x.checked));
       set(result, 'sqlBuilder.splitBy', find(this.settings.groupBy, x => x.checked));
       set(result, 'sqlBuilder.dataFields', [assign({aggregate: 'sum'}, y)]);
+      set(result, 'sqlBuilder.booleanCriteria', this.model.sqlBuilder.booleanCriteria);
       set(result, 'xAxis', {title: this.labels.x});
       set(result, 'yAxis', {title: this.labels.y});
       set(result, 'legend', {

@@ -4,10 +4,25 @@ export function UsersManagementService($http, AppConfig) {
   'ngInject';
   const loginUrl = AppConfig.login.url;
   return {
-    getActiveUsersList
+    getActiveUsersList,
+    getRoles,
+    saveUser,
+    deleteUser,
+    updateUser
   };
-  function getActiveUsersList(customerId, token) {
-    $http.defaults.headers.common.Authorization = 'Bearer ' + token;
+  function getActiveUsersList(customerId) {
     return $http.post(`${loginUrl}/auth/admin/cust/manage/users/fetch`, customerId).then(fpGet('data'));
+  }
+  function getRoles(customerId) {
+    return $http.post(`${loginUrl}/auth/admin/cust/manage/roles/list`, customerId).then(fpGet('data'));
+  }
+  function saveUser(user) {
+    return $http.post(`${loginUrl}/auth/admin/cust/manage/users/add`, user).then(fpGet('data'));
+  }
+  function deleteUser(user) {
+    return $http.post(`${loginUrl}/auth/admin/cust/manage/users/delete`, user).then(fpGet('data'));
+  }
+  function updateUser(user) {
+    return $http.post(`${loginUrl}/auth/admin/cust/manage/users/edit`, user).then(fpGet('data'));
   }
 }

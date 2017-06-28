@@ -20,12 +20,11 @@
       </filter-chips>
     </div>
     <div layout="column" layout-align="space-between center">
-      <report-grid-display-container data="$ctrl.filteredGridData"
-                            columns="$ctrl.analysis.report.columns"
-                            groups="$ctrl.analysis.report.groupByColumns"
+      <report-grid-display-container data="$ctrl.gridData"
+                            columns="$ctrl.columns"
+                            groups="$ctrl.analysis.groupByColumns"
                             requester="$ctrl.requester">
       </report-grid-display-container>
     </div>
   </md-card-content>
 </md-card>
-

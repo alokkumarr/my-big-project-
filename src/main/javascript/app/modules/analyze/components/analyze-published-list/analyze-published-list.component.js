@@ -5,6 +5,7 @@ export const AnalyzePublishedListComponent = {
   template,
   // styles: [style],
   bindings: {
+    analysis: '<',
     analyses: '<'
   },
   controller: class AnalyzePublishedListController {
@@ -23,7 +24,6 @@ export const AnalyzePublishedListComponent = {
         caption: 'DATE',
         dataField: 'finished',
         dataType: 'date',
-        sortOrder: 'desc',
         format: 'shortDateShortTime',
         allowSorting: true,
         alignment: 'left',
@@ -37,7 +37,7 @@ export const AnalyzePublishedListComponent = {
       }];
       this.gridConfig = dxDataGridService.mergeWithDefaultConfig({
         onRowClick: row => {
-          this.goToAnalysis(row.data);
+          this.goToExecution(row.data);
         },
         columns,
         bindingOptions: {
@@ -53,10 +53,11 @@ export const AnalyzePublishedListComponent = {
       });
     }
 
-    goToAnalysis(analysis) {
+    goToExecution(executedAnalysis) {
       this._$state.go('analyze.publishedDetail', {
-        publishId: analysis.PUBLISHED_ANALYSIS_ID,
-        analysisId: analysis.ANALYSIS_ID
+        executionId: executedAnalysis.id,
+        analysisId: this.analysis.id,
+        analysis: this.analysis
       });
     }
   }

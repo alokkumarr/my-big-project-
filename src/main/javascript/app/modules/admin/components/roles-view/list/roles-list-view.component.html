@@ -1,0 +1,40 @@
+<md-card>
+  <md-card-header layout="row" layout-align="end start">
+    <md-card-title>
+      <md-card-title-text>
+        <span class="md-headline" translate="CUST_NAME" translate-value-customer="{{$ctrl.customer}}"></span>        
+      </md-card-title-text>
+    </md-card-title>
+  </md-card-header>
+
+  <md-card-content layout="row">
+    <div dx-data-grid="$ctrl.gridConfig" dx-item-alias="report">      
+      <div data-options="dxTemplate: { name: 'roleNameCellTemplate' }" >
+        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>
+      </div>
+      <div data-options="dxTemplate: { name: 'roleTypeCellTemplate' }" >
+        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>   
+      </div>
+      <div data-options="dxTemplate: { name: 'roleCodeCellTemplate' }" >
+        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>   
+      </div>
+      <div data-options="dxTemplate: { name: 'statusCellTemplate' }">
+        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>
+      </div>
+      <div data-options="dxTemplate: { name: 'actionCellTemplate' }">
+        <md-card-actions layout="row" layout-align="center center">
+          <md-button class="md-button btn-card" aria-label="Edit"
+            ng-click="$ctrl.openEditModal(report.data)">
+            <md-tooltip ng-bind="'TOOLTIP_EDIT_ROLE' | translate"></md-tooltip>
+            <md-icon md-font-icon="icon-edit"></md-icon>
+          </md-button>
+          <md-button class="md-button btn-card" aria-label="Delete" ng-disabled="report.data.activeStatusInd == 'Inactive'"
+            ng-click="$ctrl.openDeleteModal(report.data)">
+            <md-tooltip ng-bind="'TOOLTIP_DELETE_ROLE' | translate"></md-tooltip>
+            <md-icon md-font-icon="icon-trash"></md-icon>
+          </md-button>
+        </md-card-actions>
+      </div>
+    </div>
+  </md-card-content>
+</md-card>

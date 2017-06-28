@@ -1,10 +1,15 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
-import uniq from 'lodash/uniq';
+import map from 'lodash/map';
+import flatMap from 'lodash/flatMap';
+import sortBy from 'lodash/sortBy';
+import clone from 'lodash/clone';
 import reduce from 'lodash/reduce';
 import keys from 'lodash/keys';
 import forEach from 'lodash/forEach';
 import filter from 'lodash/filter';
+
+import {NUMBER_TYPES} from '../consts';
 
 const LEGEND_POSITIONING = {
   left: {
@@ -89,7 +94,7 @@ export function ChartService() {
 
     const config = {
       chart: {
-        type: type || 'column',
+        type: (type === 'line' ? 'spline' : type) || 'column',
         spacingLeft: SPACING,
         spacingRight: SPACING,
         spacingBottom: SPACING,
@@ -152,22 +157,41 @@ export function ChartService() {
     ];
   };
 
-  const gridToChart = (x, y, g, grid) => {
+  const gridToChart = (x, y, l, data) => {
     const defaultSeriesName = x ? x.displayName : 'Series 1';
-    const categories = uniq(grid.map(row => row[x.columnName]));
 
-    const defaultSeries = () => reduce(categories, (obj, c) => {
-      obj[c] = 0;
+    const categories = map(
+      get(data, 'group_by.buckets'),
+      bucket => bucket.key
+    );
+
+    const defaultSeries = () => reduce(categories, (obj, cat) => {
+      obj[cat] = 0;
       return obj;
     }, {});
 
-    const res = reduce(grid, (obj, row) => {
-      const category = row[x.columnName];
-      const series = row[g.columnName] || defaultSeriesName;
-      obj[series] = obj[series] || defaultSeries();
-      obj[series][category] += row[y.columnName];
-      return obj;
-    }, {});
+    /* Produces an object where each key is a unique value for @l column.
+       The corresponding value is another object, where each key value pair
+       is a value for @x column, and @y.
+       */
+    const res = reduce(
+      get(data, 'group_by.buckets'),
+      (obj, bucket) => {
+        forEach(
+          get(bucket, 'split_by.buckets', [{
+            key: defaultSeriesName,
+            [y.columnName]: {value: get(bucket[y.columnName], 'value', 0)}
+          }]),
+          subBucket => {
+            obj[subBucket.key] = obj[subBucket.key] || defaultSeries();
+            obj[subBucket.key][bucket.key] = subBucket[y.columnName].value;
+          }
+        );
+
+        return obj;
+      },
+      {}
+    );
 
     const xCategories = keys(defaultSeries());
     return [
@@ -214,9 +238,52 @@ export function ChartService() {
     ]);
   };
 
+  function mergeArtifactsWithSettings(artifacts, record) {
+    forEach(artifacts, a => {
+      a.checked = a.columnName === record.columnName &&
+        a.tableName === record.tableName;
+    });
+
+    return artifacts;
+  }
+
+  function fillSettings(artifacts, model) {
+    /* Flatten the artifacts into a single array */
+    let attributes = flatMap(artifacts, metric => {
+      return map(metric.columns, attr => {
+        attr.tableName = metric.artifactName;
+        return attr;
+      });
+    });
+
+    attributes = sortBy(attributes, [attr => attr.columnName]);
+
+    /* Based on data type, divide the artifacts between axes. */
+    const yaxis = filter(attributes, attr => (
+      attr.columnName &&
+      NUMBER_TYPES.indexOf(attr.type) >= 0
+    ));
+    const xaxis = filter(attributes, attr => (
+      attr.columnName &&
+      (attr.type === 'string' || attr.type === 'String')
+    ));
+    const groupBy = map(xaxis, clone);
+
+    mergeArtifactsWithSettings(xaxis, get(model, 'sqlBuilder.groupBy', {}));
+    mergeArtifactsWithSettings(yaxis, get(model, 'sqlBuilder.dataFields.[0]', {}));
+    mergeArtifactsWithSettings(groupBy, get(model, 'sqlBuilder.splitBy', {}));
+
+    return {
+      yaxis,
+      xaxis,
+      groupBy
+    };
+  }
+
   return {
     getChartConfigFor,
     dataToChangeConfig,
+    fillSettings,
 
     LEGEND_POSITIONING,
     LAYOUT_POSITIONS

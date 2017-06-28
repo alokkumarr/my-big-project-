@@ -1,6 +1,5 @@
 import first from 'lodash/first';
 import find from 'lodash/find';
-import some from 'lodash/some';
 
 import template from './analyze-report-save.component.html';
 import style from './analyze-report-save.component.scss';
@@ -22,36 +21,23 @@ export const AnalyzeReportSaveComponent = {
       this._$eventEmitter = $eventEmitter;
       this._AnalyzeService = AnalyzeService;
 
-      this.dataHolder = {
-        categories: []
-      };
+      this.dataHolder = [];
     }
 
     $onInit() {
       this._AnalyzeService.getCategories()
         .then(response => {
-          /* Find the category folder the current sub category
-             belongs to */
-          const category = find(response, category => {
-            return some(
-              category.children,
-              subCategory => subCategory.id === this.model.category
-            );
-          }) || first(response);
-
-          category.children = category.children || [];
-
-          this.dataHolder.categories = category.children;
+          this.dataHolder = response;
           this.setDefaultCategory();
         });
     }
 
     setDefaultCategory() {
       if (!this.model.categoryId) {
-        const defaultCategory = first(this.dataHolder.categories);
+        const defaultCategory = find(this.dataHolder, category => category.children.length > 0);
 
         if (defaultCategory) {
-          this.model.categoryId = defaultCategory.id;
+          this.model.categoryId = first(defaultCategory.children).id;
         }
       }
     }

@@ -15,13 +15,16 @@ export const PivotGridComponent = {
   styles: [style],
   bindings: {
     updater: '<',
-    sendFields: '&'
+    mode: '@',
+    onContentReady: '&'
   },
   controller: class PivotGridController {
-    constructor($timeout, $translate, FilterService) {
+    constructor($timeout, $translate, FilterService, $compile, $scope) {
       'ngInject';
       this._$translate = $translate;
       this._$timeout = $timeout;
+      this._$compile = $compile;
+      this._$scope = $scope;
       this._FilterService = FilterService;
       this.warnings = {
         'Drop Data Fields Here': 'SELECT_DATA_FIELDS',
@@ -38,6 +41,10 @@ export const PivotGridComponent = {
       this.pivotGridOptions = assign({
         onInitialized: e => {
           this._gridInstance = e.component;
+        },
+        onContentReady: () => {
+          const fields = this._gridInstance.getDataSource().fields();
+          this.onContentReady({fields});
         }
       }, this.getDefaultOptions());
 
@@ -73,7 +80,6 @@ export const PivotGridComponent = {
       updates.field && this.updateField(updates.field);
       updates.filters && this.updateFilters(updates.filters);
       updates.sorts && this.updateSorts(updates.sorts);
-      updates.getFields && this.sendFields({fields: this._gridInstance.getDataSource().fields()});
       updates.export && this.exportToExcel();
       /* eslint-disable no-unused-expressions */
 
@@ -156,7 +162,7 @@ export const PivotGridComponent = {
           showRowFields: true, // hides the row field area
           showDataFields: true, // hides the data field area
           showFilterFields: false, // hides the filter field area
-          allowFieldDragging: false
+          allowFieldDragging: true
         },
         export: {
           enabled: false,

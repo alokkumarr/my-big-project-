@@ -2,7 +2,7 @@ import defaultsDeep from 'lodash/defaultsDeep';
 import forEach from 'lodash/forEach';
 import set from 'lodash/set';
 import isArray from 'lodash/isArray';
-import {chartOptions} from './default-chart-options';
+import {globalChartOptions, chartOptions} from './default-chart-options';
 
 export const UPDATE_PATHS = {
   SERIES: 'series.0',
@@ -17,6 +17,8 @@ export const chartComponent = {
   controller: class HighChartController {
     constructor(Highcharts, $element) {
       'ngInject';
+
+      Highcharts.setOptions(globalChartOptions);
       this.Highcharts = Highcharts;
       this.$element = $element;
       this.chart = null;

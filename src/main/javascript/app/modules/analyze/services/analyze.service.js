@@ -1,8 +1,7 @@
 import omit from 'lodash/omit';
-import keys from 'lodash/keys';
 import forEach from 'lodash/forEach';
 import set from 'lodash/set';
-import fpMap from 'lodash/fp/map';
+import fpSortBy from 'lodash/fp/sortBy';
 import fpGet from 'lodash/fp/get';
 import filter from 'lodash/filter';
 import find from 'lodash/find';
@@ -30,7 +29,6 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     deleteAnalysis,
     executeAnalysis,
     generateQuery,
-    getAnalyses,
     getAnalysesFor,
     getAnalysisById,
     getArtifacts,
@@ -38,6 +36,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     getCategory,
     getDataByQuery,
     getDataBySettings,
+    getExecutionData,
     getLastPublishedAnalysis,
     getMethods,
     getPivotData,
@@ -45,6 +44,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     getPublishedAnalysisById,
     getSemanticLayerData,
     isExecuting,
+    publishAnalysis,
     readAnalysis,
     saveReport,
     searchAnalyses,
@@ -92,13 +92,17 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
         ['contents.action', 'search'],
         ['contents.keys.[0].categoryId', subCategoryId]
       ]);
-      return $http.post(`${url}/analysis`, payload).then(fpGet('data.contents.analyze'));
-    }).then(analyses => {
-      return analyses.slice(0, 10);
-    });
+      return $http.post(`${url}/analysis`, payload);
+    })
+      .then(fpGet('data.contents.analyze'))
+      .then(fpSortBy([analysis => -(analysis.createdTimestamp || 0)]));
   }
 
-  function searchAnalyses(analyses, searchTerm) {
+  function searchAnalyses(analyses, searchTerm = '') {
+    if (!searchTerm) {
+      return analyses;
+    }
+
     const term = searchTerm.toUpperCase();
     const matchIn = item => {
       return (item || '').toUpperCase().indexOf(term) !== -1;
@@ -111,19 +115,14 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     });
   }
 
-  function getAnalyses(category, query) {
-    return $http.get('/api/analyze/analyses', {params: {category, query}})
-      .then(fpGet('data'))
-      .then(fpMap(analysis => {
-        if (analysis.type === 'chart') {
-          return chartBe2Fe(analysis);
-        }
-        return analysis;
-      }));
+  function getPublishedAnalysesByAnalysisId(id) {
+    return $http.get(`${url}/analysis/${id}/executions`)
+      .then(fpGet(`data.execution`))
+      .then(fpSortBy([obj => -Date.parse(obj.finished)]));
   }
 
-  function getPublishedAnalysesByAnalysisId(id) {
-    return $http.get(`${url}/analysis/${id}/results`).then(fpGet(`data.results`));
+  function getExecutionData(analysisId, executionId) {
+    return $http.get(`${url}/analysis/${analysisId}/executions/${executionId}/data`).then(fpGet(`data.data`));
   }
 
   function getLastPublishedAnalysis(id) {
@@ -144,9 +143,8 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
 
   function executeAnalysis(model) {
     const deferred = $q.defer();
-    const isOngoingExecution = keys(_executingAnalyses).length > 0;
 
-    if (isOngoingExecution) {
+    if (_executingAnalyses[model.id]) {
       $translate('ERROR_ANALYSIS_ALREADY_EXECUTING').then(msg => {
         toastMessage.error(msg);
         deferred.reject(msg);
@@ -169,12 +167,29 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     return deferred.promise;
   }
 
+  function publishAnalysis(model) {
+    return updateAnalysis(model).then(analysis => {
+      executeAnalysis(model);
+      return analysis;
+    });
+  }
+
   function getAnalysisById(id) {
     return $http.get(`/api/analyze/byId/${id}`).then(fpGet('data'));
   }
 
-  function deleteAnalysis(id) {
-    return $http.delete(`/api/analyze/byId/${id}`).then(fpGet('data'));
+  function deleteAnalysis(model) {
+    if (!JwtService.hasPrivilege('DELETE', {
+      subCategoryId: model.categoryId,
+      creatorId: model.userId
+    })) {
+      return $q.reject(new Error('Access denied.'));
+    }
+    const payload = getRequestParams([
+      ['contents.action', 'delete'],
+      ['contents.keys.[0].id', model.id]
+    ]);
+    return $http.post(`${url}/analysis`, payload);
   }
 
   function getCategories() {
@@ -215,7 +230,10 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
       ['contents.keys.[0].type', model.type],
       ['contents.analyze', [model]]
     ]);
-    return $http.post(`${url}/analysis`, payload).then(fpGet(`data.contents.analyze.[1].data`));
+    return $http.post(`${url}/analysis`, payload).then(resp => {
+      return fpGet(`data.contents.analyze.[1].data`, resp) ||
+        fpGet(`data.contents.analyze.[0].data`, resp);
+    });
   }
 
   function getDataBySettings(model) {

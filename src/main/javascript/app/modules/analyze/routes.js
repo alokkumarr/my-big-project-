@@ -12,7 +12,7 @@ export function routesConfig($stateProvider) {
       component: 'analyzeView'
     }, {
       name: 'analyze.publishedDetail',
-      url: '/analysis/:analysisId/published',
+      url: '/analysis/:analysisId/published?executionId',
       component: 'analyzePublishedDetail',
       params: {
         analysis: null

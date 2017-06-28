@@ -8,15 +8,22 @@ import remove from 'lodash/remove';
 import flatten from 'lodash/flatten';
 import fpPipe from 'lodash/fp/pipe';
 import fpMap from 'lodash/fp/map';
+import map from 'lodash/map';
+import unset from 'lodash/unset';
 
 import template from './analyze-filter-modal.component.html';
-import {DEFAULT_BOOLEAN_CRITERIA, BOOLEAN_CRITERIA} from '../../../services/filter.service';
+import style from './analyze-filter-modal.component.scss';
+import {BOOLEAN_CRITERIA} from '../../../services/filter.service';
+import {OPERATORS} from '../filters/number-filter.component';
+import {NUMBER_TYPES} from '../../../consts';
 
 export const AnalyzeFilterModalComponent = {
   template,
+  styles: [style],
   bindings: {
     filters: '<',
-    artifacts: '<'
+    artifacts: '<',
+    filterBooleanCriteria: '<'
   },
   controller: class AnalyzeFlterModalController {
     constructor(toastMessage, $translate) {
@@ -26,6 +33,7 @@ export const AnalyzeFilterModalComponent = {
     }
 
     $onInit() {
+      this.translateBooleanCriteria();
       // there is 1 special case when the analysis type is report
       // and the boolean criteria should be shown
       this.analysisType = this.artifacts.length > 1 ? 'report' : '';
@@ -36,6 +44,14 @@ export const AnalyzeFilterModalComponent = {
           this.pushNewFilter(artifactFilters);
         }
         return artifactFilters;
+      });
+    }
+
+    translateBooleanCriteria() {
+      this._$translate(map(this.BOOLEAN_CRITERIA, 'label')).then(translations => {
+        forEach(this.BOOLEAN_CRITERIA, criteria => {
+          criteria.label = translations[criteria.label];
+        });
       });
     }
 
@@ -52,9 +68,6 @@ export const AnalyzeFilterModalComponent = {
         model: null,
         isRuntimeFilter: false
       };
-      if (this.analysisType === 'report') {
-        newFilter.booleanCriteria = DEFAULT_BOOLEAN_CRITERIA;
-      }
       filtersArray.push(newFilter);
     }
 
@@ -66,12 +79,25 @@ export const AnalyzeFilterModalComponent = {
       if (this.areFiltersValid(this.filters)) {
         this.removeEmptyFilters(this.filters);
         const flattenedFilters = this.unGroupFilters(this.filters);
-        this.$dialog.hide(flattenedFilters);
+        this.cleanFilters(flattenedFilters);
+        this.$dialog.hide({
+          filterBooleanCriteria: this.filterBooleanCriteria,
+          filters: flattenedFilters
+        });
       } else {
         this._$translate('ERROR_FILL_IN_REQUIRED_FILTER_MODELS').then(message => {
           this._toastMessage.error(message);
         });
       }
+    }
+
+    cleanFilters(filters) {
+      forEach(filters, filter => {
+        if (NUMBER_TYPES.includes(filter.column.type) &&
+            filter.model.operator !== OPERATORS.BETWEEN.shortName) {
+          unset(filter.model, 'otherValue');
+        }
+      });
     }
 
     areFiltersValid(filters) {
@@ -93,10 +119,6 @@ export const AnalyzeFilterModalComponent = {
           return !filter.column;
         });
       });
-    }
-
-    onBooleanCriteriaSelected(filter, value) {
-      filter.booleanCriteria = value;
     }
 
     onRuntimeToggle(filter) {

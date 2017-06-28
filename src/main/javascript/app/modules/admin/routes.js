@@ -6,6 +6,10 @@ export function routesConfig($stateProvider) {
       name: 'admin',
       url: '/admin',
       component: 'usersView'
+    }, {
+      name: 'role',
+      url: '/role',
+      component: 'rolesView'
     }
   ];
 

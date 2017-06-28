@@ -1,4 +1,5 @@
 import find from 'lodash/find';
+import get from 'lodash/get';
 import flatMap from 'lodash/flatMap';
 import filter from 'lodash/filter';
 
@@ -125,8 +126,8 @@ export class CanvasModel {
   }
 
   addFilter(filterObj) {
-    filterObj.table = this.findTable(filterObj.tableName);
-    filterObj.field = filterObj.table && filterObj.table.findField(filterObj.name);
+    filterObj.table = this.findTable(get(filterObj, 'column.table', ''));
+    filterObj.field = filterObj.table && filterObj.table.findField(get(filterObj, 'column.columnName', ''));
 
     this.filters.push(filterObj);
 

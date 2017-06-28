@@ -8,14 +8,17 @@ import find from 'lodash/find';
 
 import {OPERATORS} from '../components/analyze-filter/filters/number-filter.component';
 
-export const BOOLEAN_CRITERIA = {
-  AND: 'AND',
-  OR: 'OR'
-};
+export const BOOLEAN_CRITERIA = [{
+  label: 'ALL',
+  value: 'AND'
+}, {
+  label: 'ANY',
+  value: 'OR'
+}];
 
 export const NUMBER_TYPES = ['int', 'integer', 'double', 'long', 'timestamp'];
 
-export const DEFAULT_BOOLEAN_CRITERIA = BOOLEAN_CRITERIA.AND;
+export const DEFAULT_BOOLEAN_CRITERIA = BOOLEAN_CRITERIA[0];
 
 export function FilterService() {
   'ngInject';
@@ -37,7 +40,6 @@ export function FilterService() {
         model: frontendFilter.model,
         tableName: column.table,
         columnName: column.columnName,
-        booleanCriteria: frontendFilter.booleanCriteria,
         isRuntimeFilter: frontendFilter.isRuntimeFilter
       };
     };
@@ -45,8 +47,14 @@ export function FilterService() {
 
   function backend2FrontendFilter(artifacts) {
     return backendFilter => {
-      const artifact = find(artifacts,
-        ({artifactName}) => artifactName === backendFilter.tableName);
+      // for some reason in th edit screen the artofactName is not present in the artifact object
+      // and the target artifact cannot be found
+      // this is a temporary solution for pivot and chart types
+      // TODO undo this modification after consulting with backend
+      const artifact = artifacts.length > 1 ?
+        find(artifacts,
+          ({artifactName}) => artifactName === backendFilter.tableName) :
+        artifacts[0];
 
       const column = find(artifact.columns,
         ({columnName}) => columnName === backendFilter.columnName);
@@ -54,7 +62,6 @@ export function FilterService() {
       return {
         column,
         model: backendFilter.model,
-        booleanCriteria: backendFilter.booleanCriteria,
         isRuntimeFilter: backendFilter.isRuntimeFilter
       };
     };
@@ -126,21 +133,21 @@ export function FilterService() {
   }
 
   function getIdentityElement(booleanCriteria) {
-    if (booleanCriteria === BOOLEAN_CRITERIA.AND) {
+    if (booleanCriteria === BOOLEAN_CRITERIA[0]) {
       return true;
     }
 
-    if (booleanCriteria === BOOLEAN_CRITERIA.OR) {
+    if (booleanCriteria === BOOLEAN_CRITERIA[1]) {
       return false;
     }
   }
 
   function evaluateBoolean(a, booleanCriteria, b) {
-    if (booleanCriteria === BOOLEAN_CRITERIA.AND) {
+    if (booleanCriteria === BOOLEAN_CRITERIA[0]) {
       return a && b;
     }
 
-    if (booleanCriteria === BOOLEAN_CRITERIA.OR) {
+    if (booleanCriteria === BOOLEAN_CRITERIA[1]) {
       return a || b;
     }
   }

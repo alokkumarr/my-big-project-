@@ -1,19 +1,21 @@
 @import "themes/base/colors";
 
 analyze-pivot-settings {
+  z-index: 0;
+
+  & > .layout-row {
+    height: 100%;
+  }
+
+  md-sidenav {
+    position: static;
+    width: 300px;
+  }
+
   h3 {
     margin: 5px;
     padding: 5px;
     border-bottom: 1px solid #EEE;
-  }
-
-  .checkbox-container {
-    padding-top: 10px;
-    padding-left: 10px;
-  }
-
-  .checkbox-container:last-of-type {
-    padding-bottom: 10px;
   }
 
   .summary-type {
@@ -23,24 +25,12 @@ analyze-pivot-settings {
     }
   }
 
-  md-sidenav.pivot-settings {
-    width: 420px;
-    max-width: 420px;
+  md-toolbar {
+    min-height: 0;
   }
 
-  md-toolbar::after {
-    content: none;
-  }
-
-  md-toolbar.settings-toolbar {
-    min-height: 50px;
-    border-top: 1px solid #C4C4C4;
-    border-bottom: 1px solid #C4C4C4;
-    background-color: #F5F5F5 !important;
-
-    p {
-      margin: 0;
-    }
+  .md-subheader-content .md-errors-spacer {
+    display: none;
   }
 
   .dx-pivotgridfieldchooser span.dx-area-caption {

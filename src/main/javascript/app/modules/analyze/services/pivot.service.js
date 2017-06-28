@@ -1,5 +1,9 @@
 import assign from 'lodash/assign';
 import keys from 'lodash/keys';
+import isEmpty from 'lodash/isEmpty';
+import map from 'lodash/map';
+import mapKeys from 'lodash/mapKeys';
+import isString from 'lodash/isString';
 import find from 'lodash/find';
 import flatMap from 'lodash/flatMap';
 import uniq from 'lodash/uniq';
@@ -15,6 +19,7 @@ import invert from 'lodash/invert';
 import fpGroupBy from 'lodash/fp/groupBy';
 import sortBy from 'lodash/sortBy';
 import last from 'lodash/last';
+import omit from 'lodash/omit';
 import mapValues from 'lodash/mapValues';
 
 const FRONT_2_BACK_PIVOT_FIELD_PAIRS = {
@@ -35,8 +40,33 @@ export function PivotService() {
     mapFieldsToFilters,
     getArea,
     getFrontend2BackendFieldMapper,
-    getBackend2FrontendFieldMapper
+    getBackend2FrontendFieldMapper,
+    takeOutKeywordFromData,
+    takeOutKeywordFromArtifactColumns,
+    artifactColumns2PivotFields
   };
+
+  function artifactColumns2PivotFields() {
+    return fpPipe(
+      fpFilter(field => field.checked && field.area),
+      fpMap(artifactColumn => {
+        switch (artifactColumn.type) {
+          case 'int':
+          case 'double':
+          case 'long':
+            artifactColumn.dataType = 'number';
+            break;
+          default:
+            artifactColumn.dataType = artifactColumn.type;
+        }
+        return artifactColumn;
+      }),
+      fpMap(fpMapKeys(key => {
+        const newKey = BACK_2_FRONT_PIVOT_FIELD_PAIRS[key];
+        return newKey || key;
+      }))
+    );
+  }
 
   function getFrontend2BackendFieldMapper() {
     return fpMap(
@@ -48,6 +78,39 @@ export function PivotService() {
         fpOmit(['_initProperties', 'selector', 'dataType'])
       )
     );
+  }
+
+  /**
+   * The string type artifact columns' columnNames, have a .keyword at the end
+   * // which triggers some kind of bug in pivot grid, so they have to be removed
+   */
+  function takeOutKeywordFromData(store) {
+    if (isEmpty(store)) {
+      return store;
+    }
+    return map(store, dataObj => {
+      return mapKeys(dataObj, (v, key) => {
+        if (isString(key)) {
+          const split = key.split('.');
+          if (split[1] === 'keyword') {
+            return split[0];
+          }
+        }
+        return key;
+      });
+    });
+  }
+
+  function takeOutKeywordFromArtifactColumns(artifactColumns) {
+    forEach(artifactColumns, artifactColumn => {
+      if (artifactColumn.columnName && artifactColumn.type === 'string') {
+        const split = artifactColumn.columnName.split('.');
+        if (split[1] === 'keyword') {
+          artifactColumn.columnName = split[0];
+        }
+      }
+    });
+    return artifactColumns;
   }
 
   function getBackend2FrontendFieldMapper() {
@@ -73,7 +136,7 @@ export function PivotService() {
 
   function denormalizeData(normalizedData, fields) {
     const groupedFields = getGroupedFields(fields);
-    return flatMap(normalizedData.buckets, node => denormalizeRecursive({groupedFields, keys: {}, currentKey: 'row_level_1', node}));
+    return flatMap(normalizedData.row_level_1.buckets, node => denormalizeRecursive({groupedFields, keys: {}, currentKey: 'row_level_1', node}));
   }
 
   function getGroupedFields(fields) {
@@ -103,8 +166,10 @@ export function PivotService() {
       });
     }
     // this is a leaf
+    // these props are added by elastic search, and are of no use in the UI
+    const propsToOmit = ['doc_count', 'key', 'key_as_string'];
     return assign(
-      mapValues(node, 'value'),
+      mapValues(omit(node, propsToOmit), 'value'),
       keys
     );
   }
