@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # Update SAW semantic metadata in SAW Metadata Service
 #
@@ -15,11 +15,11 @@ files="mct_content_$s mct_error_$s mct_session_$s mct_session_and_content_$s"
 mdcli="sudo -u mapr /opt/saw/service/bin/mdcli.sh"
 host="mapr-dev02.sncrbda.dev.vacum-np.sncrcorp.net"
 data="/mapr/bda_lab_batch"
-dir=$(dirname $0)
+dir="$(dirname $0)"
 
 set -x
 for path in $files; do
     scp $dir/$path mapr@$host:$data/user/mapr/tmp
-    #ssh $host $mdcli -i tmp/$path -o tmp/result.json
+    ssh $host $mdcli -i tmp/$path -o tmp/result.json
     ssh $host cat $data/user/mapr/tmp/result.json
 done
