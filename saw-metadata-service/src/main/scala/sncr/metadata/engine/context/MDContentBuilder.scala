@@ -38,7 +38,7 @@ trait MDContentBuilder extends SourceAsJson{
 }
 
 object SelectModels extends Enumeration {
-
+  type SelectModels = Value
   val headers     = Value(0, "headers")
   val everything  = Value(1, "everything")
   val node        = Value(2, "node")

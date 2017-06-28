@@ -1,20 +1,22 @@
 package controllers
 
-import java.io.ByteArrayOutputStream
-import java.text.SimpleDateFormat
 import java.time.Instant
+import java.util
 import java.util.UUID
-import org.json4s._
-import org.json4s.JsonAST.JValue
+
+import com.synchronoss.querybuilder.{EntityType, SAWElasticSearchQueryBuilder, SAWElasticSearchQueryExecutor}
+import model.{ClientException, QueryBuilder}
+import org.json4s.JsonAST.{JArray, JLong, JObject, JString, JValue, JBool => _, JField => _, JInt => _, JNothing => _}
 import org.json4s.JsonDSL._
+import org.json4s._
 import org.json4s.native.JsonMethods._
-import play.libs.Json
-import play.mvc.{Http, Result, Results}
-import sncr.metadata.analysis.{AnalysisExecutionHandler, AnalysisNode, AnalysisResult}
-import sncr.metadata.engine.context.SelectModels
-import sncr.metadata.engine.{MDNodeUtil, tables}
+import play.mvc.Result
+import sncr.analysis.execution.ExecutionTaskHandler
+import sncr.datalake.DLConfiguration
+import sncr.datalake.engine.ExecutionType
+import sncr.metadata.analysis.AnalysisNode
 import sncr.metadata.engine.ProcessingResult._
-import sncr.analysis.execution.{AnalysisExecutionRunner, ExecutionTaskHandler, ProcessExecutionResult}
+import sncr.metadata.engine.context.SelectModels
 import sncr.metadata.semantix.SemanticNode
 import model.QueryBuilder
 import model.ClientException
@@ -407,30 +409,38 @@ class Analysis extends BaseController {
       return myArray
     }
     else {
-    // This is the part of report type starts here
-    val er: ExecutionTaskHandler = new ExecutionTaskHandler(1)
-    val aeh: AnalysisExecutionHandler = new AnalysisExecutionHandler(analysisId, queryRuntime)
-    er.startSQLExecutor(aeh)
-    val analysisResultId: String = er.getPredefResultRowID(analysisId)
-    er.waitForCompletion(analysisId, aeh.getWaitTime)
-    val out = new ByteArrayOutputStream()
-    aeh.handleResult(out)
-    val resultJson = parse(new String(out.toByteArray()))
-    val resultLog = shortMessage(pretty(render(resultJson)))
-    
-    m_log.trace("Spark SQL executor result: {}", resultLog)
-    (resultJson match {
-      case obj: JObject => {
-        m_log.error("Execution failed: {}", pretty(render(obj)))
-        throw new RuntimeException(
-          "Spark SQL execution failed: " +
-            (obj \ "error_message").extractOrElse[String]("none"))
-      }
-      case JArray(result) => result.arr
-      case value: JValue => throw new RuntimeException(
-        "Expected array: " + value)
-    }).drop(1)
-    // This is the end of report type ends here
+      // This is the part of report type starts here
+      val analysis = new sncr.datalake.engine.Analysis(analysisId)
+      val execution = analysis.executeAndWait(ExecutionType.onetime)
+      val analysisResultId: String = execution.getId
+      //TODO:: Subject to change: to get ALL data use:  val resultData = execution.getAllData
+      //TODO:: DLConfiguration.rowLimit can be replace with some Int value
+
+      val resultData = execution.getPreview(DLConfiguration.rowLimit)
+      val data = processResult(resultData)
+      m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}, created execution id: $analysisResultId"
+      m_log debug s"start:  ${analysis.getStartTS} , finished  ${analysis.getFinishedTS} "
+      m_log.trace("Spark SQL executor result: {}", pretty(render(data)))
+      data
     }
   }
+
+  import scala.collection.JavaConversions._
+  private def processResult(data: util.List[util.Map[String, (String, Object)]]) : JValue = {
+    if ( data == null || data.isEmpty) return JObject(List(JField("result", "no data found")))
+    JArray(data.map(m => {
+       JObject(m.keySet().map(k =>
+          JField(k, m.get(k)._1 match {
+            case "StringType" => JString(m.get(k)._2.asInstanceOf[String])
+            case "IntegerType" => JInt(m.get(k)._2.asInstanceOf[Int])
+            case "BooleanType" => JBool(m.get(k)._2.asInstanceOf[Boolean])
+            case "LongType" => JLong(m.get(k)._2.asInstanceOf[Long])
+          })
+         ).toList
+       )}
+    ).toList)
+  }
+
+
+
 }
