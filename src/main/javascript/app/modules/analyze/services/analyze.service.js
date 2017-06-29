@@ -7,6 +7,11 @@ import filter from 'lodash/filter';
 import find from 'lodash/find';
 import flatMap from 'lodash/flatMap';
 
+const EXECUTION_MODES = {
+  PREVIEW: 'preview',
+  LIVE: 'live'
+};
+
 export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toastMessage, $translate) {
   'ngInject';
 
@@ -214,6 +219,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
   }
 
   function updateAnalysis(model) {
+    delete model.isScheduled;
     const payload = getRequestParams([
       ['contents.action', 'update'],
       ['contents.keys.[0].id', model.id],
@@ -223,7 +229,12 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     return $http.post(`${url}/analysis`, payload).then(fpGet(`data.contents.analyze.[0]`));
   }
 
-  function applyAnalysis(model) {
+  function applyAnalysis(model, mode = EXECUTION_MODES.LIVE) {
+    delete model.isScheduled;
+    if (mode === EXECUTION_MODES.PREVIEW) {
+      model.executionType = EXECUTION_MODES.PREVIEW;
+    }
+
     const payload = getRequestParams([
       ['contents.action', 'execute'],
       ['contents.keys.[0].id', model.id],
@@ -238,7 +249,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
 
   function getDataBySettings(model) {
     return updateAnalysis(model).then(analysis => {
-      return applyAnalysis(model).then(data => {
+      return applyAnalysis(model, EXECUTION_MODES.PREVIEW).then(data => {
         return {analysis, data};
       });
     });

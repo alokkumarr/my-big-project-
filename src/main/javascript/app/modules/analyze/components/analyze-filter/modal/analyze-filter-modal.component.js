@@ -23,12 +23,14 @@ export const AnalyzeFilterModalComponent = {
   bindings: {
     filters: '<',
     artifacts: '<',
+    isRuntime: '<?runtime',
     filterBooleanCriteria: '<'
   },
   controller: class AnalyzeFlterModalController {
-    constructor(toastMessage, $translate) {
+    constructor(toastMessage, $translate, FilterService) {
       this._toastMessage = toastMessage;
       this._$translate = $translate;
+      this._FilterService = FilterService;
       this.BOOLEAN_CRITERIA = BOOLEAN_CRITERIA;
     }
 
@@ -104,8 +106,10 @@ export const AnalyzeFilterModalComponent = {
       let isValid = true;
       forOwn(filters, artifactFilters => {
         forEach(artifactFilters, filter => {
-          if (filter.column && !filter.model && !filter.isRuntimeFilter) {
-            isValid = false;
+          if (this.isRuntime) {
+            isValid = isValid && !this._FilterService.isFilterEmpty(filter);
+          } else {
+            isValid = isValid && (filter.isRuntimeFilter || !this._FilterService.isFilterEmpty(filter));
           }
         });
       });

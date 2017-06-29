@@ -12,13 +12,14 @@ export const AnalyzePublishedDetailComponent = {
   template,
   styles: [style],
   controller: class AnalyzePublishedDetailController extends AbstractComponentController {
-    constructor($injector, AnalyzeService, $state, $rootScope, $mdDialog, $window, toastMessage) {
+    constructor($injector, AnalyzeService, $state, $rootScope, $mdDialog, $window, toastMessage, FilterService) {
       'ngInject';
       super($injector);
 
       this._AnalyzeService = AnalyzeService;
       this._$state = $state;
       this._$rootScope = $rootScope;
+      this._FilterService = FilterService;
       this._toastMessage = toastMessage;
       this._$window = $window; // used for going back from the template
       this._$mdDialog = $mdDialog;
@@ -52,7 +53,9 @@ export const AnalyzePublishedDetailComponent = {
 
     executeAnalysis() {
       if (this.analysis) {
-        this._AnalyzeService.executeAnalysis(this.analysis);
+        this._FilterService.getRuntimeFilterValues(this.analysis).then(model => {
+          this._AnalyzeService.executeAnalysis(model);
+        });
       }
     }
 

@@ -1,4 +1,6 @@
 import map from 'lodash/fp/map';
+import cloneDeep from 'lodash/cloneDeep';
+import get from 'lodash/get';
 import reduce from 'lodash/fp/reduce';
 import filter from 'lodash/fp/filter';
 import isEmpty from 'lodash/isEmpty';
@@ -16,32 +18,77 @@ export const BOOLEAN_CRITERIA = [{
   value: 'OR'
 }];
 
+const FILTER_TYPES = {
+  STRING: 'string',
+  NUMBER: 'number',
+  DATE: 'date',
+  UNKNOWN: 'unknown'
+};
+
 export const NUMBER_TYPES = ['int', 'integer', 'double', 'long', 'timestamp'];
 
 export const DEFAULT_BOOLEAN_CRITERIA = BOOLEAN_CRITERIA[0];
 
-export function FilterService() {
+export function FilterService($q, $mdDialog) {
   'ngInject';
 
   return {
     getFilterEvaluator,
     getEvaluatedFilterReducer,
+    getRuntimeFilterValues,
+    isFilterEmpty,
     isFilterModelNonEmpty,
     frontend2BackendFilter,
     backend2FrontendFilter
   };
 
+  function getType(inputType) {
+    if (inputType === FILTER_TYPES.STRING) {
+      return FILTER_TYPES.STRING;
+    } else if (NUMBER_TYPES.indexOf(inputType) >= 0) {
+      return FILTER_TYPES.NUMBER;
+    } else if (inputType === FILTER_TYPES.DATE) {
+      return FILTER_TYPES.DATE;
+    }
+
+    return FILTER_TYPES.UNKNOWN;
+  }
+
+  function isFilterEmpty(filter) {
+    const filterType = getType(filter.type || filter.column.type);
+
+    switch (filterType) {
+
+      case FILTER_TYPES.STRING:
+        return isEmpty(get(filter, 'model.modelValues', []));
+
+      case FILTER_TYPES.NUMBER:
+        return isEmpty(filter.model);
+
+      case FILTER_TYPES.DATE:
+        return isEmpty(filter.model);
+
+      default:
+        return true;
+    }
+  }
+
   function frontend2BackendFilter() {
     return frontendFilter => {
       const column = frontendFilter.column;
 
-      return {
+      const result = {
         type: column.type,
-        model: frontendFilter.model,
         tableName: column.table,
         columnName: column.columnName,
         isRuntimeFilter: frontendFilter.isRuntimeFilter
       };
+
+      if (!frontendFilter.isRuntimeFilter || frontendFilter.model) {
+        result.model = frontendFilter.model;
+      }
+
+      return result;
     };
   }
 
@@ -175,5 +222,51 @@ export function FilterService() {
       default:
         return false;
     }
+  }
+
+  function getRuntimeFiltersFrom(filters = []) {
+    return filter(f => f.isRuntimeFilter, filters);
+  }
+
+  function openRuntimeModal(analysis, filters = []) {
+    const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria" runtime="true"></analyze-filter-modal>';
+    return $mdDialog.show({
+      template: tpl,
+      controller: scope => {
+        scope.filters = map(backend2FrontendFilter(analysis.artifacts), filters);
+        scope.artifacts = analysis.artifacts;
+        scope.booleanCriteria = analysis.sqlBuilder.booleanCriteria;
+      },
+      fullscreen: true,
+      autoWrap: false,
+      multiple: true
+    }).then(onApplyFilters.bind(this)(analysis));
+  }
+
+  function onApplyFilters(analysis) {
+    return result => {
+      if (!result) {
+        return $q.reject(new Error('Cancelled'));
+      }
+
+      const filterPayload = map(frontend2BackendFilter(), result.filters);
+      analysis.sqlBuilder.filters = filterPayload.concat(
+        filter(f => !f.isRuntimeFilter, analysis.sqlBuilder.filters)
+      );
+
+      return analysis;
+    };
+  }
+
+  function getRuntimeFilterValues(analysis) {
+    const clone = cloneDeep(analysis);
+    const runtimeFilters = getRuntimeFiltersFrom(
+      get(clone, 'sqlBuilder.filters', [])
+    );
+
+    if (!runtimeFilters.length) {
+      return $q.resolve(clone);
+    }
+    return openRuntimeModal(clone, runtimeFilters);
   }
 }

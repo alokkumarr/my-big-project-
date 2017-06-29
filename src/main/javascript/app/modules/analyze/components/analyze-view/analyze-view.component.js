@@ -12,7 +12,7 @@ export const AnalyzeViewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeViewController extends AbstractComponentController {
-    constructor($injector, $compile, AnalyzeService, $state, $mdDialog, toastMessage, $rootScope, localStorageService) {
+    constructor($injector, $compile, AnalyzeService, $state, $mdDialog, toastMessage, $rootScope, localStorageService, FilterService) {
       'ngInject';
       super($injector);
 
@@ -21,6 +21,7 @@ export const AnalyzeViewComponent = {
       this._$state = $state;
       this._$mdDialog = $mdDialog;
       this._localStorageService = localStorageService;
+      this._FilterService = FilterService;
       this._toastMessage = toastMessage;
       this._$rootScope = $rootScope;
       this._analysisCache = [];
@@ -195,8 +196,10 @@ export const AnalyzeViewComponent = {
     }
 
     execute(analysis) {
-      this._AnalyzeService.executeAnalysis(analysis);
-      this.goToAnalysis(analysis);
+      this._FilterService.getRuntimeFilterValues(analysis).then(model => {
+        this._AnalyzeService.executeAnalysis(model);
+        this.goToAnalysis(model);
+      });
     }
 
     openEditModal(mode, model) {
