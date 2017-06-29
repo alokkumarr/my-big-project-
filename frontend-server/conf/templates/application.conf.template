@@ -69,3 +69,5 @@ swagger.api.info.modelClasses = [ synchronoss.data.countly.model.BaseEvent ]
 
 # Max request size ~64K (from netty)
 play.server.netty.maxInitialLineLength=65536
+
+stream.topic.selectormethod=random
