@@ -18,6 +18,13 @@ export const BOOLEAN_CRITERIA = [{
   value: 'OR'
 }];
 
+const FILTER_TYPES = {
+  STRING: 'string',
+  NUMBER: 'number',
+  DATE: 'date',
+  UNKNOWN: 'unknown'
+};
+
 export const NUMBER_TYPES = ['int', 'integer', 'double', 'long', 'timestamp'];
 
 export const DEFAULT_BOOLEAN_CRITERIA = BOOLEAN_CRITERIA[0];
@@ -29,10 +36,42 @@ export function FilterService($q, $mdDialog) {
     getFilterEvaluator,
     getEvaluatedFilterReducer,
     getRuntimeFilterValues,
+    isFilterEmpty,
     isFilterModelNonEmpty,
     frontend2BackendFilter,
     backend2FrontendFilter
   };
+
+  function getType(inputType) {
+    if (inputType === FILTER_TYPES.STRING) {
+      return FILTER_TYPES.STRING;
+    } else if (NUMBER_TYPES.indexOf(inputType) >= 0) {
+      return FILTER_TYPES.NUMBER;
+    } else if (inputType === FILTER_TYPES.DATE) {
+      return FILTER_TYPES.DATE;
+    }
+
+    return FILTER_TYPES.UNKNOWN;
+  }
+
+  function isFilterEmpty(filter) {
+    const filterType = getType(filter.type || filter.column.type);
+
+    switch (filterType) {
+
+      case FILTER_TYPES.STRING:
+        return isEmpty(get(filter, 'model.modelValues', []));
+
+      case FILTER_TYPES.NUMBER:
+        return isEmpty(filter.model);
+
+      case FILTER_TYPES.DATE:
+        return isEmpty(filter.model);
+
+      default:
+        return true;
+    }
+  }
 
   function frontend2BackendFilter() {
     return frontendFilter => {
