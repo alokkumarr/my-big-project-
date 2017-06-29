@@ -219,6 +219,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
   }
 
   function updateAnalysis(model) {
+    delete model.isScheduled;
     const payload = getRequestParams([
       ['contents.action', 'update'],
       ['contents.keys.[0].id', model.id],
@@ -229,6 +230,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
   }
 
   function applyAnalysis(model, mode = EXECUTION_MODES.LIVE) {
+    delete model.isScheduled;
     if (mode === EXECUTION_MODES.PREVIEW) {
       model.executionType = EXECUTION_MODES.PREVIEW;
     }

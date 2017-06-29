@@ -38,13 +38,18 @@ export function FilterService($q, $mdDialog) {
     return frontendFilter => {
       const column = frontendFilter.column;
 
-      return {
+      const result = {
         type: column.type,
-        model: frontendFilter.model,
         tableName: column.table,
         columnName: column.columnName,
         isRuntimeFilter: frontendFilter.isRuntimeFilter
       };
+
+      if (!frontendFilter.isRuntimeFilter || frontendFilter.model) {
+        result.model = frontendFilter.model;
+      }
+
+      return result;
     };
   }
 

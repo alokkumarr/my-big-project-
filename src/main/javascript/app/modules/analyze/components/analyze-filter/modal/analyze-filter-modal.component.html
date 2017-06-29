@@ -47,17 +47,20 @@
 
   <analyze-dialog-footer>
     <div layout="column" layout-align="start">
-      <div layout="row" layout-align="start center" style="padding-bottom:10px;">
+      <div layout="row"
+           ng-hide="::$ctrl.isRuntime"
+           layout-align="start center"
+           style="padding-bottom:10px;">
         <md-select ng-model="$ctrl.filterBooleanCriteria"
                    style="width: 92px;"
                    md-container-class="select-container-class">
-        <md-option ng-repeat="booleanCriteria in $ctrl.BOOLEAN_CRITERIA"
-                  ng-value="booleanCriteria.value">
-          {{::booleanCriteria.label}}
-        </md-option>
-      </md-select>
-      <span style="padding-left: 10px;"
-            translate="OF_THE_FILTERS_ARE_TRUE"></span>
+          <md-option ng-repeat="booleanCriteria in $ctrl.BOOLEAN_CRITERIA"
+                    ng-value="booleanCriteria.value">
+            {{::booleanCriteria.label}}
+          </md-option>
+        </md-select>
+        <span style="padding-left: 10px;"
+              translate="OF_THE_FILTERS_ARE_TRUE"></span>
       </div>
 
       <div layout="row" layout-align="start center">
