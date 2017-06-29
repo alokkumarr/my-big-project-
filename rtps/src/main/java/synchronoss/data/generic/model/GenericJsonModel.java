@@ -254,7 +254,9 @@ public class GenericJsonModel {
         JsonObject src = new JsonParser().parse(srcString).getAsJsonObject();
         JsonObject dst = src;
 
-        if( src.has("EVENT_TYPE") &&
+        // Check mandatory fields
+        if( src.has("RECEIVED_TS") &&
+            src.has("EVENT_TYPE") &&
             src.has("EVENT_ID") &&
             src.has("APP_MODULE") &&
             src.has("EVENT_DATE") &&
@@ -262,7 +264,7 @@ public class GenericJsonModel {
             src.has("APP_VERSION") &&
             src.has("UID") &&
             src.has("payload") &&
-            src.entrySet().size() == 8){
+            src.entrySet().size() == 9){
 
             //System.out.println("Need to be flattened");
 
@@ -270,7 +272,10 @@ public class GenericJsonModel {
             String decoded = new String(Base64.getDecoder().decode(base64data));
             //System.out.println(base64data);
             //System.out.println(decoded);
+
+            // Put mandatory fields into final document
             dst = new JsonParser().parse(decoded).getAsJsonObject();
+            dst.addProperty("RECEIVED_TS", src.get("RECEIVED_TS").getAsString());
             dst.addProperty("EVENT_TYPE", src.get("EVENT_TYPE").getAsString());
             dst.addProperty("EVENT_ID", src.get("EVENT_ID").getAsString());
             dst.addProperty("APP_MODULE", src.get("APP_MODULE").getAsString());
@@ -279,6 +284,10 @@ public class GenericJsonModel {
             dst.addProperty("APP_VERSION", src.get("APP_VERSION").getAsString());
             dst.addProperty("UID", src.get("UID").getAsString());
             //System.out.println(dst.toString());
+        } else {
+            // This should be reported
+            logger.error("Structure of the document is incorrect, expecting 9 fields for generic document envelope.");
+            logger.error(srcString);
         }
         return dst;
     }
