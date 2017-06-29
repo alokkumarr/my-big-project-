@@ -161,8 +161,7 @@ object GenericHandler {
   val KEY_EVENT_ID    = "EVENT_ID"
   val KEY_EVENT_DATE  = "EVENT_DATE"
   val KEY_EVENT_TYPE  = "EVENT_TYPE"
-  val KEY_RECEIVED_TS = "received_ts"
-
+  val KEY_RECEIVED_TS = "RECEIVED_TS"
 
   val timestampFormat = "yyyy-MM-dd HH:mm:ss"
 }
