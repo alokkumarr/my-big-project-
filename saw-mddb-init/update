@@ -9,17 +9,24 @@
 #
 set -eu
 
+# Semantic nodes
 s="semantic_node.json"
 files="mct_content_$s mct_error_$s mct_session_$s mct_session_and_content_$s"
 
-mdcli="sudo -u mapr /opt/saw/service/bin/mdcli.sh"
-host="mapr-dev02.sncrbda.dev.vacum-np.sncrcorp.net"
+# Data objects
+#d="data_object.json"
+#files="mct_content_sum_$d mct_error_sum_$d mct_session_$d"
+
+# List objects
+files="list.json"
+
+mdcli="sudo sudo -u mapr /opt/saw/service/bin/mdcli.sh"
+host="mapr01.bda.poc.velocity-va.sncrcorp.net"
 data="/mapr/bda_lab_batch"
 dir=$(dirname $0)
 
 set -x
 for path in $files; do
-    scp $dir/$path mapr@$host:$data/user/mapr/tmp
-    #ssh $host $mdcli -i tmp/$path -o tmp/result.json
-    ssh $host cat $data/user/mapr/tmp/result.json
+    scp $dir/$path $host:$data/user/mapr/tmp
+    ssh -t $host $mdcli -i tmp/$path -o tmp/result.json
 done
