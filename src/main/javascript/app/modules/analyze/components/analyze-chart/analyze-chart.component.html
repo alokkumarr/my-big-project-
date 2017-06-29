@@ -37,6 +37,14 @@
         <div class="md-toolbar-tools"
              layout-align="start center">
           <div class="analyze-view_search-panel" layout="row" layout-align="start center">
+            <choice-group size="m"
+                          icon-only="true"
+                          style="margin-right: 10px;"
+                          items="$ctrl.BAR_COLUMN_OPTIONS"
+                          ng-if="$ctrl.barColumnChoice"
+                          ng-model="$ctrl.barColumnChoice"
+                          ng-change="$ctrl.toggleBarColumn()">
+            </choice-group>
             <span class="md-title" translate="CHART"></span>
           </div>
 
