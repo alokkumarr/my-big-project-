@@ -10,12 +10,12 @@
         <div layout="row">
 
           <md-select placeholder="Select a Category"
-                    ng-model="::$ctrl.model.categoryId">
+                     ng-model="::$ctrl.model.categoryId">
             <md-optgroup ng-repeat="category in $ctrl.dataHolder" label="{{::category.name}}">
               <md-option
-                ng-repeat="subCategory in category.children"
-                ng-bind="::subCategory.name"
-                ng-value="subCategory.id"></md-option>
+                  ng-repeat="subCategory in category.children"
+                  ng-bind="::subCategory.name"
+                  ng-value="subCategory.id"></md-option>
             </md-optgroup>
           </md-select>
         </div>
@@ -62,14 +62,15 @@
 
           <div class="days-of-week-checkboxes">
             <md-checkbox ng-repeat="day in $ctrl.repeatOnDaysOfWeek track by day.keyword"
-                       ng-checked="day.checked"
-                       ng-click="day.checked = !day.checked">
+                         ng-checked="day.checked"
+                         ng-click="day.checked = !day.checked">
               <span ng-bind="day.keyword | translate | truncate:2"></span>
             </md-checkbox>
           </div>
 
         </div>
 
+        <!--
         <div class="form-container" layout="row">
 
           <label translate="STARTS_ON" flex="20"></label>
@@ -124,6 +125,7 @@
           </md-radio-group>
 
         </div>
+        -->
 
       </div>
 

@@ -1,5 +1,9 @@
 import map from 'lodash/map';
+import get from 'lodash/get';
+import forEach from 'lodash/forEach';
+import reduce from 'lodash/reduce';
 import find from 'lodash/find';
+import isEmpty from 'lodash/isEmpty';
 import first from 'lodash/first';
 
 import template from './analyze-publish-dialog.component.html';
@@ -52,11 +56,42 @@ export const AnalyzePublishDialogComponent = {
     }
 
     $onInit() {
+      this.populateSchedule();
       this._AnalyzeService.getCategories()
         .then(response => {
           this.dataHolder = response;
           this.setDefaultCategory();
         });
+    }
+
+    populateSchedule() {
+      if (isEmpty(this.model.schedule)) {
+        return;
+      }
+
+      this.repeatOrdinal = this.model.repeatInterval;
+      this.repeatInterval = this.model.repeatUnit;
+      forEach(this.repeatOnDaysOfWeek, day => {
+        day.checked = Boolean(get(this.model, `schedule.repeatOnDaysOfWeek.${day.keyword.toUpperCase()}`));
+      });
+    }
+
+    generateSchedulePayload() {
+      if (this.schedule === this.scheduleOptions[0]) {
+        this.model.schedule = null;
+        return this.model;
+      }
+
+      this.model.schedule = {
+        repeatUnit: this.repeatInterval,
+        repeatInterval: this.repeatOrdinal,
+        repeatOnDaysOfWeek: reduce(this.repeatOnDaysOfWeek, (result, day) => {
+          result[day.keyword.toLowerCase()] = day.checked;
+          return result;
+        }, {})
+      };
+
+      return this.model;
     }
 
     setDefaultCategory() {
@@ -74,8 +109,10 @@ export const AnalyzePublishDialogComponent = {
     }
 
     publish() {
-      this.onPublish({model: this.model});
-      this._$mdDialog.hide();
+      const payload = this.generateSchedulePayload();
+      console.log(payload);
+      // this.onPublish({model: this.model});
+      // this._$mdDialog.hide();
     }
   }
 };
