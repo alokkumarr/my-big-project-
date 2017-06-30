@@ -32,6 +32,18 @@
         </md-radio-group>
       </collapser>
 
+      <collapser title="Z-Axis Options"
+                 ng-if="$ctrl.model.chartType === 'bubble'">
+        <md-radio-group ng-model="$ctrl.selected.z"
+                        ng-change="$ctrl.inputChanged($ctrl.settings.zaxis, $ctrl.selected.z)">
+          <md-radio-button ng-repeat="attr in $ctrl.settings.zaxis"
+                           role="radio"
+                           ng-value="attr">
+            <span ng-bind="::attr.displayName"></span>
+          </md-radio-button>
+        </md-radio-group>
+      </collapser>
+
       <collapser title="Group By">
         <md-radio-group ng-model="$ctrl.selected.z"
                         ng-change="$ctrl.inputChanged($ctrl.settings.groupBy, $ctrl.selected.z)">

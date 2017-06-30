@@ -48,7 +48,7 @@ export const AnalyzeNewComponent = {
             find(supportedMethodCategory.children, ({type}) => type === method.type) :
             false;
           // TODO remove when backend ads support
-          if (method.type === 'chart:bar') {
+          if (method.type === 'chart:scatter' || method.type === 'chart:bubble' || method.type === 'chart:bar') {
             isSupported = true;
           }
           set(method, 'disabled', !isSupported);
@@ -94,6 +94,8 @@ export const AnalyzeNewComponent = {
         case 'chart:stack':
         case 'chart:pie':
         case 'chart:donut':
+        case 'chart:scatter':
+        case 'chart:bubble':
           type = this.selectedAnalysisMethod.split(':')[1];
           tpl = `<analyze-chart model="model" mode="${mode}"></analyze-chart>`;
           model = {

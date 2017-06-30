@@ -279,7 +279,7 @@ export const AnalyzeChartComponent = {
         this._FilterService.frontend2BackendFilter()
       ));
 
-      const y = find(this.settings.yaxis, x => x.checked);
+      const y = find(this.settings.yaxis, y => y.checked);
 
       delete result.supports;
       set(result, 'sqlBuilder.sorts', []);

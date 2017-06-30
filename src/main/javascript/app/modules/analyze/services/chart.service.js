@@ -209,6 +209,10 @@ export function ChartService() {
     ];
   };
 
+  const gridToBubble = (x, y, group, data, z, name) => {
+
+  };
+
   /* Functions to convert grid data to chart options forEach
      various chart types */
   const dataCustomizer = {
@@ -217,11 +221,14 @@ export function ChartService() {
     line: gridToChart,
     spline: gridToChart,
     stack: gridToChart,
+    scatter: gridToChart,
+    bubble: gridToBubble,
     pie: gridToPie,
     donut: gridToPie
   };
 
   const dataToChangeConfig = (type, settings, gridData, opts) => {
+    console.log('chart type: ', opts.chart);
     const xaxis = filter(settings.xaxis, attr => attr.checked)[0] || {};
     const yaxis = filter(settings.yaxis, attr => attr.checked)[0] || {};
     const group = filter(settings.groupBy, attr => attr.checked)[0] || {};
@@ -262,7 +269,7 @@ export function ChartService() {
     /* Based on data type, divide the artifacts between axes. */
     const yaxis = filter(attributes, attr => (
       attr.columnName &&
-      NUMBER_TYPES.indexOf(attr.type) >= 0
+      NUMBER_TYPES.includes(attr.type)
     ));
     const xaxis = filter(attributes, attr => (
       attr.columnName &&
@@ -274,11 +281,21 @@ export function ChartService() {
     mergeArtifactsWithSettings(yaxis, get(model, 'sqlBuilder.dataFields.[0]', {}));
     mergeArtifactsWithSettings(groupBy, get(model, 'sqlBuilder.splitBy', {}));
 
-    return {
+    const settingsObj = {
       yaxis,
       xaxis,
       groupBy
     };
+
+    if (model.chartType === 'bubble') {
+      const zaxis = filter(attributes, attr => (
+        attr.columnName &&
+        (NUMBER_TYPES.includes(attr.type))
+      ));
+      settingsObj.zaxis = zaxis;
+    }
+
+    return settingsObj;
   }
 
   return {
