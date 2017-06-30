@@ -1,7 +1,11 @@
 import omit from 'lodash/omit';
 import forEach from 'lodash/forEach';
+import startCase from 'lodash/startCase';
 import set from 'lodash/set';
+import reduce from 'lodash/reduce';
+import trim from 'lodash/trim';
 import fpSortBy from 'lodash/fp/sortBy';
+import keys from 'lodash/keys';
 import fpGet from 'lodash/fp/get';
 import filter from 'lodash/filter';
 import find from 'lodash/find';
@@ -16,6 +20,14 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
   'ngInject';
 
   const MODULE_NAME = 'ANALYZE';
+
+  const SCHEDULE_B2F_DICTIONARY = {
+    weekly: 'weeks',
+    daily: 'days'
+  };
+
+  const SCHEDULE_DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
   const url = AppConfig.api.url;
   let _menuResolver = null;
   const _menu = new Promise(resolve => {
@@ -52,6 +64,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     publishAnalysis,
     readAnalysis,
     saveReport,
+    scheduleToString,
     searchAnalyses,
     updateMenu
   };
@@ -62,6 +75,25 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
 
   function isExecuting(analysisId) {
     return Boolean(_executingAnalyses[analysisId]);
+  }
+
+  function scheduleToString(schedule) {
+    let result;
+    if (schedule.repeatInterval === 1) {
+      result = startCase(schedule.repeatUnit);
+    } else {
+      result = `Every ${schedule.repeatInterval} ${SCHEDULE_B2F_DICTIONARY[schedule.repeatUnit]}`;
+    }
+
+    if (schedule.repeatUnit === 'weekly') {
+      const dayString = trim(reduce(SCHEDULE_DAYS, (res, day) => {
+        res.push(schedule.repeatOnDaysOfWeek[day] ? startCase(day.slice(0, 2)) : '');
+        return res;
+      }, []).join(' '));
+
+      result += dayString ? ` (${trim(dayString)})` : '';
+    }
+    return result;
   }
 
   /* getRequestParams will generate the base structure and auto-fill it

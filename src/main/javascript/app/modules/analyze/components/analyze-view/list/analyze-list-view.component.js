@@ -117,7 +117,7 @@ export const AnalyzeListViewComponent = {
         cellTemplate: 'metricsCellTemplate'
       }, {
         caption: 'SCHEDULED',
-        dataField: 'scheduled',
+        dataField: 'scheduleHuman',
         allowSorting: true,
         alignment: 'left',
         width: '15%'

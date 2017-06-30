@@ -90,6 +90,7 @@ export const AnalyzePublishDialogComponent = {
     generateSchedulePayload(clearSchedule = false) {
       if (clearSchedule) {
         this.model.schedule = null;
+        this.model.scheduleHuman = '';
         return {execute: false, payload: this.model};
       }
 
@@ -105,6 +106,8 @@ export const AnalyzePublishDialogComponent = {
           return result;
         }, {})
       };
+
+      this.model.scheduleHuman = this._AnalyzeService.scheduleToString(this.model.schedule);
 
       return {execute: false, payload: this.model};
     }
