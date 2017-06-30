@@ -178,9 +178,16 @@ export const AnalyzePivotComponent = {
           this.dataSource.store = this.deNormalizedData;
           this.dataSource = new PivotGridDataSource({store: this.dataSource.store, fields});
           this.pivotGridUpdater.next({
-            dataSource: this.dataSource,
-            sorts: this.sorts
+            dataSource: this.dataSource
           });
+          // different updates have to be done with a timeout
+          // there might be a bug in devextreme pivotgrid
+          this._$timeout(() => {
+            this.pivotGridUpdater.next({
+              sorts: this.sorts
+            });
+          });
+
           this.showProgress = false;
         })
         .catch(() => {
