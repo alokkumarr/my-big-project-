@@ -16,14 +16,28 @@ To build and run tests do the following:
 
         $ mvn verify
 
+# Deploying
+
+To deploy the system to the shared development environment run:
+
+    ./deploy
+
+Also see development [deployment](deploy/README.md) notes.
+
 # Updating SAW Transport Service routes
 
-To regenerate SAW Transport Service route files:
+After editing the `saw-transport-service/conf/routes` file, the Play
+framework generated source code files need to be regenerated.  This is
+done as follows:
 
         $ saw-transport-service/generate-routes
 
 Note: This is a workaround until the SAW Transport Service has been
 migrated to Java and Spring Framework.
+
+The generated files pattern can be found in the
+`saw-transport-service/generate-routes` script near the `rm -rf`
+command.
 
 # Updating sample semantic metadata in SAW Metadata Service
 
@@ -32,5 +46,5 @@ Service:
 
         $ saw-mddb-init/update
         
-The sample semantic metdata JSON files themselves are in the
-`saw-mddb-init` directory.
+The sample semantic metadata JSON files themselves are in
+the [`saw-mddb-init`](../saw-mddb-init) directory.

@@ -25,6 +25,4 @@ app_classpath=${app_classpath}:$(mapr classpath)
 
 cmd="java -Dlog.dir=${log_dir} -Dhadoop.home.dir=${HADOOP_HOME} -classpath $app_classpath $app_mainclass $@"
 
-echo $cmd
-
 $cmd

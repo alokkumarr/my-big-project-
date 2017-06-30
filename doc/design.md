@@ -17,9 +17,9 @@ preferred interface is OJAI.
 The Scheduler Service periodically triggers execution of analyses
 based on their configured schedule.  The Scheduler Service is a Spring
 Boot command-line application which is executed once daily by
-operating system service (`/etc/cront.daily`).  It fetches analyses
-with a schedule from the Analysis Service and triggers execution for
-any analyses that are due for execution.
+operating system services (see `/etc/cron.daily`).  It fetches
+analyses with a schedule from the Analysis Service and triggers
+execution for any analyses that are due for execution.
 
 Internally it uses the MapR-DB to keep track of analyses it has
 already executed with the current time period.  It then uses this
@@ -38,3 +38,7 @@ scheduler provides, so it was considered better to implement that
 functionality self than bringing in the complexity of Quartz.  This
 decision can be revisited later, if the needs come closer to what
 Quartz provides.
+
+Notes: There is currently no catchup of missed periods.  If needed,
+have scheduler store the last processed period and step over each
+remaining time period to catch up until the current moment.

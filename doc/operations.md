@@ -16,6 +16,9 @@ is provided by Synchronoss operations:
 3. Ensure there are hosts dedicated to SAW Services: two hosts, each
    with 32 GB of memory and running CentOS 7 as the operating system
 
+4. Ensure SAW Services hosts have the MapR client installed and a
+   `mapr` user (using the same UID on all hosts in the cluster)
+
 # Installing
 
 Execute the following steps to install SAW Services in the
@@ -30,6 +33,10 @@ environment:
    `saw-scheduler-service-daily` with the following content:
 
         sudo -u mapr java -jar /opt/saw-scheduler-service/saw-scheduler-service.jar 2>&1 | logger -t saw-scheduler-service
+
+3. Configure a URL in a front-end proxy to point to port 9200 of the
+   host that SAW Services has been installed on.  This URL should then
+   be used to configure the endpoints in the SAW web front-end.
 
 # Upgrading
 
