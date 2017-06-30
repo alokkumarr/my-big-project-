@@ -155,7 +155,10 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       /* There are three executions in the preceding tests, so the results
        * list should contain three elements */
       results.length must be (3)
-      executionId = (results(0) \ "id").extract[String]
+      val resultsSorted = results.sortWith((a, b) => {
+        (a \ "finished").extract[String] < (b \ "finished").extract[String]
+      })
+      executionId = (resultsSorted(0) \ "id").extract[String]
     }
 
     "get analysis execution data" in {

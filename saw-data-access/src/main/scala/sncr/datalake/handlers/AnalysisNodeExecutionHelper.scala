@@ -293,7 +293,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
     m_log trace "Result node descriptor: " + pretty(render(resultNodeDescriptor))
 
     val (res, msg) = resultNode.create
-    m_log info s"Analysis result creation: $res ==> $msg"
+    m_log debug s"Analysis result creation: $res ==> $msg"
     (res, msg)
   }
 

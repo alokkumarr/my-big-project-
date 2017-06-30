@@ -418,7 +418,7 @@ class Analysis extends BaseController {
       //TODO:: DLConfiguration.rowLimit can be replace with some Int value
 
       val resultData = execution.getPreview(DLConfiguration.rowLimit)
-      val data = processResult(resultData)
+      val data = processReportResult(resultData)
       m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}, created execution id: $analysisResultId"
       m_log debug s"start:  ${analysis.getStartTS} , finished  ${analysis.getFinishedTS} "
       m_log.trace("Spark SQL executor result: {}", pretty(render(data)))
@@ -427,7 +427,7 @@ class Analysis extends BaseController {
   }
 
   import scala.collection.JavaConversions._
-  private def processResult(data: util.List[util.Map[String, (String, Object)]]) : JValue = {
+  def processReportResult(data: util.List[util.Map[String, (String, Object)]]) : JValue = {
     if ( data == null || data.isEmpty) return JArray(List())
     JArray(data.map(m => {
        JObject(m.keySet().map(k =>
