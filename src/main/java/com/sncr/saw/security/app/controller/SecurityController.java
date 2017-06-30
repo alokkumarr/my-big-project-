@@ -31,6 +31,7 @@ import com.google.gson.Gson;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.common.bean.ChangePasswordDetails;
+import com.sncr.saw.security.common.bean.CustProdModule;
 import com.sncr.saw.security.common.bean.LoginDetails;
 import com.sncr.saw.security.common.bean.RandomHashcode;
 import com.sncr.saw.security.common.bean.ResetPwdDtls;
@@ -38,11 +39,17 @@ import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.Ticket;
 import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.common.bean.Valid;
+import com.sncr.saw.security.common.bean.repo.admin.CategoryDropDownList;
+import com.sncr.saw.security.common.bean.repo.admin.DeletePrivilege;
 import com.sncr.saw.security.common.bean.repo.admin.DeleteRole;
 import com.sncr.saw.security.common.bean.repo.admin.DeleteUser;
+import com.sncr.saw.security.common.bean.repo.admin.ModuleDropDownList;
+import com.sncr.saw.security.common.bean.repo.admin.PrivilegesList;
+import com.sncr.saw.security.common.bean.repo.admin.ProductDropDownList;
 import com.sncr.saw.security.common.bean.repo.admin.RolesDropDownList;
 import com.sncr.saw.security.common.bean.repo.admin.RolesList;
 import com.sncr.saw.security.common.bean.repo.admin.UsersList;
+import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.Analysis;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
@@ -923,7 +930,194 @@ public class SecurityController {
 		}
 		return roleList;
 	}
+	
+	/**
+	 * 
+	 * @param customerId
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/privileges/fetch", method = RequestMethod.POST)
+	public PrivilegesList getPrivileges(@RequestBody Long customerId) {
+		PrivilegesList privList = new PrivilegesList();
+		try {
+			if (customerId != null) {
+				privList.setPrivileges(userRepository.getPrivileges(customerId));
+				privList.setValid(true);
+			} else {
+				privList.setValid(false);
+				privList.setError("Mandatory request params are missing");
+			}
+		} catch (Exception e) {
+			privList.setValid(false);
+			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+			privList.setValidityMessage(message + " Please contact server Administrator");
+			privList.setError(e.getMessage());
+			return privList;
+		}
 
+		return privList;
+	}
+	
+	/**
+	 * 
+	 * @param customerId
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/products/list", method = RequestMethod.POST)
+	public ProductDropDownList getProductsList(@RequestBody Long customerId) {
+		ProductDropDownList products = new ProductDropDownList();
+		try {
+			products.setProducts(userRepository.getProductsDropDownList(customerId));
+			products.setValid(true);
+		} catch (Exception e) {
+			products.setValid(false);
+			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+			products.setValidityMessage(message + " Please contact server Administrator");
+			products.setError(e.getMessage());
+			return products;
+		}
+		return products;
+	}
+	
+	/**
+	 * 
+	 * @param cpm
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/modules/list", method = RequestMethod.POST)
+	public ModuleDropDownList getModulesList(@RequestBody CustProdModule cpm) {
+		ModuleDropDownList modules = new ModuleDropDownList();
+		try {
+			modules.setModules(userRepository.getModulesDropDownList(cpm.getCustomerId(), cpm.getProductId()));
+			modules.setValid(true);
+		} catch (Exception e) {
+			modules.setValid(false);
+			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+			modules.setValidityMessage(message + " Please contact server Administrator");
+			modules.setError(e.getMessage());
+			return modules;
+		}
+		return modules;
+	}
+	
+	/**
+	 * 
+	 * @param cpm
+	 * @return
+	 */
+	
+	@RequestMapping(value = "/auth/admin/cust/manage/categories/list", method = RequestMethod.POST)
+	public CategoryDropDownList getcategoriesList(@RequestBody  CustProdModule cpm) {
+		CategoryDropDownList categories = new CategoryDropDownList();
+		try {
+			categories.setCategory(userRepository.getCategoriesDropDownList(cpm.getCustomerId(), cpm.getModuleId()));
+			categories.setValid(true);
+		} catch (Exception e) {
+			categories.setValid(false);
+			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+			categories.setValidityMessage(message + " Please contact server Administrator");
+			categories.setError(e.getMessage());
+			return categories;
+		}
+		return categories;
+	}
+	
+	/**
+	 * 
+	 * @param privilege
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/privileges/add", method = RequestMethod.POST)
+	public PrivilegesList addPrivilege(@RequestBody PrivilegeDetails privilege) {
+		PrivilegesList privList = new PrivilegesList();
+		Valid valid = null;
+		try {
+			if (privilege != null) {
+				valid = userRepository.addPrivilege(privilege);
+				if (valid.getValid()) {
+					privList.setPrivileges(userRepository.getPrivileges(privilege.getCustomerId()));
+					privList.setValid(true);
+				} else {
+					privList.setValid(false);
+					privList.setValidityMessage("Privilege could not be added. " + valid.getError());
+				}
+			} else {
+				privList.setValid(false);
+				privList.setValidityMessage("Mandatory request params are missing");
+			}
+		} catch (Exception e) {
+			privList.setValid(false);
+			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+			privList.setValidityMessage(message + " Please contact server Administrator");
+			privList.setError(e.getMessage());
+			return privList;
+		}
+		return privList;
+	}
+	
+	/**
+	 * 
+	 * @param privilege
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/privileges/edit", method = RequestMethod.POST)
+	public PrivilegesList updatePrivilege(@RequestBody PrivilegeDetails privilege) {
+		PrivilegesList privList = new PrivilegesList();
+		Valid valid = null;
+		try {
+			if (privilege != null) {
+				valid = userRepository.updatePrivilege(privilege);
+				if (valid.getValid()) {
+					privList.setPrivileges(userRepository.getPrivileges(privilege.getCustomerId()));
+					privList.setValid(true);
+				} else {
+					privList.setValid(false);
+					privList.setValidityMessage("Privilege could not be updated. " + valid.getError());
+				}
+			} else {
+				privList.setValid(false);
+				privList.setValidityMessage("Mandatory request params are missing");
+			}
+		} catch (Exception e) {
+			privList.setValid(false);
+			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+			privList.setValidityMessage(message + " Please contact server Administrator");
+			privList.setError(e.getMessage());
+			return privList;
+		}
+		return privList;
+	}
+
+	/**
+	 * 
+	 * @param privilege
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/privileges/delete", method = RequestMethod.POST)
+	public PrivilegesList deletePrivilege(@RequestBody DeletePrivilege privilege) {
+		PrivilegesList privList = new PrivilegesList();
+		try {
+			if (privilege != null) {
+				if (userRepository.deletePrivilege(privilege.getPrivilegeId())) {
+					privList.setPrivileges(userRepository.getPrivileges(privilege.getCustomerId()));
+					privList.setValid(true);
+				} else {
+					privList.setValid(false);
+					privList.setValidityMessage("Privilege could not be deleted. ");
+				}
+			} else {
+				privList.setValid(false);
+				privList.setValidityMessage("Mandatory request params are missing");
+			}
+		} catch (Exception e) {
+			privList.setValid(false);
+			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+			privList.setValidityMessage(message + " Please contact server Administrator");
+			privList.setError(e.getMessage());
+			return privList;
+		}
+		return privList;
+	}
 	/**
 	 * 
 	 * @param args
