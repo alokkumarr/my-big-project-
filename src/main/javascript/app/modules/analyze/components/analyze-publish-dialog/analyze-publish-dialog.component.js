@@ -9,6 +9,16 @@ import first from 'lodash/first';
 import template from './analyze-publish-dialog.component.html';
 import style from './analyze-publish-dialog.component.scss';
 
+const F2B_DICTIONARY = {
+  WEEKS: 'weekly',
+  DAYS: 'daily'
+};
+
+const B2F_DICTIONARY = {
+  weekly: 'WEEKS',
+  daily: 'DAYS'
+};
+
 export const AnalyzePublishDialogComponent = {
   template,
   styles: [style],
@@ -69,10 +79,11 @@ export const AnalyzePublishDialogComponent = {
         return;
       }
 
-      this.repeatOrdinal = this.model.repeatInterval;
-      this.repeatInterval = this.model.repeatUnit;
+      this.schedule = this.scheduleOptions[1];
+      this.repeatOrdinal = this.model.schedule.repeatInterval;
+      this.repeatInterval = B2F_DICTIONARY[this.model.schedule.repeatUnit];
       forEach(this.repeatOnDaysOfWeek, day => {
-        day.checked = Boolean(get(this.model, `schedule.repeatOnDaysOfWeek.${day.keyword.toUpperCase()}`));
+        day.checked = Boolean(get(this.model, `schedule.repeatOnDaysOfWeek.${day.keyword.toLowerCase()}`));
       });
     }
 
@@ -83,7 +94,7 @@ export const AnalyzePublishDialogComponent = {
       }
 
       this.model.schedule = {
-        repeatUnit: this.repeatInterval,
+        repeatUnit: F2B_DICTIONARY[this.repeatInterval],
         repeatInterval: this.repeatOrdinal,
         repeatOnDaysOfWeek: reduce(this.repeatOnDaysOfWeek, (result, day) => {
           result[day.keyword.toLowerCase()] = day.checked;
@@ -110,9 +121,8 @@ export const AnalyzePublishDialogComponent = {
 
     publish() {
       const payload = this.generateSchedulePayload();
-      console.log(payload);
-      // this.onPublish({model: this.model});
-      // this._$mdDialog.hide();
+      this.onPublish({model: payload});
+      this._$mdDialog.hide();
     }
   }
 };

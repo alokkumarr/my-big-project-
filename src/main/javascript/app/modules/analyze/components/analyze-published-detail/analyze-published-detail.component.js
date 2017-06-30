@@ -24,7 +24,7 @@ export const AnalyzePublishedDetailComponent = {
       this._$window = $window; // used for going back from the template
       this._$mdDialog = $mdDialog;
       this._executionId = $state.params.executionId;
-      this.isPublished = true;
+      this.isPublished = false;
 
       this.requester = new BehaviorSubject({});
     }

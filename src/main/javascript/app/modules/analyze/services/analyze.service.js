@@ -174,7 +174,9 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
 
   function publishAnalysis(model) {
     return updateAnalysis(model).then(analysis => {
-      executeAnalysis(model);
+      if (!model.schedule) {
+        executeAnalysis(model);
+      }
       return analysis;
     });
   }
