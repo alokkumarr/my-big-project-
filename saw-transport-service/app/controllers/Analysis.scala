@@ -31,8 +31,8 @@ import java.time.LocalDateTime
 import sncr.metadata.engine.{Fields, MetadataDictionary}
 
 class Analysis extends BaseController {
-  val executorRunner = new ExecutionTaskHandler(1)
-
+  val executorRunner = new ExecutionTaskHandler(1);
+  
   /**
     * List analyses.  At the moment only used by scheduler to list
     * analyses that are scheduled.
@@ -152,7 +152,7 @@ class Analysis extends BaseController {
 	        queryRuntime = QueryBuilder.build(analysis, runtime)
         }
         /* Execute analysis and return result data */
-        val data = executeAnalysis(analysisId, queryRuntime)
+        val data = executeAnalysis(analysisId, queryRuntime, json)
         contentsAnalyze(("data", data))
       }
       case "delete" => {
@@ -204,8 +204,8 @@ class Analysis extends BaseController {
         "Expected array: " + analysisListJson)
     }
     val analysis = (analysisJson \ "schedule") match {
-      case obj: JObject => analysisJson ~ ("isScheduled", "true")
-      case _ => analysisJson ~ ("isScheduled", "false")
+      case obj: JObject => updateField(analysisJson, "isScheduled", "true")
+      case _ => updateField(analysisJson, "isScheduled", "false")
     }
     val analysisType = (analysisListJson \ "type");
     val typeInfo = analysisType.extract[String];
@@ -270,13 +270,25 @@ class Analysis extends BaseController {
   var result: String = null
   def setResult(r: String): Unit = result = r
  
-  def executeAnalysis(analysisId: String, queryRuntime: String = null): JValue = {
- 
-    // reading the JSON extract type
-    val analysisJSON = readAnalysisJson(analysisId);
-    val analysisType = (analysisJSON \ "type");
+  def executeAnalysis(analysisId: String, queryRuntime: String = null, reqJSON: JValue =null): JValue = {
+ 	var json: String = "";
+ 	var typeInfo : String = "";
+ 	var analysisJSON : JObject = null;
+ 	m_log.trace("json dataset: {}", reqJSON);
+    val analysis = analysisJson(reqJSON); // reading from request body
+    val executionType = (analysis \ "executionType");
+    if (executionType == "preview" || executionType == "scheduled"){
+		analysisJSON = readAnalysisJson(analysisId); // reading from the store
+		val analysisType = (analysisJSON \ "type");
+   		typeInfo = analysisType.extract[String];
+   		json = compact(render(analysisJSON));
+    }
+    else {
+        val analysisType = (analysis \ "type");
+        typeInfo = analysisType.extract[String];
+   		json = compact(render(analysis));
+    } 
     val analysisNode = AnalysisNode(analysisId)
-    
     val dfrm: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     val analysisName = (analysisJSON \ "metricName").extractOpt[String]
     var descriptor: JObject = null
@@ -285,12 +297,8 @@ class Analysis extends BaseController {
     var schema : JValue = JNothing
     var resultNode: AnalysisResult = null
     
-    
     if (analysisNode.getCachedData == null || analysisNode.getCachedData.isEmpty)
       throw new Exception("Could not find analysis node with provided analysis ID")
-    // check the type
-    val typeInfo = analysisType.extract[String];
-    val json = compact(render(analysisJSON));
     m_log.trace("json dataset: {}", json);
     m_log.trace("type: {}", typeInfo);
     if ( typeInfo.equals("pivot") )
@@ -442,6 +450,13 @@ class Analysis extends BaseController {
     ).toList)
   }
 
-
-
+  private def updateField(json: JObject, name: String, value: JValue) = {
+    ((json removeField {
+      case JField(fieldName, _) => fieldName == name
+      case _ => false
+    }) match {
+      case obj: JObject => obj
+      case obj => throw new RuntimeException("Unsupported type: " + obj)
+    }) ~ (name, value)
+  }
 }

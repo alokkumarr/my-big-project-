@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # Update SAW semantic metadata in SAW Metadata Service
 #
@@ -23,7 +23,7 @@ files="mct_content_$s mct_error_$s mct_session_$s mct_session_and_content_$s"
 mdcli="sudo sudo -u mapr /opt/saw/service/bin/mdcli.sh"
 host="mapr01.bda.poc.velocity-va.sncrcorp.net"
 data="/mapr/bda_lab_batch"
-dir=$(dirname $0)
+dir="$(dirname $0)"
 
 set -x
 for path in $files; do
