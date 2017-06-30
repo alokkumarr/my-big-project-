@@ -1,9 +1,11 @@
 import find from 'lodash/find';
 import forEach from 'lodash/forEach';
 import template from './analyze-chart-settings.component.html';
+import style from './analyze-chart-settings.component.scss';
 
 export const AnalyzeChartSettingsComponent = {
   template,
+  styles: [style],
   bindings: {
     settings: '<?',
     onChange: '&'
@@ -26,18 +28,33 @@ export const AnalyzeChartSettingsComponent = {
           this._clearWatcher();
         }
       });
+      this.groupRemovalAction = {
+        icon: 'icon-close',
+        isVisible: () => this.selected.g,
+        callback: () => {
+          this.selected.g = null;
+          forEach(this.settings.groupBy, attr => {
+            attr.checked = false;
+          });
+        }
+      };
     }
 
     markSelected() {
-      this.selected.y = find(this.settings.yaxis, attr => attr.checked);
-      this.selected.x = find(this.settings.xaxis, attr => attr.checked);
-      this.selected.z = find(this.settings.groupBy, attr => attr.checked);
+      this.selected.y = find(this.settings.yaxis, attr => attr.checked === 'y');
+      this.selected.x = find(this.settings.xaxis, attr => attr.checked === 'x');
+      this.selected.g = find(this.settings.groupBy, attr => attr.checked === 'g');
+      this.selected.z = find(this.settings.zaxis, attr => attr.checked === 'z');
     }
 
-    inputChanged(axisOptions, selectedAttr) {
+    inputChanged(axisOptions, selectedAttr, marker) {
 
       forEach(axisOptions, attr => {
-        attr.checked = selectedAttr === attr;
+        if (selectedAttr === attr) {
+          attr.checked = marker;
+        } else if (attr.checked === marker) {
+          attr.checked = false;
+        }
       });
 
       this.onChange({settings: this.settings});

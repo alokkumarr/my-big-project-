@@ -1,6 +1,7 @@
 import angular from 'angular';
 import Highstock from 'highcharts/highstock';
 import Highcharts from 'highcharts/highcharts';
+import more from 'highcharts/highcharts-more';
 
 import exporting from 'highcharts/modules/exporting';
 import offlineExporting from 'highcharts/modules/offline-exporting';
@@ -11,6 +12,7 @@ import {businessTransactionVolumeChart} from './business-transaction-volume.char
 
 export const ChartsModule = 'components.charts';
 
+more(Highcharts);
 exporting(Highcharts);
 offlineExporting(Highcharts);
 

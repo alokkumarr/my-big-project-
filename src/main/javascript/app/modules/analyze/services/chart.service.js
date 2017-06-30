@@ -3,11 +3,17 @@ import set from 'lodash/set';
 import map from 'lodash/map';
 import flatMap from 'lodash/flatMap';
 import sortBy from 'lodash/sortBy';
-import clone from 'lodash/clone';
 import reduce from 'lodash/reduce';
 import keys from 'lodash/keys';
 import forEach from 'lodash/forEach';
 import filter from 'lodash/filter';
+import fpPipe from 'lodash/fp/pipe';
+import fpToPairs from 'lodash/fp/toPairs';
+import fpMap from 'lodash/fp/map';
+import fpGroupBy from 'lodash/fp/groupBy';
+import fpGet from 'lodash/fp/get';
+import fpFlatMap from 'lodash/fp/flatMap';
+import fpSortBy from 'lodash/fp/sortBy';
 
 import {NUMBER_TYPES} from '../consts';
 
@@ -209,8 +215,46 @@ export function ChartService() {
     ];
   };
 
-  const gridToBubble = (x, y, group, data, z, name) => {
+  /* backend                 --- frontend
+   * group_by                --- x (x-axis)
+   * split_by                --- g (groupBy on fontend)
+   * values in lowest bucket --- y,z (y-axis, z-axis)
+  */
+  const gridToBubble = (x, y, g, data, z) => {
+    console.log('x: ', x);
+    console.log('y: ', y);
+    console.log('z: ', z);
+    console.log('group: ', g);
+    console.log('data: ', data);
 
+    const series = fpPipe(
+      fpGet('group_by.buckets'),
+      fpFlatMap(xBucket => map(get(xBucket, 'split_by.buckets'),
+        gBucket => {
+          return {
+            x: xBucket.key,
+            y: gBucket[y.columnName].value,
+            z: gBucket[z.columnName].value,
+            g: gBucket.key
+          };
+        }
+      )),
+      fpGroupBy('g'),
+      fpToPairs,
+      fpMap(([groupName, groupValues]) => {
+        return {
+          name: groupName,
+          data: groupValues
+        };
+      })
+    )(data);
+
+    console.log('series', series);
+
+    return [{
+      path: 'series',
+      data: series
+    }];
   };
 
   /* Functions to convert grid data to chart options forEach
@@ -228,12 +272,13 @@ export function ChartService() {
   };
 
   const dataToChangeConfig = (type, settings, gridData, opts) => {
-    console.log('chart type: ', opts.chart);
-    const xaxis = filter(settings.xaxis, attr => attr.checked)[0] || {};
-    const yaxis = filter(settings.yaxis, attr => attr.checked)[0] || {};
-    const group = filter(settings.groupBy, attr => attr.checked)[0] || {};
+    const xaxis = filter(settings.xaxis, attr => attr.checked === 'x')[0] || {};
+    const yaxis = filter(settings.yaxis, attr => attr.checked === 'y')[0] || {};
+    const group = filter(settings.groupBy, attr => attr.checked === 'g')[0] || {};
 
-    const changes = dataCustomizer[type](xaxis, yaxis, group, gridData);
+    const zaxis = type === 'bubble' ? filter(settings.zaxis, attr => attr.checked === 'z')[0] || {} : null;
+    const changes = dataCustomizer[type](xaxis, yaxis, group, gridData, zaxis);
+
     return changes.concat([
       {
         path: 'xAxis.title.text',
@@ -246,55 +291,77 @@ export function ChartService() {
     ]);
   };
 
-  function mergeArtifactsWithSettings(artifacts, record) {
+  function mergeArtifactsWithSettings(artifacts, record = {}, marker) {
     forEach(artifacts, a => {
-      a.checked = a.columnName === record.columnName &&
-        a.tableName === record.tableName;
+      if (a.columnName === record.columnName &&
+          a.tableName === record.tableName) {
+        a.checked = marker;
+      }
     });
 
     return artifacts;
   }
 
-  function fillSettings(artifacts, model) {
-    /* Flatten the artifacts into a single array */
-    let attributes = flatMap(artifacts, metric => {
-      return map(metric.columns, attr => {
-        attr.tableName = metric.artifactName;
-        return attr;
-      });
-    });
-
-    attributes = sortBy(attributes, [attr => attr.columnName]);
-
-    /* Based on data type, divide the artifacts between axes. */
-    const yaxis = filter(attributes, attr => (
+  function filterNumberTypes(attributes) {
+    return filter(attributes, attr => (
       attr.columnName &&
       NUMBER_TYPES.includes(attr.type)
     ));
-    const xaxis = filter(attributes, attr => (
+  }
+
+  function filterStringTypes(attributes) {
+    return filter(attributes, attr => (
       attr.columnName &&
       (attr.type === 'string' || attr.type === 'String')
     ));
-    const groupBy = map(xaxis, clone);
+  }
 
-    mergeArtifactsWithSettings(xaxis, get(model, 'sqlBuilder.groupBy', {}));
-    mergeArtifactsWithSettings(yaxis, get(model, 'sqlBuilder.dataFields.[0]', {}));
-    mergeArtifactsWithSettings(groupBy, get(model, 'sqlBuilder.splitBy', {}));
+  function fillSettings(artifacts, model) {
+    /* Flatten the artifacts into a single array and sort them */
+    const attributes = fpPipe(
+      fpFlatMap(metric => {
+        return map(metric.columns, attr => {
+          attr.tableName = metric.artifactName;
+          return attr;
+        });
+      }),
+      fpSortBy('columnName')
+    )(artifacts);
 
-    const settingsObj = {
-      yaxis,
-      xaxis,
-      groupBy
-    };
+    let xaxis;
+    let yaxis;
+    let zaxis;
+    let settingsObj;
+    const groupBy = filterStringTypes(attributes);
 
-    if (model.chartType === 'bubble') {
-      const zaxis = filter(attributes, attr => (
-        attr.columnName &&
-        (NUMBER_TYPES.includes(attr.type))
-      ));
-      settingsObj.zaxis = zaxis;
+    switch (model.chartType) {
+      case 'bubble':
+        xaxis = attributes;
+        yaxis = attributes;
+        zaxis = filterNumberTypes(attributes);
+        mergeArtifactsWithSettings(xaxis, get(model, 'sqlBuilder.dataFields.[0]'), 'x');
+        mergeArtifactsWithSettings(yaxis, get(model, 'sqlBuilder.dataFields.[1]'), 'y');
+        mergeArtifactsWithSettings(zaxis, get(model, 'sqlBuilder.dataFields.[2]'), 'z');
+        mergeArtifactsWithSettings(groupBy, get(model, 'sqlBuilder.splitBy'), 'g');
+        settingsObj = {
+          xaxis,
+          yaxis,
+          zaxis,
+          groupBy
+        };
+        break;
+      default:
+        xaxis = filterStringTypes(attributes);
+        yaxis = filterNumberTypes(attributes);
+        mergeArtifactsWithSettings(xaxis, get(model, 'sqlBuilder.groupBy'), 'x');
+        mergeArtifactsWithSettings(yaxis, get(model, 'sqlBuilder.dataFields.[0]'), 'y');
+        mergeArtifactsWithSettings(groupBy, get(model, 'sqlBuilder.splitBy'), 'g');
+        settingsObj = {
+          yaxis,
+          xaxis,
+          groupBy
+        };
     }
-
     return settingsObj;
   }
 

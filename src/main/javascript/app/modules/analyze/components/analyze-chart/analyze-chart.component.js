@@ -34,7 +34,8 @@ export const AnalyzeChartComponent = {
     mode: '@?'
   },
   controller: class AnalyzeChartController {
-    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, ChartService, FilterService, $mdSidenav) {
+    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService,
+                ChartService, FilterService, $mdSidenav, $translate, toastMessage) {
       'ngInject';
 
       this._FilterService = FilterService;
@@ -43,6 +44,8 @@ export const AnalyzeChartComponent = {
       this._$mdSidenav = $mdSidenav;
       this._$mdDialog = $mdDialog;
       this._$timeout = $timeout;
+      this._$translate = $translate;
+      this._toastMessage = toastMessage;
       this.BAR_COLUMN_OPTIONS = BAR_COLUMN_OPTIONS;
 
       this.legend = {
@@ -76,6 +79,7 @@ export const AnalyzeChartComponent = {
 
     $onInit() {
       const chartType = this.model.chartType;
+      // used only for bar or column type charts
       this.barColumnChoice = ['bar', 'column'].includes(chartType) ? chartType : '';
 
       if (this.mode === ENTRY_MODES.FORK) {
@@ -185,6 +189,9 @@ export const AnalyzeChartComponent = {
     }
 
     refreshChartData() {
+      if (!this.checkModelValidity()) {
+        return;
+      }
       this.showProgress = true;
       const payload = this.generatePayload(this.model);
       return this._AnalyzeService.getDataBySettings(payload).then(({data}) => {
@@ -195,6 +202,43 @@ export const AnalyzeChartComponent = {
       }, () => {
         this.showProgress = false;
       });
+    }
+
+    /** check the parameters, before sending the request for the cahrt data */
+    checkModelValidity() {
+      let isValid = true;
+      const errors = [];
+      const x = find(this.settings.xaxis, x => x.checked === 'x');
+      const y = find(this.settings.yaxis, y => y.checked === 'y');
+      const z = find(this.settings.zaxis, z => z.checked === 'z');
+
+      switch (this.model.chartType) {
+        case 'bubble':
+        // x, y and z axes are mandatory
+        // grouping is optional
+          if (!x || !y || !z) {
+            errors[0] = 'ERROR_X_Y_AXES_REQUIRED';
+            isValid = false;
+          }
+          break;
+        default:
+        // x and y axes are mandatory
+        // grouping is optional
+          if (!x || !y) {
+            errors[0] = 'ERROR_X_Y_Z_AXES_REQUIRED';
+            isValid = false;
+          }
+      }
+
+      if (!isValid) {
+        this._$translate(errors).then(translations => {
+          this._toastMessage.error(values(translations).join('\n'), '', {
+            timeOut: 3000
+          });
+        });
+      }
+
+      return isValid;
     }
 
     openFiltersModal(ev) {
@@ -279,13 +323,32 @@ export const AnalyzeChartComponent = {
         this._FilterService.frontend2BackendFilter()
       ));
 
-      const y = find(this.settings.yaxis, y => y.checked);
+      const x = find(this.settings.xaxis, x => x.checked === 'x');
+      const y = find(this.settings.yaxis, y => y.checked === 'y');
+      const g = find(this.settings.groupBy, g => g.checked === 'g');
+      let z;
+
+      switch (this.model.chartType) {
+        case 'bubble':
+          z = find(this.settings.zaxis, z => z.checked === 'z');
+          set(result, 'sqlBuilder.splitBy', null);
+          set(result, 'sqlBuilder.groupBy', g);
+          set(result, 'sqlBuilder.dataFields', [
+            assign({aggregate: 'sum'}, x),
+            assign({aggregate: 'sum'}, y),
+            assign({aggregate: 'sum'}, z)
+          ]);
+          break;
+        default:
+          set(result, 'sqlBuilder.splitBy', g);
+          set(result, 'sqlBuilder.groupBy', x);
+          set(result, 'sqlBuilder.dataFields', [
+            assign({aggregate: 'sum'}, y)
+          ]);
+      }
 
       delete result.supports;
       set(result, 'sqlBuilder.sorts', []);
-      set(result, 'sqlBuilder.groupBy', find(this.settings.xaxis, x => x.checked));
-      set(result, 'sqlBuilder.splitBy', find(this.settings.groupBy, x => x.checked));
-      set(result, 'sqlBuilder.dataFields', [assign({aggregate: 'sum'}, y)]);
       set(result, 'sqlBuilder.booleanCriteria', this.model.sqlBuilder.booleanCriteria);
       set(result, 'xAxis', {title: this.labels.x});
       set(result, 'yAxis', {title: this.labels.y});

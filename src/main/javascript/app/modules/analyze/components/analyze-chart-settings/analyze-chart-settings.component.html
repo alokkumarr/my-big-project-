@@ -12,10 +12,11 @@
 
       <collapser title="Y-Axis Options">
         <md-radio-group ng-model="$ctrl.selected.y"
-                        ng-change="$ctrl.inputChanged($ctrl.settings.yaxis, $ctrl.selected.y)">
+                        ng-change="$ctrl.inputChanged($ctrl.settings.yaxis, $ctrl.selected.y, 'y')">
           <md-radio-button ng-repeat="attr in $ctrl.settings.yaxis"
                            role="radio"
-                           ng-value="attr">
+                           ng-value="attr"
+                           ng-disabled="attr.checked && attr.checked != 'y'">
             <span ng-bind="::attr.displayName"></span>
           </md-radio-button>
         </md-radio-group>
@@ -23,33 +24,36 @@
 
       <collapser title="X-Axis Options">
         <md-radio-group ng-model="$ctrl.selected.x"
-                        ng-change="$ctrl.inputChanged($ctrl.settings.xaxis, $ctrl.selected.x)">
+                        ng-change="$ctrl.inputChanged($ctrl.settings.xaxis, $ctrl.selected.x, 'x')">
           <md-radio-button ng-repeat="attr in $ctrl.settings.xaxis"
                            role="radio"
-                           ng-value="attr">
+                           ng-value="attr"
+                           ng-disabled="attr.checked && attr.checked != 'x'">
             <span ng-bind="::attr.displayName"></span>
           </md-radio-button>
         </md-radio-group>
       </collapser>
-
-      <collapser title="Z-Axis Options"
-                 ng-if="$ctrl.model.chartType === 'bubble'">
+      <collapser title="Size by"
+                 ng-if="$ctrl.settings.zaxis">
         <md-radio-group ng-model="$ctrl.selected.z"
-                        ng-change="$ctrl.inputChanged($ctrl.settings.zaxis, $ctrl.selected.z)">
+                        ng-change="$ctrl.inputChanged($ctrl.settings.zaxis, $ctrl.selected.z, 'z')">
           <md-radio-button ng-repeat="attr in $ctrl.settings.zaxis"
                            role="radio"
-                           ng-value="attr">
+                           ng-value="attr"
+                           ng-disabled="attr.checked && attr.checked != 'z'">
             <span ng-bind="::attr.displayName"></span>
           </md-radio-button>
         </md-radio-group>
       </collapser>
 
-      <collapser title="Group By">
-        <md-radio-group ng-model="$ctrl.selected.z"
-                        ng-change="$ctrl.inputChanged($ctrl.settings.groupBy, $ctrl.selected.z)">
+      <collapser title="{{$ctrl.settings.zaxis ? 'Color By' : 'Group By'}}"
+                 action="$ctrl.groupRemovalAction">
+        <md-radio-group ng-model="$ctrl.selected.g"
+                        ng-change="$ctrl.inputChanged($ctrl.settings.groupBy, $ctrl.selected.g, 'g')">
           <md-radio-button ng-repeat="attr in $ctrl.settings.groupBy"
                            role="radio"
-                           ng-value="attr">
+                           ng-value="attr"
+                           ng-disabled="attr.checked && attr.checked != 'g'">
             <span ng-bind="::attr.displayName"></span>
           </md-radio-button>
         </md-radio-group>

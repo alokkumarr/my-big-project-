@@ -28,7 +28,7 @@ collapser {
       margin: 0;
     }
 
-    md-icon {
+    md-icon[md-font-icon="icon-expand"] {
       transition: transform 0.3s;
       transform: rotate(-180deg);
       text-align: center;
