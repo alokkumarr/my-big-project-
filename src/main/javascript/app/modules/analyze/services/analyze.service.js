@@ -269,7 +269,14 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
 
   function saveReport(model) {
     model.saved = true;
-    return updateAnalysis(model);
+    const updatePromise = updateAnalysis(model);
+
+    updatePromise.then(analysis => {
+      return applyAnalysis(model, EXECUTION_MODES.PREVIEW).then(data => {
+        return {analysis, data};
+      });
+    });
+    return updatePromise;
   }
 
   function getSemanticLayerData() {
