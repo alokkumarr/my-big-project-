@@ -95,7 +95,7 @@ export const AnalyzeFilterModalComponent = {
 
     cleanFilters(filters) {
       forEach(filters, filter => {
-        if (NUMBER_TYPES.includes(filter.column.type) &&
+        if (NUMBER_TYPES.includes(filter.column.type) && filter.model &&
             filter.model.operator !== OPERATORS.BETWEEN.shortName) {
           unset(filter.model, 'otherValue');
         }
