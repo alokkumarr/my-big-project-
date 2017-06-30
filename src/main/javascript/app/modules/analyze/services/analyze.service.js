@@ -5,7 +5,6 @@ import set from 'lodash/set';
 import reduce from 'lodash/reduce';
 import trim from 'lodash/trim';
 import fpSortBy from 'lodash/fp/sortBy';
-import keys from 'lodash/keys';
 import fpGet from 'lodash/fp/get';
 import filter from 'lodash/filter';
 import find from 'lodash/find';

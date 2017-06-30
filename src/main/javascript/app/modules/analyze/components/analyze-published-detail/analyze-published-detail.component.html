@@ -90,12 +90,19 @@
   <md-card>
     <md-card-title>
       <md-card-title-text>
-        <span class="md-title" ng-bind="$ctrl.analysis.userFullName | changeCase:'title'"></span>
-        <span class="md-subhead" ng-bind="$ctrl.analysis.scheduleHuman"></span>
+        <div>
+          <span class="md-title" ng-bind="$ctrl.analysis.userFullName | changeCase:'title'"></span>
+          <span ng-if="$ctrl.analysis.userFullName"> (Creator) </span>
+        </div>
       </md-card-title-text>
     </md-card-title>
     <md-card-content>
+      <div>
+        <strong ng-if="$ctrl.analysis.scheduleHuman">Schedule: </strong>
+        <span class="md-subhead" ng-bind="$ctrl.analysis.scheduleHuman"></span>
+      </div>
       <div class="row">
+        <strong ng-if="$ctrl.analysis.description">Description</strong>
         <p ng-bind="$ctrl.analysis.description"></p>
       </div>
     </md-card-content>
