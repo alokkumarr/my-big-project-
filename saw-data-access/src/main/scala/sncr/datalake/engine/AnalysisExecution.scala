@@ -28,10 +28,10 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
   protected var startTS : java.lang.Long = null
   protected var finishTS : java.lang.Long = null
 
-  def startExecution: Unit =
+  def startExecution(sqlRuntime: String = null): Unit =
   {
     try {
-      analysisNodeExecution = new AnalysisNodeExecutionHelper(an)
+      analysisNodeExecution = new AnalysisNodeExecutionHelper(an, sqlRuntime)
       id = analysisNodeExecution.resId
       m_log debug s"Started execution, result ID: $id"
       status = ExecutionStatus.STARTED

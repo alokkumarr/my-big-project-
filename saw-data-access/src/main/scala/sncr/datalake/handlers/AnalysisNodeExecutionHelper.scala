@@ -23,7 +23,7 @@ import sncr.saw.common.config.SAWServiceConfig
 /**
   * Created by srya0001 on 5/18/2017.
   */
-class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = false, var resId : String = null ) extends DLSession with HasDataObject[AnalysisNodeExecutionHelper]{
+class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cacheIt: Boolean = false, var resId : String = null ) extends DLSession with HasDataObject[AnalysisNodeExecutionHelper]{
 
   override protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisNodeExecutionHelper].getName)
   resId = if (resId == null || resId.isEmpty) UUID.randomUUID().toString else resId
@@ -64,11 +64,12 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
 
   m_log trace s"Check definition before extracting value ==> ${pretty(render(definition))}"
 
+  val sqlDefinition = (definition \ "query").extractOrElse[String]("")
   val sqlManual = (definition \ "queryManual").extractOrElse[String]("")
   val metricName = (definition \ "metricName").extractOrElse[String]("")
   val analysisKey = "AN_" + System.currentTimeMillis()
 
-  val sql = if (sqlManual != "") sqlManual else (definition \ "query").extractOrElse[String]("")
+  val sql = if (sqlManual != "") sqlManual else if (sqlRuntime != null) sqlRuntime else sqlDefinition
 
 // ----------- SAW-880 -------------------------------
 //TODO:: Modify it, see SAW-880, item 11
@@ -305,7 +306,7 @@ object AnalysisNodeExecutionHelper{
   //TODO:: The function is to be replaced with another one to construct user ( tenant ) specific path
   def getUserSpecificPath(outputLocation: String): String = outputLocation
 
-  def apply( rowId: String, cacheIt: Boolean = false) : AnalysisNodeExecutionHelper = { val an = AnalysisNode(rowId); new AnalysisNodeExecutionHelper(an, cacheIt)}
+  def apply( rowId: String, cacheIt: Boolean = false) : AnalysisNodeExecutionHelper = { val an = AnalysisNode(rowId); new AnalysisNodeExecutionHelper(an, null, cacheIt)}
   def convertJsonToList(value: JValue): util.List[util.Map[String, (String, Object)]] =
   {
     value match {

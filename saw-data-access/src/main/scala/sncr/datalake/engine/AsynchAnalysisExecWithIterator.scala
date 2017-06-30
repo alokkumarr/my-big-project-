@@ -20,7 +20,7 @@ class AsynchAnalysisExecWithIterator(an: AnalysisNode, execType : ExecutionType)
   override def call(): java.util.Iterator[java.util.HashMap[String, (String, Object)]] =
   {
     try {
-      startExecution
+      startExecution()
       if (status == ExecutionStatus.COMPLETED){
          return analysisNodeExecution.getDataIterator
       }

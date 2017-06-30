@@ -39,7 +39,7 @@ public class ExecutionRunner {
             if (analysis_id != null && !analysis_id.isEmpty()) {
                 System.out.println("Execute: \nAnalysis node id: " + analysis_id);
                 AnalysisNode an = AnalysisNode.apply(analysis_id);
-                AnalysisNodeExecutionHelper ane = new AnalysisNodeExecutionHelper(an, true, execResId);
+                AnalysisNodeExecutionHelper ane = new AnalysisNodeExecutionHelper(an, null, true, execResId);
                 ane.executeAndSave(outStream, rowLimit);
                 ane.printSample(outStream);
             }else

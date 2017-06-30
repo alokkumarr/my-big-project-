@@ -412,7 +412,7 @@ class Analysis extends BaseController {
     else {
       // This is the part of report type starts here
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
-      val execution = analysis.executeAndWait(ExecutionType.onetime)
+      val execution = analysis.executeAndWait(ExecutionType.onetime, queryRuntime)
       val analysisResultId: String = execution.getId
       //TODO:: Subject to change: to get ALL data use:  val resultData = execution.getAllData
       //TODO:: DLConfiguration.rowLimit can be replace with some Int value
