@@ -22,6 +22,9 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 
 import com.sncr.saw.security.app.repository.UserRepository;
+import com.sncr.saw.security.common.bean.Category;
+import com.sncr.saw.security.common.bean.Module;
+import com.sncr.saw.security.common.bean.Product;
 import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.Role;
 import com.sncr.saw.security.common.bean.Ticket;
@@ -33,6 +36,7 @@ import com.sncr.saw.security.common.bean.repo.ProductModuleFeature;
 import com.sncr.saw.security.common.bean.repo.ProductModules;
 import com.sncr.saw.security.common.bean.repo.Products;
 import com.sncr.saw.security.common.bean.repo.TicketDetails;
+import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.Analysis;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
@@ -1224,7 +1228,7 @@ public class UserRepositoryImpl implements UserRepository {
 		} catch (DuplicateKeyException e) {
 			logger.error("Exception encountered while creating a new user " + e.getMessage(), null, e);
 			valid.setValid(false);
-			valid.setError("User cannot be added. User ID already Exists!");
+			valid.setError("User cannot be added. Login ID already Exists!");
 			return valid;
 		} catch (DataIntegrityViolationException de) {
 			logger.error("Exception encountered while creating a new user " + de.getMessage(), null, de);
@@ -1305,7 +1309,7 @@ public class UserRepositoryImpl implements UserRepository {
 	public List<Role> getRolesDropDownList(Long customerId) {
 		ArrayList<Role> rolesList = null;
 		String sql = "SELECT R.ROLE_SYS_ID, R.ROLE_NAME FROM ROLES R "
-				+ " WHERE R.CUSTOMER_SYS_ID = ? AND ACTIVE_STATUS_IND=1;";
+				+ " WHERE R.CUSTOMER_SYS_ID = ? AND R.ACTIVE_STATUS_IND=1;";
 		try {
 			rolesList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
@@ -1476,7 +1480,7 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public List<Role> getRoletypesDropDownList() {
 		ArrayList<Role> rolesList = null;
-		String sql = "SELECT R.ROLES_TYPES_SYS_ID, R.ROLES_TYPE_NAME FROM ROLES_TYPES R ";
+		String sql = "SELECT R.ROLES_TYPES_SYS_ID, R.ROLES_TYPE_NAME FROM ROLES_TYPE R WHERE R.ACTIVE_STATUS_IND = 1";
 
 		try {
 			rolesList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
@@ -1858,5 +1862,395 @@ public class UserRepositoryImpl implements UserRepository {
 			}
 			return privExists;
 		}
+	}
+
+	@Override
+	public List<PrivilegeDetails> getPrivileges(Long customerId) {
+		ArrayList<PrivilegeDetails> privList = null;
+		String sql = "SELECT DISTINCT C.CUSTOMER_SYS_ID ,CP.CUST_PROD_SYS_ID, P.PRODUCT_NAME, CPMF.CUST_PROD_MOD_SYS_ID,"
+				+ "M.MODULE_NAME,CPMF.CUST_PROD_MOD_FEATURE_SYS_ID, CPMF.FEATURE_NAME,PV.PRIVILEGE_SYS_ID,PV.PRIVILEGE_DESC,"
+				+ "PV.PRIVILEGE_CODE,R.ROLE_NAME,R.ROLE_SYS_ID FROM USERS U INNER JOIN CUSTOMERS  C ON (C.CUSTOMER_SYS_ID=U.CUSTOMER_SYS_ID)"
+				+ " INNER JOIN CUSTOMER_PRODUCTS CP ON (CP.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID) INNER JOIN "
+				+ "CUSTOMER_PRODUCT_MODULES CPM ON (CPM.CUST_PROD_SYS_ID=CP.CUST_PROD_SYS_ID) INNER JOIN "
+				+ "CUSTOMER_PRODUCT_MODULE_FEATURES CPMF ON (CPMF.CUST_PROD_MOD_SYS_ID=CPM.CUST_PROD_MOD_SYS_ID) "
+				+ "INNER JOIN PRODUCTS P ON (P.PRODUCT_SYS_ID=CP.PRODUCT_SYS_ID) INNER JOIN PRODUCT_MODULES PM ON"
+				+ " (PM.PROD_MOD_SYS_ID=CPM.PROD_MOD_SYS_ID) INNER JOIN MODULES M ON(M.MODULE_SYS_ID=PM.MODULE_SYS_ID) "
+				+ "INNER JOIN `PRIVILEGES` PV ON (CPMF.CUST_PROD_MOD_FEATURE_SYS_ID=PV.CUST_PROD_MOD_FEATURE_SYS_ID)"
+				+ " INNER JOIN ROLES R ON(R.ROLE_SYS_ID=U.ROLE_SYS_ID AND R.ROLE_SYS_ID=PV.ROLE_SYS_ID) "
+				+ "WHERE CPMF.ACTIVE_STATUS_IND = 1  AND P.ACTIVE_STATUS_IND = M.ACTIVE_STATUS_IND AND "
+				+ "CP.ACTIVE_STATUS_IND = PM.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND "
+				+ "AND CPM.ACTIVE_STATUS_IND = CPMF.ACTIVE_STATUS_IND AND R.ACTIVE_STATUS_IND = 1 AND C.CUSTOMER_SYS_ID = 1";
+		
+		try {
+			privList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setLong(1, customerId);
+				}
+			}, new UserRepositoryImpl.privilegeDetailExtractor());
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;
+		} catch (Exception e) {
+			logger.error("Exception encountered while getting privileges : " + e.getMessage(), null, e);
+		}
+		
+		return privList;
+			
+	}
+	
+	public class privilegeDetailExtractor implements ResultSetExtractor<ArrayList<PrivilegeDetails>> {
+
+		@Override
+		public ArrayList<PrivilegeDetails> extractData(ResultSet rs) throws SQLException, DataAccessException {
+
+			PrivilegeDetails privilege = null;
+			ArrayList<PrivilegeDetails> privList = new ArrayList<PrivilegeDetails>();
+			while (rs.next()) {
+				privilege = new PrivilegeDetails();
+				
+				privilege.setProductId(rs.getLong("CUST_PROD_SYS_ID"));
+				privilege.setProductName(rs.getString("PRODUCT_NAME"));
+				privilege.setModuleId(rs.getLong("CUST_PROD_MOD_SYS_ID"));
+				privilege.setModuleName(rs.getString("MODULE_NAME"));
+				privilege.setCategoryId(rs.getLong("CUST_PROD_MOD_FEATURE_SYS_ID"));
+				privilege.setCategoryName(rs.getString("FEATURE_NAME"));
+				privilege.setPrivilegeId(rs.getLong("PRIVILEGE_SYS_ID"));
+				privilege.setPrivilegeDesc(rs.getString("PRIVILEGE_DESC"));
+				privilege.setPrivilegeCode(rs.getLong("PRIVILEGE_CODE"));
+				privilege.setRoleName(rs.getString("ROLE_NAME"));
+				privilege.setRoleId(rs.getLong("ROLE_SYS_ID"));
+				privList.add(privilege);
+			}
+			return privList;	
+		}
+	}
+	
+	@Override
+	public List<Product> getProductsDropDownList(Long customerId) {
+		ArrayList<Product> productsList = null;
+		String sql = "SELECT DISTINCT P.PRODUCT_NAME,P.PRODUCT_SYS_ID, CP.CUST_PROD_SYS_ID FROM CUSTOMER_PRODUCTS CP JOIN PRODUCTS P "
+				+ " ON(CP.PRODUCT_SYS_ID = P.PRODUCT_SYS_ID) where CP.PRODUCT_SYS_ID = P.PRODUCT_SYS_ID AND "
+				+ " P.ACTIVE_STATUS_IND = CP.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = 1"
+				+ " AND CP.CUSTOMER_SYS_ID=? ";
+
+		try {
+			productsList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setLong(1, customerId);
+				}
+			}, new UserRepositoryImpl.productsDetailExtractor());
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;
+		} catch (Exception e) {
+			logger.error("Exception encountered while fetching products : " + e.getMessage(), null, e);
+		}
+
+		return productsList;
+	}
+
+	public class productsDetailExtractor implements ResultSetExtractor<ArrayList<Product>> {
+
+		@Override
+		public ArrayList<Product> extractData(ResultSet rs) throws SQLException, DataAccessException {
+			Product product = null;
+			ArrayList<Product> productList = new ArrayList<Product>();
+			while (rs.next()) {
+				product = new Product();
+				product.setProductName(rs.getString("PRODUCT_NAME"));
+				product.setProductId(rs.getLong("CUST_PROD_SYS_ID"));
+				productList.add(product);
+			}
+			return productList;
+		}
+	}
+	
+	@Override
+	public List<Module> getModulesDropDownList(Long customerId, Long productId) {
+		ArrayList<Module> modulesList = null;
+		String sql = " SELECT DISTINCT M.MODULE_NAME, M.MODULE_SYS_ID, CPM.CUST_PROD_MOD_SYS_ID FROM CUSTOMER_PRODUCT_MODULES CPM"
+				+ " INNER JOIN PRODUCT_MODULES PM ON (CPM.PROD_MOD_SYS_ID=PM.PROD_MOD_SYS_ID)"
+				+ " INNER JOIN CUSTOMER_PRODUCTS CP ON (CP.CUST_PROD_SYS_ID=CPM.CUST_PROD_SYS_ID) INNER JOIN CUSTOMERS C ON "
+				+ " (C.CUSTOMER_SYS_ID=CP.CUSTOMER_SYS_ID) INNER JOIN MODULES M ON (M.MODULE_SYS_ID=PM.MODULE_SYS_ID) "
+				+ "INNER JOIN PRODUCTS P ON (PM.PRODUCT_SYS_ID=P.PRODUCT_SYS_ID)  WHERE C.CUSTOMER_SYS_ID=? AND"
+				+ " P.ACTIVE_STATUS_IND = CP.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = 1  "
+				+ " AND C.ACTIVE_STATUS_IND=1 AND P.ACTIVE_STATUS_IND=1 AND M.ACTIVE_STATUS_IND=1 AND  CPM.ACTIVE_STATUS_IND=1 AND CP.CUST_PROD_SYS_ID = ?";
+
+		try {
+			modulesList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setLong(1, customerId);
+					preparedStatement.setLong(2, productId);
+				}
+			}, new UserRepositoryImpl.modulesDetailExtractor());
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;
+		} catch (Exception e) {
+			logger.error("Exception encountered while fetching modules : " + e.getMessage(), null, e);
+		}
+
+		return modulesList;
+	}
+
+	public class modulesDetailExtractor implements ResultSetExtractor<ArrayList<Module>> {
+
+		@Override
+		public ArrayList<Module> extractData(ResultSet rs) throws SQLException, DataAccessException {
+			Module module = null;
+			ArrayList<Module> modulesList = new ArrayList<Module>();
+			while (rs.next()) {
+				module = new Module();
+				module.setModuleName(rs.getString("MODULE_NAME"));
+				module.setModuleId(rs.getLong("CUST_PROD_MOD_SYS_ID"));
+				modulesList.add(module);
+			}
+			return modulesList;
+		}
+	}
+	
+	@Override
+	public List<Category> getCategoriesDropDownList(Long customerId, Long moduleId) {
+		ArrayList<Category> categoriesList = null;
+		String sql = "SELECT DISTINCT CPMF.CUST_PROD_MOD_FEATURE_SYS_ID,CPMF.FEATURE_TYPE,CPMF.FEATURE_NAME FROM USERS U "
+				+ "INNER JOIN CUSTOMERS  C ON (C.CUSTOMER_SYS_ID=U.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCTS CP ON "
+				+ "(CP.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULES CPM ON "
+				+ "(CPM.CUST_PROD_SYS_ID=CP.CUST_PROD_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULE_FEATURES CPMF "
+				+ "ON (CPMF.CUST_PROD_MOD_SYS_ID=CPM.CUST_PROD_MOD_SYS_ID) INNER JOIN PRODUCTS P ON "
+				+ "(P.PRODUCT_SYS_ID=CP.PRODUCT_SYS_ID) INNER JOIN PRODUCT_MODULES PM ON "
+				+ "(PM.PROD_MOD_SYS_ID=CPM.PROD_MOD_SYS_ID) INNER JOIN MODULES M ON(M.MODULE_SYS_ID=PM.MODULE_SYS_ID) "
+				+ "WHERE C.CUSTOMER_SYS_ID= ? AND CPM.CUST_PROD_MOD_SYS_ID = ? AND CPMF.ACTIVE_STATUS_IND = 1  "
+				+ "AND P.ACTIVE_STATUS_IND = M.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = PM.ACTIVE_STATUS_IND "
+				+ "AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND";
+
+		try {
+			categoriesList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setLong(1, customerId);
+					preparedStatement.setLong(2, moduleId);
+				}
+			}, new UserRepositoryImpl.categoryDetailExtractor());					
+			
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB: " + de.getMessage(), null, de);
+			throw de;
+		} catch (Exception e) {
+			logger.error("Exception encountered while fetching categories : " + e.getMessage(), null, e);
+		}
+
+		return categoriesList;
+	}
+
+	public class categoryDetailExtractor implements ResultSetExtractor<ArrayList<Category>> {
+
+		@Override
+		public ArrayList<Category> extractData(ResultSet rs) throws SQLException, DataAccessException {
+			Category category = null;
+			ArrayList<Category> categoriesList = new ArrayList<Category>();
+			while (rs.next()) {
+				category = new Category();
+				category.setCategoryName(rs.getString("FEATURE_NAME"));
+				category.setCategoryType(rs.getString("FEATURE_TYPE"));
+				category.setCategoryId(rs.getLong("CUST_PROD_MOD_FEATURE_SYS_ID"));
+				categoriesList.add(category);
+			}
+			return categoriesList;
+		}
+	}
+
+	@Override
+	public Valid addPrivilege(PrivilegeDetails privilege) {
+
+		String sql1 = "SELECT * FROM PRIVILEGES " + " WHERE CUST_PROD_SYS_ID = ? AND CUST_PROD_MOD_SYS_ID=?"
+				+ " AND CUST_PROD_MOD_FEATURE_SYS_ID =? AND ROLE_SYS_ID = ?";
+		boolean privExists = false;
+		
+		Valid valid = new Valid();
+		try {
+			privExists = jdbcTemplate.query(sql1, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setLong(1, privilege.getProductId());
+					preparedStatement.setLong(2, privilege.getModuleId());
+					preparedStatement.setLong(3, privilege.getCategoryId());
+					preparedStatement.setLong(4, privilege.getRoleId());
+				}
+			}, new UserRepositoryImpl.PrivExistsExtractor());
+
+			if (!privExists) {
+
+				// Check if this is a child or a parent category
+
+				// if child - Then insert privilege "view" for parent and then
+				// insert privilege for child
+
+				if (privilege.getCategoryType().split("_")[0].equals("CHILD")) {
+
+					//Get Parent feature id
+					String sql2 = "select CUST_PROD_MOD_FEATURE_SYS_ID from CUSTOMER_PRODUCT_MODULE_FEATURES"
+							+ " WHERE FEATURE_CODE=?";
+					
+					Long featurId = null;
+					featurId = jdbcTemplate.query(sql2, new PreparedStatementSetter() {
+						public void setValues(PreparedStatement preparedStatement) throws SQLException {							
+							preparedStatement.setString(1, privilege.getCategoryType().split("_")[1]);
+						}
+					}, new UserRepositoryImpl.featureIdExtractor());
+					
+					
+					// check if privilege exists for parent
+
+					String sql3 = "SELECT * FROM PRIVILEGES " + " WHERE CUST_PROD_SYS_ID = ? AND CUST_PROD_MOD_SYS_ID=?"
+							+ " AND CUST_PROD_MOD_FEATURE_SYS_ID =? AND ROLE_SYS_ID = ?";
+					boolean pExists = false;
+					Long parentFeatureId = featurId;
+					pExists = jdbcTemplate.query(sql3, new PreparedStatementSetter() {
+						public void setValues(PreparedStatement preparedStatement) throws SQLException {
+							preparedStatement.setLong(1, privilege.getProductId());
+							preparedStatement.setLong(2, privilege.getModuleId());
+							preparedStatement.setLong(3, parentFeatureId);
+							preparedStatement.setLong(4, privilege.getRoleId());
+						}
+					}, new UserRepositoryImpl.PrivExistsExtractor());
+					//if there is no priv for parent. then create priv with "View" option only
+					if (!pExists) {
+
+						String sql4 = "INSERT INTO PRIVILEGES (CUST_PROD_SYS_ID, CUST_PROD_MOD_SYS_ID, "
+								+ "CUST_PROD_MOD_FEATURE_SYS_ID, ROLE_SYS_ID, ANALYSIS_SYS_ID, PRIVILEGE_CODE, PRIVILEGE_DESC, "
+								+ "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) VALUES ( ?, ?, ?, ?, ?, ?, ?, '1', sysdate(), ?) ";
+						jdbcTemplate.update(sql4, new PreparedStatementSetter() {
+							public void setValues(PreparedStatement preparedStatement) throws SQLException {
+								preparedStatement.setLong(1, privilege.getProductId());
+								preparedStatement.setLong(2, privilege.getModuleId());
+								preparedStatement.setLong(3, parentFeatureId);
+								preparedStatement.setLong(4, privilege.getRoleId());
+								preparedStatement.setLong(5, 0);
+								preparedStatement.setLong(6, 32768);
+								preparedStatement.setString(7, "View");
+								preparedStatement.setString(8, privilege.getMasterLoginId());
+							}
+						});
+					}
+
+				} 
+
+				String sql5 = "INSERT INTO PRIVILEGES (CUST_PROD_SYS_ID, CUST_PROD_MOD_SYS_ID, "
+						+ "CUST_PROD_MOD_FEATURE_SYS_ID, ROLE_SYS_ID, ANALYSIS_SYS_ID, PRIVILEGE_CODE, PRIVILEGE_DESC, "
+						+ "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) VALUES ( ?, ?, ?, ?, ?, ?, ?, '1', sysdate(), ?) ";
+				jdbcTemplate.update(sql5, new PreparedStatementSetter() {
+					public void setValues(PreparedStatement preparedStatement) throws SQLException {
+						preparedStatement.setLong(1, privilege.getProductId());
+						preparedStatement.setLong(2, privilege.getModuleId());
+						preparedStatement.setLong(3, privilege.getCategoryId());
+						preparedStatement.setLong(4, privilege.getRoleId());
+						preparedStatement.setLong(5, 0);
+						preparedStatement.setLong(6, privilege.getPrivilegeCode());
+						preparedStatement.setString(7, privilege.getPrivilegeDesc());
+						preparedStatement.setString(8, privilege.getMasterLoginId());
+					}
+				});
+			
+				valid.setValid(true);
+			} else {
+				valid.setValid(false);
+				valid.setError("Privilege already exists for this category. Please try editing it.");
+			}
+
+		} catch (Exception e) {
+			logger.error("Exception encountered while accessing DB : " + e.getMessage(), null, e);
+			valid.setValid(false);
+			valid.setError("Something went wrong while adding privilege!");
+		}
+
+		return valid;
+	}
+
+	@Override
+	public Valid updatePrivilege(PrivilegeDetails privilege) {
+		String sql1 = "SELECT PRIVILEGE_SYS_ID FROM PRIVILEGES " + " WHERE CUST_PROD_SYS_ID = ? AND CUST_PROD_MOD_SYS_ID=?"
+				+ " AND CUST_PROD_MOD_FEATURE_SYS_ID =? AND ROLE_SYS_ID = ?";
+		Long privExists = null;
+		Valid valid = new Valid();
+		try {
+			privExists = jdbcTemplate.query(sql1, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setLong(1, privilege.getProductId());
+					preparedStatement.setLong(2, privilege.getModuleId());
+					preparedStatement.setLong(3, privilege.getCategoryId());
+					preparedStatement.setLong(4, privilege.getRoleId());
+				}
+			}, new UserRepositoryImpl.GetPrivExtractor());
+
+			if (privExists == null || privilege.getPrivilegeId() == privExists) {
+
+				String sql4 = "UPDATE PRIVILEGES SET CUST_PROD_SYS_ID=?, CUST_PROD_MOD_SYS_ID=?, "
+						+ "CUST_PROD_MOD_FEATURE_SYS_ID=?, ROLE_SYS_ID=?, ANALYSIS_SYS_ID=?, PRIVILEGE_CODE=?, PRIVILEGE_DESC=?, "
+						+ "MODIFIED_DATE=sysdate(), MODIFIED_BY=? WHERE PRIVILEGE_SYS_ID=?";
+				jdbcTemplate.update(sql4, new PreparedStatementSetter() {
+					public void setValues(PreparedStatement preparedStatement) throws SQLException {
+						preparedStatement.setLong(1, privilege.getProductId());
+						preparedStatement.setLong(2, privilege.getModuleId());
+						preparedStatement.setLong(3, privilege.getCategoryId());
+						preparedStatement.setLong(4, privilege.getRoleId());
+						preparedStatement.setLong(5, 0);
+						preparedStatement.setLong(6, privilege.getPrivilegeCode());
+						preparedStatement.setString(7, privilege.getPrivilegeDesc());
+						preparedStatement.setString(8, privilege.getMasterLoginId());
+						preparedStatement.setLong(9, privilege.getPrivilegeId());
+					}
+				});
+				valid.setValid(true);
+			} else {
+				valid.setValid(false);
+				valid.setError("Privilege already exists for this category. Please try editing it.");
+			}
+
+		} catch (Exception e) {
+			logger.error("Exception encountered while accessing DB : " + e.getMessage(), null, e);
+			valid.setValid(false);
+			valid.setError("Something went wrong while updating privilege!");
+		}
+
+		return valid;
+	}
+	public class GetPrivExtractor implements ResultSetExtractor<Long> {
+
+		@Override
+		public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+			Long privExists = null;
+			while (rs.next()) {
+				privExists = rs.getLong("PRIVILEGE_SYS_ID");
+			}
+			return privExists;
+		}
+	}
+	
+	public class featureIdExtractor implements ResultSetExtractor<Long> {
+
+		@Override
+		public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
+			Long privExists = null;
+			while (rs.next()) {
+				privExists = rs.getLong("CUST_PROD_MOD_FEATURE_SYS_ID");
+			}
+			return privExists;
+		}
+	}
+	
+	@Override
+	public boolean deletePrivilege(Long privId) {
+
+		String sql2 = "DELETE FROM PRIVILEGES " + " WHERE PRIVILEGE_SYS_ID = ?";
+		try {
+			jdbcTemplate.update(sql2, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setLong(1, privId);
+
+				}
+			});
+		} catch (Exception e) {
+			logger.error("Exception encountered while deleting privilege " + e.getMessage(), null, e);
+			return false;
+		}
+		return true;
 	}
 }

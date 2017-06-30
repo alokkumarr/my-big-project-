@@ -2,11 +2,15 @@ package com.sncr.saw.security.app.repository;
 
 import java.util.List;
 
+import com.sncr.saw.security.common.bean.Category;
+import com.sncr.saw.security.common.bean.Module;
+import com.sncr.saw.security.common.bean.Product;
 import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.Role;
 import com.sncr.saw.security.common.bean.Ticket;
 import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.common.bean.Valid;
+import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.Analysis;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
@@ -42,4 +46,11 @@ public interface UserRepository {
 	Valid updateRole(RoleDetails role);
 	boolean checkUserExists(Long roleId);
 	boolean checkPrivExists(Long roleId);
+	List<PrivilegeDetails> getPrivileges(Long customerId);
+	List<Product> getProductsDropDownList(Long customerId);
+	List<Module> getModulesDropDownList(Long customerId, Long productId);
+	List<Category> getCategoriesDropDownList(Long customerId, Long moduleId);
+	Valid addPrivilege(PrivilegeDetails privilege);
+	Valid updatePrivilege(PrivilegeDetails privilege);
+	boolean deletePrivilege(Long privId);
 }
