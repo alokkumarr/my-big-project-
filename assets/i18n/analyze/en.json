@@ -1,6 +1,10 @@
 {
   "ANALYZE": "ANALYZE",
   "ANALYSIS": "ANALYSIS",
+  "ANALYSIS_DETAILS_HEADER": "Analysis Details",
+  "ANALYSIS_DETAILS_CREATOR_LABEL": "Created By:",
+  "ANALYSIS_DETAILS_SCHEDULE_LABEL": "Schedule:",
+  "ANALYSIS_DETAILS_DESCRIPTION_LABEL": "Description",
   "APPLY_SETTINGS": "Apply settings",
   "CREATE_ANALYSIS": "Create Analysis",
   "CHOOSE_FIELDS_ABOVE_TO_PREVIEW_YOUR_REPORT": "Choose fields above to preview your report.",
