@@ -428,7 +428,7 @@ class Analysis extends BaseController {
 
   import scala.collection.JavaConversions._
   private def processResult(data: util.List[util.Map[String, (String, Object)]]) : JValue = {
-    if ( data == null || data.isEmpty) return JObject(List(JField("result", "no data found")))
+    if ( data == null || data.isEmpty) return JArray(List())
     JArray(data.map(m => {
        JObject(m.keySet().map(k =>
           JField(k, m.get(k)._1 match {
