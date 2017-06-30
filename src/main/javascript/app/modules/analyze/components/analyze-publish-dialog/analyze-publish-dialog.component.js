@@ -87,10 +87,14 @@ export const AnalyzePublishDialogComponent = {
       });
     }
 
-    generateSchedulePayload() {
-      if (this.schedule === this.scheduleOptions[0]) {
+    generateSchedulePayload(clearSchedule = false) {
+      if (clearSchedule) {
         this.model.schedule = null;
-        return this.model;
+        return {execute: false, payload: this.model};
+      }
+
+      if (this.schedule === this.scheduleOptions[0]) {
+        return {execute: true, payload: this.model};
       }
 
       this.model.schedule = {
@@ -102,7 +106,7 @@ export const AnalyzePublishDialogComponent = {
         }, {})
       };
 
-      return this.model;
+      return {execute: false, payload: this.model};
     }
 
     setDefaultCategory() {
@@ -119,9 +123,9 @@ export const AnalyzePublishDialogComponent = {
       this._$mdDialog.cancel();
     }
 
-    publish() {
-      const payload = this.generateSchedulePayload();
-      this.onPublish({model: payload});
+    publish(opts = {clearSchedule: false}) {
+      const {payload, execute} = this.generateSchedulePayload(opts.clearSchedule);
+      this.onPublish({model: payload, execute});
       this._$mdDialog.hide();
     }
   }

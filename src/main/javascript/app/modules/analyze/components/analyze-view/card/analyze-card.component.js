@@ -28,26 +28,6 @@ export const AnalyzeCardComponent = {
       return this._AnalyzeService.isExecuting(this.model.id);
     }
 
-    openPublishModal(ev) {
-      const tpl = '<analyze-publish-dialog model="model" on-publish="onPublish(model)"></analyze-publish-dialog>';
-
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controllerAs: '$ctrl',
-          controller: scope => {
-            scope.model = clone(this.model);
-            scope.onPublish = this.publish.bind(this);
-          },
-          autoWrap: false,
-          fullscreen: true,
-          focusOnOpen: false,
-          multiple: true,
-          targetEvent: ev,
-          clickOutsideToClose: true
-        });
-    }
-
     remove() {
       this.onAction({
         type: 'delete',
@@ -55,10 +35,10 @@ export const AnalyzeCardComponent = {
       });
     }
 
-    publish(model) {
+    publish() {
       this.onAction({
         type: 'publish',
-        model
+        model: clone(this.model)
       });
     }
 

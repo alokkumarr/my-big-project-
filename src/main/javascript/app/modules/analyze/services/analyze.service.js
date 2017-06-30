@@ -172,9 +172,9 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     return deferred.promise;
   }
 
-  function publishAnalysis(model) {
+  function publishAnalysis(model, execute = false) {
     return updateAnalysis(model).then(analysis => {
-      if (!model.schedule) {
+      if (execute) {
         executeAnalysis(model);
       }
       return analysis;

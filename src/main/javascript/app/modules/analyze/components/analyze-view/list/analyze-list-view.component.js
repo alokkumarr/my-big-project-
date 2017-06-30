@@ -69,29 +69,10 @@ export const AnalyzeListViewComponent = {
       });
     }
 
-    openPublishModal(model) {
-      const tpl = '<analyze-publish-dialog model="model" on-publish="onPublish(model)"></analyze-publish-dialog>';
-
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controllerAs: '$ctrl',
-          controller: scope => {
-            scope.model = clone(model);
-            scope.onPublish = this.publish.bind(this);
-          },
-          autoWrap: false,
-          fullscreen: true,
-          focusOnOpen: false,
-          multiple: true,
-          clickOutsideToClose: true
-        });
-    }
-
     publish(model) {
       this.onAction({
         type: 'publish',
-        model
+        model: clone(model)
       });
     }
 
