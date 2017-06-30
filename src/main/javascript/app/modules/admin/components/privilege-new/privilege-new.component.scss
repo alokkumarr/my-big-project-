@@ -1,9 +1,9 @@
-.new-role-dialog {
-  .role-dialog {
+.new-privilege-dialog {
+  .privilege-dialog {
     width: 500px;
   }
 
-  .role-dialog_header {
+  .privilege-dialog_header {
     .layout-row {
       justify-content: space-between;
     }
@@ -17,7 +17,7 @@
     }
   }
 
-  .role-dialog_content {
+  .privilege-dialog_content {
     padding: 15px;
 
     .md-subhead {
@@ -46,7 +46,7 @@
     }
   }
 
-  .role-dialog_footer {
+  .privilege-dialog_footer {
     .layout-row {
       justify-content: space-between;
     }
@@ -84,9 +84,5 @@
 
   md-checkbox {
     width: 20px !important;
-  }
-
-  .question-icon-margin {
-    margin-top: -8px;
   }
 }

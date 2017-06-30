@@ -8,5 +8,6 @@ export const AdminMenuData = [{
   url: '#!/role'
 }, {
   id: '',
-  name: 'Privilege'
+  name: 'Privilege',
+  url: '#!/privilege'
 }];

@@ -4,6 +4,7 @@
   "CUST_NAME": "Customer : {{customer}}",
   "USERS_MGMT_LIST":"User Management",
   "ROLES_MGMT_LIST":"Role Management",
+  "PRIVILEGES_MGMT_LIST":"Privilege Management",
   
   "NEW_USER":"Add New User",
   "CREATE_USER":"Save User",
@@ -14,6 +15,11 @@
   "CREATE_ROLE":"Save Role",
   "EDIT_ROLE":"Edit Role",
   "UPDATE_ROLE":"Update",
+  
+  "NEW_PRIVILEGE":"Add New Privilege",
+  "CREATE_PRIVILEGE":"Save Privilege",
+  "EDIT_PRIVILEGE":"Edit Privilege",
+  "UPDATE_PRIVILEGE":"Update",
   
   "USER_FIRST_NAME_LABEL":"First Name",
   "USER_MIDDLE_NAME_LABEL":"Middle Name",
@@ -27,9 +33,23 @@
   "ROLE_NAME_LABEL":"Role Name",
   "ROLE_DESC_LABEL":"Description",
   "ROLE_DSK_LABEL":"DSK",
-  "ROLE_MY_ANAY_LABEL":"My Analysis",
+  "ROLE_MY_ANAY_LABEL":"Create default privileges for My Analyses Category",
   "ROLE_TYPE_LABEL":"Role Type",
   "ROLE_ACTIVE_LABEL":"Status",
+  
+  "PRIVILEGE_PROD_LABEL":"Product",
+  "PRIVILEGE_ROLE_LABEL":"Role",
+  "PRIVILEGE_MODL_LABEL":"Module",
+  "PRIVILEGE_CATG_LABEL":"Category",
+  "PRIVILEGE_All_LABEL":"All",
+  "PRIVILEGE_ACCESS_LABEL":"View",
+  "PRIVILEGE_CREATE_LABEL":"Create",
+  "PRIVILEGE_EXECUTE_LABEL":"Execute",
+  "PRIVILEGE_PUBLISH_LABEL":"Publish",
+  "PRIVILEGE_FORK_LABEL":"Fork",
+  "PRIVILEGE_EDIT_LABEL":"Edit",
+  "PRIVILEGE_EXPORT_LABEL":"Export",
+  "PRIVILEGE_DELETE_LABEL":"Delete",
   
   "TOOLTIP_ADD_ROLE":"Add Role",
   "TOOLTIP_DELETE_ROLE":"Delete Role",
@@ -39,6 +59,10 @@
   "TOOLTIP_ADD_USER":"Add User",  
   "TOOLTIP_EDIT_USER":"Edit User",
   "TOOLTIP_DELETE_USER":"Delete User",
+  
+  "TOOLTIP_ADD_PRIVILEGE":"Add Privilege",
+  "TOOLTIP_EDIT_PRIVILEGE":"Edit Privilege",
+  "TOOLTIP_DELETE_PRIVILEGE":"Delete Privilege",
   
   "NO_IMPLEMENTED_TEMPLATE_YET": "No implemented template yet!",
   "TOOLTIP_ROLE_ANAS_MSG":"Automatically create default privileges to the My Analyses category for any user assigned to this Role. At least one privilege per Role is needed for application access."
