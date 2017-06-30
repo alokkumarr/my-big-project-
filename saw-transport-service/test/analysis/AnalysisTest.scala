@@ -151,7 +151,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
     "list analysis executions" in {
       /* List results of previously executed analysis */
       val response = sendGetRequest("/analysis/%s/executions".format(id))
-      val results = extractArray(response, "execution")
+      val results = extractArray(response, "executions")
       /* There are three executions in the preceding tests, so the results
        * list should contain three elements */
       results.length must be (3)

@@ -47,6 +47,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
         }
         case ExecutionType.onetime => {
           analysisNodeExecution.executeSQLNoDataLoad()
+          analysisNodeExecution.createAnalysisResult(null, null)
           analysisNodeExecution.getAllData
         }
         case ExecutionType.preview => {
