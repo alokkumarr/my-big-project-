@@ -175,8 +175,7 @@ export const AnalyzePivotComponent = {
           this.settingsModified = false;
           this.deNormalizedData = this._PivotService.denormalizeData(data, fields);
           this.deNormalizedData = this._PivotService.takeOutKeywordFromData(this.deNormalizedData);
-          this.dataSource.store = this.deNormalizedData;
-          this.dataSource = new PivotGridDataSource({store: this.dataSource.store, fields});
+          this.dataSource = new PivotGridDataSource({store: this.deNormalizedData, fields});
           this.pivotGridUpdater.next({
             dataSource: this.dataSource
           });
@@ -187,7 +186,6 @@ export const AnalyzePivotComponent = {
               sorts: this.sorts
             });
           });
-
           this.showProgress = false;
         })
         .catch(() => {
@@ -388,10 +386,7 @@ export const AnalyzePivotComponent = {
           controller: scope => {
             scope.model = {
               pivot: this.model,
-              dataSource: {
-                store: this.dataSource.store,
-                fields: this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns)
-              }
+              dataSource: this.dataSource
             };
           },
           targetEvent: ev,
