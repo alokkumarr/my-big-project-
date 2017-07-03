@@ -7,7 +7,6 @@ import org.json4s.DefaultFormats
   * Created by srya0001 on 1/27/2017.
   */
 object MetadataDictionary extends Enumeration {
-
   val DSK = Value(1, "dsk" )
   val storage_type = Value(3, "storage_type")
   val index_name = Value(10, "index_name")
@@ -18,6 +17,8 @@ object MetadataDictionary extends Enumeration {
   val analysisId = Value(100, "analysis_id")
   val semanticId = Value(101, "semantic_id")
   val dataObjectId = Value(102, "dataobject_id")
+  val analysisResult = Value(103, "analysisresult_id")
+  val numberOfRecords = Value(104, "# of records")
 
   val separator: String = "::"
 

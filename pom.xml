@@ -28,7 +28,7 @@
 		<!-- output.directory>${output}</output.directory -->
   	    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- Versions of 3rd party dependencies  -->
-		<spark-version>1.6.1</spark-version>
+		<spark-version>2.1.0</spark-version>
 		<java.version>1.8</java.version>
 		<elasticsearch.version>1.7.3</elasticsearch.version>
 		<elasticsearch-spark.version>2.4.0</elasticsearch-spark.version>
@@ -61,6 +61,7 @@
 		<mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
 		<scala.major.version>2.11</scala.major.version>
 		<scala.version>2.11.8</scala.version>
+		<scala.compat.version>2.11</scala.compat.version>
 		<Json4s.latestVersion>3.3.0</Json4s.latestVersion>
 		<rpm.saw.root>/opt</rpm.saw.root>
 	</properties>

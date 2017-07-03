@@ -39,30 +39,11 @@ class Extractor {
       return (false, "Storage type value is not acceptable")
 
     m_log debug "Extracted storage type: " + stv
-
-    val (in_bRes, in_value) = testField(json, "index_name")
-    if (!in_bRes) return (false, "Storage type (ES) requires index name")
-    val inn = in_value.get
-    m_log debug "Extracted index name: " + inn
-    values(MetadataDictionary.index_name.toString) = inn
-
-
-    if (stv.equalsIgnoreCase("ES") && (inn == null || inn.isEmpty))
-      return (false, "Storage type (ES) requires correct index name")
-
-    val (ot_bRes, ot_value) = testField(json, "object_type")
-    val ot = if (ot_bRes) values(MetadataDictionary.object_type.toString) = ot_value.get
-    m_log debug "Extracted object type: " + ot
-
-
-    val (v_bRes, v_value) = testField(json, "verb")
-    if (!v_bRes) return (false, "Storage type (ES) requires ES verb")
-    val verb = v_value.get
-    m_log debug "Extracted verb: " + verb
-    values(MetadataDictionary.verb.toString) = verb
-
-    if (stv.equalsIgnoreCase("ES") && (verb == null || verb.isEmpty ))
-      return (false, "Storage type (ES) requires correct ES verb, e.g: _search")
+    stv match {
+      case "ES" =>  {val (esRes, esMsg) = extractESSpecificValues(stv, json); if (!esRes) return (esRes, esMsg)}
+      case "DL" =>  {val (dlRes, dlMsg) = extractDLSpecificValues(stv, json); if (!dlRes) return (dlRes, dlMsg)}
+      case _ => return (false, "Unsupported storage type!")
+    }
 
     val queryLookupRes = (__ \ 'query).json.pick
     val pickResult = json.transform( queryLookupRes )
@@ -83,5 +64,55 @@ class Extractor {
     (true, value)
   }
 
+
+  def extractESSpecificValues(stv: String, json: JsValue): (Boolean, String) ={
+
+    val (in_bRes, in_value) = testField(json, "index_name")
+    if (!in_bRes) return (false, "Storage type (ES) requires index name")
+    val inn = in_value.get
+    m_log debug "Extracted index name: " + inn
+    values(MetadataDictionary.index_name.toString) = inn
+
+
+    if (inn == null || inn.isEmpty) return (false, "Storage type (ES) requires correct index name")
+
+    val (ot_bRes, ot_value) = testField(json, "object_type")
+    val ot = if (ot_bRes) values(MetadataDictionary.object_type.toString) = ot_value.get
+    m_log debug "Extracted object type: " + ot
+
+
+    val (v_bRes, v_value) = testField(json, "verb")
+    if (!v_bRes) return (false, "Storage type (ES) requires ES verb")
+    val verb = v_value.get
+    m_log debug "Extracted verb: " + verb
+    values(MetadataDictionary.verb.toString) = verb
+
+    if (verb == null || verb.isEmpty ) return (false, "Storage type (ES) requires correct ES verb, e.g: _search")
+
+    (true, "success")
+  }
+
+
+  private def extractDLSpecificValues(stv: String, json: JsValue): (Boolean, String) ={
+
+
+    val ids = List( MetadataDictionary.analysisId.toString,
+                    MetadataDictionary.semanticId.toString,
+                    MetadataDictionary.dataObjectId.toString,
+                    MetadataDictionary.verb.toString,
+                    MetadataDictionary.analysisResult.toString,
+                    MetadataDictionary.numberOfRecords.toString
+    )
+
+    ids.foreach( idType => {
+    val (bRes, v) = testField(json, idType); if (bRes) {
+        val id = v.get
+        m_log debug s"Extracted $idType = $id"; values(idType) = id}})
+
+    if (!values.keySet.exists( k => ids.foldLeft(false)( (p, s) => p || s.equals(k))))
+      return (false, "Request must contain one of the following: Analysis ID or Semantic ID or DataObject ID")
+
+    (true, "success")
+  }
 
 }

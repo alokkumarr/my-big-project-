@@ -43,7 +43,7 @@ class SemanticNodeExecutionHelper(val sn : SemanticNode, cacheIt : Boolean = fal
         throw new Exception(m)
     }
 
-  m_log debug s"Check definition before extracting value ==> ${pretty(render(definition))}"
+  m_log trace s"Check definition before extracting value ==> ${pretty(render(definition))}"
 
   val metric = (definition \ "metric").extractOrElse[String]("")
   val outputLocation = SemanticNodeExecutionHelper.getUserSpecificPath(metric) + "-" + id
@@ -51,6 +51,9 @@ class SemanticNodeExecutionHelper(val sn : SemanticNode, cacheIt : Boolean = fal
   var lastSQLExecRes = -1
   var execResult : java.util.List[java.util.Map[String, (String, Object)]] = null
   var isDataLoaded = false
+
+  var startTS : java.lang.Long = System.currentTimeMillis()
+  var finishedTS: Long =  System.currentTimeMillis()
 
   /**
     * Specific to SemanticNode method to load data objects
@@ -80,6 +83,8 @@ class SemanticNodeExecutionHelper(val sn : SemanticNode, cacheIt : Boolean = fal
     lastSQLExecRes = llastSQLExecRes; lastSQLExecMessage = llastSQLExecMessage
     ( lastSQLExecRes, lastSQLExecMessage)
   }
+
+  def getData : java.util.List[java.util.Map[String, (String, Object)]] = getData(metric)
 
 }
 

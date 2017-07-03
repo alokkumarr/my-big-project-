@@ -22,7 +22,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
 
     "create analysis" in {
       /* Create analysis using analysis template preloaded into MapR-DB */
-      val semanticId = "da561e07-4260-4d5e-b1d4-e04e4b8c6f0b"
+      val semanticId = "340df99d-16a6-45cb-af49-5699e3337e50"
       val typeJson: JObject = ("analysisType", "report")
       val response = sendRequest(
         actionKeyMessage("create", semanticId, typeJson))
@@ -90,7 +90,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
 
     "search multiple analyses by category" in {
       /* Create a second analysis */
-      val semanticId = "da561e07-4260-4d5e-b1d4-e04e4b8c6f0b"
+      val semanticId = "340df99d-16a6-45cb-af49-5699e3337e50"
       val typeJson: JObject = ("analysisType", "report")
       val secondAnalysis = analyze(sendRequest(
         actionKeyMessage("create", semanticId, typeJson)))
@@ -151,11 +151,14 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
     "list analysis executions" in {
       /* List results of previously executed analysis */
       val response = sendGetRequest("/analysis/%s/executions".format(id))
-      val results = extractArray(response, "execution")
+      val results = extractArray(response, "executions")
       /* There are three executions in the preceding tests, so the results
        * list should contain three elements */
       results.length must be (3)
-      executionId = (results(0) \ "id").extract[String]
+      val resultsSorted = results.sortWith((a, b) => {
+        (a \ "finished").extract[String] < (b \ "finished").extract[String]
+      })
+      executionId = (resultsSorted(0) \ "id").extract[String]
     }
 
     "get analysis execution data" in {

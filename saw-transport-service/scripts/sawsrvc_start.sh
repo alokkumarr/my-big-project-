@@ -148,13 +148,15 @@ declare lib_classpath=$(
   )
 
 for j in `ls /opt/mapr/spark/spark-current/jars/*.jar`; do
- app_classpath=${app_classpath}:"${j}"
+ lib_classpath=${lib_classpath}:"${j}"
 done
-
 lib_classpath=${lib_classpath}:$(mapr classpath)
 
 	
 declare -r app_classpath="$conf_dir:$lib_classpath"
+
+
+
 vlog app_classpath: $app_classpath
 
 declare -r java_args=$( echo \

@@ -199,7 +199,7 @@ class AnalysisResult(private val parentAnalysisRowID : String,
         case "location" => val p = _objects(desc._1).asInstanceOf[String]
           m_log debug s"Removing file at location $p, reference: ${desc._1}"
           HFileOperations.deleteFile(p)
-        case _ => m_log trace s"Clean up is not required for object: ${desc._1}"
+        case _ => m_log debug s"Clean up is not required for object: ${desc._1} -> ${desc._2}"
       }
     })
   }
@@ -226,12 +226,24 @@ class AnalysisResult(private val parentAnalysisRowID : String,
   }
 
 
+  def getObjectDescriptors = _objects_descriptor
+
+  def getObject(ref: String) : Option[Any]=
+  {
+    _objects_descriptor(ref) match {
+      case "location" | "json" => _objects.get(ref)
+      case "binary" => {
+        val encoded_data = _objects.get(ref)
+        Option(Base64.getDecoder.decode(encoded_data.get.asInstanceOf[String]))
+      }
+      case _ => m_log error s"Unsupported result type for object: $ref"; null
+    }
+  }
+
 }
 
 
 object AnalysisResult{
-
-
 
   def apply(parentRowId: String, rowId: String) :AnalysisResult =
   {

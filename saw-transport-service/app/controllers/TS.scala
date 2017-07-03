@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import play.api.libs.json.JsValue
 import play.libs.Json
 import play.mvc.Result
+import sncr.dl.DLQueryHandler
 import sncr.es.ESQueryHandler
 import sncr.metadata.engine.MetadataDictionary
 import sncr.request.Extractor
@@ -46,11 +47,10 @@ class TS extends BaseServiceProvider {
     val stv : String = extractor.values.get(MetadataDictionary.storage_type.toString).get.asInstanceOf [String]
     m_log debug s"Storage Type: ${stv}"
 
-    val req = new ESQueryHandler(extractor)
     stv match
     {
-      case "ES" =>  req.handleRequest(json)
-      case "DL" =>  res.put("result", "success"); return play.mvc.Results.ok(res)
+      case "ES" =>  val req = new ESQueryHandler(extractor); req.handleRequest(json)
+      case "DL" =>  val req = new DLQueryHandler(extractor); req.handleRequest(json)
       case _ =>
             res.put("result", "failure")
             res.put("reason", "Unsupported storage type")

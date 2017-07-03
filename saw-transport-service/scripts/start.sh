@@ -367,8 +367,10 @@ addJava "-Dhadoop.home.dir=/opt/mapr/hadoop/hadoop-$(cat /opt/mapr/hadoop/hadoop
 # Middle tier specisfic
 # addJava "-Djava.security.auth.login.config=/opt/mapr/conf/mapr.login.conf"
 ##:$(mapr classpath)
-app_classpath=${app_classpath}:$(mapr classpath)
-
+    app_classpath=${app_classpath}:$(mapr classpath)
+for j in `ls /opt/mapr/spark/spark-current/jars/*.jar`; do
+ app_classpath=${app_classpath}:"${j}"
+done
 
 # java_cmd is overrode in process_args when -java-home is used
 declare java_cmd=$(get_java_cmd)

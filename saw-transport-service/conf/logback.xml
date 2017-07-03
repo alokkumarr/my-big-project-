@@ -26,6 +26,10 @@
   <!-- Silence libraries that are verbose at INFO level -->
   <logger name="akka.event" level="WARN"/>
   <logger name="org.apache.hadoop" level="WARN"/>
+  <!-- Silence even warnings for now until they can be fixed in the
+       new Spark SQL Executor -->
+  <logger name="org.apache.spark" level="ERROR"/>
+  <logger name="org.spark_project" level="WARN"/>
   <!-- Silence warning about loading native code -->
   <logger name="org.apache.hadoop.util.NativeCodeLoader" level="ERROR"/>
 

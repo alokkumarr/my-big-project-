@@ -3,14 +3,16 @@ package sncr.datalake.handlers
 import java.io.OutputStream
 import java.lang.Long
 import java.time.format.DateTimeFormatter
+import java.util
 import java.util.UUID
 
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
 import com.typesafe.config.Config
 import org.apache.hadoop.fs.Path
-import org.json4s.JsonAST._
+import org.json4s.JsonAST.{JObject, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
+import sncr.datalake.engine.ExecutionStatus
 import sncr.datalake.exceptions.{DAException, ErrorCodes}
 import sncr.datalake.{DLConfiguration, DLSession}
 import sncr.metadata.analysis.{AnalysisNode, AnalysisResult}
@@ -21,10 +23,13 @@ import sncr.saw.common.config.SAWServiceConfig
 /**
   * Created by srya0001 on 5/18/2017.
   */
-class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = false, var resId : String = null ) extends DLSession with HasDataObject[AnalysisNodeExecutionHelper]{
+class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cacheIt: Boolean = false, var resId : String = null ) extends DLSession with HasDataObject[AnalysisNodeExecutionHelper]{
 
   override protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisNodeExecutionHelper].getName)
   resId = if (resId == null || resId.isEmpty) UUID.randomUUID().toString else resId
+
+  def setFinishTime = { finishedTS =  System.currentTimeMillis }
+  def setStartTime = { startTS =  System.currentTimeMillis }
 
   if (an.getCachedData.isEmpty) throw new DAException(ErrorCodes.NodeDoesNotExist, "AnalysisNode")
   if (an.getRelatedNodes.isEmpty) throw new DAException(ErrorCodes.DataObjectNotFound, "AnalysisNode")
@@ -57,25 +62,34 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
   var resultNode: AnalysisResult = null
   var resultNodeDescriptor: JObject = null
 
-  m_log debug s"Check definition before extracting value ==> ${pretty(render(definition))}"
+  m_log trace s"Check definition before extracting value ==> ${pretty(render(definition))}"
 
+  val sqlDefinition = (definition \ "query").extractOrElse[String]("")
   val sqlManual = (definition \ "queryManual").extractOrElse[String]("")
-  val analysis = (definition \ "analysis").extractOrElse[String]("")
-  val sql = if (sqlManual != "") sqlManual else (definition \ "query").extractOrElse[String]("")
-  val outputType = ( definition \ "outputFile" \ "outputFormat").extractOrElse[String]("")
-  val initOutputLocation = ( definition \ "outputFile" \ "outputFileName").extractOrElse[String]("")
+  val metricName = (definition \ "metricName").extractOrElse[String]("")
+  val analysisKey = "AN_" + System.currentTimeMillis()
 
-  if (sql.isEmpty || outputType.isEmpty || initOutputLocation.isEmpty || analysis.isEmpty )
-    throw new Exception("Invalid Analysis object, one of the attribute is null/empty: SQL, outputType, outputLocation")
-  else
-    m_log debug s"Analysis executions parameters, type : $outputType, \n output filename:  $initOutputLocation, \n sql => $sql"
+  val sql = if (sqlManual != "") sqlManual else if (sqlRuntime != null) sqlRuntime else sqlDefinition
+
+// ----------- SAW-880 -------------------------------
+//TODO:: Modify it, see SAW-880, item 11
+//  val outputType = ( definition \ "outputFile" \ "outputFormat").extractOrElse[String](DLConfiguration.defaultOutputType)
+//  val initOutputLocation = ( definition \ "outputFile" \ "outputFileName").extractOrElse[String](DLConfiguration.commonLocation)
+  val outputType = DLConfiguration.defaultOutputType
+  val initOutputLocation = DLConfiguration.commonLocation
+// ----------- SAW-880 -------------------------------
+
+  m_log debug s" Analysis: $metricName, \n Output location: $initOutputLocation \n Output type: $outputType, \n SQL: $sql"
+
+  if (sql.isEmpty || metricName.isEmpty || outputType.isEmpty || initOutputLocation.isEmpty)
+    throw new Exception("Invalid Analysis object, one of the attribute is null/empty: SQL query, analysis attribute")
 
   val outputLocation = AnalysisNodeExecutionHelper.getUserSpecificPath(initOutputLocation) + "-" + resId
   var lastSQLExecRes = -1
   var execResult : java.util.List[java.util.Map[String, (String, Object)]] = null
   var isDataLoaded = false
   var startTS : java.lang.Long = System.currentTimeMillis()
-  var finishedTS: Long = null
+  var finishedTS: Long =  System.currentTimeMillis()
   /**
     * Specific to AnalysisNode method to load data objects
     */
@@ -94,26 +108,36 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
   var lastSQLExecMessage : String = null
 
   /**
-    * Wrapper for base method to execute SQL statement
+    * Wrapper for base method to execute SQL statement and load (materialize) limited amount of data
     *
-    * @param limit - number of rows to return, it should be less or equal value configured in application configuration file.
+    * @param limit - number of rows to materialize, it should be less or equal value configured in application configuration file.
     * @return
     */
   def executeSQL(limit : Int = DLConfiguration.rowLimit): (Integer, String) = {
-    val (llastSQLExecRes, llastSQLExecMessage) = executeAndGetData(analysis, sql, limit)
+    val (llastSQLExecRes, llastSQLExecMessage) = executeAndGetData(analysisKey, sql, limit)
     lastSQLExecRes = llastSQLExecRes; lastSQLExecMessage = llastSQLExecMessage
     (lastSQLExecRes, lastSQLExecMessage)
   }
 
-
-  def getExecutionData :java.util.List[java.util.Map[String, (String, Object)]] = getData(analysis)
-
   /**
-    * Wrapper around base method that combines SQL execution and new data object saving to appropriate location
+    * Wrapper for base method to execute SQL statement, the method does not materialized data
     *
-    * @param rl - rows limit , it should be less or equal value configured in application configuration file.
+    * @param limit - number of rows to return, it should be less or equal value configured in application configuration file.
+    * @return
     */
-  def executeAndSave(rl: Int) : Unit = _executeAndSave(null, rl)
+  def executeSQLNoDataLoad(limit : Int = DLConfiguration.rowLimit): (Integer, String) = {
+    val (llastSQLExecRes, llastSQLExecMessage) = execute(analysisKey, sql)
+    lastSQLExecRes = llastSQLExecRes; lastSQLExecMessage = llastSQLExecMessage
+    (lastSQLExecRes, lastSQLExecMessage)
+  }
+
+  def getExecutionData :java.util.List[java.util.Map[String, (String, Object)]] = getData(analysisKey)
+
+
+  def getAllData : Unit =  materializeDataToList(analysisKey)
+  def getIterator : Unit =  materializeDataToIterator(analysisKey)
+
+  def getPreview(limit: Int = DLConfiguration.rowLimit) : Unit =  materializeDataToList(analysisKey, limit )
 
   /**
     * Wrapper around base method that combines SQL execution and new data object saving to appropriate location
@@ -123,14 +147,6 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
     *            can be used for debugging
     */
   def executeAndSave(out: OutputStream, rl: Int) : Unit = _executeAndSave(out, rl)
-
-  /**
-    * Wrapper around base method that combines SQL execution and new data object saving to appropriate location
-    *
-    * @param out - Hadoop output stream is used to print AnalysisResult descriptor into it.
-    *            can be used for debugging
-    */
-  def executeAndSave(out: OutputStream ) : Unit = _executeAndSave(out, DLConfiguration.rowLimit)
 
 
   /**
@@ -150,6 +166,9 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
     createAnalysisResult(resId, out)
   }
 
+  def getDataIterator : java.util.Iterator[java.util.HashMap[String, (String, Object)]] = dataIterator(analysisKey)
+
+
   def printSample(out: OutputStream) : Unit =
   {
 
@@ -158,7 +177,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
       return
     }
 
-    val sample = getDataSampleAsString(analysis)
+    val sample = getDataSampleAsString(analysisKey)
     if (out != null && sample != null)
       out.write(sample.getBytes)
   }
@@ -173,13 +192,20 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
   def createAnalysisResult(resId: String = null, out: OutputStream = null): Unit = {
 
     createAnalysisResultHeader(resId)
-    saveData(analysis, outputLocation, outputType)
+    saveData(analysisKey, outputLocation, outputType)
+    finishedTS = System.currentTimeMillis
+    val newDescriptor = JObject (resultNodeDescriptor.obj ++ List(
+      JField("execution_finish_ts", JLong(finishedTS)),
+      JField("exec-code", JLong(lastSQLExecRes)),
+      JField("exec-msg", JString(lastSQLExecMessage))
+    ))
+    resultNode.setDescriptor(compact(render(newDescriptor)))
 
-    resultNode.addObject("dataLocation", outputLocation, getSchema(analysis))
+    resultNode.addObject("dataLocation", outputLocation, getSchema(analysisKey))
     resultNode.update()
-    val descriptorPrintable = new JObject(resultNodeDescriptor.obj ::: List(("dataLocation", JString(outputLocation))))
 
     if (out != null) {
+      val descriptorPrintable = new JObject(resultNodeDescriptor.obj ::: List(("dataLocation", JString(outputLocation))))
       out.write(pretty(render(descriptorPrintable)).getBytes())
       out.flush()
     }
@@ -193,8 +219,16 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
     *
     */
   def completeAnalysisResult: Unit = {
-    saveData(analysis, outputLocation, outputType)
-    resultNode.addObject("dataLocation", outputLocation, getSchema(analysis))
+    saveData(analysisKey, outputLocation, outputType)
+    finishedTS = System.currentTimeMillis
+    val newDescriptor = JObject (resultNodeDescriptor.obj ++ List(
+      JField("execution_finish_ts", JLong(finishedTS)),
+      JField("exec-code", JLong(lastSQLExecRes)),
+      JField("exec-msg", JString(lastSQLExecMessage))
+    ))
+    resultNode.setDescriptor(compact(render(newDescriptor)))
+
+    resultNode.addObject("dataLocation", outputLocation, getSchema(analysisKey))
     resultNode.update()
   }
 
@@ -222,7 +256,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
       return (lastSQLExecRes, m)
     }
 
-    if (getData(analysis) == null) throw new DAException( ErrorCodes.NoResultToSave, analysis)
+    if (getDataset(analysisKey) == null) throw new DAException( ErrorCodes.NoResultToSave, analysisKey)
 
     var nodeExists = false
     try {
@@ -259,20 +293,56 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, cacheIt: Boolean = fals
     m_log trace "Result node descriptor: " + pretty(render(resultNodeDescriptor))
 
     val (res, msg) = resultNode.create
-    m_log info s"Analysis result creation: $res ==> $msg"
+    m_log debug s"Analysis result creation: $res ==> $msg"
     (res, msg)
   }
-
 
 }
 
 object AnalysisNodeExecutionHelper{
 
+  protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisNodeExecutionHelper].getName)
+
   //TODO:: The function is to be replaced with another one to construct user ( tenant ) specific path
-  def getUserSpecificPath(outputLocation: String): String = {
-     DLConfiguration.commonLocation + Path.SEPARATOR + outputLocation
+  def getUserSpecificPath(outputLocation: String): String = outputLocation
+
+  def apply( rowId: String, cacheIt: Boolean = false) : AnalysisNodeExecutionHelper = { val an = AnalysisNode(rowId); new AnalysisNodeExecutionHelper(an, null, cacheIt)}
+  def convertJsonToList(value: JValue): util.List[util.Map[String, (String, Object)]] =
+  {
+    value match {
+      case a:JArray =>
+      case o:JObject => //convertJsonToList(o.obj.)
+      case _ => { val l = List(Map("data-conversion-error" -> ("result", new Object))) }
+    }
+   null
   }
 
-  def apply( rowId: String, cacheIt: Boolean = false) : AnalysisNodeExecutionHelper = { val an = AnalysisNode(rowId); new AnalysisNodeExecutionHelper(an, cacheIt)}
+  def loadAnalysisResult(id: String): util.List[util.Map[String, (String, Object)]] =
+  {
+    DLConfiguration.initSpark()
+    val dlsession = new DLSession("SAW-TS-Show-AnalysisResult")
+    val resultNode = AnalysisResult(null, id)
+    //    resultNodeDescriptor = resultNode.getCachedData(MDObjectStruct.key_Definition.toString)
+    val od = resultNode.getObjectDescriptors
+    if (od.isEmpty)
+    {
+      m_log debug s"Nothing to load, return null"
+      return null
+    }
+    val onlyKey = od.keysIterator.next()
+    val rawdata = resultNode.getObject(onlyKey)
+    if (rawdata.isDefined) {
+      od(onlyKey) match {
+        case "json" => convertJsonToList(rawdata.get.asInstanceOf[JValue])
+        case "location" => {
+          dlsession.loadObject(onlyKey, rawdata.get.asInstanceOf[String], "parquet", DLConfiguration.rowLimit)
+          dlsession.getData(onlyKey)
+        }
+        case "binary" => throw new Exception("Loading binary data not supported yet")
+      }
+    }
+    else null
+  }
+
 
 }
