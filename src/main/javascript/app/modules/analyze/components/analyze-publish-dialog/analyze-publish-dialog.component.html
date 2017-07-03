@@ -22,20 +22,13 @@
       </div>
 
       <div class="form-container" layout="column">
-        <label translate="SCHEDULE"></label>
-        <md-radio-group ng-model="$ctrl.schedule" layout="row">
-
-          <md-radio-button ng-value="::$ctrl.scheduleOptions[0]">
-            <span ng-bind="::$ctrl.scheduleOptions[0] | translate"></span>
-          </md-radio-button>
-          <md-radio-button ng-value="::$ctrl.scheduleOptions[1]">
-            <span ng-bind="::$ctrl.scheduleOptions[1] | translate"></span>
-          </md-radio-button>
-
-        </md-radio-group>
+        <md-checkbox ng-checked="$ctrl.hasSchedule"
+                      ng-click="$ctrl.hasSchedule = !$ctrl.hasSchedule">
+          <span translate="SET_SCHEDULE_LABEL"></span>
+        </md-checkbox>
       </div>
 
-      <div ng-if="$ctrl.schedule === $ctrl.scheduleOptions[1]" class="repeat-schedule-container" layout="column">
+      <div ng-show="$ctrl.hasSchedule" class="schedule-container" layout="column">
         <div layout="row" class="form-container">
 
           <label translate="REPEAT_EVERY" flex="20"></label>
@@ -47,29 +40,32 @@
             </md-option>
           </md-select>
 
-          <md-select ng-model="::$ctrl.repeatInterval" flex="30" style="margin-left: 24px;">
+          <md-select ng-model="::$ctrl.repeatInterval" flex="30" style="padding-left: 24px;">
             <md-option ng-repeat="repeatInterval in $ctrl.repeatIntervals"
                        ng-bind="::repeatInterval | translate"
                        ng-value="repeatInterval">
             </md-option>
           </md-select>
-
-
         </div>
 
         <div ng-if="$ctrl.repeatInterval === $ctrl.repeatIntervals[1]" class="form-container" layout="row">
-
           <label translate="REPEAT_ON" flex="20"></label>
-
-          <div class="days-of-week-checkboxes">
+          <div class="days-of-week-checkboxes" flex="80">
             <md-checkbox ng-repeat="day in $ctrl.repeatOnDaysOfWeek track by day.keyword"
                          ng-checked="day.checked"
                          ng-click="day.checked = !day.checked">
               <span ng-bind="day.keyword | translate | truncate:2"></span>
             </md-checkbox>
           </div>
-
         </div>
+
+        <div class="form-container" layout="column">
+          <label translate="EMAIL_TO_COLLABORATORS"></label>
+          <md-input-container md-no-float flex="20">
+            <input ng-model="$ctrl.email" type="email" />
+          </md-input-container>
+        </div>
+
 
         <!--
         <div class="form-container" layout="row">
@@ -130,13 +126,6 @@
 
       </div>
 
-      <div class="form-container" layout="column" flex="50">
-        <label translate="EMAIL_TO_COLLABORATORS"></label>
-        <md-input-container md-no-float flex="20">
-          <input ng-model="$ctrl.email" type="email" />
-        </md-input-container>
-      </div>
-
     </div>
   </analyze-dialog-content>
 
@@ -147,11 +136,6 @@
 
       <md-button class="btn-card" ng-click="$ctrl.cancel()" translate="CANCEL">
       </md-button>
-
-      <div layout="row" layout-align="end center" flex ng-show="$ctrl.schedule === $ctrl.scheduleOptions[1]">
-        <md-button ng-click="$ctrl.publish({clearSchedule: true})" translate="CLEAR_SCHEDULE">
-        </md-button>
-      </div>
     </div>
   </analyze-dialog-footer>
 </analyze-dialog>

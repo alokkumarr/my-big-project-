@@ -34,8 +34,7 @@ export const AnalyzePublishDialogComponent = {
       this._AnalyzeService = AnalyzeService;
       this.dataHolder = [];
       this.dateFormat = 'mm/dd/yyyy';
-      this.scheduleOptions = ['PUBLISH_ONCE', 'SCHEDULE'];
-      this.schedule = this.scheduleOptions[0];
+      this.hasSchedule = false;
 
       this.repeatIntervals = ['DAYS', 'WEEKS'];
       this.repeatInterval = this.repeatIntervals[0];
@@ -79,7 +78,7 @@ export const AnalyzePublishDialogComponent = {
         return;
       }
 
-      this.schedule = this.scheduleOptions[1];
+      this.hasSchedule = true;
       this.repeatOrdinal = this.model.schedule.repeatInterval;
       this.repeatInterval = B2F_DICTIONARY[this.model.schedule.repeatUnit];
       forEach(this.repeatOnDaysOfWeek, day => {
@@ -87,14 +86,10 @@ export const AnalyzePublishDialogComponent = {
       });
     }
 
-    generateSchedulePayload(clearSchedule = false) {
-      if (clearSchedule) {
+    generateSchedulePayload() {
+      if (!this.hasSchedule) {
         this.model.schedule = null;
         this.model.scheduleHuman = '';
-        return {execute: false, payload: this.model};
-      }
-
-      if (this.schedule === this.scheduleOptions[0]) {
         return {execute: true, payload: this.model};
       }
 
@@ -109,7 +104,7 @@ export const AnalyzePublishDialogComponent = {
 
       this.model.scheduleHuman = this._AnalyzeService.scheduleToString(this.model.schedule);
 
-      return {execute: false, payload: this.model};
+      return {execute: true, payload: this.model};
     }
 
     setDefaultCategory() {
@@ -126,8 +121,8 @@ export const AnalyzePublishDialogComponent = {
       this._$mdDialog.cancel();
     }
 
-    publish(opts = {clearSchedule: false}) {
-      const {payload, execute} = this.generateSchedulePayload(opts.clearSchedule);
+    publish() {
+      const {payload, execute} = this.generateSchedulePayload();
       this.onPublish({model: payload, execute});
       this._$mdDialog.hide();
     }
