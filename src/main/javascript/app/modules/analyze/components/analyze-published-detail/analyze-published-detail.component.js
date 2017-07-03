@@ -24,7 +24,7 @@ export const AnalyzePublishedDetailComponent = {
       this._$window = $window; // used for going back from the template
       this._$mdDialog = $mdDialog;
       this._executionId = $state.params.executionId;
-      this.isPublished = true;
+      this.isPublished = false;
 
       this.requester = new BehaviorSubject({});
     }
@@ -157,17 +157,22 @@ export const AnalyzePublishedDetailComponent = {
       }
     }
 
-    publish(model) {
+    publish(model, execute) {
       this._$rootScope.showProgress = true;
-      this._AnalyzeService.publishAnalysis(model).then(() => {
+      this._AnalyzeService.publishAnalysis(model, execute).then(() => {
+        this.analysis = model;
         this._$rootScope.showProgress = false;
+
+        this._toastMessage.info(execute ?
+                                'Analysis has been published.' :
+                                'Analysis schedule changes have been updated.');
       }, () => {
         this._$rootScope.showProgress = false;
       });
     }
 
     openPublishModal() {
-      const template = '<analyze-publish-dialog model="model" on-publish="onPublish(model)"></analyze-publish-dialog>';
+      const template = '<analyze-publish-dialog model="model" on-publish="onPublish(model, execute)"></analyze-publish-dialog>';
 
       this.showDialog({
         template,

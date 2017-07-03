@@ -3,6 +3,7 @@ import style from './analyze-view.component.scss';
 
 import cloneDeep from 'lodash/cloneDeep';
 import remove from 'lodash/remove';
+import findIndex from 'lodash/findIndex';
 import {Subject} from 'rxjs/Subject';
 
 import {Events, AnalyseTypes} from '../../consts';
@@ -181,13 +182,46 @@ export const AnalyzeViewComponent = {
     print() {
     }
 
-    publish(model) {
-      this._$rootScope.showProgress = true;
-      this._AnalyzeService.publishAnalysis(model).then(() => {
-        this._$rootScope.showProgress = false;
-        this._$state.go('analyze.view', {id: model.categoryId});
-      }, () => {
-        this._$rootScope.showProgress = false;
+    openPublishModal(model, onPublish) {
+      const tpl = '<analyze-publish-dialog model="model" on-publish="onPublish(model, execute)"></analyze-publish-dialog>';
+
+      this._$mdDialog
+        .show({
+          template: tpl,
+          controllerAs: '$ctrl',
+          controller: scope => {
+            scope.model = model;
+            scope.onPublish = onPublish.bind(this);
+          },
+          autoWrap: false,
+          fullscreen: true,
+          focusOnOpen: false,
+          multiple: true,
+          clickOutsideToClose: true
+        });
+    }
+
+    publish(analysis) {
+      this.openPublishModal(analysis, (model, execute) => {
+        this._$rootScope.showProgress = true;
+        this._AnalyzeService.publishAnalysis(model, execute).then(() => {
+          this._$rootScope.showProgress = false;
+
+          /* Update the new analysis in the current list */
+          const id = findIndex(this.analyses, report => {
+            return report.id === model.id;
+          });
+          this.analyses.splice(id, 1, model);
+          this.updater.next({analyses: this.analyses});
+
+          this._toastMessage.info(execute ?
+                                  'Analysis has been published.' :
+                                  'Analysis schedule changes have been updated.');
+
+          this._$state.go('analyze.view', {id: model.categoryId});
+        }, () => {
+          this._$rootScope.showProgress = false;
+        });
       });
     }
 
