@@ -3,14 +3,12 @@
   # "become" as it results in a sudo error
   #become: true
   vars:
-    title: SAW Scheduler Service
+    title: SAW Transport Service
     module: saw-transport-service
     rpm: "{{module}}-1.0.0-1.noarch.rpm"
     target_rpm: ../{{module}}/target/rpm/{{module}}/RPMS/noarch/{{rpm}}
-    tmp_rpm: /root/saw-tmp/{{rpm}}
+    tmp_rpm: /root/{{rpm}}
   tasks:
-    - name: Create SAW temporary directory
-      file: path=/root/saw-tmp state=directory
     - name: Copy SAW Transport Service package
       synchronize: src="{{target_rpm}}" dest="{{tmp_rpm}}"
     - name: Install SAW Transport Service package
@@ -22,19 +20,11 @@
   vars:
     title: SAW Scheduler Service
     module: saw-scheduler-service
-    jar: /opt/{{module}}/{{module}}.jar
+    rpm: "{{module}}-1.0.0-1-noarch.rpm"
+    target_rpm: ../{{module}}/target/{{rpm}}
+    tmp_rpm: /root/{{rpm}}
   tasks:
-    # Workaround: Copy plain files until the module has RPM packaging
-    - name: Prepare {{title}} directory
-      file: path=/opt/{{module}} state=directory
-    # Add the service main file
-    - name: Copy {{title}} package
-      synchronize:
-        src: ../{{module}}/target/{{module}}-1.0.0-exec.jar
-        dest: "{{jar}}"
-    # Add daily launcher
-    - name: Install {{title}} daily launcher
-      copy:
-        content: "sudo -u mapr java -jar {{jar}} 2>&1 | logger -t {{module}}\n"
-        dest: "/etc/cron.daily/{{module}}-daily"
-        mode: a+x
+    - name: Copy SAW Scheduler Service package
+      synchronize: src="{{target_rpm}}" dest="{{tmp_rpm}}"
+    - name: Install SAW Scheduler Service package
+      yum: name={{tmp_rpm}} state=present
