@@ -1480,7 +1480,7 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public List<Role> getRoletypesDropDownList() {
 		ArrayList<Role> rolesList = null;
-		String sql = "SELECT R.ROLES_TYPES_SYS_ID, R.ROLES_TYPE_NAME FROM ROLES_TYPE R WHERE R.ACTIVE_STATUS_IND = 1";
+		String sql = "SELECT R.ROLES_TYPE_SYS_ID, R.ROLES_TYPE_NAME FROM ROLES_TYPE R WHERE R.ACTIVE_STATUS_IND = 1";
 
 		try {
 			rolesList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
@@ -1506,7 +1506,7 @@ public class UserRepositoryImpl implements UserRepository {
 			while (rs.next()) {
 				role = new Role();
 				role.setRoleName(rs.getString("ROLES_TYPE_NAME"));
-				role.setRoleId(rs.getLong("ROLES_TYPES_SYS_ID"));
+				role.setRoleId(rs.getLong("ROLES_TYPE_SYS_ID"));
 				roleList.add(role);
 			}
 			return roleList;
