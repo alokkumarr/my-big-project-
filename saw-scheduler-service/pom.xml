@@ -112,6 +112,41 @@
           <classifier>exec</classifier>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>de.dentrassi.maven</groupId>
+        <artifactId>rpm</artifactId>
+        <version>0.9.2</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>rpm</goal>
+            </goals>
+            <configuration>
+              <entries>
+                <entry>
+                  <name>/opt/bda/saw-scheduler</name>
+                  <directory>true</directory>
+                </entry>
+                <entry>
+                  <name>/opt/bda/saw-scheduler/saw-scheduler.jar</name>
+                  <file>target/saw-scheduler-service-1.0.0-exec.jar</file> 
+                </entry>
+                <entry>
+                  <name>/lib/systemd/system/saw-scheduler.service</name>
+                  <file>src/main/system/saw-scheduler.service</file> 
+                </entry>
+                <entry>
+                  <name>/lib/systemd/system/saw-scheduler.timer</name>
+                  <file>src/main/system/saw-scheduler.timer</file> 
+                </entry>
+              </entries>
+              <signature>
+                <skip>true</skip>
+              </signature>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <repositories>

@@ -1,0 +1,6 @@
+[Unit]
+Description=SAW Scheduler
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c "exec java -jar /opt/bda/saw-scheduler-service/saw-scheduler-service.jar"
