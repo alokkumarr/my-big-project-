@@ -77,7 +77,6 @@ class JwtService {
 
   _isSet(code, bitIndex) {
     const fullCode = padStart((code >>> 0).toString(2), PRIVILEGE_CODE_LENGTH, '0');
-
     /* If index of 'All' privileges is set, it is considered same as if the
        requested privilege bit is set */
     return fullCode[bitIndex] === '1' || fullCode[PRIVILEGE_INDEX.ALL] === '1';
@@ -90,6 +89,9 @@ class JwtService {
      @opts should have either categoryId or subCategoryId field set.
      */
   hasPrivilege(name, opts) {
+    if (!PRIVILEGE_INDEX[name]) {
+      throw new Error(`Privilige ${name} is not supported!`);
+    }
     opts.module = opts.module || 'ANALYZE';
 
     const token = this.getTokenObj();
@@ -111,10 +113,28 @@ class JwtService {
       code = subCategory.privilegeCode || 0;
     }
 
-    return {
-      DELETE: this._isSet(code, PRIVILEGE_INDEX.DELETE) &&
-        (this.isOwner(token, opts.creatorId) || this.isAdmin(token))
-    }[name];
+    switch (name) {
+      case 'ACCESS':
+        return this._isSet(code, PRIVILEGE_INDEX.ACCESS);
+      case 'CREATE':
+        return this._isSet(code, PRIVILEGE_INDEX.CREATE);
+      case 'EXECUTE':
+        return this._isSet(code, PRIVILEGE_INDEX.EXECUTE);
+      case 'PUBLISH':
+        return this._isSet(code, PRIVILEGE_INDEX.PUBLISH);
+      case 'FORK':
+        return this._isSet(code, PRIVILEGE_INDEX.FORK);
+      case 'EDIT':
+        return this._isSet(code, PRIVILEGE_INDEX.EDIT) &&
+          (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
+      case 'EXPORT':
+        return this._isSet(code, PRIVILEGE_INDEX.EXPORT);
+      case 'DELETE':
+        return this._isSet(code, PRIVILEGE_INDEX.DELETE) &&
+          (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
+      default:
+        return false;
+    }
   }
 }
 

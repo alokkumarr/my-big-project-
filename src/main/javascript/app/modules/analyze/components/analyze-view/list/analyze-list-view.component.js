@@ -1,5 +1,3 @@
-import clone from 'lodash/clone';
-
 import template from './analyze-list-view.component.html';
 
 export const AnalyzeListViewComponent = {
@@ -13,11 +11,12 @@ export const AnalyzeListViewComponent = {
     updater: '<'
   },
   controller: class AnalyzeListViewController {
-    constructor($mdDialog, dxDataGridService, AnalyzeService) {
+    constructor($mdDialog, dxDataGridService, AnalyzeService, AnalyzeActionsService) {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this._dxDataGridService = dxDataGridService;
       this._AnalyzeService = AnalyzeService;
+      this._AnalyzeActionsService = AnalyzeActionsService;
 
       this._gridListInstance = null;
     }
@@ -55,56 +54,20 @@ export const AnalyzeListViewComponent = {
       this.onUpdateAnalysisType(this.analysisType);
     }
 
-    remove(analysis) {
+    fork() {
+      this._AnalyzeActionsService.fork(this.model);
+    }
+
+    onSuccessfulDeletion(analysis) {
       this.onAction({
-        type: 'delete',
+        type: 'onSuccessfulDeletion',
         model: analysis
       });
     }
 
-    fork(analysis) {
+    onSuccessfulExecution(analysis) {
       this.onAction({
-        type: 'fork',
-        model: analysis
-      });
-    }
-
-    openPublishModal(model) {
-      const tpl = '<analyze-publish-dialog model="model" on-publish="onPublish(model)"></analyze-publish-dialog>';
-
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controllerAs: '$ctrl',
-          controller: scope => {
-            scope.model = clone(model);
-            scope.onPublish = this.publish.bind(this);
-          },
-          autoWrap: false,
-          fullscreen: true,
-          focusOnOpen: false,
-          multiple: true,
-          clickOutsideToClose: true
-        });
-    }
-
-    publish(model) {
-      this.onAction({
-        type: 'publish',
-        model
-      });
-    }
-
-    execute(analysis) {
-      this.onAction({
-        type: 'execute',
-        model: analysis
-      });
-    }
-
-    edit(analysis) {
-      this.onAction({
-        type: 'edit',
+        type: 'onSuccessfulExecution',
         model: analysis
       });
     }

@@ -35,53 +35,12 @@
             <md-icon md-font-icon="icon-fork"></md-icon>
           </md-button>
 
-          <md-menu-bar>
-            <md-menu>
-              <md-button class="md-button btn-card" aria-label="More"
-                          ng-click="$mdMenu.open()">
-                <md-icon md-font-icon="icon-more"></md-icon>
-              </md-button>
+          <analyze-actions-menu analysis="report.data"
+                                exclude="fork"
+                                on-successful-deletion="$ctrl.onSuccessfulDeletion(analysis)"
+                                on-successful-execution="$ctrl.onSuccessfulExecution(analysis)"
+          ></analyze-actions-menu>
 
-              <md-menu-content>
-                <md-menu-item>
-                  <md-button aria-label="Execute"
-                              ng-click="$ctrl.execute(report.data)"
-                              translate="EXECUTE">
-                  </md-button>
-                </md-menu-item>
-                <md-menu-item>
-                  <md-button aria-label="Edit"
-                              ng-click="$ctrl.edit(report.data)"
-                              translate="EDIT">
-                  </md-button>
-                </md-menu-item>
-                <md-menu-item>
-                  <md-button aria-label="Publish"
-                              ng-click="$ctrl.openPublishModal(report.data)"
-                              translate="PUBLISH">
-                  </md-button>
-                </md-menu-item>
-                <md-menu-item>
-                  <md-button aria-label="Print"
-                              ng-click="$ctrl.print(report.data)"
-                              translate="PRINT">
-                  </md-button>
-                </md-menu-item>
-                <md-menu-item>
-                  <md-button aria-label="Export"
-                              ng-click="$ctrl.export(report.data)"
-                              translate="EXPORT">
-                  </md-button>
-                </md-menu-item>
-                <md-menu-item>
-                  <md-button aria-label="Delete"
-                              ng-click="$ctrl.remove(report.data)">
-                    <span translate="DELETE" md-colors="{color: 'warn'}"></span>
-                  </md-button>
-                </md-menu-item>
-              </md-menu-content>
-            </md-menu>
-          </md-menu-bar>
         </md-card-actions>
       </div>
     </div>

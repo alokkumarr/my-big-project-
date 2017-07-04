@@ -43,6 +43,7 @@
 
       <div class="analyze-view_action-panel" layout="row" layout-align="end center">
         <md-button class="btn-primary"
+                   ng-show="$ctrl.canUserCreate"
                    ng-click="$ctrl.openNewAnalysisModal()">
           + <span translate="ANALYSIS"></span>
         </md-button>

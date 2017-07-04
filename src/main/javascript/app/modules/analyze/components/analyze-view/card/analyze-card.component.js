@@ -13,15 +13,12 @@ export const AnalyzeCardComponent = {
   },
   controller: class AnalyzeCardController {
 
-    constructor($mdDialog, AnalyzeService, $log) {
+    constructor($mdDialog, AnalyzeService, $log, AnalyzeActionsService) {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this._AnalyzeService = AnalyzeService;
+      this._AnalyzeActionsService = AnalyzeActionsService;
       this._$log = $log;
-    }
-
-    openMenu($mdMenu, ev) {
-      $mdMenu.open(ev);
     }
 
     showExecutingFlag() {
@@ -48,52 +45,21 @@ export const AnalyzeCardComponent = {
         });
     }
 
-    remove() {
-      this.onAction({
-        type: 'delete',
-        model: this.model
-      });
-    }
-
-    publish(model) {
-      this.onAction({
-        type: 'publish',
-        model
-      });
-    }
-
-    execute() {
-      this.onAction({
-        type: 'execute',
-        model: this.model
-      });
-    }
-
     fork() {
+      this._AnalyzeActionsService.fork(this.model);
+    }
+
+    onSuccessfulDeletion(analysis) {
       this.onAction({
-        type: 'fork',
-        model: this.model
+        type: 'onSuccessfulDeletion',
+        model: analysis
       });
     }
 
-    edit() {
+    onSuccessfulExecution(analysis) {
       this.onAction({
-        type: 'edit',
-        model: this.model
-      });
-    }
-
-    print() {
-      this.onAction({
-        type: 'print',
-        model: this.model
-      });
-    }
-
-    export() {
-      this.onAction({
-        type: 'export',
-        model: this.model
+        type: 'onSuccessfulExecution',
+        model: analysis
       });
     }
   }

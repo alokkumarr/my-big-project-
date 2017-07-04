@@ -11,6 +11,8 @@ import {PivotService} from './services/pivot.service';
 import {ChartService} from './services/chart.service';
 
 import {AnalyzePageComponent} from './components/analyze-page/analyze-page.component';
+import {AnalyzeActionsService} from './components/analyze-actions/analyze-actions.service';
+import {AnalyzeActionsMenuComponent} from './components/analyze-actions/analyze-actions-menu.component';
 import {AnalyzeViewComponent} from './components/analyze-view/analyze-view.component';
 import {AnalyzeCardsViewComponent} from './components/analyze-view/card/analyze-cards-view.component';
 import {AnalyzeCardComponent} from './components/analyze-view/card/analyze-card.component';
@@ -62,7 +64,9 @@ angular.module(AnalyzeModule, [])
   .factory('AnalyzeService', AnalyzeService)
   .factory('PivotService', PivotService)
   .factory('ChartService', ChartService)
+  .factory('AnalyzeActionsService', AnalyzeActionsService)
   .component('reportGridDisplay', ReportGridDisplayComponent)
+  .component('analyzeActionsMenu', AnalyzeActionsMenuComponent)
   .component('reportGridDisplayNode', ReportGridDisplayNodeComponent)
   .component('reportGridDisplayContainer', ReportGridDisplayContainerComponent)
   .component('reportGridContainer', ReportGridContainerComponent)
