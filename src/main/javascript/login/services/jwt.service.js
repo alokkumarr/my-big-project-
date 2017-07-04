@@ -61,6 +61,10 @@ class JwtService {
     };
   }
 
+  getUserId() {
+    return get(this.getTokenObj(), 'ticket.userId').toString();
+  }
+
   _isRole(token, role) {
     const roleType = get(token, 'ticket.roleType');
     return roleType === role;
