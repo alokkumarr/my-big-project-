@@ -123,8 +123,8 @@ export const AnalyzePublishDialogComponent = {
 
     publish() {
       const {payload, execute} = this.generateSchedulePayload();
-      this.onPublish({model: payload, execute});
-      this._$mdDialog.hide();
+      const promise = this.onPublish({model: payload, execute});
+      this._$mdDialog.hide(promise);
     }
   }
 };

@@ -18,54 +18,15 @@
 
       <div>
 
-        <md-menu-bar>
-          <md-menu>
-            <md-button class="md-icon-button" aria-label="More"
-                       ng-click="$mdMenu.open()">
-              <md-icon md-font-icon="icon-more"></md-icon>
-            </md-button>
+        <analyze-actions-menu analysis="$ctrl.analysis"
+                              ng-if="$ctrl.analysis"
+                              exclude="publish"
+                              on-successful-deletion="$ctrl.onSuccessfulDeletion(analysis)"
+        ></analyze-actions-menu>
 
-            <md-menu-content>
-              <md-menu-item>
-                <md-button aria-label="Execute"
-                          ng-click="$ctrl.executeAnalysis()"
-                          translate="EXECUTE">
-                </md-button>
-              </md-menu-item>
-              <md-menu-item>
-                <md-button aria-label="Fork"
-                           ng-if="::$ctrl.analysis"
-                           ng-click="$ctrl.openEditModal('fork')"
-                           translate="FORK_AND_EDIT">
-                </md-button>
-              </md-menu-item>
-              <md-menu-item>
-                <md-button aria-label="Edit"
-                           ng-if="::$ctrl.analysis"
-                           ng-click="$ctrl.openEditModal('edit')"
-                           translate="EDIT">
-                </md-button>
-              </md-menu-item>
-              <md-menu-item>
-                <md-button ng-click="$ctrl.exportData()">
-                  <span translate="EXPORT"></span>
-                </md-button>
-              </md-menu-item>
-              <md-menu-item>
-                <md-button ng-click="ctrl.openPrintModal()">
-                  <span translate="PRINT"></span>
-                </md-button>
-              </md-menu-item>
-              <md-menu-item>
-                <md-button ng-click="$ctrl.openDeleteModal()">
-                  <span translate="DELETE" md-colors="{color: 'warn'}"></span>
-                </md-button>
-              </md-menu-item>
-            </md-menu-content>
-          </md-menu>
-        </md-menu-bar>
-
-        <md-button ng-hide="$ctrl.isPublished" class="btn-primary" ng-click="$ctrl.openPublishModal()">
+        <md-button ng-hide="$ctrl.isPublished && !$ctrl.canUserPublish"
+                   class="btn-primary"
+                   ng-click="$ctrl.publish()">
           <span translate="PUBLISH"></span>
         </md-button>
 

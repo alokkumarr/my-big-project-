@@ -1,5 +1,3 @@
-import clone from 'lodash/clone';
-
 import template from './analyze-card.component.html';
 import style from './analyze-card.component.scss';
 
@@ -13,67 +11,49 @@ export const AnalyzeCardComponent = {
   },
   controller: class AnalyzeCardController {
 
-    constructor($mdDialog, AnalyzeService, $log) {
+    constructor($mdDialog, AnalyzeService, $log, AnalyzeActionsService, JwtService) {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this._AnalyzeService = AnalyzeService;
+      this._AnalyzeActionsService = AnalyzeActionsService;
       this._$log = $log;
+      this._JwtService = JwtService;
+
+      this.canUserFork = false;
     }
 
-    openMenu($mdMenu, ev) {
-      $mdMenu.open(ev);
+    $onInit() {
+      this.canUserFork = this._JwtService.hasPrivilege('FORK', {
+        subCategoryId: this.model.categoryId
+      });
     }
 
     showExecutingFlag() {
       return this._AnalyzeService.isExecuting(this.model.id);
     }
 
-    remove() {
-      this.onAction({
-        type: 'delete',
-        model: this.model
-      });
-    }
-
-    publish() {
-      this.onAction({
-        type: 'publish',
-        model: clone(this.model)
-      });
-    }
-
-    execute() {
-      this.onAction({
-        type: 'execute',
-        model: this.model
-      });
-    }
-
     fork() {
+      this._AnalyzeActionsService.fork(this.model);
+    }
+
+    onSuccessfulDeletion(analysis) {
       this.onAction({
-        type: 'fork',
-        model: this.model
+        type: 'onSuccessfulDeletion',
+        model: analysis
       });
     }
 
-    edit() {
+    onSuccessfulExecution(analysis) {
       this.onAction({
-        type: 'edit',
-        model: this.model
+        type: 'onSuccessfulExecution',
+        model: analysis
       });
     }
 
-    print() {
+    onSuccessfulPublish(analysis) {
       this.onAction({
-        type: 'print',
-        model: this.model
-      });
-    }
-
-    export() {
-      this.onAction({
-        type: 'export',
-        model: this.model
+        type: 'onSuccessfulPublish',
+        model: analysis
       });
     }
   }
