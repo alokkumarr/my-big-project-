@@ -1,5 +1,3 @@
-import clone from 'lodash/clone';
-
 import template from './analyze-card.component.html';
 import style from './analyze-card.component.scss';
 
