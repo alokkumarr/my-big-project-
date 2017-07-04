@@ -51,12 +51,22 @@
   <md-card>
     <md-card-title>
       <md-card-title-text>
-        <span class="md-title" ng-bind="$ctrl.analysis.userFullName | changeCase:'title'"></span>
-        <span class="md-subhead" ng-bind="$ctrl.analysis.scheduled"></span>
+        <div>
+          <span class="md-title" translate="ANALYSIS_DETAILS_HEADER"></span>
+        </div>
       </md-card-title-text>
     </md-card-title>
     <md-card-content>
-      <div class="row">
+        <div>
+          <strong ng-if="$ctrl.analysis.userFullName" translate="ANALYSIS_DETAILS_CREATOR_LABEL"></strong>
+          <span ng-bind="$ctrl.analysis.userFullName | changeCase:'title'"></span>
+        </div>
+      <div>
+        <strong ng-if="$ctrl.analysis.scheduleHuman" translate="ANALYSIS_DETAILS_SCHEDULE_LABEL"></strong>
+        <span ng-bind="$ctrl.analysis.scheduleHuman"></span>
+      </div>
+      <div class="row analysis-detail-description">
+        <strong ng-if="$ctrl.analysis.description" translate="ANALYSIS_DETAILS_DESCRIPTION_LABEL"></strong>
         <p ng-bind="$ctrl.analysis.description"></p>
       </div>
     </md-card-content>

@@ -34,26 +34,6 @@ export const AnalyzeCardComponent = {
       return this._AnalyzeService.isExecuting(this.model.id);
     }
 
-    openPublishModal(ev) {
-      const tpl = '<analyze-publish-dialog model="model" on-publish="onPublish(model)"></analyze-publish-dialog>';
-
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controllerAs: '$ctrl',
-          controller: scope => {
-            scope.model = clone(this.model);
-            scope.onPublish = this.publish.bind(this);
-          },
-          autoWrap: false,
-          fullscreen: true,
-          focusOnOpen: false,
-          multiple: true,
-          targetEvent: ev,
-          clickOutsideToClose: true
-        });
-    }
-
     fork() {
       this._AnalyzeActionsService.fork(this.model);
     }
@@ -68,6 +48,13 @@ export const AnalyzeCardComponent = {
     onSuccessfulExecution(analysis) {
       this.onAction({
         type: 'onSuccessfulExecution',
+        model: analysis
+      });
+    }
+
+    onSuccessfulPublish(analysis) {
+      this.onAction({
+        type: 'onSuccessfulPublish',
         model: analysis
       });
     }

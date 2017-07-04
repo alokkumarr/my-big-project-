@@ -11,7 +11,8 @@ export const AnalyzeActionsMenuComponent = {
     analysis: '<',
     exclude: '@',
     onSuccessfulDeletion: '&',
-    onSuccessfulExecution: '&'
+    onSuccessfulExecution: '&',
+    onSuccessfulPublish: '&'
   },
   controller: class AnalyzeActionsMenuController {
     constructor(AnalyzeActionsService, $state, JwtService) {
@@ -80,8 +81,8 @@ export const AnalyzeActionsMenuComponent = {
     }
 
     publish() {
-      this._AnalyzeActionsService.publish(this.analysis).then(() => {
-        this._$state.go('analyze.view', {id: this.analysis.categoryId});
+      this._AnalyzeActionsService.publish(this.analysis).then(analysis => {
+        invoke(this, 'onSuccessfulPublish', {analysis});
       });
     }
 

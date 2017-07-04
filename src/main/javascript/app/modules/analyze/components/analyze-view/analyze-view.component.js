@@ -2,6 +2,7 @@ import template from './analyze-view.component.html';
 import style from './analyze-view.component.scss';
 
 import remove from 'lodash/remove';
+import findIndex from 'lodash/findIndex';
 import {Subject} from 'rxjs/Subject';
 
 import {Events} from '../../consts';
@@ -134,11 +135,25 @@ export const AnalyzeViewComponent = {
         case 'onSuccessfulExecution':
           this.goToAnalysis(payload);
           break;
+        case 'onSuccessfulPublish':
+          this.onSuccessfulPublish(payload);
+          break;
         case 'view':
           this.view(payload);
           break;
         default:
       }
+    }
+
+    onSuccessfulPublish(analysis) {
+      /* Update the new analysis in the current list */
+      const analysisId = findIndex(this.analyses, ({id}) => {
+        return id === analysis.id;
+      });
+      this.analyses.splice(analysisId, 1, analysis);
+      this.updater.next({analyses: this.analyses});
+
+      this._$state.go('analyze.view', {id: analysis.categoryId});
     }
 
     view(analysisId) {

@@ -79,6 +79,13 @@ export const AnalyzeListViewComponent = {
       });
     }
 
+    onSuccessfulPublish(analysis) {
+      this.onAction({
+        type: 'onSuccessfulPublish',
+        model: analysis
+      });
+    }
+
     reloadDataGrid(analyses) {
       this._gridListInstance.option('dataSource', analyses);
       this._gridListInstance.refresh();
@@ -106,7 +113,7 @@ export const AnalyzeListViewComponent = {
         cellTemplate: 'metricsCellTemplate'
       }, {
         caption: 'SCHEDULED',
-        dataField: 'scheduled',
+        dataField: 'scheduleHuman',
         allowSorting: true,
         alignment: 'left',
         width: '15%'

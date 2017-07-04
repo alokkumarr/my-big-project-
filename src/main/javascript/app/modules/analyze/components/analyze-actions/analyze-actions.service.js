@@ -31,7 +31,7 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
   }
 
   function publish(analysis) {
-    openPublishModal(analysis);
+    return openPublishModal(analysis);
   }
 
   function print() {
@@ -47,7 +47,7 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
   function openPublishModal(analysis) {
     const template = '<analyze-publish-dialog model="model" on-publish="onPublish(model)"></analyze-publish-dialog>';
 
-    showDialog({
+    return showDialog({
       template,
       controller: scope => {
         scope.model = analysis;
@@ -58,8 +58,12 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
 
   function doPublish(analysis) {
     $rootScope.showProgress = true;
-    AnalyzeService.publishAnalysis(analysis).then(() => {
+    return AnalyzeService.publishAnalysis(analysis, execute).then(updatedAnalysis => {
       $rootScope.showProgress = false;
+      toastMessage.info(execute ?
+                                'Analysis has been published.' :
+                                'Analysis schedule changes have been updated.');
+      return updatedAnalysis;
     }, () => {
       $rootScope.showProgress = false;
     });

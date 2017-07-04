@@ -24,8 +24,8 @@ export const AnalyzePublishedDetailComponent = {
       this._$mdDialog = $mdDialog;
       this._JwtService = JwtService;
       this._executionId = $state.params.executionId;
-      this.isPublished = true;
       this.canUserPublish = false;
+      this.isPublished = false;
 
       this.requester = new BehaviorSubject({});
     }

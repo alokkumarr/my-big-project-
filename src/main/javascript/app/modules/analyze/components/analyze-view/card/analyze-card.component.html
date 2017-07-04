@@ -23,7 +23,7 @@
           <span ng-bind-html="::($ctrl.mkdel.metrics || []).join(', ') | highlight:$ctrl.highlightTerm"></span>
           <span>
             <md-icon md-font-icon="icon-calendar"></md-icon>
-            <span ng-bind="::($ctrl.model.scheduled || 'No Schedule Set')"></span>
+            <span ng-bind="$ctrl.model.scheduleHuman || 'No Schedule Set'"></span>
           </span>
         </span>
       </md-card-title-text>
@@ -42,6 +42,7 @@
                             exclude="fork"
                             on-successful-deletion="$ctrl.onSuccessfulDeletion(analysis)"
                             on-successful-execution="$ctrl.onSuccessfulExecution(analysis)"
+                            on-successful-publish="$ctrl.onSuccessfulPublish(analysis)"
       ></analyze-actions-menu>
 
     </md-card-actions>
