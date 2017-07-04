@@ -19,11 +19,14 @@
       <div>
 
         <analyze-actions-menu analysis="$ctrl.analysis"
+                              ng-if="$ctrl.analysis"
                               exclude="publish"
                               on-successful-deletion="$ctrl.onSuccessfulDeletion(analysis)"
         ></analyze-actions-menu>
 
-        <md-button ng-hide="$ctrl.isPublished" class="btn-primary" ng-click="$ctrl.publish()">
+        <md-button ng-hide="$ctrl.isPublished && !$ctrl.canUserPublish"
+                   class="btn-primary"
+                   ng-click="$ctrl.publish()">
           <span translate="PUBLISH"></span>
         </md-button>
 

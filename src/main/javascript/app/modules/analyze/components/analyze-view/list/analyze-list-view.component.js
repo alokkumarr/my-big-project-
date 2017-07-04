@@ -11,19 +11,26 @@ export const AnalyzeListViewComponent = {
     updater: '<'
   },
   controller: class AnalyzeListViewController {
-    constructor($mdDialog, dxDataGridService, AnalyzeService, AnalyzeActionsService) {
+    constructor($mdDialog, dxDataGridService, AnalyzeService, AnalyzeActionsService, JwtService) {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this._dxDataGridService = dxDataGridService;
       this._AnalyzeService = AnalyzeService;
       this._AnalyzeActionsService = AnalyzeActionsService;
+      this._JwtService = JwtService;
 
       this._gridListInstance = null;
+
+      this.canUserFork = false;
     }
 
     $onInit() {
       this.gridConfig = this.getGridConfig();
       this.updaterSubscribtion = this.updater.subscribe(update => this.onUpdate(update));
+
+      this.canUserFork = this._JwtService.hasPrivilege('FORK', {
+        subCategoryId: this.analyses[0].categoryId
+      });
     }
 
     showExecutingFlag(analysisId) {

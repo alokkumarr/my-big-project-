@@ -13,12 +13,21 @@ export const AnalyzeCardComponent = {
   },
   controller: class AnalyzeCardController {
 
-    constructor($mdDialog, AnalyzeService, $log, AnalyzeActionsService) {
+    constructor($mdDialog, AnalyzeService, $log, AnalyzeActionsService, JwtService) {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this._AnalyzeService = AnalyzeService;
       this._AnalyzeActionsService = AnalyzeActionsService;
       this._$log = $log;
+      this._JwtService = JwtService;
+
+      this.canUserFork = false;
+    }
+
+    $onInit() {
+      this.canUserFork = this._JwtService.hasPrivilege('FORK', {
+        subCategoryId: this.model.categoryId
+      });
     }
 
     showExecutingFlag() {

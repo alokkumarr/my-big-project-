@@ -59,6 +59,7 @@
     <div class="analyze-view_analyses-list"
          ng-switch-when="list">
       <analyze-list-view analyses="$ctrl.analyses"
+                         ng-if="$ctrl.analyses"
                          analysis-type="$ctrl.states.analysisType"
                          updater="$ctrl.updater"
                          on-action="$ctrl.onCardAction(type, model)"

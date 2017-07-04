@@ -1,6 +1,7 @@
 import filter from 'lodash/filter';
 import isString from 'lodash/isString';
 import invoke from 'lodash/invoke';
+import upperCase from 'lodash/upperCase';
 
 import template from './analyze-actions-menu.component.html';
 
@@ -13,10 +14,11 @@ export const AnalyzeActionsMenuComponent = {
     onSuccessfulExecution: '&'
   },
   controller: class AnalyzeActionsMenuController {
-    constructor(AnalyzeActionsService, $state) {
+    constructor(AnalyzeActionsService, $state, JwtService) {
       'ngInject';
       this._AnalyzeActionsService = AnalyzeActionsService;
       this._$state = $state;
+      this._JwtService = JwtService;
 
       this.ACTIONS = [{
         label: 'EXECUTE',
@@ -51,13 +53,16 @@ export const AnalyzeActionsMenuComponent = {
     }
 
     $onInit() {
-
       const actionsToExclude = isString(this.exclude) ? this.exclude.split('-') : [];
+      this.actions = filter(this.ACTIONS, ({value}) => {
+        const notExcluded = !actionsToExclude.includes(value);
+        const privilegeName = upperCase(value === 'print' ? 'export' : value);
+        const hasPriviledge = this._JwtService.hasPrivilege(privilegeName, {
+          subCategoryId: this.analysis.categoryId
+        });
 
-      this.actions = filter(this.ACTIONS, action => {
-        return !actionsToExclude.includes(action.value);
+        return notExcluded && hasPriviledge;
       });
-
     }
 
     execute() {

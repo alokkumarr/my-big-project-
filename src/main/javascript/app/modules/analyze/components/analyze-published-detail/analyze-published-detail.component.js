@@ -9,7 +9,7 @@ export const AnalyzePublishedDetailComponent = {
   template,
   styles: [style],
   controller: class AnalyzePublishedDetailController extends AbstractComponentController {
-    constructor($injector, AnalyzeService, $state, $rootScope, $mdDialog,
+    constructor($injector, AnalyzeService, $state, $rootScope, JwtService, $mdDialog,
                 $window, toastMessage, FilterService, AnalyzeActionsService) {
       'ngInject';
       super($injector);
@@ -22,8 +22,10 @@ export const AnalyzePublishedDetailComponent = {
       this._toastMessage = toastMessage;
       this._$window = $window; // used for going back from the template
       this._$mdDialog = $mdDialog;
+      this._JwtService = JwtService;
       this._executionId = $state.params.executionId;
       this.isPublished = true;
+      this.canUserPublish = false;
 
       this.requester = new BehaviorSubject({});
     }
@@ -33,6 +35,7 @@ export const AnalyzePublishedDetailComponent = {
       const analysis = this._$state.params.analysis;
       if (analysis) {
         this.analysis = analysis;
+        this.setPrivileges();
         if (!this.analysis.schedule) {
           this.isPublished = false;
         }
@@ -44,6 +47,12 @@ export const AnalyzePublishedDetailComponent = {
           this.loadExecutedAnalyses(analysisId);
         });
       }
+    }
+
+    setPrivileges() {
+      this.canUserPublish = this._JwtService.hasPrivilege('PUBLISH', {
+        subCategoryId: this.analysis.categoryId
+      });
     }
 
     showExecutingFlag() {
@@ -68,6 +77,7 @@ export const AnalyzePublishedDetailComponent = {
       return this._AnalyzeService.readAnalysis(analysisId)
         .then(analysis => {
           this.analysis = analysis;
+          this.setPrivileges();
           if (!this.analysis.schedule) {
             this.isPublished = false;
           }

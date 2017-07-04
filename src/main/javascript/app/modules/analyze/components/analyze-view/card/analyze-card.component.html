@@ -30,7 +30,9 @@
     </md-card-title>
 
     <md-card-actions layout="row" layout-align="center center">
-      <md-button class="md-button btn-card" aria-label="Fork"
+      <md-button class="md-button btn-card"
+                 aria-label="Fork"
+                 ng-disabled="!$ctrl.canUserFork"
                  ng-click="$ctrl.fork()">
         <md-tooltip ng-bind="'TOOLTIP_FORK_ANALYSIS' | translate"></md-tooltip>
         <md-icon md-font-icon="icon-fork"></md-icon>
