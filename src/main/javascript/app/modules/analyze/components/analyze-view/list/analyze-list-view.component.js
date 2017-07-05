@@ -61,8 +61,8 @@ export const AnalyzeListViewComponent = {
       this.onUpdateAnalysisType(this.analysisType);
     }
 
-    fork() {
-      this._AnalyzeActionsService.fork(this.model);
+    fork(analysis) {
+      this._AnalyzeActionsService.fork(analysis);
     }
 
     onSuccessfulDeletion(analysis) {
