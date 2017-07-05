@@ -124,11 +124,11 @@
             <configuration>
               <entries>
                 <entry>
-                  <name>/opt/bda/saw-scheduler</name>
+                  <name>/opt/bda/saw-scheduler-service</name>
                   <directory>true</directory>
                 </entry>
                 <entry>
-                  <name>/opt/bda/saw-scheduler/saw-scheduler.jar</name>
+                  <name>/opt/bda/saw-scheduler-service/saw-scheduler.jar</name>
                   <file>target/saw-scheduler-service-1.0.0-exec.jar</file> 
                 </entry>
                 <entry>

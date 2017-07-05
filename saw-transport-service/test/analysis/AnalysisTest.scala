@@ -128,12 +128,19 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
     }
 
     "execute interactive analysis with runtime filters" in {
-      /* Execute existing analysis with runtime filters*/
+      /* Execute existing analysis with runtime filters */
       val body = actionKeyAnalysisMessage("execute", id, analysis)
       val response = analyze(sendRequest(body))
       /* Expect zero rows in result because runtime filter is designed to
        * rejects all rows */
       extractArray(response, "data").length must be (0)
+    }
+
+    "execute saved analysis" in {
+      /* Execute previously saved analysis */
+      val body = actionKeyMessage("execute", id)
+      val response = analyze(sendRequest(body))
+      extractArray(response, "data").length must be (10)
     }
 
     "execute analysis with manual query" in {
@@ -154,7 +161,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
       val results = extractArray(response, "executions")
       /* There are three executions in the preceding tests, so the results
        * list should contain three elements */
-      results.length must be (3)
+      results.length must be (4)
       val resultsSorted = results.sortWith((a, b) => {
         (a \ "finished").extract[String] < (b \ "finished").extract[String]
       })

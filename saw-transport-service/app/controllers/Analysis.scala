@@ -138,18 +138,23 @@ class Analysis extends BaseController {
         json merge contentsAnalyze(searchAnalysisJson(keys))
       }
       case "execute" => {
-        val analysisId = extractAnalysisId(json);
-        val analysis = analysisJson(json);
-        val analysisType = (analysis \ "type");
-        var queryRuntime : String = "";
-    	val typeInfo = analysisType.extract[String];
-    	if ( typeInfo.equals("report"))
-    	{
-	        /* Build query based on analysis supplied in request body */
-	        val executionType = (analysis \ "executionType")
-	          .extractOrElse[String]("interactive")
-	        val runtime = (executionType == "interactive")
-	        queryRuntime = QueryBuilder.build(analysis, runtime)
+        val analysisId = extractAnalysisId(json)
+        var queryRuntime: String = null
+        (json \ "contents" \ "analyze") match {
+          case obj: JArray => {
+            val analysis = analysisJson(json)
+            val analysisType = (analysis \ "type")
+    	    val typeInfo = analysisType.extract[String]
+    	    if (typeInfo.equals("report"))
+    	    {
+	      /* Build query based on analysis supplied in request body */
+	      val executionType = (analysis \ "executionType")
+	        .extractOrElse[String]("interactive")
+	      val runtime = (executionType == "interactive")
+	      queryRuntime = QueryBuilder.build(analysis, runtime)
+            }
+          }
+          case _ => {}
         }
         /* Execute analysis and return result data */
         val data = executeAnalysis(analysisId, queryRuntime, json)
@@ -275,9 +280,11 @@ class Analysis extends BaseController {
  	var typeInfo : String = "";
  	var analysisJSON : JObject = null;
  	m_log.trace("json dataset: {}", reqJSON);
-    val analysis = analysisJson(reqJSON); // reading from request body
-    val executionType = (analysis \ "executionType");
-    if (executionType == "preview" || executionType == "scheduled"){
+    val analysis = (reqJSON \ "contents" \ "analyze") match {
+      case obj: JArray => analysisJson(reqJSON); // reading from request body
+      case _ => null
+    }
+    if (analysis == null) {
 		analysisJSON = readAnalysisJson(analysisId); // reading from the store
 		val analysisType = (analysisJSON \ "type");
    		typeInfo = analysisType.extract[String];
@@ -420,7 +427,8 @@ class Analysis extends BaseController {
     else {
       // This is the part of report type starts here
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
-      val execution = analysis.executeAndWait(ExecutionType.onetime, queryRuntime)
+      val query = if (queryRuntime != null) queryRuntime else QueryBuilder.build(analysisJSON, false)
+      val execution = analysis.executeAndWait(ExecutionType.onetime, query)
       val analysisResultId: String = execution.getId
       //TODO:: Subject to change: to get ALL data use:  val resultData = execution.getAllData
       //TODO:: DLConfiguration.rowLimit can be replace with some Int value

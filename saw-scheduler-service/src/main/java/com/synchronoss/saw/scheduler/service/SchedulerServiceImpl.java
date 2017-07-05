@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientResponseException;
 
 @Service
 public class SchedulerServiceImpl
@@ -48,7 +49,12 @@ public class SchedulerServiceImpl
         AnalysisSchedule[] analyses = analysisService.getAnalysisSchedules();
         log.info("Processing analyses");
         for (AnalysisSchedule analysis : analyses) {
-            processAnalysis(analysis, periodId);
+            try {
+                processAnalysis(analysis, periodId);
+            } catch (RestClientResponseException e) {
+                log.error("Error while processing analysis", e);
+                log.error("Response body: {}", e.getResponseBodyAsString());
+            }
         }
         log.info("Finished processing analyses");
     }

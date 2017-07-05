@@ -19,20 +19,28 @@ is provided by Synchronoss operations:
 4. Ensure SAW Services hosts have the MapR client installed and a
    `mapr` user (using the same UID on all hosts in the cluster)
 
+5. Ensure SAW Services hosts have the Spark client installed and that
+   there is a `/opt/mapr/spark/spark-current` symlink pointing to the
+   current Spark version
+
 # Installing
 
 Execute the following steps to install SAW Services in the
 environment:
 
-1. Install the SAW Metadata Service by...
+1. Locate the artifacts required for installing SAW Services: RPM
+   packages for each service to be installed
 
-2. Install the SAW Scheduler Service by copying the
-   `saw-scheduler-service.jar` file to
-   `/opt/saw-scheduler-service/saw-scheduler-service.jar` on one of
-   the SAW nodes.  Additionally create an executable file
-   `saw-scheduler-service-daily` with the following content:
+1. Install the SAW Transport Service by copying the RPM package to the
+   host that it will run on.  Then execute `sudo rpm -i
+   saw-transport-service-*.rpm`.  Finally execute `sudo -u mapr
+   /opt/saw/service/bin/sawsrvc_start.sh` to start the service.
 
-        sudo -u mapr java -jar /opt/saw-scheduler-service/saw-scheduler-service.jar 2>&1 | logger -t saw-scheduler-service
+2. Install the SAW Scheduler Service by copying the RPM package to the
+   host that it will run on.  Then execute `sudo rpm -i
+   saw-scheduler-service-*.rpm`.  No additional steps needed, as the
+   scheduler will automatically be invoked by the system services when
+   required.
 
 3. Configure a URL in a front-end proxy to point to port 9200 of the
    host that SAW Services has been installed on.  This URL should then
@@ -41,10 +49,25 @@ environment:
 # Upgrading
 
 To upgrade an existing SAW Services installation, follow the same
-steps as for installing an entirely new environments.
+steps as for installing an entirely new environment.
+
+# Status check
+
+To check the status of all SAW Services units execute:
+
+        $ systemctl list-units --all saw-\*
+
+To check the status of all SAW Services timers execute:
+
+        $ systemctl list-timers --all saw-\*
 
 # Logs
 
-The application logs are found in `/var/log/messages`.  For now the
-SAW Metadata Service does not use syslog and instead logs into
-`/var/saw/service/log`.
+The SAW Services logs are found using the `journalctl` command.  To
+view the logs of individual services, use the `-u` option:
+
+        $ sudo journalctl -u saw-scheduler.timer
+        $ sudo journalctl -u saw-scheduler.service
+
+Note: For now the SAW Metadata Service does not use syslog and instead
+logs into `/var/saw/service/log`.
