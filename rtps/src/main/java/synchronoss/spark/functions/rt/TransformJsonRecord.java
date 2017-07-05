@@ -50,8 +50,6 @@ public class TransformJsonRecord implements FlatMapFunction<Iterator<ConsumerRec
                 try {
 
                     JsonObject flattenedRecord =  GenericJsonModel.flatten(src);
-
-                    //String transformedRecord = GenericJsonModel.transform(src, "EVENT_TYPE", types, transformations);
                     String transformedRecord = GenericJsonModel.transform(flattenedRecord, "EVENT_TYPE", types, transformations);
                     ret.add(transformedRecord);
                 } catch (com.google.gson.stream.MalformedJsonException e){
