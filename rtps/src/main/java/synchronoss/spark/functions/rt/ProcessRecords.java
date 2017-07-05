@@ -9,14 +9,10 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.VoidFunction2;
-import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SQLContext;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.types.StructType;
@@ -24,7 +20,6 @@ import org.apache.spark.streaming.Time;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
 import org.apache.spark.streaming.kafka09.CanCommitOffsets;
 import org.apache.spark.streaming.kafka09.HasOffsetRanges;
-import org.apache.spark.streaming.kafka09.KafkaUtils;
 import org.apache.spark.streaming.kafka09.OffsetRange;
 import org.elasticsearch.spark.sql.api.java.JavaEsSparkSQL;
 import synchronoss.data.countly.model.CountlyModel;
@@ -34,22 +29,20 @@ import synchronoss.data.generic.model.transformation.Transform;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.spark.api.java.StorageLevels.MEMORY_AND_DISK_SER;
 import static synchronoss.spark.drivers.rt.EventProcessingApplicationDriver.DM_COUNTLY;
 import static synchronoss.spark.drivers.rt.EventProcessingApplicationDriver.DM_GENERIC;
 import static synchronoss.spark.drivers.rt.EventProcessingApplicationDriver.DM_SIMPLE;
 
 /**
  * Created by asor0002 on 5/19/2017.
+ *
  */
 public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<String, String>>, Time> {
     //JavaRDD<ConsumerRecord<String, String>>, Time,
@@ -146,7 +139,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     // We have to support time based indexes
     // Configuration can specify index name with multiple date/time formats in curly brackets
     // In this case we will create index name based on current timestamp
-    public static String parseIndexName(String template, Date now) {
+    private static String parseIndexName(String template, Date now) {
 
         String indexName = template;
         Pattern patternIndexName = Pattern.compile("\\{(.*?)\\}");
@@ -200,7 +193,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 
     private int processJsonRecords(JavaRDD<String> jsonRdd, Time tm, SparkConf cnf){
         SparkSession sess = SparkSession.builder().config(cnf).getOrCreate();
-        JavaRDD<Row> rowRdd = sess.read().json(jsonRdd).toJavaRDD();
+        JavaRDD<Row> rowRdd = sess.read().schema(schema).json(jsonRdd).toJavaRDD();
         Dataset<Row> df = sess.createDataFrame(rowRdd, schema);
 
         // Elastic Search
@@ -281,7 +274,6 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
                 }
             }
             if(commit) {
-
                 System.out.println("Storing offsets");
                 ((CanCommitOffsets)inStream.inputDStream()).commitAsync(offsetRanges);
             }
