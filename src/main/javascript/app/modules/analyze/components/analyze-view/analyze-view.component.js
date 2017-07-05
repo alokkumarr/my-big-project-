@@ -1,18 +1,19 @@
 import template from './analyze-view.component.html';
 import style from './analyze-view.component.scss';
 
-import cloneDeep from 'lodash/cloneDeep';
 import remove from 'lodash/remove';
+import findIndex from 'lodash/findIndex';
 import {Subject} from 'rxjs/Subject';
 
-import {Events, AnalyseTypes} from '../../consts';
+import {Events} from '../../consts';
 import AbstractComponentController from 'app/lib/common/components/abstractComponent';
 
 export const AnalyzeViewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeViewController extends AbstractComponentController {
-    constructor($injector, $compile, AnalyzeService, $state, $mdDialog, toastMessage, $rootScope, localStorageService, FilterService) {
+    constructor($injector, $compile, AnalyzeService, $state, $mdDialog, JwtService,
+                toastMessage, $rootScope, localStorageService, FilterService) {
       'ngInject';
       super($injector);
 
@@ -24,6 +25,7 @@ export const AnalyzeViewComponent = {
       this._FilterService = FilterService;
       this._toastMessage = toastMessage;
       this._$rootScope = $rootScope;
+      this._JwtService = JwtService;
       this._analysisCache = [];
 
       this.LIST_VIEW = 'list';
@@ -39,6 +41,7 @@ export const AnalyzeViewComponent = {
         searchTerm: ''
       };
       this.updater = new Subject();
+      this.canUserCreate = false;
     }
 
     $onInit() {
@@ -48,6 +51,9 @@ export const AnalyzeViewComponent = {
 
       this.loadCategory();
       this.loadAnalyses();
+      this.canUserCreate = this._JwtService.hasPrivilege('CREATE', {
+        subCategoryId: this.$state.params.id
+      });
     }
 
     $onDestroy() {
@@ -112,122 +118,46 @@ export const AnalyzeViewComponent = {
       });
     }
 
-    removeAnalysis(model) {
-      this._$rootScope.showProgress = true;
-      this._AnalyzeService.deleteAnalysis(model).then(() => {
-        remove(this.analyses, report => {
-          return report.id === model.id;
-        });
-        this.updater.next({analyses: this.analyses});
-        this._$rootScope.showProgress = false;
-        this._toastMessage.info('Analysis deleted.');
-      }, err => {
-        this._$rootScope.showProgress = false;
-        this._toastMessage.error(err.message || 'Analysis not deleted.');
+    removeDeletedAnalysis(analysis) {
+      remove(this.analyses, report => {
+        return report.id === analysis.id;
       });
-    }
-
-    openDeleteModal(model) {
-      const confirm = this._$mdDialog.confirm()
-            .title('Are you sure you want to delete this analysis?')
-        .textContent('Any published analyses will also be deleted.')
-        .ok('Delete')
-        .cancel('Cancel');
-
-      this._$mdDialog.show(confirm).then(() => {
-        this.removeAnalysis(model);
-      }, err => {
-        if (err) {
-          this._$log.error(err);
-        }
-      });
+      this.updater.next({analyses: this.analyses});
     }
 
     /* ACTIONS */
 
     onCardAction(actionType, payload) {
       switch (actionType) {
-        case 'fork':
-        case 'edit': {
-          const clone = cloneDeep(payload);
-          this.openEditModal(actionType, clone);
+        case 'onSuccessfulDeletion':
+          this.removeDeletedAnalysis(payload);
           break;
-        }
-        case 'delete':
-          this.openDeleteModal(payload);
+        case 'onSuccessfulExecution':
+          this.goToAnalysis(payload);
           break;
-        case 'publish':
-          this.publish(payload);
-          break;
-        case 'execute':
-          this.execute(payload);
+        case 'onSuccessfulPublish':
+          this.onSuccessfulPublish(payload);
           break;
         case 'view':
           this.view(payload);
           break;
-        case 'export':
-          this.export(payload);
-          break;
-        case 'print':
-          this.print(payload);
-          break;
         default:
       }
     }
 
-    export() {
-    }
-
-    print() {
-    }
-
-    publish(model) {
-      this._$rootScope.showProgress = true;
-      this._AnalyzeService.publishAnalysis(model).then(() => {
-        this._$rootScope.showProgress = false;
-        this._$state.go('analyze.view', {id: model.categoryId});
-      }, () => {
-        this._$rootScope.showProgress = false;
+    onSuccessfulPublish(analysis) {
+      /* Update the new analysis in the current list */
+      const analysisId = findIndex(this.analyses, ({id}) => {
+        return id === analysis.id;
       });
+      this.analyses.splice(analysisId, 1, analysis);
+      this.updater.next({analyses: this.analyses});
+
+      this._$state.go('analyze.view', {id: analysis.categoryId});
     }
 
     view(analysisId) {
       this.goToLastPublishedAnalysis(analysisId);
-    }
-
-    execute(analysis) {
-      this._FilterService.getRuntimeFilterValues(analysis).then(model => {
-        this._AnalyzeService.executeAnalysis(model);
-        this.goToAnalysis(model);
-      });
-    }
-
-    openEditModal(mode, model) {
-      if (mode === 'fork') {
-        model.name += ' Copy';
-      }
-      const openModal = template => {
-        this.showDialog({
-          template,
-          controller: scope => {
-            scope.model = model;
-          },
-          multiple: true
-        });
-      };
-
-      switch (model.type) {
-        case AnalyseTypes.Report:
-          openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
-          break;
-        case AnalyseTypes.Chart:
-          openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
-          break;
-        case AnalyseTypes.Pivot:
-          openModal(`<analyze-pivot model="model" mode="${mode}"></analyze-pivot>`);
-          break;
-        default:
-      }
     }
   }
 };
