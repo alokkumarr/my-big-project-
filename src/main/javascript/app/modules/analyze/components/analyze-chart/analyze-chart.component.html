@@ -3,14 +3,14 @@
 
     <div layout="row">
       <md-button class="ard_back-btn"
-                 ng-click="$ctrl.$dialog.hide()">
+                 ng-click="$ctrl.goBack()">
         <md-icon md-font-icon="icon-arrow-left"></md-icon>
       </md-button>
 
       <div class="ard_meta" flex>
         <div class="md-title">
           <strong class="e2e-report-title" ng-bind="$ctrl.model.name"></strong>
-          <label translate="DRAFT"></label>
+          <label translate="DRAFT" ng-show="$ctrl.draftMode"></label>
         </div>
         <div class="md-description">
           <md-icon md-font-icon="icon-report"></md-icon>
