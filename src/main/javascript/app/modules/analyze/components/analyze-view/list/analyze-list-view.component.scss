@@ -1,0 +1,13 @@
+@import "themes/base/colors";
+
+analyze-list-view {
+  .branded-column[role="columnheader"] {
+    color: $primary-blue-b3;
+    font-weight: normal;
+  }
+
+  .branded-column-name {
+    color: $primary-blue-b2;
+    font-weight: bolder;
+  }
+}

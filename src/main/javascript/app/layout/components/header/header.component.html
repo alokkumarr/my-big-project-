@@ -16,9 +16,10 @@
       </div>
 
       <div layout="row">
-        <md-button class="md-icon-button" aria-label="More">
+        <!-- gui-cleanup-2.0 -->
+        <!--<md-button class="md-icon-button" aria-label="More">
           <md-icon md-font-icon="icon-launchpad"></md-icon>
-        </md-button>
+        </md-button>-->
 
         <md-menu-bar>
           <md-menu>
@@ -29,9 +30,10 @@
               <md-icon md-font-icon="icon-user-placeholder"></md-icon>
             </md-button>
             <md-menu-content>
-              <md-menu-item>
+              <!-- gui-cleanup-2.0 -->
+              <!--<md-menu-item>
                 <md-button translate="ACCOUNT"></md-button>
-              </md-menu-item>
+              </md-menu-item>-->
               <md-menu-item>
                 <md-button ng-click="$ctrl.changePwd()" translate="CHANGE_PASSWORD"></md-button>
               </md-menu-item>
@@ -45,13 +47,13 @@
             </md-menu-content>
           </md-menu>
         </md-menu-bar>
-
-        <md-button class="md-icon-button" aria-label="Menu"
+        <!-- gui-cleanup-2.0 -->
+        <!--<md-button class="md-icon-button" aria-label="Menu"
                    ng-click="toggleRight()">
           <md-tooltip ng-bind="'TOOLTIP_ALERTS' | translate"></md-tooltip>
           <div class="alert-bell-icon"></div>
           <badge class="alerts-badge" label="{{5}}"></badge>
-        </md-button>
+        </md-button>-->
       </div>
     </div>
     <md-progress-linear ng-show="$ctrl.showProgress" md-mode="indeterminate"></md-progress-linear>

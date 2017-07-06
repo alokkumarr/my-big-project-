@@ -38,14 +38,15 @@ export const AnalyzeActionsMenuComponent = {
         value: 'publish',
         fn: this.publish.bind(this)
       }, {
-        label: 'PRINT',
-        value: 'print',
-        fn: this.print.bind(this)
-      }, {
-        label: 'EXPORT',
-        value: 'export',
-        fn: this.export.bind(this)
-      }, {
+      /* gui-cleanup-2.0 */
+      //   label: 'PRINT',
+      //   value: 'print',
+      //   fn: this.print.bind(this)
+      // }, {
+      //   label: 'EXPORT',
+      //   value: 'export',
+      //   fn: this.export.bind(this)
+      // }, {
         label: 'DELETE',
         value: 'delete',
         fn: this.delete.bind(this),
