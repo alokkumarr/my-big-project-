@@ -1,7 +1,9 @@
 import template from './analyze-list-view.component.html';
+import style from './analyze-list-view.component.scss';
 
 export const AnalyzeListViewComponent = {
   template,
+  styles: [style],
   bindings: {
     analyses: '<',
     analysisType: '<',
@@ -99,7 +101,8 @@ export const AnalyzeListViewComponent = {
         allowSorting: true,
         alignment: 'left',
         width: '50%',
-        cellTemplate: 'nameCellTemplate'
+        cellTemplate: 'nameCellTemplate',
+        cssClass: 'branded-column-name'
       }, {
         caption: 'METRICS',
         dataField: 'metrics',
@@ -130,7 +133,10 @@ export const AnalyzeListViewComponent = {
       }, {
         caption: '',
         cellTemplate: 'actionCellTemplate'
-      }];
+      }].map(column => {
+        column.cssClass = column.cssClass ? `${column.cssClass} branded-column` : 'branded-column';
+        return column;
+      });
 
       return this._dxDataGridService.mergeWithDefaultConfig({
         onInitialized: this.onGridInitialized.bind(this),

@@ -70,13 +70,12 @@
         <p ng-bind="$ctrl.analysis.description"></p>
       </div>
     </md-card-content>
-    <!--
-      <md-card-footer>
+    <!-- gui-cleanup-2.0 -->
+      <!--<md-card-footer>
         <md-icon md-font-icon="icon-fork"></md-icon>
         <span translate="FORKED_FROM_ANALYSIS_BY_CREATOR"
               translate-values="{analysis: $ctrl.analysis.forkedFrom.analysisName, creator: $ctrl.analysis.forkedFrom.creatorName}"></span>
-      </md-card-footer>
-    -->
+      </md-card-footer>-->
   </md-card>
   <panel start-collapsed="false" ng-if="$ctrl.analyses" title="'OTHER_PUBLISHED_ANALYSES' | translate">
     <analyze-published-list ng-if="$ctrl.analyses.length" analysis="$ctrl.analysis" analyses="$ctrl.analyses"></analyze-published-list>
