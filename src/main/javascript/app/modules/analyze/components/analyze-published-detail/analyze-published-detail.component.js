@@ -1,6 +1,8 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import get from 'lodash/get';
 
+import {Events} from '../../consts';
+
 import template from './analyze-published-detail.component.html';
 import style from './analyze-published-detail.component.scss';
 import AbstractComponentController from 'app/lib/common/components/abstractComponent';
@@ -33,6 +35,15 @@ export const AnalyzePublishedDetailComponent = {
     $onInit() {
       const analysisId = this._$state.params.analysisId;
       const analysis = this._$state.params.analysis;
+
+      this._destroyHandler = this.on(Events.AnalysesRefresh, () => {
+        this.loadAnalysisById(analysisId).then(() => {
+          this._executionId = null;
+          this.loadExecutionData();
+          this.loadExecutedAnalyses(analysisId);
+        });
+      });
+
       if (analysis) {
         this.analysis = analysis;
         this.setPrivileges();
@@ -47,6 +58,10 @@ export const AnalyzePublishedDetailComponent = {
           this.loadExecutedAnalyses(analysisId);
         });
       }
+    }
+
+    $onDestroy() {
+      this._destroyHandler();
     }
 
     setPrivileges() {
