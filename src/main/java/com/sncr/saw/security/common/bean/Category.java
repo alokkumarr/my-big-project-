@@ -6,10 +6,16 @@ public class Category {
     private String categoryName;
     private Long categoryId;
     private String categoryType;
+    private String categoryCode;
     private ArrayList<Category> subCategory;
     
         
-	
+	public String getCategoryCode() {
+		return categoryCode;
+	}
+	public void setCategoryCode(String categoryCode) {
+		this.categoryCode = categoryCode;
+	}
 	public ArrayList<Category> getSubCategory() {
 		return subCategory;
 	}

@@ -36,6 +36,8 @@ import com.sncr.saw.security.common.bean.repo.ProductModuleFeature;
 import com.sncr.saw.security.common.bean.repo.ProductModules;
 import com.sncr.saw.security.common.bean.repo.Products;
 import com.sncr.saw.security.common.bean.repo.TicketDetails;
+import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
+import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.Analysis;
@@ -2010,9 +2012,10 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 	
 	@Override
-	public List<Category> getCategoriesDropDownList(Long customerId, Long moduleId) {
+	public List<Category> getCategoriesDropDownList(Long customerId, Long moduleId, boolean catOnly) {
 		ArrayList<Category> categoriesList = null;
-		String sql = "SELECT DISTINCT CPMF.CUST_PROD_MOD_FEATURE_SYS_ID,CPMF.FEATURE_TYPE,CPMF.FEATURE_NAME FROM USERS U "
+		StringBuffer sql = new StringBuffer();
+				sql.append("SELECT DISTINCT CPMF.CUST_PROD_MOD_FEATURE_SYS_ID,CPMF.FEATURE_TYPE,CPMF.FEATURE_NAME,CPMF.FEATURE_CODE FROM USERS U "
 				+ "INNER JOIN CUSTOMERS  C ON (C.CUSTOMER_SYS_ID=U.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCTS CP ON "
 				+ "(CP.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULES CPM ON "
 				+ "(CPM.CUST_PROD_SYS_ID=CP.CUST_PROD_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULE_FEATURES CPMF "
@@ -2021,15 +2024,19 @@ public class UserRepositoryImpl implements UserRepository {
 				+ "(PM.PROD_MOD_SYS_ID=CPM.PROD_MOD_SYS_ID) INNER JOIN MODULES M ON(M.MODULE_SYS_ID=PM.MODULE_SYS_ID) "
 				+ "WHERE C.CUSTOMER_SYS_ID= ? AND CPM.CUST_PROD_MOD_SYS_ID = ? AND CPMF.ACTIVE_STATUS_IND = 1  "
 				+ "AND P.ACTIVE_STATUS_IND = M.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = PM.ACTIVE_STATUS_IND "
-				+ "AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND";
+				+ "AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND");
+		
+		if(catOnly){
+			sql.append(" AND CPMF.FEATURE_TYPE LIKE 'PARENT%'");
+		}
 
 		try {
-			categoriesList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
+			categoriesList = jdbcTemplate.query(sql.toString(), new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
 					preparedStatement.setLong(1, customerId);
 					preparedStatement.setLong(2, moduleId);
 				}
-			}, new UserRepositoryImpl.categoryDetailExtractor());					
+			}, new UserRepositoryImpl.categoryListDetailExtractor());					
 			
 		} catch (DataAccessException de) {
 			logger.error("Exception encountered while accessing DB: " + de.getMessage(), null, de);
@@ -2041,7 +2048,7 @@ public class UserRepositoryImpl implements UserRepository {
 		return categoriesList;
 	}
 
-	public class categoryDetailExtractor implements ResultSetExtractor<ArrayList<Category>> {
+	public class categoryListDetailExtractor implements ResultSetExtractor<ArrayList<Category>> {
 
 		@Override
 		public ArrayList<Category> extractData(ResultSet rs) throws SQLException, DataAccessException {
@@ -2052,6 +2059,7 @@ public class UserRepositoryImpl implements UserRepository {
 				category.setCategoryName(rs.getString("FEATURE_NAME"));
 				category.setCategoryType(rs.getString("FEATURE_TYPE"));
 				category.setCategoryId(rs.getLong("CUST_PROD_MOD_FEATURE_SYS_ID"));
+				category.setCategoryCode(rs.getString("FEATURE_CODE"));
 				categoriesList.add(category);
 			}
 			return categoriesList;
@@ -2252,5 +2260,381 @@ public class UserRepositoryImpl implements UserRepository {
 			return false;
 		}
 		return true;
+	}
+	
+	@Override
+	public List<CategoryDetails> getCategories(Long customerId) {
+		ArrayList<CategoryDetails> categoryList = null;
+		ArrayList<CategoryDetails> catList = new ArrayList<CategoryDetails>();
+		StringBuffer sql = new StringBuffer();
+		sql.append("SELECT DISTINCT C.CUSTOMER_SYS_ID ,CP.CUST_PROD_SYS_ID, P.PRODUCT_NAME, CPMF.CUST_PROD_MOD_SYS_ID,"
+				+ "	M.MODULE_NAME,CPMF.CUST_PROD_MOD_FEATURE_SYS_ID, CPMF.FEATURE_NAME,CPMF.FEATURE_TYPE,CPMF.FEATURE_CODE,"
+				+ " CPMF.FEATURE_DESC, CPMF.ACTIVE_STATUS_IND FROM USERS U "
+				+ " INNER JOIN CUSTOMERS  C ON (C.CUSTOMER_SYS_ID=U.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCTS CP ON "
+				+ " (CP.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULES CPM ON "
+				+ " (CPM.CUST_PROD_SYS_ID=CP.CUST_PROD_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULE_FEATURES CPMF "
+				+ " ON (CPMF.CUST_PROD_MOD_SYS_ID=CPM.CUST_PROD_MOD_SYS_ID) INNER JOIN PRODUCTS P ON "
+				+ " (P.PRODUCT_SYS_ID=CP.PRODUCT_SYS_ID) INNER JOIN PRODUCT_MODULES PM ON "
+				+ " (PM.PROD_MOD_SYS_ID=CPM.PROD_MOD_SYS_ID) INNER JOIN MODULES M ON(M.MODULE_SYS_ID=PM.MODULE_SYS_ID) "
+				+ " WHERE CPM.CUST_PROD_MOD_SYS_ID = 1  "
+				+ " AND P.ACTIVE_STATUS_IND = M.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = PM.ACTIVE_STATUS_IND "
+				+ " AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND  AND C.CUSTOMER_SYS_ID=?");
+		
+			
+		try {
+			categoryList = jdbcTemplate.query(sql.toString(), new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setLong(1, customerId);
+				}
+			}, new UserRepositoryImpl.CategoryDetailExtractor());
+			
+			ArrayList<CategoryDetails> categoryParentSorted = new ArrayList<CategoryDetails>();
+			ArrayList<CategoryDetails> categoryChildSorted = new ArrayList<CategoryDetails>();
+			ArrayList<SubCategoryDetails> subCategory = null;
+			
+			for(CategoryDetails catDetails : categoryList){
+								
+					if (catDetails.getCategoryType().split("_")[0].equals("PARENT")) {
+						categoryParentSorted.add(catDetails);
+					} else if (catDetails.getCategoryType().split("_")[0].equals("CHILD")) {
+						categoryChildSorted.add(catDetails);
+					}				
+			}
+			
+			for(CategoryDetails catPDetails : categoryParentSorted){
+				subCategory = new ArrayList<SubCategoryDetails>();
+				for(CategoryDetails catCDetails : categoryChildSorted){
+					SubCategoryDetails subCategories = new SubCategoryDetails();
+					if(catCDetails.getCategoryType().split("_")[1].equals(catPDetails.getCategoryCode())){
+						subCategories.setSubCategoryId(catCDetails.getCategoryId());
+						subCategories.setSubCategoryName(catCDetails.getCategoryName());
+						subCategories.setSubCategoryDesc(catCDetails.getCategoryDesc());
+						subCategories.setActivestatusInd(catCDetails.getActiveStatusInd());
+						subCategory.add(subCategories);	
+					}
+									
+				}		
+				catPDetails.setSubCategories(subCategory);
+				catList.add(catPDetails);
+			}		
+			
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;
+		} catch (Exception e) {
+			logger.error("Exception encountered while getting privileges : " + e.getMessage(), null, e);
+		}
+		
+		return catList;
+			
+	}
+	
+	public class CategoryDetailExtractor implements ResultSetExtractor<ArrayList<CategoryDetails>> {
+
+		@Override
+		public ArrayList<CategoryDetails> extractData(ResultSet rs) throws SQLException, DataAccessException {
+
+			CategoryDetails category = null;
+			ArrayList<CategoryDetails> catList = new ArrayList<CategoryDetails>();
+			while (rs.next()) {
+				category = new CategoryDetails();
+				
+				category.setProductId(rs.getLong("CUST_PROD_SYS_ID"));
+				category.setProductName(rs.getString("PRODUCT_NAME"));
+				category.setModuleId(rs.getLong("CUST_PROD_MOD_SYS_ID"));
+				category.setModuleName(rs.getString("MODULE_NAME"));
+				category.setCategoryId(rs.getLong("CUST_PROD_MOD_FEATURE_SYS_ID"));
+				category.setCategoryName(rs.getString("FEATURE_NAME"));
+				category.setCustomerId(rs.getLong("CUSTOMER_SYS_ID"));		
+				category.setCategoryCode(rs.getString("FEATURE_CODE"));
+				category.setCategoryType(rs.getString("FEATURE_TYPE"));
+				category.setCategoryDesc(rs.getString("FEATURE_DESC"));
+				category.setActiveStatusInd(rs.getLong("ACTIVE_STATUS_IND"));
+				catList.add(category);
+			}
+			return catList;	
+		}
+	}
+
+	@Override
+	public Valid addCategory(CategoryDetails category) {
+		Valid valid = new Valid();
+		String sql = "INSERT INTO CUSTOMER_PRODUCT_MODULE_FEATURES (CUST_PROD_MOD_SYS_ID,DEFAULT_URL,`DEFAULT`,"
+				+ "FEATURE_NAME,FEATURE_DESC,FEATURE_CODE,FEATURE_TYPE,ACTIVE_STATUS_IND,CREATED_DATE,CREATED_BY)"
+				+ " VALUES (?,?,0,?,?,?,?,?,sysdate(),?)";
+
+		String[] categoryCode = category.getCategoryName().toUpperCase().split(" ");
+		StringBuffer featureCode = new StringBuffer();
+		for (int i = 0; i < categoryCode.length; i++) {
+			featureCode.append(categoryCode[i]);
+		}
+		featureCode.append(category.getCustomerId());
+		StringBuffer featureType = new StringBuffer();
+		if (category.isSubCategoryInd()) {
+			featureType.append("CHILD_" + category.getCategoryCode());
+		} else {
+			featureType.append("PARENT_" + featureCode);
+		}
+
+		try {
+
+			jdbcTemplate.update(sql, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setLong(1, category.getModuleId());
+					preparedStatement.setString(2, "/");
+					preparedStatement.setString(3, category.getCategoryName());
+					preparedStatement.setString(4, category.getCategoryDesc());
+					preparedStatement.setString(5, featureCode.toString());
+					preparedStatement.setString(6, featureType.toString());
+					preparedStatement.setLong(7, category.getActiveStatusInd());
+					preparedStatement.setString(8, category.getMasterLoginId());
+				}
+			});
+			valid.setValid(true);
+		} catch (Exception e) {
+			logger.error("Exception encountered while accessing DB : " + e.getMessage(), null, e);
+			valid.setValid(false);
+			valid.setError("Something went wrong while adding category!");
+		}
+
+		return valid;
+	}
+
+	@Override
+	public boolean checkCatExists(CategoryDetails category) {
+		Boolean catExists;
+		String sql1 = "SELECT * FROM CUSTOMER_PRODUCT_MODULE_FEATURES "
+				+ " WHERE CUST_PROD_MOD_SYS_ID = ? AND FEATURE_NAME = ? AND CUST_PROD_MOD_FEATURE_SYS_ID != ?";
+		try {
+			catExists = jdbcTemplate.query(sql1, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setLong(1, category.getProductId());
+					preparedStatement.setString(2, category.getCategoryName());
+					preparedStatement.setLong(3, category.getCategoryId());
+				}
+			}, new UserRepositoryImpl.CatExistsExtractor());
+		} catch (Exception e) {
+			logger.error("Exception encountered while updating role " + e.getMessage(), null, e);
+			return false;
+		}
+		return catExists;
+	}
+
+	public class CatExistsExtractor implements ResultSetExtractor<Boolean> {
+
+		@Override
+		public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
+			Boolean catExists = false;
+			while (rs.next()) {
+				catExists = true;
+			}
+			return catExists;
+		}
+	}
+	
+	@Override
+	public boolean checkSubCatExists(CategoryDetails category) {
+		Boolean catExists;
+		String sql1 = "SELECT * FROM CUSTOMER_PRODUCT_MODULE_FEATURES "
+				+ " WHERE CUST_PROD_MOD_SYS_ID = ? AND FEATURE_NAME = ? AND FEATURE_TYPE = ? AND CUST_PROD_MOD_FEATURE_SYS_ID != ?";
+		try {
+			catExists = jdbcTemplate.query(sql1, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setLong(1, category.getProductId());
+					preparedStatement.setString(2, category.getSubCategories().get(0).getSubCategoryName());
+					preparedStatement.setString(3, "CHILD_"+category.getCategoryCode());
+					preparedStatement.setLong(4, category.getSubCategories().get(0).getSubCategoryId());
+				}
+			}, new UserRepositoryImpl.SubCatExistsExtractor());
+		} catch (Exception e) {
+			logger.error("Exception encountered while updating role " + e.getMessage(), null, e);
+			return false;
+		}
+		return catExists;
+	}
+
+	public class SubCatExistsExtractor implements ResultSetExtractor<Boolean> {
+
+		@Override
+		public Boolean extractData(ResultSet rs) throws SQLException, DataAccessException {
+			Boolean catExists = false;
+			while (rs.next()) {
+				catExists = true;
+			}
+			return catExists;
+		}
+	}
+	
+	@Override
+	public boolean deleteCategory(Long categoryId) {
+
+		String sql2 = "DELETE FROM CUSTOMER_PRODUCT_MODULE_FEATURES " + " WHERE CUST_PROD_MOD_FEATURE_SYS_ID = ?";
+		try {
+			jdbcTemplate.update(sql2, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setLong(1, categoryId);
+
+				}
+			});
+		} catch (Exception e) {
+			logger.error("Exception encountered while deleting category " + e.getMessage(), null, e);
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public List<SubCategoryDetails> getSubCategories(Long customerId, String featureCode) {
+		ArrayList<SubCategoryDetails> categoryList = null;
+		StringBuffer sql = new StringBuffer();
+		sql.append("SELECT DISTINCT C.CUSTOMER_SYS_ID ,CP.CUST_PROD_SYS_ID, P.PRODUCT_NAME, CPMF.CUST_PROD_MOD_SYS_ID,"
+				+ "	M.MODULE_NAME,CPMF.CUST_PROD_MOD_FEATURE_SYS_ID, CPMF.FEATURE_NAME,CPMF.FEATURE_TYPE,"
+				+ " CPMF.FEATURE_CODE,CPMF.FEATURE_DESC,CPMF.ACTIVE_STATUS_IND FROM USERS U "
+				+ " INNER JOIN CUSTOMERS  C ON (C.CUSTOMER_SYS_ID=U.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCTS CP ON "
+				+ " (CP.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULES CPM ON "
+				+ " (CPM.CUST_PROD_SYS_ID=CP.CUST_PROD_SYS_ID) INNER JOIN CUSTOMER_PRODUCT_MODULE_FEATURES CPMF "
+				+ " ON (CPMF.CUST_PROD_MOD_SYS_ID=CPM.CUST_PROD_MOD_SYS_ID) INNER JOIN PRODUCTS P ON "
+				+ " (P.PRODUCT_SYS_ID=CP.PRODUCT_SYS_ID) INNER JOIN PRODUCT_MODULES PM ON "
+				+ " (PM.PROD_MOD_SYS_ID=CPM.PROD_MOD_SYS_ID) INNER JOIN MODULES M ON(M.MODULE_SYS_ID=PM.MODULE_SYS_ID) "
+				+ " WHERE C.CUSTOMER_SYS_ID= 1 AND CPM.CUST_PROD_MOD_SYS_ID = 1  "
+				+ " AND P.ACTIVE_STATUS_IND = M.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = PM.ACTIVE_STATUS_IND "
+				+ " AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND AND C.CUSTOMER_SYS_ID=?");
+
+		sql.append(" AND CPMF.FEATURE_TYPE LIKE ?");
+
+		try {
+			categoryList = jdbcTemplate.query(sql.toString(), new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setLong(1, customerId);
+					preparedStatement.setString(2, "CHILD_"+featureCode);
+				}
+			}, new UserRepositoryImpl.SubCategoryDetailExtractor());
+
+		} catch (DataAccessException de) {
+			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
+			throw de;
+		} catch (Exception e) {
+			logger.error("Exception encountered while getting privileges : " + e.getMessage(), null, e);
+		}
+
+		return categoryList;
+
+	}
+	
+	public class SubCategoryDetailExtractor implements ResultSetExtractor<ArrayList<SubCategoryDetails>> {
+
+		@Override
+		public ArrayList<SubCategoryDetails> extractData(ResultSet rs) throws SQLException, DataAccessException {
+
+
+			SubCategoryDetails subCategory = null;
+			ArrayList<SubCategoryDetails> subCatList = new ArrayList<SubCategoryDetails>();
+			while (rs.next()) {				
+				subCategory = new SubCategoryDetails();	
+				subCategory.setSubCategoryId(rs.getLong("CUST_PROD_MOD_FEATURE_SYS_ID"));
+				subCategory.setSubCategoryName(rs.getString("FEATURE_NAME"));
+				subCategory.setSubCategoryDesc(rs.getString("FEATURE_DESC"));
+				subCategory.setActivestatusInd(rs.getLong("ACTIVE_STATUS_IND"));
+				subCatList.add(subCategory);
+			}
+			return subCatList;	
+		}
+	}
+	
+	
+
+	@Override
+	public Valid updateCategory(CategoryDetails category) {
+		Valid valid = new Valid();
+		
+		//Update Parent Category
+		String sql = "UPDATE CUSTOMER_PRODUCT_MODULE_FEATURES SET FEATURE_NAME=?,FEATURE_DESC=?,FEATURE_CODE=?,"
+				+ "FEATURE_TYPE=?,ACTIVE_STATUS_IND=?,MODIFIED_DATE=sysdate(),MODIFIED_BY=? WHERE CUST_PROD_MOD_FEATURE_SYS_ID=?";				
+
+		String[] categoryCode = category.getCategoryName().toUpperCase().split(" ");
+		StringBuffer featureCode = new StringBuffer();
+		StringBuffer featureType = new StringBuffer();	
+		
+		if (category.isIscatNameChanged()) {
+			for (int i = 0; i < categoryCode.length; i++) {
+				featureCode.append(categoryCode[i]);
+			}
+			featureCode.append(category.getCustomerId());
+			featureType.append("PARENT_" + featureCode);
+		} else {
+			featureCode.append(category.getCategoryCode());
+			featureType.append(category.getCategoryType());
+		}
+		
+		Boolean subCatExists = category.getSubCategories().size() > 0 ? true : false;
+		
+		try {
+
+			jdbcTemplate.update(sql, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setString(1, category.getCategoryName());
+					preparedStatement.setString(2, category.getCategoryDesc());
+					preparedStatement.setString(3, featureCode.toString());
+					preparedStatement.setString(4, featureType.toString());
+					preparedStatement.setLong(5, category.getActiveStatusInd());
+					preparedStatement.setString(6, category.getMasterLoginId());
+					preparedStatement.setLong(7, category.getCategoryId());
+				}
+			});
+			
+			if(subCatExists){
+				//Update Child Category
+				String sql1 = "UPDATE CUSTOMER_PRODUCT_MODULE_FEATURES SET FEATURE_NAME=?,FEATURE_DESC=?,"
+						+ "FEATURE_CODE=?,FEATURE_TYPE=?,ACTIVE_STATUS_IND=?,MODIFIED_DATE=sysdate(),MODIFIED_BY=?"
+						+ " WHERE CUST_PROD_MOD_FEATURE_SYS_ID=?";				
+				String[] subCategoryCode = category.getSubCategories().get(0).getSubCategoryName().toUpperCase().split(" ");
+				StringBuffer subFeatureCode = new StringBuffer();
+				StringBuffer subFeatureType = new StringBuffer();	
+				
+				
+					for (int i = 0; i < subCategoryCode.length; i++) {
+						subFeatureCode.append(subCategoryCode[i]);
+					}
+					subFeatureCode.append(category.getSubCategories().get(0).getSubCategoryId());
+					subFeatureType.append("CHILD_" + featureCode);
+				
+				jdbcTemplate.update(sql1, new PreparedStatementSetter() {
+					public void setValues(PreparedStatement preparedStatement) throws SQLException {
+						preparedStatement.setString(1, category.getSubCategories().get(0).getSubCategoryName());
+						preparedStatement.setString(2, category.getSubCategories().get(0).getSubCategoryDesc());
+						preparedStatement.setString(3, subFeatureCode.toString());
+						preparedStatement.setString(4, subFeatureType.toString());
+						preparedStatement.setLong(5, category.getSubCategories().get(0).getActivestatusInd());
+						preparedStatement.setString(6, category.getMasterLoginId());
+						preparedStatement.setLong(7, category.getSubCategories().get(0).getSubCategoryId());
+					}
+				});
+				
+				//Update FeatureType of all sub categories
+				if (category.isIscatNameChanged()) {
+									
+					//update all sub categories with new feature type
+				
+					String sql2 = "UPDATE CUSTOMER_PRODUCT_MODULE_FEATURES SET FEATURE_TYPE=?,MODIFIED_DATE=sysdate(),MODIFIED_BY=?"
+							+ " WHERE FEATURE_TYPE=?";		
+					jdbcTemplate.update(sql2, new PreparedStatementSetter() {
+						public void setValues(PreparedStatement preparedStatement) throws SQLException {							
+							preparedStatement.setString(1, subFeatureType.toString());							
+							preparedStatement.setString(2, category.getMasterLoginId());
+							preparedStatement.setString(3, "CHILD_"+category.getCategoryCode());
+						}
+					});
+				}
+				
+			}
+			
+			valid.setValid(true);
+		} catch (Exception e) {
+			logger.error("Exception encountered while accessing DB : " + e.getMessage(), null, e);
+			valid.setValid(false);
+			valid.setError("Something went wrong while adding category!");
+		}
+
+		return valid;
 	}
 }
