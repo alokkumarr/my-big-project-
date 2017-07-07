@@ -131,7 +131,7 @@ export const ReportGridComponent = {
 
     prepareGridColumns(columns) {
       return map(columns, column => {
-        return {
+        const field = {
           caption: column.getDisplayName(),
           dataField: column.name,
           dataType: column.type,
@@ -139,6 +139,13 @@ export const ReportGridComponent = {
           alignment: 'left',
           width: COLUMN_WIDTH
         };
+        if (NUMBER_TYPES.includes(column.type)) {
+          field.format = {
+            type: 'decimal',
+            precision: 2
+          };
+        }
+        return field;
       });
     }
 

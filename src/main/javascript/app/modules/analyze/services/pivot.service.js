@@ -22,6 +22,8 @@ import last from 'lodash/last';
 import omit from 'lodash/omit';
 import mapValues from 'lodash/mapValues';
 
+import {NUMBER_TYPES} from '../consts';
+
 const FRONT_2_BACK_PIVOT_FIELD_PAIRS = {
   caption: 'displayName',
   dataField: 'columnName',
@@ -50,14 +52,14 @@ export function PivotService() {
     return fpPipe(
       fpFilter(field => field.checked && field.area),
       fpMap(artifactColumn => {
-        switch (artifactColumn.type) {
-          case 'int':
-          case 'double':
-          case 'long':
-            artifactColumn.dataType = 'number';
-            break;
-          default:
-            artifactColumn.dataType = artifactColumn.type;
+        if (NUMBER_TYPES.includes(artifactColumn.type)) {
+          artifactColumn.dataType = 'number';
+          artifactColumn.format = {
+            type: 'decimal',
+            precision: 2
+          };
+        } else {
+          artifactColumn.dataType = artifactColumn.type;
         }
         return artifactColumn;
       }),

@@ -1,6 +1,7 @@
 import defaultsDeep from 'lodash/defaultsDeep';
 import fpFilter from 'lodash/fp/filter';
 import fpFlatMap from 'lodash/fp/flatMap';
+import fpMap from 'lodash/fp/map';
 import fpPipe from 'lodash/fp/pipe';
 import fpGet from 'lodash/fp/get';
 import first from 'lodash/first';
@@ -18,7 +19,7 @@ import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
 
-import {ENTRY_MODES} from '../../consts';
+import {ENTRY_MODES, NUMBER_TYPES} from '../../consts';
 
 const DEBOUNCE_INTERVAL = 500; // milliseconds
 
@@ -491,7 +492,6 @@ export const AnalyzeReportComponent = {
     applyDataToGrid(columns, sorts, groups, data) {
       this.showFiltersButtonIfDataIsReady();
       const grid = first(this._$componentHandler.get('ard-grid-container'));
-
       if (grid) {
         grid.updateColumns(columns);
         grid.updateSorts(sorts);

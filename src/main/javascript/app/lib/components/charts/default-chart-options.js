@@ -36,6 +36,7 @@ export const chartOptions = {
     borderWidth: 0,
     shadow: false,
     useHTML: true,
+    valueDecimals: 2,
     headerFormat: '<span style="font-size: 12px; opacity: 0.8;">{point.key}</span><br/>',
     pointFormat: '<span style="color:{point.color}; stroke: white; stroke-width: 2; ' +
     'font-size: 25px;">\u25CF</span> {series.name}: <b>{point.y}</b><br/>',
