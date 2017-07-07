@@ -10,4 +10,8 @@ export const AdminMenuData = [{
   id: '',
   name: 'Privilege',
   url: '#!/privilege'
+}, {
+  id: '',
+  name: 'Category',
+  url: '#!/categories'
 }];

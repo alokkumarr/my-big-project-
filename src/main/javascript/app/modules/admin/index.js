@@ -18,10 +18,17 @@ import {PrivilegesListViewComponent} from './components/privileges-view/list/pri
 import {PrivilegeDialogComponent} from './components/privilege-dialog/privilege-dialog.component';
 import {PrivilegeNewComponent} from './components/privilege-new/privilege-new.component';
 import {PrivilegeEditComponent} from './components/privilege-edit/privilege-edit.component';
+import {CategoriesViewComponent} from './components/categories-view/categories-view.component';
+import {CategoriesListViewComponent} from './components/categories-view/list/categories-list-view.component';
+import {CategoryDialogComponent} from './components/category-dialog/category-dialog.component';
+import {CategoryNewComponent} from './components/category-new/category-new.component';
+import {CategoryEditComponent} from './components/category-edit/category-edit.component';
+import {CategoryDeleteComponent} from './components/category-delete/category-delete.component';
 
 import {UsersManagementService} from './services/users.service';
 import {RolesManagementService} from './services/roles.service';
 import {PrivilegesManagementService} from './services/privileges.service';
+import {CategoriesManagementService} from './services/categories.service';
 
 export const AdminModule = 'AdminModule';
 
@@ -31,6 +38,7 @@ angular.module(AdminModule, [])
   .factory('UsersManagementService', UsersManagementService)
   .factory('RolesManagementService', RolesManagementService)
   .factory('PrivilegesManagementService', PrivilegesManagementService)
+  .factory('CategoriesManagementService', CategoriesManagementService)
   .component('usersView', UsersViewComponent)
   .component('usersListView', UsersListViewComponent)
   .component('userDialog', UserDialogComponent)
@@ -45,4 +53,10 @@ angular.module(AdminModule, [])
   .component('privilegesListView', PrivilegesListViewComponent)
   .component('privilegeDialog', PrivilegeDialogComponent)
   .component('privilegeNew', PrivilegeNewComponent)
-  .component('privilegeEdit', PrivilegeEditComponent);
+  .component('privilegeEdit', PrivilegeEditComponent)
+  .component('categoriesView', CategoriesViewComponent)
+  .component('categoriesListView', CategoriesListViewComponent)
+  .component('categoryDialog', CategoryDialogComponent)
+  .component('categoryNew', CategoryNewComponent)
+  .component('categoryEdit', CategoryEditComponent)
+  .component('categoryDelete', CategoryDeleteComponent);
