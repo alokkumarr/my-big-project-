@@ -279,6 +279,7 @@ class Analysis extends BaseController {
  	var json: String = "";
  	var typeInfo : String = "";
  	var analysisJSON : JObject = null;
+ 	
  	m_log.trace("json dataset: {}", reqJSON);
     val analysis = (reqJSON \ "contents" \ "analyze") match {
       case obj: JArray => analysisJson(reqJSON); // reading from request body
@@ -312,6 +313,7 @@ class Analysis extends BaseController {
     {
       val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json), json);
+      val finishedTS = System.currentTimeMillis;    
       val myArray = parse(data);
       m_log.trace("pivot dataset: {}", myArray)
       
@@ -335,6 +337,8 @@ class Analysis extends BaseController {
         JField("id", JString(analysisId)),
         JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
         JField("execution_result", JString("success")),
+        JField("execution_finish_ts", JLong(finishedTS)),
+        JField("exec-code", JInt(0)),
         JField("execution_timestamp", JString(timestamp))
       ))
       m_log debug s"Create result: with content: ${compact(render(descriptor))}"
@@ -347,6 +351,8 @@ class Analysis extends BaseController {
 	        JField("id", JString(analysisId)),
 	        JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
 	        JField("execution_result", JString("no result")),
+	        JField("execution_finish_ts", JLong(-1L)),
+	        JField("exec-code", JInt(1)),
 	        JField("execution_timestamp", JString(timestamp)),
 	        JField("error_message", JString(errorMsg))
 	      ))
@@ -370,6 +376,7 @@ class Analysis extends BaseController {
     if ( typeInfo.equals("chart") ){
       val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json), json);
+      val finishedTS = System.currentTimeMillis;    
       val myArray = parse(data);
       var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
       // The below block is for execution result to store
@@ -390,7 +397,9 @@ class Analysis extends BaseController {
         JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
         JField("id", JString(analysisId)),
         JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+        JField("execution_finish_ts", JLong(finishedTS)),
         JField("execution_result", JString("success")),
+        JField("exec-code", JInt(0)),
         JField("execution_timestamp", JString(timestamp))
       ))
       m_log debug s"Create result: with content: ${compact(render(descriptor))}"
@@ -403,6 +412,8 @@ class Analysis extends BaseController {
 	        JField("id", JString(analysisId)),
 	        JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
 	        JField("execution_result", JString("no result")),
+	        JField("execution_finish_ts", JLong(-1L)),
+	        JField("exec-code", JInt(1)),
 	        JField("execution_timestamp", JString(timestamp)),
 	        JField("error_message", JString(errorMsg))
 	      ))
