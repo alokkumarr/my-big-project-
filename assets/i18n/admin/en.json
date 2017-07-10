@@ -5,6 +5,7 @@
   "USERS_MGMT_LIST":"User Management",
   "ROLES_MGMT_LIST":"Role Management",
   "PRIVILEGES_MGMT_LIST":"Privilege Management",
+  "CATEGORIES_MGMT_LIST":"Category Management",
   
   "NEW_USER":"Add New User",
   "CREATE_USER":"Save User",
@@ -20,6 +21,13 @@
   "CREATE_PRIVILEGE":"Save Privilege",
   "EDIT_PRIVILEGE":"Edit Privilege",
   "UPDATE_PRIVILEGE":"Update",
+  
+  "NEW_CATEGORY":"Add New Category",
+  "CREATE_CATEGORY":"Save Category",
+  "EDIT_CATEGORY":"Edit Category",
+  "UPDATE_CATEGORY":"Update",
+  "DELETE_HEADER_CATEGORY":"Delete Category",
+  "DELETE_CATEGORY":"Delete",
   
   "USER_FIRST_NAME_LABEL":"First Name",
   "USER_MIDDLE_NAME_LABEL":"Middle Name",
@@ -51,6 +59,18 @@
   "PRIVILEGE_EXPORT_LABEL":"Export",
   "PRIVILEGE_DELETE_LABEL":"Delete",
   
+  "CATEGORY_PROD_LABEL":"Product",
+  "CATEGORY_MODL_LABEL":"Module",
+  "SUB_CATEGORY_FLAG_LABEL":"To create Sub-Category",
+  "CATEGORY_NAME_LABEL":"Category Name",
+  "CATEGORY_DESC_LABEL":"Description",
+  "CATEGORY_LABEL":"Category",
+  "SUB_CATEGORY_NAME_HEADER":"Select one of the sub-categories to edit",
+  "SUB_CATEGORY_NAME_LABEL":"Sub-Category Name",
+  "SUB_CATEGORY_DESC_LABEL":"Description",
+  "CATEGORY_ACTIVE_LABEL":"Status",
+  "CATEGORY_DELETE_SMENT":"Please delete the below sub-categories before deleting the category.",
+  
   "TOOLTIP_ADD_ROLE":"Add Role",
   "TOOLTIP_DELETE_ROLE":"Delete Role",
   "TOOLTIP_EDIT_ROLE":"Edit Role",
@@ -63,6 +83,11 @@
   "TOOLTIP_ADD_PRIVILEGE":"Add Privilege",
   "TOOLTIP_EDIT_PRIVILEGE":"Edit Privilege",
   "TOOLTIP_DELETE_PRIVILEGE":"Delete Privilege",
+  
+  "TOOLTIP_ADD_CATEGORY":"Add Category",
+  "TOOLTIP_EDIT_CATEGORY":"Edit Category",
+  "TOOLTIP_DELETE_CATEGORY":"Delete Category",
+  "TOOLTIP_DELETE_SUB_CATEGORY":"Delete Sub Category",
   
   "NO_IMPLEMENTED_TEMPLATE_YET": "No implemented template yet!",
   "TOOLTIP_ROLE_ANAS_MSG":"Automatically create default privileges to the My Analyses category for any user assigned to this Role. At least one privilege per Role is needed for application access."

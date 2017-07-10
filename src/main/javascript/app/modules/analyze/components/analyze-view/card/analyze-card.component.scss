@@ -1,7 +1,7 @@
 .saw-analyze-card {
   .saw-ac-placeholder {
-    height: 159px;
-    width: 434px;
+    height: calc(159px / 2);
+    width: calc(434px / 2);
     background-size: contain;
     background-repeat: no-repeat;
 

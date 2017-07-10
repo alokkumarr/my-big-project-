@@ -25,7 +25,7 @@ const FILTER_TYPES = {
   UNKNOWN: 'unknown'
 };
 
-export const NUMBER_TYPES = ['int', 'integer', 'double', 'long', 'timestamp'];
+export const NUMBER_TYPES = ['int', 'integer', 'double', 'long', 'float'];
 
 export const DEFAULT_BOOLEAN_CRITERIA = BOOLEAN_CRITERIA[0];
 

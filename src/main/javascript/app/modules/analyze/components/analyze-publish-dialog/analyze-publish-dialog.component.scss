@@ -21,12 +21,8 @@
     }
   }
 
-  .repeat-schedule-container {
-    label {
-      text-align: end;
-      padding-right: 8px;
-      padding-top: 6px;
-    }
+  .schedule-container {
+    padding: 0 30px;
   }
 
   .days-of-week-checkboxes {
@@ -37,4 +33,3 @@
     line-height: 32px;
   }
 }
-

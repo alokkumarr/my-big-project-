@@ -94,9 +94,9 @@ export const AnalyzePivotComponent = {
     }
 
     loadExistingAnalysis() {
-      this.initExistingSettings();
       this.artifacts = this.getSortedArtifacts(this.model.artifacts);
       this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
+      this.initExistingSettings();
       this.loadPivotData();
     }
 

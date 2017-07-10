@@ -43,6 +43,7 @@
 
       <div class="analyze-view_action-panel" layout="row" layout-align="end center">
         <md-button class="btn-primary"
+                   ng-show="$ctrl.canUserCreate"
                    ng-click="$ctrl.openNewAnalysisModal()">
           + <span translate="ANALYSIS"></span>
         </md-button>
@@ -58,6 +59,7 @@
     <div class="analyze-view_analyses-list"
          ng-switch-when="list">
       <analyze-list-view analyses="$ctrl.analyses"
+                         ng-if="$ctrl.analyses"
                          analysis-type="$ctrl.states.analysisType"
                          updater="$ctrl.updater"
                          on-action="$ctrl.onCardAction(type, model)"
