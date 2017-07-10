@@ -54,6 +54,7 @@ export const AnalyzePivotDetailComponent = {
       }
 
       this.normalizedData = data;
+      this.fields = this._PivotService.artifactColumns2PivotFields()(this.analysis.artifacts[0].columns);
       this.updatePivot();
       /* eslint-disable no-unused-expressions */
     }
