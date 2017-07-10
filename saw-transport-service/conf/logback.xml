@@ -35,9 +35,11 @@
 
   <logger name="play" level="INFO"/>
 
-  <logger name="controllers" level="INFO"/>
-  <logger name="sncr" level="INFO"/>
-  <logger name="com.synchronoss" level="INFO"/>
+  <logger name="controllers" level="TRACE"/>
+  <logger name="sncr.metadata.analysis.AnalysisExecutionHandler" level="TRACE"/>
+  <logger name="sncr" level="TRACE"/>
+   <logger name="sncr.metadata" level="TRACE"/>
+  <logger name="com.synchronoss" level="TRACE"/>
   <logger name="test" level="${log.test.level:-INFO}"/>
 
   <root level="INFO">
