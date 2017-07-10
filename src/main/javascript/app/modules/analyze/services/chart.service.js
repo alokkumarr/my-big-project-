@@ -257,7 +257,7 @@ export function ChartService() {
       });
     });
 
-    attributes = sortBy(attributes, [attr => attr.columnName]);
+    attributes = sortBy(attributes, [attr => attr.displayName]);
 
     /* Based on data type, divide the artifacts between axes. */
     const yaxis = filter(attributes, attr => (
