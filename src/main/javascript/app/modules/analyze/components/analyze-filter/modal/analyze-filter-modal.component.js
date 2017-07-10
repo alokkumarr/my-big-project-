@@ -78,8 +78,8 @@ export const AnalyzeFilterModalComponent = {
     }
 
     onApplyFilters() {
+      this.removeEmptyFilters(this.filters);
       if (this.areFiltersValid(this.filters)) {
-        this.removeEmptyFilters(this.filters);
         const flattenedFilters = this.unGroupFilters(this.filters);
         this.cleanFilters(flattenedFilters);
         this.$dialog.hide({
