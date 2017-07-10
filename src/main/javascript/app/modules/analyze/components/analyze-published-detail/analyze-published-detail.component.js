@@ -64,6 +64,10 @@ export const AnalyzePublishedDetailComponent = {
       this._destroyHandler();
     }
 
+    executeAnalysis() {
+      this._AnalyzeActionsService.execute(this.analysis);
+    }
+
     setPrivileges() {
       this.canUserPublish = this._JwtService.hasPrivilege('PUBLISH', {
         subCategoryId: this.analysis.categoryId
