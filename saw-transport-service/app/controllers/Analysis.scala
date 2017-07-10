@@ -452,6 +452,7 @@ class Analysis extends BaseController {
             case "IntegerType" => JInt(m.get(k)._2.asInstanceOf[Int])
             case "BooleanType" => JBool(m.get(k)._2.asInstanceOf[Boolean])
             case "LongType" => JLong(m.get(k)._2.asInstanceOf[Long])
+            case "DoubleType" => JDouble(m.get(k)._2.asInstanceOf[Double])
           })
          ).toList
        )}
