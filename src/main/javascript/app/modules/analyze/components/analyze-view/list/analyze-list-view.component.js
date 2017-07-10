@@ -133,10 +133,7 @@ export const AnalyzeListViewComponent = {
       }, {
         caption: '',
         cellTemplate: 'actionCellTemplate'
-      }].map(column => {
-        column.cssClass = column.cssClass ? `${column.cssClass} branded-column` : 'branded-column';
-        return column;
-      });
+      }];
 
       return this._dxDataGridService.mergeWithDefaultConfig({
         onInitialized: this.onGridInitialized.bind(this),
