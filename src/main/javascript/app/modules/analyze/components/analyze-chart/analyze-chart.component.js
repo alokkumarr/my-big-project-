@@ -44,6 +44,7 @@ export const AnalyzeChartComponent = {
       this._$mdDialog = $mdDialog;
       this._$timeout = $timeout;
       this.BAR_COLUMN_OPTIONS = BAR_COLUMN_OPTIONS;
+      this.draftMode = false;
 
       this.legend = {
         align: get(this.model, 'legend.align', 'right'),
@@ -111,6 +112,29 @@ export const AnalyzeChartComponent = {
       this.onSettingsChanged();
       this._$timeout(() => {
         this.updateLegendPosition();
+        this.draftMode = false;
+      });
+    }
+
+    goBack() {
+      if (!this.draftMode) {
+        this.$dialog.hide();
+        return;
+      }
+
+      const confirm = this._$mdDialog.confirm()
+            .title('There are unsaved changes')
+            .textContent('Do you want to discard unsaved changes and go back?')
+        .multiple(true)
+        .ok('Discard')
+        .cancel('Cancel');
+
+      this._$mdDialog.show(confirm).then(() => {
+        this.$dialog.hide();
+      }, err => {
+        if (err) {
+          this._$log.error(err);
+        }
       });
     }
 
@@ -130,6 +154,7 @@ export const AnalyzeChartComponent = {
       const align = this._ChartService.LEGEND_POSITIONING[this.legend.align];
       const layout = this._ChartService.LAYOUT_POSITIONS[this.legend.layout];
 
+      this.draftMode = true;
       this.updateChart.next([
         {
           path: 'legend.align',
@@ -149,6 +174,7 @@ export const AnalyzeChartComponent = {
     updateCustomLabels() {
       this.labels.x = this.labels.tempX;
       this.labels.y = this.labels.tempY;
+      this.draftMode = true;
       this.reloadChart(this.settings, this.filteredGridData);
     }
 
@@ -162,22 +188,26 @@ export const AnalyzeChartComponent = {
 
     onSettingsChanged() {
       this.analysisChanged = true;
+      this.draftMode = true;
     }
 
     clearFilters() {
       this.filters = [];
       this.analysisChanged = true;
+      this.draftMode = true;
     }
 
     onFilterRemoved(index) {
       this.filters.splice(index, 1);
       this.analysisChanged = true;
+      this.draftMode = true;
     }
 
     onApplyFilters({filters, filterBooleanCriteria} = {}) {
       if (filters) {
         this.filters = filters;
         this.analysisChanged = true;
+        this.draftMode = true;
       }
       if (filterBooleanCriteria) {
         this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;
@@ -236,6 +266,7 @@ export const AnalyzeChartComponent = {
           };
 
           scope.onSave = data => {
+            this.draftMode = true;
             this.model.description = data.description;
           };
         },
@@ -329,6 +360,7 @@ export const AnalyzeChartComponent = {
     }
 
     onAnalysisSaved(successfullySaved) {
+      this.draftMode = false;
       this.$dialog.hide(successfullySaved);
     }
   }

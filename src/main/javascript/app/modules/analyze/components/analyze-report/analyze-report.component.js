@@ -41,6 +41,7 @@ export const AnalyzeReportComponent = {
       this._reloadTimer = null;
       this._modelLoaded = null;
       this.showProgress = false;
+      this.draftMode = false;
 
       this._modelPromise = new Promise(resolve => {
         this._modelLoaded = resolve;
@@ -156,6 +157,7 @@ export const AnalyzeReportComponent = {
       if (filters) {
         this.filters = filters;
         this.analysisChanged = true;
+        this.draftMode = true;
       }
       if (filterBooleanCriteria) {
         this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;
@@ -165,11 +167,13 @@ export const AnalyzeReportComponent = {
     onClearAllFilters() {
       this.filters = [];
       this.analysisChanged = true;
+      this.draftMode = true;
     }
 
     onFilterRemoved(index) {
       this.filters.splice(index, 1);
       this.analysisChanged = true;
+      this.draftMode = true;
     }
     // END filters section
 
@@ -199,6 +203,7 @@ export const AnalyzeReportComponent = {
 
       if (this.mode) {
         this.reloadPreviewGrid(true);
+        this.draftMode = false;
       }
 
       this._unregisterCanvasHandlers = this._unregisterCanvasHandlers.concat([
@@ -505,6 +510,10 @@ export const AnalyzeReportComponent = {
     }
 
     reloadPreviewGrid(refresh = false) {
+      if (refresh) {
+        this.draftMode = true;
+      }
+
       const doReload = () => {
         return this._$timeout(() => {
           this._reloadTimer = null;
@@ -545,6 +554,28 @@ export const AnalyzeReportComponent = {
       } else {
         this._reloadTimer = doReload();
       }
+    }
+
+    goBack() {
+      if (!this.draftMode) {
+        this.$dialog.hide();
+        return;
+      }
+
+      const confirm = this._$mdDialog.confirm()
+            .title('There are unsaved changes')
+        .textContent('Do you want to discard unsaved changes and go back?')
+        .multiple(true)
+        .ok('Discard')
+        .cancel('Cancel');
+
+      this._$mdDialog.show(confirm).then(() => {
+        this.$dialog.hide();
+      }, err => {
+        if (err) {
+          this._$log.error(err);
+        }
+      });
     }
 
     getSelectedColumns(tables) {
@@ -653,6 +684,7 @@ export const AnalyzeReportComponent = {
           this.canvas.model.sorts = sorts;
           this.canvas._$eventEmitter.emit('sortChanged');
           this.analysisChanged = true;
+          this.draftMode = true;
         });
     }
 
@@ -667,6 +699,7 @@ export const AnalyzeReportComponent = {
           };
 
           scope.onSave = data => {
+            this.draftMode = true;
             this.model.description = data.description;
           };
         },
@@ -717,6 +750,7 @@ export const AnalyzeReportComponent = {
     }
 
     onAnalysisSaved(successfullySaved) {
+      this.draftMode = false;
       this.$dialog.hide(successfullySaved);
     }
   }

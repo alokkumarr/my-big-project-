@@ -280,11 +280,9 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     });
   }
 
-  function getDataBySettings(model) {
-    return updateAnalysis(model).then(analysis => {
-      return applyAnalysis(model, EXECUTION_MODES.PREVIEW).then(data => {
-        return {analysis, data};
-      });
+  function getDataBySettings(analysis) {
+    return applyAnalysis(analysis, EXECUTION_MODES.PREVIEW).then(data => {
+      return {analysis, data};
     });
   }
 
