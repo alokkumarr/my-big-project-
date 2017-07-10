@@ -3,21 +3,31 @@ const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
 
 exports.config = {
   framework: 'jasmine2',
+  //chromeDriver: '../node_modules/chromedriver/bin/chromedriver',
   seleniumAddress: 'http://localhost:4444/wd/hub',
   getPageTimeout: 60000,
   allScriptsTimeout: 500000,
-  directConnect: true,
+  //directConnect: true,
 
-  capabilities: {
-    browserName: 'chrome',
-    chromeOptions: {
-      args: [
-        //'incognito',
-        'disable-extensions',
-        'disable-web-security'
-      ]
+  multiCapabilities: [
+
+    {
+      browserName: 'chrome',
+       chromeOptions: {
+        args: [
+          //'incognito',
+          'disable-extensions',
+          'disable-web-security'
+        ]
+      }
+    },
+
+    {
+      browserName: 'firefox'
     }
-  },
+  ],
+
+  //maxSessions: 2,
 
   jasmineNodeOpts: {
     isVerbose: true,

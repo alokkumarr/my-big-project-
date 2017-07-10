@@ -1,17 +1,32 @@
+const metrics = element.all(by.css('[ng-model="$ctrl.selectedMetric"] > md-radio-button'));
+const eventsMetric = metrics.filter(elem => {
+  return elem(by.css('span[ng-bind="::metric.metricName"]')).getText()
+    .then(text => {
+      return text && text.includes('MCT Events');
+    });
+}).first();
 module.exports = {
   analysisElems: {
     listView: element(by.css('[ng-value="$ctrl.LIST_VIEW"]')),
     cardView: element(by.css('[ng-value="$ctrl.CARD_VIEW"]')),
     newAnalyzeDialog: element(by.css('.new-analyze-dialog')),
-    addAnalysisBtn: element(by.partialButtonText('ANALYSIS')),
+    addAnalysisBtn: element(by.css('[ng-click="$ctrl.openNewAnalysisModal()"]')),
     cardTitle: element(by.binding('::$ctrl.model.name')),
+    //
     firstMetric: element(by.css('[ng-model="$ctrl.selectedMetric"] > md-radio-button:first-child')),
     lastMetric: element(by.css('[ng-model="$ctrl.selectedMetric"] > md-radio-button:last-child')),
-    reportTable: element(by.css('[value="table:report"]')),
-    pivotTable: element(by.css('[value="table:pivot"]')),
+    reportType: element(by.css('[value="table:report"]')),
+    pivotType: element(by.css('[value="table:pivot"]')),
+    columnType: element(by.css('[value="chart:column"]')),
+    lineType: element(by.css('[value="chart:line"]')),
     createAnalysisBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]')),
-    designerDialog: element(by.css('.ard_canvas')),
     saveAnalysisBtn: element(by.css('[ng-click="$ctrl.openSaveModal()"]')),
+    //
+    // eventsMetric: element(by.cssContainingText('[ng-model="$ctrl.selectedMetric"]', 'MCT Events')),
+    eventsMetric,
+    designerView: element(by.css('.ard_canvas')),
+    columnChartsView: element(by.css('.highcharts-container ')),
+    //
     reportCategory: element(by.model('::$ctrl.model.category')),
     reportNameField: element(by.model('$ctrl.model.name')),
     reportDescriptionField: element(by.model('$ctrl.model.description')),
@@ -24,6 +39,7 @@ module.exports = {
     filterItemComplete: element(by.css('[aria-label="Complete"]')),
     applyFilterBtn: element(by.css('[ng-click="$ctrl.onFiltersApplied()"]')),
     filterCounter: element(by.css('.filter-counter')),
+    sessionIdField: element(by.css('.e2e-MCT_SESSION\\:SESSION_ID')),
     totalPriceField: element(by.css('.e2e-Orders\\:TotalPrice')),
     shipperNameField: element(by.css('.e2e-Shippers\\:ShipperName')),
     customerNameField: element(by.css('.e2e-Customers\\:CustomerName')),
@@ -32,6 +48,7 @@ module.exports = {
     customersEmail: element(by.css('.e2e-Customers\\:EMAIL_ADDRESS')),
     productsProductTypes: element(by.css('.e2e-Products\\:PRODUCT_TYPES')),
     serviceProductStatus: element(by.css('.e2e-Service\\:PROD_OM_STATUS')),
+    refreshDataBtn: element(by.css('[ng-click="$ctrl.refreshGridData()"]')),
     toggleDetailsPanel: element(by.css('[ng-click="$ctrl.toggleDetailsPanel()"]')),
     reportGridContainer: element(by.css('.ard_details-grid'))
   },
@@ -44,8 +61,12 @@ module.exports = {
     expect(this.analysisElems.newAnalyzeDialog.isDisplayed()).toBeTruthy();
   },
 
-  validateDesignerDialog() {
-    expect(this.analysisElems.designerDialog.isDisplayed()).toBeTruthy();
+  validateDesignerView() {
+    expect(this.analysisElems.designerView.isDisplayed()).toBeTruthy();
+  },
+
+  validateColumnChartsView() {
+    expect(this.analysisElems.columnChartsView.isDisplayed()).toBeTruthy();
   },
 
   validateReportGrid() {
