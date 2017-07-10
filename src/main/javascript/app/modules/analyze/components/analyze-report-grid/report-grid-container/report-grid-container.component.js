@@ -169,6 +169,9 @@ export const ReportGridContainerComponent = {
       if (!isEmpty(this.grouped.by)) {
         this.grouped.by.pop();
 
+        this.settings.layoutMode = this.LAYOUT_MODE.DETAIL;
+        this.onLayoutModeUpdate();
+
         this.updateColumns();
         this.applyGrouping();
         this.eventEmitter.emit('groupingChanged', this.grouped.by);
