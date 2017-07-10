@@ -10,6 +10,8 @@ import com.sncr.saw.security.common.bean.Role;
 import com.sncr.saw.security.common.bean.Ticket;
 import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.common.bean.Valid;
+import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
+import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.Analysis;
@@ -49,8 +51,15 @@ public interface UserRepository {
 	List<PrivilegeDetails> getPrivileges(Long customerId);
 	List<Product> getProductsDropDownList(Long customerId);
 	List<Module> getModulesDropDownList(Long customerId, Long productId);
-	List<Category> getCategoriesDropDownList(Long customerId, Long moduleId);
+	List<Category> getCategoriesDropDownList(Long customerId, Long moduleId, boolean parent);
 	Valid addPrivilege(PrivilegeDetails privilege);
 	Valid updatePrivilege(PrivilegeDetails privilege);
 	boolean deletePrivilege(Long privId);
+	List<CategoryDetails> getCategories(Long customerId);
+	Valid addCategory(CategoryDetails category);
+	boolean checkCatExists(CategoryDetails category);
+	boolean deleteCategory(Long categoryId);
+	List<SubCategoryDetails> getSubCategories(Long customerId, String featureCode);
+	Valid updateCategory(CategoryDetails category);
+	boolean checkSubCatExists(CategoryDetails category);	
 }

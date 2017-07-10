@@ -39,7 +39,8 @@ import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.Ticket;
 import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.common.bean.Valid;
-import com.sncr.saw.security.common.bean.repo.admin.CategoryDropDownList;
+import com.sncr.saw.security.common.bean.repo.admin.CategoryList;
+import com.sncr.saw.security.common.bean.repo.admin.DeleteCategory;
 import com.sncr.saw.security.common.bean.repo.admin.DeletePrivilege;
 import com.sncr.saw.security.common.bean.repo.admin.DeleteRole;
 import com.sncr.saw.security.common.bean.repo.admin.DeleteUser;
@@ -49,6 +50,7 @@ import com.sncr.saw.security.common.bean.repo.admin.ProductDropDownList;
 import com.sncr.saw.security.common.bean.repo.admin.RolesDropDownList;
 import com.sncr.saw.security.common.bean.repo.admin.RolesList;
 import com.sncr.saw.security.common.bean.repo.admin.UsersList;
+import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.Analysis;
@@ -1007,10 +1009,10 @@ public class SecurityController {
 	 */
 	
 	@RequestMapping(value = "/auth/admin/cust/manage/categories/list", method = RequestMethod.POST)
-	public CategoryDropDownList getcategoriesList(@RequestBody  CustProdModule cpm) {
-		CategoryDropDownList categories = new CategoryDropDownList();
+	public CategoryList getcategoriesList(@RequestBody  CustProdModule cpm) {
+		CategoryList categories = new CategoryList();
 		try {
-			categories.setCategory(userRepository.getCategoriesDropDownList(cpm.getCustomerId(), cpm.getModuleId()));
+			categories.setCategory(userRepository.getCategoriesDropDownList(cpm.getCustomerId(), cpm.getModuleId(), false));
 			categories.setValid(true);
 		} catch (Exception e) {
 			categories.setValid(false);
@@ -1118,6 +1120,189 @@ public class SecurityController {
 		}
 		return privList;
 	}
+	
+	/**
+	 * 
+	 * @param customerId
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/categories/fetch", method = RequestMethod.POST)
+	public CategoryList getCategories(@RequestBody Long customerId) {
+		CategoryList catList = new CategoryList();
+		try {
+			if (customerId != null) {
+				catList.setCategories(userRepository.getCategories(customerId));
+				catList.setValid(true);
+			} else {
+				catList.setValid(false);
+				catList.setError("Mandatory request params are missing");
+			}
+		} catch (Exception e) {
+			catList.setValid(false);
+			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+			catList.setValidityMessage(message + " Please contact server Administrator");
+			catList.setError(e.getMessage());
+			return catList;
+		}
+
+		return catList;
+	}
+	
+	/**
+	 * 
+	 * @param customerId
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/categories/add", method = RequestMethod.POST)
+	public CategoryList addCategories(@RequestBody CategoryDetails category) {
+		CategoryList catList = new CategoryList();
+		Valid valid = null;
+		try {
+			if (category != null) {
+				if (!userRepository.checkCatExists(category)) {
+					valid = userRepository.addCategory(category);
+					if (valid.getValid()) {
+						catList.setCategories(userRepository.getCategories(category.getCustomerId()));
+						catList.setValid(true);
+					} else {
+						catList.setValid(false);
+						catList.setValidityMessage("Category could not be added. " + valid.getError());
+					}
+				} else {
+					catList.setValid(false);
+					catList.setValidityMessage(
+							"Category Name already exists for this Customer Product Module Combination. ");
+				}
+			} else {
+				catList.setValid(false);
+				catList.setValidityMessage("Mandatory request params are missing");
+			}
+		} catch (Exception e) {
+			catList.setValid(false);
+			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+			catList.setValidityMessage(message + " Please contact server Administrator");
+			catList.setError(e.getMessage());
+			return catList;
+		}
+		return catList;
+	}
+	
+	/**
+	 * 
+	 * @param cpm
+	 * @return
+	 */
+	
+	@RequestMapping(value = "/auth/admin/cust/manage/categories/parent/list", method = RequestMethod.POST)
+	public CategoryList getcategoriesOnlyList(@RequestBody  CustProdModule cpm) {
+		CategoryList categories = new CategoryList();
+		try {
+			categories.setCategory(userRepository.getCategoriesDropDownList(cpm.getCustomerId(), cpm.getModuleId(),true));
+			categories.setValid(true);
+		} catch (Exception e) {
+			categories.setValid(false);
+			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+			categories.setValidityMessage(message + " Please contact server Administrator");
+			categories.setError(e.getMessage());
+			return categories;
+		}
+		return categories;
+	}
+	
+	/**
+	 * 
+	 * @param category
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/categories/delete", method = RequestMethod.POST)
+	public CategoryList deleteCategories(@RequestBody DeleteCategory category) {
+		CategoryList catList = new CategoryList();
+		try {
+
+			if (userRepository.deleteCategory(category.getCategoryId())) {
+				catList.setCategories(userRepository.getCategories(category.getCustomerId()));
+				catList.setValid(true);
+			} else {
+				catList.setValid(false);
+				catList.setValidityMessage("Category could not be deleted. ");
+			}
+
+		} catch (Exception e) {
+			catList.setValid(false);
+			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+			catList.setValidityMessage(message + " Please contact server Administrator");
+			catList.setError(e.getMessage());
+			return catList;
+		}
+		return catList;
+	}
+
+	/**
+	 * 
+	 * @param category
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/subcategories/delete", method = RequestMethod.POST)
+	public CategoryList deleteSubCategories(@RequestBody DeleteCategory category) {
+		CategoryList catList = new CategoryList();
+		try {
+			if (userRepository.deleteCategory(category.getCategoryId())) {
+				catList.setSubCategories(userRepository.getSubCategories(category.getCustomerId(), category.getCategoryCode()));
+				catList.setValid(true);
+			} else {
+				catList.setValid(false);
+				catList.setValidityMessage("Category could not be deleted. ");
+			}
+
+		} catch (Exception e) {
+			catList.setValid(false);
+			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+			catList.setValidityMessage(message + " Please contact server Administrator");
+			catList.setError(e.getMessage());
+			return catList;
+		}
+		return catList;
+	}
+
+	/**
+	 * 
+	 * @param category
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/categories/edit", method = RequestMethod.POST)
+	public CategoryList updateCategories(@RequestBody CategoryDetails category) {
+		CategoryList catList = new CategoryList();
+		Valid valid = new Valid();
+		try {
+			if (category.isIscatNameChanged() && userRepository.checkCatExists(category)) {
+				catList.setValid(false);
+				catList.setValidityMessage(
+						"Category Name already exists for this Customer Product Module Combination. ");
+			} else if (userRepository.checkSubCatExists(category)) {
+				catList.setValid(false);
+				catList.setValidityMessage(
+						"Sub Category Name already exists for this Customer Product Module Category Combination. ");
+			} else {
+				valid = userRepository.updateCategory(category);
+				if (valid.getValid()) {
+					catList.setCategories(userRepository.getCategories(category.getCustomerId()));
+					catList.setValid(true);
+				} else {
+					catList.setValid(false);
+					catList.setValidityMessage("Category could not be edited. ");
+				}
+			}
+
+		} catch (Exception e) {
+			catList.setValid(false);
+			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+			catList.setValidityMessage(message + " Please contact server Administrator");
+			catList.setError(e.getMessage());
+			return catList;
+		}
+		return catList;
+	}
+
 	/**
 	 * 
 	 * @param args
