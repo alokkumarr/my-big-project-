@@ -10,8 +10,8 @@ describe('Analyses Tests', () => {
 
   it('should open the sidenav menu and go to first category', () => {
     sidenav.sidenavElements.menuBtn.click();
-    sidenav.sidenavElements.myAnalyses.click();
-    sidenav.sidenavElements.firstCategory.click();
+    sidenav.sidenavElements.cannedAnalysisCategoriesToggle.click();
+    sidenav.sidenavElements.firstCannedAnalysisCategory.click();
   });
 
   it('should display card view by default', () => {
@@ -23,11 +23,9 @@ describe('Analyses Tests', () => {
     analyze.validateNewAnalyze();
   });
 
-  it('should verify the first metric', () => {
-    analyze.analysisElems.firstMetric.click();
-    expect(analyze.analysisElems.secondMetric.getAttribute('aria-disabled')).toEqual('true');
-    analyze.analysisElems.firstMetric.click();
-    expect(analyze.analysisElems.secondMetric.getAttribute('aria-disabled')).toEqual('false');
+  it('should have the Report method enabled when selecting the last analysis', () => {
+    analyze.analysisElems.lastMetric.click();
+    expect(analyze.analysisElems.reportTable.getAttribute('disabled')).toEqual(null);
   });
 
   it('should select report type and proceed', () => {
@@ -54,7 +52,7 @@ describe('Analyses Tests', () => {
   });
 
   it('should attempt to save the report and fill the details', () => {
-    analyze.analysisElems.saveReportBtn.click();
+    analyze.analysisElems.saveAnalysisBtn.click();
     expect(analyze.analysisElems.reportCategory.getText()).toEqual('Order Fulfillment');
     analyze.analysisElems.reportNameField.clear().sendKeys('e2e report');
     analyze.analysisElems.reportDescriptionField.clear().sendKeys('e2e test description');
