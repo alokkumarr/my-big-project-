@@ -45,8 +45,6 @@ import static synchronoss.spark.drivers.rt.EventProcessingApplicationDriver.DM_S
  *
  */
 public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<String, String>>, Time> {
-    //JavaRDD<ConsumerRecord<String, String>>, Time,
-    //JavaRDD<ConsumerRecord<String, String>>> {
 
     private static final Logger logger = Logger.getLogger(ProcessRecords.class);
     private static final long serialVersionUID = -3110740581467891647L;
@@ -102,7 +100,6 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     }
     public void  call(
         JavaRDD<ConsumerRecord<String, String>> in, Time tm) throws Exception {
-
         if (!in.isEmpty()) {
             switch(dataModel.toLowerCase()){
                 case DM_GENERIC : {
@@ -133,7 +130,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
             }
         } //<-- if(!in.isEmpty())...
 
-        CommitOffsetts(in);
+        CommitOffsets(in, tm);
     }
 
     // We have to support time based indexes
@@ -262,19 +259,19 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
         return 0;
     }
 
-    private void CommitOffsetts(JavaRDD<ConsumerRecord<String, String>> rdd) {
+    private void CommitOffsets(JavaRDD<ConsumerRecord<String, String>> rdd, Time tm) {
         if(rdd.rdd() instanceof HasOffsetRanges) {
             OffsetRange[] offsetRanges = ((HasOffsetRanges)rdd.rdd()).offsetRanges();
             boolean commit = false;
             for(OffsetRange o : offsetRanges) {
                 if(o.fromOffset() < o.untilOffset()) {
-                    System.out.println(o.topic() + " " + o.partition()
-                                       + " " + o.fromOffset() + " " + o.untilOffset());
+                    logger.info("Batch Time: " + tm + ". Updated offsets : " + o.topic() + ", part. : " + o.partition()
+                                       + " [ from: " + o.fromOffset() + "; until: " + o.untilOffset() + "]");
                     commit = true;
                 }
             }
             if(commit) {
-                System.out.println("Storing offsets");
+                logger.info("Committing new offsets.");
                 ((CanCommitOffsets)inStream.inputDStream()).commitAsync(offsetRanges);
             }
         }
