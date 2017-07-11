@@ -1,5 +1,6 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import get from 'lodash/get';
+import clone from 'lodash/clone';
 
 import {Events} from '../../consts';
 
@@ -126,6 +127,14 @@ export const AnalyzePublishedDetailComponent = {
           this.analyses = analyses;
           this.loadLastPublishedAnalysis();
         });
+    }
+
+    fork() {
+      this._AnalyzeActionsService.fork(clone(this.analysis));
+    }
+
+    edit() {
+      this._AnalyzeActionsService.edit(clone(this.analysis));
     }
 
     publish() {
