@@ -18,9 +18,20 @@
 
       <div>
 
+        <md-button ng-hide="!$ctrl.canUserEdit"
+            class="btn-link"
+            ng-click="$ctrl.publish()">
+          <span translate="EDIT"></span>
+        </md-button>
+        <md-button ng-hide="!$ctrl.canUserFork"
+                   class="btn-link"
+                   ng-click="$ctrl.publish()">
+          <span translate="FORK_AND_EDIT"></span>
+        </md-button>
+
         <analyze-actions-menu analysis="$ctrl.analysis"
                               ng-if="$ctrl.analysis"
-                              exclude="publish"
+                              exclude="publish-fork-edit"
                               on-successful-deletion="$ctrl.onSuccessfulDeletion(analysis)"
         ></analyze-actions-menu>
 
