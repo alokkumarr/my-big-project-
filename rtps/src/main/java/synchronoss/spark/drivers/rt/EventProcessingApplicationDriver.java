@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.spark.api.java.StorageLevels.MEMORY_AND_DISK_SER;
 
 /**
  * Created by asor0002 on 7/25/2016.
@@ -135,8 +134,6 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
                                           model, fieldDefinitions,
                                           esIndex, esConfig,
                                           outputPath, this.instanceName, outputType));
-            //.foreachRDD(new CommitOffsets(eventsStream));
-
         return jssc;
     }
 
