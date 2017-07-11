@@ -27,6 +27,8 @@ export const AnalyzePublishedDetailComponent = {
       this._JwtService = JwtService;
       this._executionId = $state.params.executionId;
       this.canUserPublish = false;
+      this.canUserFork = false;
+      this.canUserEdit = false;
       this.isPublished = false;
 
       this.requester = new BehaviorSubject({});
@@ -70,6 +72,12 @@ export const AnalyzePublishedDetailComponent = {
 
     setPrivileges() {
       this.canUserPublish = this._JwtService.hasPrivilege('PUBLISH', {
+        subCategoryId: this.analysis.categoryId
+      });
+      this.canUserFork = this._JwtService.hasPrivilege('FORK', {
+        subCategoryId: this.analysis.categoryId
+      });
+      this.canUserEdit = this._JwtService.hasPrivilege('EDIT', {
         subCategoryId: this.analysis.categoryId
       });
     }

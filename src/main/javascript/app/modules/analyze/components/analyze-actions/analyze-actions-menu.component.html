@@ -1,7 +1,8 @@
-<md-menu-bar>
+<md-menu-bar ng-show="$ctrl.actions.length">
   <md-menu>
     <md-button class="md-button btn-card" aria-label="More"
-                ng-click="$mdMenu.open()">
+                ng-click="$mdMenu.open()"
+                   style="min-width: 0; width: 30px;">
       <md-icon md-font-icon="icon-more"></md-icon>
     </md-button>
 
