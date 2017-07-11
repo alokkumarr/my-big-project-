@@ -26,6 +26,7 @@ describe('Report Analysis Tests', () => {
   it('should have the Report method enabled when selecting the last analysis', () => {
     analyze.analysisElems.lastMetric.click();
     expect(analyze.analysisElems.reportType.getAttribute('disabled')).toEqual(null);
+  });
 
   it('should select the Events metric', () => {
     analyze.analysisElems.eventsMetric.click();
