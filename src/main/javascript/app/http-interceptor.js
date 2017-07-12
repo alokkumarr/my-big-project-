@@ -1,3 +1,5 @@
+import get from 'lodash/get';
+
 export function interceptor($httpProvider) {
   'ngInject';
   /* eslint-disable */
@@ -13,7 +15,8 @@ export function interceptor($httpProvider) {
         const $translate = $injector.get('$translate');
 
         $translate(generalErrorMsgKey).then(generalErrorMsg => {
-          toastMessage.error(generalErrorMsg);
+          const msg = get(error, 'data.error.message') || get(error, 'data.message', generalErrorMsg);
+          toastMessage.error(msg || generalErrorMsg);
         });
 
         return $q.reject(error);
