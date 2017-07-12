@@ -1647,44 +1647,7 @@ public class UserRepositoryImpl implements UserRepository {
 	private void insertMyAnalysisPrivileges(RoleDetails role, Long roleId, Long custProdMod, Long custProd,
 			Long custProdModFeatr) {
 
-		String sql3 = "select PRIVILEGE_SYS_ID from privileges where ROLE_SYS_ID=?";
-		Boolean privExists = jdbcTemplate.query(sql3, new PreparedStatementSetter() {
-			public void setValues(PreparedStatement preparedStatement) throws SQLException {
-				preparedStatement.setLong(1, roleId);
-			}
-
-		}, new UserRepositoryImpl.PrivDetailExtractor());
-
-		if (privExists == null || !privExists) {
-
-			String sql5 = "INSERT INTO PRIVILEGES (CUST_PROD_SYS_ID, CUST_PROD_MOD_SYS_ID, "
-					+ "CUST_PROD_MOD_FEATURE_SYS_ID, ROLE_SYS_ID, ANALYSIS_SYS_ID, PRIVILEGE_CODE, PRIVILEGE_DESC, "
-					+ "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) "
-					+ " VALUES (?, ?, '0', ?, '0', '128', 'All', '1', sysdate(), ?) ";
-
-			jdbcTemplate.update(sql5, new PreparedStatementSetter() {
-				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setLong(1, custProd);
-					preparedStatement.setLong(2, custProdMod);
-					preparedStatement.setLong(3, roleId);
-					preparedStatement.setString(4, role.getMasterLoginId());
-				}
-			});
-
-			String sql6 = "INSERT INTO PRIVILEGES (CUST_PROD_SYS_ID, CUST_PROD_MOD_SYS_ID, "
-					+ "CUST_PROD_MOD_FEATURE_SYS_ID, ROLE_SYS_ID, ANALYSIS_SYS_ID, PRIVILEGE_CODE, PRIVILEGE_DESC, "
-					+ "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) "
-					+ "VALUES (?, '0', '0', ?, '0', '128', 'All', '1', sysdate(), ?)";
-
-			jdbcTemplate.update(sql6, new PreparedStatementSetter() {
-				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setLong(1, custProd);
-					preparedStatement.setLong(2, roleId);
-					preparedStatement.setString(3, role.getMasterLoginId());
-				}
-
-			});
-		}
+				
 		String sql4 = "INSERT INTO PRIVILEGES (CUST_PROD_SYS_ID, CUST_PROD_MOD_SYS_ID, "
 				+ "CUST_PROD_MOD_FEATURE_SYS_ID, ROLE_SYS_ID, ANALYSIS_SYS_ID, PRIVILEGE_CODE, PRIVILEGE_DESC, "
 				+ "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) VALUES ( ?, ?, ?, ?, '0', '128', 'All', '1', sysdate(), ?) ";
@@ -1871,14 +1834,14 @@ public class UserRepositoryImpl implements UserRepository {
 		ArrayList<PrivilegeDetails> privList = null;
 		String sql = "SELECT DISTINCT C.CUSTOMER_SYS_ID ,CP.CUST_PROD_SYS_ID, P.PRODUCT_NAME, CPMF.CUST_PROD_MOD_SYS_ID,"
 				+ "M.MODULE_NAME,CPMF.CUST_PROD_MOD_FEATURE_SYS_ID, CPMF.FEATURE_NAME,PV.PRIVILEGE_SYS_ID,PV.PRIVILEGE_DESC,"
-				+ "PV.PRIVILEGE_CODE,R.ROLE_NAME,R.ROLE_SYS_ID FROM USERS U INNER JOIN CUSTOMERS  C ON (C.CUSTOMER_SYS_ID=U.CUSTOMER_SYS_ID)"
+				+ "PV.PRIVILEGE_CODE,R.ROLE_NAME,R.ROLE_SYS_ID FROM CUSTOMERS  C"
 				+ " INNER JOIN CUSTOMER_PRODUCTS CP ON (CP.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID) INNER JOIN "
 				+ "CUSTOMER_PRODUCT_MODULES CPM ON (CPM.CUST_PROD_SYS_ID=CP.CUST_PROD_SYS_ID) INNER JOIN "
 				+ "CUSTOMER_PRODUCT_MODULE_FEATURES CPMF ON (CPMF.CUST_PROD_MOD_SYS_ID=CPM.CUST_PROD_MOD_SYS_ID) "
 				+ "INNER JOIN PRODUCTS P ON (P.PRODUCT_SYS_ID=CP.PRODUCT_SYS_ID) INNER JOIN PRODUCT_MODULES PM ON"
 				+ " (PM.PROD_MOD_SYS_ID=CPM.PROD_MOD_SYS_ID) INNER JOIN MODULES M ON(M.MODULE_SYS_ID=PM.MODULE_SYS_ID) "
 				+ "INNER JOIN `PRIVILEGES` PV ON (CPMF.CUST_PROD_MOD_FEATURE_SYS_ID=PV.CUST_PROD_MOD_FEATURE_SYS_ID)"
-				+ " INNER JOIN ROLES R ON(R.ROLE_SYS_ID=U.ROLE_SYS_ID AND R.ROLE_SYS_ID=PV.ROLE_SYS_ID) "
+				+ " INNER JOIN ROLES R ON(R.ROLE_SYS_ID=PV.ROLE_SYS_ID) "
 				+ "WHERE CPMF.ACTIVE_STATUS_IND = 1  AND P.ACTIVE_STATUS_IND = M.ACTIVE_STATUS_IND AND "
 				+ "CP.ACTIVE_STATUS_IND = PM.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND "
 				+ "AND CPM.ACTIVE_STATUS_IND = CPMF.ACTIVE_STATUS_IND AND R.ACTIVE_STATUS_IND = 1 AND C.CUSTOMER_SYS_ID = ? ";
