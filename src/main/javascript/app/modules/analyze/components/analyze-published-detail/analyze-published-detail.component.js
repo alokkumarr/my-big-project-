@@ -1,6 +1,5 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import get from 'lodash/get';
-import clone from 'lodash/clone';
 
 import {Events} from '../../consts';
 
@@ -13,7 +12,7 @@ export const AnalyzePublishedDetailComponent = {
   styles: [style],
   controller: class AnalyzePublishedDetailController extends AbstractComponentController {
     constructor($injector, AnalyzeService, $state, $rootScope, JwtService, $mdDialog,
-                $window, toastMessage, FilterService, AnalyzeActionsService) {
+                $window, toastMessage, FilterService, AnalyzeActionsService, $scope) {
       'ngInject';
       super($injector);
 
@@ -21,16 +20,20 @@ export const AnalyzePublishedDetailComponent = {
       this._AnalyzeActionsService = AnalyzeActionsService;
       this._$state = $state;
       this._$rootScope = $rootScope;
+      this._$scope = $scope;
       this._FilterService = FilterService;
       this._toastMessage = toastMessage;
       this._$window = $window; // used for going back from the template
       this._$mdDialog = $mdDialog;
       this._JwtService = JwtService;
       this._executionId = $state.params.executionId;
+      this._executionWatcher = null;
+      this._executionToast = null;
       this.canUserPublish = false;
       this.canUserFork = false;
       this.canUserEdit = false;
       this.isPublished = false;
+      this.isExecuting = false;
 
       this.requester = new BehaviorSubject({});
     }
@@ -49,6 +52,7 @@ export const AnalyzePublishedDetailComponent = {
 
       if (analysis) {
         this.analysis = analysis;
+        this.watchAnalysisExecution();
         this.setPrivileges();
         if (!this.analysis.schedule) {
           this.isPublished = false;
@@ -57,14 +61,61 @@ export const AnalyzePublishedDetailComponent = {
         this.loadExecutedAnalyses(analysisId);
       } else {
         this.loadAnalysisById(analysisId).then(() => {
+          this.watchAnalysisExecution();
           this.loadExecutionData();
           this.loadExecutedAnalyses(analysisId);
         });
       }
     }
 
+    watchAnalysisExecution() {
+      this.isExecuting = this._AnalyzeService.isExecuting(this.analysis.id);
+
+      this._executionWatcher = this._$scope.$watch(
+        () => this._AnalyzeService.isExecuting(this.analysis.id),
+        (newVal, prevVal) => {
+          if (newVal === prevVal) {
+            return;
+          }
+
+          this.isExecuting = newVal;
+
+          if (!newVal) {
+            this.refreshData();
+          }
+        }
+      );
+    }
+
     $onDestroy() {
       this._destroyHandler();
+      this._executionWatcher();
+
+      if (this._executionToast) {
+        this._toastMessage.clear(this._executionToast);
+      }
+    }
+
+    refreshData() {
+      const gotoLastPublished = () => {
+        this._$state.go('analyze.publishedDetail', {
+          analysisId: this.analysis.id,
+          analysis: this.analysis,
+          executionId: null
+        }, {reload: true});
+      };
+
+      if (this._executionToast) {
+        this._toastMessage.clear(this._executionToast);
+      }
+
+      this._executionToast = this._toastMessage.info('Tap to reload data.', 'Execution finished', {
+        timeOut: 0,
+        extendedTimeOut: 0,
+        closeButton: true,
+        tapToDismiss: true,
+        onTap: gotoLastPublished.bind(this)
+      });
     }
 
     executeAnalysis() {
@@ -81,10 +132,6 @@ export const AnalyzePublishedDetailComponent = {
       this.canUserEdit = this._JwtService.hasPrivilege('EDIT', {
         subCategoryId: this.analysis.categoryId
       });
-    }
-
-    showExecutingFlag() {
-      return this.analysis && this._AnalyzeService.isExecuting(this.analysis.id);
     }
 
     exportData() {
@@ -130,11 +177,11 @@ export const AnalyzePublishedDetailComponent = {
     }
 
     fork() {
-      this._AnalyzeActionsService.fork(clone(this.analysis));
+      this._AnalyzeActionsService.fork(this.analysis);
     }
 
     edit() {
-      this._AnalyzeActionsService.edit(clone(this.analysis));
+      this._AnalyzeActionsService.edit(this.analysis);
     }
 
     publish() {
