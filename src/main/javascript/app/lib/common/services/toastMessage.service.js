@@ -7,8 +7,13 @@ export function toastMessageService(toastr) {
   return {
     clear,
     error,
-    info
+    info,
+    success
   };
+
+  function success(msg, title, options) {
+    return toastr.success(msg, title, options);
+  }
 
   function info(msg, title, options) {
     return toastr.info(msg, title, options);

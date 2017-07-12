@@ -109,7 +109,7 @@ export const AnalyzePublishedDetailComponent = {
         this._toastMessage.clear(this._executionToast);
       }
 
-      this._executionToast = this._toastMessage.info('Tap to reload data.', 'Execution finished', {
+      this._executionToast = this._toastMessage.success('Tap this message to reload data.', 'Execution finished', {
         timeOut: 0,
         extendedTimeOut: 0,
         closeButton: true,
