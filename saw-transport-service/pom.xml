@@ -314,11 +314,13 @@
             <artifactId>netty-transport</artifactId>
             <version>${io.netty.version}</version>
         </dependency>
-        <dependency>
+<!--  
+       <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-transport-native-epoll</artifactId>
             <version>${io.netty.version}</version>
         </dependency>
+ -->    
         <dependency>
             <groupId>org.asynchttpclient</groupId>
             <artifactId>async-http-client</artifactId>

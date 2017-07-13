@@ -184,8 +184,11 @@
           },
           "type": "array"
         },
-        "groupBy": {
-          "id": "/properties/sqlBuilder/properties/sort/items",
+        "axesFields": {
+          "id": "/properties/sqlBuilder/properties/axesFields/items",
+          "items": 
+          {
+          "id": "/properties/sqlBuilder/properties/axesFields/items",
           "properties": {
             "columnName": {
               "id": "/properties/sqlBuilder/properties/sort/items/properties/columnName",
@@ -231,58 +234,14 @@
           ],
           "type": "object"
         },
-        "splitBy": {
-          "id": "/properties/sqlBuilder/properties/splitBy/items",
-          "properties": {
-            "columnName": {
-              "id": "/properties/sqlBuilder/properties/sort/items/properties/columnName",
-              "type": "string"
-            },
-            "type": {
-              "enum": [
-                "date",
-                "timestamp",
-                "long",
-                "double",
-                "integer",
-                "string",
-                "float"
-              ],
-              "id": "/properties/sqlBuilder/groupBy/properties/type",
-              "type": "string"
-            },
-            "tableName": {
-              "id": "/properties/sqlBuilder/groupBy/properties/tableName",
-              "type": "string"
-            },
-            "name": {
-              "id": "/properties/sqlBuilder/groupBy/properties/name",
-              "type": "string"
-            },
-            "groupInterval": {
-              "enum": [
-                "year",
-                "month",
-                "day",
-                "quarter",
-                "hour",
-                "week"
-              ],
-              "id": "/properties/sqlBuilder/properties/columnFields/items/properties/groupInterval",
-              "type": "string"
-            }
-          },
-          "required": [
-            "type",
-            "columnName"
-          ],
-          "type": "object"
+          "type" : "array"
         }
       },
       "required": [
         "sorts",
         "filters",
-        "dataFields"
+        "dataFields",
+        "axesFields"
       ]
     }
   },

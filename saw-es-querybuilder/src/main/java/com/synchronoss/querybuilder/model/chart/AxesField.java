@@ -15,54 +15,74 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "columnName",
-    "isRuntimeFilter",
-    "model",
+    "type",
     "tableName",
-    "type"
+    "name",
+    "groupInterval"
 })
-public class Filter {
+public class AxesField {
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("columnName")
     private String columnName;
-    @JsonProperty("isRuntimeFilter")
-    private Filter.IsRuntimeFilter isRuntimeFilter;
-    @JsonProperty("model")
-    private Model model;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("type")
+    private AxesField.Type type;
     @JsonProperty("tableName")
     private String tableName;
-    @JsonProperty("type")
-    private Filter.Type type;
+    @JsonProperty("name")
+    private String name;
+    @JsonProperty("groupInterval")
+    private AxesField.GroupInterval groupInterval;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("columnName")
     public String getColumnName() {
         return columnName;
     }
 
+    /**
+     * 
+     * (Required)
+     * 
+     */
     @JsonProperty("columnName")
     public void setColumnName(String columnName) {
         this.columnName = columnName;
     }
 
-    @JsonProperty("isRuntimeFilter")
-    public Filter.IsRuntimeFilter getIsRuntimeFilter() {
-        return isRuntimeFilter;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("type")
+    public AxesField.Type getType() {
+        return type;
     }
 
-    @JsonProperty("isRuntimeFilter")
-    public void setIsRuntimeFilter(Filter.IsRuntimeFilter isRuntimeFilter) {
-        this.isRuntimeFilter = isRuntimeFilter;
-    }
-
-    @JsonProperty("model")
-    public Model getModel() {
-        return model;
-    }
-
-    @JsonProperty("model")
-    public void setModel(Model model) {
-        this.model = model;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("type")
+    public void setType(AxesField.Type type) {
+        this.type = type;
     }
 
     @JsonProperty("tableName")
@@ -75,14 +95,24 @@ public class Filter {
         this.tableName = tableName;
     }
 
-    @JsonProperty("type")
-    public Filter.Type getType() {
-        return type;
+    @JsonProperty("name")
+    public String getName() {
+        return name;
     }
 
-    @JsonProperty("type")
-    public void setType(Filter.Type type) {
-        this.type = type;
+    @JsonProperty("name")
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @JsonProperty("groupInterval")
+    public AxesField.GroupInterval getGroupInterval() {
+        return groupInterval;
+    }
+
+    @JsonProperty("groupInterval")
+    public void setGroupInterval(AxesField.GroupInterval groupInterval) {
+        this.groupInterval = groupInterval;
     }
 
     @JsonAnyGetter
@@ -95,33 +125,42 @@ public class Filter {
         this.additionalProperties.put(name, value);
     }
 
-    public enum IsRuntimeFilter {
+    public enum GroupInterval {
 
-        FALSE(false),
-        TRUE(true);
-        private final Boolean value;
-        private final static Map<Boolean, Filter.IsRuntimeFilter> CONSTANTS = new HashMap<Boolean, Filter.IsRuntimeFilter>();
+        YEAR("year"),
+        MONTH("month"),
+        DAY("day"),
+        QUARTER("quarter"),
+        HOUR("hour"),
+        WEEK("week");
+        private final String value;
+        private final static Map<String, AxesField.GroupInterval> CONSTANTS = new HashMap<String, AxesField.GroupInterval>();
 
         static {
-            for (Filter.IsRuntimeFilter c: values()) {
+            for (AxesField.GroupInterval c: values()) {
                 CONSTANTS.put(c.value, c);
             }
         }
 
-        private IsRuntimeFilter(Boolean value) {
+        private GroupInterval(String value) {
             this.value = value;
         }
 
+        @Override
+        public String toString() {
+            return this.value;
+        }
+
         @JsonValue
-        public Boolean value() {
+        public String value() {
             return this.value;
         }
 
         @JsonCreator
-        public static Filter.IsRuntimeFilter fromValue(Boolean value) {
-            Filter.IsRuntimeFilter constant = CONSTANTS.get(value);
+        public static AxesField.GroupInterval fromValue(String value) {
+            AxesField.GroupInterval constant = CONSTANTS.get(value);
             if (constant == null) {
-                throw new IllegalArgumentException((value +""));
+                throw new IllegalArgumentException(value);
             } else {
                 return constant;
             }
@@ -131,18 +170,18 @@ public class Filter {
 
     public enum Type {
 
-        LONG("long"),
-        STRING("string"),
-        INT("integer"),
-        DOUBLE("double"),
         DATE("date"),
         TIMESTAMP("timestamp"),
+        LONG("long"),
+        DOUBLE("double"),
+        INTEGER("integer"),
+        STRING("string"),
         FLOAT("float");
         private final String value;
-        private final static Map<String, Filter.Type> CONSTANTS = new HashMap<String, Filter.Type>();
+        private final static Map<String, AxesField.Type> CONSTANTS = new HashMap<String, AxesField.Type>();
 
         static {
-            for (Filter.Type c: values()) {
+            for (AxesField.Type c: values()) {
                 CONSTANTS.put(c.value, c);
             }
         }
@@ -162,8 +201,8 @@ public class Filter {
         }
 
         @JsonCreator
-        public static Filter.Type fromValue(String value) {
-            Filter.Type constant = CONSTANTS.get(value);
+        public static AxesField.Type fromValue(String value) {
+            AxesField.Type constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {

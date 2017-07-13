@@ -19,8 +19,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
     "booleanCriteria",
     "filters",
     "sorts",
-    "groupBy",
-    "splitBy"
+    "axesFields"
 })
 public class SqlBuilder {
 
@@ -47,10 +46,13 @@ public class SqlBuilder {
      */
     @JsonProperty("sorts")
     private List<Sort> sorts = null;
-    @JsonProperty("groupBy")
-    private GroupBy groupBy;
-    @JsonProperty("splitBy")
-    private SplitBy splitBy;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("axesFields")
+    private List<AxesField> axesFields = null;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -124,24 +126,24 @@ public class SqlBuilder {
         this.sorts = sorts;
     }
 
-    @JsonProperty("groupBy")
-    public GroupBy getGroupBy() {
-        return groupBy;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("axesFields")
+    public List<AxesField> getAxesFields() {
+        return axesFields;
     }
 
-    @JsonProperty("groupBy")
-    public void setGroupBy(GroupBy groupBy) {
-        this.groupBy = groupBy;
-    }
-
-    @JsonProperty("splitBy")
-    public SplitBy getSplitBy() {
-        return splitBy;
-    }
-
-    @JsonProperty("splitBy")
-    public void setSplitBy(SplitBy splitBy) {
-        this.splitBy = splitBy;
+    /**
+     * 
+     * (Required)
+     * 
+     */
+    @JsonProperty("axesFields")
+    public void setAxesFields(List<AxesField> axesFields) {
+        this.axesFields = axesFields;
     }
 
     @JsonAnyGetter
