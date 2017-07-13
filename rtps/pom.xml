@@ -65,6 +65,7 @@
               <goal>shade</goal>
             </goals>
             <configuration>
+              <finalName>${app.nameVer}</finalName>
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
               </transformers>
@@ -129,7 +130,7 @@
               <groupname>${app.group}</groupname>
               <sources>
                 <source>
-                  <location>target/${project.artifactId}-${project.version}.jar</location>
+                  <location>target/${app.nameVer}.jar</location>
                 </source>
               </sources>
             </mapping>
