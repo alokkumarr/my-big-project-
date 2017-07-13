@@ -1647,7 +1647,44 @@ public class UserRepositoryImpl implements UserRepository {
 	private void insertMyAnalysisPrivileges(RoleDetails role, Long roleId, Long custProdMod, Long custProd,
 			Long custProdModFeatr) {
 
-				
+		String sql3 = "select PRIVILEGE_SYS_ID from privileges where ROLE_SYS_ID=?";
+		Boolean privExists = jdbcTemplate.query(sql3, new PreparedStatementSetter() {
+			public void setValues(PreparedStatement preparedStatement) throws SQLException {
+				preparedStatement.setLong(1, roleId);
+			}
+
+		}, new UserRepositoryImpl.PrivDetailExtractor());
+
+		if (privExists == null || !privExists) {
+
+			String sql5 = "INSERT INTO PRIVILEGES (CUST_PROD_SYS_ID, CUST_PROD_MOD_SYS_ID, "
+					+ "CUST_PROD_MOD_FEATURE_SYS_ID, ROLE_SYS_ID, ANALYSIS_SYS_ID, PRIVILEGE_CODE, PRIVILEGE_DESC, "
+					+ "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) "
+					+ " VALUES (?, ?, '0', ?, '0', '128', 'All', '1', sysdate(), ?) ";
+
+			jdbcTemplate.update(sql5, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setLong(1, custProd);
+					preparedStatement.setLong(2, custProdMod);
+					preparedStatement.setLong(3, roleId);
+					preparedStatement.setString(4, role.getMasterLoginId());
+				}
+			});
+
+			String sql6 = "INSERT INTO PRIVILEGES (CUST_PROD_SYS_ID, CUST_PROD_MOD_SYS_ID, "
+					+ "CUST_PROD_MOD_FEATURE_SYS_ID, ROLE_SYS_ID, ANALYSIS_SYS_ID, PRIVILEGE_CODE, PRIVILEGE_DESC, "
+					+ "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) "
+					+ "VALUES (?, '0', '0', ?, '0', '128', 'All', '1', sysdate(), ?)";
+
+			jdbcTemplate.update(sql6, new PreparedStatementSetter() {
+				public void setValues(PreparedStatement preparedStatement) throws SQLException {
+					preparedStatement.setLong(1, custProd);
+					preparedStatement.setLong(2, roleId);
+					preparedStatement.setString(3, role.getMasterLoginId());
+				}
+
+			});
+		}
 		String sql4 = "INSERT INTO PRIVILEGES (CUST_PROD_SYS_ID, CUST_PROD_MOD_SYS_ID, "
 				+ "CUST_PROD_MOD_FEATURE_SYS_ID, ROLE_SYS_ID, ANALYSIS_SYS_ID, PRIVILEGE_CODE, PRIVILEGE_DESC, "
 				+ "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) VALUES ( ?, ?, ?, ?, '0', '128', 'All', '1', sysdate(), ?) ";
@@ -1803,7 +1840,7 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public boolean checkPrivExists(Long roleId) {
 		Boolean privExists;
-		String sql1 = "SELECT * FROM PRIVILEGES " + " WHERE ROLE_SYS_ID = ?";
+		String sql1 = "SELECT * FROM PRIVILEGES " + " WHERE ROLE_SYS_ID = ? AND CUST_PROD_MOD_FEATURE_SYS_ID != 0";
 		try {
 			privExists = jdbcTemplate.query(sql1, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {

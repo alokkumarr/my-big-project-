@@ -877,7 +877,7 @@ public class SecurityController {
 					roleList.setValidityMessage("Role could not be deleted as User(s) exists in this role.");
 				} else if (userRepository.checkPrivExists(deleteRole.getRoleId())) {
 						roleList.setValid(false);
-						roleList.setValidityMessage("Role could not be deleted as Privileges(s) exists for this role or You are not authorized to delete.");				
+						roleList.setValidityMessage("Role could not be deleted as Privileges(s) exists for this role");				
 				}
 				
 				if (roleList.getValid()) {
