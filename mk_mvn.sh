@@ -1,6 +1,7 @@
 #!/bin/bash
 
-VERSION=1.2.0622
+VERSION=1.3.0626
+# 0626 fix git HEAD for empty repository
 
 # This script calculates product release number and
 # executes mvn with -Dprod.release=<release_number argument>
@@ -26,20 +27,28 @@ else
     set -- clean package
 fi
 
+# Empty if there is no object in repository
+git_head=$( git rev-parse --short=5 HEAD -- . 2>/dev/null )
+
+# Calculate bnum if not given
 [[ $bnum ]] || {
-    last_tag=$( git for-each-ref --count=1 --sort='-*authordate' --format='%(tag)' )
-    if [[ $last_tag ]] ; then
-        bnum=$( git rev-list --count HEAD ^$last_tag )
-    else
-        bnum=$( git rev-list --count HEAD )
-    fi
+    [[ $git_head ]] && {
+        last_tag=$( git for-each-ref --count=1 --sort='-*authordate' --format='%(tag)' )
+        if [[ $last_tag ]] ; then
+            bnum=$( git rev-list --count HEAD ^$last_tag )
+        else
+            bnum=$( git rev-list --count HEAD )
+        fi
+    }
 }
 
-# provide value if bnum still empty
+# provide values if still empty
+[[ $git_head ]] || git_head=00000
 [[ $bnum ]] || {
     btyp='u' # unknown
     bnum='999'
 }
+
 
 # Check dirty files in git directory
 # add w<day-of-year>.<min-of-day>
@@ -52,7 +61,7 @@ wnum=
 
 # RPM release number:
 # ( b<BAMBOO_BUILD> / c<COMMIT_COUNT> / u999 )_g<HEAD_HASH>[ _w<DAY_OF_YEAR>.<MIN_OF_DAY> ]
-rpm_release=${btyp}${bnum}_g$( git rev-parse --short=5 HEAD )${wnum:-}
+rpm_release=${btyp}${bnum}_g${git_head}${wnum:-}
 
 mvn_cmd=( mvn -Dprod.release=${rpm_release} "$@" )
 
