@@ -154,7 +154,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
   function getPublishedAnalysesByAnalysisId(id) {
     return $http.get(`${url}/analysis/${id}/executions`)
       .then(fpGet(`data.executions`))
-      .then(fpSortBy([obj => -Date.parse(obj.finished)]));
+      .then(fpSortBy([obj => -obj.finished]));
   }
 
   function getExecutionData(analysisId, executionId) {

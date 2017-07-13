@@ -34,14 +34,14 @@ export function MenuService($q, JwtService) {
     deferred.resolve(map(module.prodModFeature, feature => {
       const obj = {
         id: feature.prodModFeatureID,
-        name: feature.prodModFeatureDesc || feature.prodModFeatureName,
+        name: feature.prodModFeatureName || feature.prodModFeatureDesc,
         data: feature
       };
 
       obj.children = map(feature.productModuleSubFeatures, subfeature => {
         return {
           id: subfeature.prodModFeatureID,
-          name: subfeature.prodModFeatureDesc || subfeature.prodModFeatureName,
+          name: subfeature.prodModFeatureName || subfeature.prodModFeatureDesc,
           url: `#!/${moduleName.toLowerCase()}/${subfeature.prodModFeatureID}`,
           data: subfeature
         };

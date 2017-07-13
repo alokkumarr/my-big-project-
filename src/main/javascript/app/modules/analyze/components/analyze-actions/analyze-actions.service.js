@@ -1,4 +1,5 @@
 import defaultsDeep from 'lodash/defaultsDeep';
+import clone from 'lodash/clone';
 
 import {AnalyseTypes} from '../../consts';
 
@@ -22,16 +23,17 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
   }
 
   function fork(analysis) {
-    analysis.name += ' Copy';
-    openEditModal(analysis, 'fork');
+    const model = clone(analysis);
+    model.name += ' Copy';
+    openEditModal(model, 'fork');
   }
 
   function edit(analysis) {
-    openEditModal(analysis, 'edit');
+    openEditModal(clone(analysis), 'edit');
   }
 
   function publish(analysis) {
-    return openPublishModal(analysis);
+    return openPublishModal(clone(analysis));
   }
 
   function print() {

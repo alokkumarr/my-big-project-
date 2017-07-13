@@ -10,14 +10,13 @@
         <div style="margin-left: 16px;" flex>
           <div class="md-headline">
             <span ng-bind="$ctrl.analysis.name"></span>
-            <label ng-if="$ctrl.showExecutingFlag()" translate="STATUS_EXECUTING"></label>
+            <label ng-if="$ctrl.isExecuting" translate="STATUS_EXECUTING"></label>
           </div>
           <div class="md-subhead" ng-bind="$ctrl.analysis.metrics"></div>
         </div>
       </div>
 
       <div>
-
         <md-button ng-hide="!$ctrl.canUserEdit"
             class="btn-link"
             ng-click="$ctrl.edit()">
