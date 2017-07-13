@@ -49,6 +49,8 @@ export const ReportGridComponent = {
 
     setListenersOnColumnHeaders() {
       /* eslint-disable angular/angularelement */
+      // the devextreme data-grid, has no public events to lsiten for the reordering of columns
+      // so the listeners have to be manually put in
       this._$timeout(() => {
         const cssSelector = `div.report-dx-grid[data-grid-identifier="${this.gridIdentifier}"] td[role="columnheader"]`;
         const columnHeaders = Array.from($(cssSelector));
