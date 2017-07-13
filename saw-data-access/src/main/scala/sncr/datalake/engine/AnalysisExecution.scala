@@ -5,7 +5,8 @@ import org.slf4j.{Logger, LoggerFactory}
 import sncr.datalake.engine.ExecutionStatus.ExecutionStatus
 import sncr.datalake.engine.ExecutionType.ExecutionType
 import sncr.datalake.handlers.AnalysisNodeExecutionHelper
-import sncr.metadata.analysis.AnalysisNode
+import sncr.metadata.analysis.{AnalysisNode, AnalysisResult}
+import org.json4s.JsonAST.JValue
 import sncr.metadata.engine.ProcessingResult
 
 import scala.concurrent.Future
@@ -19,7 +20,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
 
   protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisExecution].getName)
 
-
+  def getAnalysisExecutionResultNode : AnalysisResult = analysisNodeExecution.resultNode
   protected var analysisNodeExecution : AnalysisNodeExecutionHelper = null
   protected var id : String = null
   protected var executionMessage : String = null
@@ -146,7 +147,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
     AnalysisNodeExecutionHelper.loadAnalysisResult(id)
   }
 
-
+  def loadESExecutionData(anres: AnalysisResult) : JValue  = AnalysisNodeExecutionHelper.loadESAnalysisResult(anres)
 }
 
 

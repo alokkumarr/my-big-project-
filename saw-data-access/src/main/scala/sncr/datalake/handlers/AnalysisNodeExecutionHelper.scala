@@ -17,8 +17,8 @@ import sncr.datalake.exceptions.{DAException, ErrorCodes}
 import sncr.datalake.{DLConfiguration, DLSession}
 import sncr.metadata.analysis.{AnalysisNode, AnalysisResult}
 import sncr.metadata.datalake.DataObject
-import sncr.metadata.engine.Fields
-import sncr.metadata.engine.MDObjectStruct._
+import sncr.metadata.engine.{Fields, MDObjectStruct}
+
 import sncr.saw.common.config.SAWServiceConfig
 /**
   * Created by srya0001 on 5/18/2017.
@@ -343,6 +343,32 @@ object AnalysisNodeExecutionHelper{
     }
     else null
   }
+  def loadESAnalysisResult(anres: AnalysisResult): JValue =
+  {
+    val resultNodeDescriptor = anres.getCachedData(MDObjectStruct.key_Definition.toString)
+    val d_type = (resultNodeDescriptor.asInstanceOf[JValue] \ "type").extractOpt[String];
+    val od = anres.getObjectDescriptors
+    if (od.isEmpty)
+    {
+      m_log debug s"Nothing to load, return null"
+      return null
+    }
+    val onlyKey = od.keysIterator.next()
+    if (d_type.get == "chart" || d_type.get == "pivot") {
+        val onlyKey = od.keysIterator.next()
+        val rawdata = anres.getObject(onlyKey)
 
+        if (rawdata.isDefined) {
+          od(onlyKey) match {
+            case "json" => rawdata.get.asInstanceOf[JValue]
+          }
+        }
+        else {
+          throw  new Exception("No data found!!")
+        }
+ }
+    else
+      throw  new Exception("Incorrect call the method should be called only for ES data")
+  }
 
 }
