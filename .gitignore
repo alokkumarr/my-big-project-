@@ -1,16 +1,16 @@
 # ignore directories
 out/
-symbols/
+lib/
+log/
 wrk/
 target/
-
-# ignore all files starting with _
-_*
+_*/
 
 # ignore all files ending with ~
 *~
+_*
 
-# ignore all others
+# other files to ignore
 .classpath
 .project
 .cache
@@ -24,7 +24,7 @@ _*
 .last*
 
 *.iml
-Makefile
 pom.xml.versionsBackup
-mvn*.log
-*.sublime*
+dependency-reduced-pom.xml
+
+*.sublime-*

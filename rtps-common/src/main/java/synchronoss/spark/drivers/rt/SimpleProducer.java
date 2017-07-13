@@ -24,12 +24,13 @@ public class SimpleProducer {
         System.out.println("Sending message to stream...");
         configureProducer();
         topic = args[0];
-        String messageText = args[1];
+        numMessages = Integer.parseInt(args[1]);
+        String messageText = args[2];
 
         System.out.println(messageText);
         ProducerRecord<String, String> rec = new ProducerRecord<String, String>(topic, messageText);
         // Send the record to the producer client library.
-        producer.send(rec);
+        for(int i = 0; i < numMessages;i++) producer.send(rec);
 
         producer.close();
         System.out.println("Done");

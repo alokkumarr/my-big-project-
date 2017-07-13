@@ -79,6 +79,7 @@ public class AppMonitoringInfo {
             // Should be local FS, not HDFS
             FileSystem fs = FileSystem.getLocal(fsConf);
             // Will return false if file doesn't exists
+            logger.debug("Checking for stop file : " + fullPath);
             return fs.deleteOnExit(new Path(fullPath));
         } catch(Exception e){
             logger.error(e.getMessage());

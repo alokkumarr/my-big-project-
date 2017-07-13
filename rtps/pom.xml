@@ -15,8 +15,8 @@
         <app.name>rtps</app.name>
         <app.verRel>${rpm.version}-${rpm.release}</app.verRel>
         <app.nameVer>${app.name}-${app.verRel}</app.nameVer>
-        <app.optDir>/opt/bda/${app.nameVer}</app.optDir>
-        <app.varDir>/var/bda/${app.name}</app.varDir>
+        <app.optDir>/dfs/opt/bda/xdf/${app.nameVer}</app.optDir>
+        <app.varDir>/dfs/var/bda/${app.name}</app.varDir>
         <app.user>mapr</app.user>
         <app.group>mapr</app.group>
     </properties>
@@ -41,52 +41,49 @@
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.5.5</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>synchronoss.spark.drivers.rt.CrashReportStreamingDriver</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>rtps-app</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <tarLongFileMode>posix</tarLongFileMode>
-                            <outputDirectory>${output.directory}</outputDirectory>
-                            <descriptors>
-                                <descriptor>src/main/assembly/event-processing-app-assembly.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven.compile.version}</version>
+        <executions>
+          <execution>
+            <id>compile</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <verbose>true</verbose>
+          <fork>true</fork>
+          <compilerVersion>${maven.compiler.version}</compilerVersion>
+          <source>${maven.compiler.version}</source>
+          <target>${maven.compiler.version}</target>
+          <encoding>UTF-8</encoding>
+          <compilerArgument>-Xlint:all</compilerArgument>
+          <showWarnings>true</showWarnings>
+          <showDeprecation>true</showDeprecation>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.4.3</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
             <!-- RPM plugin -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -119,12 +116,12 @@
                             <groupname>${app.group}</groupname>
                             <sources>
                                 <source>
-                                    <location>target/${project.artifactId}-${project.version}-package/${project.artifactId}-${project.version}/lib</location>
+                                    <location>target/${project.artifactId}-${project.version}.jar</location>
                                 </source>
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>${app.optDir}/sbin</directory>
+                            <directory>${app.optDir}/bin</directory>
                             <filemode>750</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>

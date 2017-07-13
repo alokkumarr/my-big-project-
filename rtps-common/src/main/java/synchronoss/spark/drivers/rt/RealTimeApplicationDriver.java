@@ -30,10 +30,10 @@ public class RealTimeApplicationDriver {
     private String mandatorySettings[][] = {
         //Obsolete:  {"spark.checkpoint.path", "Spark checkpoint path is not configured (%s). Please correct configuration file."},
             {"spark.app.name", "Application name is not configured (%s). Please correct configuration file."},
-            //{"spark.app.id", "Application instance id is not configured (%s). Please correct configuration file."},
+            //Obsolete: {"spark.app.id", "Application instance id is not configured (%s). Please correct configuration file."},
             {"monitoring.controlfile.path", "Path to control file is not configured (%s). Please correct configuration file."},
-            {"monitoring.interval", "Monitoring interval is not configured (%s). Please correct configuration file."},
-            {"monitoring.idle.threshold", "Idle threshold is not configured (%s). Please correct configuration file."}
+            {"monitoring.interval", "Monitoring interval is not configured (%s). Please correct configuration file."}
+            //Obsolete: {"monitoring.idle.threshold", "Idle threshold is not configured (%s). Please correct configuration file."}
     };
 
     protected void run(String configurationFilePath) {
@@ -54,24 +54,7 @@ public class RealTimeApplicationDriver {
         instanceName = appName; // + "." + instanceId;
         String controlFilePath = appConfig.getString("monitoring.controlfile.path");
         long interval = appConfig.getLong("monitoring.interval");
-        int idleThreshold = appConfig.getInt("monitoring.idle.threshold");
-        //Obsolete: String sparkMaster = appConfig.getString("spark.master");
-
-        // Setup spark master using system properties
-        // This way when checkpoint exists we still able to connect to master host defined in configuration file
-        // without using SparkConfig (ignored by checkpoint loader)
-        // If checkpoint doesn't exists master will be set through SparkConf
-        //Obsolete: logger.info("Spark connection string: " + sparkMaster);
-        //Obsolete: Properties props = System.getProperties();
-        //Obsolete: props.setProperty("spark.master", sparkMaster);
-
-        // Retrieve check point path from configuration
-        //Obsolete: String checkpointDirectory = appConfig.getString("spark.checkpoint.path");
-
-        // Initialize Spark context from scratch
-        // This function will be executed if checkpoint information
-        // is not available
-        //Obsolete: Function0<JavaStreamingContext> createContextFunc = () -> createContext(instanceName, appConfig);
+        //int idleThreshold = appConfig.getInt("monitoring.idle.threshold");
 
         // Create Streaming context
         // If checkpoint information is found in the FS - application state will be restored
@@ -87,7 +70,7 @@ public class RealTimeApplicationDriver {
                 System.exit(-1);
             }
             // Set callbacks for bacth processing
-            RealTimeBatchListener batchListener = new RealTimeBatchListener(idleThreshold);
+            RealTimeBatchListener batchListener = new RealTimeBatchListener();
             jssc.addStreamingListener(batchListener );
             // Start streaming application
             jssc.start();
@@ -95,7 +78,7 @@ public class RealTimeApplicationDriver {
                 // Setup monitoring interval
                 long timeout = 1000 * 60 * interval;
                 // Monitor execution flow
-                monitor(jssc, batchListener, timeout, instanceName, controlFilePath);
+                monitor(jssc, timeout, instanceName, controlFilePath);
                 exit_code = 0;
             } catch (Exception e) {
                 logger.error(e.getMessage());
@@ -116,17 +99,15 @@ public class RealTimeApplicationDriver {
         return null;
     }
 
-    protected void monitor(JavaStreamingContext jssc, RealTimeBatchListener batchListener, long timeout,
+    protected void monitor(JavaStreamingContext jssc, long timeout,
                            String instanceName, String controlFilePath) throws Exception {
         logger.info("Staring application loop...");
+        logger.info("Control file will be created created: " + controlFilePath);
         while (!jssc.awaitTerminationOrTimeout(timeout)) {
             // Check if shutdown request has been placed
-            if(batchListener.isIdleApplication() && AppMonitoringInfo.checkForShutdown(controlFilePath, instanceName)){
-                // Not very graceful, but it looks like we can not use jssc.stop(boolean, boolean)
-                // since this command will destroy integrity with checkpoint information and we will loose
-                // stream/queue offsets and some other important execution information
-                // So we just simulate hard stop with proper exit code
+            if(AppMonitoringInfo.checkForShutdown(controlFilePath, instanceName)){
                 logger.info(String.format("Found shutdown request for %s at %s - exiting.", instanceName, controlFilePath));
+                jssc.stop(true, true);
                 System.exit(0);
             }
         }

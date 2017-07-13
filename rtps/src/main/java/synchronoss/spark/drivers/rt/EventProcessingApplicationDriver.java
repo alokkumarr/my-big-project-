@@ -81,7 +81,6 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
         // Hardcoded Spark parameters - we don't want them to be overwritten in configuration in any case
         sparkConf.set("spark.app.name", instanceName);
 
-
         // MapR Streams configuration parameters
         HashMap<String, Object> kafkaParams = new HashMap<>();
         // !!!!!!!!!!!!! NEED CLEANUP !!!!!!!!!!!!!!!!!!!
@@ -90,7 +89,7 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
         // Setup MapR kafka consumer
         String topic = appConfig.getString("streams.topic");
         List<String> topics = Arrays.asList(topic);
-        System.out.println("================ Stream : " + topics);
+        logger.info("Connection to stream : " + topics);
 
         // We have to modify/enforce some kafka parameters
         fixKafkaParams(kafkaParams);
@@ -141,7 +140,6 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
             {"maprfs.path", "Output Storage not configured. Please specify value for maprfs.path in configuration file"},
             {"fields.model", "Data model not specified. Please specify value for fields.model in configuration file. Valid values are 'generic' or 'countly'"},
             {"streams.topic", "Input stream/topic not configured. Please specify value for streams.topic in configuration file"},
-            //{"spark.checkpoint.path", "Spark checkpoint location path not configured."},
             {"spark.batch.interval", "Spark bath interval not configured"}
     };
 

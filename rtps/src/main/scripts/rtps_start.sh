@@ -54,7 +54,7 @@ JAR=$( set -- $RTPS_HOME/lib/bda-rt-event-processing-*.jar ; echo $1 )
 CONF_OPT="spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$RTPS_HOME/conf/log4j.properties"
 
 # Application log
-log=/var/bda/$APPL_NAME/log/$APPL_INST.log
+log=/dfs/var/bda/$APPL_NAME/log/$APPL_INST.log
 rotate_log ()
 {
     log=$1;
@@ -74,8 +74,6 @@ rotate_log "$log"
 # -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -Dcom.sun.management.jmxremote
 
 CONF=$APPL_HOME/conf/$APPL_INST.conf
-# Validate checkpoint.path parent directory exists
-( cd /var/bda/rtps/cpt ) || exit
 
 MAIN_CLASS=synchronoss.spark.drivers.rt.EventProcessingApplicationDriver
 

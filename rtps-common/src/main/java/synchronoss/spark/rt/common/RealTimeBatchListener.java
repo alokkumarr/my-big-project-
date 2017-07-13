@@ -14,11 +14,11 @@ import java.util.Date;
 public class RealTimeBatchListener implements StreamingListener {
     private static final Logger logger = Logger.getLogger(RealTimeBatchListener.class);
     private int numberOfEmptyBatches;
-    private int idleThreshold;
+    //private int idleThreshold;
     private boolean idle = false;
 
-    public RealTimeBatchListener(int idleThreshold) {
-        this.idleThreshold = idleThreshold;
+    public RealTimeBatchListener() {
+      //  this.idleThreshold = idleThreshold;
         numberOfEmptyBatches = 0;
     }
 
@@ -39,12 +39,12 @@ public class RealTimeBatchListener implements StreamingListener {
         } else {
             // Count number of empty batches to set idle status
             numberOfEmptyBatches++;
-            if(numberOfEmptyBatches >= idleThreshold) {
-                idle = true;
-            }
-            if(numberOfEmptyBatches == idleThreshold ){
-                logger.info("Application is idle.");
-            }
+            //if(numberOfEmptyBatches >= idleThreshold) {
+            //    idle = true;
+            //}
+            //if(numberOfEmptyBatches == idleThreshold ){
+            //    logger.info("Application is idle.");
+            //}
         }
     }
 
