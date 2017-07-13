@@ -9,7 +9,6 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
@@ -184,71 +183,21 @@ class SAWChartTypeElasticSearchQueryBuilder {
       }
       searchSourceBuilder.query(boolQueryBuilder);
     }
-
-    com.synchronoss.querybuilder.model.chart.GroupBy groupBy = sqlBuilderNode.getGroupBy();
-    com.synchronoss.querybuilder.model.chart.SplitBy splitBy = sqlBuilderNode.getSplitBy();
-    List<com.synchronoss.querybuilder.model.chart.DataField> dataFields =
-        sqlBuilderNode.getDataFields();
-
-
-
-    // Use case I: The below block is only when groupBy is available
-    if (groupBy != null) {
-      if (splitBy == null && dataFields.isEmpty()) {
-        searchSourceBuilder =
-            searchSourceBuilder.query(boolQueryBuilder).aggregation(
-                AggregationBuilders.terms("group_by").field(groupBy.getColumnName()));
+    List<com.synchronoss.querybuilder.model.chart.AxesField>  axesFields = sqlBuilderNode.getAxesFields();
+    List<com.synchronoss.querybuilder.model.chart.DataField> dataFields =  sqlBuilderNode.getDataFields();
+    if (axesFields != null && dataFields !=null)
+    {
+      if (!axesFields.isEmpty() && axesFields.size() <=3){
+      searchSourceBuilder = AxesFieldDataFieldsAvailable.rowDataFieldsAvailable
+          (axesFields, dataFields, searchSourceBuilder, boolQueryBuilder);
       }
-    }
-
-    // Use case II: The below block is only when groupBy is available & columnBy is available
-    if (groupBy != null && splitBy != null) {
-      if (dataFields.isEmpty()) {
-        searchSourceBuilder =
-            searchSourceBuilder.query(boolQueryBuilder).aggregation(
-                AggregationBuilders.terms("group_by").field(groupBy.getColumnName())
-                    .subAggregation(QueryBuilderUtil.aggregationBuilderChart(splitBy)));
+      else {
+        
+          throw new IllegalArgumentException("Charts cannot have more than three axes");
       }
-    }
-
-
-    // Use case III: The below block is only when groupBy, splitBy are available
-
-    if (groupBy != null && splitBy != null) {
-      if (!(dataFields.isEmpty())) {
-        searchSourceBuilder =
-            AllFieldsAvailableChart.allFieldsAvailable(groupBy, splitBy, dataFields,
-                searchSourceBuilder, boolQueryBuilder);
-      }
-    }
-
-    // Use case IV: The below block is only when splitBy are available
-
-    if (splitBy != null) {
-      if (groupBy == null && dataFields.isEmpty()) {
-        searchSourceBuilder =
-            searchSourceBuilder.query(boolQueryBuilder).aggregation(
-                QueryBuilderUtil.aggregationBuilderChart(splitBy));
-      }
-    }
-
-    // Use case V: The below block is only when splitBy & dataField are available
-    if (splitBy != null) {
-      if (groupBy == null && !(dataFields.isEmpty())) {
-        searchSourceBuilder =
-            SpiltByAndDataFieldsAvailableChart.allFieldsAvailable(splitBy, dataFields,
-                searchSourceBuilder, boolQueryBuilder);
-      }
-    }
-
-    // Use case VI: The below block is only when groupBy & dataField are available
-
-    if (groupBy != null) {
-      if (splitBy == null && !(dataFields.isEmpty())) {
-        searchSourceBuilder =
-            GroupByAndFieldsAvailableChart.allFieldsAvailable(groupBy, dataFields,
-                searchSourceBuilder, boolQueryBuilder);
-      }
+    } 
+    else {
+        throw new IllegalArgumentException("Please select appropriate value for the axes & metrices");
     }
 
     setSearchSourceBuilder(searchSourceBuilder);

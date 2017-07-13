@@ -159,7 +159,7 @@ public class Sort {
         TIMESTAMP("timestamp"),
         LONG("long"),
         DOUBLE("double"),
-        INT("integer"),
+        INTEGER("integer"),
         STRING("string"),
         FLOAT("float");
         private final String value;

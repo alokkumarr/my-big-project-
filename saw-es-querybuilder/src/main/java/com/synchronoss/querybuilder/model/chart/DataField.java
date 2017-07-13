@@ -191,7 +191,7 @@ public class DataField {
         LONG("long"),
         DOUBLE("double"),
         FLOAT("float"),
-        INT("integer"),
+        INTEGER("integer"),
         STRING("string");
         private final String value;
         private final static Map<String, DataField.Type> CONSTANTS = new HashMap<String, DataField.Type>();
