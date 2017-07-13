@@ -39,9 +39,10 @@ jars=( $RTPS_HOME/lib/rtps-*.jar )
 JAR="@{jars[0]}"
 ( <"$JAR" ) || exit
 
-# log4j options
 CONF_OPTS=(
+    # log4j option
     --conf "spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$L4J_CONF"
+    # more options can be added here
     )
 
 # -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -Dcom.sun.management.jmxremote
@@ -49,22 +50,23 @@ CONF_OPTS=(
 MAIN_CLASS=synchronoss.spark.drivers.rt.EventProcessingApplicationDriver
 
 VERBOSE_OPT=
-if [[ $VERBOSE ]] ; then
+[[ $VERBOSE ]] && {
     VERBOSE_OPT='--verbose'
     echo "=== ENV BEGIN"
     /bin/env
     echo "=== ENV END"
-fi
+    echo "$(date +%FT%T%z) sent 'spark-submit $MAIN_CLASS'"
+}
 
-echo "$(date +%FT%T%z) sent 'spark-submit $MAIN_CLASS'"
 (
     [[ $VERBOSE ]] && set -vx
     #################################
     $SPARK_SUBMIT_XPATH </dev/null  \
         $VERBOSE_OPT                \
-        ${CONF_OPTS[@]}             \
         --class $MAIN_CLASS         \
-        $JAR $APPL_CONF             &
+        ${CONF_OPTS[@]}             \
+        $JAR $APPL_CONF             & # run in BG!
     #################################
 )
-exit 0
+
+exit
