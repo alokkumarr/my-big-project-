@@ -33,27 +33,27 @@
         </repository>
     </repositories>
     <dependencies>
-        <dependency>
-            <groupId>com.synchronoss</groupId>
-            <artifactId>rtps-common</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
+      <dependency>
+        <groupId>com.synchronoss</groupId>
+        <artifactId>rtps-common</artifactId>
+        <version>${project.parent.version}</version>
+      </dependency>
     </dependencies>
     <build>
-        <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${maven.compile.version}</version>
-        <executions>
-          <execution>
-            <id>compile</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-        </executions>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${maven.compile.version}</version>
+          <executions>
+            <execution>
+              <id>compile</id>
+              <phase>compile</phase>
+              <goals>
+                <goal>compile</goal>
+              </goals>
+            </execution>
+          </executions>
         <configuration>
           <verbose>true</verbose>
           <fork>true</fork>
