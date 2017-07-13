@@ -6,14 +6,14 @@ CMD_NAM=$( basename $0 )
 
 # execute_rtps.sh <APPL_CONF> [<log4j_conf>]
 usage() {
-    echo Usage: $CMD_NAM <APPL_CONF> [<log4j_conf>]
+    echo "Usage: $CMD_NAM <APPL_CONF> [<log4j_conf>]"
     exit ${1:-0}
 }
-[[ $# = 0 || $1 = -[hH] ]] && usage
+[[ $# = 0 || "$1" = -@(-|)h* ]] && usage
 
 # Check Application configuration file
-APPL_CONF=${1:?required argument missing}
-( $<APPL_CONF ) || exit
+APPL_CONF="${1:?empty argument}"
+( <"$APPL_CONF" ) || exit
 
 L4J_CONF=${2:-}
 
@@ -25,7 +25,7 @@ RTPS_HOME=$( cd $CMD_DIR/.. ; pwd )
 
 # Check LOG4J configuration file
 : ${L4J_CONF:=$RTPS_HOME/conf/log4j.properties}
-( <$L4J_CONF ) || exit
+( <"$L4J_CONF" ) || exit
 
 # Check SPARK executable is in place
 SPARK_SUBMIT_XPATH=/opt/mapr/spark/spark-current/bin/spark-submit
@@ -36,7 +36,7 @@ SPARK_SUBMIT_XPATH=/opt/mapr/spark/spark-current/bin/spark-submit
 
 # Get first name of jar file
 jars=( $RTPS_HOME/lib/rtps-*.jar )
-JAR="@{jars[0]}"
+JAR="${jars[0]}"
 ( <"$JAR" ) || exit
 
 CONF_OPTS=(
