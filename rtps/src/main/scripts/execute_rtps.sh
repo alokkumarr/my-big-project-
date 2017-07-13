@@ -1,12 +1,31 @@
 #!/bin/bash
+# RTPS script to be executed on mapr box to start application run
 
 CMD_DIR=$( cd $(dirname $0); pwd )
+CMD_NAM=$( basename $0 )
+
+# execute_rtps.sh <APPL_CONF> [<log4j_conf>]
+usage() {
+    echo Usage: $CMD_NAM <APPL_CONF> [<log4j_conf>]
+    exit ${1:-0}
+}
+[[ $# = 0 || $1 = -[hH] ]] && usage
+
+# Check Application configuration file
+APPL_CONF=${1:?required argument missing}
+( $<APPL_CONF ) || exit
+
+L4J_CONF=${2:-}
+
+##
+VERBOSE=${VERBOSE:-}
+#
 RTPS_HOME=$( cd $CMD_DIR/.. ; pwd )
 ( cd $RTPS_HOME/lib ) || exit
 
-# RTPS script to be executed on mapr box to start application instance run
-
-VERBOSE=${VERBOSE:-}
+# Check LOG4J configuration file
+: ${L4J_CONF:=$RTPS_HOME/conf/log4j.properties}
+( <$L4J_CONF ) || exit
 
 # Check SPARK executable is in place
 SPARK_SUBMIT_XPATH=/opt/mapr/spark/spark-current/bin/spark-submit
@@ -15,65 +34,17 @@ SPARK_SUBMIT_XPATH=/opt/mapr/spark/spark-current/bin/spark-submit
     exit 1
 }
 
-###############
-# Application instance ID
-APPL_INST=${1:-}
-: ${APPL_INST:?argument missing}
-
-[[ $APPL_INST = *.* ]] || {
-    echo 1>&2 "invalid APPL_INST: '$APPL_INST', must be <APPL_NAME>.<APPL_INUM>"
-    exit 1
-}
-
-# Application name
-APPL_NAME=${APPL_INST%.[1-9]}
-: ${APPL_NAME:?part of argument missing}
-
-# Application instance number
-APPL_INUM=${APPL_INST##*.}
-: ${APPL_INUM:?part of argument missing}
-################
-
-# Get Real Time Processing System home dir
-#RTPS_ENV=/etc/bda/rtps.env
-#source $RTPS_ENV || {
-#    echo 1>&2 "error in 'source $RTPS_ENV'"
-#    exit 1
-#}
-#: ${RTPS_HOME?:not set in $RTPS_ENV}
-
-# Get Application home dir
-APPL_ENV=/etc/bda/$APPL_NAME.env
-source $APPL_ENV || exit
-: ${APPL_HOME?:not set in $APPL_ENV}
-
 # Get first name of jar file
-JAR=$( set -- $RTPS_HOME/lib/bda-rt-event-processing-*.jar ; echo $1 )
+jars=( $RTPS_HOME/lib/rtps-*.jar )
+JAR="@{jars[0]}"
+( <"$JAR" ) || exit
 
 # log4j options
-CONF_OPT="spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$RTPS_HOME/conf/log4j.properties"
-
-# Application log
-log=/dfs/var/bda/$APPL_NAME/log/$APPL_INST.log
-rotate_log ()
-{
-    log=$1;
-    let num=${2:-5};
-    if [ -f "$log" ]; then # rotate logs
-        while [ $num -gt 1 ]; do
-            let prev=num-1
-            [ -f "$log.$prev" ] && mv "$log.$prev" "$log.$num"
-            num=$prev
-        done
-        mv "$log" "$log.$num";
-    fi
-}
-rotate_log "$log"
-[[ $VERBOSE ]] && eval "echo LOG files: ; /bin/ls -s $log*"
+CONF_OPTS=(
+    --conf "spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$L4J_CONF"
+    )
 
 # -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -Dcom.sun.management.jmxremote
-
-CONF=$APPL_HOME/conf/$APPL_INST.conf
 
 MAIN_CLASS=synchronoss.spark.drivers.rt.EventProcessingApplicationDriver
 
@@ -85,17 +56,15 @@ if [[ $VERBOSE ]] ; then
     echo "=== ENV END"
 fi
 
+echo "$(date +%FT%T%z) sent 'spark-submit $MAIN_CLASS'"
 (
     [[ $VERBOSE ]] && set -vx
     #################################
     $SPARK_SUBMIT_XPATH </dev/null  \
         $VERBOSE_OPT                \
-        --jars $RTPS_HOME/lib/*     \
-        --conf $CONF_OPT            \
+        ${CONF_OPTS[@]}             \
         --class $MAIN_CLASS         \
-        $JAR $CONF &>"$log"         &
+        $JAR $APPL_CONF             &
     #################################
 )
-echo "$(date +%FT%T%z) rtps_start '$APPL_INST' sent 'spark-submit $MAIN_CLASS'" 
-echo "log: '$log'"
 exit 0
