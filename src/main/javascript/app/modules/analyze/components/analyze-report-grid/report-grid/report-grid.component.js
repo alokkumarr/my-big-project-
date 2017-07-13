@@ -4,6 +4,7 @@ import find from 'lodash/find';
 import forEach from 'lodash/forEach';
 import remove from 'lodash/remove';
 import isUndefined from 'lodash/isUndefined';
+import $ from 'jquery';
 
 import template from './report-grid.component.html';
 import style from './report-grid.component.scss';
@@ -18,13 +19,15 @@ export const ReportGridComponent = {
   bindings: {
     reportGridContainer: '<',
     reportGridNode: '<',
-    source: '<'
+    source: '<',
+    gridIdentifier: '@'
   },
   controller: class ReportGridController {
-    constructor($mdDialog, dxDataGridService) {
+    constructor($mdDialog, dxDataGridService, $timeout) {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this._dxDataGridService = dxDataGridService;
+      this._$timeout = $timeout;
 
       this.settings = {};
       this.columns = [];
@@ -42,6 +45,26 @@ export const ReportGridComponent = {
           dataSource: this.source || []
         })
       });
+    }
+
+    setListenersOnColumnHeaders() {
+      /* eslint-disable angular/angularelement */
+      this._$timeout(() => {
+        const cssSelector = `div.report-dx-grid[data-grid-identifier="${this.gridIdentifier}"] td[role="columnheader"]`;
+        const columnHeaders = Array.from($(cssSelector));
+        forEach(columnHeaders, header => {
+          const $elem = $(header);
+          $elem.on('dxdragend', () => {
+            this.onColumnReorder();
+          });
+        });
+      });
+      /* eslint-enable angular/angularelement */
+    }
+
+    onColumnReorder() {
+      const columns = this._gridInstance.getVisibleColumns();
+      this.reportGridContainer.onColumnReorder(columns);
     }
 
     onGridInitialized(e) {
@@ -135,6 +158,7 @@ export const ReportGridComponent = {
           caption: column.getDisplayName(),
           dataField: column.name,
           dataType: column.type,
+          visibleIndex: column.visibleIndex,
           allowSorting: false,
           alignment: 'left',
           width: COLUMN_WIDTH
@@ -180,6 +204,7 @@ export const ReportGridComponent = {
       if (this._gridInstance) {
         this._gridInstance.refresh();
       }
+      this.setListenersOnColumnHeaders();
     }
 
     $onDestroy() {
