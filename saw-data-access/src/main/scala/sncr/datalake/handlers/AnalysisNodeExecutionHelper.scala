@@ -17,7 +17,7 @@ import sncr.datalake.exceptions.{DAException, ErrorCodes}
 import sncr.datalake.{DLConfiguration, DLSession}
 import sncr.metadata.analysis.{AnalysisNode, AnalysisResult}
 import sncr.metadata.datalake.DataObject
-import sncr.metadata.engine.Fields
+import sncr.metadata.engine.{Fields, MDObjectStruct}
 import sncr.metadata.engine.MDObjectStruct._
 import sncr.saw.common.config.SAWServiceConfig
 /**
