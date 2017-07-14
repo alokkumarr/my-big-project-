@@ -28,7 +28,7 @@ export function runConfig($rootScope, $state, $location, $window, JwtService, Id
     }
 
     /* Allow admin users to visit admin pages */
-    if (JwtService.isAdmin(token) && (startsWith(toState, 'admin') || startsWith(toState, 'role'))) {
+    if (JwtService.isAdmin(token) && (startsWith(toState, 'admin') || startsWith(toState, 'role') || startsWith(toState, 'privilege') || startsWith(toState, 'categories'))) {
       return true;
     }
 

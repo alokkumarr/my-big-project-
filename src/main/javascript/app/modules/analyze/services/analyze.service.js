@@ -1,16 +1,32 @@
 import omit from 'lodash/omit';
 import forEach from 'lodash/forEach';
+import startCase from 'lodash/startCase';
 import set from 'lodash/set';
+import reduce from 'lodash/reduce';
+import trim from 'lodash/trim';
 import fpSortBy from 'lodash/fp/sortBy';
 import fpGet from 'lodash/fp/get';
 import filter from 'lodash/filter';
 import find from 'lodash/find';
 import flatMap from 'lodash/flatMap';
 
+const EXECUTION_MODES = {
+  PREVIEW: 'preview',
+  LIVE: 'live'
+};
+
 export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toastMessage, $translate) {
   'ngInject';
 
   const MODULE_NAME = 'ANALYZE';
+
+  const SCHEDULE_B2F_DICTIONARY = {
+    weekly: 'weeks',
+    daily: 'days'
+  };
+
+  const SCHEDULE_DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
   const url = AppConfig.api.url;
   let _menuResolver = null;
   const _menu = new Promise(resolve => {
@@ -47,6 +63,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     publishAnalysis,
     readAnalysis,
     saveReport,
+    scheduleToString,
     searchAnalyses,
     updateMenu
   };
@@ -57,6 +74,25 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
 
   function isExecuting(analysisId) {
     return Boolean(_executingAnalyses[analysisId]);
+  }
+
+  function scheduleToString(schedule) {
+    let result;
+    if (schedule.repeatInterval === 1) {
+      result = startCase(schedule.repeatUnit);
+    } else {
+      result = `Every ${schedule.repeatInterval} ${SCHEDULE_B2F_DICTIONARY[schedule.repeatUnit]}`;
+    }
+
+    if (schedule.repeatUnit === 'weekly') {
+      const dayString = trim(reduce(SCHEDULE_DAYS, (res, day) => {
+        res.push(schedule.repeatOnDaysOfWeek[day] ? startCase(day.slice(0, 2)) : '');
+        return res;
+      }, []).join(' '));
+
+      result += dayString ? ` (${trim(dayString)})` : '';
+    }
+    return result;
   }
 
   /* getRequestParams will generate the base structure and auto-fill it
@@ -117,8 +153,8 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
 
   function getPublishedAnalysesByAnalysisId(id) {
     return $http.get(`${url}/analysis/${id}/executions`)
-      .then(fpGet(`data.execution`))
-      .then(fpSortBy([obj => -Date.parse(obj.finished)]));
+      .then(fpGet(`data.executions`))
+      .then(fpSortBy([obj => -obj.finished]));
   }
 
   function getExecutionData(analysisId, executionId) {
@@ -167,9 +203,11 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     return deferred.promise;
   }
 
-  function publishAnalysis(model) {
+  function publishAnalysis(model, execute = false) {
     return updateAnalysis(model).then(analysis => {
-      executeAnalysis(model);
+      if (execute) {
+        executeAnalysis(model);
+      }
       return analysis;
     });
   }
@@ -214,6 +252,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
   }
 
   function updateAnalysis(model) {
+    delete model.isScheduled;
     const payload = getRequestParams([
       ['contents.action', 'update'],
       ['contents.keys.[0].id', model.id],
@@ -223,7 +262,12 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     return $http.post(`${url}/analysis`, payload).then(fpGet(`data.contents.analyze.[0]`));
   }
 
-  function applyAnalysis(model) {
+  function applyAnalysis(model, mode = EXECUTION_MODES.LIVE) {
+    delete model.isScheduled;
+    if (mode === EXECUTION_MODES.PREVIEW) {
+      model.executionType = EXECUTION_MODES.PREVIEW;
+    }
+
     const payload = getRequestParams([
       ['contents.action', 'execute'],
       ['contents.keys.[0].id', model.id],
@@ -236,11 +280,9 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     });
   }
 
-  function getDataBySettings(model) {
-    return updateAnalysis(model).then(analysis => {
-      return applyAnalysis(model).then(data => {
-        return {analysis, data};
-      });
+  function getDataBySettings(analysis) {
+    return applyAnalysis(analysis, EXECUTION_MODES.PREVIEW).then(data => {
+      return {analysis, data};
     });
   }
 
@@ -258,7 +300,14 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
 
   function saveReport(model) {
     model.saved = true;
-    return updateAnalysis(model);
+    const updatePromise = updateAnalysis(model);
+
+    updatePromise.then(analysis => {
+      return applyAnalysis(model, EXECUTION_MODES.PREVIEW).then(data => {
+        return {analysis, data};
+      });
+    });
+    return updatePromise;
   }
 
   function getSemanticLayerData() {

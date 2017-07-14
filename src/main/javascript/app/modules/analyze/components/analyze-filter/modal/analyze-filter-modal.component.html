@@ -12,12 +12,14 @@
                     layout="row"
                     layout-align="space-between start">
         <analyze-filter-row filter="filter"
+                            runtime="$ctrl.isRuntime"
                             on-change="$ctrl.onFilterChange(filter, artifact.artifactName, $index)"
                             artifact="artifact"
                             style="padding-right: 10px;">
         </analyze-filter-row>
 
         <md-checkbox class="md-secondary"
+                     ng-hide="::$ctrl.isRuntime"
                      ng-disabled="!filter.column.filterEligible"
                      ng-model="filter.isRuntimeFilter"
                      ng-change="$ctrl.onRuntimeToggle(filter)">
@@ -25,13 +27,14 @@
         </md-checkbox>
 
         <md-button class="md-icon-button md-secondary"
+                   ng-hide="::$ctrl.isRuntime"
                    aria-label="Remove"
                    ng-click="$ctrl.onRemoveFilter($index, artifact.artifactName)">
           <md-icon md-font-icon="icon-close"></md-icon>
         </md-button>
 
       </md-list-item>
-      <md-list-item>
+      <md-list-item ng-hide="::$ctrl.isRuntime">
         <md-button class="md-icon-button"
                     aria-label="Add Filter"
                     ng-click="$ctrl.addFilter(artifact.artifactName)">
@@ -44,17 +47,20 @@
 
   <analyze-dialog-footer>
     <div layout="column" layout-align="start">
-      <div layout="row" layout-align="start center" style="padding-bottom:10px;">
+      <div layout="row"
+           ng-hide="::$ctrl.isRuntime"
+           layout-align="start center"
+           style="padding-bottom:10px;">
         <md-select ng-model="$ctrl.filterBooleanCriteria"
                    style="width: 92px;"
                    md-container-class="select-container-class">
-        <md-option ng-repeat="booleanCriteria in $ctrl.BOOLEAN_CRITERIA"
-                  ng-value="booleanCriteria.value">
-          {{::booleanCriteria.label}}
-        </md-option>
-      </md-select>
-      <span style="padding-left: 10px;"
-            translate="OF_THE_FILTERS_ARE_TRUE"></span>
+          <md-option ng-repeat="booleanCriteria in $ctrl.BOOLEAN_CRITERIA"
+                    ng-value="booleanCriteria.value">
+            {{::booleanCriteria.label}}
+          </md-option>
+        </md-select>
+        <span style="padding-left: 10px;"
+              translate="OF_THE_FILTERS_ARE_TRUE"></span>
       </div>
 
       <div layout="row" layout-align="start center">

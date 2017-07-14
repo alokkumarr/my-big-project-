@@ -1,9 +1,9 @@
 export default {
   login: {
-    url: 'http://10.49.0.171:9000/saw-security',
+    url: 'https://saw.bda.poc.velocity-va.synchronoss.net/saw-security',
     jwtKey: 'jwtToken'
   },
   api: {
-    url: 'http://mapr-dev02.sncrbda.dev.vacum-np.sncrcorp.net:9200'
+    url: 'https://saw.bda.poc.velocity-va.synchronoss.net/api'
   }
 };

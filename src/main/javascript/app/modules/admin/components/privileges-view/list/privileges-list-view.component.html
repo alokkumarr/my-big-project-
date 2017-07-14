@@ -1,0 +1,43 @@
+<md-card>
+  <md-card-header layout="row" layout-align="end start">
+    <md-card-title>
+      <md-card-title-text>
+        <span class="md-headline" translate="CUST_NAME" translate-value-customer="{{$ctrl.customer}}"></span>        
+      </md-card-title-text>
+    </md-card-title>
+  </md-card-header>
+
+  <md-card-content layout="row">
+    <div id="user-grid" dx-data-grid="$ctrl.gridConfig" dx-item-alias="report">      
+      <div data-options="dxTemplate: { name: 'productCellTemplate' }" >
+        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>
+      </div>
+      <div data-options="dxTemplate: { name: 'moduleCellTemplate' }" >
+        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>   
+      </div>
+      <div data-options="dxTemplate: { name: 'categoryCellTemplate' }" >
+        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>   
+      </div>
+      <div data-options="dxTemplate: { name: 'roleCellTemplate' }" >
+        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>   
+      </div>
+      <div data-options="dxTemplate: { name: 'privilegeDescCellTemplate' }" >
+        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span> 
+      </div>
+      <div data-options="dxTemplate: { name: 'actionCellTemplate' }">
+        <md-card-actions layout="row" layout-align="center center">
+          <md-button class="md-button btn-card" aria-label="Edit"
+            ng-click="$ctrl.openEditModal(report.data)">
+            <md-tooltip ng-bind="'TOOLTIP_EDIT_PRIVILEGE' | translate"></md-tooltip>
+            <md-icon md-font-icon="icon-edit"></md-icon>
+          </md-button>
+          <md-button class="md-button btn-card" aria-label="Delete" 
+            ng-click="$ctrl.openDeleteModal(report.data)">
+            <md-tooltip ng-bind="'TOOLTIP_DELETE_PRIVILEGE' | translate"></md-tooltip>
+            <md-icon md-font-icon="icon-trash"></md-icon>
+          </md-button>
+        </md-card-actions>
+      </div>
+    </div>
+  </md-card-content>
+</md-card>

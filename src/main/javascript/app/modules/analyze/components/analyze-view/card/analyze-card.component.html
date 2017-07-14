@@ -23,62 +23,28 @@
           <span ng-bind-html="::($ctrl.mkdel.metrics || []).join(', ') | highlight:$ctrl.highlightTerm"></span>
           <span>
             <md-icon md-font-icon="icon-calendar"></md-icon>
-            <span ng-bind="::($ctrl.model.scheduled || 'No Schedule Set')"></span>
+            <span ng-bind="$ctrl.model.scheduleHuman || 'No Schedule Set'"></span>
           </span>
         </span>
       </md-card-title-text>
     </md-card-title>
 
     <md-card-actions layout="row" layout-align="center center">
-      <md-button class="md-button btn-card" aria-label="Fork"
+      <md-button class="md-button btn-card"
+                 aria-label="Fork"
+                 ng-show="$ctrl.canUserFork"
                  ng-click="$ctrl.fork()">
         <md-tooltip ng-bind="'TOOLTIP_FORK_ANALYSIS' | translate"></md-tooltip>
         <md-icon md-font-icon="icon-fork"></md-icon>
       </md-button>
 
-      <md-menu-bar>
-        <md-menu>
-          <md-button class="md-button btn-card" aria-label="More"
-                     ng-click="$mdMenu.open()">
-            <md-icon md-font-icon="icon-more"></md-icon>
-          </md-button>
+      <analyze-actions-menu analysis="$ctrl.model"
+                            exclude="fork"
+                            on-successful-deletion="$ctrl.onSuccessfulDeletion(analysis)"
+                            on-successful-execution="$ctrl.onSuccessfulExecution(analysis)"
+                            on-successful-publish="$ctrl.onSuccessfulPublish(analysis)"
+      ></analyze-actions-menu>
 
-          <md-menu-content>
-            <md-menu-item>
-              <md-button aria-label="Execute"
-                         ng-click="$ctrl.execute()"
-                         translate="EXECUTE">
-              </md-button>
-            </md-menu-item>
-            <md-menu-item>
-              <md-button aria-label="Edit"
-                         ng-click="$ctrl.edit()"
-                         translate="EDIT">
-              </md-button>
-            </md-menu-item>
-            <md-menu-item>
-              <md-button ng-click="$ctrl.openPublishModal($event)">
-                <span translate="PUBLISH"></span>
-              </md-button>
-            </md-menu-item>
-            <md-menu-item>
-              <md-button ng-click="ctrl.print()">
-                <span translate="PRINT"></span>
-              </md-button>
-            </md-menu-item>
-            <md-menu-item>
-              <md-button ng-click="ctrl.export()">
-                <span translate="EXPORT"></span>
-              </md-button>
-            </md-menu-item>
-            <md-menu-item>
-              <md-button ng-click="$ctrl.remove()">
-                <span translate="DELETE" md-colors="{color: 'warn'}"></span>
-              </md-button>
-            </md-menu-item>
-          </md-menu-content>
-        </md-menu>
-      </md-menu-bar>
     </md-card-actions>
   </md-card-footer>
 </md-card>

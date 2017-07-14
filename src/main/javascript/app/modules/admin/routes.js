@@ -10,6 +10,14 @@ export function routesConfig($stateProvider) {
       name: 'role',
       url: '/role',
       component: 'rolesView'
+    }, {
+      name: 'privilege',
+      url: '/privilege',
+      component: 'privilegesView'
+    }, {
+      name: 'categories',
+      url: '/categories',
+      component: 'categoriesView'
     }
   ];
 

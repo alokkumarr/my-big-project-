@@ -68,6 +68,20 @@ export const ReportGridContainerComponent = {
       this._unregister();
     }
 
+    onColumnReorder(gridColumns) {
+      this.columns = map(this.columns, column => {
+        const target = find(gridColumns, ({dataField}) => {
+          return dataField === column.name;
+        });
+        if (target) {
+          column.visibleIndex = target.visibleIndex;
+        }
+        return column;
+      });
+      this.updateColumns(this.columns);
+      this.refreshGrid();
+    }
+
     setGridNodeComponent(gridNodeComponent) {
       this.gridNodeComponent = gridNodeComponent;
 
@@ -92,7 +106,6 @@ export const ReportGridContainerComponent = {
       if (!isUndefined(columns)) {
         this.columns = columns;
       }
-
       if (this.gridNodeComponent) {
         columns = filter(this.columns, column => {
           return column.checked && !this.isGroupedBy(column.name);
@@ -168,6 +181,9 @@ export const ReportGridContainerComponent = {
     undoGrouping() {
       if (!isEmpty(this.grouped.by)) {
         this.grouped.by.pop();
+
+        this.settings.layoutMode = this.LAYOUT_MODE.DETAIL;
+        this.onLayoutModeUpdate();
 
         this.updateColumns();
         this.applyGrouping();

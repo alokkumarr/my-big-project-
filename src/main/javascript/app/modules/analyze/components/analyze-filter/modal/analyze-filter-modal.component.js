@@ -23,12 +23,14 @@ export const AnalyzeFilterModalComponent = {
   bindings: {
     filters: '<',
     artifacts: '<',
+    isRuntime: '<?runtime',
     filterBooleanCriteria: '<'
   },
   controller: class AnalyzeFlterModalController {
-    constructor(toastMessage, $translate) {
+    constructor(toastMessage, $translate, FilterService) {
       this._toastMessage = toastMessage;
       this._$translate = $translate;
+      this._FilterService = FilterService;
       this.BOOLEAN_CRITERIA = BOOLEAN_CRITERIA;
     }
 
@@ -76,8 +78,8 @@ export const AnalyzeFilterModalComponent = {
     }
 
     onApplyFilters() {
+      this.removeEmptyFilters(this.filters);
       if (this.areFiltersValid(this.filters)) {
-        this.removeEmptyFilters(this.filters);
         const flattenedFilters = this.unGroupFilters(this.filters);
         this.cleanFilters(flattenedFilters);
         this.$dialog.hide({
@@ -93,7 +95,7 @@ export const AnalyzeFilterModalComponent = {
 
     cleanFilters(filters) {
       forEach(filters, filter => {
-        if (NUMBER_TYPES.includes(filter.column.type) &&
+        if (NUMBER_TYPES.includes(filter.column.type) && filter.model &&
             filter.model.operator !== OPERATORS.BETWEEN.shortName) {
           unset(filter.model, 'otherValue');
         }
@@ -104,8 +106,10 @@ export const AnalyzeFilterModalComponent = {
       let isValid = true;
       forOwn(filters, artifactFilters => {
         forEach(artifactFilters, filter => {
-          if (filter.column && !filter.model && !filter.isRuntimeFilter) {
-            isValid = false;
+          if (this.isRuntime) {
+            isValid = isValid && !this._FilterService.isFilterEmpty(filter);
+          } else {
+            isValid = isValid && (filter.isRuntimeFilter || !this._FilterService.isFilterEmpty(filter));
           }
         });
       });

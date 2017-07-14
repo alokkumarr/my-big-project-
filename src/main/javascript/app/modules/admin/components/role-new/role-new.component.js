@@ -27,7 +27,7 @@ export const RoleNewComponent = {
       const custCode = get(this._JwtService.getTokenObj(), 'ticket.custCode');
       const userId = get(this._JwtService.getTokenObj(), 'ticket.masterLoginId');
       this.role = {
-        activeStatusInd: 'Active',
+        activeStatusInd: 1,
         custSysId: custId,
         customerCode: custCode,
         masterLoginId: userId,

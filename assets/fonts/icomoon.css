@@ -298,6 +298,12 @@
   content: url(../svg/export.svg);
 }
 
+.icon-question-mark:before {
+  content: "?";
+  font-size: 18px;
+  font-weight: bolder;
+}
+
 .icon-row:before {
   content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAI0lEQVQoz2P4z4AfAlHCfwjEzqKPAsKObIBA7Cz6KBgGIQkAQ8IdQJKOGQIAAAAASUVORK5CYII=);
 }

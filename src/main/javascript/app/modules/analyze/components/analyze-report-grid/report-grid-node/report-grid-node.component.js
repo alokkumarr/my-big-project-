@@ -13,7 +13,8 @@ export const ReportGridNodeComponent = {
   bindings: {
     reportGridContainer: '<',
     reportGridNode: '<',
-    source: '<'
+    source: '<',
+    gridIdentifier: '@'
   },
   controller: class ReportGridNodeController {
     constructor() {

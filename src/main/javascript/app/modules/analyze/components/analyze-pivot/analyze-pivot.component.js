@@ -47,6 +47,7 @@ export const AnalyzePivotComponent = {
       this._toastMessage = toastMessage;
       this._$translate = $translate;
 
+      this.draftMode = false;
       this.deNormalizedData = [];
       this.normalizedData = [];
       this.dataSource = {};
@@ -93,9 +94,9 @@ export const AnalyzePivotComponent = {
     }
 
     loadExistingAnalysis() {
-      this.initExistingSettings();
       this.artifacts = this.getSortedArtifacts(this.model.artifacts);
       this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
+      this.initExistingSettings();
       this.loadPivotData();
     }
 
@@ -105,6 +106,7 @@ export const AnalyzePivotComponent = {
           this.model = defaults(this.model, analysis);
           this.model.id = analysis.id;
           this.settingsModified = true;
+          this.draftMode = true;
           this.artifacts = this.getSortedArtifacts(this.model.artifacts);
           this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
           this.loadPivotData();
@@ -118,6 +120,28 @@ export const AnalyzePivotComponent = {
       this.sorts = this.mapBackend2FrontendSort(this.model.sqlBuilder.sorts, this.sortFields);
     }
 
+    goBack() {
+      if (!this.draftMode) {
+        this.$dialog.hide();
+        return;
+      }
+
+      const confirm = this._$mdDialog.confirm()
+            .title('There are unsaved changes')
+            .textContent('Do you want to discard unsaved changes and go back?')
+        .multiple(true)
+        .ok('Discard')
+        .cancel('Cancel');
+
+      this._$mdDialog.show(confirm).then(() => {
+        this.$dialog.hide();
+      }, err => {
+        if (err) {
+          this._$log.error(err);
+        }
+      });
+    }
+
     getSortedArtifacts(artifacts) {
       return [{
         artifactName: artifacts[0].artifactName,
@@ -129,6 +153,7 @@ export const AnalyzePivotComponent = {
       this.artifacts[0].columns = columns;
       this.sortFields = this.getArtifactColumns2SortFieldMapper()(this.artifacts[0].columns);
       this.settingsModified = true;
+      this.draftMode = true;
       const pivotFields = this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns);
       this.setDataSource(this.dataSource.store, pivotFields);
     }
@@ -175,11 +200,16 @@ export const AnalyzePivotComponent = {
           this.settingsModified = false;
           this.deNormalizedData = this._PivotService.denormalizeData(data, fields);
           this.deNormalizedData = this._PivotService.takeOutKeywordFromData(this.deNormalizedData);
-          this.dataSource.store = this.deNormalizedData;
-          this.dataSource = new PivotGridDataSource({store: this.dataSource.store, fields});
+          this.dataSource = new PivotGridDataSource({store: this.deNormalizedData, fields});
           this.pivotGridUpdater.next({
-            dataSource: this.dataSource,
-            sorts: this.sorts
+            dataSource: this.dataSource
+          });
+          // different updates have to be done with a timeout
+          // there might be a bug in devextreme pivotgrid
+          this._$timeout(() => {
+            this.pivotGridUpdater.next({
+              sorts: this.sorts
+            });
           });
           this.showProgress = false;
         })
@@ -209,6 +239,7 @@ export const AnalyzePivotComponent = {
       if (filters) {
         this.filters = filters;
         this.settingsModified = true;
+        this.draftMode = true;
       }
       if (filterBooleanCriteria) {
         this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;
@@ -218,11 +249,13 @@ export const AnalyzePivotComponent = {
     onClearAllFilters() {
       this.filters = [];
       this.settingsModified = true;
+      this.draftMode = true;
     }
 
     onFilterRemoved(index) {
       this.filters.splice(index, 1);
       this.settingsModified = true;
+      this.draftMode = true;
     }
 // END filters
 
@@ -325,6 +358,7 @@ export const AnalyzePivotComponent = {
     applySorts(sorts) {
       this.pivotGridUpdater.next({sorts});
       this.settingsModified = true;
+      this.draftMode = true;
     }
 
     openSortModal(ev) {
@@ -361,6 +395,7 @@ export const AnalyzePivotComponent = {
           };
 
           scope.onSave = data => {
+            this.draftMode = true;
             this.model.description = data.description;
           };
         },
@@ -381,10 +416,7 @@ export const AnalyzePivotComponent = {
           controller: scope => {
             scope.model = {
               pivot: this.model,
-              dataSource: {
-                store: this.dataSource.store,
-                fields: this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns)
-              }
+              dataSource: this.dataSource
             };
           },
           targetEvent: ev,

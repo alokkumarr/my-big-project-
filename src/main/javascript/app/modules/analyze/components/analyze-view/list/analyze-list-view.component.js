@@ -1,9 +1,9 @@
-import clone from 'lodash/clone';
-
 import template from './analyze-list-view.component.html';
+import style from './analyze-list-view.component.scss';
 
 export const AnalyzeListViewComponent = {
   template,
+  styles: [style],
   bindings: {
     analyses: '<',
     analysisType: '<',
@@ -13,18 +13,26 @@ export const AnalyzeListViewComponent = {
     updater: '<'
   },
   controller: class AnalyzeListViewController {
-    constructor($mdDialog, dxDataGridService, AnalyzeService) {
+    constructor($mdDialog, dxDataGridService, AnalyzeService, AnalyzeActionsService, JwtService) {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this._dxDataGridService = dxDataGridService;
       this._AnalyzeService = AnalyzeService;
+      this._AnalyzeActionsService = AnalyzeActionsService;
+      this._JwtService = JwtService;
 
       this._gridListInstance = null;
+
+      this.canUserFork = false;
     }
 
     $onInit() {
       this.gridConfig = this.getGridConfig();
       this.updaterSubscribtion = this.updater.subscribe(update => this.onUpdate(update));
+
+      this.canUserFork = this._JwtService.hasPrivilege('FORK', {
+        subCategoryId: this.analyses[0].categoryId
+      });
     }
 
     showExecutingFlag(analysisId) {
@@ -55,56 +63,27 @@ export const AnalyzeListViewComponent = {
       this.onUpdateAnalysisType(this.analysisType);
     }
 
-    remove(analysis) {
-      this.onAction({
-        type: 'delete',
-        model: analysis
-      });
-    }
-
     fork(analysis) {
+      this._AnalyzeActionsService.fork(analysis);
+    }
+
+    onSuccessfulDeletion(analysis) {
       this.onAction({
-        type: 'fork',
+        type: 'onSuccessfulDeletion',
         model: analysis
       });
     }
 
-    openPublishModal(model) {
-      const tpl = '<analyze-publish-dialog model="model" on-publish="onPublish(model)"></analyze-publish-dialog>';
-
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controllerAs: '$ctrl',
-          controller: scope => {
-            scope.model = clone(model);
-            scope.onPublish = this.publish.bind(this);
-          },
-          autoWrap: false,
-          fullscreen: true,
-          focusOnOpen: false,
-          multiple: true,
-          clickOutsideToClose: true
-        });
-    }
-
-    publish(model) {
+    onSuccessfulExecution(analysis) {
       this.onAction({
-        type: 'publish',
-        model
-      });
-    }
-
-    execute(analysis) {
-      this.onAction({
-        type: 'execute',
+        type: 'onSuccessfulExecution',
         model: analysis
       });
     }
 
-    edit(analysis) {
+    onSuccessfulPublish(analysis) {
       this.onAction({
-        type: 'edit',
+        type: 'onSuccessfulPublish',
         model: analysis
       });
     }
@@ -122,7 +101,8 @@ export const AnalyzeListViewComponent = {
         allowSorting: true,
         alignment: 'left',
         width: '50%',
-        cellTemplate: 'nameCellTemplate'
+        cellTemplate: 'nameCellTemplate',
+        cssClass: 'branded-column-name'
       }, {
         caption: 'METRICS',
         dataField: 'metrics',
@@ -136,7 +116,7 @@ export const AnalyzeListViewComponent = {
         cellTemplate: 'metricsCellTemplate'
       }, {
         caption: 'SCHEDULED',
-        dataField: 'scheduled',
+        dataField: 'scheduleHuman',
         allowSorting: true,
         alignment: 'left',
         width: '15%'
