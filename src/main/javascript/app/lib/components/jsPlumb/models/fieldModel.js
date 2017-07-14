@@ -15,6 +15,7 @@ export class FieldModel {
     this.isHidden = false;
     this.isJoinEligible = false;
     this.isFilterEligible = false;
+    this.visibleIndex = null;
   }
 
   setMeta(meta) {

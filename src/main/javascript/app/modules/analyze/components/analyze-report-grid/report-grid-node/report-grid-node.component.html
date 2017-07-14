@@ -13,6 +13,7 @@
       <report-grid-node
         report-grid-container="$ctrl.reportGridContainer"
         report-grid-node="$ctrl"
+        grid-identifier="{{$ctrl.gridIdentifier + groupNode.groupValue}}"
         source="groupNode.source">
       </report-grid-node>
     </div>
@@ -23,6 +24,7 @@
     <report-grid
       report-grid-container="$ctrl.reportGridContainer"
       report-grid-node="$ctrl"
+      grid-identifier="{{$ctrl.gridIdentifier + groupNode.groupValue}}"
       source="$ctrl.source">
     </report-grid>
   </div>
