@@ -1,5 +1,3 @@
-import get from 'lodash/get';
-
 export function interceptor($httpProvider) {
   'ngInject';
   /* eslint-disable */
@@ -9,16 +7,19 @@ export function interceptor($httpProvider) {
       responseError: error => {
         // need to use injetor because using the toastr service
         // causes a circular dependency with $http
+    	const errorMessage = error.data.message;
         const generalErrorMsgKey = 'ERROR_OOPS_SERVER';
         const toastMessage = $injector.get('toastMessage');
         const $q = $injector.get('$q');
         const $translate = $injector.get('$translate');
 
-        $translate(generalErrorMsgKey).then(generalErrorMsg => {
-          const msg = get(error, 'data.error.message') || get(error, 'data.message', generalErrorMsg);
-          toastMessage.error(msg || generalErrorMsg);
-        });
-
+        if(errorMessage) {
+          toastMessage.error(errorMessage);
+        } else {
+          $translate(generalErrorMsgKey).then(generalErrorMsg => {
+            toastMessage.error(generalErrorMsg);
+          });
+        }
         return $q.reject(error);
       }
     };
