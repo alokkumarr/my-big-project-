@@ -676,7 +676,7 @@ public class UserRepositoryImpl implements UserRepository {
 													.split("_")[1])) {
 										//get the privCode
 										PrivilegeDetails PrivilegeDetails = fetchIfPrivExists(prodModFeatrChildren.get(z).getRoleId(),prodModFeatrChildren.get(z).getProdModFeatureID());
-										if(null != PrivilegeDetails) {
+										if(PrivilegeDetails != null) {
 											prodModFeatrChildren.get(z).setPrivilegeCode(PrivilegeDetails.getPrivilegeCode());
 										} else {
 											prodModFeatrChildren.get(z).setPrivilegeCode(prodModFeatrParents.get(y).getPrivilegeCode());
