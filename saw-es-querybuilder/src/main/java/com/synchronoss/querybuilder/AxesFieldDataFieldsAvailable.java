@@ -8,21 +8,21 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 class AxesFieldDataFieldsAvailable {
 
-	public static SearchSourceBuilder rowDataFieldsAvailable(List<com.synchronoss.querybuilder.model.chart.AxesField> axesField,  
+	public static SearchSourceBuilder rowDataFieldsAvailable(List<com.synchronoss.querybuilder.model.chart.NodeField> nodeField,  
 			List<com.synchronoss.querybuilder.model.chart.DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	{
-	    	if (axesField.size()==2)
+	    	if (nodeField.size()==2)
 	    	{
-	    	   searchSourceBuilder =    axesDataFieldsAvailableRowFieldTwo(axesField, dataFields, searchSourceBuilder, boolQueryBuilder);
+	    	   searchSourceBuilder =    axesDataFieldsAvailableRowFieldTwo(nodeField, dataFields, searchSourceBuilder, boolQueryBuilder);
 	    	}// end of rowfield.size()==2
-	    	if (axesField.size()==3)
+	    	if (nodeField.size()==3)
 	    	{
-		    	   searchSourceBuilder = axesDataFieldsAvailableRowFieldThree(axesField, dataFields, searchSourceBuilder, boolQueryBuilder);	    		
+		    	   searchSourceBuilder = axesDataFieldsAvailableRowFieldThree(nodeField, dataFields, searchSourceBuilder, boolQueryBuilder);	    		
 	    	}	
 	    return searchSourceBuilder;
 	}
 	
-	private static SearchSourceBuilder axesDataFieldsAvailableRowFieldTwo(List<com.synchronoss.querybuilder.model.chart.AxesField> axesFields, 
+	private static SearchSourceBuilder axesDataFieldsAvailableRowFieldTwo(List<com.synchronoss.querybuilder.model.chart.NodeField> nodeFields, 
 	    List<com.synchronoss.querybuilder.model.chart.DataField> dataFields, 
 	    SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	{
@@ -30,16 +30,16 @@ class AxesFieldDataFieldsAvailable {
 			{
 				if (dataFields.size()==1)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(axesFields.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("y_axis").field(axesFields.get(1).getColumnName())
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(nodeFields.get(0).getColumnName())
+							.subAggregation(AggregationBuilders.terms("y_axis").field(nodeFields.get(1).getColumnName())
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
 	    							));
 				}// dataFields.size() == 1
 
 				if (dataFields.size()==2)
 				{
-                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(axesFields.get(0).getColumnName())
-                      .subAggregation(AggregationBuilders.terms("y_axis").field(axesFields.get(1).getColumnName())
+                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(nodeFields.get(0).getColumnName())
+                      .subAggregation(AggregationBuilders.terms("y_axis").field(nodeFields.get(1).getColumnName())
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
 	    					));
@@ -48,8 +48,8 @@ class AxesFieldDataFieldsAvailable {
 
 				if (dataFields.size()==3)
 				{
-                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(axesFields.get(0).getColumnName())
-                      .subAggregation(AggregationBuilders.terms("y_axis").field(axesFields.get(1).getColumnName())
+                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(nodeFields.get(0).getColumnName())
+                      .subAggregation(AggregationBuilders.terms("y_axis").field(nodeFields.get(1).getColumnName())
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))		
@@ -59,8 +59,8 @@ class AxesFieldDataFieldsAvailable {
 				
 				if (dataFields.size()==4)
 				{
-                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(axesFields.get(0).getColumnName())
-                      .subAggregation(AggregationBuilders.terms("y_axis").field(axesFields.get(1).getColumnName())
+                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(nodeFields.get(0).getColumnName())
+                      .subAggregation(AggregationBuilders.terms("y_axis").field(nodeFields.get(1).getColumnName())
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))
@@ -71,8 +71,8 @@ class AxesFieldDataFieldsAvailable {
 				
 				if (dataFields.size()==5)
 				{
-                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(axesFields.get(0).getColumnName())
-                      .subAggregation(AggregationBuilders.terms("y_axis").field(axesFields.get(1).getColumnName())
+                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(nodeFields.get(0).getColumnName())
+                      .subAggregation(AggregationBuilders.terms("y_axis").field(nodeFields.get(1).getColumnName())
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))
@@ -85,7 +85,7 @@ class AxesFieldDataFieldsAvailable {
 		return searchSourceBuilder;
 	}
 	
-	private static SearchSourceBuilder axesDataFieldsAvailableRowFieldThree(List<com.synchronoss.querybuilder.model.chart.AxesField> axesfields, 
+	private static SearchSourceBuilder axesDataFieldsAvailableRowFieldThree(List<com.synchronoss.querybuilder.model.chart.NodeField> axesfields, 
 	        List<com.synchronoss.querybuilder.model.chart.DataField> dataFields, 
 			SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	{

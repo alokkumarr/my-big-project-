@@ -183,13 +183,13 @@ class SAWChartTypeElasticSearchQueryBuilder {
       }
       searchSourceBuilder.query(boolQueryBuilder);
     }
-    List<com.synchronoss.querybuilder.model.chart.AxesField>  axesFields = sqlBuilderNode.getAxesFields();
+    List<com.synchronoss.querybuilder.model.chart.NodeField>  nodeFields = sqlBuilderNode.getNodeFields();
     List<com.synchronoss.querybuilder.model.chart.DataField> dataFields =  sqlBuilderNode.getDataFields();
-    if (axesFields != null && dataFields !=null)
+    if (nodeFields != null && dataFields !=null)
     {
-      if (!axesFields.isEmpty() && axesFields.size() <=3){
+      if (!nodeFields.isEmpty() && nodeFields.size() <=3){
       searchSourceBuilder = AxesFieldDataFieldsAvailable.rowDataFieldsAvailable
-          (axesFields, dataFields, searchSourceBuilder, boolQueryBuilder);
+          (nodeFields, dataFields, searchSourceBuilder, boolQueryBuilder);
       }
       else {
         
