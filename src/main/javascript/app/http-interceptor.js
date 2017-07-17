@@ -1,3 +1,19 @@
+/* on tap handler for error toast message. Used to expand a more detailed
+ view of error */
+function openErrorDetails(dialog, error) {
+  dialog.show({
+    template: `<error-detail error-obj="errorObj"></error-detail>`,
+    controller: scope => {
+      scope.errorObj = error;
+    },
+    controllerAs: '$ctrl',
+    autoWrap: false,
+    focusOnOpen: false,
+    multiple: true,
+    clickOutsideToClose: true
+  });
+}
+
 export function interceptor($httpProvider) {
   'ngInject';
   /* eslint-disable */
@@ -7,19 +23,21 @@ export function interceptor($httpProvider) {
       responseError: error => {
         // need to use injetor because using the toastr service
         // causes a circular dependency with $http
-    	const errorMessage = error.data.message;
         const generalErrorMsgKey = 'ERROR_OOPS_SERVER';
         const toastMessage = $injector.get('toastMessage');
         const $q = $injector.get('$q');
+        const $mdDialog = $injector.get('$mdDialog');
         const $translate = $injector.get('$translate');
+        const ErrorDetail = $injector.get('ErrorDetail');
 
-        if(errorMessage) {
-          toastMessage.error(errorMessage);
-        } else {
-          $translate(generalErrorMsgKey).then(generalErrorMsg => {
-            toastMessage.error(generalErrorMsg);
+        $translate(generalErrorMsgKey).then(generalErrorMsg => {
+          const msg = ErrorDetail.getTitle(error, generalErrorMsg);
+          toastMessage.error('Tap to view details', msg, {
+            tapToDismiss: true,
+            onTap: () => openErrorDetails($mdDialog, error)
           });
-        }
+        });
+
         return $q.reject(error);
       }
     };
