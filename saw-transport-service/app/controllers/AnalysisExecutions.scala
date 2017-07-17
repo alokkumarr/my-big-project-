@@ -7,8 +7,8 @@ import org.json4s.JsonAST.{JArray, JObject, JString, JValue}
 import org.json4s.JsonDSL._
 import play.libs.Json
 import play.mvc.{Http, Result, Results}
-
 import sncr.metadata.analysis.AnalysisResult
+import sncr.metadata.engine.MDObjectStruct
 
 class AnalysisExecutions extends BaseController {
   val analysisController = new Analysis
@@ -36,10 +36,24 @@ class AnalysisExecutions extends BaseController {
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
       val execution = analysis.getExecution(executionId)
       val data = execution.loadExecution(executionId)
-      ("data", analysisController.processReportResult(data))
+      if (data == null) {
+        val anares = execution.getAnalysisExecutionResultNode
+        val desc = anares.getCachedData(MDObjectStruct.key_Definition.toString)
+        val d_type = (desc.asInstanceOf[JValue] \ "type").extractOpt[String];
+        if (d_type.isDefined) {
+
+          if (d_type.get == "chart" || d_type.get == "pivot") {
+            ("data", execution.loadESExecutionData(anares))
+          }
+          else  throw new Exception("Unsupported data format")
+        }
+        else null
+          }
+      else{
+        ("data", analysisController.processReportResult(data))
+      }
     })
   }
-
   def execute(analysisId: String): Result = {
     handle((json, ticket) => {
       analysisController.executeAnalysis(analysisId, null, null)

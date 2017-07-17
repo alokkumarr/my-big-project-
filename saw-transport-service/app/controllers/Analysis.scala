@@ -337,9 +337,10 @@ class Analysis extends BaseController {
         JField("id", JString(analysisId)),
         JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
         JField("execution_result", JString("success")),
+        JField("type", JString("pivot")),
         JField("execution_finish_ts", JLong(finishedTS)),
         JField("exec-code", JInt(0)),
-        JField("execution_timestamp", JString(timestamp))
+        JField("execution_start_ts", JString(timestamp))
       ))
       m_log debug s"Create result: with content: ${compact(render(descriptor))}"
 		}
@@ -352,8 +353,9 @@ class Analysis extends BaseController {
 	        JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
 	        JField("execution_result", JString("no result")),
 	        JField("execution_finish_ts", JLong(-1L)),
+          JField("type", JString("pivot")),
 	        JField("exec-code", JInt(1)),
-	        JField("execution_timestamp", JString(timestamp)),
+	        JField("execution_start_ts", JString(timestamp)),
 	        JField("error_message", JString(errorMsg))
 	      ))
      	}
@@ -398,9 +400,10 @@ class Analysis extends BaseController {
         JField("id", JString(analysisId)),
         JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
         JField("execution_finish_ts", JLong(finishedTS)),
+        JField("type", JString("chart")),
         JField("execution_result", JString("success")),
         JField("exec-code", JInt(0)),
-        JField("execution_timestamp", JString(timestamp))
+        JField("execution_start_ts", JString(timestamp))
       ))
       m_log debug s"Create result: with content: ${compact(render(descriptor))}"
 		}
@@ -413,8 +416,9 @@ class Analysis extends BaseController {
 	        JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
 	        JField("execution_result", JString("no result")),
 	        JField("execution_finish_ts", JLong(-1L)),
+          JField("type", JString("chart")),
 	        JField("exec-code", JInt(1)),
-	        JField("execution_timestamp", JString(timestamp)),
+	        JField("execution_start_ts", JString(timestamp)),
 	        JField("error_message", JString(errorMsg))
 	      ))
      	}
