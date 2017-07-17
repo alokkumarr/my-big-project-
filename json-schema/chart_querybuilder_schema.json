@@ -184,7 +184,7 @@
           },
           "type": "array"
         },
-        "axesFields": {
+        "nodeFields": {
           "id": "/properties/sqlBuilder/properties/axesFields/items",
           "items": 
           {
@@ -241,7 +241,7 @@
         "sorts",
         "filters",
         "dataFields",
-        "axesFields"
+        "nodeFields"
       ]
     }
   },

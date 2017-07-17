@@ -37,7 +37,7 @@ class AnalysisExecutions extends BaseController {
       val execution = analysis.getExecution(executionId)
       val data = execution.loadExecution(executionId)
       if (data == null) {
-        val anares = execution.getAnalysisExecutionResultNode
+        val anares = AnalysisResult(analysisId, executionId)
         val desc = anares.getCachedData(MDObjectStruct.key_Definition.toString)
         val d_type = (desc.asInstanceOf[JValue] \ "type").extractOpt[String];
         if (d_type.isDefined) {

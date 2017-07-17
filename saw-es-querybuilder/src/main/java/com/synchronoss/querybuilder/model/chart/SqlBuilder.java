@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
     "booleanCriteria",
     "filters",
     "sorts",
-    "axesFields"
+    "nodeFields"
 })
 public class SqlBuilder {
 
@@ -51,8 +51,8 @@ public class SqlBuilder {
      * (Required)
      * 
      */
-    @JsonProperty("axesFields")
-    private List<AxesField> axesFields = null;
+    @JsonProperty("nodeFields")
+    private List<NodeField> nodeFields = null;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -131,9 +131,9 @@ public class SqlBuilder {
      * (Required)
      * 
      */
-    @JsonProperty("axesFields")
-    public List<AxesField> getAxesFields() {
-        return axesFields;
+    @JsonProperty("nodeFields")
+    public List<NodeField> getNodeFields() {
+        return nodeFields;
     }
 
     /**
@@ -141,9 +141,9 @@ public class SqlBuilder {
      * (Required)
      * 
      */
-    @JsonProperty("axesFields")
-    public void setAxesFields(List<AxesField> axesFields) {
-        this.axesFields = axesFields;
+    @JsonProperty("nodeFields")
+    public void setNodeFields(List<NodeField> nodeFields) {
+        this.nodeFields = nodeFields;
     }
 
     @JsonAnyGetter

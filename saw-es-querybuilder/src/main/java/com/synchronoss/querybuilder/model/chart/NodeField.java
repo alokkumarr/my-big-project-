@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
     "name",
     "groupInterval"
 })
-public class AxesField {
+public class NodeField {
 
     /**
      * 
@@ -35,13 +35,13 @@ public class AxesField {
      * 
      */
     @JsonProperty("type")
-    private AxesField.Type type;
+    private NodeField.Type type;
     @JsonProperty("tableName")
     private String tableName;
     @JsonProperty("name")
     private String name;
     @JsonProperty("groupInterval")
-    private AxesField.GroupInterval groupInterval;
+    private NodeField.GroupInterval groupInterval;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -71,7 +71,7 @@ public class AxesField {
      * 
      */
     @JsonProperty("type")
-    public AxesField.Type getType() {
+    public NodeField.Type getType() {
         return type;
     }
 
@@ -81,7 +81,7 @@ public class AxesField {
      * 
      */
     @JsonProperty("type")
-    public void setType(AxesField.Type type) {
+    public void setType(NodeField.Type type) {
         this.type = type;
     }
 
@@ -106,12 +106,12 @@ public class AxesField {
     }
 
     @JsonProperty("groupInterval")
-    public AxesField.GroupInterval getGroupInterval() {
+    public NodeField.GroupInterval getGroupInterval() {
         return groupInterval;
     }
 
     @JsonProperty("groupInterval")
-    public void setGroupInterval(AxesField.GroupInterval groupInterval) {
+    public void setGroupInterval(NodeField.GroupInterval groupInterval) {
         this.groupInterval = groupInterval;
     }
 
@@ -134,10 +134,10 @@ public class AxesField {
         HOUR("hour"),
         WEEK("week");
         private final String value;
-        private final static Map<String, AxesField.GroupInterval> CONSTANTS = new HashMap<String, AxesField.GroupInterval>();
+        private final static Map<String, NodeField.GroupInterval> CONSTANTS = new HashMap<String, NodeField.GroupInterval>();
 
         static {
-            for (AxesField.GroupInterval c: values()) {
+            for (NodeField.GroupInterval c: values()) {
                 CONSTANTS.put(c.value, c);
             }
         }
@@ -157,8 +157,8 @@ public class AxesField {
         }
 
         @JsonCreator
-        public static AxesField.GroupInterval fromValue(String value) {
-            AxesField.GroupInterval constant = CONSTANTS.get(value);
+        public static NodeField.GroupInterval fromValue(String value) {
+            NodeField.GroupInterval constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {
@@ -178,10 +178,10 @@ public class AxesField {
         STRING("string"),
         FLOAT("float");
         private final String value;
-        private final static Map<String, AxesField.Type> CONSTANTS = new HashMap<String, AxesField.Type>();
+        private final static Map<String, NodeField.Type> CONSTANTS = new HashMap<String, NodeField.Type>();
 
         static {
-            for (AxesField.Type c: values()) {
+            for (NodeField.Type c: values()) {
                 CONSTANTS.put(c.value, c);
             }
         }
@@ -201,8 +201,8 @@ public class AxesField {
         }
 
         @JsonCreator
-        public static AxesField.Type fromValue(String value) {
-            AxesField.Type constant = CONSTANTS.get(value);
+        public static NodeField.Type fromValue(String value) {
+            NodeField.Type constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException(value);
             } else {
