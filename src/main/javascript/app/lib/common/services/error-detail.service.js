@@ -1,7 +1,7 @@
 import get from 'lodash/get';
 import truncate from 'lodash/truncate';
 
-const ERROR_TITLE_LENGTH = 30;
+const ERROR_TITLE_LENGTH = 50;
 
 export function errorDetailService() {
   'ngInject';
@@ -13,8 +13,10 @@ export function errorDetailService() {
 
   function getTitle(error, defaultMessage = 'Error') {
     const title = get(error, 'data.error.message') ||
-      get(error, 'data.message', defaultMessage);
-    return truncate(title, ERROR_TITLE_LENGTH);
+          get(error, 'data.message', '');
+    return title ? truncate(title, {
+      length: ERROR_TITLE_LENGTH
+    }) : defaultMessage;
   }
 
   function getDetail(error) {
