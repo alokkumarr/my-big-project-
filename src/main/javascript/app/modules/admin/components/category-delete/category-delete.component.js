@@ -6,7 +6,8 @@ export const CategoryDeleteComponent = {
   template,
   bindings: {
     deleteCategory: '<',
-    onDelete: '&'
+    onDelete: '&',
+    onSearch: '&'
   },
   styles: [style],
   controller: class CategoryDeleteController {
@@ -41,14 +42,15 @@ export const CategoryDeleteComponent = {
           this.deleteCategory.subCategories = this.response.subCategories;
           this._$rootScope.showProgress = false;
           this._$mdToast.show({
-            template: '<md-toast><span>Sub-category deleted successfully.</md-toast>',
+            template: '<md-toast><span>Sub-category deleted successfully.</span></md-toast>',
             position: 'bottom left',
             toastClass: 'toast-primary'
           });
+          this.onSearch({flag: true});
         } else {
           this._$rootScope.showProgress = false;
           this._$mdToast.show({
-            template: '<md-toast><span>' + this.response.validityMessage + '</md-toast>',
+            template: '<md-toast><span>' + this.response.validityMessage + '</span></md-toast>',
             position: 'bottom left',
             toastClass: 'toast-primary'
           });
@@ -72,14 +74,14 @@ export const CategoryDeleteComponent = {
           this.$dialog.hide(true);
           this.onDelete({categories: this.response.categories});
           this._$mdToast.show({
-            template: '<md-toast><span>Category deleted successfully.</md-toast>',
+            template: '<md-toast><span>Category deleted successfully.</span></md-toast>',
             position: 'bottom left',
             toastClass: 'toast-primary'
           });
         } else {
           this._$rootScope.showProgress = false;
           this._$mdToast.show({
-            template: '<md-toast><span>' + this.response.validityMessage + '</md-toast>',
+            template: '<md-toast><span>' + this.response.validityMessage + '</span></md-toast>',
             position: 'bottom left',
             toastClass: 'toast-primary'
           });
