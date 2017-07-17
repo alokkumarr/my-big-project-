@@ -138,6 +138,12 @@ export function PivotService() {
 
   function denormalizeData(normalizedData, fields) {
     const groupedFields = getGroupedFields(fields);
+    if (fields.length === 1) {
+      // if there is only one data field, there will be 1 data point sent
+      const dataField = fields[0].dataField;
+      const dataPoint = normalizedData[dataField];
+      return [{[dataField]: dataPoint.value}];
+    }
     return flatMap(normalizedData.row_level_1.buckets, node => denormalizeRecursive({groupedFields, keys: {}, currentKey: 'row_level_1', node}));
   }
 
