@@ -1,0 +1,24 @@
+@import "themes/base/colors";
+
+.error-detail-dialog {
+  md-dialog-content {
+    padding: 0 24px 20px;
+
+    .error-detail-container {
+      background: #F3F3F3;
+      border: 1px solid $primary-grey-g2;
+      border-radius: 3px;
+      padding: 10px;
+      overflow: scroll;
+      max-height: 200px;
+
+      button.error-detail-copy {
+        display: none;
+      }
+
+      code {
+        word-wrap: break-word;
+      }
+    }
+  }
+}
