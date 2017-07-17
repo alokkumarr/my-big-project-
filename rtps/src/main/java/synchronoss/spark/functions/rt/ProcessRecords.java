@@ -101,6 +101,7 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
     public void  call(
         JavaRDD<ConsumerRecord<String, String>> in, Time tm) throws Exception {
         if (!in.isEmpty()) {
+            logger.info("Starting new batch processing. Batch time: " + tm);
             switch(dataModel.toLowerCase()){
                 case DM_GENERIC : {
                     if (transformations == null) {

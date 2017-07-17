@@ -192,7 +192,7 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
             FileSystem fs = FileSystem.get(config);
             if(!fs.exists(path)){
                 // directory doesn't exists - try to create
-                fs.create(path);
+                fs.mkdirs(path);
             }
         } catch(Exception e){
             logger.error(e.getMessage());
