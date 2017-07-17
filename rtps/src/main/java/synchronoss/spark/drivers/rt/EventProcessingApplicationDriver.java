@@ -1,5 +1,8 @@
 package synchronoss.spark.drivers.rt;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.log4j.Logger;
@@ -81,16 +84,32 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
         // Hardcoded Spark parameters - we don't want them to be overwritten in configuration in any case
         sparkConf.set("spark.app.name", instanceName);
 
+        //Processing pipeline
+        logger.info("Starting " + model + " processing model.");
+        String outputPath = appConfig.getString("maprfs.path");
+        String outputType = appConfig.hasPath("maprfs.outputType") ? appConfig.getString("maprfs.outputType") : "parquet";
+
+        if (outputType.equals("parquet") || outputType.equals("json")) {
+            logger.info("Data output type is  " + outputType);
+        } else {
+            logger.error("Invalid data output type :" + outputType + " . Please set maprfs.outputType configuration parameter to 'parquet' or 'json'");
+            System.exit(-1);
+        }
+        if(checkOutputPath(outputPath) != 0){
+            logger.error("Can't create output directory " + outputPath);
+            System.exit(-1);
+        }
+        logger.info("Output directory " + outputPath);
+
+
         // MapR Streams configuration parameters
         HashMap<String, Object> kafkaParams = new HashMap<>();
         // !!!!!!!!!!!!! NEED CLEANUP !!!!!!!!!!!!!!!!!!!
         ConfigurationHelper.initConfig2(kafkaParams, appConfig, "streams.", true);
-
         // Setup MapR kafka consumer
         String topic = appConfig.getString("streams.topic");
         List<String> topics = Arrays.asList(topic);
         logger.info("Connection to stream : " + topics);
-
         // We have to modify/enforce some kafka parameters
         fixKafkaParams(kafkaParams);
 
@@ -116,23 +135,11 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
         logger.info("Elastic Search settings");
         logger.info(esConfig);
 
-        //Processing pipeline
-        logger.info("Starting " + model + " processing model.");
-        String outputPath = appConfig.getString("maprfs.path");
-        String outputType = appConfig.hasPath("maprfs.outputType") ? appConfig.getString("maprfs.outputType") : "parquet";
-
-        if (outputType.equals("parquet") || outputType.equals("json")) {
-            logger.info("Data output type is  " + outputType);
-        } else {
-            logger.error("Invalid data output type :" + outputType + " . Please set maprfs.outputType configuration parameter to 'parquet' or 'json'");
-            System.exit(-1);
-        }
-
         eventsStream
             .foreachRDD(new ProcessRecords(eventsStream,
                                           model, fieldDefinitions,
                                           esIndex, esConfig,
-                                          outputPath, this.instanceName, outputType));
+                                          outputPath, this.appName, outputType));
         return jssc;
     }
 
@@ -175,5 +182,23 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
         //========================================================
     }
 
-
+    private int checkOutputPath(String p) {
+        // Check if output path exists
+        String defaultFS = "maprfs:///";
+        Configuration config = new Configuration();
+        config.set("fs.defaultFS", defaultFS);
+        try {
+            Path path = new Path(p);
+            FileSystem fs = FileSystem.get(config);
+            if(!fs.exists(path)){
+                // directory doesn't exists - try to create
+                fs.create(path);
+            }
+        } catch(Exception e){
+            logger.error(e.getMessage());
+            e.printStackTrace();
+            return -1;
+        }
+        return 0;
+    }
 }

@@ -15,7 +15,7 @@ import java.util.Properties;
  */
 public class RealTimeApplicationDriver {
     private static Logger logger = Logger.getLogger(RealTimeApplicationDriver.class);
-    protected String instanceName;
+    protected String appName;
 
     // Initialize real time application from scratch or restore from checkpoint
     // And starts application
@@ -28,12 +28,9 @@ public class RealTimeApplicationDriver {
     //  - monitoring.idle.threshold
 
     private String mandatorySettings[][] = {
-        //Obsolete:  {"spark.checkpoint.path", "Spark checkpoint path is not configured (%s). Please correct configuration file."},
             {"spark.app.name", "Application name is not configured (%s). Please correct configuration file."},
-            //Obsolete: {"spark.app.id", "Application instance id is not configured (%s). Please correct configuration file."},
             {"monitoring.controlfile.path", "Path to control file is not configured (%s). Please correct configuration file."},
             {"monitoring.interval", "Monitoring interval is not configured (%s). Please correct configuration file."}
-            //Obsolete: {"monitoring.idle.threshold", "Idle threshold is not configured (%s). Please correct configuration file."}
     };
 
     protected void run(String configurationFilePath) {
@@ -49,23 +46,17 @@ public class RealTimeApplicationDriver {
         }
 
         // Extract configuration options
-        String appName = appConfig.getString("spark.app.name");
-        //String instanceId = appConfig.getString("spark.app.id");
-        instanceName = appName; // + "." + instanceId;
+        appName = appConfig.getString("spark.app.name");
         String controlFilePath = appConfig.getString("monitoring.controlfile.path");
         long interval = appConfig.getLong("monitoring.interval");
-        //int idleThreshold = appConfig.getInt("monitoring.idle.threshold");
 
         // Create Streaming context
-        // If checkpoint information is found in the FS - application state will be restored
-        // Otherwise new context will be created
-        JavaStreamingContext jssc = createContext(instanceName, appConfig);
-                //JavaStreamingContext.getOrCreate(checkpointDirectory, createContextFunc);
+        JavaStreamingContext jssc = createContext(appName, appConfig);
 
         if(jssc != null) {
             // In order to connect to other systems (e.g. monitoring) we have to write
             // process information to dedicated file
-            if (AppMonitoringInfo.store(jssc.sparkContext().sc(), instanceName, controlFilePath, appConfig) < 0) {
+            if (AppMonitoringInfo.store(jssc.sparkContext().sc(), appName, controlFilePath, appConfig) < 0) {
                 logger.error("Can't write application monitoring data - exiting application");
                 System.exit(-1);
             }
@@ -78,7 +69,7 @@ public class RealTimeApplicationDriver {
                 // Setup monitoring interval
                 long timeout = 1000 * 60 * interval;
                 // Monitor execution flow
-                monitor(jssc, timeout, instanceName, controlFilePath);
+                monitor(jssc, timeout, appName, controlFilePath);
                 exit_code = 0;
             } catch (Exception e) {
                 logger.error(e.getMessage());
