@@ -31,6 +31,7 @@ export const CategoryEditComponent = {
       this.newSubCategoriesList = [];
       if (this.editCategory.subCategories.length > 0) {
         this.changeSelectedSubCategory(this.editCategory.subCategories[0]);
+        this.subCategoryFlag = true;
       }
       this.newCategoryName = this.editCategory.categoryName;
       this.statuses = [{
