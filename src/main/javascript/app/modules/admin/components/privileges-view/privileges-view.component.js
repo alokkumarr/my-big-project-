@@ -2,7 +2,7 @@ import template from './privileges-view.component.html';
 import style from './privileges-view.component.scss';
 import AbstractComponentController from 'app/lib/common/components/abstractComponent';
 import {Subject} from 'rxjs/Subject';
-import {AdminMenuData} from '../../consts';
+import {AdminMenuData, PrivilegesTableHeader} from '../../consts';
 
 export const PrivilegesViewComponent = {
   template,
@@ -24,11 +24,12 @@ export const PrivilegesViewComponent = {
       this.resp = this._JwtService.getTokenObj();
       this.custID = this.resp.ticket.custID;
       this.custCode = this.resp.ticket.custCode;
+      this._privilegesCache = [];
       this._$rootScope.showProgress = true;
       this.PrivilegesManagementService.getActivePrivilegesList(this.custID).then(admin => {
         this.admin = admin;
         if (this.admin.valid) {
-          this.privilegeList = this.admin.privileges;
+          this._privilegesCache = this.privilegeList = this.admin.privileges;
           this._$rootScope.showProgress = false;
         } else {
           this._$rootScope.showProgress = false;
@@ -51,7 +52,9 @@ export const PrivilegesViewComponent = {
       this.showDialog({
         controller: scope => {
           scope.onSaveAction = privileges => {
-            this.updater.next({privileges});
+            this._privilegesCache = this.privilegeList = privileges;
+            this.applySearchFilter();
+            this.updater.next({privileges: this.privilegeList});
           };
         },
         template: '<privilege-new on-save="onSaveAction(privileges)"></privilege-new>',
@@ -78,7 +81,9 @@ export const PrivilegesViewComponent = {
       }).then(data => {
         if (data.valid) {
           this._$rootScope.showProgress = false;
-          this.privilegeList = data.privileges;
+          this._privilegesCache = this.privilegeList = data.privileges;
+          this.applySearchFilter();
+          this.updater.next({privileges: this.privilegeList});
           this._$mdToast.show({
             template: '<md-toast><span> Privilege is successfully deleted </md-toast>',
             position: 'bottom left',
@@ -104,7 +109,9 @@ export const PrivilegesViewComponent = {
         controller: scope => {
           scope.privilege = editPrivilege;
           scope.onUpdateAction = privileges => {
-            this.updater.next({privileges});
+            this._privilegesCache = this.privilegeList = privileges;
+            this.applySearchFilter();
+            this.updater.next({privileges: this.privilegeList});
           };
         },
         template: '<privilege-edit edit-privilege="privilege" on-update="onUpdateAction(privileges)" ></privilege-edit>',
@@ -122,6 +129,46 @@ export const PrivilegesViewComponent = {
           break;
         default:
       }
+    }
+    checkColumns(name) {
+      this.headerList = [];
+      this.headerList = PrivilegesTableHeader;
+      for (let i = 0; i < this.headerList.length; i++) {
+        if (this.headerList[i].name === name) {
+          return true;
+        }
+      }
+      return false;
+    }
+    applySearchFilter() {
+      this.searchText = [];
+      this.searchText = this.states.searchTerm.split(/:(.*)/).slice(0, -1);
+      switch (this.searchText.length) {
+        case 0: {
+          this.states.searchTermValue = this.states.searchTerm;
+          this.privilegeList = this.PrivilegesManagementService.searchPrivileges(this._privilegesCache, this.states.searchTerm, 'All');
+          break;
+        }
+        case 2: {
+          if (this.checkColumns(this.searchText[0].trim().toUpperCase())) {
+            this.states.searchTermValue = this.searchText[1].trim();
+            this.privilegeList = this.PrivilegesManagementService.searchPrivileges(this._privilegesCache, this.searchText[1].trim(), this.searchText[0].trim().toUpperCase());
+          } else {
+            this.states.searchTermValue = '';
+            this.privilegeList = this.PrivilegesManagementService.searchPrivileges(this._privilegesCache, this.states.searchTermValue, 'All');
+            this._$mdToast.show({
+              template: '<md-toast><span>"' + this.searchText[0].trim() + '" - Column does not exist.</md-toast>',
+              position: 'bottom left',
+              toastClass: 'toast-primary'
+            });
+          }
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+      this.updater.next({privileges: this.privilegeList});
     }
   }
 };

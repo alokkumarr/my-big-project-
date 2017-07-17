@@ -2,7 +2,7 @@ import template from './roles-view.component.html';
 import style from './roles-view.component.scss';
 import AbstractComponentController from 'app/lib/common/components/abstractComponent';
 import {Subject} from 'rxjs/Subject';
-import {AdminMenuData} from '../../consts';
+import {AdminMenuData, RolesTableHeader} from '../../consts';
 
 export const RolesViewComponent = {
   template,
@@ -24,11 +24,12 @@ export const RolesViewComponent = {
       this.resp = this._JwtService.getTokenObj();
       this.custID = this.resp.ticket.custID;
       this.custCode = this.resp.ticket.custCode;
+      this._rolesCache = [];
       this._$rootScope.showProgress = true;
       this.RolesManagementService.getActiveRolesList(this.custID).then(admin => {
         this.admin = admin;
         if (this.admin.valid) {
-          this.rolesList = this.admin.roles;
+          this._rolesCache = this.rolesList = this.admin.roles;
           this._$rootScope.showProgress = false;
         } else {
           this._$rootScope.showProgress = false;
@@ -57,7 +58,9 @@ export const RolesViewComponent = {
             controller: scope => {
               scope.roleTypes = this.response.roles;
               scope.onSaveAction = roles => {
-                this.updater.next({roles});
+                this._rolesCache = this.rolesList = roles;
+                this.applySearchFilter();
+                this.updater.next({roles: this.rolesList});
               };
             },
             template: '<role-new role-types="roleTypes" on-save="onSaveAction(roles)"></role-new>',
@@ -96,7 +99,9 @@ export const RolesViewComponent = {
       }).then(data => {
         if (data.valid) {
           this._$rootScope.showProgress = false;
-          this.rolesList = data.roles;
+          this._rolesCache = this.rolesList = data.roles;
+          this.applySearchFilter();
+          this.updater.next({roles: this.rolesList});
           this._$mdToast.show({
             template: '<md-toast><span> Role is successfully deleted </md-toast>',
             position: 'bottom left',
@@ -126,7 +131,9 @@ export const RolesViewComponent = {
               scope.roles = this.response.roles;
               scope.role = editRole;
               scope.onUpdateAction = roles => {
-                this.updater.next({roles});
+                this._rolesCache = this.rolesList = roles;
+                this.applySearchFilter();
+                this.updater.next({roles: this.rolesList});
               };
             },
             template: '<role-edit role-types="roles" edit-role="role" on-update="onUpdateAction(roles)" ></role-edit>',
@@ -155,6 +162,46 @@ export const RolesViewComponent = {
           break;
         default:
       }
+    }
+    checkColumns(name) {
+      this.headerList = [];
+      this.headerList = RolesTableHeader;
+      for (let i = 0; i < this.headerList.length; i++) {
+        if (this.headerList[i].name === name) {
+          return true;
+        }
+      }
+      return false;
+    }
+    applySearchFilter() {
+      this.searchText = [];
+      this.searchText = this.states.searchTerm.split(/:(.*)/).slice(0, -1);
+      switch (this.searchText.length) {
+        case 0: {
+          this.states.searchTermValue = this.states.searchTerm;
+          this.rolesList = this.RolesManagementService.searchRoles(this._rolesCache, this.states.searchTerm, 'All');
+          break;
+        }
+        case 2: {
+          if (this.checkColumns(this.searchText[0].trim().toUpperCase())) {
+            this.states.searchTermValue = this.searchText[1].trim();
+            this.rolesList = this.RolesManagementService.searchRoles(this._rolesCache, this.searchText[1].trim(), this.searchText[0].trim().toUpperCase());
+          } else {
+            this.states.searchTermValue = '';
+            this.userList = this.RolesManagementService.searchRoles(this._rolesCache, this.states.searchTermValue, 'All');
+            this._$mdToast.show({
+              template: '<md-toast><span>"' + this.searchText[0].trim() + '" - Column does not exist.</md-toast>',
+              position: 'bottom left',
+              toastClass: 'toast-primary'
+            });
+          }
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+      this.updater.next({roles: this.rolesList});
     }
   }
 };
