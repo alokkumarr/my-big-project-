@@ -36,6 +36,7 @@ export const ReportGridDisplayComponent = {
         return {
           caption: column.aliasName || column.displayName,
           dataField: column.columnName,
+          visibleIndex: column.visibleIndex,
           dataType: column.type,
           width: COLUMN_WIDTH
         };

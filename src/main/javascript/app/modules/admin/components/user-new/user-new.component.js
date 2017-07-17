@@ -26,7 +26,7 @@ export const UserNewComponent = {
     $onInit() {
       const custId = parseInt(get(this._JwtService.getTokenObj(), 'ticket.custID'), 10);
       this.user = {
-        activeStatusInd: 'Active',
+        activeStatusInd: 1,
         customerId: custId,
         masterLoginId: '',
         firstName: '',

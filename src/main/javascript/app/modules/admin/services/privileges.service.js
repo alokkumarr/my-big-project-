@@ -1,4 +1,5 @@
 import fpGet from 'lodash/fp/get';
+import filter from 'lodash/filter';
 
 export function PrivilegesManagementService($http, AppConfig) {
   'ngInject';
@@ -11,7 +12,8 @@ export function PrivilegesManagementService($http, AppConfig) {
     getCategories,
     savePrivilege,
     deletePrivilege,
-    updatePrivilege
+    updatePrivilege,
+    searchPrivileges
   };
   function getActivePrivilegesList(customerId) {
     return $http.post(`${loginUrl}/auth/admin/cust/manage/privileges/fetch`, customerId).then(fpGet('data'));
@@ -36,5 +38,40 @@ export function PrivilegesManagementService($http, AppConfig) {
   }
   function updatePrivilege(privilege) {
     return $http.post(`${loginUrl}/auth/admin/cust/manage/privileges/edit`, privilege).then(fpGet('data'));
+  }
+  function searchPrivileges(privileges, searchTerm = '', header) {
+    if (!searchTerm) {
+      return privileges;
+    }
+    const term = searchTerm.toUpperCase();
+    const matchIn = item => {
+      return (item || '').toUpperCase().indexOf(term) !== -1;
+    };
+    return filter(privileges, item => {
+      switch (header) {
+        default: {
+          return matchIn(item.productName) ||
+            matchIn(item.moduleName) ||
+            matchIn(item.categoryName) ||
+            matchIn(item.roleName) ||
+            matchIn(item.privilegeDesc);
+        }
+        case 'PRODUCT': {
+          return matchIn(item.productName);
+        }
+        case 'MODULE': {
+          return matchIn(item.moduleName);
+        }
+        case 'CATEGORY': {
+          return matchIn(item.categoryName);
+        }
+        case 'ROLE': {
+          return matchIn(item.roleName);
+        }
+        case 'PRIVILEGE DESC': {
+          return matchIn(item.privilegeDesc);
+        }
+      }
+    });
   }
 }

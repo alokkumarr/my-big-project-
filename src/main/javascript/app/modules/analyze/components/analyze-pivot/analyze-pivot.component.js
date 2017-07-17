@@ -485,8 +485,8 @@ export const AnalyzePivotComponent = {
         booleanCriteria: this.model.sqlBuilder.booleanCriteria,
         filters: map(this.filters, this._FilterService.frontend2BackendFilter()),
         sorts: this.mapFrontend2BackendSort(this.sorts),
-        rowFields: groupedFields.row,
-        columnFields: groupedFields.column,
+        rowFields: groupedFields.row || [],
+        columnFields: groupedFields.column || [],
         dataFields: groupedFields.data
       };
     }

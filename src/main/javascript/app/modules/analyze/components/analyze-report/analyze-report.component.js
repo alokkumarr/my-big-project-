@@ -288,6 +288,7 @@ export const AnalyzeReportComponent = {
           field.alias = itemB.aliasName;
           field.type = itemB.type;
           field.checked = itemB.checked;
+          field.visibleIndex = itemB.visibleIndex;
           field.isHidden = Boolean(itemB.hide);
           field.isJoinEligible = Boolean(itemB.joinEligible);
           if (field.isJoinEligible) {
@@ -372,7 +373,8 @@ export const AnalyzeReportComponent = {
             hide: field.isHidden,
             joinEligible: field.meta.joinEligible,
             filterEligible: field.meta.filterEligible,
-            checked: field.checked
+            checked: field.checked,
+            visibleIndex: field.visibleIndex
           };
 
           tableArtifact.columns.push(fieldArtifact);
