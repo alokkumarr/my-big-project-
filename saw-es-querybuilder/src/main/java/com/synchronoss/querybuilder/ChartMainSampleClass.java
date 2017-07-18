@@ -196,7 +196,7 @@ public class ChartMainSampleClass {
     List<com.synchronoss.querybuilder.model.chart.DataField> dataFields =  sqlBuilderNode.getDataFields();
     if (nodeFields != null && dataFields !=null)
     {
-      if (!nodeFields.isEmpty() && nodeFields.size() <=3){
+      if (!nodeFields.isEmpty() && dataFields.size() <=3){
       searchSourceBuilder = AxesFieldDataFieldsAvailable.rowDataFieldsAvailable
           (nodeFields, dataFields, searchSourceBuilder, boolQueryBuilder);
       }
