@@ -30,16 +30,16 @@ class AxesFieldDataFieldsAvailable {
 			{
 				if (dataFields.size()==1)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(nodeFields.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("y_axis").field(nodeFields.get(1).getColumnName())
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("node_field_1").field(nodeFields.get(0).getColumnName())
+							.subAggregation(AggregationBuilders.terms("node_field_2").field(nodeFields.get(1).getColumnName())
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
 	    							));
 				}// dataFields.size() == 1
 
 				if (dataFields.size()==2)
 				{
-                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(nodeFields.get(0).getColumnName())
-                      .subAggregation(AggregationBuilders.terms("y_axis").field(nodeFields.get(1).getColumnName())
+                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("node_field_1").field(nodeFields.get(0).getColumnName())
+                      .subAggregation(AggregationBuilders.terms("node_field_2").field(nodeFields.get(1).getColumnName())
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
 	    					));
@@ -48,8 +48,8 @@ class AxesFieldDataFieldsAvailable {
 
 				if (dataFields.size()==3)
 				{
-                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(nodeFields.get(0).getColumnName())
-                      .subAggregation(AggregationBuilders.terms("y_axis").field(nodeFields.get(1).getColumnName())
+                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("node_field_1").field(nodeFields.get(0).getColumnName())
+                      .subAggregation(AggregationBuilders.terms("node_field_2").field(nodeFields.get(1).getColumnName())
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))		
@@ -59,8 +59,8 @@ class AxesFieldDataFieldsAvailable {
 				
 				if (dataFields.size()==4)
 				{
-                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(nodeFields.get(0).getColumnName())
-                      .subAggregation(AggregationBuilders.terms("y_axis").field(nodeFields.get(1).getColumnName())
+                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("node_field_1").field(nodeFields.get(0).getColumnName())
+                      .subAggregation(AggregationBuilders.terms("node_field_2").field(nodeFields.get(1).getColumnName())
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))
@@ -71,8 +71,8 @@ class AxesFieldDataFieldsAvailable {
 				
 				if (dataFields.size()==5)
 				{
-                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(nodeFields.get(0).getColumnName())
-                      .subAggregation(AggregationBuilders.terms("y_axis").field(nodeFields.get(1).getColumnName())
+                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("node_field_1").field(nodeFields.get(0).getColumnName())
+                      .subAggregation(AggregationBuilders.terms("node_field_2").field(nodeFields.get(1).getColumnName())
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))
@@ -93,18 +93,18 @@ class AxesFieldDataFieldsAvailable {
 			{
 				if (dataFields.size()==1)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(axesfields.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("y_axis").field(axesfields.get(1).getColumnName())
-							.subAggregation(AggregationBuilders.terms("z_axis").field(axesfields.get(2).getColumnName())		
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("node_field_1").field(axesfields.get(0).getColumnName())
+							.subAggregation(AggregationBuilders.terms("node_field_2").field(axesfields.get(1).getColumnName())
+							.subAggregation(AggregationBuilders.terms("node_field_3").field(axesfields.get(2).getColumnName())		
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
 	    							)));
 				}// dataFields.size() == 1
 
 				if (dataFields.size()==2)
 				{
-                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(axesfields.get(0).getColumnName())
-                      .subAggregation(AggregationBuilders.terms("y_axis").field(axesfields.get(1).getColumnName())
-                      .subAggregation(AggregationBuilders.terms("z_axis").field(axesfields.get(2).getColumnName())        
+                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("node_field_1").field(axesfields.get(0).getColumnName())
+                      .subAggregation(AggregationBuilders.terms("node_field_2").field(axesfields.get(1).getColumnName())
+                      .subAggregation(AggregationBuilders.terms("node_field_3").field(axesfields.get(2).getColumnName())      
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
 	    					)));
@@ -113,9 +113,9 @@ class AxesFieldDataFieldsAvailable {
 
 				if (dataFields.size()==3)
 				{
-                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(axesfields.get(0).getColumnName())
-                      .subAggregation(AggregationBuilders.terms("y_axis").field(axesfields.get(1).getColumnName())
-                      .subAggregation(AggregationBuilders.terms("z_axis").field(axesfields.get(2).getColumnName())        
+                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("node_field_1").field(axesfields.get(0).getColumnName())
+                      .subAggregation(AggregationBuilders.terms("node_field_2").field(axesfields.get(1).getColumnName())
+                      .subAggregation(AggregationBuilders.terms("node_field_3").field(axesfields.get(2).getColumnName())      
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))		
@@ -125,9 +125,9 @@ class AxesFieldDataFieldsAvailable {
 				
 				if (dataFields.size()==4)
 				{
-                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(axesfields.get(0).getColumnName())
-                      .subAggregation(AggregationBuilders.terms("y_axis").field(axesfields.get(1).getColumnName())
-                      .subAggregation(AggregationBuilders.terms("z_axis").field(axesfields.get(2).getColumnName())        
+                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("node_field_1").field(axesfields.get(0).getColumnName())
+                      .subAggregation(AggregationBuilders.terms("node_field_2").field(axesfields.get(1).getColumnName())
+                      .subAggregation(AggregationBuilders.terms("node_field_3").field(axesfields.get(2).getColumnName())      
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))
@@ -138,9 +138,9 @@ class AxesFieldDataFieldsAvailable {
 				
 				if (dataFields.size()==5)
 				{
-                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("x_axis").field(axesfields.get(0).getColumnName())
-                      .subAggregation(AggregationBuilders.terms("y_axis").field(axesfields.get(1).getColumnName())
-                      .subAggregation(AggregationBuilders.terms("z_axis").field(axesfields.get(2).getColumnName())        
+                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("node_field_1").field(axesfields.get(0).getColumnName())
+                      .subAggregation(AggregationBuilders.terms("node_field_2").field(axesfields.get(1).getColumnName())
+                      .subAggregation(AggregationBuilders.terms("node_field_3").field(axesfields.get(2).getColumnName())      
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))
