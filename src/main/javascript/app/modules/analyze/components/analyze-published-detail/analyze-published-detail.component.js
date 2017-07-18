@@ -5,7 +5,7 @@ import {Events} from '../../consts';
 
 import template from './analyze-published-detail.component.html';
 import style from './analyze-published-detail.component.scss';
-import AbstractComponentController from 'app/lib/common/components/abstractComponent';
+import AbstractComponentController from 'app/common/components/abstractComponent';
 
 export const AnalyzePublishedDetailComponent = {
   template,
