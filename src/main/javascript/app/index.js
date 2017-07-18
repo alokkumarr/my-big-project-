@@ -30,8 +30,7 @@ import {config} from './config';
 import {interceptor} from './http-interceptor';
 import {runConfig} from './run';
 
-import {LibModule} from './lib';
-import {CommonModule} from './modules/common';
+import {CommonModule} from './common';
 import {ObserveModule} from './modules/observe';
 import {AnalyzeModule} from './modules/analyze';
 import {AlertsModule} from './modules/alerts';
@@ -55,7 +54,6 @@ angular
     'ngIdle',
     'dx',
     'pascalprecht.translate',
-    LibModule,
     CommonModule,
     ObserveModule,
     AnalyzeModule,

@@ -1,6 +1,6 @@
 import template from './categories-view.component.html';
 import style from './categories-view.component.scss';
-import AbstractComponentController from 'app/lib/common/components/abstractComponent';
+import AbstractComponentController from 'app/common/components/abstractComponent';
 import {Subject} from 'rxjs/Subject';
 import {AdminMenuData, CategoriesTableHeader} from '../../consts';
 

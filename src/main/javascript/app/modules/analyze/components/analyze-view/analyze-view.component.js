@@ -6,7 +6,7 @@ import findIndex from 'lodash/findIndex';
 import {Subject} from 'rxjs/Subject';
 
 import {Events} from '../../consts';
-import AbstractComponentController from 'app/lib/common/components/abstractComponent';
+import AbstractComponentController from 'app/common/components/abstractComponent';
 
 export const AnalyzeViewComponent = {
   template,
