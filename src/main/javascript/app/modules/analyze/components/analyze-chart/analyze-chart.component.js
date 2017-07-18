@@ -314,8 +314,8 @@ export const AnalyzeChartComponent = {
 
       delete result.supports;
       set(result, 'sqlBuilder.sorts', []);
-      set(result, 'sqlBuilder.groupBy', find(this.settings.xaxis, x => x.checked));
-      set(result, 'sqlBuilder.splitBy', find(this.settings.groupBy, x => x.checked));
+      set(result, 'sqlBuilder.nodeFields.[0]', find(this.settings.xaxis, x => x.checked));
+      set(result, 'sqlBuilder.nodeFields.[1]', find(this.settings.groupBy, g => g.checked));
       set(result, 'sqlBuilder.dataFields', [assign({aggregate: 'sum'}, y)]);
       set(result, 'sqlBuilder.booleanCriteria', this.model.sqlBuilder.booleanCriteria);
       set(result, 'xAxis', {title: this.labels.x});

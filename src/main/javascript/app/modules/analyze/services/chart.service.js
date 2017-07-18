@@ -161,7 +161,7 @@ export function ChartService() {
     const defaultSeriesName = x ? x.displayName : 'Series 1';
 
     const categories = map(
-      get(data, 'group_by.buckets'),
+      get(data, 'x_axis.buckets'),
       bucket => bucket.key
     );
 
@@ -175,10 +175,10 @@ export function ChartService() {
        is a value for @x column, and @y.
        */
     const res = reduce(
-      get(data, 'group_by.buckets'),
+      get(data, 'x_axis.buckets'),
       (obj, bucket) => {
         forEach(
-          get(bucket, 'split_by.buckets', [{
+          get(bucket, 'y_axis.buckets', [{
             key: defaultSeriesName,
             [y.columnName]: {value: get(bucket[y.columnName], 'value', 0)}
           }]),
@@ -270,9 +270,9 @@ export function ChartService() {
     ));
     const groupBy = map(xaxis, clone);
 
-    mergeArtifactsWithSettings(xaxis, get(model, 'sqlBuilder.groupBy', {}));
+    mergeArtifactsWithSettings(xaxis, get(model, 'sqlBuilder.nodeFields[0]', {}));
+    mergeArtifactsWithSettings(groupBy, get(model, 'sqlBuilder.nodeFields[1]', {}));
     mergeArtifactsWithSettings(yaxis, get(model, 'sqlBuilder.dataFields.[0]', {}));
-    mergeArtifactsWithSettings(groupBy, get(model, 'sqlBuilder.splitBy', {}));
 
     return {
       yaxis,
