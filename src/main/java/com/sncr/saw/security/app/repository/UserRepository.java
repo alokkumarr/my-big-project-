@@ -61,5 +61,7 @@ public interface UserRepository {
 	boolean deleteCategory(Long categoryId);
 	List<SubCategoryDetails> getSubCategories(Long customerId, String featureCode);
 	Valid updateCategory(CategoryDetails category);
-	boolean checkSubCatExists(CategoryDetails category);	
+	boolean checkSubCatExists(CategoryDetails category);
+	boolean checkIfSubCatExists(CategoryDetails category);
+	PrivilegeDetails fetchIfPrivExists(Long roleId, Long custProdModFeatureId);	
 }

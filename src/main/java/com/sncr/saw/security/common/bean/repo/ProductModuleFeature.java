@@ -20,9 +20,16 @@ public class ProductModuleFeature implements Serializable {
 	private String prodModFeatureType;
 	private String defaultFeature;	
 	private String prodModFeatrCode;
+	private Long roleId;
 	private ArrayList<ProductModuleFeature> ProductModuleSubFeatures;
 	
 		
+	public Long getRoleId() {
+		return roleId;
+	}
+	public void setRoleId(Long roleId) {
+		this.roleId = roleId;
+	}
 	public ArrayList<ProductModuleFeature> getProductModuleSubFeatures() {
 		return ProductModuleSubFeatures;
 	}
