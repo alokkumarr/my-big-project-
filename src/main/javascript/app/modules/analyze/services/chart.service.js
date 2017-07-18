@@ -161,7 +161,7 @@ export function ChartService() {
     const defaultSeriesName = x ? x.displayName : 'Series 1';
 
     const categories = map(
-      get(data, 'x_axis.buckets'),
+      get(data, 'node_field_1.buckets'),
       bucket => bucket.key
     );
 
@@ -175,10 +175,10 @@ export function ChartService() {
        is a value for @x column, and @y.
        */
     const res = reduce(
-      get(data, 'x_axis.buckets'),
+      get(data, 'node_field_1.buckets'),
       (obj, bucket) => {
         forEach(
-          get(bucket, 'y_axis.buckets', [{
+          get(bucket, 'node_field_2.buckets', [{
             key: defaultSeriesName,
             [y.columnName]: {value: get(bucket[y.columnName], 'value', 0)}
           }]),
