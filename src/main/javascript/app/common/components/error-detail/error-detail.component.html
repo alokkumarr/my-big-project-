@@ -1,0 +1,18 @@
+<md-dialog class="error-detail-dialog">
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2 ng-bind="::$ctrl.errorMessage"></h2>
+      <span flex></span>
+
+      <md-button class="md-icon-button"
+                 ng-click="$ctrl.cancel()">
+        <md-icon md-font-icon="icon-close"></md-icon>
+      </md-button>
+    </div>
+  </md-toolbar>
+  <md-dialog-content>
+    <div class="error-detail-container">
+      <code ng-bind="::$ctrl.errorObj"> </code>
+    </div>
+  </md-dialog-content>
+</md-dialog>
