@@ -15,6 +15,7 @@ import fpMapValues from 'lodash/fp/mapValues';
 import groupBy from 'lodash/groupBy';
 import fpFlatMap from 'lodash/fp/flatMap';
 import fpSortBy from 'lodash/fp/sortBy';
+import reduce from 'lodash/reduce';
 
 import {NUMBER_TYPES} from '../consts';
 
@@ -132,6 +133,31 @@ export function ChartService() {
     return config;
   };
 
+    /** the mapping between the field columnNames, and the chart axes
+   * the backend returns the aggregate data in with the fields columnName as property
+   * the bubble chart requires x, y, z for the axes if they are of number type
+   * Example:
+   * AVAILABLE_MB -> x
+   */
+  function getDataFieldMap(dataFields) {
+    return reduce(dataFields, (accumulator, field) => {
+      accumulator[field.columnName] = field.checked;
+      return accumulator;
+    }, {});
+  }
+
+  /** the mapping between the tree node names and the chart axes or groupBy names
+   * the backend returns the string type data as tree node names
+   * the bubble chart requires x, y, z for the axes if they are of type number
+   * it can be an array, because the only useful in the tree node is the index
+   * Example:
+   * string_field_1: 0 -> g (marker on the checked attribute)
+   * string_field_2: 1 -> y
+   */
+  function getNodeFieldMap(nodeFields) {
+    return map(nodeFields, 'checked');
+  }
+
   /** parse the tree structure data and return a flattened array:
    * [{
    *   x: ..,
@@ -140,7 +166,9 @@ export function ChartService() {
    *   z: ..
    * }, ..]
    */
-  function parseData(data, nodeFieldMap, dataFieldMap) {
+  function parseData(data, sqlBuilder) {
+    const nodeFieldMap = getNodeFieldMap(sqlBuilder.nodeFields);
+    const dataFieldMap = getDataFieldMap(sqlBuilder.dataFields);
     return parseNode(data, {}, nodeFieldMap, dataFieldMap, 1);
   }
 

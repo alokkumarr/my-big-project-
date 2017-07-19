@@ -9,7 +9,6 @@ import map from 'lodash/map';
 import values from 'lodash/values';
 import clone from 'lodash/clone';
 import set from 'lodash/set';
-import reduce from 'lodash/reduce';
 import cloneDeep from 'lodash/cloneDeep';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
 
@@ -225,9 +224,9 @@ export const AnalyzeChartComponent = {
         return;
       }
       this.showProgress = true;
-      const {payload, metaData} = this.generatePayloadWithParserMetaData(this.model);
+      const payload = this.generatePayload(this.model);
       return this._AnalyzeService.getDataBySettings(payload).then(({data}) => {
-        const parsedData = this._ChartService.parseData(data, metaData.nodeFieldMap, metaData.dataFieldMap);
+        const parsedData = this._ChartService.parseData(data, payload.sqlBuilder);
         this.gridData = this.filteredGridData = parsedData || this.filteredGridData;
         this.analysisChanged = false;
         this.showProgress = false;
@@ -355,44 +354,6 @@ export const AnalyzeChartComponent = {
 
     isDataField(field) {
       return field && NUMBER_TYPES.includes(field.type);
-    }
-
-    /** the mapping between the field columnNames, and the chart axes
-     * the backend returns the aggregate data in with the fields columnName as property
-     * the bubble chart requires x, y, z for the axes if they are of number type
-     * Example:
-     * AVAILABLE_MB -> x
-     */
-    getDataFieldMap(dataFields) {
-      return reduce(dataFields, (accumulator, field) => {
-        accumulator[field.columnName] = field.checked;
-        return accumulator;
-      }, {});
-    }
-
-    /** the mapping between the tree node names and the chart axes or groupBy names
-     * the backend returns the string type data as tree node names
-     * the bubble chart requires x, y, z for the axes if they are of type number
-     * it can be an array, because the only useful in the tree node is the index
-     * Example:
-     * string_field_1: 0 -> g (marker on the checked attribute)
-     * string_field_2: 1 -> y
-     */
-    getNodeFieldMap(nodeFields) {
-      return map(nodeFields, 'checked');
-    }
-
-    /** generate the metadata for easier parsing */
-    generatePayloadWithParserMetaData(source) {
-      const payload = this.generatePayload(source);
-      const metaData = {
-        nodeFieldMap: this.getNodeFieldMap(payload.sqlBuilder.nodeFields),
-        dataFieldMap: this.getDataFieldMap(payload.sqlBuilder.dataFields)
-      };
-      return {
-        payload,
-        metaData
-      };
     }
 
     generatePayload(source) {
