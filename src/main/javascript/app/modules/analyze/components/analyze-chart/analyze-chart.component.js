@@ -21,11 +21,11 @@ import style from './analyze-chart.component.scss';
 const BAR_COLUMN_OPTIONS = [{
   label: 'TOOLTIP_BAR_CHART',
   type: 'bar',
-  icon: 'icon-hor-bar-chart'
+  icon: {font: 'icon-hor-bar-chart'}
 }, {
   label: 'TOOLTIP_COLUMN_CHART',
   type: 'column',
-  icon: 'icon-vert-bar-chart'
+  icon: {font: 'icon-vert-bar-chart'}
 }];
 
 export const AnalyzeChartComponent = {
@@ -382,6 +382,7 @@ export const AnalyzeChartComponent = {
       return map(nodeFields, 'checked');
     }
 
+    /** generate the metadata for easier parsing */
     generatePayloadWithParserMetaData(source) {
       const payload = this.generatePayload(source);
       const metaData = {

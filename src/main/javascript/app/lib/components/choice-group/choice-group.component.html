@@ -6,7 +6,12 @@
              ng-value="item.type"
              ng-click="$ctrl.onItemSelected(item)">
     <md-icon flex
-             md-font-icon="{{::item.icon}}">
+             ng-if="::item.icon.font"
+             md-font-icon="{{::item.icon.font}}">
+    </md-icon>
+    <md-icon flex
+             ng-if="::item.icon.svg"
+             md-svg-src="{{::item.icon.svg}}">
     </md-icon>
     <md-tooltip ng-bind="item.label | translate"
                 ng-if="::$ctrl.iconOnly"></md-tooltip>
