@@ -181,7 +181,7 @@ export const AnalyzeChartComponent = {
       this.labels.x = this.labels.tempX;
       this.labels.y = this.labels.tempY;
       this.draftMode = true;
-      this.reloadChart(this.settings, this.filteredGridData);
+      this.reloadChart(this.settings);
     }
 
     getDataByQuery() {

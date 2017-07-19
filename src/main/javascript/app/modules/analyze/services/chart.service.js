@@ -266,10 +266,10 @@ export function ChartService() {
 
     const changes = [{
       path: 'xAxis.title.text',
-      data: get(opts, 'labels.x', labels.x)
+      data: (opts.labels && opts.labels.x) || labels.x
     }, {
       path: 'yAxis.title.text',
-      data: get(opts, 'labels.y', labels.y)
+      data: (opts.labels && opts.labels.y) || labels.y
     }];
 
     if (!isEmpty(gridData)) {
