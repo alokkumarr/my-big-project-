@@ -1,6 +1,7 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import findIndex from 'lodash/findIndex';
 import find from 'lodash/find';
+import filter from 'lodash/filter';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import assign from 'lodash/assign';
@@ -8,10 +9,11 @@ import map from 'lodash/map';
 import values from 'lodash/values';
 import clone from 'lodash/clone';
 import set from 'lodash/set';
+import reduce from 'lodash/reduce';
 import cloneDeep from 'lodash/cloneDeep';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
 
-import {ENTRY_MODES} from '../../consts';
+import {ENTRY_MODES, NUMBER_TYPES} from '../../consts';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -223,9 +225,10 @@ export const AnalyzeChartComponent = {
         return;
       }
       this.showProgress = true;
-      const payload = this.generatePayload(this.model);
+      const {payload, metaData} = this.generatePayloadWithParserMetaData(this.model);
       return this._AnalyzeService.getDataBySettings(payload).then(({data}) => {
-        this.gridData = this.filteredGridData = data || this.filteredGridData;
+        const parsedData = this._ChartService.parseData(data, metaData.nodeFieldMap, metaData.dataFieldMap);
+        this.gridData = this.filteredGridData = parsedData || this.filteredGridData;
         this.analysisChanged = false;
         this.showProgress = false;
         this.reloadChart(this.settings, this.filteredGridData);
@@ -346,49 +349,86 @@ export const AnalyzeChartComponent = {
       return artifacts[id];
     }
 
-    generatePayload(source) {
-      const result = clone(source);
+    isStringField(field) {
+      return field && !NUMBER_TYPES.includes(field.type);
+    }
 
-      set(result, 'sqlBuilder.filters', map(
+    isDataField(field) {
+      return field && NUMBER_TYPES.includes(field.type);
+    }
+
+    /** the mapping between the field columnNames, and the chart axes
+     * the backend returns the aggregate data in with the fields columnName as property
+     * the bubble chart requires x, y, z for the axes if they are of number type
+     * Example:
+     * AVAILABLE_MB -> x
+     */
+    getDataFieldMap(dataFields) {
+      return reduce(dataFields, (accumulator, field) => {
+        accumulator[field.columnName] = field.checked;
+        return accumulator;
+      }, {});
+    }
+
+    /** the mapping between the tree node names and the chart axes or groupBy names
+     * the backend returns the string type data as tree node names
+     * the bubble chart requires x, y, z for the axes if they are of type number
+     * it can be an array, because the only useful in the tree node is the index
+     * Example:
+     * string_field_1: 0 -> g (marker on the checked attribute)
+     * string_field_2: 1 -> y
+     */
+    getNodeFieldMap(nodeFields) {
+      return map(nodeFields, 'checked');
+    }
+
+    generatePayloadWithParserMetaData(source) {
+      const payload = this.generatePayload(source);
+      const metaData = {
+        nodeFieldMap: this.getNodeFieldMap(payload.sqlBuilder.nodeFields),
+        dataFieldMap: this.getDataFieldMap(payload.sqlBuilder.dataFields)
+      };
+      return {
+        payload,
+        metaData
+      };
+    }
+
+    generatePayload(source) {
+      const payload = clone(source);
+
+      set(payload, 'sqlBuilder.filters', map(
         this.filters,
         this._FilterService.frontend2BackendFilter()
       ));
 
+      const g = find(this.settings.groupBy, g => g.checked === 'g');
       const x = find(this.settings.xaxis, x => x.checked === 'x');
       const y = find(this.settings.yaxis, y => y.checked === 'y');
-      const g = find(this.settings.groupBy, g => g.checked === 'g');
-      let z;
+      const z = find(this.settings.zaxis, z => z.checked === 'z');
 
-      switch (this.model.chartType) {
-        case 'bubble':
-          z = find(this.settings.zaxis, z => z.checked === 'z');
-          set(result, 'sqlBuilder.splitBy', null);
-          set(result, 'sqlBuilder.groupBy', g);
-          set(result, 'sqlBuilder.dataFields', [
-            assign({aggregate: 'sum'}, x),
-            assign({aggregate: 'sum'}, y),
-            assign({aggregate: 'sum'}, z)
-          ]);
-          break;
-        default:
-          set(result, 'sqlBuilder.splitBy', g);
-          set(result, 'sqlBuilder.groupBy', x);
-          set(result, 'sqlBuilder.dataFields', [
-            assign({aggregate: 'sum'}, y)
-          ]);
-      }
+      const allFields = [g, x, y, z];
 
-      delete result.supports;
-      set(result, 'sqlBuilder.sorts', []);
-      set(result, 'sqlBuilder.booleanCriteria', this.model.sqlBuilder.booleanCriteria);
-      set(result, 'xAxis', {title: this.labels.x});
-      set(result, 'yAxis', {title: this.labels.y});
-      set(result, 'legend', {
+      const nodeFields = filter(allFields, this.isStringField);
+      const dataFields = filter(allFields, this.isDataField).map(field => {
+        field.aggregate = 'sum';
+        return field;
+      });
+
+      set(payload, 'sqlBuilder.dataFields', dataFields);
+      set(payload, 'sqlBuilder.nodeFields', nodeFields);
+
+      delete payload.supports;
+      set(payload, 'sqlBuilder.sorts', []);
+      set(payload, 'sqlBuilder.booleanCriteria', this.model.sqlBuilder.booleanCriteria);
+      set(payload, 'xAxis', {title: this.labels.x});
+      set(payload, 'yAxis', {title: this.labels.y});
+      set(payload, 'legend', {
         align: this.legend.align,
         layout: this.legend.layout
       });
 
-      return result;
+      return payload;
     }
 
     openSaveModal(ev) {
