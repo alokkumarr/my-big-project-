@@ -249,7 +249,7 @@ export const AnalyzeChartComponent = {
         // x, y and z axes are mandatory
         // grouping is optional
           if (!x || !y || !z) {
-            errors[0] = 'ERROR_X_Y_AXES_REQUIRED';
+            errors[0] = 'ERROR_X_Y_SIZEBY_AXES_REQUIRED';
             isValid = false;
           }
           break;
@@ -257,7 +257,7 @@ export const AnalyzeChartComponent = {
         // x and y axes are mandatory
         // grouping is optional
           if (!x || !y) {
-            errors[0] = 'ERROR_X_Y_Z_AXES_REQUIRED';
+            errors[0] = 'ERROR_X_Y_AXES_REQUIRED';
             isValid = false;
           }
       }
@@ -290,6 +290,9 @@ export const AnalyzeChartComponent = {
     }
 
     reloadChart(settings, filteredGridData) {
+      if (isEmpty(filteredGridData)) {
+        return;
+      }
       const changes = this._ChartService.dataToChangeConfig(
         this.model.chartType,
         settings,

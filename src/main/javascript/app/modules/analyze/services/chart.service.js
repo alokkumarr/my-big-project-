@@ -381,7 +381,7 @@ export function ChartService() {
 
     switch (model.chartType) {
       case 'bubble':
-        xaxis = attributes;
+        xaxis = filterStringTypes(attributes);
         yaxis = attributes;
         zaxis = filterNumberTypes(attributes);
         settingsObj = {
