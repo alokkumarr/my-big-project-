@@ -5,11 +5,15 @@
 </category-dialog-header> <category-dialog-content>
 <div layout="column">
 <form name="newCategoryForm" method="post">
-  <div class="input-checkbox-container" flex> <label class="label-padding"
-		translate="SUB_CATEGORY_FLAG_LABEL"></label> 
-      <md-checkbox type="checkbox"
-		ng-model="$ctrl.subCategoryInd" ></md-checkbox>
-  </div>
+
+  <md-radio-group ng-model="$ctrl.subCategoryInd">
+    <md-radio-button ng-value="false" class="horizantal-radio-box">
+      <span translate="CATEGORY_FLAG_LABEL"></span>
+    </md-radio-button>
+    <md-radio-button ng-value="true" class="horizantal-radio-box">
+      <span translate="SUB_CATEGORY_FLAG_LABEL"></span>
+    </md-radio-button>
+  </md-radio-group>
   <md-input-container flex class="padding-for-container"> <label
 		translate="CATEGORY_PROD_LABEL"></label> <md-select
 		ng-model="$ctrl.category.productId" required

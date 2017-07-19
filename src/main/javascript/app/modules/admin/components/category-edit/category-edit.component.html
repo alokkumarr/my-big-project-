@@ -18,7 +18,7 @@
 		ng-bind="::module.moduleName"></md-option> </md-select> </md-input-container>
   <md-input-container flex> <label
 		translate="CATEGORY_NAME_LABEL"></label> <input name="categoryName"
-		ng-model="$ctrl.newCategoryName" 
+		ng-model="$ctrl.newCategoryName" ng-readonly="$ctrl.newCategoryName.toUpperCase() == 'MY ANALYSIS'"
 		ng-pattern="/^[a-zA-Z\s]*$/"
 		required/> </md-input-container>
   <md-input-container flex> <label

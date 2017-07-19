@@ -26,6 +26,7 @@ export const CategoryNewComponent = {
       const userId = get(this._JwtService.getTokenObj(), 'ticket.masterLoginId');
       this.masterLoginId = userId;
       this.getProducts(custId);
+      this.subCategoryInd = false;
       this.category = {
         activeStatusInd: 1
       };
