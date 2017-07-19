@@ -30,12 +30,11 @@ export const AnalyzeChartSettingsComponent = {
       });
       this.groupRemovalAction = {
         icon: 'icon-close',
+        class: 'md-warn',
         isVisible: () => this.selected.g,
         callback: () => {
+          this.selected.g.checked = false;
           this.selected.g = null;
-          forEach(this.settings.groupBy, attr => {
-            attr.checked = false;
-          });
         }
       };
     }

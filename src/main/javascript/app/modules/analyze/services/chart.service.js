@@ -16,6 +16,7 @@ import groupBy from 'lodash/groupBy';
 import fpFlatMap from 'lodash/fp/flatMap';
 import fpSortBy from 'lodash/fp/sortBy';
 import reduce from 'lodash/reduce';
+import concat from 'lodash/concat';
 
 import {NUMBER_TYPES} from '../consts';
 
@@ -316,8 +317,35 @@ export function ChartService() {
       });
     }
 
-    return changes;
+    return concat(
+      changes,
+      addSpecificChartConfig(type, fields)
+    );
   };
+
+  function addSpecificChartConfig(chartType, fields) {
+    const changes = [];
+    if (chartType === 'bubble') {
+      const groupString = `<tr><th colspan="2"><h3>{point.g}</h3></th></tr>`;
+      const xIsNumber = NUMBER_TYPES.includes(fields.x.type);
+      const yIsNumber = NUMBER_TYPES.includes(fields.y.type);
+      // z is always a number
+      changes.push({
+        path: 'tooltip',
+        data: {
+          useHTML: true,
+          headerFormat: '<table>',
+          pointFormat: `${fields.g ? groupString : ''}
+              <tr><th>${fields.x.displayName}:</th><td>{point.x${xIsNumber ? ':,.2f' : ''}}</td></tr>
+              <tr><th>${fields.y.displayName}:</th><td>{point.y${yIsNumber ? ':,.2f' : ''}}</td></tr>
+              <tr><th>${fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>`,
+          footerFormat: '</table>',
+          followPointer: true
+        }
+      });
+    }
+    return changes;
+  }
 
   function filterNumberTypes(attributes) {
     return filter(attributes, attr => (
