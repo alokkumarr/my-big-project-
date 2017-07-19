@@ -113,7 +113,8 @@ export function ChartService() {
       legend: {
         align: legendPosition.align,
         verticalAlign: legendPosition.verticalAlign,
-        layout: legendLayout.layout
+        layout: legendLayout.layout,
+        enabled: false
       },
       series: [{
         name: 'Series 1',
@@ -344,6 +345,13 @@ export function ChartService() {
         }
       });
     }
+
+    // if there is no grouping disable the legend
+    // because there is only one data series
+    changes.push({
+      path: 'legend.enabled',
+      data: Boolean(fields.g)
+    });
     return changes;
   }
 
