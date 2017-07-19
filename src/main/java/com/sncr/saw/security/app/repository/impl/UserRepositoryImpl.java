@@ -1342,14 +1342,11 @@ public class UserRepositoryImpl implements UserRepository {
 
 	@Override
 	public boolean deleteUser(Long userId, String masterLoginId) {
-		String sql = "UPDATE USERS SET ACTIVE_STATUS_IND = 0, INACTIVATED_DATE=SYSDATE(), INACTIVATED_BY=?  "
-				+ " WHERE USER_SYS_ID = ?";
+		String sql = "DELETE FROM USERS WHERE USER_SYS_ID = ?";
 		try {
 			jdbcTemplate.update(sql, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setString(1, masterLoginId);
-					preparedStatement.setLong(2, userId);
-
+					preparedStatement.setLong(1, userId);
 				}
 			});
 		} catch (Exception e) {
