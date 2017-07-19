@@ -44,13 +44,9 @@ export const AnalyzeNewComponent = {
         const supportedMethodCategory = find(supportedMethods, ({category}) => category === methodCategory.category);
 
         forEach(methodCategory.children, method => {
-          let isSupported = supportedMethodCategory ?
+          const isSupported = supportedMethodCategory ?
             find(supportedMethodCategory.children, ({type}) => type === method.type) :
             false;
-          // TODO remove when backend ads support
-          if (method.type === 'chart:scatter' || method.type === 'chart:bubble' || method.type === 'chart:bar') {
-            isSupported = true;
-          }
           set(method, 'disabled', !isSupported);
         });
       });
