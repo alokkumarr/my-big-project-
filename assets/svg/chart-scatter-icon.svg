@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="48x" viewBox="0 0 80 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 45 (43475) - http://www.bohemiancoding.com/sketch -->
+    <title>Scatter-Icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Global-Filters" stroke="none" stroke-width="1" fill-rule="evenodd">
+        <g id="Scatter-Icon">
+            <g id="Group-19">
+                <rect id="Rectangle-19" x="0" y="76" width="80" height="4" rx="2"></rect>
+                <rect id="Rectangle-19-Copy-3" x="0" y="0" width="4" height="80" rx="2"></rect>
+            </g>
+            <g id="Group-17" transform="translate(11.000000, 11.000000)">
+                <ellipse id="Oval-6" cx="3" cy="50.3297335" rx="3" ry="2.96653144"></ellipse>
+                <ellipse id="Oval-6-Copy-14" cx="62.3185096" cy="7.96653144" rx="3" ry="2.96653144"></ellipse>
+                <ellipse id="Oval-6-Copy-15" cx="54.9036959" cy="25.0747476" rx="3" ry="2.96653144"></ellipse>
+                <ellipse id="Oval-6-Copy-16" cx="34.3069912" cy="12.8545932" rx="3" ry="2.96653144"></ellipse>
+                <ellipse id="Oval-6-Copy-17" cx="29" cy="42.9665314" rx="3" ry="2.96653144"></ellipse>
+                <ellipse id="Oval-6-Copy-20" cx="34" cy="27.9665314" rx="3" ry="2.96653144"></ellipse>
+                <ellipse id="Oval-6-Copy-21" cx="7" cy="35.9665314" rx="3" ry="2.96653144"></ellipse>
+                <ellipse id="Oval-6-Copy-22" cx="49" cy="2.96653144" rx="3" ry="2.96653144"></ellipse>
+                <ellipse id="Oval-6-Copy-18" cx="44.1934095" cy="38.109579" rx="3" ry="2.96653144"></ellipse>
+                <ellipse id="Oval-6-Copy-19" cx="12.0625501" cy="22.6307168" rx="3" ry="2.96653144"></ellipse>
+            </g>
+        </g>
+    </g>
+</svg>

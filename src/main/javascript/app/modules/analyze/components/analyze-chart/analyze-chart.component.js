@@ -1,6 +1,7 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import findIndex from 'lodash/findIndex';
 import find from 'lodash/find';
+import filter from 'lodash/filter';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import assign from 'lodash/assign';
@@ -11,7 +12,7 @@ import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
 
-import {ENTRY_MODES} from '../../consts';
+import {ENTRY_MODES, NUMBER_TYPES} from '../../consts';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -19,11 +20,11 @@ import style from './analyze-chart.component.scss';
 const BAR_COLUMN_OPTIONS = [{
   label: 'TOOLTIP_BAR_CHART',
   type: 'bar',
-  icon: 'icon-hor-bar-chart'
+  icon: {font: 'icon-hor-bar-chart'}
 }, {
   label: 'TOOLTIP_COLUMN_CHART',
   type: 'column',
-  icon: 'icon-vert-bar-chart'
+  icon: {font: 'icon-vert-bar-chart'}
 }];
 
 export const AnalyzeChartComponent = {
@@ -34,7 +35,8 @@ export const AnalyzeChartComponent = {
     mode: '@?'
   },
   controller: class AnalyzeChartController {
-    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, ChartService, FilterService, $mdSidenav) {
+    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService,
+                ChartService, FilterService, $mdSidenav, $translate, toastMessage) {
       'ngInject';
 
       this._FilterService = FilterService;
@@ -43,6 +45,8 @@ export const AnalyzeChartComponent = {
       this._$mdSidenav = $mdSidenav;
       this._$mdDialog = $mdDialog;
       this._$timeout = $timeout;
+      this._$translate = $translate;
+      this._toastMessage = toastMessage;
       this.BAR_COLUMN_OPTIONS = BAR_COLUMN_OPTIONS;
       this.draftMode = false;
 
@@ -77,6 +81,7 @@ export const AnalyzeChartComponent = {
 
     $onInit() {
       const chartType = this.model.chartType;
+      // used only for bar or column type charts
       this.barColumnChoice = ['bar', 'column'].includes(chartType) ? chartType : '';
 
       if (this.mode === ENTRY_MODES.FORK) {
@@ -175,7 +180,7 @@ export const AnalyzeChartComponent = {
       this.labels.x = this.labels.tempX;
       this.labels.y = this.labels.tempY;
       this.draftMode = true;
-      this.reloadChart(this.settings, this.filteredGridData);
+      this.reloadChart(this.settings);
     }
 
     getDataByQuery() {
@@ -215,16 +220,57 @@ export const AnalyzeChartComponent = {
     }
 
     refreshChartData() {
+      if (!this.checkModelValidity()) {
+        return;
+      }
       this.showProgress = true;
       const payload = this.generatePayload(this.model);
       return this._AnalyzeService.getDataBySettings(payload).then(({data}) => {
-        this.gridData = this.filteredGridData = data || this.filteredGridData;
+        const parsedData = this._ChartService.parseData(data, payload.sqlBuilder);
+        this.gridData = this.filteredGridData = parsedData || this.filteredGridData;
         this.analysisChanged = false;
         this.showProgress = false;
         this.reloadChart(this.settings, this.filteredGridData);
       }, () => {
         this.showProgress = false;
       });
+    }
+
+    /** check the parameters, before sending the request for the cahrt data */
+    checkModelValidity() {
+      let isValid = true;
+      const errors = [];
+      const x = find(this.settings.xaxis, x => x.checked === 'x');
+      const y = find(this.settings.yaxis, y => y.checked === 'y');
+      const z = find(this.settings.zaxis, z => z.checked === 'z');
+
+      switch (this.model.chartType) {
+        case 'bubble':
+        // x, y and z axes are mandatory
+        // grouping is optional
+          if (!x || !y || !z) {
+            errors[0] = 'ERROR_X_Y_SIZEBY_AXES_REQUIRED';
+            isValid = false;
+          }
+          break;
+        default:
+        // x and y axes are mandatory
+        // grouping is optional
+          if (!x || !y) {
+            errors[0] = 'ERROR_X_Y_AXES_REQUIRED';
+            isValid = false;
+          }
+      }
+
+      if (!isValid) {
+        this._$translate(errors).then(translations => {
+          this._toastMessage.error(values(translations).join('\n'), '', {
+            timeOut: 3000
+          });
+        });
+      }
+
+      return isValid;
     }
 
     openFiltersModal(ev) {
@@ -244,6 +290,9 @@ export const AnalyzeChartComponent = {
     }
 
     reloadChart(settings, filteredGridData) {
+      if (isEmpty(filteredGridData)) {
+        return;
+      }
       const changes = this._ChartService.dataToChangeConfig(
         this.model.chartType,
         settings,
@@ -302,30 +351,49 @@ export const AnalyzeChartComponent = {
       return artifacts[id];
     }
 
-    generatePayload(source) {
-      const result = clone(source);
+    isStringField(field) {
+      return field && !NUMBER_TYPES.includes(field.type);
+    }
 
-      set(result, 'sqlBuilder.filters', map(
+    isDataField(field) {
+      return field && NUMBER_TYPES.includes(field.type);
+    }
+
+    generatePayload(source) {
+      const payload = clone(source);
+
+      set(payload, 'sqlBuilder.filters', map(
         this.filters,
         this._FilterService.frontend2BackendFilter()
       ));
 
-      const y = find(this.settings.yaxis, x => x.checked);
+      const g = find(this.settings.groupBy, g => g.checked === 'g');
+      const x = find(this.settings.xaxis, x => x.checked === 'x');
+      const y = find(this.settings.yaxis, y => y.checked === 'y');
+      const z = find(this.settings.zaxis, z => z.checked === 'z');
 
-      delete result.supports;
-      set(result, 'sqlBuilder.sorts', []);
-      set(result, 'sqlBuilder.nodeFields.[0]', find(this.settings.xaxis, x => x.checked));
-      set(result, 'sqlBuilder.nodeFields.[1]', find(this.settings.groupBy, g => g.checked));
-      set(result, 'sqlBuilder.dataFields', [assign({aggregate: 'sum'}, y)]);
-      set(result, 'sqlBuilder.booleanCriteria', this.model.sqlBuilder.booleanCriteria);
-      set(result, 'xAxis', {title: this.labels.x});
-      set(result, 'yAxis', {title: this.labels.y});
-      set(result, 'legend', {
+      const allFields = [g, x, y, z];
+
+      const nodeFields = filter(allFields, this.isStringField);
+      const dataFields = filter(allFields, this.isDataField).map(field => {
+        field.aggregate = 'sum';
+        return field;
+      });
+
+      set(payload, 'sqlBuilder.dataFields', dataFields);
+      set(payload, 'sqlBuilder.nodeFields', nodeFields);
+
+      delete payload.supports;
+      set(payload, 'sqlBuilder.sorts', []);
+      set(payload, 'sqlBuilder.booleanCriteria', this.model.sqlBuilder.booleanCriteria);
+      set(payload, 'xAxis', {title: this.labels.x});
+      set(payload, 'yAxis', {title: this.labels.y});
+      set(payload, 'legend', {
         align: this.legend.align,
         layout: this.legend.layout
       });
 
-      return result;
+      return payload;
     }
 
     openSaveModal(ev) {

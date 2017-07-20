@@ -67,7 +67,7 @@ export const AnalyzeChartDetailComponent = {
         return;
       }
 
-      this.filteredData = data;
+      this.filteredData = this._ChartService.parseData(data, this.analysis.sqlBuilder);
       this.updateChart();
       /* eslint-disable no-unused-expressions */
     }

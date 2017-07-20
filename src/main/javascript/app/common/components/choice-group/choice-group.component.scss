@@ -31,6 +31,15 @@ choice-group {
       color: rgba(#596574, 0.7);
     }
 
+    md-icon[md-svg-src] {
+      transform: translate(-0.25em, -0.25em);
+
+      svg {
+        height: 1em;
+        width: 1em;
+      }
+    }
+
     &.selected {
       background-color: #1A89D4;
       color: #FFF;
