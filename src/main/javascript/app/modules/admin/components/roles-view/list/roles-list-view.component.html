@@ -10,7 +10,14 @@
   <md-card-content layout="row">
     <div dx-data-grid="$ctrl.gridConfig" dx-item-alias="report">      
       <div data-options="dxTemplate: { name: 'roleNameCellTemplate' }" >
-        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>
+        <span class="clickable" ng-if="report.data.privExists"
+              ng-bind-html="::report.value | highlight:$ctrl.searchTerm"
+              ui-sref="privilege({role: report.data.roleName})">
+          <md-tooltip ng-bind="'TOOLTIP_VIEW_PRIVILEGE' | translate" ></md-tooltip>
+        </span>
+        <span ng-if="!report.data.privExists"
+              ng-bind-html="::report.value | highlight:$ctrl.searchTerm">
+        </span>
       </div>
       <div data-options="dxTemplate: { name: 'roleTypeCellTemplate' }" >
         <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>   

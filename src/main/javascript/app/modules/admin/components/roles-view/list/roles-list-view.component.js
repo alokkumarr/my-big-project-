@@ -1,8 +1,10 @@
 import template from './roles-list-view.component.html';
+import style from './roles-list-view.component.scss';
 import isUndefined from 'lodash/isUndefined';
 
 export const RolesListViewComponent = {
   template,
+  styles: [style],
   bindings: {
     roles: '<',
     updater: '<',
@@ -69,7 +71,8 @@ export const RolesListViewComponent = {
         allowSorting: true,
         alignment: 'left',
         width: '20%',
-        cellTemplate: 'roleNameCellTemplate'
+        cellTemplate: 'roleNameCellTemplate',
+        cssClass: 'branded-column-name'
       }, {
         caption: 'ROLE TYPE',
         dataField: 'roleType',
