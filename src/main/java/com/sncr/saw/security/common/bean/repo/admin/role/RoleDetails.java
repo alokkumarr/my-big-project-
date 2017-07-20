@@ -12,15 +12,15 @@ public class RoleDetails {
 	private String masterLoginId;
 	private String customerCode;
 	private Boolean myAnalysis;
-	private Boolean myAnalysisPrev;
+	private Boolean privExists;
 	
 	
-	public Boolean getMyAnalysisPrev() {
-		return myAnalysisPrev;
+	public Boolean getPrivExists() {
+		return privExists;
 	}
-	public void setMyAnalysisPrev(Boolean myAnalysisPrev) {
-		this.myAnalysisPrev = myAnalysisPrev;
-	}
+	public void setPrivExists(Boolean privExists) {
+		this.privExists = privExists;
+	}	
 	public Boolean getMyAnalysis() {
 		return myAnalysis;
 	}

@@ -1419,7 +1419,7 @@ public class UserRepositoryImpl implements UserRepository {
 					+ "(PM.PRODUCT_SYS_ID=P.PRODUCT_SYS_ID) "
 					+ "WHERE C.CUSTOMER_SYS_ID=? AND P.ACTIVE_STATUS_IND = CP.ACTIVE_STATUS_IND AND "
 					+ "CP.ACTIVE_STATUS_IND = 1 "
-					+ "AND C.ACTIVE_STATUS_IND=1 AND P.ACTIVE_STATUS_IND=1 AND M.ACTIVE_STATUS_IND=1 AND M.MODULE_CODE = 'ANLYS00001';";
+					+ "AND C.ACTIVE_STATUS_IND=1 AND P.ACTIVE_STATUS_IND=1 AND M.ACTIVE_STATUS_IND=1";
 
 			cpmf = jdbcTemplate.query(sql2, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
@@ -1428,11 +1428,7 @@ public class UserRepositoryImpl implements UserRepository {
 				}
 			}, new UserRepositoryImpl.CPMFDetailExtractor());
 
-			// use above id's to check if feature exists,
-			// if no create feature, get the feature sys id and create
-			// privilege
-			// if yes check if My Analysis priv exists, if not create
-
+			
 			String sql3 = "SELECT CPMF.CUST_PROD_MOD_FEATURE_SYS_ID from customer_product_module_features CPMF "
 					+ "where CUST_PROD_MOD_SYS_ID = ? AND FEATURE_NAME = 'MY ANALYSIS'";
 
@@ -1443,13 +1439,28 @@ public class UserRepositoryImpl implements UserRepository {
 					Long custProd = cpmf.get(i).getCustProdSysId();
 					featureSysId = getFeatureSysId(sql3, custProdMod);
 					Long roleSysId = roleId;
+					String sql4 = "select * from privileges where CUST_PROD_SYS_ID=? AND CUST_PROD_MOD_SYS_ID=?"
+							+ " AND	 CUST_PROD_MOD_FEATURE_SYS_ID != 0 ANd ROLE_SYS_ID=?";
+
+					Boolean privExists = jdbcTemplate.query(sql4, new PreparedStatementSetter() {
+						public void setValues(PreparedStatement preparedStatement) throws SQLException {
+							preparedStatement.setLong(1, custProd);
+							preparedStatement.setLong(2, custProdMod);
+							preparedStatement.setLong(3, roleSysId);
+						}
+
+					}, new UserRepositoryImpl.PrivDetailExtractor());
+					
+					if (privExists) {
+						roleList.get(y).setPrivExists(true);
+					} 
 					if (featureSysId != 0) {
 						Long custProdModFeatr = featureSysId;
-						// check if priv exists
-						String sql4 = "select * from privileges where CUST_PROD_SYS_ID=? AND CUST_PROD_MOD_SYS_ID=?"
+						// check if priv exists for My analysis
+						String sql5 = "select * from privileges where CUST_PROD_SYS_ID=? AND CUST_PROD_MOD_SYS_ID=?"
 								+ " AND	 CUST_PROD_MOD_FEATURE_SYS_ID=? ANd ROLE_SYS_ID=?";
 
-						Boolean privExists = jdbcTemplate.query(sql4, new PreparedStatementSetter() {
+						Boolean myAPrivExists = jdbcTemplate.query(sql5, new PreparedStatementSetter() {
 							public void setValues(PreparedStatement preparedStatement) throws SQLException {
 								preparedStatement.setLong(1, custProd);
 								preparedStatement.setLong(2, custProdMod);
@@ -1459,12 +1470,10 @@ public class UserRepositoryImpl implements UserRepository {
 
 						}, new UserRepositoryImpl.PrivDetailExtractor());
 
-						if (privExists) {
+						if (myAPrivExists) {
 							roleList.get(y).setMyAnalysis(true);
-							roleList.get(y).setMyAnalysisPrev(true);
 						} else {
 							roleList.get(y).setMyAnalysis(false);
-							roleList.get(y).setMyAnalysisPrev(false);
 						}
 
 					}
@@ -1619,7 +1628,7 @@ public class UserRepositoryImpl implements UserRepository {
 						+ "(PM.PRODUCT_SYS_ID=P.PRODUCT_SYS_ID) "
 						+ "WHERE C.CUSTOMER_SYS_ID=? AND P.ACTIVE_STATUS_IND = CP.ACTIVE_STATUS_IND AND "
 						+ "CP.ACTIVE_STATUS_IND = 1 "
-						+ "AND C.ACTIVE_STATUS_IND=1 AND P.ACTIVE_STATUS_IND=1 AND M.ACTIVE_STATUS_IND=1 AND M.MODULE_CODE = 'ANLYS00001';";
+						+ "AND C.ACTIVE_STATUS_IND=1 AND P.ACTIVE_STATUS_IND=1 AND M.ACTIVE_STATUS_IND=1";
 
 				cpmf = jdbcTemplate.query(sql2, new PreparedStatementSetter() {
 					public void setValues(PreparedStatement preparedStatement) throws SQLException {
@@ -1696,6 +1705,23 @@ public class UserRepositoryImpl implements UserRepository {
 	private void insertMyAnalysisPrivileges(RoleDetails role, Long roleId, Long custProdMod, Long custProd,
 			Long custProdModFeatr) {
 
+		insertPMFAccessPrivilege(role.getMasterLoginId(), roleId, custProdMod, custProd);
+		String sql4 = "INSERT INTO PRIVILEGES (CUST_PROD_SYS_ID, CUST_PROD_MOD_SYS_ID, "
+				+ "CUST_PROD_MOD_FEATURE_SYS_ID, ROLE_SYS_ID, ANALYSIS_SYS_ID, PRIVILEGE_CODE, PRIVILEGE_DESC, "
+				+ "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) VALUES ( ?, ?, ?, ?, '0', '128', 'All', '1', sysdate(), ?) ";
+
+		jdbcTemplate.update(sql4, new PreparedStatementSetter() {
+			public void setValues(PreparedStatement preparedStatement) throws SQLException {
+				preparedStatement.setLong(1, custProd);
+				preparedStatement.setLong(2, custProdMod);
+				preparedStatement.setLong(3, custProdModFeatr);
+				preparedStatement.setLong(4, roleId);
+				preparedStatement.setString(5, role.getMasterLoginId());
+			}
+		});
+	}
+
+	private void insertPMFAccessPrivilege(String masterLoginId, Long roleId, Long custProdMod, Long custProd) {
 		String sql3 = "select PRIVILEGE_SYS_ID from privileges where ROLE_SYS_ID=?";
 		Boolean privExists = jdbcTemplate.query(sql3, new PreparedStatementSetter() {
 			public void setValues(PreparedStatement preparedStatement) throws SQLException {
@@ -1716,7 +1742,7 @@ public class UserRepositoryImpl implements UserRepository {
 					preparedStatement.setLong(1, custProd);
 					preparedStatement.setLong(2, custProdMod);
 					preparedStatement.setLong(3, roleId);
-					preparedStatement.setString(4, role.getMasterLoginId());
+					preparedStatement.setString(4, masterLoginId);
 				}
 			});
 
@@ -1729,24 +1755,11 @@ public class UserRepositoryImpl implements UserRepository {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
 					preparedStatement.setLong(1, custProd);
 					preparedStatement.setLong(2, roleId);
-					preparedStatement.setString(3, role.getMasterLoginId());
+					preparedStatement.setString(3, masterLoginId);
 				}
 
 			});
 		}
-		String sql4 = "INSERT INTO PRIVILEGES (CUST_PROD_SYS_ID, CUST_PROD_MOD_SYS_ID, "
-				+ "CUST_PROD_MOD_FEATURE_SYS_ID, ROLE_SYS_ID, ANALYSIS_SYS_ID, PRIVILEGE_CODE, PRIVILEGE_DESC, "
-				+ "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) VALUES ( ?, ?, ?, ?, '0', '128', 'All', '1', sysdate(), ?) ";
-
-		jdbcTemplate.update(sql4, new PreparedStatementSetter() {
-			public void setValues(PreparedStatement preparedStatement) throws SQLException {
-				preparedStatement.setLong(1, custProd);
-				preparedStatement.setLong(2, custProdMod);
-				preparedStatement.setLong(3, custProdModFeatr);
-				preparedStatement.setLong(4, roleId);
-				preparedStatement.setString(5, role.getMasterLoginId());
-			}
-		});
 	}
 
 	private Long getFeatureSysId(String sql3, Long custProdMod) {
@@ -2167,7 +2180,10 @@ public class UserRepositoryImpl implements UserRepository {
 			}, new UserRepositoryImpl.PrivExistsExtractor());
 
 			if (!privExists) {
-
+				
+				//Check if privilege exists for the product/module, if no then create privileges for them.
+				
+				insertPMFAccessPrivilege(privilege.getMasterLoginId(), privilege.getRoleId(), privilege.getModuleId(), privilege.getProductId());
 				// Check if this is a child or a parent category
 
 				// if child - Then insert privilege "view" for parent and then
