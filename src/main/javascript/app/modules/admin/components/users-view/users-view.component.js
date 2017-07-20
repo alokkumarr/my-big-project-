@@ -4,11 +4,20 @@ import AbstractComponentController from 'app/common/components/abstractComponent
 import {Subject} from 'rxjs/Subject';
 import {AdminMenuData, UsersTableHeader} from '../../consts';
 
+const SEARCH_CONFIG = [
+  {keyword: 'LOGIN ID', fieldName: 'masterLoginId'},
+  {keyword: 'ROLE', fieldName: 'roleName'},
+  {keyword: 'FIRST NAME', fieldName: 'firstName'},
+  {keyword: 'LAST NAME', fieldName: 'lastName'},
+  {keyword: 'EMAIL', fieldName: 'email'},
+  {keyword: 'STATUS', fieldName: 'activeStatusInd'}
+];
+
 export const UsersViewComponent = {
   template,
   styles: [style],
   controller: class UsersViewPageController extends AbstractComponentController {
-    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, UsersManagementService, $window, $rootScope) {
+    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, UsersManagementService, $window, $rootScope, LocalSearchService) {
       'ngInject';
       super($injector);
       this._$compile = $compile;
@@ -20,6 +29,7 @@ export const UsersViewComponent = {
       this._$mdToast = $mdToast;
       this._JwtService = JwtService;
       this._$rootScope = $rootScope;
+      this._LocalSearchService = LocalSearchService;
       this._usersCache = [];
       this.updater = new Subject();
       this.admin = {};
@@ -63,7 +73,6 @@ export const UsersViewComponent = {
               scope.onSaveAction = users => {
                 this._usersCache = this.userList = users;
                 this.applySearchFilter();
-                this.updater.next({users: this.userList});
               };
             },
             template: '<user-new roles="roles" on-save="onSaveAction(users)"></user-new>',
@@ -105,7 +114,6 @@ export const UsersViewComponent = {
           this._$rootScope.showProgress = false;
           this._usersCache = this.userList = data.users;
           this.applySearchFilter();
-          this.updater.next({users: this.userList});
           this._$mdToast.show({
             template: '<md-toast><span> User is successfully inactivated </md-toast>',
             position: 'bottom left',
@@ -137,7 +145,6 @@ export const UsersViewComponent = {
               scope.onUpdateAction = users => {
                 this._usersCache = this.userList = users;
                 this.applySearchFilter();
-                this.updater.next({users: this.userList});
               };
             },
             template: '<user-edit roles="roles" user="user" on-update="onUpdateAction(users)" ></user-edit>',
@@ -177,35 +184,21 @@ export const UsersViewComponent = {
       }
       return false;
     }
+
     applySearchFilter() {
-      this.searchText = [];
-      this.searchText = this.states.searchTerm.split(/:(.*)/).slice(0, -1);
-      switch (this.searchText.length) {
-        case 0: {
-          this.states.searchTermValue = this.states.searchTerm;
-          this.userList = this.UsersManagementService.searchUsers(this._usersCache, this.states.searchTerm, 'All');
-          break;
-        }
-        case 2: {
-          if (this.checkColumns(this.searchText[0].trim().toUpperCase())) {
-            this.states.searchTermValue = this.searchText[1].trim();
-            this.userList = this.UsersManagementService.searchUsers(this._usersCache, this.searchText[1].trim(), this.searchText[0].trim().toUpperCase());
-          } else {
-            this.states.searchTermValue = '';
-            this.userList = this.UsersManagementService.searchUsers(this._usersCache, this.states.searchTermValue, 'All');
-            this._$mdToast.show({
-              template: '<md-toast><span>"' + this.searchText[0].trim() + '" - Column does not exist.</md-toast>',
-              position: 'bottom left',
-              toastClass: 'toast-primary'
-            });
-          }
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-      this.updater.next({users: this.userList});
+      const searchCriteria = this._LocalSearchService.parseSearchTerm(this.states.searchTerm);
+      this.states.searchTermValue = searchCriteria.trimmedTerm;
+
+      this._LocalSearchService.doSearch(searchCriteria, this._usersCache, SEARCH_CONFIG).then(data => {
+        this.userList = data;
+        this.updater.next({users: this.userList});
+      }, err => {
+        this._$mdToast.show({
+          template: `<md-toast><span>${err.message}</span></md-toast>`,
+          position: 'bottom left',
+          toastClass: 'toast-primary'
+        });
+      });
     }
   }
 };

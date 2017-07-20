@@ -8,12 +8,18 @@ import {Subject} from 'rxjs/Subject';
 import {Events} from '../../consts';
 import AbstractComponentController from 'app/common/components/abstractComponent';
 
+const SEARCH_CONFIG = [
+  {keyword: 'NAME', fieldName: 'name'},
+  {keyword: 'TYPE', fieldName: 'type'},
+  {keyword: 'METRIC', fieldName: 'metricName'}
+];
+
 export const AnalyzeViewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeViewController extends AbstractComponentController {
     constructor($injector, $compile, AnalyzeService, $state, $mdDialog, JwtService,
-                toastMessage, $rootScope, localStorageService, FilterService) {
+                toastMessage, $rootScope, localStorageService, FilterService, LocalSearchService) {
       'ngInject';
       super($injector);
 
@@ -22,6 +28,7 @@ export const AnalyzeViewComponent = {
       this._$state = $state;
       this._$mdDialog = $mdDialog;
       this._localStorageService = localStorageService;
+      this._LocalSearchService = LocalSearchService;
       this._FilterService = FilterService;
       this._toastMessage = toastMessage;
       this._$rootScope = $rootScope;
@@ -97,8 +104,14 @@ export const AnalyzeViewComponent = {
     }
 
     applySearchFilter() {
-      this.analyses = this._AnalyzeService.searchAnalyses(this._analysisCache, this.states.searchTerm);
-      this.updater.next({analyses: this.analyses});
+      const searchCriteria = this._LocalSearchService.parseSearchTerm(this.states.searchTerm);
+      this.states.searchTermValue = searchCriteria.trimmedTerm;
+      this._LocalSearchService.doSearch(searchCriteria, this._analysisCache, SEARCH_CONFIG).then(data => {
+        this.analyses = data;
+        this.updater.next({analyses: this.analyses});
+      }, err => {
+        this._toastMessage.error(err.message);
+      });
     }
 
     openNewAnalysisModal() {

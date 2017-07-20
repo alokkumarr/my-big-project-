@@ -4,11 +4,19 @@ import AbstractComponentController from 'app/common/components/abstractComponent
 import {Subject} from 'rxjs/Subject';
 import {AdminMenuData, PrivilegesTableHeader} from '../../consts';
 
+const SEARCH_CONFIG = [
+  {keyword: 'PRODUCT', fieldName: 'productName'},
+  {keyword: 'MODULE', fieldName: 'moduleName'},
+  {keyword: 'CATEGORY', fieldName: 'categoryName'},
+  {keyword: 'ROLE', fieldName: 'roleName'},
+  {keyword: 'PRIVILEGE DESC', fieldName: 'privilegeDesc'}
+];
+
 export const PrivilegesViewComponent = {
   template,
   styles: [style],
   controller: class PrivilegesViewPageController extends AbstractComponentController {
-    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, PrivilegesManagementService, $window, $rootScope) {
+    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, PrivilegesManagementService, $window, $rootScope, LocalSearchService) {
       'ngInject';
       super($injector);
       this._$compile = $compile;
@@ -20,6 +28,7 @@ export const PrivilegesViewComponent = {
       this._$mdToast = $mdToast;
       this._JwtService = JwtService;
       this._$rootScope = $rootScope;
+      this._LocalSearchService = LocalSearchService;
       this.updater = new Subject();
       this.resp = this._JwtService.getTokenObj();
       this.custID = this.resp.ticket.custID;
@@ -54,7 +63,6 @@ export const PrivilegesViewComponent = {
           scope.onSaveAction = privileges => {
             this._privilegesCache = this.privilegeList = privileges;
             this.applySearchFilter();
-            this.updater.next({privileges: this.privilegeList});
           };
         },
         template: '<privilege-new on-save="onSaveAction(privileges)"></privilege-new>',
@@ -83,7 +91,6 @@ export const PrivilegesViewComponent = {
           this._$rootScope.showProgress = false;
           this._privilegesCache = this.privilegeList = data.privileges;
           this.applySearchFilter();
-          this.updater.next({privileges: this.privilegeList});
           this._$mdToast.show({
             template: '<md-toast><span> Privilege is successfully deleted </md-toast>',
             position: 'bottom left',
@@ -111,7 +118,6 @@ export const PrivilegesViewComponent = {
           scope.onUpdateAction = privileges => {
             this._privilegesCache = this.privilegeList = privileges;
             this.applySearchFilter();
-            this.updater.next({privileges: this.privilegeList});
           };
         },
         template: '<privilege-edit edit-privilege="privilege" on-update="onUpdateAction(privileges)" ></privilege-edit>',
@@ -140,35 +146,21 @@ export const PrivilegesViewComponent = {
       }
       return false;
     }
+
     applySearchFilter() {
-      this.searchText = [];
-      this.searchText = this.states.searchTerm.split(/:(.*)/).slice(0, -1);
-      switch (this.searchText.length) {
-        case 0: {
-          this.states.searchTermValue = this.states.searchTerm;
-          this.privilegeList = this.PrivilegesManagementService.searchPrivileges(this._privilegesCache, this.states.searchTerm, 'All');
-          break;
-        }
-        case 2: {
-          if (this.checkColumns(this.searchText[0].trim().toUpperCase())) {
-            this.states.searchTermValue = this.searchText[1].trim();
-            this.privilegeList = this.PrivilegesManagementService.searchPrivileges(this._privilegesCache, this.searchText[1].trim(), this.searchText[0].trim().toUpperCase());
-          } else {
-            this.states.searchTermValue = '';
-            this.privilegeList = this.PrivilegesManagementService.searchPrivileges(this._privilegesCache, this.states.searchTermValue, 'All');
-            this._$mdToast.show({
-              template: '<md-toast><span>"' + this.searchText[0].trim() + '" - Column does not exist.</md-toast>',
-              position: 'bottom left',
-              toastClass: 'toast-primary'
-            });
-          }
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-      this.updater.next({privileges: this.privilegeList});
+      const searchCriteria = this._LocalSearchService.parseSearchTerm(this.states.searchTerm);
+      this.states.searchTermValue = searchCriteria.trimmedTerm;
+
+      this._LocalSearchService.doSearch(searchCriteria, this._privilegesCache, SEARCH_CONFIG).then(data => {
+        this.privilegeList = data;
+        this.updater.next({privileges: this.privilegeList});
+      }, err => {
+        this._$mdToast.show({
+          template: `<md-toast><span>${err.message}</span></md-toast>`,
+          position: 'bottom left',
+          toastClass: 'toast-primary'
+        });
+      });
     }
   }
 };
