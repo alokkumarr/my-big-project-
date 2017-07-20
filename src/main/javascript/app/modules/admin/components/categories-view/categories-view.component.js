@@ -1,14 +1,23 @@
+import map from 'lodash/map';
+
 import template from './categories-view.component.html';
 import style from './categories-view.component.scss';
 import AbstractComponentController from 'app/common/components/abstractComponent';
 import {Subject} from 'rxjs/Subject';
 import {AdminMenuData, CategoriesTableHeader} from '../../consts';
 
+const SEARCH_CONFIG = [
+  {keyword: 'PRODUCT', fieldName: 'productName'},
+  {keyword: 'MODULE', fieldName: 'moduleName'},
+  {keyword: 'CATEGORY', fieldName: 'categoryName'},
+  {keyword: 'SUB CATEGORIES', fieldName: 'subCategories', accessor: input => map(input, sc => sc.subCategoryName)}
+];
+
 export const CategoriesViewComponent = {
   template,
   styles: [style],
   controller: class CategoriesViewPageController extends AbstractComponentController {
-    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, CategoriesManagementService, $window, $rootScope) {
+    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, CategoriesManagementService, $window, $rootScope, LocalSearchService) {
       'ngInject';
       super($injector);
       this._$compile = $compile;
@@ -20,6 +29,7 @@ export const CategoriesViewComponent = {
       this._$mdToast = $mdToast;
       this._JwtService = JwtService;
       this._$rootScope = $rootScope;
+      this._LocalSearchService = LocalSearchService;
       this.updater = new Subject();
       this.resp = this._JwtService.getTokenObj();
       this.custID = this.resp.ticket.custID;
@@ -53,7 +63,6 @@ export const CategoriesViewComponent = {
           scope.onSaveAction = categories => {
             this._categoriesCache = this.categoriesList = categories;
             this.applySearchFilter();
-            this.updater.next({categories: this.categoriesList});
           };
         },
         template: '<category-new on-save="onSaveAction(categories)"></category-new>',
@@ -69,7 +78,6 @@ export const CategoriesViewComponent = {
           scope.onUpdateAction = categories => {
             this._categoriesCache = this.categoriesList = categories;
             this.applySearchFilter();
-            this.updater.next({categories: this.categoriesList});
           };
         },
         template: '<category-edit edit-category="category" on-update="onUpdateAction(categories)" ></category-edit>',
@@ -85,7 +93,6 @@ export const CategoriesViewComponent = {
           scope.onDeleteAction = categories => {
             this._categoriesCache = this.categoriesList = categories;
             this.applySearchFilter();
-            this.updater.next({categories: this.categoriesList});
           };
           scope.executeSearchFilter = flag => {
             if (flag) {
@@ -118,35 +125,21 @@ export const CategoriesViewComponent = {
       }
       return false;
     }
+
     applySearchFilter() {
-      this.searchText = [];
-      this.searchText = this.states.searchTerm.split(/:(.*)/).slice(0, -1);
-      switch (this.searchText.length) {
-        case 0: {
-          this.states.searchTermValue = this.states.searchTerm;
-          this.categoriesList = this.CategoriesManagementService.searchCategories(this._categoriesCache, this.states.searchTerm, 'All');
-          break;
-        }
-        case 2: {
-          if (this.checkColumns(this.searchText[0].trim().toUpperCase())) {
-            this.states.searchTermValue = this.searchText[1].trim();
-            this.categoriesList = this.CategoriesManagementService.searchCategories(this._categoriesCache, this.searchText[1].trim(), this.searchText[0].trim().toUpperCase());
-          } else {
-            this.states.searchTermValue = '';
-            this.categoriesList = this.CategoriesManagementService.searchCategories(this._categoriesCache, this.states.searchTermValue, 'All');
-            this._$mdToast.show({
-              template: '<md-toast><span>"' + this.searchText[0].trim() + '" - Column does not exist.</span></md-toast>',
-              position: 'bottom left',
-              toastClass: 'toast-primary'
-            });
-          }
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-      this.updater.next({categories: this.categoriesList});
+      const searchCriteria = this._LocalSearchService.parseSearchTerm(this.states.searchTerm);
+      this.states.searchTermValue = searchCriteria.trimmedTerm;
+
+      this._LocalSearchService.doSearch(searchCriteria, this._categoriesCache, SEARCH_CONFIG).then(data => {
+        this.categoriesList = data;
+        this.updater.next({categories: this.categoriesList});
+      }, err => {
+        this._$mdToast.show({
+          template: `<md-toast><span>${err.message}</span></md-toast>`,
+          position: 'bottom left',
+          toastClass: 'toast-primary'
+        });
+      });
     }
   }
 };

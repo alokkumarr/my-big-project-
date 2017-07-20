@@ -4,11 +4,18 @@ import AbstractComponentController from 'app/common/components/abstractComponent
 import {Subject} from 'rxjs/Subject';
 import {AdminMenuData, RolesTableHeader} from '../../consts';
 
+const SEARCH_CONFIG = [
+  {keyword: 'ROLE NAME', fieldName: 'roleName'},
+  {keyword: 'ROLE TYPE', fieldName: 'roleType'},
+  {keyword: 'STATUS', fieldName: 'activeStatusInd'},
+  {keyword: 'ROLE DESCRIPTION', fieldName: 'roleDesc'}
+];
+
 export const RolesViewComponent = {
   template,
   styles: [style],
   controller: class RolesViewPageController extends AbstractComponentController {
-    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, RolesManagementService, $window, $rootScope) {
+    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, RolesManagementService, $window, $rootScope, LocalSearchService) {
       'ngInject';
       super($injector);
       this._$compile = $compile;
@@ -20,6 +27,7 @@ export const RolesViewComponent = {
       this._$mdToast = $mdToast;
       this._JwtService = JwtService;
       this._$rootScope = $rootScope;
+      this._LocalSearchService = LocalSearchService;
       this.updater = new Subject();
       this.resp = this._JwtService.getTokenObj();
       this.custID = this.resp.ticket.custID;
@@ -60,7 +68,6 @@ export const RolesViewComponent = {
               scope.onSaveAction = roles => {
                 this._rolesCache = this.rolesList = roles;
                 this.applySearchFilter();
-                this.updater.next({roles: this.rolesList});
               };
             },
             template: '<role-new role-types="roleTypes" on-save="onSaveAction(roles)"></role-new>',
@@ -101,7 +108,6 @@ export const RolesViewComponent = {
           this._$rootScope.showProgress = false;
           this._rolesCache = this.rolesList = data.roles;
           this.applySearchFilter();
-          this.updater.next({roles: this.rolesList});
           this._$mdToast.show({
             template: '<md-toast><span> Role is successfully deleted </md-toast>',
             position: 'bottom left',
@@ -133,7 +139,6 @@ export const RolesViewComponent = {
               scope.onUpdateAction = roles => {
                 this._rolesCache = this.rolesList = roles;
                 this.applySearchFilter();
-                this.updater.next({roles: this.rolesList});
               };
             },
             template: '<role-edit role-types="roles" edit-role="role" on-update="onUpdateAction(roles)" ></role-edit>',
@@ -173,35 +178,21 @@ export const RolesViewComponent = {
       }
       return false;
     }
+
     applySearchFilter() {
-      this.searchText = [];
-      this.searchText = this.states.searchTerm.split(/:(.*)/).slice(0, -1);
-      switch (this.searchText.length) {
-        case 0: {
-          this.states.searchTermValue = this.states.searchTerm;
-          this.rolesList = this.RolesManagementService.searchRoles(this._rolesCache, this.states.searchTerm, 'All');
-          break;
-        }
-        case 2: {
-          if (this.checkColumns(this.searchText[0].trim().toUpperCase())) {
-            this.states.searchTermValue = this.searchText[1].trim();
-            this.rolesList = this.RolesManagementService.searchRoles(this._rolesCache, this.searchText[1].trim(), this.searchText[0].trim().toUpperCase());
-          } else {
-            this.states.searchTermValue = '';
-            this.userList = this.RolesManagementService.searchRoles(this._rolesCache, this.states.searchTermValue, 'All');
-            this._$mdToast.show({
-              template: '<md-toast><span>"' + this.searchText[0].trim() + '" - Column does not exist.</md-toast>',
-              position: 'bottom left',
-              toastClass: 'toast-primary'
-            });
-          }
-          break;
-        }
-        default: {
-          break;
-        }
-      }
-      this.updater.next({roles: this.rolesList});
+      const searchCriteria = this._LocalSearchService.parseSearchTerm(this.states.searchTerm);
+      this.states.searchTermValue = searchCriteria.trimmedTerm;
+
+      this._LocalSearchService.doSearch(searchCriteria, this._rolesCache, SEARCH_CONFIG).then(data => {
+        this.rolesList = data;
+        this.updater.next({roles: this.rolesList});
+      }, err => {
+        this._$mdToast.show({
+          template: `<md-toast><span>${err.message}</span></md-toast>`,
+          position: 'bottom left',
+          toastClass: 'toast-primary'
+        });
+      });
     }
   }
 };

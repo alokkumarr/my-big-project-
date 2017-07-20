@@ -1,5 +1,4 @@
 import fpGet from 'lodash/fp/get';
-import filter from 'lodash/filter';
 
 export function UsersManagementService($http, AppConfig) {
   'ngInject';
@@ -9,8 +8,7 @@ export function UsersManagementService($http, AppConfig) {
     getRoles,
     saveUser,
     deleteUser,
-    updateUser,
-    searchUsers
+    updateUser
   };
   function getActiveUsersList(customerId) {
     return $http.post(`${loginUrl}/auth/admin/cust/manage/users/fetch`, customerId).then(fpGet('data'));
@@ -26,44 +24,5 @@ export function UsersManagementService($http, AppConfig) {
   }
   function updateUser(user) {
     return $http.post(`${loginUrl}/auth/admin/cust/manage/users/edit`, user).then(fpGet('data'));
-  }
-  function searchUsers(users, searchTerm = '', header) {
-    if (!searchTerm) {
-      return users;
-    }
-    const term = searchTerm.toUpperCase();
-    const matchIn = item => {
-      return (item || '').toUpperCase().indexOf(term) !== -1;
-    };
-    return filter(users, item => {
-      switch (header) {
-        default: {
-          return matchIn(item.masterLoginId) ||
-            matchIn(item.roleName) ||
-            matchIn(item.firstName) ||
-            matchIn(item.lastName) ||
-            matchIn(item.email) ||
-            matchIn(item.activeStatusInd);
-        }
-        case 'LOGIN ID': {
-          return matchIn(item.masterLoginId);
-        }
-        case 'ROLE': {
-          return matchIn(item.roleName);
-        }
-        case 'FIRST NAME': {
-          return matchIn(item.firstName);
-        }
-        case 'LAST NAME': {
-          return matchIn(item.lastName);
-        }
-        case 'EMAIL': {
-          return matchIn(item.email);
-        }
-        case 'STATUS': {
-          return matchIn(item.activeStatusInd);
-        }
-      }
-    });
   }
 }
