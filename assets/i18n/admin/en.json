@@ -76,7 +76,7 @@
   "TOOLTIP_ADD_ROLE":"Add Role",
   "TOOLTIP_DELETE_ROLE":"Delete Role",
   "TOOLTIP_EDIT_ROLE":"Edit Role",
-  "TOOLTIP_VIEW_ROLE_PRIL":"View Privileges",
+  "TOOLTIP_VIEW_PRIVILEGE":"View Privileges",
   
   "TOOLTIP_ADD_USER":"Add User",  
   "TOOLTIP_EDIT_USER":"Edit User",

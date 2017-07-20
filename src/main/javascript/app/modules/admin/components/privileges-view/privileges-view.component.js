@@ -39,6 +39,10 @@ export const PrivilegesViewComponent = {
         this.admin = admin;
         if (this.admin.valid) {
           this._privilegesCache = this.privilegeList = this.admin.privileges;
+          this.states.searchTerm = this._$state.params.role ? `role:"${this._$state.params.role}"` : '';
+          /* eslint-disable */
+          this.states.searchTerm && this.applySearchFilter();
+          /* eslint-enable */
           this._$rootScope.showProgress = false;
         } else {
           this._$rootScope.showProgress = false;
