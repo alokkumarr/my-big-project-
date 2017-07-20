@@ -18,8 +18,8 @@ export function LocalSearchService($q) {
   function parseSearchTerm(searchTerm = '') {
     const searchText = searchTerm.split(':');
     const result = searchText.length > 1 ?
-      {field: searchText[0], fullTerm: searchText.slice(1).join(':')} :
-      {field: null, fullTerm: searchText[0]};
+      {field: trim(searchText[0]), fullTerm: trim(searchText.slice(1).join(':'))} :
+      {field: null, fullTerm: trim(searchText[0])};
 
     result.trimmedTerm = trim(trim(result.fullTerm, '"'), '\'');
     result.exact = result.fullTerm.toUpperCase() !== result.trimmedTerm.toUpperCase();
