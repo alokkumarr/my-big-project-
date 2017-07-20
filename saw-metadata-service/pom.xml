@@ -27,7 +27,7 @@
             <groupId>com.synchronoss</groupId>
             <artifactId>saw-common</artifactId>
             <version>${project.version}</version>
-        </dependency>
+		</dependency>
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-client</artifactId>

@@ -225,6 +225,13 @@
             <groupId>com.typesafe.play</groupId>
             <artifactId>play-netty-server_${scala.major.version}</artifactId>
             <version>${play2.version}</version>
+			  <exclusions>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-transport-native-epoll</artifactId>
+                </exclusion>
+            </exclusions>
+
         </dependency>
         <dependency>
             <!-- com.typesafe.play.play-server_2.11-2.5.10.jar -->

@@ -30,19 +30,49 @@ environment:
 
 1. Locate the artifacts required for installing SAW Services: RPM
    packages for each service to be installed
+   
+2. Go to /opt/saw/service/conf : open application.conf in your favorite editor & change the below attribute value accordingly
+   
+   `metadata = {
+  path = "/main/metadata"
+  zookeeper-quorum = "mapr01.bda.poc.velocity-va.sncrcorp.net,mapr02.bda.poc.velocity-   va.sncrcorp.net,mapr03.bda.poc.velocity-va.sncrcorp.net,mapr04.bda.poc.velocity-va.sncrcorp.net,mapr05.bda.poc.velocity-va.sncrcorp.net,mapr06.bda.poc.velocity-va.sncrcorp.net,mapr07.bda.poc.velocity-va.sncrcorp.net,mapr08.bda.poc.velocity-va.sncrcorp.net,mapr09.bda.poc.velocity-va.sncrcorp.net,mapr10.bda.poc.velocity-va.sncrcorp.net"
+  user = "mapr"
+} `
 
-1. Install the SAW Transport Service by copying the RPM package to the
+
+3. Then change spark related attributes under 
+   `spark = {....}`
+   
+   
+4. Then change elastic search related attributes under  
+  `es = {
+  host = "10.48.22.179"
+  timeout = 30
+  port = 9200
+  username = "elastic"
+  password = "xuw3dUraHapret"
+  protocol = "http"
+}`
+
+   `Note: It does not support https protocol`
+ 
+5. Now before executing step 6 i.e. start the service
+   You need to change or make sure that one vm argument has right value in the script i.e esproxy URL
+   ` -Durl=http://saw03.bda.poc.velocity-va.sncrcorp.net:9200/ `
+   
+  
+5. Install the SAW Transport Service by copying the RPM package to the
    host that it will run on.  Then execute `sudo rpm -i
    saw-transport-service-*.rpm`.  Finally execute `sudo -u mapr
    /opt/saw/service/bin/sawsrvc_start.sh` to start the service.
 
-2. Install the SAW Scheduler Service by copying the RPM package to the
+6. Install the SAW Scheduler Service by copying the RPM package to the
    host that it will run on.  Then execute `sudo rpm -i
    saw-scheduler-service-*.rpm`.  No additional steps needed, as the
    scheduler will automatically be invoked by the system services when
    required.
 
-3. Configure a URL in a front-end proxy to point to port 9200 of the
+7. Configure a URL in a front-end proxy to point to port 9200 of the
    host that SAW Services has been installed on.  This URL should then
    be used to configure the endpoints in the SAW web front-end.
 
