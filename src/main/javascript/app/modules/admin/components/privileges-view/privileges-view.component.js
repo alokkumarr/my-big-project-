@@ -34,6 +34,7 @@ export const PrivilegesViewComponent = {
       this.custID = this.resp.ticket.custID;
       this.custCode = this.resp.ticket.custCode;
       this._privilegesCache = [];
+      this.states = {};
       this._$rootScope.showProgress = true;
       this.PrivilegesManagementService.getActivePrivilegesList(this.custID).then(admin => {
         this.admin = admin;
