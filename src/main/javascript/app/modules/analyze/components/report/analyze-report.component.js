@@ -623,29 +623,20 @@ export const AnalyzeReportComponent = {
       }).then(this.onApplyFilters.bind(this));
     }
 
-    openPreviewModal(ev) {
+    openReportPreviewModal(ev) {
       const tpl = '<analyze-report-preview model="model"></analyze-report-preview>';
 
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controller: scope => {
-            scope.model = {
-              report: this.model,
-              columns: this.columns,
-              sorts: map(this.canvas.model.sorts, sort => {
-                return {
-                  column: sort.field.name,
-                  direction: sort.order
-                };
-              })
-            };
-          },
-          targetEvent: ev,
-          fullscreen: true,
-          autoWrap: false,
-          multiple: true
-        });
+      this.openPreviewModal(tpl, ev, {
+        report: this.model,
+        columns: this.columns,
+        data: this.gridData,
+        sorts: map(this.canvas.model.sorts, sort => {
+          return {
+            column: sort.field.name,
+            direction: sort.order
+          };
+        })
+      });
     }
 
     updateJoins(name, obj) {

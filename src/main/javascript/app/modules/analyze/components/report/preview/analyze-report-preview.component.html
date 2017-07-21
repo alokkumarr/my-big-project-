@@ -1,4 +1,4 @@
-<analyze-dialog class="analyze-report-preview">
+<analyze-dialog class="analyze-report-preview" >
   <analyze-dialog-header>
     <div class="arp-header" layout="row" layout-align="space-between center">
       <div layout="row" layout-align="center center">
@@ -20,7 +20,8 @@
 
   <analyze-dialog-content>
     <report-grid-container id="arp-grid-container" class="arp_details-grid"
-                           source="$ctrl.data"
+                           layout="row"
+                           show-group-panel="true"
                            columns="$ctrl.model.columns">
     </report-grid-container>
 

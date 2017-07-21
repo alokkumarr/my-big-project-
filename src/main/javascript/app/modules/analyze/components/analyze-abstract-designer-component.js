@@ -30,6 +30,17 @@ export default class AbstractDesignerComponentController {
     this.showProgress = false;
   }
 
+  openPreviewModal(template, ev, model) {
+
+    this.showModal({
+      template,
+      controller: scope => {
+        scope.model = model;
+      },
+      fullscreen: true
+    }, ev);
+  }
+
   openDescriptionModal(ev, model) {
     const tpl = '<analyze-description-dialog model="model" on-save="onSave($data)"></analyze-description-dialog>';
 

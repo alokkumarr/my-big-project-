@@ -4,7 +4,7 @@ import template from './analyze-chart-preview.component.html';
 export const AnalyzeChartPreviewComponent = {
   template,
   bindings: {
-    config: '<model'
+    model: '<'
   },
   controller: class AnalyzeChartPreviewController {
     constructor($componentHandler, $mdDialog, $timeout, AnalyzeService) {

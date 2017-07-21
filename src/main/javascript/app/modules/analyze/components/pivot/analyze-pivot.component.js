@@ -383,23 +383,13 @@ export const AnalyzePivotComponent = {
         });
     }
 
-    openPreviewModal(ev) {
+    openPivotPreviewModal(ev) {
       const tpl = '<analyze-pivot-preview model="model"></analyze-pivot-preview>';
 
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controller: scope => {
-            scope.model = {
-              pivot: this.model,
-              dataSource: this.dataSource
-            };
-          },
-          targetEvent: ev,
-          fullscreen: true,
-          autoWrap: false,
-          multiple: true
-        });
+      this.openPreviewModal(tpl, ev, {
+        pivot: this.model,
+        dataSource: this.dataSource
+      });
     }
 
     mapBackend2FrontendSort(sorts, sortFields) {

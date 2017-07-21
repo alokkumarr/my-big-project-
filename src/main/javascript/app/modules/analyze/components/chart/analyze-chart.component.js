@@ -302,20 +302,11 @@ export const AnalyzeChartComponent = {
       this.updateChart.next(changes);
     }
 
-    openPreviewModal(ev) {
+    openChartPreviewModal(ev) {
       const tpl = '<analyze-chart-preview model="model"></analyze-chart-preview>';
-
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controller: scope => {
-            scope.model = this.chartOptions;
-          },
-          targetEvent: ev,
-          fullscreen: true,
-          autoWrap: false,
-          multiple: true
-        });
+      this.openPreviewModal(tpl, ev, {
+        chartOptions: this.chartOptions
+      });
     }
 
     getSelectedSettingsFor(axis, artifacts) {
