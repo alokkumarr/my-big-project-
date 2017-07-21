@@ -16,6 +16,7 @@ import {ENTRY_MODES, NUMBER_TYPES} from '../../consts';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
+import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
 
 const BAR_COLUMN_OPTIONS = [{
   label: 'TOOLTIP_BAR_CHART',
@@ -34,11 +35,11 @@ export const AnalyzeChartComponent = {
     model: '<',
     mode: '@?'
   },
-  controller: class AnalyzeChartController {
+  controller: class AnalyzeChartController extends AbstractDesignerComponentController {
     constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService,
                 ChartService, FilterService, $mdSidenav, $translate, toastMessage) {
       'ngInject';
-
+      super();
       this._FilterService = FilterService;
       this._AnalyzeService = AnalyzeService;
       this._ChartService = ChartService;
@@ -48,7 +49,6 @@ export const AnalyzeChartComponent = {
       this._$translate = $translate;
       this._toastMessage = toastMessage;
       this.BAR_COLUMN_OPTIONS = BAR_COLUMN_OPTIONS;
-      this.draftMode = false;
 
       this.legend = {
         align: get(this.model, 'legend.align', 'right'),
@@ -117,7 +117,7 @@ export const AnalyzeChartComponent = {
       this.onSettingsChanged();
       this._$timeout(() => {
         this.updateLegendPosition();
-        this.draftMode = false;
+        this.endDraftMode();
       });
     }
 
@@ -159,7 +159,7 @@ export const AnalyzeChartComponent = {
       const align = this._ChartService.LEGEND_POSITIONING[this.legend.align];
       const layout = this._ChartService.LAYOUT_POSITIONS[this.legend.layout];
 
-      this.draftMode = true;
+      this.startDraftMode();
       this.updateChart.next([
         {
           path: 'legend.align',
@@ -179,7 +179,7 @@ export const AnalyzeChartComponent = {
     updateCustomLabels() {
       this.labels.x = this.labels.tempX;
       this.labels.y = this.labels.tempY;
-      this.draftMode = true;
+      this.startDraftMode();
       this.reloadChart(this.settings);
     }
 
@@ -193,26 +193,26 @@ export const AnalyzeChartComponent = {
 
     onSettingsChanged() {
       this.analysisChanged = true;
-      this.draftMode = true;
+      this.startDraftMode();
     }
 
     clearFilters() {
       this.filters = [];
       this.analysisChanged = true;
-      this.draftMode = true;
+      this.startDraftMode();
     }
 
     onFilterRemoved(index) {
       this.filters.splice(index, 1);
       this.analysisChanged = true;
-      this.draftMode = true;
+      this.startDraftMode();
     }
 
     onApplyFilters({filters, filterBooleanCriteria} = {}) {
       if (filters) {
         this.filters = filters;
         this.analysisChanged = true;
-        this.draftMode = true;
+        this.startDraftMode();
       }
       if (filterBooleanCriteria) {
         this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;
@@ -315,7 +315,7 @@ export const AnalyzeChartComponent = {
           };
 
           scope.onSave = data => {
-            this.draftMode = true;
+            this.startDraftMode();
             this.model.description = data.description;
           };
         },
@@ -428,7 +428,7 @@ export const AnalyzeChartComponent = {
     }
 
     onAnalysisSaved(successfullySaved) {
-      this.draftMode = false;
+      this.endDraftMode();
       this.$dialog.hide(successfullySaved);
     }
   }

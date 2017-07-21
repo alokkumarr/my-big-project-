@@ -16,6 +16,7 @@ import uniqBy from 'lodash/uniqBy';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
+import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
 import {ENTRY_MODES} from '../../consts';
 
@@ -28,10 +29,10 @@ export const AnalyzeReportComponent = {
     model: '<',
     mode: '@'
   },
-  controller: class AnalyzeReportController {
+  controller: class AnalyzeReportController extends AbstractDesignerComponentController {
     constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, FilterService) {
       'ngInject';
-
+      super();
       this._$componentHandler = $componentHandler;
       this._$mdDialog = $mdDialog;
       this._$scope = $scope;
@@ -41,7 +42,6 @@ export const AnalyzeReportComponent = {
       this._reloadTimer = null;
       this._modelLoaded = null;
       this.showProgress = false;
-      this.draftMode = false;
 
       this._modelPromise = new Promise(resolve => {
         this._modelLoaded = resolve;
@@ -157,7 +157,7 @@ export const AnalyzeReportComponent = {
       if (filters) {
         this.filters = filters;
         this.analysisChanged = true;
-        this.draftMode = true;
+        this.startDraftMode();
       }
       if (filterBooleanCriteria) {
         this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;
@@ -167,13 +167,13 @@ export const AnalyzeReportComponent = {
     onClearAllFilters() {
       this.filters = [];
       this.analysisChanged = true;
-      this.draftMode = true;
+      this.startDraftMode();
     }
 
     onFilterRemoved(index) {
       this.filters.splice(index, 1);
       this.analysisChanged = true;
-      this.draftMode = true;
+      this.startDraftMode();
     }
     // END filters section
 
@@ -203,7 +203,7 @@ export const AnalyzeReportComponent = {
 
       if (this.mode) {
         this.reloadPreviewGrid(true);
-        this.draftMode = false;
+        this.endDraftMode();
       }
 
       this._unregisterCanvasHandlers = this._unregisterCanvasHandlers.concat([
@@ -513,7 +513,7 @@ export const AnalyzeReportComponent = {
 
     reloadPreviewGrid(refresh = false) {
       if (refresh) {
-        this.draftMode = true;
+        this.startDraftMode();
       }
 
       const doReload = () => {
@@ -686,7 +686,7 @@ export const AnalyzeReportComponent = {
           this.canvas.model.sorts = sorts;
           this.canvas._$eventEmitter.emit('sortChanged');
           this.analysisChanged = true;
-          this.draftMode = true;
+          this.startDraftMode();
         });
     }
 
@@ -701,7 +701,7 @@ export const AnalyzeReportComponent = {
           };
 
           scope.onSave = data => {
-            this.draftMode = true;
+            this.startDraftMode();
             this.model.description = data.description;
           };
         },
@@ -752,7 +752,7 @@ export const AnalyzeReportComponent = {
     }
 
     onAnalysisSaved(successfullySaved) {
-      this.draftMode = false;
+      this.endDraftMode();
       this.$dialog.hide(successfullySaved);
     }
   }

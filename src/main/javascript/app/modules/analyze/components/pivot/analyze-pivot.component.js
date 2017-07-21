@@ -23,6 +23,7 @@ import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 
 import template from './analyze-pivot.component.html';
 import style from './analyze-pivot.component.scss';
+import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
 import {DEFAULT_AGGREGATE_TYPE, DEFAULT_GROUP_INTERVAL} from '../pivot/settings/analyze-pivot-settings.component';
 
@@ -35,9 +36,10 @@ export const AnalyzePivotComponent = {
     model: '<',
     mode: '@?'
   },
-  controller: class AnalyzePivotController {
+  controller: class AnalyzePivotController extends AbstractDesignerComponentController {
     constructor($mdDialog, $timeout, PivotService, AnalyzeService, FilterService, $mdSidenav, toastMessage, $translate) {
       'ngInject';
+      super();
       this._$mdDialog = $mdDialog;
       this._$mdSidenav = $mdSidenav;
       this._PivotService = PivotService;
@@ -46,8 +48,6 @@ export const AnalyzePivotComponent = {
       this._AnalyzeService = AnalyzeService;
       this._toastMessage = toastMessage;
       this._$translate = $translate;
-
-      this.draftMode = false;
       this.deNormalizedData = [];
       this.normalizedData = [];
       this.dataSource = {};
@@ -106,7 +106,7 @@ export const AnalyzePivotComponent = {
           this.model = defaults(this.model, analysis);
           this.model.id = analysis.id;
           this.settingsModified = true;
-          this.draftMode = true;
+          this.startDraftMode();
           this.artifacts = this.getSortedArtifacts(this.model.artifacts);
           this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
           this.loadPivotData();
@@ -153,7 +153,7 @@ export const AnalyzePivotComponent = {
       this.artifacts[0].columns = columns;
       this.sortFields = this.getArtifactColumns2SortFieldMapper()(this.artifacts[0].columns);
       this.settingsModified = true;
-      this.draftMode = true;
+      this.startDraftMode();
       const pivotFields = this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns);
       this.setDataSource(this.dataSource.store, pivotFields);
     }
@@ -239,7 +239,7 @@ export const AnalyzePivotComponent = {
       if (filters) {
         this.filters = filters;
         this.settingsModified = true;
-        this.draftMode = true;
+        this.startDraftMode();
       }
       if (filterBooleanCriteria) {
         this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;
@@ -249,13 +249,13 @@ export const AnalyzePivotComponent = {
     onClearAllFilters() {
       this.filters = [];
       this.settingsModified = true;
-      this.draftMode = true;
+      this.startDraftMode();
     }
 
     onFilterRemoved(index) {
       this.filters.splice(index, 1);
       this.settingsModified = true;
-      this.draftMode = true;
+      this.startDraftMode();
     }
 // END filters
 
@@ -358,7 +358,7 @@ export const AnalyzePivotComponent = {
     applySorts(sorts) {
       this.pivotGridUpdater.next({sorts});
       this.settingsModified = true;
-      this.draftMode = true;
+      this.startDraftMode();
     }
 
     openSortModal(ev) {
@@ -395,7 +395,7 @@ export const AnalyzePivotComponent = {
           };
 
           scope.onSave = data => {
-            this.draftMode = true;
+            this.startDraftMode();
             this.model.description = data.description;
           };
         },
@@ -521,6 +521,7 @@ export const AnalyzePivotComponent = {
     }
 
     onAnalysisSaved(successfullySaved) {
+      this.endDraftMode();
       this.$dialog.hide(successfullySaved);
     }
   }
