@@ -41,7 +41,6 @@ export const AnalyzeReportComponent = {
       this._FilterService = FilterService;
       this._reloadTimer = null;
       this._modelLoaded = null;
-      this.showProgress = false;
 
       this._modelPromise = new Promise(resolve => {
         this._modelLoaded = resolve;
@@ -451,7 +450,7 @@ export const AnalyzeReportComponent = {
     }
 
     onSaveQuery(analysis) {
-      this.showProgress = true;
+      this.startProgress();
       this._AnalyzeService.getDataBySettings(clone(analysis))
         .then(({analysis, data}) => {
           this.gridData = data;
@@ -460,14 +459,14 @@ export const AnalyzeReportComponent = {
           const columnNames = keys(fpGet('[0]', data));
           this.columns = this.getColumns(columnNames);
           this.applyDataToGrid(this.columns, [], [], this.gridData);
-          this.showProgress = false;
+          this.endProgress();
         }, () => {
-          this.showProgress = false;
+          this.endProgress();
         });
     }
 
     refreshGridData() {
-      this.showProgress = true;
+      this.startProgress();
       this.model = assign(this.model, this.generatePayload());
 
       const sorts = map(this.canvas.model.sorts, sort => {
@@ -487,10 +486,10 @@ export const AnalyzeReportComponent = {
           this.model.query = analysis.queryManual || analysis.query;
           this.applyDataToGrid(this.columns, sorts, groups, this.gridData);
           this.analysisChanged = false;
-          this.showProgress = false;
+          this.endProgress();
           this.toggleDetailsPanel(true);
         }, () => {
-          this.showProgress = false;
+          this.endProgress();
         });
     }
 
@@ -688,29 +687,6 @@ export const AnalyzeReportComponent = {
           this.analysisChanged = true;
           this.startDraftMode();
         });
-    }
-
-    openDescriptionModal(ev) {
-      const tpl = '<analyze-description-dialog model="model" on-save="onSave($data)"></analyze-description-dialog>';
-
-      this._$mdDialog.show({
-        template: tpl,
-        controller: scope => {
-          scope.model = {
-            description: this.model.description
-          };
-
-          scope.onSave = data => {
-            this.startDraftMode();
-            this.model.description = data.description;
-          };
-        },
-        autoWrap: false,
-        focusOnOpen: false,
-        multiple: true,
-        targetEvent: ev,
-        clickOutsideToClose: true
-      });
     }
 
     openSaveModal(ev) {

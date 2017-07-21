@@ -62,7 +62,6 @@ export const AnalyzeChartComponent = {
       this.updateChart = new BehaviorSubject({});
       this.settings = null;
       this.gridData = this.filteredGridData = [];
-      this.showProgress = false;
       this.analysisChanged = false;
       this.labels = {
         tempY: '', tempX: '', y: '', x: ''
@@ -223,16 +222,16 @@ export const AnalyzeChartComponent = {
       if (!this.checkModelValidity()) {
         return;
       }
-      this.showProgress = true;
+      this.startProgress();
       const payload = this.generatePayload(this.model);
       return this._AnalyzeService.getDataBySettings(payload).then(({data}) => {
         const parsedData = this._ChartService.parseData(data, payload.sqlBuilder);
         this.gridData = this.filteredGridData = parsedData || this.filteredGridData;
         this.analysisChanged = false;
-        this.showProgress = false;
+        this.endProgress();
         this.reloadChart(this.settings, this.filteredGridData);
       }, () => {
-        this.showProgress = false;
+        this.endProgress();
       });
     }
 
@@ -301,30 +300,6 @@ export const AnalyzeChartComponent = {
       );
 
       this.updateChart.next(changes);
-    }
-
-    // filters section
-    openDescriptionModal(ev) {
-      const tpl = '<analyze-description-dialog model="model" on-save="onSave($data)"></analyze-description-dialog>';
-
-      this._$mdDialog.show({
-        template: tpl,
-        controller: scope => {
-          scope.model = {
-            description: this.model.description
-          };
-
-          scope.onSave = data => {
-            this.startDraftMode();
-            this.model.description = data.description;
-          };
-        },
-        autoWrap: false,
-        focusOnOpen: false,
-        multiple: true,
-        targetEvent: ev,
-        clickOutsideToClose: true
-      });
     }
 
     openPreviewModal(ev) {

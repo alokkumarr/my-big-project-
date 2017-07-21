@@ -58,7 +58,6 @@ export const AnalyzePivotComponent = {
       this.settingsModified = false;
       this.artifacts = [];
       this.backupColumns = [];
-      this.showProgress = false;
     }
 
     $onInit() {
@@ -192,7 +191,7 @@ export const AnalyzePivotComponent = {
       if (!this.checkModelValidity(model)) {
         return;
       }
-      this.showProgress = true;
+      this.startProgress();
       return this._AnalyzeService.getDataBySettings(clone(model))
         .then(({data}) => {
           const fields = this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns);
@@ -211,10 +210,10 @@ export const AnalyzePivotComponent = {
               sorts: this.sorts
             });
           });
-          this.showProgress = false;
+          this.endProgress();
         })
         .catch(() => {
-          this.showProgress = false;
+          this.endProgress();
         });
     }
 
@@ -382,29 +381,6 @@ export const AnalyzePivotComponent = {
           this.sorts = sorts;
           this.applySorts(sorts);
         });
-    }
-
-    openDescriptionModal(ev) {
-      const tpl = '<analyze-description-dialog model="model" on-save="onSave($data)"></analyze-description-dialog>';
-
-      this._$mdDialog.show({
-        template: tpl,
-        controller: scope => {
-          scope.model = {
-            description: this.model.description
-          };
-
-          scope.onSave = data => {
-            this.startDraftMode();
-            this.model.description = data.description;
-          };
-        },
-        autoWrap: false,
-        focusOnOpen: false,
-        multiple: true,
-        targetEvent: ev,
-        clickOutsideToClose: true
-      });
     }
 
     openPreviewModal(ev) {
