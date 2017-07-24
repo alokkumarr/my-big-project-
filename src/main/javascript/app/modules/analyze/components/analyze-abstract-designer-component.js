@@ -1,4 +1,5 @@
 import defaultsDeep from 'lodash/defaultsDeep';
+import cloneDeep from 'lodash/cloneDeep';
 
 export default class AbstractDesignerComponentController {
   constructor($mdDialog) {
@@ -6,6 +7,8 @@ export default class AbstractDesignerComponentController {
 
     this.draftMode = false;
     this.showProgress = false;
+    this.analysisChanged = false;
+    this.filters = [];
   }
 
   $onInit() {
@@ -28,6 +31,29 @@ export default class AbstractDesignerComponentController {
 
   endProgress() {
     this.showProgress = false;
+  }
+
+  clearFilters() {
+    this.filters = [];
+    this.analysisChanged = true;
+    this.startDraftMode();
+  }
+
+  onFilterRemoved(index) {
+    this.filters.splice(index, 1);
+    this.analysisChanged = true;
+    this.startDraftMode();
+  }
+
+  onApplyFilters({filters, filterBooleanCriteria} = {}) {
+    if (filters) {
+      this.filters = filters;
+      this.analysisChanged = true;
+      this.startDraftMode();
+    }
+    if (filterBooleanCriteria) {
+      this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;
+    }
   }
 
   openPreviewModal(template, ev, model) {
@@ -82,6 +108,22 @@ export default class AbstractDesignerComponentController {
           this.$dialog.hide(successfullySaved);
         }
       });
+  }
+
+  openFiltersModal(ev) {
+    const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria"></analyze-filter-modal>';
+    this._$mdDialog.show({
+      template: tpl,
+      controller: scope => {
+        scope.filters = cloneDeep(this.filters);
+        scope.artifacts = this.model.artifacts;
+        scope.booleanCriteria = this.model.sqlBuilder.booleanCriteria;
+      },
+      targetEvent: ev,
+      fullscreen: true,
+      autoWrap: false,
+      multiple: true
+    }).then(this.onApplyFilters.bind(this));
   }
 
   showModal(config, ev) {

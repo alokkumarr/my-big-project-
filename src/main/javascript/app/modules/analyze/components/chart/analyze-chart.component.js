@@ -9,7 +9,6 @@ import map from 'lodash/map';
 import values from 'lodash/values';
 import clone from 'lodash/clone';
 import set from 'lodash/set';
-import cloneDeep from 'lodash/cloneDeep';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
 
 import {ENTRY_MODES, NUMBER_TYPES} from '../../consts';
@@ -62,12 +61,9 @@ export const AnalyzeChartComponent = {
       this.updateChart = new BehaviorSubject({});
       this.settings = null;
       this.gridData = this.filteredGridData = [];
-      this.analysisChanged = false;
       this.labels = {
         tempY: '', tempX: '', y: '', x: ''
       };
-
-      this.filters = [];
 
       this.chartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
 
@@ -195,29 +191,6 @@ export const AnalyzeChartComponent = {
       this.startDraftMode();
     }
 
-    clearFilters() {
-      this.filters = [];
-      this.analysisChanged = true;
-      this.startDraftMode();
-    }
-
-    onFilterRemoved(index) {
-      this.filters.splice(index, 1);
-      this.analysisChanged = true;
-      this.startDraftMode();
-    }
-
-    onApplyFilters({filters, filterBooleanCriteria} = {}) {
-      if (filters) {
-        this.filters = filters;
-        this.analysisChanged = true;
-        this.startDraftMode();
-      }
-      if (filterBooleanCriteria) {
-        this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;
-      }
-    }
-
     refreshChartData() {
       if (!this.checkModelValidity()) {
         return;
@@ -270,22 +243,6 @@ export const AnalyzeChartComponent = {
       }
 
       return isValid;
-    }
-
-    openFiltersModal(ev) {
-      const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria"></analyze-filter-modal>';
-      this._$mdDialog.show({
-        template: tpl,
-        controller: scope => {
-          scope.filters = cloneDeep(this.filters);
-          scope.artifacts = this.model.artifacts;
-          scope.booleanCriteria = this.model.sqlBuilder.booleanCriteria;
-        },
-        targetEvent: ev,
-        fullscreen: true,
-        autoWrap: false,
-        multiple: true
-      }).then(this.onApplyFilters.bind(this));
     }
 
     reloadChart(settings, filteredGridData) {

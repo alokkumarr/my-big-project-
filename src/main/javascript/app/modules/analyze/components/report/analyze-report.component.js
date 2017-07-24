@@ -8,7 +8,6 @@ import map from 'lodash/map';
 import keys from 'lodash/keys';
 import forEach from 'lodash/forEach';
 import clone from 'lodash/clone';
-import cloneDeep from 'lodash/cloneDeep';
 import sortBy from 'lodash/sortBy';
 import filter from 'lodash/filter';
 import assign from 'lodash/assign';
@@ -61,7 +60,6 @@ export const AnalyzeReportComponent = {
 
       this.gridData = [];
       this.columns = [];
-      this.filters = [];
 
       this._unregisterCanvasHandlers = [];
     }
@@ -145,37 +143,6 @@ export const AnalyzeReportComponent = {
 
     // END requests
 
-    // filters section
-    showFiltersButtonIfDataIsReady() {
-      if (this.canvas && this.gridData) {
-        this.showFiltersButton = true;
-      }
-    }
-
-    onApplyFilters({filters, filterBooleanCriteria} = {}) {
-      if (filters) {
-        this.filters = filters;
-        this.analysisChanged = true;
-        this.startDraftMode();
-      }
-      if (filterBooleanCriteria) {
-        this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;
-      }
-    }
-
-    onClearAllFilters() {
-      this.filters = [];
-      this.analysisChanged = true;
-      this.startDraftMode();
-    }
-
-    onFilterRemoved(index) {
-      this.filters.splice(index, 1);
-      this.analysisChanged = true;
-      this.startDraftMode();
-    }
-    // END filters section
-
     toggleDetailsPanel(forceOpen) {
       if (forceOpen === true || forceOpen === false) {
         this.states.detailsExpanded = forceOpen;
@@ -197,7 +164,6 @@ export const AnalyzeReportComponent = {
         this.model.artifacts = [];
       } else {
         this.fillCanvas(this.model.artifacts);
-        this.showFiltersButtonIfDataIsReady();
       }
 
       if (this.mode) {
@@ -494,7 +460,6 @@ export const AnalyzeReportComponent = {
     }
 
     applyDataToGrid(columns, sorts, groups, data) {
-      this.showFiltersButtonIfDataIsReady();
       const grid = first(this._$componentHandler.get('ard-grid-container'));
       if (grid) {
         grid.updateColumns(columns);
@@ -605,22 +570,6 @@ export const AnalyzeReportComponent = {
 
     isPreviewDisabled() {
       return !this.hasSelectedColumns();
-    }
-
-    openFiltersModal(ev) {
-      const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria"></analyze-filter-modal>';
-      this._$mdDialog.show({
-        template: tpl,
-        controller: scope => {
-          scope.filters = cloneDeep(this.filters);
-          scope.artifacts = this.model.artifacts;
-          scope.booleanCriteria = this.model.sqlBuilder.booleanCriteria;
-        },
-        targetEvent: ev,
-        fullscreen: true,
-        autoWrap: false,
-        multiple: true
-      }).then(this.onApplyFilters.bind(this));
     }
 
     openReportPreviewModal(ev) {

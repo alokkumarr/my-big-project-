@@ -60,7 +60,7 @@
             <span translate="DESCRIPTION"></span>
           </md-button>
 
-            <md-button ng-if="$ctrl.showFiltersButton && !$ctrl.model.edit"
+            <md-button ng-if="!$ctrl.model.edit"
                        ng-show="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE"
                        ng-click="$ctrl.openFiltersModal($event)">
               <md-icon md-font-icon="icon-filter"></md-icon>

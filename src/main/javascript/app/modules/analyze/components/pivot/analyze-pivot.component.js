@@ -52,7 +52,6 @@ export const AnalyzePivotComponent = {
       this.normalizedData = [];
       this.dataSource = {};
       this.sorts = [];
-      this.filters = [];
       this.sortFields = null;
       this.pivotGridUpdater = new BehaviorSubject({});
       this.settingsModified = false;
@@ -216,47 +215,6 @@ export const AnalyzePivotComponent = {
           this.endProgress();
         });
     }
-
-// filters
-    openFiltersModal(ev) {
-      const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria"></analyze-filter-modal>';
-      this._$mdDialog.show({
-        template: tpl,
-        controller: scope => {
-          scope.filters = cloneDeep(this.filters);
-          scope.artifacts = this.artifacts;
-          scope.booleanCriteria = this.model.sqlBuilder.booleanCriteria;
-        },
-        targetEvent: ev,
-        fullscreen: true,
-        autoWrap: false,
-        multiple: true
-      }).then(this.onApplyFilters.bind(this));
-    }
-
-    onApplyFilters({filters, filterBooleanCriteria} = {}) {
-      if (filters) {
-        this.filters = filters;
-        this.settingsModified = true;
-        this.startDraftMode();
-      }
-      if (filterBooleanCriteria) {
-        this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;
-      }
-    }
-
-    onClearAllFilters() {
-      this.filters = [];
-      this.settingsModified = true;
-      this.startDraftMode();
-    }
-
-    onFilterRemoved(index) {
-      this.filters.splice(index, 1);
-      this.settingsModified = true;
-      this.startDraftMode();
-    }
-// END filters
 
     onPivotContentReady(fields) {
       if (isEmpty(this.artifacts) || isEmpty(fields)) {
