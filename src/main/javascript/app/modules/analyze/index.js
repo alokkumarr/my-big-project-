@@ -26,7 +26,6 @@ import {AnalyzeNewComponent} from './components/new/analyze-new.component';
 import {pivotAreaTypeFilter} from './filters/pivot-area-type.filter';
 import {AnalyzePivotSettingsComponent} from './components/pivot/settings/analyze-pivot-settings.component';
 import {AnalyzePivotPreviewComponent} from './components/pivot/preview/analyze-pivot-preview.component';
-import {PivotGridComponent} from './components/pivot-grid/pivot-grid.component';
 import {AnalyzePivotComponent} from './components/pivot/analyze-pivot.component';
 import {AnalyzeReportComponent} from './components/report/analyze-report.component';
 import {AnalyzeReportQueryComponent} from './components/report/query/analyze-report-query.component';
@@ -86,7 +85,6 @@ angular.module(AnalyzeModule, [])
   .component('analyzeNew', AnalyzeNewComponent)
   .component('analyzePivotSettings', AnalyzePivotSettingsComponent)
   .component('analyzePivotPreview', AnalyzePivotPreviewComponent)
-  .component('pivotGrid', PivotGridComponent)
   .component('analyzePivot', AnalyzePivotComponent)
   .component('analyzeReport', AnalyzeReportComponent)
   .component('analyzeReportQuery', AnalyzeReportQueryComponent)
