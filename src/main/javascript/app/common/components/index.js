@@ -19,6 +19,7 @@ import {mdButtonGroupComponent} from './md-button-group/md-button-group.componen
 import {ChoiceGroupComponent} from './choice-group';
 import {ChartsModule} from './charts';
 import {SidenavComponent, SidenavBtnComponent} from './sidenav';
+import {PivotGridComponent} from './pivot-grid/pivot-grid.component';
 import {BinaryOptionComponent} from './binary-option/binary-option.component';
 
 export const CommonComponentModule = 'CommonModule.Component';
@@ -43,4 +44,5 @@ angular
   .component('rangeSlider', RangeSliderComponent)
   .component('searchBox', SearchBoxComponent)
   .component('sidenav', SidenavComponent)
+  .component('pivotGrid', PivotGridComponent)
   .component('sidenavBtn', SidenavBtnComponent);

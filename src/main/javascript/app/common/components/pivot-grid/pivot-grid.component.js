@@ -2,10 +2,6 @@ import forEach from 'lodash/forEach';
 import assign from 'lodash/assign';
 import values from 'lodash/values';
 import mapValues from 'lodash/mapValues';
-import fpPipe from 'lodash/fp/pipe';
-import fpFilter from 'lodash/fp/filter';
-import fpMap from 'lodash/fp/map';
-import fpToPairs from 'lodash/fp/toPairs';
 
 import template from './pivot-grid.component.html';
 import style from './pivot-grid.component.scss';
@@ -19,13 +15,10 @@ export const PivotGridComponent = {
     onContentReady: '&'
   },
   controller: class PivotGridController {
-    constructor($timeout, $translate, FilterService, $compile, $scope) {
+    constructor($timeout, $translate) {
       'ngInject';
       this._$translate = $translate;
       this._$timeout = $timeout;
-      this._$compile = $compile;
-      this._$scope = $scope;
-      this._FilterService = FilterService;
       this.warnings = {
         'Drop Data Fields Here': 'SELECT_DATA_FIELDS',
         'Drop Column Fields Here': 'SELECT_COLUMN_FIELDS',
@@ -77,8 +70,6 @@ export const PivotGridComponent = {
     update(updates) {
       /* eslint-disable no-unused-expressions */
       updates.dataSource && this.updateDataSource(updates.dataSource);
-      updates.field && this.updateField(updates.field);
-      updates.filters && this.updateFilters(updates.filters);
       updates.sorts && this.updateSorts(updates.sorts);
       updates.export && this.exportToExcel();
       /* eslint-disable no-unused-expressions */
@@ -92,37 +83,6 @@ export const PivotGridComponent = {
 
     updateDataSource(dataSource) {
       this._gridInstance.option('dataSource', dataSource);
-    }
-
-    updateField(field) {
-      const pivotGridDataSource = this._gridInstance.getDataSource();
-
-      pivotGridDataSource.field(field.dataField, field.modifierObj);
-      pivotGridDataSource.load();
-    }
-
-    updateFilters(filters) {
-      const pivotGridDataSource = this._gridInstance.getDataSource();
-
-      forEach(filters, filter => {
-        if (this._FilterService.isFilterModelNonEmpty(filter.model)) {
-          const filterValues = fpPipe(
-            fpToPairs,
-            fpFilter(pair => pair[1]),
-            fpMap(pair => pair[0])
-          )(filter.model);
-          pivotGridDataSource.field(filter.name, {
-            filterType: 'include',
-            filterValues
-          });
-        } else {
-          pivotGridDataSource.field(filter.name, {
-            filterType: null,
-            filterValues: null
-          });
-        }
-      });
-      pivotGridDataSource.load();
     }
 
     updateSorts(sorts) {
