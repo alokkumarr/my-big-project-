@@ -11,8 +11,8 @@ import defaults from 'lodash/defaults';
 import unset from 'lodash/unset';
 import filter from 'lodash/filter';
 import cloneDeep from 'lodash/cloneDeep';
-import sortBy from 'lodash/sortBy';
 import fpSortBy from 'lodash/fp/sortBy';
+import sortBy from 'lodash/sortBy';
 import forEach from 'lodash/forEach';
 import fpGroupBy from 'lodash/fp/groupBy';
 import groupBy from 'lodash/groupBy';
@@ -23,9 +23,9 @@ import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 
 import template from './analyze-pivot.component.html';
 import style from './analyze-pivot.component.scss';
+import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
 import {DEFAULT_AGGREGATE_TYPE, DEFAULT_GROUP_INTERVAL} from '../pivot/settings/analyze-pivot-settings.component';
-
 import {DATE_TYPES, NUMBER_TYPES, ENTRY_MODES, MAX_POSSIBLE_FIELDS_OF_SAME_AREA} from '../../consts';
 
 export const AnalyzePivotComponent = {
@@ -35,10 +35,10 @@ export const AnalyzePivotComponent = {
     model: '<',
     mode: '@?'
   },
-  controller: class AnalyzePivotController {
-    constructor($mdDialog, $timeout, PivotService, AnalyzeService, FilterService, $mdSidenav, toastMessage, $translate) {
+  controller: class AnalyzePivotController extends AbstractDesignerComponentController {
+    constructor($timeout, PivotService, AnalyzeService, FilterService, $mdSidenav, toastMessage, $translate) {
       'ngInject';
-      this._$mdDialog = $mdDialog;
+      super();
       this._$mdSidenav = $mdSidenav;
       this._PivotService = PivotService;
       this._$timeout = $timeout;
@@ -46,19 +46,13 @@ export const AnalyzePivotComponent = {
       this._AnalyzeService = AnalyzeService;
       this._toastMessage = toastMessage;
       this._$translate = $translate;
-
-      this.draftMode = false;
       this.deNormalizedData = [];
       this.normalizedData = [];
       this.dataSource = {};
-      this.sorts = [];
-      this.filters = [];
       this.sortFields = null;
       this.pivotGridUpdater = new BehaviorSubject({});
-      this.settingsModified = false;
       this.artifacts = [];
       this.backupColumns = [];
-      this.showProgress = false;
     }
 
     $onInit() {
@@ -81,7 +75,7 @@ export const AnalyzePivotComponent = {
       this._AnalyzeService.createAnalysis(this.model.semanticId, this.model.type)
         .then(analysis => {
           this.initModel(analysis);
-          this.settingsModified = true;
+          this.analysisUnSynched();
           this.artifacts = this.getSortedArtifacts(this.model.artifacts);
           this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
         });
@@ -105,8 +99,8 @@ export const AnalyzePivotComponent = {
         .then(analysis => {
           this.model = defaults(this.model, analysis);
           this.model.id = analysis.id;
-          this.settingsModified = true;
-          this.draftMode = true;
+          this.analysisUnSynched();
+          this.startDraftMode();
           this.artifacts = this.getSortedArtifacts(this.model.artifacts);
           this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
           this.loadPivotData();
@@ -120,28 +114,6 @@ export const AnalyzePivotComponent = {
       this.sorts = this.mapBackend2FrontendSort(this.model.sqlBuilder.sorts, this.sortFields);
     }
 
-    goBack() {
-      if (!this.draftMode) {
-        this.$dialog.hide();
-        return;
-      }
-
-      const confirm = this._$mdDialog.confirm()
-            .title('There are unsaved changes')
-            .textContent('Do you want to discard unsaved changes and go back?')
-        .multiple(true)
-        .ok('Discard')
-        .cancel('Cancel');
-
-      this._$mdDialog.show(confirm).then(() => {
-        this.$dialog.hide();
-      }, err => {
-        if (err) {
-          this._$log.error(err);
-        }
-      });
-    }
-
     getSortedArtifacts(artifacts) {
       return [{
         artifactName: artifacts[0].artifactName,
@@ -152,8 +124,8 @@ export const AnalyzePivotComponent = {
     onApplySettings(columns) {
       this.artifacts[0].columns = columns;
       this.sortFields = this.getArtifactColumns2SortFieldMapper()(this.artifacts[0].columns);
-      this.settingsModified = true;
-      this.draftMode = true;
+      this.analysisUnSynched();
+      this.startDraftMode();
       const pivotFields = this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns);
       this.setDataSource(this.dataSource.store, pivotFields);
     }
@@ -192,12 +164,12 @@ export const AnalyzePivotComponent = {
       if (!this.checkModelValidity(model)) {
         return;
       }
-      this.showProgress = true;
+      this.startProgress();
       return this._AnalyzeService.getDataBySettings(clone(model))
         .then(({data}) => {
           const fields = this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns);
           this.normalizedData = data;
-          this.settingsModified = false;
+          this.analysisSynched();
           this.deNormalizedData = this._PivotService.denormalizeData(data, fields);
           this.deNormalizedData = this._PivotService.takeOutKeywordFromData(this.deNormalizedData);
           this.dataSource = new PivotGridDataSource({store: this.deNormalizedData, fields});
@@ -211,53 +183,12 @@ export const AnalyzePivotComponent = {
               sorts: this.sorts
             });
           });
-          this.showProgress = false;
+          this.endProgress();
         })
         .catch(() => {
-          this.showProgress = false;
+          this.endProgress();
         });
     }
-
-// filters
-    openFiltersModal(ev) {
-      const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria"></analyze-filter-modal>';
-      this._$mdDialog.show({
-        template: tpl,
-        controller: scope => {
-          scope.filters = cloneDeep(this.filters);
-          scope.artifacts = this.artifacts;
-          scope.booleanCriteria = this.model.sqlBuilder.booleanCriteria;
-        },
-        targetEvent: ev,
-        fullscreen: true,
-        autoWrap: false,
-        multiple: true
-      }).then(this.onApplyFilters.bind(this));
-    }
-
-    onApplyFilters({filters, filterBooleanCriteria} = {}) {
-      if (filters) {
-        this.filters = filters;
-        this.settingsModified = true;
-        this.draftMode = true;
-      }
-      if (filterBooleanCriteria) {
-        this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;
-      }
-    }
-
-    onClearAllFilters() {
-      this.filters = [];
-      this.settingsModified = true;
-      this.draftMode = true;
-    }
-
-    onFilterRemoved(index) {
-      this.filters.splice(index, 1);
-      this.settingsModified = true;
-      this.draftMode = true;
-    }
-// END filters
 
     onPivotContentReady(fields) {
       if (isEmpty(this.artifacts) || isEmpty(fields)) {
@@ -357,73 +288,28 @@ export const AnalyzePivotComponent = {
 
     applySorts(sorts) {
       this.pivotGridUpdater.next({sorts});
-      this.settingsModified = true;
-      this.draftMode = true;
+      this.analysisUnSynched();
+      this.startDraftMode();
     }
 
-    openSortModal(ev) {
-      const tpl = '<analyze-sort-dialog model="model"></analyze-sort-dialog>';
-
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controller: scope => {
-            scope.model = {
-              fields: this.sortFields,
-              sorts: map(this.sorts, sort => clone(sort))
-            };
-          },
-          targetEvent: ev,
-          fullscreen: true,
-          autoWrap: false,
-          multiple: true
-        })
+    openPivotSortModal(ev) {
+      this.openSortModal(ev, {
+        fields: this.sortFields,
+        sorts: map(this.sorts, sort => clone(sort))
+      })
         .then(sorts => {
           this.sorts = sorts;
           this.applySorts(sorts);
         });
     }
 
-    openDescriptionModal(ev) {
-      const tpl = '<analyze-description-dialog model="model" on-save="onSave($data)"></analyze-description-dialog>';
-
-      this._$mdDialog.show({
-        template: tpl,
-        controller: scope => {
-          scope.model = {
-            description: this.model.description
-          };
-
-          scope.onSave = data => {
-            this.draftMode = true;
-            this.model.description = data.description;
-          };
-        },
-        autoWrap: false,
-        focusOnOpen: false,
-        multiple: true,
-        targetEvent: ev,
-        clickOutsideToClose: true
-      });
-    }
-
-    openPreviewModal(ev) {
+    openPivotPreviewModal(ev) {
       const tpl = '<analyze-pivot-preview model="model"></analyze-pivot-preview>';
 
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controller: scope => {
-            scope.model = {
-              pivot: this.model,
-              dataSource: this.dataSource
-            };
-          },
-          targetEvent: ev,
-          fullscreen: true,
-          autoWrap: false,
-          multiple: true
-        });
+      this.openPreviewModal(tpl, ev, {
+        pivot: this.model,
+        dataSource: this.dataSource
+      });
     }
 
     mapBackend2FrontendSort(sorts, sortFields) {
@@ -491,37 +377,9 @@ export const AnalyzePivotComponent = {
       };
     }
 
-    openSaveModal(ev) {
+    openSavePivotModal(ev) {
       const model = this.getModel();
-      const tpl = '<analyze-save-dialog model="model" on-save="onSave($data)"></analyze-save-dialog>';
-
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controller: scope => {
-            scope.model = clone(model);
-
-            scope.onSave = data => {
-              this.model.id = data.id;
-              this.model.name = data.name;
-              this.model.description = data.description;
-            };
-          },
-          autoWrap: false,
-          fullscreen: true,
-          focusOnOpen: false,
-          multiple: true,
-          targetEvent: ev,
-          clickOutsideToClose: true
-        }).then(successfullySaved => {
-          if (successfullySaved) {
-            this.onAnalysisSaved(successfullySaved);
-          }
-        });
-    }
-
-    onAnalysisSaved(successfullySaved) {
-      this.$dialog.hide(successfullySaved);
+      this.openSaveModal(ev, model);
     }
   }
 };

@@ -19,7 +19,7 @@
       </div>
 
       <div class="ard_actions" flex>
-        <md-button ng-click="$ctrl.openSaveModal()"
+        <md-button ng-click="$ctrl.openSaveChartModal($event)"
                    translate="SAVE">
         </md-button>
       </div>
@@ -50,14 +50,14 @@
 
           <div class="analyze-view_action-panel" layout="row" layout-align="end center">
             <md-button ng-click="$ctrl.refreshChartData()"
-                       ng-class="{'btn-primary': $ctrl.analysisChanged}" >
+                       ng-class="{'btn-primary': $ctrl.didAnalysisChange}" >
               <span translate="REFRESH_DATA"></span>
             </md-button>
-            <md-button ng-click="$ctrl.openDescriptionModal($event)">
+            <md-button ng-click="$ctrl.openDescriptionModal($event, $ctrl.model)">
               <md-icon md-font-icon="icon-description"></md-icon>
               <span translate="DESCRIPTION"></span>
             </md-button>
-            <md-button ng-click="$ctrl.openPreviewModal($event)">
+            <md-button ng-click="$ctrl.openChartPreviewModal($event)">
               <md-icon md-font-icon="icon-full-screen"></md-icon>
               <span translate="PREVIEW"></span>
             </md-button>

@@ -18,7 +18,7 @@
       </div>
 
       <div class="ard_actions" flex>
-        <md-button class="btn-primary" ng-click="$ctrl.openSaveModal()"
+        <md-button class="btn-primary" ng-click="$ctrl.openSavePivotModal($event)"
                    translate="SAVE">
         </md-button>
       </div>
@@ -38,21 +38,21 @@
               translate="PIVOT"></span>
 
         <div class="ard_toolbar-actions" flex="70" layot="row" layout-wrap>
-          <md-button ng-class="$ctrl.settingsModified ? 'btn-primary' : 'action'" ng-click="$ctrl.onRefreshData()">
+          <md-button ng-class="$ctrl.didAnalysisChange ? 'btn-primary' : 'action'" ng-click="$ctrl.onRefreshData()">
             <span translate="REFRESH_DATA"></span>
           </md-button>
 
-          <md-button class="action" ng-click="$ctrl.openDescriptionModal($event)">
+          <md-button class="action" ng-click="$ctrl.openDescriptionModal($event, $ctrl.model)">
             <md-icon md-font-icon="icon-description"></md-icon>
             <span translate="DESCRIPTION"></span>
           </md-button>
 
-          <md-button class="action" ng-click="$ctrl.openPreviewModal($event)">
+          <md-button class="action" ng-click="$ctrl.openPivotPreviewModal($event)">
             <md-icon md-font-icon="icon-full-screen"></md-icon>
             <span translate="PREVIEW"></span>
           </md-button>
 
-          <md-button class="action" ng-click="$ctrl.openSortModal($event)"
+          <md-button class="action" ng-click="$ctrl.openPivotSortModal($event)"
                      ng-disabled="!$ctrl.sortFields">
             <md-icon md-font-icon="icon-sort"></md-icon>
             <span translate="SORT"></span>
