@@ -38,7 +38,7 @@
               translate="PIVOT"></span>
 
         <div class="ard_toolbar-actions" flex="70" layot="row" layout-wrap>
-          <md-button ng-class="$ctrl.settingsModified ? 'btn-primary' : 'action'" ng-click="$ctrl.onRefreshData()">
+          <md-button ng-class="$ctrl.didAnalysisChange ? 'btn-primary' : 'action'" ng-click="$ctrl.onRefreshData()">
             <span translate="REFRESH_DATA"></span>
           </md-button>
 
@@ -52,7 +52,7 @@
             <span translate="PREVIEW"></span>
           </md-button>
 
-          <md-button class="action" ng-click="$ctrl.openSortModal($event)"
+          <md-button class="action" ng-click="$ctrl.openPivotSortModal($event)"
                      ng-disabled="!$ctrl.sortFields">
             <md-icon md-font-icon="icon-sort"></md-icon>
             <span translate="SORT"></span>

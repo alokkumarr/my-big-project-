@@ -97,7 +97,7 @@
           <md-button ng-click="$ctrl.refreshGridData()"
                      ng-if="!$ctrl.model.edit"
                      ng-show="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE"
-                     ng-class="{'btn-primary': $ctrl.analysisChanged}" >
+                     ng-class="{'btn-primary': $ctrl.didAnalysisChange}" >
             <span translate="REFRESH_DATA"></span>
           </md-button>
 
@@ -107,7 +107,7 @@
             <span translate="PREVIEW"></span>
           </md-button>
 
-          <md-button ng-click="$ctrl.openSortModal($event)"
+          <md-button ng-click="$ctrl.openReportSortModal($event)"
                      ng-if="!$ctrl.model.edit"
                      ng-show="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE"
                      ng-disabled="$ctrl.isSortDisabled()">

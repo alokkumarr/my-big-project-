@@ -9,13 +9,12 @@ import map from 'lodash/map';
 import values from 'lodash/values';
 import clone from 'lodash/clone';
 import set from 'lodash/set';
-import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
-
-import {ENTRY_MODES, NUMBER_TYPES} from '../../consts';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
 import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
+import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
+import {ENTRY_MODES, NUMBER_TYPES} from '../../consts';
 
 const BAR_COLUMN_OPTIONS = [{
   label: 'TOOLTIP_BAR_CHART',
@@ -35,7 +34,7 @@ export const AnalyzeChartComponent = {
     mode: '@?'
   },
   controller: class AnalyzeChartController extends AbstractDesignerComponentController {
-    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService,
+    constructor($componentHandler, $timeout, AnalyzeService,
                 ChartService, FilterService, $mdSidenav, $translate, toastMessage) {
       'ngInject';
       super();
@@ -43,7 +42,6 @@ export const AnalyzeChartComponent = {
       this._AnalyzeService = AnalyzeService;
       this._ChartService = ChartService;
       this._$mdSidenav = $mdSidenav;
-      this._$mdDialog = $mdDialog;
       this._$timeout = $timeout;
       this._$translate = $translate;
       this._toastMessage = toastMessage;
@@ -116,28 +114,6 @@ export const AnalyzeChartComponent = {
       });
     }
 
-    goBack() {
-      if (!this.draftMode) {
-        this.$dialog.hide();
-        return;
-      }
-
-      const confirm = this._$mdDialog.confirm()
-            .title('There are unsaved changes')
-            .textContent('Do you want to discard unsaved changes and go back?')
-        .multiple(true)
-        .ok('Discard')
-        .cancel('Cancel');
-
-      this._$mdDialog.show(confirm).then(() => {
-        this.$dialog.hide();
-      }, err => {
-        if (err) {
-          this._$log.error(err);
-        }
-      });
-    }
-
     toggleBarColumn() {
       if (this.model.chartType === 'bar') {
         this.model.chartType = 'column';
@@ -187,7 +163,7 @@ export const AnalyzeChartComponent = {
     }
 
     onSettingsChanged() {
-      this.analysisChanged = true;
+      this.analysisUnSynched();
       this.startDraftMode();
     }
 
@@ -200,7 +176,7 @@ export const AnalyzeChartComponent = {
       return this._AnalyzeService.getDataBySettings(payload).then(({data}) => {
         const parsedData = this._ChartService.parseData(data, payload.sqlBuilder);
         this.gridData = this.filteredGridData = parsedData || this.filteredGridData;
-        this.analysisChanged = false;
+        this.analysisSynched();
         this.endProgress();
         this.reloadChart(this.settings, this.filteredGridData);
       }, () => {

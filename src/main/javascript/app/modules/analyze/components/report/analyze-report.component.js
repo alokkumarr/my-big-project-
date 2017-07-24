@@ -29,12 +29,10 @@ export const AnalyzeReportComponent = {
     mode: '@'
   },
   controller: class AnalyzeReportController extends AbstractDesignerComponentController {
-    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, FilterService) {
+    constructor($componentHandler, $timeout, AnalyzeService, FilterService) {
       'ngInject';
       super();
       this._$componentHandler = $componentHandler;
-      this._$mdDialog = $mdDialog;
-      this._$scope = $scope;
       this._$timeout = $timeout;
       this._AnalyzeService = AnalyzeService;
       this._FilterService = FilterService;
@@ -451,7 +449,7 @@ export const AnalyzeReportComponent = {
           this.gridData = data;
           this.model.query = analysis.queryManual || analysis.query;
           this.applyDataToGrid(this.columns, sorts, groups, this.gridData);
-          this.analysisChanged = false;
+          this.analysisSynched();
           this.endProgress();
           this.toggleDetailsPanel(true);
         }, () => {
@@ -508,7 +506,7 @@ export const AnalyzeReportComponent = {
             this.gridData = [];
             this.applyDataToGrid(this.columns, sorts, groups, this.gridData);
           } else {
-            this.analysisChanged = true;
+            this.analysisUnSynched();
           }
 
         }, DEBOUNCE_INTERVAL);
@@ -520,28 +518,6 @@ export const AnalyzeReportComponent = {
       } else {
         this._reloadTimer = doReload();
       }
-    }
-
-    goBack() {
-      if (!this.draftMode) {
-        this.$dialog.hide();
-        return;
-      }
-
-      const confirm = this._$mdDialog.confirm()
-            .title('There are unsaved changes')
-        .textContent('Do you want to discard unsaved changes and go back?')
-        .multiple(true)
-        .ok('Discard')
-        .cancel('Cancel');
-
-      this._$mdDialog.show(confirm).then(() => {
-        this.$dialog.hide();
-      }, err => {
-        if (err) {
-          this._$log.error(err);
-        }
-      });
     }
 
     getSelectedColumns(tables) {
@@ -596,35 +572,22 @@ export const AnalyzeReportComponent = {
       this.canvas._$eventEmitter.emit('joinChanged', obj);
     }
 
-    openSortModal(ev) {
+    openReportSortModal(ev) {
+
       this.states.detailsExpanded = true;
 
       this._$timeout(() => {
         this.reloadPreviewGrid(false);
       });
 
-      const tpl = '<analyze-sort-dialog model="model"></analyze-sort-dialog>';
-
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controller: scope => {
-            scope.model = {
-              fields: this.canvas.model.getSelectedFields(),
-              sorts: map(this.canvas.model.sorts, sort => {
-                return clone(sort);
-              })
-            };
-          },
-          targetEvent: ev,
-          fullscreen: true,
-          autoWrap: false,
-          multiple: true
-        })
+      this.openSortModal(ev, {
+        fields: this.canvas.model.getSelectedFields(),
+        sorts: map(this.canvas.model.sorts, sort => clone(sort))
+      })
         .then(sorts => {
           this.canvas.model.sorts = sorts;
           this.canvas._$eventEmitter.emit('sortChanged');
-          this.analysisChanged = true;
+          this.analysisUnSynched();
           this.startDraftMode();
         });
     }

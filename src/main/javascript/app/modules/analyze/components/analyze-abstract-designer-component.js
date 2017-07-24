@@ -2,19 +2,23 @@ import defaultsDeep from 'lodash/defaultsDeep';
 import cloneDeep from 'lodash/cloneDeep';
 
 export default class AbstractDesignerComponentController {
-  constructor($mdDialog) {
+  constructor($mdDialog, $log) {
     this._$mdDialog = $mdDialog;
+    this._$log = $log;
 
     this.draftMode = false;
     this.showProgress = false;
-    this.analysisChanged = false;
+    this.didAnalysisChange = false;
     this.filters = [];
+    this.sorts = [];
   }
 
-  $onInit() {
+  analysisUnSynched() {
+    this.didAnalysisChange = true;
   }
 
-  $onDestroy() {
+  analysisSynched() {
+    this.didAnalysisChange = false;
   }
 
   startDraftMode() {
@@ -33,27 +37,62 @@ export default class AbstractDesignerComponentController {
     this.showProgress = false;
   }
 
+  // Filters
   clearFilters() {
     this.filters = [];
-    this.analysisChanged = true;
+    this.didAnalysisChange = true;
     this.startDraftMode();
   }
 
   onFilterRemoved(index) {
     this.filters.splice(index, 1);
-    this.analysisChanged = true;
+    this.didAnalysisChange = true;
     this.startDraftMode();
   }
 
   onApplyFilters({filters, filterBooleanCriteria} = {}) {
     if (filters) {
       this.filters = filters;
-      this.analysisChanged = true;
+      this.didAnalysisChange = true;
       this.startDraftMode();
     }
     if (filterBooleanCriteria) {
       this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;
     }
+  }
+  // Filters END
+
+  goBack() {
+    if (!this.draftMode) {
+      this.$dialog.hide();
+      return;
+    }
+
+    const confirm = this._$mdDialog.confirm()
+      .title('There are unsaved changes')
+      .textContent('Do you want to discard unsaved changes and go back?')
+      .multiple(true)
+      .ok('Discard')
+      .cancel('Cancel');
+
+    this._$mdDialog.show(confirm).then(() => {
+      this.$dialog.hide();
+    }, err => {
+      if (err) {
+        this._$log.error(err);
+      }
+    });
+  }
+
+  openSortModal(ev, model) {
+    const tpl = '<analyze-sort-dialog model="model"></analyze-sort-dialog>';
+
+    return this.showModal({
+      template: tpl,
+      controller: scope => {
+        scope.model = model;
+      }
+    }, ev);
   }
 
   openPreviewModal(template, ev, model) {
@@ -62,8 +101,7 @@ export default class AbstractDesignerComponentController {
       template,
       controller: scope => {
         scope.model = model;
-      },
-      fullscreen: true
+      }
     }, ev);
   }
 
@@ -90,7 +128,6 @@ export default class AbstractDesignerComponentController {
 
     this.showModal({
       template: tpl,
-      fullscreen: true,
       controller: scope => {
         scope.model = payload;
 
@@ -112,18 +149,15 @@ export default class AbstractDesignerComponentController {
 
   openFiltersModal(ev) {
     const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria"></analyze-filter-modal>';
-    this._$mdDialog.show({
+
+    this.showModal({
       template: tpl,
       controller: scope => {
         scope.filters = cloneDeep(this.filters);
         scope.artifacts = this.model.artifacts;
         scope.booleanCriteria = this.model.sqlBuilder.booleanCriteria;
-      },
-      targetEvent: ev,
-      fullscreen: true,
-      autoWrap: false,
-      multiple: true
-    }).then(this.onApplyFilters.bind(this));
+      }
+    }, ev).then(this.onApplyFilters.bind(this));
   }
 
   showModal(config, ev) {
@@ -131,6 +165,7 @@ export default class AbstractDesignerComponentController {
       multiple: true,
       autoWrap: false,
       focusOnOpen: false,
+      fullscreen: true,
       targetEvent: ev,
       clickOutsideToClose: true
     });
