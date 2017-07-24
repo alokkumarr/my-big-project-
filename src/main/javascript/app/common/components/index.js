@@ -21,6 +21,9 @@ import {ChartsModule} from './charts';
 import {SidenavComponent, SidenavBtnComponent} from './sidenav';
 import {PivotGridComponent} from './pivot-grid/pivot-grid.component';
 import {BinaryOptionComponent} from './binary-option/binary-option.component';
+import {ReportGridDisplayComponent} from './report-grid-display/grid/report-grid-display.component';
+import {ReportGridDisplayNodeComponent} from './report-grid-display/node/report-grid-display-node.component';
+import {ReportGridDisplayContainerComponent} from './report-grid-display/container/report-grid-display-container.component';
 
 export const CommonComponentModule = 'CommonModule.Component';
 
@@ -45,4 +48,7 @@ angular
   .component('searchBox', SearchBoxComponent)
   .component('sidenav', SidenavComponent)
   .component('pivotGrid', PivotGridComponent)
+  .component('reportGridDisplay', ReportGridDisplayComponent)
+  .component('reportGridDisplayNode', ReportGridDisplayNodeComponent)
+  .component('reportGridDisplayContainer', ReportGridDisplayContainerComponent)
   .component('sidenavBtn', SidenavBtnComponent);
