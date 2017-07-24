@@ -362,40 +362,9 @@ export const AnalyzeChartComponent = {
       return payload;
     }
 
-    openSaveModal(ev) {
+    openSaveChartModal(ev) {
       const payload = this.generatePayload(this.model);
-
-      const tpl = '<analyze-save-dialog model="model" on-save="onSave($data)"></analyze-save-dialog>';
-
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controller: scope => {
-            scope.model = payload;
-
-            scope.onSave = data => {
-              this.model.id = data.id;
-              this.model.name = data.name;
-              this.model.description = data.description;
-              this.model.category = data.category;
-            };
-          },
-          autoWrap: false,
-          fullscreen: true,
-          focusOnOpen: false,
-          multiple: true,
-          targetEvent: ev,
-          clickOutsideToClose: true
-        }).then(successfullySaved => {
-          if (successfullySaved) {
-            this.onAnalysisSaved(successfullySaved);
-          }
-        });
-    }
-
-    onAnalysisSaved(successfullySaved) {
-      this.endDraftMode();
-      this.$dialog.hide(successfullySaved);
+      this.openSaveModal(ev, payload);
     }
   }
 

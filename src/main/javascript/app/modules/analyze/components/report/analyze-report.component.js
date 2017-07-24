@@ -680,7 +680,7 @@ export const AnalyzeReportComponent = {
         });
     }
 
-    openSaveModal(ev) {
+    openSaveReportModal(ev) {
       if (!this.canvas) {
         return;
       }
@@ -690,37 +690,7 @@ export const AnalyzeReportComponent = {
       }
 
       this.model = assign(this.model, this.generatePayload());
-      const tpl = '<analyze-save-dialog model="model" on-save="onSave($data)"></analyze-save-dialog>';
-
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controller: scope => {
-            scope.model = clone(this.model);
-
-            scope.onSave = data => {
-              this.model.id = data.id;
-              this.model.name = data.name;
-              this.model.description = data.description;
-              this.model.categoryId = data.categoryId;
-            };
-          },
-          autoWrap: false,
-          fullscreen: true,
-          focusOnOpen: false,
-          multiple: true,
-          targetEvent: ev,
-          clickOutsideToClose: true
-        }).then(successfullySaved => {
-          if (successfullySaved) {
-            this.onAnalysisSaved(successfullySaved);
-          }
-        });
-    }
-
-    onAnalysisSaved(successfullySaved) {
-      this.endDraftMode();
-      this.$dialog.hide(successfullySaved);
+      this.openSaveModal(ev, this.model);
     }
   }
 };

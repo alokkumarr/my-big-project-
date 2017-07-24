@@ -59,6 +59,31 @@ export default class AbstractDesignerComponentController {
     }, ev);
   }
 
+  openSaveModal(ev, payload) {
+    const tpl = '<analyze-save-dialog model="model" on-save="onSave($data)"></analyze-save-dialog>';
+
+    this.showModal({
+      template: tpl,
+      fullscreen: true,
+      controller: scope => {
+        scope.model = payload;
+
+        scope.onSave = data => {
+          this.model.id = data.id;
+          this.model.name = data.name;
+          this.model.description = data.description;
+          this.model.category = data.categoryId;
+        };
+      }
+    }, ev)
+      .then(successfullySaved => {
+        if (successfullySaved) {
+          this.endDraftMode();
+          this.$dialog.hide(successfullySaved);
+        }
+      });
+  }
+
   showModal(config, ev) {
     config = defaultsDeep(config, {
       multiple: true,
