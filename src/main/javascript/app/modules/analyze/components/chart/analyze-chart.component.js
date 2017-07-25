@@ -35,9 +35,9 @@ export const AnalyzeChartComponent = {
   },
   controller: class AnalyzeChartController extends AbstractDesignerComponentController {
     constructor($componentHandler, $timeout, AnalyzeService,
-                ChartService, FilterService, $mdSidenav, $translate, toastMessage) {
+                ChartService, FilterService, $mdSidenav, $translate, toastMessage, $injector) {
       'ngInject';
-      super();
+      super($injector);
       this._FilterService = FilterService;
       this._AnalyzeService = AnalyzeService;
       this._ChartService = ChartService;

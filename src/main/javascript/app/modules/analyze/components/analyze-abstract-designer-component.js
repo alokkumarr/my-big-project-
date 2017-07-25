@@ -2,9 +2,9 @@ import defaultsDeep from 'lodash/defaultsDeep';
 import cloneDeep from 'lodash/cloneDeep';
 
 export default class AbstractDesignerComponentController {
-  constructor($mdDialog, $log) {
-    this._$mdDialog = $mdDialog;
-    this._$log = $log;
+  constructor($injector) {
+    this._$mdDialog = $injector.get('$mdDialog');
+    this._$log = $injector.get('$log');
 
     this.draftMode = false;
     this.showProgress = false;

@@ -29,9 +29,9 @@ export const AnalyzeReportComponent = {
     mode: '@'
   },
   controller: class AnalyzeReportController extends AbstractDesignerComponentController {
-    constructor($componentHandler, $timeout, AnalyzeService, FilterService) {
+    constructor($componentHandler, $timeout, AnalyzeService, FilterService, $injector) {
       'ngInject';
-      super();
+      super($injector);
       this._$componentHandler = $componentHandler;
       this._$timeout = $timeout;
       this._AnalyzeService = AnalyzeService;
