@@ -3,6 +3,8 @@ import take from 'lodash/take';
 
 import template from './report-grid-display.component.html';
 
+import {NUMBER_TYPES} from '../../../consts.js';
+
 const COLUMN_WIDTH = 175;
 
 export const ReportGridDisplayComponent = {
@@ -33,13 +35,20 @@ export const ReportGridDisplayComponent = {
 
     _getDxColumns(columns) {
       return map(columns, column => {
-        return {
+        const field = {
           caption: column.aliasName || column.displayName,
           dataField: column.columnName,
           visibleIndex: column.visibleIndex,
-          dataType: column.type,
+          dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
           width: COLUMN_WIDTH
         };
+        if (NUMBER_TYPES.includes(column.type)) {
+          field.format = {
+            type: 'decimal',
+            precision: 2
+          };
+        }
+        return field;
       });
     }
 
