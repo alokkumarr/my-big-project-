@@ -36,6 +36,7 @@ export const ReportGridDisplayComponent = {
     _getDxColumns(columns) {
       return map(columns, column => {
         const field = {
+          alignment: 'left',
           caption: column.aliasName || column.displayName,
           dataField: column.columnName,
           visibleIndex: column.visibleIndex,
