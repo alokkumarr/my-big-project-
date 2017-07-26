@@ -14,6 +14,12 @@ const EXECUTION_MODES = {
   LIVE: 'live'
 };
 
+const EXECUTION_STATES = {
+  SUCCESS: 'success',
+  ERROR: 'error',
+  EXECUTING: 'executing'
+};
+
 export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toastMessage, $translate) {
   'ngInject';
 
@@ -42,6 +48,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     chartFe2Be,
     createAnalysis,
     deleteAnalysis,
+    didExecutionFail,
     executeAnalysis,
     generateQuery,
     getAnalysesFor,
@@ -71,7 +78,11 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
   }
 
   function isExecuting(analysisId) {
-    return Boolean(_executingAnalyses[analysisId]);
+    return EXECUTION_STATES.EXECUTING === _executingAnalyses[analysisId];
+  }
+
+  function didExecutionFail(analysisId) {
+    return EXECUTION_STATES.ERROR === _executingAnalyses[analysisId];
   }
 
   function scheduleToString(schedule) {
@@ -161,7 +172,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
   function executeAnalysis(model) {
     const deferred = $q.defer();
 
-    if (_executingAnalyses[model.id]) {
+    if (isExecuting(model.id)) {
       $translate('ERROR_ANALYSIS_ALREADY_EXECUTING').then(msg => {
         toastMessage.error(msg);
         deferred.reject(msg);
@@ -171,12 +182,12 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
       $translate('INFO_ANALYSIS_SUBMITTED').then(msg => {
         toastMessage.info(msg);
       });
-      _executingAnalyses[model.id] = true;
+      _executingAnalyses[model.id] = EXECUTION_STATES.EXECUTING;
       applyAnalysis(model).then(analysis => {
-        delete _executingAnalyses[model.id];
+        _executingAnalyses[model.id] = EXECUTION_STATES.SUCCESS;
         deferred.resolve(analysis);
       }, err => {
-        delete _executingAnalyses[model.id];
+        _executingAnalyses[model.id] = EXECUTION_STATES.ERROR;
         deferred.reject(err);
       });
     }
