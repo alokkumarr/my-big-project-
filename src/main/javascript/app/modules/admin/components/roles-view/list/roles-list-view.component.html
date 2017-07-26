@@ -10,7 +10,14 @@
   <md-card-content layout="row">
     <div dx-data-grid="$ctrl.gridConfig" dx-item-alias="report">      
       <div data-options="dxTemplate: { name: 'roleNameCellTemplate' }" >
-        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>
+        <span class="clickable" ng-if="report.data.privExists"
+              ng-bind-html="::report.value | highlight:$ctrl.searchTerm"
+              ui-sref="privilege({role: report.data.roleName})">
+          <md-tooltip ng-bind="'TOOLTIP_VIEW_PRIVILEGE' | translate" ></md-tooltip>
+        </span>
+        <span ng-if="!report.data.privExists"
+              ng-bind-html="::report.value | highlight:$ctrl.searchTerm">
+        </span>
       </div>
       <div data-options="dxTemplate: { name: 'roleTypeCellTemplate' }" >
         <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>   
@@ -28,7 +35,7 @@
             <md-tooltip ng-bind="'TOOLTIP_EDIT_ROLE' | translate"></md-tooltip>
             <md-icon md-font-icon="icon-edit"></md-icon>
           </md-button>
-          <md-button class="md-button btn-card" aria-label="Delete" ng-disabled="report.data.activeStatusInd == 'Inactive'"
+          <md-button class="md-button btn-card" aria-label="Delete"
             ng-click="$ctrl.openDeleteModal(report.data)">
             <md-tooltip ng-bind="'TOOLTIP_DELETE_ROLE' | translate"></md-tooltip>
             <md-icon md-font-icon="icon-trash"></md-icon>

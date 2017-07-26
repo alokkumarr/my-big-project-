@@ -2,12 +2,21 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import map from 'lodash/map';
 import flatMap from 'lodash/flatMap';
-import sortBy from 'lodash/sortBy';
-import clone from 'lodash/clone';
-import reduce from 'lodash/reduce';
-import keys from 'lodash/keys';
+import assign from 'lodash/assign';
+import find from 'lodash/find';
 import forEach from 'lodash/forEach';
 import filter from 'lodash/filter';
+import indexOf from 'lodash/indexOf';
+import isEmpty from 'lodash/isEmpty';
+import fpPipe from 'lodash/fp/pipe';
+import fpOmit from 'lodash/fp/omit';
+import fpMapKeys from 'lodash/fp/mapKeys';
+import fpMapValues from 'lodash/fp/mapValues';
+import groupBy from 'lodash/groupBy';
+import fpFlatMap from 'lodash/fp/flatMap';
+import fpSortBy from 'lodash/fp/sortBy';
+import reduce from 'lodash/reduce';
+import concat from 'lodash/concat';
 
 import {NUMBER_TYPES} from '../consts';
 
@@ -104,7 +113,8 @@ export function ChartService() {
       legend: {
         align: legendPosition.align,
         verticalAlign: legendPosition.verticalAlign,
-        layout: legendLayout.layout
+        layout: legendLayout.layout,
+        enabled: false
       },
       series: [{
         name: 'Series 1',
@@ -125,166 +135,287 @@ export function ChartService() {
     return config;
   };
 
-  const hasNoData = categories => {
-    return (angular.isArray(categories) &&
-            categories[0] === 'undefined');
-  };
-
-  const gridToPie = (x, y, g, grid) => {
-    const result = {
-      name: x.displayName,
-      colorByPoint: true,
-      data: []
-    };
-
-    const defaultSeriesName = x ? x.displayName : 'Series 1';
-    const series = reduce(grid, (obj, row) => {
-      const category = row[x.columnName] || defaultSeriesName;
-      obj[category] = obj[category] || 0;
-      obj[category] += row[y.columnName];
-      return obj;
+    /** the mapping between the field columnNames, and the chart axes
+   * the backend returns the aggregate data in with the fields columnName as property
+   * the bubble chart requires x, y, z for the axes if they are of number type
+   * Example:
+   * AVAILABLE_MB -> x
+   */
+  function getDataFieldMap(dataFields) {
+    return reduce(dataFields, (accumulator, field) => {
+      accumulator[field.columnName] = field.checked;
+      return accumulator;
     }, {});
-
-    forEach(keys(series), key => {
-      result.data.push({name: key, y: series[key]});
-    });
-
-    return [
-      {
-        path: 'series',
-        data: [result]
-      }
-    ];
-  };
-
-  const gridToChart = (x, y, l, data) => {
-    const defaultSeriesName = x ? x.displayName : 'Series 1';
-
-    const categories = map(
-      get(data, 'group_by.buckets'),
-      bucket => bucket.key
-    );
-
-    const defaultSeries = () => reduce(categories, (obj, cat) => {
-      obj[cat] = 0;
-      return obj;
-    }, {});
-
-    /* Produces an object where each key is a unique value for @l column.
-       The corresponding value is another object, where each key value pair
-       is a value for @x column, and @y.
-       */
-    const res = reduce(
-      get(data, 'group_by.buckets'),
-      (obj, bucket) => {
-        forEach(
-          get(bucket, 'split_by.buckets', [{
-            key: defaultSeriesName,
-            [y.columnName]: {value: get(bucket[y.columnName], 'value', 0)}
-          }]),
-          subBucket => {
-            obj[subBucket.key] = obj[subBucket.key] || defaultSeries();
-            obj[subBucket.key][bucket.key] = subBucket[y.columnName].value;
-          }
-        );
-
-        return obj;
-      },
-      {}
-    );
-
-    const xCategories = keys(defaultSeries());
-    return [
-      {
-        path: 'xAxis.categories',
-        data: hasNoData(xCategories) ? ['X-Axis'] : xCategories
-      },
-      {
-        path: 'series',
-        data: keys(res).map(k => ({
-          name: k,
-          data: xCategories.map(c => res[k][c])
-        }))
-      }
-    ];
-  };
-
-  /* Functions to convert grid data to chart options forEach
-     various chart types */
-  const dataCustomizer = {
-    column: gridToChart,
-    bar: gridToChart,
-    line: gridToChart,
-    spline: gridToChart,
-    stack: gridToChart,
-    pie: gridToPie,
-    donut: gridToPie
-  };
-
-  const dataToChangeConfig = (type, settings, gridData, opts) => {
-    const xaxis = filter(settings.xaxis, attr => attr.checked)[0] || {};
-    const yaxis = filter(settings.yaxis, attr => attr.checked)[0] || {};
-    const group = filter(settings.groupBy, attr => attr.checked)[0] || {};
-
-    const changes = dataCustomizer[type](xaxis, yaxis, group, gridData);
-    return changes.concat([
-      {
-        path: 'xAxis.title.text',
-        data: get(opts, 'labels.x', xaxis.displayName) || xaxis.displayName
-      },
-      {
-        path: 'yAxis.title.text',
-        data: get(opts, 'labels.y', yaxis.displayName) || yaxis.displayName
-      }
-    ]);
-  };
-
-  function mergeArtifactsWithSettings(artifacts, record) {
-    forEach(artifacts, a => {
-      a.checked = a.columnName === record.columnName &&
-        a.tableName === record.tableName;
-    });
-
-    return artifacts;
   }
 
-  function fillSettings(artifacts, model) {
-    /* Flatten the artifacts into a single array */
-    let attributes = flatMap(artifacts, metric => {
-      return map(metric.columns, attr => {
-        attr.tableName = metric.artifactName;
-        return attr;
+  /** the mapping between the tree node names and the chart axes or groupBy names
+   * the backend returns the string type data as tree node names
+   * the bubble chart requires x, y, z for the axes if they are of type number
+   * it can be an array, because the only useful in the tree node is the index
+   * Example:
+   * string_field_1: 0 -> g (marker on the checked attribute)
+   * string_field_2: 1 -> y
+   */
+  function getNodeFieldMap(nodeFields) {
+    return map(nodeFields, 'checked');
+  }
+
+  /** parse the tree structure data and return a flattened array:
+   * [{
+   *   x: ..,
+   *   y: ..,
+   *   g: ..,
+   *   z: ..
+   * }, ..]
+   */
+  function parseData(data, sqlBuilder) {
+    const nodeFieldMap = getNodeFieldMap(sqlBuilder.nodeFields);
+    const dataFieldMap = getDataFieldMap(sqlBuilder.dataFields);
+    return parseNode(data, {}, nodeFieldMap, dataFieldMap, 1);
+  }
+
+  function parseNode(node, dataObj, nodeFieldMap, dataFieldMap, level) {
+    if (node.key) {
+      dataObj[nodeFieldMap[level - 2]] = node.key;
+    }
+
+    const childNode = node[`node_field_${level}`];
+    if (childNode) {
+      const data = flatMap(childNode.buckets, bucket => parseNode(bucket, dataObj, nodeFieldMap, dataFieldMap, level + 1));
+      return data;
+    }
+    const datum = parseLeaf(node, dataObj, dataFieldMap);
+    return datum;
+  }
+
+  function parseLeaf(node, dataObj, dataFieldsMap) {
+    const dataFields = fpPipe(
+      fpOmit(['doc_count', 'key']),
+      fpMapKeys(k => {
+        return dataFieldsMap[k];
+      }),
+      fpMapValues('value')
+    )(node);
+
+    return assign(
+      dataFields,
+      dataObj
+    );
+  }
+
+  function splitToSeriesAndCategories(parsedData, fields) {
+    const series = [];
+    const categories = {};
+
+    // if there is a group by
+    // // group the data into multiple series
+    if (fields.g) {
+      const groupedData = groupBy(parsedData, 'g');
+      forEach(groupedData, (group, k) => {
+        series.push({
+          name: k,
+          data: group
+        });
+      });
+    } else {
+      series[0] = {
+        data: parsedData
+      };
+    }
+
+    forEach(series, serie => {
+      forEach(serie.data, dataPoint => {
+        forEach(dataPoint, (v, k) => {
+          if (isCategoryAxis(fields, k)) {
+            addToCategory(categories, k, v);
+            dataPoint[k] = indexOf(categories[k], v);
+          }
+        });
       });
     });
 
-    attributes = sortBy(attributes, [attr => attr.columnName]);
+    return {
+      series,
+      categories
+    };
+  }
 
-    /* Based on data type, divide the artifacts between axes. */
-    const yaxis = filter(attributes, attr => (
+  function addToCategory(categories, key, newCategoryValue) {
+    if (!categories[key]) {
+      categories[key] = [];
+    }
+    if (indexOf(categories[key], newCategoryValue) < 0) {
+      categories[key].push(newCategoryValue);
+    }
+  }
+
+  function isCategoryAxis(fields, key) {
+    const dataType = get(fields, `${key}.type`);
+    const isAxis = key !== 'g';
+    // strings should be represented as categories in the chart
+    /* eslint-disable angular/typecheck-string */
+    const isCategoryAxis = isAxis && (dataType === 'string' || dataType === 'String');
+    /* eslint-enable angular/typecheck-string */
+    return isCategoryAxis;
+  }
+
+  function customizeSeriesForChartType(series, chartType) {
+    let mapperFn;
+    switch (chartType) {
+      case 'column':
+      case 'bar':
+      case 'line':
+      case 'spline':
+      case 'stack':
+      case 'scatter':
+        mapperFn = ({x, y}) => [x, y];
+        break;
+      case 'bubble':
+        // the bubble chart already supports the parsed data
+        return;
+      default:
+        throw new Error(`Chart type: ${chartType} is not supported!`);
+    }
+    forEach(series, serie => {
+      serie.data = map(serie.data, mapperFn);
+    });
+  }
+
+  const dataToChangeConfig = (type, settings, gridData, opts) => {
+    const fields = {
+      x: find(settings.xaxis, attr => attr.checked === 'x'),
+      y: find(settings.yaxis, attr => attr.checked === 'y'),
+      z: find(settings.zaxis, attr => attr.checked === 'z'),
+      g: find(settings.groupBy, attr => attr.checked === 'g')
+    };
+
+    const labels = {
+      x: get(fields, 'x.displayName', ''),
+      y: get(fields, 'y.displayName', '')
+    };
+
+    const changes = [{
+      path: 'xAxis.title.text',
+      data: (opts.labels && opts.labels.x) || labels.x
+    }, {
+      path: 'yAxis.title.text',
+      data: (opts.labels && opts.labels.y) || labels.y
+    }];
+
+    if (!isEmpty(gridData)) {
+      const {series, categories} = splitToSeriesAndCategories(gridData, fields);
+      customizeSeriesForChartType(series, type);
+      changes.push({
+        path: 'series',
+        data: series
+      });
+      // add the categories
+      forEach(categories, (category, k) => {
+        changes.push({
+          path: `${k}Axis.categories`,
+          data: category
+        });
+      });
+    }
+
+    return concat(
+      changes,
+      addSpecificChartConfig(type, fields)
+    );
+  };
+
+  function addSpecificChartConfig(chartType, fields) {
+    const changes = [];
+    if (chartType === 'bubble') {
+      const groupString = `<tr><th colspan="2"><h3>{point.g}</h3></th></tr>`;
+      const xIsNumber = NUMBER_TYPES.includes(fields.x.type);
+      const yIsNumber = NUMBER_TYPES.includes(fields.y.type);
+      // z is always a number
+      changes.push({
+        path: 'tooltip',
+        data: {
+          useHTML: true,
+          headerFormat: '<table>',
+          pointFormat: `${fields.g ? groupString : ''}
+              <tr><th>${fields.x.displayName}:</th><td>{point.x${xIsNumber ? ':,.2f' : ''}}</td></tr>
+              <tr><th>${fields.y.displayName}:</th><td>{point.y${yIsNumber ? ':,.2f' : ''}}</td></tr>
+              <tr><th>${fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>`,
+          footerFormat: '</table>',
+          followPointer: true
+        }
+      });
+    }
+
+    // if there is no grouping disable the legend
+    // because there is only one data series
+    changes.push({
+      path: 'legend.enabled',
+      data: Boolean(fields.g)
+    });
+    return changes;
+  }
+
+  function filterNumberTypes(attributes) {
+    return filter(attributes, attr => (
       attr.columnName &&
-      NUMBER_TYPES.indexOf(attr.type) >= 0
+      NUMBER_TYPES.includes(attr.type)
     ));
-    const xaxis = filter(attributes, attr => (
+  }
+
+  function filterStringTypes(attributes) {
+    return filter(attributes, attr => (
       attr.columnName &&
       (attr.type === 'string' || attr.type === 'String')
     ));
-    const groupBy = map(xaxis, clone);
+  }
 
-    mergeArtifactsWithSettings(xaxis, get(model, 'sqlBuilder.groupBy', {}));
-    mergeArtifactsWithSettings(yaxis, get(model, 'sqlBuilder.dataFields.[0]', {}));
-    mergeArtifactsWithSettings(groupBy, get(model, 'sqlBuilder.splitBy', {}));
+  function fillSettings(artifacts, model) {
+    /* Flatten the artifacts into a single array and sort them */
+    const attributes = fpPipe(
+      fpFlatMap(metric => {
+        return map(metric.columns, attr => {
+          attr.tableName = metric.artifactName;
+          return attr;
+        });
+      }),
+      fpSortBy('columnName')
+    )(artifacts);
 
-    return {
-      yaxis,
-      xaxis,
-      groupBy
-    };
+    let xaxis;
+    let yaxis;
+    let zaxis;
+    let settingsObj;
+    const groupBy = filterStringTypes(attributes);
+
+    switch (model.chartType) {
+      case 'bubble':
+        xaxis = filterStringTypes(attributes);
+        yaxis = attributes;
+        zaxis = filterNumberTypes(attributes);
+        settingsObj = {
+          xaxis,
+          yaxis,
+          zaxis,
+          groupBy
+        };
+        break;
+      default:
+        xaxis = filterStringTypes(attributes);
+        yaxis = filterNumberTypes(attributes);
+        settingsObj = {
+          yaxis,
+          xaxis,
+          groupBy
+        };
+    }
+    return settingsObj;
   }
 
   return {
     getChartConfigFor,
     dataToChangeConfig,
     fillSettings,
+    parseData,
 
     LEGEND_POSITIONING,
     LAYOUT_POSITIONS

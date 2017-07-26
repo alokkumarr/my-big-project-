@@ -23,8 +23,10 @@ export const UsersListViewComponent = {
     }
 
     $onChanges(changedObj) {
-      if (!isUndefined(changedObj.users.currentValue)) {
-        this.reloadDataGrid(changedObj.users.currentValue);
+      if (changedObj.users) {
+        if (!isUndefined(changedObj.users.currentValue)) {
+          this.reloadDataGrid(changedObj.users.currentValue);
+        }
       }
     }
 

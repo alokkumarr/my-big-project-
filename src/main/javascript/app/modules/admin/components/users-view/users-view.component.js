@@ -1,14 +1,23 @@
 import template from './users-view.component.html';
 import style from './users-view.component.scss';
-import AbstractComponentController from 'app/lib/common/components/abstractComponent';
+import AbstractComponentController from 'app/common/components/abstractComponent';
 import {Subject} from 'rxjs/Subject';
-import {AdminMenuData} from '../../consts';
+import {AdminMenuData, UsersTableHeader} from '../../consts';
+
+const SEARCH_CONFIG = [
+  {keyword: 'LOGIN ID', fieldName: 'masterLoginId'},
+  {keyword: 'ROLE', fieldName: 'roleName'},
+  {keyword: 'FIRST NAME', fieldName: 'firstName'},
+  {keyword: 'LAST NAME', fieldName: 'lastName'},
+  {keyword: 'EMAIL', fieldName: 'email'},
+  {keyword: 'STATUS', fieldName: 'activeStatusInd'}
+];
 
 export const UsersViewComponent = {
   template,
   styles: [style],
   controller: class UsersViewPageController extends AbstractComponentController {
-    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, UsersManagementService, $window, $rootScope) {
+    constructor($componentHandler, $injector, $compile, $state, $mdDialog, $mdToast, JwtService, UsersManagementService, $window, $rootScope, LocalSearchService) {
       'ngInject';
       super($injector);
       this._$compile = $compile;
@@ -20,17 +29,20 @@ export const UsersViewComponent = {
       this._$mdToast = $mdToast;
       this._JwtService = JwtService;
       this._$rootScope = $rootScope;
+      this._LocalSearchService = LocalSearchService;
+      this._usersCache = [];
       this.updater = new Subject();
       this.admin = {};
       this.states = {
-        searchTerm: ''
+        searchTerm: '',
+        searchTermValue: ''
       };
       this.resp = this._JwtService.getTokenObj();
       this._$rootScope.showProgress = true;
       this.UsersManagementService.getActiveUsersList(this.resp.ticket.custID).then(admin => {
         this.admin = admin;
         if (this.admin.valid) {
-          this.userList = this.admin.users;
+          this._usersCache = this.userList = this.admin.users;
           this._$rootScope.showProgress = false;
         } else {
           this._$rootScope.showProgress = false;
@@ -59,7 +71,8 @@ export const UsersViewComponent = {
             controller: scope => {
               scope.roles = this.response.roles;
               scope.onSaveAction = users => {
-                this.updater.next({users});
+                this._usersCache = this.userList = users;
+                this.applySearchFilter();
               };
             },
             template: '<user-new roles="roles" on-save="onSaveAction(users)"></user-new>',
@@ -99,9 +112,10 @@ export const UsersViewComponent = {
       }).then(data => {
         if (data.valid) {
           this._$rootScope.showProgress = false;
-          this.userList = data.users;
+          this._usersCache = this.userList = data.users;
+          this.applySearchFilter();
           this._$mdToast.show({
-            template: '<md-toast><span> User is successfully inactivated </md-toast>',
+            template: '<md-toast><span> User is successfully deleted </md-toast>',
             position: 'bottom left',
             toastClass: 'toast-primary'
           });
@@ -129,7 +143,8 @@ export const UsersViewComponent = {
               scope.roles = this.response.roles;
               scope.user = editUser;
               scope.onUpdateAction = users => {
-                this.updater.next({users});
+                this._usersCache = this.userList = users;
+                this.applySearchFilter();
               };
             },
             template: '<user-edit roles="roles" user="user" on-update="onUpdateAction(users)" ></user-edit>',
@@ -158,6 +173,32 @@ export const UsersViewComponent = {
           break;
         default:
       }
+    }
+    checkColumns(name) {
+      this.headerList = [];
+      this.headerList = UsersTableHeader;
+      for (let i = 0; i < this.headerList.length; i++) {
+        if (this.headerList[i].name === name) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    applySearchFilter() {
+      const searchCriteria = this._LocalSearchService.parseSearchTerm(this.states.searchTerm);
+      this.states.searchTermValue = searchCriteria.trimmedTerm;
+
+      this._LocalSearchService.doSearch(searchCriteria, this._usersCache, SEARCH_CONFIG).then(data => {
+        this.userList = data;
+        this.updater.next({users: this.userList});
+      }, err => {
+        this._$mdToast.show({
+          template: `<md-toast><span>${err.message}</span></md-toast>`,
+          position: 'bottom left',
+          toastClass: 'toast-primary'
+        });
+      });
     }
   }
 };

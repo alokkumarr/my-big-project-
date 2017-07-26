@@ -6,7 +6,6 @@ import reduce from 'lodash/reduce';
 import trim from 'lodash/trim';
 import fpSortBy from 'lodash/fp/sortBy';
 import fpGet from 'lodash/fp/get';
-import filter from 'lodash/filter';
 import find from 'lodash/find';
 import flatMap from 'lodash/flatMap';
 
@@ -64,7 +63,6 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     readAnalysis,
     saveReport,
     scheduleToString,
-    searchAnalyses,
     updateMenu
   };
 
@@ -134,27 +132,10 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
       .then(fpSortBy([analysis => -(analysis.createdTimestamp || 0)]));
   }
 
-  function searchAnalyses(analyses, searchTerm = '') {
-    if (!searchTerm) {
-      return analyses;
-    }
-
-    const term = searchTerm.toUpperCase();
-    const matchIn = item => {
-      return (item || '').toUpperCase().indexOf(term) !== -1;
-    };
-
-    return filter(analyses, item => {
-      return matchIn(item.name) ||
-        matchIn(item.type) ||
-        matchIn(item.metricName);
-    });
-  }
-
   function getPublishedAnalysesByAnalysisId(id) {
     return $http.get(`${url}/analysis/${id}/executions`)
-      .then(fpGet(`data.execution`))
-      .then(fpSortBy([obj => -Date.parse(obj.finished)]));
+      .then(fpGet(`data.executions`))
+      .then(fpSortBy([obj => -obj.finished]));
   }
 
   function getExecutionData(analysisId, executionId) {

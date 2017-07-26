@@ -18,7 +18,7 @@
 		ng-bind="::module.moduleName"></md-option> </md-select> </md-input-container>
   <md-input-container flex> <label
 		translate="CATEGORY_NAME_LABEL"></label> <input name="categoryName"
-		ng-model="$ctrl.newCategoryName" 
+		ng-model="$ctrl.newCategoryName" ng-readonly="$ctrl.newCategoryName.toUpperCase() == 'MY ANALYSIS'"
 		ng-pattern="/^[a-zA-Z\s]*$/"
 		required/> </md-input-container>
   <md-input-container flex> <label
@@ -29,10 +29,10 @@
 		ng-model="$ctrl.editCategory.activeStatusInd" required> <md-option
 		ng-repeat="status in $ctrl.statuses" ng-value="status.ind"
 		ng-bind="::status.name"></md-option> </md-select> </md-input-container>
-  <md-input-container flex  class="padding-for-container">
+  <md-input-container ng-if="$ctrl.subCategoryFlag" flex  class="padding-for-container">
     <sub-category-label translate="SUB_CATEGORY_NAME_HEADER"></sub-category-label>
   </md-input-container>
-  <div class="sub-categories-list">
+  <div ng-if="$ctrl.subCategoryFlag" class="sub-categories-list">
   <md-input-container flex class="padding-for-container">
     <div ng-repeat="subCategory in $ctrl.editCategory.subCategories">
       <md-button class="btn-card " aria-label="Edit" 
@@ -44,7 +44,7 @@
     </div>
   </md-input-container>
   </div>
-  <div class="sub-category-body">
+  <div ng-if="$ctrl.subCategoryFlag" class="sub-category-body">
   <md-input-container flex> <label
 		translate="SUB_CATEGORY_NAME_LABEL"></label> <input name="subCategoryName"
 		ng-model="$ctrl.selectedSubCategory.subCategoryName" 

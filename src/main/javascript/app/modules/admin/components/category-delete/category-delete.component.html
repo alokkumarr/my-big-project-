@@ -11,6 +11,10 @@
     class="padding-for-container"> 
     <sub-category-label translate="CATEGORY_DELETE_SMENT"></sub-category-label>
   </md-input-container>
+  <md-input-container ng-if="$ctrl.deleteCategory.categoryName.toUpperCase() == 'MY ANALYSIS'" flex 
+    class="padding-for-container"> 
+    <sub-category-label translate="MY_CATEGORY_DELETE_SMENT"></sub-category-label>
+  </md-input-container>
   <md-input-container ng-if="$ctrl.deleteCategory.subCategories.length > 0" flex 
     class="padding-for-container">
     <category-label>Sub-Categories</category-label>
@@ -25,7 +29,8 @@
     </ul>
   </md-input-container>
   <div class="layout-row">
-    <md-button class="btn-primary" ng-disabled="$ctrl.deleteCategory.subCategories.length > 0"
+    <md-button class="btn-primary" 
+      ng-disabled="$ctrl.deleteCategory.subCategories.length > 0 || $ctrl.deleteCategory.categoryName.toUpperCase() == 'MY ANALYSIS'"
       ng-click="$ctrl.doDeleteCategory()"
 		translate="DELETE_CATEGORY"> </md-button>
     <md-button class="btn-card button-pull-right" ng-click="$ctrl.$dialog.hide()"

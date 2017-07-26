@@ -6,7 +6,6 @@
       </md-card-title-text>
     </md-card-title>
   </md-card-header>
-
   <md-card-content layout="row">
     <div id="user-grid" dx-data-grid="$ctrl.gridConfig" dx-item-alias="report">      
       <div data-options="dxTemplate: { name: 'productCellTemplate' }" >
@@ -16,7 +15,7 @@
         <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>   
       </div>
       <div data-options="dxTemplate: { name: 'categoryCellTemplate' }" >
-        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>   
+        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>
       </div>
       <div data-options="dxTemplate: { name: 'subCategoriesCellTemplate' }" >
       <span ng-repeat="subCategory in report.value">

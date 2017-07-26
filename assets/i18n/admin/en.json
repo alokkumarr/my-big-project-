@@ -22,7 +22,7 @@
   "EDIT_PRIVILEGE":"Edit Privilege",
   "UPDATE_PRIVILEGE":"Update",
   
-  "NEW_CATEGORY":"Add New Category",
+  "NEW_CATEGORY":"Add New Category or Sub-Category",
   "CREATE_CATEGORY":"Save Category",
   "EDIT_CATEGORY":"Edit Category",
   "UPDATE_CATEGORY":"Update",
@@ -61,7 +61,8 @@
   
   "CATEGORY_PROD_LABEL":"Product",
   "CATEGORY_MODL_LABEL":"Module",
-  "SUB_CATEGORY_FLAG_LABEL":"To create Sub-Category",
+  "CATEGORY_FLAG_LABEL":"Category",
+  "SUB_CATEGORY_FLAG_LABEL":"Sub-Category",
   "CATEGORY_NAME_LABEL":"Category Name",
   "CATEGORY_DESC_LABEL":"Description",
   "CATEGORY_LABEL":"Category",
@@ -70,11 +71,12 @@
   "SUB_CATEGORY_DESC_LABEL":"Description",
   "CATEGORY_ACTIVE_LABEL":"Status",
   "CATEGORY_DELETE_SMENT":"Please delete the below sub-categories before deleting the category.",
+  "MY_CATEGORY_DELETE_SMENT":"This Category cannot be deleted.",
   
   "TOOLTIP_ADD_ROLE":"Add Role",
   "TOOLTIP_DELETE_ROLE":"Delete Role",
   "TOOLTIP_EDIT_ROLE":"Edit Role",
-  "TOOLTIP_VIEW_ROLE_PRIL":"View Privileges",
+  "TOOLTIP_VIEW_PRIVILEGE":"View Privileges",
   
   "TOOLTIP_ADD_USER":"Add User",  
   "TOOLTIP_EDIT_USER":"Edit User",
