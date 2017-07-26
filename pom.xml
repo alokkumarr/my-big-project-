@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.synchronoss</groupId>
   <artifactId>bda-rtps</artifactId>
-  <version>2.0.0_dev</version>
+  <version>2.0.0_rc0</version>
   <packaging>pom</packaging>
   <properties>
     <!--
@@ -44,7 +44,8 @@
       Soft link to be created in postinstall
       ${app.optParDir}/${app.name}-current -> xdf/${app.nameVer}
     -->
-    <app.varDir>/dfs/var/bda/${app.name}</app.varDir>
+    <!-- NB: no var dir -->
+    <!-- app.varDir>/dfs/var/bda/${app.name}</app.varDir -->
     <app.user>mapr</app.user>
     <app.group>mapr</app.group>
     <!-- deps versions -->

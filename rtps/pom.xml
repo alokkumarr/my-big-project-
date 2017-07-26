@@ -4,22 +4,11 @@
   <parent>
     <groupId>com.synchronoss</groupId>
     <artifactId>bda-rtps</artifactId>
-    <version>2.0.0_dev</version>
+    <version>2.0.0_rc0</version>
   </parent>
   <!-- use app.name from parent pom -->
   <artifactId>${app.name}</artifactId>
-  <repositories>
-    <repository>
-      <id>mapr-maven</id>
-      <url>http://repository.mapr.com/maven</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
+  <!-- repositories in parent -->
   <dependencies>
     <dependency>
       <groupId>com.synchronoss</groupId>
@@ -120,7 +109,6 @@
             <mapping>
               <directory>${app.optDir}/conf</directory>
             </mapping>
-<!-- @@@ -->
             <!-- files -->
             <mapping>
               <directory>${app.optDir}/lib</directory>
@@ -166,11 +154,11 @@
               </sources>
             </mapping>
           </mappings>
-          <preinstallScriptlet>
+          <!-- preinstallScriptlet>
             <script>
 #echo PreInstall done: ${app.nameVer}
             </script>
-          </preinstallScriptlet>
+          </preinstallScriptlet -->
           <postinstallScriptlet>
             <script>
 echo PostInstall started: ${app.nameVer}
