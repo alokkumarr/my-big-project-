@@ -29,9 +29,9 @@ export const AnalyzeReportComponent = {
     mode: '@'
   },
   controller: class AnalyzeReportController extends AbstractDesignerComponentController {
-    constructor($componentHandler, $timeout, AnalyzeService, FilterService) {
+    constructor($componentHandler, $timeout, AnalyzeService, FilterService, $injector) {
       'ngInject';
-      super();
+      super($injector);
       this._$componentHandler = $componentHandler;
       this._$timeout = $timeout;
       this._AnalyzeService = AnalyzeService;
@@ -240,7 +240,7 @@ export const AnalyzeReportComponent = {
         /* Show join eligible fields on top for easy access */
         const sortedForJoin = sortBy(itemA.columns, [
           c => !c.joinEligible,
-          c => c.columnName
+          c => c.displayName
         ]);
 
         forEach(sortedForJoin, itemB => {

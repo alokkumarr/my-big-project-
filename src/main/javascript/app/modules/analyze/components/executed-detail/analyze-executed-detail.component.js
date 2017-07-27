@@ -80,7 +80,7 @@ export const AnalyzeExecutedDetailComponent = {
 
           this.isExecuting = newVal;
 
-          if (!newVal) {
+          if (!newVal && !this._AnalyzeService.didExecutionFail(this.analysis.id)) {
             this.refreshData();
           }
         }
