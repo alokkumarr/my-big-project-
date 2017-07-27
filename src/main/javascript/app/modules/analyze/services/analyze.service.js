@@ -1,4 +1,3 @@
-import omit from 'lodash/omit';
 import forEach from 'lodash/forEach';
 import startCase from 'lodash/startCase';
 import set from 'lodash/set';
