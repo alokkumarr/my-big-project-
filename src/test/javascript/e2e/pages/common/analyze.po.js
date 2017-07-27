@@ -5,6 +5,7 @@ const eventsMetric = metrics.filter(elem => {
       return text && text.includes('MCT Events');
     });
 }).first();
+
 module.exports = {
   analysisElems: {
     listView: element(by.css('[ng-value="$ctrl.LIST_VIEW"]')),
@@ -24,6 +25,7 @@ module.exports = {
     //
     // eventsMetric: element(by.cssContainingText('[ng-model="$ctrl.selectedMetric"]', 'MCT Events')),
     eventsMetric,
+    reportsMetric: element(by.cssContainingText('span[ng-bind="::metric.metricName"]', 'MBT Reporting')),
     designerView: element(by.css('.ard_canvas')),
     columnChartsView: element(by.css('.highcharts-container ')),
     //
