@@ -3,11 +3,11 @@ const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
 
 exports.config = {
   framework: 'jasmine2',
-  //chromeDriver: '../node_modules/chromedriver/bin/chromedriver',
-  seleniumAddress: 'http://localhost:4444/wd/hub',
+  chromeDriver: '../node_modules/chromedriver/bin/chromedriver',
+  //seleniumAddress: 'http://localhost:4444/wd/hub',
   getPageTimeout: 60000,
   allScriptsTimeout: 500000,
-  //directConnect: true,
+  directConnect: true,
 
   multiCapabilities: [
 
@@ -22,9 +22,9 @@ exports.config = {
       }
     },
 
-    {
+/*    {
       browserName: 'firefox'
-    }
+    }*/
   ],
 
   //maxSessions: 2,

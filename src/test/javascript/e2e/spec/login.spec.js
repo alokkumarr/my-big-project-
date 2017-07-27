@@ -8,7 +8,7 @@ describe('Login Tests', () => {
   });
 
   it('should enter valid credentials and attempt to login', () => {
-    login.userLogin('att3_admin@att.com', 'Sawsyncnewuser1!');
+    login.userLogin('sawadmin@synchronoss.com', 'Sawsyncnewuser1!');
   });
 
   it('should be successfully logged in', () => {
