@@ -9,13 +9,12 @@ import map from 'lodash/map';
 import values from 'lodash/values';
 import clone from 'lodash/clone';
 import set from 'lodash/set';
-import cloneDeep from 'lodash/cloneDeep';
-import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
-
-import {ENTRY_MODES, NUMBER_TYPES} from '../../consts';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
+import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
+import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
+import {ENTRY_MODES, NUMBER_TYPES} from '../../consts';
 
 const BAR_COLUMN_OPTIONS = [{
   label: 'TOOLTIP_BAR_CHART',
@@ -34,21 +33,19 @@ export const AnalyzeChartComponent = {
     model: '<',
     mode: '@?'
   },
-  controller: class AnalyzeChartController {
-    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService,
-                ChartService, FilterService, $mdSidenav, $translate, toastMessage) {
+  controller: class AnalyzeChartController extends AbstractDesignerComponentController {
+    constructor($componentHandler, $timeout, AnalyzeService,
+                ChartService, FilterService, $mdSidenav, $translate, toastMessage, $injector) {
       'ngInject';
-
+      super($injector);
       this._FilterService = FilterService;
       this._AnalyzeService = AnalyzeService;
       this._ChartService = ChartService;
       this._$mdSidenav = $mdSidenav;
-      this._$mdDialog = $mdDialog;
       this._$timeout = $timeout;
       this._$translate = $translate;
       this._toastMessage = toastMessage;
       this.BAR_COLUMN_OPTIONS = BAR_COLUMN_OPTIONS;
-      this.draftMode = false;
 
       this.legend = {
         align: get(this.model, 'legend.align', 'right'),
@@ -62,13 +59,9 @@ export const AnalyzeChartComponent = {
       this.updateChart = new BehaviorSubject({});
       this.settings = null;
       this.gridData = this.filteredGridData = [];
-      this.showProgress = false;
-      this.analysisChanged = false;
       this.labels = {
         tempY: '', tempX: '', y: '', x: ''
       };
-
-      this.filters = [];
 
       this.chartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
 
@@ -117,29 +110,7 @@ export const AnalyzeChartComponent = {
       this.onSettingsChanged();
       this._$timeout(() => {
         this.updateLegendPosition();
-        this.draftMode = false;
-      });
-    }
-
-    goBack() {
-      if (!this.draftMode) {
-        this.$dialog.hide();
-        return;
-      }
-
-      const confirm = this._$mdDialog.confirm()
-            .title('There are unsaved changes')
-            .textContent('Do you want to discard unsaved changes and go back?')
-        .multiple(true)
-        .ok('Discard')
-        .cancel('Cancel');
-
-      this._$mdDialog.show(confirm).then(() => {
-        this.$dialog.hide();
-      }, err => {
-        if (err) {
-          this._$log.error(err);
-        }
+        this.endDraftMode();
       });
     }
 
@@ -159,7 +130,7 @@ export const AnalyzeChartComponent = {
       const align = this._ChartService.LEGEND_POSITIONING[this.legend.align];
       const layout = this._ChartService.LAYOUT_POSITIONS[this.legend.layout];
 
-      this.draftMode = true;
+      this.startDraftMode();
       this.updateChart.next([
         {
           path: 'legend.align',
@@ -179,52 +150,29 @@ export const AnalyzeChartComponent = {
     updateCustomLabels() {
       this.labels.x = this.labels.tempX;
       this.labels.y = this.labels.tempY;
-      this.draftMode = true;
+      this.startDraftMode();
       this.reloadChart(this.settings);
     }
 
     onSettingsChanged() {
-      this.analysisChanged = true;
-      this.draftMode = true;
-    }
-
-    clearFilters() {
-      this.filters = [];
-      this.analysisChanged = true;
-      this.draftMode = true;
-    }
-
-    onFilterRemoved(index) {
-      this.filters.splice(index, 1);
-      this.analysisChanged = true;
-      this.draftMode = true;
-    }
-
-    onApplyFilters({filters, filterBooleanCriteria} = {}) {
-      if (filters) {
-        this.filters = filters;
-        this.analysisChanged = true;
-        this.draftMode = true;
-      }
-      if (filterBooleanCriteria) {
-        this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;
-      }
+      this.analysisUnSynched();
+      this.startDraftMode();
     }
 
     refreshChartData() {
       if (!this.checkModelValidity()) {
         return;
       }
-      this.showProgress = true;
+      this.startProgress();
       const payload = this.generatePayload(this.model);
       return this._AnalyzeService.getDataBySettings(payload).then(({data}) => {
         const parsedData = this._ChartService.parseData(data, payload.sqlBuilder);
         this.gridData = this.filteredGridData = parsedData || this.filteredGridData;
-        this.analysisChanged = false;
-        this.showProgress = false;
+        this.analysisSynched();
+        this.endProgress();
         this.reloadChart(this.settings, this.filteredGridData);
       }, () => {
-        this.showProgress = false;
+        this.endProgress();
       });
     }
 
@@ -265,22 +213,6 @@ export const AnalyzeChartComponent = {
       return isValid;
     }
 
-    openFiltersModal(ev) {
-      const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria"></analyze-filter-modal>';
-      this._$mdDialog.show({
-        template: tpl,
-        controller: scope => {
-          scope.filters = cloneDeep(this.filters);
-          scope.artifacts = this.model.artifacts;
-          scope.booleanCriteria = this.model.sqlBuilder.booleanCriteria;
-        },
-        targetEvent: ev,
-        fullscreen: true,
-        autoWrap: false,
-        multiple: true
-      }).then(this.onApplyFilters.bind(this));
-    }
-
     reloadChart(settings, filteredGridData) {
       if (isEmpty(filteredGridData)) {
         return;
@@ -295,44 +227,11 @@ export const AnalyzeChartComponent = {
       this.updateChart.next(changes);
     }
 
-    // filters section
-    openDescriptionModal(ev) {
-      const tpl = '<analyze-description-dialog model="model" on-save="onSave($data)"></analyze-description-dialog>';
-
-      this._$mdDialog.show({
-        template: tpl,
-        controller: scope => {
-          scope.model = {
-            description: this.model.description
-          };
-
-          scope.onSave = data => {
-            this.draftMode = true;
-            this.model.description = data.description;
-          };
-        },
-        autoWrap: false,
-        focusOnOpen: false,
-        multiple: true,
-        targetEvent: ev,
-        clickOutsideToClose: true
-      });
-    }
-
-    openPreviewModal(ev) {
+    openChartPreviewModal(ev) {
       const tpl = '<analyze-chart-preview model="model"></analyze-chart-preview>';
-
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controller: scope => {
-            scope.model = this.chartOptions;
-          },
-          targetEvent: ev,
-          fullscreen: true,
-          autoWrap: false,
-          multiple: true
-        });
+      this.openPreviewModal(tpl, ev, {
+        chartOptions: this.chartOptions
+      });
     }
 
     getSelectedSettingsFor(axis, artifacts) {
@@ -388,40 +287,9 @@ export const AnalyzeChartComponent = {
       return payload;
     }
 
-    openSaveModal(ev) {
+    openSaveChartModal(ev) {
       const payload = this.generatePayload(this.model);
-
-      const tpl = '<analyze-save-dialog model="model" on-save="onSave($data)"></analyze-save-dialog>';
-
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controller: scope => {
-            scope.model = payload;
-
-            scope.onSave = data => {
-              this.model.id = data.id;
-              this.model.name = data.name;
-              this.model.description = data.description;
-              this.model.category = data.category;
-            };
-          },
-          autoWrap: false,
-          fullscreen: true,
-          focusOnOpen: false,
-          multiple: true,
-          targetEvent: ev,
-          clickOutsideToClose: true
-        }).then(successfullySaved => {
-          if (successfullySaved) {
-            this.onAnalysisSaved(successfullySaved);
-          }
-        });
-    }
-
-    onAnalysisSaved(successfullySaved) {
-      this.draftMode = false;
-      this.$dialog.hide(successfullySaved);
+      this.openSaveModal(ev, payload);
     }
   }
 

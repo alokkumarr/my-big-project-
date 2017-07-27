@@ -8,7 +8,6 @@ import map from 'lodash/map';
 import keys from 'lodash/keys';
 import forEach from 'lodash/forEach';
 import clone from 'lodash/clone';
-import cloneDeep from 'lodash/cloneDeep';
 import sortBy from 'lodash/sortBy';
 import filter from 'lodash/filter';
 import assign from 'lodash/assign';
@@ -16,6 +15,7 @@ import uniqBy from 'lodash/uniqBy';
 
 import template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
+import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
 import {ENTRY_MODES} from '../../consts';
 
@@ -28,20 +28,16 @@ export const AnalyzeReportComponent = {
     model: '<',
     mode: '@'
   },
-  controller: class AnalyzeReportController {
-    constructor($componentHandler, $mdDialog, $scope, $timeout, AnalyzeService, FilterService) {
+  controller: class AnalyzeReportController extends AbstractDesignerComponentController {
+    constructor($componentHandler, $timeout, AnalyzeService, FilterService, $injector) {
       'ngInject';
-
+      super($injector);
       this._$componentHandler = $componentHandler;
-      this._$mdDialog = $mdDialog;
-      this._$scope = $scope;
       this._$timeout = $timeout;
       this._AnalyzeService = AnalyzeService;
       this._FilterService = FilterService;
       this._reloadTimer = null;
       this._modelLoaded = null;
-      this.showProgress = false;
-      this.draftMode = false;
 
       this._modelPromise = new Promise(resolve => {
         this._modelLoaded = resolve;
@@ -62,7 +58,6 @@ export const AnalyzeReportComponent = {
 
       this.gridData = [];
       this.columns = [];
-      this.filters = [];
 
       this._unregisterCanvasHandlers = [];
     }
@@ -146,37 +141,6 @@ export const AnalyzeReportComponent = {
 
     // END requests
 
-    // filters section
-    showFiltersButtonIfDataIsReady() {
-      if (this.canvas && this.gridData) {
-        this.showFiltersButton = true;
-      }
-    }
-
-    onApplyFilters({filters, filterBooleanCriteria} = {}) {
-      if (filters) {
-        this.filters = filters;
-        this.analysisChanged = true;
-        this.draftMode = true;
-      }
-      if (filterBooleanCriteria) {
-        this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;
-      }
-    }
-
-    onClearAllFilters() {
-      this.filters = [];
-      this.analysisChanged = true;
-      this.draftMode = true;
-    }
-
-    onFilterRemoved(index) {
-      this.filters.splice(index, 1);
-      this.analysisChanged = true;
-      this.draftMode = true;
-    }
-    // END filters section
-
     toggleDetailsPanel(forceOpen) {
       if (forceOpen === true || forceOpen === false) {
         this.states.detailsExpanded = forceOpen;
@@ -198,12 +162,11 @@ export const AnalyzeReportComponent = {
         this.model.artifacts = [];
       } else {
         this.fillCanvas(this.model.artifacts);
-        this.showFiltersButtonIfDataIsReady();
       }
 
       if (this.mode) {
         this.reloadPreviewGrid(true);
-        this.draftMode = false;
+        this.endDraftMode();
       }
 
       this._unregisterCanvasHandlers = this._unregisterCanvasHandlers.concat([
@@ -451,7 +414,7 @@ export const AnalyzeReportComponent = {
     }
 
     onSaveQuery(analysis) {
-      this.showProgress = true;
+      this.startProgress();
       this._AnalyzeService.getDataBySettings(clone(analysis))
         .then(({analysis, data}) => {
           this.gridData = data;
@@ -460,14 +423,14 @@ export const AnalyzeReportComponent = {
           const columnNames = keys(fpGet('[0]', data));
           this.columns = this.getColumns(columnNames);
           this.applyDataToGrid(this.columns, [], [], this.gridData);
-          this.showProgress = false;
+          this.endProgress();
         }, () => {
-          this.showProgress = false;
+          this.endProgress();
         });
     }
 
     refreshGridData() {
-      this.showProgress = true;
+      this.startProgress();
       this.model = assign(this.model, this.generatePayload());
 
       const sorts = map(this.canvas.model.sorts, sort => {
@@ -486,16 +449,15 @@ export const AnalyzeReportComponent = {
           this.gridData = data;
           this.model.query = analysis.queryManual || analysis.query;
           this.applyDataToGrid(this.columns, sorts, groups, this.gridData);
-          this.analysisChanged = false;
-          this.showProgress = false;
+          this.analysisSynched();
+          this.endProgress();
           this.toggleDetailsPanel(true);
         }, () => {
-          this.showProgress = false;
+          this.endProgress();
         });
     }
 
     applyDataToGrid(columns, sorts, groups, data) {
-      this.showFiltersButtonIfDataIsReady();
       const grid = first(this._$componentHandler.get('ard-grid-container'));
       if (grid) {
         grid.updateColumns(columns);
@@ -513,7 +475,7 @@ export const AnalyzeReportComponent = {
 
     reloadPreviewGrid(refresh = false) {
       if (refresh) {
-        this.draftMode = true;
+        this.startDraftMode();
       }
 
       const doReload = () => {
@@ -544,7 +506,7 @@ export const AnalyzeReportComponent = {
             this.gridData = [];
             this.applyDataToGrid(this.columns, sorts, groups, this.gridData);
           } else {
-            this.analysisChanged = true;
+            this.analysisUnSynched();
           }
 
         }, DEBOUNCE_INTERVAL);
@@ -556,28 +518,6 @@ export const AnalyzeReportComponent = {
       } else {
         this._reloadTimer = doReload();
       }
-    }
-
-    goBack() {
-      if (!this.draftMode) {
-        this.$dialog.hide();
-        return;
-      }
-
-      const confirm = this._$mdDialog.confirm()
-            .title('There are unsaved changes')
-        .textContent('Do you want to discard unsaved changes and go back?')
-        .multiple(true)
-        .ok('Discard')
-        .cancel('Cancel');
-
-      this._$mdDialog.show(confirm).then(() => {
-        this.$dialog.hide();
-      }, err => {
-        if (err) {
-          this._$log.error(err);
-        }
-      });
     }
 
     getSelectedColumns(tables) {
@@ -608,45 +548,20 @@ export const AnalyzeReportComponent = {
       return !this.hasSelectedColumns();
     }
 
-    openFiltersModal(ev) {
-      const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria"></analyze-filter-modal>';
-      this._$mdDialog.show({
-        template: tpl,
-        controller: scope => {
-          scope.filters = cloneDeep(this.filters);
-          scope.artifacts = this.model.artifacts;
-          scope.booleanCriteria = this.model.sqlBuilder.booleanCriteria;
-        },
-        targetEvent: ev,
-        fullscreen: true,
-        autoWrap: false,
-        multiple: true
-      }).then(this.onApplyFilters.bind(this));
-    }
-
-    openPreviewModal(ev) {
+    openReportPreviewModal(ev) {
       const tpl = '<analyze-report-preview model="model"></analyze-report-preview>';
 
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controller: scope => {
-            scope.model = {
-              report: this.model,
-              columns: this.columns,
-              sorts: map(this.canvas.model.sorts, sort => {
-                return {
-                  column: sort.field.name,
-                  direction: sort.order
-                };
-              })
-            };
-          },
-          targetEvent: ev,
-          fullscreen: true,
-          autoWrap: false,
-          multiple: true
-        });
+      this.openPreviewModal(tpl, ev, {
+        report: this.model,
+        columns: this.columns,
+        data: this.gridData,
+        sorts: map(this.canvas.model.sorts, sort => {
+          return {
+            column: sort.field.name,
+            direction: sort.order
+          };
+        })
+      });
     }
 
     updateJoins(name, obj) {
@@ -657,63 +572,27 @@ export const AnalyzeReportComponent = {
       this.canvas._$eventEmitter.emit('joinChanged', obj);
     }
 
-    openSortModal(ev) {
+    openReportSortModal(ev) {
+
       this.states.detailsExpanded = true;
 
       this._$timeout(() => {
         this.reloadPreviewGrid(false);
       });
 
-      const tpl = '<analyze-sort-dialog model="model"></analyze-sort-dialog>';
-
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controller: scope => {
-            scope.model = {
-              fields: this.canvas.model.getSelectedFields(),
-              sorts: map(this.canvas.model.sorts, sort => {
-                return clone(sort);
-              })
-            };
-          },
-          targetEvent: ev,
-          fullscreen: true,
-          autoWrap: false,
-          multiple: true
-        })
+      this.openSortModal(ev, {
+        fields: this.canvas.model.getSelectedFields(),
+        sorts: map(this.canvas.model.sorts, sort => clone(sort))
+      })
         .then(sorts => {
           this.canvas.model.sorts = sorts;
           this.canvas._$eventEmitter.emit('sortChanged');
-          this.analysisChanged = true;
-          this.draftMode = true;
+          this.analysisUnSynched();
+          this.startDraftMode();
         });
     }
 
-    openDescriptionModal(ev) {
-      const tpl = '<analyze-description-dialog model="model" on-save="onSave($data)"></analyze-description-dialog>';
-
-      this._$mdDialog.show({
-        template: tpl,
-        controller: scope => {
-          scope.model = {
-            description: this.model.description
-          };
-
-          scope.onSave = data => {
-            this.draftMode = true;
-            this.model.description = data.description;
-          };
-        },
-        autoWrap: false,
-        focusOnOpen: false,
-        multiple: true,
-        targetEvent: ev,
-        clickOutsideToClose: true
-      });
-    }
-
-    openSaveModal(ev) {
+    openSaveReportModal(ev) {
       if (!this.canvas) {
         return;
       }
@@ -723,37 +602,7 @@ export const AnalyzeReportComponent = {
       }
 
       this.model = assign(this.model, this.generatePayload());
-      const tpl = '<analyze-save-dialog model="model" on-save="onSave($data)"></analyze-save-dialog>';
-
-      this._$mdDialog
-        .show({
-          template: tpl,
-          controller: scope => {
-            scope.model = clone(this.model);
-
-            scope.onSave = data => {
-              this.model.id = data.id;
-              this.model.name = data.name;
-              this.model.description = data.description;
-              this.model.categoryId = data.categoryId;
-            };
-          },
-          autoWrap: false,
-          fullscreen: true,
-          focusOnOpen: false,
-          multiple: true,
-          targetEvent: ev,
-          clickOutsideToClose: true
-        }).then(successfullySaved => {
-          if (successfullySaved) {
-            this.onAnalysisSaved(successfullySaved);
-          }
-        });
-    }
-
-    onAnalysisSaved(successfullySaved) {
-      this.draftMode = false;
-      this.$dialog.hide(successfullySaved);
+      this.openSaveModal(ev, this.model);
     }
   }
 };

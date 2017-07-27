@@ -115,7 +115,7 @@ export const UsersViewComponent = {
           this._usersCache = this.userList = data.users;
           this.applySearchFilter();
           this._$mdToast.show({
-            template: '<md-toast><span> User is successfully inactivated </md-toast>',
+            template: '<md-toast><span> User is successfully deleted </md-toast>',
             position: 'bottom left',
             toastClass: 'toast-primary'
           });

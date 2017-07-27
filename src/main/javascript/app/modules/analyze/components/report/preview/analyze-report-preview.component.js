@@ -18,11 +18,10 @@ export const AnalyzeReportPreviewComponent = {
       this._AnalyzeService = AnalyzeService;
 
       this.MORE_ROWS_COUNT = 500;
-      this.data = [];
     }
 
     $onInit() {
-      this.loadMore();
+      this._$timeout(() => this.reloadPreviewGrid());
     }
 
     cancel() {
@@ -34,17 +33,9 @@ export const AnalyzeReportPreviewComponent = {
       if (grid) {
         grid.updateColumns(this.model.columns);
         grid.updateSorts(this.model.sorts);
-        grid.updateSource(this.data);
+        grid.updateSource(this.model.data);
         grid.refreshGrid();
       }
-    }
-
-    loadMore() {
-      this._AnalyzeService.getDataByQuery()
-        .then(data => {
-          this.data.push(...data);
-          this.reloadPreviewGrid();
-        });
     }
   }
 };

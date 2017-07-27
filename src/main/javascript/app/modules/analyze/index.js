@@ -26,7 +26,6 @@ import {AnalyzeNewComponent} from './components/new/analyze-new.component';
 import {pivotAreaTypeFilter} from './filters/pivot-area-type.filter';
 import {AnalyzePivotSettingsComponent} from './components/pivot/settings/analyze-pivot-settings.component';
 import {AnalyzePivotPreviewComponent} from './components/pivot/preview/analyze-pivot-preview.component';
-import {PivotGridComponent} from './components/pivot-grid/pivot-grid.component';
 import {AnalyzePivotComponent} from './components/pivot/analyze-pivot.component';
 import {AnalyzeReportComponent} from './components/report/analyze-report.component';
 import {AnalyzeReportQueryComponent} from './components/report/query/analyze-report-query.component';
@@ -34,9 +33,6 @@ import {AnalyzeDialogComponent} from './components/dialog/analyze-dialog.compone
 import {AnalyzeSortDialogComponent} from './components/sort-dialog/analyze-sort-dialog.component';
 import {AnalyzeDescriptionDialogComponent} from './components/description-dialog/analyze-description-dialog.component';
 import {AnalyzeReportPreviewComponent} from './components/report/preview/analyze-report-preview.component';
-import {ReportGridDisplayComponent} from './components/report-grid-display/grid/report-grid-display.component';
-import {ReportGridDisplayNodeComponent} from './components/report-grid-display/node/report-grid-display-node.component';
-import {ReportGridDisplayContainerComponent} from './components/report-grid-display/container/report-grid-display-container.component';
 import {ReportGridComponent} from './components/report/grid/report-grid/report-grid.component';
 import {ReportGridNodeComponent} from './components/report/grid/report-grid-node/report-grid-node.component';
 import {ReportGridContainerComponent} from './components/report/grid/report-grid-container/report-grid-container.component';
@@ -65,10 +61,7 @@ angular.module(AnalyzeModule, [])
   .factory('PivotService', PivotService)
   .factory('ChartService', ChartService)
   .factory('AnalyzeActionsService', AnalyzeActionsService)
-  .component('reportGridDisplay', ReportGridDisplayComponent)
   .component('analyzeActionsMenu', AnalyzeActionsMenuComponent)
-  .component('reportGridDisplayNode', ReportGridDisplayNodeComponent)
-  .component('reportGridDisplayContainer', ReportGridDisplayContainerComponent)
   .component('reportGridContainer', ReportGridContainerComponent)
   .component('reportGridNode', ReportGridNodeComponent)
   .component('reportGrid', ReportGridComponent)
@@ -86,7 +79,6 @@ angular.module(AnalyzeModule, [])
   .component('analyzeNew', AnalyzeNewComponent)
   .component('analyzePivotSettings', AnalyzePivotSettingsComponent)
   .component('analyzePivotPreview', AnalyzePivotPreviewComponent)
-  .component('pivotGrid', PivotGridComponent)
   .component('analyzePivot', AnalyzePivotComponent)
   .component('analyzeReport', AnalyzeReportComponent)
   .component('analyzeReportQuery', AnalyzeReportQueryComponent)
