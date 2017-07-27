@@ -1,4 +1,5 @@
 const webpackHelper = require('./webpack.helper');
+const DefinePlugin = require('webpack/lib/DefinePlugin');
 
 const MODULE_DIR = 'node_modules';
 
@@ -23,6 +24,11 @@ module.exports = {
           configFile: webpackHelper.root('conf/eslint-dev-rules.js')
         }
       },
+      {
+        enforce: 'pre',
+        test: /\.html$/,
+        loader: 'htmlhint-loader'
+      },
       // loaders
       {
         test: /\.json$/,
@@ -32,6 +38,26 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'ng-annotate-loader!babel-loader'
+      },
+      {
+        test: /\.html$/,
+        loader: 'html-loader'
+      },
+      {
+        test: /\.(css|scss)$/,
+        loader: 'null-loader'
+      },
+      {
+        test: /\.(css|scss)$/,
+        loader: 'raw-loader'
+      },
+      {
+        test: /\.(eot|woff|woff2|ttf)$/,
+        loader: 'null-loader'
+      },
+      {
+        test: /\.(png|jpg|svg)$/,
+        loader: 'null-loader'
       }
     ]
   }

@@ -48,10 +48,13 @@ import {AnalyzePublishDialogComponent} from './components/publish-dialog/analyze
 import {AnalyzeChartComponent} from './components/chart/analyze-chart.component';
 import {AnalyzeChartSettingsComponent} from './components/chart/settings/analyze-chart-settings.component';
 import {AnalyzeChartPreviewComponent} from './components/chart/preview/analyze-chart-preview.component';
+import {CommonModule} from '../../common';
 
 export const AnalyzeModule = 'AnalyzeModule';
 
-angular.module(AnalyzeModule, [])
+angular.module(AnalyzeModule, [
+  CommonModule
+])
   .run(transitions)
   .config(routesConfig)
   .config(i18nConfig)

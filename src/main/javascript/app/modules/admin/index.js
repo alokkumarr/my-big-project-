@@ -29,10 +29,12 @@ import {UsersManagementService} from './services/users.service';
 import {RolesManagementService} from './services/roles.service';
 import {PrivilegesManagementService} from './services/privileges.service';
 import {CategoriesManagementService} from './services/categories.service';
-
+import {CommonModule} from '../../common';
 export const AdminModule = 'AdminModule';
 
-angular.module(AdminModule, [])
+angular.module(AdminModule, [
+  CommonModule
+])
   .config(i18nConfig)
   .config(routesConfig)
   .factory('UsersManagementService', UsersManagementService)
