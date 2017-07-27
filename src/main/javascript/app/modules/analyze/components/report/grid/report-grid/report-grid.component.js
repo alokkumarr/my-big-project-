@@ -159,7 +159,7 @@ export const ReportGridComponent = {
         const field = {
           caption: column.getDisplayName(),
           dataField: column.name,
-          dataType: column.type,
+          dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
           visibleIndex: column.visibleIndex,
           allowSorting: false,
           alignment: 'left',

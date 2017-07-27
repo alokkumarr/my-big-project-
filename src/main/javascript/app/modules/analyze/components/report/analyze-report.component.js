@@ -240,7 +240,7 @@ export const AnalyzeReportComponent = {
         /* Show join eligible fields on top for easy access */
         const sortedForJoin = sortBy(itemA.columns, [
           c => !c.joinEligible,
-          c => c.columnName
+          c => c.displayName
         ]);
 
         forEach(sortedForJoin, itemB => {
