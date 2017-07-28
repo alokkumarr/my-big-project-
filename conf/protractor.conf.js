@@ -1,9 +1,14 @@
 const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
+console.log('platform: ', process.platform);
+
+const windowsPath = '../node_modules/chromedriver/lib/chromedriver/chromedriver.exe';
+const unixPath = '../node_modules/protractor/bin/chromedriver';
+const chromedriverPath = process.platform === 'win32' ? windowsPath : unixPath;
 
 exports.config = {
   framework: 'jasmine2',
-  chromeDriver: '../node_modules/chromedriver/bin/chromedriver',
+  chromeDriver: chromedriverPath,
   //seleniumAddress: 'http://localhost:4444/wd/hub',
   getPageTimeout: 60000,
   allScriptsTimeout: 500000,
