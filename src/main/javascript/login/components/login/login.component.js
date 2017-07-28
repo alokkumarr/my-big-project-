@@ -3,11 +3,12 @@ import template from './login.component.html';
 export const LoginComponent = {
   template,
   controller: class LoginController {
-    constructor($window, $state, UserService) {
+    constructor($window, $state, UserService, JwtService) {
       'ngInject';
       this._$window = $window;
       this._$state = $state;
       this._UserService = UserService;
+      this._JwtService = JwtService;
 
       this.dataHolder = {
         username: null,
@@ -25,13 +26,14 @@ export const LoginComponent = {
         authpwd: this.dataHolder.password
       })
         .then(res => {
-          if (res.ticket.valid) {
+          if (this._JwtService.isValid(res)) {
             this._$window.location.assign('./');
           } else {
-            this.states.error = res.ticket.validityReason;
+            this.states.error = this._JwtService.getValidityReason(res);
           }
         })
-        .catch(() => {
+        .catch(err => {
+          console.error(err);
           this.states.error = 'Network Error!';
         });
     }

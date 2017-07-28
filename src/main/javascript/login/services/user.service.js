@@ -1,3 +1,5 @@
+import get from 'lodash/get';
+
 class UserService {
   constructor($window, $http, $state, AppConfig, JwtService) {
     this._$window = $window;
@@ -17,15 +19,12 @@ class UserService {
 
     return this._$http.post(this._AppConfig.login.url + route, LoginDetails)
       .then(response => {
-        const base64Url = response.data.token.split('.')[1];
-        const base64 = base64Url.replace('-', '+').replace('_', '/');
-        const resp = angular.fromJson(this._$window.atob(base64));
+        const resp = this._JwtService.parseJWT(get(response, 'data.aToken'));
 
         // Store the user's info for easy lookup
-        if (resp.ticket.valid) {
+        if (this._JwtService.isValid(resp)) {
           // this._JwtService.destroy();
-          this._JwtService.set(response.data.token);
-          this._$http.defaults.headers.common.Authorization = 'Bearer ' + response.data.token;
+          this._JwtService.set(get(response, 'data.aToken'), get(response, 'data.rToken'));
         }
 
         return resp;
