@@ -5,6 +5,7 @@ import find from 'lodash/find';
 import template from './analyze-new.component.html';
 import style from './analyze-new.component.scss';
 import emptyTemplate from './analyze-new-empty.html';
+import methods from './methods';
 
 import {AnalyseTypes, ENTRY_MODES} from '../../consts';
 
@@ -21,16 +22,12 @@ export const AnalyzeNewComponent = {
       this._$scope = $scope;
       this._$mdDialog = $mdDialog;
       this._AnalyzeService = AnalyzeService;
+      this.methods = methods;
     }
 
     $onInit() {
       this.selectedAnalysisMethod = '';
       this.selectedMetric = null;
-
-      this._AnalyzeService.getMethods()
-        .then(methods => {
-          this.methods = methods;
-        });
     }
 
     onMetricSelected() {
