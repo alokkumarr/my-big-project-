@@ -19,6 +19,7 @@
 
       <div class="ard_actions" flex>
         <md-button class="btn-primary" ng-click="$ctrl.openSavePivotModal($event)"
+                   e2e="open-save-modal"
                    translate="SAVE">
         </md-button>
       </div>
@@ -42,23 +43,29 @@
             <span translate="REFRESH_DATA"></span>
           </md-button>
 
-          <md-button class="action" ng-click="$ctrl.openDescriptionModal($event, $ctrl.model)">
+          <md-button class="action" ng-click="$ctrl.openDescriptionModal($event, $ctrl.model)"
+                                    e2e="open-description-modal">
             <md-icon md-font-icon="icon-description"></md-icon>
             <span translate="DESCRIPTION"></span>
           </md-button>
 
-          <md-button class="action" ng-click="$ctrl.openPivotPreviewModal($event)">
+          <md-button class="action"
+                     ng-click="$ctrl.openPivotPreviewModal($event)"
+                     e2e="open-preview-modal">
             <md-icon md-font-icon="icon-full-screen"></md-icon>
             <span translate="PREVIEW"></span>
           </md-button>
 
-          <md-button class="action" ng-click="$ctrl.openPivotSortModal($event)"
+          <md-button class="action"
+                     ng-click="$ctrl.openPivotSortModal($event)"
+                     e2e="open-sort-modal"
                      ng-disabled="!$ctrl.sortFields">
             <md-icon md-font-icon="icon-sort"></md-icon>
             <span translate="SORT"></span>
           </md-button>
 
           <md-button class="action" ng-click="$ctrl.openFiltersModal()"
+                     e2e="open-filter-modal"
                      ng-disabled="!$ctrl.filters">
             <md-icon md-font-icon="icon-filter"></md-icon>
             <span translate="FILTER"></span>

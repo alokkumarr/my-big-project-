@@ -1,6 +1,5 @@
 const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
-console.log('platform: ', process.platform);
 
 const windowsPath = '../node_modules/chromedriver/lib/chromedriver/chromedriver.exe';
 const unixPath = '../node_modules/protractor/bin/chromedriver';

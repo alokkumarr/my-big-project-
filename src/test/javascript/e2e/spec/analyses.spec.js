@@ -1,12 +1,24 @@
-const header = require('../pages/components/header.co.js');
 const sidenav = require('../pages/components/sidenav.co.js');
 const analyze = require('../pages/common/analyze.po.js');
+const {hasClass} = require('../utils');
+const protractor = require('protractor');
+
+const ec = protractor.ExpectedConditions;
+
+const navigateToAnalyze = () => {
+  browser.driver.get('http://localhost:3000');
+  // the app should automatically navigate to the analyze page
+  // and when its on there th ecurrent module link is disabled
+  const alreadyOnAnalyzePage = ec.urlContains('/analyze');
+
+  // wait for the app to automatically navigate to the default page
+  browser
+    .wait(() => alreadyOnAnalyzePage, 1000)
+    .then(() => expect(browser.getCurrentUrl()).toContain('/analyze'));
+};
 
 describe('Report Analysis Tests', () => {
-  it('should navigate to Analyze page', () => {
-    header.headerElements.analyzeBtn.click();
-    expect(browser.getCurrentUrl()).toContain('/analyze');
-  });
+  it('should navigate to Analyze page', navigateToAnalyze);
 
   it('should open the sidenav menu and go to first category', () => {
     sidenav.sidenavElements.menuBtn.click();
@@ -34,42 +46,56 @@ describe('Report Analysis Tests', () => {
   });
 
   it('should add fields and see the results', () => {
+    const refreshDataBtn = analyze.analysisElems.refreshDataBtn;
     analyze.analysisElems.sessionIdField.click();
     analyze.analysisElems.toggleDetailsPanel.click();
-    analyze.analysisElems.refreshDataBtn.click();
-    browser.wait(10000);
-    analyze.validateReportGrid();
+    refreshDataBtn.click();
+    // when the data is out of synch and needs to be refreshed
+    // the button gets the btn-primary class, and is highlighted
+    // when the data is refreshed, it looses that class
+    const dataRefreshed = ec.not(hasClass(refreshDataBtn, 'btn-primary'));
+
+    // the wait function needs a promise condition to wait for
+    browser
+      .wait(() => dataRefreshed, 10000)
+      .then(() => analyze.validateReportGrid());
   });
 
   it('should apply filters', () => {
+    // this should be updated to the new filters in the filters modal
+    // analyze.analysisElems.filterAnalysisBtn.click();
+
+    expect(true).toBe(false);
+
+    /* outDated filters sidenav
     analyze.analysisElems.reportFilterBtn.click();
     analyze.analysisElems.filterItemInternet.click();
     analyze.analysisElems.filterItemComplete.click();
     analyze.analysisElems.applyFilterBtn.click();
     analyze.validateReportFilters();
+    */
   });
+
+  const reportName = 'e2e report';
+  const reportDescription = 'e2e test report description';
 
   it('should attempt to save the report and fill the details', () => {
     analyze.analysisElems.saveAnalysisBtn.click();
     expect(analyze.analysisElems.reportCategory.getText()).toEqual('Order Fulfillment');
-    analyze.analysisElems.reportNameField.clear().sendKeys('e2e report');
-    analyze.analysisElems.reportDescriptionField.clear().sendKeys('e2e test description');
+    analyze.analysisElems.reportNameField.clear().sendKeys(reportName);
+    analyze.analysisElems.reportDescriptionField.clear().sendKeys(reportDescription);
     analyze.analysisElems.saveReportDetails.click();
   });
 
   it('should change the report details accordingly ', () => {
-    expect(analyze.analysisElems.reportTitle.getText()).toEqual('e2e report');
+    expect(analyze.analysisElems.reportTitle.getText()).toEqual(reportName);
     analyze.analysisElems.reportDescriptionBtn.click();
-    expect(analyze.analysisElems.reportDescription.getAttribute('value')).toEqual('e2e test description');
+    expect(analyze.analysisElems.reportDescription.getAttribute('value')).toEqual(reportDescription);
   });
 });
 
 describe('Column Chart Analysis Tests', () => {
-  it('should navigate to Analyze page', () => {
-    browser.driver.get('http://localhost:3000');
-    header.headerElements.analyzeBtn.click();
-    expect(browser.getCurrentUrl()).toContain('/analyze');
-  });
+  it('should automatically redirect to Analyze page when going to the homepage', navigateToAnalyze);
 
   it('should open the sidenav menu and go to first category', () => {
     sidenav.sidenavElements.menuBtn.click();
@@ -98,17 +124,20 @@ describe('Column Chart Analysis Tests', () => {
   it('should apply filters', () => {
   });
 
+  const chartName = 'e2e column chart';
+  const chartDescription = 'e2e test chart description';
+
   it('should attempt to save the report and fill the details', () => {
     analyze.analysisElems.saveAnalysisBtn.click();
     expect(analyze.analysisElems.reportCategory.getText()).toEqual('Order Fulfillment');
-    analyze.analysisElems.reportNameField.clear().sendKeys('e2e column chart');
-    analyze.analysisElems.reportDescriptionField.clear().sendKeys('e2e test description');
+    analyze.analysisElems.reportNameField.clear().sendKeys(chartName);
+    analyze.analysisElems.reportDescriptionField.clear().sendKeys(chartDescription);
     analyze.analysisElems.saveReportDetails.click();
   });
 
   it('should change the chart details accordingly ', () => {
-    expect(analyze.analysisElems.reportTitle.getText()).toEqual('e2e column chart');
+    expect(analyze.analysisElems.reportTitle.getText()).toEqual(chartName);
     analyze.analysisElems.reportDescriptionBtn.click();
-    expect(analyze.analysisElems.reportDescription.getAttribute('value')).toEqual('e2e test description');
+    expect(analyze.analysisElems.reportDescription.getAttribute('value')).toEqual(chartDescription);
   });
 });

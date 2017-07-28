@@ -19,6 +19,7 @@
 
       <div class="ard_actions" flex>
         <md-button ng-click="$ctrl.openSaveReportModal($event)"
+                   e2e="open-save-modal"
                    translate="SAVE">
         </md-button>
       </div>
@@ -55,14 +56,16 @@
               <span translate="QUERY"></span>
             </md-button>
 
-          <md-button ng-click="$ctrl.openDescriptionModal($event, $ctrl.model)">
+          <md-button ng-click="$ctrl.openDescriptionModal($event, $ctrl.model)"
+                     e2e="open-description-modal">
             <md-icon md-font-icon="icon-description"></md-icon>
             <span translate="DESCRIPTION"></span>
           </md-button>
 
             <md-button ng-if="!$ctrl.model.edit"
                        ng-show="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE"
-                       ng-click="$ctrl.openFiltersModal($event)">
+                       ng-click="$ctrl.openFiltersModal($event)"
+                       e2e="open-filter-modal">
               <md-icon md-font-icon="icon-filter"></md-icon>
               <span translate="FILTER"></span>
             </md-button>
@@ -102,12 +105,14 @@
           </md-button>
 
           <md-button ng-click="$ctrl.openReportPreviewModal($event)"
+                     e2e="open-preview-modal"
                      ng-disabled="$ctrl.isPreviewDisabled()">
             <md-icon md-font-icon="icon-full-screen"></md-icon>
             <span translate="PREVIEW"></span>
           </md-button>
 
           <md-button ng-click="$ctrl.openReportSortModal($event)"
+                     e2e="open-sort-modal"
                      ng-if="!$ctrl.model.edit"
                      ng-show="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE"
                      ng-disabled="$ctrl.isSortDisabled()">

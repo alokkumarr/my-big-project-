@@ -1,6 +1,6 @@
 const metrics = element.all(by.css('[ng-model="$ctrl.selectedMetric"] > md-radio-button'));
 const eventsMetric = metrics.filter(elem => {
-  return elem(by.css('span[ng-bind="::metric.metricName"]')).getText()
+  return elem.element(by.css('span[ng-bind="::metric.metricName"]')).getText()
     .then(text => {
       return text && text.includes('MCT Events');
     });
@@ -21,7 +21,12 @@ module.exports = {
     columnType: element(by.css('[value="chart:column"]')),
     lineType: element(by.css('[value="chart:line"]')),
     createAnalysisBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]')),
-    saveAnalysisBtn: element(by.css('[ng-click="$ctrl.openSaveModal()"]')),
+    // analysis designer action buttons
+    saveAnalysisBtn: element(by.css('button[e2e="open-save-modal"]')),
+    editDescriptionAnalysisBtn: element(by.css('button[e2e="open-description-modal"]')),
+    previewAnalysisBtn: element(by.css('[e2e="open-preview-modal"]')),
+    filterAnalysisBtn: element(by.css('[e2e="open-filter-modal"]')),
+    sortAnalysisBtn: element(by.css('[e2e="open-sort-modal"]')),
     //
     // eventsMetric: element(by.cssContainingText('[ng-model="$ctrl.selectedMetric"]', 'MCT Events')),
     eventsMetric,
@@ -36,7 +41,6 @@ module.exports = {
     saveReportDetails: element(by.css('[ng-click="$ctrl.save()"]')),
     reportTitle: element(by.css('.e2e-report-title')),
     reportDescriptionBtn: element(by.partialButtonText('Description')),
-    reportFilterBtn: element(by.css('[ng-click="$ctrl.openFilterSidenav()"]')),
     filterItemInternet: element(by.css('[aria-label="INTERNET"]')),
     filterItemComplete: element(by.css('[aria-label="Complete"]')),
     applyFilterBtn: element(by.css('[ng-click="$ctrl.onFiltersApplied()"]')),
