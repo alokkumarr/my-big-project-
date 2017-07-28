@@ -33,7 +33,7 @@ class SAWChartTypeElasticSearchQueryBuilder {
 
   public SAWChartTypeElasticSearchQueryBuilder(String jsonString) {
     super();
-    assert (this.jsonString == null && this.jsonString.trim().equals(""));
+    //assert (jsonString == null);
     this.jsonString = jsonString;
   }
 

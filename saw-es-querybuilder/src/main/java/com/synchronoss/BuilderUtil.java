@@ -59,6 +59,7 @@ public class BuilderUtil
         JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
         JsonValidator validator = factory.getValidator();
         String chart = System.getProperty("schema.chart");
+        if (chart == null){throw new NullPointerException("schema.chart property is not set.");}
         final JsonNode data = JsonLoader.fromString(json);
         final JsonNode schema = JsonLoader.fromFile(new File(chart));
         ProcessingReport report = validator.validate(schema, data);

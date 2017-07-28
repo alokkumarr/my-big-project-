@@ -1,0 +1,352 @@
+{
+        "id": "29782b6a-07ba-4136-abd5-5f111fc76773",
+        "dataSecurityKey": "empty",
+        "type": "chart",
+        "module": "ANALYZE",
+        "metric": "MCT Content",
+        "metricName": "MCT Content",
+        "customerCode": "ATT",
+        "disabled": "false",
+        "checked": "false",
+        "esRepository": {
+          "storageType": "ES",
+          "indexName": "mct_data",
+          "type": "content_type"
+        },
+        "artifacts": [
+          {
+            "artifactName": "MCT_CONTENT_SUMMARY",
+            "columns": [
+              {
+                "name": "SUMMARY_TYPE",
+                "type": "string",
+                "columnName": "SUMMARY_TYPE.keyword",
+                "displayName": "Summary Type",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY"
+              },
+              {
+                "name": "SESSION_ID",
+                "type": "string",
+                "columnName": "SESSION_ID.keyword",
+                "displayName": "Session ID",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": true,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY"
+              },
+              {
+                "name": "SERVER_DIM_DATE",
+                "type": "string",
+                "columnName": "SERVER_DIM_DATE.keyword",
+                "displayName": "Server Date",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY"
+              },
+              {
+                "name": "TARGET_OS",
+                "type": "string",
+                "columnName": "TARGET_OS.keyword",
+                "displayName": "Target OS",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY"
+              },
+              {
+                "name": "TARGET_APP_VERSION",
+                "type": "string",
+                "columnName": "TARGET_APP_VERSION.keyword",
+                "displayName": "Target App. Version",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY"
+              },
+              {
+                "name": "TARGET_MANUFACTURER",
+                "type": "string",
+                "columnName": "TARGET_MANUFACTURER.keyword",
+                "displayName": "Target Manufacturer",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY"
+              },
+              {
+                "name": "SOURCE_OS",
+                "type": "string",
+                "columnName": "SOURCE_OS.keyword",
+                "displayName": "Source OS",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY"
+              },
+              {
+                "name": "SOURCE_MANUFACTURER",
+                "type": "string",
+                "columnName": "SOURCE_MANUFACTURER.keyword",
+                "displayName": "Source Manufacturer",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY",
+                "checked": "g"
+              },
+              {
+                "name": "SESSION_STATUS",
+                "type": "string",
+                "columnName": "SESSION_STATUS",
+                "displayName": "Session Status",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY"
+              },
+              {
+                "name": "AVAILABLE_ITEMS",
+                "type": "long",
+                "columnName": "AVAILABLE_ITEMS",
+                "displayName": "Available Items",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY"
+              },
+              {
+                "name": "SELECTED_ITEMS",
+                "type": "long",
+                "columnName": "SELECTED_ITEMS",
+                "displayName": "Selected Items",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY"
+              },
+              {
+                "name": "TRANSFER_ITEMS",
+                "type": "long",
+                "columnName": "TRANSFER_ITEMS",
+                "displayName": "Transfer Items",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY"
+              },
+              {
+                "name": "FAILED_ITEMS",
+                "type": "long",
+                "columnName": "FAILED_ITEMS",
+                "displayName": "Failed Items",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY"
+              },
+              {
+                "name": "AVAILABLE_BYTES",
+                "type": "long",
+                "columnName": "AVAILABLE_BYTES",
+                "displayName": "Available Bytes",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY"
+              },
+              {
+                "name": "AVAILABLE_MB",
+                "type": "float",
+                "columnName": "AVAILABLE_MB",
+                "displayName": "Available MB",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY",
+                "checked": "y",
+                "aggregate": "sum"
+              },
+              {
+                "name": "SELECTED_BYTES",
+                "type": "long",
+                "columnName": "SELECTED_BYTES",
+                "displayName": "Selected Bytes",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY"
+              },
+              {
+                "name": "TRANSFER_BYTES",
+                "type": "long",
+                "columnName": "TRANSFER_BYTES",
+                "displayName": "Transfer Bytes",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY"
+              },
+              {
+                "name": "TRANSFER_MB",
+                "type": "float",
+                "columnName": "TRANSFER_MB",
+                "displayName": "Transfer MB",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY"
+              },
+              {
+                "name": "FAILED_BYTES",
+                "type": "long",
+                "columnName": "FAILED_BYTES",
+                "displayName": "Failed Bytes",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY",
+                "checked": "z",
+                "aggregate": "sum"
+              },
+              {
+                "name": "FAILED_MB",
+                "type": "float",
+                "columnName": "FAILED_MB",
+                "displayName": "Failed MB",
+                "aliasName": "",
+                "table": "MCT_CONTENT_SUMMARY",
+                "joinEligible": false,
+                "filterEligible": true,
+                "tableName": "MCT_CONTENT_SUMMARY",
+                "checked": "x",
+                "aggregate": "sum"
+              }
+            ]
+          }
+        ],
+        "repository": {
+          "storageType": "DL",
+          "objects": [
+            {
+              "EnrichedDataObjectId": "MCT_CONTENT_SUMMARY::parquet::1499455565568",
+              "displayName": "MCT Content Summary",
+              "EnrichedDataObjectName": "MCT_CONTENT_SUMMARY",
+              "description": "Content Summary of MCT events",
+              "lastUpdatedTimestamp": "undefined"
+            }
+          ],
+          "_number_of_elements": 1
+        },
+        "semanticId": "e5775d0a-acae-42a8-b3fc-830563ebb297",
+        "createdTimestamp": 1500398108809,
+        "userId": 1,
+        "userFullName": "shwetha p somayaji",
+        "chartType": "bubble",
+        "name": "Untitled Chart",
+        "description": "",
+        "categoryId": "4",
+        "scheduled": null,
+        "sqlBuilder": {
+          "booleanCriteria": "AND",
+          "filters": [
+          {
+           "columnName" : "SOURCE_MANUFACTURER",
+           "isRuntimeFilter" : false,
+           "type" : "string",
+           "operator" : "EQ",
+           "tableName" : "MCT_CONTENT_SUMMARY",
+           "model" : {"modelValues" : ["IOS"]}
+         }
+          ],
+          "dataFields": [
+            {
+              "name": "FAILED_MB",
+              "type": "float",
+              "columnName": "FAILED_MB",
+              "displayName": "Failed MB",
+              "aliasName": "",
+              "table": "MCT_CONTENT_SUMMARY",
+              "joinEligible": false,
+              "filterEligible": true,
+              "tableName": "MCT_CONTENT_SUMMARY",
+              "checked": "x",
+              "aggregate": "sum"
+            },
+            {
+              "name": "AVAILABLE_MB",
+              "type": "float",
+              "columnName": "AVAILABLE_MB",
+              "displayName": "Available MB",
+              "aliasName": "",
+              "table": "MCT_CONTENT_SUMMARY",
+              "joinEligible": false,
+              "filterEligible": true,
+              "tableName": "MCT_CONTENT_SUMMARY",
+              "checked": "y",
+              "aggregate": "avg"
+            },
+            {
+              "name": "FAILED_BYTES",
+              "type": "long",
+              "columnName": "FAILED_BYTES",
+              "displayName": "Failed Bytes",
+              "aliasName": "",
+              "table": "MCT_CONTENT_SUMMARY",
+              "joinEligible": false,
+              "filterEligible": true,
+              "tableName": "MCT_CONTENT_SUMMARY",
+              "checked": "z",
+              "aggregate": "max"
+            }
+          ],
+          "nodeFields": [
+            {
+              "name": "SOURCE_MANUFACTURER",
+              "type": "string",
+              "columnName": "SOURCE_MANUFACTURER.keyword",
+              "displayName": "Source Manufacturer",
+              "aliasName": "",
+              "table": "MCT_CONTENT_SUMMARY",
+              "joinEligible": false,
+              "filterEligible": true,
+              "tableName": "MCT_CONTENT_SUMMARY",
+              "checked": "g"
+            }
+          ],
+          "sorts": []
+        },
+        "xAxis": {
+          "title": null
+        },
+        "yAxis": {
+          "title": null
+        },
+        "legend": {
+          "align": "right",
+          "layout": "vertical"
+        },
+        "executionType": "preview"
+      }
