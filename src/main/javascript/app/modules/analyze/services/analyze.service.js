@@ -1,4 +1,3 @@
-import omit from 'lodash/omit';
 import forEach from 'lodash/forEach';
 import startCase from 'lodash/startCase';
 import set from 'lodash/set';
@@ -44,26 +43,18 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
   const _executingAnalyses = {};
 
   return {
-    chartBe2Fe,
-    chartFe2Be,
     createAnalysis,
     deleteAnalysis,
     didExecutionFail,
     executeAnalysis,
     generateQuery,
     getAnalysesFor,
-    getAnalysisById,
-    getArtifacts,
     getCategories,
     getCategory,
-    getDataByQuery,
     getDataBySettings,
     getExecutionData,
-    getLastPublishedAnalysis,
     getMethods,
-    getPivotData,
     getPublishedAnalysesByAnalysisId,
-    getPublishedAnalysisById,
     getSemanticLayerData,
     isExecuting,
     publishAnalysis,
@@ -153,14 +144,6 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     return $http.get(`${url}/analysis/${analysisId}/executions/${executionId}/data`).then(fpGet(`data.data`));
   }
 
-  function getLastPublishedAnalysis(id) {
-    return $http.get(`/api/analyze/lastPublishedAnalysis/${id}`).then(fpGet('data'));
-  }
-
-  function getPublishedAnalysisById(id) {
-    return $http.get(`/api/analyze/publishedAnalysis/${id}`).then(fpGet('data'));
-  }
-
   function readAnalysis(analysisId) {
     const payload = getRequestParams([
       ['contents.action', 'read'],
@@ -204,10 +187,6 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     });
   }
 
-  function getAnalysisById(id) {
-    return $http.get(`/api/analyze/byId/${id}`).then(fpGet('data'));
-  }
-
   function deleteAnalysis(model) {
     if (!JwtService.hasPrivilege('DELETE', {
       subCategoryId: model.categoryId,
@@ -237,10 +216,6 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
 
   function getMethods() {
     return $http.get('/api/analyze/methods').then(fpGet('data'));
-  }
-
-  function getArtifacts() {
-    return $http.get('/api/analyze/artifacts').then(fpGet('data'));
   }
 
   function updateAnalysis(model) {
@@ -278,14 +253,6 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     });
   }
 
-  function getDataByQuery() {
-    return $http.get('/api/analyze/dataByQuery').then(fpGet('data'));
-  }
-
-  function getPivotData() {
-    return $http.get('/api/analyze/pivotData').then(fpGet('data.aggregations.filtered.row_level_1'));
-  }
-
   function generateQuery(payload) {
     return $http.post('/api/analyze/generateQuery', payload).then(fpGet('data'));
   }
@@ -318,22 +285,5 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
       ['contents.keys.[0].analysisType', type]
     ]);
     return $http.post(`${url}/analysis`, params).then(fpGet('data.contents.analyze.[0]'));
-  }
-
-  /**
-   * Converts chart type analysis from backend
-   * to a format usable on front-end
-   */
-  function chartBe2Fe(source) {
-    const result = omit(source, ['_id', 'chart_type', 'plot_variant']);
-    result.id = source._id || source.id;
-    result.chartType = source.chart_type || source.chartType;
-    result.plotVariant = source.plot_variant || source.plotVariant;
-
-    return result;
-  }
-
-  function chartFe2Be() {
-    // TODO
   }
 }
