@@ -36,6 +36,7 @@ public class WebSecurityConfig extends
     http.csrf().disable();
      
     http.authorizeRequests() .antMatchers(HttpMethod.OPTIONS,"**/doAuthenticate/**").permitAll()//allow CORS option calls
+      .antMatchers(HttpMethod.OPTIONS,"**/getAccessToken/**").permitAll()//allow CORS option calls
       .antMatchers(HttpMethod.OPTIONS,"**/auth/reCreateTicket/**").permitAll()//allow CORS option calls
       .antMatchers(HttpMethod.OPTIONS,"**/resetPassword/**").permitAll()//allow CORS option calls
       .antMatchers(HttpMethod.OPTIONS,"**/rstChangePassword/**").permitAll()//allow CORS option calls

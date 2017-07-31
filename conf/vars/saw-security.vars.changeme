@@ -19,7 +19,8 @@ server.address=CHANGEME # 127.0.0.1
 server.context-path=CHANGEME # /saw-security
 
 #Ticket Validity in Mins 
-ticket.validity.mins=CHANGEME # 120
+ticket.validity.mins=CHANGEME # 20
+ticket.rToken.validity.mins=CHANGEME # 1440
 
 #mail properties
 mail.protocol=CHANGEME # smtp

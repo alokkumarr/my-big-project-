@@ -5,6 +5,8 @@ package com.sncr.saw.security.app.controller;
 
 import java.security.SecureRandom;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,6 +16,7 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
+import javax.servlet.ServletException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +37,7 @@ import com.sncr.saw.security.common.bean.ChangePasswordDetails;
 import com.sncr.saw.security.common.bean.CustProdModule;
 import com.sncr.saw.security.common.bean.LoginDetails;
 import com.sncr.saw.security.common.bean.RandomHashcode;
+import com.sncr.saw.security.common.bean.RefreshToken;
 import com.sncr.saw.security.common.bean.ResetPwdDtls;
 import com.sncr.saw.security.common.bean.ResetValid;
 import com.sncr.saw.security.common.bean.Ticket;
@@ -57,6 +61,7 @@ import com.sncr.saw.security.common.bean.repo.analysis.Analysis;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.util.TicketHelper;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -85,6 +90,7 @@ public class SecurityController {
 		ticket = new Ticket();
 		ticket.setMasterLoginId(loginDetails.getMasterLoginId());
 		ticket.setValid(false);
+		RefreshToken rToken = null;
 		try {
 			boolean[] ret = userRepository.authenticateUser(loginDetails.getMasterLoginId(),
 					loginDetails.getPassword());
@@ -96,7 +102,7 @@ public class SecurityController {
 					user = new User();
 					user.setMasterLoginId(loginDetails.getMasterLoginId());
 					user.setValidMins((nSSOProperties.getValidityMins() != null
-							? Long.parseLong(nSSOProperties.getValidityMins()) : 720));
+							? Long.parseLong(nSSOProperties.getValidityMins()) : 60));
 					ticket = tHelper.createTicket(user, false);
 				} else {
 					ticket.setValidityReason("Password Expired");
@@ -104,6 +110,12 @@ public class SecurityController {
 			} else {
 				ticket.setValidityReason("Invalid User Credentials");
 			}
+			rToken = new RefreshToken();
+			rToken.setValid(true);
+			rToken.setMasterLoginId(loginDetails.getMasterLoginId());
+			rToken.setValidUpto(System.currentTimeMillis() + (nSSOProperties.getRefreshTokenValidityMins() != null
+							? Long.parseLong(nSSOProperties.getRefreshTokenValidityMins()) : 1440) * 60 * 1000);
+			
 		} catch (DataAccessException de) {
 			logger.error("Exception occured creating ticket ", de, null);
 			ticket.setValidityReason("Database error. Please contact server Administrator.");
@@ -116,6 +128,71 @@ public class SecurityController {
 		}
 
 		return new LoginResponse(Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", ticket)
+				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact(),Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", rToken)
+				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
+	}
+	
+	@RequestMapping(value = "/getNewAccessToken", method = RequestMethod.POST)
+	public LoginResponse accessToken(@RequestBody String rToken) {
+
+		Claims refreshToken = Jwts.parser().setSigningKey("sncrsaw2").parseClaimsJws(rToken).getBody();
+		//Check if the refresh Token is valid
+		Iterator<?> it = ((Map<String, Object>) refreshToken.get("ticket")).entrySet().iterator();
+		Boolean validity = false;
+		String masterLoginId = null;
+		while (it.hasNext()) {
+			Map.Entry<String, Object> pair = (Map.Entry<String, Object>) it.next();
+			if (pair.getKey().equals("validUpto")) {
+				validity = Long.parseLong(pair.getValue().toString()) > (new Date().getTime());
+			}
+			if (pair.getKey().equals("masterLoginId")) {
+				masterLoginId = pair.getValue().toString();
+			}
+			it.remove();
+		}
+		if (!validity) {
+			try {
+				throw new ServletException("Token has expired. Please re-login.");
+			} catch (ServletException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
+		logger.info("Ticket will be created..");
+		logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
+
+		Ticket ticket = null;
+		User user = null;
+		TicketHelper tHelper = new TicketHelper(userRepository);
+		ticket = new Ticket();
+		ticket.setMasterLoginId(masterLoginId);
+		ticket.setValid(false);
+		RefreshToken newRToken = null;
+		try {
+			user = new User();
+			user.setMasterLoginId(masterLoginId);
+			user.setValidMins((nSSOProperties.getValidityMins() != null
+							? Long.parseLong(nSSOProperties.getValidityMins()) : 60));
+			ticket = tHelper.createTicket(user, false);				
+			newRToken = new RefreshToken();
+			newRToken.setValid(true);
+			newRToken.setValidUpto(System.currentTimeMillis() +(nSSOProperties.getRefreshTokenValidityMins() != null
+							? Long.parseLong(nSSOProperties.getRefreshTokenValidityMins()) : 1440) * 60 * 1000);			
+		} catch (DataAccessException de) {
+			logger.error("Exception occured creating ticket ", de, null);
+			ticket.setValidityReason("Database error. Please contact server Administrator.");
+			ticket.setError(de.getMessage());
+			return new LoginResponse(Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket)
+					.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
+		} catch (Exception e) {
+			logger.error("Exception occured creating ticket ", e, null);
+			return null;
+		}
+
+		return new LoginResponse(Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket)
+				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact(),Jwts.builder().setSubject(masterLoginId).claim("ticket", rToken)
 				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
 	}
 
@@ -131,13 +208,17 @@ public class SecurityController {
 		ticket = new Ticket();
 		ticket.setMasterLoginId(loginDetails.getMasterLoginId());
 		ticket.setValid(false);
+		RefreshToken rToken = null;
 		try {
 			user = new User();
 			user.setMasterLoginId(loginDetails.getMasterLoginId());
 			user.setValidMins((nSSOProperties.getValidityMins() != null
-					? Long.parseLong(nSSOProperties.getValidityMins()) : 720));
+					? Long.parseLong(nSSOProperties.getValidityMins()) : 60));
 			ticket = tHelper.createDefaultTicket(user, true);
-
+			rToken = new RefreshToken();
+			rToken.setValid(true);
+			rToken.setValidUpto((nSSOProperties.getRefreshTokenValidityMins() != null
+							? Long.parseLong(nSSOProperties.getRefreshTokenValidityMins()) : 1440) * 60 * 1000);
 		} catch (DataAccessException de) {
 			logger.error("Exception occured creating ticket ", de, null);
 			ticket.setValidityReason("Database error. Please contact server Administrator.");
@@ -150,6 +231,7 @@ public class SecurityController {
 		}
 
 		return new LoginResponse(Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", ticket)
+				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact(),Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("rToken", rToken)
 				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
 	}
 
@@ -370,10 +452,17 @@ public class SecurityController {
 
 	@SuppressWarnings("unused")
 	private static class LoginResponse {
-		public String token;
+		
+		public String aToken;
+		public String rToken;
+		
+		public LoginResponse(final String aToken) {
+			this.aToken = aToken;
+		}
 
-		public LoginResponse(final String token) {
-			this.token = token;
+		public LoginResponse(final String aToken, final String rToken) {
+			this.aToken = aToken;
+			this.rToken = rToken;
 		}
 	}
 
