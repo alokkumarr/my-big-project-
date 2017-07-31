@@ -178,6 +178,7 @@ public class SecurityController {
 			ticket = tHelper.createTicket(user, false);				
 			newRToken = new RefreshToken();
 			newRToken.setValid(true);
+			newRToken.setMasterLoginId(masterLoginId);
 			newRToken.setValidUpto(System.currentTimeMillis() +(nSSOProperties.getRefreshTokenValidityMins() != null
 							? Long.parseLong(nSSOProperties.getRefreshTokenValidityMins()) : 1440) * 60 * 1000);			
 		} catch (DataAccessException de) {
@@ -192,7 +193,7 @@ public class SecurityController {
 		}
 
 		return new LoginResponse(Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket)
-				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact(),Jwts.builder().setSubject(masterLoginId).claim("ticket", rToken)
+				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact(),Jwts.builder().setSubject(masterLoginId).claim("ticket", newRToken)
 				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
 	}
 
