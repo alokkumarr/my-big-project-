@@ -1,0 +1,175 @@
+{"content_type": {
+                "_parent": {
+                    "type": "session_type"
+                },
+                "_routing": {
+                    "required": true
+                },
+                "properties": {
+                    "AVAILABLE_BYTES": {
+                        "type": "long"
+                    },
+                    "AVAILABLE_ITEMS": {
+                        "type": "long"
+                    },
+                    "AVAILABLE_MB": {
+                        "type": "float"
+                    },
+                    "BATCH_ID": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "CONTENT_ID_CNT": {
+                        "type": "long"
+                    },
+                    "CONTENT_TYPE": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "DER_SERVER_DIM_DATE": {
+                        "type": "date",
+                        "format": "yyyy-MM-dd HH:mm:ss"
+                    },
+                    "FAILED_BYTES": {
+                        "type": "long"
+                    },
+                    "FAILED_ITEMS": {
+                        "type": "long"
+                    },
+                    "FAILED_MB": {
+                        "type": "float"
+                    },
+                    "OPCO": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        },
+                        "fielddata": true
+                    },
+                    "PROCESSING_DATE": {
+                        "type": "date",
+                        "format": "yyyy-MM-dd HH:mm:ss"
+                    },
+                    "SELECTED_BYTES": {
+                        "type": "long"
+                    },
+                    "SELECTED_ITEMS": {
+                        "type": "long"
+                    },
+                    "SERVER_DIM_DATE": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        },
+                        "fielddata": true
+                    },
+                    "SESSION_ID": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        },
+                        "fielddata": true
+                    },
+                    "SOURCE_MANUFACTURER": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        },
+                        "fielddata": true
+                    },
+                    "SOURCE_OS": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        },
+                        "fielddata": true
+                    },
+                    "SRC_FILE_NAME": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        }
+                    },
+                    "SUMMARY_TYPE": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        },
+                        "fielddata": true
+                    },
+                    "TARGET_APP_VERSION": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        },
+                        "fielddata": true
+                    },
+                    "TARGET_MANUFACTURER": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        },
+                        "fielddata": true
+                    },
+                    "TARGET_OS": {
+                        "type": "text",
+                        "fields": {
+                            "keyword": {
+                                "type": "keyword",
+                                "ignore_above": 256
+                            }
+                        },
+                        "fielddata": true
+                    },
+                    "TRANSFER_BYTES": {
+                        "type": "long"
+                    },
+                    "TRANSFER_ITEMS": {
+                        "type": "long"
+                    },
+                    "TRANSFER_MB": {
+                        "type": "float"
+                    },
+                    "TRANSFER_SECONDS": {
+                        "type": "float"
+                    }
+                }
+            }
+            }

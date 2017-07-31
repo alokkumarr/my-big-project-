@@ -32,7 +32,6 @@ class SAWPivotTypeElasticSearchQueryBuilder {
 
   public SAWPivotTypeElasticSearchQueryBuilder(String jsonString) {
     super();
-    assert (this.jsonString == null && this.jsonString.trim().equals(""));
     this.jsonString = jsonString;
   }
 
