@@ -21,19 +21,34 @@ class JwtService {
   constructor($window, AppConfig) {
     this._$window = $window;
     this._AppConfig = AppConfig;
+
+    this._refreshTokenKey = `${AppConfig.login.jwtKey}Refresh`;
   }
 
   set(accessToken, refreshToken) {
     this._$window.localStorage[this._AppConfig.login.jwtKey] = accessToken;
-    this._$window.localStorage[`${this._AppConfig.login.jwtKey}Refresh`] = refreshToken;
+    this._$window.localStorage[this._refreshTokenKey] = refreshToken;
   }
 
   get() {
     return this._$window.localStorage[this._AppConfig.login.jwtKey];
   }
 
+  getAccessToken() {
+    return this.get();
+  }
+
+  getRefreshToken() {
+    return this._$window.localStorage[this._refreshTokenKey];
+  }
+
+  validity() {
+    return new Date(this.getTokenObj().ticket.validUpto);
+  }
+
   destroy() {
     this._$window.localStorage.removeItem(this._AppConfig.login.jwtKey);
+    this._$window.localStorage.removeItem(this._refreshTokenKey);
   }
 
   parseJWT(jwt) {

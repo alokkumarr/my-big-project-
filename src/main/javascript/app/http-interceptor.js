@@ -1,3 +1,5 @@
+import get from 'lodash/get';
+
 /* on tap handler for error toast message. Used to expand a more detailed
  view of error */
 function openErrorDetails(dialog, error) {
@@ -17,6 +19,44 @@ function openErrorDetails(dialog, error) {
 export function interceptor($httpProvider) {
   'ngInject';
   /* eslint-disable */
+  $httpProvider.interceptors.push(function refreshTokenInterceptor($injector) {
+    'ngInject';
+
+    let refreshRequest = null;
+
+    return {
+      responseError: response => {
+        const $q = $injector.get('$q');
+        const errorMessage = get(response, 'data.message', '');
+
+        if (!/token has expired/i.test(errorMessage)) {
+          return $q.reject(response);
+        }
+        var deferred = $q.defer();
+
+        if (!refreshRequest) {
+          refreshRequest = $injector.get('UserService').refreshAccessToken();
+        }
+
+        refreshRequest.then(() => {
+          refreshRequest = null;
+          $injector.get("$http")(response.config).then(
+            deferred.resolve.bind(deferred),
+            deferred.reject.bind(deferred)
+          );
+        }, error => {
+          $injector.get('JwtService').destroy();
+
+          const state = $injector.get('$state');
+          state.go(state.current.name, state.params, {reload: true});
+
+          deferred.reject(error);
+        });
+        return deferred.promise;
+      }
+    };
+  });
+
   $httpProvider.interceptors.push(function toastInterceptor($injector) {
     'ngInject';
     return {
@@ -46,12 +86,12 @@ export function interceptor($httpProvider) {
   /* Add jwt auth token to all requests if present */
   $httpProvider.interceptors.push(function authInterceptor($injector) {
     'ngInject';
-    const JwtService = $injector.get('JwtService');
-    const token = JwtService.get();
-
     return {
       request: function (config) {
-        if (token) {
+        const JwtService = $injector.get('JwtService');
+        const token = JwtService.get();
+
+        if (token && !/getNewAccessToken/.test(config.url)) {
           config.headers['Authorization'] = `Bearer ${token}`;
         }
 

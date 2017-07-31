@@ -124,6 +124,22 @@ class UserService {
         return res;
       });
   }
+
+  refreshAccessToken(rtoken = this._JwtService.getRefreshToken()) {
+    const route = '/getNewAccessToken';
+    return this._$http.post(this._AppConfig.login.url + route, rtoken)
+      .then(response => {
+        const resp = this._JwtService.parseJWT(get(response, 'data.aToken'));
+        // Store the user's info for easy lookup
+        if (this._JwtService.isValid(resp)) {
+          // this._JwtService.destroy();
+          this._JwtService.set(get(response, 'data.aToken'), get(response, 'data.rToken'));
+        }
+        return resp;
+      }, err => {
+        throw err;
+      });
+  }
 }
 
 export function UserServiceFactory($window, $http, $state, AppConfig, JwtService) {

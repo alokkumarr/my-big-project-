@@ -33,8 +33,8 @@ export const LoginComponent = {
           }
         })
         .catch(err => {
-          console.error(err);
           this.states.error = 'Network Error!';
+          throw err;
         });
     }
 
