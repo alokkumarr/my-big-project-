@@ -22,8 +22,8 @@ public class SAWElasticSearchQueryBuilder {
   public String getQuery(EntityType type, String jsonString) throws IllegalArgumentException, ProcessingException {
     String query = null;
     try {
-      assert (type.find(type) == null);
-      assert (jsonString == null || jsonString.equals(""));
+      //assert (type.find(type) == null);
+      //assert (jsonString == null || jsonString.equals(""));
 
       query =
           type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString)
@@ -47,8 +47,8 @@ public class SAWElasticSearchQueryBuilder {
       throws IllegalArgumentException {
     SearchSourceBuilder query = null;
     try {
-      assert (type.find(type) == null);
-      assert (jsonString == null || jsonString.equals(""));
+     // assert (type.find(type) == null);
+     // assert (jsonString == null || jsonString.equals(""));
 
       query =
           type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString)
