@@ -170,8 +170,7 @@ export const AnalyzePivotComponent = {
           const fields = this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns);
           this.normalizedData = data;
           this.analysisSynched();
-          this.deNormalizedData = this._PivotService.denormalizeData(data, fields);
-          this.deNormalizedData = this._PivotService.takeOutKeywordFromData(this.deNormalizedData);
+          this.deNormalizedData = this._PivotService.parseData(data, model.sqlBuilder);
           this.dataSource = new PivotGridDataSource({store: this.deNormalizedData, fields});
           this.pivotGridUpdater.next({
             dataSource: this.dataSource
@@ -185,8 +184,9 @@ export const AnalyzePivotComponent = {
           });
           this.endProgress();
         })
-        .catch(() => {
+        .catch(error => {
           this.endProgress();
+          throw error;
         });
     }
 
