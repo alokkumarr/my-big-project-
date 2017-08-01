@@ -1,9 +1,6 @@
 import assign from 'lodash/assign';
 import keys from 'lodash/keys';
-import isEmpty from 'lodash/isEmpty';
 import map from 'lodash/map';
-import mapKeys from 'lodash/mapKeys';
-import isString from 'lodash/isString';
 import find from 'lodash/find';
 import flatMap from 'lodash/flatMap';
 import forEach from 'lodash/forEach';
@@ -151,7 +148,7 @@ export function PivotService() {
     // take out the .keyword form the columnName
     // if there is one
     const columnName = fieldMap[level - 1];
-    if (columnName.includes('.keyword')) {
+    if (columnName.indexOf('.keyword') > -1) {
       return columnName.split('.')[0];
     }
     return columnName;
@@ -188,8 +185,8 @@ export function PivotService() {
   function getChildNodeName(node) {
     const nodeKeys = keys(node);
     const childNodeName = find(nodeKeys, key => {
-      const isRow = key.includes('row_level');
-      const isColumn = key.includes('column_level');
+      const isRow = key.indexOf('row_level') > -1;
+      const isColumn = key.indexOf('column_level') > -1;
       return isRow || isColumn;
     });
 

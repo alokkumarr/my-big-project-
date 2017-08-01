@@ -8,7 +8,7 @@ export const bubbleChartDataGrouped = {
         key: 'ANDROID',
         doc_count: 163663,
         node_field_2: {
-          doc_count_error_upper_bound: 33,
+          doc_count_error_upper_bouind: 33,
           sum_other_doc_count: 3776,
           buckets: [
             {
