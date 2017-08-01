@@ -2,7 +2,6 @@ import angular from 'angular';
 import 'angular-ui-router';
 
 import 'angular-material';
-import 'angular-material/angular-material.css';
 
 import 'angular-local-storage';
 import 'angular-sanitize';
