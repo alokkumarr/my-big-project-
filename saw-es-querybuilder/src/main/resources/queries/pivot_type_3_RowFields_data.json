@@ -271,25 +271,51 @@
                   "android"
                ]
             }
-         }
+         },
+         {
+            "type":"string",
+            "tableName":"MCT_CONTENT_SUMMARY",
+            "columnName":"SOURCE_OS",
+            "isRuntimeFilter":true
+            
+        }
       ],
       "sorts":[
          {
             "columnName":"SOURCE_OS",
             "type":"string",
             "order":"asc"
+         },
+         {
+            "columnName":"MCT_CONTENT_SUMMARY",
+            "type":"string",
+            "order":"desc"
          }
       ],
       "rowFields":[
          {
             "type":"string",
             "columnName":"SOURCE_OS"
+         },
+                  {
+            "type":"string",
+            "columnName":"MCT_CONTENT_SUMMARY"
+         },
+                  {
+            "type":"string",
+            "columnName":"SOURCE_OS"
          }
+         
+         
       ],
       "columnFields":[
          {
             "type":"string",
             "columnName":"SERVER_DIM_DATE"
+         },
+         {
+            "type":"float",
+            "columnName":"TRANSFER_MB"
          }
       ],
       "dataFields":[
@@ -298,6 +324,18 @@
             "columnName":"AVAILABLE_MB",
             "aggregate":"sum",
             "name":"AVAILABLE_MB"
+         },
+         {
+            "type":"float",
+            "columnName":"AVAILABLE_MB",
+            "aggregate":"avg",
+            "name":"AVAILABLE_MB_AVG"
+         },
+         {
+            "type":"float",
+            "columnName":"AVAILABLE_MB",
+            "aggregate":"max",
+            "name":"AVAILABLE_MB_MAX"
          }
       ]
    },

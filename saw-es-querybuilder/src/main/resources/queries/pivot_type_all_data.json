@@ -271,7 +271,14 @@
                   "android"
                ]
             }
-         }
+         },
+         {
+            "type":"string",
+            "tableName":"MCT_CONTENT_SUMMARY",
+            "columnName":"SOURCE_OS",
+            "isRuntimeFilter":true
+            
+        }
       ],
       "sorts":[
          {
