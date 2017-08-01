@@ -7,6 +7,7 @@ class UserService {
     this._$state = $state;
     this._AppConfig = AppConfig;
     this._JwtService = JwtService;
+    this.refreshTokenEndpoint = 'getNewAccessToken';
   }
 
   attemptAuth(formData) {
@@ -126,7 +127,7 @@ class UserService {
   }
 
   refreshAccessToken(rtoken = this._JwtService.getRefreshToken()) {
-    const route = '/getNewAccessToken';
+    const route = `/${this.refreshTokenEndpoint}`;
     return this._$http.post(this._AppConfig.login.url + route, rtoken)
       .then(response => {
         const resp = this._JwtService.parseJWT(get(response, 'data.aToken'));

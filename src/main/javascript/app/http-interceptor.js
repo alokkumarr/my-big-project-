@@ -19,44 +19,6 @@ function openErrorDetails(dialog, error) {
 export function interceptor($httpProvider) {
   'ngInject';
   /* eslint-disable */
-  $httpProvider.interceptors.push(function refreshTokenInterceptor($injector) {
-    'ngInject';
-
-    let refreshRequest = null;
-
-    return {
-      responseError: response => {
-        const $q = $injector.get('$q');
-        const errorMessage = get(response, 'data.message', '');
-
-        if (!/token has expired/i.test(errorMessage)) {
-          return $q.reject(response);
-        }
-        var deferred = $q.defer();
-
-        if (!refreshRequest) {
-          refreshRequest = $injector.get('UserService').refreshAccessToken();
-        }
-
-        refreshRequest.then(() => {
-          refreshRequest = null;
-          $injector.get("$http")(response.config).then(
-            deferred.resolve.bind(deferred),
-            deferred.reject.bind(deferred)
-          );
-        }, error => {
-          $injector.get('JwtService').destroy();
-
-          const state = $injector.get('$state');
-          state.go(state.current.name, state.params, {reload: true});
-
-          deferred.reject(error);
-        });
-        return deferred.promise;
-      }
-    };
-  });
-
   $httpProvider.interceptors.push(function toastInterceptor($injector) {
     'ngInject';
     return {
@@ -79,6 +41,48 @@ export function interceptor($httpProvider) {
         });
 
         return $q.reject(error);
+      }
+    };
+  });
+
+  $httpProvider.interceptors.push(function refreshTokenInterceptor($injector) {
+    'ngInject';
+
+    let refreshRequest = null;
+
+    return {
+      responseError: response => {
+        const $q = $injector.get('$q');
+        const errorMessage = get(response, 'data.message', '');
+        const userService = $injector.get('UserService');
+        const refreshRegexp = new RegExp(userService.refreshTokenEndpoint);
+
+        if (!/token has expired/i.test(errorMessage) ||
+            refreshRegexp.test(get(response, 'config.url', ''))) {
+          return $q.reject(response);
+        }
+        var deferred = $q.defer();
+
+        if (!refreshRequest) {
+          refreshRequest = userService.refreshAccessToken();
+        }
+
+        refreshRequest.then(() => {
+          refreshRequest = null;
+          $injector.get("$http")(response.config).then(
+            deferred.resolve.bind(deferred),
+            deferred.reject.bind(deferred)
+          );
+        }, error => {
+          refreshRequest = null;
+          $injector.get('JwtService').destroy();
+
+          const state = $injector.get('$state');
+          state.go(state.current.name, state.params, {reload: true});
+
+          deferred.reject(error);
+        });
+        return deferred.promise;
       }
     };
   });
