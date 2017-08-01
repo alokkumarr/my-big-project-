@@ -20,6 +20,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.common.bean.Category;
@@ -40,7 +41,6 @@ import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
-import com.sncr.saw.security.common.bean.repo.analysis.Analysis;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.util.Ccode;
@@ -64,7 +64,7 @@ public class UserRepositoryImpl implements UserRepository {
 	private static final Logger logger = LoggerFactory.getLogger(UserRepositoryImpl.class);
 
 	private final JdbcTemplate jdbcTemplate;
-
+	
 	@Autowired
 	public UserRepositoryImpl(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
@@ -121,7 +121,13 @@ public class UserRepositoryImpl implements UserRepository {
 		 * Date pwd_Expiration_Date = addDaystoDate(new Date(pwd_Modified_Date),
 		 * Integer.parseInt(pwd_Expiration_Days));
 		 */
-		Date pwd_Expiration_Date = addDays(pwd_Modified_Date, pwd_Expiration_Days);
+		Date pwd_Expiration_Date = null;
+		if(pwd_Modified_Date != null){
+			pwd_Expiration_Date = addDays(pwd_Modified_Date, pwd_Expiration_Days);
+		} else {
+			pwd_Expiration_Date = addDays(new Date(), pwd_Expiration_Days);
+		}
+		
 
 		int dateDiff = DateUtil.getNumberOfDays(DateUtil.getDateString(pwd_Expiration_Date, DateUtil.PATTERN_MMDDYYYY),
 				sysDate);
@@ -365,52 +371,7 @@ public class UserRepositoryImpl implements UserRepository {
 					+ " : " + e.getMessage(), null, e);
 			throw e;
 		}
-	}
-
-	@Override
-	public String verifyUserCredentials(String masterLoginId, String email, String fName) {
-		String message = null;
-		String sql = "select u.active_status_ind, u.first_name" + " from users u" + " where u.user_id = ?";
-
-		try {
-			User user = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setString(1, masterLoginId);
-				}
-			}, new UserRepositoryImpl.UserCredentialsExtractor());
-			if (user == null) {
-				message = "'User Name' provided is not identified in the system, please re-verify.";
-				return message;
-			} else if (user.getActiveStatusInd().equals("Inactive")) {
-				message = "User is inactive, please contact administrator.";
-				return message;
-			} else if (user.getFirstName() != null && user.getFirstName() != null
-					&& !user.getFirstName().equalsIgnoreCase(fName)) {
-				message = "'First Name' provided is not identified in the system, please re-verify.";
-				return message;
-			}
-
-			sql = "select ci.email from users u, user_contact uc, contact_info ci " + " where u.user_id=?"
-					+ " and u.user_sys_id=uc.user_sys_id " + " and uc.contact_info_sys_id = ci.contact_info_sys_id  ";
-
-			String emailFrmDB = jdbcTemplate.query(sql, new PreparedStatementSetter() {
-				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setString(1, masterLoginId);
-				}
-			}, new UserRepositoryImpl.StringExtractor("email"));
-			if (!emailFrmDB.equals(email)) {
-				message = "'Email Address' provided is not identified in the system, please re-verify.";
-				return message;
-			}
-		} catch (DataAccessException de) {
-			logger.error("Exception encountered while accessing DB : " + de.getMessage(), null, de);
-			throw de;
-		} catch (Exception e) {
-			logger.error("Exception encountered while resetting password for user " + e.getMessage(), null, e);
-			message = "Error encountered while resetting password.";
-		}
-		return message;
-	}
+	}	
 
 	@Override
 	public String updateUserPass(String masterLoginId, String newPassEncrp) {
@@ -1095,7 +1056,7 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public boolean createAnalysis(Analysis analysis) {
+	public boolean createAnalysis(AnalysisSummary analysis) {
 
 		String sql = "INSERT INTO ANALYSIS (CUST_PROD_MOD_FEATURE_SYS_ID, ANALYSIS_ID, "
 				+ "ANALYSIS_NAME, CREATED_BY,  CREATED_DATE, ACTIVE_STATUS_IND ) "
@@ -1167,7 +1128,7 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public boolean updateAnalysis(Analysis analysis) {
+	public boolean updateAnalysis(AnalysisSummary analysis) {
 
 		StringBuffer sql = new StringBuffer();
 		sql.append("UPDATE ANALYSIS SET ANALYSIS_NAME =?, CUST_PROD_MOD_FEATURE_SYS_ID= ?, "
@@ -1191,7 +1152,7 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
-	public boolean deleteAnalysis(Analysis analysis) {
+	public boolean deleteAnalysis(AnalysisSummary analysis) {
 		String sql = "UPDATE ANALYSIS SET ACTIVE_STATUS_IND = 0 ,INACTIVATED_DATE=SYSDATE(), INACTIVATED_BY=? "
 				+ " WHERE ANALYSIS_ID = ? ";
 		try {
@@ -1430,7 +1391,7 @@ public class UserRepositoryImpl implements UserRepository {
 
 			
 			String sql3 = "SELECT CPMF.CUST_PROD_MOD_FEATURE_SYS_ID from customer_product_module_features CPMF "
-					+ "where CUST_PROD_MOD_SYS_ID = ? AND FEATURE_NAME = 'MY ANALYSIS'";
+					+ "where CUST_PROD_MOD_SYS_ID = ? AND FEATURE_NAME = 'My Analysis'";
 
 			for (int y = 0; y < roleList.size(); y++) {
 				roleId = roleList.get(y).getRoleSysId();
@@ -1643,7 +1604,7 @@ public class UserRepositoryImpl implements UserRepository {
 				// if yes check if My Analysis priv exists, if not create
 
 				String sql3 = "SELECT CPMF.CUST_PROD_MOD_FEATURE_SYS_ID from customer_product_module_features CPMF "
-						+ "where CUST_PROD_MOD_SYS_ID = ? AND FEATURE_NAME = 'MY ANALYSIS'";
+						+ "where CUST_PROD_MOD_SYS_ID = ? AND FEATURE_NAME = 'My Analysis'";
 
 				for (int i = 0; i < cpmf.size(); i++) {
 					Long custProdMod = cpmf.get(i).getCustProdModSysId();
@@ -1658,9 +1619,9 @@ public class UserRepositoryImpl implements UserRepository {
 					} else {
 						// create feature
 						String sql6 = "INSERT INTO CUSTOMER_PRODUCT_MODULE_FEATURES (CUST_PROD_MOD_SYS_ID, "
-								+ "DEFAULT_URL, FEATURE_NAME, FEATURE_DESC,FEATURE_CODE,FEATURE_TYPE,DEFAULT, "
+								+ "DEFAULT_URL, FEATURE_NAME, FEATURE_DESC,FEATURE_CODE,FEATURE_TYPE,`DEFAULT`, "
 								+ "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY) "
-								+ " VALUES (?, '/', 'MY ANALYSIS', 'My Analysis', ?, ?,'1', '1', sysdate(), ?) ";
+								+ " VALUES (?, '/', 'My Analysis', 'My Analysis', ?, ?,'1', '1', sysdate(), ?) ";
 
 						StringBuffer feature_Code = new StringBuffer();
 						feature_Code.append("MYANALYSIS_").append(custProdMod);

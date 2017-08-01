@@ -21,7 +21,19 @@ public class AnalysisSummary implements Serializable{
 	private String inactivatedBy;  
 	private Date modifiedDate; 
 	private String modifiedBy;
+	private String userId;
 	
+	
+	
+	public String getUserId() {
+		return userId;
+	}
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 	public Long getAnalysisId() {
 		return analysisId;
 	}

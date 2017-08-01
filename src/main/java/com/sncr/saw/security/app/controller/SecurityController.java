@@ -58,6 +58,7 @@ import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.Analysis;
+import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.util.TicketHelper;
 
@@ -133,10 +134,10 @@ public class SecurityController {
 	}
 	
 	@RequestMapping(value = "/getNewAccessToken", method = RequestMethod.POST)
-	public LoginResponse accessToken(@RequestBody String rToken) {
+	public LoginResponse accessToken(@RequestBody String rToken) throws ServletException {
 
 		Claims refreshToken = Jwts.parser().setSigningKey("sncrsaw2").parseClaimsJws(rToken).getBody();
-		//Check if the refresh Token is valid
+		// Check if the refresh Token is valid
 		Iterator<?> it = ((Map<String, Object>) refreshToken.get("ticket")).entrySet().iterator();
 		Boolean validity = false;
 		String masterLoginId = null;
@@ -151,50 +152,48 @@ public class SecurityController {
 			it.remove();
 		}
 		if (!validity) {
+			throw new ServletException("Token has expired. Please re-login.");
+		} else {
+
+			logger.info("Ticket will be created..");
+			logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
+
+			Ticket ticket = null;
+			User user = null;
+			TicketHelper tHelper = new TicketHelper(userRepository);
+			ticket = new Ticket();
+			ticket.setMasterLoginId(masterLoginId);
+			ticket.setValid(false);
+			RefreshToken newRToken = null;
 			try {
-				throw new ServletException("Token has expired. Please re-login.");
-			} catch (ServletException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				user = new User();
+				user.setMasterLoginId(masterLoginId);
+				user.setValidMins((nSSOProperties.getValidityMins() != null
+						? Long.parseLong(nSSOProperties.getValidityMins()) : 60));
+				ticket = tHelper.createTicket(user, false);
+				newRToken = new RefreshToken();
+				newRToken.setValid(true);
+				newRToken.setMasterLoginId(masterLoginId);
+				newRToken
+						.setValidUpto(System.currentTimeMillis() + (nSSOProperties.getRefreshTokenValidityMins() != null
+								? Long.parseLong(nSSOProperties.getRefreshTokenValidityMins()) : 1440) * 60 * 1000);
+			} catch (DataAccessException de) {
+				logger.error("Exception occured creating ticket ", de, null);
+				ticket.setValidityReason("Database error. Please contact server Administrator.");
+				ticket.setError(de.getMessage());
+				return new LoginResponse(Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket)
+						.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
+			} catch (Exception e) {
+				logger.error("Exception occured creating ticket ", e, null);
+				return null;
 			}
-		}
-		
-		
-		logger.info("Ticket will be created..");
-		logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
 
-		Ticket ticket = null;
-		User user = null;
-		TicketHelper tHelper = new TicketHelper(userRepository);
-		ticket = new Ticket();
-		ticket.setMasterLoginId(masterLoginId);
-		ticket.setValid(false);
-		RefreshToken newRToken = null;
-		try {
-			user = new User();
-			user.setMasterLoginId(masterLoginId);
-			user.setValidMins((nSSOProperties.getValidityMins() != null
-							? Long.parseLong(nSSOProperties.getValidityMins()) : 60));
-			ticket = tHelper.createTicket(user, false);				
-			newRToken = new RefreshToken();
-			newRToken.setValid(true);
-			newRToken.setMasterLoginId(masterLoginId);
-			newRToken.setValidUpto(System.currentTimeMillis() +(nSSOProperties.getRefreshTokenValidityMins() != null
-							? Long.parseLong(nSSOProperties.getRefreshTokenValidityMins()) : 1440) * 60 * 1000);			
-		} catch (DataAccessException de) {
-			logger.error("Exception occured creating ticket ", de, null);
-			ticket.setValidityReason("Database error. Please contact server Administrator.");
-			ticket.setError(de.getMessage());
-			return new LoginResponse(Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket)
-					.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
-		} catch (Exception e) {
-			logger.error("Exception occured creating ticket ", e, null);
-			return null;
+			return new LoginResponse(
+					Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket).setIssuedAt(new Date())
+							.signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact(),
+					Jwts.builder().setSubject(masterLoginId).claim("ticket", newRToken).setIssuedAt(new Date())
+							.signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
 		}
-
-		return new LoginResponse(Jwts.builder().setSubject(masterLoginId).claim("ticket", ticket)
-				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact(),Jwts.builder().setSubject(masterLoginId).claim("ticket", newRToken)
-				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
 	}
 
 	@RequestMapping(value = "/getDefaults", method = RequestMethod.POST)
@@ -558,7 +557,7 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/analysis/createAnalysis", method = RequestMethod.POST)
-	public Valid createAnalysis(@RequestBody Analysis analysis) {
+	public Valid createAnalysis(@RequestBody AnalysisSummary analysis) {
 		Valid valid = new Valid();
 		try {
 			if (!analysis.getAnalysisName().isEmpty() && analysis.getAnalysisId() != null
@@ -594,7 +593,7 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/analysis/update", method = RequestMethod.POST)
-	public Valid updateAnalysis(@RequestBody Analysis analysis) {
+	public Valid updateAnalysis(@RequestBody AnalysisSummary analysis) {
 		Valid valid = new Valid();
 		try {
 			if (!analysis.getAnalysisName().isEmpty() && analysis.getAnalysisId() != null
@@ -630,7 +629,7 @@ public class SecurityController {
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/analysis/delete", method = RequestMethod.POST)
-	public Valid deleteAnalysis(@RequestBody Analysis analysis) {
+	public Valid deleteAnalysis(@RequestBody AnalysisSummary analysis) {
 		Valid valid = new Valid();
 		try {
 			if (analysis.getAnalysisId() != null) {
