@@ -12,10 +12,12 @@ import {PriceRangeFilterComponent} from './components/price-range-filter/price-r
 import {RadioFilterComponent} from './components/radio-filter/radio-filter.component';
 import {TimeRangeFilterComponent} from './components/time-range-filter/time-range-filter.component';
 import {FilterGroupComponent} from './components/filter-group/filter-group.component';
-
+import {CommonModule} from '../../common';
 export const ObserveModule = 'ObserveModule';
 
-angular.module(ObserveModule, [])
+angular.module(ObserveModule, [
+  CommonModule
+])
   .config(routesConfig)
   .config(i18nConfig)
   .factory('ObserveService', ObserveService)

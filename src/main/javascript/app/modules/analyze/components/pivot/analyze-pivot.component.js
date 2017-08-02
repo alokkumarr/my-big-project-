@@ -36,9 +36,9 @@ export const AnalyzePivotComponent = {
     mode: '@?'
   },
   controller: class AnalyzePivotController extends AbstractDesignerComponentController {
-    constructor($timeout, PivotService, AnalyzeService, FilterService, $mdSidenav, toastMessage, $translate) {
+    constructor($timeout, PivotService, AnalyzeService, FilterService, $mdSidenav, toastMessage, $translate, $injector) {
       'ngInject';
-      super();
+      super($injector);
       this._$mdSidenav = $mdSidenav;
       this._PivotService = PivotService;
       this._$timeout = $timeout;
