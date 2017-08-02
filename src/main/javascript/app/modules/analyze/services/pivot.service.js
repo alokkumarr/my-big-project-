@@ -29,10 +29,7 @@ export function PivotService() {
   'ngInject';
 
   return {
-    putSettingsDataInFields,
     getArea,
-    getFrontend2BackendFieldMapper,
-    getBackend2FrontendFieldMapper,
     takeOutKeywordFromArtifactColumns,
     artifactColumns2PivotFields,
     parseData
@@ -60,18 +57,6 @@ export function PivotService() {
     );
   }
 
-  function getFrontend2BackendFieldMapper() {
-    return fpMap(
-      fpPipe(
-        fpMapKeys(key => {
-          const newKey = FRONT_2_BACK_PIVOT_FIELD_PAIRS[key];
-          return newKey || key;
-        }),
-        fpOmit(['_initProperties', 'selector', 'dataType'])
-      )
-    );
-  }
-
   function takeOutKeywordFromArtifactColumns(artifactColumns) {
     forEach(artifactColumns, artifactColumn => {
       if (artifactColumn.columnName && artifactColumn.type === 'string') {
@@ -82,39 +67,6 @@ export function PivotService() {
       }
     });
     return artifactColumns;
-  }
-
-  function getBackend2FrontendFieldMapper() {
-    return fpPipe(
-      fpMap(bEField => {
-        switch (bEField.type) {
-          case 'int':
-          case 'double':
-          case 'long':
-            bEField.dataType = 'number';
-            break;
-          default:
-            bEField.dataType = bEField.type;
-        }
-        return bEField;
-      }),
-      fpMap(fpMapKeys(key => {
-        const newKey = BACK_2_FRONT_PIVOT_FIELD_PAIRS[key];
-        return newKey || key;
-      }))
-    );
-  }
-
-  function putSettingsDataInFields(settings, fields) {
-    forEach(fields, field => {
-      const area = this.getArea(field.dataField);
-      const targetField = find(settings[area], ({dataField}) => {
-        return dataField === field.dataField;
-      });
-      field.area = targetField.area;
-      field.summaryType = targetField.summaryType;
-      field.checked = targetField.checked;
-    });
   }
 
   function getArea(key) {
