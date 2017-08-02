@@ -17,6 +17,9 @@ public class NSSOProperties {
 
 	@Value("${ticket.validity.mins}")
 	private String validityMins;
+	
+	@Value("${ticket.rToken.validity.mins}")
+	private String refreshTokenValidityMins;
 
 	@Value("${mail.host}")
 	private String mailHost;
@@ -41,6 +44,14 @@ public class NSSOProperties {
 	
 	
 	
+	public String getRefreshTokenValidityMins() {
+		return refreshTokenValidityMins;
+	}
+
+	public void setRefreshTokenValidityMins(String refreshTokenValidityMins) {
+		this.refreshTokenValidityMins = refreshTokenValidityMins;
+	}
+
 	/**
 	 * @return the validityMins
 	 */

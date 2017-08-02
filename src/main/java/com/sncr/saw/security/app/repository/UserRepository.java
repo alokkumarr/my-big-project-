@@ -14,16 +14,14 @@ import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
-import com.sncr.saw.security.common.bean.repo.analysis.Analysis;
+import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 
 public interface UserRepository {
 	void insertTicketDetails(Ticket ticket) throws Exception;
 	boolean[] authenticateUser(String masterLoginId, String password);
 	void prepareTicketDetails(User user, Boolean onlyDef);
-	void invalidateTicket(String ticketId, String validityMessage);
-	String verifyUserCredentials(String masterLoginId, String eMail,
-			String firstName);
+	void invalidateTicket(String ticketId, String validityMessage);	
 	String updateUserPass(String masterLoginId, String newPassEncrp);
 	Ticket getTicketDetails(String ticketId);
 	String changePassword(String loginId, String newPass, String oldPass);
@@ -32,9 +30,9 @@ public interface UserRepository {
 	void insertResetPasswordDtls(String userId, String randomHash,
 			Long createdTime, long validUpto);
 	ResetValid validateResetPasswordDtls(String randomHash);
-	boolean createAnalysis (Analysis analysis);
-	boolean updateAnalysis(Analysis analysis);
-	boolean deleteAnalysis(Analysis analysis);
+	boolean createAnalysis (AnalysisSummary analysis);
+	boolean updateAnalysis(AnalysisSummary analysis);
+	boolean deleteAnalysis(AnalysisSummary analysis);
 	AnalysisSummaryList getAnalysisByFeatureID (Long featureId);
 	List<User> getUsers(Long customerId);
 	Valid addUser(User user);
