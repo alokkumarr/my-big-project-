@@ -25,9 +25,14 @@ export function interceptor($httpProvider) {
       responseError: error => {
         // need to use injetor because using the toastr service
         // causes a circular dependency with $http
+        const $q = $injector.get('$q');
+
+        if (get(error, 'config._hideError', false) === true) {
+          return $q.reject(error);
+        }
+
         const generalErrorMsgKey = 'ERROR_OOPS_SERVER';
         const toastMessage = $injector.get('toastMessage');
-        const $q = $injector.get('$q');
         const $mdDialog = $injector.get('$mdDialog');
         const $translate = $injector.get('$translate');
         const ErrorDetail = $injector.get('ErrorDetail');
@@ -57,10 +62,15 @@ export function interceptor($httpProvider) {
         const userService = $injector.get('UserService');
         const refreshRegexp = new RegExp(userService.refreshTokenEndpoint);
 
-        if (!/token has expired/i.test(errorMessage) ||
-            refreshRegexp.test(get(response, 'config.url', ''))) {
+        if (!/token has expired/i.test(errorMessage)) {
           return $q.reject(response);
         }
+
+        if (refreshRegexp.test(get(response, 'config.url', ''))) {
+          response.config._hideError = true;
+          return $q.reject(response);
+        }
+
         var deferred = $q.defer();
 
         if (!refreshRequest) {
