@@ -139,3 +139,29 @@ export const columnChartGrouped = {
   ],
   sorts: []
 };
+
+export const pivot = {
+  booleanCriteria: 'AND',
+  filters: [],
+  sorts: [],
+  rowFields: [
+    {
+      type: 'string',
+      columnName: 'ACCOUNT_NAME'
+    }
+  ],
+  columnFields: [
+    {
+      type: 'string',
+      columnName: 'OPP_ADVISORY_NAME'
+    }
+  ],
+  dataFields: [
+    {
+      type: 'double',
+      columnName: 'OPP_ACV_ACTUAL',
+      aggregate: 'sum',
+      name: 'OPP_ACV_ACTUAL'
+    }
+  ]
+};
