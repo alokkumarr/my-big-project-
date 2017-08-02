@@ -4,7 +4,6 @@ import {AnalyzeModule} from '../../../main/javascript/app/modules/analyze';
 import {data} from './pivotData';
 import {pivot as pivotSqlBuilder} from './sqlBuilder';
 import {artifacts} from './artifacts';
-import {NUMBER_TYPES} from '../../../main/javascript/app/modules/analyze/consts';
 const artifactColumns = artifacts[0].columns;
 
 describe('PivotService', () => {
@@ -38,21 +37,24 @@ describe('PivotService', () => {
     it('Transforms artifact columns to pivotFields', () => {
       const pivotFields = PivotService.artifactColumns2PivotFields()(artifactColumns);
       const elem = pivotFields[0];
-      console.log('fields: ', pivotFields);
       expect(pivotFields).to.be.an('array');
       expect(elem).to.be.an('object');
       expect(elem).to.have.property('dataType');
       expect(elem).to.have.property('caption');
       expect(elem).to.have.property('dataField');
-      const numberElem = find(pivotFields, field => NUMBER_TYPES.includes(field.datatType));
-      if (numberElem) {
-        expect(numberElem).toBe.have.property('summaryType');
-        expect(numberElem).toBe.have.property('format');
-      }
-
+      const numberElem = find(pivotFields, field => field.dataType === 'number');
+      expect(numberElem).to.have.property('summaryType');
+      expect(numberElem).to.have.property('format');
     });
   });
 
+  describe('takeOutKeywordFromArtifactColumns(artifactColumns)', () => {
+    it('takes out the ".keyword" suffix form the solumnNames of columns of type string', () => {
+      const result = PivotService.takeOutKeywordFromArtifactColumns(artifactColumns);
+      const stringElem = find(result, field => field.type === 'string');
+      expect(stringElem.columnName).to.not.include('.keyword');
+    });
+  });
 });
 
 function elemContainsFields(fields, elem) {
