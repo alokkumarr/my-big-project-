@@ -20,9 +20,8 @@ export function runConfig($rootScope, $state, $location, $window, JwtService, Id
   $transitions.onStart({}, trans => {
     const toState = trans.to().name;
     const token = JwtService.getTokenObj();
-    const currentTime = Date.now();
     /* If no token present, send to login */
-    if (!startsWith(toState, 'login') && (!token || token.ticket.validUpto < currentTime)) {
+    if (!startsWith(toState, 'login') && !token) {
       $window.location.assign('./login.html');
       return false; // this technically doesn't matter, since we're changing the location itself, still...
     }
