@@ -31,6 +31,7 @@ module.exports = function (config) {
       require('karma-webpack')
     ],
     preprocessors: {
+      'main/javascript/app/**/*.js': ['coverage'],
       'test/javascript/specs/**/*.spec.js': ['webpack']
     },
     webpack: require('./webpack.test'),
