@@ -1877,8 +1877,8 @@ public class UserRepositoryImpl implements UserRepository {
 		return privExists;
 	}
 	
-	@Override
-	public PrivilegeDetails fetchIfPrivExists(Long roleId, Long custProdModFeatureId) {
+
+	private PrivilegeDetails fetchIfPrivExists(Long roleId, Long custProdModFeatureId) {
 		PrivilegeDetails priv = null;
 		String sql1 = "SELECT PRIVILEGE_CODE, PRIVILEGE_DESC FROM PRIVILEGES " + " WHERE ROLE_SYS_ID = ? AND CUST_PROD_MOD_FEATURE_SYS_ID =?";
 		try {
@@ -2524,8 +2524,7 @@ public class UserRepositoryImpl implements UserRepository {
 		}
 	}
 	
-	@Override
-	public boolean checkIfSubCatExists(CategoryDetails category) {
+	private boolean checkIfSubCatExists(CategoryDetails category) {
 		Boolean catExists;
 		String sql1 = "SELECT * FROM CUSTOMER_PRODUCT_MODULE_FEATURES "
 				+ " WHERE FEATURE_TYPE = ? ";
