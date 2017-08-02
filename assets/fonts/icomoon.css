@@ -294,10 +294,6 @@
   content: "\e937";
 }
 
-.icon-export:before {
-  content: url(../svg/export.svg);
-}
-
 .icon-question-mark:before {
   content: "?";
   font-size: 18px;
@@ -324,4 +320,20 @@
 .icon-number-type:before {
   content: '123';
   font-weight: bolder;
+}
+
+.icon-chart-bubble:before {
+  content: '\e93c';
+}
+
+.icon-chart-line:before{
+  content:'\e93d';
+}
+
+.icon-chart-scatter:before{
+  content: '\e93e';
+}
+
+.icon-export:before{
+  content: '\e93f';
 }

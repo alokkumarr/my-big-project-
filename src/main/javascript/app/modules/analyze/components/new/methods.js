@@ -36,17 +36,17 @@ const methods = [
       },
       {
         label: 'Line Chart',
-        icon: {svg: 'assets/svg/chart-line-icon.svg'},
+        icon: {font: 'icon-chart-line'},
         type: 'chart:line'
       },
       {
         label: 'Scatter Plot',
-        icon: {svg: 'assets/svg/chart-scatter-icon.svg'},
+        icon: {font: 'icon-chart-scatter'},
         type: 'chart:scatter'
       },
       {
         label: 'Bubble Chart',
-        icon: {svg: 'assets/svg/chart-bubble-icon.svg'},
+        icon: {font: 'icon-chart-bubble'},
         type: 'chart:bubble'
       }
     ]
