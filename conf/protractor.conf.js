@@ -2,7 +2,7 @@ const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
 
 const windowsPath = '../node_modules/chromedriver/lib/chromedriver/chromedriver.exe';
-const unixPath = '../node_modules/protractor/bin/chromedriver';
+const unixPath = '../node_modules/protractor/node_modules/webdriver-manager/selenium/chromedriver_2.31';
 const chromedriverPath = process.platform === 'win32' ? windowsPath : unixPath;
 
 exports.config = {
