@@ -55,6 +55,10 @@ export function FilterService($q, $mdDialog) {
   }
 
   function isFilterEmpty(filter) {
+    if (!filter) {
+      return true;
+    }
+
     const filterType = getType(filter.type || get(filter, 'column.type', FILTER_TYPES.UNKNOWN));
 
     switch (filterType) {

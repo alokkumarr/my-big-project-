@@ -1,3 +1,5 @@
+import {NUMBER_TYPES, DATE_TYPES} from '../../common/consts.js';
+
 export const Events = {
   AnalysesRefresh: 'Analyses:Refresh'
 };
@@ -16,7 +18,6 @@ export const ENTRY_MODES = {
 
 export const LAST_ANALYSES_CATEGORY_ID = 'lastAnalysesListId';
 
-export const NUMBER_TYPES = ['int', 'integer', 'double', 'long', 'float'];
-export const DATE_TYPES = ['timestamp', 'date'];
+export {NUMBER_TYPES, DATE_TYPES};
 
 export const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;

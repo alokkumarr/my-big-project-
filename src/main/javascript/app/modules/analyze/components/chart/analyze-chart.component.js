@@ -154,14 +154,6 @@ export const AnalyzeChartComponent = {
       this.reloadChart(this.settings);
     }
 
-    getDataByQuery() {
-      return this._AnalyzeService.getDataByQuery()
-        .then(data => {
-          this.gridData = data;
-          this.filteredGridData = data;
-        });
-    }
-
     onSettingsChanged() {
       this.analysisUnSynched();
       this.startDraftMode();
