@@ -16,6 +16,7 @@ module.exports = function (config) {
     },
     port: 9876,
     files: [
+      'test/javascript/specs/polyfills.js',
       '../node_modules/angular/angular.js',
       '../node_modules/angular-mocks/angular-mocks.js',
       'test/javascript/specs/**/*.spec.js'
@@ -31,7 +32,7 @@ module.exports = function (config) {
       require('karma-webpack')
     ],
     preprocessors: {
-      'main/javascript/app/**/*.js': ['coverage'],
+      'test/javascript/specs/polyfills.js': ['webpack'],
       'test/javascript/specs/**/*.spec.js': ['webpack']
     },
     webpack: require('./webpack.test'),

@@ -35,8 +35,7 @@ export const AnalyzePivotDetailComponent = {
     }
 
     updatePivot() {
-      this.deNormalizedData = this._PivotService.denormalizeData(this.normalizedData, this.fields);
-      this.deNormalizedData = this._PivotService.takeOutKeywordFromData(this.deNormalizedData);
+      this.deNormalizedData = this._PivotService.parseData(this.normalizedData, this.analysis.sqlBuilder);
       this.dataSource.store = this.deNormalizedData;
       this.dataSource = new PivotGridDataSource({store: this.dataSource.store, fields: this.fields});
       this.pivotGridUpdater.next({
