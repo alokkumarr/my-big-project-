@@ -4,7 +4,7 @@ import find from 'lodash/find';
 import template from './analyze-save-dialog.component.html';
 import style from './analyze-save-dialog.component.scss';
 
-import {Events} from '../../consts';
+import {Events, PRIVILEGES} from '../../consts';
 
 export const AnalyzeSaveDialogComponent = {
   template,
@@ -25,7 +25,7 @@ export const AnalyzeSaveDialogComponent = {
     }
 
     $onInit() {
-      this._AnalyzeService.getCategories()
+      this._AnalyzeService.getCategories(PRIVILEGES.CREATE)
         .then(response => {
           this.dataHolder = response;
           this.setDefaultCategory();

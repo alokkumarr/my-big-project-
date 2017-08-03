@@ -6,7 +6,9 @@ import trim from 'lodash/trim';
 import fpSortBy from 'lodash/fp/sortBy';
 import fpGet from 'lodash/fp/get';
 import find from 'lodash/find';
+import filter from 'lodash/filter';
 import flatMap from 'lodash/flatMap';
+import cloneDeep from 'lodash/cloneDeep';
 
 const EXECUTION_MODES = {
   PREVIEW: 'preview',
@@ -201,8 +203,20 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     return $http.post(`${url}/analysis`, payload);
   }
 
-  function getCategories() {
-    return _menu;
+  function getCategories(privilege) {
+    if (!privilege) {
+      return _menu;
+    }
+
+    return _menu.then(menu => {
+      const menuClone = cloneDeep(menu);
+      forEach(menuClone, menuFeature => {
+        menuFeature.children = filter(menuFeature.children, menuSubFeature => {
+          return JwtService.hasPrivilege(privilege, {subCategoryId: menuSubFeature.id});
+        });
+      });
+      return menuClone;
+    });
   }
 
   function getCategory(id) {
