@@ -1,0 +1,71 @@
+<category-dialog control="$ctrl" class="edit-category-dialog"> <category-dialog-header>
+<div layout="row">
+  <div class="md-title" translate="EDIT_CATEGORY"></div>
+</div>
+</category-dialog-header> <category-dialog-content>
+<div layout="column">
+<form name="editCategoryForm" method="post">
+  <md-input-container flex class="padding-for-container"> <label
+		translate="CATEGORY_PROD_LABEL"></label> <md-select
+		ng-model="$ctrl.editCategory.productId" required
+		ng-change="$ctrl.getModules($ctrl.editCategory.productId, 1)"> <md-option
+		ng-repeat="product in $ctrl.productsList" ng-value="product.productId"
+		ng-bind="::product.productName"></md-option> </md-select> </md-input-container>
+  <md-input-container flex class="padding-for-container"> <label
+		translate="CATEGORY_MODL_LABEL"></label> <md-select
+		ng-model="$ctrl.editCategory.moduleId" required> <md-option
+		ng-repeat="module in $ctrl.modulesList" ng-value="module.moduleId"
+		ng-bind="::module.moduleName"></md-option> </md-select> </md-input-container>
+  <md-input-container flex> <label
+		translate="CATEGORY_NAME_LABEL"></label> <input name="categoryName"
+		ng-model="$ctrl.newCategoryName" ng-readonly="$ctrl.newCategoryName.toUpperCase() == 'MY ANALYSIS'"
+		ng-pattern="/^[a-zA-Z\s]*$/"
+		required/> </md-input-container>
+  <md-input-container flex> <label
+		translate="CATEGORY_DESC_LABEL"></label> <input name="categoryDesc"
+		ng-model="$ctrl.editCategory.categoryDesc"/> </md-input-container>
+  <md-input-container flex  class="padding-for-container"> <label
+		translate="CATEGORY_ACTIVE_LABEL"></label> <md-select
+		ng-model="$ctrl.editCategory.activeStatusInd" required> <md-option
+		ng-repeat="status in $ctrl.statuses" ng-value="status.ind"
+		ng-bind="::status.name"></md-option> </md-select> </md-input-container>
+  <md-input-container ng-if="$ctrl.subCategoryFlag" flex  class="padding-for-container">
+    <sub-category-label translate="SUB_CATEGORY_NAME_HEADER"></sub-category-label>
+  </md-input-container>
+  <div ng-if="$ctrl.subCategoryFlag" class="sub-categories-list">
+  <md-input-container flex class="padding-for-container">
+    <div ng-repeat="subCategory in $ctrl.editCategory.subCategories">
+      <md-button class="btn-card " aria-label="Edit" 
+            ng-disabled="editCategoryForm.subCategoryName.$invalid || editCategoryForm.subCategoryDesc.$invalid"
+            ng-click="$ctrl.changeSelectedSubCategory(subCategory)">
+            {{subCategory.subCategoryName}}
+          <md-tooltip ng-bind="subCategory.subCategoryName | translate"></md-tooltip>
+        </md-button>
+    </div>
+  </md-input-container>
+  </div>
+  <div ng-if="$ctrl.subCategoryFlag" class="sub-category-body">
+  <md-input-container flex> <label
+		translate="SUB_CATEGORY_NAME_LABEL"></label> <input name="subCategoryName"
+		ng-model="$ctrl.selectedSubCategory.subCategoryName" 
+		ng-pattern="/^[a-zA-Z\s]*$/"
+		required/> </md-input-container>
+  <md-input-container flex> <label
+		translate="SUB_CATEGORY_DESC_LABEL"></label> <input name="subCategoryDesc"
+		ng-model="$ctrl.selectedSubCategory.subCategoryDesc"/> </md-input-container>
+  <md-input-container flex  class="padding-for-container"> <label
+		translate="CATEGORY_ACTIVE_LABEL"></label> <md-select 
+		ng-model="$ctrl.selectedSubCategory.activestatusInd" required> <md-option
+		ng-repeat="status in $ctrl.statuses" ng-value="status.ind"
+		ng-bind="::status.name"></md-option> </md-select> </md-input-container>
+  </div>
+  <div class="layout-row category-buttons-group">
+    <md-button class="btn-primary" ng-disabled="editCategoryForm.$invalid"
+      ng-click="$ctrl.updateCategory()"
+		translate="UPDATE_CATEGORY"> </md-button>
+    <md-button class="btn-card button-pull-right" ng-click="$ctrl.$dialog.hide()"
+		translate="CANCEL"> </md-button>
+  </div>
+</form>
+</div>
+</category-dialog-content> </category-dialog>

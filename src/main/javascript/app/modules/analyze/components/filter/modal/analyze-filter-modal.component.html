@@ -1,0 +1,80 @@
+<analyze-dialog control="$ctrl" class="analyze-filters">
+  <analyze-dialog-header layout="row" layout-align="space-between center" flex="grow">
+    <strong translate="FILTERS"></strong>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content layout="column">
+    <md-list ng-repeat="artifact in $ctrl.artifacts track by artifact.artifactName">
+      <md-subheader class="md-no-sticky">{{artifact.artifactName}}</md-subheader>
+      <md-divider style="padding-bottom: 10px"></md-divider>
+      <md-list-item ng-repeat="filter in $ctrl.filters[artifact.artifactName] track by $index"
+                    class="md-no-proxy"
+                    layout="row"
+                    layout-align="space-between start">
+        <analyze-filter-row filter="filter"
+                            runtime="$ctrl.isRuntime"
+                            on-change="$ctrl.onFilterChange(filter, artifact.artifactName, $index)"
+                            artifact="artifact"
+                            style="padding-right: 10px;">
+        </analyze-filter-row>
+
+        <md-checkbox class="md-secondary"
+                     ng-hide="::$ctrl.isRuntime"
+                     ng-disabled="!filter.column.filterEligible"
+                     ng-model="filter.isRuntimeFilter"
+                     ng-change="$ctrl.onRuntimeToggle(filter)">
+          <span translate="PROMPT"></span>
+        </md-checkbox>
+
+        <md-button class="md-icon-button md-secondary"
+                   ng-hide="::$ctrl.isRuntime"
+                   aria-label="Remove"
+                   ng-click="$ctrl.onRemoveFilter($index, artifact.artifactName)">
+          <md-icon md-font-icon="icon-close"></md-icon>
+        </md-button>
+
+      </md-list-item>
+      <md-list-item ng-hide="::$ctrl.isRuntime">
+        <md-button class="md-icon-button"
+                    aria-label="Add Filter"
+                    ng-click="$ctrl.addFilter(artifact.artifactName)">
+          <md-icon md-font-icon="icon-plus"></md-icon>
+        </md-button>
+      </md-list-item>
+      <md-divider></md-divider>
+    </md-list>
+  </analyze-dialog-content>
+
+  <analyze-dialog-footer>
+    <div layout="column" layout-align="start">
+      <div layout="row"
+           ng-hide="::$ctrl.isRuntime"
+           layout-align="start center"
+           style="padding-bottom:10px;">
+        <md-select ng-model="$ctrl.filterBooleanCriteria"
+                   style="width: 92px;"
+                   md-container-class="select-container-class">
+          <md-option ng-repeat="booleanCriteria in $ctrl.BOOLEAN_CRITERIA"
+                    ng-value="booleanCriteria.value">
+            {{::booleanCriteria.label}}
+          </md-option>
+        </md-select>
+        <span style="padding-left: 10px;"
+              translate="OF_THE_FILTERS_ARE_TRUE"></span>
+      </div>
+
+      <div layout="row" layout-align="start center">
+        <md-button class="btn-primary"
+                   ng-click="$ctrl.onApplyFilters()"
+                   translate="APPLY_FILTERS">
+        </md-button>
+
+        <md-button class="btn-card"
+                   style="margin-left: 30px;"
+                   ng-click="$ctrl.$dialog.hide()"
+                   translate="CANCEL">
+        </md-button>
+      </div>
+    </div>
+  </analyze-dialog-footer>
+</analyze-dialog>

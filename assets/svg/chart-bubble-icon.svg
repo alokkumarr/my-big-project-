@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="48px" height="48px" viewBox="0 0 80 80" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 45 (43475) - http://www.bohemiancoding.com/sketch -->
+    <title>Bubble-Icon</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Global-Filters" stroke="none" stroke-width="1" fill-rule="evenodd">
+        <g id="Bubble-Icon">
+            <g id="Group-19">
+                <rect id="Rectangle-19" x="0" y="76" width="80" height="4" rx="2"></rect>
+                <rect id="Rectangle-19-Copy-3" x="0" y="0" width="4" height="80" rx="2"></rect>
+            </g>
+            <g id="Group" transform="translate(10.000000, 12.000000)" fill-opacity="0.824671649">
+                <ellipse id="Oval-6-Copy-14" cx="42.8225561" cy="42.9686688" rx="10.8123397" ry="10.9584524"></ellipse>
+                <ellipse id="Oval-6-Copy-10" cx="17.214383" cy="28.0305678" rx="10.8123397" ry="10.9584524"></ellipse>
+                <ellipse id="Oval-6-Copy-12" cx="9.10512821" cy="41.2383868" rx="9.10512821" ry="9.22817048"></ellipse>
+                <ellipse id="Oval-6-Copy-6" cx="32.152484" cy="6.63274753" rx="6.5443109" ry="6.63274753"></ellipse>
+                <ellipse id="Oval-6-Copy-9" cx="42.8225561" cy="6.63274753" rx="5.26390224" ry="5.33503606"></ellipse>
+                <ellipse id="Oval-6-Copy-7" cx="32.152484" cy="23.7048629" rx="6.5443109" ry="6.63274753"></ellipse>
+                <ellipse id="Oval-6-Copy-8" cx="59.7524038" cy="38.4699357" rx="4.26802885" ry="4.32570491"></ellipse>
+                <ellipse id="Oval-6-Copy-13" cx="54.7730369" cy="42.0458517" rx="5.69070513" ry="5.76760655"></ellipse>
+            </g>
+        </g>
+    </g>
+</svg>

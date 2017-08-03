@@ -21,6 +21,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const WebpackBuildVersion = require('./webpack.version');
 
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
 module.exports = function (env) {
   const isDevelopment = env === 'development';
   const isProduction = env === 'production';
@@ -45,7 +47,7 @@ module.exports = function (env) {
       sourceMapFilename: isDevelopment ? '[file].map' : ''
     },
 
-    devtool: isDevelopment ? 'eval-source-map' : false,
+    devtool: isDevelopment ? 'source-map' : false,
 
     resolve: {
       modules: [MODULE_DIR, webpackHelper.root('src/main/javascript')],
@@ -141,6 +143,9 @@ module.exports = function (env) {
         configFile: webpackHelper.root('.stylelintrc')
       }),
       new ExtractTextPlugin('css/[name].css')
+      // new BundleAnalyzerPlugin({
+      //   generateStatsFile: true
+      // })
     ]
   };
 
@@ -171,21 +176,13 @@ module.exports = function (env) {
   }
 
   if (isProduction) {
+    const commonVendorKeys = ['angular', 'angular-material', 'jquery', 'angular-ui-router', 'angular-translate'];
     const pkg = require(webpackHelper.root('package.json'));
 
-    const vendorKeys = Object.keys(pkg.dependencies).map(key => {
-      // devextreme has no index.js or a main set in package.json, so we have to manually select the main file
-      if (key === 'devextreme') {
-        return path.join(key, 'ui', 'data_grid');
-      }
+    const appChunks = ['commonVendor', 'app'];
+    const loginChunks = ['commonVendor', 'login'];
 
-      return key;
-    });
-
-    const appChunks = ['vendor', 'app'];
-    const loginChunks = ['vendor', 'login'];
-
-    conf.entry.vendor = vendorKeys;
+    conf.entry.commonVendor = commonVendorKeys;
 
     conf.plugins.push(new CleanWebpackPlugin([BUILD_DIR], {
       root: webpackHelper.root(),
@@ -211,7 +208,7 @@ module.exports = function (env) {
     }));
 
     conf.plugins.push(new CommonsChunkPlugin({
-      names: ['vendor'],
+      names: ['commonVendor'],
       minChunks: Infinity
     }));
 

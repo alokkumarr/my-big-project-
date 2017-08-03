@@ -1,0 +1,43 @@
+<role-dialog control="$ctrl" class="new-role-dialog"> <role-dialog-header>
+<div layout="row">
+  <div class="md-title" translate="NEW_ROLE"></div>
+</div>
+</role-dialog-header> <role-dialog-content>
+<div layout="column">
+<form name="newRoleForm" method="post">
+  <md-input-container flex> <label
+		translate="ROLE_NAME_LABEL"></label> <input name="roleName"
+		ng-model="$ctrl.role.roleName" 
+		ng-pattern="/^[a-zA-Z\s]*$/"
+		required/> </md-input-container>
+  <md-input-container flex> <label
+		translate="ROLE_DESC_LABEL"></label> <input name="roleDesc"
+		ng-model="$ctrl.role.roleDesc" /> </md-input-container>
+  <md-input-container flex  class="padding-for-container"> <label
+		translate="ROLE_ACTIVE_LABEL"></label> <md-select
+		ng-model="$ctrl.role.activeStatusInd" required> <md-option
+		ng-repeat="status in $ctrl.statuses" ng-value="status.ind"
+		ng-bind="::status.name"></md-option> </md-select> </md-input-container>
+  <md-input-container flex class="padding-for-container"> <label
+		translate="ROLE_TYPE_LABEL"></label> <md-select
+		ng-model="$ctrl.role.roleType" required> <md-option
+		ng-repeat="roleType in $ctrl.roleTypes" ng-value="roleType.roleName"
+		ng-bind="::roleType.roleName"></md-option> </md-select> </md-input-container>
+  <div class="input-checkbox-container" flex> <label class="label-padding"
+		translate="ROLE_MY_ANAY_LABEL"></label> <md-checkbox type="checkbox"
+		ng-model="$ctrl.role.myAnalysis" ></md-checkbox>
+    <md-button class="md-button-icon btn-card" aria-label="popmsg" >
+            <md-tooltip ng-bind="'TOOLTIP_ROLE_ANAS_MSG' | translate"></md-tooltip>
+            <md-icon md-font-icon="icon-question-mark" class="question-icon-margin"></md-icon>
+          </md-button>
+  </div>
+  <div class="layout-row">
+    <md-button class="btn-primary" ng-disabled="newRoleForm.$invalid"
+      ng-click="$ctrl.createRole()"
+		translate="CREATE_ROLE"> </md-button>
+    <md-button class="btn-card button-pull-right" ng-click="$ctrl.$dialog.hide()"
+		translate="CANCEL"> </md-button>
+  </div>
+</form>
+</div>
+</role-dialog-content> </role-dialog>

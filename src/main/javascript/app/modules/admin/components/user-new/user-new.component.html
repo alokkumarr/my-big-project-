@@ -1,0 +1,53 @@
+<user-dialog control="$ctrl" class="new-user-dialog"> <user-dialog-header>
+<div layout="row">
+  <div class="md-title" translate="NEW_USER"></div>
+</div>
+</user-dialog-header> <user-dialog-content>
+<div layout="column">
+<form name="newUserForm" method="post">
+  <md-input-container flex class="padding-for-container"> <label
+		translate="USER_ROLES_LABEL"></label> <md-select
+		ng-model="$ctrl.user.roleId" required> <md-option
+		ng-repeat="role in $ctrl.roles" ng-value="role.roleId"
+		ng-bind="::role.roleName"></md-option> </md-select> </md-input-container>
+  <md-input-container flex> <label
+		translate="USER_FIRST_NAME_LABEL"></label> <input name="firstName"
+		ng-model="$ctrl.user.firstName" 
+		ng-pattern="/^[a-zA-Z]*$/"
+		ng-change="$ctrl.addToUserId($ctrl.user.firstName, $ctrl.user.lastName)" required/> </md-input-container>
+  <md-input-container flex> <label
+		translate="USER_MIDDLE_NAME_LABEL"></label> <input
+		ng-model="$ctrl.user.middleName"
+		ng-pattern="/^[a-zA-Z\s]*$/" /> </md-input-container>
+  <md-input-container flex> <label
+		translate="USER_LAST_NAME_LABEL"></label> <input
+		ng-model="$ctrl.user.lastName" 
+		ng-pattern="/^[a-zA-Z]*$/"
+		ng-change="$ctrl.addToUserId($ctrl.user.firstName, $ctrl.user.lastName)" required/> </md-input-container>
+  <md-input-container flex> <label
+		translate="USER_ID_LABEL"></label> <input name="masterLoginId"
+		ng-model="$ctrl.user.masterLoginId"
+		ng-pattern="/^[A-z\d_@.#$=!%^)(\]:\*;\?\/\,}{'\|<>\[&\+-`~]*$/"
+		required/> </md-input-container>
+  <md-input-container flex> <label
+		translate="USER_PASSWORD_LABEL"></label> <input type="password"
+		ng-model="$ctrl.user.password" required/> 
+  </md-input-container>
+  <md-input-container flex> <label
+		translate="USER_EMAIL_LABEL"></label> <input name="email" type="email"
+		ng-model="$ctrl.user.email"
+		required/> </md-input-container>
+  <md-input-container flex  class="padding-for-container"> <label
+		translate="USER_ACTIVE_LABEL"></label> <md-select
+		ng-model="$ctrl.user.activeStatusInd" required> <md-option
+		ng-repeat="status in $ctrl.statuses" ng-value="status.ind"
+		ng-bind="::status.name"></md-option> </md-select> </md-input-container>
+<div class="layout-row">
+  <md-button class="btn-primary" ng-disabled="newUserForm.$invalid"
+		ng-click="$ctrl.createUser()" translate="CREATE_USER"> </md-button>
+  <md-button class="btn-card button-pull-right" ng-click="$ctrl.$dialog.hide()"
+		translate="CANCEL"> </md-button>
+</div>
+</form>
+</div>
+</user-dialog-content>  </user-dialog>

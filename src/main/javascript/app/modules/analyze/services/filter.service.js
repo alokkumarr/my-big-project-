@@ -1,213 +1,121 @@
 import map from 'lodash/fp/map';
-import get from 'lodash/fp/get';
-import uniq from 'lodash/uniq';
-import transfrom from 'lodash/transform';
-import toPairs from 'lodash/fp/toPairs';
-import pipe from 'lodash/fp/pipe';
+import cloneDeep from 'lodash/cloneDeep';
+import get from 'lodash/get';
 import reduce from 'lodash/fp/reduce';
 import filter from 'lodash/fp/filter';
 import isEmpty from 'lodash/isEmpty';
-import set from 'lodash/fp/set';
+import isNumber from 'lodash/isNumber';
 import values from 'lodash/values';
-import compact from 'lodash/compact';
-import forEach from 'lodash/forEach';
 import find from 'lodash/find';
 
-import {OPERATORS} from '../components/analyze-filter-sidenav/filters/number-filter.component';
+import {OPERATORS} from '../components/filter/filters/number-filter.component';
 
-export const BOOLEAN_CRITERIA = {
-  AND: 'AND',
-  OR: 'OR'
+export const BOOLEAN_CRITERIA = [{
+  label: 'ALL',
+  value: 'AND'
+}, {
+  label: 'ANY',
+  value: 'OR'
+}];
+
+const FILTER_TYPES = {
+  STRING: 'string',
+  NUMBER: 'number',
+  DATE: 'date',
+  UNKNOWN: 'unknown'
 };
 
-export const DEFAULT_BOOLEAN_CRITERIA = BOOLEAN_CRITERIA.AND;
+export const NUMBER_TYPES = ['int', 'integer', 'double', 'long', 'float'];
 
-const EVENTS = {
-  OPEN_SIDENAV: 'OPEN_SIDENAV',
-  APPLY_FILTERS: 'APPLY_FILTERS',
-  CLEAR_ALL_FILTERS: 'CLEAR_ALL_FILTERS'
-};
+export const DEFAULT_BOOLEAN_CRITERIA = BOOLEAN_CRITERIA[0];
 
-export function FilterService($mdSidenav, $eventEmitter, $log) {
+export function FilterService($q, $mdDialog) {
   'ngInject';
 
-  const unRegisterFuncs = [];
-
   return {
-    onOpenFilterSidenav,
-    onApplyFilters,
-    onClearAllFilters,
-    offOpenFilterSidenav,
-    offApplyFilters,
-    offClearAllFilters,
-    openFilterSidenav,
-    applyFilters,
-    clearAllFilters,
     getFilterEvaluator,
     getEvaluatedFilterReducer,
-    getSelectedFilterMapper,
+    getRuntimeFilterValues,
+    isFilterEmpty,
     isFilterModelNonEmpty,
-    getCanvasFieldsToFiltersMapper,
-    getChartSetttingsToFiltersMapper,
-    getGridDataFilter,
-    getFilterClearer,
-    getFrontEnd2BackEndFilterMapper,
-    getBackEnd2FrontEndFilterMapper,
-    mergeCanvasFiltersWithPossibleFilters
+    frontend2BackendFilter,
+    backend2FrontendFilter
   };
 
-  function onOpenFilterSidenav(callback) {
-    unRegisterFuncs[EVENTS.OPEN_SIDENAV] = $eventEmitter.on(EVENTS.OPEN_SIDENAV, callback);
+  function getType(inputType) {
+    if (inputType === FILTER_TYPES.STRING) {
+      return FILTER_TYPES.STRING;
+    } else if (NUMBER_TYPES.indexOf(inputType) >= 0) {
+      return FILTER_TYPES.NUMBER;
+    } else if (inputType === FILTER_TYPES.DATE) {
+      return FILTER_TYPES.DATE;
+    }
+
+    return FILTER_TYPES.UNKNOWN;
   }
 
-  function onApplyFilters(callback) {
-    unRegisterFuncs[EVENTS.APPLY_FILTERS] = $eventEmitter.on(EVENTS.APPLY_FILTERS, callback);
+  function isFilterEmpty(filter) {
+    if (!filter) {
+      return true;
+    }
+
+    const filterType = getType(filter.type || get(filter, 'column.type', FILTER_TYPES.UNKNOWN));
+
+    switch (filterType) {
+
+      case FILTER_TYPES.STRING:
+        return isEmpty(get(filter, 'model.modelValues', []));
+
+      case FILTER_TYPES.NUMBER:
+        return isEmpty(filter.model);
+
+      case FILTER_TYPES.DATE:
+        return isEmpty(filter.model);
+
+      default:
+        return true;
+    }
   }
 
-  function onClearAllFilters(callback) {
-    unRegisterFuncs[EVENTS.CLEAR_ALL_FILTERS] = $eventEmitter.on(EVENTS.CLEAR_ALL_FILTERS, callback);
-  }
+  function frontend2BackendFilter() {
+    return frontendFilter => {
+      const column = frontendFilter.column;
 
-  function offOpenFilterSidenav() {
-    unRegisterFuncs[EVENTS.OPEN_SIDENAV]();
-  }
-
-  function offApplyFilters() {
-    unRegisterFuncs[EVENTS.APPLY_FILTERS]();
-  }
-
-  function offClearAllFilters() {
-    unRegisterFuncs[EVENTS.CLEAR_ALL_FILTERS]();
-  }
-
-  function openFilterSidenav(payload, sidenavId) {
-    $eventEmitter.emit(EVENTS.OPEN_SIDENAV, payload);
-    $mdSidenav(sidenavId).open();
-  }
-
-  function applyFilters(payload, sidenavId) {
-    $eventEmitter.emit(EVENTS.APPLY_FILTERS, payload);
-    $mdSidenav(sidenavId).close();
-  }
-
-  function clearAllFilters(sidenavId) {
-    $eventEmitter.emit(EVENTS.CLEAR_ALL_FILTERS);
-    $mdSidenav(sidenavId).close();
-  }
-
-  /* eslint-disable camelcase */
-  function getFrontEnd2BackEndFilterMapper() {
-    return frontEndFilter => {
-      const backEndFilter = {
-        column_name: frontEndFilter.name,
-        label: frontEndFilter.label,
-        table_name: frontEndFilter.tableName,
-        boolean_criteria: frontEndFilter.booleanCriteria,
-        filter_type: frontEndFilter.type
+      const result = {
+        type: column.type,
+        tableName: column.table,
+        columnName: column.columnName,
+        isRuntimeFilter: frontendFilter.isRuntimeFilter
       };
 
-      if (frontEndFilter.type === 'int' || frontEndFilter.type === 'double') {
-        backEndFilter.operator = frontEndFilter.operator;
-        backEndFilter.search_conditions =
-          frontEndFilter.operator === OPERATORS.BETWEEN ?
-          [frontEndFilter.model.otherValue, frontEndFilter.model.value] :
-          [frontEndFilter.model.value];
-
-      } else if (frontEndFilter.type === 'string') {
-        backEndFilter.operator = null;
-        backEndFilter.search_conditions = pipe(
-          // transform the model object to an array of strings
-          toPairs,
-          // filter only the ones that are truthy
-          // in case someone checked and unchecked the checkbox
-          filter(get('1')),
-          // take only the string value
-          map(get('0'))
-        )(frontEndFilter.model);
+      if (!frontendFilter.isRuntimeFilter || frontendFilter.model) {
+        result.model = frontendFilter.model;
       }
 
-      return backEndFilter;
-    };
-  }
-  /* eslint-enable camelcase */
-
-  /* eslint-disable camelcase */
-  function getBackEnd2FrontEndFilterMapper() {
-    return backEndFilter => {
-      const frontEndFilter = {
-        name: backEndFilter.column_name,
-        label: backEndFilter.label,
-        tableName: backEndFilter.table_name,
-        booleanCriteria: backEndFilter.boolean_criteria,
-        type: backEndFilter.filter_type
-      };
-
-      if (backEndFilter.filter_type === 'int' || backEndFilter.filter_type === 'double') {
-        frontEndFilter.operator = backEndFilter.operator;
-        frontEndFilter.model = {
-          otherValue: backEndFilter.operator === OPERATORS.BETWEEN ?
-            backEndFilter.search_conditions[0] : null,
-
-          value: backEndFilter.operator === OPERATORS.BETWEEN ?
-            backEndFilter.search_conditions[1] :
-            backEndFilter.search_conditions[0]
-        };
-      } else if (backEndFilter.filter_type === 'string') {
-        // transform a string of arrays to an object with the strings as keys
-        frontEndFilter.model = transfrom(backEndFilter.search_conditions,
-          (model, value) => {
-            model[value] = true;
-          },
-        {});
-      }
-
-      return frontEndFilter;
+      return result;
     };
   }
 
-  function getChartSetttingsToFiltersMapper(gridData) {
-    return pipe(
-      filter(get('filter_eligible')),
-      map(field => {
-        return {
-          tableName: (field.table ? field.table.name : field.tableName),
-          label: field.alias || field.displayName || field.display_name,
-          name: field.name || field.column_name,
-          type: field.type,
-          model: null,
-          booleanCriteria: DEFAULT_BOOLEAN_CRITERIA,
-          items: field.type === 'string' ? uniq(map(get(field.name || field.column_name), gridData)) : null
-        };
-      }));
-  }
-  /* eslint-enable camelcase */
+  function backend2FrontendFilter(artifacts) {
+    return backendFilter => {
+      // for some reason in th edit screen the artofactName is not present in the artifact object
+      // and the target artifact cannot be found
+      // this is a temporary solution for pivot and chart types
+      // TODO undo this modification after consulting with backend
+      const artifact = artifacts.length > 1 ?
+        find(artifacts,
+          ({artifactName}) => artifactName === backendFilter.tableName) :
+        artifacts[0];
 
-  function getCanvasFieldsToFiltersMapper(gridData) {
-    return pipe(
-      filter(get('isFilterEligible')),
-      map(field => {
-        return {
-          tableName: (field.table ? field.table.name : field.tableName),
-          label: field.alias || field.displayName,
-          name: field.name,
-          type: field.type,
-          model: null,
-          booleanCriteria: DEFAULT_BOOLEAN_CRITERIA,
-          items: field.type === 'string' ? uniq(map(get(field.name), gridData)) : null
-        };
-      }));
-  }
+      const column = find(artifact.columns,
+        ({columnName}) => columnName === backendFilter.columnName);
 
-  function getFilterClearer() {
-    return map(pipe(
-      set('model', null),
-      set('operator', null),
-      set('booleanCriteria', DEFAULT_BOOLEAN_CRITERIA)
-    ));
-  }
-
-  function getSelectedFilterMapper() {
-    return filter(filter => isFilterModelNonEmpty(filter.model));
+      return {
+        column,
+        model: backendFilter.model,
+        isRuntimeFilter: backendFilter.isRuntimeFilter
+      };
+    };
   }
 
   function isFilterModelNonEmpty(model) {
@@ -222,19 +130,10 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
     }
 
     // can be an object with null values
-    if (isEmpty(compact(values(model)))) {
+    if (isEmpty(filter(x => isNumber(x) || Boolean(x), values(model)))) {
       return false;
     }
     return true;
-  }
-
-  function getGridDataFilter(filters) {
-    return filter(row => {
-      return pipe(
-        getFilterEvaluator(row),
-        getEvaluatedFilterReducer()
-      )(filters);
-    });
   }
 
   /**
@@ -249,7 +148,10 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
           isValid = Boolean(filter.model[row[filter.name]]);
           break;
         case 'int':
+        case 'integer':
+        case 'timestamp':
         case 'double':
+        case 'long':
           isValid = Boolean(isNumberValid(row[filter.name], filter.model, filter.operator));
           break;
         default:
@@ -261,22 +163,6 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
         booleanCriteria: filter.booleanCriteria,
         value: isValid
       };
-    });
-  }
-
-  function mergeCanvasFiltersWithPossibleFilters(canvasFilters, possibleFilters) {
-    forEach(possibleFilters, possibleFilter => {
-      try {
-        const targetCanvasFilter = find(canvasFilters, canvasFilter => {
-          const tableName = canvasFilter.table ? canvasFilter.table.name : canvasFilter.tableName;
-          return possibleFilter.name === canvasFilter.name &&
-            possibleFilter.tableName === (tableName);
-        }) || {};
-
-        Object.assign(possibleFilter, targetCanvasFilter);
-      } catch (err) {
-        $log.error(err);
-      }
     });
   }
 
@@ -298,21 +184,21 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
   }
 
   function getIdentityElement(booleanCriteria) {
-    if (booleanCriteria === BOOLEAN_CRITERIA.AND) {
+    if (booleanCriteria === BOOLEAN_CRITERIA[0]) {
       return true;
     }
 
-    if (booleanCriteria === BOOLEAN_CRITERIA.OR) {
+    if (booleanCriteria === BOOLEAN_CRITERIA[1]) {
       return false;
     }
   }
 
   function evaluateBoolean(a, booleanCriteria, b) {
-    if (booleanCriteria === BOOLEAN_CRITERIA.AND) {
+    if (booleanCriteria === BOOLEAN_CRITERIA[0]) {
       return a && b;
     }
 
-    if (booleanCriteria === BOOLEAN_CRITERIA.OR) {
+    if (booleanCriteria === BOOLEAN_CRITERIA[1]) {
       return a || b;
     }
   }
@@ -323,22 +209,68 @@ export function FilterService($mdSidenav, $eventEmitter, $log) {
     const c = numberFilterModel.otherValue;
 
     switch (operator) {
-      case OPERATORS.GREATER:
+      case OPERATORS.GREATER.value:
         return a > b;
-      case OPERATORS.LESS:
+      case OPERATORS.LESS.value:
         return a < b;
-      case OPERATORS.GREATER_OR_EQUAL:
+      case OPERATORS.GREATER_OR_EQUAL.value:
         return a >= b;
-      case OPERATORS.LESS_OR_EQUAL:
+      case OPERATORS.LESS_OR_EQUAL.value:
         return a <= b;
-      case OPERATORS.NOT_EQUALS:
+      case OPERATORS.NOT_EQUALS.value:
         return a !== b;
-      case OPERATORS.EQUALS:
+      case OPERATORS.EQUALS.value:
         return a === b;
-      case OPERATORS.BETWEEN:
+      case OPERATORS.BETWEEN.value:
         return c <= a && a <= b;
       default:
         return false;
     }
+  }
+
+  function getRuntimeFiltersFrom(filters = []) {
+    return filter(f => f.isRuntimeFilter, filters);
+  }
+
+  function openRuntimeModal(analysis, filters = []) {
+    const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria" runtime="true"></analyze-filter-modal>';
+    return $mdDialog.show({
+      template: tpl,
+      controller: scope => {
+        scope.filters = map(backend2FrontendFilter(analysis.artifacts), filters);
+        scope.artifacts = analysis.artifacts;
+        scope.booleanCriteria = analysis.sqlBuilder.booleanCriteria;
+      },
+      fullscreen: true,
+      autoWrap: false,
+      multiple: true
+    }).then(onApplyFilters.bind(this)(analysis));
+  }
+
+  function onApplyFilters(analysis) {
+    return result => {
+      if (!result) {
+        return $q.reject(new Error('Cancelled'));
+      }
+
+      const filterPayload = map(frontend2BackendFilter(), result.filters);
+      analysis.sqlBuilder.filters = filterPayload.concat(
+        filter(f => !f.isRuntimeFilter, analysis.sqlBuilder.filters)
+      );
+
+      return analysis;
+    };
+  }
+
+  function getRuntimeFilterValues(analysis) {
+    const clone = cloneDeep(analysis);
+    const runtimeFilters = getRuntimeFiltersFrom(
+      get(clone, 'sqlBuilder.filters', [])
+    );
+
+    if (!runtimeFilters.length) {
+      return $q.resolve(clone);
+    }
+    return openRuntimeModal(clone, runtimeFilters);
   }
 }

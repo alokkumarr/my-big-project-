@@ -1,0 +1,24 @@
+<analyze-dialog class="analyze-pivot-preview">
+  <analyze-dialog-header>
+    <div class="arp-header" layout="row" layout-align="space-between center">
+      <div layout="row" layout-align="center center">
+        <md-button class="arp-header-close-btn"
+                   ng-click="$parent.$ctrl.cancel()">
+          <md-icon md-font-icon="icon-remove"></md-icon>
+        </md-button>
+        <div class="md-title">
+          <strong ng-bind="::$ctrl.model.pivot.name"></strong>
+        </div>
+      </div>
+      <!-- gui-cleanup-2.0 -->
+      <!--<div layout="row" layout-align="center center">
+        <md-button translate="EXPORT"></md-button>
+        <md-button class="btn-primary" translate="PUBLISH"></md-button>
+      </div>-->
+    </div>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+    <pivot-grid updater="$ctrl.pivotGridUpdater"></pivot-grid>
+  </analyze-dialog-content>
+</analyze-dialog>

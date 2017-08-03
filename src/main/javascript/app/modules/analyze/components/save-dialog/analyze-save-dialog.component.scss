@@ -1,0 +1,18 @@
+analyze-save-dialog {
+  width: 550px;
+
+  .ars-content {
+    md-select {
+      width: 250px;
+    }
+
+    input {
+      width: 450px;
+      line-height: 27px;
+    }
+
+    textarea {
+      width: 450px;
+    }
+  }
+}

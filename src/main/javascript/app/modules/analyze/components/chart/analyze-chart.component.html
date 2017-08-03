@@ -1,0 +1,113 @@
+<analyze-dialog control="$ctrl" class="analyze-chart-dialog">
+  <analyze-dialog-header>
+
+    <div layout="row">
+      <md-button class="ard_back-btn"
+                 ng-click="$ctrl.goBack()">
+        <md-icon md-font-icon="icon-arrow-left"></md-icon>
+      </md-button>
+
+      <div class="ard_meta" flex>
+        <div class="md-title">
+          <strong class="e2e-report-title" ng-bind="$ctrl.model.name"></strong>
+          <label translate="DRAFT" ng-show="$ctrl.draftMode"></label>
+        </div>
+        <div class="md-description">
+          <md-icon md-font-icon="icon-report"></md-icon>
+          <span ng-bind="::$ctrl.model.metricName"></span>
+        </div>
+      </div>
+
+      <div class="ard_actions" flex>
+        <md-button ng-click="$ctrl.openSaveChartModal($event)"
+                   translate="SAVE">
+        </md-button>
+      </div>
+    </div>
+    <md-progress-linear ng-show="$ctrl.showProgress" md-mode="indeterminate"></md-progress-linear>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+    <analyze-chart-settings
+        settings="$ctrl.settings"
+        on-change="$ctrl.onSettingsChanged(settings)"
+    ></analyze-chart-settings>
+    <div layout="column">
+      <md-toolbar class="secondary-toolbar chart-options-toolbar">
+        <div class="md-toolbar-tools"
+             layout-align="start center">
+          <div class="analyze-view_search-panel" layout="row" layout-align="start center">
+            <choice-group size="m"
+                          icon-only="true"
+                          style="margin-right: 10px;"
+                          items="$ctrl.BAR_COLUMN_OPTIONS"
+                          ng-if="$ctrl.barColumnChoice"
+                          ng-model="$ctrl.barColumnChoice"
+                          ng-change="$ctrl.toggleBarColumn()">
+            </choice-group>
+            <span class="md-title" translate="CHART"></span>
+          </div>
+
+          <div class="analyze-view_action-panel" layout="row" layout-align="end center">
+            <md-button ng-click="$ctrl.refreshChartData()"
+                       ng-class="{'btn-primary': $ctrl.didAnalysisChange}" >
+              <span translate="REFRESH_DATA"></span>
+            </md-button>
+            <md-button ng-click="$ctrl.openDescriptionModal($event, $ctrl.model)">
+              <md-icon md-font-icon="icon-description"></md-icon>
+              <span translate="DESCRIPTION"></span>
+            </md-button>
+            <md-button ng-click="$ctrl.openChartPreviewModal($event)">
+              <md-icon md-font-icon="icon-full-screen"></md-icon>
+              <span translate="PREVIEW"></span>
+            </md-button>
+            <md-button ng-click="$ctrl.openFiltersModal()">
+              <md-icon md-font-icon="icon-filter"></md-icon>
+              <span translate="FILTER"></span>
+            </md-button>
+          </div>
+        </div>
+      </md-toolbar>
+
+      <chart updater="$ctrl.updateChart" options="$ctrl.chartOptions"></chart>
+      <md-card class="chart-container-card">
+        <md-card-content layout="column">
+          <filter-chips filters="$ctrl.filters"
+                        on-clear-all-filters="$ctrl.onClearAllFilters()"
+                        on-filter-removed="$ctrl.onFilterRemoved(index)">
+          </filter-chips>
+          <h3 translate="CUSTOM_AXIS_LABELS"></h3>
+          <div layout="row" layout-align="center">
+            <md-input-container flex>
+                <label translate="CUSTOM_Y_AXIS_LABEL"></label>
+                <input ng-model="$ctrl.labels.tempY"/>
+            </md-input-container>
+            <md-input-container flex>
+                <label translate="CUSTOM_X_AXIS_LABEL"></label>
+                <input ng-model="$ctrl.labels.tempX"/>
+            </md-input-container>
+            <md-button flex="nogrow" class="btn-primary" ng-click="$ctrl.updateCustomLabels()">
+              <span translate="UPDATE"></span>
+            </md-button>
+          </div>
+
+          <h3 translate="LEGEND_OPTIONS"></h3>
+          <div layout="row" layout-align="center">
+            <md-input-container flex>
+              <label translate="POSITION"></label>
+              <md-select ng-model="$ctrl.legend.align" ng-change="$ctrl.updateLegendPosition()">
+                <md-option ng-repeat="position in $ctrl.legend.options.align" ng-value="position.name" ng-bind="::position.displayName"></md-option>
+              </md-select>
+            </md-input-container>
+            <md-input-container flex>
+              <label translate="LAYOUT"></label>
+              <md-select ng-model="$ctrl.legend.layout" ng-change="$ctrl.updateLegendPosition()">
+                <md-option ng-repeat="position in $ctrl.legend.options.layout" ng-value="position.name" ng-bind="::position.displayName"></md-option>
+              </md-select>
+            </md-input-container>
+          </div>
+        </md-card-content>
+      </md-card>
+    </div>
+  </analyze-dialog-content>
+</analyze-dialog>

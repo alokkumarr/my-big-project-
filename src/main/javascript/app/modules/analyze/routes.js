@@ -11,13 +11,12 @@ export function routesConfig($stateProvider) {
       url: '/:id',
       component: 'analyzeView'
     }, {
-      name: 'analyze.publishedDetailLast',
-      url: '/analysis/:analysisId/LastPublished',
-      component: 'analyzePublishedDetail'
-    }, {
-      name: 'analyze.publishedDetail',
-      url: '/analysis/:analysisId/published/:publishId',
-      component: 'analyzePublishedDetail'
+      name: 'analyze.executedDetail',
+      url: '/analysis/:analysisId/executed?executionId',
+      component: 'analyzeExecutedDetail',
+      params: {
+        analysis: null
+      }
     }
   ];
 

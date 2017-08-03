@@ -1,0 +1,27 @@
+<div class="categories-view">
+  <md-toolbar class="secondary-toolbar">
+    <div class="md-toolbar-tools" layout-align="start center">
+      <div class="categories-view_search-panel" layout="row" layout-align="start center">
+        <span class="md-title" translate="CATEGORIES_MGMT_LIST"></span>&nbsp;
+        <search-box placeholder="Search Category"
+                    ng-model="$ctrl.states.searchTerm"
+                    on-change="$ctrl.applySearchFilter()" delay="1000"></search-box>
+      </div>
+      <div class="categories-view_action-panel" layout="row" layout-align="end center">
+        <md-button class="btn-primary" ng-click="$ctrl.openNewCategoryModal()">
+          <md-tooltip ng-bind="'TOOLTIP_ADD_CATEGORY' | translate"></md-tooltip>
+          + <span translate="CATEGORY"></span>
+        </md-button>
+      </div>      
+    </div>
+  </md-toolbar>
+  <div class="categories-view_categories-list">
+    <categories-list-view 
+      categories="$ctrl.categoriesList" 
+      updater="$ctrl.updater" 
+      customer="$ctrl.custCode" 
+      on-action="$ctrl.onCategoryAction(type, model)" 
+      search-term="$ctrl.states.searchTermValue">
+    </categories-list-view>
+  </div>
+</div>

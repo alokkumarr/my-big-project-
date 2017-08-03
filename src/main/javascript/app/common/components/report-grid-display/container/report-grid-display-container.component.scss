@@ -1,0 +1,18 @@
+report-grid-display-container {
+  width: 100%;
+  padding-bottom: 10px;
+
+  md-card {
+    padding: 0;
+    margin: 0;
+    overflow-x: auto;
+  }
+
+  .rgc-group-panel {
+    padding: 20px 20px 10px;
+  }
+
+  .rgc-panel {
+    padding: 20px 10px;
+  }
+}

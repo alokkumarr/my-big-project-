@@ -1,0 +1,82 @@
+<analyze-dialog control="$ctrl" class="analyze-pivot-dialog">
+  <analyze-dialog-header>
+    <div layout="row">
+      <md-button class="ard_back-btn"
+                 ng-click="$ctrl.goBack()">
+        <md-icon md-font-icon="icon-arrow-left"></md-icon>
+      </md-button>
+
+      <div class="ard_meta" flex>
+        <div class="md-title">
+          <strong class="e2e-pivot-title" ng-bind="$ctrl.model.name"></strong>
+          <label translate="DRAFT" ng-show="$ctrl.draftMode"></label>
+        </div>
+        <div class="md-description">
+          <md-icon md-font-icon="icon-report"></md-icon>
+          <span ng-bind="::$ctrl.model.metricName"></span>
+        </div>
+      </div>
+
+      <div class="ard_actions" flex>
+        <md-button class="btn-primary" ng-click="$ctrl.openSavePivotModal($event)"
+                   translate="SAVE">
+        </md-button>
+      </div>
+    </div>
+    <md-progress-linear ng-show="$ctrl.showProgress" md-mode="indeterminate"></md-progress-linear>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+    <analyze-pivot-settings on-apply-settings="$ctrl.onApplySettings(columns)"
+                            artifact-columns="$ctrl.artifacts[0].columns">
+    </analyze-pivot-settings>
+
+    <div layout="column">
+      <div layout="row" class="ard_toolbar" layou="space-between">
+
+        <span class="ard_toolbar-text" flex="25"
+              translate="PIVOT"></span>
+
+        <div class="ard_toolbar-actions" flex="70" layot="row" layout-wrap>
+          <md-button ng-class="$ctrl.didAnalysisChange ? 'btn-primary' : 'action'" ng-click="$ctrl.onRefreshData()">
+            <span translate="REFRESH_DATA"></span>
+          </md-button>
+
+          <md-button class="action" ng-click="$ctrl.openDescriptionModal($event, $ctrl.model)">
+            <md-icon md-font-icon="icon-description"></md-icon>
+            <span translate="DESCRIPTION"></span>
+          </md-button>
+
+          <md-button class="action" ng-click="$ctrl.openPivotPreviewModal($event)">
+            <md-icon md-font-icon="icon-full-screen"></md-icon>
+            <span translate="PREVIEW"></span>
+          </md-button>
+
+          <md-button class="action" ng-click="$ctrl.openPivotSortModal($event)"
+                     ng-disabled="!$ctrl.sortFields">
+            <md-icon md-font-icon="icon-sort"></md-icon>
+            <span translate="SORT"></span>
+          </md-button>
+
+          <md-button class="action" ng-click="$ctrl.openFiltersModal()"
+                     ng-disabled="!$ctrl.filters">
+            <md-icon md-font-icon="icon-filter"></md-icon>
+            <span translate="FILTER"></span>
+          </md-button>
+        </div>
+      </div>
+      <md-card layout="row"
+               style="max-width: calc(100vw - 333px); overflow: auto;">
+        <md-card-content layout="column">
+          <filter-chips filters="$ctrl.filters"
+                        on-clear-all-filters="$ctrl.onClearAllFilters()"
+                        on-filter-removed="$ctrl.onFilterRemoved(index)">
+          </filter-chips>
+          <pivot-grid updater="$ctrl.pivotGridUpdater"
+                      mode="designer"
+                      on-content-ready="$ctrl.onPivotContentReady(fields)"></pivot-grid>
+        </md-card-content>
+      </md-card>
+    </div>
+  </analyze-dialog-content>
+</analyze-dialog>

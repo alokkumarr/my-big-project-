@@ -1,0 +1,9 @@
+<md-chips ng-model="$ctrl.keywords.modelValues"
+          required
+          md-on-add="$ctrl.onChange({model: $ctrl.keywords})"
+          md-on-remove="$ctrl.onChange({model: $ctrl.keywords})"
+          md-removable="true"
+          md-add-on-blur
+          md-separator-keys="$ctrl.separatorKeys"
+          placeholder="separate by ';'">
+</md-chips>

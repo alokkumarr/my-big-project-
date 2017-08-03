@@ -1,0 +1,35 @@
+<role-dialog control="$ctrl" class="edit-role-dialog"> <role-dialog-header>
+<div layout="row">
+  <div class="md-title" translate="EDIT_ROLE"></div>
+</div>
+</role-dialog-header> <role-dialog-content>
+<div layout="column">
+<form name="editRoleForm" method="post">
+  <md-input-container flex> <label
+		translate="ROLE_NAME_LABEL"></label> <input name="roleName"
+		ng-model="$ctrl.editRole.roleName" 
+		ng-pattern="/^[a-zA-Z\s]*$/"
+		required/> </md-input-container>
+  <md-input-container flex> <label
+		translate="ROLE_DESC_LABEL"></label> <input name="roleDesc"
+		ng-model="$ctrl.editRole.roleDesc" /> </md-input-container>
+  <md-input-container flex  class="padding-for-container"> <label
+		translate="ROLE_ACTIVE_LABEL"></label> <md-select
+		ng-model="$ctrl.editRole.activeStatusInd" required> <md-option
+		ng-repeat="status in $ctrl.statuses" ng-value="status.ind"
+		ng-bind="::status.name"></md-option> </md-select> </md-input-container>
+  <md-input-container flex class="padding-for-container"> <label
+		translate="ROLE_TYPE_LABEL"></label> <md-select
+		ng-model="$ctrl.editRole.roleType" required> <md-option
+		ng-repeat="roleType in $ctrl.roleTypes" ng-value="roleType.roleName"
+		ng-bind="::roleType.roleName"></md-option> </md-select> </md-input-container>
+  <div class="layout-row">
+    <md-button class="btn-primary" ng-disabled="editRoleForm.$invalid"
+      ng-click="$ctrl.updateRole()"
+		translate="UPDATE_ROLE"> </md-button>
+    <md-button class="btn-card button-pull-right" ng-click="$ctrl.$dialog.hide()"
+		translate="CANCEL"> </md-button>
+  </div>
+</form>
+</div>
+</role-dialog-content>  </role-dialog>

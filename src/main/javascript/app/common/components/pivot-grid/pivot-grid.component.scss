@@ -1,0 +1,25 @@
+@import "themes/base/colors";
+
+pivot-grid {
+  .dx-pivotgrid.dx-row-lines .dx-pivotgrid-area tbody > tr:not(:last-child):not(.dx-expand-border) + tr:not(.dx-expand-border) > td:not(.dx-total):not(.dx-grandtotal) {
+    border-top: none;
+  }
+
+  .dx-pivotgrid {
+    thead.dx-pivotgrid-horizontal-headers > tr > td > span {
+      font-size: 14px;
+      font-weight: 600;
+      color: #596574;
+    }
+
+    tbody.dx-pivotgrid-vertical-headers > tr > td > span {
+      font-size: 14px;
+      font-weight: 600;
+      color: #596574;
+    }
+  }
+
+  .dx-pivotgrid .dx-word-wrap .dx-pivotgrid-collapsed > span {
+    color: $primary-blue-b2;
+  }
+}
