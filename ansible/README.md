@@ -1,8 +1,7 @@
 # Introduction
 
-This directory contains Ansible Playbooks for deploying SAW Security
-to the shared development environment.  It is currently for
-development and testing purposes only, not for production.
+This directory contains Ansible Playbooks for deploying SAW Security.
+It is used for development, testing and production uses.
 
 # Preconditions
 
