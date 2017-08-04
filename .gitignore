@@ -21,6 +21,7 @@ dist/
 /.sass-cache
 /connect.lock
 /coverage/*
+/junit.xml
 /libpeerconnection.log
 npm-debug.log*
 testem.log
