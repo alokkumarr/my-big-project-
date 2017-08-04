@@ -500,6 +500,59 @@ echo pre-remove completed: ${app.nameVer}
                     </preremoveScriptlet> 
                 </configuration>
             </plugin>
+            <plugin>
+              <groupId>io.fabric8</groupId>
+              <artifactId>docker-maven-plugin</artifactId>
+              <version>0.21.0</version>
+              <configuration>
+                <images>
+                  <image>
+                    <name>saw-security:${project.version}</name>
+                    <alias>saw-security</alias>
+                    <build>
+                      <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+                      <assembly>
+                        <descriptorRef>project</descriptorRef>
+                      </assembly>
+                    </build>
+                    <run>
+                      <!-- Run privileged for systemd -->
+                      <privileged>true</privileged>
+                      <wait>
+                        <!--
+                            Wait until the container health check
+                            reports that systemd services are up and
+                            running
+                        -->
+                        <healthy>true</healthy>
+                        <!--
+                            Increase timeout to allow application
+                            deployment to finish
+                        -->
+                        <time>120000</time>
+                      </wait>
+                    </run>
+                  </image>
+                </images>
+              </configuration>
+              <executions>
+                <execution>
+                  <id>start</id>
+                  <phase>pre-integration-test</phase>
+                  <goals>
+                    <goal>build</goal>
+                    <goal>start</goal>
+                  </goals>
+                </execution>
+                <execution>
+                  <id>stop</id>
+                  <phase>post-integration-test</phase>
+                  <goals>
+                    <goal>stop</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
         </plugins>
     </build>
 
