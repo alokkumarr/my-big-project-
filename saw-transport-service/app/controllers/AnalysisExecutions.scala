@@ -24,7 +24,7 @@ class AnalysisExecutions extends BaseController {
         val id = Bytes.toString(result.getRowKey)
         ("id", id) ~
         ("finished", (content \ "execution_finish_ts").extractOpt[Long]) ~
-        ("status", (content \ "execution_result").extractOpt[String])
+        ("status", (content \ "exec-msg").extractOpt[String])
       })
       /* Note: Keep "results" property for API backwards compatibility */
       ("executions", executions) ~ ("results", executions) : JValue
