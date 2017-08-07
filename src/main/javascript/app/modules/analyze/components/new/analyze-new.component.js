@@ -116,7 +116,8 @@ export const AnalyzeNewComponent = {
         autoWrap: false,
         focusOnOpen: false,
         multiple: true,
-        clickOutsideToClose: true
+        clickOutsideToClose: true,
+        hasBackdrop: false
       }).then(successfullySaved => {
         if (successfullySaved) {
           this.$dialog.hide(successfullySaved);

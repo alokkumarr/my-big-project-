@@ -1,17 +1,71 @@
+const analysisCards = element.all(by.css('md-card[e2e="analysis-card"]'));
+const getCards = name => analysisCards.filter(elem => {
+  return elem.element(by.css('a[e2e="analysis-name"]')).getText()
+    .then(text => {
+      return text && text.includes(name);
+    });
+});
+
+const getCard = name => getCards(name).first();
+
+const getCardTitle = name => element.all(by.cssContainingText('a[e2e="analysis-name"]', name)).first();
+
+const doAnalysisAction = (name, action) => {
+  const card = getCard(name);
+  const toggle = card.element(by.css('button[e2e="actions-menu-toggle"]'));
+  toggle.click();
+  toggle.getAttribute('aria-owns').then(id => {
+    element(by.id(id)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)).click();
+  });
+};
+
 module.exports = {
+  newDialog: {
+    getMetric: name => element(by.css(`md-radio-button[e2e="metric-name-${name}"]`)),
+    getMethod: name => element(by.css(`button[e2e="item-type-${name}"]`)),
+    createBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]'))
+  },
+  designerDialog: {
+    elem: element(by.css('analyze-save-dialog')),
+    chart: {
+      container: element(by.css('.highcharts-container '))
+    },
+    saveBtn: element(by.css('button[e2e="open-save-modal"]'))
+  },
+  main: {
+    categoryTitle: element((by.css('span[e2e="category-title"]'))),
+    getAnalysisCard: getCard,
+    getAnalysisCards: getCards,
+    getCardTitle,
+    doAnalysisAction,
+    confirmDeleteBtn: element(by.cssContainingText('button[ng-click="dialog.hide()"]', 'Delete'))
+  },
+  saveDialog: {
+    selectedCategory: element(by.css('md-select[e2e="save-dialog-selected-category"]')),
+    nameInput: element(by.css('input[e2e="save-dialog-name"]')),
+    descriptionInput: element(by.css('textarea[e2e="save-dialog-description"]')),
+    saveBtn: element(by.css('button[e2e="save-dialog-save-analysis"]')),
+    cancelBtn: element(by.css('button[translate="CANCEL"]'))
+  },
   analysisElems: {
     listView: element(by.css('[ng-value="$ctrl.LIST_VIEW"]')),
     cardView: element(by.css('[ng-value="$ctrl.CARD_VIEW"]')),
     newAnalyzeDialog: element(by.css('.new-analyze-dialog')),
     addAnalysisBtn: element(by.partialButtonText('ANALYSIS')),
     cardTitle: element(by.binding('::$ctrl.model.name')),
-    firstMetric: element(by.xpath('//span[. = "Metric a 1"]/../..')),
-    secondMetric: element(by.xpath('//span[. = "Metric b 2"]/../..')),
-    reportTable: element(by.xpath('//p[. = "Report"]/..')),
-    pivotTable: element(by.xpath('//p[. = "Pivot"]/..')),
     createAnalysisBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]')),
     designerDialog: element(by.css('.ard_canvas')),
-    saveReportBtn: element(by.xpath('//button[. = "Save"]')),
+    // analysis designer action buttons
+    editDescriptionAnalysisBtn: element(by.css('button[e2e="open-description-modal"]')),
+    previewAnalysisBtn: element(by.css('[e2e="open-preview-modal"]')),
+    filterAnalysisBtn: element(by.css('[e2e="open-filter-modal"]')),
+    sortAnalysisBtn: element(by.css('[e2e="open-sort-modal"]')),
+    //
+    // eventsMetric: element(by.cssContainingText('[ng-model="$ctrl.selectedMetric"]', 'MCT Events')),
+    reportsMetric: element(by.cssContainingText('span[ng-bind="::metric.metricName"]', 'MBT Reporting')),
+    designerView: element(by.css('.ard_canvas')),
+    columnChartsView: element(by.css('.highcharts-container ')),
+    //
     reportCategory: element(by.model('::$ctrl.model.category')),
     reportNameField: element(by.model('$ctrl.model.name')),
     reportDescriptionField: element(by.model('$ctrl.model.description')),
@@ -46,6 +100,10 @@ module.exports = {
 
   validateDesignerDialog() {
     expect(this.analysisElems.designerDialog.isDisplayed()).toBeTruthy();
+  },
+
+  validateDesignerView() {
+    expect(this.analysisElems.designerView.isDisplayed()).toBeTruthy();
   },
 
   validateReportGrid() {

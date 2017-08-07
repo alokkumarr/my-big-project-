@@ -1,4 +1,5 @@
-<md-card class="saw-analyze-card">
+<md-card class="saw-analyze-card"
+         e2e="analysis-card">
   <md-card-header>
     <span flex></span>
     <md-chip class="tag-chip status-chip"
@@ -16,8 +17,9 @@
     <md-card-title>
       <md-card-title-text>
         <a class="md-headline"
-              ng-bind-html="$ctrl.model.name | highlight:$ctrl.highlightTerm"
-              ui-sref="analyze.executedDetail({analysisId: $ctrl.model.id, analysis: $ctrl.model})">
+           e2e="analysis-name"
+           ng-bind-html="$ctrl.model.name | highlight:$ctrl.highlightTerm"
+           ui-sref="analyze.executedDetail({analysisId: $ctrl.model.id, analysis: $ctrl.model})">
         </a>
         <span class="md-subhead">
           <span ng-bind-html="::($ctrl.mkdel.metrics || []).join(', ') | highlight:$ctrl.highlightTerm"></span>
