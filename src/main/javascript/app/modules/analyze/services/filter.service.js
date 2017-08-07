@@ -8,7 +8,7 @@ import isNumber from 'lodash/isNumber';
 import values from 'lodash/values';
 import find from 'lodash/find';
 
-import {OPERATORS} from '../components/analyze-filter/filters/number-filter.component';
+import {OPERATORS} from '../components/filter/filters/number-filter.component';
 
 export const BOOLEAN_CRITERIA = [{
   label: 'ALL',
@@ -55,6 +55,10 @@ export function FilterService($q, $mdDialog) {
   }
 
   function isFilterEmpty(filter) {
+    if (!filter) {
+      return true;
+    }
+
     const filterType = getType(filter.type || get(filter, 'column.type', FILTER_TYPES.UNKNOWN));
 
     switch (filterType) {

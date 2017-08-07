@@ -1,3 +1,5 @@
+import get from 'lodash/get';
+
 /* on tap handler for error toast message. Used to expand a more detailed
  view of error */
 function openErrorDetails(dialog, error) {
@@ -23,9 +25,14 @@ export function interceptor($httpProvider) {
       responseError: error => {
         // need to use injetor because using the toastr service
         // causes a circular dependency with $http
+        const $q = $injector.get('$q');
+
+        if (get(error, 'config._hideError', false) === true) {
+          return $q.reject(error);
+        }
+
         const generalErrorMsgKey = 'ERROR_OOPS_SERVER';
         const toastMessage = $injector.get('toastMessage');
-        const $q = $injector.get('$q');
         const $mdDialog = $injector.get('$mdDialog');
         const $translate = $injector.get('$translate');
         const ErrorDetail = $injector.get('ErrorDetail');
@@ -43,15 +50,62 @@ export function interceptor($httpProvider) {
     };
   });
 
+  $httpProvider.interceptors.push(function refreshTokenInterceptor($injector) {
+    'ngInject';
+
+    let refreshRequest = null;
+
+    return {
+      responseError: response => {
+        const $q = $injector.get('$q');
+        const errorMessage = get(response, 'data.message', '');
+        const userService = $injector.get('UserService');
+        const refreshRegexp = new RegExp(userService.refreshTokenEndpoint);
+
+        if (!/token has expired/i.test(errorMessage)) {
+          return $q.reject(response);
+        }
+
+        if (refreshRegexp.test(get(response, 'config.url', ''))) {
+          response.config._hideError = true;
+          return $q.reject(response);
+        }
+
+        var deferred = $q.defer();
+
+        if (!refreshRequest) {
+          refreshRequest = userService.refreshAccessToken();
+        }
+
+        refreshRequest.then(() => {
+          refreshRequest = null;
+          $injector.get("$http")(response.config).then(
+            deferred.resolve.bind(deferred),
+            deferred.reject.bind(deferred)
+          );
+        }, error => {
+          refreshRequest = null;
+          $injector.get('JwtService').destroy();
+
+          const state = $injector.get('$state');
+          state.go(state.current.name, state.params, {reload: true});
+
+          deferred.reject(error);
+        });
+        return deferred.promise;
+      }
+    };
+  });
+
   /* Add jwt auth token to all requests if present */
   $httpProvider.interceptors.push(function authInterceptor($injector) {
     'ngInject';
-    const JwtService = $injector.get('JwtService');
-    const token = JwtService.get();
-
     return {
       request: function (config) {
-        if (token) {
+        const JwtService = $injector.get('JwtService');
+        const token = JwtService.get();
+
+        if (token && !/getNewAccessToken/.test(config.url)) {
           config.headers['Authorization'] = `Bearer ${token}`;
         }
 
