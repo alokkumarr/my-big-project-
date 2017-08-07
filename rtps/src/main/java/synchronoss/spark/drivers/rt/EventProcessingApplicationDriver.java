@@ -1,5 +1,8 @@
 package synchronoss.spark.drivers.rt;
 
+
+import com.mapr.db.Admin;
+import com.mapr.streams.Streams;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -11,11 +14,13 @@ import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka09.*;
+import org.ojai.store.DocumentStore;
 import synchronoss.data.generic.model.GenericJsonModelValidator;
 import synchronoss.spark.functions.rt.*;
 import synchronoss.spark.rt.common.ConfigurationHelper;
 import synchronoss.spark.rt.common.FileUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -107,9 +112,19 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
         // !!!!!!!!!!!!! NEED CLEANUP !!!!!!!!!!!!!!!!!!!
         ConfigurationHelper.initConfig2(kafkaParams, appConfig, "streams.", true);
         // Setup MapR kafka consumer
-        String topic = appConfig.getString("streams.topic");
-        List<String> topics = Arrays.asList(topic);
-        logger.info("Connection to stream : " + topics);
+        String configuredSource = appConfig.getString("streams.topic");
+
+        // Validate if stream/topic exists
+        if(validateStream(configuredSource) != 0){
+            logger.error("Can't connect to the stream " + configuredSource);
+            System.exit(-1);
+        }
+
+        // We have to create list with single string
+        List<String> src = new ArrayList<>();
+        src.add(configuredSource);
+
+        logger.info("Connection to stream : " + src);
         // We have to modify/enforce some kafka parameters
         fixKafkaParams(kafkaParams);
 
@@ -122,8 +137,7 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
         // Create stream
         JavaInputDStream<ConsumerRecord<String, String>> eventsStream
             = KafkaUtils.createDirectStream(jssc, LocationStrategies.PreferConsistent(),
-                                            ConsumerStrategies.<String, String>Subscribe(topics, kafkaParams));
-
+                                            ConsumerStrategies.<String, String>Subscribe(src, kafkaParams));
         // Configuration for ElasticSearch
         Map<String, String> esConfig = new HashMap<>();
 
@@ -200,5 +214,26 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
             return -1;
         }
         return 0;
+    }
+
+    private int validateStream(String p) {
+        int retval = -1;
+        try {
+            String[] t = p.split(":");
+            if(t.length != 2){
+                logger.error("Invalid stream/topic configuration value, please correct configuration file. Must be defined as <stream path>:<topic> .");
+            } else {
+                DocumentStore ds = Streams.getMessageStore(t[0], t[1]);
+                if (ds == null) {
+                    logger.error("getMessageStore(<stream path>, <topic>) returned NULL.");
+                } else {
+                    retval = 0;
+                }
+            }
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            e.printStackTrace();
+        }
+        return retval ;
     }
 }
