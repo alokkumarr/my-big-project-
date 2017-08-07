@@ -60,7 +60,8 @@ export const AnalyzeActionsMenuComponent = {
         const notExcluded = !actionsToExclude.includes(value);
         const privilegeName = upperCase(value === 'print' ? 'export' : value);
         const hasPriviledge = this._JwtService.hasPrivilege(privilegeName, {
-          subCategoryId: this.analysis.categoryId
+          subCategoryId: this.analysis.categoryId,
+          creatorId: this.analysis.userId
         });
 
         return notExcluded && hasPriviledge;
