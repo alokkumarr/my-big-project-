@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.synchronoss</groupId>
   <artifactId>bda-rtps</artifactId>
-  <version>2.0.0_rc0</version>
+  <version>2.0.1_dev</version>
   <packaging>pom</packaging>
   <properties>
     <!--
