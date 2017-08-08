@@ -1,13 +1,12 @@
+const {doMdSelectOption} = require('../../utils');
+
 const getCards = name => element.all(by.css('md-card[e2e="analysis-card"]')).filter(elem => {
-  return elem.element(by.css('a[e2e="analysis-name"]')).getText()
-    .then(text => {
-      return text && text.includes(name);
-    });
+  return elem.element(by.cssContainingText('a[e2e="analysis-name"]', name));
 });
 
 const getCard = name => getCards(name).first();
 
-const getCardTitle = name => element.all(by.cssContainingText('a[e2e="analysis-name"]', name)).first();
+const getCardTitle = name => element(by.cssContainingText('a[e2e="analysis-name"]', name));
 
 const doAnalysisAction = (name, action) => {
   const card = getCard(name);
@@ -27,6 +26,8 @@ const getChartSettingsRadio = (axis, name) => {
 
 const openFiltersBtn = element(by.css('button[ng-click="$ctrl.openFiltersModal()"]'));
 
+const refreshBtn = element(by.css('button[e2e="refresh-data-btn"]'));
+
 const getFilterRow = index => element.all(by.css('analyze-filter-row')).get(index);
 
 const getFilterAutocomplete = index => getFilterRow(index)
@@ -38,6 +39,32 @@ const getStringFilterInput = index => getFilterRow(index)
 
 const getAppliedFilter = name => element(by.css('filter-chips'))
   .element(by.cssContainingText('md-chip-template > span', name));
+
+const getPivotField = name => element(by.css(`md-list-item[e2e="pivot-field-${name}"]`));
+
+const getPivotFieldCheckbox = name => getPivotField(name).element(by.css('md-checkbox'));
+
+const doSelectPivotArea = (name, area) => {
+  doMdSelectOption({
+    parentElem: getPivotField(name),
+    btnSelector: 'button[e2e="pivot-area-menu-btn"]',
+    optionSelector: `button[e2e="pivot-area-selector-${area}"]`
+  });
+};
+const doSelectPivotAggregate = (name, aggregate) => {
+  doMdSelectOption({
+    parentElem: getPivotField(name),
+    btnSelector: 'button[e2e="pivot-aggregate-menu-btn"]',
+    optionSelector: `button[e2e="pivot-aggregate-selector-${aggregate}"]`
+  });
+};
+const doSelectPivotGroupInterval = (name, groupInterval) => {
+  doMdSelectOption({
+    parentElem: getPivotField(name),
+    btnSelector: 'button[e2e="pivot-group-interval-menu-btn"]',
+    optionSelector: `button[e2e="pivot-group-interval-selector-${groupInterval}"]`
+  });
+};
 
 module.exports = {
   newDialog: {
@@ -53,8 +80,23 @@ module.exports = {
       getZRadio: name => getChartSettingsRadio('z', name),
       getGroupRadio: name => getChartSettingsRadio('g', name),
       container: element(by.css('.highcharts-container ')),
-      refreshBtn: element(by.css('button[e2e="refresh-data-btn"]')),
-      openFiltersBtn
+      title: element(by.css('span[e2e="designer-type-chart"]')),
+      openFiltersBtn,
+      refreshBtn
+    },
+    pivot: {
+      title: element(by.css('span[e2e="designer-type-pivot"]')),
+      getPivotFieldCheckbox,
+      doSelectPivotArea,
+      doSelectPivotAggregate,
+      doSelectPivotGroupInterval,
+      openFiltersBtn,
+      refreshBtn
+    },
+    report: {
+      title: element(by.css('span[e2e="designer-type-report"]')),
+      openFiltersBtn,
+      refreshBtn
     },
     saveBtn: element(by.css('button[e2e="open-save-modal"]'))
   },

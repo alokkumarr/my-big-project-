@@ -4,17 +4,17 @@ const protractor = require('protractor');
 const ec = protractor.ExpectedConditions;
 const {hasClass} = require('../utils');
 
-describe('create a new columnChart type analysis', () => {
+describe('create a new pivot type analysis', () => {
   let categoryName;
-  const chartDesigner = analyze.designerDialog.chart;
-  const chartName = 'e2e column chart';
-  const chartDescription = 'e2e test chart description';
-  const xAxisName = 'Source Manufacturer';
-  const yAxisName = 'Available MB';
-  const filterValue = 'APPLE';
-  const groupName = 'Source OS';
+  const pivotDesigner = analyze.designerDialog.pivot;
+  const pivotName = `e2e pivot${(new Date()).toString()}`;
+  const pivotDescription = 'e2e pivot description';
+  const dataField = 'Available MB';
+  const filterValue = 'SAMSUNG';
+  const columnField = 'Source Manufacturer';
+  const rowField = 'Source OS';
   const metric = 'MCT Content';
-  const method = 'chart:column';
+  const method = 'table:pivot';
 
   it('should open the sidenav menu and go to first category', () => {
     sidenav.menuBtn.click();
@@ -33,21 +33,21 @@ describe('create a new columnChart type analysis', () => {
     analyze.validateNewAnalyze();
   });
 
-  it('should select Column Chart type and proceed', () => {
+  it('should select pivot type and proceed', () => {
     const newDialog = analyze.newDialog;
     newDialog.getMetric(metric).click();
     newDialog.getMethod(method).click();
     newDialog.createBtn.click();
-    expect(chartDesigner.title.isPresent()).toBe(true);
+    expect(pivotDesigner.title.isPresent()).toBe(true);
   });
 
   it('should apply filters', () => {
     const filters = analyze.filtersDialog;
     const filterAC = filters.getFilterAutocomplete(0);
     const stringFilterInput = filters.getStringFilterInput(0);
-    const fieldName = xAxisName;
+    const fieldName = columnField;
 
-    chartDesigner.openFiltersBtn.click();
+    pivotDesigner.openFiltersBtn.click();
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
     filters.applyBtn.click();
@@ -55,17 +55,19 @@ describe('create a new columnChart type analysis', () => {
     expect(filters.getAppliedFilter(fieldName).isPresent()).toBe(true);
   });
 
-  it('should select x, y axes and a grouping', () => {
-    const refreshBtn = chartDesigner.refreshBtn;
-    const x = chartDesigner.getXRadio(xAxisName);
-    const y = chartDesigner.getYRadio(yAxisName);
-    const g = chartDesigner.getGroupRadio(groupName);
-    x.click();
-    y.click();
-    g.click();
-    expect(hasClass(x, 'md-checked')).toBeTruthy();
-    expect(hasClass(y, 'md-checked')).toBeTruthy();
-    expect(hasClass(g, 'md-checked')).toBeTruthy();
+  it('should select row, column and data fields and refresh data', () => {
+    const refreshBtn = pivotDesigner.refreshBtn;
+
+    pivotDesigner.getPivotFieldCheckbox(dataField).click();
+    pivotDesigner.doSelectPivotArea(dataField, 'data');
+    pivotDesigner.doSelectPivotAggregate(dataField, 'sum');
+
+    pivotDesigner.getPivotFieldCheckbox(columnField).click();
+    pivotDesigner.doSelectPivotArea(columnField, 'column');
+
+    pivotDesigner.getPivotFieldCheckbox(rowField).click();
+    pivotDesigner.doSelectPivotArea(rowField, 'row');
+
     const doesDataNeedRefreshing = hasClass(refreshBtn, 'btn-primary');
     expect(doesDataNeedRefreshing).toBeTruthy();
     refreshBtn.click();
@@ -79,23 +81,22 @@ describe('create a new columnChart type analysis', () => {
     expect(designer.elem).toBeTruthy();
     expect(save.selectedCategory.getText()).toEqual(categoryName);
 
-    save.nameInput.clear().sendKeys(chartName);
-    save.descriptionInput.clear().sendKeys(chartDescription);
+    save.nameInput.clear().sendKeys(pivotName);
+    save.descriptionInput.clear().sendKeys(pivotDescription);
     save.saveBtn.click();
-    // const newAnalysis = analyze.main.getCardTitle(chartName);
-    const condition = ec.presenceOf(analyze.main.getCardTitle(chartName));
+    const condition = ec.presenceOf(analyze.main.getCardTitle(pivotName));
     browser
     .wait(condition, 5000)
-    .then(() => expect(analyze.main.getCardTitle(chartName).isPresent()).toBe(true));
+    .then(() => expect(analyze.main.getCardTitle(pivotName).isPresent()).toBe(true));
   });
 
   it('should delete the created analysis', () => {
     const main = analyze.main;
-    main.getAnalysisCards(chartName).count()
+    main.getAnalysisCards(pivotName).count()
       .then(count => {
-        main.doAnalysisAction(chartName, 'delete');
+        main.doAnalysisAction(pivotName, 'delete');
         main.confirmDeleteBtn.click();
-        expect(main.getAnalysisCards(chartName).count()).toBe(count - 1);
+        expect(main.getAnalysisCards(pivotName).count()).toBe(count - 1);
       });
   });
 });
