@@ -1,5 +1,4 @@
-const analysisCards = element.all(by.css('md-card[e2e="analysis-card"]'));
-const getCards = name => analysisCards.filter(elem => {
+const getCards = name => element.all(by.css('md-card[e2e="analysis-card"]')).filter(elem => {
   return elem.element(by.css('a[e2e="analysis-name"]')).getText()
     .then(text => {
       return text && text.includes(name);
@@ -15,7 +14,9 @@ const doAnalysisAction = (name, action) => {
   const toggle = card.element(by.css('button[e2e="actions-menu-toggle"]'));
   toggle.click();
   toggle.getAttribute('aria-owns').then(id => {
-    element(by.id(id)).element(by.css(`button[e2e="actions-menu-selector-${action}"]`)).click();
+    element(by.id(id))
+      .element(by.css(`button[e2e="actions-menu-selector-${action}"]`))
+      .click();
   });
 };
 
@@ -23,6 +24,20 @@ const getChartSettingsRadio = (axis, name) => {
   return element(by.css(`md-radio-group[ng-model="$ctrl.selected.${axis}"]`))
     .element(by.css(`md-radio-button[e2e="radio-button-${name}"]`));
 };
+
+const openFiltersBtn = element(by.css('button[ng-click="$ctrl.openFiltersModal()"]'));
+
+const getFilterRow = index => element.all(by.css('analyze-filter-row')).get(index);
+
+const getFilterAutocomplete = index => getFilterRow(index)
+  .element(by.css('md-autocomplete[e2e="filter-row"] > md-autocomplete-wrap > input'));
+
+const getStringFilterInput = index => getFilterRow(index)
+  .element(by.css('string-filter'))
+  .element(by.css('input[aria-label="Chips input."]'));
+
+const getAppliedFilter = name => element(by.css('filter-chips'))
+  .element(by.cssContainingText('md-chip-template > span', name));
 
 module.exports = {
   newDialog: {
@@ -38,9 +53,16 @@ module.exports = {
       getZRadio: name => getChartSettingsRadio('z', name),
       getGroupRadio: name => getChartSettingsRadio('g', name),
       container: element(by.css('.highcharts-container ')),
-      refreshBtn: element(by.css('button[e2e="refresh-data-btn"]'))
+      refreshBtn: element(by.css('button[e2e="refresh-data-btn"]')),
+      openFiltersBtn
     },
     saveBtn: element(by.css('button[e2e="open-save-modal"]'))
+  },
+  filtersDialog: {
+    getFilterAutocomplete,
+    getStringFilterInput,
+    applyBtn: element(by.css('button[e2e="apply-filter-btn"]')),
+    getAppliedFilter
   },
   main: {
     categoryTitle: element((by.css('span[e2e="category-title"]'))),
@@ -57,6 +79,8 @@ module.exports = {
     saveBtn: element(by.css('button[e2e="save-dialog-save-analysis"]')),
     cancelBtn: element(by.css('button[translate="CANCEL"]'))
   },
+
+  // OLD test elements
   analysisElems: {
     listView: element(by.css('[ng-value="$ctrl.LIST_VIEW"]')),
     cardView: element(by.css('[ng-value="$ctrl.CARD_VIEW"]')),

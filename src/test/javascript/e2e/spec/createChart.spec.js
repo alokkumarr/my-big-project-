@@ -19,7 +19,13 @@ const navigateToAnalyze = () => {
 
 describe('create a new columnChart type analysis', () => {
   let categoryName;
-
+  const chartDesigner = analyze.designerDialog.chart;
+  const chartName = 'e2e column chart';
+  const chartDescription = 'e2e test chart description';
+  const xAxisName = 'Source Manufacturer';
+  const yAxisName = 'Available MB';
+  const filterValue = 'APPLE';
+  const groupName = 'Source OS';
   it('should automatically redirect to Analyze page when going to the homepage', navigateToAnalyze);
 
   it('should open the sidenav menu and go to first category', () => {
@@ -41,19 +47,32 @@ describe('create a new columnChart type analysis', () => {
 
   it('should select Column Chart type and proceed', () => {
     const newDialog = analyze.newDialog;
-    const chartContainer = analyze.designerDialog.chart.container;
+    const chartContainer = chartDesigner.container;
     newDialog.getMetric('MCT Content').click();
     newDialog.getMethod('chart:column').click();
     newDialog.createBtn.click();
     expect(chartContainer.isDisplayed()).toBeTruthy();
   });
 
+  it('should apply filters', () => {
+    const filters = analyze.filtersDialog;
+    const filterAC = filters.getFilterAutocomplete(0);
+    const stringFilterInput = filters.getStringFilterInput(0);
+    const fieldName = xAxisName;
+
+    chartDesigner.openFiltersBtn.click();
+    filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
+    stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
+    filters.applyBtn.click();
+
+    expect(filters.getAppliedFilter(fieldName).isPresent()).toBe(true);
+  });
+
   it('should select x, y axes and a grouping', () => {
-    const chartDesigner = analyze.designerDialog.chart;
     const refreshBtn = chartDesigner.refreshBtn;
-    const x = chartDesigner.getXRadio('Source Manufacturer');
-    const y = chartDesigner.getYRadio('Available Bytes');
-    const g = chartDesigner.getGroupRadio('Source OS');
+    const x = chartDesigner.getXRadio(xAxisName);
+    const y = chartDesigner.getYRadio(yAxisName);
+    const g = chartDesigner.getGroupRadio(groupName);
     x.click();
     y.click();
     g.click();
@@ -64,15 +83,6 @@ describe('create a new columnChart type analysis', () => {
     expect(doesDataNeedRefreshing).toBeTruthy();
     refreshBtn.click();
   });
-
-  // it('should display the added fields to chart', () => {
-  // });
-
-  // it('should apply filters', () => {
-  // });
-
-  const chartName = 'e2e column chart';
-  const chartDescription = 'e2e test chart description';
 
   it('should attempt to save the report', () => {
     const save = analyze.saveDialog;
@@ -85,10 +95,10 @@ describe('create a new columnChart type analysis', () => {
     save.nameInput.clear().sendKeys(chartName);
     save.descriptionInput.clear().sendKeys(chartDescription);
     save.saveBtn.click();
-    browser.sleep(4000);
-
-    const newAnalysis = analyze.main.getCardTitle(chartName);
-    expect(newAnalysis.isDisplayed()).toBeTruthy();
+    // const newAnalysis = analyze.main.getCardTitle(chartName);
+    browser
+    .wait(() => analyze.main.getCardTitle(chartName).isPresent(), 5000)
+    .then(() => expect(analyze.main.getCardTitle(chartName).isPresent()).toBe(true));
   });
 
   it('should delete the created analysis', () => {
@@ -97,7 +107,6 @@ describe('create a new columnChart type analysis', () => {
       .then(count => {
         main.doAnalysisAction(chartName, 'delete');
         main.confirmDeleteBtn.click();
-        browser.sleep(4000);
         expect(main.getAnalysisCards(chartName).count()).toBe(count - 1);
       });
   });
