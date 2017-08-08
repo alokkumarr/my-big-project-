@@ -21,3 +21,15 @@ export const LAST_ANALYSES_CATEGORY_ID = 'lastAnalysesListId';
 export {NUMBER_TYPES, DATE_TYPES};
 
 export const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
+
+export const PRIVILEGES = {
+  ACCESS: 'ACCESS',
+  CREATE: 'CREATE',
+  EXECUTE: 'EXECUTE',
+  PUBLISH: 'PUBLISH',
+  FORK: 'FORK',
+  EDIT: 'EDIT',
+  EXPORT: 'EXPORT',
+  DELETE: 'DELETE',
+  ALL: 'ALL'
+};
