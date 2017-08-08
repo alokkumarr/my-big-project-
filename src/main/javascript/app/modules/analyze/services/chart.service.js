@@ -378,7 +378,7 @@ export function ChartService() {
           return attr;
         });
       }),
-      fpSortBy('columnName')
+      fpSortBy('displayName')
     )(artifacts);
 
     let xaxis;
