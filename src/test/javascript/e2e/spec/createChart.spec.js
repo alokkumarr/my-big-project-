@@ -1,6 +1,7 @@
 const sidenav = require('../pages/components/sidenav.co.js');
 const analyze = require('../pages/common/analyze.po.js');
 const protractor = require('protractor');
+const {hasClass} = require('../utils');
 
 const ec = protractor.ExpectedConditions;
 
@@ -45,6 +46,23 @@ describe('create a new columnChart type analysis', () => {
     newDialog.getMethod('chart:column').click();
     newDialog.createBtn.click();
     expect(chartContainer.isDisplayed()).toBeTruthy();
+  });
+
+  it('should select x, y axes and a grouping', () => {
+    const chartDesigner = analyze.designerDialog.chart;
+    const refreshBtn = chartDesigner.refreshBtn;
+    const x = chartDesigner.getXRadio('Source Manufacturer');
+    const y = chartDesigner.getYRadio('Available Bytes');
+    const g = chartDesigner.getGroupRadio('Source OS');
+    x.click();
+    y.click();
+    g.click();
+    expect(hasClass(x, 'md-checked')).toBeTruthy();
+    expect(hasClass(y, 'md-checked')).toBeTruthy();
+    expect(hasClass(g, 'md-checked')).toBeTruthy();
+    const doesDataNeedRefreshing = hasClass(refreshBtn, 'btn-primary');
+    expect(doesDataNeedRefreshing).toBeTruthy();
+    refreshBtn.click();
   });
 
   // it('should display the added fields to chart', () => {

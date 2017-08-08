@@ -19,6 +19,11 @@ const doAnalysisAction = (name, action) => {
   });
 };
 
+const getChartSettingsRadio = (axis, name) => {
+  return element(by.css(`md-radio-group[ng-model="$ctrl.selected.${axis}"]`))
+    .element(by.css(`md-radio-button[e2e="radio-button-${name}"]`));
+};
+
 module.exports = {
   newDialog: {
     getMetric: name => element(by.css(`md-radio-button[e2e="metric-name-${name}"]`)),
@@ -28,7 +33,12 @@ module.exports = {
   designerDialog: {
     elem: element(by.css('analyze-save-dialog')),
     chart: {
-      container: element(by.css('.highcharts-container '))
+      getXRadio: name => getChartSettingsRadio('x', name),
+      getYRadio: name => getChartSettingsRadio('y', name),
+      getZRadio: name => getChartSettingsRadio('z', name),
+      getGroupRadio: name => getChartSettingsRadio('g', name),
+      container: element(by.css('.highcharts-container ')),
+      refreshBtn: element(by.css('button[e2e="refresh-data-btn"]'))
     },
     saveBtn: element(by.css('button[e2e="open-save-modal"]'))
   },
