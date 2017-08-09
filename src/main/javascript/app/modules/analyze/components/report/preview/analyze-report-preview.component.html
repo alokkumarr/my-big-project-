@@ -19,17 +19,13 @@
   </analyze-dialog-header>
 
   <analyze-dialog-content>
-    <report-grid-container id="arp-grid-container" class="arp_details-grid"
-                           layout="row"
-                           show-group-panel="true"
-                           columns="$ctrl.model.columns">
-    </report-grid-container>
-
-    <div layout="column" layout-align="center center">
-      <md-button class="arp-load-more-btn"
-                 ng-click="$ctrl.loadMore()"
-                 translate="LOAD_MORE_ROWS" translate-values="{nrOfRows: $ctrl.MORE_ROWS_COUNT}">
-      </md-button>
-    </div>
+    <report-grid-display-container id="arp-grid-container"
+      class="arp_details-grid"
+      layout="row"
+      data="$ctrl.model.data"
+      columns="$ctrl.model.columns"
+      groups="$ctrl.model.report.groupByColumns"
+      requester="$ctrl.requester">
+    </report-grid-display-container>
   </analyze-dialog-content>
 </analyze-dialog>

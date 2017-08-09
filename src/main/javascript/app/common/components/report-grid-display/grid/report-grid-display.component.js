@@ -38,7 +38,7 @@ export const ReportGridDisplayComponent = {
         const field = {
           alignment: 'left',
           caption: column.aliasName || column.displayName,
-          dataField: column.columnName,
+          dataField: column.columnName || column.name,
           visibleIndex: column.visibleIndex,
           dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
           width: COLUMN_WIDTH

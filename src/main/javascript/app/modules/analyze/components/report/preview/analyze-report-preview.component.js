@@ -1,4 +1,5 @@
 import first from 'lodash/first';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import template from './analyze-report-preview.component.html';
 import style from './analyze-report-preview.component.scss';
@@ -18,10 +19,11 @@ export const AnalyzeReportPreviewComponent = {
       this._AnalyzeService = AnalyzeService;
 
       this.MORE_ROWS_COUNT = 500;
+      this.requester = new BehaviorSubject({});
     }
 
     $onInit() {
-      this._$timeout(() => this.reloadPreviewGrid());
+      // this._$timeout(() => this.reloadPreviewGrid());
     }
 
     cancel() {
