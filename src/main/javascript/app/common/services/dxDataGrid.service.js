@@ -7,7 +7,7 @@ export function dxDataGridService() {
   };
 
   function mergeWithDefaultConfig(config) {
-    return defaults(config, getDefaultConfig());
+    return defaults({}, config, getDefaultConfig());
   }
 
   function getDefaultConfig() {

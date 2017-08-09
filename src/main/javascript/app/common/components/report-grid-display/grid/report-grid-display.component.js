@@ -24,11 +24,19 @@ export const ReportGridDisplayComponent = {
     $onInit() {
       const columns = this._getDxColumns(this.columns);
 
-      this.data = take(this.data, 30);
-
       this.gridConfig = this._dxDataGridService.mergeWithDefaultConfig({
         columns,
         dataSource: this.data,
+        scrolling: {
+          mode: 'standard'
+        },
+        paging: {
+          pageSize: 10
+        },
+        pager: {
+          showNavigationButtons: true,
+          showPageSizeSelector: true
+        },
         onInitialized: this.onGridInitialized.bind(this)
       });
     }
