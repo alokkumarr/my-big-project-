@@ -55,6 +55,11 @@ md-menu-bar {
       > md-icon {
         color: $btn-primary-text-color;
       }
+
+      &[disabled] {
+        background-color: $btn-disabled-bg-color;
+        color: $btn-disabled-text-color;
+      }
     }
 
     &.btn-secondary {
@@ -72,6 +77,10 @@ md-menu-bar {
         }
       }
 
+      &[disabled] {
+        background-color: $btn-disabled-bg-color;
+        color: $btn-disabled-text-color;
+      }
     }
 
     &.btn-tertiary {
