@@ -24,7 +24,7 @@ const getChartSettingsRadio = (axis, name) => {
     .element(by.css(`md-radio-button[e2e="radio-button-${name}"]`));
 };
 
-const openFiltersBtn = element(by.css('button[ng-click="$ctrl.openFiltersModal()"]'));
+const openFiltersBtn = element(by.css('button[ng-click="$ctrl.openFiltersModal($event)"]'));
 
 const refreshBtn = element(by.css('button[e2e="refresh-data-btn"]'));
 
@@ -66,6 +66,22 @@ const doSelectPivotGroupInterval = (name, groupInterval) => {
   });
 };
 
+const getReportField = (tableName, fieldName) => element(by.css(`[e2e="js-plumb-field-${tableName}:${fieldName}"]`));
+const getReportFieldCheckbox = (tableName, fieldName) => getReportField(tableName, fieldName).element(by.css('md-checkbox'));
+const getReportFieldEndPoint = (tableName, fieldName, side) => {
+  const endpoints = getReportField(tableName, fieldName).all(by.css('js-plumb-endpoint'));
+  switch (side) {
+    case 'left':
+      return endpoints.last();
+    case 'right':
+    default:
+      return endpoints.first();
+  }
+};
+const getJoinlabel = (tableNameA, fieldNameA, tableNameB, fieldNameB, joinType) => {
+  return element(by.css(`[e2e="join-label-${tableNameA}:${fieldNameA}-${joinType}-${tableNameB}:${fieldNameB}"]`));
+};
+
 module.exports = {
   newDialog: {
     getMetric: name => element(by.css(`md-radio-button[e2e="metric-name-${name}"]`)),
@@ -95,6 +111,10 @@ module.exports = {
     },
     report: {
       title: element(by.css('span[e2e="designer-type-report"]')),
+      expandBtn: element(by.css('button[e2e="report-expand-btn"]')),
+      getReportFieldCheckbox,
+      getReportFieldEndPoint,
+      getJoinlabel,
       openFiltersBtn,
       refreshBtn
     },

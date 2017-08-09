@@ -44,7 +44,7 @@ export class FieldModel {
   }
 
   getIdentifier() {
-    return `${this.table.name}:${this.name}`;
+    return `${this.table.name}:${this.getDisplayName()}`;
   }
 
   getEndpoint(side) {

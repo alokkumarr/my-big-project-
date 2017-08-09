@@ -38,7 +38,8 @@ exports.config = {
       // webpackHelper.root('src/test/javascript/e2e/spec/analyses.spec.js'),
       webpackHelper.root('src/test/javascript/e2e/spec/goToAnalyze.spec'),
       // webpackHelper.root('src/test/javascript/e2e/spec/createChart.spec.js')
-      webpackHelper.root('src/test/javascript/e2e/spec/createPivot.spec.js')
+      // webpackHelper.root('src/test/javascript/e2e/spec/createPivot.spec.js')
+      webpackHelper.root('src/test/javascript/e2e/spec/createReport.spec.js')
     ]
   },
 
