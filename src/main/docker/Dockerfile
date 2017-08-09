@@ -32,4 +32,4 @@ COPY maven /maven/
 CMD /usr/lib/systemd/systemd
 
 # Add health check to be used by Docker Maven plug-in
-HEALTHCHECK CMD systemctl is-system-running --quiet
+HEALTHCHECK --interval=5s CMD systemctl is-system-running --quiet
