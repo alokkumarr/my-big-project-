@@ -13,7 +13,7 @@
 - name: Create BDA directory
   file: path=/etc/bda state=directory
 - name: Create SAW Security variables file
-  file: path=/etc/bda/saw-security.vars state=touch
+  template: src=saw-security.vars dest=/etc/bda/saw-security.vars
 - name: Install SAW Security package
   yum: name="{{ item }}" state=present
   with_fileglob: ["../rpms/bda-saw-security-*.rpm"]
