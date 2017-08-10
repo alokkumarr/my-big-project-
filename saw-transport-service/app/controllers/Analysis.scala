@@ -5,7 +5,7 @@ import java.util
 import java.util.UUID
 
 import com.synchronoss.querybuilder.{EntityType, SAWElasticSearchQueryBuilder, SAWElasticSearchQueryExecutor}
-import model.{ClientException, QueryBuilder}
+import model.{ClientException, PaginateDataSet, QueryBuilder}
 import org.json4s.JsonAST.{JArray, JLong, JObject, JString, JValue, JBool => _, JField => _, JInt => _, JNothing => _}
 import org.json4s.JsonDSL._
 import org.json4s._
@@ -19,8 +19,6 @@ import sncr.metadata.analysis.AnalysisResult
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine.context.SelectModels
 import sncr.metadata.semantix.SemanticNode
-import model.QueryBuilder
-import model.ClientException
 import org.apache.hadoop.hbase.util.Bytes
 import sncr.metadata.engine.SearchMetadata._
 import com.synchronoss.querybuilder.SAWElasticSearchQueryExecutor
@@ -28,10 +26,12 @@ import com.synchronoss.querybuilder.EntityType
 import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
+
 import sncr.metadata.engine.{Fields, MetadataDictionary}
 
 class Analysis extends BaseController {
   val executorRunner = new ExecutionTaskHandler(1);
+  var totalRows: Int =0;
   
   /**
     * List analyses.  At the moment only used by scheduler to list
@@ -152,6 +152,7 @@ class Analysis extends BaseController {
 	        .extractOrElse[String]("interactive")
 	      val runtime = (executionType == "interactive")
 	      queryRuntime = QueryBuilder.build(analysis, runtime)
+            contentsAnalyze(("totalRows", totalRows));
             }
           }
           case _ => {}
@@ -159,6 +160,8 @@ class Analysis extends BaseController {
         /* Execute analysis and return result data */
         val data = executeAnalysis(analysisId, queryRuntime, json)
         contentsAnalyze(("data", data))
+
+
       }
       case "delete" => {
         val analysisId = extractAnalysisId(json)
@@ -281,6 +284,8 @@ class Analysis extends BaseController {
  	var analysisJSON : JObject = null;
  	
  	m_log.trace("json dataset: {}", reqJSON);
+    val start = (reqJSON \ "contents" \ "start").extractOrElse(0)
+    val limit = (reqJSON \ "contents" \ "limit").extractOrElse(DLConfiguration.rowLimit)
     val analysis = (reqJSON \ "contents" \ "analyze") match {
       case obj: JArray => analysisJson(reqJSON); // reading from request body
       case _ => null
@@ -449,8 +454,20 @@ class Analysis extends BaseController {
       //TODO:: Subject to change: to get ALL data use:  val resultData = execution.getAllData
       //TODO:: DLConfiguration.rowLimit can be replace with some Int value
 
-      val resultData = execution.getPreview(DLConfiguration.rowLimit)
-      val data = processReportResult(resultData)
+      var data: JValue = null
+      var resultData : java.util.List[java.util.Map[String, (String, Object)]] = null
+
+      if (PaginateDataSet.INSTANCE.getCache(analysisId.toString.concat(analysisResultId)) != null)
+      {
+        data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisId.toString.concat(analysisResultId)));
+        totalRows = PaginateDataSet.INSTANCE.sizeOfData();
+      }
+      else {
+        resultData = execution.getPreview(limit);
+        PaginateDataSet.INSTANCE.putCache(analysisId.toString.concat(analysisResultId), resultData);
+        data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisId.toString.concat(analysisResultId)))
+        totalRows = PaginateDataSet.INSTANCE.sizeOfData();
+      }
       m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}, created execution id: $analysisResultId"
       m_log debug s"start:  ${analysis.getStartTS} , finished  ${analysis.getFinishedTS} "
       m_log.trace("Spark SQL executor result: {}", pretty(render(data)))

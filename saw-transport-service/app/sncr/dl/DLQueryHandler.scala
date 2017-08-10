@@ -3,12 +3,9 @@ package sncr.dl
 import java.io.IOException
 import java.util
 import java.util.concurrent.ExecutionException
-
 import com.fasterxml.jackson.databind.node.ObjectNode
 import org.apache.commons.httpclient.util.TimeoutController.TimeoutException
 import org.apache.http.client.HttpResponseException
-import org.apache.spark.sql.catalyst
-import org.apache.spark.sql.catalyst.analysis
 import org.json4s.JsonAST.{JBool, JLong, _}
 import org.json4s.native.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}

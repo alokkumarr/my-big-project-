@@ -21,7 +21,7 @@ check_command sbt
 
 # Build dependencies required while generating route files
 cd $(dirname $0)/..
-mvn -q -pl saw-metadata-service,saw-es-querybuilder -am package
+mvn -q -pl saw-data-access,saw-metadata-service,saw-es-querybuilder -am package
 
 cd saw-transport-service
 
@@ -31,7 +31,7 @@ rm -rf $cont/routes.java $cont/ReverseRoutes.scala $cont/javascript app/router
 
 # Copy over libraries required while generating route files
 mkdir -p lib
-dirs="saw-common saw-metadata-service saw-es-querybuilder"
+dirs="saw-data-access saw-common saw-metadata-service saw-es-querybuilder"
 for dir in $dirs; do
     cp ../$dir/target/*.jar lib
 done
