@@ -7,7 +7,7 @@
 # Bamboo, consider setting the value from the command line instead and
 # removing this script.
 #
-set -eu
+set -eu -o pipefail
 
 dir=$(dirname $0)
 revision=$(git describe --match 'v*' --long | sed -e 's/^v//')
