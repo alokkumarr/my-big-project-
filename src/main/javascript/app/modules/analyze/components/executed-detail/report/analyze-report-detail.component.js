@@ -62,6 +62,7 @@ export const AnalyzeReportDetailComponent = {
         return;
       }
 
+      this.gridData = data;
       this.columns = this._getColumns(this.analysis, data);
     }
     // TODO runtime filters in SAW-634

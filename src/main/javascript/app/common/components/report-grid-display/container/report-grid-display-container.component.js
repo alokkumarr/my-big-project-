@@ -121,6 +121,7 @@ export const ReportGridDisplayContainerComponent = {
       const nodes = map(groupedObj, (val, key) => {
         return {
           groupValue: key,
+          columnName,
           itemCount: val.length,
           data: map(val, omit(columnName))
         };

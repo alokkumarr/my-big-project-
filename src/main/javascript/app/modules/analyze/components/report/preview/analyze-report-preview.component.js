@@ -1,4 +1,3 @@
-import first from 'lodash/first';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import template from './analyze-report-preview.component.html';
@@ -30,14 +29,10 @@ export const AnalyzeReportPreviewComponent = {
       this._$mdDialog.cancel();
     }
 
-    reloadPreviewGrid() {
-      const grid = first(this._$componentHandler.get('arp-grid-container'));
-      if (grid) {
-        grid.updateColumns(this.model.columns);
-        grid.updateSorts(this.model.sorts);
-        grid.updateSource(this.model.data);
-        grid.refreshGrid();
-      }
+    loadGridData(options = {}) {
+      return this._AnalyzeService.previewExecution(this.model.report, options).then(({data, count}) => {
+        return {data, count};
+      });
     }
   }
 };

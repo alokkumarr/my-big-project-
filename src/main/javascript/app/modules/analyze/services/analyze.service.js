@@ -62,6 +62,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     getPublishedAnalysesByAnalysisId,
     getSemanticLayerData,
     isExecuting,
+    previewExecution,
     publishAnalysis,
     readAnalysis,
     saveReport,
@@ -168,6 +169,22 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
       ['contents.keys.[0].id', analysisId]
     ]);
     return $http.post(`${url}/analysis`, payload).then(fpGet(`data.contents.analyze.[0]`));
+  }
+
+  function previewExecution(model, options = {}) {
+    return applyAnalysis(model, EXECUTION_MODES.PREVIEW).then(data => {
+      const count = data.length;
+
+      if (has(options, 'skip')) {
+        data = drop(data, options.skip);
+      }
+
+      if (has(options, 'take')) {
+        data = take(data, options.take);
+      }
+
+      return {data, count};
+    });
   }
 
   function executeAnalysis(model) {
