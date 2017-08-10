@@ -1,4 +1,7 @@
 import forEach from 'lodash/forEach';
+import has from 'lodash/has';
+import drop from 'lodash/drop';
+import take from 'lodash/take';
 import startCase from 'lodash/startCase';
 import set from 'lodash/set';
 import reduce from 'lodash/reduce';
@@ -142,8 +145,21 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
       .then(fpSortBy([obj => -obj.finished]));
   }
 
-  function getExecutionData(analysisId, executionId) {
-    return $http.get(`${url}/analysis/${analysisId}/executions/${executionId}/data`).then(fpGet(`data.data`));
+  function getExecutionData(analysisId, executionId, options = {}) {
+    return $http.get(`${url}/analysis/${analysisId}/executions/${executionId}/data`).then(resp => {
+      let data = fpGet(`data.data`, resp);
+      const count = data.length;
+
+      if (has(options, 'skip')) {
+        data = drop(data, options.skip);
+      }
+
+      if (has(options, 'take')) {
+        data = take(data, options.take);
+      }
+
+      return {data, count};
+    });
   }
 
   function readAnalysis(analysisId) {

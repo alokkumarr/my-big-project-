@@ -22,6 +22,7 @@ export const ReportGridDisplayContainerComponent = {
   template,
   bindings: {
     data: '<',
+    source: '&',
     columns: '<',
     groups: '<',
     requester: '<'
@@ -43,6 +44,10 @@ export const ReportGridDisplayContainerComponent = {
       this.settings = {
         layoutMode: LAYOUT_MODE.DETAIL
       };
+    }
+
+    loadData(options) {
+      return this.source({options});
     }
 
     request(requests) {

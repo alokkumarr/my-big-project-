@@ -22,6 +22,7 @@
     <div layout="column" layout-align="space-between center">
       <report-grid-display-container data="$ctrl.gridData"
                             columns="$ctrl.columns"
+                            source="$ctrl.loadData(options)"
                             groups="$ctrl.analysis.groupByColumns"
                             requester="$ctrl.requester">
       </report-grid-display-container>

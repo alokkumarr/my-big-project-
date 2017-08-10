@@ -1,5 +1,5 @@
 import map from 'lodash/map';
-import take from 'lodash/take';
+import DataSource from 'devextreme/data/data_source';
 
 import template from './report-grid-display.component.html';
 
@@ -11,7 +11,8 @@ export const ReportGridDisplayComponent = {
   template,
   bindings: {
     data: '<',
-    columns: '<'
+    columns: '<',
+    source: '&'
   },
   controller: class ReportGridDisplayController {
     constructor(dxDataGridService, FilterService) {
@@ -26,7 +27,10 @@ export const ReportGridDisplayComponent = {
 
       this.gridConfig = this._dxDataGridService.mergeWithDefaultConfig({
         columns,
-        dataSource: this.data,
+        remoteOperations: {
+          paging: true
+        },
+        dataSource: this._createCustomStore(),
         scrolling: {
           mode: 'standard'
         },
@@ -39,6 +43,16 @@ export const ReportGridDisplayComponent = {
         },
         onInitialized: this.onGridInitialized.bind(this)
       });
+    }
+
+    _createCustomStore() {
+      const store = new DataSource({
+        load: options => {
+          return this.source({options})
+            .then(({data, count}) => ({data, totalCount: count}));
+        }
+      });
+      return store;
     }
 
     _getDxColumns(columns) {
@@ -64,9 +78,8 @@ export const ReportGridDisplayComponent = {
     $onChanges() {
       if (this._gridInstance) {
         const columns = this._getDxColumns(this.columns);
-        this._gridInstance.option('dataSource', this.data);
         this._gridInstance.option('columns', columns);
-        this._gridInstance.refresh();
+        // this._gridInstance.refresh();
       }
     }
 

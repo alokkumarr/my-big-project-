@@ -12,7 +12,7 @@ export const AnalyzeExecutedDetailComponent = {
   styles: [style],
   controller: class AnalyzeExecutedDetailController extends AbstractComponentController {
     constructor($injector, AnalyzeService, $state, $rootScope, JwtService, $mdDialog,
-                $window, toastMessage, FilterService, AnalyzeActionsService, $scope) {
+                $window, toastMessage, FilterService, AnalyzeActionsService, $scope, $q) {
       'ngInject';
       super($injector);
 
@@ -21,6 +21,7 @@ export const AnalyzeExecutedDetailComponent = {
       this._$state = $state;
       this._$rootScope = $rootScope;
       this._$scope = $scope;
+      this._$q = $q;
       this._FilterService = FilterService;
       this._toastMessage = toastMessage;
       this._$window = $window; // used for going back from the template
@@ -45,7 +46,6 @@ export const AnalyzeExecutedDetailComponent = {
       this._destroyHandler = this.on(Events.AnalysesRefresh, () => {
         this.loadAnalysisById(analysisId).then(() => {
           this._executionId = null;
-          this.loadExecutionData();
           this.loadExecutedAnalyses(analysisId);
         });
       });
@@ -57,12 +57,10 @@ export const AnalyzeExecutedDetailComponent = {
         if (!this.analysis.schedule) {
           this.isPublished = false;
         }
-        this.loadExecutionData();
         this.loadExecutedAnalyses(analysisId);
       } else {
         this.loadAnalysisById(analysisId).then(() => {
           this.watchAnalysisExecution();
-          this.loadExecutionData();
           this.loadExecutedAnalyses(analysisId);
         });
       }
@@ -140,12 +138,14 @@ export const AnalyzeExecutedDetailComponent = {
       });
     }
 
-    loadExecutionData() {
+    loadExecutionData(options = {}) {
       if (this._executionId) {
-        this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId).then(data => {
+        return this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId, options).then(({data, count}) => {
           this.requester.next({data});
+          return {data, count};
         });
       }
+      return this._$q.reject(new Error('No execution id selected'));
     }
 
     loadAnalysisById(analysisId) {

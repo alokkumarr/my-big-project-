@@ -10,6 +10,7 @@ export const AnalyzeReportDetailComponent = {
   template,
   bindings: {
     analysis: '<',
+    source: '&',
     requester: '<'
   },
   controller: class AnalyzeReportDetailController {
@@ -52,12 +53,15 @@ export const AnalyzeReportDetailComponent = {
       this.dataSubscription.unsubscribe();
     }
 
+    loadData(options) {
+      return this.source({options});
+    }
+
     onData({data}) {
       if (!data) {
         return;
       }
 
-      this.gridData = data;
       this.columns = this._getColumns(this.analysis, data);
     }
     // TODO runtime filters in SAW-634
