@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Deploy SAW Security to the shared development environment
+# Deploy SAW Security to an environment
 #
 
 error() {
@@ -9,7 +9,7 @@ error() {
 }
 
 if ! command -v ansible-playbook > /dev/null; then
-    error "Ansible not found; please install and retry"
+    error "Ansible not found; please install Ansible and retry"
 fi
 
 cd $(dirname $0)

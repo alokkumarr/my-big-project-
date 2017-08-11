@@ -11,6 +11,9 @@ see
 
 # Prerequisites
 
+Passwordless SSH access to the target hosts is required.  Also "sudo"
+rights are required.
+
 # Installing
 
 # Upgrading

@@ -4,7 +4,9 @@ After=default.target
 
 [Service]
 Type=oneshot
-ExecStart=/maven/deploy
+ExecStart=/bin/bash -c "tar -xzf *.tgz && bda-saw-security-*/deploy"
+WorkingDirectory=/maven
+SyslogIdentifier=saw-deploy
 
 [Install]
 WantedBy=default.target

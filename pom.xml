@@ -501,6 +501,25 @@ echo pre-remove completed: ${app.nameVer}
                 </configuration>
             </plugin>
             <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                  <descriptors>
+                    <descriptor>${project.basedir}/src/main/assembly/assembly.xml</descriptor>
+                  </descriptors>
+                  <!-- Remove artifact classifier "bin" from archive name -->
+                  <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                  <execution>
+                    <phase>package</phase>
+                    <goals>
+                      <goal>single</goal>
+                    </goals>
+                  </execution>
+                </executions>
+            </plugin>
+            <plugin>
               <groupId>io.fabric8</groupId>
               <artifactId>docker-maven-plugin</artifactId>
               <version>0.21.0</version>
@@ -512,7 +531,19 @@ echo pre-remove completed: ${app.nameVer}
                     <build>
                       <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
                       <assembly>
-                        <descriptorRef>project</descriptorRef>
+                        <inline xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+                                xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+                          <fileSets>
+                            <fileSet>
+                              <directory>${project.build.directory}</directory>
+                              <outputDirectory>.</outputDirectory>
+                              <includes>
+                                <include>*.tgz</include>
+                              </includes>
+                            </fileSet>
+                          </fileSets>
+                        </inline>
                       </assembly>
                     </build>
                     <run>
