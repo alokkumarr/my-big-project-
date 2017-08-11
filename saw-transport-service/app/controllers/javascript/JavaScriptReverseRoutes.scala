@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
-// @SOURCE:saw-services/saw-transport-service/conf/routes
-// @DATE:Mon Jun 26 04:00:36 EDT 2017
+// @SOURCE:/Users/Shared/WORK/SAW-BE/saw-transport-service/conf/routes
+// @DATE:Thu Aug 10 22:00:37 EDT 2017
 
 import play.api.routing.JavaScriptReverseRoute
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
@@ -183,6 +183,16 @@ package controllers.javascript {
       """
     )
   
+    // @LINE:20
+    def getExecutionData: JavaScriptReverseRoute = JavaScriptReverseRoute(
+      "controllers.AnalysisExecutions.getExecutionData",
+      """
+        function(analysisId0,executionId1,start2,limit3) {
+          return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "analysis/" + (""" + implicitly[PathBindable[String]].javascriptUnbind + """)("analysisId", encodeURIComponent(analysisId0)) + "/executions/" + (""" + implicitly[PathBindable[String]].javascriptUnbind + """)("executionId", encodeURIComponent(executionId1)) + "/data" + _qS([(start2 == null ? null : (""" + implicitly[QueryStringBindable[Int]].javascriptUnbind + """)("start", start2)), (limit3 == null ? null : (""" + implicitly[QueryStringBindable[Int]].javascriptUnbind + """)("limit", limit3))])})
+        }
+      """
+    )
+  
     // @LINE:17
     def list: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.AnalysisExecutions.list",
@@ -193,16 +203,6 @@ package controllers.javascript {
             return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "analysis/" + (""" + implicitly[PathBindable[String]].javascriptUnbind + """)("analysisId", encodeURIComponent(analysisId0)) + "/executions"})
           }
         
-        }
-      """
-    )
-  
-    // @LINE:20
-    def getExecutionData: JavaScriptReverseRoute = JavaScriptReverseRoute(
-      "controllers.AnalysisExecutions.getExecutionData",
-      """
-        function(analysisId0,executionId1) {
-          return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "analysis/" + (""" + implicitly[PathBindable[String]].javascriptUnbind + """)("analysisId", encodeURIComponent(analysisId0)) + "/executions/" + (""" + implicitly[PathBindable[String]].javascriptUnbind + """)("executionId", encodeURIComponent(executionId1)) + "/data"})
         }
       """
     )
