@@ -9,4 +9,6 @@ set -euo pipefail
 
 dir=$(dirname $0)
 revision=$(git describe --match 'v*' --long | sed -e 's/^v//')
-echo "-Drevision=$revision" > $dir/maven.config
+revision_nodash=$(echo $revision | sed -e 's/-/_/g')
+maven_config="-Drevision=$revision -Drevision.nodash=$revision_nodash"
+echo "$maven_config" > $dir/maven.config
