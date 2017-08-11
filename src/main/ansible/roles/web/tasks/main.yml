@@ -17,3 +17,5 @@
 - name: Install SAW Security package
   yum: name="{{ item }}" state=present
   with_fileglob: ["../rpms/bda-saw-security-*.rpm"]
+- name: Run SAW Security configuration initialization
+  command: /opt/bda/saw-security/bin/conf_init

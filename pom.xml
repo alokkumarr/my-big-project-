@@ -473,13 +473,6 @@ echo check Python module with "'import MySQLdb'"
 echo pre-install completed: ${app.nameVer}
                         </script>
                     </preinstallScriptlet>
-                    <postinstallScriptlet>
-                        <script>
-echo post-install starting: ${app.nameVer}
-${app.optDir}/bin/conf_init
-echo post-install complete: ${app.nameVer}
-                        </script>
-                    </postinstallScriptlet>
                     <preremoveScriptlet>
                         <script>
 echo pre-remove starting: ${app.nameVer}
