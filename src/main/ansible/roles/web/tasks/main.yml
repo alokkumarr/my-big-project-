@@ -4,8 +4,6 @@
   template: src=mysql-saw.cnf dest=/etc/my.cnf.d/saw.conf
 - name: Enable and start MariaDB service
   systemd: name=mariadb enabled=true state=started
-- name: Install Python interface to MySQL
-  yum: name=MySQL-python state=present
 - name: Create SAW Security group
   group: name=saw
 - name: Create SAW Security user

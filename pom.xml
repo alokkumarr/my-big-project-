@@ -272,6 +272,10 @@
                     <defaultGroupname>${app.group}</defaultGroupname>
                     <defaultDirmode>0755</defaultDirmode>
                     <defaultFilemode>0444</defaultFilemode>
+                    <requires>
+                      <require>java-1.8.0-openjdk-headless &gt;= 1.8.0</require>
+                      <require>MySQL-python &gt;= 1.2.5</require>
+                    </requires>
                     <mappings>
                         <!-- home dir -->
                         <mapping>
