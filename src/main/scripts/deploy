@@ -12,5 +12,5 @@ if ! command -v ansible-playbook > /dev/null; then
     error "Ansible not found; please install Ansible and retry"
 fi
 
-cd $(dirname $0)
-ansible-playbook -i ansible/hosts ansible/playbook.yml
+cd $(dirname $0)/ansible
+ansible-playbook -i hosts site.yml

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sncr</groupId>
     <artifactId>bda-saw-security</artifactId>
-    <version>2.0.0</version>
+    <version>${revision}</version>
     <packaging>war</packaging>
 
     <parent>
@@ -26,7 +26,7 @@
         <prod.release>0</prod.release>
         <project.release>${prod.release}</project.release>
         
-        <rpm.version>${project.version}</rpm.version>
+        <rpm.version>${revision.nodash}</rpm.version>
         
         <!-- 
             Release version number cannot be removed optionally.
