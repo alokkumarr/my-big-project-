@@ -281,6 +281,7 @@ else:
     if cnt == 1:
         mail_msg= "Object Creation Structure already exists. Please use fresh database for initial setup."
         #RSMailer.mail(email_subject,email,mail_msg)  
+        raise Exception(mail_msg)
     else:
         log1.debug("started executing the create and insert script for RS_HL_INITIAL_SETUP table")
         querystring1 = """CREATE TABLE RS_HL_INITIAL_SETUP
@@ -763,5 +764,6 @@ else:
         print mail_msg
         log1.debug("%s deployment not completed successfully" %customer)
         #RSMailer.mail(email_subject,email,mail_msg)
+        raise Exception(mail_msg)
 
     cur10.close()    
