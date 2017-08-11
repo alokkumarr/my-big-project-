@@ -280,7 +280,7 @@ else:
     cur.close()
     if cnt == 1:
         mail_msg= "Object Creation Structure already exists. Please use fresh database for initial setup."
-        RSMailer.mail(email_subject,email,mail_msg)  
+        #RSMailer.mail(email_subject,email,mail_msg)  
     else:
         log1.debug("started executing the create and insert script for RS_HL_INITIAL_SETUP table")
         querystring1 = """CREATE TABLE RS_HL_INITIAL_SETUP
@@ -572,7 +572,7 @@ else:
                                                 
                                                 mail_msg = """%s Scripts Deployment failed in '%s' script execution""" % (customer,app_stat_dt_file)
                                                 log1.debug("""%s Scripts Deployment failed in '%s' script execution""" % (customer,app_stat_dt_file))
-                                                RSMailer.mail(email_subject,email,mail_msg,app_stat_dt_log_file)
+                                                #RSMailer.mail(email_subject,email,mail_msg,app_stat_dt_log_file)
                                                 raise Exception(mail_msg)
                                             
                                             sqlQuery = ''
@@ -586,7 +586,7 @@ else:
                             else:
                                 mail_msg = "'%s' data insertion file not present" %app_stat_dt_file
                                 log1.debug("'%s' data insertion file not present" %app_stat_dt_file)
-                                RSMailer.mail(email_subject,email,mail_msg)
+                                #RSMailer.mail(email_subject,email,mail_msg)
                                 raise Exception(mail_msg)
                         dt_exec_check=1    
                         app_dt_succ_upd = """
@@ -608,7 +608,7 @@ else:
         else:
             mail_msg = "App Static data config file not present"
             log1.debug("App Static data config file not present")
-            RSMailer.mail(email_subject,email,mail_msg)
+            #RSMailer.mail(email_subject,email,mail_msg)
             raise Exception(mail_msg)
         
         # The process used for Application static data insertion will be used for Config static data insertion process
@@ -649,7 +649,7 @@ else:
                         except:
                             mail_msg = """ Please check CONFIG_DATA config file """
                             log1.debug(""" Please check CONFIG_DATA config file """)
-                            RSMailer.mail(email_subject,email,mail_msg)
+                            #RSMailer.mail(email_subject,email,mail_msg)
                             raise Exception(mail_msg)
                         
                         cur9.close()
@@ -690,7 +690,7 @@ else:
                                                 
                                                 mail_msg = """%s Scripts Deployment failed in '%s' script execution""" % (customer,cfg_stat_dt_file)
                                                 log1.debug("""%s Scripts Deployment failed in '%s' script execution""" % (customer,cfg_stat_dt_file))
-                                                RSMailer.mail(email_subject,email,mail_msg,cfg_stat_dt_log_file)
+                                                #RSMailer.mail(email_subject,email,mail_msg,cfg_stat_dt_log_file)
                                                 raise Exception(mail_msg)
                                             
                                             sqlQuery = ''
@@ -704,7 +704,7 @@ else:
                             else:
                                 mail_msg = "'%s' data insertion file not present" %cfg_stat_dt_file
                                 log1.debug("'%s' data insertion file not present" %cfg_stat_dt_file)
-                                RSMailer.mail(email_subject,email,mail_msg)
+                                #RSMailer.mail(email_subject,email,mail_msg)
                                 raise Exception(mail_msg)
                             
                         cfg_dt_succ_upd = """
@@ -757,11 +757,11 @@ else:
         mail_msg = "%s deployment completed successfully" %customer
         log1.debug("%s deployment completed successfully" %customer)
         print mail_msg
-        RSMailer.mail(email_subject,email,mail_msg)
+        #RSMailer.mail(email_subject,email,mail_msg)
     else:
         mail_msg = "%s deployment not completed successfully" %customer
         print mail_msg
         log1.debug("%s deployment not completed successfully" %customer)
-        RSMailer.mail(email_subject,email,mail_msg)
+        #RSMailer.mail(email_subject,email,mail_msg)
 
     cur10.close()    
