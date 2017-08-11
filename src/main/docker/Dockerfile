@@ -15,8 +15,9 @@ RUN yum -y -q --nogpgcheck install openssh-clients
 COPY saw-deploy.service /etc/systemd/system/
 RUN systemctl enable saw-deploy
 
-# Speed up deployment by preinstalling MariaDB in container image
+# Speed up deployment by preinstalling packages in container image
 RUN yum -y -q --nogpgcheck install mariadb-server
+RUN yum -y -q --nogpgcheck install java-1.8.0-openjdk-headless MySQL-python
 
 # Workaround: https://bugzilla.redhat.com/show_bug.cgi?id=1472439
 RUN systemctl mask systemd-machine-id-commit.service
