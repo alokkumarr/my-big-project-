@@ -65,11 +65,11 @@ public enum PaginateDataSet {
       * @return
   */
     private <T> List<T> getPage(List<T> sourceList, int start, int limit) {
-        if(limit <= 0 || start <= 0) {
+        if(limit < 0 || start < 0) {
             throw new IllegalArgumentException("invalid limit: " + limit);
         }
 
-        int fromIndex = (start - 1) * limit;
+        int fromIndex = (limit - 1) * start;
         if(sourceList == null || sourceList.size() < fromIndex){
             return Collections.emptyList();
         }

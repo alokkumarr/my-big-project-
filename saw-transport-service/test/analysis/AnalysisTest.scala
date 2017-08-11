@@ -22,7 +22,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
 
     "create analysis" in {
       /* Create analysis using analysis template preloaded into MapR-DB */
-      val semanticId = "340df99d-16a6-45cb-af49-5699e3337e50"
+      val semanticId = "2fc134ef-2d3c-4306-a058-370e5309d3a6"
       val typeJson: JObject = ("analysisType", "report")
       val response = sendRequest(
         actionKeyMessage("create", semanticId, typeJson))
@@ -90,7 +90,7 @@ class AnalysisTest extends MaprTest with CancelAfterFailure {
 
     "search multiple analyses by category" in {
       /* Create a second analysis */
-      val semanticId = "340df99d-16a6-45cb-af49-5699e3337e50"
+      val semanticId = "2fc134ef-2d3c-4306-a058-370e5309d3a6"
       val typeJson: JObject = ("analysisType", "report")
       val secondAnalysis = analyze(sendRequest(
         actionKeyMessage("create", semanticId, typeJson)))

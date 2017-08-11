@@ -3,7 +3,6 @@ package controllers
 import java.time.Instant
 import java.util
 import java.util.UUID
-
 import com.synchronoss.querybuilder.{EntityType, SAWElasticSearchQueryBuilder, SAWElasticSearchQueryExecutor}
 import model.{ClientException, PaginateDataSet, QueryBuilder}
 import org.json4s.JsonAST.{JArray, JLong, JObject, JString, JValue, JBool => _, JField => _, JInt => _, JNothing => _}
@@ -19,8 +18,6 @@ import sncr.metadata.analysis.AnalysisResult
 import sncr.metadata.engine.ProcessingResult._
 import sncr.metadata.engine.context.SelectModels
 import sncr.metadata.semantix.SemanticNode
-import org.apache.hadoop.hbase.util.Bytes
-import sncr.metadata.engine.SearchMetadata._
 import com.synchronoss.querybuilder.SAWElasticSearchQueryExecutor
 import com.synchronoss.querybuilder.EntityType
 import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder
@@ -459,14 +456,23 @@ class Analysis extends BaseController {
 
       if (PaginateDataSet.INSTANCE.getCache(analysisId.toString.concat(analysisResultId)) != null)
       {
+        m_log.trace("when data is available in cache analysisResultId: {}", analysisId.toString.concat(analysisResultId));
+        m_log.trace("when data is available in cache size of limit {}", limit);
+        m_log.trace("when data is available in cache size of start {}", start);
         data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisId.toString.concat(analysisResultId)));
         totalRows = PaginateDataSet.INSTANCE.sizeOfData();
+        m_log.trace("totalRows {}", totalRows);
       }
       else {
         resultData = execution.getPreview(limit);
+        m_log.trace("when data is not available in cache analysisResultId: {}", analysisId.toString.concat(analysisResultId));
+        m_log.trace("when data is not available in cache size of limit {}", limit);
+        m_log.trace("when data is not available in cache size of start {}", start);
+        m_log.trace("when data is not available fresh execution of resultData {}", resultData.size());
         PaginateDataSet.INSTANCE.putCache(analysisId.toString.concat(analysisResultId), resultData);
         data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisId.toString.concat(analysisResultId)))
         totalRows = PaginateDataSet.INSTANCE.sizeOfData();
+        m_log.info("totalRows {}", totalRows);
       }
       m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}, created execution id: $analysisResultId"
       m_log debug s"start:  ${analysis.getStartTS} , finished  ${analysis.getFinishedTS} "
