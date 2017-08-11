@@ -2,12 +2,10 @@
 #
 # Update the revision property in ".mvn/maven.config".  Populates the
 # parameterized Maven POM "version" property with a value calculated
-# from the current Git revision.  Note: When Maven 3.5.0, which allows
-# overriding property values from the command line, is available in
-# Bamboo, consider setting the value from the command line instead and
-# removing this script.
+# from the current Git revision.  Used in continuous integration to
+# build packages that are automatically versioned.
 #
-set -eu -o pipefail
+set -euo pipefail
 
 dir=$(dirname $0)
 revision=$(git describe --match 'v*' --long | sed -e 's/^v//')
