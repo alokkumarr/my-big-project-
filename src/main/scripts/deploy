@@ -4,12 +4,16 @@
 #
 
 error() {
-    echo "Error: $*"
+    echo "Error: $1"
+    echo "Hint: $2"
     exit 1
 }
 
 if ! command -v ansible-playbook > /dev/null; then
-    error "Ansible not found; please install Ansible and retry"
+    message="Ansible required but not found; please install and retry"
+    command="yum install epel-release && yum install ansible"
+    hint="Install Ansible using \"$command\""
+    error "$message" "$hint"
 fi
 
 cd $(dirname $0)/ansible
