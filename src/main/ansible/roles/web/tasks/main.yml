@@ -17,3 +17,5 @@
   with_fileglob: ["../rpms/bda-saw-security-*.rpm"]
 - name: Run SAW Security configuration initialization
   command: /opt/bda/saw-security/bin/conf_init
+- name: Run SAW Security initial database setup
+  command: /opt/bda/saw-security/db/setup/init
