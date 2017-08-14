@@ -106,6 +106,7 @@ for tfn in $APPL_HOME/conf/templates/* ; do
 \$ $APPL_HOME/bin/mk_conf.sh $conf_tmpl $vars_file $xarg >$conf_file
 =======================================
 "
+        exit 1
     }
     [[ -s $conf_file ]] && {
         chown $APPL_USER:$APPL_GROUP $conf_file &&
