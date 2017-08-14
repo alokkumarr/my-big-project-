@@ -24,7 +24,7 @@
         <spring.release>4.1.6.RELEASE</spring.release>
         <rpm.bda.root>/opt</rpm.bda.root>
         <rpm.release>1</rpm.release>
-        <rpm.version>${project.version}</rpm.version>
+        <rpm.version>${revision.nodash}</rpm.version>
         <akka.version>2.4.9</akka.version>
         <scala.major.version>2.11</scala.major.version>
         <app.user>mapr</app.user>

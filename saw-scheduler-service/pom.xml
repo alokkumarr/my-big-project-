@@ -8,8 +8,9 @@
     <version>1.5.4.RELEASE</version>
     <relativePath/>
   </parent>
+  <groupId>com.synchronoss</groupId>
   <artifactId>saw-scheduler-service</artifactId>
-  <version>1.0.0</version>
+  <version>${revision}</version>
   <packaging>jar</packaging>
   <dependencies>
     <dependency>
@@ -122,6 +123,7 @@
               <goal>rpm</goal>
             </goals>
             <configuration>
+              <version>${revision.nodash}</version>
               <entries>
                 <entry>
                   <name>/opt/bda/saw-scheduler-service</name>
@@ -129,7 +131,7 @@
                 </entry>
                 <entry>
                   <name>/opt/bda/saw-scheduler-service/saw-scheduler.jar</name>
-                  <file>target/saw-scheduler-service-1.0.0-exec.jar</file> 
+                  <file>target/saw-scheduler-service-${revision}-exec.jar</file> 
                 </entry>
                 <entry>
                   <name>/lib/systemd/system/saw-scheduler.service</name>
