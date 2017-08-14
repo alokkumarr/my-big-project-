@@ -2,17 +2,21 @@
 
 This document describes how to develop the application.
 
+# Requirements
+
+- Java
+- Maven
+- Docker (for system tests)
+
 # Building and running tests
 
 To build and run tests do the following:
 
-1. Install Java and Maven
-
-2. Run the project unit tests using Maven:
+1. Run the project unit tests using Maven:
 
         $ mvn test
 
-3. Run the project integration tests using Maven:
+2. Run the project system tests using Maven:
 
         $ mvn verify
 
