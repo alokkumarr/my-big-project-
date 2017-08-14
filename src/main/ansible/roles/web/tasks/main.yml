@@ -1,7 +1,7 @@
 - name: Install MariaDB package
   yum: name=mariadb-server state=present
 - name: Install MariaDB configuration additions
-  template: src=mysql-saw.cnf dest=/etc/my.cnf.d/saw.conf
+  template: src=mysql-saw.cnf dest=/etc/my.cnf.d/saw.cnf
 - name: Enable and start MariaDB service
   systemd: name=mariadb enabled=true state=started
 - name: Create SAW Security group
@@ -17,3 +17,5 @@
   with_fileglob: ["../rpms/bda-saw-security-*.rpm"]
 - name: Run SAW Security configuration initialization
   command: /opt/bda/saw-security/bin/conf_init
+- name: Run SAW Security initial database setup
+  command: /opt/bda/saw-security/db/setup/init
