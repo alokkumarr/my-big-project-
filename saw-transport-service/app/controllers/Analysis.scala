@@ -154,9 +154,7 @@ class Analysis extends BaseController {
         }
         /* Execute analysis and return result data */
         val data = executeAnalysis(analysisId, queryRuntime, json)
-        contentsAnalyze(("data", data))
-        contentsAnalyze(("totalRows", totalRows));
-
+        contentsAnalyze(("data", data)~ ("totalRows",totalRows))
 
       }
       case "delete" => {

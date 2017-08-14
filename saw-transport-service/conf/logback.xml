@@ -39,6 +39,7 @@
   <logger name="sncr.metadata.analysis.AnalysisExecutionHandler" level="INFO"/>
   <logger name="sncr" level="DEBUG"/>
   <logger name="com.synchronoss" level="INFO"/>
+  <logger name="sncr.metadata" level="TRACE"/>
   <logger name="test" level="${log.test.level:-INFO}"/>
 
   <root level="INFO">
