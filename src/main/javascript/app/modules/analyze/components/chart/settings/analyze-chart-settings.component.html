@@ -16,6 +16,7 @@
           <md-radio-button ng-repeat="attr in $ctrl.settings.yaxis"
                            role="radio"
                            ng-value="attr"
+                           e2e="radio-button-{{::attr.displayName}}"
                            ng-disabled="attr.checked && attr.checked != 'y'">
             <span ng-bind="::attr.displayName"></span>
           </md-radio-button>
@@ -28,6 +29,7 @@
           <md-radio-button ng-repeat="attr in $ctrl.settings.xaxis"
                            role="radio"
                            ng-value="attr"
+                           e2e="radio-button-{{::attr.displayName}}"
                            ng-disabled="attr.checked && attr.checked != 'x'">
             <span ng-bind="::attr.displayName"></span>
           </md-radio-button>
@@ -40,6 +42,7 @@
           <md-radio-button ng-repeat="attr in $ctrl.settings.zaxis"
                            role="radio"
                            ng-value="attr"
+                           e2e="radio-button-{{::attr.displayName}}"
                            ng-disabled="attr.checked && attr.checked != 'z'">
             <span ng-bind="::attr.displayName"></span>
           </md-radio-button>
@@ -53,6 +56,7 @@
           <md-radio-button ng-repeat="attr in $ctrl.settings.groupBy"
                            role="radio"
                            ng-value="attr"
+                           e2e="radio-button-{{::attr.displayName}}"
                            ng-disabled="attr.checked && attr.checked != 'g'">
             <span ng-bind="::attr.displayName"></span>
           </md-radio-button>

@@ -9,9 +9,9 @@
                 ng-repeat="field in $ctrl.model.fields | filter:{isHidden:false} track by $index"
                 ng-click="$event.stopPropagation();"
                 ng-mousedown="$ctrl.onFieldMouseDown($event, field);"
+                e2e="js-plumb-field-{{field.getIdentifier()}}"
                 ng-mouseup="$ctrl.onFieldMouseUp($event, field);">
-    <md-checkbox ng-class="'e2e-' + field.getIdentifier()"
-                 ng-model="field.checked"></md-checkbox>
+    <md-checkbox ng-model="field.checked"></md-checkbox>
 
     <span class="jsp-table-column-name"
           ng-bind="::field.getDisplayName()"></span>

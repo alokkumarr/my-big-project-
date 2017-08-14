@@ -20,6 +20,7 @@
                       layout="row" layout-wrap>
         <md-radio-button ng-repeat="metric in $ctrl.metrics track by $index"
                           ng-value="metric"
+                          e2e="metric-name-{{::metric.metricName}}"
                           class="adc-metric" flex="30">
           <span ng-bind="::metric.metricName"></span>
         </md-radio-button>

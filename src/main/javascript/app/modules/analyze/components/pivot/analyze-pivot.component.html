@@ -18,7 +18,9 @@
       </div>
 
       <div class="ard_actions" flex>
-        <md-button class="btn-primary" ng-click="$ctrl.openSavePivotModal($event)"
+        <md-button class="btn-primary"
+                   ng-click="$ctrl.openSavePivotModal($event)"
+                   e2e="open-save-modal"
                    translate="SAVE">
         </md-button>
       </div>
@@ -34,31 +36,40 @@
     <div layout="column">
       <div layout="row" class="ard_toolbar" layou="space-between">
 
-        <span class="ard_toolbar-text" flex="25"
+        <span class="ard_toolbar-text"
+              flex="25"
+              e2e="designer-type-pivot"
               translate="PIVOT"></span>
 
         <div class="ard_toolbar-actions" flex="70" layot="row" layout-wrap>
-          <md-button ng-class="$ctrl.didAnalysisChange ? 'btn-primary' : 'action'" ng-click="$ctrl.onRefreshData()">
+          <md-button ng-class="$ctrl.didAnalysisChange ? 'btn-primary' : 'action'"
+                     e2e="refresh-data-btn"
+                     ng-click="$ctrl.onRefreshData()">
             <span translate="REFRESH_DATA"></span>
           </md-button>
 
-          <md-button class="action" ng-click="$ctrl.openDescriptionModal($event, $ctrl.model)">
+          <md-button class="action" ng-click="$ctrl.openDescriptionModal($event, $ctrl.model)"
+                                    e2e="open-description-modal">
             <md-icon md-font-icon="icon-description"></md-icon>
             <span translate="DESCRIPTION"></span>
           </md-button>
 
-          <md-button class="action" ng-click="$ctrl.openPivotPreviewModal($event)">
+          <md-button class="action"
+                     ng-click="$ctrl.openPivotPreviewModal($event)"
+                     e2e="open-preview-modal">
             <md-icon md-font-icon="icon-full-screen"></md-icon>
             <span translate="PREVIEW"></span>
           </md-button>
 
-          <md-button class="action" ng-click="$ctrl.openPivotSortModal($event)"
+          <md-button class="action"
+                     ng-click="$ctrl.openPivotSortModal($event)"
+                     e2e="open-sort-modal"
                      ng-disabled="!$ctrl.sortFields">
             <md-icon md-font-icon="icon-sort"></md-icon>
             <span translate="SORT"></span>
           </md-button>
 
-          <md-button class="action" ng-click="$ctrl.openFiltersModal()"
+          <md-button class="action" ng-click="$ctrl.openFiltersModal($event)"
                      ng-disabled="!$ctrl.filters">
             <md-icon md-font-icon="icon-filter"></md-icon>
             <span translate="FILTER"></span>

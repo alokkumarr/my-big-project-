@@ -1,23 +1,37 @@
 const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
 
+const windowsPath = '../node_modules/chromedriver/lib/chromedriver/chromedriver.exe';
+const unixPath = '../node_modules/protractor/node_modules/webdriver-manager/selenium/chromedriver_2.31';
+const chromedriverPath = process.platform === 'win32' ? windowsPath : unixPath;
+
 exports.config = {
   framework: 'jasmine2',
-  seleniumAddress: 'http://localhost:4444/wd/hub',
+  chromeDriver: chromedriverPath,
+  //seleniumAddress: 'http://localhost:4444/wd/hub',
   getPageTimeout: 60000,
   allScriptsTimeout: 500000,
   directConnect: true,
 
-  capabilities: {
-    browserName: 'chrome',
-    chromeOptions: {
-      args: [
-        //'incognito',
-        'disable-extensions',
-        'disable-web-security'
-      ]
-    }
-  },
+  multiCapabilities: [
+
+    {
+      browserName: 'chrome',
+       chromeOptions: {
+        args: [
+          //'incognito',
+          'disable-extensions',
+          'disable-web-security'
+        ]
+      }
+    },
+
+/*    {
+      browserName: 'firefox'
+    }*/
+  ],
+
+  //maxSessions: 2,
 
   jasmineNodeOpts: {
     isVerbose: true,
@@ -35,7 +49,12 @@ exports.config = {
     ],
 
     analyses: [
-      webpackHelper.root('src/test/javascript/e2e/spec/analyses.spec.js')
+      webpackHelper.root('src/test/javascript/e2e/spec/priviliges.spec.js')
+      // webpackHelper.root('src/test/javascript/e2e/spec/analyses.spec.js'),
+      // webpackHelper.root('src/test/javascript/e2e/spec/goToAnalyze.spec'),
+      // webpackHelper.root('src/test/javascript/e2e/spec/createChart.spec.js')
+      // webpackHelper.root('src/test/javascript/e2e/spec/createPivot.spec.js')
+      // webpackHelper.root('src/test/javascript/e2e/spec/createReport.spec.js')
     ]
   },
 

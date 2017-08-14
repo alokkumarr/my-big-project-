@@ -20,6 +20,7 @@
 
       <div class="ard_actions" flex>
         <md-button ng-click="$ctrl.openSaveChartModal($event)"
+                   e2e="open-save-modal"
                    translate="SAVE">
         </md-button>
       </div>
@@ -45,23 +46,29 @@
                           ng-model="$ctrl.barColumnChoice"
                           ng-change="$ctrl.toggleBarColumn()">
             </choice-group>
-            <span class="md-title" translate="CHART"></span>
+            <span class="md-title"
+                  e2e="designer-type-chart"
+                  translate="CHART">
+            </span>
           </div>
 
           <div class="analyze-view_action-panel" layout="row" layout-align="end center">
             <md-button ng-click="$ctrl.refreshChartData()"
+                       e2e="refresh-data-btn"
                        ng-class="{'btn-primary': $ctrl.didAnalysisChange}" >
               <span translate="REFRESH_DATA"></span>
             </md-button>
-            <md-button ng-click="$ctrl.openDescriptionModal($event, $ctrl.model)">
+            <md-button ng-click="$ctrl.openDescriptionModal($event, $ctrl.model)"
+                       e2e="open-description-modal">
               <md-icon md-font-icon="icon-description"></md-icon>
               <span translate="DESCRIPTION"></span>
             </md-button>
-            <md-button ng-click="$ctrl.openChartPreviewModal($event)">
+            <md-button ng-click="$ctrl.openChartPreviewModal($event)"
+                       e2e="open-preview-modal">
               <md-icon md-font-icon="icon-full-screen"></md-icon>
               <span translate="PREVIEW"></span>
             </md-button>
-            <md-button ng-click="$ctrl.openFiltersModal()">
+            <md-button ng-click="$ctrl.openFiltersModal($event)">
               <md-icon md-font-icon="icon-filter"></md-icon>
               <span translate="FILTER"></span>
             </md-button>
