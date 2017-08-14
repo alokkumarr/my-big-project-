@@ -88,16 +88,19 @@
 
       <div layout="row" class="ard_toolbar">
         <md-button class="ard_toolbar-expand"
+                   e2e="report-expand-btn"
                    ng-class="{'m-expanded':$ctrl.states.detailsExpanded}"
                    ng-click="$ctrl.toggleDetailsPanel()">
           <md-icon md-font-icon="icon-expand"></md-icon>
         </md-button>
 
         <span class="ard_toolbar-text"
+              e2e="designer-type-report"
               translate="REPORT"></span>
 
         <div class="ard_toolbar-actions" flex>
           <md-button ng-click="$ctrl.refreshGridData()"
+                     e2e="refresh-data-btn"
                      ng-if="!$ctrl.model.edit"
                      ng-show="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE"
                      ng-class="{'btn-primary': $ctrl.didAnalysisChange}" >

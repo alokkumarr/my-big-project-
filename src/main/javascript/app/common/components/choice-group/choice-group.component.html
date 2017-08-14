@@ -1,5 +1,6 @@
 <div layout="row" layout-align="start center" ng-class="$ctrl.sizeClass">
   <md-button layout="column"
+             e2e="item-type-{{::item.type}}"
              ng-repeat="item in $ctrl.items track by item.type"
              ng-class="{'selected': item.type === $ctrl.ngModel}"
              ng-disabled="item.disabled"

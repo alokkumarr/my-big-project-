@@ -23,7 +23,9 @@
 
         <md-menu-bar>
           <md-menu>
-            <md-button class="md-icon-button" aria-label="User"
+            <md-button class="md-icon-button"
+                       aria-label="User"
+                       e2e="account-settings-menu-btn"
                        ng-click="$mdMenu.open()">
 
               <md-tooltip ng-bind="'TOOLTIP_ACCOUNT_SETTINGS' | translate"></md-tooltip>
@@ -35,14 +37,23 @@
                 <md-button translate="ACCOUNT"></md-button>
               </md-menu-item>-->
               <md-menu-item>
-                <md-button ng-click="$ctrl.changePwd()" translate="CHANGE_PASSWORD"></md-button>
+                <md-button ng-click="$ctrl.changePwd()"
+                           e2e="account-settings-selector-change-password"
+                           translate="CHANGE_PASSWORD">
+                </md-button>
               </md-menu-item>
               <md-menu-item ng-if="$ctrl.showAdmin">
-                <md-button ui-sref="admin" translate="ADMIN"></md-button>
+                <md-button ui-sref="admin"
+                           e2e="account-settings-selector-admin"
+                           translate="ADMIN">
+                </md-button>
               </md-menu-item>
               <md-menu-divider></md-menu-divider>
               <md-menu-item>
-                <md-button ng-click="$ctrl.logout()" translate="LOG_OUT"></md-button>
+                <md-button ng-click="$ctrl.logout()"
+                           e2e="account-settings-selector-logout"
+                           translate="LOG_OUT">
+                </md-button>
               </md-menu-item>
             </md-menu-content>
           </md-menu>

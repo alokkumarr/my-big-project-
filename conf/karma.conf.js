@@ -6,13 +6,15 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     frameworks: ['mocha', 'chai'],
     browsers: ['PhantomJS'],
-    reporters: ['progress', 'coverage'],
-    junitReporter: {
-      outputDir: 'test-reports'
-    },
+    reporters: ['progress', 'coverage', 'junit'],
     coverageReporter: {
       dir: webpackHelper.root('coverage'),
       type: 'html'
+    },
+    junitReporter: {
+      outputDir: webpackHelper.root(),
+      outputFile: 'junit.xml',
+      useBrowserName: false
     },
     port: 9876,
     files: [
@@ -27,6 +29,7 @@ module.exports = function (config) {
       require('karma-mocha'),
       require('karma-mocha-reporter'),
       require('karma-coverage'),
+      require('karma-junit-reporter'),
       require('karma-phantomjs-launcher'),
       require('karma-phantomjs-shim'),
       require('karma-webpack')

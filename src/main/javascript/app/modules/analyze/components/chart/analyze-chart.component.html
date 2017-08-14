@@ -46,11 +46,15 @@
                           ng-model="$ctrl.barColumnChoice"
                           ng-change="$ctrl.toggleBarColumn()">
             </choice-group>
-            <span class="md-title" translate="CHART"></span>
+            <span class="md-title"
+                  e2e="designer-type-chart"
+                  translate="CHART">
+            </span>
           </div>
 
           <div class="analyze-view_action-panel" layout="row" layout-align="end center">
             <md-button ng-click="$ctrl.refreshChartData()"
+                       e2e="refresh-data-btn"
                        ng-class="{'btn-primary': $ctrl.didAnalysisChange}" >
               <span translate="REFRESH_DATA"></span>
             </md-button>
@@ -64,8 +68,7 @@
               <md-icon md-font-icon="icon-full-screen"></md-icon>
               <span translate="PREVIEW"></span>
             </md-button>
-            <md-button ng-click="$ctrl.openFiltersModal()"
-                       e2e="open-filter-modal">
+            <md-button ng-click="$ctrl.openFiltersModal($event)">
               <md-icon md-font-icon="icon-filter"></md-icon>
               <span translate="FILTER"></span>
             </md-button>
