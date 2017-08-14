@@ -271,7 +271,12 @@ export const AnalyzeChartComponent = {
         return field;
       });
 
+      const data = find(this.settings.yaxis, y => y.columnName === 'FAILED_MB');
+
+      data.aggregate = 'sum';
+
       set(payload, 'sqlBuilder.dataFields', dataFields);
+      payload.sqlBuilder.dataFields.push(data);
       set(payload, 'sqlBuilder.nodeFields', nodeFields);
 
       delete payload.supports;
