@@ -46,7 +46,6 @@ export function MenuService($q, JwtService) {
           data: subfeature
         };
       });
-
       return obj;
     }));
 

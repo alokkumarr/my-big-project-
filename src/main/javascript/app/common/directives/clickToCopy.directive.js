@@ -43,22 +43,20 @@ function copyTextToClipboard($document, text) {
 
 class ClickToCopyDirective {
 
-  controller($element, $document, toastMessage) {
+  controller($scope, $element, $document, toastMessage) {
     'ngInject';
 
-    this._$document = $document;
-    this._$element = $element;
-    this._toastMessage = toastMessage;
-
     this.onClick = () => {
-      const status = copyTextToClipboard(this._$document[0], this._$element[0].value || this._$element[0].textContent);
+      const status = copyTextToClipboard($document[0], $element[0].value || $element[0].textContent);
       /* eslint-disable */
-      status && this._toastMessage.info('Error details copied to clipboard');
+      status && toastMessage.info('Error details copied to clipboard');
       /* eslint-enable */
     };
 
     $element.css('cursor', 'pointer');
-    $element.on('click', this.onClick.bind(this));
+    $element.on('click', this.onClick);
+
+    $scope.$on('$destroy', () => $element.off('click', this.onClick));
   }
 
 }

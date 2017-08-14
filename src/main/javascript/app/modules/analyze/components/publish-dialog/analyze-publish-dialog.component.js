@@ -9,6 +9,8 @@ import first from 'lodash/first';
 import template from './analyze-publish-dialog.component.html';
 import style from './analyze-publish-dialog.component.scss';
 
+import {PRIVILEGES} from '../../consts';
+
 const F2B_DICTIONARY = {
   WEEKS: 'weekly',
   DAYS: 'daily'
@@ -66,7 +68,7 @@ export const AnalyzePublishDialogComponent = {
 
     $onInit() {
       this.populateSchedule();
-      this._AnalyzeService.getCategories()
+      this._AnalyzeService.getCategories(PRIVILEGES.PUBLISH)
         .then(response => {
           this.dataHolder = response;
           this.setDefaultCategory();
