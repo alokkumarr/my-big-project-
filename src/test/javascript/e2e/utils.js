@@ -22,7 +22,16 @@ function doMdSelectOption({parentElem, btnSelector, optionSelector}) {
   });
 }
 
+function getMdSelectOptions({parentElem, btnSelector}) {
+  const btn = parentElem.element(by.css(btnSelector));
+  btn.click();
+  return btn.getAttribute('aria-owns').then(id => {
+    return element(by.id(id));
+  });
+}
+
 module.exports = {
   hasClass,
-  doMdSelectOption
+  doMdSelectOption,
+  getMdSelectOptions
 };

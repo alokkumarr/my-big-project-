@@ -14,5 +14,28 @@ module.exports = {
     userElem.clear().sendKeys(user);
     passwordElem.clear().sendKeys(password);
     loginElem.click();
+  },
+
+  /**
+   * Login as a user from this list
+   * https://confluence.synchronoss.net:8443/pages/viewpage.action?spaceKey=BDA&title=Users%2C+Roles+And+Privileges
+   */
+  loginAs(role) {
+    const password = 'Sawsyncnewuser1!';
+    switch (role) {
+      case 'admin':
+        this.userLogin('sawadmin@synchronoss.com', password);
+        break;
+      case 'user':
+        this.userLogin('reportuser@synchronoss.com', password);
+        break;
+      case 'analyst':
+        this.userLogin('analyst@synchronoss.com', password);
+        break;
+      case 'reviewer':
+        this.userLogin('reviewer@synchronoss.com', password);
+        break;
+      default:
+    }
   }
 };

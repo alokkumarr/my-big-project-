@@ -19,11 +19,13 @@
       <div>
         <md-button ng-hide="!$ctrl.canUserEdit"
             class="btn-link"
+            e2e="action-edit-btn"
             ng-click="$ctrl.edit()">
           <span translate="EDIT"></span>
         </md-button>
         <md-button ng-hide="!$ctrl.canUserFork"
                    class="btn-link"
+                   e2e="action-fork-btn"
                    ng-click="$ctrl.fork()">
           <span translate="FORK_AND_EDIT"></span>
         </md-button>
@@ -36,6 +38,7 @@
 
         <md-button ng-hide="$ctrl.isPublished && !$ctrl.canUserPublish"
                    class="btn-primary"
+                   e2e="action-publish-btn"
                    ng-click="$ctrl.publish()">
           <span translate="PUBLISH"></span>
         </md-button>

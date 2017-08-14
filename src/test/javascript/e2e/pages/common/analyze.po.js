@@ -1,4 +1,4 @@
-const {doMdSelectOption} = require('../../utils');
+const {doMdSelectOption, getMdSelectOptions} = require('../../utils');
 
 const getCards = name => element.all(by.css('md-card[e2e="analysis-card"]')).filter(elem => {
   return elem.element(by.cssContainingText('a[e2e="analysis-name"]', name));
@@ -6,7 +6,12 @@ const getCards = name => element.all(by.css('md-card[e2e="analysis-card"]')).fil
 
 const getCard = name => getCards(name).first();
 
+const firstCard = element.all(by.css('md-card[e2e="analysis-card"]')).first();
+
+const getForkBtn = parent => parent.element(by.css('button[e2e="action-fork-btn"]'));
+
 const getCardTitle = name => element(by.cssContainingText('a[e2e="analysis-name"]', name));
+const firstCardTitle = element.all(by.css('a[e2e="analysis-name"]')).first();
 
 const doAnalysisAction = (name, action) => {
   const card = getCard(name);
@@ -18,6 +23,15 @@ const doAnalysisAction = (name, action) => {
       .click();
   });
 };
+
+const getAnalysisActionOptions = name => {
+  return getMdSelectOptions({
+    parentElem: getCard(name),
+    btnSelector: 'button[e2e="actions-menu-toggle"]'
+  });
+};
+
+const getAnalysisOption = (parent, option) => parent.element(by.css(`button[e2e="actions-menu-selector-${option}"]`));
 
 const getChartSettingsRadio = (axis, name) => {
   return element(by.css(`md-radio-group[ng-model="$ctrl.selected.${axis}"]`))
@@ -82,6 +96,14 @@ const getJoinlabel = (tableNameA, fieldNameA, tableNameB, fieldNameB, joinType) 
   return element(by.css(`[e2e="join-label-${tableNameA}:${fieldNameA}-${joinType}-${tableNameB}:${fieldNameB}"]`));
 };
 
+const doAccountAction = action => {
+  doMdSelectOption({
+    parentElem: element(by.css('header > md-toolbar')),
+    btnSelector: 'button[e2e="account-settings-menu-btn"]',
+    optionSelector: `button[e2e="account-settings-selector-${action}"]`
+  });
+};
+
 module.exports = {
   newDialog: {
     getMetric: name => element(by.css(`md-radio-button[e2e="metric-name-${name}"]`)),
@@ -132,7 +154,13 @@ module.exports = {
     getAnalysisCards: getCards,
     getCardTitle,
     doAnalysisAction,
-    confirmDeleteBtn: element(by.cssContainingText('button[ng-click="dialog.hide()"]', 'Delete'))
+    getAnalysisActionOptions,
+    confirmDeleteBtn: element(by.cssContainingText('button[ng-click="dialog.hide()"]', 'Delete')),
+    doAccountAction,
+    firstCard,
+    getForkBtn,
+    getAnalysisOption,
+    firstCardTitle
   },
   saveDialog: {
     selectedCategory: element(by.css('md-select[e2e="save-dialog-selected-category"]')),

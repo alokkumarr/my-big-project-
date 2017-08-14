@@ -1,5 +1,6 @@
 const login = require('../pages/common/login.po.js');
 const header = require('../pages/components/header.co.js');
+const analyze = require('../pages/common/analyze.po.js');
 
 describe('Login Tests', () => {
 
@@ -14,6 +15,10 @@ describe('Login Tests', () => {
   it('should be successfully logged in', () => {
     browser.sleep(2000);
     expect(header.headerElements.companyLogo.isPresent()).toBeTruthy();
+  });
+
+  it('should log out', () => {
+    analyze.main.doAccountAction('logout');
   });
 
 });
