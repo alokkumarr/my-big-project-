@@ -41,36 +41,11 @@ Execute the following steps to install SAW Services:
         cd saw-services-*
         ./deploy <config>
 
-2. Go to /opt/saw/service/conf : open application.conf in your favorite editor & change the below attribute value accordingly
-   
-   `metadata = {
-  path = "/main/metadata"
-  zookeeper-quorum = "mapr01.bda.poc.velocity-va.sncrcorp.net,mapr02.bda.poc.velocity-   va.sncrcorp.net,mapr03.bda.poc.velocity-va.sncrcorp.net,mapr04.bda.poc.velocity-va.sncrcorp.net,mapr05.bda.poc.velocity-va.sncrcorp.net,mapr06.bda.poc.velocity-va.sncrcorp.net,mapr07.bda.poc.velocity-va.sncrcorp.net,mapr08.bda.poc.velocity-va.sncrcorp.net,mapr09.bda.poc.velocity-va.sncrcorp.net,mapr10.bda.poc.velocity-va.sncrcorp.net"
-  user = "mapr"
-} `
-
-
-3. Then change spark related attributes under 
-   `spark = {....}`
-   
-   
-4. Then change elastic search related attributes under  
-  `es = {
-  host = "10.48.22.179"
-  timeout = 30
-  port = 9200
-  username = "elastic"
-  password = "xuw3dUraHapret"
-  protocol = "http"
-}`
-
-   `Note: It does not support https protocol`
- 
-5. Now before executing step 6 i.e. start the service
+3. Now before executing step 6 i.e. start the service
    You need to change or make sure that one vm argument has right value in the script i.e esproxy URL
    ` -Durl=http://saw03.bda.poc.velocity-va.sncrcorp.net:9200/ `
   
-6. Configure a URL in a front-end proxy to point to port 9200 of the
+4. Configure a URL in a front-end proxy to point to port 9200 of the
    host that SAW Services has been installed on.  This URL should then
    be used to configure the endpoints in the SAW web front-end.
 
