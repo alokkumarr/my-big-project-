@@ -22,12 +22,12 @@ is provided:
 Execute the following steps to install SAW Security:
 
 1. Get the SAW Security release package (named
-   `bda-saw-security-*.tgz`) for the desired version
+   `saw-security-*.tgz`) for the desired version
 
 2. Extract the release package and execute the deploy script
 
-        tar -xzf bda-saw-security-*.tgz
-        cd bda-saw-security-*
+        tar -xzf saw-security-*.tgz
+        cd saw-security-*
         ./deploy <config>
 
 Note: Configure passwordless SSH access to the target host for a

@@ -17,7 +17,7 @@
       <outputDirectory>ansible</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}/rpm/bda-saw-security/RPMS/noarch</directory>
+      <directory>${project.build.directory}/rpm/saw-security/RPMS/noarch</directory>
       <outputDirectory>rpms</outputDirectory>
     </fileSet>
   </fileSets>
