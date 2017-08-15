@@ -2,7 +2,7 @@
 <sncr:governance
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:sncr="http://synchronoss.com/governance">
-    <sncr:projectName>bda-saw-security</sncr:projectName>
+    <sncr:projectName>saw-security</sncr:projectName>
     <sncr:version>1.0</sncr:version>
     <sncr:jiraProject>SAW</sncr:jiraProject>
     <sncr:application>ServerAPI</sncr:application>
