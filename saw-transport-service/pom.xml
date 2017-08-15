@@ -9,7 +9,7 @@
     <groupId>com.synchronoss.saw</groupId>
     <artifactId>saw-transport-service</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0</version>
+    <version>${revision}</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slf4j.version>1.7.21</slf4j.version>

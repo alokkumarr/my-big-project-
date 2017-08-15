@@ -7,7 +7,7 @@
 	<packaging>jar</packaging>
 	<name>saw-es-querybuilder</name>
 	<url>http://www.synchronoss.com</url>
-	<version>1.0.0</version>
+	<version>${revision}</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<es.version>5.4.0</es.version>
