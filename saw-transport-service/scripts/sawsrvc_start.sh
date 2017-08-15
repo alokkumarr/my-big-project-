@@ -152,7 +152,7 @@ for j in `ls /opt/mapr/spark/spark-current/jars/*.jar`; do
 done
 lib_classpath=${lib_classpath}:$(mapr classpath)
 
-	
+
 declare -r app_classpath="$conf_dir:$lib_classpath"
 
 
@@ -167,8 +167,8 @@ declare -r java_args=$( echo \
     -Duser.dir=${user_dir} \
     -Durl=http://saw03.bda.poc.velocity-va.sncrcorp.net:9200/ \
     -Djava.library.path=/opt/mapr/lib \
-    -Dschema.pivot=/opt/saw/service-1.0.0.1/schema/pivot_querybuilder_schema.json \
-    -Dschema.chart=/opt/saw/service-1.0.0.1/schema/chart_querybuilder_schema.json \
+    -Dschema.pivot=/opt/saw/service/schema/pivot_querybuilder_schema.json \
+    -Dschema.chart=/opt/saw/service/schema/chart_querybuilder_schema.json \
     -Dhadoop.home.dir=/opt/mapr/hadoop/hadoop-$(cat /opt/mapr/hadoop/hadoopversion)
     )
 vlog java_args: $java_args
