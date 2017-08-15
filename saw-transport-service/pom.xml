@@ -545,11 +545,12 @@
                     <execution>
                         <id>saw-services-rpm</id>
                         <goals>
-                            <goal>rpm</goal>
+                            <goal>attached-rpm</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
+                    <classifier>rpm</classifier>
                     <license>Synchronoss proprietary product</license>
                     <distribution>SAW Transport Service</distribution>
                     <needarch>false</needarch>
