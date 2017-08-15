@@ -149,15 +149,12 @@ class Analysis extends BaseController {
 	        .extractOrElse[String]("interactive")
 	      val runtime = (executionType == "interactive")
 	      queryRuntime = QueryBuilder.build(analysis, runtime)
-            contentsAnalyze(("totalRows", totalRows));
-            }
-          }
+          }}
           case _ => {}
         }
         /* Execute analysis and return result data */
         val data = executeAnalysis(analysisId, queryRuntime, json)
-        contentsAnalyze(("data", data))
-
+        contentsAnalyze(("data", data)~ ("totalRows",totalRows))
 
       }
       case "delete" => {
@@ -454,23 +451,23 @@ class Analysis extends BaseController {
       var data: JValue = null
       var resultData : java.util.List[java.util.Map[String, (String, Object)]] = null
 
-      if (PaginateDataSet.INSTANCE.getCache(analysisId.toString.concat(analysisResultId)) != null)
+      if (PaginateDataSet.INSTANCE.getCache(analysisId) != null)
       {
-        m_log.trace("when data is available in cache analysisResultId: {}", analysisId.toString.concat(analysisResultId));
+        m_log.trace("when data is available in cache analysisId: {}", analysisId);
         m_log.trace("when data is available in cache size of limit {}", limit);
         m_log.trace("when data is available in cache size of start {}", start);
-        data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisId.toString.concat(analysisResultId)));
+        data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisId));
         totalRows = PaginateDataSet.INSTANCE.sizeOfData();
         m_log.trace("totalRows {}", totalRows);
       }
       else {
-        resultData = execution.getPreview(limit);
-        m_log.trace("when data is not available in cache analysisResultId: {}", analysisId.toString.concat(analysisResultId));
+        resultData = execution.getPreview(DLConfiguration.rowLimit);
+        m_log.trace("when data is not available in cache analysisId: {}", analysisId);
         m_log.trace("when data is not available in cache size of limit {}", limit);
         m_log.trace("when data is not available in cache size of start {}", start);
         m_log.trace("when data is not available fresh execution of resultData {}", resultData.size());
-        PaginateDataSet.INSTANCE.putCache(analysisId.toString.concat(analysisResultId), resultData);
-        data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisId.toString.concat(analysisResultId)))
+        PaginateDataSet.INSTANCE.putCache(analysisId, resultData);
+        data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisId))
         totalRows = PaginateDataSet.INSTANCE.sizeOfData();
         m_log.info("totalRows {}", totalRows);
       }

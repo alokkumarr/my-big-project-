@@ -21,14 +21,14 @@ public enum PaginateDataSet {
      * @return
      */
     public List<Map<String, Tuple2<String, Object>>> getCache(String key) {
-        return cache.get(key);
+        return this.cache.get(key);
     }
 
     /**
      * @return
      */
     public int sizeOfData(){
-        return dataSize;
+        return this.dataSize;
     }
 
     /**
@@ -48,9 +48,9 @@ public enum PaginateDataSet {
    public List<Map<String, Tuple2<String, Object>>> paginate(int limit, int start, String key)
    {
        List<Map<String, Tuple2<String, Object>>> paginatedData = new ArrayList<Map<String, Tuple2<String, Object>>>();
-       if (cache.get(key)!=null)
+       if (this.cache.get(key)!=null)
        {
-            paginatedData = getPage(cache.get(key), start, limit);
+            paginatedData = getPage(this.cache.get(key), start, limit);
        }
        dataSize = paginatedData.size();
        return paginatedData;
@@ -64,19 +64,16 @@ public enum PaginateDataSet {
       * @param pageSize
       * @return
   */
-    private <T> List<T> getPage(List<T> sourceList, int start, int limit) {
+    private List<Map<String, Tuple2<String, Object>>> getPage(List<Map<String, Tuple2<String, Object>>> sourceList, int start, int limit) {
         if(limit < 0 || start < 0) {
             throw new IllegalArgumentException("invalid limit: " + limit);
         }
-
         int fromIndex = (limit - 1) * start;
         if(sourceList == null || sourceList.size() < fromIndex){
-            return Collections.emptyList();
+            throw new NullPointerException("sourceList size is zero or null");
         }
         // toIndex exclusive
         return sourceList.subList(fromIndex, Math.min(fromIndex + limit, sourceList.size()));
     }
-
-
 
 }
