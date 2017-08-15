@@ -142,6 +142,6 @@
 		<module>saw-transport-service</module>					
 		<module>saw-es-querybuilder</module>
 		<module>saw-scheduler-service</module>	
-		<module>saw-services-dist</module>	
+		<module>dist</module>	
 	</modules> 
 </project>
