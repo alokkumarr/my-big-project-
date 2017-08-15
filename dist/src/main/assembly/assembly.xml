@@ -12,6 +12,7 @@
       <useAllReactorProjects>true</useAllReactorProjects>
       <includeSubModules>false</includeSubModules>
       <includes>
+        <include>${project.groupId}:saw-transport-service</include>
         <include>${project.groupId}:saw-scheduler-service</include>
       </includes>
       <binaries>
@@ -22,4 +23,14 @@
       </binaries>
     </moduleSet>
   </moduleSets>
+  <fileSets>
+    <fileSet>
+      <directory>${project.build.scriptSourceDirectory}</directory>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>${project.basedir}/src/main/ansible</directory>
+      <outputDirectory>ansible</outputDirectory>
+    </fileSet>
+  </fileSets>
 </assembly>

@@ -1,85 +1,62 @@
 # Introduction
 
 This document describes how to install and configure SAW Services in
-testing and production environments.
+an environment.
 
 # Prerequisites
 
 Before starting an installation of SAW Services ensure the following
-is provided by Synchronoss operations:
+is provided:
 
-1. Ensure the environment has a MapR 5.2 cluster installed and
-   configured
+1. The environment has a MapR 5.2 cluster installed and configured
 
-2. Ensure the MapR cluster has Spark 2.1 installed and configured
+2. The MapR cluster has Spark 2.1 installed and configured
 
-3. Ensure there are hosts dedicated to SAW Services: two hosts, each
-   with 32 GB of memory and running CentOS 7 as the operating system
+3. A host for running SAW Services, with 32 GB of memory and running
+   CentOS 7 as the operating system (the target host)
 
-4. Ensure SAW Services hosts have the MapR client installed and a
-   `mapr` user (using the same UID on all hosts in the cluster)
+4. A host for deploying SAW Services from (the deploy host), which
+   will be used to run the deploy command and store the environment
+   configuration
 
-5. Ensure SAW Services hosts have the Spark client installed and that
-   there is a `/opt/mapr/spark/spark-current` symlink pointing to the
-   current Spark version
+4. The target host has the MapR client installed and a `mapr` user
+   (using the same UID on all hosts in the cluster)
+
+5. The target host has the Spark client installed and that there is a
+   `/opt/mapr/spark/spark-current` symlink pointing to the current
+   Spark version
+
+6. SAW Services environment configuration
 
 # Installing
 
-Execute the following steps to install SAW Services in the
-environment:
+Execute the following steps to install SAW Services:
 
-1. Locate the artifacts required for installing SAW Services: RPM
-   packages for each service to be installed
-   
-2. Go to /opt/saw/service/conf : open application.conf in your favorite editor & change the below attribute value accordingly
-   
-   `metadata = {
-  path = "/main/metadata"
-  zookeeper-quorum = "mapr01.bda.poc.velocity-va.sncrcorp.net,mapr02.bda.poc.velocity-   va.sncrcorp.net,mapr03.bda.poc.velocity-va.sncrcorp.net,mapr04.bda.poc.velocity-va.sncrcorp.net,mapr05.bda.poc.velocity-va.sncrcorp.net,mapr06.bda.poc.velocity-va.sncrcorp.net,mapr07.bda.poc.velocity-va.sncrcorp.net,mapr08.bda.poc.velocity-va.sncrcorp.net,mapr09.bda.poc.velocity-va.sncrcorp.net,mapr10.bda.poc.velocity-va.sncrcorp.net"
-  user = "mapr"
-} `
+1. Get the SAW Services release package (named
+   `saw-services-*.tgz`) for the desired version
 
+2. Extract the release package and execute the deploy script
 
-3. Then change spark related attributes under 
-   `spark = {....}`
-   
-   
-4. Then change elastic search related attributes under  
-  `es = {
-  host = "10.48.22.179"
-  timeout = 30
-  port = 9200
-  username = "elastic"
-  password = "xuw3dUraHapret"
-  protocol = "http"
-}`
+        tar -xzf saw-services-*.tgz
+        cd saw-services-*
+        ./deploy <config>
 
-   `Note: It does not support https protocol`
- 
-5. Now before executing step 6 i.e. start the service
+3. Now before executing step 6 i.e. start the service
    You need to change or make sure that one vm argument has right value in the script i.e esproxy URL
    ` -Durl=http://saw03.bda.poc.velocity-va.sncrcorp.net:9200/ `
-   
   
-5. Install the SAW Transport Service by copying the RPM package to the
-   host that it will run on.  Then execute `sudo rpm -i
-   saw-transport-service-*.rpm`.  Finally execute `sudo -u mapr
-   /opt/saw/service/bin/sawsrvc_start.sh` to start the service.
-
-6. Install the SAW Scheduler Service by copying the RPM package to the
-   host that it will run on.  Then execute `sudo rpm -i
-   saw-scheduler-service-*.rpm`.  No additional steps needed, as the
-   scheduler will automatically be invoked by the system services when
-   required.
-
-7. Configure a URL in a front-end proxy to point to port 9200 of the
+4. Configure a URL in a front-end proxy to point to port 9200 of the
    host that SAW Services has been installed on.  This URL should then
    be used to configure the endpoints in the SAW web front-end.
 
+Note: Configure passwordless SSH access to the target host for a
+smoother installation experience.
+
 # Upgrading
 
-To upgrade an existing SAW Services installation, follow the same
-steps as for installing an entirely new environment.
+To upgrade an existing installation, follow the same steps as for
+installing an entirely new environment.  The deploy command will
+detect an already existing installation and upgrade it.
 
 # Status check
 

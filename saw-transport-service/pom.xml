@@ -6,9 +6,10 @@
         <artifactId>saw-services</artifactId>
         <version>1.0.0</version>
     </parent>
+    <groupId>com.synchronoss.saw</groupId>
     <artifactId>saw-transport-service</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0</version>
+    <version>${revision}</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slf4j.version>1.7.21</slf4j.version>
@@ -545,11 +546,12 @@
                     <execution>
                         <id>saw-services-rpm</id>
                         <goals>
-                            <goal>rpm</goal>
+                            <goal>attached-rpm</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
+                    <classifier>rpm</classifier>
                     <license>Synchronoss proprietary product</license>
                     <distribution>SAW Transport Service</distribution>
                     <needarch>false</needarch>

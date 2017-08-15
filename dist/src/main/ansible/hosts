@@ -1,0 +1,2 @@
+[saw-services]
+localhost ansible_connection=local
