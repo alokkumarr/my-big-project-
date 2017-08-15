@@ -6,6 +6,7 @@
         <artifactId>saw-services</artifactId>
         <version>1.0.0</version>
     </parent>
+    <groupId>com.synchronoss.saw</groupId>
     <artifactId>saw-transport-service</artifactId>
     <packaging>jar</packaging>
     <version>1.0.0</version>
