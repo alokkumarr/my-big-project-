@@ -65,7 +65,7 @@ class AnalysisExecutions extends BaseController {
           m_log.trace("when data is available in cache size of limit {}", limit);
           m_log.trace("when data is available in cache size of start {}", start);
           pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(limitSize, start, executionId));
-          totalRows = DLConfiguration.rowLimit;
+          totalRows = 10000;
           m_log.info("totalRows {}", totalRows);
         }
         else {
@@ -75,7 +75,7 @@ class AnalysisExecutions extends BaseController {
           pagingData = analysisController.processReportResult(data)
           PaginateDataSet.INSTANCE.putCache(executionId,data);
           pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(limitSize, start, executionId));
-          totalRows = DLConfiguration.rowLimit;
+          totalRows = 10000;
           m_log.trace("totalRows {}", totalRows);
         }
         ("data", pagingData) ~ ("totalRows",totalRows)

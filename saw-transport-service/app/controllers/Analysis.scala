@@ -28,7 +28,7 @@ import sncr.metadata.engine.{Fields, MetadataDictionary}
 
 class Analysis extends BaseController {
   val executorRunner = new ExecutionTaskHandler(1);
-  var totalRows: Int = DLConfiguration.rowLimit;
+  var totalRows: Int = 10000;
   
   /**
     * List analyses.  At the moment only used by scheduler to list
