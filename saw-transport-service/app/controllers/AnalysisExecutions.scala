@@ -66,7 +66,7 @@ class AnalysisExecutions extends BaseController {
           m_log.trace("when data is available in cache size of start {}", start);
           pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(limitSize, start, executionId));
           totalRows = PaginateDataSet.INSTANCE.sizeOfData();
-          m_log.info("totalRows {}", totalRows);
+          m_log.trace("totalRows {}", totalRows);
         }
         else {
           if (data !=null) {
