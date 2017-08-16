@@ -147,18 +147,13 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
   }
 
   function getExecutionData(analysisId, executionId, options = {}) {
-    return $http.get(`${url}/analysis/${analysisId}/executions/${executionId}/data`).then(resp => {
-      let data = fpGet(`data.data`, resp);
-      const count = data.length;
-
-      if (has(options, 'skip')) {
-        data = drop(data, options.skip);
-      }
-
-      if (has(options, 'take')) {
-        data = take(data, options.take);
-      }
-
+    options.skip = options.skip || 0;
+    options.take = options.take || 10;
+    return $http.get(
+      `${url}/analysis/${analysisId}/executions/${executionId}/data?start=${options.skip}&limit=${options.take}`
+    ).then(resp => {
+      const data = fpGet(`data.data`, resp);
+      const count = fpGet(`data.totalRows`, resp);
       return {data, count};
     });
   }

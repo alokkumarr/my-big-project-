@@ -140,10 +140,11 @@ export const AnalyzeExecutedDetailComponent = {
 
     loadExecutionData(options = {}) {
       if (this._executionId) {
-        return this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId, options).then(({data, count}) => {
-          this.requester.next({data});
-          return {data, count};
-        });
+        return this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId, options)
+          .then(({data, count}) => {
+            this.requester.next({data});
+            return {data, count};
+          });
       }
       return this._$q.reject(new Error('No execution id selected'));
     }

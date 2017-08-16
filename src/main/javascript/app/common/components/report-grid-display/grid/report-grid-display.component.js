@@ -39,6 +39,7 @@ export const ReportGridDisplayComponent = {
         },
         pager: {
           showNavigationButtons: true,
+          allowedPageSizes: [5, 10, 20],
           showPageSizeSelector: true
         },
         onInitialized: this.onGridInitialized.bind(this)
