@@ -1,7 +1,8 @@
+const login = require('../pages/common/login.po.js');
 const sidenav = require('../pages/components/sidenav.co.js');
 const analyze = require('../pages/common/analyze.po.js');
 const protractor = require('protractor');
-const ec = protractor.ExpectedConditions;
+const commonFunctions = require('../helpers/commonFunctions.js');
 const {hasClass} = require('../utils');
 
 describe('create a new columnChart type analysis', () => {
@@ -15,6 +16,11 @@ describe('create a new columnChart type analysis', () => {
   const groupName = 'Source OS';
   const metric = 'MCT Content';
   const method = 'chart:column';
+
+  it('login as admin', () => {
+    expect(browser.getCurrentUrl()).toContain('/login');
+    login.loginAs('admin');
+  });
 
   it('should open the sidenav menu and go to first category', () => {
     sidenav.menuBtn.click();
@@ -74,6 +80,7 @@ describe('create a new columnChart type analysis', () => {
   it('should attempt to save the report', () => {
     const save = analyze.saveDialog;
     const designer = analyze.designerDialog;
+    commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
     designer.saveBtn.click();
 
     expect(designer.elem).toBeTruthy();
@@ -83,10 +90,8 @@ describe('create a new columnChart type analysis', () => {
     save.descriptionInput.clear().sendKeys(chartDescription);
     save.saveBtn.click();
     // const newAnalysis = analyze.main.getCardTitle(chartName);
-    const condition = ec.presenceOf(analyze.main.getCardTitle(chartName));
-    browser
-    .wait(condition, 5000)
-    .then(() => expect(analyze.main.getCardTitle(chartName).isPresent()).toBe(true));
+    commonFunctions.waitFor.elementToBePresent(analyze.main.getCardTitle(chartName))
+      .then(() => expect(analyze.main.getCardTitle(chartName).isPresent()).toBe(true));
   });
 
   it('should delete the created analysis', () => {
@@ -94,8 +99,13 @@ describe('create a new columnChart type analysis', () => {
     main.getAnalysisCards(chartName).count()
       .then(count => {
         main.doAnalysisAction(chartName, 'delete');
+        commonFunctions.waitFor.elementToBeClickable(main.confirmDeleteBtn);
         main.confirmDeleteBtn.click();
         expect(main.getAnalysisCards(chartName).count()).toBe(count - 1);
       });
+  });
+
+  it('should log out', () => {
+    analyze.main.doAccountAction('logout');
   });
 });

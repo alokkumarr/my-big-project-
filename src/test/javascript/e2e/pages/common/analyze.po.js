@@ -1,4 +1,5 @@
 const {doMdSelectOption, getMdSelectOptions} = require('../../utils');
+const commonFunctions = require('../../helpers/commonFunctions.js');
 
 const getCards = name => element.all(by.css('md-card[e2e="analysis-card"]')).filter(elem => {
   return elem.element(by.cssContainingText('a[e2e="analysis-name"]', name));
@@ -16,6 +17,7 @@ const firstCardTitle = element.all(by.css('a[e2e="analysis-name"]')).first();
 const doAnalysisAction = (name, action) => {
   const card = getCard(name);
   const toggle = card.element(by.css('button[e2e="actions-menu-toggle"]'));
+  commonFunctions.waitFor.elementToBeClickable(toggle);
   toggle.click();
   toggle.getAttribute('aria-owns').then(id => {
     element(by.id(id))
@@ -97,12 +99,27 @@ const getJoinlabel = (tableNameA, fieldNameA, tableNameB, fieldNameB, joinType) 
 };
 
 const doAccountAction = action => {
+  navigateToHome();
   doMdSelectOption({
     parentElem: element(by.css('header > md-toolbar')),
     btnSelector: 'button[e2e="account-settings-menu-btn"]',
     optionSelector: `button[e2e="account-settings-selector-${action}"]`
   });
+  return browser.driver.wait(() => {
+    return browser.driver.getCurrentUrl().then(url => {
+      return /login/.test(url);
+    });
+  }, 10000);
 };
+
+function navigateToHome() {
+  browser.driver.get('http://localhost:3000/');
+  return browser.driver.wait(() => {
+    return browser.driver.getCurrentUrl().then(url => {
+      return /analyze/.test(url);
+    });
+  }, 10000);
+}
 
 module.exports = {
   newDialog: {

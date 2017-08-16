@@ -14,7 +14,8 @@ exports.config = {
       args: [
         //'incognito',
         'disable-extensions',
-        'disable-web-security'
+        'disable-web-security',
+        '--start-fullscreen' // enable for Mac OS
       ]
     }
   },
@@ -35,12 +36,12 @@ exports.config = {
     ],
 
     analyses: [
-      webpackHelper.root('src/test/javascript/e2e/spec/priviliges.spec.js')
-      // webpackHelper.root('src/test/javascript/e2e/spec/analyses.spec.js'),
-      // webpackHelper.root('src/test/javascript/e2e/spec/goToAnalyze.spec'),
-      // webpackHelper.root('src/test/javascript/e2e/spec/createChart.spec.js')
-      // webpackHelper.root('src/test/javascript/e2e/spec/createPivot.spec.js')
-      // webpackHelper.root('src/test/javascript/e2e/spec/createReport.spec.js')
+      webpackHelper.root('src/test/javascript/e2e/spec/priviliges.spec.js'),
+      //obsolete webpackHelper.root('src/test/javascript/e2e/spec/analyses.spec.js'),
+      webpackHelper.root('src/test/javascript/e2e/spec/goToAnalyze.spec.js'),
+      webpackHelper.root('src/test/javascript/e2e/spec/createChart.spec.js'),
+      webpackHelper.root('src/test/javascript/e2e/spec/createPivot.spec.js'),
+      webpackHelper.root('src/test/javascript/e2e/spec/createReport.spec.js')
     ]
   },
 
@@ -53,8 +54,13 @@ exports.config = {
 
     browser.manage().timeouts().pageLoadTimeout(10000);
     browser.manage().timeouts().implicitlyWait(10000);
-    browser.driver.manage().window().maximize();
+    //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.driver.get('http://localhost:3000');
-    browser.sleep(2000);
+
+    return browser.driver.wait(() => {
+      return browser.driver.getCurrentUrl().then(url => {
+        return /login/.test(url);
+      });
+    }, 10000);
   }
 };

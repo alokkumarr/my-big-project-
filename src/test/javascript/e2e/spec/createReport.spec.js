@@ -1,7 +1,9 @@
+const login = require('../pages/common/login.po.js');
 const sidenav = require('../pages/components/sidenav.co.js');
 const analyze = require('../pages/common/analyze.po.js');
 const protractor = require('protractor');
-const ec = protractor.ExpectedConditions;
+const EC = protractor.ExpectedConditions;
+const commonFunctions = require('../helpers/commonFunctions.js');
 
 describe('create a new pivot type analysis', () => {
   let categoryName;
@@ -31,7 +33,13 @@ describe('create a new pivot type analysis', () => {
   const metric = 'MCT Events aggregated by session (view)';
   const method = 'table:report';
 
+  it('login as admin', () => {
+    expect(browser.getCurrentUrl()).toContain('/login');
+    login.loginAs('admin');
+  });
+
   it('should open the sidenav menu and go to first category', () => {
+    commonFunctions.waitFor.elementToBeClickable(sidenav.menuBtn);
     sidenav.menuBtn.click();
     sidenav.publicCategoriesToggle.click();
     categoryName = sidenav.firstPublicCategory.getText();
@@ -108,10 +116,8 @@ describe('create a new pivot type analysis', () => {
     save.nameInput.clear().sendKeys(reportName);
     save.descriptionInput.clear().sendKeys(reportDescription);
     save.saveBtn.click();
-    const condition = ec.presenceOf(analyze.main.getCardTitle(reportName));
-    browser
-    .wait(condition, 7000)
-    .then(() => expect(analyze.main.getCardTitle(reportName).isPresent()).toBe(true));
+    commonFunctions.waitFor.elementToBePresent(analyze.main.getCardTitle(reportName))
+      .then(() => expect(analyze.main.getCardTitle(reportName).isPresent()).toBe(true));
   });
 
   it('should delete the created analysis', () => {
@@ -122,5 +128,9 @@ describe('create a new pivot type analysis', () => {
         main.confirmDeleteBtn.click();
         expect(main.getAnalysisCards(reportName).count()).toBe(count - 1);
       });
+  });
+
+  it('should log out', () => {
+    analyze.main.doAccountAction('logout');
   });
 });
