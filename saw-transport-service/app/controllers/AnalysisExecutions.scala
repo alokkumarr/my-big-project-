@@ -59,23 +59,23 @@ class AnalysisExecutions extends BaseController {
       }
       else {
         if (limit==0) {limitSize = DLConfiguration.rowLimit} else {limitSize = limit};
-        if (PaginateDataSet.INSTANCE.getCache(analysisId.toString.concat(executionId)) != null)
+        if (PaginateDataSet.INSTANCE.getCache(executionId) != null)
         {
-          m_log.trace("when data is available in cache executionId: {}", analysisId.toString.concat(executionId));
+          m_log.trace("when data is available in cache executionId: {}", executionId);
           m_log.trace("when data is available in cache size of limit {}", limit);
           m_log.trace("when data is available in cache size of start {}", start);
-          pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(limitSize, start, analysisId.toString.concat(executionId)));
-          totalRows = PaginateDataSet.INSTANCE.sizeOfData();
+          pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(limitSize, start, executionId));
+          totalRows = DLConfiguration.rowLimit;
           m_log.info("totalRows {}", totalRows);
         }
         else {
-          m_log.trace("when data is not available in cache executionId: {}", analysisId.toString.concat(executionId));
+          m_log.trace("when data is not available in cache executionId: {}", executionId);
           m_log.trace("when data is not available in cache size of limit {}", limit);
           m_log.trace("when data is not available in cache size of start {}", start);
           pagingData = analysisController.processReportResult(data)
-          PaginateDataSet.INSTANCE.putCache(analysisId.toString.concat(executionId),data);
-          pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(limitSize, start, analysisId.toString.concat(executionId)));
-          totalRows = PaginateDataSet.INSTANCE.sizeOfData();
+          PaginateDataSet.INSTANCE.putCache(executionId,data);
+          pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(limitSize, start, executionId));
+          totalRows = DLConfiguration.rowLimit;
           m_log.trace("totalRows {}", totalRows);
         }
         ("data", pagingData) ~ ("totalRows",totalRows)
