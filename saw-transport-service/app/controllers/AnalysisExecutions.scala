@@ -61,29 +61,26 @@ class AnalysisExecutions extends BaseController {
         if (limit==0) {limitSize = DLConfiguration.rowLimit} else {limitSize = limit};
         if (PaginateDataSet.INSTANCE.getCache(executionId) != null)
         {
-          m_log.trace("when data is available in cache executionId: {}", executionId);
-          m_log.trace("when data is available in cache size of limit {}", limit);
-          m_log.trace("when data is available in cache size of start {}", start);
-          pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(limitSize, start, executionId));
-          totalRows = PaginateDataSet.INSTANCE.sizeOfData();
-          m_log.trace("totalRows {}", totalRows);
+          m_log.trace("when data is available in cache executionId: {}", executionId)
+          m_log.trace("when data is available in cache size of limit {}", limit)
+          m_log.trace("when data is available in cache size of start {}", start)
+          pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(limitSize, start, executionId))
+          totalRows = PaginateDataSet.INSTANCE.sizeOfData()
+          m_log.trace("totalRows {}", totalRows)
         }
         else {
-          if (data !=null) {
-          m_log.trace("when data is not available in cache executionId: {}", executionId);
-          m_log.trace("when data is not available in cache size of limit {}", limit);
-          m_log.trace("when data is not available in cache size of start {}", start);
-          pagingData = analysisController.processReportResult(data)
-          PaginateDataSet.INSTANCE.putCache(executionId,data);
-          pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(limitSize, start, executionId));
-          totalRows = PaginateDataSet.INSTANCE.sizeOfData();
-          m_log.trace("totalRows {}", totalRows);
-         ("data", pagingData) ~ ("totalRows",totalRows)
-          }
-          else {
-            ("data", pagingData) ~ ("totalRows",0)
+          if (data != null) {
+            m_log.trace("when data is not available in cache executionId: {}", executionId);
+            m_log.trace("when data is not available in cache size of limit {}", limit)
+            m_log.trace("when data is not available in cache size of start {}", start)
+            pagingData = analysisController.processReportResult(data)
+            PaginateDataSet.INSTANCE.putCache(executionId, data)
+            pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(limitSize, start, executionId))
+            totalRows = PaginateDataSet.INSTANCE.sizeOfData()
+            m_log.trace("totalRows {}", totalRows)
           }
         }
+        ("data", pagingData) ~ ("totalRows",totalRows)
       }
     })
   }
