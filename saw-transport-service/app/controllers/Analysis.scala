@@ -457,7 +457,7 @@ class Analysis extends BaseController {
         m_log.trace("when data is available in cache size of limit {}", limit);
         m_log.trace("when data is available in cache size of start {}", start);
         data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisId));
-        //totalRows = PaginateDataSet.INSTANCE.sizeOfData();
+        totalRows = PaginateDataSet.INSTANCE.sizeOfData();
         m_log.trace("totalRows {}", totalRows);
       }
       else {
@@ -468,7 +468,7 @@ class Analysis extends BaseController {
         m_log.trace("when data is not available fresh execution of resultData {}", resultData.size());
         PaginateDataSet.INSTANCE.putCache(analysisId, resultData);
         data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisId))
-        //totalRows = PaginateDataSet.INSTANCE.sizeOfData();
+        totalRows = PaginateDataSet.INSTANCE.sizeOfData();
         m_log.info("totalRows {}", totalRows);
       }
       m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}, created execution id: $analysisResultId"

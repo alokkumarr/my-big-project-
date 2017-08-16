@@ -2,6 +2,7 @@ package model;
 
 import play.libs.F;
 import scala.Tuple2;
+import scala.Tuple3;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,9 +51,10 @@ public enum PaginateDataSet {
        List<Map<String, Tuple2<String, Object>>> paginatedData = new ArrayList<Map<String, Tuple2<String, Object>>>();
        if (this.cache.get(key)!=null)
        {
+            dataSize = this.cache.get(key).size();
             paginatedData = getPage(this.cache.get(key), start, limit);
        }
-       dataSize = paginatedData.size();
+
        return paginatedData;
    }
 
@@ -72,7 +74,7 @@ public enum PaginateDataSet {
         if(sourceList == null || sourceList.size() < fromIndex){
             throw new NullPointerException("sourceList size is zero or null");
         }
-        // toIndex exclusive
+
         return sourceList.subList(fromIndex, Math.min(fromIndex + limit, sourceList.size()));
     }
 
