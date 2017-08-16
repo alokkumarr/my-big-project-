@@ -98,7 +98,7 @@ export const AnalyzeExecutedDetailComponent = {
 
     refreshData() {
       const gotoLastPublished = () => {
-        this._$state.go('analyze.publishedDetail', {
+        this._$state.go('analyze.executedDetail', {
           analysisId: this.analysis.id,
           analysis: this.analysis,
           executionId: null
