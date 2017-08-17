@@ -9,10 +9,6 @@
   </formats>
   <fileSets>
     <fileSet>
-      <directory>${project.build.scriptSourceDirectory}</directory>
-      <outputDirectory></outputDirectory>
-    </fileSet>
-    <fileSet>
       <directory>${project.basedir}/src/main/doc</directory>
       <outputDirectory></outputDirectory>
     </fileSet>

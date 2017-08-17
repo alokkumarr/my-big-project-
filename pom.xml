@@ -539,7 +539,7 @@ echo pre-remove completed: ${app.nameVer}
                     <name>saw-security:${project.version}</name>
                     <alias>saw-security</alias>
                     <build>
-                      <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+                      <dockerFileDir>${project.basedir}/src/test/docker</dockerFileDir>
                       <assembly>
                         <inline xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                                 xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"

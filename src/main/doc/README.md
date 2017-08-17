@@ -1,8 +1,8 @@
-# Deployment
+This is the SAW Security module.
 
-Execute the following command to deploy SAW Security:
+To install the SAW Security module, use the SAW bundle package which
+coordinates installation of SAW modules.  See its Operations Guide for
+more information about installing SAW modules.
 
-        ./deploy <config>
-
-A sample configuration can be found in the `config` file.  See the
-Operations Guide in the `doc` directory for more details.
+To configure the SAW Security module, see the Operations Guide in the
+"doc" directory.

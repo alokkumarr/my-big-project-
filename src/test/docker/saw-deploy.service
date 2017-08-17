@@ -4,7 +4,7 @@ After=default.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c "tar -xzf *.tgz && saw-security-*/deploy"
+ExecStart=/root/deploy
 WorkingDirectory=/maven
 SyslogIdentifier=saw-deploy
 
