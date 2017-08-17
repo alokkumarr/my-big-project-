@@ -451,23 +451,23 @@ class Analysis extends BaseController {
       var data: JValue = null
       var resultData : java.util.List[java.util.Map[String, (String, Object)]] = null
 
-      if (PaginateDataSet.INSTANCE.getCache(analysisId) != null)
+      if (PaginateDataSet.INSTANCE.getCache(analysisResultId) != null)
       {
-        m_log.trace("when data is available in cache analysisId: {}", analysisId);
+        m_log.trace("when data is available in cache analysisId: {}", analysisResultId);
         m_log.trace("when data is available in cache size of limit {}", limit);
         m_log.trace("when data is available in cache size of start {}", start);
-        data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisId));
+        data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisResultId));
         totalRows = PaginateDataSet.INSTANCE.sizeOfData();
         m_log.trace("totalRows {}", totalRows);
       }
       else {
         resultData = execution.getPreview(DLConfiguration.rowLimit);
-        m_log.trace("when data is not available in cache analysisId: {}", analysisId);
+        m_log.trace("when data is not available in cache analysisResultId: {}", analysisResultId);
         m_log.trace("when data is not available in cache size of limit {}", limit);
         m_log.trace("when data is not available in cache size of start {}", start);
         m_log.trace("when data is not available fresh execution of resultData {}", resultData.size());
-        PaginateDataSet.INSTANCE.putCache(analysisId, resultData);
-        data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisId))
+        PaginateDataSet.INSTANCE.putCache(analysisResultId, resultData);
+        data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisResultId))
         totalRows = PaginateDataSet.INSTANCE.sizeOfData();
         m_log.info("totalRows {}", totalRows);
       }
