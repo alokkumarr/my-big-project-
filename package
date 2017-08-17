@@ -4,7 +4,7 @@
 # any SAW modules to be packaged togehter have been put in
 # "target/saw-*.tgz".
 #
-set -eux
+set -eu
 
 dir=$(dirname $0)
 cd $dir/target
