@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+# Package SAW modules in a single package for convenience.  Assumes
+# any SAW modules to be packaged togehter have been put in
+# "target/saw-*.tgz".
+#
+set -eux
+
+dir=$(dirname $0)
+cd $dir/target
+
+# Extract parent SAW package
+saw_tgz=$(echo saw-2*.tgz)
+tar -xzf $saw_tgz
+rm $saw_tgz
+saw=$(echo saw-2*)
+mkdir $saw/modules
+
+# Add SAW modules
+cd $saw/modules
+for module in saw-security saw-services; do
+    tar -xzf ../../$module-*.tgz
+    ln -s $module-* $module
+done
+cd ../..
+
+# Archive the SAW parent package again
+tar -czf saw.tgz $saw
