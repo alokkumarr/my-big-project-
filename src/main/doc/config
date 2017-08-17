@@ -1,0 +1,12 @@
+#
+# Sample SAW environment configuration
+#
+
+[saw-security]
+localhost
+
+[saw-services]
+localhost
+
+[saw-web]
+localhost
