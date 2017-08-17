@@ -10,14 +10,13 @@ dir=$(dirname $0)
 cd $dir/target
 
 # Extract parent SAW package
-saw_tgz=$(echo saw-2*.tgz)
-tar -xzf $saw_tgz
-rm $saw_tgz
-saw=$(echo saw-2*)
-mkdir $saw/modules
+tar -xzf saw-2*.tgz
+rm saw-2*.tgz
+mv saw-2* saw
+mkdir saw/modules
 
 # Add SAW modules
-cd $saw/modules
+cd saw/modules
 for module in saw-security saw-services; do
     tar -xzf ../../$module-*.tgz
     ln -s $module-* $module
@@ -25,4 +24,4 @@ done
 cd ../..
 
 # Archive the SAW parent package again
-tar -czf saw.tgz $saw
+tar -czf saw.tgz saw
