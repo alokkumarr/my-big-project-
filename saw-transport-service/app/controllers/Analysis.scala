@@ -453,7 +453,7 @@ class Analysis extends BaseController {
 
       if (PaginateDataSet.INSTANCE.getCache(analysisResultId) != null)
       {
-        m_log.trace("when data is available in cache analysisId: {}", analysisResultId);
+        m_log.trace("when data is available in cache analysisResultId: {}", analysisResultId);
         m_log.trace("when data is available in cache size of limit {}", limit);
         m_log.trace("when data is available in cache size of start {}", start);
         data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisResultId));
