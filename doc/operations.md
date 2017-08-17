@@ -5,36 +5,15 @@ an environment.
 
 # Prerequisites
 
-Before starting an installation of SAW Security ensure the following
-is provided:
-
-1. A host for running SAW Security, with 32 GB of memory and CentOS 7
-   as the operating system (the target host)
-
-2. A host for deploying SAW Security from (the deploy host), which
-   will be used to run the deploy command and store the environment
-   configuration
-
-3. SAW Security environment configuration
+The only prerequisites SAW Security has are those already described as
+common to all modules in the SAW bundle package Operations Guide.
 
 # Installing
 
-Execute the following steps to install SAW Security:
+To install SAW Security, use the SAW bundle package which coordinates
+installation of SAW modules.  See the SAW bundle package Operations
+Guide for closer details about installing.
 
-1. Get the SAW Security release package (named
-   `saw-security-*.tgz`) for the desired version
+# Configuring
 
-2. Extract the release package and execute the deploy script
-
-        tar -xzf saw-security-*.tgz
-        cd saw-security-*
-        ./deploy <config>
-
-Note: Configure passwordless SSH access to the target host for a
-smoother installation experience.
-
-# Upgrading
-
-To upgrade an existing installation, follow the same steps as for
-installing an entirely new environment.  The deploy command will
-detect an already existing installation and upgrade it.
+At the moment there are no SAW Security parameters to configure.
