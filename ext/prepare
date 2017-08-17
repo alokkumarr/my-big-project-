@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# Prepare SAW module packages for inclusion into the SAW bundle
+# release package.  Assumes SAW modules to be packaged together are
+# stored in this directory as "saw-*.tgz".
+#
+set -eu
+
+dir=$(dirname $0)
+cd $dir
+
+# Add SAW modules
+mkdir -p modules
+cd modules
+for module in saw-security saw-services; do
+    tar -xzf ../$module-*.tgz
+    ln -s $module-* $module
+done
