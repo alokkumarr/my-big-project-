@@ -1,8 +1,6 @@
 package model;
 
-import play.libs.F;
 import scala.Tuple2;
-import scala.Tuple3;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -67,15 +65,21 @@ public enum PaginateDataSet {
       * @return
   */
     private List<Map<String, Tuple2<String, Object>>> getPage(List<Map<String, Tuple2<String, Object>>> sourceList, int start, int limit) {
-        if(limit < 0 || start < 0) {
-            throw new IllegalArgumentException("invalid limit: " + limit);
+        if(limit < 0) {
+            throw new IllegalArgumentException("invalid limit: " + limit + " because limit default value is 10");
         }
-        int fromIndex = (limit - 1) * start;
+        if(start < 0) {
+            throw new IllegalArgumentException("invalid start: " + start + " because start default value is 0");
+        }
+        int fromIndex = (start - 1) * limit;
         if(sourceList == null || sourceList.size() < fromIndex){
-            throw new NullPointerException("sourceList size is zero or null");
+            throw new NullPointerException("sourceList size is zero or null or list is smaller size then provided start index : " + fromIndex);
         }
 
         return sourceList.subList(fromIndex, Math.min(fromIndex + limit, sourceList.size()));
     }
+
+
+
 
 }
