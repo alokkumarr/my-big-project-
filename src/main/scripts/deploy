@@ -28,6 +28,6 @@ if ! command -v ansible-playbook > /dev/null; then
 fi
 
 echo "Starting deployment"
-cd $(dirname $0)/ansible
+cd $(dirname $0)
 ansible-playbook -i $config site.yml
 echo "Finished deployment"

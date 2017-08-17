@@ -1,0 +1,12 @@
+#
+# Environment configuration for local testing
+#
+
+[saw-security]
+localhost ansible_connection=local
+
+[saw-services]
+localhost ansible_connection=local
+
+[saw-web]
+localhost ansible_connection=local
