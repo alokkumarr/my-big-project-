@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
 // @SOURCE:/Users/Shared/WORK/SAW-BE/saw-transport-service/conf/routes
-// @DATE:Thu Aug 10 22:00:37 EDT 2017
+// @DATE:Thu Aug 17 11:45:50 EDT 2017
 
 package router
 
@@ -70,7 +70,7 @@ class Routes(
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis""", """controllers.Analysis.process"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis/""" + "$" + """analysisId<[^/]+>/executions""", """controllers.AnalysisExecutions.list(analysisId:String)"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis/""" + "$" + """analysisId<[^/]+>/results""", """controllers.AnalysisExecutions.list(analysisId:String)"""),
-    ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis/""" + "$" + """analysisId<[^/]+>/executions/""" + "$" + """executionId<[^/]+>/data""", """controllers.AnalysisExecutions.getExecutionData(analysisId:String, executionId:String, start:Int ?= 0, limit:Int ?= 10)"""),
+    ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis/""" + "$" + """analysisId<[^/]+>/executions/""" + "$" + """executionId<[^/]+>/data""", """controllers.AnalysisExecutions.getExecutionData(analysisId:String, executionId:String, start:Int ?= 0, limit:Int ?= 10, analysisType:String ?= "report")"""),
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis/""" + "$" + """analysisId<[^/]+>/executions""", """controllers.AnalysisExecutions.execute(analysisId:String)"""),
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """semantic""", """controllers.Semantic.handleRequest"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """ObjectSearch""", """controllers.MCT.handleTagRequest(LCID:String, query:Option[String])"""),
@@ -211,12 +211,12 @@ class Routes(
     PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("analysis/"), DynamicPart("analysisId", """[^/]+""",true), StaticPart("/executions/"), DynamicPart("executionId", """[^/]+""",true), StaticPart("/data")))
   )
   private[this] lazy val controllers_AnalysisExecutions_getExecutionData7_invoker = createInvoker(
-    AnalysisExecutions_5.getExecutionData(fakeValue[String], fakeValue[String], fakeValue[Int], fakeValue[Int]),
+    AnalysisExecutions_5.getExecutionData(fakeValue[String], fakeValue[String], fakeValue[Int], fakeValue[Int], fakeValue[String]),
     HandlerDef(this.getClass.getClassLoader,
       "router",
       "controllers.AnalysisExecutions",
       "getExecutionData",
-      Seq(classOf[String], classOf[String], classOf[Int], classOf[Int]),
+      Seq(classOf[String], classOf[String], classOf[Int], classOf[Int], classOf[String]),
       "GET",
       """""",
       this.prefix + """analysis/""" + "$" + """analysisId<[^/]+>/executions/""" + "$" + """executionId<[^/]+>/data"""
@@ -389,8 +389,8 @@ class Routes(
   
     // @LINE:20
     case controllers_AnalysisExecutions_getExecutionData7_route(params) =>
-      call(params.fromPath[String]("analysisId", None), params.fromPath[String]("executionId", None), params.fromQuery[Int]("start", Some(0)), params.fromQuery[Int]("limit", Some(10))) { (analysisId, executionId, start, limit) =>
-        controllers_AnalysisExecutions_getExecutionData7_invoker.call(AnalysisExecutions_5.getExecutionData(analysisId, executionId, start, limit))
+      call(params.fromPath[String]("analysisId", None), params.fromPath[String]("executionId", None), params.fromQuery[Int]("start", Some(0)), params.fromQuery[Int]("limit", Some(10)), params.fromQuery[String]("analysisType", Some("report"))) { (analysisId, executionId, start, limit, analysisType) =>
+        controllers_AnalysisExecutions_getExecutionData7_invoker.call(AnalysisExecutions_5.getExecutionData(analysisId, executionId, start, limit, analysisType))
       }
   
     // @LINE:22
