@@ -25,10 +25,6 @@
   </moduleSets>
   <fileSets>
     <fileSet>
-      <directory>${project.build.scriptSourceDirectory}</directory>
-      <outputDirectory></outputDirectory>
-    </fileSet>
-    <fileSet>
       <directory>${project.basedir}/src/main/ansible</directory>
       <outputDirectory>ansible</outputDirectory>
     </fileSet>

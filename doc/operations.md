@@ -3,6 +3,12 @@
 This document describes how to install and configure SAW Services in
 an environment.
 
+# Installing
+
+To install SAW Security, use the SAW bundle package which coordinates
+installation of SAW modules.  See the SAW bundle package Operations
+Guide for closer details about installing.
+
 # Prerequisites
 
 Before starting an installation of SAW Services ensure the following
@@ -28,36 +34,13 @@ is provided:
 
 6. SAW Services environment configuration
 
-# Installing
+# After installation
 
-Execute the following steps to install SAW Services:
-
-1. Get the SAW Services release package (named
-   `saw-services-*.tgz`) for the desired version
-
-2. Extract the release package and execute the deploy script
-
-        tar -xzf saw-services-*.tgz
-        cd saw-services-*
-        ./deploy <config>
-
-3. Now before executing step 6 i.e. start the service
-   You need to change or make sure that one vm argument has right value in the script i.e esproxy URL
-   ` -Durl=http://saw03.bda.poc.velocity-va.sncrcorp.net:9200/ `
+Before executing step 6 i.e. start the service You need to change or
+make sure that one vm argument has right value in the script i.e
+esproxy URL
+`-Durl=http://saw03.bda.poc.velocity-va.sncrcorp.net:9200/`
   
-4. Configure a URL in a front-end proxy to point to port 9200 of the
-   host that SAW Services has been installed on.  This URL should then
-   be used to configure the endpoints in the SAW web front-end.
-
-Note: Configure passwordless SSH access to the target host for a
-smoother installation experience.
-
-# Upgrading
-
-To upgrade an existing installation, follow the same steps as for
-installing an entirely new environment.  The deploy command will
-detect an already existing installation and upgrade it.
-
 # Status check
 
 To check the status of all SAW Services units execute:
