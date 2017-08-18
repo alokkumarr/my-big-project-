@@ -65,11 +65,11 @@ public enum PaginateDataSet {
       * @return
   */
     private List<Map<String, Tuple2<String, Object>>> getPage(List<Map<String, Tuple2<String, Object>>> sourceList, int start, int limit) {
-        if(limit < 0) {
+        if(limit <= 0) {
             throw new IllegalArgumentException("invalid limit: " + limit + " because limit default value is 10");
         }
-        if(start < 0) {
-            throw new IllegalArgumentException("invalid start: " + start + " because start default value is 0");
+        if(start <= 0) {
+            throw new IllegalArgumentException("invalid start: " + start + " because start default value is 1");
         }
         int fromIndex = (start - 1) * limit;
         if(sourceList == null || sourceList.size() < fromIndex){
