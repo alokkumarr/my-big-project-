@@ -5,8 +5,11 @@ an environment.
 
 # Prerequisites
 
-The only prerequisites SAW Security has are those already described as
-common to all modules in the SAW bundle package Operations Guide.
+Before starting an installation of SAW Security ensure the following
+is provided:
+
+- A mail relay host, used to send out password reset emails.  The mail
+  relay host is configured in the SAW environment configuration
 
 # Installing
 
