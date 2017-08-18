@@ -331,8 +331,8 @@ export function ChartService() {
       const xIsNumber = NUMBER_TYPES.includes(fields.x.type);
       const yIsNumber = NUMBER_TYPES.includes(fields.y.type);
       // z is always a number
-      const xLabel = opts.labels.x === null ? fields.x.displayName : opts.labels.x;
-      const yLabel = opts.labels.y === null ? fields.y.displayName : opts.labels.y;
+      const xLabel = get(opts, 'labels.x') === null ? get(fields, 'x.displayName') : get(opts, 'labels.x');
+      const yLabel = get(opts, 'labels.y') === null ? get(fields, 'y.displayName') : get(opts, 'labels.y');
       changes.push({
         path: 'tooltip',
         data: {
