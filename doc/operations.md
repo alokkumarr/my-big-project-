@@ -3,12 +3,6 @@
 This document describes how to install and configure SAW Services in
 an environment.
 
-# Installing
-
-To install SAW Security, use the SAW bundle package which coordinates
-installation of SAW modules.  See the SAW bundle package Operations
-Guide for closer details about installing.
-
 # Prerequisites
 
 Before starting an installation of SAW Services ensure the following
@@ -18,21 +12,20 @@ is provided:
 
 2. The MapR cluster has Spark 2.1 installed and configured
 
-3. A host for running SAW Services, with 32 GB of memory and running
-   CentOS 7 as the operating system (the target host)
+3. The SAW Services target host has the MapR client installed and a
+   `mapr` user (using the same UID on all hosts in the cluster)
 
-4. A host for deploying SAW Services from (the deploy host), which
-   will be used to run the deploy command and store the environment
-   configuration
-
-4. The target host has the MapR client installed and a `mapr` user
-   (using the same UID on all hosts in the cluster)
-
-5. The target host has the Spark client installed and that there is a
+4. The target host has the Spark client installed and that there is a
    `/opt/mapr/spark/spark-current` symlink pointing to the current
    Spark version
 
-6. SAW Services environment configuration
+5. SAW Services environment configuration
+
+# Installing
+
+To install SAW Security, use the SAW bundle package which coordinates
+installation of SAW modules.  See the SAW bundle package Operations
+Guide for closer details about installing.
 
 # After installation
 
