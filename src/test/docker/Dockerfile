@@ -23,8 +23,14 @@ COPY saw-deploy.service /etc/systemd/system/
 RUN systemctl enable saw-deploy
 
 # Speed up deployment by preinstalling packages in container image
+
+# SAW Security
 RUN yum -y -q --nogpgcheck install mariadb-server
 RUN yum -y -q --nogpgcheck install java-1.8.0-openjdk-headless MySQL-python
+# SAW Web
+RUN yum -y -q --nogpgcheck install tomcat
+# SAW
+RUN yum -y -q --nogpgcheck install nginx
 
 # Add local SAW environment configuration
 ADD config /root/config

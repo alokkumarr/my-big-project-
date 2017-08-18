@@ -61,3 +61,8 @@ for relevant operations.
 To upgrade an existing installation, follow the same steps as for
 installing an entirely new environment.  The deploy command will
 detect an already existing installation and upgrade it.
+
+# Interfaces
+
+The SAW system is exposed on port 80 of the target host.  It provides
+both SAW Web, SAW Security endpoints.

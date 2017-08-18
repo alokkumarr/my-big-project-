@@ -3,14 +3,14 @@
 # "localhost" with the target host to deploy SAW modules on.
 #
 
-[saw-security]
-localhost
-
-[saw-services]
+[saw-proxy]
 localhost
 
 [saw-web]
 localhost
 
-[saw-proxy]
+[saw-services]
+localhost
+
+[saw-security]
 localhost

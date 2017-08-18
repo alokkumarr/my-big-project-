@@ -1,2 +1,8 @@
+# Note: Order according to dependencies, to ensure health checks can
+# succeed right after installation
 - include: modules/saw-security/ansible/site.yml
 - include: modules/saw-services/ansible/site.yml
+- include: modules/saw-web/ansible/site.yml
+- hosts: saw-proxy
+  roles:
+    - saw-proxy
