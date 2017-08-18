@@ -278,8 +278,8 @@ class Analysis extends BaseController {
  	var analysisJSON : JObject = null;
  	
  	m_log.trace("json dataset: {}", reqJSON);
-    val start = (reqJSON \ "contents" \ "start").extractOrElse(0)
-    val limit = (reqJSON \ "contents" \ "limit").extractOrElse(DLConfiguration.rowLimit)
+    val start = (reqJSON \ "contents" \ "page").extractOrElse(0)
+    val limit = (reqJSON \ "contents" \ "pageSize").extractOrElse(10)
     val analysis = (reqJSON \ "contents" \ "analyze") match {
       case obj: JArray => analysisJson(reqJSON); // reading from request body
       case _ => null

@@ -36,7 +36,7 @@ class AnalysisExecutions extends BaseController {
   }
 
 
-  def getExecutionData(analysisId: String, executionId: String, start: Int,limit: Int, analysisType: String): Result = {
+  def getExecutionData(analysisId: String, executionId: String, page: Int,pageSize: Int, analysisType: String): Result = {
     handle(process = (json, ticket) =>
     {
       var totalRows : Int =0
@@ -50,9 +50,9 @@ class AnalysisExecutions extends BaseController {
         if (PaginateDataSet.INSTANCE.getCache(executionId) != null)
         {
           m_log.trace("when data is available in cache executionId: {}", executionId)
-          m_log.trace("when data is available in cache size of limit {}", limit)
-          m_log.trace("when data is available in cache size of start {}", start)
-          pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, executionId))
+          m_log.trace("when data is available in cache size of pageSize {}", pageSize)
+          m_log.trace("when data is available in cache size of page {}", page)
+          pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(pageSize, page, executionId))
           totalRows = PaginateDataSet.INSTANCE.sizeOfData()
           m_log.trace("totalRows {}", totalRows)
         }
@@ -62,12 +62,12 @@ class AnalysisExecutions extends BaseController {
           if (data != null)
           {
             m_log.trace("when data is not available in cache executionId: {}", executionId);
-            m_log.trace("when data is not available in cache size of limit {}", limit)
-            m_log.trace("when data is not available in cache size of start {}", start)
+            m_log.trace("when data is not available in cache size of limit {}", pageSize)
+            m_log.trace("when data is not available in cache size of start {}", page)
             m_log.trace("when data is not available in cache actual size of data {}", data.size())
             pagingData = analysisController.processReportResult(data)
             PaginateDataSet.INSTANCE.putCache(executionId, data)
-            pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, executionId))
+            pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(pageSize, page, executionId))
             totalRows = PaginateDataSet.INSTANCE.sizeOfData()
             m_log.trace("totalRows {}", totalRows)
           }
