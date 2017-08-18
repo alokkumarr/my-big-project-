@@ -96,7 +96,7 @@ export const AnalyzeChartComponent = {
 
     initChart() {
       this.settings = this._ChartService.fillSettings(this.model.artifacts, this.model);
-      this.reloadChart(this.settings, this.filteredGridData, this.model.sqlBuilder);
+      this.reloadChart(this.settings, this.filteredGridData);
 
       if (isEmpty(this.mode)) {
         return;
@@ -166,13 +166,12 @@ export const AnalyzeChartComponent = {
       }
       this.startProgress();
       const payload = this.generatePayload(this.model);
-      this.sqlBuilder = payload.sqlBuilder;
       return this._AnalyzeService.getDataBySettings(payload).then(({data}) => {
         const parsedData = this._ChartService.parseData(data, payload.sqlBuilder);
         this.gridData = this.filteredGridData = parsedData || this.filteredGridData;
         this.analysisSynched();
         this.endProgress();
-        this.reloadChart(this.settings, this.filteredGridData, this.sqlBuilder);
+        this.reloadChart(this.settings, this.filteredGridData);
       }, () => {
         this.endProgress();
       });
@@ -215,7 +214,7 @@ export const AnalyzeChartComponent = {
       return isValid;
     }
 
-    reloadChart(settings, filteredGridData, sqlBuilder) {
+    reloadChart(settings, filteredGridData) {
       if (isEmpty(filteredGridData)) {
         return;
       }
@@ -223,10 +222,7 @@ export const AnalyzeChartComponent = {
         this.model.chartType,
         settings,
         filteredGridData,
-        {
-          labels: this.labels,
-          sqlBuilder
-        }
+        {labels: this.labels}
       );
 
       this.updateChart.next(changes);

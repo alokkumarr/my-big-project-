@@ -140,26 +140,10 @@ export function ChartService() {
     return config;
   };
 
-    /** the mapping between the field columnNames, and the chart axes
-   * the backend returns the aggregate data in with the fields columnName as property
-   * the bubble chart requires x, y, z for the axes if they are of number type
+  /** the mapping between the tree level, and the columName of the field
    * Example:
-   * AVAILABLE_MB -> x
-   */
-  function getDataFieldMap(dataFields) {
-    return reduce(dataFields, (accumulator, field) => {
-      accumulator[field.columnName] = field.checked;
-      return accumulator;
-    }, {});
-  }
-
-  /** the mapping between the tree node names and the chart axes or groupBy names
-   * the backend returns the string type data as tree node names
-   * the bubble chart requires x, y, z for the axes if they are of type number
-   * it can be an array, because the only useful in the tree node is the index
-   * Example:
-   * string_field_1: 0 -> g (marker on the checked attribute)
-   * string_field_2: 1 -> y
+   * string_field_1: 0 -> SOURCE_OS (marker on the checked attribute)
+   * string_field_2: 1 -> SOURCE_MANUFACTURER
    */
   function getNodeFieldMap(nodeFields) {
     return map(nodeFields, 'columnName');
@@ -175,30 +159,26 @@ export function ChartService() {
    */
   function parseData(data, sqlBuilder) {
     const nodeFieldMap = getNodeFieldMap(sqlBuilder.nodeFields);
-    const dataFieldMap = getDataFieldMap(sqlBuilder.dataFields);
-    return parseNode(data, {}, nodeFieldMap, dataFieldMap, 1);
+    return parseNode(data, {}, nodeFieldMap, 1);
   }
 
-  function parseNode(node, dataObj, nodeFieldMap, dataFieldMap, level) {
+  function parseNode(node, dataObj, nodeFieldMap, level) {
     if (node.key) {
       dataObj[nodeFieldMap[level - 2]] = node.key;
     }
 
     const childNode = node[`node_field_${level}`];
     if (childNode) {
-      const data = flatMap(childNode.buckets, bucket => parseNode(bucket, dataObj, nodeFieldMap, dataFieldMap, level + 1));
+      const data = flatMap(childNode.buckets, bucket => parseNode(bucket, dataObj, nodeFieldMap, level + 1));
       return data;
     }
-    const datum = parseLeaf(node, dataObj, dataFieldMap);
+    const datum = parseLeaf(node, dataObj);
     return datum;
   }
 
   function parseLeaf(node, dataObj) {
     const dataFields = fpPipe(
       fpOmit(['doc_count', 'key']),
-      // fpMapKeys(k => {
-      //   return dataFieldsMap[k];
-      // }),
       fpMapValues('value')
     )(node);
 
@@ -221,14 +201,10 @@ export function ChartService() {
     } else {
       const axesFieldNameMap = getAxesFieldNameMap(fields);
       const yField = fields.y[0];
-      const data = map(parsedData, dataPoint => {
-        return mapValues(axesFieldNameMap, val => {
-          return dataPoint[val];
-        });
-      });
       series = [{
-        data,
-        name: yField.alias || yField.displayName
+        name: yField.alias || yField.displayName,
+        data: map(parsedData,
+          dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val]))
       }];
     }
     // split out categories form the data
@@ -250,54 +226,32 @@ export function ChartService() {
   }
 
   function splitSeriesByGroup(parsedData, fields) {
-    const series = [];
     const axesFieldNameMap = getAxesFieldNameMap(fields);
-    const data = map(parsedData, dataPoint => mapValues(axesFieldNameMap, val => {
-      return dataPoint[val];
-    }));
-    const groupedData = groupBy(data, 'g');
-    forEach(groupedData, (group, k) => {
-      series.push({
-        name: k,
-        data: group
-      });
-    });
-    return series;
-    // fpPipe(
-    //   fpMap(dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])),
-    //   fpGroupBy('g'),
-    //   fpToPairs,
-    //   fpMap(([name, data]) => ({name, data}))
-    // );
+
+    return fpPipe(
+      fpMap(dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])),
+      fpGroupBy('g'),
+      fpToPairs,
+      fpMap(([name, data]) => ({name, data}))
+    )(parsedData);
   }
 
   function splitSeriesByYAxes(parsedData, fields) {
-    const seriesObj = reduce(fields.y, (accumulator, field) => {
-      accumulator[field.columnName] = [];
-      return accumulator;
-    }, {});
-
     const axesFieldNameMap = getAxesFieldNameMap(fields, 'y');
+    const series = map(fields.y, ({alias, displayName}) => (
+      {name: alias || displayName, data: []})
+    );
 
     forEach(parsedData, dataPoint => {
-      forEach(fields.y, field => {
-        seriesObj[field.columnName].push(assign(
+      forEach(fields.y, (field, index) => {
+        series[index].data.push(assign(
           {y: dataPoint[field.columnName]},
           mapValues(axesFieldNameMap, val => dataPoint[val])
         ));
       });
     });
 
-    return fpPipe(
-      fpToPairs,
-      fpMap(([name, data]) => {
-        const field = find(fields.y, ({columnName}) => columnName === name);
-        return {
-          data,
-          name: field.alias || field.displayName
-        };
-      })
-    )(seriesObj);
+    return series;
   }
 
   /**
@@ -334,24 +288,6 @@ export function ChartService() {
     return isCategoryAxis;
   }
 
-  function customizeSeriesForChartType(series, chartType) {
-    // deprecated
-    let mapperFn;
-    switch (chartType) {
-      case 'column':
-      case 'bar':
-      case 'line':
-      case 'spline':
-      case 'stack':
-      case 'scatter':
-      case 'bubble':
-        // the bubble chart already supports the parsed data
-        return;
-      default:
-        throw new Error(`Chart type: ${chartType} is not supported!`);
-    }
-  }
-
   const dataToChangeConfig = (type, settings, gridData, opts) => {
     const fields = {
       x: find(settings.xaxis, attr => attr.checked === 'x'),
@@ -377,8 +313,7 @@ export function ChartService() {
     }];
 
     if (!isEmpty(gridData)) {
-      const {series, categories} = splitToSeriesAndCategories(gridData, fields, opts.sqlBuilder);
-      customizeSeriesForChartType(series, type);
+      const {series, categories} = splitToSeriesAndCategories(gridData, fields);
       changes.push({
         path: 'series',
         data: series
@@ -450,7 +385,7 @@ export function ChartService() {
     // because there is only one data series
     changes.push({
       path: 'legend.enabled',
-      data: Boolean(fields.g)
+      data: Boolean(!yIsSingle || fields.g)
     });
     return changes;
   }
