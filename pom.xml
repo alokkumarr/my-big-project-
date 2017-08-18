@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.synchronoss</groupId>
   <artifactId>bda-saw</artifactId>
-  <version>2.0.0-SNAPSHOT</version>
+  <version>${revision}</version>
   <packaging>war</packaging>
   <parent>
 		<groupId>org.springframework.boot</groupId>
@@ -39,8 +39,8 @@
     <maven.assembly.version>2.4</maven.assembly.version>
 	<project.name>saw</project.name>
     <!-- RPM -->
-    <rpm.version>2</rpm.version>
-    <rpm.release>0.0</rpm.release>
+    <rpm.version>${revision.nodash}</rpm.version>
+    <rpm.release>0</rpm.release>
     <app.user>nobody</app.user>
     <app.group>nobody</app.group>
     <!-- must be first 2 digits from ${project.version} -->
@@ -830,7 +830,7 @@
                         <mapping>
                             <directory>${app.optDir}</directory>
                             <sources>
-                                <source><location>target/bda-saw-2.0.0.0.war</location></source>
+                                <source><location>target/saw.war</location></source>
                                 <!--
                                 <source><location>...</location></source>
                                 -->
