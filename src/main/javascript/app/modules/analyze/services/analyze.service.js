@@ -1,7 +1,5 @@
 import forEach from 'lodash/forEach';
-import has from 'lodash/has';
-import drop from 'lodash/drop';
-import take from 'lodash/take';
+import floor from 'lodash/floor';
 import startCase from 'lodash/startCase';
 import set from 'lodash/set';
 import reduce from 'lodash/reduce';
@@ -149,8 +147,9 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
   function getExecutionData(analysisId, executionId, options = {}) {
     options.skip = options.skip || 0;
     options.take = options.take || 10;
+    const page = floor(options.skip / options.take) + 1;
     return $http.get(
-      `${url}/analysis/${analysisId}/executions/${executionId}/data?start=${options.skip}&limit=${options.take}`
+      `${url}/analysis/${analysisId}/executions/${executionId}/data?page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}`
     ).then(resp => {
       const data = fpGet(`data.data`, resp);
       const count = fpGet(`data.totalRows`, resp);
@@ -167,19 +166,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
   }
 
   function previewExecution(model, options = {}) {
-    return applyAnalysis(model, EXECUTION_MODES.PREVIEW).then(data => {
-      const count = data.length;
-
-      if (has(options, 'skip')) {
-        data = drop(data, options.skip);
-      }
-
-      if (has(options, 'take')) {
-        data = take(data, options.take);
-      }
-
-      return {data, count};
-    });
+    return applyAnalysis(model, EXECUTION_MODES.PREVIEW, options);
   }
 
   function executeAnalysis(model) {
@@ -196,9 +183,9 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
         toastMessage.info(msg);
       });
       _executingAnalyses[model.id] = EXECUTION_STATES.EXECUTING;
-      applyAnalysis(model).then(analysis => {
+      applyAnalysis(model).then(({data}) => {
         _executingAnalyses[model.id] = EXECUTION_STATES.SUCCESS;
-        deferred.resolve(analysis);
+        deferred.resolve(data);
       }, err => {
         _executingAnalyses[model.id] = EXECUTION_STATES.ERROR;
         deferred.reject(err);
@@ -271,26 +258,34 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     return $http.post(`${url}/analysis`, payload).then(fpGet(`data.contents.analyze.[0]`));
   }
 
-  function applyAnalysis(model, mode = EXECUTION_MODES.LIVE) {
+  function applyAnalysis(model, mode = EXECUTION_MODES.LIVE, options = {}) {
     delete model.isScheduled;
     if (mode === EXECUTION_MODES.PREVIEW) {
       model.executionType = EXECUTION_MODES.PREVIEW;
     }
 
+    options.skip = options.skip || 0;
+    options.take = options.take || 10;
+    const page = floor(options.skip / options.take) + 1;
+
     const payload = getRequestParams([
       ['contents.action', 'execute'],
+      ['contents.page', page],
+      ['contents.pageSize', options.take],
       ['contents.keys.[0].id', model.id],
       ['contents.keys.[0].type', model.type],
       ['contents.analyze', [model]]
     ]);
     return $http.post(`${url}/analysis`, payload).then(resp => {
-      return fpGet(`data.contents.analyze.[1].data`, resp) ||
-        fpGet(`data.contents.analyze.[0].data`, resp);
+      return {
+        data: fpGet(`data.contents.analyze.[0].data`, resp),
+        count: fpGet(`data.contents.analyze.[0].totalRows`, resp)
+      };
     });
   }
 
   function getDataBySettings(analysis) {
-    return applyAnalysis(analysis, EXECUTION_MODES.PREVIEW).then(data => {
+    return applyAnalysis(analysis, EXECUTION_MODES.PREVIEW).then(({data}) => {
       return {analysis, data};
     });
   }
@@ -304,7 +299,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     const updatePromise = updateAnalysis(model);
 
     updatePromise.then(analysis => {
-      return applyAnalysis(model, EXECUTION_MODES.PREVIEW).then(data => {
+      return applyAnalysis(model, EXECUTION_MODES.PREVIEW).then(({data}) => {
         return {analysis, data};
       });
     });

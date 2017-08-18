@@ -140,6 +140,7 @@ export const AnalyzeExecutedDetailComponent = {
 
     loadExecutionData(options = {}) {
       if (this._executionId) {
+        options.analysisType = this.analysis.type;
         return this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId, options)
           .then(({data, count}) => {
             this.requester.next({data});
