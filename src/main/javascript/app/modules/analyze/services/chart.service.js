@@ -14,7 +14,6 @@ import fpToPairs from 'lodash/fp/toPairs';
 import fpJoin from 'lodash/fp/join';
 import fpMap from 'lodash/fp/map';
 import fpMapValues from 'lodash/fp/mapValues';
-import groupBy from 'lodash/groupBy';
 import fpFlatMap from 'lodash/fp/flatMap';
 import fpSortBy from 'lodash/fp/sortBy';
 import reduce from 'lodash/reduce';

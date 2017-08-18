@@ -9,7 +9,6 @@ import map from 'lodash/map';
 import values from 'lodash/values';
 import clone from 'lodash/clone';
 import set from 'lodash/set';
-import cloneDeep from 'lodash/cloneDeep';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
