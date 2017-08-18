@@ -83,7 +83,7 @@ export const AnalyzeChartComponent = {
 
       if (this.mode === ENTRY_MODES.EDIT) {
         this.initChart();
-        this.refreshChartData();
+        this.onRefreshData();
       } else {
         this._AnalyzeService.createAnalysis(this.model.semanticId, 'chart').then(analysis => {
           this.model = assign(analysis, this.model);
@@ -159,7 +159,7 @@ export const AnalyzeChartComponent = {
       this.startDraftMode();
     }
 
-    refreshChartData() {
+    onRefreshData() {
       if (!this.checkModelValidity()) {
         return;
       }
