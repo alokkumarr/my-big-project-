@@ -1,0 +1,9 @@
+- name: Install EPEL release package (for NGINX)
+#  include_role: name=geerlingguy.repo-epel
+  yum:
+    name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    state: present
+- name: Install NGINX package
+  yum: name=nginx state=present
+- name: Install NGINX SAW proxy configuration
+  template: src=saw-proxy.conf dest=/etc/nginx/default.d/saw-proxy.conf

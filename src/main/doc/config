@@ -11,3 +11,6 @@ localhost
 
 [saw-web]
 localhost
+
+[saw-proxy]
+localhost
