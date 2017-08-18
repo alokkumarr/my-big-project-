@@ -1,0 +1,7 @@
+- name: Install Tomcat package
+  yum: name=tomcat state=present
+- name: Enable and start Tomcat service
+  systemd: name=tomcat enabled=true state=started
+- name: Install SAW Web package
+  yum: name="{{ item }}" state=present
+  with_fileglob: ["../rpms/saw-web-*.rpm"]

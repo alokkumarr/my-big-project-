@@ -1,4 +1,17 @@
-# Synchronoss Visual Framework
+# Introduction
+
+This is the Synchronoss Analytics Workbench (SAW) Web component.  It
+provides a web user interface to SAW services.  The project is further
+described on its [Confluence page].
+
+[Confluence page]: https://confluence.synchronoss.net:8443/display/BDA/Synchronoss+Analytics+Workbench+-+SAW
+
+# Operations
+
+See the [operations guide](doc/operations.md) for details about
+operations and monitoring.
+
+# Development
 
 ### Requirements: Node 4+ && NPM 3+
 
