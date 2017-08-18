@@ -169,7 +169,6 @@ export const AnalyzeChartComponent = {
       this.sqlBuilder = payload.sqlBuilder;
       return this._AnalyzeService.getDataBySettings(payload).then(({data}) => {
         const parsedData = this._ChartService.parseData(data, payload.sqlBuilder);
-        console.log('parsedData', parsedData);
         this.gridData = this.filteredGridData = parsedData || this.filteredGridData;
         this.analysisSynched();
         this.endProgress();
@@ -277,12 +276,7 @@ export const AnalyzeChartComponent = {
         return field;
       });
 
-      // const data = find(this.settings.yaxis, y => y.columnName === 'FAILED_MB');
-
-      // data.aggregate = 'sum';
-      // data.checked = 'y';
       set(payload, 'sqlBuilder.dataFields', dataFields);
-      // payload.sqlBuilder.dataFields[1] = data;
       set(payload, 'sqlBuilder.nodeFields', nodeFields);
 
       delete payload.supports;

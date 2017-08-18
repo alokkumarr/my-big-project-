@@ -30,7 +30,7 @@ export const AnalyzeChartSettingsComponent = {
     }
 
     $onInit() {
-      this.multipleYAxes.enabled = this.chartType !== 'bubble' || this.chartType !== 'pie';
+      this.multipleYAxes.enabled = this.chartType !== 'bubble' && this.chartType !== 'pie';
       this._clearWatcher = this._$scope.$watch(() => this.settings, newVal => {
         if (newVal) {
           this.markSelected();
@@ -66,23 +66,31 @@ export const AnalyzeChartSettingsComponent = {
     }
 
     inputChanged(axisOptions, selectedAttr, marker) {
-      if (marker !== 'y') {
-        forEach(axisOptions, attr => {
-          if (selectedAttr === attr) {
-            attr.checked = marker;
-          } else if (attr.checked === marker) {
-            attr.checked = false;
-          }
-        });
+      if (this.multipleYAxes.enabled === false || marker !== 'y') {
+        this.setRadioButtonSelection(axisOptions, selectedAttr, marker);
       } else {
-        const target = find(axisOptions, ({columnName}) => columnName === selectedAttr.columnName);
-        if (selectedAttr.checked === true) {
-          target.checked = 'y';
-        } else {
-          target.checked = false;
-        }
+        this.setChecBoxSelection(axisOptions, selectedAttr);
       }
       this.onChange({settings: this.settings});
+    }
+
+    setRadioButtonSelection(axisOptions, selectedAttr, marker) {
+      forEach(axisOptions, attr => {
+        if (selectedAttr === attr) {
+          attr.checked = marker;
+        } else if (attr.checked === marker) {
+          attr.checked = false;
+        }
+      });
+    }
+
+    setChecBoxSelection(axisOptions, selectedAttr) {
+      const target = find(axisOptions, ({columnName}) => columnName === selectedAttr.columnName);
+      if (selectedAttr.checked === true) {
+        target.checked = 'y';
+      } else {
+        target.checked = false;
+      }
     }
   }
 };

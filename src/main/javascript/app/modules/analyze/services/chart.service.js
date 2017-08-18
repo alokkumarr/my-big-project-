@@ -220,14 +220,15 @@ export function ChartService() {
       series = splitSeriesByGroup(parsedData, fields);
     } else {
       const axesFieldNameMap = getAxesFieldNameMap(fields);
-      console.log('namemap', axesFieldNameMap);
+      const yField = fields.y[0];
       const data = map(parsedData, dataPoint => {
         return mapValues(axesFieldNameMap, val => {
           return dataPoint[val];
         });
       });
       series = [{
-        data
+        data,
+        name: yField.alias || yField.displayName
       }];
     }
     // split out categories form the data
@@ -289,7 +290,13 @@ export function ChartService() {
 
     return fpPipe(
       fpToPairs,
-      fpMap(([name, data]) => ({name, data}))
+      fpMap(([name, data]) => {
+        const field = find(fields.y, ({columnName}) => columnName === name);
+        return {
+          data,
+          name: field.alias || field.displayName
+        };
+      })
     )(seriesObj);
   }
 
@@ -328,6 +335,7 @@ export function ChartService() {
   }
 
   function customizeSeriesForChartType(series, chartType) {
+    // deprecated
     let mapperFn;
     switch (chartType) {
       case 'column':
@@ -336,17 +344,12 @@ export function ChartService() {
       case 'spline':
       case 'stack':
       case 'scatter':
-        mapperFn = ({x, y}) => [x, y];
-        break;
       case 'bubble':
         // the bubble chart already supports the parsed data
         return;
       default:
         throw new Error(`Chart type: ${chartType} is not supported!`);
     }
-    forEach(series, serie => {
-      serie.data = map(serie.data, mapperFn);
-    });
   }
 
   const dataToChangeConfig = (type, settings, gridData, opts) => {
@@ -356,8 +359,6 @@ export function ChartService() {
       z: find(settings.zaxis, attr => attr.checked === 'z'),
       g: find(settings.groupBy, attr => attr.checked === 'g')
     };
-
-    console.log('sqlBuilder', opts.sqlBuilder);
 
     const labels = {
       x: get(fields, 'x.displayName', ''),
@@ -377,8 +378,6 @@ export function ChartService() {
 
     if (!isEmpty(gridData)) {
       const {series, categories} = splitToSeriesAndCategories(gridData, fields, opts.sqlBuilder);
-      console.log('series', series);
-      console.log('categories', categories);
       customizeSeriesForChartType(series, type);
       changes.push({
         path: 'series',
@@ -395,31 +394,57 @@ export function ChartService() {
 
     return concat(
       changes,
-      addSpecificChartConfig(type, fields)
+      addTooltipsAndLegend(fields)
     );
   };
 
-  function addSpecificChartConfig(chartType, fields) {
+  function addTooltipsAndLegend(fields) {
     const changes = [];
-    if (chartType === 'bubble') {
-      const groupString = `<tr><th colspan="2"><h3>{point.g}</h3></th></tr>`;
-      const xIsNumber = NUMBER_TYPES.includes(fields.x.type);
-      const yIsNumber = NUMBER_TYPES.includes(fields.y.type);
-      // z is always a number
-      changes.push({
-        path: 'tooltip',
-        data: {
-          useHTML: true,
-          headerFormat: '<table>',
-          pointFormat: `${fields.g ? groupString : ''}
-              <tr><th>${fields.x.displayName}:</th><td>{point.x${xIsNumber ? ':,.2f' : ''}}</td></tr>
-              <tr><th>${fields.y.displayName}:</th><td>{point.y${yIsNumber ? ':,.2f' : ''}}</td></tr>
-              <tr><th>${fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>`,
-          footerFormat: '</table>',
-          followPointer: true
-        }
-      });
-    }
+
+    const xIsNumber = NUMBER_TYPES.includes(fields.x.type);
+    const xIsString = fields.x.type === 'string';
+    // x can be either a string, a number or a date
+    // string -> use the value from categories
+    // number -> restrict the number to 2 decimals
+    // date -> just show the date
+    const xStringValue = xIsString ?
+      'point.key' : xIsNumber ?
+        'point.x:,.2f' : 'point.x';
+    const xAxisString = `<tr>
+      <th>${fields.x.displayName}:</th>
+      <td>{${xStringValue}}</td>
+    </tr>`;
+
+    const yIsSingle = fields.y.length === 1;
+    const yIsNumber = NUMBER_TYPES.includes(fields.y.type);
+
+    const yAxisName = `${yIsSingle || fields.g ? fields.y[0].displayName : '{series.name}'}`;
+    const yAxisString = `<tr>
+      <th>${yAxisName}:</th>
+      <td>{point.y${yIsNumber ? ':,.2f' : ''}}</td>
+    </tr>`;
+    const zAxisString = fields.z ?
+    `<tr><th>${fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>` :
+    '';
+    const groupString = fields.g ?
+    `<tr><th>Group:</th><td>{point.g}</td></tr>` :
+    '';
+
+    const tooltipObj = {
+      useHTML: true,
+      headerFormat: `<table> ${xIsString ? xAxisString : ''}`,
+      pointFormat: `${xIsNumber ? xAxisString : ''}
+        ${yAxisString}
+        ${zAxisString}
+        ${groupString}`,
+      footerFormat: '</table>',
+      followPointer: true
+    };
+
+    changes.push({
+      path: 'tooltip',
+      data: tooltipObj
+    });
 
     // if there is no grouping disable the legend
     // because there is only one data series
