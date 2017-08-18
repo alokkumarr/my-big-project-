@@ -17,7 +17,7 @@ POST    /analysis                         controllers.Analysis.process
 GET     /analysis/:analysisId/executions  controllers.AnalysisExecutions.list(analysisId: String)
 # Note: Keep for API backwards compatibility, remove in future
 GET     /analysis/:analysisId/results     controllers.AnalysisExecutions.list(analysisId: String)
-GET     /analysis/:analysisId/executions/:executionId/data  controllers.AnalysisExecutions.getExecutionData(analysisId: String, executionId: String, start: Int ?=0, limit: Int ?=10)
+GET     /analysis/:analysisId/executions/:executionId/data  controllers.AnalysisExecutions.getExecutionData(analysisId: String, executionId: String, page: Int ?=1, pageSize: Int ?=10, analysisType: String ?="report")
 
 POST    /analysis/:analysisId/executions  controllers.AnalysisExecutions.execute(analysisId: String)
 

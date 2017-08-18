@@ -28,7 +28,7 @@ import sncr.metadata.engine.{Fields, MetadataDictionary}
 
 class Analysis extends BaseController {
   val executorRunner = new ExecutionTaskHandler(1);
-  var totalRows: Int = 10000;
+  var totalRows: Int = 0;
   
   /**
     * List analyses.  At the moment only used by scheduler to list
@@ -278,8 +278,8 @@ class Analysis extends BaseController {
  	var analysisJSON : JObject = null;
  	
  	m_log.trace("json dataset: {}", reqJSON);
-    val start = (reqJSON \ "contents" \ "start").extractOrElse(0)
-    val limit = (reqJSON \ "contents" \ "limit").extractOrElse(DLConfiguration.rowLimit)
+    val start = (reqJSON \ "contents" \ "page").extractOrElse(0)
+    val limit = (reqJSON \ "contents" \ "pageSize").extractOrElse(10)
     val analysis = (reqJSON \ "contents" \ "analyze") match {
       case obj: JArray => analysisJson(reqJSON); // reading from request body
       case _ => null
@@ -451,24 +451,24 @@ class Analysis extends BaseController {
       var data: JValue = null
       var resultData : java.util.List[java.util.Map[String, (String, Object)]] = null
 
-      if (PaginateDataSet.INSTANCE.getCache(analysisId) != null)
+      if (PaginateDataSet.INSTANCE.getCache(analysisResultId) != null)
       {
-        m_log.trace("when data is available in cache analysisId: {}", analysisId);
+        m_log.trace("when data is available in cache analysisResultId: {}", analysisResultId);
         m_log.trace("when data is available in cache size of limit {}", limit);
         m_log.trace("when data is available in cache size of start {}", start);
-        data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisId));
-        //totalRows = PaginateDataSet.INSTANCE.sizeOfData();
+        data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisResultId));
+        totalRows = PaginateDataSet.INSTANCE.sizeOfData();
         m_log.trace("totalRows {}", totalRows);
       }
       else {
         resultData = execution.getPreview(DLConfiguration.rowLimit);
-        m_log.trace("when data is not available in cache analysisId: {}", analysisId);
+        m_log.trace("when data is not available in cache analysisResultId: {}", analysisResultId);
         m_log.trace("when data is not available in cache size of limit {}", limit);
         m_log.trace("when data is not available in cache size of start {}", start);
         m_log.trace("when data is not available fresh execution of resultData {}", resultData.size());
-        PaginateDataSet.INSTANCE.putCache(analysisId, resultData);
-        data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisId))
-        //totalRows = PaginateDataSet.INSTANCE.sizeOfData();
+        PaginateDataSet.INSTANCE.putCache(analysisResultId, resultData);
+        data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisResultId))
+        totalRows = PaginateDataSet.INSTANCE.sizeOfData();
         m_log.info("totalRows {}", totalRows);
       }
       m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}, created execution id: $analysisResultId"

@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
 // @SOURCE:/Users/Shared/WORK/SAW-BE/saw-transport-service/conf/routes
-// @DATE:Thu Aug 10 22:00:37 EDT 2017
+// @DATE:Fri Aug 18 00:45:57 EDT 2017
 
 import play.api.routing.JavaScriptReverseRoute
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
@@ -183,16 +183,6 @@ package controllers.javascript {
       """
     )
   
-    // @LINE:20
-    def getExecutionData: JavaScriptReverseRoute = JavaScriptReverseRoute(
-      "controllers.AnalysisExecutions.getExecutionData",
-      """
-        function(analysisId0,executionId1,start2,limit3) {
-          return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "analysis/" + (""" + implicitly[PathBindable[String]].javascriptUnbind + """)("analysisId", encodeURIComponent(analysisId0)) + "/executions/" + (""" + implicitly[PathBindable[String]].javascriptUnbind + """)("executionId", encodeURIComponent(executionId1)) + "/data" + _qS([(start2 == null ? null : (""" + implicitly[QueryStringBindable[Int]].javascriptUnbind + """)("start", start2)), (limit3 == null ? null : (""" + implicitly[QueryStringBindable[Int]].javascriptUnbind + """)("limit", limit3))])})
-        }
-      """
-    )
-  
     // @LINE:17
     def list: JavaScriptReverseRoute = JavaScriptReverseRoute(
       "controllers.AnalysisExecutions.list",
@@ -203,6 +193,16 @@ package controllers.javascript {
             return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "analysis/" + (""" + implicitly[PathBindable[String]].javascriptUnbind + """)("analysisId", encodeURIComponent(analysisId0)) + "/executions"})
           }
         
+        }
+      """
+    )
+  
+    // @LINE:20
+    def getExecutionData: JavaScriptReverseRoute = JavaScriptReverseRoute(
+      "controllers.AnalysisExecutions.getExecutionData",
+      """
+        function(analysisId0,executionId1,page2,pageSize3,analysisType4) {
+          return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "analysis/" + (""" + implicitly[PathBindable[String]].javascriptUnbind + """)("analysisId", encodeURIComponent(analysisId0)) + "/executions/" + (""" + implicitly[PathBindable[String]].javascriptUnbind + """)("executionId", encodeURIComponent(executionId1)) + "/data" + _qS([(page2 == null ? null : (""" + implicitly[QueryStringBindable[Int]].javascriptUnbind + """)("page", page2)), (pageSize3 == null ? null : (""" + implicitly[QueryStringBindable[Int]].javascriptUnbind + """)("pageSize", pageSize3)), (analysisType4 == null ? null : (""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("analysisType", analysisType4))])})
         }
       """
     )
