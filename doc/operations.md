@@ -8,13 +8,15 @@ modules in an environment.
 Before starting an installation of SAW ensure the following
 is provided:
 
-1. A host for running SAW, with 32 GB of memory and CentOS 7 as the
-   operating system (the target host)
+1. At least one host for running SAW (the target host), with 32 GB of
+   memory and CentOS 7 as the operating system
 
-2. A host for deploying SAW from (the deploy host), which will be used
-   to run the deploy command and store the environment configuration
+2. A host for deploying from (the deploy host), running CentOS 7 as
+   the operating system.  This host will be used to run the deploy
+   command and store the environment configuration.  The deploy host
+   is typically common to the entire environment.
 
-3. SAW environment configuration
+3. SAW environment configuration (see next section)
 
 # Configuring
 
@@ -42,7 +44,7 @@ Execute the following steps to install SAW and its modules:
 2. Prepare a SAW environment configuration file, as described in the
    previous section
 
-3. Extract the package and execute the deploy script, giving it the
+3. Extract the package and execute the deploy command, giving it the
    path to the environment configuration file as an argument
 
         tar -xzf saw.tgz
@@ -50,7 +52,9 @@ Execute the following steps to install SAW and its modules:
         ./deploy <config>
 
 Note: Configure passwordless SSH access to the target host for a
-smoother installation experience.
+smoother installation experience.  The deploy command should be run as
+a normal user.  The deploy command will use sudo to request privileges
+for relevant operations.
 
 # Upgrading
 
