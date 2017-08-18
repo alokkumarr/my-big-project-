@@ -1,0 +1,25 @@
+info:
+  component: Synchronoss Gateway Service
+spring:
+  application:
+    name: saw-gateway-service
+server:
+  address: localhost
+  port: 8080 
+  context-path: /saw
+  compression:
+    enabled: true  
+
+metadata:
+     url: http://mapr-dev01.sncrbda.dev.vacum-np.sncrcorp.net:9200      
+     context: /md
+analysis:
+     url: http://mapr-dev01.sncrbda.dev.vacum-np.sncrcorp.net:9200
+     context: /analysis
+security:
+   url: https://saw.bda.poc.velocity-va.synchronoss.net 
+   context: /saw-security   
+  
+
+
+ 

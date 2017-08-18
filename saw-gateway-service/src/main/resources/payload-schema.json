@@ -1,0 +1,58 @@
+{
+   "$schema":"http://json-schema.org/draft-04/schema#",
+   "properties":{
+      "contents":{
+         "properties":{
+            "action":{
+               "enum":[
+                  "create",
+                  "update",
+                  "read",
+                  "delete",
+                  "search",
+                  "execute"
+              ],
+               "type":"string"
+            },
+            "alert":{
+               "description":"Allows ANY array but describes nothing.",
+               "title":"Empty array schema.",
+               "type":"array"
+            },
+            "analyze":{
+               "description":"Allows ANY array but describes nothing.",
+               "title":"Empty array schema.",
+               "type":"array"
+            },
+            "keys":{
+               "description":"Allows ANY object but describes nothing.",
+               "title":"Empty object schema.",
+               "type": "array",
+  				"items": {
+    				"type": "object"
+    				}
+            },
+            "observe":{
+               "description":"Allows ANY array but describes nothing.",
+               "title":"Empty array schema.",
+               "type":"array"
+            }
+         },
+         "type":"object"
+      },
+      "links":{
+         "description":"Allows ANY object but describes nothing.",
+         "title":"Empty object schema.",
+         "type":"object"
+      },
+      "data":{
+         "description":"Allows ANY object but describes nothing.",
+         "title":"Empty object schema.",
+         "type":"array"
+      }
+   },
+   "required":[
+      "contents"
+   ],
+   "type":"object"
+}
