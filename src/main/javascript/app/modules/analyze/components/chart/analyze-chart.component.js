@@ -9,6 +9,7 @@ import map from 'lodash/map';
 import values from 'lodash/values';
 import clone from 'lodash/clone';
 import set from 'lodash/set';
+import cloneDeep from 'lodash/cloneDeep';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -95,7 +96,7 @@ export const AnalyzeChartComponent = {
 
     initChart() {
       this.settings = this._ChartService.fillSettings(this.model.artifacts, this.model);
-      this.reloadChart(this.settings, this.filteredGridData);
+      this.reloadChart(this.settings, this.filteredGridData, this.model.sqlBuilder);
 
       if (isEmpty(this.mode)) {
         return;
@@ -165,12 +166,14 @@ export const AnalyzeChartComponent = {
       }
       this.startProgress();
       const payload = this.generatePayload(this.model);
+      this.sqlBuilder = payload.sqlBuilder;
       return this._AnalyzeService.getDataBySettings(payload).then(({data}) => {
         const parsedData = this._ChartService.parseData(data, payload.sqlBuilder);
+        console.log('parsedData', parsedData);
         this.gridData = this.filteredGridData = parsedData || this.filteredGridData;
         this.analysisSynched();
         this.endProgress();
-        this.reloadChart(this.settings, this.filteredGridData);
+        this.reloadChart(this.settings, this.filteredGridData, this.sqlBuilder);
       }, () => {
         this.endProgress();
       });
@@ -213,7 +216,7 @@ export const AnalyzeChartComponent = {
       return isValid;
     }
 
-    reloadChart(settings, filteredGridData) {
+    reloadChart(settings, filteredGridData, sqlBuilder) {
       if (isEmpty(filteredGridData)) {
         return;
       }
@@ -221,7 +224,10 @@ export const AnalyzeChartComponent = {
         this.model.chartType,
         settings,
         filteredGridData,
-        {labels: this.labels}
+        {
+          labels: this.labels,
+          sqlBuilder
+        }
       );
 
       this.updateChart.next(changes);
@@ -260,10 +266,10 @@ export const AnalyzeChartComponent = {
 
       const g = find(this.settings.groupBy, g => g.checked === 'g');
       const x = find(this.settings.xaxis, x => x.checked === 'x');
-      const y = find(this.settings.yaxis, y => y.checked === 'y');
+      const y = filter(this.settings.yaxis, y => y.checked === 'y');
       const z = find(this.settings.zaxis, z => z.checked === 'z');
 
-      const allFields = [g, x, y, z];
+      const allFields = [g, x, ...y, z];
 
       const nodeFields = filter(allFields, this.isStringField);
       const dataFields = filter(allFields, this.isDataField).map(field => {
@@ -271,12 +277,12 @@ export const AnalyzeChartComponent = {
         return field;
       });
 
-      const data = find(this.settings.yaxis, y => y.columnName === 'FAILED_MB');
+      // const data = find(this.settings.yaxis, y => y.columnName === 'FAILED_MB');
 
-      data.aggregate = 'sum';
-
+      // data.aggregate = 'sum';
+      // data.checked = 'y';
       set(payload, 'sqlBuilder.dataFields', dataFields);
-      payload.sqlBuilder.dataFields.push(data);
+      // payload.sqlBuilder.dataFields[1] = data;
       set(payload, 'sqlBuilder.nodeFields', nodeFields);
 
       delete payload.supports;

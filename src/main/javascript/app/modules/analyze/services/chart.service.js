@@ -10,13 +10,18 @@ import indexOf from 'lodash/indexOf';
 import isEmpty from 'lodash/isEmpty';
 import fpPipe from 'lodash/fp/pipe';
 import fpOmit from 'lodash/fp/omit';
-import fpMapKeys from 'lodash/fp/mapKeys';
+import fpToPairs from 'lodash/fp/toPairs';
+import fpJoin from 'lodash/fp/join';
+import fpMap from 'lodash/fp/map';
 import fpMapValues from 'lodash/fp/mapValues';
 import groupBy from 'lodash/groupBy';
 import fpFlatMap from 'lodash/fp/flatMap';
 import fpSortBy from 'lodash/fp/sortBy';
 import reduce from 'lodash/reduce';
 import concat from 'lodash/concat';
+import compact from 'lodash/compact';
+import fpGroupBy from 'lodash/fp/groupBy';
+import mapValues from 'lodash/mapValues';
 
 import {NUMBER_TYPES} from '../consts';
 
@@ -157,7 +162,7 @@ export function ChartService() {
    * string_field_2: 1 -> y
    */
   function getNodeFieldMap(nodeFields) {
-    return map(nodeFields, 'checked');
+    return map(nodeFields, 'columnName');
   }
 
   /** parse the tree structure data and return a flattened array:
@@ -188,12 +193,12 @@ export function ChartService() {
     return datum;
   }
 
-  function parseLeaf(node, dataObj, dataFieldsMap) {
+  function parseLeaf(node, dataObj) {
     const dataFields = fpPipe(
       fpOmit(['doc_count', 'key']),
-      fpMapKeys(k => {
-        return dataFieldsMap[k];
-      }),
+      // fpMapKeys(k => {
+      //   return dataFieldsMap[k];
+      // }),
       fpMapValues('value')
     )(node);
 
@@ -204,25 +209,28 @@ export function ChartService() {
   }
 
   function splitToSeriesAndCategories(parsedData, fields) {
-    const series = [];
+    let series = [];
     const categories = {};
+    const areMultipleYAxes = fields.y.length > 1;
+    const isGrouped = fields.g;
 
-    // if there is a group by
-    // // group the data into multiple series
-    if (fields.g) {
-      const groupedData = groupBy(parsedData, 'g');
-      forEach(groupedData, (group, k) => {
-        series.push({
-          name: k,
-          data: group
+    if (areMultipleYAxes) {
+      series = splitSeriesByYAxes(parsedData, fields);
+    } else if (isGrouped) {
+      series = splitSeriesByGroup(parsedData, fields);
+    } else {
+      const axesFieldNameMap = getAxesFieldNameMap(fields);
+      console.log('namemap', axesFieldNameMap);
+      const data = map(parsedData, dataPoint => {
+        return mapValues(axesFieldNameMap, val => {
+          return dataPoint[val];
         });
       });
-    } else {
-      series[0] = {
-        data: parsedData
-      };
+      series = [{
+        data
+      }];
     }
-
+    // split out categories form the data
     forEach(series, serie => {
       forEach(serie.data, dataPoint => {
         forEach(dataPoint, (v, k) => {
@@ -238,6 +246,66 @@ export function ChartService() {
       series,
       categories
     };
+  }
+
+  function splitSeriesByGroup(parsedData, fields) {
+    const series = [];
+    const axesFieldNameMap = getAxesFieldNameMap(fields);
+    const data = map(parsedData, dataPoint => mapValues(axesFieldNameMap, val => {
+      return dataPoint[val];
+    }));
+    const groupedData = groupBy(data, 'g');
+    forEach(groupedData, (group, k) => {
+      series.push({
+        name: k,
+        data: group
+      });
+    });
+    return series;
+    // fpPipe(
+    //   fpMap(dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])),
+    //   fpGroupBy('g'),
+    //   fpToPairs,
+    //   fpMap(([name, data]) => ({name, data}))
+    // );
+  }
+
+  function splitSeriesByYAxes(parsedData, fields) {
+    const seriesObj = reduce(fields.y, (accumulator, field) => {
+      accumulator[field.columnName] = [];
+      return accumulator;
+    }, {});
+
+    const axesFieldNameMap = getAxesFieldNameMap(fields, 'y');
+
+    forEach(parsedData, dataPoint => {
+      forEach(fields.y, field => {
+        seriesObj[field.columnName].push(assign(
+          {y: dataPoint[field.columnName]},
+          mapValues(axesFieldNameMap, val => dataPoint[val])
+        ));
+      });
+    });
+
+    return fpPipe(
+      fpToPairs,
+      fpMap(([name, data]) => ({name, data}))
+    )(seriesObj);
+  }
+
+  /**
+   * get the map from colmnNames to the axes, or group
+   * Ex
+   * y -> AVAILABLE_MB
+   */
+  function getAxesFieldNameMap(fields, exclude) {
+    // y axis ommitted because it is added in splitSeriesByYAxes
+    const y = exclude === 'y' ? [] : fields.y;
+    const fieldsArray = compact([fields.x, ...y, fields.z, fields.g]);
+    return reduce(fieldsArray, (accumulator, field) => {
+      accumulator[field.checked] = field.columnName;
+      return accumulator;
+    }, {});
   }
 
   function addToCategory(categories, key, newCategoryValue) {
@@ -284,14 +352,19 @@ export function ChartService() {
   const dataToChangeConfig = (type, settings, gridData, opts) => {
     const fields = {
       x: find(settings.xaxis, attr => attr.checked === 'x'),
-      y: find(settings.yaxis, attr => attr.checked === 'y'),
+      y: filter(settings.yaxis, attr => attr.checked === 'y'),
       z: find(settings.zaxis, attr => attr.checked === 'z'),
       g: find(settings.groupBy, attr => attr.checked === 'g')
     };
 
+    console.log('sqlBuilder', opts.sqlBuilder);
+
     const labels = {
       x: get(fields, 'x.displayName', ''),
-      y: get(fields, 'y.displayName', '')
+      y: fpPipe(
+        fpMap('displayName'),
+        fpJoin(' | ')
+      )(fields.y)
     };
 
     const changes = [{
@@ -303,7 +376,9 @@ export function ChartService() {
     }];
 
     if (!isEmpty(gridData)) {
-      const {series, categories} = splitToSeriesAndCategories(gridData, fields);
+      const {series, categories} = splitToSeriesAndCategories(gridData, fields, opts.sqlBuilder);
+      console.log('series', series);
+      console.log('categories', categories);
       customizeSeriesForChartType(series, type);
       changes.push({
         path: 'series',
