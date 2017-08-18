@@ -1,5 +1,8 @@
 import find from 'lodash/find';
 import forEach from 'lodash/forEach';
+import map from 'lodash/map';
+import clone from 'lodash/clone';
+
 import template from './analyze-chart-settings.component.html';
 import style from './analyze-chart-settings.component.scss';
 
@@ -8,7 +11,8 @@ export const AnalyzeChartSettingsComponent = {
   styles: [style],
   bindings: {
     settings: '<?',
-    onChange: '&'
+    onChange: '&',
+    chartType: '<'
   },
   controller: class AnalyzeChartSettingsController {
     constructor(AnalyzeService, FilterService, $mdSidenav, $scope) {
@@ -19,9 +23,14 @@ export const AnalyzeChartSettingsComponent = {
       this._$mdSidenav = $mdSidenav;
       this._$scope = $scope;
       this.selected = {};
+      this.multipleYAxes = {
+        enabled: false,
+        fields: []
+      };
     }
 
     $onInit() {
+      this.multipleYAxes.enabled = this.chartType !== 'bubble' || this.chartType !== 'pie';
       this._clearWatcher = this._$scope.$watch(() => this.settings, newVal => {
         if (newVal) {
           this.markSelected();
@@ -40,22 +49,39 @@ export const AnalyzeChartSettingsComponent = {
     }
 
     markSelected() {
-      this.selected.y = find(this.settings.yaxis, attr => attr.checked === 'y');
+      if (this.multipleYAxes.enabled) {
+        this.multipleYAxes.fields = map(this.settings.yaxis, field => {
+          const clonedField = clone(field);
+          if (clonedField.checked === 'y') {
+            clonedField.checked = true;
+          }
+          return clonedField;
+        });
+      } else {
+        this.selected.y = find(this.settings.yaxis, attr => attr.checked === 'y');
+      }
       this.selected.x = find(this.settings.xaxis, attr => attr.checked === 'x');
       this.selected.g = find(this.settings.groupBy, attr => attr.checked === 'g');
       this.selected.z = find(this.settings.zaxis, attr => attr.checked === 'z');
     }
 
     inputChanged(axisOptions, selectedAttr, marker) {
-
-      forEach(axisOptions, attr => {
-        if (selectedAttr === attr) {
-          attr.checked = marker;
-        } else if (attr.checked === marker) {
-          attr.checked = false;
+      if (marker !== 'y') {
+        forEach(axisOptions, attr => {
+          if (selectedAttr === attr) {
+            attr.checked = marker;
+          } else if (attr.checked === marker) {
+            attr.checked = false;
+          }
+        });
+      } else {
+        const target = find(axisOptions, ({columnName}) => columnName === selectedAttr.columnName);
+        if (selectedAttr.checked === true) {
+          target.checked = 'y';
+        } else {
+          target.checked = false;
         }
-      });
-
+      }
       this.onChange({settings: this.settings});
     }
   }

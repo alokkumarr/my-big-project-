@@ -9,9 +9,11 @@
     </md-toolbar>
 
     <md-content layout-margin>
+      {{$ctrl.chartType}}
 
       <collapser title="Y-Axis Options">
         <md-radio-group ng-model="$ctrl.selected.y"
+                        ng-if="$ctrl.chartType === 'bubble' || $ctrl.chartType === 'pie'"
                         ng-change="$ctrl.inputChanged($ctrl.settings.yaxis, $ctrl.selected.y, 'y')">
           <md-radio-button ng-repeat="attr in $ctrl.settings.yaxis"
                            role="radio"
@@ -21,6 +23,21 @@
             <span ng-bind="::attr.displayName"></span>
           </md-radio-button>
         </md-radio-group>
+
+        <md-list ng-if="$ctrl.chartType !== 'bubble' || $ctrl.chartType !== 'pie'">
+          <!-- update tests -->
+          <md-list-item ng-repeat="attr in $ctrl.multipleYAxes.fields"
+                        e2e="radio-button-{{::attr.displayName}}">
+
+            <md-checkbox ng-model="attr.checked"
+                         ng-change="$ctrl.inputChanged($ctrl.settings.yaxis, attr, 'y')"
+                         style="align-self: flex-end;">
+            </md-checkbox>
+
+            <!-- <p>{{ attr.alias || attr.displayName }}</p> -->
+            <span ng-bind="attr.alias || attr.displayName"></span>
+          </md-list-item>
+        </md-list>
       </collapser>
 
       <collapser title="X-Axis Options">
