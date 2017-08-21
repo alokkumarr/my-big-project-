@@ -1,0 +1,10 @@
+[Unit]
+Description=SAW Transport
+
+[Service]
+ExecStart=/opt/saw/service/bin/start.sh
+SyslogIdentifier=saw-transport-service
+User=mapr
+
+[Install]
+WantedBy=default.target

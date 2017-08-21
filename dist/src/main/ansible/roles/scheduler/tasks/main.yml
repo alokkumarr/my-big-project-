@@ -1,3 +1,5 @@
+- name: Create MapR user
+  user: name=mapr state=present
 - name: Install SAW Scheduler Service package
   yum: name="{{ item }}" state=present
   with_fileglob: ["../rpms/saw-scheduler-service-*.rpm"]

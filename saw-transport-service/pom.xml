@@ -678,6 +678,18 @@
                                 </source>
                             </sources>
                         </mapping>
+                        <mapping>
+                            <directory>/usr/lib/systemd/system</directory>
+                            <directoryIncluded>false</directoryIncluded>
+                            <filemode>644</filemode>
+                            <username>${app.user}</username>
+                            <groupname>${app.group}</groupname>
+                            <sources>
+                                <source>
+                                    <location>src/main/system/saw-transport.service</location>
+                                </source>
+                            </sources>
+                        </mapping>
                     </mappings>
                     <preinstallScriptlet>
                         <script>echo Install is being prepared
