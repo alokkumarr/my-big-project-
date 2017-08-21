@@ -6,94 +6,52 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SAWCompositeProperties {
 
-  @Value("${metadata.url}")
-  private String metaDataURL;
+  @Value("${service-url}")
+  private String serviceURL;
 
-  @Value("${analysis.url}")
-  private String executionDataURL;
+  @Value("${context.metadata}")
+  private String contextMetadata;
 
-  @Value("${semantic.url}")
-  private String semanticDataURL;
+  @Value("${context.security}")
+  private String contextSecurity;
 
-  @Value("${metadata.context}")
-  private String metaDataContext;
+  @Value("${context.analysis}")
+  private String contextAnalysis;
 
-  @Value("${analysis.context}")
-  private String executionDataContext;
-
-  @Value("${semantic.context}")
-  private String semanticDataContext;
-
-
-  @Value("${security.context}")
-  private String securityContext;
-
-  @Value("${security.url}")
-  private String securityURL;
-
-  public String getSecurityURL() {
-    return securityURL;
+  public String getServiceURL() {
+    return serviceURL;
   }
 
-  public void setSecurityURL(String securityURL) {
-    this.securityURL = securityURL;
+  public void setServiceURL(String serviceURL) {
+    this.serviceURL = serviceURL;
   }
 
-  public String getMetaDataURL() {
-    return metaDataURL;
+  public String getContextMetadata() {
+    return contextMetadata;
   }
 
-  public void setMetaDataURL(String metaDataURL) {
-    this.metaDataURL = metaDataURL;
+  public void setContextMetadata(String contextMetadata) {
+    this.contextMetadata = contextMetadata;
   }
 
-  public String getExecutionDataURL() {
-    return executionDataURL;
+  public String getContextSecurity() {
+    return contextSecurity;
   }
 
-  public void setExecutionDataURL(String executionDataURL) {
-    this.executionDataURL = executionDataURL;
+  public void setContextSecurity(String contextSecurity) {
+    this.contextSecurity = contextSecurity;
   }
 
-  public String getSemanticDataURL() {
-    return semanticDataURL;
+  public String getContextAnalysis() {
+    return contextAnalysis;
   }
 
-  public void setSemanticDataURL(String semanticDataURL) {
-    this.semanticDataURL = semanticDataURL;
+  public void setContextAnalysis(String contextAnalysis) {
+    this.contextAnalysis = contextAnalysis;
   }
 
-  public String getMetaDataContext() {
-    return metaDataContext;
-  }
+  
 
-  public void setMetaDataContext(String metaDataContext) {
-    this.metaDataContext = metaDataContext;
-  }
-
-  public String getExecutionDataContext() {
-    return executionDataContext;
-  }
-
-  public void setExecutionDataContext(String executionDataContext) {
-    this.executionDataContext = executionDataContext;
-  }
-
-  public String getSemanticDataContext() {
-    return semanticDataContext;
-  }
-
-  public void setSemanticDataContext(String semanticDataContext) {
-    this.semanticDataContext = semanticDataContext;
-  }
-
-  public String getSecurityContext() {
-    return securityContext;
-  }
-
-  public void setSecurityContext(String securityContext) {
-    this.securityContext = securityContext;
-  }
 
 
 }

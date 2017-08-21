@@ -10,20 +10,12 @@ import org.springframework.web.client.RestTemplate;
 
 
 
-// TODO : Enable Edge Sever with Zuul
-// TODO : Enable Feign client later once base service is ready, the request shall
-// hostname:port/serviceId/actualContextPath
 @SpringBootApplication
-// @EnableZuulProxy
-// @EnableFeignClients
-// @EnableCircuitBreaker
-// @EnableDiscoveryClient
 public class SAWCompositeServiceApplication {
 
   private static final Logger LOG = LoggerFactory.getLogger(SAWCompositeServiceApplication.class);
 
   @Bean
-  // @LoadBalanced
   RestTemplate restTemplate() {
     return new RestTemplate();
   }

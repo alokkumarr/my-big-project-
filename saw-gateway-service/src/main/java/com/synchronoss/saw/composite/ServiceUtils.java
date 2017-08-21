@@ -1,7 +1,6 @@
 package com.synchronoss.saw.composite;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -17,20 +16,9 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
-import com.synchronoss.saw.composite.exceptions.JSONValidationSAWException;
-import com.synchronoss.saw.composite.model.Constraints;
-import com.synchronoss.saw.composite.model.Contents.Action;
-import com.synchronoss.saw.composite.model.Key;
-import com.synchronoss.saw.composite.model.RoutingPayload;
 
 @Component
 public class ServiceUtils {
-  // private static final Logger LOG =
-  // LoggerFactory.getLogger(ServiceUtils.class);
-
-  /*
-   * @Autowired private LoadBalancerClient loadBalancer;
-   */
   public final String SCHEMA_FILENAME = "payload-schema.json";
 
   public ObjectMapper getMapper() {
@@ -39,38 +27,6 @@ public class ServiceUtils {
     return objectMapper;
   }
 
-  /**
-   *
-   * @param serviceId
-   * @return
-   */
-  /*
-   * public URI getServiceUrl(String serviceId) { return getServiceUrl(serviceId, null); }
-   */
-  /**
-   *
-   * @param serviceId
-   * @param fallbackUri
-   * @return
-   */
-  /*
-   * protected URI getServiceUrl(String serviceId, String fallbackUri) { URI uri = null; try {
-   * ServiceInstance instance = loadBalancer.choose(serviceId);
-   * 
-   * if (instance == null) { throw new RuntimeException("Can't find a service with serviceId = " +
-   * serviceId); }
-   * 
-   * uri = instance.getUri(); LOG.debug("Resolved serviceId '{}' to URL '{}'.", serviceId, uri);
-   * 
-   * } catch (RuntimeException e) {
-   * 
-   * if (fallbackUri == null) { throw e;
-   * 
-   * } else { uri = URI.create(fallbackUri);
-   * LOG.warn("Failed to resolve serviceId '{}'. Fallback to URL '{}'.", serviceId, uri); } }
-   * 
-   * return uri; }
-   */
   public <T> ResponseEntity<T> createOkResponse(T body) {
     return createResponse(body, HttpStatus.OK);
   }
@@ -116,7 +72,7 @@ public class ServiceUtils {
    * IllegalStateException("Unable to locate a leaderboard service"); } }
    */
 
-  public boolean checkContraints(String value) {
+/*  public boolean checkContraints(String value) {
     boolean exists = false;
 
     try {
@@ -128,8 +84,8 @@ public class ServiceUtils {
 
     return exists;
   }
-
-  public boolean checkKeysConstraintsForRead(RoutingPayload routingPayload)
+*/
+/*  public boolean checkKeysConstraintsForRead(RoutingPayload routingPayload)
       throws NullPointerException, JSONValidationSAWException {
     boolean correct = true;
     if (routingPayload.getContents().getAction() != null) {
@@ -151,7 +107,6 @@ public class ServiceUtils {
     return correct;
   }
 
-
   public boolean checkKeysConstraints(RoutingPayload routingPayload, String key) {
     boolean correct = true;
     if (routingPayload.getContents().getAction() != null) {
@@ -169,5 +124,5 @@ public class ServiceUtils {
     }
     return correct;
   }
-
+*/
 }
