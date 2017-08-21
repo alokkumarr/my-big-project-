@@ -59,12 +59,7 @@ describe('create columnChart type analysis', () => {
     filters.applyBtn.click();
 
     const appliedFilter = filters.getAppliedFilter(fieldName);
-    try {
-      commonFunctions.waitFor.elementToBePresent(appliedFilter);
-    } catch (err) {
-      browser.sleep(1000000);
-      throw new Error(err);
-    }
+    commonFunctions.waitFor.elementToBePresent(appliedFilter);
     expect(appliedFilter.isPresent()).toBe(true);
   });
 
@@ -92,7 +87,7 @@ describe('create columnChart type analysis', () => {
 
     commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
     expect(designer.saveDialog).toBeTruthy();
-    expect(save.selectedCategory.getText()).toEqual(categoryName); //TODO catch error here
+    expect(save.selectedCategory.getText()).toEqual(categoryName); // TODO catch error here
 
     save.nameInput.clear().sendKeys(chartName);
     save.descriptionInput.clear().sendKeys(chartDescription);
@@ -118,11 +113,6 @@ describe('create columnChart type analysis', () => {
   });
 
   it('should log out', () => {
-    try {
       analyze.main.doAccountAction('logout');
-    } catch (err) {
-      browser.sleep(1000000);
-      throw new Error(err);
-    }
   });
 });
