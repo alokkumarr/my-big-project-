@@ -22,7 +22,7 @@ import compact from 'lodash/compact';
 import fpGroupBy from 'lodash/fp/groupBy';
 import mapValues from 'lodash/mapValues';
 
-import {NUMBER_TYPES} from '../consts';
+import {NUMBER_TYPES, AGGREGATE_TYPES_OBJ} from '../consts';
 
 const LEGEND_POSITIONING = {
   left: {
@@ -298,7 +298,7 @@ export function ChartService() {
     const labels = {
       x: get(fields, 'x.displayName', ''),
       y: fpPipe(
-        fpMap('displayName'),
+        fpMap(field => `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${field.displayName}`),
         fpJoin(' | ')
       )(fields.y)
     };

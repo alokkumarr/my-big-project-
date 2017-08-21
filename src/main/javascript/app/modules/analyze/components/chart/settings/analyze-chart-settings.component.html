@@ -14,13 +14,20 @@
         <md-radio-group ng-model="$ctrl.selected.y"
                         ng-if="$ctrl.multipleYAxes.enabled == false"
                         ng-change="$ctrl.inputChanged($ctrl.settings.yaxis, $ctrl.selected.y, 'y')">
-          <md-radio-button ng-repeat="attr in $ctrl.settings.yaxis"
-                           role="radio"
-                           ng-value="attr"
-                           e2e="radio-button-{{::attr.displayName}}"
-                           ng-disabled="attr.checked && attr.checked != 'y'">
-            <span ng-bind="::attr.displayName"></span>
-          </md-radio-button>
+          <div flex layout="row"
+               layout-align="space-between center"
+               ng-repeat="attr in $ctrl.settings.yaxis">
+            <md-radio-button role="radio"
+                             ng-value="attr"
+                             e2e="radio-button-{{::attr.displayName}}"
+                             ng-disabled="attr.checked && attr.checked != 'y'">
+              <span ng-bind="::attr.displayName"></span>
+            </md-radio-button>
+            <aggregate-chooser ng-show="attr.checked && attr.checked === 'y'"
+                               artifact-column="attr"
+                               on-select="$ctrl.onSelectAggregateType(aggregateType, attr, 'radio')">
+            </aggregate-chooser>
+          </div>
         </md-radio-group>
 
         <md-list ng-if="$ctrl.multipleYAxes.enabled">
@@ -33,6 +40,12 @@
                          style="align-self: flex-end;">
             </md-checkbox>
             <span ng-bind="attr.alias || attr.displayName"></span>
+
+            <aggregate-chooser ng-show="attr.checked"
+                               class="md-secondary"
+                               artifact-column="attr"
+                               on-select="$ctrl.onSelectAggregateType(aggregateType, attr, 'checkbox')">
+            </aggregate-chooser>
           </md-list-item>
         </md-list>
       </collapser>
@@ -49,17 +62,25 @@
           </md-radio-button>
         </md-radio-group>
       </collapser>
+
       <collapser title="Size by"
                  ng-if="$ctrl.settings.zaxis">
         <md-radio-group ng-model="$ctrl.selected.z"
                         ng-change="$ctrl.inputChanged($ctrl.settings.zaxis, $ctrl.selected.z, 'z')">
-          <md-radio-button ng-repeat="attr in $ctrl.settings.zaxis"
-                           role="radio"
-                           ng-value="attr"
-                           e2e="radio-button-{{::attr.displayName}}"
-                           ng-disabled="attr.checked && attr.checked != 'z'">
+          <div flex layout="row"
+               layout-align="space-between center"
+               ng-repeat="attr in $ctrl.settings.zaxis">
+            <md-radio-button role="radio"
+                             ng-value="attr"
+                             e2e="radio-button-{{::attr.displayName}}"
+                             ng-disabled="attr.checked && attr.checked != 'z'">
             <span ng-bind="::attr.displayName"></span>
-          </md-radio-button>
+            </md-radio-button>
+            <aggregate-chooser ng-show="attr.checked && attr.checked === 'z'"
+                               artifact-column="attr"
+                               on-select="$ctrl.onSelectAggregateType(aggregateType, attr, 'radio')">
+            </aggregate-chooser>
+          </div>
         </md-radio-group>
       </collapser>
 

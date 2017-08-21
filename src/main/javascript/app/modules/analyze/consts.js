@@ -39,7 +39,7 @@ export const PRIVILEGES = {
 };
 
 export const AGGREGATE_TYPES = [{
-  label: 'Sum',
+  label: 'Total',
   value: 'sum',
   icon: 'icon-Sum'
 }, {

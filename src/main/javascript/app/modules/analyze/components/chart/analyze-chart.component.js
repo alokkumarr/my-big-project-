@@ -266,10 +266,7 @@ export const AnalyzeChartComponent = {
       const allFields = [g, x, ...y, z];
 
       const nodeFields = filter(allFields, this.isStringField);
-      const dataFields = filter(allFields, this.isDataField).map(field => {
-        field.aggregate = 'sum';
-        return field;
-      });
+      const dataFields = filter(allFields, this.isDataField);
 
       set(payload, 'sqlBuilder.dataFields', dataFields);
       set(payload, 'sqlBuilder.nodeFields', nodeFields);
