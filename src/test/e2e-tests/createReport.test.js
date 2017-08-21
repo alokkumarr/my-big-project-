@@ -4,7 +4,7 @@ const analyze = require('../javascript/pages/common/analyze.po.js');
 const protractor = require('protractor');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 
-describe('create a new pivot type analysis', () => {
+describe('create a new report type analysis', () => {
   let categoryName;
   const reportDesigner = analyze.designerDialog.report;
   const reportName = `e2e report ${(new Date()).toString()}`;
@@ -107,16 +107,21 @@ describe('create a new pivot type analysis', () => {
   it('should attempt to save the report', () => {
     const save = analyze.saveDialog;
     const designer = analyze.designerDialog;
-    designer.saveBtn.click();
+    commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
+    browser.actions().mouseMove(designer.saveBtn).click();
 
-    expect(designer.elem).toBeTruthy();
+    commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
+    expect(designer.saveDialog).toBeTruthy();
     expect(save.selectedCategory.getText()).toEqual(categoryName);
 
     save.nameInput.clear().sendKeys(reportName);
     save.descriptionInput.clear().sendKeys(reportDescription);
     save.saveBtn.click();
-    commonFunctions.waitFor.elementToBePresent(analyze.main.getCardTitle(reportName))
-      .then(() => expect(analyze.main.getCardTitle(reportName).isPresent()).toBe(true));
+
+    const createdAnalysis = analyze.main.getCardTitle(reportName);
+
+    commonFunctions.waitFor.elementToBePresent(createdAnalysis)
+      .then(() => expect(createdAnalysis.isPresent()).toBe(true));
   });
 
   it('should delete the created analysis', () => {

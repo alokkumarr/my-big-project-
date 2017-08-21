@@ -90,8 +90,8 @@ describe('create columnChart type analysis', () => {
     commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
     designer.saveBtn.click();
 
-    commonFunctions.waitFor.elementToBeVisible(designer.elem);
-    expect(designer.elem).toBeTruthy();
+    commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
+    expect(designer.saveDialog).toBeTruthy();
     expect(save.selectedCategory.getText()).toEqual(categoryName); //TODO catch error here
 
     save.nameInput.clear().sendKeys(chartName);

@@ -15,7 +15,7 @@ exports.config = {
         //'incognito',
         'disable-extensions',
         'disable-web-security',
-        '--start-fullscreen' // enable for Mac OS
+        //  '--start-fullscreen' // enable for Mac OS
       ]
     }
   },
@@ -36,12 +36,13 @@ exports.config = {
     ],
 
     analyses: [
-      //webpackHelper.root('src/test/e2e-tests/priviliges.test.js'),
+      webpackHelper.root('src/test/e2e-tests/priviliges.test.js'),
       //webpackHelper.root('src/test/javascript/e2e/spec/analyses.test.js'), //obsolete
-      //webpackHelper.root('src/test/e2e-tests/goToAnalyze.test.js'),
+      webpackHelper.root('src/test/e2e-tests/goToAnalyze.test.js'),
       webpackHelper.root('src/test/e2e-tests/createChart.test.js'),
       webpackHelper.root('src/test/e2e-tests/createPivot.test.js'),
       webpackHelper.root('src/test/e2e-tests/createReport.test.js')
+      //webpackHelper.root('src/test/e2e-tests/debug.test.js') //for testing purposes
     ]
   },
 

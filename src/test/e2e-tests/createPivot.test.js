@@ -58,8 +58,10 @@ describe('create a new pivot type analysis', () => {
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
     filters.applyBtn.click();
+    const filterName = filters.getAppliedFilter(fieldName);
 
-    expect(filters.getAppliedFilter(fieldName).isPresent()).toBe(true);
+    commonFunctions.waitFor.elementToBePresent(filterName);
+    expect(filterName.isPresent()).toBe(true);
   });
 
   it('should select row, column and data fields and refresh data', () => {
@@ -86,7 +88,7 @@ describe('create a new pivot type analysis', () => {
     commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
     designer.saveBtn.click();
 
-    expect(designer.elem).toBeTruthy();
+    expect(designer.saveDialog).toBeTruthy();
     expect(save.selectedCategory.getText()).toEqual(categoryName);
 
     save.nameInput.clear().sendKeys(pivotName);

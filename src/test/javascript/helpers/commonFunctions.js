@@ -4,13 +4,13 @@ const EC = protractor.ExpectedConditions;
 module.exports = {
   waitFor: {
     elementToBeClickable: element => {
-      return browser.wait(EC.elementToBeClickable(element), 1000000);
+      return browser.wait(EC.elementToBeClickable(element), 10000);
     },
     elementToBeVisible: element => {
-      return browser.wait(EC.visibilityOf(element), 1000000);
+      return browser.wait(EC.visibilityOf(element), 10000);
     },
     elementToBePresent: element => {
-      return browser.wait(EC.presenceOf(element), 1000000);
+      return browser.wait(EC.presenceOf(element), 10000);
     },
     // Possible options: /analyze/ , /login/
     pageToBeReady: pageName => {

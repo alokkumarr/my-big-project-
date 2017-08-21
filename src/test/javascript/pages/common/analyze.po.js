@@ -130,7 +130,7 @@ module.exports = {
     createBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]'))
   },
   designerDialog: {
-    elem: element(by.css('analyze-save-dialog')),
+    saveDialog: element(by.css('analyze-save-dialog')),
     chart: {
       getXRadio: name => getChartSettingsRadio('x', name),
       getYRadio: name => getChartSettingsRadio('y', name),
