@@ -18,6 +18,13 @@ is provided:
 
 3. SAW environment configuration (see next section)
 
+Please note that the target hosts must be allocated exclusively for
+SAW use.  The underlying infrastructure up to the operating system
+level are expected to be managed externally, while SAW fully manages
+packages and configuration on the target hosts.
+
+Currently SAW only supports deploying to a single target host.
+
 # Configuring
 
 Each SAW environment requires its own configuration.  A sample
