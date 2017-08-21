@@ -12,11 +12,10 @@ public enum Constraints {
 		this.s = s;
 	}
 
-	public Constraints find(Constraints val) {
-      return Arrays.stream(Constraints.values()).filter(e -> e.s.equals(val.s)).reduce((t1, t2) -> t1)
-              .<IllegalStateException>orElseThrow(() -> {
-                  throw new IllegalStateException(String.format("Unsupported type %s.", val));
-              });
-  }
-	
+	public static Constraints find(String val) throws IllegalStateException  {
+		return Arrays.stream(Constraints.values()).filter(e -> e.s.equals(val)).reduce((t1, t2) -> t1).
+				<IllegalStateException>orElseThrow(() -> {
+					throw new IllegalStateException(String.format("Unsupported type %s.", val));
+				});
+	}
 }
