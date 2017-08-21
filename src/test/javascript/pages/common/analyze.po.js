@@ -1,4 +1,4 @@
-const {doMdSelectOption, getMdSelectOptions} = require('../../utils');
+const {doMdSelectOption, getMdSelectOptions} = require('../../helpers/utils');
 const commonFunctions = require('../../helpers/commonFunctions.js');
 
 const getCards = name => element.all(by.css('md-card[e2e="analysis-card"]')).filter(elem => {
@@ -18,11 +18,13 @@ const doAnalysisAction = (name, action) => {
   const card = getCard(name);
   const toggle = card.element(by.css('button[e2e="actions-menu-toggle"]'));
   commonFunctions.waitFor.elementToBeClickable(toggle);
+  commonFunctions.waitFor.elementToBeVisible(toggle);
   toggle.click();
   toggle.getAttribute('aria-owns').then(id => {
-    element(by.id(id))
-      .element(by.css(`button[e2e="actions-menu-selector-${action}"]`))
-      .click();
+    const actionButton = element(by.id(id))
+      .element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
+    commonFunctions.waitFor.elementToBeVisible(actionButton);
+    actionButton.click();
   });
 };
 

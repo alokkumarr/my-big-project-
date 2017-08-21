@@ -1,8 +1,8 @@
-const login = require('../pages/common/login.po.js');
-const sidenav = require('../pages/components/sidenav.co.js');
-const analyze = require('../pages/common/analyze.po.js');
+const login = require('../javascript/pages/common/login.po.js');
+const sidenav = require('../javascript/pages/components/sidenav.co.js');
+const analyze = require('../javascript/pages/common/analyze.po.js');
 const protractor = require('protractor');
-const commonFunctions = require('../helpers/commonFunctions.js');
+const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 
 describe('create a new pivot type analysis', () => {
   let categoryName;

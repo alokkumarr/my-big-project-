@@ -1,6 +1,6 @@
-const login = require('../pages/common/login.po.js');
-const header = require('../pages/components/header.co.js');
-const analyze = require('../pages/common/analyze.po.js');
+const login = require('../javascript/pages/common/login.po.js');
+const header = require('../javascript/pages/components/header.co.js');
+const analyze = require('../javascript/pages/common/analyze.po.js');
 
 describe('Login Tests', () => {
 

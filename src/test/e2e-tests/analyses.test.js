@@ -1,6 +1,6 @@
-const header = require('../pages/components/header.co.js');
-const sidenav = require('../pages/components/sidenav.co.js');
-const analyze = require('../pages/common/analyze.po.js');
+const header = require('../javascript/pages/components/header.co.js');
+const sidenav = require('../javascript/pages/components/sidenav.co.js');
+const analyze = require('../javascript/pages/common/analyze.po.js');
 
 describe('Analyses Tests', () => {
   it('should navigate to Analyze page', () => {

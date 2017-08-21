@@ -1,11 +1,10 @@
 const protractor = require('protractor');
-const login = require('../pages/common/login.po.js');
-const analyze = require('../pages/common/analyze.po.js');
+const login = require('../javascript/pages/common/login.po.js');
+const analyze = require('../javascript/pages/common/analyze.po.js');
 const ec = protractor.ExpectedConditions;
 
-describe('create a new columnChart type analysis', () => {
+describe('should go to Analyze page after landing on home page', () => {
   it('login as admin', () => {
-    browser.sleep(2000);
     expect(browser.getCurrentUrl()).toContain('/login');
     login.loginAs('admin');
   });
