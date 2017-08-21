@@ -1,9 +1,19 @@
+let apiUrl;
+
+/* eslint-disable */
+if (__PRODUCTION__) {
+  apiUrl = window.location.origin;
+} else {
+  apiUrl = 'https://saw.bda.poc.velocity-va.synchronoss.net';
+}
+/* eslint-enable */
+
 export default {
   login: {
-    url: 'https://saw.bda.poc.velocity-va.synchronoss.net/saw-security',
+    url: `${apiUrl}/saw-security`,
     jwtKey: 'jwtToken'
   },
   api: {
-    url: 'https://saw.bda.poc.velocity-va.synchronoss.net/api'
+    url: `${apiUrl}/api`
   }
 };
