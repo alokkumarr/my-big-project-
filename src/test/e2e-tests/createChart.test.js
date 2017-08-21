@@ -113,6 +113,6 @@ describe('create columnChart type analysis', () => {
   });
 
   it('should log out', () => {
-      analyze.main.doAccountAction('logout');
+    analyze.main.doAccountAction('logout');
   });
 });
