@@ -1,5 +1,9 @@
+- name: Create MapR user
+  user: name=mapr state=present
 - name: Install SAW Transport Service package
   yum: name="{{ item }}" state=present
   with_fileglob: ["../rpms/saw-transport-service-*.rpm"]
 - name: Install SAW Transport Service configuration file
   template: src=application.conf dest=/opt/saw/service/conf
+- name: Enable and start SAW Transport Service
+  systemd: name=saw-transport enabled=true state=started

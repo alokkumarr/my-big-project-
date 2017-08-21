@@ -134,11 +134,11 @@
                   <file>target/saw-scheduler-service-${revision}-exec.jar</file> 
                 </entry>
                 <entry>
-                  <name>/lib/systemd/system/saw-scheduler.service</name>
+                  <name>/usr/lib/systemd/system/saw-scheduler.service</name>
                   <file>src/main/system/saw-scheduler.service</file> 
                 </entry>
                 <entry>
-                  <name>/lib/systemd/system/saw-scheduler.timer</name>
+                  <name>/usr/lib/systemd/system/saw-scheduler.timer</name>
                   <file>src/main/system/saw-scheduler.timer</file> 
                 </entry>
               </entries>
