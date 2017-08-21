@@ -5,6 +5,7 @@ import clone from 'lodash/clone';
 
 import template from './analyze-chart-settings.component.html';
 import style from './analyze-chart-settings.component.scss';
+import {AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE, AGGREGATE_TYPES_OBJ} from '../../../consts';
 
 export const AnalyzeChartSettingsComponent = {
   template,
@@ -17,6 +18,10 @@ export const AnalyzeChartSettingsComponent = {
   controller: class AnalyzeChartSettingsController {
     constructor(AnalyzeService, FilterService, $mdSidenav, $scope) {
       'ngInject';
+
+      this.AGGREGATE_TYPES = AGGREGATE_TYPES;
+      this.AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
+      this.DEFAULT_AGGREGATE_TYPE = DEFAULT_AGGREGATE_TYPE;
 
       this._FilterService = FilterService;
       this._AnalyzeService = AnalyzeService;

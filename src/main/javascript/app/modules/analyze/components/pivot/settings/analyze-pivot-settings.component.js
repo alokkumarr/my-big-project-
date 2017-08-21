@@ -7,37 +7,10 @@ import map from 'lodash/map';
 
 import template from './analyze-pivot-settings.component.html';
 import style from './analyze-pivot-settings.component.scss';
-import {DATE_TYPES, MAX_POSSIBLE_FIELDS_OF_SAME_AREA} from '../../../consts';
+import {DATE_TYPES, MAX_POSSIBLE_FIELDS_OF_SAME_AREA,
+  AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE, AGGREGATE_TYPES_OBJ} from '../../../consts';
 
 export const ANALYZE_PIVOT_SETTINGS_SIDENAV_ID = 'ANALYZE_PIVOT_SETTINGS_SIDENAV_ID';
-
-const AGGREGATE_TYPES = [{
-  label: 'Sum',
-  value: 'sum',
-  icon: 'icon-Sum'
-}, {
-  label: 'Average',
-  value: 'avg',
-  icon: 'icon-AVG'
-}, {
-  label: 'Mininum',
-  value: 'min',
-  icon: 'icon-MIN'
-}, {
-  label: 'Maximum',
-  value: 'max',
-  icon: 'icon-MAX'
-}, {
-  label: 'Count',
-  value: 'count',
-  icon: 'icon-Count'
-}];
-
-export const DEFAULT_AGGREGATE_TYPE = AGGREGATE_TYPES[0];
-const AGGREGATE_TYPES_OBJ = fpPipe(
-  fpGroupBy('value'),
-  fpMapValues(v => v[0])
-)(AGGREGATE_TYPES);
 
 const AREA_TYPES = [{
   label: 'Row',

@@ -11,6 +11,7 @@ import {PivotService} from './services/pivot.service';
 import {ChartService} from './services/chart.service';
 
 import {AnalyzePageComponent} from './components/page/analyze-page.component';
+import {AggregateChooserComponent} from './components/aggregate-chooser/aggregate-chooser.component';
 import {AnalyzeActionsService} from './components/actions/analyze-actions.service';
 import {AnalyzeActionsMenuComponent} from './components/actions/analyze-actions-menu.component';
 import {AnalyzeViewComponent} from './components/view/analyze-view.component';
@@ -65,6 +66,7 @@ angular.module(AnalyzeModule, [
   .factory('ChartService', ChartService)
   .factory('AnalyzeActionsService', AnalyzeActionsService)
   .component('analyzeActionsMenu', AnalyzeActionsMenuComponent)
+  .component('aggregateChooser', AggregateChooserComponent)
   .component('reportGridContainer', ReportGridContainerComponent)
   .component('reportGridNode', ReportGridNodeComponent)
   .component('reportGrid', ReportGridComponent)
