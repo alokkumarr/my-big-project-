@@ -1,4 +1,5 @@
 let apiUrl;
+let endpoints;
 
 /* eslint-disable */
 if (__PRODUCTION__) {
@@ -8,12 +9,20 @@ if (__PRODUCTION__) {
 }
 /* eslint-enable */
 
+/* Use old endpoints for velocity environments. It's difficult
+   to configure/update the new ones for this */
+if (/velocity-va/.test(apiUrl)) {
+  endpoints = {security: 'saw-security', services: 'api'};
+} else {
+  endpoints = {security: 'security', services: 'services'};
+}
+
 export default {
   login: {
-    url: `${apiUrl}/saw-security`,
+    url: `${apiUrl}/${endpoints.security}`,
     jwtKey: 'jwtToken'
   },
   api: {
-    url: `${apiUrl}/api`
+    url: `${apiUrl}/${endpoints.services}`
   }
 };
