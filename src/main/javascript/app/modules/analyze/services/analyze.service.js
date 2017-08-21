@@ -285,8 +285,8 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
   }
 
   function getDataBySettings(analysis) {
-    return applyAnalysis(analysis, EXECUTION_MODES.PREVIEW).then(({data}) => {
-      return {analysis, data};
+    return applyAnalysis(analysis, EXECUTION_MODES.PREVIEW).then(({data, count}) => {
+      return {analysis, data, count};
     });
   }
 

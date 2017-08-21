@@ -137,6 +137,9 @@
                                show-view-more="true"
                                ng-show="$ctrl.columns.length">
         </report-grid-container>
+        <div class="data-count-limit" ng-if="$ctrl.gridData.length">
+          Showing {{$ctrl.gridData.length}} out of {{$ctrl.gridDataTotalCount}} rows. Click on 'Preview' to see more.
+        </div>
       </div>
     </div>
   </analyze-dialog-content>

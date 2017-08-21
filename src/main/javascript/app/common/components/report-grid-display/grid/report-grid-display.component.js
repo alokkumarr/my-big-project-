@@ -6,6 +6,7 @@ import template from './report-grid-display.component.html';
 import {NUMBER_TYPES} from '../../../consts.js';
 
 const COLUMN_WIDTH = 175;
+const DEFAULT_PAGE_SIZE = 10;
 
 export const ReportGridDisplayComponent = {
   template,
@@ -35,11 +36,11 @@ export const ReportGridDisplayComponent = {
           mode: 'standard'
         },
         paging: {
-          pageSize: 10
+          pageSize: DEFAULT_PAGE_SIZE
         },
         pager: {
           showNavigationButtons: true,
-          allowedPageSizes: [5, 10, 20],
+          allowedPageSizes: [DEFAULT_PAGE_SIZE, 25, 50, 100],
           showPageSizeSelector: true
         },
         onInitialized: this.onGridInitialized.bind(this)
