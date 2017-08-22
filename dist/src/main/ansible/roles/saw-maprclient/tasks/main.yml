@@ -1,0 +1,4 @@
+- name: Create MapR group
+  group: name=mapr gid=5000 state=present
+- name: Create MapR user
+  user: name=mapr uid=500 group=mapr state=present

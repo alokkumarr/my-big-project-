@@ -1,0 +1,7 @@
+[maprecosystem]
+name=MapR Technologies (ecosystem)
+baseurl=http://package.mapr.com/releases/MEP/MEP-3.0.0/redhat
+enabled=1
+fastestmirror_enabled=0
+gpgcheck=0
+gpgkey=http://package.mapr.com/releases/pub/maprgpg.key

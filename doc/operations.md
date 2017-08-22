@@ -12,14 +12,9 @@ is provided:
 
 2. The MapR cluster has Spark 2.1 installed and configured
 
-3. The SAW Services target host has the MapR client installed and a
-   `mapr` user (using the same UID on all hosts in the cluster)
+3. The SAW Services target host has the MapR Yum repositories enabled
 
-4. The target host has the Spark client installed and that there is a
-   `/opt/mapr/spark/spark-current` symlink pointing to the current
-   Spark version
-
-5. SAW Services environment configuration
+4. SAW Services environment configuration
 
 # Installing
 

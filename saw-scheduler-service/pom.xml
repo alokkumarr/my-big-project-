@@ -124,6 +124,9 @@
             </goals>
             <configuration>
               <version>${revision.nodash}</version>
+              <requires>
+                <require>mapr-client</require>
+              </requires>
               <entries>
                 <entry>
                   <name>/opt/bda/saw-scheduler-service</name>

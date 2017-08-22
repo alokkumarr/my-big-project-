@@ -1,4 +1,4 @@
 - hosts: saw-services
   roles:
-    - transport
-    - scheduler
+    - saw-transport
+    - saw-scheduler

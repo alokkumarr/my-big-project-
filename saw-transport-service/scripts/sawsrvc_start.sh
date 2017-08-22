@@ -147,7 +147,7 @@ declare lib_classpath=$(
     $lib_dir
   )
 
-for j in `ls /opt/mapr/spark/spark-current/jars/*.jar`; do
+for j in `ls /opt/mapr/spark/spark-2.1.0/jars/*.jar`; do
  lib_classpath=${lib_classpath}:"${j}"
 done
 lib_classpath=${lib_classpath}:$(mapr classpath)
@@ -169,7 +169,7 @@ declare -r java_args=$( echo \
     -Djava.library.path=/opt/mapr/lib \
     -Dschema.pivot=/opt/saw/service/schema/pivot_querybuilder_schema.json \
     -Dschema.chart=/opt/saw/service/schema/chart_querybuilder_schema.json \
-    -Dhadoop.home.dir=/opt/mapr/hadoop/hadoop-$(cat /opt/mapr/hadoop/hadoopversion)
+    -Dhadoop.home.dir=/opt/mapr/hadoop/hadoop-2.7.0
     )
 vlog java_args: $java_args
 

@@ -22,7 +22,12 @@ RUN yum -y -q --nogpgcheck install openssh-clients
 COPY saw-deploy.service /etc/systemd/system/
 RUN systemctl enable saw-deploy
 
+# Add MapR Yum repositories
+ADD maprtech.repo /etc/yum.repos.d
+ADD maprecosystem.repo /etc/yum.repos.d
+
 # Speed up deployment by preinstalling packages in container image
+RUN yum -y -q --nogpgcheck install mapr-client mapr-spark
 RUN yum -y -q --nogpgcheck install java-1.8.0-openjdk-headless
 
 # Add deploy script and local SAW environment configuration

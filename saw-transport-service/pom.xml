@@ -563,6 +563,10 @@
                     <defineStatements>
                         <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
                     </defineStatements>
+                    <requires>
+                      <require>mapr-client &gt;= 5.2.0</require>
+                      <require>mapr-spark &gt;= 2.1.0</require>
+                    </requires>
                     <mappings>
                         <mapping>
                             <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/lib</directory>

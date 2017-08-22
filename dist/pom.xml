@@ -81,7 +81,7 @@
                       Increase timeout to allow application
                       deployment to finish
                   -->
-                  <time>120000</time>
+                  <time>600000</time>
                 </wait>
               </run>
             </image>
