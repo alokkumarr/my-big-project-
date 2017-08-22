@@ -8,22 +8,22 @@
 		<version>1.5.2.RELEASE</version>
 		<relativePath/>
 	</parent>
-	
-	
+
+
 	<groupId>com.synchronoss</groupId>
 	<artifactId>saw-services</artifactId>
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
-	
+
 	<name>Data Processing Framework</name>
 	<url>http://www.synchronoss.com</url>
-	
+
 	<inceptionYear>2016</inceptionYear>
 	<scm>
 		<connection>scm:svn:http://none</connection>
 		<url>scm:svn:https://none</url>
 	</scm>
-	
+
 	<properties>
 		<!-- output.directory>${output}</output.directory -->
   	    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -52,12 +52,12 @@
 		<amazon.s3>1.0</amazon.s3>
 		<kyro>3.0.0</kyro>
 		<common.lang>2.6</common.lang>
-		<json.vesion>20080701</json.vesion>		
+		<json.vesion>20080701</json.vesion>
 		<guava.version>20.0</guava.version>
 		<jdk.version>1.8</jdk.version>
 		<snappy.version>1.0.4.1</snappy.version>
 		<commons-collections.version>3.2.1</commons-collections.version>
-		<mapr.core.version>5.2.0</mapr.core.version>		
+		<mapr.core.version>5.2.0</mapr.core.version>
 		<mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
 		<scala.major.version>2.11</scala.major.version>
 		<scala.version>2.11.8</scala.version>
@@ -75,7 +75,7 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<!--   <version>1.1.8</version> -->  
+			<!--   <version>1.1.8</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -122,10 +122,10 @@
 <!--			<dependency>
 		    <groupId>org.springframework.boot</groupId>
 		    <artifactId>spring-boot-starter-security</artifactId>
-		</dependency>	
- -->	
+		</dependency>
+ -->
  </dependencies>
-	
+
 	<pluginRepositories>
 		<pluginRepository>
 			<id>typesafe-releases-plugins</id>
@@ -136,12 +136,13 @@
 		</pluginRepository>
 	</pluginRepositories>
 	<modules>
-		<module>saw-common</module>	
-		<module>saw-metadata-service</module>	
+		<module>saw-common</module>
+		<module>saw-metadata-service</module>
 		<module>saw-data-access</module>
-		<module>saw-transport-service</module>					
+		<module>saw-transport-service</module>
 		<module>saw-es-querybuilder</module>
-		<module>saw-scheduler-service</module>	
-		<module>dist</module>	
-	</modules> 
+		<module>saw-scheduler-service</module>
+		<module>saw-gateway-service</module>	
+		<module>dist</module>
+	</modules>
 </project>
