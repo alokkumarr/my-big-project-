@@ -71,5 +71,7 @@ detect an already existing installation and upgrade it.
 
 # Interfaces
 
-The SAW system is exposed on port 80 of the target host.  It provides
-both SAW Web, SAW Security endpoints.
+The SAW Web module and supporting services are exposed on port 80 of
+the target host, i.e. `http://<target-host>/`.  The SAW Web
+application will automatically discover the endpoints for SAW Security
+and SAW Services based on the URL it is being served from.
