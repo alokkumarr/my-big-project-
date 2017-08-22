@@ -22,13 +22,6 @@ To install SAW Security, use the SAW bundle package which coordinates
 installation of SAW modules.  See the SAW bundle package Operations
 Guide for closer details about installing.
 
-# After installation
-
-Before executing step 6 i.e. start the service You need to change or
-make sure that one vm argument has right value in the script i.e
-esproxy URL
-`-Durl=http://saw03.bda.poc.velocity-va.sncrcorp.net:9200/`
-  
 # Status check
 
 To check the status of all SAW Services units execute:
