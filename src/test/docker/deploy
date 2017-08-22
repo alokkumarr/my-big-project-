@@ -1,0 +1,9 @@
+#!/bin/sh
+#
+# Deploy SAW Web into localhost
+#
+
+tar -xzf saw-web-*.tgz
+echo "Starting deployment"
+ansible-playbook -i /root/config saw-web-*/ansible/site.yml
+echo "Finished deployment"
