@@ -15,7 +15,7 @@ RUN systemctl mask getty@tty1.service
 RUN sed -i '/tsflags=nodocs/d' /etc/yum.conf
 
 # Install system utilities
-RUN yum -y -q --nogpgcheck install man nc lsof
+RUN yum -y -q --nogpgcheck install less man nc lsof
 
 # Install Ansible from EPEL repository
 RUN yum -y -q --nogpgcheck install epel-release
@@ -39,7 +39,7 @@ RUN yum -y -q --nogpgcheck install nginx
 # SAW Web
 RUN yum -y -q --nogpgcheck install tomcat
 # SAW Services
-RUN yum -y -q --nogpgcheck install mapr-client mapr-spark
+RUN yum -y -q --nogpgcheck install mapr-client mapr-spark perl
 # SAW Security
 RUN yum -y -q --nogpgcheck install mariadb-server
 RUN yum -y -q --nogpgcheck install java-1.8.0-openjdk-headless MySQL-python
