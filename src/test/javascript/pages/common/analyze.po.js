@@ -194,7 +194,7 @@ module.exports = {
     listView: element(by.css('[ng-value="$ctrl.LIST_VIEW"]')),
     cardView: element(by.css('[ng-value="$ctrl.CARD_VIEW"]')),
     newAnalyzeDialog: element(by.css('.new-analyze-dialog')),
-    addAnalysisBtn: element(by.partialButtonText('ANALYSIS')),
+    addAnalysisBtn: element(by.css('[ng-click="$ctrl.openNewAnalysisModal()"]')),
     cardTitle: element(by.binding('::$ctrl.model.name')),
     createAnalysisBtn: element(by.css('[ng-click="$ctrl.createAnalysis()"]')),
     designerDialog: element(by.css('.ard_canvas')),
@@ -216,11 +216,11 @@ module.exports = {
     saveReportDetails: element(by.css('[ng-click="$ctrl.save()"]')),
     reportTitle: element(by.css('.e2e-report-title')),
     reportDescriptionBtn: element(by.partialButtonText('Description')),
-    reportFilterBtn: element(by.css('[ng-click="$ctrl.openFilterSidenav()"]')),
     filterItemInternet: element(by.css('[aria-label="INTERNET"]')),
     filterItemComplete: element(by.css('[aria-label="Complete"]')),
     applyFilterBtn: element(by.css('[ng-click="$ctrl.onFiltersApplied()"]')),
     filterCounter: element(by.css('.filter-counter')),
+    sessionIdField: element(by.css('.e2e-MCT_SESSION\\:SESSION_ID')),
     totalPriceField: element(by.css('.e2e-Orders\\:TotalPrice')),
     shipperNameField: element(by.css('.e2e-Shippers\\:ShipperName')),
     customerNameField: element(by.css('.e2e-Customers\\:CustomerName')),
@@ -229,6 +229,7 @@ module.exports = {
     customersEmail: element(by.css('.e2e-Customers\\:EMAIL_ADDRESS')),
     productsProductTypes: element(by.css('.e2e-Products\\:PRODUCT_TYPES')),
     serviceProductStatus: element(by.css('.e2e-Service\\:PROD_OM_STATUS')),
+    refreshDataBtn: element(by.css('[ng-click="$ctrl.refreshGridData()"]')),
     toggleDetailsPanel: element(by.css('[ng-click="$ctrl.toggleDetailsPanel()"]')),
     reportGridContainer: element(by.css('.ard_details-grid'))
   },
@@ -241,12 +242,12 @@ module.exports = {
     expect(this.analysisElems.newAnalyzeDialog.isDisplayed()).toBeTruthy();
   },
 
-  validateDesignerDialog() {
-    expect(this.analysisElems.designerDialog.isDisplayed()).toBeTruthy();
-  },
-
   validateDesignerView() {
     expect(this.analysisElems.designerView.isDisplayed()).toBeTruthy();
+  },
+
+  validateColumnChartsView() {
+    expect(this.analysisElems.columnChartsView.isDisplayed()).toBeTruthy();
   },
 
   validateReportGrid() {

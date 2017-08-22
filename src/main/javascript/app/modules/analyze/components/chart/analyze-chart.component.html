@@ -58,11 +58,13 @@
                        ng-class="{'btn-primary': $ctrl.didAnalysisChange}" >
               <span translate="REFRESH_DATA"></span>
             </md-button>
-            <md-button ng-click="$ctrl.openDescriptionModal($event, $ctrl.model)">
+            <md-button ng-click="$ctrl.openDescriptionModal($event, $ctrl.model)"
+                       e2e="open-description-modal">
               <md-icon md-font-icon="icon-description"></md-icon>
               <span translate="DESCRIPTION"></span>
             </md-button>
-            <md-button ng-click="$ctrl.openChartPreviewModal($event)">
+            <md-button ng-click="$ctrl.openChartPreviewModal($event)"
+                       e2e="open-preview-modal">
               <md-icon md-font-icon="icon-full-screen"></md-icon>
               <span translate="PREVIEW"></span>
             </md-button>

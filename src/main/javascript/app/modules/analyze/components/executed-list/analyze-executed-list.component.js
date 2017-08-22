@@ -52,7 +52,7 @@ export const AnalyzeExecutedListComponent = {
     }
 
     goToExecution(executedAnalysis) {
-      this._$state.go('analyze.publishedDetail', {
+      this._$state.go('analyze.executedDetail', {
         executionId: executedAnalysis.id,
         analysisId: this.analysis.id,
         analysis: this.analysis
