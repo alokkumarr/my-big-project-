@@ -1,4 +1,4 @@
-package com.synchronoss.saw.composite.controller;
+package com.synchronoss.saw.gateway.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,10 +14,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import com.synchronoss.saw.composite.SAWCompositeProperties;
-import com.synchronoss.saw.composite.ServiceUtils;
-import com.synchronoss.saw.composite.aspects.RoutingLogging;
-import com.synchronoss.saw.composite.exceptions.SecurityModuleSAWException;
+
+import com.synchronoss.saw.gateway.SAWGatewayProperties;
+import com.synchronoss.saw.gateway.ServiceUtils;
+import com.synchronoss.saw.gateway.aspects.RoutingLogging;
+import com.synchronoss.saw.gateway.exceptions.SecurityModuleSAWException;
 
 /**
  * This class is the integration & universal response object<br>
@@ -28,14 +29,10 @@ import com.synchronoss.saw.composite.exceptions.SecurityModuleSAWException;
  * @version 1.0
  */
 
-// TODO : Non Blocking asynchronous implementation
-// TODO : Feign Client & Zuul needs to tested for time being it has been deactivated
-
-
 @RestController
-public class CommonAndDefaultSAWController {
+public class GatewayServiceController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(CommonAndDefaultSAWController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(GatewayServiceController.class);
 
 	@Autowired
 	private RestTemplate restTemplate;
@@ -45,17 +42,10 @@ public class CommonAndDefaultSAWController {
 
 	
 	@Autowired
-	private SAWCompositeProperties sawCompositeProperties;
+	private SAWGatewayProperties sawCompositeProperties;
 	
-	//@Autowired
-	//private final LoadBalancerClient loadBalancerClient;
-
-	
-
-	//@HystrixCommand(fallbackMethod = "defaultMenu")
 	@RoutingLogging
-	@RequestMapping(method = RequestMethod.POST, value = "/menu")
-	public ResponseEntity<?> menu(@RequestBody String payload, @RequestHeader HttpHeaders headers) 
+		public ResponseEntity<?> menu(@RequestBody String payload, @RequestHeader HttpHeaders headers) 
 	{
 
 		// TODO : For time being it's true
@@ -97,7 +87,6 @@ public class CommonAndDefaultSAWController {
 	}
 
 	@RoutingLogging
-	@RequestMapping(method = RequestMethod.POST, value = "/menuItems")
 	public ResponseEntity<?> menu(@RequestBody String payload) 
 	{
 
@@ -132,7 +121,6 @@ public class CommonAndDefaultSAWController {
 	public ResponseEntity<?> menuCategories(@RequestBody String payload) 
 	{
 
-		// TODO : For time being it's true
 		boolean validity_token = true;
 		String default_uri = "/analyze";
 		String token;
@@ -157,13 +145,5 @@ public class CommonAndDefaultSAWController {
 		return null;
 	}
 
-	/**
-	 * This method is fallback implementation of /menu/categories endpoints
-	 * @param loginDetails
-	 * @return
-	 */
-	public ResponseEntity<?> defaultMenuCategories(@RequestBody String payload) {
-		return null;
-	}
 	
 }

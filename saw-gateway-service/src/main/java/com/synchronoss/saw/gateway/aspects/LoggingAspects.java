@@ -1,4 +1,4 @@
-package com.synchronoss.saw.composite.aspects;
+package com.synchronoss.saw.gateway.aspects;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -23,8 +23,8 @@ public class LoggingAspects {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(LoggingAspects.class);
 
-	@Around("com.synchronoss.saw.composite.aspects.RoutingArchitecture.mediaAnnotation() || "
-			+ "com.synchronoss.saw.composite.aspects.RoutingArchitecture.inRouteLayer() || com.synchronoss.saw.composite.aspects.RoutingArchitecture.controller()")
+	@Around("com.synchronoss.saw.gateway.aspects.RoutingArchitecture.mediaAnnotation() || "
+			+ "com.synchronoss.saw.gateway.aspects.RoutingArchitecture.inRouteLayer() || com.synchronoss.saw.gateway.aspects.RoutingArchitecture.controller()")
 	public Object inRouteAroundAdvice(ProceedingJoinPoint proceedingJoinPoint) throws Throwable
 	{
 		Object returnedValueFromMethod = null;
@@ -97,13 +97,6 @@ public class LoggingAspects {
 			throw throwable;
 		}
 
-		if (LOGGER.isTraceEnabled()) 
-		{
-				//mitoPerformanceMonitor.stopMonitor();
-				//this.logPerformanceMetrics(mitoPerformanceMonitor, proceedingJoinPoint);
-				
-		}
-	
 		return returnedValueFromMethod;
 	}
 }

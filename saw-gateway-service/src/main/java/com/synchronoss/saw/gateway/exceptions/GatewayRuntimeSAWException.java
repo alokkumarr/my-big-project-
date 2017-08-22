@@ -1,23 +1,18 @@
-package com.synchronoss.saw.composite.exceptions;
+package com.synchronoss.saw.gateway.exceptions;
 
 
 
-public class CompositeRuntimeSAWException extends RuntimeException{
+public class GatewayRuntimeSAWException extends RuntimeException{
 	
 
 	/** Use serialVersionUID from Spring 1.2 for interoperability */
     private static final long serialVersionUID = 5439915454935047936L;
 
-    static {
-            ExceptionSAWUtils.class.getName();
-    }
-
-
     /**
      * Construct a {@code NestedRuntimeException} with the specified detail message.
      * @param msg the detail message
      */
-    public CompositeRuntimeSAWException(String msg) {
+    public GatewayRuntimeSAWException(String msg) {
             super(msg);
     }
 
@@ -27,7 +22,7 @@ public class CompositeRuntimeSAWException extends RuntimeException{
      * @param msg the detail message
      * @param cause the nested exception
      */
-    public CompositeRuntimeSAWException(String msg, Throwable cause) {
+    public GatewayRuntimeSAWException(String msg, Throwable cause) {
             super(msg, cause);
     }
 
@@ -88,8 +83,8 @@ public class CompositeRuntimeSAWException extends RuntimeException{
             if (cause == this) {
                     return false;
             }
-            if (cause instanceof CompositeRuntimeSAWException) {
-                    return ((CompositeRuntimeSAWException) cause).contains(exType);
+            if (cause instanceof GatewayRuntimeSAWException) {
+                    return ((GatewayRuntimeSAWException) cause).contains(exType);
             }
             else {
                     while (cause != null) {

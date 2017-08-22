@@ -1,4 +1,4 @@
-package com.synchronoss.saw.composite.exceptions;
+package com.synchronoss.saw.gateway.exceptions;
 
 import java.util.Arrays;
 

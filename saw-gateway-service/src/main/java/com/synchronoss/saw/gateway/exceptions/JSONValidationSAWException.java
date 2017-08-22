@@ -1,11 +1,11 @@
-package com.synchronoss.saw.composite.exceptions;
+package com.synchronoss.saw.gateway.exceptions;
 
 
 
 @SuppressWarnings("serial")
-public class SecurityModuleSAWException extends CompositeRuntimeSAWException {
+public class JSONValidationSAWException extends GatewayRuntimeSAWException {
 
-    public SecurityModuleSAWException(String msg) {
+    public JSONValidationSAWException(String msg) {
         super(msg);
 }
 
@@ -15,7 +15,7 @@ public class SecurityModuleSAWException extends CompositeRuntimeSAWException {
  * @param msg the detail message
  * @param cause the root cause
  */
-public SecurityModuleSAWException(String msg, Throwable cause) {
+public JSONValidationSAWException(String msg, Throwable cause) {
         super(msg, cause);
 }
 
@@ -25,10 +25,10 @@ public boolean equals(Object other) {
         if (this == other) {
                 return true;
         }
-        if (!(other instanceof SecurityModuleSAWException)) {
+        if (!(other instanceof JSONValidationSAWException)) {
                 return false;
         }
-        SecurityModuleSAWException otherBe = (SecurityModuleSAWException) other;
+        JSONValidationSAWException otherBe = (JSONValidationSAWException) other;
         return (getMessage().equals(otherBe.getMessage()) &&
         		ExceptionSAWUtils.nullSafeEquals(getCause(), otherBe.getCause()));
 }

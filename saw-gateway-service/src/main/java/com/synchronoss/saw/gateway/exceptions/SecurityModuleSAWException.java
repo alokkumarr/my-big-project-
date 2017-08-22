@@ -1,11 +1,11 @@
-package com.synchronoss.saw.composite.exceptions;
+package com.synchronoss.saw.gateway.exceptions;
 
 
 
 @SuppressWarnings("serial")
-public class CategoriesSAWException extends CompositeRuntimeSAWException {
+public class SecurityModuleSAWException extends GatewayRuntimeSAWException {
 
-    public CategoriesSAWException(String msg) {
+    public SecurityModuleSAWException(String msg) {
         super(msg);
 }
 
@@ -15,7 +15,7 @@ public class CategoriesSAWException extends CompositeRuntimeSAWException {
  * @param msg the detail message
  * @param cause the root cause
  */
-public CategoriesSAWException(String msg, Throwable cause) {
+public SecurityModuleSAWException(String msg, Throwable cause) {
         super(msg, cause);
 }
 
@@ -25,10 +25,10 @@ public boolean equals(Object other) {
         if (this == other) {
                 return true;
         }
-        if (!(other instanceof CategoriesSAWException)) {
+        if (!(other instanceof SecurityModuleSAWException)) {
                 return false;
         }
-        CategoriesSAWException otherBe = (CategoriesSAWException) other;
+        SecurityModuleSAWException otherBe = (SecurityModuleSAWException) other;
         return (getMessage().equals(otherBe.getMessage()) &&
         		ExceptionSAWUtils.nullSafeEquals(getCause(), otherBe.getCause()));
 }

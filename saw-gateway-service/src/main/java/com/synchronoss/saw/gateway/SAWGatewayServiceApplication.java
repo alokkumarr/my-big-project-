@@ -1,4 +1,4 @@
-package com.synchronoss.saw.composite;
+package com.synchronoss.saw.gateway;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,9 +11,9 @@ import org.springframework.web.client.RestTemplate;
 
 
 @SpringBootApplication
-public class SAWCompositeServiceApplication {
+public class SAWGatewayServiceApplication {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SAWCompositeServiceApplication.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SAWGatewayServiceApplication.class);
 
   @Bean
   RestTemplate restTemplate() {
@@ -23,7 +23,7 @@ public class SAWCompositeServiceApplication {
 
   public static void main(String[] args) {
     ConfigurableApplicationContext ctx =
-        SpringApplication.run(SAWCompositeServiceApplication.class, args);
+        SpringApplication.run(SAWGatewayServiceApplication.class, args);
     LOG.info(ctx.getApplicationName() + " has started.");
 
   }

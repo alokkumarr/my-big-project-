@@ -1,4 +1,4 @@
-package com.synchronoss.saw.composite;
+package com.synchronoss.saw.gateway;
 
 import java.io.IOException;
 

@@ -1,10 +1,10 @@
-package com.synchronoss.saw.composite;
+package com.synchronoss.saw.gateway;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class SAWCompositeProperties {
+public class SAWGatewayProperties {
 
   @Value("${service-url}")
   private String serviceURL;

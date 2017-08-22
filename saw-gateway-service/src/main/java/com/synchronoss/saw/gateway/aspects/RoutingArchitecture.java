@@ -1,4 +1,4 @@
-package com.synchronoss.saw.composite.aspects;
+package com.synchronoss.saw.gateway.aspects;
 
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 public class RoutingArchitecture {
 
 
-	@Pointcut("@annotation(com.synchronoss.saw.composite.aspects.RoutingLogging) ")
+	@Pointcut("@annotation(com.synchronoss.saw.gateway.aspects.RoutingLogging) ")
 	public void mediaAnnotation(){}
 	
-	@Pointcut("within(com.synchronoss.saw.composite..*)")
+	@Pointcut("within(com.synchronoss.saw.gateway..*)")
 	public void inRouteLayer(){}
 	
 	@Pointcut("within(@org.springframework.stereotype.Controller *)")

@@ -1,4 +1,4 @@
-package com.synchronoss.saw.composite.aspects;
+package com.synchronoss.saw.gateway.aspects;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

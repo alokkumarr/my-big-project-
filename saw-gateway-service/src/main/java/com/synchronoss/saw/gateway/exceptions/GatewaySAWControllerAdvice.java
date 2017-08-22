@@ -1,4 +1,4 @@
-package com.synchronoss.saw.composite.exceptions;
+package com.synchronoss.saw.gateway.exceptions;
 
 import java.io.FileNotFoundException;
 import java.util.Optional;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ControllerAdvice
 @RequestMapping(produces = "application/vnd.error")
 @ResponseBody
-public class CompositeSAWControllerAdvice {
+public class GatewaySAWControllerAdvice {
 
 	@ResponseStatus(value = HttpStatus.NOT_FOUND)
 	@ExceptionHandler(FileNotFoundException.class)
@@ -38,7 +38,7 @@ public class CompositeSAWControllerAdvice {
 	}
 	
 	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-	@ExceptionHandler({ AnalyzeModuleSAWException.class, CommonModuleSAWException.class, CategoriesSAWException.class,
+	@ExceptionHandler({ CommonModuleSAWException.class,
 		TokenMissingSAWException.class, TokenValidationSAWException.class,IllegalStateException.class,
 		Exception.class})
 	public VndErrors  badRequestException(Exception ex) {
