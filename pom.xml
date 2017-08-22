@@ -464,6 +464,15 @@
                                 </softlinkSource>
                             </sources>
                         </mapping>
+                        <mapping>
+                            <directory>/usr/lib/systemd/system</directory>
+                            <directoryIncluded>false</directoryIncluded>
+                            <sources>
+                                <source>
+                                    <location>src/main/system/saw-security.service</location>
+                                </source>
+                            </sources>
+                        </mapping>
                     </mappings>
 
                     <preinstallScriptlet>

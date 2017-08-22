@@ -52,7 +52,7 @@ vardir=$( appl_info vardir )
 ###
 # Set variables
 LOG_DIR=$vardir/log
-( cd $LOGDIR ) || exit
+( cd $LOG_DIR ) || exit
 LOG_FILE=$LOG_DIR/$APPL_NAME.log
 #
 PID_DIR=$vardir/run

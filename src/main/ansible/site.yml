@@ -1,3 +1,4 @@
 - hosts: saw-security
   roles:
-    - security
+    - saw-security-db
+    - saw-security-web
