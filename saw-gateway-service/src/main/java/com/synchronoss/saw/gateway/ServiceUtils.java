@@ -63,66 +63,6 @@ public class ServiceUtils {
     return report.isSuccess();
   }
 
-  /*
-   * public String getSAWAddress(LoadBalancerClient loadBalancerClient, String serviceId) {
-   * 
-   * ServiceInstance serviceInstance = loadBalancerClient.choose(serviceId); if (serviceInstance !=
-   * null) { return String.format("http://%s:%d/%s", serviceInstance.getHost(),
-   * serviceInstance.getPort(), serviceInstance.getServiceId()); } else { throw new
-   * IllegalStateException("Unable to locate a leaderboard service"); } }
-   */
-
-/*  public boolean checkContraints(String value) {
-    boolean exists = false;
-
-    try {
-      Constraints.find(value);
-      exists = true;
-    } catch (IllegalStateException ex) {
-      exists = false;
-    }
-
-    return exists;
-  }
-*/
-/*  public boolean checkKeysConstraintsForRead(RoutingPayload routingPayload)
-      throws NullPointerException, JSONValidationSAWException {
-    boolean correct = true;
-    if (routingPayload.getContents().getAction() != null) {
-      if (routingPayload.getContents().getAction().value().equals(Action.READ.value())) {
-        List<Key> items = routingPayload.getContents().getKeys();
-
-        items.forEach(item -> {
-          if (item.getAdditionalProperties().get("id").equals("")
-              || item.getAdditionalProperties().get("id") == null) {
-            throw new NullPointerException("id attribute is not valid.");
-          }
-        });
-      } else {
-        throw new NullPointerException("action attribute is not mentioned.");
-      }
-    } else {
-      throw new JSONValidationSAWException("Request body is not aligned with the specification");
-    }
-    return correct;
-  }
-
-  public boolean checkKeysConstraints(RoutingPayload routingPayload, String key) {
-    boolean correct = true;
-    if (routingPayload.getContents().getAction() != null) {
-      List<Key> items = routingPayload.getContents().getKeys();
-
-      items.forEach(item -> {
-        if (item.getAdditionalProperties().get(key).equals("")
-            || item.getAdditionalProperties().get(key) == null) {
-          throw new NullPointerException(key + " attribute is not valid.");
-        }
-      });
-
-    } else {
-      throw new JSONValidationSAWException("Request body is not aligned with the specification");
-    }
-    return correct;
-  }
-*/
+  
+  
 }
