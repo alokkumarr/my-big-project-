@@ -1,6 +1,8 @@
 #
 # Sample SAW environment configuration.  Customize it by replacing
-# "localhost" with the target host to deploy SAW modules on.
+# "localhost" with the target host to deploy SAW modules on and
+# updating the "[*:vars]" sections with values appropriate for the
+# environment.
 #
 
 [saw-proxy]
@@ -11,6 +13,15 @@ localhost
 
 [saw-services]
 localhost
+
+[saw-services:vars]
+saw_elasticsearch_protocol=http
+saw_elasticsearch_host=localhost
+saw_elasticsearch_port=9200
+saw_elasticsearch_username=elastic
+saw_elasticsearch_password=elastic
+saw_spark_master_url=spark://localhost:7077
+saw_zookeeper_quorum=localhost
 
 [saw-security]
 localhost
