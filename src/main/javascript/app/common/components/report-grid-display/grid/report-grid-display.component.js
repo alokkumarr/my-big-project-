@@ -1,17 +1,19 @@
 import map from 'lodash/map';
-import take from 'lodash/take';
+import DataSource from 'devextreme/data/data_source';
 
 import template from './report-grid-display.component.html';
 
 import {NUMBER_TYPES} from '../../../consts.js';
 
 const COLUMN_WIDTH = 175;
+const DEFAULT_PAGE_SIZE = 10;
 
 export const ReportGridDisplayComponent = {
   template,
   bindings: {
     data: '<',
-    columns: '<'
+    columns: '<',
+    source: '&'
   },
   controller: class ReportGridDisplayController {
     constructor(dxDataGridService, FilterService) {
@@ -24,13 +26,35 @@ export const ReportGridDisplayComponent = {
     $onInit() {
       const columns = this._getDxColumns(this.columns);
 
-      this.data = take(this.data, 30);
-
       this.gridConfig = this._dxDataGridService.mergeWithDefaultConfig({
         columns,
-        dataSource: this.data,
+        remoteOperations: {
+          paging: true
+        },
+        dataSource: this._createCustomStore(),
+        scrolling: {
+          mode: 'standard'
+        },
+        paging: {
+          pageSize: DEFAULT_PAGE_SIZE
+        },
+        pager: {
+          showNavigationButtons: true,
+          allowedPageSizes: [DEFAULT_PAGE_SIZE, 25, 50, 100],
+          showPageSizeSelector: true
+        },
         onInitialized: this.onGridInitialized.bind(this)
       });
+    }
+
+    _createCustomStore() {
+      const store = new DataSource({
+        load: options => {
+          return this.source({options})
+            .then(({data, count}) => ({data, totalCount: count}));
+        }
+      });
+      return store;
     }
 
     _getDxColumns(columns) {
@@ -38,7 +62,7 @@ export const ReportGridDisplayComponent = {
         const field = {
           alignment: 'left',
           caption: column.aliasName || column.displayName,
-          dataField: column.columnName,
+          dataField: column.columnName || column.name,
           visibleIndex: column.visibleIndex,
           dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
           width: COLUMN_WIDTH
@@ -56,9 +80,8 @@ export const ReportGridDisplayComponent = {
     $onChanges() {
       if (this._gridInstance) {
         const columns = this._getDxColumns(this.columns);
-        this._gridInstance.option('dataSource', this.data);
         this._gridInstance.option('columns', columns);
-        this._gridInstance.refresh();
+        // this._gridInstance.refresh();
       }
     }
 

@@ -6,8 +6,7 @@
         <md-button ng-click="$ctrl._$window.history.back()" class="md-icon-button back-button" aria-label="Back">
           <md-icon md-font-icon="icon-arrow-left"></md-icon>
         </md-button>
-
-        <div style="margin-left: 16px;" flex>
+<div style="margin-left: 16px;" flex>
           <div class="md-headline">
             <span ng-bind="$ctrl.analysis.name"></span>
             <label ng-if="$ctrl.isExecuting" translate="STATUS_EXECUTING"></label>
@@ -58,7 +57,7 @@
   </md-card>
   <div ng-switch="$ctrl.analysis.type" ng-if="$ctrl.analyses.length">
     <analyze-chart-detail ng-switch-when="chart" analysis="$ctrl.analysis" requester="$ctrl.requester"></analyze-chart-detail>
-    <analyze-report-detail ng-switch-when="report" analysis="$ctrl.analysis" requester="$ctrl.requester"></analyze-report-detail>
+    <analyze-report-detail ng-switch-when="report" analysis="$ctrl.analysis" requester="$ctrl.requester" source="$ctrl.loadExecutionData(options)"></analyze-report-detail>
     <analyze-pivot-detail ng-switch-when="pivot" analysis="$ctrl.analysis" requester="$ctrl.requester"></analyze-pivot-detail>
   </div>
   <md-card>
