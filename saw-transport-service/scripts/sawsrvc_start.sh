@@ -201,7 +201,7 @@ else
 fi
 #
 if [[ $FG_EXECJ ]] ; then
-  eval $exec_cmd &>$elog </dev/null
+  $exec_cmd
   echo never gets here
 fi
 

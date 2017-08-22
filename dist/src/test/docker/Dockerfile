@@ -28,7 +28,7 @@ ADD maprecosystem.repo /etc/yum.repos.d
 
 # Speed up deployment by preinstalling packages in container image
 RUN yum -y -q --nogpgcheck install mapr-client mapr-spark
-RUN yum -y -q --nogpgcheck install java-1.8.0-openjdk-headless
+RUN yum -y -q --nogpgcheck install java-1.8.0-openjdk-headless perl
 
 # Add deploy script and local SAW environment configuration
 ADD deploy /root/
