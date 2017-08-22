@@ -565,7 +565,7 @@
                     </defineStatements>
                     <requires>
                       <require>mapr-client &gt;= 5.2.0</require>
-                      <require>mapr-spark &gt;= 5.2.0</require>
+                      <require>mapr-spark &gt;= 2.1.0</require>
                     </requires>
                     <mappings>
                         <mapping>
