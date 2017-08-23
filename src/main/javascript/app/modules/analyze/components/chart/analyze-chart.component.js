@@ -161,7 +161,7 @@ export const AnalyzeChartComponent = {
 
     refreshChartData() {
       if (!this.checkModelValidity()) {
-        return;
+        return null;
       }
       this.startProgress();
       const payload = this.generatePayload(this.model);

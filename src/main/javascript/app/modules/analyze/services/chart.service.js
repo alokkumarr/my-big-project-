@@ -1,5 +1,6 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
+import sum from 'lodash/sum';
 import map from 'lodash/map';
 import flatMap from 'lodash/flatMap';
 import assign from 'lodash/assign';
@@ -60,7 +61,7 @@ const LAYOUT_POSITIONS = {
   }
 };
 
-export function ChartService() {
+export function ChartService(Highcharts) {
   'ngInject';
 
   /* Customize default config for stack column chart */
@@ -259,8 +260,70 @@ export function ChartService() {
     return isCategoryAxis;
   }
 
-  function customizeSeriesForChartType(series, chartType) {
+  function dataToNestedDonut(series, categories, fields) {
+    /* Group by option forms the inner circle. X axis option forms the outer region
+       This logic is adapted from https://www.highcharts.com/demo/pie-donut */
+
+    const colors = Highcharts.getOptions().colors;
+    const gCategories = map(series, s => s.name);
+    const data = map(series, (s, i) => {
+      const drilldown = {
+        color: colors[i],
+        categories: map(s.data, d => get(categories, `x.${d.x}`)),
+        data: map(s.data, d => d.y)
+      };
+      return {
+        drilldown,
+        y: sum(drilldown.data)
+      };
+    });
+    const innerData = [];
+    const outerData = [];
+    const dataLen = data.length;
+
+    for (let i = 0; i < dataLen; i += 1) {
+
+      innerData.push({
+        name: gCategories[i],
+        y: data[i].y,
+        color: data[i].color
+      });
+
+      const drillDataLen = data[i].drilldown.data.length;
+      for (let j = 0; j < drillDataLen; j += 1) {
+        const brightness = 0.2 - (j / drillDataLen);
+        outerData.push({
+          name: data[i].drilldown.categories[j],
+          y: data[i].drilldown.data[j],
+          /* eslint-disable */
+          color: Highcharts.Color(data[i].color).brighten(brightness).get()
+          /* eslint-enable */
+        });
+      }
+    }
+
+    const chartSeries = [{
+      name: get(fields, 'y.displayName'),
+      data: innerData,
+      dataLabels: {
+        enabled: false
+      },
+      size: '60%'
+    }, {
+      name: get(fields, 'y.displayName'),
+      data: outerData,
+      size: '100%',
+      innerSize: '60%',
+      id: 'outerData'
+    }];
+
+    return chartSeries;
+  }
+
+  function customizeSeriesForChartType(series, chartType, categories, fields) {
     let mapperFn;
+    let chartSeries;
+
     switch (chartType) {
       case 'column':
       case 'bar':
@@ -269,26 +332,55 @@ export function ChartService() {
       case 'stack':
       case 'scatter':
         mapperFn = ({x, y}) => [x, y];
-        break;
+        forEach(series, serie => {
+          serie.data = map(serie.data, mapperFn);
+        });
+        return {chartSeries: series};
+
+      case 'pie':
+        if (!fields.g) {
+          set(series, '0.name', get(fields, 'y.displayName'));
+          mapperFn = ({x, y}) => {
+            const category = get(categories, `x.${x}`);
+            return {name: category, y, drilldown: category};
+          };
+          forEach(series, serie => {
+            serie.data = map(serie.data, mapperFn);
+          });
+
+          chartSeries = series;
+
+        } else {
+          chartSeries = dataToNestedDonut(series, categories, fields);
+        }
+
+        return {chartSeries};
+
       case 'bubble':
         // the bubble chart already supports the parsed data
-        return;
+        return {chartSeries: series};
+
       default:
         throw new Error(`Chart type: ${chartType} is not supported!`);
     }
-    forEach(series, serie => {
-      serie.data = map(serie.data, mapperFn);
-    });
   }
 
-  const dataToChangeConfig = (type, settings, gridData, opts) => {
-    const fields = {
-      x: find(settings.xaxis, attr => attr.checked === 'x'),
-      y: find(settings.yaxis, attr => attr.checked === 'y'),
-      z: find(settings.zaxis, attr => attr.checked === 'z'),
-      g: find(settings.groupBy, attr => attr.checked === 'g')
-    };
+  function getPieChangeConfig(type, settings, fields, gridData, opts) {
+    const changes = [];
 
+    if (!isEmpty(gridData)) {
+      const {series, categories} = splitToSeriesAndCategories(gridData, fields);
+      const {chartSeries} = customizeSeriesForChartType(series, type, categories, fields);
+      changes.push({
+        path: 'series',
+        data: chartSeries
+      });
+    }
+
+    return changes;
+  }
+
+  function getBarChangeConfig(type, settings, fields, gridData, opts) {
     const labels = {
       x: get(fields, 'x.displayName', ''),
       y: get(fields, 'y.displayName', '')
@@ -304,10 +396,10 @@ export function ChartService() {
 
     if (!isEmpty(gridData)) {
       const {series, categories} = splitToSeriesAndCategories(gridData, fields);
-      customizeSeriesForChartType(series, type);
+      const {chartSeries} = customizeSeriesForChartType(series, type, categories, fields);
       changes.push({
         path: 'series',
-        data: series
+        data: chartSeries
       });
       // add the categories
       forEach(categories, (category, k) => {
@@ -316,6 +408,38 @@ export function ChartService() {
           data: category
         });
       });
+    }
+
+    return changes;
+  }
+
+  const dataToChangeConfig = (type, settings, gridData, opts) => {
+    let changes;
+    const fields = {
+      x: find(settings.xaxis, attr => attr.checked === 'x'),
+      y: find(settings.yaxis, attr => attr.checked === 'y'),
+      z: find(settings.zaxis, attr => attr.checked === 'z'),
+      g: find(settings.groupBy, attr => attr.checked === 'g')
+    };
+
+    switch (type) {
+      case 'column':
+      case 'bar':
+      case 'line':
+      case 'spline':
+      case 'stack':
+      case 'scatter':
+      case 'bubble':
+        changes = getBarChangeConfig(type, settings, fields, gridData, opts);
+        break;
+
+      case 'pie':
+        changes = getPieChangeConfig(type, settings, fields, gridData, opts);
+        break;
+
+      default:
+        changes = getBarChangeConfig(type, settings, fields, gridData, opts);
+        break;
     }
 
     return concat(
