@@ -320,25 +320,27 @@ export function ChartService() {
 
     return concat(
       changes,
-      addSpecificChartConfig(type, fields)
+      addSpecificChartConfig(type, fields, opts)
     );
   };
 
-  function addSpecificChartConfig(chartType, fields) {
+  function addSpecificChartConfig(chartType, fields, opts) {
     const changes = [];
     if (chartType === 'bubble') {
       const groupString = `<tr><th colspan="2"><h3>{point.g}</h3></th></tr>`;
       const xIsNumber = NUMBER_TYPES.includes(fields.x.type);
       const yIsNumber = NUMBER_TYPES.includes(fields.y.type);
       // z is always a number
+      const xLabel = get(opts, 'labels.x') === null ? get(fields, 'x.displayName') : get(opts, 'labels.x');
+      const yLabel = get(opts, 'labels.y') === null ? get(fields, 'y.displayName') : get(opts, 'labels.y');
       changes.push({
         path: 'tooltip',
         data: {
           useHTML: true,
           headerFormat: '<table>',
           pointFormat: `${fields.g ? groupString : ''}
-              <tr><th>${fields.x.displayName}:</th><td>{point.x${xIsNumber ? ':,.2f' : ''}}</td></tr>
-              <tr><th>${fields.y.displayName}:</th><td>{point.y${yIsNumber ? ':,.2f' : ''}}</td></tr>
+              <tr><th>${xLabel}:</th><td>{point.x${xIsNumber ? ':,.2f' : ''}}</td></tr>
+              <tr><th>${yLabel}:</th><td>{point.y${yIsNumber ? ':,.2f' : ''}}</td></tr>
               <tr><th>${fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>`,
           footerFormat: '</table>',
           followPointer: true
