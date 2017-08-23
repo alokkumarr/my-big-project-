@@ -55,28 +55,11 @@
           </md-menu-content>
         </md-menu>
 
-        <md-menu class="md-secondary" ng-show="artifactColumn.checked && artifactColumn.area === 'data'">
-          <md-button aria-label="TOOLTIP_AGGREGATE_TYPE"
-                     class="md-icon-button"
-                     e2e="pivot-aggregate-menu-btn"
-                     ng-click="$ctrl.openMenu($mdMenu, $event)">
-            <md-icon md-menu-origin
-                     md-font-icon="{{$ctrl.AGGREGATE_TYPES_OBJ[artifactColumn.aggregate].icon}}"></md-icon>
-            <md-tooltip ng-bind="'TOOLTIP_AGGREGATE_TYPE' | translate"></md-tooltip>
-          </md-button>
-          <md-menu-content width="4">
-            <md-menu-item ng-repeat="aggregateType in $ctrl.AGGREGATE_TYPES track by aggregateType.value">
-              <md-button ng-click="$ctrl.onSelectAggregateType(aggregateType, artifactColumn)"
-                         e2e="pivot-aggregate-selector-{{aggregateType.value}}"
-                         style="font-size: 14px;">
-                <md-icon md-font-icon="{{::aggregateType.icon}}"
-                         style="font-size: 14px;"
-                         md-menu-align-target></md-icon>
-                {{::aggregateType.label}}
-              </md-button>
-            </md-menu-item>
-          </md-menu-content>
-        </md-menu>
+        <aggregate-chooser ng-show="artifactColumn.checked && artifactColumn.area === 'data'"
+                           class="md-secondary"
+                           artifact-column="artifactColumn"
+                           on-select="$ctrl.onSelectAggregateType(aggregateType, artifactColumn)">
+        </aggregate-chooser>
 
         <md-menu class="md-secondary" ng-show="artifactColumn.checked && $ctrl.DATE_TYPES.includes(artifactColumn.type)">
           <md-button aria-label="GROUP_INTERVAL"
