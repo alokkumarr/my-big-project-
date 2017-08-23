@@ -378,7 +378,7 @@ export function ChartService(Highcharts) {
     }
   }
 
-  function getPieChangeConfig(type, settings, fields, gridData, opts) {
+  function getPieChangeConfig(type, settings, fields, gridData) {
     const changes = [];
 
     if (!isEmpty(gridData)) {
