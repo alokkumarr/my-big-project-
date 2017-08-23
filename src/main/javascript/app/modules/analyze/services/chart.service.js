@@ -2,6 +2,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import sum from 'lodash/sum';
 import map from 'lodash/map';
+import round from 'lodash/round';
 import flatMap from 'lodash/flatMap';
 import assign from 'lodash/assign';
 import find from 'lodash/find';
@@ -80,12 +81,12 @@ export function ChartService(Highcharts) {
   const pieConfig = config => {
     delete config.xAxis;
     delete config.yAxis;
-    set(config, 'plotOptions.pie.showInLegend', true);
     set(config, 'series', [{
       name: 'Brands',
       colorByPoint: true,
       data: []
     }]);
+    set(config, 'plotOptions.pie.showInLegend', false);
     return config;
   };
 
@@ -302,20 +303,31 @@ export function ChartService(Highcharts) {
       }
     }
 
+    /* eslint-disable */
     const chartSeries = [{
       name: get(fields, 'y.displayName'),
       data: innerData,
       dataLabels: {
-        enabled: false
+        formatter: function () {
+          return this.percentage > 5 ? `${this.point.name}: ${round(this.percentage, 2)}%` : null;
+        },
+        color: '#ffffff',
+        distance: -30
       },
       size: '60%'
     }, {
       name: get(fields, 'y.displayName'),
       data: outerData,
+      dataLabels: {
+        formatter: function () {
+          return `${this.point.name}: ${round(this.percentage, 2)}%`;
+        }
+      },
       size: '100%',
       innerSize: '60%',
       id: 'outerData'
     }];
+    /* eslint-enable */
 
     return chartSeries;
   }
@@ -340,6 +352,7 @@ export function ChartService(Highcharts) {
       case 'pie':
         if (!fields.g) {
           set(series, '0.name', get(fields, 'y.displayName'));
+          set(series, '0.dataLabels.format', '{point.name}: {point.percentage:.2f}%');
           mapperFn = ({x, y}) => {
             const category = get(categories, `x.${x}`);
             return {name: category, y, drilldown: category};
