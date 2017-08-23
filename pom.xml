@@ -25,6 +25,8 @@
           <finalName>${project.artifactId}</finalName>
           <!-- Remove artifact classifier "bin" from archive name -->
           <appendAssemblyId>false</appendAssemblyId>
+          <!-- Enable long file names without Maven warning -->
+          <tarLongFileMode>posix</tarLongFileMode>
         </configuration>
         <executions>
           <execution>
