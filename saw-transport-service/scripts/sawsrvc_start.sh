@@ -165,7 +165,7 @@ declare -r java_args=$( echo \
     -Dpidfile.path=$pidfile_path \
     -Dlog.dir=${log_dir} \
     -Duser.dir=${user_dir} \
-    -Durl=http://saw03.bda.poc.velocity-va.sncrcorp.net:9200/ \
+    -Durl=http://$(hostname -f):9200/ \
     -Djava.library.path=/opt/mapr/lib \
     -Dschema.pivot=/opt/saw/service/schema/pivot_querybuilder_schema.json \
     -Dschema.chart=/opt/saw/service/schema/chart_querybuilder_schema.json \
@@ -201,7 +201,7 @@ else
 fi
 #
 if [[ $FG_EXECJ ]] ; then
-  eval $exec_cmd &>$elog </dev/null
+  $exec_cmd
   echo never gets here
 fi
 

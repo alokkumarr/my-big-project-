@@ -11,6 +11,12 @@ RUN systemctl mask systemd-remount-fs.service
 # Workaround: Getty service occasionally fails, so disable for now
 RUN systemctl mask getty@tty1.service
 
+# Enable installing documentation for packages
+RUN sed -i '/tsflags=nodocs/d' /etc/yum.conf
+
+# Install system utilities
+RUN yum -y -q --nogpgcheck install less man nc lsof
+
 # Install Ansible from EPEL repository
 RUN yum -y -q --nogpgcheck install epel-release
 RUN yum -y -q --nogpgcheck install ansible rsync
@@ -28,7 +34,7 @@ ADD maprecosystem.repo /etc/yum.repos.d
 
 # Speed up deployment by preinstalling packages in container image
 RUN yum -y -q --nogpgcheck install mapr-client mapr-spark
-RUN yum -y -q --nogpgcheck install java-1.8.0-openjdk-headless
+RUN yum -y -q --nogpgcheck install java-1.8.0-openjdk-headless perl
 
 # Add deploy script and local SAW environment configuration
 ADD deploy /root/
