@@ -1,5 +1,6 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
+import clone from 'lodash/clone';
 import sum from 'lodash/sum';
 import map from 'lodash/map';
 import round from 'lodash/round';
@@ -226,13 +227,15 @@ export function ChartService(Highcharts) {
     }
 
     forEach(series, serie => {
-      forEach(serie.data, dataPoint => {
+      serie.data = map(serie.data, point => {
+        const dataPoint = clone(point);
         forEach(dataPoint, (v, k) => {
           if (isCategoryAxis(fields, k)) {
             addToCategory(categories, k, v);
             dataPoint[k] = indexOf(categories[k], v);
           }
         });
+        return dataPoint;
       });
     });
 
@@ -305,7 +308,6 @@ export function ChartService(Highcharts) {
 
     /* eslint-disable */
     const chartSeries = [{
-      name: get(fields, 'y.displayName'),
       data: innerData,
       dataLabels: {
         formatter: function () {
@@ -316,7 +318,6 @@ export function ChartService(Highcharts) {
       },
       size: '60%'
     }, {
-      name: get(fields, 'y.displayName'),
       data: outerData,
       dataLabels: {
         formatter: function () {
@@ -351,7 +352,6 @@ export function ChartService(Highcharts) {
 
       case 'pie':
         if (!fields.g) {
-          set(series, '0.name', get(fields, 'y.displayName'));
           set(series, '0.dataLabels.format', '{point.name}: {point.percentage:.2f}%');
           mapperFn = ({x, y}) => {
             const category = get(categories, `x.${x}`);
@@ -378,12 +378,18 @@ export function ChartService(Highcharts) {
     }
   }
 
-  function getPieChangeConfig(type, settings, fields, gridData) {
+  function getPieChangeConfig(type, settings, fields, gridData, opts) {
     const changes = [];
+    const yLabel = get(opts, 'labels.y') || get(fields, 'y.displayName', '');
 
     if (!isEmpty(gridData)) {
       const {series, categories} = splitToSeriesAndCategories(gridData, fields);
-      const {chartSeries} = customizeSeriesForChartType(series, type, categories, fields);
+      const {chartSeries} = customizeSeriesForChartType(series, type, categories, fields, opts);
+
+      forEach(chartSeries, seriesData => {
+        seriesData.name = yLabel;
+      });
+
       changes.push({
         path: 'series',
         data: chartSeries
