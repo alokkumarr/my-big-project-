@@ -138,6 +138,41 @@ export function ChartService(Highcharts) {
     return config;
   };
 
+  function getViewOptionsFor(type) {
+    const config = {
+      axisLabels: {
+        x: 'X-Axis', y: 'Y-Axis', z: 'Z-Axis', g: 'Group By'
+      },
+      renamable: {
+        x: true, y: true, z: false, g: false
+      },
+      legend: true
+    };
+
+    switch (type) {
+      case 'bubble':
+        config.axisLabels.z = 'Size By';
+        config.axisLabels.g = 'Color By';
+        return config;
+
+      case 'pie':
+        config.axisLabels.y = 'Angle';
+        config.axisLabels.x = 'Color By';
+        config.renamable.x = false;
+        config.legend = false;
+        return config;
+
+      case 'column':
+      case 'bar':
+      case 'line':
+      case 'spline':
+      case 'stack':
+      case 'scatter':
+      default:
+        return config;
+    }
+  }
+
     /** the mapping between the field columnNames, and the chart axes
    * the backend returns the aggregate data in with the fields columnName as property
    * the bubble chart requires x, y, z for the axes if they are of number type
@@ -264,7 +299,7 @@ export function ChartService(Highcharts) {
     return isCategoryAxis;
   }
 
-  function dataToNestedDonut(series, categories, fields) {
+  function dataToNestedDonut(series, categories) {
     /* Group by option forms the inner circle. X axis option forms the outer region
        This logic is adapted from https://www.highcharts.com/demo/pie-donut */
 
@@ -364,7 +399,7 @@ export function ChartService(Highcharts) {
           chartSeries = series;
 
         } else {
-          chartSeries = dataToNestedDonut(series, categories, fields);
+          chartSeries = dataToNestedDonut(series, categories);
         }
 
         return {chartSeries};
@@ -556,6 +591,7 @@ export function ChartService(Highcharts) {
 
   return {
     getChartConfigFor,
+    getViewOptionsFor,
     dataToChangeConfig,
     fillSettings,
     parseData,

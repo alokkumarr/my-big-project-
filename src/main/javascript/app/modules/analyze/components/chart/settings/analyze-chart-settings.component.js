@@ -8,6 +8,7 @@ export const AnalyzeChartSettingsComponent = {
   styles: [style],
   bindings: {
     settings: '<?',
+    viewOptions: '<?',
     onChange: '&'
   },
   controller: class AnalyzeChartSettingsController {

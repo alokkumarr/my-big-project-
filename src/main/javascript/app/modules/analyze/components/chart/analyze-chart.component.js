@@ -66,6 +66,7 @@ export const AnalyzeChartComponent = {
       this.chartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
 
       this.barColumnChoice = '';
+      this.chartViewOptions = ChartService.getViewOptionsFor(this.model.chartType);
     }
 
     toggleLeft() {
