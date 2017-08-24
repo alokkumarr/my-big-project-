@@ -8,14 +8,7 @@ server:
   port: 8080 
   context-path: /saw
   compression:
-    enabled: true  
-
-service-url: https://saw.bda.poc.velocity-va.synchronoss.net/
-context:
-    metadata: /md
-    analysis: /analysis
-    security: /saw-security
-    
+    enabled: true    
    
   
 

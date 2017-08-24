@@ -1,0 +1,25 @@
+analysis:
+    service:
+        host: https://saw.bda.poc.velocity-va.synchronoss.net
+metadata:
+    service:
+        host: https://saw.bda.poc.velocity-va.synchronoss.net
+semantic:
+    service:
+        host: https://saw.bda.poc.velocity-va.synchronoss.net
+
+api:
+    gateway:
+        endpoints:
+        -   location: ${metadata.service.host}
+            method: POST
+            path: '[/]*api/md*'
+        -   location: ${analysis.service.host}
+            method: GET
+            path: '[/]*api/analysis.*'
+        -   location: ${analysis.service.host}
+            method: POST
+            path: '[/]*api/analysis*'
+        -   location: ${semantic.service.host}
+            method: POST
+            path: '[/]*api/semantic*'
