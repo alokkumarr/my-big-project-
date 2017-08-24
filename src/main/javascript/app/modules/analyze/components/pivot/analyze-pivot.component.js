@@ -25,8 +25,8 @@ import template from './analyze-pivot.component.html';
 import style from './analyze-pivot.component.scss';
 import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
-import {DEFAULT_AGGREGATE_TYPE, DEFAULT_GROUP_INTERVAL} from '../pivot/settings/analyze-pivot-settings.component';
-import {DATE_TYPES, NUMBER_TYPES, ENTRY_MODES, MAX_POSSIBLE_FIELDS_OF_SAME_AREA} from '../../consts';
+import {DEFAULT_GROUP_INTERVAL} from '../pivot/settings/analyze-pivot-settings.component';
+import {DATE_TYPES, NUMBER_TYPES, ENTRY_MODES, MAX_POSSIBLE_FIELDS_OF_SAME_AREA, DEFAULT_AGGREGATE_TYPE} from '../../consts';
 
 export const AnalyzePivotComponent = {
   template,

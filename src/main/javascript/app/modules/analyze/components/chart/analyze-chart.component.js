@@ -261,16 +261,13 @@ export const AnalyzeChartComponent = {
 
       const g = find(this.settings.groupBy, g => g.checked === 'g');
       const x = find(this.settings.xaxis, x => x.checked === 'x');
-      const y = find(this.settings.yaxis, y => y.checked === 'y');
+      const y = filter(this.settings.yaxis, y => y.checked === 'y');
       const z = find(this.settings.zaxis, z => z.checked === 'z');
 
-      const allFields = [g, x, y, z];
+      const allFields = [g, x, ...y, z];
 
       const nodeFields = filter(allFields, this.isStringField);
-      const dataFields = filter(allFields, this.isDataField).map(field => {
-        field.aggregate = 'sum';
-        return field;
-      });
+      const dataFields = filter(allFields, this.isDataField);
 
       set(payload, 'sqlBuilder.dataFields', dataFields);
       set(payload, 'sqlBuilder.nodeFields', nodeFields);
