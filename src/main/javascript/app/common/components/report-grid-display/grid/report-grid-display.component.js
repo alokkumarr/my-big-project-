@@ -43,7 +43,9 @@ export const ReportGridDisplayComponent = {
           allowedPageSizes: [DEFAULT_PAGE_SIZE, 25, 50, 100],
           showPageSizeSelector: true
         },
-        onInitialized: this.onGridInitialized.bind(this)
+        onInitialized: this.onGridInitialized.bind(this),
+        height: 'auto',
+        width: 'auto'
       });
     }
 

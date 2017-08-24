@@ -19,14 +19,16 @@
   </analyze-dialog-header>
 
   <analyze-dialog-content>
-    <report-grid-display-container id="arp-grid-container"
-      class="arp_details-grid"
-      layout="row"
-      source="$ctrl.loadGridData(options)"
-      data="$ctrl.model.data"
-      columns="$ctrl.model.columns"
-      groups="$ctrl.model.report.groupByColumns"
-      requester="$ctrl.requester">
-    </report-grid-display-container>
+    <div layout="column" style="height: 500px; min-height: 500px;">
+      <report-grid-display-container id="arp-grid-container"
+        class="arp_details-grid"
+        layout="row"
+        source="$ctrl.loadGridData(options)"
+        data="$ctrl.model.data"
+        columns="$ctrl.model.columns"
+        groups="$ctrl.model.report.groupByColumns"
+        requester="$ctrl.requester">
+      </report-grid-display-container>
+    </div>
   </analyze-dialog-content>
 </analyze-dialog>
