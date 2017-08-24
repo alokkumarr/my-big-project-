@@ -17,7 +17,7 @@ object MetadataStoreSchema {
     * Directory in which metadata store tables are created when the
     * metadata store schema is created
     */
-  val TableHome = "/main/metadata-test"
+  val TableHome = "/main/metadata"
 
   /**
    * Initializes metadata store schema: creates MapR-DB binary tables
@@ -42,6 +42,7 @@ object MetadataStoreSchema {
     /* Create Analysis Result table*/
     initTable(admin, "analysis_results", "_system", "_source", "_search",
       "_objects")
+    log.info("Done initializing metadata store tables")
   }
 
   /**
