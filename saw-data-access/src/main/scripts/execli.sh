@@ -13,7 +13,7 @@ echo "Application bin: $bin_dir"
 echo "Library dir: $lib_dir"
 echo "Log dir: $log_dir"
 
-export HADOOP_HOME=/opt/mapr/hadoop/hadoop-$(cat /opt/mapr/hadoop/hadoopversion)
+export HADOOP_HOME=/opt/mapr/hadoop/hadoop-2.7.0
 
 echo Hadoop home: $HADOOP_HOME
 declare app_classpath="$conf_dir"
