@@ -6,6 +6,7 @@ After=default.target
 Type=oneshot
 ExecStart=/bin/bash -c "tar -xzf saw.tgz && saw/deploy /root/config"
 WorkingDirectory=/maven
+Environment=SAW_ENV=dev
 SyslogIdentifier=saw-deploy
 
 [Install]
