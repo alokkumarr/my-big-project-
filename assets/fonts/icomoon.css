@@ -219,3 +219,8 @@
 .icon-export:before {
   content: "\e940";
 }
+.icon-Count:before {
+  content: "#";
+  font-size: 26px;
+  font-weight: bolder;
+}

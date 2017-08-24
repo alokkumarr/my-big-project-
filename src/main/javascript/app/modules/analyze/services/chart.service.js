@@ -1,6 +1,7 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
 import clone from 'lodash/clone';
+import some from 'lodash/some';
 import sum from 'lodash/sum';
 import map from 'lodash/map';
 import round from 'lodash/round';
@@ -150,6 +151,7 @@ export function ChartService(Highcharts) {
       renamable: {
         x: true, y: true, z: false, g: false
       },
+      customTooltip: true,
       legend: true
     };
 
@@ -163,6 +165,7 @@ export function ChartService(Highcharts) {
         config.axisLabels.y = 'Angle';
         config.axisLabels.x = 'Color By';
         config.renamable.x = false;
+        config.customTooltip = false;
         config.legend = false;
         return config;
 
@@ -407,10 +410,8 @@ export function ChartService(Highcharts) {
       case 'spline':
       case 'stack':
       case 'scatter':
-        mapperFn = ({x, y}) => [x, y];
-        forEach(series, serie => {
-          serie.data = map(serie.data, mapperFn);
-        });
+      case 'bubble':
+        // the bubble chart already supports the parsed data
         return {chartSeries: series};
 
       case 'pie':
@@ -432,10 +433,6 @@ export function ChartService(Highcharts) {
 
         return {chartSeries};
 
-      case 'bubble':
-        // the bubble chart already supports the parsed data
-        return {chartSeries: series};
-
       default:
         throw new Error(`Chart type: ${chartType} is not supported!`);
     }
@@ -443,7 +440,7 @@ export function ChartService(Highcharts) {
 
   function getPieChangeConfig(type, settings, fields, gridData, opts) {
     const changes = [];
-    const yLabel = get(opts, 'labels.y') || get(fields, 'y.displayName', '');
+    const yLabel = get(opts, 'labels.y') || get(fields, 'y.0.displayName', '');
 
     if (!isEmpty(gridData)) {
       const {series, categories} = splitToSeriesAndCategories(gridData, fields);
@@ -480,10 +477,9 @@ export function ChartService(Highcharts) {
 
     if (!isEmpty(gridData)) {
       const {series, categories} = splitToSeriesAndCategories(gridData, fields);
-      const {chartSeries} = customizeSeriesForChartType(series, type, categories, fields);
       changes.push({
         path: 'series',
-        data: chartSeries
+        data: series
       });
       // add the categories
       forEach(categories, (category, k) => {
@@ -502,12 +498,15 @@ export function ChartService(Highcharts) {
     let changes;
     const fields = {
       x: find(settings.xaxis, attr => attr.checked === 'x'),
-      y: find(settings.yaxis, attr => attr.checked === 'y'),
+      y: filter(settings.yaxis, attr => attr.checked === 'y'),
       z: find(settings.zaxis, attr => attr.checked === 'z'),
       g: find(settings.groupBy, attr => attr.checked === 'g')
     };
 
     switch (type) {
+      case 'pie':
+        changes = getPieChangeConfig(type, settings, fields, gridData, opts);
+        break;
       case 'column':
       case 'bar':
       case 'line':
@@ -515,13 +514,6 @@ export function ChartService(Highcharts) {
       case 'stack':
       case 'scatter':
       case 'bubble':
-        changes = getBarChangeConfig(type, settings, fields, gridData, opts);
-        break;
-
-      case 'pie':
-        changes = getPieChangeConfig(type, settings, fields, gridData, opts);
-        break;
-
       default:
         changes = getBarChangeConfig(type, settings, fields, gridData, opts);
         break;
@@ -529,12 +521,16 @@ export function ChartService(Highcharts) {
 
     return concat(
       changes,
-      addTooltipsAndLegend(fields)
+      addTooltipsAndLegend(fields, type)
     );
   };
 
-  function addTooltipsAndLegend(fields) {
+  function addTooltipsAndLegend(fields, type) {
     const changes = [];
+
+    if (!getViewOptionsFor(type).customTooltip) {
+      return changes;
+    }
 
     const xIsNumber = NUMBER_TYPES.includes(fields.x.type);
     const xIsString = fields.x.type === 'string';
@@ -544,22 +540,22 @@ export function ChartService(Highcharts) {
     // date -> just show the date
     const xStringValue = xIsString ?
       'point.key' : xIsNumber ?
-        'point.x:,.2f' : 'point.x';
+        'point.x:.2f' : 'point.x';
     const xAxisString = `<tr>
       <th>${fields.x.displayName}:</th>
       <td>{${xStringValue}}</td>
     </tr>`;
 
     const yIsSingle = fields.y.length === 1;
-    const yIsNumber = NUMBER_TYPES.includes(fields.y.type);
+    const yIsNumber = some(fields.y, y => NUMBER_TYPES.includes(y.type));
 
     const yAxisName = `${yIsSingle || fields.g ? fields.y[0].displayName : '{series.name}'}`;
     const yAxisString = `<tr>
       <th>${yAxisName}:</th>
-      <td>{point.y${yIsNumber ? ':,.2f' : ''}}</td>
+      <td>{point.y${yIsNumber ? ':.2f' : ''}}</td>
     </tr>`;
     const zAxisString = fields.z ?
-    `<tr><th>${fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>` :
+    `<tr><th>${fields.z.displayName}:</th><td>{point.z:.2f}</td></tr>` :
     '';
     const groupString = fields.g ?
     `<tr><th>Group:</th><td>{point.g}</td></tr>` :
