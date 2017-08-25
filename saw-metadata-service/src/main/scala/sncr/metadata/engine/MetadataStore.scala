@@ -36,6 +36,9 @@ abstract class MetadataStore{
   lazy val connection = ConnectionFactory.createConnection(hbaseConf)
   lazy val admin = connection.getAdmin
 
+  /* Initialize store schema on startup */
+  MetadataStoreSchema.init(admin)
+
   var mdNodeStoreTable : Table = null
 //  var searchFields : Map[String, Any] = Map.empty
 

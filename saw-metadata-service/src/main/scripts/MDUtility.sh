@@ -15,7 +15,7 @@ echo "Library dir: $lib_dir"
 echo "Log dir: /var/saw/service/log"
 
 
-export HADOOP_HOME=/opt/mapr/hadoop/hadoop-$(cat /opt/mapr/hadoop/hadoopversion)
+export HADOOP_HOME=/opt/mapr/hadoop/hadoop-2.7.0
 declare app_classpath="$conf_dir"
 for j in `ls $lib_dir`
 do

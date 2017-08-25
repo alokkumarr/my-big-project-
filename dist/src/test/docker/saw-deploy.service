@@ -6,6 +6,7 @@ After=default.target
 Type=oneshot
 ExecStart=/root/deploy
 WorkingDirectory=/maven
+Environment=SAW_ENV=dev
 SyslogIdentifier=saw-deploy
 
 [Install]
