@@ -21,6 +21,8 @@ export const ReportGridDisplayComponent = {
       this._dxDataGridService = dxDataGridService;
       this._FilterService = FilterService;
       this._gridInstance = null;
+      this.pageSize = DEFAULT_PAGE_SIZE;
+      this.$window = window;
     }
 
     $onInit() {
@@ -36,12 +38,27 @@ export const ReportGridDisplayComponent = {
           mode: 'standard'
         },
         paging: {
-          pageSize: DEFAULT_PAGE_SIZE
+          pageSize: this.pageSize
         },
         pager: {
           showNavigationButtons: true,
           allowedPageSizes: [DEFAULT_PAGE_SIZE, 25, 50, 100],
           showPageSizeSelector: true
+        },
+        loadPanel: {
+          position: {
+            of: '.dx-datagrid-rowsview',
+            at: 'center',
+            my: 'center'
+          },
+          onShowing: () => {
+            if (this._gridInstance) {
+              this.pageSize = this._gridInstance.pageSize();
+            }
+          }
+        },
+        bindingOptions: {
+          'loadPanel.position.of': '$ctrl.pageSize > 50 ? window : ".dx-datagrid-rowsview"'
         },
         onInitialized: this.onGridInitialized.bind(this)
       });
