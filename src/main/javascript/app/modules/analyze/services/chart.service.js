@@ -237,9 +237,10 @@ export function ChartService() {
 
   function splitSeriesByYAxes(parsedData, fields) {
     const axesFieldNameMap = getAxesFieldNameMap(fields, 'y');
-    const series = map(fields.y, ({alias, displayName}) => (
-      {name: alias || displayName, data: []})
-    );
+    const series = map(fields.y, ({alias, displayName, aggregate}) => ({
+      name: `${AGGREGATE_TYPES_OBJ[aggregate].label} ${alias || displayName}`,
+      data: []
+    }));
 
     forEach(parsedData, dataPoint => {
       forEach(fields.y, (field, index) => {
@@ -352,7 +353,10 @@ export function ChartService() {
     const yIsSingle = fields.y.length === 1;
     const yIsNumber = NUMBER_TYPES.includes(fields.y.type);
 
-    const yAxisName = `${yIsSingle || fields.g ? fields.y[0].displayName : '{series.name}'}`;
+    const yField = fields.y[0];
+    const yAxisName = `${yIsSingle || fields.g ?
+      `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}` :
+      '{series.name}'}`;
     const yAxisString = `<tr>
       <th>${yAxisName}:</th>
       <td>{point.y${yIsNumber ? ':,.2f' : ''}}</td>
