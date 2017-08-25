@@ -125,6 +125,7 @@
             <configuration>
               <version>${revision.nodash}</version>
               <requires>
+                <require>java-1.8.0-openjdk-headless</require>
                 <require>mapr-client</require>
               </requires>
               <entries>
