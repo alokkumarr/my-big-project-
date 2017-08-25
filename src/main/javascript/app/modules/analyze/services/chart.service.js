@@ -143,12 +143,16 @@ export function ChartService(Highcharts) {
     return config;
   };
 
+  /* Provides view related configuration for various chart types */
   function getViewOptionsFor(type) {
     const config = {
       axisLabels: {
         x: 'X-Axis', y: 'Y-Axis', z: 'Z-Axis', g: 'Group By'
       },
       renamable: {
+        x: true, y: true, z: false, g: false
+      },
+      required: {
         x: true, y: true, z: false, g: false
       },
       customTooltip: true,
@@ -159,6 +163,7 @@ export function ChartService(Highcharts) {
       case 'bubble':
         config.axisLabels.z = 'Size By';
         config.axisLabels.g = 'Color By';
+        config.required.z = true;
         return config;
 
       case 'pie':

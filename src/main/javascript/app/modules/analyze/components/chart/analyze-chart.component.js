@@ -1,6 +1,7 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import findIndex from 'lodash/findIndex';
 import find from 'lodash/find';
+import forEach from 'lodash/forEach';
 import filter from 'lodash/filter';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
@@ -181,33 +182,23 @@ export const AnalyzeChartComponent = {
     checkModelValidity() {
       let isValid = true;
       const errors = [];
-      const x = find(this.settings.xaxis, x => x.checked === 'x');
-      const y = find(this.settings.yaxis, y => y.checked === 'y');
-      const z = find(this.settings.zaxis, z => z.checked === 'z');
+      const present = {
+        x: find(this.settings.xaxis, x => x.checked === 'x'),
+        y: find(this.settings.yaxis, y => y.checked === 'y'),
+        z: find(this.settings.zaxis, z => z.checked === 'z'),
+        g: find(this.settings.groupBy, g => g.checked === 'g')
+      };
 
-      switch (this.model.chartType) {
-        case 'bubble':
-        // x, y and z axes are mandatory
-        // grouping is optional
-          if (!x || !y || !z) {
-            errors[0] = 'ERROR_X_Y_SIZEBY_AXES_REQUIRED';
-            isValid = false;
-          }
-          break;
-        default:
-        // x and y axes are mandatory
-        // grouping is optional
-          if (!x || !y) {
-            errors[0] = 'ERROR_X_Y_AXES_REQUIRED';
-            isValid = false;
-          }
-      }
+      forEach(this.chartViewOptions.required, (v, k) => {
+        if (v && !present[k]) {
+          errors.push(`'${this.chartViewOptions.axisLabels[k]}'`);
+        }
+      });
 
-      if (!isValid) {
-        this._$translate(errors).then(translations => {
-          this._toastMessage.error(values(translations).join('\n'), '', {
-            timeOut: 3000
-          });
+      if (errors.length) {
+        isValid = false;
+        this._toastMessage.error(`${errors.join(', ')} required`, '', {
+          timeOut: 3000
         });
       }
 
