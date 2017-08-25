@@ -6,7 +6,9 @@
 - name: Enable and start SAW Transport Service
   systemd: name=saw-transport enabled=true state=started
 - name: Create SAW Transport Service metadata store directory
-  shell: sudo -u mapr hadoop fs -mkdir -p /main/metadata
+  become: true
+  become_user: mapr
+  shell: hadoop fs -mkdir -p /main/metadata
   # Workaround: There is no MapR client configured when running inside
   # Docker container, so skip steps to initialize MapR-FS
   when: lookup('env', 'SAW_ENV') != 'dev'
