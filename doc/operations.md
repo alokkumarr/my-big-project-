@@ -75,3 +75,18 @@ The SAW Web module and supporting services are exposed on port 80 of
 the target host, i.e. `http://<target-host>/`.  The SAW Web
 application will automatically discover the endpoints for SAW Security
 and SAW Services based on the URL it is being served from.
+
+# Status
+
+To check the status of all SAW units and timers, execute the following
+commands:
+
+        $ sudo systemctl list-units --all saw-*
+        $ sudo systemctl list-timers --all saw-*
+
+# Logs
+
+The SAW system logs can be accessed using the `journalctl` command.
+To view the logs of individual services, use the `-u` option:
+
+        $ sudo journalctl -u saw-*

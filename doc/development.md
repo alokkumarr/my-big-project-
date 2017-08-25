@@ -41,6 +41,9 @@ To enter a shell inside the container, execute the following command:
 
         $ docker exec -it $(docker ps -ql) bash
 
+While inside the container, use `systemctl status saw-*` to check the
+status and `journalctl -u saw-*` to see logs of SAW services.
+
 # Making a release
 
 To make a release of the project, execute the following steps:
