@@ -20,14 +20,6 @@ To build and run tests do the following:
 
         $ mvn verify
 
-# Deploying
-
-To deploy the system to the shared development environment run:
-
-    ./deploy
-
-Also see development [deployment](deploy/README.md) notes.
-
 # Updating SAW Transport Service routes
 
 After editing the `saw-transport-service/conf/routes` file, the Play
