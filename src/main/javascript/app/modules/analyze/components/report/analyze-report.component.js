@@ -57,6 +57,7 @@ export const AnalyzeReportComponent = {
       };
 
       this.gridData = [];
+      this.gridDataTotalCount = 0;
       this.columns = [];
 
       this._unregisterCanvasHandlers = [];
@@ -429,7 +430,7 @@ export const AnalyzeReportComponent = {
         });
     }
 
-    refreshGridData() {
+    onRefreshData() {
       this.startProgress();
       this.model = assign(this.model, this.generatePayload());
 
@@ -445,8 +446,9 @@ export const AnalyzeReportComponent = {
       ));
 
       this._AnalyzeService.getDataBySettings(clone(this.model))
-        .then(({analysis, data}) => {
+        .then(({analysis, data, count}) => {
           this.gridData = data;
+          this.gridDataTotalCount = count;
           this.model.query = analysis.queryManual || analysis.query;
           this.applyDataToGrid(this.columns, sorts, groups, this.gridData);
           this.analysisSynched();

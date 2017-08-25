@@ -290,6 +290,7 @@ export const AnalyzePivotComponent = {
       this.pivotGridUpdater.next({sorts});
       this.analysisUnSynched();
       this.startDraftMode();
+      this.onRefreshData();
     }
 
     openPivotSortModal(ev) {

@@ -130,9 +130,9 @@ module.exports = function (env) {
         clear: false
       }),
       new DefinePlugin({
-        '__DEVELOPMENT__': isDevelopment,
-        '__PRODUCTION__': isProduction,
-        '__MOCK__': enableMock
+        '__DEVELOPMENT__': JSON.stringify(isDevelopment),
+        '__PRODUCTION__': JSON.stringify(isProduction),
+        '__MOCK__': JSON.stringify(enableMock)
       }),
       new LoaderOptionsPlugin({
         options: {

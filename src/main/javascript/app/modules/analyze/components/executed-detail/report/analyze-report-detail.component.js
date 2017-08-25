@@ -10,6 +10,7 @@ export const AnalyzeReportDetailComponent = {
   template,
   bindings: {
     analysis: '<',
+    source: '&',
     requester: '<'
   },
   controller: class AnalyzeReportDetailController {
@@ -50,6 +51,10 @@ export const AnalyzeReportDetailComponent = {
 
     $onDestroy() {
       this.dataSubscription.unsubscribe();
+    }
+
+    loadData(options) {
+      return this.source({options});
     }
 
     onData({data}) {

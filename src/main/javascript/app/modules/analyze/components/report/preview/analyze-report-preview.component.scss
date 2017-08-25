@@ -37,9 +37,8 @@ analyze-report-preview {
     }
 
     &_details-grid {
-      .report-grid-container {
-        padding: 20px;
-      }
+      width: 98%;
+      margin: 0 auto;
     }
   }
 }
