@@ -3,6 +3,8 @@
 - include: modules/saw-security/ansible/site.yml
 - include: modules/saw-services/ansible/site.yml
 - include: modules/saw-web/ansible/site.yml
-- hosts: saw-proxy
+- name: SAW Proxy
+  hosts: saw-proxy
+  become: true
   roles:
     - saw-proxy
