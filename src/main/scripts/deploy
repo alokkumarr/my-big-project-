@@ -10,6 +10,7 @@ if [ $# -ne 1 ]; then
 fi
 
 config=$1
+dir=$(dirname $0)
 
 yum_install() {
     sudo yum -q -y install $*
@@ -28,6 +29,5 @@ if ! command -v ansible-playbook > /dev/null; then
 fi
 
 echo "Starting deployment"
-cd $(dirname $0)
-ansible-playbook -i $config site.yml
+ansible-playbook -i $config $dir/site.yml
 echo "Finished deployment"

@@ -1,5 +1,5 @@
 [Unit]
-Description=Deploy SAW application
+Description=SAW testing deployer
 After=default.target
 
 [Service]
