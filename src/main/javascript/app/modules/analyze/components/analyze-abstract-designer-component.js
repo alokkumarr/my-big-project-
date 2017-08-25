@@ -55,6 +55,7 @@ export default class AbstractDesignerComponentController {
       this.filters = filters;
       this.didAnalysisChange = true;
       this.startDraftMode();
+      this.onRefreshData();
     }
     if (filterBooleanCriteria) {
       this.model.sqlBuilder.booleanCriteria = filterBooleanCriteria;

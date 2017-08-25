@@ -210,7 +210,7 @@ module.exports = {
     customersEmail: element(by.css('.e2e-Customers\\:EMAIL_ADDRESS')),
     productsProductTypes: element(by.css('.e2e-Products\\:PRODUCT_TYPES')),
     serviceProductStatus: element(by.css('.e2e-Service\\:PROD_OM_STATUS')),
-    refreshDataBtn: element(by.css('[ng-click="$ctrl.refreshGridData()"]')),
+    refreshDataBtn: element(by.css('[ng-click="$ctrl.onRefreshData()"]')),
     toggleDetailsPanel: element(by.css('[ng-click="$ctrl.toggleDetailsPanel()"]')),
     reportGridContainer: element(by.css('.ard_details-grid'))
   },
