@@ -3,3 +3,12 @@
 Execute the following command to get a shell inside the container:
 
         docker exec -it $(docker ps -ql) bash
+
+# What should I do if building SAW Transport Service fails with a permission denied error?
+
+If building SAW Transport Service gives an error `Failed to create
+assembly: Error creating assembly archive package: Problem copying
+files :
+/Users/Shared/WORK/SAW-BE/saw-transport-service/target/saw-transport-service-2-package/saw-transport-service-2/lib/aopalliance.aopalliance-1.0.jar
+(Permission denied)`, then remove the `saw-transport-service/target`
+directory and retry.
