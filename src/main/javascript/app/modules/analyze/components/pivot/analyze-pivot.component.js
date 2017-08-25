@@ -304,6 +304,7 @@ export const AnalyzePivotComponent = {
     }
 
     openPivotPreviewModal(ev) {
+      this.onRefreshData();
       const tpl = '<analyze-pivot-preview model="model"></analyze-pivot-preview>';
 
       this.openPreviewModal(tpl, ev, {

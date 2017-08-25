@@ -551,6 +551,7 @@ export const AnalyzeReportComponent = {
     }
 
     openReportPreviewModal(ev) {
+      this.refreshGridData();
       const tpl = '<analyze-report-preview model="model"></analyze-report-preview>';
       this.model = assign(this.model, this.generatePayload());
       this.openPreviewModal(tpl, ev, {

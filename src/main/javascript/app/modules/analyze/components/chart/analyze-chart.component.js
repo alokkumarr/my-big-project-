@@ -228,6 +228,7 @@ export const AnalyzeChartComponent = {
     }
 
     openChartPreviewModal(ev) {
+      this.refreshChartData();
       const tpl = '<analyze-chart-preview model="model"></analyze-chart-preview>';
       this.openPreviewModal(tpl, ev, {
         chartOptions: this.chartOptions,
