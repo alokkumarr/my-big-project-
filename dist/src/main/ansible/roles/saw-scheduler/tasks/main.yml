@@ -1,5 +1,8 @@
 - name: Install SAW Scheduler Service package
   yum: name="{{ item }}" state=present
   with_fileglob: ["../rpms/saw-scheduler-service-*.rpm"]
-# Note: The SAW Scheduler Service does not need systemd enable because
-# it is invoked from a timer
+- name: Enable SAW Scheduler Service timer
+  systemd: name=saw-scheduler enabled=true state=started
+  # Workaround: There is no MapR client configured when running inside
+  # Docker container, so skip steps to start the SAW Scheduler Service
+  when: lookup('env', 'container') != 'docker'
