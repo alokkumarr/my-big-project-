@@ -21,24 +21,3 @@ is provided:
 To install SAW Security, use the SAW bundle package which coordinates
 installation of SAW modules.  See the SAW bundle package Operations
 Guide for closer details about installing.
-
-# Status check
-
-To check the status of all SAW Services units execute:
-
-        $ systemctl list-units --all saw-\*
-
-To check the status of all SAW Services timers execute:
-
-        $ systemctl list-timers --all saw-\*
-
-# Logs
-
-The SAW Services logs are found using the `journalctl` command.  To
-view the logs of individual services, use the `-u` option:
-
-        $ sudo journalctl -u saw-scheduler.timer
-        $ sudo journalctl -u saw-scheduler.service
-
-Note: For now the SAW Metadata Service does not use syslog and instead
-logs into `/var/saw/service/log`.

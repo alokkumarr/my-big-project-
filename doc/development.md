@@ -20,13 +20,17 @@ To build and run tests do the following:
 
         $ mvn verify
 
-# Deploying
+# Testing deployment
 
-To deploy the system to the shared development environment run:
+To build and run a Docker container that runs SAW Services in
+development mode, execute the following command:
 
-    ./deploy
+        $ mvn -pl dist -am package -DskipTests
+        $ mvn -pl dist docker:build docker:start -Ddocker.verbose
 
-Also see development [deployment](deploy/README.md) notes.
+Note: SAW Services is a multi-module Maven project, so the above
+commands differ from the command used for a single-module Maven
+project like SAW Security and Web.
 
 # Updating SAW Transport Service routes
 
