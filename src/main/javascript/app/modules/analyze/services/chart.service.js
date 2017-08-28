@@ -296,12 +296,16 @@ export function ChartService() {
       g: find(settings.groupBy, attr => attr.checked === 'g')
     };
 
+    const singleYAxis = fields.y.length === 1;
+    let yLabel;
+    if (singleYAxis) {
+      const yField = fields.y[0];
+      yLabel = `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}`;
+    }
+
     const labels = {
       x: get(fields, 'x.displayName', ''),
-      y: fpPipe(
-        fpMap(field => `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${field.displayName}`),
-        fpJoin(' | ')
-      )(fields.y)
+      y: singleYAxis ? yLabel : ''
     };
 
     const changes = [{
