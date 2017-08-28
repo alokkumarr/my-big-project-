@@ -11,7 +11,6 @@ import isEmpty from 'lodash/isEmpty';
 import fpPipe from 'lodash/fp/pipe';
 import fpOmit from 'lodash/fp/omit';
 import fpToPairs from 'lodash/fp/toPairs';
-import fpJoin from 'lodash/fp/join';
 import fpMap from 'lodash/fp/map';
 import fpMapValues from 'lodash/fp/mapValues';
 import fpFlatMap from 'lodash/fp/flatMap';
