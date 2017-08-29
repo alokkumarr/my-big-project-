@@ -199,7 +199,7 @@ appl_start() {
     # Run in foreground
     if [[ $FG_EXECJ ]] ; then
         vlog 'run in foreground'
-        exec $exec_cmd </dev/null &>$START_LOG
+        exec $exec_cmd
         echo never gets here
     fi 
     # Start service in daemon mode
