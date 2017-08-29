@@ -65,6 +65,9 @@
                 </assembly>
               </build>
               <run>
+                <ports> 
+                  <port>8080:80</port>
+                </ports>
                 <!-- Run privileged for systemd -->
                 <privileged>true</privileged>
                 <wait>
