@@ -11,7 +11,6 @@ import isEmpty from 'lodash/isEmpty';
 import fpPipe from 'lodash/fp/pipe';
 import fpOmit from 'lodash/fp/omit';
 import fpToPairs from 'lodash/fp/toPairs';
-import fpJoin from 'lodash/fp/join';
 import fpMap from 'lodash/fp/map';
 import fpMapValues from 'lodash/fp/mapValues';
 import fpFlatMap from 'lodash/fp/flatMap';
@@ -296,12 +295,16 @@ export function ChartService() {
       g: find(settings.groupBy, attr => attr.checked === 'g')
     };
 
+    const singleYAxis = fields.y.length === 1;
+    let yLabel;
+    if (singleYAxis) {
+      const yField = fields.y[0];
+      yLabel = `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}`;
+    }
+
     const labels = {
       x: get(fields, 'x.displayName', ''),
-      y: fpPipe(
-        fpMap(field => `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${field.displayName}`),
-        fpJoin(' | ')
-      )(fields.y)
+      y: singleYAxis ? yLabel : ''
     };
 
     const changes = [{
