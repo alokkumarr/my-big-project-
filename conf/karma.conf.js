@@ -38,7 +38,7 @@ module.exports = function (config) {
       'test/javascript/specs/polyfills.js': ['webpack'],
       'test/javascript/specs/**/*.spec.js': ['webpack']
     },
-    webpack: require('./webpack.test'),
+    webpack: require('./webpack.test')('development'),
     webpackMiddleware: {
       noInfo: false
     }

@@ -75,11 +75,11 @@ class JwtService {
 
   /* Bootstraps request structure with necessary auth data */
   getRequestParams() {
-    // const token = this.getTokenObj();
+    const token = this.getTokenObj();
     return {
       contents: {
         keys: [{
-          customerCode: 'ATT'
+          customerCode: get(token, 'ticket.custCode', 'ATT')
           // dataSecurityKey: get(token, 'ticket.dataSecurityKey')
         }]
       }

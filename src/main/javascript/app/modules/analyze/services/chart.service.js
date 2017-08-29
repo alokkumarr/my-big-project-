@@ -15,7 +15,6 @@ import isEmpty from 'lodash/isEmpty';
 import fpPipe from 'lodash/fp/pipe';
 import fpOmit from 'lodash/fp/omit';
 import fpToPairs from 'lodash/fp/toPairs';
-import fpJoin from 'lodash/fp/join';
 import fpMap from 'lodash/fp/map';
 import fpMapValues from 'lodash/fp/mapValues';
 import fpFlatMap from 'lodash/fp/flatMap';
@@ -285,9 +284,10 @@ export function ChartService(Highcharts) {
 
   function splitSeriesByYAxes(parsedData, fields) {
     const axesFieldNameMap = getAxesFieldNameMap(fields, 'y');
-    const series = map(fields.y, ({alias, displayName}) => (
-      {name: alias || displayName, data: []})
-    );
+    const series = map(fields.y, ({alias, displayName, aggregate}) => ({
+      name: `${AGGREGATE_TYPES_OBJ[aggregate].label} ${alias || displayName}`,
+      data: []
+    }));
 
     forEach(parsedData, dataPoint => {
       forEach(fields.y, (field, index) => {
@@ -464,12 +464,16 @@ export function ChartService(Highcharts) {
   }
 
   function getBarChangeConfig(type, settings, fields, gridData, opts) {
+    const singleYAxis = fields.y.length === 1;
+    let yLabel;
+    if (singleYAxis) {
+      const yField = fields.y[0];
+      yLabel = `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}`;
+    }
+
     const labels = {
       x: get(fields, 'x.displayName', ''),
-      y: fpPipe(
-        fpMap(field => `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${field.displayName}`),
-        fpJoin(' | ')
-      )(fields.y)
+      y: singleYAxis ? yLabel : ''
     };
 
     const changes = [{
@@ -554,7 +558,10 @@ export function ChartService(Highcharts) {
     const yIsSingle = fields.y.length === 1;
     const yIsNumber = some(fields.y, y => NUMBER_TYPES.includes(y.type));
 
-    const yAxisName = `${yIsSingle || fields.g ? fields.y[0].displayName : '{series.name}'}`;
+    const yField = fields.y[0];
+    const yAxisName = `${yIsSingle || fields.g ?
+      `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}` :
+      '{series.name}'}`;
     const yAxisString = `<tr>
       <th>${yAxisName}:</th>
       <td>{point.y${yIsNumber ? ':.2f' : ''}}</td>
