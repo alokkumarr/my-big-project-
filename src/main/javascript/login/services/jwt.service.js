@@ -79,7 +79,8 @@ class JwtService {
     return {
       contents: {
         keys: [{
-          customerCode: get(token, 'ticket.custCode', 'ATT')
+          customerCode: 'ATT'
+          // customerCode: get(token, 'ticket.custCode', 'ATT')
           // dataSecurityKey: get(token, 'ticket.dataSecurityKey')
         }]
       }

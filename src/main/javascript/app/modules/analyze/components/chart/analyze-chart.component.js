@@ -9,6 +9,7 @@ import map from 'lodash/map';
 import values from 'lodash/values';
 import clone from 'lodash/clone';
 import set from 'lodash/set';
+import concat from 'lodash/concat';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -34,18 +35,21 @@ export const AnalyzeChartComponent = {
     mode: '@?'
   },
   controller: class AnalyzeChartController extends AbstractDesignerComponentController {
-    constructor($componentHandler, $timeout, AnalyzeService,
+    constructor($componentHandler, $timeout, AnalyzeService, SortService,
                 ChartService, FilterService, $mdSidenav, $translate, toastMessage, $injector) {
       'ngInject';
       super($injector);
       this._FilterService = FilterService;
       this._AnalyzeService = AnalyzeService;
       this._ChartService = ChartService;
+      this._SortService = SortService;
       this._$mdSidenav = $mdSidenav;
       this._$timeout = $timeout;
       this._$translate = $translate;
       this._toastMessage = toastMessage;
       this.BAR_COLUMN_OPTIONS = BAR_COLUMN_OPTIONS;
+      this.sortFields = [];
+      this.sorts = [];
 
       this.legend = {
         align: get(this.model, 'legend.align', 'right'),
@@ -95,6 +99,9 @@ export const AnalyzeChartComponent = {
 
     initChart() {
       this.settings = this._ChartService.fillSettings(this.model.artifacts, this.model);
+      this.sortFields = this._SortService.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
+      this.sorts = this.model.sqlBuilder.sorts ?
+        this._SortService.mapBackend2FrontendSort(this.model.sqlBuilder.sorts, this.sortFields) : [];
       this.reloadChart(this.settings, this.filteredGridData);
 
       if (isEmpty(this.mode)) {
@@ -272,7 +279,7 @@ export const AnalyzeChartComponent = {
       set(payload, 'sqlBuilder.nodeFields', nodeFields);
 
       delete payload.supports;
-      set(payload, 'sqlBuilder.sorts', []);
+      set(payload, 'sqlBuilder.sorts', this._SortService.mapFrontend2BackendSort(this.sorts));
       set(payload, 'sqlBuilder.booleanCriteria', this.model.sqlBuilder.booleanCriteria);
       set(payload, 'xAxis', {title: this.labels.x});
       set(payload, 'yAxis', {title: this.labels.y});
@@ -282,6 +289,21 @@ export const AnalyzeChartComponent = {
       });
 
       return payload;
+    }
+
+    openChartSortModal(ev) {
+      this.openSortModal(ev, {
+        fields: this.sortFields,
+        sorts: map(this.sorts, sort => clone(sort))
+      }).then(sorts => {
+        this.sorts = sorts;
+        console.log('sorts', this.sorts);
+        this.applySorts();
+      });
+    }
+
+    applySorts() {
+      this.onRefreshData();
     }
 
     openSaveChartModal(ev) {
