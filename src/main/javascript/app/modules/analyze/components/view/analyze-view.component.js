@@ -11,6 +11,8 @@ import AbstractComponentController from 'app/common/components/abstractComponent
 const SEARCH_CONFIG = [
   {keyword: 'NAME', fieldName: 'name'},
   {keyword: 'TYPE', fieldName: 'type'},
+  {keyword: 'CREATOR', fieldName: 'userFullName'},
+  {keyword: 'CREATED', fieldName: 'new Date(rowData.createdTimestamp).toDateString()'},
   {keyword: 'METRIC', fieldName: 'metricName'}
 ];
 
