@@ -1,3 +1,5 @@
+const commonFunctions = require('../../javascript/helpers/commonFunctions');
+
 /**
  * Check if an element has class
  */
@@ -14,11 +16,12 @@ function hasClass(element, cls) {
  */
 function doMdSelectOption({parentElem, btnSelector, optionSelector}) {
   const btn = parentElem.element(by.css(btnSelector));
+  commonFunctions.waitFor.elementToBeClickable(btn);
   btn.click();
   btn.getAttribute('aria-owns').then(id => {
-    element(by.id(id))
-      .element(by.css(optionSelector))
-      .click();
+    const elem = element(by.id(id)).element(by.css(optionSelector));
+    commonFunctions.waitFor.elementToBeClickable(elem);
+    elem.click();
   });
 }
 

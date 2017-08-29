@@ -1,37 +1,24 @@
 const webpackHelper = require('./webpack.helper');
 const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
 
-const windowsPath = '../node_modules/chromedriver/lib/chromedriver/chromedriver.exe';
-const unixPath = '../node_modules/protractor/node_modules/webdriver-manager/selenium/chromedriver_2.31';
-const chromedriverPath = process.platform === 'win32' ? windowsPath : unixPath;
-
 exports.config = {
   framework: 'jasmine2',
-  chromeDriver: chromedriverPath,
-  //seleniumAddress: 'http://localhost:4444/wd/hub',
+  seleniumAddress: 'http://localhost:4444/wd/hub',
   getPageTimeout: 60000,
   allScriptsTimeout: 500000,
   directConnect: true,
 
-  multiCapabilities: [
-
-    {
-      browserName: 'chrome',
-       chromeOptions: {
-        args: [
-          //'incognito',
-          'disable-extensions',
-          'disable-web-security'
-        ]
-      }
-    },
-
-/*    {
-      browserName: 'firefox'
-    }*/
-  ],
-
-  //maxSessions: 2,
+  capabilities: {
+    browserName: 'chrome',
+    chromeOptions: {
+      args: [
+        //'incognito',
+        'disable-extensions',
+        'disable-web-security',
+        //  '--start-fullscreen' // enable for Mac OS
+      ]
+    }
+  },
 
   jasmineNodeOpts: {
     isVerbose: true,
@@ -45,16 +32,17 @@ exports.config = {
   suites: {
 
     authentication: [
-      webpackHelper.root('src/test/javascript/e2e/spec/login.spec.js')
+      webpackHelper.root('src/test/e2e-tests/login.test.js')
     ],
 
     analyses: [
-      webpackHelper.root('src/test/javascript/e2e/spec/priviliges.spec.js')
-      // webpackHelper.root('src/test/javascript/e2e/spec/analyses.spec.js'),
-      // webpackHelper.root('src/test/javascript/e2e/spec/goToAnalyze.spec'),
-      // webpackHelper.root('src/test/javascript/e2e/spec/createChart.spec.js')
-      // webpackHelper.root('src/test/javascript/e2e/spec/createPivot.spec.js')
-      // webpackHelper.root('src/test/javascript/e2e/spec/createReport.spec.js')
+      webpackHelper.root('src/test/e2e-tests/priviliges.test.js'),
+      // webpackHelper.root('src/test/javascript/e2e/spec/analyses.test.js'), // obsolete
+      webpackHelper.root('src/test/e2e-tests/goToAnalyze.test.js'),
+      webpackHelper.root('src/test/e2e-tests/createChart.test.js'),
+      webpackHelper.root('src/test/e2e-tests/createPivot.test.js'),
+      webpackHelper.root('src/test/e2e-tests/createReport.test.js')
+      // webpackHelper.root('src/test/e2e-tests/debug.test.js') // for testing purposes
     ]
   },
 
@@ -67,8 +55,13 @@ exports.config = {
 
     browser.manage().timeouts().pageLoadTimeout(10000);
     browser.manage().timeouts().implicitlyWait(10000);
-    browser.driver.manage().window().maximize();
+    //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.driver.get('http://localhost:3000');
-    browser.sleep(2000);
+
+    return browser.driver.wait(() => {
+      return browser.driver.getCurrentUrl().then(url => {
+        return /login/.test(url);
+      });
+    }, 10000);
   }
 };
