@@ -15,7 +15,7 @@ RUN systemctl mask getty@tty1.service
 RUN sed -i '/tsflags=nodocs/d' /etc/yum.conf
 
 # Install system utilities
-RUN yum -y -q --nogpgcheck install less man nc lsof
+RUN yum -y -q --nogpgcheck install less man iproute lsof nc file
 
 # Install Ansible from EPEL repository
 RUN yum -y -q --nogpgcheck install epel-release
