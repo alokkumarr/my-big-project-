@@ -445,7 +445,8 @@ export function ChartService(Highcharts) {
 
   function getPieChangeConfig(type, settings, fields, gridData, opts) {
     const changes = [];
-    const yLabel = get(opts, 'labels.y') || get(fields, 'y.0.displayName', '');
+    const yField = get(fields, 'y.0', {});
+    const yLabel = get(opts, 'labels.y') || `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}`;
 
     if (!isEmpty(gridData)) {
       const {series, categories} = splitToSeriesAndCategories(gridData, fields);
