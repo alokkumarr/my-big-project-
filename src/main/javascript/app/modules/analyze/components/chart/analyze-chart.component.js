@@ -9,6 +9,9 @@ import map from 'lodash/map';
 import values from 'lodash/values';
 import clone from 'lodash/clone';
 import set from 'lodash/set';
+import forEach from 'lodash/forEach';
+import concat from 'lodash/concat';
+import remove from 'lodash/remove';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -35,7 +38,7 @@ export const AnalyzeChartComponent = {
   },
   controller: class AnalyzeChartController extends AbstractDesignerComponentController {
     constructor($componentHandler, $timeout, AnalyzeService,
-                ChartService, FilterService, $mdSidenav, $translate, toastMessage, $injector) {
+      ChartService, FilterService, $mdSidenav, $translate, toastMessage, $injector) {
       'ngInject';
       super($injector);
       this._FilterService = FilterService;
@@ -186,16 +189,16 @@ export const AnalyzeChartComponent = {
 
       switch (this.model.chartType) {
         case 'bubble':
-        // x, y and z axes are mandatory
-        // grouping is optional
+          // x, y and z axes are mandatory
+          // grouping is optional
           if (!x || !y || !z) {
             errors[0] = 'ERROR_X_Y_SIZEBY_AXES_REQUIRED';
             isValid = false;
           }
           break;
         default:
-        // x and y axes are mandatory
-        // grouping is optional
+          // x and y axes are mandatory
+          // grouping is optional
           if (!x || !y) {
             errors[0] = 'ERROR_X_Y_AXES_REQUIRED';
             isValid = false;
@@ -265,8 +268,19 @@ export const AnalyzeChartComponent = {
 
       const allFields = [g, x, ...y, z];
 
-      const nodeFields = filter(allFields, this.isStringField);
+      let nodeFields = filter(allFields, this.isStringField);
       const dataFields = filter(allFields, this.isDataField);
+
+      if (payload.chartType === 'scatter') {
+        const xFields = remove(dataFields, ({checked}) => checked === 'x');
+        nodeFields = concat(xFields, nodeFields);
+      }
+
+      forEach(dataFields, field => {
+        if (!field.aggregate) {
+          field.aggregate = 'sum';
+        }
+      });
 
       set(payload, 'sqlBuilder.dataFields', dataFields);
       set(payload, 'sqlBuilder.nodeFields', nodeFields);
