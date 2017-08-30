@@ -1,6 +1,6 @@
 - name: Install SAW Transport Service package
   yum: name="{{ item }}" state=present
-  with_fileglob: ["../rpms/saw-transport-service-*.rpm"]
+  with_fileglob: ["../rpms/saw-transport-*.rpm"]
   notify:
     - restart saw-transport
 - name: Install SAW Transport Service configuration file
@@ -8,7 +8,7 @@
   notify:
     - restart saw-transport
 - name: Enable SAW Transport Service
-  systemd: name=saw-transport enabled=true
+  systemd: name=saw-transport enabled=true daemon_reload=true
 - name: Create SAW Transport Service metadata store directory
   become: true
   become_user: mapr
