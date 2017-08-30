@@ -16,4 +16,4 @@
 - name: Run SAW Security initial database setup
   command: /opt/bda/saw-security/db/setup/init
 - name: Enable SAW Security service
-  systemd: name=saw-security enabled=true
+  systemd: name=saw-security enabled=true daemon_reload=true
