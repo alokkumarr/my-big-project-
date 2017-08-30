@@ -3,7 +3,7 @@ Description=SAW Transport
 
 [Service]
 ExecStart=/opt/saw/service/bin/sawsrvc_start.sh --fxj -v
-SyslogIdentifier=saw-transport-service
+SyslogIdentifier=saw-transport
 User=mapr
 
 [Install]
