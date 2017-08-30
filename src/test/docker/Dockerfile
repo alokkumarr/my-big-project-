@@ -11,6 +11,12 @@ RUN systemctl mask systemd-remount-fs.service
 # Workaround: Getty service occasionally fails, so disable for now
 RUN systemctl mask getty@tty1.service
 
+# Enable installing documentation for packages
+RUN sed -i '/tsflags=nodocs/d' /etc/yum.conf
+
+# Install system utilities
+RUN yum -y -q --nogpgcheck install less man iproute lsof nc file
+
 # Install Ansible from EPEL repository
 RUN yum -y -q --nogpgcheck install epel-release
 RUN yum -y -q --nogpgcheck install ansible rsync
