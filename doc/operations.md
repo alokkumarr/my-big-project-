@@ -78,10 +78,14 @@ and SAW Services based on the URL it is being served from.
 
 # Status
 
-To check the status of all SAW units and timers, execute the following
+To check the status of all SAW systemd units, execute the following
 commands:
 
         $ sudo systemctl list-units --all saw-*
+
+To check the status of all SAW systemd timers, execute the following
+command:
+
         $ sudo systemctl list-timers --all saw-*
 
 # Logs
