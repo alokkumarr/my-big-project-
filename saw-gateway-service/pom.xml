@@ -176,6 +176,7 @@
 							<goal>rpm</goal>
 						</goals>
 						<configuration>
+							<packageName>saw-gateway</packageName>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-gateway-service</name>
