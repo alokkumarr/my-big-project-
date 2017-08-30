@@ -9,9 +9,11 @@
 - name: Install SAW Security package
   yum: name="{{ item }}" state=present
   with_fileglob: ["../rpms/saw-security-*.rpm"]
+  notify:
+    - restart saw-security
 - name: Run SAW Security configuration initialization
   command: /opt/bda/saw-security/bin/conf_init
 - name: Run SAW Security initial database setup
   command: /opt/bda/saw-security/db/setup/init
-- name: Enable and start SAW Security service
-  systemd: name=saw-security enabled=true state=started
+- name: Enable SAW Security service
+  systemd: name=saw-security enabled=true
