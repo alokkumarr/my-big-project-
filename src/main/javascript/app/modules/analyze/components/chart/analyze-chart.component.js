@@ -225,14 +225,12 @@ export const AnalyzeChartComponent = {
       if (isEmpty(filteredGridData)) {
         return;
       }
-      console.log(this.sorts);
       if (!isEmpty(this.sorts)) {
         filteredGridData = orderBy(
           filteredGridData,
           map(this.sorts, 'field.dataField'),
           map(this.sorts, 'order')
         );
-        console.log('sortData', filteredGridData);
       }
       const changes = this._ChartService.dataToChangeConfig(
         this.model.chartType,
