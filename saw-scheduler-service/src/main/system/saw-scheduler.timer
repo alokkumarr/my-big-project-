@@ -1,5 +1,5 @@
 [Unit]
-Description=Run SAW Scheduler daily
+Description=SAW Scheduler timer
 
 [Timer]
 OnCalendar=03:00

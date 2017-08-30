@@ -1,6 +1,6 @@
 - name: Install SAW Scheduler Service package
   yum: name="{{ item }}" state=present
-  with_fileglob: ["../rpms/saw-scheduler-service-*.rpm"]
+  with_fileglob: ["../rpms/saw-scheduler-*.rpm"]
 - name: Enable SAW Scheduler Service timer
   systemd: name=saw-scheduler enabled=true
   notify:
