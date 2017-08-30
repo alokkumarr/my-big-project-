@@ -9,7 +9,7 @@ import map from 'lodash/map';
 import values from 'lodash/values';
 import clone from 'lodash/clone';
 import set from 'lodash/set';
-import concat from 'lodash/concat';
+import orderBy from 'lodash/orderBy';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -162,6 +162,7 @@ export const AnalyzeChartComponent = {
     }
 
     onSettingsChanged() {
+      this.sortFields = this._SortService.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
       this.analysisUnSynched();
       this.startDraftMode();
     }
@@ -223,6 +224,15 @@ export const AnalyzeChartComponent = {
     reloadChart(settings, filteredGridData) {
       if (isEmpty(filteredGridData)) {
         return;
+      }
+      console.log(this.sorts);
+      if (!isEmpty(this.sorts)) {
+        filteredGridData = orderBy(
+          filteredGridData,
+          map(this.sorts, 'field.dataField'),
+          map(this.sorts, 'order')
+        );
+        console.log('sortData', filteredGridData);
       }
       const changes = this._ChartService.dataToChangeConfig(
         this.model.chartType,
@@ -297,13 +307,8 @@ export const AnalyzeChartComponent = {
         sorts: map(this.sorts, sort => clone(sort))
       }).then(sorts => {
         this.sorts = sorts;
-        console.log('sorts', this.sorts);
-        this.applySorts();
+        this.onRefreshData();
       });
-    }
-
-    applySorts() {
-      this.onRefreshData();
     }
 
     openSaveChartModal(ev) {
