@@ -4,7 +4,8 @@
     <md-button ng-click="$ctrl.onClick($event)"
                ng-href="{{$ctrl.metadata.url}}">
       <div flex layout="row">
-        <span ng-bind="$ctrl.metadata.name"></span>
+        <span ng-class="{activeButton: $ctrl.checkActiveMenu('{{$ctrl.metadata.url}}') }" 
+        ng-bind="$ctrl.metadata.name"></span>
       </div>
     </md-button>
   </div>
@@ -22,7 +23,7 @@
       </div>
     </md-button>
 
-    <ul class="menu-toggle-list"
+    <ul class="menu-toggle-list" ng-init="$ctrl.checkAndCollapse()"
         collapse="!$ctrl.isOpen">
       <li ng-repeat="childItem in $ctrl.metadata.children">
         <accordion-menu-link metadata="childItem"></accordion-menu-link>
