@@ -8,7 +8,7 @@
   notify:
     - restart saw-transport
 - name: Enable SAW Transport Service
-  systemd: name=saw-transport enabled=true
+  systemd: name=saw-transport enabled=true daemon_reload=true
 - name: Create SAW Transport Service metadata store directory
   become: true
   become_user: mapr
