@@ -2,3 +2,4 @@
   roles:
     - saw-transport
     - saw-scheduler
+    - saw-gateway

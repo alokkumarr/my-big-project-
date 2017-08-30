@@ -1,0 +1,7 @@
+[Unit]
+Description=SAW Gateway
+
+[Service]
+ExecStart=/bin/sh -c "exec java -jar /opt/bda/saw-gateway-service/saw-gateway.jar --spring.config.location=/opt/bda/saw-gateway-service/conf/application.yml"
+SyslogIdentifier=saw-gateway-service
+User=mapr

@@ -17,6 +17,11 @@
       <artifactId>saw-scheduler-service</artifactId>
       <version>${revision}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>saw-gateway-service</artifactId>
+      <version>${revision}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -30,6 +35,7 @@
           <!-- Remove artifact classifier "bin" from archive name -->
           <appendAssemblyId>false</appendAssemblyId>
           <finalName>saw-services-${project.version}</finalName>
+          <tarLongFileMode>posix</tarLongFileMode>
         </configuration>
         <executions>
           <execution>

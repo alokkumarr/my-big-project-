@@ -5,24 +5,23 @@ spring:
     name: saw-gateway-service
 server:
   address: localhost
-  port: 9002 
-  context-path: /saw
+  port: 9100 
+  context-path: /api-gateway
   compression:
     enabled: true    
 
 analysis:
     service:
-        host: https://saw.bda.poc.velocity-va.synchronoss.net
+        host: localhost:9200
 metadata:
     service:
-        host: https://saw.bda.poc.velocity-va.synchronoss.net
+        host: localhost:9200
 semantic:
     service:
-        host: https://saw.bda.poc.velocity-va.synchronoss.net
+        host: localhost:9200
 security:
     service:
-        host: http://localhost:8081/saw-security
-
+        host: localhost:9000/saw-security
 
 api:
     gateway:
@@ -38,4 +37,7 @@ api:
             path: '[/]*api/analysis*'
         -   location: ${semantic.service.host}
             method: POST
-            path: '[/]*api/semantic*'            
+            path: '[/]*api/semantic*'
+logging:
+  config: /opt/bda/saw-gateway-service/conf/logback.xml
+  file: /var/bda/service/saw/gateway/logs/
