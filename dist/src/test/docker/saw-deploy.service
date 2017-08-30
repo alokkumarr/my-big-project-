@@ -6,6 +6,7 @@ After=default.target
 Type=oneshot
 ExecStart=/root/deploy
 WorkingDirectory=/maven
+Environment=container=docker
 SyslogIdentifier=saw-deploy
 
 [Install]

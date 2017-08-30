@@ -35,6 +35,7 @@
           <!-- Remove artifact classifier "bin" from archive name -->
           <appendAssemblyId>false</appendAssemblyId>
           <finalName>saw-services-${project.version}</finalName>
+          <!-- Enable long file names without Maven warning -->
           <tarLongFileMode>posix</tarLongFileMode>
         </configuration>
         <executions>

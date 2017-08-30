@@ -1,7 +1,18 @@
 - name: Install SAW Transport Service package
   yum: name="{{ item }}" state=present
   with_fileglob: ["../rpms/saw-transport-service-*.rpm"]
+  notify:
+    - restart saw-transport
 - name: Install SAW Transport Service configuration file
   template: src=application.conf dest=/opt/saw/service/conf
-- name: Enable and start SAW Transport Service
-  systemd: name=saw-transport enabled=true state=started
+  notify:
+    - restart saw-transport
+- name: Enable SAW Transport Service
+  systemd: name=saw-transport enabled=true
+- name: Create SAW Transport Service metadata store directory
+  become: true
+  become_user: mapr
+  shell: hadoop fs -mkdir -p /main/metadata
+  # Workaround: There is no MapR client configured when running inside
+  # Docker container, so skip steps to initialize MapR-FS
+  when: lookup('env', 'container') != 'docker'

@@ -2,6 +2,7 @@
 #
 # Deploy SAW Services into localhost
 #
+set -eu
 
 tar -xzf saw-services-*.tgz
 echo "Starting deployment"
