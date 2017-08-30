@@ -558,7 +558,7 @@
                     <targetOS>i386-linux</targetOS>
                     <group>SAW/Transport Server</group>
                     <packager>SAW</packager>
-                    <name>${project.artifactId}</name>
+                    <name>saw-transport</name>
 
                     <defineStatements>
                         <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
