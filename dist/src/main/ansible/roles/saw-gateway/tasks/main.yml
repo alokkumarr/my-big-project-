@@ -1,0 +1,7 @@
+- name: Install SAW Gateway Service package
+  yum: name="{{ item }}" state=present
+  with_fileglob: ["../rpms/saw-gateway-service-*.rpm"]
+- name: Install SAW Gateway Service configuration file
+  template: src=application.yml dest=/opt/bda/saw-gateway-service/conf
+- name: Enable and start SAW Gateway Service
+  systemd: name=saw-gateway enabled=true state=started
