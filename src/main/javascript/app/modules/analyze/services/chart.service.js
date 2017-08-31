@@ -643,6 +643,15 @@ export function ChartService(Highcharts) {
           groupBy
         };
         break;
+      case 'scatter':
+        xaxis = attributes;
+        yaxis = attributes;
+        settingsObj = {
+          xaxis,
+          yaxis,
+          groupBy
+        };
+        break;
       default:
         xaxis = filterStringTypes(attributes);
         yaxis = filterNumberTypes(attributes);

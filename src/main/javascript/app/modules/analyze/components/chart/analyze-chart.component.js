@@ -10,6 +10,8 @@ import map from 'lodash/map';
 import values from 'lodash/values';
 import clone from 'lodash/clone';
 import set from 'lodash/set';
+import concat from 'lodash/concat';
+import remove from 'lodash/remove';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -36,7 +38,7 @@ export const AnalyzeChartComponent = {
   },
   controller: class AnalyzeChartController extends AbstractDesignerComponentController {
     constructor($componentHandler, $timeout, AnalyzeService,
-                ChartService, FilterService, $mdSidenav, $translate, toastMessage, $injector) {
+      ChartService, FilterService, $mdSidenav, $translate, toastMessage, $injector) {
       'ngInject';
       super($injector);
       this._FilterService = FilterService;
@@ -257,8 +259,19 @@ export const AnalyzeChartComponent = {
 
       const allFields = [g, x, ...y, z];
 
-      const nodeFields = filter(allFields, this.isStringField);
+      let nodeFields = filter(allFields, this.isStringField);
       const dataFields = filter(allFields, this.isDataField);
+
+      if (payload.chartType === 'scatter') {
+        const xFields = remove(dataFields, ({checked}) => checked === 'x');
+        nodeFields = concat(xFields, nodeFields);
+      }
+
+      forEach(dataFields, field => {
+        if (!field.aggregate) {
+          field.aggregate = 'sum';
+        }
+      });
 
       set(payload, 'sqlBuilder.dataFields', dataFields);
       set(payload, 'sqlBuilder.nodeFields', nodeFields);

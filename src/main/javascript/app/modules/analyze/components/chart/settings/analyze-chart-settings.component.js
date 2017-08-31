@@ -59,7 +59,9 @@ export const AnalyzeChartSettingsComponent = {
       if (this.multipleYAxes.enabled) {
         this.multipleYAxes.fields = map(this.settings.yaxis, field => {
           const clonedField = clone(field);
-          if (clonedField.checked === 'y') {
+          if (clonedField.checked && clonedField.checked !== 'y') {
+            clonedField.disabled = true;
+          } else if (clonedField.checked === 'y') {
             clonedField.checked = true;
           }
           return clonedField;
@@ -75,6 +77,7 @@ export const AnalyzeChartSettingsComponent = {
     inputChanged(axisOptions, selectedAttr, marker) {
       if (this.multipleYAxes.enabled === false || marker !== 'y') {
         this.setRadioButtonSelection(axisOptions, selectedAttr, marker);
+        this.markSelected();
       } else {
         this.setCheckBoxSelection(axisOptions, selectedAttr);
       }

@@ -864,6 +864,8 @@ echo ${app.nameVer} pre-install is being executed
                 <finalName>${app.name}-${project.version}</finalName>
                 <!-- Remove artifact classifier "bin" from archive name -->
                 <appendAssemblyId>false</appendAssemblyId>
+                <!-- Enable long file names without Maven warning -->
+                <tarLongFileMode>posix</tarLongFileMode>
               </configuration>
               <executions>
                 <execution>
