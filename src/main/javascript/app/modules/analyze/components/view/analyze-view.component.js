@@ -44,8 +44,7 @@ export const AnalyzeViewComponent = {
 
       this.states = {
         reportView: [this.LIST_VIEW, this.CARD_VIEW].indexOf(savedView) >= 0 ?
-          savedView :
-          this.CARD_VIEW,
+          savedView : this.LIST_VIEW,
         analysisType: 'all',
         searchTerm: ''
       };
