@@ -100,7 +100,7 @@ export const AnalyzeListViewComponent = {
         dataField: 'name',
         allowSorting: true,
         alignment: 'left',
-        width: '50%',
+        width: '40%',
         cellTemplate: 'nameCellTemplate',
         cssClass: 'branded-column-name'
       }, {
@@ -130,6 +130,25 @@ export const AnalyzeListViewComponent = {
           return (rowData.type || '').toUpperCase();
         },
         cellTemplate: 'typeCellTemplate'
+      }, {
+        caption: 'CREATOR',
+        dataField: 'userFullName',
+        allowSorting: true,
+        alignment: 'left',
+        width: '10%',
+        calculateCellValue: rowData => {
+          return (rowData.userFullName || '').toUpperCase();
+        },
+        cellTemplate: 'creatorCellTemplate'
+      }, {
+        caption: 'CREATED',
+        allowSorting: true,
+        alignment: 'left',
+        width: '10%',
+        calculateCellValue: rowData => {
+          return (new Date(rowData.createdTimestamp).toDateString() || '').toUpperCase();
+        },
+        cellTemplate: 'timecreatedCellTemplate'
       }, {
         caption: '',
         cellTemplate: 'actionCellTemplate'

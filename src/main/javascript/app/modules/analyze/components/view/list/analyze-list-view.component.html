@@ -1,12 +1,4 @@
 <md-card>
-  <md-card-header layout="row" layout-align="end start">
-    <md-card-title>
-      <md-card-title-text>
-        <span class="md-headline" translate="LIST"></span>
-      </md-card-title-text>
-    </md-card-title>
-  </md-card-header>
-
   <md-card-content layout="row">
     <div dx-data-grid="$ctrl.gridConfig" dx-item-alias="report">
       <div data-options="dxTemplate: { name: 'nameCellTemplate' }" >
@@ -25,6 +17,12 @@
         <md-chip class="tag-chip">
           <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>
         </md-chip>
+      </div>
+      <div data-options="dxTemplate: { name: 'creatorCellTemplate' }">
+        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>
+      </div>
+      <div data-options="dxTemplate: { name: 'timecreatedCellTemplate' }">
+          <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>
       </div>
       <div data-options="dxTemplate: { name: 'actionCellTemplate' }">
         <md-card-actions layout="row" layout-align="center center">
