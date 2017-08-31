@@ -10,7 +10,7 @@ dir=$(dirname $0)
 cd $dir
 
 # Add SAW modules
-rm -r modules
+rm -rf modules
 mkdir modules
 cd modules
 for module in saw-security saw-services saw-web; do
