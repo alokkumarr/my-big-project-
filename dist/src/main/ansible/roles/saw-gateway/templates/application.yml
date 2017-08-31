@@ -33,7 +33,7 @@ api:
             path: '[/]*api/md*'
         -   location: ${analysis.service.host}
             method: GET
-            path: '[/]*api/analysis.*'
+            path: '[/]*api/analysis*'
         -   location: ${analysis.service.host}
             method: POST
             path: '[/]*api/analysis*'
