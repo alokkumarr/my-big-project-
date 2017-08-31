@@ -28,6 +28,8 @@ export const ReportGridDisplayComponent = {
     $onInit() {
       const columns = this._getDxColumns(this.columns);
 
+      const gridSelector = '.report-dx-grid.report-dx-grid-display';
+
       this.gridConfig = this._dxDataGridService.mergeWithDefaultConfig({
         columns,
         remoteOperations: {
@@ -47,7 +49,7 @@ export const ReportGridDisplayComponent = {
         },
         loadPanel: {
           position: {
-            of: '.dx-datagrid-rowsview',
+            of: gridSelector,
             at: 'center',
             my: 'center'
           },
@@ -58,7 +60,7 @@ export const ReportGridDisplayComponent = {
           }
         },
         bindingOptions: {
-          'loadPanel.position.of': '$ctrl.pageSize > 50 ? window : ".dx-datagrid-rowsview"'
+          'loadPanel.position.of': `$ctrl.pageSize > ${DEFAULT_PAGE_SIZE} ? window : "${gridSelector}"`
         },
         onInitialized: this.onGridInitialized.bind(this)
       });
