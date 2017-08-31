@@ -40,4 +40,3 @@ api:
             path: '[/]*api/semantic*'
 logging:
   config: /opt/bda/saw-gateway-service/conf/logback.xml
-  file: /var/bda/service/saw/gateway/logs/
