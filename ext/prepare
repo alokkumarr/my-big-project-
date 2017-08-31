@@ -10,9 +10,10 @@ dir=$(dirname $0)
 cd $dir
 
 # Add SAW modules
-mkdir -p modules
+rm -r modules
+mkdir modules
 cd modules
 for module in saw-security saw-services saw-web; do
     tar -xzf ../$module-*.tgz
-    ln -sf $module-* $module
+    ln -s $module-* $module
 done
