@@ -38,14 +38,17 @@ export default class AbstractDesignerComponentController {
   }
 
   // Filters
-  clearFilters() {
+  onClearAllFilters() {
     this.filters = [];
     this.didAnalysisChange = true;
     this.startDraftMode();
   }
 
-  onFilterRemoved(index) {
-    this.filters.splice(index, 1);
+  clearFilters() {
+    this.onClearAllFilters();
+  }
+
+  onFilterRemoved(/* index */) {
     this.didAnalysisChange = true;
     this.startDraftMode();
   }

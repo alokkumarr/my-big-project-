@@ -1,6 +1,10 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
+import clone from 'lodash/clone';
+import some from 'lodash/some';
+import sum from 'lodash/sum';
 import map from 'lodash/map';
+import round from 'lodash/round';
 import flatMap from 'lodash/flatMap';
 import assign from 'lodash/assign';
 import find from 'lodash/find';
@@ -63,7 +67,7 @@ const LAYOUT_POSITIONS = {
   }
 };
 
-export function ChartService() {
+export function ChartService(Highcharts) {
   'ngInject';
 
   /* Customize default config for stack column chart */
@@ -82,12 +86,12 @@ export function ChartService() {
   const pieConfig = config => {
     delete config.xAxis;
     delete config.yAxis;
-    set(config, 'plotOptions.pie.showInLegend', true);
     set(config, 'series', [{
       name: 'Brands',
       colorByPoint: true,
       data: []
     }]);
+    set(config, 'plotOptions.pie.showInLegend', false);
     return config;
   };
 
@@ -137,6 +141,48 @@ export function ChartService() {
     }
     return config;
   };
+
+  /* Provides view related configuration for various chart types */
+  function getViewOptionsFor(type) {
+    const config = {
+      axisLabels: {
+        x: 'X-Axis', y: 'Y-Axis', z: 'Z-Axis', g: 'Group By'
+      },
+      renamable: {
+        x: true, y: true, z: false, g: false
+      },
+      required: {
+        x: true, y: true, z: false, g: false
+      },
+      customTooltip: true,
+      legend: true
+    };
+
+    switch (type) {
+      case 'bubble':
+        config.axisLabels.z = 'Size By';
+        config.axisLabels.g = 'Color By';
+        config.required.z = true;
+        return config;
+
+      case 'pie':
+        config.axisLabels.y = 'Angle';
+        config.axisLabels.x = 'Color By';
+        config.renamable.x = false;
+        config.customTooltip = false;
+        config.legend = false;
+        return config;
+
+      case 'column':
+      case 'bar':
+      case 'line':
+      case 'spline':
+      case 'stack':
+      case 'scatter':
+      default:
+        return config;
+    }
+  }
 
   /** the mapping between the tree level, and the columName of the field
    * Example:
@@ -207,13 +253,15 @@ export function ChartService() {
     }
     // split out categories form the data
     forEach(series, serie => {
-      forEach(serie.data, dataPoint => {
+      serie.data = map(serie.data, point => {
+        const dataPoint = clone(point);
         forEach(dataPoint, (v, k) => {
           if (isCategoryAxis(fields, k)) {
             addToCategory(categories, k, v);
             dataPoint[k] = indexOf(categories[k], v);
           }
         });
+        return dataPoint;
       });
     });
 
@@ -287,14 +335,136 @@ export function ChartService() {
     return isCategoryAxis;
   }
 
-  const dataToChangeConfig = (type, settings, gridData, opts) => {
-    const fields = {
-      x: find(settings.xaxis, attr => attr.checked === 'x'),
-      y: filter(settings.yaxis, attr => attr.checked === 'y'),
-      z: find(settings.zaxis, attr => attr.checked === 'z'),
-      g: find(settings.groupBy, attr => attr.checked === 'g')
-    };
+  function dataToNestedDonut(series, categories) {
+    /* Group by option forms the inner circle. X axis option forms the outer region
+       This logic is adapted from https://www.highcharts.com/demo/pie-donut */
 
+    const colors = Highcharts.getOptions().colors;
+    const gCategories = map(series, s => s.name);
+    const data = map(series, (s, i) => {
+      const drilldown = {
+        color: colors[i],
+        categories: map(s.data, d => get(categories, `x.${d.x}`)),
+        data: map(s.data, d => d.y)
+      };
+      return {
+        drilldown,
+        y: sum(drilldown.data)
+      };
+    });
+    const innerData = [];
+    const outerData = [];
+    const dataLen = data.length;
+
+    for (let i = 0; i < dataLen; i += 1) {
+
+      innerData.push({
+        name: gCategories[i],
+        y: data[i].y,
+        color: data[i].color
+      });
+
+      const drillDataLen = data[i].drilldown.data.length;
+      for (let j = 0; j < drillDataLen; j += 1) {
+        const brightness = 0.2 - (j / drillDataLen);
+        outerData.push({
+          name: data[i].drilldown.categories[j],
+          y: data[i].drilldown.data[j],
+          /* eslint-disable */
+          color: Highcharts.Color(data[i].color).brighten(brightness).get()
+          /* eslint-enable */
+        });
+      }
+    }
+
+    /* eslint-disable */
+    const chartSeries = [{
+      data: innerData,
+      dataLabels: {
+        formatter: function () {
+          return this.percentage > 5 ? `${this.point.name}: ${round(this.percentage, 2)}%` : null;
+        },
+        color: '#ffffff',
+        distance: -30
+      },
+      size: '60%'
+    }, {
+      data: outerData,
+      dataLabels: {
+        formatter: function () {
+          return `${this.point.name}: ${round(this.percentage, 2)}%`;
+        }
+      },
+      size: '100%',
+      innerSize: '60%',
+      id: 'outerData'
+    }];
+    /* eslint-enable */
+
+    return chartSeries;
+  }
+
+  function customizeSeriesForChartType(series, chartType, categories, fields) {
+    let mapperFn;
+    let chartSeries;
+
+    switch (chartType) {
+      case 'column':
+      case 'bar':
+      case 'line':
+      case 'spline':
+      case 'stack':
+      case 'scatter':
+      case 'bubble':
+        // the bubble chart already supports the parsed data
+        return {chartSeries: series};
+
+      case 'pie':
+        if (!fields.g) {
+          set(series, '0.dataLabels.format', '{point.name}: {point.percentage:.2f}%');
+          mapperFn = ({x, y}) => {
+            const category = get(categories, `x.${x}`);
+            return {name: category, y, drilldown: category};
+          };
+          forEach(series, serie => {
+            serie.data = map(serie.data, mapperFn);
+          });
+
+          chartSeries = series;
+
+        } else {
+          chartSeries = dataToNestedDonut(series, categories);
+        }
+
+        return {chartSeries};
+
+      default:
+        throw new Error(`Chart type: ${chartType} is not supported!`);
+    }
+  }
+
+  function getPieChangeConfig(type, settings, fields, gridData, opts) {
+    const changes = [];
+    const yField = get(fields, 'y.0', {});
+    const yLabel = get(opts, 'labels.y') || `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}`;
+
+    if (!isEmpty(gridData)) {
+      const {series, categories} = splitToSeriesAndCategories(gridData, fields);
+      const {chartSeries} = customizeSeriesForChartType(series, type, categories, fields, opts);
+
+      forEach(chartSeries, seriesData => {
+        seriesData.name = yLabel;
+      });
+      changes.push({
+        path: 'series',
+        data: chartSeries
+      });
+    }
+
+    return changes;
+  }
+
+  function getBarChangeConfig(type, settings, fields, gridData, opts) {
     const singleYAxis = fields.y.length === 1;
     let yLabel;
     if (singleYAxis) {
@@ -330,14 +500,47 @@ export function ChartService() {
       });
     }
 
+    return changes;
+  }
+
+  const dataToChangeConfig = (type, settings, gridData, opts) => {
+
+    let changes;
+    const fields = {
+      x: find(settings.xaxis, attr => attr.checked === 'x'),
+      y: filter(settings.yaxis, attr => attr.checked === 'y'),
+      z: find(settings.zaxis, attr => attr.checked === 'z'),
+      g: find(settings.groupBy, attr => attr.checked === 'g')
+    };
+
+    switch (type) {
+      case 'pie':
+        changes = getPieChangeConfig(type, settings, fields, gridData, opts);
+        break;
+      case 'column':
+      case 'bar':
+      case 'line':
+      case 'spline':
+      case 'stack':
+      case 'scatter':
+      case 'bubble':
+      default:
+        changes = getBarChangeConfig(type, settings, fields, gridData, opts);
+        break;
+    }
+
     return concat(
       changes,
-      addTooltipsAndLegend(fields)
+      addTooltipsAndLegend(fields, type)
     );
   };
 
-  function addTooltipsAndLegend(fields) {
+  function addTooltipsAndLegend(fields, type) {
     const changes = [];
+
+    if (!getViewOptionsFor(type).customTooltip) {
+      return changes;
+    }
 
     const xIsNumber = NUMBER_TYPES.includes(fields.x.type);
     const xIsString = fields.x.type === 'string';
@@ -347,14 +550,14 @@ export function ChartService() {
     // date -> just show the date
     const xStringValue = xIsString ?
       'point.key' : xIsNumber ?
-        'point.x:,.2f' : 'point.x';
+        'point.x:.2f' : 'point.x';
     const xAxisString = `<tr>
       <th>${fields.x.displayName}:</th>
       <td>{${xStringValue}}</td>
     </tr>`;
 
     const yIsSingle = fields.y.length === 1;
-    const yIsNumber = NUMBER_TYPES.includes(fields.y.type);
+    const yIsNumber = some(fields.y, y => NUMBER_TYPES.includes(y.type));
 
     const yField = fields.y[0];
     const yAxisName = `${yIsSingle || fields.g ?
@@ -362,10 +565,10 @@ export function ChartService() {
       '{series.name}'}`;
     const yAxisString = `<tr>
       <th>${yAxisName}:</th>
-      <td>{point.y${yIsNumber ? ':,.2f' : ''}}</td>
+      <td>{point.y${yIsNumber ? ':.2f' : ''}}</td>
     </tr>`;
     const zAxisString = fields.z ?
-    `<tr><th>${fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>` :
+    `<tr><th>${fields.z.displayName}:</th><td>{point.z:.2f}</td></tr>` :
     '';
     const groupString = fields.g ?
     `<tr><th>Group:</th><td>{point.g}</td></tr>` :
@@ -463,6 +666,7 @@ export function ChartService() {
 
   return {
     getChartConfigFor,
+    getViewOptionsFor,
     dataToChangeConfig,
     fillSettings,
     parseData,

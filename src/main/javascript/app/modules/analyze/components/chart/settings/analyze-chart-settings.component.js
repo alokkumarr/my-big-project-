@@ -13,6 +13,7 @@ export const AnalyzeChartSettingsComponent = {
   styles: [style],
   bindings: {
     settings: '<?',
+    viewOptions: '<?',
     onChange: '&',
     chartType: '<'
   },
