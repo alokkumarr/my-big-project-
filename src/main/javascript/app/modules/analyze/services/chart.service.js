@@ -21,7 +21,7 @@ import compact from 'lodash/compact';
 import fpGroupBy from 'lodash/fp/groupBy';
 import mapValues from 'lodash/mapValues';
 
-import {NUMBER_TYPES, AGGREGATE_TYPES_OBJ} from '../consts';
+import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ} from '../consts';
 
 const LEGEND_POSITIONING = {
   left: {
@@ -403,10 +403,11 @@ export function ChartService() {
     ));
   }
 
-  function filterStringTypes(attributes) {
+  function filterNodeTypes(attributes) {
     return filter(attributes, attr => (
       attr.columnName &&
-      (attr.type === 'string' || attr.type === 'String')
+      ((attr.type === 'string' || attr.type === 'String') ||
+      DATE_TYPES.includes(attr.type))
     ));
   }
 
@@ -426,11 +427,11 @@ export function ChartService() {
     let yaxis;
     let zaxis;
     let settingsObj;
-    const groupBy = filterStringTypes(attributes);
+    const groupBy = filterNodeTypes(attributes);
 
     switch (model.chartType) {
       case 'bubble':
-        xaxis = filterStringTypes(attributes);
+        xaxis = filterNodeTypes(attributes);
         yaxis = attributes;
         zaxis = filterNumberTypes(attributes);
         settingsObj = {
@@ -450,7 +451,7 @@ export function ChartService() {
         };
         break;
       default:
-        xaxis = filterStringTypes(attributes);
+        xaxis = filterNodeTypes(attributes);
         yaxis = filterNumberTypes(attributes);
         settingsObj = {
           yaxis,
