@@ -1,3 +1,5 @@
+import isEmpty from 'lodash/isEmpty';
+
 import template from './analyze-cards-view.component.html';
 
 export const AnalyzeCardsViewComponent = {
@@ -19,9 +21,13 @@ export const AnalyzeCardsViewComponent = {
     }
 
     filterReports(item) {
-      let isIncluded = true;
+      let isIncluded;
 
-      if (this.analysisType !== 'all') {
+      if (this.analysisType === 'all') {
+        isIncluded = true;
+      } else if (this.analysisType === 'scheduled') {
+        isIncluded = !isEmpty(item.scheduleHuman);
+      } else {
         isIncluded = this.analysisType === item.type;
       }
 
