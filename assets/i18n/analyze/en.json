@@ -59,6 +59,7 @@
   "TOOLTIP_EXECUTE_ANALYSIS": "Execute Analysis",
   "TOOLTIP_PIVOT_AREA": "Pivot area",
   "TOOLTIP_AGGREGATE_TYPE": "Aggregate type",
+  "TOOLTIP_GROUP_INTERVAL": "Group interval",
   "TOOLTIP_NUMBER_TYPE": "Number",
   "TOOLTIP_STRING_TYPE": "String",
   "TOOLTIP_DATE_TYPE": "Date",

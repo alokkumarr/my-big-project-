@@ -20,6 +20,7 @@ import concat from 'lodash/concat';
 import compact from 'lodash/compact';
 import fpGroupBy from 'lodash/fp/groupBy';
 import mapValues from 'lodash/mapValues';
+import moment from 'moment';
 
 import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ} from '../consts';
 
@@ -192,6 +193,10 @@ export function ChartService() {
     const areMultipleYAxes = fields.y.length > 1;
     const isGrouped = fields.g;
 
+    const fieldsArray = compact([fields.x, ...fields.y, fields.z, fields.g]);
+    const dateFields = filter(fieldsArray, ({type}) => DATE_TYPES.includes(type));
+    formatDatesIfNeeded(parsedData, dateFields);
+
     if (areMultipleYAxes) {
       series = splitSeriesByYAxes(parsedData, fields);
     } else if (isGrouped) {
@@ -205,7 +210,7 @@ export function ChartService() {
           dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val]))
       }];
     }
-    // split out categories form the data
+    // split out categories frem the data
     forEach(series, serie => {
       forEach(serie.data, dataPoint => {
         forEach(dataPoint, (v, k) => {
@@ -221,6 +226,16 @@ export function ChartService() {
       series,
       categories
     };
+  }
+
+  function formatDatesIfNeeded(parsedData, dateFields) {
+    if (!isEmpty(dateFields)) {
+      forEach(parsedData, dataPoint => {
+        forEach(dateFields, ({columnName, dateFormat}) => {
+          dataPoint[columnName] = moment(dataPoint[columnName]).format(dateFormat);
+        });
+      });
+    }
   }
 
   function splitSeriesByGroup(parsedData, fields) {
@@ -282,7 +297,8 @@ export function ChartService() {
     const isAxis = key !== 'g';
     // strings should be represented as categories in the chart
     /* eslint-disable angular/typecheck-string */
-    const isCategoryAxis = isAxis && (dataType === 'string' || dataType === 'String');
+    const isCategoryAxis = isAxis &&
+      (dataType === 'string' || dataType === 'String' || DATE_TYPES.includes(dataType));
     /* eslint-enable angular/typecheck-string */
     return isCategoryAxis;
   }
