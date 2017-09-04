@@ -1,4 +1,5 @@
 import map from 'lodash/map';
+import find from 'lodash/find';
 import fpPipe from 'lodash/fp/pipe';
 import fpFilter from 'lodash/fp/filter';
 import fpMap from 'lodash/fp/map';
