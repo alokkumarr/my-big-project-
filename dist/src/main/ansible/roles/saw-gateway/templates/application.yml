@@ -30,15 +30,15 @@ api:
         endpoints:
         -   location: ${metadata.service.host}
             method: POST
-            path: '[/]*api/md*'
+            path: '[/]md*'
         -   location: ${analysis.service.host}
             method: GET
-            path: '[/]*api/analysis*'
+            path: '[/]analysis*'
         -   location: ${analysis.service.host}
             method: POST
-            path: '[/]*api/analysis*'
+            path: '[/]analysis*'
         -   location: ${semantic.service.host}
             method: POST
-            path: '[/]*api/semantic*'
+            path: '[/]semantic*'
 logging:
   config: /opt/bda/saw-gateway-service/conf/logback.xml

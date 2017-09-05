@@ -79,7 +79,7 @@ public class GatewayController {
  * @throws IOException
  * @throws URISyntaxException
  */
-@RequestMapping(value = "/api/**", method = {GET, POST, DELETE, OPTIONS})
+@RequestMapping(value = "/**", method = {GET, POST, DELETE, OPTIONS})
   @ResponseBody
   public ResponseEntity<String> proxyRequest(HttpServletRequest request) throws NoSuchRequestHandlingMethodException, IOException, URISyntaxException {
     HttpUriRequest proxiedRequest = createHttpUriRequest(request);
