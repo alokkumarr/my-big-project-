@@ -14,16 +14,16 @@ server:
 
 analysis:
     service:
-        host: localhost:9200
+        host: http://localhost:9200
 metadata:
     service:
-        host: localhost:9200
+        host: http://localhost:9200
 semantic:
     service:
-        host: localhost:9200
+        host: http://localhost:9200
 security:
     service:
-        host: localhost:9000/saw-security
+        host: http://localhost:9000/saw-security
 
 api:
     gateway:
