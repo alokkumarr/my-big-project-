@@ -3,6 +3,8 @@ info:
 spring:
   application:
     name: saw-gateway-service
+  main:
+    banner-mode: 'off'
 server:
   address: localhost
   port: 9100 
