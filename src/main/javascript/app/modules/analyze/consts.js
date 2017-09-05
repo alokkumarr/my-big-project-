@@ -4,7 +4,7 @@ import fpMapValues from 'lodash/fp/mapValues';
 
 import {NUMBER_TYPES, DATE_TYPES} from '../../common/consts.js';
 
-export const Events = {
+   export var Events = {
   AnalysesRefresh: 'Analyses:Refresh'
 };
 

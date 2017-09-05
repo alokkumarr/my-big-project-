@@ -365,7 +365,7 @@ export const AnalyzePivotComponent = {
             }
             return backendField;
           })
-        ),
+        )
       )(this.artifacts[0].columns);
 
       return {

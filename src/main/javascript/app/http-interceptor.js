@@ -18,7 +18,7 @@ function openErrorDetails(dialog, error) {
 
 export function interceptor($httpProvider) {
   'ngInject';
-  /* eslint-disable */
+  /* tslint:disable */
   $httpProvider.interceptors.push(function toastInterceptor($injector) {
     'ngInject';
     return {
@@ -113,5 +113,5 @@ export function interceptor($httpProvider) {
       }
     };
   });
-  /* eslint-enable */
+  /* tslint:enable */
 }

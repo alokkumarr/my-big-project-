@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* tslint:disable */
 export const bubbleChartDataGrouped = {
   node_field_1: {
     doc_count_error_upper_bound: 0,
@@ -484,4 +484,4 @@ export const columnChartGroupedData = {
     ]
   }
 };
-/* eslint-enable */
+/* tslint:enable */

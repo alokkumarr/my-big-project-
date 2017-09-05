@@ -27,7 +27,7 @@ module.exports = function (env) {
           options: {
             fix: false,
             tsConfigFile: webpackHelper.root('conf/tsconfig.json'),
-            configuration: require(webpackHelper.root('conf/eslint-dev-rules.js'))
+            configFile: webpackHelper.root('conf/tslint-dev.json')
           }
         },
         {
