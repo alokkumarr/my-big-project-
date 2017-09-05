@@ -13,7 +13,7 @@
     "e2e": "protractor conf/protractor.conf.js",
     "express": "node src/main/javascript/middlelayer/index.js",
     "prepush": "npm run lint",
-    "lint": "eslint -c .eslintrc.js --ext .js ./src",
+    "lint": "tslint -c .eslintrc.js ./src",
     "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
@@ -100,6 +100,10 @@
     "stylelint-config-standard": "16.0.0",
     "stylelint-loader": "6.2.0",
     "stylelint-webpack-plugin": "0.6.0",
+    "ts-loader": "^2.3.4",
+    "tslint": "^5.7.0",
+    "tslint-loader": "^3.5.3",
+    "typescript": "^2.4.2",
     "url-loader": "0.5.7",
     "webpack": "2.2.1",
     "webpack-bundle-analyzer": "2.4.0",

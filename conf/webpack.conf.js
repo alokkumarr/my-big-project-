@@ -69,12 +69,13 @@ module.exports = function (env) {
           enforce: 'pre',
           test: /\.js$/,
           exclude: /node_modules/,
-          loader: 'eslint-loader',
+          loader: 'tslint-loader',
           options: {
             fix: false,
-            configFile: isDevelopment ?
-              webpackHelper.root('conf/eslint-dev-rules.js') :
-              webpackHelper.root('conf/eslint-prod-rules.js')
+            tsConfigFile: webpackHelper.root('conf/tsconfig.json'),
+            configuration: isDevelopment ?
+              require(webpackHelper.root('conf/eslint-dev-rules.js')) :
+              require(webpackHelper.root('conf/eslint-prod-rules.js'))
           }
         },
         {
@@ -90,7 +91,13 @@ module.exports = function (env) {
         {
           test: /\.js$/,
           exclude: /node_modules/,
-          loader: 'ng-annotate-loader!babel-loader'
+          loaders: ['ng-annotate-loader', {
+            loader: 'ts-loader',
+            options: {
+              configFile: webpackHelper.root('conf/tsconfig.json'),
+              entryFileIsJs: true
+            }
+          }]
         },
         {
           test: /\.html$/,
