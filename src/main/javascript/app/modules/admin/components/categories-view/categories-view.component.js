@@ -1,6 +1,6 @@
-import map from 'lodash/map';
+import * as map from 'lodash/map';
 
-import template from './categories-view.component.html';
+import * as template from './categories-view.component.html';
 import style from './categories-view.component.scss';
 import AbstractComponentController from 'app/common/components/abstractComponent';
 import {Subject} from 'rxjs/Subject';

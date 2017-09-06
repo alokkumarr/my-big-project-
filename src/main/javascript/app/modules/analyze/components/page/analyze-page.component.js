@@ -1,8 +1,8 @@
-import fpFirst from 'lodash/fp/first';
-import fpGet from 'lodash/fp/get';
-import fpPipe from 'lodash/fp/pipe';
+import * as fpFirst from 'lodash/fp/first';
+import * as fpGet from 'lodash/fp/get';
+import * as fpPipe from 'lodash/fp/pipe';
 
-import template from './analyze-page.component.html';
+import * as template from './analyze-page.component.html';
 import style from './analyze-page.component.scss';
 import {LAST_ANALYSES_CATEGORY_ID} from '../../consts';
 

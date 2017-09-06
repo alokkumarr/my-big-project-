@@ -1,4 +1,4 @@
-import template from './jsPlumbJoinDialog.component.html';
+import * as template from './jsPlumbJoinDialog.component.html';
 import style from './jsPlumbJoinDialog.component.scss';
 
 export const JSPlumbJoinDialog = {

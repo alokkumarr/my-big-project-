@@ -1,7 +1,7 @@
-import defaultsDeep from 'lodash/defaultsDeep';
-import forEach from 'lodash/forEach';
-import set from 'lodash/set';
-import isArray from 'lodash/isArray';
+import * as defaultsDeep from 'lodash/defaultsDeep';
+import * as forEach from 'lodash/forEach';
+import * as set from 'lodash/set';
+import * as isArray from 'lodash/isArray';
 import {globalChartOptions, chartOptions} from './default-chart-options';
 
 export const UPDATE_PATHS = {

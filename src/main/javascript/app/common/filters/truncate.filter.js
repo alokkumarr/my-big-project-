@@ -1,4 +1,4 @@
-import truncate from 'lodash/truncate';
+import * as truncate from 'lodash/truncate';
 
 export function truncateFilter() {
   return (input, length) => {

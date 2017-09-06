@@ -1,8 +1,8 @@
-import get from 'lodash/get';
-import values from 'lodash/values';
+import * as get from 'lodash/get';
+import * as values from 'lodash/values';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
-import template from './analyze-chart-detail.component.html';
+import * as template from './analyze-chart-detail.component.html';
 
 export const AnalyzeChartDetailComponent = {
   template,

@@ -1,4 +1,4 @@
-import template from './accordionMenuLink.component.html';
+import * as template from './accordionMenuLink.component.html';
 
 export const AccordionMenuLink = {
   template,

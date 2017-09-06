@@ -1,9 +1,9 @@
-import filter from 'lodash/filter';
-import isString from 'lodash/isString';
-import invoke from 'lodash/invoke';
-import upperCase from 'lodash/upperCase';
+import * as filter from 'lodash/filter';
+import * as isString from 'lodash/isString';
+import * as invoke from 'lodash/invoke';
+import * as upperCase from 'lodash/upperCase';
 
-import template from './analyze-actions-menu.component.html';
+import * as template from './analyze-actions-menu.component.html';
 
 export const AnalyzeActionsMenuComponent = {
   template,

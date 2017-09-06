@@ -1,8 +1,8 @@
-import cloneDeep from 'lodash/cloneDeep';
-import map from 'lodash/map';
-import omit from 'lodash/omit';
+import * as cloneDeep from 'lodash/cloneDeep';
+import * as map from 'lodash/map';
+import * as omit from 'lodash/omit';
 
-import template from './filter-sidenav.component.html';
+import * as template from './filter-sidenav.component.html';
 
 export const OBSERVE_FILTER_SIDENAV_ID = 'observe-filter-sidenav';
 export const FilterSidenavComponent = {

@@ -1,4 +1,4 @@
-import template from './users-view.component.html';
+import * as template from './users-view.component.html';
 import style from './users-view.component.scss';
 import AbstractComponentController from 'app/common/components/abstractComponent';
 import {Subject} from 'rxjs/Subject';

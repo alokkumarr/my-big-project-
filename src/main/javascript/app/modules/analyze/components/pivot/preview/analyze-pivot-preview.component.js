@@ -1,4 +1,4 @@
-import template from './analyze-pivot-preview.component.html';
+import * as template from './analyze-pivot-preview.component.html';
 import style from './analyze-pivot-preview.component.scss';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 

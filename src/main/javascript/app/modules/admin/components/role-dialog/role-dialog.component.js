@@ -1,4 +1,4 @@
-import template from './role-dialog.component.html';
+import * as template from './role-dialog.component.html';
 import style from './role-dialog.component.scss';
 
 export const RoleDialogComponent = {

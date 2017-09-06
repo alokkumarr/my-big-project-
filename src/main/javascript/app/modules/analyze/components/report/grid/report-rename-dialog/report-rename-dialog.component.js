@@ -1,4 +1,4 @@
-import template from './report-rename-dialog.component.html';
+import * as template from './report-rename-dialog.component.html';
 
 export const ReportRenameDialogComponent = {
   template,

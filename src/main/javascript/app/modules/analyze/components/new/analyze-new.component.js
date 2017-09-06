@@ -1,8 +1,8 @@
-import set from 'lodash/set';
-import forEach from 'lodash/forEach';
-import find from 'lodash/find';
+import * as set from 'lodash/set';
+import * as forEach from 'lodash/forEach';
+import * as find from 'lodash/find';
 
-import template from './analyze-new.component.html';
+import * as template from './analyze-new.component.html';
 import style from './analyze-new.component.scss';
 import emptyTemplate from './analyze-new-empty.html';
 import methods from './methods';

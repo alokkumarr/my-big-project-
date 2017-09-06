@@ -1,4 +1,4 @@
-import get from 'lodash/get';
+import * as get from 'lodash/get';
 
 /* on tap handler for error toast message. Used to expand a more detailed
  view of error */

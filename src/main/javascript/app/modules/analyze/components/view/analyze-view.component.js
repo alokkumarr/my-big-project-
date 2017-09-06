@@ -1,8 +1,8 @@
-import template from './analyze-view.component.html';
+import * as template from './analyze-view.component.html';
 import style from './analyze-view.component.scss';
 
-import remove from 'lodash/remove';
-import findIndex from 'lodash/findIndex';
+import * as remove from 'lodash/remove';
+import * as findIndex from 'lodash/findIndex';
 import {Subject} from 'rxjs/Subject';
 
 import {Events} from '../../consts';

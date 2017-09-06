@@ -1,5 +1,5 @@
-import defaultsDeep from 'lodash/defaultsDeep';
-import clone from 'lodash/clone';
+import * as defaultsDeep from 'lodash/defaultsDeep';
+import * as clone from 'lodash/clone';
 
 import {AnalyseTypes} from '../../consts';
 

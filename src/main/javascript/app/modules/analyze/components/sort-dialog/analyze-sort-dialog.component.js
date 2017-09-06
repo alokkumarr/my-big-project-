@@ -1,6 +1,6 @@
-import find from 'lodash/find';
+import * as find from 'lodash/find';
 
-import template from './analyze-sort-dialog.component.html';
+import * as template from './analyze-sort-dialog.component.html';
 import style from './analyze-sort-dialog.component.scss';
 import {DATE_TYPES, NUMBER_TYPES} from '../../consts';
 

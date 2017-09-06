@@ -5,7 +5,7 @@ import * as forEach from 'lodash/forEach';
 import * as filter from 'lodash/filter';
 import * as map from 'lodash/map';
 
-import template from './analyze-pivot-settings.component.html';
+import * as template from './analyze-pivot-settings.component.html';
 import style from './analyze-pivot-settings.component.scss';
 import {DATE_TYPES, MAX_POSSIBLE_FIELDS_OF_SAME_AREA,
   AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE, AGGREGATE_TYPES_OBJ} from '../../../consts';

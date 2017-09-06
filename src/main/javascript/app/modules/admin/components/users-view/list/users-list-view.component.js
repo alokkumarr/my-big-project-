@@ -1,5 +1,5 @@
-import template from './users-list-view.component.html';
-import isUndefined from 'lodash/isUndefined';
+import * as template from './users-list-view.component.html';
+import * as isUndefined from 'lodash/isUndefined';
 
 export const UsersListViewComponent = {
   template,

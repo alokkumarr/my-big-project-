@@ -1,4 +1,4 @@
-import template from './user-edit.component.html';
+import * as template from './user-edit.component.html';
 import style from './user-edit.component.scss';
 
 export const UserEditComponent = {

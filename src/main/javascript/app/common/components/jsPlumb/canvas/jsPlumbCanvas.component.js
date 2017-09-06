@@ -1,6 +1,6 @@
 import jsPlumb from 'jsplumb';
 
-import template from './jsPlumbCanvas.component.html';
+import * as template from './jsPlumbCanvas.component.html';
 import style from './jsPlumbCanvas.component.scss';
 import {JS_PLUMB_DEFAULT_SETTINGS} from '../settings';
 import {CanvasModel} from '../models/canvasModel';

@@ -1,7 +1,7 @@
-import map from 'lodash/map';
+import * as map from 'lodash/map';
 import DataSource from 'devextreme/data/data_source';
 
-import template from './report-grid-display.component.html';
+import * as template from './report-grid-display.component.html';
 
 import {NUMBER_TYPES} from '../../../consts.js';
 

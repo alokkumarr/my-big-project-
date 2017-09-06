@@ -1,12 +1,12 @@
-import map from 'lodash/fp/map';
-import cloneDeep from 'lodash/cloneDeep';
-import get from 'lodash/get';
-import reduce from 'lodash/fp/reduce';
-import filter from 'lodash/fp/filter';
-import isEmpty from 'lodash/isEmpty';
-import isNumber from 'lodash/isNumber';
-import values from 'lodash/values';
-import find from 'lodash/find';
+import * as map from 'lodash/fp/map';
+import * as cloneDeep from 'lodash/cloneDeep';
+import * as get from 'lodash/get';
+import * as reduce from 'lodash/fp/reduce';
+import * as filter from 'lodash/fp/filter';
+import * as isEmpty from 'lodash/isEmpty';
+import * as isNumber from 'lodash/isNumber';
+import * as values from 'lodash/values';
+import * as find from 'lodash/find';
 
 import {OPERATORS} from '../components/filter/filters/number-filter.component';
 

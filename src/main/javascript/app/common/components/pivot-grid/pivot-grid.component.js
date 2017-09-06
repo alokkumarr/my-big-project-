@@ -1,9 +1,9 @@
-import forEach from 'lodash/forEach';
-import assign from 'lodash/assign';
-import values from 'lodash/values';
-import mapValues from 'lodash/mapValues';
+import * as forEach from 'lodash/forEach';
+import * as assign from 'lodash/assign';
+import * as values from 'lodash/values';
+import * as mapValues from 'lodash/mapValues';
 
-import template from './pivot-grid.component.html';
+import * as template from './pivot-grid.component.html';
 import style from './pivot-grid.component.scss';
 
 export const PivotGridComponent = {

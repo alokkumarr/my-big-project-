@@ -1,4 +1,4 @@
-import template from './report-grid-display-node.component.html';
+import * as template from './report-grid-display-node.component.html';
 import style from './report-grid-display-node.component.scss';
 
 import {LAYOUT_MODE} from '../container/report-grid-display-container.component';

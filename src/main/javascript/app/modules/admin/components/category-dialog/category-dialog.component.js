@@ -1,4 +1,4 @@
-import template from './category-dialog.component.html';
+import * as template from './category-dialog.component.html';
 import style from './category-dialog.component.scss';
 
 export const CategoryDialogComponent = {
