@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# Create network tunnel for MapR client to access the development MapR
+# cluster
+#
+set -eu
+
+ssh_cmd="sshpass -p mapr ssh -o StrictHostKeyChecking=no"
+remote="mapr@mapr02.bda.poc.velocity-va.sncrcorp.net"
+
+exec sshuttle -e "$ssh_cmd" -r $remote --dns -N

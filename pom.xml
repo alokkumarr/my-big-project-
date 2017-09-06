@@ -65,6 +65,11 @@
                 </assembly>
               </build>
               <run>
+                <!-- Allow using short names like "mapr01" for MapR
+                     cluster hosts inside container -->
+                <dnsSearch>
+                  <host>bda.poc.velocity-va.sncrcorp.net</host>
+                </dnsSearch>
                 <ports> 
                   <port>80:80</port>
                 </ports>

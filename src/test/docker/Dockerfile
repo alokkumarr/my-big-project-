@@ -44,6 +44,16 @@ RUN yum -y -q --nogpgcheck install mapr-client mapr-spark perl
 RUN yum -y -q --nogpgcheck install mariadb-server
 RUN yum -y -q --nogpgcheck install java-1.8.0-openjdk-headless MySQL-python
 
+# Configure MapR client
+ADD mapr-configure /root/
+RUN /root/mapr-configure
+
+# Enable tunneling for MapR client
+RUN yum -y -q --nogpgcheck install sshuttle sshpass
+ADD tunnel /root/
+COPY saw-tunnel.service /etc/systemd/system/
+RUN systemctl enable saw-tunnel
+
 # Add local SAW environment configuration
 ADD config /root/config
 
