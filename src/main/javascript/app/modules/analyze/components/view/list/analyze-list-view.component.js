@@ -143,11 +143,9 @@ export const AnalyzeListViewComponent = {
       }, {
         caption: 'CREATED',
         allowSorting: true,
+        dataField: 'createdTimestamp',
         alignment: 'left',
         width: '10%',
-        calculateCellValue: rowData => {
-          return (new Date(rowData.createdTimestamp).toDateString() || '').toUpperCase();
-        },
         cellTemplate: 'timecreatedCellTemplate'
       }, {
         caption: '',
