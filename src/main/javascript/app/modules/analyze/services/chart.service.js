@@ -107,6 +107,7 @@ export function ChartService(Highcharts) {
     const legendLayout = LAYOUT_POSITIONS[get(options, 'legend.layout', 'vertical')];
 
     const SPACING = 45;
+    const HEIGHT = (angular.isUndefined(options.chart) ? 400 : options.chart.height);
 
     const config = {
       chart: {
@@ -115,6 +116,7 @@ export function ChartService(Highcharts) {
         spacingRight: SPACING,
         spacingBottom: SPACING,
         spacingTop: SPACING,
+        height: HEIGHT,
         reflow: true
       },
       legend: {
