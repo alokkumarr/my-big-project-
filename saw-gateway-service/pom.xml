@@ -129,7 +129,9 @@
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 					<compilerArgument>-Xlint:all</compilerArgument>
+					<compilerArgument>-Xlint:-processing</compilerArgument>
 					<testCompilerArgument>-Xlint:all</testCompilerArgument>
+					<testCompilerArgument>-Xlint:-processing</testCompilerArgument>
 					<showDeprecation>true</showDeprecation>
 					<showWarnings>true</showWarnings>
 				</configuration>
