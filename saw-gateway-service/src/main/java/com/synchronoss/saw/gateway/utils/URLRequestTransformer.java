@@ -1,13 +1,19 @@
 package com.synchronoss.saw.gateway.utils;
 
 
-import org.apache.http.client.methods.RequestBuilder;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
-import com.synchronoss.saw.gateway.ApiGatewayProperties;
-import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.http.client.methods.RequestBuilder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.NoHandlerFoundException;
+
+import com.synchronoss.saw.gateway.ApiGatewayProperties;
+import com.synchronoss.saw.gateway.ApiGatewayProperties.Endpoint;
 
 public class URLRequestTransformer extends ProxyRequestTransformer {
 
@@ -18,7 +24,7 @@ public class URLRequestTransformer extends ProxyRequestTransformer {
   }
 
   @Override
-  public RequestBuilder transform(HttpServletRequest request) throws NoSuchRequestHandlingMethodException, URISyntaxException {
+  public RequestBuilder transform(HttpServletRequest request) throws URISyntaxException {
     String requestURI = request.getRequestURI();
     URI uri;
     if (request.getQueryString() != null && !request.getQueryString().isEmpty()) {
@@ -31,15 +37,13 @@ public class URLRequestTransformer extends ProxyRequestTransformer {
     rb.setUri(uri);
     return rb;
   }
-
-  private String getServiceUrl(String requestURI, HttpServletRequest httpServletRequest) throws NoSuchRequestHandlingMethodException {
-
-    ApiGatewayProperties.Endpoint endpoint =
+  
+  @ExceptionHandler(value=NoHandlerFoundException.class)
+  private String getServiceUrl(String requestURI, HttpServletRequest httpServletRequest)  {
+    Optional<Endpoint> endpoint =
             apiGatewayProperties.getEndpoints().stream()
-                    .filter(e ->
-                                    requestURI.matches(e.getPath()) && e.getMethod() == RequestMethod.valueOf(httpServletRequest.getMethod())
-                    )
-                    .findFirst().orElseThrow(() -> new NoSuchRequestHandlingMethodException(httpServletRequest));
-    return endpoint.getLocation() + requestURI;
+                    .filter(e ->requestURI.matches(e.getPath()) && e.getMethod() == RequestMethod.valueOf(httpServletRequest.getMethod())
+                    ).findFirst();
+    return endpoint.get().getLocation() + requestURI;
   }
 }

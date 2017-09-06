@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
+
 
 import com.synchronoss.saw.gateway.ApiGatewayProperties;
 import com.synchronoss.saw.gateway.exceptions.TokenMissingSAWException;
@@ -81,7 +81,7 @@ public class GatewayController {
  */
 @RequestMapping(value = "/**", method = {GET, POST, DELETE, OPTIONS})
   @ResponseBody
-  public ResponseEntity<String> proxyRequest(HttpServletRequest request) throws NoSuchRequestHandlingMethodException, IOException, URISyntaxException {
+  public ResponseEntity<String> proxyRequest(HttpServletRequest request) throws  IOException, URISyntaxException {
     HttpUriRequest proxiedRequest = createHttpUriRequest(request);
     logger.info("request: {}", proxiedRequest);
     logger.trace(request.getHeader("Accept"));
@@ -173,7 +173,7 @@ public class GatewayController {
   	requestHeaders.set("Content-type", request.getHeader("Content-type"));
 	return requestHeaders;  
   }
-  private HttpUriRequest createHttpUriRequest(HttpServletRequest request) throws URISyntaxException, NoSuchRequestHandlingMethodException, IOException {
+  private HttpUriRequest createHttpUriRequest(HttpServletRequest request) throws URISyntaxException, IOException {
     URLRequestTransformer urlRequestTransformer = new URLRequestTransformer(apiGatewayProperties);
     ContentRequestTransformer contentRequestTransformer = new ContentRequestTransformer();
     HeadersRequestTransformer headersRequestTransformer = new HeadersRequestTransformer();
