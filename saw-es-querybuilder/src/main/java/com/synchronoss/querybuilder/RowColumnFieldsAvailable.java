@@ -58,7 +58,7 @@ class RowColumnFieldsAvailable {
     if (columnFields.size() == 1) {
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields,
@@ -69,7 +69,7 @@ class RowColumnFieldsAvailable {
     if (columnFields.size() == 2) {
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields,
@@ -82,7 +82,7 @@ class RowColumnFieldsAvailable {
     if (columnFields.size() == 3) {
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields,
@@ -96,7 +96,7 @@ class RowColumnFieldsAvailable {
     if (columnFields.size() == 4) {
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields,
@@ -115,7 +115,7 @@ class RowColumnFieldsAvailable {
 
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields,
@@ -142,11 +142,11 @@ class RowColumnFieldsAvailable {
     if (columnFields.size() == 1) {
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   AggregationBuilders
-                      .terms("row_level_2")
+                      .terms("row_level_2").size(50)
                       .field(rowfield.get(1).getColumnName())
                       .subAggregation(
                           QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields,
@@ -161,11 +161,11 @@ class RowColumnFieldsAvailable {
 
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   AggregationBuilders
-                      .terms("row_level_2")
+                      .terms("row_level_2").size(50)
                       .field(rowfield.get(1).getColumnName())
                       .subAggregation(
                           QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields,
@@ -183,11 +183,11 @@ class RowColumnFieldsAvailable {
 
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   AggregationBuilders
-                      .terms("row_level_2")
+                      .terms("row_level_2").size(50)
                       .field(rowfield.get(1).getColumnName())
                       .subAggregation(
                           QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields,
@@ -205,11 +205,11 @@ class RowColumnFieldsAvailable {
 
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   AggregationBuilders
-                      .terms("row_level_2")
+                      .terms("row_level_2").size(50)
                       .field(rowfield.get(1).getColumnName())
                       .subAggregation(
                           QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields,
@@ -230,11 +230,11 @@ class RowColumnFieldsAvailable {
 
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   AggregationBuilders
-                      .terms("row_level_2")
+                      .terms("row_level_2").size(50)
                       .field(rowfield.get(1).getColumnName())
                       .subAggregation(
                           QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields,
@@ -265,15 +265,15 @@ class RowColumnFieldsAvailable {
 
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   AggregationBuilders
-                      .terms("row_level_2")
+                      .terms("row_level_2").size(50)
                       .field(rowfield.get(1).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_3")
+                              .terms("row_level_3").size(50)
                               .field(rowfield.get(2).getColumnName())
                               .subAggregation(
                                   QueryBuilderUtil.aggregationBuilder(columnFields.get(0),
@@ -288,15 +288,15 @@ class RowColumnFieldsAvailable {
 
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   AggregationBuilders
-                      .terms("row_level_2")
+                      .terms("row_level_2").size(50)
                       .field(rowfield.get(1).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_3")
+                              .terms("row_level_3").size(50)
                               .field(rowfield.get(2).getColumnName())
                               .subAggregation(
                                   QueryBuilderUtil.aggregationBuilder(columnFields.get(0),
@@ -312,15 +312,15 @@ class RowColumnFieldsAvailable {
     if (columnFields.size() == 3) {
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   AggregationBuilders
-                      .terms("row_level_2")
+                      .terms("row_level_2").size(50)
                       .field(rowfield.get(1).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_3")
+                              .terms("row_level_3").size(50)
                               .field(rowfield.get(2).getColumnName())
                               .subAggregation(
                                   QueryBuilderUtil.aggregationBuilder(columnFields.get(0),
@@ -337,15 +337,15 @@ class RowColumnFieldsAvailable {
     if (columnFields.size() == 4) {
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   AggregationBuilders
-                      .terms("row_level_2")
+                      .terms("row_level_2").size(50)
                       .field(rowfield.get(1).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_3")
+                              .terms("row_level_3").size(50)
                               .field(rowfield.get(2).getColumnName())
                               .subAggregation(
                                   QueryBuilderUtil.aggregationBuilder(columnFields.get(0),
@@ -370,15 +370,15 @@ class RowColumnFieldsAvailable {
 
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   AggregationBuilders
-                      .terms("row_level_2")
+                      .terms("row_level_2").size(50)
                       .field(rowfield.get(1).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_3")
+                              .terms("row_level_3").size(50)
                               .field(rowfield.get(2).getColumnName())
                               .subAggregation(
                                   QueryBuilderUtil.aggregationBuilder(columnFields.get(0),
@@ -411,19 +411,19 @@ class RowColumnFieldsAvailable {
 
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   AggregationBuilders
-                      .terms("row_level_2")
+                      .terms("row_level_2").size(50)
                       .field(rowfield.get(1).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_3")
+                              .terms("row_level_3").size(50)
                               .field(rowfield.get(2).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_4")
+                                      .terms("row_level_4").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           QueryBuilderUtil.aggregationBuilder(columnFields.get(0),
@@ -438,19 +438,19 @@ class RowColumnFieldsAvailable {
 
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   AggregationBuilders
-                      .terms("row_level_2")
+                      .terms("row_level_2").size(50)
                       .field(rowfield.get(1).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_3")
+                              .terms("row_level_3").size(50)
                               .field(rowfield.get(2).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_4")
+                                      .terms("row_level_4").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           QueryBuilderUtil.aggregationBuilder(columnFields.get(0),
@@ -469,19 +469,19 @@ class RowColumnFieldsAvailable {
 
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   AggregationBuilders
-                      .terms("row_level_2")
+                      .terms("row_level_2").size(50)
                       .field(rowfield.get(1).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_3")
+                              .terms("row_level_3").size(50)
                               .field(rowfield.get(2).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_4")
+                                      .terms("row_level_4").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           QueryBuilderUtil.aggregationBuilder(columnFields.get(0),
@@ -501,19 +501,19 @@ class RowColumnFieldsAvailable {
 
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   AggregationBuilders
-                      .terms("row_level_2")
+                      .terms("row_level_2").size(50)
                       .field(rowfield.get(1).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_3")
+                              .terms("row_level_3").size(50)
                               .field(rowfield.get(2).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_4")
+                                      .terms("row_level_4").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           QueryBuilderUtil.aggregationBuilder(columnFields.get(0),
@@ -537,19 +537,19 @@ class RowColumnFieldsAvailable {
 
       searchSourceBuilder.query(boolQueryBuilder).aggregation(
           AggregationBuilders
-              .terms("row_level_1")
+              .terms("row_level_1").size(50)
               .field(rowfield.get(0).getColumnName())
               .subAggregation(
                   AggregationBuilders
-                      .terms("row_level_2")
+                      .terms("row_level_2").size(50)
                       .field(rowfield.get(1).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_3")
+                              .terms("row_level_3").size(50)
                               .field(rowfield.get(2).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_4")
+                                      .terms("row_level_4").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           QueryBuilderUtil.aggregationBuilder(columnFields.get(0),
@@ -587,23 +587,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -621,23 +621,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -660,23 +660,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -703,23 +703,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -750,23 +750,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -805,23 +805,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -845,23 +845,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -890,23 +890,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -939,23 +939,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -992,23 +992,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -1053,23 +1053,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -1101,23 +1101,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -1153,23 +1153,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -1209,23 +1209,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -1269,23 +1269,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -1336,23 +1336,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -1390,23 +1390,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -1449,23 +1449,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -1512,23 +1512,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -1579,23 +1579,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -1654,23 +1654,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -1715,23 +1715,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -1781,23 +1781,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -1851,23 +1851,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
@@ -1925,23 +1925,23 @@ class RowColumnFieldsAvailable {
               .query(boolQueryBuilder)
               .aggregation(
                   AggregationBuilders
-                      .terms("row_level_1")
+                      .terms("row_level_1").size(50)
                       .field(rowfield.get(0).getColumnName())
                       .subAggregation(
                           AggregationBuilders
-                              .terms("row_level_2")
+                              .terms("row_level_2").size(50)
                               .field(rowfield.get(1).getColumnName())
                               .subAggregation(
                                   AggregationBuilders
-                                      .terms("row_level_3")
+                                      .terms("row_level_3").size(50)
                                       .field(rowfield.get(2).getColumnName())
                                       .subAggregation(
                                           AggregationBuilders
-                                              .terms("row_level_4")
+                                              .terms("row_level_4").size(50)
                                               .field(rowfield.get(2).getColumnName())
                                               .subAggregation(
                                                   AggregationBuilders
-                                                      .terms("row_level_5")
+                                                      .terms("row_level_5").size(50)
                                                       .field(rowfield.get(2).getColumnName())
                                                       .subAggregation(
                                                           QueryBuilderUtil
