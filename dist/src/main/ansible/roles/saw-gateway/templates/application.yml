@@ -3,6 +3,8 @@ info:
 spring:
   application:
     name: saw-gateway-service
+  main:
+    banner-mode: 'off'
 server:
   address: localhost
   port: 9100 
@@ -12,17 +14,16 @@ server:
 
 analysis:
     service:
-        host: https://saw.bda.poc.velocity-va.synchronoss.net/api
+        host: http://localhost:9200
 metadata:
     service:
-        host: https://saw.bda.poc.velocity-va.synchronoss.net/api
+        host: http://localhost:9200
 semantic:
     service:
-        host: https://saw.bda.poc.velocity-va.synchronoss.net/api
+        host: http://localhost:9200
 security:
     service:
-        host: http://localhost:8081/saw-security
-
+        host: http://localhost:9000/saw-security
 
 api:
     gateway:
@@ -38,4 +39,6 @@ api:
             path: '[/]analysis*'
         -   location: ${semantic.service.host}
             method: POST
-            path: '[/]semantic*'          
+            path: '[/]semantic*'
+logging:
+  config: /opt/bda/saw-gateway-service/conf/logback.xml

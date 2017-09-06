@@ -10,9 +10,9 @@
 		<relativePath />
 	</parent>
 
+	<groupId>com.synchronoss.saw</groupId>
 	<artifactId>saw-gateway-service</artifactId>
-	<name>saw-gateway-service</name>
-	<version>1.0.0</version>
+	<version>${revision}</version>
 	<packaging>jar</packaging>
 	<description>This layer is responsible to merge the service serve the user interface.
 	                 It will act as mediation layer to multiple internal micro service.
@@ -21,7 +21,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<json.validate>2.2.6</json.validate>
-		<start-class>com.synchronoss.saw.composite.SAWCompositeServiceApplication</start-class>
+		<start-class>com.synchronoss.saw.gateway.SAWGatewayServiceApplication</start-class>
 		<java.version>1.8</java.version>
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
@@ -58,8 +58,8 @@
 			<artifactId>aspectjrt</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>org.aspectj</groupId>
-		    <artifactId>aspectjweaver</artifactId>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.jolokia</groupId>
@@ -94,17 +94,34 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-config</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.tomakehurst</groupId>
+			<artifactId>wiremock</artifactId>
+			<version>2.7.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>19.0</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<finalName>${project.name}</finalName>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -112,11 +129,90 @@
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 					<compilerArgument>-Xlint:all</compilerArgument>
+					<compilerArgument>-Xlint:-processing</compilerArgument>
+					<testCompilerArgument>-Xlint:all</testCompilerArgument>
+					<testCompilerArgument>-Xlint:-processing</testCompilerArgument>
 					<showDeprecation>true</showDeprecation>
 					<showWarnings>true</showWarnings>
 				</configuration>
 			</plugin>
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>**/*RemoteIT.java</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<!-- Workaround: The Spring Boot Maven plug-in repackaging causes issues 
+						with the Maven Failsafe plug-in not finding classes (https://github.com/spring-projects/spring-boot/issues/6254), 
+						so use a separate classifier until Maven Failsafe upgraded to 2.19.2. -->
+					<classifier>exec</classifier>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>de.dentrassi.maven</groupId>
+				<artifactId>rpm</artifactId>
+				<version>0.9.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>rpm</goal>
+						</goals>
+						<configuration>
+							<packageName>saw-gateway</packageName>
+							<entries>
+								<entry>
+									<name>/opt/bda/saw-gateway-service</name>
+									<directory>true</directory>
+								</entry>
+								<entry>
+									<name>/opt/bda/saw-gateway-service/saw-gateway.jar</name>
+									<file>target/saw-gateway-service-${revision}-exec.jar</file>
+								</entry>
+								<entry>
+									<name>/usr/lib/systemd/system/saw-gateway.service</name>
+									<file>src/main/system/saw-gateway.service</file>
+								</entry>
+								<entry>
+									<name>/opt/bda/saw-gateway-service/conf/logback.xml</name>
+									<file>src/main/resources/logback.xml</file>
+								</entry>
+								<entry>
+									<name>/opt/bda/saw-gateway-service/conf/application.yml</name>
+									<file>src/main/resources/application.yml</file>
+								</entry>
+								<entry>
+									<name>/var/bda/service/saw/gateway/logs</name>
+									<directory>true</directory>
+								</entry>
+							</entries>
+							<signature>
+								<skip>true</skip>
+							</signature>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
+	<repositories>
+		<repository>
+			<id>synchronoss</id>
+			<url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+		</repository>
+	</repositories>
 </project>

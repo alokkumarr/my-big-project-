@@ -18,6 +18,6 @@ is provided:
 
 # Installing
 
-To install SAW Security, use the SAW bundle package which coordinates
+To install SAW Services, use the SAW bundle package which coordinates
 installation of SAW modules.  See the SAW bundle package Operations
 Guide for closer details about installing.
