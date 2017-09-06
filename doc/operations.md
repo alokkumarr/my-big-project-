@@ -5,18 +5,26 @@ modules in an environment.
 
 # Prerequisites
 
-Before starting an installation of SAW ensure the following
-is provided:
+Before starting an installation of SAW ensure the following has been
+provided in the environment:
 
-1. At least one host for running SAW (the target host), with 32 GB of
-   memory and CentOS 7 as the operating system
+1. Install and configure a MapR version 5.2 cluster in the environment
 
-2. A host for deploying from (the deploy host), running CentOS 7 as
-   the operating system.  This host will be used to run the deploy
+2. Install and configure Apache Spark version 2.1 from the MapR
+   Ecosystem Pack on the MapR cluster
+
+3. Configure a MapR user in the MapR cluster (with user ID 500)
+
+4. Provision a host to deploy from (the deploy host), running CentOS 7
+   as the operating system.  This host will be used to run the deploy
    command and store the environment configuration.  The deploy host
    is typically common to the entire environment.
 
-3. SAW environment configuration (see next section)
+5. Provision a host for running SAW (the target host), with 32 GB of
+   memory and CentOS 7 as the operating system.  The host should be
+   dedicated to SAW and not run other applications.
+
+6. Enable MapR Yum repositories on the SAW target host
 
 Please note that the target hosts must be allocated exclusively for
 SAW use.  The underlying infrastructure up to the operating system
