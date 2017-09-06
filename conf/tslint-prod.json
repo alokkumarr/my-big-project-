@@ -4,7 +4,7 @@
     "angular-tslint-rules"
   ],
   "rules": {
-    "indent": [true, "spaces", 2],
+    "indent": [true, "spaces"],
     "quotemark": [true, "single"],
     "object-literal-sort-keys": false,
     "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
@@ -12,7 +12,7 @@
     "no-warning-comments": [0]
   },
   "jsRules": {
-    "indent": [true, "spaces", 2],
+    "indent": [true, "spaces"],
     "quotemark": [true, "single"],
     "object-literal-sort-keys": false,
     "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],

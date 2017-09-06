@@ -1,4 +1,4 @@
-import angular from 'angular';
+import * as angular from 'angular';
 
 import 'angular-material/angular-material.css';
 import 'devextreme/dist/css/dx.common.css';

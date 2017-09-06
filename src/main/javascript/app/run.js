@@ -1,8 +1,8 @@
-import get from 'lodash/get';
-import toLower from 'lodash/toLower';
-import map from 'lodash/map';
-import some from 'lodash/some';
-import startsWith from 'lodash/startsWith';
+import * as get from 'lodash/get';
+import * as toLower from 'lodash/toLower';
+import * as map from 'lodash/map';
+import * as some from 'lodash/some';
+import * as startsWith from 'lodash/startsWith';
 
 export function runConfig($rootScope, $state, $location, $window, JwtService, Idle, UserService, $transitions, $log) {
   'ngInject';

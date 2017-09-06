@@ -1,7 +1,7 @@
-import get from 'lodash/get';
-import padStart from 'lodash/padStart';
-import find from 'lodash/find';
-import flatMap from 'lodash/flatMap';
+import * as get from 'lodash/get';
+import * as padStart from 'lodash/padStart';
+import * as find from 'lodash/find';
+import * as flatMap from 'lodash/flatMap';
 
 const PRIVILEGE_CODE_LENGTH = 16;
 

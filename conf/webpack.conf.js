@@ -50,6 +50,7 @@ module.exports = function (env) {
     devtool: isDevelopment ? 'source-map' : false,
 
     resolve: {
+      extensions: [".ts", ".js"],
       modules: [MODULE_DIR, webpackHelper.root('src/main/javascript')],
       alias: {
         fonts: webpackHelper.root('assets/fonts'),
@@ -67,7 +68,7 @@ module.exports = function (env) {
         // preloaders
         {
           enforce: 'pre',
-          test: /\.js$/,
+          test: /\.[jt]s$/,
           exclude: /node_modules/,
           loader: 'tslint-loader',
           options: {
@@ -89,13 +90,12 @@ module.exports = function (env) {
           loader: 'json-loader'
         },
         {
-          test: /\.js$/,
+          test: /\.[jt]s$/,
           exclude: /node_modules/,
           loaders: ['ng-annotate-loader', {
             loader: 'ts-loader',
             options: {
-              configFile: webpackHelper.root('conf/tsconfig.json'),
-              entryFileIsJs: true
+              configFile: webpackHelper.root('conf/tsconfig.json')
             }
           }]
         },

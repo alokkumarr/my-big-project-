@@ -1,4 +1,4 @@
-import templateUrl from './content.component.html';
+import * as templateUrl from './content.component.html';
 
 export const LayoutContentComponent = {
   template: templateUrl

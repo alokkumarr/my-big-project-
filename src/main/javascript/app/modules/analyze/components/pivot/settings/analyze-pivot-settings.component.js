@@ -1,9 +1,9 @@
-import fpGroupBy from 'lodash/fp/groupBy';
-import fpPipe from 'lodash/fp/pipe';
-import fpMapValues from 'lodash/fp/mapValues';
-import forEach from 'lodash/forEach';
-import filter from 'lodash/filter';
-import map from 'lodash/map';
+import * as fpGroupBy from 'lodash/fp/groupBy';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpMapValues from 'lodash/fp/mapValues';
+import * as forEach from 'lodash/forEach';
+import * as filter from 'lodash/filter';
+import * as map from 'lodash/map';
 
 import template from './analyze-pivot-settings.component.html';
 import style from './analyze-pivot-settings.component.scss';
