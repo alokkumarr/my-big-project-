@@ -8,6 +8,19 @@ localhost ansible_connection=local
 [saw-services]
 localhost ansible_connection=local
 
+[saw-services:vars]
+saw_elasticsearch_protocol=http
+saw_elasticsearch_host=elasticsearch01
+saw_elasticsearch_port=9200
+saw_elasticsearch_username=elastic
+saw_elasticsearch_password=xuw3dUraHapret
+saw_spark_master_url=spark://mapr02:7077
+saw_zookeeper_quorum=mapr01,mapr02,mapr03,mapr04,mapr05,mapr06,mapr07,mapr08,mapr09,mapr10
+# Workaround: The SAW testing environment (Velocity Lab) has the MapR
+# user ID exceptionally set up to be 501, instead of the typical 500,
+# so override it here
+saw_mapr_user_id=501
+
 [saw-web]
 localhost ansible_connection=local
 
