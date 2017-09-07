@@ -50,12 +50,12 @@ RUN /root/mapr-configure
 
 # Enable tunneling for MapR client
 RUN yum -y -q --nogpgcheck install sshuttle sshpass
-ADD tunnel /root/
+ADD saw-tunnel /root/
 COPY saw-tunnel.service /etc/systemd/system/
 RUN systemctl enable saw-tunnel
 
 # Add local SAW environment configuration
-ADD config /root/config
+ADD saw-config /root/
 
 # Add assembly from Docker Maven plug-in
 COPY maven /maven/

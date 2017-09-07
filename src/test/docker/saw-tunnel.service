@@ -7,7 +7,7 @@ After=network.target
 # Type=notify, but that seems to cause a time out so leave it out for
 # now
 #Type=notify
-ExecStart=/root/tunnel
+ExecStart=/root/saw-tunnel
 Restart=on-failure
 SyslogIdentifier=saw-tunnel
 
