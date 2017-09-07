@@ -6,6 +6,13 @@ import 'angular-material/angular-material.css';
 
 import 'fonts/icomoon.css';
 
+import 'zone.js';
+import 'reflect-metadata';
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { UpgradeModule } from '@angular/upgrade/static';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+
 import AppConfig from '../../../../appConfig';
 
 import {routesConfig} from './routes';
@@ -43,3 +50,20 @@ angular
   .component('passwordPreResetComponent', PasswordPreResetComponent)
   .component('passwordResetComponent', PasswordResetComponent)
   .component('loginComponent', LoginComponent);
+
+@NgModule({
+  imports: [
+    BrowserModule,
+    UpgradeModule
+  ]
+})
+export class NewLoginModule {
+  constructor() { }
+  ngDoBootstrap() {
+  }
+}
+
+platformBrowserDynamic().bootstrapModule(NewLoginModule).then(platformRef => {
+  const upgrade = platformRef.injector.get(UpgradeModule) as UpgradeModule;
+  upgrade.bootstrap(document.documentElement, [LoginModule]);
+});

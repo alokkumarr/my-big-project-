@@ -5,6 +5,7 @@
     "module": "CommonJS",
     "allowSyntheticDefaultImports": true,
     "noStrictGenericChecks": true,
+    "experimentalDecorators": true,
     "lib" : ["es2015", "es2015.iterable", "dom"],
     "allowJs": true
   },
