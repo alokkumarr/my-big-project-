@@ -22,6 +22,7 @@ const FILTER_TYPES = {
   STRING: 'string',
   NUMBER: 'number',
   DATE: 'date',
+  TIMESTAMP: 'timestamp',
   UNKNOWN: 'unknown'
 };
 
@@ -49,6 +50,8 @@ export function FilterService($q, $mdDialog) {
       return FILTER_TYPES.NUMBER;
     } else if (inputType === FILTER_TYPES.DATE) {
       return FILTER_TYPES.DATE;
+    } else if (inputType === FILTER_TYPES.TIMESTAMP) {
+      return FILTER_TYPES.TIMESTAMP;
     }
 
     return FILTER_TYPES.UNKNOWN;
@@ -70,6 +73,9 @@ export function FilterService($q, $mdDialog) {
         return isEmpty(filter.model);
 
       case FILTER_TYPES.DATE:
+        return isEmpty(filter.model);
+
+      case FILTER_TYPES.TIMESTAMP:
         return isEmpty(filter.model);
 
       default:
