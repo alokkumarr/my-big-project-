@@ -42,7 +42,7 @@ export const AnalyzeNewComponent = {
 
         forEach(methodCategory.children, method => {
           const isSupported = supportedMethodCategory ?
-            find(supportedMethodCategory.children, ({type}) => type === method.type) :
+            find(supportedMethodCategory.children, ({type}) => type === method.type || method.type === 'chart:pie') :
             false;
           set(method, 'disabled', !isSupported);
         });

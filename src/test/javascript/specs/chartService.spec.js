@@ -24,30 +24,27 @@ describe('ChartService', () => {
       const parsedData = ChartService.parseData(bubbleChartDataGrouped, bubbleChartGrouped);
       expect(parsedData).to.be.an('array');
       expect(parsedData[0]).to.be.an('object');
-      expect(parsedData[0]).to.have.a.property('x');
-      expect(parsedData[0]).to.have.a.property('y');
-      expect(parsedData[0]).to.have.a.property('z');
-      expect(parsedData[0]).to.have.a.property('g');
+      expect(parsedData[0]).to.have.a.property('AVAILABLE_ITEMS');
+      expect(parsedData[0]).to.have.a.property('AVAILABLE_MB');
+      expect(parsedData[0]).to.have.a.property('SOURCE_OS.keyword');
+      expect(parsedData[0]).to.have.a.property('SOURCE_MANUFACTURER.keyword');
     });
 
     it('parses columnChart data', () => {
       const parsedData = ChartService.parseData(columnChartData, columnChart);
       expect(parsedData).to.be.an('array');
       expect(parsedData[0]).to.be.an('object');
-      expect(parsedData[0]).to.have.a.property('x');
-      expect(parsedData[0]).to.have.a.property('y');
-      expect(parsedData[0]).to.not.have.a.property('z');
-      expect(parsedData[0]).to.not.have.a.property('g');
+      expect(parsedData[0]).to.have.a.property('AVAILABLE_MB');
+      expect(parsedData[0]).to.have.a.property('SOURCE_MANUFACTURER.keyword');
     });
 
     it('parses columnChartGrouped data', () => {
       const parsedData = ChartService.parseData(columnChartGroupedData, columnChartGrouped);
       expect(parsedData).to.be.an('array');
       expect(parsedData[0]).to.be.an('object');
-      expect(parsedData[0]).to.have.a.property('x');
-      expect(parsedData[0]).to.have.a.property('y');
-      expect(parsedData[0]).to.not.have.a.property('z');
-      expect(parsedData[0]).to.have.a.property('g');
+      expect(parsedData[0]).to.have.a.property('AVAILABLE_MB');
+      expect(parsedData[0]).to.have.a.property('SOURCE_OS.keyword');
+      expect(parsedData[0]).to.have.a.property('SOURCE_MANUFACTURER.keyword');
     });
   });
 });

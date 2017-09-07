@@ -30,8 +30,10 @@
 
   <analyze-dialog-content>
     <analyze-chart-settings
+        view-options="$ctrl.chartViewOptions"
         settings="$ctrl.settings"
         on-change="$ctrl.onSettingsChanged(settings)"
+        chart-type="$ctrl.model.chartType"
     ></analyze-chart-settings>
     <div layout="column">
       <md-toolbar class="secondary-toolbar chart-options-toolbar">
@@ -53,7 +55,7 @@
           </div>
 
           <div class="analyze-view_action-panel" layout="row" layout-align="end center">
-            <md-button ng-click="$ctrl.refreshChartData()"
+            <md-button ng-click="$ctrl.onRefreshData()"
                        e2e="refresh-data-btn"
                        ng-class="{'btn-primary': $ctrl.didAnalysisChange}" >
               <span translate="REFRESH_DATA"></span>
@@ -85,12 +87,12 @@
           </filter-chips>
           <h3 translate="CUSTOM_AXIS_LABELS"></h3>
           <div layout="row" layout-align="center">
-            <md-input-container flex>
-                <label translate="CUSTOM_Y_AXIS_LABEL"></label>
+            <md-input-container flex ng-if="::$ctrl.chartViewOptions.renamable.y">
+                <label ng-bind="::('Custom ' + $ctrl.chartViewOptions.axisLabels.y + ' Label')"></label>
                 <input ng-model="$ctrl.labels.tempY"/>
             </md-input-container>
-            <md-input-container flex>
-                <label translate="CUSTOM_X_AXIS_LABEL"></label>
+            <md-input-container flex ng-if="::$ctrl.chartViewOptions.renamable.x">
+                <label ng-bind="::('Custom ' + $ctrl.chartViewOptions.axisLabels.x + ' Label')"></label>
                 <input ng-model="$ctrl.labels.tempX"/>
             </md-input-container>
             <md-button flex="nogrow" class="btn-primary" ng-click="$ctrl.updateCustomLabels()">
@@ -98,8 +100,8 @@
             </md-button>
           </div>
 
-          <h3 translate="LEGEND_OPTIONS"></h3>
-          <div layout="row" layout-align="center">
+          <h3 translate="LEGEND_OPTIONS" ng-if="::$ctrl.chartViewOptions.legend"></h3>
+          <div layout="row" layout-align="center" ng-if="::$ctrl.chartViewOptions.legend">
             <md-input-container flex>
               <label translate="POSITION"></label>
               <md-select ng-model="$ctrl.legend.align" ng-change="$ctrl.updateLegendPosition()">

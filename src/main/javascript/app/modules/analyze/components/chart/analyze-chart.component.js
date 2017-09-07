@@ -1,6 +1,7 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import findIndex from 'lodash/findIndex';
 import find from 'lodash/find';
+import forEach from 'lodash/forEach';
 import filter from 'lodash/filter';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
@@ -9,6 +10,8 @@ import map from 'lodash/map';
 import values from 'lodash/values';
 import clone from 'lodash/clone';
 import set from 'lodash/set';
+import concat from 'lodash/concat';
+import remove from 'lodash/remove';
 
 import template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -35,7 +38,7 @@ export const AnalyzeChartComponent = {
   },
   controller: class AnalyzeChartController extends AbstractDesignerComponentController {
     constructor($componentHandler, $timeout, AnalyzeService,
-                ChartService, FilterService, $mdSidenav, $translate, toastMessage, $injector) {
+      ChartService, FilterService, $mdSidenav, $translate, toastMessage, $injector) {
       'ngInject';
       super($injector);
       this._FilterService = FilterService;
@@ -66,6 +69,7 @@ export const AnalyzeChartComponent = {
       this.chartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
 
       this.barColumnChoice = '';
+      this.chartViewOptions = ChartService.getViewOptionsFor(this.model.chartType);
     }
 
     toggleLeft() {
@@ -83,7 +87,7 @@ export const AnalyzeChartComponent = {
 
       if (this.mode === ENTRY_MODES.EDIT) {
         this.initChart();
-        this.refreshChartData();
+        this.onRefreshData();
       } else {
         this._AnalyzeService.createAnalysis(this.model.semanticId, 'chart').then(analysis => {
           this.model = assign(analysis, this.model);
@@ -159,9 +163,9 @@ export const AnalyzeChartComponent = {
       this.startDraftMode();
     }
 
-    refreshChartData() {
+    onRefreshData() {
       if (!this.checkModelValidity()) {
-        return;
+        return null;
       }
       this.startProgress();
       const payload = this.generatePayload(this.model);
@@ -180,33 +184,23 @@ export const AnalyzeChartComponent = {
     checkModelValidity() {
       let isValid = true;
       const errors = [];
-      const x = find(this.settings.xaxis, x => x.checked === 'x');
-      const y = find(this.settings.yaxis, y => y.checked === 'y');
-      const z = find(this.settings.zaxis, z => z.checked === 'z');
+      const present = {
+        x: find(this.settings.xaxis, x => x.checked === 'x'),
+        y: find(this.settings.yaxis, y => y.checked === 'y'),
+        z: find(this.settings.zaxis, z => z.checked === 'z'),
+        g: find(this.settings.groupBy, g => g.checked === 'g')
+      };
 
-      switch (this.model.chartType) {
-        case 'bubble':
-        // x, y and z axes are mandatory
-        // grouping is optional
-          if (!x || !y || !z) {
-            errors[0] = 'ERROR_X_Y_SIZEBY_AXES_REQUIRED';
-            isValid = false;
-          }
-          break;
-        default:
-        // x and y axes are mandatory
-        // grouping is optional
-          if (!x || !y) {
-            errors[0] = 'ERROR_X_Y_AXES_REQUIRED';
-            isValid = false;
-          }
-      }
+      forEach(this.chartViewOptions.required, (v, k) => {
+        if (v && !present[k]) {
+          errors.push(`'${this.chartViewOptions.axisLabels[k]}'`);
+        }
+      });
 
-      if (!isValid) {
-        this._$translate(errors).then(translations => {
-          this._toastMessage.error(values(translations).join('\n'), '', {
-            timeOut: 3000
-          });
+      if (errors.length) {
+        isValid = false;
+        this._toastMessage.error(`${errors.join(', ')} required`, '', {
+          timeOut: 3000
         });
       }
 
@@ -265,15 +259,23 @@ export const AnalyzeChartComponent = {
 
       const g = find(this.settings.groupBy, g => g.checked === 'g');
       const x = find(this.settings.xaxis, x => x.checked === 'x');
-      const y = find(this.settings.yaxis, y => y.checked === 'y');
+      const y = filter(this.settings.yaxis, y => y.checked === 'y');
       const z = find(this.settings.zaxis, z => z.checked === 'z');
 
-      const allFields = [g, x, y, z];
+      const allFields = [g, x, ...y, z];
 
-      const nodeFields = filter(allFields, this.isStringField);
-      const dataFields = filter(allFields, this.isDataField).map(field => {
-        field.aggregate = 'sum';
-        return field;
+      let nodeFields = filter(allFields, this.isStringField);
+      const dataFields = filter(allFields, this.isDataField);
+
+      if (payload.chartType === 'scatter') {
+        const xFields = remove(dataFields, ({checked}) => checked === 'x');
+        nodeFields = concat(xFields, nodeFields);
+      }
+
+      forEach(dataFields, field => {
+        if (!field.aggregate) {
+          field.aggregate = 'sum';
+        }
       });
 
       set(payload, 'sqlBuilder.dataFields', dataFields);

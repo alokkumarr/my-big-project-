@@ -63,7 +63,7 @@
 	<dependency>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-tomcat</artifactId>
-		<!-- <scope>provided</scope> -->
+		<scope>provided</scope>
 	</dependency>
 	<dependency>
 		<groupId>org.springframework.boot</groupId>
@@ -864,6 +864,8 @@ echo ${app.nameVer} pre-install is being executed
                 <finalName>${app.name}-${project.version}</finalName>
                 <!-- Remove artifact classifier "bin" from archive name -->
                 <appendAssemblyId>false</appendAssemblyId>
+                <!-- Enable long file names without Maven warning -->
+                <tarLongFileMode>posix</tarLongFileMode>
               </configuration>
               <executions>
                 <execution>

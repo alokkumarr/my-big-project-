@@ -1,3 +1,5 @@
+import isEmpty from 'lodash/isEmpty';
+
 import template from './analyze-list-view.component.html';
 import style from './analyze-list-view.component.scss';
 
@@ -53,6 +55,10 @@ export const AnalyzeListViewComponent = {
     onUpdateAnalysisType(analysisType) {
       if (analysisType === 'all') {
         this._gridListInstance.clearFilter();
+      } else if (analysisType === 'scheduled') {
+        this._gridListInstance.filter(itemData => {
+          return !isEmpty(itemData.scheduleHuman);
+        });
       } else {
         this._gridListInstance.filter(['type', '=', analysisType]);
       }

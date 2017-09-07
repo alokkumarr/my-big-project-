@@ -430,7 +430,7 @@ export const AnalyzeReportComponent = {
         });
     }
 
-    refreshGridData() {
+    onRefreshData() {
       this.startProgress();
       this.model = assign(this.model, this.generatePayload());
 
