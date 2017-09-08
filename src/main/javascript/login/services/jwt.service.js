@@ -147,26 +147,26 @@ class JwtService {
     }
 
     switch (name) {
-      case 'ACCESS':
-        return this._isSet(code, PRIVILEGE_INDEX.ACCESS);
-      case 'CREATE':
-        return this._isSet(code, PRIVILEGE_INDEX.CREATE);
-      case 'EXECUTE':
-        return this._isSet(code, PRIVILEGE_INDEX.EXECUTE);
-      case 'PUBLISH':
-        return this._isSet(code, PRIVILEGE_INDEX.PUBLISH);
-      case 'FORK':
-        return this._isSet(code, PRIVILEGE_INDEX.FORK);
-      case 'EDIT':
-        return this._isSet(code, PRIVILEGE_INDEX.EDIT) &&
-          (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
-      case 'EXPORT':
-        return this._isSet(code, PRIVILEGE_INDEX.EXPORT);
-      case 'DELETE':
-        return this._isSet(code, PRIVILEGE_INDEX.DELETE) &&
-          (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
-      default:
-        return false;
+    case 'ACCESS':
+      return this._isSet(code, PRIVILEGE_INDEX.ACCESS);
+    case 'CREATE':
+      return this._isSet(code, PRIVILEGE_INDEX.CREATE);
+    case 'EXECUTE':
+      return this._isSet(code, PRIVILEGE_INDEX.EXECUTE);
+    case 'PUBLISH':
+      return this._isSet(code, PRIVILEGE_INDEX.PUBLISH);
+    case 'FORK':
+      return this._isSet(code, PRIVILEGE_INDEX.FORK);
+    case 'EDIT':
+      return this._isSet(code, PRIVILEGE_INDEX.EDIT) &&
+        (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
+    case 'EXPORT':
+      return this._isSet(code, PRIVILEGE_INDEX.EXPORT);
+    case 'DELETE':
+      return this._isSet(code, PRIVILEGE_INDEX.DELETE) &&
+        (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
+    default:
+      return false;
     }
   }
 }

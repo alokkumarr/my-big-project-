@@ -142,19 +142,19 @@ export const AnalyzeViewComponent = {
 
     onCardAction(actionType, payload) {
       switch (actionType) {
-        case 'onSuccessfulDeletion':
-          this.removeDeletedAnalysis(payload);
-          break;
-        case 'onSuccessfulExecution':
-          this.goToAnalysis(payload);
-          break;
-        case 'onSuccessfulPublish':
-          this.onSuccessfulPublish(payload);
-          break;
-        case 'view':
-          this.view(payload);
-          break;
-        default:
+      case 'onSuccessfulDeletion':
+        this.removeDeletedAnalysis(payload);
+        break;
+      case 'onSuccessfulExecution':
+        this.goToAnalysis(payload);
+        break;
+      case 'onSuccessfulPublish':
+        this.onSuccessfulPublish(payload);
+        break;
+      case 'view':
+        this.view(payload);
+        break;
+      default:
       }
     }
 

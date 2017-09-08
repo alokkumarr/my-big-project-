@@ -64,6 +64,7 @@ module.exports = function (env) {
     },
 
     module: {
+      exprContextCritical: false,
       rules: [
         // preloaders
         {
@@ -73,7 +74,8 @@ module.exports = function (env) {
           loader: 'tslint-loader',
           options: {
             fix: false,
-            tsConfigFile: webpackHelper.root('conf/tsconfig.json'),
+            typeCheck: false, // tslint-loader is way too slow with this enabled. Use pre-push hook for typechecking
+            tsConfigFile: webpackHelper.root('tsconfig.json'),
             configFile: isDevelopment ?
               webpackHelper.root('conf/tslint-dev.json') :
               webpackHelper.root('conf/tslint-prod.json')

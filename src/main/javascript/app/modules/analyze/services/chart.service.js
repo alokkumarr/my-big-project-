@@ -159,28 +159,28 @@ export function ChartService(Highcharts) {
     };
 
     switch (type) {
-      case 'bubble':
-        config.axisLabels.z = 'Size By';
-        config.axisLabels.g = 'Color By';
-        config.required.z = true;
-        return config;
+    case 'bubble':
+      config.axisLabels.z = 'Size By';
+      config.axisLabels.g = 'Color By';
+      config.required.z = true;
+      return config;
 
-      case 'pie':
-        config.axisLabels.y = 'Angle';
-        config.axisLabels.x = 'Color By';
-        config.renamable.x = false;
-        config.customTooltip = false;
-        config.legend = false;
-        return config;
+    case 'pie':
+      config.axisLabels.y = 'Angle';
+      config.axisLabels.x = 'Color By';
+      config.renamable.x = false;
+      config.customTooltip = false;
+      config.legend = false;
+      return config;
 
-      case 'column':
-      case 'bar':
-      case 'line':
-      case 'spline':
-      case 'stack':
-      case 'scatter':
-      default:
-        return config;
+    case 'column':
+    case 'bar':
+    case 'line':
+    case 'spline':
+    case 'stack':
+    case 'scatter':
+    default:
+      return config;
     }
   }
 
@@ -409,37 +409,37 @@ export function ChartService(Highcharts) {
     let chartSeries;
 
     switch (chartType) {
-      case 'column':
-      case 'bar':
-      case 'line':
-      case 'spline':
-      case 'stack':
-      case 'scatter':
-      case 'bubble':
-        // the bubble chart already supports the parsed data
-        return {chartSeries: series};
+    case 'column':
+    case 'bar':
+    case 'line':
+    case 'spline':
+    case 'stack':
+    case 'scatter':
+    case 'bubble':
+      // the bubble chart already supports the parsed data
+      return {chartSeries: series};
 
-      case 'pie':
-        if (!fields.g) {
-          set(series, '0.dataLabels.format', '{point.name}: {point.percentage:.2f}%');
-          mapperFn = ({x, y}) => {
-            const category = get(categories, `x.${x}`);
-            return {name: category, y, drilldown: category};
-          };
-          forEach(series, serie => {
-            serie.data = map(serie.data, mapperFn);
-          });
+    case 'pie':
+      if (!fields.g) {
+        set(series, '0.dataLabels.format', '{point.name}: {point.percentage:.2f}%');
+        mapperFn = ({x, y}) => {
+          const category = get(categories, `x.${x}`);
+          return {name: category, y, drilldown: category};
+        };
+        forEach(series, serie => {
+          serie.data = map(serie.data, mapperFn);
+        });
 
-          chartSeries = series;
+        chartSeries = series;
 
-        } else {
-          chartSeries = dataToNestedDonut(series, categories);
-        }
+      } else {
+        chartSeries = dataToNestedDonut(series, categories);
+      }
 
-        return {chartSeries};
+      return {chartSeries};
 
-      default:
-        throw new Error(`Chart type: ${chartType} is not supported!`);
+    default:
+      throw new Error(`Chart type: ${chartType} is not supported!`);
     }
   }
 
@@ -514,19 +514,19 @@ export function ChartService(Highcharts) {
     };
 
     switch (type) {
-      case 'pie':
-        changes = getPieChangeConfig(type, settings, fields, gridData, opts);
-        break;
-      case 'column':
-      case 'bar':
-      case 'line':
-      case 'spline':
-      case 'stack':
-      case 'scatter':
-      case 'bubble':
-      default:
-        changes = getBarChangeConfig(type, settings, fields, gridData, opts);
-        break;
+    case 'pie':
+      changes = getPieChangeConfig(type, settings, fields, gridData, opts);
+      break;
+    case 'column':
+    case 'bar':
+    case 'line':
+    case 'spline':
+    case 'stack':
+    case 'scatter':
+    case 'bubble':
+    default:
+      changes = getBarChangeConfig(type, settings, fields, gridData, opts);
+      break;
     }
 
     return concat(
@@ -632,34 +632,34 @@ export function ChartService(Highcharts) {
     const groupBy = filterStringTypes(attributes);
 
     switch (model.chartType) {
-      case 'bubble':
-        xaxis = filterStringTypes(attributes);
-        yaxis = attributes;
-        zaxis = filterNumberTypes(attributes);
-        settingsObj = {
-          xaxis,
-          yaxis,
-          zaxis,
-          groupBy
-        };
-        break;
-      case 'scatter':
-        xaxis = attributes;
-        yaxis = attributes;
-        settingsObj = {
-          xaxis,
-          yaxis,
-          groupBy
-        };
-        break;
-      default:
-        xaxis = filterStringTypes(attributes);
-        yaxis = filterNumberTypes(attributes);
-        settingsObj = {
-          yaxis,
-          xaxis,
-          groupBy
-        };
+    case 'bubble':
+      xaxis = filterStringTypes(attributes);
+      yaxis = attributes;
+      zaxis = filterNumberTypes(attributes);
+      settingsObj = {
+        xaxis,
+        yaxis,
+        zaxis,
+        groupBy
+      };
+      break;
+    case 'scatter':
+      xaxis = attributes;
+      yaxis = attributes;
+      settingsObj = {
+        xaxis,
+        yaxis,
+        groupBy
+      };
+      break;
+    default:
+      xaxis = filterStringTypes(attributes);
+      yaxis = filterNumberTypes(attributes);
+      settingsObj = {
+        yaxis,
+        xaxis,
+        groupBy
+      };
     }
     return settingsObj;
   }

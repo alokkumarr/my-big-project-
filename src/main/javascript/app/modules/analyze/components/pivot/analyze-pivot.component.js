@@ -57,17 +57,17 @@ export const AnalyzePivotComponent = {
 
     $onInit() {
       switch (this.mode) {
-        case ENTRY_MODES.NEW:
-          this.loadNewAnalysis();
-          break;
-        case ENTRY_MODES.EDIT:
-          this.loadExistingAnalysis();
-          break;
-        case ENTRY_MODES.FORK:
-          this.loadForkedAnalysis();
-          break;
-        default:
-          break;
+      case ENTRY_MODES.NEW:
+        this.loadNewAnalysis();
+        break;
+      case ENTRY_MODES.EDIT:
+        this.loadExistingAnalysis();
+        break;
+      case ENTRY_MODES.FORK:
+        this.loadForkedAnalysis();
+        break;
+      default:
+        break;
       }
     }
 

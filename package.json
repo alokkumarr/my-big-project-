@@ -13,7 +13,7 @@
     "e2e": "protractor conf/protractor.conf.js",
     "express": "node src/main/javascript/middlelayer/index.js",
     "prepush": "npm run lint",
-    "lint": "tslint -c tslint.json ./src/main/javascript/app/**/*.js",
+    "lint": "tslint --type-check --project tsconfig.json -c tslint.json ./src/main/javascript/{app,login}/**/*.{ts,js}",
     "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
@@ -58,6 +58,7 @@
     "zone.js": "^0.8.17"
   },
   "devDependencies": {
+    "@types/jasmine": "^2.5.54",
     "angular-tslint-rules": "^1.0.4",
     "async": "2.1.5",
     "autoprefixer": "6.7.2",
@@ -119,6 +120,7 @@
     "ts-loader": "^2.3.4",
     "tslint": "^5.7.0",
     "tslint-config-xo": "^1.3.0",
+    "tslint-eslint-rules": "^4.1.1",
     "tslint-loader": "^3.5.3",
     "typescript": "^2.5.2",
     "url-loader": "0.5.7",

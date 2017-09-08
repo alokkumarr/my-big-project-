@@ -165,13 +165,13 @@ export const UsersViewComponent = {
 
     onCardAction(actionType, payload) {
       switch (actionType) {
-        case 'delete':
-          this.openDeleteModal(payload);
-          break;
-        case 'edit':
-          this.openEditModal(payload);
-          break;
-        default:
+      case 'delete':
+        this.openDeleteModal(payload);
+        break;
+      case 'edit':
+        this.openEditModal(payload);
+        break;
+      default:
       }
     }
     checkColumns(name) {

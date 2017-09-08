@@ -63,17 +63,17 @@ export function FilterService($q, $mdDialog) {
 
     switch (filterType) {
 
-      case FILTER_TYPES.STRING:
-        return isEmpty(get(filter, 'model.modelValues', []));
+    case FILTER_TYPES.STRING:
+      return isEmpty(get(filter, 'model.modelValues', []));
 
-      case FILTER_TYPES.NUMBER:
-        return isEmpty(filter.model);
+    case FILTER_TYPES.NUMBER:
+      return isEmpty(filter.model);
 
-      case FILTER_TYPES.DATE:
-        return isEmpty(filter.model);
+    case FILTER_TYPES.DATE:
+      return isEmpty(filter.model);
 
-      default:
-        return true;
+    default:
+      return true;
     }
   }
 
@@ -144,19 +144,19 @@ export function FilterService($q, $mdDialog) {
       let isValid;
 
       switch (filter.type) {
-        case 'string':
-          isValid = Boolean(filter.model[row[filter.name]]);
-          break;
-        case 'int':
-        case 'integer':
-        case 'timestamp':
-        case 'double':
-        case 'long':
-          isValid = Boolean(isNumberValid(row[filter.name], filter.model, filter.operator));
-          break;
-        default:
-          isValid = false;
-          break;
+      case 'string':
+        isValid = Boolean(filter.model[row[filter.name]]);
+        break;
+      case 'int':
+      case 'integer':
+      case 'timestamp':
+      case 'double':
+      case 'long':
+        isValid = Boolean(isNumberValid(row[filter.name], filter.model, filter.operator));
+        break;
+      default:
+        isValid = false;
+        break;
       }
 
       return {
@@ -209,22 +209,22 @@ export function FilterService($q, $mdDialog) {
     const c = numberFilterModel.otherValue;
 
     switch (operator) {
-      case OPERATORS.GREATER.value:
-        return a > b;
-      case OPERATORS.LESS.value:
-        return a < b;
-      case OPERATORS.GREATER_OR_EQUAL.value:
-        return a >= b;
-      case OPERATORS.LESS_OR_EQUAL.value:
-        return a <= b;
-      case OPERATORS.NOT_EQUALS.value:
-        return a !== b;
-      case OPERATORS.EQUALS.value:
-        return a === b;
-      case OPERATORS.BETWEEN.value:
-        return c <= a && a <= b;
-      default:
-        return false;
+    case OPERATORS.GREATER.value:
+      return a > b;
+    case OPERATORS.LESS.value:
+      return a < b;
+    case OPERATORS.GREATER_OR_EQUAL.value:
+      return a >= b;
+    case OPERATORS.LESS_OR_EQUAL.value:
+      return a <= b;
+    case OPERATORS.NOT_EQUALS.value:
+      return a !== b;
+    case OPERATORS.EQUALS.value:
+      return a === b;
+    case OPERATORS.BETWEEN.value:
+      return c <= a && a <= b;
+    default:
+      return false;
     }
   }
 
