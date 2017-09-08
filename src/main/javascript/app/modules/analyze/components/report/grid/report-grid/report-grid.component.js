@@ -4,7 +4,7 @@ import * as find from 'lodash/find';
 import * as forEach from 'lodash/forEach';
 import * as remove from 'lodash/remove';
 import * as isUndefined from 'lodash/isUndefined';
-import $ from 'jquery';
+import * as $ from 'jquery';
 
 import * as template from './report-grid.component.html';
 import style from './report-grid.component.scss';

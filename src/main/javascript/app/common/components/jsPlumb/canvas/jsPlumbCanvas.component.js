@@ -1,4 +1,4 @@
-import jsPlumb from 'jsplumb';
+import * as jsPlumb from 'jsplumb';
 
 import * as template from './jsPlumbCanvas.component.html';
 import style from './jsPlumbCanvas.component.scss';
