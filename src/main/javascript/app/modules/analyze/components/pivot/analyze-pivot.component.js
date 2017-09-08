@@ -356,6 +356,7 @@ export const AnalyzePivotComponent = {
               type: field.type,
               columnName: field.columnName
             };
+            this.putBackKeywordSuffix(backendField);
             if (field.area === 'data') {
               backendField.aggregate = field.aggregate;
               // name field is needed for the elastic search request
@@ -370,12 +371,19 @@ export const AnalyzePivotComponent = {
 
       return {
         booleanCriteria: this.model.sqlBuilder.booleanCriteria,
-        filters: map(this.filters, this._FilterService.frontend2BackendFilter()),
-        sorts: this.mapFrontend2BackendSort(this.sorts),
+        filters: map(map(this.filters, this._FilterService.frontend2BackendFilter()), this.putBackKeywordSuffix),
+        sorts: map(this.mapFrontend2BackendSort(this.sorts), this.putBackKeywordSuffix),
         rowFields: groupedFields.row || [],
         columnFields: groupedFields.column || [],
         dataFields: groupedFields.data
       };
+    }
+
+    putBackKeywordSuffix(field) {
+      if (field.type === 'string') {
+        field.columnName = `${field.columnName}.keyword`;
+      }
+      return field;
     }
 
     openSavePivotModal(ev) {
