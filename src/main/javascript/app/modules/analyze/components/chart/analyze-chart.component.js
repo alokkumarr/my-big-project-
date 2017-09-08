@@ -155,7 +155,7 @@ export const AnalyzeChartComponent = {
       this.labels.x = this.labels.tempX;
       this.labels.y = this.labels.tempY;
       this.startDraftMode();
-      this.reloadChart(this.settings, this.filteredGridData);
+      this.onRefreshData();
     }
 
     onSettingsChanged() {
@@ -222,14 +222,9 @@ export const AnalyzeChartComponent = {
     }
 
     openChartPreviewModal(ev) {
-      this.refreshChartData();
       const tpl = '<analyze-chart-preview model="model"></analyze-chart-preview>';
       this.openPreviewModal(tpl, ev, {
-        chartOptions: this.chartOptions,
-        settings: this.settings,
-        chart: this.generatePayload(this.model),
-        legend: this.legend,
-        labels: this.labels
+        chartOptions: this.chartOptions
       });
     }
 
