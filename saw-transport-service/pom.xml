@@ -571,7 +571,7 @@
                     <mappings>
                         <mapping>
                             <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/lib</directory>
-                            <filemode>440</filemode>
+                            <filemode>444</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
                             <sources>
@@ -584,7 +584,7 @@
                         </mapping>
                         <mapping>
                             <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/sparklib</directory>
-                            <filemode>440</filemode>
+                            <filemode>444</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
                             <sources>
@@ -597,7 +597,7 @@
                         </mapping>
                         <mapping>
                             <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/bin</directory>
-                            <filemode>750</filemode>
+                            <filemode>755</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
                             <sources>
@@ -635,7 +635,7 @@
                         </mapping>
                         <mapping>
                             <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/schema</directory>
-                            <filemode>750</filemode>
+                            <filemode>755</filemode>
                             <username>${app.user}</username>
                             <groupname>${app.group}</groupname>
                             <sources>
