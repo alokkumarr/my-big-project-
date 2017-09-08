@@ -24,7 +24,7 @@ provided in the environment:
    memory and CentOS 7 as the operating system.  The host should be
    dedicated to SAW and not run other applications.
 
-6. Enable MapR Yum repositories on the SAW target host
+6. Install and configure MapR client on the SAW target host
 
 Please note that the target hosts must be allocated exclusively for
 SAW use.  The underlying infrastructure up to the operating system
