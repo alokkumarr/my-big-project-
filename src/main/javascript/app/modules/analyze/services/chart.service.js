@@ -101,6 +101,29 @@ export function ChartService(Highcharts) {
     donut: donutConfig
   };
 
+  function addCommas(nStr) {
+    nStr = String(nStr);
+    const x = nStr.split('.');
+    let x1 = x[0];
+    const x2 = x.length > 1 ? '.' + x[1] : '';
+    const rgx = /(\d+)(\d{3})/;
+    while (rgx.test(x1)) {
+      x1 = x1.replace(rgx, '$1,$2');
+    }
+    return x1 + x2;
+  }
+
+  function updateAnalysisModel(analysis) {
+    switch (analysis.chartType) {
+      case 'pie':
+        analysis.labelOptions = analysis.labelOptions || {enabled: true, value: 'percentage'};
+        break;
+      default:
+        break;
+    }
+    return analysis;
+  }
+
   /* Returns default chart config for various chart types */
   const getChartConfigFor = (type, options) => {
     const legendPosition = LEGEND_POSITIONING[get(options, 'legend.align', 'right')];
@@ -154,6 +177,7 @@ export function ChartService(Highcharts) {
       required: {
         x: true, y: true, z: false, g: false
       },
+      labelOptions: [],
       customTooltip: true,
       legend: true
     };
@@ -169,6 +193,13 @@ export function ChartService(Highcharts) {
         config.axisLabels.y = 'Angle';
         config.axisLabels.x = 'Color By';
         config.renamable.x = false;
+        config.labelOptions = [{
+          value: 'percentage',
+          name: 'Show Percentage'
+        }, {
+          value: 'data',
+          name: 'Show Data Value'
+        }];
         config.customTooltip = false;
         config.legend = false;
         return config;
@@ -377,29 +408,19 @@ export function ChartService(Highcharts) {
       }
     }
 
-    /* eslint-disable */
     const chartSeries = [{
       data: innerData,
       dataLabels: {
-        formatter: function () {
-          return this.percentage > 5 ? `${this.point.name}: ${round(this.percentage, 2)}%` : null;
-        },
         color: '#ffffff',
         distance: -30
       },
       size: '60%'
     }, {
       data: outerData,
-      dataLabels: {
-        formatter: function () {
-          return `${this.point.name}: ${round(this.percentage, 2)}%`;
-        }
-      },
       size: '100%',
       innerSize: '60%',
       id: 'outerData'
     }];
-    /* eslint-enable */
 
     return chartSeries;
   }
@@ -421,7 +442,6 @@ export function ChartService(Highcharts) {
 
       case 'pie':
         if (!fields.g) {
-          set(series, '0.dataLabels.format', '{point.name}: {point.percentage:.2f}%');
           mapperFn = ({x, y}) => {
             const category = get(categories, `x.${x}`);
             return {name: category, y, drilldown: category};
@@ -448,12 +468,26 @@ export function ChartService(Highcharts) {
     const yField = get(fields, 'y.0', {});
     const yLabel = get(opts, 'labels.y') || `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}`;
 
+    const labelOptions = get(opts, 'labelOptions', {enabled: true, value: 'percentage'});
+
     if (!isEmpty(gridData)) {
       const {series, categories} = splitToSeriesAndCategories(gridData, fields);
       const {chartSeries} = customizeSeriesForChartType(series, type, categories, fields, opts);
 
       forEach(chartSeries, seriesData => {
         seriesData.name = yLabel;
+        seriesData.dataLabels = seriesData.dataLabels || {};
+        seriesData.dataLabels.enabled = labelOptions.enabled;
+        /* eslint-disable */
+        seriesData.dataLabels.formatter = function () {
+          if (this.percentage <= 5) {
+            return null;
+          }
+          const data = labelOptions.value === 'percentage' ? this.percentage : this.y;
+          const isPercent = labelOptions.value === 'percentage';
+          return `${this.point.name}: ${addCommas(round(data, 2))}${isPercent ? '%' : '' }`;
+        };
+        /* eslint-enable */
       });
       changes.push({
         path: 'series',
@@ -670,6 +704,7 @@ export function ChartService(Highcharts) {
     dataToChangeConfig,
     fillSettings,
     parseData,
+    updateAnalysisModel,
 
     LEGEND_POSITIONING,
     LAYOUT_POSITIONS
