@@ -1,5 +1,5 @@
-import forEach from 'lodash/forEach';
-import find from 'lodash/find';
+import * as forEach from 'lodash/forEach';
+import * as find from 'lodash/find';
 import {AnalyzeModule} from '../../../main/javascript/app/modules/analyze';
 import {data} from './pivotData';
 import {pivot as pivotSqlBuilder} from './sqlBuilder';

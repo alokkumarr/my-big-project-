@@ -21,11 +21,12 @@ module.exports = function (env) {
         // preloaders
         {
           enforce: 'pre',
-          test: /\.js$/,
+          test: /\.[jt]s$/,
           exclude: /node_modules/,
           loader: 'tslint-loader',
           options: {
             fix: false,
+            typeCheck: false, // tslint-loader is way too slow with this enabled. Use pre-push hook for typechecking
             tsConfigFile: webpackHelper.root('conf/tsconfig.json'),
             configFile: webpackHelper.root('conf/tslint-dev.json')
           }
@@ -41,7 +42,7 @@ module.exports = function (env) {
           loader: 'json-loader'
         },
         {
-          test: /\.js$/,
+          test: /\.[jt]s$/,
           exclude: /node_modules/,
           loaders: ['ng-annotate-loader', {
             loader: 'ts-loader',
