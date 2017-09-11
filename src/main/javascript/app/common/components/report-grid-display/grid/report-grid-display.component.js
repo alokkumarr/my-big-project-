@@ -21,10 +21,14 @@ export const ReportGridDisplayComponent = {
       this._dxDataGridService = dxDataGridService;
       this._FilterService = FilterService;
       this._gridInstance = null;
+      this.pageSize = DEFAULT_PAGE_SIZE;
+      this.$window = window;
     }
 
     $onInit() {
       const columns = this._getDxColumns(this.columns);
+
+      const gridSelector = '.report-dx-grid.report-dx-grid-display';
 
       this.gridConfig = this._dxDataGridService.mergeWithDefaultConfig({
         columns,
@@ -36,14 +40,31 @@ export const ReportGridDisplayComponent = {
           mode: 'standard'
         },
         paging: {
-          pageSize: DEFAULT_PAGE_SIZE
+          pageSize: this.pageSize
         },
         pager: {
           showNavigationButtons: true,
           allowedPageSizes: [DEFAULT_PAGE_SIZE, 25, 50, 100],
           showPageSizeSelector: true
         },
-        onInitialized: this.onGridInitialized.bind(this)
+        loadPanel: {
+          position: {
+            of: gridSelector,
+            at: 'center',
+            my: 'center'
+          },
+          onShowing: () => {
+            if (this._gridInstance) {
+              this.pageSize = this._gridInstance.pageSize();
+            }
+          }
+        },
+        bindingOptions: {
+          'loadPanel.position.of': `$ctrl.pageSize > ${DEFAULT_PAGE_SIZE} ? window : "${gridSelector}"`
+        },
+        onInitialized: this.onGridInitialized.bind(this),
+        height: 'auto',
+        width: 'auto'
       });
     }
 
