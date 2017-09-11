@@ -108,7 +108,7 @@ export const AnalyzeListViewComponent = {
         dataField: 'metrics',
         allowSorting: true,
         alignment: 'left',
-        width: '20%',
+        width: '10%',
         calculateCellValue: rowData => {
           return rowData.metricName ||
             (rowData.metrics || []).join(', ');
@@ -119,13 +119,13 @@ export const AnalyzeListViewComponent = {
         dataField: 'scheduleHuman',
         allowSorting: true,
         alignment: 'left',
-        width: '15%'
+        width: '12%'
       }, {
         caption: 'TYPE',
         dataField: 'type',
         allowSorting: true,
         alignment: 'left',
-        width: '10%',
+        width: '8%',
         calculateCellValue: rowData => {
           return (rowData.type || '').toUpperCase();
         },
@@ -135,7 +135,7 @@ export const AnalyzeListViewComponent = {
         dataField: 'userFullName',
         allowSorting: true,
         alignment: 'left',
-        width: '10%',
+        width: '20%',
         calculateCellValue: rowData => {
           return (rowData.userFullName || '').toUpperCase();
         },
@@ -145,7 +145,10 @@ export const AnalyzeListViewComponent = {
         allowSorting: true,
         dataField: 'createdTimestamp',
         alignment: 'left',
-        width: '10%',
+        width: '15%',
+        calculateCellValue: rowData => {
+          return (new Date(rowData.createdTimestamp).toDateString() || '').toUpperCase();
+        },
         cellTemplate: 'timecreatedCellTemplate'
       }, {
         caption: '',
