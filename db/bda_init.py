@@ -54,8 +54,11 @@ def init_logger( tag = cmd_nam ):
     # create console handler
     ch = logging.StreamHandler() # sys.stderr
     ch.setFormatter(formatter)
+    # Create syslog handler
+    syslog = logging.handlers.SysLogHandler(address = '/dev/log')
     # add the handlers to the logger
     logger.addHandler(ch)
+    logger.addHandler(syslog)
     return logger
 
 # Add file handler to logger
@@ -148,17 +151,6 @@ if not appl_info_file:
 
 appl_info_dict = read_appl_info(appl_info_file)
 logger.debug("appl_info: %d values", len(appl_info()))
-
-# Derivatives
-if 'vardir' in appl_info_dict:
-    var_dir = appl_info_dict['vardir']
-    if var_dir[0] != '/':
-        logger.error( "bad vardir in appl_info: %s", var_dir )
-        sys.exit(1)
-    log_fnm = os.path.join(var_dir, "log", cmd_nam + ".log")
-    logger.debug("log_fnm: %s", log_fnm)
-    # Add file handler to logger
-    logger = init_logger_file(logger, log_fnm)
 
 if __name__ == '__main__': # test
     print "Log file:", log_fnm

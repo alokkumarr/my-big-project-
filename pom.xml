@@ -314,9 +314,6 @@
                             <directory>${app.varDir}</directory>
                         </mapping>
                         <mapping>
-                            <directory>${app.varDir}/log</directory>
-                        </mapping>
-                        <mapping>
                             <directory>${app.varDir}/run</directory>
                         </mapping>
                         
