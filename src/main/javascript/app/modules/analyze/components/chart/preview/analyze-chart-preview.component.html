@@ -7,22 +7,18 @@
           <md-icon md-font-icon="icon-remove"></md-icon>
         </md-button>
         <div class="md-title">
-          <strong ng-bind="::$ctrl.model.report.name"></strong>
+          <strong ng-bind="::$ctrl.model.chart.name"></strong>
         </div>
       </div>
-      <!-- gui-cleanup-2.0 -->
-      <!--<div layout="row" layout-align="center center">
-        <md-button translate="EXPORT"></md-button>
-        <md-button class="btn-primary" translate="PUBLISH"></md-button>
-      </div>-->
     </div>
   </analyze-dialog-header>
 
   <analyze-dialog-content>
-      <md-card class="chart-container-card">
-        <md-card-content>
-            <chart style="width: 100%" options="$ctrl.model.chartOptions"></chart>
-        </md-card-content>
-      </md-card>
+      <div layout="row">
+        <chart style="width: calc(100% - 20px); margin: 0 10px"
+               options="$ctrl.chartOptions"
+               updater="$ctrl.chartUpdater">
+        </chart>
+      </div>
   </analyze-dialog-content>
 </analyze-dialog>

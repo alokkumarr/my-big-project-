@@ -22,7 +22,6 @@
       }
     ],
     "function-calc-no-unspaced-operator": null,
-    "media-feature-no-missing-punctuation": null,
     "selector-type-no-unknown": null
   }
 }
