@@ -27,7 +27,7 @@ object MetadataStoreSchema {
    * every startup of the application.
    */
   def init(admin: Admin) {
-    log.info("Initializing metadata store tables")
+    log.debug("Initializing metadata store tables")
     /* Create UI artifact table */
     initTable(admin, "ui_metadata", "_system", "_source", "_search")
     /* Create Semantic Layer storage*/
@@ -42,7 +42,7 @@ object MetadataStoreSchema {
     /* Create Analysis Result table*/
     initTable(admin, "analysis_results", "_system", "_source", "_search",
       "_objects")
-    log.info("Done initializing metadata store tables")
+    log.debug("Done initializing metadata store tables")
   }
 
   /**
@@ -51,7 +51,7 @@ object MetadataStoreSchema {
    */
   private def initTable(admin: Admin, name: String, familyNames: String*) {
     val tablePath = TableHome + "/" + name
-    log.info("Checking table: {}", tablePath)
+    log.debug("Checking table: {}", tablePath)
     if (!admin.tableExists(TableName.valueOf(tablePath))) {
       log.info("Table does not exist: {}", tablePath)
       val descriptor = new HTableDescriptor()
