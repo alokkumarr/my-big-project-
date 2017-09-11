@@ -22,7 +22,7 @@
         <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>
       </div>
       <div data-options="dxTemplate: { name: 'timecreatedCellTemplate' }">
-          <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>
+          <span ng-bind-html="report.value | date: 'dd/MMM/yy' | highlight:$ctrl.searchTerm"></span>
       </div>
       <div data-options="dxTemplate: { name: 'actionCellTemplate' }">
         <md-card-actions layout="row" layout-align="center center">
