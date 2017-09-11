@@ -148,7 +148,11 @@ class Analysis extends BaseController {
 	      val executionType = (analysis \ "executionType")
 	        .extractOrElse[String]("interactive")
 	      val runtime = (executionType == "interactive")
-	      queryRuntime = QueryBuilder.build(analysis, runtime)
+              queryRuntime = (analysis \ "queryManual") match {
+                case JNothing => QueryBuilder.build(analysis, runtime)
+                case obj: JString => obj.extract[String]
+                case obj => unexpectedElement("string", obj)
+              }
           }}
           case _ => {}
         }
