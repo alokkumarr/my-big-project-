@@ -62,7 +62,9 @@ export const ReportGridDisplayComponent = {
         bindingOptions: {
           'loadPanel.position.of': `$ctrl.pageSize > ${DEFAULT_PAGE_SIZE} ? window : "${gridSelector}"`
         },
-        onInitialized: this.onGridInitialized.bind(this)
+        onInitialized: this.onGridInitialized.bind(this),
+        height: 'auto',
+        width: 'auto'
       });
     }
 

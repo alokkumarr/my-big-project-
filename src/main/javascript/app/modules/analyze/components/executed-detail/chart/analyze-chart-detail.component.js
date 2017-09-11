@@ -55,7 +55,7 @@ export const AnalyzeChartDetailComponent = {
         this.analysis.chartType,
         this.settings,
         this.filteredData,
-        {labels: this.labels}
+        {labels: this.labels, labelOptions: this.analysis.labelOptions}
       );
 
       this.chartUpdater.next(changes);

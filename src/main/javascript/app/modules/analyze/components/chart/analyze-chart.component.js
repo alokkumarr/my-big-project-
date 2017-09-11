@@ -98,6 +98,7 @@ export const AnalyzeChartComponent = {
     }
 
     initChart() {
+      this._ChartService.updateAnalysisModel(this.model);
       this.settings = this._ChartService.fillSettings(this.model.artifacts, this.model);
       this.reloadChart(this.settings, this.filteredGridData);
 
@@ -149,6 +150,11 @@ export const AnalyzeChartComponent = {
           data: layout.layout
         }
       ]);
+    }
+
+    updateLabelOptions() {
+      this.startDraftMode();
+      this.reloadChart(this.settings, this.filteredGridData);
     }
 
     updateCustomLabels() {
@@ -215,16 +221,21 @@ export const AnalyzeChartComponent = {
         this.model.chartType,
         settings,
         filteredGridData,
-        {labels: this.labels}
+        {labels: this.labels, labelOptions: this.model.labelOptions}
       );
 
       this.updateChart.next(changes);
     }
 
     openChartPreviewModal(ev) {
+      this.onRefreshData();
       const tpl = '<analyze-chart-preview model="model"></analyze-chart-preview>';
       this.openPreviewModal(tpl, ev, {
-        chartOptions: this.chartOptions
+        chartOptions: this.chartOptions,
+        settings: this.settings,
+        chart: this.generatePayload(this.model),
+        legend: this.legend,
+        labels: this.labels
       });
     }
 
