@@ -1,5 +1,5 @@
 let apiUrl;
-let endpoints;
+const endpoints = {security: 'security', services: 'services'};
 
 /* eslint-disable */
 if (__PRODUCTION__) {
@@ -8,8 +8,6 @@ if (__PRODUCTION__) {
   apiUrl = 'https://saw.bda.poc.velocity-va.synchronoss.net';
 }
 /* eslint-enable */
-
-endpoints = {security: 'security', services: 'services'};
 
 export default {
   login: {
