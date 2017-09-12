@@ -7,10 +7,10 @@ spring:
     banner-mode: 'off'
 server:
   address: localhost
-  port: 9100 
+  port: 9100
   context-path: ''
   compression:
-    enabled: true    
+    enabled: true
 
 analysis:
     service:
@@ -33,7 +33,7 @@ api:
             path: '[/]md*'
         -   location: ${analysis.service.host}
             method: GET
-            path: '[/]analysis*'
+            path: '[/]analysis.*'
         -   location: ${analysis.service.host}
             method: POST
             path: '[/]analysis*'
