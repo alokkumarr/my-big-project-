@@ -22,6 +22,7 @@ saw_elasticsearch_username=elastic
 saw_elasticsearch_password=elastic
 saw_spark_master_url=spark://localhost:7077
 saw_zookeeper_quorum=localhost
+#saw_mapr_user_id=500
 
 [saw-security]
 localhost
