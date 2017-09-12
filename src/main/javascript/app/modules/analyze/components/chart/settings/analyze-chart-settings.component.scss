@@ -38,6 +38,11 @@ analyze-chart-settings {
         &[disabled] ~ span {
           color: #C1C1C1;
         }
+
+        .md-label {
+          display: block !important;
+          width: 120px;
+        }
       }
     }
   }
