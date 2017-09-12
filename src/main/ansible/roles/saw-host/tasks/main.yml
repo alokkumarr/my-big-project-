@@ -1,0 +1,3 @@
+- name: Make systemd journal persistent
+  file: name=/var/log/journal state=directory
+  notify: restart journald

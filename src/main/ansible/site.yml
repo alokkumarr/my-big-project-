@@ -1,5 +1,10 @@
-# Note: Order according to dependencies, to ensure health checks can
-# succeed right after installation
+# Note: Order according to dependencies, to ensure health checks
+# can succeed right after installation
+- name: SAW Host
+  hosts: all
+  become: true
+  roles:
+    - saw-host
 - include: modules/saw-security/ansible/site.yml
 - include: modules/saw-services/ansible/site.yml
 - include: modules/saw-web/ansible/site.yml
