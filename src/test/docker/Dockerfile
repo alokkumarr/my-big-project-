@@ -25,6 +25,7 @@ RUN yum -y -q --nogpgcheck install ansible rsync
 RUN yum -y -q --nogpgcheck install openssh-clients
 
 # Add oneshot service to start application deployment at startup
+ADD saw-deploy-dev /root/
 COPY saw-deploy.service /etc/systemd/system/
 RUN systemctl enable saw-deploy
 

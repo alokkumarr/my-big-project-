@@ -1,3 +1,7 @@
 - name: Make systemd journal persistent
   file: name=/var/log/journal state=directory
   notify: restart journald
+  # Workaround: Restarting journald inside a container seems to cause
+  # the saw-deploy service to fail, so skip it for development
+  # containers for now
+  when: lookup('env', 'container') != 'docker'

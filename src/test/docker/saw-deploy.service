@@ -4,8 +4,7 @@ After=default.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c "tar -xzf saw.tgz && saw/saw-deploy /root/saw-config"
-WorkingDirectory=/maven
+ExecStart=/root/saw-deploy-dev
 Environment=container=docker
 SyslogIdentifier=saw-deploy
 

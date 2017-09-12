@@ -1,0 +1,9 @@
+#!/bin/sh
+#
+# Start SAW deployment for container
+#
+set -eu
+
+cd /maven
+tar -xzf saw.tgz
+saw/saw-deploy /root/saw-config
