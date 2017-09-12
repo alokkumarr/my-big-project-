@@ -48,6 +48,11 @@ const methods = [
         label: 'Bubble Chart',
         icon: {font: 'icon-chart-bubble'},
         type: 'chart:bubble'
+      },
+      {
+        label: 'Pie Chart',
+        icon: {font: 'icon-chart-pie'},
+        type: 'chart:pie'
       }
     ]
   }

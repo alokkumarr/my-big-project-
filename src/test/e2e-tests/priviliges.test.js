@@ -1,7 +1,7 @@
-const login = require('../pages/common/login.po.js');
-const header = require('../pages/components/header.co.js');
-const analyze = require('../pages/common/analyze.po.js');
-const executedAnalysis = require('../pages/common/executedAlaysis.po');
+const login = require('../javascript/pages/common/login.po.js');
+const header = require('../javascript/pages/components/header.co.js');
+const analyze = require('../javascript/pages/common/analyze.po.js');
+const executedAnalysis = require('../javascript/pages/common/executedAlaysis.po');
 const protractor = require('protractor');
 const ec = protractor.ExpectedConditions;
 

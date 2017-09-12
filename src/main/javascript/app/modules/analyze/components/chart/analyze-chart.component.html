@@ -30,6 +30,7 @@
 
   <analyze-dialog-content>
     <analyze-chart-settings
+        view-options="$ctrl.chartViewOptions"
         settings="$ctrl.settings"
         on-change="$ctrl.onSettingsChanged(settings)"
         chart-type="$ctrl.model.chartType"
@@ -92,22 +93,41 @@
                         on-filter-removed="$ctrl.onFilterRemoved(index)">
           </filter-chips>
           <h3 translate="CUSTOM_AXIS_LABELS"></h3>
-          <div layout="row" layout-align="center">
-            <md-input-container flex>
-                <label translate="CUSTOM_Y_AXIS_LABEL"></label>
-                <input ng-model="$ctrl.labels.tempY"/>
-            </md-input-container>
-            <md-input-container flex>
-                <label translate="CUSTOM_X_AXIS_LABEL"></label>
-                <input ng-model="$ctrl.labels.tempX"/>
-            </md-input-container>
-            <md-button flex="nogrow" class="btn-primary" ng-click="$ctrl.updateCustomLabels()">
-              <span translate="UPDATE"></span>
-            </md-button>
+          <div layout="column">
+            <div layout="row" layout-align="center">
+              <md-input-container flex ng-if="::$ctrl.chartViewOptions.renamable.y">
+                  <label ng-bind="::('Custom ' + $ctrl.chartViewOptions.axisLabels.y + ' Label')"></label>
+                  <input ng-model="$ctrl.labels.tempY"/>
+              </md-input-container>
+              <md-input-container flex ng-if="::$ctrl.chartViewOptions.renamable.x">
+                  <label ng-bind="::('Custom ' + $ctrl.chartViewOptions.axisLabels.x + ' Label')"></label>
+                  <input ng-model="$ctrl.labels.tempX"/>
+              </md-input-container>
+              <md-button flex="nogrow" class="btn-primary" ng-click="$ctrl.updateCustomLabels()">
+                <span translate="APPLY"></span>
+              </md-button>
+            </div>
+            <div layout="row" class="label-options">
+              <md-checkbox ng-if="::$ctrl.chartViewOptions.labelOptions.length" flex="20"
+                ng-change="$ctrl.updateLabelOptions()"
+                ng-model="$ctrl.model.labelOptions.enabled">
+                <span translate="SHOW_CHART_LABELS"></span>
+              </md-checkbox>
+              <md-radio-group ng-model="$ctrl.model.labelOptions.value" flex="30"
+                ng-change="$ctrl.updateLabelOptions()"
+                ng-show="$ctrl.model.labelOptions.enabled">
+                <div layout="row">
+                  <md-radio-button ng-value="option.value" flex
+                    ng-repeat="option in $ctrl.chartViewOptions.labelOptions">
+                    <span ng-bind="::option.name"></span>
+                  </md-radio-button>
+                </div>
+              </md-radio-group>
+            </div>
           </div>
 
-          <h3 translate="LEGEND_OPTIONS"></h3>
-          <div layout="row" layout-align="center">
+          <h3 translate="LEGEND_OPTIONS" ng-if="::$ctrl.chartViewOptions.legend"></h3>
+          <div layout="row" layout-align="center" ng-if="::$ctrl.chartViewOptions.legend">
             <md-input-container flex>
               <label translate="POSITION"></label>
               <md-select ng-model="$ctrl.legend.align" ng-change="$ctrl.updateLegendPosition()">

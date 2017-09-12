@@ -14,11 +14,12 @@ export const AnalyzeChartDetailComponent = {
     requester: '<'
   },
   controller: class AnalyzeChartDetailController {
-    constructor(ChartService, FilterService, $timeout) {
+    constructor(ChartService, FilterService, $timeout, SortService) {
       'ngInject';
 
       this._ChartService = ChartService;
       this._FilterService = FilterService;
+      this._SortService = SortService;
       this._$timeout = $timeout;
       this.chartUpdater = new BehaviorSubject({});
       this.labels = {
@@ -32,9 +33,8 @@ export const AnalyzeChartDetailComponent = {
       this.subscription = this.requester.subscribe(options => this.request(options));
 
       this.sortFields = this._SortService.getArtifactColumns2SortFieldMapper()(this.analysis.artifacts[0].columns);
-      this.sorts = this.model.sqlBuilder.sorts ?
+      this.sorts = this.analysis.sqlBuilder.sorts ?
         this._SortService.mapBackend2FrontendSort(this.analysis.sqlBuilder.sorts, this.sortFields) : [];
-
       this.labels.x = get(this.analysis, 'xAxis.title', null);
       this.labels.y = get(this.analysis, 'yAxis.title', null);
 
@@ -46,7 +46,10 @@ export const AnalyzeChartDetailComponent = {
           layout: values(this._ChartService.LAYOUT_POSITIONS)
         }
       };
-      this.chartOptions = this._ChartService.getChartConfigFor(this.analysis.chartType, {legend: this.legend});
+      this.chart = {
+        height: 580
+      };
+      this.chartOptions = this._ChartService.getChartConfigFor(this.analysis.chartType, {chart: this.chart, legend: this.legend});
 
       this._$timeout(() => {
         this.updateChart();
@@ -59,8 +62,8 @@ export const AnalyzeChartDetailComponent = {
 
     updateChart() {
       if (!isEmpty(this.sorts)) {
-        this.filteredGridData = orderBy(
-          this.filteredGridData,
+        this.filteredData = orderBy(
+          this.filteredData,
           map(this.sorts, 'field.dataField'),
           map(this.sorts, 'order')
         );
@@ -69,7 +72,7 @@ export const AnalyzeChartDetailComponent = {
         this.analysis.chartType,
         this.settings,
         this.filteredData,
-        {labels: this.labels}
+        {labels: this.labels, labelOptions: this.analysis.labelOptions}
       );
 
       this.chartUpdater.next(changes);

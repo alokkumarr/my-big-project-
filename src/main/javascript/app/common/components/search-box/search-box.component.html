@@ -1,6 +1,6 @@
 <div class="search-box" ng-class="{'m-search-visible': $ctrl.states.hovered || $ctrl.states.focused || $ctrl.model}">
   <md-icon md-font-icon="icon-search"
-    ng-click="$ctrl.states.focused = true">
+    ng-click="$ctrl.doAutoFocus()">
     <md-tooltip ng-bind="'TOOLTIP_SEARCH' | translate"></md-tooltip>
 
   </md-icon>
@@ -8,7 +8,7 @@
   <input placeholder="{{$ctrl.placeholder}}"
          ng-click="$ctrl.states.focused = true"
          ng-change="$ctrl.onModelChanged()"
-         ng-model="$ctrl.model"/>
+         ng-model="$ctrl.model" type="text" id="search-box-autofocus" />
 
   <md-icon md-font-icon="icon-close"
     ng-click="$ctrl.states.focused = false; $ctrl.model = ''; $ctrl.onModelChanged()"

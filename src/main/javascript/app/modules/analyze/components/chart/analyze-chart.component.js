@@ -1,6 +1,7 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import findIndex from 'lodash/findIndex';
 import find from 'lodash/find';
+import forEach from 'lodash/forEach';
 import filter from 'lodash/filter';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
@@ -10,7 +11,6 @@ import values from 'lodash/values';
 import clone from 'lodash/clone';
 import set from 'lodash/set';
 import orderBy from 'lodash/orderBy';
-import forEach from 'lodash/forEach';
 import concat from 'lodash/concat';
 import remove from 'lodash/remove';
 
@@ -73,6 +73,7 @@ export const AnalyzeChartComponent = {
       this.chartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
 
       this.barColumnChoice = '';
+      this.chartViewOptions = ChartService.getViewOptionsFor(this.model.chartType);
     }
 
     toggleLeft() {
@@ -101,6 +102,7 @@ export const AnalyzeChartComponent = {
     }
 
     initChart() {
+      this._ChartService.updateAnalysisModel(this.model);
       this.settings = this._ChartService.fillSettings(this.model.artifacts, this.model);
       this.sortFields = this._SortService.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
       this.sorts = this.model.sqlBuilder.sorts ?
@@ -157,11 +159,16 @@ export const AnalyzeChartComponent = {
       ]);
     }
 
+    updateLabelOptions() {
+      this.startDraftMode();
+      this.reloadChart(this.settings, this.filteredGridData);
+    }
+
     updateCustomLabels() {
       this.labels.x = this.labels.tempX;
       this.labels.y = this.labels.tempY;
       this.startDraftMode();
-      this.refreshChartData(this.settings);
+      this.reloadChart(this.settings, this.filteredGridData);
     }
 
     onSettingsChanged() {
@@ -172,7 +179,7 @@ export const AnalyzeChartComponent = {
 
     onRefreshData() {
       if (!this.checkModelValidity()) {
-        return;
+        return null;
       }
       this.startProgress();
       const payload = this.generatePayload(this.model);
@@ -191,33 +198,23 @@ export const AnalyzeChartComponent = {
     checkModelValidity() {
       let isValid = true;
       const errors = [];
-      const x = find(this.settings.xaxis, x => x.checked === 'x');
-      const y = find(this.settings.yaxis, y => y.checked === 'y');
-      const z = find(this.settings.zaxis, z => z.checked === 'z');
+      const present = {
+        x: find(this.settings.xaxis, x => x.checked === 'x'),
+        y: find(this.settings.yaxis, y => y.checked === 'y'),
+        z: find(this.settings.zaxis, z => z.checked === 'z'),
+        g: find(this.settings.groupBy, g => g.checked === 'g')
+      };
 
-      switch (this.model.chartType) {
-        case 'bubble':
-          // x, y and z axes are mandatory
-          // grouping is optional
-          if (!x || !y || !z) {
-            errors[0] = 'ERROR_X_Y_SIZEBY_AXES_REQUIRED';
-            isValid = false;
-          }
-          break;
-        default:
-          // x and y axes are mandatory
-          // grouping is optional
-          if (!x || !y) {
-            errors[0] = 'ERROR_X_Y_AXES_REQUIRED';
-            isValid = false;
-          }
-      }
+      forEach(this.chartViewOptions.required, (v, k) => {
+        if (v && !present[k]) {
+          errors.push(`'${this.chartViewOptions.axisLabels[k]}'`);
+        }
+      });
 
-      if (!isValid) {
-        this._$translate(errors).then(translations => {
-          this._toastMessage.error(values(translations).join('\n'), '', {
-            timeOut: 3000
-          });
+      if (errors.length) {
+        isValid = false;
+        this._toastMessage.error(`${errors.join(', ')} required`, '', {
+          timeOut: 3000
         });
       }
 
@@ -239,16 +236,21 @@ export const AnalyzeChartComponent = {
         this.model.chartType,
         settings,
         filteredGridData,
-        {labels: this.labels}
+        {labels: this.labels, labelOptions: this.model.labelOptions}
       );
 
       this.updateChart.next(changes);
     }
 
     openChartPreviewModal(ev) {
+      this.refreshChartData();
       const tpl = '<analyze-chart-preview model="model"></analyze-chart-preview>';
       this.openPreviewModal(tpl, ev, {
-        chartOptions: this.chartOptions
+        chartOptions: this.chartOptions,
+        settings: this.settings,
+        chart: this.generatePayload(this.model),
+        legend: this.legend,
+        labels: this.labels
       });
     }
 
@@ -319,6 +321,7 @@ export const AnalyzeChartComponent = {
         sorts: map(this.sorts, sort => clone(sort))
       }).then(sorts => {
         this.sorts = sorts;
+        this.startDraftMode();
         this.onRefreshData();
       });
     }

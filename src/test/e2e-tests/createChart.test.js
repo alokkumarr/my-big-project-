@@ -1,13 +1,14 @@
-const sidenav = require('../pages/components/sidenav.co.js');
-const analyze = require('../pages/common/analyze.po.js');
+const login = require('../javascript/pages/common/login.po.js');
+const sidenav = require('../javascript/pages/components/sidenav.co.js');
+const analyze = require('../javascript/pages/common/analyze.po.js');
 const protractor = require('protractor');
-const ec = protractor.ExpectedConditions;
-const {hasClass} = require('../utils');
+const commonFunctions = require('../javascript/helpers/commonFunctions.js');
+const {hasClass} = require('../javascript/helpers/utils');
 
-describe('create a new columnChart type analysis', () => {
+describe('create columnChart type analysis', () => {
   let categoryName;
   const chartDesigner = analyze.designerDialog.chart;
-  const chartName = 'e2e column chart';
+  const chartName = `e2e column chart ${(new Date()).toString()}`;
   const chartDescription = 'e2e test chart description';
   const xAxisName = 'Source Manufacturer';
   const yAxisName = 'Available MB';
@@ -15,6 +16,11 @@ describe('create a new columnChart type analysis', () => {
   const groupName = 'Source OS';
   const metric = 'MCT Content';
   const method = 'chart:column';
+
+  it('login as admin', () => {
+    expect(browser.getCurrentUrl()).toContain('/login');
+    login.loginAs('admin');
+  });
 
   it('should open the sidenav menu and go to first category', () => {
     sidenav.menuBtn.click();
@@ -52,7 +58,9 @@ describe('create a new columnChart type analysis', () => {
     stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
     filters.applyBtn.click();
 
-    expect(filters.getAppliedFilter(fieldName).isPresent()).toBe(true);
+    const appliedFilter = filters.getAppliedFilter(fieldName);
+    commonFunctions.waitFor.elementToBePresent(appliedFilter);
+    expect(appliedFilter.isPresent()).toBe(true);
   });
 
   it('should select x, y axes and a grouping', () => {
@@ -74,28 +82,37 @@ describe('create a new columnChart type analysis', () => {
   it('should attempt to save the report', () => {
     const save = analyze.saveDialog;
     const designer = analyze.designerDialog;
+    commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
     designer.saveBtn.click();
 
-    expect(designer.elem).toBeTruthy();
-    expect(save.selectedCategory.getText()).toEqual(categoryName);
+    commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
+    expect(designer.saveDialog).toBeTruthy();
+    expect(save.selectedCategory.getText()).toEqual(categoryName); // TODO catch error here
 
     save.nameInput.clear().sendKeys(chartName);
     save.descriptionInput.clear().sendKeys(chartDescription);
     save.saveBtn.click();
-    // const newAnalysis = analyze.main.getCardTitle(chartName);
-    const condition = ec.presenceOf(analyze.main.getCardTitle(chartName));
-    browser
-    .wait(condition, 5000)
-    .then(() => expect(analyze.main.getCardTitle(chartName).isPresent()).toBe(true));
+
+    const createdAnalysis = analyze.main.getCardTitle(chartName);
+    commonFunctions.waitFor.elementToBePresent(createdAnalysis)
+      .then(() => expect(createdAnalysis.isPresent()).toBe(true));
   });
 
   it('should delete the created analysis', () => {
     const main = analyze.main;
-    main.getAnalysisCards(chartName).count()
-      .then(count => {
-        main.doAnalysisAction(chartName, 'delete');
-        main.confirmDeleteBtn.click();
-        expect(main.getAnalysisCards(chartName).count()).toBe(count - 1);
-      });
+    const cards = main.getAnalysisCards(chartName);
+    cards.count().then(count => {
+      main.doAnalysisAction(chartName, 'delete');
+      commonFunctions.waitFor.elementToBeClickable(main.confirmDeleteBtn);
+      main.confirmDeleteBtn.click();
+
+      commonFunctions.waitFor.cardsCountToUpdate(cards, count);
+
+      expect(main.getAnalysisCards(chartName).count()).toBe(count - 1);
+    });
+  });
+
+  it('should log out', () => {
+    analyze.main.doAccountAction('logout');
   });
 });
