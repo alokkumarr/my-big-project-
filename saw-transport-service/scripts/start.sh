@@ -338,7 +338,6 @@ declare -r app_home="$(realpath "$(dirname "$real_script_path")")"
 # TODO - Check whether this is ok in cygwin...
 declare -r lib_dir="$(realpath "${app_home}/../lib")"
 declare -r conf_dir="$(realpath "${app_home}/../conf")"
-declare -r log_dir="$(realpath "/var/saw/service/log")"
 
 APPLICATION_HOME=$(cd "${app_home}/.."; pwd -P)
 export APPLICATION_HOME
@@ -349,7 +348,6 @@ echo "APPLICATION_HOME : $APPLICATION_HOME"
 echo "Configuration dir: $conf_dir"
 echo "Application home: $app_home"
 echo "Library dir: $lib_dir"
-echo "Log dir: $log_dir"
 
 declare -r script_conf_file="${app_home}/../conf/application.ini"
 
@@ -359,7 +357,6 @@ do
 	app_classpath=${app_classpath}:"${lib_dir}/${j}"
 done
 
-addJava "-Dlog.dir=${log_dir}"
 addJava "-Duser.dir=$(cd "${app_home}/.."; pwd -P)"
 addJava "-Djava.library.path=/opt/mapr/lib"
 addJava "-Dhadoop.home.dir=/opt/mapr/hadoop/hadoop-2.7.0"
@@ -377,8 +374,6 @@ declare java_cmd=$(get_java_cmd)
 
 # if configuration files exist, prepend their contents to $@ so it can be processed by this runner
 [[ -f "$script_conf_file" ]] && set -- $(loadConfigFile "$script_conf_file") "$@"
-
-[[ ! -d $log_dir ]] || mkdir -p -m 755 $log_dir
 
 #export PATH=$PATH:/opt/mapr/lib:/opt/mapr/libexp
 
