@@ -135,10 +135,6 @@ declare -r lib_dir="${saw_service_home}/lib"
 vlog lib_dir: $lib_dir
 ( cd $lib_dir ) || exit
 
-declare -r log_dir="/var/saw/service/log"
-vlog log_dir: $log_dir
-( cd $log_dir ) || exit
-
 # Create ':' separated list of all files in $lib_dir
 declare lib_classpath=$(
   /usr/bin/perl -e 'use Cwd "realpath";
@@ -163,7 +159,6 @@ declare -r java_args=$( echo \
     $java_opts -Xmx4096m -Xms512m \
     -Dhttp.port=$SAW_SERVICE_PORT \
     -Dpidfile.path=$pidfile_path \
-    -Dlog.dir=${log_dir} \
     -Duser.dir=${user_dir} \
     -Durl=http://$(hostname -f):9200/ \
     -Djava.library.path=/opt/mapr/lib \
@@ -193,12 +188,7 @@ vlog "EXEC_CMD: $exec_cmd"
 export APPLICATION_SECRET="y=5L3Lrezk1j0KsBo8K>YHR6JIxfcb=ax]0sT7m2NZHcafHZM73_=fqnNcGP8r<x"
 export SAW_EXECUTOR_HOME=${saw_service_home}
 
-if [[ $VERBOSE ]] ; then
-  elog=$log_dir/$(date +%y%m%dT%H%M%S).xdfts-$SAW_SERVICE_PORT.elog
-  vlog EXECLOG: $elog
-else
-  elog=/dev/null
-fi
+elog=/dev/null
 #
 if [[ $FG_EXECJ ]] ; then
   $exec_cmd

@@ -648,13 +648,6 @@
                             </sources>
                         </mapping>
                         <mapping>
-                            <directory>/var/saw/service/log</directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
-                        </mapping>
-                        <mapping>
                             <directory>/var/saw/service/run</directory>
                             <directoryIncluded>true</directoryIncluded>
                             <filemode>755</filemode>
