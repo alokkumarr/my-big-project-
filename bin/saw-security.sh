@@ -51,10 +51,6 @@ vardir=$( appl_info vardir )
 
 ###
 # Set variables
-LOG_DIR=$vardir/log
-( cd $LOG_DIR ) || exit
-LOG_FILE=$LOG_DIR/$APPL_NAME.log
-#
 PID_DIR=$vardir/run
 ( cd $PID_DIR ) || exit
 PID_FILE=$PID_DIR/$APPL_NAME.pid
@@ -180,7 +176,6 @@ appl_start() {
         -Djava.net.preferIPv4Stack=true
         -Dspring.config.location=$confdir/application.properties
         -Dlogging.config=$confdir/logback.xml
-        -Dsaw.log.file=$LOG_DIR/saw-security
         -Dquartz.properties.location=$confdir
         -jar $war_file
         -name saw-security
@@ -192,8 +187,6 @@ appl_start() {
         exit 0
     }
     vlog CMD: "$exec_cmd"
-    START_LOG=$LOG_DIR/start-$APPL_NAME.log
-    vlog START_LOG: $START_LOG
     /bin/rm -f $PID_FILE
 
     # Run in foreground
@@ -203,7 +196,7 @@ appl_start() {
         echo never gets here
     fi 
     # Start service in daemon mode
-    ( eval $exec_cmd </dev/null &>$START_LOG & )
+    ( eval $exec_cmd </dev/null & )
     vlog $(dts) 'started in background'
     # No check for pid
     (( WAIT_SECS > 0 )) || {
