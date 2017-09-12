@@ -68,6 +68,13 @@ export const chartComponent = {
       }
     }
 
+    /* Checks if the chart type is pie and whether the series has negative values.
+       This is necessary because pie chart can't display negative values correctly,
+       leading to all sorts of problems if not handled explicitly.
+
+       Returns {all: Boolean, some: Boolean} depending on whether all values in all
+       series are negative or only some of them.
+    */
     pieHasNegatives() {
       const result = {all: true, some: false};
       if (get(this.config, 'chart.type') !== 'pie') {
