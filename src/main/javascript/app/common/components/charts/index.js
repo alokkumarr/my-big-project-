@@ -4,6 +4,7 @@ import Highcharts from 'highcharts/highcharts';
 import more from 'highcharts/highcharts-more';
 
 import exporting from 'highcharts/modules/exporting';
+import noData from 'highcharts/modules/no-data-to-display';
 import offlineExporting from 'highcharts/modules/offline-exporting';
 
 import {chartComponent} from './chart.component';
@@ -13,6 +14,7 @@ import {businessTransactionVolumeChart} from './business-transaction-volume.char
 export const ChartsModule = 'components.charts';
 
 more(Highcharts);
+noData(Highcharts);
 exporting(Highcharts);
 offlineExporting(Highcharts);
 

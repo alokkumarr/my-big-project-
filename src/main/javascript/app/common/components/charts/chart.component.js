@@ -1,6 +1,8 @@
 import defaultsDeep from 'lodash/defaultsDeep';
 import forEach from 'lodash/forEach';
+import filter from 'lodash/filter';
 import set from 'lodash/set';
+import get from 'lodash/get';
 import isArray from 'lodash/isArray';
 import {globalChartOptions, chartOptions} from './default-chart-options';
 
@@ -15,11 +17,12 @@ export const chartComponent = {
   },
   template: '<div></div>',
   controller: class HighChartController {
-    constructor(Highcharts, $element) {
+    constructor(Highcharts, $element, toastMessage) {
       'ngInject';
 
       Highcharts.setOptions(globalChartOptions);
       this.Highcharts = Highcharts;
+      this.toastMessage = toastMessage;
       this.$element = $element;
       this.chart = null;
     }
@@ -51,10 +54,49 @@ export const chartComponent = {
         forEach(updates, updateObj => {
           set(this.config, updateObj.path, updateObj.data);
         });
+
         // Not using chart.update due to a bug with navigation
         // update and bar styles.
         this.chart = this.Highcharts.chart(this.$element[0], this.config);
+
+        const pieNegatives = this.pieHasNegatives();
+        if (pieNegatives.all) {
+          this.chart.showNoData('Data unsuitable for Pie chart. Please use a different chart type.');
+        } else if (pieNegatives.some) {
+          this.toastMessage.error('Some negative values have been ommitted. Please use a different chart type if you wish to include them.');
+        }
       }
+    }
+
+    pieHasNegatives() {
+      const result = {all: true, some: false};
+      if (get(this.config, 'chart.type') !== 'pie') {
+        result.all = false;
+        return result;
+      }
+
+      const series = get(this.config, 'series', []) || [];
+
+      forEach(series, pie => {
+        if (!isArray(pie.data)) {
+          return;
+        }
+
+        const positives = filter(pie.data, slice => slice.y >= 0);
+
+        if (positives.length === pie.data.length) {
+          result.all = false;
+          result.some = result.some || false;
+        } else if (positives.length === 0) {
+          result.all = result.all && true;
+          result.some = true;
+        } else {
+          result.all = false;
+          result.some = true;
+        }
+      });
+
+      return result;
     }
 
     onExport() {
