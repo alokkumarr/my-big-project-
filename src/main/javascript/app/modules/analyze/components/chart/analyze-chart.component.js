@@ -224,7 +224,11 @@ export const AnalyzeChartComponent = {
     openChartPreviewModal(ev) {
       const tpl = '<analyze-chart-preview model="model"></analyze-chart-preview>';
       this.openPreviewModal(tpl, ev, {
-        chartOptions: this.chartOptions
+        chartOptions: this.chartOptions,
+        settings: this.settings,
+        chart: this.generatePayload(this.model),
+        legend: this.legend,
+        labels: this.labels
       });
     }
 
