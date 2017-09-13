@@ -17,13 +17,13 @@
           <div flex layout="row"
                layout-align="space-between center"
                ng-repeat="attr in $ctrl.settings.yaxis">
-            <md-radio-button role="radio"
+            <md-radio-button flex role="radio"
                              ng-value="attr"
                              e2e="radio-button-{{::attr.displayName}}"
                              ng-disabled="attr.checked && attr.checked != 'y'">
               <span ng-bind="::attr.displayName"></span>
             </md-radio-button>
-            <aggregate-chooser ng-show="attr.checked && attr.checked === 'y'"
+            <aggregate-chooser flex="20" ng-show="attr.checked && attr.checked === 'y'"
                                artifact-column="attr"
                                on-select="$ctrl.onSelectAggregateType(aggregateType, attr, 'radio')">
             </aggregate-chooser>
@@ -35,14 +35,14 @@
           <md-list-item ng-repeat="attr in $ctrl.multipleYAxes.fields"
                         e2e="radio-button-{{::attr.displayName}}">
 
-            <md-checkbox ng-model="attr.checked"
+            <md-checkbox flex ng-model="attr.checked"
                          ng-disabled="attr.disabled"
                          ng-change="$ctrl.inputChanged($ctrl.settings.yaxis, attr, 'y')"
                          style="align-self: flex-end;">
               <span ng-bind="attr.alias || attr.displayName"></span>
             </md-checkbox>
 
-            <aggregate-chooser ng-show="attr.checked"
+            <aggregate-chooser flex="20" ng-show="attr.checked"
                                class="md-secondary"
                                artifact-column="attr"
                                on-select="$ctrl.onSelectAggregateType(aggregateType, attr, 'checkbox')">
