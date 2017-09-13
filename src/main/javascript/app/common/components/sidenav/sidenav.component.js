@@ -45,6 +45,13 @@ export const SidenavComponent = {
       }
     }
 
+    openSidenavManually() {
+      if (!this.isOpen()) {
+        this.$timeout(() => {
+          this._sidenavInst.toggle();
+        });
+      }
+    }
     getMenuHeader() {
       return {
         analyze: 'Analyses',

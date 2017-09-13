@@ -60,6 +60,7 @@ export const UsersViewComponent = {
     $onInit() {
       const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
       leftSideNav.update(AdminMenuData, 'ADMIN');
+      leftSideNav.openSidenavManually();
     }
     openNewUserModal() {
       this._$rootScope.showProgress = true;
