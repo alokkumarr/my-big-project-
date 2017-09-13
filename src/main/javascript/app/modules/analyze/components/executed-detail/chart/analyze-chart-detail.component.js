@@ -39,7 +39,10 @@ export const AnalyzeChartDetailComponent = {
           layout: values(this._ChartService.LAYOUT_POSITIONS)
         }
       };
-      this.chartOptions = this._ChartService.getChartConfigFor(this.analysis.chartType, {legend: this.legend});
+      this.chart = {
+        height: 580
+      };
+      this.chartOptions = this._ChartService.getChartConfigFor(this.analysis.chartType, {chart: this.chart, legend: this.legend});
 
       this._$timeout(() => {
         this.updateChart();
@@ -55,7 +58,7 @@ export const AnalyzeChartDetailComponent = {
         this.analysis.chartType,
         this.settings,
         this.filteredData,
-        {labels: this.labels}
+        {labels: this.labels, labelOptions: this.analysis.labelOptions}
       );
 
       this.chartUpdater.next(changes);

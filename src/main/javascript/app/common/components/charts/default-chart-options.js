@@ -12,7 +12,7 @@ export const chartOptions = {
     series: {
       barBgColor: '#f3f5f8',
       marker: {
-        fillColor: '#FFFFFF',
+        fillColor: null,
         lineWidth: 2,
         lineColor: null // inherit from series
       }

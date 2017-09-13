@@ -46,6 +46,10 @@ export const SearchBoxComponent = {
       this.$document.on('click', this.onDocumentClick);
     }
 
+    doAutoFocus() {
+      this.states.focused = true;
+      this.$document[0].getElementById('search-box-autofocus').focus();
+    }
     cancelSearch() {
       this.model = '';
       this.onModelChanged();
