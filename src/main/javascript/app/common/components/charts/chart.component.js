@@ -63,7 +63,7 @@ export const chartComponent = {
         if (pieNegatives.all) {
           this.chart.showNoData('Data unsuitable for Pie chart. Please use a different chart type.');
         } else if (pieNegatives.some) {
-          this.toastMessage.error('Some negative values have been ommitted. Please use a different chart type if you wish to include them.');
+          this.toastMessage.error('Some negative and zero values have been ommitted. Please use a different chart type if you wish to include them.');
         }
       }
     }
@@ -89,7 +89,7 @@ export const chartComponent = {
           return;
         }
 
-        const positives = filter(pie.data, slice => slice.y >= 0);
+        const positives = filter(pie.data, slice => slice.y > 0);
 
         if (positives.length === pie.data.length) {
           result.all = false;
