@@ -77,7 +77,6 @@ export const AnalyzePivotComponent = {
           this.initModel(analysis);
           this.analysisUnSynched();
           this.artifacts = this.getSortedArtifacts(this.model.artifacts);
-          this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
         });
     }
 
@@ -89,7 +88,6 @@ export const AnalyzePivotComponent = {
 
     loadExistingAnalysis() {
       this.artifacts = this.getSortedArtifacts(this.model.artifacts);
-      this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
       this.initExistingSettings();
       this.loadPivotData();
     }
@@ -102,7 +100,6 @@ export const AnalyzePivotComponent = {
           this.analysisUnSynched();
           this.startDraftMode();
           this.artifacts = this.getSortedArtifacts(this.model.artifacts);
-          this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
           this.loadPivotData();
         });
     }
@@ -198,6 +195,9 @@ export const AnalyzePivotComponent = {
 
       forEach(selectedArtifactColumns, artifactColumn => {
         const targetField = find(fields, ({dataField}) => {
+          if (artifactColumn.type === 'string') {
+            return dataField === artifactColumn.columnName.split('.')[0];
+          }
           return dataField === artifactColumn.columnName;
         });
         artifactColumn.areaIndex = targetField.areaIndex;
@@ -275,7 +275,6 @@ export const AnalyzePivotComponent = {
       return fpPipe(
         fpFilter(artifactColumn => artifactColumn.checked &&
           (artifactColumn.area === 'row' || artifactColumn.area === 'column')),
-        // fpFilter(artifactColumn => !DATE_TYPES.includes(artifactColumn.dataType)),
         fpMap(artifactColumn => {
           return {
             type: artifactColumn.type,
@@ -357,7 +356,6 @@ export const AnalyzePivotComponent = {
               type: field.type,
               columnName: field.columnName
             };
-            this.putBackKeywordSuffix(backendField);
             if (field.area === 'data') {
               backendField.aggregate = field.aggregate;
               // name field is needed for the elastic search request
@@ -372,19 +370,12 @@ export const AnalyzePivotComponent = {
 
       return {
         booleanCriteria: this.model.sqlBuilder.booleanCriteria,
-        filters: map(map(this.filters, this._FilterService.frontend2BackendFilter()), this.putBackKeywordSuffix),
-        sorts: map(this.mapFrontend2BackendSort(this.sorts), this.putBackKeywordSuffix),
+        filters: map(this.filters, this._FilterService.frontend2BackendFilter()),
+        sorts: this.mapFrontend2BackendSort(this.sorts),
         rowFields: groupedFields.row || [],
         columnFields: groupedFields.column || [],
         dataFields: groupedFields.data
       };
-    }
-
-    putBackKeywordSuffix(field) {
-      if (field.type === 'string') {
-        field.columnName = `${field.columnName}.keyword`;
-      }
-      return field;
     }
 
     openSavePivotModal(ev) {
