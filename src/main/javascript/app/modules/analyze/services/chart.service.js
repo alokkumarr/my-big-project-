@@ -649,13 +649,6 @@ export function ChartService(Highcharts) {
     ));
   }
 
-  function filterStringTypes(attributes) {
-    return filter(attributes, attr => (
-      attr.columnName &&
-      (attr.type === 'string' || attr.type === 'String')
-    ));
-  }
-
   function fillSettings(artifacts, model) {
     /* Flatten the artifacts into a single array and sort them */
     const attributes = fpPipe(
