@@ -70,6 +70,13 @@
               <md-icon md-font-icon="icon-full-screen"></md-icon>
               <span translate="PREVIEW"></span>
             </md-button>
+            <md-button class="action"
+                       ng-click="$ctrl.openChartSortModal($event)"
+                       e2e="open-sort-modal"
+                       ng-disabled="!$ctrl.sortFields">
+              <md-icon md-font-icon="icon-sort"></md-icon>
+              <span translate="SORT"></span>
+            </md-button>
             <md-button ng-click="$ctrl.openFiltersModal($event)">
               <md-icon md-font-icon="icon-filter"></md-icon>
               <span translate="FILTER"></span>

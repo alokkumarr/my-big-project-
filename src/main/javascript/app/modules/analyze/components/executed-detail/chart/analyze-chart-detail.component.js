@@ -1,5 +1,8 @@
 import get from 'lodash/get';
 import values from 'lodash/values';
+import orderBy from 'lodash/orderBy';
+import map from 'lodash/map';
+import isEmpty from 'lodash/isEmpty';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 import template from './analyze-chart-detail.component.html';
@@ -11,11 +14,12 @@ export const AnalyzeChartDetailComponent = {
     requester: '<'
   },
   controller: class AnalyzeChartDetailController {
-    constructor(ChartService, FilterService, $timeout) {
+    constructor(ChartService, FilterService, $timeout, SortService) {
       'ngInject';
 
       this._ChartService = ChartService;
       this._FilterService = FilterService;
+      this._SortService = SortService;
       this._$timeout = $timeout;
       this.chartUpdater = new BehaviorSubject({});
       this.labels = {
@@ -28,6 +32,9 @@ export const AnalyzeChartDetailComponent = {
       this.settings = this._ChartService.fillSettings(this.analysis.artifacts, this.analysis);
       this.subscription = this.requester.subscribe(options => this.request(options));
 
+      this.sortFields = this._SortService.getArtifactColumns2SortFieldMapper()(this.analysis.artifacts[0].columns);
+      this.sorts = this.analysis.sqlBuilder.sorts ?
+        this._SortService.mapBackend2FrontendSort(this.analysis.sqlBuilder.sorts, this.sortFields) : [];
       this.labels.x = get(this.analysis, 'xAxis.title', null);
       this.labels.y = get(this.analysis, 'yAxis.title', null);
 
@@ -54,6 +61,13 @@ export const AnalyzeChartDetailComponent = {
     }
 
     updateChart() {
+      if (!isEmpty(this.sorts)) {
+        this.filteredData = orderBy(
+          this.filteredData,
+          map(this.sorts, 'field.dataField'),
+          map(this.sorts, 'order')
+        );
+      }
       const changes = this._ChartService.dataToChangeConfig(
         this.analysis.chartType,
         this.settings,
