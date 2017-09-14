@@ -642,6 +642,13 @@ export function ChartService(Highcharts) {
     ));
   }
 
+  function filterNonNumberTypes(attributes) {
+    return filter(attributes, attr => (
+      attr.columnName &&
+      !NUMBER_TYPES.includes(attr.type)
+    ));
+  }
+
   function filterStringTypes(attributes) {
     return filter(attributes, attr => (
       attr.columnName &&
@@ -661,16 +668,14 @@ export function ChartService(Highcharts) {
       fpSortBy('displayName')
     )(artifacts);
 
-    let xaxis;
-    let yaxis;
-    let zaxis;
     let settingsObj;
-    const groupBy = filterStringTypes(attributes);
+    let zaxis;
+    const yaxis = filterNumberTypes(attributes);
+    const xaxis = attributes;
+    const groupBy = filterNonNumberTypes(attributes);
 
     switch (model.chartType) {
       case 'bubble':
-        xaxis = filterStringTypes(attributes);
-        yaxis = attributes;
         zaxis = filterNumberTypes(attributes);
         settingsObj = {
           xaxis,
@@ -679,18 +684,7 @@ export function ChartService(Highcharts) {
           groupBy
         };
         break;
-      case 'scatter':
-        xaxis = attributes;
-        yaxis = attributes;
-        settingsObj = {
-          xaxis,
-          yaxis,
-          groupBy
-        };
-        break;
       default:
-        xaxis = filterStringTypes(attributes);
-        yaxis = filterNumberTypes(attributes);
         settingsObj = {
           yaxis,
           xaxis,
