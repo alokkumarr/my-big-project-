@@ -30,9 +30,9 @@ export function PivotService() {
 
   return {
     getArea,
-    takeOutKeywordFromArtifactColumns,
     artifactColumns2PivotFields,
-    parseData
+    parseData,
+    trimSuffixFromPivotFields
   };
 
   function artifactColumns2PivotFields() {
@@ -57,16 +57,14 @@ export function PivotService() {
     );
   }
 
-  function takeOutKeywordFromArtifactColumns(artifactColumns) {
-    forEach(artifactColumns, artifactColumn => {
-      if (artifactColumn.columnName && artifactColumn.type === 'string') {
-        const split = artifactColumn.columnName.split('.');
-        if (split[1] === 'keyword') {
-          artifactColumn.columnName = split[0];
-        }
+  function trimSuffixFromPivotFields(fields) {
+    forEach(fields, field => {
+      if (field.dataField && field.type === 'string') {
+        const split = field.dataField.split('.');
+        field.dataField = split[0];
       }
     });
-    return artifactColumns;
+    return fields;
   }
 
   function getArea(key) {
@@ -100,8 +98,9 @@ export function PivotService() {
     // take out the .keyword form the columnName
     // if there is one
     const columnName = fieldMap[level - 1];
-    if (columnName.indexOf('.keyword') > -1) {
-      return columnName.split('.')[0];
+    const split = columnName.split('.');
+    if (split[1]) {
+      return split[0];
     }
     return columnName;
   }

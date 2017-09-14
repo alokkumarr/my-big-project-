@@ -79,7 +79,6 @@ export const AnalyzePivotComponent = {
           this.initModel(analysis);
           this.analysisUnSynched();
           this.artifacts = this.getSortedArtifacts(this.model.artifacts);
-          this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
         });
     }
 
@@ -91,7 +90,6 @@ export const AnalyzePivotComponent = {
 
     loadExistingAnalysis() {
       this.artifacts = this.getSortedArtifacts(this.model.artifacts);
-      this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
       this.initExistingSettings();
       this.loadPivotData();
     }
@@ -104,7 +102,6 @@ export const AnalyzePivotComponent = {
           this.analysisUnSynched();
           this.startDraftMode();
           this.artifacts = this.getSortedArtifacts(this.model.artifacts);
-          this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
           this.loadPivotData();
         });
     }
@@ -200,6 +197,9 @@ export const AnalyzePivotComponent = {
 
       forEach(selectedArtifactColumns, artifactColumn => {
         const targetField = find(fields, ({dataField}) => {
+          if (artifactColumn.type === 'string') {
+            return dataField === artifactColumn.columnName.split('.')[0];
+          }
           return dataField === artifactColumn.columnName;
         });
         artifactColumn.areaIndex = targetField.areaIndex;

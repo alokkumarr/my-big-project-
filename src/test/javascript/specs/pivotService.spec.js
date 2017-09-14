@@ -48,9 +48,9 @@ describe('PivotService', () => {
     });
   });
 
-  describe('takeOutKeywordFromArtifactColumns(artifactColumns)', () => {
+  describe('trimSuffixFromPivotFields(fields)', () => {
     it('takes out the ".keyword" suffix form the solumnNames of columns of type string', () => {
-      const result = PivotService.takeOutKeywordFromArtifactColumns(artifactColumns);
+      const result = PivotService.trimSuffixFromPivotFields(artifactColumns);
       const stringElem = find(result, field => field.type === 'string');
       expect(stringElem.columnName).to.not.include('.keyword');
     });
