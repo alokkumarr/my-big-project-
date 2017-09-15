@@ -152,9 +152,6 @@ export const AnalyzeListViewComponent = {
         dataField: 'createdTimestamp',
         alignment: 'left',
         width: '15%',
-        calculateCellValue: rowData => {
-          return (new Date(rowData.createdTimestamp).toDateString() || '').toUpperCase();
-        },
         cellTemplate: 'timecreatedCellTemplate'
       }, {
         caption: '',
