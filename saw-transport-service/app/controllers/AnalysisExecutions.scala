@@ -47,7 +47,7 @@ class AnalysisExecutions extends BaseController {
 
       m_log.trace("analysisType {}", analysisType)
       if (analysisType == "report") {
-        if (PaginateDataSet.INSTANCE.getCache(executionId) != null)
+        if (PaginateDataSet.INSTANCE.getCache(executionId) != null && PaginateDataSet.INSTANCE.getCache(executionId).get(0).size()>0)
         {
           m_log.trace("when data is available in cache executionId: {}", executionId)
           m_log.trace("when data is available in cache size of pageSize {}", pageSize)

@@ -455,7 +455,7 @@ class Analysis extends BaseController {
       var data: JValue = null
       var resultData : java.util.List[java.util.Map[String, (String, Object)]] = null
 
-      if (PaginateDataSet.INSTANCE.getCache(analysisResultId) != null)
+      if (PaginateDataSet.INSTANCE.getCache(analysisResultId) != null && PaginateDataSet.INSTANCE.getCache(analysisResultId).get(0).size()>0)
       {
         m_log.trace("when data is available in cache analysisResultId: {}", analysisResultId);
         m_log.trace("when data is available in cache size of limit {}", limit);
