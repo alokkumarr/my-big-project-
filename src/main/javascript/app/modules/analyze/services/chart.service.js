@@ -658,11 +658,10 @@ export function ChartService(Highcharts) {
     ));
   }
 
-  function filterNodeTypes(attributes) {
+  function filterNonNumberTypes(attributes) {
     return filter(attributes, attr => (
       attr.columnName &&
-      ((attr.type === 'string' || attr.type === 'String') ||
-      DATE_TYPES.includes(attr.type))
+      !NUMBER_TYPES.includes(attr.type)
     ));
   }
 
@@ -678,16 +677,14 @@ export function ChartService(Highcharts) {
       fpSortBy('displayName')
     )(artifacts);
 
-    let xaxis;
-    let yaxis;
-    let zaxis;
     let settingsObj;
-    const groupBy = filterNodeTypes(attributes);
+    let zaxis;
+    const yaxis = filterNumberTypes(attributes);
+    const xaxis = attributes;
+    const groupBy = filterNonNumberTypes(attributes);
 
     switch (model.chartType) {
       case 'bubble':
-        xaxis = filterNodeTypes(attributes);
-        yaxis = attributes;
         zaxis = filterNumberTypes(attributes);
         settingsObj = {
           xaxis,
@@ -696,18 +693,7 @@ export function ChartService(Highcharts) {
           groupBy
         };
         break;
-      case 'scatter':
-        xaxis = attributes;
-        yaxis = attributes;
-        settingsObj = {
-          xaxis,
-          yaxis,
-          groupBy
-        };
-        break;
       default:
-        xaxis = filterNodeTypes(attributes);
-        yaxis = filterNumberTypes(attributes);
         settingsObj = {
           yaxis,
           xaxis,
