@@ -103,7 +103,8 @@ and SAW Services based on the URL it is being served from.
 
 To enable creating analyses in SAW, load semantic metadata as follows:
 
-        $ /opt/saw/service/sbin/mdcli.sh -i \
+        $ ssh <saw-services-host>
+        $ sudo -u mapr /opt/saw/service/bin/mdcli.sh -i \
             file://<nodes-json> -o file:///tmp/log.json
 
 The semantic metadata JSON is stored in the `<nodes-json>` file.
