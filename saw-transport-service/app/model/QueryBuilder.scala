@@ -175,7 +175,7 @@ object QueryBuilder {
       case "date" | "timestamp" => {
         val lte = subProperty("model", "lte")
         val gte = subProperty("model", "gte")
-        "BETWEEN TO_DATE('%s') AND TO_DATE('%s')".format(lte, gte)
+        "BETWEEN TO_DATE('%s') AND TO_DATE('%s')".format(gte, lte)
       }
       case obj: String => throw ClientException("Unknown filter type: " + obj)
     }
