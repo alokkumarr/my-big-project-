@@ -12,3 +12,9 @@ files :
 /Users/Shared/WORK/SAW-BE/saw-transport-service/target/saw-transport-service-2-package/saw-transport-service-2/lib/aopalliance.aopalliance-1.0.jar
 (Permission denied)`, then remove the `saw-transport-service/target`
 directory and retry.
+
+# What can I do if my Docker container reports running out of disk space?
+
+Try running the following command to free up disk space:
+
+        docker system prune
