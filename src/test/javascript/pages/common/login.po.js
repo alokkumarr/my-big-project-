@@ -1,3 +1,5 @@
+const commonFunctions = require('../../helpers/commonFunctions.js');
+
 module.exports = {
   loginElements: {
     userNameField: element(by.id('input_0')),
@@ -6,6 +8,7 @@ module.exports = {
     invalidErr: element(by.css('.err-msg'))
   },
 
+  // Wait after login is provided to prevent elements manipulation when page is not ready yet
   userLogin(user, password) {
     const userElem = this.loginElements.userNameField;
     const passwordElem = this.loginElements.passwordField;
@@ -14,6 +17,7 @@ module.exports = {
     userElem.clear().sendKeys(user);
     passwordElem.clear().sendKeys(password);
     loginElem.click();
+    return commonFunctions.waitFor.pageToBeReady(/analyze/);
   },
 
   /**

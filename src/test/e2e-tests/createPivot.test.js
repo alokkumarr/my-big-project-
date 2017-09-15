@@ -1,8 +1,9 @@
-const sidenav = require('../pages/components/sidenav.co.js');
-const analyze = require('../pages/common/analyze.po.js');
+const login = require('../javascript/pages/common/login.po.js');
+const sidenav = require('../javascript/pages/components/sidenav.co.js');
+const analyze = require('../javascript/pages/common/analyze.po.js');
 const protractor = require('protractor');
-const ec = protractor.ExpectedConditions;
-const {hasClass} = require('../utils');
+const commonFunctions = require('../javascript/helpers/commonFunctions.js');
+const {hasClass} = require('../javascript/helpers/utils');
 
 describe('create a new pivot type analysis', () => {
   let categoryName;
@@ -15,6 +16,12 @@ describe('create a new pivot type analysis', () => {
   const rowField = 'Source OS';
   const metric = 'MCT Content';
   const method = 'table:pivot';
+
+  it('login as admin', () => {
+    browser.waitForAngular();
+    expect(browser.getCurrentUrl()).toContain('/login');
+    login.loginAs('admin');
+  });
 
   it('should open the sidenav menu and go to first category', () => {
     sidenav.menuBtn.click();
@@ -51,8 +58,10 @@ describe('create a new pivot type analysis', () => {
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
     filters.applyBtn.click();
+    const filterName = filters.getAppliedFilter(fieldName);
 
-    expect(filters.getAppliedFilter(fieldName).isPresent()).toBe(true);
+    commonFunctions.waitFor.elementToBePresent(filterName);
+    expect(filterName.isPresent()).toBe(true);
   });
 
   it('should select row, column and data fields and refresh data', () => {
@@ -76,18 +85,17 @@ describe('create a new pivot type analysis', () => {
   it('should attempt to save the report', () => {
     const save = analyze.saveDialog;
     const designer = analyze.designerDialog;
+    commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
     designer.saveBtn.click();
 
-    expect(designer.elem).toBeTruthy();
+    expect(designer.saveDialog).toBeTruthy();
     expect(save.selectedCategory.getText()).toEqual(categoryName);
 
     save.nameInput.clear().sendKeys(pivotName);
     save.descriptionInput.clear().sendKeys(pivotDescription);
     save.saveBtn.click();
-    const condition = ec.presenceOf(analyze.main.getCardTitle(pivotName));
-    browser
-    .wait(condition, 5000)
-    .then(() => expect(analyze.main.getCardTitle(pivotName).isPresent()).toBe(true));
+    commonFunctions.waitFor.elementToBePresent(analyze.main.getCardTitle(pivotName))
+      .then(() => expect(analyze.main.getCardTitle(pivotName).isPresent()).toBe(true));
   });
 
   it('should delete the created analysis', () => {
@@ -98,5 +106,9 @@ describe('create a new pivot type analysis', () => {
         main.confirmDeleteBtn.click();
         expect(main.getAnalysisCards(pivotName).count()).toBe(count - 1);
       });
+  });
+
+  it('should log out', () => {
+    analyze.main.doAccountAction('logout');
   });
 });

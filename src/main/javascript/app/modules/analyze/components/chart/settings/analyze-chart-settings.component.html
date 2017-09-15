@@ -10,7 +10,7 @@
 
     <md-content layout-margin>
 
-      <collapser title="Y-Axis Options">
+      <collapser title="{{::$ctrl.viewOptions.axisLabels.y}}">
         <md-radio-group ng-model="$ctrl.selected.y"
                         ng-if="$ctrl.multipleYAxes.enabled == false"
                         ng-change="$ctrl.inputChanged($ctrl.settings.yaxis, $ctrl.selected.y, 'y')">
@@ -39,8 +39,8 @@
                          ng-disabled="attr.disabled"
                          ng-change="$ctrl.inputChanged($ctrl.settings.yaxis, attr, 'y')"
                          style="align-self: flex-end;">
+              <span ng-bind="attr.alias || attr.displayName"></span>
             </md-checkbox>
-            <span ng-bind="attr.alias || attr.displayName"></span>
 
             <aggregate-chooser ng-show="attr.checked"
                                class="md-secondary"
@@ -51,7 +51,7 @@
         </md-list>
       </collapser>
 
-      <collapser title="X-Axis Options">
+      <collapser title="{{::$ctrl.viewOptions.axisLabels.x}}">
         <md-radio-group ng-model="$ctrl.selected.x"
                         ng-change="$ctrl.inputChanged($ctrl.settings.xaxis, $ctrl.selected.x, 'x')">
           <div flex layout="row"
@@ -88,8 +88,7 @@
           </div>
         </md-radio-group>
       </collapser>
-
-      <collapser title="Size by"
+      <collapser title="{{::$ctrl.viewOptions.axisLabels.z}}"
                  ng-if="$ctrl.settings.zaxis">
         <md-radio-group ng-model="$ctrl.selected.z"
                         ng-change="$ctrl.inputChanged($ctrl.settings.zaxis, $ctrl.selected.z, 'z')">
@@ -111,7 +110,7 @@
         </md-radio-group>
       </collapser>
 
-      <collapser title="{{$ctrl.settings.zaxis ? 'Color By' : 'Group By'}}"
+      <collapser title="{{::$ctrl.viewOptions.axisLabels.g}}"
                  action="$ctrl.groupRemovalAction">
         <md-radio-group ng-model="$ctrl.selected.g"
                         ng-change="$ctrl.inputChanged($ctrl.settings.groupBy, $ctrl.selected.g, 'g')">

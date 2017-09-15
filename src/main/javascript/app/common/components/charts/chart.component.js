@@ -37,7 +37,9 @@ export const chartComponent = {
     }
 
     $onDestroy() {
-      this.subscription.unsubscribe();
+      if (this.subscription) {
+        this.subscription.unsubscribe();
+      }
     }
 
     onOptionsChartUpdate(updates) {

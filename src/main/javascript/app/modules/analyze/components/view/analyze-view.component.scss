@@ -1,3 +1,5 @@
+@import "themes/base/colors";
+
 analyze-view {
   width: 100%;
 }
@@ -22,10 +24,11 @@ analyze-view {
 
       md-radio-button {
         margin: 0;
+        padding-right: 3px;
 
         &.md-checked {
           md-icon {
-            color: #000;
+            color: $primary-blue-b2;
           }
         }
 
