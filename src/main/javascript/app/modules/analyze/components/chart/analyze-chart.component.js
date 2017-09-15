@@ -261,7 +261,7 @@ export const AnalyzeChartComponent = {
       return artifacts[id];
     }
 
-    isStringField(field) {
+    isNodeField(field) {
       return field && !NUMBER_TYPES.includes(field.type);
     }
 
@@ -284,7 +284,7 @@ export const AnalyzeChartComponent = {
 
       const allFields = [g, x, ...y, z];
 
-      let nodeFields = filter(allFields, this.isStringField);
+      let nodeFields = filter(allFields, this.isNodeField);
       const dataFields = filter(allFields, this.isDataField);
 
       if (payload.chartType === 'scatter') {

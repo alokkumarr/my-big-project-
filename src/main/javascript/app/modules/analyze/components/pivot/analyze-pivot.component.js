@@ -17,6 +17,7 @@ import forEach from 'lodash/forEach';
 import fpGroupBy from 'lodash/fp/groupBy';
 import groupBy from 'lodash/groupBy';
 import values from 'lodash/values';
+import has from 'lodash/has';
 import fpMapValues from 'lodash/fp/mapValues';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
@@ -220,7 +221,7 @@ export const AnalyzePivotComponent = {
 
     applyDefaultsBasedOnAreaChange(artifactColumn) {
       if (DATE_TYPES.includes(artifactColumn.type) &&
-          !artifactColumn.groupInterval) {
+          !has(artifactColumn, 'groupInterval')) {
 
         artifactColumn.groupInterval = DEFAULT_GROUP_INTERVAL.value;
       }

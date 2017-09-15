@@ -68,7 +68,7 @@
                      ng-click="$ctrl.openMenu($mdMenu, $event)">
             <md-icon md-menu-origin
                      md-font-icon="icon-calendar"></md-icon>
-            <md-tooltip ng-bind="'GROUP_INTERVAL' | translate"></md-tooltip>
+            <md-tooltip ng-bind="'TOOLTIP_GROUP_INTERVAL' | translate"></md-tooltip>
           </md-button>
           <md-menu-content width="4">
             <md-menu-item ng-repeat="groupInterval in $ctrl.GROUP_INTERVALS track by groupInterval.value">
