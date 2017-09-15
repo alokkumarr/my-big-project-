@@ -77,23 +77,12 @@ To upgrade an existing installation, follow the same steps as for
 installing an entirely new environment.  The deploy command will
 detect an already existing installation and upgrade it.
 
-# Interfaces
-
-The SAW Web module and supporting services are exposed on port 80 of
-the target host, i.e. `http://<target-host>/`.  The SAW Web
-application will automatically discover the endpoints for SAW Security
-and SAW Services based on the URL it is being served from.
-
 # Status
 
-To check the status of all SAW systemd units, execute the following
-commands:
+To check the status of all SAW systemd units and times, execute the
+following commands:
 
         $ sudo systemctl list-units --all saw-*
-
-To check the status of all SAW systemd timers, execute the following
-command:
-
         $ sudo systemctl list-timers --all saw-*
 
 # Logs
@@ -102,3 +91,19 @@ The SAW system logs can be accessed using the `journalctl` command.
 To view the logs of individual services, use the `-u` option:
 
         $ sudo journalctl -u saw-*
+
+# Entrypoints
+
+The SAW Web module and supporting services are exposed on port 80 of
+the target host, i.e. `http://<target-host>/`.  The SAW Web
+application will automatically discover the endpoints for SAW Security
+and SAW Services based on the URL it is being served from.
+
+# Loading semantic metadata
+
+To enable creating analyses in SAW, load semantic metadata as follows:
+
+        $ /opt/saw/service/sbin/mdcli.sh -i \
+            file://<nodes-json> -o file:///tmp/log.json
+
+The semantic metadata JSON is stored in the `<nodes-json>` file.
