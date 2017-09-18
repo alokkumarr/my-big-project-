@@ -178,7 +178,9 @@ export const AnalyzeReportComponent = {
         }),
 
         this.canvas._$eventEmitter.on('sortChanged', () => {
-          this.reloadPreviewGrid(true);
+          this.didAnalysisChange = true;
+          this.startDraftMode();
+          this.onRefreshData();
         }),
 
         this.canvas._$eventEmitter.on('groupingChanged', groups => {
