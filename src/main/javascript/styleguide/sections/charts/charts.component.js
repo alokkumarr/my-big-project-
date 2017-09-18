@@ -1,7 +1,7 @@
-import map from 'lodash/map';
-import sum from 'lodash/sum';
-import range from 'lodash/range';
-import template from './charts.component.html';
+import * as map from 'lodash/map';
+import * as sum from 'lodash/sum';
+import * as range from 'lodash/range';
+import * as template from './charts.component.html';
 
 export const ChartsComponent = {
   template,
