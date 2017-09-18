@@ -9,6 +9,7 @@ import {AnalyzeService} from './services/analyze.service';
 import {FilterService} from './services/filter.service';
 import {PivotService} from './services/pivot.service';
 import {ChartService} from './services/chart.service';
+import {SortService} from './services/sort.service';
 
 import {AnalyzePageComponent} from './components/page/analyze-page.component';
 import {AggregateChooserComponent} from './components/aggregate-chooser/aggregate-chooser.component';
@@ -64,6 +65,7 @@ angular.module(AnalyzeModule, [
   .factory('AnalyzeService', AnalyzeService)
   .factory('PivotService', PivotService)
   .factory('ChartService', ChartService)
+  .factory('SortService', SortService)
   .factory('AnalyzeActionsService', AnalyzeActionsService)
   .component('analyzeActionsMenu', AnalyzeActionsMenuComponent)
   .component('aggregateChooser', AggregateChooserComponent)

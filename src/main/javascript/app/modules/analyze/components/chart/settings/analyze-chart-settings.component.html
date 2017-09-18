@@ -54,13 +54,38 @@
       <collapser title="{{::$ctrl.viewOptions.axisLabels.x}}">
         <md-radio-group ng-model="$ctrl.selected.x"
                         ng-change="$ctrl.inputChanged($ctrl.settings.xaxis, $ctrl.selected.x, 'x')">
-          <md-radio-button ng-repeat="attr in $ctrl.settings.xaxis"
-                           role="radio"
-                           ng-value="attr"
-                           e2e="radio-button-{{::attr.displayName}}"
-                           ng-disabled="attr.checked && attr.checked != 'x'">
+          <div flex layout="row"
+               layout-align="space-between center"
+               ng-repeat="attr in $ctrl.settings.xaxis track by attr.columnName">
+
+            <md-radio-button role="radio"
+                             ng-value="attr"
+                             e2e="radio-button-{{::attr.displayName}}"
+                             ng-disabled="attr.checked && attr.checked != 'x'">
             <span ng-bind="::attr.displayName"></span>
-          </md-radio-button>
+            </md-radio-button>
+
+            <md-menu class="md-secondary" ng-show="attr.checked && $ctrl.DATE_TYPES.includes(attr.type)">
+              <md-button aria-label="DATE_FORMAT"
+                         class="md-icon-button"
+                         e2e="pivot-date-format-menu-btn"
+                         ng-click="$mdMenu.open($event)">
+                <md-icon md-menu-origin
+                         md-font-icon="icon-calendar"></md-icon>
+                <md-tooltip ng-bind="'TOOLTIP_DATE_FORMAT' | translate"></md-tooltip>
+              </md-button>
+              <md-menu-content width="4">
+                <md-menu-item ng-repeat="dateFormat in $ctrl.DATE_FORMATS track by dateFormat.value">
+                  <md-button ng-click="$ctrl.onSelectDateFormat(dateFormat, attr)"
+                             e2e="pivot-date-format-selector-{{dateFormat.value}}"
+                             style="font-size: 14px;">
+                    {{::dateFormat.label}}
+                  </md-button>
+                </md-menu-item>
+              </md-menu-content>
+            </md-menu>
+
+          </div>
         </md-radio-group>
       </collapser>
       <collapser title="{{::$ctrl.viewOptions.axisLabels.z}}"
@@ -80,6 +105,7 @@
                                artifact-column="attr"
                                on-select="$ctrl.onSelectAggregateType(aggregateType, attr, 'radio')">
             </aggregate-chooser>
+
           </div>
         </md-radio-group>
       </collapser>

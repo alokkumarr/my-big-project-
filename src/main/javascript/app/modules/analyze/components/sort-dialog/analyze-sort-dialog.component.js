@@ -1,4 +1,5 @@
 import * as find from 'lodash/find';
+import * as forEach from 'lodash/forEach';
 
 import * as template from './analyze-sort-dialog.component.html';
 import style from './analyze-sort-dialog.component.scss';
@@ -16,6 +17,18 @@ export const AnalyzeSortDialogComponent = {
       this._$mdDialog = $mdDialog;
       this.NUMBER_TYPES = NUMBER_TYPES;
       this.DATE_TYPES = DATE_TYPES;
+    }
+
+    $onInit() {
+      // the field objects have to be reset in the sorts array
+      // because the object references are not the same as those in the fields array
+      // and md-select doesn't work, if the analysis with existing sorts is being edited.
+      forEach(this.model.sorts, (sort, key) => {
+        const target = find(this.model.fields, ({dataField}) => dataField === sort.field.dataField);
+        if (target) {
+          this.model.sorts[key].field = target;
+        }
+      });
     }
 
     addSort() {

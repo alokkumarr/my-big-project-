@@ -10,6 +10,7 @@ import * as map from 'lodash/map';
 import * as values from 'lodash/values';
 import * as clone from 'lodash/clone';
 import * as set from 'lodash/set';
+import * as orderBy from 'lodash/orderBy';
 import * as concat from 'lodash/concat';
 import * as remove from 'lodash/remove';
 
@@ -37,18 +38,21 @@ export const AnalyzeChartComponent = {
     mode: '@?'
   },
   controller: class AnalyzeChartController extends AbstractDesignerComponentController {
-    constructor($componentHandler, $timeout, AnalyzeService,
-      ChartService, FilterService, $mdSidenav, $translate, toastMessage, $injector) {
+    constructor($componentHandler, $timeout, AnalyzeService, SortService,
+                ChartService, FilterService, $mdSidenav, $translate, toastMessage, $injector) {
       'ngInject';
       super($injector);
       this._FilterService = FilterService;
       this._AnalyzeService = AnalyzeService;
       this._ChartService = ChartService;
+      this._SortService = SortService;
       this._$mdSidenav = $mdSidenav;
       this._$timeout = $timeout;
       this._$translate = $translate;
       this._toastMessage = toastMessage;
       this.BAR_COLUMN_OPTIONS = BAR_COLUMN_OPTIONS;
+      this.sortFields = [];
+      this.sorts = [];
 
       this.legend = {
         align: get(this.model, 'legend.align', 'right'),
@@ -100,6 +104,9 @@ export const AnalyzeChartComponent = {
     initChart() {
       this._ChartService.updateAnalysisModel(this.model);
       this.settings = this._ChartService.fillSettings(this.model.artifacts, this.model);
+      this.sortFields = this._SortService.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
+      this.sorts = this.model.sqlBuilder.sorts ?
+        this._SortService.mapBackend2FrontendSort(this.model.sqlBuilder.sorts, this.sortFields) : [];
       this.reloadChart(this.settings, this.filteredGridData);
 
       if (isEmpty(this.mode)) {
@@ -161,10 +168,11 @@ export const AnalyzeChartComponent = {
       this.labels.x = this.labels.tempX;
       this.labels.y = this.labels.tempY;
       this.startDraftMode();
-      this.reloadChart(this.settings, this.filteredGridData);
+      this.onRefreshData();
     }
 
     onSettingsChanged() {
+      this.sortFields = this._SortService.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
       this.analysisUnSynched();
       this.startDraftMode();
     }
@@ -217,6 +225,13 @@ export const AnalyzeChartComponent = {
       if (isEmpty(filteredGridData)) {
         return;
       }
+      if (!isEmpty(this.sorts)) {
+        filteredGridData = orderBy(
+          filteredGridData,
+          map(this.sorts, 'field.dataField'),
+          map(this.sorts, 'order')
+        );
+      }
       const changes = this._ChartService.dataToChangeConfig(
         this.model.chartType,
         settings,
@@ -228,7 +243,6 @@ export const AnalyzeChartComponent = {
     }
 
     openChartPreviewModal(ev) {
-      this.onRefreshData();
       const tpl = '<analyze-chart-preview model="model"></analyze-chart-preview>';
       this.openPreviewModal(tpl, ev, {
         chartOptions: this.chartOptions,
@@ -247,7 +261,7 @@ export const AnalyzeChartComponent = {
       return artifacts[id];
     }
 
-    isStringField(field) {
+    isNodeField(field) {
       return field && !NUMBER_TYPES.includes(field.type);
     }
 
@@ -270,7 +284,7 @@ export const AnalyzeChartComponent = {
 
       const allFields = [g, x, ...y, z];
 
-      let nodeFields = filter(allFields, this.isStringField);
+      let nodeFields = filter(allFields, this.isNodeField);
       const dataFields = filter(allFields, this.isDataField);
 
       if (payload.chartType === 'scatter') {
@@ -288,7 +302,7 @@ export const AnalyzeChartComponent = {
       set(payload, 'sqlBuilder.nodeFields', nodeFields);
 
       delete payload.supports;
-      set(payload, 'sqlBuilder.sorts', []);
+      set(payload, 'sqlBuilder.sorts', this._SortService.mapFrontend2BackendSort(this.sorts));
       set(payload, 'sqlBuilder.booleanCriteria', this.model.sqlBuilder.booleanCriteria);
       set(payload, 'xAxis', {title: this.labels.x});
       set(payload, 'yAxis', {title: this.labels.y});
@@ -298,6 +312,17 @@ export const AnalyzeChartComponent = {
       });
 
       return payload;
+    }
+
+    openChartSortModal(ev) {
+      this.openSortModal(ev, {
+        fields: this.sortFields,
+        sorts: map(this.sorts, sort => clone(sort))
+      }).then(sorts => {
+        this.sorts = sorts;
+        this.startDraftMode();
+        this.onRefreshData();
+      });
     }
 
     openSaveChartModal(ev) {

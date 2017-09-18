@@ -6,7 +6,23 @@ import * as unset from 'lodash/unset';
 
 import * as template from './analyze-chart-settings.component.html';
 import style from './analyze-chart-settings.component.scss';
-import {AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE, AGGREGATE_TYPES_OBJ, NUMBER_TYPES} from '../../../consts';
+import {AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE, AGGREGATE_TYPES_OBJ, NUMBER_TYPES, DATE_TYPES} from '../../../consts';
+
+const DATE_FORMATS = [{
+  value: 'MMMM Do YYYY, h:mm:ss a',
+  label: 'September 1st 2017, 1:28:31 pm'
+}, {
+  value: 'MMM Do YYYY',
+  label: ' Sep 1st 2017'
+}, {
+  value: 'MMM YYYY',
+  label: 'September 2017'
+}, {
+  value: 'MM YYYY',
+  label: '09 2017'
+}];
+
+const DEFAULT_DATE_FORMAT = DATE_FORMATS[1];
 
 export const AnalyzeChartSettingsComponent = {
   template,
@@ -24,6 +40,8 @@ export const AnalyzeChartSettingsComponent = {
       this.AGGREGATE_TYPES = AGGREGATE_TYPES;
       this.AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
       this.DEFAULT_AGGREGATE_TYPE = DEFAULT_AGGREGATE_TYPE;
+      this.DATE_TYPES = DATE_TYPES;
+      this.DATE_FORMATS = DATE_FORMATS;
 
       this._FilterService = FilterService;
       this._AnalyzeService = AnalyzeService;
@@ -88,6 +106,9 @@ export const AnalyzeChartSettingsComponent = {
       forEach(axisOptions, attr => {
         if (selectedAttr === attr) {
           attr.checked = marker;
+          if (marker === 'x' && DATE_TYPES.includes(selectedAttr.type)) {
+            attr.dateFormat = DEFAULT_DATE_FORMAT.value;
+          }
           if (['y', 'z'].includes(marker) && NUMBER_TYPES.includes(selectedAttr.type)) {
             attr.aggregate = DEFAULT_AGGREGATE_TYPE.value;
           }
@@ -119,12 +140,17 @@ export const AnalyzeChartSettingsComponent = {
       }
     }
 
-    onSelectAggregateType(aggregateType, artifactColumn, container) {
-      artifactColumn.aggregate = aggregateType.value;
+    onSelectAggregateType(aggregateType, attr, container) {
+      attr.aggregate = aggregateType.value;
       if (container === 'checkbox') {
-        const target = find(this.settings.yaxis, ({columnName}) => columnName === artifactColumn.columnName);
+        const target = find(this.settings.yaxis, ({columnName}) => columnName === attr.columnName);
         target.aggregate = aggregateType.value;
       }
+    }
+
+    onSelectDateFormat(dateFormat, attr) {
+      attr.dateFormat = dateFormat.value;
+      this.onChange({settings: this.settings});
     }
   }
 };

@@ -15,10 +15,11 @@ export const PivotGridComponent = {
     onContentReady: '&'
   },
   controller: class PivotGridController {
-    constructor($timeout, $translate) {
+    constructor($timeout, $translate, PivotService) {
       'ngInject';
       this._$translate = $translate;
       this._$timeout = $timeout;
+      this._PivotService = PivotService;
       this.warnings = {
         'Drop Data Fields Here': 'SELECT_DATA_FIELDS',
         'Drop Column Fields Here': 'SELECT_COLUMN_FIELDS',
@@ -82,6 +83,8 @@ export const PivotGridComponent = {
     }
 
     updateDataSource(dataSource) {
+      const parsedFields = this._PivotService.trimSuffixFromPivotFields(dataSource.fields());
+      dataSource.fields(parsedFields);
       this._gridInstance.option('dataSource', dataSource);
     }
 
@@ -98,7 +101,10 @@ export const PivotGridComponent = {
       });
 
       forEach(sorts, sort => {
-        pivotGridDataSource.field(sort.field.dataField, {
+        const dataField = sort.field.type === 'string' ?
+          sort.field.dataField.split('.')[0] :
+          sort.field.dataField;
+        pivotGridDataSource.field(dataField, {
           sortOrder: sort.order
         });
       });

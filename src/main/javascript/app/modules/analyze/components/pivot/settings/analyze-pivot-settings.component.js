@@ -74,6 +74,9 @@ const ARTIFACT_ICON_TYPES_OBJ = {
 };
 
 const GROUP_INTERVALS = [{
+  label: 'ALL',
+  value: undefined
+}, {
   label: 'YEAR',
   value: 'year'
 }, {
@@ -90,7 +93,7 @@ const GROUP_INTERVALS = [{
   value: 'dayOfWeek'
 }];
 
-export const DEFAULT_GROUP_INTERVAL = GROUP_INTERVALS[2];
+export const DEFAULT_GROUP_INTERVAL = GROUP_INTERVALS[3];
 
 export const AnalyzePivotSettingsComponent = {
   template,
