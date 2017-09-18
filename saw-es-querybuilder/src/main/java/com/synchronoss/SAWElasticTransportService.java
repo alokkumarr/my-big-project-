@@ -35,7 +35,7 @@ public class SAWElasticTransportService {
     esProxy.setIndexName(indexName);
     esProxy.setObjectType(type);
     esProxy.setVerb("_search");
-    esProxy.setQuery(query.replaceAll("\\s+",""));
+    esProxy.setQuery(query);
     esProxy.setModuleName(moduleName);
     esProxy.setDsk(dsk);
     esProxy.setUsername(username);

@@ -81,6 +81,81 @@ class AxesFieldDataFieldsAvailable {
 	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(4)))
 	                                    );         
 	                }// dataFields.size() == 5
+	                
+	                if (dataFields.size()==6)
+	                {
+	                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("node_field_1").field(nodeFields.get(0).getColumnName())
+	                      
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(3)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(4)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(5)))
+	                                    );         
+	                }// dataFields.size() == 6
+	                
+	                if (dataFields.size()==7)
+	                {
+	                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("node_field_1").field(nodeFields.get(0).getColumnName())
+	                      
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(3)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(4)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(5)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(6)))
+	                                    );         
+	                }// dataFields.size() == 7
+
+	                if (dataFields.size()==8)
+	                {
+	                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("node_field_1").field(nodeFields.get(0).getColumnName())
+	                      
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(3)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(4)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(5)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(6)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(7)))
+	                                    );         
+	                }// dataFields.size() == 8
+	                if (dataFields.size()==9)
+	                {
+	                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("node_field_1").field(nodeFields.get(0).getColumnName())
+	                      
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(3)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(4)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(5)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(6)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(7)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(8)))
+	                                    );         
+	                }// dataFields.size() == 9
+
+	                if (dataFields.size()==10)
+	                {
+	                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("node_field_1").field(nodeFields.get(0).getColumnName())
+	                      
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(3)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(4)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(5)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(6)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(7)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(8)))
+	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(9)))
+	                                    );         
+	                }// dataFields.size() == 10
+	                
 	            } // !dataFields.isEmpty()
 	        
 	        return searchSourceBuilder;
