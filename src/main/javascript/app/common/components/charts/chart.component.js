@@ -17,13 +17,14 @@ export const chartComponent = {
   },
   template: '<div></div>',
   controller: class HighChartController {
-    constructor(Highcharts, $element, toastMessage) {
+    constructor(Highcharts, $element, toastMessage, $translate) {
       'ngInject';
 
       Highcharts.setOptions(globalChartOptions);
       this.Highcharts = Highcharts;
       this.toastMessage = toastMessage;
       this.$element = $element;
+      this._$translate = $translate;
       this.chart = null;
     }
 
@@ -61,9 +62,9 @@ export const chartComponent = {
 
         const pieNegatives = this.pieHasNegatives();
         if (pieNegatives.all) {
-          this.chart.showNoData('Data unsuitable for Pie chart. Please use a different chart type.');
+          this._$translate('PIE_NO_DATA_PRESENT').then(this.chart.showNoData.bind(this.chart));
         } else if (pieNegatives.some) {
-          this.toastMessage.error('Some negative and zero values have been ommitted. Please use a different chart type if you wish to include them.');
+          this._$translate('PIE_SOME_DATA_PRESENT').then(this.toastMessage.error.bind(this.toastMessage));
         }
       }
     }
