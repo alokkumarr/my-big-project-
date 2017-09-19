@@ -1,5 +1,5 @@
-import get from 'lodash/get';
-import template from './header.component.html';
+import * as get from 'lodash/get';
+import * as template from './header.component.html';
 import style from './header.component.scss';
 
 export const LayoutHeaderComponent = {

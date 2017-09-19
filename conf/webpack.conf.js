@@ -50,6 +50,7 @@ module.exports = function (env) {
     devtool: isDevelopment ? 'source-map' : false,
 
     resolve: {
+      extensions: [".ts", ".js"],
       modules: [MODULE_DIR, webpackHelper.root('src/main/javascript')],
       alias: {
         fonts: webpackHelper.root('assets/fonts'),
@@ -63,18 +64,21 @@ module.exports = function (env) {
     },
 
     module: {
+      exprContextCritical: false,
       rules: [
         // preloaders
         {
           enforce: 'pre',
-          test: /\.js$/,
+          test: /\.[jt]s$/,
           exclude: /node_modules/,
-          loader: 'eslint-loader',
+          loader: 'tslint-loader',
           options: {
             fix: false,
+            typeCheck: false, // tslint-loader is way too slow with this enabled. Use pre-push hook for typechecking
+            tsConfigFile: webpackHelper.root('tsconfig.json'),
             configFile: isDevelopment ?
-              webpackHelper.root('conf/eslint-dev-rules.js') :
-              webpackHelper.root('conf/eslint-prod-rules.js')
+              webpackHelper.root('conf/tslint-dev.json') :
+              webpackHelper.root('conf/tslint-prod.json')
           }
         },
         {
@@ -88,9 +92,14 @@ module.exports = function (env) {
           loader: 'json-loader'
         },
         {
-          test: /\.js$/,
+          test: /\.[jt]s$/,
           exclude: /node_modules/,
-          loader: 'ng-annotate-loader!babel-loader'
+          loaders: ['ng-annotate-loader', {
+            loader: 'ts-loader',
+            options: {
+              configFile: webpackHelper.root('conf/tsconfig.json')
+            }
+          }]
         },
         {
           test: /\.html$/,

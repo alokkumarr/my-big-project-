@@ -1,5 +1,5 @@
-import get from 'lodash/get';
-import template from './category-edit.component.html';
+import * as get from 'lodash/get';
+import * as template from './category-edit.component.html';
 import style from './category-edit.component.scss';
 
 export const CategoryEditComponent = {

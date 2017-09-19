@@ -1,4 +1,4 @@
-import template from './choice-group.component.html';
+import * as template from './choice-group.component.html';
 import style from './choice-group.component.scss';
 
 /**

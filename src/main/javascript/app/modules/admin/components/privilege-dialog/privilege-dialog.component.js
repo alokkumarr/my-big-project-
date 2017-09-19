@@ -1,4 +1,4 @@
-import template from './privilege-dialog.component.html';
+import * as template from './privilege-dialog.component.html';
 import style from './privilege-dialog.component.scss';
 
 export const PrivilegeDialogComponent = {

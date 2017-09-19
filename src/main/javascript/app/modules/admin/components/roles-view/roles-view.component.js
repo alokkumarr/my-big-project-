@@ -1,4 +1,4 @@
-import template from './roles-view.component.html';
+import * as template from './roles-view.component.html';
 import style from './roles-view.component.scss';
 import AbstractComponentController from 'app/common/components/abstractComponent';
 import {Subject} from 'rxjs/Subject';
@@ -159,13 +159,13 @@ export const RolesViewComponent = {
 
     onRoleAction(actionType, payload) {
       switch (actionType) {
-        case 'delete':
-          this.openDeleteModal(payload);
-          break;
-        case 'edit':
-          this.openEditModal(payload);
-          break;
-        default:
+      case 'delete':
+        this.openDeleteModal(payload);
+        break;
+      case 'edit':
+        this.openEditModal(payload);
+        break;
+      default:
       }
     }
     checkColumns(name) {

@@ -1,4 +1,4 @@
-import template from './analyze-executed-list.component.html';
+import * as template from './analyze-executed-list.component.html';
 
 export const AnalyzeExecutedListComponent = {
   template,

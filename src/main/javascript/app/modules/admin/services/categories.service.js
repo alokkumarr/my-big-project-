@@ -1,4 +1,4 @@
-import fpGet from 'lodash/fp/get';
+import * as fpGet from 'lodash/fp/get';
 
 export function CategoriesManagementService($http, AppConfig) {
   'ngInject';

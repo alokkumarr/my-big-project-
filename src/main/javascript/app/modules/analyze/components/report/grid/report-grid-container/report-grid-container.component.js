@@ -1,15 +1,15 @@
-import groupBy from 'lodash/groupBy';
-import map from 'lodash/map';
-import forEach from 'lodash/forEach';
-import omit from 'lodash/fp/omit';
-import isEmpty from 'lodash/isEmpty';
-import find from 'lodash/find';
-import isArray from 'lodash/isArray';
-import filter from 'lodash/filter';
-import assign from 'lodash/assign';
-import isUndefined from 'lodash/isUndefined';
+import * as groupBy from 'lodash/groupBy';
+import * as map from 'lodash/map';
+import * as forEach from 'lodash/forEach';
+import * as omit from 'lodash/fp/omit';
+import * as isEmpty from 'lodash/isEmpty';
+import * as find from 'lodash/find';
+import * as isArray from 'lodash/isArray';
+import * as filter from 'lodash/filter';
+import * as assign from 'lodash/assign';
+import * as isUndefined from 'lodash/isUndefined';
 
-import template from './report-grid-container.component.html';
+import * as template from './report-grid-container.component.html';
 import style from './report-grid-container.component.scss';
 
 export const LAYOUT_MODE = {

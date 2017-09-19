@@ -1,4 +1,4 @@
-import template from './login.component.html';
+import * as template from './login.component.html';
 
 export const LoginComponent = {
   template,

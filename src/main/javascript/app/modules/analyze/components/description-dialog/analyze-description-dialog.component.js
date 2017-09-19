@@ -1,4 +1,4 @@
-import template from './analyze-description-dialog.component.html';
+import * as template from './analyze-description-dialog.component.html';
 import style from './analyze-description-dialog.component.scss';
 
 export const AnalyzeDescriptionDialogComponent = {

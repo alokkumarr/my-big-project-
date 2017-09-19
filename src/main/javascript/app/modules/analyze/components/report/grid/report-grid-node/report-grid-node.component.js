@@ -1,8 +1,8 @@
-import forEach from 'lodash/forEach';
-import assign from 'lodash/assign';
-import isUndefined from 'lodash/isUndefined';
+import * as forEach from 'lodash/forEach';
+import * as assign from 'lodash/assign';
+import * as isUndefined from 'lodash/isUndefined';
 
-import template from './report-grid-node.component.html';
+import * as template from './report-grid-node.component.html';
 import style from './report-grid-node.component.scss';
 
 import {LAYOUT_MODE} from '../report-grid-container/report-grid-container.component';

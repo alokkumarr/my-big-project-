@@ -1,8 +1,8 @@
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
-
-import template from './analyze-pivot-preview.component.html';
-import style from './analyze-pivot-preview.component.scss';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
+
+import * as template from './analyze-pivot-preview.component.html';
+import style from './analyze-pivot-preview.component.scss';
 
 export const AnalyzePivotPreviewComponent = {
   template,

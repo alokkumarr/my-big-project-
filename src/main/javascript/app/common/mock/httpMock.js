@@ -1,6 +1,6 @@
 import 'angular-mocks';
-import flatten from 'lodash/flatten';
-import values from 'lodash/values';
+import * as flatten from 'lodash/flatten';
+import * as values from 'lodash/values';
 
 const req = require.context('api/', true, /^(.*\.mock\.(js$))[^.]*$/igm);
 const mocks = flatten(req.keys().map(key => {

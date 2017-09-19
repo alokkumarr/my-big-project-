@@ -1,6 +1,6 @@
-import template from './role-edit.component.html';
+import * as template from './role-edit.component.html';
 import style from './role-edit.component.scss';
-import get from 'lodash/get';
+import * as get from 'lodash/get';
 
 export const RoleEditComponent = {
   template,
