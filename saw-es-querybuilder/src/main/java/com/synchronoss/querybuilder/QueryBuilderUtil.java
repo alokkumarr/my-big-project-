@@ -9,6 +9,8 @@ import org.elasticsearch.search.aggregations.bucket.histogram.Histogram.Order;
 
 public class QueryBuilderUtil {
 	
+	public final static String DATE_FORMAT = "yyyy-MM-dd";
+	
 	public static AggregationBuilder aggregationBuilder (com.synchronoss.querybuilder.model.pivot.ColumnField columnField, 
 	    List<com.synchronoss.querybuilder.model.pivot.DataField> dataField, String aggregationName)
 
@@ -18,7 +20,7 @@ public class QueryBuilderUtil {
 		if (columnField.getType().equals("date"))
 		{
 			aggregationBuilder = AggregationBuilders.
-					dateHistogram(aggregationName).field(columnField.getColumnName()).
+					dateHistogram(aggregationName).field(columnField.getColumnName()).format(DATE_FORMAT).
 					dateHistogramInterval(groupInterval(columnField.getGroupInterval().name())).order(Order.KEY_ASC);
 			
 			if (!(dataField.isEmpty())&& dataField.size()>0)
@@ -97,7 +99,7 @@ public class QueryBuilderUtil {
 		if (splitBy.getType().equals("date"))
 		{
 			aggregationBuilder = AggregationBuilders.
-					dateHistogram("split_by").field(splitBy.getColumnName()).
+					dateHistogram("split_by").field(splitBy.getColumnName()).format(DATE_FORMAT).
 					dateHistogramInterval(groupInterval(splitBy.getGroupInterval().value())).order(Order.KEY_ASC);
 		}
 		else 

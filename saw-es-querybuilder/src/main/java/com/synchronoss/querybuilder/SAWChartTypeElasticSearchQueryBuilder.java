@@ -187,13 +187,13 @@ class SAWChartTypeElasticSearchQueryBuilder {
     List<com.synchronoss.querybuilder.model.chart.DataField> dataFields =  sqlBuilderNode.getDataFields();
     if (nodeFields != null && dataFields !=null)
     {
-      if (!nodeFields.isEmpty() && dataFields.size() <=3){
+      if ((!nodeFields.isEmpty() && nodeFields.size() <=3) && !dataFields.isEmpty()){
       searchSourceBuilder = AxesFieldDataFieldsAvailable.rowDataFieldsAvailable
           (nodeFields, dataFields, searchSourceBuilder, boolQueryBuilder);
       }
       else {
         
-          throw new IllegalArgumentException("Charts cannot have more than three axes");
+          throw new IllegalArgumentException("nodeFields & dataFields cannot be empty");
       }
     } 
     else {
