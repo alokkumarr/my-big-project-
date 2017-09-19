@@ -1,6 +1,6 @@
-import filter from 'lodash/filter';
-import some from 'lodash/some';
-import trim from 'lodash/trim';
+import * as filter from 'lodash/filter';
+import * as some from 'lodash/some';
+import * as trim from 'lodash/trim';
 
 export function LocalSearchService($q) {
   'ngInject';

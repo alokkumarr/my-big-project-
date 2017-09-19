@@ -1,9 +1,9 @@
 import 'devextreme/ui/pivot_grid';
-import isEmpty from 'lodash/isEmpty';
+import * as isEmpty from 'lodash/isEmpty';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 
-import template from './analyze-pivot-detail.component.html';
+import * as template from './analyze-pivot-detail.component.html';
 
 export const AnalyzePivotDetailComponent = {
   template,

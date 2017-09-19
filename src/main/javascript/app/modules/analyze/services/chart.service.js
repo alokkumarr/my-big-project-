@@ -1,30 +1,30 @@
-import get from 'lodash/get';
-import set from 'lodash/set';
-import clone from 'lodash/clone';
-import some from 'lodash/some';
-import sum from 'lodash/sum';
-import map from 'lodash/map';
-import round from 'lodash/round';
-import flatMap from 'lodash/flatMap';
-import assign from 'lodash/assign';
-import find from 'lodash/find';
-import forEach from 'lodash/forEach';
-import filter from 'lodash/filter';
-import indexOf from 'lodash/indexOf';
-import isEmpty from 'lodash/isEmpty';
-import fpPipe from 'lodash/fp/pipe';
-import fpOmit from 'lodash/fp/omit';
-import fpToPairs from 'lodash/fp/toPairs';
-import fpMap from 'lodash/fp/map';
-import fpMapValues from 'lodash/fp/mapValues';
-import fpFlatMap from 'lodash/fp/flatMap';
-import fpSortBy from 'lodash/fp/sortBy';
-import reduce from 'lodash/reduce';
-import concat from 'lodash/concat';
-import compact from 'lodash/compact';
-import fpGroupBy from 'lodash/fp/groupBy';
-import mapValues from 'lodash/mapValues';
-import moment from 'moment';
+import * as get from 'lodash/get';
+import * as set from 'lodash/set';
+import * as clone from 'lodash/clone';
+import * as some from 'lodash/some';
+import * as sum from 'lodash/sum';
+import * as map from 'lodash/map';
+import * as round from 'lodash/round';
+import * as flatMap from 'lodash/flatMap';
+import * as assign from 'lodash/assign';
+import * as find from 'lodash/find';
+import * as forEach from 'lodash/forEach';
+import * as filter from 'lodash/filter';
+import * as indexOf from 'lodash/indexOf';
+import * as isEmpty from 'lodash/isEmpty';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpOmit from 'lodash/fp/omit';
+import * as fpToPairs from 'lodash/fp/toPairs';
+import * as fpMap from 'lodash/fp/map';
+import * as fpMapValues from 'lodash/fp/mapValues';
+import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as fpSortBy from 'lodash/fp/sortBy';
+import * as reduce from 'lodash/reduce';
+import * as concat from 'lodash/concat';
+import * as compact from 'lodash/compact';
+import * as fpGroupBy from 'lodash/fp/groupBy';
+import * as mapValues from 'lodash/mapValues';
+import * as moment from 'moment';
 
 import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ} from '../consts';
 
@@ -116,11 +116,11 @@ export function ChartService(Highcharts) {
 
   function updateAnalysisModel(analysis) {
     switch (analysis.chartType) {
-      case 'pie':
-        analysis.labelOptions = analysis.labelOptions || {enabled: true, value: 'percentage'};
-        break;
-      default:
-        break;
+    case 'pie':
+      analysis.labelOptions = analysis.labelOptions || {enabled: true, value: 'percentage'};
+      break;
+    default:
+      break;
     }
     return analysis;
   }
@@ -186,35 +186,35 @@ export function ChartService(Highcharts) {
     };
 
     switch (type) {
-      case 'bubble':
-        config.axisLabels.z = 'Size By';
-        config.axisLabels.g = 'Color By';
-        config.required.z = true;
-        return config;
+    case 'bubble':
+      config.axisLabels.z = 'Size By';
+      config.axisLabels.g = 'Color By';
+      config.required.z = true;
+      return config;
 
-      case 'pie':
-        config.axisLabels.y = 'Angle';
-        config.axisLabels.x = 'Color By';
-        config.renamable.x = false;
-        config.labelOptions = [{
-          value: 'percentage',
-          name: 'Show Percentage'
-        }, {
-          value: 'data',
-          name: 'Show Data Value'
-        }];
-        config.customTooltip = false;
-        config.legend = false;
-        return config;
+    case 'pie':
+      config.axisLabels.y = 'Angle';
+      config.axisLabels.x = 'Color By';
+      config.renamable.x = false;
+      config.labelOptions = [{
+        value: 'percentage',
+        name: 'Show Percentage'
+      }, {
+        value: 'data',
+        name: 'Show Data Value'
+      }];
+      config.customTooltip = false;
+      config.legend = false;
+      return config;
 
-      case 'column':
-      case 'bar':
-      case 'line':
-      case 'spline':
-      case 'stack':
-      case 'scatter':
-      default:
-        return config;
+    case 'column':
+    case 'bar':
+    case 'line':
+    case 'spline':
+    case 'stack':
+    case 'scatter':
+    default:
+      return config;
     }
   }
 
@@ -448,36 +448,37 @@ export function ChartService(Highcharts) {
     let chartSeries;
 
     switch (chartType) {
-      case 'column':
-      case 'bar':
-      case 'line':
-      case 'spline':
-      case 'stack':
-      case 'scatter':
-      case 'bubble':
-        // the bubble chart already supports the parsed data
-        return {chartSeries: series};
+    case 'column':
+    case 'bar':
+    case 'line':
+    case 'spline':
+    case 'stack':
+    case 'scatter':
+    case 'bubble':
+      // the bubble chart already supports the parsed data
+      return {chartSeries: series};
 
-      case 'pie':
-        if (!fields.g) {
-          mapperFn = ({x, y}) => {
-            const category = get(categories, `x.${x}`);
-            return {name: category, y, drilldown: category};
-          };
-          forEach(series, serie => {
-            serie.data = map(serie.data, mapperFn);
-          });
+    case 'pie':
+      if (!fields.g) {
+        set(series, '0.dataLabels.format', '{point.name}: {point.percentage:.2f}%');
+        mapperFn = ({x, y}) => {
+          const category = get(categories, `x.${x}`);
+          return {name: category, y, drilldown: category};
+        };
+        forEach(series, serie => {
+          serie.data = map(serie.data, mapperFn);
+        });
 
-          chartSeries = series;
+        chartSeries = series;
 
-        } else {
-          chartSeries = dataToNestedDonut(series, categories);
-        }
+      } else {
+        chartSeries = dataToNestedDonut(series, categories);
+      }
 
-        return {chartSeries};
+      return {chartSeries};
 
-      default:
-        throw new Error(`Chart type: ${chartType} is not supported!`);
+    default:
+      throw new Error(`Chart type: ${chartType} is not supported!`);
     }
   }
 
@@ -566,19 +567,19 @@ export function ChartService(Highcharts) {
     };
 
     switch (type) {
-      case 'pie':
-        changes = getPieChangeConfig(type, settings, fields, gridData, opts);
-        break;
-      case 'column':
-      case 'bar':
-      case 'line':
-      case 'spline':
-      case 'stack':
-      case 'scatter':
-      case 'bubble':
-      default:
-        changes = getBarChangeConfig(type, settings, fields, gridData, opts);
-        break;
+    case 'pie':
+      changes = getPieChangeConfig(type, settings, fields, gridData, opts);
+      break;
+    case 'column':
+    case 'bar':
+    case 'line':
+    case 'spline':
+    case 'stack':
+    case 'scatter':
+    case 'bubble':
+    default:
+      changes = getBarChangeConfig(type, settings, fields, gridData, opts);
+      break;
     }
 
     return concat(
@@ -684,21 +685,21 @@ export function ChartService(Highcharts) {
     const groupBy = filterNonNumberTypes(attributes);
 
     switch (model.chartType) {
-      case 'bubble':
-        zaxis = filterNumberTypes(attributes);
-        settingsObj = {
-          xaxis,
-          yaxis,
-          zaxis,
-          groupBy
-        };
-        break;
-      default:
-        settingsObj = {
-          yaxis,
-          xaxis,
-          groupBy
-        };
+    case 'bubble':
+      zaxis = filterNumberTypes(attributes);
+      settingsObj = {
+        xaxis,
+        yaxis,
+        zaxis,
+        groupBy
+      };
+      break;
+    default:
+      settingsObj = {
+        yaxis,
+        xaxis,
+        groupBy
+      };
     }
     return settingsObj;
   }

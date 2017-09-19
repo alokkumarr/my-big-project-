@@ -1,12 +1,12 @@
-import map from 'lodash/fp/map';
-import cloneDeep from 'lodash/cloneDeep';
-import get from 'lodash/get';
-import reduce from 'lodash/fp/reduce';
-import filter from 'lodash/fp/filter';
-import isEmpty from 'lodash/isEmpty';
-import isNumber from 'lodash/isNumber';
-import values from 'lodash/values';
-import find from 'lodash/find';
+import * as map from 'lodash/fp/map';
+import * as cloneDeep from 'lodash/cloneDeep';
+import * as get from 'lodash/get';
+import * as reduce from 'lodash/fp/reduce';
+import * as filter from 'lodash/fp/filter';
+import * as isEmpty from 'lodash/isEmpty';
+import * as isNumber from 'lodash/isNumber';
+import * as values from 'lodash/values';
+import * as find from 'lodash/find';
 
 import {OPERATORS} from '../components/filter/filters/number-filter.component';
 
@@ -66,20 +66,20 @@ export function FilterService($q, $mdDialog) {
 
     switch (filterType) {
 
-      case FILTER_TYPES.STRING:
-        return isEmpty(get(filter, 'model.modelValues', []));
+    case FILTER_TYPES.STRING:
+      return isEmpty(get(filter, 'model.modelValues', []));
 
-      case FILTER_TYPES.NUMBER:
-        return isEmpty(filter.model);
+    case FILTER_TYPES.NUMBER:
+      return isEmpty(filter.model);
 
-      case FILTER_TYPES.DATE:
-        return isEmpty(filter.model);
+    case FILTER_TYPES.DATE:
+      return isEmpty(filter.model);
 
-      case FILTER_TYPES.TIMESTAMP:
-        return isEmpty(filter.model);
+    case FILTER_TYPES.TIMESTAMP:
+      return isEmpty(filter.model);
 
-      default:
-        return true;
+    default:
+      return true;
     }
   }
 
@@ -150,19 +150,19 @@ export function FilterService($q, $mdDialog) {
       let isValid;
 
       switch (filter.type) {
-        case 'string':
-          isValid = Boolean(filter.model[row[filter.name]]);
-          break;
-        case 'int':
-        case 'integer':
-        case 'timestamp':
-        case 'double':
-        case 'long':
-          isValid = Boolean(isNumberValid(row[filter.name], filter.model, filter.operator));
-          break;
-        default:
-          isValid = false;
-          break;
+      case 'string':
+        isValid = Boolean(filter.model[row[filter.name]]);
+        break;
+      case 'int':
+      case 'integer':
+      case 'timestamp':
+      case 'double':
+      case 'long':
+        isValid = Boolean(isNumberValid(row[filter.name], filter.model, filter.operator));
+        break;
+      default:
+        isValid = false;
+        break;
       }
 
       return {
@@ -215,22 +215,22 @@ export function FilterService($q, $mdDialog) {
     const c = numberFilterModel.otherValue;
 
     switch (operator) {
-      case OPERATORS.GREATER.value:
-        return a > b;
-      case OPERATORS.LESS.value:
-        return a < b;
-      case OPERATORS.GREATER_OR_EQUAL.value:
-        return a >= b;
-      case OPERATORS.LESS_OR_EQUAL.value:
-        return a <= b;
-      case OPERATORS.NOT_EQUALS.value:
-        return a !== b;
-      case OPERATORS.EQUALS.value:
-        return a === b;
-      case OPERATORS.BETWEEN.value:
-        return c <= a && a <= b;
-      default:
-        return false;
+    case OPERATORS.GREATER.value:
+      return a > b;
+    case OPERATORS.LESS.value:
+      return a < b;
+    case OPERATORS.GREATER_OR_EQUAL.value:
+      return a >= b;
+    case OPERATORS.LESS_OR_EQUAL.value:
+      return a <= b;
+    case OPERATORS.NOT_EQUALS.value:
+      return a !== b;
+    case OPERATORS.EQUALS.value:
+      return a === b;
+    case OPERATORS.BETWEEN.value:
+      return c <= a && a <= b;
+    default:
+      return false;
     }
   }
 

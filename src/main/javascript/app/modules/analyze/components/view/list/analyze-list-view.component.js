@@ -1,6 +1,6 @@
-import isEmpty from 'lodash/isEmpty';
+import * as isEmpty from 'lodash/isEmpty';
 
-import template from './analyze-list-view.component.html';
+import * as template from './analyze-list-view.component.html';
 import style from './analyze-list-view.component.scss';
 
 export const AnalyzeListViewComponent = {

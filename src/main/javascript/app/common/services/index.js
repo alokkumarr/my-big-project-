@@ -1,4 +1,4 @@
-import angular from 'angular';
+import * as angular from 'angular';
 import 'angular-toastr';
 import 'angular-toastr/dist/angular-toastr.css';
 

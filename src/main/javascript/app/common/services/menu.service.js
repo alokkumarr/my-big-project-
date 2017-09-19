@@ -1,6 +1,6 @@
-import map from 'lodash/map';
-import get from 'lodash/get';
-import find from 'lodash/find';
+import * as map from 'lodash/map';
+import * as get from 'lodash/get';
+import * as find from 'lodash/find';
 
 export function MenuService($q, JwtService) {
   'ngInject';

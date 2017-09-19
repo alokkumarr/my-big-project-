@@ -1,4 +1,4 @@
-import template from './panel.component.html';
+import * as template from './panel.component.html';
 import style from './panel.component.scss';
 
 export const PanelComponent = {

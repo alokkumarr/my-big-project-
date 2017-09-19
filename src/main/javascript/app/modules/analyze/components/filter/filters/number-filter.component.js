@@ -1,8 +1,8 @@
-import values from 'lodash/values';
-import get from 'lodash/get';
-import find from 'lodash/find';
+import * as values from 'lodash/values';
+import * as get from 'lodash/get';
+import * as find from 'lodash/find';
 
-import template from './number-filter.component.html';
+import * as template from './number-filter.component.html';
 
 export const OPERATORS = {
   GREATER: {

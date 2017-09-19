@@ -1,5 +1,5 @@
-import isUndefined from 'lodash/isUndefined';
-import template from './price-range-filter.component.html';
+import * as isUndefined from 'lodash/isUndefined';
+import * as template from './price-range-filter.component.html';
 
 const MAX_PRICE = 100;
 const MIN_PRICE = 0;

@@ -1,7 +1,7 @@
-import get from 'lodash/get';
-import padStart from 'lodash/padStart';
-import find from 'lodash/find';
-import flatMap from 'lodash/flatMap';
+import * as get from 'lodash/get';
+import * as padStart from 'lodash/padStart';
+import * as find from 'lodash/find';
+import * as flatMap from 'lodash/flatMap';
 
 const PRIVILEGE_CODE_LENGTH = 16;
 
@@ -147,26 +147,26 @@ class JwtService {
     }
 
     switch (name) {
-      case 'ACCESS':
-        return this._isSet(code, PRIVILEGE_INDEX.ACCESS);
-      case 'CREATE':
-        return this._isSet(code, PRIVILEGE_INDEX.CREATE);
-      case 'EXECUTE':
-        return this._isSet(code, PRIVILEGE_INDEX.EXECUTE);
-      case 'PUBLISH':
-        return this._isSet(code, PRIVILEGE_INDEX.PUBLISH);
-      case 'FORK':
-        return this._isSet(code, PRIVILEGE_INDEX.FORK);
-      case 'EDIT':
-        return this._isSet(code, PRIVILEGE_INDEX.EDIT) &&
-          (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
-      case 'EXPORT':
-        return this._isSet(code, PRIVILEGE_INDEX.EXPORT);
-      case 'DELETE':
-        return this._isSet(code, PRIVILEGE_INDEX.DELETE) &&
-          (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
-      default:
-        return false;
+    case 'ACCESS':
+      return this._isSet(code, PRIVILEGE_INDEX.ACCESS);
+    case 'CREATE':
+      return this._isSet(code, PRIVILEGE_INDEX.CREATE);
+    case 'EXECUTE':
+      return this._isSet(code, PRIVILEGE_INDEX.EXECUTE);
+    case 'PUBLISH':
+      return this._isSet(code, PRIVILEGE_INDEX.PUBLISH);
+    case 'FORK':
+      return this._isSet(code, PRIVILEGE_INDEX.FORK);
+    case 'EDIT':
+      return this._isSet(code, PRIVILEGE_INDEX.EDIT) &&
+        (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
+    case 'EXPORT':
+      return this._isSet(code, PRIVILEGE_INDEX.EXPORT);
+    case 'DELETE':
+      return this._isSet(code, PRIVILEGE_INDEX.DELETE) &&
+        (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
+    default:
+      return false;
     }
   }
 }

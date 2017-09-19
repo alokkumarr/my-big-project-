@@ -1,7 +1,7 @@
-import map from 'lodash/map';
-import isEmpty from 'lodash/isEmpty';
+import * as map from 'lodash/map';
+import * as isEmpty from 'lodash/isEmpty';
 
-import template from './checkbox-filter.component.html';
+import * as template from './checkbox-filter.component.html';
 
 export const CheckboxFilterComponent = {
   template,

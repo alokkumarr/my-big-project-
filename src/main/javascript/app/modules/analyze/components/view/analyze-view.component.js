@@ -1,12 +1,12 @@
-import template from './analyze-view.component.html';
+import * as template from './analyze-view.component.html';
 import style from './analyze-view.component.scss';
 
-import remove from 'lodash/remove';
-import findIndex from 'lodash/findIndex';
+import * as remove from 'lodash/remove';
+import * as findIndex from 'lodash/findIndex';
 import {Subject} from 'rxjs/Subject';
 
 import {Events} from '../../consts';
-import AbstractComponentController from 'app/common/components/abstractComponent';
+import AbstractComponentController from '../../../../common/components/abstractComponent';
 
 const SEARCH_CONFIG = [
   {keyword: 'NAME', fieldName: 'name'},
@@ -143,19 +143,19 @@ export const AnalyzeViewComponent = {
 
     onCardAction(actionType, payload) {
       switch (actionType) {
-        case 'onSuccessfulDeletion':
-          this.removeDeletedAnalysis(payload);
-          break;
-        case 'onSuccessfulExecution':
-          this.goToAnalysis(payload);
-          break;
-        case 'onSuccessfulPublish':
-          this.onSuccessfulPublish(payload);
-          break;
-        case 'view':
-          this.view(payload);
-          break;
-        default:
+      case 'onSuccessfulDeletion':
+        this.removeDeletedAnalysis(payload);
+        break;
+      case 'onSuccessfulExecution':
+        this.goToAnalysis(payload);
+        break;
+      case 'onSuccessfulPublish':
+        this.onSuccessfulPublish(payload);
+        break;
+      case 'view':
+        this.view(payload);
+        break;
+      default:
       }
     }
 

@@ -1,5 +1,5 @@
-import defaultsDeep from 'lodash/defaultsDeep';
-import clone from 'lodash/clone';
+import * as defaultsDeep from 'lodash/defaultsDeep';
+import * as clone from 'lodash/clone';
 
 import {AnalyseTypes} from '../../consts';
 
@@ -83,16 +83,16 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
     };
 
     switch (analysis.type) {
-      case AnalyseTypes.Report:
-        openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
-        break;
-      case AnalyseTypes.Chart:
-        openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
-        break;
-      case AnalyseTypes.Pivot:
-        openModal(`<analyze-pivot model="model" mode="${mode}"></analyze-pivot>`);
-        break;
-      default:
+    case AnalyseTypes.Report:
+      openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
+      break;
+    case AnalyseTypes.Chart:
+      openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
+      break;
+    case AnalyseTypes.Pivot:
+      openModal(`<analyze-pivot model="model" mode="${mode}"></analyze-pivot>`);
+      break;
+    default:
     }
   }
 

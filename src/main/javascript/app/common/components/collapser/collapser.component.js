@@ -1,4 +1,4 @@
-import templateUrl from './collapser.component.html';
+import * as templateUrl from './collapser.component.html';
 import style from './collapser.component.scss';
 
 /**

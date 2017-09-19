@@ -1,4 +1,4 @@
-import template from './analyze-card.component.html';
+import * as template from './analyze-card.component.html';
 import style from './analyze-card.component.scss';
 
 export const AnalyzeCardComponent = {

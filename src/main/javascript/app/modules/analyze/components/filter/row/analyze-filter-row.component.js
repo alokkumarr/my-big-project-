@@ -1,4 +1,4 @@
-import template from './analyze-filter-row.component.html';
+import * as template from './analyze-filter-row.component.html';
 
 export const AnalyzeFilterRowComponent = {
   template,

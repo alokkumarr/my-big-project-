@@ -1,5 +1,5 @@
-import get from 'lodash/get';
-import template from './role-new.component.html';
+import * as get from 'lodash/get';
+import * as template from './role-new.component.html';
 import style from './role-new.component.scss';
 
 export const RoleNewComponent = {
