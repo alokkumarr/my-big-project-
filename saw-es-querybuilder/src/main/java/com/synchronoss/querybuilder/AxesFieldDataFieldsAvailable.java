@@ -6,8 +6,6 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import com.synchronoss.querybuilder.model.chart.DataField;
-
 class AxesFieldDataFieldsAvailable {
 
 	public static SearchSourceBuilder rowDataFieldsAvailable(List<com.synchronoss.querybuilder.model.chart.NodeField> nodeField,  
@@ -32,7 +30,8 @@ class AxesFieldDataFieldsAvailable {
 	        List<com.synchronoss.querybuilder.model.chart.DataField> dataFields, 
 	        SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	    {
-	            if ((!dataFields.isEmpty()) && dataFields.size() >0)
+	      
+ 		   if ((!dataFields.isEmpty()) && dataFields.size() >0)
 	            {
 	                if (dataFields.size()==1)
 	                {
@@ -99,8 +98,8 @@ class AxesFieldDataFieldsAvailable {
 	                
 	                if (dataFields.size()==7)
 	                {
-	                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("node_field_1").field(nodeFields.get(0).getColumnName())
-	                      
+	                  searchSourceBuilder.query(boolQueryBuilder)
+	                  			.aggregation(AggregationBuilders.terms("node_field_1").field(nodeFields.get(0).getColumnName())
 	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(0)))
 	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(1)))
 	                            .subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldChart(dataFields.get(2)))
@@ -111,7 +110,7 @@ class AxesFieldDataFieldsAvailable {
 	                                    );         
 	                }// dataFields.size() == 7
 
-	                if (dataFields.size()==8)
+	                    if (dataFields.size()==8)
 	                {
 	                  searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("node_field_1").field(nodeFields.get(0).getColumnName())
 	                      

@@ -38,12 +38,12 @@ public class ChartMainSampleClass {
     System.setProperty("host", "10.48.72.74");
     System.setProperty("port", "9300");
     System.setProperty("cluster", "sncr-salesdemo");
-    System.setProperty("schema.chart", "D:\\Work\\SAW2_0\\saw-services\\saw-es-querybuilder\\src\\main\\resources\\schema\\chart_querybuilder_schema.json");
+    System.setProperty("schema.chart", "/Users/Shared/WORK/SAW-BE/saw-es-querybuilder/src/main/resources/schema/chart_querybuilder_schema.json");
 
     // This is the entry point for /analysis service as JSONString not as file
     JsonNode objectNode =
         objectMapper.readTree(new File(
-            "C:\\Users\\saurav.paul\\Desktop\\Sergey\\chart_type_data.json"));
+            "/Users/spau0004/Desktop/Sergey/chart_type_data.json"));
     String chart = System.getProperty("schema.chart");
     // JsonNode objectNode = objectMapper.readTree(new File(args[0]));
 
@@ -196,7 +196,7 @@ public class ChartMainSampleClass {
     List<com.synchronoss.querybuilder.model.chart.DataField> dataFields =  sqlBuilderNode.getDataFields();
     if (nodeFields != null && dataFields !=null)
     {
-      if (!nodeFields.isEmpty() && dataFields.size() <=3){
+    	if ((!nodeFields.isEmpty() && nodeFields.size() <=3) && !dataFields.isEmpty()){
       searchSourceBuilder = AxesFieldDataFieldsAvailable.rowDataFieldsAvailable
           (nodeFields, dataFields, searchSourceBuilder, boolQueryBuilder);
       }
@@ -210,10 +210,8 @@ public class ChartMainSampleClass {
     }
     String query = searchSourceBuilder.toString();
     System.out.println(query);
-    System.setProperty("url", "http://mapr-dev02.sncrbda.dev.vacum-np.sncrcorp.net:9200/");
-    String response =
-        SAWElasticTransportService.executeReturnAsString(query, objectNode.toString(), "some",
-            "xssds", "login");
-    System.out.println(response);
+    //System.setProperty("url", "https://saw.bda.poc.velocity-va.synchronoss.net/services/md");
+    //String response =SAWElasticTransportService.executeReturnAsString(query, objectNode.toString(), "some", "xssds", "login");
+    //System.out.println(response);
   }
 }
