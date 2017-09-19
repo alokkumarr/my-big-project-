@@ -24,6 +24,7 @@ import concat from 'lodash/concat';
 import compact from 'lodash/compact';
 import fpGroupBy from 'lodash/fp/groupBy';
 import mapValues from 'lodash/mapValues';
+import sortBy from 'lodash/sortBy';
 import moment from 'moment';
 
 import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ} from '../consts';
@@ -303,6 +304,12 @@ export function ChartService(Highcharts) {
       });
     });
 
+    if (!isEmpty(categories)) {
+      forEach(series, serie => {
+        serie.data = sortBy(serie.data, 'x');
+      });
+    }
+
     return {
       series,
       categories
@@ -556,7 +563,6 @@ export function ChartService(Highcharts) {
   }
 
   const dataToChangeConfig = (type, settings, gridData, opts) => {
-
     let changes;
     const fields = {
       x: find(settings.xaxis, attr => attr.checked === 'x'),
