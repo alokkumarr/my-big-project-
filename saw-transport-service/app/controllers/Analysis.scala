@@ -136,6 +136,16 @@ class Analysis extends BaseController {
       }
       case "execute" => {
         val analysisId = extractAnalysisId(json)
+        val (dataSecurityKey: String) = ticket match {
+          case None => throw new ClientException(
+            "Valid JWT not found in Authorization header")
+          case Some(ticket) =>
+            (ticket.dataSecurityKey)
+        }
+        val dskStr = dataSecurityKey.asInstanceOf[String].toString;
+        m_log.trace("dskStr dataset: {}", dskStr);
+        val parsedDSK = parse(dskStr);
+        m_log.trace("parsedDSK dataset: {}", parsedDSK);
         var queryRuntime: String = null
         (json \ "contents" \ "analyze") match {
           case obj: JArray => {
