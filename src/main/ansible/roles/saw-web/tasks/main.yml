@@ -5,3 +5,8 @@
 - name: Install SAW Web package
   yum: name="{{ item }}" state=present
   with_fileglob: ["../rpms/saw-web-*.rpm"]
+  # Workaround: Any previously deployed and exploded WAR needs to be
+  # removed before deploying a new version of the WAR.  This
+  # workaround can be removed when/if SAW Web is converted to a Spring
+  # Boot application.
+  notify: remove previous exploded WAR

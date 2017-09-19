@@ -8,8 +8,7 @@
       <div class="ars_sort-item" layout="row" layout-align="space-around center" layout-padding
            ng-repeat="sort in $ctrl.model.sorts track by $index">
         <span translate="SORT_BY"></span>
-
-        <md-select ng-model="::sort.field">
+        <md-select ng-model="sort.field">
           <md-option
             ng-repeat="field in $ctrl.model.fields | filter:$ctrl.filterSortOption.bind($ctrl, sort)"
             ng-bind="::field.getDisplayName ? field.getDisplayName() : field.label"

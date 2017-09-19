@@ -17,6 +17,7 @@ import forEach from 'lodash/forEach';
 import fpGroupBy from 'lodash/fp/groupBy';
 import groupBy from 'lodash/groupBy';
 import values from 'lodash/values';
+import has from 'lodash/has';
 import fpMapValues from 'lodash/fp/mapValues';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
@@ -36,7 +37,8 @@ export const AnalyzePivotComponent = {
     mode: '@?'
   },
   controller: class AnalyzePivotController extends AbstractDesignerComponentController {
-    constructor($timeout, PivotService, AnalyzeService, FilterService, $mdSidenav, toastMessage, $translate, $injector) {
+    constructor($timeout, PivotService, AnalyzeService, FilterService, SortService,
+      $mdSidenav, toastMessage, $translate, $injector) {
       'ngInject';
       super($injector);
       this._$mdSidenav = $mdSidenav;
@@ -44,6 +46,7 @@ export const AnalyzePivotComponent = {
       this._$timeout = $timeout;
       this._FilterService = FilterService;
       this._AnalyzeService = AnalyzeService;
+      this._SortService = SortService;
       this._toastMessage = toastMessage;
       this._$translate = $translate;
       this.deNormalizedData = [];
@@ -77,7 +80,6 @@ export const AnalyzePivotComponent = {
           this.initModel(analysis);
           this.analysisUnSynched();
           this.artifacts = this.getSortedArtifacts(this.model.artifacts);
-          this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
         });
     }
 
@@ -89,7 +91,6 @@ export const AnalyzePivotComponent = {
 
     loadExistingAnalysis() {
       this.artifacts = this.getSortedArtifacts(this.model.artifacts);
-      this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
       this.initExistingSettings();
       this.loadPivotData();
     }
@@ -102,7 +103,6 @@ export const AnalyzePivotComponent = {
           this.analysisUnSynched();
           this.startDraftMode();
           this.artifacts = this.getSortedArtifacts(this.model.artifacts);
-          this.artifacts[0].columns = this._PivotService.takeOutKeywordFromArtifactColumns(this.artifacts[0].columns);
           this.loadPivotData();
         });
     }
@@ -110,8 +110,8 @@ export const AnalyzePivotComponent = {
     initExistingSettings() {
       this.filters = map(this.model.sqlBuilder.filters,
                          this._FilterService.backend2FrontendFilter(this.artifacts));
-      this.sortFields = this.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
-      this.sorts = this.mapBackend2FrontendSort(this.model.sqlBuilder.sorts, this.sortFields);
+      this.sortFields = this._SortService.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
+      this.sorts = this._SortService.mapBackend2FrontendSort(this.model.sqlBuilder.sorts, this.sortFields);
     }
 
     getSortedArtifacts(artifacts) {
@@ -123,7 +123,7 @@ export const AnalyzePivotComponent = {
 
     onApplySettings(columns) {
       this.artifacts[0].columns = columns;
-      this.sortFields = this.getArtifactColumns2SortFieldMapper()(this.artifacts[0].columns);
+      this.sortFields = this._SortService.getArtifactColumns2SortFieldMapper()(this.artifacts[0].columns);
       this.analysisUnSynched();
       this.startDraftMode();
       const pivotFields = this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns);
@@ -198,6 +198,9 @@ export const AnalyzePivotComponent = {
 
       forEach(selectedArtifactColumns, artifactColumn => {
         const targetField = find(fields, ({dataField}) => {
+          if (artifactColumn.type === 'string') {
+            return dataField === artifactColumn.columnName.split('.')[0];
+          }
           return dataField === artifactColumn.columnName;
         });
         artifactColumn.areaIndex = targetField.areaIndex;
@@ -218,7 +221,7 @@ export const AnalyzePivotComponent = {
 
     applyDefaultsBasedOnAreaChange(artifactColumn) {
       if (DATE_TYPES.includes(artifactColumn.type) &&
-          !artifactColumn.groupInterval) {
+          !has(artifactColumn, 'groupInterval')) {
 
         artifactColumn.groupInterval = DEFAULT_GROUP_INTERVAL.value;
       }
@@ -271,21 +274,6 @@ export const AnalyzePivotComponent = {
       return valid;
     }
 
-    getArtifactColumns2SortFieldMapper() {
-      return fpPipe(
-        fpFilter(artifactColumn => artifactColumn.checked &&
-          (artifactColumn.area === 'row' || artifactColumn.area === 'column')),
-        // fpFilter(artifactColumn => !DATE_TYPES.includes(artifactColumn.dataType)),
-        fpMap(artifactColumn => {
-          return {
-            type: artifactColumn.type,
-            dataField: artifactColumn.columnName,
-            label: artifactColumn.alias || artifactColumn.displayName
-          };
-        })
-      );
-    }
-
     applySorts(sorts) {
       this.pivotGridUpdater.next({sorts});
       this.analysisUnSynched();
@@ -311,26 +299,6 @@ export const AnalyzePivotComponent = {
       this.openPreviewModal(tpl, ev, {
         pivot: this.getModel(),
         dataSource: this.dataSource
-      });
-    }
-
-    mapBackend2FrontendSort(sorts, sortFields) {
-      return map(sorts, sort => {
-        const targetField = find(sortFields, ({dataField}) => dataField === sort.columnName);
-        return {
-          field: targetField,
-          order: sort.order
-        };
-      });
-    }
-
-    mapFrontend2BackendSort(sorts) {
-      return map(sorts, sort => {
-        return {
-          columnName: sort.field.dataField,
-          type: sort.field.type,
-          order: sort.order
-        };
       });
     }
 
@@ -372,7 +340,7 @@ export const AnalyzePivotComponent = {
       return {
         booleanCriteria: this.model.sqlBuilder.booleanCriteria,
         filters: map(this.filters, this._FilterService.frontend2BackendFilter()),
-        sorts: this.mapFrontend2BackendSort(this.sorts),
+        sorts: this._SortService.mapFrontend2BackendSort(this.sorts),
         rowFields: groupedFields.row || [],
         columnFields: groupedFields.column || [],
         dataFields: groupedFields.data

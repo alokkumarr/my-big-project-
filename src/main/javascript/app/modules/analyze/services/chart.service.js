@@ -24,8 +24,9 @@ import concat from 'lodash/concat';
 import compact from 'lodash/compact';
 import fpGroupBy from 'lodash/fp/groupBy';
 import mapValues from 'lodash/mapValues';
+import moment from 'moment';
 
-import {NUMBER_TYPES, AGGREGATE_TYPES_OBJ} from '../consts';
+import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ} from '../consts';
 
 const LEGEND_POSITIONING = {
   left: {
@@ -271,6 +272,10 @@ export function ChartService(Highcharts) {
     const areMultipleYAxes = fields.y.length > 1;
     const isGrouped = fields.g;
 
+    const fieldsArray = compact([fields.x, ...fields.y, fields.z, fields.g]);
+    const dateFields = filter(fieldsArray, ({type}) => DATE_TYPES.includes(type));
+    formatDatesIfNeeded(parsedData, dateFields);
+
     if (areMultipleYAxes) {
       series = splitSeriesByYAxes(parsedData, fields);
     } else if (isGrouped) {
@@ -284,7 +289,7 @@ export function ChartService(Highcharts) {
           dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val]))
       }];
     }
-    // split out categories form the data
+    // split out categories frem the data
     forEach(series, serie => {
       serie.data = map(serie.data, point => {
         const dataPoint = clone(point);
@@ -302,6 +307,16 @@ export function ChartService(Highcharts) {
       series,
       categories
     };
+  }
+
+  function formatDatesIfNeeded(parsedData, dateFields) {
+    if (!isEmpty(dateFields)) {
+      forEach(parsedData, dataPoint => {
+        forEach(dateFields, ({columnName, dateFormat}) => {
+          dataPoint[columnName] = moment(dataPoint[columnName]).format(dateFormat);
+        });
+      });
+    }
   }
 
   function splitSeriesByGroup(parsedData, fields) {
@@ -363,7 +378,8 @@ export function ChartService(Highcharts) {
     const isAxis = key !== 'g';
     // strings should be represented as categories in the chart
     /* eslint-disable angular/typecheck-string */
-    const isCategoryAxis = isAxis && (dataType === 'string' || dataType === 'String');
+    const isCategoryAxis = isAxis &&
+      (dataType === 'string' || dataType === 'String' || DATE_TYPES.includes(dataType));
     /* eslint-enable angular/typecheck-string */
     return isCategoryAxis;
   }
@@ -642,10 +658,10 @@ export function ChartService(Highcharts) {
     ));
   }
 
-  function filterStringTypes(attributes) {
+  function filterNonNumberTypes(attributes) {
     return filter(attributes, attr => (
       attr.columnName &&
-      (attr.type === 'string' || attr.type === 'String')
+      !NUMBER_TYPES.includes(attr.type)
     ));
   }
 
@@ -661,16 +677,14 @@ export function ChartService(Highcharts) {
       fpSortBy('displayName')
     )(artifacts);
 
-    let xaxis;
-    let yaxis;
-    let zaxis;
     let settingsObj;
-    const groupBy = filterStringTypes(attributes);
+    let zaxis;
+    const yaxis = filterNumberTypes(attributes);
+    const xaxis = attributes;
+    const groupBy = filterNonNumberTypes(attributes);
 
     switch (model.chartType) {
       case 'bubble':
-        xaxis = filterStringTypes(attributes);
-        yaxis = attributes;
         zaxis = filterNumberTypes(attributes);
         settingsObj = {
           xaxis,
@@ -679,18 +693,7 @@ export function ChartService(Highcharts) {
           groupBy
         };
         break;
-      case 'scatter':
-        xaxis = attributes;
-        yaxis = attributes;
-        settingsObj = {
-          xaxis,
-          yaxis,
-          groupBy
-        };
-        break;
       default:
-        xaxis = filterStringTypes(attributes);
-        yaxis = filterNumberTypes(attributes);
         settingsObj = {
           yaxis,
           xaxis,
