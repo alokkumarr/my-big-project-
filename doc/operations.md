@@ -85,6 +85,19 @@ following commands:
         $ sudo systemctl list-units --all saw-*
         $ sudo systemctl list-timers --all saw-*
 
+# Starting, stopping and restarting services
+
+To stop, start or restart SAW services, execute the following
+commands:
+
+        $ sudo systemctl stop <service>
+        $ sudo systemctl start <service>
+        $ sudo systemctl restart <service>
+
+Where `<service>` can be any of the SAW services (for example
+`saw-gateway`), which can be listed using the `sudo systemctl
+list-units saw-*` command shown in the previous section.
+
 # Logs
 
 The SAW system logs can be accessed using the `journalctl` command.
