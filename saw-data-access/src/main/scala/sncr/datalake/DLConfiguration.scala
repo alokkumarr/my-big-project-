@@ -78,14 +78,29 @@ object DLConfiguration {
     sparkConf = new SparkConf()
     sparkConf.setAppName ("SAW-DataAccess")
     sparkConf.set ("spark.master", cfg.getString ("master") )
+    setIfPathExists(sparkConf, "spark.yarn.queue", cfg, "yarn.queue")
     sparkConf.set ("spark.executor.memory", cfg.getString ("executor.memory") )
     sparkConf.set ("spark.cores.max", cfg.getString ("cores.max") )
     sparkConf.set ("driver.memory", cfg.getString ("driver.memory") )
+    setIfPathExists(sparkConf, "spark.driver.port", cfg, "driver.port")
+    setIfPathExists(sparkConf, "spark.driver.host", cfg, "driver.host")
+    setIfPathExists(sparkConf, "spark.driver.bindAddress", cfg, "driver.bindAddress")
+    setIfPathExists(sparkConf, "spark.driver.blockManager.port", cfg, "driver.blockManager.port")
     sparkConf.set ("spark.sql.inMemoryColumnarStorage.compressed", "true")
     sparkConf.set ("spark.sql.inMemoryColumnarStorage.batchSize", String.valueOf (rowLimit) )
     ctx = SparkContext.getOrCreate(sparkConf)
     jarFiles.foreach(f => ctx.addJar( jarLocation + Path.SEPARATOR + f))
     initialized = true
+  }
+
+  private def setIfPathExists(sparkConf: SparkConf, sparkProperty: String, cfg: Config, path: String) {
+    logger.debug("Checking if configuration path exists: {}", path)
+    if (cfg.hasPath(path)) {
+      logger.debug("Configuration path found, so setting Spark property: {}", sparkProperty)
+      sparkConf.set(sparkProperty, cfg.getString(path))
+    } else {
+      logger.debug("Configuration path not found")
+    }
   }
 }
 
