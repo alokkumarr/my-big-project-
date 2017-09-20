@@ -6,3 +6,6 @@ ExecStart=/bin/sh -c "exec java -jar /opt/bda/saw-gateway-service/saw-gateway.ja
 SyslogIdentifier=saw-gateway
 User=mapr
 Restart=on-failure
+
+[Install]
+WantedBy=default.target
