@@ -1,4 +1,4 @@
-import template from './time-range-filter.component.html';
+import * as template from './time-range-filter.component.html';
 
 export const TimeRangeFilterComponent = {
   template,

@@ -1,8 +1,8 @@
-import isString from 'lodash/isString';
-import isFunction from 'lodash/isFunction';
-import isEmpty from 'lodash/isEmpty';
-import forEach from 'lodash/forEach';
-import isUndefined from 'lodash/isUndefined';
+import * as isString from 'lodash/isString';
+import * as isFunction from 'lodash/isFunction';
+import * as isEmpty from 'lodash/isEmpty';
+import * as forEach from 'lodash/forEach';
+import * as isUndefined from 'lodash/isUndefined';
 
 export default class EventEmitter {
   constructor() {

@@ -1,12 +1,12 @@
-import map from 'lodash/map';
-import get from 'lodash/get';
-import forEach from 'lodash/forEach';
-import reduce from 'lodash/reduce';
-import find from 'lodash/find';
-import isEmpty from 'lodash/isEmpty';
-import first from 'lodash/first';
+import * as map from 'lodash/map';
+import * as get from 'lodash/get';
+import * as forEach from 'lodash/forEach';
+import * as reduce from 'lodash/reduce';
+import * as find from 'lodash/find';
+import * as isEmpty from 'lodash/isEmpty';
+import * as first from 'lodash/first';
 
-import template from './analyze-publish-dialog.component.html';
+import * as template from './analyze-publish-dialog.component.html';
 import style from './analyze-publish-dialog.component.scss';
 
 import {PRIVILEGES} from '../../consts';

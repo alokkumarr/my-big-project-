@@ -1,5 +1,5 @@
-import get from 'lodash/get';
-import template from './category-new.component.html';
+import * as get from 'lodash/get';
+import * as template from './category-new.component.html';
 import style from './category-new.component.scss';
 
 export const CategoryNewComponent = {

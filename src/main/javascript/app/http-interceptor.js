@@ -1,4 +1,4 @@
-import get from 'lodash/get';
+import * as get from 'lodash/get';
 
 /* on tap handler for error toast message. Used to expand a more detailed
  view of error */
@@ -18,7 +18,7 @@ function openErrorDetails(dialog, error) {
 
 export function interceptor($httpProvider) {
   'ngInject';
-  /* eslint-disable */
+  /* tslint:disable */
   $httpProvider.interceptors.push(function toastInterceptor($injector) {
     'ngInject';
     return {
@@ -113,5 +113,5 @@ export function interceptor($httpProvider) {
       }
     };
   });
-  /* eslint-enable */
+  /* tslint:enable */
 }

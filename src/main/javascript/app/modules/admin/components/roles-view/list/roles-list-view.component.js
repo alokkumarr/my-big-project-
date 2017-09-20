@@ -1,6 +1,6 @@
-import template from './roles-list-view.component.html';
+import * as template from './roles-list-view.component.html';
 import style from './roles-list-view.component.scss';
-import isUndefined from 'lodash/isUndefined';
+import * as isUndefined from 'lodash/isUndefined';
 
 export const RolesListViewComponent = {
   template,

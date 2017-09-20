@@ -1,15 +1,15 @@
-import forEach from 'lodash/forEach';
-import floor from 'lodash/floor';
-import startCase from 'lodash/startCase';
-import set from 'lodash/set';
-import reduce from 'lodash/reduce';
-import trim from 'lodash/trim';
-import fpSortBy from 'lodash/fp/sortBy';
-import fpGet from 'lodash/fp/get';
-import find from 'lodash/find';
-import filter from 'lodash/filter';
-import flatMap from 'lodash/flatMap';
-import cloneDeep from 'lodash/cloneDeep';
+import * as forEach from 'lodash/forEach';
+import * as floor from 'lodash/floor';
+import * as startCase from 'lodash/startCase';
+import * as set from 'lodash/set';
+import * as reduce from 'lodash/reduce';
+import * as trim from 'lodash/trim';
+import * as fpSortBy from 'lodash/fp/sortBy';
+import * as fpGet from 'lodash/fp/get';
+import * as find from 'lodash/find';
+import * as filter from 'lodash/filter';
+import * as flatMap from 'lodash/flatMap';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 const EXECUTION_MODES = {
   PREVIEW: 'preview',

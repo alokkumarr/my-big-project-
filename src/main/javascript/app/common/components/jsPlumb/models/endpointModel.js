@@ -11,12 +11,12 @@ export class EndpointModel {
 
   getAnchor() {
     switch (this.side) {
-      case 'left':
-        return 'LeftMiddle';
-      case 'right':
-        return 'RightMiddle';
-      default:
-        throw new Error('Can\'t identify anchor!');
+    case 'left':
+      return 'LeftMiddle';
+    case 'right':
+      return 'RightMiddle';
+    default:
+      throw new Error('Can\'t identify anchor!');
     }
   }
 }

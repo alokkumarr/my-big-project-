@@ -1,10 +1,10 @@
-import fpGroupBy from 'lodash/fp/groupBy';
-import fpPipe from 'lodash/fp/pipe';
-import fpMapValues from 'lodash/fp/mapValues';
+import * as fpGroupBy from 'lodash/fp/groupBy';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpMapValues from 'lodash/fp/mapValues';
 
 import {NUMBER_TYPES, DATE_TYPES} from '../../common/consts.js';
 
-export const Events = {
+export var Events = {
   AnalysesRefresh: 'Analyses:Refresh'
 };
 

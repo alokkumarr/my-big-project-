@@ -1,10 +1,10 @@
-import values from 'lodash/values';
-import upperFirst from 'lodash/upperFirst';
+import * as values from 'lodash/values';
+import * as upperFirst from 'lodash/upperFirst';
 import {Subject} from 'rxjs/Subject';
 
 import {VIEWS} from './business-transaction-volume.service';
 import {UPDATE_PATHS} from './chart.component';
-import template from './business-transaction-volume.chart.html';
+import * as template from './business-transaction-volume.chart.html';
 
 const MAX_POINTS_ON_X_AXIS = {
   [VIEWS.DAILY]: 32,

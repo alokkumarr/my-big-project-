@@ -1,5 +1,5 @@
-import get from 'lodash/get';
-import template from './privilege-edit.component.html';
+import * as get from 'lodash/get';
+import * as template from './privilege-edit.component.html';
 import style from './privilege-edit.component.scss';
 
 export const PrivilegeEditComponent = {

@@ -1,4 +1,4 @@
-import template from './user-dialog.component.html';
+import * as template from './user-dialog.component.html';
 import style from './user-dialog.component.scss';
 
 export const UserDialogComponent = {

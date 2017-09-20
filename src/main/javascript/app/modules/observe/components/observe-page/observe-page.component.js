@@ -1,12 +1,12 @@
-import map from 'lodash/fp/map';
-import filter from 'lodash/fp/filter';
-import pipe from 'lodash/fp/pipe';
-import get from 'lodash/fp/get';
-import indexOf from 'lodash/fp/indexOf';
-import lte from 'lodash/lte';
-import omit from 'lodash/fp/omit';
+import * as map from 'lodash/fp/map';
+import * as filter from 'lodash/fp/filter';
+import * as pipe from 'lodash/fp/pipe';
+import * as get from 'lodash/fp/get';
+import * as indexOf from 'lodash/fp/indexOf';
+import * as lte from 'lodash/lte';
+import * as omit from 'lodash/fp/omit';
 
-import template from './observe-page.component.html';
+import * as template from './observe-page.component.html';
 import style from './observe-page.component.scss';
 import {OBSERVE_FILTER_SIDENAV_ID} from '../filter-sidenav/filter-sidenav.component';
 

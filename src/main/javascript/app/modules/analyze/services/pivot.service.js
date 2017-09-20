@@ -1,19 +1,19 @@
-import assign from 'lodash/assign';
-import keys from 'lodash/keys';
-import map from 'lodash/map';
-import find from 'lodash/find';
-import flatMap from 'lodash/flatMap';
-import forEach from 'lodash/forEach';
-import fpMap from 'lodash/fp/map';
-import fpPipe from 'lodash/fp/pipe';
-import fpFilter from 'lodash/fp/filter';
-import split from 'lodash/split';
-import first from 'lodash/first';
-import fpMapKeys from 'lodash/fp/mapKeys';
-import fpOmit from 'lodash/fp/omit';
-import invert from 'lodash/invert';
-import concat from 'lodash/concat';
-import fpMapValues from 'lodash/fp/mapValues';
+import * as assign from 'lodash/assign';
+import * as keys from 'lodash/keys';
+import * as map from 'lodash/map';
+import * as find from 'lodash/find';
+import * as flatMap from 'lodash/flatMap';
+import * as forEach from 'lodash/forEach';
+import * as fpMap from 'lodash/fp/map';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpFilter from 'lodash/fp/filter';
+import * as split from 'lodash/split';
+import * as first from 'lodash/first';
+import * as fpMapKeys from 'lodash/fp/mapKeys';
+import * as fpOmit from 'lodash/fp/omit';
+import * as invert from 'lodash/invert';
+import * as concat from 'lodash/concat';
+import * as fpMapValues from 'lodash/fp/mapValues';
 
 import {NUMBER_TYPES} from '../consts';
 

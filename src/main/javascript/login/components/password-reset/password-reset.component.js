@@ -1,4 +1,4 @@
-import template from './password-reset.component.html';
+import * as template from './password-reset.component.html';
 
 export const PasswordResetComponent = {
   template,

@@ -1,4 +1,4 @@
-import template from './binary-option.component.html';
+import * as template from './binary-option.component.html';
 import style from './binary-option.component.scss';
 
 export const BinaryOptionComponent = {

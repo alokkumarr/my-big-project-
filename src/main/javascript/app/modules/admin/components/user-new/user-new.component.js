@@ -1,5 +1,5 @@
-import get from 'lodash/get';
-import template from './user-new.component.html';
+import * as get from 'lodash/get';
+import * as template from './user-new.component.html';
 
 import style from './user-new.component.scss';
 

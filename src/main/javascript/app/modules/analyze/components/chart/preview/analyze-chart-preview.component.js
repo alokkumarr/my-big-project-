@@ -1,6 +1,6 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
-import template from './analyze-chart-preview.component.html';
+import * as template from './analyze-chart-preview.component.html';
 import style from './analyze-chart-preview.component.scss';
 
 export const AnalyzeChartPreviewComponent = {

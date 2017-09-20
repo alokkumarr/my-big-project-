@@ -1,9 +1,9 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import get from 'lodash/get';
+import * as get from 'lodash/get';
 
 import {Events} from '../../consts';
 
-import template from './analyze-executed-detail.component.html';
+import * as template from './analyze-executed-detail.component.html';
 import style from './analyze-executed-detail.component.scss';
 import AbstractComponentController from 'app/common/components/abstractComponent';
 

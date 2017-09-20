@@ -1,10 +1,10 @@
-import isEmpty from 'lodash/isEmpty';
-import map from 'lodash/map';
-import flatMap from 'lodash/flatMap';
-import filter from 'lodash/filter';
-import keys from 'lodash/keys';
+import * as isEmpty from 'lodash/isEmpty';
+import * as map from 'lodash/map';
+import * as flatMap from 'lodash/flatMap';
+import * as filter from 'lodash/filter';
+import * as keys from 'lodash/keys';
 
-import template from './analyze-report-detail.component.html';
+import * as template from './analyze-report-detail.component.html';
 
 export const AnalyzeReportDetailComponent = {
   template,

@@ -1,4 +1,4 @@
-import template from './sidenav.component.html';
+import * as template from './sidenav.component.html';
 import style from './sidenav.component.scss';
 
 export const SidenavComponent = {

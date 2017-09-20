@@ -1,10 +1,10 @@
-import find from 'lodash/find';
-import forEach from 'lodash/forEach';
-import map from 'lodash/map';
-import clone from 'lodash/clone';
-import unset from 'lodash/unset';
+import * as find from 'lodash/find';
+import * as forEach from 'lodash/forEach';
+import * as map from 'lodash/map';
+import * as clone from 'lodash/clone';
+import * as unset from 'lodash/unset';
 
-import template from './analyze-chart-settings.component.html';
+import * as template from './analyze-chart-settings.component.html';
 import style from './analyze-chart-settings.component.scss';
 import {AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE, AGGREGATE_TYPES_OBJ, NUMBER_TYPES, DATE_TYPES} from '../../../consts';
 

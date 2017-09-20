@@ -1,4 +1,4 @@
-import filter from 'lodash/filter';
+import * as filter from 'lodash/filter';
 
 import {NUMBER_TYPES} from '../consts';
 

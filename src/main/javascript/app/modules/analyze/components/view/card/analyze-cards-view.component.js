@@ -1,6 +1,6 @@
-import isEmpty from 'lodash/isEmpty';
+import * as isEmpty from 'lodash/isEmpty';
 
-import template from './analyze-cards-view.component.html';
+import * as template from './analyze-cards-view.component.html';
 
 export const AnalyzeCardsViewComponent = {
   template,

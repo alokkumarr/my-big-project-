@@ -1,7 +1,7 @@
-import find from 'lodash/find';
-import get from 'lodash/get';
-import flatMap from 'lodash/flatMap';
-import filter from 'lodash/filter';
+import * as find from 'lodash/find';
+import * as get from 'lodash/get';
+import * as flatMap from 'lodash/flatMap';
+import * as filter from 'lodash/filter';
 
 import {TableModel} from './tableModel';
 import {JoinModel} from './joinModel';

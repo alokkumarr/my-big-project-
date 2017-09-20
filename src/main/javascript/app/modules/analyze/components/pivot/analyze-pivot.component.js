@@ -1,28 +1,28 @@
 import 'devextreme/ui/pivot_grid';
-import map from 'lodash/map';
-import clone from 'lodash/clone';
-import fpMap from 'lodash/fp/map';
-import fpPipe from 'lodash/fp/pipe';
-import fpFilter from 'lodash/fp/filter';
-import find from 'lodash/find';
-import isEmpty from 'lodash/isEmpty';
-import assign from 'lodash/assign';
-import defaults from 'lodash/defaults';
-import unset from 'lodash/unset';
-import filter from 'lodash/filter';
-import cloneDeep from 'lodash/cloneDeep';
-import fpSortBy from 'lodash/fp/sortBy';
-import sortBy from 'lodash/sortBy';
-import forEach from 'lodash/forEach';
-import fpGroupBy from 'lodash/fp/groupBy';
-import groupBy from 'lodash/groupBy';
-import values from 'lodash/values';
-import has from 'lodash/has';
-import fpMapValues from 'lodash/fp/mapValues';
+import * as map from 'lodash/map';
+import * as clone from 'lodash/clone';
+import * as fpMap from 'lodash/fp/map';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpFilter from 'lodash/fp/filter';
+import * as find from 'lodash/find';
+import * as isEmpty from 'lodash/isEmpty';
+import * as assign from 'lodash/assign';
+import * as defaults from 'lodash/defaults';
+import * as unset from 'lodash/unset';
+import * as filter from 'lodash/filter';
+import * as cloneDeep from 'lodash/cloneDeep';
+import * as fpSortBy from 'lodash/fp/sortBy';
+import * as sortBy from 'lodash/sortBy';
+import * as forEach from 'lodash/forEach';
+import * as fpGroupBy from 'lodash/fp/groupBy';
+import * as groupBy from 'lodash/groupBy';
+import * as values from 'lodash/values';
+import * as has from 'lodash/has';
+import * as fpMapValues from 'lodash/fp/mapValues';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 
-import template from './analyze-pivot.component.html';
+import * as template from './analyze-pivot.component.html';
 import style from './analyze-pivot.component.scss';
 import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
@@ -60,17 +60,17 @@ export const AnalyzePivotComponent = {
 
     $onInit() {
       switch (this.mode) {
-        case ENTRY_MODES.NEW:
-          this.loadNewAnalysis();
-          break;
-        case ENTRY_MODES.EDIT:
-          this.loadExistingAnalysis();
-          break;
-        case ENTRY_MODES.FORK:
-          this.loadForkedAnalysis();
-          break;
-        default:
-          break;
+      case ENTRY_MODES.NEW:
+        this.loadNewAnalysis();
+        break;
+      case ENTRY_MODES.EDIT:
+        this.loadExistingAnalysis();
+        break;
+      case ENTRY_MODES.FORK:
+        this.loadForkedAnalysis();
+        break;
+      default:
+        break;
       }
     }
 
@@ -334,7 +334,7 @@ export const AnalyzePivotComponent = {
             }
             return backendField;
           })
-        ),
+        )
       )(this.artifacts[0].columns);
 
       return {
