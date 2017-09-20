@@ -130,4 +130,4 @@ class BaseController extends Controller {
   }
 }
 
-case class Ticket(userId: Integer, userFullName: String)
+case class Ticket(userId: Integer, userFullName: String, dataSecurityKey: String)
