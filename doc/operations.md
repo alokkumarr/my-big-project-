@@ -38,7 +38,7 @@ Currently SAW only supports deploying to a single target host.
 Each SAW environment requires its own configuration.  A sample
 configuration has been provided in the `config` file, which defaults
 to installing on `localhost`.  At a minimum, copy this sample file and
-change the `localhost` entries to the target host.
+change the `localhost` entries to the SAW target host.
 
 The sample configuration defaults to installing all available modules:
 SAW Web, SAW Services and SAW Security.  To install only a subset of
@@ -66,7 +66,7 @@ Execute the following steps to install SAW and its modules:
         cd saw
         ./deploy <config>
 
-Note: Configure passwordless SSH access to the target host for a
+Note: Configure passwordless SSH access to the SAW target host for a
 smoother installation experience.  The deploy command should be run as
 a normal user.  The deploy command will use sudo to request privileges
 for relevant operations.
@@ -91,28 +91,31 @@ Under normal circumstances there should be no need to start, stop or
 restart SAW services manually.  However, if needed it can be done
 using the following commands:
 
-        $ sudo systemctl stop <service>
-        $ sudo systemctl start <service>
-        $ sudo systemctl restart <service>
+        $ sudo systemctl stop <saw-service>
+        $ sudo systemctl start <saw-service>
+        $ sudo systemctl restart <saw-service>
 
-Where `<service>` is one of the SAW systemd services (for example
+Where `<saw-service>` is one of the SAW systemd services (for example
 `saw-gateway`), which can be listed using the `sudo systemctl
 list-units saw-*` command shown in the previous section.
 
 # Logs
 
-The SAW systemd services system logs can be accessed using the
-`journalctl` command.  To view the logs of individual services, use
-the `-u` option:
+The SAW systemd services system logs can be accessed using the `sudo
+journalctl` command.  To view the logs of individual services, use the
+`-u` option:
 
         $ sudo journalctl -u saw-*
 
 # Entrypoints
 
 The SAW Web module and supporting services are exposed on port 80 of
-the target host, i.e. `http://<target-host>/`.  The SAW Web
+the SAW target host, i.e. `http://<saw-target-host>/`.  The SAW Web
 application will automatically discover the endpoints for SAW Security
 and SAW Services based on the URL it is being served from.
+
+Nothing else in the SAW deployment, except for port 80 on the SAW
+target host, is accessed by external parties.
 
 # Loading semantic metadata
 
