@@ -5,3 +5,7 @@ Description=SAW Gateway
 ExecStart=/bin/sh -c "exec java -jar /opt/bda/saw-gateway-service/saw-gateway.jar --spring.config.location=/opt/bda/saw-gateway-service/conf/application.yml"
 SyslogIdentifier=saw-gateway
 User=mapr
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
