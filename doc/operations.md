@@ -77,31 +77,33 @@ To upgrade an existing installation, follow the same steps as for
 installing an entirely new environment.  The deploy command will
 detect an already existing installation and upgrade it.
 
-# Status
+# Listing services and checking their status
 
-To check the status of all SAW systemd units and times, execute the
-following commands:
+To list services and check the status of all SAW systemd units and
+timers, execute the following commands:
 
         $ sudo systemctl list-units --all saw-*
         $ sudo systemctl list-timers --all saw-*
 
 # Starting, stopping and restarting services
 
-To stop, start or restart SAW services, execute the following
-commands:
+Under normal circumstances there should be no need to start, stop or
+restart SAW services manually.  However, if needed it can be done
+using the following commands:
 
         $ sudo systemctl stop <service>
         $ sudo systemctl start <service>
         $ sudo systemctl restart <service>
 
-Where `<service>` can be any of the SAW services (for example
+Where `<service>` is one of the SAW systemd services (for example
 `saw-gateway`), which can be listed using the `sudo systemctl
 list-units saw-*` command shown in the previous section.
 
 # Logs
 
-The SAW system logs can be accessed using the `journalctl` command.
-To view the logs of individual services, use the `-u` option:
+The SAW systemd services system logs can be accessed using the
+`journalctl` command.  To view the logs of individual services, use
+the `-u` option:
 
         $ sudo journalctl -u saw-*
 
