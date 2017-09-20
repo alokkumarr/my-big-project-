@@ -91,7 +91,8 @@ class BaseController extends Controller {
             .asInstanceOf[java.util.Map[String, Object]]
           Some(Ticket(
             ticket.get("userId").asInstanceOf[Integer],
-            ticket.get("userFullName").asInstanceOf[String]))
+            ticket.get("userFullName").asInstanceOf[String],
+            ticket.get("dataSecurityKey").asInstanceOf[String]))
         } else {
           log.info("Unrecognized Authorization header: " + value)
           None
