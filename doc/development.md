@@ -91,4 +91,7 @@ To make a release of the project, execute the following steps:
    integration server.  Enter the tag created in the previous step in
    the Revision field.
 
+3. Add the "release" label to the build result (to prevent it from
+   being expired by the continuous integration server)
+
 [project]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW
