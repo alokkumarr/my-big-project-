@@ -68,12 +68,14 @@ containers.
 
 # Continuous integration
 
-After a pull request has been merged, the change will be picked up for
-building and testing in the project's continuous integration [Bamboo
-plan].  The change will also be automatically deployed to the shared
-development environment.
+After a pull request has been merged, the changes will be picked up
+for building and testing in the project's continuous integration
+[Bamboo build plan].  If the build plan succeeds, it will also trigger
+automatic deployment of the changes to the shared development
+environment using the related [Bamboo deployment project].
 
-[Bamboo plan]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW
+[Bamboo build plan]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW
+[Bamboo deployment project]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW/deployments
 
 # Making a release
 
