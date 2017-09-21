@@ -142,10 +142,16 @@ class Analysis extends BaseController {
           case Some(ticket) =>
             (ticket.dataSecurityKey)
         }
-        val dskStr = dataSecurityKey.asInstanceOf[String].toString;
-        m_log.trace("dskStr dataset: {}", dskStr);
-        val parsedDSK = parse(dskStr);
-        m_log.trace("parsedDSK dataset: {}", parsedDSK);
+        val dskString = dataSecurityKey.asInstanceOf[String].toString;
+        val dskStr : String =null
+        var parsedDSK : JValue=null
+        if(!dskString.equals("")) {
+        val dskStr = "{ \"dataSecurityKey\" :" +dataSecurityKey.asInstanceOf[String].toString + "}";
+        m_log.trace("dskStr: {}", dskStr);
+        parsedDSK = parse(dskStr);
+          m_log.trace("parsedDskStr dataset: {}", parsedDSK);
+        }
+
         var queryRuntime: String = null
         (json \ "contents" \ "analyze") match {
           case obj: JArray => {
@@ -167,7 +173,7 @@ class Analysis extends BaseController {
           case _ => {}
         }
         /* Execute analysis and return result data */
-        val data = executeAnalysis(analysisId, queryRuntime, json)
+        val data = executeAnalysis(analysisId, queryRuntime, json, dskStr)
         contentsAnalyze(("data", data)~ ("totalRows",totalRows))
 
       }
@@ -286,7 +292,7 @@ class Analysis extends BaseController {
   var result: String = null
   def setResult(r: String): Unit = result = r
  
-  def executeAnalysis(analysisId: String, queryRuntime: String = null, reqJSON: JValue =null): JValue = {
+  def executeAnalysis(analysisId: String, queryRuntime: String = null, reqJSON: JValue =null, dataSecurityKeyStr : String): JValue = {
  	var json: String = "";
  	var typeInfo : String = "";
  	var analysisJSON : JObject = null;
@@ -324,9 +330,18 @@ class Analysis extends BaseController {
     m_log.trace("type: {}", typeInfo);
     if ( typeInfo.equals("pivot") )
     {
-      val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
+      var data : String= null
+      if (dataSecurityKeyStr!=null || !dataSecurityKeyStr.equals("")) {
+        data = SAWElasticSearchQueryExecutor.executeReturnAsString(
+          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json, dataSecurityKeyStr), json);
+      }
+      else {
+        data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json), json);
-      val finishedTS = System.currentTimeMillis;    
+
+      }
+
+      val finishedTS = System.currentTimeMillis;
       val myArray = parse(data);
       m_log.trace("pivot dataset: {}", myArray)
       
@@ -390,9 +405,16 @@ class Analysis extends BaseController {
       return myArray
     }
     if ( typeInfo.equals("chart") ){
-      val data = SAWElasticSearchQueryExecutor.executeReturnAsString(
+      var data : String = null
+      if (dataSecurityKeyStr!=null || !dataSecurityKeyStr.equals("")) {
+        data = SAWElasticSearchQueryExecutor.executeReturnAsString(
+          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json, dataSecurityKeyStr), json);
+      }
+      else {
+        data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json), json);
-      val finishedTS = System.currentTimeMillis;    
+      }
+      val finishedTS = System.currentTimeMillis;
       val myArray = parse(data);
       var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
       // The below block is for execution result to store

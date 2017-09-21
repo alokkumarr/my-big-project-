@@ -26,6 +26,9 @@ public class RowField {
      */
     @JsonProperty("columnName")
     private String columnName;
+    
+    @JsonProperty("groupInterval")
+    private RowField.GroupInterval groupInterval;
     /**
      * 
      * (Required)
@@ -75,6 +78,16 @@ public class RowField {
     public void setType(RowField.Type type) {
         this.type = type;
     }
+    
+    @JsonProperty("groupInterval")
+    public RowField.GroupInterval getGroupInterval() {
+        return groupInterval;
+    }
+
+    @JsonProperty("groupInterval")
+    public void setGroupInterval(RowField.GroupInterval groupInterval) {
+        this.groupInterval = groupInterval;
+    }
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
@@ -86,6 +99,48 @@ public class RowField {
         this.additionalProperties.put(name, value);
     }
 
+    public enum GroupInterval {
+
+        YEAR("year"),
+        MONTH("month"),
+        DAY("day"),
+        QUARTER("quarter"),
+        HOUR("hour"),
+        WEEK("week");
+        private final String value;
+        private final static Map<String, RowField.GroupInterval> CONSTANTS = new HashMap<String, RowField.GroupInterval>();
+
+        static {
+            for (RowField.GroupInterval c: values()) {
+                CONSTANTS.put(c.value, c);
+            }
+        }
+
+        private GroupInterval(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
+
+        @JsonValue
+        public String value() {
+            return this.value;
+        }
+
+        @JsonCreator
+        public static RowField.GroupInterval fromValue(String value) {
+        	RowField.GroupInterval constant = CONSTANTS.get(value);
+            if (constant == null) {
+                throw new IllegalArgumentException(value);
+            } else {
+                return constant;
+            }
+        }
+
+    }
     public enum Type {
 
         DATE("date"),

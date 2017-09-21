@@ -196,6 +196,18 @@
                 "id":"/properties/sqlBuilder/properties/rowFields/items/properties/columnName",
                 "type":"string"
               },
+              "groupInterval":{
+                "enum":[
+                  "year",
+                  "month",
+                  "day",
+                  "quarter",
+                  "hour",
+                  "week"
+                ],
+                "id":"/properties/sqlBuilder/properties/rowFields/items/properties/groupInterval",
+                "type":"string"
+              },
               "type":{
                 "enum":[
                   "date",

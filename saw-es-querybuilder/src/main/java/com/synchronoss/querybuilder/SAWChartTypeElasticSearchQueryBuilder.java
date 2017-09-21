@@ -15,6 +15,9 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.BuilderUtil;
 import com.synchronoss.querybuilder.model.chart.Filter.Type;
@@ -28,13 +31,23 @@ class SAWChartTypeElasticSearchQueryBuilder {
 
 
   String jsonString;
+  String dataSecurityString;
 
   SearchSourceBuilder searchSourceBuilder;
 
   public SAWChartTypeElasticSearchQueryBuilder(String jsonString) {
     super();
-    //assert (jsonString == null);
     this.jsonString = jsonString;
+  }
+  
+  public SAWChartTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey) {
+	    super();
+	    this.dataSecurityString = dataSecurityKey;
+	    this.jsonString = jsonString;
+  }
+
+  public String getDataSecurityString() {
+	return dataSecurityString;
   }
 
   public String getJsonString() {
@@ -71,12 +84,25 @@ class SAWChartTypeElasticSearchQueryBuilder {
       FieldSortBuilder sortBuilder = SortBuilders.fieldSort(item.getColumnName()).order(sortOrder);
       searchSourceBuilder.sort(sortBuilder);
     }
-
+    DataSecurityKey dataSecurityKeyNode = null;
+    ObjectMapper objectMapper = null;
+    if (getDataSecurityString()!=null && !getDataSecurityString().trim().equals("")){		
+	    objectMapper= new ObjectMapper();
+	    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+	    JsonNode objectNode = objectMapper.readTree(getDataSecurityString());
+	    dataSecurityKeyNode = objectMapper.treeToValue(objectNode, DataSecurityKey.class);
+    }
     // The below block adding filter block
     final BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();;
     if (sqlBuilderNode.getBooleanCriteria() != null) {
       List<com.synchronoss.querybuilder.model.chart.Filter> filters = sqlBuilderNode.getFilters();
       List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
+      if (dataSecurityKeyNode!=null) {
+    	  for (DataSecurityKeyDef dsk : dataSecurityKeyNode.getDataSecuritykey()){
+    	      TermsQueryBuilder dataSecurityBuilder = new TermsQueryBuilder(dsk.getName(), dsk.getValues());
+    	      builder.add(dataSecurityBuilder);
+    	      }
+      }
       for (com.synchronoss.querybuilder.model.chart.Filter item : filters) {
         if (!item.getIsRuntimeFilter().value()) {
           if (item.getType().value().equals(Type.DATE.value())

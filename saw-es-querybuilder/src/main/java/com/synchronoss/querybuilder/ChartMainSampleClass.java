@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
@@ -13,6 +14,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -45,6 +47,7 @@ public class ChartMainSampleClass {
     // JsonNode objectNode = objectMapper.readTree(new File(args[0]));
 
     String json = "{ \"sqlBuilder\" :" + objectNode.get("sqlBuilder").toString() + "}";
+    String dataSecurityKey = "{\"dataSecuritykey\":[{\"name\":\"ORDER_STATE.raw\",\"values\":[\"KA\",\"Alabama\",\"Hawaii\"]},{\"name\":\"TRANSACTION_ID\",\"values\":[\"015cd74a-08dc-494f-8b71-f1cbd546fc31\"]}]}";
     JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
     JsonValidator validator = factory.getValidator();
     final JsonNode data = JsonLoader.fromString(json);
@@ -83,6 +86,17 @@ public class ChartMainSampleClass {
     if (sqlBuilderNode.getBooleanCriteria() != null) {
       List<com.synchronoss.querybuilder.model.chart.Filter> filters = sqlBuilderNode.getFilters();
       List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
+      
+      JsonNode objectNode2 = objectMapper.readTree(dataSecurityKey);
+      DataSecurityKey dataSecurityKeyNode =
+    	        objectMapper.treeToValue(objectNode2,
+    	            DataSecurityKey.class);
+      
+      for (DataSecurityKeyDef dsk : dataSecurityKeyNode.getDataSecuritykey()){
+      TermsQueryBuilder dataSecurityBuilder =
+              new TermsQueryBuilder(dsk.getName(), dsk.getValues());
+      builder.add(dataSecurityBuilder);
+      }
       for (com.synchronoss.querybuilder.model.chart.Filter item : filters) {
         if (!item.getIsRuntimeFilter().value()) {
           if (item.getType().value().equals(Type.DATE.value())

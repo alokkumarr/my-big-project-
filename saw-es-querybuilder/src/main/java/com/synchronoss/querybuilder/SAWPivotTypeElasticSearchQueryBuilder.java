@@ -15,6 +15,9 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.BuilderUtil;
 import com.synchronoss.querybuilder.model.chart.Filter.Type;
@@ -28,14 +31,25 @@ import com.synchronoss.querybuilder.model.pivot.SqlBuilder.BooleanCriteria;
 class SAWPivotTypeElasticSearchQueryBuilder {
 
   String jsonString;
+  String dataSecurityString;
   SearchSourceBuilder searchSourceBuilder;
 
   public SAWPivotTypeElasticSearchQueryBuilder(String jsonString) {
     super();
     this.jsonString = jsonString;
   }
+  
+  public SAWPivotTypeElasticSearchQueryBuilder(String jsonString, String dataSecurityKey) {
+	    super();
+	    this.dataSecurityString = dataSecurityKey;
+	    this.jsonString = jsonString;
+}
 
-  public String getJsonString() {
+  public String getDataSecurityString() {
+	return dataSecurityString;
+}
+
+public String getJsonString() {
     return jsonString;
   }
 
@@ -66,6 +80,14 @@ class SAWPivotTypeElasticSearchQueryBuilder {
       FieldSortBuilder sortBuilder = SortBuilders.fieldSort(item.getColumnName()).order(sortOrder);
       searchSourceBuilder.sort(sortBuilder);
     }
+    DataSecurityKey dataSecurityKeyNode = null;
+    ObjectMapper objectMapper = null;
+    if (getDataSecurityString()!=null && !getDataSecurityString().trim().equals("")){		
+	    objectMapper= new ObjectMapper();
+	    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+	    JsonNode objectNode = objectMapper.readTree(getDataSecurityString());
+	    dataSecurityKeyNode = objectMapper.treeToValue(objectNode, DataSecurityKey.class);
+    }
 
     // The below block adding filter block
     // The below block adding filter block
@@ -73,6 +95,14 @@ class SAWPivotTypeElasticSearchQueryBuilder {
     if (sqlBuilderNode.getBooleanCriteria() !=null ){
     List<com.synchronoss.querybuilder.model.pivot.Filter> filters = sqlBuilderNode.getFilters();
     List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
+
+    if (dataSecurityKeyNode!=null) {
+  	  for (DataSecurityKeyDef dsk : dataSecurityKeyNode.getDataSecuritykey()){
+  	      TermsQueryBuilder dataSecurityBuilder = new TermsQueryBuilder(dsk.getName(), dsk.getValues());
+  	      builder.add(dataSecurityBuilder);
+  	      }
+    }
+
     for (com.synchronoss.querybuilder.model.pivot.Filter item : filters) 
     {
       if (!item.getIsRuntimeFilter().value()){

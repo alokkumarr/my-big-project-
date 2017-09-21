@@ -134,6 +134,26 @@ public class ChartQueryBuilderTest {
     Assert.assertTrue(response.status().equals(RestStatus.OK));
   }
   
+  @Test
+  public void queryWithDataFieldsFiltersAndSortsWithDataSecurityKey()
+  {
+    ClassLoader classLoader = getClass().getClassLoader();
+    URL inputFile = classLoader.getResource("queries/chart_type_data_3_datafields_filters_sorts.json");
+    String dataSecurityKey = "{\"dataSecuritykey\":[{\"name\":\"ORDER_STATE.raw\",\"values\":[\"KA\",\"Alabama\",\"Hawaii\"]},{\"name\":\"TRANSACTION_ID\",\"values\":[\"015cd74a-08dc-494f-8b71-f1cbd546fc31\"]}]}";
+    InputStream inputStream;
+    String jsonString = null;
+    try {
+      inputStream = new FileInputStream(inputFile.getFile());
+      jsonString = IOUtils.toString(inputStream, StandardCharsets.UTF_8.name());
+    } catch (IOException e) {
+      assertThat(e.getMessage(), is("IOException"));    
+    }
+    SAWElasticSearchQueryBuilder sawElasticSearchQueryBuilder = new SAWElasticSearchQueryBuilder();
+    SearchResponse response = client.prepareSearch(INDEX_NAME).setTypes(TYPE_NAME)
+    .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.CHART, jsonString,dataSecurityKey).query()).execute().actionGet();
+    Assert.assertTrue(response.status().equals(RestStatus.OK));
+  }
+  
 
   }
   
