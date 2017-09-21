@@ -1,19 +1,19 @@
-import defaultsDeep from 'lodash/defaultsDeep';
-import fpFilter from 'lodash/fp/filter';
-import fpFlatMap from 'lodash/fp/flatMap';
-import fpPipe from 'lodash/fp/pipe';
-import fpGet from 'lodash/fp/get';
-import first from 'lodash/first';
-import map from 'lodash/map';
-import keys from 'lodash/keys';
-import forEach from 'lodash/forEach';
-import clone from 'lodash/clone';
-import sortBy from 'lodash/sortBy';
-import filter from 'lodash/filter';
-import assign from 'lodash/assign';
-import uniqBy from 'lodash/uniqBy';
+import * as defaultsDeep from 'lodash/defaultsDeep';
+import * as fpFilter from 'lodash/fp/filter';
+import * as fpFlatMap from 'lodash/fp/flatMap';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpGet from 'lodash/fp/get';
+import * as first from 'lodash/first';
+import * as map from 'lodash/map';
+import * as keys from 'lodash/keys';
+import * as forEach from 'lodash/forEach';
+import * as clone from 'lodash/clone';
+import * as sortBy from 'lodash/sortBy';
+import * as filter from 'lodash/filter';
+import * as assign from 'lodash/assign';
+import * as uniqBy from 'lodash/uniqBy';
 
-import template from './analyze-report.component.html';
+import * as template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
 import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
@@ -178,7 +178,9 @@ export const AnalyzeReportComponent = {
         }),
 
         this.canvas._$eventEmitter.on('sortChanged', () => {
-          this.reloadPreviewGrid(true);
+          this.didAnalysisChange = true;
+          this.startDraftMode();
+          this.onRefreshData();
         }),
 
         this.canvas._$eventEmitter.on('groupingChanged', groups => {

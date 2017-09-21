@@ -1,4 +1,4 @@
-import templateUrl from './range-slider.component.html';
+import * as templateUrl from './range-slider.component.html';
 
 /**
  * @example usage in an html example:

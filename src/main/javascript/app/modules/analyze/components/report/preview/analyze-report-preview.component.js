@@ -1,6 +1,6 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
-import template from './analyze-report-preview.component.html';
+import * as template from './analyze-report-preview.component.html';
 import style from './analyze-report-preview.component.scss';
 
 export const AnalyzeReportPreviewComponent = {

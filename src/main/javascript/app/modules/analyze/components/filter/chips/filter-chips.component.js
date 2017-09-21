@@ -1,4 +1,4 @@
-import template from './filter-chips.component.html';
+import * as template from './filter-chips.component.html';
 import style from './filter-chips.component.scss';
 
 export const FilterChipsComponent = {

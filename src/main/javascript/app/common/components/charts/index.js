@@ -1,10 +1,10 @@
-import angular from 'angular';
-import Highstock from 'highcharts/highstock';
-import Highcharts from 'highcharts/highcharts';
-import more from 'highcharts/highcharts-more';
+import * as angular from 'angular';
+import * as Highstock from 'highcharts/highstock';
+import * as Highcharts from 'highcharts/highcharts';
+import * as more from 'highcharts/highcharts-more';
 
-import exporting from 'highcharts/modules/exporting';
-import offlineExporting from 'highcharts/modules/offline-exporting';
+import * as exporting from 'highcharts/modules/exporting';
+import * as offlineExporting from 'highcharts/modules/offline-exporting';
 
 import {chartComponent} from './chart.component';
 import {businessTransactionVolumeService} from './business-transaction-volume.service';

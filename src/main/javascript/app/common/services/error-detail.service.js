@@ -1,5 +1,5 @@
-import get from 'lodash/get';
-import truncate from 'lodash/truncate';
+import * as get from 'lodash/get';
+import * as truncate from 'lodash/truncate';
 
 const ERROR_TITLE_LENGTH = 50;
 

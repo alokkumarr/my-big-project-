@@ -1,7 +1,7 @@
-import cloneDeep from 'lodash/cloneDeep';
-import isEmpty from 'lodash/isEmpty';
+import * as cloneDeep from 'lodash/cloneDeep';
+import * as isEmpty from 'lodash/isEmpty';
 
-import template from './filter-group.component.html';
+import * as template from './filter-group.component.html';
 
 export const FilterGroupComponent = {
   template,

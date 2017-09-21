@@ -1,4 +1,4 @@
-import find from 'lodash/find';
+import * as find from 'lodash/find';
 
 import {EndpointModel} from './endpointModel';
 

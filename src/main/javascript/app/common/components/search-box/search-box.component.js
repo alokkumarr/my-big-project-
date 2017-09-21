@@ -1,4 +1,4 @@
-import template from './search-box.component.html';
+import * as template from './search-box.component.html';
 import style from './search-box.component.scss';
 
 export const SearchBoxComponent = {

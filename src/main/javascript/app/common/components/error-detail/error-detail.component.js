@@ -1,4 +1,4 @@
-import template from './error-detail.component.html';
+import * as template from './error-detail.component.html';
 import style from './error-detail.component.scss';
 
 export const ErrorDetailComponent = {

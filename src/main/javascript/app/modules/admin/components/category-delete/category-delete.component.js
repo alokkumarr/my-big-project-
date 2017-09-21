@@ -1,5 +1,5 @@
-import get from 'lodash/get';
-import template from './category-delete.component.html';
+import * as get from 'lodash/get';
+import * as template from './category-delete.component.html';
 import style from './category-delete.component.scss';
 
 export const CategoryDeleteComponent = {

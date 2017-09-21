@@ -1,5 +1,5 @@
-import find from 'lodash/find';
-import isEmpty from 'lodash/isEmpty';
+import * as find from 'lodash/find';
+import * as isEmpty from 'lodash/isEmpty';
 
 export const JSPlumbConnector = {
   bindings: {

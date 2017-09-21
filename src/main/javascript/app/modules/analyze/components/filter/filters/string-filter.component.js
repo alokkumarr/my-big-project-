@@ -1,5 +1,5 @@
-import isEmpty from 'lodash/isEmpty';
-import template from './string-filter.component.html';
+import * as isEmpty from 'lodash/isEmpty';
+import * as template from './string-filter.component.html';
 
 export const StringFilterComponent = {
   template,

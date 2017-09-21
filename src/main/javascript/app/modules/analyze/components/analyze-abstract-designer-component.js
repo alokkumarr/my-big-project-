@@ -1,5 +1,5 @@
-import defaultsDeep from 'lodash/defaultsDeep';
-import cloneDeep from 'lodash/cloneDeep';
+import * as defaultsDeep from 'lodash/defaultsDeep';
+import * as cloneDeep from 'lodash/cloneDeep';
 
 export default class AbstractDesignerComponentController {
   constructor($injector) {

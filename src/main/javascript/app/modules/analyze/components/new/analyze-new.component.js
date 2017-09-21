@@ -1,8 +1,8 @@
-import set from 'lodash/set';
-import forEach from 'lodash/forEach';
-import find from 'lodash/find';
+import * as set from 'lodash/set';
+import * as forEach from 'lodash/forEach';
+import * as find from 'lodash/find';
 
-import template from './analyze-new.component.html';
+import * as template from './analyze-new.component.html';
 import style from './analyze-new.component.scss';
 import emptyTemplate from './analyze-new-empty.html';
 import methods from './methods';
@@ -58,53 +58,53 @@ export const AnalyzeNewComponent = {
       const mode = ENTRY_MODES.NEW;
 
       switch (this.selectedAnalysisMethod) {
-        case 'table:report':
-          tpl = `<analyze-report model="model" mode="${mode}"></analyze-report>`;
-          model = {
-            type: AnalyseTypes.Report,
-            name: 'Untitled Analysis',
-            description: '',
-            categoryId: this.subCategory,
-            semanticId,
-            metricName,
-            scheduled: null
-          };
-          break;
-        case 'table:pivot':
-          tpl = `<analyze-pivot model="model" mode="${mode}"></analyze-pivot>`;
-          model = {
-            type: AnalyseTypes.Pivot,
-            name: 'Untitled Analysis',
-            description: '',
-            categoryId: this.subCategory,
-            semanticId,
-            scheduled: null
-          };
-          break;
-        case 'chart:column':
-        case 'chart:bar':
-        case 'chart:line':
-        case 'chart:stack':
-        case 'chart:pie':
-        case 'chart:donut':
-        case 'chart:scatter':
-        case 'chart:bubble':
-          type = this.selectedAnalysisMethod.split(':')[1];
-          tpl = `<analyze-chart model="model" mode="${mode}"></analyze-chart>`;
-          model = {
-            type: AnalyseTypes.Chart,
-            chartType: type,
-            name: 'Untitled Chart',
-            metricName,
-            semanticId,
-            description: '',
-            categoryId: this.subCategory,
-            scheduled: null
-          };
-          break;
-        default:
-          tpl = emptyTemplate;
-          break;
+      case 'table:report':
+        tpl = `<analyze-report model="model" mode="${mode}"></analyze-report>`;
+        model = {
+          type: AnalyseTypes.Report,
+          name: 'Untitled Analysis',
+          description: '',
+          categoryId: this.subCategory,
+          semanticId,
+          metricName,
+          scheduled: null
+        };
+        break;
+      case 'table:pivot':
+        tpl = `<analyze-pivot model="model" mode="${mode}"></analyze-pivot>`;
+        model = {
+          type: AnalyseTypes.Pivot,
+          name: 'Untitled Analysis',
+          description: '',
+          categoryId: this.subCategory,
+          semanticId,
+          scheduled: null
+        };
+        break;
+      case 'chart:column':
+      case 'chart:bar':
+      case 'chart:line':
+      case 'chart:stack':
+      case 'chart:pie':
+      case 'chart:donut':
+      case 'chart:scatter':
+      case 'chart:bubble':
+        type = this.selectedAnalysisMethod.split(':')[1];
+        tpl = `<analyze-chart model="model" mode="${mode}"></analyze-chart>`;
+        model = {
+          type: AnalyseTypes.Chart,
+          chartType: type,
+          name: 'Untitled Chart',
+          metricName,
+          semanticId,
+          description: '',
+          categoryId: this.subCategory,
+          scheduled: null
+        };
+        break;
+      default:
+        tpl = emptyTemplate;
+        break;
       }
 
       this._$mdDialog.show({

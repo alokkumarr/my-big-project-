@@ -1,4 +1,4 @@
-import template from './date-filter.component.html';
+import * as template from './date-filter.component.html';
 
 export const DateFilterComponent = {
   template,

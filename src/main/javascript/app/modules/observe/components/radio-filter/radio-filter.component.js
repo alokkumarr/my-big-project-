@@ -1,4 +1,4 @@
-import template from './radio-filter.component.html';
+import * as template from './radio-filter.component.html';
 
 export const RadioFilterComponent = {
   template,
