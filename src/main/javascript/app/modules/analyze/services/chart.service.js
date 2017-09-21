@@ -613,12 +613,9 @@ export function ChartService(Highcharts) {
     const yIsNumber = some(fields.y, y => NUMBER_TYPES.includes(y.type));
 
     const yField = fields.y[0];
-    const yAxisName = `${yIsSingle || fields.g ?
-      `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}` :
-      '{series.name}'}`;
     const yAxisString = `<tr>
-      <th>${yAxisName}:</th>
-      <td>{point.y${yIsNumber ? ':.2f' : ''}}</td>
+      <th>{series.name}:</th>
+      <td>{point.y:.2f}</td>
     </tr>`;
     const zAxisString = fields.z ?
     `<tr><th>${fields.z.displayName}:</th><td>{point.z:.2f}</td></tr>` :
