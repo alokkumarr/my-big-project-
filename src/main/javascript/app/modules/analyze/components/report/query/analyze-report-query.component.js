@@ -1,4 +1,4 @@
-import template from './analyze-report-query.component.html';
+import * as template from './analyze-report-query.component.html';
 import style from './analyze-report-query.component.scss';
 
 const WARN_DIALOG = {

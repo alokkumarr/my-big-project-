@@ -1,13 +1,13 @@
-import pipe from 'lodash/fp/pipe';
-import get from 'lodash/fp/get';
-import map from 'lodash/fp/map';
-import curry from 'lodash/fp/curry';
-import zipObject from 'lodash/fp/zipObject';
-import split from 'lodash/split';
-import parseInt from 'lodash/parseInt';
-import zip from 'lodash/zip';
-import spread from 'lodash/spread';
-import truncate from 'lodash/truncate';
+import * as pipe from 'lodash/fp/pipe';
+import * as get from 'lodash/fp/get';
+import * as map from 'lodash/fp/map';
+import * as curry from 'lodash/fp/curry';
+import * as zipObject from 'lodash/fp/zipObject';
+import * as split from 'lodash/split';
+import * as parseInt from 'lodash/parseInt';
+import * as zip from 'lodash/zip';
+import * as spread from 'lodash/spread';
+import * as truncate from 'lodash/truncate';
 
 export const VIEWS = {
   DAILY: 'days',

@@ -1,7 +1,7 @@
-import first from 'lodash/first';
-import find from 'lodash/find';
+import * as first from 'lodash/first';
+import * as find from 'lodash/find';
 
-import template from './analyze-save-dialog.component.html';
+import * as template from './analyze-save-dialog.component.html';
 import style from './analyze-save-dialog.component.scss';
 
 import {Events, PRIVILEGES} from '../../consts';

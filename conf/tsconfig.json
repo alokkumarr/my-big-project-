@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "target": "es5",
+    "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
+    "noStrictGenericChecks": true,
+    "experimentalDecorators": true,
+    "lib" : ["es2015", "es2015.iterable", "dom"],
+    "allowJs": true
+  },
+  "exclude": [
+    "node_modules/**/*",
+    "**/*.spec.ts"
+  ]
+}

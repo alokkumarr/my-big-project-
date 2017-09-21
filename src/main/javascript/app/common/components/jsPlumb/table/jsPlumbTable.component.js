@@ -1,6 +1,6 @@
-import isEmpty from 'lodash/isEmpty';
+import * as isEmpty from 'lodash/isEmpty';
 
-import template from './jsPlumbTable.component.html';
+import * as template from './jsPlumbTable.component.html';
 import style from './jsPlumbTable.component.scss';
 
 export const JSPlumbTable = {

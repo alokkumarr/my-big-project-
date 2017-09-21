@@ -1,11 +1,11 @@
-import get from 'lodash/get';
-import values from 'lodash/values';
-import orderBy from 'lodash/orderBy';
-import map from 'lodash/map';
-import isEmpty from 'lodash/isEmpty';
+import * as get from 'lodash/get';
+import * as values from 'lodash/values';
+import * as orderBy from 'lodash/orderBy';
+import * as map from 'lodash/map';
+import * as isEmpty from 'lodash/isEmpty';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
-import template from './analyze-chart-detail.component.html';
+import * as template from './analyze-chart-detail.component.html';
 
 export const AnalyzeChartDetailComponent = {
   template,

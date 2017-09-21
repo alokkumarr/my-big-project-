@@ -1,8 +1,8 @@
-import map from 'lodash/map';
-import find from 'lodash/find';
-import fpPipe from 'lodash/fp/pipe';
-import fpFilter from 'lodash/fp/filter';
-import fpMap from 'lodash/fp/map';
+import * as map from 'lodash/map';
+import * as find from 'lodash/find';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpFilter from 'lodash/fp/filter';
+import * as fpMap from 'lodash/fp/map';
 
 export function SortService() {
 

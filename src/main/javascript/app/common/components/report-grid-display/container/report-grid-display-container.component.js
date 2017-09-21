@@ -1,16 +1,16 @@
-import groupBy from 'lodash/groupBy';
-import map from 'lodash/map';
-import omit from 'lodash/fp/omit';
-import forEach from 'lodash/forEach';
-import find from 'lodash/find';
-import flatMap from 'lodash/flatMap';
-import keys from 'lodash/keys';
-import isArray from 'lodash/isArray';
-import reduce from 'lodash/reduce';
-import join from 'lodash/join';
+import * as groupBy from 'lodash/groupBy';
+import * as map from 'lodash/map';
+import * as omit from 'lodash/fp/omit';
+import * as forEach from 'lodash/forEach';
+import * as find from 'lodash/find';
+import * as flatMap from 'lodash/flatMap';
+import * as keys from 'lodash/keys';
+import * as isArray from 'lodash/isArray';
+import * as reduce from 'lodash/reduce';
+import * as join from 'lodash/join';
 import json2csv from 'json2csv';
 
-import template from './report-grid-display-container.component.html';
+import * as template from './report-grid-display-container.component.html';
 import style from './report-grid-display-container.component.scss';
 
 export const LAYOUT_MODE = {

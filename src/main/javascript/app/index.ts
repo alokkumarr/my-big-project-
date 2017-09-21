@@ -1,10 +1,17 @@
-import angular from 'angular';
+import * as angular from 'angular';
 
 import 'angular-material/angular-material.css';
 import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.light.css';
 
 import 'fonts/icomoon.css';
+
+import 'zone.js';
+import 'reflect-metadata';
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { UpgradeModule } from '@angular/upgrade/static';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import {routesConfig} from './routes';
 import {themeConfig} from './theme';
@@ -38,3 +45,22 @@ angular
   .component('layoutHeader', LayoutHeaderComponent)
   .component('layoutContent', LayoutContentComponent)
   .component('layoutFooter', LayoutFooterComponent);
+
+// angular.bootstrap(document, [AppModule]);
+
+@NgModule({
+  imports: [
+    BrowserModule,
+    UpgradeModule
+  ]
+})
+export class NewAppModule {
+  constructor() { }
+  ngDoBootstrap() {
+  }
+}
+
+platformBrowserDynamic().bootstrapModule(NewAppModule).then(platformRef => {
+  const upgrade = platformRef.injector.get(UpgradeModule) as UpgradeModule;
+  upgrade.bootstrap(document.documentElement, [AppModule]);
+});

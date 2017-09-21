@@ -1,9 +1,9 @@
-import camelCase from 'lodash/camelCase';
-import kebabCase from 'lodash/kebabCase';
-import lowerCase from 'lodash/lowerCase';
-import snakeCase from 'lodash/snakeCase';
-import startCase from 'lodash/startCase';
-import upperCase from 'lodash/upperCase';
+import * as camelCase from 'lodash/camelCase';
+import * as kebabCase from 'lodash/kebabCase';
+import * as lowerCase from 'lodash/lowerCase';
+import * as snakeCase from 'lodash/snakeCase';
+import * as startCase from 'lodash/startCase';
+import * as upperCase from 'lodash/upperCase';
 
 export function changeCaseFilter() {
   return (input, caseType) => {

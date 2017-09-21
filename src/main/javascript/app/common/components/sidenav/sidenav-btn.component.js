@@ -1,4 +1,4 @@
-import template from './sidenav-btn.component.html';
+import * as template from './sidenav-btn.component.html';
 
 export const SidenavBtnComponent = {
   template,

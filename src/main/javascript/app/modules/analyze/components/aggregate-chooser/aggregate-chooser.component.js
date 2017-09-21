@@ -1,4 +1,4 @@
-import template from './aggregate-chooser.component.html';
+import * as template from './aggregate-chooser.component.html';
 import {AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE, AGGREGATE_TYPES_OBJ} from '../../consts';
 
 export const AggregateChooserComponent = {

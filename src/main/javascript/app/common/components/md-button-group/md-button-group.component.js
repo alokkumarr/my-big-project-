@@ -94,21 +94,21 @@ export const mdButtonGroupComponent = {
       const keyCode = ev.which || ev.keyCode;
 
       switch (keyCode) {
-        case mdConst.KEY_CODE.LEFT_ARROW:
-        case mdConst.KEY_CODE.UP_ARROW:
-          ev.preventDefault();
-          this.originalCtrl.selectPrevious();
-          this.setFocus(this.$element);
-          break;
+      case mdConst.KEY_CODE.LEFT_ARROW:
+      case mdConst.KEY_CODE.UP_ARROW:
+        ev.preventDefault();
+        this.originalCtrl.selectPrevious();
+        this.setFocus(this.$element);
+        break;
 
-        case mdConst.KEY_CODE.RIGHT_ARROW:
-        case mdConst.KEY_CODE.DOWN_ARROW:
-          ev.preventDefault();
-          this.originalCtrl.selectNext();
-          this.setFocus(this.$element);
-          break;
-        default:
-          break;
+      case mdConst.KEY_CODE.RIGHT_ARROW:
+      case mdConst.KEY_CODE.DOWN_ARROW:
+        ev.preventDefault();
+        this.originalCtrl.selectNext();
+        this.setFocus(this.$element);
+        break;
+      default:
+        break;
       }
     }
 

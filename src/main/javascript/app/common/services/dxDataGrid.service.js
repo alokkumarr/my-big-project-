@@ -1,4 +1,4 @@
-import defaults from 'lodash/defaults';
+import * as defaults from 'lodash/defaults';
 
 export function dxDataGridService() {
 

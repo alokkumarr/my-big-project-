@@ -1,4 +1,4 @@
-import template from './jsPlumbJoinLabel.component.html';
+import * as template from './jsPlumbJoinLabel.component.html';
 import style from './jsPlumbJoinLabel.component.scss';
 
 export const JSPlumbJoinLabel = {

@@ -1,12 +1,12 @@
-import assign from 'lodash/assign';
-import map from 'lodash/map';
-import find from 'lodash/find';
-import forEach from 'lodash/forEach';
-import remove from 'lodash/remove';
-import isUndefined from 'lodash/isUndefined';
-import $ from 'jquery';
+import * as assign from 'lodash/assign';
+import * as map from 'lodash/map';
+import * as find from 'lodash/find';
+import * as forEach from 'lodash/forEach';
+import * as remove from 'lodash/remove';
+import * as isUndefined from 'lodash/isUndefined';
+import * as $ from 'jquery';
 
-import template from './report-grid.component.html';
+import * as template from './report-grid.component.html';
 import style from './report-grid.component.scss';
 import {NUMBER_TYPES} from '../../../../consts';
 
