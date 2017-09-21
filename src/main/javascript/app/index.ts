@@ -60,7 +60,16 @@ export class NewAppModule {
   }
 }
 
-platformBrowserDynamic().bootstrapModule(NewAppModule).then(platformRef => {
+export const platformRefPromise = platformBrowserDynamic().bootstrapModule(NewAppModule);
+
+platformRefPromise.then(platformRef => {
   const upgrade = platformRef.injector.get(UpgradeModule) as UpgradeModule;
   upgrade.bootstrap(document.documentElement, [AppModule]);
+
+  /* Workaround to fix performance - Turns off propagation of changes from
+     angular to angularjs. Remove this once upgradation of components start.
+     */
+  setTimeout(() => {
+    upgrade.ngZone.onMicrotaskEmpty.observers.splice(1, 1);
+  }, 100);
 });
