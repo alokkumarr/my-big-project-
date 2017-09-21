@@ -25,6 +25,7 @@ import * as compact from 'lodash/compact';
 import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as mapValues from 'lodash/mapValues';
 import * as moment from 'moment';
+import * as toString from 'lodash/toString'
 
 import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ} from '../consts';
 
@@ -460,9 +461,8 @@ export function ChartService(Highcharts) {
 
     case 'pie':
       if (!fields.g) {
-        set(series, '0.dataLabels.format', '{point.name}: {point.percentage:.2f}%');
         mapperFn = ({x, y}) => {
-          const category = get(categories, `x.${x}`);
+          const category = get(categories, `x.${x}`, toString(x || 0));
           return {name: category, y, drilldown: category};
         };
         forEach(series, serie => {
