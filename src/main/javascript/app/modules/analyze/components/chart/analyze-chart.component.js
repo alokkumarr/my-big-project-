@@ -298,6 +298,19 @@ export const AnalyzeChartComponent = {
         }
       });
 
+      if (isEmpty(this.sorts)) {
+        forEach(nodeFields, node => {
+          this.sorts.push({
+            field: {    
+              type: node.type,
+              label: node.displayName,
+              dataField: node.columnName
+            }
+            order :'asc'
+          })
+        });  
+      }
+
       set(payload, 'sqlBuilder.dataFields', dataFields);
       set(payload, 'sqlBuilder.nodeFields', nodeFields);
 
