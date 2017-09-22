@@ -305,7 +305,7 @@ export const AnalyzeChartComponent = {
               type: node.type,
               label: node.displayName,
               dataField: node.columnName
-            }
+            },
             order :'asc'
           })
         });  
