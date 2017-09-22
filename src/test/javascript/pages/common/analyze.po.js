@@ -238,6 +238,10 @@ module.exports = {
     expect(this.analysisElems.cardView.getAttribute('aria-checked')).toEqual('true');
   },
 
+  validateListView() {
+    expect(this.analysisElems.listView.getAttribute('aria-checked')).toEqual('true');
+  },
+
   validateNewAnalyze() {
     expect(this.analysisElems.newAnalyzeDialog.isDisplayed()).toBeTruthy();
   },

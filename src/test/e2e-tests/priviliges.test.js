@@ -4,11 +4,13 @@ const analyze = require('../javascript/pages/common/analyze.po.js');
 const executedAnalysis = require('../javascript/pages/common/executedAlaysis.po');
 const protractor = require('protractor');
 const ec = protractor.ExpectedConditions;
+const CommonFunctions = require('../javascript/helpers/commonFunctions');
 
 function isOptionPresent(options, optionName) {
   const option = analyze.main.getAnalysisOption(options, optionName);
   return option.isPresent();
 }
+
 describe('Privileges', () => {
   describe('for Admin', () => {
     it('should land on login page', () => {
@@ -27,6 +29,8 @@ describe('Privileges', () => {
 
     let analysisOptions;
     it('actions menu exists', () => {
+      CommonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
+      analyze.analysisElems.cardView.click();
       analyze.main.getAnalysisActionOptions(analyze.main.firstCard).then(options => {
         analysisOptions = options;
         expect(options.isPresent()).toBe(true);
@@ -102,6 +106,8 @@ describe('Privileges', () => {
 
     let analysisOptions;
     it('actions menu exists', () => {
+      CommonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
+      analyze.analysisElems.cardView.click();
       analyze.main.getAnalysisActionOptions(analyze.main.firstCard).then(options => {
         analysisOptions = options;
         expect(options.isPresent()).toBe(true);
@@ -177,6 +183,8 @@ describe('Privileges', () => {
 
     let analysisOptions;
     it('actions menu exists', () => {
+      CommonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
+      analyze.analysisElems.cardView.click();
       analyze.main.getAnalysisActionOptions(analyze.main.firstCard).then(options => {
         analysisOptions = options;
         expect(options.isPresent()).toBe(true);

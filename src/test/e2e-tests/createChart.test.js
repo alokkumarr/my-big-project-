@@ -22,16 +22,17 @@ describe('create columnChart type analysis', () => {
     login.loginAs('admin');
   });
 
-  it('should open the sidenav menu and go to first category', () => {
+  //Obsolete. Now menu opens automatically with first category expanded
+  /* it('should open the sidenav menu and go to first category', () => {
     sidenav.menuBtn.click();
     sidenav.publicCategoriesToggle.click();
     categoryName = sidenav.firstPublicCategory.getText();
     sidenav.firstPublicCategory.click();
     expect(analyze.main.categoryTitle.getText()).toEqual(categoryName);
-  });
+  }); */
 
-  it('should display card view by default', () => {
-    analyze.validateCardView();
+  it('should display list view by default', () => {
+    analyze.validateListView();
   });
 
   it('should open the new Analysis dialog', () => {
