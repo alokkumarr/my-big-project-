@@ -1,8 +1,9 @@
-# How can I run a command inside a recently started Docker container?
+# How can I run a command inside the SAW Docker container?
 
-Execute the following command to get a shell inside the container:
+Execute the following command to get a shell inside the SAW Docker
+container:
 
-        docker exec -it $(docker ps -ql) bash
+        docker exec -it saw bash
 
 # What should I do if building SAW Transport Service fails with a permission denied error?
 

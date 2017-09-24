@@ -12,7 +12,7 @@ RUN systemctl mask systemd-remount-fs.service
 RUN systemctl mask getty@tty1.service
 
 # Enable installing documentation for packages
-RUN sed -i '/tsflags=nodocs/d' /etc/yum.conf
+RUN sed -i -e '/tsflags=nodocs/d' /etc/yum.conf
 
 # Install system utilities
 RUN yum -y -q --nogpgcheck install less man iproute lsof nc bind-utils file

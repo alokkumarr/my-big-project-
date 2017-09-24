@@ -52,7 +52,7 @@ development mode, execute the following command:
 
 To enter a shell inside the container, execute the following command:
 
-        $ docker exec -it $(docker ps -ql) bash
+        $ docker exec -it saw bash
 
 While inside the container, the following commands can be used as
 starting points to investigate installed SAW services and packages:

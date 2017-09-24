@@ -42,6 +42,9 @@
         <artifactId>docker-maven-plugin</artifactId>
         <version>0.21.0</version>
         <configuration>
+          <!-- Start containers in parallel to reduce startup time -->
+          <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
+          <startParallel>true</startParallel>
           <images>
             <image>
               <name>saw:${project.version}</name>
@@ -65,28 +68,46 @@
                 </assembly>
               </build>
               <run>
-                <!-- Allow using short names like "mapr01" for MapR
-                     cluster hosts inside container -->
-                <dnsSearch>
-                  <host>bda.poc.velocity-va.sncrcorp.net</host>
-                </dnsSearch>
+                <!-- Use the alias as the name of the container -->
+                <namingStrategy>alias</namingStrategy>
+                <network>
+                  <name>saw</name>
+                </network>
                 <ports> 
                   <port>80:80</port>
                 </ports>
                 <!-- Run privileged for systemd -->
                 <privileged>true</privileged>
                 <wait>
-                  <!--
-                      Wait until the container health check
-                      reports that systemd services are up and
-                      running
-                  -->
+                  <!-- Wait until the container health check reports
+                       that systemd services are up and running -->
                   <healthy>true</healthy>
-                  <!--
-                      Increase timeout to allow application
-                      deployment to finish
-                  -->
-                  <time>600000</time>
+                  <!-- Increase timeout to allow application
+                       deployment to finish -->
+                  <time>300000</time>
+                </wait>
+              </run>
+            </image>
+            <image>
+              <name>saw-mapr:${project.version}</name>
+              <alias>saw-mapr</alias>
+              <build>
+                <dockerFileDir>${project.basedir}/src/test/docker-mapr</dockerFileDir>
+              </build>
+              <run>
+                <!-- Use the alias as the name of the container -->
+                <namingStrategy>alias</namingStrategy>
+                <network>
+                  <name>saw</name>
+                </network>
+                <!-- Run privileged for MapR -->
+                <privileged>true</privileged>
+                <wait>
+                  <!-- Wait until the container health check reports
+                       that MapR is up and running -->
+                  <healthy>true</healthy>
+                  <!-- Increase timeout to allow MapR to start -->
+                  <time>300000</time>
                 </wait>
               </run>
             </image>

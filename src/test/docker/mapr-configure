@@ -6,5 +6,8 @@ set -eu
 
 name="bda_lab_batch"
 host="mapr02:7222"
+# For SAW MapR container
+#name="demo.mapr.io"
+#host="saw-mapr:7222"
 
 /opt/mapr/server/configure.sh -N $name -c -C $host

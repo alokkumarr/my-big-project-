@@ -20,6 +20,9 @@ saw_zookeeper_quorum=mapr01,mapr02,mapr03,mapr04,mapr05,mapr06,mapr07,mapr08,map
 # user ID exceptionally set up to be 501, instead of the typical 500,
 # so override it here
 saw_mapr_user_id=501
+# For SAW MapR container
+#saw_spark_master_url=spark://saw-mapr:7077
+#saw_zookeeper_quorum=saw-mapr
 
 [saw-web]
 localhost ansible_connection=local
