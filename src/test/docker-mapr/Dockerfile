@@ -5,7 +5,7 @@ FROM maprtech/mapr-1base:5.2.0
 RUN sed -i -e '/tsflags=nodocs/d' /etc/yum.conf
 
 # Install system utilities
-RUN yum -y -q --nogpgcheck install lsof
+RUN yum -y -q --nogpgcheck install lsof smem
 
 # Workaround: Bamboo builds fail with no space left error, so reduce
 # loopack disk size.  Additionally put on volume, which has more space
