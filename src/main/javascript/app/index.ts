@@ -20,7 +20,7 @@ import {config} from './config';
 import {interceptor} from './http-interceptor';
 import {runConfig} from './run';
 
-import {ObserveModule} from './modules/observe';
+import {ObserveModule, ObserveUpgradeModule} from './modules/observe';
 import {AnalyzeModule} from './modules/analyze';
 import {AlertsModule} from './modules/alerts';
 import {AdminModule} from './modules/admin';
@@ -51,7 +51,8 @@ angular
 @NgModule({
   imports: [
     BrowserModule,
-    UpgradeModule
+    UpgradeModule,
+    ObserveUpgradeModule
   ]
 })
 export class NewAppModule {

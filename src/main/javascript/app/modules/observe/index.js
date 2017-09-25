@@ -1,4 +1,6 @@
 import * as angular from 'angular';
+import { downgradeComponent } from '@angular/upgrade/static';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import {routesConfig} from './routes';
 import {i18nConfig} from './i18n';
@@ -13,7 +15,15 @@ import {RadioFilterComponent} from './components/radio-filter/radio-filter.compo
 import {TimeRangeFilterComponent} from './components/time-range-filter/time-range-filter.component';
 import {FilterGroupComponent} from './components/filter-group/filter-group.component';
 import {CommonModule} from '../../common';
+
 export const ObserveModule = 'ObserveModule';
+
+@NgModule({
+  declarations: [ ObservePageComponent ],
+  entryComponents: [ ObservePageComponent ],
+  schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+})
+export class ObserveUpgradeModule {}
 
 angular.module(ObserveModule, [
   CommonModule
@@ -21,7 +31,10 @@ angular.module(ObserveModule, [
   .config(routesConfig)
   .config(i18nConfig)
   .factory('ObserveService', ObserveService)
-  .component('observePage', ObservePageComponent)
+  .directive(
+    'observePage',
+    downgradeComponent({component: ObservePageComponent})
+  )
   .component('filterSidenav', FilterSidenavComponent)
   .component('checkboxFilter', CheckboxFilterComponent)
   .component('priceRangeFilter', PriceRangeFilterComponent)
