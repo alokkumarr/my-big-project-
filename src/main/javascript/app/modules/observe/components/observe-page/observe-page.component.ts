@@ -1,5 +1,8 @@
 declare function require(string): string;
 
+import { MdDialog, MdIconRegistry } from '@angular/material';
+import { NewDashboardComponent } from '../new-dashboard/new-dashboard.component';
+
 const template = require('./observe-page.component.html');
 require('./observe-page.component.scss');
 // import * as template from './observe-page.component.html';
@@ -14,10 +17,15 @@ import { Component } from '@angular/core';
   template: template
 })
 export class ObservePageComponent {
-  constructor() {
+  constructor(public dialog: MdDialog, private iconRegistry: MdIconRegistry) {
     // this.$componentHandler = $componentHandler;
     // this.MenuService = MenuService;
+    this.iconRegistry.setDefaultFontSetClass('icomoon');
 
+  }
+
+  openDialog() {
+    this.dialog.open(NewDashboardComponent);
   }
 
   // $onInit() {

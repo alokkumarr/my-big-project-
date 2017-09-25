@@ -1,13 +1,16 @@
 import * as angular from 'angular';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgModule } from '@angular/core';
 
 import {routesConfig} from './routes';
 import {i18nConfig} from './i18n';
 
+import {MaterialModule} from '../../material.module';
+
 import {ObserveService} from './services/observe.service';
 
 import {ObservePageComponent} from './components/observe-page/observe-page.component';
+import {NewDashboardComponent} from './components/new-dashboard/new-dashboard.component';
 import {FilterSidenavComponent} from './components/filter-sidenav/filter-sidenav.component';
 import {CheckboxFilterComponent} from './components/checkbox-filter/checkbox-filter.component';
 import {PriceRangeFilterComponent} from './components/price-range-filter/price-range-filter.component';
@@ -19,9 +22,9 @@ import {CommonModule} from '../../common';
 export const ObserveModule = 'ObserveModule';
 
 @NgModule({
-  declarations: [ ObservePageComponent ],
-  entryComponents: [ ObservePageComponent ],
-  schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+  imports: [ MaterialModule ],
+  declarations: [ ObservePageComponent, NewDashboardComponent ],
+  entryComponents: [ ObservePageComponent, NewDashboardComponent ]
 })
 export class ObserveUpgradeModule {}
 
