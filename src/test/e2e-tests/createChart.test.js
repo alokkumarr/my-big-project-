@@ -48,6 +48,24 @@ describe('create columnChart type analysis', () => {
     expect(chartDesigner.title.isPresent()).toBe(true);
   });
 
+  it('should select x, y axes and a grouping', () => {
+    const refreshBtn = chartDesigner.refreshBtn;
+    const x = chartDesigner.getXRadio(xAxisName);
+    const y = chartDesigner.getYCheckBox(yAxisName);
+    const g = chartDesigner.getGroupRadio(groupName);
+    x.click();
+    commonFunctions.waitFor.elementToBeClickable(y);
+    y.click();
+    g.click();
+    const yParent = chartDesigner.getYCheckBoxParent(yAxisName);
+    expect(hasClass(x, 'md-checked')).toBeTruthy();
+    expect(hasClass(yParent, 'md-checked')).toBeTruthy();
+    expect(hasClass(g, 'md-checked')).toBeTruthy();
+    const doesDataNeedRefreshing = hasClass(refreshBtn, 'btn-primary');
+    expect(doesDataNeedRefreshing).toBeTruthy();
+    refreshBtn.click();
+  });
+
   it('should apply filters', () => {
     const filters = analyze.filtersDialog;
     const filterAC = filters.getFilterAutocomplete(0);
@@ -62,22 +80,6 @@ describe('create columnChart type analysis', () => {
     const appliedFilter = filters.getAppliedFilter(fieldName);
     commonFunctions.waitFor.elementToBePresent(appliedFilter);
     expect(appliedFilter.isPresent()).toBe(true);
-  });
-
-  it('should select x, y axes and a grouping', () => {
-    const refreshBtn = chartDesigner.refreshBtn;
-    const x = chartDesigner.getXRadio(xAxisName);
-    const y = chartDesigner.getYRadio(yAxisName);
-    const g = chartDesigner.getGroupRadio(groupName);
-    x.click();
-    y.click();
-    g.click();
-    expect(hasClass(x, 'md-checked')).toBeTruthy();
-    expect(hasClass(y, 'md-checked')).toBeTruthy();
-    expect(hasClass(g, 'md-checked')).toBeTruthy();
-    const doesDataNeedRefreshing = hasClass(refreshBtn, 'btn-primary');
-    expect(doesDataNeedRefreshing).toBeTruthy();
-    refreshBtn.click();
   });
 
   it('should attempt to save the report', () => {

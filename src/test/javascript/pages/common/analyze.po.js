@@ -42,6 +42,10 @@ const getChartSettingsRadio = (axis, name) => {
     .element(by.css(`md-radio-button[e2e="radio-button-${name}"]`));
 };
 
+const getChartSettingsCheckBox = name => {
+  return element(by.xpath(`//md-checkbox[@ng-model="attr.checked"]/following-sibling::span[text()="${name}"]/preceding-sibling::md-checkbox/div[1]`));
+};
+
 const openFiltersBtn = element(by.css('button[ng-click="$ctrl.openFiltersModal($event)"]'));
 
 const refreshBtn = element(by.css('button[e2e="refresh-data-btn"]'));
@@ -133,7 +137,8 @@ module.exports = {
     saveDialog: element(by.css('analyze-save-dialog')),
     chart: {
       getXRadio: name => getChartSettingsRadio('x', name),
-      getYRadio: name => getChartSettingsRadio('y', name),
+      getYCheckBox: name => getChartSettingsCheckBox(name),
+      getYCheckBoxParent: name => commonFunctions.find.parent(getChartSettingsCheckBox(name)),
       getZRadio: name => getChartSettingsRadio('z', name),
       getGroupRadio: name => getChartSettingsRadio('g', name),
       container: element(by.css('.highcharts-container ')),

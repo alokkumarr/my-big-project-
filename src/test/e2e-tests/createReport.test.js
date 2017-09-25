@@ -63,21 +63,6 @@ describe('create a new report type analysis', () => {
     expect(reportDesigner.title.isPresent()).toBe(true);
   });
 
-  it('should apply filters', () => {
-    const filters = analyze.filtersDialog;
-    const filterAC = filters.getFilterAutocomplete(0);
-    const stringFilterInput = filters.getStringFilterInput(0);
-    const fieldName = tables[0].fields[0];
-
-    reportDesigner.openFiltersBtn.click();
-    filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
-    stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
-    filters.applyBtn.click();
-    reportDesigner.expandBtn.click();
-
-    expect(filters.getAppliedFilter(fieldName).isPresent()).toBe(true);
-  });
-
   it('should select fields and refresh data', () => {
     tables.forEach(table => {
       table.fields.forEach(field => {
@@ -104,11 +89,30 @@ describe('create a new report type analysis', () => {
     reportDesigner.refreshBtn.click();
   });
 
+  it('should apply filters', () => {
+    const filters = analyze.filtersDialog;
+    const filterAC = filters.getFilterAutocomplete(0);
+    const stringFilterInput = filters.getStringFilterInput(0);
+    const fieldName = tables[0].fields[0];
+
+    commonFunctions.waitFor.elementToBeClickable(reportDesigner.openFiltersBtn);
+    // browser.sleep(100000);
+    reportDesigner.openFiltersBtn.click();
+    filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
+    stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
+    filters.applyBtn.click();
+
+    const appliedFilter = filters.getAppliedFilter(fieldName);
+    commonFunctions.waitFor.elementToBePresent(appliedFilter);
+    expect(appliedFilter.isPresent()).toBe(true);
+  });
+
   it('should attempt to save the report', () => {
     const save = analyze.saveDialog;
     const designer = analyze.designerDialog;
     commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
-    browser.actions().mouseMove(designer.saveBtn).click();
+    // browser.actions().mouseMove(designer.saveBtn).click();
+    designer.saveBtn.click();
 
     commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
     expect(designer.saveDialog).toBeTruthy();

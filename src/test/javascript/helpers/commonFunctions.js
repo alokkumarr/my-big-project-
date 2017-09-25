@@ -29,5 +29,10 @@ module.exports = {
         });
       }, 10000);
     }
+  },
+  find: {
+    parent: element => {
+      return element.element(by.xpath(`parent::*`));
+    }
   }
 };
