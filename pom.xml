@@ -68,8 +68,6 @@
                 </assembly>
               </build>
               <run>
-                <!-- Use the alias as the name of the container -->
-                <namingStrategy>alias</namingStrategy>
                 <!--
                     Workaround: Resolving hostnames of other
                     containers does not seem to work if systemd is
@@ -105,8 +103,6 @@
                 <dockerFileDir>${project.basedir}/src/test/docker-mapr</dockerFileDir>
               </build>
               <run>
-                <!-- Use the alias as the name of the container -->
-                <namingStrategy>alias</namingStrategy>
                 <!--
                     Workaround: See note about container links in
                     other image configuration.
