@@ -17,6 +17,11 @@ describe('create columnChart type analysis', () => {
   const metric = 'MCT Content';
   const method = 'chart:column';
 
+  afterEach(function() {
+    browser.executeScript('window.sessionStorage.clear();');
+    browser.executeScript('window.localStorage.clear();');
+  });
+
   it('login as admin', () => {
     expect(browser.getCurrentUrl()).toContain('/login');
     login.loginAs('admin');
@@ -32,7 +37,13 @@ describe('create columnChart type analysis', () => {
   }); */
 
   it('should display list view by default', () => {
+    categoryName = sidenav.firstPublicCategory.getText();
     analyze.validateListView();
+  });
+
+  it('should switch to card view', () => {
+    commonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
+    analyze.analysisElems.cardView.click();
   });
 
   it('should open the new Analysis dialog', () => {

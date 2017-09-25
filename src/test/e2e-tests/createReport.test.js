@@ -32,25 +32,38 @@ describe('create a new report type analysis', () => {
   const metric = 'MCT Events aggregated by session (view)';
   const method = 'table:report';
 
+  afterEach(function() {
+    browser.executeScript('window.sessionStorage.clear();');
+    browser.executeScript('window.localStorage.clear();');
+  });
+
   it('login as admin', () => {
     expect(browser.getCurrentUrl()).toContain('/login');
     login.loginAs('admin');
   });
 
-  it('should open the sidenav menu and go to first category', () => {
+  //Obsolete. Now menu opens automatically with first category expanded
+  /* it('should open the sidenav menu and go to first category', () => {
     commonFunctions.waitFor.elementToBeClickable(sidenav.menuBtn);
     sidenav.menuBtn.click();
     sidenav.publicCategoriesToggle.click();
     categoryName = sidenav.firstPublicCategory.getText();
     sidenav.firstPublicCategory.click();
     expect(analyze.main.categoryTitle.getText()).toEqual(categoryName);
+  }); */
+
+  it('should display list view by default', () => {
+    categoryName = sidenav.firstPublicCategory.getText();
+    analyze.validateListView();
   });
 
-  it('should display card view by default', () => {
-    analyze.validateCardView();
+  it('should switch to card view', () => {
+    commonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
+    analyze.analysisElems.cardView.click();
   });
 
   it('should open the new Analysis dialog', () => {
+    commonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.addAnalysisBtn);
     analyze.analysisElems.addAnalysisBtn.click();
     analyze.validateNewAnalyze();
   });
