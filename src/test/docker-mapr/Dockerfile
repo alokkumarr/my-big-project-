@@ -23,5 +23,9 @@ RUN sed -i -e '2idf -h' /usr/bin/init-script
 # script instead
 RUN sed -i -e 's,while true,touch /mapr-init-done\nwhile true,' /usr/bin/init-script
 
+# Expose MapR CLDB port, so that workaround using container links in
+# "saw" container produces environment variables
+EXPOSE 7222
+
 # Add health check to be used by Docker Maven plug-in
 HEALTHCHECK --interval=5s CMD test -e /mapr-init-done && hadoop fs -ls /

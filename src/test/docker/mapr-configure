@@ -8,6 +8,6 @@ name="bda_lab_batch"
 host="mapr02:7222"
 # For SAW MapR container
 #name="demo.mapr.io"
-#host="saw-mapr:7222"
+#host="${SAW_MAPR_PORT_7222_TCP_ADDR}:${SAW_MAPR_PORT_7222_TCP_PORT}"
 
 /opt/mapr/server/configure.sh -N $name -c -C $host

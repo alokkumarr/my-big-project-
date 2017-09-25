@@ -70,9 +70,19 @@
               <run>
                 <!-- Use the alias as the name of the container -->
                 <namingStrategy>alias</namingStrategy>
+                <!--
+                    Workaround: Resolving hostnames of other
+                    containers does not seem to work if systemd is
+                    running inside container, so use container links
+                    as workaround for now.  For links to work, disable
+                    custom networking.
                 <network>
                   <name>saw</name>
                 </network>
+                -->
+                <links>
+                  <link>saw-mapr</link>
+                </links>
                 <ports> 
                   <port>80:80</port>
                 </ports>
@@ -97,9 +107,13 @@
               <run>
                 <!-- Use the alias as the name of the container -->
                 <namingStrategy>alias</namingStrategy>
+                <!--
+                    Workaround: See note about container links in
+                    other image configuration.
                 <network>
                   <name>saw</name>
                 </network>
+                -->
                 <!-- Run privileged for MapR -->
                 <privileged>true</privileged>
                 <wait>
