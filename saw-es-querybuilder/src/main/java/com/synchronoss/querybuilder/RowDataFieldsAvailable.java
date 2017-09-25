@@ -3,6 +3,7 @@ package com.synchronoss.querybuilder;
 import java.util.List;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
@@ -41,61 +42,24 @@ class RowDataFieldsAvailable {
 	}
 	
 	
+	private static AggregationBuilder addSubaggregation(
+			List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields, AggregationBuilder aggregation) {
+		for (int i = 0; i < dataFields.size(); i++) {
+			aggregation = aggregation
+					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(i)));
+		}
+		return aggregation;
+	}
 	
 	private static SearchSourceBuilder rowDataFieldsAvailableRowFieldOne(List<com.synchronoss.querybuilder.model.pivot.RowField> rowfield, 
 	    List<com.synchronoss.querybuilder.model.pivot.ColumnField> columnFields, 
 			List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	{
-	
-		
 			if ((!dataFields.isEmpty()) && dataFields.size() >0)
 			{
-				if (dataFields.size()==1)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    							);
-				}// dataFields.size() == 1
-
-				if (dataFields.size()==2)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1))));
-	    			
-				}// dataFields.size() == 2
-
-				if (dataFields.size()==3)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2))));
-	    			
-				}// dataFields.size() == 3
-				
-				if (dataFields.size()==4)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(3)))));
-	    			
-				}// dataFields.size() == 4
-				
-				if (dataFields.size()==5)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(3)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(4)))
-	    							);			
-				}// dataFields.size() == 5
-			} // !dataFields.isEmpty()
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0), "row_level_1")));
+			} 
+			// !dataFields.isEmpty()
 		return searchSourceBuilder;
 	}
 	
@@ -104,62 +68,12 @@ class RowDataFieldsAvailable {
 	    SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	{
 	
-			if ((!dataFields.isEmpty()) && dataFields.size() >0)
-			{
-				if (dataFields.size()==1)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    							));
-				}// dataFields.size() == 1
-
-				if (dataFields.size()==2)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					));
-	    			
-				}// dataFields.size() == 2
-
-				if (dataFields.size()==3)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))		
-	    							));
-	    			
-				}// dataFields.size() == 3
-				
-				if (dataFields.size()==4)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(3)))
-	    							));
-	    			
-				}// dataFields.size() == 4
-				
-				if (dataFields.size()==5)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(3)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(4)))
-	    							));			
-				}// dataFields.size() == 5
-			} // !dataFields.isEmpty()
-		
+		if ((!dataFields.isEmpty()) && dataFields.size() >0)
+		{
+				searchSourceBuilder.query(boolQueryBuilder)
+				.aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName()).subAggregation(
+						addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1), "row_level_2"))));
+		} 	
 		return searchSourceBuilder;
 	}
 	
@@ -168,67 +82,13 @@ class RowDataFieldsAvailable {
 			SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	{
 	
-			if ((!dataFields.isEmpty()) && dataFields.size() >0)
-			{
-				if (dataFields.size()==1)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName())		
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    							)));
-				}// dataFields.size() == 1
-
-				if (dataFields.size()==2)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName())			
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					)));
-	    			
-				}// dataFields.size() == 2
-
-				if (dataFields.size()==3)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName())				
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))		
-	    							)));
-	    			
-				}// dataFields.size() == 3
-				
-				if (dataFields.size()==4)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName())				
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(3)))
-	    							)));
-	    			
-				}// dataFields.size() == 4
-				
-				if (dataFields.size()==5)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName())			
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(3)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(4)))
-	    							)));			
-				}// dataFields.size() == 5
-			} // !dataFields.isEmpty()
-		
+		if ((!dataFields.isEmpty()) && dataFields.size() >0)
+		{
+				searchSourceBuilder.query(boolQueryBuilder)
+				.aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName()).
+						subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName()).subAggregation(
+						addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2), "row_level_3")))));
+		} 	
 		return searchSourceBuilder;
 	}
 
@@ -237,74 +97,16 @@ class RowDataFieldsAvailable {
 			List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	{
 	
-			if ((!dataFields.isEmpty()) && dataFields.size() >0)
-			{
-				if (dataFields.size()==1)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName())	
-									.subAggregation(AggregationBuilders.terms("row_level_4").field(rowfield.get(2).getColumnName())		
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    							))));
-				}// dataFields.size() == 1
+		if ((!dataFields.isEmpty()) && dataFields.size() >0)
+		{
+				searchSourceBuilder.query(boolQueryBuilder)
+				.aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName()).
+						subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName()).
+								subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName()).subAggregation(
+						addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3), "row_level_4"))))));
+		} 	
+		
 
-				if (dataFields.size()==2)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName())	
-									.subAggregation(AggregationBuilders.terms("row_level_4").field(rowfield.get(2).getColumnName())
-
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					))));
-	    			
-				}// dataFields.size() == 2
-
-				if (dataFields.size()==3)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName())
-									.subAggregation(AggregationBuilders.terms("row_level_4").field(rowfield.get(2).getColumnName())
-
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))		
-	    							))));
-	    			
-				}// dataFields.size() == 3
-				
-				if (dataFields.size()==4)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName())	
-									.subAggregation(AggregationBuilders.terms("row_level_4").field(rowfield.get(2).getColumnName())		
-
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(3)))
-	    							))));
-	    			
-				}// dataFields.size() == 4
-				
-				if (dataFields.size()==5)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName())	
-									.subAggregation(AggregationBuilders.terms("row_level_4").field(rowfield.get(2).getColumnName())		
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(3)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(4)))
-	    							))));			
-				}// dataFields.size() == 5
-			} // !dataFields.isEmpty()
 		
 		return searchSourceBuilder;
 	}
@@ -314,77 +116,15 @@ class RowDataFieldsAvailable {
 			List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	{
 	
-			if ((!dataFields.isEmpty()) && dataFields.size() >0)
-			{
-				if (dataFields.size()==1)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName())	
-									.subAggregation(AggregationBuilders.terms("row_level_4").field(rowfield.get(2).getColumnName())
-											.subAggregation(AggregationBuilders.terms("row_level_5").field(rowfield.get(2).getColumnName())		
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    							)))));
-				}// dataFields.size() == 1
-
-				if (dataFields.size()==2)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName())	
-									.subAggregation(AggregationBuilders.terms("row_level_4").field(rowfield.get(2).getColumnName())
-											.subAggregation(AggregationBuilders.terms("row_level_5").field(rowfield.get(2).getColumnName())		
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					)))));
-	    			
-				}// dataFields.size() == 2
-
-				if (dataFields.size()==3)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName())
-									.subAggregation(AggregationBuilders.terms("row_level_4").field(rowfield.get(2).getColumnName())
-											.subAggregation(AggregationBuilders.terms("row_level_5").field(rowfield.get(2).getColumnName())		
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))		
-	    							)))));
-	    			
-				}// dataFields.size() == 3
-				
-				if (dataFields.size()==4)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName())	
-									.subAggregation(AggregationBuilders.terms("row_level_4").field(rowfield.get(2).getColumnName())	
-											.subAggregation(AggregationBuilders.terms("row_level_5").field(rowfield.get(2).getColumnName())	
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(3)))
-	    							)))));
-	    			
-				}// dataFields.size() == 4
-				
-				if (dataFields.size()==5)
-				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName())
-							.subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName())	
-									.subAggregation(AggregationBuilders.terms("row_level_4").field(rowfield.get(2).getColumnName())
-											.subAggregation(AggregationBuilders.terms("row_level_5").field(rowfield.get(2).getColumnName())		
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(3)))
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(4)))
-	    							)))));			
-				}// dataFields.size() == 5
-			} // !dataFields.isEmpty()
-		
+		if ((!dataFields.isEmpty()) && dataFields.size() >0)
+		{
+				searchSourceBuilder.query(boolQueryBuilder)
+				.aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName()).
+						subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName()).
+								subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName())
+										.subAggregation(AggregationBuilders.terms("row_level_4").field(rowfield.get(3).getColumnName())
+										.subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilderRow(rowfield.get(4), "row_level_5")))))));
+		} 	
 		return searchSourceBuilder;
 	}
 

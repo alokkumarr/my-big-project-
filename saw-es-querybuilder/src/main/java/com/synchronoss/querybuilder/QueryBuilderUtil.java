@@ -1,44 +1,53 @@
 package com.synchronoss.querybuilder;
 
-import java.util.List;
-
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram.Order;
+
+import com.synchronoss.querybuilder.model.chart.NodeField;
+import com.synchronoss.querybuilder.model.pivot.ColumnField;
 
 public class QueryBuilderUtil {
 	
 	public final static String DATE_FORMAT = "yyyy-MM-dd";
 	
 	public static AggregationBuilder aggregationBuilder (com.synchronoss.querybuilder.model.pivot.ColumnField columnField, 
-	    List<com.synchronoss.querybuilder.model.pivot.DataField> dataField, String aggregationName)
+	     String aggregationName)
 
 	{
 		AggregationBuilder aggregationBuilder = null;
 		
-		if (columnField.getType().equals("date"))
-		{
+		if (columnField.getType().name().equals(ColumnField.Type.DATE.name()) || columnField.getType().name().equals(ColumnField.Type.TIMESTAMP.name())){
 			aggregationBuilder = AggregationBuilders.
 					dateHistogram(aggregationName).field(columnField.getColumnName()).format(DATE_FORMAT).
-					dateHistogramInterval(groupInterval(columnField.getGroupInterval().name())).order(Order.KEY_ASC);
-			
-			if (!(dataField.isEmpty())&& dataField.size()>0)
-			{
-				aggregationBuilder = AggregationBuilders.
-						dateHistogram(aggregationName).field(columnField.getColumnName()).
-						dateHistogramInterval(groupInterval(columnField.getGroupInterval().name())).order(Order.KEY_ASC);
-	
-			}
+					dateHistogramInterval(groupInterval(columnField.getGroupInterval().value())).order(Order.KEY_ASC);
 		}
-		else 
-		{
+		else {
           aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(columnField.getColumnName());
 		}
 		
 		return aggregationBuilder;
 	}
+	
+	public static AggregationBuilder aggregationBuilderRow(com.synchronoss.querybuilder.model.pivot.RowField rowField, 
+		     String aggregationName)
 
+		{
+			AggregationBuilder aggregationBuilder = null;
+			
+			if (rowField.getType().name().equals(ColumnField.Type.DATE.name()) || rowField.getType().name().equals(ColumnField.Type.TIMESTAMP.name())){
+				aggregationBuilder = AggregationBuilders.
+						dateHistogram(aggregationName).field(rowField.getColumnName()).format(DATE_FORMAT).
+						dateHistogramInterval(groupInterval(rowField.getGroupInterval().value())).order(Order.KEY_ASC);
+			}
+			else {
+	          aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(rowField.getColumnName());
+			}
+			
+			return aggregationBuilder;
+		}
+	
      public static DateHistogramInterval groupInterval(String groupInterval)
      {
     	 DateHistogramInterval histogramInterval = null; 
@@ -92,19 +101,17 @@ public class QueryBuilderUtil {
  	 * @param splitBy
  	 * @return
  	 */
-	public static AggregationBuilder aggregationBuilderChart(com.synchronoss.querybuilder.model.chart.SplitBy splitBy)
+	public static AggregationBuilder aggregationBuilderChart(com.synchronoss.querybuilder.model.chart.NodeField nodeField, String nodeName)
 	{
 		AggregationBuilder aggregationBuilder = null;
 		
-		if (splitBy.getType().equals("date"))
-		{
+		if (nodeField.getType().name().equals(NodeField.Type.DATE.name()) || nodeField.getType().name().equals(NodeField.Type.TIMESTAMP.name()) ){
 			aggregationBuilder = AggregationBuilders.
-					dateHistogram("split_by").field(splitBy.getColumnName()).format(DATE_FORMAT).
-					dateHistogramInterval(groupInterval(splitBy.getGroupInterval().value())).order(Order.KEY_ASC);
+					dateHistogram(nodeName).field(nodeField.getColumnName()).format("yyyy-mm-dd").
+					dateHistogramInterval(groupInterval(nodeField.getGroupInterval().value())).order(Order.KEY_ASC);
 		}
-		else 
-		{
-			aggregationBuilder = AggregationBuilders.terms("split_by").field(splitBy.getColumnName());
+		else{
+			aggregationBuilder = AggregationBuilders.terms(nodeName).field(nodeField.getColumnName());
 		}
 		return aggregationBuilder;
 	}	

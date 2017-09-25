@@ -42,7 +42,7 @@ class ColumnDataFieldsAvailable {
 	
 	
 	private static SearchSourceBuilder columnDataFieldsAvailableRowFieldOne(List<com.synchronoss.querybuilder.model.pivot.RowField> rowfield, List<com.synchronoss.querybuilder.model.pivot.ColumnField> columnFields, 
-			List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
+			List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields,  SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	{
 	
 		if (columnFields.size()==1)
@@ -52,14 +52,14 @@ class ColumnDataFieldsAvailable {
 				if (dataFields.size()==1)
 				{
 					searchSourceBuilder.query(boolQueryBuilder)
-					        .aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
+					        .aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    							);
 				}// dataFields.size() == 1
 
 				if (dataFields.size()==2)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					);
@@ -68,7 +68,7 @@ class ColumnDataFieldsAvailable {
 
 				if (dataFields.size()==3)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))		
@@ -78,7 +78,7 @@ class ColumnDataFieldsAvailable {
 				
 				if (dataFields.size()==4)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
@@ -89,7 +89,7 @@ class ColumnDataFieldsAvailable {
 				
 				if (dataFields.size()==5)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
@@ -113,16 +113,16 @@ class ColumnDataFieldsAvailable {
 			{
 				if (dataFields.size()==1)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")		
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")		
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    							));
 				}// dataFields.size() == 1
 
 				if (dataFields.size()==2)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")		
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")		
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					));
@@ -131,8 +131,8 @@ class ColumnDataFieldsAvailable {
 
 				if (dataFields.size()==3)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")	    	    							
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")	    	    							
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))		
@@ -142,8 +142,8 @@ class ColumnDataFieldsAvailable {
 				
 				if (dataFields.size()==4)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
@@ -154,8 +154,8 @@ class ColumnDataFieldsAvailable {
 				
 				if (dataFields.size()==5)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
@@ -179,18 +179,18 @@ class ColumnDataFieldsAvailable {
 			{
 				if (dataFields.size()==1)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), dataFields, "column_level_3")			
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")
+	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2),  "column_level_3")			
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    							)));
 				}// dataFields.size() == 1
 
 				if (dataFields.size()==2)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")
-	    							.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), dataFields, "column_level_3")			
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")
+	    							.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2),  "column_level_3")			
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					)));
@@ -199,9 +199,9 @@ class ColumnDataFieldsAvailable {
 
 				if (dataFields.size()==3)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")
-	    	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), dataFields, "column_level_3") 					
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")
+	    	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2),  "column_level_3") 					
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))		
@@ -211,9 +211,9 @@ class ColumnDataFieldsAvailable {
 				
 				if (dataFields.size()==4)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")
-	    	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), dataFields, "column_level_3")			
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")
+	    	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2),  "column_level_3")			
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
@@ -224,9 +224,9 @@ class ColumnDataFieldsAvailable {
 				
 				if (dataFields.size()==5)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), dataFields, "column_level_3")			
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2),  "column_level_3")			
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
@@ -250,20 +250,20 @@ class ColumnDataFieldsAvailable {
 			{
 				if (dataFields.size()==1)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), dataFields, "column_level_3")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), dataFields, "column_level_4")
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")
+	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2),  "column_level_3")
+	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3),  "column_level_4")
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    							))));
 				}// dataFields.size() == 1
 
 				if (dataFields.size()==2)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), dataFields, "column_level_3")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), dataFields, "column_level_4")				
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")
+	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2),  "column_level_3")
+	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3),  "column_level_4")				
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					))));
@@ -272,10 +272,10 @@ class ColumnDataFieldsAvailable {
 
 				if (dataFields.size()==3)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), dataFields, "column_level_3") 	
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), dataFields, "column_level_4")							
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2),  "column_level_3") 	
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3),  "column_level_4")							
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))		
@@ -285,10 +285,10 @@ class ColumnDataFieldsAvailable {
 				
 				if (dataFields.size()==4)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), dataFields, "column_level_3")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), dataFields, "column_level_4")				
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2),  "column_level_3")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3),  "column_level_4")				
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
@@ -299,10 +299,10 @@ class ColumnDataFieldsAvailable {
 				
 				if (dataFields.size()==5)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), dataFields, "column_level_3")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), dataFields, "column_level_4")		
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2),  "column_level_3")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3),  "column_level_4")		
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
@@ -318,7 +318,7 @@ class ColumnDataFieldsAvailable {
 	
 	private static SearchSourceBuilder columnDataAvailableRowFieldFive(List<com.synchronoss.querybuilder.model.pivot.RowField> rowfield, 
 	    List<com.synchronoss.querybuilder.model.pivot.ColumnField> columnFields, 
-			List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields, SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
+			List<com.synchronoss.querybuilder.model.pivot.DataField> dataFields,  SearchSourceBuilder searchSourceBuilder, BoolQueryBuilder boolQueryBuilder)
 	{
 	
 		if (columnFields.size()==5)
@@ -327,22 +327,22 @@ class ColumnDataFieldsAvailable {
 			{
 				if (dataFields.size()==1)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), dataFields, "column_level_3")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), dataFields, "column_level_4")
-   	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(4), dataFields, "column_level_5")	    	    							
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")
+	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2),  "column_level_3")
+	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3),  "column_level_4")
+   	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(4),  "column_level_5")	    	    							
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    							)))));
 				}// dataFields.size() == 1
 
 				if (dataFields.size()==2)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), dataFields, "column_level_3")
-	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), dataFields, "column_level_4")				
-   	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(4), dataFields, "column_level_5")	    	    							
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")
+	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2),  "column_level_3")
+	    					.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3),  "column_level_4")				
+   	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(4),  "column_level_5")	    	    							
    							.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					)))));
@@ -351,11 +351,11 @@ class ColumnDataFieldsAvailable {
 
 				if (dataFields.size()==3)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), dataFields, "column_level_3") 	
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), dataFields, "column_level_4")	
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(4), dataFields, "column_level_5")					
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2),  "column_level_3") 	
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3),  "column_level_4")	
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(4),  "column_level_5")					
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))		
@@ -365,11 +365,11 @@ class ColumnDataFieldsAvailable {
 				
 				if (dataFields.size()==4)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), dataFields, "column_level_3")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), dataFields, "column_level_4")
-	    	    	    	.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(4), dataFields, "column_level_5")	    	    	    					
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2),  "column_level_3")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3),  "column_level_4")
+	    	    	    	.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(4),  "column_level_5")	    	    	    					
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
@@ -380,11 +380,11 @@ class ColumnDataFieldsAvailable {
 				
 				if (dataFields.size()==5)
 				{
-					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), dataFields, "column_level_1")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), dataFields, "column_level_2")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), dataFields, "column_level_3")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), dataFields, "column_level_4")
-	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(4), dataFields, "column_level_5")					
+					searchSourceBuilder.query(boolQueryBuilder).aggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0),  "column_level_1")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1),  "column_level_2")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2),  "column_level_3")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3),  "column_level_4")
+	    	    			.subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(4),  "column_level_5")					
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(0)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(1)))
 	    					.subAggregation(QueryBuilderUtil.aggregationBuilderDataField(dataFields.get(2)))
