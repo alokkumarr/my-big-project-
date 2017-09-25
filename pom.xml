@@ -338,6 +338,7 @@
                 <goals>
                   <goal>npm</goal>
                 </goals>
+                <phase>test</phase>
                 <configuration>
                   <arguments>run test</arguments>
                 </configuration>
@@ -710,6 +711,7 @@
                 <goals>
                   <goal>npm</goal>
                 </goals>
+                <phase>test</phase>
                 <configuration>
                   <arguments>run test</arguments>
                 </configuration>
