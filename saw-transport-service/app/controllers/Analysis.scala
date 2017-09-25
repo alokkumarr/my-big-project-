@@ -145,7 +145,7 @@ class Analysis extends BaseController {
         val dskString = dataSecurityKey.asInstanceOf[String].toString;
         val dskStr : String =null
         var parsedDSK : JValue=null
-        if(!dskString.equals("")) {
+        if(!dskString.equals("") && !dskStr.equals("NA")) {
         val dskStr = "{ \"dataSecurityKey\" :" +dataSecurityKey.asInstanceOf[String].toString + "}";
         m_log.trace("dskStr: {}", dskStr);
         parsedDSK = parse(dskStr);
