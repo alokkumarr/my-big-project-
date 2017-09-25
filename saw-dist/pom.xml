@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.synchronoss.saw</groupId>
+    <artifactId>saw</artifactId>
+    <version>${revision}</version>
+  </parent>
+  <artifactId>saw-dist</artifactId>
+  <version>${revision}</version>
+  <packaging>jar</packaging>
+  <name>SAW Distribution</name>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <docker.naming>none</docker.naming>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/assembly.xml</descriptor>
+          </descriptors>
+          <!-- Leave version number of SAW bundle project out of
+               artifact name, to avoid confusion as each SAW module at
+               least for now has its own release cycle -->
+          <finalName>${project.parent.artifactId}</finalName>
+          <!-- Remove artifact classifier "bin" from archive name -->
+          <appendAssemblyId>false</appendAssemblyId>
+          <!-- Enable long file names without Maven warning -->
+          <tarLongFileMode>posix</tarLongFileMode>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin> 
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-failsafe-plugin</artifactId>
+	<executions>
+	  <execution>
+	    <goals>
+	      <goal>integration-test</goal>
+	      <goal>verify</goal>
+	    </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <version>0.22.1</version>
+        <configuration>
+          <!-- Start containers in parallel to reduce startup time -->
+          <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
+          <startParallel>true</startParallel>
+          <images>
+            <image>
+              <name>saw:${project.version}</name>
+              <alias>saw</alias>
+              <build>
+                <dockerFileDir>${project.basedir}/src/test/docker</dockerFileDir>
+                <assembly>
+                  <inline xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                          xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+                          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+                    <fileSets>
+                      <fileSet>
+                        <directory>${project.build.directory}</directory>
+                        <outputDirectory>.</outputDirectory>
+                        <includes>
+                          <include>*.tgz</include>
+                        </includes>
+                      </fileSet>
+                    </fileSets>
+                  </inline>
+                </assembly>
+              </build>
+              <run>
+                <namingStrategy>${saw.docker.naming}</namingStrategy>
+                <!--
+                    Workaround: Resolving hostnames of other
+                    containers does not seem to work if systemd is
+                    running inside container, so use container links
+                    as workaround for now.  For links to work, disable
+                    custom networking.
+                <network>
+                  <name>saw</name>
+                </network>
+                -->
+                <links>
+                  <link>saw-mapr</link>
+                </links>
+                <ports> 
+                  <port>saw.docker.port:80</port>
+                </ports>
+                <!-- Run privileged for systemd -->
+                <privileged>true</privileged>
+                <!-- Bind mount volume for saving system logs in case
+                     needed for troubleshooting after a failed run -->
+                <volumes>
+                  <bind>
+                    <volume>${project.build.directory}:/build</volume>
+                  </bind>
+                </volumes>
+                <wait>
+                  <!-- Wait until the container health check reports
+                       that systemd services are up and running -->
+                  <healthy>true</healthy>
+                  <!-- Increase timeout to allow application
+                       deployment to finish -->
+                  <time>300000</time>
+                </wait>
+              </run>
+            </image>
+            <image>
+              <name>saw-mapr:${project.version}</name>
+              <alias>saw-mapr</alias>
+              <build>
+                <dockerFileDir>${project.basedir}/src/test/docker-mapr</dockerFileDir>
+              </build>
+              <run>
+                <namingStrategy>${saw.docker.naming}</namingStrategy>
+                <!--
+                    Workaround: See note about container links in
+                    other image configuration.
+                <network>
+                  <name>saw</name>
+                </network>
+                -->
+                <!-- Run privileged for MapR -->
+                <privileged>true</privileged>
+                <wait>
+                  <!-- Wait until the container health check reports
+                       that MapR is up and running -->
+                  <healthy>true</healthy>
+                  <!-- Increase timeout to allow MapR to start -->
+                  <time>300000</time>
+                </wait>
+              </run>
+            </image>
+          </images>
+        </configuration>
+        <executions>
+          <execution>
+            <id>start</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>build</goal>
+              <goal>start</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>stop</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>stop</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <repositories>
+    <repository>
+      <id>synchronoss</id>
+      <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+    </repository>
+  </repositories>
+</project>

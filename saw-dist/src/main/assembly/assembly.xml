@@ -7,14 +7,14 @@
   <formats>
     <format>tgz</format>
   </formats>
-  <baseDirectory>${project.artifactId}</baseDirectory>
+  <baseDirectory>${project.parent.artifactId}</baseDirectory>
   <fileSets>
     <fileSet>
       <directory>${project.basedir}/src/main/doc</directory>
       <outputDirectory></outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>${project.basedir}/doc</directory>
+      <directory>${project.parent.basedir}/doc</directory>
       <includes>
         <include>operations.md</include>
       </includes>
@@ -29,7 +29,7 @@
       <outputDirectory></outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>${project.basedir}/ext/modules</directory>
+      <directory>${project.parent.basedir}/ext/modules</directory>
       <outputDirectory>modules</outputDirectory>
     </fileSet>
   </fileSets>

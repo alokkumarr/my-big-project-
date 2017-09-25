@@ -49,7 +49,8 @@ To build and run a Docker container that runs the SAW system in
 development mode, execute the following command:
 
         $ ext/prepare-dev
-        $ mvn package docker:build docker:start -DskipTests -Dsaw.port=80
+        $ mvn -pl saw-dist -am package
+        $ mvn -pl saw-dist docker:build docker:start
 
 Note: The above assumes that `saw`, `saw-security`, `saw-services` and
 `saw-web` are all checked out in the same directory.  The

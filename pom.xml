@@ -7,148 +7,37 @@
   <version>${revision}</version>
   <packaging>pom</packaging>
   <name>SAW</name>
+  <modules>
+    <module>saw-dist</module>
+  </modules>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.12</version>
+        <scope>test</scope>
+    </dependency>
+    </dependencies>
+  </dependencyManagement>
   <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.0.0</version>
-        <configuration>
-          <descriptors>
-            <descriptor>src/main/assembly/assembly.xml</descriptor>
-          </descriptors>
-          <!-- Leave version number of SAW bundle project out of
-               artifact name, to avoid confusion as each SAW module at
-               least for now has its own release cycle -->
-          <finalName>${project.artifactId}</finalName>
-          <!-- Remove artifact classifier "bin" from archive name -->
-          <appendAssemblyId>false</appendAssemblyId>
-          <!-- Enable long file names without Maven warning -->
-          <tarLongFileMode>posix</tarLongFileMode>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>io.fabric8</groupId>
-        <artifactId>docker-maven-plugin</artifactId>
-        <version>0.22.1</version>
-        <configuration>
-          <!-- Start containers in parallel to reduce startup time -->
-          <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
-          <startParallel>true</startParallel>
-          <images>
-            <image>
-              <name>saw:${project.version}</name>
-              <alias>saw</alias>
-              <build>
-                <dockerFileDir>${project.basedir}/src/test/docker</dockerFileDir>
-                <assembly>
-                  <inline xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                          xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
-                          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
-                    <fileSets>
-                      <fileSet>
-                        <directory>${project.build.directory}</directory>
-                        <outputDirectory>.</outputDirectory>
-                        <includes>
-                          <include>*.tgz</include>
-                        </includes>
-                      </fileSet>
-                    </fileSets>
-                  </inline>
-                </assembly>
-              </build>
-              <run>
-                <!--
-                    Workaround: Resolving hostnames of other
-                    containers does not seem to work if systemd is
-                    running inside container, so use container links
-                    as workaround for now.  For links to work, disable
-                    custom networking.
-                <network>
-                  <name>saw</name>
-                </network>
-                -->
-                <links>
-                  <link>saw-mapr</link>
-                </links>
-                <ports> 
-                  <port>saw.port:80</port>
-                </ports>
-                <!-- Run privileged for systemd -->
-                <privileged>true</privileged>
-                <!-- Bind mount volume for saving system logs in case
-                     needed for troubleshooting after a failed run -->
-                <volumes>
-                  <bind>
-                    <volume>${project.build.directory}:/build</volume>
-                  </bind>
-                </volumes>
-                <wait>
-                  <!-- Wait until the container health check reports
-                       that systemd services are up and running -->
-                  <healthy>true</healthy>
-                  <!-- Increase timeout to allow application
-                       deployment to finish -->
-                  <time>300000</time>
-                </wait>
-              </run>
-            </image>
-            <image>
-              <name>saw-mapr:${project.version}</name>
-              <alias>saw-mapr</alias>
-              <build>
-                <dockerFileDir>${project.basedir}/src/test/docker-mapr</dockerFileDir>
-              </build>
-              <run>
-                <!--
-                    Workaround: See note about container links in
-                    other image configuration.
-                <network>
-                  <name>saw</name>
-                </network>
-                -->
-                <!-- Run privileged for MapR -->
-                <privileged>true</privileged>
-                <wait>
-                  <!-- Wait until the container health check reports
-                       that MapR is up and running -->
-                  <healthy>true</healthy>
-                  <!-- Increase timeout to allow MapR to start -->
-                  <time>300000</time>
-                </wait>
-              </run>
-            </image>
-          </images>
-        </configuration>
-        <executions>
-          <execution>
-            <id>start</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>build</goal>
-              <goal>start</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>stop</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>stop</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+        <plugin> 
+	  <groupId>org.apache.maven.plugins</groupId>
+	  <artifactId>maven-failsafe-plugin</artifactId>
+	  <version>2.20.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
   <repositories>
     <repository>
@@ -156,4 +45,16 @@
       <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
     </repository>
   </repositories>
+  <profiles>
+    <profile>
+      <id>dev</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <saw.docker.port>80</saw.docker.port>
+        <saw.docker.naming>alias</saw.docker.naming>
+      </properties>
+    </profile>
+  </profiles>
 </project>
