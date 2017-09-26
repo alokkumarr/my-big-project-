@@ -11,9 +11,13 @@ export const DateFilterComponent = {
       this._$filter = $filter;
     }
     $onInit() {
-      this.tempModel = this.model || {
-        gte: '',
-        lte: ''
+      /* this.model has string values. Change them to actual date objects
+      to be able to work with md-datepicker first.
+      */
+      this.model = this.model || {};
+      this.tempModel = {
+        gte: this.model.gte ? new Date(this.model.gte) : '',
+        lte: this.model.lte ? new Date(this.model.lte) : ''
       };
     }
 
