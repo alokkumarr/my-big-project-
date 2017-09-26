@@ -32,11 +32,6 @@ describe('create a new report type analysis', () => {
   const metric = 'MCT Events aggregated by session (view)';
   const method = 'table:report';
 
-  afterEach(function() {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
-  });
-
   it('login as admin', () => {
     expect(browser.getCurrentUrl()).toContain('/login');
     login.loginAs('admin');

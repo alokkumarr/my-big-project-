@@ -17,11 +17,6 @@ describe('create columnChart type analysis', () => {
   const metric = 'MCT Content';
   const method = 'chart:column';
 
-  afterEach(function() {
-    browser.executeScript('window.sessionStorage.clear();');
-    browser.executeScript('window.localStorage.clear();');
-  });
-
   it('login as admin', () => {
     expect(browser.getCurrentUrl()).toContain('/login');
     login.loginAs('admin');

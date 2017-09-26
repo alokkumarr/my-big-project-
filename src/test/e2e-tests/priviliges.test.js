@@ -12,6 +12,7 @@ function isOptionPresent(options, optionName) {
 }
 
 describe('Privileges', () => {
+
   describe('for Admin', () => {
     it('should land on login page', () => {
       browser.sleep(2000);
