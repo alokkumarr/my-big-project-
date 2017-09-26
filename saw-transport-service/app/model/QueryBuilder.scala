@@ -21,7 +21,7 @@ object QueryBuilder {
       case obj: JValue => unexpectedElement(obj, "object", "sqlBuilder")
     }
 
-    if (DSK !=null) {
+    if (DSK!=null && (!DSK.equals("") || !DSK.equals("NA"))) {
       whereClause = "%s %s %s %s %s".format(
         buildSelect(artifacts, sqlBuilder),
         buildFrom(artifacts, sqlBuilder),
@@ -150,7 +150,7 @@ object QueryBuilder {
         throw new RuntimeException(
           "Unrecognized boolean criteria: " + booleanCriteria)
       }
-       "WHERE " + filters.mkString(" " + booleanCriteria.toUpperCase + " ") + " AND " + TransportUtils.buildDSK(DSK)
+       "WHERE " + filters.mkString(" " + booleanCriteria.toUpperCase + " ")
     }
   }
 
@@ -172,7 +172,7 @@ object QueryBuilder {
         throw new RuntimeException(
           "Unrecognized boolean criteria: " + booleanCriteria)
       }
-      if (DSK !=null){
+      if((DSK!=null) && (!DSK.equals("") || !DSK.equals("NA"))){
         finalFilter = "WHERE " + filters.mkString(" " + booleanCriteria.toUpperCase + " ") + " AND " + TransportUtils.buildDSK(DSK)
       }
       else {
