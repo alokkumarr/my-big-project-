@@ -147,7 +147,8 @@ class Analysis extends BaseController {
         var parsedDSK : JValue=null
         m_log.trace("Received from pre process request: {}", dataSecurityKey)
         m_log.trace("Received from post process request: {}", dskString)
-        if((dskString!=null) || (!dskString.equals("") || !dskStr.equals("NA"))) {
+        if((dskString!=null) && (!dskString.equals("") || !dskString.equals("NA")))
+        {
         val dskStr = "{ \"dataSecurityKey\" :" +dataSecurityKey.asInstanceOf[String].toString + "}";
         m_log.trace("dskStr: {}", dskStr);
         parsedDSK = parse(dskStr);
