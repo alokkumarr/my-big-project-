@@ -143,16 +143,13 @@ class Analysis extends BaseController {
             (ticket.dataSecurityKey)
         }
         val dskString = dataSecurityKey.asInstanceOf[String].toString;
-        val dskStr : String =null
-        var parsedDSK : JValue=null
+        var dskStr : String =null
         m_log.trace("Received from pre process request: {}", dataSecurityKey)
         m_log.trace("Received from post process request: {}", dskString)
-        if((dskString!=null) && (!dskString.equals("") || !dskString.equals("NA")))
-        {
-        val dskStr = "{ \"dataSecurityKey\" :" +dataSecurityKey.asInstanceOf[String].toString + "}";
-        m_log.trace("dskStr: {}", dskStr);
-        parsedDSK = parse(dskStr);
-          m_log.trace("parsedDskStr dataset: {}", parsedDSK);
+        if((dskString!=null)) {
+          if (!dskString.equals("") && !dskString.equals("NA")){
+        dskStr = "{ \"dataSecurityKey\" :" +dataSecurityKey.asInstanceOf[String].toString + "}";
+        m_log.trace("dskStr: {}", dskStr);}
         }
 
         var queryRuntime: String = null
@@ -334,7 +331,7 @@ class Analysis extends BaseController {
     if ( typeInfo.equals("pivot") )
     {
       var data : String= null
-      if (dataSecurityKeyStr!=null || (!dataSecurityKeyStr.equals("") || (!dataSecurityKeyStr.equals("NA")))) {
+      if (dataSecurityKeyStr!=null) {
         data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json, dataSecurityKeyStr), json);
       }
@@ -409,7 +406,7 @@ class Analysis extends BaseController {
     }
     if ( typeInfo.equals("chart") ){
       var data : String = null
-      if (dataSecurityKeyStr!=null || (!dataSecurityKeyStr.equals("") || (!dataSecurityKeyStr.equals("NA")))) {
+      if (dataSecurityKeyStr!=null) {
         data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json, dataSecurityKeyStr), json);
       }
