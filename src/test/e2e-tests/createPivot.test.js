@@ -17,6 +17,11 @@ describe('create a new pivot type analysis', () => {
   const metric = 'MCT Content';
   const method = 'table:pivot';
 
+  afterAll(function() {
+    browser.executeScript('window.sessionStorage.clear();');
+    browser.executeScript('window.localStorage.clear();');
+  });
+
   it('login as admin', () => {
     browser.waitForAngular();
     expect(browser.getCurrentUrl()).toContain('/login');

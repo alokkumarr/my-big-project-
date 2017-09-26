@@ -36,7 +36,7 @@ exports.config = {
     ],
 
     analyses: [
-      // webpackHelper.root('src/test/e2e-tests/priviliges.test.js'),
+      webpackHelper.root('src/test/e2e-tests/priviliges.test.js'),
       webpackHelper.root('src/test/e2e-tests/goToAnalyze.test.js'),
       webpackHelper.root('src/test/e2e-tests/createChart.test.js'),
       webpackHelper.root('src/test/e2e-tests/createPivot.test.js'),
