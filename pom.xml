@@ -82,7 +82,7 @@
                   <link>saw-mapr</link>
                 </links>
                 <ports> 
-                  <port>80:80</port>
+                  <port>saw.port:80</port>
                 </ports>
                 <!-- Run privileged for systemd -->
                 <privileged>true</privileged>
