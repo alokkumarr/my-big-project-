@@ -1,9 +1,13 @@
 create-dashboard {
+  display: flex;
+  flex-wrap: wrap;
+
   .has-movable {
     margin: 20px 5px;
     padding: 20px;
     border: 3px solid #9CE09C;
     min-height: 100px;
+    width: 45%;
 
     &.draggedOver {
       background-color: #DBFDDB;

@@ -1,9 +1,17 @@
-<div class="has-movable">
-  <li draggable *ngFor="let analysis of loadedAnalyses" [dragData]="analysis">
+<div class="has-movable" [dragOverClass]="'draggedOver'" [dragHintClass]="'dragHinted'" droppable (onDrop)="onDrop($event, this.loadedAnalyses)">
+  <li draggable *ngFor="let analysis of loadedAnalyses" [dragData]="{collection: 'loadedAnalyses', analysis: analysis}">
     {{analysis.name}}
   </li>
 </div>
 
-<div class="has-movable" [dragOverClass]="'draggedOver'" [dragHintClass]="'dragHinted'" droppable (onDrop)="onDrop($event)">
-  <li *ngFor="let analysis of chosenAnalyses">{{analysis.name}}</li>
+<div class="has-movable" [dragOverClass]="'draggedOver'" [dragHintClass]="'dragHinted'" droppable (onDrop)="onDrop($event, this.chosenAnalyses1)">
+  <li draggable *ngFor="let analysis of chosenAnalyses1" [dragData]="{collection: 'chosenAnalyses1', analysis: analysis}">{{analysis.name}}</li>
+</div>
+
+<div class="has-movable" [dragOverClass]="'draggedOver'" [dragHintClass]="'dragHinted'" droppable (onDrop)="onDrop($event, this.chosenAnalyses2)">
+  <li draggable *ngFor="let analysis of chosenAnalyses2" [dragData]="{collection: 'chosenAnalyses2', analysis: analysis}">{{analysis.name}}</li>
+</div>
+
+<div class="has-movable" [dragOverClass]="'draggedOver'" [dragHintClass]="'dragHinted'" droppable (onDrop)="onDrop($event, this.chosenAnalyses3)">
+  <li draggable *ngFor="let analysis of chosenAnalyses3" [dragData]="{collection: 'chosenAnalyses3', analysis: analysis}">{{analysis.name}}</li>
 </div>

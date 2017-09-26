@@ -19,10 +19,17 @@ export class CreateDashboardComponent {
     name: 'Sample Report Analysis'
   }];
 
-  public chosenAnalyses = [];
+  public chosenAnalyses1 = [];
+  public chosenAnalyses2 = [];
+  public chosenAnalyses3 = [];
 
-  onDrop(data) {
-    this.loadedAnalyses = this.loadedAnalyses.filter(analysis => analysis.id !== data.dragData.id);
-    this.chosenAnalyses.push(data.dragData);
+  onDrop(data, collection) {
+    const movedAnalysis = data.dragData.analysis;
+    const present = collection.filter(an => an.id === movedAnalysis.id);
+    if (present.length > 0) {
+      return;
+    }
+    this[data.dragData.collection] = this[data.dragData.collection].filter(an => an.id !== data.dragData.analysis.id);
+    collection.push(movedAnalysis);
   }
 }
