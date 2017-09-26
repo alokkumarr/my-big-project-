@@ -1,0 +1,9 @@
+<div class="has-movable">
+  <li draggable *ngFor="let analysis of loadedAnalyses" [dragData]="analysis">
+    {{analysis.name}}
+  </li>
+</div>
+
+<div class="has-movable" [dragOverClass]="'draggedOver'" [dragHintClass]="'dragHinted'" droppable (onDrop)="onDrop($event)">
+  <li *ngFor="let analysis of chosenAnalyses">{{analysis.name}}</li>
+</div>
