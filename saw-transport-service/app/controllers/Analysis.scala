@@ -145,7 +145,7 @@ class Analysis extends BaseController {
         val dskString = dataSecurityKey.asInstanceOf[String].toString;
         val dskStr : String =null
         var parsedDSK : JValue=null
-        if(!dskString.equals("") && !dskStr.equals("NA")) {
+        if((dskString!=null) && (!dskString.equals("") && !dskStr.equals("NA"))) {
         val dskStr = "{ \"dataSecurityKey\" :" +dataSecurityKey.asInstanceOf[String].toString + "}";
         m_log.trace("dskStr: {}", dskStr);
         parsedDSK = parse(dskStr);
@@ -331,7 +331,7 @@ class Analysis extends BaseController {
     if ( typeInfo.equals("pivot") )
     {
       var data : String= null
-      if (dataSecurityKeyStr!=null || !dataSecurityKeyStr.equals("")) {
+      if (dataSecurityKeyStr!=null || (!dataSecurityKeyStr.equals("") || (!dataSecurityKeyStr.equals("NA")))) {
         data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json, dataSecurityKeyStr), json);
       }
@@ -406,7 +406,7 @@ class Analysis extends BaseController {
     }
     if ( typeInfo.equals("chart") ){
       var data : String = null
-      if (dataSecurityKeyStr!=null || !dataSecurityKeyStr.equals("")) {
+      if (dataSecurityKeyStr!=null || (!dataSecurityKeyStr.equals("") || (!dataSecurityKeyStr.equals("NA")))) {
         data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json, dataSecurityKeyStr), json);
       }
