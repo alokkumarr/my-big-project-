@@ -8,7 +8,8 @@ import org.json4s.native.JsonMethods._
 object QueryBuilder {
   implicit val formats = DefaultFormats
 
-  def build(json: JValue, runtime: Boolean = false): String = {
+  def build(json: JValue, runtime: Boolean = false, DSK: String): String = {
+    var whereClause : String =null
     val artifacts = json \ "artifacts" match {
       case artifacts: JArray => artifacts.arr
       case JNothing => List()
@@ -19,13 +20,27 @@ object QueryBuilder {
       case JNothing => JObject()
       case obj: JValue => unexpectedElement(obj, "object", "sqlBuilder")
     }
-    "%s %s %s %s %s".format(
-      buildSelect(artifacts, sqlBuilder),
-      buildFrom(artifacts, sqlBuilder),
-      buildWhere(sqlBuilder, runtime),
-      buildGroupBy(artifacts, sqlBuilder),
-      buildOrderBy(sqlBuilder)
-    ).replaceAll("\\s+", " ").trim
+
+    if (DSK !=null) {
+      whereClause = "%s %s %s %s %s".format(
+        buildSelect(artifacts, sqlBuilder),
+        buildFrom(artifacts, sqlBuilder),
+        buildWhere(sqlBuilder, runtime, DSK),
+        buildGroupBy(artifacts, sqlBuilder),
+        buildOrderBy(sqlBuilder)
+      ).replaceAll("\\s+", " ").trim
+    }
+    else {
+      whereClause = "%s %s %s %s %s".format(
+        buildSelect(artifacts, sqlBuilder),
+        buildFrom(artifacts, sqlBuilder),
+        buildWhere(sqlBuilder, runtime),
+        buildGroupBy(artifacts, sqlBuilder),
+        buildOrderBy(sqlBuilder)
+      ).replaceAll("\\s+", " ").trim
+
+    }
+    whereClause
   }
 
   private def buildSelect(artifacts: List[JValue], sqlBuilder: JObject) = {
@@ -118,6 +133,7 @@ object QueryBuilder {
   }
 
   private def buildWhere(sqlBuilder: JObject, runtime: Boolean): String = {
+
     val filters = ((sqlBuilder \ "filters") match {
       case filters: JArray => filters.arr
       case JNothing => List()
@@ -134,7 +150,35 @@ object QueryBuilder {
         throw new RuntimeException(
           "Unrecognized boolean criteria: " + booleanCriteria)
       }
-      "WHERE " + filters.mkString(" " + booleanCriteria.toUpperCase + " ")
+       "WHERE " + filters.mkString(" " + booleanCriteria.toUpperCase + " ") + " AND " + TransportUtils.buildDSK(DSK)
+    }
+  }
+
+  private def buildWhere(sqlBuilder: JObject, runtime: Boolean, DSK :String): String = {
+    var finalFilter : String = null
+    val filters = ((sqlBuilder \ "filters") match {
+      case filters: JArray => filters.arr
+      case JNothing => List()
+      case json: JValue => unexpectedElement(json, "array", "filters")
+    }).filter((filter: JValue) => {
+      !(filter \ "isRuntimeFilter").extract[Boolean] || runtime
+    }).map(buildWhereFilterElement)
+    if (filters.isEmpty) {
+      ""
+    } else {
+      val booleanCriteria = (
+        sqlBuilder \ "booleanCriteria").extractOrElse[String]("and").toLowerCase
+      if (!List("and", "or").contains(booleanCriteria)) {
+        throw new RuntimeException(
+          "Unrecognized boolean criteria: " + booleanCriteria)
+      }
+      if (DSK !=null){
+        finalFilter = "WHERE " + filters.mkString(" " + booleanCriteria.toUpperCase + " ") + " AND " + TransportUtils.buildDSK(DSK)
+      }
+      else {
+        finalFilter = "WHERE " + filters.mkString(" " + booleanCriteria.toUpperCase + " ")
+      }
+      finalFilter
     }
   }
 

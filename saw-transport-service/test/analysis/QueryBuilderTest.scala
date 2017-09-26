@@ -146,7 +146,7 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     val sqlBuilderJson = if (sqlBuilders.isEmpty)
       JObject() else sqlBuilders.reduceLeft(_ merge _)
     QueryBuilder.build(("artifacts", artifacts) ~
-      ("sqlBuilder", sqlBuilderJson))
+      ("sqlBuilder", sqlBuilderJson),false, null)
   }
 
   private def artifact(name: String)(columns: String*)(

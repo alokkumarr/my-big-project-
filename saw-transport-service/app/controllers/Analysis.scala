@@ -73,6 +73,18 @@ class Analysis extends BaseController {
 
   private def doProcess(json: JValue, ticket: Option[Ticket]): JValue = {
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
+    val (dataSecurityKey: String) = ticket match {
+      case None => throw new ClientException(
+        "Valid JWT not found in Authorization header")
+      case Some(ticket) =>
+        (ticket.dataSecurityKey)
+    }
+    val dskString = dataSecurityKey.asInstanceOf[String].toString;
+    var dskStr : String =null
+    if(!dskString.equals("") && !dskStr.equals("NA")) {
+      dskStr = "{ \"dataSecurityKey\" :" +dataSecurityKey.asInstanceOf[String].toString + "}";
+      m_log.trace("dskStr: {}", dskStr);
+    }
     action match {
       case "create" => {
         val semanticId = extractAnalysisId(json)
@@ -111,7 +123,7 @@ class Analysis extends BaseController {
       case "update" => {
         val analysisId = extractAnalysisId(json)
         val analysisNode = AnalysisNode(analysisId)
-        val responseJson = analysisJson(json)
+        val responseJson = analysisJson(json, dskStr)
         analysisNode.setDefinition(responseJson)
         val (result, message) = analysisNode.update(
           Map("id" -> analysisId))
@@ -136,26 +148,10 @@ class Analysis extends BaseController {
       }
       case "execute" => {
         val analysisId = extractAnalysisId(json)
-        val (dataSecurityKey: String) = ticket match {
-          case None => throw new ClientException(
-            "Valid JWT not found in Authorization header")
-          case Some(ticket) =>
-            (ticket.dataSecurityKey)
-        }
-        val dskString = dataSecurityKey.asInstanceOf[String].toString;
-        val dskStr : String =null
-        var parsedDSK : JValue=null
-        if(!dskString.equals("") && !dskStr.equals("NA")) {
-        val dskStr = "{ \"dataSecurityKey\" :" +dataSecurityKey.asInstanceOf[String].toString + "}";
-        m_log.trace("dskStr: {}", dskStr);
-        parsedDSK = parse(dskStr);
-          m_log.trace("parsedDskStr dataset: {}", parsedDSK);
-        }
-
         var queryRuntime: String = null
         (json \ "contents" \ "analyze") match {
           case obj: JArray => {
-            val analysis = analysisJson(json)
+            val analysis = analysisJson(json, dskStr)
             val analysisType = (analysis \ "type")
     	    val typeInfo = analysisType.extract[String]
     	    if (typeInfo.equals("report"))
@@ -165,7 +161,7 @@ class Analysis extends BaseController {
 	        .extractOrElse[String]("interactive")
 	      val runtime = (executionType == "interactive")
               queryRuntime = (analysis \ "queryManual") match {
-                case JNothing => QueryBuilder.build(analysis, runtime)
+                case JNothing => QueryBuilder.build(analysis, runtime, dskStr)
                 case obj: JString => obj.extract[String]
                 case obj => unexpectedElement("string", obj)
               }
@@ -206,7 +202,7 @@ class Analysis extends BaseController {
     }
   }
 
-  def analysisJson(json: JValue): JObject = {
+  def analysisJson(json: JValue, DSK : String): JObject = {
     val analysisListJson = json \ "contents" \ "analyze"
     val analysisJson = analysisListJson match {
       case array: JArray => {
@@ -233,7 +229,7 @@ class Analysis extends BaseController {
     val typeInfo = analysisType.extract[String];
     if ( typeInfo.equals("report") ){
     val query = (analysis \ "queryManual") match {
-      case JNothing => QueryBuilder.build(analysis)
+      case JNothing => QueryBuilder.build(analysis,false,DSK)
       case obj: JString => ""
       case obj => unexpectedElement("string", obj)
     }
@@ -301,7 +297,7 @@ class Analysis extends BaseController {
     val start = (reqJSON \ "contents" \ "page").extractOrElse(0)
     val limit = (reqJSON \ "contents" \ "pageSize").extractOrElse(10)
     val analysis = (reqJSON \ "contents" \ "analyze") match {
-      case obj: JArray => analysisJson(reqJSON); // reading from request body
+      case obj: JArray => analysisJson(reqJSON, dataSecurityKeyStr); // reading from request body
       case _ => null
     }
     if (analysis == null) {
@@ -478,7 +474,7 @@ class Analysis extends BaseController {
     else {
       // This is the part of report type starts here
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
-      val query = if (queryRuntime != null) queryRuntime else QueryBuilder.build(analysisJSON, false)
+      val query = if (queryRuntime != null) queryRuntime else QueryBuilder.build(analysisJSON, false, dataSecurityKeyStr)
       val execution = analysis.executeAndWait(ExecutionType.onetime, query)
       val analysisResultId: String = execution.getId
       //TODO:: Subject to change: to get ALL data use:  val resultData = execution.getAllData
