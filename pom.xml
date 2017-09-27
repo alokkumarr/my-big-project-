@@ -40,7 +40,7 @@
       <plugin>
         <groupId>io.fabric8</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>0.21.0</version>
+        <version>0.22.1</version>
         <configuration>
           <!-- Start containers in parallel to reduce startup time -->
           <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
@@ -86,6 +86,13 @@
                 </ports>
                 <!-- Run privileged for systemd -->
                 <privileged>true</privileged>
+                <!-- Bind mount volume for saving system logs in case
+                     needed for troubleshooting after a failed run -->
+                <volumes>
+                  <bind>
+                    <volume>${project.build.directory}:/build</volume>
+                  </bind>
+                </volumes>
                 <wait>
                   <!-- Wait until the container health check reports
                        that systemd services are up and running -->
