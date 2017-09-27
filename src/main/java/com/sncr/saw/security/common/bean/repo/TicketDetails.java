@@ -5,8 +5,6 @@ package com.sncr.saw.security.common.bean.repo;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author gsan0003
@@ -26,7 +24,7 @@ public class TicketDetails implements Serializable {
 	private String compName;
 	private String roleCode;
 	private String roleType;
-	private Map<String, List<String>> dataSKey;
+	private String dataSKey;
 	private Long userId;
 	private ArrayList<Products> products;
 	
@@ -65,11 +63,11 @@ public class TicketDetails implements Serializable {
 		this.custID = custID;
 	}
 
-	public Map<String, List<String>> getDataSKey() {
+	public String getDataSKey() {
 		return dataSKey;
 	}
 
-	public void setDataSKey(Map<String, List<String>> dataSKey) {
+	public void setDataSKey(String dataSKey) {
 		this.dataSKey = dataSKey;
 	}
 
