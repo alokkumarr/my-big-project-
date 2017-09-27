@@ -3,14 +3,15 @@
  */
 package com.sncr.saw.security.common.bean;
 
-import java.io.Serializable;
-import java.util.ArrayList;
+import com.sncr.saw.security.common.bean.repo.Products;
+import com.sncr.saw.security.common.constants.SSOCommonConstants;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import com.sncr.saw.security.common.bean.repo.Products;
-import com.sncr.saw.security.common.constants.SSOCommonConstants;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 
 
@@ -37,7 +38,7 @@ public class Ticket implements Serializable {
 	private String roleCode;
 	private String roleType;
 	private Long createdTime;	
-	private String dataSecurityKey;	
+	private Map<String, List<String>> dataSecurityKey;
 	private String error;
 	private String custID;
 	private String custCode;
@@ -106,15 +107,15 @@ public class Ticket implements Serializable {
 	 */
 	private String validityReason;	
 	
-	public String getDataSecurityKey() {
+	public Map<String,List<String>> getDataSecurityKey() {
 		return dataSecurityKey;
 	}
 
-	public void setDataSecurityKey(String dataSecurityKey) {
+	public void setDataSecurityKey(Map<String,List<String>> dataSecurityKey) {
 		this.dataSecurityKey = dataSecurityKey;
 	}
-	
-	
+
+
 	public String getDefaultProdID() {
 		return defaultProdID;
 	}
@@ -264,7 +265,7 @@ public class Ticket implements Serializable {
 	}
 
 	/**
-	 * @param userName the userName to set
+	 * @param userFullName the userName to set
 	 */
 	public void setUserFullName(String userFullName) {
 		this.userFullName = userFullName;
