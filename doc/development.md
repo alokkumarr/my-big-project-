@@ -48,7 +48,12 @@ system tests can be run.
 To build and run a Docker container that runs the SAW system in
 development mode, execute the following command:
 
+        $ ext/prepare-dev
         $ mvn package docker:build docker:start -DskipTests -Dsaw.port=80
+
+Note: The above assumes that `saw`, `saw-security`, `saw-services` and
+`saw-web` are all checked out in the same directory.  The
+`ext/prepare-dev` will exit with an error if they are not.
 
 After that the SAW Web application can be accessed
 at [http://localhost/](http://localhost/).  To enter a shell inside

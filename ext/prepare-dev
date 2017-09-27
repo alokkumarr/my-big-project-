@@ -32,9 +32,14 @@ mvn_web() {
 modules="${1:-security services web}"
 for module in $modules; do
     echo "+ build $module"
-    (cd $repos/saw-$module && .mvn/update-revision)
+    repo=$repos/saw-$module
+    if [ ! -d $repo ]; then
+        echo "Error: Expected repository at $repo, but directory not found"
+        exit 1
+    fi
+    (cd $repo && .mvn/update-revision)
     mvn_$module
-    (cd $repos/saw-$module && git checkout .mvn/maven.config)
+    (cd $repo && git checkout .mvn/maven.config)
 done
 
 ext/prepare
