@@ -13,6 +13,11 @@ function isOptionPresent(options, optionName) {
 
 describe('Privileges', () => {
 
+  afterAll(function() {
+    browser.executeScript('window.sessionStorage.clear();');
+    browser.executeScript('window.localStorage.clear();');
+  });
+
   describe('for Admin', () => {
     it('should land on login page', () => {
       browser.sleep(2000);

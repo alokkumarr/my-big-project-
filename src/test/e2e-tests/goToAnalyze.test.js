@@ -4,6 +4,11 @@ const analyze = require('../javascript/pages/common/analyze.po.js');
 const ec = protractor.ExpectedConditions;
 
 describe('should go to Analyze page after landing on home page', () => {
+  afterAll(function() {
+    browser.executeScript('window.sessionStorage.clear();');
+    browser.executeScript('window.localStorage.clear();');
+  });
+
   it('login as admin', () => {
     expect(browser.getCurrentUrl()).toContain('/login');
     login.loginAs('admin');

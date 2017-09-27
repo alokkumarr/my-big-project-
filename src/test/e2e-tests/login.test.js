@@ -4,6 +4,11 @@ const analyze = require('../javascript/pages/common/analyze.po.js');
 
 describe('Login Tests', () => {
 
+  afterAll(function() {
+    browser.executeScript('window.sessionStorage.clear();');
+    browser.executeScript('window.localStorage.clear();');
+  });
+
   it('should land on login page', () => {
     expect(browser.getCurrentUrl()).toContain('/login');
   });
