@@ -136,7 +136,7 @@ class AllFieldsAvailablePivot {
     	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
         		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_1"))));
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))));
       } // !dataFields.isEmpty()
     } // end of columnFields.size()==1
 
@@ -294,7 +294,7 @@ class AllFieldsAvailablePivot {
         		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3"))
         		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4"))
         		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_2"))));
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))));
       } // !dataFields.isEmpty()
     } // end of columnFields.size()==2
 
@@ -396,7 +396,7 @@ class AllFieldsAvailablePivot {
         		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(4),"row_level_5"))
         		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
         		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_3"))));
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3"))));
       } // !dataFields.isEmpty()
     } // end of columnFields.size()==3
 

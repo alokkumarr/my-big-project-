@@ -37,7 +37,7 @@ public class ChartMainSampleClass {
     System.setProperty("host", "10.48.72.74");
     System.setProperty("port", "9300");
     System.setProperty("cluster", "sncr-salesdemo");
-    System.setProperty("schema.chart", "/Users/Shared/WORK/SAW-BE/saw-es-querybuilder/src/main/resources/schema/chart_querybuilder_schema.json");
+    System.setProperty("schema.chart", "/Users/Shared/WORK/saw-services/saw-es-querybuilder/src/main/resources/schema/chart_querybuilder_schema.json");
 
     // This is the entry point for /analysis service as JSONString not as file
     JsonNode objectNode =
