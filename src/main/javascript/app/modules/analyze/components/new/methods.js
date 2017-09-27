@@ -40,6 +40,11 @@ const methods = [
         type: 'chart:line'
       },
       {
+        label: 'Combo Chart',
+        icon: {font: 'icon-chart-combo'},
+        type: 'chart:combo'
+      },
+      {
         label: 'Scatter Plot',
         icon: {font: 'icon-chart-scatter'},
         type: 'chart:scatter'

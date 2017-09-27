@@ -6,7 +6,8 @@ import * as unset from 'lodash/unset';
 
 import * as template from './analyze-chart-settings.component.html';
 import style from './analyze-chart-settings.component.scss';
-import {AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE, AGGREGATE_TYPES_OBJ, NUMBER_TYPES, DATE_TYPES} from '../../../consts';
+import {AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE, COMBO_TYPES,
+  AGGREGATE_TYPES_OBJ, NUMBER_TYPES, DATE_TYPES} from '../../../consts';
 
 const DATE_FORMATS = [{
   value: 'MMMM Do YYYY, h:mm:ss a',
@@ -129,6 +130,14 @@ export const AnalyzeChartSettingsComponent = {
         if (!selectedAttr.aggregate) {
           selectedAttr.aggregate = DEFAULT_AGGREGATE_TYPE.value;
           target.aggregate = DEFAULT_AGGREGATE_TYPE.value;
+        }
+        if (!selectedAttr.comboType) {
+          if (['line', 'column'].includes(this.chartType)) {
+            target.comboType = this.chartType;
+          }
+          if (this.chartType === 'combo') {
+            target.comboType = 'column';
+          }
         }
       } else {
         target.checked = false;

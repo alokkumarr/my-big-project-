@@ -18,15 +18,15 @@ import * as template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
 import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
-import {ENTRY_MODES, NUMBER_TYPES} from '../../consts';
+import {ENTRY_MODES, NUMBER_TYPES, COMBO_TYPES} from '../../consts';
 
-const BAR_COLUMN_OPTIONS = [{
-  label: 'TOOLTIP_BAR_CHART',
-  type: 'bar',
+const INVERTING_OPTIONS = [{
+  label: 'TOOLTIP_INVERTED',
+  type: true,
   icon: {font: 'icon-hor-bar-chart'}
 }, {
-  label: 'TOOLTIP_COLUMN_CHART',
-  type: 'column',
+  label: 'TOOLTIP_NOT_INVERTED',
+  type: false,
   icon: {font: 'icon-vert-bar-chart'}
 }];
 
@@ -50,7 +50,8 @@ export const AnalyzeChartComponent = {
       this._$timeout = $timeout;
       this._$translate = $translate;
       this._toastMessage = toastMessage;
-      this.BAR_COLUMN_OPTIONS = BAR_COLUMN_OPTIONS;
+      this.INVERTING_OPTIONS = INVERTING_OPTIONS;
+      this.COMBO_TYPES = COMBO_TYPES;
       this.sortFields = [];
       this.sorts = [];
 
@@ -72,8 +73,9 @@ export const AnalyzeChartComponent = {
 
       this.chartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
 
-      this.barColumnChoice = '';
+      this.isInverted = false;
       this.chartViewOptions = ChartService.getViewOptionsFor(this.model.chartType);
+      this.invertableCharts = ['column', 'bar', 'line', 'area', 'combo'];
     }
 
     toggleLeft() {
@@ -82,8 +84,10 @@ export const AnalyzeChartComponent = {
 
     $onInit() {
       const chartType = this.model.chartType;
-      // used only for bar or column type charts
-      this.barColumnChoice = ['bar', 'column'].includes(chartType) ? chartType : '';
+
+      if (this.chartType === 'column') {
+        this.isInverted = true;
+      }
 
       if (this.mode === ENTRY_MODES.FORK) {
         delete this.model.id;
@@ -102,6 +106,7 @@ export const AnalyzeChartComponent = {
     }
 
     initChart() {
+      console.log('chartType: ', this.model.chartType);
       this._ChartService.updateAnalysisModel(this.model);
       this.settings = this._ChartService.fillSettings(this.model.artifacts, this.model);
       this.sortFields = this._SortService.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
@@ -126,15 +131,10 @@ export const AnalyzeChartComponent = {
       });
     }
 
-    toggleBarColumn() {
-      if (this.model.chartType === 'bar') {
-        this.model.chartType = 'column';
-      } else if (this.model.chartType === 'column') {
-        this.model.chartType = 'bar';
-      }
+    toggleChartInversion() {
       this.updateChart.next([{
-        path: 'chart.type',
-        data: this.model.chartType
+        path: 'chart.inverted',
+        data: this.isInverted
       }]);
     }
 

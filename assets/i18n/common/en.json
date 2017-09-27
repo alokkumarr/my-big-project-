@@ -88,6 +88,8 @@
   "TOOLTIP_BAR_CHART": "Bar Chart",
   "TOOLTIP_COLUMN_CHART": "Column Chart",
   "TOOLTIP_ACCOUNT_SETTINGS": "Account Settings",
+  "TOOLTIP_INVERTED": "Inverted",
+  "TOOLTIP_NOT_INVERTED": "Not Inverted",
 
   "ERROR_OOPS_SERVER": "Oops, it looks like something went wrong with the server, if you see this message regularly, please contact customer support."
 }

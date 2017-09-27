@@ -35,6 +35,7 @@
         on-change="$ctrl.onSettingsChanged(settings)"
         chart-type="$ctrl.model.chartType"
     ></analyze-chart-settings>
+    <div>
     <div layout="column">
       <md-toolbar class="secondary-toolbar chart-options-toolbar">
         <div class="md-toolbar-tools"
@@ -43,10 +44,10 @@
             <choice-group size="m"
                           icon-only="true"
                           style="margin-right: 10px;"
-                          items="$ctrl.BAR_COLUMN_OPTIONS"
-                          ng-if="$ctrl.barColumnChoice"
-                          ng-model="$ctrl.barColumnChoice"
-                          ng-change="$ctrl.toggleBarColumn()">
+                          items="$ctrl.INVERTING_OPTIONS"
+                          ng-if="$ctrl.invertableCharts.includes($ctrl.model.chartType)"
+                          ng-model="$ctrl.isInverted"
+                          ng-change="$ctrl.toggleChartInversion()">
             </choice-group>
             <span class="md-title"
                   e2e="designer-type-chart"
@@ -85,14 +86,14 @@
         </div>
       </md-toolbar>
 
-      <chart updater="$ctrl.updateChart" options="$ctrl.chartOptions"></chart>
+      <chart ng-if="$ctrl.gridData.length" updater="$ctrl.updateChart" options="$ctrl.chartOptions"></chart>
       <md-card class="chart-container-card">
         <md-card-content layout="column">
           <filter-chips filters="$ctrl.filters"
                         on-clear-all-filters="$ctrl.onClearAllFilters()"
                         on-filter-removed="$ctrl.onFilterRemoved(index)">
           </filter-chips>
-          <h3 translate="CUSTOM_AXIS_LABELS"></h3>
+          <h3 translate="CHART_OPTIONS"></h3>
           <div layout="column">
             <div layout="row" layout-align="center">
               <md-input-container flex ng-if="::$ctrl.chartViewOptions.renamable.y">
@@ -126,6 +127,31 @@
             </div>
           </div>
 
+          <div layout="column">
+            <div ng-repeat="y in $ctrl.settings.yaxis | filter:{checked: 'y'} track by y.columnName"
+                 style="padding-bottom:5px;">
+              <div layout="row" layout-align="center">
+                <md-select ng-model="y.comboType">
+                  <md-option ng-repeat="type in $ctrl.COMBO_TYPES"
+                              ng-value="type.value">
+                    <md-icon md-font-icon="{{::type.icon}}"></md-icon>
+                    <span ng-bind="type.label"></span>
+                  </md-option>
+                </md-select>
+                <md-input-container flex md-no-float>
+                    <input ng-model="y.alias" placeholder="{{y.displayName}}"/>
+                </md-input-container>
+              </div>
+            </div>
+            <md-input-container flex ng-if="::$ctrl.chartViewOptions.renamable.x">
+              <label ng-bind="::('Custom ' + $ctrl.chartViewOptions.axisLabels.x + ' Label')"></label>
+              <input ng-model="$ctrl.labels.tempX"/>
+            </md-input-container>
+            <md-button flex="nogrow" class="btn-primary" ng-click="$ctrl.updateCustomLabels()">
+              <span translate="APPLY"></span>
+            </md-button>
+          </div>
+
           <h3 translate="LEGEND_OPTIONS" ng-if="::$ctrl.chartViewOptions.legend"></h3>
           <div layout="row" layout-align="center" ng-if="::$ctrl.chartViewOptions.legend">
             <md-input-container flex>
@@ -144,5 +170,6 @@
         </md-card-content>
       </md-card>
     </div>
+  </div>
   </analyze-dialog-content>
 </analyze-dialog>

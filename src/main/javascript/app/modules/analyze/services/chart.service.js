@@ -135,7 +135,7 @@ export function ChartService(Highcharts) {
 
     const config = {
       chart: {
-        type: (type === 'line' ? 'spline' : type) || 'column',
+        type: type === 'combo' ? null : type,
         spacingLeft: SPACING,
         spacingRight: SPACING,
         spacingBottom: SPACING,
@@ -171,8 +171,12 @@ export function ChartService(Highcharts) {
   /* Provides view related configuration for various chart types */
   function getViewOptionsFor(type) {
     const config = {
+      yAxisLabels: [],
       axisLabels: {
-        x: 'X-Axis', y: 'Y-Axis', z: 'Z-Axis', g: 'Group By'
+        x: 'X-Axis',
+        y: 'Y-Axis',
+        z: 'Z-Axis',
+        g: 'Group By'
       },
       renamable: {
         x: true, y: true, z: false, g: false
@@ -283,11 +287,9 @@ export function ChartService(Highcharts) {
     } else {
       const axesFieldNameMap = getAxesFieldNameMap(fields);
       const yField = fields.y[0];
-      series = [{
-        name: yField.alias || yField.displayName,
-        data: map(parsedData,
-          dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val]))
-      }];
+      series = [getSerie(yField)];
+      series[0].data = map(parsedData,
+        dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val]))
     }
     // split out categories frem the data
     forEach(series, serie => {
@@ -307,6 +309,30 @@ export function ChartService(Highcharts) {
       series,
       categories
     };
+  }
+
+  function getSerie({alias, displayName, comboType, aggregate}) {
+    return {
+      name: `${AGGREGATE_TYPES_OBJ[aggregate].label} ${alias || displayName}`,
+      type: comboType,
+      data: []
+    }
+  }
+
+  function splitSeriesByYAxes(parsedData, fields) {
+    const axesFieldNameMap = getAxesFieldNameMap(fields, 'y');
+    const series = map(fields.y, getSerie);
+
+    forEach(parsedData, dataPoint => {
+      forEach(fields.y, (field, index) => {
+        series[index].data.push(assign(
+          {y: dataPoint[field.columnName]},
+          mapValues(axesFieldNameMap, val => dataPoint[val])
+        ));
+      });
+    });
+
+    return series;
   }
 
   function formatDatesIfNeeded(parsedData, dateFields) {
@@ -330,24 +356,6 @@ export function ChartService(Highcharts) {
     )(parsedData);
   }
 
-  function splitSeriesByYAxes(parsedData, fields) {
-    const axesFieldNameMap = getAxesFieldNameMap(fields, 'y');
-    const series = map(fields.y, ({alias, displayName, aggregate}) => ({
-      name: `${AGGREGATE_TYPES_OBJ[aggregate].label} ${alias || displayName}`,
-      data: []
-    }));
-
-    forEach(parsedData, dataPoint => {
-      forEach(fields.y, (field, index) => {
-        series[index].data.push(assign(
-          {y: dataPoint[field.columnName]},
-          mapValues(axesFieldNameMap, val => dataPoint[val])
-        ));
-      });
-    });
-
-    return series;
-  }
 
   /**
    * get the map from colmnNames to the axes, or group
@@ -455,6 +463,7 @@ export function ChartService(Highcharts) {
     case 'stack':
     case 'scatter':
     case 'bubble':
+    case 'combo':
       // the bubble chart already supports the parsed data
       return {chartSeries: series};
 

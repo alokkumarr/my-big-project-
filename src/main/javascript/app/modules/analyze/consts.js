@@ -60,6 +60,20 @@ export const AGGREGATE_TYPES = [{
   icon: 'icon-Count'
 }];
 
+export const COMBO_TYPES = [{
+  label: 'line',
+  value: 'line',
+  icon: 'icon-chart-line'
+}, {
+  label: 'column',
+  value: 'column',
+  icon: 'icon-vert-bar-chart'
+}, {
+  label: 'area',
+  value: 'area',
+  icon: 'icon-vert-bar-chart'
+}];
+
 export const DEFAULT_AGGREGATE_TYPE = AGGREGATE_TYPES[0];
 
 export const AGGREGATE_TYPES_OBJ = fpPipe(
