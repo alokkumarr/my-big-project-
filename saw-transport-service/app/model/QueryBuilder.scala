@@ -4,6 +4,8 @@ import org.json4s._
 import org.json4s.JsonDSL._
 import org.json4s.JsonAST.JValue
 import org.json4s.native.JsonMethods._
+import org.apache.log4j._
+
 
 object QueryBuilder {
   implicit val formats = DefaultFormats
@@ -288,6 +290,8 @@ object QueryBuilder {
         name, expected, location))
   }
 }
+
+
 
 trait Relation {
   def relations: List[String]
