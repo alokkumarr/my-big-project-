@@ -1,0 +1,27 @@
+= SAW Services REST API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+
+SAW Services REST API
+
+== Authenticate
+
+The HTTP request:
+
+include::{snippets}/authenticate/http-request.adoc[]
+
+The HTTP response:
+
+include::{snippets}/authenticate/http-response.adoc[]
+
+== Schedule
+
+The HTTP request:
+
+include::{snippets}/analysis-list/http-request.adoc[]
+
+The HTTP response:
+
+include::{snippets}/analysis-list/http-response.adoc[]
+

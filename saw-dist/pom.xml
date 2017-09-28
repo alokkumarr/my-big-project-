@@ -21,6 +21,24 @@
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <version>3.0.3</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.restdocs</groupId>
+      <artifactId>spring-restdocs-restassured</artifactId>
+      <version>1.2.1.RELEASE</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.9.1</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -60,14 +78,19 @@
 	    </goals>
           </execution>
         </executions>
+        <configuration>
+          <systemPropertyVariables>
+            <saw.docker.port>${saw.docker.port}</saw.docker.port>
+          </systemPropertyVariables>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>io.fabric8</groupId>
         <artifactId>docker-maven-plugin</artifactId>
         <version>0.22.1</version>
         <configuration>
-          <!-- Start containers in parallel to reduce startup time -->
           <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
+          <!-- Start containers in parallel to reduce startup time -->
           <startParallel>true</startParallel>
           <images>
             <image>
@@ -173,6 +196,31 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin> 
+	<groupId>org.asciidoctor</groupId>
+	<artifactId>asciidoctor-maven-plugin</artifactId>
+	<version>1.5.3</version>
+	<executions>
+	  <execution>
+	    <id>generate-docs</id>
+	    <phase>post-integration-test</phase> 
+	    <goals>
+	      <goal>process-asciidoc</goal>
+	    </goals>
+	    <configuration>
+	      <backend>html</backend>
+	      <doctype>book</doctype>
+	    </configuration>
+	  </execution>
+	</executions>
+	<dependencies>
+	  <dependency> 
+	    <groupId>org.springframework.restdocs</groupId>
+	    <artifactId>spring-restdocs-asciidoctor</artifactId>
+	    <version>1.2.1.RELEASE</version>
+	  </dependency>
+	</dependencies>
       </plugin>
     </plugins>
   </build>
