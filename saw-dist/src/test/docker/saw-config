@@ -1,21 +1,35 @@
 #
-# Environment configuration for local testing
+# SAW environment configuration for local testing
 #
 
-[saw-security]
+[saw-proxy]
+localhost ansible_connection=local
+
+[saw-web]
 localhost ansible_connection=local
 
 [saw-services]
 localhost ansible_connection=local
 
 [saw-services:vars]
+#
+# Elasticsearch configuration
+#
 saw_elasticsearch_protocol=http
 saw_elasticsearch_host=elasticsearch01
 saw_elasticsearch_port=9200
 saw_elasticsearch_username=elastic
 saw_elasticsearch_password=xuw3dUraHapret
+
+#
+# Spark configuration
+#
 saw_spark_master_url=spark://mapr02:7077
 saw_zookeeper_quorum=mapr01,mapr02,mapr03,mapr04,mapr05,mapr06,mapr07,mapr08,mapr09,mapr10
+
+#
+# MapR configuration
+#
 # Workaround: The SAW testing environment (Velocity Lab) has the MapR
 # user ID exceptionally set up to be 501, instead of the typical 500,
 # so override it here
@@ -24,8 +38,5 @@ saw_mapr_user_id=501
 #saw_spark_master_url=spark://saw-mapr:7077
 #saw_zookeeper_quorum=saw-mapr
 
-[saw-web]
-localhost ansible_connection=local
-
-[saw-proxy]
+[saw-security]
 localhost ansible_connection=local
