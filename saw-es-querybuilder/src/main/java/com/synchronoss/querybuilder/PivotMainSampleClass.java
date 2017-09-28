@@ -37,12 +37,12 @@ public class PivotMainSampleClass {
     System.setProperty("host", "10.48.72.74");
     System.setProperty("port", "9300");
     System.setProperty("cluster", "sncr-salesdemo");
-    System.setProperty("schema.pivot", "/Users/Shared/WORK/SAW-BE/saw-es-querybuilder/src/main/resources/schema/pivot_querybuilder_schema.json");
+    System.setProperty("schema.pivot", "/Users/Shared/WORK/saw-services/saw-es-querybuilder/src/main/resources/schema/pivot_querybuilder_schema.json");
 
     // This is the entry point for /analysis service as JSONString not as file
     JsonNode objectNode =
         objectMapper.readTree(new File(
-            "/Users/spau0004/Desktop/Sergey/pivot_type_data.json"));
+            "/Users/spau0004/Desktop/Sergey/pivot_type_data_1.json"));
     String pivot = System.getProperty("schema.pivot");
     // JsonNode objectNode = objectMapper.readTree(new File(args[0]));
     String json = "{ \"sqlBuilder\" :" + objectNode.get("sqlBuilder").toString() + "}";

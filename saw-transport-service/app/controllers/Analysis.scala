@@ -124,6 +124,7 @@ class Analysis extends BaseController {
       case "update" => {
         val analysisId = extractAnalysisId(json)
         val analysisNode = AnalysisNode(analysisId)
+        m_log.trace("dskStr after processing inside update block before analysisJson(json, dskStr) : {}", dskStr);
         val responseJson = analysisJson(json, dskStr)
         analysisNode.setDefinition(responseJson)
         val (result, message) = analysisNode.update(
@@ -161,6 +162,7 @@ class Analysis extends BaseController {
 	      val executionType = (analysis \ "executionType")
 	        .extractOrElse[String]("interactive")
 	      val runtime = (executionType == "interactive")
+            m_log.trace("dskStr after processing inside execute block before runtime: {}", dskStr);
               queryRuntime = (analysis \ "queryManual") match {
                 case JNothing => QueryBuilder.build(analysis, runtime, dskStr)
                 case obj: JString => obj.extract[String]
@@ -170,6 +172,7 @@ class Analysis extends BaseController {
           case _ => {}
         }
         /* Execute analysis and return result data */
+        m_log.trace("dskStr after processing inside execute block before Execute analysis and return result data : {}", dskStr);
         val data = executeAnalysis(analysisId, queryRuntime, json, dskStr)
         contentsAnalyze(("data", data)~ ("totalRows",totalRows))
 
@@ -293,8 +296,8 @@ class Analysis extends BaseController {
  	var json: String = "";
  	var typeInfo : String = "";
  	var analysisJSON : JObject = null;
- 	
- 	m_log.trace("json dataset: {}", reqJSON);
+    m_log.trace("dataSecurityKeyStr dataset: {}", dataSecurityKeyStr);
+ 	  m_log.trace("json dataset: {}", reqJSON);
     val start = (reqJSON \ "contents" \ "page").extractOrElse(0)
     val limit = (reqJSON \ "contents" \ "pageSize").extractOrElse(10)
     val analysis = (reqJSON \ "contents" \ "analyze") match {
@@ -329,6 +332,7 @@ class Analysis extends BaseController {
     {
       var data : String= null
       if (dataSecurityKeyStr!=null) {
+        m_log.trace("dataSecurityKeyStr dataset inside pivot block: {}", dataSecurityKeyStr);
         data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.PIVOT, json, dataSecurityKeyStr), json);
       }
@@ -404,6 +408,7 @@ class Analysis extends BaseController {
     if ( typeInfo.equals("chart") ){
       var data : String = null
       if (dataSecurityKeyStr!=null) {
+        m_log.trace("dataSecurityKeyStr dataset inside chart block: {}", dataSecurityKeyStr);
         data = SAWElasticSearchQueryExecutor.executeReturnAsString(
           new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.CHART, json, dataSecurityKeyStr), json);
       }
@@ -474,6 +479,7 @@ class Analysis extends BaseController {
     }
     else {
       // This is the part of report type starts here
+      m_log.trace("dataSecurityKeyStr dataset inside report block: {}", dataSecurityKeyStr);
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
       val query = if (queryRuntime != null) queryRuntime else QueryBuilder.build(analysisJSON, false, dataSecurityKeyStr)
       val execution = analysis.executeAndWait(ExecutionType.onetime, query)
