@@ -9,7 +9,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -298,7 +297,7 @@ public class UserRepositoryImpl implements UserRepository {
 	/**
 	 * inserts ticket into sso db
 	 * 
-	 * @param ticket
+	 * @param Ticket
 	 * @throws Exception
 	 * 
 	 */
@@ -541,19 +540,8 @@ public class UserRepositoryImpl implements UserRepository {
 					}
 				}, new UserRepositoryImpl.PrepareProdModFeatureChildExtractor());
 
-              String fetchDSKSql = "SELECT SG.SEC_GROUP_SYS_ID, SGDA.ATTRIBUTE_NAME, SGDV.DSK_VALUE FROM S"
-								   + "EC_GROUP SG INNER JOIN SEC_GROUP_DSK_ATTRIBUTE SGDA ON "
-								   + "(SG.SEC_GROUP_SYS_ID = SGDA.SEC_GROUP_SYS_ID) INNER JOIN SEC_GROUP_DSK_VALUE SGDV "
-								   + "ON SGDA.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = SGDV.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID "
-								   + "INNER JOIN USERS U ON U.SEC_GROUP_SYS_ID = SG.SEC_GROUP_SYS_ID "
-								   + "WHERE U.USER_ID = ? AND SG.ACTIVE_STATUS_IND='1'";
-              Map<String,List<String>> dskList = jdbcTemplate.query(fetchDSKSql, new PreparedStatementSetter() {
-				  @Override public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					  preparedStatement.setString(1, masterLoginId);
-				  }
-			  }, new UserRepositoryImpl.DSKValuesExtractor());
-				ticketDetails.setDataSKey(dskList);
-              // Roles and privileges
+
+				// Roles and privileges
 				/**
 				 * String sql2 = "SELECT DISTINCT P.PRIVILEGE_CODE,
 				 * P.PRIVILEGE_NAME, P.PRIVILEGE_DESC, CPMF.FEATURE_NAME FROM
@@ -714,25 +702,6 @@ public class UserRepositoryImpl implements UserRepository {
 		}
 	}
 
-	private class  DSKValuesExtractor implements ResultSetExtractor<Map <String , List<String>>>{
-		Map<String , List<String>> dskValues = new HashMap<>();
-		@Override
-		public Map<String, List<String>> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
-			while(resultSet.next()) {
-				String dskAttribute = resultSet.getString("ATTRIBUTE_NAME");
-				if (dskValues.containsKey(dskAttribute)) {
-					dskValues.get(dskAttribute).add(resultSet.getString("DSK_VALUE"));
-				}
-				else {
-					List<String> values = new ArrayList();
-					values.add(resultSet.getString("DSK_VALUE"));
-					dskValues.put(dskAttribute, values);
-				}
-			}
-			return dskValues;
-		}
-	}
-
 	@Override
 	public Ticket getTicketDetails(String ticketId) {
 		Ticket ticket = null;
@@ -777,6 +746,7 @@ public class UserRepositoryImpl implements UserRepository {
 				ticketDetails.setRoleType(rs.getString("role_type"));
 				ticketDetails.setRoleCode(rs.getString("role_code"));
 				ticketDetails.setLandingProd(rs.getString("landing_prod_sys_id"));
+				ticketDetails.setDataSKey(rs.getString("data_security_key"));
 				ticketDetails.setUserId(rs.getLong("user_sys_id"));
 				if (firstName == null) {
 					firstName = rs.getString("first_name");
@@ -1510,6 +1480,7 @@ public class UserRepositoryImpl implements UserRepository {
 					role.setActiveStatusInd("Inactive");
 				}
 				role.setCustSysId(rs.getLong("CUSTOMER_SYS_ID"));
+				role.setDsk(rs.getString("DATA_SECURITY_KEY"));
 				role.setRoleDesc(rs.getString("ROLE_DESC"));
 				role.setRoleName(rs.getString("ROLE_NAME"));
 				role.setRoleSysId(rs.getLong("ROLE_SYS_ID"));
