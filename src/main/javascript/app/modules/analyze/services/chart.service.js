@@ -557,7 +557,7 @@ export function ChartService(Highcharts) {
       path: 'yAxis',
       data: map(fields.y, (y, k) => ({
         gridLineWidth: 0,
-        opposite : k > 1,
+        opposite : k > 0,
         title: {
           text: y.alias || `${AGGREGATE_TYPES_OBJ[y.aggregate].label} ${y.displayName}`,
           style: {

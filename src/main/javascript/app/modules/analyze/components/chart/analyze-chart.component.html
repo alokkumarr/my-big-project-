@@ -87,6 +87,11 @@
       </md-toolbar>
 
       <div layout="column" style="overflow: auto;">
+        <div ng-if="!$ctrl.gridData.length">
+          <div class="saw-ac-placeholder m-{{::$ctrl.model.chartType}}"></div>
+          Please select some data for the chart axes!
+        </div>
+
         <chart ng-if="$ctrl.gridData.length"
                updater="$ctrl.updateChart"
                options="$ctrl.chartOptions"></chart>
