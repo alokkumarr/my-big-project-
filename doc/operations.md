@@ -82,8 +82,8 @@ detect an already existing installation and upgrade it.
 To list services and check the status of all SAW systemd units and
 timers, execute the following commands:
 
-        $ sudo systemctl list-units --all saw-*
-        $ sudo systemctl list-timers --all saw-*
+        $ sudo systemctl list-units --all saw-\*
+        $ sudo systemctl list-timers --all saw-\*
 
 Please note that it is normal for the `saw-scheduler` service to be in
 an inactive state most of the time.  It is activated on a set schedule
@@ -101,7 +101,7 @@ using the following commands:
 
 Where `<saw-service>` is one of the SAW systemd services (for example
 `saw-gateway`), which can be listed using the `sudo systemctl
-list-units saw-*` command shown in the previous section.
+list-units saw-\*` command shown in the previous section.
 
 # Logs
 
@@ -109,7 +109,7 @@ The SAW systemd services system logs can be accessed using the `sudo
 journalctl` command.  To view the logs of individual services, use the
 `-u` option:
 
-        $ sudo journalctl -u saw-*
+        $ sudo journalctl -u saw-\*
 
 # Entrypoints
 
