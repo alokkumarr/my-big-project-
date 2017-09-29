@@ -46,7 +46,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -586,18 +585,6 @@ public class UserRepositoryImpl implements UserRepository {
 					}
 				}, new UserRepositoryImpl.PrepareProdModFeatureChildExtractor());
 
-              String fetchDSKSql = "SELECT SG.SEC_GROUP_SYS_ID, SGDA.ATTRIBUTE_NAME, SGDV.DSK_VALUE FROM S"
-								   + "EC_GROUP SG INNER JOIN SEC_GROUP_DSK_ATTRIBUTE SGDA ON "
-								   + "(SG.SEC_GROUP_SYS_ID = SGDA.SEC_GROUP_SYS_ID) INNER JOIN SEC_GROUP_DSK_VALUE SGDV "
-								   + "ON SGDA.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = SGDV.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID "
-								   + "INNER JOIN USERS U ON U.SEC_GROUP_SYS_ID = SG.SEC_GROUP_SYS_ID "
-								   + "WHERE U.USER_ID = ? AND SG.ACTIVE_STATUS_IND='1'";
-              Map<String,List<String>> dskList = jdbcTemplate.query(fetchDSKSql, new PreparedStatementSetter() {
-				  @Override public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					  preparedStatement.setString(1, masterLoginId);
-				  }
-			  }, new UserRepositoryImpl.DSKValuesExtractor());
-				ticketDetails.setDataSKey(dskList);
               // Roles and privileges
 				/**
 				 * String sql2 = "SELECT DISTINCT P.PRIVILEGE_CODE,
@@ -759,25 +746,6 @@ public class UserRepositoryImpl implements UserRepository {
 		}
 	}
 
-	private class  DSKValuesExtractor implements ResultSetExtractor<Map <String , List<String>>>{
-		Map<String , List<String>> dskValues = new HashMap<>();
-		@Override
-		public Map<String, List<String>> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
-			while(resultSet.next()) {
-				String dskAttribute = resultSet.getString("ATTRIBUTE_NAME");
-				if (dskValues.containsKey(dskAttribute)) {
-					dskValues.get(dskAttribute).add(resultSet.getString("DSK_VALUE"));
-				}
-				else {
-					List<String> values = new ArrayList();
-					values.add(resultSet.getString("DSK_VALUE"));
-					dskValues.put(dskAttribute, values);
-				}
-			}
-			return dskValues;
-		}
-	}
-
 	@Override
 	public Ticket getTicketDetails(String ticketId) {
 		Ticket ticket = null;
@@ -822,6 +790,7 @@ public class UserRepositoryImpl implements UserRepository {
 				ticketDetails.setRoleType(rs.getString("role_type"));
 				ticketDetails.setRoleCode(rs.getString("role_code"));
 				ticketDetails.setLandingProd(rs.getString("landing_prod_sys_id"));
+				ticketDetails.setDataSKey(rs.getString("data_security_key"));
 				ticketDetails.setUserId(rs.getLong("user_sys_id"));
 				if (firstName == null) {
 					firstName = rs.getString("first_name");
@@ -1442,7 +1411,7 @@ public class UserRepositoryImpl implements UserRepository {
 				}
 			}, new UserRepositoryImpl.roleDetailExtractor());
 
-			Long featureSysId;
+			List<Long> featureSysIdList;
 			ArrayList<CustomerProductModuleFeature> cpmf = new ArrayList<CustomerProductModuleFeature>();
 
 			// Get the CUST, PROD, MOD details
@@ -1465,15 +1434,19 @@ public class UserRepositoryImpl implements UserRepository {
 			}, new UserRepositoryImpl.CPMFDetailExtractor());
 
 			
-			String sql3 = "SELECT CPMF.CUST_PROD_MOD_FEATURE_SYS_ID from customer_product_module_features CPMF "
-					+ "where CUST_PROD_MOD_SYS_ID = ? AND FEATURE_NAME = 'My Analysis'";
+			 String sql3 = " SELECT CPMF1.CUST_PROD_MOD_FEATURE_SYS_ID "
+										+ "FROM "
+										+ "( SELECT  FEATURE_CODE from customer_product_module_features "
+										+ "where CUST_PROD_MOD_SYS_ID = ? AND FEATURE_NAME = 'My Analysis') CPMF INNER JOIN "
+										+ "                    customer_product_module_features CPMF1"
+										+ "                    ON (CPMF.FEATURE_CODE = REPLACE(CPMF1.FEATURE_TYPE, 'CHILD_', ''));";
 
 			for (int y = 0; y < roleList.size(); y++) {
 				roleId = roleList.get(y).getRoleSysId();
 				for (int i = 0; i < cpmf.size(); i++) {
 					Long custProdMod = cpmf.get(i).getCustProdModSysId();
 					Long custProd = cpmf.get(i).getCustProdSysId();
-					featureSysId = getFeatureSysId(sql3, custProdMod);
+					featureSysIdList = getFeatureSysId(sql3, custProdMod);
 					Long roleSysId = roleId;
 					String sql4 = "select * from privileges where CUST_PROD_SYS_ID=? AND CUST_PROD_MOD_SYS_ID=?"
 							+ " AND	 CUST_PROD_MOD_FEATURE_SYS_ID != 0 ANd ROLE_SYS_ID=?";
@@ -1490,8 +1463,8 @@ public class UserRepositoryImpl implements UserRepository {
 					if (privExists) {
 						roleList.get(y).setPrivExists(true);
 					} 
-					if (featureSysId != 0) {
-						Long custProdModFeatr = featureSysId;
+					if (featureSysIdList.get(0) != 0) {
+						Long custProdModFeatr = featureSysIdList.get(0);
 						// check if priv exists for My analysis
 						String sql5 = "select * from privileges where CUST_PROD_SYS_ID=? AND CUST_PROD_MOD_SYS_ID=?"
 								+ " AND	 CUST_PROD_MOD_FEATURE_SYS_ID=? ANd ROLE_SYS_ID=?";
@@ -1555,6 +1528,7 @@ public class UserRepositoryImpl implements UserRepository {
 					role.setActiveStatusInd("Inactive");
 				}
 				role.setCustSysId(rs.getLong("CUSTOMER_SYS_ID"));
+				role.setDsk(rs.getString("DATA_SECURITY_KEY"));
 				role.setRoleDesc(rs.getString("ROLE_DESC"));
 				role.setRoleName(rs.getString("ROLE_NAME"));
 				role.setRoleSysId(rs.getLong("ROLE_SYS_ID"));
@@ -1612,7 +1586,7 @@ public class UserRepositoryImpl implements UserRepository {
 	public Valid addRole(RoleDetails role) {
 		Valid valid = new Valid();
 		Long roleId;
-		Long featureSysId;
+		List<Long> featureSysIdList;
 		ArrayList<CustomerProductModuleFeature> cpmf = new ArrayList<CustomerProductModuleFeature>();
 		String sql = "INSERT INTO ROLES (CUSTOMER_SYS_ID, ROLE_NAME, ROLE_CODE, ROLE_DESC, ROLE_TYPE, "
 				+ "DATA_SECURITY_KEY, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY ) "
@@ -1687,13 +1661,14 @@ public class UserRepositoryImpl implements UserRepository {
 				for (int i = 0; i < cpmf.size(); i++) {
 					Long custProdMod = cpmf.get(i).getCustProdModSysId();
 					Long custProd = cpmf.get(i).getCustProdSysId();
-					featureSysId = getFeatureSysId(sql3, custProdMod);
+					featureSysIdList = getFeatureSysId(sql3, custProdMod);
 
-					if (featureSysId != 0) {
-						Long custProdModFeatr = featureSysId;
-						// create priv
-						insertMyAnalysisPrivileges(role, roleId, custProdMod, custProd, custProdModFeatr);
-
+					for (Long featureSysId : featureSysIdList ) {
+						if (featureSysId != 0) {
+							Long custProdModFeatr = featureSysId;
+							// create priv
+							insertMyAnalysisPrivileges(role, roleId, custProdMod, custProd, custProdModFeatr);
+						}
 					}
 					// Removing else part if there are no sub category then it should not be the part of privilege table.
 					/*else {
@@ -1801,7 +1776,7 @@ public class UserRepositoryImpl implements UserRepository {
 		}
 	}
 
-	private Long getFeatureSysId(String sql3, Long custProdMod) {
+	private List<Long> getFeatureSysId(String sql3, Long custProdMod) {
 		return jdbcTemplate.query(sql3, new PreparedStatementSetter() {
 			public void setValues(PreparedStatement preparedStatement) throws SQLException {
 				preparedStatement.setLong(1, custProdMod);
@@ -1839,15 +1814,15 @@ public class UserRepositoryImpl implements UserRepository {
 		}
 	}
 
-	public class MyAnalysisDetailExtractor implements ResultSetExtractor<Long> {
+	public class MyAnalysisDetailExtractor implements ResultSetExtractor<List<Long>> {
 
 		@Override
-		public Long extractData(ResultSet rs) throws SQLException, DataAccessException {
-			Long featureSysId = 0L;
+		public List<Long> extractData(ResultSet rs) throws SQLException, DataAccessException {
+			List<Long> featureIdList = new ArrayList<>();
 			while (rs.next()) {
-				featureSysId = rs.getLong("CUST_PROD_MOD_FEATURE_SYS_ID");
+				featureIdList.add(rs.getLong("CUST_PROD_MOD_FEATURE_SYS_ID"));
 			}
-			return featureSysId;
+			return featureIdList;
 		}
 	}
 
