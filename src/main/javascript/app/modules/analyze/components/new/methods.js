@@ -36,32 +36,32 @@ const methods = [
       },
       {
         label: 'Line Chart',
-        icon: {font: 'icon-chart-line'},
+        icon: {font: 'icon-line-chart'},
         type: 'chart:line'
       },
       {
         label: 'Area Chart',
-        icon: {font: 'icon-chart-line'},
+        icon: {font: 'icon-line-chart'},
         type: 'chart:area'
       },
       {
         label: 'Combo Chart',
-        icon: {font: 'icon-chart-combo'},
+        icon: {font: 'icon-combo-chart'},
         type: 'chart:combo'
       },
       {
         label: 'Scatter Plot',
-        icon: {font: 'icon-chart-scatter'},
+        icon: {font: 'icon-scatter-chart'},
         type: 'chart:scatter'
       },
       {
         label: 'Bubble Chart',
-        icon: {font: 'icon-chart-bubble'},
+        icon: {font: 'icon-bubble-chart'},
         type: 'chart:bubble'
       },
       {
         label: 'Pie Chart',
-        icon: {font: 'icon-chart-pie'},
+        icon: {font: 'icon-pie-chart'},
         type: 'chart:pie'
       }
     ]
