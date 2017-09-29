@@ -207,7 +207,7 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     * @param viewName
     * @param limit
     */
-  protected def materializeDataToList(viewName: String, limit: Int = 0) : Unit = {
+  protected def materializeDataToList(viewName: String, limit: Int = DLConfiguration.rowLimit) : Unit = {
     if (nativeloadedData.get(viewName).isEmpty) {
       m_log error "Attempt to materialize non-existing dataset"
       return
