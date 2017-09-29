@@ -528,6 +528,18 @@ class Analysis extends BaseController {
             case "BooleanType" => JBool(m.get(k)._2.asInstanceOf[Boolean])
             case "LongType" => JLong(m.get(k)._2.asInstanceOf[Long])
             case "DoubleType" => JDouble(m.get(k)._2.asInstanceOf[Double])
+            case dataType => m.get(k)._2 match {
+              case obj: String => JString(obj)
+              case obj: java.lang.Integer => JInt(obj.intValue())
+              case obj: java.lang.Long => JLong(obj.longValue())
+              case obj: java.lang.Float => JDouble(obj.floatValue())
+              case obj: java.lang.Double => JDouble(obj.doubleValue())
+              case obj: java.lang.Boolean => JBool(obj.booleanValue())
+              case obj =>
+                throw new RuntimeException(
+                  "Unsupported data type in result: " + dataType
+                    + ", object class: " + obj.getClass.getName)
+            }
           })
          ).toList
        )}
