@@ -16,7 +16,10 @@
         <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>   
       </div>
       <div data-options="dxTemplate: { name: 'categoryCellTemplate' }" >
-        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>   
+        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>
+      </div>
+      <div data-options="dxTemplate: { name: 'subCategoryCellTemplate' }" >
+        <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>
       </div>
       <div data-options="dxTemplate: { name: 'roleCellTemplate' }" >
         <span ng-bind-html="report.value | highlight:$ctrl.searchTerm"></span>   

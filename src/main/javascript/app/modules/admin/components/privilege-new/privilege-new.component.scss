@@ -1,6 +1,6 @@
 .new-privilege-dialog {
   .privilege-dialog {
-    width: 500px;
+    width: 890px;
   }
 
   .privilege-dialog_header {
@@ -84,5 +84,30 @@
 
   md-checkbox {
     width: 20px !important;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+
+  .sub-caterory-label {
+    width: 150px;
+    word-wrap: break-word;
+  }
+
+  .horizantal-radio-box {
+    float: left;
+    padding-right: 12px;
+  }
+
+  tr.border_bottom td {
+    border-bottom: 0.1px solid black;
+  }
+
+  md-switch {
+    padding-left: 8px;
+    margin: 6px 0;
+  }
+
+  md-switch .md-container {
+    margin-right: 0;
   }
 }
