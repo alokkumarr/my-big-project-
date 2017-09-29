@@ -81,9 +81,9 @@ class Analysis extends BaseController {
     }
     m_log.trace("dataSecurityKey before processing: {}", dataSecurityKey);
     val dskString = dataSecurityKey.asInstanceOf[String].toString;
-    var dskStr : String =null
+    var dskStr : String = "";
     if((dskString!=null) && (!dskString.equals("") && !dskString.equals("NA"))){
-      dskStr = "{ \"dataSecurityKey\" :" +dataSecurityKey.asInstanceOf[String].toString + "}";
+      dskStr = dataSecurityKey.asInstanceOf[String].toString;
       m_log.trace("dskStr after processing: {}", dskStr);
     }
     action match {
