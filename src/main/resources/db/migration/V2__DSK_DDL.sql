@@ -58,8 +58,7 @@ TABLE Scripts Starts
 	/*******************************************************************************
 	 ALTER Table Scripts Starts
 	********************************************************************************/
-    ALTER TABLE `users` 
-     DROP COLUMN IF EXISTS `SEC_GROUP_SYS_ID`;
+    
 	ALTER TABLE USERS 
     	 ADD COLUMN SEC_GROUP_SYS_ID BIGINT(20) NULL AFTER `ACTIVE_STATUS_IND`;
 
