@@ -1,8 +1,7 @@
 package com.sncr.saw.security.app.repository;
 
-import java.util.List;
-
 import com.sncr.saw.security.common.bean.Category;
+import com.sncr.saw.security.common.bean.CustomerProductSubModule;
 import com.sncr.saw.security.common.bean.Module;
 import com.sncr.saw.security.common.bean.Product;
 import com.sncr.saw.security.common.bean.ResetValid;
@@ -12,10 +11,14 @@ import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
+import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryWithPrivilegeDetails;
+import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
+
+import java.util.List;
 
 public interface UserRepository {
 	void insertTicketDetails(Ticket ticket) throws Exception;
@@ -50,7 +53,7 @@ public interface UserRepository {
 	List<Product> getProductsDropDownList(Long customerId);
 	List<Module> getModulesDropDownList(Long customerId, Long productId);
 	List<Category> getCategoriesDropDownList(Long customerId, Long moduleId, boolean parent);
-	Valid addPrivilege(PrivilegeDetails privilege);
+	Valid upsertPrivilege(AddPrivilegeDetails addPrivilegeDetails);
 	Valid updatePrivilege(PrivilegeDetails privilege);
 	boolean deletePrivilege(Long privId);
 	List<CategoryDetails> getCategories(Long customerId);
@@ -58,6 +61,7 @@ public interface UserRepository {
 	boolean checkCatExists(CategoryDetails category);
 	boolean deleteCategory(Long categoryId);
 	List<SubCategoryDetails> getSubCategories(Long customerId, String featureCode);
+	List<SubCategoryWithPrivilegeDetails> getSubCategoriesWithPrivilege(CustomerProductSubModule cpsm);
 	Valid updateCategory(CategoryDetails category);
 	boolean checkSubCatExists(CategoryDetails category);
 }

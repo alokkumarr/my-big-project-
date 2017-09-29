@@ -3,38 +3,12 @@
  */
 package com.sncr.saw.security.app.controller;
 
-import java.security.SecureRandom;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.mail.Message;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMultipart;
-import javax.servlet.ServletException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.google.gson.Gson;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.common.bean.ChangePasswordDetails;
 import com.sncr.saw.security.common.bean.CustProdModule;
+import com.sncr.saw.security.common.bean.CustomerProductSubModule;
 import com.sncr.saw.security.common.bean.LoginDetails;
 import com.sncr.saw.security.common.bean.RandomHashcode;
 import com.sncr.saw.security.common.bean.RefreshToken;
@@ -53,17 +27,43 @@ import com.sncr.saw.security.common.bean.repo.admin.PrivilegesList;
 import com.sncr.saw.security.common.bean.repo.admin.ProductDropDownList;
 import com.sncr.saw.security.common.bean.repo.admin.RolesDropDownList;
 import com.sncr.saw.security.common.bean.repo.admin.RolesList;
+import com.sncr.saw.security.common.bean.repo.admin.SubCategoryWithPrivilegeList;
 import com.sncr.saw.security.common.bean.repo.admin.UsersList;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
+import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.util.TicketHelper;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.mail.Message;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMultipart;
+import javax.servlet.ServletException;
+import java.security.SecureRandom;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author gsan0003
@@ -74,9 +74,9 @@ public class SecurityController {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityController.class);
 
 	@Autowired
-	public UserRepository userRepository;
+	private UserRepository userRepository;
 	@Autowired
-	NSSOProperties nSSOProperties;
+	private NSSOProperties nSSOProperties;
 
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
@@ -84,10 +84,9 @@ public class SecurityController {
 		logger.info("Ticket will be created..");
 		logger.info("Token Expiry :" + nSSOProperties.getValidityMins());
 
-		Ticket ticket = null;
+		Ticket ticket = new Ticket();
 		User user = null;
 		TicketHelper tHelper = new TicketHelper(userRepository);
-		ticket = new Ticket();
 		ticket.setMasterLoginId(loginDetails.getMasterLoginId());
 		ticket.setValid(false);
 		RefreshToken rToken = null;
@@ -539,7 +538,7 @@ public class SecurityController {
 	/**
 	 * This method return whether the token is valid or not
 	 * 
-	 * @param validateToken
+	 * @param
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/validateToken", method = RequestMethod.POST)
@@ -811,7 +810,7 @@ public class SecurityController {
 
 	/**
 	 * 
-	 * @param user
+	 * @param deleteUser
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/users/delete", method = RequestMethod.POST)
@@ -843,7 +842,7 @@ public class SecurityController {
 
 	/**
 	 * 
-	 * @param user
+	 * @param customerId
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/roles/list", method = RequestMethod.POST)
@@ -896,7 +895,7 @@ public class SecurityController {
 
 	/**
 	 * 
-	 * @param user
+	 * @param 
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/roles/types/list", method = RequestMethod.POST)
@@ -917,7 +916,7 @@ public class SecurityController {
 
 	/**
 	 * 
-	 * @param user
+	 * @param role
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/roles/add", method = RequestMethod.POST)
@@ -950,7 +949,7 @@ public class SecurityController {
 
 	/**
 	 * 
-	 * @param user
+	 * @param deleteRole
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/roles/delete", method = RequestMethod.POST)
@@ -990,7 +989,7 @@ public class SecurityController {
 
 	/**
 	 * 
-	 * @param user
+	 * @param role
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/roles/edit", method = RequestMethod.POST)
@@ -1114,18 +1113,40 @@ public class SecurityController {
 	
 	/**
 	 * 
-	 * @param privilege
+	 * @param cpsm
 	 * @return
 	 */
-	@RequestMapping(value = "/auth/admin/cust/manage/privileges/add", method = RequestMethod.POST)
-	public PrivilegesList addPrivilege(@RequestBody PrivilegeDetails privilege) {
+	
+	@RequestMapping(value = "/auth/admin/cust/manage/subCategoriesWithPrivilege/list", method = RequestMethod.POST)
+	public SubCategoryWithPrivilegeList getSubCategoriesList(@RequestBody CustomerProductSubModule cpsm) {
+		SubCategoryWithPrivilegeList subcategories = new SubCategoryWithPrivilegeList();
+		try {
+			subcategories.setSubCategories(userRepository.getSubCategoriesWithPrivilege(cpsm));
+			subcategories.setValid(true);
+		} catch (Exception e) {
+			subcategories.setValid(false);
+			String message = (e instanceof DataAccessException) ? "Database error." : "Error.";
+			subcategories.setValidityMessage(message + " Please contact server Administrator");
+			subcategories.setError(e.getMessage());
+			return subcategories;
+		}
+		return subcategories;
+	}
+	
+	/**
+	 * 
+	 * @param addPrivilegeDetails
+	 * @return
+	 */
+	@RequestMapping(value = "/auth/admin/cust/manage/privileges/upsert", method = RequestMethod.POST)
+	public PrivilegesList addPrivilege(@RequestBody AddPrivilegeDetails addPrivilegeDetails) {
 		PrivilegesList privList = new PrivilegesList();
 		Valid valid = null;
 		try {
-			if (privilege != null) {
-				valid = userRepository.addPrivilege(privilege);
+			if (addPrivilegeDetails != null) {
+				valid = userRepository.upsertPrivilege(addPrivilegeDetails);
 				if (valid.getValid()) {
-					privList.setPrivileges(userRepository.getPrivileges(privilege.getCustomerId()));
+					privList.setPrivileges(userRepository.getPrivileges(addPrivilegeDetails.getCustomerId()));
 					privList.setValid(true);
 				} else {
 					privList.setValid(false);
@@ -1238,7 +1259,7 @@ public class SecurityController {
 	
 	/**
 	 * 
-	 * @param customerId
+	 * @param category
 	 * @return
 	 */
 	@RequestMapping(value = "/auth/admin/cust/manage/categories/add", method = RequestMethod.POST)
