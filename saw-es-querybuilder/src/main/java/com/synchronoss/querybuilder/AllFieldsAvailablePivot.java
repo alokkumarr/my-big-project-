@@ -76,8 +76,8 @@ class AllFieldsAvailablePivot {
       if ((!dataFields.isEmpty()) && dataFields.size() > 0) {
           searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-                  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+                  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2")))));
       } 
     } // end of columnFields.size()==2
 
@@ -87,9 +87,9 @@ class AllFieldsAvailablePivot {
     	  
           searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))
-                  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2")
+                  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3"))))));
 
     	  
       }
@@ -100,10 +100,10 @@ class AllFieldsAvailablePivot {
     	  
           searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_1"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_3"))
-                  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(4), "column_level_4"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_1")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_3")
+                  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(4), "column_level_4")))))));
     } // end of columnFields.size()==4
 
     }
@@ -112,11 +112,11 @@ class AllFieldsAvailablePivot {
         
     	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_1"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_3"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4"))
-                  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(4), "column_level_5"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_1")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_3")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4")
+                  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(4), "column_level_5"))))))));
     	  
  
     } // end of columnFields.size()==5
@@ -135,8 +135,8 @@ class AllFieldsAvailablePivot {
       if ((!dataFields.isEmpty()) && dataFields.size() > 0) {
     	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")))));
       } // !dataFields.isEmpty()
     } // end of columnFields.size()==1
 
@@ -146,9 +146,9 @@ class AllFieldsAvailablePivot {
     	  
     	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))))));
 
       } // !dataFields.isEmpty()
     } // end of columnFields.size()==2
@@ -159,21 +159,21 @@ class AllFieldsAvailablePivot {
     	  
        	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3")))))));
     } // end of columnFields.size()==3
     }
     if (columnFields.size() == 4) {
       if ((!dataFields.isEmpty()) && dataFields.size() > 0) { 
       	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4"))))))));
     } // end of columnFields.size()==4
     }
 
@@ -182,12 +182,12 @@ class AllFieldsAvailablePivot {
     	  
       	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(4), "column_level_5"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(4), "column_level_5")))))))));
     } // end of columnFields.size()==5
     }
     return searchSourceBuilder;
@@ -204,9 +204,9 @@ class AllFieldsAvailablePivot {
         
       	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))))));
     } // end of columnFields.size()==1
     }
 
@@ -215,10 +215,10 @@ class AllFieldsAvailablePivot {
     	  
       	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2")))))));
     } // end of columnFields.size()==2
     }
     
@@ -226,11 +226,11 @@ class AllFieldsAvailablePivot {
       if ((!dataFields.isEmpty()) && dataFields.size() > 0) {
       	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3"))))))));
     } // end of columnFields.size()==3
     }
       
@@ -238,12 +238,12 @@ class AllFieldsAvailablePivot {
           if ((!dataFields.isEmpty()) && dataFields.size() > 0) {
           	  searchSourceBuilder.query(boolQueryBuilder)
               .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-            		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-            		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3"))
-            		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-            		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))
-            		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3"))
-            		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4"))));
+            		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+            		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3")
+            		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+            		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2")
+            		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3")
+            		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4")))))))));
         } // end of columnFields.size()==4  
       }
 
@@ -252,13 +252,13 @@ class AllFieldsAvailablePivot {
     	  
       	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(4), "column_level_5"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(4), "column_level_5"))))))))));
 
       }
     } // end of columnFields.size()==5
@@ -277,10 +277,10 @@ class AllFieldsAvailablePivot {
     	  
       	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")))))));
       } // !dataFields.isEmpty()
     } // end of columnFields.size()==1
 
@@ -290,11 +290,11 @@ class AllFieldsAvailablePivot {
         
       	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))))))));
       } // !dataFields.isEmpty()
     } // end of columnFields.size()==2
 
@@ -304,12 +304,12 @@ class AllFieldsAvailablePivot {
         
       	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3")))))))));
 
       } // !dataFields.isEmpty()
     } // end of columnFields.size()==3
@@ -320,13 +320,13 @@ class AllFieldsAvailablePivot {
           
         	  searchSourceBuilder.query(boolQueryBuilder)
             .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-          		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-          		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3"))
-          		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4"))
-          		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-          		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))
-          		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3"))
-          		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4"))));
+          		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+          		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3")
+          		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4")
+          		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+          		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2")
+          		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3")
+          		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4"))))))))));
 
         } // !dataFields.isEmpty()
       } // end of columnFields.size()==4
@@ -337,14 +337,14 @@ class AllFieldsAvailablePivot {
     	 
     	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(4), "column_level_5"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(4), "column_level_5")))))))))));
       } // !dataFields.isEmpty()
     } // end of columnFields.size()==5
 
@@ -362,11 +362,11 @@ class AllFieldsAvailablePivot {
         
       	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(4),"row_level_5"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(4),"row_level_5")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))))))));
       } // !dataFields.isEmpty()
     } // end of columnFields.size()==1
 
@@ -376,12 +376,12 @@ class AllFieldsAvailablePivot {
  
       	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(4),"row_level_5"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_1"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(4),"row_level_5")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_1")))))))));
       } // !dataFields.isEmpty()
     } // end of columnFields.size()==2
 
@@ -390,13 +390,13 @@ class AllFieldsAvailablePivot {
       if ((!dataFields.isEmpty()) && dataFields.size() > 0) {
       	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(4),"row_level_5"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(4),"row_level_5")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3"))))))))));
       } // !dataFields.isEmpty()
     } // end of columnFields.size()==3
 
@@ -404,14 +404,14 @@ class AllFieldsAvailablePivot {
       if ((!dataFields.isEmpty()) && dataFields.size() > 0) {
       	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(4),"row_level_5"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(4),"row_level_5")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4")))))))))));
     } // end of columnFields.size()==4
 
     }
@@ -420,15 +420,15 @@ class AllFieldsAvailablePivot {
        
       	  searchSourceBuilder.query(boolQueryBuilder)
           .aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1")
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(4),"row_level_5"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3"))
-        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4"))
-        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(4), "column_level_5"))));
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(4),"row_level_5")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(0), "column_level_1")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(1), "column_level_2")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(2), "column_level_3")
+        		  .subAggregation(QueryBuilderUtil.aggregationBuilder(columnFields.get(3), "column_level_4")
+        		  .subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilder(columnFields.get(4), "column_level_5"))))))))))));
 
       } // !dataFields.isEmpty()
     } // end of columnFields.size()==5

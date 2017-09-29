@@ -71,7 +71,7 @@ class RowDataFieldsAvailable {
 		if ((!dataFields.isEmpty()) && dataFields.size() >0)
 		{
 				searchSourceBuilder.query(boolQueryBuilder)
-				.aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName()).subAggregation(
+				.aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1").subAggregation(
 						addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1), "row_level_2"))));
 		} 	
 		return searchSourceBuilder;
@@ -85,8 +85,8 @@ class RowDataFieldsAvailable {
 		if ((!dataFields.isEmpty()) && dataFields.size() >0)
 		{
 				searchSourceBuilder.query(boolQueryBuilder)
-				.aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName()).
-						subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName()).subAggregation(
+				.aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1").
+						subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2").subAggregation(
 						addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2), "row_level_3")))));
 		} 	
 		return searchSourceBuilder;
@@ -100,9 +100,9 @@ class RowDataFieldsAvailable {
 		if ((!dataFields.isEmpty()) && dataFields.size() >0)
 		{
 				searchSourceBuilder.query(boolQueryBuilder)
-				.aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName()).
-						subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName()).
-								subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName()).subAggregation(
+				.aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1").
+						subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2").
+								subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3").subAggregation(
 						addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3), "row_level_4"))))));
 		} 	
 		
@@ -119,10 +119,10 @@ class RowDataFieldsAvailable {
 		if ((!dataFields.isEmpty()) && dataFields.size() >0)
 		{
 				searchSourceBuilder.query(boolQueryBuilder)
-				.aggregation(AggregationBuilders.terms("row_level_1").field(rowfield.get(0).getColumnName()).
-						subAggregation(AggregationBuilders.terms("row_level_2").field(rowfield.get(1).getColumnName()).
-								subAggregation(AggregationBuilders.terms("row_level_3").field(rowfield.get(2).getColumnName())
-										.subAggregation(AggregationBuilders.terms("row_level_4").field(rowfield.get(3).getColumnName())
+				.aggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(0),"row_level_1").
+						subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(1),"row_level_2").
+								subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(2),"row_level_3")
+										.subAggregation(QueryBuilderUtil.aggregationBuilderRow(rowfield.get(3),"row_level_4")
 										.subAggregation(addSubaggregation(dataFields, QueryBuilderUtil.aggregationBuilderRow(rowfield.get(4), "row_level_5")))))));
 		} 	
 		return searchSourceBuilder;
