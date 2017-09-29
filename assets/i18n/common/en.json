@@ -73,6 +73,8 @@
   "VIEW": "View",
   "VEW_N_MORE": "View {{value}} more",
   "YEAR": "Year",
+  "PIE_NO_DATA_PRESENT": "Pie chart doesn't support negative or zero values. Please select different criteria or use a different chart type.",
+  "PIE_SOME_DATA_PRESENT": "Pie chart doesn't support negative or zero values. They have been filtered out from the results.",
 
   "MONDAY": "Monday",
   "TUESDAY": "Tuesday",

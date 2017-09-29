@@ -2,7 +2,8 @@ import {CHART_COLORS} from '../../consts';
 
 export const globalChartOptions = {
   lang: {
-    thousandsSep: ','
+    thousandsSep: ',',
+    noData: 'No data to display'
   }
 };
 
@@ -40,6 +41,16 @@ export const chartOptions = {
   },
   title: {
     text: ''
+  },
+  lang: {
+    noData: 'No data to display'
+  },
+  noData: {
+    style: {
+      fontWeight: 'bold',
+      fontSize: '15px',
+      color: '#303030'
+    }
   },
   credits: false
 };

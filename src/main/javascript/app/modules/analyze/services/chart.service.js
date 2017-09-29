@@ -24,7 +24,9 @@ import * as concat from 'lodash/concat';
 import * as compact from 'lodash/compact';
 import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as mapValues from 'lodash/mapValues';
+import * as sortBy from 'lodash/sortBy';
 import * as moment from 'moment';
+import * as toString from 'lodash/toString'
 
 import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS} from '../consts';
 
@@ -306,6 +308,12 @@ export function ChartService(Highcharts) {
       });
     });
 
+    if (!isEmpty(categories)) {
+      forEach(series, serie => {
+        serie.data = sortBy(serie.data, 'x');
+      });
+    }
+
     return {
       series,
       categories
@@ -472,9 +480,8 @@ export function ChartService(Highcharts) {
 
     case 'pie':
       if (!fields.g) {
-        set(series, '0.dataLabels.format', '{point.name}: {point.percentage:.2f}%');
         mapperFn = ({x, y}) => {
-          const category = get(categories, `x.${x}`);
+          const category = get(categories, `x.${x}`, toString(x || 0));
           return {name: category, y, drilldown: category};
         };
         forEach(series, serie => {
@@ -584,7 +591,6 @@ export function ChartService(Highcharts) {
   }
 
   const dataToChangeConfig = (type, settings, gridData, opts) => {
-
     let changes;
     const fields = {
       x: find(settings.xaxis, attr => attr.checked === 'x'),
@@ -640,12 +646,9 @@ export function ChartService(Highcharts) {
     const yIsNumber = some(fields.y, y => NUMBER_TYPES.includes(y.type));
 
     const yField = fields.y[0];
-    const yAxisName = `${yIsSingle || fields.g ?
-      `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}` :
-      '{series.name}'}`;
     const yAxisString = `<tr>
-      <th>${yAxisName}:</th>
-      <td>{point.y${yIsNumber ? ':.2f' : ''}}</td>
+      <th>{series.name}:</th>
+      <td>{point.y:.2f}</td>
     </tr>`;
     const zAxisString = fields.z ?
     `<tr><th>${fields.z.displayName}:</th><td>{point.z:.2f}</td></tr>` :

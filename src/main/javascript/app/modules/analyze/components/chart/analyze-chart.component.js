@@ -267,11 +267,11 @@ export const AnalyzeChartComponent = {
     }
 
     isNodeField(field) {
-      return field && !NUMBER_TYPES.includes(field.type);
+      return field && (!NUMBER_TYPES.includes(field.type) || field.checked === 'x');
     }
 
     isDataField(field) {
-      return field && NUMBER_TYPES.includes(field.type);
+      return field && NUMBER_TYPES.includes(field.type) && field.checked !== 'x';
     }
 
     generatePayload(source) {

@@ -8,7 +8,8 @@ export function toastMessageService(toastr) {
     clear,
     error,
     info,
-    success
+    success,
+    warn
   };
 
   function success(msg, title, options) {
@@ -17,6 +18,10 @@ export function toastMessageService(toastr) {
 
   function info(msg, title, options) {
     return toastr.info(msg, title, options);
+  }
+
+  function warn(msg, title, options) {
+    return toastr.warning(msg, title, options);
   }
 
   function error(msg, title, options) {
