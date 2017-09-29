@@ -1,4 +1,5 @@
 import * as find from 'lodash/find';
+import * as filter from 'lodash/filter';
 import * as forEach from 'lodash/forEach';
 import * as map from 'lodash/map';
 import * as clone from 'lodash/clone';
@@ -132,11 +133,15 @@ export const AnalyzeChartSettingsComponent = {
           target.aggregate = DEFAULT_AGGREGATE_TYPE.value;
         }
         if (!selectedAttr.comboType) {
-          if (['line', 'column'].includes(this.chartType)) {
+          if (['line', 'column', 'area'].includes(this.chartType)) {
             target.comboType = this.chartType;
           }
-          if (this.chartType === 'combo') {
+          if (['combo', 'bar'].includes(this.chartType)) {
             target.comboType = 'column';
+          }
+          if (this.chartType === 'combo') {
+            if (filter(this.multipleYAxes.fields, 'checked').length > 1)
+              target.comboType = 'line';
           }
         }
       } else {

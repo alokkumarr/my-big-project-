@@ -18,7 +18,7 @@ import * as template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
 import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
-import {ENTRY_MODES, NUMBER_TYPES, COMBO_TYPES} from '../../consts';
+import {ENTRY_MODES, NUMBER_TYPES, COMBO_TYPES, COMBO_TYPES_OBJ} from '../../consts';
 
 const INVERTING_OPTIONS = [{
   label: 'TOOLTIP_INVERTED',
@@ -52,6 +52,7 @@ export const AnalyzeChartComponent = {
       this._toastMessage = toastMessage;
       this.INVERTING_OPTIONS = INVERTING_OPTIONS;
       this.COMBO_TYPES = COMBO_TYPES;
+      this.COMBO_TYPES_OBJ = COMBO_TYPES_OBJ;
       this.sortFields = [];
       this.sorts = [];
 
@@ -76,6 +77,7 @@ export const AnalyzeChartComponent = {
       this.isInverted = false;
       this.chartViewOptions = ChartService.getViewOptionsFor(this.model.chartType);
       this.invertableCharts = ['column', 'bar', 'line', 'area', 'combo'];
+      this.multyYCharts = this.invertableCharts;
     }
 
     toggleLeft() {
@@ -85,7 +87,7 @@ export const AnalyzeChartComponent = {
     $onInit() {
       const chartType = this.model.chartType;
 
-      if (this.chartType === 'column') {
+      if (this.model.chartType === 'bar') {
         this.isInverted = true;
       }
 
@@ -106,7 +108,6 @@ export const AnalyzeChartComponent = {
     }
 
     initChart() {
-      console.log('chartType: ', this.model.chartType);
       this._ChartService.updateAnalysisModel(this.model);
       this.settings = this._ChartService.fillSettings(this.model.artifacts, this.model);
       this.sortFields = this._SortService.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
@@ -129,6 +130,10 @@ export const AnalyzeChartComponent = {
         this.updateLegendPosition();
         this.endDraftMode();
       });
+    }
+
+    onSelectComboType(attributeColumn, comboType) {
+      attributeColumn.comboType = comboType.value;
     }
 
     toggleChartInversion() {

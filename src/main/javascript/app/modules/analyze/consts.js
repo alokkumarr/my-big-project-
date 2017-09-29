@@ -2,7 +2,7 @@ import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMapValues from 'lodash/fp/mapValues';
 
-import {NUMBER_TYPES, DATE_TYPES} from '../../common/consts.js';
+import {NUMBER_TYPES, DATE_TYPES, CHART_COLORS} from '../../common/consts.js';
 
 export var Events = {
   AnalysesRefresh: 'Analyses:Refresh'
@@ -22,7 +22,7 @@ export const ENTRY_MODES = {
 
 export const LAST_ANALYSES_CATEGORY_ID = 'lastAnalysesListId';
 
-export {NUMBER_TYPES, DATE_TYPES};
+export {NUMBER_TYPES, DATE_TYPES, CHART_COLORS};
 
 export const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
 
@@ -60,6 +60,13 @@ export const AGGREGATE_TYPES = [{
   icon: 'icon-Count'
 }];
 
+export const DEFAULT_AGGREGATE_TYPE = AGGREGATE_TYPES[0];
+
+export const AGGREGATE_TYPES_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(AGGREGATE_TYPES);
+
 export const COMBO_TYPES = [{
   label: 'line',
   value: 'line',
@@ -74,9 +81,7 @@ export const COMBO_TYPES = [{
   icon: 'icon-vert-bar-chart'
 }];
 
-export const DEFAULT_AGGREGATE_TYPE = AGGREGATE_TYPES[0];
-
-export const AGGREGATE_TYPES_OBJ = fpPipe(
+export const COMBO_TYPES_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
-)(AGGREGATE_TYPES);
+)(COMBO_TYPES);

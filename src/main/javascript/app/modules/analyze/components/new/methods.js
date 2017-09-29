@@ -40,6 +40,11 @@ const methods = [
         type: 'chart:line'
       },
       {
+        label: 'Area Chart',
+        icon: {font: 'icon-chart-line'},
+        type: 'chart:area'
+      },
+      {
         label: 'Combo Chart',
         icon: {font: 'icon-chart-combo'},
         type: 'chart:combo'

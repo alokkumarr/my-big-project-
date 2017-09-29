@@ -26,7 +26,7 @@ import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as mapValues from 'lodash/mapValues';
 import * as moment from 'moment';
 
-import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ} from '../consts';
+import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS} from '../consts';
 
 const LEGEND_POSITIONING = {
   left: {
@@ -135,7 +135,7 @@ export function ChartService(Highcharts) {
 
     const config = {
       chart: {
-        type: type === 'combo' ? null : type,
+        type: ['combo', 'bar'].includes(type) ? null : type,
         spacingLeft: SPACING,
         spacingRight: SPACING,
         spacingBottom: SPACING,
@@ -214,6 +214,7 @@ export function ChartService(Highcharts) {
     case 'column':
     case 'bar':
     case 'line':
+    case 'area':
     case 'spline':
     case 'stack':
     case 'scatter':
@@ -287,7 +288,7 @@ export function ChartService(Highcharts) {
     } else {
       const axesFieldNameMap = getAxesFieldNameMap(fields);
       const yField = fields.y[0];
-      series = [getSerie(yField)];
+      series = [getSerie(yField, 0)];
       series[0].data = map(parsedData,
         dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val]))
     }
@@ -311,10 +312,11 @@ export function ChartService(Highcharts) {
     };
   }
 
-  function getSerie({alias, displayName, comboType, aggregate}) {
+  function getSerie({alias, displayName, comboType, aggregate}, index) {
     return {
       name: `${AGGREGATE_TYPES_OBJ[aggregate].label} ${alias || displayName}`,
       type: comboType,
+      yAxis: index,
       data: []
     }
   }
@@ -463,6 +465,7 @@ export function ChartService(Highcharts) {
     case 'stack':
     case 'scatter':
     case 'bubble':
+    case 'area':
     case 'combo':
       // the bubble chart already supports the parsed data
       return {chartSeries: series};
@@ -535,17 +538,32 @@ export function ChartService(Highcharts) {
     }
 
     const labels = {
-      x: get(fields, 'x.displayName', ''),
-      y: singleYAxis ? yLabel : ''
+      x: get(fields, 'x.displayName', '')
     };
 
     const changes = [{
       path: 'xAxis.title.text',
       data: (opts.labels && opts.labels.x) || labels.x
-    }, {
-      path: 'yAxis.title.text',
-      data: (opts.labels && opts.labels.y) || labels.y
     }];
+
+    changes.push({
+      path: 'yAxis',
+      data: map(fields.y, (y, k) => ({
+        gridLineWidth: 0,
+        opposite : k > 1,
+        title: {
+          text: y.alias || `${AGGREGATE_TYPES_OBJ[y.aggregate].label} ${y.displayName}`,
+          style: {
+            color: CHART_COLORS[k]
+          }
+        },
+        labels: {
+          style: {
+            color: CHART_COLORS[k]
+          }
+        }
+      }))
+    });
 
     if (!isEmpty(gridData)) {
       const {series, categories} = splitToSeriesAndCategories(gridData, fields);
