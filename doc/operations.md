@@ -85,6 +85,10 @@ timers, execute the following commands:
         $ sudo systemctl list-units --all saw-*
         $ sudo systemctl list-timers --all saw-*
 
+Please note that it is normal for the `saw-scheduler` service to be in
+an inactive state most of the time.  It is activated on a set schedule
+by `saw-scheduler.timer`.
+
 # Starting, stopping and restarting services
 
 Under normal circumstances there should be no need to start, stop or
