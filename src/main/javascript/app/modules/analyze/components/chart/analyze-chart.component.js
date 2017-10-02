@@ -57,8 +57,8 @@ export const AnalyzeChartComponent = {
       this.sorts = [];
 
       this.legend = {
-        align: get(this.model, 'legend.align', 'right'),
-        layout: get(this.model, 'legend.layout', 'vertical'),
+        align: get(this.model, 'legend.align'),
+        layout: get(this.model, 'legend.layout'),
         options: {
           align: values(this._ChartService.LEGEND_POSITIONING),
           layout: values(this._ChartService.LAYOUT_POSITIONS)
@@ -146,6 +146,10 @@ export const AnalyzeChartComponent = {
     updateLegendPosition() {
       const align = this._ChartService.LEGEND_POSITIONING[this.legend.align];
       const layout = this._ChartService.LAYOUT_POSITIONS[this.legend.layout];
+
+      if (!align || !layout) {
+        return;
+      }
 
       this.startDraftMode();
       this.updateChart.next([

@@ -129,8 +129,10 @@ export function ChartService(Highcharts) {
 
   /* Returns default chart config for various chart types */
   const getChartConfigFor = (type, options) => {
-    const legendPosition = LEGEND_POSITIONING[get(options, 'legend.align', 'right')];
-    const legendLayout = LAYOUT_POSITIONS[get(options, 'legend.layout', 'vertical')];
+    const initialLegendPosition = type === 'combo' ? 'top' : 'right';
+    const initialLegendLayout = type === 'combo' ? 'horizontal' : 'vertical';
+    const legendPosition = LEGEND_POSITIONING[get(options, 'legend.align', initialLegendPosition)];
+    const legendLayout = LAYOUT_POSITIONS[get(options, 'legend.layout', initialLegendLayout)];
 
     const SPACING = 45;
     const HEIGHT = (angular.isUndefined(options.chart) ? 400 : options.chart.height);
