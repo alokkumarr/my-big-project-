@@ -70,7 +70,7 @@ export const AGGREGATE_TYPES_OBJ = fpPipe(
 export const COMBO_TYPES = [{
   label: 'line',
   value: 'line',
-  icon: 'icon-chart-line'
+  icon: 'icon-line-chart'
 }, {
   label: 'column',
   value: 'column',

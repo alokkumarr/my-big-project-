@@ -139,7 +139,7 @@ export function ChartService(Highcharts) {
 
     const config = {
       chart: {
-        type: ['combo', 'bar'].includes(type) ? null : type,
+        type: ['combo', 'bar'].includes(type) ? null : splinifyChartType(type),
         spacingLeft: SPACING,
         spacingRight: SPACING,
         spacingBottom: SPACING,
@@ -177,10 +177,7 @@ export function ChartService(Highcharts) {
     const config = {
       yAxisLabels: [],
       axisLabels: {
-        x: 'X-Axis',
-        y: 'Y-Axis',
-        z: 'Z-Axis',
-        g: 'Group By'
+        x: 'Dimensions', y: 'Metrics', z: 'Z-Axis', g: 'Group By'
       },
       renamable: {
         x: true, y: true, z: false, g: false
@@ -322,10 +319,23 @@ export function ChartService(Highcharts) {
     };
   }
 
+  function splinifyChartType(type) {
+    switch (type) {
+      case 'line':
+        return 'spline';
+      case 'area':
+      return 'areaspline';
+      default:
+        return type;
+    }
+  }
+
   function getSerie({alias, displayName, comboType, aggregate}, index) {
+    const splinifiedChartType = splinifyChartType(comboType);
+
     return {
       name: `${AGGREGATE_TYPES_OBJ[aggregate].label} ${alias || displayName}`,
-      type: comboType,
+      type: splinifiedChartType,
       yAxis: index,
       data: []
     }
