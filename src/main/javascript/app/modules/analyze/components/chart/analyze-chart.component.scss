@@ -25,6 +25,19 @@ chart {
     width: 100%;
   }
 
+  .chart-non-ideal {
+    color: #B2B2B2;
+
+    span {
+      font-size: 24px;
+    }
+
+    md-icon {
+      font-size: 200px;
+      padding: 50px;
+    }
+  }
+
   .chart-options-toolbar::after {
     border-width: 0;
   }

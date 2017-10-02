@@ -86,12 +86,16 @@
         </div>
       </md-toolbar>
 
-      <div layout="column" style="overflow: auto;">
-        <div ng-if="!$ctrl.gridData.length">
-          <div class="saw-ac-placeholder m-{{::$ctrl.model.chartType}}"></div>
-          Please select some data for the chart axes!
-        </div>
+      <md-card class="chart-non-ideal chart-container-card"
+               ng-show="!$ctrl.gridData.length">
+        <md-card-content layout="column">
+          <span translate="CHOOSE_DATA_TO_VIEW_IN_CHART"></span>
+          <md-icon md-font-icon="icon-chart-view"></md-icon>
+        </md-card-content>
+      </md-card>
 
+      <div layout="column"
+           style="overflow: auto;">
         <chart ng-if="$ctrl.gridData.length"
                updater="$ctrl.updateChart"
                options="$ctrl.chartOptions"></chart>
@@ -170,7 +174,9 @@
               </md-input-container>
             </div>
             <div>
-              <md-button class="btn-primary" ng-click="$ctrl.updateCustomLabels()">
+              <md-button class="btn-primary"
+                         ng-click="$ctrl.updateCustomLabels()"
+                         style="margin-top: 10px;">
                 <span translate="APPLY"></span>
               </md-button>
             </div>
