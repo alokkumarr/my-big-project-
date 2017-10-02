@@ -79,11 +79,10 @@ detect an already existing installation and upgrade it.
 
 # Listing services and checking their status
 
-To list services and check the status of all SAW systemd units and
-timers, execute the following commands:
+To list services and check the status of all SAW systemd units,
+execute the following commands:
 
-        $ sudo systemctl list-units --all saw-\*
-        $ sudo systemctl list-timers --all saw-\*
+        $ sudo systemctl list-units saw-\*
 
 Please note that it is normal for the `saw-scheduler` service to be in
 an inactive state most of the time.  It is activated on a set schedule
@@ -95,8 +94,8 @@ Under normal circumstances there should be no need to start, stop or
 restart SAW services manually.  However, if needed it can be done
 using the following commands:
 
-        $ sudo systemctl stop <saw-service>
         $ sudo systemctl start <saw-service>
+        $ sudo systemctl stop <saw-service>
         $ sudo systemctl restart <saw-service>
 
 Where `<saw-service>` is one of the SAW systemd services (for example
