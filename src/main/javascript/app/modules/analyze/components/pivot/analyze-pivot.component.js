@@ -131,7 +131,8 @@ export const AnalyzePivotComponent = {
     }
 
     setDataSource(store, fields) {
-      this.dataSource = new PivotGridDataSource({store, fields});
+      const parsedFields = this._PivotService.trimSuffixFromPivotFields(fields);
+      this.dataSource = new PivotGridDataSource({store, fields: parsedFields});
       this.pivotGridUpdater.next({
         dataSource: this.dataSource
       });
@@ -171,10 +172,7 @@ export const AnalyzePivotComponent = {
           this.normalizedData = data;
           this.analysisSynched();
           this.deNormalizedData = this._PivotService.parseData(data, model.sqlBuilder);
-          this.dataSource = new PivotGridDataSource({store: this.deNormalizedData, fields});
-          this.pivotGridUpdater.next({
-            dataSource: this.dataSource
-          });
+          this.setDataSource(this.deNormalizedData, fields);
           // different updates have to be done with a timeout
           // there might be a bug in devextreme pivotgrid
           this._$timeout(() => {
