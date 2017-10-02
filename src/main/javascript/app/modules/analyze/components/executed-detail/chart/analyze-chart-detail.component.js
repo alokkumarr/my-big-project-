@@ -72,7 +72,7 @@ export const AnalyzeChartDetailComponent = {
         this.analysis.chartType,
         this.settings,
         this.filteredData,
-        {labels: this.labels, labelOptions: this.analysis.labelOptions}
+        {labels: this.labels, labelOptions: this.analysis.labelOptions, sorts: this.sorts}
       );
 
       this.chartUpdater.next(changes);
