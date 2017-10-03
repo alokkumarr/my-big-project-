@@ -22,13 +22,12 @@
           <md-checkbox ng-model="artifactColumn.checked"
                       ng-change="$ctrl.onChecked(artifactColumn)"
                       style="align-self: flex-end;">
+            <p>{{ artifactColumn.alias || artifactColumn.displayName }}
+              <md-icon md-font-icon="{{$ctrl.ARTIFACT_ICON_TYPES_OBJ[artifactColumn.type].icon}}">
+                <md-tooltip ng-bind="$ctrl.ARTIFACT_ICON_TYPES_OBJ[artifactColumn.type].tooltip | translate"></md-tooltip>
+              </md-icon>
+            </p>
           </md-checkbox>
-
-          <p>{{ artifactColumn.alias || artifactColumn.displayName }}
-            <md-icon md-font-icon="{{$ctrl.ARTIFACT_ICON_TYPES_OBJ[artifactColumn.type].icon}}">
-              <md-tooltip ng-bind="$ctrl.ARTIFACT_ICON_TYPES_OBJ[artifactColumn.type].tooltip | translate"></md-tooltip>
-            </md-icon>
-          </p>
         </div>
 
         <md-menu class="md-secondary"
