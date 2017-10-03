@@ -11,7 +11,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 
@@ -38,7 +37,7 @@ public class Ticket implements Serializable {
 	private String roleCode;
 	private String roleType;
 	private Long createdTime;	
-	private Map<String, List<String>> dataSecurityKey;
+	private List<DSKDetails> dataSecurityKey;
 	private String error;
 	private String custID;
 	private String custCode;
@@ -107,11 +106,11 @@ public class Ticket implements Serializable {
 	 */
 	private String validityReason;	
 	
-	public Map<String,List<String>> getDataSecurityKey() {
+	public List<DSKDetails> getDataSecurityKey() {
 		return dataSecurityKey;
 	}
 
-	public void setDataSecurityKey(Map<String,List<String>> dataSecurityKey) {
+	public void setDataSecurityKey(List<DSKDetails> dataSecurityKey) {
 		this.dataSecurityKey = dataSecurityKey;
 	}
 

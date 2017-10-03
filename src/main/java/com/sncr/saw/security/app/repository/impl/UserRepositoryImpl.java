@@ -1,30 +1,8 @@
 package com.sncr.saw.security.app.repository.impl;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementSetter;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.PlatformTransactionManager;
-
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.common.bean.Category;
+import com.sncr.saw.security.common.bean.DSKDetails;
 import com.sncr.saw.security.common.bean.Module;
 import com.sncr.saw.security.common.bean.Product;
 import com.sncr.saw.security.common.bean.ResetValid;
@@ -46,6 +24,27 @@ import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.util.Ccode;
 import com.sncr.saw.security.common.util.DateUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Repository;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class is used to do CRUD operations on the oracle data base having nsso
@@ -547,11 +546,19 @@ public class UserRepositoryImpl implements UserRepository {
 								   + "ON SGDA.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID = SGDV.SEC_GROUP_DSK_ATTRIBUTE_SYS_ID "
 								   + "INNER JOIN USERS U ON U.SEC_GROUP_SYS_ID = SG.SEC_GROUP_SYS_ID "
 								   + "WHERE U.USER_ID = ? AND SG.ACTIVE_STATUS_IND='1'";
-              Map<String,List<String>> dskList = jdbcTemplate.query(fetchDSKSql, new PreparedStatementSetter() {
+              Map<String,List<String>> dskValueMapping = jdbcTemplate.query(fetchDSKSql, new PreparedStatementSetter() {
 				  @Override public void setValues(PreparedStatement preparedStatement) throws SQLException {
 					  preparedStatement.setString(1, masterLoginId);
 				  }
 			  }, new UserRepositoryImpl.DSKValuesExtractor());
+               // DSK values should be array in JSON object hence converting into list.
+              List<DSKDetails> dskList = new ArrayList<>();
+				for (String key : dskValueMapping.keySet()) {
+					DSKDetails dskDetails = new DSKDetails();
+					dskDetails.setName(key);
+					dskDetails.setValues(dskValueMapping.get(key));
+					dskList.add(dskDetails);
+				}
 				ticketDetails.setDataSKey(dskList);
               // Roles and privileges
 				/**
