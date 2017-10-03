@@ -41,7 +41,7 @@ const methods = [
       },
       {
         label: 'Area Chart',
-        icon: {font: 'icon-line-chart'},
+        icon: {font: 'icon-area-chart'},
         type: 'chart:area'
       },
       {

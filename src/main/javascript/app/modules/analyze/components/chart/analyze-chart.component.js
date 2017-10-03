@@ -80,7 +80,8 @@ export const AnalyzeChartComponent = {
 
       this.isInverted = false;
       this.chartViewOptions = ChartService.getViewOptionsFor(this.model.chartType);
-      this.invertableCharts = ['column', 'bar', 'line', 'area', 'combo'];
+      this.comboableCharts = ['column', 'bar', 'line', 'area', 'combo'];
+      this.invertableCharts = [ ...this.comboableCharts, 'stack'];
       this.multyYCharts = this.invertableCharts;
     }
 
@@ -90,6 +91,7 @@ export const AnalyzeChartComponent = {
 
     $onInit() {
       const chartType = this.model.chartType;
+      console.log(chartType);
 
       if (this.model.chartType === 'bar') {
         this.isInverted = true;
@@ -280,6 +282,15 @@ export const AnalyzeChartComponent = {
 
     isDataField(field) {
       return field && NUMBER_TYPES.includes(field.type) && field.checked !== 'x';
+    }
+
+    xAndYSelected() {
+      if (!this.settings) {
+        return false;
+      }
+      const selectedY = !isEmpty(filter(this.settings.yaxis, ({checked}) => checked === 'y'));
+      const selectedX = Boolean(find(this.settings.xaxis, ({checked}) => checked === 'x'))
+      return selectedY || selectedX;
     }
 
     generatePayload(source) {

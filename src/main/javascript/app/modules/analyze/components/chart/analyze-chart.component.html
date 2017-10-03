@@ -100,7 +100,7 @@
                updater="$ctrl.updateChart"
                options="$ctrl.chartOptions"></chart>
       </div>
-      <md-card class="chart-container-card">
+      <md-card class="chart-container-card" ng-show="$ctrl.xAndYSelected()">
         <md-card-content layout="column">
           <filter-chips filters="$ctrl.filters"
                         on-clear-all-filters="$ctrl.onClearAllFilters()"
@@ -140,7 +140,8 @@
             </div>
           </div>
 
-          <div layout="column" ng-if="$ctrl.multyYCharts.includes($ctrl.model.chartType)">
+          <div layout="column"
+               ng-if="$ctrl.multyYCharts.includes($ctrl.model.chartType)">
             <div ng-repeat="y in $ctrl.settings.yaxis | filter:{checked: 'y'} track by y.columnName"
                  style="padding-bottom:5px;"
                  layout="row"
@@ -148,7 +149,7 @@
               <md-input-container flex="30" md-no-float>
                 <input ng-model="y.alias" placeholder="{{y.displayName}}"/>
               </md-input-container>
-              <md-menu flex="30">
+              <md-menu flex="30" ng-if="$ctrl.comboableCharts.includes($ctrl.model.chartType)">
                 <md-button class="md-icon-button"
                             ng-click="$mdMenu.open($event)">
                   <md-icon md-menu-origin
@@ -168,9 +169,11 @@
               </md-menu>
             </div>
             <div layout="row"
-                 layout-align="start center">
-              <md-input-container flex="30" md-no-float ng-if="::$ctrl.chartViewOptions.renamable.x">
-                <input ng-model="$ctrl.labels.tempX" placeholder="{{::('Custom ' + $ctrl.chartViewOptions.axisLabels.x + ' Label')}}"/>
+                 layout-align="start center"
+                 ng-repeat="x in $ctrl.settings.xaxis | filter:{checked: 'x'} track by x.columnName">
+              <md-input-container flex="30" md-no-float>
+                <input ng-model="x.alias"
+                       placeholder="{{::x.displayName}}"/>
               </md-input-container>
             </div>
             <div>
