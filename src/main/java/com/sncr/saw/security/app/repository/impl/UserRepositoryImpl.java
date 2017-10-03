@@ -1,5 +1,6 @@
 package com.sncr.saw.security.app.repository.impl;
 
+
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.common.bean.Category;
 import com.sncr.saw.security.common.bean.CustomerProductSubModule;
@@ -39,6 +40,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
+
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -302,6 +304,7 @@ public class UserRepositoryImpl implements UserRepository {
 	/**
 	 * inserts ticket into sso db
 	 * 
+	
 	 * @param ticket
 	 * @throws Exception
 	 * 
@@ -519,7 +522,8 @@ public class UserRepositoryImpl implements UserRepository {
 						preparedStatement.setString(2, ticketDetails.getRoleCode());
 					}
 				}, new UserRepositoryImpl.PrepareProdModFeatureExtractor());
-
+			
+				
 				String sql6 = "SELECT DISTINCT"
 				+ "   U.USER_SYS_ID, "
 				+ "   R.ROLE_SYS_ID, "
@@ -571,7 +575,7 @@ public class UserRepositoryImpl implements UserRepository {
 				+ "   AND CP.ACTIVE_STATUS_IND = PM.ACTIVE_STATUS_IND  "
 				+ "   AND CP.ACTIVE_STATUS_IND = CPM.ACTIVE_STATUS_IND  "
 				+ "   AND CPM.ACTIVE_STATUS_IND = CPMF.ACTIVE_STATUS_IND  "
-				+ "   AND PV.ROLE_SYS_ID = R.ROLE_SYS_ID AND PV.PRIVILEGE_CODE <>0"
+				+ "   AND PV.ROLE_SYS_ID = R.ROLE_SYS_ID AND PV.PRIVILEGE_CODE <>'0'"
 				+ "   AND R.ROLE_CODE = ?  "
 				+ "   AND R.ACTIVE_STATUS_IND = 1  "
 				+ "   AND CPMF.FEATURE_TYPE LIKE 'CHILD_%'";
@@ -830,6 +834,7 @@ public class UserRepositoryImpl implements UserRepository {
 				ticketDetails.setRoleType(rs.getString("role_type"));
 				ticketDetails.setRoleCode(rs.getString("role_code"));
 				ticketDetails.setLandingProd(rs.getString("landing_prod_sys_id"));
+				
 				ticketDetails.setUserId(rs.getLong("user_sys_id"));
 				if (firstName == null) {
 					firstName = rs.getString("first_name");
@@ -1450,6 +1455,7 @@ public class UserRepositoryImpl implements UserRepository {
 				}
 			}, new UserRepositoryImpl.roleDetailExtractor());
 
+			
 		
 			List<Long> featureSysIdList;
 			ArrayList<CustomerProductModuleFeature> cpmf = new ArrayList<CustomerProductModuleFeature>();
@@ -1474,6 +1480,7 @@ public class UserRepositoryImpl implements UserRepository {
 			}, new UserRepositoryImpl.CPMFDetailExtractor());
 
 			
+			
 	
 			 String sql3 = " SELECT CPMF1.CUST_PROD_MOD_FEATURE_SYS_ID "
 										+ "FROM "
@@ -1487,6 +1494,7 @@ public class UserRepositoryImpl implements UserRepository {
 				for (int i = 0; i < cpmf.size(); i++) {
 					Long custProdMod = cpmf.get(i).getCustProdModSysId();
 					Long custProd = cpmf.get(i).getCustProdSysId();
+					
 					
 					featureSysIdList = getFeatureSysId(sql3, custProdMod);
 					Long roleSysId = roleId;
@@ -1505,6 +1513,7 @@ public class UserRepositoryImpl implements UserRepository {
 					if (privExists) {
 						roleList.get(y).setPrivExists(true);
 					} 
+					
 				
 					if (featureSysIdList.get(0) != 0) {
 						Long custProdModFeatr = featureSysIdList.get(0);
@@ -1572,6 +1581,7 @@ public class UserRepositoryImpl implements UserRepository {
 				}
 				role.setCustSysId(rs.getLong("CUSTOMER_SYS_ID"));
 				
+				
 				role.setRoleDesc(rs.getString("ROLE_DESC"));
 				role.setRoleName(rs.getString("ROLE_NAME"));
 				role.setRoleSysId(rs.getLong("ROLE_SYS_ID"));
@@ -1629,6 +1639,7 @@ public class UserRepositoryImpl implements UserRepository {
 	public Valid addRole(RoleDetails role) {
 		Valid valid = new Valid();
 		Long roleId;
+		
 	
 		List<Long> featureSysIdList;
 		ArrayList<CustomerProductModuleFeature> cpmf = new ArrayList<CustomerProductModuleFeature>();
@@ -1696,6 +1707,7 @@ public class UserRepositoryImpl implements UserRepository {
 				// if yes check if My Analysis priv exists, if not create
 
 				
+				
 				String sql3 = " SELECT CPMF1.CUST_PROD_MOD_FEATURE_SYS_ID "
 							  + "FROM "
 							  + "( SELECT  FEATURE_CODE from customer_product_module_features "
@@ -1707,8 +1719,10 @@ public class UserRepositoryImpl implements UserRepository {
 					Long custProdMod = cpmf.get(i).getCustProdModSysId();
 					Long custProd = cpmf.get(i).getCustProdSysId();
 					
+					
 					featureSysIdList = getFeatureSysId(sql3, custProdMod);
 
+					
 					
 					for (Long featureSysId : featureSysIdList ) {
 						if (featureSysId != 0) {
@@ -1739,6 +1753,7 @@ public class UserRepositoryImpl implements UserRepository {
 						});
 						Long newFeatureId = getFeatureSysId(sql3, custProdMod);
 						insertMyAnalysisPrivileges(role, roleId, custProdMod, custProd, newFeatureId);
+			
 				
 					}*/
 				}
@@ -1825,6 +1840,7 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	
+	
 	private List<Long> getFeatureSysId(String sql3, Long custProdMod) {
 		return jdbcTemplate.query(sql3, new PreparedStatementSetter() {
 			public void setValues(PreparedStatement preparedStatement) throws SQLException {
@@ -1864,16 +1880,18 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	
+	
 	public class MyAnalysisDetailExtractor implements ResultSetExtractor<List<Long>> {
 
 		@Override
-		
 		public List<Long> extractData(ResultSet rs) throws SQLException, DataAccessException {
 			List<Long> featureIdList = new ArrayList<>();
 			while (rs.next()) {
 				
+				
 				featureIdList.add(rs.getLong("CUST_PROD_MOD_FEATURE_SYS_ID"));
 			}
+			
 			
 			return featureIdList;
 		}
@@ -2030,6 +2048,8 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public List<PrivilegeDetails> getPrivileges(Long customerId) {
 		ArrayList<PrivilegeDetails> privList = null;
+		
+	
 	
 		String sql = "SELECT DISTINCT C.CUSTOMER_SYS_ID, CP.CUST_PROD_SYS_ID, P.PRODUCT_NAME, CPMF.CUST_PROD_MOD_SYS_ID, M.MODULE_NAME, "
 					 + "PC.CUST_PROD_MOD_FEATURE_SYS_ID AS CATEGORY_ID,PC.FEATURE_CODE, CPMF.CUST_PROD_MOD_FEATURE_SYS_ID AS SUB_CATEGORY_ID, PC.FEATURE_NAME, "
@@ -2116,6 +2136,7 @@ public class UserRepositoryImpl implements UserRepository {
 				privilege.setProductName(rs.getString("PRODUCT_NAME"));
 				privilege.setModuleId(rs.getLong("CUST_PROD_MOD_SYS_ID"));
 				privilege.setModuleName(rs.getString("MODULE_NAME"));
+				
 				privilege.setCategoryId(rs.getLong("CATEGORY_ID"));
 				privilege.setCategoryCode(rs.getString("FEATURE_CODE"));
 				privilege.setSubCategoryId(rs.getLong("SUB_CATEGORY_ID"));
@@ -2359,7 +2380,9 @@ public class UserRepositoryImpl implements UserRepository {
 	}
 
 	@Override
+	
 
+		
 	public Valid upsertPrivilege(AddPrivilegeDetails addPrivilegeDetails) {
 		Valid valid = new Valid();
 		// Add privilege at subcategory level functional implementation are as follows.
@@ -2431,6 +2454,7 @@ public class UserRepositoryImpl implements UserRepository {
 
 		try {
 		
+		
 			privExists = jdbcTemplate.query(sql1, preparedStatement -> {
                 preparedStatement.setLong(1, addPrivilegeDetails.getProductId());
                 preparedStatement.setLong(2, addPrivilegeDetails.getModuleId());
@@ -2443,12 +2467,14 @@ public class UserRepositoryImpl implements UserRepository {
 				//Check if privilege exists for the product/module, if no then create privileges for them.
 				
 				
+				
 				insertPMFAccessPrivilege(addPrivilegeDetails.getMasterLoginId(), addPrivilegeDetails.getRoleId(), addPrivilegeDetails.getModuleId(), addPrivilegeDetails.getProductId());
 				// Check if this is a child or a parent category
 
 				// if child - Then insert privilege "view" for parent and then
 				// insert privilege for child
 
+				
 				
 				if (addPrivilegeDetails.getCategoryType().split("_")[0].equals("CHILD")) {
 
@@ -2515,9 +2541,11 @@ public class UserRepositoryImpl implements UserRepository {
 						preparedStatement.setString(8, privilege.getMasterLoginId());
 					}
 				
+				
 				});*/
 			
 				valid.setValid(true);
+			
 			
 		} catch (Exception e) {
 			logger.error("Exception encountered while accessing DB : " + e.getMessage(), null, e);
