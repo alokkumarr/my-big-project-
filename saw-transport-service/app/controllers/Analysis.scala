@@ -528,6 +528,10 @@ class Analysis extends BaseController {
             case "BooleanType" => JBool(m.get(k)._2.asInstanceOf[Boolean])
             case "LongType" => JLong(m.get(k)._2.asInstanceOf[Long])
             case "DoubleType" => JDouble(m.get(k)._2.asInstanceOf[Double])
+            /* It is possible that the data type information returned from the
+             * Spark SQL Executor might not always come through
+             * reliably.  So as a fallback also perform conversions
+             * based on the Java object classes.  */
             case dataType => m.get(k)._2 match {
               case obj: String => JString(obj)
               case obj: java.lang.Integer => JInt(obj.intValue())
@@ -535,6 +539,7 @@ class Analysis extends BaseController {
               case obj: java.lang.Float => JDouble(obj.floatValue())
               case obj: java.lang.Double => JDouble(obj.doubleValue())
               case obj: java.lang.Boolean => JBool(obj.booleanValue())
+              case obj: java.sql.Date => JLong(obj.getTime())
               case obj =>
                 throw new RuntimeException(
                   "Unsupported data type in result: " + dataType
