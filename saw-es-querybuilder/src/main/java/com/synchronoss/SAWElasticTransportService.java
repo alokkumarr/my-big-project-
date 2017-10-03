@@ -58,6 +58,8 @@ public class SAWElasticTransportService {
     JsonNode finalResponse = objectMapper.readTree(esResponse.get("data").toString());
     return finalResponse.get("aggregations").toString();
   }
+  
+  
 
   /**
    * 
@@ -74,7 +76,6 @@ public class SAWElasticTransportService {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     String response = execute(query, jsonString, dsk, userName, moduleName);
-   // String arr[] = new String[1];
     String arr = response;
     return arr;
   }

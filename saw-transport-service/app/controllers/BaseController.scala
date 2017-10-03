@@ -13,6 +13,7 @@ import org.json4s.native.JsonMethods.{compact, parse, pretty, render}
 import org.slf4j.{Logger, LoggerFactory}
 import play.libs.Json
 import play.mvc.{Controller, Http, Result, Results}
+import collection.JavaConverters._
 
 import model.ClientException
 
@@ -92,7 +93,7 @@ class BaseController extends Controller {
           Some(Ticket(
             ticket.get("userId").asInstanceOf[Integer],
             ticket.get("userFullName").asInstanceOf[String],
-            ticket.get("dataSecurityKey").asInstanceOf[String]))
+            ticket.get("dataSecurityKey").asJava.asInstanceOf[java.util.List[Any]]))
         } else {
           log.info("Unrecognized Authorization header: " + value)
           None

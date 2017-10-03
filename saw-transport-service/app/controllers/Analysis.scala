@@ -80,11 +80,12 @@ class Analysis extends BaseController {
         (ticket.dataSecurityKey)
     }
     m_log.trace("dataSecurityKey before processing: {}", dataSecurityKey);
-    val dskString = dataSecurityKey.asInstanceOf[String].toString;
+    val dskString = dataSecurityKey.asInstanceOf[java.util.List[Any]];
     var dskStr : String = "";
-    if((dskString!=null) && (!dskString.equals("") && !dskString.equals("NA"))){
-      dskStr = dataSecurityKey.asInstanceOf[String].toString;
+    if(dskString!=null && dskString.size()>0){
+      dskStr = "dataSecuritykey :[" + dataSecurityKey.mkString(",") + "]";
       m_log.trace("dskStr after processing: {}", dskStr);
+
     }
     action match {
       case "create" => {

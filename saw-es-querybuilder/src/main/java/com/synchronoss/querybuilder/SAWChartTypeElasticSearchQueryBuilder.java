@@ -99,7 +99,7 @@ class SAWChartTypeElasticSearchQueryBuilder {
       List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
       if (dataSecurityKeyNode!=null) {
     	  for (DataSecurityKeyDef dsk : dataSecurityKeyNode.getDataSecuritykey()){
-    	      TermsQueryBuilder dataSecurityBuilder = new TermsQueryBuilder(dsk.getName(), dsk.getValues());
+    	      TermsQueryBuilder dataSecurityBuilder = new TermsQueryBuilder(dsk.getName().concat(BuilderUtil.SUFFIX), dsk.getValues());
     	      builder.add(dataSecurityBuilder);
     	      }
       }
