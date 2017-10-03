@@ -73,7 +73,7 @@ class Analysis extends BaseController {
 
   private def doProcess(json: JValue, ticket: Option[Ticket]): JValue = {
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
-    val (dataSecurityKey: String) = ticket match {
+    val (dataSecurityKey: java.util.List[Any]) = ticket match {
       case None => throw new ClientException(
         "Valid JWT not found in Authorization header")
       case Some(ticket) =>
