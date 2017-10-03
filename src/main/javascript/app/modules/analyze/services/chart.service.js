@@ -321,12 +321,12 @@ export function ChartService(Highcharts) {
 
   function splinifyChartType(type) {
     switch (type) {
-      case 'line':
-        return 'spline';
-      case 'area':
+    case 'line':
+      return 'spline';
+    case 'area':
       return 'areaspline';
-      default:
-        return type;
+    default:
+      return type;
     }
   }
 

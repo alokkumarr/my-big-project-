@@ -13,6 +13,10 @@ import * as set from 'lodash/set';
 import * as orderBy from 'lodash/orderBy';
 import * as concat from 'lodash/concat';
 import * as remove from 'lodash/remove';
+import * as every from 'lodash/every';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpMap from 'lodash/fp/map';
+import * as fpFilter from 'lodash/fp/filter';
 
 import * as template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -335,8 +339,22 @@ export const AnalyzeChartComponent = {
     }
 
     openSaveChartModal(ev) {
+      this.model.chartType = this.getNewChartType(this.model)
       const payload = this.generatePayload(this.model);
       this.openSaveModal(ev, payload);
+    }
+
+    getNewChartType(model) {
+      const types = fpPipe(
+        fpFilter(({checked}) => checked === 'y'),
+        fpMap('comboType')
+      )(model.artifacts[0].columns);
+      if (isEmpty(types)) {
+        return model.chartType;
+      }
+      const firstType = types[0];
+      const typesAreTheSame = every(types, type => type === firstType);
+      return typesAreTheSame ? firstType : 'combo';
     }
   }
 
