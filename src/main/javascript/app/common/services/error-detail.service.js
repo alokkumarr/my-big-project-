@@ -20,6 +20,6 @@ export function errorDetailService() {
   }
 
   function getDetail(error) {
-    return error;
+    return JSON.stringify(error);
   }
 }
