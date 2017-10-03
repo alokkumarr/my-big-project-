@@ -13,7 +13,7 @@ import org.json4s.native.JsonMethods.{compact, parse, pretty, render}
 import org.slf4j.{Logger, LoggerFactory}
 import play.libs.Json
 import play.mvc.{Controller, Http, Result, Results}
-import collection.JavaConverters._
+
 
 import model.ClientException
 

@@ -23,6 +23,7 @@ import com.synchronoss.querybuilder.EntityType
 import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
+import collection.JavaConverters._
 
 import sncr.metadata.engine.{Fields, MetadataDictionary}
 
@@ -80,12 +81,12 @@ class Analysis extends BaseController {
         (ticket.dataSecurityKey)
     }
     m_log.trace("dataSecurityKey before processing: {}", dataSecurityKey);
-    val dskString = dataSecurityKey.asInstanceOf[java.util.List[Any]];
+    val dskString = dataSecurityKey.asScala.mkString(",")
+    m_log.trace("dataSecurityKey after conversion: {}", dskString);
     var dskStr : String = "";
-    if(dskString!=null && dskString.size()>0){
-      dskStr = "dataSecuritykey :[" + dataSecurityKey.mkString(",") + "]";
+    if(dskString!=null && dataSecurityKey.size()>0){
+      dskStr = "dataSecuritykey :[" + dskString + "]";
       m_log.trace("dskStr after processing: {}", dskStr);
-
     }
     action match {
       case "create" => {
