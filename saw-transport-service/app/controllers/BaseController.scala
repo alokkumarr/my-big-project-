@@ -93,7 +93,7 @@ class BaseController extends Controller {
           Some(Ticket(
             ticket.get("userId").asInstanceOf[Integer],
             ticket.get("userFullName").asInstanceOf[String],
-            ticket.get("dataSecurityKey").asJava.asInstanceOf[java.util.List[Any]]))
+            ticket.get("dataSecurityKey").asInstanceOf[java.util.List[Any]]))
         } else {
           log.info("Unrecognized Authorization header: " + value)
           None
