@@ -1,15 +1,5 @@
 package com.sncr.saw.security.app.repository.impl.test;
 
-import static org.mockito.Mockito.when; // ...or...
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import com.sncr.saw.security.app.repository.UserRepository;
 import com.sncr.saw.security.common.bean.Category;
 import com.sncr.saw.security.common.bean.Module;
@@ -21,11 +11,25 @@ import com.sncr.saw.security.common.bean.User;
 import com.sncr.saw.security.common.bean.Valid;
 import com.sncr.saw.security.common.bean.repo.admin.category.CategoryDetails;
 import com.sncr.saw.security.common.bean.repo.admin.category.SubCategoryDetails;
+import com.sncr.saw.security.common.bean.repo.admin.privilege.AddPrivilegeDetails;
 import com.sncr.saw.security.common.bean.repo.admin.privilege.PrivilegeDetails;
+import com.sncr.saw.security.common.bean.repo.admin.privilege.SubCategoriesPrivilege;
 import com.sncr.saw.security.common.bean.repo.admin.role.RoleDetails;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.util.DateUtil;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class UserRepositoryImplTest {
 
@@ -41,6 +45,8 @@ public class UserRepositoryImplTest {
 	
 	private static PrivilegeDetails privilege1;
 	private static PrivilegeDetails privilege2;
+    private static AddPrivilegeDetails addPrivilege1;
+    private static AddPrivilegeDetails addPrivilege2;
 	private static List<PrivilegeDetails> privilegeList = new ArrayList<PrivilegeDetails>();
 	
 	private static CategoryDetails category1;
@@ -146,7 +152,22 @@ public class UserRepositoryImplTest {
 		privilege1.setPrivilegeCode(128l);
 		privilege1.setPrivilegeDesc("All");
 		privilege1.setPrivilegeId(1l);
-		
+		addPrivilege1 = new AddPrivilegeDetails();
+		SubCategoriesPrivilege subCategoriesPrivilege = new SubCategoriesPrivilege();
+		subCategoriesPrivilege.setPrivilegeCode(128l);
+		subCategoriesPrivilege.setPrivilegeDesc("All");
+		subCategoriesPrivilege.setPrivilegeId(11L);
+		List <SubCategoriesPrivilege > list = new ArrayList<>();
+		list.add(subCategoriesPrivilege);
+		addPrivilege1.setCustomerId(1l);
+		addPrivilege1.setProductId(1l);
+		addPrivilege1.setRoleId(1l);
+		addPrivilege1.setModuleId(1l);
+		addPrivilege1.setCategoryId(1l);
+		addPrivilege1.setCategoryType("parents");
+		addPrivilege1.setMasterLoginId("1");
+		addPrivilege1.setSubCategoriesPrivilege(list);
+
         privilege2 = new PrivilegeDetails();
 		privilege2.setCustomerId(1l);
 		privilege2.setProductId(1l);
@@ -158,6 +179,22 @@ public class UserRepositoryImplTest {
 		privilege2.setPrivilegeCode(128l);
 		privilege2.setPrivilegeDesc("All");
 		privilege2.setPrivilegeId(2l);
+
+		addPrivilege2 = new AddPrivilegeDetails();
+		SubCategoriesPrivilege subCategoriesPrivilege2 = new SubCategoriesPrivilege();
+		subCategoriesPrivilege.setPrivilegeCode(128l);
+		subCategoriesPrivilege.setPrivilegeDesc("All");
+		subCategoriesPrivilege.setPrivilegeId(11L);
+		List <SubCategoriesPrivilege > list2 = new ArrayList<>();
+		list.add(subCategoriesPrivilege2);
+		addPrivilege2.setCustomerId(1l);
+		addPrivilege2.setProductId(1l);
+		addPrivilege2.setRoleId(1l);
+		addPrivilege2.setModuleId(1l);
+		addPrivilege2.setCategoryId(1l);
+		addPrivilege2.setCategoryType("child");
+		addPrivilege2.setMasterLoginId("1");
+		addPrivilege2.setSubCategoriesPrivilege(list);
 		// End of ****************Privilege Management*************************
 		
 		// ****************Categories Management*************************
@@ -603,8 +640,8 @@ public class UserRepositoryImplTest {
 	public void testAddPrivilege() {
 		Valid validPrivilege1 = new Valid();
 		validPrivilege1.setValid(true);	
-		when(userRepositoryDAO.addPrivilege(privilege1)).thenReturn(validPrivilege1); // Stubbing the methods of mocked PrivilegeuserRepo with mocked data.	
-		Valid isbn = userRepositoryDAO.addPrivilege(privilege1);
+		when(userRepositoryDAO.upsertPrivilege(addPrivilege1)).thenReturn(validPrivilege1); // Stubbing the methods of mocked PrivilegeuserRepo with mocked data.
+		Valid isbn = userRepositoryDAO.upsertPrivilege(addPrivilege1);
 		assertNotNull(isbn);
 		assertEquals(true, isbn.getValid());
 		if(isbn.getValid()){
@@ -616,8 +653,8 @@ public class UserRepositoryImplTest {
 		
 		Valid validPrivilege2 = new Valid();
 		validPrivilege2.setValid(true);	
-		when(userRepositoryDAO.addPrivilege(privilege2)).thenReturn(validPrivilege2); // Stubbing the methods of mocked PrivilegeuserRepo with mocked data.	
-		isbn = userRepositoryDAO.addPrivilege(privilege2);
+		when(userRepositoryDAO.upsertPrivilege(addPrivilege2)).thenReturn(validPrivilege2); // Stubbing the methods of mocked PrivilegeuserRepo with mocked data.
+		isbn = userRepositoryDAO.upsertPrivilege(addPrivilege2);
 		assertNotNull(isbn);
 		assertEquals(true, isbn.getValid());
 		if(isbn.getValid()){
