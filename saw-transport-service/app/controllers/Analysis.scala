@@ -23,6 +23,7 @@ import com.synchronoss.querybuilder.EntityType
 import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
+import collection.JavaConverters._
 
 import sncr.metadata.engine.{Fields, MetadataDictionary}
 
@@ -73,17 +74,18 @@ class Analysis extends BaseController {
 
   private def doProcess(json: JValue, ticket: Option[Ticket]): JValue = {
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
-    val (dataSecurityKey: String) = ticket match {
+    val (dataSecurityKey: java.util.List[Any]) = ticket match {
       case None => throw new ClientException(
         "Valid JWT not found in Authorization header")
       case Some(ticket) =>
         (ticket.dataSecurityKey)
     }
     m_log.trace("dataSecurityKey before processing: {}", dataSecurityKey);
-    val dskString = dataSecurityKey.asInstanceOf[String].toString;
+    val dskString = dataSecurityKey.asScala.mkString(",")
+    m_log.trace("dataSecurityKey after conversion: {}", dskString);
     var dskStr : String = "";
-    if((dskString!=null) && (!dskString.equals("") && !dskString.equals("NA"))){
-      dskStr = dataSecurityKey.asInstanceOf[String].toString;
+    if(dskString!=null && dataSecurityKey.size()>0){
+      dskStr = "dataSecuritykey :[" + dskString + "]";
       m_log.trace("dskStr after processing: {}", dskStr);
     }
     action match {

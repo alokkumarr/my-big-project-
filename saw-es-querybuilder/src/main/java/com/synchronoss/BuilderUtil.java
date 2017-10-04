@@ -16,6 +16,9 @@ import com.github.fge.jsonschema.main.JsonValidator;
 public class BuilderUtil 
 {
 
+     public static final String SUFFIX = ".keyword";
+     public static final int SIZE = 50;
+  
 	/**
 	 * This method is used to load the json string to object tree
 	 * @param jsonString
@@ -84,4 +87,7 @@ public class BuilderUtil
         return repository;
 		
 	}
+	
+	
+	
 }

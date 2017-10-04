@@ -5,6 +5,7 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram.Order;
 
+import com.synchronoss.BuilderUtil;
 import com.synchronoss.querybuilder.model.chart.NodeField;
 import com.synchronoss.querybuilder.model.pivot.ColumnField;
 
@@ -28,11 +29,11 @@ public class QueryBuilderUtil {
 			}
 		  else {
 		    aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(columnField.getColumnName())
-		        .format(DATE_FORMAT).order(org.elasticsearch.search.aggregations.bucket.terms.Terms.Order.term(false));
+		        .format(DATE_FORMAT).order(org.elasticsearch.search.aggregations.bucket.terms.Terms.Order.term(false)).size(BuilderUtil.SIZE);
 		  }
 		}
 		else {
-          aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(columnField.getColumnName());
+          aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(columnField.getColumnName()).size(BuilderUtil.SIZE);
 		}
 		
 		return aggregationBuilder;
@@ -52,11 +53,11 @@ public class QueryBuilderUtil {
 	            }
 	          else {
 	            aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(rowField.getColumnName())
-	                .format(DATE_FORMAT).order(org.elasticsearch.search.aggregations.bucket.terms.Terms.Order.term(false));
+	                .format(DATE_FORMAT).order(org.elasticsearch.search.aggregations.bucket.terms.Terms.Order.term(false)).size(BuilderUtil.SIZE);
 	          }
 			}
 			else {
-	          aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(rowField.getColumnName());
+	          aggregationBuilder =  AggregationBuilders.terms(aggregationName).field(rowField.getColumnName()).size(BuilderUtil.SIZE);
 			}
 			
 			return aggregationBuilder;
@@ -128,11 +129,11 @@ public class QueryBuilderUtil {
             }
           else {
             aggregationBuilder =  AggregationBuilders.terms(nodeName).field(nodeField.getColumnName())
-                .format(DATE_FORMAT).order(org.elasticsearch.search.aggregations.bucket.terms.Terms.Order.term(false));
+                .format(DATE_FORMAT).order(org.elasticsearch.search.aggregations.bucket.terms.Terms.Order.term(false)).size(BuilderUtil.SIZE);
           }
 		}
 		else{
-			aggregationBuilder = AggregationBuilders.terms(nodeName).field(nodeField.getColumnName());
+			aggregationBuilder = AggregationBuilders.terms(nodeName).field(nodeField.getColumnName()).size(BuilderUtil.SIZE);
 		}
 		return aggregationBuilder;
 	}	

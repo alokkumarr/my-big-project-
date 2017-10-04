@@ -192,7 +192,7 @@ object QueryBuilder {
       (filter \ name \ subname).extract[String]
     }
     val condition = property("type") match {
-      case "int" | "long" | "float" | "double" => {
+      case "int" | "long" | "float" | "double" | "integer" => {
         val operator = subProperty("model", "operator").toLowerCase
         val value = subProperty("model", "value")
         if (operator == "btw") {
