@@ -81,13 +81,12 @@ class Analysis extends BaseController {
         (ticket.dataSecurityKey)
     }
     m_log.trace("dataSecurityKey before processing: {}", dataSecurityKey);
-    val dskString = dataSecurityKey.asScala.mkString(",")
-    m_log.trace("dataSecurityKey after conversion: {}", dskString);
-    var dskStr : String = "";
-    if(dskString!=null && dataSecurityKey.size()>0){
-      dskStr = "dataSecuritykey :[" + dskString + "]";
+    var dskStr : String = null;
+    if(dataSecurityKey.size()>0){
+      dskStr = dataSecurityKey.asScala.mkString(",") ;
       m_log.trace("dskStr after processing: {}", dskStr);
     }
+
     action match {
       case "create" => {
         val semanticId = extractAnalysisId(json)
