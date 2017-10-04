@@ -7,6 +7,15 @@ analyze-pivot-settings {
     height: 100%;
   }
 
+  .truncated-field-name {
+    display: block;
+    margin-right: 10px;
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   md-sidenav {
     position: static;
     width: 300px;
