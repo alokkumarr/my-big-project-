@@ -110,7 +110,7 @@ export const AnalyzePivotComponent = {
     initExistingSettings() {
       this.filters = map(this.model.sqlBuilder.filters,
                          this._FilterService.backend2FrontendFilter(this.artifacts));
-      this.sortFields = this._SortService.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
+      this.sortFields = this.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
       this.sorts = this._SortService.mapBackend2FrontendSort(this.model.sqlBuilder.sorts, this.sortFields);
     }
 
@@ -123,7 +123,7 @@ export const AnalyzePivotComponent = {
 
     onApplySettings(columns) {
       this.artifacts[0].columns = columns;
-      this.sortFields = this._SortService.getArtifactColumns2SortFieldMapper()(this.artifacts[0].columns);
+      this.sortFields = this.getArtifactColumns2SortFieldMapper()(this.artifacts[0].columns);
       this.analysisUnSynched();
       this.startDraftMode();
       const pivotFields = this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns);
@@ -310,6 +310,21 @@ export const AnalyzePivotComponent = {
       });
       unset(model, 'supports');
       return model;
+    }
+
+    getArtifactColumns2SortFieldMapper() {
+      return fpPipe(
+        fpFilter(artifactColumn => artifactColumn.checked &&
+          (artifactColumn.area === 'row' || artifactColumn.area === 'column')),
+        // fpFilter(artifactColumn => !DATE_TYPES.includes(artifactColumn.dataType)),
+        fpMap(artifactColumn => {
+          return {
+            type: artifactColumn.type,
+            dataField: artifactColumn.columnName,
+            label: artifactColumn.alias || artifactColumn.displayName
+          };
+        })
+      );
     }
 
     getSqlBuilder() {
