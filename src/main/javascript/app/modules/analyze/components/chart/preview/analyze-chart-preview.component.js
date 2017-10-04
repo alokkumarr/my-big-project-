@@ -25,8 +25,8 @@ export const AnalyzeChartPreviewComponent = {
 
     $onInit() {
       this.chart = {
-        height: 680;
-      }
+        height: 680
+      };
       this.chartOptions = this._ChartService.getChartConfigFor(this.model.chart.chartType, {chart: this.chart, legend: this.model.legend});
       this._AnalyzeService.previewExecution(this.model.chart).then(({data}) => {
         const parsedData = this._ChartService.parseData(data, this.model.chart.sqlBuilder);
