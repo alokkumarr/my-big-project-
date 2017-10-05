@@ -81,13 +81,6 @@ class Analysis extends BaseController {
       case Some(ticket) =>
         (ticket.dataSecurityKey)
     }
-    m_log.trace("dataSecurityKey before processing: {}", dataSecurityKey);
-    var dskStr : String = null;
-    if(dataSecurityKey.size()>0){
-      //dskStr = dataSecurityKey.asScala.mkString(",") ;
-      dskStr = BuilderUtil.constructDSKCompatibleString(BuilderUtil.listToJSONString(dataSecurityKey));
-      m_log.trace("dskStr after processing: {}", dskStr);
-    }
 
     action match {
       case "create" => {
@@ -125,6 +118,14 @@ class Analysis extends BaseController {
         responseJson
       }
       case "update" => {
+        m_log.trace("dataSecurityKey before processing in update: {}", dataSecurityKey);
+        var dskStr : String = ""
+        if(dataSecurityKey.size()>0){
+          //dskStr = dataSecurityKey.asScala.mkString(",") ;
+          dskStr = BuilderUtil.constructDSKCompatibleString(BuilderUtil.listToJSONString(dataSecurityKey));
+          m_log.trace("dskStr after processing in update: {}", dskStr);
+        }
+
         val analysisId = extractAnalysisId(json)
         val analysisNode = AnalysisNode(analysisId)
         m_log.trace("dskStr after processing inside update block before analysisJson(json, dskStr) : {}", dskStr);
@@ -152,6 +153,15 @@ class Analysis extends BaseController {
         json merge contentsAnalyze(searchAnalysisJson(keys))
       }
       case "execute" => {
+
+        m_log.trace("dataSecurityKey before processing in execute: {}", dataSecurityKey);
+        var dskStr : String = ""
+        if(dataSecurityKey.size()>0){
+          //dskStr = dataSecurityKey.asScala.mkString(",") ;
+          dskStr = BuilderUtil.constructDSKCompatibleString(BuilderUtil.listToJSONString(dataSecurityKey));
+          m_log.trace("dskStr after processing in execute: {}", dskStr);
+        }
+
         val analysisId = extractAnalysisId(json)
         var queryRuntime: String = null
         (json \ "contents" \ "analyze") match {
