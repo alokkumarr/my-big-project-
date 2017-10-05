@@ -24,6 +24,7 @@ import * as concat from 'lodash/concat';
 import * as compact from 'lodash/compact';
 import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as mapValues from 'lodash/mapValues';
+import * as sortBy from 'lodash/sortBy';
 import * as moment from 'moment';
 import * as toString from 'lodash/toString'
 
@@ -304,6 +305,12 @@ export function ChartService(Highcharts) {
       });
     });
 
+    if (!isEmpty(categories)) {
+      forEach(series, serie => {
+        serie.data = sortBy(serie.data, 'x');
+      });
+    }
+
     return {
       series,
       categories
@@ -557,7 +564,6 @@ export function ChartService(Highcharts) {
   }
 
   const dataToChangeConfig = (type, settings, gridData, opts) => {
-
     let changes;
     const fields = {
       x: find(settings.xaxis, attr => attr.checked === 'x'),
@@ -613,12 +619,9 @@ export function ChartService(Highcharts) {
     const yIsNumber = some(fields.y, y => NUMBER_TYPES.includes(y.type));
 
     const yField = fields.y[0];
-    const yAxisName = `${yIsSingle || fields.g ?
-      `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}` :
-      '{series.name}'}`;
     const yAxisString = `<tr>
-      <th>${yAxisName}:</th>
-      <td>{point.y${yIsNumber ? ':.2f' : ''}}</td>
+      <th>{series.name}:</th>
+      <td>{point.y:.2f}</td>
     </tr>`;
     const zAxisString = fields.z ?
     `<tr><th>${fields.z.displayName}:</th><td>{point.z:.2f}</td></tr>` :

@@ -1,5 +1,5 @@
 analyze-sort-dialog {
-  width: 550px;
+  width: 620px;
 }
 
 .ars {
@@ -33,4 +33,8 @@ analyze-sort-dialog {
     text-decoration: underline;
     cursor: pointer;
   }
+}
+
+.layout-row md-select {
+  width: 275px;
 }
