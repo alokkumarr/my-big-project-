@@ -93,7 +93,7 @@ class BaseController extends Controller {
           Some(Ticket(
             ticket.get("userId").asInstanceOf[Integer],
             ticket.get("userFullName").asInstanceOf[String],
-            ticket.get("dataSecurityKey").asInstanceOf[java.util.List[Any]]))
+            ticket.get("dataSecurityKey").asInstanceOf[java.util.List[Object]]))
         } else {
           log.info("Unrecognized Authorization header: " + value)
           None
@@ -132,4 +132,4 @@ class BaseController extends Controller {
   }
 }
 
-case class Ticket(userId: Integer, userFullName: String, dataSecurityKey: java.util.List[Any])
+case class Ticket(userId: Integer, userFullName: String, dataSecurityKey: java.util.List[Object])
