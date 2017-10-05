@@ -21,6 +21,7 @@ import sncr.metadata.semantix.SemanticNode
 import com.synchronoss.querybuilder.SAWElasticSearchQueryExecutor
 import com.synchronoss.querybuilder.EntityType
 import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder
+import com.synchronoss.BuilderUtil
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 import collection.JavaConverters._
@@ -83,7 +84,8 @@ class Analysis extends BaseController {
     m_log.trace("dataSecurityKey before processing: {}", dataSecurityKey);
     var dskStr : String = null;
     if(dataSecurityKey.size()>0){
-      dskStr = dataSecurityKey.asScala.mkString(",") ;
+      //dskStr = dataSecurityKey.asScala.mkString(",") ;
+      dskStr = BuilderUtil.constructDSKCompatibleString(BuilderUtil.listToJSONString(dataSecurityKey));
       m_log.trace("dskStr after processing: {}", dskStr);
     }
 
