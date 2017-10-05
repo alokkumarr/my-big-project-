@@ -17,6 +17,10 @@
     }
   }
 
+  md-dialog md-dialog-content {
+    overflow: unset;
+  }
+
   .privilege-dialog_content {
     padding: 15px;
 
