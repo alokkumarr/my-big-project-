@@ -21,6 +21,7 @@ import sncr.metadata.semantix.SemanticNode
 import com.synchronoss.querybuilder.SAWElasticSearchQueryExecutor
 import com.synchronoss.querybuilder.EntityType
 import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder
+import com.synchronoss.BuilderUtil
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 import collection.JavaConverters._
@@ -74,7 +75,7 @@ class Analysis extends BaseController {
 
   private def doProcess(json: JValue, ticket: Option[Ticket]): JValue = {
     val action = (json \ "contents" \ "action").extract[String].toLowerCase
-    val (dataSecurityKey: java.util.List[Any]) = ticket match {
+    val (dataSecurityKey: java.util.List[Object]) = ticket match {
       case None => throw new ClientException(
         "Valid JWT not found in Authorization header")
       case Some(ticket) =>
@@ -83,7 +84,8 @@ class Analysis extends BaseController {
     m_log.trace("dataSecurityKey before processing: {}", dataSecurityKey);
     var dskStr : String = null;
     if(dataSecurityKey.size()>0){
-      dskStr = dataSecurityKey.asScala.mkString(",") ;
+      //dskStr = dataSecurityKey.asScala.mkString(",") ;
+      dskStr = BuilderUtil.constructDSKCompatibleString(BuilderUtil.listToJSONString(dataSecurityKey));
       m_log.trace("dskStr after processing: {}", dskStr);
     }
 
@@ -482,7 +484,9 @@ class Analysis extends BaseController {
       // This is the part of report type starts here
       m_log.trace("dataSecurityKeyStr dataset inside report block: {}", dataSecurityKeyStr);
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
-      val query = if (queryRuntime != null) queryRuntime else QueryBuilder.build(analysisJSON, false, dataSecurityKeyStr)
+      var query :String =null
+        if (queryRuntime != null) {query = queryRuntime} else {query = QueryBuilder.build(analysisJSON, false, dataSecurityKeyStr)}
+      m_log.trace("query inside report block before executeAndWait : {}", query);
       val execution = analysis.executeAndWait(ExecutionType.onetime, query)
       val analysisResultId: String = execution.getId
       //TODO:: Subject to change: to get ALL data use:  val resultData = execution.getAllData

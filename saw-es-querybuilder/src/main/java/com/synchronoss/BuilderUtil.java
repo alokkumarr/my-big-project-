@@ -2,6 +2,7 @@ package com.synchronoss;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -88,6 +89,20 @@ public class BuilderUtil
 		
 	}
 	
+	public static String listToJSONString (List<Object> objects) throws JsonProcessingException
+	{
+	  String jsonString = null;
+	  ObjectMapper objectMapper = new ObjectMapper();
+	  objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+	  jsonString = objectMapper.writeValueAsString(objects);
+	  return jsonString;
+	} 
+	
+	   public static String constructDSKCompatibleString (String dskJSONString) throws JsonProcessingException
+	    {
+	      return "{\"dataSecurityKey\":" + dskJSONString + "}";
+	    } 
+
 	
 	
 }
