@@ -236,7 +236,7 @@ export const AnalyzeChartComponent = {
         this.model.chartType,
         settings,
         filteredGridData,
-        {labels: this.labels, labelOptions: this.model.labelOptions}
+        {labels: this.labels, labelOptions: this.model.labelOptions, sorts: this.sorts}
       );
 
       this.updateChart.next(changes);
@@ -297,6 +297,19 @@ export const AnalyzeChartComponent = {
           field.aggregate = 'sum';
         }
       });
+
+      if (isEmpty(this.sorts)) {
+        forEach(nodeFields, node => {
+          this.sorts.push({
+            field: {
+              type: node.type,
+              label: node.displayName,
+              dataField: node.columnName
+            },
+            order :'asc'
+          })
+        });
+      }
 
       set(payload, 'sqlBuilder.dataFields', dataFields);
       set(payload, 'sqlBuilder.nodeFields', nodeFields);

@@ -19,6 +19,7 @@ import * as fpMap from 'lodash/fp/map';
 import * as fpMapValues from 'lodash/fp/mapValues';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpSortBy from 'lodash/fp/sortBy';
+import * as fpOrderBy from 'lodash/fp/orderBy';
 import * as reduce from 'lodash/reduce';
 import * as concat from 'lodash/concat';
 import * as compact from 'lodash/compact';
@@ -268,7 +269,7 @@ export function ChartService(Highcharts) {
     );
   }
 
-  function splitToSeriesAndCategories(parsedData, fields) {
+  function splitToSeriesAndCategories(parsedData, fields, {sorts}) {
     let series = [];
     const categories = {};
     const areMultipleYAxes = fields.y.length > 1;
@@ -298,6 +299,34 @@ export function ChartService(Highcharts) {
         forEach(dataPoint, (v, k) => {
           if (isCategoryAxis(fields, k)) {
             addToCategory(categories, k, v);
+          }
+        });
+        return dataPoint;
+      });
+    });
+
+    // sort the categories if a sort is specified for category field
+    if (sorts && sorts.length) {
+      forEach(categories, (v, k) => {
+        const field = filter(fieldsArray, field => field.checked === k)[0] || {};
+        const sortField = filter(sorts, sortF => sortF.field.dataField === field.columnName)[0] || {};
+        categories[k] = fpOrderBy(
+          value => getSortValue(field, value),
+          sortField.order === 'asc' ? 'asc' : 'desc',
+          categories[k]
+        );
+      });
+    }
+
+    /* assign data points to category indexes. If this is done
+    at the same time as creation of categories, it becomes impossible
+    to get the index from sorted categories array since it'll be
+    incomplete */
+    forEach(series, serie => {
+      serie.data = map(serie.data, point => {
+        const dataPoint = clone(point);
+        forEach(dataPoint, (v, k) => {
+          if (isCategoryAxis(fields, k)) {
             dataPoint[k] = indexOf(categories[k], v);
           }
         });
@@ -315,6 +344,18 @@ export function ChartService(Highcharts) {
       series,
       categories
     };
+  }
+
+  function getSortValue(field, value) {
+    if (!field) {
+      return value;
+    }
+
+    if (DATE_TYPES.includes(field.type)) {
+      return moment(value, field.dateFormat);
+    }
+
+    return value;
   }
 
   function formatDatesIfNeeded(parsedData, dateFields) {
@@ -497,7 +538,7 @@ export function ChartService(Highcharts) {
     const labelOptions = get(opts, 'labelOptions', {enabled: true, value: 'percentage'});
 
     if (!isEmpty(gridData)) {
-      const {series, categories} = splitToSeriesAndCategories(gridData, fields);
+      const {series, categories} = splitToSeriesAndCategories(gridData, fields, opts);
       const {chartSeries} = customizeSeriesForChartType(series, type, categories, fields, opts);
 
       forEach(chartSeries, seriesData => {
@@ -546,7 +587,7 @@ export function ChartService(Highcharts) {
     }];
 
     if (!isEmpty(gridData)) {
-      const {series, categories} = splitToSeriesAndCategories(gridData, fields);
+      const {series, categories} = splitToSeriesAndCategories(gridData, fields, opts);
       changes.push({
         path: 'series',
         data: series
