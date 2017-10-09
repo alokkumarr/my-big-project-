@@ -166,7 +166,12 @@ object QueryBuilder {
       !(filter \ "isRuntimeFilter").extract[Boolean] || runtime
     }).map(buildWhereFilterElement)
     if (filters.isEmpty) {
-      ""
+      if(DSK!=null && DSK.nonEmpty){
+        finalFilter = "WHERE " + TransportUtils.buildDSK(DSK)
+      } else {
+        finalFilter= ""
+      }
+      finalFilter
     } else {
       val booleanCriteria = (
         sqlBuilder \ "booleanCriteria").extractOrElse[String]("and").toLowerCase
