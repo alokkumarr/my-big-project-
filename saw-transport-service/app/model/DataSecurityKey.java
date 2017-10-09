@@ -1,10 +1,6 @@
 
 package model;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -12,9 +8,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "dataSecuritykey"
+    "dataSecurityKey"
 })
 public class DataSecurityKey {
 
@@ -23,17 +23,17 @@ public class DataSecurityKey {
      * (Required)
      * 
      */
-    @JsonProperty("dataSecuritykey")
+    @JsonProperty("dataSecurityKey")
     private List<DataSecurityKeyDef> dataSecuritykey;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     
-    @JsonProperty("dataSecuritykey")
+    @JsonProperty("dataSecurityKey")
     public List<DataSecurityKeyDef> getDataSecuritykey() {
 		return dataSecuritykey;
 	}
-    @JsonProperty("dataSecuritykey")
+    @JsonProperty("dataSecurityKey")
 	public void setDataSecuritykey(List<DataSecurityKeyDef> dataSecuritykey) {
 		this.dataSecuritykey = dataSecuritykey;
 	}

@@ -27,11 +27,13 @@ public class TransportUtils {
             for (int j = 0; j<valueSize;j++){
                 if (j!=valueSize-1)
                 {
-                    builder.append(dataSecurityKeyNode.getDataSecuritykey().get(i).getValues().get(j));
+                    /* since this is having potential bug in initial implementation, So appending single "'" 
+                    to avoid sql query error */
+                    builder.append("'"+dataSecurityKeyNode.getDataSecuritykey().get(i).getValues().get(j)+"'");
                     builder.append(",");
                 }
                 else {
-                    builder.append(dataSecurityKeyNode.getDataSecuritykey().get(i).getValues().get(j));
+                    builder.append("'"+dataSecurityKeyNode.getDataSecuritykey().get(i).getValues().get(j)+"'");
                 }
             }
             builder.append(")");
