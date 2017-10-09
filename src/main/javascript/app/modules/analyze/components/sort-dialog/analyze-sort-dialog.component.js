@@ -31,9 +31,9 @@ export const AnalyzeSortDialogComponent = {
         }
       });
       if (isEmpty(this.model.sorts)) {
-        this.addSort();  
+        this.addSort();
       }
-      
+
     }
 
     addSort() {

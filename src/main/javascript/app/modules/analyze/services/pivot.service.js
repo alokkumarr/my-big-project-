@@ -3,7 +3,6 @@ import * as keys from 'lodash/keys';
 import * as map from 'lodash/map';
 import * as find from 'lodash/find';
 import * as flatMap from 'lodash/flatMap';
-import * as forEach from 'lodash/forEach';
 import * as fpMap from 'lodash/fp/map';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
@@ -14,9 +13,7 @@ import * as fpOmit from 'lodash/fp/omit';
 import * as invert from 'lodash/invert';
 import * as concat from 'lodash/concat';
 import * as clone from 'lodash/clone';
-import * as isNumber from 'lodash/isNumber';
 import * as fpMapValues from 'lodash/fp/mapValues';
-import * as moment from 'moment';
 
 import {NUMBER_TYPES} from '../consts';
 

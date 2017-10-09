@@ -1,5 +1,6 @@
 import * as get from 'lodash/get';
 import * as truncate from 'lodash/truncate';
+import * as angular from 'angular';
 
 const ERROR_TITLE_LENGTH = 50;
 
@@ -20,6 +21,6 @@ export function errorDetailService() {
   }
 
   function getDetail(error) {
-    return JSON.stringify(error);
+    return angular.toJson(error);
   }
 }

@@ -1,7 +1,6 @@
 import * as get from 'lodash/get';
 import * as set from 'lodash/set';
 import * as clone from 'lodash/clone';
-import * as some from 'lodash/some';
 import * as sum from 'lodash/sum';
 import * as map from 'lodash/map';
 import * as round from 'lodash/round';
@@ -26,7 +25,7 @@ import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as mapValues from 'lodash/mapValues';
 import * as sortBy from 'lodash/sortBy';
 import * as moment from 'moment';
-import * as toString from 'lodash/toString'
+import * as toString from 'lodash/toString';
 
 import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ} from '../consts';
 
@@ -616,9 +615,6 @@ export function ChartService(Highcharts) {
     </tr>`;
 
     const yIsSingle = fields.y.length === 1;
-    const yIsNumber = some(fields.y, y => NUMBER_TYPES.includes(y.type));
-
-    const yField = fields.y[0];
     const yAxisString = `<tr>
       <th>{series.name}:</th>
       <td>{point.y:.2f}</td>
