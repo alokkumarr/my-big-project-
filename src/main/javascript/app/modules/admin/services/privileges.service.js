@@ -9,9 +9,11 @@ export function PrivilegesManagementService($http, AppConfig) {
     getProducts,
     getModules,
     getCategories,
+    getParentCategories,
     savePrivilege,
     deletePrivilege,
-    updatePrivilege
+    updatePrivilege,
+    getSubCategories
   };
   function getActivePrivilegesList(customerId) {
     return $http.post(`${loginUrl}/auth/admin/cust/manage/privileges/fetch`, customerId).then(fpGet('data'));
@@ -28,13 +30,19 @@ export function PrivilegesManagementService($http, AppConfig) {
   function getCategories(inputObject) {
     return $http.post(`${loginUrl}/auth/admin/cust/manage/categories/list`, inputObject).then(fpGet('data'));
   }
+  function getParentCategories(inputObject) {
+    return $http.post(`${loginUrl}/auth/admin/cust/manage/categories/parent/list`, inputObject).then(fpGet('data'));
+  }
   function savePrivilege(privilege) {
-    return $http.post(`${loginUrl}/auth/admin/cust/manage/privileges/add`, privilege).then(fpGet('data'));
+    return $http.post(`${loginUrl}/auth/admin/cust/manage/privileges/upsert`, privilege).then(fpGet('data'));
   }
   function deletePrivilege(privilege) {
     return $http.post(`${loginUrl}/auth/admin/cust/manage/privileges/delete`, privilege).then(fpGet('data'));
   }
   function updatePrivilege(privilege) {
-    return $http.post(`${loginUrl}/auth/admin/cust/manage/privileges/edit`, privilege).then(fpGet('data'));
+    return $http.post(`${loginUrl}/auth/admin/cust/manage/privileges/upsert`, privilege).then(fpGet('data'));
+  }
+  function getSubCategories(inputObject) {
+    return $http.post(`${loginUrl}/auth/admin/cust/manage/subCategoriesWithPrivilege/list`, inputObject).then(fpGet('data'));
   }
 }

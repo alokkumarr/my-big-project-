@@ -20,19 +20,6 @@ export const PrivilegeNewComponent = {
       this._$componentHandler = $componentHandler;
       this._$state = $state;
     }
-    checkAccessPrivilege() {
-      this.countFlag = 0;
-      for (let i = 1; i < this.privilegeListCode.length; i++) {
-        if (this.privilegeListCode[i] === true) {
-          this.countFlag = 1;
-        }
-      }
-      if (this.countFlag === 1) {
-        this.privilegeListCode[0] = true;
-      } else {
-        this.privilegeListCode[0] = false;
-      }
-    }
     $onInit() {
       const custId = parseInt(get(this._JwtService.getTokenObj(), 'ticket.custID'), 10);
       this.customerId = custId;
@@ -40,7 +27,7 @@ export const PrivilegeNewComponent = {
       this.masterLoginId = userId;
       this.getRoles(custId);
       this.getProducts(custId);
-      this.privilegeListCodeName = ['Access/View', 'Create', 'Execute', 'Publish', 'Fork', 'Edit', 'Export', 'Delete', 'All', '', '', '', '', '', '', ''];
+      this.privilegeListCodeName = ['View', 'Create', 'Execute', 'Publish', 'Fork', 'Edit', 'Export', 'Delete', 'All', '', '', '', '', '', '', ''];
       this.privilegeListCode = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
     }
     getRoles(custID) {
@@ -62,6 +49,7 @@ export const PrivilegeNewComponent = {
       });
     }
     getProducts(custID) {
+      this._$rootScope.showProgress = true;
       this._PrivilegesManagementService.getProducts(custID).then(response => {
         this.response = response;
         if (this.response.valid) {
@@ -80,6 +68,7 @@ export const PrivilegeNewComponent = {
       });
     }
     getModules(inputProductId) {
+      this._$rootScope.showProgress = true;
       const inputObject = {
         customerId: this.customerId,
         productId: inputProductId,
@@ -104,14 +93,17 @@ export const PrivilegeNewComponent = {
       });
     }
     getCategories(inputModuleId) {
+      this._$rootScope.showProgress = true;
       const inputObject = {
         customerId: this.customerId,
         productId: 0,
         moduleId: inputModuleId
       };
-      this._PrivilegesManagementService.getCategories(inputObject).then(response => {
+      this._PrivilegesManagementService.getParentCategories(inputObject).then(response => {
         this.response = response;
         if (this.response.valid) {
+          this.subCategoriesList = [];
+          this.privilege.categoryCode = '';
           this.categoriesList = this.response.category;
           this.privilege.categoryId = null;
           this._$rootScope.showProgress = false;
@@ -127,52 +119,150 @@ export const PrivilegeNewComponent = {
         this._$rootScope.showProgress = false;
       });
     }
-    checkAndCreatePrivilege() {
-      this.flag = 0;
-      for (let i = 0; i < this.privilegeListCode.length; i++) {
-        if (this.privilegeListCode[i] === true) {
-          this.flag = 1;
-        }
-      }
-      if (this.flag === 1) {
-        this.createPrivilege();
-      } else {
-        this._$mdToast.show({
-          template: '<md-toast><span>Please select atleast one privilege.</md-toast>',
-          position: 'bottom left',
-          toastClass: 'toast-primary'
+    getSubCategories(inputProductId, inputRoleId, inputModuleId, inputCategoryCode) {
+      this.SCList = [];
+      this.subCategoriesList = [];
+      if(inputProductId > 0 && inputRoleId > 0 && inputModuleId > 0 &&  inputCategoryCode != '' ){
+        this._$rootScope.showProgress = true;
+        const inputObject = {
+          customerId: this.customerId,
+          roleId: inputRoleId,
+          productId: inputProductId,
+          moduleId: inputModuleId,
+          categoryCode: inputCategoryCode
+        };
+        this._PrivilegesManagementService.getSubCategories(inputObject).then(response => {
+          this.response = response;
+          if (this.response.valid) {
+            this.SCList = this.response.subCategories;
+            if (this.SCList.length < 1) {
+              this._$mdToast.show({
+                template: '<md-toast><span> There is no Sub-Categories </md-toast>',
+                position: 'bottom left',
+                toastClass: 'toast-primary'
+              });
+            } else {
+              this.subCategoriesList = this.setUpPrivilegeForDisplay(this.SCList);
+            }
+            this._$rootScope.showProgress = false;
+          } else {
+            this._$rootScope.showProgress = false;
+            this._$mdToast.show({
+              template: '<md-toast><span>' + this.response.validityMessage + '</md-toast>',
+              position: 'bottom left',
+              toastClass: 'toast-primary'
+            });
+          }
+        }).catch(() => {
+          this._$rootScope.showProgress = false;
         });
       }
     }
-    createPrivilege() {
-      this._$rootScope.showProgress = true;
-      this.privilegeCodeString = '';
-      this.privilegeCodeDesc = '';
-      if (this.privilegeListCode[8] === true) {
-        this.privilegeListCode = [false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false];
-      }
-      this.j = 0;
-      for (let i = 0; i < this.privilegeListCode.length; i++) {
-        this.code = '0';
-        if (this.privilegeListCode[i] === true) {
-          this.code = '1';
-          if (this.j === 0) {
-            this.privilegeCodeDesc = this.privilegeListCodeName[i];
-            this.j = 1;
+    dec2bin(dec) {
+      return (dec >>> 0).toString(2);
+    }
+    setUpPrivilegeForDisplay(list) {
+      this.currentList = [];
+      this.currentList = list;
+      for (let i = 0; i < this.currentList.length; i++) {
+        this.privilegeCodeStringInitArray = [];
+        this.privilegeListCode = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
+        this.privilegeValue = this.currentList[i].privilegeCode;
+        if (this.privilegeValue > 0) {
+          if (this.privilegeValue === 128) {
+            this.privilegeListCode = [true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false];
           } else {
-            this.privilegeCodeDesc = this.privilegeCodeDesc + ',' + this.privilegeListCodeName[i];
+            this.privilegeCodeStringInit = this.dec2bin(this.privilegeValue);
+            this.privilegeCodeStringInitArray = this.privilegeCodeStringInit.split('');
+            this.privilegeListCodeLength = this.privilegeListCode.length - 1;
+            for (let i = this.privilegeCodeStringInitArray.length - 1; i > -1; i--) {
+              if (this.privilegeCodeStringInitArray[i] === '0') {
+                this.privilegeListCode[this.privilegeListCodeLength] = false;
+              } else {
+                this.privilegeListCode[this.privilegeListCodeLength] = true;
+              }
+              --this.privilegeListCodeLength;
+            }
           }
         }
-        this.privilegeCodeString = this.privilegeCodeString + this.code;
+        this.currentList[i].privilegeCodeList = this.privilegeListCode;
       }
-      for (let i = 0; i < this.categoriesList.length; i++) {
-        if (this.privilege.categoryId === this.categoriesList[i].categoryId) {
-          this.privilege.categoryType = this.categoriesList[i].categoryType;
+      return this.currentList;
+    }
+    setUpPrivilegeForSend(list) {
+      this.sendList = [];
+      this.returnList = [];
+      angular.merge(this.sendList, list);
+      for (let i = 0; i < this.sendList.length; i++) {
+        this.newObject = {
+          privilegeCode: 0,
+          privilegeDesc: 'No Access',
+          subCategoryId: 0,
+          privilegeId: 0
+        }
+        this.changeNewObjectFlag = 0;
+        this.desc = '';
+        this.codeString = '';
+        this.codeInteger = 0;
+        if (this.sendList[i].privilegeCodeList[0] === false) {
+          this.sendList[i].privilegeCodeList = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
+        }
+        if (this.sendList[i].privilegeCodeList[8] === true) {
+          this.sendList[i].privilegeCodeList = [false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false];
+        }
+        this.k = 0;
+        for (let j = 0; j < this.sendList[i].privilegeCodeList.length; j++) {
+          this.code = '0';
+          if (this.sendList[i].privilegeCodeList[j] === true) {
+            this.changeNewObjectFlag = 1;
+            this.code = '1';
+            if (this.k === 0) {
+              this.desc = this.privilegeListCodeName[j];
+              this.k = 1;
+            } else {
+              this.desc = this.desc + ',' + this.privilegeListCodeName[j];
+            }
+          }
+          this.codeString = this.codeString + this.code;
+        }
+        if (this.changeNewObjectFlag === 0) {
+          this.newObject.subCategoryId = this.sendList[i].subCategoryId;
+          this.newObject.privilegeId = this.sendList[i].privilegeId;
+          this.returnList.push(this.newObject);
+        } else {
+          this.codeInteger = parseInt(this.codeString, 2);
+          this.newObject.privilegeCode = this.codeInteger;
+          this.newObject.privilegeDesc = this.desc;
+          this.newObject.subCategoryId = this.sendList[i].subCategoryId;
+          this.newObject.privilegeId = this.sendList[i].privilegeId;
+          this.returnList.push(this.newObject);
         }
       }
-      const privilegeCode = parseInt(this.privilegeCodeString, 2);
-      this.privilege.privilegeDesc = this.privilegeCodeDesc;
-      this.privilege.privilegeCode = privilegeCode;
+      return this.returnList;
+    }
+    modifyAllPrivilege(index, list) {
+      this.allPrivilegeList = [];
+      this.allPrivilegeList = list;
+      for (let i = 0; i < this.allPrivilegeList.length; i++) {
+        if (i === index) {
+          if (this.allPrivilegeList[i].privilegeCodeList[8] === true) {
+            this.allPrivilegeList[i].privilegeCodeList = [true, true, true, true, true, true, true, true, true, false, false, false, false, false, false, false];
+          }
+        }
+      }
+      this.subCategoriesList = this.allPrivilegeList;
+    }
+    createPrivilege() {
+      this._$rootScope.showProgress = true;
+      this.finalPrivilege = [];
+      this.finalPrivilege = this.setUpPrivilegeForSend(this.subCategoriesList);
+      this.privilege.subCategoriesPrivilege = this.finalPrivilege;
+      for (let i = 0; i < this.categoriesList.length; i++) {
+        if (this.privilege.categoryCode === this.categoriesList[i].categoryCode) {
+          this.privilege.categoryType = this.categoriesList[i].categoryType;
+          this.privilege.categoryId = this.categoriesList[i].categoryId;
+        }
+      }
       this.privilege.customerId = this.customerId;
       this.privilege.masterLoginId = this.masterLoginId;
       this._PrivilegesManagementService.savePrivilege(this.privilege).then(response => {
