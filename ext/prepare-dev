@@ -1,30 +1,32 @@
 #!/bin/sh
 #
-# Copy SAW modules into bundle project for development purposes.
-# Assumes all repositories ("saw", "saw-security", "saw-serviecs" and
-# "saw-web") are checked out at the same level.  To be removed when
-# all SAW Git repositories are merged.
+# Build and copy SAW module packages into bundle project
 #
 set -eu
 
 root=$(dirname $0)/..
-repos=$root/..
-
+repos=.
 cd $root
 
-t="clean package -DskipTests"
+mvn="mvn"
+bamboo_mvn="/opt/apache-maven-3.5.0/bin/mvn"
+if [ -f "$bamboo_mvn" ]; then
+    mvn="$bamboo_mvn"
+fi
+
+t="clean package"
 mvn_security() {
-    mvn -f $repos/saw-security/pom.xml $t
+    $mvn -f $repos/saw-security/pom.xml $t
     rm -f ext/saw-security-*.tgz
     cp $repos/saw-security/target/saw-security-*.tgz ext
 }
 mvn_services() {
-    mvn -f $repos/saw-services/pom.xml -pl dist -am $t
+    $mvn -f $repos/saw-services/pom.xml -pl dist -am $t
     rm -f ext/saw-services-*.tgz
     cp $repos/saw-services/dist/target/saw-services-*.tgz ext
 }
 mvn_web() {
-    mvn -f $repos/saw-web/pom.xml $t -Prpm
+    $mvn -f $repos/saw-web/pom.xml $t -Prpm
     rm -f ext/saw-web-*.tgz
     cp $repos/saw-web/target/saw-web-*.tgz ext
 }
@@ -41,5 +43,3 @@ for module in $modules; do
     mvn_$module
     (cd $repo && git checkout .mvn/maven.config)
 done
-
-ext/prepare

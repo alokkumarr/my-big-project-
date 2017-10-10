@@ -1,13 +1,18 @@
 #!/bin/sh
 #
 # Prepare SAW module packages for inclusion into the SAW bundle
-# release package.  Assumes SAW modules to be packaged together are
-# stored in this directory as "saw-*.tgz".
+# release package.  To be removed when all SAW modules are build from
+# the same Maven multi-module project.
 #
 set -eu
 
 dir=$(dirname $0)
 cd $dir
+
+# Prepare SAW module packages if not already copied into place
+if [ -z "$(find .. -name 'saw-*.tgz')" ]; then
+    ./prepare-dev
+fi
 
 # Add SAW modules
 rm -rf modules

@@ -34,10 +34,12 @@ install the command line tools and launch the Docker daemon:
 
 # Building and testing
 
-To build the project execute the following command:
+To build the project execute the following command (the prepare step
+currently requires Linux or equivalent environment):
 
+        $ ext/prepare
         $ mvn package
-    
+
 The release package will be located at `target/saw.tgz`.
 
 Note: The Docker daemon must be running while building to ensure the
@@ -48,7 +50,7 @@ system tests can be run.
 To build and run a Docker container that runs the SAW system in
 development mode, execute the following command:
 
-        $ ext/prepare-dev
+        $ ext/prepare
         $ mvn -pl saw-dist -am package
         $ mvn -pl saw-dist docker:build docker:start
 
