@@ -139,7 +139,7 @@ public class ChartQueryBuilderTest {
   {
     ClassLoader classLoader = getClass().getClassLoader();
     URL inputFile = classLoader.getResource("queries/chart_type_data_3_datafields_filters_sorts.json");
-    String dataSecurityKey = "{\"dataSecuritykey\":[{\"name\":\"ORDER_STATE.raw\",\"values\":[\"KA\",\"Alabama\",\"Hawaii\"]},{\"name\":\"TRANSACTION_ID\",\"values\":[\"015cd74a-08dc-494f-8b71-f1cbd546fc31\"]}]}";
+    String dataSecurityKey = "{\"dataSecurityKey\":[{\"name\":\"ORDER_STATE.raw\",\"values\":[\"KA\",\"Alabama\",\"Hawaii\"]},{\"name\":\"TRANSACTION_ID\",\"values\":[\"015cd74a-08dc-494f-8b71-f1cbd546fc31\"]}]}";
     InputStream inputStream;
     String jsonString = null;
     try {
