@@ -519,11 +519,16 @@ class Analysis extends BaseController {
         m_log.trace("when data is not available in cache analysisResultId: {}", analysisResultId);
         m_log.trace("when data is not available in cache size of limit {}", limit);
         m_log.trace("when data is not available in cache size of start {}", start);
-        m_log.trace("when data is not available fresh execution of resultData {}", resultData.size());
-        PaginateDataSet.INSTANCE.putCache(analysisResultId, resultData);
-        data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisResultId))
-        totalRows = PaginateDataSet.INSTANCE.sizeOfData();
-        m_log.info("totalRows {}", totalRows);
+        if (resultData !=null) {
+          m_log.trace("when data is not available fresh execution of resultData {}", resultData.size());
+          PaginateDataSet.INSTANCE.putCache(analysisResultId, resultData);
+          data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisResultId))
+          totalRows = PaginateDataSet.INSTANCE.sizeOfData();
+          m_log.info("totalRows {}", totalRows);
+        }
+        else {
+          data = JArray(List())
+        }
       }
       m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}, created execution id: $analysisResultId"
       m_log debug s"start:  ${analysis.getStartTS} , finished  ${analysis.getFinishedTS} "
