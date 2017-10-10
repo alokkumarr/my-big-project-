@@ -35,7 +35,7 @@
                               on-successful-deletion="$ctrl.onSuccessfulDeletion(analysis)"
         ></analyze-actions-menu>
 
-        <md-button ng-hide="$ctrl.isPublished && !$ctrl.canUserPublish"
+        <md-button ng-hide="!$ctrl.canUserPublish"
                    class="btn-primary"
                    e2e="action-publish-btn"
                    ng-click="$ctrl.publish()">
