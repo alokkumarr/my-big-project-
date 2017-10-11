@@ -219,6 +219,7 @@ object QueryBuilder {
       case "string" => {
          val modelValues = ((filter \ "model" \ "modelValues") match {
            case array: JArray => array.arr
+           case JNothing => List.empty
            case obj => unexpectedElement(obj, "array", "modelValues")
          }).map(_.extract[String])
         "IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"

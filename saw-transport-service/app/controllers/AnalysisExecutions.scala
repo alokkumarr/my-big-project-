@@ -47,15 +47,16 @@ class AnalysisExecutions extends BaseController {
 
       m_log.trace("analysisType {}", analysisType)
       if (analysisType == "report") {
-        if (PaginateDataSet.INSTANCE.getCache(executionId) != null && PaginateDataSet.INSTANCE.getCache(executionId).get(0).size()>0)
+        if (PaginateDataSet.INSTANCE.getCache(executionId) != null && PaginateDataSet.INSTANCE.getCache(executionId).size()>0)
         {
-          m_log.trace("when data is available in cache executionId: {}", executionId)
-          m_log.trace("when data is available in cache size of pageSize {}", pageSize)
-          m_log.trace("when data is available in cache size of page {}", page)
-          pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(pageSize, page, executionId))
-          totalRows = PaginateDataSet.INSTANCE.sizeOfData()
-          m_log.trace("totalRows {}", totalRows)
-        }
+          if (PaginateDataSet.INSTANCE.getCache(executionId).get(0).size()>0) {
+            m_log.trace("when data is available in cache executionId: {}", executionId)
+            m_log.trace("when data is available in cache size of pageSize {}", pageSize)
+            m_log.trace("when data is available in cache size of page {}", page)
+            pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(pageSize, page, executionId))
+            totalRows = PaginateDataSet.INSTANCE.sizeOfData()
+            m_log.trace("totalRows {}", totalRows)
+          }
         else
         {
           val data: util.List[util.Map[String, (String, Object)]] = execution.loadExecution(executionId)
@@ -71,6 +72,15 @@ class AnalysisExecutions extends BaseController {
             totalRows = PaginateDataSet.INSTANCE.sizeOfData()
             m_log.trace("totalRows {}", totalRows)
           }
+        }
+      }
+        else {
+          val data: util.List[util.Map[String, (String, Object)]] = execution.loadExecution(executionId)
+          pagingData = analysisController.processReportResult(data)
+          PaginateDataSet.INSTANCE.putCache(executionId, data)
+          pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(pageSize, page, executionId))
+          totalRows = PaginateDataSet.INSTANCE.sizeOfData()
+          m_log.trace("totalRows {}", totalRows)
         }
         ("data", pagingData) ~ ("totalRows",totalRows)
       }
