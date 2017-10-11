@@ -9,8 +9,9 @@ set -eu
 dir=$(dirname $0)
 cd $dir
 
-# Prepare SAW module packages if not already copied into place
-if [ -z "$(find .. -name 'saw-*.tgz')" ]; then
+# Prepare SAW module packages from merged repositories if available,
+# otherwise assume provided
+if [ -d ../saw-security ]; then
     ./prepare-dev
 fi
 
