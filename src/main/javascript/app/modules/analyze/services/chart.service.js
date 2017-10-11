@@ -175,7 +175,7 @@ export function ChartService(Highcharts) {
   function getViewOptionsFor(type) {
     const config = {
       axisLabels: {
-        x: 'X-Axis', y: 'Y-Axis', z: 'Z-Axis', g: 'Group By'
+        x: 'Dimensions', y: 'Metrics', z: 'Z-Axis', g: 'Group By'
       },
       renamable: {
         x: true, y: true, z: false, g: false
