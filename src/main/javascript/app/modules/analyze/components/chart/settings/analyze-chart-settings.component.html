@@ -39,7 +39,7 @@
                          ng-disabled="attr.disabled"
                          ng-change="$ctrl.inputChanged($ctrl.settings.yaxis, attr, 'y')"
                          style="align-self: flex-end;">
-              <span ng-bind="attr.alias || attr.displayName"></span>
+              <span ng-bind="attr.displayName"></span>
             </md-checkbox>
 
             <aggregate-chooser flex="20" ng-show="attr.checked"
