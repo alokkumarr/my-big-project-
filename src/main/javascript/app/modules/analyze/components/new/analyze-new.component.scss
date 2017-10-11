@@ -21,7 +21,7 @@
     padding: 0 15px;
 
     .md-subhead {
-      padding: 15px 0;
+      padding: 10px 0;
     }
 
     .md-body-1 {
@@ -33,6 +33,19 @@
 
       .md-button {
         margin-right: -1px;
+      }
+    }
+
+    analyze-dialog-content .layout-column md-radio-group md-radio-button {
+      .md-label span {
+        word-wrap: break-word;
+        display: inline-block;
+        width: 186px;
+        padding-bottom: 8px;
+      }
+
+      .md-container {
+        top: 34%;
       }
     }
   }
