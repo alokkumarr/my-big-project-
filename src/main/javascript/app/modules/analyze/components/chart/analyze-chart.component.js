@@ -91,7 +91,6 @@ export const AnalyzeChartComponent = {
 
     $onInit() {
       const chartType = this.model.chartType;
-      console.log(chartType);
 
       if (this.model.chartType === 'bar') {
         this.isInverted = true;

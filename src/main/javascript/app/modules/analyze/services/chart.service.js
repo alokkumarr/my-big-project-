@@ -369,12 +369,13 @@ export function ChartService(Highcharts) {
 
   function splitSeriesByGroup(parsedData, fields) {
     const axesFieldNameMap = getAxesFieldNameMap(fields);
+    const comboType = fields.y[0].comboType;
 
     return fpPipe(
       fpMap(dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])),
       fpGroupBy('g'),
       fpToPairs,
-      fpMap(([name, data]) => ({name, data}))
+      fpMap(([name, data]) => ({name, data, type: comboType}))
     )(parsedData);
   }
 
@@ -557,7 +558,7 @@ export function ChartService(Highcharts) {
     }
 
     const labels = {
-      x: get(fields, 'x.displayName', '')
+      x: get(fields, 'x.alias', get(fields, 'x.displayName', ''))
     };
 
     const changes = [{
