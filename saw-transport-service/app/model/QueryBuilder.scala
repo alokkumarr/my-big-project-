@@ -1,16 +1,24 @@
 package model
 
+import java.text.SimpleDateFormat
+
+import controllers.BaseController
 import org.json4s._
 import org.json4s.JsonDSL._
 import org.json4s.JsonAST.JValue
 import org.json4s.native.JsonMethods._
 import org.apache.log4j._
+import org.slf4j.{Logger, LoggerFactory}
+import play.mvc.Controller
+import play.api.Logger
 
 
-object QueryBuilder {
+
+object QueryBuilder extends {
   implicit val formats = DefaultFormats
+  val query_logger = LoggerFactory.getLogger(this.getClass.getName);
 
-  def build(json: JValue, runtime: Boolean = false, DSK: String): String = {
+ def build(json: JValue, runtime: Boolean = false, DSK: String): String = {
     var whereClause : String =null
     val artifacts = json \ "artifacts" match {
       case artifacts: JArray => artifacts.arr
@@ -141,7 +149,8 @@ object QueryBuilder {
       case JNothing => List()
       case json: JValue => unexpectedElement(json, "array", "filters")
     }).filter((filter: JValue) => {
-      !(filter \ "isRuntimeFilter").extract[Boolean] || runtime
+       query_logger.trace("isRuntimeFilter value on buildWhere : {}", (filter \ "isRuntimeFilter").extract[Boolean]);
+      !((filter \ "isRuntimeFilter").extractOrElse[Boolean](false)) || runtime
     }).map(buildWhereFilterElement)
     if (filters.isEmpty) {
       ""
@@ -163,7 +172,8 @@ object QueryBuilder {
       case JNothing => List()
       case json: JValue => unexpectedElement(json, "array", "filters")
     }).filter((filter: JValue) => {
-      !(filter \ "isRuntimeFilter").extract[Boolean] || runtime
+      query_logger.trace("isRuntimeFilter value on buildWhere with DSK : {}", (filter \ "isRuntimeFilter").extract[Boolean]);
+      !((filter \ "isRuntimeFilter").extractOrElse[Boolean](false)) || runtime
     }).map(buildWhereFilterElement)
     if (filters.isEmpty) {
       if(DSK!=null && DSK.nonEmpty){
@@ -219,7 +229,6 @@ object QueryBuilder {
       case "string" => {
          val modelValues = ((filter \ "model" \ "modelValues") match {
            case array: JArray => array.arr
-           case JNothing => List.empty
            case obj => unexpectedElement(obj, "array", "modelValues")
          }).map(_.extract[String])
         "IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
