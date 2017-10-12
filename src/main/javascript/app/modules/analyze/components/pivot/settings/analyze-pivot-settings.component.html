@@ -21,12 +21,16 @@
         <div layout="row">
           <md-checkbox ng-model="artifactColumn.checked"
                       ng-change="$ctrl.onChecked(artifactColumn)"
-                      style="align-self: flex-end;">
-            <p>{{ artifactColumn.alias || artifactColumn.displayName }}
+                      style="margin-bottom: 0;">
+            <div layout="row" layout-align="start start">
+              <span class="truncated-field-name">
+                {{ artifactColumn.alias || artifactColumn.displayName }}
+                <md-tooltip ng-bind="artifactColumn.alias || artifactColumn.displayName"></md-tooltip>
+              </span>
               <md-icon md-font-icon="{{$ctrl.ARTIFACT_ICON_TYPES_OBJ[artifactColumn.type].icon}}">
                 <md-tooltip ng-bind="$ctrl.ARTIFACT_ICON_TYPES_OBJ[artifactColumn.type].tooltip | translate"></md-tooltip>
               </md-icon>
-            </p>
+            </div>
           </md-checkbox>
         </div>
 

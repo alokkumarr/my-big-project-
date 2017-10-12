@@ -3,6 +3,15 @@ analyze-chart-settings {
     color: #C1C1C1;
   }
 
+  .truncated-field-name {
+    display: block;
+    margin-right: 10px;
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   md-radio-group {
     & > div {
       height: 40px;
