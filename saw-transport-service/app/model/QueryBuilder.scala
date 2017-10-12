@@ -141,7 +141,7 @@ object QueryBuilder {
       case JNothing => List()
       case json: JValue => unexpectedElement(json, "array", "filters")
     }).filter((filter: JValue) => {
-      !(filter \ "isRuntimeFilter").extract[Boolean] || runtime
+      !((filter \ "isRuntimeFilter").extractOrElse[Boolean](false)) || runtime
     }).map(buildWhereFilterElement)
     if (filters.isEmpty) {
       ""
@@ -163,7 +163,7 @@ object QueryBuilder {
       case JNothing => List()
       case json: JValue => unexpectedElement(json, "array", "filters")
     }).filter((filter: JValue) => {
-      !(filter \ "isRuntimeFilter").extract[Boolean] || runtime
+      !((filter \ "isRuntimeFilter").extractOrElse[Boolean](false)) || runtime
     }).map(buildWhereFilterElement)
     if (filters.isEmpty) {
       if(DSK!=null && DSK.nonEmpty){
@@ -219,7 +219,6 @@ object QueryBuilder {
       case "string" => {
          val modelValues = ((filter \ "model" \ "modelValues") match {
            case array: JArray => array.arr
-           case JNothing => List.empty
            case obj => unexpectedElement(obj, "array", "modelValues")
          }).map(_.extract[String])
         "IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
