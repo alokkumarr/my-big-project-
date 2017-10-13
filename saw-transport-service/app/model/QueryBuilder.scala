@@ -146,7 +146,7 @@ object QueryBuilder extends {
 
     val filters = ((sqlBuilder \ "filters") match {
       case filters: JArray => filters.arr
-      //case JNothing => List()
+      case JNothing => List()
       case json: JValue => unexpectedElement(json, "array", "filters")
     }).filter((filter: JValue) => {
        query_logger.trace("isRuntimeFilter value on buildWhere : {}", (filter \ "isRuntimeFilter").extract[Boolean]);
@@ -173,7 +173,7 @@ object QueryBuilder extends {
     var finalFilter : String = null
     val filters = ((sqlBuilder \ "filters") match {
       case filters: JArray => filters.arr
-      //case JNothing => List()
+      case JNothing => List()
       case json: JValue => unexpectedElement(json, "array", "filters")
     }).filter((filter: JValue) => {
       query_logger.trace("isRuntimeFilter value on buildWhere with DSK : {}", (filter \ "isRuntimeFilter").extract[Boolean]);
