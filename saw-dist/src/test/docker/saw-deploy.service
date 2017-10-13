@@ -6,6 +6,11 @@ After=default.target
 Type=oneshot
 ExecStart=/root/saw-deploy-dev
 Environment=container=docker
+# Workaround: As Docker DNS lookups do not work inside CentOS 7
+# containers for now, Docker links are used as a workaround.  The
+# hostname and port for Docker links is provided in environment
+# variables, so pass them here to /root/mapr-configure.
+PassEnvironment=SAW_MAPR_PORT_7222_TCP_ADDR SAW_MAPR_PORT_7222_TCP_PORT SAW_MAPR_PORT_7077_TCP_ADDR SAW_MAPR_PORT_7077_TCP_PORT
 SyslogIdentifier=saw-deploy
 
 [Install]

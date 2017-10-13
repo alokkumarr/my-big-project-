@@ -7,6 +7,35 @@ RUN sed -i -e '/tsflags=nodocs/d' /etc/yum.conf
 # Install system utilities
 RUN yum -y -q --nogpgcheck install lsof smem
 
+#
+# Install Spark
+#
+# Workaround: Replace default MapR Ecosystem Pack repository with
+# newer to get Spark 2.1
+RUN sed -i -e 's,ecosystem-5.x,MEP/MEP-3.0.1,' \
+    /etc/yum.repos.d/mapr_ecosystem.repo
+# Workaround: Installing mapr-spark gives RPM checksum error if patch
+# repository is enabled, so disable it for now and rebuild Yum cache
+RUN rm /etc/yum.repos.d/mapr_patch.repo && yum clean all
+RUN yum -y -q --nogpgcheck install mapr-spark-master mapr-spark
+RUN ln -s /opt/mapr/spark/spark-* /opt/mapr/spark/spark-current
+# Workaround: Replace default container hostname with localhost
+RUN sed -i -e 's,72ba20be3774,localhost,' \
+    /opt/mapr/spark/spark-current/conf/spark-defaults.conf \
+    /opt/mapr/spark/spark-current/conf/spark-env.sh
+# Configure Spark slaves
+RUN echo localhost > /opt/mapr/spark/spark-current/conf/slaves
+# Workaround: The default configuration binds to localhost by default,
+# so remove those lines to bind to all interfaces and allow access
+# from other containers
+RUN sed -i -e '/^export SPARK_MASTER_[A-Z]*=localhost$/d' \
+    /opt/mapr/spark/spark-current/conf/spark-env.sh
+
+# Add MapR container initialization script
+ADD saw-mapr-init /root/
+RUN sed -i -e 's,while true,/root/saw-mapr-init\nwhile true,' \
+    /usr/bin/init-script
+
 # Workaround: Bamboo builds fail with no space left error, so reduce
 # loopack disk size.  Additionally put on volume, which has more space
 # than root filesystem.
@@ -17,15 +46,10 @@ VOLUME /mapr-data
 # available in Bamboo agents
 RUN sed -i -e '2idf -h' /usr/bin/init-script
 
-# Workaround: Using "/usr/sbin/lsof -i :7222" or similar as
-# healthcheck indicates success too early, as the MapR image
-# /usr/bin/init-script restarts services once, so hook into the init
-# script instead
-RUN sed -i -e 's,while true,touch /mapr-init-done\nwhile true,' /usr/bin/init-script
-
-# Expose MapR CLDB port, so that workaround using container links in
-# "saw" container produces environment variables
-EXPOSE 7222
+# Workaround: Expose MapR CLDB and Spark master ports, so that
+# container links in "saw" container produces environment variables.
+# Remove when Docker DNS lookups work inside CentOS 7 containers.
+EXPOSE 7222 7077
 
 # Add health check to be used by Docker Maven plug-in
-HEALTHCHECK --interval=5s CMD test -e /mapr-init-done && hadoop fs -ls /
+HEALTHCHECK --interval=5s CMD test -e /saw-mapr-init-done && hadoop fs -ls /

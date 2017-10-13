@@ -15,11 +15,11 @@ RUN systemctl mask getty@tty1.service
 RUN sed -i -e '/tsflags=nodocs/d' /etc/yum.conf
 
 # Install system utilities
+RUN yum -y -q --nogpgcheck install epel-release
 RUN yum -y -q --nogpgcheck install man less file iproute lsof nc bind-utils \
     smem sudo
 
 # Install Ansible from EPEL repository
-RUN yum -y -q --nogpgcheck install epel-release
 RUN yum -y -q --nogpgcheck install ansible rsync
 
 # Workaround: See https://github.com/ansible/ansible/issues/12208
@@ -29,6 +29,12 @@ RUN yum -y -q --nogpgcheck install openssh-clients
 ADD saw-deploy-dev /root/
 COPY saw-deploy.service /etc/systemd/system/
 RUN systemctl enable saw-deploy
+
+# Add local SAW environment configuration
+ADD saw-config /root/
+
+# Add SAW test metrics
+ADD saw-metrics /root/saw-metrics/
 
 # Add MapR Yum repository
 ADD maprtech.repo /etc/yum.repos.d
@@ -48,16 +54,23 @@ RUN yum -y -q --nogpgcheck install java-1.8.0-openjdk-headless MySQL-python
 
 # Configure MapR client
 ADD mapr-configure /root/
-RUN /root/mapr-configure
+# Workaround: As Docker DNS lookups do not work inside CentOS 7
+# containers for now, Docker links are used as a workaround.  The
+# hostname and port for Docker links is only available at runtime, so
+# therefore the MapR client has to be configured in "saw-deploy-dev"
+# at runtime instead of in the Dockerfile at container image build
+# time.  Move MapR client configuration back to the Dockerfile when
+# Docker DNS lookups start working in CentOS 7.
+#RUN /root/mapr-configure
 
-# Enable tunneling for MapR client
-RUN yum -y -q --nogpgcheck install sshuttle sshpass
-ADD saw-tunnel /root/
-COPY saw-tunnel.service /etc/systemd/system/
-RUN systemctl enable saw-tunnel
-
-# Add local SAW environment configuration
-ADD saw-config /root/
+# Tunneling for MapR client: enable if connecting to a MapR cluster in
+# a shared environment.  Works for MapR clients and Elasticsearch.
+# Spark drivers however require incoming connections so executing
+# Spark jobs will not work over the tunnel.
+#RUN yum -y -q --nogpgcheck install sshuttle sshpass
+#ADD saw-tunnel /root/
+#COPY saw-tunnel.service /etc/systemd/system/
+#RUN systemctl enable saw-tunnel
 
 # Add assembly from Docker Maven plug-in
 COPY maven /maven/

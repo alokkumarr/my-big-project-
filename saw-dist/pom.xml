@@ -166,6 +166,11 @@
                   <name>saw</name>
                 </network>
                 -->
+                <ports> 
+                  <port>saw.mcs.port:8443</port>
+                  <port>saw.spark.master.port:8080</port>
+                  <port>saw.spark.worker.port:8081</port>
+                </ports>
                 <!-- Run privileged for MapR -->
                 <privileged>true</privileged>
                 <wait>

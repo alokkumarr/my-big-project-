@@ -54,6 +54,9 @@
       <properties>
         <saw.docker.port>80</saw.docker.port>
         <saw.docker.naming>alias</saw.docker.naming>
+        <saw.mcs.port>8443</saw.mcs.port>
+        <saw.spark.master.port>8080</saw.spark.master.port>
+        <saw.spark.worker.port>8081</saw.spark.worker.port>
       </properties>
     </profile>
   </profiles>
