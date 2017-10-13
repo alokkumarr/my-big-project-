@@ -427,6 +427,19 @@
             <artifactId>janino</artifactId>
             <version>3.0.7</version>
         </dependency>
+        <!--
+            Workaround: Transport Service dependencies pull in
+            commons-lang3 version 3.4, which causes a FastDateParser
+            serialization version error when loading JSON files
+            because Spark uses version 3.5.  Add an explicit
+            dependency on version 3.5 to force matching library
+            versions.
+        -->
+	<dependency>
+	  <groupId>org.apache.commons</groupId>
+	  <artifactId>commons-lang3</artifactId>
+	  <version>3.5</version>
+	</dependency>
     </dependencies>
     <build>
         <sourceDirectory>${project.basedir}/app</sourceDirectory>
