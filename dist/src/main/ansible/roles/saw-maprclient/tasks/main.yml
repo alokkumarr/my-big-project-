@@ -6,3 +6,8 @@
     uid: "{{ saw_mapr_user_id | default('500') }}"
     group: mapr
     state: present
+# Workaround: The Transport Service uses "mapr classpath" which drops
+# certain Hadoop libraries entries if the "which" command is missing.
+# So install it as a workaround.
+- name: Install which for MapR classpath command
+  yum: name=which state=present
