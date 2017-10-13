@@ -126,13 +126,9 @@
                   <name>saw</name>
                 </network>
                 -->
-                <!--
-                    Workaround: Disable MapR container until Bamboo
-                    Docker image caching issue has been addressed
                 <links>
                   <link>saw-mapr</link>
                 </links>
-                -->
                 <ports> 
                   <port>saw.docker.port:80</port>
                 </ports>
@@ -155,9 +151,6 @@
                 </wait>
               </run>
             </image>
-            <!--
-                Workaround: Disable MapR container until Bamboo
-                Docker image caching issue has been addressed
             <image>
               <name>saw-mapr:${project.version}</name>
               <alias>saw-mapr</alias>
@@ -166,25 +159,24 @@
               </build>
               <run>
                 <namingStrategy>${saw.docker.naming}</namingStrategy>
-                <!- -
+                <!--
                     Workaround: See note about container links in
                     other image configuration.
                 <network>
                   <name>saw</name>
                 </network>
-                - ->
-                <!- - Run privileged for MapR - ->
+                -->
+                <!-- Run privileged for MapR -->
                 <privileged>true</privileged>
                 <wait>
-                  <!- - Wait until the container health check reports
-                       that MapR is up and running - ->
+                  <!-- Wait until the container health check reports
+                       that MapR is up and running -->
                   <healthy>true</healthy>
-                  <!- - Increase timeout to allow MapR to start - ->
+                  <!-- Increase timeout to allow MapR to start -->
                   <time>300000</time>
                 </wait>
               </run>
             </image>
-            -->
           </images>
         </configuration>
         <executions>
