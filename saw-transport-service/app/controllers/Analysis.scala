@@ -495,7 +495,7 @@ class Analysis extends BaseController {
       m_log.trace("dataSecurityKeyStr dataset inside report block: {}", dataSecurityKeyStr);
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
       var query :String =null
-        if (queryRuntime != null) {query = queryRuntime} else {query = QueryBuilder.build(analysisJSON, false, dataSecurityKeyStr)}
+        if (queryRuntime != null) {query = queryRuntime} else {query = QueryBuilder.build(analysisJSON, true, dataSecurityKeyStr)}
       m_log.trace("query inside report block before executeAndWait : {}", query);
       val execution = analysis.executeAndWait(ExecutionType.onetime, query)
       val analysisResultId: String = execution.getId
