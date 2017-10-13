@@ -26,12 +26,10 @@ RUN yum -y -q --nogpgcheck install ansible rsync
 RUN yum -y -q --nogpgcheck install openssh-clients
 
 # Add oneshot service to start application deployment at startup
-ADD saw-deploy-dev /root/
-COPY saw-deploy.service /etc/systemd/system/
+ADD saw-deploy/saw-deploy /root/
+ADD saw-deploy/saw-config /root/
+COPY saw-deploy/saw-deploy.service /etc/systemd/system/
 RUN systemctl enable saw-deploy
-
-# Add local SAW environment configuration
-ADD saw-config /root/
 
 # Add SAW test metrics
 ADD saw-metrics /root/saw-metrics/
@@ -57,11 +55,10 @@ ADD mapr-configure /root/
 # Workaround: As Docker DNS lookups do not work inside CentOS 7
 # containers for now, Docker links are used as a workaround.  The
 # hostname and port for Docker links is only available at runtime, so
-# therefore the MapR client has to be configured in "saw-deploy-dev"
-# at runtime instead of in the Dockerfile at container image build
-# time.  Move MapR client configuration back to the Dockerfile when
-# Docker DNS lookups start working in CentOS 7.
-#RUN /root/mapr-configure
+# therefore the MapR client has to be configured in "saw-deploy" at
+# runtime instead of in the Dockerfile at container image build time.
+# Move MapR client configuration back to the Dockerfile when Docker
+# DNS lookups start working in CentOS 7.  RUN /root/mapr-configure
 
 # Tunneling for MapR client: enable if connecting to a MapR cluster in
 # a shared environment.  Works for MapR clients and Elasticsearch.

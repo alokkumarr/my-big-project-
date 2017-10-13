@@ -4,7 +4,7 @@ After=default.target
 
 [Service]
 Type=oneshot
-ExecStart=/root/saw-deploy-dev
+ExecStart=/root/saw-deploy
 Environment=container=docker
 # Workaround: As Docker DNS lookups do not work inside CentOS 7
 # containers for now, Docker links are used as a workaround.  The
