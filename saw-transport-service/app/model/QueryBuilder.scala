@@ -150,7 +150,9 @@ object QueryBuilder extends {
       case json: JValue => unexpectedElement(json, "array", "filters")
     }).filter((filter: JValue) => {
        query_logger.trace("isRuntimeFilter value on buildWhere : {}", (filter \ "isRuntimeFilter").extract[Boolean]);
-      !((filter \ "isRuntimeFilter").extractOrElse[Boolean](false)) || runtime
+       query_logger.trace("isRuntimeFilter value on buildWhere evaluation : {}", !((filter \ "isRuntimeFilter").extractOrElse[Boolean](false) || runtime));
+       query_logger.trace("Runtime parameter value : {}", runtime);
+      !((filter \ "isRuntimeFilter").extractOrElse[Boolean](false) || runtime)
     }).map(buildWhereFilterElement)
     if (filters.isEmpty) {
       ""
@@ -161,8 +163,10 @@ object QueryBuilder extends {
         throw new RuntimeException(
           "Unrecognized boolean criteria: " + booleanCriteria)
       }
+       query_logger.trace("buildWhere query : {}", filters.mkString(" " + booleanCriteria.toUpperCase + " "))
        "WHERE " + filters.mkString(" " + booleanCriteria.toUpperCase + " ")
     }
+
   }
 
   private def buildWhere(sqlBuilder: JObject, runtime: Boolean, DSK :String): String = {
@@ -173,7 +177,9 @@ object QueryBuilder extends {
       case json: JValue => unexpectedElement(json, "array", "filters")
     }).filter((filter: JValue) => {
       query_logger.trace("isRuntimeFilter value on buildWhere with DSK : {}", (filter \ "isRuntimeFilter").extract[Boolean]);
-      !((filter \ "isRuntimeFilter").extractOrElse[Boolean](false)) || runtime
+      query_logger.trace("isRuntimeFilter value on buildWhere evaluation : {}", !((filter \ "isRuntimeFilter").extractOrElse[Boolean](false) || runtime));
+      query_logger.trace("Runtime parameter value : {}", runtime);
+      !((filter \ "isRuntimeFilter").extractOrElse[Boolean](false) || runtime)
     }).map(buildWhereFilterElement)
     if (filters.isEmpty) {
       if(DSK!=null && DSK.nonEmpty){
