@@ -176,6 +176,7 @@ class Analysis extends BaseController {
 	        .extractOrElse[String]("interactive")
 	      val runtime = (executionType == "interactive")
             m_log.trace("dskStr after processing inside execute block before runtime: {}", dskStr);
+            m_log.trace("runtime execute block before queryRuntime: {}", runtime);
               queryRuntime = (analysis \ "queryManual") match {
                 case JNothing => QueryBuilder.build(analysis, runtime, dskStr)
                 case obj: JString => obj.extract[String]
@@ -494,11 +495,13 @@ class Analysis extends BaseController {
       // This is the part of report type starts here
       m_log.trace("dataSecurityKeyStr dataset inside report block: {}", dataSecurityKeyStr);
       val analysis = new sncr.datalake.engine.Analysis(analysisId)
-      var query :String =null
-        if (queryRuntime != null) {query = queryRuntime} else {query = QueryBuilder.build(analysisJSON, true, dataSecurityKeyStr)}
+      m_log.trace("queryRuntime inside report block before executeAndWait: {}", queryRuntime);
+      //var query :String =null
+      val query = if (queryRuntime != null) queryRuntime else QueryBuilder.build(analysisJSON, false, dataSecurityKeyStr)
       m_log.trace("query inside report block before executeAndWait : {}", query);
       val execution = analysis.executeAndWait(ExecutionType.onetime, query)
       val analysisResultId: String = execution.getId
+      m_log.trace("analysisResultId inside report block after executeAndWait : {}", analysisResultId);
       //TODO:: Subject to change: to get ALL data use:  val resultData = execution.getAllData
       //TODO:: DLConfiguration.rowLimit can be replace with some Int value
 
