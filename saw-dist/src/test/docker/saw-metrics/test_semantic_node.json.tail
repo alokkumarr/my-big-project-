@@ -1,0 +1,13 @@
+            ]
+          }
+        ]
+      },
+      "base-relation": [
+        {
+          "id": "@DATA_OBJECT_ID@",
+          "node-category": "DataObject"
+        }
+      ]
+    }
+  }
+]

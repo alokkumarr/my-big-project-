@@ -31,26 +31,3 @@
           {
             "artifactName": "TEST",
             "columns": [
-              {
-                "name": "TEST",
-                "columnName": "TEST",
-                "displayName": "TEST",
-                "aliasName": "",
-                "table": "TEST",
-                "type": "string",
-                "joinEligible": false,
-                "filterEligible": true
-              }
-            ]
-          }
-        ]
-      },
-      "base-relation": [
-        {
-          "id": "@DATA_OBJECT_ID@",
-          "node-category": "DataObject"
-        }
-      ]
-    }
-  }
-]
