@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# Load SAW test metrics
+#
+set -eu
+
+chown -R mapr /root
+sm="sudo -u mapr"
+hp="hadoop fs -put "
+mc="/opt/saw/service/bin/mdcli.sh"
+
+m=/root/saw-metrics
+td=test_data_object.json
+ts=test_semantic_node.json
+
+tdo=$td-output
+tso=$ts-output
+
+$sm $hp $m/$td /
+$sm $mc -i /$td -o /$tdo
+
+set -o pipefail
+id=$(hadoop fs -cat /$tdo | grep TEST | sed -e 's/.*".*":"\(.*\)".*/\1/')
+sed -i -e "s/@DATA_OBJECT_ID@/$id/" $m/$ts
+
+$sm $hp $m/$ts /
+$sm $mc -i /$ts -o /$tso
+
+$sm $hp $m/test.json /

@@ -1,0 +1,31 @@
+[
+    {
+        "node-category": "DataObject",
+        "action": {
+            "verb": "create",
+            "content": {
+                "storageType": "DL",
+                "displayName": "Test Metric",
+                "description": "Test Metric",
+                "name": "TEST",
+                "product": "SYNCHRONOSS",
+                "type": "json",
+                "partitionType": "none"
+            },
+            "schema": {
+                "type": "struct",
+                "fields": [
+                    {
+                        "name": "TEST",
+                        "type": "string",
+                        "nullable": true,
+                        "metadata": {}
+                    }
+                ]
+            },
+            "dl-locations": [
+                "/test.json"
+            ]
+        }
+    }
+]
