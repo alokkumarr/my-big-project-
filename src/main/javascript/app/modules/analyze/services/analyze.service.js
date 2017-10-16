@@ -12,7 +12,7 @@ import * as flatMap from 'lodash/flatMap';
 import * as cloneDeep from 'lodash/cloneDeep';
 
 const EXECUTION_MODES = {
-  PREVIEW: 'interactive',
+  PREVIEW: 'preview',
   LIVE: 'live'
 };
 
