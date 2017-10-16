@@ -115,7 +115,7 @@ export const PivotGridComponent = {
         showBorders: true,
         allowSorting: false,
         allowFiltering: false,
-        allowExpandAll: false,
+        allowExpandAll: true,
         fieldChooser: {
           enabled: false
         },
