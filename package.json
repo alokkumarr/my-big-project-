@@ -12,7 +12,7 @@
     "postinstall": "node node_modules/protractor/bin/webdriver-manager update",
     "e2e": "protractor conf/protractor.conf.js",
     "express": "node src/main/javascript/middlelayer/index.js",
-    "prepush": "run-s eslint lint",
+    "prepush": "npm run -s eslint lint",
     "lint": "tslint --type-check --project tsconfig.json -c tslint.json ./src/main/javascript/{app,login}/**/*.ts",
     "eslint": "eslint -c .eslintrc --ext .js ./src",
     "eslint:fix": "npm run eslint -- --fix",
