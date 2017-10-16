@@ -134,10 +134,11 @@
                 </ports>
                 <!-- Run privileged for systemd -->
                 <privileged>true</privileged>
-                <!-- Bind mount volume for saving system logs in case
-                     needed for troubleshooting after a failed run -->
                 <volumes>
                   <bind>
+                    <!-- Bind mount volume for saving system logs in
+                         case needed for troubleshooting after a
+                         failed run -->
                     <volume>${project.build.directory}:/build</volume>
                   </bind>
                 </volumes>

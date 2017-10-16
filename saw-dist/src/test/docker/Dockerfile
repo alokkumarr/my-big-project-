@@ -12,7 +12,7 @@ RUN systemctl mask systemd-remount-fs.service
 RUN systemctl mask getty@tty1.service
 
 # Enable installing documentation for packages
-RUN sed -i -e '/tsflags=nodocs/d' /etc/yum.conf
+RUN sed -i -e '/^tsflags=nodocs$/d' /etc/yum.conf
 
 # Install system utilities
 RUN yum -y -q --nogpgcheck install epel-release
@@ -25,21 +25,14 @@ RUN yum -y -q --nogpgcheck install ansible rsync
 # Workaround: See https://github.com/ansible/ansible/issues/12208
 RUN yum -y -q --nogpgcheck install openssh-clients
 
-# Add oneshot service to start application deployment at startup
-ADD saw-deploy/saw-deploy /root/
-ADD saw-deploy/saw-config /root/
-COPY saw-deploy/saw-deploy.service /etc/systemd/system/
-RUN systemctl enable saw-deploy
-
-# Add SAW test metrics
-ADD saw-metrics /root/saw-metrics/
-
 # Add MapR Yum repository
 ADD maprtech.repo /etc/yum.repos.d
 ADD maprecosystem.repo /etc/yum.repos.d
 
-# Speed up deployment by preinstalling packages in container image
-
+#
+# Speed up SAW deployment by preinstalling certain packages in
+# container image
+#
 # SAW
 RUN yum -y -q --nogpgcheck install nginx
 # SAW Web
@@ -68,6 +61,15 @@ ADD mapr-configure /root/
 #ADD saw-tunnel /root/
 #COPY saw-tunnel.service /etc/systemd/system/
 #RUN systemctl enable saw-tunnel
+
+# Add oneshot service to start application deployment at startup
+ADD saw-deploy/saw-deploy /root/
+ADD saw-deploy/saw-config /root/
+COPY saw-deploy/saw-deploy.service /etc/systemd/system/
+RUN systemctl enable saw-deploy
+
+# Add SAW test metrics
+ADD saw-metrics /root/saw-metrics/
 
 # Add assembly from Docker Maven plug-in
 COPY maven /maven/
