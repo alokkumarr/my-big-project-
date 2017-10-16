@@ -306,8 +306,8 @@ export const AnalyzeChartComponent = {
               label: node.displayName,
               dataField: node.columnName
             },
-            order :'asc'
-          })
+            order: 'asc'
+          });
         });
       }
 
