@@ -173,6 +173,7 @@ export const AnalyzeChartComponent = {
 
     onSettingsChanged() {
       this.sortFields = this._SortService.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
+      this.sorts = this._SortService.filterInvalidSorts(this.sorts, this.sortFields);
       this.analysisUnSynched();
       this.startDraftMode();
     }
