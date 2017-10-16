@@ -173,6 +173,7 @@ export const AnalyzeChartComponent = {
 
     onSettingsChanged() {
       this.sortFields = this._SortService.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
+      this.sorts = this._SortService.filterInvalidSorts(this.sorts, this.sortFields);
       this.analysisUnSynched();
       this.startDraftMode();
     }
@@ -222,9 +223,12 @@ export const AnalyzeChartComponent = {
     }
 
     reloadChart(settings, filteredGridData) {
+      let emptyData;
       if (isEmpty(filteredGridData)) {
-        return;
+        /* Making sure empty data refreshes chart and shows no data there.  */
+        emptyData = {path: 'series', data: []};
       }
+
       if (!isEmpty(this.sorts)) {
         filteredGridData = orderBy(
           filteredGridData,
@@ -238,6 +242,10 @@ export const AnalyzeChartComponent = {
         filteredGridData,
         {labels: this.labels, labelOptions: this.model.labelOptions, sorts: this.sorts}
       );
+
+      if (emptyData) {
+        changes.push(emptyData);
+      }
 
       this.updateChart.next(changes);
     }
