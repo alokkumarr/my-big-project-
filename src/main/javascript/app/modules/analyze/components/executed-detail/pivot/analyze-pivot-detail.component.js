@@ -46,6 +46,12 @@ export const AnalyzePivotDetailComponent = {
       });
     }
 
+    exportAnalysis() {
+      this.pivotGridUpdater.next({
+        export: true
+      });
+    }
+
     request({data, exports}) {
       /* eslint-disable no-unused-expressions */
       exports && this.onExport();

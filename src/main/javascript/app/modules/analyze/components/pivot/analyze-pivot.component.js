@@ -300,12 +300,6 @@ export const AnalyzePivotComponent = {
       });
     }
 
-    exportAnalysis() {
-      this.pivotGridUpdater.next({
-        export: true
-      });
-    }
-
     getModel() {
       const model = assign(this.model, {
         artifacts: [{
