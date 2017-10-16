@@ -262,6 +262,8 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     delete model.isScheduled;
     if (mode === EXECUTION_MODES.PREVIEW) {
       model.executionType = EXECUTION_MODES.PREVIEW;
+    } else {
+      delete model.executionType;
     }
 
     if (model.type === 'report' && model.edit === true) {
