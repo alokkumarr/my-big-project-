@@ -312,7 +312,6 @@ export function ChartService(Highcharts) {
         serie.data = sortBy(serie.data, 'x');
       });
     }
-
     return {
       series,
       categories
@@ -334,7 +333,7 @@ export function ChartService(Highcharts) {
     const splinifiedChartType = splinifyChartType(comboType);
 
     return {
-      name: `${AGGREGATE_TYPES_OBJ[aggregate].label} ${alias || displayName}`,
+      name: alias || `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`,
       type: splinifiedChartType,
       yAxis: index,
       data: []
@@ -573,12 +572,12 @@ export function ChartService(Highcharts) {
         opposite : k > 0,
         title: {
           text: y.alias || `${AGGREGATE_TYPES_OBJ[y.aggregate].label} ${y.displayName}`,
-          style: {
+          style: fields.y.length <= 1 ? null : {
             color: CHART_COLORS[k]
           }
         },
         labels: {
-          style: {
+          style: fields.y.length <= 1 ? null : {
             color: CHART_COLORS[k]
           }
         }
