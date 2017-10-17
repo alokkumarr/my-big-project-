@@ -23,7 +23,6 @@ import * as reduce from 'lodash/reduce';
 import * as concat from 'lodash/concat';
 import * as compact from 'lodash/compact';
 import * as fpGroupBy from 'lodash/fp/groupBy';
-import * as fpPick from 'lodash/fp/pick';
 import * as mapValues from 'lodash/mapValues';
 import * as sortBy from 'lodash/sortBy';
 import * as moment from 'moment';
