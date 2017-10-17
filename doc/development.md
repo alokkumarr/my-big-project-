@@ -95,7 +95,7 @@ To make a release of the project, execute the following steps:
    repository:
 
         $ git tag -a -m "Version 1.0.0" v1.0.0 <commit>
-        $ git push --tags origin
+        $ git push --tags
 
 2. Start a customized build of the [project] on the continuous
    integration server.  Enter the tag created in the previous step in
