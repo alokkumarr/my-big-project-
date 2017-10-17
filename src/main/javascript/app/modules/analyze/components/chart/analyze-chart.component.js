@@ -84,6 +84,20 @@ export const AnalyzeChartComponent = {
       this.comboableCharts = ['column', 'bar', 'line', 'area', 'combo'];
       this.invertableCharts = [...this.comboableCharts, 'stack'];
       this.multyYCharts = this.invertableCharts;
+
+      this.designerStates = {
+        noSelection: 'no-selection',
+        noData: 'no-data-for-selection',
+        hasData: 'selection-has-data'
+      };
+      this.designerState = this.designerStates.noSelection;
+    }
+
+    gotData(data) {
+      if (!isEmpty(data)) {
+        this.designerState = this.designerStates.noData;
+      }
+      this.designerState = this.designerStates.hasData;
     }
 
     toggleLeft() {
@@ -200,6 +214,7 @@ export const AnalyzeChartComponent = {
       return this._AnalyzeService.getDataBySettings(payload).then(({data}) => {
         const parsedData = this._ChartService.parseData(data, payload.sqlBuilder);
         this.gridData = this.filteredGridData = parsedData || this.filteredGridData;
+        this.gotData(this.gridData);
         this.analysisSynched();
         this.endProgress();
         this.reloadChart(this.settings, this.filteredGridData);
