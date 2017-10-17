@@ -1,7 +1,6 @@
 import * as get from 'lodash/get';
 import * as set from 'lodash/set';
 import * as clone from 'lodash/clone';
-import * as some from 'lodash/some';
 import * as sum from 'lodash/sum';
 import * as map from 'lodash/map';
 import * as round from 'lodash/round';
@@ -19,6 +18,7 @@ import * as fpMap from 'lodash/fp/map';
 import * as fpMapValues from 'lodash/fp/mapValues';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpSortBy from 'lodash/fp/sortBy';
+import * as fpOrderBy from 'lodash/fp/orderBy';
 import * as reduce from 'lodash/reduce';
 import * as concat from 'lodash/concat';
 import * as compact from 'lodash/compact';
@@ -26,7 +26,7 @@ import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as mapValues from 'lodash/mapValues';
 import * as sortBy from 'lodash/sortBy';
 import * as moment from 'moment';
-import * as toString from 'lodash/toString'
+import * as toString from 'lodash/toString';
 
 import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS} from '../consts';
 
@@ -272,7 +272,7 @@ export function ChartService(Highcharts) {
     );
   }
 
-  function splitToSeriesAndCategories(parsedData, fields) {
+  function splitToSeriesAndCategories(parsedData, fields, {sorts}) {
     let series = [];
     const categories = {};
     const areMultipleYAxes = fields.y.length > 1;
@@ -291,7 +291,8 @@ export function ChartService(Highcharts) {
       const yField = fields.y[0];
       series = [getSerie(yField, 0)];
       series[0].data = map(parsedData,
-        dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val]))
+        dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])
+      );
     }
     // split out categories frem the data
     forEach(series, serie => {
@@ -300,6 +301,34 @@ export function ChartService(Highcharts) {
         forEach(dataPoint, (v, k) => {
           if (isCategoryAxis(fields, k)) {
             addToCategory(categories, k, v);
+          }
+        });
+        return dataPoint;
+      });
+    });
+
+    // sort the categories if a sort is specified for category field
+    if (sorts && sorts.length) {
+      forEach(categories, (v, k) => {
+        const field = filter(fieldsArray, field => field.checked === k)[0] || {};
+        const sortField = filter(sorts, sortF => sortF.field.dataField === field.columnName)[0] || {};
+        categories[k] = fpOrderBy(
+          value => getSortValue(field, value),
+          sortField.order === 'asc' ? 'asc' : 'desc',
+          categories[k]
+        );
+      });
+    }
+
+    /* assign data points to category indexes. If this is done
+    at the same time as creation of categories, it becomes impossible
+    to get the index from sorted categories array since it'll be
+    incomplete */
+    forEach(series, serie => {
+      serie.data = map(serie.data, point => {
+        const dataPoint = clone(point);
+        forEach(dataPoint, (v, k) => {
+          if (isCategoryAxis(fields, k)) {
             dataPoint[k] = indexOf(categories[k], v);
           }
         });
@@ -326,6 +355,29 @@ export function ChartService(Highcharts) {
       return 'areaspline';
     default:
       return type;
+
+    }
+  }
+
+  function getSortValue(field, value) {
+    if (!field) {
+      return value;
+    }
+
+    if (DATE_TYPES.includes(field.type)) {
+      return moment(value, field.dateFormat);
+    }
+
+    return value;
+  }
+
+  function formatDatesIfNeeded(parsedData, dateFields) {
+    if (!isEmpty(dateFields)) {
+      forEach(parsedData, dataPoint => {
+        forEach(dateFields, ({columnName, dateFormat}) => {
+          dataPoint[columnName] = moment(dataPoint[columnName]).format(dateFormat);
+        });
+      });
     }
   }
 
@@ -337,7 +389,7 @@ export function ChartService(Highcharts) {
       type: splinifiedChartType,
       yAxis: index,
       data: []
-    }
+    };
   }
 
   function splitSeriesByYAxes(parsedData, fields) {
@@ -356,16 +408,6 @@ export function ChartService(Highcharts) {
     return series;
   }
 
-  function formatDatesIfNeeded(parsedData, dateFields) {
-    if (!isEmpty(dateFields)) {
-      forEach(parsedData, dataPoint => {
-        forEach(dateFields, ({columnName, dateFormat}) => {
-          dataPoint[columnName] = moment(dataPoint[columnName]).format(dateFormat);
-        });
-      });
-    }
-  }
-
   function splitSeriesByGroup(parsedData, fields) {
     const axesFieldNameMap = getAxesFieldNameMap(fields);
     const comboType = fields.y[0].comboType;
@@ -377,7 +419,6 @@ export function ChartService(Highcharts) {
       fpMap(([name, data]) => ({name, data, type: comboType}))
     )(parsedData);
   }
-
 
   /**
    * get the map from colmnNames to the axes, or group
@@ -521,7 +562,7 @@ export function ChartService(Highcharts) {
     const labelOptions = get(opts, 'labelOptions', {enabled: true, value: 'percentage'});
 
     if (!isEmpty(gridData)) {
-      const {series, categories} = splitToSeriesAndCategories(gridData, fields);
+      const {series, categories} = splitToSeriesAndCategories(gridData, fields, opts);
       const {chartSeries} = customizeSeriesForChartType(series, type, categories, fields, opts);
 
       forEach(chartSeries, seriesData => {
@@ -549,13 +590,6 @@ export function ChartService(Highcharts) {
   }
 
   function getBarChangeConfig(type, settings, fields, gridData, opts) {
-    const singleYAxis = fields.y.length === 1;
-    let yLabel;
-    if (singleYAxis) {
-      const yField = fields.y[0];
-      yLabel = `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}`;
-    }
-
     const labels = {
       x: get(fields, 'x.alias', get(fields, 'x.displayName', ''))
     };
@@ -569,7 +603,7 @@ export function ChartService(Highcharts) {
       path: 'yAxis',
       data: map(fields.y, (y, k) => ({
         gridLineWidth: 0,
-        opposite : k > 0,
+        opposite: k > 0,
         title: {
           text: y.alias || `${AGGREGATE_TYPES_OBJ[y.aggregate].label} ${y.displayName}`,
           style: fields.y.length <= 1 ? null : {
@@ -585,7 +619,7 @@ export function ChartService(Highcharts) {
     });
 
     if (!isEmpty(gridData)) {
-      const {series, categories} = splitToSeriesAndCategories(gridData, fields);
+      const {series, categories} = splitToSeriesAndCategories(gridData, fields, opts);
       changes.push({
         path: 'series',
         data: series
@@ -655,9 +689,6 @@ export function ChartService(Highcharts) {
     </tr>`;
 
     const yIsSingle = fields.y.length === 1;
-    const yIsNumber = some(fields.y, y => NUMBER_TYPES.includes(y.type));
-
-    const yField = fields.y[0];
     const yAxisString = `<tr>
       <th>{series.name}:</th>
       <td>{point.y:.2f}</td>

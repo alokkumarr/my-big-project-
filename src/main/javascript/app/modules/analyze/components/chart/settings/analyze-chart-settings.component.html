@@ -62,7 +62,7 @@
                              ng-value="attr"
                              e2e="radio-button-{{::attr.displayName}}"
                              ng-disabled="attr.checked && attr.checked != 'x'">
-            <span ng-bind="::attr.displayName"></span>
+            <span class="truncated-field-name" ng-bind="::attr.displayName"></span>
             </md-radio-button>
 
             <md-menu class="md-secondary" ng-show="attr.checked && attr.checked == 'x' && $ctrl.DATE_TYPES.includes(attr.type)">

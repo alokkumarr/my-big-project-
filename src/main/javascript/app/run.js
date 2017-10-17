@@ -13,7 +13,6 @@ export function runConfig($rootScope, $state, $location, $window, JwtService, Id
     if (data && data.title) {
       return data.title;
     }
-
     return 'Synchronoss';
   };
 

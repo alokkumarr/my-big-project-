@@ -19,7 +19,7 @@ function openErrorDetails(dialog, error) {
 export function interceptor($httpProvider) {
   'ngInject';
   /* tslint:disable */
-  $httpProvider.interceptors.push(function toastInterceptor($injector) {
+  $httpProvider.interceptors.push($injector => {
     'ngInject';
     return {
       responseError: error => {
@@ -50,7 +50,7 @@ export function interceptor($httpProvider) {
     };
   });
 
-  $httpProvider.interceptors.push(function refreshTokenInterceptor($injector) {
+  $httpProvider.interceptors.push($injector => {
     'ngInject';
 
     let refreshRequest = null;
@@ -71,7 +71,7 @@ export function interceptor($httpProvider) {
           return $q.reject(response);
         }
 
-        var deferred = $q.defer();
+        const deferred = $q.defer();
 
         if (!refreshRequest) {
           refreshRequest = userService.refreshAccessToken();
@@ -79,7 +79,7 @@ export function interceptor($httpProvider) {
 
         refreshRequest.then(() => {
           refreshRequest = null;
-          $injector.get("$http")(response.config).then(
+          $injector.get('$http')(response.config).then(
             deferred.resolve.bind(deferred),
             deferred.reject.bind(deferred)
           );
@@ -98,15 +98,15 @@ export function interceptor($httpProvider) {
   });
 
   /* Add jwt auth token to all requests if present */
-  $httpProvider.interceptors.push(function authInterceptor($injector) {
+  $httpProvider.interceptors.push($injector => {
     'ngInject';
     return {
-      request: function (config) {
+      request(config) {
         const JwtService = $injector.get('JwtService');
         const token = JwtService.get();
 
         if (token && !/getNewAccessToken/.test(config.url)) {
-          config.headers['Authorization'] = `Bearer ${token}`;
+          config.headers.Authorization = `Bearer ${token}`;
         }
 
         return config;

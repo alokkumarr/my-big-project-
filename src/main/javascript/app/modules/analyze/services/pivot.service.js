@@ -3,7 +3,6 @@ import * as keys from 'lodash/keys';
 import * as map from 'lodash/map';
 import * as find from 'lodash/find';
 import * as flatMap from 'lodash/flatMap';
-import * as forEach from 'lodash/forEach';
 import * as fpMap from 'lodash/fp/map';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
@@ -13,6 +12,7 @@ import * as fpMapKeys from 'lodash/fp/mapKeys';
 import * as fpOmit from 'lodash/fp/omit';
 import * as invert from 'lodash/invert';
 import * as concat from 'lodash/concat';
+import * as clone from 'lodash/clone';
 import * as fpMapValues from 'lodash/fp/mapValues';
 
 import {NUMBER_TYPES} from '../consts';
@@ -58,13 +58,14 @@ export function PivotService() {
   }
 
   function trimSuffixFromPivotFields(fields) {
-    forEach(fields, field => {
+    return map(fields, field => {
+      const clonedField = clone(field);
       if (field.dataField && field.type === 'string') {
         const split = field.dataField.split('.');
-        field.dataField = split[0];
+        clonedField.dataField = split[0];
       }
+      return clonedField;
     });
-    return fields;
   }
 
   function getArea(key) {
@@ -108,7 +109,8 @@ export function PivotService() {
   function parseNode(node, dataObj, nodeFieldMap, level) {
     if (node.key) {
       const columnName = getColumnName(nodeFieldMap, level);
-      dataObj[columnName] = node.key;
+      dataObj[columnName] = node.key_as_string || node.key;
+      // dataObj[columnName] = isNumber(node.key) ? node.key - (node.key % 86400000) : node.key;
     }
 
     const nodeName = getChildNodeName(node);
@@ -123,7 +125,7 @@ export function PivotService() {
 
   function parseLeaf(node, dataObj) {
     const dataFields = fpPipe(
-      fpOmit(['doc_count', 'key']),
+      fpOmit(['doc_count', 'key', 'key_as_string']),
       fpMapValues('value')
     )(node);
 

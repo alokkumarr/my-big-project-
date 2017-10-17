@@ -11,10 +11,9 @@
                 ng-mousedown="$ctrl.onFieldMouseDown($event, field);"
                 e2e="js-plumb-field-{{field.getIdentifier()}}"
                 ng-mouseup="$ctrl.onFieldMouseUp($event, field);">
-    <md-checkbox ng-model="field.checked"></md-checkbox>
-
-    <span class="jsp-table-column-name"
-          ng-bind="::field.getDisplayName()"></span>
+    <md-checkbox style="width:300px" ng-model="field.checked">
+      <span class="jsp-table-column-name" ng-bind="::field.getDisplayName()"></span>
+    </md-checkbox>
 
     <js-plumb-endpoint ng-repeat="endpoint in field.endpoints track by $index"
                        model="endpoint"></js-plumb-endpoint>

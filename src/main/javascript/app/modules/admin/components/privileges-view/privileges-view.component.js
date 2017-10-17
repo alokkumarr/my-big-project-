@@ -9,7 +9,8 @@ const SEARCH_CONFIG = [
   {keyword: 'MODULE', fieldName: 'moduleName'},
   {keyword: 'CATEGORY', fieldName: 'categoryName'},
   {keyword: 'ROLE', fieldName: 'roleName'},
-  {keyword: 'PRIVILEGE DESC', fieldName: 'privilegeDesc'}
+  {keyword: 'PRIVILEGE DESC', fieldName: 'privilegeDesc'},
+  {keyword: 'SUB CATEGORY', fieldName: 'subCategoryName'}
 ];
 
 export const PrivilegesViewComponent = {
@@ -85,7 +86,7 @@ export const PrivilegesViewComponent = {
       };
       const confirm = this._$mdDialog.confirm()
         .title('Are you sure you want to delete this privilege?')
-        .textContent('Privilege Details : ' + this.privilege.productName + ' --> ' + this.privilege.moduleName + ' --> ' + this.privilege.categoryName + ' --> ' + this.privilege.roleName + '.')
+        .textContent('Privilege Details : ' + this.privilege.productName + ' --> ' + this.privilege.moduleName + ' --> ' + this.privilege.categoryName + ' --> ' + this.privilege.subCategoryName+ ' --> ' + this.privilege.roleName + '.')
         .ok('Delete')
         .cancel('Cancel');
       this._$mdDialog.show(confirm).then(() => {

@@ -71,6 +71,7 @@ export const AnalyzeChartSettingsComponent = {
         callback: () => {
           this.selected.g.checked = false;
           this.selected.g = null;
+          this.inputChanged(this.settings.groupBy, this.selected.g, 'g');
         }
       };
     }
@@ -95,10 +96,10 @@ export const AnalyzeChartSettingsComponent = {
     }
 
     inputChanged(axisOptions, selectedAttr, marker) {
-      if (this.multipleYAxes.enabled === false || marker !== 'y') {
+      if (selectedAttr && (this.multipleYAxes.enabled === false || marker !== 'y')) {
         this.setRadioButtonSelection(axisOptions, selectedAttr, marker);
         this.markSelected();
-      } else {
+      } else if (selectedAttr) {
         this.setCheckBoxSelection(axisOptions, selectedAttr);
       }
       this.onChange({settings: this.settings});

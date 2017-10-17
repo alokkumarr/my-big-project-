@@ -1,3 +1,4 @@
+import * as get from 'lodash/get';
 import * as map from 'lodash/map';
 import * as find from 'lodash/find';
 import * as fpPipe from 'lodash/fp/pipe';
@@ -9,17 +10,24 @@ export function SortService() {
   return {
     mapBackend2FrontendSort,
     mapFrontend2BackendSort,
+    filterInvalidSorts,
     getArtifactColumns2SortFieldMapper
   };
 
   function mapBackend2FrontendSort(sorts, sortFields) {
-    return map(sorts, sort => {
+    return fpFilter(val => val.field, map(sorts, sort => {
       const targetField = find(sortFields, ({dataField}) => dataField === sort.columnName);
       return {
         field: targetField,
         order: sort.order
       };
-    });
+    }));
+  }
+
+  function filterInvalidSorts(sorts, sortFields) {
+    return fpFilter(sort => {
+      return find(sortFields, ({dataField}) => dataField === get(sort, 'field.dataField'));
+    }, sorts);
   }
 
   function mapFrontend2BackendSort(sorts) {
