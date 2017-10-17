@@ -30,7 +30,7 @@ export const PrivilegeEditComponent = {
       this.getProducts(custId);
       this.getModules(this.editPrivilege.productId, 0);
       this.getCategories(this.editPrivilege.moduleId, 0);
-      this.getSubCategories(this.editPrivilege.productId, this.editPrivilege.roleId, this.editPrivilege.moduleId, this.editPrivilege.categoryCode)
+      this.getSubCategories(this.editPrivilege.productId, this.editPrivilege.roleId, this.editPrivilege.moduleId, this.editPrivilege.categoryCode);
       this.privilegeListCodeName = ['View', 'Create', 'Execute', 'Publish', 'Fork', 'Edit', 'Export', 'Delete', 'All', '', '', '', '', '', '', ''];
       this.privilegeListCode = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
     }
@@ -130,7 +130,7 @@ export const PrivilegeEditComponent = {
     getSubCategories(inputProductId, inputRoleId, inputModuleId, inputCategoryCode) {
       this.SCList = [];
       this.subCategoriesList = [];
-      if(inputProductId > 0 && inputRoleId > 0 && inputModuleId > 0 &&  inputCategoryCode != '' ){
+      if (inputProductId > 0 && inputRoleId > 0 && inputModuleId > 0 && inputCategoryCode !== '') {
         this._$rootScope.showProgress = true;
         const inputObject = {
           customerId: this.customerId,
@@ -204,7 +204,7 @@ export const PrivilegeEditComponent = {
           privilegeDesc: 'No Access',
           subCategoryId: 0,
           privilegeId: 0
-        }
+        };
         this.changeNewObjectFlag = 0;
         this.desc = '';
         this.codeString = '';

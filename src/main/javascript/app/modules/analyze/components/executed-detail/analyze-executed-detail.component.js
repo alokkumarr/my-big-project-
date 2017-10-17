@@ -134,7 +134,7 @@ export const AnalyzeExecutedDetailComponent = {
 
     exportData() {
       this.requester.next({
-        export: true
+        exportAnalysis: true
       });
     }
 

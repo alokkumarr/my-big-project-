@@ -46,9 +46,9 @@ export const AnalyzePivotDetailComponent = {
       });
     }
 
-    request({data, exports}) {
+    request({data, exportAnalysis}) {
       /* eslint-disable no-unused-expressions */
-      exports && this.onExport();
+      exportAnalysis && this.onExport();
 
       if (!data) {
         return;
