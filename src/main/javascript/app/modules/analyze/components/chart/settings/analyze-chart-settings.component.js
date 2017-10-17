@@ -7,7 +7,7 @@ import * as unset from 'lodash/unset';
 
 import * as template from './analyze-chart-settings.component.html';
 import style from './analyze-chart-settings.component.scss';
-import {AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE, COMBO_TYPES,
+import {AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE,
   AGGREGATE_TYPES_OBJ, NUMBER_TYPES, DATE_TYPES} from '../../../consts';
 
 const DATE_FORMATS = [{
@@ -141,8 +141,9 @@ export const AnalyzeChartSettingsComponent = {
             target.comboType = 'column';
           }
           if (this.chartType === 'combo') {
-            if (filter(this.multipleYAxes.fields, 'checked').length > 1)
+            if (filter(this.multipleYAxes.fields, 'checked').length > 1) {
               target.comboType = 'line';
+            }
           }
         }
       } else {
