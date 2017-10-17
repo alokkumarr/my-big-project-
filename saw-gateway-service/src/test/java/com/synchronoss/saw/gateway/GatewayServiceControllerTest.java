@@ -30,17 +30,17 @@ import com.synchronoss.saw.gateway.controller.GatewayController;
 @RunWith(SpringRunner.class)
 @WebMvcTest(GatewayController.class)
 @TestPropertySource(properties = {
-		"security.service.host=http://localhost:8081" }, locations = "application-test.properties")
+		"security.service.host=http://localhost:9081" }, locations = "application-test.properties")
 public class GatewayServiceControllerTest {
 
 	@Rule
-	public WireMockRule wireMockRule_1 = new WireMockRule(options().port(8081));
+	public WireMockRule wireMockRule_1 = new WireMockRule(options().port(9081));
 	WireMockServer wireMockServer = null;
 
 	@Before
 
 	public void setup() throws Exception {
-		wireMockServer = new WireMockServer(options().port(8091));
+		wireMockServer = new WireMockServer(options().port(9091));
 		wireMockServer.start();
 	}
 
