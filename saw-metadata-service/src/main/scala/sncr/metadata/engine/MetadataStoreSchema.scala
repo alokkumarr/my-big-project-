@@ -1,5 +1,6 @@
 package sncr.metadata.engine
 
+import files.HFileOperations
 import org.apache.hadoop.hbase.HColumnDescriptor
 import org.apache.hadoop.hbase.HTableDescriptor
 import org.apache.hadoop.hbase.TableName
@@ -27,7 +28,9 @@ object MetadataStoreSchema {
    * every startup of the application.
    */
   def init(admin: Admin) {
-    log.debug("Initializing metadata store tables")
+    log.info("Creating metadata store directory: {}", TableHome)
+    HFileOperations.createDirectory(TableHome)
+    log.info("Initializing metadata store tables")
     /* Create UI artifact table */
     initTable(admin, "ui_metadata", "_system", "_source", "_search")
     /* Create Semantic Layer storage*/
@@ -42,7 +45,6 @@ object MetadataStoreSchema {
     /* Create Analysis Result table*/
     initTable(admin, "analysis_results", "_system", "_source", "_search",
       "_objects")
-    log.debug("Done initializing metadata store tables")
   }
 
   /**

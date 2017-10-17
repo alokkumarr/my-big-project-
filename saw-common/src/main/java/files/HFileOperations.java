@@ -109,6 +109,14 @@ public class HFileOperations {
         }
     }
 
+    public static void createDirectory(String dir) throws IOException {
+        Path path = new Path(dir);
+        Configuration conf = new Configuration();
+        try (FileSystem fs = FileSystem.get(path.toUri(), conf)) {
+            fs.mkdirs(path);
+        }
+    }
+
     public static String[] listJarFiles(String directoryLocation, final String fileExtension) {
         String[] jarFiles = null;
         File jars = new File(directoryLocation);
