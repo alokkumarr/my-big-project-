@@ -22,7 +22,7 @@ import * as template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
 import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
-import {ENTRY_MODES, NUMBER_TYPES, COMBO_TYPES, COMBO_TYPES_OBJ} from '../../consts';
+import {ENTRY_MODES, NUMBER_TYPES, COMBO_TYPES, COMBO_TYPES_OBJ, CHART_TYPES_OBJ} from '../../consts';
 
 const INVERTING_OPTIONS = [{
   label: 'TOOLTIP_INVERTED',
@@ -57,6 +57,7 @@ export const AnalyzeChartComponent = {
       this.INVERTING_OPTIONS = INVERTING_OPTIONS;
       this.COMBO_TYPES = COMBO_TYPES;
       this.COMBO_TYPES_OBJ = COMBO_TYPES_OBJ;
+      this.CHART_TYPES_OBJ = CHART_TYPES_OBJ;
       this.sortFields = [];
       this.sorts = [];
 

@@ -90,7 +90,7 @@
                ng-show="!$ctrl.gridData.length">
         <md-card-content layout="column" layout-align="center center">
           <span translate="NO_DATA_FOR_THIS_CONFIGURATION"></span>
-          <md-icon md-font-icon="icon-chart-view"></md-icon>
+          <md-icon md-font-icon="{{$ctrl.CHART_TYPES_OBJ['chart:' + $ctrl.model.chartType].icon.font}}"></md-icon>
         </md-card-content>
       </md-card>
 

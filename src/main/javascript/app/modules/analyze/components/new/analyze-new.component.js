@@ -5,9 +5,8 @@ import * as find from 'lodash/find';
 import * as template from './analyze-new.component.html';
 import style from './analyze-new.component.scss';
 import emptyTemplate from './analyze-new-empty.html';
-import methods from './methods';
 
-import {AnalyseTypes, ENTRY_MODES} from '../../consts';
+import {AnalyseTypes, ENTRY_MODES, ANALYSIS_METHODS} from '../../consts';
 
 export const AnalyzeNewComponent = {
   template,
@@ -22,7 +21,7 @@ export const AnalyzeNewComponent = {
       this._$scope = $scope;
       this._$mdDialog = $mdDialog;
       this._AnalyzeService = AnalyzeService;
-      this.methods = methods;
+      this.methods = ANALYSIS_METHODS;
     }
 
     $onInit() {
