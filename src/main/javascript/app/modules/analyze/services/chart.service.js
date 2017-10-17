@@ -23,6 +23,7 @@ import * as reduce from 'lodash/reduce';
 import * as concat from 'lodash/concat';
 import * as compact from 'lodash/compact';
 import * as fpGroupBy from 'lodash/fp/groupBy';
+import * as fpPick from 'lodash/fp/pick';
 import * as mapValues from 'lodash/mapValues';
 import * as sortBy from 'lodash/sortBy';
 import * as moment from 'moment';
@@ -383,13 +384,28 @@ export function ChartService(Highcharts) {
 
   function getSerie({alias, displayName, comboType, aggregate}, index) {
     const splinifiedChartType = splinifyChartType(comboType);
-
+    const zIndex = getZIndex(comboType);
     return {
       name: alias || `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`,
       type: splinifiedChartType,
       yAxis: index,
+      zIndex,
       data: []
     };
+  }
+
+  function getZIndex(type) {
+    switch (type) {
+    case 'area':
+      return 0;
+    case 'column':
+    case 'bar':
+      return 1;
+    case 'pline':
+      return 3;
+    default:
+      return 4;
+    }
   }
 
   function splitSeriesByYAxes(parsedData, fields) {
