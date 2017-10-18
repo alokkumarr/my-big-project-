@@ -15,7 +15,7 @@ operations and monitoring.
 To start with saw security on local machine we will need below software to be installed which are as follows:
  1. Java 8.
  2. Maven 3.x
- 3. MariaDB 10.x
+ 3. MariaDB 5.5
  4. Spring Tool Suite or equivalent 
  
 *Note : If you are using Mac install `homebrew`*
@@ -33,7 +33,7 @@ Maven
 MariaDB
 -------
 > brew update
-> brew install mariadb
+> brew install mariadb@5.5
 > brew services start mariadb or mysql.service start
 	>  [mysql_secure_installation](https://mariadb.com/kb/en/library/mysql_secure_installation/)
  `mysql -u root -p -h localhost`
