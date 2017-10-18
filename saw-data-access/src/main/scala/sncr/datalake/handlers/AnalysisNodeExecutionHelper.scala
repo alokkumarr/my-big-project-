@@ -265,7 +265,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
       nodeExists = true
     }
     catch {
-      case e: Exception => m_log debug("Tried to load node: ", e)
+      case e: Exception => m_log debug("Tried to load node: {}", e.toString)
     }
     if (nodeExists) resultNode.delete
 
