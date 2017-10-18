@@ -1,0 +1,16 @@
+.input-container input {
+  background-color: $input-bg-color;
+  color: $input-color;
+  border: $input-border;
+  border-radius: 3px;
+  padding: 0 $input-padding;
+  line-height: $input-line-height;
+  font-size: $input-font-size;
+  height: 34px;
+}
+
+md-input-container {
+  .md-input.ng-invalid.ng-dirty {
+    padding: 5px;
+  }
+}

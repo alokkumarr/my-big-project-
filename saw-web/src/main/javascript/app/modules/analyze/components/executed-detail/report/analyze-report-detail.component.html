@@ -1,0 +1,33 @@
+<md-card layout="column">
+  <md-card-title>
+    <md-card-title-text>
+      <span class="md-title" ng-bind="::$ctrl.analysis.name"></span>
+    </md-card-title-text>
+
+    <!--
+      <md-button class="btn-tertiary"
+                ng-click="$ctrl.openFilterSidenav()"
+                ng-disabled="$ctrl._isEmpty($ctrl.analysis.report.filters)">
+        <md-icon md-font-icon="icon-filter"></md-icon>
+        <span translate="FILTER"></span>
+      </md-button>
+    -->
+  </md-card-title>
+
+  <md-card-content>
+    <div layout="column" layout-align="space-between start">
+      <filter-chips filters="$ctrl.filters.selected"
+                    on-clear-all-filters="$ctrl.onClearAllFilters()"
+                    on-filter-removed="$ctrl.onFilterRemoved(chip)">
+      </filter-chips>
+    </div>
+    <div layout="column" layout-align="space-between center">
+      <report-grid-display-container data="$ctrl.gridData"
+                            columns="$ctrl.columns"
+                            source="$ctrl.loadData(options)"
+                            groups="$ctrl.analysis.groupByColumns"
+                            requester="$ctrl.requester">
+      </report-grid-display-container>
+    </div>
+  </md-card-content>
+</md-card>

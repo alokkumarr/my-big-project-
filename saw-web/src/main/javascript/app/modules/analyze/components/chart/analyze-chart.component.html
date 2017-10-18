@@ -1,0 +1,213 @@
+<analyze-dialog control="$ctrl" class="analyze-chart-dialog">
+  <analyze-dialog-header>
+
+    <div layout="row">
+      <md-button class="ard_back-btn"
+                 ng-click="$ctrl.goBack()">
+        <md-icon md-font-icon="icon-arrow-left"></md-icon>
+      </md-button>
+
+      <div class="ard_meta" flex>
+        <div class="md-title">
+          <strong class="e2e-report-title" ng-bind="$ctrl.model.name"></strong>
+          <label translate="DRAFT" ng-show="$ctrl.draftMode"></label>
+        </div>
+        <div class="md-description">
+          <md-icon md-font-icon="icon-report"></md-icon>
+          <span ng-bind="::$ctrl.model.metricName"></span>
+        </div>
+      </div>
+
+      <div class="ard_actions" flex>
+        <md-button ng-click="$ctrl.openSaveChartModal($event)"
+                   e2e="open-save-modal"
+                   translate="SAVE">
+        </md-button>
+      </div>
+    </div>
+    <md-progress-linear ng-show="$ctrl.showProgress" md-mode="indeterminate"></md-progress-linear>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+    <analyze-chart-settings
+        view-options="$ctrl.chartViewOptions"
+        settings="$ctrl.settings"
+        on-change="$ctrl.onSettingsChanged(settings)"
+        chart-type="$ctrl.model.chartType"
+    ></analyze-chart-settings>
+    <div layout="column" style="overflow: auto;">
+    <div flex>
+      <md-toolbar class="secondary-toolbar chart-options-toolbar">
+        <div class="md-toolbar-tools"
+             layout-align="start center">
+          <div class="analyze-view_search-panel" layout="row" layout-align="start center">
+            <choice-group size="m"
+                          icon-only="true"
+                          style="margin-right: 10px;"
+                          items="$ctrl.INVERTING_OPTIONS"
+                          ng-if="$ctrl.invertableCharts.includes($ctrl.model.chartType)"
+                          ng-model="$ctrl.isInverted"
+                          ng-change="$ctrl.toggleChartInversion()">
+            </choice-group>
+            <span class="md-title"
+                  e2e="designer-type-chart"
+                  translate="CHART">
+            </span>
+          </div>
+
+          <div class="analyze-view_action-panel" layout="row" layout-align="end center">
+            <md-button ng-click="$ctrl.onRefreshData()"
+                       e2e="refresh-data-btn"
+                       ng-class="{'btn-primary': $ctrl.didAnalysisChange}" >
+              <span translate="REFRESH_DATA"></span>
+            </md-button>
+            <md-button ng-click="$ctrl.openDescriptionModal($event, $ctrl.model)"
+                       e2e="open-description-modal">
+              <md-icon md-font-icon="icon-description"></md-icon>
+              <span translate="DESCRIPTION"></span>
+            </md-button>
+            <md-button ng-click="$ctrl.openChartPreviewModal($event)"
+                       e2e="open-preview-modal">
+              <md-icon md-font-icon="icon-full-screen"></md-icon>
+              <span translate="PREVIEW"></span>
+            </md-button>
+            <md-button class="action"
+                       ng-click="$ctrl.openChartSortModal($event)"
+                       e2e="open-sort-modal"
+                       ng-disabled="!$ctrl.sortFields">
+              <md-icon md-font-icon="icon-sort"></md-icon>
+              <span translate="SORT"></span>
+            </md-button>
+            <md-button ng-click="$ctrl.openFiltersModal($event)">
+              <md-icon md-font-icon="icon-filter"></md-icon>
+              <span translate="FILTER"></span>
+            </md-button>
+          </div>
+        </div>
+      </md-toolbar>
+
+      <md-card class="chart-non-ideal chart-container-card"
+               ng-show="$ctrl.designerState === $ctrl.designerStates.noData ||
+                        $ctrl.designerState === $ctrl.designerStates.noSelection">
+        <md-card-content layout="column" layout-align="center center">
+          <span ng-show="$ctrl.designerState === $ctrl.designerStates.noData"
+                translate="NO_DATA_FOR_THIS_CONFIGURATION"></span>
+          <span ng-show="$ctrl.designerState === $ctrl.designerStates.noSelection"
+                translate="PLEASE_SELECT_FIELDS_FOR_CHART"></span>
+          <md-icon md-font-icon="{{$ctrl.CHART_TYPES_OBJ['chart:' + $ctrl.model.chartType].icon.font}}"></md-icon>
+        </md-card-content>
+      </md-card>
+
+      <div layout="column"
+           style="overflow: auto;"
+           >
+        <chart updater="$ctrl.updateChart"
+               ng-if="$ctrl.designerState === $ctrl.designerStates.hasData"
+               options="$ctrl.chartOptions"></chart>
+      </div>
+      <md-card class="chart-container-card" ng-show="$ctrl.xAndYSelected()">
+        <md-card-content layout="column">
+          <filter-chips filters="$ctrl.filters"
+                        on-clear-all-filters="$ctrl.onClearAllFilters()"
+                        on-filter-removed="$ctrl.onFilterRemoved(index)">
+          </filter-chips>
+          <h3 translate="CHART_OPTIONS"></h3>
+          <div layout="column" ng-if="!$ctrl.multyYCharts.includes($ctrl.model.chartType)">
+            <div layout="row" layout-align="center">
+              <md-input-container flex ng-if="::$ctrl.chartViewOptions.renamable.y">
+                  <label ng-bind="::('Custom ' + $ctrl.chartViewOptions.axisLabels.y + ' Label')"></label>
+                  <input ng-model="$ctrl.labels.tempY"/>
+              </md-input-container>
+              <md-input-container flex ng-if="::$ctrl.chartViewOptions.renamable.x">
+                  <label ng-bind="::('Custom ' + $ctrl.chartViewOptions.axisLabels.x + ' Label')"></label>
+                  <input ng-model="$ctrl.labels.tempX"/>
+              </md-input-container>
+              <md-button class="btn-primary" ng-click="$ctrl.updateCustomLabels()">
+                <span translate="APPLY"></span>
+              </md-button>
+            </div>
+            <div layout="row" class="label-options">
+              <md-checkbox ng-if="::$ctrl.chartViewOptions.labelOptions.length" flex="20"
+                ng-change="$ctrl.updateLabelOptions()"
+                ng-model="$ctrl.model.labelOptions.enabled">
+                <span translate="SHOW_CHART_LABELS"></span>
+              </md-checkbox>
+              <md-radio-group ng-model="$ctrl.model.labelOptions.value" flex="30"
+                ng-change="$ctrl.updateLabelOptions()"
+                ng-show="$ctrl.model.labelOptions.enabled">
+                <div layout="row">
+                  <md-radio-button ng-value="option.value" flex
+                    ng-repeat="option in $ctrl.chartViewOptions.labelOptions">
+                    <span ng-bind="::option.name"></span>
+                  </md-radio-button>
+                </div>
+              </md-radio-group>
+            </div>
+          </div>
+
+          <div layout="column"
+               ng-if="$ctrl.multyYCharts.includes($ctrl.model.chartType)">
+            <div ng-repeat="y in $ctrl.settings.yaxis | filter:{checked: 'y'} track by y.columnName"
+                 style="padding-bottom:5px;"
+                 layout="row"
+                 layout-align="start center">
+              <md-input-container flex="30" md-no-float>
+                <input ng-model="y.alias" placeholder="{{y.displayName}}"/>
+              </md-input-container>
+              <md-menu flex="30" ng-if="$ctrl.comboableCharts.includes($ctrl.model.chartType)">
+                <md-button class="md-icon-button"
+                            ng-click="$mdMenu.open($event)">
+                  <md-icon md-menu-origin
+                            style="display: inline;"
+                            md-font-icon="{{$ctrl.COMBO_TYPES_OBJ[y.comboType].icon}}"></md-icon>
+                  {{$ctrl.COMBO_TYPES_OBJ[y.comboType].label}}
+                </md-button>
+                <md-menu-content width="4">
+                  <md-menu-item ng-repeat="type in $ctrl.COMBO_TYPES">
+                    <md-button ng-click="$ctrl.onSelectComboType(y, type)"
+                                style="font-size: 14px;">
+                        <md-icon md-font-icon="{{::type.icon}}"></md-icon>
+                        {{type.label}}
+                    </md-button>
+                  </md-menu-item>
+                </md-menu-content>
+              </md-menu>
+            </div>
+            <div layout="row"
+                 layout-align="start center"
+                 ng-repeat="x in $ctrl.settings.xaxis | filter:{checked: 'x'} track by x.columnName">
+              <md-input-container flex="30" md-no-float>
+                <input ng-model="x.alias"
+                       placeholder="{{::x.displayName}}"/>
+              </md-input-container>
+            </div>
+            <div>
+              <md-button class="btn-primary"
+                         ng-click="$ctrl.updateCustomLabels()"
+                         style="margin-top: 10px;">
+                <span translate="APPLY"></span>
+              </md-button>
+            </div>
+          </div>
+
+          <h3 translate="LEGEND_OPTIONS" ng-if="::$ctrl.chartViewOptions.legend"></h3>
+          <div layout="row" layout-align="center" ng-if="::$ctrl.chartViewOptions.legend">
+            <md-input-container flex>
+              <label translate="POSITION"></label>
+              <md-select ng-model="$ctrl.legend.align" ng-change="$ctrl.updateLegendPosition()">
+                <md-option ng-repeat="position in $ctrl.legend.options.align" ng-value="position.name" ng-bind="::position.displayName"></md-option>
+              </md-select>
+            </md-input-container>
+            <md-input-container flex>
+              <label translate="LAYOUT"></label>
+              <md-select ng-model="$ctrl.legend.layout" ng-change="$ctrl.updateLegendPosition()">
+                <md-option ng-repeat="position in $ctrl.legend.options.layout" ng-value="position.name" ng-bind="::position.displayName"></md-option>
+              </md-select>
+            </md-input-container>
+          </div>
+        </md-card-content>
+      </md-card>
+    </div>
+  </div>
+  </analyze-dialog-content>
+</analyze-dialog>

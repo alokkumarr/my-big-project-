@@ -1,0 +1,64 @@
+.new-user-dialog {
+  .user-dialog {
+    width: 500px;
+  }
+
+  .user-dialog_header {
+    .layout-row {
+      justify-content: space-between;
+    }
+
+    .md-title {
+      line-height: 36px;
+    }
+
+    .md-button {
+      margin-right: 0;
+    }
+  }
+
+  .user-dialog_content {
+    padding: 15px;
+
+    .md-subhead {
+      padding: 15px 0;
+    }
+
+    .md-body-1 {
+      padding-bottom: 5px;
+    }
+
+    .adc-method {
+      padding-bottom: 15px;
+
+      .md-button {
+        margin-left: -1px;
+      }
+    }
+
+    input {
+      background: transparent;
+      border-width: 0 0 1px;
+    }
+
+    md-input-container {
+      width: 100%;
+    }
+  }
+
+  .user-dialog_footer {
+    .layout-row {
+      justify-content: space-between;
+    }
+  }
+}
+
+.padding-for-container {
+  padding-bottom: 20px;
+}
+
+.button-pull-right {
+  position: absolute;
+  right: 15px;
+}
+

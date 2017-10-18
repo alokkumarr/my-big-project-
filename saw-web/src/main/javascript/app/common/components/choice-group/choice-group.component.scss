@@ -1,0 +1,91 @@
+choice-group {
+  .md-button {
+    padding: 8px;
+    flex: 0 0 25%;
+    border: 1px solid #B0BFC8;
+    border-radius: 0;
+    font-size: 16px;
+    color: #596574;
+    text-align: center;
+
+    &:hover {
+      background-color: #F3F5F8;
+    }
+
+    &:first-child {
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px;
+    }
+
+    &:last-child {
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
+
+    &.selected {
+      background-color: #DEE4EA;
+      color: #596574;
+    }
+
+    [disabled] {
+      background-color: transparent;
+      color: rgba(#596574, 0.7);
+    }
+
+    md-icon[md-svg-src] {
+      transform: translate(-0.25em, -0.25em);
+
+      svg {
+        height: 1em;
+        width: 1em;
+      }
+    }
+
+    &.selected {
+      background-color: #1A89D4;
+      color: #FFF;
+
+      md-icon {
+        color: #FFF;
+      }
+    }
+  }
+
+  .size-xl {
+    flex-wrap: wrap;
+
+    .md-button {
+      margin-top: 2px;
+      padding: 24px 18px 0;
+
+      p {
+        margin: 0;
+        font-weight: 600;
+      }
+
+      md-icon {
+        font-size: 48px;
+        height: 48px;
+      }
+    }
+  }
+
+  .size-m {
+    flex-wrap: wrap;
+
+    .md-button {
+      margin-top: 2px;
+      min-width: 0;
+
+      p {
+        margin: 0;
+        font-weight: 600;
+      }
+
+      md-icon {
+        font-size: 16px;
+        height: 16px;
+      }
+    }
+  }
+}

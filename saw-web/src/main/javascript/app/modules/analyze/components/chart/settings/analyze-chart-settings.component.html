@@ -1,0 +1,153 @@
+<div layout="row">
+  <md-sidenav class="md-sidenav-left"
+              md-component-id="left"
+              md-is-open="true"
+              md-disable-backdrop
+              md-whiteframe="4">
+    <md-toolbar class="md-theme-indigo">
+      <h1 class="md-toolbar-tools">Dataset Fields</h1>
+    </md-toolbar>
+
+    <md-content layout-margin>
+
+      <collapser title="{{::$ctrl.viewOptions.axisLabels.y}}">
+        <md-radio-group ng-model="$ctrl.selected.y"
+                        ng-if="$ctrl.multipleYAxes.enabled == false"
+                        ng-change="$ctrl.inputChanged($ctrl.settings.yaxis, $ctrl.selected.y, 'y')">
+          <div flex layout="row"
+               layout-align="space-between center"
+               ng-repeat="attr in $ctrl.settings.yaxis">
+            <md-radio-button flex role="radio"
+                             ng-value="attr"
+                             e2e="radio-button-{{::attr.displayName}}"
+                             ng-disabled="attr.checked && attr.checked != 'y'">
+              <span ng-bind="::attr.displayName"></span>
+            </md-radio-button>
+            <aggregate-chooser flex="20" ng-show="attr.checked && attr.checked === 'y'"
+                               artifact-column="attr"
+                               on-select="$ctrl.onSelectAggregateType(aggregateType, attr, 'radio')">
+            </aggregate-chooser>
+          </div>
+        </md-radio-group>
+
+        <md-list ng-if="$ctrl.multipleYAxes.enabled">
+          <!-- update tests -->
+          <md-list-item ng-repeat="attr in $ctrl.multipleYAxes.fields"
+                        e2e="radio-button-{{::attr.displayName}}">
+
+            <md-checkbox flex ng-model="attr.checked"
+                         ng-disabled="attr.disabled"
+                         ng-change="$ctrl.inputChanged($ctrl.settings.yaxis, attr, 'y')"
+                         style="align-self: flex-end;">
+              <span ng-bind="attr.displayName"></span>
+            </md-checkbox>
+
+            <aggregate-chooser flex="20" ng-show="attr.checked"
+                               class="md-secondary"
+                               artifact-column="attr"
+                               on-select="$ctrl.onSelectAggregateType(aggregateType, attr, 'checkbox')">
+            </aggregate-chooser>
+          </md-list-item>
+        </md-list>
+      </collapser>
+
+      <collapser title="{{::$ctrl.viewOptions.axisLabels.x}}">
+        <md-radio-group ng-model="$ctrl.selected.x"
+                        ng-change="$ctrl.inputChanged($ctrl.settings.xaxis, $ctrl.selected.x, 'x')">
+          <div flex layout="row"
+               layout-align="space-between center"
+               ng-repeat="attr in $ctrl.settings.xaxis track by attr.columnName">
+
+            <md-radio-button role="radio"
+                             ng-value="attr"
+                             e2e="radio-button-{{::attr.displayName}}"
+                             ng-disabled="attr.checked && attr.checked != 'x'">
+            <span class="truncated-field-name" ng-bind="::attr.displayName"></span>
+            </md-radio-button>
+
+            <md-menu class="md-secondary" ng-show="attr.checked && attr.checked == 'x' && $ctrl.DATE_TYPES.includes(attr.type)">
+              <md-button aria-label="DATE_FORMAT"
+                         class="md-icon-button"
+                         e2e="pivot-date-format-menu-btn"
+                         ng-click="$mdMenu.open($event)">
+                <md-icon md-menu-origin
+                         md-font-icon="icon-calendar"></md-icon>
+                <md-tooltip ng-bind="'TOOLTIP_DATE_FORMAT' | translate"></md-tooltip>
+              </md-button>
+              <md-menu-content width="4">
+                <md-menu-item ng-repeat="dateFormat in $ctrl.DATE_FORMATS track by dateFormat.value">
+                  <md-button ng-click="$ctrl.onSelectDateFormat(dateFormat, attr)"
+                             e2e="pivot-date-format-selector-{{dateFormat.value}}"
+                             style="font-size: 14px;">
+                    {{::dateFormat.label}}
+                  </md-button>
+                </md-menu-item>
+              </md-menu-content>
+            </md-menu>
+
+          </div>
+        </md-radio-group>
+      </collapser>
+      <collapser title="{{::$ctrl.viewOptions.axisLabels.z}}"
+                 ng-if="$ctrl.settings.zaxis">
+        <md-radio-group ng-model="$ctrl.selected.z"
+                        ng-change="$ctrl.inputChanged($ctrl.settings.zaxis, $ctrl.selected.z, 'z')">
+          <div flex layout="row"
+               layout-align="space-between center"
+               ng-repeat="attr in $ctrl.settings.zaxis">
+            <md-radio-button role="radio"
+                             ng-value="attr"
+                             e2e="radio-button-{{::attr.displayName}}"
+                             ng-disabled="attr.checked && attr.checked != 'z'">
+            <span ng-bind="::attr.displayName"></span>
+            </md-radio-button>
+            <aggregate-chooser ng-show="attr.checked && attr.checked === 'z'"
+                               artifact-column="attr"
+                               on-select="$ctrl.onSelectAggregateType(aggregateType, attr, 'radio')">
+            </aggregate-chooser>
+
+          </div>
+        </md-radio-group>
+      </collapser>
+
+      <collapser title="{{::$ctrl.viewOptions.axisLabels.g}}"
+                 action="$ctrl.groupRemovalAction">
+        <md-radio-group ng-model="$ctrl.selected.g"
+                        ng-change="$ctrl.inputChanged($ctrl.settings.groupBy, $ctrl.selected.g, 'g')">
+          <div flex layout="row"
+               layout-align="space-between center"
+               ng-repeat="attr in $ctrl.settings.groupBy">
+            <md-radio-button role="radio"
+                             ng-value="attr"
+                             e2e="radio-button-{{::attr.displayName}}"
+                             ng-disabled="attr.checked && attr.checked != 'g'">
+              <span ng-bind="::attr.displayName"></span>
+            </md-radio-button>
+
+            <md-menu class="md-secondary" ng-show="attr.checked && attr.checked == 'g' && $ctrl.DATE_TYPES.includes(attr.type)">
+              <md-button aria-label="DATE_FORMAT"
+                         class="md-icon-button"
+                         e2e="pivot-date-format-menu-btn"
+                         ng-click="$mdMenu.open($event)">
+                <md-icon md-menu-origin
+                         md-font-icon="icon-calendar"></md-icon>
+                <md-tooltip ng-bind="'TOOLTIP_DATE_FORMAT' | translate"></md-tooltip>
+              </md-button>
+              <md-menu-content width="4">
+                <md-menu-item ng-repeat="dateFormat in $ctrl.DATE_FORMATS track by dateFormat.value">
+                  <md-button ng-click="$ctrl.onSelectDateFormat(dateFormat, attr)"
+                             e2e="pivot-date-format-selector-{{dateFormat.value}}"
+                             style="font-size: 14px;">
+                    {{::dateFormat.label}}
+                  </md-button>
+                </md-menu-item>
+              </md-menu-content>
+            </md-menu>
+
+          </div>
+        </md-radio-group>
+      </collapser>
+
+    </md-content>
+  </md-sidenav>
+</div>

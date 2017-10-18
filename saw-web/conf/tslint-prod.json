@@ -1,0 +1,22 @@
+{
+  "extends": [
+    "tslint-eslint-rules"
+  ],
+  "rules": {
+    "ter-indent": [true, 2],
+    "quotemark": [true, "single"],
+    "object-literal-sort-keys": false,
+    "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
+    "max-params": ["error", 20],
+    "no-unused-variable": true,
+    "no-warning-comments": [0]
+  },
+  "jsRules": {
+    "ter-indent": [true, 2],
+    "quotemark": [true, "single"],
+    "object-literal-sort-keys": false,
+    "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
+    "max-params": ["error", 20],
+    "no-warning-comments": [0]
+  }
+}

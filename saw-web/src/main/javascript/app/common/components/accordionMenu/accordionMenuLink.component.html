@@ -1,0 +1,33 @@
+<div ng-if="!$ctrl.metadata.hidden"
+     ng-switch="$ctrl.hasChildren()">
+  <div ng-switch-when="false">
+    <md-button ng-click="$ctrl.onClick($event)"
+               ng-href="{{$ctrl.metadata.url}}">
+      <div flex layout="row">
+        <span ng-class="{activeButton: $ctrl.checkActiveMenu('{{$ctrl.metadata.url}}') }" 
+        ng-bind="$ctrl.metadata.name"></span>
+      </div>
+    </md-button>
+  </div>
+
+  <div ng-switch-when="true">
+    <md-button class="md-button-toggle"
+               ng-click="$ctrl.onClick($event)">
+      <div flex layout="row">
+        <span ng-bind="$ctrl.metadata.name"></span>
+        <span flex></span>
+        <span class="md-toggle-icon"
+              ng-class="{'toggled' : $ctrl.isOpen}">
+          <md-icon md-font-icon="icon-expand"></md-icon>
+        </span>
+      </div>
+    </md-button>
+
+    <ul class="menu-toggle-list" ng-init="$ctrl.checkAndCollapse()"
+        collapse="!$ctrl.isOpen">
+      <li ng-repeat="childItem in $ctrl.metadata.children">
+        <accordion-menu-link metadata="childItem"></accordion-menu-link>
+      </li>
+    </ul>
+  </div>
+</div>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Synchronoss - Export Highchart</title>
+  </head>
+  <body>
+    <div id="highchart-widget" style="min-width: 310px; height: 400px; margin: 0 auto;"></div>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script type="text/javascript">
+      const series = [{
+        name: 'Brands',
+        colorByPoint: true,
+        animation: false,
+        data: [{
+          name: 'Explorer',
+          y: 56.33
+        }, {
+          name: 'Chrome',
+          y: 24.03
+        }, {
+          name: 'Firefox',
+          y: 10.38
+        }, {
+          name: 'Safari',
+          y: 4.77
+        }, {
+          name: 'Opera',
+          y: 0.91
+        }, {
+          name: 'Other',
+          y: 0.2
+        }]
+      }];
+
+      function html_render() {
+        Highcharts.chart('highchart-widget', {
+          chart: {
+            type: 'column'
+          },
+          title: {
+            text: 'Browser market shares. January, 2015 to May, 2015'
+          },
+          xAxis: {
+            type: 'category'
+          },
+          yAxis: {
+            title: {
+              text: 'Total percent market share'
+            }
+          },
+          legend: {
+            enabled: false
+          },
+          plotOptions: {
+            series: {
+              borderWidth: 0,
+              dataLabels: {
+                enabled: true,
+                format: '{point.y:.1f}%'
+              }
+            }
+          },
+          series: series,
+          loading: {
+              showDuration: 0
+          }
+        });
+      }
+
+      html_render();
+    </script>
+  </body>
+</html>

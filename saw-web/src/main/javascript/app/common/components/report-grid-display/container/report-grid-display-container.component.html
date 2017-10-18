@@ -1,0 +1,31 @@
+<div class="report-grid-display-container" layout="column">
+  <div class="rgc-group-panel" layout="row" layout-align="space-between center"
+       ng-if="$ctrl.groups.length > 0">
+
+    <div>
+      <span translate="GROUPED_BY"></span> :&nbsp;<strong ng-bind="$ctrl.groupedByString"></strong>
+    </div>
+
+    <md-radio-group layout="row" layout-align="end center"
+                    ng-model="$ctrl.settings.layoutMode"
+                    ng-change="$ctrl.onLayoutModeUpdate()">
+
+      <md-radio-button ng-value="::$ctrl.LAYOUT_MODE.DETAIL">
+        <span translate="SHOW_EACH_ROW"></span>
+      </md-radio-button>
+      <md-radio-button ng-value="::$ctrl.LAYOUT_MODE.SUMMARY">
+        <span translate="SUMMARY_VIEW"></span>
+      </md-radio-button>
+
+    </md-radio-group>
+  </div>
+
+  <md-card>
+    <report-grid-display-node
+      columns="$ctrl.columns"
+      settings="$ctrl.settings"
+      source="$ctrl.loadData(options)"
+      data="$ctrl.groupedData">
+    </report-grid-display-node>
+  </md-card>
+</div>

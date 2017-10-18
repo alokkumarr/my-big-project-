@@ -1,0 +1,22 @@
+<div layout="row" layout-align="start center" ng-class="$ctrl.sizeClass">
+  <md-button layout="column"
+             e2e="item-type-{{::item.type}}"
+             ng-repeat="item in $ctrl.items track by item.type"
+             ng-class="{'selected': item.type === $ctrl.ngModel}"
+             ng-disabled="item.disabled"
+             ng-value="item.type"
+             ng-click="$ctrl.onItemSelected(item)">
+    <md-icon flex
+             ng-if="::item.icon.font"
+             md-font-icon="{{::item.icon.font}}">
+    </md-icon>
+    <md-icon flex
+             ng-if="::item.icon.svg"
+             md-svg-src="{{::item.icon.svg}}">
+    </md-icon>
+    <md-tooltip ng-bind="item.label | translate"
+                ng-if="::$ctrl.iconOnly"></md-tooltip>
+    <p ng-bind="::item.label"
+       ng-if="::!$ctrl.iconOnly"></p>
+  </md-button>
+</div>

@@ -1,0 +1,39 @@
+layout-header {
+  .lh-toolbar {
+    height: 70px;
+    max-height: 70px;
+    padding: 0 20px;
+
+    .link {
+      padding: 0 20px;
+    }
+  }
+
+  .alert-bell-icon {
+    background-image: url(~img/alert-bell.png);
+    background-size: 85% 85%;
+    background-repeat: no-repeat;
+    height: 21px;
+    width: 39px;
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+.root-container > layout-header {
+  position: fixed;
+  // the z-index of the modal-backdrop is 79
+  // the z-index of the sidenav is 60
+  z-index: 70;
+  width: 100%;
+  max-width: 1600px;
+
+  .lh-toolbar {
+    background-color: white;
+  }
+}
+
+header .company-logo {
+  background-position-x: -10px;
+  height: 50px;
+  width: 145px;
+}

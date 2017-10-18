@@ -1,0 +1,65 @@
+@import "themes/base/colors";
+
+analyze-pivot-settings {
+  z-index: 0;
+
+  & > .layout-row {
+    height: 100%;
+  }
+
+  .truncated-field-name {
+    display: block;
+    margin-right: 10px;
+    max-width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  md-sidenav {
+    position: static;
+    width: 352px;
+  }
+
+  h3 {
+    margin: 5px;
+    padding: 5px;
+    border-bottom: 1px solid #EEE;
+  }
+
+  .summary-type {
+    md-checkbox {
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+  }
+
+  md-toolbar {
+    min-height: 0;
+  }
+
+  .md-subheader-content .md-errors-spacer {
+    display: none;
+  }
+
+  .dx-pivotgridfieldchooser span.dx-area-caption {
+    color: $primary-blue-b2;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .dx-checkbox-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    background-color: #FFF;
+  }
+
+  .dx-checkbox-checked .dx-checkbox-icon {
+    color: white;
+    font-size: 13px;
+    background-color: $primary-blue-b2;
+    text-align: center;
+    font-weight: bold;
+  }
+}

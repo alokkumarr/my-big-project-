@@ -1,0 +1,66 @@
+<category-dialog control="$ctrl" class="new-category-dialog"> <category-dialog-header>
+<div layout="row">
+  <div class="md-title" translate="NEW_CATEGORY"></div>
+</div>
+</category-dialog-header> <category-dialog-content>
+<div layout="column">
+<form name="newCategoryForm" method="post">
+
+  <md-radio-group ng-model="$ctrl.subCategoryInd">
+    <md-radio-button ng-value="false" class="horizantal-radio-box">
+      <span translate="CATEGORY_FLAG_LABEL"></span>
+    </md-radio-button>
+    <md-radio-button ng-value="true" class="horizantal-radio-box">
+      <span translate="SUB_CATEGORY_FLAG_LABEL"></span>
+    </md-radio-button>
+  </md-radio-group>
+  <md-input-container flex class="padding-for-container"> <label
+		translate="CATEGORY_PROD_LABEL"></label> <md-select
+		ng-model="$ctrl.category.productId" required
+		ng-change="$ctrl.getModules($ctrl.category.productId)"> <md-option
+		ng-repeat="product in $ctrl.productsList" ng-value="product.productId"
+		ng-bind="::product.productName"></md-option> </md-select> </md-input-container>
+  <md-input-container flex class="padding-for-container"> <label
+		translate="CATEGORY_MODL_LABEL"></label> <md-select
+		ng-model="$ctrl.category.moduleId" required
+		ng-change="$ctrl.getCategories($ctrl.category.moduleId)"> <md-option
+		ng-repeat="module in $ctrl.modulesList" ng-value="module.moduleId"
+		ng-bind="::module.moduleName"></md-option> </md-select> </md-input-container>
+  <md-input-container ng-if="!$ctrl.subCategoryInd" flex> <label
+		translate="CATEGORY_NAME_LABEL"></label> <input name="categoryName"
+		ng-model="$ctrl.category.categoryName" 
+		ng-pattern="/^[a-zA-Z\s]*$/"
+		required/> </md-input-container>
+  <md-input-container ng-if="!$ctrl.subCategoryInd" flex> <label
+		translate="CATEGORY_DESC_LABEL"></label> <input name="categoryDesc"
+		ng-model="$ctrl.category.categoryDesc" /> </md-input-container>
+  <md-input-container ng-if="$ctrl.subCategoryInd" flex class="padding-for-container"> <label
+		translate="CATEGORY_LABEL"></label> <md-select
+			ng-model="::$ctrl.category.categoryId" required >
+  <md-option ng-repeat="category in $ctrl.categoriesList"
+			ng-bind="::category.categoryName" ng-value="category.categoryId"></md-option>
+  </md-select>
+  </md-input-container>
+  <md-input-container ng-if="$ctrl.subCategoryInd" flex> <label
+		translate="SUB_CATEGORY_NAME_LABEL"></label> <input name="subCategoryName"
+		ng-model="$ctrl.category.categoryName" 
+		ng-pattern="/^[a-zA-Z\s]*$/"
+		required/> </md-input-container>
+  <md-input-container ng-if="$ctrl.subCategoryInd" flex> <label
+		translate="SUB_CATEGORY_DESC_LABEL"></label> <input name="subCategoryDesc"
+		ng-model="$ctrl.category.categoryDesc" /> </md-input-container>
+  <md-input-container flex  class="padding-for-container"> <label
+		translate="CATEGORY_ACTIVE_LABEL"></label> <md-select
+		ng-model="$ctrl.category.activeStatusInd" required> <md-option
+		ng-repeat="status in $ctrl.statuses" ng-value="status.ind"
+		ng-bind="::status.name"></md-option> </md-select> </md-input-container>
+  <div class="layout-row">
+    <md-button class="btn-primary" ng-disabled="newCategoryForm.$invalid"
+      ng-click="$ctrl.createCategory()"
+		translate="CREATE_CATEGORY"> </md-button>
+    <md-button class="btn-card button-pull-right" ng-click="$ctrl.$dialog.hide()"
+		translate="CANCEL"> </md-button>
+  </div>
+</form>
+</div>
+</category-dialog-content> </category-dialog>

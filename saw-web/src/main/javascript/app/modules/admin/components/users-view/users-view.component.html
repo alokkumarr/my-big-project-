@@ -1,0 +1,27 @@
+<div class="users-view">
+  <md-toolbar class="secondary-toolbar">
+    <div class="md-toolbar-tools" layout-align="start center">
+      <div class="users-view_search-panel" layout="row" layout-align="start center">
+        <span class="md-title" translate="USERS_MGMT_LIST"></span>&nbsp;
+        <search-box placeholder="Search User"
+                    ng-model="$ctrl.states.searchTerm"
+                    on-change="$ctrl.applySearchFilter()" delay="1000"></search-box>
+      </div>
+      <div class="users-view_action-panel" layout="row" layout-align="end center">
+        <md-button class="btn-primary" ng-click="$ctrl.openNewUserModal()">
+          <md-tooltip ng-bind="'TOOLTIP_ADD_USER' | translate"></md-tooltip>
+          + <span translate="USER"></span>
+        </md-button>
+      </div>      
+    </div>
+  </md-toolbar>
+  <div class="users-view_users-list">
+    <users-list-view id="user-grid-dir"
+      users="$ctrl.userList"
+      updater="$ctrl.updater"
+      customer="$ctrl.custCode"
+      on-action="$ctrl.onCardAction(type, model)"
+      search-term="$ctrl.states.searchTermValue">
+    </users-list-view>
+  </div>
+</div>

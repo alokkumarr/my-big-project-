@@ -1,0 +1,37 @@
+<div>
+  <md-sidenav class="md-sidenav-right md-whiteframe-4dp" md-component-id="right">
+    <md-toolbar class="tbar-transparent">
+      <div class="md-toolbar-tools">
+        <div class="new-alerts-container">
+          <span class="new-alerts-count-box">0</span>
+          <span class="new-alerts-label"> New Alerts </span>
+        </div>
+        <md-button class="btn-secondary" aria-label="Learn More">Dismiss All</md-button>
+      </div>
+    </md-toolbar>
+    <md-content>
+      <div class="alerts-filter">
+        <span flex class="card-title">Today</span>
+        <md-button class="btn-card filter-open-button" ng-click="ctrl.showMenu($event)">
+          <md-icon md-font-icon="icon-filter"/>
+          Filter
+        </md-button>
+      </div>
+
+      <md-card class="alerts-card">
+        <md-card-header>
+          <div class="alerts-severity alerts-severity-high"></div>
+          <div class="alerts-card-title-wrapper">
+            <span class="card-title">Killowatt Hours Alert</span>
+            <span class="alerts-card-time">1 am</span>
+          </div>
+          <div class="alerts-card-category">Power</div>
+        </md-card-header>
+        <md-card-actions layout="row" layout-align="stretch">
+          <md-button flex class="btn-card">View</md-button>
+          <md-button flex class="btn-card">Dismiss</md-button>
+        </md-card-actions>
+      </md-card>
+    </md-content>
+  </md-sidenav>
+</div>

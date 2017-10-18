@@ -1,0 +1,26 @@
+<div layout="row">
+  <div flex show-gt-md class="sidebar-hider"></div>
+
+  <div layout-gt-md="column" class="app-container">
+    <div class="root-container">
+      <layout-header></layout-header>
+
+      <main class="main-content">
+        <sidenav class="left-side-nav"
+                 id="left-side-nav"
+                 flex="none"></sidenav>
+
+        <sidenav-btn class="left-side-nav_btn"
+                     target="left-side-nav"></sidenav-btn>
+
+        <div class="render-content">
+          <ui-view></ui-view>
+        </div>
+      </main>
+
+      <layout-footer></layout-footer>
+    </div>
+  </div>
+
+  <div flex show-gt-md class="sidebar-hider"></div>
+</div>

@@ -1,0 +1,68 @@
+{
+  artifacts: [
+    {
+      artifact_name: 'Table1',
+      artifact_position: [
+        4,
+        10
+      ],
+      artifact_attributes: [
+        {
+          display_name: 'Column 1',
+          column_name: 'col1',
+          alias_name: 'Column One',
+          type: 'string',
+          hide: false,
+          join_eligible: false,
+          filter_eligible: false,
+          checked: false,
+          index: 0
+        }
+      ],
+      sql_builder: {
+        group_by_columns: [
+          'col1'
+        ],
+        order_by_columns: [
+          {
+            column_name: 'col1',
+            order: 'asc'
+          }
+        ],
+        joins: [
+          {
+            type: 'inner',
+            criteria: [
+              {
+                table_name: 'Table1',
+                column_name: 'col2',
+                side: 'right'
+              },
+              {
+                table_name: 'Table2',
+                column_name: 'col1',
+                side: 'left'
+              }
+            ]
+          }
+        ],
+        filters: [
+          {
+            column_name: 'col2',
+            boolean_criteria: 'AND',
+            operator: '=',
+            search_conditions: [
+              'abc',
+              'def'
+            ]
+          }
+        ]
+      },
+      data: [
+        {
+          col1: '100'
+        }
+      ]
+    }
+  ]
+}

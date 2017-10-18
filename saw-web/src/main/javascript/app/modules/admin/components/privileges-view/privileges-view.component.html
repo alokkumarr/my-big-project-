@@ -1,0 +1,27 @@
+<div class="privileges-view">
+  <md-toolbar class="secondary-toolbar">
+    <div class="md-toolbar-tools" layout-align="start center">
+      <div class="privileges-view_search-panel" layout="row" layout-align="start center">
+        <span class="md-title" translate="PRIVILEGES_MGMT_LIST"></span>&nbsp;
+        <search-box placeholder="Search Privilege"
+                    ng-model="$ctrl.states.searchTerm"
+                    on-change="$ctrl.applySearchFilter()" delay="1000"></search-box>
+      </div>
+      <div class="privileges-view_action-panel" layout="row" layout-align="end center">
+        <md-button class="btn-primary" ng-click="$ctrl.openNewPrivilegeModal()">
+          <md-tooltip ng-bind="'TOOLTIP_ADD_PRIVILEGE' | translate"></md-tooltip>
+          + <span translate="PRIVILEGE"></span>
+        </md-button>
+      </div>      
+    </div>
+  </md-toolbar>
+  <div class="privileges-view_privileges-list">
+    <privileges-list-view id="privilege-grid-dir"
+      privileges="$ctrl.privilegeList"
+      updater="$ctrl.updater"
+      customer="$ctrl.custCode"
+      on-action="$ctrl.onPrivilegeAction(type, model)"
+      search-term="$ctrl.states.searchTermValue">
+    </privileges-list-view>
+  </div>
+</div>

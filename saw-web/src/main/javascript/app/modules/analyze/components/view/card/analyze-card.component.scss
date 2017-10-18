@@ -1,0 +1,82 @@
+.saw-analyze-card {
+  .saw-ac-placeholder {
+    height: 159px;
+    width: 434px;
+    background-size: contain;
+    background-repeat: no-repeat;
+
+    &.m-report {
+      background-image: url('~img/charts/report.png');
+    }
+
+    &.m-pivot {
+      background-image: url('~img/charts/pivot.png');
+    }
+
+    &.m-chart-bubble {
+      background-image: url('~img/charts/chart-bubble.png');
+    }
+
+    &.m-chart-column {
+      background-image: url('~img/charts/chart-column.png');
+    }
+
+    &.m-chart-area {
+      background-image: url('~img/charts/chart-area.svg');
+    }
+
+    &.m-chart-combo {
+      background-image: url('~img/charts/chart-combo.svg');
+    }
+
+    &.m-chart-bar {
+      background-image: url('~img/charts/chart-bar.png');
+    }
+
+    &.m-chart-donut {
+      background-image: url('~img/charts/chart-donut.png');
+    }
+
+    &.m-chart-line {
+      background-image: url('~img/charts/chart-line.png');
+    }
+
+    &.m-chart-pie {
+      background-image: url('~img/charts/chart-pie.png');
+    }
+
+    &.m-chart-scatter {
+      background-image: url('~img/charts/chart-scatter.png');
+    }
+
+    &.m-chart-stack {
+      background-image: url('~img/charts/chart-stack.png');
+    }
+  }
+
+  md-card-title {
+    padding: 0;
+
+    .md-headline {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .md-subhead {
+      font-size: 12px;
+      padding-top: 0 !important;
+    }
+  }
+
+  md-icon {
+    text-align: center;
+  }
+
+  .md-button {
+    min-width: 35px;
+  }
+
+  &_report {
+    width: 100%;
+  }
+}

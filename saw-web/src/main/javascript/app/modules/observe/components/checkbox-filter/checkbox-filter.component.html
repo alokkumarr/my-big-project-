@@ -1,0 +1,8 @@
+<div layout="column" layout-align="stretch" style="padding-left: 10px">
+  <div flex ng-repeat="item in $ctrl.ngModel track by $index">
+    <md-checkbox ng-checked="item.checked"
+                   ng-click="$ctrl.onToggle(item)"
+                   ng-bind="::item.label">
+    </md-checkbox>
+  </div>
+</div>

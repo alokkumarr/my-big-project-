@@ -1,0 +1,60 @@
+<analyze-dialog control="$ctrl" class="new-analyze-dialog">
+  <analyze-dialog-header>
+    <div layout="row">
+      <div class="md-title" translate="NEW_ANALYSIS"></div>
+
+      <!-- gui-cleanup-2.0 -->
+      <!--<md-button class="btn-card" >
+        <md-icon md-font-icon="icon-upload"></md-icon>
+        <span translate="UPLOAD"></span>
+      </md-button>-->
+    </div>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+    <div layout="column">
+      <div class="md-subhead" translate="WHAT_WOULD_YOU_LIKE_TO_ANALYZE"></div>
+
+      <md-radio-group ng-model="$ctrl.selectedMetric"
+                      ng-change="$ctrl.onMetricSelected()"
+                      layout="row" layout-wrap>
+        <md-radio-button ng-repeat="metric in $ctrl.metrics track by $index"
+                          ng-value="metric"
+                          e2e="metric-name-{{::metric.metricName}}"
+                          class="adc-metric" flex="30">
+          <span ng-bind="::metric.metricName"></span>
+        </md-radio-button>
+      </md-radio-group>
+
+      <div class="md-subhead" translate="HOW_WOULD_YOU_LIKE_TO_ANALYZE"></div>
+
+      <div>
+        <div class="adc-method"
+             ng-repeat="method in $ctrl.methods track by $index">
+          <div class="md-body-1" flex
+               ng-bind="::method.label"></div>
+          <div flex>
+            <choice-group size="xl"
+                          items="method.children"
+                          ng-model="$ctrl.selectedAnalysisMethod">
+            </choice-group>
+          </div>
+        </div>
+      </div>
+    </div>
+  </analyze-dialog-content>
+
+  <analyze-dialog-footer>
+    <div class="layout-row">
+      <md-button class="btn-primary"
+                 ng-disabled="!$ctrl.selectedAnalysisMethod || !$ctrl.selectedMetric"
+                 ng-click="$ctrl.createAnalysis()"
+                 translate="CREATE_ANALYSIS">
+      </md-button>
+
+      <md-button class="btn-card"
+                 ng-click="$ctrl.$dialog.hide()" translate="CANCEL">
+      </md-button>
+    </div>
+  </analyze-dialog-footer>
+</analyze-dialog>

@@ -1,0 +1,24 @@
+<analyze-dialog class="analyze-report-preview">
+  <analyze-dialog-header>
+    <div class="arp-header" layout="row" layout-align="space-between center">
+      <div layout="row" layout-align="center center">
+        <md-button class="arp-header-close-btn"
+                   ng-click="$parent.$ctrl.cancel()">
+          <md-icon md-font-icon="icon-remove"></md-icon>
+        </md-button>
+        <div class="md-title">
+          <strong ng-bind="::$ctrl.model.chart.name"></strong>
+        </div>
+      </div>
+    </div>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+      <div layout="row">
+        <chart style="width: calc(100% - 20px); margin: 0 10px"
+               options="$ctrl.chartOptions"
+               updater="$ctrl.chartUpdater">
+        </chart>
+      </div>
+  </analyze-dialog-content>
+</analyze-dialog>

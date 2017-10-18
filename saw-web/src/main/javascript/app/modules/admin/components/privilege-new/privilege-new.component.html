@@ -1,0 +1,119 @@
+<privilege-dialog control="$ctrl" class="new-privilege-dialog"> <privilege-dialog-header>
+<div layout="row">
+  <div class="md-title" translate="NEW_PRIVILEGE"></div>
+</div>
+</privilege-dialog-header> <privilege-dialog-content>
+<div layout="column">
+<form name="newPrivilegeForm" method="post">
+  <md-input-container flex class="padding-for-container"> <label
+		translate="PRIVILEGE_PROD_LABEL"></label> <md-select
+		ng-model="$ctrl.privilege.productId" required
+		ng-change="$ctrl.getModules($ctrl.privilege.productId)"> <md-option
+		ng-repeat="product in $ctrl.productsList" ng-value="product.productId"
+		ng-bind="::product.productName"></md-option> </md-select> </md-input-container>
+  <md-input-container flex class="padding-for-container"> <label
+		translate="PRIVILEGE_ROLE_LABEL"></label> <md-select
+		ng-model="$ctrl.privilege.roleId" 
+		ng-change="$ctrl.getSubCategories($ctrl.privilege.productId, $ctrl.privilege.roleId, $ctrl.privilege.moduleId, $ctrl.privilege.categoryCode)"
+		required> <md-option
+		ng-repeat="role in $ctrl.rolesList" ng-value="role.roleId"
+		ng-bind="::role.roleName"></md-option> </md-select> </md-input-container>
+  <md-input-container flex class="padding-for-container"> <label
+		translate="PRIVILEGE_MODL_LABEL"></label> <md-select
+		ng-model="$ctrl.privilege.moduleId" required
+		ng-change="$ctrl.getCategories($ctrl.privilege.moduleId)"> <md-option
+		ng-repeat="module in $ctrl.modulesList" ng-value="module.moduleId"
+		ng-bind="::module.moduleName"></md-option> </md-select> </md-input-container>
+  <md-input-container flex class="padding-for-container"> <label
+        translate="PRIVILEGE_CATG_LABEL"></label> <md-select
+        ng-model="::$ctrl.privilege.categoryCode" 
+        ng-change="$ctrl.getSubCategories($ctrl.privilege.productId, $ctrl.privilege.roleId, $ctrl.privilege.moduleId, $ctrl.privilege.categoryCode)"
+			required >
+  <md-option ng-repeat="category in $ctrl.categoriesList"
+			ng-bind="::category.categoryName" ng-value="category.categoryCode"></md-option>
+  </md-select>
+  </md-input-container>
+  <div flex class="padding-for-container">
+    <table style="width: 840px;" ng-if="$ctrl.subCategoriesList.length > 0">
+    <tr>
+      <th style="width: 155px; word-wrap: break-word;" align="left">
+        <span translate="PRIVILEGE_SUB_CATG_LABEL"></span></th>
+      <th style="width: 45px;" align="center">
+        <span translate="PRIVILEGE_SUB_CATG_ACSE_LABEL"></span></th>
+      <th style="width: 550px;" align="center">
+        <span translate="PRIVILEGE_SUB_CATG_PRI_LABEL"></span></th>
+    </tr>
+    <tr ng-repeat="subCategory in $ctrl.subCategoriesList" class="border_bottom">
+      <td align="left">
+        <div class="sub-caterory-label">{{subCategory.subCategoryName}}</div>
+      </td>
+      <td align="center">
+      <md-switch ng-model="subCategory.privilegeCodeList[0]"
+        class="md-primary">
+      </md-switch>
+      </td>
+      <td align="center">
+      <span ng-if="subCategory.privilegeCodeList[0]">
+          <span class="input-checkbox-container" flex> 
+          <md-checkbox type="checkbox"
+            ng-model="subCategory.privilegeCodeList[8]" 
+            ng-change="$ctrl.modifyAllPrivilege($index, $ctrl.subCategoriesList)"></md-checkbox>
+          <label class="label-padding" translate="PRIVILEGE_All_LABEL"></label>
+          </span>
+          <span class="input-checkbox-container">
+            <md-checkbox type="checkbox" ng-disabled="subCategory.privilegeCodeList[8] == true"
+              ng-model="subCategory.privilegeCodeList[1]"></md-checkbox>
+            <label class="label-padding" 
+            translate="PRIVILEGE_CREATE_LABEL"></label>
+          </span>
+          <span class="input-checkbox-container">
+            <md-checkbox type="checkbox" ng-disabled="subCategory.privilegeCodeList[8] == true"
+              ng-model="subCategory.privilegeCodeList[5]"></md-checkbox>
+            <label class="label-padding"  
+            translate="PRIVILEGE_EDIT_LABEL"></label>
+          </span>
+          <span class="input-checkbox-container">
+            <md-checkbox type="checkbox" ng-disabled="subCategory.privilegeCodeList[8] == true"
+              ng-model="subCategory.privilegeCodeList[4]"></md-checkbox>
+            <label class="label-padding"  
+            translate="PRIVILEGE_FORK_LABEL"></label> 
+          </span>
+          <span class="input-checkbox-container">
+            <md-checkbox type="checkbox" ng-disabled="subCategory.privilegeCodeList[8] == true"
+              ng-model="subCategory.privilegeCodeList[2]"></md-checkbox>
+            <label class="label-padding" 
+            translate="PRIVILEGE_EXECUTE_LABEL"></label>
+          </span>
+          <span class="input-checkbox-container">
+            <md-checkbox type="checkbox" ng-disabled="subCategory.privilegeCodeList[8] == true"
+              ng-model="subCategory.privilegeCodeList[3]"></md-checkbox>
+            <label class="label-padding" 
+            translate="PRIVILEGE_PUBLISH_LABEL"></label>
+          </span>
+          <span class="input-checkbox-container">
+            <md-checkbox type="checkbox" ng-disabled="subCategory.privilegeCodeList[8] == true"
+              ng-model="subCategory.privilegeCodeList[6]"></md-checkbox>
+            <label class="label-padding" 
+            translate="PRIVILEGE_EXPORT_LABEL"></label>
+          </span>
+          <span class="input-checkbox-container">
+            <md-checkbox type="checkbox" ng-disabled="subCategory.privilegeCodeList[8] == true"
+              ng-model="subCategory.privilegeCodeList[7]"></md-checkbox>
+            <label class="label-padding" 
+            translate="PRIVILEGE_DELETE_LABEL"></label>
+          </span>
+      </span>
+      </td>
+    </tr>
+    </table>
+  </div>
+  <div class="layout-row">
+    <md-button class="btn-primary" ng-disabled="newPrivilegeForm.$invalid || $ctrl.subCategoriesList.length < 1"
+      ng-click="$ctrl.createPrivilege()"
+		translate="CREATE_PRIVILEGE"> </md-button>
+    <md-button class="btn-card button-pull-right" ng-click="$ctrl.$dialog.hide()"
+		translate="CANCEL"> </md-button>
+  </div>
+</form>
+</div>
+</privilege-dialog-content> </privilege-dialog>

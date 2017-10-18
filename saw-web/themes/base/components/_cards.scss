@@ -1,0 +1,43 @@
+md-card {
+  padding: 0;
+  background-color: $card-bg-color;
+  box-shadow: 0 2px 6px 0 $card-shadow-color;
+  border-radius: 3px;
+
+  md-card-header {
+    padding: 24px 24px 16px;
+  }
+
+  md-card-content {
+    padding: 5px 24px;
+  }
+
+  md-card-footer {
+    padding-top: 24px 0 0;
+    border-left-width: 0 !important;
+    border-right-width: 0 !important;
+    border-bottom-width: 0 !important;
+  }
+
+  md-card-actions {
+    margin: 0;
+    padding: 0;
+  }
+
+  .footer-headline {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .footer-subtitle {
+    font-size: 12px;
+  }
+
+  &.#{$theme-cls} {
+    color: $app-font-color;
+  }
+
+  md-card-footer {
+    border: $card-footer-border-top;
+  }
+}

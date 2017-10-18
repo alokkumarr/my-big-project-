@@ -1,0 +1,72 @@
+<header>
+  <md-toolbar class="app-toolbar">
+    <div class="lh-toolbar"
+         layout="row" layout-align="space-between center">
+      <div layout="row">
+        <div class="company-logo"></div>
+      </div>
+
+      <div layout="row" class="lh-links">
+        <span ng-repeat="module in $ctrl.modules"
+              class="link" aria-label="{{::module.productModName}}"
+              ui-sref="{{::module.productModName.toLowerCase()}}"
+              ui-sref-active="m-active"
+              translate="{{::module.productModName}}">
+        </span>
+      </div>
+
+      <div layout="row">
+        <!-- gui-cleanup-2.0 -->
+        <!--<md-button class="md-icon-button" aria-label="More">
+          <md-icon md-font-icon="icon-launchpad"></md-icon>
+        </md-button>-->
+
+        <md-menu-bar>
+          <md-menu>
+            <md-button class="md-icon-button"
+                       aria-label="User"
+                       e2e="account-settings-menu-btn"
+                       ng-click="$mdMenu.open()">
+
+              <md-tooltip ng-bind="'TOOLTIP_ACCOUNT_SETTINGS' | translate"></md-tooltip>
+              <md-icon md-font-icon="icon-user-placeholder"></md-icon>
+            </md-button>
+            <md-menu-content>
+              <!-- gui-cleanup-2.0 -->
+              <!--<md-menu-item>
+                <md-button translate="ACCOUNT"></md-button>
+              </md-menu-item>-->
+              <md-menu-item>
+                <md-button ng-click="$ctrl.changePwd()"
+                           e2e="account-settings-selector-change-password"
+                           translate="CHANGE_PASSWORD">
+                </md-button>
+              </md-menu-item>
+              <md-menu-item ng-if="$ctrl.showAdmin">
+                <md-button ui-sref="admin"
+                           e2e="account-settings-selector-admin"
+                           translate="ADMIN">
+                </md-button>
+              </md-menu-item>
+              <md-menu-divider></md-menu-divider>
+              <md-menu-item>
+                <md-button ng-click="$ctrl.logout()"
+                           e2e="account-settings-selector-logout"
+                           translate="LOG_OUT">
+                </md-button>
+              </md-menu-item>
+            </md-menu-content>
+          </md-menu>
+        </md-menu-bar>
+        <!-- gui-cleanup-2.0 -->
+        <!--<md-button class="md-icon-button" aria-label="Menu"
+                   ng-click="toggleRight()">
+          <md-tooltip ng-bind="'TOOLTIP_ALERTS' | translate"></md-tooltip>
+          <div class="alert-bell-icon"></div>
+          <badge class="alerts-badge" label="{{5}}"></badge>
+        </md-button>-->
+      </div>
+    </div>
+    <md-progress-linear ng-show="$ctrl.showProgress" md-mode="indeterminate"></md-progress-linear>
+  </md-toolbar>
+</header>

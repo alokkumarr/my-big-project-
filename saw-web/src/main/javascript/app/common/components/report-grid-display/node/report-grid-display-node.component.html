@@ -1,0 +1,30 @@
+<div ng-switch="!!$ctrl.data.isGroup">
+  <div class="indent"
+       ng-switch-when="true">
+    <div ng-repeat="node in $ctrl.data.nodes track by $index">
+      <div layout="row" layout-align="start center">
+        <h3 ng-bind="node.groupValue"></h3>
+
+        <md-chips>
+          <md-chip ng-bind="node.itemCount"></md-chip>
+        </md-chips>
+      </div>
+
+      <report-grid-display-node
+      columns="$ctrl.columns"
+      settings="$ctrl.settings"
+      source="$ctrl.loadData(options)"
+      data="node.data">
+    </report-grid-display-node>
+    </div>
+  </div>
+
+  <div ng-switch-default
+       ng-if="$ctrl.settings.layoutMode === $ctrl.LAYOUT_MODE.DETAIL"
+       class="grid-container">
+    <report-grid-display columns="$ctrl.columns"
+                         source="$ctrl.loadData(options)"
+                         data="$ctrl.data">
+    </report-grid-display>
+  </div>
+</div>

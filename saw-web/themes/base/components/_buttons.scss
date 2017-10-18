@@ -1,0 +1,154 @@
+.clickable {
+  cursor: pointer;
+}
+
+.md-button {
+  text-transform: none;
+
+  &.md-icon-button {
+    overflow: visible;
+    font-size: 23px;
+  }
+}
+
+.back-button {
+  md-icon {
+    font-weight: bold;
+    font-size: 24px;
+    padding: 6px;
+  }
+}
+
+.btn-round {
+  border-radius: 100px;
+}
+
+.btn-primary > md-icon {
+  color: white;
+}
+
+md-menu-bar {
+  display: inline-block;
+}
+
+.#{$theme-cls} {
+  &.md-button {
+    border-radius: 3px;
+    font-size: 16px;
+    margin: 0;
+    padding: 0 10px;
+
+    &.btn-primary {
+      background-color: $btn-primary-bg-color;
+      color: $btn-primary-text-color;
+
+      &:not([disabled]):hover {
+        background-color: $btn-primary-bg-hover-color;
+      }
+
+      &:not([disabled]).md-focused {
+        background-color: $btn-primary-bg-hover-color;
+        &:hover {
+          background-color: $btn-primary-bg-hover-color;
+        }
+      }
+
+      > md-icon {
+        color: $btn-primary-text-color;
+      }
+
+      &[disabled] {
+        background-color: $btn-disabled-bg-color;
+        color: $btn-disabled-text-color;
+      }
+    }
+
+    &.btn-secondary {
+      color: $btn-secondary-text-color;
+      border: $btn-secondary-border;
+
+      &:not([disabled]):hover {
+        background-color: $btn-secondary-bg-hover-color;
+      }
+
+      &:not([disabled]).md-focused {
+        background-color: $btn-secondary-bg-hover-color;
+        &:hover {
+          background-color: $btn-secondary-bg-hover-color;
+        }
+      }
+
+      &[disabled] {
+        background-color: $btn-disabled-bg-color;
+        color: $btn-disabled-text-color;
+      }
+    }
+
+    &.btn-tertiary {
+      color: $btn-tertiary-text-color;
+      border-radius: 0;
+
+      &:not([disabled]):hover {
+        opacity: 0.75;
+      }
+    }
+
+    &.btn-card {
+      color: $btn-card-text-color;
+      border-radius: 0;
+
+      &:not([disabled]):hover {
+        opacity: 0.75;
+      }
+    }
+  }
+
+  .button-group {
+    outline: none;
+
+    > .md-button {
+      font-size: 16px;
+      color: rgba(89, 101, 116, 0.7);
+      background-color: transparent;
+      text-transform: none;
+      margin: 0 0 0 -1px;
+      padding: 0 8px;
+      border-radius: 0;
+      border: 1px solid #B0BFC8;
+
+      //border-bottom-width: 1px;
+      //border-top-width: 1px;
+      //border-right-width: 1px;
+      //border-color: #B0BFC8;
+      //border-style: solid;
+
+      &:first-child {
+        border-radius: 3px 0 0 3px;
+        //border-left-width: 1px;
+      }
+
+      &:last-child {
+        border-radius: 0 3px 3px 0;
+      }
+
+      &:not([disabled]):hover {
+        background-color: rgba(193, 193, 193, 0.96);
+        color: rgba(44, 65, 164, 0.96);
+        transition: 0.3s;
+      }
+
+      &:not([disabled]).md-icon-button:hover {
+        background-color: #CAD3DB;
+      }
+    }
+
+    > .md-button:not(.md-icon-button) {
+      min-width: 100px;
+    }
+
+    .md-active {
+      background-color: #DEE4EA;
+      opacity: 1;
+    }
+  }
+}

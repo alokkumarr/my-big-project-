@@ -1,0 +1,40 @@
+analyze-sort-dialog {
+  width: 620px;
+}
+
+.ars {
+  &_sort {
+    &-list {
+      max-height: 300px;
+      overflow-y: scroll;
+    }
+
+    &-item {
+      border-bottom: 1px solid #CCC;
+    }
+
+    &-order {
+      min-width: 182px;
+    }
+
+    &-rbtn {
+      min-width: 75px;
+    }
+  }
+
+  &_arrow {
+    text-align: center;
+    font-size: 11px;
+    line-height: 28px !important;
+    transform: rotate(180deg);
+  }
+
+  &_add-link {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+.layout-row md-select {
+  width: 275px;
+}

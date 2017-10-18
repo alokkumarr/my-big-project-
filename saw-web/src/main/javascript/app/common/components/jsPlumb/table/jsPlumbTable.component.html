@@ -1,0 +1,21 @@
+<md-list>
+  <md-subheader class="md-no-sticky" layout-padding>
+    <span ng-bind="::$ctrl.model.name"></span>
+  </md-subheader>
+
+  <md-divider></md-divider>
+
+  <md-list-item class="md-no-proxy"
+                ng-repeat="field in $ctrl.model.fields | filter:{isHidden:false} track by $index"
+                ng-click="$event.stopPropagation();"
+                ng-mousedown="$ctrl.onFieldMouseDown($event, field);"
+                e2e="js-plumb-field-{{field.getIdentifier()}}"
+                ng-mouseup="$ctrl.onFieldMouseUp($event, field);">
+    <md-checkbox style="width:300px" ng-model="field.checked">
+      <span class="jsp-table-column-name" ng-bind="::field.getDisplayName()"></span>
+    </md-checkbox>
+
+    <js-plumb-endpoint ng-repeat="endpoint in field.endpoints track by $index"
+                       model="endpoint"></js-plumb-endpoint>
+  </md-list-item>
+</md-list>

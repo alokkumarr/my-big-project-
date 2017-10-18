@@ -1,0 +1,58 @@
+.new-analyze-dialog {
+  .analyze-dialog {
+    max-width: 700px;
+  }
+
+  .analyze-dialog_header {
+    .layout-row {
+      justify-content: space-between;
+    }
+
+    .md-title {
+      line-height: 36px;
+    }
+
+    .md-button {
+      margin-right: 0;
+    }
+  }
+
+  .analyze-dialog_content {
+    padding: 0 15px;
+
+    .md-subhead {
+      padding: 10px 0;
+    }
+
+    .md-body-1 {
+      padding-bottom: 5px;
+    }
+
+    .adc-method {
+      padding-bottom: 15px;
+
+      .md-button {
+        margin-right: -1px;
+      }
+    }
+
+    analyze-dialog-content .layout-column md-radio-group md-radio-button {
+      .md-label span {
+        word-wrap: break-word;
+        display: inline-block;
+        width: 186px;
+        padding-bottom: 8px;
+      }
+
+      .md-container {
+        top: 34%;
+      }
+    }
+  }
+
+  .analyze-dialog_footer {
+    .layout-row {
+      justify-content: space-between;
+    }
+  }
+}

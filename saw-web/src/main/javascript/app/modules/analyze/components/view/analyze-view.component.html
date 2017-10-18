@@ -1,0 +1,85 @@
+<div class="analyze-view">
+  <md-toolbar class="secondary-toolbar">
+    <div class="md-toolbar-tools"
+         layout-align="start center">
+      <div class="analyze-view_search-panel" layout="row" layout-align="start center">
+        <span class="md-title"
+              e2e="category-title"
+              ng-bind="$ctrl.category.name"></span>&nbsp;
+        <search-box placeholder="Search Analyses"
+                    ng-model="$ctrl.states.searchTerm"
+                    on-change="$ctrl.applySearchFilter()" delay="1000"></search-box>
+      </div>
+
+      <div layout="row" layout-align="start center">
+        <md-input-container class="analyze-view_switch-view">
+          <md-radio-group ng-model="$ctrl.states.reportView" ng-change="$ctrl.onReportViewChange()">
+            <md-radio-button ng-value="$ctrl.LIST_VIEW">
+              <md-icon md-font-icon="icon-Table-view">
+                <md-tooltip ng-bind="'TOOLTIP_LIST_VIEW' | translate"></md-tooltip>
+              </md-icon>
+            </md-radio-button>
+
+            <md-radio-button ng-value="$ctrl.CARD_VIEW">
+              <md-icon md-font-icon="icon-card-view">
+                <md-tooltip ng-bind="'TOOLTIP_CARD_VIEW' | translate"></md-tooltip>
+              </md-icon>
+            </md-radio-button>
+          </md-radio-group>
+        </md-input-container>
+
+        <md-input-container class="analyze-view_switch-type">
+          <md-select ng-model="$ctrl.states.analysisType"
+                     ng-change="$ctrl.onAnalysisTypeChange()">
+            <md-option value="all" selected translate="ALL_TYPES"></md-option>
+            <md-divider></md-divider>
+            <md-option value="chart" translate="CHARTS"></md-option>
+            <md-option value="report" translate="REPORTS"></md-option>
+            <md-option value="pivot" translate="PIVOTS"></md-option>
+            <md-divider></md-divider>
+            <md-option value="scheduled" translate="SCHEDULED"></md-option>
+          </md-select>
+        </md-input-container>
+      </div>
+
+      <div class="analyze-view_action-panel" layout="row" layout-align="end center">
+        <md-button class="btn-primary"
+                   ng-show="$ctrl.canUserCreate"
+                   ng-click="$ctrl.openNewAnalysisModal()">
+          + <span translate="ANALYSIS"></span>
+        </md-button>
+      </div>
+    </div>
+  </md-toolbar>
+
+  <div layout="column"
+       ng-switch="$ctrl.states.reportView" style="background-color: whitesmoke;">
+
+    <!-- LIST VIEW -->
+
+    <div class="analyze-view_analyses-list"
+         ng-switch-when="list">
+      <analyze-list-view analyses="$ctrl.analyses"
+                         ng-if="$ctrl.analyses"
+                         analysis-type="$ctrl.states.analysisType"
+                         updater="$ctrl.updater"
+                         on-action="$ctrl.onCardAction(type, model)"
+                         search-term="$ctrl.states.searchTermValue">
+      </analyze-list-view>
+
+    </div>
+
+    <!-- CARD VIEW -->
+    <div ng-switch-when="card">
+      <analyze-cards-view layout="row"
+                          layout-align="start start"
+                          layout-wrap
+                          analyses="$ctrl.analyses"
+                          analysis-type="$ctrl.states.analysisType"
+                          filter="$ctrl.filterReports"
+                          on-action="$ctrl.onCardAction(type, model)"
+                          search-term="$ctrl.states.searchTermValue">
+      </analyze-cards-view>
+    </div>
+  </div>
+</div>

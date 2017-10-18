@@ -1,0 +1,90 @@
+<div layout="row">
+  <md-sidenav md-component-id="{{$ctrl.ANALYZE_PIVOT_SETTINGS_SIDENAV_ID}}"
+              md-is-open="true"
+              md-disable-backdrop
+              md-whiteframe="4">
+    <md-toolbar class="md-theme-indigo">
+      <h1 class="md-toolbar-tools" translate="PIVOT_SETTINGS"></h1>
+    </md-toolbar>
+      <md-list style="padding-top: 0;">
+
+      <md-subheader class="md-no-sticky">
+        <md-input-container md-no-float class="md-block">
+          <input ng-model="$ctrl.filterText.displayName" placeholder="Filter by keyword"/>
+        </md-input-container>
+      </md-subheader>
+
+      <md-list-item md-no-proxy
+                    ng-repeat="artifactColumn in $ctrl.artifactColumns | filter:$ctrl.filterText track by artifactColumn.columnName"
+                    e2e="pivot-field-{{artifactColumn.alias || artifactColumn.displayName}}">
+
+        <div layout="row">
+          <md-checkbox ng-model="artifactColumn.checked"
+                      ng-change="$ctrl.onChecked(artifactColumn)"
+                      style="margin-bottom: 0;">
+            <div layout="row" layout-align="start start">
+              <span class="truncated-field-name">
+                {{ artifactColumn.alias || artifactColumn.displayName }}
+                <md-tooltip ng-bind="artifactColumn.alias || artifactColumn.displayName"></md-tooltip>
+              </span>
+              <md-icon md-font-icon="{{$ctrl.ARTIFACT_ICON_TYPES_OBJ[artifactColumn.type].icon}}">
+                <md-tooltip ng-bind="$ctrl.ARTIFACT_ICON_TYPES_OBJ[artifactColumn.type].tooltip | translate"></md-tooltip>
+              </md-icon>
+            </div>
+          </md-checkbox>
+        </div>
+
+        <md-menu class="md-secondary"
+                ng-show="artifactColumn.checked">
+          <md-button aria-label="AREA_TYPE"
+                    class="md-icon-button"
+                    e2e="pivot-area-menu-btn"
+                    ng-click="$ctrl.openMenu($mdMenu, $event)">
+            <md-icon md-menu-origin
+                     md-font-icon="{{$ctrl.AREA_TYPES_OBJ[artifactColumn.area].icon}}"></md-icon>
+            <md-tooltip ng-bind="'TOOLTIP_PIVOT_AREA' | translate"></md-tooltip>
+          </md-button>
+          <md-menu-content width="4">
+            <md-menu-item ng-repeat="areaType in $ctrl.AREA_TYPES | pivotAreaTypeFilter:artifactColumn.type track by areaType.value">
+              <md-button ng-click="$ctrl.onSelectAreaType(areaType.value, artifactColumn)"
+                         e2e="pivot-area-selector-{{areaType.value}}"
+                         style="font-size: 14px;">
+                <md-icon md-font-icon="{{::areaType.icon}}"
+                         style="font-size: 14px;"
+                         md-menu-align-target></md-icon>
+                {{::areaType.label}}
+              </md-button>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+
+        <aggregate-chooser ng-show="artifactColumn.checked && artifactColumn.area === 'data'"
+                           class="md-secondary"
+                           artifact-column="artifactColumn"
+                           on-select="$ctrl.onSelectAggregateType(aggregateType, artifactColumn)">
+        </aggregate-chooser>
+
+        <md-menu class="md-secondary" ng-show="artifactColumn.checked && $ctrl.DATE_TYPES.includes(artifactColumn.type)">
+          <md-button aria-label="GROUP_INTERVAL"
+                     class="md-icon-button"
+                     e2e="pivot-group-interval-menu-btn"
+                     ng-click="$ctrl.openMenu($mdMenu, $event)">
+            <md-icon md-menu-origin
+                     md-font-icon="icon-calendar"></md-icon>
+            <md-tooltip ng-bind="'TOOLTIP_GROUP_INTERVAL' | translate"></md-tooltip>
+          </md-button>
+          <md-menu-content width="4">
+            <md-menu-item ng-repeat="groupInterval in $ctrl.GROUP_INTERVALS track by groupInterval.value">
+              <md-button ng-click="$ctrl.onSelectGroupInterval(groupInterval, artifactColumn)"
+                         e2e="pivot-group-interval-selector-{{groupInterval.value}}"
+                         style="font-size: 14px;">
+                {{::groupInterval.label}}
+              </md-button>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+
+      </md-list-item>
+    </md-list>
+  </md-sidenav>
+</div>

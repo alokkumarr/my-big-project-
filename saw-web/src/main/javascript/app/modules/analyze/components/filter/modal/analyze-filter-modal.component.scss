@@ -1,0 +1,21 @@
+analyze-filter-modal {
+  md-list-item {
+    &::before {
+      content: none;
+    }
+
+    > div.md-secondary-container {
+      margin: 0;
+      align-self: baseline;
+    }
+  }
+}
+
+.md-select-menu-container.select-container-class {
+  width: 111px;
+  min-width: 0 !important;
+
+  md-select-menu {
+    overflow: hidden;
+  }
+}

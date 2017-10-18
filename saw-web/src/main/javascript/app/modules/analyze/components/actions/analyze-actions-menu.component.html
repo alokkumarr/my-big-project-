@@ -1,0 +1,21 @@
+<md-menu-bar ng-show="$ctrl.actions.length">
+  <md-menu>
+    <md-button class="md-button btn-card" aria-label="More"
+               ng-click="$mdMenu.open()"
+               e2e="actions-menu-toggle"
+               style="border-radius: 3px;padding: 0 10px;">
+      <md-icon md-font-icon="icon-more"></md-icon>
+    </md-button>
+
+    <md-menu-content>
+      <md-menu-item ng-repeat="action in ::$ctrl.actions track by action.value">
+        <md-button aria-label="{{::action.label | translate}}"
+                   ng-click="action.fn()"
+                   e2e="actions-menu-selector-{{action.value}}">
+          <span ng-bind="::action.label | translate"
+                md-colors="action.color ? {color: action.color} : {}"></span>
+        </md-button>
+      </md-menu-item>
+    </md-menu-content>
+  </md-menu>
+</md-menu-bar>

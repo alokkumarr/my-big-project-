@@ -1,0 +1,21 @@
+<md-dialog class="user-dialog" layout="column">
+  <div ng-if="$ctrl.states.loader">
+    <md-backdrop class="md-menu-backdrop"></md-backdrop>
+    <div class="md-scroll-mask">
+      <md-progress-circular md-diameter="96"></md-progress-circular>
+    </div>
+  </div>
+
+  <div ng-if="$ctrl.isTranscludePresent('header')">
+    <md-toolbar class="user-dialog_header"
+                ng-transclude="header"></md-toolbar>
+  </div>
+
+  <md-dialog-content class="user-dialog_content"
+                     ng-if="$ctrl.isTranscludePresent('content')"
+                     ng-transclude="content"></md-dialog-content>
+
+  <md-dialog-actions class="user-dialog_footer"
+                     ng-if="$ctrl.isTranscludePresent('footer')"
+                     ng-transclude="footer"></md-dialog-actions>
+</md-dialog>

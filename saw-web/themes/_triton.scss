@@ -1,0 +1,100 @@
+@import "./base/colors";
+
+$theme-name: triton;
+$theme-cls: "md-#{$theme-name}-theme";
+
+//== Iconography
+//
+
+//Load fonts from this directory.
+$icon-font-path: "~fonts";
+// File name for all font files.
+$icon-font-name: "icomoon";
+
+$highlight-bg-color: $secondary-yellow;
+
+// Forms
+$checkbox-inactive-bg-color: $primary-white;
+$checkbox-inactive-border: 1px solid $primary-grey-g2;
+$checkbox-active-bg-color: $primary-blue-b2;
+$checkbox-active-border: 1px solid $primary-blue-b2;
+$checkbox-label-color: $primary-grey-g4;
+
+$radiobtn-iactive-bg-color: $primary-white;
+$radiobtn-inactive-border: 1px solid $primary-grey-g2;
+$radiobtn-active-bg-color: $primary-blue-b2;
+$radiobtn-active-border: 1px solid #FFFFFF;
+$radiobtn-label-color: $primary-grey-g4;
+
+$input-bg-color: $primary-grey-g1;
+$input-border: 1px solid $primary-grey-g2;
+$input-color: $primary-grey-g4;
+$input-label-color: $primary-grey-g3;
+$input-font-size: 12px;
+
+$input-line-height: $input-font-size;
+$input-padding: 5px;
+$input-focused-border-color: rgb(25, 118, 210);
+
+$dropdown-normal-bg-color: #F6F8FB;
+
+// Buttons
+$btn-primary-bg-color: $primary-blue-b2;
+$btn-primary-bg-hover-color: rgba(25, 136, 211, 0.75);
+$btn-primary-text-color: white;
+
+$btn-secondary-text-color: $primary-grey-g4;
+$btn-secondary-bg-hover-color: rgba(158,158,158,0.2);
+$btn-secondary-border: 1px solid $primary-grey-g1;
+
+$btn-tertiary-text-color: $primary-blue-b2;
+$btn-card-text-color: $primary-grey-g4;
+
+$btn-disabled-bg-color: $primary-grey-g2;
+$btn-disabled-text-color: white;
+
+// Side bars
+$sidebar-right-bg-color: #FFF;
+$sidebar-left-bg-color: #FFF;
+$sidebar-left-width: 240px;
+
+// Grid
+$ui-grid-cell-padding-right: 30px;
+$ui-grid-row-height: 36px; // should be the same from your gridOptions. Both in css and in js have to be set
+$ui-grid-cell-content-padding: 5px;
+$ui-grid-cell-color: $primary-grey-g4;
+
+// Cards
+$card-bg-color: #FFFFFF;
+$card-shadow-color: rgba(20, 39, 54, 0.17);
+
+$cards-border-color: $primary-grey-g1;
+$card-footer-border-top: 1px solid $cards-border-color;
+$card-content-main-color: $primary-grey-g4;
+$card-font-size: 12px;
+$card-font-weight: normal;
+$card-title-font-size: 18px;
+$card-title-font-weight: bold;
+
+// Date picker
+$date-picker-open-background-color: #FFFFFF;
+$date-picker-selection-indicator-color: $primary-blue-b2;
+
+// Typography
+$app-font-color: $primary-grey-g4;
+$link-color: $primary-blue-b2;
+
+// Login
+
+$login-middle-logo-color: $primary-blue-b2;
+
+// Logos
+$company-logo-path: '~img/synchronoss-transparent.svg';
+$symmetra-logo-path: '~img/symmetra-mark.png';
+$powered-by-synchronoss-logo-path: '~img/synchronoss_logo_360.png';
+
+// tags
+$tag-bg-color: $primary-grey-g1;
+$tag-text-color: $primary-grey-g4;
+
+@import "./base/base";

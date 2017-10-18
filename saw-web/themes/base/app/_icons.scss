@@ -1,0 +1,17 @@
+.icon-arrow-down-circled, .icon-arrow-up-circles {
+  font-size: 20px;
+  position: relative;
+}
+
+.icon-arrow-down-circled .path2:before {
+  content: "\e902";
+  margin-left: 0 !important; //To be changed if the font size is changed
+  top: 0;
+  left: 0;
+  position: absolute;
+  color: rgb(255, 255, 255);
+}
+
+md-icon[md-font-icon="icon-menu"] {
+  font-size: 24px;
+}

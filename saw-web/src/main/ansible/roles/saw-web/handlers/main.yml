@@ -1,0 +1,5 @@
+- name: remove previous exploded WAR
+  shell: >-
+    systemctl stop tomcat &&
+    rm -rf /usr/share/tomcat/webapps/saw &&
+    systemctl start tomcat

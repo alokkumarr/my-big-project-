@@ -1,0 +1,34 @@
+target
+/node
+node_modules
+log.txt
+debug.log
+.tmp/
+coverage/
+build/
+dist/
+
+
+# IDEs and editors
+/.idea
+/.vscode
+.project
+.classpath
+*.launch
+.settings/
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage/*
+/junit.xml
+/libpeerconnection.log
+npm-debug.log*
+testem.log
+/typings
+yarn.lock
+*~
+
+#System Files
+.DS_Store
+Thumbs.db
