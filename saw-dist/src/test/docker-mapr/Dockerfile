@@ -49,10 +49,5 @@ VOLUME /mapr-data
 # available in Bamboo agents
 #RUN sed -i -e '2idf -h' /usr/bin/init-script
 
-# Workaround: Expose MapR CLDB and Spark master ports, so that
-# container links in "saw" container produces environment variables.
-# Remove when Docker DNS lookups work inside CentOS 7 containers.
-EXPOSE 7222 7077
-
 # Add health check to be used by Docker Maven plug-in
 HEALTHCHECK --interval=5s CMD test -e /saw-mapr-init-done && hadoop fs -ls /

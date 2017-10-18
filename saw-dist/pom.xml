@@ -116,19 +116,9 @@
               </build>
               <run>
                 <namingStrategy>${saw.docker.naming}</namingStrategy>
-                <!--
-                    Workaround: Resolving hostnames of other
-                    containers does not seem to work if systemd is
-                    running inside container, so use container links
-                    as workaround for now.  For links to work, disable
-                    custom networking.
                 <network>
                   <name>saw</name>
                 </network>
-                -->
-                <links>
-                  <link>saw-mapr</link>
-                </links>
                 <ports> 
                   <port>saw.docker.port:80</port>
                 </ports>
@@ -160,13 +150,9 @@
               </build>
               <run>
                 <namingStrategy>${saw.docker.naming}</namingStrategy>
-                <!--
-                    Workaround: See note about container links in
-                    other image configuration.
                 <network>
                   <name>saw</name>
                 </network>
-                -->
                 <ports> 
                   <port>saw.mcs.port:8443</port>
                   <port>saw.spark.master.port:8080</port>

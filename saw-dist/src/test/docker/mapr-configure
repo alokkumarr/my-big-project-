@@ -9,6 +9,6 @@ name="demo.mapr.io"
 # containers for now, Docker links are used as a workaround.  The
 # hostname and port for Docker links is provided in environment
 # variables, so insert them here.
-host="${SAW_MAPR_PORT_7222_TCP_ADDR}:${SAW_MAPR_PORT_7222_TCP_PORT}"
+host="saw-mapr:7222"
 
 /opt/mapr/server/configure.sh -N $name -c -C $host

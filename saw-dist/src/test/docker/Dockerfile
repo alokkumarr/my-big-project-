@@ -35,13 +35,7 @@ RUN yum -y -q --nogpgcheck install java-1.8.0-openjdk-headless MySQL-python
 
 # Configure MapR client
 ADD mapr-configure /root/
-# Workaround: As Docker DNS lookups do not work inside CentOS 7
-# containers for now, Docker links are used as a workaround.  The
-# hostname and port for Docker links is only available at runtime, so
-# therefore the MapR client has to be configured in "saw-deploy" at
-# runtime instead of in the Dockerfile at container image build time.
-# Move MapR client configuration back to the Dockerfile when Docker
-# DNS lookups start working in CentOS 7.  RUN /root/mapr-configure
+RUN /root/mapr-configure
 
 # Tunneling for MapR client: enable if connecting to a MapR cluster in
 # a shared environment.  Works for MapR clients and Elasticsearch.

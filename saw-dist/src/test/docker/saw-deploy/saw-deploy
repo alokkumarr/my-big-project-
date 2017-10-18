@@ -8,14 +8,6 @@ set -eu
 # troubleshooting after a failed run
 trap "journalctl -u saw-* > /build/saw-system.log" EXIT
 
-# Workaround: As Docker DNS lookups do not work inside CentOS 7
-# containers for now, Docker links are used as a workaround.  The
-# hostname and port for Docker links is only available at runtime, so
-# therefore the MapR client has to be configured here instead of in
-# the Dockerfile for now.  Move back to the Dockerfile when Docker DNS
-# lookups start working in CentOS 7.
-/root/mapr-configure
-
 cd /maven
 tar -xzf saw.tgz
 saw/saw-deploy /root/saw-config

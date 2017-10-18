@@ -28,7 +28,7 @@ saw_elasticsearch_password=xuw3dUraHapret
 # containers for now, Docker links are used as a workaround.  The
 # hostname and port for Docker links is provided in environment
 # variables, so insert them into the configuration here.
-saw_spark_master_url=spark://{{ lookup('env','SAW_MAPR_PORT_7077_TCP_ADDR') }}:{{ lookup('env','SAW_MAPR_PORT_7077_TCP_PORT') }}
+saw_spark_master_url=spark://saw-mapr:7077
 saw_zookeeper_quorum=saw-mapr
 
 [saw-security]

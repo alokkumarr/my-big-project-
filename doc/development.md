@@ -13,7 +13,8 @@ To prepare for building the project, execute the following steps:
 
 3. Install Docker (for integration tests)
 
-4. Configure Docker to provide at least 8 GB memory
+4. Configure Docker to allocate at least 8 GB memory and the maximum
+   number of CPUs for containers
 
 5. Install RPM (for building RPM packages, until SAW Security and
    Transport Service have been migrated to the pure Java RPM builder
