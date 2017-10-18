@@ -1,0 +1,28 @@
+{
+   "sub": "shwetha@att.com",
+   "ticket": 
+	 {
+   "ticketId": "28_1481019911763_2102342349", 
+   "windowId": "28_1481019911763_1066874973",
+   "masterLoginId": "admin@att.com", 
+	 "customer_code" : "ATT", 
+   "userName": "Adminstrator", 
+   "password": null,				
+   "prodCode": "1",
+   "roleType": "Admin",
+   "createdTime": 1481019911763,
+   "dataSecurityKey": "ATT_ADMIN",
+   "validUpto": 1481027111763,
+   "valid": true,
+   "validityReason": "User Authenticated Successfully",
+   "validMins": 20,
+   "iat": 1481019912
+	},
+	"contents": { 
+		"action" : "search",
+		"keys" : {
+			"module" : "analyze",
+			"type" : "chart"
+		}
+	}
+}

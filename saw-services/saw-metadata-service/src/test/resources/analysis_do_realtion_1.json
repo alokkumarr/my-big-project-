@@ -1,0 +1,21 @@
+[
+
+	{
+		"node-category" : "DataObject"
+		"action" : 
+		{
+			"verb" : "create",
+			"content" :
+			{
+					"name" : "PASSENGER_DATA",
+					"owner" : "TEST",
+					"type" : "json",
+					"partition_type" : "parquet"
+			},
+			"dl-location" : [ 
+				"/main/data/testapp/output/PASSENGER_DATA"
+			]
+		}
+	}
+
+]		

@@ -1,0 +1,29 @@
+# ignore all bin directories
+# matches "bin" in any subfolder
+bin/
+
+# ignore all target directories
+target/
+
+# ignore all files ending with ~
+*~
+# ignore all others
+.classpath
+.project
+.cache
+.settings
+.project
+.idea
+.m2
+.vagrant
+.yum
+.bash_history
+
+*.iml
+Makefile
+out/
+pom.xml.versionsBackup
+
+lib/
+
+*.log

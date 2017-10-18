@@ -1,0 +1,214 @@
+// ===============================================================
+// The JSON document is interface between SAW UI 
+// Component and SAW Metadata component.
+// ===============================================================
+// Legend:
+// 'ticket' object - token to be handles and sent back unchanged
+// fields marked with 'R' - are required fields, SAW MD validates each request. 
+//    If these fields are not found - a request is invlid and will be rejected
+// 'contents.key' objects - is required for Retrieve action.
+//  
+// ===============================================================
+
+{
+ "sub": "shwetha@att.com",
+
+ // action = 
+ // create - will create new MD node per "customer code"
+ // update - will update existing MD node, will return "node does not exists" if there is not MD node to update
+ // delete - will remove existing MD node, will return "node does not exists" if there is not MD node to delete
+ // retrieve - will retrieve Node from MD Store and return as JSON doc in "contents" object
+ // search - will find all MD nodes satisfied to criteria in searchble fields
+  
+	
+// Header (token) - accept it by SAW MD Service and return it back 
+// ------------------------ Token Start --------------------------	
+ "ticket": {
+   "ticketId": "28_1481019911763_2105937035", //R
+   "windowId": "28_1481019911763_1066874973",
+   "masterLoginId": "admin@att.com", //R
+	 "customer_code" : "ATT", //R -- UNIQUE KEY, used for updates
+   "userName": "Adminstrator", //R
+   "password": null,				
+   "prodCode": "1",
+   "roleType": "Admin",
+   "createdTime": 1481019911763,
+   "dataSecurityKey": "ATT_ADMIN",	//R
+   "validUpto": 1481027111763,
+   "valid": true,
+   "validityReason": "User Authenticated Successfully",
+   "validMins": 20,
+   "iat": 1481019912,
+	 "product_modules":[ 
+				//List of modules
+				{
+						 "pro_code": "ST",
+						 "product_mod_name": "Observe",
+						 "product_mod_desc": "Observe Module",
+						 "product_mod_code": "OBSV",
+						 "module_url" : "/observe",
+				},
+				{
+           "pro_code": "MCT",
+           "productDesc": "Mobile Content Transfer",
+           "product_mod_name": "Alert",
+           "product_mod_desc": "Alert Module",
+           "product_mod_code": "ALERT",
+           "module_url" : "/alert"
+          
+				}
+		],
+		"product_modules_features": [
+		{
+			 "prodCode": "ST",
+			 "productModName": "Analyze",
+			 "productModDesc": "Analyze Module",
+			 "productModCode": "ANALYZE",
+			 "prodModFeature": 
+			 [
+				// Product - module features
+				 {
+					 "prodModFeatureName": "My Analysis",
+					 "prodModFeatureDesc": "My Analysis",
+					 "defaultURL": "/report",
+					 "default" : true,
+					 "customer_Prod_module_feature_sys_id" : "feature_id_1",
+					 "prodModFeatrPriv": [
+							{
+							 "privName": "Report Read Write",
+							 "privCode": "REPORTCATRW",
+							 "privDesc": "Report Read Write",
+							 "prodModFeatrName": "REPORTCAT"
+							}
+					 ]
+				 },
+				{}
+			]
+	 }
+	 ]
+	 // end of role based access information
+} // end of ticket block
+// ------------------------ Token End --------------------------	
+
+// The below block is HATEOS Compliant (https://en.wikipedia.org/wiki/HATEOAS)
+// start of content related information i.e. the below information will be retrieved by backend services using features for the 
+
+// ------------- MD will skip this section: Start  ------------
+"_links": {
+	"self" : {
+				"href" : "/analyze/"
+	}, // The UI needs to set this attribute for the backend to route to respective business service
+	"next" : {"href" : "/analyze/report/{id}"}
+	},
+// ------------- MD will skip this section: End  -------------------
+	
+// ---------------- Request body - Contents - Start ----------------
+"contents": { //R
+	//Search fields, the object is required for retrieve, delete actions
+	"keys" : {  //R
+   "module" : "Analyze", 					// String, filter for search 
+   "userName" : "admin@att.com", 	// String, filter for search 
+   "dataSecurityKey": "ATT", 			// String, filter for search 
+   "type" : "report", 						// String, filter for search 
+	 "metric_name" : "metric_1", 		// String, filter for search 
+	 "report_id" : "",							// String, filter for search 
+   "customer_Prod_module_feature_sys_id" : "",  // String, filter for search 	 
+   "number_of_records" : 10, 			// Int, to limit the number of records for pagination
+   "from_record" : 0							// Int, start record for pagination
+	},
+
+	"action" : "create|modify|retrive|delete",
+  //Module descriptor, the object is required for create, update actions
+	// Document object name defines UI object type
+	"analyze" :
+		[
+			{
+				"_id" : "", 
+				"name" : "",
+				"userName": "admin@att.com", // to be added to store from Ticket object
+				"dataSecurityKey" : "ATT",   // to be added to store from Ticket object
+				"category" : "My Analysis",
+				"type" : "report", 
+				"customer_Prod_module_feature_sys_id" : "", //as a part of publish report this field should be the identifier have to saved in Quartz
+				"metric_name" : "Metric_name_1",
+				"scheduled" : "", // it will contain cron-expression, this conversion can happen either on client side or server side(API). This should take care of repeat
+					"publish" : {
+						"sourceType" : "SFTP|EMAIL",
+						"email_id" : [], // This will be if it email Id
+						"host" : "", // These are for SFTP
+						"port" : 22,
+						"password" : "" // encrypt the password,
+						"share" : {
+							"customer_Prod_module_feature_sys_id": "" 
+						}
+				},  
+				"description" : "", //
+				"repository": 
+				{
+					"storage_type" : "ES|DL|RDBMS",
+					"URL" : "it can be JDBC URL or ES URL or datalake URL"
+				},
+				"artifacts": 
+				[
+					{
+					"artifact_name": "",
+					"artifact_position": [ 500,200],
+					"artifact_attributes" : 
+					[
+						//List of columns
+						{
+							"column_name" : "",
+							"display_name" : "",
+							"type" : "int|String",
+							"join_elgible" : "",
+							"filter_eligible" : "",
+							"hide" : "", // This is UI concentric attribute for an instance data which will be stored under type "report"
+							"checked" : "" // This is UI concentric attribute for an instance data which will be stored under type "report"
+						},
+						{}
+					],
+				"sql_builder": { // This block needs to used to build the query on the execution service
+					"group_by_columns": [],
+					"order_by_columns": [],
+					//List of joins
+					"joins": [
+						{
+							"type": "inner",
+							"criteria": [
+								{
+									"table_name": "Orders",
+									"column_name": "Shipper",
+									"side": "right"
+								},
+								{
+									"table_name": "Shippers",
+									"column_name": "ShipperID",
+									"side": "left"
+								}
+							]
+						}
+					],
+					// Where clause
+					"filters": [
+						{
+							"column_name": "TotalPrice",
+							"boolean_criteria": "AND",
+							"operator": ">=",
+							"search_conditions": [
+								1
+							]
+						}
+					]
+				}
+			},
+			// Another artifact
+			{}
+			]	
+			},
+			// Another node of the same type
+			{}
+		]
+	}  // End of contents section
+// ---------------- Request body - Contents - End ----------------	
+} // End of document
+// ===============================================================

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Note: Use logback-test.xml because not all tests might be loading
+    a Spring context and application.properties
+-->
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/base.xml" />
+  <logger name="org.springframework" level="WARN"/>
+  <!--
+      When running tests there is not a need to see INFO level
+      messages by default, so raise the logging level higher
+  -->
+  <root level="WARN"/>
+</configuration>

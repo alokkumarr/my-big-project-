@@ -1,0 +1,43 @@
+[
+	{
+		"node-category" : "AnalysisNode",
+		"NodeId" : "PassengerDataAnalysis_2::101::3::466064295030141",
+		"action" : 
+		{
+			"verb" : "read"
+		}
+	},
+	{
+		"node-category" : "AnalysisNode",
+		"NodeId" : "PassengerDataAnalysis_2::101::3::466064295030141",
+		"action" : 
+		{
+			"verb" : "delete"
+		}
+	},
+	{
+		"node-category" : "AnalysisNode",
+		"NodeId" : "PassengerDataAnalysis_2::101::3::466064295030141",
+		"action" : 
+		{
+			"verb" : "read"
+		}
+	},
+	{
+		"node-category" : "AnalysisNode",
+		"NodeId" : "101::1490024809754",
+		"action" : 
+		{
+			"verb" : "delete"
+		}
+	},
+	{
+		"node-category" : "AnalysisNode",
+		"NodeId" : "101::1490024809754",
+		"action" : 
+		{
+			"verb" : "read"
+		}
+	}
+	
+]		

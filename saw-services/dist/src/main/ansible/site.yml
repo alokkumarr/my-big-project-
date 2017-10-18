@@ -1,0 +1,7 @@
+- name: SAW Services
+  hosts: saw-services
+  become: true
+  roles:
+    - saw-transport
+    - saw-scheduler
+    - saw-gateway

@@ -1,0 +1,32 @@
+#!/bin/sh
+#
+# Update SAW semantic metadata in SAW Metadata Service
+#
+# Used by developers to load the sample sematic metadata JSON files
+# into the SAW Metadata Service until a better tool exists.  Assumes
+# SSH access to SAW nodes.  Output of script must be checked manually
+# to ensure operation was successful.
+#
+set -eu
+
+# Semantic nodes
+s="semantic_node.json"
+files="mct_content_$s mct_error_$s mct_session_$s mct_session_and_content_$s"
+
+# Data objects
+#d="data_object.json"
+#files="mct_content_sum_$d mct_error_sum_$d mct_session_$d"
+
+# List objects
+#files="list.json"
+
+mdcli="sudo sudo -u mapr /opt/saw/service/bin/mdcli.sh"
+host="mapr01.bda.poc.velocity-va.sncrcorp.net"
+data="/mapr/bda_lab_batch"
+dir="$(dirname $0)"
+
+set -x
+for path in $files; do
+    scp $dir/$path $host:$data/user/mapr/tmp
+    ssh -t $host $mdcli -i tmp/$path -o tmp/result.json
+done

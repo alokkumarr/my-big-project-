@@ -1,0 +1,24 @@
+<configuration>
+  <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel"/>
+  <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
+    <encoder>
+      <pattern>%coloredLevel - %logger - %message%n%xException</pattern>
+    </encoder>
+  </appender>
+  <!--
+      The logger name is typically the Java/Scala package name.
+      This configures the log level to log at for a package and its children packages.
+    -->
+  <logger level="DEBUG" name="sncr.saw.common.config">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+  <logger level="DEBUG" name="sncr.datalake">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+  <logger level="DEBUG" name="sncr.metadata">
+    <appender-ref ref="STDOUT"/>
+  </logger>
+  <root level="DEBUG">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>

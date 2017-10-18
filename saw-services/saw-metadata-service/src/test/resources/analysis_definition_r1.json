@@ -1,0 +1,422 @@
+[
+	{
+	"verb" : "write",
+	"content" : {
+			"name": "pgidev_r1",
+			"description": "Cost by Carrier and Call Type",
+			"tenantId": "ATT",
+			"productId": "Analysis",
+			"emailId": "srya0001@synchronoss.com",
+			"publishedBy": "ABC",
+			"copyToFTP": true,
+			"attachAnalysisToMail": true,
+			"isScheduled": true,
+			"outputFile": {
+					"outputFormat": "parquet",
+					"outputFileName": "DB"
+			},
+			"analysis": {
+					"analysisId": 21,
+					"productViewsId": 1,
+					"analysisCategoryId": 3,
+					"analysisCategoryName": "UA_RRM",
+					"tenantId": "ATT",
+					"productId": "none",
+					"analysisName": "RegressionTest1",
+					"analysisDescription": "Cost by Carrier and Call Type",
+					"analysisQuery": "SELECT tbl1.orig_date._xdfDate as CALL_DATE,ACCOUNT_NUMBER,VENDOR_NAME,REGION,CURRENCY,CALL_TYPE,ACCESS_TYPE,\n      ROUND((SUM(CAST(elapsed_time AS NUMERIC(9,2)))))  AS TOTAL_SWITCH_MOU ,(SUM(CAST(TOTAL_COST AS NUMERIC(19,4))))  AS Total_Cost\nFROM `data/VRUF` as tbl1 \nWHERE  tbl1.orig_date._xdfDate  Between ? \nGROUP BY VENDOR_NAME,ACCOUNT_NUMBER,REGION,tbl1.orig_date._xdfDate,CURRENCY,CALL_TYPE,ACCESS_TYPE",
+					"analysisQueryType": "VIEW",
+					"displayStatus": "A",
+					"designerQuery": true,
+					"createdUser": "srya0001",
+					"modifiedUser": "srya0001",
+					"createdDate": "2017-03-14 07:20:50",
+					"modifiedDate": "2017-03-14 07:20:50",
+					"parameters": [
+							{
+									"defaultValue": "today",
+									"name": "orig_date",
+									"type": "Date_Range",
+									"value": "",
+									"display": "Date",
+									"optional": true,
+									"index": 1,
+									"rawAnalysisId": 4,
+									"rawAnalysisParametersId": 1
+							}
+					],
+					"columns": [
+							{
+									"align": "LEFT",
+									"label": "Call Date",
+									"name": "CALL_DATE",
+									"pattern": "Call Date",
+									"size": "100",
+									"type": "Date_Range",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 4,
+									"rawAnalysisColumnsId": 24,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "Account Number",
+									"name": "ACCOUNT_NUMBER",
+									"pattern": "Account Number",
+									"size": "100",
+									"type": "String",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 4,
+									"rawAnalysisColumnsId": 25,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "Vendor Name",
+									"name": "VENDOR_NAME",
+									"pattern": "Vendor Name",
+									"size": "100",
+									"type": "String",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 4,
+									"rawAnalysisColumnsId": 26,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "Region",
+									"name": "REGION",
+									"pattern": "Region",
+									"size": "100",
+									"type": "String",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 4,
+									"rawAnalysisColumnsId": 27,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "Currency",
+									"name": "CURRENCY",
+									"pattern": "Currency",
+									"size": "100",
+									"type": "String",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 4,
+									"rawAnalysisColumnsId": 28,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "Call Type",
+									"name": "CALL_TYPE",
+									"pattern": "Call Type",
+									"size": "100",
+									"type": "String",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 4,
+									"rawAnalysisColumnsId": 29,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "Access Type",
+									"name": "ACCESS_TYPE",
+									"pattern": "Access Type",
+									"size": "100",
+									"type": "String",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 4,
+									"rawAnalysisColumnsId": 30,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "MOU",
+									"name": "TOTAL_SWITCH_MOU",
+									"pattern": "MOU",
+									"size": "100",
+									"type": "Number",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 4,
+									"rawAnalysisColumnsId": 31,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "Total Cost",
+									"name": "Total_Cost",
+									"pattern": "Total Cost",
+									"size": "100",
+									"type": "Number",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 4,
+									"rawAnalysisColumnsId": 32,
+									"selected": true
+							}
+					],
+					"parametarised": true,
+					"scheduled": true,
+					"analysisSuperCategoryList": [
+							"ABC"
+					]
+			}
+		}
+	}, 
+	{
+	"verb" : "write",
+	"content" : {	
+				"name": "pgidev_r1",
+				"description": "Fraud Monitor Report -- Regression test 2",
+				"tenantId": "ATT",
+				"productId": "Analysis",
+				"emailId": "srya0001@synchronoss.com",
+				"publishedBy": "ABC",
+				"copyToFTP": true,
+				"attachAnalysisToMail": true,
+				"isScheduled": true,
+				"outputFile": {
+						"outputFormat": "parquet",
+						"outputFileName": "DB"
+				},
+				"analysis": {
+						"analysisId": 22,
+						"productViewsId": 1,
+						"analysisCategoryId": 3,
+						"analysisCategoryName": "ABC",
+						"tenantId": "ATT",
+						"productId": "Analysis",
+						"analysisName": "UA_RRM_R2",
+						"analysisDescription": "Fraud Monitor Report",
+						"analysisQuery": "\nSELECT  \nMAIN.orig_date._xdfDate            						 	AS Call_Date,\nMAIN.VENDOR_NAME                         					 	AS Vendor_Name,\nMAIN.FROM_COUNTRY_NAME                   					 	AS Country,\n(CAST(MAIN.BTN AS VARCHAR(50))) 					AS Billing_Telephone_Number,\nCAST(MAIN.TO_TN AS BIGINT)                            				AS Called_Number,\nMAIN.CURRENCY                           					 	AS Currency ,\nCAST((COUNT(*)) AS BIGINT)                            				AS Call_Count,\nROUND((SUM(CAST(MAIN.elapsed_time AS NUMERIC(9,2)))))              AS Minutes_of_Usage,\n(SUM(CAST(MAIN.TOTAL_COST AS NUMERIC(19,4))))               AS Charge_in_Local_Currency,\nCUR.CONVERSION_RATE                     						AS FX_Rate,\nCAST((CAST((SUM(MAIN.TOTAL_COST*CUR.CONVERSION_RATE))AS DOUBLE)) AS NUMERIC(19,4))      AS Charge_in_USD\nFROM\n  `data/VRUF` as MAIN \nJOIN \n(SELECT * FROM `ref/CURRENCYCONVERSION` as RE WHERE STATUS=1 ) CUR\nON(COALESCE((CAST(MAIN.CURRENCY AS VARCHAR)),\'\') = COALESCE((CAST(CUR.BASE_CURRENCY_COUNTRY_CODE AS VARCHAR)),\'\'))\n\nWHERE MAIN.orig_date._xdfDate BETWEEN ? \nand (UPPER((LTRIM(RTRIM(MAIN.VENDOR_NAME)))) LIKE \'%\'||LTRIM(RTRIM(UPPER(?)))||\'%\' ) \nand(UPPER((LTRIM(RTRIM(MAIN.BTN)))) LIKE \'%\'||LTRIM(RTRIM(UPPER(?)))||\'%\' ) \nand(UPPER((LTRIM(RTRIM(MAIN.TO_TN)))) LIKE \'%\'||LTRIM(RTRIM(UPPER(?)))||\'%\' ) \nand (UPPER((LTRIM(RTRIM(MAIN.FROM_COUNTRY_NAME)))) LIKE \'%\'||LTRIM(RTRIM(UPPER(?)))||\'%\' ) \nGROUP BY\nMAIN.orig_date._xdfDate,\nMAIN.VENDOR_NAME,\nMAIN.FROM_COUNTRY_NAME,\n(CAST(MAIN.BTN AS VARCHAR(50))),\nCAST(MAIN.TO_TN AS BIGINT) ,\nCUR.CONVERSION_RATE,\nMAIN.CURRENCY",
+						"analysisQueryType": "VIEW",
+						"displayStatus": "Y",
+						"designerQuery": true,
+						"createdUser": "sysadmin@pgidev.com",
+						"modifiedUser": "sysadmin@pgidev.com",
+						"createdDate": "2014-03-14 07:35:19",
+						"modifiedDate": "2017-03-14 07:35:19",
+						"parameters": [
+							{
+									"defaultValue": "",
+									"name": "orig_date",
+									"type": "Date_Range",
+									"value": "",
+									"display": "Date",
+									"optional": true,
+									"index": 1,
+									"rawAnalysisId": 22,
+									"rawAnalysisParametersId": 9
+							},
+							{
+									"defaultValue": "",
+									"name": "VENDOR_NAME",
+									"type": "String",
+									"value": "",
+									"display": "Vendor Name",
+									"optional": true,
+									"index": 2,
+									"rawAnalysisId": 22,
+									"rawAnalysisParametersId": 10
+							},
+							{
+									"defaultValue": "",
+									"name": "BTN",
+									"type": "String",
+									"value": "",
+									"display": "BTN",
+									"optional": true,
+									"index": 3,
+									"rawAnalysisId": 22,
+									"rawAnalysisParametersId": 11
+							},
+							{
+									"defaultValue": "",
+									"name": "FROM_COUNTRY_NAME",
+									"type": "String",
+									"value": "",
+									"display": "Country",
+									"optional": true,
+									"index": 4,
+									"rawAnalysisId": 22,
+									"rawAnalysisParametersId": 12
+							},
+							{
+									"defaultValue": "",
+									"name": "TO_TN",
+									"type": "String",
+									"value": "",
+									"display": "Called Number",
+									"optional": true,
+									"index": 5,
+									"rawAnalysisId": 22,
+									"rawAnalysisParametersId": 13
+							}
+						],
+						"columns": [
+							{
+									"align": "LEFT",
+									"label": "Call Date",
+									"name": "CALL_DATE",
+									"pattern": "Call Date",
+									"size": "100",
+									"type": "Date_Range",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 22,
+									"rawAnalysisColumnsId": 47,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "Vendor Name",
+									"name": "VENDOR_NAME",
+									"pattern": "Vendor Name",
+									"size": "100",
+									"type": "String",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 22,
+									"rawAnalysisColumnsId": 48,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "Country",
+									"name": "COUNTRY",
+									"pattern": "Country",
+									"size": "100",
+									"type": "String",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 22,
+									"rawAnalysisColumnsId": 49,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "BTN",
+									"name": "Billing_Telephone_Number",
+									"pattern": "BTN",
+									"size": "100",
+									"type": "String",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 22,
+									"rawAnalysisColumnsId": 50,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "Called Number",
+									"name": "Called_Number",
+									"pattern": "Called Number",
+									"size": "100",
+									"type": "String",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 22,
+									"rawAnalysisColumnsId": 51,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "Currency",
+									"name": "Currency",
+									"pattern": "Currency",
+									"size": "100",
+									"type": "String",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 22,
+									"rawAnalysisColumnsId": 52,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "Call Count",
+									"name": "Call_Count",
+									"pattern": "Call_Count",
+									"size": "100",
+									"type": "Number",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 22,
+									"rawAnalysisColumnsId": 53,
+									"selected": true
+							}							
+							{
+									"align": "LEFT",
+									"label": "MOU",
+									"name": "Minutes_of_Usage",
+									"pattern": "MOU",
+									"size": "100",
+									"type": "Number",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 22,
+									"rawAnalysisColumnsId": 54,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "Charge in Local Currency",
+									"name": "Charge_in_Local_Currency",
+									"pattern": "Charge in Local Currency",
+									"size": "100",
+									"type": "Number",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 22,
+									"rawAnalysisColumnsId": 55,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "FX Rate",
+									"name": "FX_Rate",
+									"pattern": "FX Rate",
+									"size": "100",
+									"type": "Number",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 22,
+									"rawAnalysisColumnsId": 56,
+									"selected": true
+							},
+							{
+									"align": "LEFT",
+									"label": "Charge in USD",
+									"name": "Charge_in_USD",
+									"pattern": "Charge in USD",
+									"size": "100",
+									"type": "Number",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 22,
+									"rawAnalysisColumnsId": 57,
+									"selected": true
+							}							
+						],
+						"parametarised": true,
+						"scheduled": true,
+						"analysisSuperCategoryList": [
+								"ABC"
+						]
+				}
+		}
+	},
+	{
+		"verb" : "read",
+		"keys" :  { "analysisId" : 22 }
+	}
+]	

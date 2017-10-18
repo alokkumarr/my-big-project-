@@ -1,0 +1,78 @@
+{
+		"name": "ABC",
+		"description": "ABC",
+		"tenantId": "ABC",
+		"productId": "ABC",
+		"emailId": "ABC",
+		"publishedBy": "ABC",
+		"copyToFTP": true,
+		"attachAnalysisToMail": true,
+		"isScheduled": true,
+		"outputFile": {
+				"outputFormat": "ABC",
+				"outputFileName": "ABC"
+		},
+		"analysis": {
+				"analysisId": 123,
+				"productViewsId": 123,
+				"analysisCategoryId": 123,
+				"analysisCategoryName": "ABC",
+				"tenantId": "ABC",
+				"productId": "ABC",
+				"analysisName": "ABC",
+				"analysisDescription": "ABC",
+				"analysisQuery": "ABC",
+				"analysisQueryType": "ABC",
+				"displayStatus": "ABC",
+				"designerQuery": true,
+				"createdUser": "ABC",
+				"modifiedUser": "ABC",
+				"createdDate": "ABC",
+				"modifiedDate": "ABC",
+				"parameters": [
+						{
+								"defaultValue": "ABC",
+								"name": "ABC",
+								"type": "ABC",
+								"value": "ABC",
+								"display": "ABC",
+								"optional": true,
+								"index": 123,
+								"rawAnalysisId": 123,
+								"rawAnalysisParametersId": 123,
+								"lookupValue": "ABC",
+								"lookup": [
+										{
+												"value": "ABC"
+										}
+								]
+						}
+				],
+				"columns": [
+						{
+								"align": "ABC",
+								"label": "ABC",
+								"name": "ABC",
+								"pattern": "ABC",
+								"size": "ABC",
+								"type": "ABC",
+								"aggregate": "ABC",
+								"sortType": "ABC",
+								"groupBy": "ABC",
+								"criteria": "ABC",
+								"alias": "ABC",
+								"viewName": "ABC",
+								"criteriaOption": "ABC",
+								"renderCriteria": "ABC",
+								"rawAnalysisId": 123,
+								"rawAnalysisColumnsId": 123,
+								"selected": true,
+						}
+				],
+				"parametarised": true,
+				"scheduled": true,
+				"analysisSuperCategoryList": [
+						"ABC"
+				]
+		}
+}

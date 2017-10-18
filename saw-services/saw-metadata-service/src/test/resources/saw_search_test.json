@@ -1,0 +1,472 @@
+[
+{
+	"sub": "shwetha@att.com",
+	"ticket": 
+	{
+		 "ticketId": "1", 
+		 "windowId": "28_1481019911763_1066874973",
+		 "masterLoginId": "admin@att.com", 
+		 "customer_code" : "ATT", 
+		 "userName": "Adminstrator", 
+		 "password": null,				
+		 "prodCode": "1",
+		 "roleType": "Admin",
+		 "createdTime": 1481019911763,
+		 "dataSecurityKey": "ATT_ADMIN",
+		 "validUpto": 1481027111763,
+		 "valid": true,
+		 "validityReason": "User Authenticated Successfully",
+		 "validMins": 20,
+		 "iat": 1481019912
+	}
+"contents": { 
+	"action" : "create",
+	"analyze" :
+		[
+			{
+				"_id" : "FT101", 
+				"name" : "NewCustomerModule",
+				"userName": "admin@att.com", 
+				"dataSecurityKey" : "ATT",   
+				"category" : "My Analysis",
+				"type" : "report", 
+				"customer_Prod_module_feature_sys_id" : "FT_sys01", 
+				"metric_name" : "Metric_name_1",
+				"scheduled" : "10:00 AM", 
+					"publish" : {
+						"sourceType" : "EMAIL",
+						"email_id" : ["srya0001@synchronoss.com"], 
+						"host" : "localhost", 
+						"port" : 22,
+						"password" : "hidden", 
+						"share" : {
+							"customer_Prod_module_feature_sys_id": "" 
+						}
+				},  
+				"description" : "Full test node 1", 
+				"repository": 
+				{
+					"storage_type" : "DL",
+					"URL" : "URL1"
+				},
+				"artifacts": 
+				[
+					{
+					"artifact_name": "",
+					"artifact_position": [ 500,200],
+					"artifact_attributes" : 
+					[
+						{
+							"column_name" : "",
+							"display_name" : "",
+							"type" : "int|String",
+							"join_elgible" : "",
+							"filter_eligible" : "",
+							"hide" : "", 
+							"checked" : "" 
+						},
+						{}
+					]
+					}
+				]	
+			},
+			
+			{
+				"_id" : "FT101", 
+				"name" : "NewCustomerModule",
+				"userName": "admin@att.com", 
+				"dataSecurityKey" : "Verizon",   
+				"category" : "My Analysis",
+				"type" : "chart", 
+				"customer_Prod_module_feature_sys_id" : "FT_sys02", 
+				"metric_name" : "Metric_name_1",
+				"scheduled" : "10:00 AM", 
+					"publish" : {
+						"sourceType" : "EMAIL",
+						"email_id" : ["srya0001@synchronoss.com"], 
+						"host" : "localhost", 
+						"port" : 22,
+						"password" : "hidden", 
+						"share" : {
+							"customer_Prod_module_feature_sys_id": "" 
+						}
+				},  
+				"description" : "Full test node 1", 
+				"repository": 
+				{
+					"storage_type" : "DL",
+					"URL" : "URL1"
+				},
+				"artifacts": 
+				[
+					{
+					"artifact_name": "",
+					"artifact_position": [ 500,200],
+					"artifact_attributes" : 
+					[
+						{
+							"column_name" : "",
+							"display_name" : "",
+							"type" : "int|String",
+							"join_elgible" : "",
+							"filter_eligible" : "",
+							"hide" : "", 
+							"checked" : "" 
+						},
+						{}
+					]
+					}
+				]	
+			},
+			
+			{
+				"_id" : "FT101", 
+				"name" : "NewCustomerModule",
+				"userName": "admin@att.com", 
+				"dataSecurityKey" : "ATT",   
+				"category" : "My Analysis",
+				"type" : "chart", 
+				"customer_Prod_module_feature_sys_id" : "FT_sys03", 
+				"metric_name" : "Metric_name_2",
+				"scheduled" : "10:00 AM", 
+					"publish" : {
+						"sourceType" : "EMAIL",
+						"email_id" : ["srya0001@synchronoss.com"], 
+						"host" : "localhost", 
+						"port" : 22,
+						"password" : "hidden", 
+						"share" : {
+							"customer_Prod_module_feature_sys_id": "" 
+						}
+				},  
+				"description" : "Full test node 1", 
+				"repository": 
+				{
+					"storage_type" : "DL",
+					"URL" : "URL1"
+				},
+				"artifacts": 
+				[
+					{
+					"artifact_name": "",
+					"artifact_position": [ 500,200],
+					"artifact_attributes" : 
+					[
+						{
+							"column_name" : "",
+							"display_name" : "",
+							"type" : "int|String",
+							"join_elgible" : "",
+							"filter_eligible" : "",
+							"hide" : "", 
+							"checked" : "" 
+						},
+						{}
+					]
+					}
+				]	
+			},
+			
+			{
+				"_id" : "FT104", 
+				"name" : "NewCustomerModule",
+				"userName": "admin@att.com", 
+				"dataSecurityKey" : "Verizon",   
+				"category" : "My Analysis",
+				"type" : "table", 
+				"customer_Prod_module_feature_sys_id" : "FT_sys04", 
+				"metric_name" : "Metric_name_2",
+				"scheduled" : "10:00 AM", 
+					"publish" : {
+						"sourceType" : "EMAIL",
+						"email_id" : ["srya0001@synchronoss.com"], 
+						"host" : "localhost", 
+						"port" : 22,
+						"password" : "hidden", 
+						"share" : {
+							"customer_Prod_module_feature_sys_id": "" 
+						}
+				},  
+				"description" : "Full test node 1", 
+				"repository": 
+				{
+					"storage_type" : "DL",
+					"URL" : "URL1"
+				},
+				"artifacts": 
+				[
+					{
+					"artifact_name": "",
+					"artifact_position": [ 500,200],
+					"artifact_attributes" : 
+					[
+						{
+							"column_name" : "",
+							"display_name" : "",
+							"type" : "int|String",
+							"join_elgible" : "",
+							"filter_eligible" : "",
+							"hide" : "", 
+							"checked" : "" 
+						},
+						{}
+					]
+					}
+				]	
+			},
+
+			{
+				"_id" : "FT105", 
+				"name" : "NewCustomerModule",
+				"userName": "admin@att.com", 
+				"dataSecurityKey" : "ATT",   
+				"category" : "My Analysis",
+				"type" : "chart", 
+				"customer_Prod_module_feature_sys_id" : "FT_sys05", 
+				"metric_name" : "Metric_name_2",
+				"scheduled" : "10:00 AM", 
+					"publish" : {
+						"sourceType" : "EMAIL",
+						"email_id" : ["srya0001@synchronoss.com"], 
+						"host" : "localhost", 
+						"port" : 22,
+						"password" : "hidden", 
+						"share" : {
+							"customer_Prod_module_feature_sys_id": "" 
+						}
+				},  
+				"description" : "Full test node 1", 
+				"repository": 
+				{
+					"storage_type" : "DL",
+					"URL" : "URL1"
+				},
+				"artifacts": 
+				[
+					{
+					"artifact_name": "",
+					"artifact_position": [ 500,200],
+					"artifact_attributes" : 
+					[
+						{
+							"column_name" : "",
+							"display_name" : "",
+							"type" : "int|String",
+							"join_elgible" : "",
+							"filter_eligible" : "",
+							"hide" : "", 
+							"checked" : "" 
+						},
+						{}
+					]
+					}
+				]	
+			},
+
+			{
+				"_id" : "FT106", 
+				"name" : "NewCustomerModule",
+				"userName": "admin@att.com", 
+				"dataSecurityKey" : "Verizon",  
+				"category" : "My Analysis",
+				"type" : "report", 
+				"customer_Prod_module_feature_sys_id" : "FT_sys06", 
+				"metric_name" : "Metric_name_1",
+				"scheduled" : "10:00 AM", 
+					"publish" : {
+						"sourceType" : "EMAIL",
+						"email_id" : ["srya0001@synchronoss.com"], 
+						"host" : "localhost", 
+						"port" : 22,
+						"password" : "hidden", 
+						"share" : {
+							"customer_Prod_module_feature_sys_id": "" 
+						}
+				},  
+				"description" : "Full test node 1", 
+				"repository": 
+				{
+					"storage_type" : "DL",
+					"URL" : "URL1"
+				},
+				"artifacts": 
+				[
+					{
+					"artifact_name": "",
+					"artifact_position": [ 500,200],
+					"artifact_attributes" : 
+					[
+						{
+							"column_name" : "",
+							"display_name" : "",
+							"type" : "int|String",
+							"join_elgible" : "",
+							"filter_eligible" : "",
+							"hide" : "", 
+							"checked" : "" 
+						},
+						{}
+					]
+					}
+				]	
+			},
+			
+			{
+				"_id" : "FT107", 
+				"name" : "NewCustomerModule",
+				"userName": "admin@att.com", 
+				"dataSecurityKey" : "ATT",   
+				"category" : "My Analysis",
+				"type" : "chart", 
+				"customer_Prod_module_feature_sys_id" : "FT_sys02", 
+				"metric_name" : "Metric_name_2",
+				"scheduled" : "10:00 AM", 
+					"publish" : {
+						"sourceType" : "EMAIL",
+						"email_id" : ["srya0001@synchronoss.com"], 
+						"host" : "localhost", 
+						"port" : 22,
+						"password" : "hidden", 
+						"share" : {
+							"customer_Prod_module_feature_sys_id": "" 
+						}
+				},  
+				"description" : "Full test node 1", 
+				"repository": 
+				{
+					"storage_type" : "DL",
+					"URL" : "URL1"
+				},
+				"artifacts": 
+				[
+					{
+					"artifact_name": "",
+					"artifact_position": [ 500,200],
+					"artifact_attributes" : 
+					[
+						{
+							"column_name" : "",
+							"display_name" : "",
+							"type" : "int|String",
+							"join_elgible" : "",
+							"filter_eligible" : "",
+							"hide" : "", 
+							"checked" : "" 
+						},
+						{}
+					]
+					}
+				]	
+			},
+
+			
+			]
+	}
+}
+
+		] 
+	}
+},
+{
+	"sub": "shwetha@att.com",
+	"action" : "create"
+	"ticket": 
+	{
+		 "ticketId": "8", 
+		 "windowId": "28_1481019911763_1066874973",
+		 "masterLoginId": "admin@att.com", 
+		 "customer_code" : "Verizon", 
+		 "userName": "Adminstrator", 
+		 "password": null,				
+		 "prodCode": "1",
+		 "roleType": "Admin",
+		 "createdTime": 1481019911763,
+		 "dataSecurityKey": "ATT_ADMIN",
+		 "validUpto": 1481027111763,
+		 "valid": true,
+		 "validityReason": "User Authenticated Successfully",
+		 "validMins": 20,
+		 "iat": 1481019912
+	}
+"contents": { 
+	"analyze" :
+		[
+			{
+				"_id" : "FT101", 
+				"name" : "NewCustomerModule",
+				"userName": "admin@att.com", 
+				"dataSecurityKey" : "Verizon",   
+				"category" : "My Analysis",
+				"type" : "chart", 
+				"customer_Prod_module_feature_sys_id" : "FT_sys03", 
+				"metric_name" : "Metric_name_1",
+				"scheduled" : "10:00 AM", 
+					"publish" : {
+						"sourceType" : "EMAIL",
+						"email_id" : ["srya0001@synchronoss.com"], 
+						"host" : "localhost", 
+						"port" : 22,
+						"password" : "hidden", 
+						"share" : {
+							"customer_Prod_module_feature_sys_id": "" 
+						}
+				},  
+				"description" : "Full test node 1", 
+				"repository": 
+				{
+					"storage_type" : "DL",
+					"URL" : "URL1"
+				},
+				"artifacts": 
+				[
+					{
+					"artifact_name": "",
+					"artifact_position": [ 500,200],
+					"artifact_attributes" : 
+					[
+						{
+							"column_name" : "",
+							"display_name" : "",
+							"type" : "int|String",
+							"join_elgible" : "",
+							"filter_eligible" : "",
+							"hide" : "", 
+							"checked" : "" 
+						},
+						{}
+					]
+					}
+				]	
+			}
+		] 
+	}
+},
+{
+   "sub": "shwetha@att.com",
+   "action" : "search",
+   "ticket": 
+	 {
+   "ticketId": "28_1481019911763_2102342349", 
+   "windowId": "28_1481019911763_1066874973",
+   "masterLoginId": "admin@att.com", 
+	 "customer_code" : "ATT", 
+   "userName": "Adminstrator", 
+   "password": null,				
+   "prodCode": "1",
+   "roleType": "Admin",
+   "createdTime": 1481019911763,
+   "dataSecurityKey": "ATT_ADMIN",
+   "validUpto": 1481027111763,
+   "valid": true,
+   "validityReason": "User Authenticated Successfully",
+   "validMins": 20,
+   "iat": 1481019912
+	},
+	"contents": { 
+		"keys" : {
+			"module" : "analyze",
+			"type" : "chart"
+		}
+	}
+}
+]

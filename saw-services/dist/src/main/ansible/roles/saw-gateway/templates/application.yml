@@ -1,0 +1,50 @@
+info:
+  component: Synchronoss Gateway Service
+spring:
+  application:
+    name: saw-gateway-service
+  main:
+    banner-mode: 'off'
+server:
+  address: localhost
+  port: 9100
+  context-path: ''
+  compression:
+    enabled: true
+
+analysis:
+    service:
+        host: http://localhost:9300
+internal-analysis:
+    service:
+        host: http://localhost:9200
+metadata:
+    service:
+        host: http://localhost:9200
+semantic:
+    service:
+        host: http://localhost:9200
+security:
+    service:
+        host: http://localhost:9000/saw-security
+
+api:
+    gateway:
+        endpoints:
+        -   location: ${metadata.service.host}
+            method: POST
+            path: '[/]md*'
+        -   location: ${internal-analysis.service.host}
+            method: GET
+            path: '[/]analysis.*'
+        -   location: ${internal-analysis.service.host}
+            method: POST
+            path: '[/]analysis*'
+        -   location: ${semantic.service.host}
+            method: POST
+            path: '[/]semantic*'
+        -   location: ${analysis.service.host}
+            method: GET
+            path: '/api/analyses.*'
+logging:
+  config: /opt/bda/saw-gateway-service/conf/logback.xml

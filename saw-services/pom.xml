@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+ <parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.5.2.RELEASE</version>
+		<relativePath/>
+	</parent>
+
+
+	<groupId>com.synchronoss</groupId>
+	<artifactId>saw-services</artifactId>
+	<version>1.0.0</version>
+	<packaging>pom</packaging>
+
+	<name>Data Processing Framework</name>
+	<url>http://www.synchronoss.com</url>
+
+	<inceptionYear>2016</inceptionYear>
+	<scm>
+		<connection>scm:svn:http://none</connection>
+		<url>scm:svn:https://none</url>
+	</scm>
+
+	<properties>
+		<!-- output.directory>${output}</output.directory -->
+  	    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- Versions of 3rd party dependencies  -->
+		<spark-version>2.1.0</spark-version>
+		<java.version>1.8</java.version>
+		<elasticsearch.version>1.7.3</elasticsearch.version>
+		<elasticsearch-spark.version>2.4.0</elasticsearch-spark.version>
+		<parquet.version>1.6.0</parquet.version>
+		<junit.version>4.6</junit.version>
+		<date4j.version>1.5.1</date4j.version>
+		<jxel.version>2.1.1</jxel.version>
+		<opencsv.version>2.3</opencsv.version>
+		<build.number.plugin>1.1</build.number.plugin>
+		<enforcer.version>1.3.1</enforcer.version>
+		<maven.assembly.version>2.4</maven.assembly.version>
+		<maven.jar.version>2.4</maven.jar.version>
+		<maven.compile.version>2.3.2</maven.compile.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<jackson.core.version>2.8.7</jackson.core.version>
+		<http.version>4.3.4</http.version>
+		<log4j.version>1.2.17</log4j.version>
+		<slfj.version>1.7.6</slfj.version>
+		<ezmorph.version>0.8.1</ezmorph.version>
+		<amazon.s3>1.0</amazon.s3>
+		<kyro>3.0.0</kyro>
+		<common.lang>2.6</common.lang>
+		<json.vesion>20080701</json.vesion>
+		<guava.version>20.0</guava.version>
+		<jdk.version>1.8</jdk.version>
+		<snappy.version>1.0.4.1</snappy.version>
+		<commons-collections.version>3.2.1</commons-collections.version>
+		<mapr.core.version>5.2.0</mapr.core.version>
+		<mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
+		<scala.major.version>2.11</scala.major.version>
+		<scala.version>2.11.8</scala.version>
+		<scala.compat.version>2.11</scala.compat.version>
+		<Json4s.latestVersion>3.3.0</Json4s.latestVersion>
+		<rpm.saw.root>/opt</rpm.saw.root>
+	</properties>
+  <repositories>
+   <repository>
+    <id>synchronoss</id>
+      <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+    </repository>
+  </repositories>
+  <dependencies>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<!--   <version>1.1.8</version> -->
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			 <!-- <version>4.5.3</version> -->
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<!-- <version>4.4.6</version> -->
+		</dependency>
+		<dependency>
+			<groupId>com.typesafe.scala-logging</groupId>
+			<artifactId>scala-logging_${scala.major.version}</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>${scala.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json4s</groupId>
+			<artifactId>json4s-native_${scala.major.version}</artifactId>
+			<version>${Json4s.latestVersion}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json4s</groupId>
+			<artifactId>json4s-jackson_${scala.major.version}</artifactId>
+			<version>${Json4s.latestVersion}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.scalatest</groupId>
+			<artifactId>scalatest_${scala.major.version}</artifactId>
+			<version>2.2.6</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.scalactic</groupId>
+			<artifactId>scalactic_${scala.major.version}</artifactId>
+			<version>2.2.6</version>
+			<scope>test</scope>
+ 		</dependency>
+<!--			<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+ -->
+ </dependencies>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>typesafe-releases-plugins</id>
+			<url>http://repo.typesafe.com/typesafe/releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
+	<modules>
+		<module>saw-common</module>
+		<module>saw-analysis-service</module>	
+		<module>saw-metadata-service</module>
+		<module>saw-data-access</module>
+		<module>saw-transport-service</module>
+		<module>saw-es-querybuilder</module>
+		<module>saw-scheduler-service</module>
+		<module>saw-gateway-service</module>	
+		<module>dist</module>
+	</modules>
+</project>

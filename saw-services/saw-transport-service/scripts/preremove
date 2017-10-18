@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# Only remove files if removing package completely.  If upgrading, do
+# not remove the files just created by the new package's postinstall
+# script which runs before the old package's preremove script.
+if [ $1 -eq 0 ]; then
+    source /etc/saw/service.env || exit
+
+    echo "Remove link on current version of SAW Common Service"
+
+    rm -rf /var/saw/service/log/*
+    rm -f ${SAW_HOME}/service
+    rm -f /etc/saw/service.env
+fi
+
+echo "SAW Common Service pre-remove step has been completed"

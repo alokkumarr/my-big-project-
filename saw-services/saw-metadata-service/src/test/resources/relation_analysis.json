@@ -1,0 +1,45 @@
+[
+	{
+		"node-category" : "AnalysisNode",
+		"NodeId" : "PassengerDataAnalysis_1::101::3::463047281927493",
+		"action" : 
+		{
+			"verb" : "add-element",
+			"base-relation" : [ 
+				{ "NodeId" : "PASSENGER_DATA::1490643672072", "node-category" : "DataObject" },
+				{ "NodeId":"PASSENGER_DATA::1490643164159", "node-category" : "DataObject" },
+				{ "NodeId":"AIRSTAT_2::1490719756137", "node-category" : "DataObject" }, 
+				{ "NodeId":"NUM_PARSING_PQ_2::1490719756211", "node-category" : "DataObject" }, 
+				{ "NodeId":"PT_ENERGY_CONSUMPTION_2::1490719756316", "node-category" : "DataObject" } 			
+			]
+		}
+	},
+	{
+		"node-category" : "AnalysisNode",
+		"NodeId" : "PassengerDataAnalysis_1::101::3::463047281927493",
+		"action" : 
+		{
+			"verb" : "read"
+		}
+	},
+	{
+		"node-category" : "AnalysisNode",
+		"NodeId" : "PassengerDataAnalysis_1::101::3::463047281927493",
+		"action" : 
+		{
+			"verb" : "del-element",
+			"base-relation" : [ 
+				{ "NodeId" : "PASSENGER_DATA::1490643672072", "node-category" : "DataObject" },
+				{ "NodeId":"PASSENGER_DATA::1490643164159", "node-category" : "DataObject" },
+			]
+		}
+	},
+	{
+		"node-category" : "AnalysisNode",
+		"NodeId" : "PassengerDataAnalysis_1::101::3::463047281927493",
+		"action" : 
+		{
+			"verb" : "read"
+		}
+	}	
+]

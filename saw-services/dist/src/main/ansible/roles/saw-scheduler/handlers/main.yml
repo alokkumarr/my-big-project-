@@ -1,0 +1,5 @@
+- name: restart saw-scheduler
+  systemd: name=saw-scheduler.timer state=restarted daemon_reload=true
+  # Workaround: There is no MapR client configured when running inside
+  # Docker container, so skip steps to start the SAW Scheduler Service
+  when: lookup('env', 'container') != 'docker'

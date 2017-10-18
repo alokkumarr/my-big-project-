@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<assembly
+    xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+<id>package</id>
+<formats>
+    <format>dir</format>
+</formats>
+  <fileSets>
+	  <fileSet>
+		  <directoryMode>750</directoryMode>
+		  <directory>${project.basedir}/../saw-common/target/saw-common-${project.version}-package/saw-common-${project.version}/lib</directory>
+		  <outputDirectory>lib</outputDirectory>
+		  <fileMode>440</fileMode>
+	  </fileSet>
+	  <fileSet>
+		  <directoryMode>750</directoryMode>
+		  <directory>${project.basedir}/../saw-metadata-service/target/saw-metadata-service-${project.version}-package/saw-metadata-service-${project.version}/lib</directory>
+		  <outputDirectory>lib</outputDirectory>
+		  <fileMode>440</fileMode>
+	  </fileSet>
+	  <fileSet>
+		  <directoryMode>750</directoryMode>
+		  <directory>${project.basedir}/../saw-data-access/target</directory>
+		  <outputDirectory>sparklib</outputDirectory>
+		  <includes>
+			  <include>saw-data-access-${project.version}-jar-with-dependencies.jar</include>
+		  </includes>
+		  <fileMode>440</fileMode>
+	  </fileSet>
+  </fileSets>
+  <dependencySets>
+    <dependencySet>
+		<outputDirectory>lib</outputDirectory>
+		<outputFileNameMapping>${artifact.groupId}.${artifact.artifactId}-${artifact.version}.${artifact.extension}</outputFileNameMapping>
+		<scope>runtime</scope>
+		<excludes>
+			<exclude>*-maven-*</exclude>
+		</excludes>
+    </dependencySet>
+  </dependencySets>
+</assembly>
+

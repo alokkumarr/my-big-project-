@@ -1,0 +1,49 @@
+[
+	{
+		"node-category" : "DataObject"
+		"NodeId" : "PASSENGER_DATA::1490643164159"
+		"action" : 
+		{
+			"verb" : "read"
+		}
+	},
+	{
+		"node-category" : "DataObject",
+		"NodeId":"PASSENGER_DATA::1490643164159",
+		"action" : 
+		{
+			"verb" : "add-dl-location",
+			"dl-locations" : [ 
+				"/main/data/testapp/output/PASSENGER_DATA",
+				"/main/data/testapp/output/PASSENGER_DATA2"
+			]
+		}
+	},
+	{
+		"node-category" : "DataObject"
+		"NodeId" : "PASSENGER_DATA::1490643164159"
+		"action" : 
+		{
+			"verb" : "read"
+		}
+	},
+	{
+		"node-category" : "DataObject",
+		"NodeId":"PASSENGER_DATA::1490643164159",
+		"action" : 
+		{
+			"verb" : "del-dl-location",
+			"dl-locations" : [ 
+				"/main/data/testapp/output/PASSENGER_DATA2"
+			]
+		}
+	},
+	{
+		"node-category" : "DataObject"
+		"NodeId" : "PASSENGER_DATA::1490643164159"
+		"action" : 
+		{
+			"verb" : "read"
+		}
+	}
+]		

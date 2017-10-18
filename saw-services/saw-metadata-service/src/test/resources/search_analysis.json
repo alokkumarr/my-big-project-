@@ -1,0 +1,13 @@
+[
+	{
+		"node-category" : "AnalysisNode",
+		"action" : 
+		{
+			"verb" : "search",
+			"keys" :
+			{
+					"analysisId": 101
+			}
+		}
+	}
+]		

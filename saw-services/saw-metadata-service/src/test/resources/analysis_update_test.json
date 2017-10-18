@@ -1,0 +1,75 @@
+[
+	{
+	"verb" : "update",
+	"keys" : 
+		{   
+			 "analysisId" : 22 
+		},	
+	"content" : {
+			"name": "updatedAnalysis-regressiontest-1",
+			"description": "Update this analysis ",
+			"tenantId": "ATT",
+			"productId": "Regression Test 1",
+			"emailId": "asor0001@synchronoss.com",
+			"publishedBy": "ABC",
+			"copyToFTP": true,
+			"attachAnalysisToMail": true,
+			"isScheduled": true,
+			"outputFile": {
+					"outputFormat": "parquet",
+					"outputFileName": "DB"
+			},
+			"analysis": {
+					"analysisId": 777,
+					"productViewsId": 11,
+					"analysisCategoryId": 333,
+					"analysisCategoryName": "UA_RRM_Updated_r1",
+					"tenantId": "ATT",
+					"productId": "OldProduct",
+					"analysisName": "Updated Analysis",
+					"analysisDescription": "Updated Analysis test",
+					"analysisQuery": "SELECT tbl1.orig_date._xdfDate as CALL_DATE,ACCOUNT_NUMBER,VENDOR_NAME,REGION,CURRENCY,CALL_TYPE,ACCESS_TYPE,\n      ROUND((SUM(CAST(elapsed_time AS NUMERIC(9,2)))))  AS TOTAL_SWITCH_MOU ,(SUM(CAST(TOTAL_COST AS NUMERIC(19,4))))  AS Total_Cost\nFROM `data/VRUF` as tbl1 \nWHERE  tbl1.orig_date._xdfDate  Between ? \nGROUP BY VENDOR_NAME,ACCOUNT_NUMBER,REGION,tbl1.orig_date._xdfDate,CURRENCY,CALL_TYPE,ACCESS_TYPE",
+					"analysisQueryType": "VIEW",
+					"displayStatus": "N",
+					"designerQuery": true,
+					"createdUser": "srya0001",
+					"modifiedUser": "srya0001",
+					"createdDate": "2017-03-13 07:20:50",
+					"modifiedDate": "2017-03-13 07:20:50",
+					"parameters": [
+							{
+									"defaultValue": "today",
+									"name": "orig_date",
+									"type": "Date_Range",
+									"value": "",
+									"display": "Date",
+									"optional": true,
+									"index": 1,
+									"rawAnalysisId": 4,
+									"rawAnalysisParametersId": 1
+							}
+					],
+					"columns": [
+							{
+									"align": "LEFT",
+									"label": "Call Date",
+									"name": "CALL_DATE",
+									"pattern": "Call Date",
+									"size": "100",
+									"type": "Date_Range",
+									"aggregate": "N",
+									"groupBy": "Y",
+									"rawAnalysisId": 22,
+									"rawAnalysisColumnsId": 222,
+									"selected": true
+							}
+					],
+					"parametarised": false,
+					"scheduled": true,
+					"analysisSuperCategoryList": [
+							"ABC"
+					]
+			}
+		}
+	}
+]		

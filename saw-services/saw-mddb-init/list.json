@@ -1,0 +1,36 @@
+[
+    {
+        "node-category": "SemanticNode",
+        "action": {
+            "verb": "list"
+        }
+    },
+    {
+        "node-category": "SemanticNode",
+        "id": "527fc5f0-eca8-45db-aa21-851b8ead194f",
+        "action": {
+            "verb": "read"
+        }
+    },
+    {
+        "node-category": "SemanticNode",
+        "id": "5645c4cf-63f1-48ff-8ad6-ba633ae3051a",
+        "action": {
+            "verb": "read"
+        }
+    },
+    {
+        "node-category": "SemanticNode",
+        "id": "6a54051c-6e0e-4170-a764-690056c0b6cd",
+        "action": {
+            "verb": "read"
+        }
+    },
+    {
+        "node-category": "SemanticNode",
+        "id": "340df99d-16a6-45cb-af49-5699e3337e50"
+        "action": {
+            "verb": "read"
+        }
+    },
+]

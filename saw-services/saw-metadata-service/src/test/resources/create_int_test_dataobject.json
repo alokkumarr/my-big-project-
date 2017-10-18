@@ -1,0 +1,86 @@
+[
+	{
+		"node-category" : "DataObject",
+		"action" : 
+		{
+			"verb" : "create",
+			"content" :
+			{
+					"name" : "PASSENGER_DATA",
+					"owner" : "Integration Test",
+					"type" : "parquet",
+					"partition_type" : "hive",
+					"application" : "IntagrationTest"
+			},
+			"schema" : {
+				"type" : "struct",
+				"fields" : [ {
+					"name" : "ActivityDate",
+					"type" : "string",
+					"nullable" : true,
+					"metadata" : { }
+				}, {
+					"name" : "ActivityTypeCode",
+					"type" : "string",
+					"nullable" : true,
+					"metadata" : { }
+				}, {
+					"name" : "GEOSummary",
+					"type" : "string",
+					"nullable" : true,
+					"metadata" : { }
+				}, {
+					"name" : "OperatingAirline",
+					"type" : "string",
+					"nullable" : true,
+					"metadata" : { }
+				}, {
+					"name" : "PublishedAirline",
+					"type" : "string",
+					"nullable" : true,
+					"metadata" : { }
+				}, {
+					"name" : "PublishedAirlineIATACode",
+					"type" : "string",
+					"nullable" : true,
+					"metadata" : { }
+				}, {
+					"name" : "OperatingAirlineIATACode",
+					"type" : "string",
+					"nullable" : true,
+					"metadata" : { }
+				}, {
+					"name" : "Terminal",
+					"type" : "string",
+					"nullable" : true,
+					"metadata" : { }
+				}, {
+					"name" : "PriceCategoryCode",
+					"type" : "string",
+					"nullable" : true,
+					"metadata" : { }
+				}, {
+					"name" : "BoardingArea",
+					"type" : "string",
+					"nullable" : true,
+					"metadata" : { }
+				}, {
+					"name" : "PassengerCount",
+					"type" : "long",
+					"nullable" : true,
+					"metadata" : { }
+				}, {
+					"name" : "GEORegion",
+					"type" : "string",
+					"nullable" : true,
+					"metadata" : { }
+				} ]
+			},
+			"dl-locations" : [ 
+				"/main/data/testapp/output/PASSENGER_DATA"
+			]
+		}
+	}
+	
+]
+		
