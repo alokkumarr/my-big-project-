@@ -24,7 +24,7 @@ public class TransformCountlyRecord implements FlatMapFunction<Iterator<Consumer
 
         while (in.hasNext()) {
             String src = in.next().value();
-            if (!src.isEmpty()) {
+            if (src!= null && !src.isEmpty()) {
                 try {
                     String transformedRecord = CountlyModel.transform(src);
                     ret.add(transformedRecord);

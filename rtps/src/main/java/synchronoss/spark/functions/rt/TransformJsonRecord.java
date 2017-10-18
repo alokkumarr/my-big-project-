@@ -46,7 +46,7 @@ public class TransformJsonRecord implements FlatMapFunction<Iterator<ConsumerRec
 
         while (in.hasNext()) {
             String src = in.next().value();
-            if (!src.isEmpty()) {
+            if (src!= null && !src.isEmpty()) {
                 try {
 
                     JsonObject flattenedRecord =  GenericJsonModel.flatten(src);
