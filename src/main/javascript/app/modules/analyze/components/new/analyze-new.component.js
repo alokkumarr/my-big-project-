@@ -5,9 +5,8 @@ import * as find from 'lodash/find';
 import * as template from './analyze-new.component.html';
 import style from './analyze-new.component.scss';
 import emptyTemplate from './analyze-new-empty.html';
-import methods from './methods';
 
-import {AnalyseTypes, ENTRY_MODES} from '../../consts';
+import {AnalyseTypes, ENTRY_MODES, ANALYSIS_METHODS} from '../../consts';
 
 export const AnalyzeNewComponent = {
   template,
@@ -22,7 +21,7 @@ export const AnalyzeNewComponent = {
       this._$scope = $scope;
       this._$mdDialog = $mdDialog;
       this._AnalyzeService = AnalyzeService;
-      this.methods = methods;
+      this.methods = ANALYSIS_METHODS;
     }
 
     $onInit() {
@@ -42,7 +41,10 @@ export const AnalyzeNewComponent = {
 
         forEach(methodCategory.children, method => {
           const isSupported = supportedMethodCategory ?
-            find(supportedMethodCategory.children, ({type}) => type === method.type || method.type === 'chart:pie') :
+            find(supportedMethodCategory.children, ({type}) => type === method.type ||
+              method.type === 'chart:pie' ||
+              method.type === 'chart:combo' ||
+              method.type === 'chart:area') :
             false;
           set(method, 'disabled', !isSupported);
         });
@@ -89,6 +91,8 @@ export const AnalyzeNewComponent = {
       case 'chart:donut':
       case 'chart:scatter':
       case 'chart:bubble':
+      case 'chart:area':
+      case 'chart:combo':
         type = this.selectedAnalysisMethod.split(':')[1];
         tpl = `<analyze-chart model="model" mode="${mode}"></analyze-chart>`;
         model = {

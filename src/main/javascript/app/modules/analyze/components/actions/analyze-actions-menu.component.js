@@ -12,7 +12,8 @@ export const AnalyzeActionsMenuComponent = {
     exclude: '@',
     onSuccessfulDeletion: '&',
     onSuccessfulExecution: '&',
-    onSuccessfulPublish: '&'
+    onSuccessfulPublish: '&',
+    onFrontEndExport: '&'
   },
   controller: class AnalyzeActionsMenuController {
     constructor(AnalyzeActionsService, $state, JwtService) {
@@ -43,10 +44,10 @@ export const AnalyzeActionsMenuComponent = {
       //   value: 'print',
       //   fn: this.print.bind(this)
       // }, {
-      //   label: 'EXPORT',
-      //   value: 'export',
-      //   fn: this.export.bind(this)
-      // }, {
+        label: 'EXPORT',
+        value: 'export',
+        fn: this.export.bind(this)
+      }, {
         label: 'DELETE',
         value: 'delete',
         fn: this.delete.bind(this),
@@ -93,7 +94,8 @@ export const AnalyzeActionsMenuComponent = {
     }
 
     export() {
-      this._AnalyzeActionsService.exportAnalysis();
+      // this._AnalyzeActionsService.exportAnalysis();
+      this.onFrontEndExport();
     }
 
     delete() {

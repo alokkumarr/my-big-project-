@@ -1,4 +1,5 @@
 import * as find from 'lodash/find';
+import * as filter from 'lodash/filter';
 import * as forEach from 'lodash/forEach';
 import * as map from 'lodash/map';
 import * as clone from 'lodash/clone';
@@ -6,7 +7,8 @@ import * as unset from 'lodash/unset';
 
 import * as template from './analyze-chart-settings.component.html';
 import style from './analyze-chart-settings.component.scss';
-import {AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE, AGGREGATE_TYPES_OBJ, NUMBER_TYPES, DATE_TYPES} from '../../../consts';
+import {AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE,
+  AGGREGATE_TYPES_OBJ, NUMBER_TYPES, DATE_TYPES} from '../../../consts';
 
 const DATE_FORMATS = [{
   value: 'MMMM Do YYYY, h:mm:ss a',
@@ -130,6 +132,19 @@ export const AnalyzeChartSettingsComponent = {
         if (!selectedAttr.aggregate) {
           selectedAttr.aggregate = DEFAULT_AGGREGATE_TYPE.value;
           target.aggregate = DEFAULT_AGGREGATE_TYPE.value;
+        }
+        if (!selectedAttr.comboType) {
+          if (['line', 'column', 'area'].includes(this.chartType)) {
+            target.comboType = this.chartType;
+          }
+          if (['combo', 'bar'].includes(this.chartType)) {
+            target.comboType = 'column';
+          }
+          if (this.chartType === 'combo') {
+            if (filter(this.multipleYAxes.fields, 'checked').length > 1) {
+              target.comboType = 'line';
+            }
+          }
         }
       } else {
         target.checked = false;

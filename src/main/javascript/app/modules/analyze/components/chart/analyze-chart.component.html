@@ -35,7 +35,8 @@
         on-change="$ctrl.onSettingsChanged(settings)"
         chart-type="$ctrl.model.chartType"
     ></analyze-chart-settings>
-    <div layout="column">
+    <div layout="column" style="overflow: auto;">
+    <div flex>
       <md-toolbar class="secondary-toolbar chart-options-toolbar">
         <div class="md-toolbar-tools"
              layout-align="start center">
@@ -43,10 +44,10 @@
             <choice-group size="m"
                           icon-only="true"
                           style="margin-right: 10px;"
-                          items="$ctrl.BAR_COLUMN_OPTIONS"
-                          ng-if="$ctrl.barColumnChoice"
-                          ng-model="$ctrl.barColumnChoice"
-                          ng-change="$ctrl.toggleBarColumn()">
+                          items="$ctrl.INVERTING_OPTIONS"
+                          ng-if="$ctrl.invertableCharts.includes($ctrl.model.chartType)"
+                          ng-model="$ctrl.isInverted"
+                          ng-change="$ctrl.toggleChartInversion()">
             </choice-group>
             <span class="md-title"
                   e2e="designer-type-chart"
@@ -85,15 +86,33 @@
         </div>
       </md-toolbar>
 
-      <chart updater="$ctrl.updateChart" options="$ctrl.chartOptions"></chart>
-      <md-card class="chart-container-card">
+      <md-card class="chart-non-ideal chart-container-card"
+               ng-show="$ctrl.designerState === $ctrl.designerStates.noData ||
+                        $ctrl.designerState === $ctrl.designerStates.noSelection">
+        <md-card-content layout="column" layout-align="center center">
+          <span ng-show="$ctrl.designerState === $ctrl.designerStates.noData"
+                translate="NO_DATA_FOR_THIS_CONFIGURATION"></span>
+          <span ng-show="$ctrl.designerState === $ctrl.designerStates.noSelection"
+                translate="PLEASE_SELECT_FIELDS_FOR_CHART"></span>
+          <md-icon md-font-icon="{{$ctrl.CHART_TYPES_OBJ['chart:' + $ctrl.model.chartType].icon.font}}"></md-icon>
+        </md-card-content>
+      </md-card>
+
+      <div layout="column"
+           style="overflow: auto;"
+           >
+        <chart updater="$ctrl.updateChart"
+               ng-if="$ctrl.designerState === $ctrl.designerStates.hasData"
+               options="$ctrl.chartOptions"></chart>
+      </div>
+      <md-card class="chart-container-card" ng-show="$ctrl.xAndYSelected()">
         <md-card-content layout="column">
           <filter-chips filters="$ctrl.filters"
                         on-clear-all-filters="$ctrl.onClearAllFilters()"
                         on-filter-removed="$ctrl.onFilterRemoved(index)">
           </filter-chips>
-          <h3 translate="CUSTOM_AXIS_LABELS"></h3>
-          <div layout="column">
+          <h3 translate="CHART_OPTIONS"></h3>
+          <div layout="column" ng-if="!$ctrl.multyYCharts.includes($ctrl.model.chartType)">
             <div layout="row" layout-align="center">
               <md-input-container flex ng-if="::$ctrl.chartViewOptions.renamable.y">
                   <label ng-bind="::('Custom ' + $ctrl.chartViewOptions.axisLabels.y + ' Label')"></label>
@@ -103,7 +122,7 @@
                   <label ng-bind="::('Custom ' + $ctrl.chartViewOptions.axisLabels.x + ' Label')"></label>
                   <input ng-model="$ctrl.labels.tempX"/>
               </md-input-container>
-              <md-button flex="nogrow" class="btn-primary" ng-click="$ctrl.updateCustomLabels()">
+              <md-button class="btn-primary" ng-click="$ctrl.updateCustomLabels()">
                 <span translate="APPLY"></span>
               </md-button>
             </div>
@@ -126,6 +145,51 @@
             </div>
           </div>
 
+          <div layout="column"
+               ng-if="$ctrl.multyYCharts.includes($ctrl.model.chartType)">
+            <div ng-repeat="y in $ctrl.settings.yaxis | filter:{checked: 'y'} track by y.columnName"
+                 style="padding-bottom:5px;"
+                 layout="row"
+                 layout-align="start center">
+              <md-input-container flex="30" md-no-float>
+                <input ng-model="y.alias" placeholder="{{y.displayName}}"/>
+              </md-input-container>
+              <md-menu flex="30" ng-if="$ctrl.comboableCharts.includes($ctrl.model.chartType)">
+                <md-button class="md-icon-button"
+                            ng-click="$mdMenu.open($event)">
+                  <md-icon md-menu-origin
+                            style="display: inline;"
+                            md-font-icon="{{$ctrl.COMBO_TYPES_OBJ[y.comboType].icon}}"></md-icon>
+                  {{$ctrl.COMBO_TYPES_OBJ[y.comboType].label}}
+                </md-button>
+                <md-menu-content width="4">
+                  <md-menu-item ng-repeat="type in $ctrl.COMBO_TYPES">
+                    <md-button ng-click="$ctrl.onSelectComboType(y, type)"
+                                style="font-size: 14px;">
+                        <md-icon md-font-icon="{{::type.icon}}"></md-icon>
+                        {{type.label}}
+                    </md-button>
+                  </md-menu-item>
+                </md-menu-content>
+              </md-menu>
+            </div>
+            <div layout="row"
+                 layout-align="start center"
+                 ng-repeat="x in $ctrl.settings.xaxis | filter:{checked: 'x'} track by x.columnName">
+              <md-input-container flex="30" md-no-float>
+                <input ng-model="x.alias"
+                       placeholder="{{::x.displayName}}"/>
+              </md-input-container>
+            </div>
+            <div>
+              <md-button class="btn-primary"
+                         ng-click="$ctrl.updateCustomLabels()"
+                         style="margin-top: 10px;">
+                <span translate="APPLY"></span>
+              </md-button>
+            </div>
+          </div>
+
           <h3 translate="LEGEND_OPTIONS" ng-if="::$ctrl.chartViewOptions.legend"></h3>
           <div layout="row" layout-align="center" ng-if="::$ctrl.chartViewOptions.legend">
             <md-input-container flex>
@@ -144,5 +208,6 @@
         </md-card-content>
       </md-card>
     </div>
+  </div>
   </analyze-dialog-content>
 </analyze-dialog>

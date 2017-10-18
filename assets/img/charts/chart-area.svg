@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="429px" height="129px" viewBox="0 0 429 129" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>area-chart-large</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#0068BA" stop-opacity="0.191944067" offset="0%"></stop>
+            <stop stop-color="#0068BA" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="area-chart-large">
+            <polygon id="Path-2" fill="url(#linearGradient-1)" points="37 13 70 42 100 37 130 60 159 13 189 36.5 219 23 250 27 279 77 309 45 340 22 370 51 401 36.5 401 121 36.9986127 121"></polygon>
+            <g id="Group" stroke="#D5D6D6">
+                <polyline id="Path-3" points="10 0 10 121 429 121"></polyline>
+                <path d="M0.383064949,6 L10.0622577,6" id="Path-4"></path>
+                <path d="M0.383064949,16 L10.0622577,16" id="Path-4-Copy"></path>
+                <path d="M0.383064949,26 L10.0622577,26" id="Path-4-Copy-2"></path>
+                <path d="M0.383064949,36 L10.0622577,36" id="Path-4-Copy-3"></path>
+                <path d="M0.383064949,46 L10.0622577,46" id="Path-4-Copy-4"></path>
+                <path d="M0.383064949,56 L10.0622577,56" id="Path-4-Copy-5"></path>
+                <path d="M0.383064949,66 L10.0622577,66" id="Path-4-Copy-6"></path>
+                <path d="M0.383064949,76 L10.0622577,76" id="Path-4-Copy-7"></path>
+                <path d="M0.383064949,86 L10.0622577,86" id="Path-4-Copy-8"></path>
+                <path d="M0.383064949,96 L10.0622577,96" id="Path-4-Copy-9"></path>
+                <path d="M0.383064949,106 L10.0622577,106" id="Path-4-Copy-10"></path>
+                <path d="M0.383064949,116 L10.0622577,116" id="Path-4-Copy-11"></path>
+                <path d="M17.3830649,122 L17.3830649,128.836038" id="Path-4-Copy-12"></path>
+                <path d="M27.3830649,122 L27.3830649,128.836038" id="Path-4-Copy-13"></path>
+                <path d="M37.3830649,122 L37.3830649,128.836038" id="Path-4-Copy-14"></path>
+                <path d="M47.3830649,122 L47.3830649,128.836038" id="Path-4-Copy-15"></path>
+                <path d="M57.3830649,122 L57.3830649,128.836038" id="Path-4-Copy-16"></path>
+                <path d="M67.3830649,122 L67.3830649,128.836038" id="Path-4-Copy-17"></path>
+                <path d="M77.3830649,122 L77.3830649,128.836038" id="Path-4-Copy-18"></path>
+                <path d="M87.3830649,122 L87.3830649,128.836038" id="Path-4-Copy-19"></path>
+                <path d="M97.3830649,122 L97.3830649,128.836038" id="Path-4-Copy-20"></path>
+                <path d="M107.383065,122 L107.383065,128.836038" id="Path-4-Copy-21"></path>
+                <path d="M117.383065,122 L117.383065,128.836038" id="Path-4-Copy-22"></path>
+                <path d="M127.383065,122 L127.383065,128.836038" id="Path-4-Copy-23"></path>
+                <path d="M137.383065,122 L137.383065,128.836038" id="Path-4-Copy-24"></path>
+                <path d="M147.383065,122 L147.383065,128.836038" id="Path-4-Copy-25"></path>
+                <path d="M157.383065,122 L157.383065,128.836038" id="Path-4-Copy-26"></path>
+                <path d="M167.383065,122 L167.383065,128.836038" id="Path-4-Copy-27"></path>
+                <path d="M177.383065,122 L177.383065,128.836038" id="Path-4-Copy-28"></path>
+                <path d="M187.383065,122 L187.383065,128.836038" id="Path-4-Copy-29"></path>
+                <path d="M197.383065,122 L197.383065,128.836038" id="Path-4-Copy-30"></path>
+                <path d="M207.383065,122 L207.383065,128.836038" id="Path-4-Copy-31"></path>
+                <path d="M217.383065,122 L217.383065,128.836038" id="Path-4-Copy-32"></path>
+                <path d="M227.383065,122 L227.383065,128.836038" id="Path-4-Copy-33"></path>
+                <path d="M237.383065,122 L237.383065,128.836038" id="Path-4-Copy-34"></path>
+                <path d="M247.383065,122 L247.383065,128.836038" id="Path-4-Copy-35"></path>
+                <path d="M257.383065,122 L257.383065,128.836038" id="Path-4-Copy-36"></path>
+                <path d="M267.383065,122 L267.383065,128.836038" id="Path-4-Copy-37"></path>
+                <path d="M277.383065,122 L277.383065,128.836038" id="Path-4-Copy-38"></path>
+                <path d="M287.383065,122 L287.383065,128.836038" id="Path-4-Copy-39"></path>
+                <path d="M297.383065,122 L297.383065,128.836038" id="Path-4-Copy-40"></path>
+                <path d="M307.383065,122 L307.383065,128.836038" id="Path-4-Copy-41"></path>
+                <path d="M317.383065,122 L317.383065,128.836038" id="Path-4-Copy-42"></path>
+                <path d="M327.383065,122 L327.383065,128.836038" id="Path-4-Copy-43"></path>
+                <path d="M337.383065,122 L337.383065,128.836038" id="Path-4-Copy-44"></path>
+                <path d="M347.383065,122 L347.383065,128.836038" id="Path-4-Copy-45"></path>
+                <path d="M357.383065,122 L357.383065,128.836038" id="Path-4-Copy-46"></path>
+                <path d="M367.383065,122 L367.383065,128.836038" id="Path-4-Copy-47"></path>
+                <path d="M377.383065,122 L377.383065,128.836038" id="Path-4-Copy-48"></path>
+                <path d="M387.383065,122 L387.383065,128.836038" id="Path-4-Copy-49"></path>
+                <path d="M397.383065,122 L397.383065,128.836038" id="Path-4-Copy-50"></path>
+                <path d="M407.383065,122 L407.383065,128.836038" id="Path-4-Copy-51"></path>
+                <path d="M417.383065,122 L417.383065,128.836038" id="Path-4-Copy-52"></path>
+                <path d="M427.383065,122 L427.383065,128.836038" id="Path-4-Copy-53"></path>
+            </g>
+            <polyline id="Path-2" stroke="#0075BF" stroke-width="2" points="37 13 70 42 100 37 130 60 159 13 189 36.5 219 23 250 27 279 77 309 45 340 22 370 51 401 36.5"></polyline>
+            <circle id="Oval" stroke="#0075BF" stroke-width="3" fill="#FFFFFF" cx="37" cy="13" r="4"></circle>
+            <circle id="Oval-Copy" stroke="#0075BF" stroke-width="3" fill="#FFFFFF" cx="69" cy="42" r="4"></circle>
+            <circle id="Oval-Copy-2" stroke="#0075BF" stroke-width="3" fill="#FFFFFF" cx="99" cy="37" r="4"></circle>
+            <circle id="Oval-Copy-3" stroke="#0075BF" stroke-width="3" fill="#FFFFFF" cx="130" cy="59" r="4"></circle>
+            <circle id="Oval-Copy-4" stroke="#0075BF" stroke-width="3" fill="#FFFFFF" cx="159" cy="13" r="4"></circle>
+            <circle id="Oval-Copy-5" stroke="#0075BF" stroke-width="3" fill="#FFFFFF" cx="189" cy="36" r="4"></circle>
+            <circle id="Oval-Copy-6" stroke="#0075BF" stroke-width="3" fill="#FFFFFF" cx="218" cy="23" r="4"></circle>
+            <circle id="Oval-Copy-7" stroke="#0075BF" stroke-width="3" fill="#FFFFFF" cx="249" cy="27" r="4"></circle>
+            <circle id="Oval-Copy-9" stroke="#0075BF" stroke-width="3" fill="#FFFFFF" cx="309" cy="46" r="4"></circle>
+            <circle id="Oval-Copy-10" stroke="#0075BF" stroke-width="3" fill="#FFFFFF" cx="340" cy="23" r="4"></circle>
+            <circle id="Oval-Copy-11" stroke="#0075BF" stroke-width="3" fill="#FFFFFF" cx="370" cy="51" r="4"></circle>
+            <circle id="Oval-Copy-12" stroke="#0075BF" stroke-width="3" fill="#FFFFFF" cx="401" cy="37" r="4"></circle>
+        </g>
+    </g>
+</svg>

@@ -33,9 +33,10 @@
                               ng-if="$ctrl.analysis"
                               exclude="publish-fork-edit"
                               on-successful-deletion="$ctrl.onSuccessfulDeletion(analysis)"
+                              on-front-end-export="$ctrl.exportData()"
         ></analyze-actions-menu>
 
-        <md-button ng-hide="$ctrl.isPublished && !$ctrl.canUserPublish"
+        <md-button ng-hide="!$ctrl.canUserPublish"
                    class="btn-primary"
                    e2e="action-publish-btn"
                    ng-click="$ctrl.publish()">
