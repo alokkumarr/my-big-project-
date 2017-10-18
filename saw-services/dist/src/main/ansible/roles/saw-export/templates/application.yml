@@ -12,6 +12,7 @@ server:
 
 analysis:
     service:
-        host: https://saw.bda.poc.velocity-va.synchronoss.net/api
+        host: http://localhost:9200
 
-       
+logging:
+  config: /opt/bda/saw-export-service/conf/logback.xml       

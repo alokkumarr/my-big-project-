@@ -21,7 +21,10 @@ semantic:
         host: https://saw.bda.poc.velocity-va.synchronoss.net/api
 security:
     service:
-        host: http://localhost:8081/saw-security
+        host: http://localhost:9000/saw-security
+export:
+    service:
+        host: http://localhost:9400       
 
 
 api:
@@ -39,3 +42,9 @@ api:
         -   location: ${semantic.service.host}
             method: POST
             path: '[/]semantic*'          
+        -   location: ${export.service.host}
+            method : GET
+            path : '[/]export.*'
+        
+        
+        

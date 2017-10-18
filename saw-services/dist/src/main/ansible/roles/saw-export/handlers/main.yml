@@ -1,0 +1,2 @@
+- name: restart saw-export
+  systemd: name=saw-export state=restarted daemon_reload=true

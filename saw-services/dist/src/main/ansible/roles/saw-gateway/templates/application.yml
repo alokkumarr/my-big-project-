@@ -27,6 +27,9 @@ semantic:
 security:
     service:
         host: http://localhost:9000/saw-security
+export:
+    service:
+        host: http://localhost:9400
 
 api:
     gateway:
@@ -46,5 +49,8 @@ api:
         -   location: ${analysis.service.host}
             method: GET
             path: '/api/analyses.*'
+        -   location: ${export.service.host}
+            method : GET
+            path : '[/]export.*'    
 logging:
   config: /opt/bda/saw-gateway-service/conf/logback.xml
