@@ -18,4 +18,4 @@ saw/saw-deploy /root/saw-config
 sed -i -e 's,log4.log,/tmp/log4.log,' /opt/mapr/conf/log4j.properties
 
 # Load SAW test metrics
-/root/saw-metrics/saw-metrics
+#/root/saw-metrics/saw-metrics
