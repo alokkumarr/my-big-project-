@@ -32,25 +32,38 @@ describe('create a new report type analysis', () => {
   const metric = 'MCT Events aggregated by session (view)';
   const method = 'table:report';
 
+  afterAll(function() {
+    browser.executeScript('window.sessionStorage.clear();');
+    browser.executeScript('window.localStorage.clear();');
+  });
+
   it('login as admin', () => {
     expect(browser.getCurrentUrl()).toContain('/login');
     login.loginAs('admin');
   });
 
-  it('should open the sidenav menu and go to first category', () => {
+  //Obsolete. Now menu opens automatically with first category expanded
+  /* it('should open the sidenav menu and go to first category', () => {
     commonFunctions.waitFor.elementToBeClickable(sidenav.menuBtn);
     sidenav.menuBtn.click();
     sidenav.publicCategoriesToggle.click();
     categoryName = sidenav.firstPublicCategory.getText();
     sidenav.firstPublicCategory.click();
     expect(analyze.main.categoryTitle.getText()).toEqual(categoryName);
+  }); */
+
+  it('should display list view by default', () => {
+    categoryName = sidenav.firstPublicCategory.getText();
+    analyze.validateListView();
   });
 
-  it('should display card view by default', () => {
-    analyze.validateCardView();
+  it('should switch to card view', () => {
+    commonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
+    analyze.analysisElems.cardView.click();
   });
 
   it('should open the new Analysis dialog', () => {
+    commonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.addAnalysisBtn);
     analyze.analysisElems.addAnalysisBtn.click();
     analyze.validateNewAnalyze();
   });
@@ -61,21 +74,6 @@ describe('create a new report type analysis', () => {
     newDialog.getMethod(method).click();
     newDialog.createBtn.click();
     expect(reportDesigner.title.isPresent()).toBe(true);
-  });
-
-  it('should apply filters', () => {
-    const filters = analyze.filtersDialog;
-    const filterAC = filters.getFilterAutocomplete(0);
-    const stringFilterInput = filters.getStringFilterInput(0);
-    const fieldName = tables[0].fields[0];
-
-    reportDesigner.openFiltersBtn.click();
-    filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
-    stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
-    filters.applyBtn.click();
-    reportDesigner.expandBtn.click();
-
-    expect(filters.getAppliedFilter(fieldName).isPresent()).toBe(true);
   });
 
   it('should select fields and refresh data', () => {
@@ -104,11 +102,30 @@ describe('create a new report type analysis', () => {
     reportDesigner.refreshBtn.click();
   });
 
+  it('should apply filters', () => {
+    const filters = analyze.filtersDialog;
+    const filterAC = filters.getFilterAutocomplete(0);
+    const stringFilterInput = filters.getStringFilterInput(0);
+    const fieldName = tables[0].fields[0];
+
+    commonFunctions.waitFor.elementToBeClickable(reportDesigner.openFiltersBtn);
+    // browser.sleep(100000);
+    reportDesigner.openFiltersBtn.click();
+    filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
+    stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
+    filters.applyBtn.click();
+
+    const appliedFilter = filters.getAppliedFilter(fieldName);
+    commonFunctions.waitFor.elementToBePresent(appliedFilter);
+    expect(appliedFilter.isPresent()).toBe(true);
+  });
+
   it('should attempt to save the report', () => {
     const save = analyze.saveDialog;
     const designer = analyze.designerDialog;
     commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
-    browser.actions().mouseMove(designer.saveBtn).click();
+    // browser.actions().mouseMove(designer.saveBtn).click();
+    designer.saveBtn.click();
 
     commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
     expect(designer.saveDialog).toBeTruthy();

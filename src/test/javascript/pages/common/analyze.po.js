@@ -11,7 +11,7 @@ const firstCard = element.all(by.css('md-card[e2e="analysis-card"]')).first();
 
 const getForkBtn = parent => parent.element(by.css('button[e2e="action-fork-btn"]'));
 
-const getCardTitle = name => element(by.cssContainingText('a[e2e="analysis-name"]', name));
+const getCardTitle = name => element(by.xpath(`//a[@e2e="analysis-name" and text() = "${name}"]`));
 const firstCardTitle = element.all(by.css('a[e2e="analysis-name"]')).first();
 
 const doAnalysisAction = (name, action) => {
@@ -40,6 +40,10 @@ const getAnalysisOption = (parent, option) => parent.element(by.css(`button[e2e=
 const getChartSettingsRadio = (axis, name) => {
   return element(by.css(`md-radio-group[ng-model="$ctrl.selected.${axis}"]`))
     .element(by.css(`md-radio-button[e2e="radio-button-${name}"]`));
+};
+
+const getChartSettingsCheckBox = name => {
+  return element(by.xpath(`//md-checkbox[@ng-model="attr.checked"]/*/span[text()="${name}"]/parent::*/preceding-sibling::*`));
 };
 
 const openFiltersBtn = element(by.css('button[ng-click="$ctrl.openFiltersModal($event)"]'));
@@ -133,7 +137,8 @@ module.exports = {
     saveDialog: element(by.css('analyze-save-dialog')),
     chart: {
       getXRadio: name => getChartSettingsRadio('x', name),
-      getYRadio: name => getChartSettingsRadio('y', name),
+      getYCheckBox: name => getChartSettingsCheckBox(name),
+      getYCheckBoxParent: name => commonFunctions.find.parent(getChartSettingsCheckBox(name)),
       getZRadio: name => getChartSettingsRadio('z', name),
       getGroupRadio: name => getChartSettingsRadio('g', name),
       container: element(by.css('.highcharts-container ')),
@@ -182,7 +187,7 @@ module.exports = {
     firstCardTitle
   },
   saveDialog: {
-    selectedCategory: element(by.css('md-select[e2e="save-dialog-selected-category"]')),
+    selectedCategory: element(by.xpath('//md-select[@e2e="save-dialog-selected-category"]/*/span[1]')),
     nameInput: element(by.css('input[e2e="save-dialog-name"]')),
     descriptionInput: element(by.css('textarea[e2e="save-dialog-description"]')),
     saveBtn: element(by.css('button[e2e="save-dialog-save-analysis"]')),
@@ -236,6 +241,10 @@ module.exports = {
 
   validateCardView() {
     expect(this.analysisElems.cardView.getAttribute('aria-checked')).toEqual('true');
+  },
+
+  validateListView() {
+    expect(this.analysisElems.listView.getAttribute('aria-checked')).toEqual('true');
   },
 
   validateNewAnalyze() {

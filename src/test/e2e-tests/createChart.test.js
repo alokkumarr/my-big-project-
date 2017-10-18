@@ -17,21 +17,33 @@ describe('create columnChart type analysis', () => {
   const metric = 'MCT Content';
   const method = 'chart:column';
 
+  afterAll(function() {
+    browser.executeScript('window.sessionStorage.clear();');
+    browser.executeScript('window.localStorage.clear();');
+  });
+
   it('login as admin', () => {
     expect(browser.getCurrentUrl()).toContain('/login');
     login.loginAs('admin');
   });
 
-  it('should open the sidenav menu and go to first category', () => {
+  //Obsolete. Now menu opens automatically with first category expanded
+  /* it('should open the sidenav menu and go to first category', () => {
     sidenav.menuBtn.click();
     sidenav.publicCategoriesToggle.click();
     categoryName = sidenav.firstPublicCategory.getText();
     sidenav.firstPublicCategory.click();
     expect(analyze.main.categoryTitle.getText()).toEqual(categoryName);
+  }); */
+
+  it('should display list view by default', () => {
+    categoryName = sidenav.firstPublicCategory.getText();
+    analyze.validateListView();
   });
 
-  it('should display card view by default', () => {
-    analyze.validateCardView();
+  it('should switch to card view', () => {
+    commonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
+    analyze.analysisElems.cardView.click();
   });
 
   it('should open the new Analysis dialog', () => {
@@ -45,6 +57,24 @@ describe('create columnChart type analysis', () => {
     newDialog.getMethod(method).click();
     newDialog.createBtn.click();
     expect(chartDesigner.title.isPresent()).toBe(true);
+  });
+
+  it('should select x, y axes and a grouping', () => {
+    const refreshBtn = chartDesigner.refreshBtn;
+    const x = chartDesigner.getXRadio(xAxisName);
+    const y = chartDesigner.getYCheckBox(yAxisName);
+    const g = chartDesigner.getGroupRadio(groupName);
+    x.click();
+    commonFunctions.waitFor.elementToBeClickable(y);
+    y.click();
+    g.click();
+    const yParent = chartDesigner.getYCheckBoxParent(yAxisName);
+    expect(hasClass(x, 'md-checked')).toBeTruthy();
+    expect(hasClass(yParent, 'md-checked')).toBeTruthy();
+    expect(hasClass(g, 'md-checked')).toBeTruthy();
+    const doesDataNeedRefreshing = hasClass(refreshBtn, 'btn-primary');
+    expect(doesDataNeedRefreshing).toBeTruthy();
+    refreshBtn.click();
   });
 
   it('should apply filters', () => {
@@ -61,22 +91,6 @@ describe('create columnChart type analysis', () => {
     const appliedFilter = filters.getAppliedFilter(fieldName);
     commonFunctions.waitFor.elementToBePresent(appliedFilter);
     expect(appliedFilter.isPresent()).toBe(true);
-  });
-
-  it('should select x, y axes and a grouping', () => {
-    const refreshBtn = chartDesigner.refreshBtn;
-    const x = chartDesigner.getXRadio(xAxisName);
-    const y = chartDesigner.getYRadio(yAxisName);
-    const g = chartDesigner.getGroupRadio(groupName);
-    x.click();
-    y.click();
-    g.click();
-    expect(hasClass(x, 'md-checked')).toBeTruthy();
-    expect(hasClass(y, 'md-checked')).toBeTruthy();
-    expect(hasClass(g, 'md-checked')).toBeTruthy();
-    const doesDataNeedRefreshing = hasClass(refreshBtn, 'btn-primary');
-    expect(doesDataNeedRefreshing).toBeTruthy();
-    refreshBtn.click();
   });
 
   it('should attempt to save the report', () => {

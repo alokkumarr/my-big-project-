@@ -17,22 +17,34 @@ describe('create a new pivot type analysis', () => {
   const metric = 'MCT Content';
   const method = 'table:pivot';
 
+  afterAll(function() {
+    browser.executeScript('window.sessionStorage.clear();');
+    browser.executeScript('window.localStorage.clear();');
+  });
+
   it('login as admin', () => {
     browser.waitForAngular();
     expect(browser.getCurrentUrl()).toContain('/login');
     login.loginAs('admin');
   });
 
-  it('should open the sidenav menu and go to first category', () => {
+  //Obsolete. Now menu opens automatically with first category expanded
+  /* it('should open the sidenav menu and go to first category', () => {
     sidenav.menuBtn.click();
     sidenav.publicCategoriesToggle.click();
     categoryName = sidenav.firstPublicCategory.getText();
     sidenav.firstPublicCategory.click();
     expect(analyze.main.categoryTitle.getText()).toEqual(categoryName);
+  }); */
+
+  it('should display list view by default', () => {
+    categoryName = sidenav.firstPublicCategory.getText();
+    analyze.validateListView();
   });
 
-  it('should display card view by default', () => {
-    analyze.validateCardView();
+  it('should switch to card view', () => {
+    commonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
+    analyze.analysisElems.cardView.click();
   });
 
   it('should open the new Analysis dialog', () => {
