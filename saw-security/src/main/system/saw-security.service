@@ -1,0 +1,9 @@
+[Unit]
+Description=SAW Security
+
+[Service]
+ExecStart=/opt/bda/saw-security/bin/saw-security.sh start --fg
+SyslogIdentifier=saw-security
+
+[Install]
+WantedBy=default.target

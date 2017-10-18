@@ -1,0 +1,6 @@
+- name: SAW Security
+  hosts: saw-security
+  become: true
+  roles:
+    - saw-security-db
+    - saw-security-web

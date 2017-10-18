@@ -1,0 +1,124 @@
+#!/bin/bash 
+###
+# This script executes post-install step(s):
+# - get 'db.init.password' parameter value from
+#   /etc/bda/saw-security.vars file, if found -
+#   calculate encrypted value for 'ds.cpass' vars parameter;
+# - create application configuration file(s) from template(s)
+#   in conf/templates;
+# - execute DB initial seturp script: $APPL_HOME/db/setup/Initial_Setup.py
+# The script is executed as root during post-install phase
+# of application rpm installation.
+# Required files:
+#   /etc/bda/saw-security.vars
+#   $CMD_DIR/appl_info
+#   $APPL_HOME/bin/mk_conf.sh
+#   $APPL_HOME/bin/ccode.sh
+#   $APPL_HOME/lib/$APPL_NAME*.jar
+#   $APPL_HOME/conf/templates/*
+###
+[[ $DEBUG ]] && set -vx
+
+CMD_DIR=$( cd $( dirname $0 ); pwd )
+
+# Check appl_info DB is available
+( $CMD_DIR/appl_info ) || exit $?
+# Function API
+appl_info() {
+    $CMD_DIR/appl_info ${1:?arg missing}
+}
+
+# Get and check application properties
+# Application name
+APPL_NAME=$( appl_info name )
+: ${APPL_NAME:?no value}
+# Application home directory
+APPL_HOME=$( appl_info optdir )
+: ${APPL_HOME:?no value}
+( cd $APPL_HOME ) || exit $?
+# Application user
+APPL_USER=$( appl_info user )
+: ${APPL_USER:?no value}
+# Application group
+APPL_GROUP=$( appl_info group )
+: ${APPL_GROUP:?no value}
+
+# Check vars file exists
+vars_file=/etc/bda/$APPL_NAME.vars
+( <$vars_file ) || exit $?
+
+# Check mk_conf.sh can be executed
+( $APPL_HOME/bin/mk_conf.sh -h >/dev/null ) || exit $?
+# Function API
+mk_conf() {
+    $APPL_HOME/bin/mk_conf.sh "$@"
+}
+
+# extended pattern matching operators
+shopt -s extglob
+
+# Parse VARS file, get value of db.init.password
+db_init_pass=
+while read s ; do
+    # trim comment
+    s=${s%%\#*}
+    # Check assignment
+    [[ $s == *=* ]] || continue
+    # remove all spaces
+    s=$(tr -d ' ' <<<"$s")
+    # extract name and value
+    snam=${s%%=*} 
+    [[ $snam = db.init.password ]] && {
+        sval=${s#*=}
+        db_init_pass="$sval"
+        break
+    }
+done < $vars_file
+ds_cpass_val=
+[[ $db_init_pass ]] && {
+    # Calc pass crypto
+    ( $APPL_HOME/bin/ccode.sh ) || exit
+    db_cenc_pass=$($APPL_HOME/bin/ccode.sh "$db_init_pass")
+    ds_cpass_val='db.cpass='"$db_cenc_pass"
+    echo '# pass crypto created'
+}
+
+# Generate conf files from template
+for tfn in $APPL_HOME/conf/templates/* ; do
+    bfn=$(basename $tfn)
+    echo "# generate $APPL_NAME conf file: $bfn"
+    conf_tmpl=$tfn
+    conf_file=$APPL_HOME/conf/$bfn
+    xarg=
+    [[ $bfn = application.properties ]] && xarg="$ds_cpass_val"
+    mk_conf $conf_tmpl $vars_file "$xarg" >$conf_file || {
+        # remove empty file
+        [[ -s $conf_file ]] || rm -f $conf_file
+        echo "
+***************************************
+* ERROR creating configuration file:
+* $conf_file
+* Check contents of files:
+*   template: $conf_tmpl
+*   vars: $vars_file
+* and fix manually by excuting command:
+=======================================
+\$ $APPL_HOME/bin/mk_conf.sh $conf_tmpl $vars_file $xarg >$conf_file
+=======================================
+"
+        exit 1
+    }
+    [[ -s $conf_file ]] && {
+        chown $APPL_USER:$APPL_GROUP $conf_file &&
+        chmod 0644 $conf_file
+        echo "# $APPL_NAME conf file created: $conf_file"
+    }
+done
+
+echo '========================================'
+echo '# Manual step required to'
+echo '# execute DB Initial Setup'
+echo sudo python $APPL_HOME/db/setup/Initial_Setup.py --vars
+echo '========================================'
+
+exit

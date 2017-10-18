@@ -1,0 +1,12 @@
+[Unit]
+Description=Deploy SAW application
+After=default.target
+
+[Service]
+Type=oneshot
+ExecStart=/root/deploy
+WorkingDirectory=/maven
+SyslogIdentifier=saw-deploy
+
+[Install]
+WantedBy=default.target

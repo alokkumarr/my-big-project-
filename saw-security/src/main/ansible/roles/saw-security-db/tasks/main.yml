@@ -1,0 +1,6 @@
+- name: Install MariaDB package
+  yum: name=mariadb-server state=present
+- name: Install MariaDB configuration additions
+  template: src=mysql-saw.cnf dest=/etc/my.cnf.d/saw.cnf
+- name: Enable and start MariaDB service
+  systemd: name=mariadb enabled=true state=started

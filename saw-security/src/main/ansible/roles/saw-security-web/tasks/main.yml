@@ -1,0 +1,19 @@
+- name: Create SAW Security group
+  group: name=saw
+- name: Create SAW Security user
+  user: name=saw group=saw
+- name: Create BDA directory
+  file: path=/etc/bda state=directory
+- name: Create SAW Security variables file
+  template: src=saw-security.vars dest=/etc/bda/saw-security.vars
+- name: Install SAW Security package
+  yum: name="{{ item }}" state=present
+  with_fileglob: ["../rpms/saw-security-*.rpm"]
+  notify:
+    - restart saw-security
+- name: Run SAW Security configuration initialization
+  command: /opt/bda/saw-security/bin/conf_init
+- name: Run SAW Security initial database setup
+  command: /opt/bda/saw-security/db/setup/init
+- name: Enable SAW Security service
+  systemd: name=saw-security enabled=true daemon_reload=true

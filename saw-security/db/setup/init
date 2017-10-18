@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+# Run initial database setup
+#
+set -eu
+
+dir=$(dirname $0)
+
+# Use a marker file to ensure database setup is only run once, until
+# automatic migration (including initial setup) is implemented
+marker=/etc/bda/saw-security-initial-setup
+if [ -f $marker ]; then
+    echo "Initial database setup has already been run, so not running again"
+    echo "(Marker file: $marker)"
+    exit
+fi
+touch $marker
+
+# Create database users
+mysql -u root < $dir/init.sql
+
+# Populate database
+python $dir/Initial_Setup.py --vars

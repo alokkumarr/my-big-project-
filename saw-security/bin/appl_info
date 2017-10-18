@@ -1,0 +1,15 @@
+#!/bin/bash
+awk "(\$1 == \"${1:-:}:\"){print \$2; exit;}" $0; exit
+
+# values provided from pom
+name:    saw-security
+version: 2.0.0_wip
+release: 0-fffff
+#
+user:    saw
+group:   saw
+#
+optdir:  /opt/bda/saw-security
+vardir:  /var/bda/saw-security
+#
+# more values can be added on the box
