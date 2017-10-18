@@ -1,0 +1,11 @@
+[Unit]
+Description=SAW Export
+
+[Service]
+ExecStart=/bin/sh -c "exec java -jar /opt/bda/saw-export-service/saw-export.jar --spring.config.location=/opt/bda/saw-export-service/conf/application.yml"
+SyslogIdentifier=saw-export
+User=mapr
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
