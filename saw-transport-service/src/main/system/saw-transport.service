@@ -2,7 +2,7 @@
 Description=SAW Transport
 
 [Service]
-ExecStart=/opt/saw/service/bin/sawsrvc_start.sh --fxj -v
+ExecStart=/opt/saw/service/bin/sawsrvc_start.sh --fxj
 SyslogIdentifier=saw-transport
 User=mapr
 Restart=on-failure
