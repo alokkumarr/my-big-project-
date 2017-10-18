@@ -53,13 +53,11 @@ public class ServicesApiIT {
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
-    /*
     @Test
     public void testListExecute() throws JsonProcessingException {
         String token = authenticate();
         list(token);
     }
-    */
 
     private static final String TEST_USERNAME = "sawadmin@synchronoss.com";
     private static final String TEST_PASSWORD = "Sawsyncnewuser1!";

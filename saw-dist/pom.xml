@@ -152,6 +152,7 @@
                 <namingStrategy>${saw.docker.naming}</namingStrategy>
                 <network>
                   <name>saw</name>
+                  <alias>saw-mapr</alias>
                 </network>
                 <ports> 
                   <port>saw.mcs.port:8443</port>
