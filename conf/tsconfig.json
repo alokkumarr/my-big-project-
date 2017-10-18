@@ -6,11 +6,17 @@
     "allowSyntheticDefaultImports": true,
     "noStrictGenericChecks": true,
     "experimentalDecorators": true,
-    "lib" : ["es2015", "es2015.iterable", "dom"],
+    "emitDecoratorMetadata": true,
+    "lib" : ["es2015", "es2015.iterable", "dom", "es6", "es2017"],
     "allowJs": true
   },
   "exclude": [
-    "node_modules/**/*",
-    "**/*.spec.ts"
+    "node_modules",
+    "**/*.spec.ts",
+    "src/test",
+    "src/main/javascript/middlelayer",
+    "src/main/javascript/styleguide",
+    "conf",
+    "dist"
   ]
 }

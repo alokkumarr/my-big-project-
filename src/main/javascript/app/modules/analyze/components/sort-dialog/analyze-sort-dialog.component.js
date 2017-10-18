@@ -1,5 +1,6 @@
 import * as find from 'lodash/find';
 import * as forEach from 'lodash/forEach';
+import * as isEmpty from 'lodash/isEmpty';
 
 import * as template from './analyze-sort-dialog.component.html';
 import style from './analyze-sort-dialog.component.scss';
@@ -29,6 +30,10 @@ export const AnalyzeSortDialogComponent = {
           this.model.sorts[key].field = target;
         }
       });
+      if (isEmpty(this.model.sorts)) {
+        this.addSort();
+      }
+
     }
 
     addSort() {

@@ -68,28 +68,35 @@ export const PrivilegesListViewComponent = {
         dataField: 'productName',
         allowSorting: true,
         alignment: 'left',
-        width: '15%',
+        width: '10%',
         cellTemplate: 'productCellTemplate'
       }, {
         caption: 'MODULE',
         dataField: 'moduleName',
         allowSorting: true,
         alignment: 'left',
-        width: '15%',
+        width: '10%',
         cellTemplate: 'moduleCellTemplate'
       }, {
         caption: 'CATEGORY',
         dataField: 'categoryName',
         allowSorting: true,
         alignment: 'left',
-        width: '15%',
+        width: '12%',
         cellTemplate: 'categoryCellTemplate'
+      }, {
+        caption: 'SUB CATEGORY',
+        dataField: 'subCategoryName',
+        allowSorting: true,
+        alignment: 'left',
+        width: '15%',
+        cellTemplate: 'subCategoryCellTemplate'
       }, {
         caption: 'ROLE',
         dataField: 'roleName',
         allowSorting: true,
         alignment: 'left',
-        width: '14%',
+        width: '12%',
         cellTemplate: 'roleCellTemplate'
       }, {
         caption: 'PRIVILEGE DESC',

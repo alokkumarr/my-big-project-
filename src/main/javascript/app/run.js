@@ -13,7 +13,6 @@ export function runConfig($rootScope, $state, $location, $window, JwtService, Id
     if (data && data.title) {
       return data.title;
     }
-
     return 'Synchronoss';
   };
 
@@ -37,7 +36,7 @@ export function runConfig($rootScope, $state, $location, $window, JwtService, Id
     );
 
     /* See if the state we're going to is in the list of supported modules */
-    const allowed = some(modules, moduleName => startsWith(toState, moduleName));
+    const allowed = some(modules, moduleName => startsWith(toState, moduleName) || startsWith(toState, 'observe'));
 
     if (!allowed) {
       $log.error(new Error(`Privilege to access ${toState} not present.`));

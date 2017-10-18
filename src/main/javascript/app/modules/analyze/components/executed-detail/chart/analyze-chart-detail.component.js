@@ -37,7 +37,6 @@ export const AnalyzeChartDetailComponent = {
         this._SortService.mapBackend2FrontendSort(this.analysis.sqlBuilder.sorts, this.sortFields) : [];
       this.labels.x = get(this.analysis, 'xAxis.title', null);
       this.labels.y = get(this.analysis, 'yAxis.title', null);
-
       this.legend = {
         align: get(this.analysis, 'legend.align', 'right'),
         layout: get(this.analysis, 'legend.layout', 'vertical'),
@@ -72,7 +71,7 @@ export const AnalyzeChartDetailComponent = {
         this.analysis.chartType,
         this.settings,
         this.filteredData,
-        {labels: this.labels, labelOptions: this.analysis.labelOptions}
+        {labels: this.labels, labelOptions: this.analysis.labelOptions, sorts: this.sorts}
       );
 
       this.chartUpdater.next(changes);

@@ -17,6 +17,7 @@ export const ErrorDetailComponent = {
 
     $onInit() {
       this.errorMessage = this._ErrorDetail.getTitle(this.errorObj);
+      this.errorBody = this._ErrorDetail.getDetail(this.errorObj);
     }
 
     cancel() {
