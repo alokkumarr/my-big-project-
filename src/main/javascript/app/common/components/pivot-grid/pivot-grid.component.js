@@ -28,6 +28,7 @@ export const PivotGridComponent = {
       $translate(values(this.warnings)).then(translations => {
         this.warnings = mapValues(this.warnings, warning => translations[warning]);
       });
+      this.preExportState = null;
     }
 
     $onInit() {
@@ -38,6 +39,10 @@ export const PivotGridComponent = {
         onContentReady: () => {
           const fields = this._gridInstance.getDataSource().fields();
           this.onContentReady({fields});
+        },
+        onExported: e => {
+          e.component.getDataSource().state(this.preExportState);
+          this.preExportState = null;
         }
       }, this.getDefaultOptions());
 
@@ -78,6 +83,10 @@ export const PivotGridComponent = {
     }
 
     exportToExcel() {
+      const dataSource = this._gridInstance.getDataSource();
+      const fields = dataSource.fields();
+      this.preExportState = dataSource.state();
+      forEach(fields, ({dataField}) => dataSource.expandAll(dataField));
       this._gridInstance.exportToExcel();
     }
 
@@ -115,7 +124,7 @@ export const PivotGridComponent = {
         showBorders: true,
         allowSorting: false,
         allowFiltering: false,
-        allowExpandAll: false,
+        allowExpandAll: true,
         fieldChooser: {
           enabled: false
         },

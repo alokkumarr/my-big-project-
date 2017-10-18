@@ -122,7 +122,7 @@ export const PrivilegeNewComponent = {
     getSubCategories(inputProductId, inputRoleId, inputModuleId, inputCategoryCode) {
       this.SCList = [];
       this.subCategoriesList = [];
-      if(inputProductId > 0 && inputRoleId > 0 && inputModuleId > 0 &&  inputCategoryCode != '' ){
+      if (inputProductId > 0 && inputRoleId > 0 && inputModuleId > 0 && inputCategoryCode !== '') {
         this._$rootScope.showProgress = true;
         const inputObject = {
           customerId: this.customerId,
@@ -199,7 +199,7 @@ export const PrivilegeNewComponent = {
           privilegeDesc: 'No Access',
           subCategoryId: 0,
           privilegeId: 0
-        }
+        };
         this.changeNewObjectFlag = 0;
         this.desc = '';
         this.codeString = '';

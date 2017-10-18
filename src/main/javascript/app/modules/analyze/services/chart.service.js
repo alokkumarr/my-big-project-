@@ -28,7 +28,7 @@ import * as sortBy from 'lodash/sortBy';
 import * as moment from 'moment';
 import * as toString from 'lodash/toString';
 
-import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ} from '../consts';
+import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS} from '../consts';
 
 const LEGEND_POSITIONING = {
   left: {
@@ -129,15 +129,17 @@ export function ChartService(Highcharts) {
 
   /* Returns default chart config for various chart types */
   const getChartConfigFor = (type, options) => {
-    const legendPosition = LEGEND_POSITIONING[get(options, 'legend.align', 'right')];
-    const legendLayout = LAYOUT_POSITIONS[get(options, 'legend.layout', 'vertical')];
+    const initialLegendPosition = type === 'combo' ? 'top' : 'right';
+    const initialLegendLayout = type === 'combo' ? 'horizontal' : 'vertical';
+    const legendPosition = LEGEND_POSITIONING[get(options, 'legend.align', initialLegendPosition)];
+    const legendLayout = LAYOUT_POSITIONS[get(options, 'legend.layout', initialLegendLayout)];
 
     const SPACING = 45;
     const HEIGHT = (angular.isUndefined(options.chart) ? 400 : options.chart.height);
 
     const config = {
       chart: {
-        type: (type === 'line' ? 'spline' : type) || 'column',
+        type: ['combo', 'bar'].includes(type) ? null : splinifyChartType(type),
         spacingLeft: SPACING,
         spacingRight: SPACING,
         spacingBottom: SPACING,
@@ -173,6 +175,7 @@ export function ChartService(Highcharts) {
   /* Provides view related configuration for various chart types */
   function getViewOptionsFor(type) {
     const config = {
+      yAxisLabels: [],
       axisLabels: {
         x: 'Dimensions', y: 'Metrics', z: 'Z-Axis', g: 'Group By'
       },
@@ -212,6 +215,7 @@ export function ChartService(Highcharts) {
     case 'column':
     case 'bar':
     case 'line':
+    case 'area':
     case 'spline':
     case 'stack':
     case 'scatter':
@@ -285,11 +289,10 @@ export function ChartService(Highcharts) {
     } else {
       const axesFieldNameMap = getAxesFieldNameMap(fields);
       const yField = fields.y[0];
-      series = [{
-        name: yField.alias || yField.displayName,
-        data: map(parsedData,
-          dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val]))
-      }];
+      series = [getSerie(yField, 0)];
+      series[0].data = map(parsedData,
+        dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])
+      );
     }
     // split out categories frem the data
     forEach(series, serie => {
@@ -338,11 +341,22 @@ export function ChartService(Highcharts) {
         serie.data = sortBy(serie.data, 'x');
       });
     }
-
     return {
       series,
       categories
     };
+  }
+
+  function splinifyChartType(type) {
+    switch (type) {
+    case 'line':
+      return 'spline';
+    case 'area':
+      return 'areaspline';
+    default:
+      return type;
+
+    }
   }
 
   function getSortValue(field, value) {
@@ -367,23 +381,35 @@ export function ChartService(Highcharts) {
     }
   }
 
-  function splitSeriesByGroup(parsedData, fields) {
-    const axesFieldNameMap = getAxesFieldNameMap(fields);
+  function getSerie({alias, displayName, comboType, aggregate}, index) {
+    const splinifiedChartType = splinifyChartType(comboType);
+    const zIndex = getZIndex(comboType);
+    return {
+      name: alias || `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`,
+      type: splinifiedChartType,
+      yAxis: index,
+      zIndex,
+      data: []
+    };
+  }
 
-    return fpPipe(
-      fpMap(dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])),
-      fpGroupBy('g'),
-      fpToPairs,
-      fpMap(([name, data]) => ({name, data}))
-    )(parsedData);
+  function getZIndex(type) {
+    switch (type) {
+    case 'area':
+      return 0;
+    case 'column':
+    case 'bar':
+      return 1;
+    case 'pline':
+      return 3;
+    default:
+      return 4;
+    }
   }
 
   function splitSeriesByYAxes(parsedData, fields) {
     const axesFieldNameMap = getAxesFieldNameMap(fields, 'y');
-    const series = map(fields.y, ({alias, displayName, aggregate}) => ({
-      name: `${AGGREGATE_TYPES_OBJ[aggregate].label} ${alias || displayName}`,
-      data: []
-    }));
+    const series = map(fields.y, getSerie);
 
     forEach(parsedData, dataPoint => {
       forEach(fields.y, (field, index) => {
@@ -395,6 +421,18 @@ export function ChartService(Highcharts) {
     });
 
     return series;
+  }
+
+  function splitSeriesByGroup(parsedData, fields) {
+    const axesFieldNameMap = getAxesFieldNameMap(fields);
+    const comboType = fields.y[0].comboType;
+
+    return fpPipe(
+      fpMap(dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])),
+      fpGroupBy('g'),
+      fpToPairs,
+      fpMap(([name, data]) => ({name, data, type: comboType}))
+    )(parsedData);
   }
 
   /**
@@ -503,6 +541,8 @@ export function ChartService(Highcharts) {
     case 'stack':
     case 'scatter':
     case 'bubble':
+    case 'area':
+    case 'combo':
       // the bubble chart already supports the parsed data
       return {chartSeries: series};
 
@@ -565,25 +605,33 @@ export function ChartService(Highcharts) {
   }
 
   function getBarChangeConfig(type, settings, fields, gridData, opts) {
-    const singleYAxis = fields.y.length === 1;
-    let yLabel;
-    if (singleYAxis) {
-      const yField = fields.y[0];
-      yLabel = `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}`;
-    }
-
     const labels = {
-      x: get(fields, 'x.displayName', ''),
-      y: singleYAxis ? yLabel : ''
+      x: get(fields, 'x.alias', get(fields, 'x.displayName', ''))
     };
 
     const changes = [{
       path: 'xAxis.title.text',
       data: (opts.labels && opts.labels.x) || labels.x
-    }, {
-      path: 'yAxis.title.text',
-      data: (opts.labels && opts.labels.y) || labels.y
     }];
+
+    changes.push({
+      path: 'yAxis',
+      data: map(fields.y, (y, k) => ({
+        gridLineWidth: 0,
+        opposite: k > 0,
+        title: {
+          text: y.alias || `${AGGREGATE_TYPES_OBJ[y.aggregate].label} ${y.displayName}`,
+          style: fields.y.length <= 1 ? null : {
+            color: CHART_COLORS[k]
+          }
+        },
+        labels: {
+          style: fields.y.length <= 1 ? null : {
+            color: CHART_COLORS[k]
+          }
+        }
+      }))
+    });
 
     if (!isEmpty(gridData)) {
       const {series, categories} = splitToSeriesAndCategories(gridData, fields, opts);

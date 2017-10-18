@@ -11,6 +11,8 @@ import {PivotService} from './services/pivot.service';
 import {ChartService} from './services/chart.service';
 import {SortService} from './services/sort.service';
 
+import {pivotAreaTypeFilter} from './filters/pivot-area-type.filter';
+
 import {AnalyzePageComponent} from './components/page/analyze-page.component';
 import {AggregateChooserComponent} from './components/aggregate-chooser/aggregate-chooser.component';
 import {AnalyzeActionsService} from './components/actions/analyze-actions.service';
@@ -25,7 +27,6 @@ import {AnalyzePivotDetailComponent} from './components/executed-detail/pivot/an
 import {AnalyzeChartDetailComponent} from './components/executed-detail/chart/analyze-chart-detail.component';
 import {AnalyzeExecutedDetailComponent} from './components/executed-detail/analyze-executed-detail.component';
 import {AnalyzeNewComponent} from './components/new/analyze-new.component';
-import {pivotAreaTypeFilter} from './filters/pivot-area-type.filter';
 import {AnalyzePivotSettingsComponent} from './components/pivot/settings/analyze-pivot-settings.component';
 import {AnalyzePivotPreviewComponent} from './components/pivot/preview/analyze-pivot-preview.component';
 import {AnalyzePivotComponent} from './components/pivot/analyze-pivot.component';

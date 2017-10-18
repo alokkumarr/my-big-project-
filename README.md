@@ -87,3 +87,13 @@ assets/i18n
 
 - Adding a new module:
 make an i18n.js angular config file like in the other modules, and include it in the modules index.js
+
+## Steps for adding Icons
+- go to [icomoon](https://icomoon.io/app/#/select)
+- if there are other icon sets loaded, just delete them
+- click on the Import Icons button
+- select the selection.json file in the fonts directory (note: not assets/fonts, use the fonts directory in the root directory)
+- click on the menu button of the icon set, on the right, and select "Import to set" to add an svg icon, give the same name and tags to the icon
+- when done, generate font and download it
+- copy the zipped folder contents to the fonts directory where the current selection.json resides, for future modification
+- from there, copy the fonts to the assets/fonts directory, also copy the styles.css and rename it to icomoon.css, edit the icomoon.css file, and delete the "fonts/" part form the urls of the fonts
