@@ -1,6 +1,9 @@
 package sncr.datalake.engine
 
+import files.HFileOperations;
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
+import org.json4s.{JObject, DefaultFormats}
+import org.json4s.native.JsonMethods.parse
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.datalake.engine.ExecutionStatus.ExecutionStatus
 import sncr.datalake.engine.ExecutionType.ExecutionType
@@ -8,6 +11,10 @@ import sncr.datalake.handlers.AnalysisNodeExecutionHelper
 import sncr.metadata.analysis.{AnalysisNode, AnalysisResult}
 import org.json4s.JsonAST.JValue
 import sncr.metadata.engine.ProcessingResult
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.text.SimpleDateFormat
+import scala.collection.JavaConverters._
 
 import scala.concurrent.Future
 
@@ -28,6 +35,11 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
   protected var status : ExecutionStatus = ExecutionStatus.INIT
   protected var startTS : java.lang.Long = null
   protected var finishTS : java.lang.Long = null
+
+  implicit val formats = new DefaultFormats {
+    override def dateFormatter = new SimpleDateFormat(
+      "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+  }
 
   def startExecution(sqlRuntime: String = null): Unit =
   {
@@ -146,8 +158,62 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
     *
     * @return List<Map<…>> data structure
     */
-  def loadExecution(id : String) : java.util.List[java.util.Map[String, (String, Object)]] = {
-    AnalysisNodeExecutionHelper.loadAnalysisResult(id)
+  def loadExecution(id: String, limit: Integer = 0) : java.util.List[java.util.Map[String, (String, Object)]] = {
+    /* Note: If loading of execution results is reimplemented in any other
+     * service as part of a refactoring, it should be implemented
+     * using Java streams to allow processing the data using a
+     * streaming approach. This avoids risking out of memory errors
+     * due to loading the entire execution result into memory at the
+     * same time. */
+    val results = new java.util.ArrayList[java.util.Map[String, (String, Object)]]
+    val resultNode = AnalysisResult(null, id)
+    if (!resultNode.getObjectDescriptors.contains("dataLocation")) {
+      m_log.debug("Data location property not found: {}", id)
+      return results
+    }
+    resultNode.getObject("dataLocation") match {
+      case Some(dir: String) => {
+        val files = try {
+          /* Get list of all files in the execution result directory */
+          HFileOperations.getFilesStatus(dir)
+        } catch {
+          case e: Throwable => {
+            m_log.debug("Exception while getting result files: {}", e)
+            return results
+          }
+        }
+        /* Filter out the JSON files which contain the result rows */
+        files.filter(_.getPath.getName.endsWith(".json")).foreach(file => {
+          m_log.debug("Filtered file: " + file.getPath.getName)
+          val is = HFileOperations.readFileToInputStream(file.getPath.toString)
+          val reader = new BufferedReader(new InputStreamReader(is))
+          /* Use an iterator over the lines of the file, which map to rows of the results encoded as JSON */
+          reader.lines.iterator.asScala.foreach(line => {
+            val resultsRow = new java.util.HashMap[String, (String, Object)]
+            parse(line) match {
+              case obj: JObject => {
+                /* Convert the parsed JSON to the data type expected by the
+                 * loadExecution method signature */
+                val rowMap = obj.extract[Map[String, Any]]
+                rowMap.keys.foreach(key => {
+                  rowMap.get(key).foreach(value => resultsRow.put(key, ("unknown", value.asInstanceOf[AnyRef])))
+                })
+              }
+              case obj => throw new RuntimeException("Unknown result row type from JSON: " + obj.getClass.getName)
+            }
+            results.add(resultsRow)
+            if (limit > 0 && results.size() >= limit) {
+              return results
+            }
+          })
+        })
+      }
+      case obj => {
+        m_log.debug("Data location not found for results: {}", id)
+        return results
+      }
+    }
+    results
   }
 
   def loadESExecutionData(anres: AnalysisResult) : JValue  = AnalysisNodeExecutionHelper.loadESAnalysisResult(anres)
