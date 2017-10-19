@@ -31,7 +31,7 @@ public class DataExportController {
   public ResponseEntity<DataResponse> exportAnalyses (@PathVariable("executionId") String executionId, 
       HttpServletRequest request, HttpServletResponse response){
     logger.info("executionId in export {}", executionId);
-    logger.info("URI to execute ", apiExportOtherProperties);
+    logger.info("URI to execute {}", apiExportOtherProperties);
     DataResponse dataResponse = new DataResponse();
     List<Object> data = new ArrayList<>();
     data.add("id");
