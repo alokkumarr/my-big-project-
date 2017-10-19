@@ -72,7 +72,7 @@
                connectionTimeout="20000"
                maxHttpHeaderSize="8192"
                maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
-               enableLookups="false" redirectPort="8443" acceptCount="100"
+               enableLookups="false" acceptCount="100"
                disableUploadTimeout="true"
                compression="on"
                compressionMinSize="2048"
