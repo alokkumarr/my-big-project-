@@ -2,16 +2,24 @@ import * as angular from 'angular';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgModule } from '@angular/core';
 import { CommonModule as AngularCommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Ng2DragDropModule } from 'ng2-drag-drop';
+import { GridsterModule } from 'angular-gridster2';
 
 import {routesConfig} from './routes';
 import {i18nConfig} from './i18n';
 
 import {MaterialModule} from '../../material.module';
 
+import {jwtServiceProvider} from '../../../login/services/ajs-login-providers';
+import {analyzeServiceProvider} from '../analyze/services/ajs-analyze-providers';
+import {menuServiceProvider} from '../../common/services/ajs-common-providers';
 import {ObserveService} from './services/observe.service';
 
+import {ChartUpgradeComponent} from '../../common/components/charts/chart.component.adapter';
+
 import {ObservePageComponent} from './components/observe-page/observe-page.component';
+import {AnalysisChoiceComponent} from './components/analysis-choice/analysis-choice.component';
 import {CreateDashboardComponent} from './components/create-dashboard/create-dashboard.component';
 import {NewDashboardComponent} from './components/new-dashboard/new-dashboard.component';
 import {FilterSidenavComponent} from './components/filter-sidenav/filter-sidenav.component';
@@ -23,20 +31,6 @@ import {FilterGroupComponent} from './components/filter-group/filter-group.compo
 import {CommonModule} from '../../common';
 
 export const ObserveModule = 'ObserveModule';
-
-@NgModule({
-  imports: [ AngularCommonModule, MaterialModule, Ng2DragDropModule.forRoot() ],
-  declarations: [
-    ObservePageComponent,
-    NewDashboardComponent,
-    CreateDashboardComponent
-  ],
-  entryComponents: [
-    ObservePageComponent,
-    NewDashboardComponent
-  ]
-})
-export class ObserveUpgradeModule {}
 
 angular.module(ObserveModule, [
   CommonModule
@@ -54,3 +48,26 @@ angular.module(ObserveModule, [
   .component('radioFilter', RadioFilterComponent)
   .component('timeRangeFilter', TimeRangeFilterComponent)
   .component('filterGroup', FilterGroupComponent);
+
+@NgModule({
+  imports: [ AngularCommonModule, FormsModule, MaterialModule, Ng2DragDropModule.forRoot(), GridsterModule ],
+  declarations: [
+    ObservePageComponent,
+    NewDashboardComponent,
+    CreateDashboardComponent,
+    AnalysisChoiceComponent,
+    ChartUpgradeComponent
+  ],
+  entryComponents: [
+    ObservePageComponent,
+    NewDashboardComponent,
+    CreateDashboardComponent,
+    AnalysisChoiceComponent
+  ],
+  providers: [
+    jwtServiceProvider,
+    analyzeServiceProvider,
+    menuServiceProvider
+  ]
+})
+export class ObserveUpgradeModule {}

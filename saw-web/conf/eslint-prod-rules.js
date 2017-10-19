@@ -21,7 +21,7 @@ module.exports = {
     jasmine: true
   },
   rules: {
-    'angular/no-service-method': 2,
+    'angular/no-service-method': 0,
     'angular/on-watch': 0,
     'no-negated-condition': 0,
     'quote-props': [1, 'as-needed'],

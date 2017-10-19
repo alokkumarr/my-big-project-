@@ -1,0 +1,28 @@
+<div md-dialog-title>
+  <span>Select an Analysis</span>
+  <md-progress-bar [mode]="'indeterminate'" *ngIf="showProgress"></md-progress-bar>
+</div>
+
+<div md-dialog-content>
+  <md-select placeholder="Category" [(ngModel)]="selection.category" (change)="onCategoryUpdated()">
+    <md-option *ngFor="let category of categories" [value]="category.id">
+      {{ category.name }}
+    </md-option>
+  </md-select>
+  <md-select placeholder="Sub Category" [(ngModel)]="selection.subCategory" (change)="onSubCategoryUpdated()">
+    <md-option *ngFor="let subCategory of subCategories" [value]="subCategory.id">
+      {{ subCategory.name }}
+    </md-option>
+  </md-select>
+  <md-select placeholder="Analysis" [(ngModel)]="selection.analysis">
+    <md-option *ngFor="let analysis of analyses" [value]="analysis.id">
+      {{ analysis.name }}
+      <md-chip color="primary">{{analysis.type}}</md-chip>
+    </md-option>
+  </md-select>
+</div>
+
+<div class="layout-row" md-dialog-actions>
+  <button md-button (click)="closeDialog()">Cancel</button>
+  <button md-button (click)="save()" [disabled]="!selection.analysis">Save</button>
+</div>

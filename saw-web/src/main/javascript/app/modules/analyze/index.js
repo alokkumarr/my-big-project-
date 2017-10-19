@@ -63,7 +63,7 @@ angular.module(AnalyzeModule, [
   .config(i18nConfig)
   .filter('pivotAreaTypeFilter', pivotAreaTypeFilter)
   .factory('FilterService', FilterService)
-  .factory('AnalyzeService', AnalyzeService)
+  .service('AnalyzeService', AnalyzeService)
   .factory('PivotService', PivotService)
   .factory('ChartService', ChartService)
   .factory('SortService', SortService)

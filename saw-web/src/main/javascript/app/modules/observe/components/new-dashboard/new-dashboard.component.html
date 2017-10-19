@@ -1,7 +1,18 @@
-<h1 md-dialog-title>New Dasboard</h1>
-<div md-dialog-content>
-  Select a template for creating a new dashboard
+<div class="md-title" md-dialog-title>
+  <h3>New Dashboard</h3>
+  <h5>Select a template</h5>
 </div>
-<div md-dialog-actions>
-  <button md-button>Create</button>
+
+<div layout="column" md-dialog-content>
+  <md-radio-group [(ngModel)]="selectedLayout" layout="row" layout-wrap>
+    <md-radio-button *ngFor="let layout of availableLayouts" [value]="layout.id"
+      class="adc-metric" flex="30">
+      <md-icon [fontIcon]="layout.icon"></md-icon>
+      <div class="layout-name">{{layout.name}}</div>
+    </md-radio-button>
+  </md-radio-group>
+</div>
+
+<div class="layout-row" md-dialog-actions>
+  <button md-raised-button color="primary" (click)="createNewDashboard()" [disabled]="!selectedLayout">Create</button>
 </div>
