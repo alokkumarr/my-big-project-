@@ -4,14 +4,6 @@
 #
 set -eu
 
-# The MapR container might still be starting up, so wait until MapR-FS
-# has been verified being available
-echo "Waiting for MapR-FS to become available"
-while ! hadoop fs -ls / 2> /dev/null; do
-    sleep 5
-    echo "Retrying accessing MapR-FS"
-done
-
 # Make the metrics files readable to the "mapr" user
 chmod -R a+rx /root
 sudo_mapr="sudo -u mapr"
@@ -73,6 +65,14 @@ generate_test_semantic_node_json > $metrics/$test_sn
 #
 # Put semantic node, data object and data in the data lake
 #
+
+# The MapR container might still be starting up, so wait until MapR-FS
+# has been verified being available
+echo "Waiting for MapR-FS to become available"
+while ! hadoop fs -ls / 2> /dev/null; do
+    sleep 5
+    echo "Retrying accessing MapR-FS"
+done
 
 echo "Putting semantic node and data into the datalake"
 # Load the data object
