@@ -29,6 +29,7 @@ RUN echo localhost > /opt/mapr/spark/spark-current/conf/slaves
 # so remove those lines to bind to all interfaces and allow access
 # from other containers
 RUN sed -i -e '/^export SPARK_MASTER_[A-Z]*=localhost$/d' \
+    -e 's/export SPARK_WORKER_MEMORY=16g/export SPARK_WORKER_MEMORY=1g/' \
     /opt/mapr/spark/spark-current/conf/spark-env.sh
 
 # Add MapR container initialization script
