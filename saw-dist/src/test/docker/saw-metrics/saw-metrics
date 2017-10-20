@@ -69,7 +69,7 @@ generate_test_semantic_node_json > $metrics/$test_sn
 # The MapR container might still be starting up, so wait until MapR-FS
 # has been verified being available
 echo "Waiting for MapR-FS to become available"
-while ! hadoop fs -ls / 2> /dev/null; do
+while ! hadoop fs -ls / > /dev/null 2>&1; do
     sleep 5
     echo "Retrying accessing MapR-FS"
 done
