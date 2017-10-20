@@ -4,7 +4,9 @@ for more details. Add all upgradable services in analyze module to this
 file. */
 
 import { AnalyzeService } from './analyze.service';
+import { ChartService } from './chart.service';
 
+/* Analyze service adapter */
 export function analyzeServiceFactory(i: any) {
   return i.get('AnalyzeService');
 }
@@ -14,3 +16,14 @@ export const analyzeServiceProvider = {
   useFactory: analyzeServiceFactory,
   deps: ['$injector']
 };
+
+/* Chart service adapter */
+export function chartServiceFactory(i: any) {
+  return i.get('ChartService');
+}
+
+export const chartServiceProvider = {
+  provide: ChartService,
+  useFactory: chartServiceFactory,
+  deps: ['$injector']
+}

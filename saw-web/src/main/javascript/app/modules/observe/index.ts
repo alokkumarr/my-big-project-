@@ -12,7 +12,7 @@ import {i18nConfig} from './i18n';
 import {MaterialModule} from '../../material.module';
 
 import {jwtServiceProvider} from '../../../login/services/ajs-login-providers';
-import {analyzeServiceProvider} from '../analyze/services/ajs-analyze-providers';
+import {analyzeServiceProvider, chartServiceProvider} from '../analyze/services/ajs-analyze-providers';
 import {menuServiceProvider} from '../../common/services/ajs-common-providers';
 import {ObserveService} from './services/observe.service';
 
@@ -67,7 +67,8 @@ angular.module(ObserveModule, [
   providers: [
     jwtServiceProvider,
     analyzeServiceProvider,
-    menuServiceProvider
+    menuServiceProvider,
+    chartServiceProvider
   ]
 })
 export class ObserveUpgradeModule {}

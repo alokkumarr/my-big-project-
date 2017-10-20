@@ -65,7 +65,7 @@ angular.module(AnalyzeModule, [
   .factory('FilterService', FilterService)
   .service('AnalyzeService', AnalyzeService)
   .factory('PivotService', PivotService)
-  .factory('ChartService', ChartService)
+  .service('ChartService', ChartService)
   .factory('SortService', SortService)
   .factory('AnalyzeActionsService', AnalyzeActionsService)
   .component('analyzeActionsMenu', AnalyzeActionsMenuComponent)
