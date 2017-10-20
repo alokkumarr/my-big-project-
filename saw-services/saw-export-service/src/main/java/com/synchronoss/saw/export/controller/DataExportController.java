@@ -30,7 +30,9 @@ public class DataExportController {
     logger.info("executionId in export {}", executionId);
     DataResponse dataResponse = new DataResponse();
     List<Object> data = new ArrayList<>();
-    data.add("id");
+    data.add("id1");
+    data.add("id2");
+    data.add("id3");
     dataResponse.setData(data);
     dataResponse.setRowsToExport(100);
     dataResponse.setTotalRows(10);
@@ -38,7 +40,8 @@ public class DataExportController {
     String jsonString_1 = "{ \"id\" : \"8a1d762e-4976-43a3-8867-e46f2d04f0c7\" }";
     String jsonString_2 = "{ \"id\" : \"8a1d762e-4976-43a3-8867-e46f2d04f0c9\" }";
     Stream<Object> stream = Stream.of(jsonString_1, jsonString_2);
-    return new ResponseEntity<>(stream,HttpStatus.OK);
+    System.out.println(data.stream());
+    return new ResponseEntity<>(data.stream(),HttpStatus.OK);
   }
   
 }

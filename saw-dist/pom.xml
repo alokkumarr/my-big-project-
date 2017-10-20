@@ -132,7 +132,14 @@
                     <volume>${project.build.directory}:/build</volume>
                   </bind>
                 </volumes>
-
+                <wait>
+                  <!-- Wait until the container health check reports
+                       that systemd services are up and running -->
+                  <healthy>true</healthy>
+                  <!-- Increase timeout to allow application
+                       deployment to finish -->
+                  <time>600000</time>
+                </wait>  
               </run>
             </image>
             <image>
@@ -154,7 +161,13 @@
                 </ports>
                 <!-- Run privileged for MapR -->
                 <privileged>true</privileged>
-                
+                <wait>
+                  <!-- Wait until the container health check reports
+                       that MapR is up and running -->
+                  <healthy>true</healthy>
+                  <!-- Increase timeout to allow MapR to start -->
+                  <time>600000</time>
+                </wait>
               </run>
             </image>
           </images>
