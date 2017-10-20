@@ -20,7 +20,7 @@
       <button md-icon-button (click)="removeTile(item)">
         <md-icon fontIcon="icon-close"></md-icon>
       </button>
-      <chart-upgrade class="analysis-container" [updater]="item.updater" [options]="chartOptions"></chart-upgrade>
+      <observe-chart class="analysis-container" [analysis]="item.analysis" [updater]="item.updater"></observe-chart>
     </gridster-item>
   </gridster>
 </div>

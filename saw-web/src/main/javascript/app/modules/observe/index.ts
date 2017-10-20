@@ -19,9 +19,9 @@ import {ObserveService} from './services/observe.service';
 import {ChartUpgradeComponent} from '../../common/components/charts/chart.component.adapter';
 
 import {ObservePageComponent} from './components/observe-page/observe-page.component';
+import {ObserveChartComponent} from './components/observe-chart/observe-chart.component';
 import {AnalysisChoiceComponent} from './components/analysis-choice/analysis-choice.component';
 import {CreateDashboardComponent} from './components/create-dashboard/create-dashboard.component';
-import {NewDashboardComponent} from './components/new-dashboard/new-dashboard.component';
 import {FilterSidenavComponent} from './components/filter-sidenav/filter-sidenav.component';
 import {CheckboxFilterComponent} from './components/checkbox-filter/checkbox-filter.component';
 import {PriceRangeFilterComponent} from './components/price-range-filter/price-range-filter.component';
@@ -53,14 +53,14 @@ angular.module(ObserveModule, [
   imports: [ AngularCommonModule, FormsModule, MaterialModule, Ng2DragDropModule.forRoot(), GridsterModule ],
   declarations: [
     ObservePageComponent,
-    NewDashboardComponent,
     CreateDashboardComponent,
     AnalysisChoiceComponent,
+    ObserveChartComponent,
     ChartUpgradeComponent
   ],
   entryComponents: [
     ObservePageComponent,
-    NewDashboardComponent,
+    ObserveChartComponent,
     CreateDashboardComponent,
     AnalysisChoiceComponent
   ],
