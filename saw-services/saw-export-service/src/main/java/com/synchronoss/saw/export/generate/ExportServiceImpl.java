@@ -37,7 +37,7 @@ public class ExportServiceImpl implements ExportService{
     HttpEntity<?> requestEntity = new HttpEntity<Object>(setRequestHeader(request));
     RestTemplate restTemplate = new RestTemplate();
     String url = apiExportOtherProperties+"/" + executionId +"/executions/"+analysisId+"/data?page=1&pageSize="+apiExportSize+"&analysisType=report";
-    logger.info("Transport Service URL: {}", url);
+    logger.debug("Transport Service URL: {}", url);
     ResponseEntity<DataResponse> transportResponse = restTemplate.exchange(url, HttpMethod.GET,
             requestEntity, DataResponse.class);
     return transportResponse.getBody();
@@ -63,7 +63,7 @@ public class ExportServiceImpl implements ExportService{
     responseStringFuture.addCallback(new ListenableFutureCallback<ResponseEntity<DataResponse>>() {
       @Override
       public void onSuccess(ResponseEntity<DataResponse> entity) {
-        logger.info("[Success] Response string:" + entity);
+        logger.debug("[Success] Response string:" + entity);
       }
       @Override
       public void onFailure(Throwable t) {
