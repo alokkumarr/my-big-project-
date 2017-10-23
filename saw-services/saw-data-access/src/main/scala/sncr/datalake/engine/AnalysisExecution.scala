@@ -113,6 +113,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
     * @return List<Map<…>> data structure
     */
   def getData : Future[java.util.List[java.util.Map[String, (String, Object)]]] = {
+    throw new RuntimeException("getData: No longer supported to prevent out of memory issues")
       Future {
         analysisNodeExecution.getExecutionData
       }
@@ -124,6 +125,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
     * @return List<Map<…>> data structure
     */
   def getAllData : java.util.List[java.util.Map[String, (String, Object)]] = {
+    throw new RuntimeException("getAllData: No longer supported to prevent out of memory issues")
     analysisNodeExecution.getAllData
     analysisNodeExecution.getExecutionData
   }
@@ -134,6 +136,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
     * @return List<Map<…>> data structure
     */
   def getPreview(limit:Int) : java.util.List[java.util.Map[String, (String, Object)]] = {
+    throw new RuntimeException("getPreview: No longer supported to prevent out of memory issues")
     analysisNodeExecution.getPreview(limit)
     analysisNodeExecution.getExecutionData
   }
