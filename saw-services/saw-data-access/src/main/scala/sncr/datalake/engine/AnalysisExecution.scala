@@ -53,19 +53,20 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
       startTS = analysisNodeExecution.getStartTS
       m_log debug s"Loaded objects, Started TS: $startTS "
       status = ExecutionStatus.IN_PROGRESS
+      /* Execute the query and use the execution ID also as the analysis
+       * result node ID (and do not load any results into the Spark
+       * driver) */
       execType match {
         case ExecutionType.scheduled => {
           analysisNodeExecution.executeSQLNoDataLoad()
-          analysisNodeExecution.createAnalysisResult(null, null)
+          analysisNodeExecution.createAnalysisResult(id, null)
         }
         case ExecutionType.onetime => {
           analysisNodeExecution.executeSQLNoDataLoad()
-          analysisNodeExecution.createAnalysisResult(null, null)
-          analysisNodeExecution.getAllData
+          analysisNodeExecution.createAnalysisResult(id, null)
         }
         case ExecutionType.preview => {
           analysisNodeExecution.executeSQL()
-          analysisNodeExecution.getPreview()
         }
       }
       analysisNodeExecution.setFinishTime
