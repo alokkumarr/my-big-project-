@@ -234,7 +234,7 @@ export const ReportGridComponent = {
         if (this._gridInstance) {
           const columns = this._gridInstance.option('columns');
           const column = this.getColumnByName(newFormat.column);
-          const typeValue;
+          const typeValue ='';
           if (newFormat.CommaSeparator) {
             typeValue = 'fixedpoint';
           } else {
