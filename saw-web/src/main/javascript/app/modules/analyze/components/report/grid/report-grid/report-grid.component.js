@@ -76,14 +76,17 @@ export const ReportGridComponent = {
     onContextMenuPreparing(e) {
       if (e.target === 'header') {
         e.items = [];
-        e.items.push({
-          text: 'Format Data',
-          icon: 'grid-menu-item icon-edit',
-          onItemClick: () => {
-            this.formatColumn(e.column);
-          }
-        });
 
+        if (e.column.dataType === 'number') {
+          e.items.push({
+            text: 'Format Data',
+            icon: 'grid-menu-item icon-edit',
+            onItemClick: () => {
+              this.formatColumn(e.column);
+            }
+          });  
+        }
+        
         e.items.push({
           text: 'Rename',
           icon: 'grid-menu-item icon-edit',
@@ -175,7 +178,7 @@ export const ReportGridComponent = {
         if (NUMBER_TYPES.includes(column.type)) {
           field.format = {
             type: 'decimal',
-            precision: 2
+            precision: 1
           };
         }
         return field;
@@ -229,7 +232,20 @@ export const ReportGridComponent = {
     }
 
     formatColumn(gridColumn) {
-      this.openFormatModal(gridColumn);
+      this.openFormatModal(gridColumn).then(newFormat => {
+        if (this._gridInstance) {
+          const columns = this._gridInstance.option('columns');
+          const column = this.getColumnByName(newFormat.column);
+          if (column) {
+            column.format = {
+              type: 'decimal',
+              precision: newFormat.NumberDecimal
+            };
+          }
+          this._gridInstance.option('columns', columns);
+        }
+      });
+
     }
 
     renameColumn(gridColumn) {

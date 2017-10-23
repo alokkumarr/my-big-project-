@@ -3,8 +3,7 @@ import style from './report-format-dialog.component.scss';
 
 export const ReportFormatDialogComponent = {
   bindings: {
-    modelData: '<',
-    columns: '<'
+    modelData: '<'
   },
   template,
   style: [style],
@@ -12,6 +11,10 @@ export const ReportFormatDialogComponent = {
     constructor($mdDialog) {
       'ngInject';
       this._$mdDialog = $mdDialog;
+      this.format = ({
+        column: this.modelData.dataField;//caption
+      });
+
     }
 
     cancel() {
@@ -19,7 +22,7 @@ export const ReportFormatDialogComponent = {
     }
 
     apply() {
-      this._$mdDialog.hide();
+      this._$mdDialog.hide(this.format);
     }
   }
 };
