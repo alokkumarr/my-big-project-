@@ -23,15 +23,6 @@ public class DataResponse {
 @JsonProperty("data")
 private List<Object> data = null;
 /**
-* The rowstoexport schema.
-* <p>
-* An explanation about the purpose of this instance.
-* 
-*/
-@JsonProperty("rowsToExport")
-@JsonPropertyDescription("An explanation about the purpose of this instance.")
-private Integer rowsToExport = 0;
-/**
 * The totalrows schema.
 * <p>
 * An explanation about the purpose of this instance.
@@ -55,33 +46,6 @@ this.data = data;
 
 public DataResponse withData(List<Object> data) {
 this.data = data;
-return this;
-}
-
-/**
-* The rowstoexport schema.
-* <p>
-* An explanation about the purpose of this instance.
-* 
-*/
-@JsonProperty("rowsToExport")
-public Integer getRowsToExport() {
-return rowsToExport;
-}
-
-/**
-* The rowstoexport schema.
-* <p>
-* An explanation about the purpose of this instance.
-* 
-*/
-@JsonProperty("rowsToExport")
-public void setRowsToExport(Integer rowsToExport) {
-this.rowsToExport = rowsToExport;
-}
-
-public DataResponse withRowsToExport(Integer rowsToExport) {
-this.rowsToExport = rowsToExport;
 return this;
 }
 

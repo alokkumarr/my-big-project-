@@ -5,10 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 
 
 
 @SpringBootApplication
+@ComponentScan("com.synchronoss")
 public class SAWExportServiceApplication {
 
   private static final Logger LOG = LoggerFactory.getLogger(SAWExportServiceApplication.class);

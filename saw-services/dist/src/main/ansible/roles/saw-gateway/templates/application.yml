@@ -11,6 +11,8 @@ server:
   context-path: ''
   compression:
     enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json      
+
 
 analysis:
     service:
@@ -51,6 +53,6 @@ api:
             path: '/api/analyses.*'
         -   location: ${export.service.host}
             method : GET
-            path : '[/]export.*'    
+            path : '[/]export.*'
 logging:
   config: /opt/bda/saw-gateway-service/conf/logback.xml

@@ -6,6 +6,11 @@ public class ExportRuntimeSAWException extends RuntimeException{
 
 
     /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
+    /**
      * Construct a {@code NestedRuntimeException} with the specified detail message.
      * @param msg the detail message
      */

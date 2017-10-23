@@ -8,10 +8,12 @@ server:
   port: 9400
   context-path: ''
   compression:
-    enabled: true    
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json    
 
 analysis:
     service:
-        host: https://saw.bda.poc.velocity-va.synchronoss.net/api
+        host: https://saw.bda.poc.velocity-va.synchronoss.net/services/analysis
+    size: 10000
 
        
