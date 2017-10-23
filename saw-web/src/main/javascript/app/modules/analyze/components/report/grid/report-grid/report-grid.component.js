@@ -176,7 +176,7 @@ export const ReportGridComponent = {
         if (NUMBER_TYPES.includes(column.type)) {
           field.format = {
             type: 'decimal',
-            precision: 1
+            precision: 2
           };
         }
         return field;
@@ -234,9 +234,14 @@ export const ReportGridComponent = {
         if (this._gridInstance) {
           const columns = this._gridInstance.option('columns');
           const column = this.getColumnByName(newFormat.column);
+          if (newFormat.CommaSeparator) {
+            const typeValue = 'fixedpoint';
+          } else {
+            const typeValue = 'decimal';
+          }
           if (column) {
             column.format = {
-              type: 'decimal',
+              type: typeValue,
               precision: newFormat.NumberDecimal
             };
           }
