@@ -76,8 +76,6 @@ export const ReportGridComponent = {
     onContextMenuPreparing(e) {
       if (e.target === 'header') {
         e.items = [];
-        console.log(e.column);
-        console.log(e.column.dataType);
         e.items.push({
           text: 'Format Data',
           icon: 'grid-menu-item icon-edit',
@@ -294,7 +292,6 @@ export const ReportGridComponent = {
     }
 
     openFormatModal(model) {
-      console.log(model);
       return this._$mdDialog
         .show({
           controller: scope => {
