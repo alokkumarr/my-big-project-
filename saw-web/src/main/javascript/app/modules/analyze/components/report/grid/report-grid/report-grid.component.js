@@ -76,6 +76,15 @@ export const ReportGridComponent = {
     onContextMenuPreparing(e) {
       if (e.target === 'header') {
         e.items = [];
+        console.log(e.column);
+        console.log(e.column.dataType);
+        e.items.push({
+          text: 'Format Data',
+          icon: 'grid-menu-item icon-edit',
+          onItemClick: () => {
+            this.formatColumn(e.column);
+          }
+        });
 
         e.items.push({
           text: 'Rename',
@@ -221,6 +230,10 @@ export const ReportGridComponent = {
       });
     }
 
+    formatColumn(gridColumn) {
+      this.openFormatModal(gridColumn);
+    }
+
     renameColumn(gridColumn) {
       this.openRenameModal()
         .then(newName => {
@@ -274,6 +287,20 @@ export const ReportGridComponent = {
       return this._$mdDialog
         .show({
           template: '<report-rename-dialog></report-rename-dialog>',
+          fullscreen: false,
+          multiple: true,
+          clickOutsideToClose: true
+        });
+    }
+
+    openFormatModal(model) {
+      console.log(model);
+      return this._$mdDialog
+        .show({
+          controller: scope => {
+            scope.model = model;
+          },
+          template: '<report-format-dialog model-data=model> </report-format-dialog>',
           fullscreen: false,
           multiple: true,
           clickOutsideToClose: true

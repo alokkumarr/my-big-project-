@@ -70,5 +70,9 @@
   "ERROR_PIVOT_DATA_FIELD": "Only fields of type number are allowed in the data area!",
   "ERROR_PIVOT_DATA_FIELD_REQUIRED": "You need to have at least one field in the data area!",
   "ERROR_X_Y_AXES_REQUIRED": "X, and Y axes are required!",
-  "ERROR_X_Y_SIZEBY_AXES_REQUIRED": "X, Y axes and Size by option are required!"
+  "ERROR_X_Y_SIZEBY_AXES_REQUIRED": "X, Y axes and Size by option are required!",
+  "FORMAT":"Format",
+  "ShowCommaSeparators": "Show Comma Separators",
+  "SpecifyNumberDecimals":"Specify Number of Decimals (0-99)",
+  "ShowCurrency":"Show as Currency"
 }

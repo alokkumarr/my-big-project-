@@ -1,0 +1,15 @@
+.format-row {
+  border-bottom: 1px solid #CCC;
+  height: 50px;
+  padding: 8px;
+
+  span {
+    float: left;
+    margin-right: 20px;
+    margin-top: 20px;
+  }
+
+  input {
+    margin-top: 20px;
+  }
+}

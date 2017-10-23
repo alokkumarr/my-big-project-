@@ -1,0 +1,37 @@
+<analyze-dialog class="analyze-sort-dialog">
+  <analyze-dialog-header layout="row" layout-align="start center" flex="grow">
+    <strong ng-bind="'Format ' + $ctrl.modelData.caption"></strong>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+    <div class="number-format">
+      <div class="format-row">
+        <span translate="ShowCommaSeparators"></span>
+        <md-switch class="md-primary"></md-switch>
+      </div>
+
+      <div class="format-row">
+        <span translate="SpecifyNumberDecimals"></span>
+        <input class="ng-pristine ng-valid md-input ng-empty ng-touched" style="">
+      </div>
+
+      <div class="format-row">
+        <span translate="ShowCurrency"></span>
+        <md-switch class="md-primary"></md-switch>
+      </div>
+    </div>
+  </analyze-dialog-content>
+
+  <analyze-dialog-footer>
+    <div layout="row">
+      <md-button class="btn-primary"
+                 translate="Apply">
+      </md-button>
+
+      <md-button class="btn-card"
+                 ng-click="$ctrl.cancel()"
+                translate="CANCEL">
+      </md-button>
+    </div>
+  </analyze-dialog-footer>
+</analyze-dialog>
