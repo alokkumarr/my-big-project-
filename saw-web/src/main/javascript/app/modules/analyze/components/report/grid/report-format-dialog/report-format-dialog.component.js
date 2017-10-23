@@ -12,7 +12,7 @@ export const ReportFormatDialogComponent = {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this.format = ({
-        column: this.modelData.dataField;//caption
+        column: this.modelData.dataField
       });
 
     }
