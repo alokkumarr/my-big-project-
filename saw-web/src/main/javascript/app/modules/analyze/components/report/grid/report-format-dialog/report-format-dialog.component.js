@@ -19,7 +19,6 @@ export const ReportFormatDialogComponent = {
     }
 
     apply() {
-      console.log(this.columns);
       this._$mdDialog.hide();
     }
   }
