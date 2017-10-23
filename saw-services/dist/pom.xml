@@ -25,6 +25,11 @@
       <artifactId>saw-gateway-service</artifactId>
       <version>${revision}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>saw-export-service</artifactId>
+      <version>${revision}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
