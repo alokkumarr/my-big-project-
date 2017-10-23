@@ -15,8 +15,6 @@ require('./create-dashboard.component.scss');
 export class CreateDashboardComponent {
   @ViewChild('gridster') gridster: GridsterComponent;
 
-  public loadedAnalyses = [];
-  public analyses = [];
   public options: GridsterConfig;
   public dashboard: Array<GridsterItem>;
   public chartUpdater = new BehaviorSubject({});
@@ -51,33 +49,8 @@ export class CreateDashboardComponent {
     this.dashboard = [];
   }
 
-  addAnalysis(index, analysis) {
-    if (!Array.isArray(this.analyses[index])) {
-      this.analyses[index] = [];
-    }
-    this.analyses[index].push(analysis);
-    return analysis;
-  }
-
-  removeAnalysis(index, analysis) {
-    if (!Array.isArray(this.analyses[index])) {
-      this.analyses[index] = [];
-    }
-
-    this.analyses[index] = this.analyses[index].filter(an => an.id !== analysis.id);
-    return analysis;
-  }
-
   removeTile(item: GridsterItem) {
     this.dashboard.splice(this.dashboard.indexOf(item), 1);
-  }
-
-  hasAnalyses(index) {
-    if (!Array.isArray(this.analyses[index])) {
-      this.analyses[index] = [];
-    }
-
-    return this.analyses[index].length > 0;
   }
 
   exitCreator(data) {

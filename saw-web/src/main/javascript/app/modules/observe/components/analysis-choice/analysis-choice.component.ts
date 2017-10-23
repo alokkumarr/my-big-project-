@@ -1,6 +1,7 @@
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
 import * as find from 'lodash/find';
+import * as filter from 'lodash/filter';
 import { Component } from '@angular/core';
 import { MdDialogRef } from '@angular/material';
 import { JwtService } from '../../../../../login/services/jwt.service';
@@ -8,6 +9,8 @@ import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
 require('./analysis-choice.component.scss');
 const template = require('./analysis-choice.component.html');
+
+const ALLOWED_ANALYSIS_TYPES = ['chart'];
 
 @Component({
   selector: 'analysis-choice',
@@ -51,7 +54,7 @@ export class AnalysisChoiceComponent {
     this.showProgress = true;
     this.analyze.getAnalysesFor(this.selection.subCategory.toString()).then(result => {
       this.showProgress = false;
-      this.analyses = result;
+      this.analyses = filter(result, analysis => analysis && ALLOWED_ANALYSIS_TYPES.includes(analysis.type));
     }, () => {
       this.showProgress = false;
     });
