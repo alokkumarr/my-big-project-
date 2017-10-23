@@ -83,7 +83,7 @@ export const ReportGridComponent = {
             onItemClick: () => {
               this.formatColumn(e.column);
             }
-          });  
+          });
         }
         e.items.push({
           text: 'Rename',
