@@ -5,8 +5,6 @@ import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
 import * as get from 'lodash/get';
 import * as set from 'lodash/set';
-import * as map from 'lodash/map';
-import * as values from 'lodash/values';
 import * as isEmpty from 'lodash/isEmpty';
 import * as clone from 'lodash/clone';
 import * as filter from 'lodash/filter';

@@ -1,11 +1,9 @@
-import { Directive,
+import {
   Component,
   ElementRef,
-  Injector,
   Input,
   ViewChild
  } from '@angular/core';
-import { UpgradeComponent } from '@angular/upgrade/static';
 
 import * as Highcharts from 'highcharts/highcharts';
 import * as defaultsDeep from 'lodash/defaultsDeep';
@@ -15,18 +13,6 @@ import * as set from 'lodash/set';
 import * as get from 'lodash/get';
 import * as isArray from 'lodash/isArray';
 import {globalChartOptions, chartOptions} from './default-chart-options';
-
-@Directive({
-  selector: 'chart'
-})
-export class ChartDirective extends UpgradeComponent {
-  @Input() options: any;
-  @Input('updater') updater$: any;
-
-  constructor(elementRef: ElementRef, injector: Injector) {
-    super('chart', elementRef, injector);
-  }
-}
 
 @Component({
   selector: 'chart-upgrade',

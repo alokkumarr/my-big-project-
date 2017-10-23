@@ -251,8 +251,8 @@ export class AnalyzeService {
     }
 
     if (model.type === 'report' && model.edit === true) {
-      toastMessage.error('SQL mode is no longer supported. Please create a new report in designer mode.');
-      return $q.resolve({data: [], count: 0});
+      this._toastMessage.error('SQL mode is no longer supported. Please create a new report in designer mode.');
+      return this._$q.resolve({data: [], count: 0});
     }
 
     options.skip = options.skip || 0;

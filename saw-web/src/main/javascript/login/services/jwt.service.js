@@ -36,7 +36,7 @@ export class JwtService {
     return this._$window.localStorage[this._AppConfig.login.jwtKey];
   }
 
-  getCategories () {
+  getCategories() {
     const token = this.getTokenObj();
     const analyzeModule = find(
       get(token, 'ticket.products[0].productModules'),

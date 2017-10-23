@@ -3,7 +3,6 @@ import { downgradeComponent } from '@angular/upgrade/static';
 import { NgModule } from '@angular/core';
 import { CommonModule as AngularCommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Ng2DragDropModule } from 'ng2-drag-drop';
 import { GridsterModule } from 'angular-gridster2';
 
 import {routesConfig} from './routes';
@@ -50,7 +49,7 @@ angular.module(ObserveModule, [
   .component('filterGroup', FilterGroupComponent);
 
 @NgModule({
-  imports: [ AngularCommonModule, FormsModule, MaterialModule, Ng2DragDropModule.forRoot(), GridsterModule ],
+  imports: [ AngularCommonModule, FormsModule, MaterialModule, GridsterModule ],
   declarations: [
     ObservePageComponent,
     CreateDashboardComponent,
