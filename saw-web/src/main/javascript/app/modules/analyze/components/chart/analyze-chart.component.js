@@ -385,6 +385,11 @@ export const AnalyzeChartComponent = {
     }
 
     getNewChartType(model) {
+
+      if (!this.multyYCharts.includes(model.chartType)) {
+        return model.chartType;
+      }
+
       const types = fpPipe(
         fpFilter(({checked}) => checked === 'y'),
         fpMap('comboType')
