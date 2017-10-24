@@ -9,12 +9,12 @@ server:
   context-path: ''
   compression:
     enabled: true
-    mime-types: text/html,text/css,application/javascript,application/json      
+    mime-types: text/html,text/css,application/javascript,application/json
 
 
 analysis:
     service:
-        host: http://localhost:9200
+        host: http://localhost:9200/analysis
 
 logging:
   config: /opt/bda/saw-export-service/conf/logback.xml
