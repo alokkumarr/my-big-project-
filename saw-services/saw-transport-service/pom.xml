@@ -32,6 +32,7 @@
         <app.group>mapr</app.group>
         <mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
         <es.version>5.4.0</es.version>
+        <rpm.maven.plugin.phase>package</rpm.maven.plugin.phase>
     </properties>
     <dependencies>
 	<dependency>
@@ -558,6 +559,7 @@
                 <executions>
                     <execution>
                         <id>saw-services-rpm</id>
+                        <phase>${rpm.maven.plugin.phase}</phase>
                         <goals>
                             <goal>attached-rpm</goal>
                         </goals>
