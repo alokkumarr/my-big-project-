@@ -105,15 +105,17 @@ export const AnalyzeChartComponent = {
     }
 
     $onInit() {
-      if (this.model.chartType === 'bar') {
+      if (this.mode === ENTRY_MODES.NEW && this.model.chartType === 'bar') {
         this.isInverted = true;
       }
 
       if (this.mode === ENTRY_MODES.FORK) {
+        this.isInverted = this.model.isInverted;
         delete this.model.id;
       }
 
       if (this.mode === ENTRY_MODES.EDIT) {
+        this.isInverted = this.model.isInverted;
         this.initChart();
         this.onRefreshData();
       } else {
@@ -270,6 +272,10 @@ export const AnalyzeChartComponent = {
         filteredGridData,
         {labels: this.labels, labelOptions: this.model.labelOptions, sorts: this.sorts}
       );
+      changes.push({
+        path: 'chart.inverted',
+        data: this.isInverted
+      });
       this.updateChart.next(changes);
     }
 
@@ -359,6 +365,7 @@ export const AnalyzeChartComponent = {
       set(payload, 'sqlBuilder.booleanCriteria', this.model.sqlBuilder.booleanCriteria);
       set(payload, 'xAxis', {title: this.labels.x});
       set(payload, 'yAxis', {title: this.labels.y});
+      set(payload, 'isInverted', this.isInverted);
       set(payload, 'legend', {
         align: this.legend.align,
         layout: this.legend.layout
