@@ -76,7 +76,6 @@ export const ReportGridComponent = {
     onContextMenuPreparing(e) {
       if (e.target === 'header') {
         e.items = [];
-        console.log(e.column.dataType);
         if (e.column.dataType === 'number' || e.column.dataType === 'timestamp' || e.column.dataType === 'date') {
           e.items.push({
             text: 'Format Data',
@@ -238,7 +237,6 @@ export const ReportGridComponent = {
           let typeValue = '';
           if (column) {
             if (newFormat.type === 'date') {
-              console.log('inside if')
               column.format = newFormat.dateFormat;
             } else {
               if (newFormat.CommaSeparator) {
