@@ -12,7 +12,8 @@ export const ReportFormatDialogComponent = {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this.format = ({
-        column: this.modelData.dataField
+        column: this.modelData.dataField,
+        type: this.modelData.dataType
       });
 
       if (this.modelData.format.type === 'fixedpoint') {

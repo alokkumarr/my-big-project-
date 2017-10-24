@@ -4,7 +4,7 @@
   </analyze-dialog-header>
 
   <analyze-dialog-content>
-    <div class="number-format">
+    <div class="number-format" ng-if="$ctrl.modelData.dataType === 'number'">
       <div class="format-row">
         <span translate="ShowCommaSeparators"></span>
         <md-switch class="md-primary" ng-model="$ctrl.format.CommaSeparator"></md-switch>
@@ -19,6 +19,27 @@
         <span translate="ShowCurrency"></span>
         <md-switch class="md-primary"></md-switch>
       </div>
+    </div>
+
+    <div class="date-format" ng-if="$ctrl.modelData.dataType === 'date'">
+      <md-radio-group ng-model="$ctrl.format.dateFormat" > 
+        <md-radio-button class="row" ng-value="'MMM/dd/yyyy'" flex>
+          <span>September 1, 2017</span>
+        </md-radio-button>
+        <md-radio-button class="row" ng-value="'MM/dd/yyyy'" flex>
+          <span>09/01/2017 (mm/dd/yyyy)</span>
+        </md-radio-button>
+
+        <md-radio-button class="row" ng-value="'dd/MM/yyyy'" flex>
+          <span>01/09/2017 (dd/mm/yyyy)</span>
+        </md-radio-button>
+        <md-radio-button class="row" ng-value="'MM/yy'" flex>
+          <span>09/17 (mm/yy)</span>
+        </md-radio-button>
+        <md-radio-button class="row" ng-value="'MM/dd'" flex>
+          <span>September 1 </span>
+        </md-radio-button>
+      </md-radio-group>
     </div>
   </analyze-dialog-content>
 

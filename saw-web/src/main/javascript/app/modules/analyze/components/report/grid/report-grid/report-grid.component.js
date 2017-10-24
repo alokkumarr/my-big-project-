@@ -76,7 +76,8 @@ export const ReportGridComponent = {
     onContextMenuPreparing(e) {
       if (e.target === 'header') {
         e.items = [];
-        if (e.column.dataType === 'number') {
+        console.log(e.column.dataType);
+        if (e.column.dataType === 'number' || e.column.dataType === 'timestamp' || e.column.dataType === 'date') {
           e.items.push({
             text: 'Format Data',
             icon: 'grid-menu-item icon-edit',
@@ -235,16 +236,21 @@ export const ReportGridComponent = {
           const columns = this._gridInstance.option('columns');
           const column = this.getColumnByName(newFormat.column);
           let typeValue = '';
-          if (newFormat.CommaSeparator) {
-            typeValue = 'fixedpoint';
-          } else {
-            typeValue = 'decimal';
-          }
           if (column) {
-            column.format = {
-              type: typeValue,
-              precision: newFormat.NumberDecimal
-            };
+            if (newFormat.type === 'date') {
+              console.log('inside if')
+              column.format = newFormat.dateFormat;
+            } else {
+              if (newFormat.CommaSeparator) {
+                typeValue = 'fixedpoint';
+              } else {
+                typeValue = 'decimal';
+              }
+              column.format = {
+                type: typeValue,
+                precision: newFormat.NumberDecimal
+              };
+            }
           }
           this._gridInstance.option('columns', columns);
         }
