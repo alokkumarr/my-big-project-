@@ -23,13 +23,13 @@ import scala.concurrent.Future
   */
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
+class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val resultId: String = null) {
 
   protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisExecution].getName)
 
   def getAnalysisExecutionResultNode : AnalysisResult = analysisNodeExecution.resultNode
   protected var analysisNodeExecution : AnalysisNodeExecutionHelper = null
-  protected var id : String = null
+  protected var id : String = resultId
   protected var executionMessage : String = null
   protected var executionCode : Integer = -1
   protected var status : ExecutionStatus = ExecutionStatus.INIT
@@ -44,7 +44,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
   def startExecution(sqlRuntime: String = null): Unit =
   {
     try {
-      analysisNodeExecution = new AnalysisNodeExecutionHelper(an, sqlRuntime)
+      analysisNodeExecution = new AnalysisNodeExecutionHelper(an, sqlRuntime, false, resultId)
       id = analysisNodeExecution.resId
       m_log debug s"Started execution, result ID: $id"
       status = ExecutionStatus.STARTED
