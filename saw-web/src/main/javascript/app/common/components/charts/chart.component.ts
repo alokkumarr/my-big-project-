@@ -14,11 +14,16 @@ import * as get from 'lodash/get';
 import * as isArray from 'lodash/isArray';
 import {globalChartOptions, chartOptions} from './default-chart-options';
 
+export const UPDATE_PATHS = {
+  SERIES: 'series.0',
+  X_AXIS: 'xAxis'
+};
+
 @Component({
-  selector: 'chart-upgrade',
+  selector: 'chart',
   template: `<div #container></div>`
 })
-export class ChartUpgradeComponent {
+export class ChartComponent {
   @Input() updater: any;
   @Input() options: any;
   @ViewChild('container') container: ElementRef;

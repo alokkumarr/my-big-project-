@@ -101,9 +101,9 @@
       <div layout="column"
            style="overflow: auto;"
            >
-        <chart updater="$ctrl.updateChart"
+        <chart [updater]="$ctrl.updateChart"
                ng-if="$ctrl.designerState === $ctrl.designerStates.hasData"
-               options="$ctrl.chartOptions"></chart>
+               [options]="$ctrl.chartOptions"></chart>
       </div>
       <md-card class="chart-container-card" ng-show="$ctrl.xAndYSelected()">
         <md-card-content layout="column">

@@ -20,7 +20,7 @@ import {
 import {menuServiceProvider} from '../../common/services/ajs-common-providers';
 import {ObserveService} from './services/observe.service';
 
-import {ChartUpgradeComponent} from '../../common/components/charts/chart.component.adapter';
+import {ChartComponent} from '../../common/components/charts/chart.component';
 
 import {ObservePageComponent} from './components/observe-page/observe-page.component';
 import {ObserveChartComponent} from './components/observe-chart/observe-chart.component';
@@ -60,13 +60,14 @@ angular.module(ObserveModule, [
     CreateDashboardComponent,
     AnalysisChoiceComponent,
     ObserveChartComponent,
-    ChartUpgradeComponent
+    ChartComponent
   ],
   entryComponents: [
     ObservePageComponent,
     ObserveChartComponent,
     CreateDashboardComponent,
-    AnalysisChoiceComponent
+    AnalysisChoiceComponent,
+    ChartComponent
   ],
   providers: [
     jwtServiceProvider,
