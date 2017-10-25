@@ -4,6 +4,7 @@ package com.synchronoss.querybuilder.model.pivot;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @JsonPropertyOrder({
     "booleanCriteria",
     "operator",
+    "dynamic",
     "value",
     "otherValue",
     "gte",
@@ -30,6 +32,8 @@ public class Model {
     private Model.BooleanCriteria booleanCriteria;
     @JsonProperty("operator")
     private Model.Operator operator;
+    @JsonProperty("dynamic")
+    private Model.Dynamic dynamic;
     @JsonProperty("value")
     private Integer value;
     @JsonProperty("otherValue")
@@ -64,7 +68,15 @@ public class Model {
     public void setOperator(Model.Operator operator) {
         this.operator = operator;
     }
-
+    
+    @JsonProperty("dynamic")
+    public Model.Dynamic getDynamic() {
+      return dynamic;
+    }
+    @JsonProperty("dynamic")
+    public void setDynamic(Model.Dynamic dynamic) {
+      this.dynamic = dynamic;
+    }
     @JsonProperty("value")
     public Integer getValue() {
         return value;
@@ -217,5 +229,51 @@ public class Model {
         }
 
     }
+    
+    public enum Dynamic {
+
+      YTD("YTD"),
+      MTD("MTD"),
+      LTM("Last 3 months"),
+      LSM("Last Six Months"),
+      LM("Last Month"),
+      LQ("Last Quarter"),
+      LW("Last Week"),
+      TW("This week"),
+      LTW("Last two weeks");
+      private final String value;
+      private final static Map<String, Model.Dynamic> CONSTANTS = new HashMap<String, Model.Dynamic>();
+
+      static {
+          for (Model.Dynamic c: values()) {
+              CONSTANTS.put(c.value, c);
+          }
+      }
+
+      private Dynamic(String value) {
+          this.value = value;
+      }
+
+      @Override
+      public String toString() {
+          return this.value;
+      }
+
+      @JsonValue
+      public String value() {
+          return this.value;
+      }
+
+      @JsonCreator
+      public static Model.Dynamic fromValue(String value) {
+          Model.Dynamic constant = CONSTANTS.get(value);
+          if (constant == null) {
+              throw new IllegalArgumentException(value);
+          } else {
+              return constant;
+          }
+      }
+
+  }
 
 }
