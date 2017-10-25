@@ -392,15 +392,18 @@ export const AnalyzeChartComponent = {
     }
 
     getNewChartType(model) {
-
-      if (!this.multyYCharts.includes(model.chartType)) {
-        return model.chartType;
-      }
-
       const types = fpPipe(
         fpFilter(({checked}) => checked === 'y'),
         fpMap('comboType')
       )(model.artifacts[0].columns);
+      if (types.length === 1 &&
+        types[0] === 'column' &&
+        model.isInverted === true) {
+        return 'bar';
+      }
+      if (!this.multyYCharts.includes(model.chartType)) {
+        return model.chartType;
+      }
       if (isEmpty(types)) {
         return model.chartType;
       }
