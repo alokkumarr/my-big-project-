@@ -133,9 +133,18 @@ export const AnalyzeExecutedDetailComponent = {
     }
 
     exportData() {
-      this.requester.next({
-        exportAnalysis: true
-      });
+      if (this.analysis.type === 'pivot') {
+        this.requester.next({
+          exportAnalysis: true
+        });
+      } else {
+        const analysisId = this.analysis.id;
+        const executionId = this._executionId || this.analyses[0].id;
+        console.log('export', this.analysis);
+        console.log('export', this.analyses);
+        console.log('export', this._executionId);
+        this._AnalyzeActionsService.exportAnalysis(analysisId, executionId);
+      }
     }
 
     loadExecutionData(options = {}) {

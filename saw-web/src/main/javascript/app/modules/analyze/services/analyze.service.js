@@ -65,7 +65,8 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     readAnalysis,
     saveReport,
     scheduleToString,
-    updateMenu
+    updateMenu,
+    getExportData
   };
 
   function updateMenu(menu) {
@@ -121,6 +122,13 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     });
 
     return reqParams;
+  }
+
+  function getExportData(analysisId, executionId) {
+    return $http.get(`${url}/export/${executionId}/executions/${analysisId}/data`).then(data => {
+      console.log('data: ', data);
+      return data;
+    });
   }
 
   function getAnalysesFor(subCategoryId/* , opts = {} */) {
