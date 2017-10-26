@@ -17,5 +17,13 @@
 .date-format md-radio-group .row {
   border-top: 1px solid #CCC;
   height: 50px;
-  margin-left: 10px;
+
+  .md-container {
+    margin: 8px;
+  }
+
+  .md-label span {
+    padding: 10px;
+    padding-top: 22px;
+  }
 }

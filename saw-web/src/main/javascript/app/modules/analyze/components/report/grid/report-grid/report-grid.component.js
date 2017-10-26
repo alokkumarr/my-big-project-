@@ -236,7 +236,8 @@ export const ReportGridComponent = {
           const column = this.getColumnByName(newFormat.column);
           let typeValue = '';
           if (column) {
-            if (newFormat.type === 'date') {
+            if (newFormat.type === 'date' || newFormat.type === 'timestamp') {
+              column.dataType = 'date';
               column.format = newFormat.dateFormat;
             } else {
               if (newFormat.CommaSeparator) {

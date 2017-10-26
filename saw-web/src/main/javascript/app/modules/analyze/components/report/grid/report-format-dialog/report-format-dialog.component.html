@@ -12,7 +12,7 @@
 
       <div class="format-row">
         <span translate="SpecifyNumberDecimals"></span>
-        <input class="ng-pristine ng-valid md-input ng-empty ng-touched" ng-model="$ctrl.format.NumberDecimal" ng-value="$ctrl.modelData.format.precision">
+        <input class="ng-pristine ng-valid md-input ng-empty ng-touched" ng-model="$ctrl.format.NumberDecimal" ng-value="$ctrl.modelData.format.precision"/>
       </div>
 
       <div class="format-row">
@@ -21,23 +21,22 @@
       </div>
     </div>
 
-    <div class="date-format" ng-if="$ctrl.modelData.dataType === 'date'">
+    <div class="date-format" ng-if="$ctrl.modelData.dataType === 'date' || $ctrl.modelData.dataType === 'timestamp'">
       <md-radio-group ng-model="$ctrl.format.dateFormat" > 
-        <md-radio-button class="row" ng-value="'MMM/dd/yyyy'" flex>
-          <span>September 1, 2017</span>
+        <md-radio-button class="row" ng-value="'date'" flex>
+          <span>Fri September 1, 2017 (Day MMM dd, yyyy)</span>
         </md-radio-button>
-        <md-radio-button class="row" ng-value="'MM/dd/yyyy'" flex>
+        <md-radio-button class="row" ng-value="'shortDate'" flex>
           <span>09/01/2017 (mm/dd/yyyy)</span>
         </md-radio-button>
-
         <md-radio-button class="row" ng-value="'dd/MM/yyyy'" flex>
           <span>01/09/2017 (dd/mm/yyyy)</span>
         </md-radio-button>
-        <md-radio-button class="row" ng-value="'MM/yy'" flex>
-          <span>09/17 (mm/yy)</span>
+        <md-radio-button class="row" ng-value="'monthAndYear'" flex>
+          <span>September 17 (MMM YYYY)</span>
         </md-radio-button>
-        <md-radio-button class="row" ng-value="'MM/dd'" flex>
-          <span>September 1 </span>
+        <md-radio-button class="row" ng-value="'monthAndDay'" flex>
+          <span>September 1 (MMM DD)</span>
         </md-radio-button>
       </md-radio-group>
     </div>

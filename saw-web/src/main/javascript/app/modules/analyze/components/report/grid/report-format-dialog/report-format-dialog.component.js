@@ -15,8 +15,9 @@ export const ReportFormatDialogComponent = {
         column: this.modelData.dataField,
         type: this.modelData.dataType
       });
+      this.format.dateFormat = this.modelData.format;
 
-      if (this.modelData.format.type === 'fixedpoint') {
+      if (this.modelData.dataType === 'number' && this.modelData.format.type === 'fixedpoint') {
         this.format.CommaSeparator = true;
       } else {
         this.format.CommaSeparator = false;
