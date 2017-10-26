@@ -1,28 +1,34 @@
 const login = require('../javascript/pages/common/login.po.js');
 const header = require('../javascript/pages/components/header.co.js');
 const analyze = require('../javascript/pages/common/analyze.po.js');
+const users = require('../javascript/data/users.js');
+const using = require('jasmine-data-provider');
 
-describe('Login Tests', () => {
+describe('Login Tests: login.test.js', () => {
 
-  afterAll(function() {
+  /*module.exports = {
+    userDataProvider: {
+      'admin': {handle: users.admin.loginId},
+      'userOne': {handle: users.userOne.loginId},
+    }
+  };*/
+
+  const userDataProvider = {
+    'admin': {handle: users.admin.loginId},
+    'user': {handle: users.userOne.loginId},
+  };
+
+  afterAll(function () {
     browser.executeScript('window.sessionStorage.clear();');
     browser.executeScript('window.localStorage.clear();');
   });
 
-  it('should land on login page', () => {
-    expect(browser.getCurrentUrl()).toContain('/login');
+  using(userDataProvider, function (data, description) {
+    it('Should successfully login by ' + description, () => {
+      expect(browser.getCurrentUrl()).toContain('/login');
+      login.userLogin(data.handle, users.anyUser.password);
+      expect(header.headerElements.companyLogo.isPresent()).toBeTruthy();
+      analyze.main.doAccountAction('logout');
+    });
   });
-
-  it('should enter valid credentials and attempt to login', () => {
-    login.userLogin('sawadmin@synchronoss.com', 'Sawsyncnewuser1!');
-  });
-
-  it('should be successfully logged in', () => {
-    expect(header.headerElements.companyLogo.isPresent()).toBeTruthy();
-  });
-
-  it('should log out', () => {
-    analyze.main.doAccountAction('logout');
-  });
-
 });
