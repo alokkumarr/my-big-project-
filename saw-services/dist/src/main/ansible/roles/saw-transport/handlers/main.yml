@@ -1,2 +1,4 @@
 - name: restart saw-transport
   systemd: name=saw-transport state=restarted daemon_reload=true
+- name: restart saw-transport-executor
+  systemd: name=saw-transport-executor state=restarted daemon_reload=true

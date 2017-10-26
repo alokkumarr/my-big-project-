@@ -3,11 +3,15 @@
   with_fileglob: ["../rpms/saw-transport-*.rpm"]
   notify:
     - restart saw-transport
+    - restart saw-transport-executor
 - name: Install SAW Transport Service configuration file
   template: src=application.conf dest=/opt/saw/service/conf
   notify:
     - restart saw-transport
+    - restart saw-transport-executor
 - name: Create Transport Service environment file
   file: path=/etc/saw-transport-service-env state=touch
 - name: Enable SAW Transport Service
   systemd: name=saw-transport enabled=true daemon_reload=true
+- name: Enable SAW Transport Service Executor
+  systemd: name=saw-transport-executor enabled=true daemon_reload=true

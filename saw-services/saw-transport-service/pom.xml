@@ -699,7 +699,11 @@
                             <groupname>${app.group}</groupname>
                             <sources>
                                 <source>
-                                    <location>src/main/system/saw-transport.service</location>
+                                    <location>src/main/system</location>
+                                    <includes>
+                                      <include>saw-transport.service</include>
+                                      <include>saw-transport-executor.service</include>
+                                    </includes>
                                 </source>
                             </sources>
                         </mapping>
