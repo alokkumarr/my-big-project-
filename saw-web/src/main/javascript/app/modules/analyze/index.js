@@ -4,7 +4,6 @@ import {routesConfig} from './routes';
 import {i18nConfig} from './i18n';
 
 import {transitions} from './transitions';
-import { loadMessages, locale } from 'devextreme/localization'; 
 
 import {AnalyzeService} from './services/analyze.service';
 import {FilterService} from './services/filter.service';
