@@ -125,10 +125,8 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
   }
 
   function getExportData(analysisId, executionId) {
-    return $http.get(`${url}/export/${executionId}/executions/${analysisId}/data`).then(data => {
-      console.log('data: ', data);
-      return data;
-    });
+    return $http.get(`${url}/exports/${executionId}/executions/${analysisId}/data`)
+      .then(fpGet('data.data'));
   }
 
   function getAnalysesFor(subCategoryId/* , opts = {} */) {

@@ -1,5 +1,5 @@
 import {saveAs} from 'file-saver';
-import Blob from 'blob';
+import * as Blob from 'blob';
 
 export function fileService() {
 
