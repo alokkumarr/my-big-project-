@@ -4,6 +4,11 @@ package com.synchronoss.saw.export.exceptions;
 
 public class TokenValidationSAWException extends ExportRuntimeSAWException {
 
+    /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
     public TokenValidationSAWException(String msg) {
         super(msg);
 }

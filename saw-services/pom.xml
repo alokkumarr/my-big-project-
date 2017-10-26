@@ -137,13 +137,14 @@
 	</pluginRepositories>
 	<modules>
 		<module>saw-common</module>
-		<module>saw-analysis-service</module>	
+		<module>saw-analysis-service</module>
 		<module>saw-metadata-service</module>
 		<module>saw-data-access</module>
 		<module>saw-transport-service</module>
 		<module>saw-es-querybuilder</module>
 		<module>saw-scheduler-service</module>
-		<module>saw-gateway-service</module>	
+		<module>saw-gateway-service</module>
+		<module>saw-export-service</module>	
 		<module>dist</module>
 	</modules>
 </project>
