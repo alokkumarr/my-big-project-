@@ -159,7 +159,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
     *
     * @return List<Map<…>> data structure
     */
-  def loadExecution(id: String, limit: Integer = 0) : java.util.List[java.util.Map[String, (String, Object)]] = {
+  def loadExecution(id: String, limit: Integer = 10000) : java.util.List[java.util.Map[String, (String, Object)]] = {
     /* Note: If loading of execution results is reimplemented in any other
      * service as part of a refactoring, it should be implemented
      * using Java streams to allow processing the data using a
