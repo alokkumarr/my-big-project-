@@ -43,7 +43,7 @@ currently requires Linux or equivalent environment):
         $ ext/prepare
         $ mvn package
 
-The release package will be located at `target/saw.tgz`.
+The release package will be located at `target/saw-*.tgz`.
 
 Note: The Docker daemon must be running while building to ensure the
 integration tests can be run.
