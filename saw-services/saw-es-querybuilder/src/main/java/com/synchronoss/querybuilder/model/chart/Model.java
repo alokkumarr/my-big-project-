@@ -181,13 +181,13 @@ public class Model {
 
       YTD("YTD"),
       MTD("MTD"),
-      LTM("Last 3 months"),
-      LSM("Last Six Months"),
-      LM("Last Month"),
-      LQ("Last Quarter"),
-      LW("Last Week"),
-      TW("This week"),
-      LTW("Last two weeks");
+      LTM("LTM"),
+      LSM("LSM"),
+      LM("LM"),
+      LQ("LQ"),
+      LW("LW"),
+      TW("TW"),
+      LTW("LTW");
       private final String value;
       private final static Map<String, Model.Preset> CONSTANTS = new HashMap<String, Model.Preset>();
 

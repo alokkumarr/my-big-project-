@@ -80,7 +80,8 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a >= " +
         "TO_DATE('2017-01-02T00:00:00Z') AND t.a <= TO_DATE('2017-01-01T00:00:00Z')")
     }
-    it("with two filters should have a WHERE clause with one OR") {
+
+   it("with two filters should have a WHERE clause with one OR") {
       query(artifactT)(filters("OR",
         filterBinary("float", "t", "a", "gte", "1"),
         filterBinary("double", "t", "b", "lte", "2"))
@@ -208,9 +209,10 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
   private def filterDate(filterType: String, tableName: String,
     columnName: String, lte: String, gte: String): JObject = {
     filterCommon(filterType, tableName, columnName, null).merge(
-      ("model", ("lte", lte) ~ ("gte", gte)): JObject)
+      ("model", ("lte", lte) ~ ("gte", gte) ~ ("preset","")): JObject)
   }
 
+  
   private def orderBy(columns: JObject*) = {
     ("orderByColumns", columns)
   }

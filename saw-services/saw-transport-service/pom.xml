@@ -32,6 +32,7 @@
         <app.group>mapr</app.group>
         <mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
         <es.version>5.4.0</es.version>
+        <threeten.extra>1.2</threeten.extra>
     </properties>
     <dependencies>
 	<dependency>
@@ -75,6 +76,11 @@
 		<artifactId>elasticsearch</artifactId>
 		<version>${es.version}</version>
 	</dependency>
+        <dependency>
+            <groupId>org.threeten</groupId>
+            <artifactId>threeten-extra</artifactId>
+            <version>${threeten.extra}</version>
+        </dependency>
         <dependency>
             <groupId>com.synchronoss</groupId>
             <artifactId>saw-metadata-service</artifactId>
