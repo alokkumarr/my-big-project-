@@ -1,5 +1,7 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import * as get from 'lodash/get';
+import * as keys from 'lodash/keys';
+import * as json2csv from 'json2csv';
 
 import {Events} from '../../consts';
 
@@ -11,12 +13,13 @@ export const AnalyzeExecutedDetailComponent = {
   template,
   styles: [style],
   controller: class AnalyzeExecutedDetailController extends AbstractComponentController {
-    constructor($injector, AnalyzeService, $state, $rootScope, JwtService, $mdDialog,
+    constructor($injector, AnalyzeService, $state, $rootScope, JwtService, $mdDialog, fileService,
                 $window, toastMessage, FilterService, AnalyzeActionsService, $scope, $q) {
       'ngInject';
       super($injector);
 
       this._AnalyzeService = AnalyzeService;
+      this._fileService = fileService;
       this._AnalyzeActionsService = AnalyzeActionsService;
       this._$state = $state;
       this._$rootScope = $rootScope;
@@ -133,9 +136,18 @@ export const AnalyzeExecutedDetailComponent = {
     }
 
     exportData() {
-      this.requester.next({
-        exportAnalysis: true
-      });
+      if (this.analysis.type === 'pivot') {
+        this.requester.next({
+          exportAnalysis: true
+        });
+      } else {
+        const analysisId = this.analysis.id;
+        const executionId = this._executionId || this.analyses[0].id;
+        this._AnalyzeActionsService.exportAnalysis(analysisId, executionId).then(data => {
+          const csv = json2csv({data, fields: keys(data[0])});
+          this._fileService.exportCSV(csv);
+        });
+      }
     }
 
     loadExecutionData(options = {}) {

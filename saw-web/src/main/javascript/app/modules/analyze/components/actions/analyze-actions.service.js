@@ -39,7 +39,8 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
   function print() {
   }
 
-  function exportAnalysis() {
+  function exportAnalysis(analysisId, executionId) {
+    return AnalyzeService.getExportData(analysisId, executionId);
   }
 
   function deleteAnalysis(analysis) {
