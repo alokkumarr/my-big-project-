@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @JsonPropertyOrder({
     "booleanCriteria",
     "operator",
-    "dynamic",
+    "preset",
     "value",
     "otherValue",
     "gte",
@@ -32,8 +32,8 @@ public class Model {
     private Model.BooleanCriteria booleanCriteria;
     @JsonProperty("operator")
     private Model.Operator operator;
-    @JsonProperty("dynamic")
-    private Model.Dynamic dynamic;
+    @JsonProperty("preset")
+    private Model.Preset preset;
     @JsonProperty("value")
     private Integer value;
     @JsonProperty("otherValue")
@@ -69,13 +69,13 @@ public class Model {
         this.operator = operator;
     }
     
-    @JsonProperty("dynamic")
-    public Model.Dynamic getDynamic() {
-      return dynamic;
+    @JsonProperty("preset")
+    public Model.Preset getPreset() {
+      return preset;
     }
-    @JsonProperty("dynamic")
-    public void setDynamic(Model.Dynamic dynamic) {
-      this.dynamic = dynamic;
+    @JsonProperty("preset")
+    public void setPreset(Model.Preset preset) {
+      this.preset = preset;
     }
     @JsonProperty("value")
     public Integer getValue() {
@@ -230,7 +230,7 @@ public class Model {
 
     }
     
-    public enum Dynamic {
+    public enum Preset {
 
       YTD("YTD"),
       MTD("MTD"),
@@ -242,15 +242,15 @@ public class Model {
       TW("This week"),
       LTW("Last two weeks");
       private final String value;
-      private final static Map<String, Model.Dynamic> CONSTANTS = new HashMap<String, Model.Dynamic>();
+      private final static Map<String, Model.Preset> CONSTANTS = new HashMap<String, Model.Preset>();
 
       static {
-          for (Model.Dynamic c: values()) {
+          for (Model.Preset c: values()) {
               CONSTANTS.put(c.value, c);
           }
       }
 
-      private Dynamic(String value) {
+      private Preset(String value) {
           this.value = value;
       }
 
@@ -265,8 +265,8 @@ public class Model {
       }
 
       @JsonCreator
-      public static Model.Dynamic fromValue(String value) {
-          Model.Dynamic constant = CONSTANTS.get(value);
+      public static Model.Preset fromValue(String value) {
+          Model.Preset constant = CONSTANTS.get(value);
           if (constant == null) {
               throw new IllegalArgumentException(value);
           } else {
