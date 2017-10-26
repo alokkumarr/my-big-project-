@@ -108,6 +108,11 @@ export class AnalyzeService {
     return reqParams;
   }
 
+  getExportData(analysisId, executionId) {
+    return this._$http.get(`${this.url}/exports/${executionId}/executions/${analysisId}/data`)
+      .then(fpGet('data.data'));
+  }
+
   getAnalysesFor(subCategoryId/* , opts = {} */) {
     /* Wait until the menu has been loaded. The menu payload contains the
        analyses list from which we'll load the result for this function. */

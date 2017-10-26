@@ -29,6 +29,7 @@ RUN echo localhost > /opt/mapr/spark/spark-current/conf/slaves
 # so remove those lines to bind to all interfaces and allow access
 # from other containers
 RUN sed -i -e '/^export SPARK_MASTER_[A-Z]*=localhost$/d' \
+    -e 's/export SPARK_WORKER_MEMORY=16g/export SPARK_WORKER_MEMORY=1g/' \
     /opt/mapr/spark/spark-current/conf/spark-env.sh
 
 # Add MapR container initialization script
@@ -42,7 +43,7 @@ RUN sed -i -e 's/^sleep 60/sleep 30/' /usr/bin/init-script
 # Workaround: Bamboo builds fail with no space left error, so reduce
 # loopack disk size.  Additionally put on volume, which has more space
 # than root filesystem.
-RUN sed -i -e 's/20G/5G/' -e '2imkdir -p /mapr-data' \
+RUN sed -i -e 's/20G/10G/' -e '2imkdir -p /mapr-data' \
     -e 's,/opt/mapr/docker.disk,/mapr-data/docker.disk,g' /usr/bin/init-script
 VOLUME /mapr-data
 # Also log amount of disk available in container, to track disk space

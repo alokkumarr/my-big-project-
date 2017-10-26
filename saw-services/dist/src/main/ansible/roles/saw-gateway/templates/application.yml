@@ -9,8 +9,11 @@ server:
   address: localhost
   port: 9100
   context-path: ''
+  maxHttpHeaderSize: 65536
   compression:
     enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json      
+
 
 analysis:
     service:
@@ -27,6 +30,9 @@ semantic:
 security:
     service:
         host: http://localhost:9000/saw-security
+export:
+    service:
+        host: http://localhost:9400
 
 api:
     gateway:
@@ -46,5 +52,8 @@ api:
         -   location: ${analysis.service.host}
             method: GET
             path: '/api/analyses.*'
+        -   location: ${export.service.host}
+            method : GET
+            path : '[/]export.*'
 logging:
   config: /opt/bda/saw-gateway-service/conf/logback.xml

@@ -1,0 +1,11 @@
+- name: Install SAW Export Service package
+  yum: name="{{ item }}" state=present
+  with_fileglob: ["../rpms/saw-export-*.rpm"]
+  notify:
+    - restart saw-export
+- name: Install SAW export Service configuration file
+  template: src=application.yml dest=/opt/bda/saw-export-service/conf
+  notify:
+    - restart saw-export
+- name: Enable SAW Export Service
+  systemd: name=saw-export enabled=true

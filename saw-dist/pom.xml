@@ -67,7 +67,7 @@
           </execution>
         </executions>
       </plugin>
-      <plugin> 
+      <plugin>
 	<groupId>org.apache.maven.plugins</groupId>
 	<artifactId>maven-failsafe-plugin</artifactId>
 	<executions>
@@ -119,7 +119,7 @@
                 <network>
                   <name>saw</name>
                 </network>
-                <ports> 
+                <ports>
                   <port>saw.docker.port:80</port>
                 </ports>
                 <!-- Run privileged for systemd -->
@@ -139,7 +139,7 @@
                   <!-- Increase timeout to allow application
                        deployment to finish -->
                   <time>600000</time>
-                </wait>
+                </wait>  
               </run>
             </image>
             <image>
@@ -154,7 +154,7 @@
                   <name>saw</name>
                   <alias>saw-mapr</alias>
                 </network>
-                <ports> 
+                <ports>
                   <port>saw.mcs.port:8443</port>
                   <port>saw.spark.master.port:8080</port>
                   <port>saw.spark.worker.port:8081</port>
@@ -190,14 +190,14 @@
           </execution>
         </executions>
       </plugin>
-      <plugin> 
+      <plugin>
 	<groupId>org.asciidoctor</groupId>
 	<artifactId>asciidoctor-maven-plugin</artifactId>
 	<version>1.5.3</version>
 	<executions>
 	  <execution>
 	    <id>generate-docs</id>
-	    <phase>post-integration-test</phase> 
+	    <phase>post-integration-test</phase>
 	    <goals>
 	      <goal>process-asciidoc</goal>
 	    </goals>
@@ -208,7 +208,7 @@
 	  </execution>
 	</executions>
 	<dependencies>
-	  <dependency> 
+	  <dependency>
 	    <groupId>org.springframework.restdocs</groupId>
 	    <artifactId>spring-restdocs-asciidoctor</artifactId>
 	    <version>1.2.1.RELEASE</version>

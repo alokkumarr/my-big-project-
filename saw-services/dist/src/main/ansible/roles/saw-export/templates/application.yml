@@ -9,11 +9,12 @@ server:
   context-path: ''
   compression:
     enabled: true
-    mime-types: text/html,text/css,application/javascript,application/json    
+    mime-types: text/html,text/css,application/javascript,application/json
+
 
 analysis:
     service:
-        host: https://saw.bda.poc.velocity-va.synchronoss.net/services/analysis
-    size: 10000
+        host: http://localhost:9200/analysis
 
-       
+logging:
+  config: /opt/bda/saw-export-service/conf/logback.xml

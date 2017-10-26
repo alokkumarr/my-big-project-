@@ -1,5 +1,7 @@
 - name: Install Tomcat package
   yum: name=tomcat state=present
+- name: Install SAW Gateway Service configuration file
+  template: src=server.xml dest=/usr/share/tomcat/conf
 - name: Enable and start Tomcat service
   systemd: name=tomcat enabled=true state=started
 - name: Install SAW Web package
