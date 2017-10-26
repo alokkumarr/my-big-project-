@@ -21,6 +21,7 @@ module.exports = function (config) {
       'test/javascript/specs/polyfills.js',
       '../node_modules/angular/angular.js',
       '../node_modules/angular-mocks/angular-mocks.js',
+      '../node_modules/reflect-metadata/Reflect.js',
       'test/javascript/specs/**/*.spec.js'
     ],
     exclude: [],

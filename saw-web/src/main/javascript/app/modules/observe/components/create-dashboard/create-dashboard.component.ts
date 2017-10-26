@@ -1,4 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, Inject, ViewChild } from '@angular/core';
+import { MdDialogRef, MD_DIALOG_DATA, MdDialog } from '@angular/material';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { GridsterConfig, GridsterItem, GridsterComponent } from 'angular-gridster2';
+
+import { AnalysisChoiceComponent } from '../analysis-choice/analysis-choice.component';
 
 const template = require('./create-dashboard.component.html');
 require('./create-dashboard.component.scss');
@@ -8,28 +13,60 @@ require('./create-dashboard.component.scss');
   template
 })
 export class CreateDashboardComponent {
-  public loadedAnalyses = [{
-    id: 1,
-    name: 'Sample Chart Analysis'
-  }, {
-    id: 2,
-    name: 'Sample Pivot Analysis'
-  }, {
-    id: 3,
-    name: 'Sample Report Analysis'
-  }];
+  @ViewChild('gridster') gridster: GridsterComponent;
 
-  public chosenAnalyses1 = [];
-  public chosenAnalyses2 = [];
-  public chosenAnalyses3 = [];
+  public options: GridsterConfig;
+  public dashboard: Array<GridsterItem>;
+  public chartUpdater = new BehaviorSubject({});
 
-  onDrop(data, collection) {
-    const movedAnalysis = data.dragData.analysis;
-    const present = collection.filter(an => an.id === movedAnalysis.id);
-    if (present.length > 0) {
-      return;
-    }
-    this[data.dragData.collection] = this[data.dragData.collection].filter(an => an.id !== data.dragData.analysis.id);
-    collection.push(movedAnalysis);
+  constructor(public dialogRef: MdDialogRef<CreateDashboardComponent>,
+    public dialog: MdDialog,
+    @Inject(MD_DIALOG_DATA) public layout: any) {
+  }
+
+  static itemChange(item, itemComponent) {
+    setTimeout(() => {
+      item.updater.next([]);
+    }, 500)
+  }
+
+  ngOnInit() {
+    this.options = {
+      gridType: 'scrollVertical',
+      minCols: 2,
+      maxCols: 100,
+      minRows: 2,
+      maxRows: 100,
+      itemChangeCallback: CreateDashboardComponent.itemChange,
+      draggable: {
+        enabled: true
+      },
+      resizable: {
+        enabled: true
+      }
+    };
+
+    this.dashboard = [];
+  }
+
+  removeTile(item: GridsterItem) {
+    this.dashboard.splice(this.dashboard.indexOf(item), 1);
+  }
+
+  exitCreator(data) {
+    this.dialogRef.close(data);
+  }
+
+  chooseAnalysis() {
+    const dialogRef = this.dialog.open(AnalysisChoiceComponent);
+
+    dialogRef.afterClosed().subscribe(analysis => {
+      if (!analysis) {
+        return;
+      }
+
+      const item = { cols: 1, rows: 1, analysis, updater: new BehaviorSubject({}) };
+      this.dashboard.push(item);
+    });
   }
 }

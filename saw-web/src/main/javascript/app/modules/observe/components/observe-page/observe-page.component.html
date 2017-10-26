@@ -1,6 +1,10 @@
-<div>
-  <h1>Observe</h1>
-  <button md-raised-button color="primary" (click)="openDialog()">+ Dashboard</button>
+<div class="page-header-toolbar">
+  <h2>Observe</h2>
+  <div class="page-header-actions">
+    <button md-raised-button color="primary" (click)="createDashboard()">+ Dashboard</button>
+  </div>
 </div>
 
-<create-dashboard></create-dashboard>
+<div class="page-content">
+  <span>No dashboards available.</span>
+</div>
