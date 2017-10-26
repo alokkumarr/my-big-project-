@@ -13,6 +13,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import sncr.datalake.engine.Analysis
 import sncr.datalake.engine.ExecutionType
+import files.HFileOperations
 
 /**
  * Queue for sending and receiving requests to execute report queries.
@@ -30,6 +31,9 @@ class ReportExecutorQueue {
    * Create required MapR streams if they do not exist
    */
   def createIfNotExists(retries: Int = 12) {
+    /* Create the parent directory of the stream if it does not exist */
+    HFileOperations.createDirectory("/main")
+    /* Create the queue stream */
     log.debug("Creating stream for executor queue: {}", ExecutorStream)
     val conf = new Configuration()
     val streamAdmin = Streams.newAdmin(conf)
