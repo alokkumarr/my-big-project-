@@ -3,6 +3,8 @@ import { MdDialogRef, MD_DIALOG_DATA, MdDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { GridsterConfig, GridsterItem, GridsterComponent } from 'angular-gridster2';
 
+import * as forEach from 'lodash/forEach';
+
 import { AnalysisChoiceComponent } from '../analysis-choice/analysis-choice.component';
 
 const template = require('./create-dashboard.component.html');
@@ -24,10 +26,19 @@ export class CreateDashboardComponent {
     @Inject(MD_DIALOG_DATA) public layout: any) {
   }
 
-  static itemChange(item, itemComponent) {
+  itemChange(item, itemComponent) {
     setTimeout(() => {
+      if (this.gridster.columns !== this.columns) {
+        this.refreshAllTiles();
+      } else {
       item.updater.next([]);
+      }
+      this.columns = this.gridster.columns;
     }, 500)
+  }
+
+  refreshAllTiles() {
+    forEach(this.dashboard, i => i.updater.next([]))
   }
 
   ngOnInit() {
@@ -37,7 +48,7 @@ export class CreateDashboardComponent {
       maxCols: 100,
       minRows: 2,
       maxRows: 100,
-      itemChangeCallback: CreateDashboardComponent.itemChange,
+      itemChangeCallback: this.itemChange.bind(this),
       draggable: {
         enabled: true
       },
