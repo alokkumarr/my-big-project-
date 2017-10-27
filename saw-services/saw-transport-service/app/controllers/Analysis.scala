@@ -26,10 +26,12 @@ import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 import collection.JavaConverters._
 
+import executor.ReportExecutorQueue
 import sncr.metadata.engine.{Fields, MetadataDictionary}
 
 class Analysis extends BaseController {
   val executorRunner = new ExecutionTaskHandler(1);
+  val executorQueue = new ReportExecutorQueue
   var totalRows: Int = 0;
   
   /**
@@ -499,7 +501,11 @@ class Analysis extends BaseController {
       //var query :String =null
       val query = if (queryRuntime != null) queryRuntime else QueryBuilder.build(analysisJSON, false, dataSecurityKeyStr)
       m_log.trace("query inside report block before executeAndWait : {}", query);
-      val execution = analysis.executeAndWait(ExecutionType.onetime, query)
+      /* Execute analysis report query through queue for concurrency */
+      val execution = analysis.executeAndWaitQueue(
+        ExecutionType.onetime, query, (analysisId, resultId, query) => {
+          executorQueue.send(analysisId, resultId, query)
+        })
       val analysisResultId: String = execution.getId
       m_log.trace("analysisResultId inside report block after executeAndWait : {}", analysisResultId);
       //TODO:: Subject to change: to get ALL data use:  val resultData = execution.getAllData

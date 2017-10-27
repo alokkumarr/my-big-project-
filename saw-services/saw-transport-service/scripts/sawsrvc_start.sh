@@ -91,23 +91,12 @@ process_args "$@"
 
 vlog CMD: $THIS_FILE_PATH "$@"
 
-# Check if HTTP service is running on the box
-/usr/bin/curl -qs http://$SAW_SERVICE_HOST:$SAW_SERVICE_PORT/sr &>/dev/null && {
-    die "SAW_SERVICE is already running on $SAW_SERVICE_HOST:$SAW_SERVICE_PORT"
-}
-
 declare -r saw_service_home="${SAW_SERVICE_HOME:-$(realpath "$(dirname $THIS_FILE_PATH)/..")}"
 vlog xdfts_home: $saw_service_home
 ( cd $saw_service_home ) || exit
 
 declare -r pidfile_path=/var/saw/service/run/$(mk_pidfile_name)
 vlog pidfile_path: $pidfile_path
-
-# Check pid file exists and service process with stored pid is running
-[[ -s $pidfile_path ]]     &&
-pid=$( <$pidfile_path )    &&
-[[ -d /proc/${pid:-000} ]] &&
-die "SAW_SERVICE process ($pid) is still running on $SAW_SERVICE_HOST"
 
 # Validate Java
 declare java_cmd="${JAVA_HOME:-/usr}/bin/java"
