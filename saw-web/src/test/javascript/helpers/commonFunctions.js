@@ -34,5 +34,9 @@ module.exports = {
     parent: element => {
       return element.element(by.xpath(`parent::*`));
     }
+  },
+  dismissDropdownMenu: () => {
+    element(by.css('md-backdrop')).click();
+    expect(element(by.css('md-backdrop')).isPresent()).toBe(false);
   }
 };

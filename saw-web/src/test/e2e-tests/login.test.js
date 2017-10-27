@@ -4,6 +4,7 @@ const analyze = require('../javascript/pages/common/analyze.po.js');
 const users = require('../javascript/data/users.js');
 const using = require('jasmine-data-provider');
 
+//Prerequisites: two users should exist with user types: admin and user
 describe('Login Tests: login.test.js', () => {
 
   const userDataProvider = {
@@ -17,7 +18,7 @@ describe('Login Tests: login.test.js', () => {
   });
 
   using(userDataProvider, function (data, description) {
-    it('Should successfully login by ' + description, () => {
+    it('Should successfully logged in by ' + description, () => {
       expect(browser.getCurrentUrl()).toContain('/login');
       login.userLogin(data.handle, users.anyUser.password);
       expect(header.headerElements.companyLogo.isPresent()).toBeTruthy();
