@@ -55,6 +55,15 @@ RUN systemctl enable saw-deploy
 # Add SAW test metrics
 ADD saw-metrics /root/saw-metrics/
 
+# Workaround: There seems to be some logging configuration embedded in
+# MapR libraries that tries to write to a file "log4.log" in the
+# current working directory.  SAW services are run as the "mapr" user
+# and do not have write permissions to "log4.log" in the root
+# directory, and generate an error and long stacktrace in the logs.
+# This is repeated for every Transport Service and Executor process.
+# So create a writable file as a workaround to silence these errors.
+RUN touch /log4.log && chmod a+w log4.log
+
 # Add assembly from Docker Maven plug-in
 COPY maven /maven/
 
