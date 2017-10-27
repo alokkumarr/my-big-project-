@@ -62,7 +62,7 @@ ADD saw-metrics /root/saw-metrics/
 # directory, and generate an error and long stacktrace in the logs.
 # This is repeated for every Transport Service and Executor process.
 # So create a writable file as a workaround to silence these errors.
-RUN touch /log4.log && chmod a+w log4.log
+RUN log=log4.log && touch $log && chmod a+w $log
 
 # Add assembly from Docker Maven plug-in
 COPY maven /maven/
