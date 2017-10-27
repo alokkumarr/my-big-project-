@@ -14,21 +14,20 @@ class ReportExecutor {
   private def init {
     /* Use property to detect if launched as regular Transport Service or
      * as executor */
-    val property = System.getProperty("saw.executor", "false")
-    val isExecutor = property.equals("true")
-    log.debug("Is executor: {}", isExecutor)
-    if (!isExecutor) {
+    val executor = System.getProperty("saw.executor", "none")
+    if (executor.equals("none")) {
       /* This is the regular Transport Service application, so stop here */
       return
     }
     /* This is the Transport Service Executor application, so continue */
-    runExecutor
+    log.info("Starting executor: {}", executor)
+    val Array(executorType, _) = executor.split("-", 2)
+    runExecutor(executorType)
   }
 
-  private def runExecutor {
-    log.info("Starting executor")
+  private def runExecutor(executorType: String) {
     try {
-      val queue = new ReportExecutorQueue
+      val queue = new ReportExecutorQueue(executorType)
       /* Process one message and let the executor exit so that the system
        * service restarts it to create a fresh new instance to process
        * the next message */

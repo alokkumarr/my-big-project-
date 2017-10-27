@@ -16,6 +16,12 @@ localhost
 
 [saw-services:vars]
 #
+# Transport Service Executor configuration
+#
+saw_transport_executor_regular_count=1
+saw_transport_executor_preview_count=1
+
+#
 # Elasticsearch configuration
 #
 saw_elasticsearch_protocol=http

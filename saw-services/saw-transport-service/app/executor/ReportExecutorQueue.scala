@@ -19,8 +19,8 @@ import files.HFileOperations
  * Queue for sending and receiving requests to execute report queries.
  * Implemented using MapR streams.
  */
-class ReportExecutorQueue {
-  val ExecutorStream = "/main/saw-transport-executor-stream"
+class ReportExecutorQueue(val executorType: String) {
+  val ExecutorStream = "/main/saw-transport-executor-" + executorType + "-stream"
   val ExecutorTopic = ExecutorStream + ":executions"
   val log: Logger = LoggerFactory.getLogger(classOf[ReportExecutorQueue].getName)
 
@@ -66,7 +66,7 @@ class ReportExecutorQueue {
    * Send request to execute report to queue
    */
   def send(analysisId: String, resultId: String, query: String) {
-    log.debug("Starting send")
+    log.debug("Starting send: {}", executorType)
     val properties = new Properties()
     properties.setProperty("key.serializer",
       "org.apache.kafka.common.serialization.StringSerializer")
@@ -84,7 +84,7 @@ class ReportExecutorQueue {
    * Process request to execute report from queue
    */
   def receive {
-    log.debug("Starting receive")
+    log.debug("Starting receive: {}", executorType)
     val properties = new Properties()
     properties.setProperty("group.id", "saw-transport-executor")
     properties.setProperty("key.deserializer",
@@ -101,11 +101,11 @@ class ReportExecutorQueue {
   }
 
   private def receiveMessage(consumer: KafkaConsumer[String, String]) {
-    log.debug("Receive message")
+    log.debug("Receive message poll: {}", executorType)
     val pollTimeout = 60 * 60 * 1000
     val records = consumer.poll(pollTimeout)
     records.asScala.foreach(record => {
-      log.debug("Received queue record: {}", record);
+      log.debug("Received message: {} {}", executorType, record: Any);
       val Array(analysisId, resultId, query) = record.value.split(",", 3)
       execute(analysisId, resultId, query)
     })
