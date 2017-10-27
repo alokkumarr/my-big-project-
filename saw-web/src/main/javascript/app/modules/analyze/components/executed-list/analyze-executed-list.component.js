@@ -22,7 +22,7 @@ export const AnalyzeExecutedListComponent = {
         caption: 'DATE',
         dataField: 'finished',
         calculateCellValue: rowData => {
-          let _date = new Date(rowData.finished);
+          const _date = new Date(rowData.finished);
           return (_date.toLocaleString('en-US', {timeZone: 'Europe/Helsinki'}));
         },
         allowSorting: true,
