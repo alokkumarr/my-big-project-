@@ -29,34 +29,26 @@ create-dashboard {
       background-color: whitesmoke;
 
       gridster-item {
-        display: flex !important;
-        align-items: center;
-        flex-direction: row;
-        flex-wrap: wrap;
-
         & > button {
-          align-self: start;
           position: absolute;
+          top: 0;
           z-index: 1;
           right: 0;
-        }
-
-        .analysis-title {
-          position: absolute;
-          left: 0;
-          top: 0;
-          padding: 20px;
-          font-size: 2em;
-          z-index: 1;
         }
 
         & > .analysis-container {
           display: block;
           width: 100%;
+          height: 100%;
 
           & > * {
             display: block;
             width: 100%;
+            height: 100%;
+
+            div {
+              height: 100%;
+            }
           }
         }
       }

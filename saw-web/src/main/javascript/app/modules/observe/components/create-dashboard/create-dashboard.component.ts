@@ -17,6 +17,7 @@ require('./create-dashboard.component.scss');
 export class CreateDashboardComponent {
   @ViewChild('gridster') gridster: GridsterComponent;
 
+  public columns = 4;
   public options: GridsterConfig;
   public dashboard: Array<GridsterItem>;
   public chartUpdater = new BehaviorSubject({});
@@ -27,26 +28,33 @@ export class CreateDashboardComponent {
   }
 
   itemChange(item, itemComponent) {
+    window['mygridster'] = this.gridster;
     setTimeout(() => {
       if (this.gridster.columns !== this.columns) {
         this.refreshAllTiles();
       } else {
-      item.updater.next([]);
+        item.updater.next([{ path: 'chart.height', data: this.getHeight(item)}]);
       }
       this.columns = this.gridster.columns;
     }, 500)
   }
 
+  getHeight(item) {
+    return (this.gridster.curRowHeight - 20) * item.rows;
+  }
+
   refreshAllTiles() {
-    forEach(this.dashboard, i => i.updater.next([]))
+    forEach(this.dashboard, i => i.updater.next([
+      {path: 'chart.height', data: this.getHeight(i)}
+    ]));
   }
 
   ngOnInit() {
     this.options = {
       gridType: 'scrollVertical',
-      minCols: 2,
+      minCols: this.columns,
       maxCols: 100,
-      minRows: 2,
+      minRows: 4,
       maxRows: 100,
       itemChangeCallback: this.itemChange.bind(this),
       draggable: {

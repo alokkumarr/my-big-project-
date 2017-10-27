@@ -45,10 +45,10 @@ export class ObserveChartComponent {
 
   ngOnInit() {
     this.chartOptions = this.chartService.getChartConfigFor(this.analysis.chartType, { legend: this.legend });
+    // set(this.chartOptions, 'chart.height', '90%');
   }
 
   ngAfterViewInit() {
-    // this.chartUpdater.next([{ 'path': 'series', 'data': [{ 'name': 'Total Failed Bytes', 'data': [{ 'name': 'ANDROID', 'y': 31738882905685, 'drilldown': 'ANDROID' }, { 'name': 'UNKNOWN', 'y': 18794631884548, 'drilldown': 'UNKNOWN' }, { 'name': 'IOS', 'y': 30719183764427, 'drilldown': 'IOS' }, { 'name': 'WP8.1', 'y': 18555545758, 'drilldown': 'WP8.1' }, { 'name': 'BLACKBERRY', 'y': 17692721302, 'drilldown': 'BLACKBERRY' }], 'dataLabels': { 'enabled': true } }] }]);
     this.initChart();
   }
 
@@ -103,14 +103,18 @@ export class ObserveChartComponent {
       );
     }
 
-    const changes = this.chartService.dataToChangeConfig(
+    let changes = this.chartService.dataToChangeConfig(
       this.analysis.chartType,
       settings,
       gridData,
       { labels, labelOptions: this.analysis.labelOptions, sorts: this.sorts }
     );
 
-    changes.concat(this.getLegend());
+    changes = changes.concat(this.getLegend());
+    changes = changes.concat([
+      {path: 'title.text', data: this.analysis.name},
+      {path: 'title.y', data: -10}
+    ]);
 
     this.chartUpdater.next(changes);
   }
