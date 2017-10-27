@@ -19,3 +19,9 @@
   content: '123';
   font-weight: bolder;
 }
+
+.icon-Count::before {
+  content: "#";
+  font-size: 26px;
+  font-weight: bolder;
+}
