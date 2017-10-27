@@ -7,5 +7,7 @@
   template: src=application.conf dest=/opt/saw/service/conf
   notify:
     - restart saw-transport
+- name: Create Transport Service environment file
+  file: path=/etc/saw-transport-service-env state=touch
 - name: Enable SAW Transport Service
   systemd: name=saw-transport enabled=true daemon_reload=true

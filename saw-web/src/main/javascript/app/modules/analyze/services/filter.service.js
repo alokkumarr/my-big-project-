@@ -30,20 +30,15 @@ export const NUMBER_TYPES = ['int', 'integer', 'double', 'long', 'float'];
 
 export const DEFAULT_BOOLEAN_CRITERIA = BOOLEAN_CRITERIA[0];
 
-export function FilterService($q, $mdDialog) {
-  'ngInject';
+export class FilterService {
+  constructor($q, $mdDialog) {
+    'ngInject';
 
-  return {
-    getFilterEvaluator,
-    getEvaluatedFilterReducer,
-    getRuntimeFilterValues,
-    isFilterEmpty,
-    isFilterModelNonEmpty,
-    frontend2BackendFilter,
-    backend2FrontendFilter
-  };
+    this._$q = $q;
+    this._$mdDialog = $mdDialog;
+  }
 
-  function getType(inputType) {
+  getType(inputType) {
     if (inputType === FILTER_TYPES.STRING) {
       return FILTER_TYPES.STRING;
     } else if (NUMBER_TYPES.indexOf(inputType) >= 0) {
@@ -57,12 +52,12 @@ export function FilterService($q, $mdDialog) {
     return FILTER_TYPES.UNKNOWN;
   }
 
-  function isFilterEmpty(filter) {
+  isFilterEmpty(filter) {
     if (!filter) {
       return true;
     }
 
-    const filterType = getType(filter.type || get(filter, 'column.type', FILTER_TYPES.UNKNOWN));
+    const filterType = this.getType(filter.type || get(filter, 'column.type', FILTER_TYPES.UNKNOWN));
 
     switch (filterType) {
 
@@ -83,7 +78,7 @@ export function FilterService($q, $mdDialog) {
     }
   }
 
-  function frontend2BackendFilter() {
+  frontend2BackendFilter() {
     return frontendFilter => {
       const column = frontendFilter.column;
 
@@ -102,7 +97,7 @@ export function FilterService($q, $mdDialog) {
     };
   }
 
-  function backend2FrontendFilter(artifacts) {
+  backend2FrontendFilter(artifacts) {
     return backendFilter => {
       // for some reason in th edit screen the artofactName is not present in the artifact object
       // and the target artifact cannot be found
@@ -124,7 +119,7 @@ export function FilterService($q, $mdDialog) {
     };
   }
 
-  function isFilterModelNonEmpty(model) {
+  isFilterModelNonEmpty(model) {
     if (!model) {
       return false;
     }
@@ -145,7 +140,7 @@ export function FilterService($q, $mdDialog) {
   /**
    * Get the lazy filter evaluator for ever row
    */
-  function getFilterEvaluator(row) {
+  getFilterEvaluator(row) {
     return map(filter => {
       let isValid;
 
@@ -158,7 +153,7 @@ export function FilterService($q, $mdDialog) {
       case 'timestamp':
       case 'double':
       case 'long':
-        isValid = Boolean(isNumberValid(row[filter.name], filter.model, filter.operator));
+        isValid = Boolean(this.isNumberValid(row[filter.name], filter.model, filter.operator));
         break;
       default:
         isValid = false;
@@ -175,21 +170,21 @@ export function FilterService($q, $mdDialog) {
 /**
  * reduce the array of evaluated filters and their booleanCriteria( AND | OR )
  */
-  function getEvaluatedFilterReducer() {
+  getEvaluatedFilterReducer() {
     return (evaluatedFilters => {
       // we need to know the first elements booleanCriteria to get the identity element
       // so that we don't influence the result
-      const accumulator = isEmpty(evaluatedFilters) ? true : getIdentityElement(evaluatedFilters[0].booleanCriteria);
+      const accumulator = isEmpty(evaluatedFilters) ? true : this.getIdentityElement(evaluatedFilters[0].booleanCriteria);
 
       return reduce((accum, evaluatedFilter) => {
 
-        return evaluateBoolean(accum, evaluatedFilter.booleanCriteria, evaluatedFilter.value);
+        return this.evaluateBoolean(accum, evaluatedFilter.booleanCriteria, evaluatedFilter.value);
 
       }, accumulator)(evaluatedFilters);
     });
   }
 
-  function getIdentityElement(booleanCriteria) {
+  getIdentityElement(booleanCriteria) {
     if (booleanCriteria === BOOLEAN_CRITERIA[0]) {
       return true;
     }
@@ -199,7 +194,7 @@ export function FilterService($q, $mdDialog) {
     }
   }
 
-  function evaluateBoolean(a, booleanCriteria, b) {
+  evaluateBoolean(a, booleanCriteria, b) {
     if (booleanCriteria === BOOLEAN_CRITERIA[0]) {
       return a && b;
     }
@@ -209,7 +204,7 @@ export function FilterService($q, $mdDialog) {
     }
   }
 
-  function isNumberValid(number, numberFilterModel, operator) {
+  isNumberValid(number, numberFilterModel, operator) {
     const a = number;
     const b = numberFilterModel.value;
     const c = numberFilterModel.otherValue;
@@ -234,32 +229,32 @@ export function FilterService($q, $mdDialog) {
     }
   }
 
-  function getRuntimeFiltersFrom(filters = []) {
+  getRuntimeFiltersFrom(filters = []) {
     return filter(f => f.isRuntimeFilter, filters);
   }
 
-  function openRuntimeModal(analysis, filters = []) {
+  openRuntimeModal(analysis, filters = []) {
     const tpl = '<analyze-filter-modal filters="filters" artifacts="artifacts" filter-boolean-criteria="booleanCriteria" runtime="true"></analyze-filter-modal>';
-    return $mdDialog.show({
+    return this._$mdDialog.show({
       template: tpl,
       controller: scope => {
-        scope.filters = map(backend2FrontendFilter(analysis.artifacts), filters);
+        scope.filters = map(this.backend2FrontendFilter.bind(this)(analysis.artifacts), filters);
         scope.artifacts = analysis.artifacts;
         scope.booleanCriteria = analysis.sqlBuilder.booleanCriteria;
       },
       fullscreen: true,
       autoWrap: false,
       multiple: true
-    }).then(onApplyFilters.bind(this)(analysis));
+    }).then(this.onApplyFilters.bind(this)(analysis));
   }
 
-  function onApplyFilters(analysis) {
+  onApplyFilters(analysis) {
     return result => {
       if (!result) {
-        return $q.reject(new Error('Cancelled'));
+        return this._$q.reject(new Error('Cancelled'));
       }
 
-      const filterPayload = map(frontend2BackendFilter(), result.filters);
+      const filterPayload = map(this.frontend2BackendFilter.bind(this)(), result.filters);
       analysis.sqlBuilder.filters = filterPayload.concat(
         filter(f => !f.isRuntimeFilter, analysis.sqlBuilder.filters)
       );
@@ -268,15 +263,15 @@ export function FilterService($q, $mdDialog) {
     };
   }
 
-  function getRuntimeFilterValues(analysis) {
+  getRuntimeFilterValues(analysis) {
     const clone = cloneDeep(analysis);
-    const runtimeFilters = getRuntimeFiltersFrom(
+    const runtimeFilters = this.getRuntimeFiltersFrom(
       get(clone, 'sqlBuilder.filters', [])
     );
 
     if (!runtimeFilters.length) {
-      return $q.resolve(clone);
+      return this._$q.resolve(clone);
     }
-    return openRuntimeModal(clone, runtimeFilters);
+    return this.openRuntimeModal(clone, runtimeFilters);
   }
 }

@@ -19,4 +19,4 @@ angular.module(CommonServiceModule, moduleDependencies)
   .factory('ErrorDetail', errorDetailService)
   .factory('fileService', fileService)
   .factory('toastMessage', toastMessageService)
-  .factory('MenuService', MenuService);
+  .service('MenuService', MenuService);

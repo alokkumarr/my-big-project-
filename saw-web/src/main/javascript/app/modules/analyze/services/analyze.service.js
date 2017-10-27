@@ -22,65 +22,50 @@ const EXECUTION_STATES = {
   EXECUTING: 'executing'
 };
 
-export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toastMessage, $translate) {
-  'ngInject';
+const MODULE_NAME = 'ANALYZE';
 
-  const MODULE_NAME = 'ANALYZE';
+const SCHEDULE_B2F_DICTIONARY = {
+  weekly: 'weeks',
+  daily: 'days'
+};
 
-  const SCHEDULE_B2F_DICTIONARY = {
-    weekly: 'weeks',
-    daily: 'days'
-  };
+const SCHEDULE_DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
-  const SCHEDULE_DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+export class AnalyzeService {
+  constructor($http, $q, AppConfig, JwtService, toastMessage, $translate) {
+    'ngInject';
 
-  const url = AppConfig.api.url;
-  let _menuResolver = null;
-  const _menu = new Promise(resolve => {
-    _menuResolver = resolve;
-  });
+    this._$http = $http;
+    this._$q = $q;
+    this._JwtService = JwtService;
+    this._toastMessage = toastMessage;
+    this._$translate = $translate;
+
+    this.url = AppConfig.api.url;
+    this._menuResolver = null;
+    this._menu = new Promise(resolve => {
+      this._menuResolver = resolve;
+    });
+    this._executingAnalyses = {};
+  }
 
   /* Maintains a list of analyses being executed.
      Allows showing of execution badge across pages and possibly block
      executions until current ones get completed */
-  const _executingAnalyses = {};
 
-  return {
-    createAnalysis,
-    deleteAnalysis,
-    didExecutionFail,
-    executeAnalysis,
-    generateQuery,
-    getAnalysesFor,
-    getCategories,
-    getCategory,
-    getDataBySettings,
-    getExecutionData,
-    getMethods,
-    getPublishedAnalysesByAnalysisId,
-    getSemanticLayerData,
-    isExecuting,
-    previewExecution,
-    publishAnalysis,
-    readAnalysis,
-    saveReport,
-    scheduleToString,
-    updateMenu
-  };
-
-  function updateMenu(menu) {
-    _menuResolver(menu);
+  updateMenu(menu) {
+    this._menuResolver(menu);
   }
 
-  function isExecuting(analysisId) {
-    return EXECUTION_STATES.EXECUTING === _executingAnalyses[analysisId];
+  isExecuting(analysisId) {
+    return EXECUTION_STATES.EXECUTING === this._executingAnalyses[analysisId];
   }
 
-  function didExecutionFail(analysisId) {
-    return EXECUTION_STATES.ERROR === _executingAnalyses[analysisId];
+  didExecutionFail(analysisId) {
+    return EXECUTION_STATES.ERROR === this._executingAnalyses[analysisId];
   }
 
-  function scheduleToString(schedule) {
+  scheduleToString(schedule) {
     let result;
     if (schedule.repeatInterval === 1) {
       result = startCase(schedule.repeatUnit);
@@ -112,8 +97,8 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
        ['contents.keys.[0].id', '1234556']
      ]
      */
-  function getRequestParams(params = []) {
-    const reqParams = JwtService.getRequestParams();
+  getRequestParams(params = []) {
+    const reqParams = this._JwtService.getRequestParams();
 
     set(reqParams, 'contents.keys.[0].module', MODULE_NAME);
     forEach(params, tuple => {
@@ -123,33 +108,37 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     return reqParams;
   }
 
-  function getAnalysesFor(subCategoryId/* , opts = {} */) {
+  getExportData(analysisId, executionId) {
+    return this._$http.get(`${this.url}/exports/${executionId}/executions/${analysisId}/data`)
+      .then(fpGet('data.data'));
+  }
+
+  getAnalysesFor(subCategoryId/* , opts = {} */) {
     /* Wait until the menu has been loaded. The menu payload contains the
        analyses list from which we'll load the result for this function. */
-    return _menu.then(() => {
-
-      const payload = getRequestParams([
+    return this._menu.then(() => {
+      const payload = this.getRequestParams([
         ['contents.action', 'search'],
         ['contents.keys.[0].categoryId', subCategoryId]
       ]);
-      return $http.post(`${url}/analysis`, payload);
+      return this._$http.post(`${this.url}/analysis`, payload);
     })
       .then(fpGet('data.contents.analyze'))
       .then(fpSortBy([analysis => -(analysis.createdTimestamp || 0)]));
   }
 
-  function getPublishedAnalysesByAnalysisId(id) {
-    return $http.get(`${url}/analysis/${id}/executions`)
+  getPublishedAnalysesByAnalysisId(id) {
+    return this._$http.get(`${this.url}/analysis/${id}/executions`)
       .then(fpGet(`data.executions`))
       .then(fpSortBy([obj => -obj.finished]));
   }
 
-  function getExecutionData(analysisId, executionId, options = {}) {
+  getExecutionData(analysisId, executionId, options = {}) {
     options.skip = options.skip || 0;
     options.take = options.take || 10;
     const page = floor(options.skip / options.take) + 1;
-    return $http.get(
-      `${url}/analysis/${analysisId}/executions/${executionId}/data?page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}`
+    return this._$http.get(
+      `${this.url}/analysis/${analysisId}/executions/${executionId}/data?page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}`
     ).then(resp => {
       const data = fpGet(`data.data`, resp);
       const count = fpGet(`data.totalRows`, resp);
@@ -157,37 +146,37 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     });
   }
 
-  function readAnalysis(analysisId) {
-    const payload = getRequestParams([
+  readAnalysis(analysisId) {
+    const payload = this.getRequestParams([
       ['contents.action', 'read'],
       ['contents.keys.[0].id', analysisId]
     ]);
-    return $http.post(`${url}/analysis`, payload).then(fpGet(`data.contents.analyze.[0]`));
+    return this._$http.post(`${this.url}/analysis`, payload).then(fpGet(`data.contents.analyze.[0]`));
   }
 
-  function previewExecution(model, options = {}) {
-    return applyAnalysis(model, EXECUTION_MODES.PREVIEW, options);
+  previewExecution(model, options = {}) {
+    return this.applyAnalysis(model, EXECUTION_MODES.PREVIEW, options);
   }
 
-  function executeAnalysis(model) {
-    const deferred = $q.defer();
+  executeAnalysis(model) {
+    const deferred = this._$q.defer();
 
-    if (isExecuting(model.id)) {
-      $translate('ERROR_ANALYSIS_ALREADY_EXECUTING').then(msg => {
-        toastMessage.error(msg);
+    if (this.isExecuting(model.id)) {
+      this._$translate('ERROR_ANALYSIS_ALREADY_EXECUTING').then(msg => {
+        this._toastMessage.error(msg);
         deferred.reject(msg);
       });
 
     } else {
-      $translate('INFO_ANALYSIS_SUBMITTED').then(msg => {
-        toastMessage.info(msg);
+      this._$translate('INFO_ANALYSIS_SUBMITTED').then(msg => {
+        this._toastMessage.info(msg);
       });
-      _executingAnalyses[model.id] = EXECUTION_STATES.EXECUTING;
-      applyAnalysis(model).then(({data}) => {
-        _executingAnalyses[model.id] = EXECUTION_STATES.SUCCESS;
+      this._executingAnalyses[model.id] = EXECUTION_STATES.EXECUTING;
+      this.applyAnalysis(model).then(({data}) => {
+        this._executingAnalyses[model.id] = EXECUTION_STATES.SUCCESS;
         deferred.resolve(data);
       }, err => {
-        _executingAnalyses[model.id] = EXECUTION_STATES.ERROR;
+        this._executingAnalyses[model.id] = EXECUTION_STATES.ERROR;
         deferred.reject(err);
       });
     }
@@ -195,70 +184,70 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     return deferred.promise;
   }
 
-  function publishAnalysis(model, execute = false) {
-    return updateAnalysis(model).then(analysis => {
+  publishAnalysis(model, execute = false) {
+    return this.updateAnalysis(model).then(analysis => {
       if (execute) {
-        executeAnalysis(model);
+        this.executeAnalysis(model);
       }
       return analysis;
     });
   }
 
-  function deleteAnalysis(model) {
-    if (!JwtService.hasPrivilege('DELETE', {
+  deleteAnalysis(model) {
+    if (!this._JwtService.hasPrivilege('DELETE', {
       subCategoryId: model.categoryId,
       creatorId: model.userId
     })) {
-      return $q.reject(new Error('Access denied.'));
+      return this._$q.reject(new Error('Access denied.'));
     }
-    const payload = getRequestParams([
+    const payload = this.getRequestParams([
       ['contents.action', 'delete'],
       ['contents.keys.[0].id', model.id]
     ]);
-    return $http.post(`${url}/analysis`, payload);
+    return this._$http.post(`${this.url}/analysis`, payload);
   }
 
-  function getCategories(privilege) {
+  getCategories(privilege) {
     if (!privilege) {
-      return _menu;
+      return this._menu;
     }
 
-    return _menu.then(menu => {
+    return this._menu.then(menu => {
       const menuClone = cloneDeep(menu);
       forEach(menuClone, menuFeature => {
         menuFeature.children = filter(menuFeature.children, menuSubFeature => {
-          return JwtService.hasPrivilege(privilege, {subCategoryId: menuSubFeature.id});
+          return this._JwtService.hasPrivilege(privilege, {subCategoryId: menuSubFeature.id});
         });
       });
       return menuClone;
     });
   }
 
-  function getCategory(id) {
+  getCategory(id) {
     /* Wait until the menu has been loaded. The menu payload contains the
        analyses list from which we'll load the result for this function. */
-    return _menu.then(menu => {
+    return this._menu.then(menu => {
       const subCategories = flatMap(menu, category => category.children);
       return find(subCategories, sc => sc.id.toString() === id);
     });
   }
 
-  function getMethods() {
-    return $http.get('/api/analyze/methods').then(fpGet('data'));
+  getMethods() {
+    return this._$http.get('/api/analyze/methods').then(fpGet('data'));
   }
 
-  function updateAnalysis(model) {
+  updateAnalysis(model) {
     delete model.isScheduled;
-    const payload = getRequestParams([
+    const payload = this.getRequestParams([
       ['contents.action', 'update'],
       ['contents.keys.[0].id', model.id],
       ['contents.keys.[0].type', model.type],
       ['contents.analyze', [model]]
     ]);
-    return $http.post(`${url}/analysis`, payload).then(fpGet(`data.contents.analyze.[0]`));
+    return this._$http.post(`${this.url}/analysis`, payload).then(fpGet(`data.contents.analyze.[0]`));
   }
 
-  function applyAnalysis(model, mode = EXECUTION_MODES.LIVE, options = {}) {
+  applyAnalysis(model, mode = EXECUTION_MODES.LIVE, options = {}) {
     delete model.isScheduled;
     if (mode === EXECUTION_MODES.PREVIEW) {
       model.executionType = EXECUTION_MODES.PREVIEW;
@@ -267,15 +256,15 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     }
 
     if (model.type === 'report' && model.edit === true) {
-      toastMessage.error('SQL mode is no longer supported. Please create a new report in designer mode.');
-      return $q.resolve({data: [], count: 0});
+      this._toastMessage.error('SQL mode is no longer supported. Please create a new report in designer mode.');
+      return this._$q.resolve({data: [], count: 0});
     }
 
     options.skip = options.skip || 0;
     options.take = options.take || 10;
     const page = floor(options.skip / options.take) + 1;
 
-    const payload = getRequestParams([
+    const payload = this.getRequestParams([
       ['contents.action', 'execute'],
       ['contents.page', page],
       ['contents.pageSize', options.take],
@@ -283,7 +272,7 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
       ['contents.keys.[0].type', model.type],
       ['contents.analyze', [model]]
     ]);
-    return $http.post(`${url}/analysis`, payload).then(resp => {
+    return this._$http.post(`${this.url}/analysis`, payload).then(resp => {
       return {
         data: fpGet(`data.contents.analyze.[0].data`, resp),
         count: fpGet(`data.contents.analyze.[0].totalRows`, resp)
@@ -291,43 +280,43 @@ export function AnalyzeService($http, $timeout, $q, AppConfig, JwtService, toast
     });
   }
 
-  function getDataBySettings(analysis) {
-    return applyAnalysis(analysis, EXECUTION_MODES.PREVIEW).then(({data, count}) => {
+  getDataBySettings(analysis) {
+    return this.applyAnalysis(analysis, EXECUTION_MODES.PREVIEW).then(({data, count}) => {
       return {analysis, data, count};
     });
   }
 
-  function generateQuery(payload) {
-    return $http.post('/api/analyze/generateQuery', payload).then(fpGet('data'));
+  generateQuery(payload) {
+    return this._$http.post('/api/analyze/generateQuery', payload).then(fpGet('data'));
   }
 
-  function saveReport(model) {
+  saveReport(model) {
     model.saved = true;
-    const updatePromise = updateAnalysis(model);
+    const updatePromise = this.updateAnalysis(model);
 
     updatePromise.then(analysis => {
-      return applyAnalysis(model, EXECUTION_MODES.PREVIEW).then(({data}) => {
+      return this.applyAnalysis(model, EXECUTION_MODES.PREVIEW).then(({data}) => {
         return {analysis, data};
       });
     });
     return updatePromise;
   }
 
-  function getSemanticLayerData() {
-    const params = getRequestParams([
+  getSemanticLayerData() {
+    const params = this.getRequestParams([
       ['contents.action', 'search'],
       ['contents.select', 'headers'],
       ['contents.context', 'Semantic']
     ]);
-    return $http.post(`${url}/md`, params).then(fpGet(`data.contents.[0].${MODULE_NAME}`));
+    return this._$http.post(`${this.url}/md`, params).then(fpGet(`data.contents.[0].${MODULE_NAME}`));
   }
 
-  function createAnalysis(metricId, type) {
-    const params = getRequestParams([
+  createAnalysis(metricId, type) {
+    const params = this.getRequestParams([
       ['contents.action', 'create'],
       ['contents.keys.[0].id', metricId || 'c7a32609-2940-4492-afcc-5548b5e5a040'],
       ['contents.keys.[0].analysisType', type]
     ]);
-    return $http.post(`${url}/analysis`, params).then(fpGet('data.contents.analyze.[0]'));
+    return this._$http.post(`${this.url}/analysis`, params).then(fpGet('data.contents.analyze.[0]'));
   }
 }

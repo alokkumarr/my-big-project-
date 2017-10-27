@@ -564,6 +564,7 @@ class Analysis extends BaseController {
               case obj: java.lang.Double => JDouble(obj.doubleValue())
               case obj: java.lang.Boolean => JBool(obj.booleanValue())
               case obj: java.sql.Date => JLong(obj.getTime())
+              case obj: scala.math.BigInt => JLong(obj.toLong)
               case obj =>
                 throw new RuntimeException(
                   "Unsupported data type in result: " + dataType
