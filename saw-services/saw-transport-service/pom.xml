@@ -716,7 +716,7 @@
                                     <location>src/main/system</location>
                                     <includes>
                                       <include>saw-transport.service</include>
-                                      <include>saw-transport-executor.service</include>
+                                      <include>saw-transport-executor@.service</include>
                                     </includes>
                                 </source>
                             </sources>
