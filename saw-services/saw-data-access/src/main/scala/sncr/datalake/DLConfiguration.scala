@@ -76,7 +76,8 @@ object DLConfiguration {
     if (initialized) return
     logger info s"Spark settings: \n Master: ${cfg.getString ("master")} \n Worker memory: ${cfg.getString ("executor.memory")} \n  Cores: ${cfg.getString ("cores.max")} \n Driver memory: ${cfg.getString ("driver.memory")} "
     sparkConf = new SparkConf()
-    sparkConf.setAppName ("SAW-DataAccess")
+    val executor = System.getProperty("saw.executor", "unknown")
+    sparkConf.setAppName("SAW-Executor (" + executor + ")")
     sparkConf.set ("spark.master", cfg.getString ("master") )
     setIfPathExists(sparkConf, "spark.yarn.queue", cfg, "yarn.queue")
     sparkConf.set ("spark.executor.memory", cfg.getString ("executor.memory") )

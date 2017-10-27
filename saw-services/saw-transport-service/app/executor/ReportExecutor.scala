@@ -2,6 +2,8 @@ package executor
 
 import org.slf4j.{Logger, LoggerFactory}
 
+import sncr.datalake.DLConfiguration
+
 /**
  * Report executor for executing analysis report queries based on
  * requests received from MapR Streams queue
@@ -26,6 +28,11 @@ class ReportExecutor {
   }
 
   private def runExecutor(executorType: String) {
+    /* For executor of type preview, preload the Spark context in an
+     * attempt to provide faster responses */
+    if (executorType.equals("preview")) {
+      DLConfiguration.initSpark()
+    }
     try {
       val queue = new ReportExecutorQueue(executorType)
       /* Process one message and let the executor exit so that the system
