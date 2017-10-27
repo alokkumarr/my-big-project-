@@ -74,14 +74,13 @@ object DLConfiguration {
 
   def initSpark(): Unit = {
     if (initialized) return
-    logger info s"Spark settings: \n Master: ${cfg.getString ("master")} \n Worker memory: ${cfg.getString ("executor.memory")} \n  Cores: ${cfg.getString ("cores.max")} \n Driver memory: ${cfg.getString ("driver.memory")} "
     sparkConf = new SparkConf()
     val executor = System.getProperty("saw.executor", "unknown")
     sparkConf.setAppName("SAW-Executor (" + executor + ")")
     sparkConf.set ("spark.master", cfg.getString ("master") )
-    setIfPathExists(sparkConf, "spark.yarn.queue", cfg, "yarn.queue")
-    sparkConf.set ("spark.executor.memory", cfg.getString ("executor.memory") )
-    sparkConf.set ("spark.cores.max", cfg.getString ("cores.max") )
+    setIfPathExists(sparkConf, "spark.yarn.queue", cfg, getPathByExecutor("yarn.queue", executor))
+    sparkConf.set ("spark.executor.memory", cfg.getString(getPathByExecutor("executor.memory", executor)))
+    sparkConf.set ("spark.cores.max", cfg.getString(getPathByExecutor("cores.max", executor)))
     sparkConf.set ("driver.memory", cfg.getString ("driver.memory") )
     setIfPathExists(sparkConf, "spark.driver.port", cfg, "driver.port")
     setIfPathExists(sparkConf, "spark.driver.host", cfg, "driver.host")
@@ -94,6 +93,11 @@ object DLConfiguration {
     ctx = SparkContext.getOrCreate(sparkConf)
     jarFiles.foreach(f => ctx.addJar( jarLocation + Path.SEPARATOR + f))
     initialized = true
+  }
+
+  private def getPathByExecutor(key: String, executor: String) = {
+    val executorType = if (executor.startsWith("preview-")) "preview" else "regular"
+    key + "." + executorType
   }
 
   private def setIfPathExists(sparkConf: SparkConf, sparkProperty: String, cfg: Config, path: String) {

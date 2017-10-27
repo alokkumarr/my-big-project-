@@ -36,7 +36,8 @@ saw_elasticsearch_password=elastic
 saw_spark_master_url=spark://localhost:7077
 # If Spark is configured to use YARN, use the variable below to set
 # the YARN queue
-#saw_spark_yarn_queue=saw
+#saw_spark_yarn_queue_regular=saw-regular
+#saw_spark_yarn_queue_preview=saw-preview
 saw_zookeeper_quorum=localhost
 
 #
