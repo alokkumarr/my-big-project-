@@ -47,7 +47,7 @@ class Analysis(val analysisId : String) {
     new AnalysisExecution(an, execType, resultId)
   }
 
-  private def waitForResult(resultId: String, retries: Int = 200) {
+  private def waitForResult(resultId: String, retries: Int = 20) {
     try {
       /* Try loading the result node.  If it does not exist an exception is
        * raised. */
