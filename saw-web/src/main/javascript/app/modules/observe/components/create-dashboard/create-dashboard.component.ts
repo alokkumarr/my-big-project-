@@ -2,6 +2,13 @@ import { Component, Inject, ViewChild } from '@angular/core';
 import { MdDialogRef, MD_DIALOG_DATA, MdDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { GridsterConfig, GridsterItem, GridsterComponent } from 'angular-gridster2';
+import {
+  trigger,
+  state,
+  style,
+  animate,
+  transition
+} from '@angular/animations';
 
 import * as forEach from 'lodash/forEach';
 
@@ -14,11 +21,36 @@ const MARGIN_BETWEEN_TILES = 10;
 
 @Component({
   selector: 'create-dashboard',
-  template
+  template,
+  animations: [
+    trigger('moveButton', [
+      state('empty', style({
+        bottom: '50%',
+        right: '50%',
+        transform: 'translateX(50%)'
+      })),
+      state('filled', style({
+        bottom: '30px',
+        right: '30px',
+        transform: 'translateX(0%)'
+      })),
+      transition('* => *', animate('500ms ease-out'))
+    ]),
+    trigger('hideHelp', [
+      state('empty', style({
+        opacity: 1
+      })),
+      state('filled', style({
+        opacity: 0
+      })),
+      transition('* => *', animate('250ms ease-out'))
+    ])
+  ]
 })
 export class CreateDashboardComponent {
   @ViewChild('gridster') gridster: GridsterComponent;
 
+  public fillState = 'empty';
   public columns = 4;
   public options: GridsterConfig;
   public dashboard: Array<GridsterItem>;
@@ -27,6 +59,10 @@ export class CreateDashboardComponent {
   constructor(public dialogRef: MdDialogRef<CreateDashboardComponent>,
     public dialog: MdDialog,
     @Inject(MD_DIALOG_DATA) public layout: any) {
+  }
+
+  checkEmpty() {
+    this.fillState = this.dashboard.length > 0 ? 'filled' : 'empty';
   }
 
   itemChange(item, itemComponent) {
@@ -82,6 +118,7 @@ export class CreateDashboardComponent {
 
   removeTile(item: GridsterItem) {
     this.dashboard.splice(this.dashboard.indexOf(item), 1);
+    this.checkEmpty();
   }
 
   exitCreator(data) {
@@ -98,6 +135,7 @@ export class CreateDashboardComponent {
 
       const item = { cols: 1, rows: 1, analysis, updater: new BehaviorSubject({}) };
       this.dashboard.push(item);
+      this.checkEmpty();
     });
   }
 }

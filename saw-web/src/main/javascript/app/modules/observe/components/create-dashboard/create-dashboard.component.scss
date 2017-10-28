@@ -55,10 +55,21 @@ create-dashboard {
     }
   }
 
+  .add-button-help {
+    position: absolute;
+    font-size: 1.5em;
+    opacity: 1;
+    bottom: 45%;
+    right: 50%;
+    transform: translateX(50%);
+    z-index: 1;
+  }
+
   .add-analysis {
     position: absolute;
-    bottom: 30px;
-    right: 30px;
+    bottom: 50%;
+    right: 50%;
+    transform: translateX(50%);
     z-index: 1;
 
     md-icon {
