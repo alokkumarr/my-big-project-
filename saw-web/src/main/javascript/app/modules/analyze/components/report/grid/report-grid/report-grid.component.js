@@ -220,6 +220,34 @@ export const ReportGridComponent = {
       });
     }
 
+    formatColumn(gridColumn) {
+      this.openFormatModal(gridColumn).then(newFormat => {
+        if (this._gridInstance) {
+          const columns = this._gridInstance.option('columns');
+          const column = this.getColumnByName(newFormat.column);
+          let typeValue = '';
+          if (column) {
+            if (newFormat.type === 'date' || newFormat.type === 'timestamp') {
+              column.dataType = 'date';
+              column.format = newFormat.dateFormat;
+            } else {
+              if (newFormat.CommaSeparator) {
+                typeValue = 'fixedpoint';
+              } else {
+                typeValue = 'decimal';
+              }
+              column.format = {
+                type: typeValue,
+                precision: newFormat.NumberDecimal
+              };
+            }
+          }
+          this._gridInstance.option('columns', columns);
+        }
+      });
+
+    }
+
     renameColumn(gridColumn) {
       this.openRenameModal()
         .then(newName => {
@@ -273,6 +301,19 @@ export const ReportGridComponent = {
       return this._$mdDialog
         .show({
           template: '<report-rename-dialog></report-rename-dialog>',
+          fullscreen: false,
+          multiple: true,
+          clickOutsideToClose: true
+        });
+    }
+
+    openFormatModal(model) {
+      return this._$mdDialog
+        .show({
+          controller: scope => {
+            scope.model = model;
+          },
+          template: '<report-format-dialog model-data=model> </report-format-dialog>',
           fullscreen: false,
           multiple: true,
           clickOutsideToClose: true
