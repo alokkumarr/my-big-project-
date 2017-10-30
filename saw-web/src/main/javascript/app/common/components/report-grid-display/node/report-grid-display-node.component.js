@@ -18,6 +18,7 @@ export const ReportGridDisplayNodeComponent = {
     }
 
     loadData(options) {
+      console.log(this.data);
       return this.source({options});
     }
   }
