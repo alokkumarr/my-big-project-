@@ -24,8 +24,7 @@ export const AnalyzeExecutedListComponent = {
         dataField: 'finished',
         dataType: 'string',
         calculateCellValue: rowData => {
-          let d = moment(rowData.finished).zone(new Date().getTimezoneOffset()).format('MM-DD-YYYY'); // The 0 there is the key, which sets the date to the epoch
-          return (d || '');
+          return (moment(rowData.finished).zone(new Date().getTimezoneOffset()).format('MM-DD-YYYY'));
         },
         allowSorting: true,
         alignment: 'left',
