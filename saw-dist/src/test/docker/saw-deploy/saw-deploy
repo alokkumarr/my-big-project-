@@ -12,11 +12,6 @@ cd /maven
 tar -xzf saw-*.tgz
 saw/saw-deploy /root/saw-config
 
-# Workaround: The default MapR log4j configuration causes Transport
-# Service to generate permissions error, so move the location to a
-# writable directory for now
-sed -i -e 's,log4.log,/tmp/log4.log,' /opt/mapr/conf/log4j.properties
-
 # Load SAW test metrics
 #
 # Note: To reduce startup time, this should be put into its own
