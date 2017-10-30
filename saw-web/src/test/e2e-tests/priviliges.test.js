@@ -1,6 +1,6 @@
 const login = require('../javascript/pages/common/login.po.js');
 const header = require('../javascript/pages/components/header.co.js');
-const analyze = require('../javascript/pages/common/analyze.po.js');
+const analyze = require('../javascript/pages/common/analyzePage.po.js');
 const homePage = require('../javascript/pages/homePage.po.js');
 const executedAnalysis = require('../javascript/pages/common/executedAlaysis.po');
 const protractor = require('protractor');
@@ -100,7 +100,9 @@ describe('Privileges', () => {
   });
 });
 
-describe('for the User', () => {
+
+//TODO refactor test for the user privileges
+/*describe('for the User', () => {
   let analysisOptions;
   it('should login as a user and open action menu', () => {
     expect(browser.getCurrentUrl()).toContain('/login');
@@ -178,9 +180,9 @@ describe('for the User', () => {
   it('log out', () => {
     analyze.main.doAccountAction('logout');
   });
-});
+});*/
 
-/*describe('for the Analyst', () => {
+describe('for the Analyst', () => {
   it('should land on login page', () => {
     browser.sleep(2000);
     expect(browser.getCurrentUrl()).toContain('/login');
@@ -332,4 +334,4 @@ describe('for Reviewer', () => {
   it('should log out', () => {
     analyze.main.doAccountAction('logout');
   });
-});*/
+});

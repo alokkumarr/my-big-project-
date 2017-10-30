@@ -1,6 +1,6 @@
 const login = require('../javascript/pages/common/login.po.js');
 const header = require('../javascript/pages/components/header.co.js');
-const analyze = require('../javascript/pages/common/analyze.po.js');
+const analyze = require('../javascript/pages/common/analyzePage.po.js');
 const users = require('../javascript/data/users.js');
 const using = require('jasmine-data-provider');
 

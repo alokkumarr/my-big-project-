@@ -1,6 +1,6 @@
 const login = require('../javascript/pages/common/login.po.js');
 const sidenav = require('../javascript/pages/components/sidenav.co.js');
-const analyze = require('../javascript/pages/common/analyze.po.js');
+const analyze = require('../javascript/pages/common/analyzePage.po.js');
 const protractor = require('protractor');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 const {hasClass} = require('../javascript/helpers/utils');

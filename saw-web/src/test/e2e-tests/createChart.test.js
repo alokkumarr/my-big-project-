@@ -1,6 +1,6 @@
 const login = require('../javascript/pages/common/login.po.js');
 const sidenav = require('../javascript/pages/components/sidenav.co.js');
-const analyze = require('../javascript/pages/common/analyze.po.js');
+const analyze = require('../javascript/pages/common/analyzePage.po.js');
 const protractor = require('protractor');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 const {hasClass} = require('../javascript/helpers/utils');
@@ -93,7 +93,7 @@ describe('create columnChart type analysis', () => {
     expect(appliedFilter.isPresent()).toBe(true);
   });
 
-  it('should attempt to save the report', () => {
+  it('should attempt to save column chart', () => {
     const save = analyze.saveDialog;
     const designer = analyze.designerDialog;
     commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
@@ -112,7 +112,7 @@ describe('create columnChart type analysis', () => {
       .then(() => expect(createdAnalysis.isPresent()).toBe(true));
   });
 
-  it('should delete the created analysis', () => {
+  it('should delete the created column chart', () => {
     const main = analyze.main;
     const cards = main.getAnalysisCards(chartName);
     cards.count().then(count => {
