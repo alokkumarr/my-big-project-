@@ -17,7 +17,7 @@
 <div md-dialog-content>
   <gridster [options]="options" #gridster>
     <gridster-item [item]="item" *ngFor="let item of dashboard">
-      <span class="analysis-title">{{item.analysis.name}}</span>
+      <!-- <span class="analysis-title">{{item.analysis.name}}</span> -->
       <button md-icon-button (click)="removeTile(item)">
         <md-icon fontIcon="icon-close"></md-icon>
       </button>
@@ -26,6 +26,7 @@
     </gridster-item>
   </gridster>
 </div>
-<button md-fab color="primary" class="add-analysis" (click)="chooseAnalysis()">
+<span [@hideHelp]="fillState" class="add-button-help">Add a new analysis to the dashboard</span>
+<button [@moveButton]="fillState" md-fab color="primary" class="add-analysis" (click)="chooseAnalysis()">
   <md-icon fontIcon="icon-plus"></md-icon>
 </button>
