@@ -54,6 +54,7 @@ RUN systemctl enable saw-deploy
 
 # Add SAW test metrics
 ADD saw-metrics /root/saw-metrics/
+RUN /root/saw-metrics/saw-metrics generate
 
 # Workaround: There seems to be some logging configuration embedded in
 # MapR libraries that tries to write to a file "log4.log" in the

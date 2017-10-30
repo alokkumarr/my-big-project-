@@ -18,4 +18,9 @@ saw/saw-deploy /root/saw-config
 sed -i -e 's,log4.log,/tmp/log4.log,' /opt/mapr/conf/log4j.properties
 
 # Load SAW test metrics
-#/root/saw-metrics/saw-metrics
+#
+# Note: To reduce startup time, this should be put into its own
+# startup service that runs in parallel with saw-deploy.service.
+# Block on "http://localhost/services" becoming responsive before
+# proceeding.
+/root/saw-metrics/saw-metrics load
