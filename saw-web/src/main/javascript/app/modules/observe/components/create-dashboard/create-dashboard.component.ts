@@ -66,7 +66,6 @@ export class CreateDashboardComponent {
   }
 
   itemChange(item, itemComponent) {
-    window['mygridster'] = this.gridster;
     setTimeout(() => {
       if (this.gridster.columns !== this.columns) {
         this.refreshAllTiles();

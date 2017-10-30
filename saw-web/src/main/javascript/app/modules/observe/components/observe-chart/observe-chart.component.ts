@@ -45,7 +45,6 @@ export class ObserveChartComponent {
 
   ngOnInit() {
     this.chartOptions = this.chartService.getChartConfigFor(this.analysis.chartType, { legend: this.legend });
-    // set(this.chartOptions, 'chart.height', '90%');
   }
 
   ngAfterViewInit() {
