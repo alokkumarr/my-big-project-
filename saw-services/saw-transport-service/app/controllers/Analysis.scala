@@ -32,7 +32,7 @@ import sncr.metadata.engine.{Fields, MetadataDictionary}
 class Analysis extends BaseController {
   val executorRunner = new ExecutionTaskHandler(1);
   val executorRegularQueue = new ReportExecutorQueue("regular")
-  val executorPreviewQueue = new ReportExecutorQueue("preview")
+  val executorFastQueue = new ReportExecutorQueue("fast")
   var totalRows: Int = 0;
   
   /**
@@ -510,7 +510,7 @@ class Analysis extends BaseController {
       val execution = analysis.executeAndWaitQueue(
         executionTypeEnum, query, (analysisId, resultId, query) => {
           val executorQueue = executionTypeEnum match {
-            case ExecutionType.preview => executorPreviewQueue
+            case ExecutionType.preview => executorFastQueue
             case _ => executorRegularQueue
           }
           executorQueue.send(analysisId, resultId, query)

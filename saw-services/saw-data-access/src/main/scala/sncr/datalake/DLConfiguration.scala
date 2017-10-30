@@ -96,7 +96,7 @@ object DLConfiguration {
   }
 
   private def getPathByExecutor(key: String, executor: String) = {
-    val executorType = if (executor.startsWith("preview-")) "preview" else "regular"
+    val executorType = if (executor.startsWith("fast-")) "fast" else "regular"
     key + "." + executorType
   }
 

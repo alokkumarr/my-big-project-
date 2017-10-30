@@ -28,9 +28,9 @@ class ReportExecutor {
   }
 
   private def runExecutor(executorType: String) {
-    /* For executor of type preview, preload the Spark context in an
-     * attempt to provide faster responses */
-    if (executorType.equals("preview")) {
+    /* For executor of type fast, preload the Spark context in an attempt
+     * to provide faster responses */
+    if (executorType.equals("fast")) {
       DLConfiguration.initSpark()
     }
     try {
