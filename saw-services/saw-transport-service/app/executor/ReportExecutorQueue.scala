@@ -13,6 +13,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import sncr.datalake.engine.Analysis
 import sncr.datalake.engine.ExecutionType
+import sncr.datalake.engine.ExecutionType.ExecutionType
 import files.HFileOperations
 
 /**
@@ -65,7 +66,7 @@ class ReportExecutorQueue(val executorType: String) {
   /**
    * Send request to execute report to queue
    */
-  def send(analysisId: String, resultId: String, query: String) {
+  def send(analysisId: String, resultId: String, query: String, executionType: ExecutionType) {
     log.debug("Starting send: {}", executorType)
     val properties = new Properties()
     properties.setProperty("key.serializer",
@@ -74,7 +75,7 @@ class ReportExecutorQueue(val executorType: String) {
       "org.apache.kafka.common.serialization.StringSerializer")
     val producer = new KafkaProducer[String, String](properties)
     producer.send(new ProducerRecord[String, String](
-      ExecutorTopic, analysisId + "," + resultId + "," + query))
+      ExecutorTopic, analysisId + "," + resultId + "," + query + "," + executionType))
     producer.flush
     producer.close
     log.debug("Finished send")
@@ -106,13 +107,19 @@ class ReportExecutorQueue(val executorType: String) {
     val records = consumer.poll(pollTimeout)
     records.asScala.foreach(record => {
       log.debug("Received message: {} {}", executorType, record: Any);
-      val Array(analysisId, resultId, query) = record.value.split(",", 3)
-      execute(analysisId, resultId, query)
+      val Array(analysisId, resultId, query, executionType) = record.value.split(",", 4)
+      val executionTypeEnum = executionType match {
+        case "preview" => ExecutionType.preview
+        case "onetime" => ExecutionType.onetime
+        case "scheduled" => ExecutionType.scheduled
+        case obj => throw new RuntimeException("Unknown execution type: " + obj)
+      }
+      execute(analysisId, resultId, query, executionTypeEnum)
     })
   }
 
-  private def execute(analysisId: String, resultId: String, query: String) {
+  private def execute(analysisId: String, resultId: String, query: String, executionType: ExecutionType) {
     val analysis = new Analysis(analysisId)
-    analysis.executeAndWait(ExecutionType.onetime, query, resultId)
+    analysis.executeAndWait(executionType, query, resultId)
   }
 }

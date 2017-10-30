@@ -176,8 +176,8 @@ class Analysis extends BaseController {
     	    if (typeInfo.equals("report"))
     	    {
 	      /* Build query based on analysis supplied in request body */
-	      val runtime = (executionType == "interactive")
-              executionType = (analysis \ "executionType").extractOrElse[String]("interactive")
+              executionType = (analysis \ "executionType").extractOrElse[String]("onetime")
+	      val runtime = (executionType == "onetime")
               m_log.debug("Execution type: {}", executionType)
             m_log.trace("dskStr after processing inside execute block before runtime: {}", dskStr);
             m_log.trace("runtime execute block before queryRuntime: {}", runtime);
@@ -505,15 +505,19 @@ class Analysis extends BaseController {
       /* Execute analysis report query through queue for concurrency */
       val executionTypeEnum = executionType match {
         case "preview" => ExecutionType.preview
-        case _ => ExecutionType.onetime
+        case "onetime" => ExecutionType.onetime
+        case "scheduled" => ExecutionType.scheduled
+        case obj => throw new RuntimeException("Unknown execution type: " + obj)
       }
       val execution = analysis.executeAndWaitQueue(
         executionTypeEnum, query, (analysisId, resultId, query) => {
           val executorQueue = executionTypeEnum match {
             case ExecutionType.preview => executorFastQueue
-            case _ => executorRegularQueue
+            case ExecutionType.onetime => executorFastQueue
+            case ExecutionType.scheduled => executorRegularQueue
+            case obj => throw new RuntimeException("Unknown execution type: " + obj)
           }
-          executorQueue.send(analysisId, resultId, query)
+          executorQueue.send(analysisId, resultId, query, executionTypeEnum)
         })
       val analysisResultId: String = execution.getId
       m_log.trace("analysisResultId inside report block after executeAndWait : {}", analysisResultId);
