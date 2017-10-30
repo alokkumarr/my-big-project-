@@ -278,18 +278,5 @@ export const ReportGridComponent = {
           clickOutsideToClose: true
         });
     }
-
-    openFormatModal(model) {
-      return this._$mdDialog
-        .show({
-          controller: scope => {
-            scope.model = model;
-          },
-          template: '<report-format-dialog model-data=model> </report-format-dialog>',
-          fullscreen: false,
-          multiple: true,
-          clickOutsideToClose: true
-        });
-    }
   }
 };
