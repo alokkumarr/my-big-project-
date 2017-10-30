@@ -1,23 +1,40 @@
 import { NgModule } from '@angular/core';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   MatButtonModule,
+  MatRadioModule,
+  MatSelectModule,
   MatIconModule,
-  MatDialogModule
+  MatDialogModule,
+  MatFormFieldModule,
+  MatProgressBarModule,
+  MatChipsModule
 } from '@angular/material';
+
 require('@angular/material/prebuilt-themes/indigo-pink.css');
+import '../../../../themes/_angular_next.scss';
 
 @NgModule({
   imports: [
-    NoopAnimationsModule,
+    BrowserAnimationsModule,
     MatButtonModule,
     MatIconModule,
-    MatDialogModule
+    MatDialogModule,
+    MatRadioModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatProgressBarModule,
+    MatChipsModule
   ],
   exports: [
     MatButtonModule,
     MatIconModule,
-    MatDialogModule
+    MatDialogModule,
+    MatRadioModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatProgressBarModule,
+    MatChipsModule
   ]
 })
 export class MaterialModule {}

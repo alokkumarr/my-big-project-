@@ -33,6 +33,7 @@
         <mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
         <es.version>5.4.0</es.version>
         <threeten.extra>1.2</threeten.extra>
+        <rpm.maven.plugin.phase>package</rpm.maven.plugin.phase>
     </properties>
     <dependencies>
 	<dependency>
@@ -446,6 +447,21 @@
 	  <artifactId>commons-lang3</artifactId>
 	  <version>3.5</version>
 	</dependency>
+        <!--
+            Add MapR Streams dependencies for Transport Service Executor
+        -->
+        <dependency>
+          <groupId>com.mapr.streams</groupId>
+          <artifactId>mapr-streams</artifactId>
+          <version>5.2.0-mapr</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.kafka</groupId>
+          <artifactId>kafka-clients</artifactId>
+          <version>0.9.0.0-mapr-1607</version>
+          <scope>provided</scope>
+        </dependency>
     </dependencies>
     <build>
         <sourceDirectory>${project.basedir}/app</sourceDirectory>
@@ -564,6 +580,7 @@
                 <executions>
                     <execution>
                         <id>saw-services-rpm</id>
+                        <phase>${rpm.maven.plugin.phase}</phase>
                         <goals>
                             <goal>attached-rpm</goal>
                         </goals>
@@ -703,7 +720,11 @@
                             <groupname>${app.group}</groupname>
                             <sources>
                                 <source>
-                                    <location>src/main/system/saw-transport.service</location>
+                                    <location>src/main/system</location>
+                                    <includes>
+                                      <include>saw-transport.service</include>
+                                      <include>saw-transport-executor@.service</include>
+                                    </includes>
                                 </source>
                             </sources>
                         </mapping>

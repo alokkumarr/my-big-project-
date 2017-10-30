@@ -52,9 +52,9 @@ location.
 
 # Installing
 
-Execute the following steps to install SAW and its modules:
+Execute the following steps to install SAW:
 
-1. Get the SAW modules bundle package (named `saw.tgz`)
+1. Get the SAW release package (named `saw-*.tgz`)
 
 2. Prepare a SAW environment configuration file, as described in the
    previous section
@@ -62,7 +62,7 @@ Execute the following steps to install SAW and its modules:
 3. Extract the package and execute the deploy command, giving it the
    path to the environment configuration file as an argument
 
-        tar -xzf saw.tgz
+        tar -xzf saw-*.tgz
         cd saw
         ./deploy <config>
 
