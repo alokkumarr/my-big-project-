@@ -1,7 +1,7 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import * as get from 'lodash/get';
 import * as keys from 'lodash/keys';
-import * as json2csv from 'json2csv';
+import {json2csv} from 'json-2-csv';
 
 import {Events} from '../../consts';
 
@@ -14,11 +14,12 @@ export const AnalyzeExecutedDetailComponent = {
   styles: [style],
   controller: class AnalyzeExecutedDetailController extends AbstractComponentController {
     constructor($injector, AnalyzeService, $state, $rootScope, JwtService, $mdDialog, fileService,
-                $window, toastMessage, FilterService, AnalyzeActionsService, $scope, $q) {
+                $window, toastMessage, FilterService, AnalyzeActionsService, $scope, $q, $translate) {
       'ngInject';
       super($injector);
 
       this._AnalyzeService = AnalyzeService;
+      this._$translate = $translate;
       this._fileService = fileService;
       this._AnalyzeActionsService = AnalyzeActionsService;
       this._$state = $state;
@@ -144,8 +145,19 @@ export const AnalyzeExecutedDetailComponent = {
         const analysisId = this.analysis.id;
         const executionId = this._executionId || this.analyses[0].id;
         this._AnalyzeActionsService.exportAnalysis(analysisId, executionId).then(data => {
-          const csv = json2csv({data, fields: keys(data[0])});
-          this._fileService.exportCSV(csv);
+          json2csv(data, (err, csv) => {
+            if (err) {
+              this._$translate('ERROR_EXPORT_FAILED').then(translation => {
+                this._toastMessage.error(translation);
+              });
+            }
+            this._fileService.exportCSV(csv);
+          }, {
+            trimHeaderFields: false,
+            delimiter: {
+              eol: '\r\n'
+            }
+          });
         });
       }
     }
