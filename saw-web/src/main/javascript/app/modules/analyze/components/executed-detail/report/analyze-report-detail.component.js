@@ -10,8 +10,7 @@ export const AnalyzeReportDetailComponent = {
   template,
   bindings: {
     analysis: '<',
-    source: '&',
-    requester: '<'
+    source: '&'
   },
   controller: class AnalyzeReportDetailController {
     constructor(FilterService) {
