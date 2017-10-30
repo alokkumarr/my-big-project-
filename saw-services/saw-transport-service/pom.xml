@@ -448,6 +448,7 @@
           <groupId>com.mapr.streams</groupId>
           <artifactId>mapr-streams</artifactId>
           <version>5.2.0-mapr</version>
+          <scope>provided</scope>
         </dependency>
         <dependency>
           <groupId>org.apache.kafka</groupId>
