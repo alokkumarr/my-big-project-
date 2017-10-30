@@ -148,9 +148,6 @@ export const AnalyzeExecutedDetailComponent = {
           this._fileService.exportCSV(csv);
         });
       }
-      this.requester.next({
-        exportAnalysis: true
-      });
     }
 
     loadExecutionData(options = {}) {
