@@ -1,6 +1,5 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import * as get from 'lodash/get';
-import * as keys from 'lodash/keys';
 import {json2csv} from 'json-2-csv';
 
 import {Events} from '../../consts';
