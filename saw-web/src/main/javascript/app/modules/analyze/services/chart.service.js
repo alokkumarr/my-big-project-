@@ -70,53 +70,59 @@ const LAYOUT_POSITIONS = {
   }
 };
 
-export function ChartService(Highcharts) {
-  'ngInject';
+/* Customize default config for stack column chart */
+const stackConfig = config => {
+  set(config, 'chart.type', 'column');
+  set(config, 'plotOptions.column.stacking', 'normal');
+  return config;
+};
 
-  /* Customize default config for stack column chart */
-  const stackConfig = config => {
-    set(config, 'chart.type', 'column');
-    set(config, 'plotOptions.column.stacking', 'normal');
-    return config;
-  };
+const donutConfig = config => {
 
-  const donutConfig = config => {
+  set(config, 'chart.type', 'pie');
+  return pieConfig(config);
+};
 
-    set(config, 'chart.type', 'pie');
-    return pieConfig(config);
-  };
+const pieConfig = config => {
+  delete config.xAxis;
+  delete config.yAxis;
+  set(config, 'series', [{
+    name: 'Brands',
+    colorByPoint: true,
+    data: []
+  }]);
+  set(config, 'plotOptions.pie.showInLegend', false);
+  return config;
+};
 
-  const pieConfig = config => {
-    delete config.xAxis;
-    delete config.yAxis;
-    set(config, 'series', [{
-      name: 'Brands',
-      colorByPoint: true,
-      data: []
-    }]);
-    set(config, 'plotOptions.pie.showInLegend', false);
-    return config;
-  };
+const configCustomizer = {
+  stack: stackConfig,
+  pie: pieConfig,
+  donut: donutConfig
+};
 
-  const configCustomizer = {
-    stack: stackConfig,
-    pie: pieConfig,
-    donut: donutConfig
-  };
+const addCommas = nStr => {
+  nStr = String(nStr);
+  const x = nStr.split('.');
+  let x1 = x[0];
+  const x2 = x.length > 1 ? '.' + x[1] : '';
+  const rgx = /(\d+)(\d{3})/;
+  while (rgx.test(x1)) {
+    x1 = x1.replace(rgx, '$1,$2');
+  }
+  return x1 + x2;
+};
 
-  function addCommas(nStr) {
-    nStr = String(nStr);
-    const x = nStr.split('.');
-    let x1 = x[0];
-    const x2 = x.length > 1 ? '.' + x[1] : '';
-    const rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-      x1 = x1.replace(rgx, '$1,$2');
-    }
-    return x1 + x2;
+export class ChartService {
+  constructor(Highcharts) {
+    'ngInject';
+
+    this._Highcharts = Highcharts;
+    this.LEGEND_POSITIONING = LEGEND_POSITIONING;
+    this.LAYOUT_POSITIONS = LAYOUT_POSITIONS;
   }
 
-  function updateAnalysisModel(analysis) {
+  updateAnalysisModel(analysis) {
     switch (analysis.chartType) {
     case 'pie':
       analysis.labelOptions = analysis.labelOptions || {enabled: true, value: 'percentage'};
@@ -128,7 +134,7 @@ export function ChartService(Highcharts) {
   }
 
   /* Returns default chart config for various chart types */
-  const getChartConfigFor = (type, options) => {
+  getChartConfigFor(type, options) {
     const initialLegendPosition = type === 'combo' ? 'top' : 'right';
     const initialLegendLayout = type === 'combo' ? 'horizontal' : 'vertical';
     const legendPosition = LEGEND_POSITIONING[get(options, 'legend.align', initialLegendPosition)];
@@ -139,7 +145,7 @@ export function ChartService(Highcharts) {
 
     const config = {
       chart: {
-        type: ['combo', 'bar'].includes(type) ? null : splinifyChartType(type),
+        type: ['combo', 'bar'].includes(type) ? null : this.splinifyChartType(type),
         spacingLeft: SPACING,
         spacingRight: SPACING,
         spacingBottom: SPACING,
@@ -170,10 +176,10 @@ export function ChartService(Highcharts) {
       return configCustomizer[type](config);
     }
     return config;
-  };
+  }
 
   /* Provides view related configuration for various chart types */
-  function getViewOptionsFor(type) {
+  getViewOptionsFor(type) {
     const config = {
       yAxisLabels: [],
       axisLabels: {
@@ -229,7 +235,7 @@ export function ChartService(Highcharts) {
    * string_field_1: 0 -> SOURCE_OS (marker on the checked attribute)
    * string_field_2: 1 -> SOURCE_MANUFACTURER
    */
-  function getNodeFieldMap(nodeFields) {
+  getNodeFieldMap(nodeFields) {
     return map(nodeFields, 'columnName');
   }
 
@@ -241,26 +247,26 @@ export function ChartService(Highcharts) {
    *   z: ..
    * }, ..]
    */
-  function parseData(data, sqlBuilder) {
-    const nodeFieldMap = getNodeFieldMap(sqlBuilder.nodeFields);
-    return parseNode(data, {}, nodeFieldMap, 1);
+  parseData(data, sqlBuilder) {
+    const nodeFieldMap = this.getNodeFieldMap(sqlBuilder.nodeFields);
+    return this.parseNode(data, {}, nodeFieldMap, 1);
   }
 
-  function parseNode(node, dataObj, nodeFieldMap, level) {
+  parseNode(node, dataObj, nodeFieldMap, level) {
     if (node.key) {
       dataObj[nodeFieldMap[level - 2]] = node.key;
     }
 
     const childNode = node[`node_field_${level}`];
     if (childNode) {
-      const data = flatMap(childNode.buckets, bucket => parseNode(bucket, dataObj, nodeFieldMap, level + 1));
+      const data = flatMap(childNode.buckets, bucket => this.parseNode(bucket, dataObj, nodeFieldMap, level + 1));
       return data;
     }
-    const datum = parseLeaf(node, dataObj);
+    const datum = this.parseLeaf(node, dataObj);
     return datum;
   }
 
-  function parseLeaf(node, dataObj) {
+  parseLeaf(node, dataObj) {
     const dataFields = fpPipe(
       fpOmit(['doc_count', 'key']),
       fpMapValues('value')
@@ -272,7 +278,7 @@ export function ChartService(Highcharts) {
     );
   }
 
-  function splitToSeriesAndCategories(parsedData, fields, {sorts}) {
+  splitToSeriesAndCategories(parsedData, fields, {sorts}) {
     let series = [];
     const categories = {};
     const areMultipleYAxes = fields.y.length > 1;
@@ -280,16 +286,16 @@ export function ChartService(Highcharts) {
 
     const fieldsArray = compact([fields.x, ...fields.y, fields.z, fields.g]);
     const dateFields = filter(fieldsArray, ({type}) => DATE_TYPES.includes(type));
-    formatDatesIfNeeded(parsedData, dateFields);
+    this.formatDatesIfNeeded(parsedData, dateFields);
 
     if (areMultipleYAxes) {
-      series = splitSeriesByYAxes(parsedData, fields);
+      series = this.splitSeriesByYAxes(parsedData, fields);
     } else if (isGrouped) {
-      series = splitSeriesByGroup(parsedData, fields);
+      series = this.splitSeriesByGroup(parsedData, fields);
     } else {
-      const axesFieldNameMap = getAxesFieldNameMap(fields);
+      const axesFieldNameMap = this.getAxesFieldNameMap(fields);
       const yField = fields.y[0];
-      series = [getSerie(yField, 0)];
+      series = [this.getSerie(yField, 0)];
       series[0].data = map(parsedData,
         dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])
       );
@@ -299,8 +305,8 @@ export function ChartService(Highcharts) {
       serie.data = map(serie.data, point => {
         const dataPoint = clone(point);
         forEach(dataPoint, (v, k) => {
-          if (isCategoryAxis(fields, k)) {
-            addToCategory(categories, k, v);
+          if (this.isCategoryAxis(fields, k)) {
+            this.addToCategory(categories, k, v);
           }
         });
         return dataPoint;
@@ -313,7 +319,7 @@ export function ChartService(Highcharts) {
         const field = filter(fieldsArray, field => field.checked === k)[0] || {};
         const sortField = filter(sorts, sortF => sortF.field.dataField === field.columnName)[0] || {};
         categories[k] = fpOrderBy(
-          value => getSortValue(field, value),
+          value => this.getSortValue(field, value),
           sortField.order === 'asc' ? 'asc' : 'desc',
           categories[k]
         );
@@ -328,7 +334,7 @@ export function ChartService(Highcharts) {
       serie.data = map(serie.data, point => {
         const dataPoint = clone(point);
         forEach(dataPoint, (v, k) => {
-          if (isCategoryAxis(fields, k)) {
+          if (this.isCategoryAxis(fields, k)) {
             dataPoint[k] = indexOf(categories[k], v);
           }
         });
@@ -347,7 +353,7 @@ export function ChartService(Highcharts) {
     };
   }
 
-  function splinifyChartType(type) {
+  splinifyChartType(type) {
     switch (type) {
     case 'line':
       return 'spline';
@@ -359,7 +365,7 @@ export function ChartService(Highcharts) {
     }
   }
 
-  function getSortValue(field, value) {
+  getSortValue(field, value) {
     if (!field) {
       return value;
     }
@@ -371,7 +377,7 @@ export function ChartService(Highcharts) {
     return value;
   }
 
-  function formatDatesIfNeeded(parsedData, dateFields) {
+  formatDatesIfNeeded(parsedData, dateFields) {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
         forEach(dateFields, ({columnName, dateFormat}) => {
@@ -381,9 +387,9 @@ export function ChartService(Highcharts) {
     }
   }
 
-  function getSerie({alias, displayName, comboType, aggregate}, index) {
-    const splinifiedChartType = splinifyChartType(comboType);
-    const zIndex = getZIndex(comboType);
+  getSerie({alias, displayName, comboType, aggregate}, index) {
+    const splinifiedChartType = this.splinifyChartType(comboType);
+    const zIndex = this.getZIndex(comboType);
     return {
       name: alias || `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`,
       type: splinifiedChartType,
@@ -393,7 +399,7 @@ export function ChartService(Highcharts) {
     };
   }
 
-  function getZIndex(type) {
+  getZIndex(type) {
     switch (type) {
     case 'area':
       return 0;
@@ -407,9 +413,9 @@ export function ChartService(Highcharts) {
     }
   }
 
-  function splitSeriesByYAxes(parsedData, fields) {
-    const axesFieldNameMap = getAxesFieldNameMap(fields, 'y');
-    const series = map(fields.y, getSerie);
+  splitSeriesByYAxes(parsedData, fields) {
+    const axesFieldNameMap = this.getAxesFieldNameMap(fields, 'y');
+    const series = map(fields.y, this.getSerie.bind(this));
 
     forEach(parsedData, dataPoint => {
       forEach(fields.y, (field, index) => {
@@ -423,8 +429,8 @@ export function ChartService(Highcharts) {
     return series;
   }
 
-  function splitSeriesByGroup(parsedData, fields) {
-    const axesFieldNameMap = getAxesFieldNameMap(fields);
+  splitSeriesByGroup(parsedData, fields) {
+    const axesFieldNameMap = this.getAxesFieldNameMap(fields);
     const comboType = fields.y[0].comboType;
 
     return fpPipe(
@@ -440,7 +446,7 @@ export function ChartService(Highcharts) {
    * Ex
    * y -> AVAILABLE_MB
    */
-  function getAxesFieldNameMap(fields, exclude) {
+  getAxesFieldNameMap(fields, exclude) {
     // y axis ommitted because it is added in splitSeriesByYAxes
     const y = exclude === 'y' ? [] : fields.y;
     const fieldsArray = compact([fields.x, ...y, fields.z, fields.g]);
@@ -450,7 +456,7 @@ export function ChartService(Highcharts) {
     }, {});
   }
 
-  function addToCategory(categories, key, newCategoryValue) {
+  addToCategory(categories, key, newCategoryValue) {
     if (!categories[key]) {
       categories[key] = [];
     }
@@ -459,7 +465,7 @@ export function ChartService(Highcharts) {
     }
   }
 
-  function isCategoryAxis(fields, key) {
+  isCategoryAxis(fields, key) {
     const dataType = get(fields, `${key}.type`);
     const isAxis = key !== 'g';
     // strings should be represented as categories in the chart
@@ -470,11 +476,11 @@ export function ChartService(Highcharts) {
     return isCategoryAxis;
   }
 
-  function dataToNestedDonut(series, categories) {
+  dataToNestedDonut(series, categories) {
     /* Group by option forms the inner circle. X axis option forms the outer region
        This logic is adapted from https://www.highcharts.com/demo/pie-donut */
 
-    const colors = Highcharts.getOptions().colors;
+    const colors = this._Highcharts.getOptions().colors;
     const gCategories = map(series, s => s.name);
     const data = map(series, (s, i) => {
       const drilldown = {
@@ -506,7 +512,7 @@ export function ChartService(Highcharts) {
           name: data[i].drilldown.categories[j],
           y: data[i].drilldown.data[j],
           /* eslint-disable */
-          color: Highcharts.Color(data[i].color).brighten(brightness).get()
+          color: this._Highcharts.Color(data[i].color).brighten(brightness).get()
           /* eslint-enable */
         });
       }
@@ -529,7 +535,7 @@ export function ChartService(Highcharts) {
     return chartSeries;
   }
 
-  function customizeSeriesForChartType(series, chartType, categories, fields) {
+  customizeSeriesForChartType(series, chartType, categories, fields) {
     let mapperFn;
     let chartSeries;
 
@@ -559,7 +565,7 @@ export function ChartService(Highcharts) {
         chartSeries = series;
 
       } else {
-        chartSeries = dataToNestedDonut(series, categories);
+        chartSeries = this.dataToNestedDonut(series, categories);
       }
 
       return {chartSeries};
@@ -569,7 +575,7 @@ export function ChartService(Highcharts) {
     }
   }
 
-  function getPieChangeConfig(type, settings, fields, gridData, opts) {
+  getPieChangeConfig(type, settings, fields, gridData, opts) {
     const changes = [];
     const yField = get(fields, 'y.0', {});
     const yLabel = get(opts, 'labels.y') || `${AGGREGATE_TYPES_OBJ[yField.aggregate].label} ${yField.displayName}`;
@@ -577,8 +583,8 @@ export function ChartService(Highcharts) {
     const labelOptions = get(opts, 'labelOptions', {enabled: true, value: 'percentage'});
 
     if (!isEmpty(gridData)) {
-      const {series, categories} = splitToSeriesAndCategories(gridData, fields, opts);
-      const {chartSeries} = customizeSeriesForChartType(series, type, categories, fields, opts);
+      const {series, categories} = this.splitToSeriesAndCategories(gridData, fields, opts);
+      const {chartSeries} = this.customizeSeriesForChartType(series, type, categories, fields, opts);
 
       forEach(chartSeries, seriesData => {
         seriesData.name = yLabel;
@@ -604,7 +610,7 @@ export function ChartService(Highcharts) {
     return changes;
   }
 
-  function getBarChangeConfig(type, settings, fields, gridData, opts) {
+  getBarChangeConfig(type, settings, fields, gridData, opts) {
     const labels = {
       x: get(fields, 'x.alias', get(fields, 'x.displayName', ''))
     };
@@ -634,7 +640,7 @@ export function ChartService(Highcharts) {
     });
 
     if (!isEmpty(gridData)) {
-      const {series, categories} = splitToSeriesAndCategories(gridData, fields, opts);
+      const {series, categories} = this.splitToSeriesAndCategories(gridData, fields, opts);
       changes.push({
         path: 'series',
         data: series
@@ -651,7 +657,7 @@ export function ChartService(Highcharts) {
     return changes;
   }
 
-  const dataToChangeConfig = (type, settings, gridData, opts) => {
+  dataToChangeConfig(type, settings, gridData, opts) {
     let changes;
     const fields = {
       x: find(settings.xaxis, attr => attr.checked === 'x'),
@@ -662,7 +668,7 @@ export function ChartService(Highcharts) {
 
     switch (type) {
     case 'pie':
-      changes = getPieChangeConfig(type, settings, fields, gridData, opts);
+      changes = this.getPieChangeConfig(type, settings, fields, gridData, opts);
       break;
     case 'column':
     case 'bar':
@@ -672,20 +678,20 @@ export function ChartService(Highcharts) {
     case 'scatter':
     case 'bubble':
     default:
-      changes = getBarChangeConfig(type, settings, fields, gridData, opts);
+      changes = this.getBarChangeConfig(type, settings, fields, gridData, opts);
       break;
     }
 
     return concat(
       changes,
-      addTooltipsAndLegend(fields, type)
+      this.addTooltipsAndLegend(fields, type)
     );
-  };
+  }
 
-  function addTooltipsAndLegend(fields, type) {
+  addTooltipsAndLegend(fields, type) {
     const changes = [];
 
-    if (!getViewOptionsFor(type).customTooltip) {
+    if (!this.getViewOptionsFor(type).customTooltip) {
       return changes;
     }
 
@@ -740,21 +746,21 @@ export function ChartService(Highcharts) {
     return changes;
   }
 
-  function filterNumberTypes(attributes) {
+  filterNumberTypes(attributes) {
     return filter(attributes, attr => (
       attr.columnName &&
       NUMBER_TYPES.includes(attr.type)
     ));
   }
 
-  function filterNonNumberTypes(attributes) {
+  filterNonNumberTypes(attributes) {
     return filter(attributes, attr => (
       attr.columnName &&
       !NUMBER_TYPES.includes(attr.type)
     ));
   }
 
-  function fillSettings(artifacts, model) {
+  fillSettings(artifacts, model) {
     /* Flatten the artifacts into a single array and sort them */
     const attributes = fpPipe(
       fpFlatMap(metric => {
@@ -768,13 +774,13 @@ export function ChartService(Highcharts) {
 
     let settingsObj;
     let zaxis;
-    const yaxis = filterNumberTypes(attributes);
+    const yaxis = this.filterNumberTypes(attributes);
     const xaxis = attributes;
-    const groupBy = filterNonNumberTypes(attributes);
+    const groupBy = this.filterNonNumberTypes(attributes);
 
     switch (model.chartType) {
     case 'bubble':
-      zaxis = filterNumberTypes(attributes);
+      zaxis = this.filterNumberTypes(attributes);
       settingsObj = {
         xaxis,
         yaxis,
@@ -791,17 +797,4 @@ export function ChartService(Highcharts) {
     }
     return settingsObj;
   }
-
-  return {
-    getChartConfigFor,
-    getViewOptionsFor,
-    dataToChangeConfig,
-    fillSettings,
-    parseData,
-    updateAnalysisModel,
-
-    LEGEND_POSITIONING,
-    LAYOUT_POSITIONS
-  };
-
 }

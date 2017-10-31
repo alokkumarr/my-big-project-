@@ -1,17 +1,32 @@
-<div class="has-movable" [dragOverClass]="'draggedOver'" [dragHintClass]="'dragHinted'" droppable (onDrop)="onDrop($event, this.loadedAnalyses)">
-  <li draggable *ngFor="let analysis of loadedAnalyses" [dragData]="{collection: 'loadedAnalyses', analysis: analysis}">
-    {{analysis.name}}
-  </li>
+<div md-dialog-title>
+  <button md-icon-button (click)="exitCreator()">
+    <md-icon fontIcon="icon-arrow-left"></md-icon>
+  </button>
+  <span>
+    Create New Dashboard
+  </span>
+  <div class="title-actions">
+    <button md-button>
+      Description
+    </button>
+    <button md-raised-button color="primary">
+      Save
+    </button>
+  </div>
 </div>
-
-<div class="has-movable" [dragOverClass]="'draggedOver'" [dragHintClass]="'dragHinted'" droppable (onDrop)="onDrop($event, this.chosenAnalyses1)">
-  <li draggable *ngFor="let analysis of chosenAnalyses1" [dragData]="{collection: 'chosenAnalyses1', analysis: analysis}">{{analysis.name}}</li>
+<div md-dialog-content>
+  <gridster [options]="options" #gridster>
+    <gridster-item [item]="item" *ngFor="let item of dashboard">
+      <!-- <span class="analysis-title">{{item.analysis.name}}</span> -->
+      <button md-icon-button (click)="removeTile(item)">
+        <md-icon fontIcon="icon-close"></md-icon>
+      </button>
+      <observe-chart *ngIf="item.analysis.type === 'chart'"
+      class="analysis-container" [analysis]="item.analysis" [updater]="item.updater"></observe-chart>
+    </gridster-item>
+  </gridster>
 </div>
-
-<div class="has-movable" [dragOverClass]="'draggedOver'" [dragHintClass]="'dragHinted'" droppable (onDrop)="onDrop($event, this.chosenAnalyses2)">
-  <li draggable *ngFor="let analysis of chosenAnalyses2" [dragData]="{collection: 'chosenAnalyses2', analysis: analysis}">{{analysis.name}}</li>
-</div>
-
-<div class="has-movable" [dragOverClass]="'draggedOver'" [dragHintClass]="'dragHinted'" droppable (onDrop)="onDrop($event, this.chosenAnalyses3)">
-  <li draggable *ngFor="let analysis of chosenAnalyses3" [dragData]="{collection: 'chosenAnalyses3', analysis: analysis}">{{analysis.name}}</li>
-</div>
+<span [@hideHelp]="fillState" class="add-button-help">Add a new analysis to the dashboard</span>
+<button [@moveButton]="fillState" md-fab color="primary" class="add-analysis" (click)="chooseAnalysis()">
+  <md-icon fontIcon="icon-plus"></md-icon>
+</button>

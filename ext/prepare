@@ -9,11 +9,8 @@ set -eu
 dir=$(dirname $0)
 cd $dir
 
-# Prepare SAW module packages from merged repositories if available,
-# otherwise assume provided
-if [ -d ../saw-security ]; then
-    ./prepare-dev
-fi
+# Prepare SAW module packages from merged repositories
+./prepare-dev $@
 
 # Add SAW modules
 rm -rf modules

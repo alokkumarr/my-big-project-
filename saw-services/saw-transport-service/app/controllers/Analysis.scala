@@ -26,10 +26,13 @@ import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 import collection.JavaConverters._
 
+import executor.ReportExecutorQueue
 import sncr.metadata.engine.{Fields, MetadataDictionary}
 
 class Analysis extends BaseController {
   val executorRunner = new ExecutionTaskHandler(1);
+  val executorRegularQueue = new ReportExecutorQueue("regular")
+  val executorPreviewQueue = new ReportExecutorQueue("preview")
   var totalRows: Int = 0;
   
   /**
@@ -163,6 +166,7 @@ class Analysis extends BaseController {
         }
 
         val analysisId = extractAnalysisId(json)
+	var executionType: String = null
         var queryRuntime: String = null
         (json \ "contents" \ "analyze") match {
           case obj: JArray => {
@@ -172,9 +176,9 @@ class Analysis extends BaseController {
     	    if (typeInfo.equals("report"))
     	    {
 	      /* Build query based on analysis supplied in request body */
-	      val executionType = (analysis \ "executionType")
-	        .extractOrElse[String]("interactive")
 	      val runtime = (executionType == "interactive")
+              executionType = (analysis \ "executionType").extractOrElse[String]("interactive")
+              m_log.debug("Execution type: {}", executionType)
             m_log.trace("dskStr after processing inside execute block before runtime: {}", dskStr);
             m_log.trace("runtime execute block before queryRuntime: {}", runtime);
               queryRuntime = (analysis \ "queryManual") match {
@@ -185,9 +189,8 @@ class Analysis extends BaseController {
           }}
           case _ => {}
         }
-        /* Execute analysis and return result data */
         m_log.trace("dskStr after processing inside execute block before Execute analysis and return result data : {}", dskStr);
-        val data = executeAnalysis(analysisId, queryRuntime, json, dskStr)
+        val data = executeAnalysis(analysisId, executionType, queryRuntime, json, dskStr)
         contentsAnalyze(("data", data)~ ("totalRows",totalRows))
 
       }
@@ -306,7 +309,7 @@ class Analysis extends BaseController {
   var result: String = null
   def setResult(r: String): Unit = result = r
  
-  def executeAnalysis(analysisId: String, queryRuntime: String = null, reqJSON: JValue =null, dataSecurityKeyStr : String): JValue = {
+  def executeAnalysis(analysisId: String, executionType: String, queryRuntime: String = null, reqJSON: JValue =null, dataSecurityKeyStr : String): JValue = {
  	var json: String = "";
  	var typeInfo : String = "";
  	var analysisJSON : JObject = null;
@@ -499,7 +502,19 @@ class Analysis extends BaseController {
       //var query :String =null
       val query = if (queryRuntime != null) queryRuntime else QueryBuilder.build(analysisJSON, false, dataSecurityKeyStr)
       m_log.trace("query inside report block before executeAndWait : {}", query);
-      val execution = analysis.executeAndWait(ExecutionType.onetime, query)
+      /* Execute analysis report query through queue for concurrency */
+      val executionTypeEnum = executionType match {
+        case "preview" => ExecutionType.preview
+        case _ => ExecutionType.onetime
+      }
+      val execution = analysis.executeAndWaitQueue(
+        executionTypeEnum, query, (analysisId, resultId, query) => {
+          val executorQueue = executionTypeEnum match {
+            case ExecutionType.preview => executorPreviewQueue
+            case _ => executorRegularQueue
+          }
+          executorQueue.send(analysisId, resultId, query)
+        })
       val analysisResultId: String = execution.getId
       m_log.trace("analysisResultId inside report block after executeAndWait : {}", analysisResultId);
       //TODO:: Subject to change: to get ALL data use:  val resultData = execution.getAllData
@@ -518,7 +533,8 @@ class Analysis extends BaseController {
         m_log.trace("totalRows {}", totalRows);
       }
       else {
-        resultData = execution.getPreview(DLConfiguration.rowLimit);
+        /* Load execution results from data lake (instead of from Spark driver) */
+        resultData = execution.loadExecution(execution.getId, 100)
         m_log.trace("when data is not available in cache analysisResultId: {}", analysisResultId);
         m_log.trace("when data is not available in cache size of limit {}", limit);
         m_log.trace("when data is not available in cache size of start {}", start);
@@ -563,6 +579,7 @@ class Analysis extends BaseController {
               case obj: java.lang.Double => JDouble(obj.doubleValue())
               case obj: java.lang.Boolean => JBool(obj.booleanValue())
               case obj: java.sql.Date => JLong(obj.getTime())
+              case obj: scala.math.BigInt => JLong(obj.toLong)
               case obj =>
                 throw new RuntimeException(
                   "Unsupported data type in result: " + dataType

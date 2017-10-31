@@ -1,7 +1,9 @@
 declare function require(string): string;
 
 import { MdDialog, MdIconRegistry } from '@angular/material';
-import { NewDashboardComponent } from '../new-dashboard/new-dashboard.component';
+import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.component';
+import { MenuService } from '../../../../common/services/menu.service';
+import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
 const template = require('./observe-page.component.html');
 require('./observe-page.component.scss');
@@ -17,15 +19,23 @@ import { Component } from '@angular/core';
   template: template
 })
 export class ObservePageComponent {
-  constructor(public dialog: MdDialog, private iconRegistry: MdIconRegistry) {
+  constructor(public dialog: MdDialog,
+    private iconRegistry: MdIconRegistry,
+    private analyze: AnalyzeService,
+    private menu: MenuService
+  ) {
     // this.$componentHandler = $componentHandler;
     // this.MenuService = MenuService;
     this.iconRegistry.setDefaultFontSetClass('icomoon');
-
+    this.menu.getMenu('ANALYZE').then(data => {
+      this.analyze.updateMenu(data);
+    });
   }
 
-  openDialog() {
-    this.dialog.open(NewDashboardComponent);
+  createDashboard() {
+    this.dialog.open(CreateDashboardComponent, {
+      panelClass: 'full-screen-dialog'
+    });
   }
 
   // $onInit() {

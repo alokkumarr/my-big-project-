@@ -9,7 +9,7 @@ set -eu
 trap "journalctl -u saw-* > /build/saw-system.log" EXIT
 
 cd /maven
-tar -xzf saw.tgz
+tar -xzf saw-*.tgz
 saw/saw-deploy /root/saw-config
 
 # Workaround: The default MapR log4j configuration causes Transport
