@@ -131,7 +131,7 @@ export function PivotService() {
       return {formattedData: data, formattedFields: fields};
     }
 
-    const formattedData= map(data, dataPoint => {
+    const formattedData = map(data, dataPoint => {
       const clonedDataPoint = clone(dataPoint);
       forEach(dateFields, ({dataField, dateInterval}) => {
         const format = DATE_INTERVALS_OBJ[dateInterval].format;
