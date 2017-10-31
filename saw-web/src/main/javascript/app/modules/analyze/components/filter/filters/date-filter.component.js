@@ -12,17 +12,20 @@ export const DateFilterComponent = {
     constructor($filter, $translate) {
       this._$filter = $filter;
       this.presets = [{
-        value: 'YTD',
-        keyword: 'YEAR_TO_DATE'
+        value: 'TW',
+        keyword: 'THIS_WEEK'
       }, {
         value: 'MTD',
         keyword: 'MONTH_TO_DATE'
       }, {
-        value: 'LTM',
-        keyword: 'LAST_3_MONTHS'
+        value: 'YTD',
+        keyword: 'YEAR_TO_DATE'
       }, {
-        value: 'LSM',
-        keyword: 'LAST_6_MONTHS'
+        value: 'LW',
+        keyword: 'LAST_WEEK'
+      }, {
+        value: 'LTW',
+        keyword: 'LAST_2_WEEKS'
       }, {
         value: 'LM',
         keyword: 'LAST_MONTH'
@@ -30,14 +33,11 @@ export const DateFilterComponent = {
         value: 'LQ',
         keyword: 'LAST_QUARTER'
       }, {
-        value: 'LW',
-        keyword: 'LAST_WEEK'
+        value: 'LTM',
+        keyword: 'LAST_3_MONTHS'
       }, {
-        value: 'TW',
-        keyword: 'THIS_WEEK'
-      }, {
-        value: 'LTW',
-        keyword: 'LAST_2_WEEKS'
+        value: 'LSM',
+        keyword: 'LAST_6_MONTHS'
       }, {
         value: 'CUSTOM',
         keyword: 'CUSTOM'
