@@ -398,9 +398,10 @@ export const AnalyzeChartComponent = {
         fpMap('comboType'),
         fpCompact
       )(model.artifacts[0].columns);
-      if (types.length === 1 &&
-        types[0] === 'column' &&
-        model.isInverted === true) {
+
+      if (types.length >= 1 &&
+        every(types, type => type === 'column') &&
+        (this.isInverted || model.isInverted)) {
         return 'bar';
       }
       if (!this.comboableCharts.includes(model.chartType)) {
