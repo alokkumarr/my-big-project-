@@ -13,15 +13,6 @@ localhost ansible_connection=local
 
 [saw-services:vars]
 #
-# Elasticsearch configuration
-#
-saw_elasticsearch_protocol=http
-saw_elasticsearch_host=elasticsearch01
-saw_elasticsearch_port=9200
-saw_elasticsearch_username=elastic
-saw_elasticsearch_password=xuw3dUraHapret
-
-#
 # Spark configuration
 #
 # Workaround: As Docker DNS lookups do not work inside CentOS 7
@@ -30,6 +21,15 @@ saw_elasticsearch_password=xuw3dUraHapret
 # variables, so insert them into the configuration here.
 saw_spark_master_url=spark://saw-mapr:7077
 saw_zookeeper_quorum=saw-mapr
+
+#
+# Elasticsearch configuration
+#
+saw_elasticsearch_protocol=http
+saw_elasticsearch_host=elasticsearch01
+saw_elasticsearch_port=9200
+saw_elasticsearch_username=elastic
+saw_elasticsearch_password=xuw3dUraHapret
 
 [saw-security]
 localhost ansible_connection=local

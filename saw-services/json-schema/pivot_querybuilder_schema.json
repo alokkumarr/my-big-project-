@@ -153,6 +153,20 @@
                       "id":"/properties/filters/model/properties/lte",
                       "type":"string"
                     },
+	            "preset":{
+                      "id":"/properties/filters/model/properties/preset",
+                      "type":"string",
+ 			"enum": [
+                      "YTD",
+                      "MTD",
+                      "LTM",
+                      "LM",
+                      "LQ",
+                      "TW",
+                      "BTW",
+ 		              "LTW"
+                    ]
+                    },		
                     "format":{
                       "id":"/properties/filters/model/properties/format",
                       "type":"string"

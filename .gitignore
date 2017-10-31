@@ -1,3 +1,4 @@
 target/
 ext/modules/
 ext/saw-*.tgz
+.DS_Store

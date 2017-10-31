@@ -52,7 +52,7 @@
           <!-- Leave version number of SAW bundle project out of
                artifact name, to avoid confusion as each SAW module at
                least for now has its own release cycle -->
-          <finalName>${project.parent.artifactId}</finalName>
+          <finalName>${project.parent.artifactId}-${project.version}</finalName>
           <!-- Remove artifact classifier "bin" from archive name -->
           <appendAssemblyId>false</appendAssemblyId>
           <!-- Enable long file names without Maven warning -->
