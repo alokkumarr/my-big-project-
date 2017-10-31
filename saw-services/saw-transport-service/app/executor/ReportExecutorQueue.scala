@@ -66,7 +66,7 @@ class ReportExecutorQueue(val executorType: String) {
   /**
    * Send request to execute report to queue
    */
-  def send(analysisId: String, resultId: String, query: String, executionType: ExecutionType) {
+  def send(executionType: ExecutionType, analysisId: String, resultId: String, query: String) {
     log.debug("Starting send: {}", executorType)
     val properties = new Properties()
     properties.setProperty("key.serializer",
@@ -75,7 +75,7 @@ class ReportExecutorQueue(val executorType: String) {
       "org.apache.kafka.common.serialization.StringSerializer")
     val producer = new KafkaProducer[String, String](properties)
     producer.send(new ProducerRecord[String, String](
-      ExecutorTopic, analysisId + "," + resultId + "," + query + "," + executionType))
+      ExecutorTopic, executionType + "," + analysisId + "," + resultId + "," + query))
     producer.flush
     producer.close
     log.debug("Finished send")
@@ -107,7 +107,7 @@ class ReportExecutorQueue(val executorType: String) {
     val records = consumer.poll(pollTimeout)
     records.asScala.foreach(record => {
       log.debug("Received message: {} {}", executorType, record: Any);
-      val Array(analysisId, resultId, query, executionType) = record.value.split(",", 4)
+      val Array(executionType, analysisId, resultId, query) = record.value.split(",", 4)
       val executionTypeEnum = executionType match {
         case "preview" => ExecutionType.preview
         case "onetime" => ExecutionType.onetime

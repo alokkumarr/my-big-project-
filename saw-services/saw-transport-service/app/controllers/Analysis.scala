@@ -517,7 +517,7 @@ class Analysis extends BaseController {
             case ExecutionType.scheduled => executorRegularQueue
             case obj => throw new RuntimeException("Unknown execution type: " + obj)
           }
-          executorQueue.send(analysisId, resultId, query, executionTypeEnum)
+          executorQueue.send(executionTypeEnum, analysisId, resultId, query)
         })
       val analysisResultId: String = execution.getId
       m_log.trace("analysisResultId inside report block after executeAndWait : {}", analysisResultId);
