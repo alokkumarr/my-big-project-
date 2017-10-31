@@ -28,7 +28,8 @@ export const AnalyzePivotPreviewComponent = {
       this._AnalyzeService.previewExecution(this.model.pivot, options).then(({data}) => {
         const fields = this._PivotService.artifactColumns2PivotFields()(this.model.pivot.artifacts[0].columns);
         const parsedData = this._PivotService.parseData(data, this.model.pivot.sqlBuilder);
-        this.dataSource = new PivotGridDataSource({store: parsedData, fields});
+        const {formattedFields, formattedData} = this._PivotService.formatDates(parsedData, fields);
+        this.dataSource = new PivotGridDataSource({store: formattedData, fields: formattedFields});
         this.pivotGridUpdater.next({
           dataSource: this.dataSource
         });

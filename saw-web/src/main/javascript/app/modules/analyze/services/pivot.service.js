@@ -8,14 +8,19 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
 import * as split from 'lodash/split';
 import * as first from 'lodash/first';
+import * as forEach from 'lodash/forEach';
+import * as isEmpty from 'lodash/isEmpty';
 import * as fpMapKeys from 'lodash/fp/mapKeys';
 import * as fpOmit from 'lodash/fp/omit';
 import * as invert from 'lodash/invert';
 import * as concat from 'lodash/concat';
 import * as clone from 'lodash/clone';
 import * as fpMapValues from 'lodash/fp/mapValues';
+import * as fpPick from 'lodash/fp/pick';
+import * as moment from 'moment';
 
-import {NUMBER_TYPES} from '../consts';
+import {NUMBER_TYPES, DATE_TYPES} from '../consts';
+import {DATE_INTERVALS_OBJ} from '../components/pivot/settings/analyze-pivot-settings.component';
 
 const FRONT_2_BACK_PIVOT_FIELD_PAIRS = {
   caption: 'displayName',
@@ -32,7 +37,8 @@ export function PivotService() {
     getArea,
     artifactColumns2PivotFields,
     parseData,
-    trimSuffixFromPivotFields
+    trimSuffixFromPivotFields,
+    formatDates
   };
 
   function artifactColumns2PivotFields() {
@@ -104,6 +110,37 @@ export function PivotService() {
       return split[0];
     }
     return columnName;
+  }
+
+  function formatDates(data, fields) {
+    const formattedFields = map(fields, field => {
+      if (DATE_TYPES.includes(field.type) &&
+          ['day', 'quarter', 'month'].includes(field.dateInterval)) {
+        const clonedField = clone(field);
+        clonedField.dataType = 'string';
+        return clonedField;
+      }
+      return field;
+    });
+
+    const dateFields = fpPipe(
+      fpFilter(({type}) => DATE_TYPES.includes(type)),
+      fpMap(fpPick(['dataField', 'dateInterval']))
+    )(fields);
+    if (isEmpty(dateFields)) {
+      return {formattedData: data, formattedFields: fields};
+    }
+
+    const formattedData= map(data, dataPoint => {
+      const clonedDataPoint = clone(dataPoint);
+      forEach(dateFields, ({dataField, dateInterval}) => {
+        const format = DATE_INTERVALS_OBJ[dateInterval].format;
+        clonedDataPoint[dataField] = moment(dataPoint[dataField]).format(format);
+      });
+      return clonedDataPoint;
+    });
+
+    return {formattedData, formattedFields};
   }
 
   function parseNode(node, dataObj, nodeFieldMap, level) {

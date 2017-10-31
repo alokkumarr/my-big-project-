@@ -18,6 +18,7 @@ import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as groupBy from 'lodash/groupBy';
 import * as values from 'lodash/values';
 import * as has from 'lodash/has';
+
 import * as fpMapValues from 'lodash/fp/mapValues';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
@@ -127,12 +128,13 @@ export const AnalyzePivotComponent = {
       this.analysisUnSynched();
       this.startDraftMode();
       const pivotFields = this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns);
-      this.setDataSource(this.dataSource.store, pivotFields);
+      this.setDataSource(this.deNormalizedData, pivotFields);
     }
 
     setDataSource(store, fields) {
       const parsedFields = this._PivotService.trimSuffixFromPivotFields(fields);
-      this.dataSource = new PivotGridDataSource({store, fields: parsedFields});
+      const {formattedFields, formattedData} = this._PivotService.formatDates(store, parsedFields);
+      this.dataSource = new PivotGridDataSource({store: formattedData, fields: formattedFields});
       this.pivotGridUpdater.next({
         dataSource: this.dataSource
       });
@@ -213,7 +215,7 @@ export const AnalyzePivotComponent = {
 
         this.artifacts[0].columns = this.backupColumns;
         const pivotFields = this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns);
-        this.setDataSource(this.dataSource.store, pivotFields);
+        this.setDataSource(this.deNormalizedData, pivotFields);
       }
     }
 
