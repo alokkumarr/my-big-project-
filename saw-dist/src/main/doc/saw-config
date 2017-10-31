@@ -29,14 +29,14 @@ saw_spark_master_url=spark://localhost:7077
 # If Spark is configured to use YARN, use the variable below to set
 # the YARN queue
 #saw_spark_yarn_queue_regular=saw-regular
-#saw_spark_yarn_queue_preview=saw-preview
+#saw_spark_yarn_queue_fast=saw-fast
 saw_zookeeper_quorum=localhost
 
 #
 # Transport Service Executor configuration
 #
 #saw_transport_executor_regular_count=2
-#saw_transport_executor_preview_count=2
+#saw_transport_executor_fast_count=2
 
 #
 # Elasticsearch configuration

@@ -53,12 +53,7 @@ public class ServicesApiIT {
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
-    /* Workaround: The testListExecute integration test fails
-     * intermittently due to TransportService responding with 500
-     * Internal Server Error (see SAW-1619).  Disable the test until
-     * the failure has been analyzed and fixed, to avoid failing other
-     * builds in the meanwhile.  */
-    //@Test
+    @Test
     public void testListExecute() throws JsonProcessingException {
         String token = authenticate();
         list(token);

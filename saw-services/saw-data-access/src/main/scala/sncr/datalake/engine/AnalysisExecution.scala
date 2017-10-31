@@ -66,7 +66,8 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val 
           analysisNodeExecution.createAnalysisResult(id, null)
         }
         case ExecutionType.preview => {
-          analysisNodeExecution.executeSQL()
+          analysisNodeExecution.executeSQLNoDataLoad()
+          analysisNodeExecution.createAnalysisResult(id, null)
         }
       }
       analysisNodeExecution.setFinishTime
