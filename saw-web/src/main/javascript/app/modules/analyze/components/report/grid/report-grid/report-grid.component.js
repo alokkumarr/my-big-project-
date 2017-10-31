@@ -79,7 +79,7 @@ export const ReportGridComponent = {
         if (e.column.dataType === 'number' || e.column.dataType === 'timestamp' || e.column.dataType === 'date') {
           e.items.push({
             text: 'Format Data',
-            icon: 'grid-menu-item icon-edit',
+            icon: 'grid-menu-item icon-filter',
             onItemClick: () => {
               this.formatColumn(e.column);
             }
@@ -245,14 +245,28 @@ export const ReportGridComponent = {
               } else {
                 typeValue = 'decimal';
               }
-              column.format = {
-                type: typeValue,
-                precision: newFormat.NumberDecimal
-              };
+              if(newFormat.CurrencyFlag){
+                column.format = {
+                  type: typeValue,
+                  precision: newFormat.NumberDecimal,
+                  currency: newFormat.CurrencyCode,
+                  currencySymbol: newFormat.CurrencySymbol
+                };
+                column.customizeText = (source)=> {
+                  return source.valueText + ' ' + column.format.currencySymbol;
+                }
+              } else {
+                column.format = {
+                  type: typeValue,
+                  precision: newFormat.NumberDecimal
+                }
+              }
+              
             }
           }
           this._gridInstance.option('columns', columns);
         }
+        this.reportGridContainer.formatColumn(gridColumn.dataField, gridColumn.dataType, newFormat);
       });
 
     }

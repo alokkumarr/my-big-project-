@@ -1,29 +1,61 @@
-.number-format .format-row {
-  border-bottom: 1px solid #CCC;
-  height: 50px;
-  padding: 8px;
+@import "themes/base/colors";
 
-  span {
+report-format-dialog {
+  .number-format .format-row {
+    border-bottom: 1px solid #CCC;
+    height: 50px;
+    padding: 8px;
+
+    .span-label {
+      float: left;
+      margin-right: 20px;
+      margin-top: 14px;
+    }
+
+    input {
+      margin-top: 5px;
+      width: 157px;
+      height: 23px;
+      padding: 6px;
+    }
+  }
+
+  .date-format md-radio-group .row {
+    border-top: 1px solid #CCC;
+    height: 50px;
+
+    .md-container {
+      margin: 8px;
+    }
+
+    .md-label span {
+      padding: 10px;
+      padding-top: 22px;
+    }
+  }
+
+  md-switch {
+    width: 43px;
     float: left;
-    margin-right: 20px;
-    margin-top: 20px;
+    margin-top: 10px;
   }
 
-  input {
-    margin-top: 20px;
-  }
-}
-
-.date-format md-radio-group .row {
-  border-top: 1px solid #CCC;
-  height: 50px;
-
-  .md-container {
-    margin: 8px;
+  md-select {
+    width: 227px;
+    height: 38px;
+    margin-top: 6px !important;
   }
 
-  .md-label span {
-    padding: 10px;
-    padding-top: 22px;
+  .sample-block {
+    border-radius: 5px;
+    border-left: 6px solid $primary-blue-b2;
+    background: $primary-grey-g1;
+    font-size: xx-large;
+    padding: 6px;
+    margin: 6px;
+  }
+
+  .sample-block h6 {
+    margin: 1px;
   }
 }

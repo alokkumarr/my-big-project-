@@ -82,17 +82,25 @@ export const ReportGridDisplayComponent = {
       return map(columns, column => {
         const field = {
           alignment: 'left',
-          caption: column.aliasName || column.displayName,
+          caption: column.alias || column.displayName,
+          format: column.format,
           dataField: column.columnName || column.name,
           visibleIndex: column.visibleIndex,
           dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
           width: COLUMN_WIDTH
         };
-        if (NUMBER_TYPES.includes(column.type)) {
+        if (NUMBER_TYPES.includes(column.type) && column.format === undefined) {
           field.format = {
             type: 'decimal',
             precision: 2
           };
+        }
+        if (NUMBER_TYPES.includes(column.type) && column.format != undefined) {
+          if (column.format.currency) {
+            field.customizeText = (data)=> {
+              return data.valueText + ' ' + column.format.currencySymbol;
+            }
+          }
         }
         return field;
       });

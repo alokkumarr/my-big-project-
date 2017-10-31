@@ -335,6 +335,7 @@ export const AnalyzeReportComponent = {
             displayName: field.meta.displayName,
             table: table.name,
             aliasName: field.alias,
+            format: field.format,
             type: field.meta.type,
             hide: field.isHidden,
             joinEligible: field.meta.joinEligible,
