@@ -25,9 +25,6 @@ class ReportExecutorQueue(val executorType: String) {
   val ExecutorTopic = ExecutorStream + ":executions"
   val log: Logger = LoggerFactory.getLogger(classOf[ReportExecutorQueue].getName)
 
-  /* Automatically create queue upon startup if it does not exist */
-  createIfNotExists()
-
   /**
    * Create required MapR streams if they do not exist
    */
@@ -67,6 +64,8 @@ class ReportExecutorQueue(val executorType: String) {
    * Send request to execute report to queue
    */
   def send(executionType: ExecutionType, analysisId: String, resultId: String, query: String) {
+    /* Automatically create queue before sending if it does not exist */
+    createIfNotExists()
     log.debug("Starting send: {}", executorType)
     val properties = new Properties()
     properties.setProperty("key.serializer",
@@ -85,6 +84,8 @@ class ReportExecutorQueue(val executorType: String) {
    * Process request to execute report from queue
    */
   def receive {
+    /* Automatically create queue before receiving if it does not exist */
+    createIfNotExists()
     log.debug("Starting receive: {}", executorType)
     val properties = new Properties()
     properties.setProperty("group.id", "saw-transport-executor")
