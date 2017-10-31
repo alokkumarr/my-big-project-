@@ -137,7 +137,7 @@ public class BuilderUtil
         dynamicConvertor.setGte(firstDayOfMonth.format(dateTimeFormatter));
         break;
       }
-      case "Last 3 months": {
+      case "LTM": {
         
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime last3Month = now.minusMonths(3);
@@ -145,27 +145,27 @@ public class BuilderUtil
         dynamicConvertor.setGte(last3Month.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter));
         break;
       }
-      case "Last Six Months": {
+      case "LSM": {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime last6Months = now.minusMonths(6);
         dynamicConvertor.setLte(now.minusMonths(1).with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter));
         dynamicConvertor.setGte(last6Months.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter));
         break;
       }
-      case "Last Month": {
+      case "LM": {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime lastMonth = now.minusMonths(1);
         dynamicConvertor.setLte(lastMonth.with(TemporalAdjusters.lastDayOfMonth()).format(dateTimeFormatter));
         dynamicConvertor.setGte(lastMonth.with(TemporalAdjusters.firstDayOfMonth()).format(dateTimeFormatter));
         break;
       }
-      case "Last Quarter": {
+      case "LQ": {
         YearQuarter quarter = YearQuarter.now();
         dynamicConvertor.setLte(quarter.minusQuarters(1).atEndOfQuarter().toString());
         dynamicConvertor.setGte(quarter.minusQuarters(1).atDay(1).toString());
         break;
       }
-      case "Last Week": {
+      case "LW": {
         DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime lastWeek = now.minusWeeks(1);
@@ -176,7 +176,7 @@ public class BuilderUtil
         dynamicConvertor.setGte(startOfWeek.format(dateTimeFormatter));
         break;
       }
-      case "This week": {
+      case "TW": {
         DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime lastWeek = now;
@@ -186,7 +186,7 @@ public class BuilderUtil
         dynamicConvertor.setGte(startOfWeek.format(dateTimeFormatter));
         break;
       }
-      case "Last two weeks": {
+      case "LTW": {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime last2Week = now.minusWeeks(2);
         DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
@@ -196,6 +196,7 @@ public class BuilderUtil
         dynamicConvertor.setGte(startOfWeek.format(dateTimeFormatter));
         break;
       }
+      default : throw new IllegalArgumentException(dynamic + " not present");
 
     }
 
