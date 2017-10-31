@@ -315,7 +315,7 @@ class Analysis extends BaseController {
  	var analysisJSON : JObject = null;
     m_log.trace("dataSecurityKeyStr dataset: {}", dataSecurityKeyStr);
  	  m_log.trace("json dataset: {}", reqJSON);
-    val start = (reqJSON \ "contents" \ "page").extractOrElse(0)
+    val start = (reqJSON \ "contents" \ "page").extractOrElse(1)
     val limit = (reqJSON \ "contents" \ "pageSize").extractOrElse(10)
     val analysis = (reqJSON \ "contents" \ "analyze") match {
       case obj: JArray => analysisJson(reqJSON, dataSecurityKeyStr); // reading from request body
