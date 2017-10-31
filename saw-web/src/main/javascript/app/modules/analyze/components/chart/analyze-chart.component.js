@@ -17,6 +17,7 @@ import * as every from 'lodash/every';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
 import * as fpFilter from 'lodash/fp/filter';
+import * as fpCompact from 'lodash/fp/compact';
 
 import * as template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -394,14 +395,15 @@ export const AnalyzeChartComponent = {
     getNewChartType(model) {
       const types = fpPipe(
         fpFilter(({checked}) => checked === 'y'),
-        fpMap('comboType')
+        fpMap('comboType'),
+        fpCompact
       )(model.artifacts[0].columns);
       if (types.length === 1 &&
         types[0] === 'column' &&
         model.isInverted === true) {
         return 'bar';
       }
-      if (!this.multyYCharts.includes(model.chartType)) {
+      if (!this.comboableCharts.includes(model.chartType)) {
         return model.chartType;
       }
       if (isEmpty(types)) {
