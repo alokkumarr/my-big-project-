@@ -135,7 +135,7 @@ export function PivotService() {
       const clonedDataPoint = clone(dataPoint);
       forEach(dateFields, ({dataField, dateInterval}) => {
         const format = DATE_INTERVALS_OBJ[dateInterval].format;
-        clonedDataPoint[dataField] = moment(dataPoint[dataField]).format(format);
+        clonedDataPoint[dataField] = moment(dataPoint[dataField]).utcOffset(0).format(format);
       });
       return clonedDataPoint;
     });
@@ -147,7 +147,6 @@ export function PivotService() {
     if (node.key) {
       const columnName = getColumnName(nodeFieldMap, level);
       dataObj[columnName] = node.key_as_string || node.key;
-      // dataObj[columnName] = isNumber(node.key) ? node.key - (node.key % 86400000) : node.key;
     }
 
     const nodeName = getChildNodeName(node);
