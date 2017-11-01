@@ -17,6 +17,7 @@ import * as every from 'lodash/every';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
 import * as fpFilter from 'lodash/fp/filter';
+import * as fpCompact from 'lodash/fp/compact';
 
 import * as template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
@@ -105,15 +106,17 @@ export const AnalyzeChartComponent = {
     }
 
     $onInit() {
-      if (this.model.chartType === 'bar') {
+      if (this.mode === ENTRY_MODES.NEW && this.model.chartType === 'bar') {
         this.isInverted = true;
       }
 
       if (this.mode === ENTRY_MODES.FORK) {
+        this.isInverted = this.model.isInverted;
         delete this.model.id;
       }
 
       if (this.mode === ENTRY_MODES.EDIT) {
+        this.isInverted = this.model.isInverted;
         this.initChart();
         this.onRefreshData();
       } else {
@@ -270,6 +273,10 @@ export const AnalyzeChartComponent = {
         filteredGridData,
         {labels: this.labels, labelOptions: this.model.labelOptions, sorts: this.sorts}
       );
+      changes.push({
+        path: 'chart.inverted',
+        data: this.isInverted
+      });
       this.updateChart.next(changes);
     }
 
@@ -359,6 +366,7 @@ export const AnalyzeChartComponent = {
       set(payload, 'sqlBuilder.booleanCriteria', this.model.sqlBuilder.booleanCriteria);
       set(payload, 'xAxis', {title: this.labels.x});
       set(payload, 'yAxis', {title: this.labels.y});
+      set(payload, 'isInverted', this.isInverted);
       set(payload, 'legend', {
         align: this.legend.align,
         layout: this.legend.layout
@@ -387,8 +395,18 @@ export const AnalyzeChartComponent = {
     getNewChartType(model) {
       const types = fpPipe(
         fpFilter(({checked}) => checked === 'y'),
-        fpMap('comboType')
+        fpMap('comboType'),
+        fpCompact
       )(model.artifacts[0].columns);
+
+      if (types.length >= 1 &&
+        every(types, type => type === 'column') &&
+        (this.isInverted || model.isInverted)) {
+        return 'bar';
+      }
+      if (!this.comboableCharts.includes(model.chartType)) {
+        return model.chartType;
+      }
       if (isEmpty(types)) {
         return model.chartType;
       }

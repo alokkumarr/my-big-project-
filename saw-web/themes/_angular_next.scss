@@ -1,0 +1,30 @@
+@import "./base/colors";
+@import "../node_modules/@angular/material/theming";
+
+$sncr-typography: mat-typography-config(
+  $font-family: 'Source Sans Pro',
+  $headline: mat-typography-level(32px, 48px, 700),
+  $body-1: mat-typography-level(16px, 24px, 500),
+  $button: mat-typography-level(16px, 24px, 500)
+);
+
+@include mat-core($sncr-typography);
+
+$mat-primary: (
+  100: #D3EAF5,
+  500: $primary-blue-b2,
+  700: #0069A2,
+  contrast: (
+    100: white,
+    500: white,
+    700: white
+  )
+);
+
+$sncr-app-primary: mat-palette($mat-primary);
+$sncr-app-accent: mat-palette($mat-primary);
+$sncr-app-warn: mat-palette($mat-primary);
+
+$sncr-app-theme: mat-light-theme($sncr-app-primary, $sncr-app-accent, $sncr-app-warn);
+
+@include angular-material-theme($sncr-app-theme);

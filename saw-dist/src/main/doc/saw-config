@@ -16,13 +16,11 @@ localhost
 
 [saw-services:vars]
 #
-# Elasticsearch configuration
+# MapR configuration
 #
-saw_elasticsearch_protocol=http
-saw_elasticsearch_host=localhost
-saw_elasticsearch_port=9200
-saw_elasticsearch_username=elastic
-saw_elasticsearch_password=elastic
+# If the MapR cluster "mapr" user ID differs from the expected default
+# of 500, use the variable below to set it
+#saw_mapr_user_id=500
 
 #
 # Spark configuration
@@ -30,15 +28,24 @@ saw_elasticsearch_password=elastic
 saw_spark_master_url=spark://localhost:7077
 # If Spark is configured to use YARN, use the variable below to set
 # the YARN queue
-#saw_spark_yarn_queue=saw
+#saw_spark_yarn_queue_regular=saw-regular
+#saw_spark_yarn_queue_fast=saw-fast
 saw_zookeeper_quorum=localhost
 
 #
-# MapR configuration
+# Transport Service Executor configuration
 #
-# If the MapR cluster "mapr" user ID differs from the expected default
-# of 500, use the variable below to set it
-#saw_mapr_user_id=500
+#saw_transport_executor_regular_count=2
+#saw_transport_executor_fast_count=2
+
+#
+# Elasticsearch configuration
+#
+saw_elasticsearch_protocol=http
+saw_elasticsearch_host=localhost
+saw_elasticsearch_port=9200
+saw_elasticsearch_username=elastic
+saw_elasticsearch_password=elastic
 
 [saw-security]
 localhost

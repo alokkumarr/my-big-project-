@@ -31,7 +31,7 @@ mvn_web() {
     cp $repos/saw-web/target/saw-web-*.tgz ext
 }
 
-modules="${1:-security services web}"
+modules="${*:-security services web}"
 for module in $modules; do
     echo "+ build $module"
     repo=$repos/saw-$module

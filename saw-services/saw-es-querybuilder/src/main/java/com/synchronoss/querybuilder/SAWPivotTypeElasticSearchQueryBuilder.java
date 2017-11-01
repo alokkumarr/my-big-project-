@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.BuilderUtil;
+import com.synchronoss.DynamicConvertor;
 import com.synchronoss.querybuilder.model.chart.Filter.Type;
 import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 import com.synchronoss.querybuilder.model.pivot.SqlBuilder;
@@ -166,10 +167,19 @@ public String getJsonString() {
       if (item.getIsRuntimeFilter().value() && item.getModel()!=null)
       {
         if (item.getType().value().equals(Type.DATE.value()) || item.getType().value().equals(Type.TIMESTAMP.value())) {
-          RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-          rangeQueryBuilder.lte(item.getModel().getLte());
-          rangeQueryBuilder.gte(item.getModel().getGte());
-          builder.add(rangeQueryBuilder);
+          if (item.getModel().getPreset()!=null)
+          {
+            DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.lte(dynamicConvertor.getLte());
+            rangeQueryBuilder.gte(dynamicConvertor.getGte());
+          }
+          else {
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.lte(item.getModel().getLte());
+            rangeQueryBuilder.gte(item.getModel().getGte());
+            builder.add(rangeQueryBuilder);
+          }
         }
         if (item.getType().value().equals(Type.STRING.value())) {
           TermsQueryBuilder termsQueryBuilder =

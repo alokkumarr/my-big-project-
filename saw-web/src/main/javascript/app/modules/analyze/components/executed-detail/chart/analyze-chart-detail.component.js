@@ -74,6 +74,11 @@ export const AnalyzeChartDetailComponent = {
         {labels: this.labels, labelOptions: this.analysis.labelOptions, sorts: this.sorts}
       );
 
+      changes.push({
+        path: 'chart.inverted',
+        data: this.analysis.isInverted
+      });
+
       this.chartUpdater.next(changes);
     }
 

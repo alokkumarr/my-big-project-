@@ -1,3 +1,4 @@
+import 'core-js';
 import {AdminModule} from '../../../../main/javascript/app/modules/admin';
 import {customerId, inputObject} from './categoriesData';
 
