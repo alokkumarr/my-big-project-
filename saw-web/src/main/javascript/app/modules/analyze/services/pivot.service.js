@@ -42,7 +42,7 @@ export function PivotService() {
         if (NUMBER_TYPES.includes(artifactColumn.type)) {
           artifactColumn.dataType = 'number';
           artifactColumn.format = {
-            type: 'decimal',
+            type: 'fixedPoint',
             precision: 2
           };
         } else {
