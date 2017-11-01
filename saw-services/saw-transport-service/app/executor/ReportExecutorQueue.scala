@@ -122,13 +122,21 @@ class ReportExecutorQueue(val executorType: String) {
     /* Close MapR streams consumer before starting to execute, to unblock
      * other consumers that need to read messages from the same
      * partition */
+    log.debug("Closing consumer")
     consumer.close()
     /* Start executions */
+    log.debug("Executing queries")
     executions.foreach(_())
   }
 
   private def execute(analysisId: String, resultId: String, query: String, executionType: ExecutionType) {
-    val analysis = new Analysis(analysisId)
-    analysis.executeAndWait(executionType, query, resultId)
+    try {
+      log.debug("Executing analysis {}, result {}", analysisId, resultId: Any)
+      val analysis = new Analysis(analysisId)
+      analysis.executeAndWait(executionType, query, resultId)
+    } catch {
+      case e: Exception =>
+        log.error("Error while executing analysis " + analysisId, e)
+    }
   }
 }
