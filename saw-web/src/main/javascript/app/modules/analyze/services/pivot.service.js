@@ -136,6 +136,10 @@ export function PivotService() {
       forEach(dateFields, ({dataField, dateInterval}) => {
         const format = DATE_INTERVALS_OBJ[dateInterval].format;
         clonedDataPoint[dataField] = moment(dataPoint[dataField]).utcOffset(0).format(format);
+        if (dateInterval === 'quarter') {
+          const parts = split(clonedDataPoint[dataField], '-');
+          clonedDataPoint[dataField] = `${parts[0]}-Q${parts[1]}`;
+        }
       });
       return clonedDataPoint;
     });
