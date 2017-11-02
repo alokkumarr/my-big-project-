@@ -98,7 +98,7 @@ export const ReportGridDisplayComponent = {
             precision: 2
           };
         }
-        if (!angular.isUndefined(NUMBER_TYPES.includes(column.type) && column.format)) {
+        if (angular.isDefined(NUMBER_TYPES.includes(column.type) && column.format)) {
           if (column.format.currency) {
             field.customizeText = (data => {
               return data.valueText + ' ' + column.format.currencySymbol;
