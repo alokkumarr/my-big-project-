@@ -14,6 +14,7 @@
       <includeSubModules>false</includeSubModules>
       <includes>
         <include>com.sncr:saw-security</include>
+        <include>com.synchronoss.saw:saw-services-dist</include>
       </includes>
       <binaries>
         <attachmentClassifier>bin</attachmentClassifier>

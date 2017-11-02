@@ -12,7 +12,7 @@
   <artifactId>saw-analysis-service</artifactId>
   <version>${revision}</version>
   <packaging>jar</packaging>
-  <name>SAW Analysis Service</name>
+  <name>saw-analysis-service</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
