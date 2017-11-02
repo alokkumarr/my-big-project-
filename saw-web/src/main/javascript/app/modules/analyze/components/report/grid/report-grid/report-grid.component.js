@@ -77,7 +77,7 @@ export const ReportGridComponent = {
       if (e.target === 'header') {
         e.items = [];
 
-        if (e.column.dataType === 'number' || e.column.dataType === 'timestamp' || e.column.dataType === 'date') {
+        if (e.column.dataType === 'number' || e.column.dataType === 'timestamp' || e.column.dataType === 'date' || e.column.dataType === 'string-date') {
           e.items.push({
             text: 'Format Data',
             icon: 'grid-menu-item icon-filter',

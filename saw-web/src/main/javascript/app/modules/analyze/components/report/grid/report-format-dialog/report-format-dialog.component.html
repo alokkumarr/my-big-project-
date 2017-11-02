@@ -31,7 +31,7 @@
       </div>
     </div>
 
-    <div class="date-format" ng-if="$ctrl.modelData.dataType === 'date' || $ctrl.modelData.dataType === 'timestamp'">
+    <div class="date-format" ng-if="$ctrl.modelData.dataType === 'date' || $ctrl.modelData.dataType === 'timestamp' || $ctrl.modelData.dataType === 'string-date'">
       <md-radio-group ng-model="$ctrl.format.dateFormat" > 
         <md-radio-button class="row" ng-value="'date'" flex>
           <span>Default </span>
