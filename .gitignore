@@ -1,3 +1,7 @@
 target/
 ext/modules/
 ext/saw-*.tgz
+#System Files
+.DS_Store
+Thumbs.db
+

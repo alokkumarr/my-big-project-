@@ -9,6 +9,7 @@ import 'devextreme/localization';
 let messagesEn = require("devextreme/localization/messages/en.json");
 
 import 'fonts/icomoon.css';
+import '../../../../assets/additional-icons.css';
 
 import 'zone.js';
 import 'reflect-metadata';

@@ -17,8 +17,10 @@ const PRIVILEGE_INDEX = {
   ALL: 8
 };
 
-class JwtService {
+export class JwtService {
   constructor($window, AppConfig) {
+    'ngInject';
+
     this._$window = $window;
     this._AppConfig = AppConfig;
 
@@ -32,6 +34,16 @@ class JwtService {
 
   get() {
     return this._$window.localStorage[this._AppConfig.login.jwtKey];
+  }
+
+  getCategories() {
+    const token = this.getTokenObj();
+    const analyzeModule = find(
+      get(token, 'ticket.products[0].productModules'),
+      mod => mod.productModName === 'ANALYZE'
+    );
+
+    return get(analyzeModule, 'prodModFeature', []) || [];
   }
 
   getAccessToken() {

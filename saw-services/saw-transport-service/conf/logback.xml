@@ -20,6 +20,9 @@
   <logger name="org.apache.hadoop.util.NativeCodeLoader" level="ERROR"/>
 
   <logger name="play" level="INFO"/>
+  <!-- Workaround: Kafka config logger is verbose at info level, so reduce -->
+  <logger name="org.apache.kafka.clients.consumer.ConsumerConfig" level="WARN"/>
+  <logger name="org.apache.kafka.clients.producer.ProducerConfig" level="WARN"/>
 
   <logger name="com.synchronoss" level="INFO"/>
   <logger name="controllers" level="INFO"/>

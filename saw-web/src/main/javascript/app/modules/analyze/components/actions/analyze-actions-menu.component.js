@@ -13,7 +13,7 @@ export const AnalyzeActionsMenuComponent = {
     onSuccessfulDeletion: '&',
     onSuccessfulExecution: '&',
     onSuccessfulPublish: '&',
-    onFrontEndExport: '&'
+    onExport: '&'
   },
   controller: class AnalyzeActionsMenuController {
     constructor(AnalyzeActionsService, $state, JwtService) {
@@ -94,8 +94,7 @@ export const AnalyzeActionsMenuComponent = {
     }
 
     export() {
-      // this._AnalyzeActionsService.exportAnalysis();
-      this.onFrontEndExport();
+      this.onExport();
     }
 
     delete() {

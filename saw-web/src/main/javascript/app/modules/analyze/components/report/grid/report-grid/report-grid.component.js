@@ -76,6 +76,7 @@ export const ReportGridComponent = {
     onContextMenuPreparing(e) {
       if (e.target === 'header') {
         e.items = [];
+
         if (e.column.dataType === 'number' || e.column.dataType === 'timestamp' || e.column.dataType === 'date') {
           e.items.push({
             text: 'Format Data',
@@ -85,6 +86,7 @@ export const ReportGridComponent = {
             }
           });
         }
+
         e.items.push({
           text: 'Rename',
           icon: 'grid-menu-item icon-edit',

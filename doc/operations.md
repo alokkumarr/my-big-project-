@@ -52,9 +52,9 @@ location.
 
 # Installing
 
-Execute the following steps to install SAW and its modules:
+Execute the following steps to install SAW:
 
-1. Get the SAW modules bundle package (named `saw.tgz`)
+1. Get the SAW release package (named `saw-*.tgz`)
 
 2. Prepare a SAW environment configuration file, as described in the
    previous section
@@ -62,7 +62,7 @@ Execute the following steps to install SAW and its modules:
 3. Extract the package and execute the deploy command, giving it the
    path to the environment configuration file as an argument
 
-        tar -xzf saw.tgz
+        tar -xzf saw-*.tgz
         cd saw
         ./deploy <config>
 
@@ -137,3 +137,18 @@ Include the below properties in NGINX server config file to support, http reques
        client_body_buffer_size 32k;
        client_header_buffer_size 16k;
        large_client_header_buffers 8 64k;
+
+# Clearing the Transport Service Executor queues
+
+If the SAW report execution queue has filled up, for example due to
+many long-running queries being executed, the queues can be cleared
+using the following commands:
+
+        $ ssh <mapr-host>
+        $ stream=/main/saw-transport-executor-regular-stream
+        $ sudo -u mapr maprcli stream topic delete -path $stream -topic executions
+        $ stream=/main/saw-transport-executor-fast-stream
+        $ sudo -u mapr maprcli stream topic delete -path $stream -topic executions
+
+Please note that clearing the queues affects all users of the system
+and report execution types.

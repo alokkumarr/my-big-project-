@@ -23,13 +23,13 @@ import scala.concurrent.Future
   */
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
+class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType, val resultId: String = null) {
 
   protected val m_log: Logger = LoggerFactory.getLogger(classOf[AnalysisExecution].getName)
 
   def getAnalysisExecutionResultNode : AnalysisResult = analysisNodeExecution.resultNode
   protected var analysisNodeExecution : AnalysisNodeExecutionHelper = null
-  protected var id : String = null
+  protected var id : String = resultId
   protected var executionMessage : String = null
   protected var executionCode : Integer = -1
   protected var status : ExecutionStatus = ExecutionStatus.INIT
@@ -44,7 +44,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
   def startExecution(sqlRuntime: String = null): Unit =
   {
     try {
-      analysisNodeExecution = new AnalysisNodeExecutionHelper(an, sqlRuntime)
+      analysisNodeExecution = new AnalysisNodeExecutionHelper(an, sqlRuntime, false, resultId)
       id = analysisNodeExecution.resId
       m_log debug s"Started execution, result ID: $id"
       status = ExecutionStatus.STARTED
@@ -66,7 +66,8 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
           analysisNodeExecution.createAnalysisResult(id, null)
         }
         case ExecutionType.preview => {
-          analysisNodeExecution.executeSQL()
+          analysisNodeExecution.executeSQLNoDataLoad()
+          analysisNodeExecution.createAnalysisResult(id, null)
         }
       }
       analysisNodeExecution.setFinishTime
@@ -159,7 +160,7 @@ class AnalysisExecution(val an: AnalysisNode, val execType : ExecutionType) {
     *
     * @return List<Map<…>> data structure
     */
-  def loadExecution(id: String, limit: Integer = 0) : java.util.List[java.util.Map[String, (String, Object)]] = {
+  def loadExecution(id: String, limit: Integer = 10000) : java.util.List[java.util.Map[String, (String, Object)]] = {
     /* Note: If loading of execution results is reimplemented in any other
      * service as part of a refactoring, it should be implemented
      * using Java streams to allow processing the data using a

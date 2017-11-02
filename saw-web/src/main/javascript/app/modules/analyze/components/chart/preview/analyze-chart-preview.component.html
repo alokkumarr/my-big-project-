@@ -16,8 +16,8 @@
   <analyze-dialog-content>
       <div layout="row">
         <chart style="width: calc(100% - 20px); margin: 0 10px"
-               options="$ctrl.chartOptions"
-               updater="$ctrl.chartUpdater">
+               [options]="$ctrl.chartOptions"
+               [updater]="$ctrl.chartUpdater">
         </chart>
       </div>
   </analyze-dialog-content>

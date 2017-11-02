@@ -1,0 +1,15 @@
+analysis-choice {
+  .mat-dialog-content {
+    display: flex;
+    flex-direction: column;
+
+    md-select {
+      min-width: 20vw;
+    }
+  }
+
+  .mat-dialog-actions {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+}

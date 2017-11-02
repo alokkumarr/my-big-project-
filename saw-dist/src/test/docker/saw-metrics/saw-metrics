@@ -4,8 +4,10 @@
 #
 set -eu
 
-# Make the metrics files readable to the "mapr" user
-chmod -R a+rx /root
+if [ $# -ne 1 ]; then
+    echo "Usage: $0 <command>"
+fi
+
 sudo_mapr="sudo -u mapr"
 hadoop_put="hadoop fs -put "
 mdcli="/opt/saw/service/bin/mdcli.sh"
@@ -13,6 +15,24 @@ mdcli="/opt/saw/service/bin/mdcli.sh"
 metrics=/root/saw-metrics
 test_do=test_data_object.json
 test_sn=test_semantic_node.json
+
+main() {
+    # Make the metrics files readable to the "mapr" user
+    chmod -R a+rx /root
+    # Run the metric command requested
+    command=$1
+    ${command}_metric
+}
+
+#
+# Generate semantic node and data
+#
+
+generate_metric() {
+    echo "Generating semantic node and data"
+    generate_test_json > $metrics/test.json
+    generate_test_semantic_node_json > $metrics/$test_sn
+}
 
 generate_test_json() {
     local ts val
@@ -55,38 +75,34 @@ EOF
 }
 
 #
-# Generate semantic node and data
-#
-
-echo "Generating semantic node and data"
-generate_test_json > $metrics/test.json
-generate_test_semantic_node_json > $metrics/$test_sn
-
-#
 # Put semantic node, data object and data in the data lake
 #
 
-# The MapR container might still be starting up, so wait until MapR-FS
-# has been verified being available
-echo "Waiting for MapR-FS to become available"
-while ! hadoop fs -ls / > /dev/null 2>&1; do
-    sleep 5
-    echo "Retrying accessing MapR-FS"
-done
+load_metric() {
+    # The MapR container might still be starting up, so wait until MapR-FS
+    # has been verified being available
+    echo "Waiting for MapR-FS to become available"
+    while ! hadoop fs -ls / > /dev/null 2>&1; do
+        sleep 5
+        echo "Retrying accessing MapR-FS"
+    done
 
-echo "Putting semantic node and data into the datalake"
-# Load the data object
-test_do_output=$test_do-output
-$sudo_mapr $hadoop_put $metrics/$test_do /
-$sudo_mapr $mdcli -i /$test_do -o /$test_do_output
-# Insert the data object ID into the semantic node
-set -o pipefail
-id=$(hadoop fs -cat /$test_do_output | grep TEST \
-         | sed -e 's/.*".*":"\(.*\)".*/\1/')
-sed -i -e "s/@DATA_OBJECT_ID@/$id/" $metrics/$test_sn
-# Load the semantic node
-test_sn_output=$test_sn-output
-$sudo_mapr $hadoop_put $metrics/$test_sn /
-$sudo_mapr $mdcli -i /$test_sn -o /$test_sn_output
-# Upload the test data to the data lake
-$sudo_mapr $hadoop_put $metrics/test.json /
+    echo "Putting semantic node and data into the datalake"
+    # Load the data object
+    test_do_output=$test_do-output
+    $sudo_mapr $hadoop_put $metrics/$test_do /
+    $sudo_mapr $mdcli -i /$test_do -o /$test_do_output
+    # Insert the data object ID into the semantic node
+    set -o pipefail
+    id=$(hadoop fs -cat /$test_do_output | grep TEST \
+             | sed -e 's/.*".*":"\(.*\)".*/\1/')
+    sed -i -e "s/@DATA_OBJECT_ID@/$id/" $metrics/$test_sn
+    # Load the semantic node
+    test_sn_output=$test_sn-output
+    $sudo_mapr $hadoop_put $metrics/$test_sn /
+    $sudo_mapr $mdcli -i /$test_sn -o /$test_sn_output
+    # Upload the test data to the data lake
+    $sudo_mapr $hadoop_put $metrics/test.json /
+}
+
+main "$@"

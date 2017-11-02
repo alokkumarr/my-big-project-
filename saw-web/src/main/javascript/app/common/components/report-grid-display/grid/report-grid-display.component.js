@@ -80,6 +80,9 @@ export const ReportGridDisplayComponent = {
 
     _getDxColumns(columns) {
       return map(columns, column => {
+        if (column.type === 'date') {
+          column.type = 'string-date';
+        }
         const field = {
           alignment: 'left',
           caption: column.alias || column.displayName,

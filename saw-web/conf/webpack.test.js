@@ -10,6 +10,7 @@ module.exports = function (env) {
 
   const conf = {
     resolve: {
+      extensions: [".ts", ".js"],
       modules: [
         MODULE_DIR,
         webpackHelper.root('src/main/javascript')

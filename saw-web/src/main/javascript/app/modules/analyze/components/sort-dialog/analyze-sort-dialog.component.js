@@ -1,4 +1,5 @@
 import * as find from 'lodash/find';
+import * as has from 'lodash/has';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 
@@ -25,7 +26,13 @@ export const AnalyzeSortDialogComponent = {
       // because the object references are not the same as those in the fields array
       // and md-select doesn't work, if the analysis with existing sorts is being edited.
       forEach(this.model.sorts, (sort, key) => {
-        const target = find(this.model.fields, ({dataField}) => dataField === sort.field.dataField);
+        const target = find(this.model.fields, ({dataField, name}) => {
+          if (has(sort, 'field.dataField')) {
+            return dataField === sort.field.dataField;
+          }
+
+          return name === sort.field.name;
+        });
         if (target) {
           this.model.sorts[key].field = target;
         }
