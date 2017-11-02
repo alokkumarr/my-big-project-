@@ -46,13 +46,12 @@ The release package will be located at `target/saw-*.tgz`.
 Note: The Docker daemon must be running while building to ensure the
 integration tests can be run.
 
-# Testing deployment
+# Running full system locally in a container
 
 To build and run a Docker container that runs the SAW system in
 development mode, execute the following command:
 
-        $ mvn -pl saw-dist -am package
-        $ mvn -pl saw-dist docker:build docker:start
+        $ mvn verify -P docker-keep
 
 After that the SAW Web application can be accessed
 at [http://localhost/](http://localhost/).  To enter a shell inside
