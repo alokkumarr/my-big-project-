@@ -7,6 +7,7 @@
   <artifactId>bda-saw</artifactId>
   <version>${revision}</version>
   <packaging>war</packaging>
+  <name>saw-web</name>
   <parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -829,7 +830,7 @@
                         <mapping>
                             <directory>${app.optDir}</directory>
                             <sources>
-                                <source><location>target/saw.war</location></source>
+                                <source><location>target/saw-web.war</location></source>
                                 <!--
                                 <source><location>...</location></source>
                                 -->
@@ -840,7 +841,7 @@
                           <directory>/usr/share/tomcat/webapps</directory>
                           <sources>
                             <softlinkSource>
-                              <location>${app.optDir}/saw.war</location>
+                              <location>${app.optDir}/saw-web.war</location>
                               <destination>saw.war</destination>
                             </softlinkSource>
                           </sources>
@@ -882,8 +883,6 @@ echo ${app.nameVer} pre-install is being executed
                 <!-- Put version number back in finalName after RPM
                      profile removed it -->
                 <finalName>${app.name}-${project.version}</finalName>
-                <!-- Remove artifact classifier "bin" from archive name -->
-                <appendAssemblyId>false</appendAssemblyId>
                 <!-- Enable long file names without Maven warning -->
                 <tarLongFileMode>posix</tarLongFileMode>
               </configuration>

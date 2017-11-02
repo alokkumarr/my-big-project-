@@ -11,6 +11,7 @@
     <module>saw-dist</module>
     <module>saw-security</module>
     <module>saw-services</module>
+    <module>saw-web</module>
   </modules>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
