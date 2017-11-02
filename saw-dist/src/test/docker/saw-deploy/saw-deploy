@@ -6,7 +6,7 @@ set -eu
 
 # Save SAW system logs to build directory in case needed for
 # troubleshooting after a failed run
-trap "journalctl -u saw-* > /build/saw-system.log" EXIT
+trap "journalctl -u saw-\* > /build/saw-system.log" EXIT
 
 cd /maven
 tar -xzf saw-*.tgz
