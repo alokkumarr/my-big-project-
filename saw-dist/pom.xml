@@ -90,6 +90,10 @@
         <version>0.22.1</version>
         <configuration>
           <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
+          <!-- Workaround: Remove volumes created for Bamboo agent
+               disk space workaround (see the VOLUME directive in
+               "saw-dist/src/test/docker-mapr/Dockerfile". -->
+          <removeVolumes>true</removeVolumes>
           <!-- Start containers in parallel to reduce startup time -->
           <startParallel>true</startParallel>
           <images>
