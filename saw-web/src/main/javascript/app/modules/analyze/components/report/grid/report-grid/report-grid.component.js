@@ -182,15 +182,15 @@ export const ReportGridComponent = {
         if (angular.isUndefined(NUMBER_TYPES.includes(column.type) && column.format)) {
           field.format = {
             type: 'decimal',
-            precision : 2
-          }
+            precision: 2
+          };
         }
         if (angular.isDefined(NUMBER_TYPES.includes(column.type))) {
           if (angular.isDefined(column.format)) {
-            if (column.format.currency != '') {
+            if (column.format.currency !== '') {
               field.customizeText = (data => {
                 return data.valueText + ' ' + column.format.currencySymbol;
-              });  
+              });
             }
           }
         }
