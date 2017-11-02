@@ -237,9 +237,9 @@ export const ReportGridContainerComponent = {
     }
 
     formatColumn(columnName, datatype, format) {
-      for(let i = 0; i < this.columns.length; i++){
+      for (let i = 0; i < this.columns.length; i++) {
         if (this.columns[i].name === columnName) {
-          switch(format.type) {
+          switch (format.type) {
           case 'date':
             this.columns[i].type = 'date';
             this.columns[i].format = format.dateFormat;
@@ -255,15 +255,15 @@ export const ReportGridContainerComponent = {
               currency: undefined,
               currencySymbol: undefined
             };
-            if(format.NumberDecimal > -1){
+            if (format.NumberDecimal > -1) {
               this.columns[i].format.precision = format.NumberDecimal;
             }
-            if(format.CommaSeparator){
-              this.columns[i].format .type = 'fixedPoint';
+            if (format.CommaSeparator) {
+              this.columns[i].format.type = 'fixedPoint';
             } else {
               this.columns[i].format.type = 'decimal';
             }
-            if(format.CurrencyFlag){
+            if (format.CurrencyFlag) {
               this.columns[i].format.currency = format.CurrencyCode;
               this.columns[i].format.currencySymbol = format.CurrencySymbol;
             }

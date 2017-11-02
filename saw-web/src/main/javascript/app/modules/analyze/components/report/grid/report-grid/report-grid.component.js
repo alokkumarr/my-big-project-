@@ -247,23 +247,22 @@ export const ReportGridComponent = {
               } else {
                 typeValue = 'decimal';
               }
-              if(newFormat.CurrencyFlag){
+              if (newFormat.CurrencyFlag) {
                 column.format = {
                   type: typeValue,
                   precision: newFormat.NumberDecimal,
                   currency: newFormat.CurrencyCode,
                   currencySymbol: newFormat.CurrencySymbol
                 };
-                column.customizeText = (source)=> {
+                column.customizeText = (source => {
                   return source.valueText + ' ' + column.format.currencySymbol;
-                }
+                });
               } else {
                 column.format = {
                   type: typeValue,
                   precision: newFormat.NumberDecimal
-                }
+                };
               }
-              
             }
           }
           this._gridInstance.option('columns', columns);

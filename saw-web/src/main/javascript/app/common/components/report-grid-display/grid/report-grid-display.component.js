@@ -92,17 +92,17 @@ export const ReportGridDisplayComponent = {
           dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
           width: COLUMN_WIDTH
         };
-        if (NUMBER_TYPES.includes(column.type) && column.format === undefined) {
+        if (angular.isUndefined(NUMBER_TYPES.includes(column.type) && column.format)) {
           field.format = {
             type: 'decimal',
             precision: 2
           };
         }
-        if (NUMBER_TYPES.includes(column.type) && column.format != undefined) {
+        if (!angular.isUndefined(NUMBER_TYPES.includes(column.type) && column.format)) {
           if (column.format.currency) {
-            field.customizeText = (data)=> {
+            field.customizeText = (data => {
               return data.valueText + ' ' + column.format.currencySymbol;
-            }
+            });
           }
         }
         return field;
