@@ -268,7 +268,7 @@ export const ReportGridContainerComponent = {
               this.columns[i].format.currencySymbol = format.CurrencySymbol;
             }
             break;
-          case 'default':
+          default:
             break;
           }
         }
