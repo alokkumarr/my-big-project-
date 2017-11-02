@@ -8,6 +8,7 @@
     <version>1.5.7.RELEASE</version>
     <relativePath/>
   </parent>
+  <groupId>com.synchronoss.saw</groupId>
   <artifactId>saw-analysis-service</artifactId>
   <version>${revision}</version>
   <packaging>jar</packaging>
