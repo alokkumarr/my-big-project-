@@ -6,7 +6,7 @@
   <artifactId>saw</artifactId>
   <version>${revision}</version>
   <packaging>pom</packaging>
-  <name>SAW</name>
+  <name>saw</name>
   <modules>
     <module>saw-dist</module>
   </modules>

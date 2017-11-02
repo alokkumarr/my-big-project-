@@ -10,7 +10,7 @@
   <artifactId>saw-dist</artifactId>
   <version>${revision}</version>
   <packaging>jar</packaging>
-  <name>SAW Distribution</name>
+  <name>saw-dist</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <docker.naming>none</docker.naming>
