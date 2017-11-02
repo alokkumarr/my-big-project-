@@ -166,6 +166,9 @@ export const ReportGridComponent = {
 
     prepareGridColumns(columns) {
       return map(columns, column => {
+        if (column.type === 'timestamp') {
+          column.type = 'date';
+        }
         const field = {
           caption: column.getDisplayName(),
           dataField: column.name,
@@ -173,13 +176,23 @@ export const ReportGridComponent = {
           visibleIndex: column.visibleIndex,
           allowSorting: false,
           alignment: 'left',
-          width: COLUMN_WIDTH
+          width: COLUMN_WIDTH,
+          format: column.format
         };
-        if (NUMBER_TYPES.includes(column.type)) {
+        if (angular.isUndefined(NUMBER_TYPES.includes(column.type) && column.format)) {
           field.format = {
             type: 'decimal',
-            precision: 2
-          };
+            precision : 2
+          }
+        }
+        if (angular.isDefined(NUMBER_TYPES.includes(column.type))) {
+          if (angular.isDefined(column.format)) {
+            if (column.format.currency != '') {
+              field.customizeText = (data => {
+                return data.valueText + ' ' + column.format.currencySymbol;
+              });  
+            }
+          }
         }
         return field;
       });
