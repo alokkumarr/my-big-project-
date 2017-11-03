@@ -153,6 +153,7 @@ export const AnalyzeExecutedDetailComponent = {
             this._fileService.exportCSV(csv);
           }, {
             trimHeaderFields: false,
+            checkSchemaDifferences: false,
             delimiter: {
               eol: '\r\n'
             }
