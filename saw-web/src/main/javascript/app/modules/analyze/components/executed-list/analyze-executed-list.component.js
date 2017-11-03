@@ -24,7 +24,7 @@ export const AnalyzeExecutedListComponent = {
         dataField: 'finished',
         dataType: 'string',
         calculateCellValue: rowData => {
-          return (moment(rowData.finished).zone(new Date().getTimezoneOffset()).format('MM-DD-YYYY'));
+          return (moment(rowData.finished).utcOffset(new Date().getTimezoneOffset()).format('MM-DD-YYYY'));
         },
         allowSorting: true,
         alignment: 'left',
