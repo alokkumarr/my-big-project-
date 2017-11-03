@@ -23,7 +23,7 @@ import {runConfig} from './run';
 
 import {ObserveModule, ObserveUpgradeModule} from './modules/observe/index';
 import {CommonModuleTs} from './common';
-import {AnalyzeModule} from './modules/analyze';
+import {AnalyzeModule, AnalyzeModuleTs} from './modules/analyze/index';
 import {AlertsModule} from './modules/alerts';
 import {AdminModule} from './modules/admin';
 
@@ -55,6 +55,7 @@ angular
     BrowserModule,
     UpgradeModule,
     CommonModuleTs,
+    AnalyzeModuleTs,
     ObserveUpgradeModule
   ]
 })

@@ -20,7 +20,7 @@ export const AnalyzeViewComponent = {
   template,
   styles: [style],
   controller: class AnalyzeViewController extends AbstractComponentController {
-    constructor($injector, $compile, AnalyzeService, $state, $mdDialog, JwtService,
+    constructor($injector, $compile, AnalyzeService, $state, $mdDialog, JwtService, AnalyzeDialogService,
                 toastMessage, $rootScope, localStorageService, FilterService, LocalSearchService) {
       'ngInject';
       super($injector);
@@ -35,6 +35,7 @@ export const AnalyzeViewComponent = {
       this._toastMessage = toastMessage;
       this._$rootScope = $rootScope;
       this._JwtService = JwtService;
+      this._AnalyzeDialogService = AnalyzeDialogService;
       this._analysisCache = [];
 
       this.LIST_VIEW = 'list';
@@ -50,6 +51,10 @@ export const AnalyzeViewComponent = {
       };
       this.updater = new Subject();
       this.canUserCreate = false;
+    }
+
+    openTestModal() {
+      this._AnalyzeDialogService.openNewAnalysisDialog();
     }
 
     $onInit() {

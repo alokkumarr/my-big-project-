@@ -1,4 +1,8 @@
 import * as angular from 'angular';
+import { downgradeInjectable } from '@angular/upgrade/static';
+
+import { NgModule } from '@angular/core';
+import {MaterialModule} from '../../material.module';
 
 import {routesConfig} from './routes';
 import {i18nConfig} from './i18n';
@@ -53,6 +57,9 @@ import {AnalyzeChartSettingsComponent} from './components/chart/settings/analyze
 import {AnalyzeChartPreviewComponent} from './components/chart/preview/analyze-chart-preview.component';
 import {CommonModule} from '../../common';
 
+import DesignerDialogComponent from './components/designer-dialog/designer-dialog.component';
+import AnalyzeDialogService from './services/analyze-dialog.service';
+
 export const AnalyzeModule = 'AnalyzeModule';
 
 angular.module(AnalyzeModule, [
@@ -67,6 +74,7 @@ angular.module(AnalyzeModule, [
   .factory('PivotService', PivotService)
   .service('ChartService', ChartService)
   .service('SortService', SortService)
+  .factory('AnalyzeDialogService', downgradeInjectable(AnalyzeDialogService) as Function)
   .factory('AnalyzeActionsService', AnalyzeActionsService)
   .component('analyzeActionsMenu', AnalyzeActionsMenuComponent)
   .component('aggregateChooser', AggregateChooserComponent)
@@ -105,3 +113,16 @@ angular.module(AnalyzeModule, [
   .component('analyzeChartSettings', AnalyzeChartSettingsComponent)
   .component('analyzeChartPreview', AnalyzeChartPreviewComponent)
   .component('analyzeSaveDialog', AnalyzeSaveDialogComponent);
+
+@NgModule({
+  imports: [MaterialModule],
+  declarations: [
+    DesignerDialogComponent
+  ],
+  entryComponents: [
+    DesignerDialogComponent
+  ],
+  providers: [AnalyzeDialogService],
+  exports: [DesignerDialogComponent]
+})
+export class AnalyzeModuleTs {}
