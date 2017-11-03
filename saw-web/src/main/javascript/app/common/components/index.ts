@@ -1,4 +1,5 @@
 import * as angular from 'angular';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 import {AccordionMenu, AccordionMenuLink} from './accordionMenu';
 import {BadgeComponent} from './badge';
@@ -47,7 +48,7 @@ angular
   .component('rangeSlider', RangeSliderComponent)
   .component('searchBox', SearchBoxComponent)
   .component('sidenav', SidenavComponent)
-  .component('pivotGrid', PivotGridComponent)
+  .directive('pivotGrid', downgradeComponent({component: PivotGridComponent}))
   .component('reportGridDisplay', ReportGridDisplayComponent)
   .component('reportGridDisplayNode', ReportGridDisplayNodeComponent)
   .component('reportGridDisplayContainer', ReportGridDisplayContainerComponent)
