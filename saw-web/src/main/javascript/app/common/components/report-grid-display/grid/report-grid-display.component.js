@@ -4,7 +4,7 @@ import * as forEach from 'lodash/forEach';
 
 import * as template from './report-grid-display.component.html';
 
-import {NUMBER_TYPES, DATE_TYPES} from '../../../consts.js';
+import {NUMBER_TYPES} from '../../../consts.js';
 
 const COLUMN_WIDTH = 175;
 const DEFAULT_PAGE_SIZE = 10;
@@ -70,7 +70,7 @@ export const ReportGridDisplayComponent = {
 
     _createCustomStore() {
       const store = new DataSource({
-        load: options => {    
+        load: options => {
           return this.source({options})
             .then(({data, count}) => ({data, totalCount: count}));
         }
@@ -105,7 +105,7 @@ export const ReportGridDisplayComponent = {
       if (this._gridInstance) {
         const columns = this._getDxColumns(this.columns);
         forEach(columns, column => {
-          if (column.dataType == 'date') {
+          if (column.dataType === 'date') {
             column.dataType = 'string';
           }
         });
