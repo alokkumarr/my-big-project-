@@ -21,17 +21,35 @@
       <artifactId>saw-security</artifactId>
       <version>${project.version}</version>
       <type>war</type>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.synchronoss.saw</groupId>
       <artifactId>saw-services-dist</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.synchronoss</groupId>
       <artifactId>bda-saw</artifactId>
       <version>${project.version}</version>
       <type>war</type>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
