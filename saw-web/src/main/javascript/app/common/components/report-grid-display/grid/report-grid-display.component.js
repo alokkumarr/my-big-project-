@@ -1,9 +1,10 @@
 import * as map from 'lodash/map';
 import DataSource from 'devextreme/data/data_source';
+import * as forEach from 'lodash/forEach';
 
 import * as template from './report-grid-display.component.html';
 
-import {NUMBER_TYPES} from '../../../consts.js';
+import {NUMBER_TYPES, DATE_TYPES} from '../../../consts.js';
 
 const COLUMN_WIDTH = 175;
 const DEFAULT_PAGE_SIZE = 10;
@@ -29,7 +30,6 @@ export const ReportGridDisplayComponent = {
       const columns = this._getDxColumns(this.columns);
 
       const gridSelector = '.report-dx-grid.report-dx-grid-display';
-
       this.gridConfig = this._dxDataGridService.mergeWithDefaultConfig({
         columns,
         remoteOperations: {
@@ -70,7 +70,7 @@ export const ReportGridDisplayComponent = {
 
     _createCustomStore() {
       const store = new DataSource({
-        load: options => {
+        load: options => {    
           return this.source({options})
             .then(({data, count}) => ({data, totalCount: count}));
         }
@@ -80,7 +80,9 @@ export const ReportGridDisplayComponent = {
 
     _getDxColumns(columns) {
       return map(columns, column => {
-        console.log(column);
+        if (column.type === 'string-date') {
+          column.type = 'date';
+        }
         const field = {
           alignment: 'left',
           caption: column.aliasName || column.displayName,
@@ -102,6 +104,11 @@ export const ReportGridDisplayComponent = {
     $onChanges() {
       if (this._gridInstance) {
         const columns = this._getDxColumns(this.columns);
+        forEach(columns, column => {
+          if (column.dataType == 'date') {
+            column.dataType = 'string';
+          }
+        });
         this._gridInstance.option('columns', columns);
         // this._gridInstance.refresh();
       }
