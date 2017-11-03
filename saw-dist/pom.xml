@@ -10,12 +10,47 @@
   <artifactId>saw-dist</artifactId>
   <version>${revision}</version>
   <packaging>jar</packaging>
-  <name>SAW Distribution</name>
+  <name>saw-dist</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <docker.naming>none</docker.naming>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>com.sncr</groupId>
+      <artifactId>saw-security</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.synchronoss.saw</groupId>
+      <artifactId>saw-services-dist</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.synchronoss</groupId>
+      <artifactId>bda-saw</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

@@ -529,8 +529,6 @@ echo pre-remove completed: ${app.nameVer}
                   <descriptors>
                     <descriptor>${project.basedir}/src/main/assembly/assembly.xml</descriptor>
                   </descriptors>
-                  <!-- Remove artifact classifier "bin" from archive name -->
-                  <appendAssemblyId>false</appendAssemblyId>
                   <!-- Enable long file names without Maven warning -->
                   <tarLongFileMode>posix</tarLongFileMode>
                 </configuration>

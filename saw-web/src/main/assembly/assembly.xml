@@ -7,6 +7,7 @@
   <formats>
     <format>tgz</format>
   </formats>
+  <baseDirectory>saw-web</baseDirectory>
   <fileSets>
     <fileSet>
       <directory>${project.basedir}/src/main/doc</directory>

@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.synchronoss.saw</groupId>
-  <artifactId>dist</artifactId>
+  <artifactId>saw-services-dist</artifactId>
   <version>${revision}</version>
   <packaging>jar</packaging>
   <properties>
@@ -45,8 +45,6 @@
           <descriptors>
             <descriptor>${project.basedir}/src/main/assembly/assembly.xml</descriptor>
           </descriptors>
-          <!-- Remove artifact classifier "bin" from archive name -->
-          <appendAssemblyId>false</appendAssemblyId>
           <finalName>saw-services-${project.version}</finalName>
           <!-- Enable long file names without Maven warning -->
           <tarLongFileMode>posix</tarLongFileMode>
