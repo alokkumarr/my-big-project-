@@ -32,7 +32,7 @@ import sncr.metadata.engine.{Fields, MetadataDictionary}
 class Analysis extends BaseController {
   val executorRunner = new ExecutionTaskHandler(1);
   val executorRegularQueue = new ReportExecutorQueue("regular")
-  val executorPreviewQueue = new ReportExecutorQueue("preview")
+  val executorFastQueue = new ReportExecutorQueue("fast")
   var totalRows: Int = 0;
   
   /**
@@ -176,8 +176,8 @@ class Analysis extends BaseController {
     	    if (typeInfo.equals("report"))
     	    {
 	      /* Build query based on analysis supplied in request body */
-	      val runtime = (executionType == "interactive")
-              executionType = (analysis \ "executionType").extractOrElse[String]("interactive")
+              executionType = (analysis \ "executionType").extractOrElse[String]("onetime")
+	      val runtime = (executionType == "onetime")
               m_log.debug("Execution type: {}", executionType)
             m_log.trace("dskStr after processing inside execute block before runtime: {}", dskStr);
             m_log.trace("runtime execute block before queryRuntime: {}", runtime);
@@ -315,7 +315,7 @@ class Analysis extends BaseController {
  	var analysisJSON : JObject = null;
     m_log.trace("dataSecurityKeyStr dataset: {}", dataSecurityKeyStr);
  	  m_log.trace("json dataset: {}", reqJSON);
-    val start = (reqJSON \ "contents" \ "page").extractOrElse(0)
+    val start = (reqJSON \ "contents" \ "page").extractOrElse(1)
     val limit = (reqJSON \ "contents" \ "pageSize").extractOrElse(10)
     val analysis = (reqJSON \ "contents" \ "analyze") match {
       case obj: JArray => analysisJson(reqJSON, dataSecurityKeyStr); // reading from request body
@@ -505,15 +505,19 @@ class Analysis extends BaseController {
       /* Execute analysis report query through queue for concurrency */
       val executionTypeEnum = executionType match {
         case "preview" => ExecutionType.preview
-        case _ => ExecutionType.onetime
+        case "onetime" => ExecutionType.onetime
+        case "scheduled" => ExecutionType.scheduled
+        case obj => throw new RuntimeException("Unknown execution type: " + obj)
       }
       val execution = analysis.executeAndWaitQueue(
         executionTypeEnum, query, (analysisId, resultId, query) => {
           val executorQueue = executionTypeEnum match {
-            case ExecutionType.preview => executorPreviewQueue
-            case _ => executorRegularQueue
+            case ExecutionType.preview => executorFastQueue
+            case ExecutionType.onetime => executorFastQueue
+            case ExecutionType.scheduled => executorRegularQueue
+            case obj => throw new RuntimeException("Unknown execution type: " + obj)
           }
-          executorQueue.send(analysisId, resultId, query)
+          executorQueue.send(executionTypeEnum, analysisId, resultId, query)
         })
       val analysisResultId: String = execution.getId
       m_log.trace("analysisResultId inside report block after executeAndWait : {}", analysisResultId);

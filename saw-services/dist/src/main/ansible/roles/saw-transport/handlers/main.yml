@@ -9,6 +9,6 @@
 - name: restart saw-transport-executor-regular
   systemd: name=saw-transport-executor@regular-{{ item }} state=restarted daemon_reload=true
   with_sequence: count={{ saw_transport_executor_regular_count | default('1') }}
-- name: restart saw-transport-executor-preview
-  systemd: name=saw-transport-executor@preview-{{ item }} state=restarted daemon_reload=true
-  with_sequence: count={{ saw_transport_executor_regular_count | default('1') }}
+- name: restart saw-transport-executor-fast
+  systemd: name=saw-transport-executor@fast-{{ item }} state=restarted daemon_reload=true
+  with_sequence: count={{ saw_transport_executor_fast_count | default('1') }}

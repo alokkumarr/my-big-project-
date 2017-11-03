@@ -13,6 +13,7 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import sncr.datalake.engine.Analysis
 import sncr.datalake.engine.ExecutionType
+import sncr.datalake.engine.ExecutionType.ExecutionType
 import files.HFileOperations
 
 /**
@@ -23,9 +24,6 @@ class ReportExecutorQueue(val executorType: String) {
   val ExecutorStream = "/main/saw-transport-executor-" + executorType + "-stream"
   val ExecutorTopic = ExecutorStream + ":executions"
   val log: Logger = LoggerFactory.getLogger(classOf[ReportExecutorQueue].getName)
-
-  /* Automatically create queue upon startup if it does not exist */
-  createIfNotExists()
 
   /**
    * Create required MapR streams if they do not exist
@@ -65,7 +63,9 @@ class ReportExecutorQueue(val executorType: String) {
   /**
    * Send request to execute report to queue
    */
-  def send(analysisId: String, resultId: String, query: String) {
+  def send(executionType: ExecutionType, analysisId: String, resultId: String, query: String) {
+    /* Automatically create queue before sending if it does not exist */
+    createIfNotExists()
     log.debug("Starting send: {}", executorType)
     val properties = new Properties()
     properties.setProperty("key.serializer",
@@ -74,7 +74,7 @@ class ReportExecutorQueue(val executorType: String) {
       "org.apache.kafka.common.serialization.StringSerializer")
     val producer = new KafkaProducer[String, String](properties)
     producer.send(new ProducerRecord[String, String](
-      ExecutorTopic, analysisId + "," + resultId + "," + query))
+      ExecutorTopic, executionType + "," + analysisId + "," + resultId + "," + query))
     producer.flush
     producer.close
     log.debug("Finished send")
@@ -84,6 +84,8 @@ class ReportExecutorQueue(val executorType: String) {
    * Process request to execute report from queue
    */
   def receive {
+    /* Automatically create queue before receiving if it does not exist */
+    createIfNotExists()
     log.debug("Starting receive: {}", executorType)
     val properties = new Properties()
     properties.setProperty("group.id", "saw-transport-executor")
@@ -104,15 +106,37 @@ class ReportExecutorQueue(val executorType: String) {
     log.debug("Receive message poll: {}", executorType)
     val pollTimeout = 60 * 60 * 1000
     val records = consumer.poll(pollTimeout)
-    records.asScala.foreach(record => {
+    val executions = records.asScala.map(record => {
       log.debug("Received message: {} {}", executorType, record: Any);
-      val Array(analysisId, resultId, query) = record.value.split(",", 3)
-      execute(analysisId, resultId, query)
+      val Array(executionType, analysisId, resultId, query) = record.value.split(",", 4)
+      val executionTypeEnum = executionType match {
+        case "preview" => ExecutionType.preview
+        case "onetime" => ExecutionType.onetime
+        case "scheduled" => ExecutionType.scheduled
+        case obj => throw new RuntimeException("Unknown execution type: " + obj)
+      }
+      /* Save execution as a function to be invoked only after MapR streams
+       * consumer has been closed */
+      () => execute(analysisId, resultId, query, executionTypeEnum)
     })
+    /* Close MapR streams consumer before starting to execute, to unblock
+     * other consumers that need to read messages from the same
+     * partition */
+    log.debug("Closing consumer")
+    consumer.close()
+    /* Start executions */
+    log.debug("Executing queries")
+    executions.foreach(_())
   }
 
-  private def execute(analysisId: String, resultId: String, query: String) {
-    val analysis = new Analysis(analysisId)
-    analysis.executeAndWait(ExecutionType.onetime, query, resultId)
+  private def execute(analysisId: String, resultId: String, query: String, executionType: ExecutionType) {
+    try {
+      log.debug("Executing analysis {}, result {}", analysisId, resultId: Any)
+      val analysis = new Analysis(analysisId)
+      analysis.executeAndWait(executionType, query, resultId)
+    } catch {
+      case e: Exception =>
+        log.error("Error while executing analysis " + analysisId, e)
+    }
   }
 }
