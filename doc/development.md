@@ -68,6 +68,20 @@ starting points to investigate installed SAW services and packages:
         $ journalctl -u saw-*
         $ rpm -qa saw-*
 
+To stop the Docker containers, execute the following command:
+
+        $ mvn -pl saw-dist docker:stop
+
+To rerun deployment using an already built package, execute the
+following command:
+
+        $ mvn -pl saw-dist docker:build docker:start -P docker-keep
+
+The produce more verbose output from Docker container building and
+running, add the following to the command-line:
+
+        $ mvn [...] -Ddocker.verbose -Ddocker.showLogs 
+
 Note: The Docker daemon must be running to be able to build and run
 containers.
 
