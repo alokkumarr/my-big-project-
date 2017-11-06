@@ -1,4 +1,5 @@
 import * as map from 'lodash/map';
+import * as isUndefined from 'lodash/isUndefined';
 import DataSource from 'devextreme/data/data_source';
 
 import * as template from './report-grid-display.component.html';
@@ -92,16 +93,20 @@ export const ReportGridDisplayComponent = {
           dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
           width: COLUMN_WIDTH
         };
-        if (angular.isUndefined(NUMBER_TYPES.includes(column.type) && column.format)) {
+        if (!isUndefined(NUMBER_TYPES.includes(column.type)) && isUndefined(column.format)) {
           field.format = {
             type: 'decimal',
             precision: 2
           };
         }
-        if (angular.isDefined(NUMBER_TYPES.includes(column.type) && column.format)) {
-          if (column.format.currency) {
+        if (!isUndefined(NUMBER_TYPES.includes(column.type)) && !isUndefined(column.format)) {
+          if (!isUndefined(column.format.currency)) {
             field.customizeText = (data => {
-              return data.valueText + ' ' + column.format.currencySymbol;
+              if (!isUndefined(column.format.currencySymbol)) {
+                return data.valueText + ' ' + column.format.currencySymbol;
+              } else {
+                return data.valueText;
+              }
             });
           }
         }

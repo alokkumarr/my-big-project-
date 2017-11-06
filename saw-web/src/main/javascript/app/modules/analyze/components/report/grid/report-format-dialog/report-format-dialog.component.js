@@ -18,26 +18,26 @@ export const ReportFormatDialogComponent = {
       this.getSymbolFromCurrency = getSymbolFromCurrency;
       this.number = 1000.33333;
       this.finalNumber = 0;
-      this.StringNumber = '';
+      this.stringNumber = '';
       this.format = {
         column: this.modelData.dataField,
         type: this.modelData.dataType
       };
       if (this.modelData.dataType === 'number') {
-        this.format.CurrencySymbol = '';
+        this.format.currencySymbol = '';
         if (this.modelData.dataType === 'number' && this.modelData.format.type === 'fixedpoint') {
-          this.format.CommaSeparator = true;
+          this.format.commaSeparator = true;
         } else {
-          this.format.CommaSeparator = false;
+          this.format.commaSeparator = false;
         }
-        this.format.NumberDecimal = this.modelData.format.precision;
+        this.format.numberDecimal = this.modelData.format.precision;
         if (this.modelData.format.currency) {
-          this.format.CurrencyCode = this.modelData.format.currency;
-          this.format.CurrencySymbol = this.getSymbolFromCurrency(this.format.CurrencyCode);
-          this.format.CurrencyFlag = true;
+          this.format.currencyCode = this.modelData.format.currency;
+          this.format.currencySymbol = this.getSymbolFromCurrency(this.format.currencyCode);
+          this.format.currencyFlag = true;
         } else {
-          this.format.CurrencyCode = 'USD';
-          this.format.CurrencyFlag = true;
+          this.format.currencyCode = 'USD';
+          this.format.currencyFlag = false;
         }
         this.modifyNumber();
       }
@@ -47,35 +47,42 @@ export const ReportFormatDialogComponent = {
     }
 
     modifyNumber() {
-      if (this.format.NumberDecimal > -1 && this.format.CommaSeparator && this.format.CurrencyFlag) {
-        this.finalNumber = this._$filter('number')(this.number, this.format.NumberDecimal);
-        if (this.format.CurrencyCode) {
-          this.format.CurrencySymbol = this.getSymbolFromCurrency(this.format.CurrencyCode);
-          this.StringNumber = this.finalNumber + ' ' + this.format.CurrencySymbol;
+      if (this.format.numberDecimal > -1 && this.format.commaSeparator && this.format.currencyFlag) {
+        this.finalNumber = this._$filter('number')(this.number, this.format.numberDecimal);
+        if (this.format.currencyCode) {
+          this.format.currencySymbol = this.getSymbolFromCurrency(this.format.currencyCode);
+          this.stringNumber = this.finalNumber + ' ' + this.format.currencySymbol;
         } else {
-          this.StringNumber = this.finalNumber.toString();
+          this.stringNumber = this.finalNumber.toString();
         }
       }
-      if (this.format.NumberDecimal > -1 && this.format.CommaSeparator && !this.format.CurrencyFlag) {
-        this.StringNumber = this._$filter('number')(this.number, this.format.NumberDecimal);
+
+      if (this.format.numberDecimal > -1 && this.format.commaSeparator && !this.format.currencyFlag) {
+        this.format.currencySymbol = undefined;
+        this.stringNumber = this._$filter('number')(this.number, this.format.numberDecimal);
       }
-      if (this.format.NumberDecimal > -1 && !this.format.CommaSeparator && this.format.CurrencyFlag) {
-        this.StringNumber = this._$filter('number')(this.number, this.format.NumberDecimal);
-        this.StringNumber = (num => num.split(',').join(''))(this.StringNumber);
-        if (this.format.CurrencyCode) {
-          this.format.CurrencySymbol = this.getSymbolFromCurrency(this.format.CurrencyCode);
-          this.StringNumber = this.StringNumber + ' ' + this.format.CurrencySymbol;
+
+      if (this.format.numberDecimal > -1 && !this.format.commaSeparator && this.format.currencyFlag) {
+        this.stringNumber = this._$filter('number')(this.number, this.format.numberDecimal);
+        this.stringNumber = (num => num.split(',').join(''))(this.stringNumber);
+        if (this.format.currencyCode) {
+          this.format.currencySymbol = this.getSymbolFromCurrency(this.format.currencyCode);
+          this.stringNumber = this.stringNumber + ' ' + this.format.currencySymbol;
         } else {
-          this.format.CurrencySymbol = '';
-          this.StringNumber = this.StringNumber.toString();
+          this.format.currencySymbol = undefined;
+          this.stringNumber = this.stringNumber.toString();
         }
       }
-      if (this.format.NumberDecimal > -1 && !this.format.CommaSeparator && !this.format.CurrencyFlag) {
-        this.StringNumber = this._$filter('number')(this.number, this.format.NumberDecimal);
-        this.StringNumber = (num => num.split(',').join(''))(this.StringNumber);
+
+      if (this.format.numberDecimal > -1 && !this.format.commaSeparator && !this.format.currencyFlag) {
+        this.format.currencySymbol = undefined;
+        this.stringNumber = this._$filter('number')(this.number, this.format.numberDecimal);
+        this.stringNumber = (num => num.split(',').join(''))(this.stringNumber);
       }
-      if (!(this.format.NumberDecimal > -1) && this.format.CommaSeparator && !this.format.CurrencyFlag) {
-        this.StringNumber = this._$filter('number')(this.number);
+
+      if (!(this.format.numberDecimal > -1) && this.format.commaSeparator && !this.format.currencyFlag) {
+        this.format.currencySymbol = undefined;
+        this.stringNumber = this._$filter('number')(this.number);
       }
     }
 

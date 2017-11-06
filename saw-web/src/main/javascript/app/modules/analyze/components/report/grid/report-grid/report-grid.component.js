@@ -77,7 +77,7 @@ export const ReportGridComponent = {
       if (e.target === 'header') {
         e.items = [];
 
-        if (e.column.dataType === 'number' || e.column.dataType === 'timestamp' || e.column.dataType === 'date' || e.column.dataType === 'string-date') {
+        if (['number', 'timestamp', 'date', 'string-date'].includes(e.column.dataType)) {
           e.items.push({
             text: 'Format Data',
             icon: 'grid-menu-item icon-filter',
@@ -179,19 +179,21 @@ export const ReportGridComponent = {
           width: COLUMN_WIDTH,
           format: column.format
         };
-        if (angular.isUndefined(NUMBER_TYPES.includes(column.type) && column.format)) {
+        if (!isUndefined(NUMBER_TYPES.includes(column.type)) && isUndefined(column.format)) {
           field.format = {
             type: 'decimal',
             precision: 2
           };
         }
-        if (angular.isDefined(NUMBER_TYPES.includes(column.type))) {
-          if (angular.isDefined(column.format)) {
-            if (column.format.currency !== '') {
-              field.customizeText = (data => {
+        if (!isUndefined(NUMBER_TYPES.includes(column.type)) && !isUndefined(column.format)) {
+          if (!isUndefined(column.format.currency)) {
+            field.customizeText = (data => {
+              if (!isUndefined(column.format.currencySymbol)) {
                 return data.valueText + ' ' + column.format.currencySymbol;
-              });
-            }
+              } else {
+                return data.valueText;
+              }
+            });
           }
         }
         return field;
@@ -255,26 +257,31 @@ export const ReportGridComponent = {
               column.dataType = 'date';
               column.format = newFormat.dateFormat;
             } else {
-              if (newFormat.CommaSeparator) {
+              if (newFormat.commaSeparator) {
                 typeValue = 'fixedpoint';
               } else {
                 typeValue = 'decimal';
               }
-              if (newFormat.CurrencyFlag) {
+              if (newFormat.currencyFlag) {
                 column.format = {
                   type: typeValue,
-                  precision: newFormat.NumberDecimal,
-                  currency: newFormat.CurrencyCode,
-                  currencySymbol: newFormat.CurrencySymbol
+                  precision: newFormat.numberDecimal,
+                  currency: newFormat.currencyCode,
+                  currencySymbol: newFormat.currencySymbol
                 };
                 column.customizeText = (source => {
-                  return source.valueText + ' ' + column.format.currencySymbol;
+                  if (!isUndefined(column.format.currencySymbol)) {
+                    return source.valueText + ' ' + column.format.currencySymbol;
+                  } else {
+                    return source.valueText;
+                  }
                 });
               } else {
                 column.format = {
                   type: typeValue,
-                  precision: newFormat.NumberDecimal
+                  precision: newFormat.numberDecimal
                 };
+                column.customizeText = undefined;
               }
             }
           }

@@ -7,13 +7,13 @@
     <div class="number-format" ng-if="$ctrl.modelData.dataType === 'number'">
       <div class="format-row">
         <span class="span-label" translate="ShowCommaSeparators"></span>
-        <md-switch class="md-primary" ng-model="$ctrl.format.CommaSeparator" ng-change="$ctrl.modifyNumber()"></md-switch>
+        <md-switch class="md-primary" ng-model="$ctrl.format.commaSeparator" ng-change="$ctrl.modifyNumber()"></md-switch>
       </div>
       <div class="format-row">
         <span class="span-label" translate="ShowCurrency"></span>
-        <md-switch class="md-primary" ng-model="$ctrl.format.CurrencyFlag" ng-change="$ctrl.modifyNumber()"></md-switch>
-        <md-select ng-if="$ctrl.format.CurrencyFlag" ng-change="$ctrl.modifyNumber()"
-		        ng-model="$ctrl.format.CurrencyCode"> <md-option
+        <md-switch class="md-primary" ng-model="$ctrl.format.currencyFlag" ng-change="$ctrl.modifyNumber()"></md-switch>
+        <md-select ng-if="$ctrl.format.currencyFlag" ng-change="$ctrl.modifyNumber()"
+		        ng-model="$ctrl.format.currencyCode"> <md-option
 		        ng-repeat="codeList in $ctrl.currencyCodeList" ng-value="codeList.code"
 		        ng-bind="::codeList.code"></md-option>
           </md-select>
@@ -21,13 +21,13 @@
       <div class="format-row">
         <span class="span-label" translate="SpecifyNumberDecimals"></span>
         <input class="ng-pristine ng-valid md-input ng-empty ng-touched" type="number"
-         ng-model="$ctrl.format.NumberDecimal"
+         ng-model="$ctrl.format.numberDecimal"
          ng-change="$ctrl.modifyNumber()" ng-maxlength="2"/>
       </div>
       
       <div class="sample-block">
           <h6>Sample:</h6>
-          {{$ctrl.StringNumber}}
+          {{$ctrl.stringNumber}}
       </div>
     </div>
 

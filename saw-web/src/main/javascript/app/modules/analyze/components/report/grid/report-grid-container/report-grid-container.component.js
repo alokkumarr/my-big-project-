@@ -237,42 +237,42 @@ export const ReportGridContainerComponent = {
     }
 
     formatColumn(columnName, datatype, format) {
-      for (let i = 0; i < this.columns.length; i++) {
-        if (this.columns[i].name === columnName) {
+      forEach(this.columns, value => {
+        if (value.name === columnName) {
           switch (format.type) {
           case 'date':
-            this.columns[i].type = 'date';
-            this.columns[i].format = format.dateFormat;
+            value.type = 'date';
+            value.format = format.dateFormat;
             break;
           case 'timestamp':
-            this.columns[i].type = 'date';
-            this.columns[i].format = format.dateFormat;
+            value.type = 'date';
+            value.format = format.dateFormat;
             break;
           case 'number':
-            this.columns[i].format = {
+            value.format = {
               precision: 0,
               type: 'decimal',
               currency: undefined,
               currencySymbol: undefined
             };
-            if (format.NumberDecimal > -1) {
-              this.columns[i].format.precision = format.NumberDecimal;
+            if (format.numberDecimal > -1) {
+              value.format.precision = format.numberDecimal;
             }
-            if (format.CommaSeparator) {
-              this.columns[i].format.type = 'fixedPoint';
+            if (format.commaSeparator) {
+              value.format.type = 'fixedPoint';
             } else {
-              this.columns[i].format.type = 'decimal';
+              value.format.type = 'decimal';
             }
-            if (format.CurrencyFlag) {
-              this.columns[i].format.currency = format.CurrencyCode;
-              this.columns[i].format.currencySymbol = format.CurrencySymbol;
+            if (format.currencyFlag) {
+              value.format.currency = format.currencyCode;
+              value.format.currencySymbol = format.currencySymbol;
             }
             break;
           default:
             break;
           }
         }
-      }
+      });
     }
 
     hideColumn(columnName) {
