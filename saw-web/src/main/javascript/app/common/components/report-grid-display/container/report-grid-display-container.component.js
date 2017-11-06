@@ -9,6 +9,8 @@ import * as isArray from 'lodash/isArray';
 import * as reduce from 'lodash/reduce';
 import * as join from 'lodash/join';
 import json2csv from 'json2csv';
+import * as moment from 'moment';
+import * as isUndefined from 'lodash/isUndefined';
 
 import * as template from './report-grid-display-container.component.html';
 import style from './report-grid-display-container.component.scss';
@@ -94,7 +96,26 @@ export const ReportGridDisplayContainerComponent = {
     }
 
     $onChanges() {
-      this.groupedData = this.groupData(this.data, this.groups);
+      if (!isUndefined(this.data)) {
+        const sourceData = this.data;
+        this.groupedData = this.groupData(this.formatDates(sourceData), this.groups);
+      }
+    }
+
+    formatDates(data) {
+      const keys = Object.keys(data[0]);
+      var formats = [
+        moment.ISO_8601,
+        'MM/DD/YYYY  :)  HH*mm*ss'
+      ];
+      forEach(data, data => {
+        forEach(keys, key => {
+          if (moment(data[key], formats, true).isValid()) {
+            data[key] = moment(data[key]).utcOffset(new Date().getTimezoneOffset()).format('MM/DD/YYYY');
+          }
+        });
+      });
+      return data;
     }
 
     getGroupLabels(groups, columns) {

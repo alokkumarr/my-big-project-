@@ -210,29 +210,18 @@ export const ReportGridComponent = {
 
     formatDates(data) {
       const keys = Object.keys(data[0]);
+      var formats = [
+        moment.ISO_8601,
+        'MM/DD/YYYY  :)  HH*mm*ss'
+      ];
       forEach(data, data => {
         forEach(keys, key => {
-          const date = this.checkDates(data[key]);
-          if (date) {
-            data[key] = moment(data[key]).format('MM/DD/YYYY');
+          if (moment(data[key], formats, true).isValid()) {
+            data[key] = moment(data[key]).utcOffset(new Date().getTimezoneOffset()).format('MM/DD/YYYY');
           }
         });
       });
       return data;
-    }
-
-    checkDates(dateStr) {
-      if (Object.prototype.toString.call(dateStr) === '[object Date]') {
-        if (isNaN( dateStr.getTime())) {  
-          return false;
-        }
-        else {
-          return true;
-        }
-      }
-      else {
-        return false;
-      }
     }
 
     refreshGrid() {
