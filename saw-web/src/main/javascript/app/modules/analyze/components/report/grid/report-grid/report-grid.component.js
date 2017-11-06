@@ -147,7 +147,6 @@ export const ReportGridComponent = {
 
     updateColumns(columns) {
       this.columns = columns;
-
       if (this._gridInstance) {
         const columns = this.prepareGridColumns(this.columns);
         forEach(columns, column => {
