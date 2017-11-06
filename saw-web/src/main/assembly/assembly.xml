@@ -25,7 +25,10 @@
       <outputDirectory>ansible</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}/rpm/saw-web/RPMS/noarch</directory>
+      <directory>${project.build.directory}</directory>
+      <includes>
+        <include>saw-web-*.rpm</include>
+      </includes>
       <outputDirectory>rpms</outputDirectory>
     </fileSet>
   </fileSets>
