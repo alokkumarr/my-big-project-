@@ -5,6 +5,7 @@ import * as forEach from 'lodash/forEach';
 import * as remove from 'lodash/remove';
 import * as isUndefined from 'lodash/isUndefined';
 import * as $ from 'jquery';
+import * as moment from 'moment';
 
 import * as template from './report-grid.component.html';
 import style from './report-grid.component.scss';
@@ -202,7 +203,35 @@ export const ReportGridComponent = {
 
     onSourceUpdate() {
       if (this._gridInstance) {
-        this._gridInstance.option('dataSource', this.source);
+        const sourceData = this.source;
+        this._gridInstance.option('dataSource', this.formatDates(sourceData));
+      }
+    }
+
+    formatDates(data) {
+      const keys = Object.keys(data[0]);
+      forEach(data, data => {
+        forEach(keys, key => {
+          const date = this.checkDates(data[key]);
+          if (date) {
+            data[key] = moment(data[key]).format('MM/DD/YYYY');
+          }
+        });
+      });
+      return data;
+    }
+
+    checkDates(dateStr) {
+      if (Object.prototype.toString.call(dateStr) === '[object Date]') {
+        if (isNaN( dateStr.getTime())) {  
+          return false;
+        }
+        else {
+          return true;
+        }
+      }
+      else {
+        return false;
       }
     }
 
