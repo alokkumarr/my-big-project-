@@ -210,7 +210,7 @@ export const ReportGridComponent = {
 
     formatDates(data) {
       const keys = Object.keys(data[0]);
-      var formats = [
+      const formats = [
         moment.ISO_8601,
         'MM/DD/YYYY  :)  HH*mm*ss'
       ];
