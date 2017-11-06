@@ -157,16 +157,17 @@
                       "id":"/properties/filters/model/properties/preset",
                       "type":"string",
  			"enum": [
-                      "YTD",
-                      "MTD",
-                      "LTM",
-                      "LM",
-                      "LQ",
-                      "TW",
-                      "BTW",
- 		              "LTW",
-                      "LW"
-                    ]
+              "YTD",
+              "MTD",
+              "LTM",
+              "LSM",
+              "LM",
+              "LQ",
+              "LW",
+              "TW",
+              "LTW",
+              "LSW"
+            ]
                     },		
                     "format":{
                       "id":"/properties/filters/model/properties/format",
