@@ -150,7 +150,7 @@ public class SecurityController {
 			it.remove();
 		}
 		if (!validity) {
-			throw new ServletException("Token has expired. Please re-login.");
+			return new LoginResponse(validity, "Token has expired. Please re-login");
 		} else {
 
 			logger.info("Ticket will be created..");
@@ -453,6 +453,8 @@ public class SecurityController {
 		
 		public String aToken;
 		public String rToken;
+		public boolean validity;
+		public String message;
 		
 		public LoginResponse(final String aToken) {
 			this.aToken = aToken;
@@ -461,6 +463,11 @@ public class SecurityController {
 		public LoginResponse(final String aToken, final String rToken) {
 			this.aToken = aToken;
 			this.rToken = rToken;
+		}
+
+		public LoginResponse(boolean validity, String message) {
+			this.validity = validity;
+			this.message = message;
 		}
 	}
 

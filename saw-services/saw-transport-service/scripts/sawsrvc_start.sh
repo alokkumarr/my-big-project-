@@ -91,23 +91,12 @@ process_args "$@"
 
 vlog CMD: $THIS_FILE_PATH "$@"
 
-# Check if HTTP service is running on the box
-/usr/bin/curl -qs http://$SAW_SERVICE_HOST:$SAW_SERVICE_PORT/sr &>/dev/null && {
-    die "SAW_SERVICE is already running on $SAW_SERVICE_HOST:$SAW_SERVICE_PORT"
-}
-
 declare -r saw_service_home="${SAW_SERVICE_HOME:-$(realpath "$(dirname $THIS_FILE_PATH)/..")}"
 vlog xdfts_home: $saw_service_home
 ( cd $saw_service_home ) || exit
 
-declare -r pidfile_path=/var/saw/service/run/$(mk_pidfile_name)
+declare -r pidfile_path=/dev/null
 vlog pidfile_path: $pidfile_path
-
-# Check pid file exists and service process with stored pid is running
-[[ -s $pidfile_path ]]     &&
-pid=$( <$pidfile_path )    &&
-[[ -d /proc/${pid:-000} ]] &&
-die "SAW_SERVICE process ($pid) is still running on $SAW_SERVICE_HOST"
 
 # Validate Java
 declare java_cmd="${JAVA_HOME:-/usr}/bin/java"
@@ -160,6 +149,7 @@ declare -r java_args=$( echo \
     -Dhttp.port=$SAW_SERVICE_PORT \
     -Dpidfile.path=$pidfile_path \
     -Duser.dir=${user_dir} \
+    -Daggr.es.size=1000 \
     -Durl=http://$(hostname -f):9200/ \
     -Djava.library.path=/opt/mapr/lib \
     -Dschema.pivot=/opt/saw/service/schema/pivot_querybuilder_schema.json \
@@ -182,7 +172,7 @@ vlog "EXEC_CMD: $exec_cmd"
   exit 0
 }
 
-/bin/rm -f $pidfile_path
+#/bin/rm -f $pidfile_path
 
 # Additinal DEV key: X^kFEdvnivVbWVv5o^9wQylyz@h4G0vPjzpX@hDkkNWSom_^iOh^1ic>]@K94mSI
 export APPLICATION_SECRET="y=5L3Lrezk1j0KsBo8K>YHR6JIxfcb=ax]0sT7m2NZHcafHZM73_=fqnNcGP8r<x"

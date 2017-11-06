@@ -15,6 +15,8 @@ import org.springframework.web.filter.GenericFilterBean;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.ExpiredJwtException;
 
 public class JwtFilter extends GenericFilterBean {
 
@@ -40,6 +42,10 @@ public class JwtFilter extends GenericFilterBean {
 				request.setAttribute("claims", claims);
 			} catch (final SignatureException e) {
 				throw new ServletException("Invalid token.");
+			} catch (MalformedJwtException ex) {
+				throw  new ServletException("Invalid token");
+			} catch (ExpiredJwtException expired) {
+				throw new ServletException("token has expired");
 			}
 
 			// This checks the validity of the token. logging out does not need

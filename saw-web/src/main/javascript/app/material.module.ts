@@ -10,7 +10,9 @@ import {
   MatProgressBarModule,
   MatChipsModule
 } from '@angular/material';
+
 require('@angular/material/prebuilt-themes/indigo-pink.css');
+import '../../../../themes/_angular_next.scss';
 
 @NgModule({
   imports: [

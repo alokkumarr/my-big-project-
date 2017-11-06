@@ -29,44 +29,47 @@ create-dashboard {
       background-color: whitesmoke;
 
       gridster-item {
-        display: flex !important;
-        align-items: center;
-        flex-direction: row;
-        flex-wrap: wrap;
-
         & > button {
-          align-self: start;
           position: absolute;
+          top: 0;
           z-index: 1;
           right: 0;
-        }
-
-        .analysis-title {
-          position: absolute;
-          left: 0;
-          top: 0;
-          padding: 20px;
-          font-size: 2em;
-          z-index: 1;
         }
 
         & > .analysis-container {
           display: block;
           width: 100%;
+          height: 100%;
 
           & > * {
             display: block;
             width: 100%;
+            height: 100%;
+
+            div {
+              height: 100%;
+            }
           }
         }
       }
     }
   }
 
+  .add-button-help {
+    position: absolute;
+    font-size: 1.5em;
+    opacity: 1;
+    bottom: 45%;
+    right: 50%;
+    transform: translateX(50%);
+    z-index: 1;
+  }
+
   .add-analysis {
     position: absolute;
-    bottom: 30px;
-    right: 30px;
+    bottom: 50%;
+    right: 50%;
+    transform: translateX(50%);
     z-index: 1;
 
     md-icon {

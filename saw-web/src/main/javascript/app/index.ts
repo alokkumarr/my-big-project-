@@ -5,6 +5,7 @@ import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.light.css';
 
 import 'fonts/icomoon.css';
+import '../../../../assets/additional-icons.css';
 
 import 'zone.js';
 import 'reflect-metadata';

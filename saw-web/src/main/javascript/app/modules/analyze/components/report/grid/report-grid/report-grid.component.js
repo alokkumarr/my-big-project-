@@ -76,7 +76,6 @@ export const ReportGridComponent = {
     onContextMenuPreparing(e) {
       if (e.target === 'header') {
         e.items = [];
-
         e.items.push({
           text: 'Rename',
           icon: 'grid-menu-item icon-edit',
