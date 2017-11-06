@@ -255,11 +255,6 @@ export class AnalyzeService {
       delete model.executionType;
     }
 
-    if (model.type === 'report' && model.edit === true) {
-      this._toastMessage.error('SQL mode is no longer supported. Please create a new report in designer mode.');
-      return this._$q.resolve({data: [], count: 0});
-    }
-
     options.skip = options.skip || 0;
     options.take = options.take || 10;
     const page = floor(options.skip / options.take) + 1;
