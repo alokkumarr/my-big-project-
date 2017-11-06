@@ -160,7 +160,7 @@ export const ReportGridComponent = {
             column.dataType = 'string';
           }
         });
-        this._gridInstance.option('columns', columns));
+        this._gridInstance.option('columns', columns);
       }
     }
 
