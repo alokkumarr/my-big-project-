@@ -13,6 +13,11 @@ import {NUMBER_TYPES} from '../../../../consts';
 // const MIN_ROWS_TO_SHOW = 5;
 const COLUMN_WIDTH = 175;
 
+export const DATE_INTERVALS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(DATE_INTERVALS);
+
 export const ReportGridComponent = {
   template,
   style: [style],
@@ -36,7 +41,6 @@ export const ReportGridComponent = {
 
     $onInit() {
       this.reportGridNode.setGridComponent(this);
-
       this.settings = assign(this.settings, {
         gridConfig: this._dxDataGridService.mergeWithDefaultConfig({
           onInitialized: this.onGridInitialized.bind(this),
@@ -76,6 +80,7 @@ export const ReportGridComponent = {
     onContextMenuPreparing(e) {
       if (e.target === 'header') {
         e.items = [];
+
         e.items.push({
           text: 'Rename',
           icon: 'grid-menu-item icon-edit',
@@ -149,7 +154,13 @@ export const ReportGridComponent = {
       this.columns = columns;
 
       if (this._gridInstance) {
-        this._gridInstance.option('columns', this.prepareGridColumns(this.columns));
+        const columns = this.prepareGridColumns(this.columns);
+        forEach(columns, column => {
+          if (column.dataType === 'date') {
+            column.dataType = 'string';
+          }
+        });
+        this._gridInstance.option('columns', columns));
       }
     }
 
