@@ -30,7 +30,7 @@ public class BuilderUtil
 {
 
      public static final String SUFFIX = ".keyword";
-     public static final int SIZE = 50;
+     public static final int SIZE = ((System.getProperty("aggr.es.size")!=null && !System.getProperty("aggr.es.size").equals("")) ? Integer.parseInt(System.getProperty("aggr.es.size")):1000);
   
 	/**
 	 * This method is used to load the json string to object tree
@@ -119,7 +119,7 @@ public class BuilderUtil
   public static DynamicConvertor dynamicDecipher(String dynamic)
 
   {
-    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     DynamicConvertor dynamicConvertor = new DynamicConvertor();
 
     switch (dynamic) {
@@ -202,5 +202,9 @@ public class BuilderUtil
 
     return dynamicConvertor;
   }
-  
+  public static void main(String[] args) {
+    System.setProperty("aggr.es.size","");
+    int SIZE = ((System.getProperty("aggr.es.size")!=null && !System.getProperty("aggr.es.size").equals("")) ? Integer.parseInt(System.getProperty("aggr.es.size")):1000);
+    System.out.println(SIZE);
+  }
 }
