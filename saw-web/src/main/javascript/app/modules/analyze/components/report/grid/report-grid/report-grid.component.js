@@ -13,11 +13,6 @@ import {NUMBER_TYPES} from '../../../../consts';
 // const MIN_ROWS_TO_SHOW = 5;
 const COLUMN_WIDTH = 175;
 
-export const DATE_INTERVALS_OBJ = fpPipe(
-  fpGroupBy('value'),
-  fpMapValues(v => v[0])
-)(DATE_INTERVALS);
-
 export const ReportGridComponent = {
   template,
   style: [style],
