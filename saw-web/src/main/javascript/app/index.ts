@@ -6,7 +6,7 @@ import 'devextreme/dist/css/dx.light.css';
 
 import 'devextreme/localization'; 
 
-let messagesEn = require("devextreme/localization/messages/en.json");
+let messagesEn = require('devextreme/localization/messages/en.json');
 
 import 'fonts/icomoon.css';
 import '../../../../assets/additional-icons.css';
