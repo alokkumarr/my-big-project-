@@ -187,6 +187,7 @@ public class Model {
       LQ("LQ"),
       LW("LW"),
       TW("TW"),
+      LSW("LSW"),
       LTW("LTW");
       private final String value;
       private final static Map<String, Model.Preset> CONSTANTS = new HashMap<String, Model.Preset>();
