@@ -191,7 +191,7 @@ export const AnalyzeExecutedDetailComponent = {
     replaceCSVHeader(csv, fields) {
       const firstNewLine = indexOf(csv, '\n');
       const firstRow = slice(csv, 0, firstNewLine).join('');
-      const displayNames = map(fields, 'displayName').join(',');
+      const displayNames = map(fields, ({aliasName, displayName}) => aliasName || displayName).join(',');
       return replace(csv, firstRow, displayNames);
     }
 
