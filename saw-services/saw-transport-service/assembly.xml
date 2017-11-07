@@ -9,25 +9,25 @@
 </formats>
   <fileSets>
 	  <fileSet>
-		  <directoryMode>750</directoryMode>
+		  <directoryMode>755</directoryMode>
 		  <directory>${project.basedir}/../saw-common/target/saw-common-${project.version}-package/saw-common-${project.version}/lib</directory>
 		  <outputDirectory>lib</outputDirectory>
-		  <fileMode>440</fileMode>
+		  <fileMode>644</fileMode>
 	  </fileSet>
 	  <fileSet>
-		  <directoryMode>750</directoryMode>
+		  <directoryMode>755</directoryMode>
 		  <directory>${project.basedir}/../saw-metadata-service/target/saw-metadata-service-${project.version}-package/saw-metadata-service-${project.version}/lib</directory>
 		  <outputDirectory>lib</outputDirectory>
-		  <fileMode>440</fileMode>
+		  <fileMode>644</fileMode>
 	  </fileSet>
 	  <fileSet>
-		  <directoryMode>750</directoryMode>
+		  <directoryMode>755</directoryMode>
 		  <directory>${project.basedir}/../saw-data-access/target</directory>
 		  <outputDirectory>sparklib</outputDirectory>
 		  <includes>
 			  <include>saw-data-access-${project.version}-jar-with-dependencies.jar</include>
 		  </includes>
-		  <fileMode>440</fileMode>
+		  <fileMode>644</fileMode>
 	  </fileSet>
   </fileSets>
   <dependencySets>

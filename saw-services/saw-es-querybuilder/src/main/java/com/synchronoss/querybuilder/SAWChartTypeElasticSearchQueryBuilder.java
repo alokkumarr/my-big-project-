@@ -107,11 +107,22 @@ class SAWChartTypeElasticSearchQueryBuilder {
       for (com.synchronoss.querybuilder.model.chart.Filter item : filters) {
         if (!item.getIsRuntimeFilter().value()) {
           if (item.getType().value().equals(Type.DATE.value())
-              || item.getType().value().equals(Type.TIMESTAMP.value())) {
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            rangeQueryBuilder.lte(item.getModel().getLte());
-            rangeQueryBuilder.gte(item.getModel().getGte());
-            builder.add(rangeQueryBuilder);
+              || item.getType().value().equals(Type.TIMESTAMP.value())) 
+          {
+            if (item.getModel().getPreset()!=null)
+            {
+              DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
+              RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+              rangeQueryBuilder.lte(dynamicConvertor.getLte());
+              rangeQueryBuilder.gte(dynamicConvertor.getGte());
+              builder.add(rangeQueryBuilder);
+            }
+            else {
+              RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+              rangeQueryBuilder.lte(item.getModel().getLte());
+              rangeQueryBuilder.gte(item.getModel().getGte());
+              builder.add(rangeQueryBuilder);
+            }
           }
           if (item.getType().value().equals(Type.STRING.value())) {
             TermsQueryBuilder termsQueryBuilder =
@@ -172,6 +183,7 @@ class SAWChartTypeElasticSearchQueryBuilder {
               RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
               rangeQueryBuilder.lte(dynamicConvertor.getLte());
               rangeQueryBuilder.gte(dynamicConvertor.getGte());
+              builder.add(rangeQueryBuilder);
             }
             else {
               RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());

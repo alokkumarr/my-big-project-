@@ -41,7 +41,7 @@
           </span>
 
           <div>
-            <!-- <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.DESIGNER_MODE}"
+            <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.DESIGNER_MODE}"
                        class="mode-selector"
                        ng-disabled="$ctrl.states.disable.designer || $ctrl.model.edit"
                        ng-click="$ctrl.setSqlMode($ctrl.DESIGNER_MODE)">
@@ -54,13 +54,13 @@
                        ng-click="$ctrl.setSqlMode($ctrl.QUERY_MODE)">
               <md-icon md-font-icon="icon-query-mode"></md-icon>
               <span translate="QUERY"></span>
-            </md-button> -->
+            </md-button>
 
-          <md-button ng-click="$ctrl.openDescriptionModal($event, $ctrl.model)"
-                     e2e="open-description-modal">
-            <md-icon md-font-icon="icon-description"></md-icon>
-            <span translate="DESCRIPTION"></span>
-          </md-button>
+            <md-button ng-click="$ctrl.openDescriptionModal($event, $ctrl.model)"
+                      e2e="open-description-modal">
+              <md-icon md-font-icon="icon-description"></md-icon>
+              <span translate="DESCRIPTION"></span>
+            </md-button>
 
             <md-button ng-if="!$ctrl.model.edit"
                        ng-show="$ctrl.states.sqlMode === $ctrl.DESIGNER_MODE"

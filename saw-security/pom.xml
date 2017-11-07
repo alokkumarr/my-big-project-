@@ -529,8 +529,6 @@ echo pre-remove completed: ${app.nameVer}
                   <descriptors>
                     <descriptor>${project.basedir}/src/main/assembly/assembly.xml</descriptor>
                   </descriptors>
-                  <!-- Remove artifact classifier "bin" from archive name -->
-                  <appendAssemblyId>false</appendAssemblyId>
                   <!-- Enable long file names without Maven warning -->
                   <tarLongFileMode>posix</tarLongFileMode>
                 </configuration>
@@ -542,71 +540,6 @@ echo pre-remove completed: ${app.nameVer}
                     </goals>
                   </execution>
                 </executions>
-            </plugin>
-            <plugin>
-              <groupId>io.fabric8</groupId>
-              <artifactId>docker-maven-plugin</artifactId>
-              <version>0.21.0</version>
-              <configuration>
-                <images>
-                  <image>
-                    <name>saw-security:${project.version}</name>
-                    <alias>saw-security</alias>
-                    <build>
-                      <dockerFileDir>${project.basedir}/src/test/docker</dockerFileDir>
-                      <assembly>
-                        <inline xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
-                                xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
-                          <fileSets>
-                            <fileSet>
-                              <directory>${project.build.directory}</directory>
-                              <outputDirectory>.</outputDirectory>
-                              <includes>
-                                <include>*.tgz</include>
-                              </includes>
-                            </fileSet>
-                          </fileSets>
-                        </inline>
-                      </assembly>
-                    </build>
-                    <run>
-                      <!-- Run privileged for systemd -->
-                      <privileged>true</privileged>
-                      <wait>
-                        <!--
-                            Wait until the container health check
-                            reports that systemd services are up and
-                            running
-                        -->
-                        <healthy>true</healthy>
-                        <!--
-                            Increase timeout to allow application
-                            deployment to finish
-                        -->
-                        <time>120000</time>
-                      </wait>
-                    </run>
-                  </image>
-                </images>
-              </configuration>
-              <executions>
-                <execution>
-                  <id>start</id>
-                  <phase>pre-integration-test</phase>
-                  <goals>
-                    <goal>build</goal>
-                    <goal>start</goal>
-                  </goals>
-                </execution>
-                <execution>
-                  <id>stop</id>
-                  <phase>post-integration-test</phase>
-                  <goals>
-                    <goal>stop</goal>
-                  </goals>
-                </execution>
-              </executions>
             </plugin>
         </plugins>
     </build>
