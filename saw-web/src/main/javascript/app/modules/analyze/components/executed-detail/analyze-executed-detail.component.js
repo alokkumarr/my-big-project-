@@ -1,6 +1,5 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import * as get from 'lodash/get';
-import * as keys from 'lodash/keys';
 import * as fpPick from 'lodash/fp/pick';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
@@ -8,7 +7,6 @@ import * as fpMap from 'lodash/fp/map';
 import * as map from 'lodash/map';
 import * as flatMap from 'lodash/flatMap';
 import * as replace from 'lodash/replace';
-import * as forEach from 'lodash/forEach';
 import * as indexOf from 'lodash/indexOf';
 import * as slice from 'lodash/slice';
 import {json2csv} from 'json-2-csv';
