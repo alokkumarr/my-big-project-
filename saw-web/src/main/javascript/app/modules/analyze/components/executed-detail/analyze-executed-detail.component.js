@@ -1,5 +1,16 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import * as get from 'lodash/get';
+import * as keys from 'lodash/keys';
+import * as fpPick from 'lodash/fp/pick';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpFilter from 'lodash/fp/filter';
+import * as fpMap from 'lodash/fp/map';
+import * as map from 'lodash/map';
+import * as flatMap from 'lodash/flatMap';
+import * as replace from 'lodash/replace';
+import * as forEach from 'lodash/forEach';
+import * as indexOf from 'lodash/indexOf';
+import * as slice from 'lodash/slice';
 import {json2csv} from 'json-2-csv';
 
 import {Events} from '../../consts';
@@ -135,6 +146,13 @@ export const AnalyzeExecutedDetailComponent = {
       });
     }
 
+    getCheckedFieldsForExport(artifacts) {
+      return flatMap(artifacts, artifact => fpPipe(
+        fpFilter('checked'),
+        fpMap(fpPick(['columnName', 'aliasName', 'displayName']))
+      )(artifact.columns));
+    }
+
     exportData() {
       if (this.analysis.type === 'pivot') {
         this.requester.next({
@@ -144,22 +162,37 @@ export const AnalyzeExecutedDetailComponent = {
         const analysisId = this.analysis.id;
         const executionId = this._executionId || this.analyses[0].id;
         this._AnalyzeActionsService.exportAnalysis(analysisId, executionId).then(data => {
+          const fields = this.getCheckedFieldsForExport(this.analysis.artifacts);
+          const keys = map(fields, 'columnName');
+          const exportOptions = {
+            trimHeaderFields: false,
+            emptyFieldValue: '',
+            checkSchemaDifferences: false,
+            delimiter: {
+              wrap: '"',
+              eol: '\r\n'
+            },
+            keys
+          };
           json2csv(data, (err, csv) => {
             if (err) {
               this._$translate('ERROR_EXPORT_FAILED').then(translation => {
                 this._toastMessage.error(translation);
               });
             }
-            this._fileService.exportCSV(csv);
-          }, {
-            trimHeaderFields: false,
-            checkSchemaDifferences: false,
-            delimiter: {
-              eol: '\r\n'
-            }
-          });
+            const csvWithDisplayNames = this.replaceCSVHeader(csv, fields);
+            this._fileService.exportCSV(csvWithDisplayNames, this.analysis.name);
+          }, exportOptions
+        );
         });
       }
+    }
+
+    replaceCSVHeader(csv, fields) {
+      const firstNewLine = indexOf(csv, '\n');
+      const firstRow = slice(csv, 0, firstNewLine).join('');
+      const displayNames = map(fields, 'displayName').join(',');
+      return replace(csv, firstRow, displayNames);
     }
 
     loadExecutionData(options = {}) {
