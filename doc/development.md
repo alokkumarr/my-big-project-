@@ -16,19 +16,8 @@ To prepare for building the project, execute the following steps:
 4. Configure Docker to allocate at least 8 GB memory and the maximum
    number of CPUs for containers
 
-If you are on a Mac the above can be installed using [Homebrew] as
-follows:
-
-        $ brew cask install java
-        $ brew install maven
-        $ brew cask install docker
-
-After installing the above on a Mac, open the Docker application to
-install the command line tools and launch the Docker daemon:
-
-        $ open -a Docker
-
-[Homebrew]: http://brew.sh/
+Note: Instructions for how to set up the above on a Mac can be found
+in the [Mac setup instructions](development-mac.md).
 
 # Building and testing
 
