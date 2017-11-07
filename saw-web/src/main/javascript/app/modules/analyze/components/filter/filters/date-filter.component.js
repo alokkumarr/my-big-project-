@@ -1,5 +1,6 @@
 import * as map from 'lodash/map';
 import * as forEach from 'lodash/forEach';
+import * as unset from 'lodash/unset';
 import * as template from './date-filter.component.html';
 
 export const DateFilterComponent = {
@@ -72,7 +73,7 @@ export const DateFilterComponent = {
         lte: ''
       };
       this.dateFormat = 'yyyy-MM-dd HH:ss:mm';
-      this.updatedDate.preset = this.tempModel.preset;
+      unset(this.updatedDate, 'preset');
       this.updatedDate.gte = this._$filter('date')(this.tempModel.gte, this.dateFormat);
       this.updatedDate.lte = this._$filter('date')(this.tempModel.lte, this.dateFormat);
       this.onChange({model: this.updatedDate});

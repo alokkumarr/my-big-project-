@@ -15,7 +15,7 @@ import * as template from './analyze-filter-modal.component.html';
 import style from './analyze-filter-modal.component.scss';
 import {BOOLEAN_CRITERIA} from '../../../services/filter.service';
 import {OPERATORS} from '../filters/number-filter.component';
-import {NUMBER_TYPES} from '../../../consts';
+import {NUMBER_TYPES, DATE_TYPES} from '../../../consts';
 
 export const AnalyzeFilterModalComponent = {
   template,
@@ -111,10 +111,19 @@ export const AnalyzeFilterModalComponent = {
           } else {
             isValid = isValid && (filter.isRuntimeFilter || !this._FilterService.isFilterEmpty(filter));
           }
+          if (this.isDateFilterValid(filter)) {
+            isValid = false;
+          }
         });
       });
 
       return isValid;
+    }
+
+    isDateFilterValid(filter) {
+      return DATE_TYPES.includes(filter.column.type) &&
+        (filter.model.preset === 'CUSTOM' &&
+        (!filter.model.lte || !filter.model.gte));
     }
 
     removeEmptyFilters(filters) {
