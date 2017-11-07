@@ -16,17 +16,12 @@ To prepare for building the project, execute the following steps:
 4. Configure Docker to allocate at least 8 GB memory and the maximum
    number of CPUs for containers
 
-5. Install RPM (for building RPM packages, until SAW Security and
-   Transport Service have been migrated to the pure Java RPM builder
-   that has no dependencies on external tools)
-
 If you are on a Mac the above can be installed using [Homebrew] as
 follows:
 
         $ brew cask install java
         $ brew install maven
         $ brew cask install docker
-        $ brew install rpm
 
 After installing the above on a Mac, open the Docker application to
 install the command line tools and launch the Docker daemon:
