@@ -16,6 +16,8 @@ import 'mottle';
 import 'devextreme/ui/data_grid';
 import 'devextreme/integration/angular';
 
+import { NgModule } from '@angular/core';
+import {DxPivotGridModule, DxPivotGridComponent} from 'devextreme-angular';
 import EventEmitter from './utils/eventEmitter';
 import ComponentHandler from './utils/componentHandler';
 
@@ -27,6 +29,7 @@ import {CommonDirectiveModule} from './directives';
 import {AuthServiceFactory} from '../../login/services/auth.service';
 import {UserServiceFactory} from '../../login/services/user.service';
 import {JwtServiceFactory} from '../../login/services/jwt.service';
+import {PivotGridComponent} from './components/pivot-grid/pivot-grid.component';
 
 import AppConfig from '../../../../../appConfig';
 
@@ -64,3 +67,20 @@ angular
   .factory('AuthService', AuthServiceFactory)
   .factory('UserService', UserServiceFactory)
   .factory('JwtService', JwtServiceFactory);
+
+@NgModule({
+  imports: [
+    DxPivotGridModule
+  ],
+  declarations: [
+    PivotGridComponent
+  ],
+  entryComponents: [
+    PivotGridComponent
+  ],
+  exports: [
+    PivotGridComponent,
+    DxPivotGridComponent
+  ]
+})
+export class CommonModuleTs {}

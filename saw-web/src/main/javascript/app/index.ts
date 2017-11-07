@@ -26,7 +26,8 @@ import {interceptor} from './http-interceptor';
 import {runConfig} from './run';
 
 import {ObserveModule, ObserveUpgradeModule} from './modules/observe/index';
-import {AnalyzeModule} from './modules/analyze';
+import {CommonModuleTs} from './common';
+import {AnalyzeModule, AnalyzeModuleTs} from './modules/analyze/index';
 import {AlertsModule} from './modules/alerts';
 import {AdminModule} from './modules/admin';
 
@@ -57,6 +58,8 @@ angular
   imports: [
     BrowserModule,
     UpgradeModule,
+    CommonModuleTs,
+    AnalyzeModuleTs,
     ObserveUpgradeModule
   ]
 })
