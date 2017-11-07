@@ -11,7 +11,7 @@ To prepare for building the project, execute the following steps:
 
 2. Install Maven 3.5.0
 
-3. Install Docker (for integration tests)
+3. Install [Docker] (for integration tests)
 
 4. Configure Docker to allocate at least 8 GB memory and the maximum
    number of CPUs for containers
@@ -19,11 +19,13 @@ To prepare for building the project, execute the following steps:
 Note: Instructions for how to set up the above on a Mac can be found
 in the [Mac setup instructions](development-mac.md).
 
+[Docker]: https://www.docker.com/community-edition
+
 # Building and testing
 
-To build the project execute the following command:
+To build and test the project execute the following command:
 
-        $ mvn package
+        $ mvn verify
 
 The release package will be located at `target/saw-*.tgz`.
 
