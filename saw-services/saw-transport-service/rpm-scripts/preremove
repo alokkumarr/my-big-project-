@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Only remove files if removing package completely.  If upgrading, do
 # not remove the files just created by the new package's postinstall
