@@ -56,6 +56,18 @@ RUN systemctl enable saw-deploy
 ADD saw-metrics /root/saw-metrics/
 RUN /root/saw-metrics/saw-metrics generate
 
+# Add systemd journal gateway for browsing logs
+RUN yum -y -q --nogpgcheck install systemd-journal-gateway
+RUN systemctl enable systemd-journal-gatewayd.socket
+# Workaround: Installing the systemd journal gateway causes the
+# services below to fail, so mask them.  Remove when fixed in newer
+# systemd version.
+RUN systemctl mask systemd-machine-id-commit.service
+RUN systemctl mask systemd-remount-fs.service
+
+# Add SAW start page with links to services
+ADD start /usr/share/nginx/html/start/
+
 # Workaround: The MapR logging configuration refers to a file that is
 # not writable by the "mapr" user, so change the path to a writable
 # location.
