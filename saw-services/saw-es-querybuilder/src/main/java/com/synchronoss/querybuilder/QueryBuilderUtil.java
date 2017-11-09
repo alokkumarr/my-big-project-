@@ -1,13 +1,23 @@
 package com.synchronoss.querybuilder;
 
+import java.util.List;
+
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder.FilterFunctionBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram.Order;
 
 import com.synchronoss.BuilderUtil;
+import com.synchronoss.querybuilder.model.chart.Filter;
 import com.synchronoss.querybuilder.model.chart.NodeField;
 import com.synchronoss.querybuilder.model.pivot.ColumnField;
+import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 
 public class QueryBuilderUtil {
 	
@@ -137,5 +147,92 @@ public class QueryBuilderUtil {
 		}
 		return aggregationBuilder;
 	}	
+
+	public static List<QueryBuilder> numericFilterChart (Filter item, List<QueryBuilder> builder)
+	  {
+	   
+	    if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
+	      RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+	      rangeQueryBuilder.lte(item.getModel().getValue());
+	      rangeQueryBuilder.gte(item.getModel().getOtherValue());
+	      builder.add(rangeQueryBuilder);
+	    }
+	    if (item.getModel().getOperator().value().equals(Operator.GT.value())) {
+	      RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+	      rangeQueryBuilder.gt(item.getModel().getValue());
+	      builder.add(rangeQueryBuilder);
+	    }
+	    if (item.getModel().getOperator().value().equals(Operator.GTE.value())) {
+	      RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+	      rangeQueryBuilder.gte(item.getModel().getValue());
+	      builder.add(rangeQueryBuilder);
+	    }
+	    if (item.getModel().getOperator().value().equals(Operator.LT.value())) {
+	      RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+	      rangeQueryBuilder.lt(item.getModel().getValue());
+	      builder.add(rangeQueryBuilder);
+	    }
+	    if (item.getModel().getOperator().value().equals(Operator.LTE.value())) {
+	      RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+	      rangeQueryBuilder.lte(item.getModel().getValue());
+	      builder.add(rangeQueryBuilder);
+	    }
+	    if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
+	      TermQueryBuilder termQueryBuilder =
+	          new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
+	      builder.add(termQueryBuilder);
+	    }
+	    if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
+	      BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
+	      boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
+	          .getValue()));
+	      builder.add(boolQueryBuilderIn);
+	    }
+	    return builder;
+	  }
+	
+	public static List<QueryBuilder> numericFilterPivot (com.synchronoss.querybuilder.model.pivot.Filter item, List<QueryBuilder> builder)
+    {
+     
+      if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
+        RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+        rangeQueryBuilder.lte(item.getModel().getValue());
+        rangeQueryBuilder.gte(item.getModel().getOtherValue());
+        builder.add(rangeQueryBuilder);
+      }
+      if (item.getModel().getOperator().value().equals(Operator.GT.value())) {
+        RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+        rangeQueryBuilder.gt(item.getModel().getValue());
+        builder.add(rangeQueryBuilder);
+      }
+      if (item.getModel().getOperator().value().equals(Operator.GTE.value())) {
+        RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+        rangeQueryBuilder.gte(item.getModel().getValue());
+        builder.add(rangeQueryBuilder);
+      }
+      if (item.getModel().getOperator().value().equals(Operator.LT.value())) {
+        
+        RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+        rangeQueryBuilder.lt(item.getModel().getValue());
+        builder.add(rangeQueryBuilder);
+      }
+      if (item.getModel().getOperator().value().equals(Operator.LTE.value())) {
+        RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+        rangeQueryBuilder.lte(item.getModel().getValue());
+        builder.add(rangeQueryBuilder);
+      }
+      if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
+        TermQueryBuilder termQueryBuilder =
+            new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
+        builder.add(termQueryBuilder);
+      }
+      if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
+        BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
+        boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
+            .getValue()));
+        builder.add(boolQueryBuilderIn);
+      }
+      return builder;
+    }
 	
 }
