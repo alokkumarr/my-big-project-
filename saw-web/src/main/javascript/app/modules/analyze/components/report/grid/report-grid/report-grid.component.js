@@ -217,7 +217,7 @@ export const ReportGridComponent = {
       forEach(data, data => {
         forEach(keys, key => {
           if (moment(data[key], formats, true).isValid()) {
-            data[key] = moment(data[key]).utcOffset(new Date().getTimezoneOffset()).format('MM/DD/YYYY');
+            data[key] = moment(data[key]).format('MM/DD/YYYY');
           }
         });
       });
