@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Get app_home (with version number)
 source /tmp/.saw-service.tmp.env || exit
@@ -9,7 +9,7 @@ mkdir -m 755 -p /etc/saw
 
 chown -R mapr:mapr ${app_home}
 chmod 750 ${app_home}/bin ${app_home}/conf ${app_home}/lib ${app_home}/sparklib
-chmod 755 ${app_home} /var/saw /var/saw/service /var/saw/service/log /var/saw/service/run /var/saw/service/data
+chmod 755 ${app_home} /var/saw /var/saw/service /var/saw/service/run /var/saw/service/data
 
 ( cd /opt/saw; rm -f service; ln -s $(basename ${app_home}) service )
 

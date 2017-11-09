@@ -172,7 +172,7 @@ export const ReportGridComponent = {
         };
         if (NUMBER_TYPES.includes(column.type)) {
           field.format = {
-            type: 'decimal',
+            type: 'fixedPoint',
             precision: 2
           };
         }

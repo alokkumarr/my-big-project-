@@ -1,5 +1,6 @@
 const webpackHelper = require('./webpack.helper');
 
+const fs = require('fs');
 const async = require('async');
 const git = require('git-rev');
 const moment = require('moment');
@@ -51,4 +52,17 @@ class WebpackBuildVersion {
   }
 }
 
-module.exports = WebpackBuildVersion;
+exports.WebpackBuildVersion = WebpackBuildVersion;
+exports.gitDescription = () => {
+  try {
+    let data = fs.readFileSync(webpackHelper.root('target/classes/git.properties'));
+    data = data.toString();
+    const version = data.match(/git\.commit\.id\.describe=(.*)/);
+    return (version && version.length > 1 ?
+      version[1] :
+      JSON.stringify(version)
+    );
+  } catch (err) {
+    return err.message;
+  }
+};

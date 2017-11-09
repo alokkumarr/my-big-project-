@@ -1,32 +1,41 @@
-<div layout="row" layout-align="center center">
-  <md-icon
-    md-font-icon="icon-calendar">
-  </md-icon>
-  <md-input-container flex-gt-xs>
-    <md-datepicker
-      required
-      md-max-date="$ctrl.tempModel.lte"
-      ng-model="$ctrl.tempModel.gte"
-      ng-change="$ctrl.onModelChange()"
-      md-hide-icons="all" md-open-on-focus
-      md-placeholder="mm/dd/yyyy"
+<div layout="column" layout-align="center center">
+    <md-input-container>
+        <md-select ng-model="$ctrl.tempModel.preset" ng-change="$ctrl.onPresetSelected()">
+          <md-option ng-repeat="preset in $ctrl.presets" ng-value="preset.value">
+            {{preset.label}}
+          </md-option>
+        </md-select>
+      </md-input-container>
+  <div layout="row" layout-align="center center" ng-if="$ctrl.tempModel.preset === 'CUSTOM'">
+    <md-icon
+      md-font-icon="icon-calendar">
+    </md-icon>
+    <md-input-container flex-gt-xs>
+      <md-datepicker
+        required
+        md-max-date="$ctrl.tempModel.lte"
+        ng-model="$ctrl.tempModel.gte"
+        ng-change="$ctrl.onModelChange()"
+        md-hide-icons="all" md-open-on-focus
+        md-placeholder="mm/dd/yyyy"
 
-    ></md-datepicker>
-  </md-input-container>
-  <div style="width: 20px;padding: 0 3px; transform: rotate(180deg);">
-    <i class="icon-arrow-left"></i>
+      ></md-datepicker>
+    </md-input-container>
+    <div style="width: 20px;padding: 0 3px; transform: rotate(180deg);">
+      <i class="icon-arrow-left"></i>
+    </div>
+    <md-icon
+      md-font-icon="icon-calendar">
+    </md-icon>
+    <md-input-container flex-gt-xs>
+      <md-datepicker
+        required
+        md-min-date="$ctrl.tempModel.gte"
+        ng-model="$ctrl.tempModel.lte"
+        ng-change="$ctrl.onModelChange()"
+        md-hide-icons="all" md-open-on-focus
+        md-placeholder="mm/dd/yyyy"
+      ></md-datepicker>
+    </md-input-container>
   </div>
-  <md-icon
-    md-font-icon="icon-calendar">
-  </md-icon>
-  <md-input-container flex-gt-xs>
-    <md-datepicker
-      required
-      md-min-date="$ctrl.tempModel.gte"
-      ng-model="$ctrl.tempModel.lte"
-      ng-change="$ctrl.onModelChange()"
-      md-hide-icons="all" md-open-on-focus
-      md-placeholder="mm/dd/yyyy"
-    ></md-datepicker>
-  </md-input-container>
 </div>

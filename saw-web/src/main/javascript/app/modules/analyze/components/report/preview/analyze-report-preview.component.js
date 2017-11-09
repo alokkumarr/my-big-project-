@@ -1,5 +1,3 @@
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-
 import * as template from './analyze-report-preview.component.html';
 import style from './analyze-report-preview.component.scss';
 
@@ -18,7 +16,6 @@ export const AnalyzeReportPreviewComponent = {
       this._AnalyzeService = AnalyzeService;
 
       this.MORE_ROWS_COUNT = 500;
-      this.requester = new BehaviorSubject({});
     }
 
     $onInit() {
