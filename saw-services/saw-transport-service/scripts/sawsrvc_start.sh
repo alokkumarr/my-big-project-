@@ -145,7 +145,7 @@ declare -r app_classpath="$conf_dir:$lib_classpath"
 vlog app_classpath: $app_classpath
 
 declare -r java_args=$( echo \
-    $java_opts -Xmx4096m -Xms512m \
+    $java_opts \
     -Dhttp.port=$SAW_SERVICE_PORT \
     -Dpidfile.path=$pidfile_path \
     -Duser.dir=${user_dir} \
