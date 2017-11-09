@@ -3,12 +3,6 @@ import * as map from 'lodash/map';
 import * as omit from 'lodash/fp/omit';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
-import * as flatMap from 'lodash/flatMap';
-import * as keys from 'lodash/keys';
-import * as isArray from 'lodash/isArray';
-import * as reduce from 'lodash/reduce';
-import * as join from 'lodash/join';
-import json2csv from 'json2csv';
 import * as moment from 'moment';
 import * as isUndefined from 'lodash/isUndefined';
 
