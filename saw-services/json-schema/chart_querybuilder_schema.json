@@ -117,11 +117,14 @@
                       "YTD",
                       "MTD",
                       "LTM",
+                      "LSM",
                       "LM",
                       "LQ",
+                      "LW",
                       "TW",
-                      "BTW",
- 		               "LTW"
+                      "LTW",
+                    "LSW"
+
                     ]	
                   },
                   "format": {

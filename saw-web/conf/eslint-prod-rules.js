@@ -7,6 +7,7 @@ module.exports = {
     __DEVELOPMENT__: true,
     __PRODUCTION__: true,
     __MOCK__: true,
+    __VERSION__: true,
     expect: true,
     browser: true,
     element: true,

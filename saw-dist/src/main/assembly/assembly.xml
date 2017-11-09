@@ -8,6 +8,22 @@
     <format>tgz</format>
   </formats>
   <baseDirectory>${project.parent.artifactId}</baseDirectory>
+  <moduleSets>
+    <moduleSet>
+      <useAllReactorProjects>true</useAllReactorProjects>
+      <includeSubModules>false</includeSubModules>
+      <includes>
+        <include>com.sncr:saw-security</include>
+        <include>com.synchronoss.saw:saw-services-dist</include>
+        <include>com.synchronoss:bda-saw</include>
+      </includes>
+      <binaries>
+        <attachmentClassifier>bin</attachmentClassifier>
+        <includeDependencies>false</includeDependencies>
+        <outputDirectory>modules</outputDirectory>
+      </binaries>
+    </moduleSet>
+  </moduleSets>
   <fileSets>
     <fileSet>
       <directory>${project.basedir}/src/main/doc</directory>

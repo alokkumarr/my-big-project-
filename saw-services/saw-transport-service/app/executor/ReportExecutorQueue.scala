@@ -106,7 +106,7 @@ class ReportExecutorQueue(val executorType: String) {
     log.debug("Receive message poll: {}", executorType)
     val pollTimeout = 60 * 60 * 1000
     val records = consumer.poll(pollTimeout)
-    records.asScala.foreach(record => {
+    val executions = records.asScala.map(record => {
       log.debug("Received message: {} {}", executorType, record: Any);
       val Array(executionType, analysisId, resultId, query) = record.value.split(",", 4)
       val executionTypeEnum = executionType match {
@@ -115,12 +115,30 @@ class ReportExecutorQueue(val executorType: String) {
         case "scheduled" => ExecutionType.scheduled
         case obj => throw new RuntimeException("Unknown execution type: " + obj)
       }
-      execute(analysisId, resultId, query, executionTypeEnum)
+      /* Save execution as a function to be invoked only after MapR streams
+       * consumer has been closed */
+      () => execute(analysisId, resultId, query, executionTypeEnum)
     })
+    /* Close MapR streams consumer before starting to execute, to unblock
+     * other consumers that need to read messages from the same
+     * partition */
+    log.debug("Committing consumer offsets")
+    consumer.commitSync()
+    log.debug("Closing consumer")
+    consumer.close()
+    /* Start executions */
+    log.debug("Executing queries")
+    executions.foreach(_())
   }
 
   private def execute(analysisId: String, resultId: String, query: String, executionType: ExecutionType) {
-    val analysis = new Analysis(analysisId)
-    analysis.executeAndWait(executionType, query, resultId)
+    try {
+      log.debug("Executing analysis {}, result {}", analysisId, resultId: Any)
+      val analysis = new Analysis(analysisId)
+      analysis.executeAndWait(executionType, query, resultId)
+    } catch {
+      case e: Exception =>
+        log.error("Error while executing analysis " + analysisId, e)
+    }
   }
 }
