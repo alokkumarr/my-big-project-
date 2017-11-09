@@ -55,7 +55,7 @@ export const DateFilterComponent = {
       */
       this.model = this.model || {};
       this.tempModel = {
-        preset: this.model.preset,
+        preset: (this.model.gte || this.model.lte) ? 'CUSTOM' : this.model.preset || null,
         gte: this.model.gte ? new Date(this.model.gte) : '',
         lte: this.model.lte ? new Date(this.model.lte) : ''
       };
