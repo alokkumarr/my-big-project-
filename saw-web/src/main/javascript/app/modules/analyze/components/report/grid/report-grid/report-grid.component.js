@@ -5,6 +5,7 @@ import * as forEach from 'lodash/forEach';
 import * as remove from 'lodash/remove';
 import * as isUndefined from 'lodash/isUndefined';
 import * as $ from 'jquery';
+import * as moment from 'moment';
 
 import * as template from './report-grid.component.html';
 import style from './report-grid.component.scss';
@@ -36,7 +37,6 @@ export const ReportGridComponent = {
 
     $onInit() {
       this.reportGridNode.setGridComponent(this);
-
       this.settings = assign(this.settings, {
         gridConfig: this._dxDataGridService.mergeWithDefaultConfig({
           onInitialized: this.onGridInitialized.bind(this),
@@ -76,6 +76,7 @@ export const ReportGridComponent = {
     onContextMenuPreparing(e) {
       if (e.target === 'header') {
         e.items = [];
+
         e.items.push({
           text: 'Rename',
           icon: 'grid-menu-item icon-edit',
@@ -147,9 +148,14 @@ export const ReportGridComponent = {
 
     updateColumns(columns) {
       this.columns = columns;
-
       if (this._gridInstance) {
-        this._gridInstance.option('columns', this.prepareGridColumns(this.columns));
+        const columns = this.prepareGridColumns(this.columns);
+        forEach(columns, column => {
+          if (column.dataType === 'date') {
+            column.dataType = 'string';
+          }
+        });
+        this._gridInstance.option('columns', columns);
       }
     }
 
@@ -197,8 +203,25 @@ export const ReportGridComponent = {
 
     onSourceUpdate() {
       if (this._gridInstance) {
-        this._gridInstance.option('dataSource', this.source);
+        const sourceData = this.source;
+        this._gridInstance.option('dataSource', this.formatDates(sourceData));
       }
+    }
+
+    formatDates(data) {
+      const keys = Object.keys(data[0]);
+      const formats = [
+        moment.ISO_8601,
+        'MM/DD/YYYY  :)  HH*mm*ss'
+      ];
+      forEach(data, data => {
+        forEach(keys, key => {
+          if (moment(data[key], formats, true).isValid()) {
+            data[key] = moment(data[key]).format('MM/DD/YYYY');
+          }
+        });
+      });
+      return data;
     }
 
     refreshGrid() {
