@@ -1,5 +1,6 @@
 import * as map from 'lodash/map';
 import DataSource from 'devextreme/data/data_source';
+import * as forEach from 'lodash/forEach';
 
 import * as template from './report-grid-display.component.html';
 
@@ -29,7 +30,6 @@ export const ReportGridDisplayComponent = {
       const columns = this._getDxColumns(this.columns);
 
       const gridSelector = '.report-dx-grid.report-dx-grid-display';
-
       this.gridConfig = this._dxDataGridService.mergeWithDefaultConfig({
         columns,
         remoteOperations: {
@@ -80,8 +80,8 @@ export const ReportGridDisplayComponent = {
 
     _getDxColumns(columns) {
       return map(columns, column => {
-        if (column.type === 'date') {
-          column.type = 'string-date';
+        if (column.type === 'string-date') {
+          column.type = 'date';
         }
         const field = {
           alignment: 'left',
@@ -104,6 +104,11 @@ export const ReportGridDisplayComponent = {
     $onChanges() {
       if (this._gridInstance) {
         const columns = this._getDxColumns(this.columns);
+        forEach(columns, column => {
+          if (column.dataType === 'date') {
+            column.dataType = 'string';
+          }
+        });
         this._gridInstance.option('columns', columns);
         // this._gridInstance.refresh();
       }

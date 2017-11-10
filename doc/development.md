@@ -23,25 +23,36 @@ in the [Mac setup instructions](development-mac.md).
 
 # Building and testing
 
-To build and test the project execute the following command:
+To build and test the project execute the following commands:
 
+        $ cd saw
         $ mvn verify
 
-The release package will be located at `target/saw-*.tgz`.
+This includes running both unit and integration tests.  The release
+package will be located at `saw-dist/target/saw-*.tgz`.
 
 Note: The Docker daemon must be running while building to ensure the
-integration tests can be run.
+integration tests can run.
 
-# Running full system locally in a container
+# Running full system locally
 
-To build and run a Docker container that runs the SAW system in
-development mode, execute the following command:
+To build and run the full SAW system locally in development mode,
+execute the following commands to start SAW in Docker containers:
 
-        $ mvn verify -P docker-keep
+        $ cd saw
+        $ mvn package
+        $ mvn -pl saw-dist docker:build docker:run -P docker-saw
 
-After that the SAW Web application can be accessed
-at [http://localhost/](http://localhost/).  To enter a shell inside
-the container, execute the following command:
+Note: The Docker daemon must be running to be able to build and run
+containers.  Also, the first run will take longer as Docker downloads
+and builds images that will subsequently be available in the image
+build cache.
+
+After the above command has completed the SAW Web application can be
+accessed at [http://localhost/](http://localhost/).
+
+To enter a shell inside the main SAW container, execute the following
+command:
 
         $ docker exec -it saw bash
 
@@ -54,22 +65,13 @@ starting points to investigate installed SAW services and packages:
         $ journalctl -u saw-*
         $ rpm -qa saw-*
 
-To stop the Docker containers, execute the following command:
+To stop the SAW containers, simply send an interrupt to the Maven
+process used to start the containers.  In case containers have been
+left behind and prevent running new SAW containers, existing
+containers can be cleared out by executing the following command:
 
+        $ cd saw
         $ mvn -pl saw-dist docker:stop
-
-To rerun deployment using an already built package, execute the
-following command:
-
-        $ mvn -pl saw-dist docker:build docker:start -P docker-keep
-
-The produce more verbose output from Docker container building and
-running, add the following to the command-line:
-
-        $ mvn [...] -Ddocker.verbose -Ddocker.showLogs 
-
-Note: The Docker daemon must be running to be able to build and run
-containers.
 
 # Continuous integration
 
