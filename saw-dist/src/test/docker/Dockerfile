@@ -65,6 +65,8 @@ RUN systemctl enable saw-deploy
 # Add SAW test metrics
 ADD saw-metrics /root/saw-metrics/
 RUN /root/saw-metrics/saw-metrics generate
+COPY saw-metrics/saw-metrics.service /etc/systemd/system/
+RUN systemctl enable saw-metrics
 
 # Add systemd journal gateway for browsing logs
 RUN yum -y -q --nogpgcheck install systemd-journal-gateway
