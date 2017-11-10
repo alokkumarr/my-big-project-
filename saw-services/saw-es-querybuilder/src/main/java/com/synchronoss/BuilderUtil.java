@@ -212,8 +212,8 @@ public class BuilderUtil
      DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
      LocalDateTime startOfWeek =
          last2Week.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(2)));
-     dynamicConvertor.setLte(startOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
-     dynamicConvertor.setGte(startOfWeek.plusWeeks(2).with(TemporalAdjusters.previous(DayOfWeek.SUNDAY)).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+     dynamicConvertor.setLte(startOfWeek.plusWeeks(2).with(TemporalAdjusters.previous(DayOfWeek.SUNDAY)).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+     dynamicConvertor.setGte(startOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
      break;
    }
       default : throw new IllegalArgumentException(dynamic + " not present");

@@ -144,8 +144,8 @@ public class TransportUtils {
                 DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
                 LocalDateTime startOfWeek =
                         last2Week.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(2)));
-                dynamicConvertor.setLte(startOfWeek.plusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
-                dynamicConvertor.setGte(startOfWeek.plusWeeks(2).with(TemporalAdjusters.previous(DayOfWeek.SUNDAY)).minusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+                dynamicConvertor.setLte(startOfWeek.plusWeeks(2).with(TemporalAdjusters.previous(DayOfWeek.SUNDAY)).plusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setGte(startOfWeek.minusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
             default : throw new IllegalArgumentException(dynamic + " not present");
