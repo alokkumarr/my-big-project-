@@ -74,7 +74,7 @@ export const DateFilterComponent = {
       this.dateFormat = 'yyyy-MM-dd HH:ss:mm';
       this.updatedDate.gte = this._$filter('date')(this.tempModel.gte, this.dateFormat);
       this.updatedDate.lte = this._$filter('date')(this.tempModel.lte, this.dateFormat);
-      this.updatedDate.preset = '';
+      this.updatedDate.preset = 'NA';
       this.onChange({model: this.updatedDate});
     }
   }
