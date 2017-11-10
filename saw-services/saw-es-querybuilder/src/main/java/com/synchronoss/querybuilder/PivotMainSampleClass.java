@@ -8,7 +8,6 @@ import java.util.List;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
@@ -26,7 +25,6 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
 import com.synchronoss.SAWElasticTransportService;
 import com.synchronoss.querybuilder.model.chart.Filter.Type;
-import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 import com.synchronoss.querybuilder.model.pivot.SqlBuilder.BooleanCriteria;
 
 public class PivotMainSampleClass {
@@ -97,23 +95,7 @@ public class PivotMainSampleClass {
         if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
             || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) 
         {
-          if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            rangeQueryBuilder.lte(item.getModel().getOtherValue());
-            rangeQueryBuilder.gte(item.getModel().getValue());
-            builder.add(rangeQueryBuilder);
-          }
-          if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
-            TermQueryBuilder termQueryBuilder =
-                new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
-            builder.add(termQueryBuilder);
-          }
-          if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
-            BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
-            boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
-                .getValue()));
-            builder.add(boolQueryBuilderIn);
-          }
+          builder = QueryBuilderUtil.numericFilterPivot(item, builder);
         }
      }
       if (item.getIsRuntimeFilter().value() && item.getModel()!=null)
@@ -132,23 +114,7 @@ public class PivotMainSampleClass {
         if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
             || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) 
         {
-          if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            rangeQueryBuilder.lte(item.getModel().getOtherValue());
-            rangeQueryBuilder.gte(item.getModel().getValue());
-            builder.add(rangeQueryBuilder);
-          }
-          if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
-            TermQueryBuilder termQueryBuilder =
-                new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
-            builder.add(termQueryBuilder);
-          }
-          if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
-            BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
-            boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
-                .getValue()));
-            builder.add(boolQueryBuilderIn);
-          }
+          builder = QueryBuilderUtil.numericFilterPivot(item, builder);
         }
       }
     }
