@@ -8,6 +8,7 @@ import java.util.List;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
@@ -23,8 +24,12 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
+import com.synchronoss.BuilderUtil;
+import com.synchronoss.DynamicConvertor;
 import com.synchronoss.SAWElasticTransportService;
 import com.synchronoss.querybuilder.model.chart.Filter.Type;
+import com.synchronoss.querybuilder.model.chart.Model;
+import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 import com.synchronoss.querybuilder.model.pivot.SqlBuilder.BooleanCriteria;
 
 public class PivotMainSampleClass {
@@ -82,10 +87,20 @@ public class PivotMainSampleClass {
     {
       if (!item.getIsRuntimeFilter().value()){
         if (item.getType().value().equals(Type.DATE.value()) || item.getType().value().equals(Type.TIMESTAMP.value())) {
-          RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-          rangeQueryBuilder.lte(item.getModel().getLte());
-          rangeQueryBuilder.gte(item.getModel().getGte());
-          builder.add(rangeQueryBuilder);
+          if (item.getModel().getPreset()!=null  && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString()))
+          {
+            DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.lte(dynamicConvertor.getLte());
+            rangeQueryBuilder.gte(dynamicConvertor.getGte());
+            builder.add(rangeQueryBuilder);
+          }
+          else {
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.lte(item.getModel().getLte());
+            rangeQueryBuilder.gte(item.getModel().getGte());
+            builder.add(rangeQueryBuilder);
+          }
         }
         if (item.getType().value().equals(Type.STRING.value())) {
           TermsQueryBuilder termsQueryBuilder =
@@ -95,16 +110,42 @@ public class PivotMainSampleClass {
         if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
             || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) 
         {
-          builder = QueryBuilderUtil.numericFilterPivot(item, builder);
+          if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.lte(item.getModel().getOtherValue());
+            rangeQueryBuilder.gte(item.getModel().getValue());
+            builder.add(rangeQueryBuilder);
+          }
+          if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
+            TermQueryBuilder termQueryBuilder =
+                new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
+            builder.add(termQueryBuilder);
+          }
+          if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
+            BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
+            boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
+                .getValue()));
+            builder.add(boolQueryBuilderIn);
+          }
         }
      }
       if (item.getIsRuntimeFilter().value() && item.getModel()!=null)
       {
         if (item.getType().value().equals(Type.DATE.value()) || item.getType().value().equals(Type.TIMESTAMP.value())) {
-          RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-          rangeQueryBuilder.lte(item.getModel().getLte());
-          rangeQueryBuilder.gte(item.getModel().getGte());
-          builder.add(rangeQueryBuilder);
+          if (item.getModel().getPreset()!=null && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString()))
+          {
+            DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.lte(dynamicConvertor.getLte());
+            rangeQueryBuilder.gte(dynamicConvertor.getGte());
+            builder.add(rangeQueryBuilder);
+          }
+          else {
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.lte(item.getModel().getLte());
+            rangeQueryBuilder.gte(item.getModel().getGte());
+            builder.add(rangeQueryBuilder);
+          }
         }
         if (item.getType().value().equals(Type.STRING.value())) {
           TermsQueryBuilder termsQueryBuilder =
@@ -114,7 +155,23 @@ public class PivotMainSampleClass {
         if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
             || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) 
         {
-          builder = QueryBuilderUtil.numericFilterPivot(item, builder);
+          if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.lte(item.getModel().getOtherValue());
+            rangeQueryBuilder.gte(item.getModel().getValue());
+            builder.add(rangeQueryBuilder);
+          }
+          if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
+            TermQueryBuilder termQueryBuilder =
+                new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
+            builder.add(termQueryBuilder);
+          }
+          if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
+            BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
+            boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
+                .getValue()));
+            builder.add(boolQueryBuilderIn);
+          }
         }
       }
     }

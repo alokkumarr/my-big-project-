@@ -209,7 +209,7 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
   private def filterDate(filterType: String, tableName: String,
     columnName: String, lte: String, gte: String): JObject = {
     filterCommon(filterType, tableName, columnName, null).merge(
-      ("model", ("lte", lte) ~ ("gte", gte) ~ ("preset","")): JObject)
+      ("model", ("lte", lte) ~ ("gte", gte) ~ ("preset","NA")): JObject)
   }
 
   

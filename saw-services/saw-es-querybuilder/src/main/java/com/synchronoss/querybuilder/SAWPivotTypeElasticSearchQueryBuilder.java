@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.BuilderUtil;
 import com.synchronoss.DynamicConvertor;
+import com.synchronoss.querybuilder.model.chart.Model;
 import com.synchronoss.querybuilder.model.chart.Filter.Type;
 import com.synchronoss.querybuilder.model.pivot.SqlBuilder;
 import com.synchronoss.querybuilder.model.pivot.SqlBuilder.BooleanCriteria;
@@ -106,7 +107,7 @@ public String getJsonString() {
     {
       if (!item.getIsRuntimeFilter().value()){
         if (item.getType().value().equals(Type.DATE.value()) || item.getType().value().equals(Type.TIMESTAMP.value())) {
-          if (item.getModel().getPreset()!=null)
+          if (item.getModel().getPreset()!=null && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString()))
           {
             DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
@@ -138,7 +139,7 @@ public String getJsonString() {
       if (item.getIsRuntimeFilter().value() && item.getModel()!=null)
       {
         if (item.getType().value().equals(Type.DATE.value()) || item.getType().value().equals(Type.TIMESTAMP.value())) {
-          if (item.getModel().getPreset()!=null)
+          if (item.getModel().getPreset()!=null && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString()))
           {
             DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
