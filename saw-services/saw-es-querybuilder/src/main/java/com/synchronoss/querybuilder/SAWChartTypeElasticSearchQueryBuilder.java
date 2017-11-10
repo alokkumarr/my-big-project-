@@ -22,6 +22,7 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.BuilderUtil;
 import com.synchronoss.DynamicConvertor;
 import com.synchronoss.querybuilder.model.chart.Filter.Type;
+import com.synchronoss.querybuilder.model.chart.Model;
 import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 import com.synchronoss.querybuilder.model.pivot.SqlBuilder.BooleanCriteria;
 
@@ -109,7 +110,7 @@ class SAWChartTypeElasticSearchQueryBuilder {
           if (item.getType().value().equals(Type.DATE.value())
               || item.getType().value().equals(Type.TIMESTAMP.value())) 
           {
-            if (item.getModel().getPreset()!=null)
+            if (item.getModel().getPreset()!=null && !item.getModel().getPreset().equals(Model.Preset.NA.toString()))
             {
               DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
               RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
@@ -177,7 +178,7 @@ class SAWChartTypeElasticSearchQueryBuilder {
           if (item.getType().value().equals(Type.DATE.value())
               || item.getType().value().equals(Type.TIMESTAMP.value())) 
           {
-            if (item.getModel().getPreset()!=null)
+            if (item.getModel().getPreset()!=null && !item.getModel().getPreset().equals(Model.Preset.NA.toString()))
             {
               DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
               RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
