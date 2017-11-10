@@ -16,6 +16,7 @@ import * as fpOmit from 'lodash/fp/omit';
 import * as fpToPairs from 'lodash/fp/toPairs';
 import * as fpMap from 'lodash/fp/map';
 import * as fpMapValues from 'lodash/fp/mapValues';
+import * as fpInvert from 'lodash/fp/invert';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpSortBy from 'lodash/fp/sortBy';
 import * as fpOrderBy from 'lodash/fp/orderBy';
@@ -23,6 +24,8 @@ import * as reduce from 'lodash/reduce';
 import * as concat from 'lodash/concat';
 import * as compact from 'lodash/compact';
 import * as fpGroupBy from 'lodash/fp/groupBy';
+import * as fpUniq from 'lodash/fp/uniq';
+import * as findIndex from 'lodash/findIndex';
 import * as mapValues from 'lodash/mapValues';
 import * as sortBy from 'lodash/sortBy';
 import * as moment from 'moment';
@@ -295,7 +298,7 @@ export class ChartService {
     } else {
       const axesFieldNameMap = this.getAxesFieldNameMap(fields);
       const yField = fields.y[0];
-      series = [this.getSerie(yField, 0)];
+      series = [this.getSerie(yField, 0, fields.y)];
       series[0].data = map(parsedData,
         dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])
       );
@@ -387,13 +390,20 @@ export class ChartService {
     }
   }
 
-  getSerie({alias, displayName, comboType, aggregate}, index) {
+  getSerie({alias, displayName, comboType, aggregate}, index, fields) {
+    const comboGroups = fpPipe(
+      fpMap('comboType'),
+      fpUniq,
+      fpInvert,
+      fpMapValues(parseInt)
+    )(fields);
+
     const splinifiedChartType = this.splinifyChartType(comboType);
     const zIndex = this.getZIndex(comboType);
     return {
       name: alias || `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`,
       type: splinifiedChartType,
-      yAxis: index,
+      yAxis: comboGroups[comboType],
       zIndex,
       data: []
     };
@@ -610,6 +620,47 @@ export class ChartService {
     return changes;
   }
 
+  getYAxesChanges(fields) {
+    const labelHeight = 15;
+    const changes = fpPipe(
+      fpGroupBy('comboType'),
+      fpToPairs,
+      fpMap(([, fields]) => {
+        const titleText = map(fields, field => {
+          return field.alias || `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${field.displayName}`;
+        }).join('<br/>');
+        const isSingleField = fields.length === 1;
+        return {
+          gridLineWidth: 0,
+          opposite: true,
+          columnName: isSingleField ? fields[0].columnName : null,
+          title: {
+            useHtml: true,
+            margin: labelHeight * fields.length,
+            text: titleText,
+            style: isSingleField
+          },
+          labels: {
+            style: isSingleField
+          }
+        };
+      })
+    )(fields);
+
+    forEach(changes, (change, changeIndex) => {
+      if (changeIndex === 0) {
+        change.opposite = false;
+      }
+      if (change.columnName) {
+        const fieldIndex = findIndex(fields, ({columnName}) => columnName === change.columnName);
+        const style = {color: CHART_COLORS[fieldIndex]};
+        change.title.style = change.title.style ? style : null;
+        change.labels.style = change.labels.style ? style : null;
+      }
+    });
+    return changes;
+  }
+
   getBarChangeConfig(type, settings, fields, gridData, opts) {
     const labels = {
       x: get(fields, 'x.alias', get(fields, 'x.displayName', ''))
@@ -620,23 +671,11 @@ export class ChartService {
       data: (opts.labels && opts.labels.x) || labels.x
     }];
 
+    const yAxesChanges = this.getYAxesChanges(fields.y);
+
     changes.push({
       path: 'yAxis',
-      data: map(fields.y, (y, k) => ({
-        gridLineWidth: 0,
-        opposite: k > 0,
-        title: {
-          text: y.alias || `${AGGREGATE_TYPES_OBJ[y.aggregate].label} ${y.displayName}`,
-          style: fields.y.length <= 1 ? null : {
-            color: CHART_COLORS[k]
-          }
-        },
-        labels: {
-          style: fields.y.length <= 1 ? null : {
-            color: CHART_COLORS[k]
-          }
-        }
-      }))
+      data: yAxesChanges
     });
 
     if (!isEmpty(gridData)) {
