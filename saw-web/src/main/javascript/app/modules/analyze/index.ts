@@ -57,7 +57,11 @@ import {AnalyzeChartSettingsComponent} from './components/chart/settings/analyze
 import {AnalyzeChartPreviewComponent} from './components/chart/preview/analyze-chart-preview.component';
 import {CommonModule} from '../../common';
 
-import DesignerDialogComponent from './components/designer-dialog/designer-dialog.component';
+import {
+  DesignerDialogComponent,
+  DesignerHeaderComponent
+} from './components/designer-dialog';
+
 import AnalyzeDialogService from './services/analyze-dialog.service';
 
 export const AnalyzeModule = 'AnalyzeModule';
@@ -117,12 +121,17 @@ angular.module(AnalyzeModule, [
 @NgModule({
   imports: [MaterialModule],
   declarations: [
-    DesignerDialogComponent
+    DesignerDialogComponent,
+    DesignerHeaderComponent
   ],
   entryComponents: [
-    DesignerDialogComponent
+    DesignerDialogComponent,
+    DesignerHeaderComponent
   ],
   providers: [AnalyzeDialogService],
-  exports: [DesignerDialogComponent]
+  exports: [
+    DesignerDialogComponent,
+    DesignerHeaderComponent
+  ]
 })
 export class AnalyzeModuleTs {}

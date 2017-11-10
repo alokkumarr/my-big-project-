@@ -16,12 +16,13 @@ export const AnalyzeNewComponent = {
   },
   styles: [style],
   controller: class AnalyzeNewController {
-    constructor($scope, $mdDialog, AnalyzeService) {
+    constructor($scope, $mdDialog, AnalyzeService, AnalyzeDialogService) {
       'ngInject';
       this._$scope = $scope;
       this._$mdDialog = $mdDialog;
       this._AnalyzeService = AnalyzeService;
       this.methods = ANALYSIS_METHODS;
+      this._AnalyzeDialogService = AnalyzeDialogService;
     }
 
     $onInit() {
@@ -49,6 +50,21 @@ export const AnalyzeNewComponent = {
           set(method, 'disabled', !isSupported);
         });
       });
+    }
+
+    openUpgradedModal() {
+      const semanticId = this.selectedMetric.id;
+      const metricName = this.selectedMetric.metricName;
+      const model = {
+        type: AnalyseTypes.Report,
+        name: 'Untitled Analysis',
+        description: '',
+        categoryId: this.subCategory,
+        semanticId,
+        metricName,
+        scheduled: null
+      };
+      this._AnalyzeDialogService.openNewAnalysisDialog(model);
     }
 
     createAnalysis() {

@@ -1,3 +1,33 @@
-.mat-dialog-container {
+md-dialog-container.mat-dialog-container {
   max-width: 100vw !important;
+  padding: 0;
+}
+
+designer-dialog {
+  background-color: white;
+  display: grid;
+  grid-template:
+    "header header" 10vh
+    "data-settings toolbar" 10vh
+    "data-settings content" 80vh
+    / 20% 80%;
+
+  .designer__header {
+    grid-area: header;
+  }
+
+  .designer__toolbar {
+    grid-area: toolbar;
+    background-color: blue;
+  }
+
+  .designer__data-settings {
+    grid-area: data-settings;
+    background-color: green;
+  }
+
+  .designer__content {
+    grid-area: content;
+    background-color: brown;
+  }
 }

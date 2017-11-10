@@ -8,7 +8,6 @@ require('./designer-dialog.component.scss');
   template
 })
 export default class DesignerDialogComponent {
-
   constructor(
     public dialogRef: MatDialogRef<DesignerDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any) { }
