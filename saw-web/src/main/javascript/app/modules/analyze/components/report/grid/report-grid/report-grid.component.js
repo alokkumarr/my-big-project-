@@ -11,7 +11,7 @@ import 'moment-timezone';
 
 import * as template from './report-grid.component.html';
 import style from './report-grid.component.scss';
-import {NUMBER_TYPES, DATE_TYPES} from '../../../../consts';
+import {NUMBER_TYPES, DATE_TYPES, BACKEND_TIMEZONE} from '../../../../consts';
 
 // const MIN_ROWS_TO_SHOW = 5;
 const COLUMN_WIDTH = 175;
@@ -228,7 +228,7 @@ export const ReportGridComponent = {
       ];
       forEach(data, row => {
         forEach(keys, key => {
-          const date = moment.tz(row[key], formats, true, 'America/Los_Angeles');
+          const date = moment.tz(row[key], formats, true, BACKEND_TIMEZONE);
           if (date.isValid()) {
             row[key] = date.toDate();
           }
