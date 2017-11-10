@@ -73,6 +73,22 @@ containers can be cleared out by executing the following command:
         $ cd saw
         $ mvn -pl saw-dist docker:stop
 
+# Editing datasets in local SAW deployment
+
+When deploying SAW locally, it is possible to edit datasets and have
+changes immediately reflected in analysis executions.  This can be
+useful for exploring how different SAW features behave with varying
+data.  For example, to edit the sample report, execute the following
+commands:
+
+        $ docker exec -it saw bash
+        $ vi /root/saw-metric/test.json
+        $ hadoop fs put -f /root/saw-metric/test.json /
+
+The first step opens a shell inside the SAW container, the second step
+edits the data JSON file and the third and last step copies the data
+file into the data lake.
+
 # Continuous integration
 
 After a pull request has been merged, the changes will be picked up
