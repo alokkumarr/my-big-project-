@@ -2,6 +2,7 @@ import * as angular from 'angular';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { NgModule } from '@angular/core';
+import { FlexLayoutModule } from '@angular/flex-layout';
 import {MaterialModule} from '../../material.module';
 
 import {routesConfig} from './routes';
@@ -119,7 +120,10 @@ angular.module(AnalyzeModule, [
   .component('analyzeSaveDialog', AnalyzeSaveDialogComponent);
 
 @NgModule({
-  imports: [MaterialModule],
+  imports: [
+    MaterialModule,
+    FlexLayoutModule
+  ],
   declarations: [
     DesignerDialogComponent,
     DesignerHeaderComponent

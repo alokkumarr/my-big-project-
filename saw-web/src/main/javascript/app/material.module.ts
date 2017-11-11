@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, Injectable } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   MatButtonModule,
@@ -9,12 +9,12 @@ import {
   MatFormFieldModule,
   MatProgressBarModule,
   MatChipsModule,
-  NoConflictStyleCompatibilityMode
+  NoConflictStyleCompatibilityMode,
+  MatIconRegistry
 } from '@angular/material';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
 import '../../../../themes/_angular_next.scss';
-
 @NgModule({
   imports: [
     NoConflictStyleCompatibilityMode,
@@ -28,6 +28,7 @@ import '../../../../themes/_angular_next.scss';
     MatProgressBarModule,
     MatChipsModule
   ],
+  providers: [MatIconRegistry],
   exports: [
     MatButtonModule,
     MatIconModule,

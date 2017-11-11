@@ -1,4 +1,15 @@
-<button mat-button>
-  <mat-icon>icon-arrow-left</mat-icon>
-</button>
-<div>{{analysis.name}}</div>
+<div fxLayout="row"
+     fxLayoutAlign="space-between"
+     class="container__header">
+  <div fxLayout="row" fxLayoutAlign="start">
+    <button mat-button>
+      <mat-icon fontIcon="icon-arrow-left"></mat-icon>
+    </button>
+    <div>{{analysis.name}}</div>
+  </div>
+  <button mat-button
+          color="primary"
+          class="header-action--right">
+    <ng-container i18n>Save</ng-container>
+  </button>
+</div>
