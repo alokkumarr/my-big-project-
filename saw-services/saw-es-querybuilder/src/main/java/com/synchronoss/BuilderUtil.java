@@ -10,10 +10,6 @@ import java.time.temporal.WeekFields;
 import java.util.List;
 import java.util.Locale;
 
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.query.TermQueryBuilder;
 import org.threeten.extra.YearQuarter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,8 +21,6 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
-import com.synchronoss.querybuilder.model.chart.Filter;
-import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 
 /**
  * @author spau0004
