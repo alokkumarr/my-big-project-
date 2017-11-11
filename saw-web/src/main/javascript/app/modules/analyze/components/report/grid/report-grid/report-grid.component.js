@@ -1,15 +1,17 @@
 import * as assign from 'lodash/assign';
 import * as map from 'lodash/map';
+import * as isEmpty from 'lodash/isEmpty';
 import * as find from 'lodash/find';
 import * as forEach from 'lodash/forEach';
 import * as remove from 'lodash/remove';
 import * as isUndefined from 'lodash/isUndefined';
 import * as $ from 'jquery';
 import * as moment from 'moment';
+import 'moment-timezone';
 
 import * as template from './report-grid.component.html';
 import style from './report-grid.component.scss';
-import {NUMBER_TYPES} from '../../../../consts';
+import {NUMBER_TYPES, DATE_TYPES, BACKEND_TIMEZONE} from '../../../../consts';
 
 // const MIN_ROWS_TO_SHOW = 5;
 const COLUMN_WIDTH = 175;
@@ -170,6 +172,11 @@ export const ReportGridComponent = {
           alignment: 'left',
           width: COLUMN_WIDTH
         };
+        if (DATE_TYPES.includes(column.type)) {
+          field.format = {
+            type: 'shortDate'
+          };
+        }
         if (NUMBER_TYPES.includes(column.type)) {
           field.format = {
             type: 'fixedPoint',
@@ -209,15 +216,21 @@ export const ReportGridComponent = {
     }
 
     formatDates(data) {
+      if (isEmpty(data)) {
+        return data;
+      }
       const keys = Object.keys(data[0]);
       const formats = [
         moment.ISO_8601,
+        'YYYY-MM-DD hh:mm:ss',
+        'YYYY-MM-DD',
         'MM/DD/YYYY  :)  HH*mm*ss'
       ];
-      forEach(data, data => {
+      forEach(data, row => {
         forEach(keys, key => {
-          if (moment(data[key], formats, true).isValid()) {
-            data[key] = moment(data[key]).format('MM/DD/YYYY');
+          const date = moment.tz(row[key], formats, true, BACKEND_TIMEZONE);
+          if (date.isValid()) {
+            row[key] = date.toDate();
           }
         });
       });

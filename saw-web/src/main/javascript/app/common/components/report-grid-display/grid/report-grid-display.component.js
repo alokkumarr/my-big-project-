@@ -1,10 +1,13 @@
 import * as map from 'lodash/map';
-import DataSource from 'devextreme/data/data_source';
 import * as forEach from 'lodash/forEach';
+import * as isEmpty from 'lodash/isEmpty';
+import * as moment from 'moment';
+import DataSource from 'devextreme/data/data_source';
+import 'moment-timezone';
 
 import * as template from './report-grid-display.component.html';
 
-import {NUMBER_TYPES} from '../../../consts.js';
+import {NUMBER_TYPES, DATE_TYPES, BACKEND_TIMEZONE} from '../../../consts.js';
 
 const COLUMN_WIDTH = 175;
 const DEFAULT_PAGE_SIZE = 10;
@@ -72,10 +75,34 @@ export const ReportGridDisplayComponent = {
       const store = new DataSource({
         load: options => {
           return this.source({options})
-            .then(({data, count}) => ({data, totalCount: count}));
+            .then(({data, count}) => {
+              return {data: this.formatDates(data), totalCount: count};
+            });
         }
       });
       return store;
+    }
+
+    formatDates(data) {
+      if (isEmpty(data)) {
+        return data;
+      }
+      const keys = Object.keys(data[0]);
+      const formats = [
+        moment.ISO_8601,
+        'YYYY-MM-DD hh:mm:ss',
+        'YYYY-MM-DD',
+        'MM/DD/YYYY  :)  HH*mm*ss'
+      ];
+      forEach(data, row => {
+        forEach(keys, key => {
+          const date = moment.tz(row[key], formats, true, BACKEND_TIMEZONE);
+          if (date.isValid()) {
+            row[key] = date.toDate();
+          }
+        });
+      });
+      return data;
     }
 
     _getDxColumns(columns) {
@@ -91,6 +118,11 @@ export const ReportGridDisplayComponent = {
           dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
           width: COLUMN_WIDTH
         };
+        if (DATE_TYPES.includes(column.type)) {
+          field.format = {
+            type: 'shortDate'
+          };
+        }
         if (NUMBER_TYPES.includes(column.type)) {
           field.format = {
             type: 'fixedPoint',
