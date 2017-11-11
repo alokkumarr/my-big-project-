@@ -105,7 +105,7 @@ public class ChartMainSampleClass {
           if (item.getType().value().equals(Type.DATE.value())
               || item.getType().value().equals(Type.TIMESTAMP.value())) 
           {
-            if (item.getModel().getPreset()!=null && !item.getModel().getPreset().equals(Model.Preset.NA.toString()))
+            if (item.getModel().getPreset()!=null && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString()))
             {
               DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
               RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
@@ -173,7 +173,7 @@ public class ChartMainSampleClass {
           if (item.getType().value().equals(Type.DATE.value())
               || item.getType().value().equals(Type.TIMESTAMP.value())) 
           {
-            if (item.getModel().getPreset()!=null && !item.getModel().getPreset().equals(Model.Preset.NA.toString()))
+            if (item.getModel().getPreset()!=null && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString()))
             {
               DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
               RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
