@@ -67,7 +67,7 @@ public class JwtFilter extends GenericFilterBean {
 					it.remove();
 				}
 				if (!ticket.isValid()) {
-					response.sendError(200, "Token has expired. Please re-login.");
+					response.sendError(401, "Token has expired. Please re-login.");
 				}
 			}
 		}
