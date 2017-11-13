@@ -2,6 +2,8 @@ import * as map from 'lodash/map';
 import * as forEach from 'lodash/forEach';
 import * as template from './date-filter.component.html';
 
+export const CUSTOM_DATE_PRESET_VALUE = 'NA';
+
 export const DateFilterComponent = {
   template,
   bindings: {
@@ -11,6 +13,7 @@ export const DateFilterComponent = {
   controller: class DateFilterController {
     constructor($filter, $translate) {
       this._$filter = $filter;
+      this.CUSTOM_DATE_PRESET_VALUE = CUSTOM_DATE_PRESET_VALUE;
       this.presets = [{
         value: 'TW',
         keyword: 'THIS_WEEK'
@@ -39,7 +42,7 @@ export const DateFilterComponent = {
         value: 'LSM',
         keyword: 'LAST_6_MONTHS'
       }, {
-        value: 'CUSTOM',
+        value: CUSTOM_DATE_PRESET_VALUE,
         keyword: 'CUSTOM'
       }];
       $translate(map(this.presets, 'keyword')).then(translations => {
@@ -54,7 +57,7 @@ export const DateFilterComponent = {
       */
       this.model = this.model || {};
       this.tempModel = {
-        preset: (this.model.gte || this.model.lte) ? 'CUSTOM' : this.model.preset || null,
+        preset: (this.model.gte || this.model.lte) ? CUSTOM_DATE_PRESET_VALUE : this.model.preset || null,
         gte: this.model.gte ? new Date(this.model.gte) : '',
         lte: this.model.lte ? new Date(this.model.lte) : ''
       };
@@ -74,7 +77,7 @@ export const DateFilterComponent = {
       this.dateFormat = 'yyyy-MM-dd HH:ss:mm';
       this.updatedDate.gte = this._$filter('date')(this.tempModel.gte, this.dateFormat);
       this.updatedDate.lte = this._$filter('date')(this.tempModel.lte, this.dateFormat);
-      this.updatedDate.preset = 'NA';
+      this.updatedDate.preset = CUSTOM_DATE_PRESET_VALUE;
       this.onChange({model: this.updatedDate});
     }
   }
