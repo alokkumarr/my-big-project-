@@ -14,7 +14,7 @@ describe('create columnChart type analysis', () => {
   const yAxisName = 'Available MB';
   const filterValue = 'APPLE';
   const groupName = 'Source OS';
-  const metric = 'MCT Content';
+  const metric = 'MCT TMO Session ES';
   const method = 'chart:column';
 
   afterAll(function() {

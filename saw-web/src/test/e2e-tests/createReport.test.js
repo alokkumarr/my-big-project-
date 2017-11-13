@@ -10,26 +10,26 @@ describe('create a new report type analysis', () => {
   const reportName = `e2e report ${(new Date()).toString()}`;
   const reportDescription = 'e2e report description';
   const tables = [{
-    name: 'MCT_SESSION',
+    name: 'MCT_DN_SESSION_SUMMARY',
     fields: [
       'Source OS',
       'Available (MB)',
       'Source Model'
     ]
-  }, {
+  }/*, {
     name: 'MCT_CONTENT_SUMMARY',
     fields: [
       'Available Items'
     ]
-  }];
-  const join = {
+  }*/];
+  /*const join = {
     tableA: tables[0].name,
     fieldA: 'Session Id',
     tableB: tables[1].name,
     fieldB: 'Session Id'
-  };
+  };*/
   const filterValue = 'ANDROID';
-  const metric = 'MCT Events aggregated by session (view)';
+  const metric = 'MCT TMO Session DL';
   const method = 'table:report';
 
   afterAll(function() {
@@ -83,7 +83,7 @@ describe('create a new report type analysis', () => {
       });
     });
 
-    expect(
+    /*expect(
       reportDesigner
         .getJoinlabel(join.tableA, join.fieldA, join.tableB, join.fieldB, 'inner')
         .isPresent()
@@ -97,7 +97,7 @@ describe('create a new report type analysis', () => {
       reportDesigner
         .getJoinlabel(join.tableA, join.fieldA, join.tableB, join.fieldB, 'inner')
         .isPresent()
-    ).toBe(true);
+    ).toBe(true);*/
 
     reportDesigner.refreshBtn.click();
   });

@@ -18,12 +18,12 @@ describe('create columnChart type analysis', () => {
   const xAxisName = 'Source Manufacturer';
   const yAxisName = 'Available MB';
   const groupName = 'Source OS';
-  const metric = 'MCT Content';
+  const metric = 'MCT TMO Session ES';
   const method = 'chart:column';
 
   const userDataProvider = {
-    'admin': {handle: 'admin'},
-    'user': {handle: 'userOne'},
+    'admin': {handle: 'admin'}/*,
+    'user': {handle: 'userOne'},*/
   };
 
   afterAll(function () {

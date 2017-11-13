@@ -199,7 +199,7 @@ describe('for the Analyst', () => {
 
   let analysisOptions;
   it('actions menu exists', () => {
-    CommonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
+    commonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
     analyze.analysisElems.cardView.click();
     analyze.main.getAnalysisActionOptions(analyze.main.firstCard).then(options => {
       analysisOptions = options;
@@ -276,7 +276,7 @@ describe('for Reviewer', () => {
 
   let analysisOptions;
   it('actions menu exists', () => {
-    CommonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
+    commonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
     analyze.analysisElems.cardView.click();
     analyze.main.getAnalysisActionOptions(analyze.main.firstCard).then(options => {
       analysisOptions = options;

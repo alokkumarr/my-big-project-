@@ -14,7 +14,7 @@ describe('create a new pivot type analysis', () => {
   const filterValue = 'SAMSUNG';
   const columnField = 'Source Manufacturer';
   const rowField = 'Source OS';
-  const metric = 'MCT Content';
+  const metric = 'MCT TMO Session ES';
   const method = 'table:pivot';
 
   afterAll(function() {
