@@ -144,8 +144,8 @@ public class TransportUtils {
                 dynamicConvertor.setLte(now.with(DayOfWeek.MONDAY).minusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(last2Week.with(DayOfWeek.MONDAY).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
-
-                default : throw new IllegalArgumentException(dynamic + " not present");
+            }
+            default : throw new IllegalArgumentException(dynamic + " not present");
 
         }
 
