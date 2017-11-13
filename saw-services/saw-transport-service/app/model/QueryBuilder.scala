@@ -2,6 +2,7 @@ package model
 
 import java.text.SimpleDateFormat
 
+import com.synchronoss.DynamicConvertor
 import controllers.BaseController
 import org.json4s._
 import org.json4s.JsonDSL._
@@ -240,9 +241,19 @@ object QueryBuilder extends {
         "IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
       }
       case "date" | "timestamp" => {
-        val lte = subProperty("model", "lte")
-        val gte = subProperty("model", "gte")
-        "BETWEEN TO_DATE('%s') AND TO_DATE('%s')".format(gte, lte)
+        var lte :String = null
+        var gte : String = null
+        val preset = subProperty("model", "preset")
+        if (preset !=null && !preset.equals("NA")){
+          lte = TransportUtils.dynamicDecipher(preset).getLte();
+          gte = TransportUtils.dynamicDecipher(preset).getGte();
+        }
+        else {
+          lte = subProperty("model", "lte")
+          gte = subProperty("model", "gte")
+        }
+        //"BETWEEN TO_DATE('%s') AND TO_DATE('%s')".format(gte, lte)
+        ">= TO_DATE('%s') AND %s.%s <= TO_DATE('%s')".format(gte, property("tableName"), property("columnName"), lte)
       }
       case obj: String => throw ClientException("Unknown filter type: " + obj)
     }

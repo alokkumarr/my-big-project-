@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "operator",
+    "preset",
     "value",
     "otherValue",
     "gte",
@@ -27,6 +28,8 @@ public class Model {
 
     @JsonProperty("operator")
     private Model.Operator operator;
+    @JsonProperty("preset")
+    private Model.Preset preset;
     @JsonProperty("value")
     private Integer value;
     @JsonProperty("otherValue")
@@ -50,6 +53,14 @@ public class Model {
     @JsonProperty("operator")
     public void setOperator(Model.Operator operator) {
         this.operator = operator;
+    }
+    @JsonProperty("preset")
+    public Model.Preset getPreset() {
+      return preset;
+    }
+    @JsonProperty("preset")
+    public void setPreset(Model.Preset preset) {
+      this.preset = preset;
     }
 
     @JsonProperty("value")
@@ -165,5 +176,53 @@ public class Model {
         }
 
     }
+    
+    public enum Preset {
 
+      YTD("YTD"),
+      MTD("MTD"),
+      LTM("LTM"),
+      LSM("LSM"),
+      LM("LM"),
+      LQ("LQ"),
+      LW("LW"),
+      TW("TW"),
+      LSW("LSW"),
+      LTW("LTW"),
+      NA("NA");
+      private final String value;
+      private final static Map<String, Model.Preset> CONSTANTS = new HashMap<String, Model.Preset>();
+
+      static {
+          for (Model.Preset c: values()) {
+              CONSTANTS.put(c.value, c);
+          }
+      }
+
+      private Preset(String value) {
+          this.value = value;
+      }
+
+      @Override
+      public String toString() {
+          return this.value;
+      }
+
+      @JsonValue
+      public String value() {
+          return this.value;
+      }
+
+      @JsonCreator
+      public static Model.Preset fromValue(String value) {
+          Model.Preset constant = CONSTANTS.get(value);
+          if (constant == null) {
+              throw new IllegalArgumentException(value);
+          } else {
+              return constant;
+          }
+      }
+
+  }
+    
 }

@@ -11,59 +11,48 @@ To prepare for building the project, execute the following steps:
 
 2. Install Maven 3.5.0
 
-3. Install Docker (for integration tests)
+3. Install [Docker] (for integration tests)
 
 4. Configure Docker to allocate at least 8 GB memory and the maximum
    number of CPUs for containers
 
-5. Install RPM (for building RPM packages, until SAW Security and
-   Transport Service have been migrated to the pure Java RPM builder
-   that has no dependencies on external tools)
+Note: Instructions for how to set up the above on a Mac can be found
+in the [Mac setup instructions](development-mac.md).
 
-If you are on a Mac the above can be installed using [Homebrew] as
-follows:
-
-        $ brew cask install java
-        $ brew install maven
-        $ brew cask install docker
-        $ brew install rpm
-
-After installing the above on a Mac, open the Docker application to
-install the command line tools and launch the Docker daemon:
-
-        $ open -a Docker
-
-[Homebrew]: http://brew.sh/
+[Docker]: https://www.docker.com/community-edition
 
 # Building and testing
 
-To build the project execute the following command (the prepare step
-currently requires Linux or equivalent environment):
+To build and test the project execute the following commands:
 
-        $ ext/prepare
-        $ mvn package
+        $ cd saw
+        $ mvn verify
 
-The release package will be located at `target/saw.tgz`.
+This includes running both unit and integration tests.  The release
+package will be located at `saw-dist/target/saw-*.tgz`.
 
 Note: The Docker daemon must be running while building to ensure the
-integration tests can be run.
+integration tests can run.
 
-# Testing deployment
+# Running full system locally
 
-To build and run a Docker container that runs the SAW system in
-development mode, execute the following command:
+To build and run the full SAW system locally in development mode,
+execute the following commands to start SAW in Docker containers:
 
-        $ ext/prepare
-        $ mvn -pl saw-dist -am package
-        $ mvn -pl saw-dist docker:build docker:start
+        $ cd saw
+        $ mvn package
+        $ mvn -pl saw-dist docker:build docker:run -P docker-saw
 
-Note: The above assumes that `saw`, `saw-security`, `saw-services` and
-`saw-web` are all checked out in the same directory.  The
-`ext/prepare-dev` will exit with an error if they are not.
+Note: The Docker daemon must be running to be able to build and run
+containers.  Also, the first run will take longer as Docker downloads
+and builds images that will subsequently be available in the image
+build cache.
 
-After that the SAW Web application can be accessed
-at [http://localhost/](http://localhost/).  To enter a shell inside
-the container, execute the following command:
+After the above command has completed the SAW Web application can be
+accessed at [http://localhost/](http://localhost/).
+
+To enter a shell inside the main SAW container, execute the following
+command:
 
         $ docker exec -it saw bash
 
@@ -76,8 +65,13 @@ starting points to investigate installed SAW services and packages:
         $ journalctl -u saw-*
         $ rpm -qa saw-*
 
-Note: The Docker daemon must be running to be able to build and run
-containers.
+To stop the SAW containers, simply send an interrupt to the Maven
+process used to start the containers.  In case containers have been
+left behind and prevent running new SAW containers, existing
+containers can be cleared out by executing the following command:
+
+        $ cd saw
+        $ mvn -pl saw-dist docker:stop
 
 # Continuous integration
 

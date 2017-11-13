@@ -3,7 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.synchronoss.saw</groupId>
-  <artifactId>dist</artifactId>
+  <artifactId>saw-services-dist</artifactId>
   <version>${revision}</version>
   <packaging>jar</packaging>
   <properties>
@@ -17,12 +17,22 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>saw-analysis-service</artifactId>
+      <version>${revision}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>saw-scheduler-service</artifactId>
       <version>${revision}</version>
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>saw-gateway-service</artifactId>
+      <version>${revision}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>saw-export-service</artifactId>
       <version>${revision}</version>
     </dependency>
   </dependencies>
@@ -35,8 +45,6 @@
           <descriptors>
             <descriptor>${project.basedir}/src/main/assembly/assembly.xml</descriptor>
           </descriptors>
-          <!-- Remove artifact classifier "bin" from archive name -->
-          <appendAssemblyId>false</appendAssemblyId>
           <finalName>saw-services-${project.version}</finalName>
           <!-- Enable long file names without Maven warning -->
           <tarLongFileMode>posix</tarLongFileMode>
@@ -46,71 +54,6 @@
             <phase>package</phase>
             <goals>
               <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>io.fabric8</groupId>
-        <artifactId>docker-maven-plugin</artifactId>
-        <version>0.21.0</version>
-        <configuration>
-          <images>
-            <image>
-              <name>saw-services:${project.version}</name>
-              <alias>saw-services</alias>
-              <build>
-                <dockerFileDir>${project.basedir}/src/test/docker</dockerFileDir>
-                <assembly>
-                  <inline xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                          xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
-                          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
-                    <fileSets>
-                      <fileSet>
-                        <directory>${project.build.directory}</directory>
-                        <outputDirectory>.</outputDirectory>
-                        <includes>
-                          <include>*.tgz</include>
-                        </includes>
-                      </fileSet>
-                    </fileSets>
-                  </inline>
-                </assembly>
-              </build>
-              <run>
-                <!-- Run privileged for systemd -->
-                <privileged>true</privileged>
-                <wait>
-                  <!--
-                      Wait until the container health check
-                      reports that systemd services are up and
-                      running
-                  -->
-                  <healthy>true</healthy>
-                  <!--
-                      Increase timeout to allow application
-                      deployment to finish
-                  -->
-                  <time>600000</time>
-                </wait>
-              </run>
-            </image>
-          </images>
-        </configuration>
-        <executions>
-          <execution>
-            <id>start</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>build</goal>
-              <goal>start</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>stop</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>stop</goal>
             </goals>
           </execution>
         </executions>

@@ -33,7 +33,7 @@
                               ng-if="$ctrl.analysis"
                               exclude="publish-fork-edit"
                               on-successful-deletion="$ctrl.onSuccessfulDeletion(analysis)"
-                              on-front-end-export="$ctrl.exportData()"
+                              on-export="$ctrl.exportData()"
         ></analyze-actions-menu>
 
         <md-button ng-hide="!$ctrl.canUserPublish"
@@ -58,7 +58,7 @@
   </md-card>
   <div ng-switch="$ctrl.analysis.type" ng-if="$ctrl.analyses.length">
     <analyze-chart-detail ng-switch-when="chart" analysis="$ctrl.analysis" requester="$ctrl.requester"></analyze-chart-detail>
-    <analyze-report-detail ng-switch-when="report" analysis="$ctrl.analysis" requester="$ctrl.requester" source="$ctrl.loadExecutionData(options)"></analyze-report-detail>
+    <analyze-report-detail ng-switch-when="report" analysis="$ctrl.analysis" source="$ctrl.loadExecutionData(options)"></analyze-report-detail>
     <analyze-pivot-detail ng-switch-when="pivot" analysis="$ctrl.analysis" requester="$ctrl.requester"></analyze-pivot-detail>
   </div>
   <md-card>

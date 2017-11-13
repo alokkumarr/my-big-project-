@@ -1,25 +1,19 @@
 info:
-  component: Synchronoss data export Service
+  component: Synchronoss Data export Service
 spring:
   application:
     name: saw-export-service
 server:
   address: localhost
-  port: 9100
+  port: 9400
   context-path: ''
   compression:
-    enabled: true    
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json    
 
 analysis:
     service:
-        host: https://saw.bda.poc.velocity-va.synchronoss.net/api
-metadata:
-    service:
-        host: https://saw.bda.poc.velocity-va.synchronoss.net/api
-semantic:
-    service:
-        host: https://saw.bda.poc.velocity-va.synchronoss.net/api
-security:
-    service:
-        host: http://localhost:8081/saw-security
+        host: https://saw.bda.poc.velocity-va.synchronoss.net/services/analysis
+    size: 10000
+
        

@@ -6,16 +6,16 @@ set -eu
 
 # Save SAW system logs to build directory in case needed for
 # troubleshooting after a failed run
-trap "journalctl -u saw-* > /build/saw-system.log" EXIT
+trap "journalctl -u saw-\* > /build/saw-system.log" EXIT
 
 cd /maven
-tar -xzf saw.tgz
+tar -xzf saw-*.tgz
 saw/saw-deploy /root/saw-config
 
-# Workaround: The default MapR log4j configuration causes Transport
-# Service to generate permissions error, so move the location to a
-# writable directory for now
-sed -i -e 's,log4.log,/tmp/log4.log,' /opt/mapr/conf/log4j.properties
-
 # Load SAW test metrics
-#/root/saw-metrics/saw-metrics
+#
+# Note: To reduce startup time, this should be put into its own
+# startup service that runs in parallel with saw-deploy.service.
+# Block on "http://localhost/services" becoming responsive before
+# proceeding.
+/root/saw-metrics/saw-metrics load

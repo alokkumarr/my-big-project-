@@ -5,16 +5,8 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
 import * as fpMap from 'lodash/fp/map';
 
-export function SortService() {
-
-  return {
-    mapBackend2FrontendSort,
-    mapFrontend2BackendSort,
-    filterInvalidSorts,
-    getArtifactColumns2SortFieldMapper
-  };
-
-  function mapBackend2FrontendSort(sorts, sortFields) {
+export class SortService {
+  mapBackend2FrontendSort(sorts, sortFields) {
     return fpFilter(val => val.field, map(sorts, sort => {
       const targetField = find(sortFields, ({dataField}) => dataField === sort.columnName);
       return {
@@ -24,13 +16,13 @@ export function SortService() {
     }));
   }
 
-  function filterInvalidSorts(sorts, sortFields) {
+  filterInvalidSorts(sorts, sortFields) {
     return fpFilter(sort => {
       return find(sortFields, ({dataField}) => dataField === get(sort, 'field.dataField'));
     }, sorts);
   }
 
-  function mapFrontend2BackendSort(sorts) {
+  mapFrontend2BackendSort(sorts) {
     return map(sorts, sort => {
       return {
         columnName: sort.field.dataField,
@@ -40,7 +32,7 @@ export function SortService() {
     });
   }
 
-  function getArtifactColumns2SortFieldMapper() {
+  getArtifactColumns2SortFieldMapper() {
     return fpPipe(
       fpFilter(({checked}) => checked &&
         (checked === 'x' || checked === 'g')),

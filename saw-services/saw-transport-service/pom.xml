@@ -32,6 +32,9 @@
         <app.group>mapr</app.group>
         <mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
         <es.version>5.4.0</es.version>
+        <threeten.extra>1.2</threeten.extra>
+        <rpm.maven.plugin.phase>package</rpm.maven.plugin.phase>
+        <rpm.ts.root>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}</rpm.ts.root>
     </properties>
     <dependencies>
 	<dependency>
@@ -75,6 +78,11 @@
 		<artifactId>elasticsearch</artifactId>
 		<version>${es.version}</version>
 	</dependency>
+        <dependency>
+            <groupId>org.threeten</groupId>
+            <artifactId>threeten-extra</artifactId>
+            <version>${threeten.extra}</version>
+        </dependency>
         <dependency>
             <groupId>com.synchronoss</groupId>
             <artifactId>saw-metadata-service</artifactId>
@@ -440,21 +448,25 @@
 	  <artifactId>commons-lang3</artifactId>
 	  <version>3.5</version>
 	</dependency>
+        <!--
+            Add MapR Streams dependencies for Transport Service Executor
+        -->
+        <dependency>
+          <groupId>com.mapr.streams</groupId>
+          <artifactId>mapr-streams</artifactId>
+          <version>5.2.0-mapr</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.kafka</groupId>
+          <artifactId>kafka-clients</artifactId>
+          <version>0.9.0.0-mapr-1607</version>
+          <scope>provided</scope>
+        </dependency>
     </dependencies>
     <build>
         <sourceDirectory>${project.basedir}/app</sourceDirectory>
         <testSourceDirectory>${project.basedir}/test</testSourceDirectory>
-        <!-- To define the plugin version in your parent POM -->
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>rpm-maven-plugin</artifactId>
-                    <version>2.1.5</version>
-                    <extensions>true</extensions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <!-- To use the plugin goals in your POM or parent POM -->
         <plugins>
             <plugin>
@@ -550,159 +562,196 @@
             </plugin>
             <!-- Assembly plugin : end -->
 
-            <!-- RPM plugin -->
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>rpm-maven-plugin</artifactId>
-                <version>2.1.5</version>
-                <executions>
-                    <execution>
-                        <id>saw-services-rpm</id>
-                        <goals>
-                            <goal>attached-rpm</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <classifier>rpm</classifier>
-                    <license>Synchronoss proprietary product</license>
-                    <distribution>SAW Transport Service</distribution>
-                    <needarch>false</needarch>
-                    <targetOS>i386-linux</targetOS>
-                    <group>SAW/Transport Server</group>
-                    <packager>SAW</packager>
-                    <name>saw-transport</name>
-
-                    <defineStatements>
-                        <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
-                    </defineStatements>
-                    <requires>
-                      <require>mapr-client &gt;= 5.2.0</require>
-                      <require>mapr-spark &gt;= 2.1.0</require>
-                      <require>perl &gt;= 5.16.3</require>
-                    </requires>
-                    <mappings>
-                        <mapping>
-                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/lib</directory>
-                            <filemode>444</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
-                            <sources>
-                                <source>
-                                    <location>
-                                        target/${project.artifactId}-${project.version}-package/${project.artifactId}-${project.version}/lib
-                                    </location>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/sparklib</directory>
-                            <filemode>444</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
-                            <sources>
-                                <source>
-                                    <location>
-                                        target/${project.artifactId}-${project.version}-package/${project.artifactId}-${project.version}/sparklib
-                                    </location>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/bin</directory>
-                            <filemode>755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
-                            <sources>
-                                <source>
-                                    <location>scripts</location>
-                                    <includes>
-                                        <include>*.sh</include>
-                                    </includes>
-                                </source>
-                                <source>
-                                    <location>${project.basedir}/../saw-metadata-service/src/main/scripts</location>
-                                    <includes>
-                                        <include>*.sh</include>
-                                    </includes>
-                                </source>
-                                
-                                <source>
-                                    <location>${project.basedir}/../saw-data-access/src/main/scripts</location>
-                                    <includes>
-                                        <include>*.sh</include>
-                                    </includes>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/conf</directory>
-                            <filemode>644</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
-                            <sources>
-                                <source>
-                                    <location>conf</location>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>${rpm.saw.root}/saw/service-${rpm.version}.${rpm.release}/schema</directory>
-                            <filemode>755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
-                            <sources>
-                                <source>
-                                    <location>${project.basedir}/../json-schema</location>
-                                       <includes>
-                                        <include>*.json</include>
-                                    </includes>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>/var/saw/service/run</directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
-                        </mapping>
-                        <mapping>
-                            <directory>/var/saw/service/data</directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <filemode>644</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
-                            <sources>
-                                <source>
-                                    <location>${project.basedir}/../saw-metadata-service/src/test/resources</location>
-                                    <includes>
-                                        <include>create_ui_menu_sample.json</include>
-                                        <include>C_ui_analyze_sample.json</include>
-                                        <include>R_ui_analyze_sample.json</include>
-                                        <include>U_ui_analyze_sample.json</include>
-                                        <include>D_ui_analyze_sample.json</include>
-                                        <include>update_ui_analyze_sample.json</include>
-                                        <include>search_prepare_ui_sample.json</include>
-                                        <include>search_execute_ui_sample.json</include>
-                                    </includes>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>/usr/lib/systemd/system</directory>
-                            <directoryIncluded>false</directoryIncluded>
-                            <filemode>644</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
-                            <sources>
-                                <source>
-                                    <location>src/main/system/saw-transport.service</location>
-                                </source>
-                            </sources>
-                        </mapping>
-                    </mappings>
-                    <preinstallScriptlet>
+              <groupId>de.dentrassi.maven</groupId>
+              <artifactId>rpm</artifactId>
+              <version>0.9.3</version>
+              <executions>
+                <execution>
+                  <goals>
+                    <goal>rpm</goal>
+                  </goals>
+                  <configuration>
+                    <packageName>saw-transport</packageName>
+                    <version>${revision.nodash}</version>
+                    <skipSigning>true</skipSigning>
+                    <rulesets>
+                      <ruleset>
+                        <id>default</id>
+                        <rules>
+                          <rule>
+                            <user>${app.user}</user>
+                            <group>${app.group}</group>
+                            <mode>0444</mode>
+                          </rule>
+                          <rule>
+                            <when>
+                              <type>directory</type>
+                            </when>
+                            <mode>0750</mode>
+                          </rule>
+                          <rule>
+                            <when>
+                              <prefix>${rpm.ts.root}/bin/</prefix>
+                            </when>
+                            <mode>0755</mode>
+                          </rule>
+                          <rule>
+                            <when>
+                              <prefix>${rpm.ts.root}/conf/</prefix>
+                            </when>
+                            <mode>0644</mode>
+                          </rule>
+                          <rule>
+                            <when>
+                              <prefix>/usr/lib/systemd/system/</prefix>
+                            </when>
+                            <mode>0644</mode>
+                          </rule>
+                          <rule>
+                            <when>
+                              <prefix>/var/saw/service/data/</prefix>
+                            </when>
+                            <mode>0644</mode>
+                          </rule>
+                        </rules>
+                      </ruleset>
+                    </rulesets>
+                    <entries>
+                      <entry>
+                        <name>${rpm.ts.root}/bin</name>
+                        <directory>true</directory>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${rpm.ts.root}/lib</name>
+                        <directory>true</directory>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${rpm.ts.root}/conf</name>
+                        <directory>true</directory>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${rpm.ts.root}/sparklib</name>
+                        <directory>true</directory>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${rpm.ts.root}/schema</name>
+                        <directory>true</directory>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${rpm.ts.root}/bin</name>
+                        <collect>
+                          <from>scripts</from>
+                        </collect>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${rpm.ts.root}/bin</name>
+                        <collect>
+                          <from>${project.basedir}/../saw-metadata-service/src/main/scripts</from>
+                        </collect>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${rpm.ts.root}/bin</name>
+                        <collect>
+                          <from>${project.basedir}/../saw-data-access/src/main/scripts</from>
+                        </collect>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${rpm.ts.root}/conf</name>
+                        <collect>
+                          <from>conf</from>
+                        </collect>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${rpm.ts.root}/lib</name>
+                        <collect>
+                          <from>target/${project.artifactId}-${project.version}-package/${project.artifactId}-${project.version}/lib</from>
+                        </collect>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${rpm.ts.root}/sparklib</name>
+                        <collect>
+                          <from>target/${project.artifactId}-${project.version}-package/${project.artifactId}-${project.version}/sparklib</from>
+                        </collect>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${rpm.ts.root}/schema</name>
+                        <collect>
+                          <from>${project.basedir}/../json-schema</from>
+                        </collect>
+                      </entry>
+                      <entry>
+                        <name>/var/saw/service/data</name>
+                        <directory>true</directory>
+                        <mode>0755</mode>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>/var/saw/service/run</name>
+                        <directory>true</directory>
+                        <mode>0755</mode>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>/var/saw/service/data/C_ui_analyze_sample.json</name>
+                        <file>${project.basedir}/../saw-metadata-service/src/test/resources/C_ui_analyze_sample.json</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>/var/saw/service/data/D_ui_analyze_sample.json</name>
+                        <file>${project.basedir}/../saw-metadata-service/src/test/resources/D_ui_analyze_sample.json</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>/var/saw/service/data/R_ui_analyze_sample.json</name>
+                        <file>${project.basedir}/../saw-metadata-service/src/test/resources/R_ui_analyze_sample.json</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>/var/saw/service/data/U_ui_analyze_sample.json</name>
+                        <file>${project.basedir}/../saw-metadata-service/src/test/resources/U_ui_analyze_sample.json</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>/var/saw/service/data/create_ui_menu_sample.json</name>
+                        <file>${project.basedir}/../saw-metadata-service/src/test/resources/create_ui_menu_sample.json</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>/var/saw/service/data/search_execute_ui_sample.json</name>
+                        <file>${project.basedir}/../saw-metadata-service/src/test/resources/search_execute_ui_sample.json</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>/var/saw/service/data/search_prepare_ui_sample.json</name>
+                        <file>${project.basedir}/../saw-metadata-service/src/test/resources/search_prepare_ui_sample.json</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>/var/saw/service/data/update_ui_analyze_sample.json</name>
+                        <file>${project.basedir}/../saw-metadata-service/src/test/resources/update_ui_analyze_sample.json</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>/usr/lib/systemd/system</name>
+                        <collect>
+                          <from>src/main/system</from>
+                        </collect>
+                        <ruleset>default</ruleset>
+                      </entry>
+                    </entries>
+                    <beforeInstallation>
                         <script>echo Install is being prepared
 # Enable this part when Security will be implemented
 #------------------------------------------------------
@@ -723,19 +772,22 @@
                 echo app_home=/opt/saw/service-${rpm.version}.${rpm.release}
             } &gt;/tmp/.saw-service.tmp.env
                         </script>
-                    </preinstallScriptlet>
-                    <postinstallScriptlet>
-                        <scriptFile>scripts/postinstall</scriptFile>
-                        <fileEncoding>utf-8</fileEncoding>
-                    </postinstallScriptlet>
-                    <preremoveScriptlet>
-                        <scriptFile>scripts/preremove</scriptFile>
-                        <fileEncoding>utf-8</fileEncoding>
-                    </preremoveScriptlet>
-                </configuration>
+                    </beforeInstallation>
+                    <afterInstallation>
+                      <file>rpm-scripts/postinstall</file>
+                    </afterInstallation>>
+                    <beforeRemoval>
+                      <file>rpm-scripts/preremove</file>
+                    </beforeRemoval>
+                    <requires>
+                      <require>mapr-client &gt;= 5.2.0</require>
+                      <require>mapr-spark &gt;= 2.1.0</require>
+                      <require>perl &gt;= 5.16.3</require>
+                    </requires>
+                  </configuration>
+                </execution>
+              </executions>
             </plugin>
-            <!-- RPM plugin : end -->
-
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-surefire-plugin</artifactId>

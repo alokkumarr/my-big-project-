@@ -1,12 +1,14 @@
 package sncr.datalake.engine
 
 import java.util
+import java.util.UUID
 import java.util.concurrent.{ExecutorService, Executors, Future}
 
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
 import org.slf4j.{Logger, LoggerFactory}
 import sncr.datalake.engine.ExecutionType.ExecutionType
 import sncr.metadata.analysis.{AnalysisNode, AnalysisResult}
+import sncr.metadata.engine.ProcessingResult
 
 /**
   * Created by srya0001 on 6/8/2017.
@@ -29,14 +31,67 @@ class Analysis(val analysisId : String) {
 
 
   /**
+    * Start execution of analysis through MapR Streams queue, instead
+    * of in the Transport Service Play application, for concurrency
+    */
+  def executeAndWaitQueue(execType: ExecutionType, sqlRuntime: String = null,
+    queue: (String, String, String) => Unit):
+      AnalysisExecution = {
+    val resultId = UUID.randomUUID().toString
+    /* Send execution request to queue */
+    queue(analysisId, resultId, sqlRuntime)
+    /* Wait for analysis result node to appear */
+    waitForResult(resultId)
+    /* Return analysis execution instance for compatibility with existing
+     * interface */
+    new AnalysisExecution(an, execType, resultId)
+  }
+
+  private def waitForResult(resultId: String, retries: Int = 20) {
+    try {
+      /* Try loading the result node.  If it does not exist an exception is
+       * raised. */
+      val resultNode = AnalysisResult(null, resultId)
+      m_log.debug("Result node found: {}", resultId)
+      /* Also check that the data location property has been set, indicating
+       * results have been written out */
+      if (!resultNode.getObjectDescriptors.contains("dataLocation")) {
+        m_log.debug("Result node data location property not found yet: {}",
+          resultId)
+        waitForResultRetry(resultId, retries)
+      }
+    } catch {
+      case e: Exception => {
+        /* If the exception is not related to finding the node, rethrow it */
+        if (!e.getMessage().equals(
+          ProcessingResult.NodeDoesNotExist.toString)) {
+          throw e
+        }
+        /* The result node was not found, so pause for a while and then retry
+         * again */
+        m_log.debug("Result node not found yet: {}", resultId)
+        waitForResultRetry(resultId, retries)
+      }
+    }
+  }
+
+  private def waitForResultRetry(resultId: String, retries: Int) {
+    if (retries == 0) {
+      throw new RuntimeException("Timed out waiting for result: " + resultId)
+    }
+    Thread.sleep(3000)
+    waitForResult(resultId, retries - 1)
+  }
+
+  /**
     * start execution of an analysis and return an execution object immediately; store the "type" parameter in
     * the execution object, but no need for the Spark SQL executor to do anything with it
     */
 
-  def executeAndWait(execType: ExecutionType, sqlRuntime: String = null) : AnalysisExecution =
+  def executeAndWait(execType: ExecutionType, sqlRuntime: String = null, resultId: String = null) : AnalysisExecution =
   {
     m_log debug s"Execute analysis as ${execType.toString}"
-    val analysisExecution = new AnalysisExecution(an, execType)
+    val analysisExecution = new AnalysisExecution(an, execType, resultId)
     analysisExecution.startExecution(sqlRuntime)
     startTS = analysisExecution.getStartedTimestamp
     finishedTS = analysisExecution.getFinishedTimestamp

@@ -18,6 +18,7 @@ import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as groupBy from 'lodash/groupBy';
 import * as values from 'lodash/values';
 import * as has from 'lodash/has';
+
 import * as fpMapValues from 'lodash/fp/mapValues';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
@@ -26,7 +27,7 @@ import * as template from './analyze-pivot.component.html';
 import style from './analyze-pivot.component.scss';
 import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
-import {DEFAULT_GROUP_INTERVAL} from '../pivot/settings/analyze-pivot-settings.component';
+import {DEFAULT_DATE_INTERVAL} from '../pivot/settings/analyze-pivot-settings.component';
 import {DATE_TYPES, NUMBER_TYPES, ENTRY_MODES, MAX_POSSIBLE_FIELDS_OF_SAME_AREA, DEFAULT_AGGREGATE_TYPE} from '../../consts';
 
 export const AnalyzePivotComponent = {
@@ -127,12 +128,13 @@ export const AnalyzePivotComponent = {
       this.analysisUnSynched();
       this.startDraftMode();
       const pivotFields = this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns);
-      this.setDataSource(this.dataSource.store, pivotFields);
+      this.setDataSource(this.deNormalizedData, pivotFields);
     }
 
     setDataSource(store, fields) {
       const parsedFields = this._PivotService.trimSuffixFromPivotFields(fields);
-      this.dataSource = new PivotGridDataSource({store, fields: parsedFields});
+      const {formattedFields, formattedData} = this._PivotService.formatDates(store, parsedFields);
+      this.dataSource = new PivotGridDataSource({store: formattedData, fields: formattedFields});
       this.pivotGridUpdater.next({
         dataSource: this.dataSource
       });
@@ -213,15 +215,15 @@ export const AnalyzePivotComponent = {
 
         this.artifacts[0].columns = this.backupColumns;
         const pivotFields = this._PivotService.artifactColumns2PivotFields()(this.artifacts[0].columns);
-        this.setDataSource(this.dataSource.store, pivotFields);
+        this.setDataSource(this.deNormalizedData, pivotFields);
       }
     }
 
     applyDefaultsBasedOnAreaChange(artifactColumn) {
       if (DATE_TYPES.includes(artifactColumn.type) &&
-          !has(artifactColumn, 'groupInterval')) {
+          !has(artifactColumn, 'dateInterval')) {
 
-        artifactColumn.groupInterval = DEFAULT_GROUP_INTERVAL.value;
+        artifactColumn.dateInterval = DEFAULT_DATE_INTERVAL.value;
       }
       if (artifactColumn.area === 'data' &&
           NUMBER_TYPES.includes(artifactColumn.type) &&
@@ -316,7 +318,6 @@ export const AnalyzePivotComponent = {
       return fpPipe(
         fpFilter(artifactColumn => artifactColumn.checked &&
           (artifactColumn.area === 'row' || artifactColumn.area === 'column')),
-        // fpFilter(artifactColumn => !DATE_TYPES.includes(artifactColumn.dataType)),
         fpMap(artifactColumn => {
           return {
             type: artifactColumn.type,
@@ -344,6 +345,7 @@ export const AnalyzePivotComponent = {
               backendField.name = field.columnName;
             } else if (DATE_TYPES.includes(field.type)) {
               backendField.groupInterval = field.groupInterval;
+              backendField.dateInterval = field.dateInterval;
             }
             return backendField;
           })

@@ -3,6 +3,11 @@ package com.synchronoss.saw.export.exceptions;
 
 public class TokenMissingSAWException extends ExportRuntimeSAWException {
 
+    /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
     public TokenMissingSAWException(String msg) {
         super(msg);
 }

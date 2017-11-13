@@ -19,7 +19,8 @@ const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const WebpackBuildVersion = require('./webpack.version');
+const WebpackBuildVersion = require('./webpack.version').WebpackBuildVersion;
+const gitDescription = require('./webpack.version').gitDescription;
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
@@ -141,7 +142,8 @@ module.exports = function (env) {
       new DefinePlugin({
         '__DEVELOPMENT__': JSON.stringify(isDevelopment),
         '__PRODUCTION__': JSON.stringify(isProduction),
-        '__MOCK__': JSON.stringify(enableMock)
+        '__MOCK__': JSON.stringify(enableMock),
+        '__VERSION__': JSON.stringify(gitDescription())
       }),
       new LoaderOptionsPlugin({
         options: {

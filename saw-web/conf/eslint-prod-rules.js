@@ -7,6 +7,7 @@ module.exports = {
     __DEVELOPMENT__: true,
     __PRODUCTION__: true,
     __MOCK__: true,
+    __VERSION__: true,
     expect: true,
     browser: true,
     element: true,
@@ -21,7 +22,7 @@ module.exports = {
     jasmine: true
   },
   rules: {
-    'angular/no-service-method': 2,
+    'angular/no-service-method': 0,
     'angular/on-watch': 0,
     'no-negated-condition': 0,
     'quote-props': [1, 'as-needed'],

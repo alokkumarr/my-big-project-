@@ -10,12 +10,47 @@
   <artifactId>saw-dist</artifactId>
   <version>${revision}</version>
   <packaging>jar</packaging>
-  <name>SAW Distribution</name>
+  <name>saw-dist</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <docker.naming>none</docker.naming>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>com.sncr</groupId>
+      <artifactId>saw-security</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.synchronoss.saw</groupId>
+      <artifactId>saw-services-dist</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.synchronoss</groupId>
+      <artifactId>bda-saw</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -52,7 +87,7 @@
           <!-- Leave version number of SAW bundle project out of
                artifact name, to avoid confusion as each SAW module at
                least for now has its own release cycle -->
-          <finalName>${project.parent.artifactId}</finalName>
+          <finalName>${project.parent.artifactId}-${project.version}</finalName>
           <!-- Remove artifact classifier "bin" from archive name -->
           <appendAssemblyId>false</appendAssemblyId>
           <!-- Enable long file names without Maven warning -->
@@ -67,7 +102,7 @@
           </execution>
         </executions>
       </plugin>
-      <plugin> 
+      <plugin>
 	<groupId>org.apache.maven.plugins</groupId>
 	<artifactId>maven-failsafe-plugin</artifactId>
 	<executions>
@@ -90,6 +125,10 @@
         <version>0.22.1</version>
         <configuration>
           <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
+          <!-- Workaround: Remove volumes created for Bamboo agent
+               disk space workaround (see the VOLUME directive in
+               "saw-dist/src/test/docker-mapr/Dockerfile". -->
+          <removeVolumes>true</removeVolumes>
           <!-- Start containers in parallel to reduce startup time -->
           <startParallel>true</startParallel>
           <images>
@@ -119,7 +158,7 @@
                 <network>
                   <name>saw</name>
                 </network>
-                <ports> 
+                <ports>
                   <port>saw.docker.port:80</port>
                 </ports>
                 <!-- Run privileged for systemd -->
@@ -139,7 +178,7 @@
                   <!-- Increase timeout to allow application
                        deployment to finish -->
                   <time>600000</time>
-                </wait>
+                </wait>  
               </run>
             </image>
             <image>
@@ -154,7 +193,7 @@
                   <name>saw</name>
                   <alias>saw-mapr</alias>
                 </network>
-                <ports> 
+                <ports>
                   <port>saw.mcs.port:8443</port>
                   <port>saw.spark.master.port:8080</port>
                   <port>saw.spark.worker.port:8081</port>
@@ -190,14 +229,14 @@
           </execution>
         </executions>
       </plugin>
-      <plugin> 
+      <plugin>
 	<groupId>org.asciidoctor</groupId>
 	<artifactId>asciidoctor-maven-plugin</artifactId>
 	<version>1.5.3</version>
 	<executions>
 	  <execution>
 	    <id>generate-docs</id>
-	    <phase>post-integration-test</phase> 
+	    <phase>post-integration-test</phase>
 	    <goals>
 	      <goal>process-asciidoc</goal>
 	    </goals>
@@ -208,7 +247,7 @@
 	  </execution>
 	</executions>
 	<dependencies>
-	  <dependency> 
+	  <dependency>
 	    <groupId>org.springframework.restdocs</groupId>
 	    <artifactId>spring-restdocs-asciidoctor</artifactId>
 	    <version>1.2.1.RELEASE</version>

@@ -4,6 +4,7 @@ import * as fpMapValues from 'lodash/fp/mapValues';
 import * as forEach from 'lodash/forEach';
 import * as filter from 'lodash/filter';
 import * as map from 'lodash/map';
+import * as unset from 'lodash/unset';
 
 import * as template from './analyze-pivot-settings.component.html';
 import style from './analyze-pivot-settings.component.scss';
@@ -73,7 +74,7 @@ const ARTIFACT_ICON_TYPES_OBJ = {
   }
 };
 
-const GROUP_INTERVALS = [{
+const DATE_INTERVALS = [{
   label: 'ALL',
   value: undefined
 }, {
@@ -81,19 +82,24 @@ const GROUP_INTERVALS = [{
   value: 'year'
 }, {
   label: 'QUARTER',
-  value: 'quarter'
+  value: 'quarter',
+  format: 'YYYY-Q'
 }, {
   label: 'MONTH',
-  value: 'month'
+  value: 'month',
+  format: 'YYYY-MM'
 }, {
-  label: 'DAY',
-  value: 'day'
-}, {
-  label: 'DAY_OF_WEEK',
-  value: 'dayOfWeek'
+  label: 'DATE',
+  value: 'day',
+  format: 'YYYY-MM-DD'
 }];
 
-export const DEFAULT_GROUP_INTERVAL = GROUP_INTERVALS[3];
+export const DEFAULT_DATE_INTERVAL = DATE_INTERVALS[4];
+
+export const DATE_INTERVALS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(DATE_INTERVALS);
 
 export const AnalyzePivotSettingsComponent = {
   template,
@@ -114,7 +120,7 @@ export const AnalyzePivotSettingsComponent = {
       this.AREA_TYPES_OBJ = AREA_TYPES_OBJ;
       this.DEFAULT_AREA_TYPE = DEFAULT_AREA_TYPE;
 
-      this.GROUP_INTERVALS = GROUP_INTERVALS;
+      this.DATE_INTERVALS = DATE_INTERVALS;
 
       this.ARTIFACT_ICON_TYPES_OBJ = ARTIFACT_ICON_TYPES_OBJ;
 
@@ -129,9 +135,9 @@ export const AnalyzePivotSettingsComponent = {
     }
 
     $onInit() {
-      this._$translate(map(GROUP_INTERVALS, 'label')).then(translations => {
-        forEach(GROUP_INTERVALS, groupInterval => {
-          groupInterval.label = translations[groupInterval.label];
+      this._$translate(map(DATE_INTERVALS, 'label')).then(translations => {
+        forEach(DATE_INTERVALS, dateInterval => {
+          dateInterval.label = translations[dateInterval.label];
         });
       });
     }
@@ -169,8 +175,13 @@ export const AnalyzePivotSettingsComponent = {
       this.onApplySettings({columns: this.artifactColumns});
     }
 
-    onSelectGroupInterval(groupInterval, artifactColumn) {
-      artifactColumn.groupInterval = groupInterval.value;
+    onSelectDateInterval(dateInterval, artifactColumn) {
+      artifactColumn.dateInterval = dateInterval.value;
+      if (dateInterval.value === 'year') {
+        artifactColumn.groupInterval = artifactColumn.dateInterval;
+      } else {
+        unset(artifactColumn, 'groupInterval');
+      }
       this.onApplySettings({columns: this.artifactColumns});
     }
   }

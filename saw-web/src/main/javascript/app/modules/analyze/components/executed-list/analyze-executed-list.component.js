@@ -1,4 +1,5 @@
 import * as template from './analyze-executed-list.component.html';
+import * as moment from 'moment';
 
 export const AnalyzeExecutedListComponent = {
   template,
@@ -22,7 +23,9 @@ export const AnalyzeExecutedListComponent = {
         caption: 'DATE',
         dataField: 'finished',
         dataType: 'date',
-        format: 'shortDateShortTime',
+        calculateCellValue: rowData => {
+          return (moment(rowData.finished).utcOffset(new Date().getTimezoneOffset()).format('YYYY/MM/DD'));
+        },
         allowSorting: true,
         alignment: 'left',
         width: '30%'

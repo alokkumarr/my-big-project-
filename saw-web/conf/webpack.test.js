@@ -10,6 +10,7 @@ module.exports = function (env) {
 
   const conf = {
     resolve: {
+      extensions: [".ts", ".js"],
       modules: [
         MODULE_DIR,
         webpackHelper.root('src/main/javascript')
@@ -79,7 +80,8 @@ module.exports = function (env) {
       new DefinePlugin({
         '__DEVELOPMENT__': JSON.stringify(isDevelopment),
         '__PRODUCTION__': JSON.stringify(isProduction),
-        '__MOCK__': JSON.stringify(enableMock)
+        '__MOCK__': JSON.stringify(enableMock),
+        '__VERSION__': JSON.stringify('test')
       })
     ]
   };

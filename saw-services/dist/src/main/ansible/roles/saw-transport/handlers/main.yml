@@ -1,2 +1,14 @@
 - name: restart saw-transport
   systemd: name=saw-transport state=restarted daemon_reload=true
+# Workaround: The Ansible systemd module fails with an "Could not find
+# the requested service saw-transport-executor@*" error when working
+# with wildcards, so work around this by enumerating instances for
+# now.
+#- name: restart saw-transport-executor
+#  systemd: name=saw-transport-executor@* state=restarted daemon_reload=true
+- name: restart saw-transport-executor-regular
+  systemd: name=saw-transport-executor@regular-{{ item }} state=restarted daemon_reload=true
+  with_sequence: count={{ saw_transport_executor_regular_count | default('1') }}
+- name: restart saw-transport-executor-fast
+  systemd: name=saw-transport-executor@fast-{{ item }} state=restarted daemon_reload=true
+  with_sequence: count={{ saw_transport_executor_fast_count | default('1') }}

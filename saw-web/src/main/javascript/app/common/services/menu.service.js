@@ -2,16 +2,16 @@ import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as find from 'lodash/find';
 
-export function MenuService($q, JwtService) {
-  'ngInject';
+export class MenuService {
+  constructor($q, JwtService) {
+    'ngInject';
+    this._JwtService = JwtService;
+    this._$q = $q;
+  }
 
-  return {
-    getMenu
-  };
-
-  function getMenu(moduleName) {
-    const token = JwtService.getTokenObj();
-    const deferred = $q.defer();
+  getMenu(moduleName) {
+    const token = this._JwtService.getTokenObj();
+    const deferred = this._$q.defer();
 
     const error = (desc = 'Error occurred while getting menu.') => {
       deferred.reject(desc);

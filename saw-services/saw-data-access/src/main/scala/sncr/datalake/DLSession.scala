@@ -78,9 +78,11 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
       case "cvs" =>  sparkSession.read.csv(location)
       case _ =>  throw new DAException(ErrorCodes.UnsupportedFormat, format )
     }
-    val data = DLSession.convert(df, limit)
+    /* Note: Preloading of data objects into driver memory disabled for
+     * now to avoid running out of memory. */
+    //val data = DLSession.convert(df, limit)
     df.createOrReplaceTempView(name)
-    loadedData += (name -> data)
+    //loadedData += (name -> data)
     nativeloadedData += (name -> df)
   }
 
@@ -187,6 +189,7 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     */
   protected def materializeDataToIterator(viewName: String, limit: Int = 0) : Unit =
   {
+    throw new RuntimeException("materializeDataToIterator: No longer supported to prevent out of memory issues")
     if (nativeloadedData.get(viewName).isEmpty) {
       m_log error ("Attempt to materialize non-existing dataset")
       return
@@ -208,6 +211,7 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     * @param limit
     */
   protected def materializeDataToList(viewName: String, limit: Int = DLConfiguration.rowLimit) : Unit = {
+    throw new RuntimeException("materializeDataToList: No longer supported to prevent out of memory issues")
     if (nativeloadedData.get(viewName).isEmpty) {
       m_log error "Attempt to materialize non-existing dataset"
       return
@@ -232,7 +236,7 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     val df = df1.coalesce(1)
     format match {
       case "parquet" => df.write.parquet(location); (ProcessingResult.Success.id, "Data have been successfully saved as parquet file")
-      case "json" => df.write.json(location); (ProcessingResult.Success.id, "Data have been successfully saved as parquet file")
+      case "json" => df.write.json(location); (ProcessingResult.Success.id, "Data have been successfully saved as json file")
       case _ =>  (ProcessingResult.Success.id,  ErrorCodes.UnsupportedFormat + ": " + format )
     }
   }
@@ -287,6 +291,7 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
   def getDataSampleAsString(dobj: String) : String = pretty(render(getDataSampleAsJSON(dobj)))
 
   def convertToIterator(rows : Array[Row], dtypes: Array[(String, String)]): java.util.Iterator[util.HashMap[String, (String, Object)]] = {
+    throw new RuntimeException("convertToIterator: No longer supported to prevent out of memory issues")
     rows.map( r => {
       val dataHashMap = new util.HashMap[String, (String, Object)]()
       val rowTypeAndValue = r.toSeq.zip(dtypes)
@@ -311,6 +316,7 @@ object DLSession
 {
   import scala.collection.JavaConversions._
   def convert(rows: Array[Row], dtypes: Array[(String, String)]):java.util.List[util.Map[String, (String, Object)]] = {
+    throw new RuntimeException("convert: No longer supported to prevent out of memory issues")
     rows.map( r => {
       val dataHashMap = new util.HashMap[String, (String, Object)]()
       val rowTypeAndValue = r.toSeq.zip(dtypes)
