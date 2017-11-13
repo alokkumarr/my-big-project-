@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3">
+  <id>${ass.id}</id>
+  <!-- baseDirectory>${ass.out}</baseDirectory -->
+  <formats>
+    <format>dir</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+    <fileSet>
+      <directory>${project.basedir}/../xdf-devkit/bin</directory>
+      <includes>
+        <include>*.sh</include>
+      </includes>
+      <outputDirectory>bin</outputDirectory>
+      <fileMode>555</fileMode>
+    </fileSet>
+  </fileSets>
+  <moduleSets>
+    <moduleSet>
+      <useAllReactorProjects>true</useAllReactorProjects>
+      <includes>
+        <include>xdf-nextgen:xdf-devkit</include>
+        <include>xdf-nextgen:xdf-core</include>
+        <include>xdf-nextgen:xdf-meta</include>
+				<include>xdf-nextgen:xdf-component</include>
+				<include>xdf-nextgen:xdf-sql</include>
+				<include>xdf-nextgen:xdf-preview</include>
+				<include>xdf-nextgen:xdf-parser</include>
+      </includes>
+      <binaries>
+        <outputDirectory>lib</outputDirectory>
+        <unpack>false</unpack>
+        <includeDependencies>false</includeDependencies>
+      </binaries>
+    </moduleSet>
+  </moduleSets>
+  <dependencySets>
+    <dependencySet>
+      <useProjectArtifact>true</useProjectArtifact>
+      <outputDirectory>lib</outputDirectory>
+      <unpack>false</unpack>
+      <includes>
+        <!-- list of all 3rd party dependencies required for XDF to run -->
+        <include>commons-configuration:commons-configuration</include>
+        <include>com.mapr.hadoop:maprfs</include>
+        <include>org.slf4j:slf4j-api</include>
+        <include>org.slf4j:slf4j-log4j12</include>
+        <include>log4j:log4j</include>
+        <include>com.sun.jersey:jersey-core</include>
+        <include>com.sun.jersey:jersey-server</include>
+        <include>org.apache.zookeeper:zookeeper</include>
+        <include>org.xerial.snappy:snappy-java</include>
+        <include>commons-collections:commons-collections</include>
+        <include>commons-cli:commons-cli</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
+</assembly>

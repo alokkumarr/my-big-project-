@@ -1,0 +1,27 @@
+<configuration>
+  <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
+    <encoder>
+      <pattern>%d{dd MMM yyyy HH:mm:ss,SSS} [%level] %date %thread %logger - %message%n%xException</pattern>
+    </encoder>
+  </appender>
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE">
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${log.dir}/${xdf.core}_%d{yyyy-MM-dd}_%i.log</fileNamePattern>
+      <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+        <maxFileSize>10MB</maxFileSize>
+      </timeBasedFileNamingAndTriggeringPolicy>
+      <!-- keep 30 days' worth of history -->
+      <maxHistory>3</maxHistory>
+      <totalSizeCap>200MB</totalSizeCap>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{dd MMM yyyy HH:mm:ss,SSS} [%level] %date %thread %logger - %message%n%xException</pattern>
+    </encoder>
+  </appender>
+  <logger level="DEBUG" name="sncr.xdf">
+    <appender-ref ref="FILE"/>
+  </logger>
+  <root level="DEBUG">
+    <appender-ref ref="FILE"/>
+  </root>
+</configuration>

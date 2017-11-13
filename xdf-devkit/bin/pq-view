@@ -1,0 +1,70 @@
+#!/bin/bash
+
+: ${SPARK_HOME:=/opt/mapr/spark/spark-current}
+( cd $SPARK_HOME ) || exit
+
+PQ_FNM=${1:?parquet HDFS file name must be specified}
+#/main/data/testapp/output/STRING_PARSING_PQ
+#/main/data/testapp/output/AIRSTAT
+
+[[ $PQ_FNM = @(maprfs|hdfs|file)://* ]] || {
+    cfn="maprfs://$PQ_FNM"
+    if hadoop fs -stat "$cfn" &>/dev/null ; then
+        PQ_FNM="$cfn"
+    else
+        ( <$PQ_FNM ) || exit
+        PQ_FNM="file://$PQ_FNM"
+    fi
+}
+
+hadoop fs -ls $PQ_FNM || exit
+
+set -o posix
+
+SPARK_SUBMIT_OPTS=-Dscala.usejavacp=true
+export SPARK_SUBMIT_OPTS
+
+trap "stty echo" EXIT
+trap "echo Interrupted.. ; stty echo" INT
+
+sqlctx=spark
+[[ $(readlink /opt/mapr/spark/spark-current) = *spark-1.6* ]] &&
+sqlctx=sqlContext
+
+$SPARK_HOME/bin/spark-submit \
+    --class org.apache.spark.repl.Main \
+    --name "Spark shell" \
+    --master local'[*]' \
+    --driver-memory 2g \
+    --driver-cores 1 \
+    --executor-memory 2G \
+    --executor-cores 1 \
+<<EEOOSS
+val hfn_pq="$PQ_FNM"
+:silent
+//2.1 spark
+//1.6 sqlContext
+val df = $sqlctx.read.parquet(hfn_pq)
+df.printSchema
+println( "DF count:" + df.count )
+df.show(50)
+//for (r<-df) { print( r.toString()+"\n" ); }
+EEOOSS
+
+echo '##############################################'
+[[ -d metastore_db ]] &&
+echo manual cleanup: rm -rf derby.log metastore_db/
+
+exit
+
+# spark_host=$( /usr/bin/maprcli node list -columns hostname,svc | awk '/spark-master/{print $1}' )
+# echo spark-master: $spark_host
+# spark-shell --master "spark://$spark_host:7077" --driver-memory 2g --driver-cores 2 --executor-memory 2G --executor-cores 2
+
+###################
+#http://doc.mapr.com/display/MapR/Install+Spark+Standalone
+# manually:
+
+###################
+# To Start Spark Worker:
+# /opt/mapr/spark/spark-current/sbin/start-slaves.sh

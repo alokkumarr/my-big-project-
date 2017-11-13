@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "DataSet descriptor",
+  "description": "Defines a data object",
+  "type": "object",
+  "required": [
+    "component",
+    "created-ts",
+    "created-by",
+    "format",
+    "description"
+  ],
+  "additionalProperties": false,
+  "properties" :
+  {
+    "component": {
+      "description": "Component name creating the JSON file",
+      "type": "string"
+    },
+    "createdTs": {
+      "description": "DataSet creation TS",
+      "type": "string",
+      "additionalProperties": false,
+      "default": ""
+    },
+    "createdBy": {
+      "description": "User-creator",
+      "type": "string",
+      "additionalProperties": false,
+      "default": ""
+    },
+    "format": {
+      "description": "DataSet type",
+      "type": "string",
+      "additionalProperties": false,
+      "default": "parquet"
+    },
+    "tags": {
+      "description": "Tag to label data objects",
+      "type": "array",
+      "additionalProperties": false,
+      "minItems": 0,
+      "items": {
+        "type": "string"
+      }
+    },
+    "description": {
+      "description": "Description of the data object",
+      "type": "string",
+      "additionalProperties": false,
+      "default": "__none__"
+    }
+  }
+}

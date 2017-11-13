@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Defines the execution context of component",
+  "title" : "Session/Batch scope execution context",
+  "id": "component-ctx",
+  "exVal" : {
+    "type" : "object",
+    "properties": {
+      "target": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "value": {
+        "type": "java.lang.Object"
+      }
+    }
+  },
+  "properties" : {
+    "executionValue": {
+      "description": "System parameters specific for component execution",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/exVal"
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Get AWS public IP first
+myIP=$( curl 169.254.169.254/latest/meta-data/public-ipv4 2>/dev/null )
+# .. UNIX IP
+[[ $myIP ]] || myIP=$( ip route get 1.1.1.1 | awk '{print $NF; exit}' )
+host=$(hostname)
+shhn=$(hostname -s)
+
+svcs=$(maprcli service list | awk '/^logapath/{next} {print $3}')
+for s in $svcs ; do
+    u=$( maprcli urls -name $s 2>&1 )
+    [[ $u = *ERR* ]] && continue
+    u=$( set -- $u ; echo $2 ) # {u#* }
+    u=${u/$host/$shhn}
+    u=${u/$shhn/$myIP}
+    echo $s $u
+done
+
+exit
+
+resourcemanager http://192.168.2.152:8088
+spark-historyserver http://192.168.2.152:18080/
+historyserver http://192.168.2.152:19888/jobhistory
+cldb http://192.168.2.152:7221/cldb.jsp
+nodemanager http://192.168.2.152:8042/
+spark-master http://192.168.2.152:8080/
+
