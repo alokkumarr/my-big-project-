@@ -15,6 +15,15 @@
       <outputDirectory>bin</outputDirectory>
       <fileMode>555</fileMode>
     </fileSet>
+    <fileSet>
+      <directory>${project.basedir}/../xdf-core/src/main/scripts</directory>
+      <includes>
+        <include>execute-component.sh</include>
+        <include>xdf_info</include>
+      </includes>
+      <outputDirectory>bin</outputDirectory>
+      <fileMode>555</fileMode>
+    </fileSet>		
   </fileSets>
   <moduleSets>
     <moduleSet>

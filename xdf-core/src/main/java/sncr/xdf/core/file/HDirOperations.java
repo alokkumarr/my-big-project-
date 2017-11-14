@@ -25,13 +25,9 @@ public class HDirOperations {
 
     public static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-    public final static String SPARK_PARM_PREFIX = "spark.";
-    public final static String SPARK_MASTER = SPARK_PARM_PREFIX + "master";
     public final static String ES_PARAM_PREFIX = "es.";
 
     public final static String PARQUET_EXT = "parquet";
-    public static final String JSON_EXT = "json";
-    public static final String TEXT_EXT = "txt";
     public final static String DEFAULT_FS = "maprfs:///";
 
     public static final PathFilter FILE_FILTER = file -> (true);
@@ -42,14 +38,6 @@ public class HDirOperations {
     public final static String ES_PARAM_USER = ES_PARAM_PREFIX + "net.http.auth.user";
     public final static String ES_PARAM_PASSWORD = ES_PARAM_PREFIX + "net.http.auth.pass";
     public final static String ES_PARAM_PORT = ES_PARAM_PREFIX + "port";
-
-    public static final String JAR_EXT = ".jar";
-
-
-    public static final String CLI_NONE = ".jar";
-
-    public final static PathFilter JARFILE_FILTER = file ->
-            (file.getName().endsWith("." + JAR_EXT) && (!file.getName().startsWith(".")));
 
 
     public static boolean isEmptyParquetFile(FileStatus inputFileStatus, Configuration conf ) throws Exception {

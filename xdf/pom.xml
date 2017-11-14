@@ -165,7 +165,7 @@
               <username>${app.user}</username>
               <groupname>${app.group}</groupname>
               <sources><source>
-                <location>../xdf-rest/target/xdf-rest-3.1.0_dev-all.jar</location>
+                <location>../xdf-rest/target/xdf-rest-${project.version}-all.jar</location>
               </source></sources>
             </mapping>
 
