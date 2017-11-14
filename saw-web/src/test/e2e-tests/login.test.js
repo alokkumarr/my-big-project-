@@ -1,14 +1,14 @@
 const login = require('../javascript/pages/common/login.po.js');
 const header = require('../javascript/pages/components/header.co.js');
-const analyze = require('../javascript/pages/common/analyze.po.js');
+const analyze = require('../javascript/pages/common/analyzePage.po.js');
 const users = require('../javascript/data/users.js');
 const using = require('jasmine-data-provider');
 
 describe('Login Tests: login.test.js', () => {
 
   const userDataProvider = {
-    'admin': {handle: users.admin.loginId}/*,
-    'user': {handle: users.userOne.loginId},*/
+    'admin': {handle: users.admin.loginId},
+    'user': {handle: users.userOne.loginId},
   };
 //Prerequisites: two users should exist with user types: admin and user
   describe('Login Tests: login.test.js', () => {

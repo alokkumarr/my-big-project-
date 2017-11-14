@@ -15,7 +15,7 @@ exports.config = {
         //'incognito',
         'disable-extensions',
         'disable-web-security',
-        //  '--start-fullscreen' // enable for Mac OS
+        '--start-fullscreen' // enable for Mac OS
       ]
     }
   },
@@ -54,7 +54,9 @@ exports.config = {
       displaySuiteNumber: true
     }));
 
-    browser.manage().timeouts().pageLoadTimeout(10000);
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
+
+    browser.manage().timeouts().pageLoadTimeout(30000);
     browser.manage().timeouts().implicitlyWait(10000);
     //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.driver.get('http://localhost:3000');
@@ -63,6 +65,6 @@ exports.config = {
       return browser.driver.getCurrentUrl().then(url => {
         return /login/.test(url);
       });
-    }, 10000);
+    }, 30000);
   }
 };
