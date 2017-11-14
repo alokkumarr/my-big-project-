@@ -4,6 +4,7 @@ import * as map from 'lodash/map';
 import * as find from 'lodash/find';
 import * as flatMap from 'lodash/flatMap';
 import * as fpMap from 'lodash/fp/map';
+import * as fpForEach from 'lodash/fp/forEach';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
 import * as split from 'lodash/split';
@@ -25,7 +26,7 @@ import {DATE_INTERVALS_OBJ} from '../components/pivot/settings/analyze-pivot-set
 const FRONT_2_BACK_PIVOT_FIELD_PAIRS = {
   caption: 'displayName',
   dataField: 'columnName',
-  aggregate: 'aggregate'
+  summaryType: 'aggregate'
 };
 
 const BACK_2_FRONT_PIVOT_FIELD_PAIRS = invert(FRONT_2_BACK_PIVOT_FIELD_PAIRS);
@@ -59,7 +60,12 @@ export function PivotService() {
       fpMap(fpMapKeys(key => {
         const newKey = BACK_2_FRONT_PIVOT_FIELD_PAIRS[key];
         return newKey || key;
-      }))
+      })),
+      fpForEach(pivotField => {
+        if (pivotField.summaryType === 'count') {
+          pivotField.summaryType = 'sum';
+        }
+      })
     );
   }
 

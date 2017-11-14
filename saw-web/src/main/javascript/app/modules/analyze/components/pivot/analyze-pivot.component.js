@@ -229,7 +229,6 @@ export const AnalyzePivotComponent = {
           NUMBER_TYPES.includes(artifactColumn.type) &&
           !artifactColumn.aggregate) {
         artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
-        artifactColumn.summaryType = 'sum';
       }
     }
 
