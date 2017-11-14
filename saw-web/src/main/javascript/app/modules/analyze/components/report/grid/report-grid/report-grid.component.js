@@ -4,6 +4,7 @@ import * as find from 'lodash/find';
 import * as forEach from 'lodash/forEach';
 import * as remove from 'lodash/remove';
 import * as isUndefined from 'lodash/isUndefined';
+import * as isEmpty from 'lodash/isEmpty';
 import * as $ from 'jquery';
 
 import * as template from './report-grid.component.html';
@@ -188,8 +189,8 @@ export const ReportGridComponent = {
         if (!isUndefined(NUMBER_TYPES.includes(column.type)) && !isUndefined(column.format)) {
           if (!isUndefined(column.format.currency)) {
             field.customizeText = (data => {
-              if (!isUndefined(column.format.currencySymbol)) {
-                return data.valueText + ' ' + column.format.currencySymbol;
+              if (!isUndefined(column.format.currencySymbol)  &&  !isEmpty(data.valueText)) {
+                return column.format.currencySymbol + ' ' + data.valueText;
               } else {
                 return data.valueText;
               }
@@ -259,8 +260,8 @@ export const ReportGridComponent = {
             } else {
               if (newFormat.commaSeparator) {
                 typeValue = 'fixedpoint';
-              } else {
-                typeValue = 'decimal';
+              } else if (newFormat.numberDecimal > 0) {
+                typeValue = 'long';
               }
               if (newFormat.currencyFlag) {
                 column.format = {
@@ -270,12 +271,13 @@ export const ReportGridComponent = {
                   currencySymbol: newFormat.currencySymbol
                 };
                 column.customizeText = (source => {
-                  if (!isUndefined(column.format.currencySymbol)) {
-                    return source.valueText + ' ' + column.format.currencySymbol;
+                  if (!isUndefined(column.format.currencySymbol) && !isEmpty(source.valueText)) {
+                    return column.format.currencySymbol + ' ' + source.valueText;
                   } else {
                     return source.valueText;
                   }
                 });
+                
               } else {
                 column.format = {
                   type: typeValue,

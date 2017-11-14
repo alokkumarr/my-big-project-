@@ -2,6 +2,7 @@ import * as template from './report-format-dialog.component.html';
 import style from './report-format-dialog.component.scss';
 import * as currencyCodeList from 'currency-codes/data.js';
 import * as getSymbolFromCurrency from 'currency-symbol-map/currency-symbol-map.js';
+import * as isUndefined from 'lodash/isUndefined';
 
 export const ReportFormatDialogComponent = {
   bindings: {
@@ -23,6 +24,7 @@ export const ReportFormatDialogComponent = {
         column: this.modelData.dataField,
         type: this.modelData.dataType
       };
+      this.format.numberDecimal = 0;
       if (this.modelData.dataType === 'number') {
         this.format.currencySymbol = '';
         if (this.modelData.dataType === 'number' && this.modelData.format.type === 'fixedpoint') {
@@ -49,9 +51,9 @@ export const ReportFormatDialogComponent = {
     modifyNumber() {
       if (this.format.numberDecimal > -1 && this.format.commaSeparator && this.format.currencyFlag) {
         this.finalNumber = this._$filter('number')(this.number, this.format.numberDecimal);
-        if (this.format.currencyCode) {
-          this.format.currencySymbol = this.getSymbolFromCurrency(this.format.currencyCode);
-          this.stringNumber = this.finalNumber + ' ' + this.format.currencySymbol;
+        this.format.currencySymbol = this.getSymbolFromCurrency(this.format.currencyCode);
+        if (!isUndefined(this.format.currencySymbol) && !isUndefined(this.format.currencyCode)) {
+          this.stringNumber = this.format.currencySymbol + ' ' + this.finalNumber;
         } else {
           this.stringNumber = this.finalNumber.toString();
         }
@@ -65,9 +67,9 @@ export const ReportFormatDialogComponent = {
       if (this.format.numberDecimal > -1 && !this.format.commaSeparator && this.format.currencyFlag) {
         this.stringNumber = this._$filter('number')(this.number, this.format.numberDecimal);
         this.stringNumber = (num => num.split(',').join(''))(this.stringNumber);
-        if (this.format.currencyCode) {
-          this.format.currencySymbol = this.getSymbolFromCurrency(this.format.currencyCode);
-          this.stringNumber = this.stringNumber + ' ' + this.format.currencySymbol;
+        this.format.currencySymbol = this.getSymbolFromCurrency(this.format.currencyCode);
+        if (!isUndefined(this.format.currencySymbol) && !isUndefined(this.format.currencyCode)) {
+          this.stringNumber = this.format.currencySymbol + ' ' + this.stringNumber;
         } else {
           this.format.currencySymbol = undefined;
           this.stringNumber = this.stringNumber.toString();

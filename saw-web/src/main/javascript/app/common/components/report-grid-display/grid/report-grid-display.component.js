@@ -5,6 +5,7 @@ import DataSource from 'devextreme/data/data_source';
 import * as template from './report-grid-display.component.html';
 
 import {NUMBER_TYPES} from '../../../consts.js';
+import * as isEmpty from 'lodash/isEmpty';
 
 const COLUMN_WIDTH = 175;
 const DEFAULT_PAGE_SIZE = 10;
@@ -102,8 +103,8 @@ export const ReportGridDisplayComponent = {
         if (!isUndefined(NUMBER_TYPES.includes(column.type)) && !isUndefined(column.format)) {
           if (!isUndefined(column.format.currency)) {
             field.customizeText = (data => {
-              if (!isUndefined(column.format.currencySymbol)) {
-                return data.valueText + ' ' + column.format.currencySymbol;
+              if (!isUndefined(column.format.currencySymbol) &&  !isEmpty(data.valueText)) {
+                return column.format.currencySymbol + ' ' + data.valueText;
               } else {
                 return data.valueText;
               }
