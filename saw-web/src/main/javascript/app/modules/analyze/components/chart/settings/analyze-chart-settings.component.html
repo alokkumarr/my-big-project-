@@ -39,7 +39,10 @@
                          ng-disabled="attr.disabled"
                          ng-change="$ctrl.inputChanged($ctrl.settings.yaxis, attr, 'y')"
                          style="align-self: flex-end;">
-              <span ng-bind="attr.displayName"></span>
+              <span ng-bind="attr.displayName">
+                <md-tooltip ng-bind="attr.displayName | translate"></md-tooltip>
+              </span>
+              
             </md-checkbox>
 
             <aggregate-chooser flex="20" ng-show="attr.checked"
@@ -62,7 +65,9 @@
                              ng-value="attr"
                              e2e="radio-button-{{::attr.displayName}}"
                              ng-disabled="attr.checked && attr.checked != 'x'">
-            <span class="truncated-field-name" ng-bind="::attr.displayName"></span>
+            <span class="truncated-field-name" ng-bind="::attr.displayName">
+              <md-tooltip ng-bind="::attr.displayName | translate"></md-tooltip>
+            </span>
             </md-radio-button>
 
             <md-menu class="md-secondary" ng-show="attr.checked && attr.checked == 'x' && $ctrl.DATE_TYPES.includes(attr.type)">
@@ -99,7 +104,9 @@
                              ng-value="attr"
                              e2e="radio-button-{{::attr.displayName}}"
                              ng-disabled="attr.checked && attr.checked != 'z'">
-            <span ng-bind="::attr.displayName"></span>
+            <span ng-bind="::attr.displayName">
+              <md-tooltip ng-bind="::attr.displayName | translate"></md-tooltip>
+            </span>
             </md-radio-button>
             <aggregate-chooser ng-show="attr.checked && attr.checked === 'z'"
                                artifact-column="attr"
@@ -121,7 +128,9 @@
                              ng-value="attr"
                              e2e="radio-button-{{::attr.displayName}}"
                              ng-disabled="attr.checked && attr.checked != 'g'">
-              <span ng-bind="::attr.displayName"></span>
+              <span ng-bind="::attr.displayName">
+                <md-tooltip ng-bind="::attr.displayName | translate"></md-tooltip>
+              </span>
             </md-radio-button>
 
             <md-menu class="md-secondary" ng-show="attr.checked && attr.checked == 'g' && $ctrl.DATE_TYPES.includes(attr.type)">

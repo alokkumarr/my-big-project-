@@ -49,8 +49,11 @@ analyze-chart-settings {
         }
 
         .md-label {
-          display: block !important;
-          width: 120px;
+          display: inline-block !important;
+          width: 160px;
+          white-space: nowrap;//comment this property for discussion
+          overflow: hidden !important;
+          text-overflow: ellipsis;
         }
       }
     }
