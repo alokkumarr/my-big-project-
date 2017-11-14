@@ -25,7 +25,7 @@ import {DATE_INTERVALS_OBJ} from '../components/pivot/settings/analyze-pivot-set
 const FRONT_2_BACK_PIVOT_FIELD_PAIRS = {
   caption: 'displayName',
   dataField: 'columnName',
-  summaryType: 'aggregate'
+  aggregate: 'aggregate'
 };
 
 const BACK_2_FRONT_PIVOT_FIELD_PAIRS = invert(FRONT_2_BACK_PIVOT_FIELD_PAIRS);
