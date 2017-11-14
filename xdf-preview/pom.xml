@@ -1,13 +1,17 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <groupId>xdf-nextgen</groupId>
-    <artifactId>bigdataframework</artifactId>
-    <version>1.0.0</version>
+    <groupId>bda</groupId>
+    <artifactId>xdf-nextgen</artifactId>
+    <version>1.0.0_dev</version>
   </parent>
+
   <artifactId>xdf-preview</artifactId>
-  <name>${project.artifactId}</name>
+
+  <!-- name>${project.artifactId}</name -->
+
   <properties>
     <akka.version>2.5.4</akka.version>
     <akka.http.version>10.0.10</akka.http.version>
@@ -16,12 +20,12 @@
   <dependencies>
     <!-- XDF -->
     <dependency>
-      <groupId>xdf-nextgen</groupId>
+      <groupId>bda</groupId>
       <artifactId>xdf-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>xdf-nextgen</groupId>
+      <groupId>bda</groupId>
       <artifactId>xdf-data-profiler</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -114,7 +118,7 @@
           <outputFileName>xdf-akka-server.jar</outputFileName>
         </configuration>
       </plugin>
-      <plugin>
+      <!--plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <version>2.4.3</version>
@@ -140,7 +144,7 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
+      </plugin-->
     </plugins>
   </build>
 </project>

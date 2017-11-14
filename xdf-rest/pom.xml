@@ -1,12 +1,15 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
-    <artifactId>bigdataframework</artifactId>
-    <groupId>xdf-nextgen</groupId>
-    <version>1.0.0</version>
+    <groupId>bda</groupId>
+    <artifactId>xdf-nextgen</artifactId>
+    <version>1.0.0_dev</version>
   </parent>
+
   <artifactId>xdf-rest</artifactId>
+
   <name>${project.artifactId}</name>
   <properties>
     <akka.version>2.5.4</akka.version>
@@ -16,27 +19,27 @@
   <dependencies>
     <!-- XDF -->
     <dependency>
-      <groupId>xdf-nextgen</groupId>
+      <groupId>bda</groupId>
       <artifactId>xdf-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>xdf-nextgen</groupId>
+      <groupId>bda</groupId>
       <artifactId>xdf-preview</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>xdf-nextgen</groupId>
+      <groupId>bda</groupId>
       <artifactId>xdf-sql</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>xdf-nextgen</groupId>
+      <groupId>bda</groupId>
       <artifactId>xdf-data-profiler</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>xdf-nextgen</groupId>
+      <groupId>bda</groupId>
       <artifactId>xdf-parser</artifactId>
       <version>${project.version}</version>
     </dependency>

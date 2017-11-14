@@ -1,6 +1,6 @@
 #!/bin/bash
 # Executable script for xdf version 2+
-CMD_DIR=$( cd $(dirname $0); pwd )
+CMD_DIR=$( cd $(dirname $0); pwd -P )
 
 DRYRUN=${DRYRUN:-}
 XDF_DATA_ROOT=hdfs:///data/bda

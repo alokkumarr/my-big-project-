@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>xdf-nextgen</groupId>
-    <artifactId>bigdataframework</artifactId>
-    <version>1.0.0</version>
+    <groupId>bda</groupId>
+    <artifactId>xdf-nextgen</artifactId>
+    <version>1.0.0_dev</version>
   </parent>
 
   <!-- use app.name from parent pom -->
   <!--artifactId>${app.name}</artifactId-->
-  <artifactId>xdf</artifactId>
+  <artifactId>xdf-rpm</artifactId>
 
   <packaging>pom</packaging>
   <!--name>xdf</name-->
@@ -27,49 +27,15 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>xdf-nextgen</groupId>
-      <artifactId>xdf-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>xdf-nextgen</groupId>
-      <artifactId>xdf-meta</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>xdf-nextgen</groupId>
-      <artifactId>xdf-component</artifactId>
-      <version>${project.version}</version>
-    </dependency>		
-    <dependency>
-      <groupId>xdf-nextgen</groupId>
-      <artifactId>xdf-preview</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>xdf-nextgen</groupId>
-      <artifactId>xdf-sql</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>xdf-nextgen</groupId>
-      <artifactId>xdf-data-profiler</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>xdf-nextgen</groupId>
-      <artifactId>xdf-parser</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>xdf-nextgen</groupId>
-      <artifactId>xdf-devkit</artifactId>
+      <groupId>bda</groupId>
+      <artifactId>xdf-rest</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>
     <plugins>
       <!-- Assembly plugin -->
+<!--
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -83,15 +49,16 @@
             </goals>
             <configuration>
               <outputDirectory>${output.directory}</outputDirectory>
-              <!--archiveBaseDirectory>${ass.out}</archiveBaseDirectory-->
+              <!-*-archiveBaseDirectory>${ass.out}</archiveBaseDirectory-*->
               <descriptors>
-                <!-- descriptor>src/main/assembly/xdf-assembly.xml</descriptor -->
+                <!-*- descriptor>src/main/assembly/xdf-assembly.xml</descriptor -*->
                 <descriptor>${ass.desc}</descriptor>
               </descriptors>
             </configuration>
           </execution>
         </executions>
       </plugin>
+-->
       <!-- Assembly plugin : end -->
       <!-- RPM plugin -->
       <plugin>
@@ -111,7 +78,7 @@
           <distribution>XDF-${rpm.version}</distribution>
           <needarch>false</needarch>
           <targetOS>i386-linux</targetOS>
-          <group>BDA/XDF</group>
+          <group>SNCR/BDA</group>
           <packager>BDA</packager>
 
           <name>${rpm.name}</name>
@@ -134,10 +101,13 @@
               <directory>${app.optDir}</directory>
             </mapping>
             <mapping>
+              <directory>${app.optDir}/bin</directory>
+            </mapping>
+            <mapping>
               <directory>${app.optDir}/lib</directory>
             </mapping>
             <mapping>
-              <directory>${app.optDir}/bin</directory>
+              <directory>${app.optDir}/test</directory>
             </mapping>
             <mapping>
               <directory>${app.optDir}/conf</directory>
@@ -145,27 +115,31 @@
             <mapping>
               <directory>${app.varDir}/log</directory>
             </mapping>
-            <!-- files -->
+
+            <!-- lib files -->
             <mapping>
               <directory>${app.optDir}/lib</directory>
               <directoryIncluded>false</directoryIncluded>
               <filemode>444</filemode>
               <username>${app.user}</username>
               <groupname>${app.group}</groupname>
-              <sources>
-                <source>
-                  <location>target/${ass.out}/lib</location>
-                </source>
-              </sources>
+              <sources><source>
+                  <location>../xdf-rest/target/xdf-rest-${project.version}-all.jar</location>
+              </source></sources>
             </mapping>
+
             <mapping>
-              <directory>${app.optDir}/srv</directory>
+              <directory>${app.optDir}/test</directory>
               <directoryIncluded>false</directoryIncluded>
               <filemode>444</filemode>
               <username>${app.user}</username>
               <groupname>${app.group}</groupname>
               <sources><source>
-                <location>../xdf-rest/target/xdf-rest-${project.version}-all.jar</location>
+                <location>../xdf-rest/test</location>
+                <includes>
+                  <include>*.sh</include>
+                  <include>*.json</include>
+                </includes>
               </source></sources>
             </mapping>
 
@@ -176,29 +150,34 @@
               <username>${app.user}</username>
               <groupname>${app.group}</groupname>
               <sources>
+                <!-- xdf-component -->
+                <!--source>
+                  <location>../xdf-component/src/main/scripts/*.sh</location>
+                </source-->
+                <!-- xdf-core -->
                 <source>
-                  <location>target/${ass.out}/bin</location>
-                  <includes>
-                    <include>*.sh</include>
-                    <include>*.py</include>
-                  </includes>
+                  <location>../xdf-core/src/main/scripts/xdf_info</location>
+                  <filter>true</filter>
                 </source>
                 <source>
-                  <location>${project.basedir}/../xdf-rest/src/main/scripts</location>
-                  <includes>
-                    <include>run-task.sh</include>
-                    <include>start-server.sh</include>
-                  </includes>
+                  <location>../xdf-core/src/main/scripts/execute-component.sh</location>
                 </source>
+                <!-- xdf-meta -->
                 <source>
-                  <location>${project.basedir}/../xdf-meta/src/main/scripts</location>
+                  <location>../xdf-meta/src/main/scripts</location>
                   <includes>
+                    <include>create-metadata.sh</include>
                     <include>xdf-mdcli.sh</include>
                   </includes>
                 </source>
+                <!-- xdf-rest -->
                 <source>
-                  <filter>true</filter>
-                  <location>target/${ass.out}/bin/xdf_info</location>
+                  <location>../xdf-rest/src/main/scripts</location>
+                  <includes>
+                    <include>run-task.sh</include>
+                    <include>start-server.sh</include>
+                    <include>mk_csv.sh</include>
+                  </includes>
                 </source>
               </sources>
             </mapping>
@@ -211,21 +190,21 @@
               <groupname>${app.group}</groupname>
               <sources>
                 <source>
-                  <location>${project.basedir}/../xdf-core</location>
+                  <location>../xdf-core</location>
                   <includes>
                     <include>log4j.dtd</include>
                     <include>log4j.xml</include>
                   </includes>
                 </source>
                 <source>
-                  <location>${project.basedir}/../xdf-rest</location>
+                  <location>../xdf-rest</location>
                   <includes>
                     <include>logback.xml</include>
                     <include>xdf-rest.conf</include>
                   </includes>
                 </source>
                 <source>
-                  <location>${project.basedir}/../xdf/src/main/resources/log4j.properties</location>
+                  <location>../xdf/src/main/resources/log4j.properties</location>
                 </source>
               </sources>
             </mapping>
@@ -255,8 +234,6 @@ echo PostInstall done: ${app.nameVer}
           <preremoveScriptlet>
             <script>
 echo PreRemove started: ${app.nameVer}
-echo Remove Python compiled files
-rm -f ${app.optDir}/bin/*.pyc
 echo Remove soft link
 rm -f ${app.optParDir}/${app.name}-current # ${app.optDir}/sbin
 echo PreRemove done: ${app.nameVer}
