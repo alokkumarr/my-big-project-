@@ -1,0 +1,32 @@
+@import "themes/base/colors";
+
+designer-header {
+  background-color: pink;
+
+  .header__container {
+    height: 100%;
+  }
+
+  .header__name {
+    strong {
+      color: $primary-blue-b2;
+    }
+
+    label {
+      padding: 0 2px;
+      font-size: 11px;
+      text-transform: uppercase;
+      background-color: $secondary-orange;
+      color: $primary-white;
+      vertical-align: top;
+    }
+  }
+
+  .header__description {
+    font-size: 14px;
+
+    span {
+      color: #C7C7C7;
+    }
+  }
+}

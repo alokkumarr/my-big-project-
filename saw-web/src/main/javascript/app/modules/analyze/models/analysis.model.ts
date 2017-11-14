@@ -5,7 +5,7 @@ import Repository from './repository.model';
 import EsRepository from './es-repository.model';
 import OutputFile from './output-file.model';
 
-export default interface Analyze {
+export default interface Analysis {
   description:      string;
   checked:          null | boolean | string;
   categoryId:       number;

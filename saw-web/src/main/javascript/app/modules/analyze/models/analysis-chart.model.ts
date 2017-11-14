@@ -1,9 +1,9 @@
 import LabelOptions from './label-options.model';
 import Legend from './legend.model';
 import Axis from './axis.model';
-import Analyze from './analyze.model';
+import Analysis from './analysis.model';
 
-export default interface AnalyzeChart extends Analyze {
+export default interface AnalysisChart extends Analysis {
   legend?:          Legend;
   chartType?:       string;
   labelOptions?:    LabelOptions;

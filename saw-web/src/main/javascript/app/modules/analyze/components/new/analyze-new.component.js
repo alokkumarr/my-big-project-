@@ -53,10 +53,16 @@ export const AnalyzeNewComponent = {
     }
 
     openUpgradedModal() {
+      const mode = ENTRY_MODES.NEW;
       const semanticId = this.selectedMetric.id;
       const metricName = this.selectedMetric.metricName;
+      const method = this.selectedAnalysisMethod.split(':');
+      const isChartType = method[0] === 'chart';
+      const type = isChartType ? method[0] : method[1];
+      const chartType = isChartType ? method[1] : null;
       const model = {
-        type: AnalyseTypes.Report,
+        type,
+        chartType,
         name: 'Untitled Analysis',
         description: '',
         categoryId: this.subCategory,
@@ -64,7 +70,7 @@ export const AnalyzeNewComponent = {
         metricName,
         scheduled: null
       };
-      this._AnalyzeDialogService.openNewAnalysisDialog(model);
+      this._AnalyzeDialogService.openNewAnalysisDialog(model, mode);
     }
 
     createAnalysis() {

@@ -2,6 +2,7 @@ import * as angular from 'angular';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { NgModule } from '@angular/core';
+import { CommonModule as CommonModuleAngular4 } from '@angular/common';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {MaterialModule} from '../../material.module';
 
@@ -60,10 +61,15 @@ import {CommonModule} from '../../common';
 
 import {
   DesignerDialogComponent,
-  DesignerHeaderComponent
-} from './components/designer-dialog';
+  DesignerContainerComponent,
+  DesignerHeaderComponent,
+  DesignerService
+} from './components/designer';
+import {
+  analyzeServiceProvider
+} from './services/ajs-analyze-providers';
 
-import AnalyzeDialogService from './services/analyze-dialog.service';
+import {AnalyzeDialogService} from './services/analyze-dialog.service';
 
 export const AnalyzeModule = 'AnalyzeModule';
 
@@ -121,21 +127,24 @@ angular.module(AnalyzeModule, [
 
 @NgModule({
   imports: [
+    CommonModuleAngular4,
     MaterialModule,
     FlexLayoutModule
   ],
   declarations: [
     DesignerDialogComponent,
+    DesignerContainerComponent,
     DesignerHeaderComponent
   ],
   entryComponents: [
     DesignerDialogComponent,
+    DesignerContainerComponent,
     DesignerHeaderComponent
   ],
-  providers: [AnalyzeDialogService],
-  exports: [
-    DesignerDialogComponent,
-    DesignerHeaderComponent
+  providers: [
+    AnalyzeDialogService,
+    analyzeServiceProvider,
+    DesignerService
   ]
 })
 export class AnalyzeModuleTs {}
