@@ -96,6 +96,8 @@ XDF_DIR=$( xdf_info optdir )
 LIB_DIR=$XDF_DIR/lib
 ( cd $LIB_DIR ) || exit
 
+APPJAR=$XDF_DIR/lib/xdf-rest-1.0.0_dev-all.jar
+
 VERSION=$( xdf_info version )
 : ${VERSION:?no value}
 
@@ -115,21 +117,24 @@ Configuration file      : $CONFIG_FILE
 EEOOTT
 
 #######################################
+
+COMPONENT_JAR=$APPJAR
+
 CMD=
 PARAM_LIST=( -b $BATCH_ID -c $CONFIG_FILE -a $APPLICATION_ID )
 case "$COMPONENT_NAME" in
     sql)
-        COMPONENT_JAR=${LIB_DIR}/xdf-sql-${VERSION}.jar
+#        COMPONENT_JAR=${LIB_DIR}/xdf-sql-${VERSION}.jar
         MAIN_CLASS=sncr.xdf.sql.SQLComponent
         ;;
  
     zero)
-        COMPONENT_JAR=${LIB_DIR}/xdf-component-${VERSION}.jar
+#        COMPONENT_JAR=${LIB_DIR}/xdf-component-${VERSION}.jar
         MAIN_CLASS="sncr.xdf.component.ZeroComponent"
         ;;
 
     parser)
-        COMPONENT_JAR=${LIB_DIR}/xdf-component-${VERSION}.jar
+#        COMPONENT_JAR=${LIB_DIR}/xdf-component-${VERSION}.jar
         MAIN_CLASS="sncr.xdf.parser"
         ;;
 

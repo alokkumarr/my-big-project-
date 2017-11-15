@@ -1,26 +1,20 @@
 #!/bin/bash
 
+####################################
+#
+#  input parameters:
+#  1 - XDF data root
+#
+####################################
+
+XDF_DATA_ROOT=${1:=/data/bda/datalake}
+
 hadoop fs -mkdir /data/bda/datalake/.metadata
 
-create /data/bda/datalake/.metadata/datasets
-create /data/bda/datalake/.metadata/transformations
-create /data/bda/datalake/.metadata/datapods
-create /data/bda/datalake/.metadata/datasegments
-create /data/bda/datalake/.metadata/auditlog
+echo "create $XDF_DATA_ROOT/.metadata/datasets" | mapr dbshell
+echo "create /data/bda/datalake/.metadata/transformations" | mapr dbshell
+echo "create /data/bda/datalake/.metadata/datapods" | mapr dbshell
+echo "create /data/bda/datalake/.metadata/datasegments" | mapr dbshell
+echo "create /data/bda/datalake/.metadata/auditlog" | mapr dbshell
 
-### SRUX
-
-
-hadoop fs -mkdir /data/bda/.metadata
-
-create /data/bda/.metadata/datasets
-create /data/bda/.metadata/transformations
-create /data/bda/.metadata/datapods
-create /data/bda/.metadata/datasegments
-create /data/bda/.metadata/auditlog
-
-
-
-JsonReader jsonReader = new JsonReader(new StringReader(json));
-
-
+exit 0
