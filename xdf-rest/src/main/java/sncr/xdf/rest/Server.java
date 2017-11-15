@@ -23,7 +23,7 @@ public class Server {
         if (args != null && args.length == 2 && args[0].equals("server"))
             XDFHttpServer.main(args);
         // Executor JVM
-        if (args != null && args.length == 3 && args[0].equals("task"))
+        if (args != null && args.length >= 3 && args[0].equals("task"))
             ComponentExecutor.main(args);
     }
 
