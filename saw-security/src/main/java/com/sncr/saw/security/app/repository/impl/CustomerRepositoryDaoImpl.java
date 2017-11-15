@@ -1,13 +1,12 @@
 package com.sncr.saw.security.app.repository.impl;
 
 import com.sncr.saw.security.app.repository.CustomerRepository;
-import com.sncr.saw.security.common.bean.Customer;
+import com.sncr.saw.security.app.model.Customer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -20,7 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by pawan on 03/11/17.
+ * Created by pawan
  */
 @Repository
 public class CustomerRepositoryDaoImpl implements CustomerRepository {
@@ -37,7 +36,7 @@ public class CustomerRepositoryDaoImpl implements CustomerRepository {
     @Override
     public boolean isValidCustCode(String custCode) {
         try {
-            if(custCode==null || custCode.trim().isEmpty()) {
+            if (custCode == null || custCode.trim().isEmpty()) {
                 return false;
             }
             Pattern p = Pattern.compile("[^A-Za-z0-9]");
@@ -97,6 +96,6 @@ public class CustomerRepositoryDaoImpl implements CustomerRepository {
 
             return (Long) keyHolder.getKey();
         }
-        return  -1L;
+        return -1L;
     }
 }
