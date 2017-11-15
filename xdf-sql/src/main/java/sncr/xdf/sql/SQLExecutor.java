@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.core.file.HDirOperations;
 import scala.Tuple4;
 import sncr.xdf.context.Context;
 import sncr.xdf.core.file.DLDataSetOperations;
@@ -84,7 +83,7 @@ public class SQLExecutor implements Serializable {
 
                     logger.debug("Load data from: " + location  + ", registered table name: " + tn );
 
-                    Tuple4<String, String, Integer, HDirOperations.PARTITION_STRUCTURE> loc_desc =
+                    Tuple4<String, String, Integer, DLDataSetOperations.PARTITION_STRUCTURE> loc_desc =
                             DLDataSetOperations.getPartitioningInfo(location);
 
                     if (loc_desc == null)

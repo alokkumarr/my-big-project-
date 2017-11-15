@@ -26,7 +26,7 @@ public abstract class MetadataBase {
     public static final String DEFAULT_CATALOG = "data";
 
 
-    protected static String XDF_DATA_ROOT = "XDF_DATA_ROOT";
+    public static String XDF_DATA_ROOT = "XDF_DATA_ROOT";
     protected static String FILE_DESCRIPTOR = ".bda_meta";
     public static String DEFAULT_DATA_SOURCE = "fs";
 
@@ -59,20 +59,20 @@ public abstract class MetadataBase {
         if (a_xdfDataRoot != null && !a_xdfDataRoot.isEmpty() ){
             dlRoot = a_xdfDataRoot;
         }
+        else
+            throw new IllegalArgumentException("XDF data root parameter must be provided");
+
+/*
         else{
-            String xdfDataRootSys = System.getProperty(XDF_DATA_ROOT);
-            if(xdfDataRootSys != null && !xdfDataRootSys.isEmpty())
-                dlRoot = xdfDataRootSys;
-            else {
-                String xdfDataRootEnv = System.getenv(XDF_DATA_ROOT);
-                if (xdfDataRootEnv != null && !xdfDataRootEnv.isEmpty()) {
-                    dlRoot = xdfDataRootEnv;
-                }
+            String xdfDataRootEnv = System.getenv(XDF_DATA_ROOT);
+            if (xdfDataRootEnv != null && !xdfDataRootEnv.isEmpty()) {
+                dlRoot = xdfDataRootEnv;
             }
         }
         if (!HFileOperations.exists(dlRoot)){
             throw new XDFException(XDFException.ErrorCodes.NonExistingDataRoot, dlRoot);
         }
+*/
         return dlRoot;
     }
 

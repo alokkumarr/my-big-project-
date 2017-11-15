@@ -24,7 +24,7 @@ public class ZeroComponent extends Component implements WithMovableResult , With
         ZeroComponent component = new ZeroComponent();
         try {
             // Spark based component
-            if (component.collectParameters(args) == 0) {
+            if (component.collectCMDParameters(args) == 0) {
                 int r = component.Run();
                 System.exit(r);
             }

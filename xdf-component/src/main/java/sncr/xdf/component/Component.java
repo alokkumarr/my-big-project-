@@ -14,6 +14,7 @@ import sncr.xdf.core.file.HFileOperations;
 import sncr.xdf.datasets.conf.DataSetProperties;
 import sncr.xdf.services.AuditLogService;
 import sncr.xdf.services.DLDSMeta;
+import sncr.xdf.services.MetadataBase;
 import sncr.xdf.services.TransformationMeta;
 
 import java.util.ArrayList;
@@ -128,12 +129,12 @@ public abstract class Component {
 
     /** This method:
      * Initializes component from command line parameters,
-     * it calls underlying collectParameters methods converting parameters to Map.
+     * it calls underlying collectCMDParameters methods converting parameters to Map.
      * @param args - command line parameters.
      * @return  - 0 - Success, -1 - fail
      */
 
-    public final int collectParameters(String[] args){
+    public final int collectCMDParameters(String[] args){
         CliHandler cli = new CliHandler();
         try {
             HFileOperations.init();
@@ -141,15 +142,26 @@ public abstract class Component {
             Map<String,Object> parameters = cli.parse(args);
             String cfgLocation = (String) parameters.get(CliHandler.OPTIONS.CONFIG.name());
             String configAsStr = ConfigLoader.loadConfiguration(cfgLocation);
-            parameters.put(CliHandler.OPTIONS.CONFIG.name(), configAsStr);
+            if ( configAsStr == null || configAsStr.isEmpty()){
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "configuration file name");
+            }
 
             String appId = (String) parameters.get(CliHandler.OPTIONS.APP_ID.name());
-            parameters.put(CliHandler.OPTIONS.APP_ID.name(), appId);
+            if ( appId == null || appId.isEmpty()){
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "Project/application name");
+            }
 
             String batchId = (String) parameters.get(CliHandler.OPTIONS.BATCH_ID.name());
-            parameters.put(CliHandler.OPTIONS.BATCH_ID.name(), batchId);
+            if ( batchId == null || batchId.isEmpty()){
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "batch id/session id");
+            }
 
-            return Init(parameters);
+            String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
+            if(xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
+                throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+            }
+
+            return Init(configAsStr, appId, batchId, xdfDataRootSys);
         } catch(ParseException e){
             error = "Could not parse CMD line: " +  e.getMessage();
             logger.error(e);
@@ -163,21 +175,14 @@ public abstract class Component {
         }
     }
 
-    public final int Init(Map<String,Object> parsedParameters) throws Exception {
 
-        String configJson = (String) parsedParameters.get(CliHandler.OPTIONS.CONFIG.name());
-        String appId = (String)  parsedParameters.get(CliHandler.OPTIONS.APP_ID.name());
-        String batchId = (String) parsedParameters.get(CliHandler.OPTIONS.BATCH_ID.name());
-
-        return Init(configJson, appId, batchId);
-    }
 
     // From API
     // This method should not interact with any storage (hdfs, maprfs, es etc)
     // Ideally should never be overwritten
     // and always executed from custom initialization functions
 
-    public final int Init(String config, String appId, String batchId) throws Exception {
+    public final int Init(String config, String appId, String batchId, String xdfDataRootSys) throws Exception {
 
         logger.trace( "Configuration dump: \n" + config);
         ComponentConfiguration cfg = null;
@@ -210,7 +215,7 @@ public abstract class Component {
         if (this instanceof WithMovableResult) {
             resultDataDesc = new ArrayList<>();
         }
-        md = new DLDSMeta(null);
+        md = new DLDSMeta(xdfDataRootSys);
         transformationMD = new TransformationMeta();
         dsaux = new WithDataSetService.DataSetServiceAux(ctx, md);
         als = new AuditLogService(md.getRoot());
@@ -287,12 +292,14 @@ public abstract class Component {
     public static int startComponent(Component self, String config, String app, String batch)
     {
         logger.debug(String.format("Component [%s] has been started...", self.componentName));
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put(CliHandler.OPTIONS.CONFIG.name(), config);
-        parameters.put(CliHandler.OPTIONS.APP_ID.name(), app);
-        parameters.put(CliHandler.OPTIONS.BATCH_ID.name(), batch);
+
+        String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
+        if(xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
+            throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
+        }
+
         try {
-            if (self.Init(parameters) == 0) {
+            if (self.Init(config, app, batch, xdfDataRootSys) == 0) {
                 return self.Run();
             }
             else{

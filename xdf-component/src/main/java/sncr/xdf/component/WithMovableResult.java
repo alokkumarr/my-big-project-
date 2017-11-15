@@ -6,7 +6,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import sncr.xdf.context.Context;
 import sncr.xdf.core.file.DLDataSetOperations;
-import sncr.xdf.core.file.HDirOperations;
 
 import java.io.IOException;
 import java.util.List;
@@ -47,7 +46,7 @@ public interface WithMovableResult {
                 //If output files are PARQUET files - clean up temp. directory - remove
                 // _metadata and _common_? files.
                 if (moveTask.format.equalsIgnoreCase(DLDataSetOperations.FORMAT_PARQUET)) {
-                    HDirOperations.cleanupDataDirectory(moveTask.source);
+                    DLDataSetOperations.cleanupDataDirectory(moveTask.source);
                 } else if (moveTask.format.equalsIgnoreCase(DLDataSetOperations.FORMAT_JSON)) {
                 }
 
@@ -102,8 +101,8 @@ public interface WithMovableResult {
         public String objectName;
 
         {
-            mode = DLDataSetOperations.FORMAT_PARQUET;
-            format = DLDataSetOperations.FORMAT_JSON;
+            mode = DLDataSetOperations.MODE_APPEND;
+            format = DLDataSetOperations.FORMAT_PARQUET;
         }
 
         public MoveDataDescriptor(String src,

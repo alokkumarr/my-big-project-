@@ -3,13 +3,13 @@ package sncr.xdf.component;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
-
-import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.context.Context;
 import sncr.xdf.conf.Input;
 import sncr.xdf.conf.Output;
+import sncr.xdf.core.file.DLDataSetOperations;
 import sncr.xdf.core.file.HFileOperations;
 import sncr.xdf.datasets.conf.DataSetProperties;
+import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.services.DLDSMeta;
 import sncr.xdf.services.MetadataBase;
 
@@ -104,28 +104,31 @@ public interface WithDataSetService {
         Map<String, Map<String,String>> resMap = new HashMap();
         for( Output output: aux.ctx.componentConfiguration.getOutputs()){
             Map<String, String> res_output = new HashMap<String, String>();
+
+            String dataSource = (output.getDataSource() != null) ? output.getDataSource().toString(): MetadataBase.PREDEF_DATA_SOURCE;
+            String catalog = (output.getDataSource() != null)? output.getCatalog():  MetadataBase.PREDEF_DATA_SOURCE;
+            String format = (output.getFormat() != null) ? output.getFormat().toString() : DLDataSetOperations.FORMAT_PARQUET;
+            String mode = (output.getMode() != null) ? output.getMode().toString() : DLDataSetOperations.MODE_APPEND;
+
+
             StringBuilder sb = new StringBuilder(aux.md.getRoot());
               sb.append(Path.SEPARATOR + aux.ctx.applicationID)
                 .append(Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR)
-                .append(((output.getDataSource() != null)?
-                        Path.SEPARATOR + output.getDataSource()
-                        :Path.SEPARATOR + MetadataBase.PREDEF_DATA_SOURCE))
-                .append(((output.getCatalog() != null)?
-                        Path.SEPARATOR + output.getCatalog()
-                        :Path.SEPARATOR + MetadataBase.DEFAULT_CATALOG))
+                .append(Path.SEPARATOR + dataSource)
+                .append(Path.SEPARATOR + catalog)
                 .append(Path.SEPARATOR + output.getDataSet())
                 .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
 
             DataSetServiceAux.logger.debug(String.format("Resolve object %s in location: %s", output.getDataSet(), sb.toString()));
             res_output.put(DataSetProperties.PhysicalLocation.name(), sb.toString());
             res_output.put(DataSetProperties.Name.name(), output.getDataSet());
-            String ds = ((output.getDataSource() != null)? output.getDataSource().toString(): MetadataBase.PREDEF_DATA_SOURCE);
+            String ds = dataSource;
             String nof = (output.getNumberOfFiles() != null)? String.valueOf(output.getNumberOfFiles()):"1";
             res_output.put(DataSetProperties.Type.name(), ds);
-            res_output.put(DataSetProperties.Catalog.name(), output.getCatalog());
-            res_output.put(DataSetProperties.Format.name(), output.getFormat().toString());
+            res_output.put(DataSetProperties.Catalog.name(), catalog);
+            res_output.put(DataSetProperties.Format.name(), format);
             res_output.put(DataSetProperties.NumberOfFiles.name(), nof);
-            res_output.put(DataSetProperties.Mode.name(), output.getMode().toString());
+            res_output.put(DataSetProperties.Mode.name(), mode);
             boolean exists = false;
             try {
                 exists = HFileOperations.exists(sb.toString());

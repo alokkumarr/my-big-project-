@@ -5,13 +5,11 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.util.LongAccumulator;
-import sncr.xdf.CliHandler;
 import sncr.xdf.component.Component;
 import sncr.xdf.component.WithDataSetService;
 import sncr.xdf.component.WithSparkContext;
 import sncr.xdf.datasets.conf.DataSetProperties;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class DataProfilerComponent extends Component implements WithSparkContext, WithDataSetService {
@@ -22,7 +20,7 @@ public class DataProfilerComponent extends Component implements WithSparkContext
         DataProfilerComponent component = new DataProfilerComponent();
         try {
             // Spark based component
-            if (component.collectParameters(args) == 0) {
+            if (component.collectCMDParameters(args) == 0) {
                 int r = component.Run();
                 System.exit(r);
             }
@@ -31,8 +29,8 @@ public class DataProfilerComponent extends Component implements WithSparkContext
         }
 
     }
-
-    public static int main(String config, String locations, String app, String batch){
+/*
+    public static int main(String config, String app, String batch){
 
         DataProfilerComponent component = new DataProfilerComponent();
         try {
@@ -42,7 +40,7 @@ public class DataProfilerComponent extends Component implements WithSparkContext
             parameters.put(CliHandler.OPTIONS.BATCH_ID.name(), batch);
 
             // Spark based component
-            if (component.Init(parameters) == 0) {
+            if (component.init(config, app, batch, null ) == 0) {
                 return component.Run();
             } else {
                 return -2;
@@ -53,7 +51,7 @@ public class DataProfilerComponent extends Component implements WithSparkContext
             return -1;
         }
     }
-
+*/
     public DataProfilerComponent(){
         componentName = "DataProfiler";
     }

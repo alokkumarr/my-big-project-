@@ -2,8 +2,8 @@ package sncr.xdf.sql;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import sncr.xdf.core.file.HFileOperations;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.core.file.HDirOperations;
 import sncr.xdf.component.Component;
 import sncr.xdf.component.WithDataSetService;
 import sncr.xdf.component.WithMovableResult;
@@ -33,7 +33,7 @@ public class SQLComponent extends Component implements WithMovableResult , WithS
         SQLComponent component = new SQLComponent();
         try {
             // Spark based component
-            if (component.collectParameters(args) == 0) {
+            if (component.collectCMDParameters(args) == 0) {
                 int r = component.Run();
                 System.exit(r);
             }
@@ -55,7 +55,7 @@ public class SQLComponent extends Component implements WithMovableResult , WithS
                 String pathToSQLScript = getScriptFullPath();
                 logger.debug("Path to script: " + pathToSQLScript);
                 try {
-                    script = HDirOperations.readFile(pathToSQLScript);
+                    script = HFileOperations.readFile(pathToSQLScript);
                 } catch (FileNotFoundException e) {
                     throw new XDFException(XDFException.ErrorCodes.ConfigError, e, "Part to SQL script is not correct: " + pathToSQLScript);
                 }

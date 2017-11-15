@@ -18,6 +18,8 @@ public class XDFException extends RuntimeException {
 
     static {
         messages = new HashMap<>();
+        messages.put(ErrorCodes.IncorrectOrAbsentParameter, "Parameter: [ %s ] is invalid or absent");
+
         messages.put(ErrorCodes.DataObjectNotFound, "Data object: %s was not found in app. configuration file, configuration is not correct");
         messages.put(ErrorCodes.InputDataObjectNotFound, "Data object in input configuration file: %s was not found in app. configuration file, further processing is not possible");
         messages.put(ErrorCodes.NoSparkSQLDescriptor, "Configuration file does not have Spark SQL descriptor, configuration is not correct");
@@ -85,6 +87,7 @@ public class XDFException extends RuntimeException {
 
     public enum ErrorCodes {
         UnknownError,
+        IncorrectOrAbsentParameter,
         EmbeddedException,
         DataObjectNotFound,
         InputDataObjectNotFound,
@@ -121,7 +124,8 @@ public class XDFException extends RuntimeException {
         DataObjectAlreadyRegistered,
         CorruptedDataObjectRepository,
         CouldNotCreateDSMeta,
-        NonExistingDataRoot, lastUnused
+        NonExistingDataRoot,
+        lastUnused
     }
 
 }
