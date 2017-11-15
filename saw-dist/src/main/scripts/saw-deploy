@@ -28,6 +28,17 @@ if ! command -v ansible-playbook > /dev/null; then
     yum_install ansible
 fi
 
+# Workaround: Ansible version 2.4 has deprecated using the "include"
+# directive for importing playbooks, so it has been changed to
+# "import_playbook".  However, there are still some environments on
+# older Ansible versions, so include a workaround for them by
+# modifying "site.yml" to use the old approach.  Remove when all
+# environments have upgraded to Ansible 2.4 or newer.
+set -o pipefail
+if rpm -q ansible | grep -E "ansible-2.(2|3)" > /dev/null; then
+    sed -i -e "s/^- import_playbook:/- include:/" $dir/site.yml
+fi
+
 echo "Starting deployment"
 ansible-playbook -i $config $dir/site.yml
 echo "Finished deployment"
