@@ -1,0 +1,14 @@
+{
+  "csvInspector" : {
+    "file" : "test/files/c10-r*.*",
+    "lineSeparator" : "\n",
+    "delimiter" : ",",
+    "quoteChar" : "\"",
+    "quoteEscapeChar" : "\\",
+    "hederSize" : 1,
+    "fieldNamesLine" : 1,
+    "dateFormats" : ["yyyy-MM-dd'T'HH:mm:ss"],
+    "rowsToInspect" : 10000,
+    "sampleSize" : 100
+  }
+}
