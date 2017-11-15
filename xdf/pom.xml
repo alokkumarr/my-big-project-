@@ -34,32 +34,6 @@
   </dependencies>
   <build>
     <plugins>
-      <!-- Assembly plugin -->
-<!--
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <version>${maven.assembly.version}</version>
-        <executions>
-          <execution>
-            <id>razorsight-xdf-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${output.directory}</outputDirectory>
-              <!-*-archiveBaseDirectory>${ass.out}</archiveBaseDirectory-*->
-              <descriptors>
-                <!-*- descriptor>src/main/assembly/xdf-assembly.xml</descriptor -*->
-                <descriptor>${ass.desc}</descriptor>
-              </descriptors>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
--->
-      <!-- Assembly plugin : end -->
       <!-- RPM plugin -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -135,7 +109,7 @@
               <username>${app.user}</username>
               <groupname>${app.group}</groupname>
               <sources><source>
-                <location>../xdf-rest/test</location>
+                <location>../xdf/test</location>
                 <includes>
                   <include>*.sh</include>
                   <include>*.json</include>
@@ -150,21 +124,22 @@
               <username>${app.user}</username>
               <groupname>${app.group}</groupname>
               <sources>
-                <!-- xdf-component -->
-                <!--source>
-                  <location>../xdf-component/src/main/scripts/*.sh</location>
-                </source-->
-                <!-- xdf-core -->
                 <source>
-                  <location>../xdf-core/src/main/scripts/xdf_info</location>
+                  <location>../xdf/bin/xdf_info</location>
                   <filter>true</filter>
                 </source>
                 <source>
-                  <location>../xdf-core/src/main/scripts/execute-component.sh</location>
+                  <location>../xdf/bin</location>
+                  <includes>
+                    <include>execute-component.sh</include>
+                    <include>mk_conv.sh</include>
+                    <include>mk_csv.sh</include>
+                    <include>xdf_activate.sh</include>
+                  </includes>
                 </source>
                 <!-- xdf-meta -->
                 <source>
-                  <location>../xdf-meta/src/main/scripts</location>
+                  <location>../xdf-meta/bin</location>
                   <includes>
                     <include>create-metadata.sh</include>
                     <include>xdf-mdcli.sh</include>
@@ -172,11 +147,11 @@
                 </source>
                 <!-- xdf-rest -->
                 <source>
-                  <location>../xdf-rest/src/main/scripts</location>
+                  <location>../xdf-rest/bin</location>
                   <includes>
+                    <include>rest_env</include>
                     <include>run-task.sh</include>
                     <include>start-server.sh</include>
-                    <include>mk_csv.sh</include>
                   </includes>
                 </source>
               </sources>
@@ -190,21 +165,12 @@
               <groupname>${app.group}</groupname>
               <sources>
                 <source>
-                  <location>../xdf-core</location>
+                  <location>../xdf/conf</location>
                   <includes>
-                    <include>log4j.dtd</include>
-                    <include>log4j.xml</include>
-                  </includes>
-                </source>
-                <source>
-                  <location>../xdf-rest</location>
-                  <includes>
+                    <include>log4j.*</include>
                     <include>logback.xml</include>
                     <include>xdf-rest.conf</include>
                   </includes>
-                </source>
-                <source>
-                  <location>../xdf/src/main/resources/log4j.properties</location>
                 </source>
               </sources>
             </mapping>

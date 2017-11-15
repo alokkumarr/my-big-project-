@@ -118,56 +118,19 @@ EEOOTT
 CMD=
 PARAM_LIST=( -b $BATCH_ID -c $CONFIG_FILE -a $APPLICATION_ID )
 case "$COMPONENT_NAME" in
-    sql|SparkSQL-multiobject)
+    sql)
         COMPONENT_JAR=${LIB_DIR}/xdf-sql-${VERSION}.jar
         MAIN_CLASS=sncr.xdf.sql.SQLComponent
         ;;
  
-    scd|scd-multiobject)
-        COMPONENT_JAR=${LIB_DIR}/razorsight-scd-${VERSION}.jar
-        MAIN_CLASS=razorsight.drivers.SCDDriver
-        ;;
-
-    scd2)
-        COMPONENT_JAR=${LIB_DIR}/razorsight-scd-${VERSION}.jar
-        MAIN_CLASS=razorsight.drivers.SCDDriver2
-        ;;
-
-    transformer)
-        #
-        COMPONENT_JAR=${LIB_DIR}/razorsight-drivers-${VERSION}.jar
-        MAIN_CLASS=razorsight.drivers.ParserTransformerDriver
-        # will ignore -i in Java
-        ;;
-
-    es-reader|elasticSearchReader)
-        COMPONENT_JAR=${LIB_DIR}/razorsight-ES-loader-${VERSION}.jar
-        MAIN_CLASS=razorsight.drivers.SimpleElasticSearchReaderDriver
-        PARAM_LIST+=( $OBJECT_NAME_OPT )
-        #
-        echo "-------
-Object Name             : $OBJECT_NAME"
-        ;;
-
-    es-loader|elasticSearchLoader-multiobject)
-        COMPONENT_JAR=${LIB_DIR}/razorsight-ES-loader-${VERSION}.jar
-        MAIN_CLASS=razorsight.drivers.MultiObjectElasticSearchLoaderDriver
-        ;;
-
-    part-maker|partition-multiobject)
-        COMPONENT_JAR=${LIB_DIR}/razorsight-partitionmaker-${VERSION}.jar
-        MAIN_CLASS=razorsight.drivers.MultiObjectPartitioner
-        ;;
-
-    converter)
-        COMPONENT_JAR=${LIB_DIR}/razorsight-converter-${VERSION}.jar
-        MAIN_CLASS=razorsight.drivers.MultiObjectDataConverter
-        ;;
-
-
     zero)
         COMPONENT_JAR=${LIB_DIR}/xdf-component-${VERSION}.jar
         MAIN_CLASS="sncr.xdf.component.ZeroComponent"
+        ;;
+
+    parser)
+        COMPONENT_JAR=${LIB_DIR}/xdf-component-${VERSION}.jar
+        MAIN_CLASS="sncr.xdf.parser"
         ;;
 
     *)  echo "ERROR: Unknown XDF component: $COMPONENT_NAME"
