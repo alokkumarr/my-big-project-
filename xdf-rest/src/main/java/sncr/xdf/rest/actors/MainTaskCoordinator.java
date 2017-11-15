@@ -23,10 +23,26 @@ public class MainTaskCoordinator extends AbstractActor {
     private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private Cluster cluster = Cluster.get(getContext().system());
     private Map<String, ExecutionStatus> tasks;
+    private String dataLakeRoot;
+    private String jvmCmd;
+
+    public MainTaskCoordinator(String dataLakeRoot, String jvmCmd){
+        super();
+        this.dataLakeRoot = dataLakeRoot;
+        this.jvmCmd = jvmCmd;
+    }
+
+    public static Props props(String dataLakeRoot, String jvmCmd) {
+        // You need to specify the actual type of the returned actor
+        // since Java 8 lambdas have some runtime type information erased
+        return Props.create(MainTaskCoordinator.class,
+                            () -> new MainTaskCoordinator(dataLakeRoot, jvmCmd));
+    }
 
     //subscribe to cluster changes
     @Override
     public void preStart() {
+        log.info("Starting up (data lake root = {})", dataLakeRoot);
         tasks = new HashMap<>();
         cluster.subscribe(self(), ClusterEvent.initialStateAsEvents(),
                           ClusterEvent.MemberEvent.class, ClusterEvent.UnreachableMember.class);
@@ -112,10 +128,11 @@ public class MainTaskCoordinator extends AbstractActor {
     }
 
     private void newRequest(NewRequest r){
-        log.info("Processing new request [{}, {}, {}, {}]", r.rqid, r.component, r.app, r.batch);
+        log.info("Processing new request [{}, {}, {}, {}, ]", r.rqid, r.component, r.project, r.batch);
+        log.info("Data Lake root = {}", dataLakeRoot);
 
         // Create new component executor
-        ActorRef executor = getContext().actorOf(TaskCoordinator.props(1), "tc-" + l);
+        ActorRef executor = getContext().actorOf(TaskCoordinator.props(dataLakeRoot, jvmCmd), "tc-" + l);
         l++;
         // Keep track of executors - store executor info locally
         tasks.put(r.rqid, new ExecutionStatus(executor, r.rqid, "INIT"));

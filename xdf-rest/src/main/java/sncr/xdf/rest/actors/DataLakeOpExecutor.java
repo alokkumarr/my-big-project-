@@ -2,6 +2,7 @@ package sncr.xdf.rest.actors;
 
 import akka.actor.AbstractActor;
 import akka.actor.ActorRef;
+import akka.actor.Props;
 import akka.cluster.Cluster;
 import akka.cluster.ClusterEvent;
 import akka.event.Logging;
@@ -25,6 +26,18 @@ public class DataLakeOpExecutor extends AbstractActor {
     private DLMetadata mdt = null;
     private int executorNo = -1;
     private ActorRef coordinator;
+    private String dataLakeRoot;
+
+    public DataLakeOpExecutor(String dataLakeRoot){
+        super();
+        this.dataLakeRoot = dataLakeRoot;
+    }
+
+    public static Props props(String dataLakeRoot) {
+        // You need to specify the actual type of the returned actor
+        // since Java 8 lambdas have some runtime type information erased
+        return Props.create(DataLakeOpExecutor.class, () -> new DataLakeOpExecutor(dataLakeRoot));
+    }
 
     @Override
     public void preStart() {
@@ -40,7 +53,8 @@ public class DataLakeOpExecutor extends AbstractActor {
 
     @Override
     public Receive createReceive() {
-        return receiveBuilder()
+        try {
+            return receiveBuilder()
             .match(Init.class, r -> {
                 initialize(r);
                 coordinator = getSender();
@@ -48,32 +62,23 @@ public class DataLakeOpExecutor extends AbstractActor {
                 log.info("DataLakeOpExecutor[{}] initialized - waiting for tasks...", this.executorNo);
             }).match(ListOf.class, r -> {
                 processListRequest(getSender(), r);
-            })
-            .match(Create.class, r -> {
+            }).match(Create.class, r -> {
                 processCreateRequest(getSender(), r);
-            })
-            .match(Delete.class, r -> {
+            }).match(Delete.class, r -> {
                 processDeleteRequest(getSender(), r);
-            })
-            .match(CleanRequest.class, r ->{
+            }).match(CleanRequest.class, r -> {
                 log.info("DataLakeOpExecutor[{}] shutting down", executorNo);
                 cluster.leave(cluster.selfAddress());
                 getContext().stop(getSelf());
-            })
-            .match(ClusterEvent.MemberExited.class, mExited -> {
-                // Ignore
-                log.info("Exited event received from {}", mExited.member().address());
-                if(mExited.member().hasRole("RequestManager")) {
-                    log.info("Looks like one of leaders just left...");
-                    log.info("Should I follow?");
-                }
-            })
-            .build();
+            }).build();
+        } catch(Exception e){
+            return receiveBuilder().build();
+        }
     }
 
     private void initialize(Init r){
         try {
-            this.mdt = new DLMetadata(r.dataLakeRoot);
+            this.mdt = new DLMetadata(dataLakeRoot);
             this.executorNo = r.exeutorNo;
         } catch (Exception e) {
             log.error("Can't initialize FileSystem : {}", e.getMessage());

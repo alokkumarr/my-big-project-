@@ -28,11 +28,12 @@ public class PreviewService extends Service {
 
         String newJvmCmd = config.getString("xdf.rest.task-start-cmd");
         String dataLakeRoot = config.getString("xdf.rest.dl-root");
-        Integer numberOfExecutors = 3; // TODO: config.getString("xdf.preview.number-of-executors");
+        Integer numberOfExecutors = 1; // TODO: config.getString("xdf.preview.number-of-executors");
 
-        coordinator = system.actorOf(MainPreviewCoordinator.props(numberOfExecutors), ACTOR_NAME);
+        coordinator = system.actorOf(
+            MainPreviewCoordinator.props(numberOfExecutors, dataLakeRoot, newJvmCmd), ACTOR_NAME);
 
-        Init msg = new Init(newJvmCmd, dataLakeRoot, 0);
+        Init msg = new Init(0);
         coordinator.tell(msg, coordinator);
     }
 

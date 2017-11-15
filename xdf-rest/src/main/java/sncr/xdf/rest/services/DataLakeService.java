@@ -33,9 +33,10 @@ public class DataLakeService extends Service {
         String dataLakeRoot = config.getString("xdf.rest.dl-root");
         Integer numberOfExecutors = 1; // TODO: config.getString("xdf.dl.number-of-executors");
 
-        coordinator = system.actorOf(MainDataLakeCoordinator.props(numberOfExecutors), ACTOR_NAME);
+        coordinator = system.actorOf(
+            MainDataLakeCoordinator.props(numberOfExecutors, dataLakeRoot, newJvmCmd), ACTOR_NAME);
 
-        Init msg = new Init(newJvmCmd, dataLakeRoot, 0);
+        Init msg = new Init( 0);
         coordinator.tell(msg, coordinator);
     }
 
