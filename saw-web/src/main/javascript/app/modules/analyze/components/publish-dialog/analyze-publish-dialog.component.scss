@@ -32,4 +32,12 @@
   .end-criteria-radio {
     line-height: 32px;
   }
+
+  md-chips.md-triton-theme .md-chips .md-chip-input-container input {
+    width: 250px;
+  }
+
+  .error-msg {
+    color: red;
+  }
 }
