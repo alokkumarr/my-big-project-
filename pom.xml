@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>xdf-nextgen</groupId>
-  <artifactId>bigdataframework</artifactId>
-  <version>1.0.0</version>
+  <!-- THIS -->
+  <groupId>bda</groupId>
+  <artifactId>xdf-nextgen</artifactId>
+  <version>1.0.0_dev</version>
+  <!-- -->
   <packaging>pom</packaging>
   <properties>
     <!--
@@ -134,8 +136,8 @@
       <artifactId>opencsv</artifactId>
       <version>${opencsv.version}</version>
     </dependency>
--->		
-		
+-->
+
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
@@ -323,9 +325,8 @@
     <module>xdf-preview</module>
     <module>xdf-parser</module>
     <module>xdf-rest</module>
-    <module>xdf</module>
     <!-- -->
-    <module>xdf-devkit</module>
+    <module>xdf</module>
   </modules>
   <build>
     <defaultGoal>package</defaultGoal>
