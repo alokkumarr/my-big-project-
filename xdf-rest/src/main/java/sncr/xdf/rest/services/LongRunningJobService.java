@@ -1,12 +1,10 @@
 package sncr.xdf.rest.services;
 
 import akka.actor.ActorSystem;
-import akka.actor.Props;
 import akka.http.javadsl.model.StatusCodes;
 import akka.http.javadsl.server.Route;
 import com.typesafe.config.Config;
 import sncr.xdf.rest.AskHelper;
-import sncr.xdf.rest.actors.MainPreviewCoordinator;
 import sncr.xdf.rest.actors.MainTaskCoordinator;
 import sncr.xdf.rest.messages.Init;
 import sncr.xdf.rest.messages.NewRequest;
@@ -61,26 +59,37 @@ public class LongRunningJobService extends Service {
     private Route run(String project, String component, String batch, String config){
 
         log.info("Request to run component [{}] for project [{}] batch [{}]", component, project, batch);
+
+        if(project == null || project.isEmpty()){
+            return complete(StatusCodes.INTERNAL_SERVER_ERROR,"Project parameter can not be null or empty");
+        }
+
+        if(component == null || component.isEmpty()){
+            return complete(StatusCodes.INTERNAL_SERVER_ERROR,"Component parameter can not be null or empty");
+        }
+
+        if(batch == null || batch.isEmpty()){
+            return complete(StatusCodes.INTERNAL_SERVER_ERROR,"Component parameter can not be null or empty");
+        }
+
         NewRequest rq = new NewRequest(component,  // component
                                        project,  // app
                                        batch,   // batch
-                                       config
-        );
+                                       config);
         coordinator.tell(rq, coordinator);
-        return complete(rq.rqid);
-
+        return complete(rq.getJson());
     }
 
     private Route status(String id){
         StatusUpdate rq;
 
         // Create status update request for specific task
-        rq = new StatusUpdate(id, StatusUpdate.REQUSET);
+        rq = new StatusUpdate(id, StatusUpdate.REQUEST);
 
         // Ask main longJobCoordinator to provide status
         try {
             StatusUpdate s = AskHelper.ask(rq, coordinator, 3000L);
-            return complete(s.status);
+            return complete(s.getJson());
         } catch(Exception e){
             log.error(e.getMessage());
             return complete(StatusCodes.INTERNAL_SERVER_ERROR, e.getMessage());

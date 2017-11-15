@@ -70,6 +70,7 @@ public class TaskExecutor extends AbstractActor {
             })
             .match(NewRequest.class, r -> {
                 coordinator= getSender();
+                coordinator.tell(new StatusUpdate(r.rqid, StatusUpdate.IN_PROGRESS), getSelf());
                 int retval = processRequest(r);
                 if(retval == 0)
                     coordinator.tell(new StatusUpdate(r.rqid, StatusUpdate.COMPLETE), getSelf());
@@ -99,11 +100,11 @@ public class TaskExecutor extends AbstractActor {
             retval = 0;
         } else if(conf.has("sql")){
             SQLComponent sql = new SQLComponent();
-            retval = Component.startComponent(sql, "sql", r.project, r.batch);
+            retval = Component.startComponent(sql, dataLakeRoot, conf.toString(), r.project, r.batch);
             log.info("SQL Component returned {}", retval);
-        } else if(conf.has("sql")) {
+        } else if(conf.has("parser")) {
             Parser parser = new Parser();
-            retval = Component.startComponent(parser, conf.toString(), r.project, r.batch);
+            retval = Component.startComponent(parser, dataLakeRoot, conf.toString(), r.project, r.batch);
         } else {
             log.error("Can't process request {}, {}, {}, {}", r.component, r.project, r.batch, conf.toString());
         }

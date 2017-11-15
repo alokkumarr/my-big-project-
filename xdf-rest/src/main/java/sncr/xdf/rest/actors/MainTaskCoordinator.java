@@ -79,49 +79,33 @@ public class MainTaskCoordinator extends AbstractActor {
         }
     }
 
-    private void cleanup(){
-        if(tasks.size() > 0){
-            for(Map.Entry<String, ExecutionStatus> e : tasks.entrySet()){
-                if(e.getValue().status.equals("COMPLETED") ){
-                    e.getValue().executor.tell(new CleanRequest(), self());
-                }
-            }
-        }
-    }
-
     private void status(ActorRef sender, StatusUpdate r){
         switch(r.status){
-            case StatusUpdate.REQUSET: {
+            case StatusUpdate.REQUEST: {
                 log.info("Received status request from client");
                 String status = getStatusText(r.rqid);
                 sender.tell(new StatusUpdate(r.rqid, status), getSelf());
+                break;
             }
             default:{
                 updateStatus(r.rqid, r.status);
+                break;
             }
         }
     }
 
     private String getStatusText(String id){
         if(tasks.size() == 0){
-            return "['No tasks currently running']";
+            return "";
         } else {
             String retval = "";
             if(id != null) {
                 ExecutionStatus s = tasks.get(id);
                 if(s != null){
-                    retval = s.toJson();
+                    retval = s.status;
                 } else {
-                    retval = "'No such task + " + id + "'";
+                    retval = "'No such task";
                 }
-            } else {
-
-                // TBD : not processMap best code below...
-                for(Map.Entry<String, ExecutionStatus> e : tasks.entrySet()){
-                    retval += e.getValue().toJson() + ",\n";
-                }
-
-                retval = "[\n" + retval + "\n]";
             }
             return retval;
         }
@@ -135,7 +119,16 @@ public class MainTaskCoordinator extends AbstractActor {
         ActorRef executor = getContext().actorOf(TaskCoordinator.props(dataLakeRoot, jvmCmd), "tc-" + l);
         l++;
         // Keep track of executors - store executor info locally
-        tasks.put(r.rqid, new ExecutionStatus(executor, r.rqid, "INIT"));
+        tasks.put(r.rqid, new ExecutionStatus(executor, r.rqid, StatusUpdate.PREPARING));
         executor.tell(r, self());
+    }
+    private void cleanup(){
+        if(tasks.size() > 0){
+            for(Map.Entry<String, ExecutionStatus> e : tasks.entrySet()){
+                if(e.getValue().status.equals("COMPLETED") ){
+                    e.getValue().executor.tell(new CleanRequest(), self());
+                }
+            }
+        }
     }
 }

@@ -15,7 +15,7 @@ public class ExecutionStatus {
 
     public String toJson(){
         // TBD
-        String json = "{'id' : '" + id + "', 'status' : '" + status +  "'}";
+        String json = "{\"id\" : \"" + id + "\", \"status\" : \"" + status +  "\"}";
         return json;
     }
 

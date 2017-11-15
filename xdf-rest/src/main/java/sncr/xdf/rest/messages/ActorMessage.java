@@ -6,8 +6,8 @@ import java.io.Serializable;
 // When user request is served multiple Actors will communicate to each other
 public class ActorMessage implements Serializable {
     // User request id
-    public final static String MESSAGE_STATUS_SUCCESS = "success";
-    public final static String MESSAGE_STATUS_ERROR = "error";
+    public static final String FAILED = "failed";
+    public static final String SUCCESS = "success";
     public final String rqid;
     public String user;
     public String project;
@@ -16,10 +16,10 @@ public class ActorMessage implements Serializable {
 
     public ActorMessage(String rqid){
         this.rqid = rqid;
-        this.status = MESSAGE_STATUS_SUCCESS;
+        this.status = SUCCESS;
     }
 
-    String getJson(){
-        return "{\"id\" : \"" + rqid + "\"}";
+    public String getJson(){
+        return "{\"id\" : \"" + rqid + "\", \"status\" : \"" + status + "\"}";
     }
 }
