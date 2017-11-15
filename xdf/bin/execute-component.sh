@@ -96,10 +96,10 @@ XDF_DIR=$( xdf_info optdir )
 LIB_DIR=$XDF_DIR/lib
 ( cd $LIB_DIR ) || exit
 
-APPJAR=$XDF_DIR/lib/xdf-rest-1.0.0_dev-all.jar
-
 VERSION=$( xdf_info version )
 : ${VERSION:?no value}
+
+APPJAR=$XDF_DIR/lib/xdf-rest-${VERSION}-all.jar
 
 cat<<EEOOTT
 XDF COMPONENT SHELL SCRIPT EXECUTING AT $(date +"%m-%d-%Y %r")
@@ -160,7 +160,11 @@ EELL250
 
     # Build CSV value
     JARS=$( echo $LIB_DIR/*.jar | tr ' ' , )
-    CONF_OPT="spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG4J_CONF"
+#    CONF_OPT="spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG4J_CONF"
+    DRIVER_OPTS=("-DXDF_DATA_ROOT=$XDF_DATA_ROOT")
+    DRIVER_OPTS+=("-Djava.security.auth.login.config=/opt/mapr/conf/mapr.login.conf")
+    DRIVER_OPTS+=("-Dlog4j.configuration=file:$LOG4J_CONF")
+
     # TODO: use array
     # CONF_OPTS=( --conf "spark.driver.extraJavaOptions=-Dlog4j.configuration=file:$LOG4J_CONF" )
     # TODO: conditionally add -Dxdf.json.subs.params=true option
@@ -169,11 +173,10 @@ EELL250
     CMD=(
         $SPARK_HOME/bin/spark-submit
         --verbose
-        --driver-java-options
-        -Djava.security.auth.login.config=/opt/mapr/conf/mapr.login.conf
-        --conf $CONF_OPT
+#        "${CONF_OPT[@]}"
+        --driver-java-options "'"${DRIVER_OPTS[@]}"'"
         --class $MAIN_CLASS
-        --jars $JARS
+#        --jars $JARS
         $COMPONENT_JAR
         ${PARAM_LIST[@]}
     )
@@ -198,6 +201,12 @@ ${CMD[@]}"
 
 ${CMD[@]}
 RETVAL=$?
+
+### These CMD work if I run directly from terminal ( not through script )
+#XDF_HOME=/dfs/opt/bda/xdf-ngsr-current /opt/mapr/spark/spark-current/bin/spark-submit --verbose --driver-java-options '-Djava.security.auth.login.config=/opt/mapr/conf/mapr.login.conf -DXDF_DATA_ROOT=hdfs:///data/bda -Dlog4j.configuration=file:/dfs/opt/bda/xdf-ngsr/xdf-ngsr-1.0.0_dev/conf/log4j.properties' --class sncr.xdf.sql.SQLComponent --jars /dfs/opt/bda/xdf-ngsr/xdf-ngsr-1.0.0_dev/lib/xdf-rest-1.0.0_dev-all.jar /dfs/opt/bda/xdf-ngsr/xdf-ngsr-1.0.0_dev/lib/xdf-rest-1.0.0_dev-all.jar -b SQLTEST1 -c file:///dfs/opt/bda/apps/xda-ux-sr-comp-dev-1.0.0_dev/conf/sqlComponentWithMeta.jconf -a xda-ux-sr-comp-dev
+#XDF_HOME=/dfs/opt/bda/xdf-ngsr-current /opt/mapr/spark/spark-current/bin/spark-submit --verbose --driver-java-options '-Djava.security.auth.login.config=/opt/mapr/conf/mapr.login.conf -DXDF_DATA_ROOT=hdfs:///data/bda -Dlog4j.configuration=file:/dfs/opt/bda/xdf-ngsr/xdf-ngsr-1.0.0_dev/conf/log4j.properties' --class sncr.xdf.component.ZeroComponent --jars /dfs/opt/bda/xdf-ngsr/xdf-ngsr-1.0.0_dev/lib/xdf-rest-1.0.0_dev-all.jar /dfs/opt/bda/xdf-ngsr/xdf-ngsr-1.0.0_dev/lib/xdf-rest-1.0.0_dev-all.jar -b TEST2 -c file:///dfs/opt/bda/apps/xda-ux-sr-comp-dev-1.0.0_dev/conf/zeroComponent.jconf -a xda-ux-sr-comp-dev
+
+
 
 cat<<EEOORR
 ----------------------------------------------------------------
