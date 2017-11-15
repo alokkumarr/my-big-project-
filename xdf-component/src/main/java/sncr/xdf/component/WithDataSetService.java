@@ -106,7 +106,7 @@ public interface WithDataSetService {
             Map<String, String> res_output = new HashMap<String, String>();
 
             String dataSource = (output.getDataSource() != null) ? output.getDataSource().toString(): MetadataBase.PREDEF_DATA_SOURCE;
-            String catalog = (output.getDataSource() != null)? output.getCatalog():  MetadataBase.PREDEF_DATA_SOURCE;
+            String catalog = (output.getCatalog() != null)? output.getCatalog():  MetadataBase.DEFAULT_CATALOG;
             String format = (output.getFormat() != null) ? output.getFormat().toString() : DLDataSetOperations.FORMAT_PARQUET;
             String mode = (output.getMode() != null) ? output.getMode().toString() : DLDataSetOperations.MODE_APPEND;
 
