@@ -25,15 +25,15 @@ VERSION=$( xdf_info version )
 : ${VERSION:?no value}
 
 LOG4J_CONF=$XDF_DIR/conf/log4j.xml
-APPLIB=$SERVER_DIR/xdf-rest-3.1.0_dev-all.jar
+APPLIB=$SERVER_DIR/xdf-rest-${VERSION}-all.jar
 
-COMP_NAME=$1
+COMP_NAME=$2
 LOG_DIR=/dfs/var/bda/xdf-ux/log
 COMP_LOG_DIR=/dfs/var/bda/xdf-ux/log/$COMP_NAME
 
 ( cd $COMP_LOG_DIR ) || mkdir -p $COMP_LOG_DIR
 
-CONF_OPT="-Dlog.dir=$LOG_DIR -Dxdf.core=$1 -Dlog4j.configuration=file:$LOG4J_CONF -Dcomp.log.dir=$COMP_LOG_DIR"
+CONF_OPT="-Dlog.dir=$LOG_DIR -Dxdf.core=$3 -Dlog4j.configuration=file:$LOG4J_CONF -Dcomp.log.dir=$COMP_LOG_DIR"
 /opt/mapr/spark/spark-current/bin/spark-submit \
     --driver-java-options "$CONF_OPT" \
     --class sncr.xdf.rest.Server \

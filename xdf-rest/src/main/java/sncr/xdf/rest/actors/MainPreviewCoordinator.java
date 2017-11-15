@@ -16,6 +16,8 @@ public class MainPreviewCoordinator extends MainJVMCoordinator {
     public MainPreviewCoordinator(int numberOfExecutors){
         super(numberOfExecutors);
         JVM_ROLE = "preview";
+        JVM_LOGDIR = JVM_ROLE;
+        JVM_LOGNAME = JVM_ROLE + ".log";
     }
 
     public static Props props(Integer numberOfExecutors) {

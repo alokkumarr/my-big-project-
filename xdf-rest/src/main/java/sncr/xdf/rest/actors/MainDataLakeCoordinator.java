@@ -24,6 +24,8 @@ public class MainDataLakeCoordinator extends MainJVMCoordinator {
     public MainDataLakeCoordinator(int numberOfExecutors){
         super(3);
         JVM_ROLE = "dlsupport";
+        JVM_LOGDIR = JVM_ROLE;
+        JVM_LOGNAME = JVM_ROLE + ".log";
     }
 
     public static Props props(Integer numberOfExecutors) {

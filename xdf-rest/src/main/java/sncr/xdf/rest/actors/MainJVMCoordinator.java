@@ -20,6 +20,8 @@ abstract class MainJVMCoordinator extends AbstractActor {
     protected String dataLakeRoot = null;
     // Identifier of JVM (cluster node) - must be declared in implementation class
     protected String JVM_ROLE;
+    protected String JVM_LOGNAME;
+    protected String JVM_LOGDIR;
     // Service Readiness flag
     protected Integer isReady = 0;
     // Array of imdependent executors to support (relatively)long tasks
@@ -60,10 +62,12 @@ abstract class MainJVMCoordinator extends AbstractActor {
         cluster.unsubscribe(self());
     }
 
-    protected int initialize(String dataLakeRoot, String newJvmCmd, String jvmRole, LoggingAdapter log){
+    protected int initialize(String dataLakeRoot, String newJvmCmd, String jvmRole,  String logDir, String logName, LoggingAdapter log){
         this.dataLakeRoot = dataLakeRoot;
         this.newJvmCmd = newJvmCmd;
         this.JVM_ROLE = jvmRole;
+        this.JVM_LOGNAME = logName;
+        this.JVM_LOGDIR = logDir;
 
         // Start new JVM for Data Lake operations
         if(startNewJvm(log) == 0){
@@ -91,14 +95,14 @@ abstract class MainJVMCoordinator extends AbstractActor {
 
                 isReady = 0;
                 // Restart JVM if needed
-                initialize(dataLakeRoot, newJvmCmd, JVM_ROLE, log);
+                initialize(dataLakeRoot, newJvmCmd, JVM_ROLE,  JVM_LOGDIR, JVM_LOGNAME, log);
             }
         }
     }
 
     private int startNewJvm(LoggingAdapter log){
 
-        String cmd = newJvmCmd + " " + JVM_ROLE;
+        String cmd = newJvmCmd + " " + JVM_ROLE + " " + JVM_LOGDIR + " " + JVM_LOGNAME;
         log.info("Staring new JVM. Command line : {} ", cmd);
         try {
             java.lang.Runtime.getRuntime().exec(cmd);
@@ -145,7 +149,7 @@ abstract class MainJVMCoordinator extends AbstractActor {
                     // This message came from Service class, requesting initialization
                     // Only Service will use address of this coordinator as a sender
                     // This is initialization request
-                    initialize(r.dataLakeRoot, r.newJvmCmd, JVM_ROLE, log);
+                    initialize(r.dataLakeRoot, r.newJvmCmd, JVM_ROLE, JVM_LOGDIR, JVM_LOGNAME, log);
                 } else {
                     // This message came from one of subsequent executors (nobody else knows about this coordinator)
                     // We assume what if one executor is ready whole service is aup and ready

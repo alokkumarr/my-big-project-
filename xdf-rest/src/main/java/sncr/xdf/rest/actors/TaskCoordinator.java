@@ -48,7 +48,8 @@ public class TaskCoordinator extends MainJVMCoordinator {
                 // Notify main coordinator with status - we are preparing for execution
                 mainCoordinator.tell(new StatusUpdate(newRequest.rqid, "Preparing for execution"), getSelf());
                 // Start new dedicated cluster node/JVM for our task
-                initialize("", r.taskCmd, r.rqid, log);
+                String logName = r.component + "-" + r.batch + ".log";
+                initialize("", r.taskCmd, r.rqid, r.component, logName, log);
             })
             // Cleanup request TBD (from main coordinator)
             .match(CleanRequest.class, r ->{
