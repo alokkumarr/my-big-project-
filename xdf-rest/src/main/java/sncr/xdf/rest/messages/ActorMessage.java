@@ -18,4 +18,8 @@ public class ActorMessage implements Serializable {
         this.rqid = rqid;
         this.status = MESSAGE_STATUS_SUCCESS;
     }
+
+    String getJson(){
+        return "{\"id\" : \"" + rqid + "\"}";
+    }
 }

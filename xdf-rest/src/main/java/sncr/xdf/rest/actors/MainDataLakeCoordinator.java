@@ -21,22 +21,25 @@ public class MainDataLakeCoordinator extends MainJVMCoordinator {
 
     private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
 
-    public MainDataLakeCoordinator(int numberOfExecutors){
-        super(3);
-        JVM_ROLE = "dlsupport";
-        JVM_LOGDIR = JVM_ROLE;
-        JVM_LOGNAME = JVM_ROLE + ".log";
+    public MainDataLakeCoordinator(int numberOfExecutors,  String dataLakeRoot, String jvmCmd){
+        super(numberOfExecutors,
+              dataLakeRoot,
+              "dlsupport",
+              "dlsupport",
+              "dlsupport",
+              jvmCmd);
     }
 
-    public static Props props(Integer numberOfExecutors) {
+    public static Props props(Integer numberOfExecutors, String dataLakeRoot, String jvmCmd) {
         // You need to specify the actual type of the returned actor
         // since Java 8 lambdas have some runtime type information erased
-        return Props.create(MainDataLakeCoordinator.class, () -> new MainDataLakeCoordinator(numberOfExecutors));
+        return Props.create(MainDataLakeCoordinator.class,
+                            () -> new MainDataLakeCoordinator(numberOfExecutors, dataLakeRoot, jvmCmd));
     }
 
     @Override
     public Receive createReceive() {
-        return processCommonEvents(DataLakeOpExecutor.class, log)
+        return processCommonEvents(DataLakeOpExecutor.props(dataLakeRoot))
             .match(ListOf.class, r -> {
                 //TODO: make more generic
                 ListOf s;

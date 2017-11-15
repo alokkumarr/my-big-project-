@@ -6,6 +6,7 @@ import akka.actor.Deploy;
 import akka.actor.Props;
 import akka.cluster.Cluster;
 import akka.cluster.ClusterEvent;
+import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import akka.japi.pf.ReceiveBuilder;
 import akka.remote.RemoteScope;
@@ -14,17 +15,24 @@ import sncr.xdf.rest.messages.Init;
 
 abstract class MainJVMCoordinator extends AbstractActor {
 
+    private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     // Akka cluster reference
     protected Cluster cluster = Cluster.get(getContext().system());
-    protected String newJvmCmd = null;
-    protected String dataLakeRoot = null;
-    // Identifier of JVM (cluster node) - must be declared in implementation class
+
+    protected String dataLakeRoot;
+    // JVM related attributes
+    // Command to start new JVM
+    protected String JVM_CMD;
+    // AKKA role of JVM, will be used to recognize this coordinator's JVM
+    // among others
     protected String JVM_ROLE;
+    // JVM log name
     protected String JVM_LOGNAME;
+    // JVM log directory
     protected String JVM_LOGDIR;
     // Service Readiness flag
     protected Integer isReady = 0;
-    // Array of imdependent executors to support (relatively)long tasks
+    // Array of independent executors to support (relatively)long tasks
     protected ActorRef[] executors = null;
     protected boolean[] executorsAvailability = null;
     // Remote address to deploy executors (can be separate local JVM or remote JVM)
@@ -33,12 +41,23 @@ abstract class MainJVMCoordinator extends AbstractActor {
     // In some cases (e.g. Spark jobs) this model doesn't work - we will need 1 coordinator to multiple JVM model
     protected Deploy d = null;
 
-    protected MainJVMCoordinator(int numberOfExecutors){
+    protected MainJVMCoordinator(int numberOfExecutors,
+                                 String dataLakeRoot,
+                                 String JVM_ROLE,
+                                 String JVM_LOGDIR,
+                                 String JVM_LOGNAME,
+                                 String JVM_CMD){
         executors = new ActorRef[numberOfExecutors];
         executorsAvailability = new boolean[numberOfExecutors];
         for(int i = 0; i < numberOfExecutors; i++)
             executorsAvailability[i] = false;
-        JVM_ROLE = null;
+
+        this.dataLakeRoot = dataLakeRoot;
+
+        this.JVM_CMD = JVM_CMD;
+        this.JVM_ROLE = JVM_ROLE;
+        this.JVM_LOGNAME = JVM_LOGNAME;
+        this.JVM_LOGDIR = JVM_LOGDIR;
     }
 
     protected ActorRef getExecutor(){
@@ -52,68 +71,43 @@ abstract class MainJVMCoordinator extends AbstractActor {
     //subscribe to cluster changes
     @Override
     public void preStart() {
-        getContext().system().log().info("Starting {}", this.getClass().getSimpleName() );
-        cluster.subscribe(self(), ClusterEvent.initialStateAsEvents(), ClusterEvent.MemberEvent.class, ClusterEvent.UnreachableMember.class);
+        log.info("Starting...");
+        cluster.subscribe(
+            self(),
+            ClusterEvent.initialStateAsEvents(),
+            ClusterEvent.MemberEvent.class,
+            ClusterEvent.UnreachableMember.class);
     }
 
     @Override
     public void postStop() {
-        getContext().system().log().info("Stopping {}", this.getClass().getSimpleName() );
+        log.info("Stopping...");
         cluster.unsubscribe(self());
     }
 
-    protected int initialize(String dataLakeRoot, String newJvmCmd, String jvmRole,  String logDir, String logName, LoggingAdapter log){
-        this.dataLakeRoot = dataLakeRoot;
-        this.newJvmCmd = newJvmCmd;
-        this.JVM_ROLE = jvmRole;
-        this.JVM_LOGNAME = logName;
-        this.JVM_LOGDIR = logDir;
-
-        // Start new JVM for Data Lake operations
-        if(startNewJvm(log) == 0){
-            //success
-        } else {
-            // failure
-        }
-        return 0;
-    }
-
     // Restart JVM
-    protected void recover(ClusterEvent.UnreachableMember mUnreachable, LoggingAdapter log){
+    private void processUnreachableMember(ClusterEvent.UnreachableMember mUnreachable){
         // Check if member represents Data Lake Support JVM
-        log.warning("Node down detected - investigating. My role is {}", JVM_ROLE);
-        log.warning("Node has following roles:");
-
         for (String s : mUnreachable.member().getRoles()) {
-
-            log.warning(" {}", s);
             if (JVM_ROLE != null && JVM_ROLE.equals(s)) {
-                log.warning("JVM {} failed - trying to recover", JVM_ROLE);
-
-                log.info("Downing : {}", mUnreachable.member());
+                // his is JVM corresponding to (created by) this Coordinator
+                log.warning("{}: JVM is down - removing {} from cluster", JVM_ROLE, mUnreachable.member());
                 cluster.down(mUnreachable.member().address());
-
                 isReady = 0;
-                // Restart JVM if needed
-                initialize(dataLakeRoot, newJvmCmd, JVM_ROLE,  JVM_LOGDIR, JVM_LOGNAME, log);
+                recover();
             }
         }
     }
 
-    private int startNewJvm(LoggingAdapter log){
-
-        String cmd = newJvmCmd + " " + JVM_ROLE + " " + JVM_LOGDIR + " " + JVM_LOGNAME;
-        log.info("Staring new JVM. Command line : {} ", cmd);
-        try {
-            java.lang.Runtime.getRuntime().exec(cmd);
-            return 0;
-        } catch(Exception e){
-            log.error(e.getMessage());
-            return -1;
-        }
+    // Call back defining what to do in case of corresponding JVM become Unreachable
+    protected void recover(){
+        // Restart and reinitialize JVM
+        log.warning("{}: JVM is down - reinitializing", JVM_ROLE);
+        initialize(JVM_CMD, JVM_ROLE, JVM_LOGDIR, JVM_LOGNAME, log);
     }
 
-    protected ReceiveBuilder processCommonEvents(Class executorType, LoggingAdapter log){
+    // Process standard Akka events
+    protected ReceiveBuilder processCommonEvents(Props executorProps){
         return receiveBuilder()
             .match(ClusterEvent.MemberUp.class, mUp -> {
                 // Check if new member node/JVM was requested by this instance
@@ -127,29 +121,29 @@ abstract class MainJVMCoordinator extends AbstractActor {
                         d = new Deploy(new RemoteScope(mUp.member().address()));
                         for(Integer i = 0; i < executors.length; i++) {
                             //log.info("Starting executor {}", i);
-                            executors[i] = getContext().actorOf(Props.create(executorType).withDeploy(d), JVM_ROLE + i);
+                            executors[i] = getContext().actorOf(executorProps.withDeploy(d), JVM_ROLE + i);
                             // Start task processing
-                            executors[i].tell(new Init(newJvmCmd, dataLakeRoot, i), getSelf());
+                            executors[i].tell(new Init(i), getSelf());
                         }
                     }
                     break;
                 }
             })
-            .match(ClusterEvent.UnreachableMember.class, mUnreachable -> {
-                recover(mUnreachable, log);
-            })
+            .match(ClusterEvent.UnreachableMember.class, mUnreachable ->
+                processUnreachableMember(mUnreachable)
+            )
             .match(ClusterEvent.MemberRemoved.class, mRemoved -> {
                 // Ignore
             })
             .match(CleanRequest.class, r ->{
-                shutdown(r, log);
+                shutdown(r);
             })
             .match(Init.class, r -> {
                 if(getSender().equals(getSelf())){
                     // This message came from Service class, requesting initialization
                     // Only Service will use address of this coordinator as a sender
                     // This is initialization request
-                    initialize(r.dataLakeRoot, r.newJvmCmd, JVM_ROLE, JVM_LOGDIR, JVM_LOGNAME, log);
+                    initialize(JVM_CMD, JVM_ROLE, JVM_LOGDIR, JVM_LOGNAME, log);
                 } else {
                     // This message came from one of subsequent executors (nobody else knows about this coordinator)
                     // We assume what if one executor is ready whole service is aup and ready
@@ -162,12 +156,28 @@ abstract class MainJVMCoordinator extends AbstractActor {
             });
     }
 
-    protected void shutdown(CleanRequest r, LoggingAdapter log){
+    // Shutdown actor and JVM
+    protected void shutdown(CleanRequest r){
         log.info("Shutting down...");
         isReady = 0;
         for(int i = 0; i < executors.length; i++)
             executors[i].tell(r, getSelf());
         getContext().stop(getSelf());
+    }
+
+    // Start new JVM
+    protected static int initialize(String newJvmCmd, String role, String logDir, String logName, LoggingAdapter log){
+        // Start new JVM for Data Lake operations
+        String cmd = newJvmCmd + " " + role + " " + logDir + " " + logName;
+        log.info("Staring new JVM. Command line : {} ", cmd);
+
+        try {
+            java.lang.Runtime.getRuntime().exec(cmd);
+            return 0;
+        } catch(Exception e){
+            log.error(e.getMessage());
+            return -1;
+        }
     }
 }
 

@@ -33,11 +33,10 @@ COMP_LOG_DIR=/dfs/var/bda/xdf-ux/log/$COMP_NAME
 
 ( cd $COMP_LOG_DIR ) || mkdir -p $COMP_LOG_DIR
 
-CONF_OPT="-Dlog.dir=$LOG_DIR -Dxdf.core=$3 -Dlog4j.configuration=file:$LOG4J_CONF -Dcomp.log.dir=$COMP_LOG_DIR"
+CONF_OPT="spark.driver.extraJavaOptions=-Dlog.dir=$LOG_DIR -Dxdf.core=$3 -Dlog4j.configuration=file:$LOG4J_CONF -Dcomp.log.dir=$COMP_LOG_DIR"
+
 /opt/mapr/spark/spark-current/bin/spark-submit \
-    --driver-java-options "$CONF_OPT" \
-    --class sncr.xdf.rest.Server \
-    $APPLIB \
-    task \
-    $XDF_DIR/conf/xdf-rest.conf \
-    $@
+      --conf "$CONF_OPT" \
+      --class sncr.xdf.rest.Server \
+      $APPLIB \
+      task $XDF_DIR/conf/xdf-rest.conf $1

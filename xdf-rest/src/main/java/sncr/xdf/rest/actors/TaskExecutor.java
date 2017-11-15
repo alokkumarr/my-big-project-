@@ -3,6 +3,7 @@ package sncr.xdf.rest.actors;
 import akka.actor.AbstractActor;
 import akka.actor.ActorLogging;
 import akka.actor.ActorRef;
+import akka.actor.Props;
 import akka.cluster.Cluster;
 import akka.cluster.ClusterEvent;
 import akka.event.Logging;
@@ -12,6 +13,7 @@ import com.google.gson.JsonParser;
 import sncr.xdf.component.Component;
 import sncr.xdf.component.ZeroComponent;
 import sncr.xdf.dataprofiler.DataProfilerComponent;
+import sncr.xdf.parser.Parser;
 import sncr.xdf.rest.messages.CleanRequest;
 import sncr.xdf.rest.messages.Init;
 import sncr.xdf.rest.messages.NewRequest;
@@ -24,12 +26,23 @@ public class TaskExecutor extends AbstractActor {
     private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private final Cluster cluster = Cluster.get(getContext().system());
     private ActorRef coordinator = null;
+    private String dataLakeRoot;
 
+    public TaskExecutor(String dataLakeRoot){
+        super();
+        this.dataLakeRoot = dataLakeRoot;
+    }
+
+    public static Props props(String dataLakeRoot) {
+        // You need to specify the actual type of the returned actor
+        // since Java 8 lambdas have some runtime type information erased
+        return Props.create(TaskExecutor.class, () -> new TaskExecutor(dataLakeRoot));
+    }
 
     //subscribe to cluster changes
     @Override
     public void preStart() {
-        log.info("Starting up...");
+        log.info("Starting up (data lake root = {})...", dataLakeRoot);
         cluster.subscribe(self(), ClusterEvent.initialStateAsEvents(),
                           ClusterEvent.MemberEvent.class, ClusterEvent.UnreachableMember.class);
     }
@@ -75,20 +88,24 @@ public class TaskExecutor extends AbstractActor {
 
     private int processRequest(NewRequest r){
         JsonObject conf= new JsonParser().parse(r.componentConfig).getAsJsonObject();
-        log.info(conf.toString());
         int retval = -1;
 
         if(conf.has("zero")){
             ZeroComponent zc = new ZeroComponent();
-            retval = Component.startComponent(zc, "zero", r.app, r.batch);
+            retval = Component.startComponent(zc, "zero", r.project, r.batch);
             log.info("Zero Component returned {}", retval);
         } else if(conf.has("csvInspector")){
             log.info("Executed csvInspector, exiting");
             retval = 0;
         } else if(conf.has("sql")){
             SQLComponent sql = new SQLComponent();
-            retval = Component.startComponent(sql, "sql", r.app, r.batch);
+            retval = Component.startComponent(sql, "sql", r.project, r.batch);
             log.info("SQL Component returned {}", retval);
+        } else if(conf.has("sql")) {
+            Parser parser = new Parser();
+            retval = Component.startComponent(parser, conf.toString(), r.project, r.batch);
+        } else {
+            log.error("Can't process request {}, {}, {}, {}", r.component, r.project, r.batch, conf.toString());
         }
         return retval;
     }

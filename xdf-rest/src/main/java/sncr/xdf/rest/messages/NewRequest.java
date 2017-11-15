@@ -5,18 +5,13 @@ import java.util.UUID;
 public class NewRequest extends ActorMessage{
     public String component;
     public String batch;
-    public String app;
-    public String taskCmd;
     public String componentConfig;
 
-
-    public NewRequest(String component, String app, String batch, String taskCmd, String componentConfig) {
-        //super("1");
+    public NewRequest(String component, String project, String batch,  String componentConfig) {
         super(UUID.randomUUID().toString());
         this.component = component;
         this.batch = batch;
-        this.app = app;
-        this.taskCmd = taskCmd;
+        this.project = project;
         this.componentConfig = componentConfig;
     }
 
@@ -24,8 +19,7 @@ public class NewRequest extends ActorMessage{
         super(other.rqid);
         this.component = other.component;
         this.batch = other.batch;
-        this.app = other.app;
-        this.taskCmd = other.taskCmd;
+        this.project = other.project;
         this.componentConfig = other.componentConfig;
     }
 }

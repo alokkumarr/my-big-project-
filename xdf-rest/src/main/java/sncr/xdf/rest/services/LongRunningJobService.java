@@ -6,6 +6,7 @@ import akka.http.javadsl.model.StatusCodes;
 import akka.http.javadsl.server.Route;
 import com.typesafe.config.Config;
 import sncr.xdf.rest.AskHelper;
+import sncr.xdf.rest.actors.MainPreviewCoordinator;
 import sncr.xdf.rest.actors.MainTaskCoordinator;
 import sncr.xdf.rest.messages.Init;
 import sncr.xdf.rest.messages.NewRequest;
@@ -20,16 +21,13 @@ public class LongRunningJobService extends Service {
     private static final String FULL_ACTOR_NAME = "/user/" + ACTOR_NAME;
     private static final String STATUS = "status";
 
-    String newJvmCmd;
-
-
     public LongRunningJobService(ActorSystem system, Config config) {
         super(system, config);
-        coordinator = system.actorOf(Props.create(MainTaskCoordinator.class), ACTOR_NAME );
 
-        newJvmCmd = config.getString("xdf.rest.task-start-cmd");
+        String newJvmCmd = config.getString("xdf.rest.task-start-cmd");
         String dataLakeRoot = config.getString("xdf.rest.dl-root");
-        Init msg = new Init(newJvmCmd, dataLakeRoot, 0);
+        coordinator = system.actorOf(MainTaskCoordinator.props(dataLakeRoot, newJvmCmd), ACTOR_NAME );
+        Init msg = new Init( 0);
         coordinator.tell(msg, coordinator);
     }
 
@@ -66,7 +64,6 @@ public class LongRunningJobService extends Service {
         NewRequest rq = new NewRequest(component,  // component
                                        project,  // app
                                        batch,   // batch
-                                       newJvmCmd,
                                        config
         );
         coordinator.tell(rq, coordinator);
