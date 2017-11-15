@@ -40,5 +40,19 @@ LOG_DIR=$VAR_DIR/log
 # CONF_DIR for log4j.dtd, log4j.xml
 CLPATH=$CONF_DIR:$SRV_JAR
 
-$JAVA_CMD -Dlog.dir="$LOG_DIR" -Dxdf.core=server -cp $CLPATH sncr.xdf.rest.Server server $XDF_DIR/conf/xdf-rest.conf
+(
+#$JAVA_CMD -Dlog.dir="$LOG_DIR" -Dxdf.core=server -cp $CLPATH sncr.xdf.rest.Server server $XDF_DIR/conf/xdf-rest.conf
 # Possible TODO: replace arg 'manager' with main class 'sncr.xdf.rest.Manager'
+
+
+
+$JAVA_CMD </dev/null >/tmp/xdf-server.$$ \
+  -Dlog.dir="$LOG_DIR" \
+  -Dxdf.core=server \
+  -cp $CLPATH \
+  sncr.xdf.rest.Server \
+  server $XDF_DIR/conf/xdf-rest.conf &
+PID=$!
+ps -fp $PID
+echo server pid : $PID
+ )
