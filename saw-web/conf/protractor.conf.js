@@ -15,7 +15,7 @@ exports.config = {
         //'incognito',
         'disable-extensions',
         'disable-web-security',
-        '--start-fullscreen' // enable for Mac OS
+        //'--start-fullscreen' // enable for Mac OS
       ]
     }
   },
@@ -54,7 +54,8 @@ exports.config = {
       displaySuiteNumber: true
     }));
 
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
+    //jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
+    jasmine.getEnv().defaultTimeoutInterval = 120000; //another option if above doesn't work
 
     browser.manage().timeouts().pageLoadTimeout(30000);
     browser.manage().timeouts().implicitlyWait(10000);

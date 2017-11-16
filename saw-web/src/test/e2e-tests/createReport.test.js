@@ -4,7 +4,7 @@ const analyze = require('../javascript/pages/common/analyzePage.po.js');
 const protractor = require('protractor');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 
-describe('create a new report type analysis', () => {
+describe('create a new report type analysis: createReport.test.js', () => {
   let categoryName;
   const reportDesigner = analyze.designerDialog.report;
   const reportName = `e2e report ${(new Date()).toString()}`;
