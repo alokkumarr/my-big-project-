@@ -2,6 +2,15 @@ body {
     margin: 3em;
 }
 
+h1, p {
+    font-family: sans-serif;
+    color: grey;
+}
+
+p {
+    font-size: large;
+}
+
 td {
     padding-right: 2em;
 }
