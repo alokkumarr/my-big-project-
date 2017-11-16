@@ -4,6 +4,7 @@ import com.sncr.saw.security.app.model.Customer;
 import com.sncr.saw.security.app.repository.impl.CustomerRepositoryDaoImpl;
 import com.sncr.saw.security.app.repository.impl.RoleRepositoryDaoImpl;
 import com.sncr.saw.security.app.repository.impl.UserRepositoryImpl;
+import com.sncr.saw.security.app.service.OnBoardService;
 import com.sncr.saw.security.common.bean.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.standard.ShellComponent;
@@ -22,6 +23,9 @@ import java.util.Scanner;
 
 @ShellComponent
 class SawSecurityShell {
+
+	@Autowired
+	public OnBoardService onboard;
 
 	@Autowired
 	public CustomerRepositoryDaoImpl custDao;
