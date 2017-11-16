@@ -182,7 +182,7 @@ export const ReportGridComponent = {
         };
         if (!isUndefined(NUMBER_TYPES.includes(column.type)) && isUndefined(column.format)) {
           field.format = {
-            type: 'decimal',
+            type: 'number',
             precision: 2
           };
         }
@@ -263,6 +263,7 @@ export const ReportGridComponent = {
               } else if (newFormat.numberDecimal > 0) {
                 typeValue = 'long';
               }
+
               if (newFormat.currencyFlag) {
                 column.format = {
                   type: typeValue,
