@@ -1,18 +1,36 @@
 import { Injectable } from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogConfig} from '@angular/material';
 import Analysis from '../models/analysis.model';
-import {DesignerMode} from '../constsTS';
+import {
+  DesignerMode,
+  AnalysisDialogData,
+  AnalysisStarter
+} from '../types';
 
 import DesignerDialogComponent from '../components/designer/dialog/designer-dialog.component';
 
-export type NewAnalysisDialogData = {analysis: Analysis, designerMode: DesignerMode};
+
 @Injectable()
 export class AnalyzeDialogService {
   constructor(public dialog: MatDialog) {}
 
-  openNewAnalysisDialog(analysis: Analysis, designerMode: DesignerMode) {
-    const data: NewAnalysisDialogData = {analysis, designerMode};
+  openNewAnalysisDialog(analysisStarter: AnalysisStarter) {
+    const data: AnalysisDialogData = {
+      analysisStarter,
+      designerMode: 'new'
+    };
+    this.openAnalysisDialog(data);
+  }
 
+  openEditAdnalysisDialog(analysis: Analysis) {
+    const data: AnalysisDialogData = {
+      analysis,
+      designerMode: 'edit'
+    };
+    this.openAnalysisDialog(data);
+  }
+
+  openAnalysisDialog(data: AnalysisDialogData) {
     this.dialog.open(DesignerDialogComponent, {
       width: '100vw',
       maxWidth: '100vw',

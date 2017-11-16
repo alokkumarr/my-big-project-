@@ -1,6 +1,6 @@
 import {Component, Inject} from '@angular/core';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
-import {NewAnalysisDialogData} from '../../../services/analyze-dialog.service'
+import {AnalysisStarter} from '../../../types'
 const template = require('./designer-dialog.component.html');
 require('./designer-dialog.component.scss');
 
@@ -11,7 +11,7 @@ require('./designer-dialog.component.scss');
 export default class DesignerDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<DesignerDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: NewAnalysisDialogData) { }
+    @Inject(MAT_DIALOG_DATA) public data: AnalysisStarter) { }
 
   onBack() {
     this.dialogRef.close();

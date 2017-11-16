@@ -63,6 +63,8 @@ import {
   DesignerDialogComponent,
   DesignerContainerComponent,
   DesignerHeaderComponent,
+  DesignerSettingsComponent,
+  DesignerSettingsService,
   DesignerService
 } from './components/designer';
 import {
@@ -134,16 +136,19 @@ angular.module(AnalyzeModule, [
   declarations: [
     DesignerDialogComponent,
     DesignerContainerComponent,
-    DesignerHeaderComponent
+    DesignerHeaderComponent,
+    DesignerSettingsComponent
   ],
   entryComponents: [
     DesignerDialogComponent,
     DesignerContainerComponent,
-    DesignerHeaderComponent
+    DesignerHeaderComponent,
+    DesignerSettingsComponent
   ],
   providers: [
     AnalyzeDialogService,
     analyzeServiceProvider,
+    DesignerSettingsService,
     DesignerService
   ]
 })

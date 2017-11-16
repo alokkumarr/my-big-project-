@@ -6,8 +6,8 @@
       <mat-icon fontIcon="icon-arrow-left"></mat-icon>
     </button>
     <div fxLayout="column"
-         fxLayoutAlign="start">
-      <span class="header__name"></span>
+         fxLayoutAlign="start"
+         *ngIf="analysis">
       <div class="header__name">
         <strong class="e2e-pivot-title">
           {{analysis.name}}

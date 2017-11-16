@@ -4,5 +4,6 @@
                  (onBack)="onBack.emit()"
                  (onSave)="onSave()"></designer-header>
 <div class="designer__toolbar"></div>
-<div class="designer__data-settings"></div>
+<designer-settings class="designer__data-settings"
+                   [artifactColumns]="analysis.artifactColumns"></designer-settings>
 <div class="designer__content"></div>

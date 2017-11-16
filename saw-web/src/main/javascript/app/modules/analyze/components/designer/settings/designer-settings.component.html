@@ -1,0 +1,18 @@
+<div fxLayout="row" class="settings">
+
+  <div fxFlex="90" class="settings__unselected-fields">
+    <mat-list>
+      <mat-list-item>
+        keyword filter
+      </mat-list-item>
+      <mat-list-item>
+        type filter
+      </mat-list-item>
+      <mat-list-item *ngFor="let field of fields; trackBy: index">
+        {{field.index}}
+      </mat-list-item>
+    </mat-list>
+  </div>
+
+  <div  fxFlex="10" class="settings__selected-fields"></div>
+</div>

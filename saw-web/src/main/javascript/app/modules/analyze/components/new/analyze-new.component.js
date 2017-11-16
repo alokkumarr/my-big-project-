@@ -53,7 +53,6 @@ export const AnalyzeNewComponent = {
     }
 
     openUpgradedModal() {
-      const mode = ENTRY_MODES.NEW;
       const semanticId = this.selectedMetric.id;
       const metricName = this.selectedMetric.metricName;
       const method = this.selectedAnalysisMethod.split(':');
@@ -63,14 +62,14 @@ export const AnalyzeNewComponent = {
       const model = {
         type,
         chartType,
-        name: 'Untitled Analysis',
-        description: '',
         categoryId: this.subCategory,
         semanticId,
         metricName,
+        name: 'Untitled Analysis',
+        description: '',
         scheduled: null
       };
-      this._AnalyzeDialogService.openNewAnalysisDialog(model, mode);
+      this._AnalyzeDialogService.openNewAnalysisDialog(model);
     }
 
     createAnalysis() {
