@@ -7,7 +7,7 @@ Workbench (SAW) project.
 
 To prepare for building the project, execute the following steps:
 
-1. Install Java 1.8
+1. Install Java 8
 
 2. Install Maven 3.5.0 (for building, unit tests and packaging)
 
@@ -15,6 +15,10 @@ To prepare for building the project, execute the following steps:
 
 4. Configure Docker to allocate at least 8 GB memory and the maximum
    number of CPUs for containers
+
+Note: There is currently an incompatibility with Java 9 (SAW Transport
+Service gives a "scala.reflect.internal.MissingRequirementError"
+errors when building), so Java 8 specifically must be used.
 
 Note: Instructions for how to set up the above on a Mac can be found
 in the [Mac setup instructions](development-mac.md).
