@@ -9,9 +9,9 @@ To prepare for building the project, execute the following steps:
 
 1. Install Java 1.8
 
-2. Install Maven 3.5.0
+2. Install Maven 3.5.0 (for building, unit tests and packaging)
 
-3. Install [Docker] (for integration tests)
+3. Install [Docker] (for integration tests and local deployment)
 
 4. Configure Docker to allocate at least 8 GB memory and the maximum
    number of CPUs for containers

@@ -1,2 +1,0 @@
-[saw-security]
-localhost ansible_connection=local
