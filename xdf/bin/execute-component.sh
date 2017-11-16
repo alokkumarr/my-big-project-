@@ -1,11 +1,20 @@
 #!/bin/bash
 # Executable script for xdf version 2+
-CMD_DIR=$( cd $(dirname $0); pwd -P )
-
 DRYRUN=${DRYRUN:-}
-XDF_DATA_ROOT=hdfs:///data/bda #
+#VERBOSE=${VERBOSE:-}
 
-# Component main class
+CMD_DIR=$( cd $(dirname $0); pwd -P ) || exit
+source $CMD_DIR/app_env || exit
+
+COMPONENT_JAR=$APP_JAR
+
+# Validate spark
+SPARK_HOME=/opt/mapr/spark/spark-current
+( cd $SPARK_HOME ) || exit
+( <$SPARK_HOME/bin/spark-submit ) || exit
+#( <$SPARK_HOME/conf/spark-env.sh ) || exit
+
+# Component -> main class table
 declare -A COMP_MC=(
     [sql]=sncr.xdf.sql.SQLComponent
     [spark-sql]=sncr.xdf.sql.SQLComponent
@@ -13,16 +22,7 @@ declare -A COMP_MC=(
     [parser]=sncr.xdf.parser
     )
 
-## Mandatory
-COMPONENT_NAME= # -m
-BATCH_ID=       # -b
-CONFIG_FILE=    # -c
-APPLICATION_ID= # -processMap
-
-## Can be Optional
-LOG4J_CONF=                 # -j
-
-function usage
+function usage()
 {
     cat<<EEOOUU
 ----------------------------------------------------------------
@@ -50,40 +50,15 @@ EEOOUU
     exit ${1:-0}
 }
 
-errout(){
-    echo 1>&2 "$@"
-}
-error(){
-    errout ERROR: "$@"
-}
-warn(){
-    errout WARNIG: "$@"
-}
+## Mandatory
+APPLICATION_ID= # -a
+BATCH_ID=       # -b
+CONFIG_FILE=    # -c
+COMPONENT_NAME= # -m
 
-## Globals
-## Calculate XDF_DIR, LIB_DIR, VERSION
-# Check xdf_info executable
-$CMD_DIR/xdf_info || exit
-xdf_info() {
-    $CMD_DIR/xdf_info ${1:?xdf_info argument missing}
-}
-
-XDF_DIR=$( xdf_info optdir )
-: ${XDF_DIR:?no value}
-
-VERSION=$( xdf_info version )
-: ${VERSION:?no value}
-
-LIB_DIR=$XDF_DIR/lib
-( cd $LIB_DIR ) || exit
-
-export SPARK_HOME=/opt/mapr/spark/spark-current
-( cd $SPARK_HOME ) || exit
-
-APPJAR=$XDF_DIR/lib/xdf-rest-${VERSION}-all.jar
-( <$APPJAR ) || exit
-COMPONENT_JAR=$APPJAR
-
+## Can be Optional
+LOG4J_CONF=     # -j
+XDF_DATA_ROOT=hdfs:///data/bda # -r
 
 ## CLI Args
 while getopts a:b:c:j:m:r:nh opt
@@ -128,17 +103,16 @@ MAIN_CLASS=${COMP_MC[$COMPONENT_NAME]}
 #?? file://
 #( <${CONFIG_FILE} ) || exit
 
-# validate XDF_DATA_ROOT
-hadoop fs -stat $XDF_DATA_ROOT >/dev/null || exit 1
-
 # validate LOG4J_CONF
 : ${LOG4J_CONF:=$XDF_DIR/conf/log4j.properties}
 ( <$LOG4J_CONF ) || exit
 
-# Validate spark
-( <$SPARK_HOME/conf/spark-env.sh ) || exit
+# validate XDF_DATA_ROOT
+hadoop fs -stat $XDF_DATA_ROOT >/dev/null || exit 1
+
 # 'export SPARK_HOME' inside spark-env.sh
-source $SPARK_HOME/conf/spark-env.sh
+##?? not needed
+#source $SPARK_HOME/conf/spark-env.sh
 
 cat<<EEOOTT
 XDF COMPONENT SHELL SCRIPT EXECUTING AT $(date --rfc-3339=sec)
@@ -158,18 +132,15 @@ Log4j log file          : ${LOG4J_CONF}
 EEOOTT
 
 #######################################
-
 JAVA_PROPS=(
   -Dlog4j.configuration=file:$LOG4J_CONF #SR?? file://
   -DXDF_DATA_ROOT=$XDF_DATA_ROOT
   -Djava.security.auth.login.config=/opt/mapr/conf/mapr.login.conf
   )
-
-# TODO: use array
-# CONF_OPTS=( -Dlog4j.configuration=file:$LOG4J_CONF )
 # TODO: conditionally add -Dxdf.json.subs.params=true option
-# CONF_OPTS+=( -Dxdf.json.subs.params=true )
-# use: --conf "spark.driver.extraJavaOptions=${CONF_OPTS[@]}"
+# JAVA_PROPS+=( -Dxdf.json.subs.params=true )
+# use: --conf "spark.driver.extraJavaOptions=${CONF_OPTS[*]}"
+
 CMD=(
     $SPARK_HOME/bin/spark-submit
     --verbose

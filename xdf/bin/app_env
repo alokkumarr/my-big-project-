@@ -1,0 +1,52 @@
+#!/bin/false
+# This file must be sourced
+###
+# Common part for
+# start-server.sh
+# run-task.sh
+# execute_component.sh
+###
+: ${CMD_DIR=$( cd $(dirname $0); pwd -P )}
+: ${CMD_DIR:?no value}
+
+errout(){
+    echo 1>&2 "$@"
+}
+error(){
+    errout ERROR: "$@"
+}
+warn(){
+    errout WARNIG: "$@"
+}
+
+$CMD_DIR/xdf_info || exit
+xdf_info() {
+    $CMD_DIR/xdf_info ${1:?xdf_info argument missing}
+}
+
+#APPL_NAME=$( xdf_info name )
+#: ${APPL_NAME:?no value}
+
+VERSION=$( xdf_info version )
+: ${VERSION:?no value}
+
+XDF_DIR=$( xdf_info optdir )
+: ${XDF_DIR:?no value}
+
+LIB_DIR=$XDF_DIR/lib
+( cd $LIB_DIR ) || exit
+
+# Uber jar
+APP_JAR=$LIB_DIR/xdf-rest-${VERSION}-all.jar
+( $APP_JAR ) || exit
+
+CONF_DIR=$XDF_DIR/conf
+( cd $CONF_DIR ) || exit
+
+VAR_DIR=$( xdf_info vardir )
+: ${VAR_DIR:?no value}
+
+LOG_DIR=$VAR_DIR/log
+( cd $LOG_DIR ) || exit
+
+true
