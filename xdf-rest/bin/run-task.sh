@@ -1,7 +1,8 @@
 #!/bin/bash
 echo "Starting xdf-rest service JVM"
 
-CMD_DIR=$( cd $(dirname $0); pwd -P ) || exit
+CMD_DIR=$( cd $(dirname $0) && pwd -P )
+: ${CMD_DIR:?no value}
 source $CMD_DIR/app_env || exit
 
 LOG4J_CONF=$CONF_DIR/log4j.xml

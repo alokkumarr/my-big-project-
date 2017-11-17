@@ -78,45 +78,19 @@
               <directory>${app.optDir}/bin</directory>
             </mapping>
             <mapping>
+              <directory>${app.optDir}/conf</directory>
+            </mapping>
+            <mapping>
               <directory>${app.optDir}/lib</directory>
             </mapping>
             <mapping>
               <directory>${app.optDir}/test</directory>
-            </mapping>
-            <mapping>
-              <directory>${app.optDir}/conf</directory>
             </mapping>
             <mapping>
               <directory>${app.varDir}/log</directory>
             </mapping>
 
-            <!-- lib files -->
-            <mapping>
-              <directory>${app.optDir}/lib</directory>
-              <directoryIncluded>false</directoryIncluded>
-              <filemode>444</filemode>
-              <username>${app.user}</username>
-              <groupname>${app.group}</groupname>
-              <sources><source>
-                  <location>../xdf-rest/target/xdf-rest-${project.version}-all.jar</location>
-              </source></sources>
-            </mapping>
-
-            <mapping>
-              <directory>${app.optDir}/test</directory>
-              <directoryIncluded>false</directoryIncluded>
-              <filemode>444</filemode>
-              <username>${app.user}</username>
-              <groupname>${app.group}</groupname>
-              <sources><source>
-                <location>../xdf/test</location>
-                <includes>
-                  <include>*.sh</include>
-                  <include>*.json</include>
-                </includes>
-              </source></sources>
-            </mapping>
-
+            <!-- bin files -->
             <mapping>
               <directory>${app.optDir}/bin</directory>
               <directoryIncluded>false</directoryIncluded>
@@ -125,14 +99,11 @@
               <groupname>${app.group}</groupname>
               <sources>
                 <source>
-                  <location>../xdf/bin/xdf_info</location>
-                  <filter>true</filter>
-                </source>
-                <source>
                   <location>../xdf/bin</location>
                   <includes>
+                    <include>app_env</include>
                     <include>execute-component.sh</include>
-                    <include>mk_conv.sh</include>
+                    <include>mk_conf.sh</include>
                     <include>mk_csv.sh</include>
                     <include>xdf_activate.sh</include>
                   </includes>
@@ -149,7 +120,6 @@
                 <source>
                   <location>../xdf-rest/bin</location>
                   <includes>
-                    <include>rest_env</include>
                     <include>run-task.sh</include>
                     <include>start-server.sh</include>
                   </includes>
@@ -157,6 +127,26 @@
               </sources>
             </mapping>
 
+            <!-- bin/templates files with filter -->
+            <mapping>
+              <directory>${app.optDir}/bin/templates</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>0644</filemode>
+              <username>${app.user}</username>
+              <groupname>${app.group}</groupname>
+              <sources>
+                <source>
+                  <location>../xdf/bin/templates/xdf_info.template</location>
+                  <filter>true</filter>
+                </source>
+                <source>
+                  <location>../xdf/bin/templates/xdf-nextgen.vars.changeme</location>
+                  <destination>${app.name}.vars.changeme</destination>
+                </source>
+              </sources>
+            </mapping>
+
+            <!-- conf files -->
             <mapping>
               <directory>${app.optDir}/conf</directory>
               <directoryIncluded>false</directoryIncluded>
@@ -169,19 +159,69 @@
                   <includes>
                     <include>log4j.*</include>
                     <include>logback.xml</include>
-                    <include>xdf-rest.conf</include>
                   </includes>
                 </source>
               </sources>
             </mapping>
 
+            <!-- conf/templates file, no filter -->
+            <mapping>
+              <directory>${app.optDir}/conf/templates</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>0644</filemode>
+              <username>${app.user}</username>
+              <groupname>${app.group}</groupname>
+              <sources>
+                <source>
+                  <location>../xdf/conf/templates/xdf-rest.conf.template</location>
+                </source>
+              </sources>
+            </mapping>
+
+            <!-- lib files -->
+            <mapping>
+              <directory>${app.optDir}/lib</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>444</filemode>
+              <username>${app.user}</username>
+              <groupname>${app.group}</groupname>
+              <sources><source>
+                  <location>../xdf-rest/target/xdf-rest-${project.version}-all.jar</location>
+              </source></sources>
+            </mapping>
+
+            <!-- test files -->
+            <mapping>
+              <directory>${app.optDir}/test</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>755</filemode>
+              <username>${app.user}</username>
+              <groupname>${app.group}</groupname>
+              <sources><source>
+                <location>../xdf/test</location>
+                <includes><include>*.sh</include></includes>
+              </source></sources>
+            </mapping>
+            <!-- same dir, different perms -->
+            <mapping>
+              <directory>${app.optDir}/test</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>444</filemode>
+              <username>${app.user}</username>
+              <groupname>${app.group}</groupname>
+              <sources><source>
+                <location>../xdf/test</location>
+                <excludes><exclude>*.sh</exclude></excludes>
+              </source></sources>
+            </mapping>
+
           </mappings>
           <!-- Installation scripts -->
-          <preinstallScriptlet>
+          <!--preinstallScriptlet>
             <script>
-#echo PreInstall done: ${app.nameVer}
+echo PreInstall done: ${app.nameVer}
             </script>
-          </preinstallScriptlet>
+          </preinstallScriptlet-->
           <postinstallScriptlet>
             <script>
 echo PostInstall started: ${app.nameVer}
@@ -190,10 +230,31 @@ echo PostInstall started: ${app.nameVer}
   rm -f ${app.name}-current
   ln -s ${app.name}/${app.nameVer} ${app.name}-current
 )
-#(cd ${app.optDir};ln -s bin sbin)
 echo Soft link created:
-ls -l ${app.optParDir}/${app.name}-current # ${app.optDir}/sbin
+ls -l ${app.optParDir}/${app.name}-current
 #
+tf=( ${app.optDir}/test/* )
+if [[ $tf ]]; then
+  echo Test directory contains ${#tf[*]} files
+fi
+#
+act_cmd='su ${app.user} -c ${app.optDir}/bin/xdf_activate.sh'
+if [[ -f /etc/bda/${app.name}.vars ]] ; then
+  echo '# Activate ${app.nameVer}'
+  $act_cmd || {
+    echo '#NB# Activation completed with error'
+    echo '#    Fix the problem and execute manual activation:'
+    echo &quot;$ $act_cmd&quot;
+  }
+else
+  mkdir -p /etc/bda
+  cp ${app.optDir}/bin/templates/${app.name}.vars.changeme /etc/bda
+  echo '#NB# Activation skipped - no vars file provided'
+  echo '#    Create vars file: /etc/bda/${app.name}.vars'
+  echo '#    from /etc/bda/${app.name}.vars.changeme'
+  echo '#    and execute manual activation:'
+  echo &quot;$ $act_cmd&quot;
+fi
 echo PostInstall done: ${app.nameVer}
             </script>
           </postinstallScriptlet>
@@ -201,7 +262,7 @@ echo PostInstall done: ${app.nameVer}
             <script>
 echo PreRemove started: ${app.nameVer}
 echo Remove soft link
-rm -f ${app.optParDir}/${app.name}-current # ${app.optDir}/sbin
+rm -f ${app.optParDir}/${app.name}-current
 echo PreRemove done: ${app.nameVer}
             </script>
           </preremoveScriptlet>

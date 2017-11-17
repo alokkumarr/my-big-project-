@@ -6,7 +6,7 @@
 # run-task.sh
 # execute_component.sh
 ###
-: ${CMD_DIR=$( cd $(dirname $0); pwd -P )}
+: ${CMD_DIR=$( cd $(dirname $0) && pwd -P )}
 : ${CMD_DIR:?no value}
 
 errout(){
@@ -38,7 +38,7 @@ LIB_DIR=$XDF_DIR/lib
 
 # Uber jar
 APP_JAR=$LIB_DIR/xdf-rest-${VERSION}-all.jar
-( $APP_JAR ) || exit
+( <$APP_JAR ) || exit
 
 CONF_DIR=$XDF_DIR/conf
 ( cd $CONF_DIR ) || exit

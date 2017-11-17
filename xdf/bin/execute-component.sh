@@ -3,7 +3,8 @@
 DRYRUN=${DRYRUN:-}
 #VERBOSE=${VERBOSE:-}
 
-CMD_DIR=$( cd $(dirname $0); pwd -P ) || exit
+CMD_DIR=$( cd $(dirname $0) && pwd -P )
+: ${CMD_DIR:?no value}
 source $CMD_DIR/app_env || exit
 
 COMPONENT_JAR=$APP_JAR
