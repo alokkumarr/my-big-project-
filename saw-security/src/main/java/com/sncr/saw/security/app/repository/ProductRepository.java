@@ -7,7 +7,7 @@ import java.util.Map;
 public interface ProductRepository {
 
     // returns how many products got created
-    Map<Integer, String> createProductForOnboarding(Product prod);
+    Map<Integer, String> createProductForOnboarding();
 
     // updates one product
     boolean updateProduct(Product prod);

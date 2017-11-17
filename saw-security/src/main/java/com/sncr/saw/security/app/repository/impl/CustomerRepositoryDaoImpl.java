@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
@@ -53,9 +54,15 @@ public class CustomerRepositoryDaoImpl implements CustomerRepository {
 
   @Override
   public int testSql() {
-    String sql = "select * from users LIMIT 10";
-    System.out.println(jdbcTemplate.queryForList(sql));
-    return 0;
+    String sql = "select 1";
+    SqlRowSet srs = jdbcTemplate.queryForRowSet(sql);
+    int rowCount = 0;
+    System.out.println("Customer information:");
+    while(srs.next()) {
+      System.out.println(srs.getRow());
+      rowCount++;
+    }
+    return rowCount;
   }
 
   /*
@@ -71,7 +78,7 @@ public class CustomerRepositoryDaoImpl implements CustomerRepository {
               +
               " ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY, INACTIVATED_DATE, INACTIVATED_BY, MODIFIED_DATE,"
               +
-              "MODIFIED_BY, PASSWORD_EXPIRY_DAYS, DOMAIN_NAME) VALUES(?,?,?,?,?,?,?,NULL,?,NULL,?,?,?)";
+              "MODIFIED_BY, PASSWORD_EXPIRY_DAYS, DOMAIN_NAME) VALUES(?,?,?,?,?,?,?,'','','','',?,?)";
       KeyHolder keyHolder = new GeneratedKeyHolder();
 
       jdbcTemplate.update(
@@ -87,10 +94,8 @@ public class CustomerRepositoryDaoImpl implements CustomerRepository {
               // created at logic taken from https://justinjohnson.org/java/inserting-datetime-with-spring-jdbctemplate-and-namedparameterjdbctemplate/
               ps.setDate(6, new java.sql.Date(new Date().getTime()));
               ps.setString(7, cust.getCreatedBy());
-              ps.setString(8, cust.getInactivatedBy());
-              ps.setString(9, cust.getModifiedBy());
-              ps.setLong(10, cust.getPasswordExpiryDate());
-              ps.setString(11, cust.getDomainName());
+              ps.setLong(8, cust.getPasswordExpiryDate());
+              ps.setString(9, cust.getDomainName());
               return ps;
             }
           },

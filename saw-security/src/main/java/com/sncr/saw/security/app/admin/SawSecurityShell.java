@@ -1,19 +1,24 @@
 package com.sncr.saw.security.app.admin;
 
 import com.sncr.saw.security.app.model.Customer;
+import com.sncr.saw.security.app.repository.impl.CustomerProductModuleFeatureRepositoryDaoImpl;
+import com.sncr.saw.security.app.repository.impl.CustomerProductModuleRepositoryDaoImpl;
+import com.sncr.saw.security.app.repository.impl.CustomerProductRepositoryDaoImpl;
 import com.sncr.saw.security.app.repository.impl.CustomerRepositoryDaoImpl;
+import com.sncr.saw.security.app.repository.impl.ModuleRepositoryDaoImpl;
+import com.sncr.saw.security.app.repository.impl.ProductModuleRepositoryDaoImpl;
+import com.sncr.saw.security.app.repository.impl.ProductRepositoryDaoImpl;
 import com.sncr.saw.security.app.repository.impl.RoleRepositoryDaoImpl;
 import com.sncr.saw.security.app.repository.impl.UserRepositoryImpl;
 import com.sncr.saw.security.app.service.OnBoardService;
 import com.sncr.saw.security.common.bean.Role;
+import com.sncr.saw.security.common.bean.User;
+import java.util.Map;
+import java.util.Scanner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.Scanner;
 
 /**
  * Created by Pawan
@@ -27,154 +32,126 @@ class SawSecurityShell {
 	@Autowired
 	public OnBoardService onboard;
 
-	@Autowired
-	public CustomerRepositoryDaoImpl custDao;
-
-	@Autowired
-	public RoleRepositoryDaoImpl roleDao;
-
-	@Autowired
-	public UserRepositoryImpl usr;
-
-	public Customer customer;
-	public Role role;
-
-	@ShellMethod("Create New Customer")
-	public boolean createNewCustomer()
-	{
-		Scanner ss = new Scanner(System.in);
-		String custCode;				// NOT NULL
-		String companyName;				// NOT NULL
-		String companyBusiness = null;	// default NULL
-		Long landingProdSysId;			// NOT NULL
-		Integer activeStatusInd;		// NOT NULL
-		String createdBy;				// NOT NULL
-		String inactivatedBy = null;	// default NULL
-		String modifiedBy = null;		// default NULL
-		Integer passwordExpiryDate;		// NOT NULL
-		String domainName;				// NOT NULL
-
-		// input logic
-		System.out.print("Customer Code: ");
-		custCode = ss.next();
-
-		// do not allow the user to enter invalid cust code
-		while(!custDao.isValidCustCode(custCode)) {
-			System.out.println("Please re-enter customer code as special characters are not allowed.");
-			System.out.print("Customer Code: ");
-			custCode = ss.next();
-		}
-
-		System.out.print("Company Name: ");
-		companyName = ss.next();
-		System.out.print("Company Business: ");
-		companyBusiness = ss.next();
-
-
-		// logic to create new customer
-		if (custDao.isValidCustCode(custCode)) {
-			try {
-				// set the customer object
-				customer = new Customer();
-				customer.setCustCode(custCode);
-				customer.setCompanyName(companyName);
-				customer.setCompanyBusiness(companyBusiness);
-				customer.setLandingProdSysId(landingProdSysId);
-				customer.setActiveStatusInd(activeStatusInd);
-				customer.setCreatedBy(createdBy);
-				customer.setInactivatedBy(inactivatedBy);
-				customer.setModifiedBy(modifiedBy);
-				customer.setPasswordExpiryDate(passwordExpiryDate);
-				customer.setDomainName(domainName);
-
-				long generatedCustID = custDao.createNewCustomerDao(customer);
-				System.out.println("Generated Customer ID: " + generatedCustID);
-
-			} catch (Exception e) {
-				// ToDo: replace with logger logic
-				e.printStackTrace();
-			} finally {
-				//destroy the created object
-				customer = null;
-			}
-
-		} else {
-			// some error shit
-		}
-		return true;
-	}
-
-	@ShellMethod("Create roles for customer's users")
-	public boolean createRoles(
-			// use custSysId from output of create-new-customer 's output.
-			@ShellOption() Long custSysId
-			/*@ShellOption() String roleName,
-			@ShellOption() String roleCode,
-			@ShellOption(defaultValue = ShellOption.NULL) String roleDesc,
-			@ShellOption() String roleType,
-			@ShellOption(defaultValue = ShellOption.NULL) String dataSecurityKey,
-			@ShellOption() String activeStatusInd,
-			@ShellOption() String createdBy,
-			@ShellOption(defaultValue = ShellOption.NULL) String inactivatedBy,
-			@ShellOption(defaultValue = ShellOption.NULL) String modifiedBy*/
-	)
-	{
-		// logic to create roles for customer
-		// ROLE_CODE is unique so take care of it
-		// Also DATA_SECURITY_KEY is by default NULL
+	@ShellMethod("Onboard the customer")
+	public void onboardCustomer() {
 		try {
-			/*role = new Role();
-			role.setCustSysId(custSysId);
-			role.setRoleName(roleName);
-			role.setRoleCode(roleCode);
-			role.setRoleDesc(roleDesc);
-			role.setRoleType(roleType);
-			role.setDataSecurityKey(dataSecurityKey);
-			role.setActiveStatusInd(activeStatusInd);
-			role.setCreatedBy(createdBy);
-			role.setInactivatedBy(inactivatedBy);
-			role.setModifiedBy(modifiedBy);*/
-			long generatedRoleID = roleDao.createNewRoleDao(custSysId);
-			System.out.println("Generated Role ID: "+ generatedRoleID);
+			CustomerRepositoryDaoImpl custDao = onboard.getCustomerDao();
+			// check if connection is working fine only then proceed
+			if (custDao.testSql()==1) {
+
+				// customer creation
+				Long created_cust_id = customerCreation(custDao);
+				System.out.println("Generated CUSTOMER_SYS_ID: " + created_cust_id);
+
+				// role creation
+				RoleRepositoryDaoImpl roleDao = onboard.getRolesDao();
+				Long created_role_id = roleDao.createNewRoleDao(created_cust_id);
+				System.out.println("Generated ROLE_SYS_ID: " + created_role_id);
+
+				// user creation
+				Long created_user_id = userCreation(created_role_id, created_cust_id);
+
+				// product creation
+				Map<Integer, String> products_created_ids = createProducts();
+
+				// module creation
+				Map<Integer, String> modules_created_ids = createModules();
+
+				// product modules linkage creation
+				Map<Integer, String> prod_module_linkage_ids = createProductModuleLinkages();
+
+				// customer product linkages
+				Map<Integer, String> cust_prod_linkage_ids = createCustomerProductLinkages();
+
+				// customer product module linkages
+				Map<Integer, String> cust_prod_mod_linkage_ids = createCustomerProductModuleLinkages();
+
+				// customer product module feature linkages
+				Map<Integer, String> cust_prod_mod_feature_linkage_ids = createCustomerProductModuleFeatureLinkages();
+
+			} else {
+				// connection is not working fine
+				// needs to be sysout only
+				System.out.println("Please check your connection");
+			}
 		} catch (Exception e) {
-			// Replace with logger logic
 			e.printStackTrace();
-		} finally {
-			role = null;
 		}
-		return true;
 	}
 
-	@ShellMethod("Create new User")
-	public boolean createNewUser()
-	{
-		// logic to create new user
-		// only one user needs to be created if it's command line
-		return true;
+	private Long customerCreation(CustomerRepositoryDaoImpl custDao) {
+		// customer creation
+		Customer customer = new Customer();
+		Scanner scanner = new Scanner(System.in);
+		System.out.print("Enter CUSTOMER_CODE: ");
+		customer.setCustCode(scanner.next());
+		System.out.print("Enter COMPANY_NAME: ");
+		customer.setCompanyName(scanner.next());
+		System.out.print("Enter COMPANY_BUSINESS: ");
+		customer.setCompanyBusiness(scanner.next());
+		System.out.print("Enter LANDING_PROD_SYS_ID: ");
+		customer.setLandingProdSysId(scanner.nextLong());
+		customer.setActiveStatusInd(1);
+		customer.setCreatedBy("admin");
+		// default keep 30
+		customer.setPasswordExpiryDate(30);
+		System.out.println("Enter DOMAIN_NAME: ");
+		customer.setDomainName(scanner.next());
+		return custDao.createNewCustomerDao(customer);
 	}
 
-	@ShellMethod("Associate respective products with customer")
-	public boolean createNewCustProduct()
-	{
-		// logic to create new Product
-		return true;
+	private Long userCreation(Long roleId, Long custId) {
+		User user = new User();
+		Scanner scanner = new Scanner(System.in);
+		System.out.print(" Enter USER_ID: ");
+		user.setUserId(scanner.nextLong());
+		System.out.print(" Enter EMAIL: ");
+		user.setEmail(scanner.next());
+		user.setRoleId(roleId);
+		user.setCustomerId(custId);
+		System.out.print("Enter PASSWORD: ");
+		user.setPassword(scanner.next());
+		System.out.println("Enter FIRST_NAME: ");
+		user.setFirstName(scanner.next());
+		System.out.println("Enter MIDDLE_NAME: ");
+		user.setMiddleName(scanner.next());
+		System.out.println("Enter LAST_NAME: ");
+		user.setLastName(scanner.next());
+		user.setActiveStatusInd("1");
+		System.out.println("Enter MASTER_LOGIN: ");
+		user.setMasterLoginId(scanner.next());
+		// modify this
+		return 1L;
 	}
 
-	@ShellMethod("Create Product Feature for customer")
-	public boolean createProductModuleFeatures(Long custId)
-	{
-		// logic to create product module features
-		// take care of feature code as it's unique
-		return true;
+	public Map<Integer, String> createProducts() {
+		ProductRepositoryDaoImpl product = onboard.getProductsDao();
+		return product.createProductForOnboarding();
 	}
 
-
-
-	@ShellMethod("Create Privileges for customer")
-	public boolean createPrivileges()
-	{
-		return true;
+	public Map<Integer, String> createModules() {
+		ModuleRepositoryDaoImpl module = onboard.getModulesDao();
+		return module.createModuleForOnboarding();
 	}
 
+	public Map<Integer, String> createProductModuleLinkages() {
+		ProductModuleRepositoryDaoImpl prodModule = onboard.getProdModulesDao();
+		return prodModule.createProductModuleLinkageForOnboarding();
+	}
+
+	public Map<Integer, String> createCustomerProductLinkages() {
+		CustomerProductRepositoryDaoImpl custProd = onboard.getCustProductsDao();
+		return custProd.createCustomerProductLinkageForOnboarding();
+	}
+
+	public Map<Integer, String> createCustomerProductModuleLinkages() {
+		CustomerProductModuleRepositoryDaoImpl custProdMod = onboard.getCustProdModulesDao();
+		return custProdMod.createCustomerProductModuleLinkageForOnboarding();
+	}
+
+	public Map<Integer, String> createCustomerProductModuleFeatureLinkages() {
+		CustomerProductModuleFeatureRepositoryDaoImpl custProdModFeatures = onboard.getCustProdModuleFeaturesDao();
+		custProdModFeatures.createCustomerProductModuleFeatureLinkageForOnboarding();
+	}
 
 }
