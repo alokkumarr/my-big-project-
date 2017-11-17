@@ -1,9 +1,0 @@
-#!/bin/sh
-#
-# Deploy SAW Security into localhost
-#
-
-tar -xzf saw-security-*.tgz
-echo "Starting deployment"
-ansible-playbook -i /root/config saw-security-*/ansible/site.yml
-echo "Finished deployment"
