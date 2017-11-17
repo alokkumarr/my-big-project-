@@ -1,3 +1,5 @@
+@import "themes/base/colors";
+
 .analyze-report-publish {
   md-dialog-content {
     width: 550px;
@@ -37,7 +39,20 @@
     width: 250px;
   }
 
-  .error-msg {
-    color: red;
+  .errorTextMsg {
+    color: $secondary-red;
+  }
+
+  .errorMsg {
+    color: $primary-white;
+    background-color: $secondary-orange;
+    border-radius: 14px;
+    float: left;
+    height: 26px;
+    width: 24px;
+    text-align: center;
+    font-size: larger;
+    margin-top: 3px;
+    margin-right: 2px;
   }
 }

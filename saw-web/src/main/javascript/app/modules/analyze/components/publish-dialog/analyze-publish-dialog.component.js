@@ -37,6 +37,7 @@ export const AnalyzePublishDialogComponent = {
       this.dataHolder = [];
       this.dateFormat = 'mm/dd/yyyy';
       this.hasSchedule = false;
+      this.regexOfEmail = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/;
       const semicolon = 186;
       this.separatorKeys = [$mdConstant.KEY_CODE.ENTER, $mdConstant.KEY_CODE.COMMA, semicolon];
       if (this.model.isScheduled === 'true') {
@@ -131,7 +132,7 @@ export const AnalyzePublishDialogComponent = {
     }
 
     publish() {
-      if (!this.validateEmail(this.emails)) {
+      if (!this.validateEmails(this.emails)) {
         this.emailValidateFlag = true;
         return;
       }
@@ -140,12 +141,11 @@ export const AnalyzePublishDialogComponent = {
       this._$mdDialog.hide(promise);
     }
 
-    validateEmail(emails) {
-      const reg = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/;
-      const emailValue = emails;
+    validateEmails(emails) {
+      const emailsList = emails;
       const flag = 0;
-      forEach(emailValue, email => {
-        if (!reg.test(email.toLowerCase())) {
+      forEach(emailsList, email => {
+        if (!this.regexOfEmail.test(email.toLowerCase())) {
           flag = 1;
         }
       });
@@ -154,6 +154,10 @@ export const AnalyzePublishDialogComponent = {
       } else {
         return false;
       }
+    }
+
+    validateThisEmail(oneEmail) {
+      return this.regexOfEmail.test(oneEmail.toLowerCase());
     }
   }
 };

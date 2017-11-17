@@ -67,11 +67,16 @@
               secondary-placeholder="Emails separate by ';'"
               md-separator-keys="$ctrl.separatorKeys"
               md-enable-chip-edit="false">
-            </md-chips>
+              <md-chip-template >
+                <div ng-if="!$ctrl.validateThisEmail($chip)" class="errorMsg">?</div>
+                <span>
+                  {{$chip}}
+                </span>
+              </md-chip-template>
+            </md-chips> 
           </md-input-container>
-          <span ng-if="$ctrl.emailValidateFlag" class="error-msg" translate="EMAIL_ERROR_MSG"></span>
+          <span ng-if="$ctrl.emailValidateFlag" class="errorTextMsg" translate="EMAIL_ERROR_MSG"></span>
         </div>
-
 
         <!--
         <div class="form-container" layout="row">
