@@ -90,7 +90,7 @@ To edit the test report analysis data, execute the following commands:
 
         $ docker exec -it saw bash
         $ vi /root/saw-metrics/test.json
-        $ hadoop fs put -f /root/saw-metrics/test.json /
+        $ hadoop fs -put -f /root/saw-metrics/test.json /
 
 The first step opens a shell inside the SAW container, the second step
 edits the data JSON file and the third and last step copies the data
