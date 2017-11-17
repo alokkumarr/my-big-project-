@@ -2,23 +2,23 @@
 
 #
 # VARS params:
-#   dl-root
-#   http-port
-#==> xdf_info
-#==> xdf-rest.conf  
+#   dl.root
+#   http.port
+#==> bin/xdf_info
+#==> conf/xdf-rest.conf
 
 #
-# Activate application: generate bin/appl_info
-# from bin/templates/appl_info.templates and
-# /etc/bda/<APP_NAME>.vars and /etc/bda/cluster.vars files
+# Activate application: generate bin/xdf_info
+# from bin/templates/xdf_info.templates and
+# /etc/bda/<APP_NAME>.vars and /etc/bda/bda.vars files
 #
-CMD_DIR=$(dirname $0)
-APPL_INFO=$CMD_DIR/appl_info
-
+CMD_DIR=$( cd $(dirname $0) && pwd -P )
+: ${CMD_DIR:?no value}
+APPL_INFO=$CMD_DIR/xdf_info
 
 [[ ${1:-x} = deactivate ]] && {
-    rm -f $APPL_INFO
-    echo Deactivation completed, removed $APPL_INFO
+    rm -f $APPL_INFO $CONF_DIR/xdf-rest.conf
+    echo Deactivation completed, removed: $APPL_INFO, $CONF_DIR/xdf-rest.conf
     exit 0
 }
 
@@ -29,10 +29,10 @@ MK_CONF=$CMD_DIR/mk_conf.sh
 }
 
 # Check appl_info template
-( <$CMD_DIR/templates/appl_info.template ) || exit
+( <$CMD_DIR/templates/xdf_info.template ) || exit
 
 # Extract application name for first time
-APPL_NAME=$( awk '/^name:/ { print $2 }' $CMD_DIR/templates/appl_info.template )
+APPL_NAME=$( awk '/^name:/ { print $2 }' $CMD_DIR/templates/xdf_info.template )
 : ${APPL_NAME:?no value}
 
 # Check vars files
@@ -41,19 +41,33 @@ APPL_VARS_FILE=/etc/bda/$APPL_NAME.vars
 VARS_FILES=( $APPL_VARS_FILE )
 
 # Cluster vars file
-CLST_VARS_FILE=/etc/bda/cluster.vars
-[[ -f $CLST_VARS_FILE ]] &&
-VARS_FILES+=( $CLST_VARS_FILE )
+BDA_VARS_FILE=/etc/bda/bda.vars
+[[ -f $BDA_VARS_FILE ]] &&
+VARS_FILES+=( $BDA_VARS_FILE )
 
-# Run mk_conf
+echo Activation vars: "${VARS_FILES[@]}"
+
+# Run mk_conf to create bin/xdf_info
 $MK_CONF >$APPL_INFO \
-    $CMD_DIR/templates/appl_info.template \
-    ${VARS_FILES[@]}  || {
-    echo 1>&2 Activation completed with error
-    exit 1
-}
-
+    $CMD_DIR/templates/xdf_info.template \
+    ${VARS_FILES[@]} || {
+        echo 1>&2 error in $APPL_INFO generation
+        exit 1
+    }
 chmod 0755 $APPL_INFO
-echo Activation completed, created $APPL_INFO
+
+CONF_DIR=$( cd $CMD_DIR/../conf && pwd )
+: ${CONF_DIR:?no value}
+
+XDF_REST_CONF=$CONF_DIR/xdf-rest.conf
+# Run mk_conf to create bin/xdf_info
+$MK_CONF >$XDF_REST_CONF \
+    $CONF_DIR/templates/xdf-rest.conf.template \
+    $APPL_INFO || {
+        echo 1>&2 error in $XDF_REST_CONF generation
+        exit 1
+    }
+echo Activation completed, files created:
+ls -l $APPL_INFO $XDF_REST_CONF
 
 exit 0

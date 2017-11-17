@@ -1,14 +1,12 @@
 xdf.rest {
   name="xdf"
-  seeds = [2561]
-  # TODO : VARS parameter
-  http-port = 15010
+  task-start-cmd=${:optdir:}/bin/run-task.sh
+  #seeds = [2561]
+  #http-port = 15010
+  #dl-root = "hdfs:///data/bda"
+  seeds = [${:seeds:}]
   http-port = ${:http.port:}
-  # TODO: POM param
-  task-start-cmd=${optdir}/bin/run-task.sh
-  # TODO : VARS parameter
-  # dl-root = "hdfs:///data/bda"
-  dl-root = ${:dl.root:}
+  dl-root = "${:dl.root:}"
 }
 
 akka {

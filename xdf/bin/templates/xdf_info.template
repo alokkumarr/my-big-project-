@@ -12,9 +12,10 @@ group:   ${app.group}
 optdir:  ${app.optDir}    # /dfs/opt/bda/xdf/xdf-$version
 vardir:  ${app.varDir}    # /dfs/var/bda/xdf
 #
-# TODO: parms from VARS
-dl.root:   hdfs:///data/bda
-http.port: 15010
+# VARS params
+seeds:     ${:seeds:}       # 2681
+dl.root:   ${:dl.root:}     # hdfs:///data/bda
+http.port: ${:http.port:}   # 15010
 #
 # more values can be added on the box
 # TBD: rpm.host - installation host
