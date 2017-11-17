@@ -96,6 +96,17 @@ The first step opens a shell inside the SAW container, the second step
 edits the data JSON file and the third and last step copies the data
 file into the MapR-FS data lake.
 
+The test data is read in using the [Spark JSON datasets] support.  The
+Spark documentation does not seem to specify the mapping from JSON
+data types to Spark data types.  However, by knowing the [JSON data
+types], the [Spark data types] and then looking at the [Spark JSON
+reader] source code it is possible to derive the mapping.
+
+[Spark JSON datasets]: https://spark.apache.org/docs/2.1.2/sql-programming-guide.html#json-datasets
+[JSON data types]: https://tools.ietf.org/html/rfc7159#section-3
+[Spark data types]: http://spark.apache.org/docs/2.1.2/sql-programming-guide.html#data-types
+[Spark JSON reader]: https://github.com/apache/spark/blob/branch-2.1/sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/json/JacksonParser.scala
+
 ## Editing pivot and chart datasets
 
 To edit the test pivot/chart analysis data, execute the following
@@ -108,6 +119,15 @@ commands:
 The first step opens a shell inside the SAW container, the second step
 edits the data JSON file and the third and last step updates the data
 in Elasticsearch.
+
+The test data is loaded by sending it in JSON format to the
+Elasticsearch REST API.  The [JSON data types] are mapped to
+[Elasticsearch data types] according to the [Elasticsearch dynamic
+field mapping].
+
+[JSON data types]: https://tools.ietf.org/html/rfc7159#section-3
+[Elasticsearch data types]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/mapping-types.html
+[Elasticsearch dynamic field mapping]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/dynamic-field-mapping.html
 
 # Continuous integration
 
