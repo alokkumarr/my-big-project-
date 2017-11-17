@@ -82,16 +82,32 @@ containers can be cleared out by executing the following command:
 When deploying SAW locally, it is possible to edit datasets and have
 changes immediately reflected in analysis executions.  This can be
 useful for exploring how different SAW features behave with varying
-data.  For example, to edit the sample report, execute the following
-commands:
+data. 
+
+## Editing report datasets
+
+To edit the test report analysis data, execute the following commands:
 
         $ docker exec -it saw bash
-        $ vi /root/saw-metric/test.json
-        $ hadoop fs put -f /root/saw-metric/test.json /
+        $ vi /root/saw-metrics/test.json
+        $ hadoop fs put -f /root/saw-metrics/test.json /
 
 The first step opens a shell inside the SAW container, the second step
 edits the data JSON file and the third and last step copies the data
-file into the data lake.
+file into the MapR-FS data lake.
+
+## Editing pivot and chart datasets
+
+To edit the test pivot/chart analysis data, execute the following
+commands:
+
+        $ docker exec -it saw bash
+        $ vi /root/saw-metrics/test_es.json
+        $ /root/saw-metrics/saw-metrics-es-data
+
+The first step opens a shell inside the SAW container, the second step
+edits the data JSON file and the third and last step updates the data
+in Elasticsearch.
 
 # Continuous integration
 
