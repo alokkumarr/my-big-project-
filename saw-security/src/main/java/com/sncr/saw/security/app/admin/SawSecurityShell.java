@@ -151,7 +151,7 @@ class SawSecurityShell {
 
 	public Map<Integer, String> createCustomerProductModuleFeatureLinkages() {
 		CustomerProductModuleFeatureRepositoryDaoImpl custProdModFeatures = onboard.getCustProdModuleFeaturesDao();
-		custProdModFeatures.createCustomerProductModuleFeatureLinkageForOnboarding();
+		return custProdModFeatures.createCustomerProductModuleFeatureLinkageForOnboarding();
 	}
 
 }
