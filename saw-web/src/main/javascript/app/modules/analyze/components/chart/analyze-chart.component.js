@@ -220,12 +220,17 @@ export const AnalyzeChartComponent = {
         this.gotData(this.gridData);
         this.analysisSynched();
         this.endProgress();
+        this.resetChart();
         this.reloadChart(this.settings, this.filteredGridData);
       }, () => {
         this.endProgress();
       });
     }
 
+    resetChart() {
+      this.updateChart.next([{path: 'series', data: []}]);
+      return;
+    }
     /** check the parameters, before sending the request for the cahrt data */
     checkModelValidity() {
       let isValid = true;
