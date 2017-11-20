@@ -160,6 +160,7 @@
                 </network>
                 <ports>
                   <port>saw.docker.port:80</port>
+                  <port>saw.journal.port:19531</port>
                 </ports>
                 <!-- Run privileged for systemd -->
                 <privileged>true</privileged>
@@ -194,7 +195,7 @@
                   <alias>saw-mapr</alias>
                 </network>
                 <ports>
-                  <port>saw.mcs.port:8443</port>
+                  <port>saw.mapr.port:8443</port>
                   <port>saw.spark.master.port:8080</port>
                   <port>saw.spark.worker.port:8081</port>
                 </ports>

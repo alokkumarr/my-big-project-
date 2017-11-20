@@ -7,14 +7,18 @@ Workbench (SAW) project.
 
 To prepare for building the project, execute the following steps:
 
-1. Install Java 1.8
+1. Install Java 8
 
-2. Install Maven 3.5.0
+2. Install Maven 3.5.0 (for building, unit tests and packaging)
 
-3. Install [Docker] (for integration tests)
+3. Install [Docker] (for integration tests and local deployment)
 
 4. Configure Docker to allocate at least 8 GB memory and the maximum
    number of CPUs for containers
+
+Note: There is currently an incompatibility with Java 9 (SAW Transport
+Service gives a "scala.reflect.internal.MissingRequirementError"
+errors when building), so Java 8 specifically must be used.
 
 Note: Instructions for how to set up the above on a Mac can be found
 in the [Mac setup instructions](development-mac.md).
@@ -72,6 +76,58 @@ containers can be cleared out by executing the following command:
 
         $ cd saw
         $ mvn -pl saw-dist docker:stop
+
+# Editing datasets in local SAW deployment
+
+When deploying SAW locally, it is possible to edit datasets and have
+changes immediately reflected in analysis executions.  This can be
+useful for exploring how different SAW features behave with varying
+data. 
+
+## Editing report datasets
+
+To edit the test report analysis data, execute the following commands:
+
+        $ docker exec -it saw bash
+        $ vi /root/saw-metrics/test.json
+        $ hadoop fs -put -f /root/saw-metrics/test.json /
+
+The first step opens a shell inside the SAW container, the second step
+edits the data JSON file and the third and last step copies the data
+file into the MapR-FS data lake.
+
+The test data is read in using the [Spark JSON datasets] support.  The
+Spark documentation does not seem to specify the mapping from JSON
+data types to Spark data types.  However, by knowing the [JSON data
+types], the [Spark data types] and then looking at the [Spark JSON
+reader] source code it is possible to derive the mapping.
+
+[Spark JSON datasets]: https://spark.apache.org/docs/2.1.2/sql-programming-guide.html#json-datasets
+[JSON data types]: https://tools.ietf.org/html/rfc7159#section-3
+[Spark data types]: http://spark.apache.org/docs/2.1.2/sql-programming-guide.html#data-types
+[Spark JSON reader]: https://github.com/apache/spark/blob/branch-2.1/sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/json/JacksonParser.scala
+
+## Editing pivot and chart datasets
+
+To edit the test pivot/chart analysis data, execute the following
+commands:
+
+        $ docker exec -it saw bash
+        $ vi /root/saw-metrics/test_es.json
+        $ /root/saw-metrics/saw-metrics-es-data
+
+The first step opens a shell inside the SAW container, the second step
+edits the data JSON file and the third and last step updates the data
+in Elasticsearch.
+
+The test data is loaded by sending it in JSON format to the
+Elasticsearch REST API.  The [JSON data types] are mapped to
+[Elasticsearch data types] according to the [Elasticsearch dynamic
+field mapping].
+
+[JSON data types]: https://tools.ietf.org/html/rfc7159#section-3
+[Elasticsearch data types]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/mapping-types.html
+[Elasticsearch dynamic field mapping]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/dynamic-field-mapping.html
 
 # Continuous integration
 
