@@ -10,7 +10,8 @@ import {
   MatProgressBarModule,
   MatChipsModule,
   NoConflictStyleCompatibilityMode,
-  MatIconRegistry
+  MatIconRegistry,
+  MatListModule
 } from '@angular/material';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
@@ -26,7 +27,8 @@ import '../../../../themes/_angular_next.scss';
     MatSelectModule,
     MatFormFieldModule,
     MatProgressBarModule,
-    MatChipsModule
+    MatChipsModule,
+    MatListModule
   ],
   providers: [MatIconRegistry],
   exports: [
@@ -37,7 +39,8 @@ import '../../../../themes/_angular_next.scss';
     MatSelectModule,
     MatFormFieldModule,
     MatProgressBarModule,
-    MatChipsModule
+    MatChipsModule,
+    MatListModule
   ]
 })
 export class MaterialModule {}

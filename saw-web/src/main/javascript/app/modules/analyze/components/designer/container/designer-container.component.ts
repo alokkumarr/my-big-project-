@@ -4,14 +4,13 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-import assign from 'lodash/assign';
 
 import DesignerService from '../designer.service';
-import Analysis from '../../../models/analysis.model';
 import {
   DesignerMode,
   AnalysisType,
-  AnalysisStarter
+  AnalysisStarter,
+  Analysis
 } from '../../../types';
 const template = require('./designer-container.component.html');
 require('./designer-container.component.scss');
@@ -45,8 +44,8 @@ export default class DesignerContainerComponent {
 
   initNewAnalysis() {
     const {type, semanticId} = this.analysisStarter;
-    this._designerService.createAnalysis(semanticId, type).then(newAnalysis => {
-      this.analysis = assign(this.analysisStarter, newAnalysis);
+    this._designerService.createAnalysis(semanticId, type).then((newAnalysis: Analysis) => {
+      this.analysis = {...this.analysisStarter, ...newAnalysis};
       console.log('newAnalysis: ', this.analysis);
     });
   }

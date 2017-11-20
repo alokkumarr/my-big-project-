@@ -1,5 +1,6 @@
 import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as fpPipe from 'lodash/fp/pipe';
+import * as map from 'lodash/map';
 import * as fpMapValues from 'lodash/fp/mapValues';
 
 import {NUMBER_TYPES, DATE_TYPES, CHART_COLORS} from '../../common/consts.js';
@@ -23,6 +24,15 @@ export const ENTRY_MODES = {
 export const LAST_ANALYSES_CATEGORY_ID = 'lastAnalysesListId';
 
 export {NUMBER_TYPES, DATE_TYPES, CHART_COLORS};
+
+export const TYPE_ICONS_OBJ = fpPipe(
+  fpGroupBy('type'),
+  fpMapValues(v => v[0])
+)([
+  ...map(NUMBER_TYPES, type => ({type, icon: 'icon-number-type'})),
+  ...map(DATE_TYPES, type => ({type, icon: 'icon-calendar'})),
+  {type: 'string', icon: 'icon-string-type'}
+]);
 
 export const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
 

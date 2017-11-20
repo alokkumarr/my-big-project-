@@ -75,6 +75,8 @@ module.exports = function (env) {
           loader: 'tslint-loader',
           options: {
             fix: false,
+            "useCache": true,
+            "transpileOnly": true,
             typeCheck: false, // tslint-loader is way too slow with this enabled. Use pre-push hook for typechecking
             tsConfigFile: webpackHelper.root('tsconfig.json'),
             configFile: isDevelopment ?

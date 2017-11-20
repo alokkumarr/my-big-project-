@@ -5,5 +5,5 @@
                  (onSave)="onSave()"></designer-header>
 <div class="designer__toolbar"></div>
 <designer-settings class="designer__data-settings"
-                   [artifactColumns]="analysis.artifactColumns"></designer-settings>
+                   [artifactColumns]="analysis ? analysis.artifacts[0].columns : []"></designer-settings>
 <div class="designer__content"></div>

@@ -64,8 +64,9 @@ import {
   DesignerContainerComponent,
   DesignerHeaderComponent,
   DesignerSettingsComponent,
-  DesignerSettingsService,
-  DesignerService
+  DesignerSettingsGroupComponent,
+  DesignerService,
+  ArtifactColumnFilterPipe
 } from './components/designer';
 import {
   analyzeServiceProvider
@@ -137,18 +138,20 @@ angular.module(AnalyzeModule, [
     DesignerDialogComponent,
     DesignerContainerComponent,
     DesignerHeaderComponent,
-    DesignerSettingsComponent
+    DesignerSettingsComponent,
+    DesignerSettingsGroupComponent,
+    ArtifactColumnFilterPipe
   ],
   entryComponents: [
     DesignerDialogComponent,
     DesignerContainerComponent,
     DesignerHeaderComponent,
-    DesignerSettingsComponent
+    DesignerSettingsComponent,
+    DesignerSettingsGroupComponent
   ],
   providers: [
     AnalyzeDialogService,
     analyzeServiceProvider,
-    DesignerSettingsService,
     DesignerService
   ]
 })

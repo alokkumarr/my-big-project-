@@ -1,18 +1,29 @@
-<div fxLayout="row" class="settings">
+<div fxLayout="row" class="settings__container">
 
-  <div fxFlex="90" class="settings__unselected-fields">
-    <mat-list>
+  <div (mouseenter)="expandUnselectedSection()"
+       class="settings__unselected-fields"
+       [class.anim__expanded]="isUnselectedExpanded">
+    <mat-list *ngIf="artifactColumns">
       <mat-list-item>
         keyword filter
       </mat-list-item>
       <mat-list-item>
         type filter
       </mat-list-item>
-      <mat-list-item *ngFor="let field of fields; trackBy: index">
-        {{field.index}}
+      <mat-list-item *ngFor="let artifactColumn of unselectedArtifactColumns | artifactColumnFilter:filterObj; trackBy: index"
+                     (click)="addToGroupIfPossible(artifactColumn)">
+        {{artifactColumn.columnName}}
+        <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"></mat-icon>
       </mat-list-item>
     </mat-list>
   </div>
 
-  <div  fxFlex="10" class="settings__selected-fields"></div>
+  <div (mouseenter)="hideUnselectedSection()"
+       class="settings__selected-fields"
+       [class.anim__expanded]="!isUnselectedExpanded">
+    <designer-settings-group *ngFor="let groupAdapter of groupAdapters; trackBy: index"
+      [title]="groupAdapter.title"
+      [artifactColumns]="groupAdapter.artifactColumns"
+    ></designer-settings-group>
+  </div>
 </div>

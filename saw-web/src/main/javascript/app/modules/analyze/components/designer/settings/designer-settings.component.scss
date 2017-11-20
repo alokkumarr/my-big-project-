@@ -1,9 +1,38 @@
 designer-settings {
+  .settings__container {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+  }
+
   .settings__unselected-fields {
-    background-color: red;
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: flex 300ms cubic-bezier(0.455, 0.03, 0.515, 0.955);
+    flex: 1 1 10%;
+    box-sizing: border-box;
+
+    &.anim__expanded {
+      flex: 9 9 90%;
+    }
+
+    mat-list-item {
+      cursor: pointer;
+    }
   }
 
   .settings__selected-fields {
-    background-color: yellow;
+    overflow-x: hidden;
+    overflow-y: auto;
+    flex: 1 1 10%;
+    transition: flex 300ms cubic-bezier(0.455, 0.03, 0.515, 0.955);
+
+    &.anim__expanded {
+      flex: 9 9 90%;
+    }
+
+    mat-list-item {
+      cursor: pointer;
+    }
   }
 }

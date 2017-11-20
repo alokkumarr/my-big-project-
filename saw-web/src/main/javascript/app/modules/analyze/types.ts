@@ -1,8 +1,11 @@
-import Analysis from './models/analysis.model';
+import AnalysisChart from './models/analysis-chart.model';
+import AnalysisReport from './models/analysis-report.model';
 
 export type DesignerMode = 'edit' | 'fork' | 'new';
 export type AnalysisType = 'report' | 'chart' | 'pivot';
 export type ChartType = 'line' | 'column' | 'bar' | 'area' | 'pie' | 'scatter' | 'bubble';
+
+export type Analysis = AnalysisChart | AnalysisReport;
 
 export type AnalysisStarter = {
   name: string,

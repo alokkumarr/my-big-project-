@@ -1,1 +1,8 @@
-<div>setting-group</div>
+<div>
+  {{title}}
+  <mat-list *ngIf="artifactColumns">
+    <mat-list-item *ngFor="let artifactColumn of artifactColumns; trackBy: index">
+      {{artifactColumn.columnName}}
+    </mat-list-item>
+  </mat-list>
+</div>

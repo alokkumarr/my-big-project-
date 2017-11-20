@@ -2,10 +2,10 @@ designer-container {
   background-color: white;
   display: grid;
   grid-template:
-    "header header" 10vh
-    "data-settings toolbar" 10vh
-    "data-settings content" 80vh
-    / 20% 80%;
+    "header header" 5vh
+    "data-settings toolbar" 5vh
+    "data-settings content" 90vh
+    / 25% 75%;
 
   .designer__header {
     grid-area: header;

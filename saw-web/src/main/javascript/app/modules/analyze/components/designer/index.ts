@@ -3,16 +3,17 @@ import DesignerContainerComponent from './container';
 import DesignerHeaderComponent from './header';
 import {
   DesignerSettingsComponent,
-  DesignerSettingsGroupComponent,
-  DesignerSettingsService
+  DesignerSettingsGroupComponent
 } from './settings';
 import DesignerService from './designer.service';
+import ArtifactColumnFilterPipe from './artifact-column-filter.pipe';
 
 export {
   DesignerDialogComponent,
   DesignerContainerComponent,
   DesignerHeaderComponent,
   DesignerSettingsComponent,
-  DesignerSettingsService,
-  DesignerService
+  DesignerSettingsGroupComponent,
+  DesignerService,
+  ArtifactColumnFilterPipe
 };
