@@ -52,6 +52,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     private LongAccumulator recCounter;
 
     private StructType schema;
+    private List<String> tsFormats;
     private StructType internalSchema;
 
 
@@ -89,6 +90,9 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         recCounter = ctx.sparkSession.sparkContext().longAccumulator("ParserRecCounter");
 
         schema = createSchema(ctx.componentConfiguration.getParser().getFields(), false);
+        tsFormats = createTsFormatList(ctx.componentConfiguration.getParser().getFields());
+        logger.info(tsFormats);
+
         internalSchema = createSchema(ctx.componentConfiguration.getParser().getFields(), true);
 
         // Output data set
@@ -101,10 +105,17 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         Map.Entry<String, Map<String, String>> ds =  (Map.Entry<String, Map<String, String>>)outputDataSets.entrySet().toArray()[0];
         outputDataSetName = ds.getKey();
         outputDataSetLocation = ds.getValue().get(DataSetProperties.PhysicalLocation.name());
-        logger.info("Output dataset " + outputDataSetName + " located at " + outputDataSetLocation);
+        logger.info("Output data set " + outputDataSetName + " located at " + outputDataSetLocation);
+
+        //TODO: If data set exists and flag is not append - error
+        // This is good for UI what about pipeline? Talk to Suren
+
 
         // Check what sourcePath referring
         FileSystem fs = HFileOperations.getFileSystem();
+
+        //new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter);
+        //System.exit(0);
 
         try {
             if(headerSize >= 1) {
@@ -166,7 +177,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
 
         JavaRDD<Row> rdd = new JavaSparkContext(ctx.sparkSession.sparkContext())
             .textFile(sourcePath, 1)
-            .map(new ConvertToRow(schema, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter));
+            .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter));
 
 
         Dataset<Row> df = ctx.sparkSession.createDataFrame(rdd.rdd(), internalSchema);
@@ -206,7 +217,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             .filter(new HeaderFilter(headerSize))
             // Get rid of file numbers
             .keys()
-            .map(new ConvertToRow(schema, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter));
+            .map(new ConvertToRow(schema, tsFormats, lineSeparator, delimiter, quoteChar, quoteEscapeChar, '\'', recCounter, errCounter));
 
 
         Dataset<Row> df = ctx.sparkSession.createDataFrame(rdd.rdd(), internalSchema);
@@ -227,12 +238,25 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         return retval;
     }
 
+    private static List<String> createTsFormatList(List<Field> fields){
+        List<String> retval = new ArrayList<>();
+        for(Field field : fields){
+            if (field.getType().equals(CsvInspectorRowProcessor.T_DATETIME) &&
+            field.getFormat() != null && !field.getFormat().isEmpty()){
+                retval.add(field.getFormat());
+                logger.info("Found date field " + field.getName() + " format: " + field.getFormat());
+            } else {
+                retval.add("");
+            }
+        }
+        return retval;
+    }
     private static StructType createSchema(List<Field> fields, boolean addRejectedFlag){
 
         StructField[] structFields = new StructField[fields.size() + (addRejectedFlag ? 1 : 0)];
         int i = 0;
         for(Field field : fields){
-            // Must use Metadata.empty(), not null
+
             StructField structField = new StructField(field.getName(), convertXdfToSparkType(field.getType()), true, Metadata.empty());
             structFields[i] = structField;
             i++;

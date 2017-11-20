@@ -77,6 +77,7 @@ public class LongRunningJobService extends Service {
                                        batch,   // batch
                                        config);
         coordinator.tell(rq, coordinator);
+        rq.status  = StatusUpdate.PREPARING;
         return complete(rq.getJson());
     }
 
