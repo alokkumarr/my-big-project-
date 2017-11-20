@@ -43,5 +43,5 @@ JARS=$( echo $LIB_DIR/*.jar | tr ' ' : )
 # CONF_DIR for log4j.dtd, log4j.xml
 CLPATH=$CONF_DIR:$JARS:$(/opt/mapr/bin/mapr classpath)
 
-$JAVA_CMD -cp $CLPATH -Dcomp.log.dir="$LOG_DIR" -Dxdf.core=meta sncr.xdf.cli.CommandExecutor "$@"
+$JAVA_CMD -cp $CLPATH -DXDF_DATA_ROOT=$XDF_DATA_ROOT -Dcomp.log.dir="$LOG_DIR" -Dxdf.core=meta sncr.xdf.cli.CommandExecutor "$@"
 
