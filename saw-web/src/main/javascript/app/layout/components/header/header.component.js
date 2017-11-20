@@ -19,6 +19,10 @@ export const LayoutHeaderComponent = {
       const product = get(token, 'ticket.products.[0]');
       this.modules = product.productModules;
 
+      this.modules.unshift({
+        productModName: 'OBSERVE'
+      });
+
       if (JwtService.isAdmin(token)) {
         this.showAdmin = true;
       }
