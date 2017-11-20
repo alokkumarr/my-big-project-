@@ -125,7 +125,7 @@ function navigateToHome() {
       return /analyze/.test(url);
     });
   }, 10000);
-}
+};
 
 module.exports = {
   newDialog: {
@@ -265,5 +265,8 @@ module.exports = {
 
   validateReportFilters() {
     expect(this.analysisElems.filterCounter.isDisplayed()).toBeTruthy();
+  },
+  navigateToHomePage: () => {
+    navigateToHome();
   }
 };
