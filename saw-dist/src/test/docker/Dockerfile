@@ -55,6 +55,13 @@ RUN echo "transport.tcp.port: 8300" >> /etc/elasticsearch/elasticsearch.yml
 RUN sed -i -e 's/^-Xms2g$/-Xms256m/' -e 's/^-Xmx2g$/-Xmx256m/' \
     /etc/elasticsearch/jvm.options
 RUN systemctl enable elasticsearch
+# Install Kibana
+RUN yum -y -q install kibana
+RUN systemctl enable kibana
+RUN echo 'server.host: "0.0.0.0"' >> /etc/kibana/kibana.yml
+RUN echo 'elasticsearch.url: "http://localhost:8200"' >> /etc/kibana/kibana.yml
+RUN sed -i -e s/logstash-/sample/ \
+    /usr/share/kibana/src/core_plugins/kibana/ui_setting_defaults.js
 
 # Add oneshot service to start application deployment at startup
 ADD saw-deploy/saw-deploy /root/
