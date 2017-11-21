@@ -63,8 +63,8 @@ COPY saw-deploy/saw-deploy.service /etc/systemd/system/
 RUN systemctl enable saw-deploy
 
 # Add SAW test metrics
-ADD saw-metrics /root/saw-metrics/
-RUN /root/saw-metrics/saw-metrics generate
+COPY saw-metrics /root/saw-metrics/
+RUN chmod a+x /root
 COPY saw-metrics/saw-metrics.service /etc/systemd/system/
 RUN systemctl enable saw-metrics
 
