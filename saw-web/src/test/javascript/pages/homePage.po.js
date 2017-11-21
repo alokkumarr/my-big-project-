@@ -5,8 +5,11 @@ module.exports = {
   savedAnalysis: analysisName => {
     return element(by.xpath(`//span[text() = "${analysisName}"]`))
   },
+  expandedCategory: categoryName => {
+    return element(by.xpath(`//span[contains(text(),'${categoryName}')]/../../../button`));
+  },
   collapsedCategory: categoryName => {
-    return element(by.xpath(`//ul[contains(@class,'is-collapsed')]/preceding-sibling::button/div/span[text()='${categoryName}']`));
+    return element(by.xpath(`//ul[contains(@class,'is-collapsed')]/preceding-sibling::button/div/span[text()='${categoryName}']/../../../../../..`));
   },
   subCategory: subCategoryName => {
     return element(by.xpath(`(//span[text()='${subCategoryName}'])[1]`));

@@ -10,6 +10,7 @@ const executedAnalysisPage = require('../../javascript/pages/common/executedAlay
 const using = require('jasmine-data-provider');
 
 describe('create columnChart type analysis', () => {
+  const defaultCategory = 'AT Privileges Category DO NOT TOUCH';
   const categoryName = 'AT Analysis Category DO NOT TOUCH';
   const subCategoryName = 'AT Creating Analysis DO NOT TOUCH';
   const chartDesigner = analyze.designerDialog.chart;
@@ -23,7 +24,10 @@ describe('create columnChart type analysis', () => {
 
   const userDataProvider = {
     'admin': {handle: 'admin'}/*,
-    'user': {handle: 'userOne'},*/
+    'user': {handle: 'userOne'}*/
+    // TODO make possible for regular user
+    // error:     Failed: No element found using locator: By(xpath, //span[text() = "e2e column chart Tue Nov 21 2017 20:30:55 GMT+0700 (+07)"])
+
   };
 
   afterAll(function () {
@@ -36,16 +40,15 @@ describe('create columnChart type analysis', () => {
       expect(browser.getCurrentUrl()).toContain('/login');
       login.loginAs(data.handle);
 
-      //Navigate to Category/Sub-category
+      //Collapse default category
+      homePage.expandedCategory(defaultCategory).click();
 
-      //TODO click on category and sub category
+      //Navigate to Category/Sub-category
       const collapsedCategory = homePage.collapsedCategory(categoryName);
       const subCategory = homePage.subCategory(subCategoryName);
-      //commonFunctions.waitFor.elementToBeClickable(collapsedCategory);
-      browser.sleep(5000);
+      commonFunctions.waitFor.elementToBeClickable(collapsedCategory);
       collapsedCategory.click();
-      browser.sleep(5000);
-      //commonFunctions.waitFor.elementToBeClickable(subCategory);
+      commonFunctions.waitFor.elementToBeClickable(subCategory);
       subCategory.click();
 
       //Create analysis
@@ -89,6 +92,8 @@ describe('create columnChart type analysis', () => {
       //Change to Card View
       commonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
       analyze.analysisElems.cardView.click();
+
+      //Verify if created appeared in list
       commonFunctions.waitFor.elementToBePresent(createdAnalysis)
         .then(() => expect(createdAnalysis.isPresent()).toBe(true));
     });
@@ -103,6 +108,7 @@ describe('create columnChart type analysis', () => {
 
         commonFunctions.waitFor.cardsCountToUpdate(cards, count);
 
+        //Expect to be deleted
         expect(main.getAnalysisCards(chartName).count()).toBe(count - 1);
       });
     });
