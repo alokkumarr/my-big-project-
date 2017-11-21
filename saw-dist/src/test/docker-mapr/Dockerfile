@@ -33,7 +33,7 @@ RUN sed -i -e '/^export SPARK_MASTER_[A-Z]*=localhost$/d' \
     /opt/mapr/spark/spark-current/conf/spark-env.sh
 
 # Add MapR container initialization script
-ADD saw-mapr-init /root/
+COPY saw-mapr-init /root/
 RUN sed -i -e 's,while true,/root/saw-mapr-init\nwhile true,' \
     /usr/bin/init-script
 
