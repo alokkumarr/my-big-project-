@@ -2,6 +2,7 @@ package com.sncr.saw.security.app.repository.impl;
 
 import com.sncr.saw.security.app.repository.ProductRepository;
 import com.sncr.saw.security.common.bean.Product;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,23 @@ public class ProductRepositoryDaoImpl implements ProductRepository {
   @Autowired
   public ProductRepositoryDaoImpl(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
+  }
+
+  @Override
+  public void displayProducts() {
+    String sql = "select PRODUCT_SYS_ID, PRODUCT_NAME from PRODUCTS";
+    Map<Integer, String> results = new HashMap<Integer, String>();
+    List rs = jdbcTemplate.queryForList(sql);
+    for (Object x:rs) {
+      System.out.println(x);
+    }
+  }
+
+
+  @Override
+  public boolean checkProductExistance(Long prodId) {
+    String sql = "select PRODUCT_SYS_ID from products where PRODUCT_SYS_ID = " + prodId;
+    return !jdbcTemplate.queryForList(sql).isEmpty();
   }
 
   @Override
@@ -62,7 +80,7 @@ public class ProductRepositoryDaoImpl implements ProductRepository {
                           },
           keyHolder
       );
-      results.put((Integer) m.getKey(), keyHolder.toString());
+      results.put((Integer) m.getKey(), keyHolder.getKey().toString());
     }
     // #4 is the required one for pointing to demo app.
     return results;

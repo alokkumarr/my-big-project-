@@ -4,5 +4,6 @@ import java.util.Map;
 
 public interface CustomerProductRepository {
 
-  Map<Integer, String> createCustomerProductLinkageForOnboarding();
+  Map<Integer, String> createCustomerProductLinkageForOnboarding(Long custId,
+      Long prod_sys_id);
 }

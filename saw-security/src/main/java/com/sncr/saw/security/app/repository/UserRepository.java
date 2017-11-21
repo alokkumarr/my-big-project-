@@ -64,4 +64,5 @@ public interface UserRepository {
 	List<SubCategoryWithPrivilegeDetails> getSubCategoriesWithPrivilege(CustomerProductSubModule cpsm);
 	Valid updateCategory(CategoryDetails category);
 	boolean checkSubCatExists(CategoryDetails category);
+	Long createAdminUserForOnboarding(User user);
 }

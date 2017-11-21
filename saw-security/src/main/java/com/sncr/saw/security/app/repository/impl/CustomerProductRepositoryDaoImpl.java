@@ -31,26 +31,30 @@ public class CustomerProductRepositoryDaoImpl implements CustomerProductReposito
 
 
   @Override
-  public Map<Integer, String> createCustomerProductLinkageForOnboarding() {
+  public Map<Integer, String> createCustomerProductLinkageForOnboarding(Long custId,
+      Long prod_sys_id) {
     Map<Integer, String> sqlstatements = new HashMap<Integer, String>();
     Map<Integer, String> results = new HashMap<Integer, String>();
     KeyHolder keyHolder = new GeneratedKeyHolder();
 
     sqlstatements.put(1,
-        "INSERT INTO `CUSTOMER_PRODUCTS` (`CUSTOMER_SYS_ID`,`PRODUCT_SYS_ID`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,`MODIFIED_BY`) VALUES (1,4,1,?,'admin','','','','')");
+        "INSERT INTO `CUSTOMER_PRODUCTS` (`CUSTOMER_SYS_ID`,`PRODUCT_SYS_ID`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,`MODIFIED_BY`) VALUES (?,?,1,?,'admin',NULL,'',NULL,'')");
     for (Map.Entry m : sqlstatements.entrySet()) {
       jdbcTemplate.update(new PreparedStatementCreator() {
                             @Override
                             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                               PreparedStatement ps = con
                                   .prepareStatement(m.getValue().toString(), new String[]{"CUST_PROD_SYS_ID"});
-                              ps.setDate(1, new java.sql.Date(new Date().getTime()));
+                              ps.setLong(1, custId);
+                              ps.setLong(2, prod_sys_id);
+                              ps.setDate(3, new java.sql.Date(new Date().getTime()));
                               return ps;
                             }
                           },
           keyHolder
       );
-      results.put((Integer) m.getKey(), keyHolder.toString());
+      System.out.println(keyHolder.getClass());
+      results.put((Integer) m.getKey(), keyHolder.getKey().toString());
     }
 
     return results;

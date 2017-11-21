@@ -9,4 +9,5 @@ public interface CustomerRepository {
     boolean isValidCustCode(String custCode);
     int testSql();
     long createNewCustomerDao(Customer cust);
+    void displayCustomers();
 }

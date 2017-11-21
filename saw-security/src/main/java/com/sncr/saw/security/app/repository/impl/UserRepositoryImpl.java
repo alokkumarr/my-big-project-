@@ -29,6 +29,7 @@ import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummary;
 import com.sncr.saw.security.common.bean.repo.analysis.AnalysisSummaryList;
 import com.sncr.saw.security.common.util.Ccode;
 import com.sncr.saw.security.common.util.DateUtil;
+import java.sql.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +38,11 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 
@@ -1355,6 +1359,41 @@ public class UserRepositoryImpl implements UserRepository {
 		}
 		valid.setValid(true);
 		return valid;
+	}
+
+	@Override
+	public Long createAdminUserForOnboarding(User user) {
+		Valid valid = new Valid();
+		String sql = "INSERT INTO USERS (USER_ID, EMAIL, ROLE_SYS_ID, CUSTOMER_SYS_ID, ENCRYPTED_PASSWORD, "
+				+ "FIRST_NAME, MIDDLE_NAME, LAST_NAME, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY ) "
+				+ "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, SYSDATE(), ? ); ";
+
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+
+		try {
+
+			jdbcTemplate.update(new PreparedStatementCreator() {
+														@Override
+														public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
+															PreparedStatement ps = con.prepareStatement(sql, new String[]{"USER_SYS_ID"});
+															ps.setString(1, user.getMasterLoginId());
+															ps.setString(2, user.getEmail());
+															ps.setLong(3, user.getRoleId());
+															ps.setLong(4, user.getCustomerId());
+															ps.setString(5, Ccode.cencode(user.getPassword()).trim());
+															ps.setString(6, user.getFirstName());
+															ps.setString(7, user.getMiddleName());
+															ps.setString(8, user.getLastName());
+															ps.setString(9, user.getActiveStatusInd());
+															ps.setString(10, user.getMasterLoginId());
+															return ps;
+														}
+													},
+					keyHolder);
+			return (Long) keyHolder.getKey();
+		} catch (Exception e) {
+			return -1L;
+		}
 	}
 
 	@Override

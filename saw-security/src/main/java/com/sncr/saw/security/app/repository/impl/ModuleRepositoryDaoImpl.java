@@ -37,13 +37,13 @@ public class ModuleRepositoryDaoImpl implements ModuleRepository {
     KeyHolder keyHolder = new GeneratedKeyHolder();
 
     sqlstatements.put(1,
-        "INSERT INTO `MODULES` (`MODULE_NAME`,`MODULE_CODE`,`MODULE_DESC`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,`MODIFIED_BY`) VALUES ('ANALYZE','ANLYS00001','Analyze Module',1,?,'admin','','','','')");
+        "INSERT INTO `MODULES` (`MODULE_NAME`,`MODULE_CODE`,`MODULE_DESC`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,`MODIFIED_BY`) VALUES ('ANALYZE','ANLYS00001','Analyze Module',1,?,'admin',NULL,'',NULL,'')");
     sqlstatements.put(2,
-        "INSERT INTO `MODULES` (`MODULE_NAME`,`MODULE_CODE`,`MODULE_DESC`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,`MODIFIED_BY`) VALUES ('OBSERVE','OBSR000001','Observe Module',1,?,'admin','','','','')");
+        "INSERT INTO `MODULES` (`MODULE_NAME`,`MODULE_CODE`,`MODULE_DESC`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,`MODIFIED_BY`) VALUES ('OBSERVE','OBSR000001','Observe Module',1,?,'admin',NULL,'',NULL,'')");
     sqlstatements.put(3,
-        "INSERT INTO `MODULES` (`MODULE_NAME`,`MODULE_CODE`,`MODULE_DESC`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,`MODIFIED_BY`) VALUES ('ALERT','ALRT000001','Alert Module',1,?,'admin','','','','')");
+        "INSERT INTO `MODULES` (`MODULE_NAME`,`MODULE_CODE`,`MODULE_DESC`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,`MODIFIED_BY`) VALUES ('ALERT','ALRT000001','Alert Module',1,?,'admin',NULL,'',NULL,'')");
     sqlstatements.put(4,
-        "INSERT INTO `MODULES` (`MODULE_NAME`,`MODULE_CODE`,`MODULE_DESC`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,`MODIFIED_BY`) VALUES ('OBSERVE','OBSR000001','Observe Module',1,?,'admin','','','','')");
+        "INSERT INTO `MODULES` (`MODULE_NAME`,`MODULE_CODE`,`MODULE_DESC`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,`MODIFIED_BY`) VALUES ('OBSERVE','OBSR000001','Observe Module',1,?,'admin',NULL,'',NULL,'')");
 
     for (Map.Entry m : sqlstatements.entrySet()) {
       jdbcTemplate.update(new PreparedStatementCreator() {
@@ -57,7 +57,7 @@ public class ModuleRepositoryDaoImpl implements ModuleRepository {
                           },
           keyHolder
       );
-      results.put((Integer) m.getKey(), keyHolder.toString());
+      results.put((Integer) m.getKey(), keyHolder.getKey().toString());
     }
     // all the IDs of the generated products
     return results;

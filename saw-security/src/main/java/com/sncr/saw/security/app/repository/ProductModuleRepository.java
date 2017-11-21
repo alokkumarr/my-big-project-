@@ -6,4 +6,10 @@ public interface ProductModuleRepository {
 
   // returns how many products got created
   Map<Integer, String> createProductModuleLinkageForOnboarding();
+
+  // display product modules
+  void displayProductModules();
+
+  // check if product exist
+  boolean checkProductModuleExistance(Long prodModId);
 }

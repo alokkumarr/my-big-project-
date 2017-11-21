@@ -4,5 +4,5 @@ package com.sncr.saw.security.app.repository;
  * Created by pawan.
  */
 public interface RoleRepository {
-    long createNewRoleDao(Long custId);
+    long createNewAdminRoleDao(Long custId);
 }

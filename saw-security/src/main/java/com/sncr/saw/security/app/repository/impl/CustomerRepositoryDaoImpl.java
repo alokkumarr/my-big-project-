@@ -2,6 +2,7 @@ package com.sncr.saw.security.app.repository.impl;
 
 import com.sncr.saw.security.app.repository.CustomerRepository;
 import com.sncr.saw.security.app.model.Customer;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,11 +66,20 @@ public class CustomerRepositoryDaoImpl implements CustomerRepository {
     return rowCount;
   }
 
+  @Override
+  public void displayCustomers() {
+    String sql = "select CUSTOMER_SYS_ID, CUSTOMER_CODE, COMPANY_NAME, COMPANY_BUSINESS from CUSTOMERS";
+    List rs = jdbcTemplate.queryForList(sql);
+    for (Object x:rs) {
+      System.out.println(x);
+    }
+  }
+
   /*
-  *
-  * Example: create-new-customer "abc" "pawan" "computers" 10 1 "somebody" "admin" "someoneelse" 30 "pawan.io"
-  *
-  * */
+    *
+    * Example: create-new-customer "abc" "pawan" "computers" 10 1 "somebody" "admin" "someoneelse" 30 "pawan.io"
+    *
+    * */
   @Override
   public long createNewCustomerDao(Customer cust) {
     if (cust != null) {
@@ -78,7 +88,7 @@ public class CustomerRepositoryDaoImpl implements CustomerRepository {
               +
               " ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY, INACTIVATED_DATE, INACTIVATED_BY, MODIFIED_DATE,"
               +
-              "MODIFIED_BY, PASSWORD_EXPIRY_DAYS, DOMAIN_NAME) VALUES(?,?,?,?,?,?,?,'','','','',?,?)";
+              "MODIFIED_BY, PASSWORD_EXPIRY_DAYS, DOMAIN_NAME) VALUES(?,?,?,?,?,?,?,NULL,'',NULL,'',?,?)";
       KeyHolder keyHolder = new GeneratedKeyHolder();
 
       jdbcTemplate.update(

@@ -18,4 +18,10 @@ public interface ProductRepository {
     // returns product based on "ID"
     Product getProduct(Long prodId);
 
+    // Retrieve all the products as ID and name
+    void displayProducts();
+
+    // check if product exist
+    boolean checkProductExistance(Long prodId);
+
 }

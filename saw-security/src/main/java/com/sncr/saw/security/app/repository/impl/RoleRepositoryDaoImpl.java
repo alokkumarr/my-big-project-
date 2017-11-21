@@ -30,7 +30,7 @@ public class RoleRepositoryDaoImpl implements RoleRepository {
     // we decided that we will initially create only admin user
 
     @Override
-    public long createNewRoleDao(Long custId) {
+    public long createNewAdminRoleDao(Long custId) {
         if (custId!=null) {
             String sql = "INSERT INTO `ROLES` (`CUSTOMER_SYS_ID`, `ROLE_NAME`, `ROLE_CODE`, `ROLE_DESC`," +
                     "`ROLE_TYPE`, `DATA_SECURITY_KEY`, `ACTIVE_STATUS_IND`, `CREATED_DATE`, `CREATED_BY`)" +
