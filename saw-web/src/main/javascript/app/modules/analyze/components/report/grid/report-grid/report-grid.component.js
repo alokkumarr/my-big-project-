@@ -189,7 +189,7 @@ export const ReportGridComponent = {
         if (!isUndefined(NUMBER_TYPES.includes(column.type)) && !isUndefined(column.format)) {
           if (!isUndefined(column.format.currency)) {
             field.customizeText = (data => {
-              if (!isUndefined(column.format.currencySymbol)  &&  !isEmpty(data.valueText)) {
+              if (!isUndefined(column.format.currencySymbol) && !isEmpty(data.valueText)) {
                 return column.format.currencySymbol + ' ' + data.valueText;
               } else {
                 return data.valueText;
@@ -278,7 +278,6 @@ export const ReportGridComponent = {
                     return source.valueText;
                   }
                 });
-                
               } else {
                 column.format = {
                   type: typeValue,
