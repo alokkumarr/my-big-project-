@@ -7,7 +7,7 @@ RUN sed -i -e '/^tsflags=nodocs$/d' /etc/yum.conf
 # Install system utilities
 RUN yum -y -q --nogpgcheck install epel-release
 RUN yum -y -q --nogpgcheck install man less file iproute lsof nc bind-utils \
-    smem sudo
+    smem sudo mlocate
 
 # Install Ansible from EPEL repository
 RUN yum -y -q --nogpgcheck install ansible rsync
