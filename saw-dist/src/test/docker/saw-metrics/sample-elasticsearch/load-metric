@@ -20,8 +20,10 @@ load_semantic() {
 
 load_data() {
     echo "Loading sample Elasticsearch data"
-    curl -sS -X POST "http://localhost:8200/sample/type/" \
-         -H "Content-Type: application/json" -d @$dir/data.json
+    for data in $dir/data-*.json; do
+        curl -sS -X POST "http://localhost:8200/sample/type/" \
+             -H "Content-Type: application/json" -d @$data
+    done
 }
 
 wait_maprfs
