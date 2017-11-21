@@ -15,7 +15,7 @@ exports.config = {
         //'incognito',
         'disable-extensions',
         'disable-web-security',
-        //  '--start-fullscreen' // enable for Mac OS
+        //'--start-fullscreen' // enable for Mac OS
       ]
     }
   },
@@ -36,13 +36,14 @@ exports.config = {
     ],
 
     analyses: [
-      /*webpackHelper.root('src/test/e2e-tests/priviliges.test.js'),
+      webpackHelper.root('src/test/e2e-tests/priviliges.test.js'),
       webpackHelper.root('src/test/e2e-tests/goToAnalyze.test.js'),
       webpackHelper.root('src/test/e2e-tests/createChart.test.js'),
       webpackHelper.root('src/test/e2e-tests/createPivot.test.js'),
-      webpackHelper.root('src/test/e2e-tests/createReport.test.js')*/
+      webpackHelper.root('src/test/e2e-tests/createReport.test.js'),
       // webpackHelper.root('src/test/javascript/e2e/spec/analyses.test.js'), // obsolete
       // webpackHelper.root('src/test/e2e-tests/debug.test.js') // for testing purposes
+      webpackHelper.root('src/test/e2e-tests/charts/columnChart.test.js')
     ]
   },
 
@@ -53,7 +54,10 @@ exports.config = {
       displaySuiteNumber: true
     }));
 
-    browser.manage().timeouts().pageLoadTimeout(10000);
+    //jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
+    jasmine.getEnv().defaultTimeoutInterval = 120000; //another option if above doesn't work
+
+    browser.manage().timeouts().pageLoadTimeout(30000);
     browser.manage().timeouts().implicitlyWait(10000);
     //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.driver.get('http://localhost:3000');
@@ -62,6 +66,6 @@ exports.config = {
       return browser.driver.getCurrentUrl().then(url => {
         return /login/.test(url);
       });
-    }, 10000);
+    }, 30000);
   }
 };

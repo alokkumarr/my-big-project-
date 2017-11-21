@@ -1,0 +1,14 @@
+module.exports = {
+  accountSettingsMenuBtn: element(by.css('button[e2e="account-settings-menu-btn"]')),
+  adminMenuOption: element(by.css('a[e2e="account-settings-selector-admin"]')),
+  changePasswordMenuOption: element(by.css('button[e2e="account-settings-selector-change-password"]')),
+  savedAnalysis: analysisName => {
+    return element(by.xpath(`//span[text() = "${analysisName}"]`))
+  },
+  collapsedCategory: categoryName => {
+    return element(by.xpath(`//ul[contains(@class,'is-collapsed')]/preceding-sibling::button/div/span[text()='${categoryName}']`));
+  },
+  subCategory: subCategoryName => {
+    return element(by.xpath(`(//span[text()='${subCategoryName}'])[1]`));
+  }
+};

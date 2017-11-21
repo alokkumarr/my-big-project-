@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -25,6 +26,7 @@ public class JwtFilter extends GenericFilterBean {
 	public void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain)
 			throws IOException, ServletException {
 		final HttpServletRequest request = (HttpServletRequest) req;
+		final HttpServletResponse response = (HttpServletResponse) res;
 		if (!("OPTIONS".equals(request.getMethod()))) {
 			Ticket ticket = new Ticket();
 
@@ -65,11 +67,11 @@ public class JwtFilter extends GenericFilterBean {
 					it.remove();
 				}
 				if (!ticket.isValid()) {
-					throw new ServletException("Token has expired. Please re-login.");
+					response.sendError(401, "Token has expired. Please re-login.");
 				}
 			}
 		}
-		chain.doFilter(req, res);
+		chain.doFilter(req, response);
 	}
 
 }
