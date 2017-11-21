@@ -8,6 +8,11 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
+import com.synchronoss.saw.export.generate.ExportBean;
+import com.synchronoss.saw.export.model.Ticket;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -15,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 
 @Component
 public class ServiceUtils {
@@ -62,6 +69,49 @@ public class ServiceUtils {
     return report.isSuccess();
   }
 
-  
-  
+  /**
+   * To Do
+   * @return
+   */
+  public String getDefaultJwtToken()
+  {
+    /* create default jwt token to request saw-transport-service restAPI for scheduled analysis to dispatch the data */
+
+    Ticket ticket = new Ticket();
+    ticket.setUserId("1");
+    ticket.setRoleType("admin");
+    ticket.setUserFullName("system");
+    ticket.setDataSecurityKey(new ArrayList<>());
+
+    return Jwts.builder().setSubject("sawadmin@synchronoss.com").claim("ticket", ticket).setIssuedAt(new Date())
+            .signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact();
+  }
+
+  public String prepareMailBody(ExportBean exportBean, String body)
+  {
+    if(body.contains(MailBodyResolver.ANALYSIS_NAME))
+    {
+     body = body.replaceAll("\\"+MailBodyResolver.ANALYSIS_NAME,exportBean.getReportName());
+    }
+    if(body.contains(MailBodyResolver.ANALYSIS_DESCRIPTION))
+    {
+      body= body.replaceAll("\\"+MailBodyResolver.ANALYSIS_DESCRIPTION,exportBean.getReportDesc());
+    }
+    if(body.contains(MailBodyResolver.PUBLISH_TIME))
+    {
+      body= body.replaceAll("\\"+MailBodyResolver.PUBLISH_TIME,exportBean.getPublishDate());
+    }
+    if(body.contains(MailBodyResolver.CREATED_BY))
+    {
+      body= body.replaceAll("\\"+MailBodyResolver.CREATED_BY,exportBean.getCreatedBy());
+    }
+  return body;
+  }
+
+  public class MailBodyResolver {
+    public static final String ANALYSIS_NAME="$analysis_name";
+    public static final String ANALYSIS_DESCRIPTION="$analysis_description";
+    public static final String PUBLISH_TIME="$publish_time";
+    public static final String CREATED_BY="$created_by";
+  }
 }

@@ -3,6 +3,19 @@ info:
 spring:
   application:
     name: saw-export-service
+  mail:
+     host: outgoing.sncrcorp.net
+     port: 25
+     protocol: smtp
+     test-connection: false
+     username:
+     password:
+     smtp:
+      auth: false
+     properties:
+      mail.smtp.from: SAWReport@synchronoss.com
+      # To do : Mail body can be moved to maprdb to configure email custom template from UI for saw customers level.
+     body: "Hello  </br> Attached is an analysis for your review.</br>Analysis Name: $analysis_name </br>Analysis Description: $analysis_description </br>Publish Time : $publish_time </br> Analysis Created By: $created_by </br> </br>Regards,<br>Synchronoss Analytics Team </br>"
 server:
   address: localhost
   port: 9400
@@ -14,6 +27,11 @@ server:
 analysis:
     service:
         host: https://saw.bda.poc.velocity-va.synchronoss.net/services/analysis
+        # To Do directly referring the saw-transport service url to fetch the data ,will be requested by saw-scheduler service.
+        # this is the backend process , So request will not be going through saw-gateway-service.
+        transportHost: http://10.48.22.231:9200/analysis
     size: 10000
 
+published:
+  path: /tmp
        

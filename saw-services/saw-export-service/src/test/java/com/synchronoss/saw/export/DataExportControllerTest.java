@@ -11,9 +11,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,6 +35,7 @@ import com.synchronoss.saw.export.controller.DataExportController;
 @RunWith(SpringRunner.class)
 @WebMvcTest(DataExportController.class)
 @TestPropertySource(locations = "application-test.properties")
+@ComponentScan(basePackages = {"com.synchronoss"})
 public class DataExportControllerTest {
 
 	@Rule
@@ -38,11 +43,16 @@ public class DataExportControllerTest {
 	WireMockServer wireMockServer = null;
 
 	@Before
-
 	public void setup() throws Exception {
 		wireMockServer = new WireMockServer(options().port(9091));
 		wireMockServer.start();
 	}
+    @Test
+    public void contextLoads() {
+    }
+
+    @Autowired
+    private ApplicationContext appContext;
 
 	@Autowired
 	private MockMvc mockMvc;

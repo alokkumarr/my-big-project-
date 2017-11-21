@@ -67,6 +67,10 @@ class Analysis extends BaseController {
     }).map(analysis => {
       /* Return only schedule view */
       ("id", (analysis \ "id")) ~
+      ("name",(analysis \ "name")) ~
+      ("description",(analysis \ "description")) ~
+      ("metricName",(analysis \ "metricName")) ~
+      ("userFullName",(analysis \ "userFullName")) ~
       ("schedule", (analysis \ "schedule"))
     })
     ("analyses", analyses)
