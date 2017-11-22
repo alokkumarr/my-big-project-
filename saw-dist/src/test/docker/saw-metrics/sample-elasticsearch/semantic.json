@@ -45,17 +45,17 @@
                 "icon": "icon-vert-bar-chart",
                 "type": "chart:line"
               },
-			  			  {
+	      {
                 "label": "Bar Chart",
                 "icon": "icon-vert-bar-chart",
                 "type": "chart:bar"
               },
-			  {
+	      {
                 "label": "Scatter Plot",
                 "icon": "icon-vert-bar-chart",
                 "type": "chart:scatter"
               },
-			  {
+	      {
                 "label": "Bubble Chart",
                 "icon": "icon-vert-bar-chart",
                 "type": "chart:bubble"
