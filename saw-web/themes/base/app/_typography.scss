@@ -32,6 +32,13 @@ a {
   }
 }
 
+.version-tag {
+  color: $primary-grey-g4;
+  font-size: 12px;
+  margin: 5px;
+  align-self: baseline;
+}
+
 .highlight {
   background-color: $highlight-bg-color;
 }

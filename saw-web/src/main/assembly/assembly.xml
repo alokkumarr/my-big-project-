@@ -10,22 +10,14 @@
   <baseDirectory>saw-web</baseDirectory>
   <fileSets>
     <fileSet>
-      <directory>${project.basedir}/src/main/doc</directory>
-      <outputDirectory></outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>${project.basedir}/doc</directory>
-      <includes>
-        <include>operations.md</include>
-      </includes>
-      <outputDirectory>doc</outputDirectory>
-    </fileSet>
-    <fileSet>
       <directory>${project.basedir}/src/main/ansible</directory>
       <outputDirectory>ansible</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>${project.build.directory}/rpm/saw-web/RPMS/noarch</directory>
+      <directory>${project.build.directory}</directory>
+      <includes>
+        <include>saw-web-*.rpm</include>
+      </includes>
       <outputDirectory>rpms</outputDirectory>
     </fileSet>
   </fileSets>

@@ -1,0 +1,11 @@
+[Unit]
+Description=SAW Observe
+
+[Service]
+ExecStart=/bin/sh -c "exec java -jar /opt/bda/saw-observe-service/saw-observe.jar --spring.config.location=/opt/bda/saw-observe-service/conf/application.yml"
+SyslogIdentifier=saw-observe
+User=mapr
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

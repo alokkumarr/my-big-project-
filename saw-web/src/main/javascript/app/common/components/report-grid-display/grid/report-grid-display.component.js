@@ -1,9 +1,13 @@
 import * as map from 'lodash/map';
+import * as forEach from 'lodash/forEach';
+import * as isEmpty from 'lodash/isEmpty';
+import * as moment from 'moment';
 import DataSource from 'devextreme/data/data_source';
+import 'moment-timezone';
 
 import * as template from './report-grid-display.component.html';
 
-import {NUMBER_TYPES} from '../../../consts.js';
+import {NUMBER_TYPES, DATE_TYPES, BACKEND_TIMEZONE} from '../../../consts.js';
 
 const COLUMN_WIDTH = 175;
 const DEFAULT_PAGE_SIZE = 10;
@@ -29,7 +33,6 @@ export const ReportGridDisplayComponent = {
       const columns = this._getDxColumns(this.columns);
 
       const gridSelector = '.report-dx-grid.report-dx-grid-display';
-
       this.gridConfig = this._dxDataGridService.mergeWithDefaultConfig({
         columns,
         remoteOperations: {
@@ -72,16 +75,40 @@ export const ReportGridDisplayComponent = {
       const store = new DataSource({
         load: options => {
           return this.source({options})
-            .then(({data, count}) => ({data, totalCount: count}));
+            .then(({data, count}) => {
+              return {data: this.formatDates(data), totalCount: count};
+            });
         }
       });
       return store;
     }
 
+    formatDates(data) {
+      if (isEmpty(data)) {
+        return data;
+      }
+      const keys = Object.keys(data[0]);
+      const formats = [
+        moment.ISO_8601,
+        'YYYY-MM-DD hh:mm:ss',
+        'YYYY-MM-DD',
+        'MM/DD/YYYY  :)  HH*mm*ss'
+      ];
+      forEach(data, row => {
+        forEach(keys, key => {
+          const date = moment.tz(row[key], formats, true, BACKEND_TIMEZONE);
+          if (date.isValid()) {
+            row[key] = date.toDate();
+          }
+        });
+      });
+      return data;
+    }
+
     _getDxColumns(columns) {
       return map(columns, column => {
-        if (column.type === 'date') {
-          column.type = 'string-date';
+        if (column.type === 'string-date') {
+          column.type = 'date';
         }
         const field = {
           alignment: 'left',
@@ -91,9 +118,14 @@ export const ReportGridDisplayComponent = {
           dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
           width: COLUMN_WIDTH
         };
+        if (DATE_TYPES.includes(column.type)) {
+          field.format = {
+            type: 'shortDate'
+          };
+        }
         if (NUMBER_TYPES.includes(column.type)) {
           field.format = {
-            type: 'decimal',
+            type: 'fixedPoint',
             precision: 2
           };
         }
@@ -104,6 +136,11 @@ export const ReportGridDisplayComponent = {
     $onChanges() {
       if (this._gridInstance) {
         const columns = this._getDxColumns(this.columns);
+        forEach(columns, column => {
+          if (column.dataType === 'date') {
+            column.dataType = 'string';
+          }
+        });
         this._gridInstance.option('columns', columns);
         // this._gridInstance.refresh();
       }

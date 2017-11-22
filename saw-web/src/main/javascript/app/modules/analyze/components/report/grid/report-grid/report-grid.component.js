@@ -1,14 +1,17 @@
 import * as assign from 'lodash/assign';
 import * as map from 'lodash/map';
+import * as isEmpty from 'lodash/isEmpty';
 import * as find from 'lodash/find';
 import * as forEach from 'lodash/forEach';
 import * as remove from 'lodash/remove';
 import * as isUndefined from 'lodash/isUndefined';
 import * as $ from 'jquery';
+import * as moment from 'moment';
+import 'moment-timezone';
 
 import * as template from './report-grid.component.html';
 import style from './report-grid.component.scss';
-import {NUMBER_TYPES} from '../../../../consts';
+import {NUMBER_TYPES, DATE_TYPES, BACKEND_TIMEZONE} from '../../../../consts';
 
 // const MIN_ROWS_TO_SHOW = 5;
 const COLUMN_WIDTH = 175;
@@ -36,7 +39,6 @@ export const ReportGridComponent = {
 
     $onInit() {
       this.reportGridNode.setGridComponent(this);
-
       this.settings = assign(this.settings, {
         gridConfig: this._dxDataGridService.mergeWithDefaultConfig({
           onInitialized: this.onGridInitialized.bind(this),
@@ -76,6 +78,7 @@ export const ReportGridComponent = {
     onContextMenuPreparing(e) {
       if (e.target === 'header') {
         e.items = [];
+
         e.items.push({
           text: 'Rename',
           icon: 'grid-menu-item icon-edit',
@@ -147,9 +150,14 @@ export const ReportGridComponent = {
 
     updateColumns(columns) {
       this.columns = columns;
-
       if (this._gridInstance) {
-        this._gridInstance.option('columns', this.prepareGridColumns(this.columns));
+        const columns = this.prepareGridColumns(this.columns);
+        forEach(columns, column => {
+          if (column.dataType === 'date') {
+            column.dataType = 'string';
+          }
+        });
+        this._gridInstance.option('columns', columns);
       }
     }
 
@@ -164,9 +172,14 @@ export const ReportGridComponent = {
           alignment: 'left',
           width: COLUMN_WIDTH
         };
+        if (DATE_TYPES.includes(column.type)) {
+          field.format = {
+            type: 'shortDate'
+          };
+        }
         if (NUMBER_TYPES.includes(column.type)) {
           field.format = {
-            type: 'decimal',
+            type: 'fixedPoint',
             precision: 2
           };
         }
@@ -197,8 +210,31 @@ export const ReportGridComponent = {
 
     onSourceUpdate() {
       if (this._gridInstance) {
-        this._gridInstance.option('dataSource', this.source);
+        const sourceData = this.source;
+        this._gridInstance.option('dataSource', this.formatDates(sourceData));
       }
+    }
+
+    formatDates(data) {
+      if (isEmpty(data)) {
+        return data;
+      }
+      const keys = Object.keys(data[0]);
+      const formats = [
+        moment.ISO_8601,
+        'YYYY-MM-DD hh:mm:ss',
+        'YYYY-MM-DD',
+        'MM/DD/YYYY  :)  HH*mm*ss'
+      ];
+      forEach(data, row => {
+        forEach(keys, key => {
+          const date = moment.tz(row[key], formats, true, BACKEND_TIMEZONE);
+          if (date.isValid()) {
+            row[key] = date.toDate();
+          }
+        });
+      });
+      return data;
     }
 
     refreshGrid() {

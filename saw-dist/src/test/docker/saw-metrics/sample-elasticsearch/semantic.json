@@ -1,0 +1,112 @@
+[
+  {
+    "node-category": "SemanticNode",
+    "id": "340df99d-16a6-45cb-af49-5699e3337e50",
+    "action": {
+      "verb": "create",
+      "content": {
+        "id": "sample_semantic_object",
+        "dataSecurityKey": "",
+        "type": "semantic",
+        "module": "ANALYZE",
+        "metric": "Sample",
+        "metricName": "Sample (pivot/chart)",
+        "customerCode": "SYNCHRONOSS",
+        "disabled": "false",
+        "checked": "false",
+        "supports": [
+          {
+            "label": "TABLES",
+            "category": "table",
+            "children": [
+              {
+                "label": "Pivot",
+                "icon": "icon-pivot",
+                "type": "table:pivot"
+              }
+            ]
+          },
+          {
+            "label": "CHARTS",
+            "category": "charts",
+            "children": [
+              {
+                "label": "Column Chart",
+                "icon": "icon-vert-bar-chart",
+                "type": "chart:column"
+              },
+              {
+                "label": "Stacked Chart",
+                "icon": "icon-vert-bar-chart",
+                "type": "chart:stack"
+              },
+              {
+                "label": "Line Chart",
+                "icon": "icon-vert-bar-chart",
+                "type": "chart:line"
+              },
+			  			  {
+                "label": "Bar Chart",
+                "icon": "icon-vert-bar-chart",
+                "type": "chart:bar"
+              },
+			  {
+                "label": "Scatter Plot",
+                "icon": "icon-vert-bar-chart",
+                "type": "chart:scatter"
+              },
+			  {
+                "label": "Bubble Chart",
+                "icon": "icon-vert-bar-chart",
+                "type": "chart:bubble"
+              }
+
+            ]
+          }
+        ],
+        "esRepository": {
+          "storageType":"ES",
+          "indexName":"sample",
+          "type":"type"
+        },
+        "artifacts": [
+          {
+            "artifactName": "SAMPLE",
+            "columns": [
+              {
+                "name": "Country",
+                "type": "string",
+                "columnName": "country.keyword",
+                "displayName": "Country",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "Product",
+                "type": "string",
+                "columnName": "product.keyword",
+                "displayName": "Product",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "Units",
+                "type": "long",
+                "columnName": "units",
+                "displayName": "Units",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "filterEligible": true
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+]

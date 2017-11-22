@@ -12,7 +12,7 @@ collapser {
     transition: height 1s, padding 1s;
   }
 
-  .collapser-title {
+  .collapser-heading {
     position: fixed;
     padding: 5px 10px;
     box-sizing: border-box;
@@ -43,7 +43,7 @@ collapser {
       padding-bottom: 0;
     }
 
-    .collapser-title {
+    .collapser-heading {
       margin: 0;
       border-bottom: none;
 

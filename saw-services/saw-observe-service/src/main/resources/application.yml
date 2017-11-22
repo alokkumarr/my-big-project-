@@ -1,0 +1,15 @@
+info:
+  component: Synchronoss Observe Service
+spring:
+  application:
+    name: saw-export-service
+server:
+  address: localhost
+  port: 9500
+  context-path: ''
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json
+
+
+       
