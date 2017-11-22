@@ -5,12 +5,12 @@
     "action": {
       "verb": "create",
       "content": {
-        "id": "test_semantic_object",
+        "id": "sample_semantic_object",
         "dataSecurityKey": "",
         "type": "semantic",
         "module": "ANALYZE",
-        "metric": "Test",
-        "metricName": "Test (pivot/chart)",
+        "metric": "Sample",
+        "metricName": "Sample (pivot/chart)",
         "customerCode": "SYNCHRONOSS",
         "disabled": "false",
         "checked": "false",
@@ -66,40 +66,40 @@
         ],
         "esRepository": {
           "storageType":"ES",
-          "indexName":"test",
+          "indexName":"sample",
           "type":"type"
         },
         "artifacts": [
           {
-            "artifactName": "TEST",
+            "artifactName": "SAMPLE",
             "columns": [
               {
-                "name": "country",
+                "name": "Country",
                 "type": "string",
                 "columnName": "country.keyword",
-                "displayName": "country",
+                "displayName": "Country",
                 "aliasName": "",
-                "table": "test",
+                "table": "sample",
                 "joinEligible": false,
                 "filterEligible": true
               },
               {
-                "name": "product",
+                "name": "Product",
                 "type": "string",
                 "columnName": "product.keyword",
-                "displayName": "product",
+                "displayName": "Product",
                 "aliasName": "",
-                "table": "test",
+                "table": "sample",
                 "joinEligible": false,
                 "filterEligible": true
               },
               {
-                "name": "units",
+                "name": "Units",
                 "type": "long",
                 "columnName": "units",
-                "displayName": "units",
+                "displayName": "Units",
                 "aliasName": "",
-                "table": "test",
+                "table": "sample",
                 "joinEligible": false,
                 "filterEligible": true
               }

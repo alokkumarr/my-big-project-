@@ -5,9 +5,9 @@
             "verb": "create",
             "content": {
                 "storageType": "DL",
-                "displayName": "Test Metric",
-                "description": "Test Metric",
-                "name": "TEST",
+                "displayName": "Sample Metric",
+                "description": "Sample Metric",
+                "name": "SAMPLE",
                 "product": "SYNCHRONOSS",
                 "type": "json",
                 "partitionType": "none"
@@ -16,7 +16,7 @@
                 "type": "struct",
                 "fields": [
                     {
-                        "name": "TEST",
+                        "name": "SAMPLE",
                         "type": "string",
                         "nullable": true,
                         "metadata": {}
@@ -24,7 +24,7 @@
                 ]
             },
             "dl-locations": [
-                "/test.json"
+                "/saw-metrics/sample-spark/data.ndjson"
             ]
         }
     }
