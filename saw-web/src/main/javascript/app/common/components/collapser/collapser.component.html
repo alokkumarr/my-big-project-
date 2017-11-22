@@ -1,7 +1,7 @@
 <div ng-class="{'collapser-collapsed': $ctrl.isCollapsed}">
-  <div class="collapser-title"
+  <div class="collapser-heading"
       layout="row">
-    <h3 ng-bind="::$ctrl.title" flex="grow"></h3>
+    <h3 ng-bind="::$ctrl.heading" flex="grow"></h3>
     <md-icon ng-if="$ctrl.action.isVisible()"
              md-font-icon="{{$ctrl.action.icon}}"
              ng-class="$ctrl.action.class"
