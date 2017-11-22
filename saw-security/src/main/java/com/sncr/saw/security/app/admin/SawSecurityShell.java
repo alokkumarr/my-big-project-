@@ -12,6 +12,8 @@ import com.sncr.saw.security.common.bean.User;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -23,6 +25,8 @@ import org.springframework.shell.standard.ShellMethod;
 
 @ShellComponent
 class SawSecurityShell {
+
+  private static final Logger logger = LoggerFactory.getLogger(SawSecurityShell.class);
 
   @Autowired
   public OnBoardService onboard;
@@ -40,6 +44,7 @@ class SawSecurityShell {
         // customer creation
         Long created_cust_id = customerCreation(custDao);
         System.out.println("Generated CUSTOMER_SYS_ID: " + created_cust_id);
+        logger.info("Created user with ID: "+created_cust_id);
 
         // customer product linkages
         onboard.getProductsDao().displayProducts();
@@ -50,6 +55,7 @@ class SawSecurityShell {
         String created_cust_prod_id = cust_prod_linkage_ids.get(1);
         System.out.println(created_cust_prod_id);
         System.out.println("Generated CUST_PROD_SYS_ID: " + created_cust_prod_id);
+        logger.info("Created CUST_PROD entry with ID: "+ created_cust_prod_id);
 
         // display product modules
         onboard.getProdModulesDao().displayProductModules();
@@ -65,17 +71,20 @@ class SawSecurityShell {
 
         //create admin role
         Long createdAdminRoleSysId = createAdminRole(created_cust_id);
+        logger.info("Created Admin Role for above customer with ID: "+ createdAdminRoleSysId);
 
         // create Admin user
         Long createdAdminUserSysId = createAdminUser(createdAdminRoleSysId, created_cust_id);
         System.out.println("Generated User ID for current user is: "+ createdAdminUserSysId);
+        logger.info("Created Admin user with ID: "+ createdAdminUserSysId);
 
       } else {
         // connection is not working fine
         System.out.println("Please check your connection");
+        logger.info("Can not connect to database");
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error(e.toString());
     }
   }
 
