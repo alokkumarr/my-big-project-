@@ -76,6 +76,16 @@ containers can be removed by executing the following command:
 
         $ docker rm -f saw saw-dist
 
+# Running SAW Web in development mode using local SAW deployment
+
+When doing front-end development developers typically run the SAW Web
+application using NPM commands out of the `saw-web` source code
+directory.  To configure SAW Web to connect to a local SAW deployment,
+edit the `saw-web/appConfig.js` file as follows to replace the second
+occurrence of `apiUrl`:
+
+        apiUrl = 'http://localhost';
+
 # Editing datasets in local SAW deployment
 
 When deploying SAW locally, it is possible to edit datasets and have
