@@ -182,18 +182,47 @@ export const ReportGridComponent = {
         };
         if (!isUndefined(NUMBER_TYPES.includes(column.type)) && isUndefined(column.format)) {
           field.format = {
-            type: 'number',
+            type: 'fixedPoint',
+            comma: false,
             precision: 2
           };
+          field.customizeText = (data => {
+            const stringList = data.valueText.split(',');
+            const finalString = '';
+            forEach(stringList, value => {
+              finalString = finalString + value;
+            });
+            return finalString;
+          });
         }
         if (!isUndefined(NUMBER_TYPES.includes(column.type)) && !isUndefined(column.format)) {
           if (!isUndefined(column.format.currency)) {
             field.customizeText = (data => {
+              if (!column.format.comma) {
+                const stringList = data.valueText.split(',');
+                const finalString = '';
+                forEach(stringList, value => {
+                  finalString = finalString + value;
+                });
+                data.valueText = finalString;
+              }
               if (!isUndefined(column.format.currencySymbol) && !isEmpty(data.valueText)) {
                 return column.format.currencySymbol + ' ' + data.valueText;
               } else {
                 return data.valueText;
               }
+            });
+          } else {
+            field.customizeText = (data => {
+              if (!column.format.comma) {
+                const stringList = data.valueText.split(',');
+                const finalString = '';
+                forEach(stringList, value => {
+                  finalString = finalString + value;
+                });
+                data.valueText = finalString;
+              }
+              return data.valueText;
             });
           }
         }
@@ -253,6 +282,7 @@ export const ReportGridComponent = {
           const columns = this._gridInstance.option('columns');
           const column = this.getColumnByName(newFormat.column);
           let typeValue = '';
+          let separator = false;
           if (column) {
             if (newFormat.type === 'date' || newFormat.type === 'timestamp') {
               column.dataType = 'date';
@@ -260,18 +290,28 @@ export const ReportGridComponent = {
             } else {
               if (newFormat.commaSeparator) {
                 typeValue = 'fixedpoint';
-              } else if (newFormat.numberDecimal > 0) {
-                typeValue = 'long';
+                separator = true;
+              } else {
+                typeValue = 'fixedpoint';
+                separator = false;
               }
-
               if (newFormat.currencyFlag) {
                 column.format = {
                   type: typeValue,
+                  comma: separator,
                   precision: newFormat.numberDecimal,
                   currency: newFormat.currencyCode,
                   currencySymbol: newFormat.currencySymbol
                 };
                 column.customizeText = (source => {
+                  if (!column.format.comma) {
+                    const stringList = source.valueText.split(',');
+                    const finalString = '';
+                    forEach(stringList, value => {
+                      finalString = finalString + value;
+                    });
+                    source.valueText = finalString;
+                  }
                   if (!isUndefined(column.format.currencySymbol) && !isEmpty(source.valueText)) {
                     return column.format.currencySymbol + ' ' + source.valueText;
                   } else {
@@ -281,9 +321,20 @@ export const ReportGridComponent = {
               } else {
                 column.format = {
                   type: typeValue,
+                  comma: separator,
                   precision: newFormat.numberDecimal
                 };
-                column.customizeText = undefined;
+                column.customizeText = (source => {
+                  if (!column.format.comma) {
+                    const stringList = source.valueText.split(',');
+                    const finalString = '';
+                    forEach(stringList, value => {
+                      finalString = finalString + value;
+                    });
+                    source.valueText = finalString;
+                  }
+                  return source.valueText;
+                });
               }
             }
           }

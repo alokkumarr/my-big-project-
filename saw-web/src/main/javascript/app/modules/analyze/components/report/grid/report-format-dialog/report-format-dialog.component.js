@@ -27,7 +27,7 @@ export const ReportFormatDialogComponent = {
       this.format.numberDecimal = 0;
       if (this.modelData.dataType === 'number') {
         this.format.currencySymbol = '';
-        if (this.modelData.dataType === 'number' && this.modelData.format.type === 'fixedpoint') {
+        if (this.modelData.format.comma) {
           this.format.commaSeparator = true;
         } else {
           this.format.commaSeparator = false;

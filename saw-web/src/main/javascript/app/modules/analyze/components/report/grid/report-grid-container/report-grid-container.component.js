@@ -251,7 +251,8 @@ export const ReportGridContainerComponent = {
           case 'number':
             value.format = {
               precision: 0,
-              type: 'long',
+              type: 'fixedPoint',
+              comma: undefined,
               currency: undefined,
               currencySymbol: undefined
             };
@@ -259,9 +260,9 @@ export const ReportGridContainerComponent = {
               value.format.precision = format.numberDecimal;
             }
             if (format.commaSeparator) {
-              value.format.type = 'fixedPoint';
+              value.format.comma = true;
             } else {
-              value.format.type = 'long';
+              value.format.comma = false;
             }
             if (format.currencyFlag) {
               value.format.currency = format.currencyCode;

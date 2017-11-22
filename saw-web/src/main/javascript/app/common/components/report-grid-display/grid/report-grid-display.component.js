@@ -6,6 +6,7 @@ import * as template from './report-grid-display.component.html';
 
 import {NUMBER_TYPES} from '../../../consts.js';
 import * as isEmpty from 'lodash/isEmpty';
+import * as forEach from 'lodash/forEach';
 
 const COLUMN_WIDTH = 175;
 const DEFAULT_PAGE_SIZE = 10;
@@ -96,18 +97,47 @@ export const ReportGridDisplayComponent = {
         };
         if (!isUndefined(NUMBER_TYPES.includes(column.type)) && isUndefined(column.format)) {
           field.format = {
-            type: 'decimal',
+            type: 'fixedPoint',
+            comma: false,
             precision: 2
           };
+          field.customizeText = (data => {
+            const stringList = data.valueText.split(',');
+            const finalString = '';
+            forEach(stringList, value => {
+              finalString = finalString + value;
+            });
+            return finalString;
+          });
         }
         if (!isUndefined(NUMBER_TYPES.includes(column.type)) && !isUndefined(column.format)) {
           if (!isUndefined(column.format.currency)) {
             field.customizeText = (data => {
+              if (!column.format.comma) {
+                const stringList = data.valueText.split(',');
+                const finalString = '';
+                forEach(stringList, value => {
+                  finalString = finalString + value;
+                });
+                data.valueText = finalString;
+              }
               if (!isUndefined(column.format.currencySymbol) &&  !isEmpty(data.valueText)) {
                 return column.format.currencySymbol + ' ' + data.valueText;
               } else {
                 return data.valueText;
               }
+            });
+          } else {
+            field.customizeText = (data => {
+              if (!column.format.comma) {
+                const stringList = data.valueText.split(',');
+                const finalString = '';
+                forEach(stringList, value => {
+                  finalString = finalString + value;
+                });
+                data.valueText = finalString;
+              }
+              return data.valueText;
             });
           }
         }
