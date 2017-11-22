@@ -26,6 +26,7 @@ import com.synchronoss.saw.export.model.DataResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.UUID;
 
 @Service
 public class ExportServiceImpl implements ExportService{
@@ -35,9 +36,6 @@ public class ExportServiceImpl implements ExportService{
   @Value("${analysis.service.host}")
   private String apiExportOtherProperties;
 
-  @Value("${analysis.service.transportHost}")
-  private String dispatchHostproperties;
- 
   @Value("${analysis.size}")
   private String apiExportSize;
 
@@ -99,14 +97,12 @@ public class ExportServiceImpl implements ExportService{
   @Override
   @Async
   public void dataToBeDispatchedAsync(String executionId, RequestEntity request, String analysisId) {
-    String url = dispatchHostproperties+"/" + analysisId +"/executions/"+executionId+"/data?page=1&pageSize="
+    String url = apiExportOtherProperties+"/" + analysisId +"/executions/"+executionId+"/data?page=1&pageSize="
             +apiExportSize+"&analysisType=report";
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
-   // headers.set("Authorization", "Bearer "+ServiceUtils.getDefaultJwtToken());
     headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
     HttpEntity<?> requestEntity = new HttpEntity<Object>(request.getHeaders());
-//    requestEntity.getHeaders().set("Authorization", ServiceUtils.getDefaultJwtToken());
     AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
     ListenableFuture<ResponseEntity<DataResponse>> responseStringFuture = asyncRestTemplate.exchange(url, HttpMethod.GET,
             requestEntity, DataResponse.class);
@@ -118,11 +114,12 @@ public class ExportServiceImpl implements ExportService{
         IFileExporter iFileExporter = new CSVReportDataExporter();
         ExportBean exportBean = new ExportBean();
         String recipients =null;
+        String dir = UUID.randomUUID().toString();
         appContext.getBean(JavaMailSender.class);
           MailSenderUtil MailSender = new MailSenderUtil(appContext.getBean(JavaMailSender.class));
-        if (dispatchBean instanceof LinkedHashMap)
+        if (dispatchBean !=null && dispatchBean instanceof LinkedHashMap)
         {
-            exportBean.setFileName(publishedPath+ File.separator+ String.valueOf(((LinkedHashMap)
+            exportBean.setFileName(publishedPath+ File.separator+dir+File.separator+String.valueOf(((LinkedHashMap)
                     dispatchBean).get("name"))+"."+((LinkedHashMap) dispatchBean).get("fileType"));
             exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
             exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
@@ -131,13 +128,18 @@ public class ExportServiceImpl implements ExportService{
             recipients= String.valueOf(((LinkedHashMap) dispatchBean).get("emailList"));
         }
         try {
+          // create a directory with unique name in published location to avoid file conflict for dispatch.
+          File file = new File(exportBean.getFileName());
+          file.getParentFile().mkdir();
           iFileExporter.generateFile(exportBean ,entity.getBody().getData());
           if (recipients!=null)
             MailSender.sendMail(recipients,exportBean.getReportName() + " | " + exportBean.getPublishDate(),
                     serviceUtils.prepareMailBody(exportBean,mailBody)
              ,exportBean.getFileName());
+          logger.debug("Email sent successfully : Removing the file from published location");
+          serviceUtils.deleteFile(exportBean.getFileName(),true);
         } catch (IOException e) {
-          e.printStackTrace();
+         logger.error("Exception occured while dispatching report :" + this.getClass().getName()+ "  method dataToBeDispatchedAsync()");
         }
       }
       @Override

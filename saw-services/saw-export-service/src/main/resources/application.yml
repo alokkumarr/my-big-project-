@@ -26,10 +26,7 @@ server:
 
 analysis:
     service:
-        host: https://saw.bda.poc.velocity-va.synchronoss.net/services/analysis
-        # To Do directly referring the saw-transport service url to fetch the data ,will be requested by saw-scheduler service.
-        # this is the backend process , So request will not be going through saw-gateway-service.
-        transportHost: http://10.48.22.231:9200/analysis
+        host: http://localhost:9200/analysis
     size: 10000
 
 published:

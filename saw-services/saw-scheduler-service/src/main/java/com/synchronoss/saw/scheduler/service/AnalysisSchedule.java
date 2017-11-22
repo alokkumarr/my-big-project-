@@ -29,7 +29,7 @@ interface AnalysisSchedule {
         abstract String repeatUnit();
         abstract Integer repeatInterval();
         abstract List<String> email();
-        
+
         @Value.Default
         DaysOfWeek repeatOnDaysOfWeek() {
             return ImmutableAnalysisSchedule.DaysOfWeek.builder()
@@ -42,7 +42,6 @@ interface AnalysisSchedule {
                 .saturday(false)
                 .build();
         }
-        abstract List<String> emails();
     }
 
     @Value.Immutable

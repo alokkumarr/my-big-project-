@@ -2,7 +2,6 @@ package com.synchronoss.saw.export.distribution;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import javax.activation.DataHandler;
@@ -54,13 +53,12 @@ public class MailSenderUtil {
 			if (null != attachFile && !attachFile.isEmpty()) {
 
 					mimebodypart = new MimeBodyPart();
-					try {
+
 						FileDataSource filedatasource = new FileDataSource(
 								attachFile);
 						mimebodypart.setDataHandler(new DataHandler(
 								filedatasource));
-					} catch (Exception exception3) {
-					}
+
 					mimebodypart.setFileName(new File(attachFile).getName());
 					mimemultipart.addBodyPart(mimebodypart);
 				}

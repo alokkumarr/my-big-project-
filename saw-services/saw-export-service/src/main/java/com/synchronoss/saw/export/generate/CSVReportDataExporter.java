@@ -3,17 +3,14 @@ package com.synchronoss.saw.export.generate;
 import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
+
 
 
 public class CSVReportDataExporter implements IFileExporter {
@@ -107,17 +104,6 @@ public class CSVReportDataExporter implements IFileExporter {
         logger.debug(" Activity Ends here:" + this.getClass().getName()+ " generateCSV method");
         return file;
     }
-	
-	public static boolean deleteCSVFile(File sourceFile,	boolean isDeleteSourceFile) throws IOException {
-		logger.debug(" Requested CSV file to deleted  :" + CSVReportDataExporter.class
-				+ sourceFile.getAbsolutePath());
-		if (!sourceFile.exists())
-			return false;
 
-		if (isDeleteSourceFile) {
-			sourceFile.delete();
-		}
-		return true;
-	}
 
 }
