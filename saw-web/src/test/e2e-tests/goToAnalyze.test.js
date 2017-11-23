@@ -1,6 +1,6 @@
 const protractor = require('protractor');
 const login = require('../javascript/pages/common/login.po.js');
-const analyze = require('../javascript/pages/common/analyze.po.js');
+const analyze = require('../javascript/pages/common/analyzePage.po.js');
 const ec = protractor.ExpectedConditions;
 
 describe('should go to Analyze page after landing on home page', () => {

@@ -86,15 +86,18 @@ data.
 
 ## Editing report datasets
 
-To edit the test report analysis data, execute the following commands:
+To edit the sample report metric and data in a running container,
+execute the following commands:
 
         $ docker exec -it saw bash
-        $ vi /root/saw-metrics/test.json
-        $ hadoop fs -put -f /root/saw-metrics/test.json /
+        $ cd /root/saw-metrics/sample-spark
+        $ vi data.ndjson
+        $ vi semantic.json
+        $ ./load-metric
 
-The first step opens a shell inside the SAW container, the second step
-edits the data JSON file and the third and last step copies the data
-file into the MapR-FS data lake.
+To edit the sample report metric and data permanently, edit the
+`data.ndjson` and `semantic.json` files in the source code tree and
+rebuild the container.
 
 The test data is read in using the [Spark JSON datasets] support.  The
 Spark documentation does not seem to specify the mapping from JSON
@@ -109,16 +112,18 @@ reader] source code it is possible to derive the mapping.
 
 ## Editing pivot and chart datasets
 
-To edit the test pivot/chart analysis data, execute the following
-commands:
+To edit the sample pivot/chart metric and data in a running container,
+execute the following commands:
 
         $ docker exec -it saw bash
-        $ vi /root/saw-metrics/test_es.json
-        $ /root/saw-metrics/saw-metrics-es-data
+        $ cd /root/saw-metrics/sample-elasticsearch
+        $ vi data-*.json
+        $ vi semantic.json
+        $ ./load-metric
 
-The first step opens a shell inside the SAW container, the second step
-edits the data JSON file and the third and last step updates the data
-in Elasticsearch.
+To edit the sample pivot/chart metric and data permanently, edit the
+`data-*.json` and `semantic.json` files in the source code tree and
+rebuild the container.
 
 The test data is loaded by sending it in JSON format to the
 Elasticsearch REST API.  The [JSON data types] are mapped to
