@@ -4,11 +4,19 @@ body {
 
 h1, p {
     font-family: sans-serif;
-    color: grey;
+    color: rgb(23, 146, 204);
 }
 
 p {
     font-size: large;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+tbody {
+    border-bottom: 1em solid transparent;
 }
 
 td {

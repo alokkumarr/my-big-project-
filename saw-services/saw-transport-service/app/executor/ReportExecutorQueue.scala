@@ -1,5 +1,6 @@
 package executor
 
+import java.io.IOException
 import java.util.Properties
 import scala.collection.JavaConverters._
 
@@ -23,6 +24,8 @@ import files.HFileOperations
 class ReportExecutorQueue(val executorType: String) {
   val ExecutorStream = "/main/saw-transport-executor-" + executorType + "-stream"
   val ExecutorTopic = ExecutorStream + ":executions"
+  val MainPath = "/main"
+  val RetrySeconds = 5
   val log: Logger = LoggerFactory.getLogger(classOf[ReportExecutorQueue].getName)
 
   /**
@@ -30,7 +33,16 @@ class ReportExecutorQueue(val executorType: String) {
    */
   def createIfNotExists(retries: Int = 12) {
     /* Create the parent directory of the stream if it does not exist */
-    HFileOperations.createDirectory("/main")
+    try {
+      HFileOperations.createDirectory(MainPath)
+    } catch {
+      case e: IOException => {
+        log.debug("Failed creating main directory: {}", MainPath)
+        /* Retry creating directory for some time, as the MapR-FS connection
+         * might be intermittently unavailable at system startup */
+        retryCreateIfNotExists(e, retries)
+      }
+    }
     /* Create the queue stream */
     log.debug("Creating stream for executor queue: {}", ExecutorStream)
     val conf = new Configuration()
@@ -43,21 +55,23 @@ class ReportExecutorQueue(val executorType: String) {
       case e: TableExistsException =>
         log.debug("Stream already exists, so not creating: {}", ExecutorStream)
       case e: Exception => {
+        log.debug("Failed creating stream: {}", ExecutorStream)
         /* Retry creating stream for some time, as the MapR-FS connection
          * might be intermittently unavailable at system startup */
-        if (retries == 0) {
-          log.debug("Failed creating stream: {}", ExecutorStream)
-          throw e
-        }
-        val seconds = 5
-        log.debug("Creating stream failed, waiting for {} seconds "
-          + "and retrying", seconds)
-        Thread.sleep(seconds * 1000)
-        createIfNotExists(retries - 1)
+        retryCreateIfNotExists(e, retries)
       }
     } finally {
       streamAdmin.close()
     }
+  }
+
+  private def retryCreateIfNotExists(exception: Exception, retries: Int) {
+    if (retries == 0) {
+      throw exception
+    }
+    log.debug("Waiting for {} seconds and retrying", RetrySeconds)
+    Thread.sleep(RetrySeconds * 1000)
+    createIfNotExists(retries - 1)
   }
 
   /**
