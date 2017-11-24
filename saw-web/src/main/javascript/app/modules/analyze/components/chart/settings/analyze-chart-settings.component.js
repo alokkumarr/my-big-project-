@@ -57,7 +57,7 @@ export const AnalyzeChartSettingsComponent = {
     }
 
     $onInit() {
-      this.multipleYAxes.enabled = this.chartType !== 'bubble' && this.chartType !== 'pie' && this.chartType !== 'stack';
+      this.multipleYAxes.enabled = !['bubble', 'pie', 'stack'].includes(this.chartType);
       this._clearWatcher = this._$scope.$watch(() => this.settings, newVal => {
         if (newVal) {
           this.markSelected();
