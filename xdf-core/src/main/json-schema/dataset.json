@@ -35,14 +35,15 @@
       "additionalProperties": false,
       "default": "parquet"
     },
-    "tags": {
-      "description": "Tag to label data objects",
-      "type": "array",
-      "additionalProperties": false,
-      "minItems": 0,
-      "items": {
-        "type": "string"
-      }
+    "category": {
+      "description": "Category of a dataset",
+      "type": "string",
+      "additionalProperties": false
+    },
+    "subCategory": {
+      "description": "Sub category of a dataset",
+      "type": "string",
+      "additionalProperties": false
     },
     "description": {
       "description": "Description of the data object",

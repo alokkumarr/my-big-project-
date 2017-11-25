@@ -1,14 +1,14 @@
 
 package sncr.xdf.conf;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@Generated("org.jsonschema2pojo")
 public class Metadata {
 
     /**
@@ -19,19 +19,26 @@ public class Metadata {
     @Expose
     private String createdBy = "nobody";
     /**
-     * Tag to label data objects
-     * 
-     */
-    @SerializedName("tags")
-    @Expose
-    private List<String> tags = new ArrayList<String>();
-    /**
-     * Description of the data object
+     * Description of the data set
      * 
      */
     @SerializedName("description")
     @Expose
     private String description = "__none__";
+    /**
+     * Category of a dataset
+     * 
+     */
+    @SerializedName("category")
+    @Expose
+    private String category;
+    /**
+     * Sub category of a dataset
+     * 
+     */
+    @SerializedName("subCategory")
+    @Expose
+    private String subCategory;
 
     /**
      * No args constructor for use in serialization
@@ -42,20 +49,23 @@ public class Metadata {
 
     /**
      * 
+     * @param subCategory
      * @param createdBy
      * @param description
-     * @param tags
+     * @param category
      */
-    public Metadata(String createdBy, List<String> tags, String description) {
-        super();
+    public Metadata(String createdBy, String description, String category, String subCategory) {
         this.createdBy = createdBy;
-        this.tags = tags;
         this.description = description;
+        this.category = category;
+        this.subCategory = subCategory;
     }
 
     /**
      * Parameter name
      * 
+     * @return
+     *     The createdBy
      */
     public String getCreatedBy() {
         return createdBy;
@@ -64,6 +74,8 @@ public class Metadata {
     /**
      * Parameter name
      * 
+     * @param createdBy
+     *     The createdBy
      */
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
@@ -75,37 +87,20 @@ public class Metadata {
     }
 
     /**
-     * Tag to label data objects
+     * Description of the data set
      * 
-     */
-    public List<String> getTags() {
-        return tags;
-    }
-
-    /**
-     * Tag to label data objects
-     * 
-     */
-    public void setTags(List<String> tags) {
-        this.tags = tags;
-    }
-
-    public Metadata withTags(List<String> tags) {
-        this.tags = tags;
-        return this;
-    }
-
-    /**
-     * Description of the data object
-     * 
+     * @return
+     *     The description
      */
     public String getDescription() {
         return description;
     }
 
     /**
-     * Description of the data object
+     * Description of the data set
      * 
+     * @param description
+     *     The description
      */
     public void setDescription(String description) {
         this.description = description;
@@ -116,14 +111,64 @@ public class Metadata {
         return this;
     }
 
+    /**
+     * Category of a dataset
+     * 
+     * @return
+     *     The category
+     */
+    public String getCategory() {
+        return category;
+    }
+
+    /**
+     * Category of a dataset
+     * 
+     * @param category
+     *     The category
+     */
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public Metadata withCategory(String category) {
+        this.category = category;
+        return this;
+    }
+
+    /**
+     * Sub category of a dataset
+     * 
+     * @return
+     *     The subCategory
+     */
+    public String getSubCategory() {
+        return subCategory;
+    }
+
+    /**
+     * Sub category of a dataset
+     * 
+     * @param subCategory
+     *     The subCategory
+     */
+    public void setSubCategory(String subCategory) {
+        this.subCategory = subCategory;
+    }
+
+    public Metadata withSubCategory(String subCategory) {
+        this.subCategory = subCategory;
+        return this;
+    }
+
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("createdBy", createdBy).append("tags", tags).append("description", description).toString();
+        return ToStringBuilder.reflectionToString(this);
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(description).append(createdBy).append(tags).toHashCode();
+        return new HashCodeBuilder().append(createdBy).append(description).append(category).append(subCategory).toHashCode();
     }
 
     @Override
@@ -135,7 +180,7 @@ public class Metadata {
             return false;
         }
         Metadata rhs = ((Metadata) other);
-        return new EqualsBuilder().append(description, rhs.description).append(createdBy, rhs.createdBy).append(tags, rhs.tags).isEquals();
+        return new EqualsBuilder().append(createdBy, rhs.createdBy).append(description, rhs.description).append(category, rhs.category).append(subCategory, rhs.subCategory).isEquals();
     }
 
 }

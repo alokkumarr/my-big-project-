@@ -20,7 +20,6 @@ import sncr.xdf.services.TransformationMeta;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 
 /**
@@ -104,15 +103,26 @@ public abstract class Component {
                         return;
                     }
                     logger.debug("Create/read DS and add it to Output object DS list" );
-                    //TODO:: Now we have both: MapRDb metadata and DL based metadata
                     JsonObject dsObj = ds.getAsJsonObject();
-                    logger.debug(String.format("Add to output DataSet map document with ID: %s\n %s",
-                            dsObj.getAsJsonPrimitive(DataSetProperties.Id.toString()).getAsString(),
-                            ds.toString())
-                    );
+                    String id = dsObj.getAsJsonPrimitive(DataSetProperties.Id.toString()).getAsString();
+                    logger.debug(String.format("Add to output DataSet map document with ID: %s\n %s",id,ds.toString()));
+
                     mdOutputDSMap.put(dsObj.getAsJsonPrimitive(DataSetProperties.Id.toString()).getAsString(),ds);
 
-                    md.addDataSetToDLMeta(outputDataSets.get(o.getDataSet()), o);
+                    String step = "Could not create activity log entry for DataSet: " + o.getDataSet();
+                    try {
+                        JsonObject ale = als.generateDSAuditLogEntry(ctx, "INIT", inputDataSets, outputDataSets);
+                        String aleId = als.createAuditLog(ctx, ale);
+                        step = "Could not update metadata of DataSet: " + o.getDataSet();
+                        md.getDSStore().updateStatus(id, "INIT", ctx.startTs, null, aleId, ctx.batchID);
+                    } catch (Exception e) {
+                        error = step;
+                        logger.error(error, e);
+                        rc[0] = -1;
+                        return;
+                    }
+
+                    md.addDataSetToDLFSMeta(outputDataSets.get(o.getDataSet()), o);
                 });
                 if (rc[0] != 0)return rc[0];
             }
@@ -257,14 +267,14 @@ public abstract class Component {
                              "FAILED");
         int rc[] = {0};
         try {
-            md.writeDLMetadata(ctx);
+            md.writeDLFSMeta(ctx);
             ctx.setFinishTS();
 
             JsonObject ale = als.generateDSAuditLogEntry(ctx, status, inputDataSets, outputDataSets);
-            String ale_id = als.createAuditLog(ctx, mdOutputDSMap, ale);
+            String ale_id = als.createAuditLog(ctx, ale);
             mdOutputDSMap.forEach((id, ds) -> {
                 try {
-                    als.updateDSWithAuditLog(id, ds, ale_id, ale);
+                    md.getDSStore().updateStatus(id, status, ctx.startTs, ctx.finishedTs, ale_id, ctx.batchID);
                 } catch (Exception e) {
                     error = "Could not write AuditLog entry to document, id = " + id;
                     logger.error(error);
@@ -290,14 +300,9 @@ public abstract class Component {
         return strCtx + "\n" + specificConfParams;
     }
 
-    public static int startComponent(Component self, String config, String app, String batch)
+    public static int startComponent(Component self, String xdfDataRootSys, String config, String app, String batch)
     {
         logger.debug(String.format("Component [%s] has been started...", self.componentName));
-
-        String xdfDataRootSys = System.getProperty(MetadataBase.XDF_DATA_ROOT);
-        if(xdfDataRootSys == null || xdfDataRootSys.isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.IncorrectOrAbsentParameter, "XDF Data root");
-        }
 
         try {
             if (self.Init(config, app, batch, xdfDataRootSys) == 0) {

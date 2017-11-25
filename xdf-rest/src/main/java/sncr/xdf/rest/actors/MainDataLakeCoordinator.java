@@ -44,6 +44,7 @@ public class MainDataLakeCoordinator extends MainJVMCoordinator {
                 //TODO: make more generic
                 ListOf s;
                 ActorRef a = getExecutor();
+                log.debug("Get message to process: {}", r.toString() );
                 if(a != null) {
                     try {
                         s = AskHelper.ask(r, getExecutor(), 3000L);
@@ -52,14 +53,14 @@ public class MainDataLakeCoordinator extends MainJVMCoordinator {
                         log.error(e.getMessage());
                         List<String> lst = new ArrayList<>();
                         lst.add("{\"error\":\"Data Lake Service is not ready\"}");
-                        s = new ListOf(r.listOf, r.project, r.dataSource, r.catalog, lst);
+                        s = new ListOf(r.listOf, r.project, r.dataSource, r.catalog, null, null, lst);
                     }
                 } else {
                     // Do nothing
                     log.info("Not ready for request processing");
                     List<String> lst = new ArrayList<>();
                     lst.add("{\"error\":\"Data Lake Service is not ready\"}");
-                    s = new ListOf(r.listOf, r.project, r.dataSource, r.catalog, lst);
+                    s = new ListOf(r.listOf, r.project, r.dataSource, r.catalog, null, null, lst);
                 }
 
                 getSender().tell(s, getSelf());

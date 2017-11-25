@@ -3,12 +3,14 @@ package sncr.xdf.conf;
 
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@Generated("org.jsonschema2pojo")
 public class Input {
 
     /**
@@ -35,7 +37,7 @@ public class Input {
      */
     @SerializedName("format")
     @Expose
-    private Input.Format format = Input.Format.fromValue(null);
+    private Input.Format format = Input.Format.fromValue("parquet");
     /**
      * Type of data source
      * 
@@ -76,7 +78,6 @@ public class Input {
      * @param fileMask
      */
     public Input(String name, String dataSet, String fileMask, Input.Format format, String datasource, String catalog, String project) {
-        super();
         this.name = name;
         this.dataSet = dataSet;
         this.fileMask = fileMask;
@@ -90,6 +91,8 @@ public class Input {
      * Parameter name
      * (Required)
      * 
+     * @return
+     *     The name
      */
     public String getName() {
         return name;
@@ -99,6 +102,8 @@ public class Input {
      * Parameter name
      * (Required)
      * 
+     * @param name
+     *     The name
      */
     public void setName(String name) {
         this.name = name;
@@ -112,6 +117,8 @@ public class Input {
     /**
      * Data object name
      * 
+     * @return
+     *     The dataSet
      */
     public String getDataSet() {
         return dataSet;
@@ -120,6 +127,8 @@ public class Input {
     /**
      * Data object name
      * 
+     * @param dataSet
+     *     The dataSet
      */
     public void setDataSet(String dataSet) {
         this.dataSet = dataSet;
@@ -130,10 +139,20 @@ public class Input {
         return this;
     }
 
+    /**
+     * 
+     * @return
+     *     The fileMask
+     */
     public String getFileMask() {
         return fileMask;
     }
 
+    /**
+     * 
+     * @param fileMask
+     *     The fileMask
+     */
     public void setFileMask(String fileMask) {
         this.fileMask = fileMask;
     }
@@ -146,6 +165,8 @@ public class Input {
     /**
      * Data format
      * 
+     * @return
+     *     The format
      */
     public Input.Format getFormat() {
         return format;
@@ -154,6 +175,8 @@ public class Input {
     /**
      * Data format
      * 
+     * @param format
+     *     The format
      */
     public void setFormat(Input.Format format) {
         this.format = format;
@@ -167,6 +190,8 @@ public class Input {
     /**
      * Type of data source
      * 
+     * @return
+     *     The datasource
      */
     public String getDatasource() {
         return datasource;
@@ -175,6 +200,8 @@ public class Input {
     /**
      * Type of data source
      * 
+     * @param datasource
+     *     The datasource
      */
     public void setDatasource(String datasource) {
         this.datasource = datasource;
@@ -188,6 +215,8 @@ public class Input {
     /**
      * Catalog in data source
      * 
+     * @return
+     *     The catalog
      */
     public String getCatalog() {
         return catalog;
@@ -196,6 +225,8 @@ public class Input {
     /**
      * Catalog in data source
      * 
+     * @param catalog
+     *     The catalog
      */
     public void setCatalog(String catalog) {
         this.catalog = catalog;
@@ -209,6 +240,8 @@ public class Input {
     /**
      * Project of input object
      * 
+     * @return
+     *     The project
      */
     public String getProject() {
         return project;
@@ -217,6 +250,8 @@ public class Input {
     /**
      * Project of input object
      * 
+     * @param project
+     *     The project
      */
     public void setProject(String project) {
         this.project = project;
@@ -229,12 +264,12 @@ public class Input {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("name", name).append("dataSet", dataSet).append("fileMask", fileMask).append("format", format).append("datasource", datasource).append("catalog", catalog).append("project", project).toString();
+        return ToStringBuilder.reflectionToString(this);
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(datasource).append(catalog).append(name).append(format).append(project).append(dataSet).append(fileMask).toHashCode();
+        return new HashCodeBuilder().append(name).append(dataSet).append(fileMask).append(format).append(datasource).append(catalog).append(project).toHashCode();
     }
 
     @Override
@@ -246,42 +281,44 @@ public class Input {
             return false;
         }
         Input rhs = ((Input) other);
-        return new EqualsBuilder().append(datasource, rhs.datasource).append(catalog, rhs.catalog).append(name, rhs.name).append(format, rhs.format).append(project, rhs.project).append(dataSet, rhs.dataSet).append(fileMask, rhs.fileMask).isEquals();
+        return new EqualsBuilder().append(name, rhs.name).append(dataSet, rhs.dataSet).append(fileMask, rhs.fileMask).append(format, rhs.format).append(datasource, rhs.datasource).append(catalog, rhs.catalog).append(project, rhs.project).isEquals();
     }
 
-    public enum Format {
+    @Generated("org.jsonschema2pojo")
+    public static enum Format {
 
         @SerializedName("parquet")
-        PARQUET(null),
+        PARQUET("parquet"),
         @SerializedName("json")
-        JSON(null),
+        JSON("json"),
         @SerializedName("csv")
-        CSV(null),
+        CSV("csv"),
         @SerializedName("maprdb")
-        MAPRDB(null),
+        MAPRDB("maprdb"),
         @SerializedName("es")
-        ES(null);
-        private final sncr.xdf.conf.Format value;
-        private final static Map<sncr.xdf.conf.Format, Input.Format> CONSTANTS = new HashMap<sncr.xdf.conf.Format, Input.Format>();
+        ES("es");
+        private final String value;
+        private static Map<String, Input.Format> constants = new HashMap<String, Input.Format>();
 
         static {
             for (Input.Format c: values()) {
-                CONSTANTS.put(c.value, c);
+                constants.put(c.value, c);
             }
         }
 
-        private Format(sncr.xdf.conf.Format value) {
+        private Format(String value) {
             this.value = value;
         }
 
-        public sncr.xdf.conf.Format value() {
+        @Override
+        public String toString() {
             return this.value;
         }
 
-        public static Input.Format fromValue(sncr.xdf.conf.Format value) {
-            Input.Format constant = CONSTANTS.get(value);
+        public static Input.Format fromValue(String value) {
+            Input.Format constant = constants.get(value);
             if (constant == null) {
-                throw new IllegalArgumentException((value +""));
+                throw new IllegalArgumentException(value);
             } else {
                 return constant;
             }

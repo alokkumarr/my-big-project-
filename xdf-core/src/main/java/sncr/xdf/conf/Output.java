@@ -3,12 +3,14 @@ package sncr.xdf.conf;
 
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@Generated("org.jsonschema2pojo")
 public class Output {
 
     /**
@@ -35,14 +37,14 @@ public class Output {
      */
     @SerializedName("format")
     @Expose
-    private sncr.xdf.conf.Input.Format format = sncr.xdf.conf.Input.Format.fromValue(null);
+    private sncr.xdf.conf.Input.Format format = sncr.xdf.conf.Input.Format.fromValue("parquet");
     /**
      * mode of the partition
      * 
      */
     @SerializedName("mode")
     @Expose
-    private Output.Mode mode = Output.Mode.fromValue(null);
+    private Output.Mode mode = Output.Mode.fromValue("replace");
     /**
      * Number of files for all output objects
      * 
@@ -88,7 +90,6 @@ public class Output {
      * @param dataSource
      */
     public Output(String name, String dataSet, String fileMask, sncr.xdf.conf.Input.Format format, Output.Mode mode, Integer numberOfFiles, DataSource dataSource, String catalog, Metadata metadata) {
-        super();
         this.name = name;
         this.dataSet = dataSet;
         this.fileMask = fileMask;
@@ -104,6 +105,8 @@ public class Output {
      * Parameter name
      * (Required)
      * 
+     * @return
+     *     The name
      */
     public String getName() {
         return name;
@@ -113,6 +116,8 @@ public class Output {
      * Parameter name
      * (Required)
      * 
+     * @param name
+     *     The name
      */
     public void setName(String name) {
         this.name = name;
@@ -126,6 +131,8 @@ public class Output {
     /**
      * Data object name
      * 
+     * @return
+     *     The dataSet
      */
     public String getDataSet() {
         return dataSet;
@@ -134,6 +141,8 @@ public class Output {
     /**
      * Data object name
      * 
+     * @param dataSet
+     *     The dataSet
      */
     public void setDataSet(String dataSet) {
         this.dataSet = dataSet;
@@ -144,10 +153,20 @@ public class Output {
         return this;
     }
 
+    /**
+     * 
+     * @return
+     *     The fileMask
+     */
     public String getFileMask() {
         return fileMask;
     }
 
+    /**
+     * 
+     * @param fileMask
+     *     The fileMask
+     */
     public void setFileMask(String fileMask) {
         this.fileMask = fileMask;
     }
@@ -160,6 +179,8 @@ public class Output {
     /**
      * Data format
      * 
+     * @return
+     *     The format
      */
     public sncr.xdf.conf.Input.Format getFormat() {
         return format;
@@ -168,6 +189,8 @@ public class Output {
     /**
      * Data format
      * 
+     * @param format
+     *     The format
      */
     public void setFormat(sncr.xdf.conf.Input.Format format) {
         this.format = format;
@@ -181,6 +204,8 @@ public class Output {
     /**
      * mode of the partition
      * 
+     * @return
+     *     The mode
      */
     public Output.Mode getMode() {
         return mode;
@@ -189,6 +214,8 @@ public class Output {
     /**
      * mode of the partition
      * 
+     * @param mode
+     *     The mode
      */
     public void setMode(Output.Mode mode) {
         this.mode = mode;
@@ -202,6 +229,8 @@ public class Output {
     /**
      * Number of files for all output objects
      * 
+     * @return
+     *     The numberOfFiles
      */
     public Integer getNumberOfFiles() {
         return numberOfFiles;
@@ -210,6 +239,8 @@ public class Output {
     /**
      * Number of files for all output objects
      * 
+     * @param numberOfFiles
+     *     The numberOfFiles
      */
     public void setNumberOfFiles(Integer numberOfFiles) {
         this.numberOfFiles = numberOfFiles;
@@ -223,6 +254,8 @@ public class Output {
     /**
      * mode of the partition
      * 
+     * @return
+     *     The dataSource
      */
     public DataSource getDataSource() {
         return dataSource;
@@ -231,6 +264,8 @@ public class Output {
     /**
      * mode of the partition
      * 
+     * @param dataSource
+     *     The dataSource
      */
     public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -244,6 +279,8 @@ public class Output {
     /**
      * Location in selected container
      * 
+     * @return
+     *     The catalog
      */
     public String getCatalog() {
         return catalog;
@@ -252,6 +289,8 @@ public class Output {
     /**
      * Location in selected container
      * 
+     * @param catalog
+     *     The catalog
      */
     public void setCatalog(String catalog) {
         this.catalog = catalog;
@@ -262,10 +301,20 @@ public class Output {
         return this;
     }
 
+    /**
+     * 
+     * @return
+     *     The metadata
+     */
     public Metadata getMetadata() {
         return metadata;
     }
 
+    /**
+     * 
+     * @param metadata
+     *     The metadata
+     */
     public void setMetadata(Metadata metadata) {
         this.metadata = metadata;
     }
@@ -277,12 +326,12 @@ public class Output {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("name", name).append("dataSet", dataSet).append("fileMask", fileMask).append("format", format).append("mode", mode).append("numberOfFiles", numberOfFiles).append("dataSource", dataSource).append("catalog", catalog).append("metadata", metadata).toString();
+        return ToStringBuilder.reflectionToString(this);
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(mode).append(numberOfFiles).append(metadata).append(catalog).append(name).append(format).append(dataSet).append(fileMask).append(dataSource).toHashCode();
+        return new HashCodeBuilder().append(name).append(dataSet).append(fileMask).append(format).append(mode).append(numberOfFiles).append(dataSource).append(catalog).append(metadata).toHashCode();
     }
 
     @Override
@@ -294,36 +343,38 @@ public class Output {
             return false;
         }
         Output rhs = ((Output) other);
-        return new EqualsBuilder().append(mode, rhs.mode).append(numberOfFiles, rhs.numberOfFiles).append(metadata, rhs.metadata).append(catalog, rhs.catalog).append(name, rhs.name).append(format, rhs.format).append(dataSet, rhs.dataSet).append(fileMask, rhs.fileMask).append(dataSource, rhs.dataSource).isEquals();
+        return new EqualsBuilder().append(name, rhs.name).append(dataSet, rhs.dataSet).append(fileMask, rhs.fileMask).append(format, rhs.format).append(mode, rhs.mode).append(numberOfFiles, rhs.numberOfFiles).append(dataSource, rhs.dataSource).append(catalog, rhs.catalog).append(metadata, rhs.metadata).isEquals();
     }
 
-    public enum Mode {
+    @Generated("org.jsonschema2pojo")
+    public static enum Mode {
 
         @SerializedName("replace")
-        REPLACE(null),
+        REPLACE("replace"),
         @SerializedName("append")
-        APPEND(null);
-        private final sncr.xdf.conf.Mode value;
-        private final static Map<sncr.xdf.conf.Mode, Output.Mode> CONSTANTS = new HashMap<sncr.xdf.conf.Mode, Output.Mode>();
+        APPEND("append");
+        private final String value;
+        private static Map<String, Output.Mode> constants = new HashMap<String, Output.Mode>();
 
         static {
             for (Output.Mode c: values()) {
-                CONSTANTS.put(c.value, c);
+                constants.put(c.value, c);
             }
         }
 
-        private Mode(sncr.xdf.conf.Mode value) {
+        private Mode(String value) {
             this.value = value;
         }
 
-        public sncr.xdf.conf.Mode value() {
+        @Override
+        public String toString() {
             return this.value;
         }
 
-        public static Output.Mode fromValue(sncr.xdf.conf.Mode value) {
-            Output.Mode constant = CONSTANTS.get(value);
+        public static Output.Mode fromValue(String value) {
+            Output.Mode constant = constants.get(value);
             if (constant == null) {
-                throw new IllegalArgumentException((value +""));
+                throw new IllegalArgumentException(value);
             } else {
                 return constant;
             }

@@ -3,6 +3,7 @@ package sncr.xdf.conf;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -14,6 +15,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * SCD2 specific properties
  * 
  */
+@Generated("org.jsonschema2pojo")
 public class Scd2 {
 
     /**
@@ -68,7 +70,6 @@ public class Scd2 {
      * @param versionField
      */
     public Scd2(Set<String> keys, Set<String> trackableFields, String versionField, String versionFieldFormat, Integer numberOfFiles) {
-        super();
         this.keys = keys;
         this.trackableFields = trackableFields;
         this.versionField = versionField;
@@ -79,6 +80,8 @@ public class Scd2 {
     /**
      * List of key fields in data source to identify processed record(s)
      * 
+     * @return
+     *     The keys
      */
     public Set<String> getKeys() {
         return keys;
@@ -87,6 +90,8 @@ public class Scd2 {
     /**
      * List of key fields in data source to identify processed record(s)
      * 
+     * @param keys
+     *     The keys
      */
     public void setKeys(Set<String> keys) {
         this.keys = keys;
@@ -100,6 +105,8 @@ public class Scd2 {
     /**
      * List of trackable fields
      * 
+     * @return
+     *     The trackableFields
      */
     public Set<String> getTrackableFields() {
         return trackableFields;
@@ -108,6 +115,8 @@ public class Scd2 {
     /**
      * List of trackable fields
      * 
+     * @param trackableFields
+     *     The trackableFields
      */
     public void setTrackableFields(Set<String> trackableFields) {
         this.trackableFields = trackableFields;
@@ -121,6 +130,8 @@ public class Scd2 {
     /**
      * Name of the field containing record version (must be comparable)
      * 
+     * @return
+     *     The versionField
      */
     public String getVersionField() {
         return versionField;
@@ -129,6 +140,8 @@ public class Scd2 {
     /**
      * Name of the field containing record version (must be comparable)
      * 
+     * @param versionField
+     *     The versionField
      */
     public void setVersionField(String versionField) {
         this.versionField = versionField;
@@ -142,6 +155,8 @@ public class Scd2 {
     /**
      * If version field is date/time the field must contain Java date/time format
      * 
+     * @return
+     *     The versionFieldFormat
      */
     public String getVersionFieldFormat() {
         return versionFieldFormat;
@@ -150,6 +165,8 @@ public class Scd2 {
     /**
      * If version field is date/time the field must contain Java date/time format
      * 
+     * @param versionFieldFormat
+     *     The versionFieldFormat
      */
     public void setVersionFieldFormat(String versionFieldFormat) {
         this.versionFieldFormat = versionFieldFormat;
@@ -163,6 +180,8 @@ public class Scd2 {
     /**
      * Number of files for all output objects
      * 
+     * @return
+     *     The numberOfFiles
      */
     public Integer getNumberOfFiles() {
         return numberOfFiles;
@@ -171,6 +190,8 @@ public class Scd2 {
     /**
      * Number of files for all output objects
      * 
+     * @param numberOfFiles
+     *     The numberOfFiles
      */
     public void setNumberOfFiles(Integer numberOfFiles) {
         this.numberOfFiles = numberOfFiles;
@@ -183,12 +204,12 @@ public class Scd2 {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("keys", keys).append("trackableFields", trackableFields).append("versionField", versionField).append("versionFieldFormat", versionFieldFormat).append("numberOfFiles", numberOfFiles).toString();
+        return ToStringBuilder.reflectionToString(this);
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(numberOfFiles).append(trackableFields).append(versionField).append(keys).append(versionFieldFormat).toHashCode();
+        return new HashCodeBuilder().append(keys).append(trackableFields).append(versionField).append(versionFieldFormat).append(numberOfFiles).toHashCode();
     }
 
     @Override
@@ -200,7 +221,7 @@ public class Scd2 {
             return false;
         }
         Scd2 rhs = ((Scd2) other);
-        return new EqualsBuilder().append(numberOfFiles, rhs.numberOfFiles).append(trackableFields, rhs.trackableFields).append(versionField, rhs.versionField).append(keys, rhs.keys).append(versionFieldFormat, rhs.versionFieldFormat).isEquals();
+        return new EqualsBuilder().append(keys, rhs.keys).append(trackableFields, rhs.trackableFields).append(versionField, rhs.versionField).append(versionFieldFormat, rhs.versionFieldFormat).append(numberOfFiles, rhs.numberOfFiles).isEquals();
     }
 
 }

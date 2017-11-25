@@ -57,14 +57,14 @@ public class ZeroComponent extends Component implements WithMovableResult , With
             inDesc.get(DataSetProperties.PhysicalLocation.name()),
             outDesc.get(DataSetProperties.PhysicalLocation.name()),
             outDesc.get(DataSetProperties.Name.name()),
-            inDesc.get(DataSetProperties.Mode.name()),
+            outDesc.get(DataSetProperties.Mode.name()),
             outDesc.get(DataSetProperties.Format.name()));
         resultDataDesc.add(desc);
         logger.debug(String.format("DataSet %s will be moved from %s to %s, format: %s, mode: %s",
             inDesc.get(DataSetProperties.Name.name()),
             inDesc.get(DataSetProperties.PhysicalLocation.name()),
             outDesc.get(DataSetProperties.PhysicalLocation.name()),
-            inDesc.get(DataSetProperties.Format.name()),
+            outDesc.get(DataSetProperties.Format.name()),
             outDesc.get(DataSetProperties.Mode.name())));
 
         return super.Move();

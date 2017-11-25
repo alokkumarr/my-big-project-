@@ -9,13 +9,14 @@ import java.util.UUID;
 
 public class ListOf extends ActorMessage {
 
-
-
     // All members must be immutable
     public final List<String> list;
     public final String listOf;
     public final String dataSource;
     public final String catalog;
+    public final String category;
+    public final String subCategory;
+
 
     public ListOf (String listOf){
         super(UUID.randomUUID().toString());
@@ -24,9 +25,11 @@ public class ListOf extends ActorMessage {
         this.project = null;
         this.dataSource = null;
         this.catalog = null;
+        this.subCategory = null;
+        this.category = null;
     }
 
-    public ListOf (String listOf, String project, String datasource, String catalog, List<String> list) {
+    public ListOf (String listOf, String project, String datasource, String catalog, String category, String subCategory, List<String> list) {
         super(UUID.randomUUID().toString());
         this.listOf = listOf;
         if(list != null)
@@ -36,7 +39,8 @@ public class ListOf extends ActorMessage {
         this.project = project;
         this.dataSource = datasource;
         this.catalog = catalog;
-
+        this.subCategory = subCategory;
+        this.category = category;
     }
 
     public ListOf (ListOf o) {
@@ -49,6 +53,8 @@ public class ListOf extends ActorMessage {
         this.project = o.project;
         this.dataSource = o.dataSource;
         this.catalog = o.catalog;
+        this.category = o.category;
+        this.subCategory = o.subCategory;
     }
 
     public String toJson(){
@@ -57,4 +63,19 @@ public class ListOf extends ActorMessage {
         sb.append("[").append(lst).append("]");
         return sb.toString();
     }
+
+    public String toString(){
+        String lst = " List: \n";
+        if (list != null && !list.isEmpty() )
+            lst += String.join(",", list);
+        else
+            lst += " empty ";
+        return
+        "List type: " + listOf + ", Project: " + project +
+        ", DataSource: " + ((dataSource != null)? dataSource: "n/a") +
+        ", Catalog: " + ((catalog != null)? catalog: "n/a") +
+        ", Category: " + ((category != null)? category: "n/a") +
+        ", Sub Category: " + ((subCategory != null)? subCategory+ "\n": "n/a\n") + lst;
+    }
+
 }

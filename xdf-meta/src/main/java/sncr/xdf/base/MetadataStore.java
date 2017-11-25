@@ -6,6 +6,7 @@ import com.mapr.db.Table;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.ojai.Document;
+import org.ojai.store.DocumentMutation;
 import sncr.xdf.datasets.conf.DataSetProperties;
 import sncr.xdf.metastore.DocumentConverter;
 import sncr.xdf.services.MetadataBase;
@@ -111,6 +112,13 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
         table.flush();
     }
 
+    public void _updatePath(String id, String path, JsonElement src) throws Exception {
+        Document mutatedPart = toMapRDBDocument(src);
+        DocumentMutation mutation = MapRDB.newMutation();
+        mutation.set(path, mutatedPart);
+        table.update(id, mutation);
+        table.flush();
+    }
 
 
 

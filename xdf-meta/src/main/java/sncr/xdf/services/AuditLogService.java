@@ -14,7 +14,10 @@ import sncr.xdf.metastore.DSStore;
 import java.util.Map;
 
 /**
- * Created by srya0001 on 11/3/2017.
+ * The class provides functionality to
+ * create, store and retrieve user activity on data lake.
+ *
+ *
  */
 public class AuditLogService {
 
@@ -50,37 +53,26 @@ public class AuditLogService {
         ale.add(DataSetProperties.BatchID.toString(), new JsonPrimitive(ctx.batchID));
 
         ale.add(DataSetProperties.StartTS.toString(), new JsonPrimitive(ctx.startTs));
-        ale.add(DataSetProperties.FinishTS.toString(), new JsonPrimitive(ctx.finishedTs));
+
+        ale.add(DataSetProperties.FinishTS.toString(), new JsonPrimitive((ctx.finishedTs == null)?"":ctx.finishedTs));
 
         ale.add(DataSetProperties.ComponentProducer.toString(), new JsonPrimitive(ctx.componentName));
         ale.add(DataSetProperties.Transformations.toString(), new JsonPrimitive(ctx.transformationName));
         ale.add(DataSetProperties.Project.toString(), new JsonPrimitive(ctx.applicationID));
 
+        JsonArray ale_ids_ja = new JsonArray();
+        input.keySet().forEach(  k -> ale_ids_ja.add(new JsonPrimitive(k)));
+        ale.add("inputDataSets",  ale_ids_ja);
+
+        JsonArray ale_ods_ja = new JsonArray();
+        output.keySet().forEach(  k -> ale_ods_ja.add(new JsonPrimitive(k)));
+        ale.add("outputDataSets",  ale_ods_ja);
+
         return ale;
     }
 
-
-    /**
-     * The method is to update DS and AuditLog with AuditLog entry
-     * @param id - DataSet ID
-     * @param dsmd - DataSet metadata
-     * @param ale_id
-     * @param ale - audit log entry
-     */
-    public void updateDSWithAuditLog(String id, JsonElement dsmd, String ale_id, JsonElement ale) throws Exception {
-        JsonObject dsmdjo = dsmd.getAsJsonObject();
-        JsonObject ale_jo = ale.getAsJsonObject();
-        ale_jo.add(DataSetProperties.Id.toString(), new JsonPrimitive(ale_id)) ;
-        dsmdjo.add("lastALE", ale);
-        DSStore ds = new DSStore(dlRoot);
-        ds.update(dsmdjo.toString());
-    }
-
-    public String createAuditLog(Context ctx, Map<String, JsonElement> mdOutputDSMap, JsonObject ale) throws Exception {
+    public String createAuditLog(Context ctx, JsonObject ale) throws Exception {
         String ale_id = ctx.applicationID + MetadataStore.delimiter + System.currentTimeMillis();
-        JsonArray ale_ds_ja = new JsonArray();
-        mdOutputDSMap.keySet().forEach(  k -> ale_ds_ja.add(new JsonPrimitive(k)));
-        ale.add("dataSets",  ale_ds_ja);
         als.create(ale_id, ale.toString());
         return ale_id;
     }

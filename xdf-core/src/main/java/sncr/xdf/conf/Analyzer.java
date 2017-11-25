@@ -3,6 +3,7 @@ package sncr.xdf.conf;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -14,6 +15,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * Data profiler/analyzer configuration properties
  * 
  */
+@Generated("org.jsonschema2pojo")
 public class Analyzer {
 
     /**
@@ -60,7 +62,6 @@ public class Analyzer {
      * @param timestampMasks
      */
     public Analyzer(String esId, String fieldSeparator, Boolean header, List<String> timestampMasks) {
-        super();
         this.esId = esId;
         this.fieldSeparator = fieldSeparator;
         this.header = header;
@@ -70,6 +71,8 @@ public class Analyzer {
     /**
      * Id of elastic search document containing analyzer metadata
      * 
+     * @return
+     *     The esId
      */
     public String getEsId() {
         return esId;
@@ -78,6 +81,8 @@ public class Analyzer {
     /**
      * Id of elastic search document containing analyzer metadata
      * 
+     * @param esId
+     *     The esId
      */
     public void setEsId(String esId) {
         this.esId = esId;
@@ -91,6 +96,8 @@ public class Analyzer {
     /**
      * Field separator
      * 
+     * @return
+     *     The fieldSeparator
      */
     public String getFieldSeparator() {
         return fieldSeparator;
@@ -99,6 +106,8 @@ public class Analyzer {
     /**
      * Field separator
      * 
+     * @param fieldSeparator
+     *     The fieldSeparator
      */
     public void setFieldSeparator(String fieldSeparator) {
         this.fieldSeparator = fieldSeparator;
@@ -112,6 +121,8 @@ public class Analyzer {
     /**
      * Indicates if source data contains header
      * 
+     * @return
+     *     The header
      */
     public Boolean getHeader() {
         return header;
@@ -120,6 +131,8 @@ public class Analyzer {
     /**
      * Indicates if source data contains header
      * 
+     * @param header
+     *     The header
      */
     public void setHeader(Boolean header) {
         this.header = header;
@@ -133,6 +146,8 @@ public class Analyzer {
     /**
      * Array of timestamp masks used to define fields as timestamps/dates
      * 
+     * @return
+     *     The timestampMasks
      */
     public List<String> getTimestampMasks() {
         return timestampMasks;
@@ -141,6 +156,8 @@ public class Analyzer {
     /**
      * Array of timestamp masks used to define fields as timestamps/dates
      * 
+     * @param timestampMasks
+     *     The timestampMasks
      */
     public void setTimestampMasks(List<String> timestampMasks) {
         this.timestampMasks = timestampMasks;
@@ -153,12 +170,12 @@ public class Analyzer {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("esId", esId).append("fieldSeparator", fieldSeparator).append("header", header).append("timestampMasks", timestampMasks).toString();
+        return ToStringBuilder.reflectionToString(this);
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(header).append(fieldSeparator).append(timestampMasks).append(esId).toHashCode();
+        return new HashCodeBuilder().append(esId).append(fieldSeparator).append(header).append(timestampMasks).toHashCode();
     }
 
     @Override
@@ -170,7 +187,7 @@ public class Analyzer {
             return false;
         }
         Analyzer rhs = ((Analyzer) other);
-        return new EqualsBuilder().append(header, rhs.header).append(fieldSeparator, rhs.fieldSeparator).append(timestampMasks, rhs.timestampMasks).append(esId, rhs.esId).isEquals();
+        return new EqualsBuilder().append(esId, rhs.esId).append(fieldSeparator, rhs.fieldSeparator).append(header, rhs.header).append(timestampMasks, rhs.timestampMasks).isEquals();
     }
 
 }
