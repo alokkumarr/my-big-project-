@@ -1,5 +1,6 @@
 import { Component, Inject, ViewChild } from '@angular/core';
 import { MdDialogRef, MD_DIALOG_DATA, MdDialog } from '@angular/material';
+import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { GridsterConfig, GridsterItem, GridsterComponent } from 'angular-gridster2';
 import {
@@ -135,6 +136,14 @@ export class CreateDashboardComponent {
       const item = { cols: 1, rows: 1, analysis, updater: new BehaviorSubject({}) };
       this.dashboard.push(item);
       this.checkEmpty();
+    });
+  }
+
+  openSaveDialog() {
+    const dialogRef = this.dialog.open(SaveDashboardComponent, {
+      data: {
+        dashboard: {}
+      }
     });
   }
 }

@@ -25,6 +25,7 @@ import {ChartComponent} from '../../common/components/charts/chart.component';
 import {ObservePageComponent} from './components/observe-page/observe-page.component';
 import {ObserveChartComponent} from './components/observe-chart/observe-chart.component';
 import {AnalysisChoiceComponent} from './components/analysis-choice/analysis-choice.component';
+import {SaveDashboardComponent} from './components/save-dashboard/save-dashboard.component';
 import {CreateDashboardComponent} from './components/create-dashboard/create-dashboard.component';
 import {FilterSidenavComponent} from './components/filter-sidenav/filter-sidenav.component';
 import {CheckboxFilterComponent} from './components/checkbox-filter/checkbox-filter.component';
@@ -53,22 +54,19 @@ angular.module(ObserveModule, [
   .component('timeRangeFilter', TimeRangeFilterComponent)
   .component('filterGroup', FilterGroupComponent);
 
+const components = [
+  ObservePageComponent,
+  CreateDashboardComponent,
+  AnalysisChoiceComponent,
+  ObserveChartComponent,
+  SaveDashboardComponent,
+  ChartComponent
+];
+
 @NgModule({
   imports: [ AngularCommonModule, FormsModule, MaterialModule, GridsterModule ],
-  declarations: [
-    ObservePageComponent,
-    CreateDashboardComponent,
-    AnalysisChoiceComponent,
-    ObserveChartComponent,
-    ChartComponent
-  ],
-  entryComponents: [
-    ObservePageComponent,
-    ObserveChartComponent,
-    CreateDashboardComponent,
-    AnalysisChoiceComponent,
-    ChartComponent
-  ],
+  declarations: components,
+  entryComponents: components,
   providers: [
     jwtServiceProvider,
     analyzeServiceProvider,

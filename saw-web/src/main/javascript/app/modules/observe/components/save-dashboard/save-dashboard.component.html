@@ -1,0 +1,26 @@
+<div md-dialog-title>
+  <span>
+    Save Dashboard
+  </span>
+</div>
+<div md-dialog-content>
+  <form class="save-dashboard-form">
+    <md-form-field class="full-form-field">
+      <input mdInput name="dashboardName" placeholder="Dashboard Name" [(ngModel)]="dashboard.name"/>
+    </md-form-field>
+    <md-form-field class="full-form-field">
+      <textarea mdInput matTextareaAutosize [matAutosizeMaxRows]="6"
+        name="dashboardDesc" placeholder="Description"
+        [(ngModel)]="dashboard.description">
+      </textarea>
+    </md-form-field>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button md-button color="primary" (click)="closeDashboard()">
+    Cancel
+  </button>
+  <button md-raised-button color="primary" (click)="saveDashboard()">
+    Save
+  </button>
+</div>
