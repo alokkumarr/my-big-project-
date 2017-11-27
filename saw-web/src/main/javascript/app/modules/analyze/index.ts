@@ -59,6 +59,7 @@ import {AnalyzeChartSettingsComponent} from './components/chart/settings/analyze
 import {AnalyzeChartPreviewComponent} from './components/chart/preview/analyze-chart-preview.component';
 import {CommonModule} from '../../common';
 
+import {CommonModuleTs} from '../../common';
 import {
   DesignerDialogComponent,
   DesignerContainerComponent,
@@ -131,6 +132,7 @@ angular.module(AnalyzeModule, [
 @NgModule({
   imports: [
     CommonModuleAngular4,
+    CommonModuleTs,
     MaterialModule,
     FlexLayoutModule
   ],

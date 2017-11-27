@@ -17,6 +17,7 @@ import 'devextreme/ui/data_grid';
 import 'devextreme/integration/angular';
 
 import { NgModule } from '@angular/core';
+import { DndModule } from './dnd';
 import {DxPivotGridModule, DxPivotGridComponent} from 'devextreme-angular';
 import EventEmitter from './utils/eventEmitter';
 import ComponentHandler from './utils/componentHandler';
@@ -70,6 +71,7 @@ angular
 
 @NgModule({
   imports: [
+    DndModule,
     DxPivotGridModule
   ],
   declarations: [
@@ -79,6 +81,7 @@ angular
     PivotGridComponent
   ],
   exports: [
+    DndModule,
     PivotGridComponent,
     DxPivotGridComponent
   ]

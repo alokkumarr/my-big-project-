@@ -3,27 +3,37 @@
   <div (mouseenter)="expandUnselectedSection()"
        class="settings__unselected-fields"
        [class.anim__expanded]="isUnselectedExpanded">
-    <mat-list *ngIf="artifactColumns">
-      <mat-list-item>
+    <div *ngIf="unselectedArtifactColumns"
+              [dndSortableContainer]="sortableContainerOptions"
+              [dndCollection]="unselectedArtifactColumns">
+      <div class="settings__list-item">
         keyword filter
-      </mat-list-item>
-      <mat-list-item>
+      </div>
+      <div class="settings__list-item">
         type filter
-      </mat-list-item>
-      <mat-list-item *ngFor="let artifactColumn of unselectedArtifactColumns | artifactColumnFilter:filterObj; trackBy: index"
-                     (click)="addToGroupIfPossible(artifactColumn)">
-        {{artifactColumn.columnName}}
-        <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"></mat-icon>
-      </mat-list-item>
-    </mat-list>
+      </div>
+      <div *ngFor="let artifactColumn of unselectedArtifactColumns | artifactColumnFilter:filterObj; trackBy: index"
+           (click)="addToGroupIfPossible(artifactColumn)"
+           class="settings__list-item"
+           [dndSortable]="artifactColumn"
+           (dndOnDragEnd)="onDragEnd($event, artifactColumn)"
+           (dndOnDrag)="onDrag()">
+        <span class="settings__list-item__name">
+          {{ artifactColumn.alias || artifactColumn.displayName }}
+        </span>
+        <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
+                  class="settings__list-item__icon">
+        </mat-icon>
+      </div>
+    </div>
   </div>
 
   <div (mouseenter)="hideUnselectedSection()"
        class="settings__selected-fields"
        [class.anim__expanded]="!isUnselectedExpanded">
     <designer-settings-group *ngFor="let groupAdapter of groupAdapters; trackBy: index"
-      [title]="groupAdapter.title"
-      [artifactColumns]="groupAdapter.artifactColumns"
-    ></designer-settings-group>
+      [groupAdapter]="groupAdapter"
+      [artifactColumns]="groupAdapter.artifactColumns">
+    </designer-settings-group>
   </div>
 </div>

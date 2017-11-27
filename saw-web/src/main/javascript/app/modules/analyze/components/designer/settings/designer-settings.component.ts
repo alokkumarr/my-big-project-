@@ -28,10 +28,12 @@ export default class DesignerSettingsComponent {
   @Output() public onSettingsChange: EventEmitter<ArtifactColumnPivot[]> = new EventEmitter();
   @Input() public artifactColumns: ArtifactColumns;
 
+  private _isDraggingInProgress = false;
   public unselectedArtifactColumns: ArtifactColumns
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   public isUnselectedExpanded: boolean = false;
   public groupAdapters: IDEsignerSettingGroupAdapter[];
+  public sortableContainerOptions = {};
   public filterObj: ArtifactColumnFilter = {
     keyword: '',
     type: ''
@@ -41,12 +43,27 @@ export default class DesignerSettingsComponent {
 
   ngOnInit() {
     this.groupAdapters = this._designerService.getPivotGroupAdapters(this.artifactColumns);
-    console.log('artifactColumns', this.artifactColumns);
-    console.log('unselectedArtifactColumns', this.unselectedArtifactColumns);
+    this.sortableContainerOptions = {
+      // this can be anything as long az the soortable unselected artifactColumns
+      // don't have the same zone, so that the elements cannot be dropped back here.
+      zone: 'zone'
+    }
   }
 
   ngOnChanges() {
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+  }
+
+  onDrag() {
+    this._isDraggingInProgress = true;
+    this.hideUnselectedSection();
+  }
+
+  onDragEnd(event, artifactcolumn) {
+    this._isDraggingInProgress = false;
+    if (event.isDropSuccessful && event.isSortableDroppedInOtherContainer) {
+      this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+    }
   }
 
   hideUnselectedSection() {
@@ -54,6 +71,11 @@ export default class DesignerSettingsComponent {
   }
 
   expandUnselectedSection() {
+    // fix a bug with unselectedSection expanding while
+    // dragging is in progress
+    if (this._isDraggingInProgress) {
+      return;
+    }
     this.isUnselectedExpanded = true;
   }
 
@@ -66,7 +88,6 @@ export default class DesignerSettingsComponent {
   }
 
   addToGroupIfPossible(artifactColumn: ArtifactColumn) {
-    console.log('selected', artifactColumn);
     this._designerService.addArtifactColumnIntoGroup(
       artifactColumn,
       this.groupAdapters

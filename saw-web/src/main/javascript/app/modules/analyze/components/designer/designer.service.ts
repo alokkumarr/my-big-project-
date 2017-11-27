@@ -120,7 +120,6 @@ export default class DesignerService {
     forEach(pivotGroupAdapters, (adapter: IDEsignerSettingGroupAdapter) => {
       if (adapter.canAcceptArtifactColumn(artifactColumn)) {
         adapter.transform(artifactColumn);
-        console.log('adapter: ', adapter);
         adapter.artifactColumns = [...adapter.artifactColumns, artifactColumn];
         addedSuccessfully = true;
         return false;

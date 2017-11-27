@@ -1,8 +1,11 @@
+@import "themes/base/colors";
+
 designer-settings {
   .settings__container {
     height: 100%;
     width: 100%;
     overflow: hidden;
+    background-color: white;
   }
 
   .settings__unselected-fields {
@@ -15,9 +18,25 @@ designer-settings {
     &.anim__expanded {
       flex: 9 9 90%;
     }
+  }
 
-    mat-list-item {
-      cursor: pointer;
+  .settings__list-item {
+    padding: 5px;
+    min-width: max-content;
+
+    .settings__list-item__name {
+      // display: block;
+      max-width: 250px;
+      white-space: nowrap;
+      overflow: hidden;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      color: $primary-grey-g4;
+    }
+
+    .settings__list-item__icon {
+      margin-left: 10px;
+      color: $primary-grey-g3;
     }
   }
 
@@ -29,10 +48,6 @@ designer-settings {
 
     &.anim__expanded {
       flex: 9 9 90%;
-    }
-
-    mat-list-item {
-      cursor: pointer;
     }
   }
 }
