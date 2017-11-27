@@ -4,8 +4,7 @@ import java.text.SimpleDateFormat
 import java.security.Key
 
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
-import io.jsonwebtoken.impl.crypto.MacProvider
+
 import org.json4s._
 import org.json4s.JsonAST.JValue
 import org.json4s.JsonDSL._
@@ -76,7 +75,7 @@ class BaseController extends Controller {
     }
   }
 
-   def getTicket(header: String): Option[Ticket] = {
+  private def getTicket(header: String): Option[Ticket] = {
     header match {
       case null => None
       case value => {
