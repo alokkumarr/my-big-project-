@@ -3,8 +3,9 @@ package controllers
 import java.time.Instant
 import java.util
 import java.util.UUID
+
 import com.synchronoss.querybuilder.{EntityType, SAWElasticSearchQueryBuilder, SAWElasticSearchQueryExecutor}
-import model.{ClientException, PaginateDataSet, QueryBuilder}
+import model.{ClientException, PaginateDataSet, QueryBuilder, TransportUtils}
 import org.json4s.JsonAST.{JArray, JLong, JObject, JString, JValue, JBool => _, JField => _, JInt => _, JNothing => _}
 import org.json4s.JsonDSL._
 import org.json4s._
@@ -24,8 +25,8 @@ import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder
 import com.synchronoss.BuilderUtil
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
-import collection.JavaConverters._
 
+import collection.JavaConverters._
 import executor.ReportExecutorQueue
 import sncr.metadata.engine.{Fields, MetadataDictionary}
 
@@ -153,7 +154,13 @@ class Analysis extends BaseController {
           case keys: JObject => keys
           case obj => throw new ClientException("Expected object, got: " + obj)
         }
-        json merge contentsAnalyze(searchAnalysisJson(keys))
+        val userIdJson: JObject = ("userId", ticket.get.userId.asInstanceOf[String])
+        m_log.debug("search key"+keys);
+        val categoryId = extractKey(json, "categoryId")
+        if (TransportUtils.checkIfPrivateAnalysis(ticket.get.product,categoryId) && !ticket.get.roleType.equalsIgnoreCase("Admin"))
+        json merge contentsAnalyze(searchAnalysisJson(keys.merge(userIdJson)))
+        else
+          json merge contentsAnalyze(searchAnalysisJson(keys))
       }
       case "execute" => {
 
