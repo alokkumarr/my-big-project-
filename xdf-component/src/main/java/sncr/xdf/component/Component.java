@@ -300,12 +300,12 @@ public abstract class Component {
         return strCtx + "\n" + specificConfParams;
     }
 
-    public static int startComponent(Component self, String xdfDataRootSys, String config, String app, String batch)
+    public static int startComponent(Component self, String dataLakeRoot, String config, String app, String batch)
     {
         logger.debug(String.format("Component [%s] has been started...", self.componentName));
 
         try {
-            if (self.Init(config, app, batch, xdfDataRootSys) == 0) {
+            if (self.Init(config, app, batch, dataLakeRoot) == 0) {
                 return self.Run();
             }
             else{
