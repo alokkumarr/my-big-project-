@@ -9,7 +9,7 @@
         "dataSecurityKey": "",
         "type": "semantic",
         "module": "ANALYZE",
-        "metric": "Sample",
+        "metric": "sample-elasticsearch",
         "metricName": "Sample (pivot/chart)",
         "customerCode": "SYNCHRONOSS",
         "disabled": "false",
