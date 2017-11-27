@@ -1,0 +1,37 @@
+ {
+	"inputs" : 
+	 [ 
+		{ 
+		  "name" : "zeroin", 
+		  "dataSet" : "zeroin", 
+			"catalog" : "dinp", 
+			"format" : "parquet" 
+		} 
+   ], 
+  "outputs" : 
+	[ 
+		{ 
+		  "name"    : "zeroout", 
+		  "dataSet" : "zeroout", 
+			"catalog" : "dout", 
+			"format"  : "parquet", 
+			"mode"    : "replace", 
+			"numberOfFiles" : 2,
+				"metadata" : {
+					"createdBy" : "S.Ryabov",
+					"description" : "Zero component test",
+					"tags" : [ "XDF", "UX", "Metadata" ]
+				}
+		} 
+	],
+	"parameters" : [ 
+	{"name": "spark.master", "value": "yarn"}, 
+	{"name": "spark.yarn.queue","value":"xdf"},  
+	{"name": "spark.driver.memory","value":"1g"}, 
+	{"name": "spark.executor.memory","value":"6g"},  
+	{"name": "spark.executor.cores","value":"4"}, 
+	{"name": "spark.executor.instances","value":"8"},
+	{"name": "spark.yarn.tags","value":"XDA-SR-UX"} 
+	],  
+	"zero" : { "mode" : "copy", "numberOfFiles" : 10 } 
+ }

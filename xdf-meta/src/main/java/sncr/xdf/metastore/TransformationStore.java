@@ -19,7 +19,7 @@ public class TransformationStore extends MetadataStore implements WithSearchInMe
     }
 
     public Map<String, Document> search(QueryCondition qc) throws Exception {
-        return _search(table, qc);
+        return searchAsMap(table, qc);
     }
 
 }

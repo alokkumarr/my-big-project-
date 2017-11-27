@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by srya0001 on 10/26/2017.
@@ -16,13 +17,9 @@ public class DLMetadata extends MetadataBase {
 
     private static final Logger logger = Logger.getLogger(DLMetadata.class);
 
-
     public DLMetadata(String fsr) throws Exception {
         super(fsr);
     }
-
-
-
 
     public ArrayList<String> getListOfProjects() throws Exception{
         ArrayList<String> list = new ArrayList<>();
@@ -499,7 +496,6 @@ public class DLMetadata extends MetadataBase {
         }
         return 0;
     }
-
 
 
 }

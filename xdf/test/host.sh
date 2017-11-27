@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 ## Environment specific xdf-rest http address,
 ## must be adjusted for every environment
 

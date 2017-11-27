@@ -93,7 +93,7 @@ public class TaskExecutor extends AbstractActor {
 
         if(conf.has("zero")){
             ZeroComponent zc = new ZeroComponent();
-            retval = Component.startComponent(zc, "zero", r.project, r.batch);
+            retval = Component.startComponent(zc, dataLakeRoot, conf.toString(), r.project, r.batch);
             log.info("Zero Component returned {}", retval);
         } else if(conf.has("csvInspector")){
             log.info("Executed csvInspector, exiting");

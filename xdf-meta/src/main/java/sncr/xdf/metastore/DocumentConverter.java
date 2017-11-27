@@ -25,6 +25,15 @@ public interface DocumentConverter {
         return jsonParser.parse(json);
     }
 
+    default List<String> convertToString(List<Document> listDoc){
+        List<String> res = new ArrayList();
+        listDoc.forEach( i -> {
+            JsonElement je = toJsonElement(i);
+            if (je != null && !je.isJsonNull()) res.add(je.toString());
+        });
+        return res;
+    }
+
 
     class DCHelper{
 

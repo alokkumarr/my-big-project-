@@ -1,6 +1,7 @@
 
 package sncr.xdf.conf;
 
+import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -12,6 +13,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * SQL script executor specific properties
  * 
  */
+@Generated("org.jsonschema2pojo")
 public class Sql {
 
     /**
@@ -42,7 +44,6 @@ public class Sql {
      * @param script
      */
     public Sql(String script, String scriptLocation) {
-        super();
         this.script = script;
         this.scriptLocation = scriptLocation;
     }
@@ -50,6 +51,8 @@ public class Sql {
     /**
      * SQL script sile name name
      * 
+     * @return
+     *     The script
      */
     public String getScript() {
         return script;
@@ -58,6 +61,8 @@ public class Sql {
     /**
      * SQL script sile name name
      * 
+     * @param script
+     *     The script
      */
     public void setScript(String script) {
         this.script = script;
@@ -71,6 +76,8 @@ public class Sql {
     /**
      * Location containing SQL script, special value: 'inline' means scripts field itself is base64 encoded SQL script
      * 
+     * @return
+     *     The scriptLocation
      */
     public String getScriptLocation() {
         return scriptLocation;
@@ -79,6 +86,8 @@ public class Sql {
     /**
      * Location containing SQL script, special value: 'inline' means scripts field itself is base64 encoded SQL script
      * 
+     * @param scriptLocation
+     *     The scriptLocation
      */
     public void setScriptLocation(String scriptLocation) {
         this.scriptLocation = scriptLocation;
@@ -91,7 +100,7 @@ public class Sql {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("script", script).append("scriptLocation", scriptLocation).toString();
+        return ToStringBuilder.reflectionToString(this);
     }
 
     @Override

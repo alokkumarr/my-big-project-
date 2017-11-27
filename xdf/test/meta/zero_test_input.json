@@ -1,0 +1,34 @@
+{
+  "action" : "create",
+  "output" : "hdfs:///var/bda/xdf-srux/zero-cr-tc220.json",
+	"xdf-root" : "hdfs:///data/bda",
+	"category" : "DataSet",
+	"id" : "xda-ux-sr-comp-dev::A_user::zeroin",
+	
+	"source" : {
+
+    	"userData" : {
+			
+					"createdBy" : "S.Ryabov",
+					"description" : "Input dataset to test Zero component",
+					"category" : "test",
+					"subCategory" : "zero"
+					
+			},
+			
+			"system" : { 
+			
+				"name" : "zeroin", 
+				"type" : "fs", 
+				"project" : "xda-ux-sr-comp-dev",
+				"catalog" : "dinp", 
+				"format"  : "parquet", 
+				"mode"    : "replace", 
+				"numberOfFiles" : 2 
+				
+			}, 
+	   
+			"transformations" : [ "zero::test::2"]
+	}
+	
+}

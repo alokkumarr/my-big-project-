@@ -3,6 +3,7 @@ package sncr.xdf.conf;
 
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -14,6 +15,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * Defines the configuration XDF-UX component
  * 
  */
+@Generated("org.jsonschema2pojo")
 public class ComponentConfiguration {
 
     /**
@@ -132,7 +134,6 @@ public class ComponentConfiguration {
      * @param parameters
      */
     public ComponentConfiguration(List<Input> inputs, List<Output> outputs, List<Parameter> parameters, Parser parser, Scd2 scd2, Sql sql, Object partitioner, Object esLoader, Object esReader, Object converter, Object dbLoader, Analyzer analyzer, Object zero) {
-        super();
         this.inputs = inputs;
         this.outputs = outputs;
         this.parameters = parameters;
@@ -151,6 +152,8 @@ public class ComponentConfiguration {
     /**
      * List of named input data objects
      * 
+     * @return
+     *     The inputs
      */
     public List<Input> getInputs() {
         return inputs;
@@ -159,6 +162,8 @@ public class ComponentConfiguration {
     /**
      * List of named input data objects
      * 
+     * @param inputs
+     *     The inputs
      */
     public void setInputs(List<Input> inputs) {
         this.inputs = inputs;
@@ -172,6 +177,8 @@ public class ComponentConfiguration {
     /**
      * List of named output data objects
      * 
+     * @return
+     *     The outputs
      */
     public List<Output> getOutputs() {
         return outputs;
@@ -180,6 +187,8 @@ public class ComponentConfiguration {
     /**
      * List of named output data objects
      * 
+     * @param outputs
+     *     The outputs
      */
     public void setOutputs(List<Output> outputs) {
         this.outputs = outputs;
@@ -193,6 +202,8 @@ public class ComponentConfiguration {
     /**
      * System parameters specific for component execution
      * 
+     * @return
+     *     The parameters
      */
     public List<Parameter> getParameters() {
         return parameters;
@@ -201,6 +212,8 @@ public class ComponentConfiguration {
     /**
      * System parameters specific for component execution
      * 
+     * @param parameters
+     *     The parameters
      */
     public void setParameters(List<Parameter> parameters) {
         this.parameters = parameters;
@@ -214,6 +227,8 @@ public class ComponentConfiguration {
     /**
      * Parser specific properties
      * 
+     * @return
+     *     The parser
      */
     public Parser getParser() {
         return parser;
@@ -222,6 +237,8 @@ public class ComponentConfiguration {
     /**
      * Parser specific properties
      * 
+     * @param parser
+     *     The parser
      */
     public void setParser(Parser parser) {
         this.parser = parser;
@@ -235,6 +252,8 @@ public class ComponentConfiguration {
     /**
      * SCD2 specific properties
      * 
+     * @return
+     *     The scd2
      */
     public Scd2 getScd2() {
         return scd2;
@@ -243,6 +262,8 @@ public class ComponentConfiguration {
     /**
      * SCD2 specific properties
      * 
+     * @param scd2
+     *     The scd2
      */
     public void setScd2(Scd2 scd2) {
         this.scd2 = scd2;
@@ -256,6 +277,8 @@ public class ComponentConfiguration {
     /**
      * SQL script executor specific properties
      * 
+     * @return
+     *     The sql
      */
     public Sql getSql() {
         return sql;
@@ -264,6 +287,8 @@ public class ComponentConfiguration {
     /**
      * SQL script executor specific properties
      * 
+     * @param sql
+     *     The sql
      */
     public void setSql(Sql sql) {
         this.sql = sql;
@@ -277,6 +302,8 @@ public class ComponentConfiguration {
     /**
      * Partition maker specific properties
      * 
+     * @return
+     *     The partitioner
      */
     public Object getPartitioner() {
         return partitioner;
@@ -285,6 +312,8 @@ public class ComponentConfiguration {
     /**
      * Partition maker specific properties
      * 
+     * @param partitioner
+     *     The partitioner
      */
     public void setPartitioner(Object partitioner) {
         this.partitioner = partitioner;
@@ -298,6 +327,8 @@ public class ComponentConfiguration {
     /**
      * ES Loader specific properties
      * 
+     * @return
+     *     The esLoader
      */
     public Object getEsLoader() {
         return esLoader;
@@ -306,6 +337,8 @@ public class ComponentConfiguration {
     /**
      * ES Loader specific properties
      * 
+     * @param esLoader
+     *     The es-loader
      */
     public void setEsLoader(Object esLoader) {
         this.esLoader = esLoader;
@@ -319,6 +352,8 @@ public class ComponentConfiguration {
     /**
      * ES Reader specific properties
      * 
+     * @return
+     *     The esReader
      */
     public Object getEsReader() {
         return esReader;
@@ -327,6 +362,8 @@ public class ComponentConfiguration {
     /**
      * ES Reader specific properties
      * 
+     * @param esReader
+     *     The es-reader
      */
     public void setEsReader(Object esReader) {
         this.esReader = esReader;
@@ -340,6 +377,8 @@ public class ComponentConfiguration {
     /**
      * Converter specific properties
      * 
+     * @return
+     *     The converter
      */
     public Object getConverter() {
         return converter;
@@ -348,6 +387,8 @@ public class ComponentConfiguration {
     /**
      * Converter specific properties
      * 
+     * @param converter
+     *     The converter
      */
     public void setConverter(Object converter) {
         this.converter = converter;
@@ -361,6 +402,8 @@ public class ComponentConfiguration {
     /**
      * DB Loader specific properties
      * 
+     * @return
+     *     The dbLoader
      */
     public Object getDbLoader() {
         return dbLoader;
@@ -369,6 +412,8 @@ public class ComponentConfiguration {
     /**
      * DB Loader specific properties
      * 
+     * @param dbLoader
+     *     The db-loader
      */
     public void setDbLoader(Object dbLoader) {
         this.dbLoader = dbLoader;
@@ -382,6 +427,8 @@ public class ComponentConfiguration {
     /**
      * Data profiler/analyzer configuration properties
      * 
+     * @return
+     *     The analyzer
      */
     public Analyzer getAnalyzer() {
         return analyzer;
@@ -390,6 +437,8 @@ public class ComponentConfiguration {
     /**
      * Data profiler/analyzer configuration properties
      * 
+     * @param analyzer
+     *     The analyzer
      */
     public void setAnalyzer(Analyzer analyzer) {
         this.analyzer = analyzer;
@@ -403,6 +452,8 @@ public class ComponentConfiguration {
     /**
      * Zero specific properties
      * 
+     * @return
+     *     The zero
      */
     public Object getZero() {
         return zero;
@@ -411,6 +462,8 @@ public class ComponentConfiguration {
     /**
      * Zero specific properties
      * 
+     * @param zero
+     *     The zero
      */
     public void setZero(Object zero) {
         this.zero = zero;
@@ -423,12 +476,12 @@ public class ComponentConfiguration {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("inputs", inputs).append("outputs", outputs).append("parameters", parameters).append("parser", parser).append("scd2", scd2).append("sql", sql).append("partitioner", partitioner).append("esLoader", esLoader).append("esReader", esReader).append("converter", converter).append("dbLoader", dbLoader).append("analyzer", analyzer).append("zero", zero).toString();
+        return ToStringBuilder.reflectionToString(this);
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(outputs).append(dbLoader).append(inputs).append(converter).append(scd2).append(sql).append(zero).append(parser).append(analyzer).append(partitioner).append(esLoader).append(esReader).append(parameters).toHashCode();
+        return new HashCodeBuilder().append(inputs).append(outputs).append(parameters).append(parser).append(scd2).append(sql).append(partitioner).append(esLoader).append(esReader).append(converter).append(dbLoader).append(analyzer).append(zero).toHashCode();
     }
 
     @Override
@@ -440,7 +493,7 @@ public class ComponentConfiguration {
             return false;
         }
         ComponentConfiguration rhs = ((ComponentConfiguration) other);
-        return new EqualsBuilder().append(outputs, rhs.outputs).append(dbLoader, rhs.dbLoader).append(inputs, rhs.inputs).append(converter, rhs.converter).append(scd2, rhs.scd2).append(sql, rhs.sql).append(zero, rhs.zero).append(parser, rhs.parser).append(analyzer, rhs.analyzer).append(partitioner, rhs.partitioner).append(esLoader, rhs.esLoader).append(esReader, rhs.esReader).append(parameters, rhs.parameters).isEquals();
+        return new EqualsBuilder().append(inputs, rhs.inputs).append(outputs, rhs.outputs).append(parameters, rhs.parameters).append(parser, rhs.parser).append(scd2, rhs.scd2).append(sql, rhs.sql).append(partitioner, rhs.partitioner).append(esLoader, rhs.esLoader).append(esReader, rhs.esReader).append(converter, rhs.converter).append(dbLoader, rhs.dbLoader).append(analyzer, rhs.analyzer).append(zero, rhs.zero).isEquals();
     }
 
 }

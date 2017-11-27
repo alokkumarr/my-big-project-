@@ -1,0 +1,32 @@
+{
+  "action" : "create",
+  "output" : "hdfs:///var/bda/xdf-srux/spark-sql-cr-tc220.json",
+	"xdf-root" : "hdfs:///data/bda",
+	"category" : "DataSet",
+	"id" : "xda-ux-sr-comp-dev::A_user::T220",
+	
+	"source" : {
+
+    	"userData" : {
+			
+					"createdBy" : "S.Ryabov",
+					"description" : "Input dataset to test Spark SQL component",
+					"category" : "test", 
+					"subCategory" : "SQL"
+					
+			},
+			
+			"system" : { 
+			
+				"name" : "T220", 
+				"type" : "fs", 
+				"project" : "xda-ux-sr-comp-dev",				
+				"catalog" : "dinp", 
+				"format"  : "parquet", 
+				"mode"    : "replace", 
+				"numberOfFiles" : 2 
+				
+			}, 
+			"transformations" : [ "spark-sql::test::1"]
+	}
+}

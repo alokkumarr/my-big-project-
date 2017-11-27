@@ -1,12 +1,14 @@
 
 package sncr.xdf.conf;
 
+import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+@Generated("org.jsonschema2pojo")
 public class Parameter {
 
     @SerializedName("name")
@@ -29,15 +31,24 @@ public class Parameter {
      * @param value
      */
     public Parameter(String name, String value) {
-        super();
         this.name = name;
         this.value = value;
     }
 
+    /**
+     * 
+     * @return
+     *     The name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * 
+     * @param name
+     *     The name
+     */
     public void setName(String name) {
         this.name = name;
     }
@@ -47,10 +58,20 @@ public class Parameter {
         return this;
     }
 
+    /**
+     * 
+     * @return
+     *     The value
+     */
     public String getValue() {
         return value;
     }
 
+    /**
+     * 
+     * @param value
+     *     The value
+     */
     public void setValue(String value) {
         this.value = value;
     }
@@ -62,7 +83,7 @@ public class Parameter {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("name", name).append("value", value).toString();
+        return ToStringBuilder.reflectionToString(this);
     }
 
     @Override

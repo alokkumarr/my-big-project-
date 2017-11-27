@@ -28,20 +28,21 @@
         "type": "string",
         "default" : "nobody"
       },
-      "tags": {
-        "description": "Tag to label data objects",
-        "type": "array",
-        "additionalProperties": false,
-        "minItems": 0,
-        "items": {
-          "type": "string"
-        }
-      },
       "description": {
-        "description": "Description of the data object",
+        "description": "Description of the data set",
         "type": "string",
         "additionalProperties": false,
         "default": "__none__"
+      },
+      "category": {
+        "description": "Category of a dataset",
+        "type": "string",
+        "additionalProperties": false
+      },
+      "subCategory": {
+        "description": "Sub category of a dataset",
+        "type": "string",
+        "additionalProperties": false
       }
     }
   },

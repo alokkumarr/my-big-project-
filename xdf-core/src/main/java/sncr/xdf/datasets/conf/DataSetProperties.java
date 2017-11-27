@@ -20,19 +20,20 @@ public enum DataSetProperties {
     isNewDataSet ("isNewDataSet"),
     Exists ("exists"),
     Empty ("empty"),
-    NumberOfFiles ("numberOFFiles"),
+    NumberOfFiles ("numberOfFiles"),
     MetaCreatedBy ("metaCreatedBy"),
-    MetaTags ("tags"),
+    Category("category"),
+    SubCategory("subCategory"),
     MetaDescription ("metaDescription"),
     Mode("mode"),
     Creator("createdBy"),
     Description ("description"),
-    DataLake("dataLake"),
     UserData("userData"),
     Id ("_id"),
     Status ("status"),
     Project ( "project"),
-    BatchID ("batchID");
+    BatchID ("batchID"),
+    System("system");
 
     private final String intName;
 

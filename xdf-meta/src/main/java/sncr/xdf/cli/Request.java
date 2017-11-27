@@ -146,14 +146,17 @@ public class Request {
 
         maprDBCondition =  MapRDB.newCondition();
 
-        if (filter.size() > 1)
+        boolean toBeClosed = false;
+        if (filter.size() > 1) {
             if (query.has("conjunction"))
                 if (query.get("conjunction").getAsString().equalsIgnoreCase("or"))
                     maprDBCondition.or();
                 else
                     maprDBCondition.and();
             else
-              maprDBCondition.and();
+                maprDBCondition.and();
+            toBeClosed = true;
+        }
 
         filter.forEach(c -> {
             if ( c.isJsonObject() ){
@@ -175,6 +178,7 @@ public class Request {
                 logger.warn("Incorrect query");
             }
         });
+        if (toBeClosed) maprDBCondition.close();
         maprDBCondition.build();
 
         Map<String, Document> searchResult = null;

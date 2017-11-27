@@ -5,6 +5,8 @@ import org.apache.hadoop.fs.PathFilter;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.core.file.HFileOperations;
 
+import java.util.List;
+
 
 /**
  * Created by srya0001 on 10/16/2017.
@@ -12,9 +14,13 @@ import sncr.xdf.core.file.HFileOperations;
 public abstract class MetadataBase {
 
     public static final String PROJECTS = "projects";
-    public static final String DS_SOURCES = "sources";
-    public static final String DS_CATALOGS = "catalogs";
-    public static final String DS_SETS = "sets";
+    public static final String DS_DL_SOURCES = "sources";
+    public static final String DS_DL_CATALOGS = "catalogs";
+    public static final String DS_DL_SETS = "sets";
+
+    public static final String DS_MD_CATEGORY = "category";
+    public static final String DS_MD_SUBCATEGORY = "subcategory";
+
 
     public static final String PREDEF_DATA_SOURCE = "fs";
     public static final String PREDEF_TEMP_DIR = "temp";
@@ -80,4 +86,6 @@ public abstract class MetadataBase {
     public String getRoot() {
         return dlRoot;
     }
+
+
 }

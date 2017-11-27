@@ -1,8 +1,6 @@
 
 package sncr.xdf.datasets.conf;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -14,7 +12,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 /**
  * DataSet descriptor
  * <p>
- * Defines processMap data object
+ * Defines a data object
  * 
  */
 @Generated("org.jsonschema2pojo")
@@ -53,12 +51,19 @@ public class Dataset {
     @Expose
     private String format = "parquet";
     /**
-     * Tag to label data objects
+     * Category of a dataset
      * 
      */
-    @SerializedName("tags")
+    @SerializedName("category")
     @Expose
-    private List<String> tags = new ArrayList<String>();
+    private String category;
+    /**
+     * Sub category of a dataset
+     * 
+     */
+    @SerializedName("subCategory")
+    @Expose
+    private String subCategory;
     /**
      * Description of the data object
      * (Required)
@@ -78,18 +83,20 @@ public class Dataset {
     /**
      * 
      * @param component
+     * @param subCategory
      * @param createdBy
      * @param format
      * @param description
+     * @param category
      * @param createdTs
-     * @param tags
      */
-    public Dataset(String component, String createdTs, String createdBy, String format, List<String> tags, String description) {
+    public Dataset(String component, String createdTs, String createdBy, String format, String category, String subCategory, String description) {
         this.component = component;
         this.createdTs = createdTs;
         this.createdBy = createdBy;
         this.format = format;
-        this.tags = tags;
+        this.category = category;
+        this.subCategory = subCategory;
         this.description = description;
     }
 
@@ -202,27 +209,52 @@ public class Dataset {
     }
 
     /**
-     * Tag to label data objects
+     * Category of a dataset
      * 
      * @return
-     *     The tags
+     *     The category
      */
-    public List<String> getTags() {
-        return tags;
+    public String getCategory() {
+        return category;
     }
 
     /**
-     * Tag to label data objects
+     * Category of a dataset
      * 
-     * @param tags
-     *     The tags
+     * @param category
+     *     The category
      */
-    public void setTags(List<String> tags) {
-        this.tags = tags;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
-    public Dataset withTags(List<String> tags) {
-        this.tags = tags;
+    public Dataset withCategory(String category) {
+        this.category = category;
+        return this;
+    }
+
+    /**
+     * Sub category of a dataset
+     * 
+     * @return
+     *     The subCategory
+     */
+    public String getSubCategory() {
+        return subCategory;
+    }
+
+    /**
+     * Sub category of a dataset
+     * 
+     * @param subCategory
+     *     The subCategory
+     */
+    public void setSubCategory(String subCategory) {
+        this.subCategory = subCategory;
+    }
+
+    public Dataset withSubCategory(String subCategory) {
+        this.subCategory = subCategory;
         return this;
     }
 
@@ -260,7 +292,7 @@ public class Dataset {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(component).append(createdTs).append(createdBy).append(format).append(tags).append(description).toHashCode();
+        return new HashCodeBuilder().append(component).append(createdTs).append(createdBy).append(format).append(category).append(subCategory).append(description).toHashCode();
     }
 
     @Override
@@ -272,7 +304,7 @@ public class Dataset {
             return false;
         }
         Dataset rhs = ((Dataset) other);
-        return new EqualsBuilder().append(component, rhs.component).append(createdTs, rhs.createdTs).append(createdBy, rhs.createdBy).append(format, rhs.format).append(tags, rhs.tags).append(description, rhs.description).isEquals();
+        return new EqualsBuilder().append(component, rhs.component).append(createdTs, rhs.createdTs).append(createdBy, rhs.createdBy).append(format, rhs.format).append(category, rhs.category).append(subCategory, rhs.subCategory).append(description, rhs.description).isEquals();
     }
 
 }
