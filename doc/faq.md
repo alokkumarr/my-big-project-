@@ -1,3 +1,26 @@
+# What should I do if I run into a difficult to understand build issue?
+
+Before spending more time on analyzing it, try the following to ensure
+you have a working baseline to start from:
+
+1. Revert the working directory to the latest unmodified version of
+   the `master` branch
+
+2. Run `git clean -fdx` to remove any possible leftover files, build
+   artifacts, caches and similar that might be causing an issue
+   
+3. Retry the original build command that was failing
+
+4. If the build is no longer failing, reapply local modifications and
+   retry the build command.  If it works now, you probably had some
+   leftover files in the working directory causing the issue.  If it
+   still fails, the local modifications might have caused it.
+
+Note: The `git clean -fdx` command will delete all files in the
+working directory that are not under version control.  Take backups of
+any local modifications first if you are not familiar with how that
+command works.
+
 # How can I run a command inside the SAW Docker container?
 
 Execute the following command to get a shell inside the SAW Docker

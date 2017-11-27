@@ -72,10 +72,19 @@ starting points to investigate installed SAW services and packages:
 To stop the SAW containers, simply send an interrupt to the Maven
 process used to start the containers.  In case containers have been
 left behind and prevent running new SAW containers, existing
-containers can be cleared out by executing the following command:
+containers can be removed by executing the following command:
 
-        $ cd saw
-        $ mvn -pl saw-dist docker:stop
+        $ docker rm -f saw saw-dist
+
+# Running SAW Web in development mode using local SAW deployment
+
+When doing front-end development developers typically run the SAW Web
+application using NPM commands out of the `saw-web` source code
+directory.  To configure SAW Web to connect to a local SAW deployment,
+edit the `saw-web/appConfig.js` file as follows to replace the second
+occurrence of `apiUrl`:
+
+        apiUrl = 'http://localhost';
 
 # Editing datasets in local SAW deployment
 
