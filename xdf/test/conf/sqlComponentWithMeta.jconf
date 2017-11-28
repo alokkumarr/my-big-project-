@@ -21,7 +21,7 @@
 					"createdBy" : "S.Ryabov",
 					"description" : "SQL component test case",
 					"category" : "cat1",
-					"category" : "subcat1"		
+					"subCategory" : "subcat1"
 				}
 			} 
 		],  

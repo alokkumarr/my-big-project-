@@ -1,9 +1,9 @@
 {
   "action" : "create",
-  "output" : "hdfs:///var/bda/xdf-srux/spark-sql-cr-tc220.json",
-	"xdf-root" : "hdfs:///data/bda",
+  "output" : "hdfs:///var/bda/xdf-ngdev/spark-sql-cr-tc220.json",
+	"xdf-root" : "hdfs:///data/bda/datalake",
 	"category" : "DataSet",
-	"id" : "xda-ux-sr-comp-dev::A_user::T220",
+	"id" : "xda-ng-test-prj::T220",
 	
 	"source" : {
 
@@ -18,9 +18,10 @@
 			
 			"system" : { 
 			
+			  "physicalLocation":"hdfs:///data/bda/datalake/xda-ng-test-prj/dl/fs/dinp/T220/data",
 				"name" : "T220", 
 				"type" : "fs", 
-				"project" : "xda-ux-sr-comp-dev",				
+				"project" : "xda-ng-test-prj",				
 				"catalog" : "dinp", 
 				"format"  : "parquet", 
 				"mode"    : "replace", 

@@ -40,134 +40,6 @@ public class DLMetadata extends MetadataBase {
         return list;
     }
 
-    public ArrayList<String> getListOfContainers(String rqProject) throws Exception{
-
-        StringBuilder strPath = new StringBuilder(dlRoot + Path.SEPARATOR);
-        if (rqProject != null) {
-            strPath.append(rqProject).append(Path.SEPARATOR_CHAR);
-        } else {
-            strPath.append("*").append(Path.SEPARATOR_CHAR);
-        }
-        strPath.append("*");
-
-        ArrayList<String> list = new ArrayList<>();
-        Path p = new Path(strPath.toString());
-
-        FileStatus[] plist = fs.globStatus(p);
-        for (FileStatus f : plist) {
-            if (f.isDirectory() && !f.getPath().getName().equals(".bda_meta")) {
-                // Must validate container names to exclude garbage
-                String project = f.getPath().getParent().getName();
-                String container = f.getPath().getName();
-                // Build final object definition
-                StringBuilder sb = new StringBuilder();
-                sb.append("{").append("\"prj\":\"").append(project).append("\",\"src\":\"").append(container).append("\"").append("}");
-
-                list.add(sb.toString());
-            }
-        }
-        return list;
-    }
-
-    public ArrayList<String> getListOfLocations(String rqProject, String rqContainer) throws Exception{
-        StringBuilder strPath = new StringBuilder(dlRoot + Path.SEPARATOR);
-        if (rqProject != null) {
-            strPath.append(rqProject).append(Path.SEPARATOR_CHAR);
-        } else {
-            strPath.append("*").append(Path.SEPARATOR_CHAR);
-        }
-        if (rqContainer != null) {
-            strPath.append(rqContainer).append(Path.SEPARATOR_CHAR);
-        } else {
-            strPath.append("*").append(Path.SEPARATOR_CHAR);
-        }
-        strPath.append("*");
-
-        ArrayList<String> list = new ArrayList<>();
-        Path p = new Path(strPath.toString());
-
-        FileStatus[] plist = fs.globStatus(p);
-        for (FileStatus f : plist) {
-            if (f.isDirectory() && !f.getPath().getName().equals(".bda_meta")) {
-                // Must validate container names to exclude garbage
-                String project = f.getPath().getParent().getParent().getName();
-                String container = f.getPath().getParent().getName();
-                String location = f.getPath().getName();
-                // Build final object definition
-                StringBuilder sb = new StringBuilder();
-                sb.append("{").append("\"prj\":\"").append(project).append("\",\"src\":\"").append(container).append("\",\"cat\":\"").append(location).append("\"}");
-
-                list.add(sb.toString());
-            }
-        }
-        return list;
-    }
-
-    public ArrayList<String> getListOfObjects(String rqProject, String rqContainer, String rqLocation) throws Exception {
-        StringBuilder strPath = new StringBuilder(dlRoot + Path.SEPARATOR);
-        if (rqProject != null) {
-            strPath.append(rqProject ).append(Path.SEPARATOR_CHAR);
-        } else {
-            strPath.append("*").append(Path.SEPARATOR_CHAR);
-        }
-        if (rqContainer != null) {
-            strPath.append(rqContainer).append(Path.SEPARATOR_CHAR);
-        } else {
-            strPath.append("*").append(Path.SEPARATOR_CHAR);
-        }
-        if (rqLocation != null) {
-            strPath.append(rqLocation).append(Path.SEPARATOR_CHAR);
-        } else {
-            strPath.append("*").append(Path.SEPARATOR_CHAR);
-        }
-        strPath.append("*").append(Path.SEPARATOR_CHAR).append(".bda_meta");
-
-        ArrayList<String> list = new ArrayList<>();
-        Path p = new Path(strPath.toString());
-
-        FileStatus[] plist = fs.globStatus(p);
-        for (FileStatus f : plist) {
-
-            String object = f.getPath().getParent().getName();
-            String location = f.getPath().getParent().getParent().getName();
-            String container = f.getPath().getParent().getParent().getParent().getName();
-            String project = f.getPath().getParent().getParent().getParent().getParent().getName();
-
-            //Path meta = new Path(f.getPath() + Path.SEPARATOR + ".bda_meta");
-            byte[] content = new byte[(int)f.getLen()];
-            FSDataInputStream file = fs.open(f.getPath());
-            file.readFully(0, content);
-            file.close();
-
-            // Build final object definition
-            StringBuilder sb = new StringBuilder();
-            sb.append("{")
-                    .append("\"prj\":\"")
-                    .append(project)
-                    .append("\",\"obj\":")
-                    .append('"')
-                    .append(object)
-                    .append('"')
-                    .append(",\"cat\":")
-                    .append('"')
-                    .append(location)
-                    .append('"')
-                    .append(",\"src\":")
-                    .append('"')
-                    .append(container)
-                    .append('"')
-                    .append(",\"meta\":")
-                    .append(new String(content))
-                    .append("}");
-
-            list.add(sb.toString());
-        }
-
-        // Simulate OOM
-        //long[][] ary = new long[Integer.MAX_VALUE][Integer.MAX_VALUE];
-        return list;
-    }
-
     public void createDataSet(String project, String source, String catalog, String setName) throws Exception {
         // Have to check if project Exists
         Path projectPath = new Path(dlRoot + Path.SEPARATOR + project);
@@ -411,6 +283,8 @@ public class DLMetadata extends MetadataBase {
             Path rawPath = new Path(projectPath + Path.SEPARATOR +  PREDEF_RAW_DIR);
             fs.mkdirs(rawPath);
         }
+        //TODO:: Add creating project record in metastore, table Glob
+
     }
 
     public void deleteDataSet(String project, String source, String catalog, String setName) throws Exception {

@@ -71,6 +71,8 @@ public interface DocumentConverter {
                         doc.set(k, jp.getAsString());
                     else if (jp.isNumber()) {
                         Number jn = jp.getAsNumber();
+                        logger.debug("Process JSON number: " + jn.intValue());
+
                         if (jn.doubleValue() != jn.intValue())
                             doc.set(k, jn.doubleValue());
                         else

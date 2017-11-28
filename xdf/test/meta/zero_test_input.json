@@ -3,7 +3,7 @@
   "output" : "hdfs:///var/bda/xdf-srux/zero-cr-tc220.json",
 	"xdf-root" : "hdfs:///data/bda",
 	"category" : "DataSet",
-	"id" : "xda-ux-sr-comp-dev::A_user::zeroin",
+	"id" : "xda-ng-test-prj::zeroin",
 	
 	"source" : {
 
@@ -18,14 +18,14 @@
 			
 			"system" : { 
 			
+			  "physicalLocation":"hdfs:///data/bda/datalake/xda-ng-test-prj/dl/fs/dinp/zeroin/data",
 				"name" : "zeroin", 
 				"type" : "fs", 
-				"project" : "xda-ux-sr-comp-dev",
+				"project" : "xda-ng-test-prj",
 				"catalog" : "dinp", 
 				"format"  : "parquet", 
 				"mode"    : "replace", 
 				"numberOfFiles" : 2 
-				
 			}, 
 	   
 			"transformations" : [ "zero::test::2"]

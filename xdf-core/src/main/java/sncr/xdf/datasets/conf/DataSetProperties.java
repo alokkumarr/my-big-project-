@@ -33,6 +33,7 @@ public enum DataSetProperties {
     Status ("status"),
     Project ( "project"),
     BatchID ("batchID"),
+    User("user"),
     System("system");
 
     private final String intName;

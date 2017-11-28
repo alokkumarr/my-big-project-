@@ -6,6 +6,7 @@ import akka.http.javadsl.model.StatusCodes;
 import akka.http.javadsl.server.Route;
 import akka.http.javadsl.server.directives.FileInfo;
 import com.typesafe.config.Config;
+import sncr.xdf.rest.messages.dl.Document;
 import sncr.xdf.services.DLMetadata;
 import sncr.xdf.services.MetadataBase;
 import sncr.xdf.rest.actors.MainDataLakeCoordinator;
@@ -14,6 +15,8 @@ import sncr.xdf.rest.messages.dl.Create;
 import sncr.xdf.rest.messages.dl.Delete;
 import sncr.xdf.rest.messages.dl.ListOf;
 
+
+import java.util.Map;
 
 import static akka.http.javadsl.server.PathMatchers.segment;
 import static sncr.xdf.rest.AskHelper.ask;
@@ -85,18 +88,18 @@ public class DataLakeService extends Service {
                                             // List of catalogs
                                             getListOf(MetadataBase.DS_DL_CATALOGS, project, parameters.get("src"), null)
                                         ),
-                                        path(MetadataBase.DS_DL_SETS, () ->
+                                        path(MetadataBase.DS_DL_OBS_SETS, () ->
                                             // List of data sets
                                             getListOf(MetadataBase.DS_DL_SETS, project, parameters.get("src"), parameters.get("cat"))
                                         ),
 //TODO:: path is prefixed with DL although we work with metadata
-                                        path(MetadataBase.DS_MD_CATEGORY, () ->
+                                        path(MetadataBase.DS_DL_SETS, () ->
                                             // List of datasets from MD store by project and category
-                                            getMDListOf(MetadataBase.DS_MD_CATEGORY, project, parameters.get("category"), null)
+                                            getMDListOf(MetadataBase.DS_DL_SETS, project, parameters)
                                         ),
-                                        path(MetadataBase.DS_MD_SUBCATEGORY, () ->
+                                        path(MetadataBase.DS_DL_SET, () ->
                                             // List of datasets from MD store by project, category and subcategory
-                                            getMDListOf(MetadataBase.DS_MD_SUBCATEGORY, project, parameters.get("category"), parameters.get("scategory"))
+                                            getMDDataSet(MetadataBase.DS_DL_SET, project, parameters)
                                         ),
 // end of MD services
                                         path(MetadataBase.PREDEF_RAW_DIR, () ->
@@ -165,8 +168,6 @@ public class DataLakeService extends Service {
         );
     }
 
-
-
     private Route delete(String what, String project, String source, String catalog, String set){
         String retval;
         try {
@@ -208,11 +209,14 @@ public class DataLakeService extends Service {
         return complete(retval);
     }
 
-    private Route getMDListOf(String whatfromMD, String project, String category, String scategory) {
+    private Route getMDListOf(String whatfromMD, String project, Map<String, String> parameters) {
         String retval;
         try {
             ActorSelection dlc = system.actorSelection(FULL_ACTOR_NAME);
-            ListOf r = new ListOf(whatfromMD, project, null, null, category, scategory, null);
+            ListOf r = new ListOf(whatfromMD, project,  parameters.get("src"),
+                                                        parameters.get("cat"),
+                                                        parameters.get("category"),
+                                                        parameters.get("scategory"), null);
             ListOf result = ask(r, dlc, 3000L);
             retval = result.toJson();
         } catch(Exception e){
@@ -221,6 +225,21 @@ public class DataLakeService extends Service {
         }
         return complete(retval);
     }
+
+    private Route getMDDataSet(String whatfromMD, String project, Map<String, String> parameters) {
+        String retval;
+        try {
+            ActorSelection dlc = system.actorSelection(FULL_ACTOR_NAME);
+            Document r = new Document(whatfromMD, project, parameters);
+            Document result = ask(r, dlc, 3000L);
+            retval = result.mdEntity;
+        } catch(Exception e){
+            log.error(e.getMessage());
+            return complete(StatusCodes.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+        return complete(retval);
+    }
+
 
     private Route uploadRawFile(String project, FileInfo info, String absolutePath, String directory){
         String retval;

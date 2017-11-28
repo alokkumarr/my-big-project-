@@ -8,6 +8,7 @@ import sncr.xdf.rest.AskHelper;
 import sncr.xdf.rest.messages.StatusUpdate;
 import sncr.xdf.rest.messages.dl.Create;
 import sncr.xdf.rest.messages.dl.Delete;
+import sncr.xdf.rest.messages.dl.Document;
 import sncr.xdf.rest.messages.dl.ListOf;
 
 import java.util.ArrayList;
@@ -64,6 +65,31 @@ public class MainDataLakeCoordinator extends MainJVMCoordinator {
                 }
 
                 getSender().tell(s, getSelf());
+            })
+            .match(Document.class, r -> {
+                //TODO: make more generic
+                Document d;
+                ActorRef a = getExecutor();
+                log.debug("Get message to process: {}", r.toString() );
+                if(a != null) {
+                    try {
+                        d = AskHelper.ask(r, getExecutor(), 3000L);
+                        getSender().tell(d, getSelf());
+                    } catch (Exception e) {
+                        log.error(e.getMessage());
+                        List<String> lst = new ArrayList<>();
+                        lst.add("{\"error\":\"Data Lake Service is not ready\"}");
+                        d = new Document(r.jsMDEntityType, r.project, r.mdEntity);
+                    }
+                } else {
+                    // Do nothing
+                    log.info("Not ready for request processing");
+                    List<String> lst = new ArrayList<>();
+                    lst.add("{\"error\":\"Data Lake Service is not ready\"}");
+                    d = new Document(r.jsMDEntityType, r.project, r.mdEntity);
+                }
+
+                getSender().tell(d, getSelf());
             })
             .match(Create.class, r -> {
                 //TODO: make more generic
