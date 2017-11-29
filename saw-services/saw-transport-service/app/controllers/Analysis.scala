@@ -26,7 +26,6 @@ import com.synchronoss.BuilderUtil
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 
-import collection.JavaConverters._
 import executor.ReportExecutorQueue
 import sncr.metadata.engine.{Fields, MetadataDictionary}
 
@@ -154,11 +153,10 @@ class Analysis extends BaseController {
           case keys: JObject => keys
           case obj => throw new ClientException("Expected object, got: " + obj)
         }
-        val userIdJson: JObject = ("userId", ticket.get.userId.toString)
         m_log.debug("search key"+keys);
         val categoryId = extractKey(json, "categoryId")
         if (TransportUtils.checkIfPrivateAnalysis(ticket.get.product,categoryId) && !ticket.get.roleType.equalsIgnoreCase("Admin"))
-        json merge contentsAnalyze(searchAnalysisJson(keys.merge(userIdJson)))
+          json merge contentsAnalyze(searchAnalysisJson(keys),ticket.get.userId.toString)
         else
           json merge contentsAnalyze(searchAnalysisJson(keys))
       }
@@ -311,6 +309,16 @@ class Analysis extends BaseController {
 
   private def contentsAnalyze(analyses: List[JObject]): JObject = {
     ("contents", ("analyze", JArray(analyses)))
+  }
+
+  /**
+    * Return the list of analysis created in my analysis category by requested user.
+    * @param analyses
+    * @param userId
+    * @return
+    */
+  private def contentsAnalyze(analyses: List[JObject], userId: String): JObject = {
+    ("contents", ("analyze", JArray(analyses.filter(_.values.get("userId").get==userId.toInt))))
   }
 
   var result: String = null
