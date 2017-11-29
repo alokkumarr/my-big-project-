@@ -170,12 +170,12 @@ export class JwtService {
     case 'FORK':
       return this._isSet(code, PRIVILEGE_INDEX.FORK);
     case 'EDIT':
-      return this._isSet(code, PRIVILEGE_INDEX.EDIT) &&
+      return this._isSet(code, PRIVILEGE_INDEX.EDIT) ||
         (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
     case 'EXPORT':
       return this._isSet(code, PRIVILEGE_INDEX.EXPORT);
     case 'DELETE':
-      return this._isSet(code, PRIVILEGE_INDEX.DELETE) &&
+      return this._isSet(code, PRIVILEGE_INDEX.DELETE) ||
         (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
     default:
       return false;
