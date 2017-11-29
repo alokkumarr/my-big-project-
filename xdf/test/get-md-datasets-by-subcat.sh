@@ -6,6 +6,6 @@ source ${TEST_DIR}/host.sh
 
 
 # List all in specified data set (for review)
-curl -XGET -H "Content-Type: application/text" "$HOST/dl/subcategory?prj=$1&category=$2&scategory=$3"
+curl -XGET -H "Content-Type: application/text" "$HOST/dl/sets?prj=$1&category=$2&scategory=$3"
 echo
 

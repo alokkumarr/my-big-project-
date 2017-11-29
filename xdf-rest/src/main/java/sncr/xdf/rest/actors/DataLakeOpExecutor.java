@@ -9,6 +9,7 @@ import akka.cluster.ClusterEvent;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 import sncr.xdf.metastore.DSStore;
+import sncr.xdf.rest.messages.dl.Document;
 import sncr.xdf.services.DLMetadata;
 import sncr.xdf.services.MetadataBase;
 import sncr.xdf.rest.messages.CleanRequest;
@@ -66,6 +67,8 @@ public class DataLakeOpExecutor extends AbstractActor{
                 log.info("DataLakeOpExecutor[{}] initialized - waiting for tasks...", this.executorNo);
             }).match(ListOf.class, r -> {
                 processListRequest(getSender(), r);
+            }).match(Document.class, r -> {
+               processReadRequest(getSender(), r);
             }).match(Create.class, r -> {
                 processCreateRequest(getSender(), r);
             }).match(Delete.class, r -> {
@@ -159,7 +162,7 @@ public class DataLakeOpExecutor extends AbstractActor{
                     l = new ListOf(r.listOf, r.project, r.dataSource, r.catalog, null, null, list);
                     break;
                 }
-                case MetadataBase.DS_DL_SETS: {
+                case MetadataBase.DS_DL_OBS_SETS: {
                     List<String> list = mdt.getListOfSets(r.project, r.dataSource, r.catalog);
                     l = new ListOf(r.listOf, r.project, r.dataSource, r.catalog, null, null, list);
                     break;
@@ -170,14 +173,9 @@ public class DataLakeOpExecutor extends AbstractActor{
                     break;
                 }
 //Working with MD
-                case MetadataBase.DS_MD_CATEGORY: {
-                    List<String> list = mdstore.getListOfDSByCategory(r.project, r.category);
-                    l = new ListOf(r.listOf, r.project, null, null, r.category, null, list);
-                    break;
-                }
-                case MetadataBase.DS_MD_SUBCATEGORY: {
-                    List<String> list = mdstore.getListOfDSBySubCategory(r.project,  r.category, r.subCategory);
-                    l = new ListOf(r.listOf, r.project, null, null, r.category, r.subCategory, list);
+                case MetadataBase.DS_DL_SETS: {
+                    List<String> list = mdstore.getListOfDS(r);
+                    l = new ListOf(r.listOf, r.project, r.dataSource, r.catalog, r.category, r.subCategory, list);
                     break;
                 }
             }
@@ -187,6 +185,27 @@ public class DataLakeOpExecutor extends AbstractActor{
         log.debug("Result message: " + l.toString());
         sender.tell(l, getSelf());
     }
+
+    private void processReadRequest(ActorRef sender, Document r) {
+        Document documentOf = null;
+        log.debug("Received message: {}, ", r.toString());
+        try {
+            switch (r.jsMDEntityType) {
+                case MetadataBase.DS_DL_SET: {
+                    String doc = mdstore.readDataSet(r);
+                    documentOf = new Document(r.jsMDEntityType, r.project, doc );
+                    break;
+                }
+            }
+        } catch (Exception e){
+            log.error(e.getMessage());
+        }
+        log.debug("Result message: " + documentOf.toString());
+
+        //TODO:: Test AKKA actors for halt-state, use null in first parameter
+        sender.tell(documentOf, getSelf());
+    }
+
 
     private void processMoveToRawRequest(ActorRef sender, Create r){
         // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

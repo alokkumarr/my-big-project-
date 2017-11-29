@@ -3,11 +3,11 @@ package sncr.xdf.metastore;
 import com.google.gson.*;
 import com.mapr.db.MapRDB;
 import org.ojai.Document;
-import org.ojai.FieldPath;
 import org.ojai.store.QueryCondition;
 import sncr.xdf.base.MetadataStore;
 import sncr.xdf.base.WithSearchInMetastore;
 import sncr.xdf.core.file.HFileOperations;
+import sncr.xdf.rest.messages.dl.ListOf;
 
 import java.io.FileNotFoundException;
 import java.util.*;
@@ -117,72 +117,53 @@ public class DSStore extends MetadataStore implements WithSearchInMetastore {
      * The method queries Data Set Meta store to get all datasets as List of serialized JSON by
      * - project AND
      * - category
-     * @param project - project to search for;
-     * @param category - search criteria: "userData.category"
+     * @param r  - project to search for;
      * @return  - List of serialized JSON documents
      * @throws Exception
      */
-    public List<String> getListOfDSByCategory(String project, String category) throws Exception {
-        if (project == null) {
-            throw new Exception("Project is not specified");
+    public List<String> getListOfDS(ListOf r) throws Exception {
+        if (r.project.isEmpty()) {
+            throw new Exception("Project is empty");
         }
-        if (category == null) {
-            throw new Exception("Category is not specified");
-        }
-        QueryCondition cond = buildQCforProjectAndCategory(project, category);
+        QueryCondition cond = MapRDB.newCondition();
+        cond.and();
+        cond.is("system.project", QueryCondition.Op.EQUAL, r.project);
+        if ( r.category != null && !r.category.isEmpty()) cond = addEqOrLikeClause(cond, "userData.category", r.category);
+
+        if ( r.subCategory != null && !r.subCategory.isEmpty()
+             && r.category != null && !r.category.isEmpty())
+            cond = addEqOrLikeClause(cond, "userData.subCategory", r.subCategory);
+
+        if ( r.catalog != null && !r.catalog.isEmpty()) cond = addEqOrLikeClause(cond, "system.catalog", r.catalog);
+        if ( r.dataSource != null && !r.dataSource.isEmpty()) cond = addEqOrLikeClause(cond, "userData.type", r.dataSource);
+
         cond.close();
         cond.build();
         return convertToString(searchAsList(table, cond));
     }
 
-
-    /**
-     * The method queries Data Set Meta store to get all datasets as List of serialized JSON by
-     * - project AND
-     * - category AND
-     * - subcategory
-     * Category and sub-category can be search with 'like' conditions, e.g.: 'myCategoryOf%'
-     * @param project  - project to search for;
-     * @param category  - search criteria: "userData.category"
-     * @param subCategory - search criteria: "userData.subCategory"
-     * @return - List of serialized JSON documents
-     * @throws Exception
-     */
-    public List<String> getListOfDSBySubCategory(String project, String category, String subCategory) throws Exception {
-        if (project == null) {
-            throw new Exception("Project is not specified");
+    public String readDataSet(sncr.xdf.rest.messages.dl.Document r) throws Exception {
+        if (r == null || r.project.isEmpty() || r.name == null || r.name.isEmpty()) {
+            throw new Exception("Search parameters are not correct: either project or name are null or empty.");
         }
-        if (category == null) {
-            throw new Exception("Category is not specified");
-        }
-        if (subCategory == null) {
-            throw new Exception("Sub-category is not specified");
-        }
-        QueryCondition cond = buildQCforProjectAndCategory(project, category);
-        if (subCategory.indexOf('%') >= 0)
-            cond.like("userData.subCategory", subCategory);
-        else
-            cond.is("userData.subCategory", QueryCondition.Op.EQUAL, subCategory);
-        cond.close();
-        cond.build();
-        return convertToString(searchAsList(table, cond));
+        Document res = table.findById(r.project + delimiter + r.name);
+        return res.asJsonString();
     }
 
     /**
      * Convenient method to start building query conditions
      * It assumes AND conjunction.
-     * @param project - first query parameter
-     * @param category - second query parameter
+     * @param cond - QueryCondition in the building
+     * @param key  - Key to search
+     * @param value - search value
      * @return - pre-build QC
      */
-    private QueryCondition buildQCforProjectAndCategory(String project, String category){
-        QueryCondition cond = MapRDB.newCondition();
-        cond.and();
-        cond.is("system.project", QueryCondition.Op.EQUAL, project);
-        if (category.indexOf('%') >= 0)
-            cond.like("userData.category", category);
+    private QueryCondition addEqOrLikeClause(QueryCondition cond, String key, String value){
+
+        if (value.indexOf('%') >= 0)
+            cond.like(key, value);
         else
-            cond.is("userData.category", QueryCondition.Op.EQUAL, category);
+            cond.is(key, QueryCondition.Op.EQUAL, value);
         return cond;
     }
 

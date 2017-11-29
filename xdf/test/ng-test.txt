@@ -1,0 +1,83 @@
+GET $URL/admin/root
+GET $URL/dl/projects
+
+
+Big TC in Project env:
+
+1. Create PRJ
+POST "$URL/dl/create/project?prj=$PROJECT"
+
+2. Create catalog in Raw area
+POST "$URL/dl/create/raw?prj=$PROJECT&cat=NGCAT"
+
+3. File upload
+3.1 POST -F file=@<CSV-FILE> $URL/dl/upload/raw?prj=$PROJECT             # upload to root cat
+3.2 POST -F file=@<CSV-FILE> $URL/dl/upload/raw?prj=$PROJECT&cat=SOMECAT # upload to SOMECAT cat
+
+4. List of files in Raw area / catalog
+4.1 GET $URL/dl/raw?prj=$PROJECT						  # get files in root
+4.2 GET $URL/dl/raw?prj=$PROJECT&cat=SOMECAT 	# get files in /SOMECAT
+
+5. To get project meta-info: 
+GET "$URL/dl/sets?prj=$PROJECT" + project attributes
+5.1 -	Catalog (cat)
+	GET $URL/dl/sets?prj=$PROJECT&cat=$CATALOG
+5.2 -	Data Source type (src)
+	GET $URL/dl/sets?prj=$PROJECT&src=$SOURCE_TYPE
+5.3 -	Category (category)
+	GET $URL/dl/sets?prj=$PROJECT&category=$CATGORY
+5.4 -	Sub-category (scategory)
+	GET $URL/dl/sets?prj=$PROJECT&scategory=$SCATGORY
+
+
+6. Run inspector
+POST -d  @$inspector_jconf $URL/run?prj=$PROJECT&component=csvInspector&batch=$BATCH
+
+
+7. Run component
+-	Run:
+#POST -d  @$zero_jconf    $URL/run?prj=$PROJECT&component=zero&batch=$BATCH
+POST -d  @$parser_jconf  $URL/run?prj=$PROJECT&component=parser&batch=$BATCH"
+#--> DS created
+POST -d  @$sql_jconf     $URL/run?prj=$PROJECT&component=s&batch=$BATCH
+#--> DS created
+
+COMPONENT::= zero | parser | sql | ...
+
+#==> id: to be tested in Check status
+
+8. Check task status:
+GET $URL/run/status?id=$ID
+# while status: inprogress
+
+
+9. Get single data set from MetaStore /Check dataset name
+GET $URL/dl/set?prj=$PROJECT&name=$DATASET_NAME
+
+
+10. Delete dataset 
+DELETE $URL/dl/drop/set?prj=$PROJECT&set=$DATASET_NAME
+
+
+11. Delete project 
+DELETE $URL/admin/delete/project?prj=$PROJECT
+
+X. Run preview (synch call) 
+TBD: POST -d @./inspector.jconf -o ./inspector-results.json $URL/preview/raw/inspect?prj=$PROJECT
+
+X. Admin interface:
+GET $URL/admin/shutdown
+GET "$URL/dl/crash?prj=whatever"
+
+
+###################################
+
+Create DataSet:
+POST -d @bda_meta.json "$URL/dl/create/set?prj=$PROJECT&set=$2" -- not to be used
+
+Get Data Lake info:
+GET "$URL/dl/sources?prj=$PROJECT"   -- not used anymore
+GET $URL/dl/catalogs?prj=$PROJECT   -- not used anymore
+GET "$URL/dl/catalogs?prj=$PROJECT&src=fs"  -- not used anymore
+GET "$URL/dl/category?prj=$PROJECT&category=$2" -- not used anymore
+GET "$URL/dl/subcategory?prj=$PROJECT&category=$2&scategory=$3" -- not used anymore

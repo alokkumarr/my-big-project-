@@ -22,7 +22,7 @@ curl -XPOST -H "Content-Type: application/json" -d "@$conf" "http://$IP:$PORT/ru
 
 echo
 
-curl -XGET http://$IP:$PORT/status
+curl -XGET http://$IP:$PORT/run/status
 
 echo
 

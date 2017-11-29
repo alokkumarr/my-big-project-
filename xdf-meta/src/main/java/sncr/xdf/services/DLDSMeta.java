@@ -24,6 +24,8 @@ import java.util.Map;
 
 import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_COMMENTS;
 import static sncr.xdf.base.MetadataStore.delimiter;
+import static sncr.xdf.services.MetadataBase.DEFAULT_CATALOG;
+import static sncr.xdf.services.MetadataBase.DEFAULT_DATA_SOURCE;
 
 /**
  * The class provides
@@ -198,12 +200,18 @@ public class DLDSMeta{
     private JsonElement createDSDescriptor(String id, Context ctx, Map<String, String> o, Metadata metadata){
         JsonObject dl = new JsonObject();
 
+        String ds_type = o.containsKey(DataSetProperties.Type.name())?o.get(DataSetProperties.Type.name()): DEFAULT_DATA_SOURCE ;
+        String catalog = o.containsKey(DataSetProperties.Catalog.name())?o.get(DataSetProperties.Catalog.name()): DEFAULT_CATALOG;
+
+        dl.add(DataSetProperties.User.toString(), new JsonPrimitive(ctx.user));
         dl.add(DataSetProperties.Project.toString(), new JsonPrimitive(ctx.applicationID));
-        dl.add(DataSetProperties.Type.toString(), new JsonPrimitive(o.get(DataSetProperties.Type.name())));
+        dl.add(DataSetProperties.Type.toString(), new JsonPrimitive(ds_type));
         dl.add(DataSetProperties.Format.toString(), new JsonPrimitive(o.get(DataSetProperties.Format.name())));
+        dl.add(DataSetProperties.Name.toString(), new JsonPrimitive(o.get(DataSetProperties.Name.name())));
         dl.add(DataSetProperties.PhysicalLocation.toString(), new JsonPrimitive(o.get(DataSetProperties.PhysicalLocation.name())));
-        dl.add(DataSetProperties.Catalog.toString(), new JsonPrimitive(o.get(DataSetProperties.Catalog.name())));
+        dl.add(DataSetProperties.Catalog.toString(), new JsonPrimitive( catalog ));
         dl.add(DataSetProperties.NumberOfFiles.toString(), new JsonPrimitive(o.get(DataSetProperties.NumberOfFiles.name())));
+
         JsonObject userdata = new JsonObject();
         if ( metadata != null) {
 
@@ -243,9 +251,7 @@ public class DLDSMeta{
      */
     private String generateDSID(Context ctx, Map<String, String> o) {
         StringBuilder sb = new StringBuilder(ctx.applicationID);
-        sb
-        .append(delimiter).append(ctx.user)
-        .append(delimiter).append(o.get(DataSetProperties.Name.name()));
+        sb.append(delimiter).append(o.get(DataSetProperties.Name.name()));
         logger.debug(String.format("Generated ID for dataset %s: %s ",o.get(DataSetProperties.Name.name()), sb.toString()));
         return sb.toString();
     }

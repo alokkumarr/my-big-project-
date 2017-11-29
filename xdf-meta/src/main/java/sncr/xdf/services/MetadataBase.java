@@ -17,6 +17,8 @@ public abstract class MetadataBase {
     public static final String DS_DL_SOURCES = "sources";
     public static final String DS_DL_CATALOGS = "catalogs";
     public static final String DS_DL_SETS = "sets";
+    public static final String DS_DL_SET  = "set";
+    public static final String DS_DL_OBS_SETS = "_obs_sets";
 
     public static final String DS_MD_CATEGORY = "category";
     public static final String DS_MD_SUBCATEGORY = "subcategory";

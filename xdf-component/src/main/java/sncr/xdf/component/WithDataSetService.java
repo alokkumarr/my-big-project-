@@ -73,8 +73,11 @@ public interface WithDataSetService {
 
         StringBuilder sb = new StringBuilder(aux.md.getRoot());
         sb.append(prj + Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR)
-                .append(Path.SEPARATOR + ds)
-                .append(Path.SEPARATOR + in.getCatalog())
+                .append(Path.SEPARATOR + ds);
+
+        if (in.getCatalog() != null && !in.getCatalog().isEmpty())
+                sb.append(Path.SEPARATOR + in.getCatalog());
+                sb
                 .append(Path.SEPARATOR + in.getDataSet())
                 .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
         DataSetServiceAux.logger.debug(String.format("Resolve object %s in location: %s", in.getDataSet(), sb.toString()));
@@ -88,7 +91,8 @@ public interface WithDataSetService {
             Map<String, String> res = new HashMap();
             res.put(DataSetProperties.PhysicalLocation.name(), sb.toString());
             res.put(DataSetProperties.Name.name(), in.getDataSet());
-            res.put(DataSetProperties.Catalog.name(), in.getCatalog());
+            if (in.getCatalog() != null && !in.getCatalog().isEmpty())
+                res.put(DataSetProperties.Catalog.name(), in.getCatalog());
             res.put(DataSetProperties.Type.name(), ds);
             //TODO:: Get actual format reading data descriptor
             res.put(DataSetProperties.Format.name(), in.getFormat().name());
