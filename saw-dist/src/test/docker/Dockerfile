@@ -35,6 +35,8 @@ RUN yum -y -q --nogpgcheck install java-1.8.0-openjdk-headless MySQL-python
 
 # Configure MapR client
 COPY mapr-configure /root/
+# Set execute bit for Windows users
+RUN chmod a+x /root/mapr-configure
 RUN /root/mapr-configure
 
 # Tunneling for MapR client: enable if connecting to a MapR cluster in
