@@ -201,6 +201,9 @@ module.exports = {
     applyBtn: element(by.css('button[e2e="apply-filter-btn"]')),
     getAppliedFilter
   },
+  detail: {
+    getAnalysisChartType
+  },
   main: {
     categoryTitle: element((by.css('span[e2e="category-title"]'))),
     getAnalysisCard: getCard,
