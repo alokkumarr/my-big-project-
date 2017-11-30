@@ -20,17 +20,18 @@ const firstCardTitle = element.all(by.css('a[e2e="analysis-name"]')).first();
  * example: for pivot analysis it returns pivot
  *          for column chart analysis it returns chart:column
  */
-const getCardType = name => getCard(name)
+const getCardTypeByName = name => getCard(name)
   .element(by.css('[e2e*="analysis-type:"]'))
   .getAttribute('e2e')
-  .then(e2e => {
-    if (e2e) {
-      const [, type, chartType] = e2e.split(':');
+  .then(e2eAttribute => {
+    if (e2eAttribute) {
+      const [, type, chartType] = e2eAttribute.split(':');
       return `${type}${cartType ? `:${chartType}` : ''}`;
     }
-    return e2e;
+    return e2eAttribute;
   });
 
+//Can be used in design mode
 const getAnalysisChartType = () => element(by.css('[e2e*="chart-type:'))
   .getAttribute('e2e')
   .then(e2e => {
@@ -213,7 +214,7 @@ module.exports = {
     getForkBtn,
     getAnalysisOption,
     firstCardTitle,
-    getCardType
+    getCardType: getCardTypeByName
   },
   saveDialog: {
     selectedCategory: element(by.xpath('//md-select[@e2e="save-dialog-selected-category"]/*/span[1]')),
