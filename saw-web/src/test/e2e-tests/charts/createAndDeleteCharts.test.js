@@ -9,22 +9,35 @@ const homePage = require('../../javascript/pages/homePage.po');
 const executedAnalysisPage = require('../../javascript/pages/common/executedAlaysis.po');
 const using = require('jasmine-data-provider');
 
-describe('create Column Chart type analysis', () => {
+describe('create and delete charts', () => {
   const defaultCategory = 'AT Privileges Category DO NOT TOUCH';
   const categoryName = 'AT Analysis Category DO NOT TOUCH';
   const subCategoryName = 'AT Creating Analysis DO NOT TOUCH';
   const chartDesigner = analyze.designerDialog.chart;
-  const chartName = `e2e column chart ${(new Date()).toString()}`;
+  const chartName = `e2e chart ${(new Date()).toString()}`;
   const chartDescription = 'e2e test chart description';
   const xAxisName = 'Source Manufacturer';
   const yAxisName = 'Available MB';
+  const yAxisName2 = 'Available Items';
   const groupName = 'Source OS';
   const metric = 'MCT TMO Session ES';
-  const method = 'chart:column';
 
-  const userDataProvider = {
-    'admin': {handle: 'admin'},
-    'user': {handle: 'userOne'}
+  const dataProvider = {
+    'Column Chart by admin': {user: 'admin', chartType: 'chart:column'},
+    'Column Chart by user': {user: 'userOne', chartType: 'chart:column'},
+    'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'},
+    'Bar Chart by user': {user: 'userOne', chartType: 'chart:bar'},
+    'Stacked Chart by admin': {user: 'admin', chartType: 'chart:stack'},
+    'Stacked Chart by user': {user: 'userOne', chartType: 'chart:stack'},
+    'Line Chart by admin': {user: 'admin', chartType: 'chart:line'},
+    'Line Chart by user': {user: 'userOne', chartType: 'chart:line'},
+    'Area Chart by admin': {user: 'admin', chartType: 'chart:area'},
+    'Area Chart by user': {user: 'userOne', chartType: 'chart:area'},
+    'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'},
+    'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'},
+    'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'},
+    'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'}
+    //TODO add Bubble Chart
   };
 
   afterAll(function () {
@@ -32,10 +45,10 @@ describe('create Column Chart type analysis', () => {
     browser.executeScript('window.localStorage.clear();');
   });
 
-  using(userDataProvider, function (data, description) {
-    it('should create column chart by ' + description, () => {
+  using(dataProvider, function (data, description) {
+    it('should create ' + description, () => {
       expect(browser.getCurrentUrl()).toContain('/login');
-      login.loginAs(data.handle);
+      login.loginAs(data.user);
 
       //Collapse default category
       homePage.expandedCategory(defaultCategory).click();
@@ -43,24 +56,27 @@ describe('create Column Chart type analysis', () => {
       //Navigate to Category/Sub-category
       const collapsedCategory = homePage.collapsedCategory(categoryName);
       const subCategory = homePage.subCategory(subCategoryName);
-      commonFunctions.waitFor.elementToBeClickable(collapsedCategory);
-      collapsedCategory.click();
-      commonFunctions.waitFor.elementToBeClickable(subCategory);
-      subCategory.click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(collapsedCategory);
+      commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
 
       //Create analysis
       analyze.analysisElems.addAnalysisBtn.click();
       const newDialog = analyze.newDialog;
       newDialog.getMetric(metric).click();
-      newDialog.getMethod(method).click();
+      newDialog.getMethod(data.chartType).click();
       newDialog.createBtn.click();
 
       //Select fields
       const y = chartDesigner.getYCheckBox(yAxisName);
       chartDesigner.getXRadio(xAxisName).click();
-      commonFunctions.waitFor.elementToBeClickable(y);
-      y.click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(y);
       chartDesigner.getGroupRadio(groupName).click();
+
+      //If Combo then add one more field
+      if(data.chartType === 'chart:combo') {
+        const y2 = chartDesigner.getYCheckBox(yAxisName2);
+        commonFunctions.waitFor.elementToBeClickableAndClick(y2);
+      }
 
       //Refresh
       chartDesigner.refreshBtn.click();
@@ -68,8 +84,7 @@ describe('create Column Chart type analysis', () => {
       //Save
       const save = analyze.saveDialog;
       const designer = analyze.designerDialog;
-      commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
-      designer.saveBtn.click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(designer.saveBtn);
 
       commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
       save.nameInput.clear().sendKeys(chartName);
@@ -79,29 +94,29 @@ describe('create Column Chart type analysis', () => {
 
       //Navigate to saved chart and check type
       homePage.savedAnalysis(chartName).click();
-      const columnChartType = executedAnalysisPage.chartTypes.column;
+
+      //TODO add check for bar chart after https://jira.synchronoss.net:8443/jira/browse/SAW-1783 done
+      /*const columnChartType = executedAnalysisPage.chartTypes.column;
       commonFunctions.waitFor.elementToBePresent(columnChartType)
-        .then(() => expect(columnChartType.isPresent()).toBe(true));
+        .then(() => expect(columnChartType.isPresent()).toBe(true));*/
 
       //Navigate back
       executedAnalysisPage.backButton.click();
 
       //Change to Card View
-      commonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
-      analyze.analysisElems.cardView.click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(analyze.analysisElems.cardView);
 
       //Verify if created appeared in list
       commonFunctions.waitFor.elementToBePresent(createdAnalysis)
         .then(() => expect(createdAnalysis.isPresent()).toBe(true));
     });
 
-    it('delete the created column chart as ' + description, () => {
+    it('should delete ' + description, () => {
       const main = analyze.main;
       const cards = main.getAnalysisCards(chartName);
       cards.count().then(count => {
         main.doAnalysisAction(chartName, 'delete');
-        commonFunctions.waitFor.elementToBeClickable(main.confirmDeleteBtn);
-        main.confirmDeleteBtn.click();
+        commonFunctions.waitFor.elementToBeClickableAndClick(main.confirmDeleteBtn);
 
         commonFunctions.waitFor.cardsCountToUpdate(cards, count);
 
@@ -110,7 +125,7 @@ describe('create Column Chart type analysis', () => {
       });
     });
 
-    it('log out ' + description, () => {
+    it('log out ' + data.user, () => {
       analyze.main.doAccountAction('logout');
     });
   });
