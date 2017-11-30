@@ -1,0 +1,32 @@
+@import "themes/base/colors";
+
+old-designer-settings {
+  .settings__container {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background-color: white;
+
+    .settings__list-item__checkbox {
+      margin-right: 10px;
+    }
+
+    .settings__list-item {
+      .settings__list-item__name {
+        // display: block;
+        max-width: 250px;
+        white-space: nowrap;
+        overflow: hidden;
+        font-weight: 600;
+        text-overflow: ellipsis;
+        color: $primary-grey-g4;
+      }
+
+      .settings__list-item__icon {
+        margin-left: 10px;
+        padding-top: 5px;
+        color: $primary-grey-g3;
+      }
+    }
+  }
+}

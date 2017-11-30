@@ -15,6 +15,8 @@ export type ArtifactColumnFilter = {
   type: '' | 'number' | 'date' | 'string';
 };
 
+export type PivotArea = 'data' | 'row' | 'column';
+
 export interface IDEsignerSettingGroupAdapter {
   title: string;
   marker: string;

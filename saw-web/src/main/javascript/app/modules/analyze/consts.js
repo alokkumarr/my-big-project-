@@ -170,3 +170,50 @@ export const CHART_TYPES_OBJ = fpPipe(
   fpGroupBy('type'),
   fpMapValues(v => v[0])
 )(ANALYSIS_METHODS[1].children);
+
+export const AREA_TYPES = [{
+  label: 'Row',
+  value: 'row',
+  icon: 'icon-row'
+}, {
+  label: 'Column',
+  value: 'column',
+  icon: 'icon-column'
+}, {
+  label: 'Data',
+  value: 'data',
+  icon: 'icon-data'
+}];
+
+export const DEFAULT_AREA_TYPE = AREA_TYPES[0];
+export const AREA_TYPES_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(AREA_TYPES);
+
+export const DATE_INTERVALS = [{
+  label: 'All',
+  value: undefined
+}, {
+  label: 'Year',
+  value: 'year'
+}, {
+  label: 'Quarter',
+  value: 'quarter',
+  format: 'YYYY-Q'
+}, {
+  label: 'Month',
+  value: 'month',
+  format: 'YYYY-MM'
+}, {
+  label: 'Date',
+  value: 'day',
+  format: 'YYYY-MM-DD'
+}];
+
+export const DEFAULT_DATE_INTERVAL = DATE_INTERVALS[4];
+
+export const DATE_INTERVALS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(DATE_INTERVALS);

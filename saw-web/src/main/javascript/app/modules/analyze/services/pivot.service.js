@@ -19,8 +19,11 @@ import * as fpMapValues from 'lodash/fp/mapValues';
 import * as fpPick from 'lodash/fp/pick';
 import * as moment from 'moment';
 
-import {NUMBER_TYPES, DATE_TYPES} from '../consts';
-import {DATE_INTERVALS_OBJ} from '../components/pivot/settings/analyze-pivot-settings.component';
+import {
+  NUMBER_TYPES,
+  DATE_TYPES,
+  DATE_INTERVALS_OBJ
+} from '../consts';
 
 const FRONT_2_BACK_PIVOT_FIELD_PAIRS = {
   caption: 'displayName',

@@ -11,7 +11,9 @@ import {
   MatChipsModule,
   NoConflictStyleCompatibilityMode,
   MatIconRegistry,
-  MatListModule
+  MatListModule,
+  MatCheckboxModule,
+  MatMenuModule
 } from '@angular/material';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
@@ -28,7 +30,9 @@ import '../../../../themes/_angular_next.scss';
     MatFormFieldModule,
     MatProgressBarModule,
     MatChipsModule,
-    MatListModule
+    MatListModule,
+    MatCheckboxModule,
+    MatMenuModule
   ],
   providers: [MatIconRegistry],
   exports: [
@@ -40,7 +44,9 @@ import '../../../../themes/_angular_next.scss';
     MatFormFieldModule,
     MatProgressBarModule,
     MatChipsModule,
-    MatListModule
+    MatListModule,
+    MatCheckboxModule,
+    MatMenuModule
   ]
 })
 export class MaterialModule {}

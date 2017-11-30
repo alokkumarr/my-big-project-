@@ -98,7 +98,7 @@ module.exports = function (env) {
           test: /\.[jt]s$/,
           exclude: /node_modules/,
           loaders: ['ng-annotate-loader', {
-            loader: 'ts-loader',
+            loader: 'awesome-typescript-loader',
             options: {
               configFile: webpackHelper.root('conf/tsconfig.json')
             }
