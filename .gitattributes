@@ -2,4 +2,4 @@
 # which causes shell scripts added to Docker containers to not be
 # executable.  So as a workaround, disable CRLF conversion for all
 # files.
-* -text
+* text=auto eol=lf
