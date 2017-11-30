@@ -109,23 +109,23 @@ public class GatewayController {
     	try {
         ResponseEntity<?> securityResponse = restTemplate.exchange(url, HttpMethod.POST,
             requestEntity, Valid.class);
+        logger.info(securityResponse.getStatusCode().getReasonPhrase());
+        logger.info(securityResponse.toString());
+        Valid validate =(Valid) securityResponse.getBody();
+        if (securityResponse.getStatusCode().equals(HttpStatus.OK)){
+          proxiedResponse = httpClient.execute(proxiedRequest);
+          responseEntity = new ResponseEntity<>(read(proxiedResponse.getEntity().getContent()),
+              makeResponseHeaders(proxiedResponse),
+              HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
+        } else {
+          responseEntity = new ResponseEntity<>(validate.getValidityMessage(),
+              makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
+        }
       } catch(HttpClientErrorException e) {
         responseEntity = new ResponseEntity<>("Invalid Token",
             makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
         logger.info("Invalid Token: "+ responseEntity.toString());
         return responseEntity;
-      }
-    	logger.info(securityResponse.getStatusCode().getReasonPhrase());
-    	logger.info(securityResponse.toString());
-    	Valid validate =(Valid) securityResponse.getBody();
-    	if (securityResponse.getStatusCode().equals(HttpStatus.OK)){
-	    	proxiedResponse = httpClient.execute(proxiedRequest);
-	        responseEntity = new ResponseEntity<>(read(proxiedResponse.getEntity().getContent()),
-	        		makeResponseHeaders(proxiedResponse),
-	        		HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
-	    } else {
-        responseEntity = new ResponseEntity<>(validate.getValidityMessage(),
-            makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
       }
     }
     else {
