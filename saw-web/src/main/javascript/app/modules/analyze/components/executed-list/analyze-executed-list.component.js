@@ -22,9 +22,13 @@ export const AnalyzeExecutedListComponent = {
       }, {
         caption: 'DATE',
         dataField: 'finished',
-        dataType: 'string',
+        dataType: 'date',
         calculateCellValue: rowData => {
+<<<<<<< HEAD
           return (moment(rowData.finished).utcOffset(new Date().getTimezoneOffset()).format('MM-DD-YYYY'));
+=======
+          return (moment(rowData.finished).utcOffset(new Date().getTimezoneOffset()).format('YYYY/MM/DD'));
+>>>>>>> 2ee62bcf5b290e090b4a727024d73e11645f51d6
         },
         allowSorting: true,
         alignment: 'left',

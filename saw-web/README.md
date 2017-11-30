@@ -60,7 +60,7 @@ http://nvie.com/posts/a-successful-git-branching-model/
  - Either it can be used in WebStorm IDE or in Eclipse or in STS
  - In Eclipse you can import it as maven project, once you import it
  - To bring up the project in local mode server, under project main directory i.e. sncr_saw/
- - execute mvn clean install, it will inturn turn up localhost server after installing node, npm & required npm package
+ - execute mvn clean install -P dev, it will in turn up localhost server after installing node, npm & required npm package
 
  - In WebStorm, you can open a project &
  - execute npm install

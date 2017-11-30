@@ -1,0 +1,31 @@
+#!/bin/bash
+#
+# Load sample Elasticsearch metric (for pivot/chart)
+#
+set -eu
+
+dir=$(dirname $0)
+
+# Load common metrics functions
+. $dir/../lib/common.sh
+
+load_semantic() {
+    echo "Loading sample Elasticsearch semantic metadata"
+    local datalake=$datalake_home/sample-elasticsearch
+    local semantic=semantic.json
+    $sudo_mapr hadoop fs -mkdir -p $datalake
+    $sudo_mapr hadoop fs -put -f $dir/$semantic $datalake
+    $sudo_mapr $mdcli -i $datalake/$semantic -o $datalake/$semantic-output
+}
+
+load_data() {
+    echo "Loading sample Elasticsearch data"
+    for data in $dir/data-*.json; do
+        curl -sS -X POST "http://localhost:8200/sample/type/" \
+             -H "Content-Type: application/json" -d @$data
+    done
+}
+
+wait_maprfs
+load_semantic
+load_data

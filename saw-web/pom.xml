@@ -7,6 +7,7 @@
   <artifactId>bda-saw</artifactId>
   <version>${revision}</version>
   <packaging>war</packaging>
+  <name>saw-web</name>
   <parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -642,7 +643,7 @@
       <profile>
       <id>rpm</id>
       <activation>
-        <activeByDefault>false</activeByDefault>
+        <activeByDefault>true</activeByDefault>
       </activation>
       <build>
       <finalName>${project.name}</finalName>
@@ -757,120 +758,40 @@
 		</configuration>
 	</plugin>
 
-            <!--
-              RPM build
-              -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>rpm-maven-plugin</artifactId>
-                <version>2.1.5</version>
-                <extensions>true</extensions>
-                <!-- RPM as Side Effect -->
-                <executions>
-                  <execution>
-                    <id>generate-rpm</id>
-                    <phase>package</phase>
-                    <goals>
-                      <goal>rpm</goal>
-                    </goals>
-                  </execution>
-                </executions>
-                <!-- executions><execution>
-                    <id>${app.name}-rpm-build</id>
-                    <phase>package</phase>
-                    <goals><goal>rpm</goal></goals>
-                </execution></executions -->
-
-                <configuration>
-                    <license>Synchronoss proprietary product</license>
-                    <distribution>SNCR XDF 2017</distribution>
-                    <needarch>false</needarch>
-                    <targetOS>i386-linux</targetOS>
-                    <group>BDA/SAW</group>
-                    <packager>BDA</packager>
-                    <name>${app.name}</name>
-                    <requires><require>tomcat &gt; 7.0</require></requires>
-                    <provides><provide>${app.name}</provide></provides>
-                    <!--
-                        Only applicable to a Mapping if filemode,
-                        username, AND groupname are NOT populated.
-                    -->
-                    <defaultUsername>${app.user}</defaultUsername>
-                    <defaultGroupname>${app.group}</defaultGroupname>
-                    <defaultDirmode>555</defaultDirmode>
-                    <defaultFilemode>444</defaultFilemode>
-                    <!-- A list of %define arguments -->
-                    <defineStatements><defineStatement>
-                        _unpackaged_files_terminate_build 0
-                    </defineStatement></defineStatements>
-                    <!-- RPM contents -->
-                    <mappings>
-                        <!-- Top level directories -->
-                        <mapping><directory>${app.optDir}</directory></mapping>
-                        <mapping><directory>${app.etcDir}</directory></mapping>
-                        <mapping>
-                            <!-- /var/bda/testapp-x.x -->
-                            <directory>${app.varDir}</directory>
-                            <directoryIncluded>true</directoryIncluded>
-                            <!-- dirmode>750</dirmode -->
-                            <filemode>750</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
-                        </mapping>
-                        <!-- env file -->
-                        <!--
-                        <mapping>
-                            <directory>${app.etcDir}</directory>
-                            <sources><source><location>src/app/testapp.env</location></source></sources>
-                            <configuration>true</configuration>
-                        </mapping>
-                      -->
-
-                        <mapping>
-                            <directory>${app.optDir}</directory>
-                            <sources>
-                                <source><location>target/saw.war</location></source>
-                                <!--
-                                <source><location>...</location></source>
-                                -->
-                            </sources>
-                            <directoryIncluded>false</directoryIncluded>
-                        </mapping>
-                        <mapping>
-                          <directory>/usr/share/tomcat/webapps</directory>
-                          <sources>
-                            <softlinkSource>
-                              <location>${app.optDir}/saw.war</location>
-                              <destination>saw.war</destination>
-                            </softlinkSource>
-                          </sources>
-                        </mapping>
-                    </mappings>
-                    <preinstallScriptlet>
-                        <script>
-echo ${app.nameVer} pre-install is being executed
-#echo &gt;/tmp/.xdf-testapp.tmp.env '
-#export user=${app.user}
-#export group=${app.group}
-#export app_name=${app.name}
-#export app_version=${app.version}
-#export app_home=${app.optDir}
-#'
-                    </script>
-                    </preinstallScriptlet>
-                    <!--
-                    <postinstallScriptlet>
-                        <scriptFile>src/install/postinstall</scriptFile>
-                        <fileEncoding>utf-8</fileEncoding>
-                    </postinstallScriptlet>
-                    <preremoveScriptlet>
-                        <scriptFile>src/install/preremove</scriptFile>
-                        <fileEncoding>utf-8</fileEncoding>
-                    </preremoveScriptlet>
-                  -->
-                </configuration>
-            </plugin>
-            <!-- RPM plugin : end -->
+        <plugin>
+          <groupId>de.dentrassi.maven</groupId>
+          <artifactId>rpm</artifactId>
+          <version>0.10.0</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>rpm</goal>
+              </goals>
+              <configuration>
+                <packageName>saw-web</packageName>
+                <version>${revision.nodash}</version>
+                <skipSigning>true</skipSigning>
+                <entries>
+                  <entry>
+                    <name>${app.optDir}</name>
+                    <directory>true</directory>
+                  </entry>
+                  <entry>
+                    <name>${app.optDir}/saw-web.war</name>
+                    <file>target/saw-web.war</file>
+                  </entry>
+                  <entry>
+                    <name>/usr/share/tomcat/webapps/saw.war</name>
+                    <linkTo>${app.optDir}/saw-web.war</linkTo>
+                  </entry>
+                </entries>
+                <requires>
+                  <require>tomcat &gt; 7.0</require>
+                </requires>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
 
             <plugin>
               <artifactId>maven-assembly-plugin</artifactId>
@@ -882,8 +803,6 @@ echo ${app.nameVer} pre-install is being executed
                 <!-- Put version number back in finalName after RPM
                      profile removed it -->
                 <finalName>${app.name}-${project.version}</finalName>
-                <!-- Remove artifact classifier "bin" from archive name -->
-                <appendAssemblyId>false</appendAssemblyId>
                 <!-- Enable long file names without Maven warning -->
                 <tarLongFileMode>posix</tarLongFileMode>
               </configuration>
@@ -897,71 +816,6 @@ echo ${app.nameVer} pre-install is being executed
               </executions>
             </plugin>
 
-            <plugin>
-              <groupId>io.fabric8</groupId>
-              <artifactId>docker-maven-plugin</artifactId>
-              <version>0.21.0</version>
-              <configuration>
-                <images>
-                  <image>
-                    <name>saw-security:${project.version}</name>
-                    <alias>saw-security</alias>
-                    <build>
-                      <dockerFileDir>${project.basedir}/src/test/docker</dockerFileDir>
-                      <assembly>
-                        <inline xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
-                                xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
-                          <fileSets>
-                            <fileSet>
-                              <directory>${project.build.directory}</directory>
-                              <outputDirectory>.</outputDirectory>
-                              <includes>
-                                <include>*.tgz</include>
-                              </includes>
-                            </fileSet>
-                          </fileSets>
-                        </inline>
-                      </assembly>
-                    </build>
-                    <run>
-                      <!-- Run privileged for systemd -->
-                      <privileged>true</privileged>
-                      <wait>
-                        <!--
-                            Wait until the container health check
-                            reports that systemd services are up and
-                            running
-                        -->
-                        <healthy>true</healthy>
-                        <!--
-                            Increase timeout to allow application
-                            deployment to finish
-                        -->
-                        <time>120000</time>
-                      </wait>
-                    </run>
-                  </image>
-                </images>
-              </configuration>
-              <executions>
-                <execution>
-                  <id>start</id>
-                  <phase>pre-integration-test</phase>
-                  <goals>
-                    <goal>build</goal>
-                    <goal>start</goal>
-                  </goals>
-                </execution>
-                <execution>
-                  <id>stop</id>
-                  <phase>post-integration-test</phase>
-                  <goals>
-                    <goal>stop</goal>
-                  </goals>
-                </execution>
-              </executions>
-            </plugin>
           </plugins>
       </build>
     </profile>

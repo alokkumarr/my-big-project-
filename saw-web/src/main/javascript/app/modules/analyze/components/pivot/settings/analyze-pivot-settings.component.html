@@ -65,7 +65,7 @@
         </aggregate-chooser>
 
         <md-menu class="md-secondary" ng-show="artifactColumn.checked && $ctrl.DATE_TYPES.includes(artifactColumn.type)">
-          <md-button aria-label="GROUP_INTERVAL"
+          <md-button aria-label="DATE_INTERVAL"
                      class="md-icon-button"
                      e2e="pivot-group-interval-menu-btn"
                      ng-click="$ctrl.openMenu($mdMenu, $event)">
@@ -74,11 +74,11 @@
             <md-tooltip ng-bind="'TOOLTIP_GROUP_INTERVAL' | translate"></md-tooltip>
           </md-button>
           <md-menu-content width="4">
-            <md-menu-item ng-repeat="groupInterval in $ctrl.GROUP_INTERVALS track by groupInterval.value">
-              <md-button ng-click="$ctrl.onSelectGroupInterval(groupInterval, artifactColumn)"
-                         e2e="pivot-group-interval-selector-{{groupInterval.value}}"
+            <md-menu-item ng-repeat="dateInterval in $ctrl.DATE_INTERVALS track by dateInterval.value">
+              <md-button ng-click="$ctrl.onSelectDateInterval(dateInterval, artifactColumn)"
+                         e2e="pivot-group-interval-selector-{{dateInterval.value}}"
                          style="font-size: 14px;">
-                {{::groupInterval.label}}
+                {{::dateInterval.label}}
               </md-button>
             </md-menu-item>
           </md-menu-content>

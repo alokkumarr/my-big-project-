@@ -7,7 +7,6 @@ import java.util.List;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
@@ -21,8 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.synchronoss.BuilderUtil;
 import com.synchronoss.DynamicConvertor;
+import com.synchronoss.querybuilder.model.chart.Model;
 import com.synchronoss.querybuilder.model.chart.Filter.Type;
-import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 import com.synchronoss.querybuilder.model.pivot.SqlBuilder;
 import com.synchronoss.querybuilder.model.pivot.SqlBuilder.BooleanCriteria;
 
@@ -108,71 +107,13 @@ public String getJsonString() {
     {
       if (!item.getIsRuntimeFilter().value()){
         if (item.getType().value().equals(Type.DATE.value()) || item.getType().value().equals(Type.TIMESTAMP.value())) {
-          RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-          rangeQueryBuilder.lte(item.getModel().getLte());
-          rangeQueryBuilder.gte(item.getModel().getGte());
-          builder.add(rangeQueryBuilder);
-        }
-        if (item.getType().value().equals(Type.STRING.value())) {
-          TermsQueryBuilder termsQueryBuilder =
-              new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-          builder.add(termsQueryBuilder);
-        }
-        
-        if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item
-            .getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
-            || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase())
-            || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) {
-          
-          if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            rangeQueryBuilder.lte(item.getModel().getOtherValue());
-            rangeQueryBuilder.gte(item.getModel().getValue());
-            builder.add(rangeQueryBuilder);
-          }
-          if (item.getModel().getOperator().value().equals(Operator.GT.value())) {
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            rangeQueryBuilder.gt(item.getModel().getValue());
-            builder.add(rangeQueryBuilder);
-          }
-          if (item.getModel().getOperator().value().equals(Operator.GTE.value())) {
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            rangeQueryBuilder.gte(item.getModel().getValue());
-            builder.add(rangeQueryBuilder);
-          }
-          if (item.getModel().getOperator().value().equals(Operator.LT.value())) {
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            rangeQueryBuilder.lt(item.getModel().getValue());
-            builder.add(rangeQueryBuilder);
-          }
-          if (item.getModel().getOperator().value().equals(Operator.LTE.value())) {
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            rangeQueryBuilder.lte(item.getModel().getValue());
-            builder.add(rangeQueryBuilder);
-          }
-          if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
-            TermQueryBuilder termQueryBuilder =
-                new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
-            builder.add(termQueryBuilder);
-          }
-          if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
-            BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
-            boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
-                .getValue()));
-            builder.add(boolQueryBuilderIn);
-          }
-        }
-        
-     }
-      if (item.getIsRuntimeFilter().value() && item.getModel()!=null)
-      {
-        if (item.getType().value().equals(Type.DATE.value()) || item.getType().value().equals(Type.TIMESTAMP.value())) {
-          if (item.getModel().getPreset()!=null)
+          if (item.getModel().getPreset()!=null && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString()))
           {
             DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
             rangeQueryBuilder.lte(dynamicConvertor.getLte());
             rangeQueryBuilder.gte(dynamicConvertor.getGte());
+            builder.add(rangeQueryBuilder);
           }
           else {
             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
@@ -186,26 +127,43 @@ public String getJsonString() {
               new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
           builder.add(termsQueryBuilder);
         }
-        if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
-            || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase()) || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) 
-        {
-          if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
+        
+        if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item
+            .getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
+            || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase())
+            || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) {
+            builder = QueryBuilderUtil.numericFilterPivot(item, builder);
+        }
+        
+     }
+      if (item.getIsRuntimeFilter().value() && item.getModel()!=null)
+      {
+        if (item.getType().value().equals(Type.DATE.value()) || item.getType().value().equals(Type.TIMESTAMP.value())) {
+          if (item.getModel().getPreset()!=null && !item.getModel().getPreset().value().equals(Model.Preset.NA.toString()))
+          {
+            DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            rangeQueryBuilder.lte(item.getModel().getOtherValue());
-            rangeQueryBuilder.gte(item.getModel().getValue());
+            rangeQueryBuilder.lte(dynamicConvertor.getLte());
+            rangeQueryBuilder.gte(dynamicConvertor.getGte());
             builder.add(rangeQueryBuilder);
           }
-          if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
-            TermQueryBuilder termQueryBuilder =
-                new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
-            builder.add(termQueryBuilder);
+          else {
+            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+            rangeQueryBuilder.lte(item.getModel().getLte());
+            rangeQueryBuilder.gte(item.getModel().getGte());
+            builder.add(rangeQueryBuilder);
           }
-          if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
-            BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
-            boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
-                .getValue()));
-            builder.add(boolQueryBuilderIn);
-          }
+        }
+        if (item.getType().value().equals(Type.STRING.value())) {
+          TermsQueryBuilder termsQueryBuilder =
+              new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+          builder.add(termsQueryBuilder);
+        }
+        if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item
+            .getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
+            || item.getType().value().toLowerCase().equals(Type.FLOAT.value().toLowerCase())
+            || item.getType().value().toLowerCase().equals(Type.LONG.value().toLowerCase())) {
+          builder = QueryBuilderUtil.numericFilterPivot(item, builder);
         }
       }
     }

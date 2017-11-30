@@ -248,238 +248,173 @@
                 </configuration>
             </plugin>
             
-            <!-- Codehaus rpm plugin -->
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>rpm-maven-plugin</artifactId>
-                <version>2.1.5</version>
-                <extensions>true</extensions>
-               <executions>
-                    <execution>
-                        <id>generate-rpm</id>
-                        <goals>
-                            <goal>rpm</goal>
-                        </goals>
-                    </execution>
-                </executions>
-
-                <configuration>
-                    <license>Synchronoss proprietary product</license>
-                    <distribution>BDA distribution</distribution>
-                    <needarch>false</needarch>
-                    <targetOS>i386-linux</targetOS>
-                    <group>BDA Saw Security</group>
-                    <packager>BDA</packager>
-                    <name>${project.artifactId}</name>
-                    <defineStatements>
-                        <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
-                    </defineStatements>
-                    <defaultUsername>${app.user}</defaultUsername>
-                    <defaultGroupname>${app.group}</defaultGroupname>
-                    <defaultDirmode>0755</defaultDirmode>
-                    <defaultFilemode>0444</defaultFilemode>
-                    <requires>
-                      <require>java-1.8.0-openjdk-headless &gt;= 1.8.0</require>
-                      <require>MySQL-python &gt;= 1.2.5</require>
-                    </requires>
-                    <mappings>
-                        <!-- home dir -->
-                        <mapping>
-                            <directory>${app.optDir}</directory>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/bin</directory>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/conf</directory>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/conf/templates</directory>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/lib</directory>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/db</directory>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/db/setup</directory>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/db/setup/sql</directory>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/db/entry</directory>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/db/entry/conf</directory>
-                        </mapping>
-                        
-                        <!-- var directory for saw security (/var/bda/saw-security) -->
-                        <mapping>
-                            <directory>${app.varDir}</directory>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.varDir}/run</directory>
-                        </mapping>
-                        
-                        <!-- 
-                            etc directory for saw security (/var/bda/saw-security)
-                            Place saw-secirity.vars in this directory
-                        -->
-                        <mapping>
-                            <directory>${app.etcDir}</directory>
-                            <!--
-                            <filemode>0755</filemode>
-                            <username>${app.user}</username>
-                            <groupname>${app.group}</groupname>
-                            -->
-                        </mapping>
-                        
-                        <!-- Directory files -->
-                        <!-- Executable files --> 
-                        <mapping>
-                            <directory>${app.optDir}/bin</directory>
-                            <filemode>0555</filemode>
-                            <directoryIncluded>false</directoryIncluded>
-                            <sources>
-                                <source>
-                                    <location>${project.basedir}/bin</location>
-                                    <includes>
-                                        <include>saw-security-runner.sh</include>
-                                        <include>saw-security.sh</include>
-                                        <include>conf_init</include>
-                                        <include>mk_conf.sh</include>
-                                        <include>ccode.sh</include>
-                                    </includes>
-                                </source>
-                                <source>
-                                    <location>bin/templates/appl_info.template</location>
-                                    <destination>appl_info</destination>
-                                    <filter>true</filter>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/conf</directory>
-                            <!-- final version, not template -->
-                            <sources>
-                                <source><location>
-                                    ${project.basedir}/conf/logback.xml
-                                </location></source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/conf/templates</directory>
-                            <!-- templates -->
-                            <sources>
-                                <source>
-                                    <location>${project.basedir}/conf/templates</location>
-                                    <includes>
-                                        <include>application.properties</include>
-                                        <include>bootstrap.yml</include>
-                                    </includes>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/lib</directory>
-                            <sources>
-                                <source>
-                                    <location>${project.basedir}/target</location>
-                                    <includes>
-                                        <include>*.war</include>
-                                        <include>*.jar</include>
-                                    </includes>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/db</directory>
-                            <sources>
-                                <source><location>
-                                    ${project.basedir}/db/bda_init.py
-                                </location></source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/db/setup</directory>
-                            <filemode>0755</filemode>
-                            <sources>
-                                <source>
-                                    <location>${project.basedir}/db/setup</location>
-                                    <includes>
-                                        <include>init</include>
-                                    </includes>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/db/setup</directory>
-                            <sources>
-                                <source>
-                                    <location>${project.basedir}/db/setup</location>
-                                    <includes>
-                                        <include>init.sql</include>
-                                        <include>*.py</include>
-                                    </includes>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/db/setup/sql</directory>
-                            <sources>
-                                <source>
-                                    <location>${project.basedir}/db/setup/sql</location>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/db/entry</directory>
-                            <sources>
-                                <source>
-                                    <location>${project.basedir}/db/entry</location>
-                                    <includes>
-                                        <include>table_structure_mapping.csv</include> 
-                                        <include>Data_Entry_Automation.py</include>
-                                        <include>Data_Entry_Automation_Utilities.py</include>
-                                    </includes>
-                                </source>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>${app.optDir}/db/entry/conf</directory>
-                            <sources>
-                                <source><location>
-                                    ${project.basedir}/db/entry/conf/configuration.json
-                                </location></source>
-                            </sources>
-                        </mapping>
-                        
-                         <!--Create softlink for app directory--> 
-                        <mapping>
-                            <directory>${app.optParDir}</directory>
-                            <sources>
-                                <softlinkSource>
-                                     <!--ln -s <location> <destination>--> 
-                                    <location>${app.nameVer}</location>
-                                    <destination>${app.name}</destination>
-                                </softlinkSource>
-                            </sources>
-                        </mapping>
-                        <mapping>
-                            <directory>/usr/lib/systemd/system</directory>
-                            <directoryIncluded>false</directoryIncluded>
-                            <sources>
-                                <source>
-                                    <location>src/main/system/saw-security.service</location>
-                                </source>
-                            </sources>
-                        </mapping>
-                    </mappings>
-
-                    <preinstallScriptlet>
-                        <script>
+              <groupId>de.dentrassi.maven</groupId>
+              <artifactId>rpm</artifactId>
+              <version>0.10.0</version>
+              <executions>
+                <execution>
+                  <goals>
+                    <goal>rpm</goal>
+                  </goals>
+                  <configuration>
+                    <packageName>saw-security</packageName>
+                    <version>${revision.nodash}</version>
+                    <skipSigning>true</skipSigning>
+                    <rulesets>
+                      <ruleset>
+                        <id>default</id>
+                        <rules>
+                          <rule>
+                            <user>saw</user>
+                            <group>saw</group>
+                            <mode>0444</mode>
+                          </rule>
+                          <rule>
+                            <when>
+                              <type>directory</type>
+                            </when>
+                            <mode>0755</mode>
+                          </rule>
+                          <rule>
+                            <when>
+                              <prefix>${app.optDir}/bin/</prefix>
+                            </when>
+                            <mode>0555</mode>
+                          </rule>
+                          <rule>
+                            <when>
+                              <prefix>${app.optDir}/db/setup/init</prefix>
+                            </when>
+                            <mode>0755</mode>
+                          </rule>
+                          <rule>
+                            <when>
+                              <prefix>${app.optDir}/db/setup/init.sql</prefix>
+                            </when>
+                            <mode>0444</mode>
+                          </rule>
+                        </rules>
+                      </ruleset>
+                    </rulesets>
+                    <entries>
+                      <entry>
+                        <name>${app.optParDir}/${app.name}</name>
+                        <linkTo>${app.nameVer}</linkTo>
+                        <user>saw</user>
+                        <group>saw</group>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}</name>
+                        <directory>true</directory>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.etcDir}</name>
+                        <directory>true</directory>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.varDir}</name>
+                        <directory>true</directory>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.varDir}/run</name>
+                        <directory>true</directory>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}/bin</name>
+                        <directory>true</directory>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}/bin/appl_info</name>
+                        <file>bin/appl_info</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}/bin/ccode.sh</name>
+                        <file>bin/ccode.sh</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}/bin/conf_init</name>
+                        <file>bin/conf_init</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}/bin/mk_conf.sh</name>
+                        <file>bin/mk_conf.sh</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}/bin/saw-security-runner.sh</name>
+                        <file>bin/saw-security-runner.sh</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}/bin/saw-security.sh</name>
+                        <file>bin/saw-security.sh</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}/conf</name>
+                        <directory>true</directory>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}/conf/logback.xml</name>
+                        <file>conf/logback.xml</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}/conf/templates</name>
+                        <directory>true</directory>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}/conf/templates</name>
+                        <collect>
+                          <from>conf/templates</from>
+                        </collect>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}/lib</name>
+                        <directory>true</directory>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}/lib/saw-security-${revision}.war</name>
+                        <file>target/saw-security-${revision}.war</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}/lib/saw-security-${revision}-classes.jar</name>
+                        <file>target/saw-security-${revision}-classes.jar</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}/db</name>
+                        <directory>true</directory>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}/db</name>
+                        <collect>
+                          <from>db</from>
+                        </collect>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>/usr/lib/systemd/system/saw-security.service</name>
+                        <file>src/main/system/saw-security.service</file> 
+                        <ruleset>default</ruleset>
+                      </entry>
+                    </entries>
+                    <beforeInstallation>
 echo pre-install started: ${app.nameVer}
 echo check saw:saw user exists
 getent group ${app.group} || {
@@ -500,10 +435,8 @@ echo check Python module with "'import MySQLdb'"
 ( python -c 'import MySQLdb' ) || exit 1
 
 echo pre-install completed: ${app.nameVer}
-                        </script>
-                    </preinstallScriptlet>
-                    <preremoveScriptlet>
-                        <script>
+                    </beforeInstallation>
+                    <afterInstallation>
 echo pre-remove starting: ${app.nameVer}
 echo remove files in log/, run/ subdirs in ${app.varDir}
 ( set -x
@@ -518,9 +451,14 @@ echo remove files generated from templates
   rm -f ${app.optDir}/conf/{application.properties,bootstrap.yml}
   )
 echo pre-remove completed: ${app.nameVer}
-                        </script>
-                    </preremoveScriptlet> 
-                </configuration>
+                    </afterInstallation> 
+                    <requires>
+                      <require>java-1.8.0-openjdk-headless &gt;= 1.8.0</require>
+                      <require>MySQL-python &gt;= 1.2.5</require>
+                    </requires>
+                  </configuration>
+                </execution>
+              </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -529,8 +467,6 @@ echo pre-remove completed: ${app.nameVer}
                   <descriptors>
                     <descriptor>${project.basedir}/src/main/assembly/assembly.xml</descriptor>
                   </descriptors>
-                  <!-- Remove artifact classifier "bin" from archive name -->
-                  <appendAssemblyId>false</appendAssemblyId>
                   <!-- Enable long file names without Maven warning -->
                   <tarLongFileMode>posix</tarLongFileMode>
                 </configuration>
@@ -542,71 +478,6 @@ echo pre-remove completed: ${app.nameVer}
                     </goals>
                   </execution>
                 </executions>
-            </plugin>
-            <plugin>
-              <groupId>io.fabric8</groupId>
-              <artifactId>docker-maven-plugin</artifactId>
-              <version>0.21.0</version>
-              <configuration>
-                <images>
-                  <image>
-                    <name>saw-security:${project.version}</name>
-                    <alias>saw-security</alias>
-                    <build>
-                      <dockerFileDir>${project.basedir}/src/test/docker</dockerFileDir>
-                      <assembly>
-                        <inline xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
-                                xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
-                          <fileSets>
-                            <fileSet>
-                              <directory>${project.build.directory}</directory>
-                              <outputDirectory>.</outputDirectory>
-                              <includes>
-                                <include>*.tgz</include>
-                              </includes>
-                            </fileSet>
-                          </fileSets>
-                        </inline>
-                      </assembly>
-                    </build>
-                    <run>
-                      <!-- Run privileged for systemd -->
-                      <privileged>true</privileged>
-                      <wait>
-                        <!--
-                            Wait until the container health check
-                            reports that systemd services are up and
-                            running
-                        -->
-                        <healthy>true</healthy>
-                        <!--
-                            Increase timeout to allow application
-                            deployment to finish
-                        -->
-                        <time>120000</time>
-                      </wait>
-                    </run>
-                  </image>
-                </images>
-              </configuration>
-              <executions>
-                <execution>
-                  <id>start</id>
-                  <phase>pre-integration-test</phase>
-                  <goals>
-                    <goal>build</goal>
-                    <goal>start</goal>
-                  </goals>
-                </execution>
-                <execution>
-                  <id>stop</id>
-                  <phase>post-integration-test</phase>
-                  <goals>
-                    <goal>stop</goal>
-                  </goals>
-                </execution>
-              </executions>
             </plugin>
         </plugins>
     </build>

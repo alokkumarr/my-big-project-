@@ -33,7 +33,7 @@ RUN sed -i -e '/^export SPARK_MASTER_[A-Z]*=localhost$/d' \
     /opt/mapr/spark/spark-current/conf/spark-env.sh
 
 # Add MapR container initialization script
-ADD saw-mapr-init /root/
+COPY saw-mapr-init /root/
 RUN sed -i -e 's,while true,/root/saw-mapr-init\nwhile true,' \
     /usr/bin/init-script
 
@@ -42,13 +42,11 @@ RUN sed -i -e 's/^sleep 60/sleep 30/' /usr/bin/init-script
 
 # Workaround: Bamboo builds fail with no space left error, so reduce
 # loopack disk size.  Additionally put on volume, which has more space
-# than root filesystem.
+# than root filesystem.  Note: The volume directive is inserted into
+# the Dockerfile from the Bamboo plan, to avoid creating dangling
+# volumes in other environments which do not need the workaround.
 RUN sed -i -e 's/20G/10G/' -e '2imkdir -p /mapr-data' \
     -e 's,/opt/mapr/docker.disk,/mapr-data/docker.disk,g' /usr/bin/init-script
-VOLUME /mapr-data
-# Also log amount of disk available in container, to track disk space
-# available in Bamboo agents
-#RUN sed -i -e '2idf -h' /usr/bin/init-script
 
 # Add health check to be used by Docker Maven plug-in
 HEALTHCHECK --interval=5s CMD test -e /saw-mapr-init-done && hadoop fs -ls /

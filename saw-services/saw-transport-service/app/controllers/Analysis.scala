@@ -538,7 +538,7 @@ class Analysis extends BaseController {
       }
       else {
         /* Load execution results from data lake (instead of from Spark driver) */
-        resultData = execution.loadExecution(execution.getId, 100)
+        resultData = execution.loadExecution(execution.getId, DLConfiguration.rowLimit)
         m_log.trace("when data is not available in cache analysisResultId: {}", analysisResultId);
         m_log.trace("when data is not available in cache size of limit {}", limit);
         m_log.trace("when data is not available in cache size of start {}", start);

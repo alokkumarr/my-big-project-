@@ -10,8 +10,7 @@ export const AnalyzeReportDetailComponent = {
   template,
   bindings: {
     analysis: '<',
-    source: '&',
-    requester: '<'
+    source: '&'
   },
   controller: class AnalyzeReportDetailController {
     constructor(FilterService) {
@@ -24,7 +23,6 @@ export const AnalyzeReportDetailComponent = {
     $onInit() {
       this.filters = map(this.analysis.sqlBuilder.filters, this._FilterService.backend2FrontendFilter(this.analysis.artifacts));
       this.columns = this._getColumns(this.analysis);
-      this.dataSubscription = this.requester.subscribe(options => this.onData(options));
     }
 
     _getColumns(analysis, data = []) {
@@ -49,21 +47,8 @@ export const AnalyzeReportDetailComponent = {
       return this.columns;
     }
 
-    $onDestroy() {
-      this.dataSubscription.unsubscribe();
-    }
-
     loadData(options) {
       return this.source({options});
-    }
-
-    onData({data}) {
-      if (!data) {
-        return;
-      }
-
-      this.gridData = data;
-      this.columns = this._getColumns(this.analysis, data);
     }
     // TODO runtime filters in SAW-634
 

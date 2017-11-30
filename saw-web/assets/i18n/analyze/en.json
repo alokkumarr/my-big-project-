@@ -74,5 +74,15 @@
   "FORMAT":"Format",
   "SHOW_COMMA_SEPARATORS": "Show Comma Separators",
   "SPECIFY_NUMBER_DECIMALS":"Specify Number of Decimals (0-99)",
-  "SHOW_CURRENCY":"Show as Currency"
+  "SHOW_CURRENCY":"Show as Currency",
+  "YEAR_TO_DATE": "YTD (Year to Date)",
+  "MONTH_TO_DATE": "MTD (Month to Date)",
+  "LAST_3_MONTHS": "Last 3 Months",
+  "LAST_6_MONTHS": "Last 6 Months",
+  "LAST_MONTH": "Last Month",
+  "LAST_QUARTER": "Last Quarter",
+  "LAST_WEEK": "Last Week",
+  "THIS_WEEK": "This Week",
+  "LAST_2_WEEKS": "Last 2 Weeks",
+  "CUSTOM": "Custom"
 }

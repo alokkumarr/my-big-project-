@@ -244,7 +244,7 @@ object QueryBuilder extends {
         var lte :String = null
         var gte : String = null
         val preset = subProperty("model", "preset")
-        if (preset !=null && !preset.equals("")){
+        if (preset !=null && !preset.equals("NA")){
           lte = TransportUtils.dynamicDecipher(preset).getLte();
           gte = TransportUtils.dynamicDecipher(preset).getGte();
         }

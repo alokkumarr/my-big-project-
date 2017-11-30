@@ -80,7 +80,8 @@ module.exports = function (env) {
       new DefinePlugin({
         '__DEVELOPMENT__': JSON.stringify(isDevelopment),
         '__PRODUCTION__': JSON.stringify(isProduction),
-        '__MOCK__': JSON.stringify(enableMock)
+        '__MOCK__': JSON.stringify(enableMock),
+        '__VERSION__': JSON.stringify('test')
       })
     ]
   };

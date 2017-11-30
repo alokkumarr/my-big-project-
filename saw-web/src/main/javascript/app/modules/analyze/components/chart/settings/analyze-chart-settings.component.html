@@ -10,7 +10,7 @@
 
     <md-content layout-margin>
 
-      <collapser title="{{::$ctrl.viewOptions.axisLabels.y}}">
+      <collapser heading="{{::$ctrl.viewOptions.axisLabels.y}}">
         <md-radio-group ng-model="$ctrl.selected.y"
                         ng-if="$ctrl.multipleYAxes.enabled == false"
                         ng-change="$ctrl.inputChanged($ctrl.settings.yaxis, $ctrl.selected.y, 'y')">
@@ -39,7 +39,10 @@
                          ng-disabled="attr.disabled"
                          ng-change="$ctrl.inputChanged($ctrl.settings.yaxis, attr, 'y')"
                          style="align-self: flex-end;">
-              <span ng-bind="attr.displayName"></span>
+              <span ng-bind="attr.displayName">
+                <md-tooltip ng-bind="attr.displayName"></md-tooltip>
+              </span>
+              
             </md-checkbox>
 
             <aggregate-chooser flex="20" ng-show="attr.checked"
@@ -51,7 +54,7 @@
         </md-list>
       </collapser>
 
-      <collapser title="{{::$ctrl.viewOptions.axisLabels.x}}">
+      <collapser heading="{{::$ctrl.viewOptions.axisLabels.x}}">
         <md-radio-group ng-model="$ctrl.selected.x"
                         ng-change="$ctrl.inputChanged($ctrl.settings.xaxis, $ctrl.selected.x, 'x')">
           <div flex layout="row"
@@ -62,7 +65,9 @@
                              ng-value="attr"
                              e2e="radio-button-{{::attr.displayName}}"
                              ng-disabled="attr.checked && attr.checked != 'x'">
-            <span class="truncated-field-name" ng-bind="::attr.displayName"></span>
+            <span class="truncated-field-name" ng-bind="::attr.displayName">
+              <md-tooltip ng-bind="::attr.displayName"></md-tooltip>
+            </span>
             </md-radio-button>
 
             <md-menu class="md-secondary" ng-show="attr.checked && attr.checked == 'x' && $ctrl.DATE_TYPES.includes(attr.type)">
@@ -88,7 +93,7 @@
           </div>
         </md-radio-group>
       </collapser>
-      <collapser title="{{::$ctrl.viewOptions.axisLabels.z}}"
+      <collapser heading="{{::$ctrl.viewOptions.axisLabels.z}}"
                  ng-if="$ctrl.settings.zaxis">
         <md-radio-group ng-model="$ctrl.selected.z"
                         ng-change="$ctrl.inputChanged($ctrl.settings.zaxis, $ctrl.selected.z, 'z')">
@@ -99,7 +104,9 @@
                              ng-value="attr"
                              e2e="radio-button-{{::attr.displayName}}"
                              ng-disabled="attr.checked && attr.checked != 'z'">
-            <span ng-bind="::attr.displayName"></span>
+            <span ng-bind="::attr.displayName">
+              <md-tooltip ng-bind="::attr.displayName"></md-tooltip>
+            </span>
             </md-radio-button>
             <aggregate-chooser ng-show="attr.checked && attr.checked === 'z'"
                                artifact-column="attr"
@@ -110,7 +117,7 @@
         </md-radio-group>
       </collapser>
 
-      <collapser title="{{::$ctrl.viewOptions.axisLabels.g}}"
+      <collapser heading="{{::$ctrl.viewOptions.axisLabels.g}}"
                  action="$ctrl.groupRemovalAction">
         <md-radio-group ng-model="$ctrl.selected.g"
                         ng-change="$ctrl.inputChanged($ctrl.settings.groupBy, $ctrl.selected.g, 'g')">
@@ -121,7 +128,9 @@
                              ng-value="attr"
                              e2e="radio-button-{{::attr.displayName}}"
                              ng-disabled="attr.checked && attr.checked != 'g'">
-              <span ng-bind="::attr.displayName"></span>
+              <span ng-bind="::attr.displayName">
+                <md-tooltip ng-bind="::attr.displayName | translate"></md-tooltip>
+              </span>
             </md-radio-button>
 
             <md-menu class="md-secondary" ng-show="attr.checked && attr.checked == 'g' && $ctrl.DATE_TYPES.includes(attr.type)">

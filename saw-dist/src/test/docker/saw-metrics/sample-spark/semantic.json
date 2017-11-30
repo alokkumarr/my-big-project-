@@ -1,0 +1,76 @@
+[
+  {
+    "node-category": "SemanticNode",
+    "id": "340df99d-16a6-45cb-af49-5699e3337e50",
+    "action": {
+      "verb": "create",
+      "content": {
+        "id": "sample_semantic_object",
+        "dataSecurityKey": "",
+        "type": "semantic",
+        "module": "ANALYZE",
+        "metric": "sample-spark",
+        "metricName": "Sample (report)",
+        "customerCode": "SYNCHRONOSS",
+        "disabled": "false",
+        "checked": "false",
+        "supports": [
+          {
+            "label": "TABLES",
+            "category": "table",
+            "children": [
+              {
+                "label": "Report",
+                "icon": "icon-report",
+                "type": "table:report"
+              }
+            ]
+          }
+        ],
+        "artifacts": [
+          {
+            "artifactName": "SAMPLE",
+            "columns": [
+              {
+                "name": "Country",
+                "columnName": "country",
+                "displayName": "Country",
+                "aliasName": "",
+                "table": "sample",
+                "type": "string",
+                "joinEligible": false,
+                "filterEligible": true
+              }
+              {
+                "name": "Product",
+                "columnName": "product",
+                "displayName": "Product",
+                "aliasName": "",
+                "table": "sample",
+                "type": "string",
+                "joinEligible": false,
+                "filterEligible": true
+              }
+              {
+                "name": "Units",
+                "columnName": "units",
+                "displayName": "Units",
+                "aliasName": "",
+                "table": "sample",
+                "type": "integer",
+                "joinEligible": false,
+                "filterEligible": true
+              }
+            ]
+          }
+        ]
+      },
+      "base-relation": [
+        {
+          "id": "@DATA_OBJECT_ID@",
+          "node-category": "DataObject"
+        }
+      ]
+    }
+  }
+]

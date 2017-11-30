@@ -3,12 +3,8 @@ import * as map from 'lodash/map';
 import * as omit from 'lodash/fp/omit';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
-import * as flatMap from 'lodash/flatMap';
-import * as keys from 'lodash/keys';
-import * as isArray from 'lodash/isArray';
-import * as reduce from 'lodash/reduce';
-import * as join from 'lodash/join';
-import json2csv from 'json2csv';
+import * as moment from 'moment';
+import * as isUndefined from 'lodash/isUndefined';
 
 import * as template from './report-grid-display-container.component.html';
 import style from './report-grid-display-container.component.scss';
@@ -24,8 +20,7 @@ export const ReportGridDisplayContainerComponent = {
     data: '<',
     source: '&',
     columns: '<',
-    groups: '<',
-    requester: '<'
+    groups: '<'
   },
   styles: [style],
   controller: class ReportGridDisplayContainerController {
@@ -36,8 +31,6 @@ export const ReportGridDisplayContainerComponent = {
     }
 
     $onInit() {
-      this.requester.subscribe(requests => this.request(requests));
-
       const groupLabels = this.getGroupLabels(this.groups, this.columns);
       this.groupedData = this.groupData(this.data, this.groups);
       this.groupedByString = groupLabels.join(', ');
@@ -50,51 +43,27 @@ export const ReportGridDisplayContainerComponent = {
       return this.source({options});
     }
 
-    request(requests) {
-      /* eslint-disable no-unused-expressions */
-      requests.export && this.onExport();
-      /* eslint-disable no-unused-expressions */
-    }
-
-    onExport() {
-      this._fileService.exportCSV(this.groupData2CSV(this.groupedData));
-    }
-
-    groupData2CSV(data) {
-      if (isArray(data)) {
-        return json2csv({data, fields: keys(data[0])});
-      }
-      const dataForCSV = this.groupData2CSVRecursive({node: data, groupValues: []});
-      const csv = reduce(dataForCSV, (aggregator, datum) => {
-        aggregator.push(`\n${join(datum.groupValues, '->')}\n\n${json2csv({data: datum.data, fields: datum.fields})}`);
-        return aggregator;
-      }, []);
-
-      return join(csv, '\n');
-    }
-
-    groupData2CSVRecursive({node, groupValues}) {
-      if (node.isGroup) {
-        return flatMap(node.nodes, node => this.groupData2CSVRecursive({
-          node,
-          groupValues
-        }));
-      }
-      if (node.data && !isArray(node.data)) {
-        return this.groupData2CSVRecursive({
-          node: node.data,
-          groupValues: [...groupValues, node.groupValue]
-        });
-      }
-      return {
-        fields: keys(node.data[0]),
-        data: node.data,
-        groupValues: [...groupValues, node.groupValue]
-      };
-    }
-
     $onChanges() {
-      this.groupedData = this.groupData(this.data, this.groups);
+      if (!isUndefined(this.data)) {
+        const sourceData = this.data;
+        this.groupedData = this.groupData(this.formatDates(sourceData), this.groups);
+      }
+    }
+
+    formatDates(data) {
+      const keys = Object.keys(data[0]);
+      const formats = [
+        moment.ISO_8601,
+        'MM/DD/YYYY  :)  HH*mm*ss'
+      ];
+      forEach(data, data => {
+        forEach(keys, key => {
+          if (moment(data[key], formats, true).isValid()) {
+            data[key] = moment(data[key]).format('MM/DD/YYYY');
+          }
+        });
+      });
+      return data;
     }
 
     getGroupLabels(groups, columns) {
