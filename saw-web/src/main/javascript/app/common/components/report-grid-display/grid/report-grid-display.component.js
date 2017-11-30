@@ -8,7 +8,6 @@ import 'moment-timezone';
 
 import * as template from './report-grid-display.component.html';
 
-import * as forEach from 'lodash/forEach';
 import {NUMBER_TYPES, DATE_TYPES, BACKEND_TIMEZONE} from '../../../consts.js';
 
 const COLUMN_WIDTH = 175;

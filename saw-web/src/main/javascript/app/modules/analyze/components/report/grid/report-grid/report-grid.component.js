@@ -5,7 +5,6 @@ import * as find from 'lodash/find';
 import * as forEach from 'lodash/forEach';
 import * as remove from 'lodash/remove';
 import * as isUndefined from 'lodash/isUndefined';
-import * as isEmpty from 'lodash/isEmpty';
 import * as $ from 'jquery';
 import * as moment from 'moment';
 import 'moment-timezone';
