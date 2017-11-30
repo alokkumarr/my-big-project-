@@ -60,13 +60,17 @@ public class AuditLogService {
         ale.add(DataSetProperties.Transformations.toString(), new JsonPrimitive(ctx.transformationName));
         ale.add(DataSetProperties.Project.toString(), new JsonPrimitive(ctx.applicationID));
 
-        JsonArray ale_ids_ja = new JsonArray();
-        input.keySet().forEach(  k -> ale_ids_ja.add(new JsonPrimitive(k)));
-        ale.add("inputDataSets",  ale_ids_ja);
+        if (input != null) {
+            JsonArray ale_ids_ja = new JsonArray();
+            input.keySet().forEach(k -> ale_ids_ja.add(new JsonPrimitive(k)));
+            ale.add("inputDataSets", ale_ids_ja);
+        }
 
-        JsonArray ale_ods_ja = new JsonArray();
-        output.keySet().forEach(  k -> ale_ods_ja.add(new JsonPrimitive(k)));
-        ale.add("outputDataSets",  ale_ods_ja);
+        if (output != null) {
+            JsonArray ale_ods_ja = new JsonArray();
+            output.keySet().forEach(k -> ale_ods_ja.add(new JsonPrimitive(k)));
+            ale.add("outputDataSets", ale_ods_ja);
+        }
 
         return ale;
     }
