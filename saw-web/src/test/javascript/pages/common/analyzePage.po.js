@@ -31,7 +31,7 @@ const getCardType = name => getCard(name)
     return e2e;
   });
 
-const getAnalysisChartType = element(by.css('[e2e*="chart-type:'))
+const getAnalysisChartType = () => element(by.css('[e2e*="chart-type:'))
   .getAttribute('e2e')
   .then(e2e => {
     if (e2e) {
