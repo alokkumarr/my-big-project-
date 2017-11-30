@@ -25,7 +25,9 @@
           <span ng-bind-html="report.value | date: 'dd/MMM/yy' | highlight:$ctrl.searchTerm"></span>
       </div>
       <div data-options="dxTemplate: { name: 'actionCellTemplate' }">
-        <md-card-actions layout="row" layout-align="center center">
+        <md-card-actions layout="row"
+                         layout-align="center center"
+                         e2e="{{'analysis-type:' + $ctrl.model.chartType + ':' + $ctrl.model.chartType}}">
           <md-button class="md-button btn-card"
                      aria-label="Fork"
                      ng-show="$ctrl.canUserFork"

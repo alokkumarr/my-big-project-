@@ -14,6 +14,33 @@ const getForkBtn = parent => parent.element(by.css('button[e2e="action-fork-btn"
 const getCardTitle = name => element(by.xpath(`//a[@e2e="analysis-name" and text() = "${name}"]`));
 const firstCardTitle = element.all(by.css('a[e2e="analysis-name"]')).first();
 
+/**
+ * returns the type of the card analysis in a promise, in the form of
+ * type:chartType if it has a chartType, if not, it just returns type
+ * example: for pivot analysis it returns pivot
+ *          for column chart analysis it returns chart:column
+ */
+const getCardType = name => getCard(name)
+  .element(by.css('[e2e*="analysis-type:"]'))
+  .getAttribute('e2e')
+  .then(e2e => {
+    if (e2e) {
+      const [, type, chartType] = e2e.split(':');
+      return `${type}${cartType ? `:${chartType}` : ''}`;
+    }
+    return e2e;
+  });
+
+const getAnalysisChartType = element(by.css('[e2e*="chart-type:'))
+  .getAttribute('e2e')
+  .then(e2e => {
+    if (e2e) {
+      const [, chartType] = e2e.split(':');
+      return chartType;
+    }
+    return e2e;
+  });
+
 const doAnalysisAction = (name, action) => {
   const card = getCard(name);
   const toggle = card.element(by.css('button[e2e="actions-menu-toggle"]'));
@@ -143,6 +170,7 @@ module.exports = {
       getGroupRadio: name => getChartSettingsRadio('g', name),
       container: element(by.css('.highcharts-container ')),
       title: element(by.css('span[e2e="designer-type-chart"]')),
+      getAnalysisChartType,
       openFiltersBtn,
       refreshBtn
     },
@@ -184,7 +212,8 @@ module.exports = {
     firstCard,
     getForkBtn,
     getAnalysisOption,
-    firstCardTitle
+    firstCardTitle,
+    getCardType
   },
   saveDialog: {
     selectedCategory: element(by.xpath('//md-select[@e2e="save-dialog-selected-category"]/*/span[1]')),
