@@ -9,7 +9,7 @@ const homePage = require('../../javascript/pages/homePage.po');
 const executedAnalysisPage = require('../../javascript/pages/common/executedAlaysis.po');
 const using = require('jasmine-data-provider');
 
-describe('create columnChart type analysis', () => {
+describe('create Column Chart type analysis', () => {
   const defaultCategory = 'AT Privileges Category DO NOT TOUCH';
   const categoryName = 'AT Analysis Category DO NOT TOUCH';
   const subCategoryName = 'AT Creating Analysis DO NOT TOUCH';
@@ -23,11 +23,8 @@ describe('create columnChart type analysis', () => {
   const method = 'chart:column';
 
   const userDataProvider = {
-    'admin': {handle: 'admin'}/*,
-    'user': {handle: 'userOne'}*/
-    // TODO make possible for regular user
-    // error:     Failed: No element found using locator: By(xpath, //span[text() = "e2e column chart Tue Nov 21 2017 20:30:55 GMT+0700 (+07)"])
-
+    'admin': {handle: 'admin'},
+    'user': {handle: 'userOne'}
   };
 
   afterAll(function () {
