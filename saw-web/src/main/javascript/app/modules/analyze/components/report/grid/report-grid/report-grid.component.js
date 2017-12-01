@@ -207,9 +207,9 @@ export const ReportGridComponent = {
           };
           field.customizeText = (data => {
             const stringList = data.valueText.split(',');
-            const finalString = '';
+            let finalString = '';
             forEach(stringList, value => {
-              finalString = finalString + value;
+              finalString += value;
             });
             return finalString;
           });
@@ -219,9 +219,9 @@ export const ReportGridComponent = {
             field.customizeText = (data => {
               if (!column.format.comma) {
                 const stringList = data.valueText.split(',');
-                const finalString = '';
+                let finalString = '';
                 forEach(stringList, value => {
-                  finalString = finalString + value;
+                  finalString += value;
                 });
                 data.valueText = finalString;
               }
@@ -235,9 +235,9 @@ export const ReportGridComponent = {
             field.customizeText = (data => {
               if (!column.format.comma) {
                 const stringList = data.valueText.split(',');
-                const finalString = '';
+                let finalString = '';
                 forEach(stringList, value => {
-                  finalString = finalString + value;
+                  finalString += value;
                 });
                 data.valueText = finalString;
               }
@@ -348,9 +348,9 @@ export const ReportGridComponent = {
                 column.customizeText = (source => {
                   if (!column.format.comma) {
                     const stringList = source.valueText.split(',');
-                    const finalString = '';
+                    let finalString = '';
                     forEach(stringList, value => {
-                      finalString = finalString + value;
+                      finalString += value;
                     });
                     source.valueText = finalString;
                   }
@@ -369,9 +369,9 @@ export const ReportGridComponent = {
                 column.customizeText = (source => {
                   if (!column.format.comma) {
                     const stringList = source.valueText.split(',');
-                    const finalString = '';
+                    let finalString = '';
                     forEach(stringList, value => {
-                      finalString = finalString + value;
+                      finalString += value;
                     });
                     source.valueText = finalString;
                   }

@@ -144,7 +144,7 @@ export const ReportGridDisplayComponent = {
             const stringList = data.valueText.split(',');
             let finalString = '';
             forEach(stringList, value => {
-              finalString = finalString + value;
+              finalString += value;
             });
             return finalString;
           });
@@ -156,11 +156,11 @@ export const ReportGridDisplayComponent = {
                 const stringList = data.valueText.split(',');
                 let finalString = '';
                 forEach(stringList, value => {
-                  finalString = finalString + value;
+                  finalString += value;
                 });
                 data.valueText = finalString;
               }
-              if (!isUndefined(column.format.currencySymbol) &&  !isEmpty(data.valueText)) {
+              if (!isUndefined(column.format.currencySymbol) && !isEmpty(data.valueText)) {
                 return column.format.currencySymbol + ' ' + data.valueText;
               } else {
                 return data.valueText;
@@ -172,7 +172,7 @@ export const ReportGridDisplayComponent = {
                 const stringList = data.valueText.split(',');
                 let finalString = '';
                 forEach(stringList, value => {
-                  finalString = finalString + value;
+                  finalString += value;
                 });
                 data.valueText = finalString;
               }
