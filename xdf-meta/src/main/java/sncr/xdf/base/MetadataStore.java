@@ -1,6 +1,8 @@
 package sncr.xdf.base;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.mapr.db.MapRDB;
 import com.mapr.db.Table;
 import org.apache.hadoop.fs.Path;
@@ -112,14 +114,28 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
         table.flush();
     }
 
-    public void _updatePath(String id, String path, JsonElement src) throws Exception {
-        Document mutatedPart = toMapRDBDocument(src);
+    public void _updatePath(String id, String path, String root, JsonElement src) throws Exception {
+        Document mutatedPart = toMapRDBDocument(root, src);
         DocumentMutation mutation = MapRDB.newMutation();
-        mutation.set(path, mutatedPart);
+        logger.trace("Path: " + path + ", Doc.part.: " + mutatedPart.toString());
+        mutation.setOrReplace(path, mutatedPart);
         table.update(id, mutation);
         table.flush();
     }
 
+    protected JsonObject createStatusSection(String status, String startTS, String finishedTS, String aleId, String batchSessionId)
+    {
+        JsonObject src = new JsonObject();
+        src.add("status", new JsonPrimitive(status));
+        src.add("started", new JsonPrimitive(startTS));
+        if ( finishedTS != null)
+            src.add("finished", new JsonPrimitive(finishedTS));
+        else
+            src.add("finished", new JsonPrimitive( "" ) );
+        src.add("aleId", new JsonPrimitive(aleId));
+        src.add("batchId", new JsonPrimitive(batchSessionId));
+        return src;
+    }
 
 
 }

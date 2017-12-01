@@ -19,6 +19,10 @@ public interface DocumentConverter {
         return DCHelper.processMap(MapRDB.newDocument(), null, je);
     }
 
+    default Document toMapRDBDocument(String path, JsonElement je){
+        return DCHelper.processMap(MapRDB.newDocument(), path, je);
+    }
+
     default JsonElement toJsonElement (Document doc){
         String json = doc.asJsonString();
         JsonParser jsonParser = new JsonParser();

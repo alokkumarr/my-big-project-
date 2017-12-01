@@ -1,7 +1,6 @@
 package sncr.xdf.services;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.apache.log4j.Logger;
@@ -9,7 +8,6 @@ import sncr.xdf.base.MetadataStore;
 import sncr.xdf.context.Context;
 import sncr.xdf.datasets.conf.DataSetProperties;
 import sncr.xdf.metastore.AuditLogStore;
-import sncr.xdf.metastore.DSStore;
 
 import java.util.Map;
 

@@ -1,12 +1,6 @@
 package sncr.xdf.cli;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import org.ojai.Document;
 import sncr.xdf.core.file.HFileOperations;
-import sncr.xdf.metastore.DSStore;
 
 import java.io.FileNotFoundException;
 

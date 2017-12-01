@@ -1,14 +1,13 @@
 package sncr.xdf.rest.actors;
 
 import akka.actor.AbstractActor;
-import akka.actor.ActorLogging;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.cluster.Cluster;
 import akka.cluster.ClusterEvent;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import sncr.xdf.metastore.DSStore;
+import sncr.xdf.metastore.DataSetStore;
 import sncr.xdf.rest.messages.dl.Document;
 import sncr.xdf.services.DLMetadata;
 import sncr.xdf.services.MetadataBase;
@@ -27,7 +26,7 @@ public class DataLakeOpExecutor extends AbstractActor{
     private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
     private final Cluster cluster = Cluster.get(getContext().system());
     private DLMetadata mdt = null;
-    private DSStore mdstore = null;
+    private DataSetStore mdstore = null;
     private int executorNo = -1;
     private ActorRef coordinator;
     private String dataLakeRoot;
@@ -87,7 +86,7 @@ public class DataLakeOpExecutor extends AbstractActor{
         try {
             this.mdt = new DLMetadata(dataLakeRoot);
             this.executorNo = r.exeutorNo;
-            this.mdstore = new DSStore(dataLakeRoot);
+            this.mdstore = new DataSetStore(dataLakeRoot);
         } catch (Exception e) {
             log.error("Can't initialize FileSystem : {}", e.getMessage());
         }
