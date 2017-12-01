@@ -7,6 +7,7 @@ import * as remove from 'lodash/remove';
 import * as isUndefined from 'lodash/isUndefined';
 import * as $ from 'jquery';
 import * as moment from 'moment';
+import * as concat from 'lodash/concat';
 import 'moment-timezone';
 
 import * as template from './report-grid.component.html';
@@ -209,7 +210,7 @@ export const ReportGridComponent = {
             const stringList = data.valueText.split(',');
             let finalString = '';
             forEach(stringList, value => {
-              finalString += value;
+              finalString = finalString.concat(value);
             });
             return finalString;
           });
@@ -221,7 +222,7 @@ export const ReportGridComponent = {
                 const stringList = data.valueText.split(',');
                 let finalString = '';
                 forEach(stringList, value => {
-                  finalString += value;
+                  finalString = finalString.concat(value);
                 });
                 data.valueText = finalString;
               }
@@ -237,7 +238,7 @@ export const ReportGridComponent = {
                 const stringList = data.valueText.split(',');
                 let finalString = '';
                 forEach(stringList, value => {
-                  finalString += value;
+                  finalString = finalString.concat(value);
                 });
                 data.valueText = finalString;
               }
@@ -350,7 +351,7 @@ export const ReportGridComponent = {
                     const stringList = source.valueText.split(',');
                     let finalString = '';
                     forEach(stringList, value => {
-                      finalString += value;
+                      finalString = finalString.concat(value);
                     });
                     source.valueText = finalString;
                   }

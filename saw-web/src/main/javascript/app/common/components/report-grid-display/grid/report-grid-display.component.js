@@ -144,7 +144,7 @@ export const ReportGridDisplayComponent = {
             const stringList = data.valueText.split(',');
             let finalString = '';
             forEach(stringList, value => {
-              finalString += value;
+              finalString = finalString.concat(value);
             });
             return finalString;
           });
@@ -156,7 +156,7 @@ export const ReportGridDisplayComponent = {
                 const stringList = data.valueText.split(',');
                 let finalString = '';
                 forEach(stringList, value => {
-                  finalString += value;
+                  finalString = finalString.concat(value);
                 });
                 data.valueText = finalString;
               }
@@ -172,7 +172,7 @@ export const ReportGridDisplayComponent = {
                 const stringList = data.valueText.split(',');
                 let finalString = '';
                 forEach(stringList, value => {
-                  finalString += value;
+                  finalString = finalString.concat(value);
                 });
                 data.valueText = finalString;
               }
