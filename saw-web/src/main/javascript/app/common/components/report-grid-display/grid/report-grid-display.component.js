@@ -121,6 +121,19 @@ export const ReportGridDisplayComponent = {
           width: COLUMN_WIDTH
         };
 
+        if (DATE_TYPES.includes(column.type)) {
+          field.format = {
+            type: 'shortDate'
+          };
+        }
+
+        if (NUMBER_TYPES.includes(column.type)) {
+          field.format = {
+            type: 'fixedPoint',
+            precision: 2
+          };
+        }
+
         if (!isUndefined(NUMBER_TYPES.includes(column.type)) && isUndefined(column.format)) {
           field.format = {
             type: 'fixedPoint',
@@ -129,7 +142,7 @@ export const ReportGridDisplayComponent = {
           };
           field.customizeText = (data => {
             const stringList = data.valueText.split(',');
-            const finalString = '';
+            let finalString = '';
             forEach(stringList, value => {
               finalString = finalString + value;
             });
@@ -141,7 +154,7 @@ export const ReportGridDisplayComponent = {
             field.customizeText = (data => {
               if (!column.format.comma) {
                 const stringList = data.valueText.split(',');
-                const finalString = '';
+                let finalString = '';
                 forEach(stringList, value => {
                   finalString = finalString + value;
                 });
@@ -157,7 +170,7 @@ export const ReportGridDisplayComponent = {
             field.customizeText = (data => {
               if (!column.format.comma) {
                 const stringList = data.valueText.split(',');
-                const finalString = '';
+                let finalString = '';
                 forEach(stringList, value => {
                   finalString = finalString + value;
                 });

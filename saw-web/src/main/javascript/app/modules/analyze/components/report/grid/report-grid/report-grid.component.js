@@ -186,6 +186,19 @@ export const ReportGridComponent = {
           width: COLUMN_WIDTH,
           format: column.format
         };
+
+        if (DATE_TYPES.includes(column.type)) {
+          field.format = {
+            type: 'shortDate'
+          };
+        }
+        if (NUMBER_TYPES.includes(column.type)) {
+          field.format = {
+            type: 'fixedPoint',
+            precision: 2
+          };
+        }
+
         if (!isUndefined(NUMBER_TYPES.includes(column.type)) && isUndefined(column.format)) {
           field.format = {
             type: 'fixedPoint',
