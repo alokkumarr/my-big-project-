@@ -241,6 +241,7 @@ export const ReportGridContainerComponent = {
         if (value.name === columnName) {
           switch (format.type) {
           case 'date':
+          case 'string-date':
             value.type = 'date';
             value.format = format.dateFormat;
             break;

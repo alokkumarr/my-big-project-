@@ -79,6 +79,7 @@ export const ReportGridComponent = {
       if (e.target === 'header') {
         e.items = [];
 
+        console.log('column: ', e.column);
         if (['number', 'timestamp', 'date', 'string-date'].includes(e.column.dataType)) {
           e.items.push({
             text: 'Format Data',
@@ -164,7 +165,7 @@ export const ReportGridComponent = {
         const columns = this.prepareGridColumns(this.columns);
         forEach(columns, column => {
           if (column.dataType === 'date') {
-            column.dataType = 'string';
+            column.dataType = 'string-date';
           }
         });
         this._gridInstance.option('columns', columns);
@@ -326,7 +327,7 @@ export const ReportGridComponent = {
           let typeValue = '';
           let separator = false;
           if (column) {
-            if (newFormat.type === 'date' || newFormat.type === 'timestamp') {
+            if (['date', 'string-date', 'timestamp'].includes(newFormat.type)) {
               column.dataType = 'date';
               column.format = newFormat.dateFormat;
             } else {
@@ -356,9 +357,8 @@ export const ReportGridComponent = {
                   }
                   if (!isUndefined(column.format.currencySymbol) && !isEmpty(source.valueText)) {
                     return column.format.currencySymbol + ' ' + source.valueText;
-                  } else {
-                    return source.valueText;
                   }
+                  return source.valueText;
                 });
               } else {
                 column.format = {
