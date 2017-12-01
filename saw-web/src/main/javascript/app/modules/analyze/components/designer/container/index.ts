@@ -1,2 +1,2 @@
-import DesignerContainerComponent from './designer-container.component';
-export default DesignerContainerComponent;
+import { DesignerContainerComponent } from './designer-container.component';
+export { DesignerContainerComponent };

@@ -5,9 +5,6 @@ import {
   EventEmitter
 } from '@angular/core';
 import * as forEach from 'lodash/forEach';
-import * as assign from 'lodash/assign';
-import * as values from 'lodash/values';
-import * as mapValues from 'lodash/mapValues';
 import {Subject} from 'rxjs/Subject';
 
 require('./pivot-grid.component.scss');

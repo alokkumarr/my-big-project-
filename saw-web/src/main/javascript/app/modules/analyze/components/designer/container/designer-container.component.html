@@ -2,9 +2,15 @@
                  [analysis]="analysis"
                  [isInDraftMode]="isInDraftMode"
                  (onBack)="onBack.emit()"
-                 (onSave)="onSave()"></designer-header>
+                 (onSave)="onSave()">
+</designer-header>
+
 <div class="designer__toolbar"></div>
+
 <old-designer-settings class="designer__data-settings"
                    [artifactColumns]="analysis ? analysis.artifacts[0].columns : []">
 </old-designer-settings>
-<div class="designer__content"></div>
+
+<designer-main class="designer__main"
+               [analysis]="analysis">
+</designer-main>

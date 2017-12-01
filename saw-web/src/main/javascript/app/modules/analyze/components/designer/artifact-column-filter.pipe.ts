@@ -1,6 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import * as filter from 'lodash/filter';
-import * as indexOf from 'lodash/indexOf';
 
 import {
   ArtifactColumns,
@@ -10,19 +9,18 @@ import {
   NUMBER_TYPES,
   DATE_TYPES
 } from '../../consts'
-import { NUMBER_TYPE } from '@angular/compiler/src/output/output_ast';
 
 @Pipe({
   name: 'artifactColumnFilter',
   pure: true
 })
-export default class ArtifactColumnFilterPipe implements PipeTransform {
+export class ArtifactColumnFilterPipe implements PipeTransform {
   transform(items: ArtifactColumns, filterObj: ArtifactColumnFilter): any {
     if (!items || !filter) {
       return items;
     }
 
-    return filter(items, ({checked, type, columnName}) => {
+    return filter(items, ({type, columnName}) => {
       return this.hasType(type, filterObj) &&
         this.hasKeyword(columnName, filterObj)
     });

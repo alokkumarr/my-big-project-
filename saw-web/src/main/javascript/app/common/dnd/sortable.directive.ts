@@ -10,13 +10,11 @@ import {
 } from '@angular/core';
 
 import {
-  IDragPayload,
   ISortableDragEndData
 } from './types';
 import { dndClasses } from './consts';
 import {DragnDropService} from './dnd.service';
 import {DndSortableContainerDirective} from './sortable-container.directive';
-import { timeout } from 'q';
 
 @Directive({ selector: '[dndSortable]' })
 export class DndSortableDirective {
@@ -47,7 +45,7 @@ export class DndSortableDirective {
   ) {}
 
   @HostListener('dragenter', ['$event'])
-  onDragEnter(event) {
+  onDragEnter() {
     this._counter ++;
     if (this._counter === 1) {
       this._enableEventPropagation = true;
@@ -57,7 +55,7 @@ export class DndSortableDirective {
   }
 
   @HostListener('dragleave', ['$event'])
-  onDragLeave(event) {
+  onDragLeave() {
     this._counter --;
     if (this._counter === 0) {
       this._enableEventPropagation = false;
@@ -72,7 +70,7 @@ export class DndSortableDirective {
   }
 
   @HostListener('dragstart', ['$event'])
-  onDragStart(event) {
+  onDragStart() {
     // this timeout is needed so that the browser makes the img if the dragged element while it's still visible
     // as the _isDragged property will apply a class, that makes the element invisible
     setTimeout(() => {

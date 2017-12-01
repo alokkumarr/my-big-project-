@@ -4,13 +4,11 @@ import {
   Output,
   Input,
   HostListener,
-  HostBinding,
-  ElementRef
+  HostBinding
 } from '@angular/core';
 
 import {
-  IDroppableOptions,
-  IDragPayload
+  IDroppableOptions
 } from './types';
 import {
   arrayMove
@@ -41,8 +39,7 @@ export class DndSortableContainerDirective {
   private _placeholderPlace: any;
 
   constructor(
-    private _dragDropService: DragnDropService,
-    private _elemRef: ElementRef
+    private _dragDropService: DragnDropService
   ) {}
 
   @HostListener('dragenter', ['$event'])
@@ -57,15 +54,15 @@ export class DndSortableContainerDirective {
       if (this._isDropAllowed &&
         this.dndCollection &&
         this.dndCollection.length === 0) {
-          this.addPlaceholder(event, 'inside');
-          this._newSortableIndex = 0;
-        }
+        this.addPlaceholder(event, 'inside');
+        this._newSortableIndex = 0;
       }
     }
+  }
 
-    @HostListener('dragleave', ['$event'])
-    onDragLeave(event) {
-      this._counter --;
+  @HostListener('dragleave', ['$event'])
+  onDragLeave() {
+    this._counter --;
     if (this._counter === 0) {
       this._isDropAllowed = false;
       this.removePlaceholder();
@@ -81,7 +78,7 @@ export class DndSortableContainerDirective {
   }
 
   @HostListener('drop', ['$event'])
-  onDrop(event) {
+  onDrop() {
     this._isDropAllowed = false;
     const {data} = this._dragDropService.getPayload();
     this._counter = 0;
@@ -148,15 +145,15 @@ export class DndSortableContainerDirective {
     this._insertionPlaceholder = this._dragDropService.getElement();
     const targetElem = event.target;
     switch (where) {
-      case 'inside':
+    case 'inside':
       targetElem.append(this._insertionPlaceholder);
-        break;
-      case 'before':
+      break;
+    case 'before':
       targetElem.before(this._insertionPlaceholder);
-        break;
-      case 'after':
+      break;
+    case 'after':
       targetElem.after(this._insertionPlaceholder);
-        break;
+      break;
     }
   }
 }

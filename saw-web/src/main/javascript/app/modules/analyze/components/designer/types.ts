@@ -1,14 +1,20 @@
-import ArtifactColumnPivot from '../../models/artifact-column-pivot.model';
-import ArtifactColumnChart from '../../models/artifact-column-chart.model';
-import Artifact from '../../models/artifact.model';
-import ArtifactColumn from '../../models/artifact-column.model';
+import {
+  ArtifactColumn,
+  ArtifactColumnPivot,
+  ArtifactColumnChart
+} from '../../models/artifact-column.model';
+import {
+  Analysis
+} from '../../models/analysis.model';
+
+export {
+  ArtifactColumnPivot,
+  ArtifactColumnChart,
+  Analysis
+};
 
 export type ArtifactColumns = ArtifactColumnPivot[] | ArtifactColumnChart[];
 export type ArtifactColumn = ArtifactColumnPivot | ArtifactColumnChart;
-export {
-  ArtifactColumnPivot,
-  ArtifactColumnChart
-};
 
 export type ArtifactColumnFilter = {
   keyword: string,

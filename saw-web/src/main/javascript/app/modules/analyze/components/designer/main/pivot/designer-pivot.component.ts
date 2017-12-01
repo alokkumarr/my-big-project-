@@ -6,7 +6,6 @@ import {
 } from '@angular/core';
 import * as map from 'lodash/map';
 import * as filter from 'lodash/filter';
-import { DesignerService } from '../designer.service';
 import {
   IDEsignerSettingGroupAdapter,
   ArtifactColumn,
@@ -14,20 +13,18 @@ import {
   ArtifactColumnFilter,
   Analysis,
   ArtifactColumnPivot
-} from '../types';
-import { TYPE_ICONS_OBJ } from '../../../consts';
+} from '../../types';
+import { TYPE_ICONS_OBJ } from '../../../../consts';
 
 const template = require('./designer-main.component.html');
 require('./designer-main.component.scss');
 
 @Component({
-  selector: 'designer-main',
+  selector: 'designer-pivot',
   template
 })
-export class DesignerMainComponent {
+export class DesignerPivotComponent {
   @Output() public onSettingsChange: EventEmitter<ArtifactColumnPivot[]> = new EventEmitter();
   @Input() public analysis: Analysis;
-
-  constructor(private _designerService: DesignerService) {}
 
 }

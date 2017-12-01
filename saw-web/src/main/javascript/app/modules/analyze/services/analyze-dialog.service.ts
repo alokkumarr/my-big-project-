@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogConfig} from '@angular/material';
-import Analysis from '../models/analysis.model';
-import {
-  DesignerMode,
-  AnalysisDialogData,
-  AnalysisStarter
-} from '../types';
+import {MatDialog, MatDialogConfig} from '@angular/material';
 
-import DesignerDialogComponent from '../components/designer/dialog/designer-dialog.component';
+import {
+  AnalysisDialogData,
+  AnalysisStarter,
+  Analysis
+} from '../types';
+import { DesignerDialogComponent } from '../components/designer/dialog/designer-dialog.component';
 
 
 @Injectable()

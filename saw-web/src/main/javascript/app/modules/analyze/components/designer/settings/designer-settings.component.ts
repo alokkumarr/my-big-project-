@@ -4,16 +4,15 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-import * as map from 'lodash/map';
 import * as filter from 'lodash/filter';
-import Analysis from '../../../models/analysis.model';
-import ArtifactColumnPivot from '../../../models/artifact-column-pivot.model';
-import DesignerService from '../designer.service';
+
+import { DesignerService } from '../designer.service';
 import {
   IDEsignerSettingGroupAdapter,
   ArtifactColumn,
   ArtifactColumns,
-  ArtifactColumnFilter
+  ArtifactColumnFilter,
+  ArtifactColumnPivot
 } from '../types';
 import { TYPE_ICONS_OBJ } from '../../../consts';
 
@@ -59,7 +58,7 @@ export default class DesignerSettingsComponent {
     this.hideUnselectedSection();
   }
 
-  onDragEnd(event, artifactcolumn) {
+  onDragEnd(event) {
     this._isDraggingInProgress = false;
     if (event.isDropSuccessful && event.isSortableDroppedInOtherContainer) {
       this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();

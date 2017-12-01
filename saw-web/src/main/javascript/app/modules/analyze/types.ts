@@ -1,5 +1,7 @@
-import AnalysisChart from './models/analysis-chart.model';
-import AnalysisReport from './models/analysis-report.model';
+import {
+  AnalysisChart,
+  AnalysisReport
+} from './models/analysis.model';
 
 export type DesignerMode = 'edit' | 'fork' | 'new';
 export type AnalysisType = 'report' | 'chart' | 'pivot';

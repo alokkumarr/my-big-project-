@@ -21,7 +21,7 @@ import {
 } from '../../consts';
 
 @Injectable()
-export default class DesignerService {
+export class DesignerService {
   constructor(private _analyzeService: AnalyzeService) { }
 
   createAnalysis(semanticId: string, type: AnalysisType): Promise<Analysis> {
@@ -85,9 +85,9 @@ export default class DesignerService {
     return pivotGroupAdapters;
   }
 
-  getChartGroupAdapters(chartType: ChartType) {
+  // getChartGroupAdapters(chartType: ChartType) {
 
-  }
+  // }
 
   private _distributeArtifactColumnsIntoGroups(
     artifactColumns: ArtifactColumns,

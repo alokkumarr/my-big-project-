@@ -9,7 +9,6 @@ import {
 } from '@angular/core';
 
 import {
-  IDragPayload,
   IDraggableDragEndData
 } from './types';
 import { dndClasses } from './consts';
@@ -39,7 +38,7 @@ export class DndDraggableDirective {
   ) {}
 
   @HostListener('dragstart', ['$event'])
-  onDragStart(event) {
+  onDragStart() {
     this._isDragged = true;
     this._dragDropService.startDrag({
       data: this._data,

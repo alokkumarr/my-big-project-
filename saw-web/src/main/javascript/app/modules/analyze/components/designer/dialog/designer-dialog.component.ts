@@ -1,6 +1,6 @@
-import {Component, Inject} from '@angular/core';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
-import {AnalysisStarter} from '../../../types'
+import { Component, Inject } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { AnalysisStarter } from '../../../types'
 const template = require('./designer-dialog.component.html');
 require('./designer-dialog.component.scss');
 
@@ -8,7 +8,7 @@ require('./designer-dialog.component.scss');
   selector: 'designer-dialog',
   template
 })
-export default class DesignerDialogComponent {
+export class DesignerDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<DesignerDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: AnalysisStarter) { }

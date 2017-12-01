@@ -4,15 +4,10 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-import * as map from 'lodash/map';
 import * as filter from 'lodash/filter';
-import Analysis from '../../../models/analysis.model';
-import DesignerService from '../designer.service';
 import {
-  IDEsignerSettingGroupAdapter,
   ArtifactColumnPivot,
-  ArtifactColumns,
-  ArtifactColumnFilter
+  ArtifactColumns
 } from '../types';
 import {
   NUMBER_TYPES,
@@ -23,13 +18,11 @@ import {
   DEFAULT_AGGREGATE_TYPE,
   AGGREGATE_TYPES_OBJ,
   AREA_TYPES,
-  DEFAULT_AREA_TYPE,
   AREA_TYPES_OBJ,
   DATE_INTERVALS,
   DEFAULT_DATE_INTERVAL,
   DATE_INTERVALS_OBJ
 } from '../../../consts';
-import { NUMBER_TYPE } from '@angular/compiler/src/output/output_ast';
 
 const template = require('./old-designer-settings.component.html');
 require('./old-designer-settings.component.scss');
@@ -51,13 +44,21 @@ export class OldDesignerSettingsComponent {
   public DATE_INTERVALS = DATE_INTERVALS;
   public DATE_INTERVALS_OBJ = DATE_INTERVALS_OBJ;
 
-  constructor(private _designerService: DesignerService) {}
-
   onSuccessfulSelect() {
     this.onSettingsChange.emit();
   }
 
+  canBeChecked(artifactColumn: ArtifactColumnPivot) {
+    // only 5 fields of the same type can be selected at a time
+    const columnsWithSameArea = filter(this.artifactColumns,
+      ({area, checked}) => checked && (artifactColumn.area === area));
+    return columnsWithSameArea.length <= MAX_POSSIBLE_FIELDS_OF_SAME_AREA;
+  }
+
   onCheckToggle(artifactColumn: ArtifactColumnPivot) {
+    if (!this.canBeChecked(artifactColumn)) {
+      return;
+    }
     artifactColumn.checked = !artifactColumn.checked;
     if (artifactColumn.checked) {
       this.transform(artifactColumn);
@@ -96,7 +97,7 @@ export class OldDesignerSettingsComponent {
     artifactColumn.dateInterval = dateInterval;
   }
 
-  menuTrackByFn(index, item) {
+  menuTrackByFn(_, item) {
     return item.value;
   }
 }

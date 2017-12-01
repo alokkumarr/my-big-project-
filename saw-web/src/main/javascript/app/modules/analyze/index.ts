@@ -64,6 +64,7 @@ import {
   DesignerDialogComponent,
   DesignerContainerComponent,
   DesignerHeaderComponent,
+  DesignerMainComponent,
   // DesignerSettingsComponent,
   // DesignerSettingsGroupComponent,
   OldDesignerSettingsComponent,
@@ -142,6 +143,7 @@ angular.module(AnalyzeModule, [
     DesignerDialogComponent,
     DesignerContainerComponent,
     DesignerHeaderComponent,
+    DesignerMainComponent,
     // DesignerSettingsComponent,
     // DesignerSettingsGroupComponent,
     OldDesignerSettingsComponent,
@@ -152,6 +154,7 @@ angular.module(AnalyzeModule, [
     DesignerDialogComponent,
     DesignerContainerComponent,
     DesignerHeaderComponent,
+    DesignerMainComponent,
     OldDesignerSettingsComponent
     // DesignerSettingsComponent,
     // DesignerSettingsGroupComponent

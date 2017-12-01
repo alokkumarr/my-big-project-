@@ -1,7 +1,7 @@
 import Sort from './sort.model';
 import Join from './join.model';
 import Filter from './filter.model';
-import ArtifactColumn from './artifact-column.model';
+import { ArtifactColumn } from './artifact-column.model';
 
 export default interface SqlBuilder {
   filters:         Filter[];

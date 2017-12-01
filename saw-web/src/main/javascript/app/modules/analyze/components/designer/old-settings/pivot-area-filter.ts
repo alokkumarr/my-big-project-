@@ -1,11 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import * as filter from 'lodash/filter';
 
-import {
-  ArtifactColumns,
-  ArtifactColumnFilter,
-  PivotArea
-} from '../types';
+import { PivotArea } from '../types';
 import {NUMBER_TYPES} from '../../../consts';
 
 @Pipe({
@@ -13,7 +9,7 @@ import {NUMBER_TYPES} from '../../../consts';
   pure: true
 })
 export class PivotAreaFilterPipe implements PipeTransform {
-  transform(areaTypes, type: string): any {
+  transform(areaTypes: PivotArea, type: string): any {
     if (!areaTypes || !filter) {
       return areaTypes;
     }

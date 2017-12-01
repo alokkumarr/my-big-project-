@@ -1,2 +1,2 @@
-import DesignerDialogComponent from './designer-dialog.component';
-export default DesignerDialogComponent;
+import { DesignerDialogComponent } from './designer-dialog.component';
+export { DesignerDialogComponent };

@@ -5,10 +5,9 @@ import {
   EventEmitter
 } from '@angular/core';
 
-import DesignerService from '../designer.service';
+import { DesignerService } from '../designer.service';
 import {
   DesignerMode,
-  AnalysisType,
   AnalysisStarter,
   Analysis
 } from '../../../types';
@@ -19,7 +18,7 @@ require('./designer-container.component.scss');
   selector: 'designer-container',
   template
 })
-export default class DesignerContainerComponent {
+export class DesignerContainerComponent {
   @Input() public analysisStarter?: AnalysisStarter;
   @Input() public analysis?: Analysis;
   @Input() public designerMode: DesignerMode;
