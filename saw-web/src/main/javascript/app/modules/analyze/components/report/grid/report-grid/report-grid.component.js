@@ -7,7 +7,6 @@ import * as remove from 'lodash/remove';
 import * as isUndefined from 'lodash/isUndefined';
 import * as $ from 'jquery';
 import * as moment from 'moment';
-import * as concat from 'lodash/concat';
 import 'moment-timezone';
 
 import * as template from './report-grid.component.html';
