@@ -162,9 +162,8 @@ export const ReportGridDisplayComponent = {
               }
               if (!isUndefined(column.format.currencySymbol) && !isEmpty(data.valueText)) {
                 return column.format.currencySymbol + ' ' + data.valueText;
-              } else {
-                return data.valueText;
               }
+              return data.valueText;
             });
           } else {
             field.customizeText = (data => {

@@ -79,7 +79,6 @@ export const ReportGridComponent = {
       if (e.target === 'header') {
         e.items = [];
 
-        console.log('column: ', e.column);
         if (['number', 'timestamp', 'date', 'string-date'].includes(e.column.dataType)) {
           e.items.push({
             text: 'Format Data',
@@ -228,9 +227,8 @@ export const ReportGridComponent = {
               }
               if (!isUndefined(column.format.currencySymbol) && !isEmpty(data.valueText)) {
                 return column.format.currencySymbol + ' ' + data.valueText;
-              } else {
-                return data.valueText;
               }
+              return data.valueText;
             });
           } else {
             field.customizeText = (data => {
