@@ -82,7 +82,21 @@ containers can be removed by executing the following command:
 
         $ docker rm -f saw saw-dist
 
-# Running SAW Web in development mode using local SAW deployment
+# Running system tests using local deployment
+
+All system tests are run automatically as part of `mvn verify`.
+However, as each such invocation will involve building the entire
+package and starting a new container, it can take minutes to complete.
+To iterate faster on specific system tests against an existing local
+deployment, run the following command:
+
+        mvn -pl saw-dist test-compile failsafe:integration-test
+
+The above command will immediately start executing system tests
+against an existing local SAW deployment.  Therefore it is possible to
+edit system tests, run them and get feedback in less than a minute.
+
+# Running SAW Web in development mode using local deployment
 
 When doing front-end development developers typically run the SAW Web
 application using NPM commands out of the `saw-web` source code
