@@ -9,7 +9,7 @@
         "dataSecurityKey": "",
         "type": "semantic",
         "module": "ANALYZE",
-        "metric": "Sample",
+        "metric": "sample-spark",
         "metricName": "Sample (report)",
         "customerCode": "SYNCHRONOSS",
         "disabled": "false",
