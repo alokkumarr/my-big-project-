@@ -1,8 +1,8 @@
 import { Component, Inject, ViewChild } from '@angular/core';
-import { MdDialogRef, MD_DIALOG_DATA, MdDialog } from '@angular/material';
-import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
+import { MdDialogRef, MD_DIALOG_DATA, MdDialog } from '@angular/material'; import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { GridsterConfig, GridsterItem, GridsterComponent } from 'angular-gridster2';
+import { Dashboard } from '../../models/dashboard.interface';
 import {
   trigger,
   state,
@@ -12,6 +12,8 @@ import {
 } from '@angular/animations';
 
 import * as forEach from 'lodash/forEach';
+import * as map from 'lodash/map';
+import * as get from 'lodash/get';
 
 import { AnalysisChoiceComponent } from '../analysis-choice/analysis-choice.component';
 
@@ -116,6 +118,9 @@ export class CreateDashboardComponent {
     this.dashboard = [];
   }
 
+  initializeDashboard() {
+  }
+
   removeTile(item: GridsterItem) {
     this.dashboard.splice(this.dashboard.indexOf(item), 1);
     this.checkEmpty();
@@ -139,11 +144,35 @@ export class CreateDashboardComponent {
     });
   }
 
+  prepareDashboardForSave(): Dashboard {
+    return {
+      id: '',
+      categoryId: '',
+      name: '',
+      description: '',
+      options: {},
+      tiles: map(this.dashboard, tile => ({
+        type: 'analysis',
+        id: get(tile, 'analysis.id', ''),
+        x: tile.x,
+        y: tile.y,
+        cols: tile.cols,
+        rows: tile.rows,
+        options: {}
+      })),
+      filters: []
+    }
+  }
+
   openSaveDialog() {
     const dialogRef = this.dialog.open(SaveDashboardComponent, {
       data: {
-        dashboard: {}
+        dashboard: this.prepareDashboardForSave()
       }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      result && this.dialogRef.close();
     });
   }
 }

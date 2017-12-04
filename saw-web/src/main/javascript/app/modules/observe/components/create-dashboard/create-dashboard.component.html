@@ -9,7 +9,7 @@
     <button md-button>
       Description
     </button>
-    <button md-raised-button color="primary" (click)="openSaveDialog()">
+    <button md-raised-button color="primary" (click)="openSaveDialog()" [disabled]="dashboard.length <= 0">
       Save
     </button>
   </div>
