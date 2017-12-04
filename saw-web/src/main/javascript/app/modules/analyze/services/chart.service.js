@@ -170,7 +170,7 @@ export class ChartService {
         title: {x: -15}
       },
       xAxis: {
-        categories: ['A', 'B', 'C', 'D', 'E'],
+        categories: [],
         title: {y: 15}
       }
     };

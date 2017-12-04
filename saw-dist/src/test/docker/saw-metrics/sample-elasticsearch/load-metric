@@ -7,7 +7,7 @@ set -eu
 dir=$(dirname $0)
 
 # Load common metrics functions
-. $(dirname $dir)/lib/common.sh
+. $dir/../lib/common.sh
 
 load_semantic() {
     echo "Loading sample Elasticsearch semantic metadata"
