@@ -160,6 +160,7 @@
                 </network>
                 <ports>
                   <port>saw.docker.port:80</port>
+                  <port>saw.kibana.port:5601</port>
                   <port>saw.journal.port:19531</port>
                 </ports>
                 <!-- Run privileged for systemd -->

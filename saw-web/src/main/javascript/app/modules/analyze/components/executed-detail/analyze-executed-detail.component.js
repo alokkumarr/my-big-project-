@@ -140,7 +140,8 @@ export const AnalyzeExecutedDetailComponent = {
         subCategoryId: this.analysis.categoryId
       });
       this.canUserEdit = this._JwtService.hasPrivilege('EDIT', {
-        subCategoryId: this.analysis.categoryId
+        subCategoryId: this.analysis.categoryId,
+        creatorId: this.analysis.userId
       });
     }
 

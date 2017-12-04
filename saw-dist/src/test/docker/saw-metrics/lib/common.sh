@@ -1,17 +1,13 @@
-#!/bin/bash
 #
-# Load SAW test metrics for pivot/chart
+# Functions shared across sample SAW metric load scripts
 #
-set -eu
-
-echo "Loading Elasticsearch metric"
 
 sudo_mapr="sudo -u mapr"
 hadoop_put="hadoop fs -put -f"
 mdcli="/opt/saw/service/bin/mdcli.sh"
-dir=$(dirname $0)
+datalake_home=/saw-metrics
 
-load_metric() {
+wait_maprfs() {
     # The MapR container might still be starting up, so wait until MapR-FS
     # has been verified being available
     echo "Waiting for MapR-FS to become available"
@@ -19,12 +15,4 @@ load_metric() {
         sleep 5
         echo "Retrying accessing MapR-FS"
     done
-    # Load the semantic node
-    test_sn=$1
-    test_sn_output=$test_sn-output
-    $sudo_mapr $hadoop_put $dir/$test_sn /
-    $sudo_mapr $mdcli -i /$test_sn -o /$test_sn_output
 }
-
-load_metric test_semantic_node_es.json
-$dir/saw-metrics-es-data
