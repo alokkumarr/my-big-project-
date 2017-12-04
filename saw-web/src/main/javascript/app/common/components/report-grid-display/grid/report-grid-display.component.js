@@ -105,10 +105,10 @@ export const ReportGridDisplayComponent = {
       });
       return data;
     }
-    checkColumndatatype (columnList, columnName) {
-      const datatype = '';
+    checkColumndatatype(columnList, columnName) {
+      let datatype = '';
       forEach(columnList, column => {
-        if (column.columnName === columnName){
+        if (column.columnName === columnName) {
           datatype = column.type;
         }
       });

@@ -289,10 +289,10 @@ export const ReportGridComponent = {
       });
       return data;
     }
-    checkColumndatatype (columnList, columnName) {
-      const datatype = '';
+    checkColumndatatype(columnList, columnName) {
+      let datatype = '';
       forEach(columnList, column => {
-        if (column.meta.columnName === columnName){
+        if (column.meta.columnName === columnName) {
           datatype = column.meta.type;
         }
       });
