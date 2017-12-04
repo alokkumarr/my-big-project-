@@ -10,7 +10,7 @@
   </md-card-header>
   <md-card-content layout="row"
                    layout-align="center center"
-                   e2e="{{'analysis-type:' + $ctrl.model.chartType + ':' + $ctrl.model.chartType}}">
+                   e2e="{{'analysis-type:' + $ctrl.model.type + ':' + $ctrl.model.chartType}}">
     <div class="saw-ac-placeholder m-{{::$ctrl.model.type}}{{::$ctrl.model.chartType ? '-'+$ctrl.model.chartType : ''}}"
          style="cursor: pointer; cursor: hand;"
          ui-sref="analyze.executedDetail({analysisId: $ctrl.model.id, analysis: $ctrl.model})"></div>
