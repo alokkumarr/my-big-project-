@@ -26,7 +26,7 @@ const getCardTypeByName = name => getCard(name)
   .then(e2eAttribute => {
     if (e2eAttribute) {
       const [, type, chartType] = e2eAttribute.split(':');
-      return `${type}${cartType ? `:${chartType}` : ''}`;
+      return `${type}${chartType ? `:${chartType}` : ''}`;
     }
     return e2eAttribute;
   });
@@ -217,7 +217,7 @@ module.exports = {
     getForkBtn,
     getAnalysisOption,
     firstCardTitle,
-    getCardType: getCardTypeByName
+    getCardTypeByName: getCardTypeByName
   },
   saveDialog: {
     selectedCategory: element(by.xpath('//md-select[@e2e="save-dialog-selected-category"]/*/span[1]')),
