@@ -42,6 +42,7 @@ public abstract class Component {
     protected WithDataSetService.DataSetServiceAux dsaux;
     private Map<String, JsonElement> mdOutputDSMap;
     private Map<String, JsonElement> mdInputDSMap;
+    private String transformationID;
 
 
     public String getError(){
@@ -50,7 +51,7 @@ public abstract class Component {
 
     public int Run(){
 
-        int ret = loadMetadata();
+        int ret = processMetadata();
         if ( ret == 0) {
             ret = Execute();
             if (ret == 0) {
@@ -74,40 +75,52 @@ public abstract class Component {
         return ret;
     }
 
-    protected int loadMetadata() {
+    protected int processMetadata() {
         try {
+            transformationID = transformationMD.readOrCreateTransformation(ctx);
             if (this instanceof WithDataSetService) {
+                final boolean[] failed = {false};
                 WithDataSetService mddl = (WithDataSetService) this;
                 if (ctx.componentConfiguration.getInputs() != null &&
-                    ctx.componentConfiguration.getInputs().size() > 0) {
+                        ctx.componentConfiguration.getInputs().size() > 0) {
                     inputDataSets = mddl.resolveDataObjects(dsaux);
                     mdInputDSMap = md.loadExistingDataSets(ctx, inputDataSets);
+                    mdInputDSMap.forEach((id, ids) -> {
+                        try {
+                            md.getDSStore().addTransformationConsumer(id, transformationID);
+                        } catch (Exception e) {
+                            failed[0] = true;
+                            error = String.format("Could not add transformation consumer: %s to input dataset %s", transformationID, id );
+                            logger.error(error, e);
+                            return;
+                        }
+                    });
                 }
+                if (failed[0]) return -1;
 
                 if (ctx.componentConfiguration.getOutputs() != null &&
-                    ctx.componentConfiguration.getOutputs().size() > 0) {
+                        ctx.componentConfiguration.getOutputs().size() > 0) {
                     outputDataSets = mddl.buildPathForOutputDataObjects(dsaux);
                 }
 
                 mdOutputDSMap = new HashMap<>();
                 final int[] rc = {0};
-                ctx.componentConfiguration.getOutputs().forEach( o ->
+                ctx.componentConfiguration.getOutputs().forEach(o ->
                 {
-                    logger.debug("Add output object to data object repository: " + o.getDataSet() );
+                    logger.debug("Add output object to data object repository: " + o.getDataSet());
                     JsonElement ds = md.readOrCreateDataSet(ctx, outputDataSets.get(o.getDataSet()), o.getMetadata());
-                    if (ds == null)
-                    {
-                        error = "Could not create metadata for output dataset: " +  o.getDataSet();
+                    if (ds == null) {
+                        error = "Could not create metadata for output dataset: " + o.getDataSet();
                         logger.error(error);
                         rc[0] = -1;
                         return;
                     }
-                    logger.debug("Create/read DS and add it to Output object DS list" );
+                    logger.debug("Create/read DS and add it to Output object DS list");
                     JsonObject dsObj = ds.getAsJsonObject();
                     String id = dsObj.getAsJsonPrimitive(DataSetProperties.Id.toString()).getAsString();
-                    logger.debug(String.format("Add to output DataSet map document with ID: %s\n %s",id,ds.toString()));
+                    logger.debug(String.format("Add to output DataSet map document with ID: %s\n %s", id, ds.toString()));
 
-                    mdOutputDSMap.put(dsObj.getAsJsonPrimitive(DataSetProperties.Id.toString()).getAsString(),ds);
+                    mdOutputDSMap.put(dsObj.getAsJsonPrimitive(DataSetProperties.Id.toString()).getAsString(), ds);
 
                     String step = "Could not create activity log entry for DataSet: " + o.getDataSet();
                     try {
@@ -124,17 +137,15 @@ public abstract class Component {
 
                     md.addDataSetToDLFSMeta(outputDataSets.get(o.getDataSet()), o);
                 });
-                if (rc[0] != 0)return rc[0];
+                if (rc[0] != 0) return rc[0];
             }
-        }
-        catch (Exception e) {
+            return 0;
+
+        } catch (Exception e) {
             error = "component initialization (input-resolving/output-preparation) exception: " + e.getMessage();
             logger.error(error);
             return -1;
         }
-
-        transformationMD.readOrCreateTransformation(ctx);
-        return 0;
     }
 
 
@@ -226,13 +237,18 @@ public abstract class Component {
         if (this instanceof WithMovableResult) {
             resultDataDesc = new ArrayList<>();
         }
-        md = new DLDSMeta(xdfDataRootSys);
-        transformationMD = new TransformationMeta();
-        dsaux = new WithDataSetService.DataSetServiceAux(ctx, md);
-        als = new AuditLogService(md.getRoot());
 
-//TODO:: To be used to build DS linage
-//        ctx.md.setHeader(componentName, null);
+        try {
+            md = new DLDSMeta(xdfDataRootSys);
+            transformationMD = new TransformationMeta(xdfDataRootSys);
+            dsaux = new WithDataSetService.DataSetServiceAux(ctx, md);
+            als = new AuditLogService(md.getRoot());
+        }
+        catch(Exception e){
+            error = "Initialization of metadata services failed";
+            logger.error(error, e);
+            return -1;
+        }
 
         return 0;
     }
@@ -265,15 +281,15 @@ public abstract class Component {
                 ( ret == 0)? "SUCCESS":
                 ((ret == 1)? "PARTIAL":
                              "FAILED");
-        int rc[] = {0};
+        int rc[] = {0}; rc[0] = 0;
         try {
             md.writeDLFSMeta(ctx);
             ctx.setFinishTS();
-
             JsonObject ale = als.generateDSAuditLogEntry(ctx, status, inputDataSets, outputDataSets);
             String ale_id = als.createAuditLog(ctx, ale);
             mdOutputDSMap.forEach((id, ds) -> {
                 try {
+                    md.getDSStore().setTransformationProducer(id, transformationID);
                     md.getDSStore().updateStatus(id, status, ctx.startTs, ctx.finishedTs, ale_id, ctx.batchID);
                 } catch (Exception e) {
                     error = "Could not write AuditLog entry to document, id = " + id;
@@ -283,6 +299,7 @@ public abstract class Component {
                     return;
                 }
             });
+            transformationMD.updateStatus(transformationID, status, ctx.startTs, ctx.finishedTs, ale_id, ctx.batchID);
         } catch (Exception e) {
             error = "Exception at job finalization: " +  e.getMessage();
             logger.error(e);

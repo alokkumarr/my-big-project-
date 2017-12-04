@@ -12,14 +12,13 @@ import sncr.xdf.context.Context;
 import sncr.xdf.core.file.HFileOperations;
 import sncr.xdf.datasets.conf.DataSetProperties;
 import sncr.xdf.datasets.conf.Dataset;
-import sncr.xdf.metastore.DSStore;
+import sncr.xdf.metastore.DataSetStore;
 
 import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_COMMENTS;
@@ -40,7 +39,7 @@ public class DLDSMeta{
 
     protected static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private Map<String, Map<String, Object>> repository;
-    private DSStore dsStore;
+    private DataSetStore dsStore;
 
     public String getRoot(){
         return dsStore.getRoot();
@@ -48,7 +47,7 @@ public class DLDSMeta{
 
 
     public DLDSMeta(String fsr) throws Exception {
-        dsStore = new DSStore(fsr);
+        dsStore = new DataSetStore(fsr);
         repository = new HashMap();
     }
 
@@ -271,6 +270,6 @@ public class DLDSMeta{
         return inputDSMetaData;
     }
 
-    public DSStore getDSStore () { return dsStore; }
+    public DataSetStore getDSStore () { return dsStore; }
 
 }

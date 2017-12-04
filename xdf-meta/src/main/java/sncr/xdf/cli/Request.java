@@ -6,9 +6,8 @@ import org.apache.log4j.Logger;
 import org.ojai.Document;
 import org.ojai.store.QueryCondition;
 import sncr.xdf.core.file.HFileOperations;
-import sncr.xdf.metastore.DSStore;
+import sncr.xdf.metastore.DataSetStore;
 import sncr.xdf.metastore.TransformationStore;
-import sncr.xdf.services.DLDSMeta;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -184,7 +183,7 @@ public class Request {
         Map<String, Document> searchResult = null;
         switch ( category ){
             case DataSet:
-                DSStore dss = new DSStore(xdfRoot);
+                DataSetStore dss = new DataSetStore(xdfRoot);
                 searchResult = dss.search(maprDBCondition);
                 break;
             case DataPod:
@@ -268,7 +267,7 @@ public class Request {
     private void doAction(JsonObject item) throws Exception {
         switch ( category ){
             case DataSet:
-                DSStore dss = new DSStore(xdfRoot);
+                DataSetStore dss = new DataSetStore(xdfRoot);
                 switch (action){
                     case create: dss.create(id, src); break;
                     case delete: dss.delete(id); break;

@@ -19,13 +19,13 @@ import java.util.*;
  * enforcing referential integrity between datasets and transformations
  *
  */
-public class DSStore extends MetadataStore implements WithSearchInMetastore {
+public class DataSetStore extends MetadataStore implements WithSearchInMetastore {
 
     private static String TABLE_NAME = "datasets";
-    public final String STATUS_SECTION = "asOfNow";
-    public final String mutable_fields[] = {"root.userData", "root.transformations.asInput" };
+    private final String STATUS_SECTION = "asOfNow";
+    private final String USER_DATA = "userData";
 
-    public DSStore(String fsr) throws Exception {
+    public DataSetStore(String fsr) throws Exception {
         super(TABLE_NAME, fsr);
     }
 
@@ -39,7 +39,7 @@ public class DSStore extends MetadataStore implements WithSearchInMetastore {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             System.out.print("Parsed JSON: \n\n" + je.toString() + "\n");
 
-            DSStore dss = new DSStore(null);
+            DataSetStore dss = new DataSetStore(null);
             Document d = dss.toMapRDBDocument(je);
             System.out.print("Converted to document: \n\n" + d.asJsonString() + "\n");
 
@@ -62,7 +62,7 @@ public class DSStore extends MetadataStore implements WithSearchInMetastore {
      * @throws Exception
      */
     public void updateUserData(String id, JsonElement src) throws Exception {
-        _updatePath(id, mutable_fields[0], src);
+        _updatePath(id, USER_DATA, null, src);
     }
 
 
@@ -79,18 +79,8 @@ public class DSStore extends MetadataStore implements WithSearchInMetastore {
      * @throws Exception
      */
     public void updateStatus(String id, String status, String startTS, String finishedTS, String aleId, String batchSessionId) throws Exception {
-        JsonObject src = new JsonObject();
-        src.add("status", new JsonPrimitive(status));
-        src.add("started", new JsonPrimitive(startTS));
-        if ( finishedTS != null)
-            src.add("finished", new JsonPrimitive(finishedTS));
-        else
-            src.add("finished", new JsonPrimitive( "" ) );
-
-        src.add("aleId", new JsonPrimitive(aleId));
-        src.add("batchId", new JsonPrimitive(batchSessionId));
-
-        _updatePath(id, mutable_fields[1], src);
+        JsonObject src = createStatusSection(status, startTS, finishedTS, aleId, batchSessionId);
+        _updatePath(id, "asOfNow", null, src);
     }
 
     /**
@@ -100,17 +90,18 @@ public class DSStore extends MetadataStore implements WithSearchInMetastore {
      */
     public void setTransformationProducer(String id, String tranformationId) throws Exception {
         JsonPrimitive p = new JsonPrimitive(tranformationId);
-        _updatePath(id, "transformations.asOutput", p);
+        _updatePath(id, "transformations", "asOutput", p);
     }
 
     public void addTransformationConsumer(String id, String tranformationId) throws Exception {
         Document d = table.findById(id);
         List<Object> transformations = d.getList("transformations.asInput");
         Set<String> newList = new HashSet<>();
-        transformations.forEach( t -> newList.add((String)t));
+        newList.add(tranformationId);
+        if (transformations != null && !transformations.isEmpty())transformations.forEach( t -> newList.add((String)t));
         JsonArray ja = new JsonArray();
         newList.forEach( tid -> ja.add( new JsonPrimitive(tid)));
-        _updatePath(id, "transformations.asInput", ja);
+        _updatePath(id, "transformations", "asInput", ja);
     }
 
     /**
