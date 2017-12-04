@@ -3,6 +3,7 @@ import style from './report-format-dialog.component.scss';
 import * as currencyCodeList from 'currency-codes/data.js';
 import * as getSymbolFromCurrency from 'currency-symbol-map/currency-symbol-map.js';
 import * as isUndefined from 'lodash/isUndefined';
+import * as get from 'lodash/get';
 
 export const ReportFormatDialogComponent = {
   bindings: {
@@ -43,8 +44,8 @@ export const ReportFormatDialogComponent = {
         }
         this.modifyNumber();
       }
-      if (this.modelData.dataType === 'date' || this.modelData.dataType === 'timestamp') {
-        this.format.dateFormat = this.modelData.format;
+      if (['timestamp', 'date', 'string-date'].includes(this.modelData.dataType)) {
+        this.format.dateFormat = get(this.modelData, 'format');
       }
     }
 

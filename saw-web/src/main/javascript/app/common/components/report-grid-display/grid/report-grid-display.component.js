@@ -98,14 +98,22 @@ export const ReportGridDisplayComponent = {
       forEach(data, row => {
         forEach(keys, key => {
           const date = moment.tz(row[key], formats, true, BACKEND_TIMEZONE);
-          if (date.isValid()) {
+          if (date.isValid() && ['date', 'string-date', 'timestamp'].includes(this.checkColumndatatype(this.columns, key))) {
             row[key] = date.toDate();
           }
         });
       });
       return data;
     }
-
+    checkColumndatatype (columnList, columnName) {
+      const datatype = '';
+      forEach(columnList, column => {
+        if (column.columnName === columnName){
+          datatype = column.type;
+        }
+      });
+      return datatype;
+    }
     _getDxColumns(columns) {
       return map(columns, column => {
         if (column.type === 'timestamp' || column.type === 'string-date') {
@@ -121,20 +129,11 @@ export const ReportGridDisplayComponent = {
           width: COLUMN_WIDTH
         };
 
-        if (DATE_TYPES.includes(column.type)) {
-          field.format = {
-            type: 'shortDate'
-          };
+        if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
+          field.format = 'shortDate';
         }
 
-        if (NUMBER_TYPES.includes(column.type)) {
-          field.format = {
-            type: 'fixedPoint',
-            precision: 2
-          };
-        }
-
-        if (!isUndefined(NUMBER_TYPES.includes(column.type)) && isUndefined(column.format)) {
+        if (NUMBER_TYPES.includes(column.type) && isUndefined(column.format)) {
           field.format = {
             type: 'fixedPoint',
             comma: false,
@@ -149,7 +148,7 @@ export const ReportGridDisplayComponent = {
             return finalString;
           });
         }
-        if (!isUndefined(NUMBER_TYPES.includes(column.type)) && !isUndefined(column.format)) {
+        if (NUMBER_TYPES.includes(column.type) && !isUndefined(column.format)) {
           if (!isUndefined(column.format.currency)) {
             field.customizeText = (data => {
               if (!column.format.comma) {
@@ -188,7 +187,7 @@ export const ReportGridDisplayComponent = {
         const columns = this._getDxColumns(this.columns);
         forEach(columns, column => {
           if (column.dataType === 'date') {
-            column.dataType = 'string';
+            column.dataType = 'string-date';
           }
         });
         this._gridInstance.option('columns', columns);
