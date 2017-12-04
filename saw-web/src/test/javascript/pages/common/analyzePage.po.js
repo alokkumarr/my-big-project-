@@ -164,7 +164,12 @@ module.exports = {
   designerDialog: {
     saveDialog: element(by.css('analyze-save-dialog')),
     chart: {
+      /*
+      g - color by
+      z - size by
+       */
       getXRadio: name => getChartSettingsRadio('x', name),
+      getYRadio: name => getChartSettingsRadio('y', name),
       getYCheckBox: name => getChartSettingsCheckBox(name),
       getYCheckBoxParent: name => commonFunctions.find.parent(getChartSettingsCheckBox(name)),
       getZRadio: name => getChartSettingsRadio('z', name),

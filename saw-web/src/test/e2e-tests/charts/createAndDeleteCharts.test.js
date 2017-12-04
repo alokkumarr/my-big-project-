@@ -16,15 +16,16 @@ describe('create and delete charts', () => {
   const chartDesigner = analyzePage.designerDialog.chart;
   const chartName = `e2e chart ${(new Date()).toString()}`;
   const chartDescription = 'e2e test chart description';
-  const xAxisName = 'Source Manufacturer';
-  const yAxisName = 'Available MB';
+  let xAxisName = 'Source Manufacturer';
+  let yAxisName = 'Available MB';
   const yAxisName2 = 'Available Items';
-  const groupName = 'Source OS';
-  const metric = 'MCT TMO Session ES';
+  let groupName = 'Source OS';
+  let metric = 'MCT TMO Session ES';
+  const sizeByName = 'Activated Active Subscriber Count';
 
   const dataProvider = {
     'Column Chart by admin': {user: 'admin', chartType: 'chart:column'},
-    /*'Column Chart by user': {user: 'userOne', chartType: 'chart:column'},
+    'Column Chart by user': {user: 'userOne', chartType: 'chart:column'},
     'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'},
     'Bar Chart by user': {user: 'userOne', chartType: 'chart:bar'},
     'Stacked Chart by admin': {user: 'admin', chartType: 'chart:stack'},
@@ -36,9 +37,24 @@ describe('create and delete charts', () => {
     'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'},
     'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'},
     'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'},
-    'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'}*/
-    //TODO add Bubble Chart
+    'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'},
+    'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'},
+    'Bubble Chart by user': {user: 'userOne', chartType: 'chart:bubble'}
   };
+
+  beforeEach(function (done) {
+    setTimeout(function () {
+      expect(browser.getCurrentUrl()).toContain('/login');
+      done();
+    }, 1000)
+  });
+
+  afterEach(function (done) {
+    setTimeout(function () {
+      analyzePage.main.doAccountAction('logout');
+      done();
+    }, 1000)
+  });
 
   afterAll(function () {
     browser.executeScript('window.sessionStorage.clear();');
@@ -47,17 +63,15 @@ describe('create and delete charts', () => {
 
   using(dataProvider, function (data, description) {
     it('should create ' + description, () => {
-      expect(browser.getCurrentUrl()).toContain('/login');
+      if (data.chartType === 'chart:bubble') {
+        metric = 'PTT Subscr Detail';
+        yAxisName = 'Call Billed Unit';
+        xAxisName = 'Account Segment';
+        groupName = 'Account Name';
+      }
+
       login.loginAs(data.user);
-
-      //Collapse default category
-      homePage.expandedCategory(defaultCategory).click();
-
-      //Navigate to Category/Sub-category
-      const collapsedCategory = homePage.collapsedCategory(categoryName);
-      const subCategory = homePage.subCategory(subCategoryName);
-      commonFunctions.waitFor.elementToBeClickableAndClick(collapsedCategory);
-      commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
+      navigateToSubCategory();
 
       //Create analysis
       analyzePage.analysisElems.addAnalysisBtn.click();
@@ -67,7 +81,15 @@ describe('create and delete charts', () => {
       newDialog.createBtn.click();
 
       //Select fields
-      const y = chartDesigner.getYCheckBox(yAxisName);
+      //If chart is bubble then select radio instead of checkbox
+      // Also select Color by
+      if (data.chartType === 'chart:bubble') {
+        y = chartDesigner.getYRadio(yAxisName);
+        const sizeBy = chartDesigner.getZRadio(sizeByName);
+        commonFunctions.waitFor.elementToBeClickableAndClick(sizeBy);
+      } else {
+        y = chartDesigner.getYCheckBox(yAxisName);
+      }
       chartDesigner.getXRadio(xAxisName).click();
       commonFunctions.waitFor.elementToBeClickableAndClick(y);
       chartDesigner.getGroupRadio(groupName).click();
@@ -92,18 +114,6 @@ describe('create and delete charts', () => {
       save.saveBtn.click();
       const createdAnalysis = analyzePage.main.getCardTitle(chartName);
 
-      //Navigate to saved chart and check type
-      homePage.savedAnalysis(chartName).click();
-
-      //TODO add check for bar chart after https://jira.synchronoss.net:8443/jira/browse/SAW-1783 done
-
-      /*const columnChartType = executedAnalysisPage.chartTypes.column;
-      commonFunctions.waitFor.elementToBePresent(columnChartType)
-        .then(() => expect(columnChartType.isPresent()).toBe(true));*/
-
-      //Navigate back
-      executedAnalysisPage.backButton.click();
-
       //Change to Card View
       commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
 
@@ -118,6 +128,9 @@ describe('create and delete charts', () => {
     });
 
     it('should delete ' + description, () => {
+      login.loginAs(data.user);
+      navigateToSubCategory();
+
       const main = analyzePage.main;
       const cards = main.getAnalysisCards(chartName);
       cards.count().then(count => {
@@ -131,8 +144,16 @@ describe('create and delete charts', () => {
       });
     });
 
-    it('log out ' + data.user, () => {
-      analyzePage.main.doAccountAction('logout');
-    });
+    // Navigates to specific category where analysis creation should happen
+    const navigateToSubCategory = () => {
+      //Collapse default category
+      homePage.expandedCategory(defaultCategory).click();
+
+      //Navigate to Category/Sub-category
+      const collapsedCategory = homePage.collapsedCategory(categoryName);
+      const subCategory = homePage.subCategory(subCategoryName);
+      commonFunctions.waitFor.elementToBeClickableAndClick(collapsedCategory);
+      commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
+    };
   });
 });
