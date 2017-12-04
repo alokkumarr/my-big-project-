@@ -125,10 +125,8 @@ export const AnalyzeFilterModalComponent = {
     isDateFilterInvalid(filter) {
       if (DATE_TYPES.includes(filter.column.type)) {
         filter.model.lte = moment(filter.model.lte).utc().endOf('day').format('YYYY-MM-DD HH:mm:ss').toString();
-        //filter.model.lte = moment(filter.model.lte).endOf('day');
       }
-      
-      //filter.model.lte = moment.(filter.model.lte).endOf('day');
+
       return DATE_TYPES.includes(filter.column.type) &&
         filter.model &&
         filter.model.preset === CUSTOM_DATE_PRESET_VALUE &&
