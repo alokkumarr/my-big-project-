@@ -162,9 +162,6 @@ export class ChartService {
         layout: legendLayout.layout,
         enabled: false
       },
-      lang: {
-        noData: ''
-      },
       series: [{
         name: 'Series 1',
         data: []
