@@ -1,6 +1,6 @@
 {
   "mappings": {
-    "my_type": {
+    "saw_date": {
       "dynamic_date_formats": ["yyyy-MM-dd"]
     }
   }
