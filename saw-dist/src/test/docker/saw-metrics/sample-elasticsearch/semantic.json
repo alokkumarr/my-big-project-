@@ -102,6 +102,16 @@
                 "table": "sample",
                 "joinEligible": false,
                 "filterEligible": true
+              },
+              {
+                "name": "date",
+                "type": "date",
+                "columnName": "date",
+                "displayName": "Date",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "filterEligible": true
               }
             ]
           }

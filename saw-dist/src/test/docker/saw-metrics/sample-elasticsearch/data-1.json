@@ -1,5 +1,6 @@
 {
   "country": "ca",
   "product": "test",
-  "units": 1
+  "units": 1,
+  "date": "2017/01/01"
 }
