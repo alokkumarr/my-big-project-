@@ -10,8 +10,6 @@ import org.apache.log4j.Logger;
 import org.ojai.Document;
 import org.ojai.store.DocumentMutation;
 import sncr.xdf.datasets.conf.DataSetProperties;
-import sncr.xdf.metastore.DocumentConverter;
-import sncr.xdf.services.MetadataBase;
 
 
 /**

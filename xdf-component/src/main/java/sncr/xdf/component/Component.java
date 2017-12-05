@@ -13,9 +13,9 @@ import sncr.xdf.context.Context;
 import sncr.xdf.core.file.HFileOperations;
 import sncr.xdf.datasets.conf.DataSetProperties;
 import sncr.xdf.services.AuditLogService;
-import sncr.xdf.services.DLDSMeta;
-import sncr.xdf.services.MetadataBase;
-import sncr.xdf.services.TransformationMeta;
+import sncr.xdf.services.DLDataSetService;
+import sncr.xdf.base.MetadataBase;
+import sncr.xdf.services.TransformationService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,9 +31,9 @@ public abstract class Component {
 
     protected String error;
     protected Context ctx;
-    protected DLDSMeta md;
+    protected DLDataSetService md;
     protected AuditLogService als;
-    protected TransformationMeta transformationMD;
+    protected TransformationService transformationMD;
 
     protected String componentName = "unnamed";
     protected ArrayList<WithMovableResult.MoveDataDescriptor> resultDataDesc;
@@ -239,8 +239,8 @@ public abstract class Component {
         }
 
         try {
-            md = new DLDSMeta(xdfDataRootSys);
-            transformationMD = new TransformationMeta(xdfDataRootSys);
+            md = new DLDataSetService(xdfDataRootSys);
+            transformationMD = new TransformationService(xdfDataRootSys);
             dsaux = new WithDataSetService.DataSetServiceAux(ctx, md);
             als = new AuditLogService(md.getRoot());
         }

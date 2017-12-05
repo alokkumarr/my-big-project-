@@ -11,10 +11,9 @@ import sncr.xdf.preview.CsvInspector;
 import sncr.xdf.rest.messages.ActorMessage;
 import sncr.xdf.rest.messages.CleanRequest;
 import sncr.xdf.rest.messages.Init;
-import sncr.xdf.rest.messages.dl.ListOf;
 import sncr.xdf.rest.messages.preview.Preview;
 import sncr.xdf.services.DLMetadata;
-import sncr.xdf.services.MetadataBase;
+import sncr.xdf.base.MetadataBase;
 
 public class PreviewExecutor extends AbstractActor {
 

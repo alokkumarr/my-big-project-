@@ -44,8 +44,10 @@ public class LongRunningJobService extends Service {
                         parameter(P_PROJECT, (project) ->
                             parameter("component", (component) ->
                                 parameter("batch", (batch) ->
-                                    entity(akka.http.javadsl.unmarshalling.Unmarshaller.entityToString(), (cnf) ->
-                                        run(project, component, batch, cnf)
+                                    parameter("id", (id) ->
+                                        entity(akka.http.javadsl.unmarshalling.Unmarshaller.entityToString(), (cnf) ->
+                                            run(project, component, batch, id, cnf)
+                                        )
                                     )
                                 )
                             )
@@ -56,7 +58,7 @@ public class LongRunningJobService extends Service {
         );
     }
 
-    private Route run(String project, String component, String batch, String config){
+    private Route run(String project, String component, String batch, String id, String config){
 
         log.info("Request to run component [{}] for project [{}] batch [{}]", component, project, batch);
 
@@ -70,6 +72,10 @@ public class LongRunningJobService extends Service {
 
         if(batch == null || batch.isEmpty()){
             return complete(StatusCodes.INTERNAL_SERVER_ERROR,"Component parameter can not be null or empty");
+        }
+
+        if(id != null && !id.isEmpty() && config != null && !config.isEmpty()){
+            return complete(StatusCodes.INTERNAL_SERVER_ERROR,"Ambiguous configuration: either ID or configuration should be presented, not both");
         }
 
         NewRequest rq = new NewRequest(component,  // component

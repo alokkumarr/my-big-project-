@@ -8,7 +8,7 @@ import akka.http.javadsl.server.directives.FileInfo;
 import com.typesafe.config.Config;
 import sncr.xdf.rest.messages.dl.Document;
 import sncr.xdf.services.DLMetadata;
-import sncr.xdf.services.MetadataBase;
+import sncr.xdf.base.MetadataBase;
 import sncr.xdf.rest.actors.MainDataLakeCoordinator;
 import sncr.xdf.rest.messages.Init;
 import sncr.xdf.rest.messages.dl.Create;

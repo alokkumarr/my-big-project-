@@ -3,17 +3,13 @@ package sncr.xdf.rest.services;
 
 import akka.actor.ActorSelection;
 import akka.actor.ActorSystem;
-import akka.actor.Props;
 import akka.http.javadsl.model.StatusCodes;
 import akka.http.javadsl.server.Route;
 import com.typesafe.config.Config;
-import sncr.xdf.rest.actors.MainDataLakeCoordinator;
 import sncr.xdf.rest.actors.MainPreviewCoordinator;
-import sncr.xdf.rest.messages.CleanRequest;
 import sncr.xdf.rest.messages.Init;
-import sncr.xdf.rest.messages.dl.ListOf;
 import sncr.xdf.rest.messages.preview.Preview;
-import sncr.xdf.services.MetadataBase;
+import sncr.xdf.base.MetadataBase;
 
 import static akka.http.javadsl.server.PathMatchers.segment;
 import static sncr.xdf.rest.AskHelper.ask;

@@ -10,8 +10,8 @@ import sncr.xdf.core.file.DLDataSetOperations;
 import sncr.xdf.core.file.HFileOperations;
 import sncr.xdf.datasets.conf.DataSetProperties;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.services.DLDSMeta;
-import sncr.xdf.services.MetadataBase;
+import sncr.xdf.services.DLDataSetService;
+import sncr.xdf.base.MetadataBase;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -160,9 +160,9 @@ public interface WithDataSetService {
     class DataSetServiceAux {
         private static final Logger logger = Logger.getLogger(WithDataSetService.class);
         Context ctx;
-        DLDSMeta md;
+        DLDataSetService md;
 
-        public DataSetServiceAux(Context c, DLDSMeta m){
+        public DataSetServiceAux(Context c, DLDataSetService m){
             ctx = c; md = m;
         }
     }
