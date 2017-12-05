@@ -1,4 +1,4 @@
-package sncr.xdf.metastore;
+package sncr.xdf.services;
 
 import sncr.xdf.base.MetadataStore;
 import sncr.xdf.base.WithSearchInMetastore;

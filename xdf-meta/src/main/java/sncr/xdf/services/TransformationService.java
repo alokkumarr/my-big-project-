@@ -16,12 +16,12 @@ import java.io.*;
 /**
  * Created by srya0001 on 11/2/2017.
  */
-public class TransformationMeta {
+public class TransformationService {
 
-    private static final Logger logger = Logger.getLogger(TransformationMeta.class);
+    private static final Logger logger = Logger.getLogger(TransformationService.class);
     private final TransformationStore ts;
 
-    public TransformationMeta(String xdfDataRootSys) throws Exception {
+    public TransformationService(String xdfDataRootSys) throws Exception {
         ts = new TransformationStore(xdfDataRootSys);
     }
 

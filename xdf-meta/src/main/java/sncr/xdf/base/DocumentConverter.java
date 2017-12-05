@@ -1,4 +1,4 @@
-package sncr.xdf.metastore;
+package sncr.xdf.base;
 
 import com.google.gson.*;
 import com.mapr.db.MapRDB;

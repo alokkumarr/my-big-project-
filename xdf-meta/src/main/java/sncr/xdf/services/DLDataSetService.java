@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.gson.*;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import sncr.xdf.base.MetadataBase;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.conf.Metadata;
 import sncr.xdf.conf.Output;
@@ -23,8 +24,8 @@ import java.util.Map;
 
 import static com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_COMMENTS;
 import static sncr.xdf.base.MetadataStore.delimiter;
-import static sncr.xdf.services.MetadataBase.DEFAULT_CATALOG;
-import static sncr.xdf.services.MetadataBase.DEFAULT_DATA_SOURCE;
+import static sncr.xdf.base.MetadataBase.DEFAULT_CATALOG;
+import static sncr.xdf.base.MetadataBase.DEFAULT_DATA_SOURCE;
 
 /**
  * The class provides
@@ -33,9 +34,9 @@ import static sncr.xdf.services.MetadataBase.DEFAULT_DATA_SOURCE;
  * - loading metadata of existing datasets
  * Created by srya0001 on 10/27/2017.
  */
-public class DLDSMeta{
+public class DLDataSetService {
 
-    private static final Logger logger = Logger.getLogger(DLDSMeta.class);
+    private static final Logger logger = Logger.getLogger(DLDataSetService.class);
 
     protected static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private Map<String, Map<String, Object>> repository;
@@ -46,7 +47,7 @@ public class DLDSMeta{
     }
 
 
-    public DLDSMeta(String fsr) throws Exception {
+    public DLDataSetService(String fsr) throws Exception {
         dsStore = new DataSetStore(fsr);
         repository = new HashMap();
     }

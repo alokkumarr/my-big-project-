@@ -1,4 +1,4 @@
-package sncr.xdf.services;
+package sncr.xdf.base;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.PathFilter;
