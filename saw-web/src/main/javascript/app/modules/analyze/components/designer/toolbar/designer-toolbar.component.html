@@ -1,0 +1,9 @@
+<div fxLayout="row"
+     fxLayoutAlign="space-between"
+     class="toolbar__container">
+  <button mat-raised-button
+          (click)="refreshData.emit()"
+          [color]="isDataOutOfSynch ? 'primary' : ''">
+    <ng-container i18n>Refresh Data</ng-container>
+  </button>
+</div>

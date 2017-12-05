@@ -1,2 +1,8 @@
-import { DesignerContainerComponent } from './designer-container.component';
-export { DesignerContainerComponent };
+import {
+  DesignerContainerComponent,
+  DesignerStates
+} from './designer-container.component';
+export {
+  DesignerContainerComponent,
+  DesignerStates
+};

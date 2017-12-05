@@ -1,5 +1,5 @@
 import { Artifact } from './artifact.model';
-import SqlBuilder from './sql-builder.model';
+import { SqlBuilder } from './sql-builder.model';
 import Schedule from './schedule.model';
 import Repository from './repository.model';
 import EsRepository from './es-repository.model';

@@ -64,12 +64,14 @@ import {
   DesignerDialogComponent,
   DesignerContainerComponent,
   DesignerHeaderComponent,
-  DesignerMainComponent,
+  DesignerToolbarComponent,
+  DesignerPivotComponent,
   // DesignerSettingsComponent,
   // DesignerSettingsGroupComponent,
   OldDesignerSettingsComponent,
   DesignerService,
   ArtifactColumnFilterPipe,
+  ArtifactColumns2PivotFieldsPipe,
   PivotAreaFilterPipe
 } from './components/designer';
 import {
@@ -143,18 +145,21 @@ angular.module(AnalyzeModule, [
     DesignerDialogComponent,
     DesignerContainerComponent,
     DesignerHeaderComponent,
-    DesignerMainComponent,
+    DesignerToolbarComponent,
+    DesignerPivotComponent,
     // DesignerSettingsComponent,
     // DesignerSettingsGroupComponent,
     OldDesignerSettingsComponent,
     ArtifactColumnFilterPipe,
-    PivotAreaFilterPipe
+    PivotAreaFilterPipe,
+    ArtifactColumns2PivotFieldsPipe
   ],
   entryComponents: [
     DesignerDialogComponent,
     DesignerContainerComponent,
     DesignerHeaderComponent,
-    DesignerMainComponent,
+    DesignerToolbarComponent,
+    DesignerPivotComponent,
     OldDesignerSettingsComponent
     // DesignerSettingsComponent,
     // DesignerSettingsGroupComponent

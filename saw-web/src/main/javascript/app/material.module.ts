@@ -13,7 +13,8 @@ import {
   MatIconRegistry,
   MatListModule,
   MatCheckboxModule,
-  MatMenuModule
+  MatMenuModule,
+  MatTooltipModule
 } from '@angular/material';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
@@ -32,7 +33,8 @@ import '../../../../themes/_angular_next.scss';
     MatChipsModule,
     MatListModule,
     MatCheckboxModule,
-    MatMenuModule
+    MatMenuModule,
+    MatTooltipModule
   ],
   providers: [MatIconRegistry],
   exports: [
@@ -46,7 +48,8 @@ import '../../../../themes/_angular_next.scss';
     MatChipsModule,
     MatListModule,
     MatCheckboxModule,
-    MatMenuModule
+    MatMenuModule,
+    MatTooltipModule
   ]
 })
 export class MaterialModule {}

@@ -1,7 +1,11 @@
 import { DesignerDialogComponent } from './dialog';
 import { DesignerContainerComponent } from './container';
 import { DesignerHeaderComponent } from './header';
-import { DesignerMainComponent } from './main';
+import { DesignerToolbarComponent } from './toolbar';
+import {
+  DesignerPivotComponent,
+  ArtifactColumns2PivotFieldsPipe
+} from './pivot';
 // import {
 //   DesignerSettingsComponent,
 //   DesignerSettingsGroupComponent
@@ -17,11 +21,13 @@ export {
   DesignerDialogComponent,
   DesignerContainerComponent,
   DesignerHeaderComponent,
-  DesignerMainComponent,
+  DesignerToolbarComponent,
+  DesignerPivotComponent,
   // DesignerSettingsComponent,
   // DesignerSettingsGroupComponent,
   OldDesignerSettingsComponent,
   DesignerService,
   ArtifactColumnFilterPipe,
+  ArtifactColumns2PivotFieldsPipe,
   PivotAreaFilterPipe
 };

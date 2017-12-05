@@ -4,13 +4,24 @@ import {
   ArtifactColumnChart
 } from '../../models/artifact-column.model';
 import {
-  Analysis
-} from '../../models/analysis.model';
+  SqlBuilder,
+  SqlBuilderPivot
+} from '../../models/sql-builder.model';
+import {
+  DesignerMode,
+  AnalysisStarter,
+  Analysis,
+  AnalysisType
+} from '../../types';
 
 export {
   ArtifactColumnPivot,
   ArtifactColumnChart,
-  Analysis
+  Analysis,
+  DesignerMode,
+  AnalysisStarter,
+  AnalysisType,
+  SqlBuilder
 };
 
 export type ArtifactColumns = ArtifactColumnPivot[] | ArtifactColumnChart[];

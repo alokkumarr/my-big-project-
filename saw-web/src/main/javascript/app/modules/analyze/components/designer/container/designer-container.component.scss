@@ -2,10 +2,10 @@ designer-container {
   background-color: white;
   display: grid;
   grid-template:
-    "header header" 5vh
-    "data-settings toolbar" 5vh
-    "data-settings content" 90vh
-    / 25% 75%;
+    "header header" 6vh
+    "data-settings toolbar" 6vh
+    "data-settings content" 88vh
+    / 350px 1fr;
 
   .designer__header {
     grid-area: header;
@@ -13,7 +13,6 @@ designer-container {
 
   .designer__toolbar {
     grid-area: toolbar;
-    background-color: blue;
   }
 
   .designer__data-settings {

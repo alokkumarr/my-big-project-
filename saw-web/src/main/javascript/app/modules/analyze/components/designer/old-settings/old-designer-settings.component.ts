@@ -44,10 +44,6 @@ export class OldDesignerSettingsComponent {
   public DATE_INTERVALS = DATE_INTERVALS;
   public DATE_INTERVALS_OBJ = DATE_INTERVALS_OBJ;
 
-  onSuccessfulSelect() {
-    this.onSettingsChange.emit();
-  }
-
   canBeChecked(artifactColumn: ArtifactColumnPivot) {
     // only 5 fields of the same type can be selected at a time
     const columnsWithSameArea = filter(this.artifactColumns,
@@ -65,6 +61,7 @@ export class OldDesignerSettingsComponent {
     } else {
       this.reverseTransform(artifactColumn);
     }
+    this.onSettingsChange.emit();
   }
 
   transform(artifactColumn: ArtifactColumnPivot) {
@@ -87,14 +84,17 @@ export class OldDesignerSettingsComponent {
 
   onSelectAreaType(areaType, artifactColumn: ArtifactColumnPivot) {
     artifactColumn.area = areaType;
+    this.onSettingsChange.emit();
   }
 
   onSelectAggregateType(aggregateType, artifactColumn: ArtifactColumnPivot) {
     artifactColumn.aggregate = aggregateType;
+    this.onSettingsChange.emit();
   }
 
   onSelectDateInterval(dateInterval, artifactColumn: ArtifactColumnPivot) {
     artifactColumn.dateInterval = dateInterval;
+    this.onSettingsChange.emit();
   }
 
   menuTrackByFn(_, item) {

@@ -4,7 +4,8 @@ old-designer-settings {
   .settings__container {
     height: 100%;
     width: 100%;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     background-color: white;
 
     .settings__list-item__checkbox {
@@ -12,9 +13,11 @@ old-designer-settings {
     }
 
     .settings__list-item {
+      font-size: 14px;
+
       .settings__list-item__name {
         // display: block;
-        max-width: 250px;
+        max-width: 170px;
         white-space: nowrap;
         overflow: hidden;
         font-weight: 600;
@@ -24,7 +27,6 @@ old-designer-settings {
 
       .settings__list-item__icon {
         margin-left: 10px;
-        padding-top: 5px;
         color: $primary-grey-g3;
       }
     }

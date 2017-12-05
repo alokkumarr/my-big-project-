@@ -5,12 +5,20 @@
                  (onSave)="onSave()">
 </designer-header>
 
-<div class="designer__toolbar"></div>
+<designer-toolbar class="designer__toolbar"
+                  (refreshData)="requestData()"
+                  [isDataOutOfSynch]="isDataOutOfSynch">
+</designer-toolbar>
 
 <old-designer-settings class="designer__data-settings"
+                   (onSettingsChange)="onSettingsChange()"
                    [artifactColumns]="analysis ? analysis.artifacts[0].columns : []">
 </old-designer-settings>
 
-<designer-main class="designer__main"
-               [analysis]="analysis">
-</designer-main>
+<designer-pivot class="designer__main"
+                (onSettingsChange)="onMainSettingsChange()"
+                [isDataOutOfSynch]="isDataOutOfSynch"
+                [data]="data"
+                [artifactColumns]="firstArtifactColumns"
+                [designerState]="designerState">
+</designer-pivot>
