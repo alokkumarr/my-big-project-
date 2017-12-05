@@ -4,6 +4,9 @@ export const globalChartOptions = {
   lang: {
     thousandsSep: ',',
     noData: 'No data to display'
+  },
+  global: {
+    timezoneOffset: 0
   }
 };
 

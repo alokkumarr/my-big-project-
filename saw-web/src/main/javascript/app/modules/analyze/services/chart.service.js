@@ -384,8 +384,7 @@ export class ChartService {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
         forEach(dateFields, ({columnName, dateFormat}) => {
-          const offset = moment(dataPoint[columnName]).utcOffset();
-          dataPoint[columnName] = moment(dataPoint[columnName]).utcOffset(offset).format(dateFormat);
+          dataPoint[columnName] = moment.utc(dataPoint[columnName]).format(dateFormat);
         });
       });
     }
