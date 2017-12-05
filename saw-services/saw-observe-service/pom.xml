@@ -110,7 +110,7 @@
 		<dependency>
 		  <groupId>com.mapr.db</groupId>
 		  <artifactId>maprdb</artifactId>
-		  <version>${mapr.db.version}</version>
+		  <version>5.2.0-mapr</version>
 		</dependency>
 	</dependencies>
 	<build>

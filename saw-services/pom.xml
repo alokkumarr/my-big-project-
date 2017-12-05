@@ -58,7 +58,6 @@
 		<snappy.version>1.0.4.1</snappy.version>
 		<commons-collections.version>3.2.1</commons-collections.version>
 		<mapr.core.version>5.2.0</mapr.core.version>
-		<mapr.db.version>5.2.0-mapr</mapr.db.version>
 		<mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
 		<scala.major.version>2.11</scala.major.version>
 		<scala.version>2.11.8</scala.version>
