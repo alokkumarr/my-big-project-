@@ -1,0 +1,7 @@
+{
+  "mappings": {
+    "my_type": {
+      "dynamic_date_formats": ["yyyy-MM-dd"]
+    }
+  }
+}

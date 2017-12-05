@@ -18,11 +18,16 @@ load_semantic() {
     $sudo_mapr $mdcli -i $datalake/$semantic -o $datalake/$semantic-output
 }
 
+post_json() {
+    curl -sS -X POST -H "Content-Type: application/json" "$@"
+}
+
 load_data() {
+    local index_url="http://localhost:8200/sample"
     echo "Loading sample Elasticsearch data"
+    post_json "$index_url" -d @$dir/mappings.json
     for data in $dir/data-*.json; do
-        curl -sS -X POST "http://localhost:8200/sample/type/" \
-             -H "Content-Type: application/json" -d @$data
+        post_json "$index_url/type" -d @$data
     done
 }
 
