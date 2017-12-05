@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd" MadCap:lastBlockDepth="5" MadCap:lastHeight="286" MadCap:lastWidth="669">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="description" content="" />
+        <meta name="author" content="" /><title>Pervacio Robotics</title>
+        <link href="../Stylesheets/default.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <div class="right" style="margin-bottom: 6pt;">
+            <MadCap:topicToolbarProxy style="mc-topic-toolbar-items: SelectSearch Separator SelectGlossary QuickSearch Print Home Forward Back;margin-right: 5px;text-align: right;" data-mc-skin="/Project/Skins/TopNav/TopicToolBar.flskn" />
+        </div>
+        <div class="content">
+            <div id="contentBody">
+                <MadCap:breadcrumbsProxy class="em813" style="margin-bottom: 4px;padding-top: 8px;padding-bottom: 10px;border-bottom-style: solid;border-bottom-width: 3px;border-bottom-color: black;" />
+                <div class="row collapse">
+                    <MadCap:bodyProxy />
+                    <p style="margin-top: 0;margin-bottom: 0;font-size: 6pt;line-height: 0.81em;">&#160;</p>
+                    <p class="noSpace" style="padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0em;">&#160;</p>
+                </div>
+            </div>
+        </div>
+        <p style="text-align: center;margin-bottom: 0;border-top-style: solid;border-top-width: 3px;border-top-color: #000000;padding-left: 0px;padding-right: 0px;padding-top: 4px;padding-bottom: 0em;">&#160;</p>
+        <p style="text-align: center;margin-top: 0;padding-left: 0px;padding-right: 0px;padding-top: 0px;padding-bottom: 0em;margin-bottom: 0;"><a href="http://www.synchronoss.com/" target="_blank" title="Synchronoss Website" alt="Synchronoss Website"><img src="../Images/logo-225-white_back.png" title="Synchronoss" alt="Synchronoss" /></a>
+        </p>
+        <p class="footer_center"><a href="../../_all_PDF_FILES/user_guide/PDF_Links_user_guide.htm" title="PDF Manual" alt="PDF Manual" MadCap:conditions="default.SAW_User_Manual">PDF Manual</a><a href="../../_all_PDF_FILES/install_customer/PDF_Links.htm" MadCap:conditions="default.Customer_Solutions_Guide,default.Installation_Guide">PDF Manuals</a><span style="color: #415464;"> • </span><a href="../../CompanyInformation.htm">Company Information</a>
+            <br />
+            <br />
+        </p>
+        <p class="footer_center_81em" style="text-align: center;"><MadCap:variable name="Variables.Copyright" />
+        </p>
+    </body>
+</html>
