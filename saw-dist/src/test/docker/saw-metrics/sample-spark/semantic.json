@@ -60,6 +60,16 @@
                 "type": "integer",
                 "joinEligible": false,
                 "filterEligible": true
+              },
+              {
+                "name": "Date",
+                "columnName": "date",
+                "displayName": "Date",
+                "aliasName": "",
+                "table": "sample",
+                "type": "date",
+                "joinEligible": false,
+                "filterEligible": true
               }
             ]
           }
