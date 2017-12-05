@@ -1,0 +1,70 @@
+<analyze-dialog class="analyze-sort-dialog">
+  <analyze-dialog-header layout="row" layout-align="start center" flex="grow">
+    <strong ng-bind="'Format ' + $ctrl.modelData.caption"></strong>
+  </analyze-dialog-header>
+
+  <analyze-dialog-content>
+    <div class="number-format" ng-if="$ctrl.modelData.dataType === 'number'">
+      <div class="format-row">
+        <span class="span-label" translate="SHOW_COMMA_SEPARATORS"></span>
+        <md-switch class="md-primary" ng-model="$ctrl.format.commaSeparator" ng-change="$ctrl.modifyNumber()"></md-switch>
+      </div>
+      <div class="format-row">
+        <span class="span-label" translate="SHOW_CURRENCY"></span>
+        <md-switch class="md-primary" ng-model="$ctrl.format.currencyFlag" ng-change="$ctrl.modifyNumber()"></md-switch>
+        <md-select ng-if="$ctrl.format.currencyFlag" ng-change="$ctrl.modifyNumber()"
+		        ng-model="$ctrl.format.currencyCode"> <md-option
+		        ng-repeat="codeList in $ctrl.currencyCodeList" ng-value="codeList.code"
+		        ng-bind="::codeList.code"></md-option>
+          </md-select>
+      </div>
+      <div class="format-row">
+        <span class="span-label" translate="SPECIFY_NUMBER_DECIMALS"></span>
+        <input class="ng-pristine ng-valid md-input ng-empty ng-touched" type="number"
+         ng-model="$ctrl.format.numberDecimal"
+         ng-change="$ctrl.modifyNumber()" ng-maxlength="2"/>
+      </div>
+      
+      <div class="sample-block">
+          <h6>Sample:</h6>
+          {{$ctrl.stringNumber}}
+      </div>
+    </div>
+
+    <div class="date-format" ng-if="$ctrl.modelData.dataType === 'date' || $ctrl.modelData.dataType === 'timestamp' || $ctrl.modelData.dataType === 'string-date'">
+      <md-radio-group ng-model="$ctrl.format.dateFormat" > 
+        <md-radio-button class="row" ng-value="'date'" flex>
+          <span>Default </span>
+        </md-radio-button>
+        <md-radio-button class="row" ng-value="'longDate'" flex>
+          <span>September 1, 2017 </span>
+        </md-radio-button>
+        <md-radio-button class="row" ng-value="'shortDate'" flex>
+          <span>09/01/2017 (MM/DD/YYYY)</span>
+        </md-radio-button>
+        <md-radio-button class="row" ng-value="'dd/MM/yyyy'" flex>
+          <span>01/09/2017 (DD/MM/YYYY)</span>
+        </md-radio-button>
+        <md-radio-button class="row" ng-value="'monthAndYear'" flex>
+          <span>September 2017</span>
+        </md-radio-button>
+        <md-radio-button class="row" ng-value="'monthAndDay'" flex>
+          <span>September 1 </span>
+        </md-radio-button>
+      </md-radio-group>
+    </div>
+  </analyze-dialog-content>
+
+  <analyze-dialog-footer>
+    <div layout="row">
+      <md-button class="btn-primary" ng-click="$ctrl.apply()"
+                 translate="Apply">
+      </md-button>
+
+      <md-button class="btn-card"
+                 ng-click="$ctrl.cancel()"
+                translate="CANCEL">
+      </md-button>
+    </div>
+  </analyze-dialog-footer>
+</analyze-dialog>
