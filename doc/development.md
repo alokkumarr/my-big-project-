@@ -16,14 +16,20 @@ To prepare for building the project, execute the following steps:
 4. Configure Docker to allocate at least 8 GB memory and the maximum
    number of CPUs for containers
 
+Because of the Docker memory requirements mentioned above, the
+development machine needs to have at least 16 GB of memory.
+
 Note: There is currently an incompatibility with Java 9 (SAW Transport
 Service gives a "scala.reflect.internal.MissingRequirementError"
 errors when building), so Java 8 specifically must be used.
 
 Note: Instructions for how to set up the above on a Mac can be found
-in the [Mac setup instructions](development-mac.md).
+in the [Mac setup instructions].  Additionally there are [Windows
+setup instructions].
 
 [Docker]: https://www.docker.com/community-edition
+[Mac setup instructions]: development-mac.md
+[Windows setup instructions]: development-windows.md
 
 # Building and testing
 
@@ -164,11 +170,25 @@ To make a release of the project, execute the following steps:
         $ git tag -a -m "Version 1.0.0" v1.0.0 <commit>
         $ git push --tags
 
-2. Start a customized build of the [project] on the continuous
-   integration server.  Enter the tag created in the previous step in
-   the Revision field.
+   Note: The placeholder `<commit>` refers to the revision that has
+   been selected as the release (for example `origin/master` after all
+   required pull requests have been merged).
 
-3. Add the "release" label to the build result (to prevent it from
-   being expired by the continuous integration server)
+2. Start a customized build of the [project] on the continuous
+   integration server using the newly created release tag (click the
+   "Run" dropdown menu and select "Run customized..." and enter the
+   release tag, for example `v1.0.0`, in the Revision field).
+   
+3. After starting the build, go to the Build result summary page and
+   add the label "release" (to prevent it from being expired by the
+   continuous integration server).
+   
+4. When the build finishes successfully, send a link to the artifacts
+   page to those that need the release package (for example operations
+   that are going to use it for upgrading SAW environments)
+
+If additional fixes are needed after tagging, just repeat the same
+process above but increase the patch component of the version (for
+example 1.0.1, 1.0.2 and so on).
 
 [project]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW

@@ -9,7 +9,7 @@
         "dataSecurityKey": "",
         "type": "semantic",
         "module": "ANALYZE",
-        "metric": "Sample",
+        "metric": "sample-elasticsearch",
         "metricName": "Sample (pivot/chart)",
         "customerCode": "SYNCHRONOSS",
         "disabled": "false",
@@ -74,7 +74,7 @@
             "artifactName": "SAMPLE",
             "columns": [
               {
-                "name": "Country",
+                "name": "country.keyword",
                 "type": "string",
                 "columnName": "country.keyword",
                 "displayName": "Country",
@@ -84,7 +84,7 @@
                 "filterEligible": true
               },
               {
-                "name": "Product",
+                "name": "product.keyword",
                 "type": "string",
                 "columnName": "product.keyword",
                 "displayName": "Product",
@@ -94,7 +94,7 @@
                 "filterEligible": true
               },
               {
-                "name": "Units",
+                "name": "units",
                 "type": "long",
                 "columnName": "units",
                 "displayName": "Units",

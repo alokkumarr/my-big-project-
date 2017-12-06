@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<browserconfig>
+    <msapplication>
+        <tile>
+            <square70x70logo src="/Skins/Favicons/synchronoss32x32_1.png" />
+            <square150x150logo src="/Skins/Favicons/synchronoss96x96_1.png" />
+            <wide310x150logo src="/Skins/Favicons/synchronoss270xwide_2.png" />
+            <square310x310logo src="/Skins/Favicons/synchronoss180x180_3.png" />
+            <TileColor>#464646</TileColor>
+        </tile>
+    </msapplication>
+</browserconfig>

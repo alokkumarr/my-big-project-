@@ -24,7 +24,10 @@
     </div>
 
     <div layout="column" layout-align="space-between center">
-      <chart [updater]="$ctrl.chartUpdater" [options]="$ctrl.chartOptions"></chart>
+      <chart [updater]="$ctrl.chartUpdater"
+             [options]="$ctrl.chartOptions"
+             e2e="{{'chart-type:' + $ctrl.analysis.chartType}}">
+      </chart>
     </div>
 
   </md-card-content>

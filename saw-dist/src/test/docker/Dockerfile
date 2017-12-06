@@ -35,6 +35,11 @@ RUN yum -y -q --nogpgcheck install java-1.8.0-openjdk-headless MySQL-python
 
 # Configure MapR client
 COPY mapr-configure /root/
+# Workaround: Docker is supposed to set the execute bit for Windows
+# users automatically, but apparently in some cases does not
+# (https://github.com/moby/moby/issues/30511).  So set the execute bit
+# explicitly here until fixed in Docker.
+RUN chmod a+x /root/mapr-configure
 RUN /root/mapr-configure
 
 # Tunneling for MapR client: enable if connecting to a MapR cluster in
@@ -45,6 +50,8 @@ RUN /root/mapr-configure
 #COPY saw-tunnel /root/
 #COPY saw-tunnel.service /etc/systemd/system/
 #RUN systemctl enable saw-tunnel
+## Workaround: Set execute bit for Windows users
+#RUN chmod a+x /root/saw-tunnel
 
 # Install Elasticsearch
 COPY elasticsearch.repo /etc/yum.repos.d
@@ -68,12 +75,16 @@ COPY saw-deploy/saw-deploy /root/
 COPY saw-deploy/saw-config /root/
 COPY saw-deploy/saw-deploy.service /etc/systemd/system/
 RUN systemctl enable saw-deploy
+# Workaround: Set execute bit for Windows users
+RUN chmod a+x /root/saw-deploy
 
 # Add SAW test metrics
 COPY saw-metrics /root/saw-metrics/
 RUN chmod a+x /root
 COPY saw-metrics/saw-metrics.service /etc/systemd/system/
 RUN systemctl enable saw-metrics
+# Workaround: Set execute bit for Windows users
+RUN chmod a+x /root/saw-metrics/sample-*/load-metric
 
 # Add systemd journal gateway for browsing logs
 RUN yum -y -q --nogpgcheck install systemd-journal-gateway

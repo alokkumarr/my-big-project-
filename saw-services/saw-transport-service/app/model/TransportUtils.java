@@ -61,7 +61,7 @@ public class TransportUtils {
 
     {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String DATE_FORMAT_LTE = "23:59:59";
+        String DATE_FORMAT_LTE = "00:00:00";
         String DATE_FORMAT_GTE = "00:00:00";
         String SPACE = " ";
         DynamicConvertor dynamicConvertor = new DynamicConvertor();
@@ -116,7 +116,7 @@ public class TransportUtils {
                 LocalDateTime startOfWeek =
                         lastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
                 LocalDateTime endOfWeek = lastWeek.with(TemporalAdjusters.nextOrSame(firstDayOfWeek));
-                dynamicConvertor.setLte(endOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(endOfWeek.plusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(startOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
@@ -144,7 +144,7 @@ public class TransportUtils {
             case "LTW": {
                 LocalDateTime now = LocalDateTime.now();
                 LocalDateTime last2Week = now.minusWeeks(2);
-                dynamicConvertor.setLte(now.with(DayOfWeek.MONDAY).minusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(now.with(DayOfWeek.MONDAY).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(last2Week.with(DayOfWeek.MONDAY).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
