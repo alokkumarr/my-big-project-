@@ -21,6 +21,7 @@ export function dxDataGridService() {
       showBorders: false,
       rowAlternationEnabled: true,
       hoverStateEnabled: true,
+      wordWrapEnabled: true,
       scrolling: {
         mode: 'virtual'
       },

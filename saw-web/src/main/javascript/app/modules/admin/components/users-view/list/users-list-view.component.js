@@ -112,12 +112,10 @@ export const UsersListViewComponent = {
         width: '6%',
         cellTemplate: 'actionCellTemplate'
       }];
-      const wordWrapEnabled = true;
       return this._dxDataGridService.mergeWithDefaultConfig({
         onInitialized: this.onGridInitialized.bind(this),
         columns,
         dataSource,
-        wordWrapEnabled,
         paging: {
           pageSize: 10
         },
