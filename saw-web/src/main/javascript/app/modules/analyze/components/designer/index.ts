@@ -15,6 +15,7 @@ import {
   PivotAreaFilterPipe
 } from './old-settings';
 import { DesignerService } from './designer.service';
+import { SettingsValidationService } from './settings-validation.service';
 import { ArtifactColumnFilterPipe } from './artifact-column-filter.pipe';
 
 export {
@@ -27,6 +28,7 @@ export {
   // DesignerSettingsGroupComponent,
   OldDesignerSettingsComponent,
   DesignerService,
+  SettingsValidationService,
   ArtifactColumnFilterPipe,
   ArtifactColumns2PivotFieldsPipe,
   PivotAreaFilterPipe

@@ -16,7 +16,7 @@
 </old-designer-settings>
 
 <designer-pivot class="designer__main"
-                (onSettingsChange)="onMainSettingsChange()"
+                (onSettingsChange)="onMainSettingsChange($event)"
                 [isDataOutOfSynch]="isDataOutOfSynch"
                 [data]="data"
                 [artifactColumns]="firstArtifactColumns"

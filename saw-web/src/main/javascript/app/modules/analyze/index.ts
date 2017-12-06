@@ -70,6 +70,7 @@ import {
   // DesignerSettingsGroupComponent,
   OldDesignerSettingsComponent,
   DesignerService,
+  SettingsValidationService,
   ArtifactColumnFilterPipe,
   ArtifactColumns2PivotFieldsPipe,
   PivotAreaFilterPipe
@@ -167,7 +168,8 @@ angular.module(AnalyzeModule, [
   providers: [
     AnalyzeDialogService,
     analyzeServiceProvider,
-    DesignerService
+    DesignerService,
+    SettingsValidationService
   ]
 })
 export class AnalyzeModuleTs {}

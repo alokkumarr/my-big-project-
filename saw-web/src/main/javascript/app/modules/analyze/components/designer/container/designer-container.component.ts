@@ -19,6 +19,9 @@ import {
   SqlBuilder,
   ArtifactColumns
 } from '../types'
+import * as forEach from 'lodash/forEach';
+import * as map from 'lodash/map';
+import * as find from 'lodash/find';
 const template = require('./designer-container.component.html');
 require('./designer-container.component.scss');
 
@@ -131,9 +134,21 @@ export class DesignerContainerComponent {
     this.firstArtifactColumns = filter(this.analysis.artifacts[0].columns, 'checked');
   }
 
-  onMainSettingsChange() {
+  onMainSettingsChange(artifactColumns) {
     this.isDataOutOfSynch = true;
     this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
+    this.analysis.artifacts[0].columns = this.mergeBackupColumnChanges(
+      artifactColumns,
+      this.analysis.artifacts[0].columns
+    );
+    this.firstArtifactColumns = this.analysis.artifacts[0].columns;
+  }
+
+  mergeBackupColumnChanges(backups, artifactColumns) {
+    return map(artifactColumns, column => {
+      const backup = find(backups, ({columnName}) => column.columnName === columnName);
+      return backup || column;
+    });
   }
 
   updateAnalysis() {

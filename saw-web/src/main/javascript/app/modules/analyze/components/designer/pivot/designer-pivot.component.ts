@@ -26,6 +26,7 @@ import {
 } from '../types';
 import { DesignerStates } from '../container';
 import { IPivotGridUpdate } from '../../../../../common/components/pivot-grid/pivot-grid.component';
+import { SettingsValidationService } from '../settings-validation.service';
 import {
   TYPE_ICONS_OBJ,
   DATE_TYPES,
@@ -36,8 +37,6 @@ import {
 
 const template = require('./designer-pivot.component.html');
 require('./designer-pivot.component.scss');
-
-const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
 
 @Component({
   selector: 'designer-pivot',
@@ -56,6 +55,10 @@ export class DesignerPivotComponent {
   public updater: Subject<IPivotGridUpdate> = new Subject();
   public DesignerStates = DesignerStates;
 
+  constructor(
+    private _settingsValidationService: SettingsValidationService
+  ) {}
+
   ngOnInit() {
     this.changeFromPivotGrid = false;
   }
@@ -67,11 +70,11 @@ export class DesignerPivotComponent {
   }
 
   onContentReady({fields}) {
-    if (this.changeFromPivotGrid) {
-      if (isEmpty(this.artifactColumns) || isEmpty(fields)) {
-        return;
-      }
+    if (isEmpty(this.artifactColumns) || isEmpty(fields)) {
+      return;
+    }
 
+    if (this.changeFromPivotGrid) {
       forEach(this.artifactColumns, artifactColumn => {
         const targetField = find(fields, ({dataField}) => {
           if (artifactColumn.type === 'string') {
@@ -84,15 +87,12 @@ export class DesignerPivotComponent {
         this.applyDefaultsBasedOnAreaChange(artifactColumn);
       });
 
-      if (this.checkValidStates(this.artifactColumns)) {
-
+      if (this._settingsValidationService.checkValidPivotStates(this.artifactColumns)) {
         this.backupColumns = cloneDeep(this.artifactColumns);
       } else if (!isEmpty(this.backupColumns)) {
-
-        this.artifactColumns = this.backupColumns;
+        this.onSettingsChange.emit(this.backupColumns);
       }
     }
-
     this.changeFromPivotGrid = true;
   }
 
@@ -107,45 +107,6 @@ export class DesignerPivotComponent {
         !artifactColumn.aggregate) {
       artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
     }
-  }
-
-  checkValidStates(artifactColumns) {
-    const grouped = groupBy(artifactColumns, 'area');
-    let valid = true;
-    const errors = [];
-    const interpolationValues = {
-      fieldNr: MAX_POSSIBLE_FIELDS_OF_SAME_AREA,
-      area: null
-    };
-
-    if (grouped.column && grouped.column.length > MAX_POSSIBLE_FIELDS_OF_SAME_AREA) {
-      errors[0] = 'ERROR_PIVOT_MAX_FIELDS';
-      interpolationValues.area = 'column';
-      valid = false;
-    }
-    if (grouped.row && grouped.row.length > MAX_POSSIBLE_FIELDS_OF_SAME_AREA) {
-      errors[0] = 'ERROR_PIVOT_MAX_FIELDS';
-      interpolationValues.area = 'row';
-      valid = false;
-    }
-    if (grouped.data && grouped.data.length > MAX_POSSIBLE_FIELDS_OF_SAME_AREA) {
-      errors[0] = 'ERROR_PIVOT_MAX_FIELDS';
-      interpolationValues.area = 'data';
-      valid = false;
-    }
-
-    forEach(grouped.data, dataColumn => {
-      if (!NUMBER_TYPES.includes(dataColumn.type)) {
-        errors[1] = 'ERROR_PIVOT_DATA_FIELD';
-        valid = false;
-      }
-    });
-
-    if (!valid) {
-      // console.log('interpoaltions', interpolationValues);
-    }
-
-    return valid;
   }
 
 }
