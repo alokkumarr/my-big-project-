@@ -253,6 +253,7 @@ export const AnalyzeReportComponent = {
           field.displayName = itemB.displayName;
           field.alias = itemB.aliasName;
           field.type = itemB.type;
+          field.format = itemB.format;
           field.checked = itemB.checked;
           field.visibleIndex = itemB.visibleIndex;
           field.isHidden = Boolean(itemB.hide);
@@ -335,6 +336,7 @@ export const AnalyzeReportComponent = {
             displayName: field.meta.displayName,
             table: table.name,
             aliasName: field.alias,
+            format: field.format,
             type: field.meta.type,
             hide: field.isHidden,
             joinEligible: field.meta.joinEligible,

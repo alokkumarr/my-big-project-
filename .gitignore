@@ -4,4 +4,4 @@ ext/saw-*.tgz
 #System Files
 .DS_Store
 Thumbs.db
-
+.awcache

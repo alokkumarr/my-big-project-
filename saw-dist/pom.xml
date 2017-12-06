@@ -163,6 +163,10 @@
                       </fileSet>
                     </fileSets>
                   </inline>
+                  <!-- Workaround: Building on Windows causes execute
+                       permissions on files getting lost, so set to
+                       "auto" as a workaround. -->
+                  <permissions>auto</permissions>
                 </assembly>
               </build>
               <run>

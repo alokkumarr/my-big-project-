@@ -164,7 +164,7 @@ export class ChartService {
       },
       series: [{
         name: 'Series 1',
-        data: [0, 0, 0, 0, 0]
+        data: []
       }],
       yAxis: {
         title: {x: -15}
