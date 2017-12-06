@@ -4,16 +4,16 @@ spring:
   application:
     name: saw-export-service
   mail:
-       host: outgoing.sncrcorp.net
-       port: 25
-       protocol: smtp
+       host: "{{ emailHost | default('outgoing.sncrcorp.net') }}"
+       port: "{{ emailPort | default('25') }}"
+       protocol: "{{ emailProtocol | default('smtp') }}"
        test-connection: false
-       username:
-       password:
+       username: "{{ emailUserName | default('') }}"
+       password: "{{ emailPassword | default('') }}"
        smtp:
         auth: false
        properties:
-        mail.smtp.from: SAWReport@synchronoss.com
+        mail.smtp.from: "{{ emailFrom | default('SAWReport@synchronoss.com') }}"
         # To do : Mail body can be moved to maprdb to configure email custom template from UI for saw customers level.
        body: "Hello  </br> Attached is an analysis for your review.</br>Analysis Name: $analysis_name </br>Analysis Description: $analysis_description </br>Publish Time : $publish_time </br> Analysis Created By: $created_by </br> </br>Regards,<br>Synchronoss Analytics Team </br>"
 server:
