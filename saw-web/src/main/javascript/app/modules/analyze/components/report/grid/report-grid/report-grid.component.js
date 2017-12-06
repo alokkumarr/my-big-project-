@@ -44,6 +44,7 @@ export const ReportGridComponent = {
           onInitialized: this.onGridInitialized.bind(this),
           onContextMenuPreparing: this.onContextMenuPreparing.bind(this),
           columns: this.prepareGridColumns(this.columns),
+          wordWrapEnabled: true,
           dataSource: this.source || []
         })
       });

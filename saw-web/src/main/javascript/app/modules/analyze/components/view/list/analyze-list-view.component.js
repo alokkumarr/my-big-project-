@@ -106,7 +106,7 @@ export const AnalyzeListViewComponent = {
         dataField: 'name',
         allowSorting: true,
         alignment: 'left',
-        width: '40%',
+        width: '36%',
         cellTemplate: 'nameCellTemplate',
         cssClass: 'branded-column-name'
       }, {
@@ -114,7 +114,7 @@ export const AnalyzeListViewComponent = {
         dataField: 'metrics',
         allowSorting: true,
         alignment: 'left',
-        width: '10%',
+        width: '21%',
         calculateCellValue: rowData => {
           return rowData.metricName ||
             (rowData.metrics || []).join(', ');
@@ -151,17 +151,18 @@ export const AnalyzeListViewComponent = {
         allowSorting: true,
         dataField: 'createdTimestamp',
         alignment: 'left',
-        width: '15%',
+        width: '8%',
         cellTemplate: 'timecreatedCellTemplate'
       }, {
         caption: '',
         cellTemplate: 'actionCellTemplate'
       }];
-
+      const wordWrapEnabled = true;
       return this._dxDataGridService.mergeWithDefaultConfig({
         onInitialized: this.onGridInitialized.bind(this),
         columns,
         dataSource,
+        wordWrapEnabled,
         paging: {
           pageSize: 10
         },
