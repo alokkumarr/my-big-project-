@@ -62,7 +62,7 @@ export function interceptor($httpProvider) {
         const userService = $injector.get('UserService');
         const refreshRegexp = new RegExp(userService.refreshTokenEndpoint);
 
-        if (!/token has expired/i.test(errorMessage)) {
+        if (!(response.status === 401 && /token has expired/i.test(errorMessage))) {
           return $q.reject(response);
         }
 
