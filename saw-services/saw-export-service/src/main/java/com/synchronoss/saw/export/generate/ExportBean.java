@@ -3,7 +3,7 @@ package com.synchronoss.saw.export.generate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExportExcelBean {
+public class ExportBean {
 	
 	private String fileName;
 	private String [] columnHeader = new String []{};
@@ -13,6 +13,7 @@ public class ExportExcelBean {
 	private String reportName;
 	private String reportDesc;
 	private String publishDate;
+	private String createdBy;
 	
 	/**
 	 * @return the reportName
@@ -62,7 +63,7 @@ public class ExportExcelBean {
 	}
 
 
-	public ExportExcelBean() {
+	public ExportBean() {
 		this.serverPathLocation = System.getProperty("custom.pubReports.root");;
 	}
 	
@@ -127,5 +128,20 @@ public class ExportExcelBean {
 	public void setColumnHeader(String[] columnHeader) {
 		this.columnHeader = columnHeader;
 	}
-	
+
+	/**
+	 * Gets createdBy
+	 *
+	 * @return value of createdBy
+	 */
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	/**
+	 * Sets createdBy
+	 */
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
 }
