@@ -123,7 +123,8 @@ export const AnalyzeFilterModalComponent = {
     }
 
     isDateFilterInvalid(filter) {
-      if (DATE_TYPES.includes(filter.column.type)) {
+      console.log(filter);
+      if (DATE_TYPES.includes(filter.column.type) && filter.model.preset === 'NA') {
         filter.model.lte = moment(filter.model.lte).utc().endOf('day').format('YYYY-MM-DD HH:mm:ss').toString();
       }
 
