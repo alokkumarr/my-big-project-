@@ -83,29 +83,7 @@ public class EventSender {
                 ProducerRecord pr = new ProducerRecord(queue, msg);
                 stringProdMD = string_producer.send(pr);
             }
-//            if (stringProdMD != null) {
-//                try {
-//                    RecordMetadata recordmd = stringProdMD.get(EventHandler.streamWaitTime(), TimeUnit.SECONDS);
-//                    if ( recordmd == null )
-//                    {
-//                        EventHandler.raiseStreamMalfunctionFlag( new RTException(ErrorCodes.StreamStale, "Record Metadata is null"));
-//                    }
-//                    int msgs = msg_counter.incrementAndGet();
-//                    m_log.debug( "Sent message ID: " + messageID  + " Sent messages so far: " + msgs);
-//
-//                } catch (InterruptedException e) {
-//                    m_log.error("interrupted exception has been detected: " + e.getMessage());
-//                    EventHandler.raiseStreamMalfunctionFlag(e);
-//                } catch (ExecutionException e) {
-//                    m_log.error("send message execution exception has been detected: " + e.getMessage());
-//                    EventHandler.raiseStreamMalfunctionFlag(e);
-//                } catch (TimeoutException e) {
-//                    m_log.error("Timeout exception has been detected: " + e.getMessage());
-//                    EventHandler.raiseStreamMalfunctionFlag(e);
-//                }
-//            }
             m_log.debug( "The string message #  " + msc + " with length [ " + msg.length() + "] was successfully sent" );
-
             return stringProdMD;
         }
         else

@@ -184,9 +184,29 @@ mapping = [
       block.on.buffer.full=true
 			timeout.ms=30000
     }
-
-    
 ]
+
+genericlog = {
+
+    mapping = [
+        {
+            customer = c
+            logtype = l
+
+            topic = t
+            queue = q
+
+            class = mapr.streaming.LogMessageHandler
+            bootstrap.servers= "localhost:9092"
+            batch.size=16384
+            key.serializer=org.apache.kafka.common.serialization.StringSerializer
+            value.serializer=org.apache.kafka.common.serialization.StringSerializer
+            block.on.buffer.full=true
+            timeout.ms=30000
+        }
+    ]
+
+}
 
 stream.file.location=/opt/bda/rtis/var/run/stream.${http.port}.dump
 

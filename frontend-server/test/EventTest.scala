@@ -1,7 +1,7 @@
 import org.scalatest.FlatSpec
 import play.test.Helpers
 import rtcontrollers.EventTestController
-import synchronoss.handlers.countly.CountlyEventHandler
+import synchronoss.handlers.countly.CountlyGenericBridge
 
 /**
   * Created by srya0001 on 5/4/2016.
@@ -12,7 +12,7 @@ import synchronoss.handlers.countly.CountlyEventHandler
 
     "Event processing" should "get data correctly" in {
 
-      val cch = new CountlyEventHandler()
+        val cch = new CountlyGenericBridge()
       val test_controller = new EventTestController(cch)
 
       Helpers.invokeWithContext(Helpers.fakeRequest(Helpers.GET, query), test_controller)

@@ -82,7 +82,7 @@ object EventHandler {
 
   def buildEventHandlerList {
     import scala.collection.JavaConversions._
-    if (eventHandlerProperties.size > 0) return
+    if (eventHandlerProperties.nonEmpty) return
 
     val conf: Config = ConfigFactory.load
     val mapr_conf: java.util.List[_ <: Config] = conf.getConfigList("mapping")

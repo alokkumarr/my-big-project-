@@ -4,7 +4,7 @@ import org.scalatest.FlatSpec
 import play.api.libs.json.Json
 import play.test.Helpers
 import rtcontrollers.CrashTestController
-import synchronoss.handlers.countly.CountlyCrashHandler
+import synchronoss.handlers.countly.CountlyCrashBridge
 
 /**
   * Created by srya0001 on 5/4/2016.
@@ -17,7 +17,7 @@ class CrashReportTest extends FlatSpec {
 
   "Crash Report processing" should "get data correctly" in {
 
-    val cch = new CountlyCrashHandler()
+    val cch = new CountlyCrashBridge()
     val test_controller = new CrashTestController(cch)
 
     Helpers.invokeWithContext(

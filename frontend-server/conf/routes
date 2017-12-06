@@ -16,3 +16,7 @@ GET     /api-docs        controllers.ApiHelpController.getResources
 GET     /control        controllers.RTISControl.executeCmd(CMD:String, PARAMETERS:Option[String])
 POST    /control        controllers.RTISControl.executeExtendedCmd(CMD:String)
 GET     /sr             controllers.RTISControl.sr( parameters:Option[String])
+
+# log files and ...
+
+POST    /genericlog    controllers.GenericLog.doPost(CID : String, LOG_TYPE : String)
