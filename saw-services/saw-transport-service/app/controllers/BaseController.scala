@@ -1,11 +1,10 @@
 package controllers
 
 import java.text.SimpleDateFormat
-import java.security.Key;
+import java.security.Key
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.impl.crypto.MacProvider;
+import io.jsonwebtoken.Jwts
+
 import org.json4s._
 import org.json4s.JsonAST.JValue
 import org.json4s.JsonDSL._
@@ -13,9 +12,7 @@ import org.json4s.native.JsonMethods.{compact, parse, pretty, render}
 import org.slf4j.{Logger, LoggerFactory}
 import play.libs.Json
 import play.mvc.{Controller, Http, Result, Results}
-
-
-import model.ClientException
+import model.{ClientException, TransportUtils}
 
 class BaseController extends Controller {
   val log: Logger = LoggerFactory.getLogger(classOf[BaseController].getName)
@@ -93,7 +90,9 @@ class BaseController extends Controller {
           Some(Ticket(
             ticket.get("userId").asInstanceOf[Integer],
             ticket.get("userFullName").asInstanceOf[String],
-            ticket.get("dataSecurityKey").asInstanceOf[java.util.List[Object]]))
+            ticket.get("dataSecurityKey").asInstanceOf[java.util.List[Object]],
+            ticket.get("roleType").asInstanceOf[String],
+            ticket.get("products").asInstanceOf[java.util.List[Object]]))
         } else {
           log.info("Unrecognized Authorization header: " + value)
           None
@@ -132,4 +131,6 @@ class BaseController extends Controller {
   }
 }
 
-case class Ticket(userId: Integer, userFullName: String, dataSecurityKey: java.util.List[Object])
+case class Ticket(userId: Integer, userFullName: String, dataSecurityKey: java.util.List[Object], roleType:String , product :java.util.List[Object])
+
+
