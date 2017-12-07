@@ -2,7 +2,7 @@ import mapr.streaming.EventHandler
 import org.scalatest.FlatSpec
 import synchronoss.handlers.GenericEventHandler
 import synchronoss.handlers.charter.smartcare.CharterEventHandler
-import synchronoss.handlers.countly.{CountlyCrashHandler, CountlyEventHandler}
+import synchronoss.handlers.countly.{CountlyCrashBridge, CountlyGenericBridge}
 
 /**
   * Created by srya0001 on 5/2/2016.
@@ -15,11 +15,11 @@ class HandlerLoadingTest extends FlatSpec{
     val countlyEventHandler = "countly_event"
     val countlyCrashHandler = "countly_crash"
 
-    val countly_event_handler: CountlyEventHandler =
+    val countly_event_handler: CountlyGenericBridge =
       EventHandler.getEventHandler(countlyEventHandler)
     assert(countly_event_handler != null)
 
-    val countly_crash_handler: CountlyCrashHandler =
+    val countly_crash_handler: CountlyCrashBridge =
       EventHandler.getEventHandler(countlyCrashHandler)
     assert(countly_crash_handler != null)
 

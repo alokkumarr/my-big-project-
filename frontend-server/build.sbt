@@ -1,3 +1,4 @@
+import play.routes.compiler.RoutesCompiler
 import sbt.Keys._
 
 name := """RTService"""

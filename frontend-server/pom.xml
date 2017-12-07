@@ -383,11 +383,6 @@
             <artifactId>mapr-streams</artifactId>
             <version>${mapr.client}</version>
         </dependency>
-        <dependency>
-            <groupId>com.synchronoss</groupId>
-            <artifactId>bda-rt-data-model</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
         <dependency>
             <groupId>commons-cli</groupId>

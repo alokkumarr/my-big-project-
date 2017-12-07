@@ -3,7 +3,7 @@ package rtcontrollers
 import java.util.concurrent.Callable
 
 import play.mvc.Http
-import synchronoss.handlers.countly.CountlyEventHandler
+import synchronoss.handlers.countly.CountlyGenericBridge
 
 import scala.collection.Seq
 import scala.collection.immutable.Map
@@ -11,7 +11,7 @@ import scala.collection.immutable.Map
 /**
   * Created by srya0001 on 5/4/2016.
   */
-class EventTestController( cch: CountlyEventHandler) extends Callable[play.mvc.Result] {
+class EventTestController( cch: CountlyGenericBridge) extends Callable[play.mvc.Result] {
 
     var countly_crash_handler = cch
 
