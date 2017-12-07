@@ -203,6 +203,7 @@ genericlog = {
             value.serializer=org.apache.kafka.common.serialization.StringSerializer
             block.on.buffer.full=true
             timeout.ms=30000
+            heartbeat.ms = 1000
         }
     ]
 
