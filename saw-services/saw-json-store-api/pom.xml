@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.synchronoss.saw</groupId>
+	<artifactId>saw-json-store-api</artifactId>
+	<version>${revision}</version>
+	<packaging>jar</packaging>
+	<description></description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
+		<mapr.db.version>5.2.0-mapr</mapr.db.version>
+	</properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.mapr.db</groupId>
+      <artifactId>maprdb</artifactId>
+      <version>${mapr.db.version}</version>
+    </dependency>
+  </dependencies>
+  <repositories>
+		<repository>
+			<id>synchronoss</id>
+			<url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
+		</repository>
+	</repositories>
+</project>
