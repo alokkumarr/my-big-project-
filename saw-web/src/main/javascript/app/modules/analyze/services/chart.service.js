@@ -33,7 +33,6 @@ import * as toString from 'lodash/toString';
 import * as replace from 'lodash/replace';
 
 import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS} from '../consts';
-import { DateFilterComponent } from '../components/filter/filters/date-filter.component';
 
 const LEGEND_POSITIONING = {
   left: {

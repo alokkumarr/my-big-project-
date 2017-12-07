@@ -22,6 +22,9 @@ const DATE_FORMATS = [{
 }, {
   value: 'MM YYYY',
   label: '09 2017'
+}, {
+  value: 'YYYY',
+  label: '2017'
 }];
 
 const DEFAULT_DATE_FORMAT = DATE_FORMATS[1];
