@@ -201,19 +201,16 @@ public class BuilderUtil
         break;
       }
       case "LTW": {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime last2Week = now.minusWeeks(2);
-        DayOfWeek firstDayOfWeek = WeekFields.of(Locale.getDefault()).getFirstDayOfWeek();
-        LocalDateTime startOfWeek =
-            last2Week.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
-        dynamicConvertor.setLte(startOfWeek.plusWeeks(2).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
-        dynamicConvertor.setGte(startOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
-        break;
-      }
+     LocalDateTime now = LocalDateTime.now();
+     LocalDateTime last2Week = now.minusWeeks(2);
+     dynamicConvertor.setLte(now.with(DayOfWeek.MONDAY).minusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+     dynamicConvertor.setGte(last2Week.with(DayOfWeek.MONDAY).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
+     break;
+   }
       default : throw new IllegalArgumentException(dynamic + " not present");
 
     }
 
     return dynamicConvertor;
   }
-}
+ }

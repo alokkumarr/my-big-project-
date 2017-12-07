@@ -40,6 +40,8 @@ analyze-report-preview {
     &_details-grid {
       width: 98%;
       margin: 0 auto;
+      overflow-y: -webkit-paged-y;
+      padding-bottom: inherit;
     }
   }
 }

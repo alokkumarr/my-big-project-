@@ -1,5 +1,0 @@
-#!/bin/sh
-#
-# Temporary no-op script until all Bamboo plans, including branch
-# plans, have been updated to no longer invoke the prepare script
-#

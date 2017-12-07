@@ -1,4 +1,5 @@
 const commonFunctions = require('../../helpers/commonFunctions.js');
+const users = require('../../data/users.js');
 
 module.exports = {
   loginElements: {
@@ -24,20 +25,22 @@ module.exports = {
    * Login as a user from this list
    * https://confluence.synchronoss.net:8443/pages/viewpage.action?spaceKey=BDA&title=Users%2C+Roles+And+Privileges
    */
-  loginAs(role) {
-    const password = 'Sawsyncnewuser1!';
-    switch (role) {
+  loginAs(roleName) {
+    switch (roleName) {
       case 'admin':
-        this.userLogin('sawadmin@synchronoss.com', password);
+        this.userLogin(users.admin.loginId, users.anyUser.password);
+        break;
+      case 'userOne':
+        this.userLogin(users.userOne.loginId, users.anyUser.password);
         break;
       case 'user':
-        this.userLogin('reportuser@synchronoss.com', password);
+        this.userLogin('reportuser@synchronoss.com', 'Sawsyncnewuser1!');
         break;
       case 'analyst':
-        this.userLogin('analyst@synchronoss.com', password);
+        this.userLogin('analyst@synchronoss.com', 'Sawsyncnewuser1!');
         break;
       case 'reviewer':
-        this.userLogin('reviewer@synchronoss.com', password);
+        this.userLogin('reviewer@synchronoss.com', 'Sawsyncnewuser1!');
         break;
       default:
     }

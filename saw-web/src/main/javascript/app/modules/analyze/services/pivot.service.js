@@ -4,6 +4,7 @@ import * as map from 'lodash/map';
 import * as find from 'lodash/find';
 import * as flatMap from 'lodash/flatMap';
 import * as fpMap from 'lodash/fp/map';
+import * as fpForEach from 'lodash/fp/forEach';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpFilter from 'lodash/fp/filter';
 import * as split from 'lodash/split';
@@ -62,7 +63,12 @@ export function PivotService() {
       fpMap(fpMapKeys(key => {
         const newKey = BACK_2_FRONT_PIVOT_FIELD_PAIRS[key];
         return newKey || key;
-      }))
+      })),
+      fpForEach(pivotField => {
+        if (pivotField.summaryType === 'count') {
+          pivotField.summaryType = 'sum';
+        }
+      })
     );
   }
 
@@ -135,10 +141,12 @@ export function PivotService() {
     }
 
     const formattedData = map(data, dataPoint => {
+
       const clonedDataPoint = clone(dataPoint);
       forEach(dateFields, ({dataField, dateInterval}) => {
         const format = DATE_INTERVALS_OBJ[dateInterval].format;
-        clonedDataPoint[dataField] = moment(dataPoint[dataField]).utcOffset(0).format(format);
+        const offset = moment(dataPoint[dataField]).utcOffset();
+        clonedDataPoint[dataField] = moment(dataPoint[dataField]).utcOffset(offset).format(format);
         if (dateInterval === 'quarter') {
           const parts = split(clonedDataPoint[dataField], '-');
           clonedDataPoint[dataField] = `${parts[0]}-Q${parts[1]}`;

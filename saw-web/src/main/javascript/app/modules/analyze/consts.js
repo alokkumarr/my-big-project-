@@ -3,7 +3,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as map from 'lodash/map';
 import * as fpMapValues from 'lodash/fp/mapValues';
 
-import {NUMBER_TYPES, DATE_TYPES, CHART_COLORS} from '../../common/consts.js';
+import {NUMBER_TYPES, DATE_TYPES, CHART_COLORS, BACKEND_TIMEZONE} from '../../common/consts.js';
 
 export const Events = {
   AnalysesRefresh: 'Analyses:Refresh'
@@ -23,7 +23,7 @@ export const ENTRY_MODES = {
 
 export const LAST_ANALYSES_CATEGORY_ID = 'lastAnalysesListId';
 
-export {NUMBER_TYPES, DATE_TYPES, CHART_COLORS};
+export {NUMBER_TYPES, DATE_TYPES, CHART_COLORS, BACKEND_TIMEZONE};
 
 export const TYPE_ICONS = [{
   icon: 'icon-number-type',

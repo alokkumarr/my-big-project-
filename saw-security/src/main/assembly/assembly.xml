@@ -10,17 +10,6 @@
   <baseDirectory>${project.artifactId}</baseDirectory>
   <fileSets>
     <fileSet>
-      <directory>${project.basedir}/src/main/doc</directory>
-      <outputDirectory></outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>${project.basedir}/doc</directory>
-      <includes>
-        <include>operations.md</include>
-      </includes>
-      <outputDirectory>doc</outputDirectory>
-    </fileSet>
-    <fileSet>
       <directory>${project.basedir}/src/main/ansible</directory>
       <outputDirectory>ansible</outputDirectory>
     </fileSet>
