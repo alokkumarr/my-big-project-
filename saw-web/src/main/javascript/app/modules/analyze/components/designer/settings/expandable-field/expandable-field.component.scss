@@ -1,0 +1,33 @@
+@import "themes/base/colors";
+
+expandable-field {
+  display: block;
+
+  .expandable-field__name {
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    color: $primary-grey-g4;
+    margin-left: 5px;
+  }
+
+  .expandable-field__icon {
+    margin-left: 5px;
+    color: $primary-grey-g3;
+  }
+
+  .expandable-field__move-down {
+    transform: rotate(90deg);
+  }
+
+  .expandable-field__move-up {
+    transform: rotate(-90deg) translate(10px, 10px);
+  }
+
+  .expandable-field__remove {
+    color: red;
+    transform: scale(0.6) translateY(-5px);
+  }
+}

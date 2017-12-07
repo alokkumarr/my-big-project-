@@ -25,6 +25,20 @@ export const LAST_ANALYSES_CATEGORY_ID = 'lastAnalysesListId';
 
 export {NUMBER_TYPES, DATE_TYPES, CHART_COLORS};
 
+export const TYPE_ICONS = [{
+  icon: 'icon-number-type',
+  label: 'Number',
+  value: 'number'
+}, {
+  icon: 'icon-string-type',
+  label: 'String',
+  value: 'string'
+}, {
+  icon: 'icon-calendar',
+  label: 'Date',
+  value: 'date'
+}];
+
 export const TYPE_ICONS_OBJ = fpPipe(
   fpGroupBy('type'),
   fpMapValues(v => v[0])

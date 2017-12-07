@@ -3,21 +3,35 @@
   <div (mouseenter)="expandUnselectedSection()"
        class="settings__unselected-fields"
        [class.anim__expanded]="isUnselectedExpanded">
-    <div *ngIf="unselectedArtifactColumns"
-              [dndSortableContainer]="sortableContainerOptions"
-              [dndCollection]="unselectedArtifactColumns">
+    <div *ngIf="unselectedArtifactColumns">
+
       <div class="settings__list-item">
-        keyword filter
+        <mat-form-field>
+          <input matInput type="text"
+                 placeholder="Clearable input"
+                 (change)="onTextFilterChange($event)"
+                 [value]="value"/>
+          <button mat-button *ngIf="value"
+                  matSuffix mat-icon-button
+                  aria-label="Clear"
+                  (click)="onTextFilterChange('')">
+            <mat-icon fontIcon="icon-close"></mat-icon>
+          </button>
+        </mat-form-field>
       </div>
+
       <div class="settings__list-item">
-        type filter
+        <mat-button-toggle-group (change)="onTypeFilterChange($event)">
+          <mat-button-toggle *ngFor="let typeIcon of TYPE_ICONS; trackBy: index"
+                             [value]="typeIcon.value">
+            <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
       </div>
+
       <div *ngFor="let artifactColumn of unselectedArtifactColumns | artifactColumnFilter:filterObj; trackBy: index"
            (click)="addToGroupIfPossible(artifactColumn)"
-           class="settings__list-item"
-           [dndSortable]="artifactColumn"
-           (dndOnDragEnd)="onDragEnd($event, artifactColumn)"
-           (dndOnDrag)="onDrag()">
+           class="settings__list-item">
         <span class="settings__list-item__name">
           {{ artifactColumn.alias || artifactColumn.displayName }}
         </span>
@@ -32,6 +46,7 @@
        class="settings__selected-fields"
        [class.anim__expanded]="!isUnselectedExpanded">
     <designer-settings-group *ngFor="let groupAdapter of groupAdapters; trackBy: index"
+      (removeField)="removeFromGroup($event, groupAdapter)"
       [groupAdapter]="groupAdapter"
       [artifactColumns]="groupAdapter.artifactColumns">
     </designer-settings-group>

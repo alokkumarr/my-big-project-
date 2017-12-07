@@ -47,6 +47,7 @@ export class DesignerService {
 
     const pivotReverseTransform = (artifactColumn: ArtifactColumnPivot) => {
       artifactColumn.area = null;
+      artifactColumn.checked = false;
     }
 
     const pivotGroupAdapters =  [{
@@ -124,11 +125,11 @@ export class DesignerService {
 
   addArtifactColumnIntoGroup(
     artifactColumn: ArtifactColumn,
-    pivotGroupAdapters: IDEsignerSettingGroupAdapter[]): boolean {
+    groupAdapters: IDEsignerSettingGroupAdapter[]): boolean {
 
     let addedSuccessfully = false;
 
-    forEach(pivotGroupAdapters, (adapter: IDEsignerSettingGroupAdapter) => {
+    forEach(groupAdapters, (adapter: IDEsignerSettingGroupAdapter) => {
       if (adapter.canAcceptArtifactColumn(artifactColumn)) {
         adapter.transform(artifactColumn);
         adapter.artifactColumns = [...adapter.artifactColumns, artifactColumn];
@@ -141,9 +142,9 @@ export class DesignerService {
 
   removeArtifactColumnFromGroup(
     artifactColumn: ArtifactColumn,
-    pivotGroupAdapter: IDEsignerSettingGroupAdapter) {
-    pivotGroupAdapter.reverseTransform(artifactColumn);
-    remove(pivotGroupAdapter.artifactColumns, ({columnName}) => artifactColumn.columnName === columnName);
+    groupAdapter: IDEsignerSettingGroupAdapter) {
+    groupAdapter.reverseTransform(artifactColumn);
+    remove(groupAdapter.artifactColumns, ({columnName}) => artifactColumn.columnName === columnName);
   }
 
   getPartialSqlBuilder(artifactColumns: ArtifactColumns, type: AnalysisType) {

@@ -1,0 +1,26 @@
+<div>
+    <mat-icon fontIcon="icon-arrow-left"
+              class="expandable-field__move-up">
+    </mat-icon>
+    <mat-icon fontIcon="icon-arrow-left"
+              class="expandable-field__move-down">
+    </mat-icon>
+    <span class="expandable-field__name">
+      {{ artifactColumn.alias || artifactColumn.displayName }}
+    </span>
+    <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
+              class="expandable-field__icon">
+    </mat-icon>
+    <mat-icon fontIcon="icon-close"
+              (click)="removeRequest.emit()"
+              class="expandable-field__remove">
+    </mat-icon>
+    <mat-icon fontIcon="icon-expand"
+              (click)="toggleExpansion()">
+    </mat-icon>
+</div>
+
+<div *ngIf="isExpanded"
+     class="expandable-field__details">
+  details
+</div>

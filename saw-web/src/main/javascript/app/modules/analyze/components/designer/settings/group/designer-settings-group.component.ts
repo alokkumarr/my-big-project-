@@ -5,6 +5,7 @@ import {
   EventEmitter
 } from '@angular/core';
 import {
+  ArtifactColumn,
   ArtifactColumns,
   IDEsignerSettingGroupAdapter
 }  from '../../types';
@@ -19,21 +20,17 @@ require('./designer-settings-group.component.scss');
 })
 export default class DesignerSettingsGroupComponent {
   // @Output() public onSettingsChange: EventEmitter<ArtifactColumns[]> = new EventEmitter();
+  @Output() public removeField: EventEmitter<ArtifactColumn> = new EventEmitter();
   @Input() public artifactColumns :ArtifactColumns;
   @Input() public groupAdapter :IDEsignerSettingGroupAdapter;
 
-  public sortableContainerOptions = {};
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
 
-  ngOnInit() {
-    this.sortableContainerOptions = {
-      allowDropFn: this.groupAdapter.canAcceptArtifactColumn
-    }
+  onMoveField(direction, index) {
+
   }
 
-  onDrop(artifactColumn) {
-    // verify if acceptable
-    // add new Artifactcolumn
-    this.groupAdapter.transform(artifactColumn);
+  onRemoveField(artifactColumn: ArtifactColumn) {
+    this.removeField.emit(artifactColumn);
   }
 }

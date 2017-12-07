@@ -10,10 +10,10 @@
                   [isDataOutOfSynch]="isDataOutOfSynch">
 </designer-toolbar>
 
-<old-designer-settings class="designer__data-settings"
+<designer-settings class="designer__data-settings"
                    (onSettingsChange)="onSettingsChange()"
                    [artifactColumns]="analysis ? analysis.artifacts[0].columns : []">
-</old-designer-settings>
+</designer-settings>
 
 <designer-pivot class="designer__main"
                 (onSettingsChange)="onMainSettingsChange($event)"

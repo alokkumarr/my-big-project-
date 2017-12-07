@@ -1,9 +1,21 @@
 <div fxLayout="row"
-     fxLayoutAlign="space-between"
+     fxLayoutAlign="start"
      class="toolbar__container">
   <button mat-raised-button
           (click)="refreshData.emit()"
           [color]="isDataOutOfSynch ? 'primary' : ''">
     <ng-container i18n>Refresh Data</ng-container>
+  </button>
+  <button mat-raised-button>
+    <ng-container i18n>Description</ng-container>
+  </button>
+  <button mat-raised-button>
+    <ng-container i18n>Preview</ng-container>
+  </button>
+  <button mat-raised-button>
+    <ng-container i18n>Sort</ng-container>
+  </button>
+  <button mat-raised-button>
+    <ng-container i18n>Filter</ng-container>
   </button>
 </div>

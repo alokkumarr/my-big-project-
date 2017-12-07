@@ -16,6 +16,9 @@ import {
   MatMenuModule,
   MatTooltipModule
 } from '@angular/material';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import {MatInputModule} from '@angular/material/input'
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
 import '../../../../themes/_angular_next.scss';
@@ -34,7 +37,10 @@ import '../../../../themes/_angular_next.scss';
     MatListModule,
     MatCheckboxModule,
     MatMenuModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatExpansionModule,
+    MatButtonToggleModule,
+    MatInputModule
   ],
   providers: [MatIconRegistry],
   exports: [
@@ -49,7 +55,10 @@ import '../../../../themes/_angular_next.scss';
     MatListModule,
     MatCheckboxModule,
     MatMenuModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatExpansionModule,
+    MatButtonToggleModule,
+    MatInputModule
   ]
 })
 export class MaterialModule {}

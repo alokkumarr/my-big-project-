@@ -6,12 +6,13 @@ import {
   DesignerPivotComponent,
   ArtifactColumns2PivotFieldsPipe
 } from './pivot';
-// import {
-//   DesignerSettingsComponent,
-//   DesignerSettingsGroupComponent
-// } from './settings';
 import {
-  OldDesignerSettingsComponent,
+  DesignerSettingsComponent,
+  DesignerSettingsGroupComponent,
+  ExpandableFieldComponent
+} from './settings';
+import {
+  // OldDesignerSettingsComponent,
   PivotAreaFilterPipe
 } from './old-settings';
 import { DesignerService } from './designer.service';
@@ -24,9 +25,10 @@ export {
   DesignerHeaderComponent,
   DesignerToolbarComponent,
   DesignerPivotComponent,
-  // DesignerSettingsComponent,
-  // DesignerSettingsGroupComponent,
-  OldDesignerSettingsComponent,
+  DesignerSettingsComponent,
+  DesignerSettingsGroupComponent,
+  ExpandableFieldComponent,
+  // OldDesignerSettingsComponent,
   DesignerService,
   SettingsValidationService,
   ArtifactColumnFilterPipe,
