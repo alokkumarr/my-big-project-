@@ -104,6 +104,7 @@ export const AnalyzePivotComponent = {
           this.analysisUnSynched();
           this.startDraftMode();
           this.artifacts = this.getSortedArtifacts(this.model.artifacts);
+          this.sortFields = this.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
           this.loadPivotData();
         });
     }
