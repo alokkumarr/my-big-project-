@@ -1,5 +1,6 @@
 package com.synchronoss.saw.observe;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,16 +9,20 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
+import com.synchronoss.saw.observe.model.Observe;
+import com.synchronoss.saw.observe.model.ObserveNode;
+
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
 
 @Component
-public class ServiceUtils {
+public class ObserveUtils {
   public final String SCHEMA_FILENAME = "payload-schema.json";
 
   public ObjectMapper getMapper() {
@@ -60,6 +65,18 @@ public class ServiceUtils {
     JsonValidator validator = factory.getValidator();
     ProcessingReport report = validator.validate(schema, data);
     return report.isSuccess();
+  }
+  
+  public static Observe getObserveNode (String json, String node) throws JsonProcessingException, IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    JsonNode objectNode = objectMapper.readTree(json);
+    JsonNode observeNode = objectNode.get(node);
+    String jsonObserve = "{ \"observe\" :" + observeNode.toString() + "}";
+    JsonNode observeNodeIndependent = objectMapper.readTree(jsonObserve);
+    ObserveNode observeTreeNode = objectMapper.treeToValue(observeNodeIndependent, ObserveNode.class);
+    Observe observeTree = observeTreeNode.getObserve();
+    return observeTree; 
   }
 
   

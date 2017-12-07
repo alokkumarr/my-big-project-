@@ -145,7 +145,7 @@
 		<module>saw-scheduler-service</module>
 		<module>saw-gateway-service</module>
 		<module>saw-export-service</module>
-		<module>saw-observe-service</module>	
+		<module>saw-observe-service</module>
 		<module>dist</module>
 	</modules>
 </project>
