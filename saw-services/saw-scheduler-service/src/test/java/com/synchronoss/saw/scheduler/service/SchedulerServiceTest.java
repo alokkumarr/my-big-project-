@@ -126,7 +126,10 @@ public class SchedulerServiceTest {
                     .friday(false)
                     .saturday(false)
                     .build())
-                .build())
+                .build()).name("ReportTest")
+                    .description("Description")
+                    .metricName("Dispatch_Metrics")
+                    .userFullName("system")
             .build());
     }
 
@@ -157,6 +160,8 @@ class AnalysisServiceMock implements AnalysisService {
     public void executeAnalysis(String analysisId) {
         executions.add(analysisId);
     }
+
+    public void scheduleDispatch(AnalysisSchedule analysis) {analyses.add(analysis); }
 
     public List<String> getExecutions() {
         return executions;

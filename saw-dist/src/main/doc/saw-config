@@ -49,3 +49,13 @@ saw_elasticsearch_password=elastic
 
 [saw-security]
 localhost
+
+#Email configuration
+saw_email_host=outgoing.sncrcorp.net
+saw_email_port=25
+saw_email_protocol=smtp
+saw_email_username=
+saw_email_password=
+saw_email_from=SAWReport@synchronoss.com
+
+

@@ -74,7 +74,10 @@ public class AnalysisServiceTest {
                     .friday(false)
                     .saturday(false)
                     .build())
-                .build())
+                .build()).name("ReportTest")
+                .description("Description")
+                .metricName("Dispatch_Metrics")
+                .userFullName("system")
             .build();
         return ImmutableAnalysisSchedulesResponse.builder()
             .analyses(new AnalysisSchedule[] {analysis}).build();
