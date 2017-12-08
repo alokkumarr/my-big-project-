@@ -151,6 +151,11 @@ export const ANALYSIS_METHODS = [
         label: 'Pie Chart',
         icon: {font: 'icon-pie-chart'},
         type: 'chart:pie'
+      },
+      {
+        label: 'Timeseries Line',
+        icon: {font: 'icon-line-chart'},
+        type: 'chart:tsline'
       }
     ]
   }

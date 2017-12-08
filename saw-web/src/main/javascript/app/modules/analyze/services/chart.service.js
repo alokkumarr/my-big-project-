@@ -228,6 +228,7 @@ export class ChartService {
     case 'spline':
     case 'stack':
     case 'scatter':
+    case 'tsline':
     default:
       return config;
     }
