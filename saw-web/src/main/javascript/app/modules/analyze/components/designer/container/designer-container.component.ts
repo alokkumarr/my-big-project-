@@ -2,8 +2,7 @@ import {
   Component,
   Input,
   Output,
-  EventEmitter,
-  ChangeDetectorRef
+  EventEmitter
 } from '@angular/core';
 import * as isEmpty from 'lodash/isEmpty';
 import * as filter from 'lodash/filter';
@@ -49,8 +48,7 @@ export class DesignerContainerComponent {
   public data : any = null;
 
   constructor(
-    private _designerService: DesignerService,
-    private _changeDetectorRef: ChangeDetectorRef
+    private _designerService: DesignerService
   ) {}
 
   ngOnInit() {
@@ -130,25 +128,7 @@ export class DesignerContainerComponent {
   onSettingsChange() {
     this.isDataOutOfSynch = true;
     this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
-    this._changeDetectorRef.detectChanges();
     this.firstArtifactColumns = filter(this.analysis.artifacts[0].columns, 'checked');
-  }
-
-  onMainSettingsChange(artifactColumns) {
-    this.isDataOutOfSynch = true;
-    this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
-    this.analysis.artifacts[0].columns = this.mergeBackupColumnChanges(
-      artifactColumns,
-      this.analysis.artifacts[0].columns
-    );
-    this.firstArtifactColumns = this.analysis.artifacts[0].columns;
-  }
-
-  mergeBackupColumnChanges(backups, artifactColumns) {
-    return map(artifactColumns, column => {
-      const backup = find(backups, ({columnName}) => column.columnName === columnName);
-      return backup || column;
-    });
   }
 
   updateAnalysis() {

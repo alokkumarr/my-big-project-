@@ -29,7 +29,7 @@ require('./designer-settings.component.scss');
   template
 })
 export default class DesignerSettingsComponent {
-  @Output() public onSettingsChange: EventEmitter<ArtifactColumnPivot[]> = new EventEmitter();
+  @Output() public settingsChange: EventEmitter<ArtifactColumnPivot[]> = new EventEmitter();
   @Input() public artifactColumns: ArtifactColumns;
 
   public unselectedArtifactColumns: ArtifactColumns
@@ -51,21 +51,25 @@ export default class DesignerSettingsComponent {
     from: null
   };
 
-  public dndSortableContainerObj = {};
+  public dndSortableContainerObj = {
+    // the zone can be any value as long as it's different than the zone of the sortables in it
+    // so that you can't sort the unselected artifactColumns
+    zone: 'zone'
+  };
 
   constructor(private _designerService: DesignerService) {}
 
   ngOnInit() {
-    this.dndSortableContainerObj = {
-      // the zone can be any value as long as it's different than the zone of the sortables in it
-      // so that you can't sort the unselected artifactColumns
-      zone: 'zone'
-    }
     this.groupAdapters = this._designerService.getPivotGroupAdapters(this.artifactColumns);
   }
 
   ngOnChanges() {
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+  }
+
+  changeSettings() {
+    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+    this.settingsChange.emit();
   }
 
   hideUnselectedSection() {
@@ -96,8 +100,7 @@ export default class DesignerSettingsComponent {
       });
     }
     if (event.isDropSuccessful) {
-      this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-      this.onSettingsChange.emit();
+      this.changeSettings();
     }
   }
 
@@ -140,6 +143,7 @@ export default class DesignerSettingsComponent {
         to: null,
         from: null
       };
+      this.changeSettings();
     }
   }
 
@@ -153,17 +157,18 @@ export default class DesignerSettingsComponent {
 
   onTypeFilterChange(change) {
     console.log('Typechange', change);
-
   }
 
+  /**
+   * Add artifactColumn to the first group that can accept it, if possible
+   */
   addToGroupIfPossible(artifactColumn: ArtifactColumn) {
     const isAddSuccessful = this._designerService.addArtifactColumnIntoAGroup(
       artifactColumn,
       this.groupAdapters
     );
     if (isAddSuccessful) {
-      this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-      this.onSettingsChange.emit();
+      this.changeSettings();
     }
   }
 
@@ -172,8 +177,7 @@ export default class DesignerSettingsComponent {
       artifactColumn,
       groupAdapter
     );
-    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-    this.onSettingsChange.emit();
+    this.changeSettings();
   }
 
 }

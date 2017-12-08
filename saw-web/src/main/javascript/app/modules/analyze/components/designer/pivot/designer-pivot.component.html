@@ -5,12 +5,12 @@
   <div *ngSwitchCase="DesignerStates.SELECTION_WAITING_FOR_DATA">
     loading
   </div>
+  out of synch {{isDataOutOfSynch}}
   <pivot-grid *ngSwitchDefault
               [class.out-of-synch]="isDataOutOfSynch"
               [fields]="artifactColumns | artifactColumns2PivotFields"
               [data]="data"
               [updater]="updater"
-              mode="designer"
-              (onContentReady)="onContentReady($event)">
+              mode="designer">
   </pivot-grid>
 </div>

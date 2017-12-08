@@ -69,12 +69,10 @@ import {
   DesignerSettingsComponent,
   DesignerSettingsGroupComponent,
   ExpandableFieldComponent,
-  // OldDesignerSettingsComponent,
   DesignerService,
   SettingsValidationService,
   ArtifactColumnFilterPipe,
-  ArtifactColumns2PivotFieldsPipe,
-  PivotAreaFilterPipe
+  ArtifactColumns2PivotFieldsPipe
 } from './components/designer';
 import {
   analyzeServiceProvider
@@ -152,9 +150,7 @@ angular.module(AnalyzeModule, [
     DesignerSettingsComponent,
     DesignerSettingsGroupComponent,
     ExpandableFieldComponent,
-    // OldDesignerSettingsComponent,
     ArtifactColumnFilterPipe,
-    PivotAreaFilterPipe,
     ArtifactColumns2PivotFieldsPipe
   ],
   entryComponents: [
@@ -164,7 +160,6 @@ angular.module(AnalyzeModule, [
     DesignerToolbarComponent,
     DesignerPivotComponent,
     ExpandableFieldComponent,
-    // OldDesignerSettingsComponent
     DesignerSettingsComponent,
     DesignerSettingsGroupComponent
   ],

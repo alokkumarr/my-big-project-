@@ -5,7 +5,7 @@ import {
   EventEmitter
 } from '@angular/core';
 import * as forEach from 'lodash/forEach';
-import * as isEmpty from 'lodash/isEmpty';
+import * as isArray from 'lodash/isArray';
 import * as get from 'lodash/get';
 import {Subject} from 'rxjs/Subject';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
@@ -51,7 +51,6 @@ export class PivotGridComponent {
   private _subscription: any;
 
   ngOnInit() {
-    this.allowFieldDragging = this.mode === 'designer';
     setTimeout(() => {
       // have to repaint the grid because of the animation of the modal
       // if it's not repainted it appears smaller
@@ -79,16 +78,12 @@ export class PivotGridComponent {
   }
 
   ngOnChanges(changes) {
-    if (!isEmpty(get(changes, 'data.currentValue'))) {
+    const data = get(changes, 'data.currentValue');
+    const fields = get(changes, 'fields.currentValue');
+    if (isArray(data) || isArray(fields)) {
       const dataSource = new PivotGridDataSource({
-        store: this.data,
-        fields: this.fields
-      });
-      this.updateDataSource(dataSource);
-    } else if (!isEmpty(get(changes, 'fields.currentValue'))) {
-      const dataSource = new PivotGridDataSource({
-        store: [],
-        fields: this.fields
+        store: data || [],
+        fields: fields || []
       });
       this.updateDataSource(dataSource);
     }

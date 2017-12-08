@@ -11,12 +11,11 @@
 </designer-toolbar>
 
 <designer-settings class="designer__data-settings"
-                   (onSettingsChange)="onSettingsChange()"
+                   (settingsChange)="onSettingsChange()"
                    [artifactColumns]="analysis ? analysis.artifacts[0].columns : []">
 </designer-settings>
 
 <designer-pivot class="designer__main"
-                (onSettingsChange)="onMainSettingsChange($event)"
                 [isDataOutOfSynch]="isDataOutOfSynch"
                 [data]="data"
                 [artifactColumns]="firstArtifactColumns"

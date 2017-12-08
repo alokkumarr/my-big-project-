@@ -11,10 +11,6 @@ import {
   DesignerSettingsGroupComponent,
   ExpandableFieldComponent
 } from './settings';
-import {
-  // OldDesignerSettingsComponent,
-  PivotAreaFilterPipe
-} from './old-settings';
 import { DesignerService } from './designer.service';
 import { SettingsValidationService } from './settings-validation.service';
 import { ArtifactColumnFilterPipe } from './artifact-column-filter.pipe';
@@ -28,10 +24,8 @@ export {
   DesignerSettingsComponent,
   DesignerSettingsGroupComponent,
   ExpandableFieldComponent,
-  // OldDesignerSettingsComponent,
   DesignerService,
   SettingsValidationService,
   ArtifactColumnFilterPipe,
-  ArtifactColumns2PivotFieldsPipe,
-  PivotAreaFilterPipe
+  ArtifactColumns2PivotFieldsPipe
 };
