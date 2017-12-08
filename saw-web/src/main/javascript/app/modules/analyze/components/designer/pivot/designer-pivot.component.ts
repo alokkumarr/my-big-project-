@@ -26,7 +26,6 @@ import {
 } from '../types';
 import { DesignerStates } from '../container';
 import { IPivotGridUpdate } from '../../../../../common/components/pivot-grid/pivot-grid.component';
-import { SettingsValidationService } from '../settings-validation.service';
 import {
   TYPE_ICONS_OBJ,
   DATE_TYPES,
@@ -50,8 +49,4 @@ export class DesignerPivotComponent {
 
   public updater: Subject<IPivotGridUpdate> = new Subject();
   public DesignerStates = DesignerStates;
-
-  constructor(
-    private _settingsValidationService: SettingsValidationService
-  ) {}
 }

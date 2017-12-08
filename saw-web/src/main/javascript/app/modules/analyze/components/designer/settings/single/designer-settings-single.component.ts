@@ -5,8 +5,9 @@ import {
   EventEmitter
 } from '@angular/core';
 import * as filter from 'lodash/filter';
+import * as debounce from 'lodash/debounce';
 
-import { DesignerService } from '../designer.service';
+import { DesignerService } from '../../designer.service';
 import {
   IDEsignerSettingGroupAdapter,
   ArtifactColumn,
@@ -15,20 +16,26 @@ import {
   ArtifactColumnPivot,
   IMoveFieldToEvent,
   IMoveFieldFromEvent
-} from '../types';
+} from '../../types';
 import {
   TYPE_ICONS_OBJ,
   TYPE_ICONS
-} from '../../../consts';
+} from '../../../../consts';
 
-const template = require('./designer-settings.component.html');
-require('./designer-settings.component.scss');
+const template = require('./designer-settings-single.component.html');
+require('./designer-settings-single.component.scss');
 
+const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
+
+/**
+ * Designer settings component for designers with a single set of artifactColumns like
+ * pivot or chart
+ */
 @Component({
-  selector: 'designer-settings',
+  selector: 'designer-settings-single',
   template
 })
-export default class DesignerSettingsComponent {
+export class DesignerSettingsSingleComponent {
   @Output() public settingsChange: EventEmitter<ArtifactColumnPivot[]> = new EventEmitter();
   @Input() public artifactColumns: ArtifactColumns;
 
@@ -37,12 +44,12 @@ export default class DesignerSettingsComponent {
   public TYPE_ICONS = TYPE_ICONS;
   public isUnselectedExpanded: boolean = false;
   public groupAdapters: IDEsignerSettingGroupAdapter[];
+  private _isDragging: boolean = false;
+  private changeSettings: Function;
   public filterObj: ArtifactColumnFilter = {
     keyword: '',
     type: ''
   };
-
-  private _isDragging: boolean = false;
   private _moveEventAccumulator: {
     to: IMoveFieldToEvent,
     from: IMoveFieldFromEvent
@@ -57,7 +64,14 @@ export default class DesignerSettingsComponent {
     zone: 'zone'
   };
 
-  constructor(private _designerService: DesignerService) {}
+  constructor(private _designerService: DesignerService) {
+    // we have to debounce settings change
+    // so that the pivot grid or chart designer
+    // doesn't have to process everything with every quick change
+    this.changeSettings = debounce(() => {
+      this.settingsChange.emit();
+    }, SETTINGS_CHANGE_DEBOUNCE_TIME)
+  }
 
   ngOnInit() {
     this.groupAdapters = this._designerService.getPivotGroupAdapters(this.artifactColumns);
@@ -65,11 +79,6 @@ export default class DesignerSettingsComponent {
 
   ngOnChanges() {
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-  }
-
-  changeSettings() {
-    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-    this.settingsChange.emit();
   }
 
   hideUnselectedSection() {
@@ -100,6 +109,7 @@ export default class DesignerSettingsComponent {
       });
     }
     if (event.isDropSuccessful) {
+      this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
       this.changeSettings();
     }
   }
@@ -143,6 +153,7 @@ export default class DesignerSettingsComponent {
         to: null,
         from: null
       };
+      this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
       this.changeSettings();
     }
   }
@@ -168,6 +179,7 @@ export default class DesignerSettingsComponent {
       this.groupAdapters
     );
     if (isAddSuccessful) {
+      this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
       this.changeSettings();
     }
   }
@@ -177,6 +189,7 @@ export default class DesignerSettingsComponent {
       artifactColumn,
       groupAdapter
     );
+    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
     this.changeSettings();
   }
 

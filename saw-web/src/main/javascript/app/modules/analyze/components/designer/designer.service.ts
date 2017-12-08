@@ -32,6 +32,9 @@ import {
   NUMBER_TYPES,
   DATE_TYPES
 } from '../../consts';
+import { MAX_LENGTH_VALIDATOR } from '@angular/forms/src/directives/validators';
+
+const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
 
 @Injectable()
 export class DesignerService {
@@ -52,13 +55,29 @@ export class DesignerService {
       artifactColumn.checked = false;
     }
 
+    const areLessThenMaxFields = (artifactColumns: ArtifactColumns): boolean => {
+      return artifactColumns.length < MAX_POSSIBLE_FIELDS_OF_SAME_AREA;
+    };
+
+    const canAcceptNumberType = (groupAdapter: IDEsignerSettingGroupAdapter) => (
+      ({type}: ArtifactColumnPivot) => (
+        areLessThenMaxFields(groupAdapter.artifactColumns) &&
+        NUMBER_TYPES.includes(type)
+      )
+    );
+
+    const canAcceptNonNumberType = (groupAdapter: IDEsignerSettingGroupAdapter) => (
+      ({type}: ArtifactColumnPivot) => (
+        areLessThenMaxFields(groupAdapter.artifactColumns) &&
+        !NUMBER_TYPES.includes(type)
+      )
+    );
+
     const pivotGroupAdapters =  [{
       title: 'Data',
       marker: 'data',
       artifactColumns: [],
-      canAcceptArtifactColumn(artifactColumn: ArtifactColumnPivot) {
-        return NUMBER_TYPES.includes(artifactColumn.type);
-      },
+      canAcceptArtifactColumn: canAcceptNumberType,
       transform(artifactColumn: ArtifactColumnPivot) {
         artifactColumn.area = 'data';
         artifactColumn.checked = true;
@@ -68,9 +87,7 @@ export class DesignerService {
       title: 'Row',
       marker: 'row',
       artifactColumns: [],
-      canAcceptArtifactColumn(artifactColumn: ArtifactColumnPivot) {
-        return !NUMBER_TYPES.includes(artifactColumn.type);
-      },
+      canAcceptArtifactColumn: canAcceptNonNumberType,
       transform(artifactColumn: ArtifactColumnPivot) {
         artifactColumn.area = 'row';
         artifactColumn.checked = true;
@@ -80,9 +97,7 @@ export class DesignerService {
       title: 'Column',
       marker: 'column',
       artifactColumns: [],
-      canAcceptArtifactColumn(artifactColumn: ArtifactColumnPivot) {
-        return !NUMBER_TYPES.includes(artifactColumn.type);
-      },
+      canAcceptArtifactColumn: canAcceptNonNumberType,
       transform(artifactColumn: ArtifactColumnPivot) {
         artifactColumn.area = 'column';
         artifactColumn.checked = true;
@@ -111,7 +126,7 @@ export class DesignerService {
     const groupByProps = {
       chart: 'checked',
       pivot: 'area'
-    }
+    };
     fpPipe(
       fpFilter('checked'),
       fpGroupBy(groupByProps[analysisType]),
@@ -127,12 +142,12 @@ export class DesignerService {
 
   addArtifactColumnIntoAGroup(
     artifactColumn: ArtifactColumn,
-    groupAdapters: IDEsignerSettingGroupAdapter[]): boolean {
-
+    groupAdapters: IDEsignerSettingGroupAdapter[]
+  ): boolean {
     let addedSuccessfully = false;
 
     forEach(groupAdapters, (adapter: IDEsignerSettingGroupAdapter) => {
-      if (adapter.canAcceptArtifactColumn(artifactColumn)) {
+      if (adapter.canAcceptArtifactColumn(adapter)(artifactColumn)) {
         this.addArtifactColumnIntoGroup(artifactColumn, adapter, 0);
         addedSuccessfully = true;
         return false;
@@ -144,8 +159,8 @@ export class DesignerService {
   addArtifactColumnIntoGroup(
     artifactColumn: ArtifactColumn,
     adapter: IDEsignerSettingGroupAdapter,
-    index: number) {
-
+    index: number
+  ) {
     const array = adapter.artifactColumns;
     adapter.transform(artifactColumn);
 
@@ -160,7 +175,8 @@ export class DesignerService {
 
   removeArtifactColumnFromGroup(
     artifactColumn: ArtifactColumn,
-    groupAdapter: IDEsignerSettingGroupAdapter) {
+    groupAdapter: IDEsignerSettingGroupAdapter
+  ) {
     groupAdapter.reverseTransform(artifactColumn);
     remove(groupAdapter.artifactColumns, ({columnName}) => artifactColumn.columnName === columnName);
   }

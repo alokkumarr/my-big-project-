@@ -7,12 +7,11 @@ import {
   ArtifactColumns2PivotFieldsPipe
 } from './pivot';
 import {
-  DesignerSettingsComponent,
+  DesignerSettingsSingleComponent,
   DesignerSettingsGroupComponent,
   ExpandableFieldComponent
 } from './settings';
 import { DesignerService } from './designer.service';
-import { SettingsValidationService } from './settings-validation.service';
 import { ArtifactColumnFilterPipe } from './artifact-column-filter.pipe';
 
 export {
@@ -21,11 +20,10 @@ export {
   DesignerHeaderComponent,
   DesignerToolbarComponent,
   DesignerPivotComponent,
-  DesignerSettingsComponent,
+  DesignerSettingsSingleComponent,
   DesignerSettingsGroupComponent,
   ExpandableFieldComponent,
   DesignerService,
-  SettingsValidationService,
   ArtifactColumnFilterPipe,
   ArtifactColumns2PivotFieldsPipe
 };

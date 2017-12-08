@@ -37,7 +37,7 @@ export default class DesignerSettingsGroupComponent {
 
   ngOnInit() {
     this.dndSortableContainerObj = {
-      allowDropFn: this.groupAdapter.canAcceptArtifactColumn
+      allowDropFn: this.groupAdapter.canAcceptArtifactColumn(this.groupAdapter)
     };
   }
 

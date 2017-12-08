@@ -48,8 +48,9 @@ export interface IMoveFieldFromEvent {
 export interface IDEsignerSettingGroupAdapter {
   title: string;
   marker: string;
-  artifactColumns: Array<ArtifactColumn>;
-  canAcceptArtifactColumn: (artifactColumn: ArtifactColumn) => boolean;
+  artifactColumns: ArtifactColumns;
+  canAcceptArtifactColumn: (groupAdapter: IDEsignerSettingGroupAdapter) =>
+    (artifactColumn: ArtifactColumn) => boolean;
   transform: (artifactColumn: ArtifactColumn) => void;
   reverseTransform: (ArtifactColumn: ArtifactColumn) => void;
 }
