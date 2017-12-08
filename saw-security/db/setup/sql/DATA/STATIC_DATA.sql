@@ -6,6 +6,7 @@ Entry needs to be made here in case of new version of migartion release ***/
 
 INSERT INTO schema_version VALUES ('1', '1', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW() , '0', '1') ;
 INSERT INTO schema_version VALUES ('2', '2', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
+INSERT INTO schema_version VALUES ('3', '3', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 
 /**************************************** Initial Schema_version DML script Ends here  *******************************************/
 INSERT INTO `PRODUCTS` (`PRODUCT_SYS_ID`,`PRODUCT_NAME`,`PRODUCT_CODE`,`PRODUCT_DESC`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,`MODIFIED_BY`) VALUES (1,'MCT Insights','MCTI000001','MCT Insights',1,'2017-05-23 06:51:34','admin','','','','');
@@ -44,10 +45,10 @@ INSERT INTO `CUSTOMER_PRODUCT_MODULE_FEATURES` (`CUST_PROD_MOD_FEATURE_SYS_ID`,`
 INSERT INTO `ROLES_TYPE` (`Roles_Type_Sys_Id`,`Roles_Type_Name`,`Roles_Type_Desc`,`ACTIVE_STATUS_IND`) VALUES (1,'ADMIN','Admin',1);
 INSERT INTO `ROLES_TYPE` (`Roles_Type_Sys_Id`,`Roles_Type_Name`,`Roles_Type_Desc`,`ACTIVE_STATUS_IND`) VALUES (2,'USER','User',1);
 
-INSERT INTO `ROLES` (`ROLE_SYS_ID`, `CUSTOMER_SYS_ID`, `ROLE_NAME`, `ROLE_CODE`, `ROLE_DESC`, `ROLE_TYPE`, `DATA_SECURITY_KEY`, `ACTIVE_STATUS_IND`, `CREATED_DATE`, `CREATED_BY`) VALUES ('1', '1', 'ADMIN', 'SYNCHRONOSS_ADMIN_USER', 'Admin User', 'ADMIN', 'NA', '1', '2017-05-23 08:28:37', 'admin');
-INSERT INTO `ROLES` (`ROLE_SYS_ID`, `CUSTOMER_SYS_ID`, `ROLE_NAME`, `ROLE_CODE`, `ROLE_DESC`, `ROLE_TYPE`, `DATA_SECURITY_KEY`, `ACTIVE_STATUS_IND`, `CREATED_DATE`, `CREATED_BY`) VALUES ('2', '1', 'REPORT USER', 'SYNCHRONOSS_REPORTUSER_USER', 'Report User', 'USER', 'NA', '1', '2017-05-23 08:28:37', 'admin');
-INSERT INTO `ROLES` (`ROLE_SYS_ID`, `CUSTOMER_SYS_ID`, `ROLE_NAME`, `ROLE_CODE`, `ROLE_DESC`, `ROLE_TYPE`, `DATA_SECURITY_KEY`, `ACTIVE_STATUS_IND`, `CREATED_DATE`, `CREATED_BY`) VALUES ('3', '1', 'ANALYST', 'SYNCHRONOSS_ANALYST_USER', 'Analyst User', 'USER', 'ATT_ANALYST_DSK', '1', '2017-05-23 08:28:37', 'admin');
-INSERT INTO `ROLES` (`ROLE_SYS_ID`, `CUSTOMER_SYS_ID`, `ROLE_NAME`, `ROLE_CODE`, `ROLE_DESC`, `ROLE_TYPE`, `DATA_SECURITY_KEY`, `ACTIVE_STATUS_IND`, `CREATED_DATE`, `CREATED_BY`) VALUES ('4', '1', 'REVIEWER', 'SYNCHRONOSS_REVIEWER_USER', 'Reviewer User', 'USER', 'ATT_ANALYST_DSK', '1', '2017-05-23 08:28:37', 'admin');
+INSERT INTO `ROLES` (`ROLE_SYS_ID`, `CUSTOMER_SYS_ID`, `ROLE_NAME`, `ROLE_CODE`, `ROLE_DESC`, `ROLE_TYPE`, `ACTIVE_STATUS_IND`, `CREATED_DATE`, `CREATED_BY`) VALUES ('1', '1', 'ADMIN', 'SYNCHRONOSS_ADMIN_USER', 'Admin User', 'ADMIN', '1', '2017-05-23 08:28:37', 'admin');
+INSERT INTO `ROLES` (`ROLE_SYS_ID`, `CUSTOMER_SYS_ID`, `ROLE_NAME`, `ROLE_CODE`, `ROLE_DESC`, `ROLE_TYPE`, `ACTIVE_STATUS_IND`, `CREATED_DATE`, `CREATED_BY`) VALUES ('2', '1', 'REPORT USER', 'SYNCHRONOSS_REPORTUSER_USER', 'Report User', 'USER', '1', '2017-05-23 08:28:37', 'admin');
+INSERT INTO `ROLES` (`ROLE_SYS_ID`, `CUSTOMER_SYS_ID`, `ROLE_NAME`, `ROLE_CODE`, `ROLE_DESC`, `ROLE_TYPE`, `ACTIVE_STATUS_IND`, `CREATED_DATE`, `CREATED_BY`) VALUES ('3', '1', 'ANALYST', 'SYNCHRONOSS_ANALYST_USER', 'Analyst User', 'USER', '1', '2017-05-23 08:28:37', 'admin');
+INSERT INTO `ROLES` (`ROLE_SYS_ID`, `CUSTOMER_SYS_ID`, `ROLE_NAME`, `ROLE_CODE`, `ROLE_DESC`, `ROLE_TYPE`, `ACTIVE_STATUS_IND`, `CREATED_DATE`, `CREATED_BY`) VALUES ('4', '1', 'REVIEWER', 'SYNCHRONOSS_REVIEWER_USER', 'Reviewer User', 'USER', '1', '2017-05-23 08:28:37', 'admin');
 
 INSERT INTO `users` (`USER_SYS_ID`, `USER_ID`, `EMAIL`, `ROLE_SYS_ID`, `CUSTOMER_SYS_ID`, `ENCRYPTED_PASSWORD`, `FIRST_NAME`, `MIDDLE_NAME`, `LAST_NAME`, `ACTIVE_STATUS_IND`, `CREATED_DATE`, `CREATED_BY`) VALUES ('1', 'sawadmin@synchronoss.com', 'shwetha.somayaji@synchronoss.com', '1', '1', 'Y1lw/IcaP7G++mCJ/TlIGXnAM9Ud+b58niTjkxtdc4I=', 'shwetha', 'p', 'somayaji', '1', '2017-06-05 09:25:15', 'sawadmin@synchronoss.com');
 INSERT INTO `users` (`USER_SYS_ID`, `USER_ID`, `EMAIL`, `ROLE_SYS_ID`, `CUSTOMER_SYS_ID`, `ENCRYPTED_PASSWORD`, `FIRST_NAME`, `MIDDLE_NAME`, `LAST_NAME`, `ACTIVE_STATUS_IND`, `CREATED_DATE`, `CREATED_BY`) VALUES ('2', 'reportuser@synchronoss.com', 'shwetha.somayaji@synchronoss.com', '2', '1', 'Y1lw/IcaP7G++mCJ/TlIGXnAM9Ud+b58niTjkxtdc4I=', 'shwetha', 'p', 'somayaji', '1', '2017-06-05 09:25:15', 'sawadmin@synchronoss.com');
