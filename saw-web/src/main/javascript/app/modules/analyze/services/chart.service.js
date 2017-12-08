@@ -30,6 +30,7 @@ import * as mapValues from 'lodash/mapValues';
 import * as sortBy from 'lodash/sortBy';
 import * as moment from 'moment';
 import * as toString from 'lodash/toString';
+import * as replace from 'lodash/replace';
 
 import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS} from '../consts';
 
@@ -374,7 +375,8 @@ export class ChartService {
     }
 
     if (DATE_TYPES.includes(field.type)) {
-      return moment(value, field.dateFormat);
+      const momentDateFormat = this.getMomentDateFormat(field.dateFormat);
+      return moment(value, momentDateFormat);
     }
 
     return value;
@@ -384,8 +386,9 @@ export class ChartService {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
         forEach(dateFields, ({columnName, dateFormat}) => {
+          const momentDateFormat = this.getMomentDateFormat(dateFormat);
           const offset = moment(dataPoint[columnName]).utcOffset();
-          dataPoint[columnName] = moment(dataPoint[columnName]).utcOffset(offset).format(dateFormat);
+          dataPoint[columnName] = moment(dataPoint[columnName]).utcOffset(offset).format(momentDateFormat);
         });
       });
     }
@@ -408,6 +411,12 @@ export class ChartService {
       zIndex,
       data: []
     };
+  }
+
+  getMomentDateFormat(dateFormat) {
+    // the backend and moment.js require different date formats for days of month
+    // the backend represents it with "d", and momentjs with "Do"
+    return replace(dateFormat, 'd', 'Do');
   }
 
   getZIndex(type) {
