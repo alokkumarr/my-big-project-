@@ -1,3 +1,20 @@
+.icon-area-chart:before {
+  content: "\e953";
+}
+.icon-area-chart .path2:before {
+  content: "\e954";
+  margin-left: -1em;
+  color: rgb(134, 143, 153);
+}
+.icon-area-chart .path3:before {
+  content: "\e955";
+  margin-left: -1em;
+  color: rgb(134, 143, 153);
+}
+.icon-combo-chart:before {
+  content: "\e942";
+}
+
 .icon-row::before {
   content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1+jfqAAAAI0lEQVQoz2P4z4AfAlHCfwjEzqKPAsKObIBA7Cz6KBgGIQkAQ8IdQJKOGQIAAAAASUVORK5CYII=);
 }
@@ -24,4 +41,88 @@
   content: "#";
   font-size: 26px;
   font-weight: bolder;
+}
+
+.icon-right-join .path1:before {
+  content: "\e92e";
+  color: rgb(189, 206, 215);
+}
+
+.icon-right-join .path2:before {
+  content: "\e92f";
+  margin-left: -1em;
+  color: rgb(139, 156, 165);
+}
+
+.icon-right-join .path3:before {
+  content: "\e930";
+  margin-left: -1em;
+  color: rgb(139, 156, 165);
+}
+
+.icon-left-join .path1:before {
+  content: "\e922";
+  color: rgb(189, 206, 215);
+}
+
+.icon-left-join .path2:before {
+  content: "\e923";
+  margin-left: -1em;
+  color: rgb(139, 156, 165);
+}
+
+.icon-left-join .path3:before {
+  content: "\e924";
+  margin-left: -1em;
+  color: rgb(139, 156, 165);
+}
+
+.icon-inner-join .path1:before {
+  content: "\e91d";
+  color: rgb(189, 206, 215);
+}
+
+.icon-inner-join .path2:before {
+  content: "\e91e";
+  margin-left: -1em;
+  color: rgb(139, 156, 165);
+}
+
+.icon-inner-join .path3:before {
+  content: "\e91f";
+  margin-left: -1em;
+  color: rgb(139, 156, 165);
+}
+
+.icon-arrow-down-circled .path1:before {
+  content: "\e902";
+  color: rgb(132, 150, 160);
+}
+
+.icon-arrow-down-circled .path2:before {
+  content: "\e903";
+  margin-left: -1em;
+  color: rgb(255, 255, 255);
+}
+
+.icon-arrow-up-circles .path1:before {
+  content: "\e905";
+  color: rgb(132, 150, 160);
+}
+
+.icon-arrow-up-circles .path2:before {
+  content: "\e906";
+  margin-left: -1em;
+  color: rgb(255, 255, 255);
+}
+
+.icon-column-options .path1:before {
+  content: "\e910";
+  color: rgb(92, 102, 112);
+}
+
+.icon-column-options .path2:before {
+  content: "\e911";
+  margin-left: -1em;
+  color: rgb(209, 211, 211);
 }
