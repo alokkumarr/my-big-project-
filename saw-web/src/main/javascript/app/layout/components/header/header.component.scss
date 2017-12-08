@@ -17,6 +17,14 @@ layout-header {
     width: 39px;
     image-rendering: -webkit-optimize-contrast;
   }
+
+  .icon-help {
+    margin-top: 8px;
+  }
+
+  md-menu-bar {
+    padding: 0;
+  }
 }
 
 .root-container > layout-header {
