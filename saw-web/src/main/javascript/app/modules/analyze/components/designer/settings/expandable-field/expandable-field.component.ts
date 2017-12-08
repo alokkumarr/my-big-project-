@@ -19,7 +19,6 @@ require('./expandable-field.component.scss');
 })
 export class ExpandableFieldComponent {
   // @Output() public onSettingsChange: EventEmitter<ArtifactColumns[]> = new EventEmitter();
-  @Output() public moveRequest: EventEmitter<'up' | 'down'> = new EventEmitter();
   @Output() public removeRequest: EventEmitter<null> = new EventEmitter();
   @Input() public artifactColumn :ArtifactColumn;
 

@@ -12,7 +12,9 @@ import {
   ArtifactColumn,
   ArtifactColumns,
   ArtifactColumnFilter,
-  ArtifactColumnPivot
+  ArtifactColumnPivot,
+  IMoveFieldToEvent,
+  IMoveFieldFromEvent
 } from '../types';
 import {
   TYPE_ICONS_OBJ,
@@ -40,9 +42,25 @@ export default class DesignerSettingsComponent {
     type: ''
   };
 
+  private _isDragging: boolean = false;
+  private _moveEventAccumulator: {
+    to: IMoveFieldToEvent,
+    from: IMoveFieldFromEvent
+  } = {
+    to: null,
+    from: null
+  };
+
+  public dndSortableContainerObj = {};
+
   constructor(private _designerService: DesignerService) {}
 
   ngOnInit() {
+    this.dndSortableContainerObj = {
+      // the zone can be any value as long as it's different than the zone of the sortables in it
+      // so that you can't sort the unselected artifactColumns
+      zone: 'zone'
+    }
     this.groupAdapters = this._designerService.getPivotGroupAdapters(this.artifactColumns);
   }
 
@@ -55,7 +73,74 @@ export default class DesignerSettingsComponent {
   }
 
   expandUnselectedSection() {
+    if (this._isDragging) {
+      // don't expand unselected section while dragging
+      return;
+    }
     this.isUnselectedExpanded = true;
+  }
+
+  onDrag() {
+    this._isDragging = true;
+    this.hideUnselectedSection();
+  }
+
+  onDragEnd(event) {
+    this._isDragging = false;
+    if (event.isDropSuccessful && event.didContainerChange) {
+      const artifactColumn = <ArtifactColumn> event.data;
+      this.onMove({
+        name: 'moveFrom',
+        artifactColumn,
+        fromGroup: null
+      });
+    }
+    if (event.isDropSuccessful) {
+      this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+      this.onSettingsChange.emit();
+    }
+  }
+
+  onMove(event) {
+    // because the onDragEnd event fires after the onDrop event
+    // the moveFrom coms after the moveTo event
+    // however we need the information from the moveFrom event first to take out the element
+    // from the old group and then insert it into the new one
+    switch (event.name) {
+    case 'moveTo':
+      this._moveEventAccumulator.to = event;
+      break;
+    case 'moveFrom':
+      this._moveEventAccumulator.from = event;
+      break;
+    }
+    if (this._moveEventAccumulator.from && this._moveEventAccumulator.to) {
+      const fromGroup = this._moveEventAccumulator.from.fromGroup;
+      const {
+        toGroup,
+        toIndex,
+        artifactColumn
+      } = this._moveEventAccumulator.to;
+      // remove from old group, if it was dragged from a group
+      // do nothing if it was dragged from the unselected fields
+      if (fromGroup) {
+        this._designerService.removeArtifactColumnFromGroup(
+          artifactColumn,
+          fromGroup
+        );
+      }
+      // add to new group
+      this._designerService.addArtifactColumnIntoGroup(
+        artifactColumn,
+        toGroup,
+        toIndex
+      );
+      // clear event Acumulator
+      this._moveEventAccumulator = {
+        to: null,
+        from: null
+      };
+    }
   }
 
   getUnselectedArtifactColumns() {
@@ -72,7 +157,7 @@ export default class DesignerSettingsComponent {
   }
 
   addToGroupIfPossible(artifactColumn: ArtifactColumn) {
-    const isAddSuccessful = this._designerService.addArtifactColumnIntoGroup(
+    const isAddSuccessful = this._designerService.addArtifactColumnIntoAGroup(
       artifactColumn,
       this.groupAdapters
     );
@@ -83,7 +168,6 @@ export default class DesignerSettingsComponent {
   }
 
   removeFromGroup(artifactColumn: ArtifactColumn, groupAdapter: IDEsignerSettingGroupAdapter) {
-    console.log('remove this shit', artifactColumn);
     this._designerService.removeArtifactColumnFromGroup(
       artifactColumn,
       groupAdapter

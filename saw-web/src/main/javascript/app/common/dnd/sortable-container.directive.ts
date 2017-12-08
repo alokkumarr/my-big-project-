@@ -54,7 +54,7 @@ export class DndSortableContainerDirective {
       if (this._isDropAllowed &&
         this.dndCollection &&
         this.dndCollection.length === 0) {
-        this.addPlaceholder(event, 'inside');
+        this.addPlaceholder(event.target, 'inside');
         this._newSortableIndex = 0;
       }
     }
@@ -84,29 +84,32 @@ export class DndSortableContainerDirective {
     this._counter = 0;
     this.removePlaceholder();
     this.moveElementInSortableContainerIfNeeded(data);
-    this.dndOnDrop.emit(data);
+    this.dndOnDrop.emit({
+      didContainerChange: this._dragDropService.getSortableDroppedFlag(),
+      index: this._newSortableIndex,
+      data
+    });
   }
 
-  onElementDragOver(event, index) {
+  onElementDragOver(event, element, index) {
     if (!this._isDropAllowed) {
       return;
     }
-
-    const height = event.target.clientHeight;
+    const height = element.clientHeight;
     const offset = event.offsetY;
     const pivot = height / 2;
-    const buffer = pivot / 4;
+    const buffer = pivot / 2;
     if (offset < pivot - buffer) {
       const newPlaceholderPlace = `${index}-before`;
       if (newPlaceholderPlace !== this._placeholderPlace) {
-        this.addPlaceholder(event, 'before');
+        this.addPlaceholder(element, 'before');
         this._newSortableIndex = index;
         this._placeholderPlace = newPlaceholderPlace;
       }
     } else if (offset > pivot + buffer) {
       const newPlaceholderPlace = `${index}-after`;
       if (newPlaceholderPlace !== this._placeholderPlace) {
-        this.addPlaceholder(event, 'after');
+        this.addPlaceholder(element, 'after');
         this._newSortableIndex = index + 1;
         this._placeholderPlace = newPlaceholderPlace;
       }
@@ -135,24 +138,24 @@ export class DndSortableContainerDirective {
         arrayMove(collection, oldIndex, newIndex);
       } else {
         // moved in another container
-        collection.splice(newIndex, 0, element);
+        // collection.splice(newIndex, 0, element);
         this._dragDropService.sortableDroppedInOtherContainer();
       }
     }
   }
 
-  addPlaceholder(event, where: 'before' | 'after' | 'inside') {
+  addPlaceholder(element, where: 'before' | 'after' | 'inside') {
     this._insertionPlaceholder = this._dragDropService.getElement();
     const targetElem = event.target;
     switch (where) {
     case 'inside':
-      targetElem.append(this._insertionPlaceholder);
+      element.append(this._insertionPlaceholder);
       break;
     case 'before':
-      targetElem.before(this._insertionPlaceholder);
+      element.before(this._insertionPlaceholder);
       break;
     case 'after':
-      targetElem.after(this._insertionPlaceholder);
+      element.after(this._insertionPlaceholder);
       break;
     }
   }

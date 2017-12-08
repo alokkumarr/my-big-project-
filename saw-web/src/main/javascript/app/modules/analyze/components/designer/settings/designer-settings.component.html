@@ -2,6 +2,7 @@
 
   <div (mouseenter)="expandUnselectedSection()"
        class="settings__unselected-fields"
+       [dndSortableContainer]="dndSortableContainerObj"
        [class.anim__expanded]="isUnselectedExpanded">
     <div *ngIf="unselectedArtifactColumns">
 
@@ -31,6 +32,9 @@
 
       <div *ngFor="let artifactColumn of unselectedArtifactColumns | artifactColumnFilter:filterObj; trackBy: index"
            (click)="addToGroupIfPossible(artifactColumn)"
+           [dndSortable]="artifactColumn"
+           (dndOnDrag)="onDrag()"
+           (dndOnDragEnd)="onDragEnd($event)"
            class="settings__list-item">
         <span class="settings__list-item__name">
           {{ artifactColumn.alias || artifactColumn.displayName }}
@@ -47,6 +51,8 @@
        [class.anim__expanded]="!isUnselectedExpanded">
     <designer-settings-group *ngFor="let groupAdapter of groupAdapters; trackBy: index"
       (removeField)="removeFromGroup($event, groupAdapter)"
+      (moveFrom)="onMove($event)"
+      (moveTo)="onMove($event)"
       [groupAdapter]="groupAdapter"
       [artifactColumns]="groupAdapter.artifactColumns">
     </designer-settings-group>

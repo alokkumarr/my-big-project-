@@ -49,8 +49,6 @@ export class DndSortableDirective {
     this._counter ++;
     if (this._counter === 1) {
       this._enableEventPropagation = true;
-    } else {
-      this._enableEventPropagation = false;
     }
   }
 
@@ -64,8 +62,12 @@ export class DndSortableDirective {
 
   @HostListener('dragover', ['$event'])
   onDragOver(event) {
-    if (this._enableEventPropagation) {
-      this._sortableContainer.onElementDragOver(event, this.dndSortableIndex);
+    const elem = this._elemRef.nativeElement;
+    if (this._enableEventPropagation && event.target === elem) {
+      this._sortableContainer.onElementDragOver(
+        event,
+        elem,
+        this.dndSortableIndex);
     }
   }
 
@@ -88,11 +90,11 @@ export class DndSortableDirective {
     this._isDragged = false;
     this._dragDropService.onDragEnd();
     const isDropSuccessful = event.dataTransfer.dropEffect !== 'none';
-    const isSortableDroppedInOtherContainer = this._dragDropService.getSortableDroppedFlag();
+    const didContainerChange = this._dragDropService.getSortableDroppedFlag();
     this._dragDropService.resetSortableDroppedFlag();
     const sortableDragEndObj: ISortableDragEndData = {
       isDropSuccessful,
-      isSortableDroppedInOtherContainer
+      didContainerChange
     };
     this.dndOnDragEnd.emit(sortableDragEndObj);
   }

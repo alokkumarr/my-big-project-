@@ -10,6 +10,8 @@ import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
 import * as concat from 'lodash/concat';
 import * as flatMap from 'lodash/flatMap';
+import * as take from 'lodash/take';
+import * as takeRight from 'lodash/takeRight';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpOmit from 'lodash/fp/omit';
 import * as fpMapValues from 'lodash/fp/mapValues';
@@ -123,7 +125,7 @@ export class DesignerService {
     return pivotGroupAdapters;
   }
 
-  addArtifactColumnIntoGroup(
+  addArtifactColumnIntoAGroup(
     artifactColumn: ArtifactColumn,
     groupAdapters: IDEsignerSettingGroupAdapter[]): boolean {
 
@@ -131,13 +133,29 @@ export class DesignerService {
 
     forEach(groupAdapters, (adapter: IDEsignerSettingGroupAdapter) => {
       if (adapter.canAcceptArtifactColumn(artifactColumn)) {
-        adapter.transform(artifactColumn);
-        adapter.artifactColumns = [...adapter.artifactColumns, artifactColumn];
+        this.addArtifactColumnIntoGroup(artifactColumn, adapter, 0);
         addedSuccessfully = true;
         return false;
       }
     });
     return addedSuccessfully;
+  }
+
+  addArtifactColumnIntoGroup(
+    artifactColumn: ArtifactColumn,
+    adapter: IDEsignerSettingGroupAdapter,
+    index: number) {
+
+    const array = adapter.artifactColumns;
+    adapter.transform(artifactColumn);
+
+    const firstN = take(array, index);
+    const lastN = takeRight(array, array.length - index);
+    adapter.artifactColumns = [
+      ...firstN,
+      artifactColumn,
+      ...lastN
+    ];
   }
 
   removeArtifactColumnFromGroup(

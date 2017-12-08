@@ -3,10 +3,15 @@
       {{groupAdapter.title}}
   </span>
   <div *ngIf="artifactColumns"
-       class="settings__group__list">
-    <expandable-field *ngFor="let artifactColumn of artifactColumns; let i = index; trackBy: index"
+       class="settings__group__list"
+       [dndSortableContainer]="dndSortableContainerObj"
+       [dndCollection]="artifactColumns"
+       (dndOnDrop)="onDrop($event)">
+    <expandable-field *ngFor="let artifactColumn of artifactColumns; let i = index; trackBy: trackByFn"
+                      [dndSortable]="artifactColumn"
+                      [dndSortableIndex]="i"
+                      (dndOnDragEnd)="onDragEnd($event)"
                       [artifactColumn]="artifactColumn"
-                      (moveRequest)="onMoveField($event, i)"
                       (removeRequest)="onRemoveField(artifactColumn)"
                       class="settings__list-item"></expandable-field>
   </div>
