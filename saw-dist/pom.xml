@@ -264,6 +264,9 @@
 	  </dependency>
 	</dependencies>
         <configuration>
+          <attributes>
+            <project-version>${project.version}</project-version>
+          </attributes>
           <preserveDirectories>true</preserveDirectories>
           <requires>
             <require>asciidoctor-diagram</require>
