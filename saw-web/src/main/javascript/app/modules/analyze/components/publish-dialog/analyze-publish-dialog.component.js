@@ -29,7 +29,7 @@ export const AnalyzePublishDialogComponent = {
     onPublish: '&'
   },
   controller: class AnalyzePublishDialogController {
-    constructor($mdDialog, AnalyzeService) {
+    constructor($mdDialog, AnalyzeService, $mdConstant) {
       'ngInject';
 
       this._$mdDialog = $mdDialog;
@@ -37,7 +37,14 @@ export const AnalyzePublishDialogComponent = {
       this.dataHolder = [];
       this.dateFormat = 'mm/dd/yyyy';
       this.hasSchedule = false;
-
+      this.regexOfEmail = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/;
+      const semicolon = 186;
+      this.separatorKeys = [$mdConstant.KEY_CODE.ENTER, $mdConstant.KEY_CODE.COMMA, semicolon];
+      if (this.model.isScheduled === 'true') {
+        this.emails = get(this.model.schedule, 'emails') || [];
+      } else {
+        this.emails = [];
+      }
       this.repeatIntervals = ['DAYS', 'WEEKS'];
       this.repeatInterval = this.repeatIntervals[0];
       this.repeatOrdinals = [1, 2, 3, 4, 5, 6, 7];
@@ -96,6 +103,7 @@ export const AnalyzePublishDialogComponent = {
       }
 
       this.model.schedule = {
+        emails: this.emails,
         repeatUnit: F2B_DICTIONARY[this.repeatInterval],
         repeatInterval: this.repeatOrdinal,
         repeatOnDaysOfWeek: reduce(this.repeatOnDaysOfWeek, (result, day) => {
@@ -124,9 +132,32 @@ export const AnalyzePublishDialogComponent = {
     }
 
     publish() {
+      if (!this.validateEmails(this.emails)) {
+        this.emailValidateFlag = true;
+        return;
+      }
       const {payload, execute} = this.generateSchedulePayload();
       const promise = this.onPublish({model: payload, execute});
       this._$mdDialog.hide(promise);
+    }
+
+    validateEmails(emails) {
+      const emailsList = emails;
+      const flag = 0;
+      forEach(emailsList, email => {
+        if (!this.regexOfEmail.test(email.toLowerCase())) {
+          flag = 1;
+        }
+      });
+      if (flag === 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    validateThisEmail(oneEmail) {
+      return this.regexOfEmail.test(oneEmail.toLowerCase());
     }
   }
 };

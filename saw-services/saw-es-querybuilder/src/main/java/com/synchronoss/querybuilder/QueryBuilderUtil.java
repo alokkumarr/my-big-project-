@@ -1,18 +1,14 @@
 package com.synchronoss.querybuilder;
 
 import java.util.List;
-
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
-import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder.FilterFunctionBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram.Order;
-
 import com.synchronoss.BuilderUtil;
 import com.synchronoss.querybuilder.model.chart.Filter;
 import com.synchronoss.querybuilder.model.chart.NodeField;
@@ -134,12 +130,12 @@ public class QueryBuilderUtil {
 			
 		  if (nodeField.getGroupInterval()!=null){
             aggregationBuilder = AggregationBuilders.
-                    dateHistogram(nodeName).field(nodeField.getColumnName()).format(DATE_FORMAT).
+                    dateHistogram(nodeName).field(nodeField.getColumnName()).format(nodeField.getDateFormat()).
                     dateHistogramInterval(groupInterval(nodeField.getGroupInterval().value())).order(Order.KEY_DESC);
             }
           else {
             aggregationBuilder =  AggregationBuilders.terms(nodeName).field(nodeField.getColumnName())
-                .format(DATE_FORMAT).order(org.elasticsearch.search.aggregations.bucket.terms.Terms.Order.term(false)).size(BuilderUtil.SIZE);
+                .format(nodeField.getDateFormat()).order(org.elasticsearch.search.aggregations.bucket.terms.Terms.Order.term(false)).size(BuilderUtil.SIZE);
           }
 		}
 		else{

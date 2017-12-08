@@ -8,4 +8,4 @@
   notify:
     - restart saw-observe
 - name: Enable SAW Observe Service
-  systemd: name=saw-Observe enabled=true
+  systemd: name=saw-observe enabled=true

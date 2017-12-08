@@ -40,7 +40,7 @@
                 "type": "string",
                 "joinEligible": false,
                 "filterEligible": true
-              }
+              },
               {
                 "name": "Product",
                 "columnName": "product",
@@ -50,7 +50,7 @@
                 "type": "string",
                 "joinEligible": false,
                 "filterEligible": true
-              }
+              },
               {
                 "name": "Units",
                 "columnName": "units",
@@ -58,6 +58,16 @@
                 "aliasName": "",
                 "table": "sample",
                 "type": "integer",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "Date",
+                "columnName": "date",
+                "displayName": "Date",
+                "aliasName": "",
+                "table": "sample",
+                "type": "date",
                 "joinEligible": false,
                 "filterEligible": true
               }

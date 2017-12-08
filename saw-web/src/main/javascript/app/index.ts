@@ -4,9 +4,9 @@ import 'angular-material/angular-material.css';
 import 'devextreme/dist/css/dx.common.css';
 import 'devextreme/dist/css/dx.light.css';
 
-import 'devextreme/localization'; 
+import 'devextreme/localization';
 
-let messagesEn = require('devextreme/localization/messages/en.json');
+require('devextreme/localization/messages/en.json');
 
 import 'fonts/icomoon.css';
 import '../../../../assets/additional-icons.css';

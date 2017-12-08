@@ -84,5 +84,6 @@
   "LAST_WEEK": "Last Week",
   "THIS_WEEK": "This Week",
   "LAST_2_WEEKS": "Last 2 Weeks",
-  "CUSTOM": "Custom"
+  "CUSTOM": "Custom",
+  "EMAIL_ERROR_MSG": "Invalid Email-Id Found: Please provide valid Email-Id's in list"
 }

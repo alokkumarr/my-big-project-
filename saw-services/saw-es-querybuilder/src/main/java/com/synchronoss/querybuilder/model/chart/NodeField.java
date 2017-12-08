@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
     "columnName",
+    "dateFormat",
     "type",
     "tableName",
     "name",
@@ -29,6 +30,11 @@ public class NodeField {
      */
     @JsonProperty("columnName")
     private String columnName;
+    
+    @JsonProperty("dateFormat")
+    private String dateFormat;
+
+    
     /**
      * 
      * (Required)
@@ -63,6 +69,17 @@ public class NodeField {
     @JsonProperty("columnName")
     public void setColumnName(String columnName) {
         this.columnName = columnName;
+    }
+    
+    
+    @JsonProperty("dateFormat")
+    public String getDateFormat() {
+      return dateFormat;
+    }
+
+    @JsonProperty("dateFormat")
+    public void setDateFormat(String dateFormat) {
+      this.dateFormat = dateFormat;
     }
 
     /**

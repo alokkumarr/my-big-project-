@@ -31,7 +31,7 @@ public class XlsxExporter implements IFileExporter
 	private static final Logger logger = LoggerFactory.getLogger(XlsxExporter.class);
 	 public static final String DATA_SPLITER_REGEX = "\\|\\|\\|";
 	 public static final String DATA_SPLITER = "|||";
-	public void addHeaderRow(ExportExcelBean exportExcelBean,
+	public void addHeaderRow(ExportBean exportBean,
 			Workbook wb, Sheet wsheet) {
 		logger.debug(this.getClass().getName() + " addHeaderRow starts");
 		int col = 0;
@@ -44,15 +44,15 @@ public class XlsxExporter implements IFileExporter
 		Row row = wsheet.createRow(0);
 		Cell cell = row.createCell(col);
 		cell.setCellStyle(cellStyle1);
-		cell.setCellValue("Report Name          : " + exportExcelBean.getReportName());
+		cell.setCellValue("Report Name          : " + exportBean.getReportName());
 		row = wsheet.createRow(1);
 		cell = row.createCell(col);
 		cell.setCellStyle(cellStyle1);
-		cell.setCellValue("Report Description : "+exportExcelBean.getReportDesc());
+		cell.setCellValue("Report Description : "+ exportBean.getReportDesc());
 		row = wsheet.createRow(2);
 		cell = row.createCell(col);
 		cell.setCellStyle(cellStyle1);
-		cell.setCellValue("Published On          : "+ exportExcelBean.getPublishDate());
+		cell.setCellValue("Published On          : "+ exportBean.getPublishDate());
 		row = wsheet.createRow(3);
 		row = wsheet.createRow(4);
 		
@@ -69,7 +69,7 @@ public class XlsxExporter implements IFileExporter
 		cellStyle.setFillPattern(CellStyle.SOLID_FOREGROUND);
 		//cellStyle.setFillPattern(CellStyle);
 		
-		for (String colHeader : exportExcelBean.getColumnHeader()) {
+		for (String colHeader : exportBean.getColumnHeader()) {
 			cell = row.createCell(col);
 			cell.setCellStyle(cellStyle);
 			cell.setCellValue(colHeader);
@@ -150,20 +150,20 @@ public class XlsxExporter implements IFileExporter
 		return cs;
 	}
 
-	public File exportJsonData(ExportExcelBean exportExcelBean)
+	public File exportJsonData(ExportBean exportBean)
 			throws IOException {
 		BufferedOutputStream stream = null;
 		Workbook workBook = null;
 		File xlsxFile = null;
 		try {
 				// xlsx support
-				xlsxFile = new File(exportExcelBean.getServerPathLocation()+File.separator+exportExcelBean.getFileName());
+				xlsxFile = new File(exportBean.getServerPathLocation()+File.separator+ exportBean.getFileName());
 				xlsxFile.createNewFile();
 				stream = new BufferedOutputStream(new FileOutputStream(xlsxFile));
 			    workBook = new SXSSFWorkbook(-1);
-				SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(exportExcelBean.getReportName());
-				addHeaderRow(exportExcelBean, workBook, sheet);
-				addxlsxDataRows(exportExcelBean, (SXSSFWorkbook) workBook, sheet);
+				SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(exportBean.getReportName());
+				addHeaderRow(exportBean, workBook, sheet);
+				addxlsxDataRows(exportBean, (SXSSFWorkbook) workBook, sheet);
 				workBook.write(stream);
 				stream.flush();
 				return xlsxFile;
@@ -179,20 +179,20 @@ public class XlsxExporter implements IFileExporter
 		}
 	}
 
-	private void addxlsxDataRows(ExportExcelBean exportExcelBean,
+	private void addxlsxDataRows(ExportBean exportBean,
 			SXSSFWorkbook workBook, SXSSFSheet workSheet) {
 		CellStyle cellStyle = getStyletoCell(workBook);
 		logger.debug(this.getClass().getName() + " addxlsxDataRows starts");
-		for (int rowNum = 0; rowNum < exportExcelBean.getRowBufferList().size(); rowNum++) {
+		for (int rowNum = 0; rowNum < exportBean.getRowBufferList().size(); rowNum++) {
 			int rowInExcel =rowNum+5; 
 			SXSSFRow excelRow = (SXSSFRow) workSheet.createRow(rowInExcel);
-			String rowStr = exportExcelBean.getRowBufferList().get(rowNum).toString();
+			String rowStr = exportBean.getRowBufferList().get(rowNum).toString();
 			//Object obj = gson.fromJson(resultRows.get(rowNum), class1);
 			//BeanWrapper wrapper = PropertyAccessorFactory.forBeanPropertyAccess(class1.cast(obj));
 			String[] splittedStrings = rowStr.split("");
 			for (int colNum = 0; colNum < splittedStrings.length; colNum++) {
-				//String propertyName = exportExcelBean.getColumnHeader()[colNum];
-				String cellType = exportExcelBean.getColumnDataType()[colNum];
+				//String propertyName = exportBean.getColumnHeader()[colNum];
+				String cellType = exportBean.getColumnDataType()[colNum];
 				String value = splittedStrings[colNum];
 				//Object object = wrapper.getPropertyValue(propertyName.getPropertyName());
 				addxlsxCell(value, colNum, excelRow, cellType, workBook, cellStyle);
@@ -227,22 +227,27 @@ public class XlsxExporter implements IFileExporter
 		return null;
 	}
 
-	@Override
-	public File generateFile(ExportExcelBean exportExcelBean, String fileName,
-			List<StringBuffer> recordRowList) throws IOException {
+	 @Override
+	 public File generateFile(ExportBean exportBean, List<Object> recordRowList) throws IOException {
+		 return null;
+	 }
+
+	/* @Override
+	public File generateFile(ExportBean exportBean, String fileName,
+                             List<StringBuffer> recordRowList) throws IOException {
 		logger.debug(this.getClass().getName() + " generateFile starts");
 		BufferedOutputStream stream = null;
 		Workbook workBook = null;
 		File xlsxFile = null;
 		try {
 				// xlsx support
-				xlsxFile = new File(exportExcelBean.getServerPathLocation()+File.separator+exportExcelBean.getFileName());
+				xlsxFile = new File(exportBean.getServerPathLocation()+File.separator+ exportBean.getFileName());
 				xlsxFile.createNewFile();
 				stream = new BufferedOutputStream(new FileOutputStream(xlsxFile));
 			    workBook = new SXSSFWorkbook(1000);
-				SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(exportExcelBean.getReportName());
-				addHeaderRow(exportExcelBean, workBook, sheet);
-				addxlsxDataRows(exportExcelBean, (SXSSFWorkbook) workBook, sheet);
+				SXSSFSheet sheet = (SXSSFSheet) workBook.createSheet(exportBean.getReportName());
+				addHeaderRow(exportBean, workBook, sheet);
+				addxlsxDataRows(exportBean, (SXSSFWorkbook) workBook, sheet);
 				workBook.write(stream);
 				stream.flush();
 
@@ -257,12 +262,12 @@ public class XlsxExporter implements IFileExporter
 		}
 		logger.debug(this.getClass().getName() + " generateFile ends");
 		return xlsxFile;
-	}
+	}*/
 	
 /*	public static void main(String[] args) {
 		
 		XlsxExporter exporter = new XlsxExporter();
-		ExportExcelBean excelBean = new ExportExcelBean();
+		ExportBean excelBean = new ExportBean();
 		excelBean.setFileName("My_File_today.xlsx");
 		String[] columnHeader = new String[10]; 
 		for(int i = 0; i<10; i++)

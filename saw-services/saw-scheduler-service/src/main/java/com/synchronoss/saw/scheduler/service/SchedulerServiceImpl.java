@@ -78,6 +78,7 @@ public class SchedulerServiceImpl
              * executing multiple times during the same period */
             log.info("Set last executed period ID");
             schedulerStore.setLastExecutedPeriodId(analysisId, periodId);
+            analysisService.scheduleDispatch(analysis);
         }
     }
 
