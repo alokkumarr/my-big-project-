@@ -16,6 +16,9 @@ exports.config = {
         'disable-extensions',
         'disable-web-security',
         //'--start-fullscreen' // enable for Mac OS
+        "--headless",
+        "--disable-gpu",
+        "--window-size=2880,1800"
       ]
     }
   },
@@ -36,14 +39,14 @@ exports.config = {
     ],
 
     analyses: [
-      webpackHelper.root('src/test/e2e-tests/priviliges.test.js'),
+      /*webpackHelper.root('src/test/e2e-tests/priviliges.test.js'),
       webpackHelper.root('src/test/e2e-tests/goToAnalyze.test.js'),
       webpackHelper.root('src/test/e2e-tests/createChart.test.js'),
       webpackHelper.root('src/test/e2e-tests/createPivot.test.js'),
       webpackHelper.root('src/test/e2e-tests/createReport.test.js'),
       //webpackHelper.root('src/test/javascript/e2e/spec/analyses.test.js'), // obsolete
       //webpackHelper.root('src/test/e2e-tests/debug.test.js') // for testing purposes
-      webpackHelper.root('src/test/e2e-tests/charts/createAndDeleteCharts.test.js')
+      webpackHelper.root('src/test/e2e-tests/charts/createAndDeleteCharts.test.js')*/
 
 
     ]
@@ -55,6 +58,25 @@ exports.config = {
       displaySpecDuration: true,
       displaySuiteNumber: true
     }));
+
+    let jasmineReporters = require('jasmine-reporters');
+    let junitReporter = new jasmineReporters.JUnitXmlReporter({
+
+      // setup the output path for the junit reports
+      // should create folder in advance
+      savePath: 'output/',
+
+      // conslidate all true:
+      //   output/junitresults.xml
+      //
+      // conslidate all set to false:
+      //   output/junitresults-example1.xml
+      //   output/junitresults-example2.xml
+      consolidateAll: true
+
+    });
+    jasmine.getEnv().addReporter(junitReporter);
+
 
     //jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
     jasmine.getEnv().defaultTimeoutInterval = 500000; //another option if above doesn't work
