@@ -181,11 +181,7 @@ export const PrivilegeEditComponent = {
             this.privilegeCodeStringInitArray = this.privilegeCodeStringInit.split('');
             this.privilegeListCodeLength = this.privilegeListCode.length - 1;
             for (let i = this.privilegeCodeStringInitArray.length - 1; i > -1; i--) {
-              if (this.privilegeCodeStringInitArray[i] === '0') {
-                this.privilegeListCode[this.privilegeListCodeLength] = false;
-              } else {
-                this.privilegeListCode[this.privilegeListCodeLength] = true;
-              }
+              this.privilegeListCode[this.privilegeListCodeLength] = this.privilegeCodeStringInitArray[i] !== '0';
               --this.privilegeListCodeLength;
             }
           }

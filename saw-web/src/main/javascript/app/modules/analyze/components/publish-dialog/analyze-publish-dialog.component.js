@@ -143,17 +143,16 @@ export const AnalyzePublishDialogComponent = {
 
     validateEmails(emails) {
       const emailsList = emails;
-      const flag = 0;
+      let emailsAreValid = true;
       forEach(emailsList, email => {
-        if (!this.regexOfEmail.test(email.toLowerCase())) {
-          flag = 1;
+        const isEmailvalid = this.regexOfEmail.test(email.toLowerCase());
+        if (!isEmailvalid) {
+          emailsAreValid = false;
+          // cancel forEach
+          return false;
         }
       });
-      if (flag === 0) {
-        return true;
-      } else {
-        return false;
-      }
+      return emailsAreValid;
     }
 
     validateThisEmail(oneEmail) {
