@@ -26,6 +26,7 @@ const template = require('./designer-settings-single.component.html');
 require('./designer-settings-single.component.scss');
 
 const SETTINGS_CHANGE_DEBOUNCE_TIME = 500;
+const FILTER_CHANGE_DEBOUNCE_TIME = 300;
 
 /**
  * Designer settings component for designers with a single set of artifactColumns like
@@ -39,17 +40,21 @@ export class DesignerSettingsSingleComponent {
   @Output() public settingsChange: EventEmitter<ArtifactColumnPivot[]> = new EventEmitter();
   @Input() public artifactColumns: ArtifactColumns;
 
-  public unselectedArtifactColumns: ArtifactColumns
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   public TYPE_ICONS = TYPE_ICONS;
+  public unselectedArtifactColumns: ArtifactColumns
   public isUnselectedExpanded: boolean = false;
   public groupAdapters: IDEsignerSettingGroupAdapter[];
-  private _isDragging: boolean = false;
-  private changeSettings: Function;
   public filterObj: ArtifactColumnFilter = {
     keyword: '',
     type: ''
   };
+  public dndSortableContainerObj = {
+    // the zone can be any value as long as it's different than the zone of the sortables in it
+    // so that you can't sort the unselected artifactColumns
+    zone: 'zone'
+  };
+  private _isDragging: boolean = false;
   private _moveEventAccumulator: {
     to: IMoveFieldToEvent,
     from: IMoveFieldFromEvent
@@ -58,19 +63,19 @@ export class DesignerSettingsSingleComponent {
     from: null
   };
 
-  public dndSortableContainerObj = {
-    // the zone can be any value as long as it's different than the zone of the sortables in it
-    // so that you can't sort the unselected artifactColumns
-    zone: 'zone'
-  };
 
   constructor(private _designerService: DesignerService) {
     // we have to debounce settings change
     // so that the pivot grid or chart designer
     // doesn't have to process everything with every quick change
-    this.changeSettings = debounce(() => {
-      this.settingsChange.emit();
+    this._changeSettingsDebounced = debounce(() => {
+      this._changeSettingsDebounced
     }, SETTINGS_CHANGE_DEBOUNCE_TIME)
+
+    this.onTextFilterChange = debounce(
+      this.onTextFilterChange,
+      FILTER_CHANGE_DEBOUNCE_TIME
+    );
   }
 
   ngOnInit() {
@@ -79,6 +84,15 @@ export class DesignerSettingsSingleComponent {
 
   ngOnChanges() {
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+  }
+
+  _changeSettings() {
+    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+    this._changeSettingsDebounced();
+  }
+
+  _changeSettingsDebounced() {
+    this.settingsChange.emit();
   }
 
   hideUnselectedSection() {
@@ -109,8 +123,7 @@ export class DesignerSettingsSingleComponent {
       });
     }
     if (event.isDropSuccessful) {
-      this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-      this.changeSettings();
+      this._changeSettings();
     }
   }
 
@@ -153,8 +166,7 @@ export class DesignerSettingsSingleComponent {
         to: null,
         from: null
       };
-      this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-      this.changeSettings();
+      this._changeSettings();
     }
   }
 
@@ -162,12 +174,12 @@ export class DesignerSettingsSingleComponent {
     return filter(this.artifactColumns, ({checked}) => !checked);
   }
 
-  onTextFilterChange(change) {
-    console.log('Textchange', change);
+  onTextFilterChange(value) {
+    this.filterObj.keyword = value;
   }
 
   onTypeFilterChange(change) {
-    console.log('Typechange', change);
+    this.filterObj.type = change.value;
   }
 
   /**
@@ -179,8 +191,7 @@ export class DesignerSettingsSingleComponent {
       this.groupAdapters
     );
     if (isAddSuccessful) {
-      this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-      this.changeSettings();
+      this._changeSettings();
     }
   }
 
@@ -189,8 +200,7 @@ export class DesignerSettingsSingleComponent {
       artifactColumn,
       groupAdapter
     );
-    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
-    this.changeSettings();
+    this._changeSettings();
   }
 
 }

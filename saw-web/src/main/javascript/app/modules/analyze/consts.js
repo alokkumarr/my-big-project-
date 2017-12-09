@@ -26,6 +26,10 @@ export const LAST_ANALYSES_CATEGORY_ID = 'lastAnalysesListId';
 export {NUMBER_TYPES, DATE_TYPES, CHART_COLORS, BACKEND_TIMEZONE};
 
 export const TYPE_ICONS = [{
+  icon: '',
+  label: 'All',
+  value: ''
+}, {
   icon: 'icon-number-type',
   label: 'Number',
   value: 'number'

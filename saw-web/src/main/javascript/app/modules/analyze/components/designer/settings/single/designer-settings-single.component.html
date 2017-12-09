@@ -9,10 +9,10 @@
       <div class="settings__list-item">
         <mat-form-field>
           <input matInput type="text"
-                 placeholder="Clearable input"
-                 (change)="onTextFilterChange($event)"
-                 [value]="value"/>
-          <button mat-button *ngIf="value"
+                 placeholder="Filter"
+                 (input)="onTextFilterChange($event.target.value)"
+                 [value]="filterObj.keyword"/>
+          <button mat-button *ngIf="filterObj.keyword"
                   matSuffix mat-icon-button
                   aria-label="Clear"
                   (click)="onTextFilterChange('')">
@@ -30,7 +30,7 @@
         </mat-button-toggle-group>
       </div>
 
-      <div *ngFor="let artifactColumn of unselectedArtifactColumns | artifactColumnFilter:filterObj; trackBy: index"
+      <div *ngFor="let artifactColumn of (unselectedArtifactColumns | artifactColumnFilter:filterObj); trackBy: index"
            (click)="addToGroupIfPossible(artifactColumn)"
            [dndSortable]="artifactColumn"
            (dndOnDrag)="onDrag()"

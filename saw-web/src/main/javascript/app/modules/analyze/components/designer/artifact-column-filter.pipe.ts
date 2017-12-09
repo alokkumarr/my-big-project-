@@ -12,7 +12,7 @@ import {
 
 @Pipe({
   name: 'artifactColumnFilter',
-  pure: true
+  pure: false
 })
 export class ArtifactColumnFilterPipe implements PipeTransform {
   transform(items: ArtifactColumns, filterObj: ArtifactColumnFilter): any {
@@ -20,14 +20,14 @@ export class ArtifactColumnFilterPipe implements PipeTransform {
       return items;
     }
 
-    return filter(items, ({type, columnName}) => {
-      return this.hasType(type, filterObj) &&
-        this.hasKeyword(columnName, filterObj)
+    return filter(items, ({type, alias, displayName}) => {
+      return this.hasType(type, filterObj.type) &&
+        this.hasKeyword(alias || displayName, filterObj.keyword)
     });
   }
 
-  hasType(type, filterObj) {
-    switch (filterObj.type) {
+  hasType(type, filterType) {
+    switch (filterType) {
     case 'number':
       return NUMBER_TYPES.includes(type);
     case 'date':
@@ -39,10 +39,11 @@ export class ArtifactColumnFilterPipe implements PipeTransform {
     }
   }
 
-  hasKeyword(columnName, {keyword}) {
+  hasKeyword(name, keyword) {
     if (!keyword) {
       return true;
     }
-    return columnName.includes(keyword);
+    const regexp = new RegExp(keyword, 'i');
+    return name && name.match(regexp);
   }
 }
