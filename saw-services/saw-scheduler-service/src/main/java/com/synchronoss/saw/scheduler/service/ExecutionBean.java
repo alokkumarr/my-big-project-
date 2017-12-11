@@ -11,12 +11,11 @@ interface ExecutionBean {
      String id();
      String finished();
      String status();
-
 }
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableExecutionResponse.class)
 @JsonDeserialize(as = ImmutableExecutionResponse.class)
 interface ExecutionResponse {
-    ExecutionBean[] execution();
+    ExecutionBean[] executions();
 }
