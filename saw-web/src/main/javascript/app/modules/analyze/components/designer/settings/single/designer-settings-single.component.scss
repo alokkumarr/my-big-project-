@@ -11,6 +11,7 @@ designer-settings-single {
   .settings__unselected-fields {
     overflow-x: hidden;
     overflow-y: auto;
+    padding-left: 5px;
     transition: flex 300ms cubic-bezier(0.455, 0.03, 0.515, 0.955);
     flex: 1 1 10%;
     box-sizing: border-box;
