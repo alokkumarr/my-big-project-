@@ -52,6 +52,10 @@ export interface IDEsignerSettingGroupAdapter {
   artifactColumns: ArtifactColumns;
   canAcceptArtifactColumn: (groupAdapter: IDEsignerSettingGroupAdapter) =>
     (artifactColumn: ArtifactColumn) => boolean;
+  // a callback to possibly transform the artifactColumn added to a group
   transform: (artifactColumn: ArtifactColumn) => void;
-  reverseTransform: (ArtifactColumn: ArtifactColumn) => void;
+  // a callback to undo any transformations done to the element
+  reverseTransform: (artifactColumn: ArtifactColumn) => void;
+  // a callback to change soomething when the indexes change in artifactColumns
+  onReorder: (artifactColumns: ArtifactColumns) => void;
 }

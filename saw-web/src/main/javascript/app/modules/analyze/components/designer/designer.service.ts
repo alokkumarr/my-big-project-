@@ -52,7 +52,14 @@ export class DesignerService {
 
     const pivotReverseTransform = (artifactColumn: ArtifactColumnPivot) => {
       artifactColumn.area = null;
+      artifactColumn.areaIndex = null;
       artifactColumn.checked = false;
+    }
+
+    const onReorder = (artifactColumns: ArtifactColumns) => {
+      forEach(artifactColumns, (column, index) => {
+        column.areaIndex = index;
+      });
     }
 
     const areLessThenMaxFields = (artifactColumns: ArtifactColumns): boolean => {
@@ -73,7 +80,7 @@ export class DesignerService {
       )
     );
 
-    const pivotGroupAdapters =  [{
+    const pivotGroupAdapters: Array<IDEsignerSettingGroupAdapter> =  [{
       title: 'Data',
       marker: 'data',
       artifactColumns: [],
@@ -82,7 +89,8 @@ export class DesignerService {
         artifactColumn.area = 'data';
         artifactColumn.checked = true;
       },
-      reverseTransform: pivotReverseTransform
+      reverseTransform: pivotReverseTransform,
+      onReorder
     }, {
       title: 'Row',
       marker: 'row',
@@ -92,7 +100,8 @@ export class DesignerService {
         artifactColumn.area = 'row';
         artifactColumn.checked = true;
       },
-      reverseTransform: pivotReverseTransform
+      reverseTransform: pivotReverseTransform,
+      onReorder
     }, {
       title: 'Column',
       marker: 'column',
@@ -102,7 +111,8 @@ export class DesignerService {
         artifactColumn.area = 'column';
         artifactColumn.checked = true;
       },
-      reverseTransform: pivotReverseTransform
+      reverseTransform: pivotReverseTransform,
+      onReorder
     }];
 
     this._distributeArtifactColumnsIntoGroups(
@@ -171,14 +181,16 @@ export class DesignerService {
       artifactColumn,
       ...lastN
     ];
+    adapter.onReorder(adapter.artifactColumns);
   }
 
   removeArtifactColumnFromGroup(
     artifactColumn: ArtifactColumn,
-    groupAdapter: IDEsignerSettingGroupAdapter
+    adapter: IDEsignerSettingGroupAdapter
   ) {
-    groupAdapter.reverseTransform(artifactColumn);
-    remove(groupAdapter.artifactColumns, ({columnName}) => artifactColumn.columnName === columnName);
+    adapter.reverseTransform(artifactColumn);
+    remove(adapter.artifactColumns, ({columnName}) => artifactColumn.columnName === columnName);
+    adapter.onReorder(adapter.artifactColumns);
   }
 
   getPartialSqlBuilder(artifactColumns: ArtifactColumns, type: AnalysisType) {

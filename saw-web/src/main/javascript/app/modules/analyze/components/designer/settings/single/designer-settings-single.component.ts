@@ -154,14 +154,12 @@ export class DesignerSettingsSingleComponent {
       // remove from old group, if it was dragged from a group
       // do nothing if it was dragged from the unselected fields
       if (fromGroup) {
-        console.log('remove');
         this._designerService.removeArtifactColumnFromGroup(
           artifactColumn,
           fromGroup
         );
       }
       // add to new group
-      console.log('add to ', toIndex);
       this._designerService.addArtifactColumnIntoGroup(
         artifactColumn,
         toGroup,
