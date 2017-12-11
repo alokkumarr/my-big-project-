@@ -11,31 +11,42 @@ dir=$(dirname $0)
 
 datalake=$datalake_home/sample-spark
 
+init_datalake() {
+    $sudo_mapr hadoop fs -mkdir -p $datalake
+}
+
+load_data() {
+    echo "Loading sample Spark data"
+    $sudo_mapr $hadoop_put $dir/data-sales.ndjson $datalake
+    $sudo_mapr $hadoop_put $dir/data-product.ndjson $datalake
+}
+
 load_semantic() {
     echo "Loading sample Spark semantic metadata"
-    local semantic=semantic.json
-    local semantic_data=semantic-data.json
-    $sudo_mapr hadoop fs -mkdir -p $datalake
-    # Load the data object
-    local semantic_data_output=$datalake/$semantic_data-output
-    $sudo_mapr $hadoop_put $dir/$semantic_data $datalake
-    $sudo_mapr $mdcli -i $datalake/$semantic_data -o $semantic_data_output
-    # Insert the data object ID into the semantic node
-    set -o pipefail
-    local id=$(hadoop fs -cat $semantic_data_output | grep SAMPLE \
-             | sed -e 's/.*".*":"\(.*\)".*/\1/')
-    sed -i -e "s/@DATA_OBJECT_ID@/$id/" $dir/$semantic
+    # Load data objects
+    load_data_object semantic-sales.json
+    load_data_object semantic-product.json
     # Load the semantic node
+    local semantic=semantic.json
     local semantic_output=$datalake/$semantic-output
     $sudo_mapr $hadoop_put $dir/$semantic $datalake
     $sudo_mapr $mdcli -i $datalake/$semantic -o $semantic_output
 }
 
-load_data() {
-    echo "Loading sample Spark data"
-    $sudo_mapr $hadoop_put $dir/data.ndjson $datalake
+load_data_object() {
+    local semantic_data=$1
+    local semantic_data_output=$datalake/$semantic_data-output
+    # Load the data object
+    $sudo_mapr $hadoop_put $dir/$semantic_data $datalake
+    $sudo_mapr $mdcli -i $datalake/$semantic_data -o $semantic_data_output
+    # Insert the sales data object ID into the semantic node
+    set -o pipefail
+    local id=$(hadoop fs -cat $semantic_data_output | grep -E "(SALES|PRODUCT)" \
+             | sed -e 's/.*".*":"\(.*\)".*/\1/')
+    sed -i -e "s/@$semantic_data@/$id/" $dir/semantic.json
 }
 
 wait_maprfs
-load_semantic
+init_datalake
 load_data
+load_semantic
