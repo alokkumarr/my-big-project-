@@ -290,8 +290,8 @@ export class ChartService {
     const isGrouped = fields.g;
 
     const fieldsArray = compact([fields.x, ...fields.y, fields.z, fields.g]);
-    const dateFields = filter(fieldsArray, ({type}) => DATE_TYPES.includes(type));
-    this.formatDatesIfNeeded(parsedData, dateFields);
+    // const dateFields = filter(fieldsArray, ({type}) => DATE_TYPES.includes(type));
+    // this.formatDatesIfNeeded(parsedData, dateFields);
 
     if (areMultipleYAxes) {
       series = this.splitSeriesByYAxes(parsedData, fields);
@@ -340,7 +340,8 @@ export class ChartService {
         const dataPoint = clone(point);
         forEach(dataPoint, (v, k) => {
           if (this.isCategoryAxis(fields, k)) {
-            dataPoint[k] = indexOf(categories[k], v);
+            // dataPoint[k] = indexOf(categories[k], v);
+            dataPoint[k] = v;
           }
         });
         return dataPoint;

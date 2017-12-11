@@ -31,18 +31,27 @@ export class ChartComponent {
   @ViewChild('container') container: ElementRef;
 
   private highcharts = Highcharts;
-  private highstock = Highstock;
+  private highstock: any = Highstock;
   private chart: any = null;
+  private stockChart: any = null;
   private config: any = {};
   private subscription: any;
+  private isTimeSeries: boolean = false;
 
   constructor() {
     this.highcharts.setOptions(globalChartOptions);
+    this.highstock.setOptions(globalChartOptions);
   }
 
   ngAfterViewInit() {
     this.config = defaultsDeep(this.options, chartOptions);
-    this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
+    if (this.config.chart.type === 'tsline') {
+      this.isTimeSeries = true;
+      this.config.chart.type = 'line';
+      this.chart = this.highstock.stockChart(this.container.nativeElement, this.config);
+    } else {
+      this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
+    }
     // if we have an updater$ observable, subscribe to it
     if (this.updater) {
       this.subscription = this.updater.subscribe({
@@ -63,7 +72,11 @@ export class ChartComponent {
 
       // Not using chart.update due to a bug with navigation
       // update and bar styles.
-      this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
+      if (this.isTimeSeries) {
+        this.chart = this.highstock.stockChart(this.container.nativeElement, this.config);
+      } else {
+        this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
+      }
       if (!isUndefined(this.config.xAxis)) {
         this.config.xAxis.categories = [];
       }
