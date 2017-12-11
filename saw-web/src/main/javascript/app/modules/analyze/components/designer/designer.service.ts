@@ -30,7 +30,9 @@ import {
 } from './types';
 import {
   NUMBER_TYPES,
-  DATE_TYPES
+  DATE_TYPES,
+  DEFAULT_AGGREGATE_TYPE,
+  DEFAULT_DATE_INTERVAL
 } from '../../consts';
 import { MAX_LENGTH_VALIDATOR } from '@angular/forms/src/directives/validators';
 
@@ -80,6 +82,14 @@ export class DesignerService {
       )
     );
 
+    const applyDataFieldDefaults = artifactColumn => {
+      artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
+    }
+
+    const applyNonDatafieldDefaults = artifactColumn => {
+      artifactColumn.dateInterval = DEFAULT_DATE_INTERVAL.value;
+    }
+
     const pivotGroupAdapters: Array<IDEsignerSettingGroupAdapter> =  [{
       title: 'Data',
       marker: 'data',
@@ -88,6 +98,7 @@ export class DesignerService {
       transform(artifactColumn: ArtifactColumnPivot) {
         artifactColumn.area = 'data';
         artifactColumn.checked = true;
+        applyDataFieldDefaults(artifactColumn);
       },
       reverseTransform: pivotReverseTransform,
       onReorder
@@ -99,6 +110,7 @@ export class DesignerService {
       transform(artifactColumn: ArtifactColumnPivot) {
         artifactColumn.area = 'row';
         artifactColumn.checked = true;
+        applyNonDatafieldDefaults(artifactColumn);
       },
       reverseTransform: pivotReverseTransform,
       onReorder
@@ -110,6 +122,7 @@ export class DesignerService {
       transform(artifactColumn: ArtifactColumnPivot) {
         artifactColumn.area = 'column';
         artifactColumn.checked = true;
+        applyNonDatafieldDefaults(artifactColumn);
       },
       reverseTransform: pivotReverseTransform,
       onReorder
