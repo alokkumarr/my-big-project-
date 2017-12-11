@@ -10,7 +10,6 @@ import {
 export class DragnDropService {
   private _payload: IDragPayload = null;
   private _element: HTMLElement = null;
-  private _isSortableDroppedInOtherContainer = false;
 
   public startDrag(payload: IDragPayload, element?: HTMLElement) {
     this._payload = payload;
@@ -30,18 +29,6 @@ export class DragnDropService {
 
   public onDragEnd() {
     this._payload = null;
-  }
-
-  public sortableDroppedInOtherContainer() {
-    this._isSortableDroppedInOtherContainer = true;
-  }
-
-  public resetSortableDroppedFlag() {
-    this._isSortableDroppedInOtherContainer = false;
-  }
-
-  public getSortableDroppedFlag() {
-    return this._isSortableDroppedInOtherContainer;
   }
 
   public shouldAllowDrop(payload: IDragPayload, options: IDroppableOptions): boolean {

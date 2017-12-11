@@ -1,5 +1,5 @@
 import { Component, Inject, ViewChild } from '@angular/core';
-import { MdDialogRef, MD_DIALOG_DATA, MdDialog } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { GridsterConfig, GridsterItem, GridsterComponent } from 'angular-gridster2';
 import {
@@ -56,9 +56,9 @@ export class CreateDashboardComponent {
   public dashboard: Array<GridsterItem>;
   public chartUpdater = new BehaviorSubject({});
 
-  constructor(public dialogRef: MdDialogRef<CreateDashboardComponent>,
-    public dialog: MdDialog,
-    @Inject(MD_DIALOG_DATA) public layout: any) {
+  constructor(public dialogRef: MatDialogRef<CreateDashboardComponent>,
+    public dialog: MatDialog,
+    @Inject(MAT_DIALOG_DATA) public layout: any) {
   }
 
   checkEmpty() {

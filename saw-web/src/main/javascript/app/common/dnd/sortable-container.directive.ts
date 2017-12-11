@@ -83,9 +83,7 @@ export class DndSortableContainerDirective {
     const {data} = this._dragDropService.getPayload();
     this._counter = 0;
     this.removePlaceholder();
-    this.moveElementInSortableContainerIfNeeded(data);
     this.dndOnDrop.emit({
-      didContainerChange: this._dragDropService.getSortableDroppedFlag(),
       index: this._newSortableIndex,
       data
     });
@@ -120,27 +118,6 @@ export class DndSortableContainerDirective {
     if (this._insertionPlaceholder) {
       this._insertionPlaceholder.remove();
       this._insertionPlaceholder = null;
-    }
-  }
-
-  moveElementInSortableContainerIfNeeded(element) {
-    const collection = this.dndCollection;
-    let newIndex = this._newSortableIndex;
-    if (collection && (newIndex || newIndex === 0)) {
-      // old Index in current container
-      // if element is dragged in other container, oldIndex will be -1
-      const oldIndex = collection.indexOf(element);
-      if (oldIndex >= 0) {
-        // moved in the same container
-        if (oldIndex < newIndex) {
-          newIndex --;
-        }
-        arrayMove(collection, oldIndex, newIndex);
-      } else {
-        // moved in another container
-        // collection.splice(newIndex, 0, element);
-        this._dragDropService.sortableDroppedInOtherContainer();
-      }
     }
   }
 

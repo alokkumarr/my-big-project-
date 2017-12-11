@@ -68,9 +68,10 @@ export class DesignerSettingsSingleComponent {
     // we have to debounce settings change
     // so that the pivot grid or chart designer
     // doesn't have to process everything with every quick change
-    this._changeSettingsDebounced = debounce(() => {
-      this._changeSettingsDebounced
-    }, SETTINGS_CHANGE_DEBOUNCE_TIME)
+    this._changeSettingsDebounced = debounce(
+      this._changeSettingsDebounced,
+      SETTINGS_CHANGE_DEBOUNCE_TIME
+    );
 
     this.onTextFilterChange = debounce(
       this.onTextFilterChange,
@@ -114,7 +115,7 @@ export class DesignerSettingsSingleComponent {
 
   onDragEnd(event) {
     this._isDragging = false;
-    if (event.isDropSuccessful && event.didContainerChange) {
+    if (event.isDropSuccessful) {
       const artifactColumn = <ArtifactColumn> event.data;
       this.onMove({
         name: 'moveFrom',
@@ -122,9 +123,9 @@ export class DesignerSettingsSingleComponent {
         fromGroup: null
       });
     }
-    if (event.isDropSuccessful) {
-      this._changeSettings();
-    }
+    // if (event.isDropSuccessful) {
+    //   this._changeSettings();
+    // }
   }
 
   onMove(event) {
@@ -141,7 +142,10 @@ export class DesignerSettingsSingleComponent {
       break;
     }
     if (this._moveEventAccumulator.from && this._moveEventAccumulator.to) {
-      const fromGroup = this._moveEventAccumulator.from.fromGroup;
+      const {
+        fromGroup,
+        fromIndex
+      } = this._moveEventAccumulator.from;
       const {
         toGroup,
         toIndex,
@@ -150,12 +154,14 @@ export class DesignerSettingsSingleComponent {
       // remove from old group, if it was dragged from a group
       // do nothing if it was dragged from the unselected fields
       if (fromGroup) {
+        console.log('remove');
         this._designerService.removeArtifactColumnFromGroup(
           artifactColumn,
           fromGroup
         );
       }
       // add to new group
+      console.log('add to ', toIndex);
       this._designerService.addArtifactColumnIntoGroup(
         artifactColumn,
         toGroup,

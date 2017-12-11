@@ -10,7 +10,7 @@
     <expandable-field *ngFor="let artifactColumn of artifactColumns; let i = index; trackBy: trackByFn"
                       [dndSortable]="artifactColumn"
                       [dndSortableIndex]="i"
-                      (dndOnDragEnd)="onDragEnd($event)"
+                      (dndOnDragEnd)="onDragEnd($event, fromIndex)"
                       [artifactColumn]="artifactColumn"
                       (removeRequest)="onRemoveField(artifactColumn)"
                       class="settings__list-item"></expandable-field>

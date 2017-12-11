@@ -43,6 +43,7 @@ export interface IMoveFieldToEvent {
 export interface IMoveFieldFromEvent {
   name: 'moveFrom',
   artifactColumn: ArtifactColumn,
+  fromIndex: number,
   fromGroup: IDEsignerSettingGroupAdapter
 }
 export interface IDEsignerSettingGroupAdapter {

@@ -11,7 +11,6 @@ export interface IDroppableOptions {
 
 export interface ISortableDragEndData {
   isDropSuccessful: boolean;
-  didContainerChange: boolean;
 }
 
 export interface IDraggableDragEndData {

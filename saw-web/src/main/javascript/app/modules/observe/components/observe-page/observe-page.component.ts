@@ -1,6 +1,6 @@
 declare function require(string): string;
 
-import { MdDialog, MdIconRegistry } from '@angular/material';
+import { MatDialog, MatIconRegistry } from '@angular/material';
 import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.component';
 import { MenuService } from '../../../../common/services/menu.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
@@ -19,8 +19,8 @@ import { Component } from '@angular/core';
   template: template
 })
 export class ObservePageComponent {
-  constructor(public dialog: MdDialog,
-    private iconRegistry: MdIconRegistry,
+  constructor(public dialog: MatDialog,
+    private iconRegistry: MatIconRegistry,
     private analyze: AnalyzeService,
     private menu: MenuService
   ) {

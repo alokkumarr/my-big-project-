@@ -90,11 +90,8 @@ export class DndSortableDirective {
     this._isDragged = false;
     this._dragDropService.onDragEnd();
     const isDropSuccessful = event.dataTransfer.dropEffect !== 'none';
-    const didContainerChange = this._dragDropService.getSortableDroppedFlag();
-    this._dragDropService.resetSortableDroppedFlag();
     const sortableDragEndObj: ISortableDragEndData = {
-      isDropSuccessful,
-      didContainerChange
+      isDropSuccessful
     };
     this.dndOnDragEnd.emit(sortableDragEndObj);
   }

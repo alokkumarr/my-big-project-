@@ -45,26 +45,25 @@ export default class DesignerSettingsGroupComponent {
    * Drop event for sortable dropped in this group
    */
   onDrop(event) {
-    if (event.didContainerChange) {
-      const artifactColumn = <ArtifactColumn> event.data;
-      this.moveTo.emit({
-        name: 'moveTo',
-        artifactColumn,
-        toIndex: event.index,
-        toGroup: this.groupAdapter
-      });
-    }
+    const artifactColumn = <ArtifactColumn> event.data;
+    this.moveTo.emit({
+      name: 'moveTo',
+      artifactColumn,
+      toIndex: event.index,
+      toGroup: this.groupAdapter
+    });
   }
 
   /**
    * Dragend event from a sortable taken from this group
    */
-  onDragEnd(event) {
-    if (event.isDropSuccessful && event.didContainerChange) {
+  onDragEnd(event, fromIndex) {
+    if (event.isDropSuccessful) {
       const artifactColumn = <ArtifactColumn> event.data;
       this.moveFrom.emit({
         name: 'moveFrom',
         artifactColumn,
+        fromIndex,
         fromGroup: this.groupAdapter
       });
     }

@@ -3,7 +3,7 @@
 }
 
 .dnd__dragged__old-place {
-  opacity:0.7;
+  opacity: 0.7;
   border: 1px dashed black;
 }
 
@@ -16,7 +16,7 @@
   border: 1px dashed red;
 }
 
-/* Solve the bug with dragenter and dragleave events firing when hovering over elements in the drop container*/
+/* Solve the bug with dragenter and dragleave events firing when hovering over elements in the drop container */
 .dnd__droppable-container {
   position: relative;
 }
