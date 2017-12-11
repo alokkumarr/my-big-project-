@@ -6,6 +6,7 @@ import {
  } from '@angular/core';
 
 import * as Highcharts from 'highcharts/highcharts';
+import * as Highstock from 'highcharts/highstock';
 import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as forEach from 'lodash/forEach';
 import * as filter from 'lodash/filter';
@@ -30,6 +31,7 @@ export class ChartComponent {
   @ViewChild('container') container: ElementRef;
 
   private highcharts = Highcharts;
+  private highstock = Highstock;
   private chart: any = null;
   private config: any = {};
   private subscription: any;

@@ -106,7 +106,6 @@ export const AnalyzeChartComponent = {
     }
 
     $onInit() {
-      debugger;
       if (this.mode === ENTRY_MODES.NEW && this.model.chartType === 'bar') {
         this.isInverted = true;
       }

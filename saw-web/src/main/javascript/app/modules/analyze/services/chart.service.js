@@ -718,6 +718,7 @@ export class ChartService {
     case 'stack':
     case 'scatter':
     case 'bubble':
+    case 'tsline':
     default:
       changes = this.getBarChangeConfig(type, settings, fields, gridData, opts);
       break;
@@ -801,6 +802,13 @@ export class ChartService {
     ));
   }
 
+  filterDateTypes(attributes) {
+    return filter(attributes, attr => (
+      attr.columnName &&
+      DATE_TYPES.includes(attr.type)
+    ));
+  }
+
   fillSettings(artifacts, model) {
     /* Flatten the artifacts into a single array and sort them */
     const attributes = fpPipe(
@@ -816,7 +824,7 @@ export class ChartService {
     let settingsObj;
     let zaxis;
     const yaxis = this.filterNumberTypes(attributes);
-    const xaxis = attributes;
+    let xaxis = attributes;
     const groupBy = this.filterNonNumberTypes(attributes);
 
     switch (model.chartType) {
@@ -826,6 +834,14 @@ export class ChartService {
         xaxis,
         yaxis,
         zaxis,
+        groupBy
+      };
+      break;
+    case 'tsline':
+      xaxis = this.filterDateTypes(attributes);
+      settingsObj = {
+        xaxis,
+        yaxis,
         groupBy
       };
       break;

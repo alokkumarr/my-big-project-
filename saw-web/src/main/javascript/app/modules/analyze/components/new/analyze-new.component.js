@@ -25,7 +25,6 @@ export const AnalyzeNewComponent = {
     }
 
     $onInit() {
-      debugger;
       this.selectedAnalysisMethod = '';
       this.selectedMetric = null;
     }
