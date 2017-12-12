@@ -10,8 +10,9 @@ TEST_DIR=$( cd $(dirname $0)/../test && pwd -P )
 #######################################
 
 XDF_DIR=/dfs/opt/bda/xdf-ngsr-current/
+LOG4J_CONF=$XDF_DIR/conf/log4j.properties
 
-CP=$XDF_DIR/lib/xdf-rest-1.0.0_dev-all.jar
+CP=$XDF_DIR/conf/log4j.properties:$XDF_DIR/lib/xdf-rest-1.0.0_dev-all.jar
 CP=$CP:$(mapr classpath)
 
-java -cp ${CP} sncr.xdf.metastore.ProjectStore "$1" "$2" "$3" $4
+java -cp ${CP} -Dlog4j.configuration=file:$LOG4J_CONF   sncr.xdf.metastore.ProjectStore "$1" "$2" "$3" $

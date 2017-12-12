@@ -91,16 +91,22 @@ public class ProjectStore extends MetadataStore implements WithSearchInMetastore
         String dsTablename = getRoot() + Path.SEPARATOR + METASTORE + Path.SEPARATOR + DataSetStore.TABLE_NAME;
         DataSetStore dss = new DataSetStore(getRoot());
         List<Document> datasets = searchAsList(dsTablename, qc);
+        logger.debug("Found # datasets: " + datasets.size());
         datasets.forEach( d -> {
             String id = d.getIdString();
             try {
                 JsonElement dset = dss.read(id);
                 JsonObject jo = dset.getAsJsonObject();
-                JsonPrimitive pl = jo.getAsJsonPrimitive("system.physicalLocation");
-                HFileOperations.deleteEnt(pl.getAsString());
+                JsonPrimitive pl = jo.getAsJsonObject("system").getAsJsonPrimitive("physicalLocation");
+                logger.trace("Process dataset: " + id + " DS descriptor: " + jo.toString() + " physical location = " + ((pl != null)? pl.toString():"n/a"));
+                if (pl != null) {
+                    String normPL = pl.toString().replace("\"", "");
+                    normPL = normPL.substring(0, normPL.length() - PREDEF_DATA_DIR.length());
+                    HFileOperations.deleteEnt(normPL);
+                }
                 dss.delete(id);
             } catch (Exception e) {
-                logger.error("Could not remove datasets from Metadata Store: " + id);
+                logger.error("Could not remove datasets from Metadata Store: " + id, e);
             }}
         );
 
@@ -114,7 +120,7 @@ public class ProjectStore extends MetadataStore implements WithSearchInMetastore
             try {
                 ts.delete(id);
             } catch (Exception e) {
-                logger.error("Could not remove transformation from Metadata Store: " + id);
+                logger.error("Could not remove transformation from Metadata Store: " + id, e);
             }}
         );
         prj.delete(PLP);
