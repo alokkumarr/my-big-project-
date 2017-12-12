@@ -10,6 +10,8 @@ import * as replace from 'lodash/replace';
 import * as indexOf from 'lodash/indexOf';
 import * as slice from 'lodash/slice';
 import {json2csv} from 'json-2-csv';
+import * as keys from 'lodash/keys';
+import * as filter from 'lodash/filter';
 
 import {Events} from '../../consts';
 
@@ -145,11 +147,26 @@ export const AnalyzeExecutedDetailComponent = {
       });
     }
 
-    getCheckedFieldsForExport(artifacts) {
-      return flatMap(artifacts, artifact => fpPipe(
-        fpFilter('checked'),
-        fpMap(fpPick(['columnName', 'aliasName', 'displayName']))
-      )(artifact.columns));
+    getCheckedFieldsForExport(analysis, data) {
+      /* If report was using designer mode, find checked columns */
+      if (!analysis.edit) {
+        return flatMap(this.analysis.artifacts, artifact => fpPipe(
+          fpFilter('checked'),
+          fpMap(fpPick(['columnName', 'aliasName', 'displayName']))
+        )(artifact.columns));
+      }
+      /* If report was using sql mode, we don't really have any info
+         about columns. Keys from individual data nodes are used as
+         column names */
+      if (data.length > 0) {
+        return map(keys(data[0]), col => ({
+          label: col,
+          columnName: col,
+          displayName: col,
+          type: 'string'
+        }));
+      }
+      return columns;
     }
 
     exportData() {
@@ -161,7 +178,7 @@ export const AnalyzeExecutedDetailComponent = {
         const analysisId = this.analysis.id;
         const executionId = this._executionId || this.analyses[0].id;
         this._AnalyzeActionsService.exportAnalysis(analysisId, executionId).then(data => {
-          const fields = this.getCheckedFieldsForExport(this.analysis.artifacts);
+          const fields = this.getCheckedFieldsForExport(this.analysis, data);
           const keys = map(fields, 'columnName');
           const exportOptions = {
             trimHeaderFields: false,
