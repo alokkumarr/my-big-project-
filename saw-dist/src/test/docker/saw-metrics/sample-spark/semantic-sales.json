@@ -7,7 +7,7 @@
         "storageType": "DL",
         "displayName": "Sample Metric",
         "description": "Sample Metric",
-        "name": "SAMPLE",
+        "name": "SALES",
         "product": "SYNCHRONOSS",
         "type": "json",
         "partitionType": "none"
@@ -16,7 +16,7 @@
         "type": "struct",
         "fields": [
           {
-            "name": "SAMPLE",
+            "name": "SALES",
             "type": "string",
             "nullable": true,
             "metadata": {}
@@ -24,7 +24,7 @@
         ]
       },
       "dl-locations": [
-        "/saw-metrics/sample-spark/data.ndjson"
+        "/saw-metrics/sample-spark/data-sales.ndjson"
       ]
     }
   }

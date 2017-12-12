@@ -1,0 +1,31 @@
+[
+  {
+    "node-category": "DataObject",
+    "action": {
+      "verb": "create",
+      "content": {
+        "storageType": "DL",
+        "displayName": "Product",
+        "description": "Product",
+        "name": "PRODUCT",
+        "product": "SYNCHRONOSS",
+        "type": "json",
+        "partitionType": "none"
+      },
+      "schema": {
+        "type": "struct",
+        "fields": [
+          {
+            "name": "PRODUCT",
+            "type": "string",
+            "nullable": true,
+            "metadata": {}
+          }
+        ]
+      },
+      "dl-locations": [
+        "/saw-metrics/sample-spark/data-product.ndjson"
+      ]
+    }
+  }
+]

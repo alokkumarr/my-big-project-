@@ -53,6 +53,10 @@ class Analysis(val analysisId : String) {
        * raised. */
       val resultNode = AnalysisResult(null, resultId)
       m_log.debug("Result node found: {}", resultId)
+      /* If the result node contains an error marker, raise an exception */
+      if (resultNode.getObjectDescriptors.contains("error")) {
+        throw new RuntimeException("Execution failed due to internal error")
+      }
       /* Also check that the data location property has been set, indicating
        * results have been written out */
       if (!resultNode.getObjectDescriptors.contains("dataLocation")) {
