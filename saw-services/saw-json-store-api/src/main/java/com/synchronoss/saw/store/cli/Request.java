@@ -7,22 +7,25 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.ojai.Document;
 import org.ojai.store.QueryCondition;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.mapr.db.MapRDB;
+import com.synchronoss.saw.store.metastore.UserInterfaceStore;
 
 /**
  * The class handles basic requests to Metadata Store
  * The requests are JSON documents in the following formats
  * {
  *   [
- *     "category" : "DataSet|Transformation|DataPod|DataSegment|Observe",
+ *     "category" : "DataSet|Transformation|DataPod|DataSegment|UserInterface",
  *     "action" : "create|delete|update|read|search",
  *     "output" : "<Path and Filename where the result will be saved to>"
  *     "id" : "<id> - required for create, delete, update and read",
@@ -227,6 +230,10 @@ public class Request {
             case Transformation:
                 logger.warn("Not implemented yet");                
                break;
+            case UserInterface:
+              UserInterfaceStore tr = new UserInterfaceStore(xdfRoot);
+              searchResult = tr.search(maprDBCondition);
+              break;   
             default:
                logger.error("Not supported category");
                return;
@@ -309,6 +316,17 @@ public class Request {
             case Transformation:
                 logger.warn("Not implemented yet");
                 break;
+            case UserInterface:
+              UserInterfaceStore ts = new UserInterfaceStore(xdfRoot);
+              switch (action){
+                  case create: ts.create(id, item); break;
+                  case delete: ts.delete(id); break;
+                  case update: ts.update(id, item); break;
+                  case read: result = ts.read(id); break;
+                  default:
+                      logger.warn("Action is not supported");
+              }
+              break;
             default:
                 logger.error("Not supported category");
                 return;
@@ -443,7 +461,7 @@ public class Request {
         DataSet,
         AuditLog,
         DataPod,
-        Observe,
+        UserInterface,
         DataSegment;
     }
 

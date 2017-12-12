@@ -19,7 +19,25 @@ import com.synchronoss.saw.observe.model.ObserveResponse;
 
 /**
  * @author spau0004
- *
+ * This class is used to perform CRUD operation for the dashboard metadata
+ * The requests are JSON documents in the following formats
+ * {
+ *  "contents":{
+ *         "keys":[],
+ *         "action":"execute",
+ *               "observe":[
+ *                      {
+ *                          id: 'string',
+ *                           categoryId: 'string',
+ *                           name: 'string',
+ *                           description: 'string',
+ *                           options: 'json',
+ *                           tiles: [{ type: 'analysis', id: 'analysisId - string', cols: 'number', rows: 'number', x: 'number', y: 'number', options: 'json' }],
+ *                            filters: []
+ *                        }
+ *                           ]
+ *               }
+ *  }
  */
 @RestController
 @RequestMapping(value = "/observe/")
@@ -27,7 +45,14 @@ public class ObserveController {
 
   private static final Logger logger = LoggerFactory.getLogger(ObserveController.class);
 
-  
+  /**
+   * This method is used to create a dashboard entity in mapr store with id
+   * @param Id
+   * @param request
+   * @param response
+   * @param requestBody
+   * @return
+   */
   @RequestMapping(value = "/dashboards/{Id}", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   public ListenableFuture<ResponseEntity<ObserveResponse>> addDashboard(@PathVariable("Id") String Id, 
