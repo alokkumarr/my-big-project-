@@ -26,7 +26,9 @@ mysql -u root -e "GRANT ALL ON saw_security.* TO 'saw_security'@'localhost'"
 # Set root password
 set -o pipefail
 password=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 14)
-echo $password > /etc/bda/mariadb-root-password
+password_file=/etc/bda/mariadb-root-password
+echo $password > $password_file
+chmod u+rw,go= $password_file
 mysql -u root -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$password')"
 
 # Populate database
