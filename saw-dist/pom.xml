@@ -175,9 +175,9 @@
                   <name>saw</name>
                 </network>
                 <ports>
-                  <port>saw.docker.port:80</port>
-                  <port>saw.kibana.port:5601</port>
-                  <port>saw.journal.port:19531</port>
+                  <port>localhost:saw.docker.port:80</port>
+                  <port>localhost:saw.kibana.port:5601</port>
+                  <port>localhost:saw.journal.port:19531</port>
                 </ports>
                 <!-- Run privileged for systemd -->
                 <privileged>true</privileged>
@@ -212,9 +212,9 @@
                   <alias>saw-mapr</alias>
                 </network>
                 <ports>
-                  <port>saw.mapr.port:8443</port>
-                  <port>saw.spark.master.port:8080</port>
-                  <port>saw.spark.worker.port:8081</port>
+                  <port>localhost:saw.mapr.port:8443</port>
+                  <port>localhost:saw.spark.master.port:8080</port>
+                  <port>localhost:saw.spark.worker.port:8081</port>
                 </ports>
                 <!-- Run privileged for MapR -->
                 <privileged>true</privileged>
