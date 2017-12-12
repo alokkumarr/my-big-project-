@@ -68,8 +68,10 @@ customer = "SAW"
 # email = "kiran.ps2@synchronoss.com"
 log1.info("Get value for Email Address from the vars file")
 if use_vars_file:
-    email = vars_dict['db.init.email']
-    print "Email ID to which notifications are to be sent:", email
+    #email = vars_dict['db.init.email']
+    # Note: This email is unused and only set to avoid breaking the rest of the script.
+    email = 'noreply@example.com'
+    #print "Email ID to which notifications are to be sent:", email
 else:
     email = raw_input("Please enter Email ID to which notifications are to be sent: ")
 
