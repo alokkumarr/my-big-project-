@@ -18,6 +18,10 @@ touch $marker
 
 # Create database users
 mysql -u root < $dir/init.sql
+create_user="CREATE USER 'saw_security'@'localhost'"
+password=$(< /etc/bda/saw-security-db-password)
+mysql -u root -e "$create_user IDENTIFIED BY '$password'"
+mysql -u root -e "GRANT ALL ON saw_security.* TO 'saw_security'@'localhost'"
 
 # Set root password
 set -o pipefail
