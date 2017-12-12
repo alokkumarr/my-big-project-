@@ -100,9 +100,6 @@
         "description": "Data object name",
         "type": "string"
       },
-      "fileMask": {
-        "type": "string"
-      },
       "format": {
         "$ref": "#/format"
       },
@@ -147,6 +144,10 @@
       "items" : {
         "$ref": "#/OutputDataSet"
       }
+    },
+    "project" : {
+      "description": "Project/Application name (ID)",
+      "type": "string"
     },
     "parameters" : {
       "description" : "System parameters specific for component execution",

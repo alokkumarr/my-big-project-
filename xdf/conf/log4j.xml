@@ -16,11 +16,8 @@
     <rollingPolicy class="org.apache.log4j.rolling.TimeBasedRollingPolicy">
       <param name="FileNamePattern" value="${comp.log.dir}/${xdf.core}.%d{yyyy-MM-dd}.gz"/>
     </rollingPolicy>
-		<param name="MaxFileSize" value="10MB"/>
-    <!-- Keep one backup file -->
-    <param name="MaxBackupIndex" value="10"/>
     <layout class="org.apache.log4j.PatternLayout"> 
-      <param name="ConversionPattern" value="%d{dd MMM yyyy HH:mm:ss,SSS} [%p] %t %c - %m%n"/> 
+      <param name="ConversionPattern" value="%d{dd MMM yyyy HH:mm:ss,SSS} [%p] %t %c %L- %m%n"/> 
     </layout> 
   </appender> 		 
 		 

@@ -35,5 +35,12 @@ public interface WithSearchInMetastore {
         }
     }
 
+    default List<Document> searchAsList(String tableName, QueryCondition  qc) throws Exception
+    {
+        Table table = MapRDB.getTable(tableName);
+        return searchAsList( table, qc);
+    }
+
+
 
 }

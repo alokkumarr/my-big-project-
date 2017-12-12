@@ -8,6 +8,7 @@ import com.mapr.db.Table;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.ojai.Document;
+import org.ojai.Value;
 import org.ojai.store.DocumentMutation;
 import sncr.xdf.datasets.conf.DataSetProperties;
 
@@ -24,7 +25,7 @@ import sncr.xdf.datasets.conf.DataSetProperties;
 public abstract class MetadataStore extends MetadataBase  implements DocumentConverter{
 
     private static final Logger logger = Logger.getLogger(MetadataStore.class);
-    private static final String METASTORE = ".metadata";
+    protected static final String METASTORE = ".metadata";
 
     public static final String delimiter = "::";
 
@@ -112,11 +113,18 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
         table.flush();
     }
 
-    public void _updatePath(String id, String path, String root, JsonElement src) throws Exception {
-        Document mutatedPart = toMapRDBDocument(root, src);
+    public void _updatePath(String id, String root, String path, JsonElement src) throws Exception {
         DocumentMutation mutation = MapRDB.newMutation();
-        logger.trace("Path: " + path + ", Doc.part.: " + mutatedPart.toString());
-        mutation.setOrReplace(path, mutatedPart);
+        if ( src.isJsonObject()) {
+            Document mutatedPart = toMapRDBDocument(root, src);
+            logger.debug("Path: " + path + ", Doc.part.: " + mutatedPart.toString());
+            mutation.setOrReplace(path, mutatedPart);
+        }
+        else{
+            Document mutatedPart = toMapRDBDocument(path, src);
+            logger.debug("Path: " + path + ", Doc.part.: " + mutatedPart.toString());
+            mutation.setOrReplace(path, mutatedPart.getValue(path));
+        }
         table.update(id, mutation);
         table.flush();
     }
@@ -135,5 +143,10 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
         return src;
     }
 
+    @Override
+    protected void finalize(){
+        table.flush();
+        table.close();
+    }
 
 }

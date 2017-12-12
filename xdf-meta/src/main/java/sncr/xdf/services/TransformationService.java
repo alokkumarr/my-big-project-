@@ -34,7 +34,6 @@ public class TransformationService {
                 .configure(ALLOW_COMMENTS, true)
                 .configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, true);
 
-
         OutputStream os = new ByteArrayOutputStream();
         mapper.writeValue(os, componentConfiguration);
         os.close();

@@ -142,11 +142,11 @@ public class DLDataSetService {
     public void logMetadata(){
         logger.debug("Metadata: \n");
         repository.keySet().forEach(n ->
-                {
-                    Map<String, Object> props = repository.get(n);
-                    logger.debug( String.format("Property: %s", n));
-                    props.forEach( (pn, pv ) -> logger.debug(String.format("%s => %s", pn, pv)));
-                }
+            {
+                Map<String, Object> props = repository.get(n);
+                logger.debug( String.format("Property: %s", n));
+                props.forEach( (pn, pv ) -> logger.debug(String.format("%s => %s", pn, pv)));
+            }
         );
     }
 
@@ -173,10 +173,6 @@ public class DLDataSetService {
                 JsonElement ds = dsStore.read(id);
             if ( ds == null ){
                 JsonElement je = createDSDescriptor(id, ctx, o, metadata);
-                //TODO::
-//                "asInput" : [empty],
-//                "asOutput" : "this transformation"
-
                 dsStore.create(id, je);
                 return je;
             }
