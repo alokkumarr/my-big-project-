@@ -1,8 +1,6 @@
 import * as angular from 'angular';
 
 import 'angular-material/angular-material.css';
-import 'devextreme/dist/css/dx.common.css';
-import 'devextreme/dist/css/dx.light.css';
 
 import 'fonts/icomoon.css';
 import '../../../../assets/additional-icons.css';

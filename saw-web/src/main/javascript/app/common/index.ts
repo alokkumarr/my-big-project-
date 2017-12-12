@@ -13,7 +13,10 @@ import 'ng-idle';
 
 import 'mottle';
 
+import 'devextreme/dist/css/dx.common.css';
+import 'devextreme/dist/css/dx.light.css';
 import 'devextreme/ui/data_grid';
+import 'devextreme/integration/jquery';
 import 'devextreme/integration/angular';
 
 import { NgModule } from '@angular/core';

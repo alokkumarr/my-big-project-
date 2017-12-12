@@ -1,9 +1,8 @@
 import * as map from 'lodash/map';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
-import * as moment from 'moment';
 import DataSource from 'devextreme/data/data_source';
-import 'moment-timezone';
+import * as moment from 'moment-timezone';
 
 import * as template from './report-grid-display.component.html';
 
@@ -96,7 +95,7 @@ export const ReportGridDisplayComponent = {
       ];
       forEach(data, row => {
         forEach(keys, key => {
-          const date = moment.tz(row[key], formats, true, BACKEND_TIMEZONE);
+          const date = moment(row[key], formats, true).tz(BACKEND_TIMEZONE);
           if (date.isValid()) {
             row[key] = date.toDate();
           }
