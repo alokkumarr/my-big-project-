@@ -62,6 +62,8 @@ public class Context {
         this.batchID = batchId;
         this.applicationID = appId;
         this.componentConfiguration = compConf;
+//TODO:: Add project
+//        this.componentConfiguration.set
     }
 
     @Override

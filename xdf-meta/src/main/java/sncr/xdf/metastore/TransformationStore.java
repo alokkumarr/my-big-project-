@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class TransformationStore extends MetadataStore implements WithSearchInMetastore{
 
-    private static String TABLE_NAME = "transformations";
+    public   static String TABLE_NAME = "transformations";
 
     public TransformationStore(String altXDFRoot) throws Exception {
         super(TABLE_NAME, altXDFRoot);
@@ -37,7 +37,7 @@ public class TransformationStore extends MetadataStore implements WithSearchInMe
      */
     public void updateStatus(String id, String status, String startTS, String finishedTS, String aleId, String batchSessionId) throws Exception {
         JsonObject src = createStatusSection(status, startTS, finishedTS, aleId, batchSessionId);
-        _updatePath(id, "asOfNow", null, src);
+        _updatePath(id, null, "asOfNow", src);
     }
 
 }

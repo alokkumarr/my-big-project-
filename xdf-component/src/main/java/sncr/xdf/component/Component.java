@@ -1,10 +1,12 @@
 package sncr.xdf.component;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
+import sncr.xdf.conf.Parameter;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.CliHandler;
 import sncr.xdf.ConfigLoader;
@@ -12,13 +14,15 @@ import sncr.xdf.conf.ComponentConfiguration;
 import sncr.xdf.context.Context;
 import sncr.xdf.core.file.HFileOperations;
 import sncr.xdf.datasets.conf.DataSetProperties;
+import sncr.xdf.metastore.ProjectStore;
 import sncr.xdf.services.AuditLogService;
-import sncr.xdf.services.DLDSMeta;
-import sncr.xdf.services.MetadataBase;
-import sncr.xdf.services.TransformationMeta;
+import sncr.xdf.services.DLDataSetService;
+import sncr.xdf.base.MetadataBase;
+import sncr.xdf.services.TransformationService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -31,9 +35,9 @@ public abstract class Component {
 
     protected String error;
     protected Context ctx;
-    protected DLDSMeta md;
+    protected DLDataSetService md;
     protected AuditLogService als;
-    protected TransformationMeta transformationMD;
+    protected TransformationService transformationMD;
 
     protected String componentName = "unnamed";
     protected ArrayList<WithMovableResult.MoveDataDescriptor> resultDataDesc;
@@ -207,6 +211,7 @@ public abstract class Component {
     public final int Init(String config, String appId, String batchId, String xdfDataRootSys) throws Exception {
 
         logger.trace( "Configuration dump: \n" + config);
+
         ComponentConfiguration cfg = null;
         try {
             cfg = validateConfig(config);
@@ -220,6 +225,27 @@ public abstract class Component {
             error = "Internal error: validation procedure returns null";
             logger.error(error);
             return -1;
+        }
+
+        ProjectStore prjStore = new ProjectStore(xdfDataRootSys);
+        JsonElement prj = prjStore.readProjectData(appId);
+        JsonObject prjJo = prj.getAsJsonObject();
+        JsonElement plp;
+        List<Parameter> oldList = cfg.getParameters();
+        if (prjJo.has(ProjectStore.PLP)) {
+            plp = prjJo.get(ProjectStore.PLP);
+            JsonArray plpJA = plp.getAsJsonArray();
+            List<Parameter> newList = new ArrayList<>();
+            plpJA.forEach(  plpen -> {
+                JsonObject plpJO = plpen.getAsJsonObject();
+                Parameter parameter = new Parameter(plpJO.get("name").getAsString(), plpJO.get("value").getAsString());
+                newList.add(parameter);
+            });
+            for (Parameter pn : newList) {
+                final boolean[] found = {false};
+                oldList.forEach(po -> {if (pn.getName().equalsIgnoreCase(po.getName())) { found[0] = true; return;}});
+                if (!found[0]) oldList.add(pn);
+            }
         }
 
         try {
@@ -239,8 +265,8 @@ public abstract class Component {
         }
 
         try {
-            md = new DLDSMeta(xdfDataRootSys);
-            transformationMD = new TransformationMeta(xdfDataRootSys);
+            md = new DLDataSetService(xdfDataRootSys);
+            transformationMD = new TransformationService(xdfDataRootSys);
             dsaux = new WithDataSetService.DataSetServiceAux(ctx, md);
             als = new AuditLogService(md.getRoot());
         }

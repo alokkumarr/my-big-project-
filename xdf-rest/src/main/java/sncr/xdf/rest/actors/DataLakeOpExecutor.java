@@ -10,7 +10,7 @@ import akka.event.LoggingAdapter;
 import sncr.xdf.metastore.DataSetStore;
 import sncr.xdf.rest.messages.dl.Document;
 import sncr.xdf.services.DLMetadata;
-import sncr.xdf.services.MetadataBase;
+import sncr.xdf.base.MetadataBase;
 import sncr.xdf.rest.messages.CleanRequest;
 import sncr.xdf.rest.messages.Init;
 import sncr.xdf.rest.messages.StatusUpdate;

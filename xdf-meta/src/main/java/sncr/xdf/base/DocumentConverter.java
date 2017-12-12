@@ -1,4 +1,4 @@
-package sncr.xdf.metastore;
+package sncr.xdf.base;
 
 import com.google.gson.*;
 import com.mapr.db.MapRDB;
@@ -65,6 +65,7 @@ public interface DocumentConverter {
                     JsonArray ja = je.getAsJsonArray();
                     List<Object> l = new ArrayList<>();
                     ja.forEach(el -> processList(l, el));
+                    //TODO:: Fix it, cannot set JsonArray at root.
                     doc.set(k, l);
                 } else if (je.isJsonPrimitive()) {
                     logger.trace("Process JSON primitive with field name " + k);

@@ -5,10 +5,10 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import sncr.xdf.base.MetadataBase;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by srya0001 on 10/26/2017.

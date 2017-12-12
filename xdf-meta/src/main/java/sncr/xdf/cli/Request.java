@@ -7,6 +7,7 @@ import org.ojai.Document;
 import org.ojai.store.QueryCondition;
 import sncr.xdf.core.file.HFileOperations;
 import sncr.xdf.metastore.DataSetStore;
+import sncr.xdf.metastore.ProjectStore;
 import sncr.xdf.metastore.TransformationStore;
 
 import java.io.FileNotFoundException;
@@ -60,6 +61,8 @@ public class Request {
     private QueryCondition maprDBCondition;
     private JsonArray filter;
     private JsonParser jsonParser;
+    private String prjDescription;
+    private JsonArray plp;
 
     public Request(String jStr)
     {
@@ -98,7 +101,7 @@ public class Request {
         }
     }
 
-    private void processItem(JsonObject item) throws Exception {
+    private void processItem(JsonObject item){
 
         if (analyzeAndValidate(item)){
             logger.info("Start item processing, action: " + action + ", output: " + rFile);
@@ -110,18 +113,24 @@ public class Request {
                 return;
             }
 
-            switch (action) {
-                case create:
-                case delete:
-                case update:
-                case read:
-                    doAction(item);
-                    break;
-                case search:
-                    doSearch();
-                    break;
-                default:
-                    logger.warn("Action is not supported");
+            try {
+                switch (action) {
+                    case create:
+                    case delete:
+                    case update:
+                    case read:
+                        doAction(item);
+                        break;
+                    case search:
+                        doSearch();
+                        break;
+                    default:
+                        logger.warn("Action is not supported");
+                }
+            }
+            catch(Exception e){
+                logger.error("Could not process requested item: ", e);
+
             }
 
             if (os != null) {
@@ -136,7 +145,6 @@ public class Request {
         }
         else{
             logger.error("Could not process current item, skip it");
-
         }
     }
 
@@ -283,6 +291,27 @@ public class Request {
             case DataSegment:
                 logger.warn("Not implemented yet");
                 break;
+            case Project:
+                ProjectStore ps = new ProjectStore(xdfRoot);
+                switch (action){
+                    case create:
+                        if (plp != null)
+                            ps.createProject(id, prjDescription, plp);
+                        else
+                            ps.createProject(id, prjDescription);
+                        break;
+                    case delete: ps.deleteProject(id); break;
+                    case update:
+                        if (!prjDescription.isEmpty() )
+                            ps.updateProject(id, prjDescription);
+                        if (plp != null)
+                            ps.updateProject(id, plp);
+                        break;
+                    case read: result = ps.readProjectData(id); break;
+                    default:
+                        logger.warn("Action is not supported");
+                }
+                break;
             case Transformation:
                 TransformationStore ts = new TransformationStore(xdfRoot);
                 switch (action){
@@ -378,13 +407,26 @@ public class Request {
             return false;
         }
 
-        if (action == Actions.create || action == Actions.update ) {
+        if (action == Actions.create || action == Actions.update) {
             JsonElement src0 = item.get("source");
             if (!src0.isJsonObject()) {
                 logger.error("'source' must be valid JSON object");
                 return false;
             }
             src = src0.getAsJsonObject();
+            if (category == Project) {
+                prjDescription = ( src.has("description")? src.get("description").getAsString(): "");
+                plp = ( src.has(ProjectStore.PLP)? src.get(ProjectStore.PLP).getAsJsonArray(): null);
+                if (action == Actions.create && prjDescription.isEmpty() ){
+                    logger.error("Project description must be provided to create project");
+                    return false;
+                }
+                if (action == Actions.update && prjDescription.isEmpty() && plp == null ){
+                    logger.error("Project description and/or project level parameters are not set");
+                    return false;
+                }
+
+            }
         }
         return true;
     }
@@ -423,6 +465,7 @@ public class Request {
     }
 
     enum MetaCategory{
+        Project,
         Transformation,
         DataSet,
         AuditLog,

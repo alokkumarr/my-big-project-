@@ -21,9 +21,9 @@ import java.util.*;
  */
 public class DataSetStore extends MetadataStore implements WithSearchInMetastore {
 
-    private static String TABLE_NAME = "datasets";
-    private final String STATUS_SECTION = "asOfNow";
-    private final String USER_DATA = "userData";
+    public static String TABLE_NAME = "datasets";
+    public final String STATUS_SECTION = "asOfNow";
+    public final String USER_DATA = "userData";
 
     public DataSetStore(String fsr) throws Exception {
         super(TABLE_NAME, fsr);
@@ -36,9 +36,7 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
             String jStr = HFileOperations.readFile(json);
             JsonParser jsonParser = new JsonParser();
             JsonElement je = jsonParser.parse(jStr);
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
             System.out.print("Parsed JSON: \n\n" + je.toString() + "\n");
-
             DataSetStore dss = new DataSetStore(null);
             Document d = dss.toMapRDBDocument(je);
             System.out.print("Converted to document: \n\n" + d.asJsonString() + "\n");
@@ -62,7 +60,7 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
      * @throws Exception
      */
     public void updateUserData(String id, JsonElement src) throws Exception {
-        _updatePath(id, USER_DATA, null, src);
+        _updatePath(id, null, USER_DATA, src);
     }
 
 
@@ -80,7 +78,7 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
      */
     public void updateStatus(String id, String status, String startTS, String finishedTS, String aleId, String batchSessionId) throws Exception {
         JsonObject src = createStatusSection(status, startTS, finishedTS, aleId, batchSessionId);
-        _updatePath(id, "asOfNow", null, src);
+        _updatePath(id, null, "asOfNow", src);
     }
 
     /**
@@ -157,5 +155,6 @@ public class DataSetStore extends MetadataStore implements WithSearchInMetastore
             cond.is(key, QueryCondition.Op.EQUAL, value);
         return cond;
     }
+
 
 }

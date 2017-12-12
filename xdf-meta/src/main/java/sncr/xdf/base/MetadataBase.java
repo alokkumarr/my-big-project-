@@ -1,4 +1,4 @@
-package sncr.xdf.services;
+package sncr.xdf.base;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.PathFilter;
@@ -35,7 +35,7 @@ public abstract class MetadataBase {
 
 
     public static String XDF_DATA_ROOT = "XDF_DATA_ROOT";
-    protected static String FILE_DESCRIPTOR = ".bda_meta";
+    public static String FILE_DESCRIPTOR = ".bda_meta";
     public static String DEFAULT_DATA_SOURCE = "fs";
 
     protected final FileSystem fs;

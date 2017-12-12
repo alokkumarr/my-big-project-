@@ -1,7 +1,7 @@
 <configuration>
   <appender class="ch.qos.logback.core.ConsoleAppender" name="STDOUT">
     <encoder>
-      <pattern>%d{dd MMM yyyy HH:mm:ss,SSS} [%level] %date %thread %logger - %message%n%xException</pattern>
+      <pattern>%d{dd MMM yyyy HH:mm:ss,SSS} [%level] %date %thread %logger %line - %message%n%xException</pattern>
     </encoder>
   </appender>
   <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="FILE">
@@ -15,7 +15,7 @@
       <totalSizeCap>200MB</totalSizeCap>
     </rollingPolicy>
     <encoder>
-      <pattern>%d{dd MMM yyyy HH:mm:ss,SSS} [%level] %date %thread %logger - %message%n%xException</pattern>
+      <pattern>%d{dd MMM yyyy HH:mm:ss,SSS} [%level] %date %thread %logger %line - %message%n%xException</pattern>
     </encoder>
   </appender>
   <logger level="DEBUG" name="sncr.xdf">
