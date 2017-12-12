@@ -33,9 +33,11 @@ RUN sed -i -e '/^export SPARK_MASTER_[A-Z]*=localhost$/d' \
     /opt/mapr/spark/spark-current/conf/spark-env.sh
 
 # Add MapR container initialization script
-ADD saw-mapr-init /root/
+COPY saw-mapr-init /root/
 RUN sed -i -e 's,while true,/root/saw-mapr-init\nwhile true,' \
     /usr/bin/init-script
+# Workaround: Set execute bit for Windows users
+RUN chmod a+x /root/saw-mapr-init
 
 # Try reducing MapR container startup time
 RUN sed -i -e 's/^sleep 60/sleep 30/' /usr/bin/init-script

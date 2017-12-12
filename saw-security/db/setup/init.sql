@@ -10,5 +10,3 @@ FLUSH PRIVILEGES;
 
 -- Initialize SAW Security database
 CREATE DATABASE saw_security;
-CREATE USER 'saw_security'@'localhost' IDENTIFIED BY 'saw_security';
-GRANT ALL ON saw_security.* TO 'saw_security'@'localhost';

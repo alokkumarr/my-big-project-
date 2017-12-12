@@ -236,6 +236,47 @@ export const ReportGridContainerComponent = {
       }
     }
 
+    formatColumn(columnName, datatype, format) {
+      forEach(this.columns, value => {
+        if (value.name === columnName) {
+          switch (format.type) {
+          case 'date':
+          case 'string-date':
+            value.type = 'date';
+            value.format = format.dateFormat;
+            break;
+          case 'timestamp':
+            value.type = 'date';
+            value.format = format.dateFormat;
+            break;
+          case 'number':
+            value.format = {
+              precision: 0,
+              type: 'fixedPoint',
+              comma: undefined,
+              currency: undefined,
+              currencySymbol: undefined
+            };
+            if (format.numberDecimal > -1) {
+              value.format.precision = format.numberDecimal;
+            }
+            if (format.commaSeparator) {
+              value.format.comma = true;
+            } else {
+              value.format.comma = false;
+            }
+            if (format.currencyFlag) {
+              value.format.currency = format.currencyCode;
+              value.format.currencySymbol = format.currencySymbol;
+            }
+            break;
+          default:
+            break;
+          }
+        }
+      });
+    }
+
     hideColumn(columnName) {
       const column = find(this.columns, column => column.name === columnName);
 

@@ -3,8 +3,9 @@ package controllers
 import java.time.Instant
 import java.util
 import java.util.UUID
+
 import com.synchronoss.querybuilder.{EntityType, SAWElasticSearchQueryBuilder, SAWElasticSearchQueryExecutor}
-import model.{ClientException, PaginateDataSet, QueryBuilder}
+import model.{ClientException, PaginateDataSet, QueryBuilder, TransportUtils}
 import org.json4s.JsonAST.{JArray, JLong, JObject, JString, JValue, JBool => _, JField => _, JInt => _, JNothing => _}
 import org.json4s.JsonDSL._
 import org.json4s._
@@ -24,7 +25,6 @@ import com.synchronoss.querybuilder.SAWElasticSearchQueryBuilder
 import com.synchronoss.BuilderUtil
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
-import collection.JavaConverters._
 
 import executor.ReportExecutorQueue
 import sncr.metadata.engine.{Fields, MetadataDictionary}
@@ -67,6 +67,10 @@ class Analysis extends BaseController {
     }).map(analysis => {
       /* Return only schedule view */
       ("id", (analysis \ "id")) ~
+      ("name",(analysis \ "name")) ~
+      ("description",(analysis \ "description")) ~
+      ("metricName",(analysis \ "metricName")) ~
+      ("userFullName",(analysis \ "userFullName")) ~
       ("schedule", (analysis \ "schedule"))
     })
     ("analyses", analyses)
@@ -153,7 +157,12 @@ class Analysis extends BaseController {
           case keys: JObject => keys
           case obj => throw new ClientException("Expected object, got: " + obj)
         }
-        json merge contentsAnalyze(searchAnalysisJson(keys))
+        m_log.debug("search key"+keys);
+        val categoryId = extractKey(json, "categoryId")
+        if (TransportUtils.checkIfPrivateAnalysis(ticket.get.product,categoryId) && !ticket.get.roleType.equalsIgnoreCase("Admin"))
+          json merge contentsAnalyze(searchAnalysisJson(keys),ticket.get.userId.toString)
+        else
+          json merge contentsAnalyze(searchAnalysisJson(keys))
       }
       case "execute" => {
 
@@ -304,6 +313,16 @@ class Analysis extends BaseController {
 
   private def contentsAnalyze(analyses: List[JObject]): JObject = {
     ("contents", ("analyze", JArray(analyses)))
+  }
+
+  /**
+    * Return the list of analysis created in my analysis category by requested user.
+    * @param analyses
+    * @param userId
+    * @return
+    */
+  private def contentsAnalyze(analyses: List[JObject], userId: String): JObject = {
+    ("contents", ("analyze", JArray(analyses.filter(_.values.get("userId").get==userId.toInt))))
   }
 
   var result: String = null

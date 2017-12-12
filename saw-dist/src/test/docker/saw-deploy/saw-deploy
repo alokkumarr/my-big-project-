@@ -10,4 +10,11 @@ trap "journalctl -u saw-\* > /build/saw-system.log" EXIT
 
 cd /maven
 tar -xzf saw-*.tgz
+
+# Workaround: Building on Windows causes execute permissions on files
+# getting lost, and the permissions "auto" setting on the Docker Maven
+# plug-in does not seem to help, so set the execute bit explicitly
+# here as a workaround.
+chmod a+x saw/saw-deploy
+
 saw/saw-deploy /root/saw-config

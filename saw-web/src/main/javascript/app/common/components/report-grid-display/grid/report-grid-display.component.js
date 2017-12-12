@@ -1,4 +1,5 @@
 import * as map from 'lodash/map';
+import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
 import * as moment from 'moment';
@@ -97,37 +98,85 @@ export const ReportGridDisplayComponent = {
       forEach(data, row => {
         forEach(keys, key => {
           const date = moment.tz(row[key], formats, true, BACKEND_TIMEZONE);
-          if (date.isValid()) {
+          if (date.isValid() && ['date', 'string-date', 'timestamp'].includes(this.checkColumndatatype(this.columns, key))) {
             row[key] = date.toDate();
           }
         });
       });
       return data;
     }
-
+    checkColumndatatype(columnList, columnName) {
+      let datatype = '';
+      forEach(columnList, column => {
+        if (column.columnName === columnName) {
+          datatype = column.type;
+        }
+      });
+      return datatype;
+    }
     _getDxColumns(columns) {
       return map(columns, column => {
-        if (column.type === 'string-date') {
+        if (column.type === 'timestamp' || column.type === 'string-date') {
           column.type = 'date';
         }
         const field = {
           alignment: 'left',
-          caption: column.aliasName || column.displayName,
+          caption: column.alias || column.displayName,
+          format: column.format,
           dataField: column.columnName || column.name,
           visibleIndex: column.visibleIndex,
           dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
           width: COLUMN_WIDTH
         };
-        if (DATE_TYPES.includes(column.type)) {
-          field.format = {
-            type: 'shortDate'
-          };
+
+        if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
+          field.format = 'shortDate';
         }
-        if (NUMBER_TYPES.includes(column.type)) {
+
+        if (NUMBER_TYPES.includes(column.type) && isUndefined(column.format)) {
           field.format = {
             type: 'fixedPoint',
+            comma: false,
             precision: 2
           };
+          field.customizeText = (data => {
+            const stringList = data.valueText.split(',');
+            let finalString = '';
+            forEach(stringList, value => {
+              finalString = finalString.concat(value);
+            });
+            return finalString;
+          });
+        }
+        if (NUMBER_TYPES.includes(column.type) && !isUndefined(column.format)) {
+          if (!isUndefined(column.format.currency)) {
+            field.customizeText = (data => {
+              if (!column.format.comma) {
+                const stringList = data.valueText.split(',');
+                let finalString = '';
+                forEach(stringList, value => {
+                  finalString = finalString.concat(value);
+                });
+                data.valueText = finalString;
+              }
+              if (!isUndefined(column.format.currencySymbol) && !isEmpty(data.valueText)) {
+                return column.format.currencySymbol + ' ' + data.valueText;
+              }
+              return data.valueText;
+            });
+          } else {
+            field.customizeText = (data => {
+              if (!column.format.comma) {
+                const stringList = data.valueText.split(',');
+                let finalString = '';
+                forEach(stringList, value => {
+                  finalString = finalString.concat(value);
+                });
+                data.valueText = finalString;
+              }
+              return data.valueText;
+            });
+          }
         }
         return field;
       });
@@ -138,7 +187,7 @@ export const ReportGridDisplayComponent = {
         const columns = this._getDxColumns(this.columns);
         forEach(columns, column => {
           if (column.dataType === 'date') {
-            column.dataType = 'string';
+            column.dataType = 'string-date';
           }
         });
         this._gridInstance.option('columns', columns);

@@ -71,6 +71,10 @@
   "ERROR_PIVOT_DATA_FIELD_REQUIRED": "You need to have at least one field in the data area!",
   "ERROR_X_Y_AXES_REQUIRED": "X, and Y axes are required!",
   "ERROR_X_Y_SIZEBY_AXES_REQUIRED": "X, Y axes and Size by option are required!",
+  "FORMAT":"Format",
+  "SHOW_COMMA_SEPARATORS": "Show Comma Separators",
+  "SPECIFY_NUMBER_DECIMALS":"Specify Number of Decimals (0-99)",
+  "SHOW_CURRENCY":"Show as Currency",
   "YEAR_TO_DATE": "YTD (Year to Date)",
   "MONTH_TO_DATE": "MTD (Month to Date)",
   "LAST_3_MONTHS": "Last 3 Months",
@@ -80,5 +84,6 @@
   "LAST_WEEK": "Last Week",
   "THIS_WEEK": "This Week",
   "LAST_2_WEEKS": "Last 2 Weeks",
-  "CUSTOM": "Custom"
+  "CUSTOM": "Custom",
+  "EMAIL_ERROR_MSG": "Invalid Email-Id Found: Please provide valid Email-Id's in list"
 }

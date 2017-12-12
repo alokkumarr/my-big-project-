@@ -4,7 +4,13 @@
 "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 <!-- Checkstyle configuration based on "sun_checks.xml" -->
 <module name="Checker">
-  <module name="NewlineAtEndOfFile"/>
+  <module name="NewlineAtEndOfFile">
+    <!-- Workaround: On Windows the line separator value enforced
+         defaults to the system default of CRLF, which does not match
+         the LF enforced by "* text=auto eol=lf" in ".gitattributes".
+         So set it explicitly to "lf" here. -->
+    <property name="lineSeparator" value="lf"/>
+  </module>
   <module name="TreeWalker">
     <!-- Naming conventions -->
     <module name="ConstantName"/>

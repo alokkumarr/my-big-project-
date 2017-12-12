@@ -62,9 +62,10 @@
       <properties>
         <saw.docker.port>80</saw.docker.port>
         <saw.docker.naming>alias</saw.docker.naming>
-        <saw.mapr.port>8443</saw.mapr.port>
-        <saw.spark.master.port>8080</saw.spark.master.port>
-        <saw.spark.worker.port>8081</saw.spark.worker.port>
+        <saw.mapr.port>18443</saw.mapr.port>
+        <saw.spark.master.port>18080</saw.spark.master.port>
+        <saw.spark.worker.port>18081</saw.spark.worker.port>
+        <saw.kibana.port>15601</saw.kibana.port>
         <saw.journal.port>19531</saw.journal.port>
         <!-- Show Docker image build output by default to keep users
              up to date on the progress, as it can take considerable

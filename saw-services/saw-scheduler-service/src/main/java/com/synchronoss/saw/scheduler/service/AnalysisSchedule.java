@@ -2,7 +2,10 @@ package com.synchronoss.saw.scheduler.service;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.antlr.v4.runtime.misc.Nullable;
 import org.immutables.value.Value;
+
+import java.util.List;
 
 /**
  * Analysis schedule view representation used when requesting
@@ -15,6 +18,13 @@ import org.immutables.value.Value;
 interface AnalysisSchedule {
     String id();
     Schedule schedule();
+    @Nullable
+    String name();
+    @Nullable
+    String description();
+    @Nullable
+    String metricName();
+    String userFullName();
 
     @Value.Immutable
     @JsonSerialize(as = ImmutableAnalysisSchedule.Schedule.class)
@@ -22,6 +32,9 @@ interface AnalysisSchedule {
     abstract class Schedule {
         abstract String repeatUnit();
         abstract Integer repeatInterval();
+        @Nullable
+        abstract String[] emails();
+
         @Value.Default
         DaysOfWeek repeatOnDaysOfWeek() {
             return ImmutableAnalysisSchedule.DaysOfWeek.builder()
@@ -34,7 +47,6 @@ interface AnalysisSchedule {
                 .saturday(false)
                 .build();
         }
-
     }
 
     @Value.Immutable

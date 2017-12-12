@@ -4,5 +4,11 @@ ext/saw-*.tgz
 #System Files
 .DS_Store
 Thumbs.db
-.idea/
-
+.idea
+.mvn
+.project
+.settings
+*.iml
+.classpath
+.factorypath
+.awcache

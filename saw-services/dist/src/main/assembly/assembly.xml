@@ -7,7 +7,7 @@
   <formats>
     <format>tgz</format>
   </formats>
-  <baseDirectory>saw-services</baseDirectory>                         
+  <baseDirectory>saw-services</baseDirectory>
   <moduleSets>
     <moduleSet>
       <useAllReactorProjects>true</useAllReactorProjects>
@@ -17,6 +17,7 @@
         <include>${project.groupId}:saw-scheduler-service</include>
         <include>${project.groupId}:saw-gateway-service</include>
         <include>${project.groupId}:saw-export-service</include>
+        <include>${project.groupId}:saw-observe-service</include>
       </includes>
       <binaries>
         <attachmentClassifier>rpm</attachmentClassifier>

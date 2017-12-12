@@ -458,7 +458,7 @@ public class UserRepositoryImpl implements UserRepository {
 
 		// Generic User Details
 		try {
-			String sql = "SELECT U.USER_ID,U.USER_SYS_ID,U.FIRST_NAME,U.MIDDLE_NAME,U.LAST_NAME,C.COMPANY_NAME,C.CUSTOMER_SYS_ID,C.CUSTOMER_CODE,C.LANDING_PROD_SYS_ID,R.ROLE_CODE,R.ROLE_TYPE,R.DATA_SECURITY_KEY "
+			String sql = "SELECT U.USER_ID,U.USER_SYS_ID,U.FIRST_NAME,U.MIDDLE_NAME,U.LAST_NAME,C.COMPANY_NAME,C.CUSTOMER_SYS_ID,C.CUSTOMER_CODE,C.LANDING_PROD_SYS_ID,R.ROLE_CODE,R.ROLE_TYPE "
 					+ "	FROM USERS U, CUSTOMERS C, ROLES R WHERE U.CUSTOMER_SYS_ID=C.CUSTOMER_SYS_ID AND R.ROLE_SYS_ID=U.ROLE_SYS_ID "
 					+ "	AND C.ACTIVE_STATUS_IND = U.ACTIVE_STATUS_IND AND  U.ACTIVE_STATUS_IND = R.ACTIVE_STATUS_IND AND R.ACTIVE_STATUS_IND = 1 AND U.USER_ID=? ";
 			TicketDetails ticketDetails = jdbcTemplate.query(sql, new PreparedStatementSetter() {
@@ -1494,7 +1494,7 @@ public class UserRepositoryImpl implements UserRepository {
 	public ArrayList<RoleDetails> getRoles(Long customerId) {
 		ArrayList<RoleDetails> roleList = null;
 		long roleId;
-		String sql = "SELECT R.ROLE_SYS_ID, R.CUSTOMER_SYS_ID, R.DATA_SECURITY_KEY, R.ROLE_NAME, R.ROLE_DESC,  R.ROLE_TYPE, R.ACTIVE_STATUS_IND"
+		String sql = "SELECT R.ROLE_SYS_ID, R.CUSTOMER_SYS_ID, R.ROLE_NAME, R.ROLE_DESC,  R.ROLE_TYPE, R.ACTIVE_STATUS_IND"
 				+ "  FROM ROLES R WHERE R.CUSTOMER_SYS_ID=?";
 		try {
 			roleList = jdbcTemplate.query(sql, new PreparedStatementSetter() {
@@ -1692,8 +1692,8 @@ public class UserRepositoryImpl implements UserRepository {
 		List<Long> featureSysIdList;
 		ArrayList<CustomerProductModuleFeature> cpmf = new ArrayList<CustomerProductModuleFeature>();
 		String sql = "INSERT INTO ROLES (CUSTOMER_SYS_ID, ROLE_NAME, ROLE_CODE, ROLE_DESC, ROLE_TYPE, "
-				+ "DATA_SECURITY_KEY, ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY ) "
-				+ "VALUES ( ?, ?, ?, ?, ?, ?, ?, SYSDATE(), ? ); ";
+				+ "ACTIVE_STATUS_IND, CREATED_DATE, CREATED_BY ) "
+				+ "VALUES ( ?, ?, ?, ?, ?, ?, SYSDATE(), ? ); ";
 		StringBuffer roleCode = new StringBuffer();
 		roleCode.append(role.getCustomerCode()).append("_").append(role.getRoleName()).append("_")
 				.append(role.getRoleType());
@@ -1707,14 +1707,9 @@ public class UserRepositoryImpl implements UserRepository {
 					preparedStatement.setString(3, roleCode.toString());
 					preparedStatement.setString(4, role.getRoleDesc());
 					preparedStatement.setString(5, role.getRoleType());
-					if (role.getDsk() != null) {
-						preparedStatement.setString(6, role.getDsk());
-					} else {
-						preparedStatement.setString(6, "NA");
-					}
 
-					preparedStatement.setLong(7, Integer.parseInt(role.getActiveStatusInd()));
-					preparedStatement.setString(8, role.getMasterLoginId());
+					preparedStatement.setLong(6, Integer.parseInt(role.getActiveStatusInd()));
+					preparedStatement.setString(7, role.getMasterLoginId());
 				}
 			});
 
@@ -1968,7 +1963,7 @@ public class UserRepositoryImpl implements UserRepository {
 		StringBuffer sql = new StringBuffer();
 		Valid valid = new Valid();
 		sql.append("UPDATE ROLES SET CUSTOMER_SYS_ID = ?, ROLE_NAME = ?, ROLE_CODE = ?, ROLE_DESC=?, ROLE_TYPE=?, "
-				+ " ACTIVE_STATUS_IND=?, MODIFIED_DATE = SYSDATE(), MODIFIED_BY = ?, DATA_SECURITY_KEY = ? WHERE ROLE_SYS_ID = ?");
+				+ " ACTIVE_STATUS_IND=?, MODIFIED_DATE = SYSDATE(), MODIFIED_BY = ? WHERE ROLE_SYS_ID = ?");
 		StringBuffer roleCode = new StringBuffer();
 		roleCode.append(role.getCustomerCode()).append("_").append(role.getRoleName()).append("_")
 				.append(role.getRoleType());
@@ -1982,8 +1977,7 @@ public class UserRepositoryImpl implements UserRepository {
 					preparedStatement.setString(5, role.getRoleType());
 					preparedStatement.setInt(6, Integer.parseInt(role.getActiveStatusInd()));
 					preparedStatement.setString(7, role.getMasterLoginId());
-					preparedStatement.setString(8, role.getDsk());
-					preparedStatement.setLong(9, role.getRoleSysId());
+					preparedStatement.setLong(8, role.getRoleSysId());
 				}
 			});
 

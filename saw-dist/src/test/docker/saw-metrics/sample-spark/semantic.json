@@ -9,7 +9,7 @@
         "dataSecurityKey": "",
         "type": "semantic",
         "module": "ANALYZE",
-        "metric": "Sample",
+        "metric": "sample-spark",
         "metricName": "Sample (report)",
         "customerCode": "SYNCHRONOSS",
         "disabled": "false",
@@ -29,35 +29,70 @@
         ],
         "artifacts": [
           {
-            "artifactName": "SAMPLE",
+            "artifactName": "SALES",
             "columns": [
               {
                 "name": "Country",
                 "columnName": "country",
                 "displayName": "Country",
                 "aliasName": "",
-                "table": "sample",
+                "table": "sales",
                 "type": "string",
                 "joinEligible": false,
                 "filterEligible": true
-              }
+              },
               {
                 "name": "Product",
                 "columnName": "product",
                 "displayName": "Product",
                 "aliasName": "",
-                "table": "sample",
+                "table": "sales",
                 "type": "string",
-                "joinEligible": false,
+                "joinEligible": true,
                 "filterEligible": true
-              }
+              },
               {
                 "name": "Units",
                 "columnName": "units",
                 "displayName": "Units",
                 "aliasName": "",
-                "table": "sample",
+                "table": "sales",
                 "type": "integer",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "Date",
+                "columnName": "date",
+                "displayName": "Date",
+                "aliasName": "",
+                "table": "sales",
+                "type": "date",
+                "joinEligible": false,
+                "filterEligible": true
+              }
+            ]
+          },
+          {
+            "artifactName": "PRODUCT",
+            "columns": [
+              {
+                "name": "Product",
+                "columnName": "product",
+                "displayName": "Product",
+                "aliasName": "",
+                "table": "product",
+                "type": "string",
+                "joinEligible": true,
+                "filterEligible": true
+              },
+              {
+                "name": "Description",
+                "columnName": "description",
+                "displayName": "Description",
+                "aliasName": "",
+                "table": "product",
+                "type": "string",
                 "joinEligible": false,
                 "filterEligible": true
               }
@@ -67,7 +102,11 @@
       },
       "base-relation": [
         {
-          "id": "@DATA_OBJECT_ID@",
+          "id": "@semantic-sales.json@",
+          "node-category": "DataObject"
+        },
+        {
+          "id": "@semantic-product.json@",
           "node-category": "DataObject"
         }
       ]
