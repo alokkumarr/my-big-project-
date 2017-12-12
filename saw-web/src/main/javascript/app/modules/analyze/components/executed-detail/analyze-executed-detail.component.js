@@ -11,7 +11,6 @@ import * as indexOf from 'lodash/indexOf';
 import * as slice from 'lodash/slice';
 import {json2csv} from 'json-2-csv';
 import * as keys from 'lodash/keys';
-import * as filter from 'lodash/filter';
 
 import {Events} from '../../consts';
 
@@ -166,7 +165,6 @@ export const AnalyzeExecutedDetailComponent = {
           type: 'string'
         }));
       }
-      return columns;
     }
 
     exportData() {

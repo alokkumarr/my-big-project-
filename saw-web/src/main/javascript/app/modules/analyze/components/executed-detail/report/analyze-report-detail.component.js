@@ -22,7 +22,7 @@ export const AnalyzeReportDetailComponent = {
 
     $onInit() {
       this.filters = map(this.analysis.sqlBuilder.filters, this._FilterService.backend2FrontendFilter(this.analysis.artifacts));
-      this.source().then(({data, count}) => {
+      this.source().then(({data}) => {
         this.columns = this._getColumns(this.analysis, data);
       });
     }
