@@ -19,5 +19,11 @@ touch $marker
 # Create database users
 mysql -u root < $dir/init.sql
 
+# Set root password
+set -o pipefail
+password=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 14)
+echo $password > /etc/bda/mariadb-root-password
+mysql -u root -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$password')"
+
 # Populate database
 python $dir/Initial_Setup.py --vars
