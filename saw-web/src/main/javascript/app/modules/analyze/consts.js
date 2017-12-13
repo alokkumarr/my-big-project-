@@ -156,6 +156,11 @@ export const ANALYSIS_METHODS = [
         label: 'Timeseries Line',
         icon: {font: 'icon-line-chart'},
         type: 'chart:tsline'
+      },
+      {
+        label: 'Timeseries Area',
+        icon: {font: 'icon-area-chart'},
+        type: 'chart:tsareaspline'
       }
     ]
   }

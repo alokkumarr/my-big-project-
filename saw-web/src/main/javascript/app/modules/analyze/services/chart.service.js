@@ -230,6 +230,7 @@ export class ChartService {
     case 'stack':
     case 'scatter':
     case 'tsline':
+    case 'tsareaspline':
     default:
       return config;
     }
@@ -283,16 +284,17 @@ export class ChartService {
     );
   }
 
-  splitToSeriesAndCategories(parsedData, fields, {sorts}) {
+  splitToSeriesAndCategories(parsedData, fields, {sorts}, type) {
     let series = [];
     const categories = {};
     const areMultipleYAxes = fields.y.length > 1;
     const isGrouped = fields.g;
 
     const fieldsArray = compact([fields.x, ...fields.y, fields.z, fields.g]);
-    // const dateFields = filter(fieldsArray, ({type}) => DATE_TYPES.includes(type));
-    // this.formatDatesIfNeeded(parsedData, dateFields);
-
+    if (type.substring(0, 2) !== 'ts') {         // check if Highstock timeseries(ts) or Highchart
+      const dateFields = filter(fieldsArray, ({type}) => DATE_TYPES.includes(type));
+      this.formatDatesIfNeeded(parsedData, dateFields);
+    }
     if (areMultipleYAxes) {
       series = this.splitSeriesByYAxes(parsedData, fields);
     } else if (isGrouped) {
@@ -340,8 +342,11 @@ export class ChartService {
         const dataPoint = clone(point);
         forEach(dataPoint, (v, k) => {
           if (this.isCategoryAxis(fields, k)) {
-            // dataPoint[k] = indexOf(categories[k], v);
-            dataPoint[k] = v;
+            if (type.substring(0, 2) !== 'ts') {
+              dataPoint[k] = indexOf(categories[k], v);
+            } else {
+              dataPoint[k] = v;
+            }
           }
         });
         return dataPoint;
@@ -605,7 +610,7 @@ export class ChartService {
     const labelOptions = get(opts, 'labelOptions', {enabled: true, value: 'percentage'});
 
     if (!isEmpty(gridData)) {
-      const {series, categories} = this.splitToSeriesAndCategories(gridData, fields, opts);
+      const {series, categories} = this.splitToSeriesAndCategories(gridData, fields, opts, type);
       const {chartSeries} = this.customizeSeriesForChartType(series, type, categories, fields, opts);
 
       forEach(chartSeries, seriesData => {
@@ -691,7 +696,7 @@ export class ChartService {
     });
 
     if (!isEmpty(gridData)) {
-      const {series, categories} = this.splitToSeriesAndCategories(gridData, fields, opts);
+      const {series, categories} = this.splitToSeriesAndCategories(gridData, fields, opts, type);
       changes.push({
         path: 'series',
         data: series
@@ -729,6 +734,7 @@ export class ChartService {
     case 'scatter':
     case 'bubble':
     case 'tsline':
+    case 'tsareaspline':
     default:
       changes = this.getBarChangeConfig(type, settings, fields, gridData, opts);
       break;
@@ -847,6 +853,7 @@ export class ChartService {
         groupBy
       };
       break;
+    case 'tsareaspline':
     case 'tsline':
       xaxis = this.filterDateTypes(attributes);
       settingsObj = {

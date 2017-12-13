@@ -45,9 +45,10 @@ export class ChartComponent {
 
   ngAfterViewInit() {
     this.config = defaultsDeep(this.options, chartOptions);
-    if (this.config.chart.type === 'tsline') {
+    if (this.config.chart.type.substring(0, 2) === 'ts') {
       this.isTimeSeries = true;
-      this.config.chart.type = 'line';
+      const tstype = this.config.chart.type.slice(2);
+      this.config.chart.type = tstype;
       this.chart = this.highstock.stockChart(this.container.nativeElement, this.config);
     } else {
       this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
