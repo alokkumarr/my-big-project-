@@ -10,6 +10,7 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMap from 'lodash/fp/map';
 import * as map from 'lodash/map';
 import * as unset from 'lodash/unset';
+import * as moment from 'moment';
 
 import * as template from './analyze-filter-modal.component.html';
 import style from './analyze-filter-modal.component.scss';
@@ -122,6 +123,10 @@ export const AnalyzeFilterModalComponent = {
     }
 
     isDateFilterInvalid(filter) {
+      if (DATE_TYPES.includes(filter.column.type) && filter.model.preset === 'NA') {
+        filter.model.lte = moment(filter.model.lte).utc().endOf('day').format('YYYY-MM-DD HH:mm:ss').toString();
+      }
+
       return DATE_TYPES.includes(filter.column.type) &&
         filter.model &&
         filter.model.preset === CUSTOM_DATE_PRESET_VALUE &&

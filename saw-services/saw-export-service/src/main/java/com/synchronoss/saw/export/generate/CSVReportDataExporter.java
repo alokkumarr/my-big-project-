@@ -7,8 +7,10 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+
 
 
 public class CSVReportDataExporter implements IFileExporter {
@@ -39,7 +41,12 @@ public class CSVReportDataExporter implements IFileExporter {
 	 * @return
 	 */
 	public StringBuffer rowMaker(String values, StringBuffer rowBuffer) {
-		if (values != null && !"".equals(values)) {
+	    if(rowBuffer.length()>0)
+        {
+            // append delimeter
+            rowBuffer.append(",");
+        }
+		if (values != null && !("".equals(values) || ("null".equalsIgnoreCase(values)))) {
 			rowBuffer.append("\"");
 			rowBuffer.append(values);
 			rowBuffer.append("\"");
@@ -50,22 +57,38 @@ public class CSVReportDataExporter implements IFileExporter {
 		return rowBuffer;
 	}
 	
-	public File generateFile(ExportExcelBean exportExcelBean, String fileName, List<StringBuffer> recordRowList) {
+	public File generateFile(ExportBean exportBean, List<Object> recordRowList) {
     	BufferedWriter writer = null;
     	 File file = null;
-    	logger.debug("User activity started here:" + this.getClass().getName()+ " generateCSV method");
+    	logger.debug(" Activity started here:" + this.getClass().getName()+ " generateCSV method");
         try {
-            logger.debug("User activity started here:" + this.getClass().getName()	+ " generateCSV method");
-            file = new File(fileName);
-            writer = new BufferedWriter( new FileWriter( fileName));
+           StringBuffer rowbuffer =null;
+           String [] header = null;
+            file = new File(exportBean.getFileName());
+            writer = new BufferedWriter( new FileWriter(exportBean.getFileName()));
             if(recordRowList != null){
-            	for(StringBuffer sb : recordRowList){
-                	String printLine = sb.toString();
+            	for(Object data : recordRowList){
+            		if(data instanceof LinkedHashMap) {
+            		    rowbuffer = new StringBuffer();
+            		    if (exportBean.getColumnHeader()==null || exportBean.getColumnHeader().length==0) {
+                            Object [] obj = ((LinkedHashMap) data).keySet().toArray();
+                             header = Arrays.copyOf(obj,
+                                        obj.length, String[].class);
+                            exportBean.setColumnHeader(header);
+                            writer.write(this.appendHeader(header).toString());
+                            writer.newLine();
+                        }
+            		  for (String val : header)
+            		  if (val instanceof String) {
+            		        String value = String.valueOf(((LinkedHashMap) data).get(val));
+                         rowbuffer = this.rowMaker(value ,rowbuffer);
+                      }
+                    }
+                	String printLine = rowbuffer.toString();
                     writer.write( printLine);
                     writer.newLine();
                 }
             }
-           
         }catch( Exception e) {
         	logger.error("Exception occured while writing CSV file:" + this.getClass().getName()+ " generateCSV method", e);
         } finally{
@@ -78,19 +101,9 @@ public class CSVReportDataExporter implements IFileExporter {
         	}
         }
         
-        logger.debug("User activity Ends here:" + this.getClass().getName()+ " generateCSV method");
+        logger.debug(" Activity Ends here:" + this.getClass().getName()+ " generateCSV method");
         return file;
     }
-	
-	public static boolean deleteCSVFile(File sourceFile,	boolean isDeleteSourceFile) throws IOException {
-		logger.debug(" Requested CSV file to deleted  :" + CSVReportDataExporter.class
-				+ sourceFile.getAbsolutePath());
-		if (!sourceFile.exists())
-			return false;
 
-		if (isDeleteSourceFile) {
-			sourceFile.delete();
-		}
-		return true;
-	}
+
 }

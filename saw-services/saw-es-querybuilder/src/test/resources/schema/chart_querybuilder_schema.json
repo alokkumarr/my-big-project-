@@ -194,6 +194,10 @@
               "id": "/properties/sqlBuilder/properties/sort/items/properties/columnName",
               "type": "string"
             },
+            "dateFormat": {
+              "id": "/properties/sqlBuilder/properties/sort/items/properties/dateFormat",
+              "type": "string"
+            },
             "type": {
               "enum": [
                 "date",

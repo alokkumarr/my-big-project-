@@ -13,6 +13,7 @@ import * as set from 'lodash/set';
 import * as get from 'lodash/get';
 import * as isArray from 'lodash/isArray';
 import {globalChartOptions, chartOptions} from './default-chart-options';
+import * as isUndefined from 'lodash/isUndefined';
 
 export const UPDATE_PATHS = {
   SERIES: 'series.0',
@@ -40,7 +41,6 @@ export class ChartComponent {
   ngAfterViewInit() {
     this.config = defaultsDeep(this.options, chartOptions);
     this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
-
     // if we have an updater$ observable, subscribe to it
     if (this.updater) {
       this.subscription = this.updater.subscribe({
@@ -62,7 +62,10 @@ export class ChartComponent {
       // Not using chart.update due to a bug with navigation
       // update and bar styles.
       this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
-
+      if (!isUndefined(this.config.xAxis)) {
+        this.config.xAxis.categories = [];
+      }
+      
       const pieNegatives = this.pieHasNegatives();
       if (pieNegatives.all) {
         // do nothing

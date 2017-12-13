@@ -192,7 +192,14 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
   def createAnalysisResult(resId: String = null, out: OutputStream = null): Unit = {
 
     createAnalysisResultHeader(resId)
-    saveData(analysisKey, outputLocation, outputType)
+    try {
+      saveData(analysisKey, outputLocation, outputType)
+    } catch {
+      case e: Exception => {
+        m_log.info("Error while saving data", e)
+        resultNode.addObject("error", e.toString, getSchema(analysisKey))
+      }
+    }
     finishedTS = System.currentTimeMillis
     val newDescriptor = JObject (resultNodeDescriptor.obj ++ List(
       JField("execution_finish_ts", JLong(finishedTS)),
