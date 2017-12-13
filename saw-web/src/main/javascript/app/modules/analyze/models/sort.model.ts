@@ -1,4 +1,4 @@
-export default interface Sort {
+export interface Sort {
   order:      string;
   columnName: string;
   type:       string;

@@ -69,6 +69,8 @@ import {
   DesignerSettingsSingleComponent,
   DesignerSettingsGroupComponent,
   ExpandableFieldComponent,
+  ToolbarActionDialogComponent,
+  DesignerSortComponent,
   DesignerService,
   ArtifactColumnFilterPipe,
   ArtifactColumns2PivotFieldsPipe
@@ -149,6 +151,8 @@ angular.module(AnalyzeModule, [
     DesignerSettingsSingleComponent,
     DesignerSettingsGroupComponent,
     ExpandableFieldComponent,
+    ToolbarActionDialogComponent,
+    DesignerSortComponent,
     ArtifactColumnFilterPipe,
     ArtifactColumns2PivotFieldsPipe
   ],
@@ -160,7 +164,9 @@ angular.module(AnalyzeModule, [
     DesignerPivotComponent,
     ExpandableFieldComponent,
     DesignerSettingsSingleComponent,
-    DesignerSettingsGroupComponent
+    DesignerSettingsGroupComponent,
+    ToolbarActionDialogComponent,
+    DesignerSortComponent
   ],
   providers: [
     AnalyzeDialogService,

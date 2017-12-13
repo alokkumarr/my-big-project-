@@ -1,7 +1,4 @@
-import {
-  ArtifactColumnPivot,
-  ArtifactColumnChart
-} from '../../models/artifact-column.model';
+
 import {
   SqlBuilder,
   SqlBuilderPivot
@@ -10,7 +7,13 @@ import {
   DesignerMode,
   AnalysisStarter,
   Analysis,
-  AnalysisType
+  AnalysisType,
+  Sort,
+  ArtifactColumnPivot,
+  ArtifactColumnChart,
+  ArtifactColumn,
+  ArtifactColumns,
+  IToolbarActionData
 } from '../../types';
 
 export {
@@ -20,11 +23,13 @@ export {
   DesignerMode,
   AnalysisStarter,
   AnalysisType,
-  SqlBuilder
+  SqlBuilder,
+  Sort,
+  ArtifactColumn,
+  ArtifactColumns,
+  IToolbarActionData
 };
 
-export type ArtifactColumns = ArtifactColumnPivot[] | ArtifactColumnChart[];
-export type ArtifactColumn = ArtifactColumnPivot | ArtifactColumnChart;
 
 export type ArtifactColumnFilter = {
   keyword: string,
@@ -59,3 +64,4 @@ export interface IDEsignerSettingGroupAdapter {
   // a callback to change soomething when the indexes change in artifactColumns
   onReorder: (artifactColumns: ArtifactColumns) => void;
 }
+

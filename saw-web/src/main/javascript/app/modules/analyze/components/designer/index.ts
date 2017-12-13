@@ -11,6 +11,8 @@ import {
   DesignerSettingsGroupComponent,
   ExpandableFieldComponent
 } from './settings';
+import { ToolbarActionDialogComponent } from './toolbar-action-dialog';
+import { DesignerSortComponent } from './sort';
 import { DesignerService } from './designer.service';
 import { ArtifactColumnFilterPipe } from './artifact-column-filter.pipe';
 
@@ -23,6 +25,8 @@ export {
   DesignerSettingsSingleComponent,
   DesignerSettingsGroupComponent,
   ExpandableFieldComponent,
+  ToolbarActionDialogComponent,
+  DesignerSortComponent,
   DesignerService,
   ArtifactColumnFilterPipe,
   ArtifactColumns2PivotFieldsPipe

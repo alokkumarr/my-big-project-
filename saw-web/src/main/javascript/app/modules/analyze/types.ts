@@ -2,6 +2,21 @@ import {
   AnalysisChart,
   AnalysisReport
 } from './models/analysis.model';
+import {
+  ArtifactColumnPivot,
+  ArtifactColumnChart
+} from './models/artifact-column.model';
+
+export type ArtifactColumns = ArtifactColumnPivot[] | ArtifactColumnChart[];
+export type ArtifactColumn = ArtifactColumnPivot | ArtifactColumnChart;
+import { Sort } from './models/sort.model';
+
+export {
+  ArtifactColumnPivot,
+  ArtifactColumnChart,
+  Sort
+};
+
 
 export type DesignerMode = 'edit' | 'fork' | 'new';
 export type AnalysisType = 'report' | 'chart' | 'pivot';
@@ -25,3 +40,11 @@ export type AnalysisDialogData = {
   analysisStarter?: AnalysisStarter,
   analysis?: Analysis
 };
+
+
+export interface IToolbarActionData {
+  action: 'description' | 'sort' | 'preview' | 'filter';
+  artifactColumns?: ArtifactColumns;
+  sorts?: Sort[];
+  description?: string;
+}

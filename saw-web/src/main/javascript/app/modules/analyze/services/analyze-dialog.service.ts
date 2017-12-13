@@ -4,9 +4,12 @@ import {MatDialog, MatDialogConfig} from '@angular/material';
 import {
   AnalysisDialogData,
   AnalysisStarter,
-  Analysis
+  Analysis,
+  Sort,
+  IToolbarActionData
 } from '../types';
-import { DesignerDialogComponent } from '../components/designer/dialog/designer-dialog.component';
+import { DesignerDialogComponent } from '../components/designer/dialog';
+import { ToolbarActionDialogComponent } from '../components/designer/toolbar-action-dialog';
 
 
 @Injectable()
@@ -34,6 +37,18 @@ export class AnalyzeDialogService {
       width: '100vw',
       maxWidth: '100vw',
       height: '100vh',
+      data
+    } as MatDialogConfig);
+  }
+
+  openSortDialog(sorts: Sort[]) {
+    const data: IToolbarActionData = {
+      action: 'sort',
+      sorts
+    }
+    this.dialog.open(ToolbarActionDialogComponent, {
+      width: 'auto',
+      height: 'auto',
       data
     } as MatDialogConfig);
   }
