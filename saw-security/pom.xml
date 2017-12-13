@@ -234,11 +234,6 @@
 			<groupId>org.ehcache</groupId>
 			<artifactId>ehcache-clustered</artifactId>
 		</dependency>
-    <dependency>
-      <groupId>org.springframework.shell</groupId>
-      <artifactId>spring-shell-starter</artifactId>
-      <version>2.0.0.M2</version>
-    </dependency>
     </dependencies>
 
     <build>
@@ -248,13 +243,14 @@
               How do I create a JAR containing the classes in my webapp?
               http://maven.apache.org/plugins/maven-war-plugin/faq.html#attached
             -->
-            <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.0.0</version>
-                <configuration>
-                    <attachClasses>true</attachClasses>
-                </configuration>
-            </plugin>
+          <plugin>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>3.0.0</version>
+            <configuration>
+              <attachClasses>true</attachClasses>
+              <classesClassifier>classes</classesClassifier>
+            </configuration>
+          </plugin>
 
             <plugin>
                 <groupId>org.springframework.boot</groupId>
