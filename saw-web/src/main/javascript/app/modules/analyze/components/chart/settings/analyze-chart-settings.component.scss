@@ -3,15 +3,6 @@ analyze-chart-settings {
     color: #C1C1C1;
   }
 
-  .truncated-field-name {
-    display: block;
-    margin-right: 10px;
-    max-width: 160px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
   md-radio-group {
     & > div {
       height: 40px;
@@ -51,11 +42,15 @@ analyze-chart-settings {
         .md-label {
           display: inline-block !important;
           width: 160px;
-          white-space: nowrap;
-          overflow: hidden !important;
-          text-overflow: ellipsis;
+          white-space: normal;
+          word-wrap: normal;
+          word-break: break-word;
         }
       }
     }
+  }
+
+  aggregate-chooser > md-menu > button > md-icon {
+    margin-left: 5px;
   }
 }
