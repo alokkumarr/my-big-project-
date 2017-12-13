@@ -112,7 +112,9 @@ db_conn_type = ''
 
 if sql_server_type == "MYSQL":
     log1.debug("Get the server|database name| user| password details from vars file")
-    db_info=str(vars_dict['db.init.server'])+'|'+str(vars_dict['db.init.dbname'])+'|'+str(vars_dict['db.init.user'])+'|'+str(vars_dict['db.init.password'])
+    with open('/etc/bda/saw-security-db-password', 'r') as f:
+        db_info_password = f.readline().strip()
+    db_info=str(vars_dict['db.init.server'])+'|'+str(vars_dict['db.init.dbname'])+'|'+str(vars_dict['db.init.user'])+'|'+db_info_password
 
     sql_str_list = db_info.split("|")
 
