@@ -1691,11 +1691,12 @@ td.Table_Data
 
 td.code
 {
-	font-family: monospace;
 	border: solid 1px #000000;
 	margin-left: 2em;
 	margin-right: 1em;
 	width: 90%;
+	font-family: 'Courier New';
+	padding-bottom: 0;
 }
 
 td.Note
@@ -1962,5 +1963,16 @@ div.together
 li.list_disc
 {
 	list-style-type: disc;
+}
+
+p.code_left
+{
+	font-family: monospace;
+	background-color: #ffffff;
+	margin-left: 0;
+	font-size: 1.2em;
+	mc-disable-glossary-terms: true;
+	margin-bottom: 0;
+	padding-left: 0;
 }
 
