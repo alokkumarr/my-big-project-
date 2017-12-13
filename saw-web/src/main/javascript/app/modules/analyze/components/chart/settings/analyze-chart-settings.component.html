@@ -39,13 +39,10 @@
                          ng-disabled="attr.disabled"
                          ng-change="$ctrl.inputChanged($ctrl.settings.yaxis, attr, 'y')"
                          style="align-self: flex-end;">
-              <span ng-bind="attr.displayName">
-              </span>
-
+              {{::attr.displayName}}
             </md-checkbox>
 
             <aggregate-chooser flex="20" ng-show="attr.checked"
-                               class="md-secondary"
                                artifact-column="attr"
                                on-select="$ctrl.onSelectAggregateType(aggregateType, attr, 'checkbox')">
             </aggregate-chooser>
