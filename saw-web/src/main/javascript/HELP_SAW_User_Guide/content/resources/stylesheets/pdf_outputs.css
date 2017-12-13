@@ -1989,3 +1989,14 @@ p.footer_copyright
 	margin-bottom: 2px;
 }
 
+p.code_left
+{
+	font-family: monospace;
+	background-color: #ffffff;
+	margin-left: 0;
+	font-size: 1.2em;
+	mc-disable-glossary-terms: true;
+	margin-bottom: 0;
+	padding-left: 0;
+}
+
