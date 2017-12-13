@@ -45,7 +45,7 @@ class UserService {
       .then(() => {
         this._JwtService.destroy();
         if (path === 'logout') {
-          this._$state.go('login');
+          this._$state.reload();
         }
       });
   }
