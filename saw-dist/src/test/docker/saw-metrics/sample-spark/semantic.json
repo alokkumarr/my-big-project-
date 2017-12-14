@@ -42,6 +42,16 @@
                 "filterEligible": true
               },
               {
+                "name": "long",
+                "type": "long",
+                "columnName": "long",
+                "displayName": "Long",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
                 "name": "float",
                 "type": "float",
                 "columnName": "float",
@@ -67,30 +77,40 @@
             "artifactName": "PRODUCT",
             "columns": [
               {
-                "name": "string",
+                "name": "string 2",
                 "type": "string",
-                "columnName": "string",
-                "displayName": "String",
+                "columnName": "string 2",
+                "displayName": "String 2",
                 "aliasName": "",
                 "table": "product",
                 "joinEligible": false,
                 "filterEligible": true
               },
               {
-                "name": "float",
+                "name": "long 2",
+                "type": "long",
+                "columnName": "long 2",
+                "displayName": "Long 2",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "float 2",
                 "type": "float",
-                "columnName": "float",
-                "displayName": "Float",
+                "columnName": "float 2",
+                "displayName": "Float 2",
                 "aliasName": "",
                 "table": "product",
                 "joinEligible": false,
                 "filterEligible": true
               },
               {
-                "name": "date",
+                "name": "date 2",
                 "type": "date",
-                "columnName": "date",
-                "displayName": "Date",
+                "columnName": "date 2",
+                "displayName": "Date 2",
                 "aliasName": "",
                 "table": "product",
                 "joinEligible": false,
