@@ -752,7 +752,7 @@ export class ChartService {
     // date -> just show the date
     const xStringValue = xIsString ?
       'point.key' : xIsNumber ?
-        'point.x:.2f' : 'point.x';
+        'point.x:,.2f' : 'point.x';
     const xAxisString = `<tr>
       <th>${fields.x.displayName}:</th>
       <td>{${xStringValue}}</td>
@@ -761,10 +761,10 @@ export class ChartService {
     const yIsSingle = fields.y.length === 1;
     const yAxisString = `<tr>
       <th>{series.name}:</th>
-      <td>{point.y:.2f}</td>
+      <td>{point.y:,.2f}</td>
     </tr>`;
     const zAxisString = fields.z ?
-    `<tr><th>${fields.z.displayName}:</th><td>{point.z:.2f}</td></tr>` :
+    `<tr><th>${fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>` :
     '';
     const groupString = fields.g ?
     `<tr><th>Group:</th><td>{point.g}</td></tr>` :
