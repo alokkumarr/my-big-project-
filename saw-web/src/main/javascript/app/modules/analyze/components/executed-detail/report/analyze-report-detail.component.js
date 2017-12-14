@@ -22,10 +22,12 @@ export const AnalyzeReportDetailComponent = {
 
     $onInit() {
       this.filters = map(this.analysis.sqlBuilder.filters, this._FilterService.backend2FrontendFilter(this.analysis.artifacts));
-      this.columns = this._getColumns(this.analysis);
+      this.source().then(({data}) => {
+        this.columns = this._getColumns(this.analysis, data);
+      });
     }
 
-    _getColumns(analysis, data = []) {
+    _getColumns(analysis, data) {
       /* If report was using designer mode, find checked columns */
       if (!analysis.edit) {
         return flatMap(analysis.artifacts, table => {
