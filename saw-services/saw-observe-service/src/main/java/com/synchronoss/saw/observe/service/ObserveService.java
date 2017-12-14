@@ -14,7 +14,6 @@ public interface ObserveService {
   String PortalDataSet = "PortalDataSet";
   public ObserveResponse addDashboard(Observe node) throws JSONValidationSAWException, CreateEntitySAWException;
   public ObserveResponse getDashboardbyCriteria(Observe node) throws JSONValidationSAWException, ReadEntitySAWException;
-  public ObserveResponse listOfDashboardByCriteria(int size) throws JSONValidationSAWException, ReadEntitySAWException;
   public ObserveResponse updateDashboard(Observe node) throws JSONValidationSAWException, UpdateEntitySAWException;
   public ObserveResponse deleteDashboard(Observe node) throws JSONValidationSAWException, DeleteEntitySAWException;
   public ObserveResponse generateId() throws JSONValidationSAWException;

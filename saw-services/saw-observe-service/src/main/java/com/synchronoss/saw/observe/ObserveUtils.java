@@ -1,6 +1,8 @@
 package com.synchronoss.saw.observe;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -19,6 +21,11 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
 import com.synchronoss.saw.observe.model.Observe;
 import com.synchronoss.saw.observe.model.ObserveNode;
+import com.synchronoss.saw.observe.model.ObserveResponse;
+import com.synchronoss.saw.observe.model.store.MetaDataStoreStructure;
+import com.synchronoss.saw.observe.model.store.MetaDataStoreStructure.Action;
+import com.synchronoss.saw.observe.model.store.MetaDataStoreStructure.Category;
+import com.synchronoss.saw.observe.model.store.Query;
 
 @Component
 public class ObserveUtils {
@@ -77,7 +84,26 @@ public class ObserveUtils {
     Observe observeTree = observeTreeNode.getObserve();
     return observeTree; 
   }
-
   
+  public static String node2JsonString(Observe node, String basePath, String Id, Action action, Category category) 
+      throws JsonProcessingException
+  {
+    ObjectMapper objectMapper = new ObjectMapper();
+    MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
+    if(node !=null){
+      String jsonObserve = "{ \"observe\" :" + objectMapper.writeValueAsString(node) + "}";
+      metaDataStoreStructure.setSource(jsonObserve);
+    }
+    if (Id !=null){
+      metaDataStoreStructure.setId(Id);
+    }
+    metaDataStoreStructure.setAction(action);
+    metaDataStoreStructure.setCategory(category);
+    metaDataStoreStructure.setXdfRoot(basePath);
+    List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
+    listOfMetadata.add(metaDataStoreStructure);
+   
+    return objectMapper.writeValueAsString(listOfMetadata);
+  }
   
 }

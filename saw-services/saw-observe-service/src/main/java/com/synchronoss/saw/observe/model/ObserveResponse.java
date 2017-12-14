@@ -64,4 +64,11 @@ public class ObserveResponse {
     this.additionalProperties.put(name, value);
   }
 
+  @Override
+  public String toString() {
+    return "ObserveResponse [message=" + message + ", id=" + id + ", observe=" + observe + "]";
+  }
+  
+  
+
 }

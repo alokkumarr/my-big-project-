@@ -98,17 +98,7 @@ public class ObserveController {
     return responseObjectFuture;
   }
 
-  @RequestMapping(value = "/dashboards/list", params = {"size"}, method = RequestMethod.GET)
-  @ResponseStatus(HttpStatus.OK)
-  public ObserveResponse listOfDashboard(HttpServletRequest request, HttpServletResponse response,
-      @RequestParam(name = "size", defaultValue = "10") int size) {
-    logger.debug("size {}", size);
-    ObserveResponse responseObjectFuture = null;
-    responseObjectFuture = observeService.listOfDashboardByCriteria(size);
-    return responseObjectFuture;
-  }
-
-  @RequestMapping(value = "/dashboards/update/{Id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/dashboards/update/{Id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   public ObserveResponse updateDashboard(HttpServletRequest request, HttpServletResponse response,
       @PathVariable(name = "Id", required = true) String Id, @RequestBody String requestBody) {
@@ -121,7 +111,7 @@ public class ObserveController {
     try {
       Observe observe = ObserveUtils.getObserveNode(requestBody, "observe");
       observe.setId(Id);
-      responseObjectFuture = observeService.addDashboard(observe);
+      responseObjectFuture = observeService.updateDashboard(observe);
     } catch (IOException e) {
       throw new JSONProcessingSAWException("expected missing on the request body");
     } catch (UpdateEntitySAWException ex) {
