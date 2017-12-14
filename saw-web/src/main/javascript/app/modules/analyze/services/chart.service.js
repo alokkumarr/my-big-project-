@@ -272,7 +272,7 @@ export class ChartService {
 
   parseLeaf(node, dataObj) {
     const dataFields = fpPipe(
-      fpOmit(['doc_count', 'key']),
+      fpOmit(['doc_count', 'key', 'key_as_string']),
       fpMapValues('value')
     )(node);
 
