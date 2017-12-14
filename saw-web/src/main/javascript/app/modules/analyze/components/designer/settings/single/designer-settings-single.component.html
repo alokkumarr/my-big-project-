@@ -1,39 +1,31 @@
-<div fxLayout="row" class="settings__container">
+<div class="settings__container">
 
-  <div (mouseenter)="expandUnselectedSection()"
-       class="settings__unselected-fields"
-       [dndSortableContainer]="dndSortableContainerObj"
-       [class.anim__expanded]="isUnselectedExpanded">
+  <div class="settings__filters">
+    <mat-form-field>
+      <input matInput type="text"
+              placeholder="Filter"
+              (input)="onTextFilterChange($event.target.value)"
+              [value]="filterObj.keyword"/>
+      <button mat-button *ngIf="filterObj.keyword"
+              matSuffix mat-icon-button
+              aria-label="Clear"
+              (click)="onTextFilterChange('')">
+        <mat-icon fontIcon="icon-close"></mat-icon>
+      </button>
+    </mat-form-field>
+    <mat-button-toggle-group (change)="onTypeFilterChange($event.value)">
+      <mat-button-toggle *ngFor="let typeIcon of TYPE_ICONS; trackBy: index"
+                          [value]="typeIcon.value">
+        <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+  <div class="settings__unselected-fields"
+       [dndSortableContainer]="dndSortableContainerObj">
     <div *ngIf="unselectedArtifactColumns">
-
-      <div class="settings__list-item">
-        <mat-form-field>
-          <input matInput type="text"
-                 placeholder="Filter"
-                 (input)="onTextFilterChange($event.target.value)"
-                 [value]="filterObj.keyword"/>
-          <button mat-button *ngIf="filterObj.keyword"
-                  matSuffix mat-icon-button
-                  aria-label="Clear"
-                  (click)="onTextFilterChange('')">
-            <mat-icon fontIcon="icon-close"></mat-icon>
-          </button>
-        </mat-form-field>
-      </div>
-
-      <div class="settings__list-item">
-        <mat-button-toggle-group (change)="onTypeFilterChange($event)">
-          <mat-button-toggle *ngFor="let typeIcon of TYPE_ICONS; trackBy: index"
-                             [value]="typeIcon.value">
-            <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
-          </mat-button-toggle>
-        </mat-button-toggle-group>
-      </div>
-
       <div *ngFor="let artifactColumn of (unselectedArtifactColumns | artifactColumnFilter:filterObj); trackBy: index"
            (click)="addToGroupIfPossible(artifactColumn)"
            [dndSortable]="artifactColumn"
-           (dndOnDrag)="onDrag()"
            (dndOnDragEnd)="onDragEnd($event)"
            class="settings__list-item">
         <span class="settings__list-item__name">
@@ -46,9 +38,7 @@
     </div>
   </div>
 
-  <div (mouseenter)="hideUnselectedSection()"
-       class="settings__selected-fields"
-       [class.anim__expanded]="!isUnselectedExpanded">
+  <div class="settings__selected-fields">
     <designer-settings-group *ngFor="let groupAdapter of groupAdapters; trackBy: index"
       (removeField)="removeFromGroup($event, groupAdapter)"
       (moveFrom)="onMove($event)"

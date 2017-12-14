@@ -42,8 +42,7 @@ export class DesignerSettingsSingleComponent {
 
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
   public TYPE_ICONS = TYPE_ICONS;
-  public unselectedArtifactColumns: ArtifactColumns
-  public isUnselectedExpanded: boolean = false;
+  public unselectedArtifactColumns: ArtifactColumns;
   public groupAdapters: IDEsignerSettingGroupAdapter[];
   public filterObj: ArtifactColumnFilter = {
     keyword: '',
@@ -54,7 +53,6 @@ export class DesignerSettingsSingleComponent {
     // so that you can't sort the unselected artifactColumns
     zone: 'zone'
   };
-  private _isDragging: boolean = false;
   private _moveEventAccumulator: {
     to: IMoveFieldToEvent,
     from: IMoveFieldFromEvent
@@ -96,25 +94,7 @@ export class DesignerSettingsSingleComponent {
     this.settingsChange.emit();
   }
 
-  hideUnselectedSection() {
-    this.isUnselectedExpanded = false;
-  }
-
-  expandUnselectedSection() {
-    if (this._isDragging) {
-      // don't expand unselected section while dragging
-      return;
-    }
-    this.isUnselectedExpanded = true;
-  }
-
-  onDrag() {
-    this._isDragging = true;
-    this.hideUnselectedSection();
-  }
-
   onDragEnd(event) {
-    this._isDragging = false;
     if (event.isDropSuccessful) {
       const artifactColumn = <ArtifactColumn> event.data;
       this.onMove({
@@ -123,9 +103,6 @@ export class DesignerSettingsSingleComponent {
         fromGroup: null
       });
     }
-    // if (event.isDropSuccessful) {
-    //   this._changeSettings();
-    // }
   }
 
   onMove(event) {
@@ -182,8 +159,8 @@ export class DesignerSettingsSingleComponent {
     this.filterObj.keyword = value;
   }
 
-  onTypeFilterChange(change) {
-    this.filterObj.type = change.value;
+  onTypeFilterChange(value) {
+    this.filterObj.type = value;
   }
 
   /**

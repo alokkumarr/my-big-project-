@@ -2,23 +2,26 @@
 
 designer-settings-single {
   .settings__container {
-    height: 100%;
-    width: 100%;
     overflow: hidden;
     background-color: white;
+    display: grid;
+    padding-left: 10px;
+    height: 100%;
+    grid-template:
+      "filters" 100px
+      "unselected-fields" 1fr
+      "selected-fields" 1fr
+      / 100%;
+  }
+
+  .settings__filters {
+    grid-area: filters;
   }
 
   .settings__unselected-fields {
+    grid-area: unselected-fields;
     overflow-x: hidden;
     overflow-y: auto;
-    padding-left: 5px;
-    transition: flex 300ms cubic-bezier(0.455, 0.03, 0.515, 0.955);
-    flex: 1 1 10%;
-    box-sizing: border-box;
-
-    &.anim__expanded {
-      flex: 9 9 90%;
-    }
   }
 
   .settings__list-item {
@@ -26,13 +29,12 @@ designer-settings-single {
     min-width: max-content;
 
     .settings__list-item__name {
-      // display: block;
       max-width: 250px;
-      white-space: nowrap;
-      overflow: hidden;
       font-weight: 600;
-      text-overflow: ellipsis;
       color: $primary-grey-g4;
+      white-space: normal;
+      word-wrap: normal;
+      word-break: break-word;
     }
 
     .settings__list-item__icon {
@@ -42,14 +44,8 @@ designer-settings-single {
   }
 
   .settings__selected-fields {
+    grid-area: selected-fields;
     overflow-x: hidden;
     overflow-y: auto;
-    box-shadow: -5px 0 10px #888;
-    flex: 1 1 10%;
-    transition: flex 300ms cubic-bezier(0.455, 0.03, 0.515, 0.955);
-
-    &.anim__expanded {
-      flex: 9 9 90%;
-    }
   }
 }
