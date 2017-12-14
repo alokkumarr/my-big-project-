@@ -1,6 +1,1 @@
-{
-  "country": "us",
-  "product": "test",
-  "units": 3,
-  "date": "2017-11-30 00:00:00"
-}
+{"string": "string 7", "long": 1006, "float": 1000.07, "date": "2017-12-08 00:00:00"}
