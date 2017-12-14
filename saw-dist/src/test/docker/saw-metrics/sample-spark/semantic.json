@@ -38,7 +38,7 @@
                 "displayName": "String",
                 "aliasName": "",
                 "table": "sales",
-                "joinEligible": false,
+                "joinEligible": true,
                 "filterEligible": true
               },
               {
@@ -103,7 +103,7 @@
                 "displayName": "String 2",
                 "aliasName": "",
                 "table": "product",
-                "joinEligible": false,
+                "joinEligible": true,
                 "filterEligible": true
               },
               {
