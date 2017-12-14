@@ -1,16 +1,20 @@
 package com.synchronoss.saw.observe.exceptions;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-public class TokenMissingSAWException extends ExportRuntimeSAWException {
+@ResponseStatus(value=HttpStatus.PRECONDITION_FAILED, reason="json body is missing in request body")
+public class JSONMissingSAWException extends ExportRuntimeSAWException {
 
     /**
    * 
    */
   private static final long serialVersionUID = 1L;
 
-    public TokenMissingSAWException(String msg) {
+    public JSONMissingSAWException(String msg) {
         super(msg);
 }
+    
 
 /**
  * Create a new BeansException with the specified message
@@ -18,7 +22,7 @@ public class TokenMissingSAWException extends ExportRuntimeSAWException {
  * @param msg the detail message
  * @param cause the root cause
  */
-public TokenMissingSAWException(String msg, Throwable cause) {
+public JSONMissingSAWException(String msg, Throwable cause) {
         super(msg, cause);
 }
 
@@ -28,10 +32,10 @@ public boolean equals(Object other) {
         if (this == other) {
                 return true;
         }
-        if (!(other instanceof TokenMissingSAWException)) {
+        if (!(other instanceof JSONMissingSAWException)) {
                 return false;
         }
-        TokenMissingSAWException otherBe = (TokenMissingSAWException) other;
+        JSONMissingSAWException otherBe = (JSONMissingSAWException) other;
         return (getMessage().equals(otherBe.getMessage()) &&
         		ExceptionSAWUtils.nullSafeEquals(getCause(), otherBe.getCause()));
 }

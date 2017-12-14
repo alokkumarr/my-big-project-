@@ -18,7 +18,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.mapr.db.MapRDB;
-import com.synchronoss.saw.store.metastore.UserInterfaceStore;
+import com.synchronoss.saw.store.metastore.PortalDataSetStore;
 
 /**
  * The class handles basic requests to Metadata Store
@@ -140,7 +140,8 @@ public class Request {
             logger.info("Start item processing, action: " + action + ", output: " + rFile);
 
             try {
-                os = HFileOperations.writeToFile(rFile);
+                if(rFile!=null){
+                os = HFileOperations.writeToFile(rFile);}
             } catch (FileNotFoundException e1) {
                 logger.error("Could not write response to file: " + rFile, e1);
                 return;
@@ -230,8 +231,8 @@ public class Request {
             case Transformation:
                 logger.warn("Not implemented yet");                
                break;
-            case UserInterface:
-              UserInterfaceStore tr = new UserInterfaceStore(xdfRoot);
+            case PortalDataSet:
+              PortalDataSetStore tr = new PortalDataSetStore(xdfRoot);
               searchResult = tr.search(maprDBCondition);
               break;   
             default:
@@ -316,8 +317,8 @@ public class Request {
             case Transformation:
                 logger.warn("Not implemented yet");
                 break;
-            case UserInterface:
-              UserInterfaceStore ts = new UserInterfaceStore(xdfRoot);
+            case PortalDataSet:
+              PortalDataSetStore ts = new PortalDataSetStore(xdfRoot);
               switch (action){
                   case create: ts.create(id, item); break;
                   case delete: ts.delete(id); break;
@@ -358,12 +359,13 @@ public class Request {
     private boolean analyzeAndValidate(JsonObject item) {
 
         try {
-            if (!(item.has("action") && item.has("output") && item.has("category"))){
+            if (!(item.has("action") && item.has("category"))){
                 logger.error("Action, output and category keys are mandatory");
                 return false;
             }
 
-            rFile = item.get("output").getAsString();
+            if (item.get("output").getAsString()!=null){
+            rFile = item.get("output").getAsString();}
             String a = item.get("action").getAsString();
             if (item.has("xdf-root"))
                 xdfRoot = item.get("xdf-root").getAsString();
@@ -461,7 +463,7 @@ public class Request {
         DataSet,
         AuditLog,
         DataPod,
-        UserInterface,
+        PortalDataSet,
         DataSegment;
     }
 
