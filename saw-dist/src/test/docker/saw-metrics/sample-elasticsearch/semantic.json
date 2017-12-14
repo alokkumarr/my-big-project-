@@ -112,6 +112,26 @@
                 "table": "sample",
                 "joinEligible": false,
                 "filterEligible": true
+              },
+              {
+                "name": "integer",
+                "type": "integer",
+                "columnName": "integer",
+                "displayName": "Integer",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "double",
+                "type": "double",
+                "columnName": "double",
+                "displayName": "Double",
+                "aliasName": "",
+                "table": "sales",
+                "joinEligible": false,
+                "filterEligible": true
               }
             ]
           }

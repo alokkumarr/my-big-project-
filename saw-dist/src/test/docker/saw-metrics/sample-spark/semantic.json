@@ -70,6 +70,26 @@
                 "table": "sales",
                 "joinEligible": false,
                 "filterEligible": true
+              },
+              {
+                "name": "integer",
+                "type": "integer",
+                "columnName": "integer",
+                "displayName": "Integer",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "double",
+                "type": "double",
+                "columnName": "double",
+                "displayName": "Double",
+                "aliasName": "",
+                "table": "sales",
+                "joinEligible": false,
+                "filterEligible": true
               }
             ]
           },
@@ -113,6 +133,26 @@
                 "displayName": "Date 2",
                 "aliasName": "",
                 "table": "product",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "integer 2",
+                "type": "integer",
+                "columnName": "integer 2",
+                "displayName": "Integer 2",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "double 2",
+                "type": "double",
+                "columnName": "double 2",
+                "displayName": "Double 2",
+                "aliasName": "",
+                "table": "sales",
                 "joinEligible": false,
                 "filterEligible": true
               }
