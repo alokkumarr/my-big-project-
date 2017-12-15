@@ -25,7 +25,6 @@
             <div layout="row" layout-align="start start">
               <span class="truncated-field-name">
                 {{ artifactColumn.alias || artifactColumn.displayName }}
-                <md-tooltip ng-bind="artifactColumn.alias || artifactColumn.displayName"></md-tooltip>
               </span>
               <md-icon md-font-icon="{{$ctrl.ARTIFACT_ICON_TYPES_OBJ[artifactColumn.type].icon}}">
                 <md-tooltip ng-bind="$ctrl.ARTIFACT_ICON_TYPES_OBJ[artifactColumn.type].tooltip | translate"></md-tooltip>
