@@ -86,6 +86,25 @@ export const COMBO_TYPES_OBJ = fpPipe(
   fpMapValues(v => v[0])
 )(COMBO_TYPES);
 
+export const TSCOMBO_TYPES = [{
+  label: 'line',
+  value: 'tsline',
+  icon: 'icon-line-chart'
+}, {
+  label: 'column',
+  value: 'tscolumn',
+  icon: 'icon-vert-bar-chart'
+}, {
+  label: 'area',
+  value: 'tsareaspline',
+  icon: 'icon-area-chart'
+}];
+
+export const TSCOMBO_TYPES_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(TSCOMBO_TYPES);
+
 export const ANALYSIS_METHODS = [
   {
     label: 'TABLES',

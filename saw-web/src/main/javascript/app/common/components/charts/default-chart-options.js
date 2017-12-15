@@ -92,6 +92,9 @@ export const stockChartOptions = {
         fillColor: null,
         lineWidth: 2,
         lineColor: null // inherit from series
+      },
+      dataGrouping: {
+        enabled: false
       }
     }
   },
@@ -112,7 +115,7 @@ export const stockChartOptions = {
     enabled: true,
     useHTML: true,
     valueDecimals: 2,
-    split: true,
+    split: false,
     headerFormat: '<span style="font-size: 12px; opacity: 0.8;">{point.key}</span><br/>',
     pointFormat: '<span style="color:{point.color}; stroke: white; stroke-width: 2; ' +
       'font-size: 25px;">\u25CF</span> {series.name}: <b>{point.y}</b><br/>'

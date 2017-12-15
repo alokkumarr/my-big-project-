@@ -289,9 +289,10 @@ export class ChartService {
     const categories = {};
     const areMultipleYAxes = fields.y.length > 1;
     const isGrouped = fields.g;
+    const isHighStock = type.substring(0, 2) === 'ts';
 
     const fieldsArray = compact([fields.x, ...fields.y, fields.z, fields.g]);
-    if (type.substring(0, 2) !== 'ts') {         // check if Highstock timeseries(ts) or Highchart
+    if (!isHighStock) {         // check if Highstock timeseries(ts) or Highchart
       const dateFields = filter(fieldsArray, ({type}) => DATE_TYPES.includes(type));
       this.formatDatesIfNeeded(parsedData, dateFields);
     }
@@ -342,7 +343,7 @@ export class ChartService {
         const dataPoint = clone(point);
         forEach(dataPoint, (v, k) => {
           if (this.isCategoryAxis(fields, k)) {
-            if (type.substring(0, 2) !== 'ts') {
+            if (!isHighStock) {
               dataPoint[k] = indexOf(categories[k], v);
             } else {
               dataPoint[k] = v;
@@ -369,6 +370,10 @@ export class ChartService {
     case 'line':
       return 'spline';
     case 'area':
+      return 'areaspline';
+    case 'tsline':
+      return 'line';
+    case 'tsareaspline':
       return 'areaspline';
     default:
       return type;
@@ -779,7 +784,7 @@ export class ChartService {
     `<tr><th>Group:</th><td>{point.g}</td></tr>` :
     '';
 
-    const tooltipObj = {
+    let tooltipObj = {
       useHTML: true,
       headerFormat: `<table> ${xIsString ? xAxisString : ''}`,
       pointFormat: `${xIsNumber ? xAxisString : ''}
@@ -789,6 +794,21 @@ export class ChartService {
       footerFormat: '</table>',
       followPointer: true
     };
+
+    if (type.substring(0, 2) === 'ts') {
+      tooltipObj = {
+        enabled: true,
+        useHTML: true,
+        valueDecimals: 3,
+        split: true,
+        shared: false,
+        pointFormat: `</table> ${yAxisString}
+          ${zAxisString}
+          ${groupString}`,
+        footerFormat: '</table>',
+        followPointer: true
+      };
+    }
 
     changes.push({
       path: 'tooltip',
