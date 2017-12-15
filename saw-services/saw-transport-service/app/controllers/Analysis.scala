@@ -13,6 +13,7 @@ import org.json4s.native.JsonMethods._
 import play.mvc.Result
 import sncr.analysis.execution.ExecutionTaskHandler
 import sncr.datalake.DLConfiguration
+import sncr.datalake.TimeLogger._
 import sncr.datalake.engine.ExecutionType
 import sncr.metadata.analysis.AnalysisNode
 import sncr.metadata.analysis.AnalysisResult
@@ -166,41 +167,43 @@ class Analysis extends BaseController {
       }
       case "execute" => {
 
-        m_log.trace("dataSecurityKey before processing in execute: {}", dataSecurityKey);
-        var dskStr : String = ""
-        if(dataSecurityKey.size()>0){
-          //dskStr = dataSecurityKey.asScala.mkString(",") ;
-          dskStr = BuilderUtil.constructDSKCompatibleString(BuilderUtil.listToJSONString(dataSecurityKey));
-          m_log.trace("dskStr after processing in execute: {}", dskStr);
-        }
+        logWithTime(m_log, "Execute analysis from controller", {
+          m_log.trace("dataSecurityKey before processing in execute: {}", dataSecurityKey);
+          var dskStr : String = ""
+          if(dataSecurityKey.size()>0){
+            //dskStr = dataSecurityKey.asScala.mkString(",") ;
+            dskStr = BuilderUtil.constructDSKCompatibleString(BuilderUtil.listToJSONString(dataSecurityKey));
+            m_log.trace("dskStr after processing in execute: {}", dskStr);
+          }
 
-        val analysisId = extractAnalysisId(json)
-	var executionType: String = null
-        var queryRuntime: String = null
-        (json \ "contents" \ "analyze") match {
-          case obj: JArray => {
-            val analysis = analysisJson(json, dskStr)
-            val analysisType = (analysis \ "type")
-    	    val typeInfo = analysisType.extract[String]
-    	    if (typeInfo.equals("report"))
-    	    {
-	      /* Build query based on analysis supplied in request body */
-              executionType = (analysis \ "executionType").extractOrElse[String]("onetime")
-	      val runtime = (executionType == "onetime")
-              m_log.debug("Execution type: {}", executionType)
-            m_log.trace("dskStr after processing inside execute block before runtime: {}", dskStr);
-            m_log.trace("runtime execute block before queryRuntime: {}", runtime);
-              queryRuntime = (analysis \ "queryManual") match {
-                case JNothing => QueryBuilder.build(analysis, runtime, dskStr)
-                case obj: JString => obj.extract[String]
-                case obj => unexpectedElement("string", obj)
-              }
-          }}
-          case _ => {}
-        }
-        m_log.trace("dskStr after processing inside execute block before Execute analysis and return result data : {}", dskStr);
-        val data = executeAnalysis(analysisId, executionType, queryRuntime, json, dskStr)
-        contentsAnalyze(("data", data)~ ("totalRows",totalRows))
+          val analysisId = extractAnalysisId(json)
+	  var executionType: String = null
+          var queryRuntime: String = null
+            (json \ "contents" \ "analyze") match {
+            case obj: JArray => {
+              val analysis = analysisJson(json, dskStr)
+              val analysisType = (analysis \ "type")
+    	      val typeInfo = analysisType.extract[String]
+    	      if (typeInfo.equals("report"))
+    	      {
+	        /* Build query based on analysis supplied in request body */
+                executionType = (analysis \ "executionType").extractOrElse[String]("onetime")
+	        val runtime = (executionType == "onetime")
+                m_log.debug("Execution type: {}", executionType)
+                m_log.trace("dskStr after processing inside execute block before runtime: {}", dskStr);
+                m_log.trace("runtime execute block before queryRuntime: {}", runtime);
+                queryRuntime = (analysis \ "queryManual") match {
+                  case JNothing => QueryBuilder.build(analysis, runtime, dskStr)
+                  case obj: JString => obj.extract[String]
+                  case obj => unexpectedElement("string", obj)
+                }
+              }}
+            case _ => {}
+          }
+          m_log.trace("dskStr after processing inside execute block before Execute analysis and return result data : {}", dskStr);
+          val data = executeAnalysis(analysisId, executionType, queryRuntime, json, dskStr)
+          contentsAnalyze(("data", data)~ ("totalRows",totalRows))
+        })
 
       }
       case "delete" => {
@@ -543,39 +546,41 @@ class Analysis extends BaseController {
       //TODO:: Subject to change: to get ALL data use:  val resultData = execution.getAllData
       //TODO:: DLConfiguration.rowLimit can be replace with some Int value
 
-      var data: JValue = null
-      var resultData : java.util.List[java.util.Map[String, (String, Object)]] = null
+      logWithTime(m_log, "Load execution result", {
+        var data: JValue = null
+        var resultData : java.util.List[java.util.Map[String, (String, Object)]] = null
 
-      if (PaginateDataSet.INSTANCE.getCache(analysisResultId) != null && PaginateDataSet.INSTANCE.getCache(analysisResultId).get(0).size()>0)
-      {
-        m_log.trace("when data is available in cache analysisResultId: {}", analysisResultId);
-        m_log.trace("when data is available in cache size of limit {}", limit);
-        m_log.trace("when data is available in cache size of start {}", start);
-        data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisResultId));
-        totalRows = PaginateDataSet.INSTANCE.sizeOfData();
-        m_log.trace("totalRows {}", totalRows);
-      }
-      else {
-        /* Load execution results from data lake (instead of from Spark driver) */
-        resultData = execution.loadExecution(execution.getId, DLConfiguration.rowLimit)
-        m_log.trace("when data is not available in cache analysisResultId: {}", analysisResultId);
-        m_log.trace("when data is not available in cache size of limit {}", limit);
-        m_log.trace("when data is not available in cache size of start {}", start);
-        if (resultData !=null) {
-          m_log.trace("when data is not available fresh execution of resultData {}", resultData.size());
-          PaginateDataSet.INSTANCE.putCache(analysisResultId, resultData);
-          data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisResultId))
+        if (PaginateDataSet.INSTANCE.getCache(analysisResultId) != null && PaginateDataSet.INSTANCE.getCache(analysisResultId).get(0).size()>0)
+        {
+          m_log.trace("when data is available in cache analysisResultId: {}", analysisResultId);
+          m_log.trace("when data is available in cache size of limit {}", limit);
+          m_log.trace("when data is available in cache size of start {}", start);
+          data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisResultId));
           totalRows = PaginateDataSet.INSTANCE.sizeOfData();
-          m_log.info("totalRows {}", totalRows);
+          m_log.trace("totalRows {}", totalRows);
         }
         else {
-          data = JArray(List())
+          /* Load execution results from data lake (instead of from Spark driver) */
+          resultData = execution.loadExecution(execution.getId, DLConfiguration.rowLimit)
+          m_log.trace("when data is not available in cache analysisResultId: {}", analysisResultId);
+          m_log.trace("when data is not available in cache size of limit {}", limit);
+          m_log.trace("when data is not available in cache size of start {}", start);
+          if (resultData !=null) {
+            m_log.trace("when data is not available fresh execution of resultData {}", resultData.size());
+            PaginateDataSet.INSTANCE.putCache(analysisResultId, resultData);
+            data = processReportResult(PaginateDataSet.INSTANCE.paginate(limit, start, analysisResultId))
+            totalRows = PaginateDataSet.INSTANCE.sizeOfData();
+            m_log.info("totalRows {}", totalRows);
+          }
+          else {
+            data = JArray(List())
+          }
         }
-      }
-      m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}, created execution id: $analysisResultId"
-      m_log debug s"start:  ${analysis.getStartTS} , finished  ${analysis.getFinishedTS} "
-      m_log.trace("Spark SQL executor result: {}", pretty(render(data)))
-      data
+        m_log debug s"Exec code: ${execution.getExecCode}, message: ${execution.getExecMessage}, created execution id: $analysisResultId"
+        m_log debug s"start:  ${analysis.getStartTS} , finished  ${analysis.getFinishedTS} "
+        m_log.trace("Spark SQL executor result: {}", pretty(render(data)))
+        data
+      })
     }
   }
 
