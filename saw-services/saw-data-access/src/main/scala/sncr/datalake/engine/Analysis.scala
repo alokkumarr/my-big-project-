@@ -50,7 +50,7 @@ class Analysis(val analysisId : String) {
     new AnalysisExecution(an, execType, resultId)
   }
 
-  private def waitForResult(resultId: String, retries: Int = 20) {
+  private def waitForResult(resultId: String, retries: Int = 60) {
     if (!executionCompleted(resultId)) {
       waitForResultRetry(resultId, retries)
     }
@@ -72,7 +72,7 @@ class Analysis(val analysisId : String) {
       throw new RuntimeException("Timed out waiting for result: " + resultId)
     }
     m_log.debug("Waiting for result: {}", resultId)
-    Thread.sleep(3000)
+    Thread.sleep(1000)
     waitForResult(resultId, retries - 1)
   }
 
