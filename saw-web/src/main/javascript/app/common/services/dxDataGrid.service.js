@@ -13,6 +13,8 @@ export function dxDataGridService() {
   function getDefaultConfig() {
     return {
       columnAutoWidth: true,
+      columnMinWidth: 50,
+      columnResizingMode: 'nextColumn',
       allowColumnReordering: true,
       allowColumnResizing: true,
       showColumnHeaders: true,
@@ -21,6 +23,7 @@ export function dxDataGridService() {
       showBorders: false,
       rowAlternationEnabled: true,
       hoverStateEnabled: true,
+      wordWrapEnabled: true,
       scrolling: {
         mode: 'virtual'
       },
