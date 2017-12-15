@@ -65,6 +65,8 @@ const getAnalysisActionOptions = name => {
 
 const getAnalysisOption = (parent, option) => parent.element(by.css(`button[e2e="actions-menu-selector-${option}"]`));
 
+const getAnalysisMenuButton = (analysisName) => element(by.xpath("//a[text()='" + analysisName + "']/../../../..//*[@e2e='actions-menu-toggle']"));
+
 const getChartSettingsRadio = (axis, name) => {
   return element(by.css(`md-radio-group[ng-model="$ctrl.selected.${axis}"]`))
     .element(by.css(`md-radio-button[e2e="radio-button-${name}"]`));
@@ -222,7 +224,8 @@ module.exports = {
     getForkBtn,
     getAnalysisOption,
     firstCardTitle,
-    getCardTypeByName: getCardTypeByName
+    getCardTypeByName: getCardTypeByName,
+    getAnalysisMenuButton: getAnalysisMenuButton
   },
   saveDialog: {
     selectedCategory: element(by.xpath('//md-select[@e2e="save-dialog-selected-category"]/*/span[1]')),
@@ -274,7 +277,8 @@ module.exports = {
     serviceProductStatus: element(by.css('.e2e-Service\\:PROD_OM_STATUS')),
     refreshDataBtn: element(by.css('[ng-click="$ctrl.onRefreshData()"]')),
     toggleDetailsPanel: element(by.css('[ng-click="$ctrl.toggleDetailsPanel()"]')),
-    reportGridContainer: element(by.css('.ard_details-grid'))
+    reportGridContainer: element(by.css('.ard_details-grid')),
+    cardMenuButton: element(by.css('button[e2e="actions-menu-toggle"]'))
   },
 
   validateCardView() {

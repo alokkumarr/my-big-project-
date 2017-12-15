@@ -6,13 +6,7 @@ const using = require('jasmine-data-provider');
 
 describe('Login Tests: login.test.js', () => {
 
-  const userDataProvider = {
-    'admin': {handle: users.admin.loginId},
-    'user': {handle: users.userOne.loginId},
-  };
-//Prerequisites: two users should exist with user types: admin and user
-  describe('Login Tests: login.test.js', () => {
-
+  //Prerequisites: two users should exist with user types: admin and user
     const userDataProvider = {
       'admin': {handle: users.admin.loginId},
       'user': {handle: users.userOne.loginId},
@@ -31,5 +25,4 @@ describe('Login Tests: login.test.js', () => {
         analyze.main.doAccountAction('logout');
       });
     });
-  })
 });

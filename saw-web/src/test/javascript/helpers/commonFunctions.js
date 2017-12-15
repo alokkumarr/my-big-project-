@@ -13,6 +13,7 @@ module.exports = {
       return browser.wait(EC.presenceOf(element), 10000);
     },
     elementToBeClickableAndClick: element => {
+      let count = true;
       browser.wait(EC.elementToBeClickable(element), 10000);
       element.click();
     },
