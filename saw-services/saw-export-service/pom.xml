@@ -23,6 +23,7 @@
 		<java.version>1.8</java.version>
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
+		<jwt.version>0.7.0</jwt.version>
 	</properties>
 
 	<dependencies>
@@ -49,6 +50,10 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		<dependency>
@@ -59,6 +64,12 @@
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<!-- io.jsonwebtoken -->
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>${jwt.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.fge</groupId>
@@ -117,7 +128,6 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.11-beta2</version>
 		</dependency>
-
 	</dependencies>
 
 	<build>
@@ -166,7 +176,7 @@
 			<plugin>
 				<groupId>de.dentrassi.maven</groupId>
 				<artifactId>rpm</artifactId>
-				<version>0.9.2</version>
+				<version>0.10.0</version>
 				<executions>
 					<execution>
 						<goals>

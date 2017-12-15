@@ -233,6 +233,9 @@ module.exports = function (env) {
     conf.plugins.push(new CopyWebpackPlugin([{
       from: webpackHelper.root('assets/i18n'),
       to: webpackHelper.root('dist/assets/i18n')
+    }, {
+      from: webpackHelper.root('src/main/javascript/HELP_SAW_User_Guide'),
+      to: webpackHelper.root('dist'),
     }]));
   }
 

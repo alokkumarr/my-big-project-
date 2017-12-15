@@ -1,0 +1,356 @@
+/* MadCap Table Style: */
+
+/*<meta Version="9" />*/
+
+mcTableStyle
+{
+	name: ColmnMiddle;
+	border-collapse: collapse;
+	max-id: 3;
+}
+
+mcTableColumnStyle
+{
+	span: 1;
+	name: Column1;
+	id: 0;
+}
+
+mcTableBodyStyle
+{
+	span: 1;
+	name: Body1;
+	id: 1;
+	vertical-align: middle;
+	cell-padding-left: 5px;
+	cell-padding-right: 5px;
+	cell-padding-top: 5px;
+	cell-padding-bottom: 5px;
+}
+
+
+/* Cell Styles: */
+ 
+.TableStyle-ColmnMiddle
+{
+	border-collapse: collapse;
+	border-spacing: 0px 0px;
+}
+
+.TableStyle-ColmnMiddle-Column-Column1
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadI-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadI-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadE-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadE-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadF-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadF-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadH-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadH-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadD-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadD-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadC-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadC-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadB-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadB-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadA-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadA-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadG-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-HeadG-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootI-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootI-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootE-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootE-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootF-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootF-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootH-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootH-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootD-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootD-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootC-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootC-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootB-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootB-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootA-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootA-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootG-Column1-
+{
+	
+}
+
+.TableStyle-ColmnMiddle-FootG-Column1- p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-Body-Body1
+{
+	
+}
+
+.TableStyle-ColmnMiddle-BodyI-Column1-Body1
+{
+	vertical-align: middle;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.TableStyle-ColmnMiddle-BodyI-Column1-Body1 p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-BodyE-Column1-Body1
+{
+	vertical-align: middle;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.TableStyle-ColmnMiddle-BodyE-Column1-Body1 p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-BodyF-Column1-Body1
+{
+	vertical-align: middle;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.TableStyle-ColmnMiddle-BodyF-Column1-Body1 p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-BodyH-Column1-Body1
+{
+	vertical-align: middle;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.TableStyle-ColmnMiddle-BodyH-Column1-Body1 p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-BodyD-Column1-Body1
+{
+	vertical-align: middle;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.TableStyle-ColmnMiddle-BodyD-Column1-Body1 p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-BodyC-Column1-Body1
+{
+	vertical-align: middle;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.TableStyle-ColmnMiddle-BodyC-Column1-Body1 p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-BodyB-Column1-Body1
+{
+	vertical-align: middle;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.TableStyle-ColmnMiddle-BodyB-Column1-Body1 p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-BodyA-Column1-Body1
+{
+	vertical-align: middle;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.TableStyle-ColmnMiddle-BodyA-Column1-Body1 p
+{
+	
+}
+
+.TableStyle-ColmnMiddle-BodyG-Column1-Body1
+{
+	vertical-align: middle;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.TableStyle-ColmnMiddle-BodyG-Column1-Body1 p
+{
+	
+}
+
+

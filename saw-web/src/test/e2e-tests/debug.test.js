@@ -1,5 +1,5 @@
 const login = require('../javascript/pages/common/login.po.js');
-const analyze = require('../javascript/pages/common/analyze.po.js');
+const analyze = require('../javascript/pages/common/analyzePage.po.js');
 
 describe('Debug logout', () => {
 

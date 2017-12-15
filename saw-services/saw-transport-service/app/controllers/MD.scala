@@ -46,7 +46,7 @@ class MD extends BaseServiceProvider {
       }
       handler.validate match {
         case (0, _) =>
-          return play.mvc.Results.ok(handler.execute)
+          return play.mvc.Results.ok(handler.execute).as("application/json")
         case (res_id: Int, r: String) => res.put("reason", r); res.put("result", ProcessingResult(res_id).toString)
       }
     }

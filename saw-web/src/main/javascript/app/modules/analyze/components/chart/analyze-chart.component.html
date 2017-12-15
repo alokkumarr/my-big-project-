@@ -103,6 +103,7 @@
            >
         <chart [updater]="$ctrl.updateChart"
                ng-if="$ctrl.designerState === $ctrl.designerStates.hasData"
+               e2e="{{'chart-type:' + $ctrl.model.chartType}}"
                [options]="$ctrl.chartOptions"></chart>
       </div>
       <md-card class="chart-container-card" ng-show="$ctrl.xAndYSelected()">

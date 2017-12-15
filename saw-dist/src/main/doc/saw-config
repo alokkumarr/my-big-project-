@@ -47,5 +47,24 @@ saw_elasticsearch_port=9200
 saw_elasticsearch_username=elastic
 saw_elasticsearch_password=elastic
 
+#
+# Outgoing email configuration
+#
+saw_email_protocol=smtp
+saw_email_host=localhost
+saw_email_port=25
+saw_email_username=
+saw_email_password=
+saw_email_from=noreply@example.com
+
 [saw-security]
 localhost
+
+[saw-security:vars]
+#
+# Outgoing email configuration
+#
+saw_security_email_protocol=smtp
+saw_security_email_host=localhost
+saw_security_email_port=25
+saw_security_email_from=noreply@example.com

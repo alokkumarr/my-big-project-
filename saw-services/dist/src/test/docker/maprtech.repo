@@ -1,7 +1,0 @@
-[maprtech]
-name=MapR Technologies
-baseurl=http://package.mapr.com/releases/v5.2.0/redhat
-enabled=1
-fastestmirror_enabled=0
-gpgcheck=1
-gpgkey=http://package.mapr.com/releases/pub/maprgpg.key

@@ -12,7 +12,7 @@ import style from './collapser.component.scss';
  */
 export const CollapserComponent = {
   bindings: {
-    title: '@',
+    heading: '@',
     action: '<'
   },
   transclude: true,

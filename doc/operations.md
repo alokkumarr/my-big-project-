@@ -13,7 +13,9 @@ provided in the environment:
 2. Install and configure Apache Spark version 2.1 from the MapR
    Ecosystem Pack on the MapR cluster
 
-3. Configure a MapR user in the MapR cluster (with user ID 500)
+3. Provision a MapR user in the MapR cluster (with user ID 500)
+
+3. Provision a mail relay host
 
 4. Provision a host to deploy from (the deploy host), running CentOS 7
    as the operating system.  This host will be used to run the deploy
@@ -130,6 +132,19 @@ To enable creating analyses in SAW, load semantic metadata as follows:
 
 The semantic metadata JSON is stored in the `<nodes-json>` file.
 
+## Semantic metadata
+
+Semantic metadata supports the following values for the `type`
+property:
+- integer
+- long
+- float
+- double
+- string
+- date
+
+Note: The paths to files in the data lake must not contain spaces.
+
 # Large header settings
 
 Include the below properties in NGINX server config file to support, http request with large header(more than 8K).
@@ -152,3 +167,50 @@ using the following commands:
 
 Please note that clearing the queues affects all users of the system
 and report execution types.
+
+# SAW Security: Creating a data security key (DSK)
+
+SAW supports row level filtering using a data security key.
+
+## Prerequisites
+
+DSK configured columns should be present in ALL of the data
+objects/artifacts referenced in the metrics.
+
+## Step 1: 
+
+Create the Security Group in SEC_GROUP table.
+    
+    ########################## Create SEC_GROUP samaple script ##############################
+    INSERT INTO `SEC_GROUP` (`SEC_GROUP_SYS_ID`, `ACTIVE_STATUS_IND`, `CREATED_DATE`, `CREATED_BY`)     VALUES ('1', '1', '2017-10-04', 'system');
+    
+## Step 2: 
+
+Create DSK attribute (fields/columns name) for corresponding security
+group (SEC_GROUP created in step 1).
+    
+    ########################## DSK Attribute Sample script #############################
+    INSERT INTO `sec_group_dsk_attribute` (`SEC_GROUP_DSK_ATTRIBUTE_SYS_ID`, `SEC_GROUP_SYS_ID`, `ATTRIBUTE_NAME`) VALUES ('1', '1', 'SESSION_ID');
+    INSERT INTO `sec_group_dsk_attribute` (`SEC_GROUP_DSK_ATTRIBUTE_SYS_ID`, `SEC_GROUP_SYS_ID`, `ATTRIBUTE_NAME`) VALUES ('2', '1', 'CONTENT_CLASS');
+    
+## Step 3: 
+
+Create DSK values for corresponding DSK attribute (DSK Attribute
+created in step 2).
+
+    ########################## DSK Value sample script ###############################
+    INSERT INTO `sec_group_dsk_value` (`SEC_GROUP_DSK_VALUE_SYS_ID`, `SEC_GROUP_DSK_ATTRIBUTE_SYS_ID`, `DSK_VALUE`) VALUES ('1', '1', 'AFF2948C-DCFF-4944-8553-51435518AF67');
+    INSERT INTO `sec_group_dsk_value` (`SEC_GROUP_DSK_VALUE_SYS_ID`, `SEC_GROUP_DSK_ATTRIBUTE_SYS_ID`, `DSK_VALUE`) VALUES ('2', '1', '945ca612-d3ad-4e6e-9c92-7cff86730235');
+    INSERT INTO `sec_group_dsk_value` (`SEC_GROUP_DSK_VALUE_SYS_ID`, `SEC_GROUP_DSK_ATTRIBUTE_SYS_ID`, `DSK_VALUE`) VALUES ('3', '2', 'VIDEOS'); 
+    
+## Step 4: 
+
+Map the SEC_GROUP to users to apply the DSK filter.
+    
+    ########################## Update User with DSK script ##############################
+    UPDATE USERS SET SEC_GROUP_SYS_ID = '3' WHERE USER_ID = 'analyst.dsk.mct.report';
+
+Important Note: If any metrics contains more than one data object as
+analysis for report then DSK attribute should be configured with
+dataObjectName.columnName. Example: For MCT_SESSION data object, DSK
+Attribute name should be MCT_SESSION.SESSION_ID.

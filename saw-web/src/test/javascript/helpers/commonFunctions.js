@@ -12,6 +12,10 @@ module.exports = {
     elementToBePresent: element => {
       return browser.wait(EC.presenceOf(element), 10000);
     },
+    elementToBeClickableAndClick: element => {
+      browser.wait(EC.elementToBeClickable(element), 10000);
+      element.click();
+    },
     // Possible options: /analyze/ , /login/
     pageToBeReady: pageName => {
       return browser.driver.wait(() => {
@@ -34,5 +38,9 @@ module.exports = {
     parent: element => {
       return element.element(by.xpath(`parent::*`));
     }
+  },
+  dismissDropdownMenu: () => {
+    element(by.css('md-backdrop')).click();
+    expect(element(by.css('md-backdrop')).isPresent()).toBe(false);
   }
 };

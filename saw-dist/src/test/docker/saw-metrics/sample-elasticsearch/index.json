@@ -1,0 +1,7 @@
+{
+  "mappings": {
+    "sample": {
+      "dynamic_date_formats": ["yyyy-MM-dd HH:mm:ss"]
+    }
+  }
+}

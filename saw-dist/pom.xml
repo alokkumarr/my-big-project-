@@ -79,6 +79,18 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.6.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+          <showDepreciation>true</showDepreciation>
+          <showWarnings>true</showWarnings>
+          <compilerArgument>-Xlint:all</compilerArgument>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
           <descriptors>
@@ -151,6 +163,10 @@
                       </fileSet>
                     </fileSets>
                   </inline>
+                  <!-- Workaround: Building on Windows causes execute
+                       permissions on files getting lost, so set to
+                       "auto" as a workaround. -->
+                  <permissions>auto</permissions>
                 </assembly>
               </build>
               <run>
@@ -159,7 +175,9 @@
                   <name>saw</name>
                 </network>
                 <ports>
-                  <port>saw.docker.port:80</port>
+                  <port>localhost:saw.docker.port:80</port>
+                  <port>localhost:saw.kibana.port:5601</port>
+                  <port>localhost:saw.journal.port:19531</port>
                 </ports>
                 <!-- Run privileged for systemd -->
                 <privileged>true</privileged>
@@ -194,9 +212,9 @@
                   <alias>saw-mapr</alias>
                 </network>
                 <ports>
-                  <port>saw.mcs.port:8443</port>
-                  <port>saw.spark.master.port:8080</port>
-                  <port>saw.spark.worker.port:8081</port>
+                  <port>localhost:saw.mapr.port:8443</port>
+                  <port>localhost:saw.spark.master.port:8080</port>
+                  <port>localhost:saw.spark.worker.port:8081</port>
                 </ports>
                 <!-- Run privileged for MapR -->
                 <privileged>true</privileged>

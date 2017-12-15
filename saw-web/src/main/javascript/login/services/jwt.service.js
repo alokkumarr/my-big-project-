@@ -134,6 +134,7 @@ export class JwtService {
      @opts should have either categoryId or subCategoryId field set.
      */
   hasPrivilege(name, opts) {
+    /* eslint-disable */
     if (!PRIVILEGE_INDEX[name]) {
       throw new Error(`Privilige ${name} is not supported!`);
     }
@@ -145,18 +146,7 @@ export class JwtService {
       module => module.productModName === opts.module
     ) || [];
 
-    let code = 0; // No privilege
-
-    if (opts.categoryId) {
-      const category = find(module.prodModFeature, feature => feature.prodModFeatureID.toString() === opts.categoryId.toString()) || {};
-      code = category.privilegeCode || 0;
-    }
-
-    if (opts.subCategoryId) {
-      const subCategories = flatMap(module.prodModFeature, feature => feature.productModuleSubFeatures);
-      const subCategory = find(subCategories, subFeature => subFeature.prodModFeatureID.toString() === opts.subCategoryId.toString()) || {};
-      code = subCategory.privilegeCode || 0;
-    }
+    const code = this.getCode(opts, module);
 
     switch (name) {
     case 'ACCESS':
@@ -170,16 +160,43 @@ export class JwtService {
     case 'FORK':
       return this._isSet(code, PRIVILEGE_INDEX.FORK);
     case 'EDIT':
-      return this._isSet(code, PRIVILEGE_INDEX.EDIT) &&
+      return this._isSet(code, PRIVILEGE_INDEX.EDIT) ||
         (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
     case 'EXPORT':
       return this._isSet(code, PRIVILEGE_INDEX.EXPORT);
     case 'DELETE':
-      return this._isSet(code, PRIVILEGE_INDEX.DELETE) &&
+      return this._isSet(code, PRIVILEGE_INDEX.DELETE) ||
         (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
     default:
       return false;
     }
+    /* eslint-enable */
+  }
+
+  getCode(opts, module) {
+
+    if (opts.subCategoryId) {
+      const subCategories = flatMap(
+        module.prodModFeature,
+        feature => feature.productModuleSubFeatures);
+      const subCategory = find(
+        subCategories,
+        subFeature => subFeature.prodModFeatureID.toString() === opts.subCategoryId.toString()
+      ) || {};
+
+      return subCategory.privilegeCode || 0;
+    }
+
+    if (opts.categoryId) {
+      const category = find(
+        module.prodModFeature,
+        feature => feature.prodModFeatureID.toString() === opts.categoryId.toString()
+      ) || {};
+
+      return category.privilegeCode || 0;
+    }
+    // No privilege
+    return 0;
   }
 }
 
