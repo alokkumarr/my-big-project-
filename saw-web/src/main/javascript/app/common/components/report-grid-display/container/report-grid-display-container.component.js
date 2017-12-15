@@ -2,6 +2,7 @@ import * as groupBy from 'lodash/groupBy';
 import * as map from 'lodash/map';
 import * as omit from 'lodash/fp/omit';
 import * as forEach from 'lodash/forEach';
+import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
 import * as moment from 'moment';
 import * as isUndefined from 'lodash/isUndefined';
@@ -51,13 +52,13 @@ export const ReportGridDisplayContainerComponent = {
     }
 
     formatDates(data) {
-      const keys = Object.keys(data[0]);
+      const ks = keys(data[0] || {});
       const formats = [
         moment.ISO_8601,
         'MM/DD/YYYY  :)  HH*mm*ss'
       ];
       forEach(data, data => {
-        forEach(keys, key => {
+        forEach(ks, key => {
           if (moment(data[key], formats, true).isValid()) {
             data[key] = moment(data[key]).format('MM/DD/YYYY');
           }

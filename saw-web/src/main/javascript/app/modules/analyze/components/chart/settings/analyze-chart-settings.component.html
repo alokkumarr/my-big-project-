@@ -39,14 +39,10 @@
                          ng-disabled="attr.disabled"
                          ng-change="$ctrl.inputChanged($ctrl.settings.yaxis, attr, 'y')"
                          style="align-self: flex-end;">
-              <span ng-bind="attr.displayName">
-                <md-tooltip ng-bind="attr.displayName"></md-tooltip>
-              </span>
-              
+              {{::attr.displayName}}
             </md-checkbox>
 
             <aggregate-chooser flex="20" ng-show="attr.checked"
-                               class="md-secondary"
                                artifact-column="attr"
                                on-select="$ctrl.onSelectAggregateType(aggregateType, attr, 'checkbox')">
             </aggregate-chooser>
@@ -65,8 +61,7 @@
                              ng-value="attr"
                              e2e="radio-button-{{::attr.displayName}}"
                              ng-disabled="attr.checked && attr.checked != 'x'">
-            <span class="truncated-field-name" ng-bind="::attr.displayName">
-              <md-tooltip ng-bind="::attr.displayName"></md-tooltip>
+            <span ng-bind="::attr.displayName">
             </span>
             </md-radio-button>
 
@@ -105,7 +100,6 @@
                              e2e="radio-button-{{::attr.displayName}}"
                              ng-disabled="attr.checked && attr.checked != 'z'">
             <span ng-bind="::attr.displayName">
-              <md-tooltip ng-bind="::attr.displayName"></md-tooltip>
             </span>
             </md-radio-button>
             <aggregate-chooser ng-show="attr.checked && attr.checked === 'z'"
@@ -129,7 +123,6 @@
                              e2e="radio-button-{{::attr.displayName}}"
                              ng-disabled="attr.checked && attr.checked != 'g'">
               <span ng-bind="::attr.displayName">
-                <md-tooltip ng-bind="::attr.displayName | translate"></md-tooltip>
               </span>
             </md-radio-button>
 

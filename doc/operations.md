@@ -132,6 +132,19 @@ To enable creating analyses in SAW, load semantic metadata as follows:
 
 The semantic metadata JSON is stored in the `<nodes-json>` file.
 
+## Semantic metadata
+
+Semantic metadata supports the following values for the `type`
+property:
+- integer
+- long
+- float
+- double
+- string
+- date
+
+Note: The paths to files in the data lake must not contain spaces.
+
 # Large header settings
 
 Include the below properties in NGINX server config file to support, http request with large header(more than 8K).

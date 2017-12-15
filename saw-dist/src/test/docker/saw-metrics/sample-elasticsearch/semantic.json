@@ -67,7 +67,7 @@
         "esRepository": {
           "storageType":"ES",
           "indexName":"sample",
-          "type":"type"
+          "type":"sample"
         },
         "artifacts": [
           {
@@ -98,6 +98,16 @@
                 "type": "long",
                 "columnName": "units",
                 "displayName": "Units",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "date",
+                "type": "date",
+                "columnName": "date",
+                "displayName": "Date",
                 "aliasName": "",
                 "table": "sample",
                 "joinEligible": false,
