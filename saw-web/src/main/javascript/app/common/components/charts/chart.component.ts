@@ -27,7 +27,7 @@ export const UPDATE_PATHS = {
 export class ChartComponent {
   @Input() updater: any;
   @Input() options: any;
-  @Input() isstockchart: any;
+  @Input() isStockChart: any;
   @ViewChild('container') container: ElementRef;
 
   private highcharts: any = Highcharts;
@@ -44,7 +44,7 @@ export class ChartComponent {
   ngAfterViewInit() {
     this.config = defaultsDeep(this.options, chartOptions);
     this.stockConfig = defaultsDeep(this.options, stockChartOptions);
-    if (this.isstockchart) {
+    if (this.isStockChart) {
       this.chart = this.highcharts.stockChart(this.container.nativeElement, this.stockConfig);
     } else {
       this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
@@ -69,8 +69,8 @@ export class ChartComponent {
 
       // Not using chart.update due to a bug with navigation
       // update and bar styles.
-      if (this.isstockchart) {
-        this.chart = this.highcharts.stockChart(this.container.nativeElement, this.stockConfig);
+      if (this.isStockChart) {
+        this.chart = this.highcharts.stockChart(this.container.nativeElement, this.config);
       } else {
         this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
       }

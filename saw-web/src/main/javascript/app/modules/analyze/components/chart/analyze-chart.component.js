@@ -74,7 +74,7 @@ export const AnalyzeChartComponent = {
       };
 
       this.updateChart = new BehaviorSubject({});
-      this.isstockchart = this.model.chartType.substring(0, 2) === 'ts';
+      this.isStockChart = this.model.chartType.substring(0, 2) === 'ts';
       this.settings = null;
       this.gridData = this.filteredGridData = [];
       this.labels = {
@@ -87,8 +87,8 @@ export const AnalyzeChartComponent = {
       this.chartViewOptions = ChartService.getViewOptionsFor(this.model.chartType);
       this.comboableCharts = ['column', 'bar', 'line', 'area', 'combo'];
       this.comboableTSCharts = ['tsline', 'tsareaspline'];
-      this.invertableCharts = [...this.comboableCharts, ...this.comboableTSCharts, 'stack'];
-      this.multyYCharts = this.invertableCharts;
+      this.invertableCharts = [...this.comboableCharts, 'stack'];
+      this.multyYCharts = [...this.invertableCharts, ...this.comboableTSCharts];
 
       this.designerStates = {
         noSelection: 'no-selection',
@@ -181,20 +181,27 @@ export const AnalyzeChartComponent = {
       }
 
       this.startDraftMode();
-      this.updateChart.next([
-        {
-          path: 'legend.align',
-          data: align.align
-        },
-        {
-          path: 'legend.verticalAlign',
-          data: align.verticalAlign
-        },
-        {
-          path: 'legend.layout',
-          data: layout.layout
-        }
-      ]);
+      if (this.isStockChart) {
+        this.chartOptions.legend.align = align.align;
+        this.chartOptions.legend.verticalAlign = align.verticalAlign;
+        this.chartOptions.legend.layout = layout.layout;
+        this.onRefreshData();
+      } else {
+        this.updateChart.next([
+          {
+            path: 'legend.align',
+            data: align.align
+          },
+          {
+            path: 'legend.verticalAlign',
+            data: align.verticalAlign
+          },
+          {
+            path: 'legend.layout',
+            data: layout.layout
+          }
+        ]);
+      }
     }
 
     updateLabelOptions() {
@@ -375,6 +382,7 @@ export const AnalyzeChartComponent = {
       set(payload, 'xAxis', {title: this.labels.x});
       set(payload, 'yAxis', {title: this.labels.y});
       set(payload, 'isInverted', this.isInverted);
+      set(payload, 'isStockChart', this.isStockChart);
       set(payload, 'legend', {
         align: this.legend.align,
         layout: this.legend.layout

@@ -463,7 +463,12 @@ export class ChartService {
 
   splitSeriesByGroup(parsedData, fields) {
     const axesFieldNameMap = this.getAxesFieldNameMap(fields);
-    const comboType = fields.y[0].comboType;
+    let comboType = fields.y[0].comboType;
+    if (angular.isDefined(comboType)) {
+      if (comboType.substring(0, 2) === 'ts') {
+        comboType = comboType.slice(2);
+      }
+    }
 
     return fpPipe(
       fpMap(dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])),
@@ -803,8 +808,7 @@ export class ChartService {
         split: true,
         shared: false,
         pointFormat: `</table> ${yAxisString}
-          ${zAxisString}
-          ${groupString}`,
+          ${zAxisString}`,
         footerFormat: '</table>',
         followPointer: true
       };
