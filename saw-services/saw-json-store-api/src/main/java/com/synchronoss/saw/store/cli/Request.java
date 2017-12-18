@@ -103,7 +103,13 @@ public class Request {
       this.xdfRoot = xdfRoot;
     }
 
+     public JsonElement getResult() {
+      return result;
+    }
 
+    public void setResult(JsonElement result) {
+      this.result = result;
+    }
 
     public void process(){
         try {

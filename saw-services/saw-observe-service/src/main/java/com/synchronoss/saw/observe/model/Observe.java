@@ -1,25 +1,31 @@
 package com.synchronoss.saw.observe.model;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"id", "categoryId", "name", "description", "options", "tiles", "filters"})
+@JsonPropertyOrder({"_id","entityId", "categoryId", "name", "description","createdBy","updatedBy","createdAt","updatedAt", "options", "tiles", "filters"})
 public class Observe {
-
-  @JsonProperty("id")
-  private String id;
+  
+  @JsonProperty("_id")
+  private String _id;
+  @JsonProperty("entityId")
+  private String entityId;
   @JsonProperty("categoryId")
   private String categoryId;
   @JsonProperty("name")
   private String name;
+  @JsonProperty("createdBy")
+  private String createdBy;
+  @JsonProperty("updatedBy")
+  private String updatedBy;
+  @JsonProperty("createdAt")
+  private String createdAt;
+  @JsonProperty("updatedAt")
+  private String updatedAt;
   @JsonProperty("description")
   private String description;
   @JsonProperty("options")
@@ -28,17 +34,26 @@ public class Observe {
   private List<Object> tiles = null;
   @JsonProperty("filters")
   private List<Object> filters = null;
-  @JsonIgnore
-  private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-  @JsonProperty("id")
-  public String getId() {
-    return id;
+  
+  @JsonProperty("_id")
+  public String get_id() {
+    return _id;
+  }
+  
+  @JsonProperty("_id")
+  public void set_id(String _id) {
+    this._id = _id;
   }
 
-  @JsonProperty("id")
-  public void setId(String id) {
-    this.id = id;
+  @JsonProperty("entityId")
+  public String getEntityId() {
+    return entityId;
+  }
+
+  @JsonProperty("entityId")
+  public void setEntityId(String entityId) {
+    this.entityId = entityId;
   }
 
   @JsonProperty("categoryId")
@@ -69,6 +84,39 @@ public class Observe {
   @JsonProperty("description")
   public void setDescription(String description) {
     this.description = description;
+  }
+  
+  @JsonProperty("createdBy")
+  public String getCreatedBy() {
+    return createdBy;
+  }
+  @JsonProperty("createdBy")
+  public void setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
+  }
+  @JsonProperty("updatedBy")
+  public String getUpdatedBy() {
+    return updatedBy;
+  }
+  @JsonProperty("updatedBy")
+  public void setUpdatedBy(String updatedBy) {
+    this.updatedBy = updatedBy;
+  }
+  @JsonProperty("createdAt")
+  public String getCreatedAt() {
+    return createdAt;
+  }
+  @JsonProperty("createdAt")
+  public void setCreatedAt(String createdAt) {
+    this.createdAt = createdAt;
+  }
+  @JsonProperty("updatedAt")
+  public String getUpdatedAt() {
+    return updatedAt;
+  }
+  @JsonProperty("updatedAt")
+  public void setUpdatedAt(String updatedAt) {
+    this.updatedAt = updatedAt;
   }
 
   @JsonProperty("options")
@@ -101,14 +149,5 @@ public class Observe {
     this.filters = filters;
   }
 
-  @JsonAnyGetter
-  public Map<String, Object> getAdditionalProperties() {
-    return this.additionalProperties;
-  }
-
-  @JsonAnySetter
-  public void setAdditionalProperty(String name, Object value) {
-    this.additionalProperties.put(name, value);
-  }
 
 }

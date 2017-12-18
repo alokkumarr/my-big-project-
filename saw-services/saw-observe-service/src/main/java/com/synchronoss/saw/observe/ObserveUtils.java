@@ -19,13 +19,13 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
+import com.synchronoss.saw.observe.model.Content;
 import com.synchronoss.saw.observe.model.Observe;
 import com.synchronoss.saw.observe.model.ObserveNode;
 import com.synchronoss.saw.observe.model.ObserveResponse;
 import com.synchronoss.saw.observe.model.store.MetaDataStoreStructure;
 import com.synchronoss.saw.observe.model.store.MetaDataStoreStructure.Action;
 import com.synchronoss.saw.observe.model.store.MetaDataStoreStructure.Category;
-import com.synchronoss.saw.observe.model.store.Query;
 
 @Component
 public class ObserveUtils {
@@ -104,6 +104,18 @@ public class ObserveUtils {
     listOfMetadata.add(metaDataStoreStructure);
    
     return objectMapper.writeValueAsString(listOfMetadata);
+  }
+  
+  public static ObserveResponse prepareResponse(Observe node, String message){
+    ObserveResponse createresponse = new ObserveResponse();
+    createresponse.setMessage(message);
+    createresponse.setId(node.get_id());
+    Content content = new Content();
+    List<Observe> listOfObserve = new ArrayList<>();
+    listOfObserve.add(node);
+    content.setObserve(listOfObserve);
+    createresponse.setContents(content);
+    return createresponse;
   }
   
 }

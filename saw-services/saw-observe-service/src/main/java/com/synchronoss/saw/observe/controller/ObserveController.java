@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.synchronoss.saw.observe.ObserveUtils;
 import com.synchronoss.saw.observe.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.observe.exceptions.JSONMissingSAWException;
@@ -75,7 +75,7 @@ public class ObserveController {
     ObserveResponse responseObjectFuture = null;
     try {
       Observe observe = ObserveUtils.getObserveNode(requestBody, "observe");
-      observe.setId(observeService.generateId().getId());
+      observe.setEntityId(observeService.generateId().getId());
       responseObjectFuture = observeService.addDashboard(observe);
     } catch (IOException e) {
       throw new JSONProcessingSAWException("expected missing on the request body");
@@ -93,7 +93,7 @@ public class ObserveController {
     logger.debug("dashboardId {}", Id);
     ObserveResponse responseObjectFuture = null;
     Observe observe = new Observe();
-    observe.setId(Id);
+    observe.setEntityId(Id);
     responseObjectFuture = observeService.getDashboardbyCriteria(observe);
     return responseObjectFuture;
   }
@@ -110,7 +110,7 @@ public class ObserveController {
     ObserveResponse responseObjectFuture = null;
     try {
       Observe observe = ObserveUtils.getObserveNode(requestBody, "observe");
-      observe.setId(Id);
+      observe.setEntityId(Id);
       responseObjectFuture = observeService.updateDashboard(observe);
     } catch (IOException e) {
       throw new JSONProcessingSAWException("expected missing on the request body");
@@ -127,7 +127,7 @@ public class ObserveController {
     logger.debug("dashboard Id {}", Id);
     ObserveResponse responseObjectFuture = null;
     Observe observe = new Observe();
-    observe.setId(Id);
+    observe.setEntityId(Id);
     responseObjectFuture = observeService.deleteDashboard(observe);
     return responseObjectFuture;
   }
