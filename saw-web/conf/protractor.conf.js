@@ -15,7 +15,10 @@ exports.config = {
         //'incognito',
         'disable-extensions',
         'disable-web-security',
-        '--start-fullscreen' // enable for Mac OS
+        '--start-fullscreen', // enable for Mac OS
+        "--headless",
+        "--disable-gpu",
+        "--window-size=2880,1800"
       ]
     }
   },
@@ -32,18 +35,18 @@ exports.config = {
   suites: {
 
     authentication: [
-      //webpackHelper.root('src/test/e2e-tests/login.test.js')
+      webpackHelper.root('src/test/e2e-tests/login.test.js')
     ],
 
     analyses: [
       webpackHelper.root('src/test/e2e-tests/priviliges.test.js'),
-      /*webpackHelper.root('src/test/e2e-tests/goToAnalyze.test.js'),
+      webpackHelper.root('src/test/e2e-tests/goToAnalyze.test.js'),
       webpackHelper.root('src/test/e2e-tests/createChart.test.js'),
       webpackHelper.root('src/test/e2e-tests/createPivot.test.js'),
       webpackHelper.root('src/test/e2e-tests/createReport.test.js'),
       //webpackHelper.root('src/test/javascript/e2e/spec/analyses.test.js'), // obsolete
       //webpackHelper.root('src/test/e2e-tests/debug.test.js') // for testing purposes
-      webpackHelper.root('src/test/e2e-tests/charts/createAndDeleteCharts.test.js')*/
+      webpackHelper.root('src/test/e2e-tests/charts/createAndDeleteCharts.test.js')
 
 
     ]

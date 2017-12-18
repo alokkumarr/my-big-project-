@@ -12,7 +12,12 @@ const ec = protractor.ExpectedConditions;
 const commonFunctions = require('../javascript/helpers/commonFunctions');
 const using = require('jasmine-data-provider');
 
-
+//TODO add case for No Privileges
+//TODO add case for changing privileges
+//TODO add case for changing multiple privileges
+//TODO add case for making privilege inactive
+//TODO add case for making multiple privileges inactive
+//TODO add case for adding new privilege
 describe('Privileges tests: privileges.test.js', () => {
   const dataProvider = {
     'All privileges for user': {
@@ -132,6 +137,19 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
+    'Multiple privileges for user': {
+      user: 'userOne',
+      subCategory: "Multiple DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: false,
+      create: true,
+      edit: false,
+      fork: true,
+      publish: true,
+      execute: false,
+      export: false,
+      delete: false
+    },
     'All privileges for admin': {
       user: 'admin',
       subCategory: "All DO NOT TOUCH",
@@ -144,9 +162,124 @@ describe('Privileges tests: privileges.test.js', () => {
       execute: true,
       export: true,
       delete: true
-    }
-    //TODO add case for No Privileges
-    //TODO add same validation for admin(create categories with privileges)
+    },
+    'Create privileges for admin': {
+      user: 'admin',
+      subCategory: "Create DO NOT TOUCH",
+      cardOptions: false,
+      viewOptions: false,
+      create: true,
+      edit: false,
+      fork: false,
+      publish: false,
+      execute: false,
+      export: false,
+      delete: false
+    },
+    'Edit privileges for admin': {
+      user: 'admin',
+      subCategory: "Edit DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: false,
+      create: false,
+      edit: true,
+      fork: false,
+      publish: false,
+      execute: false,
+      export: false,
+      delete: false
+    },
+    'Fork privileges for admin': {
+      user: 'admin',
+      subCategory: "Fork DO NOT TOUCH",
+      cardOptions: false,
+      viewOptions: false,
+      create: false,
+      edit: false,
+      fork: true,
+      publish: false,
+      execute: false,
+      export: false,
+      delete: false
+    },
+    'Publish privileges for admin': {
+      user: 'admin',
+      subCategory: "Publish DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: false,
+      create: false,
+      edit: false,
+      fork: false,
+      publish: true,
+      execute: false,
+      export: false,
+      delete: false
+    },
+    'Execute privileges for admin': {
+      user: 'admin',
+      subCategory: "Execute DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: true,
+      create: false,
+      edit: false,
+      fork: false,
+      publish: false,
+      execute: true,
+      export: false,
+      delete: false
+    },
+    'Export privileges for admin': {
+      user: 'admin',
+      subCategory: "Export DO NOT TOUCH",
+      cardOptions: false,
+      viewOptions: true,
+      create: false,
+      edit: false,
+      fork: false,
+      publish: false,
+      execute: false,
+      export: true,
+      delete: false
+    },
+    'Delete privileges for admin': {
+      user: 'admin',
+      subCategory: "Delete DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: true,
+      create: false,
+      edit: false,
+      fork: false,
+      publish: false,
+      execute: false,
+      export: false,
+      delete: true
+    },
+    'View privileges for admin': {
+      user: 'admin',
+      subCategory: "View DO NOT TOUCH",
+      cardOptions: false,
+      viewOptions: false,
+      create: false,
+      edit: false,
+      fork: false,
+      publish: false,
+      execute: false,
+      export: false,
+      delete: false
+    },
+    'Multiple privileges for admin': {
+      user: 'admin',
+      subCategory: "Multiple DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: false,
+      create: true,
+      edit: false,
+      fork: true,
+      publish: true,
+      execute: false,
+      export: false,
+      delete: false
+    },
   };
 
 
@@ -186,7 +319,7 @@ describe('Privileges tests: privileges.test.js', () => {
         // Validate presence of menu on card
         element(analyze.analysisElems.cardMenuButton.isDisplayed().then(function (isVisible) {
           expect(isVisible).toBe(data.cardOptions,
-            "Options on card expected to be " + data.cardOptions + " on Analyze Page, but were " + !data.cardOptions);
+            "Options on card expected to be " + data.cardOptions + " on Analyze Page, but was " + !data.cardOptions);
         }));
 
         // Validate presence on menu items in card menu
@@ -232,7 +365,7 @@ describe('Privileges tests: privileges.test.js', () => {
         // Validate menu in analysis
         element(executedAnalysis.actionsMenuBtn.isDisplayed().then(function (isVisible) {
           expect(isVisible).toBe(data.viewOptions,
-            "Options menu button expected to be " + data.viewOptions + " in view mode, but were " + !data.viewOptions);
+            "Options menu button expected to be " + data.viewOptions + " in view mode, but was " + !data.viewOptions);
         }));
 
         // Validate menu items under menu button
