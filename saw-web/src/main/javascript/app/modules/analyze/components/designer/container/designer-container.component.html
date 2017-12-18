@@ -6,7 +6,7 @@
 </designer-header>
 
 <designer-toolbar class="designer__toolbar"
-                  (refreshData)="requestData()"
+                  (requestAction)="onToolbarAction($event)"
                   [isDataOutOfSynch]="isDataOutOfSynch">
 </designer-toolbar>
 

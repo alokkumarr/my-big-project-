@@ -8,6 +8,9 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as filter from 'lodash/filter';
 import * as unset from 'lodash/unset';
 import * as get from 'lodash/get';
+import * as forEach from 'lodash/forEach';
+import * as map from 'lodash/map';
+import * as find from 'lodash/find';
 
 import { DesignerService } from '../designer.service';
 import {
@@ -16,11 +19,13 @@ import {
   Analysis,
   AnalysisType,
   SqlBuilder,
-  ArtifactColumns
+  ArtifactColumns,
+  DesignerToolbarAciton,
+  Sort
 } from '../types'
-import * as forEach from 'lodash/forEach';
-import * as map from 'lodash/map';
-import * as find from 'lodash/find';
+
+import { AnalyzeDialogService } from '../../../services/analyze-dialog.service'
+
 const template = require('./designer-container.component.html');
 require('./designer-container.component.scss');
 
@@ -45,10 +50,12 @@ export class DesignerContainerComponent {
   public designerState: DesignerStates;
   public DesignerStates = DesignerStates;
   public firstArtifactColumns: ArtifactColumns = [];
-  public data : any = null;
+  public data: any = null;
+  public sorts: Sort[] = [];
 
   constructor(
-    private _designerService: DesignerService
+    private _designerService: DesignerService,
+    public _analyzeDialogService: AnalyzeDialogService
   ) {}
 
   ngOnInit() {
@@ -62,6 +69,20 @@ export class DesignerContainerComponent {
       break;
 
     default:
+      break;
+    }
+  }
+
+  onToolbarAction(action: DesignerToolbarAciton) {
+    switch (action) {
+    case 'refresh':
+      this.requestData();
+      break;
+    case 'sort':
+      this._analyzeDialogService.openSortDialog(this.sorts, this.firstArtifactColumns)
+        .afterClosed().subscribe(({sorts}) => {
+          this.sorts = sorts;
+        });
       break;
     }
   }
@@ -128,7 +149,7 @@ export class DesignerContainerComponent {
   onSettingsChange() {
     this.isDataOutOfSynch = true;
     this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
-    this.firstArtifactColumns = filter(this.analysis.artifacts[0].columns, 'checked');
+    this.firstArtifactColumns = this.analysis.artifacts[0].columns;
   }
 
   updateAnalysis() {

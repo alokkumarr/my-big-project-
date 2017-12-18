@@ -6,7 +6,8 @@ import {
   AnalysisStarter,
   Analysis,
   Sort,
-  IToolbarActionData
+  IToolbarActionData,
+  ArtifactColumns
 } from '../types';
 import { DesignerDialogComponent } from '../components/designer/dialog';
 import { ToolbarActionDialogComponent } from '../components/designer/toolbar-action-dialog';
@@ -21,7 +22,7 @@ export class AnalyzeDialogService {
       analysisStarter,
       designerMode: 'new'
     };
-    this.openAnalysisDialog(data);
+    return this.openAnalysisDialog(data);
   }
 
   openEditAdnalysisDialog(analysis: Analysis) {
@@ -29,11 +30,11 @@ export class AnalyzeDialogService {
       analysis,
       designerMode: 'edit'
     };
-    this.openAnalysisDialog(data);
+    return this.openAnalysisDialog(data);
   }
 
   openAnalysisDialog(data: AnalysisDialogData) {
-    this.dialog.open(DesignerDialogComponent, {
+    return this.dialog.open(DesignerDialogComponent, {
       width: '100vw',
       maxWidth: '100vw',
       height: '100vh',
@@ -41,12 +42,13 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openSortDialog(sorts: Sort[]) {
+  openSortDialog(sorts: Sort[], artifactColumns: ArtifactColumns) {
     const data: IToolbarActionData = {
       action: 'sort',
-      sorts
+      sorts,
+      artifactColumns
     }
-    this.dialog.open(ToolbarActionDialogComponent, {
+    return this.dialog.open(ToolbarActionDialogComponent, {
       width: 'auto',
       height: 'auto',
       data

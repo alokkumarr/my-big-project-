@@ -1,0 +1,30 @@
+designer-sort {
+  .sortable-fields {
+    width: 350px;
+    min-height: 150px;
+
+    .sortable-field {
+      cursor: pointer;
+      min-height: 36px;
+    }
+  }
+
+  .sorted-fields {
+    width: 400px;
+    min-height: 150px;
+
+    .sorted-field {
+      cursor: grab;
+      min-height: 36px;
+    }
+  }
+
+  mat-button-toggle {
+    mat-icon {
+      text-align: center;
+      font-size: 11px;
+      line-height: 28px !important;
+      transform: rotate(180deg);
+    }
+  }
+}

@@ -41,10 +41,15 @@ export type AnalysisDialogData = {
   analysis?: Analysis
 };
 
-
+export type DesignerToolbarAciton = 'description' | 'sort' | 'preview' | 'filter' | 'refresh';
 export interface IToolbarActionData {
-  action: 'description' | 'sort' | 'preview' | 'filter';
+  action: DesignerToolbarAciton;
   artifactColumns?: ArtifactColumns;
+  sorts?: Sort[];
+  description?: string;
+}
+
+export interface IToolbarActionResult {
   sorts?: Sort[];
   description?: string;
 }

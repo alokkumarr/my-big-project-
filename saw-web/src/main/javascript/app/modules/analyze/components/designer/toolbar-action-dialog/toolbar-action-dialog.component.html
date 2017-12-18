@@ -1,0 +1,29 @@
+<mat-card>
+    <mat-card-header>
+      <mat-card-title [ngSwitch]="data.action">
+        <span *ngSwitchCase="'sort'" i18n>Sort</span>
+        <span *ngSwitchCase="'description'" i18n>Description</span>
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content [ngSwitch]="data.action">
+      <designer-sort *ngSwitchCase="'sort'"
+                     (sortsChange)="onSortsChange($event)"
+                     [sorts]="data.sorts"
+                     [artifactColumns]="data.artifactColumns"></designer-sort>
+    </mat-card-content>
+    <mat-card-actions fxLayout="row" fxLayoutAlign="space-between center">
+      <button mat-button i18n (click)="onBack()">Cancel</button>
+      <div [ngSwitch]="data.action">
+          <button *ngSwitchCase="'sort'"
+                  (click)="onOk()"
+                  mat-raised-button color="primary" i18n>
+            Apply Sort
+          </button>
+          <button *ngSwitchCase="'description'"
+                  (click)="onOk()"
+                  mat-raised-button color="primary" i18n>
+            Save
+          </button>
+      </div>
+    </mat-card-actions>
+  </mat-card>

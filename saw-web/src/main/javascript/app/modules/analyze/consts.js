@@ -1,6 +1,7 @@
 import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as map from 'lodash/map';
+import * as reduce from 'lodash/reduce';
 import * as fpMapValues from 'lodash/fp/mapValues';
 
 import {NUMBER_TYPES, DATE_TYPES, CHART_COLORS, BACKEND_TIMEZONE} from '../../common/consts.js';
@@ -24,6 +25,15 @@ export const ENTRY_MODES = {
 export const LAST_ANALYSES_CATEGORY_ID = 'lastAnalysesListId';
 
 export {NUMBER_TYPES, DATE_TYPES, CHART_COLORS, BACKEND_TIMEZONE};
+
+export const TYPE_MAP = reduce([
+  ...map(NUMBER_TYPES, type => ({type, generalType: 'number'})),
+  ...map(DATE_TYPES, type => ({type, generalType: 'date'})),
+  {type: 'string', generalType: 'string'}
+], (typeMap, {type, generalType}) => {
+  typeMap[type] = generalType;
+  return typeMap;
+}, {});
 
 export const TYPE_ICONS = [{
   icon: '',

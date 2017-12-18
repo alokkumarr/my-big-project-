@@ -13,7 +13,9 @@ import {
   ArtifactColumnChart,
   ArtifactColumn,
   ArtifactColumns,
-  IToolbarActionData
+  IToolbarActionData,
+  DesignerToolbarAciton,
+  IToolbarActionResult
 } from '../../types';
 
 export {
@@ -27,7 +29,9 @@ export {
   Sort,
   ArtifactColumn,
   ArtifactColumns,
-  IToolbarActionData
+  IToolbarActionData,
+  DesignerToolbarAciton,
+  IToolbarActionResult
 };
 
 
