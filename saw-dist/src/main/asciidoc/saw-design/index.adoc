@@ -1,5 +1,5 @@
 = SAW Design Guide
-Version: {project-version}
+Version {project-version}
 :toc:
 :nofooter:
 :docinfo: shared
@@ -25,6 +25,19 @@ MapR-DB binary tables, but this is planned to be phased out.
 
 The application consists of three main modules: SAW Web, SAW Services
 and SAW Security.
+
+[plantuml, saw-modules, svg]
+----
+package "SAW" {
+  [SAW Web]
+  [SAW Services]
+  [SAW Security]
+}
+
+HTTP ..> [SAW Web]
+[SAW Web] --> [SAW Services]
+[SAW Services] --> [SAW Security]
+----
 
 == SAW Services
 
