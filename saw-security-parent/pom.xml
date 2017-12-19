@@ -6,7 +6,7 @@
 
   <groupId>com.sncr</groupId>
   <artifactId>saw-security-parent</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>${revision}</version>
   <packaging>pom</packaging>
 
 
@@ -27,8 +27,8 @@
 
 
   <modules>
-    <module>../saw-security</module>
-    <module>../saw-security-command-line-tool</module>
+    <module>saw-security</module>
+    <module>saw-security-command-line-tool</module>
   </modules>
 
 

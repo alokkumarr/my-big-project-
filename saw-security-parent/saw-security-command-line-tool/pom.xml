@@ -5,10 +5,12 @@
   <parent>
     <artifactId>saw-security-parent</artifactId>
     <groupId>com.sncr</groupId>
-    <version>1.0-SNAPSHOT</version>
-    <relativePath>../saw-security-parent/pom.xml</relativePath>
+    <version>${revision}</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
+  <packaging>jar</packaging>
+
 
   <artifactId>saw-security-command-line-tool</artifactId>
 
@@ -39,7 +41,8 @@
     <dependency>
       <groupId>com.sncr</groupId>
       <artifactId>saw-security</artifactId>
-      <version>2</version>
+      <version>${revision}</version>
+      <classifier>classes</classifier>
     </dependency>
     <dependency>
       <groupId>org.flywaydb</groupId>
