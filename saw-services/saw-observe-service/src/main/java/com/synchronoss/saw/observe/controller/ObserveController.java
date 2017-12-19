@@ -16,12 +16,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.observe.ObserveUtils;
 import com.synchronoss.saw.observe.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.observe.exceptions.JSONMissingSAWException;
 import com.synchronoss.saw.observe.exceptions.JSONProcessingSAWException;
 import com.synchronoss.saw.observe.exceptions.UpdateEntitySAWException;
 import com.synchronoss.saw.observe.model.Observe;
+import com.synchronoss.saw.observe.model.ObserveRequestBody;
 import com.synchronoss.saw.observe.model.ObserveResponse;
 import com.synchronoss.saw.observe.service.ObserveService;
 
@@ -65,15 +69,18 @@ public class ObserveController {
    */
   @RequestMapping(value = "/observe/dashboards/create", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
-  public ObserveResponse addDashboard(@RequestBody String requestBody) {
+  public ObserveResponse addDashboard(@RequestBody ObserveRequestBody requestBody) {
     logger.debug("Request Body", requestBody);
     if (requestBody == null) {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
     ObserveResponse responseObjectFuture = null;
    try {
-      Observe observe = ObserveUtils.getObserveNode(requestBody, "contents");
-      observe.setEntityId(observeService.generateId().getId());
+     ObjectMapper objectMapper = new ObjectMapper();
+     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+      Observe observe = ObserveUtils.getObserveNode(objectMapper.writeValueAsString(requestBody), "contents");
+      observe.setEntityId(observeService.generateId());
       responseObjectFuture = observeService.addDashboard(observe);
     } catch (IOException e) {
       throw new JSONProcessingSAWException("expected missing on the request body");
@@ -99,7 +106,7 @@ public class ObserveController {
     @RequestMapping(value = "/observe/dashboards/update/{Id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   public ObserveResponse updateDashboard(HttpServletRequest request, HttpServletResponse response,
-      @PathVariable(name = "Id", required = true) String Id, @RequestBody String requestBody) {
+      @PathVariable(name = "Id", required = true) String Id, @RequestBody ObserveRequestBody requestBody) {
     logger.debug("dashboardId {}", Id);
     logger.debug("Request Body", requestBody);
     if (requestBody == null) {
@@ -107,7 +114,10 @@ public class ObserveController {
     }
     ObserveResponse responseObjectFuture = null;
     try {
-      Observe observe = ObserveUtils.getObserveNode(requestBody, "contents");
+      ObjectMapper objectMapper = new ObjectMapper();
+      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+      Observe observe = ObserveUtils.getObserveNode(objectMapper.writeValueAsString(requestBody), "contents");
       observe.setEntityId(Id);
       responseObjectFuture = observeService.updateDashboard(observe);
     } catch (IOException e) {
@@ -134,7 +144,8 @@ public class ObserveController {
   @ResponseStatus(HttpStatus.OK)
   public ObserveResponse generateDashboardId(HttpServletRequest request,
       HttpServletResponse response) {
-    ObserveResponse responseObjectFuture = observeService.generateId();
-    return responseObjectFuture;
+    ObserveResponse observeResponse = new ObserveResponse();
+    observeResponse.setId(observeService.generateId());
+    return observeResponse;
   }
 }

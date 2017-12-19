@@ -1,5 +1,6 @@
 package com.synchronoss.saw.observe.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -8,7 +9,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({"_id","entityId", "categoryId", "name", "description","createdBy","updatedBy","createdAt","updatedAt", "options", "tiles", "filters"})
-public class Observe {
+public class Observe implements Serializable {
+  
+  private static final long serialVersionUID = 7077848381430952958L;
   
   @JsonProperty("_id")
   private String _id;

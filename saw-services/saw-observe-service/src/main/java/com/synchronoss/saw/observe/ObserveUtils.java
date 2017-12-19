@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -75,11 +76,11 @@ public class ObserveUtils {
   
   public static Observe getObserveNode (String json, String node) throws JsonProcessingException, IOException {
     ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     JsonNode objectNode = objectMapper.readTree(json);
     JsonNode contentNode = objectNode.get(node);
     JsonNode observeNode = contentNode.get("observe").get(0);
-    System.out.println(observeNode.toString());
     String jsonObserve = "{ \"observe\" :" + observeNode.toString() + "}";
     JsonNode observeNodeIndependent = objectMapper.readTree(jsonObserve);
     ObserveNode observeTreeNode = objectMapper.treeToValue(observeNodeIndependent, ObserveNode.class);
@@ -93,7 +94,7 @@ public class ObserveUtils {
     ObjectMapper objectMapper = new ObjectMapper();
     MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
     if(node !=null){
-      String jsonObserve = "{ \"observe\" :" + objectMapper.writeValueAsString(node) + "}";
+      String jsonObserve = objectMapper.writeValueAsString(node);
       metaDataStoreStructure.setSource(jsonObserve);
     }
     if (Id !=null){

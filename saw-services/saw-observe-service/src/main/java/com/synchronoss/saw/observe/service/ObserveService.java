@@ -16,6 +16,6 @@ public interface ObserveService {
   public ObserveResponse getDashboardbyCriteria(Observe node) throws JSONValidationSAWException, ReadEntitySAWException;
   public ObserveResponse updateDashboard(Observe node) throws JSONValidationSAWException, UpdateEntitySAWException;
   public ObserveResponse deleteDashboard(Observe node) throws JSONValidationSAWException, DeleteEntitySAWException;
-  public ObserveResponse generateId() throws JSONValidationSAWException;
+  public String generateId() throws JSONValidationSAWException;
 }
 

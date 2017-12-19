@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.synchronoss.saw.observe.ObserveUtils;
 import com.synchronoss.saw.observe.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.observe.exceptions.DeleteEntitySAWException;
@@ -115,12 +117,11 @@ public class ObserveServiceImpl implements ObserveService {
   }
 
   @Override
-  public ObserveResponse generateId() throws JSONValidationSAWException {
+  public String generateId() throws JSONValidationSAWException {
     String id = UUID.randomUUID().toString() + delimiter + PortalDataSet + delimiter
         + System.currentTimeMillis();
-    ObserveResponse response = new ObserveResponse();
-    response.setId(id);
-    return response;
+    
+    return id;
   }
 
   public static void main(String[] args) throws IOException {
@@ -140,5 +141,12 @@ public class ObserveServiceImpl implements ObserveService {
     System.out.println(mapper.writeValueAsString(response));
     String jsonString ="{\"contents\":{\"observe\":[{\"_id\":\"id:portalDataSet::201\",\"entityId\":\"string\",\"categoryId\":\"string\",\"name\":\"string\",\"description\":\"string\",\"createdBy\":\"string\",\"updatedBy\":\"string\",\"createdAt\":\"string\",\"updatedAt\":\"string\",\"options\":[],\"tiles\":[{\"type\":\"analysis\",\"id\":\"analysisId - string\",\"cols\":3,\"rows\":4,\"x\":5,\"y\":6,\"options\":\"\"}],\"filters\":[]}]}}";
     System.out.println(mapper.writeValueAsString(ObserveUtils.getObserveNode(jsonString, "contents")));
+    String jsonStringStoreRead = "{\"_id\": \"40139212-e078-4013-90dd-452347d460dd::PortalDataSet::1513718861739\", \"entityId\":\"40139212-e078-4013-90dd-452347d460dd::PortalDataSet::1513718861739\",\"categoryId\":\"string\",\"name\":\"string\",\"description\":\"string\",\"createdBy\":\"string\",\"updatedBy\":\"string\",\"createdAt\":\"2017-27-19 04:27:41\",\"updatedAt\":\"string\",\"tiles\":[{\"type\":\"analysis\",\"id\":\"string\",\"cols\":3,\"rows\":4,\"x\":5,\"y\":6}]}";
+    Observe observeDataRead = mapper.readValue(jsonStringStoreRead, Observe.class);
+    System.out.println(observeDataRead.get_id());
+    JsonParser parser = new JsonParser();
+    JsonElement element = parser.parse(jsonStringStoreRead);
+    System.out.println(element.isJsonObject());
+    System.out.println();
   }
 }

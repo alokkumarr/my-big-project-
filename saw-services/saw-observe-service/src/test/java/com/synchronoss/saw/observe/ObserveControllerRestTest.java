@@ -44,7 +44,7 @@ public class ObserveControllerRestTest {
   private ObserveServiceImpl  observeService;
   private String jsonStringStore =
       "{\"_id\": \"id:portalDataSet::201\", \"entityId\": \"string\", \"categoryId\":\"string\",\"name\": \"string\", \"description\": \"string\", \"createdBy\": \"string\", \"updatedBy\": \"string\",  \"createdAt\": \"string\", \"updatedAt\": \"string\", \"options\" : [], \"tiles\": [    {    \"type\": \"analysis\",      \"id\": \"analysisId - string\",      \"cols\": 3,      \"rows\": 4,      \"x\": 5,      \"y\": 6,    \"options\": \"\"    }  ],  \"filters\": []}";
-  private String incomingJsonRequest= "{\"id\":\"portalDataSet201\",\"entityId\":\"string\",\"categoryId\":\"string\",\"name\":\"string\",\"description\":\"string\",\"createdBy\":\"string\",\"updatedBy\":\"string\",\"createdAt\":\"string\",\"updatedAt\":\"string\"}";
+  private String incomingJsonRequest= "{\"contents\":{\"observe\":[{\"entityId\":\"string\",\"categoryId\":\"string\",\"name\":\"string\",\"description\":\"string\",\"createdBy\":\"string\",\"updatedBy\":\"string\",\"createdAt\":\"string\",\"updatedAt\":\"string\",\"options\":[],\"tiles\":[{\"type\":\"analysis\",\"id\":\"analysisId - string\",\"cols\":3,\"rows\":4,\"x\":5,\"y\":6,\"options\":\"\"}],\"filters\":[]}]}}";
   private Observe observe = getObserve(jsonStringStore);
  
   
@@ -59,11 +59,13 @@ public class ObserveControllerRestTest {
               .post("/observe/dashboards/create")
               .accept(MediaType.APPLICATION_JSON_UTF8_VALUE)
               .content(incomingJsonRequest)
-              .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).header(HttpHeaders.LOCATION, "http://localhost/observe/dashboards/create");
+              .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+              .header(HttpHeaders.LOCATION, "http://localhost/observe/dashboards/create");
       MvcResult result = mockMvc.perform(requestBuilder).andReturn();
       MockHttpServletResponse response = result.getResponse();
-      assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+      assertEquals(HttpStatus.CREATED.value(), response.getStatus());
   } 
+  
   
   
   @Test
@@ -92,7 +94,7 @@ public class ObserveControllerRestTest {
       MvcResult result = mockMvc.perform(requestBuilder).andReturn();
       logger.info("Response code {}", result.getResponse());
       MockHttpServletResponse response = result.getResponse();
-      assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+      assertEquals(HttpStatus.OK.value(), response.getStatus());
   }
 
   

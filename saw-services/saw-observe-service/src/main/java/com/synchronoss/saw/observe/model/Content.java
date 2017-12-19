@@ -1,5 +1,6 @@
 package com.synchronoss.saw.observe.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -10,7 +11,11 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
     "contents"
 })
-public class Content {
+public class Content implements Serializable {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
   @JsonProperty("observe")
   private List<Observe> observe = null;
  

@@ -146,7 +146,7 @@ public class Request {
             logger.info("Start item processing, action: " + action + ", output: " + rFile);
 
             try {
-                if(rFile!=null){
+                if(rFile!=null && !rFile.trim().equals("")){
                 os = HFileOperations.writeToFile(rFile);}
             } catch (FileNotFoundException e1) {
                 logger.error("Could not write response to file: " + rFile, e1);
@@ -421,11 +421,22 @@ public class Request {
 
         if (action == Actions.create || action == Actions.update ) {
             JsonElement src0 = item.get("source");
+             // This part of code has been enhanced to support both JSON String & JSONElement
             if (!src0.isJsonObject()) {
-                logger.error("'source' must be valid JSON object");
-                return false;
-            }
+              String srcData = item.get("source").getAsString();
+              try {
+                JsonParser parser = new JsonParser();
+                JsonElement element = parser.parse(srcData);
+                src =  element.getAsJsonObject();
+              }
+              catch (Exception e){
+                 logger.error("'source' must be valid JSON object : {}", e.getCause());
+                 return false;   
+              }
+          }
+            else {
             src = src0.getAsJsonObject();
+            }
         }
         return true;
     }
