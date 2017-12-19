@@ -3,14 +3,18 @@ package com.synchronoss.saw.observe.exceptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value=HttpStatus.PRECONDITION_REQUIRED, reason="request body validation failed")
-public class JSONValidationSAWException extends ExportRuntimeSAWException {
+@ResponseStatus(value=HttpStatus.BAD_REQUEST, reason="Problem on the storage while creating an entity")
+public class CreateEntitySAWException extends ExportRuntimeSAWException {
 
+    /**
+   * 
+   */
   private static final long serialVersionUID = 1L;
 
-    public JSONValidationSAWException(String msg) {
+    public CreateEntitySAWException(String msg) {
         super(msg);
 }
+    
 
 /**
  * Create a new BeansException with the specified message
@@ -18,7 +22,7 @@ public class JSONValidationSAWException extends ExportRuntimeSAWException {
  * @param msg the detail message
  * @param cause the root cause
  */
-public JSONValidationSAWException(String msg, Throwable cause) {
+public CreateEntitySAWException(String msg, Throwable cause) {
         super(msg, cause);
 }
 
@@ -28,10 +32,10 @@ public boolean equals(Object other) {
         if (this == other) {
                 return true;
         }
-        if (!(other instanceof JSONValidationSAWException)) {
+        if (!(other instanceof CreateEntitySAWException)) {
                 return false;
         }
-        JSONValidationSAWException otherBe = (JSONValidationSAWException) other;
+        CreateEntitySAWException otherBe = (CreateEntitySAWException) other;
         return (getMessage().equals(otherBe.getMessage()) &&
         		ExceptionSAWUtils.nullSafeEquals(getCause(), otherBe.getCause()));
 }

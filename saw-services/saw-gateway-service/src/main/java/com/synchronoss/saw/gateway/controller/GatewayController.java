@@ -122,7 +122,8 @@ public class GatewayController {
               makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
         }
       } catch(HttpClientErrorException e) {
-        responseEntity = new ResponseEntity<>("Invalid Token",
+    	  //SAW-1374: Just keep the message hardcoded itself.
+        responseEntity = new ResponseEntity<>("{\"message\":\"Invalid Token\"}",
             makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
         logger.info("Invalid Token: "+ responseEntity.toString());
         return responseEntity;

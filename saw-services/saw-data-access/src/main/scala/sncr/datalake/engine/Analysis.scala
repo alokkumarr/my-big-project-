@@ -8,6 +8,7 @@ import java.util.concurrent.{ExecutorService, Executors, Future}
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
 import files.HFileOperations;
 import org.slf4j.{Logger, LoggerFactory}
+import sncr.datalake.TimeLogger._
 import sncr.datalake.engine.ExecutionType.ExecutionType
 import sncr.metadata.analysis.{AnalysisNode, AnalysisResult}
 import sncr.metadata.engine.ProcessingResult
@@ -49,7 +50,7 @@ class Analysis(val analysisId : String) {
     new AnalysisExecution(an, execType, resultId)
   }
 
-  private def waitForResult(resultId: String, retries: Int = 20) {
+  private def waitForResult(resultId: String, retries: Int = 60) {
     if (!executionCompleted(resultId)) {
       waitForResultRetry(resultId, retries)
     }
@@ -71,7 +72,7 @@ class Analysis(val analysisId : String) {
       throw new RuntimeException("Timed out waiting for result: " + resultId)
     }
     m_log.debug("Waiting for result: {}", resultId)
-    Thread.sleep(3000)
+    Thread.sleep(1000)
     waitForResult(resultId, retries - 1)
   }
 
@@ -84,7 +85,9 @@ class Analysis(val analysisId : String) {
   {
     m_log debug s"Execute analysis as ${execType.toString}"
     val analysisExecution = new AnalysisExecution(an, execType, resultId)
-    analysisExecution.startExecution(sqlRuntime)
+    logWithTime(m_log, "Execute Spark SQL query", {
+      analysisExecution.startExecution(sqlRuntime)
+    })
     startTS = analysisExecution.getStartedTimestamp
     finishedTS = analysisExecution.getFinishedTimestamp
     analysisExecution
