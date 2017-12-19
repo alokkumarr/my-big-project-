@@ -387,8 +387,7 @@ export class ChartService {
       forEach(parsedData, dataPoint => {
         forEach(dateFields, ({columnName, dateFormat}) => {
           const momentDateFormat = this.getMomentDateFormat(dateFormat);
-          const offset = moment(dataPoint[columnName]).utcOffset();
-          dataPoint[columnName] = moment(dataPoint[columnName]).utcOffset(offset).format(momentDateFormat);
+          dataPoint[columnName] = moment.utc(dataPoint[columnName]).format(momentDateFormat);
         });
       });
     }
@@ -462,12 +461,12 @@ export class ChartService {
   }
 
   /**
-   * get the map from colmnNames to the axes, or group
+   * Get the map from colmnNames to the axes, or group
    * Ex
    * y -> AVAILABLE_MB
    */
   getAxesFieldNameMap(fields, exclude) {
-    // y axis ommitted because it is added in splitSeriesByYAxes
+    // Y axis ommitted because it is added in splitSeriesByYAxes
     const y = exclude === 'y' ? [] : fields.y;
     const fieldsArray = compact([fields.x, ...y, fields.z, fields.g]);
     return reduce(fieldsArray, (accumulator, field) => {
@@ -488,7 +487,7 @@ export class ChartService {
   isCategoryAxis(fields, key) {
     const dataType = get(fields, `${key}.type`);
     const isAxis = key !== 'g';
-    // strings should be represented as categories in the chart
+    // Strings should be represented as categories in the chart
     /* eslint-disable angular/typecheck-string */
     const isCategoryAxis = isAxis &&
       (dataType === 'string' || dataType === 'String' || DATE_TYPES.includes(dataType));
@@ -764,11 +763,11 @@ export class ChartService {
       <td>{point.y:,.2f}</td>
     </tr>`;
     const zAxisString = fields.z ?
-    `<tr><th>${fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>` :
-    '';
+      `<tr><th>${fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>` :
+      '';
     const groupString = fields.g ?
-    `<tr><th>Group:</th><td>{point.g}</td></tr>` :
-    '';
+      `<tr><th>Group:</th><td>{point.g}</td></tr>` :
+      '';
 
     const tooltipObj = {
       useHTML: true,
