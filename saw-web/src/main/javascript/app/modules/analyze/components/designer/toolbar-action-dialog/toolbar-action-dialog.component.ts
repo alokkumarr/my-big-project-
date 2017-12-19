@@ -1,5 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import * as cloneDeep from 'lodash/cloneDeep';
 import {
   IToolbarActionData,
   IToolbarActionResult
@@ -16,6 +17,14 @@ export class ToolbarActionDialogComponent {
     public dialogRef: MatDialogRef<ToolbarActionDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IToolbarActionData
   ) { }
+
+  ngOnInit() {
+    switch (this.data.action) {
+    case 'sort':
+      this.data.sorts = cloneDeep(this.data.sorts);
+      break;
+    }
+  }
 
   onBack() {
     this.dialogRef.close();

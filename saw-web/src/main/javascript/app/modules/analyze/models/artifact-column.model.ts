@@ -1,6 +1,7 @@
 import Format from './format.model';
 
 export interface ArtifactColumn {
+  checked?:       null | boolean | 'x', 'y', 'z', 'g';
   columnName:     string;
   table:          string;
   displayName:    string;
@@ -13,13 +14,11 @@ export interface ArtifactColumn {
 }
 
 export interface ArtifactColumnChart extends ArtifactColumn {
-  checked:        null | 'x', 'y', 'z', 'g';
   comboType?:     string;
   dateFormat?:    string;
 }
 
 export interface ArtifactColumnPivot extends ArtifactColumn {
-  checked:        null | boolean;
   area?:          'row' | 'column' | 'data';
   areaIndex?:     number;
   dateInterval?:  string;
@@ -28,7 +27,6 @@ export interface ArtifactColumnPivot extends ArtifactColumn {
 }
 
 export interface ArtifactColumnReport extends ArtifactColumn {
-  checked:        null | boolean;
   joinEigible?:   boolean;
   dateFormat?:    string;
   hide?:          boolean;

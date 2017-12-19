@@ -6,10 +6,14 @@
       </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <div class="sortable-fields">
-        <div *ngFor="let field of sortableFields; trackBy: trackByFn"
-            (click)="addSort(field)"
-            class="sortable-field">
+      <div class="sortable-fields"
+           [dndSortableContainer]="dndSortableContainerObj">
+        <div *ngFor="let field of sortableFields; let i = index; trackBy: trackByFn"
+             [dndSortable]="field"
+             [dndSortableIndex]="i"
+             (dndOnDragEnd)="onSortableDragEnd($event, fromIndex)"
+             (click)="addSort(field)"
+             class="sortable-field">
           {{field.aliasName || field.displayName}}
         </div>
       </div>
@@ -23,11 +27,20 @@
       </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <div class="sorted-fields">
-        <div *ngFor="let sort of sorts; trackBy: trackByFn"
+      <div class="sorted-fields"
+           [dndSortableContainer]="dndSortedContainerObj"
+           [dndCollection]="sorts"
+           (dndOnDrop)="onDrop($event)">
+        <div *ngFor="let sort of sorts; let i = index; trackBy: trackByFn"
+             [dndSortable]="sort"
+             [dndSortableIndex]="i"
+             (dndOnDragEnd)="onSortedDragEnd($event, fromIndex)"
              class="sorted-field"
              fxLayout="row"
              fxLayoutAlign="space-between center">
+          <mat-icon fontIcon="icon-close"
+                    (click)="removeSort(sort)"
+                    class="sorted-field__remove"></mat-icon>
           {{nameMap[sort.columnName]}}
           <div [ngSwitch]="TYPE_MAP[sort.type]">
             <mat-button-toggle-group *ngSwitchCase="'string'"

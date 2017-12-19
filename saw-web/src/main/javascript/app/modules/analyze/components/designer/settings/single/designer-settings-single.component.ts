@@ -6,6 +6,7 @@ import {
 } from '@angular/core';
 import * as filter from 'lodash/filter';
 import * as debounce from 'lodash/debounce';
+import * as get from 'lodash/get';
 
 import { DesignerService } from '../../designer.service';
 import {
@@ -81,8 +82,10 @@ export class DesignerSettingsSingleComponent {
     this.groupAdapters = this._designerService.getPivotGroupAdapters(this.artifactColumns);
   }
 
-  ngOnChanges() {
-    this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+  ngOnChanges(changes) {
+    if (get(changes, 'artifactColumns.currentValue')) {
+      this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+    }
   }
 
   _changeSettings() {

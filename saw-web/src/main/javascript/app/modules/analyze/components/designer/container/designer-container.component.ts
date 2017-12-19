@@ -55,7 +55,7 @@ export class DesignerContainerComponent {
 
   constructor(
     private _designerService: DesignerService,
-    public _analyzeDialogService: AnalyzeDialogService
+    private _analyzeDialogService: AnalyzeDialogService
   ) {}
 
   ngOnInit() {
@@ -149,11 +149,26 @@ export class DesignerContainerComponent {
   onSettingsChange() {
     this.isDataOutOfSynch = true;
     this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
-    this.firstArtifactColumns = this.analysis.artifacts[0].columns;
+    this.firstArtifactColumns = this.getFirstArtifactColumns();
+    this.cleanSorts();
+  }
+
+  getFirstArtifactColumns() {
+    return [...this.analysis.artifacts[0].columns];
   }
 
   updateAnalysis() {
     this.analysis.sqlBuilder = this.getSqlBuilder();
+  }
+
+  /**
+   * If an artifactColumn is unselected, it should be cleared out from the sorts.
+   */
+  cleanSorts() {
+    const checkedFields = filter(this.firstArtifactColumns, 'checked');
+    this.sorts = filter(this.sorts, sort => {
+      return Boolean(find(checkedFields, ({columnName}) => columnName === sort.columnName));
+    });
   }
 
   onSave() {

@@ -4,11 +4,12 @@ import {
 } from './models/analysis.model';
 import {
   ArtifactColumnPivot,
-  ArtifactColumnChart
+  ArtifactColumnChart,
+  ArtifactColumnReport
 } from './models/artifact-column.model';
 
-export type ArtifactColumns = ArtifactColumnPivot[] | ArtifactColumnChart[];
-export type ArtifactColumn = ArtifactColumnPivot | ArtifactColumnChart;
+export type ArtifactColumns = ArtifactColumnPivot[] | ArtifactColumnChart[] | ArtifactColumnReport[];
+export type ArtifactColumn = ArtifactColumnPivot | ArtifactColumnChart | ArtifactColumnReport;
 import { Sort } from './models/sort.model';
 
 export {

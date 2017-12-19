@@ -28,25 +28,37 @@ export class DesignerSortComponent {
   @Input() public sorts: Sort[];
 
   public TYPE_MAP = TYPE_MAP;
+  public checkedFields: ArtifactColumns = [];
   public sortableFields: ArtifactColumns = [];
   public nameMap: Object = {};
+  public dndSortableContainerObj = {
+    zone: 'sortableContainer'
+  };
+  public dndSortedContainerObj = {};
 
   ngOnInit() {
-    this.sortableFields = this.getSortableFields(this.artifactColumns, this.sorts);
-    this.nameMap = reduce(this.sortableFields, (accumulator, field) => {
+    this.checkedFields = filter(this.artifactColumns, 'checked');
+    this.sortableFields = this.getSortableFields(this.checkedFields, this.sorts);
+    this.nameMap = reduce(this.checkedFields, (accumulator, field) => {
       accumulator[field.columnName] = field.aliaName || field.displayName;
       return accumulator;
     }, {});
   }
 
   addSort(artifactColumn: ArtifactColumn) {
-    this.sortableFields = filter(this.sortableFields,
-      ({columnName}) => columnName !== artifactColumn.columnName);
-
     this.sorts = [
       ...this.sorts,
       this.transform(artifactColumn)
     ];
+    this.sortableFields = filter(this.sortableFields,
+      ({columnName}) => columnName !== artifactColumn.columnName);
+    this.sortsChange.emit(this.sorts);
+  }
+
+  removeSort(sort: Sort) {
+    this.sorts = filter(this.sorts,
+      ({columnName}) => columnName !== sort.columnName);
+    this.sortableFields = this.getSortableFields(this.checkedFields, this.sorts);
     this.sortsChange.emit(this.sorts);
   }
 
@@ -58,10 +70,9 @@ export class DesignerSortComponent {
     };
   }
 
-  getSortableFields(artifactcolumns: ArtifactColumns, sorts: Sort[]) {
-    return filter(this.artifactColumns, artifactColumn => {
-      return artifactColumn.checked &&
-        !find(this.sorts, ({columnName}) => columnName === artifactColumn.columnName);
+  getSortableFields(checkedFields: ArtifactColumns, sorts: Sort[]) {
+    return filter(checkedFields, field => {
+      return !find(this.sorts, ({columnName}) => columnName === field.columnName);
     });
   }
 
@@ -70,7 +81,19 @@ export class DesignerSortComponent {
     this.sortsChange.emit(this.sorts);
   }
 
-  trackByFn(index, {columnName}) {
+  trackByFn(_, {columnName}) {
     return columnName;
+  }
+
+  onDrop(event) {
+    console.log('drop', event);
+  }
+
+  onSortableDragEnd(event, fromIndex) {
+    console.log('sortableDragEnd', event);
+  }
+
+  onSortedDragEnd(event, fromIndex) {
+    console.log('sortedDragEnd', event);
   }
 }
