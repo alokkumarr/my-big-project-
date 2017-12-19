@@ -28,7 +28,7 @@ import com.synchronoss.saw.observe.model.store.MetaDataStoreStructure.Category;
 import com.synchronoss.saw.store.cli.Request;
 
 @Service
-class ObserveServiceImpl implements ObserveService {
+public class ObserveServiceImpl implements ObserveService {
 
   private static final Logger logger = LoggerFactory.getLogger(ObserveServiceImpl.class);
 
@@ -138,5 +138,7 @@ class ObserveServiceImpl implements ObserveService {
     contents.setObserve(observeListNew);
     response.setContents(contents);
     System.out.println(mapper.writeValueAsString(response));
+    String jsonString ="{\"contents\":{\"observe\":[{\"_id\":\"id:portalDataSet::201\",\"entityId\":\"string\",\"categoryId\":\"string\",\"name\":\"string\",\"description\":\"string\",\"createdBy\":\"string\",\"updatedBy\":\"string\",\"createdAt\":\"string\",\"updatedAt\":\"string\",\"options\":[],\"tiles\":[{\"type\":\"analysis\",\"id\":\"analysisId - string\",\"cols\":3,\"rows\":4,\"x\":5,\"y\":6,\"options\":\"\"}],\"filters\":[]}]}}";
+    System.out.println(mapper.writeValueAsString(ObserveUtils.getObserveNode(jsonString, "contents")));
   }
 }

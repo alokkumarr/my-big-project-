@@ -48,7 +48,6 @@ import com.synchronoss.saw.observe.service.ObserveService;
  *  }
  */
 @RestController
-@RequestMapping(value = "/observe/")
 public class ObserveController {
 
   private static final Logger logger = LoggerFactory.getLogger(ObserveController.class);
@@ -64,17 +63,16 @@ public class ObserveController {
    * @param requestBody
    * @return
    */
-  @RequestMapping(value = "/dashboards/create", method = RequestMethod.POST)
+  @RequestMapping(value = "/observe/dashboards/create", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
-  public ObserveResponse addDashboard(HttpServletRequest request, HttpServletResponse response,
-      @RequestBody String requestBody) {
+  public ObserveResponse addDashboard(@RequestBody String requestBody) {
     logger.debug("Request Body", requestBody);
     if (requestBody == null) {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
     ObserveResponse responseObjectFuture = null;
-    try {
-      Observe observe = ObserveUtils.getObserveNode(requestBody, "observe");
+   try {
+      Observe observe = ObserveUtils.getObserveNode(requestBody, "contents");
       observe.setEntityId(observeService.generateId().getId());
       responseObjectFuture = observeService.addDashboard(observe);
     } catch (IOException e) {
@@ -86,7 +84,7 @@ public class ObserveController {
     return responseObjectFuture;
   }
 
-  @RequestMapping(value = "/dashboards/read/{Id}", method = RequestMethod.GET)
+  @RequestMapping(value = "/observe/dashboards/read/{Id}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   public ObserveResponse getDashboardById(@PathVariable(name = "Id", required = true) String Id,
       HttpServletRequest request, HttpServletResponse response) {
@@ -98,7 +96,7 @@ public class ObserveController {
     return responseObjectFuture;
   }
 
-    @RequestMapping(value = "/dashboards/update/{Id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/observe/dashboards/update/{Id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)
   public ObserveResponse updateDashboard(HttpServletRequest request, HttpServletResponse response,
       @PathVariable(name = "Id", required = true) String Id, @RequestBody String requestBody) {
@@ -109,7 +107,7 @@ public class ObserveController {
     }
     ObserveResponse responseObjectFuture = null;
     try {
-      Observe observe = ObserveUtils.getObserveNode(requestBody, "observe");
+      Observe observe = ObserveUtils.getObserveNode(requestBody, "contents");
       observe.setEntityId(Id);
       responseObjectFuture = observeService.updateDashboard(observe);
     } catch (IOException e) {
@@ -120,7 +118,7 @@ public class ObserveController {
     return responseObjectFuture;
   }
 
-  @RequestMapping(value = "/dashboards/{Id}", method = RequestMethod.DELETE)
+  @RequestMapping(value = "/observe/dashboards/{Id}", method = RequestMethod.DELETE)
   @ResponseStatus(HttpStatus.OK)
   public ObserveResponse deleteDashboard(HttpServletRequest request, HttpServletResponse response,
       @PathVariable(name = "Id", required = true) String Id) {
@@ -132,7 +130,7 @@ public class ObserveController {
     return responseObjectFuture;
   }
 
-  @RequestMapping(value = "/dashboard/generateId", method = RequestMethod.GET)
+  @RequestMapping(value = "/observe/dashboard/generateId", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   public ObserveResponse generateDashboardId(HttpServletRequest request,
       HttpServletResponse response) {

@@ -77,7 +77,9 @@ public class ObserveUtils {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     JsonNode objectNode = objectMapper.readTree(json);
-    JsonNode observeNode = objectNode.get(node);
+    JsonNode contentNode = objectNode.get(node);
+    JsonNode observeNode = contentNode.get("observe").get(0);
+    System.out.println(observeNode.toString());
     String jsonObserve = "{ \"observe\" :" + observeNode.toString() + "}";
     JsonNode observeNodeIndependent = objectMapper.readTree(jsonObserve);
     ObserveNode observeTreeNode = objectMapper.treeToValue(observeNodeIndependent, ObserveNode.class);
