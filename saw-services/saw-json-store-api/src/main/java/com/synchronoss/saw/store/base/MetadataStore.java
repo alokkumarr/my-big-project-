@@ -1,5 +1,7 @@
 package com.synchronoss.saw.store.base;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.ojai.Document;
@@ -25,20 +27,21 @@ import com.synchronoss.saw.store.metastore.DocumentConverter;
 public abstract class MetadataStore extends MetadataBase  implements DocumentConverter{
 
     private static final Logger logger = Logger.getLogger(MetadataStore.class);
-    private static final String METASTORE = ".metadata";
+    private static final String METASTORE = "metadata";
 
     public static final String delimiter = "::";
 
     protected String metaRoot;
     protected final Table table;
-
-    //TODO:: Replace altRoot with configuration reading
+    
+     //TODO:: Replace altRoot with configuration reading
     protected MetadataStore(String tableName, String altRoot) throws Exception {
         super(altRoot);
         metaRoot = dlRoot + Path.SEPARATOR + METASTORE;
         String fullTableName = metaRoot + Path.SEPARATOR + tableName;
         logger.debug("Open table: " + fullTableName);
-        table = MapRDB.getTable(fullTableName);
+        boolean exists = MapRDB.tableExists(fullTableName);
+        table = !exists ? MapRDB.createTable(fullTableName) : MapRDB.getTable(fullTableName);
         table.setOption(Table.TableOption.BUFFERWRITE, false);
     }
 
