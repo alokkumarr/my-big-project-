@@ -21,12 +21,12 @@
     </mat-button-toggle-group>
   </div>
   <div class="settings__unselected-fields"
-       [dndSortableContainer]="dndSortableContainerObj">
+       dndSortableContainer
+       dndZone="designer-setting-zone">
     <div *ngIf="unselectedArtifactColumns">
       <div *ngFor="let artifactColumn of (unselectedArtifactColumns | artifactColumnFilter:filterObj); trackBy: index"
            (click)="addToGroupIfPossible(artifactColumn)"
            [dndSortable]="artifactColumn"
-           (dndOnDragEnd)="onDragEnd($event)"
            class="settings__list-item">
         <span class="settings__list-item__name">
           {{ artifactColumn.alias || artifactColumn.displayName }}
@@ -40,11 +40,10 @@
 
   <div class="settings__selected-fields">
     <designer-settings-group *ngFor="let groupAdapter of groupAdapters; trackBy: index"
-      (removeField)="removeFromGroup($event, groupAdapter)"
-      (moveFrom)="onMove($event)"
-      (moveTo)="onMove($event)"
-      [groupAdapter]="groupAdapter"
-      [artifactColumns]="groupAdapter.artifactColumns">
+                             (onSettingsChange)="changeSettings()"
+                             (removeField)="removeFromGroup($event, groupAdapter)"
+                             [groupAdapter]="groupAdapter"
+                             [artifactColumns]="groupAdapter.artifactColumns">
     </designer-settings-group>
   </div>
 </div>

@@ -42,19 +42,6 @@ export type ArtifactColumnFilter = {
 
 export type PivotArea = 'data' | 'row' | 'column';
 
-export interface IMoveFieldToEvent {
-  name: 'moveTo',
-  artifactColumn: ArtifactColumn,
-  toIndex: number,
-  toGroup: IDEsignerSettingGroupAdapter
-}
-
-export interface IMoveFieldFromEvent {
-  name: 'moveFrom',
-  artifactColumn: ArtifactColumn,
-  fromIndex: number,
-  fromGroup: IDEsignerSettingGroupAdapter
-}
 export interface IDEsignerSettingGroupAdapter {
   title: string;
   marker: string;

@@ -7,9 +7,7 @@ import {
 import {
   ArtifactColumn,
   ArtifactColumns,
-  IDEsignerSettingGroupAdapter,
-  IMoveFieldToEvent,
-  IMoveFieldFromEvent
+  IDEsignerSettingGroupAdapter
 }  from '../../types';
 import { TYPE_ICONS_OBJ } from '../../../../consts';
 import { DesignerService } from '../../designer.service';
@@ -22,51 +20,37 @@ require('./designer-settings-group.component.scss');
   template
 })
 export default class DesignerSettingsGroupComponent {
-  // @Output() public onSettingsChange: EventEmitter<ArtifactColumns[]> = new EventEmitter();
-  @Output() public moveFrom: EventEmitter<IMoveFieldFromEvent> = new EventEmitter();
-  @Output() public moveTo: EventEmitter<IMoveFieldToEvent> = new EventEmitter();
+  @Output() public onSettingsChange: EventEmitter<null> = new EventEmitter();
   @Output() public removeField: EventEmitter<ArtifactColumn> = new EventEmitter();
   @Input() public artifactColumns :ArtifactColumns;
   @Input() public groupAdapter :IDEsignerSettingGroupAdapter;
 
   public dndSortableContainerObj = {};
+  public allowDropFn;
 
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
+
+  public removeFromCallback = (payload, index, container) => {
+    this._designerService.removeArtifactColumnFromGroup(
+      payload,
+      container
+    );
+    this.onSettingsChange.emit();
+  }
+
+  public addToCallback = (payload, index, container) => {
+    this._designerService.addArtifactColumnIntoGroup(
+      payload,
+      container,
+      index
+    );
+    this.onSettingsChange.emit();
+  }
 
   constructor(private _designerService: DesignerService) {}
 
   ngOnInit() {
-    this.dndSortableContainerObj = {
-      allowDropFn: this.groupAdapter.canAcceptArtifactColumn(this.groupAdapter)
-    };
-  }
-
-  /**
-   * Drop event for sortable dropped in this group
-   */
-  onDrop(event) {
-    const artifactColumn = <ArtifactColumn> event.data;
-    this.moveTo.emit({
-      name: 'moveTo',
-      artifactColumn,
-      toIndex: event.index,
-      toGroup: this.groupAdapter
-    });
-  }
-
-  /**
-   * Dragend event from a sortable taken from this group
-   */
-  onDragEnd(event, fromIndex) {
-    if (event.isDropSuccessful) {
-      const artifactColumn = <ArtifactColumn> event.data;
-      this.moveFrom.emit({
-        name: 'moveFrom',
-        artifactColumn,
-        fromIndex,
-        fromGroup: this.groupAdapter
-      });
-    }
+    this.allowDropFn = this.groupAdapter.canAcceptArtifactColumn(this.groupAdapter)
   }
 
   onRemoveField(artifactColumn: ArtifactColumn) {

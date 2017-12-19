@@ -40,17 +40,17 @@ export class DndDraggableDirective {
   @HostListener('dragstart', ['$event'])
   onDragStart() {
     this._isDragged = true;
-    this._dragDropService.startDrag({
+    this._dragDropService.setPayload({
       data: this._data,
       allowedZones: this.dndZones
-    }, this._elemRef.nativeElement);
+    });
+    this._dragDropService.startDrag(this._elemRef.nativeElement);
     this.dndOnDrag.emit();
   }
 
   @HostListener('dragend', ['$event'])
   onDragEnd(event) {
     this._isDragged = false;
-    this._dragDropService.onDragEnd();
     const isDropSuccessful = event.dataTransfer.dropEffect !== 'none';
     const draggableDragEndObj: IDraggableDragEndData = {
       isDropSuccessful

@@ -4,13 +4,15 @@
   </span>
   <div *ngIf="artifactColumns"
        class="settings__group__list"
-       [dndSortableContainer]="dndSortableContainerObj"
-       [dndCollection]="artifactColumns"
-       (dndOnDrop)="onDrop($event)">
+       dndSortableContainer
+       [dndContainer]="groupAdapter"
+       [dndAllowDropFn]="allowDropFn"
+       [dndAddToCallback]="addToCallback">
     <expandable-field *ngFor="let artifactColumn of artifactColumns; let i = index; trackBy: trackByFn"
                       [dndSortable]="artifactColumn"
                       [dndSortableIndex]="i"
-                      (dndOnDragEnd)="onDragEnd($event, fromIndex)"
+                      [dndRemoveFromCallback]="removeFromCallback"
+                      [dndContainer]="groupAdapter"
                       [artifactColumn]="artifactColumn"
                       (removeRequest)="onRemoveField(artifactColumn)"
                       class="settings__list-item"></expandable-field>

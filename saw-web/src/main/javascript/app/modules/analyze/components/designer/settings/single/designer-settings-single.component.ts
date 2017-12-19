@@ -14,9 +14,7 @@ import {
   ArtifactColumn,
   ArtifactColumns,
   ArtifactColumnFilter,
-  ArtifactColumnPivot,
-  IMoveFieldToEvent,
-  IMoveFieldFromEvent
+  ArtifactColumnPivot
 } from '../../types';
 import {
   TYPE_ICONS_OBJ,
@@ -49,20 +47,6 @@ export class DesignerSettingsSingleComponent {
     keyword: '',
     type: ''
   };
-  public dndSortableContainerObj = {
-    // the zone can be any value as long as it's different than the zone of the sortables in it
-    // so that you can't sort the unselected artifactColumns
-    zone: 'zone'
-  };
-  private _moveEventAccumulator: {
-    to: IMoveFieldToEvent,
-    from: IMoveFieldFromEvent
-  } = {
-    to: null,
-    from: null
-  };
-
-
   constructor(private _designerService: DesignerService) {
     // we have to debounce settings change
     // so that the pivot grid or chart designer
@@ -88,70 +72,13 @@ export class DesignerSettingsSingleComponent {
     }
   }
 
-  _changeSettings() {
+  changeSettings() {
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
     this._changeSettingsDebounced();
   }
 
   _changeSettingsDebounced() {
     this.settingsChange.emit();
-  }
-
-  onDragEnd(event) {
-    if (event.isDropSuccessful) {
-      const artifactColumn = <ArtifactColumn> event.data;
-      this.onMove({
-        name: 'moveFrom',
-        artifactColumn,
-        fromGroup: null
-      });
-    }
-  }
-
-  onMove(event) {
-    // because the onDragEnd event fires after the onDrop event
-    // the moveFrom coms after the moveTo event
-    // however we need the information from the moveFrom event first to take out the element
-    // from the old group and then insert it into the new one
-    switch (event.name) {
-    case 'moveTo':
-      this._moveEventAccumulator.to = event;
-      break;
-    case 'moveFrom':
-      this._moveEventAccumulator.from = event;
-      break;
-    }
-    if (this._moveEventAccumulator.from && this._moveEventAccumulator.to) {
-      const {
-        fromGroup,
-        fromIndex
-      } = this._moveEventAccumulator.from;
-      const {
-        toGroup,
-        toIndex,
-        artifactColumn
-      } = this._moveEventAccumulator.to;
-      // remove from old group, if it was dragged from a group
-      // do nothing if it was dragged from the unselected fields
-      if (fromGroup) {
-        this._designerService.removeArtifactColumnFromGroup(
-          artifactColumn,
-          fromGroup
-        );
-      }
-      // add to new group
-      this._designerService.addArtifactColumnIntoGroup(
-        artifactColumn,
-        toGroup,
-        toIndex
-      );
-      // clear event Acumulator
-      this._moveEventAccumulator = {
-        to: null,
-        from: null
-      };
-      this._changeSettings();
-    }
   }
 
   getUnselectedArtifactColumns() {
@@ -175,7 +102,7 @@ export class DesignerSettingsSingleComponent {
       this.groupAdapters
     );
     if (isAddSuccessful) {
-      this._changeSettings();
+      this.changeSettings();
     }
   }
 
@@ -184,7 +111,7 @@ export class DesignerSettingsSingleComponent {
       artifactColumn,
       groupAdapter
     );
-    this._changeSettings();
+    this.changeSettings();
   }
 
 }

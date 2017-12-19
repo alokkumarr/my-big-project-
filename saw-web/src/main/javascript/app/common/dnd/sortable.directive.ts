@@ -10,7 +10,8 @@ import {
 } from '@angular/core';
 
 import {
-  ISortableDragEndData
+  ISortableDragEndEvent,
+  SortableCallback
 } from './types';
 import { dndClasses } from './consts';
 import {DragnDropService} from './dnd.service';
@@ -19,10 +20,12 @@ import {DndSortableContainerDirective} from './sortable-container.directive';
 @Directive({ selector: '[dndSortable]' })
 export class DndSortableDirective {
   @Output() dndOnDrag?: EventEmitter<null> = new EventEmitter<null>();
-  @Output() dndOnDragEnd?: EventEmitter<ISortableDragEndData> = new EventEmitter<ISortableDragEndData>();
+  @Output() dndOnDragEnd?: EventEmitter<ISortableDragEndEvent> = new EventEmitter<ISortableDragEndEvent>();
 
+  @Input() dndRemoveFromCallback: SortableCallback;
   @Input() dndZones?: string[] = [];
   @Input() dndSortableIndex: number;
+  @Input() dndContainer: any;
 
   @Input('dndSortable')
   set dndOptions(data: any) {
@@ -78,21 +81,27 @@ export class DndSortableDirective {
     setTimeout(() => {
       this._isDragged = true;
     }, 50);
-    this._dragDropService.startDrag({
+    this._dragDropService.setPayload({
       data: this._data,
       allowedZones: this.dndZones
-    }, this._elemRef.nativeElement);
+    });
+    this._dragDropService.startDrag(this._elemRef.nativeElement);
     this.dndOnDrag.emit();
   }
 
   @HostListener('dragend', ['$event'])
   onDragEnd(event: DragEvent) {
     this._isDragged = false;
-    this._dragDropService.onDragEnd();
+    const {data} = this._dragDropService.getPayload();
     const isDropSuccessful = event.dataTransfer.dropEffect !== 'none';
-    const sortableDragEndObj: ISortableDragEndData = {
-      isDropSuccessful
+    const sortableDragEndObj: ISortableDragEndEvent = {
+      isDropSuccessful,
+      payload: data,
+      container: this.dndContainer,
+      index: this.dndSortableIndex,
+      removeFromCallback: this.dndRemoveFromCallback
     };
+    this._dragDropService.onDragEnd(sortableDragEndObj);
     this.dndOnDragEnd.emit(sortableDragEndObj);
   }
 

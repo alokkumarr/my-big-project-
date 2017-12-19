@@ -7,7 +7,8 @@
     </mat-card-header>
     <mat-card-content>
       <div class="sortable-fields"
-           [dndSortableContainer]="dndSortableContainerObj">
+           dndSortableContainer
+           dndZone="available-fields-container">
         <div *ngFor="let field of sortableFields; let i = index; trackBy: trackByFn"
              [dndSortable]="field"
              [dndSortableIndex]="i"
@@ -28,8 +29,7 @@
     </mat-card-header>
     <mat-card-content>
       <div class="sorted-fields"
-           [dndSortableContainer]="dndSortedContainerObj"
-           [dndCollection]="sorts"
+           dndSortableContainer
            (dndOnDrop)="onDrop($event)">
         <div *ngFor="let sort of sorts; let i = index; trackBy: trackByFn"
              [dndSortable]="sort"

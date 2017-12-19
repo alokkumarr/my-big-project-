@@ -8,7 +8,9 @@ import {
 } from '@angular/core';
 
 import {
-  IDroppableOptions
+  IDroppableOptions,
+  ISortableDropEvent,
+  SortableCallback
 } from './types';
 import {
   arrayMove
@@ -20,20 +22,16 @@ import {DragnDropService} from './dnd.service';
   selector: '[dndSortableContainer]'
 })
 export class DndSortableContainerDirective {
-  @Input('dndSortableContainer')
-  set dndOptions(options: IDroppableOptions) {
-    if (options) {
-      this._droppableOptions = options;
-    }
-  }
-  @Input() public dndCollection: Array<any>;
-  @Output() public dndOnDrop: EventEmitter<any> = new EventEmitter<any>();
+  @Input() public dndZone: string;
+  @Input() public dndAllowDropFn: (dragData: any) => boolean;
+  @Input() public dndContainer: any;
+  @Input() public dndAddToCallback: SortableCallback;
+  @Output() public dndOnDrop: EventEmitter<ISortableDropEvent> = new EventEmitter<ISortableDropEvent>();
 
   @HostBinding(`class.${dndClasses.dropAreaDragOver}`) private _isDropAllowed = false;
 
   // counter for the enter and leave events of the containers children that bubble up
   private _counter = 0;
-  private _droppableOptions: IDroppableOptions;
   private _newSortableIndex: number;
   private _insertionPlaceholder: HTMLElement;
   private _placeholderPlace: any;
@@ -49,11 +47,12 @@ export class DndSortableContainerDirective {
       // if the container is empty, add the placeholder, and set the index
       // if not, then this will be handled in the onElementDragOver event
       const payload = this._dragDropService.getPayload();
-      this._isDropAllowed = this._dragDropService.shouldAllowDrop(payload, this._droppableOptions);
+      this._isDropAllowed = this._dragDropService.shouldAllowDrop(payload, {
+        zone: this.dndZone,
+        allowDropFn: this.dndAllowDropFn
+      });
 
-      if (this._isDropAllowed &&
-        this.dndCollection &&
-        this.dndCollection.length === 0) {
+      if (this._isDropAllowed) {
         this.addPlaceholder(event.target, 'inside');
         this._newSortableIndex = 0;
       }
@@ -79,14 +78,18 @@ export class DndSortableContainerDirective {
 
   @HostListener('drop', ['$event'])
   onDrop() {
-    this._isDropAllowed = false;
     const {data} = this._dragDropService.getPayload();
+    const dropEvent = {
+      index: this._newSortableIndex,
+      payload: data,
+      container: this.dndContainer,
+      addToCallback: this.dndAddToCallback
+    };
+    this._isDropAllowed = false;
     this._counter = 0;
     this.removePlaceholder();
-    this.dndOnDrop.emit({
-      index: this._newSortableIndex,
-      data
-    });
+    this._dragDropService.onDrop(dropEvent);
+    this.dndOnDrop.emit(dropEvent);
   }
 
   onElementDragOver(event, element, index) {
@@ -122,8 +125,8 @@ export class DndSortableContainerDirective {
   }
 
   addPlaceholder(element, where: 'before' | 'after' | 'inside') {
-    this._insertionPlaceholder = this._dragDropService.getElement();
     const targetElem = event.target;
+    this._insertionPlaceholder = this._dragDropService.getElement();
     switch (where) {
     case 'inside':
       element.append(this._insertionPlaceholder);

@@ -31,10 +31,6 @@ export class DesignerSortComponent {
   public checkedFields: ArtifactColumns = [];
   public sortableFields: ArtifactColumns = [];
   public nameMap: Object = {};
-  public dndSortableContainerObj = {
-    zone: 'sortableContainer'
-  };
-  public dndSortedContainerObj = {};
 
   ngOnInit() {
     this.checkedFields = filter(this.artifactColumns, 'checked');
