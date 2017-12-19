@@ -38,7 +38,6 @@ export const ReportGridDisplayComponent = {
 
     $onInit() {
       const columns = this._getDxColumns(this.columns, this.data);
-
       const gridSelector = '.report-dx-grid.report-dx-grid-display';
       this.gridConfig = this._dxDataGridService.mergeWithDefaultConfig({
         columns: isEmpty(columns) ? null : columns,
