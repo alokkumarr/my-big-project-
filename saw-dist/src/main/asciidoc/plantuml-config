@@ -1,0 +1,4 @@
+skinparam componentStyle uml2
+skinparam style strictuml
+skinparam monochrome true
+skinparam shadowing false

@@ -3,6 +3,7 @@ Version {project-version}
 :toc:
 :nofooter:
 :docinfo: shared
+:plantuml-config: plantuml-config
 
 == Introduction
 

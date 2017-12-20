@@ -163,6 +163,20 @@ field mapping].
 [Elasticsearch data types]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/mapping-types.html
 [Elasticsearch dynamic field mapping]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/dynamic-field-mapping.html
 
+# Rendering documentation
+
+Documentation in the [saw-dist/src/main/asciidoc] directory is
+automatically rendered as part of the project build process.  To
+render the documentation without running other parts of the project
+build, execute the following command:
+
+        $ mvn -pl saw-dist asciidoctor:process-asciidoc -Dasciidoctor.backend=html
+
+The output can be inspected in the `saw-dist/target/generated-docs`
+directory.
+
+[saw-dist/src/main/asciidoc]: saw-dist/src/main/asciidoc
+
 # Continuous integration
 
 After a pull request has been merged, the changes will be picked up

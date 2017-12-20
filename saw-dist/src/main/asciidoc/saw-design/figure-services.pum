@@ -1,0 +1,34 @@
+[SAW Gateway Service]
+
+node "SAW Transport Service" {
+    [SAW Dataset Service]
+    [SAW Analysis Service]
+    [SAW Execution Service]
+}
+
+[SAW Scheduler Service]
+
+cloud "MapR cluster" {
+    [MapR-DB]
+    [Apache Spark]
+}
+
+cloud "Elasticsearch cluster" {
+    [Elasticsearch]
+}
+
+[SAW Gateway Service] ..> [SAW Dataset Service]
+[SAW Gateway Service] ..> [SAW Analysis Service]
+[SAW Gateway Service] ..> [SAW Execution Service]
+
+[SAW Dataset Service] ..> [MapR-DB]
+[SAW Analysis Service] ..> [MapR-DB]
+
+[SAW Execution Service] ..> [SAW Analysis Service]
+[SAW Execution Service] ..> [MapR-DB]
+[SAW Execution Service] ..> [Apache Spark]
+[SAW Execution Service] ...> [Elasticsearch]
+
+[SAW Scheduler Service] ..> [SAW Analysis Service]
+[SAW Scheduler Service] ..> [SAW Execution Service]
+[SAW Scheduler Service] ..> [MapR-DB]
