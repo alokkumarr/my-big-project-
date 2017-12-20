@@ -11,7 +11,7 @@ server:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
 metastore:
-    base:  hdfs:///data/bda
+    base:  hdfs:///main
     
   
 

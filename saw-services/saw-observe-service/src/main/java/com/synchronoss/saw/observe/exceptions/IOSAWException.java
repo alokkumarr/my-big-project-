@@ -1,9 +1,5 @@
 package com.synchronoss.saw.observe.exceptions;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-@ResponseStatus(value=HttpStatus.NOT_FOUND, reason="problem with input output operation like reading or writing to internal file system")
 public class IOSAWException extends ExportRuntimeSAWException {
 
     /**
