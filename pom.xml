@@ -9,7 +9,7 @@
   <name>saw</name>
   <modules>
     <module>saw-dist</module>
-    <module>saw-security-parent</module>
+    <module>saw-security</module>
     <module>saw-services</module>
     <module>saw-web</module>
   </modules>

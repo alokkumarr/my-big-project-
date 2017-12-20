@@ -1,4 +1,4 @@
-package com.sncr.saw.security.app.admin;
+package com.sncr.saw.security.app;
 
 
 import org.springframework.boot.SpringApplication;

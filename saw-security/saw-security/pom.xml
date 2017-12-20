@@ -372,6 +372,11 @@
                         <ruleset>default</ruleset>
                       </entry>
                       <entry>
+                        <name>${app.optDir}/bin/customer_onboard.sh</name>
+                        <file>bin/customer_onboard.sh</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
                         <name>${app.optDir}/conf</name>
                         <directory>true</directory>
                         <ruleset>default</ruleset>
@@ -406,6 +411,11 @@
                       <entry>
                         <name>${app.optDir}/lib/saw-security-${revision}-classes.jar</name>
                         <file>target/saw-security-${revision}-classes.jar</file>
+                        <ruleset>default</ruleset>
+                      </entry>
+                      <entry>
+                        <name>${app.optDir}/lib/saw-security-command-line-tool-${revision}.jar</name>
+                        <file>../saw-security-command-line-tool/target/saw-security-command-line-tool-${revision}.jar</file>
                         <ruleset>default</ruleset>
                       </entry>
                       <entry>

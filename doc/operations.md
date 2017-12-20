@@ -205,22 +205,20 @@ Attribute name should be MCT_SESSION.SESSION_ID.
 
 # Onboarding a customer
 
-FOr onboarding a customer, we need to execute the code using saw security shell either by using saw security jar or by executing it from maven project.
+We can execute the jar file of command line tools and add saw-security-classes jar file in its classpath as follows:
 
-#### Way 1: using jar file
+    java -jar saw-security-command-line-tool-2.jar -cp saw-security-2-classes.jar
 
-As of now our packaging is war file, but if we do jar packaging, we can execute it a following manner:
+We can also utilise customer_onboard.sh script in order to execute the command with current environment setup.
 
-    java -jar generated_saw_security_jar_file
+    cd /opt/bda/saw-security/bin/
+    bash customer_onboard.sh
 
-#### Way 2: using maven
+Internally above command executes following:
 
-Inside the saw-security folder:
+    java -Dspring.config.location=/opt/bda/saw-security/conf/application.properties -Dlogging.config=/opt/bda/saw-security/conf/logback.xml -Dquartz.properties.location=/opt/bda/saw-security/conf -jar /opt/bda/saw-security/saw-security-command-line-tool-2.jar -cp /opt/bda/saw-security/saw-security-2-classes.jar --server.port=9999
 
-    mvn compile
-    mvn spring-boot:run
-
-It will start as normal spring boot project and then we can start with onboarding a customer based on the information present on the screen.
+Note that the versions may differ.
 
 Features of spring boot shell:
 1. Type in "help" and it will show you all the available commands
