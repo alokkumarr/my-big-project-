@@ -83,7 +83,8 @@
   "FRIDAY": "Friday",
   "SATURDAY": "Saturday",
   "SUNDAY": "Sunday",
-
+  "DATE": "Date"
+,
   "TOOLTIP_SEARCH": "Search",
   "TOOLTIP_LIST_VIEW": "List View",
   "TOOLTIP_CARD_VIEW": "Card View",

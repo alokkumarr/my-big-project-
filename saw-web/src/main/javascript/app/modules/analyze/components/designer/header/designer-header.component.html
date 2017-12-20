@@ -1,0 +1,27 @@
+<div fxLayout="row"
+     fxLayoutAlign="space-between"
+     class="header__container">
+  <div fxLayout="row" fxLayoutAlign="start">
+    <button mat-button (click)="onBack.emit()">
+      <mat-icon fontIcon="icon-arrow-left"></mat-icon>
+    </button>
+    <div fxLayout="column"
+         fxLayoutAlign="start"
+         *ngIf="analysis">
+      <div class="header__name">
+        <strong class="e2e-pivot-title">
+          {{analysis.name}}
+        </strong>
+        <label i18n *ngIf="isInDraftMode">Draft</label>
+      </div>
+      <div class="header__description">
+        <mat-icon fontIcon="icon-report"></mat-icon>
+        <span>{{analysis.metricName}}</span>
+      </div>
+    </div>
+  </div>
+  <button mat-raised-button
+          color="primary">
+    <ng-container i18n>Save</ng-container>
+  </button>
+</div>

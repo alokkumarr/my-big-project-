@@ -18,11 +18,7 @@ directory and retry.
 
 Try running the following command to free up disk space:
 
-        docker system prune
-
-To free up even more disk space try the following command:
-
-        docker system prune -a --volumes
+        docker system prune --volumes
 
 But be aware of that it will remove all images and volumes that are
 not in use by any container.

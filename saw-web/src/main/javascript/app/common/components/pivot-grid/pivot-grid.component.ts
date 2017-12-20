@@ -5,21 +5,31 @@ import {
   EventEmitter
 } from '@angular/core';
 import * as forEach from 'lodash/forEach';
-import * as assign from 'lodash/assign';
-import * as values from 'lodash/values';
-import * as mapValues from 'lodash/mapValues';
+import * as isEmpty from 'lodash/isEmpty';
+import * as get from 'lodash/get';
 import {Subject} from 'rxjs/Subject';
+import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 
 require('./pivot-grid.component.scss');
 const template = require('./pivot-grid.component.html');
+
+export interface IPivotGridUpdate {
+  dataSource?: any;
+  fields?: any;
+  data?: any;
+  sorts?: any;
+  export?: boolean;
+}
 
 @Component({
   selector: 'pivot-grid',
   template
 })
 export class PivotGridComponent {
-  @Input() updater: Subject<any>;
+  @Input() updater: Subject<IPivotGridUpdate>;
   @Input() mode: string;
+  @Input() fields: any[];
+  @Input() data: any[];
   @Output() onContentReady: EventEmitter<any> = new EventEmitter();
   public pivotGridOptions : any;
   rowHeaderLayout = 'tree';
@@ -68,11 +78,27 @@ export class PivotGridComponent {
     this._preExportState = null;
   }
 
-  update(updates) {
+  ngOnChanges(changes) {
+    if (!isEmpty(get(changes, 'data.currentValue'))) {
+      const dataSource = new PivotGridDataSource({
+        store: this.data,
+        fields: this.fields
+      });
+      this.updateDataSource(dataSource);
+    } else if (!isEmpty(get(changes, 'fields.currentValue'))) {
+      const dataSource = new PivotGridDataSource({
+        store: [],
+        fields: this.fields
+      });
+      this.updateDataSource(dataSource);
+    }
+  }
+
+  update(update: IPivotGridUpdate) {
     /* eslint-disable no-unused-expressions */
-    updates.dataSource && this.updateDataSource(updates.dataSource);
-    updates.sorts && this.updateSorts(updates.sorts);
-    updates.export && this.exportToExcel();
+    update.dataSource && this.updateDataSource(update.dataSource);
+    update.sorts && this.updateSorts(update.sorts);
+    update.export && this.exportToExcel();
     /* eslint-disable no-unused-expressions */
   }
 
@@ -85,7 +111,13 @@ export class PivotGridComponent {
   }
 
   updateDataSource(dataSource) {
-    this._gridInstance.option('dataSource', dataSource);
+    if (this._gridInstance) {
+      this._gridInstance.option('dataSource', dataSource);
+    } else {
+      setTimeout(() => {
+        this._gridInstance.option('dataSource', dataSource);
+      }, 100);
+    }
   }
 
   updateSorts(sorts) {
@@ -101,6 +133,8 @@ export class PivotGridComponent {
     });
 
     forEach(sorts, sort => {
+      // remove the suffix from the sort fields name, that is added by elastic search
+      // there is a bug that breaks pivotgrid when the name conains a .
       const dataField = sort.field.type === 'string' ?
         sort.field.dataField.split('.')[0] :
         sort.field.dataField;

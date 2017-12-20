@@ -1,0 +1,16 @@
+<div [ngSwitch]="designerState">
+  <div *ngSwitchCase="DesignerStates.NO_SELECTION">
+    nothing selected
+  </div>
+  <div *ngSwitchCase="DesignerStates.SELECTION_WAITING_FOR_DATA">
+    loading
+  </div>
+  <pivot-grid *ngSwitchDefault
+              [class.out-of-synch]="isDataOutOfSynch"
+              [fields]="artifactColumns | artifactColumns2PivotFields"
+              [data]="data"
+              [updater]="updater"
+              mode="designer"
+              (onContentReady)="onContentReady($event)">
+  </pivot-grid>
+</div>

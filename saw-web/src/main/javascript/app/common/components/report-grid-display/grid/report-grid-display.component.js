@@ -95,7 +95,7 @@ export const ReportGridDisplayComponent = {
         };
         if (!isUndefined(NUMBER_TYPES.includes(column.type)) && isUndefined(column.format)) {
           field.format = {
-            type: 'decimal',
+            type: 'fixedPoint',
             precision: 2
           };
         }

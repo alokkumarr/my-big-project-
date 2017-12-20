@@ -1,0 +1,25 @@
+designer-container {
+  background-color: white;
+  display: grid;
+  grid-template:
+    "header header" 6vh
+    "data-settings toolbar" 6vh
+    "data-settings content" 88vh
+    / 350px 1fr;
+
+  .designer__header {
+    grid-area: header;
+  }
+
+  .designer__toolbar {
+    grid-area: toolbar;
+  }
+
+  .designer__data-settings {
+    grid-area: data-settings;
+  }
+
+  .designer__main {
+    grid-area: content;
+  }
+}

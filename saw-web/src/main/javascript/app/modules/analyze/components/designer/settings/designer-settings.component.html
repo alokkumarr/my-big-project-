@@ -1,0 +1,39 @@
+<div fxLayout="row" class="settings__container">
+
+  <div (mouseenter)="expandUnselectedSection()"
+       class="settings__unselected-fields"
+       [class.anim__expanded]="isUnselectedExpanded">
+    <div *ngIf="unselectedArtifactColumns"
+              [dndSortableContainer]="sortableContainerOptions"
+              [dndCollection]="unselectedArtifactColumns">
+      <div class="settings__list-item">
+        keyword filter
+      </div>
+      <div class="settings__list-item">
+        type filter
+      </div>
+      <div *ngFor="let artifactColumn of unselectedArtifactColumns | artifactColumnFilter:filterObj; trackBy: index"
+           (click)="addToGroupIfPossible(artifactColumn)"
+           class="settings__list-item"
+           [dndSortable]="artifactColumn"
+           (dndOnDragEnd)="onDragEnd($event, artifactColumn)"
+           (dndOnDrag)="onDrag()">
+        <span class="settings__list-item__name">
+          {{ artifactColumn.alias || artifactColumn.displayName }}
+        </span>
+        <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
+                  class="settings__list-item__icon">
+        </mat-icon>
+      </div>
+    </div>
+  </div>
+
+  <div (mouseenter)="hideUnselectedSection()"
+       class="settings__selected-fields"
+       [class.anim__expanded]="!isUnselectedExpanded">
+    <designer-settings-group *ngFor="let groupAdapter of groupAdapters; trackBy: index"
+      [groupAdapter]="groupAdapter"
+      [artifactColumns]="groupAdapter.artifactColumns">
+    </designer-settings-group>
+  </div>
+</div>

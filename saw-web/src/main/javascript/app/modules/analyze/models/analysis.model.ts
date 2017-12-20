@@ -1,11 +1,14 @@
-import Artifact from './artifact.model';
-import SqlBuilder from './sql-builder.model';
+import { Artifact } from './artifact.model';
+import { SqlBuilder } from './sql-builder.model';
 import Schedule from './schedule.model';
 import Repository from './repository.model';
 import EsRepository from './es-repository.model';
 import OutputFile from './output-file.model';
+import LabelOptions from './label-options.model';
+import Legend from './legend.model';
+import Axis from './axis.model';
 
-export default interface Analyze {
+export interface Analysis {
   description:      string;
   checked:          null | boolean | string;
   categoryId:       number;
@@ -36,4 +39,17 @@ export default interface Analyze {
   outputFile?:      OutputFile;
   groupByColumns?:  any[];
   // groupByColumns should be deprecated
+}
+
+export interface AnalysisReport extends Analysis {
+  query?:           string;
+  queryManual?:     string;
+}
+
+export interface AnalysisChart extends Analysis {
+  legend?:          Legend;
+  chartType?:       string;
+  labelOptions?:    LabelOptions;
+  xAxis?:           Axis;
+  yAxis?:           Axis;
 }

@@ -1,0 +1,22 @@
+<div>
+  <span class ="settings__group__list-item__name">
+      {{groupAdapter.title}}
+  </span>
+  <div *ngIf="artifactColumns"
+       [dndSortableContainer]="sortableContainerOptions"
+       [dndCollection]="artifactColumns"
+       (dndOnDrop)="onDrop($event)"
+       class="settings__group__list">
+    <div *ngFor="let artifactColumn of artifactColumns; let i = index; trackBy: index"
+         [dndSortable]="artifactColumn"
+         [dndSortableIndex]="i"
+         class="settings__list-item">
+      <span class="settings__list-item__name">
+        {{ artifactColumn.alias || artifactColumn.displayName }}
+      </span>
+      <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
+                class="settings__list-item__icon">
+      </mat-icon>
+    </div>
+  </div>
+</div>

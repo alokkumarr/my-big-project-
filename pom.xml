@@ -6,9 +6,12 @@
   <artifactId>saw</artifactId>
   <version>${revision}</version>
   <packaging>pom</packaging>
-  <name>SAW</name>
+  <name>saw</name>
   <modules>
     <module>saw-dist</module>
+    <module>saw-security</module>
+    <module>saw-services</module>
+    <module>saw-web</module>
   </modules>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -47,16 +50,14 @@
   </repositories>
   <profiles>
     <profile>
-      <id>dev</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
+      <id>docker-keep</id>
       <properties>
         <saw.docker.port>80</saw.docker.port>
         <saw.docker.naming>alias</saw.docker.naming>
         <saw.mcs.port>8443</saw.mcs.port>
         <saw.spark.master.port>8080</saw.spark.master.port>
         <saw.spark.worker.port>8081</saw.spark.worker.port>
+        <docker.keepRunning>true</docker.keepRunning>
       </properties>
     </profile>
   </profiles>

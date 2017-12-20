@@ -13,7 +13,8 @@ import '../../../../assets/additional-icons.css';
 
 import 'zone.js';
 import 'reflect-metadata';
-import { NgModule } from '@angular/core';
+import { NgModule, LOCALE_ID } from '@angular/core';
+import { FlexLayoutModule } from '@angular/flex-layout';
 import { BrowserModule } from '@angular/platform-browser';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
@@ -60,8 +61,11 @@ angular
     UpgradeModule,
     CommonModuleTs,
     AnalyzeModuleTs,
-    ObserveUpgradeModule
-  ]
+    ObserveUpgradeModule,
+    FlexLayoutModule
+  ],
+  exports: [FlexLayoutModule],
+  providers: [{provide: LOCALE_ID, useValue: 'en'}]
 })
 export class NewAppModule {
   constructor() { }

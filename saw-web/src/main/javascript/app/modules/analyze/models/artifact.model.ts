@@ -1,8 +1,10 @@
-import ArtifactColumnReport from './artifact-column-report.model';
-import ArtifactColumnChart from './artifact-column-chart.model';
-import ArtifactColumnPivot from './artifact-column-pivot.model';
+import {
+  ArtifactColumnReport,
+  ArtifactColumnChart,
+  ArtifactColumnPivot
+} from './artifact-column.model';
 
-export default interface Artifact {
+export interface Artifact {
   artifactName:      string;
   columns:           ArtifactColumnReport[] | ArtifactColumnChart[] | ArtifactColumnPivot[];
   artifactPosition?: number[];

@@ -8,14 +8,20 @@ import {
   MatDialogModule,
   MatFormFieldModule,
   MatProgressBarModule,
-  MatChipsModule
+  MatChipsModule,
+  NoConflictStyleCompatibilityMode,
+  MatIconRegistry,
+  MatListModule,
+  MatCheckboxModule,
+  MatMenuModule,
+  MatTooltipModule
 } from '@angular/material';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
 import '../../../../themes/_angular_next.scss';
-
 @NgModule({
   imports: [
+    NoConflictStyleCompatibilityMode,
     BrowserAnimationsModule,
     MatButtonModule,
     MatIconModule,
@@ -24,8 +30,13 @@ import '../../../../themes/_angular_next.scss';
     MatSelectModule,
     MatFormFieldModule,
     MatProgressBarModule,
-    MatChipsModule
+    MatChipsModule,
+    MatListModule,
+    MatCheckboxModule,
+    MatMenuModule,
+    MatTooltipModule
   ],
+  providers: [MatIconRegistry],
   exports: [
     MatButtonModule,
     MatIconModule,
@@ -34,7 +45,11 @@ import '../../../../themes/_angular_next.scss';
     MatSelectModule,
     MatFormFieldModule,
     MatProgressBarModule,
-    MatChipsModule
+    MatChipsModule,
+    MatListModule,
+    MatCheckboxModule,
+    MatMenuModule,
+    MatTooltipModule
   ]
 })
 export class MaterialModule {}

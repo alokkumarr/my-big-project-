@@ -19,7 +19,8 @@ const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-const WebpackBuildVersion = require('./webpack.version');
+const WebpackBuildVersion = require('./webpack.version').WebpackBuildVersion;
+const gitDescription = require('./webpack.version').gitDescription;
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
@@ -74,6 +75,8 @@ module.exports = function (env) {
           loader: 'tslint-loader',
           options: {
             fix: false,
+            "useCache": true,
+            "transpileOnly": true,
             typeCheck: false, // tslint-loader is way too slow with this enabled. Use pre-push hook for typechecking
             tsConfigFile: webpackHelper.root('tsconfig.json'),
             configFile: isDevelopment ?
@@ -95,7 +98,7 @@ module.exports = function (env) {
           test: /\.[jt]s$/,
           exclude: /node_modules/,
           loaders: ['ng-annotate-loader', {
-            loader: 'ts-loader',
+            loader: 'awesome-typescript-loader',
             options: {
               configFile: webpackHelper.root('conf/tsconfig.json')
             }
@@ -141,7 +144,8 @@ module.exports = function (env) {
       new DefinePlugin({
         '__DEVELOPMENT__': JSON.stringify(isDevelopment),
         '__PRODUCTION__': JSON.stringify(isProduction),
-        '__MOCK__': JSON.stringify(enableMock)
+        '__MOCK__': JSON.stringify(enableMock),
+        '__VERSION__': JSON.stringify(gitDescription())
       }),
       new LoaderOptionsPlugin({
         options: {

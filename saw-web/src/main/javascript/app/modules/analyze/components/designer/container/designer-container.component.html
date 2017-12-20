@@ -1,0 +1,24 @@
+<designer-header class="designer__header"
+                 [analysis]="analysis"
+                 [isInDraftMode]="isInDraftMode"
+                 (onBack)="onBack.emit()"
+                 (onSave)="onSave()">
+</designer-header>
+
+<designer-toolbar class="designer__toolbar"
+                  (refreshData)="requestData()"
+                  [isDataOutOfSynch]="isDataOutOfSynch">
+</designer-toolbar>
+
+<old-designer-settings class="designer__data-settings"
+                   (onSettingsChange)="onSettingsChange()"
+                   [artifactColumns]="analysis ? analysis.artifacts[0].columns : []">
+</old-designer-settings>
+
+<designer-pivot class="designer__main"
+                (onSettingsChange)="onMainSettingsChange()"
+                [isDataOutOfSynch]="isDataOutOfSynch"
+                [data]="data"
+                [artifactColumns]="firstArtifactColumns"
+                [designerState]="designerState">
+</designer-pivot>

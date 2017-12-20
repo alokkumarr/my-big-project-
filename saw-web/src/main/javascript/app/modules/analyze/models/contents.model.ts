@@ -1,8 +1,8 @@
 import Key from './key.model';
-import Analyze from './analyze.model';
+import { Analysis } from './analysis.model';
 
 export interface Contents {
-  analyze: Analyze[];
+  analyze: Analysis[];
   action:  string;
   keys:    Key[];
 }

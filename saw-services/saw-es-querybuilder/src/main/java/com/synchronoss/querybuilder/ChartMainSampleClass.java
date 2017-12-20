@@ -24,6 +24,8 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
+import com.synchronoss.BuilderUtil;
+import com.synchronoss.DynamicConvertor;
 import com.synchronoss.querybuilder.model.chart.Filter.Type;
 import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 import com.synchronoss.querybuilder.model.pivot.SqlBuilder.BooleanCriteria;
@@ -47,7 +49,7 @@ public class ChartMainSampleClass {
     // JsonNode objectNode = objectMapper.readTree(new File(args[0]));
 
     String json = "{ \"sqlBuilder\" :" + objectNode.get("sqlBuilder").toString() + "}";
-    String dataSecurityKey = "{\"dataSecuritykey\":[{\"name\":\"ORDER_STATE.raw\",\"values\":[\"KA\",\"Alabama\",\"Hawaii\"]},{\"name\":\"TRANSACTION_ID\",\"values\":[\"015cd74a-08dc-494f-8b71-f1cbd546fc31\"]}]}";
+    //String dataSecurityKey = "{\"dataSecurityKey\":[{\"name\":\"ORDER_STATE.raw\",\"values\":[\"KA\",\"Alabama\",\"Hawaii\"]},{\"name\":\"TRANSACTION_ID\",\"values\":[\"015cd74a-08dc-494f-8b71-f1cbd546fc31\"]}]}";
     JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
     JsonValidator validator = factory.getValidator();
     final JsonNode data = JsonLoader.fromString(json);
@@ -87,7 +89,7 @@ public class ChartMainSampleClass {
       List<com.synchronoss.querybuilder.model.chart.Filter> filters = sqlBuilderNode.getFilters();
       List<QueryBuilder> builder = new ArrayList<QueryBuilder>();
       
-      JsonNode objectNode2 = objectMapper.readTree(dataSecurityKey);
+      /*JsonNode objectNode2 = objectMapper.readTree(dataSecurityKey);
       DataSecurityKey dataSecurityKeyNode =
     	        objectMapper.treeToValue(objectNode2,
     	            DataSecurityKey.class);
@@ -96,15 +98,26 @@ public class ChartMainSampleClass {
       TermsQueryBuilder dataSecurityBuilder =
               new TermsQueryBuilder(dsk.getName(), dsk.getValues());
       builder.add(dataSecurityBuilder);
-      }
+      }*/
       for (com.synchronoss.querybuilder.model.chart.Filter item : filters) {
         if (!item.getIsRuntimeFilter().value()) {
           if (item.getType().value().equals(Type.DATE.value())
-              || item.getType().value().equals(Type.TIMESTAMP.value())) {
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            rangeQueryBuilder.lte(item.getModel().getLte());
-            rangeQueryBuilder.gte(item.getModel().getGte());
-            builder.add(rangeQueryBuilder);
+              || item.getType().value().equals(Type.TIMESTAMP.value())) 
+          {
+            if (item.getModel().getPreset()!=null)
+            {
+              DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
+              RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+              rangeQueryBuilder.lte(dynamicConvertor.getLte());
+              rangeQueryBuilder.gte(dynamicConvertor.getGte());
+              builder.add(rangeQueryBuilder);
+            }
+            else {
+              RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+              rangeQueryBuilder.lte(item.getModel().getLte());
+              rangeQueryBuilder.gte(item.getModel().getGte());
+              builder.add(rangeQueryBuilder);
+            }
           }
           if (item.getType().value().equals(Type.STRING.value())) {
             TermsQueryBuilder termsQueryBuilder =
@@ -157,11 +170,22 @@ public class ChartMainSampleClass {
         }
         if (item.getIsRuntimeFilter().value() && item.getModel() != null) {
           if (item.getType().value().equals(Type.DATE.value())
-              || item.getType().value().equals(Type.TIMESTAMP.value())) {
-            RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
-            rangeQueryBuilder.lte(item.getModel().getLte());
-            rangeQueryBuilder.gte(item.getModel().getGte());
-            builder.add(rangeQueryBuilder);
+              || item.getType().value().equals(Type.TIMESTAMP.value())) 
+          {
+            if (item.getModel().getPreset()!=null)
+            {
+              DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
+              RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+              rangeQueryBuilder.lte(dynamicConvertor.getLte());
+              rangeQueryBuilder.gte(dynamicConvertor.getGte());
+              builder.add(rangeQueryBuilder);
+            }
+            else {
+              RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+              rangeQueryBuilder.lte(item.getModel().getLte());
+              rangeQueryBuilder.gte(item.getModel().getGte());
+              builder.add(rangeQueryBuilder);
+            }
           }
           if (item.getType().value().equals(Type.STRING.value())) {
             TermsQueryBuilder termsQueryBuilder =

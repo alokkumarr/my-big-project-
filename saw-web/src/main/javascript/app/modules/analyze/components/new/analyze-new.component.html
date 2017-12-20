@@ -52,6 +52,12 @@
                  translate="CREATE_ANALYSIS">
       </md-button>
 
+      <md-button class="btn-primary"
+                 ng-disabled="!$ctrl.selectedAnalysisMethod || !$ctrl.selectedMetric"
+                 ng-click="$ctrl.openUpgradedModal()">
+        Upgraded Analysis
+      </md-button>
+
       <md-button class="btn-card"
                  ng-click="$ctrl.$dialog.hide()" translate="CANCEL">
       </md-button>

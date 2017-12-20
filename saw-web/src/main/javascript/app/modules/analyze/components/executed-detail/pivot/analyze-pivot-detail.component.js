@@ -29,7 +29,8 @@ export const AnalyzePivotDetailComponent = {
 
     setDataSource(store, fields) {
       const parsedFields = this._PivotService.trimSuffixFromPivotFields(fields);
-      this.dataSource = new PivotGridDataSource({store, fields: parsedFields});
+      const {formattedFields, formattedData} = this._PivotService.formatDates(store, parsedFields);
+      this.dataSource = new PivotGridDataSource({store: formattedData, fields: formattedFields});
       this.pivotGridUpdater.next({
         dataSource: this.dataSource
       });
@@ -39,7 +40,8 @@ export const AnalyzePivotDetailComponent = {
       this.deNormalizedData = this._PivotService.parseData(this.normalizedData, this.analysis.sqlBuilder);
       this.dataSource.store = this.deNormalizedData;
       const parsedFields = this._PivotService.trimSuffixFromPivotFields(this.fields);
-      this.dataSource = new PivotGridDataSource({store: this.dataSource.store, fields: parsedFields});
+      const {formattedFields, formattedData} = this._PivotService.formatDates(this.deNormalizedData, parsedFields);
+      this.dataSource = new PivotGridDataSource({store: formattedData, fields: formattedFields});
       this.pivotGridUpdater.next({
         dataSource: this.dataSource,
         sorts: this.sorts

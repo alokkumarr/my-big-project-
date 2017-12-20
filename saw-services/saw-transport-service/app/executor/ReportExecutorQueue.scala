@@ -122,6 +122,8 @@ class ReportExecutorQueue(val executorType: String) {
     /* Close MapR streams consumer before starting to execute, to unblock
      * other consumers that need to read messages from the same
      * partition */
+    log.debug("Committing consumer offsets")
+    consumer.commitSync()
     log.debug("Closing consumer")
     consumer.close()
     /* Start executions */

@@ -9,6 +9,15 @@
     "emitDecoratorMetadata": true,
     "lib" : ["es2015", "es2015.iterable", "dom", "es6", "es2017"],
     "allowJs": true
+    // needed for no-unused variable rule in vscode editor to work
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true
+  },
+  "awesomeTypescriptLoaderOptios": {
+    "useBabel": true,
+    "forceIsolatedModules": true,
+    "useCache": true,
+    "usePrecompiledFiles": true
   },
   "exclude": [
     "node_modules",
@@ -17,6 +26,7 @@
     "src/main/javascript/middlelayer",
     "src/main/javascript/styleguide",
     "conf",
-    "dist"
+    "dist",
+    "target"
   ]
 }

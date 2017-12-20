@@ -2,6 +2,8 @@ import * as angular from 'angular';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { NgModule } from '@angular/core';
+import { CommonModule as CommonModuleAngular4 } from '@angular/common';
+import { FlexLayoutModule } from '@angular/flex-layout';
 import {MaterialModule} from '../../material.module';
 
 import {routesConfig} from './routes';
@@ -58,8 +60,26 @@ import {AnalyzeChartSettingsComponent} from './components/chart/settings/analyze
 import {AnalyzeChartPreviewComponent} from './components/chart/preview/analyze-chart-preview.component';
 import {CommonModule} from '../../common';
 
-import DesignerDialogComponent from './components/designer-dialog/designer-dialog.component';
-import AnalyzeDialogService from './services/analyze-dialog.service';
+import {CommonModuleTs} from '../../common';
+import {
+  DesignerDialogComponent,
+  DesignerContainerComponent,
+  DesignerHeaderComponent,
+  DesignerToolbarComponent,
+  DesignerPivotComponent,
+  // DesignerSettingsComponent,
+  // DesignerSettingsGroupComponent,
+  OldDesignerSettingsComponent,
+  DesignerService,
+  ArtifactColumnFilterPipe,
+  ArtifactColumns2PivotFieldsPipe,
+  PivotAreaFilterPipe
+} from './components/designer';
+import {
+  analyzeServiceProvider
+} from './services/ajs-analyze-providers';
+
+import {AnalyzeDialogService} from './services/analyze-dialog.service';
 
 export const AnalyzeModule = 'AnalyzeModule';
 
@@ -117,14 +137,39 @@ angular.module(AnalyzeModule, [
   .component('analyzeSaveDialog', AnalyzeSaveDialogComponent);
 
 @NgModule({
-  imports: [MaterialModule],
+  imports: [
+    CommonModuleAngular4,
+    CommonModuleTs,
+    MaterialModule,
+    FlexLayoutModule
+  ],
   declarations: [
-    DesignerDialogComponent
+    DesignerDialogComponent,
+    DesignerContainerComponent,
+    DesignerHeaderComponent,
+    DesignerToolbarComponent,
+    DesignerPivotComponent,
+    // DesignerSettingsComponent,
+    // DesignerSettingsGroupComponent,
+    OldDesignerSettingsComponent,
+    ArtifactColumnFilterPipe,
+    PivotAreaFilterPipe,
+    ArtifactColumns2PivotFieldsPipe
   ],
   entryComponents: [
-    DesignerDialogComponent
+    DesignerDialogComponent,
+    DesignerContainerComponent,
+    DesignerHeaderComponent,
+    DesignerToolbarComponent,
+    DesignerPivotComponent,
+    OldDesignerSettingsComponent
+    // DesignerSettingsComponent,
+    // DesignerSettingsGroupComponent
   ],
-  providers: [AnalyzeDialogService],
-  exports: [DesignerDialogComponent]
+  providers: [
+    AnalyzeDialogService,
+    analyzeServiceProvider,
+    DesignerService
+  ]
 })
 export class AnalyzeModuleTs {}

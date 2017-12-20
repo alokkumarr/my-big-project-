@@ -1,36 +1,24 @@
-import * as fpGroupBy from 'lodash/fp/groupBy';
-import * as fpPipe from 'lodash/fp/pipe';
-import * as fpMapValues from 'lodash/fp/mapValues';
 import * as forEach from 'lodash/forEach';
 import * as filter from 'lodash/filter';
 import * as map from 'lodash/map';
+import * as unset from 'lodash/unset';
 
 import * as template from './analyze-pivot-settings.component.html';
 import style from './analyze-pivot-settings.component.scss';
-import {DATE_TYPES, MAX_POSSIBLE_FIELDS_OF_SAME_AREA,
-  AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE, AGGREGATE_TYPES_OBJ} from '../../../consts';
+import {
+  DATE_TYPES,
+  MAX_POSSIBLE_FIELDS_OF_SAME_AREA,
+  AGGREGATE_TYPES,
+  DEFAULT_AGGREGATE_TYPE,
+  AGGREGATE_TYPES_OBJ,
+  AREA_TYPES,
+  DEFAULT_AREA_TYPE,
+  AREA_TYPES_OBJ,
+  DATE_INTERVALS,
+  DATE_INTERVALS_OBJ
+} from '../../../consts';
 
 export const ANALYZE_PIVOT_SETTINGS_SIDENAV_ID = 'ANALYZE_PIVOT_SETTINGS_SIDENAV_ID';
-
-const AREA_TYPES = [{
-  label: 'Row',
-  value: 'row',
-  icon: 'icon-row'
-}, {
-  label: 'Column',
-  value: 'column',
-  icon: 'icon-column'
-}, {
-  label: 'Data',
-  value: 'data',
-  icon: 'icon-data'
-}];
-
-const DEFAULT_AREA_TYPE = AREA_TYPES[0];
-const AREA_TYPES_OBJ = fpPipe(
-  fpGroupBy('value'),
-  fpMapValues(v => v[0])
-)(AREA_TYPES);
 
 const NUMBER_ICON = 'icon-number-type';
 const DATE_ICON = 'icon-calendar';
@@ -73,28 +61,6 @@ const ARTIFACT_ICON_TYPES_OBJ = {
   }
 };
 
-const GROUP_INTERVALS = [{
-  label: 'ALL',
-  value: undefined
-}, {
-  label: 'YEAR',
-  value: 'year'
-}, {
-  label: 'QUARTER',
-  value: 'quarter'
-}, {
-  label: 'MONTH',
-  value: 'month'
-}, {
-  label: 'DAY',
-  value: 'day'
-}, {
-  label: 'DAY_OF_WEEK',
-  value: 'dayOfWeek'
-}];
-
-export const DEFAULT_GROUP_INTERVAL = GROUP_INTERVALS[3];
-
 export const AnalyzePivotSettingsComponent = {
   template,
   styles: [style],
@@ -114,13 +80,14 @@ export const AnalyzePivotSettingsComponent = {
       this.AREA_TYPES_OBJ = AREA_TYPES_OBJ;
       this.DEFAULT_AREA_TYPE = DEFAULT_AREA_TYPE;
 
-      this.GROUP_INTERVALS = GROUP_INTERVALS;
+      this.DATE_INTERVALS = DATE_INTERVALS;
 
       this.ARTIFACT_ICON_TYPES_OBJ = ARTIFACT_ICON_TYPES_OBJ;
 
       this.ANALYZE_PIVOT_SETTINGS_SIDENAV_ID = ANALYZE_PIVOT_SETTINGS_SIDENAV_ID;
 
       this.DATE_TYPES = DATE_TYPES;
+      this.DATE_INTERVALS_OBJ = DATE_INTERVALS_OBJ;
 
       this._FilterService = FilterService;
       this._AnalyzeService = AnalyzeService;
@@ -129,9 +96,9 @@ export const AnalyzePivotSettingsComponent = {
     }
 
     $onInit() {
-      this._$translate(map(GROUP_INTERVALS, 'label')).then(translations => {
-        forEach(GROUP_INTERVALS, groupInterval => {
-          groupInterval.label = translations[groupInterval.label];
+      this._$translate(map(DATE_INTERVALS, 'label')).then(translations => {
+        forEach(DATE_INTERVALS, dateInterval => {
+          dateInterval.label = translations[dateInterval.label];
         });
       });
     }
@@ -169,8 +136,13 @@ export const AnalyzePivotSettingsComponent = {
       this.onApplySettings({columns: this.artifactColumns});
     }
 
-    onSelectGroupInterval(groupInterval, artifactColumn) {
-      artifactColumn.groupInterval = groupInterval.value;
+    onSelectDateInterval(dateInterval, artifactColumn) {
+      artifactColumn.dateInterval = dateInterval.value;
+      if (dateInterval.value === 'year') {
+        artifactColumn.groupInterval = artifactColumn.dateInterval;
+      } else {
+        unset(artifactColumn, 'groupInterval');
+      }
       this.onApplySettings({columns: this.artifactColumns});
     }
   }
