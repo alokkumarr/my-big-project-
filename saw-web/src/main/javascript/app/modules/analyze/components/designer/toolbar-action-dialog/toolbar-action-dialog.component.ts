@@ -6,7 +6,7 @@ import {
   IToolbarActionResult
 } from '../types'
 const template = require('./toolbar-action-dialog.component.html');
-// require('./toolbar-action-dialog.component.scss');
+require('./toolbar-action-dialog.component.scss');
 
 @Component({
   selector: 'toolbar-action-dialog',

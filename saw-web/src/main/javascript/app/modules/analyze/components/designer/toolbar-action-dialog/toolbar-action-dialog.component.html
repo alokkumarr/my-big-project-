@@ -1,8 +1,8 @@
 <mat-card>
     <mat-card-header>
       <mat-card-title [ngSwitch]="data.action">
-        <span *ngSwitchCase="'sort'" i18n>Sort</span>
-        <span *ngSwitchCase="'description'" i18n>Description</span>
+        <strong *ngSwitchCase="'sort'" i18n>Sort</strong>
+        <strong *ngSwitchCase="'description'" i18n>Description</strong>
       </mat-card-title>
     </mat-card-header>
     <mat-card-content [ngSwitch]="data.action">

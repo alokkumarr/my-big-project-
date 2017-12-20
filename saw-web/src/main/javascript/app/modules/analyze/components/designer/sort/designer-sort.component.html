@@ -2,19 +2,21 @@
   <mat-card>
     <mat-card-header>
       <mat-card-title>
-        <ng-container i18n>Sortable fields</ng-container>
+        <ng-container i18n>Available fields</ng-container>
       </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <div class="sortable-fields"
+      <div class="available-fields"
            dndSortableContainer
            dndZone="available-fields-container">
-        <div *ngFor="let field of sortableFields; let i = index; trackBy: trackByFn"
+        <div *ngFor="let field of availableFields; trackBy: trackByFn"
              [dndSortable]="field"
-             [dndSortableIndex]="i"
-             (dndOnDragEnd)="onSortableDragEnd($event, fromIndex)"
+             [dndRemoveFromCallback]="removeFromAvailableFields"
+             [dndContainer]="sorts"
              (click)="addSort(field)"
-             class="sortable-field">
+             fxLayout="row"
+             fxLayoutAlign="space-around center"
+             class="sort-field">
           {{field.aliasName || field.displayName}}
         </div>
       </div>
@@ -30,50 +32,29 @@
     <mat-card-content>
       <div class="sorted-fields"
            dndSortableContainer
-           (dndOnDrop)="onDrop($event)">
+           [dndContainer]="sorts"
+           [dndAddToCallback]="addToSortedFields">
         <div *ngFor="let sort of sorts; let i = index; trackBy: trackByFn"
              [dndSortable]="sort"
              [dndSortableIndex]="i"
-             (dndOnDragEnd)="onSortedDragEnd($event, fromIndex)"
-             class="sorted-field"
+             [dndRemoveFromCallback]="removeFromSortedFields"
+             [dndContainer]="sorts"
+             class="sort-field"
              fxLayout="row"
              fxLayoutAlign="space-between center">
           <mat-icon fontIcon="icon-close"
                     (click)="removeSort(sort)"
                     class="sorted-field__remove"></mat-icon>
           {{nameMap[sort.columnName]}}
-          <div [ngSwitch]="TYPE_MAP[sort.type]">
-            <mat-button-toggle-group *ngSwitchCase="'string'"
-                                     (change)="onSortOrderChange(sort, $event.value)"
-                                     [value]="sort.order">
-              <mat-button-toggle value="asc">
-                A<mat-icon fontIcon="icon-arrow-left"></mat-icon>Z
-              </mat-button-toggle>
-              <mat-button-toggle value="desc">
-                Z<mat-icon fontIcon="icon-arrow-left"></mat-icon>A
-              </mat-button-toggle>
-            </mat-button-toggle-group>
-            <mat-button-toggle-group *ngSwitchCase="'number'"
-                                     (change)="onSortOrderChange(sort, $event.value)"
-                                     [value]="sort.order">
-              <mat-button-toggle value="asc">
-                1<mat-icon fontIcon="icon-arrow-left"></mat-icon>9
-              </mat-button-toggle>
-              <mat-button-toggle value="desc">
-                9<mat-icon fontIcon="icon-arrow-left"></mat-icon>1
-              </mat-button-toggle>
-            </mat-button-toggle-group>
-            <mat-button-toggle-group *ngSwitchCase="'date'"
-                                     (change)="onSortOrderChange(sort, $event.value)"
-                                     [value]="sort.order">
-              <mat-button-toggle value="asc">
-                Jan<mat-icon fontIcon="icon-arrow-left"></mat-icon>Dec
-              </mat-button-toggle>
-              <mat-button-toggle value="desc">
-                Dec<mat-icon fontIcon="icon-arrow-left"></mat-icon>Jan
-              </mat-button-toggle>
-            </mat-button-toggle-group>
-          </div>
+          <mat-button-toggle-group (change)="onSortOrderChange(sort, $event.value)"
+                                   [value]="sort.order">
+            <mat-button-toggle value="asc">
+              <mat-icon fontIcon="icon-arrow-left" class="up"></mat-icon>
+            </mat-button-toggle>
+            <mat-button-toggle value="desc">
+              <mat-icon fontIcon="icon-arrow-left" class="down"></mat-icon>
+            </mat-button-toggle>
+          </mat-button-toggle-group>
         </div>
       </div>
     </mat-card-content>

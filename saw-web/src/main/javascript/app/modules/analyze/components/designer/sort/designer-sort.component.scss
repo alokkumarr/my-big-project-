@@ -1,35 +1,54 @@
-designer-sort {
-  .sortable-fields {
-    width: 350px;
-    min-height: 150px;
+@import "themes/base/colors";
 
-    .sortable-field {
-      cursor: pointer;
-      min-height: 36px;
-    }
+designer-sort {
+  mat-card-header > .mat-card-header-text {
+    margin-left: 0;
+  }
+
+  .available-fields {
+    width: 250px;
+    min-height: 40px;
   }
 
   .sorted-fields {
     width: 400px;
-    min-height: 150px;
+    min-height: 40px;
+  }
 
-    .sorted-field {
-      cursor: grab;
-      min-height: 36px;
+  .sort-field {
+    cursor: move;
+    font-size: 14px;
+    margin-top: 3px;
+    border: solid 1px $primary-grey-g2;
+    border-radius: 5px;
+    min-height: 40px;
+  }
+
+  .sorted-field__remove {
+    color: red;
+    cursor: pointer;
+    font-size: 24px;
+    margin-left: 5px;
+    transform: scale(0.6);
+  }
+
+  mat-button-toggle {
+    mat-icon.up {
+      text-align: center;
+      font-size: 11px;
+      line-height: 28px !important;
+      transform: rotate(90deg);
     }
 
-    .sorted-field__remove {
-      color: red;
-      transform: scale(0.6) translateY(-5px);
+    mat-icon.down {
+      text-align: center;
+      font-size: 11px;
+      line-height: 28px !important;
+      transform: rotate(-90deg);
     }
   }
 
   mat-button-toggle {
-    mat-icon {
-      text-align: center;
-      font-size: 11px;
-      line-height: 28px !important;
-      transform: rotate(180deg);
-    }
+    line-height: 24px;
   }
 }

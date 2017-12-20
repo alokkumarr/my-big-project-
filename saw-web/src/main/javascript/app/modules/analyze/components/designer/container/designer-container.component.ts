@@ -80,8 +80,10 @@ export class DesignerContainerComponent {
       break;
     case 'sort':
       this._analyzeDialogService.openSortDialog(this.sorts, this.firstArtifactColumns)
-        .afterClosed().subscribe(({sorts}) => {
-          this.sorts = sorts;
+        .afterClosed().subscribe((result) => {
+          if (result) {
+            this.sorts = result.sorts;
+          }
         });
       break;
     }
@@ -126,7 +128,7 @@ export class DesignerContainerComponent {
     return {
       booleanCriteria: 'AND',
       filters: [],
-      sorts: [],
+      sorts: this.sorts,
       ...partialSqlBuilder
     }
   }
