@@ -1,13 +1,8 @@
-= Synchonoss Analytics Workbench: Services REST API
-Version: {project-version}
+= SAW Services REST API Guide
+Version {project-version}
 :toc:
 :nofooter:
 :docinfo: shared
-:icons: font
-:source-highlighter: highlightjs
-
-Note: This document is currently not in use.  It was part of an effort
-to define the external SAW Services REST API, which was put on hold.
 
 == Authenticate
 

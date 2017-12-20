@@ -1,5 +1,5 @@
 = SAW Operations Guide
-Version: {project-version}
+Version {project-version}
 :toc:
 :nofooter:
 :docinfo: shared
