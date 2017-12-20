@@ -6,16 +6,10 @@ const using = require('jasmine-data-provider');
 
 describe('Login Tests: login.test.js', () => {
 
-  const userDataProvider = {
-    'admin': {handle: users.admin.loginId},
-    'user': {handle: users.userOne.loginId},
-  };
-//Prerequisites: two users should exist with user types: admin and user
-  describe('Login Tests: login.test.js', () => {
-
+  //Prerequisites: two users should exist with user types: admin and user
     const userDataProvider = {
-      'admin': {handle: users.admin.loginId},
-      'user': {handle: users.userOne.loginId},
+      'admin': {user: users.admin.loginId},
+      'user': {user: users.userOne.loginId},
     };
 
     afterAll(function () {
@@ -26,10 +20,9 @@ describe('Login Tests: login.test.js', () => {
     using(userDataProvider, function (data, description) {
       it('Should successfully logged in by ' + description, () => {
         expect(browser.getCurrentUrl()).toContain('/login');
-        login.userLogin(data.handle, users.anyUser.password);
+        login.userLogin(data.user, users.anyUser.password);
         expect(header.headerElements.companyLogo.isPresent()).toBeTruthy();
         analyze.main.doAccountAction('logout');
       });
     });
-  })
 });
