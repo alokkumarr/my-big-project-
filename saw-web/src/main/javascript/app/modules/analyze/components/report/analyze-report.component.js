@@ -436,10 +436,10 @@ export const AnalyzeReportComponent = {
     onSaveQuery(analysis) {
       this.startProgress();
       this._AnalyzeService.getDataBySettings(clone(analysis))
-        .then(({analysis, data}) => {
+        .then(({analysis, data, count}) => {
           this.gridData = data;
           this.model.query = analysis.queryManual || analysis.query;
-
+          this.gridDataTotalCount = count;
           const columnNames = keys(fpGet('[0]', data));
           this.columns = this.getColumns(columnNames);
           this.applyDataToGrid(this.columns, [], [], this.gridData);
