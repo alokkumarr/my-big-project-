@@ -1,19 +1,9 @@
 # Onboarding a customer
 
-We can execute the jar file of command line tools and add saw-security-classes jar file in its classpath as follows:
-
-    java -jar saw-security-command-line-tool-2.jar -cp saw-security-2-classes.jar
-
-We can also utilise customer_onboard.sh script in order to execute the command with current environment setup.
+We can utilise customer_onboard.sh script in order to execute the command with current environment setup.
 
     cd /opt/bda/saw-security/bin/
     bash customer_onboard.sh
-
-Internally above command executes following:
-
-    java -Dspring.config.location=/opt/bda/saw-security/conf/application.properties -Dlogging.config=/opt/bda/saw-security/conf/logback.xml -Dquartz.properties.location=/opt/bda/saw-security/conf -jar /opt/bda/saw-security/saw-security-command-line-tool-2.jar -cp /opt/bda/saw-security/saw-security-2-classes.jar --server.port=9999
-
-Note that the versions may differ.
 
 Features of spring boot shell:
 1. Type in "help" and it will show you all the available commands
