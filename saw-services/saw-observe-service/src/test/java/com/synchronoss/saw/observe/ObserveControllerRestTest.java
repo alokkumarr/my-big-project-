@@ -74,11 +74,14 @@ public class ObserveControllerRestTest {
           observeService.getDashboardbyCriteria(Mockito.any(Observe.class))).
       thenReturn(ObserveUtils.prepareResponse(observe, "Entity has been retrieved successfully"));
       RequestBuilder requestBuilder = MockMvcRequestBuilders.get(
-              "/observe/dashboards/read/id:portalDataSet::201").accept(
+              "/observe/dashboards/id:portalDataSet::201").accept(
               MediaType.APPLICATION_JSON);
       MvcResult result = mockMvc.perform(requestBuilder).andReturn();
       logger.info("Response code {}", result.getResponse());
       String expected = getObserveResponseString(ObserveUtils.prepareResponse(observe, "Entity has been retrieved successfully"));
+      System.out.println(expected);
+      System.out.println(result.getResponse()
+              .getContentAsString());
       JSONAssert.assertEquals(expected, result.getResponse()
               .getContentAsString(), false);
   }
