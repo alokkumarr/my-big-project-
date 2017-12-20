@@ -76,7 +76,6 @@ export const stockChartOptions = {
   },
   rangeSelector: {
     selected: 1,
-    allButtonsEnabled: true,
     buttonPosition: {
       align: 'left'
     },
@@ -95,7 +94,8 @@ export const stockChartOptions = {
       },
       dataGrouping: {
         enabled: false
-      }
+      },
+      turboThreshold: 5000
     }
   },
   exporting: {

@@ -229,8 +229,7 @@ export class ChartService {
     case 'spline':
     case 'stack':
     case 'scatter':
-    case 'tsline':
-    case 'tsareaspline':
+    case 'tsspline':
     default:
       return config;
     }
@@ -371,10 +370,8 @@ export class ChartService {
       return 'spline';
     case 'area':
       return 'areaspline';
-    case 'tsline':
-      return 'line';
-    case 'tsareaspline':
-      return 'areaspline';
+    case 'tsspline':
+      return 'spline';
     default:
       return type;
 
@@ -743,8 +740,7 @@ export class ChartService {
     case 'stack':
     case 'scatter':
     case 'bubble':
-    case 'tsline':
-    case 'tsareaspline':
+    case 'tsspline':
     default:
       changes = this.getBarChangeConfig(type, settings, fields, gridData, opts);
       break;
@@ -877,8 +873,7 @@ export class ChartService {
         groupBy
       };
       break;
-    case 'tsareaspline':
-    case 'tsline':
+    case 'tsspline':
       xaxis = this.filterDateTypes(attributes);
       settingsObj = {
         xaxis,

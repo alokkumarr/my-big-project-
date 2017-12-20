@@ -86,7 +86,7 @@ export const AnalyzeChartComponent = {
       this.isInverted = false;
       this.chartViewOptions = ChartService.getViewOptionsFor(this.model.chartType);
       this.comboableCharts = ['column', 'bar', 'line', 'area', 'combo'];
-      this.comboableTSCharts = ['tsline', 'tsareaspline'];
+      this.comboableTSCharts = ['tsspline'];
       this.invertableCharts = [...this.comboableCharts, 'stack'];
       this.multyYCharts = [...this.invertableCharts, ...this.comboableTSCharts];
 

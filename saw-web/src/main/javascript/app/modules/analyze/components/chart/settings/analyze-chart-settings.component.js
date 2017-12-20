@@ -137,7 +137,7 @@ export const AnalyzeChartSettingsComponent = {
           target.aggregate = DEFAULT_AGGREGATE_TYPE.value;
         }
         if (!selectedAttr.comboType) {
-          if (['line', 'column', 'area', 'tsline', 'tsareaspline'].includes(this.chartType)) {
+          if (['line', 'column', 'area', 'tsspline'].includes(this.chartType)) {
             target.comboType = this.chartType;
           }
           if (['combo', 'bar'].includes(this.chartType)) {
