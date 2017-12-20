@@ -36,6 +36,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 
@@ -105,20 +106,28 @@ public class GatewayController {
     	RestTemplate restTemplate = new RestTemplate();
     	String url = apiGatewayOtherProperties+"/auth/validateToken";
     	logger.info("security server URL", url);
-    	ResponseEntity<?> securityResponse = restTemplate.exchange(url, HttpMethod.POST,
-    			requestEntity, Valid.class);
-    	logger.info(securityResponse.getStatusCode().getReasonPhrase());
-    	logger.info(securityResponse.toString());
-    	Valid validate =(Valid) securityResponse.getBody();
-    	if (securityResponse.getStatusCode().equals(HttpStatus.OK)){
-	    	proxiedResponse = httpClient.execute(proxiedRequest);
-	        responseEntity = new ResponseEntity<>(read(proxiedResponse.getEntity().getContent()), 
-	        		makeResponseHeaders(proxiedResponse), 
-	        		HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
-	    }
-    	else {
-	        responseEntity = new ResponseEntity<>(validate.getValidityMessage(), makeResponseHeadersInvalid(), 	HttpStatus.UNAUTHORIZED);
-    	}
+    	try {
+        ResponseEntity<?> securityResponse = restTemplate.exchange(url, HttpMethod.POST,
+            requestEntity, Valid.class);
+        logger.info(securityResponse.getStatusCode().getReasonPhrase());
+        logger.info(securityResponse.toString());
+        Valid validate =(Valid) securityResponse.getBody();
+        if (securityResponse.getStatusCode().equals(HttpStatus.OK)){
+          proxiedResponse = httpClient.execute(proxiedRequest);
+          responseEntity = new ResponseEntity<>(read(proxiedResponse.getEntity().getContent()),
+              makeResponseHeaders(proxiedResponse),
+              HttpStatus.valueOf(proxiedResponse.getStatusLine().getStatusCode()));
+        } else {
+          responseEntity = new ResponseEntity<>(validate.getValidityMessage(),
+              makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
+        }
+      } catch(HttpClientErrorException e) {
+    	  //SAW-1374: Just keep the message hardcoded itself.
+        responseEntity = new ResponseEntity<>("{\"message\":\"Invalid Token\"}",
+            makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
+        logger.info("Invalid Token: "+ responseEntity.toString());
+        return responseEntity;
+      }
     }
     else {
     	responseEntity = new ResponseEntity<>("Token is not present & it is invalid request", makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);

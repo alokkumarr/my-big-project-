@@ -1,3 +1,4 @@
+import 'jquery';
 import * as angular from 'angular';
 import 'angular-ui-router';
 
@@ -13,7 +14,15 @@ import 'ng-idle';
 
 import 'mottle';
 
+import 'devextreme/dist/css/dx.common.css';
+import 'devextreme/dist/css/dx.light.css';
+
+import 'devextreme/localization';
+
+import 'devextreme/localization/messages/en.json';
+
 import 'devextreme/ui/data_grid';
+import 'devextreme/integration/jquery';
 import 'devextreme/integration/angular';
 
 import EventEmitter from './utils/eventEmitter';

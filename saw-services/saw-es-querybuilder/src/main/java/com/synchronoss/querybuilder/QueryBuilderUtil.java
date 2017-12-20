@@ -30,6 +30,7 @@ public class QueryBuilderUtil {
       Map<String, String> formats = new HashMap<String, String>();
       formats.put("YYYY", "year");
       formats.put("MMMYYYY", "month");
+      formats.put("MMYYYY", "month");
       formats.put("MMMdYYYY", "day");
       formats.put("MMMMdYYYY,h:mm:ssa", "hour");
       dateFormats = Collections.unmodifiableMap(formats);

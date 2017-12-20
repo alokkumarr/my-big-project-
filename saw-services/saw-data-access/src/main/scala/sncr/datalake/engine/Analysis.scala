@@ -1,11 +1,14 @@
 package sncr.datalake.engine
 
+import java.io.FileNotFoundException
 import java.util
 import java.util.UUID
 import java.util.concurrent.{ExecutorService, Executors, Future}
 
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
+import files.HFileOperations;
 import org.slf4j.{Logger, LoggerFactory}
+import sncr.datalake.TimeLogger._
 import sncr.datalake.engine.ExecutionType.ExecutionType
 import sncr.metadata.analysis.{AnalysisNode, AnalysisResult}
 import sncr.metadata.engine.ProcessingResult
@@ -47,43 +50,29 @@ class Analysis(val analysisId : String) {
     new AnalysisExecution(an, execType, resultId)
   }
 
-  private def waitForResult(resultId: String, retries: Int = 20) {
-    try {
-      /* Try loading the result node.  If it does not exist an exception is
-       * raised. */
-      val resultNode = AnalysisResult(null, resultId)
-      m_log.debug("Result node found: {}", resultId)
-      /* If the result node contains an error marker, raise an exception */
-      if (resultNode.getObjectDescriptors.contains("error")) {
-        throw new RuntimeException("Execution failed due to internal error")
-      }
-      /* Also check that the data location property has been set, indicating
-       * results have been written out */
-      if (!resultNode.getObjectDescriptors.contains("dataLocation")) {
-        m_log.debug("Result node data location property not found yet: {}",
-          resultId)
-        waitForResultRetry(resultId, retries)
-      }
-    } catch {
-      case e: Exception => {
-        /* If the exception is not related to finding the node, rethrow it */
-        if (!e.getMessage().equals(
-          ProcessingResult.NodeDoesNotExist.toString)) {
-          throw e
-        }
-        /* The result node was not found, so pause for a while and then retry
-         * again */
-        m_log.debug("Result node not found yet: {}", resultId)
-        waitForResultRetry(resultId, retries)
-      }
+  private def waitForResult(resultId: String, retries: Int = 60) {
+    if (!executionCompleted(resultId)) {
+      waitForResultRetry(resultId, retries)
     }
+  }
+
+  private def executionCompleted(resultId: String): Boolean = {
+    val path = "/main/saw-transport-executor-result-" + resultId
+    try {
+      HFileOperations.readFile(path)
+    } catch {
+      case e: FileNotFoundException => return false
+    }
+    HFileOperations.deleteFile(path)
+    true
   }
 
   private def waitForResultRetry(resultId: String, retries: Int) {
     if (retries == 0) {
       throw new RuntimeException("Timed out waiting for result: " + resultId)
     }
-    Thread.sleep(3000)
+    m_log.debug("Waiting for result: {}", resultId)
+    Thread.sleep(1000)
     waitForResult(resultId, retries - 1)
   }
 
@@ -96,7 +85,9 @@ class Analysis(val analysisId : String) {
   {
     m_log debug s"Execute analysis as ${execType.toString}"
     val analysisExecution = new AnalysisExecution(an, execType, resultId)
-    analysisExecution.startExecution(sqlRuntime)
+    logWithTime(m_log, "Execute Spark SQL query", {
+      analysisExecution.startExecution(sqlRuntime)
+    })
     startTS = analysisExecution.getStartedTimestamp
     finishedTS = analysisExecution.getFinishedTimestamp
     analysisExecution

@@ -1,0 +1,26 @@
+= SAW Services REST API Guide
+Version {project-version}
+:toc:
+:nofooter:
+:docinfo: shared
+
+== Authenticate
+
+The HTTP request:
+
+include::{snippets}/authenticate/http-request.adoc[]
+
+The HTTP response:
+
+include::{snippets}/authenticate/http-response.adoc[]
+
+== List metrics
+
+The HTTP request:
+
+include::{snippets}/list-metrics/http-request.adoc[]
+
+The HTTP response:
+
+include::{snippets}/list-metrics/http-response.adoc[]
+

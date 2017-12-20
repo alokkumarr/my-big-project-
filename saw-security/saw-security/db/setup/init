@@ -18,17 +18,13 @@ touch $marker
 
 # Create database users
 mysql -u root < $dir/init.sql
-create_user="CREATE USER 'saw_security'@'localhost'"
 password=$(< /etc/bda/saw-security-db-password)
+create_user="CREATE USER 'saw_security'@'localhost'"
 mysql -u root -e "$create_user IDENTIFIED BY '$password'"
 mysql -u root -e "GRANT ALL ON saw_security.* TO 'saw_security'@'localhost'"
 
 # Set root password
-set -o pipefail
-password=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 14)
-password_file=/etc/bda/mariadb-root-password
-echo $password > $password_file
-chmod u+rw,go= $password_file
+password=$(< /etc/bda/mariadb-root-password)
 mysql -u root -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$password')"
 
 # Populate database

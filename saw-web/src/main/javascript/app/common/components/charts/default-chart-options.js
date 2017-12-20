@@ -4,6 +4,9 @@ export const globalChartOptions = {
   lang: {
     thousandsSep: ',',
     noData: 'No data to display'
+  },
+  global: {
+    timezoneOffset: 0
   }
 };
 
@@ -11,6 +14,8 @@ export const chartOptions = {
   colors: CHART_COLORS,
   plotOptions: {
     series: {
+      // disable turboTreshold for biggger datasets
+      turboThreshold: 0,
       barBgColor: '#f3f5f8',
       marker: {
         fillColor: null,

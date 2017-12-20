@@ -9,7 +9,7 @@ const homePage = require('../../javascript/pages/homePage.po');
 const executedAnalysisPage = require('../../javascript/pages/common/executedAlaysis.po');
 const using = require('jasmine-data-provider');
 
-describe('create and delete charts', () => {
+describe('create and delete charts: createAndDeleteCharts.test.js', () => {
   const defaultCategory = 'AT Privileges Category DO NOT TOUCH';
   const categoryName = 'AT Analysis Category DO NOT TOUCH';
   const subCategoryName = 'AT Creating Analysis DO NOT TOUCH';
@@ -81,14 +81,16 @@ describe('create and delete charts', () => {
       newDialog.createBtn.click();
 
       //Select fields
-      //If chart is bubble then select radio instead of checkbox
-      // Also select Color by
-      if (data.chartType === 'chart:bubble') {
+      if (data.chartType === 'chart:bubble') {       // if chart is bubble then select Y radio instead of checkbox
         y = chartDesigner.getYRadio(yAxisName);
+
+        // Also select Color by
         const sizeBy = chartDesigner.getZRadio(sizeByName);
         commonFunctions.waitFor.elementToBeClickableAndClick(sizeBy);
+      } else if (data.chartType === 'chart:stack') {  // if chart is stacked - select Y radio instead of checkbox
+        y = chartDesigner.getYRadio(yAxisName);
       } else {
-        y = chartDesigner.getYCheckBox(yAxisName);
+        y = chartDesigner.getYCheckBox(yAxisName);    // for the rest of the cases - select Y checkbox
       }
       chartDesigner.getXRadio(xAxisName).click();
       commonFunctions.waitFor.elementToBeClickableAndClick(y);
