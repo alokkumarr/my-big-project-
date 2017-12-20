@@ -1,9 +1,12 @@
 package com.synchronoss.saw.observe.exceptions;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-
-@SuppressWarnings("serial")
+@ResponseStatus(value=HttpStatus.PRECONDITION_REQUIRED, reason="request body validation failed")
 public class JSONValidationSAWException extends ExportRuntimeSAWException {
+
+  private static final long serialVersionUID = 1L;
 
     public JSONValidationSAWException(String msg) {
         super(msg);

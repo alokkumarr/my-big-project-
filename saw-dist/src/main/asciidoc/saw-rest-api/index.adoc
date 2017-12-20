@@ -1,0 +1,31 @@
+= Synchonoss Analytics Workbench: Services REST API
+Version: {project-version}
+:toc:
+:nofooter:
+:docinfo: shared
+:icons: font
+:source-highlighter: highlightjs
+
+Note: This document is currently not in use.  It was part of an effort
+to define the external SAW Services REST API, which was put on hold.
+
+== Authenticate
+
+The HTTP request:
+
+include::{snippets}/authenticate/http-request.adoc[]
+
+The HTTP response:
+
+include::{snippets}/authenticate/http-response.adoc[]
+
+== List metrics
+
+The HTTP request:
+
+include::{snippets}/list-metrics/http-request.adoc[]
+
+The HTTP response:
+
+include::{snippets}/list-metrics/http-response.adoc[]
+

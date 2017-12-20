@@ -7,22 +7,25 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.ojai.Document;
 import org.ojai.store.QueryCondition;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.mapr.db.MapRDB;
+import com.synchronoss.saw.store.metastore.PortalDataSetStore;
 
 /**
  * The class handles basic requests to Metadata Store
  * The requests are JSON documents in the following formats
  * {
  *   [
- *     "category" : "DataSet|Transformation|DataPod|DataSegment|Observe",
+ *     "category" : "DataSet|Transformation|DataPod|DataSegment|UserInterface",
  *     "action" : "create|delete|update|read|search",
  *     "output" : "<Path and Filename where the result will be saved to>"
  *     "id" : "<id> - required for create, delete, update and read",
@@ -137,7 +140,8 @@ public class Request {
             logger.info("Start item processing, action: " + action + ", output: " + rFile);
 
             try {
-                os = HFileOperations.writeToFile(rFile);
+                if(rFile!=null){
+                os = HFileOperations.writeToFile(rFile);}
             } catch (FileNotFoundException e1) {
                 logger.error("Could not write response to file: " + rFile, e1);
                 return;
@@ -227,6 +231,10 @@ public class Request {
             case Transformation:
                 logger.warn("Not implemented yet");                
                break;
+            case PortalDataSet:
+              PortalDataSetStore tr = new PortalDataSetStore(xdfRoot);
+              searchResult = tr.search(maprDBCondition);
+              break;   
             default:
                logger.error("Not supported category");
                return;
@@ -309,6 +317,17 @@ public class Request {
             case Transformation:
                 logger.warn("Not implemented yet");
                 break;
+            case PortalDataSet:
+              PortalDataSetStore ts = new PortalDataSetStore(xdfRoot);
+              switch (action){
+                  case create: ts.create(id, item); break;
+                  case delete: ts.delete(id); break;
+                  case update: ts.update(id, item); break;
+                  case read: result = ts.read(id); break;
+                  default:
+                      logger.warn("Action is not supported");
+              }
+              break;
             default:
                 logger.error("Not supported category");
                 return;
@@ -340,12 +359,13 @@ public class Request {
     private boolean analyzeAndValidate(JsonObject item) {
 
         try {
-            if (!(item.has("action") && item.has("output") && item.has("category"))){
+            if (!(item.has("action") && item.has("category"))){
                 logger.error("Action, output and category keys are mandatory");
                 return false;
             }
 
-            rFile = item.get("output").getAsString();
+            if (item.get("output").getAsString()!=null){
+            rFile = item.get("output").getAsString();}
             String a = item.get("action").getAsString();
             if (item.has("xdf-root"))
                 xdfRoot = item.get("xdf-root").getAsString();
@@ -443,7 +463,7 @@ public class Request {
         DataSet,
         AuditLog,
         DataPod,
-        Observe,
+        PortalDataSet,
         DataSegment;
     }
 

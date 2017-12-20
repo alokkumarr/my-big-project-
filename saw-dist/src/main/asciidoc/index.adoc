@@ -1,27 +1,15 @@
-= SAW Services REST API
-:doctype: book
-:icons: font
-:source-highlighter: highlightjs
+= Synchronoss Analytics Workbench
+:docinfo: shared
+:nofooter:
 
-SAW Services REST API
+The following documents describe Synchronos Analytics Workbench for
+users of different roles:
 
-== Authenticate
+- SAW User Guide -- using the SAW web application
+- link:saw-rest-api/index.html[SAW REST API Guide] -- consuming the REST API
+- link:saw-operations/index.html[SAW Operations Guide] -- installing,
+  maintening and administering, including creating semantic
+  configurations
 
-The HTTP request:
-
-include::{snippets}/authenticate/http-request.adoc[]
-
-The HTTP response:
-
-include::{snippets}/authenticate/http-response.adoc[]
-
-== Schedule
-
-The HTTP request:
-
-include::{snippets}/analysis-list/http-request.adoc[]
-
-The HTTP response:
-
-include::{snippets}/analysis-list/http-response.adoc[]
-
+- link:saw-design/index.html[SAW Design Guide] -- understanding the
+  high-level design of the application

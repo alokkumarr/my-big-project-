@@ -11,9 +11,9 @@ analyze-pivot-settings {
     display: block;
     margin-right: 10px;
     max-width: 160px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    word-wrap: normal;
+    word-break: break-word;
   }
 
   md-sidenav {
