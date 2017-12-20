@@ -105,3 +105,6 @@ It continues with displaying that it's creating the relationships and admin role
     Tejwani
     Generated User ID for current user is: 40
     shell:>
+
+Note: This file has been moved to [rendered documentation]
+(../saw-dist/src/main/asciidoc/saw-operations/index.adoc).
