@@ -7,15 +7,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.synchronoss.saw.observe.ObserveUtils;
 import com.synchronoss.saw.observe.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.observe.exceptions.DeleteEntitySAWException;
@@ -37,6 +33,7 @@ public class ObserveServiceImpl implements ObserveService {
   @Value("${metastore.base}")
   private String basePath;
 
+  
   private DateFormat format = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
 
   @Override
@@ -45,15 +42,18 @@ public class ObserveServiceImpl implements ObserveService {
     ObserveResponse response = new ObserveResponse();
     node.setCreatedAt(format.format(new Date()));
     try {
-      response.setId(node.getEntityId());
+      logger.trace("Before invoking request to MaprDB JSON store :{}", ObserveUtils.node2JsonString(node, basePath, node.getEntityId(),
+          Action.CREATE, Category.USER_INTERFACE));
       Request request = new Request(ObserveUtils.node2JsonString(node, basePath, node.getEntityId(),
           Action.CREATE, Category.USER_INTERFACE));
       request.process();
+      response.setId(node.getEntityId());
       response = ObserveUtils.prepareResponse(node, "Entity is created successfully");
     } catch (Exception ex) {
-      throw new CreateEntitySAWException("Problem on the storage while creating an entity");
+     logger.error("Problem on the storage while creating an entity", ex);
+      throw new CreateEntitySAWException("Problem on the storage while creating an entity.");
     }
-    logger.debug("Response : {}", response.toString());
+    logger.debug("Response : "+ response.toString());
     return response;
   }
 
@@ -72,9 +72,10 @@ public class ObserveServiceImpl implements ObserveService {
       Observe observeData = mapper.readValue(jsonStringFromStore, Observe.class);
       response = ObserveUtils.prepareResponse(observeData, "Entity has been retrieved successfully");
     } catch (Exception ex) {
-      throw new ReadEntitySAWException("Exception occured while retrieving it from storage");
+      logger.error("While retrieving it has been found that Entity does not exist.", ex);
+      throw new ReadEntitySAWException("While retrieving it has been found that Entity does not exist.");
     }
-    logger.debug("Response : {}", response.toString());
+    logger.debug("Response : "+ response.toString());
     return response;
   }
 
@@ -86,15 +87,16 @@ public class ObserveServiceImpl implements ObserveService {
     ObserveResponse response = new ObserveResponse();
     node.setUpdatedAt(format.format(new Date()));
     try {
-      response.setId(node.getEntityId());
       Request request = new Request(ObserveUtils.node2JsonString(node, basePath, node.getEntityId(),
           Action.UPDATE, Category.USER_INTERFACE));
       request.process();
+      response.setId(node.getEntityId());
       response =ObserveUtils.prepareResponse(node, "Entity is updated successfully");
     } catch (Exception ex) {
-      throw new UpdateEntitySAWException("Entity does not exist");
+      logger.error("Entity does not exist to update.", ex);
+      throw new UpdateEntitySAWException("Entity does not exist to update.");
     }
-    logger.debug("Response : {}", response.toString());
+    logger.debug("Response : "+ response.toString());
     return response;
   }
 
@@ -108,11 +110,12 @@ public class ObserveServiceImpl implements ObserveService {
       Request request = new Request(ObserveUtils.node2JsonString(node, basePath, node.getEntityId(),
           Action.DELETE, Category.USER_INTERFACE));
       request.process();
-      response =ObserveUtils.prepareResponse(node, "Entity is deleted successfully");
+      response =ObserveUtils.prepareResponse(node, "Entity is deleted successfully.");
     } catch (Exception ex) {
-      throw new DeleteEntitySAWException("Entity does not exist");
+      logger.error("Entity does not exist to delete.", ex.getCause());
+      throw new DeleteEntitySAWException("Entity does not exist to delete");
     }
-    logger.debug("Response : {}", response.toString());
+    logger.debug("Response : "+ response.toString());
     return response;
   }
 
@@ -144,9 +147,8 @@ public class ObserveServiceImpl implements ObserveService {
     String jsonStringStoreRead = "{\"_id\": \"40139212-e078-4013-90dd-452347d460dd::PortalDataSet::1513718861739\", \"entityId\":\"40139212-e078-4013-90dd-452347d460dd::PortalDataSet::1513718861739\",\"categoryId\":\"string\",\"name\":\"string\",\"description\":\"string\",\"createdBy\":\"string\",\"updatedBy\":\"string\",\"createdAt\":\"2017-27-19 04:27:41\",\"updatedAt\":\"string\",\"tiles\":[{\"type\":\"analysis\",\"id\":\"string\",\"cols\":3,\"rows\":4,\"x\":5,\"y\":6}]}";
     Observe observeDataRead = mapper.readValue(jsonStringStoreRead, Observe.class);
     System.out.println(observeDataRead.get_id());
-    JsonParser parser = new JsonParser();
-    JsonElement element = parser.parse(jsonStringStoreRead);
-    System.out.println(element.isJsonObject());
-    System.out.println();
+    String jsonElementString= ObserveUtils.node2JsonString(observeDataRead, "hdfs:///main", "portalData:301", Action.CREATE, Category.USER_INTERFACE);
+    Request requestData = new Request(jsonElementString);
+    requestData.process();
   }
 }

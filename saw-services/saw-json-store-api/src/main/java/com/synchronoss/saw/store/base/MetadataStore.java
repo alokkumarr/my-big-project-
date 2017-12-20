@@ -1,9 +1,8 @@
 package com.synchronoss.saw.store.base;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.hadoop.fs.Path;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.ojai.Document;
 import org.ojai.store.DocumentMutation;
 
@@ -26,7 +25,7 @@ import com.synchronoss.saw.store.metastore.DocumentConverter;
  */
 public abstract class MetadataStore extends MetadataBase  implements DocumentConverter{
 
-    private static final Logger logger = Logger.getLogger(MetadataStore.class);
+    private static final Logger logger = LoggerFactory.getLogger(MetadataStore.class);
     private static final String METASTORE = "metadata";
 
     public static final String delimiter = "::";
@@ -40,9 +39,9 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
         metaRoot = dlRoot + Path.SEPARATOR + METASTORE;
         String fullTableName = metaRoot + Path.SEPARATOR + tableName;
         logger.debug("Open table: " + fullTableName);
-        boolean exists = MapRDB.tableExists(fullTableName);
-        table = !exists ? MapRDB.createTable(fullTableName) : MapRDB.getTable(fullTableName);
-        table.setOption(Table.TableOption.BUFFERWRITE, false);
+       boolean exists = MapRDB.tableExists(fullTableName);
+       table = !exists ? MapRDB.createTable(fullTableName) : MapRDB.getTable(fullTableName);
+       table.setOption(Table.TableOption.BUFFERWRITE, false);
     }
 
 
@@ -73,7 +72,9 @@ public abstract class MetadataStore extends MetadataBase  implements DocumentCon
     }
 
     public void create(String id, JsonElement src) throws Exception {
+      logger.trace("Element received to create in the store {}",src.toString());
         Document ds = toMapRDBDocument(src);
+        logger.trace("Element received after processing to create in the store {}",ds.asJsonString());
         _saveNew(id, ds);
     }
 

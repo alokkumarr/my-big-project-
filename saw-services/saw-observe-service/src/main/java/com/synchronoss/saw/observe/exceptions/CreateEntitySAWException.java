@@ -1,9 +1,5 @@
 package com.synchronoss.saw.observe.exceptions;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-@ResponseStatus(value=HttpStatus.BAD_REQUEST, reason="Problem on the storage while creating an entity")
 public class CreateEntitySAWException extends ExportRuntimeSAWException {
 
     /**

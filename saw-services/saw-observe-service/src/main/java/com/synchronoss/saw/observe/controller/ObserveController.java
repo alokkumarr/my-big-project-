@@ -70,7 +70,7 @@ public class ObserveController {
   @RequestMapping(value = "/observe/dashboards/create", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   public ObserveResponse addDashboard(@RequestBody ObserveRequestBody requestBody) {
-    logger.debug("Request Body", requestBody);
+    logger.debug("Request Body:{}", requestBody);
     if (requestBody == null) {
       throw new JSONMissingSAWException("json body is missing in request body");
     }
@@ -80,18 +80,19 @@ public class ObserveController {
      objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
      objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
       Observe observe = ObserveUtils.getObserveNode(objectMapper.writeValueAsString(requestBody), "contents");
+      logger.trace("Observe request object : {} ", objectMapper.writeValueAsString(observe));
       observe.setEntityId(observeService.generateId());
+      logger.trace("Invoking service with entity id : {} ", observe.getEntityId());
       responseObjectFuture = observeService.addDashboard(observe);
     } catch (IOException e) {
       throw new JSONProcessingSAWException("expected missing on the request body");
     } catch (CreateEntitySAWException ex) {
-      throw new CreateEntitySAWException("Problem on the storage while creating an entity",
-          ex.getCause());
+      throw new CreateEntitySAWException("Problem on the storage while creating an entity");
     }
     return responseObjectFuture;
   }
 
-  @RequestMapping(value = "/observe/dashboards/read/{Id}", method = RequestMethod.GET)
+  @RequestMapping(value = "/observe/dashboards/{Id}", method = RequestMethod.GET)
   @ResponseStatus(HttpStatus.OK)
   public ObserveResponse getDashboardById(@PathVariable(name = "Id", required = true) String Id,
       HttpServletRequest request, HttpServletResponse response) {
@@ -123,7 +124,7 @@ public class ObserveController {
     } catch (IOException e) {
       throw new JSONProcessingSAWException("expected missing on the request body");
     } catch (UpdateEntitySAWException ex) {
-      throw new UpdateEntitySAWException("Entity does not exist : ", ex.getCause());
+      throw new UpdateEntitySAWException("Entity does not exist.");
     }
     return responseObjectFuture;
   }

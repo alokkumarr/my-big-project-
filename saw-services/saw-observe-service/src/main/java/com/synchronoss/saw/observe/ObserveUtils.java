@@ -93,9 +93,9 @@ public class ObserveUtils {
   {
     ObjectMapper objectMapper = new ObjectMapper();
     MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
+   
     if(node !=null){
-      String jsonObserve = objectMapper.writeValueAsString(node);
-      metaDataStoreStructure.setSource(jsonObserve);
+      metaDataStoreStructure.setSource(node);
     }
     if (Id !=null){
       metaDataStoreStructure.setId(Id);
@@ -109,10 +109,29 @@ public class ObserveUtils {
     return objectMapper.writeValueAsString(listOfMetadata);
   }
   
+  public static List<MetaDataStoreStructure> nodeMetaDataStoreStructure(Observe node, String basePath, String output, String Id, Action action, Category category) 
+      throws JsonProcessingException
+  {
+    MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
+    if(node !=null){
+      metaDataStoreStructure.setSource(node);
+    }
+    if (Id !=null){
+      metaDataStoreStructure.setId(Id);
+    }
+    metaDataStoreStructure.setAction(action);
+    metaDataStoreStructure.setCategory(category);
+    metaDataStoreStructure.setXdfRoot(basePath);
+    List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
+    listOfMetadata.add(metaDataStoreStructure);
+    return listOfMetadata;
+  }
+  
   public static ObserveResponse prepareResponse(Observe node, String message){
     ObserveResponse createresponse = new ObserveResponse();
     createresponse.setMessage(message);
     createresponse.setId(node.get_id());
+    createresponse.setId(node.getEntityId());
     Content content = new Content();
     List<Observe> listOfObserve = new ArrayList<>();
     listOfObserve.add(node);
