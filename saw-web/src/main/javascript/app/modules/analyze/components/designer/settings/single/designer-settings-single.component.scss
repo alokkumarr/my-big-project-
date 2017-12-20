@@ -25,11 +25,14 @@ designer-settings-single {
   }
 
   .settings__list-item {
+    margin-top: 3px;
     padding: 5px;
     min-width: max-content;
+    border: solid 1px $primary-grey-g2;
+    border-radius: 5px;
 
     .settings__list-item__name {
-      max-width: 250px;
+      max-width: 230px;
       font-weight: 600;
       color: $primary-grey-g4;
       white-space: normal;

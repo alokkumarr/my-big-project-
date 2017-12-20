@@ -1,16 +1,17 @@
-<div>
+<div fxLayout="row" fxLayoutAlign="space-between center">
   <mat-icon fontIcon="icon-expand"
+            class="expandable-field__expand-icon"
             (click)="toggleExpansion()">
   </mat-icon>
-  <span class="expandable-field__name">
+  <div class="expandable-field__name">
     {{ artifactColumn.alias || artifactColumn.displayName }}
-  </span>
-  <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
+    <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
             class="expandable-field__icon">
   </mat-icon>
+  </div>
   <mat-icon fontIcon="icon-close"
             (click)="removeRequest.emit()"
-            class="expandable-field__remove">
+            class="expandable-field__remove-icon">
   </mat-icon>
 </div>
 
