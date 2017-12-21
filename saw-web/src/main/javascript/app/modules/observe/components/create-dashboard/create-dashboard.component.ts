@@ -146,19 +146,17 @@ export class CreateDashboardComponent {
 
   prepareDashboardForSave(): Dashboard {
     return {
-      id: '',
+      entityId: '',
       categoryId: '',
       name: '',
       description: '',
-      options: {},
       tiles: map(this.dashboard, tile => ({
         type: 'analysis',
         id: get(tile, 'analysis.id', ''),
         x: tile.x,
         y: tile.y,
         cols: tile.cols,
-        rows: tile.rows,
-        options: {}
+        rows: tile.rows
       })),
       filters: []
     }

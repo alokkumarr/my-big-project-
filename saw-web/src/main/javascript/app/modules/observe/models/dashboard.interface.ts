@@ -16,7 +16,7 @@ export interface Tile {
 
 export interface Dashboard {
   tiles: Array<Tile>,
-  id: string,
+  entityId: string,
   categoryId: string,
   name: string,
   description: string,
