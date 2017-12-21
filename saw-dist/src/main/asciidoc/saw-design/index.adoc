@@ -143,6 +143,11 @@ into memory at the same time which might lead to out of memory errors.
 
 The Elasticsearch executor supports analyses of types pivot and chart.
 
+=== SAW Export Service
+
+The SAW Export Service enables exporting analysis executions to file
+formats such as Microsoft Excel.
+
 === SAW Scheduler Service
 
 The SAW Scheduler Service periodically triggers execution of analyses

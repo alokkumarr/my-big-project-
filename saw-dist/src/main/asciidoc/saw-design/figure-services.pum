@@ -4,6 +4,7 @@ node "SAW Transport Service" {
     [SAW Dataset Service]
     [SAW Analysis Service]
     [SAW Execution Service]
+    [SAW Export Service]
 }
 
 [SAW Scheduler Service]
@@ -28,6 +29,8 @@ cloud "Elasticsearch cluster" {
 [SAW Execution Service] ..> [MapR-DB]
 [SAW Execution Service] ..> [Apache Spark]
 [SAW Execution Service] ...> [Elasticsearch]
+
+[SAW Export Service] ..> [SAW Execution Service]
 
 [SAW Scheduler Service] ..> [SAW Analysis Service]
 [SAW Scheduler Service] ..> [SAW Execution Service]
