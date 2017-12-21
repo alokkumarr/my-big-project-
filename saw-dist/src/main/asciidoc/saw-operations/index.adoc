@@ -7,8 +7,8 @@ Version {project-version}
 
 == Introduction
 
-This document describes how to install and configure SAW and its
-modules in an environment.
+This document describes how to install, configure and troubleshoot SAW
+and its modules in an environment.
 
 == Installing and configuring
 
@@ -17,25 +17,25 @@ modules in an environment.
 Before starting an installation of SAW ensure the following has been
 provided in the environment:
 
-1. Install and configure a MapR version 5.2 cluster in the environment
+. Install and configure a MapR version 5.2 cluster in the environment
 
-2. Install and configure Apache Spark version 2.1 from the MapR
-   Ecosystem Pack on the MapR cluster
+. Install and configure Apache Spark version 2.1 from the MapR
+  Ecosystem Pack on the MapR cluster
 
-3. Provision a MapR user in the MapR cluster (with user ID 500)
+. Provision a MapR user in the MapR cluster (with user ID 500)
 
-4. Provision a mail relay host
+. Provision a mail relay host
 
-5. Provision a host to deploy from (the deploy host), running CentOS 7
-   as the operating system.  This host will be used to run the deploy
-   command and store the environment configuration.  The deploy host
-   is typically common to the entire environment.
+. Provision a host to deploy from (the deploy host), running CentOS 7
+  as the operating system.  This host will be used to run the deploy
+  command and store the environment configuration.  The deploy host is
+  typically common to the entire environment.
 
-6. Provision a host for running SAW (the target host), with 32 GB of
-   memory and CentOS 7 as the operating system.  The host should be
-   dedicated to SAW and not run other applications.
+. Provision a host for running SAW (the target host), with 32 GB of
+  memory and CentOS 7 as the operating system.  The host should be
+  dedicated to SAW and not run other applications.
 
-7. Install and configure MapR client on the SAW target host
+. Install and configure MapR client on the SAW target host
 
 Please note that the target hosts must be allocated exclusively for
 SAW use.  The underlying infrastructure up to the operating system
@@ -65,13 +65,13 @@ location.
 
 Execute the following steps to install SAW:
 
-1. Get the SAW release package (named `saw-*.tgz`)
+. Get the SAW release package (named `saw-*.tgz`)
 
-2. Prepare a SAW environment configuration file, as described in the
-   previous section
+. Prepare a SAW environment configuration file, as described in the
+  previous section
 
-3. Extract the package and execute the deploy command, giving it the
-   path to the environment configuration file as an argument
+. Extract the package and execute the deploy command, giving it the
+  path to the environment configuration file as an argument
 
         tar -xzf saw-*.tgz
         cd saw
@@ -200,7 +200,7 @@ objects/artifacts referenced in the metrics.
 . Create the security group in the SEC_GROUP table in the SAW Security
 database:
     
-    INSERT INTO `SEC_GROUP` (`SEC_GROUP_SYS_ID`, `ACTIVE_STATUS_IND`, `CREATED_DATE`, `CREATED_BY`)     VALUES ('1', '1', '2017-10-04', 'system');
+    INSERT INTO `SEC_GROUP` (`SEC_GROUP_SYS_ID`, `ACTIVE_STATUS_IND`, `CREATED_DATE`, `CREATED_BY`) VALUES ('1', '1', '2017-10-04', 'system');
     
 . Create DSK attribute (fields/columns name) for corresponding
 security group (SEC_GROUP created in step 1):

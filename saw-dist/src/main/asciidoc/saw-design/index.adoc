@@ -7,7 +7,8 @@ Version {project-version}
 
 == Introduction
 
-This document describes the high-level design of the application.
+This document describes the high-level design of the SAW application,
+including its architecture and modules.
 
 == Overview
 
@@ -94,7 +95,7 @@ deleting analyses.
 The SAW Execution Service enables executing analyses.
 
 .Figure: Executing an analysis using the SAW Execution Service
-plantuml::saw-design/figure-execution.pum[format=svg]
+plantuml::saw-design/figure-execution-sequence.pum[format=svg]
 
 ==== Apache Spark
 
@@ -192,3 +193,11 @@ Spring Framework and uses a MariaDB database for persistence.
 
 .Figure: The SAW Security Service and dependencies
 plantuml::saw-design/figure-security.pum[format=svg]
+
+A client authenticated to the SAW Security Service by sending a to the
+REST API.  The credentials and privileges are checked against the SAW
+Security database, after which a token is issued and returned in the
+response to the client.
+
+.Figure: Authenticating a client using the SAW Security Service
+plantuml::saw-design/figure-security-sequence.pum[format=svg]
