@@ -75,7 +75,7 @@ Execute the following steps to install SAW:
 
         tar -xzf saw-*.tgz
         cd saw
-        ./deploy <config>
+        ./saw-deploy <config>
 
 TIP: Configure passwordless SSH access to the SAW target host for a
 smoother installation experience.  The deploy command should be run as
@@ -154,6 +154,12 @@ using the following commands:
 
 Please note that clearing the queues affects all users of the system
 and report execution types.
+
+=== Automatically generated credentials
+
+Automatically generated credentials, such as for internal service and
+administrator accounts, can be found in the `/etc/bda` directory on
+the respective host.
 
 == Loading semantic metadata
 
