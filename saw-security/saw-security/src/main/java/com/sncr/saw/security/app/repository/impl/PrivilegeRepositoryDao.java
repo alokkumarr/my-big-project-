@@ -13,7 +13,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class PrivilegeRepositoryDao implements PrivilegeRepository {
 
   private static final Logger logger = LoggerFactory.getLogger(PrivilegeRepositoryDao.class);

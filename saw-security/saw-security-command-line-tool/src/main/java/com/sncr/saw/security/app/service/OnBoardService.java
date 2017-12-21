@@ -10,7 +10,6 @@ import com.sncr.saw.security.app.repository.impl.ProductModuleRepositoryDaoImpl;
 import com.sncr.saw.security.app.repository.impl.ProductRepositoryDaoImpl;
 import com.sncr.saw.security.app.repository.impl.RoleRepositoryDaoImpl;
 import com.sncr.saw.security.app.repository.impl.UserRepositoryImpl;
-import com.sncr.saw.security.app.repository.impl.PrivilegeRepositoryDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
