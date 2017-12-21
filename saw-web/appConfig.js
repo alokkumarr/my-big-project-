@@ -5,7 +5,9 @@ const endpoints = {security: 'security', services: 'services'};
 if (__PRODUCTION__) {
   apiUrl = window.location.origin;
 } else {
-  apiUrl = 'https://saw.bda.poc.velocity-va.synchronoss.net';
+  // Note: To run against a local Docker environment, use localhost
+  // apiUrl = 'http://localhost';
+  apiUrl = 'https://sawdev-bda-velocity-vacum-np.sncrcorp.net';
 }
 /* eslint-enable */
 

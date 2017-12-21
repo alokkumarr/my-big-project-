@@ -6,16 +6,24 @@ Security, SAW Servies and SAW Web.
 
 # Development
 
-Start by reading the [development guide](doc/development.md) which
+Start by reading the [Development Guide](doc/development.md) which
 describes how to build the project and making releases.  The list
-of [frequently asked questions](doc/faq.md) describes commonly
-occuring problems and solutions to them.
+of [Frequently Asked Questions](doc/faq.md) describes commonly
+occuring problems and solutions to them.  Documentation in
+the [doc](doc) directory is internal and intended for developers.
 
-The [design guide](doc/design.md) describes the application and its
-design on a higher level.  Use it to get an overview of the components
-and the dataflow.
+# Documentation
 
-# Operations
+The [SAW Operations Guide] describes administration tasks such as
+installing, configuring and monitoring.  The [SAW Design Guide]
+describes the application and its design on a higher level.  Use it to
+get an overview of the components and the dataflow.  Documentation in
+the [saw-dist/src/main/asciidoc](saw-dist/src/main/asciidoc) directory
+is intended for external users and is rendered and an delivered as
+artifacts along the release package for external users.  The rendered
+versions of this documentation can be accessed through the continuous
+integration server's latest [build artifacts].
 
-See the [operations guide](doc/operations.md) for details about
-installing, configuring and monitoring.
+[SAW Operations Guide]: saw-dist/src/main/asciidoc/saw-operations/index.adoc
+[SAW Design Guide]: saw-dist/src/main/asciidoc/saw-design/index.adoc
+[documentation artifacts]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW/latest/artifact/shared/Documentation/index.html

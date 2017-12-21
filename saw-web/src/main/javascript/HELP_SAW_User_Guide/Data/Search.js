@@ -1,0 +1,1 @@
+define({r:0.5,st:'Stem',n:1,t:[0,83],u:['../content/_all_pdf_files/user_guide/pdf_links_user_guide.htm'],s:['$','max'],p:[['$',107],['be',69],['determined',91],['included',72],['options',34],['saw',69],['time',93]]});

@@ -14,6 +14,34 @@ const getForkBtn = parent => parent.element(by.css('button[e2e="action-fork-btn"
 const getCardTitle = name => element(by.xpath(`//a[@e2e="analysis-name" and text() = "${name}"]`));
 const firstCardTitle = element.all(by.css('a[e2e="analysis-name"]')).first();
 
+/**
+ * returns the type of the card analysis in a promise, in the form of
+ * type:chartType if it has a chartType, if not, it just returns type
+ * example: for pivot analysis it returns pivot
+ *          for column chart analysis it returns chart:column
+ */
+const getCardTypeByName = name => getCard(name)
+  .element(by.css('[e2e*="analysis-type:"]'))
+  .getAttribute('e2e')
+  .then(e2eAttribute => {
+    if (e2eAttribute) {
+      const [, type, chartType] = e2eAttribute.split(':');
+      return `${type}${chartType ? `:${chartType}` : ''}`;
+    }
+    return e2eAttribute;
+  });
+
+//Can be used in design mode
+const getAnalysisChartType = () => element(by.css('[e2e*="chart-type:'))
+  .getAttribute('e2e')
+  .then(e2e => {
+    if (e2e) {
+      const [, chartType] = e2e.split(':');
+      return chartType;
+    }
+    return e2e;
+  });
+
 const doAnalysisAction = (name, action) => {
   const card = getCard(name);
   const toggle = card.element(by.css('button[e2e="actions-menu-toggle"]'));
@@ -36,6 +64,8 @@ const getAnalysisActionOptions = name => {
 };
 
 const getAnalysisOption = (parent, option) => parent.element(by.css(`button[e2e="actions-menu-selector-${option}"]`));
+
+const getAnalysisMenuButton = (analysisName) => element(by.xpath("//a[text()='" + analysisName + "']/../../../..//*[@e2e='actions-menu-toggle']"));
 
 const getChartSettingsRadio = (axis, name) => {
   return element(by.css(`md-radio-group[ng-model="$ctrl.selected.${axis}"]`))
@@ -136,13 +166,19 @@ module.exports = {
   designerDialog: {
     saveDialog: element(by.css('analyze-save-dialog')),
     chart: {
+      /*
+      g - color by
+      z - size by
+       */
       getXRadio: name => getChartSettingsRadio('x', name),
+      getYRadio: name => getChartSettingsRadio('y', name),
       getYCheckBox: name => getChartSettingsCheckBox(name),
       getYCheckBoxParent: name => commonFunctions.find.parent(getChartSettingsCheckBox(name)),
       getZRadio: name => getChartSettingsRadio('z', name),
       getGroupRadio: name => getChartSettingsRadio('g', name),
       container: element(by.css('.highcharts-container ')),
       title: element(by.css('span[e2e="designer-type-chart"]')),
+      getAnalysisChartType,
       openFiltersBtn,
       refreshBtn
     },
@@ -172,6 +208,9 @@ module.exports = {
     applyBtn: element(by.css('button[e2e="apply-filter-btn"]')),
     getAppliedFilter
   },
+  detail: {
+    getAnalysisChartType
+  },
   main: {
     categoryTitle: element((by.css('span[e2e="category-title"]'))),
     getAnalysisCard: getCard,
@@ -184,7 +223,9 @@ module.exports = {
     firstCard,
     getForkBtn,
     getAnalysisOption,
-    firstCardTitle
+    firstCardTitle,
+    getCardTypeByName: getCardTypeByName,
+    getAnalysisMenuButton: getAnalysisMenuButton
   },
   saveDialog: {
     selectedCategory: element(by.xpath('//md-select[@e2e="save-dialog-selected-category"]/*/span[1]')),
@@ -236,7 +277,8 @@ module.exports = {
     serviceProductStatus: element(by.css('.e2e-Service\\:PROD_OM_STATUS')),
     refreshDataBtn: element(by.css('[ng-click="$ctrl.onRefreshData()"]')),
     toggleDetailsPanel: element(by.css('[ng-click="$ctrl.toggleDetailsPanel()"]')),
-    reportGridContainer: element(by.css('.ard_details-grid'))
+    reportGridContainer: element(by.css('.ard_details-grid')),
+    cardMenuButton: element(by.css('button[e2e="actions-menu-toggle"]'))
   },
 
   validateCardView() {

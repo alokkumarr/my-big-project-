@@ -99,7 +99,6 @@ export const RolesListViewComponent = {
         width: '2%',
         cellTemplate: 'actionCellTemplate'
       }];
-
       return this._dxDataGridService.mergeWithDefaultConfig({
         onInitialized: this.onGridInitialized.bind(this),
         columns,

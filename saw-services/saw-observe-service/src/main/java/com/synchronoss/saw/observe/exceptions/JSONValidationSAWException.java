@@ -1,9 +1,8 @@
 package com.synchronoss.saw.observe.exceptions;
 
-
-
-@SuppressWarnings("serial")
 public class JSONValidationSAWException extends ExportRuntimeSAWException {
+
+  private static final long serialVersionUID = 1L;
 
     public JSONValidationSAWException(String msg) {
         super(msg);

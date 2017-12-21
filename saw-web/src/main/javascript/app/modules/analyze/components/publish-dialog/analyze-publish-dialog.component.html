@@ -60,12 +60,23 @@
         </div>
 
         <div class="form-container" layout="column">
-          <label translate="EMAIL_TO_COLLABORATORS"></label>
+          <label translate="EMAIL_TO_COPY"></label>
           <md-input-container md-no-float flex="20">
-            <input ng-model="$ctrl.email" type="email" />
+            <md-chips ng-model="$ctrl.emails"
+              placeholder="Enter email-id and separate by ';'"
+              secondary-placeholder="Emails separate by ';'"
+              md-separator-keys="$ctrl.separatorKeys"
+              md-enable-chip-edit="false">
+              <md-chip-template >
+                <div ng-if="!$ctrl.validateThisEmail($chip)" class="errorMsg">?</div>
+                <span>
+                  {{$chip}}
+                </span>
+              </md-chip-template>
+            </md-chips> 
           </md-input-container>
+          <span ng-if="$ctrl.emailValidateFlag" class="errorTextMsg" translate="EMAIL_ERROR_MSG"></span>
         </div>
-
 
         <!--
         <div class="form-container" layout="row">

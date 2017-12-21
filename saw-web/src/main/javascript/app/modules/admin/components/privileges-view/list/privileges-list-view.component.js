@@ -110,7 +110,6 @@ export const PrivilegesListViewComponent = {
         width: '6%',
         cellTemplate: 'actionCellTemplate'
       }];
-
       return this._dxDataGridService.mergeWithDefaultConfig({
         onInitialized: this.onGridInitialized.bind(this),
         columns,

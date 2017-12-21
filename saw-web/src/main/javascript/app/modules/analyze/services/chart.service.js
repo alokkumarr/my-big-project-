@@ -30,6 +30,7 @@ import * as mapValues from 'lodash/mapValues';
 import * as sortBy from 'lodash/sortBy';
 import * as moment from 'moment';
 import * as toString from 'lodash/toString';
+import * as replace from 'lodash/replace';
 
 import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS} from '../consts';
 
@@ -164,13 +165,13 @@ export class ChartService {
       },
       series: [{
         name: 'Series 1',
-        data: [0, 0, 0, 0, 0]
+        data: []
       }],
       yAxis: {
         title: {x: -15}
       },
       xAxis: {
-        categories: ['A', 'B', 'C', 'D', 'E'],
+        categories: [],
         title: {y: 15}
       }
     };
@@ -271,7 +272,7 @@ export class ChartService {
 
   parseLeaf(node, dataObj) {
     const dataFields = fpPipe(
-      fpOmit(['doc_count', 'key']),
+      fpOmit(['doc_count', 'key', 'key_as_string']),
       fpMapValues('value')
     )(node);
 
@@ -374,7 +375,8 @@ export class ChartService {
     }
 
     if (DATE_TYPES.includes(field.type)) {
-      return moment(value, field.dateFormat);
+      const momentDateFormat = this.getMomentDateFormat(field.dateFormat);
+      return moment(value, momentDateFormat);
     }
 
     return value;
@@ -384,8 +386,8 @@ export class ChartService {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
         forEach(dateFields, ({columnName, dateFormat}) => {
-          const offset = moment(dataPoint[columnName]).utcOffset();
-          dataPoint[columnName] = moment(dataPoint[columnName]).utcOffset(offset).format(dateFormat);
+          const momentDateFormat = this.getMomentDateFormat(dateFormat);
+          dataPoint[columnName] = moment.utc(dataPoint[columnName]).format(momentDateFormat);
         });
       });
     }
@@ -408,6 +410,12 @@ export class ChartService {
       zIndex,
       data: []
     };
+  }
+
+  getMomentDateFormat(dateFormat) {
+    // the backend and moment.js require different date formats for days of month
+    // the backend represents it with "d", and momentjs with "Do"
+    return replace(dateFormat, 'd', 'Do');
   }
 
   getZIndex(type) {
@@ -453,12 +461,12 @@ export class ChartService {
   }
 
   /**
-   * get the map from colmnNames to the axes, or group
+   * Get the map from colmnNames to the axes, or group
    * Ex
    * y -> AVAILABLE_MB
    */
   getAxesFieldNameMap(fields, exclude) {
-    // y axis ommitted because it is added in splitSeriesByYAxes
+    // Y axis ommitted because it is added in splitSeriesByYAxes
     const y = exclude === 'y' ? [] : fields.y;
     const fieldsArray = compact([fields.x, ...y, fields.z, fields.g]);
     return reduce(fieldsArray, (accumulator, field) => {
@@ -479,7 +487,7 @@ export class ChartService {
   isCategoryAxis(fields, key) {
     const dataType = get(fields, `${key}.type`);
     const isAxis = key !== 'g';
-    // strings should be represented as categories in the chart
+    // Strings should be represented as categories in the chart
     /* eslint-disable angular/typecheck-string */
     const isCategoryAxis = isAxis &&
       (dataType === 'string' || dataType === 'String' || DATE_TYPES.includes(dataType));
@@ -743,7 +751,7 @@ export class ChartService {
     // date -> just show the date
     const xStringValue = xIsString ?
       'point.key' : xIsNumber ?
-        'point.x:.2f' : 'point.x';
+        'point.x:,.2f' : 'point.x';
     const xAxisString = `<tr>
       <th>${fields.x.displayName}:</th>
       <td>{${xStringValue}}</td>
@@ -752,14 +760,14 @@ export class ChartService {
     const yIsSingle = fields.y.length === 1;
     const yAxisString = `<tr>
       <th>{series.name}:</th>
-      <td>{point.y:.2f}</td>
+      <td>{point.y:,.2f}</td>
     </tr>`;
     const zAxisString = fields.z ?
-    `<tr><th>${fields.z.displayName}:</th><td>{point.z:.2f}</td></tr>` :
-    '';
+      `<tr><th>${fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>` :
+      '';
     const groupString = fields.g ?
-    `<tr><th>Group:</th><td>{point.g}</td></tr>` :
-    '';
+      `<tr><th>Group:</th><td>{point.g}</td></tr>` :
+      '';
 
     const tooltipObj = {
       useHTML: true,

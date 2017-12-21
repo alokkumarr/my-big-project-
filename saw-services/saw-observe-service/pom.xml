@@ -93,37 +93,45 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>com.synchronoss.saw</groupId>
+			<artifactId>saw-json-store-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>com.github.tomakehurst</groupId>
 			<artifactId>wiremock</artifactId>
 			<version>2.7.1</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+		<dependency>
+            <!-- springfox.documentation.* -->
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+		
 
 		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>19.0</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>
-			<version>3.11-beta2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-			<version>3.11-beta2</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.ojai</groupId>
-		    <artifactId>ojai</artifactId>
-		    <version>2.0</version>
+		  <groupId>com.mapr.db</groupId>
+		  <artifactId>maprdb</artifactId>
+		  <version>5.2.0-mapr</version>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>

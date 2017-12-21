@@ -5,6 +5,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -58,7 +61,7 @@ public class TransportUtils {
 
     {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        String DATE_FORMAT_LTE = "23:59:59";
+        String DATE_FORMAT_LTE = "00:00:00";
         String DATE_FORMAT_GTE = "00:00:00";
         String SPACE = " ";
         DynamicConvertor dynamicConvertor = new DynamicConvertor();
@@ -113,7 +116,7 @@ public class TransportUtils {
                 LocalDateTime startOfWeek =
                         lastWeek.with(TemporalAdjusters.previousOrSame(firstDayOfWeek.plus(1)));
                 LocalDateTime endOfWeek = lastWeek.with(TemporalAdjusters.nextOrSame(firstDayOfWeek));
-                dynamicConvertor.setLte(endOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(endOfWeek.plusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(startOfWeek.format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
@@ -141,7 +144,7 @@ public class TransportUtils {
             case "LTW": {
                 LocalDateTime now = LocalDateTime.now();
                 LocalDateTime last2Week = now.minusWeeks(2);
-                dynamicConvertor.setLte(now.with(DayOfWeek.MONDAY).minusDays(1).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
+                dynamicConvertor.setLte(now.with(DayOfWeek.MONDAY).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_LTE);
                 dynamicConvertor.setGte(last2Week.with(DayOfWeek.MONDAY).format(dateTimeFormatter)+ SPACE + DATE_FORMAT_GTE);
                 break;
             }
@@ -150,6 +153,56 @@ public class TransportUtils {
         }
 
         return dynamicConvertor;
+    }
+
+    /**
+     * extract the my analysis code from the token and if category Id belongs to my Analysis return true
+     * @param products
+     * @param categoryId
+     * @return
+     */
+    public static boolean checkIfPrivateAnalysis(List<Object> products , String categoryId)
+    {
+        String myAnalysisCode = null;
+        for (Object obj : products)
+        {
+            if (obj instanceof LinkedHashMap) {
+                List<Object> modules = ObjectTolist(((LinkedHashMap) obj).get("productModules"));
+                for (Object obj1 : modules) {
+                    if (obj1 instanceof LinkedHashMap) {
+                        List<Object> feature = ObjectTolist(((LinkedHashMap) obj1).get("prodModFeature"));
+                        for (Object obj2 : feature) {
+                            if (obj2 instanceof LinkedHashMap) {
+                                if (String.valueOf(((LinkedHashMap) obj2).
+                                        get("prodModFeatureName")).equalsIgnoreCase("My Analysis")) {
+                                    List<Object> subfeature = ObjectTolist(((LinkedHashMap) obj2).get("productModuleSubFeatures"));
+                                    for (Object obj3 : subfeature) {
+                                        if (String.valueOf(((LinkedHashMap) obj3).
+                                                get("prodModFeatureID")).equalsIgnoreCase(categoryId)) {
+                                            myAnalysisCode = String.valueOf(((LinkedHashMap) obj3).get("prodModFeatureType"));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (myAnalysisCode==null)
+        return false;
+        else
+            return true;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Object> ObjectTolist(Object object)
+    {
+        if (object instanceof List)
+        {
+            return (List<Object>) object;
+        }
+        return new ArrayList<>();
     }
 
 }
