@@ -10,19 +10,25 @@
         [(ngModel)]="dashboard.name" required />
     </md-form-field>
     <md-form-field class="full-form-field">
-      <textarea mdInput matTextareaAutosize [matAutosizeMaxRows]="6"
+      <textarea mdInput mdTextareaAutosize [mdAutosizeMaxRows]="6"
         name="dashboardDesc" placeholder="Description"
         [(ngModel)]="dashboard.description">
       </textarea>
     </md-form-field>
+
+    <md-select name="dashboardCat" placeholder="Category" [(ngModel)]="dashboard.categoryId">
+      <md-option *ngFor="let category of categories" [value]="category.id">
+        {{ category.name }}
+      </md-option>
+    </md-select>
   </form>
 </div>
-<div mat-dialog-actions>
-  <button md-button color="primary" (click)="closeDashboard()">
-    Cancel
-  </button>
+<div md-dialog-actions>
   <button md-raised-button color="primary" (click)="saveDashboard()"
     [disabled]="!isValid(dashboard)">
     Save
+  </button>
+  <button md-button color="primary" (click)="closeDashboard()">
+    Cancel
   </button>
 </div>

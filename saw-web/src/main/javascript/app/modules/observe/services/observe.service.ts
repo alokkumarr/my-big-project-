@@ -39,4 +39,10 @@ export class ObserveService {
       headers: this.addHeaders()
     }).map(fpGet('contents.observe.0'));
   }
+
+  getDashboard(entityId: string) {
+    return this.http.get(`${this.api}/observe/dashboards/${entityId}` , {
+      headers: this.addHeaders()
+    }).map(fpGet('contents.observe.0'));
+  }
 }

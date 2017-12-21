@@ -1,4 +1,8 @@
 save-dashboard {
+  .mat-dialog-actions {
+    flex-direction: row-reverse;
+  }
+
   form {
     min-width: 450px;
 

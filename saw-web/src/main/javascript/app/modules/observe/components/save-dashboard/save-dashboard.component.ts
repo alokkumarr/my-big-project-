@@ -12,6 +12,16 @@ require('./save-dashboard.component.scss');
 export class SaveDashboardComponent implements OnInit {
 
   private dashboard: any;
+  public categories = [{
+    id: '1',
+    name: 'Category 1'
+  }, {
+    id: '2',
+    name: 'Category 2'
+  }, {
+    id: '3',
+    name: 'Category 3'
+  }];
 
   constructor(private dialogRef: MdDialogRef<SaveDashboardComponent>,
     @Inject(MD_DIALOG_DATA) private data: any,
@@ -20,6 +30,7 @@ export class SaveDashboardComponent implements OnInit {
 
   ngOnInit() {
     this.dashboard = this.data.dashboard;
+    this.dashboard.categoryId = this.categories[0].id;
   }
 
   closeDashboard(data) {
