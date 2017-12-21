@@ -5,6 +5,7 @@ import com.sncr.saw.security.app.repository.impl.CustomerProductModuleFeatureRep
 import com.sncr.saw.security.app.repository.impl.CustomerProductModuleRepositoryDaoImpl;
 import com.sncr.saw.security.app.repository.impl.CustomerProductRepositoryDaoImpl;
 import com.sncr.saw.security.app.repository.impl.CustomerRepositoryDaoImpl;
+import com.sncr.saw.security.app.repository.impl.PrivilegeRepositoryDao;
 import com.sncr.saw.security.app.repository.impl.RoleRepositoryDaoImpl;
 import com.sncr.saw.security.app.repository.impl.UserRepositoryImpl;
 import com.sncr.saw.security.app.service.OnBoardService;
@@ -77,6 +78,13 @@ class SawSecurityShell {
         Long createdAdminUserSysId = createAdminUser(createdAdminRoleSysId, created_cust_id);
         System.out.println("Generated User ID for current user is: "+ createdAdminUserSysId);
         logger.info("Created Admin user with ID: "+ createdAdminUserSysId);
+
+        // At the very end add just one privilege for admin user by admin user
+        Long createdPrivilegeSysId = createPrivilegeForAdminUser(Long.parseLong(created_cust_prod_id),
+            Long.parseLong(cust_prod_mod_linkage_ids.get(1)),
+            Long.parseLong(cust_prod_mod_feature_linkage_ids.get(1)),
+            1L);
+        logger.info("Generated Privilege ID for Admin user: "+ createdPrivilegeSysId);
 
       } else {
         // connection is not working fine
@@ -217,6 +225,12 @@ class SawSecurityShell {
     RoleRepositoryDaoImpl adminRole = onboard
         .getRolesDao();
     return adminRole.createNewAdminRoleDao(custId);
+  }
+
+  public long createPrivilegeForAdminUser(Long custProdSysId, Long custProdModSysId, Long custProdModFeatureSysId, Long roleSysId) {
+    System.out.println("====== PRIVILEGE TABLE for Admin Role ======");
+    PrivilegeRepositoryDao priv = onboard.getPrivRepoDao();
+    return priv.createNewPrivilegeDao(custProdSysId, custProdModSysId, custProdModFeatureSysId, roleSysId);
   }
 
 

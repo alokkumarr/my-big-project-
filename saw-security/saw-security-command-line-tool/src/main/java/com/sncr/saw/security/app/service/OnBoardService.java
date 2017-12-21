@@ -5,10 +5,12 @@ import com.sncr.saw.security.app.repository.impl.CustomerProductModuleRepository
 import com.sncr.saw.security.app.repository.impl.CustomerProductRepositoryDaoImpl;
 import com.sncr.saw.security.app.repository.impl.CustomerRepositoryDaoImpl;
 import com.sncr.saw.security.app.repository.impl.ModuleRepositoryDaoImpl;
+import com.sncr.saw.security.app.repository.impl.PrivilegeRepositoryDao;
 import com.sncr.saw.security.app.repository.impl.ProductModuleRepositoryDaoImpl;
 import com.sncr.saw.security.app.repository.impl.ProductRepositoryDaoImpl;
 import com.sncr.saw.security.app.repository.impl.RoleRepositoryDaoImpl;
 import com.sncr.saw.security.app.repository.impl.UserRepositoryImpl;
+import com.sncr.saw.security.app.repository.impl.PrivilegeRepositoryDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,8 +47,10 @@ public class OnBoardService {
   @Autowired
   private CustomerProductModuleFeatureRepositoryDaoImpl custProdModuleFeaturesDao;
 
-  // assuming that privileges and roles will already be there as basic requirement.
+  @Autowired
+  private PrivilegeRepositoryDao privRepoDao;
 
+  // assuming that privileges and roles will already be there as basic requirement.
 
   public CustomerRepositoryDaoImpl getCustomerDao() {
     return customerDao;
@@ -82,5 +86,9 @@ public class OnBoardService {
 
   public CustomerProductModuleFeatureRepositoryDaoImpl getCustProdModuleFeaturesDao() {
     return custProdModuleFeaturesDao;
+  }
+
+  public PrivilegeRepositoryDao getPrivRepoDao() {
+    return privRepoDao;
   }
 }
