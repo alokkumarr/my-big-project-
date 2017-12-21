@@ -42,7 +42,8 @@
 
   <div class="settings__selected-fields">
     <designer-settings-group *ngFor="let groupAdapter of groupAdapters; trackBy: index"
-                             (onSettingsChange)="changeSettings()"
+                             (fieldsChange)="onFieldsChange()"
+                             (fieldPropChange)="onFieldPropChange()"
                              (removeField)="removeFromGroup($event, groupAdapter)"
                              [groupAdapter]="groupAdapter"
                              [artifactColumns]="groupAdapter.artifactColumns">

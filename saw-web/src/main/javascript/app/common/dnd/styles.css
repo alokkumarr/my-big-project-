@@ -1,10 +1,10 @@
 .dnd__drop-area__drag-over {
-  border: 1px dashed #000;
+  border: 1px dashed #000 !important;
 }
 
 .dnd__dragged__old-place {
   opacity: 0.7;
-  border: 1px dashed black;
+  border: 1px dashed black !important;
 }
 
 .dnd__dragged__sorting__old-place {
@@ -13,7 +13,7 @@
 }
 
 .dnd__dragged__sorting__new-place {
-  border: 1px dashed red;
+  border: 1px dashed red !important;
 }
 
 /* Solve the bug with dragenter and dragleave events firing when hovering over elements in the drop container */

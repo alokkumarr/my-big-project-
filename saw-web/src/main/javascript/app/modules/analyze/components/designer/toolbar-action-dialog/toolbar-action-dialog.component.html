@@ -11,8 +11,7 @@
                      [sorts]="data.sorts"
                      [artifactColumns]="data.artifactColumns"></designer-sort>
     </mat-card-content>
-    <mat-card-actions fxLayout="row" fxLayoutAlign="space-between center">
-      <button mat-button i18n (click)="onBack()">Cancel</button>
+    <mat-card-actions fxLayout="row" fxLayoutAlign="start center">
       <div [ngSwitch]="data.action">
           <button *ngSwitchCase="'sort'"
                   (click)="onOk()"
@@ -25,5 +24,6 @@
             Save
           </button>
       </div>
+      <button mat-button i18n (click)="onBack()">Cancel</button>
     </mat-card-actions>
   </mat-card>

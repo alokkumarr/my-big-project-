@@ -92,6 +92,7 @@ export class DesignerService {
 
     const pivotGroupAdapters: Array<IDEsignerSettingGroupAdapter> =  [{
       title: 'Data',
+      type: 'pivot',
       marker: 'data',
       artifactColumns: [],
       canAcceptArtifactColumn: canAcceptNumberType,
@@ -104,6 +105,7 @@ export class DesignerService {
       onReorder
     }, {
       title: 'Row',
+      type: 'pivot',
       marker: 'row',
       artifactColumns: [],
       canAcceptArtifactColumn: canAcceptNonNumberType,
@@ -116,6 +118,7 @@ export class DesignerService {
       onReorder
     }, {
       title: 'Column',
+      type: 'pivot',
       marker: 'column',
       artifactColumns: [],
       canAcceptArtifactColumn: canAcceptNonNumberType,

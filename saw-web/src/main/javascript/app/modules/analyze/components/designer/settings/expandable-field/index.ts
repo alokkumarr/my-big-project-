@@ -1,2 +1,6 @@
 import { ExpandableFieldComponent } from './expandable-field.component';
-export { ExpandableFieldComponent };
+import { ExpandDetailPivotComponent } from './pivot';
+export {
+  ExpandableFieldComponent,
+  ExpandDetailPivotComponent
+};

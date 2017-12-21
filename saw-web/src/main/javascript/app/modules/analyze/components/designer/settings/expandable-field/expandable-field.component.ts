@@ -6,7 +6,7 @@ import {
 } from '@angular/core';
 import {
   ArtifactColumn,
-  IDEsignerSettingGroupAdapter
+  AnalysisType
 }  from '../../types';
 import { TYPE_ICONS_OBJ } from '../../../../consts';
 
@@ -18,9 +18,10 @@ require('./expandable-field.component.scss');
   template
 })
 export class ExpandableFieldComponent {
-  // @Output() public onSettingsChange: EventEmitter<ArtifactColumns[]> = new EventEmitter();
+  @Output() public change: EventEmitter<ArtifactColumn> = new EventEmitter();
   @Output() public removeRequest: EventEmitter<null> = new EventEmitter();
   @Input() public artifactColumn: ArtifactColumn;
+  @Input() public analysisType: AnalysisType;
 
   public isExpanded = false;
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;

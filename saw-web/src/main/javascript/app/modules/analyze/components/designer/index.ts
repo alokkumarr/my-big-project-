@@ -9,7 +9,8 @@ import {
 import {
   DesignerSettingsSingleComponent,
   DesignerSettingsGroupComponent,
-  ExpandableFieldComponent
+  ExpandableFieldComponent,
+  ExpandDetailPivotComponent
 } from './settings';
 import { ToolbarActionDialogComponent } from './toolbar-action-dialog';
 import { DesignerSortComponent } from './sort';
@@ -25,6 +26,7 @@ export {
   DesignerSettingsSingleComponent,
   DesignerSettingsGroupComponent,
   ExpandableFieldComponent,
+  ExpandDetailPivotComponent,
   ToolbarActionDialogComponent,
   DesignerSortComponent,
   DesignerService,

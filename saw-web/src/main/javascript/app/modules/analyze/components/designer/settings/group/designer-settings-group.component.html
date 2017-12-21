@@ -13,7 +13,9 @@
                       [dndSortableIndex]="i"
                       [dndRemoveFromCallback]="removeFromCallback"
                       [dndContainer]="groupAdapter"
+                      (change)="onFieldPropChange()"
                       [artifactColumn]="artifactColumn"
+                      [analysisType]="groupAdapter.type"
                       (removeRequest)="onRemoveField(artifactColumn)"
                       class="settings__list-item"></expandable-field>
   </div>

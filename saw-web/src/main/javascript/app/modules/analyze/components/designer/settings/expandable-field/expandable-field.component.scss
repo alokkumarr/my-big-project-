@@ -2,9 +2,15 @@
 
 expandable-field {
   display: block;
+  cursor: move;
+
+  .mat-form-field-wrapper {
+    padding-bottom: 15px;
+  }
 
   .expandable-field__expand-icon {
     font-size: 24px;
+    cursor: pointer;
     transform: scale(0.6);
   }
 
@@ -24,6 +30,7 @@ expandable-field {
 
   .expandable-field__remove-icon {
     color: red;
+    cursor: pointer;
     font-size: 24px;
     transform: scale(0.6) translateY(-5px);
   }

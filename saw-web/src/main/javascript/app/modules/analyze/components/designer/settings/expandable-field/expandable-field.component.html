@@ -6,8 +6,8 @@
   <div class="expandable-field__name">
     {{ artifactColumn.alias || artifactColumn.displayName }}
     <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
-            class="expandable-field__icon">
-  </mat-icon>
+              class="expandable-field__icon">
+    </mat-icon>
   </div>
   <mat-icon fontIcon="icon-close"
             (click)="removeRequest.emit()"
@@ -16,6 +16,11 @@
 </div>
 
 <div *ngIf="isExpanded"
+     [ngSwitch]="analysisType"
      class="expandable-field__details">
+  <expand-detail-pivot *ngSwitchCase="'pivot'"
+                       (change)="change.emit(artifactColumn)"
+                       [artifactColumn]="artifactColumn">
 
+  </expand-detail-pivot>
 </div>

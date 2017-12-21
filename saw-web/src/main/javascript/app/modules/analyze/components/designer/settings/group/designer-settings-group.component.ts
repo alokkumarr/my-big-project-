@@ -19,8 +19,9 @@ require('./designer-settings-group.component.scss');
   selector: 'designer-settings-group',
   template
 })
-export default class DesignerSettingsGroupComponent {
-  @Output() public onSettingsChange: EventEmitter<null> = new EventEmitter();
+export class DesignerSettingsGroupComponent {
+  @Output() public fieldsChange: EventEmitter<null> = new EventEmitter();
+  @Output() public fieldPropChange: EventEmitter<null> = new EventEmitter();
   @Output() public removeField: EventEmitter<ArtifactColumn> = new EventEmitter();
   @Input() public artifactColumns :ArtifactColumns;
   @Input() public groupAdapter :IDEsignerSettingGroupAdapter;
@@ -35,7 +36,7 @@ export default class DesignerSettingsGroupComponent {
       payload,
       container
     );
-    this.onSettingsChange.emit();
+    this.fieldsChange.emit();
   }
 
   public addToCallback = (payload, index, container) => {
@@ -44,13 +45,17 @@ export default class DesignerSettingsGroupComponent {
       container,
       index
     );
-    this.onSettingsChange.emit();
+    this.fieldsChange.emit();
   }
 
   constructor(private _designerService: DesignerService) {}
 
   ngOnInit() {
     this.allowDropFn = this.groupAdapter.canAcceptArtifactColumn(this.groupAdapter)
+  }
+
+  onFieldPropChange() {
+    this.fieldPropChange.emit();
   }
 
   onRemoveField(artifactColumn: ArtifactColumn) {

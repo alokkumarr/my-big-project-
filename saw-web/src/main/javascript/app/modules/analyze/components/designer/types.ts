@@ -45,6 +45,7 @@ export type PivotArea = 'data' | 'row' | 'column';
 export interface IDEsignerSettingGroupAdapter {
   title: string;
   marker: string;
+  type: AnalysisType;
   artifactColumns: ArtifactColumns;
   canAcceptArtifactColumn: (groupAdapter: IDEsignerSettingGroupAdapter) =>
     (artifactColumn: ArtifactColumn) => boolean;

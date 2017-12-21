@@ -5,22 +5,48 @@ import {
   EventEmitter
 } from '@angular/core';
 import {
-  ArtifactColumn,
-  IDEsignerSettingGroupAdapter,
-  AnalysisType
+  ArtifactColumnPivot
 }  from '../../../types';
-import { TYPE_ICONS_OBJ } from '../../../../../consts';
+import {
+  TYPE_ICONS_OBJ,
+  AGGREGATE_TYPES,
+  DATE_INTERVALS,
+  DATE_TYPES
+} from '../../../../../consts';
 
-const template = require('./expand-detail.component.html');
+const template = require('./expand-detail-pivot.component.html');
 
 @Component({
   selector: 'expand-detail-pivot',
   template
 })
 export class ExpandDetailPivotComponent {
-  // @Output() public onSettingsChange: EventEmitter<ArtifactColumns[]> = new EventEmitter();
+  @Output() public change: EventEmitter<ArtifactColumnPivot> = new EventEmitter();
 
-  @Input() public type: AnalysisType;
-  @Input() public artifactColumn: ArtifactColumn;
+  @Input() public artifactColumn: ArtifactColumnPivot;
 
+  public AGGREGATE_TYPES = AGGREGATE_TYPES;
+  public DATE_INTERVALS = DATE_INTERVALS;
+  public hasAggregate: boolean = false;
+  public hasDateInterval: boolean = false;
+
+  ngOnInit() {
+    this.hasAggregate = this.artifactColumn.area === 'data';
+    this.hasDateInterval = DATE_TYPES.includes(this.artifactColumn.type);
+  }
+
+  onAliasChange(value) {
+    this.artifactColumn.aliasName = value;
+    this.change.emit(this.artifactColumn);
+  }
+
+  onAggregateChange(value) {
+    this.artifactColumn.aggregate = value;
+    this.change.emit(this.artifactColumn);
+  }
+
+  onDateIntervalChange(value) {
+    this.artifactColumn.dateInterval = value;
+    this.change.emit(this.artifactColumn);
+  }
 }

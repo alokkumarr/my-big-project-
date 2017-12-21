@@ -72,8 +72,12 @@ export class DesignerSettingsSingleComponent {
     }
   }
 
-  changeSettings() {
+  onFieldsChange() {
     this.unselectedArtifactColumns = this.getUnselectedArtifactColumns();
+    this._changeSettingsDebounced();
+  }
+
+  onFieldPropChange() {
     this._changeSettingsDebounced();
   }
 
@@ -102,7 +106,7 @@ export class DesignerSettingsSingleComponent {
       this.groupAdapters
     );
     if (isAddSuccessful) {
-      this.changeSettings();
+      this.onFieldsChange();
     }
   }
 
@@ -111,7 +115,7 @@ export class DesignerSettingsSingleComponent {
       artifactColumn,
       groupAdapter
     );
-    this.changeSettings();
+    this.onFieldsChange();
   }
 
 }
