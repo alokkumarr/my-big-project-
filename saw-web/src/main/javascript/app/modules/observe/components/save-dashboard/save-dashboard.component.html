@@ -6,7 +6,8 @@
 <div md-dialog-content>
   <form class="save-dashboard-form">
     <md-form-field class="full-form-field">
-      <input mdInput name="dashboardName" placeholder="Dashboard Name" [(ngModel)]="dashboard.name"/>
+      <input mdInput name="dashboardName" placeholder="Dashboard Name"
+        [(ngModel)]="dashboard.name" required />
     </md-form-field>
     <md-form-field class="full-form-field">
       <textarea mdInput matTextareaAutosize [matAutosizeMaxRows]="6"
@@ -20,7 +21,8 @@
   <button md-button color="primary" (click)="closeDashboard()">
     Cancel
   </button>
-  <button md-raised-button color="primary" (click)="saveDashboard()">
+  <button md-raised-button color="primary" (click)="saveDashboard()"
+    [disabled]="!isValid(dashboard)">
     Save
   </button>
 </div>
