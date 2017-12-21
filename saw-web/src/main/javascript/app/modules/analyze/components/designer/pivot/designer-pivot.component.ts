@@ -45,7 +45,6 @@ export class DesignerPivotComponent {
   @Input() artifactColumns: ArtifactColumns;
   @Input() data: any;
   @Input() designerState: DesignerStates;
-  @Input() isDataOutOfSynch: boolean;
 
   public updater: Subject<IPivotGridUpdate> = new Subject();
   public DesignerStates = DesignerStates;

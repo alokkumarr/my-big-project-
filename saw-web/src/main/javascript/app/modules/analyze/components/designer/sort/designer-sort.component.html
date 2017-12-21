@@ -1,62 +1,82 @@
-<div fxLayout="row" fxLayoutAlign="space-between center">
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>
-        <ng-container i18n>Available fields</ng-container>
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="available-fields"
-           dndSortableContainer
-           dndZone="available-fields-container">
-        <div *ngFor="let field of availableFields; trackBy: trackByFn"
-             [dndSortable]="field"
-             [dndRemoveFromCallback]="removeFromAvailableFields"
-             [dndContainer]="sorts"
-             (click)="addSort(field)"
-             fxLayout="row"
-             fxLayoutAlign="space-around center"
-             class="sort-field">
-          {{field.aliasName || field.displayName}}
-        </div>
+<div fxLayout="row" fxLayoutAlign="space-between stretch">
+  <div>
+    <strong i18n
+            class="sort-fields-title">
+      Available fields
+    </strong>
+    <div class="available-fields"
+          dndSortableContainer
+          dndZone="available-fields-container">
+      <div *ngFor="let field of availableFields; trackBy: trackByFn"
+            [dndSortable]="field"
+            [dndRemoveFromCallback]="removeFromAvailableFields"
+            [dndContainer]="sorts"
+            fxLayout="row"
+            fxLayoutAlign="space-between center"
+            class="sort-field">
+        <span class="sort-field__name">
+            {{field.aliasName || field.displayName}}
+        </span>
+        <button mat-icon-button
+                (click)="addSort(field)">
+          <mat-icon fontIcon="icon-plus">
+          </mat-icon>
+        </button>
       </div>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </div>
+  <div class="sort-divider"></div>
+  <div [ngSwitch]="sorts.length > 0"
+       class="sorted-fields-container">
+    <strong i18n
+            class="sort-fields-title">
+      Sorted fields
+    </strong>
+    <div *ngSwitchCase="false"
+          fxLayout="column"
+          fxLayoutAlign="start center">
+      <span class="non-ideal-state__message" i18n>
+          Please add some fields to sort by, by dragging, or using the add button!
+        </span>
+        <mat-icon class="non-ideal-state__icon" fontIcon="icon-sort"></mat-icon>
+    </div>
+    <div *ngSwitchCase="true"
+         class="sorted-fields"
+         dndSortableContainer
+         [dndContainer]="sorts"
+         [dndAddToCallback]="addToSortedFields">
+      <div *ngFor="let sort of sorts; let i = index; trackBy: trackByFn"
+            [dndSortable]="sort"
+            [dndSortableIndex]="i"
+            [dndRemoveFromCallback]="removeFromSortedFields"
+            [dndContainer]="sorts"
+            class="sort-field"
+            fxLayout="row"
+            fxLayoutAlign="space-between center">
+        {{nameMap[sort.columnName]}}
 
-  <mat-card>
-    <mat-card-header>
-      <mat-card-title>
-        <ng-container i18n>Sorted fields</ng-container>
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="sorted-fields"
-           dndSortableContainer
-           [dndContainer]="sorts"
-           [dndAddToCallback]="addToSortedFields">
-        <div *ngFor="let sort of sorts; let i = index; trackBy: trackByFn"
-             [dndSortable]="sort"
-             [dndSortableIndex]="i"
-             [dndRemoveFromCallback]="removeFromSortedFields"
-             [dndContainer]="sorts"
-             class="sort-field"
-             fxLayout="row"
-             fxLayoutAlign="space-between center">
-          <mat-icon fontIcon="icon-close"
-                    (click)="removeSort(sort)"
-                    class="sorted-field__remove"></mat-icon>
-          {{nameMap[sort.columnName]}}
+        <div fxLayout="row"
+              fxLayoutAlign="space-between center">
           <mat-button-toggle-group (change)="onSortOrderChange(sort, $event.value)"
-                                   [value]="sort.order">
-            <mat-button-toggle value="asc">
-              <mat-icon fontIcon="icon-arrow-left" class="up"></mat-icon>
+                                    [value]="sort.order">
+            <mat-button-toggle value="asc" i18n>
+              Ascending
             </mat-button-toggle>
-            <mat-button-toggle value="desc">
-              <mat-icon fontIcon="icon-arrow-left" class="down"></mat-icon>
+            <mat-button-toggle value="desc" i18n>
+              Descending
             </mat-button-toggle>
           </mat-button-toggle-group>
+
+          <div class="sorted-field__remove-button__container">
+            <button mat-icon-button
+                    (click)="removeSort(sort)">
+              <mat-icon fontIcon="icon-close"
+                        class="sorted-field__remove-button__icon">
+              </mat-icon>
+            </button>
+          </div>
         </div>
       </div>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </div>
 </div>

@@ -33,7 +33,8 @@ export enum DesignerStates {
   NO_SELECTION,
   SELECTION_WAITING_FOR_DATA,
   SELECTION_WITH_NO_DATA,
-  SELECTION_WITH_DATA
+  SELECTION_WITH_DATA,
+  SELECTION_OUT_OF_SYNCH_WITH_DATA
 }
 
 @Component({
@@ -150,7 +151,7 @@ export class DesignerContainerComponent {
 
   onSettingsChange() {
     this.isDataOutOfSynch = true;
-    this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
+    this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
     this.firstArtifactColumns = this.getFirstArtifactColumns();
     this.cleanSorts();
   }

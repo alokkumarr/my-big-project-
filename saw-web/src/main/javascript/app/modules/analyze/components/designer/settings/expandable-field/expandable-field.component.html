@@ -1,18 +1,24 @@
 <div fxLayout="row" fxLayoutAlign="space-between center">
-  <mat-icon fontIcon="icon-expand"
-            class="expandable-field__expand-icon"
-            (click)="toggleExpansion()">
-  </mat-icon>
-  <div class="expandable-field__name">
-    {{ artifactColumn.alias || artifactColumn.displayName }}
-    <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
-              class="expandable-field__icon">
-    </mat-icon>
+  <div fxLayout="row" fxLayoutAlign="space-between center">
+    <button mat-icon-button>
+      <mat-icon fontIcon="icon-expand"
+                (click)="toggleExpansion()">
+      </mat-icon>
+    </button>
+    <div class="expandable-field__name"
+         fxLayout="row" fxLayoutAlign="space-between center">
+      {{ artifactColumn.alias || artifactColumn.displayName }}
+      <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
+                class="expandable-field__icon">
+      </mat-icon>
+    </div>
   </div>
-  <mat-icon fontIcon="icon-close"
-            (click)="removeRequest.emit()"
-            class="expandable-field__remove-icon">
-  </mat-icon>
+  <button mat-icon-button>
+    <mat-icon fontIcon="icon-close"
+              (click)="removeRequest.emit()"
+              class="expandable-field__remove-icon">
+    </mat-icon>
+  </button>
 </div>
 
 <div *ngIf="isExpanded"

@@ -5,9 +5,18 @@ designer-sort {
     margin-left: 0;
   }
 
+  .sort-fields-title {
+    margin-bottom: 10px;
+  }
+
   .available-fields {
     width: 250px;
     min-height: 40px;
+  }
+
+  .sorted-fields-container {
+    width: 400px;
+    min-height: 200px;
   }
 
   .sorted-fields {
@@ -20,35 +29,47 @@ designer-sort {
     font-size: 14px;
     margin-top: 3px;
     border: solid 1px $primary-grey-g2;
-    border-radius: 5px;
+    border-radius: 2px;
+    padding: 5px;
     min-height: 40px;
   }
 
-  .sorted-field__remove {
+  .sorted-field__remove-button__container {
+    padding-left: 4px;
+    margin-left: 10px;
+    border-left: 1px solid $primary-grey-g2;
+  }
+
+  .sorted-field__remove-button__icon {
     color: red;
-    cursor: pointer;
-    font-size: 24px;
-    margin-left: 5px;
-    transform: scale(0.6);
+  }
+
+  .sort-divider {
+    border-left: 1px solid $primary-grey-g2;
+    margin: 23px 15px 0;
+  }
+
+  .non-ideal-state__message {
+    color: $primary-grey-g3;
+    font-size: 26px;
+  }
+
+  .non-ideal-state__icon {
+    color: $primary-grey-g2;
+    margin-top: 10px;
+    display: table;
+    font-size: 90px;
   }
 
   mat-button-toggle {
-    mat-icon.up {
-      text-align: center;
-      font-size: 11px;
-      line-height: 28px !important;
-      transform: rotate(90deg);
-    }
-
-    mat-icon.down {
-      text-align: center;
-      font-size: 11px;
-      line-height: 28px !important;
-      transform: rotate(-90deg);
+    .mat-button-toggle-label-content {
+      line-height: 24px;
     }
   }
 
-  mat-button-toggle {
+  button.mat-icon-button {
     line-height: 24px;
+    height: 26px;
+    width: 26px;
   }
 }

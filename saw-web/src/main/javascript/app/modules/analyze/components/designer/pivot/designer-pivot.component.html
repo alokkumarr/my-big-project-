@@ -1,12 +1,35 @@
 <div [ngSwitch]="designerState">
-  <div *ngSwitchCase="DesignerStates.NO_SELECTION">
-    nothing selected
+
+  <div *ngSwitchCase="DesignerStates.NO_SELECTION"
+        fxLayout="column"
+        fxLayoutAlign="space-between center"
+        class="non-ideal-state__container">
+    <span i18n class="non-ideal-state__message">
+        Please, select some fields!
+    </span>
+    <mat-icon class="non-ideal-state__icon" fontIcon="icon-pivot"></mat-icon>
   </div>
+
+  <div *ngSwitchCase="DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA"
+       fxLayout="column"
+       fxLayoutAlign="space-between center"
+       class="non-ideal-state__container">
+      <span class="non-ideal-state__message" i18n>
+        The data is out of synch with the selected fields.
+      </span>
+      <button mat-button
+              (click)="requestAction.emit('refresh')"
+              color="primary">
+        <ng-container i18n>Refresh data</ng-container>
+      </button>
+      <mat-icon class="non-ideal-state__icon" fontIcon="icon-pivot"></mat-icon>
+  </div>
+
   <div *ngSwitchCase="DesignerStates.SELECTION_WAITING_FOR_DATA">
     loading
   </div>
+
   <pivot-grid *ngSwitchDefault
-              [class.out-of-synch]="isDataOutOfSynch"
               [fields]="artifactColumns | artifactColumns2PivotFields"
               [data]="data"
               [updater]="updater"

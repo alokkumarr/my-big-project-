@@ -1,3 +1,5 @@
+@import "themes/base/colors";
+
 .dnd__drop-area__drag-over {
   border: 1px dashed #000 !important;
 }
@@ -13,7 +15,7 @@
 }
 
 .dnd__dragged__sorting__new-place {
-  border: 1px dashed red !important;
+  border: 1px dashed $primary-blue-b3 !important;
 }
 
 /* Solve the bug with dragenter and dragleave events firing when hovering over elements in the drop container */

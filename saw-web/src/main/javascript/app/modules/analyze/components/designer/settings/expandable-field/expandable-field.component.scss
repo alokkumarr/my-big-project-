@@ -8,12 +8,6 @@ expandable-field {
     padding-bottom: 15px;
   }
 
-  .expandable-field__expand-icon {
-    font-size: 24px;
-    cursor: pointer;
-    transform: scale(0.6);
-  }
-
   .expandable-field__name {
     font-weight: 600;
     max-width: 160px;
@@ -25,13 +19,11 @@ expandable-field {
   }
 
   .expandable-field__icon {
+    margin-left: 10px;
     color: $primary-grey-g3;
   }
 
   .expandable-field__remove-icon {
     color: red;
-    cursor: pointer;
-    font-size: 24px;
-    transform: scale(0.6) translateY(-5px);
   }
 }

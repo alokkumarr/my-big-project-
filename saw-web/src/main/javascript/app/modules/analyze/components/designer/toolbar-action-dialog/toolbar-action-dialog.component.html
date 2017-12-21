@@ -1,29 +1,29 @@
-<mat-card>
-    <mat-card-header>
-      <mat-card-title [ngSwitch]="data.action">
-        <strong *ngSwitchCase="'sort'" i18n>Sort</strong>
-        <strong *ngSwitchCase="'description'" i18n>Description</strong>
-      </mat-card-title>
-    </mat-card-header>
-    <mat-card-content [ngSwitch]="data.action">
-      <designer-sort *ngSwitchCase="'sort'"
-                     (sortsChange)="onSortsChange($event)"
-                     [sorts]="data.sorts"
-                     [artifactColumns]="data.artifactColumns"></designer-sort>
-    </mat-card-content>
-    <mat-card-actions fxLayout="row" fxLayoutAlign="start center">
-      <div [ngSwitch]="data.action">
-          <button *ngSwitchCase="'sort'"
-                  (click)="onOk()"
-                  mat-raised-button color="primary" i18n>
-            Apply Sort
-          </button>
-          <button *ngSwitchCase="'description'"
-                  (click)="onOk()"
-                  mat-raised-button color="primary" i18n>
-            Save
-          </button>
-      </div>
-      <button mat-button i18n (click)="onBack()">Cancel</button>
-    </mat-card-actions>
-  </mat-card>
+<header [ngSwitch]="data.action"
+        class="dialog__header">
+  <strong *ngSwitchCase="'sort'" i18n>Sort</strong>
+  <strong *ngSwitchCase="'description'" i18n>Description</strong>
+</header>
+<div [ngSwitch]="data.action"
+     class="dialog__content">
+  <designer-sort *ngSwitchCase="'sort'"
+                  (sortsChange)="onSortsChange($event)"
+                  [sorts]="data.sorts"
+                  [artifactColumns]="data.artifactColumns"></designer-sort>
+</div>
+<div class="dialog__actions"
+     fxLayout="row"
+     fxLayoutAlign="start center">
+  <div [ngSwitch]="data.action">
+      <button *ngSwitchCase="'sort'"
+              (click)="onOk()"
+              mat-raised-button color="primary" i18n>
+        Apply Sort
+      </button>
+      <button *ngSwitchCase="'description'"
+              (click)="onOk()"
+              mat-raised-button color="primary" i18n>
+        Save
+      </button>
+  </div>
+  <button mat-button i18n (click)="onBack()">Cancel</button>
+</div>

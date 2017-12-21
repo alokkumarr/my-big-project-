@@ -25,17 +25,22 @@
        dndZone="designer-setting-zone">
     <div *ngIf="unselectedArtifactColumns">
       <div *ngFor="let artifactColumn of (unselectedArtifactColumns | artifactColumnFilter:filterObj); trackBy: index"
-           (click)="addToGroupIfPossible(artifactColumn)"
            [dndSortable]="artifactColumn"
            class="settings__list-item"
            fxLayout="row"
-           fxLayoutAlign="start center">
-        <div class="settings__list-item__name">
-          {{ artifactColumn.alias || artifactColumn.displayName }}
+           fxLayoutAlign="space-between center">
+        <div class="settings__list-item__name"
+             fxLayout="row"
+             fxLayoutAlign="space-between center">
+          {{ artifactColumn.aliasName || artifactColumn.displayName }}
           <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
                     class="settings__list-item__icon">
           </mat-icon>
         </div>
+        <button mat-icon-button
+                (click)="addToGroupIfPossible(artifactColumn)">
+          <mat-icon fontIcon="icon-plus"></mat-icon>
+        </button>
       </div>
     </div>
   </div>

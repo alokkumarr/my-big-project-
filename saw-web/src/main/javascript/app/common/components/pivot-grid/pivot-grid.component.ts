@@ -27,7 +27,7 @@ export interface IPivotGridUpdate {
 })
 export class PivotGridComponent {
   @Input() updater: Subject<IPivotGridUpdate>;
-  @Input() mode: string;
+  @Input() mode: string | 'designer';
   @Input() fields: any[];
   @Input() data: any[];
   @Output() onContentReady: EventEmitter<any> = new EventEmitter();
@@ -51,6 +51,10 @@ export class PivotGridComponent {
   private _subscription: any;
 
   ngOnInit() {
+    const isNotInDesignerMode = this.mode !== 'designer';
+    this.showColumnFields = isNotInDesignerMode;
+    this.showRowFields = isNotInDesignerMode;
+    this.showDataFields = isNotInDesignerMode;
     setTimeout(() => {
       // have to repaint the grid because of the animation of the modal
       // if it's not repainted it appears smaller
