@@ -72,8 +72,33 @@ class Analysis extends BaseController {
       ("description",(analysis \ "description")) ~
       ("metricName",(analysis \ "metricName")) ~
       ("userFullName",(analysis \ "userFullName")) ~
-      ("schedule", (analysis \ "schedule"))
+      ("schedule", (analysis \ "schedule")) ~
+      ("type", (analysis \ "type"))
     })
+    ("analyses", analyses)
+  }
+
+  def getMetadataByID (analysisId:String): Result =
+  {
+    handle((json, ticket) => {
+      if (analysisId != null) {
+        getAnalysisMetadataByID(analysisId)
+      } else {
+        throw new ClientException("Unknown request")
+      }
+    })
+  }
+/** Return the analysis metadata by id field, Currently this is only used in back-end pivot table creation. */
+  private def getAnalysisMetadataByID(analysisId :String): JObject = {
+    val analysisNode = new AnalysisNode
+    val search = Map[String, Any]("id" -> analysisId)
+    /* Get analyses by ID */
+    val analyses = analysisNode.find(search).map {
+      _("content") match {
+        case obj: JObject => obj
+        case obj: JValue => unexpectedElement("object", obj)
+      }
+    }
     ("analyses", analyses)
   }
 

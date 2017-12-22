@@ -12,6 +12,7 @@ POST    /md		controllers.MD.handleRequest
 # Analysis Service
 
 GET     /analysis                         controllers.Analysis.list(view: String)
+GET     /analysis                         controllers.Analysis.getMetadataByID(analysisId: String)
 POST    /analysis                         controllers.Analysis.process
 
 GET     /analysis/:analysisId/executions  controllers.AnalysisExecutions.list(analysisId: String)

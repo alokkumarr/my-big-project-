@@ -28,6 +28,9 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
+    private final static String pivotType ="pivot";
+    private final static String chartType ="chart";
+    private final static String reportType ="report";
     public AnalysisServiceImpl(RestTemplateBuilder restTemplateBuilder) {
         restTemplate = restTemplateBuilder.build();
     }
@@ -51,10 +54,9 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     public void scheduleDispatch(AnalysisSchedule analysis)
     {
-
-       if ((analysis.schedule().emails()==null || analysis.schedule().emails().length==0)
-               && !(isValidDispatch(analysis)))
-           {
+       if (analysis.type()==reportType) {
+           if ((analysis.schedule().emails() == null || analysis.schedule().emails().length == 0)
+                   && !(isValidDispatch(analysis))) {
                return;
            }
            String recipients = prepareRecipientsList(analysis.schedule().emails());
@@ -80,7 +82,9 @@ public class AnalysisServiceImpl implements AnalysisService {
            if (latestexection[0] != null) {
                restTemplate.postForObject(url, entity, String.class, param);
            }
-
+       }
+       if(analysis.type()==pivotType)
+           log.info("");
     }
 
     private ExecutionBean[] fetchExecutionID(String analysisId)

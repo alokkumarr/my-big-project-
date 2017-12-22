@@ -25,6 +25,8 @@ interface AnalysisSchedule {
     @Nullable
     String metricName();
     String userFullName();
+    @Nullable
+    String type();
 
     @Value.Immutable
     @JsonSerialize(as = ImmutableAnalysisSchedule.Schedule.class)
