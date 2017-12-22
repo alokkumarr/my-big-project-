@@ -22,7 +22,7 @@ public class XDFException extends RuntimeException {
 
         messages.put(ErrorCodes.DataObjectNotFound, "Data object: %s was not found in app. configuration file, configuration is not correct");
         messages.put(ErrorCodes.InputDataObjectNotFound, "Data object in input configuration file: %s was not found in app. configuration file, further processing is not possible");
-        messages.put(ErrorCodes.NoSparkSQLDescriptor, "Configuration file does not have Spark SQL descriptor, configuration is not correct");
+        messages.put(ErrorCodes.NoComponentDescriptor, "Configuration does not have component descriptor, configuration is not correct: %s");
         messages.put(ErrorCodes.InvalidDataSources, "SQL contains non-unique target tables == a table name encounters twice in CREATE TABLE clause, canceling process: %s");
         messages.put(ErrorCodes.EmbeddedException, " ==> exception root source: %s");
         messages.put(ErrorCodes.PartitionCalcError, "Could not calculate partition, Object name: %s, Reason - see Spark exception");
@@ -97,7 +97,7 @@ public class XDFException extends RuntimeException {
         ConfigError,
         IncorrectSQL,
         OutDirCleanError,
-        NoSparkSQLDescriptor,
+        NoComponentDescriptor,
         FatalResFileLocUndef,
         FatalTempLocUndef,
         FatalArchivalLocUndef,

@@ -254,9 +254,27 @@
         }
       }
     },
-    "partitioner" : {
-      "description": "Partition maker specific properties",
-      "properties": {}
+    "transformer" : {
+      "description": "Transformer specific properties",
+      "properties": {
+        "script" : {
+          "description" : "SQL script sile name name",
+          "type" : "string"
+        },
+        "scriptLocation" : {
+          "description" : "Location containing SQL script, special value: 'inline' means scripts field itself is base64 encoded Java (Janino-compatible) script",
+          "type" : "string"
+        },
+        "mapping" : [
+          {
+//            "inField" :
+
+
+          }
+
+
+        ]
+      }
     },
     "es-loader" : {
       "description": "ES Loader specific properties",

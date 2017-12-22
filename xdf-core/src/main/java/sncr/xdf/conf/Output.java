@@ -28,9 +28,6 @@ public class Output {
     @SerializedName("dataSet")
     @Expose
     private String dataSet;
-    @SerializedName("fileMask")
-    @Expose
-    private String fileMask;
     /**
      * Data format
      * 
@@ -86,13 +83,11 @@ public class Output {
      * @param name
      * @param format
      * @param dataSet
-     * @param fileMask
      * @param dataSource
      */
-    public Output(String name, String dataSet, String fileMask, sncr.xdf.conf.Input.Format format, Output.Mode mode, Integer numberOfFiles, DataSource dataSource, String catalog, Metadata metadata) {
+    public Output(String name, String dataSet, sncr.xdf.conf.Input.Format format, Output.Mode mode, Integer numberOfFiles, DataSource dataSource, String catalog, Metadata metadata) {
         this.name = name;
         this.dataSet = dataSet;
-        this.fileMask = fileMask;
         this.format = format;
         this.mode = mode;
         this.numberOfFiles = numberOfFiles;
@@ -150,29 +145,6 @@ public class Output {
 
     public Output withDataSet(String dataSet) {
         this.dataSet = dataSet;
-        return this;
-    }
-
-    /**
-     * 
-     * @return
-     *     The fileMask
-     */
-    public String getFileMask() {
-        return fileMask;
-    }
-
-    /**
-     * 
-     * @param fileMask
-     *     The fileMask
-     */
-    public void setFileMask(String fileMask) {
-        this.fileMask = fileMask;
-    }
-
-    public Output withFileMask(String fileMask) {
-        this.fileMask = fileMask;
         return this;
     }
 
@@ -331,7 +303,7 @@ public class Output {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(name).append(dataSet).append(fileMask).append(format).append(mode).append(numberOfFiles).append(dataSource).append(catalog).append(metadata).toHashCode();
+        return new HashCodeBuilder().append(name).append(dataSet).append(format).append(mode).append(numberOfFiles).append(dataSource).append(catalog).append(metadata).toHashCode();
     }
 
     @Override
@@ -343,7 +315,7 @@ public class Output {
             return false;
         }
         Output rhs = ((Output) other);
-        return new EqualsBuilder().append(name, rhs.name).append(dataSet, rhs.dataSet).append(fileMask, rhs.fileMask).append(format, rhs.format).append(mode, rhs.mode).append(numberOfFiles, rhs.numberOfFiles).append(dataSource, rhs.dataSource).append(catalog, rhs.catalog).append(metadata, rhs.metadata).isEquals();
+        return new EqualsBuilder().append(name, rhs.name).append(dataSet, rhs.dataSet).append(format, rhs.format).append(mode, rhs.mode).append(numberOfFiles, rhs.numberOfFiles).append(dataSource, rhs.dataSource).append(catalog, rhs.catalog).append(metadata, rhs.metadata).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")

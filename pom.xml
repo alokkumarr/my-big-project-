@@ -321,6 +321,7 @@
     <module>xdf-meta</module>
     <module>xdf-component</module>
     <module>xdf-data-profiler</module>
+    <module>xdf-transformer</module>
     <module>xdf-sql</module>
     <module>xdf-preview</module>
     <module>xdf-parser</module>

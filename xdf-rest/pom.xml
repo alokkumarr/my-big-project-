@@ -43,6 +43,11 @@
       <artifactId>xdf-parser</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>bda</groupId>
+      <artifactId>xdf-transformer</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Akka -->
     <dependency>
       <groupId>com.typesafe.akka</groupId>
