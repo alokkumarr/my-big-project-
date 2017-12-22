@@ -271,33 +271,36 @@ export const ReportGridComponent = {
     formatDates(data) {
       if (isEmpty(data)) {
         return data;
-      }
-      const keys = Object.keys(data[0]);
-      const formats = [
-        moment.ISO_8601,
-        'YYYY-MM-DD hh:mm:ss',
-        'YYYY-MM-DD',
-        'MM/DD/YYYY  :)  HH*mm*ss'
-      ];
-      forEach(data, row => {
-        forEach(keys, key => {
-          const date = moment.tz(row[key], formats, true, BACKEND_TIMEZONE);
-          if (date.isValid() && ['date', 'string-date', 'timestamp'].includes(this.checkColumndatatype(this.columns, key))) {
-            row[key] = date.toDate();
-          }
+      } else {
+        const keys = Object.keys(data[0]);
+        const formats = [
+          moment.ISO_8601,
+          'YYYY-MM-DD hh:mm:ss',
+          'YYYY-MM-DD',
+          'MM/DD/YYYY  :)  HH*mm*ss'
+        ];
+        forEach(data, row => {
+          forEach(keys, key => {
+            const date = moment.tz(row[key], formats, true, BACKEND_TIMEZONE);
+            if (date.isValid() && ['date', 'string-date', 'timestamp'].includes(this.checkColumndatatype(this.columns, key))) {
+              row[key] = date.toDate();
+            }
+          });
         });
-      });
-      return data;
+        return data;  
+      } 
     }
+
     checkColumndatatype(columnList, columnName) {
       let datatype = '';
       forEach(columnList, column => {
-        if (column.meta.columnName === columnName) {
+        if (!isEmpty(column.meta) && column.meta.columnName === columnName) {
           datatype = column.meta.type;
         }
       });
       return datatype;
     }
+    
     refreshGrid() {
       if (this._gridInstance) {
         this._gridInstance.refresh();
