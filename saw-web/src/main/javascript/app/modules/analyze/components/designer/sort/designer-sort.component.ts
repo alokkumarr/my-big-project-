@@ -16,6 +16,7 @@ import {
   ArtifactColumn,
   Sort
 } from '../types';
+import { TYPE_MAP } from '../../../consts';
 
 const template = require('./designer-sort.component.html');
 require('./designer-sort.component.scss');
@@ -32,6 +33,7 @@ export class DesignerSortComponent {
   public checkedFields: ArtifactColumns = [];
   public availableFields: ArtifactColumns = [];
   public nameMap: Object = {};
+  public TYPE_MAP = TYPE_MAP;
 
   public removeFromAvailableFields = (artifactColumn: ArtifactColumn) => {
     this.availableFields = filter(this.availableFields,
