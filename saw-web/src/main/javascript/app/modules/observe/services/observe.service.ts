@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { JwtService } from '../../../../login/services/jwt.service';
+import { Observable } from 'rxjs/Observable';
 
 import * as fpGet from 'lodash/fp/get';
 
+import { JwtService } from '../../../../login/services/jwt.service';
 import { Dashboard } from '../models/dashboard.interface';
 import APP_CONFIG from '../../../../../../../appConfig';
 
@@ -46,7 +47,7 @@ export class ObserveService {
     }).map(fpGet('contents.observe.0'));
   }
 
-  getDashboard(entityId: string) {
+  getDashboard(entityId: string): Observable<Dashboard> {
     return this.http.get(`${this.api}/observe/dashboards/${entityId}` , {
       headers: this.addHeaders()
     }).map(fpGet('contents.observe.0'));

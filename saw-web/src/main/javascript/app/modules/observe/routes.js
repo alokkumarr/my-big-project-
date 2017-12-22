@@ -4,7 +4,7 @@ export function routesConfig($stateProvider) {
   const states = [
     {
       name: 'observe',
-      url: '/observe',
+      url: '/observe?dashboardId',
       component: 'observePage'
     }
   ];

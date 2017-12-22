@@ -18,13 +18,19 @@ import {
   sortServiceProvider,
   filterServiceProvider
 } from '../analyze/services/ajs-analyze-providers';
-import { menuServiceProvider } from '../../common/services/ajs-common-providers';
+import {
+  menuServiceProvider,
+  stateParamsProvider,
+  stateProvider,
+  componentHandlerProvider
+} from '../../common/services/ajs-common-providers';
 import { ObserveService } from './services/observe.service';
 
 import { ChartComponent } from '../../common/components/charts/chart.component';
 
 import { ObservePageComponent } from './components/observe-page/observe-page.component';
 import { ObserveChartComponent } from './components/observe-chart/observe-chart.component';
+import { DashboardGridComponent } from './components/dashboard-grid/dashboard-grid.component';
 import { AnalysisChoiceComponent } from './components/analysis-choice/analysis-choice.component';
 import { SaveDashboardComponent } from './components/save-dashboard/save-dashboard.component';
 import { CreateDashboardComponent } from './components/create-dashboard/create-dashboard.component';
@@ -57,6 +63,7 @@ angular.module(ObserveModule, [
 
 const components = [
   ObservePageComponent,
+  DashboardGridComponent,
   CreateDashboardComponent,
   AnalysisChoiceComponent,
   ObserveChartComponent,
@@ -73,6 +80,9 @@ const components = [
     jwtServiceProvider,
     analyzeServiceProvider,
     menuServiceProvider,
+    stateParamsProvider,
+    stateProvider,
+    componentHandlerProvider,
     chartServiceProvider,
     sortServiceProvider,
     filterServiceProvider

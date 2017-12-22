@@ -61,8 +61,9 @@ export class CreateDashboardComponent {
 
   constructor(public dialogRef: MdDialogRef<CreateDashboardComponent>,
     public dialog: MdDialog,
-    @Inject(MD_DIALOG_DATA) public layout: any) {
-  }
+    @Inject(MD_DIALOG_DATA) public layout: any,
+    @Inject('$state') private $state
+  ) { }
 
   checkEmpty() {
     this.fillState = this.dashboard.length > 0 ? 'filled' : 'empty';
@@ -170,7 +171,12 @@ export class CreateDashboardComponent {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      result && this.dialogRef.close();
+      if (result) {
+        this.dialogRef.afterClosed().subscribe(() => {
+          this.$state.go('observe', {dashboardId: result})
+        });
+        this.dialogRef.close();
+      }
     });
   }
 }
