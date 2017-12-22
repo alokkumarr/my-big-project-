@@ -235,26 +235,6 @@
                     <finalName>${project.artifactId}-${project.version}</finalName>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.0.0</version>
-                <configuration>
-                  <descriptors>
-                    <descriptor>${project.basedir}/src/main/assembly/assembly.xml</descriptor>
-                  </descriptors>
-                  <!-- Enable long file names without Maven warning -->
-                  <tarLongFileMode>posix</tarLongFileMode>
-                </configuration>
-                <executions>
-                  <execution>
-                    <phase>package</phase>
-                    <goals>
-                      <goal>single</goal>
-                    </goals>
-                  </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 

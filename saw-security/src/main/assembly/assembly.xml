@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<assembly
+  xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+  <id>bin</id>
+  <formats>
+    <format>tgz</format>
+  </formats>
+  <baseDirectory>${project.artifactId}</baseDirectory>
+  <moduleSets>
+    <moduleSet>
+      <useAllReactorProjects>true</useAllReactorProjects>
+      <includeSubModules>false</includeSubModules>
+      <includes>
+        <include>com.sncr:saw-security</include>
+      </includes>
+      <binaries>
+        <includeDependencies>false</includeDependencies>
+        <outputDirectory></outputDirectory>
+        <unpack>false</unpack>
+      </binaries>
+    </moduleSet>
+    <moduleSet>
+      <useAllReactorProjects>true</useAllReactorProjects>
+      <includes>
+        <include>com.sncr:saw-security-command-line-tool</include>
+      </includes>
+      <binaries>
+        <includeDependencies>false</includeDependencies>
+        <unpack>false</unpack>
+        <outputDirectory>rpms</outputDirectory>
+      </binaries>
+    </moduleSet>
+  </moduleSets>
+  <fileSets>
+    <fileSet>
+      <directory>${project.basedir}/saw-security/src/main/ansible</directory>
+      <outputDirectory>ansible</outputDirectory>
+    </fileSet>
+  </fileSets>
+</assembly>

@@ -13,7 +13,7 @@
       <useAllReactorProjects>true</useAllReactorProjects>
       <includeSubModules>false</includeSubModules>
       <includes>
-        <include>com.sncr:saw-security</include>
+        <include>com.sncr:saw-security-parent</include>
         <include>com.synchronoss.saw:saw-services-dist</include>
         <include>com.synchronoss:bda-saw</include>
       </includes>

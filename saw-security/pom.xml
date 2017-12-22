@@ -10,6 +10,12 @@
   <packaging>pom</packaging>
 
 
+  <modules>
+    <module>saw-security</module>
+    <module>saw-security-command-line-tool</module>
+  </modules>
+
+
   <build>
     <plugins>
       <plugin>
@@ -20,16 +26,25 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.0.0</version>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/assembly.xml</descriptor>
+          </descriptors>
+          <!-- Enable long file names without Maven warning -->
+          <finalName>saw-security-${project.version}</finalName>
+          <tarLongFileMode>posix</tarLongFileMode>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
-
-
-  <modules>
-    <module>saw-security</module>
-    <module>saw-security-command-line-tool</module>
-  </modules>
-
 
 </project>

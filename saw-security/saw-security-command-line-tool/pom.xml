@@ -3,10 +3,10 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>saw-security-parent</artifactId>
-    <groupId>com.sncr</groupId>
-    <version>${revision}</version>
-    <relativePath>../pom.xml</relativePath>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>1.5.2.RELEASE</version>
+    <relativePath></relativePath>
   </parent>
   <properties>
     <start-class>com.sncr.saw.security.app.SpringAdminApp</start-class>
@@ -39,8 +39,9 @@
   <modelVersion>4.0.0</modelVersion>
   <packaging>jar</packaging>
 
-
+  <groupId>com.sncr</groupId>
   <artifactId>saw-security-command-line-tool</artifactId>
+  <version>${revision}</version>
 
   <dependencyManagement>
     <dependencies>
