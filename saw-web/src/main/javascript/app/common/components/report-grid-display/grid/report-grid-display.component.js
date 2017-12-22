@@ -98,7 +98,7 @@ export const ReportGridDisplayComponent = {
     formatDates(data) {
       if (isEmpty(data)) {
         return data;
-      } 
+      }
       const ks = keys(data[0] || {});
       const formats = [
         moment.ISO_8601,
