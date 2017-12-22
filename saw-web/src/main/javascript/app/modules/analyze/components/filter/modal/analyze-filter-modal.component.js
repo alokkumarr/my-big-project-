@@ -130,7 +130,7 @@ export const AnalyzeFilterModalComponent = {
       dateFormat = format.split(' ');
       date = dateFormat[0].toUpperCase();
       if (!isUndefined(dateFormat[1])) {
-        time = ' ' + dateFormat[1];  
+        time = ' ' + dateFormat[1];
       }
       return date + time;
     }
