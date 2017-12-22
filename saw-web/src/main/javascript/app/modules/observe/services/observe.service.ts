@@ -4,6 +4,7 @@ import { JwtService } from '../../../../login/services/jwt.service';
 
 import * as fpGet from 'lodash/fp/get';
 
+import { Dashboard } from '../models/dashboard.interface';
 import APP_CONFIG from '../../../../../../../appConfig';
 
 @Injectable()
@@ -29,12 +30,17 @@ export class ObserveService {
   /* Saves dashboard. If @model.entityId not present, uses create operation.
      Otherwise uses update operation.
   */
-  saveDashboard(model) {
+  saveDashboard(model: Dashboard) {
     let method = 'post', endpoint = 'create';
     if (fpGet('entityId', model)) {
       method = 'put';
       endpoint = model.entityId
+      model.updatedBy = this.jwt.getUserId();
+    } else {
+      // Log the creator id if creating for first time
+      model.createdBy = this.jwt.getUserId();
     }
+
     return this.http[method](`${this.api}/observe/dashboards/${endpoint}` , this.addModelStructure(model), {
       headers: this.addHeaders()
     }).map(fpGet('contents.observe.0'));

@@ -15,11 +15,15 @@ export interface Tile {
 }
 
 export interface Dashboard {
-  tiles: Array<Tile>,
   entityId: string,
   categoryId: string,
   name: string,
   description: string,
+  createdBy?: string,
+  updatedBy?: string,
+  createdAt?: string,
+  updatedAt?: string
+  tiles: Array<Tile>,
   options?: Object,
   filters: Array<Object>
 }
