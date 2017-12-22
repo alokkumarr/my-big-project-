@@ -151,7 +151,7 @@ export const ReportGridDisplayComponent = {
       return datatype;
     }
     _getDxColumns(columns = [], data = []) {
-      let allColumns = '';
+      let allColumns = [];
       if (isEmpty(data)) {
         allColumns = columns;
       } else {
