@@ -13,13 +13,17 @@ including its architecture and modules.
 == Overview
 
 The application consists of three modules: SAW Web, SAW Services and
-SAW Security.
+SAW Security.  SAW Web provides a web application for creating and
+executing analysis.  It builds on top of SAW Services, which provides
+a REST API for creating and executing analyses.  SAW Security manages
+authentication and privileges of users.
 
 .Figure: SAW modules and their dependencies
 plantuml::saw-design/figure-modules.pum[format=svg]
 
-Modules can be used independently, as long as their dependencies are
-also provided.  Typically all three modules are used together.
+The modules can be taken into use independently, as long as their
+dependencies are also provided.  Typically all three modules are used
+together.
 
 .Figure: External SAW interfaces and their use
 plantuml::saw-design/figure-interfaces.pum[format=svg]
@@ -27,21 +31,27 @@ plantuml::saw-design/figure-interfaces.pum[format=svg]
 == SAW Web
 
 The SAW Web module provides a user interface for creating and
-executing analyses.  It is implemented it AngularJS.
+executing analyses.  It is implemented it AngularJS and makes calls to
+the SAW Services REST API over HTTP.  It additionally calls SAW
+Security to authenticate users and manage privileges.
+
+The SAW Web user interface is organized into two modules: analyze and
+observe.  Additionally it provides a user interface for managing users
+and privileges in SAW Security.
 
 == SAW Services
 
 SAW Services are a collection of microservices exposed over HTTP REST
-APIs.  They are implemented in Java and the Spring Framework.  As an
-exception, the SAW Transport Service is implemented in Scala and the
-Play framework.
+APIs.  They enable creating and executing analyses.  They are
+implemented in Java and the Spring Framework.  As an exception, the
+SAW Transport Service is implemented in Scala and the Play framework.
 
 .Figure: SAW Services and their dependencies
 plantuml::saw-design/figure-services.pum[format=svg]
 
 SAW Services use MapR-DB for persistence, using the OJAI interface.
 As an exception, the SAW Transport Service uses the MapR-DB binary
-tables.
+tables.  Additionally SAW Services access files on the MapR-FS.
 
 === SAW Gateway Service
 
@@ -51,51 +61,69 @@ the concerns regarding security.  It acts as edge service and
 authenticates every request that passes by it nad makes sure that it
 is valid.  In addition to these, it comes with the following benefits:
 
-1. Insulates the clients from how the application is partitioned into
-   micro-services
+. Insulates the clients from how the application is partitioned into
+  micro-services
 
-2. Insulates the clients from the problem of determining the locations
-   of service instances
+. Insulates the clients from the problem of determining the locations
+  of service instances
 
-3. Provides the optimal API for each client
+. Provides the optimal API for each client
 
-4. Reduces the number of requests/roundtrips.  For example, the API
-   gateway enables clients to retrieve data from multiple services
-   with a single round-trip.  Fewer requests also means less overhead
-   and improves the user experience.  An API gateway is essential for
-   mobile applications.
+. Reduces the number of requests/roundtrips.  For example, the API
+  gateway enables clients to retrieve data from multiple services with
+  a single round-trip.  Fewer requests also means less overhead and
+  improves the user experience.  An API gateway is essential for
+  mobile applications.
 
-5. Simplifies the client by moving logic for calling multiple services
-   from the client to API gateway
+. Simplifies the client by moving logic for calling multiple services
+  from the client to API gateway
 
-6. Translates from a "standard" public web-friendly API protocol to
-   whatever protocols are used internally
+. Translates from a "standard" public web-friendly API protocol to
+  whatever protocols are used internally
 
 The SAW gateway pattern has some drawbacks:
 
-1. Increased complexity - the API gateway is yet another moving part
-   that must be developed, deployed and managed.
+. Increased complexity - the API gateway is yet another moving part
+  that must be developed, deployed and managed.
 
-2. Increased response time due to the additional network hop through
-   the API gateway - however, for most applications the cost of an
-   extra roundtrip is insignificant.
+. Increased response time due to the additional network hop through
+  the API gateway - however, for most applications the cost of an
+  extra roundtrip is insignificant.
 
 === SAW Dataset Service
 
 The SAW Dataset Service provides starting points for creating
-analyses.
+analyses.  Administrators load information about datasets (including
+so called semantic metadata) into SAW, which is used to create
+analyses.  The information about datasets includes the location of the
+data, its schema in the form of columns, data types of columns and
+so on.  Clients can enumerate datasets and retrieve descriptions of
+them for use when creating analyses.
 
 === SAW Analysis Service
 
 The SAW Analysis Services allows creating, reading, updating and
-deleting analyses.
+deleting analyses.  Analyses are used to execute queries on data.  An
+analysis is created based on information about a dataset, also known
+as semantic metadata.  An analysis can contain one or more artifacts,
+each of which contain a set of columns.  Each column in an analysis
+has a number of properties, for example if it is selected, or joined
+with another column.  These properties affect how the analysis is
+translated into a query that is exected.
 
 === SAW Execution Service
 
-The SAW Execution Service enables executing analyses.
+The SAW Execution Service enables executing analyses.  It takes an
+analysis to execute as input, translates it into a query and executes
+the query and finally provides the results back to the client.
 
 .Figure: Executing an analysis using the SAW Execution Service
 plantuml::saw-design/figure-execution-sequence.pum[format=svg]
+
+The SAW Execution Service supports two types of storage: Apache Spark
+and Elasticsearch.  Analyses of type report are executed on Apache
+Spark clusters, while analyses of type pivot and chart are executed on
+Elasticsearch clusters.
 
 ==== Apache Spark
 
@@ -147,7 +175,9 @@ The Elasticsearch executor supports analyses of types pivot and chart.
 === SAW Export Service
 
 The SAW Export Service enables exporting analysis executions to file
-formats such as Microsoft Excel.
+formats such as Microsoft Excel.  It calls the SAW Execution Service
+to retrieve the execution result, generates the desired output file
+format and finally provides it to the client.
 
 === SAW Scheduler Service
 
@@ -189,7 +219,8 @@ deleting dashboards.
 
 The SAW Security module provides authentication and privilege services
 to other modules.  It is implemented as a microservice in Java and the
-Spring Framework and uses a MariaDB database for persistence.
+Spring Framework and uses a MariaDB database to persist authentication
+and privilege information.
 
 .Figure: The SAW Security Service and dependencies
 plantuml::saw-design/figure-security.pum[format=svg]
