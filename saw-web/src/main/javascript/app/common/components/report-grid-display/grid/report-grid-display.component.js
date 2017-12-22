@@ -98,24 +98,23 @@ export const ReportGridDisplayComponent = {
     formatDates(data) {
       if (isEmpty(data)) {
         return data;
-      } else {
-        const ks = keys(data[0] || {});
-        const formats = [
-          moment.ISO_8601,
-          'YYYY-MM-DD hh:mm:ss',
-          'YYYY-MM-DD',
-          'MM/DD/YYYY  :)  HH*mm*ss'
-        ];
-        forEach(data, row => {
-          forEach(ks, key => {
-            const date = moment.tz(row[key], formats, true, BACKEND_TIMEZONE);
-            if (date.isValid() && ['date', 'string-date', 'timestamp'].includes(this.checkColumndatatype(this.columns, key))) {
-              row[key] = date.toDate();
-            }
-          });
+      } 
+      const ks = keys(data[0] || {});
+      const formats = [
+        moment.ISO_8601,
+        'YYYY-MM-DD hh:mm:ss',
+        'YYYY-MM-DD',
+        'MM/DD/YYYY  :)  HH*mm*ss'
+      ];
+      forEach(data, row => {
+        forEach(ks, key => {
+          const date = moment.tz(row[key], formats, true, BACKEND_TIMEZONE);
+          if (date.isValid() && ['date', 'string-date', 'timestamp'].includes(this.checkColumndatatype(this.columns, key))) {
+            row[key] = date.toDate();
+          }
         });
-        return data;  
-      }
+      });
+      return data;
     }
 
     fillColumns(fields, data = []) {
