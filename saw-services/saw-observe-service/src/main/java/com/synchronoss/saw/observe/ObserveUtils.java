@@ -27,6 +27,7 @@ import com.synchronoss.saw.observe.model.ObserveResponse;
 import com.synchronoss.saw.observe.model.store.MetaDataStoreStructure;
 import com.synchronoss.saw.observe.model.store.MetaDataStoreStructure.Action;
 import com.synchronoss.saw.observe.model.store.MetaDataStoreStructure.Category;
+import com.synchronoss.saw.observe.model.store.Query;
 
 @Component
 public class ObserveUtils {
@@ -108,7 +109,30 @@ public class ObserveUtils {
    
     return objectMapper.writeValueAsString(listOfMetadata);
   }
-  
+
+  public static String node2JsonString(Observe node, String basePath, String Id, Action action, Category category, Query query) 
+      throws JsonProcessingException
+  {
+    ObjectMapper objectMapper = new ObjectMapper();
+    MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
+   
+    if(node !=null){
+      metaDataStoreStructure.setSource(node);
+    }
+    if (Id !=null){
+      metaDataStoreStructure.setId(Id);
+    }
+    if (query!=null){
+      metaDataStoreStructure.setQuery(query);
+    }
+    metaDataStoreStructure.setAction(action);
+    metaDataStoreStructure.setCategory(category);
+    metaDataStoreStructure.setXdfRoot(basePath);
+    List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
+    listOfMetadata.add(metaDataStoreStructure);
+    return objectMapper.writeValueAsString(listOfMetadata);
+  }
+
   public static List<MetaDataStoreStructure> nodeMetaDataStoreStructure(Observe node, String basePath, String output, String Id, Action action, Category category) 
       throws JsonProcessingException
   {
