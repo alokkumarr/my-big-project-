@@ -28,9 +28,6 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     private final Logger log = LoggerFactory.getLogger(getClass().getName());
 
-    private final static String pivotType ="pivot";
-    private final static String chartType ="chart";
-    private final static String reportType ="report";
     public AnalysisServiceImpl(RestTemplateBuilder restTemplateBuilder) {
         restTemplate = restTemplateBuilder.build();
     }
@@ -54,7 +51,6 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     public void scheduleDispatch(AnalysisSchedule analysis)
     {
-       if (analysis.type()==reportType) {
            if ((analysis.schedule().emails() == null || analysis.schedule().emails().length == 0)
                    && !(isValidDispatch(analysis))) {
                return;
@@ -70,10 +66,11 @@ public class AnalysisServiceImpl implements AnalysisService {
                    .emailList(recipients).fileType("csv")
                    .description(analysis.description()).name(analysis.name()).userFullName(analysis.userFullName())
                    .metricName(analysis.metricName()).publishedTime(formatted).build();
-           String[] param = new String[2];
+           String[] param = new String[3];
            param[0] = analysis.id();
            param[1] = latestexection[0];
-           String url = dispatchUrl + "/{analysisId}/executions/{executionId}/dispatch";
+           param[2] = analysis.type();
+           String url = dispatchUrl + "/{analysisId}/executions/{executionId}/dispatch/{type}";
            HttpHeaders headers = new HttpHeaders();
            headers.setContentType(MediaType.APPLICATION_JSON);
            HttpEntity<DispatchBean> entity = new HttpEntity<>(
@@ -83,9 +80,6 @@ public class AnalysisServiceImpl implements AnalysisService {
                restTemplate.postForObject(url, entity, String.class, param);
            }
        }
-       if(analysis.type()==pivotType)
-           log.info("");
-    }
 
     private ExecutionBean[] fetchExecutionID(String analysisId)
     {
@@ -101,13 +95,17 @@ public class AnalysisServiceImpl implements AnalysisService {
         String latestExecutionID = null;
         String latestFinish =null;
 
+        /** TO DO : pivot Analysis does not contains execution status , It may bug in system
+         *   consider status by-default as success if execution doesn't contains status
+         */
+
         if (executionBeans.length>0) {
             // Initialize latestExecution.
             latestExecutionID = executionBeans[0].id();
             latestFinish = executionBeans[0].finished();
             for (ExecutionBean executionBean : executionBeans) {
                if (Long.parseLong(executionBean.finished()) > Long.parseLong(latestFinish)
-                       && executionBean.status().equalsIgnoreCase("Success"))
+                       && (executionBean.status()==null || executionBean.status().equalsIgnoreCase("Success")))
                {
                    latestExecutionID = executionBean.id();
                    latestFinish = executionBean.finished();

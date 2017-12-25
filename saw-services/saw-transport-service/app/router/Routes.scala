@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
 // @SOURCE:/Users/pman0003/Codebase/bda/saw-1335/saw/saw-services/saw-transport-service/conf/routes
-// @DATE:Fri Dec 22 11:56:03 IST 2017
+// @DATE:Sat Dec 23 13:01:38 IST 2017
 
 package router
 
@@ -67,7 +67,7 @@ class Routes(
     ("""POST""", this.prefix, """controllers.TS.handleRequest"""),
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """md""", """controllers.MD.handleRequest"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis""", """controllers.Analysis.list(view:String)"""),
-    ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis""", """controllers.Analysis.getMetadataByID(analysisId:String)"""),
+    ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis/md""", """controllers.Analysis.getMetadataByID(analysisId:String)"""),
     ("""POST""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis""", """controllers.Analysis.process"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis/""" + "$" + """analysisId<[^/]+>/executions""", """controllers.AnalysisExecutions.list(analysisId:String)"""),
     ("""GET""", this.prefix + (if(this.prefix.endsWith("/")) "" else "/") + """analysis/""" + "$" + """analysisId<[^/]+>/results""", """controllers.AnalysisExecutions.list(analysisId:String)"""),
@@ -158,7 +158,7 @@ class Routes(
 
   // @LINE:15
   private[this] lazy val controllers_Analysis_getMetadataByID4_route = Route("GET",
-    PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("analysis")))
+    PathPattern(List(StaticPart(this.prefix), StaticPart(this.defaultPrefix), StaticPart("analysis/md")))
   )
   private[this] lazy val controllers_Analysis_getMetadataByID4_invoker = createInvoker(
     Analysis_1.getMetadataByID(fakeValue[String]),
@@ -169,7 +169,7 @@ class Routes(
       Seq(classOf[String]),
       "GET",
       """""",
-      this.prefix + """analysis"""
+      this.prefix + """analysis/md"""
     )
   )
 

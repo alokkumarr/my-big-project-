@@ -88,18 +88,19 @@ class Analysis extends BaseController {
       }
     })
   }
-/** Return the analysis metadata by id field, Currently this is only used in back-end pivot table creation. */
+/** Return the analysis metadata by id field,
+  * Currently this is only used in back-end pivot table creation. */
   private def getAnalysisMetadataByID(analysisId :String): JObject = {
     val analysisNode = new AnalysisNode
     val search = Map[String, Any]("id" -> analysisId)
     /* Get analyses by ID */
-    val analyses = analysisNode.find(search).map {
+    val analysis = analysisNode.find(search).map {
       _("content") match {
         case obj: JObject => obj
         case obj: JValue => unexpectedElement("object", obj)
       }
     }
-    ("analyses", analyses)
+    ("analysis", analysis)
   }
 
   def process: Result = {

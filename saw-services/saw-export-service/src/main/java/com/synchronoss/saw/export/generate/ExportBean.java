@@ -1,15 +1,13 @@
 package com.synchronoss.saw.export.generate;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.synchronoss.saw.export.model.DataField;
 
 public class ExportBean {
 	
 	private String fileName;
 	private String [] columnHeader = new String []{};
-	private List<StringBuffer> rowBufferList = new ArrayList<StringBuffer>();
 	private String serverPathLocation;
-	private String [] columnDataType = new String[]{};
+	private DataField.Type[] columnDataType;
 	private String reportName;
 	private String reportDesc;
 	private String publishDate;
@@ -66,14 +64,20 @@ public class ExportBean {
 	public ExportBean() {
 		this.serverPathLocation = System.getProperty("custom.pubReports.root");;
 	}
-	
-	
-	public String[] getColumnDataType() {
+
+	/**
+	 *
+	 * @return
+	 */
+	public DataField.Type[] getColumnDataType() {
 		return columnDataType;
 	}
 
-
-	public void setColumnDataType(String[] columnDataType) {
+	/**
+	 *
+	 * @param columnDataType
+	 */
+	public void setColumnDataType(DataField.Type[] columnDataType) {
 		this.columnDataType = columnDataType;
 	}
 
@@ -92,18 +96,6 @@ public class ExportBean {
 		this.serverPathLocation = serverPathLocation;
 	}
 
-	/**
-	 * @return the rowBufferList
-	 */
-	public List<StringBuffer> getRowBufferList() {
-		return rowBufferList;
-	}
-	/**
-	 * @param rowBufferList the rowBufferList to set
-	 */
-	public void setRowBufferList(List<StringBuffer> rowBufferList) {
-		this.rowBufferList = rowBufferList;
-	}
 	/**
 	 * @return the fileName
 	 */

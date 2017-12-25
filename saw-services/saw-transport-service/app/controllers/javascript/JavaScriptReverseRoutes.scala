@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
 // @SOURCE:/Users/pman0003/Codebase/bda/saw-1335/saw/saw-services/saw-transport-service/conf/routes
-// @DATE:Fri Dec 22 11:56:03 IST 2017
+// @DATE:Sat Dec 23 13:01:38 IST 2017
 
 import play.api.routing.JavaScriptReverseRoute
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
@@ -38,7 +38,7 @@ package controllers.javascript {
       "controllers.Analysis.getMetadataByID",
       """
         function(analysisId0) {
-          return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "analysis" + _qS([(""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("analysisId", analysisId0)])})
+          return _wA({method:"GET", url:"""" + _prefix + { _defaultPrefix } + """" + "analysis/md" + _qS([(""" + implicitly[QueryStringBindable[String]].javascriptUnbind + """)("analysisId", analysisId0)])})
         }
       """
     )

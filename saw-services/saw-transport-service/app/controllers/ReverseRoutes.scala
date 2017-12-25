@@ -1,7 +1,7 @@
 
 // @GENERATOR:play-routes-compiler
 // @SOURCE:/Users/pman0003/Codebase/bda/saw-1335/saw/saw-services/saw-transport-service/conf/routes
-// @DATE:Fri Dec 22 11:56:03 IST 2017
+// @DATE:Sat Dec 23 13:01:38 IST 2017
 
 import play.api.mvc.{ QueryStringBindable, PathBindable, Call, JavascriptLiteral }
 import play.core.routing.{ HandlerDef, ReverseRouteContext, queryString, dynamicString }
@@ -29,7 +29,7 @@ package controllers {
     // @LINE:15
     def getMetadataByID(analysisId:String): Call = {
       import ReverseRouteContext.empty
-      Call("GET", _prefix + { _defaultPrefix } + "analysis" + queryString(List(Some(implicitly[QueryStringBindable[String]].unbind("analysisId", analysisId)))))
+      Call("GET", _prefix + { _defaultPrefix } + "analysis/md" + queryString(List(Some(implicitly[QueryStringBindable[String]].unbind("analysisId", analysisId)))))
     }
   
     // @LINE:14
