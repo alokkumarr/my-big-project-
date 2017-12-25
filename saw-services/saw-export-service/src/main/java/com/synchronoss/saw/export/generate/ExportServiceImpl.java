@@ -179,7 +179,7 @@ public class ExportServiceImpl implements ExportService{
         if (dispatchBean !=null && dispatchBean instanceof LinkedHashMap)
         {
           exportBean.setFileName(publishedPath+ File.separator+dir+File.separator+String.valueOf(((LinkedHashMap)
-                  dispatchBean).get("name"))+"."+((LinkedHashMap) dispatchBean).get("fileType"));
+                  dispatchBean).get("name"))+".xlsx");
           exportBean.setReportDesc(String.valueOf(((LinkedHashMap) dispatchBean).get("description")));
           exportBean.setReportName(String.valueOf(((LinkedHashMap) dispatchBean).get("name")));
           exportBean.setPublishDate(String.valueOf(((LinkedHashMap) dispatchBean).get("publishedTime")));
