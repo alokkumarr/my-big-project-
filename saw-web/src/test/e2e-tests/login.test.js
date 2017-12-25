@@ -12,13 +12,17 @@ describe('Login Tests: login.test.js', () => {
       'user': {user: users.userOne.loginId},
     };
 
+  beforeAll(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 600000;
+  });
+
     afterAll(function () {
       browser.executeScript('window.sessionStorage.clear();');
       browser.executeScript('window.localStorage.clear();');
     });
 
     using(userDataProvider, function (data, description) {
-      it('Should successfully logged in by ' + description, () => {
+      it('Should successfully logged in by ' + description, function() {
         expect(browser.getCurrentUrl()).toContain('/login');
         login.userLogin(data.user, users.anyUser.password);
         expect(header.headerElements.companyLogo.isPresent()).toBeTruthy();
