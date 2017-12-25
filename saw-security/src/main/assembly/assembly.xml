@@ -8,34 +8,16 @@
     <format>tgz</format>
   </formats>
   <baseDirectory>saw-security</baseDirectory>
-  <moduleSets>
-    <moduleSet>
-      <useAllReactorProjects>true</useAllReactorProjects>
-      <includeSubModules>false</includeSubModules>
-      <includes>
-        <include>com.sncr:saw-security</include>
-      </includes>
-      <binaries>
-        <includeDependencies>false</includeDependencies>
-        <outputDirectory></outputDirectory>
-        <unpack>false</unpack>
-      </binaries>
-    </moduleSet>
-    <moduleSet>
-      <useAllReactorProjects>true</useAllReactorProjects>
-      <includes>
-        <include>com.sncr:saw-security-command-line-tool</include>
-      </includes>
-      <binaries>
-        <includeDependencies>false</includeDependencies>
-        <unpack>false</unpack>
-        <outputDirectory>rpms</outputDirectory>
-      </binaries>
-    </moduleSet>
-  </moduleSets>
   <fileSets>
     <fileSet>
-      <directory>${project.basedir}/saw-security/src/main/ansible</directory>
+      <directory>saw-security-command-line-tool/target</directory>
+      <outputDirectory>rpms</outputDirectory>
+      <includes>
+      	<include>saw-security-*.rpm</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>saw-security/src/main/ansible</directory>
       <outputDirectory>ansible</outputDirectory>
     </fileSet>
   </fileSets>
