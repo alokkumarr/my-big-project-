@@ -31,6 +31,7 @@ import com.sncr.saw.security.common.util.Ccode;
 import com.sncr.saw.security.common.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -703,14 +704,22 @@ public class UserRepositoryImpl implements UserRepository {
 				 **/
 				
 				
-				ArrayList<ProductModuleFeature> prodModFeatrChildSorted = null;
+						ArrayList<ProductModuleFeature> prodModFeatrChildSorted = null;
 				ArrayList<ProductModules> prodModSorted = null;
 				for (int i = 0; i < ticketDetails.getProducts().size(); i++) {
 					prodModSorted = new ArrayList<ProductModules>();
 					for (int x = 0; x < prodMods.size(); x++) {
+                        ArrayList<ProductModuleFeature> prodModFeatrParentsCopy = new ArrayList<>();
+                        //Copy the element one by one any changes to copyList  it will not impact originalList.
+                        for(ProductModuleFeature productModuleFeature: prodModFeatrParents )
+                        {
+                            ProductModuleFeature productModuleFeature1 = new ProductModuleFeature();
+                            BeanUtils.copyProperties(productModuleFeature,productModuleFeature1);
+                            prodModFeatrParentsCopy.add(productModuleFeature1);
+                        }
+
                         ArrayList<ProductModuleFeature> prodModFeatrSorted = new ArrayList<ProductModuleFeature>();
 						if (ticketDetails.getProducts().get(i).getProductCode().equals(prodMods.get(x).getProdCode())) {
-							
 							for (int y = 0; y < prodModFeatrParents.size(); y++) {
 								prodModFeatrChildSorted = new ArrayList<ProductModuleFeature>();
 								for (int z = 0; z < prodModFeatrChildren.size(); z++) {
@@ -730,17 +739,17 @@ public class UserRepositoryImpl implements UserRepository {
 									}
 
 								}
-								prodModFeatrParents.get(y)
+                                prodModFeatrParentsCopy.get(y)
 										.setProductModuleSubFeatures(prodModFeatrChildSorted);
 							}
 
 							for (int y = 0; y < prodModFeatrParents.size(); y++) {
 
 								if (ticketDetails.getProducts().get(i).getProductCode()
-										.equals(prodModFeatrParents.get(y).getProdCode())
-										&& prodModFeatrParents.get(y).getProdModCode()
+										.equals(prodModFeatrParentsCopy.get(y).getProdCode())
+										&& prodModFeatrParentsCopy.get(y).getProdModCode()
 												.equals(prodMods.get(x).getProductModCode())
-										&& prodModFeatrParents.get(y).getProductModuleSubFeatures().size()>0 ) {
+										&& prodModFeatrParentsCopy.get(y).getProductModuleSubFeatures().size()>0 ) {
 
 									/**
 									 * productModuleFeaturePrivilegesSorted =
@@ -762,8 +771,7 @@ public class UserRepositoryImpl implements UserRepository {
 									 * prodModFeatr.get(y).setProdModFeatrPriv(
 									 * productModuleFeaturePrivilegesSorted);
 									 **/
-									prodModFeatrSorted.add(prodModFeatrParents.get(y));
-
+									prodModFeatrSorted.add(prodModFeatrParentsCopy.get(y));
 								}
 
 							}
