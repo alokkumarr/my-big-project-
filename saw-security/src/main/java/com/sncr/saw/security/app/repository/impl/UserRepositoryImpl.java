@@ -702,12 +702,13 @@ public class UserRepositoryImpl implements UserRepository {
 				 * } ticketDetails.setProductModuleFeatures(prodModFeatrs);
 				 **/
 				
-				ArrayList<ProductModuleFeature> prodModFeatrSorted = new ArrayList<ProductModuleFeature>();
+				
 				ArrayList<ProductModuleFeature> prodModFeatrChildSorted = null;
 				ArrayList<ProductModules> prodModSorted = null;
 				for (int i = 0; i < ticketDetails.getProducts().size(); i++) {
 					prodModSorted = new ArrayList<ProductModules>();
 					for (int x = 0; x < prodMods.size(); x++) {
+                        ArrayList<ProductModuleFeature> prodModFeatrSorted = new ArrayList<ProductModuleFeature>();
 						if (ticketDetails.getProducts().get(i).getProductCode().equals(prodMods.get(x).getProdCode())) {
 							
 							for (int y = 0; y < prodModFeatrParents.size(); y++) {
@@ -715,9 +716,11 @@ public class UserRepositoryImpl implements UserRepository {
 								for (int z = 0; z < prodModFeatrChildren.size(); z++) {
 									if (prodModFeatrParents.get(y).getProdModFeatureType().split("_")[1]
 											.equals(prodModFeatrChildren.get(z).getProdModFeatureType()
-													.split("_")[1])) {
+													.split("_")[1]) && prodMods.get(x).getProductModCode()
+											.equalsIgnoreCase(prodModFeatrChildren.get(z).getProdModCode())) {
 										//get the privCode
-										PrivilegeDetails PrivilegeDetails = fetchIfPrivExists(prodModFeatrChildren.get(z).getRoleId(),prodModFeatrChildren.get(z).getProdModFeatureID());
+										PrivilegeDetails PrivilegeDetails = fetchIfPrivExists(prodModFeatrChildren.get(z).getRoleId(),
+												prodModFeatrChildren.get(z).getProdModFeatureID());
 										if(PrivilegeDetails != null) {
 											prodModFeatrChildren.get(z).setPrivilegeCode(PrivilegeDetails.getPrivilegeCode());
 										} else {
@@ -736,7 +739,8 @@ public class UserRepositoryImpl implements UserRepository {
 								if (ticketDetails.getProducts().get(i).getProductCode()
 										.equals(prodModFeatrParents.get(y).getProdCode())
 										&& prodModFeatrParents.get(y).getProdModCode()
-												.equals(prodMods.get(x).getProductModCode())) {
+												.equals(prodMods.get(x).getProductModCode())
+										&& prodModFeatrParents.get(y).getProductModuleSubFeatures().size()>0 ) {
 
 									/**
 									 * productModuleFeaturePrivilegesSorted =
@@ -761,9 +765,11 @@ public class UserRepositoryImpl implements UserRepository {
 									prodModFeatrSorted.add(prodModFeatrParents.get(y));
 
 								}
+
 							}
-							prodMods.get(x).setProdModFeature(prodModFeatrSorted);
-							prodModSorted.add(prodMods.get(x));
+                            prodMods.get(x).setProdModFeature(prodModFeatrSorted);
+                            prodModSorted.add(prodMods.get(x));
+
 						}
 					}
 					ticketDetails.getProducts().get(i).setProductModules(prodModSorted);
