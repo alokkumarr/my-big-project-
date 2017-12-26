@@ -23,11 +23,13 @@ import {
   stateParamsProvider,
   stateProvider,
   componentHandlerProvider,
-  headerProgressProvider
+  headerProgressProvider,
+  toastProvider
 } from '../../common/services/ajs-common-providers';
 import { ObserveService } from './services/observe.service';
 
 import { AddTokenInterceptor } from './services/add-token.interceptor';
+import { HandleErrorInterceptor } from './services/handle-error.interceptor';
 
 import { ChartComponent } from '../../common/components/charts/chart.component';
 
@@ -80,6 +82,7 @@ const components = [
   entryComponents: components,
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: HandleErrorInterceptor, multi: true },
     ObserveService,
     jwtServiceProvider,
     analyzeServiceProvider,
@@ -88,6 +91,7 @@ const components = [
     stateProvider,
     componentHandlerProvider,
     headerProgressProvider,
+    toastProvider,
     chartServiceProvider,
     sortServiceProvider,
     filterServiceProvider
