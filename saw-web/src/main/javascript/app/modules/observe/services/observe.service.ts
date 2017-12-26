@@ -15,11 +15,6 @@ export class ObserveService {
 
   constructor(private http: HttpClient, private jwt: JwtService) {}
 
-  addHeaders(headers = new HttpHeaders({})) {
-    headers = headers.append('Authorization', `Bearer ${this.jwt.getAccessToken()}`)
-    return headers;
-  }
-
   addModelStructure(model) {
     return {
       contents: {
@@ -42,20 +37,14 @@ export class ObserveService {
       model.createdBy = this.jwt.getUserId();
     }
 
-    return this.http[method](`${this.api}/observe/dashboards/${endpoint}` , this.addModelStructure(model), {
-      headers: this.addHeaders()
-    }).map(fpGet('contents.observe.0'));
+    return this.http[method](`${this.api}/observe/dashboards/${endpoint}` , this.addModelStructure(model)).map(fpGet('contents.observe.0'));
   }
 
   getDashboard(entityId: string): Observable<Dashboard> {
-    return this.http.get(`${this.api}/observe/dashboards/${entityId}` , {
-      headers: this.addHeaders()
-    }).map(fpGet('contents.observe.0'));
+    return this.http.get(`${this.api}/observe/dashboards/${entityId}`).map(fpGet('contents.observe.0'));
   }
 
   getDashboardsForCategory(categoryId, userId = this.jwt.getUserId()): Observable<Array<Dashboard>> {
-    return this.http.get(`${this.api}/observe/dashboards/${categoryId}/${userId}` , {
-      headers: this.addHeaders()
-    }).map(fpGet('contents.observe'));
+    return this.http.get(`${this.api}/observe/dashboards/${categoryId}/${userId}`).map(fpGet('contents.observe'));
   }
 }

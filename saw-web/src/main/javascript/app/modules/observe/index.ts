@@ -1,7 +1,7 @@
 import * as angular from 'angular';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CommonModule as AngularCommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GridsterModule } from 'angular-gridster2';
@@ -26,6 +26,8 @@ import {
   headerProgressProvider
 } from '../../common/services/ajs-common-providers';
 import { ObserveService } from './services/observe.service';
+
+import { AddTokenInterceptor } from './services/add-token.interceptor';
 
 import { ChartComponent } from '../../common/components/charts/chart.component';
 
@@ -77,6 +79,7 @@ const components = [
   declarations: components,
   entryComponents: components,
   providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
     ObserveService,
     jwtServiceProvider,
     analyzeServiceProvider,
