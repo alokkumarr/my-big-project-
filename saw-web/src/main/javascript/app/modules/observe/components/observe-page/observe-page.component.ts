@@ -9,6 +9,7 @@ import * as map from 'lodash/map';
 import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.component';
 import { ObserveService } from '../../services/observe.service';
 import { MenuService } from '../../../../common/services/menu.service';
+import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
 import { Dashboard } from '../../models/dashboard.interface';
@@ -36,6 +37,7 @@ export class ObservePageComponent implements OnInit {
     private analyze: AnalyzeService,
     private menu: MenuService,
     private observe: ObserveService,
+    private headerProgress: HeaderProgressService,
     @Inject('$stateParams') private $stateParams,
     @Inject('$componentHandler') private $componentHandler
   ) {
@@ -64,19 +66,23 @@ export class ObservePageComponent implements OnInit {
 
     // leftSideNav.update(data, 'OBSERVE');
 
+    this.headerProgress.show();
     this.menu.getMenu('OBSERVE')
       .then(data => {
 
         forEach(data, category => {
           this.observe.getDashboardsForCategory(category.id).subscribe((dashboards: Array<Dashboard>) => {
             category.children = category.children || [];
+
             category.children = category.children.concat(map(dashboards, dashboard => ({
               id: dashboard.entityId,
               name: dashboard.name,
               url: `#!/observe?dashboardId=${dashboard.entityId}`,
               data: dashboard
             })));
+
             leftSideNav.update(data, 'OBSERVE');
+            this.headerProgress.hide();
           });
         });
 
@@ -89,8 +95,10 @@ export class ObservePageComponent implements OnInit {
   }
 
   loadDashboard() {
+    this.headerProgress.show();
     this.observe.getDashboard(this.dashboardId).subscribe(data => {
       this.dashboard = data;
+      this.headerProgress.hide();
     })
   }
 

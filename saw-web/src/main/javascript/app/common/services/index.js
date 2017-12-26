@@ -4,6 +4,7 @@ import 'angular-toastr/dist/angular-toastr.css';
 
 import {MenuService} from './menu.service';
 import {LocalSearchService} from './local-search.service';
+import {HeaderProgressService} from './header-progress.service';
 import {errorDetailService} from './error-detail.service';
 import {dxDataGridService} from './dxDataGrid.service';
 import {fileService} from './file.service';
@@ -19,4 +20,5 @@ angular.module(CommonServiceModule, moduleDependencies)
   .factory('ErrorDetail', errorDetailService)
   .factory('fileService', fileService)
   .factory('toastMessage', toastMessageService)
+  .service('HeaderProgress', HeaderProgressService)
   .service('MenuService', MenuService);
