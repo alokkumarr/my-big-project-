@@ -444,6 +444,7 @@ export const AnalyzeReportComponent = {
           this.columns = this.getColumns(columnNames);
           this.applyDataToGrid(this.columns, [], [], this.gridData);
           this.endProgress();
+          this.toggleDetailsPanel(true);
         }, () => {
           this.endProgress();
         });
