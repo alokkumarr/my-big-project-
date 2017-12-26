@@ -1,6 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
 import { ObserveService } from '../../services/observe.service';
+import { MenuService } from '../../../../common/services/menu.service';
 
 const template = require('./save-dashboard.component.html');
 require('./save-dashboard.component.scss');
@@ -12,25 +13,20 @@ require('./save-dashboard.component.scss');
 export class SaveDashboardComponent implements OnInit {
 
   private dashboard: any;
-  public categories = [{
-    id: '1',
-    name: 'Category 1'
-  }, {
-    id: '2',
-    name: 'Category 2'
-  }, {
-    id: '3',
-    name: 'Category 3'
-  }];
+  public categories = [];
 
   constructor(private dialogRef: MdDialogRef<SaveDashboardComponent>,
     @Inject(MD_DIALOG_DATA) private data: any,
+    private menu: MenuService,
     private observe: ObserveService
   ) { }
 
   ngOnInit() {
     this.dashboard = this.data.dashboard;
-    this.dashboard.categoryId = this.categories[0].id;
+    this.menu.getMenu('OBSERVE').then(data => {
+      this.categories = data;
+      this.dashboard.categoryId = this.categories[0].id;
+    });
   }
 
   closeDashboard(data) {

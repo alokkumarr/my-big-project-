@@ -52,4 +52,10 @@ export class ObserveService {
       headers: this.addHeaders()
     }).map(fpGet('contents.observe.0'));
   }
+
+  getDashboardsForCategory(categoryId, userId = this.jwt.getUserId()): Observable<Array<Dashboard>> {
+    return this.http.get(`${this.api}/observe/dashboards/${categoryId}/${userId}` , {
+      headers: this.addHeaders()
+    }).map(fpGet('contents.observe'));
+  }
 }

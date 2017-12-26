@@ -36,11 +36,11 @@ export class JwtService {
     return this._$window.localStorage[this._AppConfig.login.jwtKey];
   }
 
-  getCategories() {
+  getCategories(moduleName = 'ANALYZE') {
     const token = this.getTokenObj();
     const analyzeModule = find(
       get(token, 'ticket.products[0].productModules'),
-      mod => mod.productModName === 'ANALYZE'
+      mod => mod.productModName === moduleName
     );
 
     return get(analyzeModule, 'prodModFeature', []) || [];
