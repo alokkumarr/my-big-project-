@@ -29,8 +29,6 @@ import { Component } from '@angular/core';
   template: template
 })
 export class ObservePageComponent implements OnInit {
-  private dashboardId: string;
-  private dashboard: Dashboard;
 
   constructor(public dialog: MdDialog,
     private iconRegistry: MdIconRegistry,
@@ -38,11 +36,9 @@ export class ObservePageComponent implements OnInit {
     private menu: MenuService,
     private observe: ObserveService,
     private headerProgress: HeaderProgressService,
-    @Inject('$stateParams') private $stateParams,
     @Inject('$componentHandler') private $componentHandler
   ) {
     this.iconRegistry.setDefaultFontSetClass('icomoon');
-    this.dashboardId = this.$stateParams.dashboardId;
   }
 
   createDashboard() {
@@ -84,7 +80,7 @@ export class ObservePageComponent implements OnInit {
             category.children = category.children.concat(map(dashboards, dashboard => ({
               id: dashboard.entityId,
               name: dashboard.name,
-              url: `#!/observe?dashboardId=${dashboard.entityId}`,
+              url: `#!/observe/${dashboard.entityId}`,
               data: dashboard
             })));
 
@@ -93,18 +89,8 @@ export class ObservePageComponent implements OnInit {
           });
         });
 
-        if (this.dashboardId) {
-          this.loadDashboard();
-        }
       });
   }
 
-  loadDashboard() {
-    this.headerProgress.show();
-    this.observe.getDashboard(this.dashboardId).subscribe(data => {
-      this.dashboard = data;
-      this.headerProgress.hide();
-    })
-  }
 
 };

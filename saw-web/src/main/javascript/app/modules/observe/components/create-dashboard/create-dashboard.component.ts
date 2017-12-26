@@ -1,4 +1,5 @@
 import { Component, Inject, ViewChild } from '@angular/core';
+import { UIRouter } from '@uirouter/angular';
 import { MdDialogRef, MD_DIALOG_DATA, MdDialog } from '@angular/material'; import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { GridsterConfig, GridsterItem, GridsterComponent } from 'angular-gridster2';
@@ -62,7 +63,7 @@ export class CreateDashboardComponent {
   constructor(public dialogRef: MdDialogRef<CreateDashboardComponent>,
     public dialog: MdDialog,
     @Inject(MD_DIALOG_DATA) public layout: any,
-    @Inject('$state') private $state
+    private router: UIRouter
   ) { }
 
   checkEmpty() {
@@ -173,7 +174,7 @@ export class CreateDashboardComponent {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.dialogRef.afterClosed().subscribe(() => {
-          this.$state.go('observe', {dashboardId: result})
+          this.router.stateService.go('observe.dashboard', {dashboardId: result});
         });
         this.dialogRef.close();
       }

@@ -13,28 +13,6 @@ export const menuServiceProvider = {
   deps: ['$injector']
 };
 
-/* $state */
-export function stateFactory(i: any) {
-  return i.get('$state');
-}
-
-export const stateProvider = {
-  provide: '$state',
-  useFactory: stateFactory,
-  deps: ['$injector']
-};
-
-/* $stateParams */
-export function stateParamsFactory(i: any) {
-  return i.get('$stateParams');
-}
-
-export const stateParamsProvider = {
-  provide: '$stateParams',
-  useFactory: stateParamsFactory,
-  deps: ['$injector']
-};
-
 /* ComponentHandler Service */
 export function componentHandlerFactory(i: any) {
   return i.get('$componentHandler');

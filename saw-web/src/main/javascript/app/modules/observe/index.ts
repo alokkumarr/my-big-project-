@@ -1,6 +1,7 @@
 import * as angular from 'angular';
 import { downgradeComponent } from '@angular/upgrade/static';
 import { NgModule } from '@angular/core';
+import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CommonModule as AngularCommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,8 +21,6 @@ import {
 } from '../analyze/services/ajs-analyze-providers';
 import {
   menuServiceProvider,
-  stateParamsProvider,
-  stateProvider,
   componentHandlerProvider,
   headerProgressProvider,
   toastProvider
@@ -34,6 +33,7 @@ import { HandleErrorInterceptor } from './services/handle-error.interceptor';
 import { ChartComponent } from '../../common/components/charts/chart.component';
 
 import { ObservePageComponent } from './components/observe-page/observe-page.component';
+import { ObserveViewComponent } from './components/observe-view/observe-view.component';
 import { ObserveChartComponent } from './components/observe-chart/observe-chart.component';
 import { DashboardGridComponent } from './components/dashboard-grid/dashboard-grid.component';
 import { AnalysisChoiceComponent } from './components/analysis-choice/analysis-choice.component';
@@ -55,10 +55,6 @@ angular.module(ObserveModule, [
   .config(routesConfig)
   .config(i18nConfig)
   .factory('ObserveService', ObserveService)
-  .directive(
-    'observePage',
-    downgradeComponent({component: ObservePageComponent})
-  )
   .component('filterSidenav', FilterSidenavComponent)
   .component('checkboxFilter', CheckboxFilterComponent)
   .component('priceRangeFilter', PriceRangeFilterComponent)
@@ -68,6 +64,7 @@ angular.module(ObserveModule, [
 
 const components = [
   ObservePageComponent,
+  ObserveViewComponent,
   DashboardGridComponent,
   CreateDashboardComponent,
   AnalysisChoiceComponent,
@@ -77,7 +74,7 @@ const components = [
 ];
 
 @NgModule({
-  imports: [ AngularCommonModule, FormsModule, MaterialModule, GridsterModule, HttpClientModule ],
+  imports: [ AngularCommonModule, FormsModule, MaterialModule, GridsterModule, HttpClientModule, UIRouterUpgradeModule ],
   declarations: components,
   entryComponents: components,
   providers: [
@@ -87,8 +84,6 @@ const components = [
     jwtServiceProvider,
     analyzeServiceProvider,
     menuServiceProvider,
-    stateParamsProvider,
-    stateProvider,
     componentHandlerProvider,
     headerProgressProvider,
     toastProvider,

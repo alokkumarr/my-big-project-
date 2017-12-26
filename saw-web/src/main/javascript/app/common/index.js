@@ -1,6 +1,6 @@
 import 'jquery';
 import * as angular from 'angular';
-import 'angular-ui-router';
+import '@uirouter/angular-hybrid';
 
 import 'angular-material';
 
@@ -43,6 +43,7 @@ export const CommonModule = 'CommonModule';
 
 const moduleDependencies = [
   'ui.router',
+  'ui.router.upgrade',
   'LocalStorageModule',
   'ngSanitize',
   'ngMaterial',

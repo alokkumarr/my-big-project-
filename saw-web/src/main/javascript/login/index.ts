@@ -1,5 +1,5 @@
 import * as angular from 'angular';
-import 'angular-ui-router';
+import '@uirouter/angular-hybrid';
 
 import 'angular-material';
 import 'angular-material/angular-material.css';
@@ -35,6 +35,7 @@ export const LoginModule = 'login';
 angular
   .module(LoginModule, [
     'ui.router',
+    'ui.router.upgrade',
     'ngMaterial'
   ])
   .config(routesConfig)
