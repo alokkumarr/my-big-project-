@@ -2,11 +2,11 @@
   Created by Alex
  */
 
-const login = require('../../javascript/pages/common/login.po.js');
-const analyzePage = require('../../javascript/pages/common/analyzePage.po.js');
+const login = require('../../javascript/pages/loginPage.po.js');
+const analyzePage = require('../../javascript/pages/analyzePage.po.js');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const homePage = require('../../javascript/pages/homePage.po');
-const executedAnalysisPage = require('../../javascript/pages/common/executedAlaysis.po');
+const executedAnalysisPage = require('../../javascript/pages/savedAlaysisPage.po');
 const using = require('jasmine-data-provider');
 
 describe('create and delete charts: createAndDeleteCharts.test.js', () => {
