@@ -137,8 +137,12 @@ export const AnalyzeFilterModalComponent = {
 
     isDateFilterInvalid(filter) {
       if (DATE_TYPES.includes(filter.column.type) && filter.model.preset === 'NA') {
-        filter.model.lte = moment(filter.model.lte).endOf('day').format(this.momentDateFormat(filter.column.format)).toString();
-        filter.model.gte = moment(filter.model.gte).format(this.momentDateFormat(filter.column.format)).toString();
+        if (isUndefined(filter.column.format)) {
+          filter.model.lte = moment(filter.model.lte).utc().endOf('day').format('YYYY-MM-DD HH:mm:ss').toString();
+        } else {
+          filter.model.lte = moment(filter.model.lte).endOf('day').format(this.momentDateFormat(filter.column.format)).toString();
+          filter.model.gte = moment(filter.model.gte).format(this.momentDateFormat(filter.column.format)).toString();
+        }
       }
 
       return DATE_TYPES.includes(filter.column.type) &&
