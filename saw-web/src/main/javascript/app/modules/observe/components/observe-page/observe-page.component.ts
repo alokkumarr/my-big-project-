@@ -34,13 +34,7 @@ export class ObservePageComponent implements OnInit {
     @Inject('$stateParams') private $stateParams,
     @Inject('$componentHandler') private $componentHandler
   ) {
-    // this.$componentHandler = $componentHandler;
-    // this.MenuService = MenuService;
     this.iconRegistry.setDefaultFontSetClass('icomoon');
-    this.menu.getMenu('ANALYZE').then(data => {
-      this.analyze.updateMenu(data);
-    });
-
     this.dashboardId = this.$stateParams.dashboardId;
   }
 
@@ -58,7 +52,7 @@ export class ObservePageComponent implements OnInit {
         id: 1,
         name: 'My Dashboards',
         children: [
-          { id: 2, name: 'Optimisation', url: `#!/observe?dashboardId=d8939bf3-d8f4-4ee7-89c4-f2a4fd4abca9::PortalDataSet::1513945502617`}
+          { id: 2, name: 'Testing', url: `#!/observe?dashboardId=d8939bf3-d8f4-4ee7-89c4-f2a4fd4abca9::PortalDataSet::1513945502617`}
         ]
       }
     ];
