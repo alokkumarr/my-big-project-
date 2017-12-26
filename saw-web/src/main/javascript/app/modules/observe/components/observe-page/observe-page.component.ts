@@ -67,6 +67,13 @@ export class ObservePageComponent implements OnInit {
     // leftSideNav.update(data, 'OBSERVE');
 
     this.headerProgress.show();
+
+    /* Needed to get the analyze service working correctly */
+    this.menu.getMenu('ANALYZE')
+      .then(data => {
+        this.analyze.updateMenu(data);
+      });
+
     this.menu.getMenu('OBSERVE')
       .then(data => {
 
@@ -85,8 +92,6 @@ export class ObservePageComponent implements OnInit {
             this.headerProgress.hide();
           });
         });
-
-        this.analyze.updateMenu(data);
 
         if (this.dashboardId) {
           this.loadDashboard();
