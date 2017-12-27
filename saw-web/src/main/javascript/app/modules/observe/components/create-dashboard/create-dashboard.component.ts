@@ -170,7 +170,8 @@ export class CreateDashboardComponent {
   openSaveDialog() {
     const dialogRef = this.dialog.open(SaveDashboardComponent, {
       data: {
-        dashboard: this.prepareDashboardForSave()
+        dashboard: this.prepareDashboardForSave(),
+        mode: 'create'
       }
     });
 
@@ -194,7 +195,7 @@ export class CreateDashboardComponent {
     const menu = this.menu.getCachedMenu('OBSERVE') || [];
     let subCategory;
     forEach(menu, category => {
-      subCategory = find(category.children, subCat => subCat.id.toString() === dashboard.categoryId.toString());
+      subCategory = subCategory || find(category.children, subCat => subCat.id.toString() === dashboard.categoryId.toString());
     });
 
     if (subCategory) {
