@@ -12,7 +12,7 @@ export const AccordionMenuLink = {
   },
   controller: class AccordionMenuLinkCtrl {
     constructor($location) {
-      this.isOpen = false;
+      this.isOpen = true;
       this.collapsFlag = 0;
       this._$location = $location;
     }
@@ -23,7 +23,7 @@ export const AccordionMenuLink = {
 
     /* Check if the current item's url matches the browser url */
     checkActiveMenu(linkUrl) {
-      this.url = '#!' + this._$location.path();
+      this.url = '#!' + this._$location.url();
       if (this.url === linkUrl) {
         return true;
       }
@@ -32,7 +32,15 @@ export const AccordionMenuLink = {
 
     /* Check if the collapser contains an item that is currently open. */
     checkAndCollapse() {
-      this.pathUrl = '#!' + this._$location.path();
+      const url = this._$location.url();
+
+      if (/^\/observe/.test(url)) {
+        /* If observe module, open all levels by default */
+        this.isOpen = true;
+        return;
+      }
+
+      this.pathUrl = '#!' + url;
       if (this.hasChildren()) {
         for (let i = 0; i < this.metadata.children.length - 1; i++) {
           if (this.pathUrl === this.metadata.children[i].url && this.collapsFlag === 0) {

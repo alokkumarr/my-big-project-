@@ -188,6 +188,8 @@ export class CreateDashboardComponent {
     });
   }
 
+  /* After successful save, update the sidemenu with the dashboard. This saves a network
+     request because we already have all the data available to us. */
   updateSideMenu(dashboard: Dashboard) {
     const menu = this.menu.getCachedMenu('OBSERVE') || [];
     let subCategory;
