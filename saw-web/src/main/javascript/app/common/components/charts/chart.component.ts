@@ -5,7 +5,8 @@ import {
   ViewChild
  } from '@angular/core';
 
-import * as Highcharts from 'highcharts/highstock';
+import * as Highcharts from 'highcharts/highcharts';
+import * as Highstock from 'highcharts/highstock';    // Had to import both highstocks & highcharts api since highstocks not supporting bubble chart.
 import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as forEach from 'lodash/forEach';
 import * as filter from 'lodash/filter';
@@ -32,6 +33,7 @@ export class ChartComponent {
   @ViewChild('container') container: ElementRef;
 
   private highcharts: any = Highcharts;
+  private highstocks: any = Highstock;
   private chart: any = null;
   private stockChart: any = null;
   private config: any = {};
@@ -48,7 +50,7 @@ export class ChartComponent {
     this.config = defaultsDeep(this.options, chartOptions);
     this.stockConfig = defaultsDeep(this.options, stockChartOptions);
     if (this.isStockChart) {
-      this.chart = this.highcharts.stockChart(this.container.nativeElement, this.stockConfig);
+      this.chart = this.highstocks.stockChart(this.container.nativeElement, this.stockConfig);
     } else {
       this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
     }
@@ -77,7 +79,7 @@ export class ChartComponent {
         // https://forum.highcharts.com/highstock-usage/creating-a-chart-manipulates-external-options-object-t15255/#p81794
         this.chartSeriesData = clone(this.config.series);
         this.chartXData = clone(this.config.xAxis);
-        this.chart = this.highcharts.stockChart(this.container.nativeElement, this.config);
+        this.chart = this.highstocks.stockChart(this.container.nativeElement, this.config);
         this.config.series = clone(this.chartSeriesData);
         this.config.xAxis = clone(this.chartXData);
         this.chartSeriesData = this.chartXData = {};
