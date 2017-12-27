@@ -216,9 +216,9 @@ object QueryBuilder extends {
     val condition = property("type") match {
       case "int" | "long" | "float" | "double" | "integer" => {
         val operator = subProperty("model", "operator").toLowerCase
-        val value = subProperty("model", "value")
+        val value = subProperty("model", "otherValue")
         if (operator == "btw") {
-          val otherValue = subProperty("model", "otherValue")
+          val otherValue = subProperty("model", "value")
           "BETWEEN %s AND %s".format(value, otherValue)
         } else {
           val operatorSql = operator match {
