@@ -12,7 +12,7 @@ export function routesConfig($stateProvider) {
     },
     {
       name: 'observe.dashboard',
-      url: '/:dashboardId',
+      url: '/:subCategory?dashboard',
       component: ObserveViewComponent
     }
   ];

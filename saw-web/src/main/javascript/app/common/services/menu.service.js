@@ -10,10 +10,22 @@ export const SAW_MODULES = {
 };
 
 export class MenuService {
-  constructor($q, JwtService) {
+  constructor($q, JwtService, $componentHandler) {
     'ngInject';
     this._JwtService = JwtService;
     this._$q = $q;
+    this._$componentHandler = $componentHandler;
+    this._menuCache = {};
+  }
+
+  updateMenu(data, moduleName, componentId = 'left-side-nav') {
+    const menu = this._$componentHandler.get(componentId)[0];
+    menu.update(data, moduleName);
+    this._menuCache[moduleName] = data;
+  }
+
+  getCachedMenu(moduleName) {
+    return this._menuCache[moduleName];
   }
 
   getMenu(moduleName) {

@@ -1,4 +1,5 @@
 import * as get from 'lodash/get';
+import * as has from 'lodash/has';
 import * as padStart from 'lodash/padStart';
 import * as find from 'lodash/find';
 import * as flatMap from 'lodash/flatMap';
@@ -135,7 +136,7 @@ export class JwtService {
      */
   hasPrivilege(name, opts) {
     /* eslint-disable */
-    if (!PRIVILEGE_INDEX[name]) {
+    if (!has(PRIVILEGE_INDEX, name)) {
       throw new Error(`Privilige ${name} is not supported!`);
     }
     opts.module = opts.module || 'ANALYZE';

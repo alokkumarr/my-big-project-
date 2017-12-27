@@ -56,17 +56,19 @@ export class ObservePageComponent implements OnInit {
         let count = this.getSubcategoryCount(data);
         forEach(data, category => {
           forEach(category.children || [], subCategory => {
+
             this.observe.getDashboardsForCategory(subCategory.id).subscribe((dashboards: Array<Dashboard>) => {
+              dashboards = dashboards || [];
               subCategory.children = subCategory.children || [];
 
               subCategory.children = subCategory.children.concat(map(dashboards, dashboard => ({
                 id: dashboard.entityId,
                 name: dashboard.name,
-                url: `#!/observe/${dashboard.entityId}`,
+                url: `#!/observe/${subCategory.id}?dashboard=${dashboard.entityId}`,
                 data: dashboard
               })));
 
-              if(--count <= 0) {
+              if(--count <= 3) {
                 this.updateSidebar(data);
               }
             }, error => {
@@ -81,8 +83,6 @@ export class ObservePageComponent implements OnInit {
   }
 
   updateSidebar(data) {
-    const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
-
     // const data = [
     //   {
     //     id: 1,
@@ -93,7 +93,7 @@ export class ObservePageComponent implements OnInit {
     //   }
     // ];
 
-    leftSideNav.update(data, 'OBSERVE');
+    this.menu.updateMenu(data, 'OBSERVE');
     this.headerProgress.hide();
   }
 

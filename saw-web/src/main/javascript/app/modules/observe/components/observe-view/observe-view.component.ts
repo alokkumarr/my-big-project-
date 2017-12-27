@@ -17,6 +17,7 @@ const template = require('./observe-view.component.html');
 
 export class ObserveViewComponent implements OnInit {
   private dashboardId: string;
+  private subCategoryId: string;
   private dashboard: Dashboard;
 
   constructor(
@@ -25,7 +26,8 @@ export class ObserveViewComponent implements OnInit {
     private headerProgress: HeaderProgressService,
     private transition: Transition
   ) {
-    this.dashboardId = this.transition.params().dashboardId;
+    this.dashboardId = this.transition.params().dashboard;
+    this.subCategoryId = this.transition.params().subCategory;
   }
 
   ngOnInit() {

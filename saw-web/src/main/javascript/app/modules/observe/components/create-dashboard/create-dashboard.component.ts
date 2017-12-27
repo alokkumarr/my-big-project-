@@ -3,6 +3,7 @@ import { UIRouter } from '@uirouter/angular';
 import { MdDialogRef, MD_DIALOG_DATA, MdDialog } from '@angular/material'; import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { GridsterConfig, GridsterItem, GridsterComponent } from 'angular-gridster2';
+import { MenuService } from '../../../../common/services/menu.service';
 import { Dashboard } from '../../models/dashboard.interface';
 import {
   trigger,
@@ -13,6 +14,7 @@ import {
 } from '@angular/animations';
 
 import * as forEach from 'lodash/forEach';
+import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 
@@ -61,9 +63,10 @@ export class CreateDashboardComponent {
   public chartUpdater = new BehaviorSubject({});
 
   constructor(public dialogRef: MdDialogRef<CreateDashboardComponent>,
-    public dialog: MdDialog,
-    @Inject(MD_DIALOG_DATA) public layout: any,
-    private router: UIRouter
+    private dialog: MdDialog,
+    private router: UIRouter,
+    private menu: MenuService,
+    @Inject(MD_DIALOG_DATA) public layout: any
   ) { }
 
   checkEmpty() {
@@ -171,13 +174,37 @@ export class CreateDashboardComponent {
       }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result: Dashboard) => {
       if (result) {
         this.dialogRef.afterClosed().subscribe(() => {
-          this.router.stateService.go('observe.dashboard', {dashboardId: result});
+          this.updateSideMenu(result);
+          this.router.stateService.go('observe.dashboard', {
+            dashboard: result.entityId,
+            subCategory: result.categoryId
+          });
         });
         this.dialogRef.close();
       }
     });
+  }
+
+  updateSideMenu(dashboard: Dashboard) {
+    const menu = this.menu.getCachedMenu('OBSERVE') || [];
+    let subCategory;
+    forEach(menu, category => {
+      subCategory = find(category.children, subCat => subCat.id.toString() === dashboard.categoryId.toString());
+    });
+
+    if (subCategory) {
+      subCategory.children = subCategory.children || [];
+      subCategory.children.push({
+        id: dashboard.entityId,
+        name: dashboard.name,
+        url: `#!/observe/${dashboard.categoryId}?dashboard=${dashboard.entityId}`,
+        data: dashboard
+      });
+    }
+
+    this.menu.updateMenu(menu, 'OBSERVE');
   }
 }

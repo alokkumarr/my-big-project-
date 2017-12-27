@@ -50,7 +50,7 @@ export class SaveDashboardComponent implements OnInit {
       return;
     }
     this.observe.saveDashboard(this.dashboard).subscribe(data => {
-      this.closeDashboard(data.entityId);
+      this.closeDashboard(data);
     }, err => {
     });
   }
