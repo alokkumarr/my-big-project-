@@ -216,10 +216,10 @@ object QueryBuilder extends {
     val condition = property("type") match {
       case "int" | "long" | "float" | "double" | "integer" => {
         val operator = subProperty("model", "operator").toLowerCase
-        val value = subProperty("model", "otherValue")
+        val value = subProperty("model", "value")
         if (operator == "btw") {
-          val otherValue = subProperty("model", "value")
-          "BETWEEN %s AND %s".format(value, otherValue)
+          val otherValue = subProperty("model", "otherValue")
+          "BETWEEN %s AND %s".format(otherValue,value)
         } else {
           val operatorSql = operator match {
             case "gt" => ">"
