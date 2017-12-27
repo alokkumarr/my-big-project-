@@ -16,9 +16,9 @@ exports.config = {
         'disable-extensions',
         'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
-        /*"--headless",
+        "--headless",
         "--disable-gpu",
-        "--window-size=2880,1800"*/
+        "--window-size=2880,1800"
       ]
     }
   },
