@@ -144,7 +144,7 @@ export const ReportGridDisplayComponent = {
     checkColumndatatype(columnList, columnName) {
       let datatype = '';
       forEach(columnList, column => {
-        if (column.columnName === columnName) {
+        if (!isEmpty(column) && column.columnName === columnName) {
           datatype = column.type;
         }
       });

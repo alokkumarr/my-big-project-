@@ -289,15 +289,17 @@ export const ReportGridComponent = {
       });
       return data;
     }
+
     checkColumndatatype(columnList, columnName) {
       let datatype = '';
       forEach(columnList, column => {
-        if (column.meta.columnName === columnName) {
+        if (!isEmpty(column.meta) && column.meta.columnName === columnName) {
           datatype = column.meta.type;
         }
       });
       return datatype;
     }
+
     refreshGrid() {
       if (this._gridInstance) {
         this._gridInstance.refresh();
