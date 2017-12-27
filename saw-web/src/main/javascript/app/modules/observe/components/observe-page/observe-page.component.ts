@@ -2,8 +2,10 @@ declare function require(string): string;
 
 import { Inject, OnInit } from '@angular/core';
 import { MdIconRegistry } from '@angular/material';
+import { UIRouter } from '@uirouter/angular';
 
 import * as forEach from 'lodash/forEach';
+import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 
 import { ObserveService } from '../../services/observe.service';
@@ -35,6 +37,7 @@ export class ObservePageComponent implements OnInit {
     private menu: MenuService,
     private observe: ObserveService,
     private headerProgress: HeaderProgressService,
+    private router: UIRouter,
     @Inject('$componentHandler') private $componentHandler
   ) {
     this.iconRegistry.setDefaultFontSetClass('icomoon');
@@ -68,12 +71,14 @@ export class ObservePageComponent implements OnInit {
                 data: dashboard
               })));
 
-              if(--count <= 3) {
+              if(--count <= 0) {
                 this.updateSidebar(data);
+                this.redirectToFirstDash(data);
               }
             }, error => {
               if(--count <= 0) {
                 this.updateSidebar(data);
+                this.redirectToFirstDash(data);
               }
             });
           });
@@ -95,6 +100,42 @@ export class ObservePageComponent implements OnInit {
 
     this.menu.updateMenu(data, 'OBSERVE');
     this.headerProgress.hide();
+  }
+
+  /* Try to redirect to first dashboard or first empty subcategory */
+  redirectToFirstDash(menu) {
+    /* Only redirect if on root observe state */
+    if (this.router.stateService.current.name !== 'observe') {
+      return;
+    }
+
+    const categoryWithDashboard = find(menu, cat => {
+      const subCategory = find(cat.children, subCat => {
+        return subCat.children.length > 0;
+      });
+
+      return Boolean(subCategory);
+    });
+
+    const categoryWithSubCategory = find(menu, cat => cat.children.length > 0);
+
+    if (categoryWithDashboard) {
+      /* If a dashboard has been found in some category/subcategory, redirect to that */
+      const subCategory = find(categoryWithDashboard.children, subCat => {
+        return subCat.children.length > 0;
+      });
+
+      this.router.stateService.go('observe.dashboard', {
+        subCategory: subCategory.id,
+        dashboard: subCategory.children[0].id
+      });
+
+    } else if (categoryWithSubCategory) {
+      /* Otherwise, redirect to the first empty subcategory available. */
+      this.router.stateService.go('observe.dashboard', {
+        subCategory: categoryWithSubCategory.children[0].id
+      });
+    }
   }
 
   getSubcategoryCount(data) {
