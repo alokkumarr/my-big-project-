@@ -73,7 +73,7 @@ const getChartSettingsRadio = (axis, name) => {
 };
 
 const getChartSettingsCheckBox = name => {
-  return element(by.xpath(`//md-checkbox[@ng-model="attr.checked"]/*/span[text()="${name}"]/parent::*/preceding-sibling::*`));
+  return element(by.xpath(`//md-checkbox[@ng-model="attr.checked"]/descendant::*[contains(text(),'${name}')]/parent::*`));
 };
 
 const openFiltersBtn = element(by.css('button[ng-click="$ctrl.openFiltersModal($event)"]'));
