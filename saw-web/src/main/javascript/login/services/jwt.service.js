@@ -200,8 +200,3 @@ export class JwtService {
     return 0;
   }
 }
-
-export function JwtServiceFactory($window, AppConfig) {
-  'ngInject';
-  return new JwtService($window, AppConfig);
-}

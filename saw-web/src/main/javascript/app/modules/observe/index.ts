@@ -12,7 +12,7 @@ import { i18nConfig } from './i18n';
 
 import { MaterialModule } from '../../material.module';
 
-import { jwtServiceProvider } from '../../../login/services/ajs-login-providers';
+import { jwtServiceProvider, userServiceProvider } from '../../../login/services/ajs-login-providers';
 import {
   analyzeServiceProvider,
   chartServiceProvider,
@@ -29,6 +29,7 @@ import { ObserveService } from './services/observe.service';
 
 import { AddTokenInterceptor } from './services/add-token.interceptor';
 import { HandleErrorInterceptor } from './services/handle-error.interceptor';
+import { RefreshTokenInterceptor } from './services/refresh-token.interceptor';
 
 import { ChartComponent } from '../../common/components/charts/chart.component';
 
@@ -82,6 +83,7 @@ const components = [
     { provide: HTTP_INTERCEPTORS, useClass: HandleErrorInterceptor, multi: true },
     ObserveService,
     jwtServiceProvider,
+    userServiceProvider,
     analyzeServiceProvider,
     menuServiceProvider,
     componentHandlerProvider,

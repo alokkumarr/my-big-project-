@@ -20,8 +20,8 @@ import {themeConfig} from './theme';
 import {runConfig} from './run';
 
 import {AuthServiceFactory} from './services/auth.service';
-import {UserServiceFactory} from './services/user.service';
-import {JwtServiceFactory} from './services/jwt.service';
+import {UserService} from './services/user.service';
+import {JwtService} from './services/jwt.service';
 
 import {LayoutContentComponent, LayoutFooterComponent} from './layout';
 
@@ -43,8 +43,8 @@ angular
   .run(runConfig)
   .value('AppConfig', AppConfig)
   .factory('AuthService', AuthServiceFactory)
-  .factory('UserService', UserServiceFactory)
-  .factory('JwtService', JwtServiceFactory)
+  .service('UserService', UserService)
+  .service('JwtService', JwtService)
   .component('layoutContent', LayoutContentComponent)
   .component('layoutFooter', LayoutFooterComponent)
   .component('passwordChangeComponent', PasswordChangeComponent)
