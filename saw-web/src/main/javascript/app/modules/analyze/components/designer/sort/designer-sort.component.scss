@@ -28,7 +28,7 @@ designer-sort {
     cursor: move;
     font-size: 14px;
     margin-top: 3px;
-    border: solid 1px $primary-grey-g2;
+    border: solid 1px $primary-grey-g1;
     border-radius: 2px;
     padding: 5px;
     min-height: 40px;
@@ -37,7 +37,7 @@ designer-sort {
   .sorted-field__remove-button__container {
     padding-left: 4px;
     margin-left: 10px;
-    border-left: 1px solid $primary-grey-g2;
+    border-left: 1px solid $primary-grey-g1;
   }
 
   .sorted-field__remove-button__icon {
@@ -45,7 +45,7 @@ designer-sort {
   }
 
   .sort-divider {
-    border-left: 1px solid $primary-grey-g2;
+    border-left: 1px solid $primary-grey-g1;
     margin: 23px 15px 0;
   }
 

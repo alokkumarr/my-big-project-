@@ -5,7 +5,7 @@
         fxLayoutAlign="space-between center"
         class="non-ideal-state__container">
     <span i18n class="non-ideal-state__message">
-        Please, select some fields!
+      Add some fields to visualize, by dragging, or using the add button
     </span>
     <mat-icon class="non-ideal-state__icon" fontIcon="icon-pivot"></mat-icon>
   </div>
@@ -15,12 +15,14 @@
        fxLayoutAlign="space-between center"
        class="non-ideal-state__container">
       <span class="non-ideal-state__message" i18n>
-        The data is out of synch with the selected fields.
+        The data is out of synch with the selected fields
       </span>
       <button mat-button
               (click)="requestAction.emit('refresh')"
               color="primary">
-        <ng-container i18n>Refresh data</ng-container>
+        <span i18n
+              class="non-ideal-state__button-text"
+              (click)="requestDataRefresh.emit()">Refresh data</span>
       </button>
       <mat-icon class="non-ideal-state__icon" fontIcon="icon-pivot"></mat-icon>
   </div>
@@ -29,7 +31,16 @@
     loading
   </div>
 
-  <pivot-grid *ngSwitchDefault
+  <div *ngSwitchCase="DesignerStates.SELECTION_WITH_NO_DATA"
+       fxLayout="column"
+       fxLayoutAlign="space-between center"
+       class="non-ideal-state__container">
+    <span class="non-ideal-state__message" i18n>
+      There is no data for the fields selected
+    </span>
+  </div>
+
+  <pivot-grid *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA"
               [fields]="artifactColumns | artifactColumns2PivotFields"
               [data]="data"
               [updater]="updater"

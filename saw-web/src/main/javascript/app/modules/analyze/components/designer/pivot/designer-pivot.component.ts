@@ -42,6 +42,7 @@ require('./designer-pivot.component.scss');
   template
 })
 export class DesignerPivotComponent {
+  @Output() requestDataRefresh: EventEmitter<null> = new EventEmitter();
   @Input() artifactColumns: ArtifactColumns;
   @Input() data: any;
   @Input() designerState: DesignerStates;

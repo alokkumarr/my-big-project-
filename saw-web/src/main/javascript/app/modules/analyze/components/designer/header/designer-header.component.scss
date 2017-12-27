@@ -5,6 +5,12 @@ designer-header {
 
   .header__container {
     height: 100%;
+
+    button {
+      line-height: 32px;
+      margin-right: 5px;
+      margin-left: 5px;
+    }
   }
 
   .header__name {

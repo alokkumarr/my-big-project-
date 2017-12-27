@@ -5,23 +5,33 @@ designer-settings-single {
     overflow: hidden;
     background-color: white;
     display: grid;
-    padding-left: 10px;
+    padding: 0 10px;
     height: 100%;
     grid-template:
-      "filters" 100px
+      "filters" 85px
       "unselected-fields" 1fr
       "selected-fields" 1fr
       / 100%;
   }
 
   .settings__filters {
-    grid-area: filters;
+    .mat-form-field-infix {
+      border: 0;
+    }
   }
 
   .settings__unselected-fields {
     grid-area: unselected-fields;
     overflow-x: hidden;
     overflow-y: auto;
+  }
+
+  .settings__selected-fields {
+    grid-area: selected-fields;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-top: 1px solid $primary-grey-g1;
+    margin-top: 10px;
   }
 
   .settings__list-item {
@@ -51,11 +61,5 @@ designer-settings-single {
       margin-left: 10px;
       color: $primary-grey-g3;
     }
-  }
-
-  .settings__selected-fields {
-    grid-area: selected-fields;
-    overflow-x: hidden;
-    overflow-y: auto;
   }
 }

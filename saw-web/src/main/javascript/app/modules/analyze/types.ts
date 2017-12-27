@@ -42,7 +42,7 @@ export type AnalysisDialogData = {
   analysis?: Analysis
 };
 
-export type DesignerToolbarAciton = 'description' | 'sort' | 'preview' | 'filter' | 'refresh';
+export type DesignerToolbarAciton = 'description' | 'sort' | 'preview' | 'filter' | 'save';
 export interface IToolbarActionData {
   action: DesignerToolbarAciton;
   artifactColumns?: ArtifactColumns;

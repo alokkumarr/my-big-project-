@@ -15,7 +15,6 @@ require('./designer-toolbar.component.scss');
   template
 })
 export class DesignerToolbarComponent {
-  @Input() isDataOutOfSynch: boolean;
   @Output() requestAction: EventEmitter<DesignerToolbarAciton> = new EventEmitter();
 
 

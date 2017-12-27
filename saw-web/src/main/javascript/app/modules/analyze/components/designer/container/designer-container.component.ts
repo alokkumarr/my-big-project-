@@ -47,7 +47,6 @@ export class DesignerContainerComponent {
   @Input() public designerMode: DesignerMode;
   @Output() public onBack: EventEmitter<any> = new EventEmitter();
   public isInDraftMode: boolean = false;
-  public isDataOutOfSynch: boolean = false;
   public designerState: DesignerStates;
   public DesignerStates = DesignerStates;
   public firstArtifactColumns: ArtifactColumns = [];
@@ -76,9 +75,6 @@ export class DesignerContainerComponent {
 
   onToolbarAction(action: DesignerToolbarAciton) {
     switch (action) {
-    case 'refresh':
-      this.requestData();
-      break;
     case 'sort':
       this._analyzeDialogService.openSortDialog(this.sorts, this.firstArtifactColumns)
         .afterClosed().subscribe((result) => {
@@ -108,7 +104,6 @@ export class DesignerContainerComponent {
           this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
         } else {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
-          this.isDataOutOfSynch = false;
           this.data = this.parseData(data.data, this.analysis.sqlBuilder);
         }
       }, err => {
@@ -150,7 +145,6 @@ export class DesignerContainerComponent {
   }
 
   onSettingsChange() {
-    this.isDataOutOfSynch = true;
     this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
     this.firstArtifactColumns = this.getFirstArtifactColumns();
     this.cleanSorts();

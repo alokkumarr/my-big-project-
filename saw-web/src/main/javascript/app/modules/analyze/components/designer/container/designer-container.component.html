@@ -2,13 +2,8 @@
                  [analysis]="analysis"
                  [isInDraftMode]="isInDraftMode"
                  (onBack)="onBack.emit()"
-                 (onSave)="onSave()">
+                 (requestAction)="onToolbarAction($event)">
 </designer-header>
-
-<designer-toolbar class="designer__toolbar"
-                  (requestAction)="onToolbarAction($event)"
-                  [isDataOutOfSynch]="isDataOutOfSynch">
-</designer-toolbar>
 
 <designer-settings-single class="designer__data-settings"
                    (settingsChange)="onSettingsChange()"
@@ -16,6 +11,7 @@
 </designer-settings-single>
 
 <designer-pivot class="designer__main"
+                (requestDataRefresh)="requestData()"
                 [data]="data"
                 [artifactColumns]="firstArtifactColumns"
                 [designerState]="designerState">
