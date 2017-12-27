@@ -11,6 +11,7 @@ import * as forEach from 'lodash/forEach';
 import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as get from 'lodash/get';
+import * as clone from 'lodash/clone';
 import * as isArray from 'lodash/isArray';
 import {globalChartOptions, chartOptions, stockChartOptions} from './default-chart-options';
 import * as isUndefined from 'lodash/isUndefined';
@@ -27,7 +28,7 @@ export const UPDATE_PATHS = {
 export class ChartComponent {
   @Input() updater: any;
   @Input() options: any;
-  @Input() isStockChart: any;
+  @Input() isStockChart: boolean;
   @ViewChild('container') container: ElementRef;
 
   private highcharts: any = Highcharts;
@@ -36,6 +37,8 @@ export class ChartComponent {
   private config: any = {};
   private stockConfig: any = {};
   private subscription: any;
+  private chartSeriesData: any = {};
+  private chartXData: any = {};
 
   constructor() {
     this.highcharts.setOptions(globalChartOptions);
@@ -70,7 +73,14 @@ export class ChartComponent {
       // Not using chart.update due to a bug with navigation
       // update and bar styles.
       if (this.isStockChart) {
+        // Fix (L-77,78,80,81,82) --- Highstocks API manipulating external config object, setting series and categories data to NULL
+        // https://forum.highcharts.com/highstock-usage/creating-a-chart-manipulates-external-options-object-t15255/#p81794
+        this.chartSeriesData = clone(this.config.series);
+        this.chartXData = clone(this.config.xAxis);
         this.chart = this.highcharts.stockChart(this.container.nativeElement, this.config);
+        this.config.series = clone(this.chartSeriesData);
+        this.config.xAxis = clone(this.chartXData);
+        this.chartSeriesData = this.chartXData = {};
       } else {
         this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
       }
