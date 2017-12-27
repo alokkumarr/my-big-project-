@@ -1,12 +1,11 @@
 declare function require(string): string;
 
 import { Inject, OnInit } from '@angular/core';
-import { MdDialog, MdIconRegistry } from '@angular/material';
+import { MdIconRegistry } from '@angular/material';
 
 import * as forEach from 'lodash/forEach';
 import * as map from 'lodash/map';
 
-import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.component';
 import { ObserveService } from '../../services/observe.service';
 import { MenuService } from '../../../../common/services/menu.service';
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
@@ -30,7 +29,7 @@ import { Component } from '@angular/core';
 })
 export class ObservePageComponent implements OnInit {
 
-  constructor(public dialog: MdDialog,
+  constructor(
     private iconRegistry: MdIconRegistry,
     private analyze: AnalyzeService,
     private menu: MenuService,
@@ -41,27 +40,8 @@ export class ObservePageComponent implements OnInit {
     this.iconRegistry.setDefaultFontSetClass('icomoon');
   }
 
-  createDashboard() {
-    this.dialog.open(CreateDashboardComponent, {
-      panelClass: 'full-screen-dialog'
-    });
-  }
 
   ngOnInit() {
-    const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
-
-    // const data = [
-    //   {
-    //     id: 1,
-    //     name: 'My Dashboards',
-    //     children: [
-    //       { id: 2, name: 'Testing', url: `#!/observe?dashboardId=d8939bf3-d8f4-4ee7-89c4-f2a4fd4abca9::PortalDataSet::1513945502617`}
-    //     ]
-    //   }
-    // ];
-
-    // leftSideNav.update(data, 'OBSERVE');
-
     this.headerProgress.show();
 
     /* Needed to get the analyze service working correctly */
@@ -73,24 +53,56 @@ export class ObservePageComponent implements OnInit {
     this.menu.getMenu('OBSERVE')
       .then(data => {
 
+        let count = this.getSubcategoryCount(data);
         forEach(data, category => {
-          this.observe.getDashboardsForCategory(category.id).subscribe((dashboards: Array<Dashboard>) => {
-            category.children = category.children || [];
+          forEach(category.children || [], subCategory => {
+            this.observe.getDashboardsForCategory(subCategory.id).subscribe((dashboards: Array<Dashboard>) => {
+              subCategory.children = subCategory.children || [];
 
-            category.children = category.children.concat(map(dashboards, dashboard => ({
-              id: dashboard.entityId,
-              name: dashboard.name,
-              url: `#!/observe/${dashboard.entityId}`,
-              data: dashboard
-            })));
+              subCategory.children = subCategory.children.concat(map(dashboards, dashboard => ({
+                id: dashboard.entityId,
+                name: dashboard.name,
+                url: `#!/observe/${dashboard.entityId}`,
+                data: dashboard
+              })));
 
-            leftSideNav.update(data, 'OBSERVE');
-            this.headerProgress.hide();
+              if(--count <= 0) {
+                this.updateSidebar(data);
+              }
+            }, error => {
+              if(--count <= 0) {
+                this.updateSidebar(data);
+              }
+            });
           });
         });
 
       });
   }
 
+  updateSidebar(data) {
+    const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
 
+    // const data = [
+    //   {
+    //     id: 1,
+    //     name: 'My Dashboards',
+    //     children: [
+    //       { id: 2, name: 'Testing', url: `#!/observe/d8939bf3-d8f4-4ee7-89c4-f2a4fd4abca9::PortalDataSet::1513945502617`}
+    //     ]
+    //   }
+    // ];
+
+    leftSideNav.update(data, 'OBSERVE');
+    this.headerProgress.hide();
+  }
+
+  getSubcategoryCount(data) {
+    let count = 0;
+    forEach(data, category => {
+      count += category.children.length;
+    });
+
+    return count;
+  }
 };

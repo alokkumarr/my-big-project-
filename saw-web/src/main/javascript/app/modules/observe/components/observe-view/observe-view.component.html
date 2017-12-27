@@ -1,3 +1,10 @@
+<div class="page-header-toolbar">
+  <h2>{{(dashboard ? dashboard.name : '') || 'Observe'}}</h2>
+  <div class="page-header-actions">
+    <button md-raised-button color="primary" (click)="createDashboard()">+ DASHBOARD</button>
+  </div>
+</div>
+
 <div class="page-content">
   <dashboard-grid [model]="dashboard" mode="view" *ngIf="dashboard"></dashboard-grid>
   <span *ngIf="!dashboard">No dashboards available.</span>

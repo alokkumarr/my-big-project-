@@ -17,9 +17,11 @@
     </md-form-field>
 
     <md-select name="dashboardCat" placeholder="Category" [(ngModel)]="dashboard.categoryId">
-      <md-option *ngFor="let category of categories" [value]="category.id">
-        {{ category.name }}
-      </md-option>
+      <md-optgroup *ngFor="let category of categories" [label]="category.name">
+        <md-option *ngFor="let subCategory of category.children" [value]="subCategory.id">
+          {{ subCategory.name }}
+        </md-option>
+      </md-optgroup>
     </md-select>
   </form>
 </div>

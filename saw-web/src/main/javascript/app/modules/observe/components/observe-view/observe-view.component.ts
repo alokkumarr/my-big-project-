@@ -1,8 +1,10 @@
 import { Component, OnInit, Inject } from '@angular/core';
 
+import { MdDialog } from '@angular/material';
 import { Transition } from '@uirouter/angular';
 import { Dashboard } from '../../models/dashboard.interface';
 
+import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.component';
 import { ObserveService } from '../../services/observe.service';
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 
@@ -18,6 +20,7 @@ export class ObserveViewComponent implements OnInit {
   private dashboard: Dashboard;
 
   constructor(
+    public dialog: MdDialog,
     private observe: ObserveService,
     private headerProgress: HeaderProgressService,
     private transition: Transition
@@ -29,6 +32,12 @@ export class ObserveViewComponent implements OnInit {
     if (this.dashboardId) {
       this.loadDashboard();
     }
+  }
+
+  createDashboard() {
+    this.dialog.open(CreateDashboardComponent, {
+      panelClass: 'full-screen-dialog'
+    });
   }
 
   loadDashboard() {

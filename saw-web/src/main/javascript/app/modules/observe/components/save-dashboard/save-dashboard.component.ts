@@ -3,6 +3,8 @@ import { MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
 import { ObserveService } from '../../services/observe.service';
 import { MenuService } from '../../../../common/services/menu.service';
 
+import * as find from 'lodash/find';
+
 const template = require('./save-dashboard.component.html');
 require('./save-dashboard.component.scss');
 
@@ -25,7 +27,13 @@ export class SaveDashboardComponent implements OnInit {
     this.dashboard = this.data.dashboard;
     this.menu.getMenu('OBSERVE').then(data => {
       this.categories = data;
-      this.dashboard.categoryId = this.categories[0].id;
+
+      /* Find the first category that has a subcategory, and assign that subcategory
+         to dashboard */
+      const category = find(this.categories, category => category.children.length > 0);
+      if (category) {
+        this.dashboard.categoryId = this.dashboard.categoryId || category.children[0].id;
+      }
     });
   }
 

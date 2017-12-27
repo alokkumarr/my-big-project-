@@ -48,7 +48,7 @@ export class MenuService {
       };
 
       /* Since there are no subcategories in observe, don't add them if they're there */
-      obj.children = moduleName === SAW_MODULES.OBSERVE.name ? [] : map(feature.productModuleSubFeatures, subfeature => {
+      obj.children = map(feature.productModuleSubFeatures, subfeature => {
         return {
           id: subfeature.prodModFeatureID,
           name: subfeature.prodModFeatureName || subfeature.prodModFeatureDesc,
