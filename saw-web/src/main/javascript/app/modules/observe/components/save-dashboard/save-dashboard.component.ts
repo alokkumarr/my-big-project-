@@ -45,7 +45,7 @@ export class SaveDashboardComponent implements OnInit {
          to dashboard */
       const category = find(this.categories, category => category.children.length > 0);
       if (category) {
-        this.dashboard.categoryId = this.dashboard.categoryId || category.children[0].id;
+        this.dashboard.categoryId = this.dashboard.categoryId || category.children[0].id.toString();
       }
     });
   }

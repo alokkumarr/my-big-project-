@@ -2,7 +2,13 @@
   <h2>{{(dashboard ? dashboard.name : '') || 'Observe'}}</h2>
   <div class="page-header-actions">
     <button md-button
+    color="warn"
+    *ngIf="dashboard"
+    (click)="deleteDashboard()">Delete</button>
+
+    <button md-button
     color="primary"
+    *ngIf="dashboard"
     (click)="editDashboard()">Edit</button>
 
     <button md-raised-button

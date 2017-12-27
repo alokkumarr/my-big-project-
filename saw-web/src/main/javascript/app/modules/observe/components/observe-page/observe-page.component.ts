@@ -53,97 +53,12 @@ export class ObservePageComponent implements OnInit {
         this.analyze.updateMenu(data);
       });
 
-    this.menu.getMenu('OBSERVE')
-      .then(data => {
-
-        let count = this.getSubcategoryCount(data);
-        forEach(data, category => {
-          forEach(category.children || [], subCategory => {
-
-            this.observe.getDashboardsForCategory(subCategory.id).subscribe((dashboards: Array<Dashboard>) => {
-              dashboards = dashboards || [];
-              subCategory.children = subCategory.children || [];
-
-              subCategory.children = subCategory.children.concat(map(dashboards, dashboard => ({
-                id: dashboard.entityId,
-                name: dashboard.name,
-                url: `#!/observe/${subCategory.id}?dashboard=${dashboard.entityId}`,
-                data: dashboard
-              })));
-
-              if(--count <= 0) {
-                this.updateSidebar(data);
-                this.redirectToFirstDash(data);
-              }
-            }, error => {
-              if(--count <= 0) {
-                this.updateSidebar(data);
-                this.redirectToFirstDash(data);
-              }
-            });
-          });
-        });
-
-      });
-  }
-
-  updateSidebar(data) {
-    // const data = [
-    //   {
-    //     id: 1,
-    //     name: 'My Dashboards',
-    //     children: [
-    //       { id: 2, name: 'Testing', url: `#!/observe/d8939bf3-d8f4-4ee7-89c4-f2a4fd4abca9::PortalDataSet::1513945502617`}
-    //     ]
-    //   }
-    // ];
-
-    this.menu.updateMenu(data, 'OBSERVE');
-    this.headerProgress.hide();
-  }
-
-  /* Try to redirect to first dashboard or first empty subcategory */
-  redirectToFirstDash(menu) {
-    /* Only redirect if on root observe state */
-    if (this.router.stateService.current.name !== 'observe') {
-      return;
-    }
-
-    const categoryWithDashboard = find(menu, cat => {
-      const subCategory = find(cat.children, subCat => {
-        return subCat.children.length > 0;
-      });
-
-      return Boolean(subCategory);
-    });
-
-    const categoryWithSubCategory = find(menu, cat => cat.children.length > 0);
-
-    if (categoryWithDashboard) {
-      /* If a dashboard has been found in some category/subcategory, redirect to that */
-      const subCategory = find(categoryWithDashboard.children, subCat => {
-        return subCat.children.length > 0;
-      });
-
-      this.router.stateService.go('observe.dashboard', {
-        subCategory: subCategory.id,
-        dashboard: subCategory.children[0].id
-      });
-
-    } else if (categoryWithSubCategory) {
-      /* Otherwise, redirect to the first empty subcategory available. */
-      this.router.stateService.go('observe.dashboard', {
-        subCategory: categoryWithSubCategory.children[0].id
-      });
-    }
-  }
-
-  getSubcategoryCount(data) {
-    let count = 0;
-    forEach(data, category => {
-      count += category.children.length;
-    });
-
-    return count;
+    this.observe.reloadMenu().subscribe((menu) => {
+      this.headerProgress.hide();
+      this.observe.updateSidebar(menu);
+      this.observe.redirectToFirstDash(menu);
+    }, () => {
+      this.headerProgress.hide();
+    })
   }
 };

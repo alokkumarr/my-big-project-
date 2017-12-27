@@ -1,10 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
+import { UIRouter } from '@uirouter/angular';
 
 import * as fpGet from 'lodash/fp/get';
+import * as forEach from 'lodash/forEach';
+import * as find from 'lodash/find';
+import * as map from 'lodash/map';
 
 import { JwtService } from '../../../../login/services/jwt.service';
+import { MenuService } from '../../../common/services/menu.service';
 import { Dashboard } from '../models/dashboard.interface';
 import APP_CONFIG from '../../../../../../../appConfig';
 
@@ -13,7 +18,10 @@ export class ObserveService {
 
   private api = fpGet('api.url', APP_CONFIG);
 
-  constructor(private http: HttpClient, private jwt: JwtService) {}
+  constructor(private http: HttpClient,
+    private jwt: JwtService,
+    private router: UIRouter,
+    private menu: MenuService) {}
 
   addModelStructure(model) {
     return {
@@ -46,5 +54,107 @@ export class ObserveService {
 
   getDashboardsForCategory(categoryId, userId = this.jwt.getUserId()): Observable<Array<Dashboard>> {
     return this.http.get(`${this.api}/observe/dashboards/${categoryId}/${userId}`).map(fpGet('contents.observe'));
+  }
+
+  deleteDashboard(dashboard: Dashboard) {
+    return this.http.delete(`${this.api}/observe/dashboards/${dashboard.entityId}`).map(fpGet('contents.observe'));
+  }
+
+  reloadMenu() {
+    return Observable.create(observer => {
+      this.menu.getMenu('OBSERVE')
+        .then(data => {
+
+          let count = this.getSubcategoryCount(data);
+          forEach(data, category => {
+            forEach(category.children || [], subCategory => {
+
+              this.getDashboardsForCategory(subCategory.id).subscribe((dashboards: Array<Dashboard>) => {
+                dashboards = dashboards || [];
+                subCategory.children = subCategory.children || [];
+
+                subCategory.children = subCategory.children.concat(map(dashboards, dashboard => ({
+                  id: dashboard.entityId,
+                  name: dashboard.name,
+                  url: `#!/observe/${subCategory.id}?dashboard=${dashboard.entityId}`,
+                  data: dashboard
+                })));
+
+                if(--count <= 0) {
+                  observer.next(data);
+                  observer.complete();
+                }
+              }, error => {
+                if(--count <= 0) {
+                  observer.next(data);
+                  observer.complete();
+                }
+              });
+            });
+          });
+        });
+      return observer;
+    });
+  }
+
+  updateSidebar(data) {
+    // const data = [
+    //   {
+    //     id: 1,
+    //     name: 'My Dashboards',
+    //     children: [
+    //       { id: 2, name: 'Testing', url: `#!/observe/d8939bf3-d8f4-4ee7-89c4-f2a4fd4abca9::PortalDataSet::1513945502617`}
+    //     ]
+    //   }
+    // ];
+
+    this.menu.updateMenu(data, 'OBSERVE');
+  }
+
+  /* Try to redirect to first dashboard or first empty subcategory */
+  redirectToFirstDash(menu, force = false) {
+    /* Only redirect if on root observe state */
+    if (this.router.stateService.current.name !== 'observe' && !force) {
+      return;
+    }
+
+    const categoryWithDashboard = find(menu, cat => {
+      const subCategory = find(cat.children, subCat => {
+        return subCat.children.length > 0;
+      });
+
+      return Boolean(subCategory);
+    });
+
+    const categoryWithSubCategory = find(menu, cat => cat.children.length > 0);
+
+
+    if (categoryWithDashboard) {
+      /* If a dashboard has been found in some category/subcategory, redirect to that */
+      const subCategory = find(categoryWithDashboard.children, subCat => {
+        return subCat.children.length > 0;
+      });
+
+      this.router.stateService.go('observe.dashboard', {
+        subCategory: subCategory.id,
+        dashboard: subCategory.children[0].id
+      });
+
+    } else if (categoryWithSubCategory) {
+      /* Otherwise, redirect to the first empty subcategory available. */
+      this.router.stateService.go('observe.dashboard', {
+        subCategory: categoryWithSubCategory.children[0].id,
+        dashboard: ''
+      });
+    }
+  }
+
+  getSubcategoryCount(data) {
+    let count = 0;
+    forEach(data, category => {
+      count += category.children.length;
+    });
+
+    return count;
   }
 }

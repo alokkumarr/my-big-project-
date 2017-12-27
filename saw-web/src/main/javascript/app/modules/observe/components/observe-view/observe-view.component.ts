@@ -45,6 +45,21 @@ export class ObserveViewComponent implements OnInit {
     }
   }
 
+  deleteDashboard(): void {
+    this.headerProgress.show();
+    this.observe.deleteDashboard(this.dashboard).subscribe(() => {
+      this.observe.reloadMenu().subscribe(menu => {
+        this.headerProgress.hide();
+        this.observe.updateSidebar(menu);
+        this.observe.redirectToFirstDash(menu, true);
+      }, () => {
+        this.headerProgress.hide();
+      });
+    }, () => {
+      this.headerProgress.hide();
+    });
+  }
+
   editDashboard(): void {
     this.dialog.open(CreateDashboardComponent, {
       panelClass: 'full-screen-dialog',
