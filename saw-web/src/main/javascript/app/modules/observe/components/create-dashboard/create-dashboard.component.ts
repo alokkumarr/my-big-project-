@@ -2,7 +2,6 @@ import { Component, Inject, ViewChild } from '@angular/core';
 import { UIRouter } from '@uirouter/angular';
 import { MdDialogRef, MD_DIALOG_DATA, MdDialog } from '@angular/material'; import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { GridsterConfig, GridsterItem, GridsterComponent } from 'angular-gridster2';
 import { MenuService } from '../../../../common/services/menu.service';
 import { Dashboard } from '../../models/dashboard.interface';
 import {
@@ -54,81 +53,35 @@ const MARGIN_BETWEEN_TILES = 10;
   ]
 })
 export class CreateDashboardComponent {
-  @ViewChild('gridster') gridster: GridsterComponent;
-
   public fillState = 'empty';
-  public columns = 4;
-  public options: GridsterConfig;
-  public dashboard: Array<GridsterItem>;
-  public chartUpdater = new BehaviorSubject({});
+  public dashboard: Dashboard;
+  public requester = new BehaviorSubject({});
+  public mode = 'create';
 
   constructor(public dialogRef: MdDialogRef<CreateDashboardComponent>,
     private dialog: MdDialog,
     private router: UIRouter,
     private menu: MenuService,
-    @Inject(MD_DIALOG_DATA) public layout: any
-  ) { }
-
-  checkEmpty() {
-    this.fillState = this.dashboard.length > 0 ? 'filled' : 'empty';
+    @Inject(MD_DIALOG_DATA) public dialogData: any
+  ) {
+    this.dashboard = get(this.dialogData, 'dashboard');
+    this.mode = get(this.dialogData, 'mode');
+    this.checkEmpty(this.dashboard);
   }
 
-  itemChange(item, itemComponent) {
-    setTimeout(() => {
-      if (this.gridster.columns !== this.columns) {
-        this.refreshAllTiles();
-      } else {
-        this.refreshTile(item);
-      }
-      this.columns = this.gridster.columns;
-    }, 500)
+  checkEmpty(dashboard) {
+    this.fillState = get(dashboard, 'tiles', []).length > 0 ? 'filled' : 'empty';
   }
 
-  getDimensions(item) {
-    return {
-      width: this.gridster.curColWidth * item.cols - MARGIN_BETWEEN_TILES,
-      height: this.gridster.curRowHeight * item.rows - MARGIN_BETWEEN_TILES
-    };
-  }
-
-  refreshTile(item) {
-    const dimensions = this.getDimensions(item);
-    item.updater.next([
-      {path: 'chart.height', data: dimensions.height},
-      {path: 'chart.width', data: dimensions.width}
-    ])
-  }
-
-  refreshAllTiles() {
-    forEach(this.dashboard, this.refreshTile.bind(this));
+  onDashboardChange(data) {
+    if (data.changed) {
+      this.checkEmpty(data.dashboard);
+    } else if (data.save) {
+      this.openSaveDialog(data.dashboard);
+    }
   }
 
   ngOnInit() {
-    this.options = {
-      gridType: 'scrollVertical',
-      minCols: this.columns,
-      maxCols: 100,
-      margin: MARGIN_BETWEEN_TILES,
-      minRows: 4,
-      maxRows: 100,
-      itemChangeCallback: this.itemChange.bind(this),
-      draggable: {
-        enabled: true
-      },
-      resizable: {
-        enabled: true
-      }
-    };
-
-    this.dashboard = [];
-  }
-
-  initializeDashboard() {
-  }
-
-  removeTile(item: GridsterItem) {
-    this.dashboard.splice(this.dashboard.indexOf(item), 1);
-    this.checkEmpty();
   }
 
   exitCreator(data) {
@@ -144,33 +97,18 @@ export class CreateDashboardComponent {
       }
 
       const item = { cols: 1, rows: 1, analysis, updater: new BehaviorSubject({}) };
-      this.dashboard.push(item);
-      this.checkEmpty();
+      this.requester.next({action: 'add', data: item})
     });
   }
 
-  prepareDashboardForSave(): Dashboard {
-    return {
-      entityId: '',
-      categoryId: '',
-      name: '',
-      description: '',
-      tiles: map(this.dashboard, tile => ({
-        type: 'analysis',
-        id: get(tile, 'analysis.id', ''),
-        x: tile.x,
-        y: tile.y,
-        cols: tile.cols,
-        rows: tile.rows
-      })),
-      filters: []
-    }
+  saveDashboard() {
+    this.requester.next({action: 'get'});
   }
 
-  openSaveDialog() {
+  openSaveDialog(dashboard: Dashboard) {
     const dialogRef = this.dialog.open(SaveDashboardComponent, {
       data: {
-        dashboard: this.prepareDashboardForSave(),
+        dashboard,
         mode: 'create'
       }
     });

@@ -75,7 +75,7 @@ export class SaveDashboardComponent implements OnInit {
   }
 
   isValid(dashboard) {
-    return Boolean(dashboard.name);
+    return Boolean(dashboard.name) && Boolean(dashboard.categoryId);
   }
 
   saveDashboard() {

@@ -45,9 +45,22 @@ export class ObserveViewComponent implements OnInit {
     }
   }
 
+  editDashboard(): void {
+    this.dialog.open(CreateDashboardComponent, {
+      panelClass: 'full-screen-dialog',
+      data: {
+        dashboard: this.dashboard,
+        mode: 'edit'
+      }
+    });
+  }
+
   createDashboard(): void {
     this.dialog.open(CreateDashboardComponent, {
-      panelClass: 'full-screen-dialog'
+      panelClass: 'full-screen-dialog',
+      data: {
+        mode: 'create'
+      }
     });
   }
 

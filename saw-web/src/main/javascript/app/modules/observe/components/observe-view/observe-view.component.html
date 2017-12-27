@@ -1,6 +1,10 @@
 <div class="page-header-toolbar">
   <h2>{{(dashboard ? dashboard.name : '') || 'Observe'}}</h2>
   <div class="page-header-actions">
+    <button md-button
+    color="primary"
+    (click)="editDashboard()">Edit</button>
+
     <button md-raised-button
     color="primary"
     (click)="createDashboard()">+ DASHBOARD</button>
