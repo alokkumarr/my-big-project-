@@ -57,18 +57,10 @@ export class SaveDashboardComponent implements OnInit {
 
   hasPrivilege(subCategoryId) {
     const moduleName = 'OBSERVE';
-    if (this.data.mode === 'create') {
-      return this.jwt.hasPrivilege('CREATE', {
-        module: moduleName,
-        subCategoryId
-      });
-    } else {
-      return this.jwt.hasPrivilege('EDIT', {
-        module: moduleName,
-        subCategoryId,
-        creatorId: this.dashboard.createdBy
-      });
-    }
+    return this.jwt.hasPrivilege('CREATE', {
+      module: moduleName,
+      subCategoryId
+    });
   }
 
   closeDashboard(data) {
