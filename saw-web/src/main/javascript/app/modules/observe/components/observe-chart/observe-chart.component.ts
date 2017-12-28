@@ -4,7 +4,7 @@ import { ChartService } from '../../../analyze/services/chart.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 import { SortService } from '../../../analyze/services/sort.service';
 import { FilterService } from '../../../analyze/services/filter.service';
-
+import * as isUndefined from 'lodash/isUndefined';
 import * as get from 'lodash/get';
 import * as set from 'lodash/set';
 import * as isEmpty from 'lodash/isEmpty';
@@ -36,6 +36,7 @@ export class ObserveChartComponent {
   public gridData: Array<any>;
   public sorts: Array<any>;
   public filters: Array<any>;
+  public isStockChart: boolean;
 
   constructor(public chartService: ChartService,
     public analyzeService: AnalyzeService,
@@ -45,6 +46,7 @@ export class ObserveChartComponent {
 
   ngOnInit() {
     this.chartOptions = this.chartService.getChartConfigFor(this.analysis.chartType, { legend: this.legend });
+    this.isStockChart = isUndefined(this.analysis.isStockChart) ? false : this.analysis.isStockChart;
   }
 
   ngAfterViewInit() {

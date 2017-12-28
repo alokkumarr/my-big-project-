@@ -181,27 +181,20 @@ export const AnalyzeChartComponent = {
       }
 
       this.startDraftMode();
-      if (this.isStockChart) {
-        this.chartOptions.legend.align = align.align;
-        this.chartOptions.legend.verticalAlign = align.verticalAlign;
-        this.chartOptions.legend.layout = layout.layout;
-        this.onRefreshData();
-      } else {
-        this.updateChart.next([
-          {
-            path: 'legend.align',
-            data: align.align
-          },
-          {
-            path: 'legend.verticalAlign',
-            data: align.verticalAlign
-          },
-          {
-            path: 'legend.layout',
-            data: layout.layout
-          }
-        ]);
-      }
+      this.updateChart.next([
+        {
+          path: 'legend.align',
+          data: align.align
+        },
+        {
+          path: 'legend.verticalAlign',
+          data: align.verticalAlign
+        },
+        {
+          path: 'legend.layout',
+          data: layout.layout
+        }
+      ]);
     }
 
     updateLabelOptions() {

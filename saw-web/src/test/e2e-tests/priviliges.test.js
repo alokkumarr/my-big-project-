@@ -2,11 +2,11 @@
   Created by Alex
  */
 
-const login = require('../javascript/pages/common/login.po.js');
-const analyze = require('../javascript/pages/common/analyzePage.po.js');
-const analyzePage = require('../javascript/pages/common/analyzePage.po.js');
+const login = require('../javascript/pages/loginPage.po.js');
+const analyze = require('../javascript/pages/analyzePage.po.js');
+const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const homePage = require('../javascript/pages/homePage.po.js');
-const executedAnalysis = require('../javascript/pages/common/executedAlaysis.po');
+const executedAnalysis = require('../javascript/pages/savedAlaysisPage.po');
 const protractor = require('protractor');
 const ec = protractor.ExpectedConditions;
 const commonFunctions = require('../javascript/helpers/commonFunctions');

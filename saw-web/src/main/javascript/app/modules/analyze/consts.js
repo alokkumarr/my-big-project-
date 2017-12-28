@@ -78,7 +78,7 @@ export const COMBO_TYPES = [{
 }, {
   label: 'area',
   value: 'area',
-  icon: 'icon-vert-bar-chart'
+  icon: 'icon-area-chart'
 }];
 
 export const COMBO_TYPES_OBJ = fpPipe(
