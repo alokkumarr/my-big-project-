@@ -1155,6 +1155,11 @@ div.codebold
 	{
 		text-align: center;
 	}
+
+	MadCap|miniTocProxy
+	{
+		list-style-type: disc;
+	}
 }
 
 li.One_Em_After

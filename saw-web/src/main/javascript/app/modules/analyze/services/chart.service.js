@@ -229,6 +229,7 @@ export class ChartService {
     case 'spline':
     case 'stack':
     case 'scatter':
+    case 'tsspline':
     default:
       return config;
     }
@@ -282,16 +283,18 @@ export class ChartService {
     );
   }
 
-  splitToSeriesAndCategories(parsedData, fields, {sorts}) {
+  splitToSeriesAndCategories(parsedData, fields, {sorts}, type) {
     let series = [];
     const categories = {};
     const areMultipleYAxes = fields.y.length > 1;
     const isGrouped = fields.g;
+    const isHighStock = type.substring(0, 2) === 'ts';
 
     const fieldsArray = compact([fields.x, ...fields.y, fields.z, fields.g]);
-    const dateFields = filter(fieldsArray, ({type}) => DATE_TYPES.includes(type));
-    this.formatDatesIfNeeded(parsedData, dateFields);
-
+    if (!isHighStock) {         // check if Highstock timeseries(ts) or Highchart
+      const dateFields = filter(fieldsArray, ({type}) => DATE_TYPES.includes(type));
+      this.formatDatesIfNeeded(parsedData, dateFields);
+    }
     if (areMultipleYAxes) {
       series = this.splitSeriesByYAxes(parsedData, fields);
     } else if (isGrouped) {
@@ -339,7 +342,11 @@ export class ChartService {
         const dataPoint = clone(point);
         forEach(dataPoint, (v, k) => {
           if (this.isCategoryAxis(fields, k)) {
-            dataPoint[k] = indexOf(categories[k], v);
+            if (!isHighStock) {
+              dataPoint[k] = indexOf(categories[k], v);
+            } else {
+              dataPoint[k] = v;
+            }
           }
         });
         return dataPoint;
@@ -363,6 +370,8 @@ export class ChartService {
       return 'spline';
     case 'area':
       return 'areaspline';
+    case 'tsspline':
+      return 'spline';
     default:
       return type;
 
@@ -387,8 +396,7 @@ export class ChartService {
       forEach(parsedData, dataPoint => {
         forEach(dateFields, ({columnName, dateFormat}) => {
           const momentDateFormat = this.getMomentDateFormat(dateFormat);
-          const offset = moment(dataPoint[columnName]).utcOffset();
-          dataPoint[columnName] = moment(dataPoint[columnName]).utcOffset(offset).format(momentDateFormat);
+          dataPoint[columnName] = moment.utc(dataPoint[columnName]).format(momentDateFormat);
         });
       });
     }
@@ -451,7 +459,12 @@ export class ChartService {
 
   splitSeriesByGroup(parsedData, fields) {
     const axesFieldNameMap = this.getAxesFieldNameMap(fields);
-    const comboType = fields.y[0].comboType;
+    let comboType = fields.y[0].comboType;
+    if (angular.isDefined(comboType)) {
+      if (comboType.substring(0, 2) === 'ts') {
+        comboType = comboType.slice(2);
+      }
+    }
 
     return fpPipe(
       fpMap(dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])),
@@ -462,12 +475,12 @@ export class ChartService {
   }
 
   /**
-   * get the map from colmnNames to the axes, or group
+   * Get the map from colmnNames to the axes, or group
    * Ex
    * y -> AVAILABLE_MB
    */
   getAxesFieldNameMap(fields, exclude) {
-    // y axis ommitted because it is added in splitSeriesByYAxes
+    // Y axis ommitted because it is added in splitSeriesByYAxes
     const y = exclude === 'y' ? [] : fields.y;
     const fieldsArray = compact([fields.x, ...y, fields.z, fields.g]);
     return reduce(fieldsArray, (accumulator, field) => {
@@ -488,7 +501,7 @@ export class ChartService {
   isCategoryAxis(fields, key) {
     const dataType = get(fields, `${key}.type`);
     const isAxis = key !== 'g';
-    // strings should be represented as categories in the chart
+    // Strings should be represented as categories in the chart
     /* eslint-disable angular/typecheck-string */
     const isCategoryAxis = isAxis &&
       (dataType === 'string' || dataType === 'String' || DATE_TYPES.includes(dataType));
@@ -603,7 +616,7 @@ export class ChartService {
     const labelOptions = get(opts, 'labelOptions', {enabled: true, value: 'percentage'});
 
     if (!isEmpty(gridData)) {
-      const {series, categories} = this.splitToSeriesAndCategories(gridData, fields, opts);
+      const {series, categories} = this.splitToSeriesAndCategories(gridData, fields, opts, type);
       const {chartSeries} = this.customizeSeriesForChartType(series, type, categories, fields, opts);
 
       forEach(chartSeries, seriesData => {
@@ -689,7 +702,7 @@ export class ChartService {
     });
 
     if (!isEmpty(gridData)) {
-      const {series, categories} = this.splitToSeriesAndCategories(gridData, fields, opts);
+      const {series, categories} = this.splitToSeriesAndCategories(gridData, fields, opts, type);
       changes.push({
         path: 'series',
         data: series
@@ -726,6 +739,7 @@ export class ChartService {
     case 'stack':
     case 'scatter':
     case 'bubble':
+    case 'tsspline':
     default:
       changes = this.getBarChangeConfig(type, settings, fields, gridData, opts);
       break;
@@ -764,13 +778,13 @@ export class ChartService {
       <td>{point.y:,.2f}</td>
     </tr>`;
     const zAxisString = fields.z ?
-    `<tr><th>${fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>` :
-    '';
+      `<tr><th>${fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>` :
+      '';
     const groupString = fields.g ?
-    `<tr><th>Group:</th><td>{point.g}</td></tr>` :
-    '';
+      `<tr><th>Group:</th><td>{point.g}</td></tr>` :
+      '';
 
-    const tooltipObj = {
+    let tooltipObj = {
       useHTML: true,
       headerFormat: `<table> ${xIsString ? xAxisString : ''}`,
       pointFormat: `${xIsNumber ? xAxisString : ''}
@@ -780,6 +794,20 @@ export class ChartService {
       footerFormat: '</table>',
       followPointer: true
     };
+
+    if (type.substring(0, 2) === 'ts') {
+      tooltipObj = {
+        enabled: true,
+        useHTML: true,
+        valueDecimals: 3,
+        split: true,
+        shared: false,
+        pointFormat: `</table> ${yAxisString}
+          ${zAxisString}`,
+        footerFormat: '</table>',
+        followPointer: true
+      };
+    }
 
     changes.push({
       path: 'tooltip',
@@ -809,6 +837,13 @@ export class ChartService {
     ));
   }
 
+  filterDateTypes(attributes) {
+    return filter(attributes, attr => (
+      attr.columnName &&
+      DATE_TYPES.includes(attr.type)
+    ));
+  }
+
   fillSettings(artifacts, model) {
     /* Flatten the artifacts into a single array and sort them */
     const attributes = fpPipe(
@@ -824,7 +859,7 @@ export class ChartService {
     let settingsObj;
     let zaxis;
     const yaxis = this.filterNumberTypes(attributes);
-    const xaxis = attributes;
+    let xaxis = attributes;
     const groupBy = this.filterNonNumberTypes(attributes);
 
     switch (model.chartType) {
@@ -834,6 +869,14 @@ export class ChartService {
         xaxis,
         yaxis,
         zaxis,
+        groupBy
+      };
+      break;
+    case 'tsspline':
+      xaxis = this.filterDateTypes(attributes);
+      settingsObj = {
+        xaxis,
+        yaxis,
         groupBy
       };
       break;

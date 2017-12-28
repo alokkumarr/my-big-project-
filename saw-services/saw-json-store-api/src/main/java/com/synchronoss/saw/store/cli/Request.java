@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.ojai.Document;
 import org.ojai.store.QueryCondition;
 
@@ -48,7 +50,7 @@ import com.synchronoss.saw.store.metastore.PortalDataSetStore;
  */
 public class Request {
 
-    private static final Logger logger = Logger.getLogger(Request.class);
+    private static final Logger logger = LoggerFactory.getLogger(Request.class);
 
     protected JsonElement request;
     private Actions action;
@@ -69,9 +71,10 @@ public class Request {
     {
         jsonParser = new JsonParser();
         request = jsonParser.parse(jStr);
+        
     }
-
-    public String getId() {
+    
+     public String getId() {
       return id;
     }
 
@@ -103,11 +106,17 @@ public class Request {
       this.xdfRoot = xdfRoot;
     }
 
+     public JsonElement getResult() {
+      return result;
+    }
 
+    public void setResult(JsonElement result) {
+      this.result = result;
+    }
 
     public void process(){
         try {
-
+            logger.trace("Actual Request Objects : {}", request.toString());
             if (request.isJsonArray()) {
             JsonArray ja = request.getAsJsonArray();
             ja.forEach( arrayElem -> {
@@ -140,7 +149,7 @@ public class Request {
             logger.info("Start item processing, action: " + action + ", output: " + rFile);
 
             try {
-                if(rFile!=null){
+                if(rFile!=null && !rFile.trim().equals("")){
                 os = HFileOperations.writeToFile(rFile);}
             } catch (FileNotFoundException e1) {
                 logger.error("Could not write response to file: " + rFile, e1);
@@ -320,9 +329,9 @@ public class Request {
             case PortalDataSet:
               PortalDataSetStore ts = new PortalDataSetStore(xdfRoot);
               switch (action){
-                  case create: ts.create(id, item); break;
+                  case create: ts.create(id, src); break;
                   case delete: ts.delete(id); break;
-                  case update: ts.update(id, item); break;
+                  case update: ts.update(id, src); break;
                   case read: result = ts.read(id); break;
                   default:
                       logger.warn("Action is not supported");
@@ -332,7 +341,8 @@ public class Request {
                 logger.error("Not supported category");
                 return;
         }
-        generateResponse("action", null);
+        // This has been commented becuase UI operation for time being does not require to write on the file system
+        //generateResponse("action", null);
     }
 
     private void generateResponse(String scope, Exception e) {
@@ -415,10 +425,11 @@ public class Request {
 
         if (action == Actions.create || action == Actions.update ) {
             JsonElement src0 = item.get("source");
+             // This part of code has been enhanced to support both JSON String & JSONElement
             if (!src0.isJsonObject()) {
-                logger.error("'source' must be valid JSON object");
-                return false;
-            }
+              logger.error("'source' must be valid JSON object");
+              return false; 
+          }
             src = src0.getAsJsonObject();
         }
         return true;
