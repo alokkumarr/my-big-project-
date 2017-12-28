@@ -21,6 +21,7 @@ export class SaveDashboardComponent implements OnInit {
 
   private dashboard: any;
   public categories = [];
+  public showProgress = false;
 
   constructor(private dialogRef: MdDialogRef<SaveDashboardComponent>,
     @Inject(MD_DIALOG_DATA) private data: any,
@@ -82,9 +83,12 @@ export class SaveDashboardComponent implements OnInit {
     if (!this.isValid(this.dashboard)) {
       return;
     }
+    this.showProgress = true;
     this.observe.saveDashboard(this.dashboard).subscribe(data => {
+      this.showProgress = false;
       this.closeDashboard(data);
     }, err => {
+      this.showProgress = false;
     });
   }
 }
