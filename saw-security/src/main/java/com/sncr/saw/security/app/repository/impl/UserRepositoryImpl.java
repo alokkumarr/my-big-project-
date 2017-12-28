@@ -2754,6 +2754,11 @@ public class UserRepositoryImpl implements UserRepository {
 		for (int i = 0; i < categoryCode.length; i++) {
 			featureCode.append(categoryCode[i]);
 		}
+		// SAW-1932 and SAW-1950
+		// adding category code because that will make the feature code unique.
+		logger.info(""+category.getModuleId());
+		featureCode.append(category.getModuleId());
+		logger.info(""+category.getCustomerId());
 		featureCode.append(category.getCustomerId());
 		StringBuffer featureType = new StringBuffer();
 		if (category.isSubCategoryInd()) {
@@ -2790,13 +2795,17 @@ public class UserRepositoryImpl implements UserRepository {
 	public boolean checkCatExists(CategoryDetails category) {
 		Boolean catExists;
 		String sql1 = "SELECT * FROM CUSTOMER_PRODUCT_MODULE_FEATURES "
-				+ " WHERE CUST_PROD_MOD_SYS_ID = ? AND FEATURE_NAME = ? AND CUST_PROD_MOD_FEATURE_SYS_ID != ?";
+				+ " WHERE CUST_PROD_MOD_SYS_ID = ? AND FEATURE_NAME = ? AND CUST_PROD_MOD_FEATURE_SYS_ID != ?"
+				+ " AND CUST_PROD_SYS_ID = ?";
 		try {
+			// SAW-1932 and SAW-1950 fix:
+			// include checking moduleID as well while testing for creating new categories.
 			catExists = jdbcTemplate.query(sql1, new PreparedStatementSetter() {
 				public void setValues(PreparedStatement preparedStatement) throws SQLException {
-					preparedStatement.setLong(1, category.getProductId());
+					preparedStatement.setLong(1, category.getModuleId());
 					preparedStatement.setString(2, category.getCategoryName());
 					preparedStatement.setLong(3, category.getCategoryId());
+					preparedStatement.setLong(4, category.getProductId());
 				}
 			}, new UserRepositoryImpl.CatExistsExtractor());
 		} catch (Exception e) {
