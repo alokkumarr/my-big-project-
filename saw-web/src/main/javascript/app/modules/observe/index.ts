@@ -39,6 +39,7 @@ import { ObserveChartComponent } from './components/observe-chart/observe-chart.
 import { DashboardGridComponent } from './components/dashboard-grid/dashboard-grid.component';
 import { AnalysisChoiceComponent } from './components/analysis-choice/analysis-choice.component';
 import { SaveDashboardComponent } from './components/save-dashboard/save-dashboard.component';
+import { ConfirmDialogComponent } from './components/dialogs/confirm-dialog/confirm-dialog.component';
 import { CreateDashboardComponent } from './components/create-dashboard/create-dashboard.component';
 import { FilterSidenavComponent } from './components/filter-sidenav/filter-sidenav.component';
 import { CheckboxFilterComponent } from './components/checkbox-filter/checkbox-filter.component';
@@ -71,6 +72,7 @@ const components = [
   AnalysisChoiceComponent,
   ObserveChartComponent,
   SaveDashboardComponent,
+  ConfirmDialogComponent,
   ChartComponent
 ];
 

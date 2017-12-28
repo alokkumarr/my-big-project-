@@ -4,6 +4,7 @@ import { MdDialog } from '@angular/material';
 import { Transition } from '@uirouter/angular';
 import { Dashboard } from '../../models/dashboard.interface';
 
+import { ConfirmDialogComponent } from '../dialogs/confirm-dialog/confirm-dialog.component';
 import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.component';
 import { ObserveService } from '../../services/observe.service';
 import { JwtService } from '../../../../../login/services/jwt.service';
@@ -43,6 +44,24 @@ export class ObserveViewComponent implements OnInit {
     if (this.dashboardId) {
       this.loadDashboard();
     }
+  }
+
+  confirmDelete() {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        message: 'Are you sure you want to delete this dashboard?',
+        actionButton: 'Delete',
+        actionColor: 'warn'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: Boolean) => {
+      if (!result) {
+        return;
+      }
+
+      this.deleteDashboard();
+    });
   }
 
   deleteDashboard(): void {
