@@ -3,12 +3,12 @@
   <div class="page-header-actions">
     <button md-button
     color="warn"
-    *ngIf="dashboard"
+    *ngIf="dashboard && privileges.delete"
     (click)="confirmDelete()">Delete</button>
 
     <button md-button
     color="primary"
-    *ngIf="dashboard"
+    *ngIf="dashboard && privileges.edit"
     (click)="editDashboard()">Edit</button>
 
     <button md-raised-button

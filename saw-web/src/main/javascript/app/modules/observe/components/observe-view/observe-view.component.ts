@@ -102,6 +102,7 @@ export class ObserveViewComponent implements OnInit {
     this.headerProgress.show();
     this.observe.getDashboard(this.dashboardId).subscribe(data => {
       this.dashboard = data;
+      this.loadPrivileges();
       this.headerProgress.hide();
     })
   }
