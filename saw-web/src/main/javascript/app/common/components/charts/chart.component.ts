@@ -5,7 +5,8 @@ import {
   ViewChild
  } from '@angular/core';
 
-import * as Highcharts from 'highcharts/highstock';
+import * as Highcharts from 'highcharts/highcharts';
+import * as Highstocks from 'highcharts/highstock';
 import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as forEach from 'lodash/forEach';
 import * as filter from 'lodash/filter';
@@ -31,6 +32,7 @@ export class ChartComponent {
   @ViewChild('container') container: ElementRef;
 
   private highcharts: any = Highcharts;
+  private highstocks: any = Highstocks;
   private chart: any = null;
   private stockChart: any = null;
   private config: any = {};
@@ -45,7 +47,7 @@ export class ChartComponent {
     this.config = defaultsDeep(this.options, chartOptions);
     this.stockConfig = defaultsDeep(this.options, stockChartOptions);
     if (this.isStockChart) {
-      this.chart = this.highcharts.stockChart(this.container.nativeElement, this.stockConfig);
+      this.chart = this.highstocks.stockChart(this.container.nativeElement, this.stockConfig);
     } else {
       this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
     }
@@ -70,7 +72,7 @@ export class ChartComponent {
       // Not using chart.update due to a bug with navigation
       // update and bar styles.
       if (this.isStockChart) {
-        this.chart = this.highcharts.stockChart(this.container.nativeElement, this.config);
+        this.chart = this.highstocks.stockChart(this.container.nativeElement, this.config);
       } else {
         this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
       }
