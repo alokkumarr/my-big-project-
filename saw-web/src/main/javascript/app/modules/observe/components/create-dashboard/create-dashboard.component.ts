@@ -3,6 +3,7 @@ import { UIRouter } from '@uirouter/angular';
 import { MdDialogRef, MD_DIALOG_DATA, MdDialog } from '@angular/material'; import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { MenuService } from '../../../../common/services/menu.service';
+import { ObserveService } from '../../services/observe.service';
 import { Dashboard } from '../../models/dashboard.interface';
 import {
   trigger,
@@ -63,6 +64,7 @@ export class CreateDashboardComponent {
     private dialog: MdDialog,
     private router: UIRouter,
     private menu: MenuService,
+    private observe: ObserveService,
     @Inject(MD_DIALOG_DATA) public dialogData: any
   ) {
     this.dashboard = get(this.dialogData, 'dashboard');
@@ -110,7 +112,7 @@ export class CreateDashboardComponent {
     const dialogRef = this.dialog.open(SaveDashboardComponent, {
       data: {
         dashboard,
-        mode: 'create'
+        mode: this.mode
       }
     });
 
@@ -121,6 +123,8 @@ export class CreateDashboardComponent {
           this.router.stateService.go('observe.dashboard', {
             dashboard: result.entityId,
             subCategory: result.categoryId
+          }, {
+            reload: true
           });
         });
         this.dialogRef.close();
@@ -131,29 +135,8 @@ export class CreateDashboardComponent {
   /* After successful save, update the sidemenu with the dashboard. This saves a network
      request because we already have all the data available to us. */
   updateSideMenu(dashboard: Dashboard) {
-    const menu = this.menu.getCachedMenu('OBSERVE') || [];
-    let subCategory;
-    forEach(menu, category => {
-      subCategory = subCategory || find(category.children, subCat => subCat.id.toString() === dashboard.categoryId.toString());
+    this.observe.reloadMenu().subscribe(menu => {
+      this.observe.updateSidebar(menu);
     });
-
-    if (subCategory) {
-      subCategory.children = subCategory.children || [];
-      const menuEntry = {
-        id: dashboard.entityId,
-        name: dashboard.name,
-        url: `#!/observe/${dashboard.categoryId}?dashboard=${dashboard.entityId}`,
-        data: dashboard
-      }
-      const existing = findIndex(subCategory.children, dash => dash.id === dashboard.entityId);
-
-      if (existing >= 0) {
-        subCategory.children.splice(existing, 1, menuEntry);
-      } else {
-        subCategory.children.push(menuEntry);
-      }
-    }
-
-    this.menu.updateMenu(menu, 'OBSERVE');
   }
 }
