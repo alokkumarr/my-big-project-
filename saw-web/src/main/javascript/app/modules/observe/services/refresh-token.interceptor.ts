@@ -26,7 +26,6 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
         const refreshRegexp = new RegExp(this.user.refreshTokenEndpoint);
 
         const tokenMessageRegex = /token has expired|invalid token/i;
-        this.user.refreshAccessToken(console.log.bind(console));
 
         if (!(error.status === 401 && tokenMessageRegex.test(errorMessage))) {
           return Observable.throw(error);
@@ -44,23 +43,25 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
         return Observable.create(observer => {
           refreshRequest.then(data => {
             refreshRequest = null;
-            const newRequest: HttpRequest<any> = req.clone({headers: req.headers.set('Authorization', `Bearer ${data}`)});
-            const http = this.injector.get(HttpClient);
-            http.request(newRequest).subscribe(result => {
-              observer.next(result);
-              observer.complete();
-            }, error => {
-              observer.error(error);
-            });
+            observer.next(data);
+            observer.complete();
           }, error => {
-            refreshRequest = null;
-            this.jwt.destroy();
             observer.error(error);
           });
 
           return observer;
+        }).flatMap(() => {
+          const token = this.jwt.getTokenObj();
+          if (token && this.jwt.isValid(token)) {
+            const newRequest: HttpRequest<any> = req.clone({headers: req.headers.set('Authorization', `Bearer ${this.jwt.getAccessToken()}`)});
+            return next.handle(newRequest);
+          } else {
+            /* If token wasn't refreshed successfully, delete the token and reload */
+            this.jwt.destroy();
+            window.location.reload();
+            return Observable.throw(new Error('Token can\'t be refreshed'));
+          }
         });
-
         // return Observable.throw(error);
       }) as any;
   }

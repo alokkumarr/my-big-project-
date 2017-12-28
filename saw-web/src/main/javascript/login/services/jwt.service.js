@@ -65,6 +65,9 @@ export class JwtService {
   }
 
   parseJWT(jwt) {
+    if (!jwt) {
+      return null;
+    }
     const base64Url = jwt.split('.')[1];
     const base64 = base64Url.replace('-', '+').replace('_', '/');
     return angular.fromJson(this._$window.atob(base64));

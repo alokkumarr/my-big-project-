@@ -83,6 +83,7 @@ const components = [
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: HandleErrorInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: RefreshTokenInterceptor, multi: true },
     ObserveService,
     jwtServiceProvider,
     userServiceProvider,
