@@ -149,6 +149,10 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
       categoryId: get(this.model, 'categoryId', ''),
       name: get(this.model, 'name', ''),
       description: get(this.model, 'description', ''),
+      createdBy: get(this.model, 'createdBy', ''),
+      createdAt: get(this.model, 'createdAt', ''),
+      updatedBy: get(this.model, 'updatedBy', ''),
+      updatedAt: get(this.model, 'updatedAt', ''),
       tiles: map(this.dashboard, tile => ({
         type: 'analysis',
         id: get(tile, 'analysis.id', ''),
