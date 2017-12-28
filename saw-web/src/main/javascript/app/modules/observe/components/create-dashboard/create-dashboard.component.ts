@@ -16,6 +16,7 @@ import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
+import * as findIndex from 'lodash/findIndex';
 
 import { AnalysisChoiceComponent } from '../analysis-choice/analysis-choice.component';
 
@@ -138,12 +139,19 @@ export class CreateDashboardComponent {
 
     if (subCategory) {
       subCategory.children = subCategory.children || [];
-      subCategory.children.push({
+      const menuEntry = {
         id: dashboard.entityId,
         name: dashboard.name,
         url: `#!/observe/${dashboard.categoryId}?dashboard=${dashboard.entityId}`,
         data: dashboard
-      });
+      }
+      const existing = findIndex(subCategory.children, dash => dash.id === dashboard.entityId);
+
+      if (existing >= 0) {
+        subCategory.children.splice(existing, 1, menuEntry);
+      } else {
+        subCategory.children.push(menuEntry);
+      }
     }
 
     this.menu.updateMenu(menu, 'OBSERVE');

@@ -38,7 +38,7 @@ export class ObserveService {
     let method = 'post', endpoint = 'create';
     if (fpGet('entityId', model)) {
       method = 'put';
-      endpoint = model.entityId
+      endpoint = `update/${model.entityId}`;
       model.updatedBy = this.jwt.getUserId();
     } else {
       // Log the creator id if creating for first time
