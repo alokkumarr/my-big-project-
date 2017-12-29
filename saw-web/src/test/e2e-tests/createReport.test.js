@@ -1,12 +1,10 @@
-const login = require('../javascript/pages/loginPage.po.js');
-const sidenav = require('../javascript/pages/components/sidenav.co.js');
-const analyze = require('../javascript/pages/analyzePage.po.js');
+const loginPage = require('../javascript/pages/loginPage.po.js');
+const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const protractor = require('protractor');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 
-describe('create a new report type analysis: createReport.test.js', () => {
-  let categoryName;
-  const reportDesigner = analyze.designerDialog.report;
+describe('Create report type analysis: createReport.test.js', () => {
+  const reportDesigner = analyzePage.designerDialog.report;
   const reportName = `e2e report ${(new Date()).toString()}`;
   const reportDescription = 'e2e report description';
   const tables = [{
@@ -36,51 +34,41 @@ describe('create a new report type analysis: createReport.test.js', () => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
   });
 
-  afterAll(function() {
+  beforeEach(function (done) {
+    setTimeout(function () {
+      expect(browser.getCurrentUrl()).toContain('/login');
+      done();
+    }, 1000)
+  });
+
+  afterEach(function (done) {
+    setTimeout(function () {
+      analyzePage.main.doAccountAction('logout');
+      done();
+    }, 1000)
+  });
+
+  afterAll(function () {
     browser.executeScript('window.sessionStorage.clear();');
     browser.executeScript('window.localStorage.clear();');
   });
 
-  it('login as admin', () => {
-    expect(browser.getCurrentUrl()).toContain('/login');
-    login.loginAs('admin');
-  });
+  it('Should apply filter to Report', () => {
+    loginPage.loginAs('admin');
 
-  //Obsolete. Now menu opens automatically with first category expanded
-  /* it('should open the sidenav menu and go to first category', () => {
-    commonFunctions.waitFor.elementToBeClickable(sidenav.menuBtn);
-    sidenav.menuBtn.click();
-    sidenav.publicCategoriesToggle.click();
-    categoryName = sidenav.firstPublicCategory.getText();
-    sidenav.firstPublicCategory.click();
-    expect(analyze.main.categoryTitle.getText()).toEqual(categoryName);
-  }); */
+    // Switch to Card View
+    commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
+    analyzePage.analysisElems.cardView.click();
 
-  it('should display list view by default', () => {
-    categoryName = sidenav.firstPublicCategory.getText();
-    analyze.validateListView();
-  });
-
-  it('should switch to card view', () => {
-    commonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
-    analyze.analysisElems.cardView.click();
-  });
-
-  it('should open the new Analysis dialog', () => {
-    commonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.addAnalysisBtn);
-    analyze.analysisElems.addAnalysisBtn.click();
-    analyze.validateNewAnalyze();
-  });
-
-  it('should select pivot type and proceed', () => {
-    const newDialog = analyze.newDialog;
+    // Create Report
+    commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.addAnalysisBtn);
+    analyzePage.analysisElems.addAnalysisBtn.click();
+    const newDialog = analyzePage.newDialog;
     newDialog.getMetric(metric).click();
     newDialog.getMethod(method).click();
     newDialog.createBtn.click();
-    expect(reportDesigner.title.isPresent()).toBe(true);
-  });
 
-  it('should select fields and refresh data', () => {
+    // Select fields and refresh
     tables.forEach(table => {
       table.fields.forEach(field => {
         reportDesigner.getReportFieldCheckbox(table.name, field).click();
@@ -104,10 +92,9 @@ describe('create a new report type analysis: createReport.test.js', () => {
     ).toBe(true);*/
 
     reportDesigner.refreshBtn.click();
-  });
 
-  it('should apply filters', () => {
-    const filters = analyze.filtersDialog;
+    // Should apply filters
+    const filters = analyzePage.filtersDialog;
     const filterAC = filters.getFilterAutocomplete(0);
     const stringFilterInput = filters.getStringFilterInput(0);
     const fieldName = tables[0].fields[0];
@@ -122,40 +109,33 @@ describe('create a new report type analysis: createReport.test.js', () => {
     const appliedFilter = filters.getAppliedFilter(fieldName);
     commonFunctions.waitFor.elementToBePresent(appliedFilter);
     expect(appliedFilter.isPresent()).toBe(true);
-  });
 
-  it('should attempt to save the report', () => {
-    const save = analyze.saveDialog;
-    const designer = analyze.designerDialog;
+    // Save
+    const save = analyzePage.saveDialog;
+    const designer = analyzePage.designerDialog;
     commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
     // browser.actions().mouseMove(designer.saveBtn).click();
     designer.saveBtn.click();
 
     commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
     expect(designer.saveDialog).toBeTruthy();
-    expect(save.selectedCategory.getText()).toEqual(categoryName);
 
     save.nameInput.clear().sendKeys(reportName);
     save.descriptionInput.clear().sendKeys(reportDescription);
     save.saveBtn.click();
 
-    const createdAnalysis = analyze.main.getCardTitle(reportName);
+    const createdAnalysis = analyzePage.main.getCardTitle(reportName);
 
     commonFunctions.waitFor.elementToBePresent(createdAnalysis)
       .then(() => expect(createdAnalysis.isPresent()).toBe(true));
-  });
 
-  it('should delete the created analysis', () => {
-    const main = analyze.main;
+    // Delete
+    const main = analyzePage.main;
     main.getAnalysisCards(reportName).count()
       .then(count => {
         main.doAnalysisAction(reportName, 'delete');
         main.confirmDeleteBtn.click();
         expect(main.getAnalysisCards(reportName).count()).toBe(count - 1);
       });
-  });
-
-  it('should log out', () => {
-    analyze.main.doAccountAction('logout');
   });
 });

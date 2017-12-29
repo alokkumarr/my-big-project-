@@ -3,10 +3,13 @@ const SpecReporter = require('jasmine-spec-reporter').SpecReporter;
 const browserstack = require('browserstack-local');
 
 exports.config = {
-  seleniumAddress: 'http://hub-cloud.browserstack.com/wd/hub',
-  //seleniumAddress: 'http://localhost:4444/wd/hub',
-  //directConnect: true,
+  //TODO Setup config depending on environment
+  //seleniumAddress: 'http://hub-cloud.browserstack.com/wd/hub', // enable for loal browserstack testing
+  seleniumAddress: 'http://localhost:4444/wd/hub', // enable for regular testing
+  directConnect: true, // enable for regular testing
   framework: 'jasmine2',
+  getPageTimeout: 5000000, // enable for regular testing
+  allScriptsTimeout: 5000000, // enable for regular testing
   capabilities: {
     'browserstack.user': 'alexanderkrivoro4',
     'browserstack.key': 'rwCmGzyDLyVrjEkmXiUW',
@@ -17,25 +20,44 @@ exports.config = {
     'os': 'OS X',
     'os_version': 'High Sierra',
     'resolution': '1920x1080',
+
+    // enable for regular testing
+    chromeOptions: {
+      args: [
+        'disable-extensions',
+        'disable-web-security',
+        '--start-fullscreen', // enable for Mac OS
+        "--headless",
+        "--disable-gpu",
+        "--window-size=2880,1800"
+      ]
+    }
+  },
+  jasmineNodeOpts: {
+    isVerbose: true,
+    showTiming: true,
+    includeStackTrace: true,
+    realtimeFailure: true,
+    showColors: true
   },
   suites: {
-    authentication: [
-      webpackHelper.root('src/test/e2e-tests/login.test.js')
+    charts: [
+      webpackHelper.root('src/test/e2e-tests/charts/applyFiltersToCharts.js'),
+      webpackHelper.root('src/test/e2e-tests/charts/createAndDeleteCharts.test.js'),
+      webpackHelper.root('src/test/e2e-tests/charts/previewForCharts.test.js')
     ],
-    analyses: [
-      webpackHelper.root('src/test/e2e-tests/priviliges.test.js'),
-      webpackHelper.root('src/test/e2e-tests/goToAnalyze.test.js'),
-      webpackHelper.root('src/test/e2e-tests/createChart.test.js'),
+    root: [
+      webpackHelper.root('src/test/e2e-tests/analyze.test.js'),
       webpackHelper.root('src/test/e2e-tests/createPivot.test.js'),
       webpackHelper.root('src/test/e2e-tests/createReport.test.js'),
-      webpackHelper.root('src/test/e2e-tests/charts/createAndDeleteCharts.test.js')
-      //webpackHelper.root('src/test/javascript/e2e/spec/analyses.test.js'), // obsolete
       //webpackHelper.root('src/test/e2e-tests/debug.test.js') // for testing purposes
+      webpackHelper.root('src/test/e2e-tests/login.test.js'),
+      webpackHelper.root('src/test/e2e-tests/priviliges.test.js'),
     ]
   },
 
   onPrepare() {
-    launchLocalBrowserStack();
+    //launchLocalBrowserStack(); // enable for loal browserstack testing
 
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: true,
@@ -43,23 +65,24 @@ exports.config = {
       displaySuiteNumber: true
     }));
 
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
-    jasmine.getEnv().defaultTimeoutInterval = 6000000; //another option if above doesn't work
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000000;
+    jasmine.getEnv().defaultTimeoutInterval = 5000000; //another option if above doesn't work
 
-    browser.manage().timeouts().pageLoadTimeout(30000);
+    browser.manage().timeouts().pageLoadTimeout(5000000);
     browser.manage().timeouts().implicitlyWait(10000);
     //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.driver.get('http://localhost:3000');
 
-    /*return browser.driver.wait(() => {
+    // enable for regular testing
+    return browser.driver.wait(() => {
       return browser.driver.getCurrentUrl().then(url => {
         return /login/.test(url);
       });
-    }, 30000);*/
+    }, 30000);
   },
 
   onComplete() {
-    stopLocalBrowserStack();
+    //stopLocalBrowserStack(); // enable for loal browserstack testing
   }
 };
 

@@ -2,6 +2,7 @@ const header = require('../javascript/pages/components/header.co.js');
 const sidenav = require('../javascript/pages/components/sidenav.co.js');
 const analyze = require('../javascript/pages/analyzePage.po.js');
 
+// Obsolete. Do not delete. Use some in future
 describe('Analyses Tests', () => {
   it('should navigate to Analyze page', () => {
     header.headerElements.analyzeBtn.click();
