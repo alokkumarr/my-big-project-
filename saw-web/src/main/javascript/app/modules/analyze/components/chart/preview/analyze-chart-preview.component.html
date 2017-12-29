@@ -17,7 +17,8 @@
       <div layout="row">
         <chart style="width: calc(100% - 20px); margin: 0 10px"
                [options]="$ctrl.chartOptions"
-               [updater]="$ctrl.chartUpdater">
+               [updater]="$ctrl.chartUpdater"
+               [is-stock-chart]="$ctrl.isStockChart">
         </chart>
       </div>
   </analyze-dialog-content>

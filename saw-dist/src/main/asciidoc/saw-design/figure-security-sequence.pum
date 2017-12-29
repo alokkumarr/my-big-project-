@@ -1,0 +1,4 @@
+"Client" -> "SAW Security Service": Authentication request
+"SAW Security Service" -> "SAW Security database": Lookup client
+"SAW Security database" --> "SAW Security Service": Credentials and privileges
+"SAW Security Service" --> Client: Authentication response

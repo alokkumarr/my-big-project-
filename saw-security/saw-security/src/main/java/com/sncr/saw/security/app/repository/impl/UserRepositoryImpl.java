@@ -32,6 +32,7 @@ import com.sncr.saw.security.common.util.DateUtil;
 import java.sql.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -481,12 +482,21 @@ public class UserRepositoryImpl implements UserRepository {
 			}, new UserRepositoryImpl.PrepareProductExtractor()));
 
 			// Cust - Prod - Modules
-			String sql4 = "SELECT DISTINCT P.PRODUCT_CODE, M.MODULE_NAME, M.MODULE_DESC, M.MODULE_CODE, CPM.MODULE_URL, CPM.DEFAULT, CPM.CUST_PROD_MOD_SYS_ID, PV.PRIVILEGE_CODE FROM CUSTOMER_PRODUCT_MODULES CPM"
+			String sql4 = "SELECT DISTINCT P.PRODUCT_CODE, M.MODULE_NAME, M.MODULE_DESC, M.MODULE_CODE, CPM.MODULE_URL, CPM.DEFAULT, CPM.CUST_PROD_MOD_SYS_ID,"
+                    /** SAW-1934 TO DO : if privilege exist for any category for product module, add the privilege code
+                     * as full access (128) for product module (Analyses, Observe , Alert) as workaround.
+                     * Analyses, Observe and Alert module are handles in categories and sub-categories level for now. which could drived module privileges.
+                     */
+                    + " '128' AS PRIVILEGE_CODE "
+                    + "FROM CUSTOMER_PRODUCT_MODULES CPM"
 					+ " INNER JOIN USERS U ON (U.CUSTOMER_SYS_ID=CPM.CUSTOMER_SYS_ID) INNER JOIN PRODUCT_MODULES PM ON (CPM.PROD_MOD_SYS_ID=PM.PROD_MOD_SYS_ID)"
 					+ " INNER JOIN CUSTOMER_PRODUCTS CP ON (CP.CUST_PROD_SYS_ID=CPM.CUST_PROD_SYS_ID) INNER JOIN CUSTOMERS C ON (C.CUSTOMER_SYS_ID=CP.CUSTOMER_SYS_ID)"
 					+ " INNER JOIN MODULES M ON (M.MODULE_SYS_ID=PM.MODULE_SYS_ID) INNER JOIN PRODUCTS P ON (PM.PRODUCT_SYS_ID=P.PRODUCT_SYS_ID) JOIN `PRIVILEGES` PV ON(CP.CUST_PROD_SYS_ID=PV.CUST_PROD_SYS_ID AND CPM.CUST_PROD_MOD_SYS_ID=PV.CUST_PROD_MOD_SYS_ID) "
 					+ " JOIN ROLES R ON(R.ROLE_SYS_ID=PV.ROLE_SYS_ID) "
-					+ " WHERE upper(U.USER_ID)=? AND P.ACTIVE_STATUS_IND = CP.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = 1 AND PV.ACTIVE_STATUS_IND=1 AND PV.CUST_PROD_MOD_FEATURE_SYS_ID=0"
+					+ " JOIN CUSTOMER_PRODUCT_MODULE_FEATURES CPMF ON " 
+					+ " (CPM.CUST_PROD_MOD_SYS_ID = CPMF.CUST_PROD_MOD_SYS_ID AND "
+					+ " PV.CUST_PROD_MOD_FEATURE_SYS_ID = CPMF.CUST_PROD_MOD_FEATURE_SYS_ID) "
+					+ " WHERE upper(U.USER_ID)=? AND P.ACTIVE_STATUS_IND = CP.ACTIVE_STATUS_IND AND CP.ACTIVE_STATUS_IND = 1 AND PV.ACTIVE_STATUS_IND=1 AND PV.PRIVILEGE_CODE <> '0' "
 					+ " AND C.ACTIVE_STATUS_IND=1 AND P.ACTIVE_STATUS_IND=1 AND M.ACTIVE_STATUS_IND=1 AND R.ROLE_CODE=? AND R.ACTIVE_STATUS_IND = 1";
 
 			/**
@@ -703,22 +713,33 @@ public class UserRepositoryImpl implements UserRepository {
 				 * } ticketDetails.setProductModuleFeatures(prodModFeatrs);
 				 **/
 				
-				ArrayList<ProductModuleFeature> prodModFeatrSorted = new ArrayList<ProductModuleFeature>();
-				ArrayList<ProductModuleFeature> prodModFeatrChildSorted = null;
+				
+						ArrayList<ProductModuleFeature> prodModFeatrChildSorted = null;
 				ArrayList<ProductModules> prodModSorted = null;
 				for (int i = 0; i < ticketDetails.getProducts().size(); i++) {
 					prodModSorted = new ArrayList<ProductModules>();
 					for (int x = 0; x < prodMods.size(); x++) {
+                        ArrayList<ProductModuleFeature> prodModFeatrParentsCopy = new ArrayList<>();
+                        //Copy the element one by one any changes to copyList  it will not impact originalList.
+                        for(ProductModuleFeature productModuleFeature: prodModFeatrParents )
+                        {
+                            ProductModuleFeature productModuleFeature1 = new ProductModuleFeature();
+                            BeanUtils.copyProperties(productModuleFeature,productModuleFeature1);
+                            prodModFeatrParentsCopy.add(productModuleFeature1);
+                        }
+
+                        ArrayList<ProductModuleFeature> prodModFeatrSorted = new ArrayList<ProductModuleFeature>();
 						if (ticketDetails.getProducts().get(i).getProductCode().equals(prodMods.get(x).getProdCode())) {
-							
 							for (int y = 0; y < prodModFeatrParents.size(); y++) {
 								prodModFeatrChildSorted = new ArrayList<ProductModuleFeature>();
 								for (int z = 0; z < prodModFeatrChildren.size(); z++) {
 									if (prodModFeatrParents.get(y).getProdModFeatureType().split("_")[1]
 											.equals(prodModFeatrChildren.get(z).getProdModFeatureType()
-													.split("_")[1])) {
+													.split("_")[1]) && prodMods.get(x).getProductModCode()
+											.equalsIgnoreCase(prodModFeatrChildren.get(z).getProdModCode())) {
 										//get the privCode
-										PrivilegeDetails PrivilegeDetails = fetchIfPrivExists(prodModFeatrChildren.get(z).getRoleId(),prodModFeatrChildren.get(z).getProdModFeatureID());
+										PrivilegeDetails PrivilegeDetails = fetchIfPrivExists(prodModFeatrChildren.get(z).getRoleId(),
+												prodModFeatrChildren.get(z).getProdModFeatureID());
 										if(PrivilegeDetails != null) {
 											prodModFeatrChildren.get(z).setPrivilegeCode(PrivilegeDetails.getPrivilegeCode());
 										} else {
@@ -728,16 +749,17 @@ public class UserRepositoryImpl implements UserRepository {
 									}
 
 								}
-								prodModFeatrParents.get(y)
+                                prodModFeatrParentsCopy.get(y)
 										.setProductModuleSubFeatures(prodModFeatrChildSorted);
 							}
 
 							for (int y = 0; y < prodModFeatrParents.size(); y++) {
 
 								if (ticketDetails.getProducts().get(i).getProductCode()
-										.equals(prodModFeatrParents.get(y).getProdCode())
-										&& prodModFeatrParents.get(y).getProdModCode()
-												.equals(prodMods.get(x).getProductModCode())) {
+										.equals(prodModFeatrParentsCopy.get(y).getProdCode())
+										&& prodModFeatrParentsCopy.get(y).getProdModCode()
+												.equals(prodMods.get(x).getProductModCode())
+										&& prodModFeatrParentsCopy.get(y).getProductModuleSubFeatures().size()>0 ) {
 
 									/**
 									 * productModuleFeaturePrivilegesSorted =
@@ -759,12 +781,13 @@ public class UserRepositoryImpl implements UserRepository {
 									 * prodModFeatr.get(y).setProdModFeatrPriv(
 									 * productModuleFeaturePrivilegesSorted);
 									 **/
-									prodModFeatrSorted.add(prodModFeatrParents.get(y));
-
+									prodModFeatrSorted.add(prodModFeatrParentsCopy.get(y));
 								}
+
 							}
-							prodMods.get(x).setProdModFeature(prodModFeatrSorted);
-							prodModSorted.add(prodMods.get(x));
+                            prodMods.get(x).setProdModFeature(prodModFeatrSorted);
+                            prodModSorted.add(prodMods.get(x));
+
 						}
 					}
 					ticketDetails.getProducts().get(i).setProductModules(prodModSorted);

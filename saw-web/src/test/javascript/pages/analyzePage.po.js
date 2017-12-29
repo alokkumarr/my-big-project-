@@ -1,5 +1,5 @@
-const {doMdSelectOption, getMdSelectOptions} = require('../../helpers/utils');
-const commonFunctions = require('../../helpers/commonFunctions.js');
+const {doMdSelectOption, getMdSelectOptions} = require('../helpers/utils');
+const commonFunctions = require('../helpers/commonFunctions.js');
 
 const getCards = name => element.all(by.css('md-card[e2e="analysis-card"]')).filter(elem => {
   return elem.element(by.cssContainingText('a[e2e="analysis-name"]', name));
@@ -73,7 +73,7 @@ const getChartSettingsRadio = (axis, name) => {
 };
 
 const getChartSettingsCheckBox = name => {
-  return element(by.xpath(`//md-checkbox[@ng-model="attr.checked"]/*/span[text()="${name}"]/parent::*/preceding-sibling::*`));
+  return element(by.xpath(`//md-checkbox[@ng-model="attr.checked"]/descendant::*[contains(text(),'${name}')]/parent::*`));
 };
 
 const openFiltersBtn = element(by.css('button[ng-click="$ctrl.openFiltersModal($event)"]'));

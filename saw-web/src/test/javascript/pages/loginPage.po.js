@@ -1,5 +1,5 @@
-const commonFunctions = require('../../helpers/commonFunctions.js');
-const users = require('../../data/users.js');
+const commonFunctions = require('../helpers/commonFunctions.js');
+const users = require('../data/users.js');
 
 module.exports = {
   loginElements: {

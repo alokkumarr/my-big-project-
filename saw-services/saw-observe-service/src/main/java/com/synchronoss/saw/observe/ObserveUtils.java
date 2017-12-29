@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,6 +20,7 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
+import com.synchronoss.saw.observe.model.Content;
 import com.synchronoss.saw.observe.model.Observe;
 import com.synchronoss.saw.observe.model.ObserveNode;
 import com.synchronoss.saw.observe.model.ObserveResponse;
@@ -75,9 +77,11 @@ public class ObserveUtils {
   
   public static Observe getObserveNode (String json, String node) throws JsonProcessingException, IOException {
     ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     JsonNode objectNode = objectMapper.readTree(json);
-    JsonNode observeNode = objectNode.get(node);
+    JsonNode contentNode = objectNode.get(node);
+    JsonNode observeNode = contentNode.get("observe").get(0);
     String jsonObserve = "{ \"observe\" :" + observeNode.toString() + "}";
     JsonNode observeNodeIndependent = objectMapper.readTree(jsonObserve);
     ObserveNode observeTreeNode = objectMapper.treeToValue(observeNodeIndependent, ObserveNode.class);
@@ -90,9 +94,9 @@ public class ObserveUtils {
   {
     ObjectMapper objectMapper = new ObjectMapper();
     MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
+   
     if(node !=null){
-      String jsonObserve = "{ \"observe\" :" + objectMapper.writeValueAsString(node) + "}";
-      metaDataStoreStructure.setSource(jsonObserve);
+      metaDataStoreStructure.setSource(node);
     }
     if (Id !=null){
       metaDataStoreStructure.setId(Id);
@@ -104,6 +108,60 @@ public class ObserveUtils {
     listOfMetadata.add(metaDataStoreStructure);
    
     return objectMapper.writeValueAsString(listOfMetadata);
+  }
+
+  public static String node2JsonString(Observe node, String basePath, String Id, Action action, Category category, Query query) 
+      throws JsonProcessingException
+  {
+    ObjectMapper objectMapper = new ObjectMapper();
+    MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
+   
+    if(node !=null){
+      metaDataStoreStructure.setSource(node);
+    }
+    if (Id !=null){
+      metaDataStoreStructure.setId(Id);
+    }
+    if (query!=null){
+      metaDataStoreStructure.setQuery(query);
+    }
+    metaDataStoreStructure.setAction(action);
+    metaDataStoreStructure.setCategory(category);
+    metaDataStoreStructure.setXdfRoot(basePath);
+    List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
+    listOfMetadata.add(metaDataStoreStructure);
+    return objectMapper.writeValueAsString(listOfMetadata);
+  }
+
+  public static List<MetaDataStoreStructure> nodeMetaDataStoreStructure(Observe node, String basePath, String output, String Id, Action action, Category category) 
+      throws JsonProcessingException
+  {
+    MetaDataStoreStructure metaDataStoreStructure = new MetaDataStoreStructure();
+    if(node !=null){
+      metaDataStoreStructure.setSource(node);
+    }
+    if (Id !=null){
+      metaDataStoreStructure.setId(Id);
+    }
+    metaDataStoreStructure.setAction(action);
+    metaDataStoreStructure.setCategory(category);
+    metaDataStoreStructure.setXdfRoot(basePath);
+    List<MetaDataStoreStructure> listOfMetadata = new ArrayList<>();
+    listOfMetadata.add(metaDataStoreStructure);
+    return listOfMetadata;
+  }
+  
+  public static ObserveResponse prepareResponse(Observe node, String message){
+    ObserveResponse createresponse = new ObserveResponse();
+    createresponse.setMessage(message);
+    createresponse.setId(node.get_id());
+    createresponse.setId(node.getEntityId());
+    Content content = new Content();
+    List<Observe> listOfObserve = new ArrayList<>();
+    listOfObserve.add(node);
+    content.setObserve(listOfObserve);
+    createresponse.setContents(content);
+    return createresponse;
   }
   
 }

@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.ojai.Document;
 
 import com.google.gson.JsonArray;
@@ -47,9 +48,10 @@ public interface DocumentConverter {
 
     class DCHelper{
 
-        protected static final Logger logger = Logger.getLogger(DCHelper.class);
+        protected static final Logger logger = LoggerFactory.getLogger(DCHelper.class);
 
         public static Document processMap(Document doc, String k, JsonElement je) {
+          logger.trace("After Parsing into JSONElement Object inside processMap :{}", je.toString());
             logger.trace("Process doc [" + k + "]:" + doc.asJsonString());
             logger.trace( "JSON element: " +je.toString() );
             if (!je.isJsonNull()){
@@ -97,24 +99,25 @@ public interface DocumentConverter {
         }
 
         private static List<?> processList(List<Object> l, JsonElement je) {
+            logger.trace("After Parsing into JSONElement Object inside processList :{}", je.toString());
             logger.trace("Process list" );
             logger.trace( "JSON element: " +je.toString() );
             if (!je.isJsonNull()){
                 if (je.isJsonObject()) {
-                    logger.trace("Process JSON object");
+                    logger.trace("Process JSON object processList");
                     JsonObject jo = je.getAsJsonObject();
                     Set<Map.Entry<String, JsonElement>> s = jo.entrySet();
                     Document doc1 = MapRDB.newDocument();
                     s.forEach(entry -> processMap(doc1, entry.getKey(), entry.getValue()));
                     l.add(doc1);
                 } else if (je.isJsonArray()) {
-                    logger.trace("Process JSON array");
+                    logger.trace("Process JSON array processList");
                     JsonArray ja = je.getAsJsonArray();
                     List<Object> l1 = new ArrayList<>();
                     ja.forEach(el -> processList(l1, el));
                     l.add(l1);
                 } else if (je.isJsonPrimitive()) {
-                    logger.trace("Process JSON primitive" );
+                    logger.trace("Process JSON primitive processList: " + je.toString() );
                     JsonPrimitive jp = je.getAsJsonPrimitive();
                     if (jp.isBoolean())
                         l.add(jp.getAsBoolean());

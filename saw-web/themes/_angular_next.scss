@@ -21,9 +21,20 @@ $mat-primary: (
   )
 );
 
+$mat-warn: (
+  100: #FF6F60,
+  500: #E53935,
+  700: #AB000D,
+  contrast: (
+    100: white,
+    500: white,
+    700: white
+  )
+);
+
 $sncr-app-primary: mat-palette($mat-primary);
 $sncr-app-accent: mat-palette($mat-primary);
-$sncr-app-warn: mat-palette($mat-primary);
+$sncr-app-warn: mat-palette($mat-warn);
 
 $sncr-app-theme: mat-light-theme($sncr-app-primary, $sncr-app-accent, $sncr-app-warn);
 

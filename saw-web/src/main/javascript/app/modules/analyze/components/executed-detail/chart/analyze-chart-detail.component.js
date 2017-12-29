@@ -49,6 +49,7 @@ export const AnalyzeChartDetailComponent = {
         height: 580
       };
       this.chartOptions = this._ChartService.getChartConfigFor(this.analysis.chartType, {chart: this.chart, legend: this.legend});
+      this.isStockChart = this.analysis.isStockChart;
 
       this._$timeout(() => {
         this.updateChart();

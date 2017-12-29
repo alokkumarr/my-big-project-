@@ -4,7 +4,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.OPTIONS;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
-
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -80,7 +80,7 @@ public class GatewayController {
  * @throws IOException
  * @throws URISyntaxException
  */
-@RequestMapping(value = "/**", method = {GET, POST, DELETE, OPTIONS})
+@RequestMapping(value = "/**", method = {GET, POST, DELETE, OPTIONS, PUT})
   @ResponseBody
   public ResponseEntity<String> proxyRequest(HttpServletRequest request) throws  IOException, URISyntaxException {
     HttpUriRequest proxiedRequest = createHttpUriRequest(request);
