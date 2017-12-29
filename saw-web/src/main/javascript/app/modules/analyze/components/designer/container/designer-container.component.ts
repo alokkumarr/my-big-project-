@@ -21,7 +21,8 @@ import {
   SqlBuilder,
   ArtifactColumns,
   DesignerToolbarAciton,
-  Sort
+  Sort,
+  Filter
 } from '../types'
 
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service'
@@ -52,6 +53,7 @@ export class DesignerContainerComponent {
   public firstArtifactColumns: ArtifactColumns = [];
   public data: any = null;
   public sorts: Sort[] = [];
+  public filters: Filter[] = [];
 
   constructor(
     private _designerService: DesignerService,
@@ -80,6 +82,14 @@ export class DesignerContainerComponent {
         .afterClosed().subscribe((result) => {
           if (result) {
             this.sorts = result.sorts;
+          }
+        });
+      break;
+    case 'filter':
+      this._analyzeDialogService.openFilterDialog(this.filters, this.firstArtifactColumns)
+        .afterClosed().subscribe((result) => {
+          if (result) {
+            this.filters = result.filters;
           }
         });
       break;

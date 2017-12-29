@@ -1,6 +1,6 @@
 import { Sort } from './sort.model';
 import { Join } from './join.model';
-import Filter from './filter.model';
+import { Filter } from './filter.model';
 import { ArtifactColumn } from './artifact-column.model';
 
 interface AbstractSqlBuilder {

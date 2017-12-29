@@ -6,6 +6,7 @@ import {
   AnalysisStarter,
   Analysis,
   Sort,
+  Filter,
   IToolbarActionData,
   ArtifactColumns
 } from '../types';
@@ -47,6 +48,19 @@ export class AnalyzeDialogService {
     const data: IToolbarActionData = {
       action: 'sort',
       sorts,
+      artifactColumns
+    }
+    return this.dialog.open(ToolbarActionDialogComponent, {
+      width: 'auto',
+      height: 'auto',
+      data
+    } as MatDialogConfig);
+  }
+
+  openFilterDialog(filters: Filter[], artifactColumns: ArtifactColumns) {
+    const data: IToolbarActionData = {
+      action: 'filter',
+      filters,
       artifactColumns
     }
     return this.dialog.open(ToolbarActionDialogComponent, {

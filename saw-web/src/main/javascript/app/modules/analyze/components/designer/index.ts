@@ -13,6 +13,7 @@ import {
   ExpandDetailPivotComponent
 } from './settings';
 import { DesignerSortComponent } from './sort';
+import { DesignerFilterComponent } from './filter';
 import { DesignerPreviewDialogComponent } from './preview-dialog';
 import { ToolbarActionDialogComponent } from './toolbar-action-dialog';
 import { DesignerService } from './designer.service';
@@ -30,6 +31,7 @@ export {
   ExpandDetailPivotComponent,
   ToolbarActionDialogComponent,
   DesignerSortComponent,
+  DesignerFilterComponent,
   DesignerPreviewDialogComponent,
   DesignerService,
   ArtifactColumnFilterPipe,

@@ -1,6 +1,6 @@
 import FilterModel from './filter-model.model';
 
-export default interface Filter {
+export interface Filter {
   isRuntimeFilter: boolean;
   tableName:       string;
   columnName:      string;

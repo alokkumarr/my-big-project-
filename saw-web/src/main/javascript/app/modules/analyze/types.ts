@@ -11,11 +11,13 @@ import {
 export type ArtifactColumns = ArtifactColumnPivot[] | ArtifactColumnChart[] | ArtifactColumnReport[];
 export type ArtifactColumn = ArtifactColumnPivot | ArtifactColumnChart | ArtifactColumnReport;
 import { Sort } from './models/sort.model';
+import { Filter } from './models/filter.model';
 
 export {
   ArtifactColumnPivot,
   ArtifactColumnChart,
-  Sort
+  Sort,
+  Filter
 };
 
 
@@ -47,10 +49,12 @@ export interface IToolbarActionData {
   action: DesignerToolbarAciton;
   artifactColumns?: ArtifactColumns;
   sorts?: Sort[];
+  filters?: Filter[];
   description?: string;
 }
 
 export interface IToolbarActionResult {
   sorts?: Sort[];
   description?: string;
+  filters?: Filter[];
 }

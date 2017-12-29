@@ -1,6 +1,7 @@
 <header [ngSwitch]="data.action"
         class="dialog__header">
   <strong *ngSwitchCase="'sort'" i18n>Sort</strong>
+  <strong *ngSwitchCase="'filter'" i18n>Filter</strong>
   <strong *ngSwitchCase="'description'" i18n>Description</strong>
 </header>
 <div [ngSwitch]="data.action"
@@ -9,6 +10,10 @@
                   (sortsChange)="onSortsChange($event)"
                   [sorts]="data.sorts"
                   [artifactColumns]="data.artifactColumns"></designer-sort>
+  <designer-filter *ngSwitchCase="'filter'"
+                  (filtersChange)="onFiltersChange($event)"
+                  [filters]="data.filters"
+                  [artifactColumns]="data.artifactColumns"></designer-filter>
 </div>
 <div class="dialog__actions"
      fxLayout="row"
@@ -18,6 +23,11 @@
               (click)="onOk()"
               mat-raised-button color="primary" i18n>
         Apply Sort
+      </button>
+      <button *ngSwitchCase="'filter'"
+              (click)="onOk()"
+              mat-raised-button color="primary" i18n>
+        Apply Filters
       </button>
       <button *ngSwitchCase="'description'"
               (click)="onOk()"

@@ -41,7 +41,11 @@ export class DesignerPreviewDialogComponent {
     const analysis = this.data.analysis;
     this._designerService.getDataForAnalysisPreview(analysis)
       .then(data => {
-        this.previewData = this._designerService.parseData(data.data, analysis.sqlBuilder);
+        switch (analysis.type) {
+        case 'pivot':
+          this.previewData = this._designerService.parseData(data.data, analysis.sqlBuilder);
+          break;
+        }
       });
   }
 

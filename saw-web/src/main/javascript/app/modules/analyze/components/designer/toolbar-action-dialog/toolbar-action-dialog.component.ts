@@ -23,6 +23,9 @@ export class ToolbarActionDialogComponent {
     case 'sort':
       this.data.sorts = cloneDeep(this.data.sorts);
       break;
+    case 'filter':
+      this.data.filters = cloneDeep(this.data.filters);
+      break;
     }
   }
 
@@ -34,11 +37,18 @@ export class ToolbarActionDialogComponent {
     this.data.sorts = sorts;
   }
 
+  onFiltersChange(filters) {
+    this.data.filters = filters;
+  }
+
   onOk() {
     let result: IToolbarActionResult = {};
     switch (this.data.action) {
     case 'sort':
       result.sorts = this.data.sorts;
+      break;
+    case 'filter':
+      result.filters = this.data.filters;
       break;
     case 'description':
       result.description = this.data.description;

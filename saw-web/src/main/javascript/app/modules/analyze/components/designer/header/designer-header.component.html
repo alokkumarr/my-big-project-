@@ -38,7 +38,8 @@
       <mat-icon fontIcon="icon-sort"></mat-icon>
       <ng-container i18n>Sort</ng-container>
     </button>
-    <button mat-button>
+    <button mat-button
+            (click)="requestAction.emit('filter')">
       <mat-icon fontIcon="icon-filter"></mat-icon>
       <ng-container i18n>Filter</ng-container>
     </button>
