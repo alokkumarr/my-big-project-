@@ -11,6 +11,7 @@ import * as fpMap from 'lodash/fp/map';
 import * as map from 'lodash/map';
 import * as unset from 'lodash/unset';
 import * as moment from 'moment';
+import * as isUndefined from 'lodash/isUndefined';
 
 import * as template from './analyze-filter-modal.component.html';
 import style from './analyze-filter-modal.component.scss';
@@ -122,9 +123,26 @@ export const AnalyzeFilterModalComponent = {
       return isValid;
     }
 
+    momentDateFormat(format) {
+      let dateFormat = [];
+      let date = '';
+      let time = '';
+      dateFormat = format.split(' ');
+      date = dateFormat[0].toUpperCase();
+      if (!isUndefined(dateFormat[1])) {
+        time = ' ' + dateFormat[1];
+      }
+      return date + time;
+    }
+
     isDateFilterInvalid(filter) {
       if (DATE_TYPES.includes(filter.column.type) && filter.model.preset === 'NA') {
-        filter.model.lte = moment(filter.model.lte).utc().endOf('day').format('YYYY-MM-DD HH:mm:ss').toString();
+        if (isUndefined(filter.column.format)) {
+          filter.model.lte = moment(filter.model.lte).endOf('day').format('YYYY-MM-DD HH:mm:ss').toString();
+        } else {
+          filter.model.lte = moment(filter.model.lte).endOf('day').format(this.momentDateFormat(filter.column.format)).toString();
+          filter.model.gte = moment(filter.model.gte).format(this.momentDateFormat(filter.column.format)).toString();
+        }
       }
 
       return DATE_TYPES.includes(filter.column.type) &&
