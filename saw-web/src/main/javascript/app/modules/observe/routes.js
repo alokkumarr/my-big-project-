@@ -1,3 +1,6 @@
+import {ObservePageComponent} from './components/observe-page/observe-page.component';
+import {ObserveViewComponent} from './components/observe-view/observe-view.component';
+
 export function routesConfig($stateProvider) {
   'ngInject';
 
@@ -5,7 +8,12 @@ export function routesConfig($stateProvider) {
     {
       name: 'observe',
       url: '/observe',
-      component: 'observePage'
+      component: ObservePageComponent
+    },
+    {
+      name: 'observe.dashboard',
+      url: '/:subCategory?dashboard',
+      component: ObserveViewComponent
     }
   ];
 

@@ -1,34 +1,28 @@
 /**
  * Just a simple wrapper around the angular-toastr library
  * */
-export function toastMessageService(toastr) {
-  'ngInject';
-
-  return {
-    clear,
-    error,
-    info,
-    success,
-    warn
-  };
-
-  function success(msg, title, options) {
-    return toastr.success(msg, title, options);
+export class ToastService {
+  constructor(toastr) {
+    this._toastr = toastr;
   }
 
-  function info(msg, title, options) {
-    return toastr.info(msg, title, options);
+  success(msg, title, options) {
+    return this._toastr.success(msg, title, options);
   }
 
-  function warn(msg, title, options) {
-    return toastr.warning(msg, title, options);
+  info(msg, title, options) {
+    return this._toastr.info(msg, title, options);
   }
 
-  function error(msg, title, options) {
-    return toastr.error(msg, title, options);
+  warn(msg, title, options) {
+    return this._toastr.warning(msg, title, options);
   }
 
-  function clear(toast) {
-    return toastr.clear(toast);
+  error(msg, title, options) {
+    return this._toastr.error(msg, title, options);
+  }
+
+  clear(toast) {
+    return this._toastr.clear(toast);
   }
 }

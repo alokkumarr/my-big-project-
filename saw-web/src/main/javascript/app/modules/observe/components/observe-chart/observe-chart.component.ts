@@ -4,7 +4,7 @@ import { ChartService } from '../../../analyze/services/chart.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 import { SortService } from '../../../analyze/services/sort.service';
 import { FilterService } from '../../../analyze/services/filter.service';
-
+import * as isUndefined from 'lodash/isUndefined';
 import * as get from 'lodash/get';
 import * as set from 'lodash/set';
 import * as isEmpty from 'lodash/isEmpty';
@@ -27,8 +27,9 @@ const template = require('./observe-chart.component.html');
 })
 export class ObserveChartComponent {
   @Input() analysis: any;
-  @Input('updater') chartUpdater: BehaviorSubject<Array<any>>;
+  @Input('updater') requester: BehaviorSubject<Array<any>>;
 
+  private chartUpdater = new BehaviorSubject([]);
   public legend: any;
   public chartOptions: any;;
   public settings: any;
@@ -36,6 +37,7 @@ export class ObserveChartComponent {
   public gridData: Array<any>;
   public sorts: Array<any>;
   public filters: Array<any>;
+  public isStockChart: boolean;
 
   constructor(public chartService: ChartService,
     public analyzeService: AnalyzeService,
@@ -45,6 +47,23 @@ export class ObserveChartComponent {
 
   ngOnInit() {
     this.chartOptions = this.chartService.getChartConfigFor(this.analysis.chartType, { legend: this.legend });
+    this.isStockChart = isUndefined(this.analysis.isStockChart) ? false : this.analysis.isStockChart;
+    this.subscribeToRequester();
+  }
+
+  ngOnDestroy() {
+    this.requester.unsubscribe();
+  }
+
+  /* Accept changes from parent component and pass those on to chart.
+     Having separate requester and chartUpdater allows transforming
+     changes coming from parent before passing them on. */
+  subscribeToRequester() {
+    this.requester.subscribe(data => {
+      let changes = this.getChangeConfig(this.settings, this.gridData, this.labels);
+      changes = changes.concat(data);
+      this.chartUpdater.next(changes);
+    });
   }
 
   ngAfterViewInit() {
@@ -88,10 +107,14 @@ export class ObserveChartComponent {
   }
 
   reloadChart(settings, gridData, labels) {
+    const changes = this.getChangeConfig(settings, gridData, labels);
+    this.chartUpdater.next(changes);
+  }
+
+  getChangeConfig(settings, gridData, labels): Array<any> {
     if (isEmpty(gridData)) {
       /* Making sure empty data refreshes chart and shows no data there.  */
-      this.chartUpdater.next([{ path: 'series', data: [] }]);
-      return;
+      return [{ path: 'series', data: [] }];
     }
 
     if (!isEmpty(this.sorts)) {
@@ -115,7 +138,7 @@ export class ObserveChartComponent {
       {path: 'title.y', data: -10}
     ]);
 
-    this.chartUpdater.next(changes);
+    return changes;
   }
 
   onRefreshData() {

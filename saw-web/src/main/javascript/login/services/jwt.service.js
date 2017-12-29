@@ -1,4 +1,5 @@
 import * as get from 'lodash/get';
+import * as has from 'lodash/has';
 import * as padStart from 'lodash/padStart';
 import * as find from 'lodash/find';
 import * as flatMap from 'lodash/flatMap';
@@ -36,11 +37,11 @@ export class JwtService {
     return this._$window.localStorage[this._AppConfig.login.jwtKey];
   }
 
-  getCategories() {
+  getCategories(moduleName = 'ANALYZE') {
     const token = this.getTokenObj();
     const analyzeModule = find(
       get(token, 'ticket.products[0].productModules'),
-      mod => mod.productModName === 'ANALYZE'
+      mod => mod.productModName === moduleName
     );
 
     return get(analyzeModule, 'prodModFeature', []) || [];
@@ -64,6 +65,9 @@ export class JwtService {
   }
 
   parseJWT(jwt) {
+    if (!jwt) {
+      return null;
+    }
     const base64Url = jwt.split('.')[1];
     const base64 = base64Url.replace('-', '+').replace('_', '/');
     return angular.fromJson(this._$window.atob(base64));
@@ -135,7 +139,7 @@ export class JwtService {
      */
   hasPrivilege(name, opts) {
     /* eslint-disable */
-    if (!PRIVILEGE_INDEX[name]) {
+    if (!has(PRIVILEGE_INDEX, name)) {
       throw new Error(`Privilige ${name} is not supported!`);
     }
     opts.module = opts.module || 'ANALYZE';
@@ -198,9 +202,4 @@ export class JwtService {
     // No privilege
     return 0;
   }
-}
-
-export function JwtServiceFactory($window, AppConfig) {
-  'ngInject';
-  return new JwtService($window, AppConfig);
 }
