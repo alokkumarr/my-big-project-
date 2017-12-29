@@ -39,8 +39,7 @@ export class ChartComponent {
   private config: any = {};
   private stockConfig: any = {};
   private subscription: any;
-  private chartSeriesData: any = {};
-  private chartXData: any = {};
+  private clonedConfig: any = {};
 
   constructor() {
     this.highcharts.setOptions(globalChartOptions);
@@ -75,14 +74,14 @@ export class ChartComponent {
       // Not using chart.update due to a bug with navigation
       // update and bar styles.
       if (this.isStockChart) {
-        // Fix (L-77,78,80,81,82) --- Highstocks API manipulating external config object, setting series and categories data to NULL
+        this.config.xAxis[0].title.text = this.config.xAxis.title.text; // Highstocks adding a default xAxis settings objects with title & categories. So have to populate them inorder the title to display.
+        this.config.xAxis[0].categories = this.config.xAxis.categories;
+        // Fix --- Highstocks API manipulating external config object, setting series and categories data to NULL
         // https://forum.highcharts.com/highstock-usage/creating-a-chart-manipulates-external-options-object-t15255/#p81794
-        this.chartSeriesData = clone(this.config.series);
-        this.chartXData = clone(this.config.xAxis);
+        this.clonedConfig = clone(this.config);
         this.chart = this.highstocks.stockChart(this.container.nativeElement, this.config);
-        this.config.series = clone(this.chartSeriesData);
-        this.config.xAxis = clone(this.chartXData);
-        this.chartSeriesData = this.chartXData = {};
+        this.config = clone(this.clonedConfig);
+        this.clonedConfig = {};
       } else {
         this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
       }
