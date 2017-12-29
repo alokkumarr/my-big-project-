@@ -2,20 +2,19 @@
   Created by Alex
  */
 
-const login = require('../../javascript/pages/loginPage.po.js');
-const analyzePage = require('../../javascript/pages/analyzePage.po.js');
-const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
+const login = require('../../javascript/pages/loginPage.po');
+const analyzePage = require('../../javascript/pages/analyzePage.po');
+const designModePage = require('../../javascript/pages/designModePage.po');
+const previewPage = require('../../javascript/pages/previewPage.po');
+const commonFunctions = require('../../javascript/helpers/commonFunctions');
 const homePage = require('../../javascript/pages/homePage.po');
-const executedAnalysisPage = require('../../javascript/pages/savedAlaysisPage.po');
 const using = require('jasmine-data-provider');
 
-describe('create and delete charts: createAndDeleteCharts.test.js', () => {
+describe('verify preview for charts: previewForCharts.test.js', () => {
   const defaultCategory = 'AT Privileges Category DO NOT TOUCH';
   const categoryName = 'AT Analysis Category DO NOT TOUCH';
   const subCategoryName = 'AT Creating Analysis DO NOT TOUCH';
   const chartDesigner = analyzePage.designerDialog.chart;
-  const chartName = `e2e chart ${(new Date()).toString()}`;
-  const chartDescription = 'e2e test chart description';
   let xAxisName = 'Source Manufacturer';
   let yAxisName = 'Available MB';
   const yAxisName2 = 'Available Items';
@@ -24,7 +23,7 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
   const sizeByName = 'Activated Active Subscriber Count';
 
   const dataProvider = {
-    'Column Chart by admin': {user: 'admin', chartType: 'chart:column'},
+    /*'Column Chart by admin': {user: 'admin', chartType: 'chart:column'},
     'Column Chart by user': {user: 'userOne', chartType: 'chart:column'},
     'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'},
     'Bar Chart by user': {user: 'userOne', chartType: 'chart:bar'},
@@ -37,7 +36,7 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
     'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'},
     'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'},
     'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'},
-    'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'},
+    'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'},*/
     'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'},
     'Bubble Chart by user': {user: 'userOne', chartType: 'chart:bubble'}
   };
@@ -45,6 +44,7 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
   beforeEach(function (done) {
     setTimeout(function () {
       expect(browser.getCurrentUrl()).toContain('/login');
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000000;
       done();
     }, 1000)
   });
@@ -62,7 +62,7 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
   });
 
   using(dataProvider, function (data, description) {
-    it('should create ' + description, () => {
+    it('should verify preview for ' + description, () => {
       if (data.chartType === 'chart:bubble') {
         metric = 'PTT Subscr Detail';
         yAxisName = 'Call Billed Unit';
@@ -105,45 +105,12 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
       //Refresh
       chartDesigner.refreshBtn.click();
 
-      //Save
-      const save = analyzePage.saveDialog;
-      const designer = analyzePage.designerDialog;
-      commonFunctions.waitFor.elementToBeClickableAndClick(designer.saveBtn);
+      // Navigate to Preview
+      designModePage.previewBtn.click();
 
-      commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
-      save.nameInput.clear().sendKeys(chartName);
-      save.descriptionInput.clear().sendKeys(chartDescription);
-      save.saveBtn.click();
-      const createdAnalysis = analyzePage.main.getCardTitle(chartName);
-
-      //Change to Card View
-      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
-
-      //Verify if created appeared in list
-      commonFunctions.waitFor.elementToBePresent(createdAnalysis)
-        .then(() => expect(createdAnalysis.isPresent()).toBe(true));
-
-      //Verify chart type on home page
-      analyzePage.main.getCardTypeByName(chartName).then(actualChartType =>
-        expect(actualChartType).toEqual(data.chartType,
-          "Chart type on Analyze Page expected to be " + data.chartType + ", but was " + actualChartType));
-    });
-
-    it('should delete ' + description, () => {
-      login.loginAs(data.user);
-      navigateToSubCategory();
-
-      const main = analyzePage.main;
-      const cards = main.getAnalysisCards(chartName);
-      cards.count().then(count => {
-        main.doAnalysisAction(chartName, 'delete');
-        commonFunctions.waitFor.elementToBeClickableAndClick(main.confirmDeleteBtn);
-
-        commonFunctions.waitFor.cardsCountToUpdate(cards, count);
-
-        //Expect to be deleted
-        expect(main.getAnalysisCards(chartName).count()).toBe(count - 1);
-      });
+      // Verify axis to be present on Preview Mode
+      commonFunctions.waitFor.elementToBePresent(previewPage.axisTitle(yAxisName));
+      commonFunctions.waitFor.elementToBePresent(previewPage.axisTitle(xAxisName));
     });
 
     // Navigates to specific category where analysis creation should happen
