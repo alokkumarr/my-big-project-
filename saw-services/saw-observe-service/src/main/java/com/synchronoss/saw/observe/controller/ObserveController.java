@@ -103,6 +103,20 @@ public class ObserveController {
     responseObjectFuture = observeService.getDashboardbyCriteria(observe);
     return responseObjectFuture;
   }
+  
+  @RequestMapping(value = "/observe/dashboards/{categoryId}/{userId}", method = RequestMethod.GET)
+  @ResponseStatus(HttpStatus.OK)
+  public ObserveResponse getDashboardByCategoryId(@PathVariable(name = "categoryId", required = true) String categoryId,
+      @PathVariable(name = "userId", required = true) String userId, HttpServletRequest request, HttpServletResponse response) {
+    logger.debug("categoryId {}", categoryId);
+    logger.debug("userId {}", userId);
+    ObserveResponse responseObjectFuture = null;
+    Observe observe = new Observe();
+    observe.setCategoryId(categoryId);
+    observe.setCreatedBy(userId);
+    responseObjectFuture = observeService.getDashboardbyCategoryId(observe);
+    return responseObjectFuture;
+  }
 
     @RequestMapping(value = "/observe/dashboards/update/{Id}", method = RequestMethod.PUT)
   @ResponseStatus(HttpStatus.OK)

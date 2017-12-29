@@ -8,17 +8,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.ojai.Document;
 import org.ojai.store.QueryCondition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 import com.mapr.db.MapRDB;
 import com.synchronoss.saw.store.metastore.PortalDataSetStore;
 
@@ -66,6 +64,7 @@ public class Request {
     private QueryCondition maprDBCondition;
     private JsonArray filter;
     private JsonParser jsonParser;
+    private JsonArray searchResultJsonArray;
 
     public Request(String jStr)
     {
@@ -113,7 +112,12 @@ public class Request {
     public void setResult(JsonElement result) {
       this.result = result;
     }
+    
+    public JsonArray getSearchResultJsonArray() {
+      return searchResultJsonArray;
+    }
 
+  
     public void process(){
         try {
             logger.trace("Actual Request Objects : {}", request.toString());
@@ -125,7 +129,8 @@ public class Request {
                     try {
                         processItem(jo);
                     } catch (Exception e) {
-                        generateResponse("item-processing", e);
+                        logger.error("Exception at process Item exception :",e);
+                        //generateResponse("item-processing", e);
                     }
                 }else{
                     logger.error("Cannot handle provided JSON item: " + arrayElem);
@@ -139,7 +144,8 @@ public class Request {
                 logger.error("Cannot handle provided JSON");
             }
         } catch (Exception e) {
-            generateResponse("process", e);
+              logger.error("Exception at process Item exception :",e);
+            //generateResponse("process", e);
         }
     }
 
@@ -209,7 +215,7 @@ public class Request {
                 String fp = cjo.getAsJsonPrimitive("field-path").getAsString();
                 String cond = cjo.getAsJsonPrimitive("condition").getAsString();
                 String val = cjo.getAsJsonPrimitive("value").getAsString();
-                if (fp != null && fp.isEmpty() && cond != null && cond.isEmpty() && val != null && val.isEmpty())
+                if (fp != null && !fp.isEmpty() && cond != null && !cond.isEmpty() && val != null && !val.isEmpty())
                 {
                     if (cond.equalsIgnoreCase("like"))
                         maprDBCondition.like(fp, val);
@@ -227,6 +233,7 @@ public class Request {
         maprDBCondition.build();
 
         Map<String, Document> searchResult = null;
+        
         switch ( category ){
             case DataSet:
                  logger.warn("Not implemented yet");                
@@ -248,34 +255,48 @@ public class Request {
                logger.error("Not supported category");
                return;
         }
+        
+        
+        // This write feature has been disabled to FS for now
         writeSearchResult(searchResult);
     }
 
+    
+    // it will require in future for time being it has been commented
     private void writeSearchResult(Map<String, Document> searchResult) {
+      
+           
 
         if (searchResult == null || searchResult.isEmpty()) {
             logger.info("No data found");
             return;
         }
-        JsonObject response = new JsonObject();
-        response.addProperty("scope", "search");
-        JsonArray respJA = new JsonArray();
-        response.add("result", respJA);
+        searchResultJsonArray = new JsonArray();
+        logger.debug(" Map<String, Document> searchResult :" + searchResult);
+        //JsonObject response = new JsonObject();
+        //response.addProperty("scope", "search");
+        //JsonArray respJA = new JsonArray();
+        //response.add("result", respJA);
         final int[] c = {0};
         searchResult.forEach( (id, doc) ->
             {
                 c[0]++;
                 JsonObject docDesc = new JsonObject();
+                
                 docDesc.addProperty("id", id);
+                
                 docDesc.add(String.valueOf(c[0]), jsonParser.parse(doc.asJsonString()));
-                respJA.add(docDesc);
+                logger.debug("searchResultJsonArray: " + jsonParser.parse(doc.asJsonString()));
+                //respJA.add(docDesc);
+                searchResultJsonArray.add(docDesc);
             }
         );
-        try {
+        logger.debug("Search Result from writeSearchResult " + searchResultJsonArray.toString());
+        /*try {
             os.write(response.toString().getBytes());
         } catch (IOException e) {
             logger.error("Could not write data to response file: ", e);
-        }
+        }*/
 
     }
 
@@ -345,7 +366,7 @@ public class Request {
         //generateResponse("action", null);
     }
 
-    private void generateResponse(String scope, Exception e) {
+    /*private void generateResponse(String scope, Exception e) {
         try{
             JsonObject response = new JsonObject();
             response.addProperty("scope", scope);
@@ -364,7 +385,7 @@ public class Request {
             return;
         }
 
-    }
+    }*/
 
     private boolean analyzeAndValidate(JsonObject item) {
 

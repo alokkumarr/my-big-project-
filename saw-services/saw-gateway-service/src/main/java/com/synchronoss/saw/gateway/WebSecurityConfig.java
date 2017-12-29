@@ -23,7 +23,7 @@ public class WebSecurityConfig extends
 	    .headers()
 	      .addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Origin", "*"))
 	      .addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization"))
-	      .addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Methods", "POST, GET, DELETE, OPTIONS"));    
+	      .addHeaderWriter(new StaticHeadersWriter("Access-Control-Allow-Methods", "POST, GET, DELETE,PUT, OPTIONS"));    
 	    	
 	       
     	
@@ -36,6 +36,7 @@ public class WebSecurityConfig extends
       .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()//allow CORS option calls
       .antMatchers(HttpMethod.GET,"/**").permitAll()//allow CORS option calls
       .antMatchers(HttpMethod.POST,"/**").permitAll()//allow CORS option calls
+      .antMatchers(HttpMethod.PUT,"/**").permitAll()//allow CORS option calls
       .antMatchers("/resources/**").permitAll();
   }
   }

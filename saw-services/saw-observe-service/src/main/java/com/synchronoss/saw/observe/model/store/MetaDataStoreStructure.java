@@ -73,7 +73,7 @@ private String xdfRoot;
 @JsonPropertyDescription("An explanation about the purpose of this instance.")
 private String id = "";
 @JsonProperty("query")
-private List<Query> query = null;
+private Query query = null;
 @JsonProperty("source")
 private Object source;
 @JsonIgnore
@@ -168,12 +168,12 @@ this.id = id;
 }
 
 @JsonProperty("query")
-public List<Query> getQuery() {
+public Query getQuery() {
 return query;
 }
 
 @JsonProperty("query")
-public void setQuery(List<Query> query) {
+public void setQuery(Query query) {
 this.query = query;
 }
 

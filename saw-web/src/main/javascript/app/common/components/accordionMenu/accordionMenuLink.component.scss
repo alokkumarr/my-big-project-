@@ -1,3 +1,13 @@
 .activeButton {
   color: #0096D5;
 }
+
+accordion-menu-link {
+  & > div {
+    padding-left: 10px;
+  }
+
+  &.accordion-root > div {
+    padding-left: 0;
+  }
+}

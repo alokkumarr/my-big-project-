@@ -8,7 +8,8 @@ import {
   MatDialogModule,
   MatFormFieldModule,
   MatProgressBarModule,
-  MatChipsModule
+  MatChipsModule,
+  MatInputModule
 } from '@angular/material';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
@@ -24,7 +25,8 @@ import '../../../../themes/_angular_next.scss';
     MatSelectModule,
     MatFormFieldModule,
     MatProgressBarModule,
-    MatChipsModule
+    MatChipsModule,
+    MatInputModule
   ],
   exports: [
     MatButtonModule,
@@ -34,7 +36,8 @@ import '../../../../themes/_angular_next.scss';
     MatSelectModule,
     MatFormFieldModule,
     MatProgressBarModule,
-    MatChipsModule
+    MatChipsModule,
+    MatInputModule
   ]
 })
 export class MaterialModule {}
