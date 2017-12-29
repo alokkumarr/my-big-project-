@@ -112,10 +112,14 @@ export const AnalyzeFilterModalComponent = {
           if (this.isRuntime) {
             isValid = isValid && !this._FilterService.isFilterEmpty(filter);
           } else {
-            isValid = isValid && (filter.isRuntimeFilter || !this._FilterService.isFilterEmpty(filter));
+            isValid = isValid && (
+              filter.isRuntimeFilter ||
+              !this._FilterService.isFilterEmpty(filter) ||
+              !this.isDateFilterInvalid(filter)
+            );
           }
-          if (this.isDateFilterInvalid(filter)) {
-            isValid = false;
+          if (isValid === false) {
+            return false;
           }
         });
       });
