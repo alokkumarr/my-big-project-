@@ -23,7 +23,7 @@ describe('verify preview for charts: previewForCharts.test.js', () => {
   const sizeByName = 'Activated Active Subscriber Count';
 
   const dataProvider = {
-    /*'Column Chart by admin': {user: 'admin', chartType: 'chart:column'},
+    'Column Chart by admin': {user: 'admin', chartType: 'chart:column'},
     'Column Chart by user': {user: 'userOne', chartType: 'chart:column'},
     'Bar Chart by admin': {user: 'admin', chartType: 'chart:bar'},
     'Bar Chart by user': {user: 'userOne', chartType: 'chart:bar'},
@@ -36,15 +36,18 @@ describe('verify preview for charts: previewForCharts.test.js', () => {
     'Combo Chart by admin': {user: 'admin', chartType: 'chart:combo'},
     'Combo Chart by user': {user: 'userOne', chartType: 'chart:combo'},
     'Scatter Plot Chart by admin': {user: 'admin', chartType: 'chart:scatter'},
-    'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'},*/
+    'Scatter Plot Chart by user': {user: 'userOne', chartType: 'chart:scatter'},
     'Bubble Chart by admin': {user: 'admin', chartType: 'chart:bubble'},
     'Bubble Chart by user': {user: 'userOne', chartType: 'chart:bubble'}
   };
 
+  beforeAll(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
+  });
+
   beforeEach(function (done) {
     setTimeout(function () {
       expect(browser.getCurrentUrl()).toContain('/login');
-      jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000000;
       done();
     }, 1000)
   });

@@ -32,6 +32,10 @@ describe('create a new report type analysis: createReport.test.js', () => {
   const metric = 'MCT TMO Session DL';
   const method = 'table:report';
 
+  beforeAll(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
+  });
+
   afterAll(function() {
     browser.executeScript('window.sessionStorage.clear();');
     browser.executeScript('window.localStorage.clear();');

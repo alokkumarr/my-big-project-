@@ -19,7 +19,7 @@ const using = require('jasmine-data-provider');
 //TODO add case for making multiple privileges inactive
 //TODO add case for adding new privilege
 describe('Privileges tests: privileges.test.js', () => {
-  const dataProvider = {
+  const dataProvider =  {
     'All privileges for user': {
       user: 'userOne',
       subCategory: "All DO NOT TOUCH",
@@ -45,7 +45,7 @@ describe('Privileges tests: privileges.test.js', () => {
       execute: false,
       export: false,
       delete: false
-    },
+    }/*,
     'Edit privileges for user': {
       user: 'userOne',
       subCategory: "Edit DO NOT TOUCH",
@@ -279,9 +279,12 @@ describe('Privileges tests: privileges.test.js', () => {
       execute: false,
       export: false,
       delete: false
-    },
+    },*/
   };
 
+  beforeAll(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
+  });
 
   beforeEach(function (done) {
     setTimeout(function () {

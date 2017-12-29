@@ -4,41 +4,22 @@ const browserstack = require('browserstack-local');
 
 exports.config = {
   seleniumAddress: 'http://hub-cloud.browserstack.com/wd/hub',
+  //seleniumAddress: 'http://localhost:4444/wd/hub',
+  //directConnect: true,
   framework: 'jasmine2',
   capabilities: {
-    'browserstack.user': 'alexanderkrivoro3',
-    'browserstack.key': 'nBTyXwJY7goDDaB15nNt',
+    'browserstack.user': 'alexanderkrivoro4',
+    'browserstack.key': 'rwCmGzyDLyVrjEkmXiUW',
     'browserstack.local': true,
+    'browserstack.debug': true,
     'browserName': 'chrome',
     'browser_version': '63.0',
     'os': 'OS X',
     'os_version': 'High Sierra',
     'resolution': '1920x1080',
-    /*chromeOptions: {
-      args: [
-        //'incognito',
-        'disable-extensions',
-        'disable-web-security',
-        '--start-fullscreen', // enable for Mac OS
-        /!*"--headless",
-        "--disable-gpu",
-        "--window-size=2880,1800"
-      ]
-    }*/
   },
-  /*jasmineNodeOpts: {
-    isVerbose: true,
-    defaultTimeoutInterval: 120000,
-    showTiming: true,
-    includeStackTrace: true,
-    realtimeFailure: true,
-    showColors: true
-  },*/
   suites: {
-    test: [
-      webpackHelper.root('src/test/e2e-tests/login.test.js')
-    ],
-    /*authentication: [
+    authentication: [
       webpackHelper.root('src/test/e2e-tests/login.test.js')
     ],
     analyses: [
@@ -50,7 +31,7 @@ exports.config = {
       webpackHelper.root('src/test/e2e-tests/charts/createAndDeleteCharts.test.js')
       //webpackHelper.root('src/test/javascript/e2e/spec/analyses.test.js'), // obsolete
       //webpackHelper.root('src/test/e2e-tests/debug.test.js') // for testing purposes
-    ]*/
+    ]
   },
 
   onPrepare() {
@@ -62,12 +43,19 @@ exports.config = {
       displaySuiteNumber: true
     }));
 
-    jasmine.getEnv().defaultTimeoutInterval = 600000; //another option if above doesn't work
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
+    jasmine.getEnv().defaultTimeoutInterval = 6000000; //another option if above doesn't work
 
     browser.manage().timeouts().pageLoadTimeout(30000);
     browser.manage().timeouts().implicitlyWait(10000);
     //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.driver.get('http://localhost:3000');
+
+    /*return browser.driver.wait(() => {
+      return browser.driver.getCurrentUrl().then(url => {
+        return /login/.test(url);
+      });
+    }, 30000);*/
   },
 
   onComplete() {

@@ -42,6 +42,10 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
     'Bubble Chart by user': {user: 'userOne', chartType: 'chart:bubble'}
   };
 
+  beforeAll(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
+  });
+
   beforeEach(function (done) {
     setTimeout(function () {
       expect(browser.getCurrentUrl()).toContain('/login');

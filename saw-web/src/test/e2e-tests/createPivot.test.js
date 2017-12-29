@@ -17,6 +17,10 @@ describe('create a new pivot type analysis', () => {
   const metric = 'MCT TMO Session ES';
   const method = 'table:pivot';
 
+  beforeAll(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
+  });
+
   afterAll(function() {
     browser.executeScript('window.sessionStorage.clear();');
     browser.executeScript('window.localStorage.clear();');

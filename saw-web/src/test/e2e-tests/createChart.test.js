@@ -17,6 +17,10 @@ describe('create columnChart type analysis: createChart.test.js', () => {
   const metric = 'MCT TMO Session ES';
   const method = 'chart:column';
 
+  beforeAll(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
+  });
+
   afterAll(function() {
     browser.executeScript('window.sessionStorage.clear();');
     browser.executeScript('window.localStorage.clear();');

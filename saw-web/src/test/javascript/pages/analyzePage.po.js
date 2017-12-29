@@ -154,7 +154,7 @@ function navigateToHome() {
     return browser.driver.getCurrentUrl().then(url => {
       return /analyze/.test(url);
     });
-  }, 10000);
+  }, 100000);
 };
 
 module.exports = {
