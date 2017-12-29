@@ -1,6 +1,6 @@
 /*******************************************************************************
- Filename:  V3__ROLES_DSK_DDL.SQL
- Purpose:   To Migrate the DDL
+ Filename:  V3__DSK_DDL_AND_OBSERVE.SQL
+ Purpose:   To Migrate the DDL and to introduce observe module
  Date:      06-12-2017
 ********************************************************************************/
 
