@@ -83,6 +83,10 @@ export class DesignerContainerComponent {
           }
         });
       break;
+    case 'preview':
+      this.updateAnalysis();
+      this._analyzeDialogService.openPreviewDialog(this.analysis);
+      break;
     }
   }
 

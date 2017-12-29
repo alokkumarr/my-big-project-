@@ -11,6 +11,7 @@ import {
 } from '../types';
 import { DesignerDialogComponent } from '../components/designer/dialog';
 import { ToolbarActionDialogComponent } from '../components/designer/toolbar-action-dialog';
+import { DesignerPreviewDialogComponent } from '../components/designer/preview-dialog';
 
 
 @Injectable()
@@ -51,6 +52,18 @@ export class AnalyzeDialogService {
     return this.dialog.open(ToolbarActionDialogComponent, {
       width: 'auto',
       height: 'auto',
+      data
+    } as MatDialogConfig);
+  }
+
+  openPreviewDialog(analysis: Analysis) {
+    const data = {
+      analysis
+    }
+    return this.dialog.open(DesignerPreviewDialogComponent, {
+      width: '100vw',
+      maxWidth: '100vw',
+      height: '100vh',
       data
     } as MatDialogConfig);
   }

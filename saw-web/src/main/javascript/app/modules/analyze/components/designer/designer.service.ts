@@ -50,6 +50,10 @@ export class DesignerService {
     return this._analyzeService.getDataBySettings(analysis);
   }
 
+  getDataForAnalysisPreview(analysis) {
+    return this._analyzeService.previewExecution(analysis);
+  }
+
   public getPivotGroupAdapters(artifactColumns): IDEsignerSettingGroupAdapter[] {
 
     const pivotReverseTransform = (artifactColumn: ArtifactColumnPivot) => {

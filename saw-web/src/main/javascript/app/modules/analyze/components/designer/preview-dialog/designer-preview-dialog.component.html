@@ -1,0 +1,19 @@
+<header fxLayout="row" fxLayoutAlign="start center">
+  <button mat-icon-button
+          (click)="close()">
+    <mat-icon fontIcon="icon-remove"></mat-icon>
+  </button>
+  <div class="preview__title">
+    <strong>
+      {{data.analysis.name}}
+    </strong>
+  </div>
+</header>
+
+<div class="preview-container">
+  <pivot-grid *ngIf="previewData"
+              [fields]="artifactColumns | artifactColumns2PivotFields"
+              [data]="previewData"
+              mode="preview">
+  </pivot-grid>
+</div>

@@ -59,12 +59,16 @@ export class PivotGridComponent {
       // have to repaint the grid because of the animation of the modal
       // if it's not repainted it appears smaller
       this._gridInstance.repaint();
-      this._subscription = this.updater.subscribe(updates => this.update(updates));
+      if (this.updater) {
+        this._subscription = this.updater.subscribe(updates => this.update(updates));
+      }
     }, 500);
   }
 
   ngOnDestroy() {
-    this._subscription.unsubscribe();
+    if (this._subscription) {
+      this._subscription.unsubscribe();
+    }
   }
   // pivot grid events
   onInitialized(e) {

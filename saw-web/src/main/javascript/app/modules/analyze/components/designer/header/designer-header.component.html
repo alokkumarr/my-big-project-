@@ -27,7 +27,9 @@
       <mat-icon fontIcon="icon-description"></mat-icon>
       <ng-container i18n>Description</ng-container>
     </button>
-    <button mat-button>
+    <button mat-button
+            (click)="requestAction.emit('preview')"
+            [disabled]="designerState !== DesignerStates.SELECTION_WITH_DATA">
       <mat-icon fontIcon="icon-full-screen"></mat-icon>
       <ng-container i18n>Preview</ng-container>
     </button>
