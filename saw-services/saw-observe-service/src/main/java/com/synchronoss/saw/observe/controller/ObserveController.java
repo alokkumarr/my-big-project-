@@ -113,7 +113,10 @@ public class ObserveController {
     ObserveResponse responseObjectFuture = null;
     Observe observe = new Observe();
     observe.setCategoryId(categoryId);
-    observe.setCreatedBy(userId);
+    /** Ignore the the user Id for now list out all the dashboard for category.
+     *  TO DO : User Id is required to handle the My DashBoard (private)feature.
+     */
+   // observe.setCreatedBy(userId);
     responseObjectFuture = observeService.getDashboardbyCategoryId(observe);
     return responseObjectFuture;
   }
