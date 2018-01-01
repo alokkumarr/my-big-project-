@@ -34,9 +34,9 @@ public class RoleRepositoryDaoImpl implements RoleRepository {
     if (custId != null) {
       String sql =
           "INSERT INTO `ROLES` (`CUSTOMER_SYS_ID`, `ROLE_NAME`, `ROLE_CODE`, `ROLE_DESC`," +
-              "`ROLE_TYPE`, `DATA_SECURITY_KEY`, `ACTIVE_STATUS_IND`, `CREATED_DATE`, `CREATED_BY`)"
+              "`ROLE_TYPE`, `ACTIVE_STATUS_IND`, `CREATED_DATE`, `CREATED_BY`)"
               +
-              " VALUES (?, 'ADMIN', ?, 'Admin User', 'ADMIN', 'NA', '1'," +
+              " VALUES (?, 'ADMIN', ?, 'Admin User', 'ADMIN', '1'," +
               "?, 'admin')";
 
       KeyHolder keyHolder = new GeneratedKeyHolder();
