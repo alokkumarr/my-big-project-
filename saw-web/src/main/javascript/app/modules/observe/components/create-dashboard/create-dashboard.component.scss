@@ -63,7 +63,7 @@ create-dashboard {
     bottom: 45%;
     right: 50%;
     transform: translateX(50%);
-    z-index: 1;
+    z-index: 9999;
   }
 
   .add-analysis {
@@ -71,7 +71,7 @@ create-dashboard {
     bottom: 50%;
     right: 50%;
     transform: translateX(50%);
-    z-index: 1;
+    z-index: 9999;
 
     md-icon {
       vertical-align: baseline;
