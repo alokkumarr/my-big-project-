@@ -9,6 +9,7 @@ import * as get from 'lodash/get';
 import * as set from 'lodash/set';
 import * as isEmpty from 'lodash/isEmpty';
 import * as clone from 'lodash/clone';
+import * as deepClone from 'lodash/cloneDeep';
 import * as filter from 'lodash/filter';
 import * as map from 'lodash/map';
 import * as orderBy from 'lodash/orderBy';
@@ -128,7 +129,7 @@ export class ObserveChartComponent {
     let changes = this.chartService.dataToChangeConfig(
       this.analysis.chartType,
       settings,
-      gridData,
+      deepClone(gridData),
       { labels, labelOptions: this.analysis.labelOptions, sorts: this.sorts }
     );
 
