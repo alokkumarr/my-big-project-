@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DEFAULT=9999
-read -e -p "Enter temporary port for running shell (Default: 9999): " port
+#read -e -p "Enter temporary port for running shell (Default: 9999): " port
 port="${port:-${DEFAULT}}"
 echo $port
 

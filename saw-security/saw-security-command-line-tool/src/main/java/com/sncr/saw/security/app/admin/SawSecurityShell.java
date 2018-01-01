@@ -95,11 +95,11 @@ class SawSecurityShell {
       logger.error(e.toString());
     }
   }
-
-  @ShellMethod("Dummy Command")
-  public void dummyCommand() {
-    onboard.getCustProdModulesDao().displayCustProdModules(1L);
-  }
+// Test out any shell related things here
+//  @ShellMethod("Dummy Command")
+//  public void dummyCommand() {
+//    onboard.getCustProdModulesDao().displayCustProdModules(1L);
+//  }
 
   private Long customerCreation(CustomerRepositoryDaoImpl custDao) {
 
