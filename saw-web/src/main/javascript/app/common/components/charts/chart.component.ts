@@ -74,8 +74,9 @@ export class ChartComponent {
       // Not using chart.update due to a bug with navigation
       // update and bar styles.
       if (this.isStockChart) {
-        this.config.xAxis[0].title.text = this.config.xAxis.title.text; // Highstocks adding a default xAxis settings objects with title & categories. So have to populate them inorder the title to display.
-        this.config.xAxis[0].categories = this.config.xAxis.categories;
+        set(this.config, 'xAxis.0.title.text', get(this.config, 'xAxis.title.text')); // Highstocks adding a default xAxis settings objects with title & categories. So have to populate them inorder the title to display.
+        set(this.config, 'xAxis.0.categories', get(this.config, 'xAxis.categories'));
+
         // Fix --- Highstocks API manipulating external config object, setting series and categories data to NULL
         // https://forum.highcharts.com/highstock-usage/creating-a-chart-manipulates-external-options-object-t15255/#p81794
         this.clonedConfig = clone(this.config);
@@ -88,7 +89,7 @@ export class ChartComponent {
       if (!isUndefined(this.config.xAxis)) {
         this.config.xAxis.categories = [];
       }
-      
+
       const pieNegatives = this.pieHasNegatives();
       if (pieNegatives.all) {
         // do nothing
