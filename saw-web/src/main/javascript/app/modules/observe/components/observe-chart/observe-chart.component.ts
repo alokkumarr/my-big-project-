@@ -139,6 +139,11 @@ export class ObserveChartComponent {
       {path: 'title.y', data: -10}
     ]);
 
+    changes.push({
+      path: 'chart.inverted',
+      data: get(this.analysis, 'isInverted', false)
+    });
+
     return changes;
   }
 
