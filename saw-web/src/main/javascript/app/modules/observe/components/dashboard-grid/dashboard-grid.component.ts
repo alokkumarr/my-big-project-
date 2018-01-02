@@ -1,12 +1,24 @@
-import { Component, Input, Output, ViewChild, OnInit, OnChanges, AfterViewChecked, EventEmitter } from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  ViewChild,
+  EventEmitter,
+  AfterViewChecked,
+  OnInit,
+  OnChanges,
+  OnDestroy
+} from '@angular/core';
 import { GridsterConfig, GridsterItem, GridsterComponent } from 'angular-gridster2';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription } from 'rxjs/Subscription';
 
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
 import * as forEach from 'lodash/forEach';
 
 import { Dashboard } from '../../models/dashboard.interface';
+import { SideNavService } from '../../../../common/services/sidenav.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
 const template = require('./dashboard-grid.component.html');
@@ -24,7 +36,7 @@ export const DASHBOARD_MODES = {
   selector: 'dashboard-grid',
   template
 })
-export class DashboardGridComponent implements OnInit, OnChanges, AfterViewChecked {
+export class DashboardGridComponent implements OnInit, OnChanges, AfterViewChecked, OnDestroy {
   @ViewChild('gridster') gridster: GridsterComponent;
 
   @Input() model: Dashboard;
@@ -37,9 +49,54 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
   public columns = 4;
   public options: GridsterConfig;
   public dashboard: Array<GridsterItem> = [];
+  private sidenavEventSubscription: Subscription;
   public initialised = false;
 
-  constructor(private analyze: AnalyzeService) {}
+  constructor(private analyze: AnalyzeService, private sidenav: SideNavService) { }
+
+  ngOnInit() {
+    this.subscribeToRequester();
+
+    this.options = {
+      gridType: 'scrollVertical',
+      minCols: this.columns,
+      maxCols: 100,
+      margin: MARGIN_BETWEEN_TILES,
+      minRows: 4,
+      maxRows: 100,
+      initCallback: this.onGridInit.bind(this),
+      itemChangeCallback: this.itemChange.bind(this),
+      draggable: {
+        enabled: !this.isViewMode()
+      },
+      resizable: {
+        enabled: !this.isViewMode()
+      }
+    };
+  }
+
+  ngAfterViewChecked() {
+    setTimeout(_ => this.initialiseDashboard());
+  }
+
+  ngOnChanges() {
+    this.initialiseDashboard();
+  }
+
+  ngOnDestroy() {
+    this.sidenavEventSubscription.unsubscribe();
+  }
+
+  onGridInit() {
+    this.sidenavEventSubscription = this.sidenav.sidenavEvent.subscribe(val => {
+      setTimeout(_ => {
+        this.gridster.resize();
+      });
+      setTimeout(_ => {
+        this.refreshAllTiles();
+      }, 500);
+    });
+  }
 
   isViewMode() {
     return this.mode === DASHBOARD_MODES.VIEW;
@@ -79,31 +136,6 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
 
   refreshAllTiles() {
     forEach(this.dashboard, this.refreshTile.bind(this));
-  }
-
-  ngOnInit() {
-    window['myview'] = this;
-    this.subscribeToRequester();
-    this.options = {
-      gridType: 'scrollVertical',
-      minCols: this.columns,
-      maxCols: 100,
-      margin: MARGIN_BETWEEN_TILES,
-      minRows: 4,
-      maxRows: 100,
-      itemChangeCallback: this.itemChange.bind(this),
-      draggable: {
-        enabled: !this.isViewMode()
-      },
-      resizable: {
-        enabled: !this.isViewMode()
-      }
-    };
-
-  }
-
-  ngAfterViewChecked() {
-    setTimeout(_ => this.initialiseDashboard());
   }
 
   initialiseDashboard() {
@@ -163,9 +195,5 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
       })),
       filters: []
     }
-  }
-
-  ngOnChanges() {
-    this.initialiseDashboard();
   }
 }
