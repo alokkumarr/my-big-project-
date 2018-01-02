@@ -23,7 +23,8 @@ import {
   menuServiceProvider,
   componentHandlerProvider,
   headerProgressProvider,
-  toastProvider
+  toastProvider,
+  sidenavProvider
 } from '../../common/services/ajs-common-providers';
 import { ObserveService } from './services/observe.service';
 
@@ -92,6 +93,7 @@ const components = [
     componentHandlerProvider,
     headerProgressProvider,
     toastProvider,
+    sidenavProvider,
     chartServiceProvider,
     sortServiceProvider,
     filterServiceProvider

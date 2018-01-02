@@ -9,6 +9,7 @@ import {errorDetailService} from './error-detail.service';
 import {dxDataGridService} from './dxDataGrid.service';
 import {fileService} from './file.service';
 import {ToastService} from './toastMessage.service';
+import {SideNavService} from './sidenav.service';
 
 export const CommonServiceModule = 'CommonModule.Service';
 
@@ -21,4 +22,5 @@ angular.module(CommonServiceModule, moduleDependencies)
   .factory('fileService', fileService)
   .service('toastMessage', ToastService)
   .service('HeaderProgress', HeaderProgressService)
+  .service('SidenavService', SideNavService)
   .service('MenuService', MenuService);
