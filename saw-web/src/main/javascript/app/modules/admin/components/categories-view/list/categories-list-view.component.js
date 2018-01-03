@@ -96,7 +96,6 @@ export const CategoriesListViewComponent = {
         width: '8%',
         cellTemplate: 'actionCellTemplate'
       }];
-
       return this._dxDataGridService.mergeWithDefaultConfig({
         onInitialized: this.onGridInitialized.bind(this),
         columns,

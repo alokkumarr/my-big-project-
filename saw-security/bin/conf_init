@@ -57,23 +57,32 @@ mk_conf() {
 # extended pattern matching operators
 shopt -s extglob
 
-# Parse VARS file, get value of db.init.password
-db_init_pass=
-while read s ; do
-    # trim comment
-    s=${s%%\#*}
-    # Check assignment
-    [[ $s == *=* ]] || continue
-    # remove all spaces
-    s=$(tr -d ' ' <<<"$s")
-    # extract name and value
-    snam=${s%%=*} 
-    [[ $snam = db.init.password ]] && {
-        sval=${s#*=}
-        db_init_pass="$sval"
-        break
-    }
-done < $vars_file
+# Set database password
+db_password_file=/etc/bda/saw-security-db-password
+db_root_password_file=/etc/bda/mariadb-root-password
+initial_setup_marker=/etc/bda/saw-security-initial-setup
+
+# For old environments, if password file does not exist, initialize to default
+if [ ! -e $db_password_file -a -e $initial_setup_marker ]; then
+   echo saw_security > $db_password_file
+   chmod go-rwx $db_password_file
+fi
+
+# Generate database passwords
+generate_password() {
+    local password_file=$1
+    if [ -e $password_file ]; then
+        return
+    fi
+    local password=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 14)
+    echo $password > $password_file
+    chmod go-rwx $password_file
+}
+generate_password $db_password_file
+generate_password $db_root_password_file
+
+# Calculate encrypted database password
+db_init_pass=$(< $db_password_file)
 ds_cpass_val=
 [[ $db_init_pass ]] && {
     # Calc pass crypto

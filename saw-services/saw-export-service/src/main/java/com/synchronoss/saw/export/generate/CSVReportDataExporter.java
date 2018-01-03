@@ -1,12 +1,14 @@
 package com.synchronoss.saw.export.generate;
 
 import com.synchronoss.saw.export.generate.interfaces.IFileExporter;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -105,5 +107,9 @@ public class CSVReportDataExporter implements IFileExporter {
         return file;
     }
 
+	@Override
+	public Workbook getWorkBook(ExportBean exportBean, List<Object> recordRowList) throws IOException {
+		return null;
+	}
 
 }

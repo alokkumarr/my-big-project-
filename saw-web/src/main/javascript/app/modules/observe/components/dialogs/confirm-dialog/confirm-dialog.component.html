@@ -1,0 +1,14 @@
+<div md-dialog-title>
+  <span [textContent]="title"></span>
+</div>
+<div md-dialog-content>
+  <span [textContent]="message"></span>
+</div>
+<div md-dialog-actions style="flex-direction: row-reverse">
+  <button md-button [color]="actionColor"
+  (click)="confirm()"
+  [textContent]="actionButton"></button>
+  <button md-button (click)="closeDashboard()">
+    Cancel
+  </button>
+</div>

@@ -1,7 +1,9 @@
 import * as get from 'lodash/get';
 
-class UserService {
+export class UserService {
   constructor($window, $http, $state, AppConfig, JwtService) {
+    'ngInject';
+
     this._$window = $window;
     this._$http = $http;
     this._$state = $state;
@@ -45,7 +47,7 @@ class UserService {
       .then(() => {
         this._JwtService.destroy();
         if (path === 'logout') {
-          this._$state.go('login');
+          this._$state.reload();
         }
       });
   }
@@ -141,9 +143,4 @@ class UserService {
         throw err;
       });
   }
-}
-
-export function UserServiceFactory($window, $http, $state, AppConfig, JwtService) {
-  'ngInject';
-  return new UserService($window, $http, $state, AppConfig, JwtService);
 }

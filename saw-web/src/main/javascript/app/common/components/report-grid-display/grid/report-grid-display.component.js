@@ -2,7 +2,12 @@ import * as map from 'lodash/map';
 import * as isUndefined from 'lodash/isUndefined';
 import * as forEach from 'lodash/forEach';
 import * as isEmpty from 'lodash/isEmpty';
+import * as keys from 'lodash/keys';
+import * as fpGet from 'lodash/fp/get';
+import * as reduce from 'lodash/reduce';
 import * as moment from 'moment';
+
+import {FieldModel} from '../../jsPlumb/models/fieldModel';
 import DataSource from 'devextreme/data/data_source';
 import 'moment-timezone';
 
@@ -21,21 +26,27 @@ export const ReportGridDisplayComponent = {
     source: '&'
   },
   controller: class ReportGridDisplayController {
-    constructor(dxDataGridService, FilterService) {
+    constructor(dxDataGridService, FilterService, $timeout) {
       'ngInject';
       this._dxDataGridService = dxDataGridService;
       this._FilterService = FilterService;
       this._gridInstance = null;
+      this._$timeout = $timeout;
       this.pageSize = DEFAULT_PAGE_SIZE;
       this.$window = window;
     }
 
     $onInit() {
-      const columns = this._getDxColumns(this.columns);
-
+      const columns = this._getDxColumns(this.columns, this.data);
       const gridSelector = '.report-dx-grid.report-dx-grid-display';
       this.gridConfig = this._dxDataGridService.mergeWithDefaultConfig({
-        columns,
+        columns: isEmpty(columns) ? null : columns,
+        customizeColumns: columns => {
+          forEach(columns, col => {
+            col.alignment = 'left';
+            col.width = COLUMN_WIDTH;
+          });
+        },
         remoteOperations: {
           paging: true
         },
@@ -88,7 +99,7 @@ export const ReportGridDisplayComponent = {
       if (isEmpty(data)) {
         return data;
       }
-      const keys = Object.keys(data[0]);
+      const ks = keys(data[0] || {});
       const formats = [
         moment.ISO_8601,
         'YYYY-MM-DD hh:mm:ss',
@@ -96,7 +107,7 @@ export const ReportGridDisplayComponent = {
         'MM/DD/YYYY  :)  HH*mm*ss'
       ];
       forEach(data, row => {
-        forEach(keys, key => {
+        forEach(ks, key => {
           const date = moment.tz(row[key], formats, true, BACKEND_TIMEZONE);
           if (date.isValid() && ['date', 'string-date', 'timestamp'].includes(this.checkColumndatatype(this.columns, key))) {
             row[key] = date.toDate();
@@ -105,23 +116,54 @@ export const ReportGridDisplayComponent = {
       });
       return data;
     }
+
+    fillColumns(fields, data = []) {
+      let table = null;
+      const columnNames = keys(fpGet('[0]', data) || {});
+
+      const columns = reduce(fields, (col, field) => {
+        table = table || field.table;
+        const index = columnNames.indexOf(field.name);
+        if (index >= 0) {
+          col.splice(index, 1, field);
+        }
+        return col;
+      }, columnNames);
+
+      return map(columns, col => {
+        if (angular.isString(col)) {
+          const customColumn = new FieldModel(table, col);
+          customColumn.checked = true;
+          return customColumn;
+        }
+        col.checked = true;
+        return col;
+      });
+    }
+
     checkColumndatatype(columnList, columnName) {
       let datatype = '';
       forEach(columnList, column => {
-        if (column.columnName === columnName) {
+        if (!isEmpty(column) && column.columnName === columnName) {
           datatype = column.type;
         }
       });
       return datatype;
     }
-    _getDxColumns(columns) {
-      return map(columns, column => {
+    _getDxColumns(columns = [], data = []) {
+      let allColumns = [];
+      if (isEmpty(data)) {
+        allColumns = columns;
+      } else {
+        allColumns = this.fillColumns(columns, data);
+      }
+      return map(allColumns, column => {
         if (column.type === 'timestamp' || column.type === 'string-date') {
           column.type = 'date';
         }
         const field = {
           alignment: 'left',
-          caption: column.alias || column.displayName,
+          caption: column.alias || column.displayName || column.name,
           format: column.format,
           dataField: column.columnName || column.name,
           visibleIndex: column.visibleIndex,
@@ -184,7 +226,7 @@ export const ReportGridDisplayComponent = {
 
     $onChanges() {
       if (this._gridInstance) {
-        const columns = this._getDxColumns(this.columns);
+        const columns = this._getDxColumns(this.columns, this.data);
         forEach(columns, column => {
           if (column.dataType === 'date') {
             column.dataType = 'string-date';

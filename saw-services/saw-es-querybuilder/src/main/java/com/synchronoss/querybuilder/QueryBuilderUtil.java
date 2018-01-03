@@ -1,6 +1,10 @@
 package com.synchronoss.querybuilder;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
@@ -9,6 +13,7 @@ import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram.Order;
+
 import com.synchronoss.BuilderUtil;
 import com.synchronoss.querybuilder.model.chart.Filter;
 import com.synchronoss.querybuilder.model.chart.NodeField;
@@ -18,6 +23,18 @@ import com.synchronoss.querybuilder.model.pivot.Model.Operator;
 public class QueryBuilderUtil {
 	
 	public final static String DATE_FORMAT = "yyyy-MM-dd";
+	public final static String SPACE_REGX = "\\s+";
+	public final static String EMPTY_STRING = "";
+	public static Map<String,String> dateFormats = new HashMap<String, String>();
+	static {
+      Map<String, String> formats = new HashMap<String, String>();
+      formats.put("YYYY", "year");
+      formats.put("MMMYYYY", "month");
+      formats.put("MMYYYY", "month");
+      formats.put("MMMdYYYY", "day");
+      formats.put("MMMMdYYYY,h:mm:ssa", "hour");
+      dateFormats = Collections.unmodifiableMap(formats);
+  }
 	
 	public static AggregationBuilder aggregationBuilder (com.synchronoss.querybuilder.model.pivot.ColumnField columnField, 
 	     String aggregationName)
@@ -127,22 +144,48 @@ public class QueryBuilderUtil {
 		AggregationBuilder aggregationBuilder = null;
 		
 		if (nodeField.getType().name().equals(NodeField.Type.DATE.name()) || nodeField.getType().name().equals(NodeField.Type.TIMESTAMP.name()) ){
-			
-		  if (nodeField.getGroupInterval()!=null){
-            aggregationBuilder = AggregationBuilders.
-                    dateHistogram(nodeName).field(nodeField.getColumnName()).format(nodeField.getDateFormat()).
-                    dateHistogramInterval(groupInterval(nodeField.getGroupInterval().value())).order(Order.KEY_DESC);
+		  nodeField = setGroupIntervalChart(nodeField);
+  		  if (nodeField.getGroupInterval()!=null){
+              aggregationBuilder = AggregationBuilders.
+                      dateHistogram(nodeName).field(nodeField.getColumnName()).format(nodeField.getDateFormat()).
+                      dateHistogramInterval(groupInterval(nodeField.getGroupInterval().value())).order(Order.KEY_DESC);
+              }
+            else {
+              aggregationBuilder =  AggregationBuilders.terms(nodeName).field(nodeField.getColumnName())
+                  .format(nodeField.getDateFormat()).order(org.elasticsearch.search.aggregations.bucket.terms.Terms.Order.term(false)).size(BuilderUtil.SIZE);
             }
-          else {
-            aggregationBuilder =  AggregationBuilders.terms(nodeName).field(nodeField.getColumnName())
-                .format(nodeField.getDateFormat()).order(org.elasticsearch.search.aggregations.bucket.terms.Terms.Order.term(false)).size(BuilderUtil.SIZE);
-          }
 		}
 		else{
 			aggregationBuilder = AggregationBuilders.terms(nodeName).field(nodeField.getColumnName()).size(BuilderUtil.SIZE);
 		}
 		return aggregationBuilder;
 	}	
+
+  public static com.synchronoss.querybuilder.model.chart.NodeField setGroupIntervalChart(
+      com.synchronoss.querybuilder.model.chart.NodeField nodeField) {
+    String interval = dateFormats.get(nodeField.getDateFormat().replaceAll(SPACE_REGX, EMPTY_STRING));
+    switch (interval) {
+      case "month":
+        nodeField.setGroupInterval(
+            com.synchronoss.querybuilder.model.chart.NodeField.GroupInterval.MONTH);
+        break;
+      case "year":
+        nodeField.setGroupInterval(
+            com.synchronoss.querybuilder.model.chart.NodeField.GroupInterval.YEAR);
+        break;
+      case "day":
+        nodeField
+            .setGroupInterval(com.synchronoss.querybuilder.model.chart.NodeField.GroupInterval.DAY);
+        break;
+      case "hour":
+        nodeField.setGroupInterval(
+            com.synchronoss.querybuilder.model.chart.NodeField.GroupInterval.HOUR);
+        break;
+      default:
+        throw new IllegalArgumentException(interval + " not present");
+    }
+    return nodeField;
+  }
 
 	public static List<QueryBuilder> numericFilterChart (Filter item, List<QueryBuilder> builder)
 	  {

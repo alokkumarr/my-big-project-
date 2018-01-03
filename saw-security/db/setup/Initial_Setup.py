@@ -68,8 +68,10 @@ customer = "SAW"
 # email = "kiran.ps2@synchronoss.com"
 log1.info("Get value for Email Address from the vars file")
 if use_vars_file:
-    email = vars_dict['db.init.email']
-    print "Email ID to which notifications are to be sent:", email
+    #email = vars_dict['db.init.email']
+    # Note: This email is unused and only set to avoid breaking the rest of the script.
+    email = 'noreply@example.com'
+    #print "Email ID to which notifications are to be sent:", email
 else:
     email = raw_input("Please enter Email ID to which notifications are to be sent: ")
 
@@ -110,7 +112,9 @@ db_conn_type = ''
 
 if sql_server_type == "MYSQL":
     log1.debug("Get the server|database name| user| password details from vars file")
-    db_info=str(vars_dict['db.init.server'])+'|'+str(vars_dict['db.init.dbname'])+'|'+str(vars_dict['db.init.user'])+'|'+str(vars_dict['db.init.password'])
+    with open('/etc/bda/saw-security-db-password', 'r') as f:
+        db_info_password = f.readline().strip()
+    db_info=str(vars_dict['db.init.server'])+'|'+str(vars_dict['db.init.dbname'])+'|'+str(vars_dict['db.init.user'])+'|'+db_info_password
 
     sql_str_list = db_info.split("|")
 

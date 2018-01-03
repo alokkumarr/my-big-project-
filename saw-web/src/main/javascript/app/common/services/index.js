@@ -4,10 +4,12 @@ import 'angular-toastr/dist/angular-toastr.css';
 
 import {MenuService} from './menu.service';
 import {LocalSearchService} from './local-search.service';
+import {HeaderProgressService} from './header-progress.service';
 import {errorDetailService} from './error-detail.service';
 import {dxDataGridService} from './dxDataGrid.service';
 import {fileService} from './file.service';
-import {toastMessageService} from './toastMessage.service';
+import {ToastService} from './toastMessage.service';
+import {SideNavService} from './sidenav.service';
 
 export const CommonServiceModule = 'CommonModule.Service';
 
@@ -18,5 +20,7 @@ angular.module(CommonServiceModule, moduleDependencies)
   .factory('LocalSearchService', LocalSearchService)
   .factory('ErrorDetail', errorDetailService)
   .factory('fileService', fileService)
-  .factory('toastMessage', toastMessageService)
+  .service('toastMessage', ToastService)
+  .service('HeaderProgress', HeaderProgressService)
+  .service('SidenavService', SideNavService)
   .service('MenuService', MenuService);

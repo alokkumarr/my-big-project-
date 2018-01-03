@@ -15,7 +15,7 @@ exports.config = {
         //'incognito',
         'disable-extensions',
         'disable-web-security',
-        //'--start-fullscreen' // enable for Mac OS
+        '--start-fullscreen', // enable for Mac OS
         "--headless",
         "--disable-gpu",
         "--window-size=2880,1800"
@@ -33,22 +33,19 @@ exports.config = {
   },
 
   suites: {
-
     authentication: [
       webpackHelper.root('src/test/e2e-tests/login.test.js')
     ],
-
     analyses: [
       /*webpackHelper.root('src/test/e2e-tests/priviliges.test.js'),
       webpackHelper.root('src/test/e2e-tests/goToAnalyze.test.js'),
       webpackHelper.root('src/test/e2e-tests/createChart.test.js'),
       webpackHelper.root('src/test/e2e-tests/createPivot.test.js'),
       webpackHelper.root('src/test/e2e-tests/createReport.test.js'),
-      //webpackHelper.root('src/test/javascript/e2e/spec/analyses.test.js'), // obsolete
+      webpackHelper.root('src/test/e2e-tests/charts/createAndDeleteCharts.test.js'),
+      webpackHelper.root('src/test/e2e-tests/charts/previewForCharts.test.js')*/
       //webpackHelper.root('src/test/e2e-tests/debug.test.js') // for testing purposes
-      webpackHelper.root('src/test/e2e-tests/charts/createAndDeleteCharts.test.js')*/
-
-
+      //webpackHelper.root('src/test/javascript/e2e/spec/analyses.test.js'), // obsolete
     ]
   },
 
@@ -59,6 +56,8 @@ exports.config = {
       displaySuiteNumber: true
     }));
 
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000000;
+    //jasmine.getEnv().defaultTimeoutInterval = 10000000; //another option if above doesn't work
     let jasmineReporters = require('jasmine-reporters');
     let junitReporter = new jasmineReporters.JUnitXmlReporter({
 
@@ -78,7 +77,7 @@ exports.config = {
     jasmine.getEnv().addReporter(junitReporter);
 
 
-    //jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
     jasmine.getEnv().defaultTimeoutInterval = 500000; //another option if above doesn't work
 
     browser.manage().timeouts().pageLoadTimeout(30000);
