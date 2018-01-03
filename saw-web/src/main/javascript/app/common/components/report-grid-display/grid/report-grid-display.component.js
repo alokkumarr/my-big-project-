@@ -151,7 +151,12 @@ export const ReportGridDisplayComponent = {
       return datatype;
     }
     _getDxColumns(columns = [], data = []) {
-      const allColumns = this.fillColumns(columns, data);
+      let allColumns = [];
+      if (isEmpty(data)) {
+        allColumns = columns;
+      } else {
+        allColumns = this.fillColumns(columns, data);
+      }
       return map(allColumns, column => {
         if (column.type === 'timestamp' || column.type === 'string-date') {
           column.type = 'date';

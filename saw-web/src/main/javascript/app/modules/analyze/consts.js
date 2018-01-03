@@ -173,7 +173,7 @@ export const ANALYSIS_METHODS = [
       },
       {
         label: 'Timeseries Chart',
-        icon: {font: 'icon-combo-chart'},
+        icon: {font: 'icon-timeseries-chart'},
         type: 'chart:tsspline'
       }
     ]

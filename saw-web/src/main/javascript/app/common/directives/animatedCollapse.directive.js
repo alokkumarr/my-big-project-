@@ -28,12 +28,14 @@ class AnimatedCollapseDirective {
   }
 
   updateHeight(element, isCollapsed) {
-    const targetHeight = isCollapsed ? 0 : this.getTargetHeight(element);
+    const targetHeight = isCollapsed ? '0' : 'auto';
 
     // Set the height of the container
-    element.css({height: `${targetHeight}px`});
+    element.css({height: `${targetHeight}`});
   }
 
+  /* This method is not being used right now. Calculates (incorrectly)
+     the height of child (collapse area). */
   getTargetHeight(target) {
     const height = target.css('height');
 

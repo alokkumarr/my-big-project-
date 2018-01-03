@@ -135,7 +135,7 @@ public class XlsxExporter implements IFileExporter
 		logger.debug(this.getClass().getName() + " addxlsxRows starts");
         String [] header = null;
 		for (int rowNum = 0; rowNum < recordRowList.size(); rowNum++) {
-			XSSFRow excelRow = workSheet.createRow(rowNum);
+			XSSFRow excelRow = workSheet.createRow(rowNum+1);
 			Object data = recordRowList.get(rowNum);
 
 			if(data instanceof LinkedHashMap) {
