@@ -39,13 +39,13 @@ class SawSecurityShell {
       // check if connection is working fine only then proceed
       if (custDao.testSql() == 1) {
 
-        // assume that the products and modules are already created.
+        // display all the products
         onboard.getProductsDao().displayProducts();
 
         // customer creation
         Long created_cust_id = customerCreation(custDao);
         System.out.println("Generated CUSTOMER_SYS_ID: " + created_cust_id);
-        logger.info("Created user with ID: "+created_cust_id);
+        logger.info("Created user with ID: " + created_cust_id);
 
         // customer product linkages
         onboard.getProductsDao().displayProducts();
@@ -56,7 +56,7 @@ class SawSecurityShell {
         String created_cust_prod_id = cust_prod_linkage_ids.get(1);
         System.out.println(created_cust_prod_id);
         System.out.println("Generated CUST_PROD_SYS_ID: " + created_cust_prod_id);
-        logger.info("Created CUST_PROD entry with ID: "+ created_cust_prod_id);
+        logger.info("Created CUST_PROD entry with ID: " + created_cust_prod_id);
 
         // display product modules
         onboard.getProdModulesDao().displayProductModules();
@@ -72,19 +72,20 @@ class SawSecurityShell {
 
         //create admin role
         Long createdAdminRoleSysId = createAdminRole(created_cust_id);
-        logger.info("Created Admin Role for above customer with ID: "+ createdAdminRoleSysId);
+        logger.info("Created Admin Role for above customer with ID: " + createdAdminRoleSysId);
 
         // create Admin user
         Long createdAdminUserSysId = createAdminUser(createdAdminRoleSysId, created_cust_id);
-        System.out.println("Generated User ID for current user is: "+ createdAdminUserSysId);
-        logger.info("Created Admin user with ID: "+ createdAdminUserSysId);
+        System.out.println("Generated User ID for current user is: " + createdAdminUserSysId);
+        logger.info("Created Admin user with ID: " + createdAdminUserSysId);
 
         // At the very end add just one privilege for admin user by admin user
-        Long createdPrivilegeSysId = createPrivilegeForAdminUser(Long.parseLong(created_cust_prod_id),
+        Long createdPrivilegeSysId = createPrivilegeForAdminUser(
+            Long.parseLong(created_cust_prod_id),
             Long.parseLong(cust_prod_mod_linkage_ids.get(1)),
             Long.parseLong(cust_prod_mod_feature_linkage_ids.get(1)),
             1L);
-        logger.info("Generated Privilege ID for Admin user: "+ createdPrivilegeSysId);
+        logger.info("Generated Privilege ID for Admin user: " + createdPrivilegeSysId);
 
       } else {
         // connection is not working fine
@@ -103,25 +104,25 @@ class SawSecurityShell {
 
   private Long customerCreation(CustomerRepositoryDaoImpl custDao) {
 
-    System.out.println("====== CUSTOMERS TABLE ======");
+    System.out.println("====== CUSTOMERS INFORMATION ======");
     // customer creation
     Customer customer = new Customer();
     Scanner scanner = new Scanner(System.in);
-    System.out.print("Enter CUSTOMER_CODE: ");
+    System.out.print("Enter CUSTOMER_CODE: (UNIQUE CODE TO IDENTIFY your company / division) ");
     customer.setCustCode(scanner.next());
-    System.out.print("Enter COMPANY_NAME: ");
+    System.out.print("Enter COMPANY NAME: ");
     customer.setCompanyName(scanner.next());
-    System.out.print("Enter COMPANY_BUSINESS: ");
+    System.out.print("Enter COMPANY BUSINESS: ");
     customer.setCompanyBusiness(scanner.next());
     boolean truth = false;
     Long prod_sys_id = -1L;
     while (truth == false) {
       // do it until they enter existing product ID
-      System.out.print("Enter LANDING_PROD_SYS_ID: ");
+      System.out.print("Enter PRODUCT ID from above for default landing page: ");
       prod_sys_id = scanner.nextLong();
       truth = onboard.getProductsDao().checkProductExistance(prod_sys_id);
       if (!truth) {
-        System.out.print("Entered LANDING_PROD_SYS_ID does not exist!!!");
+        System.out.print("Entered PRODUCT ID does not exist!!!");
       }
     }
     customer.setLandingProdSysId(prod_sys_id);
@@ -177,7 +178,7 @@ class SawSecurityShell {
 
   public Map<Integer, String> createCustomerProductModuleLinkages(Long custProdId,
       Long custId) {
-    System.out.println("====== CUSTOMER_PRODUCT_MODULES TABLE ======");
+    System.out.println("====== CUSTOMER PRODUCT MODULES ======");
     CustomerProductModuleRepositoryDaoImpl custProdMod = onboard.getCustProdModulesDao();
     Map<Integer, String> results = new HashMap<Integer, String>();
     Scanner scanner = new Scanner(System.in);
@@ -189,7 +190,7 @@ class SawSecurityShell {
       Long prodModId = -1L;
       while (truth == false) {
         // do until they enter correct product module ID
-        System.out.println("Enter PROD_MOD_SYS_ID (from above shown values): ");
+        System.out.println("Enter MODULE_ID (from above shown values): ");
         prodModId = scanner.nextLong();
         truth = onboard.getProdModulesDao().checkProductModuleExistance(prodModId);
         if (!truth) {
@@ -213,7 +214,7 @@ class SawSecurityShell {
   }
 
   public Map<Integer, String> createCustomerProductModuleFeatureLinkages(Long custProdModId) {
-    System.out.println("====== CUSTOMER_PRODUCT_MODULE_FEATURES TABLE ======");
+    System.out.println("====== ASSOCIATING DEFAULT FEATURES ======");
     CustomerProductModuleFeatureRepositoryDaoImpl custProdModFeatures = onboard
         .getCustProdModuleFeaturesDao();
     return custProdModFeatures
@@ -221,16 +222,18 @@ class SawSecurityShell {
   }
 
   public long createAdminRole(Long custId) {
-    System.out.println("====== ROLES TABLE for Admin Role ======");
+    System.out.println("====== CREATING ADMIN ROLE ======");
     RoleRepositoryDaoImpl adminRole = onboard
         .getRolesDao();
     return adminRole.createNewAdminRoleDao(custId);
   }
 
-  public long createPrivilegeForAdminUser(Long custProdSysId, Long custProdModSysId, Long custProdModFeatureSysId, Long roleSysId) {
-    System.out.println("====== PRIVILEGE TABLE for Admin Role ======");
+  public long createPrivilegeForAdminUser(Long custProdSysId, Long custProdModSysId,
+      Long custProdModFeatureSysId, Long roleSysId) {
+    System.out.println("====== CREATING PRIVILEGES FOR ADMIN ======");
     PrivilegeRepositoryDao priv = onboard.getPrivRepoDao();
-    return priv.createNewPrivilegeDao(custProdSysId, custProdModSysId, custProdModFeatureSysId, roleSysId);
+    return priv
+        .createNewPrivilegeDao(custProdSysId, custProdModSysId, custProdModFeatureSysId, roleSysId);
   }
 
 

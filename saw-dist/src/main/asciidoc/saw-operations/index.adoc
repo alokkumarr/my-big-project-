@@ -260,63 +260,76 @@ In below example, it starts with showing you which products are present in syste
     shell:>onboard-customer
     Customer information:
     1
-    {PRODUCT_SYS_ID=1, PRODUCT_NAME=MCT Insights}
-    {PRODUCT_SYS_ID=2, PRODUCT_NAME=SnT Insighjts}
-    {PRODUCT_SYS_ID=3, PRODUCT_NAME=Smart Care Insights}
-    {PRODUCT_SYS_ID=4, PRODUCT_NAME=SAW Demo}
-    {PRODUCT_SYS_ID=5, PRODUCT_NAME=Channel Insights}
-    ====== CUSTOMERS TABLE ======
-    Enter CUSTOMER_CODE: sync10
-    Enter COMPANY_NAME: sync10
-    Enter COMPANY_BUSINESS: sync10
-    Enter LANDING_PROD_SYS_ID: 4
-    Enter DOMAIN_NAME: sync10.com
-    Generated CUSTOMER_SYS_ID: 16
+    {PRODUCT_ID=1, PRODUCT_NAME=MCT Insights}
+    {PRODUCT_ID=2, PRODUCT_NAME=SnT Insighjts}
+    {PRODUCT_ID=3, PRODUCT_NAME=Smart Care Insights}
+    {PRODUCT_ID=4, PRODUCT_NAME=SAW Demo}
+    {PRODUCT_ID=5, PRODUCT_NAME=Channel Insights}
+    ====== CUSTOMERS INFORMATION ======
+    Enter CUSTOMER_CODE: (UNIQUE CODE TO IDENTIFY your company / division) temp
+    Enter COMPANY NAME: temp
+    Enter COMPANY BUSINESS: temp
+    Enter PRODUCT ID from above for default landing page: 4
+    Enter DOMAIN_NAME: abc.com
+    Generated CUSTOMER_SYS_ID: 2
+    2018-01-03 10:09:43.676  INFO 6307 --- [           main] c.s.s.s.app.admin.SawSecurityShell       : Created user with ID: 2
 
 
 In this case the generated customer_sys_id is 16. It continues to show product information as we need to associate these products with customers, in my case I chose 4 which is for saw demo.
 
-    {PRODUCT_SYS_ID=1, PRODUCT_NAME=MCT Insights}
-    {PRODUCT_SYS_ID=2, PRODUCT_NAME=SnT Insighjts}
-    {PRODUCT_SYS_ID=3, PRODUCT_NAME=Smart Care Insights}
-    {PRODUCT_SYS_ID=4, PRODUCT_NAME=SAW Demo}
-    {PRODUCT_SYS_ID=5, PRODUCT_NAME=Channel Insights}
+    {PRODUCT_ID=1, PRODUCT_NAME=MCT Insights}
+    {PRODUCT_ID=2, PRODUCT_NAME=SnT Insighjts}
+    {PRODUCT_ID=3, PRODUCT_NAME=Smart Care Insights}
+    {PRODUCT_ID=4, PRODUCT_NAME=SAW Demo}
+    {PRODUCT_ID=5, PRODUCT_NAME=Channel Insights}
     ====== CUSTOMER_PRODUCTS TABLE ======
     Enter PRODUCT_SYS_ID: 4
     class org.springframework.jdbc.support.GeneratedKeyHolder
-    11
-    Generated CUST_PROD_SYS_ID: 11
+    2
+    Generated CUST_PROD_SYS_ID: 2
+    2018-01-03 12:42:32.522  INFO 6307 --- [           main] c.s.s.s.app.admin.SawSecurityShell       : Created CUST_PROD entry with ID: 2
 
 In this example the generated customer product linkage ID is 11. It continues with displaying modules of all products, sicne we chose saw demo i.e. 4 in previous case. It makes sense to select modules of that product only. i.e. in this case either 4, 7 or 8.
 
-    {PROD_MOD_SYS_ID=1, PRODUCT_NAME=MCT Insights, MODULE_NAME=OBSERVE}
-    {PROD_MOD_SYS_ID=2, PRODUCT_NAME=SnT Insighjts, MODULE_NAME=OBSERVE}
-    {PROD_MOD_SYS_ID=3, PRODUCT_NAME=Smart Care Insights, MODULE_NAME=OBSERVE}
-    {PROD_MOD_SYS_ID=4, PRODUCT_NAME=SAW Demo, MODULE_NAME=ANALYZE}
-    {PROD_MOD_SYS_ID=5, PRODUCT_NAME=Channel Insights, MODULE_NAME=OBSERVE}
-    {PROD_MOD_SYS_ID=6, PRODUCT_NAME=MCT Insights, MODULE_NAME=ANALYZE}
-    {PROD_MOD_SYS_ID=7, PRODUCT_NAME=SAW Demo, MODULE_NAME=ALERT}
-    {PROD_MOD_SYS_ID=8, PRODUCT_NAME=SAW Demo, MODULE_NAME=OBSERVE}
-    ====== CUSTOMER_PRODUCT_MODULES TABLE ======
-    Enter PROD_MOD_SYS_ID (from above shown values):
+    {MODULE_ID=1, PRODUCT_NAME=MCT Insights, MODULE_NAME=OBSERVE}
+    {MODULE_ID=2, PRODUCT_NAME=SnT Insighjts, MODULE_NAME=OBSERVE}
+    {MODULE_ID=3, PRODUCT_NAME=Smart Care Insights, MODULE_NAME=OBSERVE}
+    {MODULE_ID=4, PRODUCT_NAME=SAW Demo, MODULE_NAME=ANALYZE}
+    {MODULE_ID=5, PRODUCT_NAME=Channel Insights, MODULE_NAME=OBSERVE}
+    {MODULE_ID=6, PRODUCT_NAME=MCT Insights, MODULE_NAME=ANALYZE}
+    {MODULE_ID=7, PRODUCT_NAME=SAW Demo, MODULE_NAME=ALERT}
+    {MODULE_ID=8, PRODUCT_NAME=SAW Demo, MODULE_NAME=OBSERVE}
+    ====== CUSTOMER PRODUCT MODULES ======
+    Enter MODULE_ID (from above shown values):
     4
+    Enter more? (yes/no): yes
+    Enter MODULE_ID (from above shown values):
+    7
+    Enter more? (yes/no): yes
+    Enter MODULE_ID (from above shown values):
+    8
     Enter more? (yes/no): no
 
 It continues with displaying that it's creating the relationships and admin role in background followed by creating admin user for the customer.
 
 
-    ====== CUSTOMER_PRODUCT_MODULE_FEATURES TABLE ======
-    ====== ROLES TABLE for Admin Role ======
+    ====== ASSOCIATING DEFAULT FEATURES ======
+    ====== CREATING ADMIN ROLE ======
+    2018-01-03 12:42:50.059  INFO 6307 --- [           main] c.s.s.s.app.admin.SawSecurityShell       : Created Admin Role for above customer with ID: 5
     ====== USERS TABLE for ADMIN USER ======
     Enter MASTER_LOGIN:
-    pawan@sync10.com
-     Enter EMAIL: pawan@sync10.com
-    Enter PASSWORD: synchronoss
+    temp@abc.com
+     Enter EMAIL: temp@abc.com
+    Enter PASSWORD: pleasechangepassword
     Enter FIRST_NAME:
-    John
+    temp
     Enter MIDDLE_NAME:
-    Bond
+    temp_mn
     Enter LAST_NAME:
-    Smith
-    Generated User ID for current user is: 40
+    temp_ln
+    Generated User ID for current user is: 5
+    2018-01-03 12:43:28.084  INFO 6307 --- [           main] c.s.s.s.app.admin.SawSecurityShell       : Created Admin user with ID: 5
+    ====== CREATING PRIVILEGES FOR ADMIN ======
+    2018-01-03 12:43:28.110  INFO 6307 --- [           main] c.s.s.s.app.admin.SawSecurityShell       : Generated Privilege ID for Admin user: 43
+    shell:>
     shell:>

@@ -31,7 +31,7 @@ public class ProductModuleRepositoryDaoImpl implements ProductModuleRepository {
 
   @Override
   public void displayProductModules() {
-    String sql = "select a.PROD_MOD_SYS_ID, b.PRODUCT_NAME, c.MODULE_NAME from product_modules a JOIN PRODUCTS b ON a.PRODUCT_SYS_ID = b.PRODUCT_SYS_ID JOIN MODULES c ON a.MODULE_SYS_ID = c.MODULE_SYS_ID";
+    String sql = "select a.PROD_MOD_SYS_ID AS MODULE_ID, b.PRODUCT_NAME AS PRODUCT_NAME, c.MODULE_NAME AS MODULE_NAME from product_modules a JOIN PRODUCTS b ON a.PRODUCT_SYS_ID = b.PRODUCT_SYS_ID JOIN MODULES c ON a.MODULE_SYS_ID = c.MODULE_SYS_ID";
     List rs = jdbcTemplate.queryForList(sql);
     for (Object x:rs) {
       System.out.println(x);
