@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
@@ -134,9 +135,14 @@ class SAWChartTypeElasticSearchQueryBuilder {
             }
           }
           if (item.getType().value().equals(Type.STRING.value())) {
-            TermsQueryBuilder termsQueryBuilder =
-                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-            builder.add(termsQueryBuilder);
+
+            for (Object s : item.getModel().getModelValues()
+                ) {
+              MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
+                  s);
+              matchQueryBuilder.analyzer("standard");
+              builder.add(matchQueryBuilder);
+            }
           }
           if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item
               .getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
@@ -173,9 +179,14 @@ class SAWChartTypeElasticSearchQueryBuilder {
             }
           }
           if (item.getType().value().equals(Type.STRING.value())) {
-            TermsQueryBuilder termsQueryBuilder =
-                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-            builder.add(termsQueryBuilder);
+
+            for (Object s : item.getModel().getModelValues()
+                ) {
+              MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
+                  s);
+              matchQueryBuilder.analyzer("standard");
+              builder.add(matchQueryBuilder);
+            }
           }
           if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item
               .getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
