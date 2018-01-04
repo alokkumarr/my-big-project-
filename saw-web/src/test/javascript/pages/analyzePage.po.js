@@ -1,5 +1,5 @@
-const {doMdSelectOption, getMdSelectOptions} = require('../../helpers/utils');
-const commonFunctions = require('../../helpers/commonFunctions.js');
+const {doMdSelectOption, getMdSelectOptions} = require('../helpers/utils');
+const commonFunctions = require('../helpers/commonFunctions.js');
 
 const getCards = name => element.all(by.css('md-card[e2e="analysis-card"]')).filter(elem => {
   return elem.element(by.cssContainingText('a[e2e="analysis-name"]', name));
@@ -65,13 +65,15 @@ const getAnalysisActionOptions = name => {
 
 const getAnalysisOption = (parent, option) => parent.element(by.css(`button[e2e="actions-menu-selector-${option}"]`));
 
+const getAnalysisMenuButton = (analysisName) => element(by.xpath("//a[text()='" + analysisName + "']/../../../..//*[@e2e='actions-menu-toggle']"));
+
 const getChartSettingsRadio = (axis, name) => {
   return element(by.css(`md-radio-group[ng-model="$ctrl.selected.${axis}"]`))
     .element(by.css(`md-radio-button[e2e="radio-button-${name}"]`));
 };
 
 const getChartSettingsCheckBox = name => {
-  return element(by.xpath(`//md-checkbox[@ng-model="attr.checked"]/*/span[text()="${name}"]/parent::*/preceding-sibling::*`));
+  return element(by.xpath(`//md-checkbox[@ng-model="attr.checked"]/descendant::*[contains(text(),'${name}')]/parent::*`));
 };
 
 const openFiltersBtn = element(by.css('button[ng-click="$ctrl.openFiltersModal($event)"]'));
@@ -222,7 +224,8 @@ module.exports = {
     getForkBtn,
     getAnalysisOption,
     firstCardTitle,
-    getCardTypeByName: getCardTypeByName
+    getCardTypeByName: getCardTypeByName,
+    getAnalysisMenuButton: getAnalysisMenuButton
   },
   saveDialog: {
     selectedCategory: element(by.xpath('//md-select[@e2e="save-dialog-selected-category"]/*/span[1]')),
@@ -274,7 +277,8 @@ module.exports = {
     serviceProductStatus: element(by.css('.e2e-Service\\:PROD_OM_STATUS')),
     refreshDataBtn: element(by.css('[ng-click="$ctrl.onRefreshData()"]')),
     toggleDetailsPanel: element(by.css('[ng-click="$ctrl.toggleDetailsPanel()"]')),
-    reportGridContainer: element(by.css('.ard_details-grid'))
+    reportGridContainer: element(by.css('.ard_details-grid')),
+    cardMenuButton: element(by.css('button[e2e="actions-menu-toggle"]'))
   },
 
   validateCardView() {

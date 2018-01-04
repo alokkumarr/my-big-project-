@@ -59,13 +59,13 @@ api:
             method: GET
             path: '[/]export.*'
         -   location: ${observe.service.host}
+            method: POST
+            path: '[/]observe.*'
+        -   location: ${observe.service.host}
             method: GET
             path: '[/]observe.*'
         -   location: ${observe.service.host}
-            method: POST
-            path: '[/]observe*'
-        -   location: ${observe.service.host}
-            method : PUT
+            method: PUT
             path: '[/]observe.*'
         -   location: ${observe.service.host}
             method: DELETE

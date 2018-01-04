@@ -1,11 +1,11 @@
-const login = require('../javascript/pages/common/login.po.js');
+const login = require('../javascript/pages/loginPage.po.js');
 const sidenav = require('../javascript/pages/components/sidenav.co.js');
-const analyze = require('../javascript/pages/common/analyzePage.po.js');
+const analyze = require('../javascript/pages/analyzePage.po.js');
 const protractor = require('protractor');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 const {hasClass} = require('../javascript/helpers/utils');
 
-describe('create columnChart type analysis', () => {
+describe('create columnChart type analysis: createChart.test.js', () => {
   let categoryName;
   const chartDesigner = analyze.designerDialog.chart;
   const chartName = `e2e column chart ${(new Date()).toString()}`;
@@ -26,15 +26,6 @@ describe('create columnChart type analysis', () => {
     expect(browser.getCurrentUrl()).toContain('/login');
     login.loginAs('admin');
   });
-
-  //Obsolete. Now menu opens automatically with first category expanded
-  /* it('should open the sidenav menu and go to first category', () => {
-    sidenav.menuBtn.click();
-    sidenav.publicCategoriesToggle.click();
-    categoryName = sidenav.firstPublicCategory.getText();
-    sidenav.firstPublicCategory.click();
-    expect(analyze.main.categoryTitle.getText()).toEqual(categoryName);
-  }); */
 
   it('should display list view by default', () => {
     categoryName = sidenav.firstPublicCategory.getText();
@@ -68,9 +59,8 @@ describe('create columnChart type analysis', () => {
     commonFunctions.waitFor.elementToBeClickable(y);
     y.click();
     g.click();
-    const yParent = chartDesigner.getYCheckBoxParent(yAxisName);
     expect(hasClass(x, 'md-checked')).toBeTruthy();
-    expect(hasClass(yParent, 'md-checked')).toBeTruthy();
+    expect(hasClass(y, 'md-checked')).toBeTruthy();
     expect(hasClass(g, 'md-checked')).toBeTruthy();
     const doesDataNeedRefreshing = hasClass(refreshBtn, 'btn-primary');
     expect(doesDataNeedRefreshing).toBeTruthy();

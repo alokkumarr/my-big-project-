@@ -2,14 +2,34 @@
 :docinfo: shared
 :nofooter:
 
-The following documents describe Synchronos Analytics Workbench for
-users of different roles:
+The following documents describe the Synchronoss Analytics Workbench
+application for different roles:
 
-- SAW User Guide -- using the SAW web application
-- link:saw-rest-api/index.html[SAW REST API Guide] -- consuming the REST API
-- link:saw-operations/index.html[SAW Operations Guide] -- installing,
-  maintening and administering, including creating semantic
-  configurations
+.Documentation
+|===
+| Title | Description | Role
 
-- link:saw-design/index.html[SAW Design Guide] -- understanding the
-  high-level design of the application
+| SAW User Guidefootnote:[See help link embedded in the Synchronoss
+  Analytics Workbench web application]
+| Using the web application to design and execute analyses
+| User
+
+| link:saw-rest-api/index.html[SAW REST API Guide]
+| Consuming the SAW REST API to develop third-party integrations
+| Developer
+
+| link:saw-operations/index.html[SAW Operations Guide]
+| Installing, maintaining and administering, including creating
+  semantic configurations
+| Administrator
+
+| link:saw-design/index.html[SAW Design Guide]
+| Understanding the high-level design of the application and its
+  modules
+| Technical
+|===
+
+The above documents are also available in PDF format for download:
+link:saw-rest-api/index.pdf[SAW REST API Guide],
+link:saw-operations/index.pdf[SAW Operations Guide],
+link:saw-design/index.pdf[SAW Design Guide].

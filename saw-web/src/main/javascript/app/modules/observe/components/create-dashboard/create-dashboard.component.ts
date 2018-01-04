@@ -1,7 +1,10 @@
 import { Component, Inject, ViewChild } from '@angular/core';
-import { MdDialogRef, MD_DIALOG_DATA, MdDialog } from '@angular/material';
+import { UIRouter } from '@uirouter/angular';
+import { MdDialogRef, MD_DIALOG_DATA, MdDialog } from '@angular/material'; import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { GridsterConfig, GridsterItem, GridsterComponent } from 'angular-gridster2';
+import { MenuService } from '../../../../common/services/menu.service';
+import { ObserveService } from '../../services/observe.service';
+import { Dashboard } from '../../models/dashboard.interface';
 import {
   trigger,
   state,
@@ -11,6 +14,10 @@ import {
 } from '@angular/animations';
 
 import * as forEach from 'lodash/forEach';
+import * as find from 'lodash/find';
+import * as map from 'lodash/map';
+import * as get from 'lodash/get';
+import * as findIndex from 'lodash/findIndex';
 
 import { AnalysisChoiceComponent } from '../analysis-choice/analysis-choice.component';
 
@@ -48,76 +55,36 @@ const MARGIN_BETWEEN_TILES = 10;
   ]
 })
 export class CreateDashboardComponent {
-  @ViewChild('gridster') gridster: GridsterComponent;
-
   public fillState = 'empty';
-  public columns = 4;
-  public options: GridsterConfig;
-  public dashboard: Array<GridsterItem>;
-  public chartUpdater = new BehaviorSubject({});
+  public dashboard: Dashboard;
+  public requester = new BehaviorSubject({});
+  public mode = 'create';
 
   constructor(public dialogRef: MdDialogRef<CreateDashboardComponent>,
-    public dialog: MdDialog,
-    @Inject(MD_DIALOG_DATA) public layout: any) {
+    private dialog: MdDialog,
+    private router: UIRouter,
+    private menu: MenuService,
+    private observe: ObserveService,
+    @Inject(MD_DIALOG_DATA) public dialogData: any
+  ) {
+    this.dashboard = get(this.dialogData, 'dashboard');
+    this.mode = get(this.dialogData, 'mode');
+    this.checkEmpty(this.dashboard);
   }
 
-  checkEmpty() {
-    this.fillState = this.dashboard.length > 0 ? 'filled' : 'empty';
+  checkEmpty(dashboard) {
+    this.fillState = get(dashboard, 'tiles', []).length > 0 ? 'filled' : 'empty';
   }
 
-  itemChange(item, itemComponent) {
-    setTimeout(() => {
-      if (this.gridster.columns !== this.columns) {
-        this.refreshAllTiles();
-      } else {
-        this.refreshTile(item);
-      }
-      this.columns = this.gridster.columns;
-    }, 500)
-  }
-
-  getDimensions(item) {
-    return {
-      width: this.gridster.curColWidth * item.cols - MARGIN_BETWEEN_TILES,
-      height: this.gridster.curRowHeight * item.rows - MARGIN_BETWEEN_TILES
-    };
-  }
-
-  refreshTile(item) {
-    const dimensions = this.getDimensions(item);
-    item.updater.next([
-      {path: 'chart.height', data: dimensions.height},
-      {path: 'chart.width', data: dimensions.width}
-    ])
-  }
-
-  refreshAllTiles() {
-    forEach(this.dashboard, this.refreshTile.bind(this));
+  onDashboardChange(data) {
+    if (data.changed) {
+      this.checkEmpty(data.dashboard);
+    } else if (data.save) {
+      this.openSaveDialog(data.dashboard);
+    }
   }
 
   ngOnInit() {
-    this.options = {
-      gridType: 'scrollVertical',
-      minCols: this.columns,
-      maxCols: 100,
-      margin: MARGIN_BETWEEN_TILES,
-      minRows: 4,
-      maxRows: 100,
-      itemChangeCallback: this.itemChange.bind(this),
-      draggable: {
-        enabled: true
-      },
-      resizable: {
-        enabled: true
-      }
-    };
-
-    this.dashboard = [];
-  }
-
-  removeTile(item: GridsterItem) {
-    this.dashboard.splice(this.dashboard.indexOf(item), 1);
-    this.checkEmpty();
   }
 
   exitCreator(data) {
@@ -133,8 +100,43 @@ export class CreateDashboardComponent {
       }
 
       const item = { cols: 1, rows: 1, analysis, updater: new BehaviorSubject({}) };
-      this.dashboard.push(item);
-      this.checkEmpty();
+      this.requester.next({action: 'add', data: item})
+    });
+  }
+
+  saveDashboard() {
+    this.requester.next({action: 'get'});
+  }
+
+  openSaveDialog(dashboard: Dashboard) {
+    const dialogRef = this.dialog.open(SaveDashboardComponent, {
+      data: {
+        dashboard,
+        mode: this.mode
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: Dashboard) => {
+      if (result) {
+        this.dialogRef.afterClosed().subscribe(() => {
+          this.updateSideMenu(result);
+          this.router.stateService.go('observe.dashboard', {
+            dashboard: result.entityId,
+            subCategory: result.categoryId
+          }, {
+            reload: true
+          });
+        });
+        this.dialogRef.close();
+      }
+    });
+  }
+
+  /* After successful save, update the sidemenu with the dashboard. This saves a network
+     request because we already have all the data available to us. */
+  updateSideMenu(dashboard: Dashboard) {
+    this.observe.reloadMenu().subscribe(menu => {
+      this.observe.updateSidebar(menu);
     });
   }
 }

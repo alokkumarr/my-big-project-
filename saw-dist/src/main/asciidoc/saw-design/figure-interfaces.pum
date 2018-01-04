@@ -1,0 +1,20 @@
+cloud {
+    actor User
+    component [Web browser] as Client
+}
+
+User .> Client
+
+interface HTTP as HTTPWeb
+interface HTTP as HTTPServices
+interface HTTP as HTTPSecurity
+
+package "SAW" {
+    HTTPWeb - [SAW Web]
+    HTTPServices - [SAW Services]
+    HTTPSecurity - [SAW Security]
+}
+
+Client .> HTTPWeb
+Client .> HTTPServices
+Client .> HTTPSecurity

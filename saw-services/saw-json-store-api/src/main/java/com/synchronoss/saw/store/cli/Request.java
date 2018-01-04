@@ -8,15 +8,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.ojai.Document;
 import org.ojai.store.QueryCondition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 import com.mapr.db.MapRDB;
 import com.synchronoss.saw.store.metastore.PortalDataSetStore;
 
@@ -48,7 +48,7 @@ import com.synchronoss.saw.store.metastore.PortalDataSetStore;
  */
 public class Request {
 
-    private static final Logger logger = Logger.getLogger(Request.class);
+    private static final Logger logger = LoggerFactory.getLogger(Request.class);
 
     protected JsonElement request;
     private Actions action;
@@ -64,14 +64,16 @@ public class Request {
     private QueryCondition maprDBCondition;
     private JsonArray filter;
     private JsonParser jsonParser;
+    private JsonArray searchResultJsonArray;
 
     public Request(String jStr)
     {
         jsonParser = new JsonParser();
         request = jsonParser.parse(jStr);
+        
     }
-
-    public String getId() {
+    
+     public String getId() {
       return id;
     }
 
@@ -103,11 +105,22 @@ public class Request {
       this.xdfRoot = xdfRoot;
     }
 
+     public JsonElement getResult() {
+      return result;
+    }
 
+    public void setResult(JsonElement result) {
+      this.result = result;
+    }
+    
+    public JsonArray getSearchResultJsonArray() {
+      return searchResultJsonArray;
+    }
 
+  
     public void process(){
         try {
-
+            logger.trace("Actual Request Objects : {}", request.toString());
             if (request.isJsonArray()) {
             JsonArray ja = request.getAsJsonArray();
             ja.forEach( arrayElem -> {
@@ -116,7 +129,8 @@ public class Request {
                     try {
                         processItem(jo);
                     } catch (Exception e) {
-                        generateResponse("item-processing", e);
+                        logger.error("Exception at process Item exception :",e);
+                        //generateResponse("item-processing", e);
                     }
                 }else{
                     logger.error("Cannot handle provided JSON item: " + arrayElem);
@@ -130,7 +144,8 @@ public class Request {
                 logger.error("Cannot handle provided JSON");
             }
         } catch (Exception e) {
-            generateResponse("process", e);
+              logger.error("Exception at process Item exception :",e);
+            //generateResponse("process", e);
         }
     }
 
@@ -140,7 +155,7 @@ public class Request {
             logger.info("Start item processing, action: " + action + ", output: " + rFile);
 
             try {
-                if(rFile!=null){
+                if(rFile!=null && !rFile.trim().equals("")){
                 os = HFileOperations.writeToFile(rFile);}
             } catch (FileNotFoundException e1) {
                 logger.error("Could not write response to file: " + rFile, e1);
@@ -200,7 +215,7 @@ public class Request {
                 String fp = cjo.getAsJsonPrimitive("field-path").getAsString();
                 String cond = cjo.getAsJsonPrimitive("condition").getAsString();
                 String val = cjo.getAsJsonPrimitive("value").getAsString();
-                if (fp != null && fp.isEmpty() && cond != null && cond.isEmpty() && val != null && val.isEmpty())
+                if (fp != null && !fp.isEmpty() && cond != null && !cond.isEmpty() && val != null && !val.isEmpty())
                 {
                     if (cond.equalsIgnoreCase("like"))
                         maprDBCondition.like(fp, val);
@@ -218,6 +233,7 @@ public class Request {
         maprDBCondition.build();
 
         Map<String, Document> searchResult = null;
+        
         switch ( category ){
             case DataSet:
                  logger.warn("Not implemented yet");                
@@ -239,34 +255,48 @@ public class Request {
                logger.error("Not supported category");
                return;
         }
+        
+        
+        // This write feature has been disabled to FS for now
         writeSearchResult(searchResult);
     }
 
+    
+    // it will require in future for time being it has been commented
     private void writeSearchResult(Map<String, Document> searchResult) {
+      
+           
 
         if (searchResult == null || searchResult.isEmpty()) {
             logger.info("No data found");
             return;
         }
-        JsonObject response = new JsonObject();
-        response.addProperty("scope", "search");
-        JsonArray respJA = new JsonArray();
-        response.add("result", respJA);
+        searchResultJsonArray = new JsonArray();
+        logger.debug(" Map<String, Document> searchResult :" + searchResult);
+        //JsonObject response = new JsonObject();
+        //response.addProperty("scope", "search");
+        //JsonArray respJA = new JsonArray();
+        //response.add("result", respJA);
         final int[] c = {0};
         searchResult.forEach( (id, doc) ->
             {
                 c[0]++;
                 JsonObject docDesc = new JsonObject();
+                
                 docDesc.addProperty("id", id);
+                
                 docDesc.add(String.valueOf(c[0]), jsonParser.parse(doc.asJsonString()));
-                respJA.add(docDesc);
+                logger.debug("searchResultJsonArray: " + jsonParser.parse(doc.asJsonString()));
+                //respJA.add(docDesc);
+                searchResultJsonArray.add(docDesc);
             }
         );
-        try {
+        logger.debug("Search Result from writeSearchResult " + searchResultJsonArray.toString());
+        /*try {
             os.write(response.toString().getBytes());
         } catch (IOException e) {
             logger.error("Could not write data to response file: ", e);
-        }
+        }*/
 
     }
 
@@ -320,9 +350,9 @@ public class Request {
             case PortalDataSet:
               PortalDataSetStore ts = new PortalDataSetStore(xdfRoot);
               switch (action){
-                  case create: ts.create(id, item); break;
+                  case create: ts.create(id, src); break;
                   case delete: ts.delete(id); break;
-                  case update: ts.update(id, item); break;
+                  case update: ts.update(id, src); break;
                   case read: result = ts.read(id); break;
                   default:
                       logger.warn("Action is not supported");
@@ -332,10 +362,11 @@ public class Request {
                 logger.error("Not supported category");
                 return;
         }
-        generateResponse("action", null);
+        // This has been commented becuase UI operation for time being does not require to write on the file system
+        //generateResponse("action", null);
     }
 
-    private void generateResponse(String scope, Exception e) {
+    /*private void generateResponse(String scope, Exception e) {
         try{
             JsonObject response = new JsonObject();
             response.addProperty("scope", scope);
@@ -354,7 +385,7 @@ public class Request {
             return;
         }
 
-    }
+    }*/
 
     private boolean analyzeAndValidate(JsonObject item) {
 
@@ -415,10 +446,11 @@ public class Request {
 
         if (action == Actions.create || action == Actions.update ) {
             JsonElement src0 = item.get("source");
+             // This part of code has been enhanced to support both JSON String & JSONElement
             if (!src0.isJsonObject()) {
-                logger.error("'source' must be valid JSON object");
-                return false;
-            }
+              logger.error("'source' must be valid JSON object");
+              return false; 
+          }
             src = src0.getAsJsonObject();
         }
         return true;

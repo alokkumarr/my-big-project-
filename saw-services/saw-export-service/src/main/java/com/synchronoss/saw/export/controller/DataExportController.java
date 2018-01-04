@@ -40,12 +40,16 @@ public class DataExportController {
     return responseObjectFuture;
   }
 
-  @RequestMapping(value = "/{analysisId}/executions/{executionId}/dispatch", method = RequestMethod.POST)
+  @RequestMapping(value = "/{analysisId}/executions/{executionId}/dispatch/{type}", method = RequestMethod.POST)
   @ResponseStatus(HttpStatus.OK)
-  public void dispatchAnalyses (@PathVariable("executionId") String executionId, @PathVariable("analysisId") String analysisId,
+  public void dispatchAnalyses(@PathVariable("executionId") String executionId, @PathVariable("analysisId") String analysisId,
+                                @PathVariable("type") String analysisType,
                                 RequestEntity request, HttpServletResponse response){
-    logger.debug("executionId in export {}", executionId);
-    exportService.dataToBeDispatchedAsync(executionId, request,analysisId);
+    logger.debug("executionId in dispatch {}", executionId);
+    if (analysisType.equalsIgnoreCase("report"))
+      exportService.reportToBeDispatchedAsync(executionId, request,analysisId);
+    else if(analysisType.equalsIgnoreCase("pivot"))
+      exportService.pivotToBeDispatchedAsync(executionId, request,analysisId);
   }
 
 }

@@ -1,6 +1,6 @@
 import 'jquery';
 import * as angular from 'angular';
-import 'angular-ui-router';
+import '@uirouter/angular-hybrid';
 
 import 'angular-material';
 
@@ -34,8 +34,8 @@ import {CommonFilterModule} from './filters';
 import {CommonDirectiveModule} from './directives';
 // import from login module
 import {AuthServiceFactory} from '../../login/services/auth.service';
-import {UserServiceFactory} from '../../login/services/user.service';
-import {JwtServiceFactory} from '../../login/services/jwt.service';
+import {UserService} from '../../login/services/user.service';
+import {JwtService} from '../../login/services/jwt.service';
 
 import AppConfig from '../../../../../appConfig';
 
@@ -43,6 +43,7 @@ export const CommonModule = 'CommonModule';
 
 const moduleDependencies = [
   'ui.router',
+  'ui.router.upgrade',
   'LocalStorageModule',
   'ngSanitize',
   'ngMaterial',
@@ -71,5 +72,5 @@ angular
     return new ComponentHandler();
   })
   .factory('AuthService', AuthServiceFactory)
-  .factory('UserService', UserServiceFactory)
-  .factory('JwtService', JwtServiceFactory);
+  .service('UserService', UserService)
+  .service('JwtService', JwtService);
