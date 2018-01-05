@@ -1,5 +1,6 @@
 package com.sncr.saw.security.app.repository;
 
+import java.util.List;
 import java.util.Map;
 
 public interface ProductModuleRepository {
@@ -8,7 +9,7 @@ public interface ProductModuleRepository {
   Map<Integer, String> createProductModuleLinkageForOnboarding();
 
   // display product modules
-  void displayProductModules();
+  List getProductModules();
 
   // check if product exist
   boolean checkProductModuleExistance(Long prodModId);

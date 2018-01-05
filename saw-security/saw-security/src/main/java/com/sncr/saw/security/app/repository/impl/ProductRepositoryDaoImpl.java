@@ -32,13 +32,11 @@ public class ProductRepositoryDaoImpl implements ProductRepository {
   }
 
   @Override
-  public void displayProducts() {
+  public List getProductList() {
     String sql = "select PRODUCT_SYS_ID AS PRODUCT_ID, PRODUCT_NAME AS PRODUCT_NAME from PRODUCTS";
     Map<Integer, String> results = new HashMap<Integer, String>();
     List rs = jdbcTemplate.queryForList(sql);
-    for (Object x:rs) {
-      System.out.println(x);
-    }
+    return rs;
   }
 
 

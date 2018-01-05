@@ -2,6 +2,7 @@ package com.sncr.saw.security.app.repository;
 
 import com.sncr.saw.security.common.bean.Product;
 
+import java.util.List;
 import java.util.Map;
 
 public interface ProductRepository {
@@ -19,7 +20,7 @@ public interface ProductRepository {
     Product getProduct(Long prodId);
 
     // Retrieve all the products as ID and name
-    void displayProducts();
+    List getProductList();
 
     // check if product exist
     boolean checkProductExistance(Long prodId);

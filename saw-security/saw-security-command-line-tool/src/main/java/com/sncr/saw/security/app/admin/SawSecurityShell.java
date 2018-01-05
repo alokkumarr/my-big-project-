@@ -11,6 +11,7 @@ import com.sncr.saw.security.app.repository.impl.UserRepositoryImpl;
 import com.sncr.saw.security.app.service.OnBoardService;
 import com.sncr.saw.security.common.bean.User;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import org.slf4j.Logger;
@@ -40,7 +41,7 @@ class SawSecurityShell {
       if (custDao.testSql() == 1) {
 
         // display all the products
-        onboard.getProductsDao().displayProducts();
+        display(onboard.getProductsDao().getProductList());
 
         // customer creation
         Long created_cust_id = customerCreation(custDao);
@@ -48,7 +49,7 @@ class SawSecurityShell {
         logger.info("Created user with ID: " + created_cust_id);
 
         // customer product linkages
-        onboard.getProductsDao().displayProducts();
+        display(onboard.getProductsDao().getProductList());
 
         // create customer product linkages
         // it's just going to be 1
@@ -59,7 +60,7 @@ class SawSecurityShell {
         logger.info("Created CUST_PROD entry with ID: " + created_cust_prod_id);
 
         // display product modules
-        onboard.getProdModulesDao().displayProductModules();
+        display(onboard.getProdModulesDao().getProductModules());
 
         // customer product module linkages
         Map<Integer, String> cust_prod_mod_linkage_ids = createCustomerProductModuleLinkages(
@@ -234,6 +235,12 @@ class SawSecurityShell {
     PrivilegeRepositoryDao priv = onboard.getPrivRepoDao();
     return priv
         .createNewPrivilegeDao(custProdSysId, custProdModSysId, custProdModFeatureSysId, roleSysId);
+  }
+
+  public void display(List rs) {
+    for (Object x:rs) {
+      System.out.println(x);
+    }
   }
 
 
