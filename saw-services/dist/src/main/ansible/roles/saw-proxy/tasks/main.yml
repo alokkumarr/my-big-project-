@@ -1,0 +1,11 @@
+- name: Install SAW Proxy Service package
+  yum: name="{{ item }}" state=present
+  with_fileglob: ["../rpms/saw-proxy-*.rpm"]
+  notify:
+    - restart saw-proxy
+- name: Install SAW Storage Proxy Service configuration file
+  template: src=application.yml dest=/opt/bda/saw-proxy-service/conf
+  notify:
+    - restart saw-proxy
+- name: Enable SAW Storage Proxy Service
+  systemd: name=saw-proxy enabled=true

@@ -8,3 +8,4 @@
     - saw-export
     - saw-observe
     - saw-scheduler
+    - saw-proxy

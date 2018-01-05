@@ -19,6 +19,7 @@
         <include>${project.groupId}:saw-workbench-service</include>
         <include>${project.groupId}:saw-observe-service</include>
         <include>${project.groupId}:saw-scheduler-service</include>
+        <include>${project.groupId}:saw-proxy-service</include>
       </includes>
       <binaries>
         <attachmentClassifier>rpm</attachmentClassifier>
