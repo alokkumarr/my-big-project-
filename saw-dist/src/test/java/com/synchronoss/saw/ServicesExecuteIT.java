@@ -270,7 +270,7 @@ public class ServicesExecuteIT {
             .body(json)
             .when().post("/services/analysis")
             .then().assertThat().statusCode(200)
-            .body(buckets + ".find { it.key == 'ca' }.doc_count", equalTo(1));
+            .body(buckets + ".find { it.key == 'string 1' }.doc_count", equalTo(1));
     }
 
     private String listSingleExecution(String token, String analysisId)
