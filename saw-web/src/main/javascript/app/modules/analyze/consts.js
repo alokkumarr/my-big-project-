@@ -172,8 +172,8 @@ export const ANALYSIS_METHODS = [
         type: 'chart:pie'
       },
       {
-        label: 'Time Series Chart',
-        icon: {font: 'icon-combo-chart'},
+        label: 'Timeseries Chart',
+        icon: {font: 'icon-timeseries-chart'},
         type: 'chart:tsspline'
       }
     ]

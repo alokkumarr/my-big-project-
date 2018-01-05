@@ -39,7 +39,7 @@ observe-page {
 
   .page-content {
     width: 100%;
-    height: 100%;
+    height: calc(100% - 62px);
     display: flex;
     align-items: center;
 

@@ -9,17 +9,22 @@ export const SidenavComponent = {
     menu: '<'
   },
   controller: class SidenavController {
-    constructor($componentHandler, $mdSidenav, $timeout) {
+    constructor($componentHandler, $mdSidenav, $timeout, $scope, SidenavService) {
       this.$componentHandler = $componentHandler;
       this.$mdSidenav = $mdSidenav;
       this.$timeout = $timeout;
+      this._$scope = $scope;
       this._moduleName = '';
+      this._SidenavService = SidenavService;
 
       this._sidenavInst = null;
     }
 
     $onInit() {
       this.unregister = this.$componentHandler.register(this.id, this);
+      this._$scope.$watch(() => this.isOpen(), newVal => {
+        this._SidenavService.sidenavEvent.next(newVal);
+      });
     }
 
     $onDestroy() {
