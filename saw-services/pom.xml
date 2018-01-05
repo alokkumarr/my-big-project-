@@ -147,6 +147,7 @@
 		<module>saw-export-service</module>
 		<module>saw-observe-service</module>
 		<module>saw-json-store-api</module>
+		<module>saw-proxy-service</module>
 		<module>dist</module>
 	</modules>
 </project>
