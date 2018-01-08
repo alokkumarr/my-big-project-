@@ -9,7 +9,7 @@ const testDir = '../saw-web/src/test';
 exports.config = {
   framework: 'jasmine2',
   seleniumAddress: 'http://localhost:4444/wd/hub',
-  getPageTimeout: 60000,
+  getPageTimeout: 600000,
   allScriptsTimeout: 500000,
   directConnect: true,
 
@@ -104,11 +104,11 @@ exports.config = {
     jasmine.getEnv().addReporter(junitReporter);
 
 
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 120000;
-    jasmine.getEnv().defaultTimeoutInterval = 500000; //another option if above doesn't work
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 600000;
+    jasmine.getEnv().defaultTimeoutInterval = 600000; //another option if above doesn't work
 
-    browser.manage().timeouts().pageLoadTimeout(30000);
-    browser.manage().timeouts().implicitlyWait(10000);
+    browser.manage().timeouts().pageLoadTimeout(600000);
+    browser.manage().timeouts().implicitlyWait(600000);
     //browser.driver.manage().window().maximize(); // disable for Mac OS
     browser.driver.get(webpackHelper.sawWebUrl());
 
@@ -116,6 +116,6 @@ exports.config = {
       return browser.driver.getCurrentUrl().then(url => {
         return /login/.test(url);
       });
-    }, 30000);
+    }, 600000);
   }
 };

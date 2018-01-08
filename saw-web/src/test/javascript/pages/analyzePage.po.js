@@ -146,7 +146,7 @@ const doAccountAction = action => {
     return browser.driver.getCurrentUrl().then(url => {
       return /login/.test(url);
     });
-  }, 10000);
+  }, 600000);
 };
 
 function navigateToHome() {
@@ -155,7 +155,7 @@ function navigateToHome() {
     return browser.driver.getCurrentUrl().then(url => {
       return /analyze/.test(url);
     });
-  }, 10000);
+  }, 600000);
 };
 
 module.exports = {
