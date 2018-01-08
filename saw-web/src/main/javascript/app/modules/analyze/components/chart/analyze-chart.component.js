@@ -63,14 +63,20 @@ export const AnalyzeChartComponent = {
       this.CHART_TYPES_OBJ = CHART_TYPES_OBJ;
       this.sortFields = [];
       this.sorts = [];
+      // Initializing DD values for legend based on chart type.
+      const initialLegendPosition = this.model.chartType === 'combo' ? 'top' : this.model.chartType.substring(0, 2) === 'ts' ? 'bottom' : 'right';
+      const initialLegendLayout = (this.model.chartType === 'combo' || this.model.chartType.substring(0, 2) === 'ts') ? 'horizontal' : 'vertical';
 
       this.legend = {
-        align: get(this.model, 'legend.align'),
-        layout: get(this.model, 'legend.layout'),
+        align: get(this.model, 'legend.align', initialLegendPosition),
+        layout: get(this.model, 'legend.layout', initialLegendLayout),
         options: {
           align: values(this._ChartService.LEGEND_POSITIONING),
           layout: values(this._ChartService.LAYOUT_POSITIONS)
         }
+      };
+      this.chartHgt = {
+        height: 500
       };
 
       this.updateChart = new BehaviorSubject({});
@@ -81,12 +87,12 @@ export const AnalyzeChartComponent = {
         tempY: '', tempX: '', y: '', x: ''
       };
 
-      this.chartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
+      this.chartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {chart: this.chartHgt, legend: this.legend});
 
       this.isInverted = false;
       this.chartViewOptions = ChartService.getViewOptionsFor(this.model.chartType);
       this.comboableCharts = ['column', 'bar', 'line', 'area', 'combo'];
-      this.comboableTSCharts = ['tsspline'];
+      this.comboableTSCharts = ['tsspline', 'tsPane'];
       this.invertableCharts = [...this.comboableCharts, 'stack'];
       this.multyYCharts = [...this.invertableCharts, ...this.comboableTSCharts];
 

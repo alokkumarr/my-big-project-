@@ -12,6 +12,7 @@ import {ChartService} from './services/chart.service';
 import {SortService} from './services/sort.service';
 
 import {pivotAreaTypeFilter} from './filters/pivot-area-type.filter';
+import {uniqueFilter} from './filters/unique.filter';
 
 import {AnalyzePageComponent} from './components/page/analyze-page.component';
 import {AggregateChooserComponent} from './components/aggregate-chooser/aggregate-chooser.component';
@@ -63,6 +64,7 @@ angular.module(AnalyzeModule, [
   .config(routesConfig)
   .config(i18nConfig)
   .filter('pivotAreaTypeFilter', pivotAreaTypeFilter)
+  .filter('uniqueFilter', uniqueFilter)
   .service('FilterService', FilterService)
   .service('AnalyzeService', AnalyzeService)
   .factory('PivotService', PivotService)
