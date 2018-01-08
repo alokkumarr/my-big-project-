@@ -14,12 +14,14 @@ import {
   MatListModule,
   MatCheckboxModule,
   MatMenuModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatDatepickerModule
 } from '@angular/material';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatInputModule} from '@angular/material/input'
 import {MatCardModule} from '@angular/material/card';
+import {MatMomentDateModule} from '@angular/material-moment-adapter';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
 import '../../../../themes/_angular_next.scss';
@@ -42,7 +44,9 @@ import '../../../../themes/_angular_next.scss';
     MatExpansionModule,
     MatButtonToggleModule,
     MatInputModule,
-    MatCardModule
+    MatCardModule,
+    MatDatepickerModule,
+    MatMomentDateModule
   ],
   providers: [MatIconRegistry],
   exports: [
@@ -61,7 +65,9 @@ import '../../../../themes/_angular_next.scss';
     MatExpansionModule,
     MatButtonToggleModule,
     MatInputModule,
-    MatCardModule
+    MatCardModule,
+    MatDatepickerModule,
+    MatMomentDateModule
   ]
 })
 export class MaterialModule {}

@@ -25,6 +25,7 @@ export class ToolbarActionDialogComponent {
       break;
     case 'filter':
       this.data.filters = cloneDeep(this.data.filters);
+      this.data.booleanCriteria = this.data.booleanCriteria;
       break;
     }
   }
@@ -39,6 +40,10 @@ export class ToolbarActionDialogComponent {
 
   onFiltersChange(filters) {
     this.data.filters = filters;
+  }
+
+  onBooleanCriteriaChange(booleanCriteria) {
+    this.data.booleanCriteria = booleanCriteria;
   }
 
   onOk() {

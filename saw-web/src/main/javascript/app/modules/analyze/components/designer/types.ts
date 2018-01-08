@@ -10,13 +10,15 @@ import {
   AnalysisType,
   Sort,
   Filter,
+  FilterModel,
   ArtifactColumnPivot,
   ArtifactColumnChart,
   ArtifactColumn,
   ArtifactColumns,
   IToolbarActionData,
   DesignerToolbarAciton,
-  IToolbarActionResult
+  IToolbarActionResult,
+  Artifact
 } from '../../types';
 
 export {
@@ -29,6 +31,8 @@ export {
   SqlBuilder,
   Sort,
   Filter,
+  FilterModel,
+  Artifact,
   ArtifactColumn,
   ArtifactColumns,
   IToolbarActionData,

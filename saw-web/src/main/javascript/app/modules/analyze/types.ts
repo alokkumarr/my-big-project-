@@ -7,17 +7,21 @@ import {
   ArtifactColumnChart,
   ArtifactColumnReport
 } from './models/artifact-column.model';
+import { Artifact } from './models/artifact.model';
 
 export type ArtifactColumns = ArtifactColumnPivot[] | ArtifactColumnChart[] | ArtifactColumnReport[];
 export type ArtifactColumn = ArtifactColumnPivot | ArtifactColumnChart | ArtifactColumnReport;
 import { Sort } from './models/sort.model';
 import { Filter } from './models/filter.model';
+import { FilterModel } from './models/filter-model.model';
 
 export {
   ArtifactColumnPivot,
   ArtifactColumnChart,
   Sort,
-  Filter
+  Filter,
+  FilterModel,
+  Artifact
 };
 
 
@@ -48,8 +52,10 @@ export type DesignerToolbarAciton = 'description' | 'sort' | 'preview' | 'filter
 export interface IToolbarActionData {
   action: DesignerToolbarAciton;
   artifactColumns?: ArtifactColumns;
+  artifacts?: Artifact[];
   sorts?: Sort[];
   filters?: Filter[];
+  booleanCriteria?: string;
   description?: string;
 }
 

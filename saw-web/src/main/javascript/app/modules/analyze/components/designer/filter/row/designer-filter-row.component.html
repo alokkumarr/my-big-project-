@@ -1,0 +1,47 @@
+<div fxLayout="row"
+     fxLayoutAlign="space-between center"
+     [ngSwitch]="TYPE_MAP[filter.type]">
+  <div fxLayout="row"
+       fxLayoutAlign="space-between center">
+    <mat-form-field>
+      <mat-select placeholder="Column"
+                  (selectionChange)="onArtifactColumnSelected($event.value)"
+                  [value]="filter.columnName">
+        <mat-option *ngFor="let artifactColumn of artifactColumns"
+                    [value]="artifactColumn.columnName">
+          {{ artifactColumn.aliasName || artifactColumn.displayName }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div *ngIf="!filter.isRuntimeFilter" style="margin-left: 10px;">
+      <designer-string-filter *ngSwitchCase="'string'"
+                              (filterModelChange)="onFilterModelChange($event)"
+                              [filterModel]="filter.model">
+      </designer-string-filter>
+      <designer-date-filter *ngSwitchCase="'date'"
+                            (filterModelChange)="onFilterModelChange($event)"
+                            [filterModel]="filter.model">
+      </designer-date-filter>
+      <designer-number-filter *ngSwitchCase="'number'"
+                              (filterModelChange)="onFilterModelChange($event)"
+                              [filterModel]="filter.model">
+      </designer-number-filter>
+    </div>
+  </div>
+
+  <div fxLayout="row"
+       fxLayoutAlign="space-between center">
+    <mat-checkbox [checked]="filter.isRuntimeFilter"
+                  (change)="onRuntimeCheckboxToggle(filter, $event.checked)"
+                  i18n>
+      Prompt
+    </mat-checkbox>
+
+    <button mat-icon-button (click)="remove()">
+      <mat-icon fontIcon="icon-close"
+                class="filter__remove-button__icon">
+      </mat-icon>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+<mat-form-field>
+  <mat-chip-list #chipList>
+    <mat-chip *ngFor="let value of filterModel.modelValues; let i = index; trackBy: index"
+             [removable]="true" (remove)="remove(i)">
+      {{value}}
+      <mat-icon matChipRemove fontIcon="icon-remove"></mat-icon>
+    </mat-chip>
+    <input [matChipInputFor]="chipList"
+           [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+           matChipInputAddOnBlur="true"
+           (matChipInputTokenEnd)="add($event)" />
+  </mat-chip-list>
+</mat-form-field>

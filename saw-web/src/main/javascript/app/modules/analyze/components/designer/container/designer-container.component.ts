@@ -54,6 +54,7 @@ export class DesignerContainerComponent {
   public data: any = null;
   public sorts: Sort[] = [];
   public filters: Filter[] = [];
+  public booleanCriteria: string = 'AND';
 
   constructor(
     private _designerService: DesignerService,
@@ -86,10 +87,13 @@ export class DesignerContainerComponent {
         });
       break;
     case 'filter':
-      this._analyzeDialogService.openFilterDialog(this.filters, this.firstArtifactColumns)
+      this._analyzeDialogService.openFilterDialog(this.filters, this.analysis.artifacts, this.booleanCriteria)
         .afterClosed().subscribe((result) => {
           if (result) {
             this.filters = result.filters;
+            this.booleanCriteria = result.booleanCriteria;
+            console.log('returned filters', this.filters);
+            console.log('returned booleanCriteria', this.booleanCriteria);
           }
         });
       break;

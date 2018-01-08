@@ -13,9 +13,9 @@
       </mat-icon>
     </div>
   </div>
-  <button mat-icon-button>
+  <button mat-icon-button
+          (click)="removeRequest.emit()">
     <mat-icon fontIcon="icon-close"
-              (click)="removeRequest.emit()"
               class="expandable-field__remove-icon">
     </mat-icon>
   </button>

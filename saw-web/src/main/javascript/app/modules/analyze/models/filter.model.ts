@@ -1,4 +1,4 @@
-import FilterModel from './filter-model.model';
+import { FilterModel } from './filter-model.model';
 
 export interface Filter {
   isRuntimeFilter: boolean;

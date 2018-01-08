@@ -1,0 +1,28 @@
+<div *ngFor="let artifact of artifacts; trackBy: index">
+  <div class="filter__table-name">
+    {{artifact.artifactName}}
+  </div>
+  <div class="filter__list">
+    <designer-filter-row *ngFor="let filter of groupedFilters[artifact.artifactName];let i = index; trackBy: index"
+                         (removeRequest)="removeFilter(i, artifact.artifactName)"
+                         [filter]="filter"
+                         [artifactColumns]="artifact.columns">
+    </designer-filter-row>
+  </div>
+  <button mat-icon-button>
+    <mat-icon fontIcon="icon-plus"
+              (click)="addFilter(artifact.artifactName)"></mat-icon>
+  </button>
+</div>
+<div fxLayout="row" fxLayoutAlign="start center">
+  <mat-button-toggle-group (change)="onBooleanCriteriaChange($event.value)"
+                           [value]="booleanCriteria">
+    <mat-button-toggle value="AND" i18n>
+      All
+    </mat-button-toggle>
+    <mat-button-toggle value="OR" i18n>
+      Any
+    </mat-button-toggle>
+  </mat-button-toggle-group>
+  <span style="padding-left: 10px;" i18n>of the filters are true</span>
+</div>

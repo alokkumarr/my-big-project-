@@ -8,7 +8,8 @@ import {
   Sort,
   Filter,
   IToolbarActionData,
-  ArtifactColumns
+  ArtifactColumns,
+  Artifact
 } from '../types';
 import { DesignerDialogComponent } from '../components/designer/dialog';
 import { ToolbarActionDialogComponent } from '../components/designer/toolbar-action-dialog';
@@ -57,11 +58,12 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openFilterDialog(filters: Filter[], artifactColumns: ArtifactColumns) {
+  openFilterDialog(filters: Filter[], artifacts: Artifact[], booleanCriteria) {
     const data: IToolbarActionData = {
       action: 'filter',
       filters,
-      artifactColumns
+      artifacts,
+      booleanCriteria
     }
     return this.dialog.open(ToolbarActionDialogComponent, {
       width: 'auto',

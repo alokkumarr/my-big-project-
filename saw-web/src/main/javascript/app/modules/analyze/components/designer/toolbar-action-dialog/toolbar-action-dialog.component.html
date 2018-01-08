@@ -10,10 +10,12 @@
                   (sortsChange)="onSortsChange($event)"
                   [sorts]="data.sorts"
                   [artifactColumns]="data.artifactColumns"></designer-sort>
-  <designer-filter *ngSwitchCase="'filter'"
+  <designer-filter-container *ngSwitchCase="'filter'"
                   (filtersChange)="onFiltersChange($event)"
+                  (booleanCriteriaChange)="onBooleanCriteriaChange($event)"
                   [filters]="data.filters"
-                  [artifactColumns]="data.artifactColumns"></designer-filter>
+                  [booleanCriteria]="data.booleanCriteria"
+                  [artifacts]="data.artifacts"></designer-filter-container>
 </div>
 <div class="dialog__actions"
      fxLayout="row"
