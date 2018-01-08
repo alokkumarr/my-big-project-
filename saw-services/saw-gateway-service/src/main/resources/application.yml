@@ -47,6 +47,9 @@ scheduler:
 workbench:
     service:
         host: http://localhost:9700
+proxy:
+    service:
+        host: http://localhost:9800
 
 api:
   gateway:
@@ -89,6 +92,7 @@ api:
             path: '[/]observe.*'
         -   location: ${observe.service.host}
             method: DELETE
+<<<<<<< HEAD
             path: '[/]observe.*'
         -   location: ${internal-analysis.service.host}
             method: POST
@@ -99,3 +103,11 @@ api:
         -   location: ${workbench.service.host}
             method: GET
             path: '[/]internal/workbench.*'
+=======
+            path: '[/]observe.*'
+        -   location: ${proxy.service.host}
+            method: POST
+            path: '[/]proxy.*'
+
+
+>>>>>>> SAW-2046: Integrate storage proxy service with Gateway Service to authorize
