@@ -172,7 +172,7 @@
 							<goal>rpm</goal>
 						</goals>
 						<configuration>
-							<packageName>saw-proxy</packageName>
+							<packageName>saw-proxy-service</packageName>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-proxy-service</name>
