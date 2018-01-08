@@ -92,14 +92,23 @@ export class DesignerContainerComponent {
           if (result) {
             this.filters = result.filters;
             this.booleanCriteria = result.booleanCriteria;
-            console.log('returned filters', this.filters);
-            console.log('returned booleanCriteria', this.booleanCriteria);
           }
         });
       break;
     case 'preview':
       this.updateAnalysis();
       this._analyzeDialogService.openPreviewDialog(this.analysis);
+      break;
+    case 'description':
+      this._analyzeDialogService.openDescriptionDialog(this.analysis.description)
+        .afterClosed().subscribe((result) => {
+          if (result) {
+            this.analysis.description = result.description;
+          }
+        });
+      break;
+    case 'save':
+      this._analyzeDialogService.openSaveDialog(this.analysis)
       break;
     }
   }

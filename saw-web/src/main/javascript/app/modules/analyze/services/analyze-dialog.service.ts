@@ -83,4 +83,28 @@ export class AnalyzeDialogService {
       data
     } as MatDialogConfig);
   }
+
+  openDescriptionDialog(description: string) {
+    const data: IToolbarActionData = {
+      action: 'description',
+      description
+    }
+    return this.dialog.open(ToolbarActionDialogComponent, {
+      width: 'auto',
+      height: 'auto',
+      data
+    } as MatDialogConfig);
+  }
+
+  openSaveDialog(analysis: Analysis) {
+    const data: IToolbarActionData = {
+      action: 'save',
+      analysis
+    }
+    return this.dialog.open(ToolbarActionDialogComponent, {
+      width: 'auto',
+      height: 'auto',
+      data
+    } as MatDialogConfig);
+  }
 }

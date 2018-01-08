@@ -46,6 +46,14 @@ export class ToolbarActionDialogComponent {
     this.data.booleanCriteria = booleanCriteria;
   }
 
+  onDescriptionChange(description) {
+    this.data.description = description;
+  }
+
+  onNameChange(name) {
+    console.log('name', name);
+  }
+
   onOk() {
     let result: IToolbarActionResult = {};
     switch (this.data.action) {

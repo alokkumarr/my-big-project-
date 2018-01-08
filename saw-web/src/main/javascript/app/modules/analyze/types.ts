@@ -57,6 +57,7 @@ export interface IToolbarActionData {
   filters?: Filter[];
   booleanCriteria?: string;
   description?: string;
+  analysis?: Analysis;
 }
 
 export interface IToolbarActionResult {

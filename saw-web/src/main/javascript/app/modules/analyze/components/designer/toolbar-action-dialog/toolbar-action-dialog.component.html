@@ -9,13 +9,23 @@
   <designer-sort *ngSwitchCase="'sort'"
                   (sortsChange)="onSortsChange($event)"
                   [sorts]="data.sorts"
-                  [artifactColumns]="data.artifactColumns"></designer-sort>
+                  [artifactColumns]="data.artifactColumns">
+  </designer-sort>
   <designer-filter-container *ngSwitchCase="'filter'"
                   (filtersChange)="onFiltersChange($event)"
                   (booleanCriteriaChange)="onBooleanCriteriaChange($event)"
                   [filters]="data.filters"
                   [booleanCriteria]="data.booleanCriteria"
-                  [artifacts]="data.artifacts"></designer-filter-container>
+                  [artifacts]="data.artifacts">
+  </designer-filter-container>
+  <designer-description *ngSwitchCase="'description'"
+                        (descriptionChange)="onDescriptionChange($event)"
+                        [description]="data.description">
+  </designer-description>
+  <designer-save *ngSwitchCase="'save'"
+                 (nameChange)="onNameChange($event)"
+                 [analysis]="data.analysis">
+  </designer-save>
 </div>
 <div class="dialog__actions"
      fxLayout="row"
@@ -32,6 +42,11 @@
         Apply Filters
       </button>
       <button *ngSwitchCase="'description'"
+              (click)="onOk()"
+              mat-raised-button color="primary" i18n>
+        Save Description
+      </button>
+      <button *ngSwitchCase="'save'"
               (click)="onOk()"
               mat-raised-button color="primary" i18n>
         Save

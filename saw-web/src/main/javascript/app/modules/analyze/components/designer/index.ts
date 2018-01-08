@@ -20,6 +20,8 @@ import {
   DesignerDateFilterComponent,
   DesignerNumberFilterComponent
 } from './filter';
+import { DesignerSaveComponent } from './save';
+import { DesignerDescriptionComponent } from './description';
 import { DesignerPreviewDialogComponent } from './preview-dialog';
 import { ToolbarActionDialogComponent } from './toolbar-action-dialog';
 import { DesignerService } from './designer.service';
@@ -37,6 +39,8 @@ export {
   ExpandDetailPivotComponent,
   ToolbarActionDialogComponent,
   DesignerSortComponent,
+  DesignerDescriptionComponent,
+  DesignerSaveComponent,
   DesignerFilterContainerComponent,
   DesignerFilterRowComponent,
   DesignerStringFilterComponent,

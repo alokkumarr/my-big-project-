@@ -23,7 +23,8 @@
 
   <div  fxLayout="row"
         fxLayoutAlign="space-between center">
-    <button mat-button>
+    <button mat-button
+            (click)="requestAction.emit('description')">
       <mat-icon fontIcon="icon-description"></mat-icon>
       <ng-container i18n>Description</ng-container>
     </button>
@@ -44,7 +45,8 @@
       <ng-container i18n>Filter</ng-container>
     </button>
     <button mat-raised-button
-            color="primary">
+            color="primary"
+            (click)="requestAction.emit('save')">
       <ng-container i18n>Save</ng-container>
     </button>
   </div>
