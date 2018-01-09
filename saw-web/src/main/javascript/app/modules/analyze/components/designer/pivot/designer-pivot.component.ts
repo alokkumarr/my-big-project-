@@ -5,38 +5,26 @@ import {
   EventEmitter
 } from '@angular/core';
 import * as map from 'lodash/map';
-import * as get from 'lodash/get';
-import * as filter from 'lodash/filter';
 import * as isEmpty from 'lodash/isEmpty';
-import * as find from 'lodash/find';
-import * as has from 'lodash/has';
 import * as forEach from 'lodash/forEach';
 import * as clone from 'lodash/clone';
-import * as groupBy from 'lodash/groupBy';
 import * as split from 'lodash/split';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpPick from 'lodash/fp/pick';
 import * as fpMap from 'lodash/fp/map';
 import * as fpFilter from 'lodash/fp/filter';
+import * as fpForEach from 'lodash/fp/forEach';
 import * as moment from 'moment';
 import {Subject} from 'rxjs/Subject';
 
 import {
-  IDEsignerSettingGroupAdapter,
-  ArtifactColumn,
   ArtifactColumns,
-  ArtifactColumnFilter,
-  Analysis,
   ArtifactColumnPivot
 } from '../types';
 import { DesignerStates } from '../container';
 import { IPivotGridUpdate } from '../../../../../common/components/pivot-grid/pivot-grid.component';
 import {
-  TYPE_ICONS_OBJ,
   DATE_TYPES,
-  NUMBER_TYPES,
-  DEFAULT_DATE_INTERVAL,
-  DEFAULT_AGGREGATE_TYPE,
   DATE_INTERVALS_OBJ
 } from '../../../consts';
 
@@ -94,14 +82,17 @@ export class DesignerPivotComponent {
     const formattedData = map(data, dataPoint => {
 
       const clonedDataPoint = clone(dataPoint);
-      forEach(this.artifactColumns, ({columnName, dateInterval}) => {
-        const format = DATE_INTERVALS_OBJ[dateInterval].format;
-        clonedDataPoint[columnName] = moment.utc(dataPoint[columnName]).format(format);
-        if (dateInterval === 'quarter') {
-          const parts = split(clonedDataPoint[columnName], '-');
-          clonedDataPoint[columnName] = `${parts[0]}-Q${parts[1]}`;
-        }
-      });
+      fpPipe(
+        fpFilter(({type}) => DATE_TYPES.includes(type)),
+        fpForEach(({columnName, dateInterval}) => {
+          const format = DATE_INTERVALS_OBJ[dateInterval].format;
+          clonedDataPoint[columnName] = moment.utc(dataPoint[columnName]).format(format);
+          if (dateInterval === 'quarter') {
+            const parts = split(clonedDataPoint[columnName], '-');
+            clonedDataPoint[columnName] = `${parts[0]}-Q${parts[1]}`;
+          }
+        })
+      )(this.artifactColumns);
       return clonedDataPoint;
     });
     return formattedData;

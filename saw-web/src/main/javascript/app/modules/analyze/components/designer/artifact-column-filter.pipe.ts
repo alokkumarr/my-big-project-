@@ -7,7 +7,8 @@ import {
 } from './types';
 import {
   NUMBER_TYPES,
-  DATE_TYPES
+  DATE_TYPES,
+  TYPE_MAP
 } from '../../consts'
 
 @Pipe({
@@ -21,19 +22,20 @@ export class ArtifactColumnFilterPipe implements PipeTransform {
     }
 
     return filter(items, ({type, alias, displayName}) => {
-      return this.hasType(type, filterObj.type) &&
+      return this.hasType(type, filterObj.types) &&
         this.hasKeyword(alias || displayName, filterObj.keyword)
     });
   }
 
-  hasType(type, filterType) {
-    switch (filterType) {
+  hasType(type, filterTypes) {
+
+    switch (TYPE_MAP[type]) {
     case 'number':
-      return NUMBER_TYPES.includes(type);
+      return filterTypes.includes('number');
     case 'date':
-      return DATE_TYPES.includes(type);
+      return filterTypes.includes('date');
     case 'string':
-      return type === 'string';
+      return filterTypes.includes('string');
     default:
       return true;
     }

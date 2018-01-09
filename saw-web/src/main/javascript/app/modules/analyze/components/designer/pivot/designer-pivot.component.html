@@ -15,15 +15,15 @@
        fxLayoutAlign="space-between center"
        class="non-ideal-state__container">
       <span class="non-ideal-state__message" i18n>
-        The data is out of synch with the selected fields
+        At least one data field needs to be selected
       </span>
-      <button mat-button
+      <!-- <button mat-button
               (click)="requestDataRefresh.emit()"
               color="primary">
         <span i18n
               class="non-ideal-state__button-text"
               (click)="requestDataRefresh.emit()">Refresh data</span>
-      </button>
+      </button> -->
       <mat-icon class="non-ideal-state__icon" fontIcon="icon-pivot"></mat-icon>
   </div>
 

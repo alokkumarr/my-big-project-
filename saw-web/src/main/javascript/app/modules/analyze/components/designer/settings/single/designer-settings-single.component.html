@@ -1,6 +1,8 @@
 <div class="settings__container">
 
-  <div class="settings__filters">
+  <div class="settings__filters"
+       fxLayout="row"
+       fxLayoutAlign="space-between center">
     <mat-form-field>
       <input matInput type="text"
               placeholder="Filter"
@@ -13,9 +15,11 @@
         <mat-icon fontIcon="icon-close"></mat-icon>
       </button>
     </mat-form-field>
-    <mat-button-toggle-group (change)="onTypeFilterChange($event.value)">
+    <mat-button-toggle-group multiple>
       <mat-button-toggle *ngFor="let typeIcon of TYPE_ICONS; trackBy: index"
-                          [value]="typeIcon.value">
+                         (change)="onTypeFilterChange($event)"
+                         [value]="typeIcon.value"
+                         [checked]="filterObj.types.includes(typeIcon.value)">
         <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
       </mat-button-toggle>
     </mat-button-toggle-group>

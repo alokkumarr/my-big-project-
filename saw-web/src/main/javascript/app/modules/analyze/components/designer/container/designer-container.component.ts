@@ -11,6 +11,9 @@ import * as get from 'lodash/get';
 import * as forEach from 'lodash/forEach';
 import * as map from 'lodash/map';
 import * as find from 'lodash/find';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpReduce from 'lodash/fp/reduce';
+import * as fpFilter from 'lodash/fp/filter';
 
 import { DesignerService } from '../designer.service';
 import {
@@ -25,6 +28,8 @@ import {
   Filter,
   IToolbarActionResult
 } from '../types'
+
+import { NUMBER_TYPES } from '../../../consts';
 
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service'
 
@@ -180,9 +185,28 @@ export class DesignerContainerComponent {
   }
 
   onSettingsChange() {
-    this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
     this.firstArtifactColumns = this.getFirstArtifactColumns();
     this.cleanSorts();
+    if (this.canRequestData()) {
+      this.requestData();
+    } else {
+      this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+    }
+  }
+
+  canRequestData() {
+    // there has to be at least 1 data field, to make a request
+    const nrOfDataFields = fpPipe(
+      fpFilter('checked'),
+      fpReduce((accumulator, {type}) => {
+        if (NUMBER_TYPES.includes(type)) {
+          return accumulator + 1;
+        }
+        return accumulator;
+      }, 0)
+    )(this.firstArtifactColumns);
+
+    return nrOfDataFields > 0
   }
 
   getFirstArtifactColumns() {

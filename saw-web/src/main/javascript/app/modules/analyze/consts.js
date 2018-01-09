@@ -36,10 +36,6 @@ export const TYPE_MAP = reduce([
 }, {});
 
 export const TYPE_ICONS = [{
-  icon: '',
-  label: 'All',
-  value: ''
-}, {
   icon: 'icon-number-type',
   label: 'Number',
   value: 'number'

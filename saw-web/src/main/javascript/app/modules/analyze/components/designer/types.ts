@@ -43,7 +43,7 @@ export {
 
 export type ArtifactColumnFilter = {
   keyword: string,
-  type: '' | 'number' | 'date' | 'string';
+  types: ('number' | 'date' | 'string')[];
 };
 
 export type PivotArea = 'data' | 'row' | 'column';

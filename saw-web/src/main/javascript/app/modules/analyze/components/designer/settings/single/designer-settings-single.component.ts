@@ -45,7 +45,7 @@ export class DesignerSettingsSingleComponent {
   public groupAdapters: IDEsignerSettingGroupAdapter[];
   public filterObj: ArtifactColumnFilter = {
     keyword: '',
-    type: ''
+    types: ['number', 'date', 'string']
   };
   constructor(private _designerService: DesignerService) {
     // we have to debounce settings change
@@ -93,8 +93,15 @@ export class DesignerSettingsSingleComponent {
     this.filterObj.keyword = value;
   }
 
-  onTypeFilterChange(value) {
-    this.filterObj.type = value;
+  onTypeFilterChange(event) {
+    const value = event.value;
+    const checked = event.source.checked;
+
+    if (!checked) {
+      this.filterObj.types = filter(this.filterObj.types, type => type !== value);
+    } else {
+      this.filterObj.types = [...this.filterObj.types, value];
+    }
   }
 
   /**

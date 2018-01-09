@@ -8,13 +8,22 @@ designer-settings-single {
     padding: 0 10px;
     height: 100%;
     grid-template:
-      "filters" 85px
+      "filters" 60px
       "unselected-fields" 1fr
       "selected-fields" 1fr
       / 100%;
   }
 
   .settings__filters {
+    .mat-input-wrapper.mat-form-field-wrapper {
+      padding-bottom: 0;
+      margin-right: 10px;
+
+      .mat-input-underline.mat-form-field-underline {
+        top: 90%;
+      }
+    }
+
     .mat-form-field-infix {
       border: 0;
     }
@@ -39,7 +48,7 @@ designer-settings-single {
     margin-top: 3px;
     padding: 5px;
     min-width: max-content;
-    border: solid 1px $primary-grey-g2;
+    border: solid 1px $primary-grey-g1;
     border-radius: 2px;
 
     button.mat-icon-button {
