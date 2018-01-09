@@ -4,7 +4,9 @@ import * as cloneDeep from 'lodash/cloneDeep';
 import {
   IToolbarActionData,
   IToolbarActionResult
-} from '../types'
+} from '../types';
+import { DesignerService } from '../designer.service';
+
 const template = require('./toolbar-action-dialog.component.html');
 require('./toolbar-action-dialog.component.scss');
 
@@ -15,7 +17,8 @@ require('./toolbar-action-dialog.component.scss');
 export class ToolbarActionDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<ToolbarActionDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: IToolbarActionData
+    @Inject(MAT_DIALOG_DATA) public data: IToolbarActionData,
+    private _designerService: DesignerService
   ) { }
 
   ngOnInit() {
@@ -25,7 +28,6 @@ export class ToolbarActionDialogComponent {
       break;
     case 'filter':
       this.data.filters = cloneDeep(this.data.filters);
-      this.data.booleanCriteria = this.data.booleanCriteria;
       break;
     }
   }
@@ -50,8 +52,12 @@ export class ToolbarActionDialogComponent {
     this.data.description = description;
   }
 
+  onSaveDescriptionChange(description) {
+    this.data.analysis.description = description;
+  }
+
   onNameChange(name) {
-    console.log('name', name);
+    this.data.analysis.name = name;
   }
 
   onOk() {
@@ -68,5 +74,17 @@ export class ToolbarActionDialogComponent {
       break;
     }
     this.dialogRef.close(result);
+  }
+
+  save() {
+    this._designerService.saveAnalysis(this.data.analysis)
+      .then(response => {
+        this.data.analysis.id = response.id;
+      }).finally(() => {
+        const result: IToolbarActionResult = {
+          isSaveSuccessful: true
+        }
+        this.dialogRef.close(result);
+      });
   }
 }

@@ -42,6 +42,7 @@ export class ExpandDetailPivotComponent {
 
   onAggregateChange(value) {
     this.artifactColumn.aggregate = value;
+    console.log('artifactColumn', this.artifactColumn);
     this.change.emit(this.artifactColumn);
   }
 

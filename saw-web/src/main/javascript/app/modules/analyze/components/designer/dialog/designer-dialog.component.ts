@@ -16,4 +16,8 @@ export class DesignerDialogComponent {
   onBack() {
     this.dialogRef.close();
   }
+
+  onSave(isSaveSuccesful) {
+    this.dialogRef.close(isSaveSuccesful);
+  }
 }

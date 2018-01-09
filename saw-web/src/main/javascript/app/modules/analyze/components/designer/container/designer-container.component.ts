@@ -22,7 +22,8 @@ import {
   ArtifactColumns,
   DesignerToolbarAciton,
   Sort,
-  Filter
+  Filter,
+  IToolbarActionResult
 } from '../types'
 
 import { AnalyzeDialogService } from '../../../services/analyze-dialog.service'
@@ -47,6 +48,7 @@ export class DesignerContainerComponent {
   @Input() public analysis?: Analysis;
   @Input() public designerMode: DesignerMode;
   @Output() public onBack: EventEmitter<any> = new EventEmitter();
+  @Output() public onSave: EventEmitter<boolean> = new EventEmitter();
   public isInDraftMode: boolean = false;
   public designerState: DesignerStates;
   public DesignerStates = DesignerStates;
@@ -80,7 +82,7 @@ export class DesignerContainerComponent {
     switch (action) {
     case 'sort':
       this._analyzeDialogService.openSortDialog(this.sorts, this.firstArtifactColumns)
-        .afterClosed().subscribe((result) => {
+        .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
             this.sorts = result.sorts;
           }
@@ -88,7 +90,7 @@ export class DesignerContainerComponent {
       break;
     case 'filter':
       this._analyzeDialogService.openFilterDialog(this.filters, this.analysis.artifacts, this.booleanCriteria)
-        .afterClosed().subscribe((result) => {
+        .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
             this.filters = result.filters;
             this.booleanCriteria = result.booleanCriteria;
@@ -101,7 +103,7 @@ export class DesignerContainerComponent {
       break;
     case 'description':
       this._analyzeDialogService.openDescriptionDialog(this.analysis.description)
-        .afterClosed().subscribe((result) => {
+        .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
             this.analysis.description = result.description;
           }
@@ -109,6 +111,11 @@ export class DesignerContainerComponent {
       break;
     case 'save':
       this._analyzeDialogService.openSaveDialog(this.analysis)
+      .afterClosed().subscribe((result: IToolbarActionResult) => {
+        if (result) {
+          this.onSave.emit(result.isSaveSuccessful);
+        }
+      });
       break;
     }
   }
@@ -119,6 +126,7 @@ export class DesignerContainerComponent {
       .then((newAnalysis: Analysis) => {
         this.analysis = {...this.analysisStarter, ...newAnalysis};
         unset(this.analysis, 'supports');
+        unset(this.analysis, 'categoryId');
       });
   }
 
@@ -193,8 +201,5 @@ export class DesignerContainerComponent {
     this.sorts = filter(this.sorts, sort => {
       return Boolean(find(checkedFields, ({columnName}) => columnName === sort.columnName));
     });
-  }
-
-  onSave() {
   }
 }

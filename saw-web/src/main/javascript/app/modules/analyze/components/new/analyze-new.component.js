@@ -6,7 +6,7 @@ import * as template from './analyze-new.component.html';
 import style from './analyze-new.component.scss';
 import emptyTemplate from './analyze-new-empty.html';
 
-import {AnalyseTypes, ENTRY_MODES, ANALYSIS_METHODS} from '../../consts';
+import {AnalyseTypes, ENTRY_MODES, ANALYSIS_METHODS, Events} from '../../consts';
 
 export const AnalyzeNewComponent = {
   template,
@@ -16,13 +16,14 @@ export const AnalyzeNewComponent = {
   },
   styles: [style],
   controller: class AnalyzeNewController {
-    constructor($scope, $mdDialog, AnalyzeService, AnalyzeDialogService) {
+    constructor($scope, $mdDialog, AnalyzeService, AnalyzeDialogService, $eventEmitter) {
       'ngInject';
       this._$scope = $scope;
       this._$mdDialog = $mdDialog;
       this._AnalyzeService = AnalyzeService;
       this.methods = ANALYSIS_METHODS;
       this._AnalyzeDialogService = AnalyzeDialogService;
+      this._$eventEmitter = $eventEmitter;
     }
 
     $onInit() {
@@ -69,7 +70,13 @@ export const AnalyzeNewComponent = {
         description: '',
         scheduled: null
       };
-      this._AnalyzeDialogService.openNewAnalysisDialog(model);
+      this._AnalyzeDialogService.openNewAnalysisDialog(model)
+        .afterClosed().subscribe(successfullySaved => {
+          if (successfullySaved) {
+            this.$dialog.hide(successfullySaved);
+            this._$eventEmitter.emit(Events.AnalysesRefresh);
+          }
+        });
     }
 
     createAnalysis() {
@@ -146,6 +153,7 @@ export const AnalyzeNewComponent = {
       }).then(successfullySaved => {
         if (successfullySaved) {
           this.$dialog.hide(successfullySaved);
+          this._$eventEmitter.emit(Events.AnalysesRefresh);
         }
       });
     }

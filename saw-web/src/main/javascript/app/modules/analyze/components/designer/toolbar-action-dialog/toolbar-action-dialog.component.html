@@ -3,6 +3,7 @@
   <strong *ngSwitchCase="'sort'" i18n>Sort</strong>
   <strong *ngSwitchCase="'filter'" i18n>Filter</strong>
   <strong *ngSwitchCase="'description'" i18n>Description</strong>
+  <strong *ngSwitchCase="'save'" i18n>Save</strong>
 </header>
 <div [ngSwitch]="data.action"
      class="dialog__content">
@@ -24,6 +25,7 @@
   </designer-description>
   <designer-save *ngSwitchCase="'save'"
                  (nameChange)="onNameChange($event)"
+                 (descriptionChange)="onSaveDescriptionChange($event)"
                  [analysis]="data.analysis">
   </designer-save>
 </div>
@@ -47,7 +49,7 @@
         Save Description
       </button>
       <button *ngSwitchCase="'save'"
-              (click)="onOk()"
+              (click)="save()"
               mat-raised-button color="primary" i18n>
         Save
       </button>

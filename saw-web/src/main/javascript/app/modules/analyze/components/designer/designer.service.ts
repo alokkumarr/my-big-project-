@@ -54,6 +54,14 @@ export class DesignerService {
     return this._analyzeService.previewExecution(analysis);
   }
 
+  getCategories(privilege) {
+    return this._analyzeService.getCategories(privilege);
+  }
+
+  saveAnalysis(analysis) {
+    return this._analyzeService.saveReport(analysis);
+  }
+
   public getPivotGroupAdapters(artifactColumns): IDEsignerSettingGroupAdapter[] {
 
     const pivotReverseTransform = (artifactColumn: ArtifactColumnPivot) => {

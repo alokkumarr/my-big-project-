@@ -11,9 +11,14 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as find from 'lodash/find';
 import * as has from 'lodash/has';
 import * as forEach from 'lodash/forEach';
-import * as cloneDeep from 'lodash/cloneDeep';
+import * as clone from 'lodash/clone';
 import * as groupBy from 'lodash/groupBy';
-import * as values from 'lodash/values';
+import * as split from 'lodash/split';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpPick from 'lodash/fp/pick';
+import * as fpMap from 'lodash/fp/map';
+import * as fpFilter from 'lodash/fp/filter';
+import * as moment from 'moment';
 import {Subject} from 'rxjs/Subject';
 
 import {
@@ -31,7 +36,8 @@ import {
   DATE_TYPES,
   NUMBER_TYPES,
   DEFAULT_DATE_INTERVAL,
-  DEFAULT_AGGREGATE_TYPE
+  DEFAULT_AGGREGATE_TYPE,
+  DATE_INTERVALS_OBJ
 } from '../../../consts';
 
 const template = require('./designer-pivot.component.html');
@@ -43,10 +49,61 @@ require('./designer-pivot.component.scss');
 })
 export class DesignerPivotComponent {
   @Output() requestDataRefresh: EventEmitter<null> = new EventEmitter();
-  @Input() artifactColumns: ArtifactColumns;
-  @Input() data: any;
+  @Input('artifactColumns') set setArtifactColumns(artifactColumns: ArtifactColumns) {
+    this.artifactColumns = this.preProcessArtifactColumns(artifactColumns);
+  };
+  @Input('data') set setData(data) {
+    this.data = this.preProcessData(data);
+  };
   @Input() designerState: DesignerStates;
 
+  public artifactColumns: ArtifactColumns;
+  public data;
   public updater: Subject<IPivotGridUpdate> = new Subject();
   public DesignerStates = DesignerStates;
+
+  preProcessArtifactColumns(artifactColumns: ArtifactColumns) {
+    return fpPipe(
+      fpFilter('checked'),
+      fpMap((column: ArtifactColumnPivot) => {
+
+        if (DATE_TYPES.includes(column.type)) {
+          const cloned = clone(column);
+          if (['day', 'quarter', 'month'].includes(column.dateInterval)) {
+            cloned.type = 'string';
+          } else {
+            cloned.groupInterval = cloned.dateInterval;
+          }
+          return cloned;
+        }
+        return column;
+      })
+    )(artifactColumns);
+  }
+
+  preProcessData(data) {
+    const processedData = this.formatDates(data, this.artifactColumns);
+    return processedData;
+  }
+
+  formatDates(data, fields: ArtifactColumns) {
+    if (isEmpty(this.artifactColumns)) {
+      return data;
+    }
+
+    const formattedData = map(data, dataPoint => {
+
+      const clonedDataPoint = clone(dataPoint);
+      forEach(this.artifactColumns, ({columnName, dateInterval}) => {
+        const format = DATE_INTERVALS_OBJ[dateInterval].format;
+        clonedDataPoint[columnName] = moment.utc(dataPoint[columnName]).format(format);
+        if (dateInterval === 'quarter') {
+          const parts = split(clonedDataPoint[columnName], '-');
+          clonedDataPoint[columnName] = `${parts[0]}-Q${parts[1]}`;
+        }
+      });
+      return clonedDataPoint;
+    });
+    return formattedData;
+  }
 }

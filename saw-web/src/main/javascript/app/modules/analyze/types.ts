@@ -64,4 +64,6 @@ export interface IToolbarActionResult {
   sorts?: Sort[];
   description?: string;
   filters?: Filter[];
+  booleanCriteria?: string;
+  isSaveSuccessful?: boolean;
 }
