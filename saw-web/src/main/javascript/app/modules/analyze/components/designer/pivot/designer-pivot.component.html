@@ -17,18 +17,11 @@
       <span class="non-ideal-state__message" i18n>
         At least one data field needs to be selected
       </span>
-      <!-- <button mat-button
-              (click)="requestDataRefresh.emit()"
-              color="primary">
-        <span i18n
-              class="non-ideal-state__button-text"
-              (click)="requestDataRefresh.emit()">Refresh data</span>
-      </button> -->
       <mat-icon class="non-ideal-state__icon" fontIcon="icon-pivot"></mat-icon>
   </div>
 
   <div *ngSwitchCase="DesignerStates.SELECTION_WAITING_FOR_DATA">
-    loading
+    <mat-icon class="non-ideal-state__icon" fontIcon="icon-pivot"></mat-icon>
   </div>
 
   <div *ngSwitchCase="DesignerStates.SELECTION_WITH_NO_DATA"
