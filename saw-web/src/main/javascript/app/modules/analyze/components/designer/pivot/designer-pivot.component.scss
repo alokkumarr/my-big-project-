@@ -1,6 +1,9 @@
 @import "themes/base/colors";
 
 designer-pivot {
+  height: calc(100% - 20px);
+  width: calc(100% - 20px);
+
   .non-ideal-state__container {
     margin-top: 50px;
   }

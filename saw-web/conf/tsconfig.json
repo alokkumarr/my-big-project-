@@ -25,6 +25,7 @@
     "src/test",
     "src/main/javascript/middlelayer",
     "src/main/javascript/styleguide",
+    "src/main/javascript/HELP_SAW_User_Guide",
     "conf",
     "dist",
     "target"

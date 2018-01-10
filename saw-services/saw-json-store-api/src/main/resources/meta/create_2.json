@@ -1,0 +1,89 @@
+[
+{
+  "action" : "create",
+  "output" : "hdfs:///var/bda/xdf-srux/cre1.json",
+	"xdf-root" : "hdfs:///data/bda",
+	"category" : "DataSet",
+	"id" : "dataset::101",
+	"source" : {
+    	"userData" : {
+					"createdBy" : "A.Sorokin",
+					"description" : "datalake",
+					"tags" : [ "Preview", "XDF", "Tag0" ]
+			},
+			"dataLake" : { 
+				"name" : "DS1", 
+				"type" : "fs", 
+				"catalog" : "asorokin", 
+				"format"  : "parquet", 
+				"mode"    : "replace", 
+				"numberOfFiles" : 20 
+			}, 
+			"transformations" : [ "transformation::spark-sql::1" ]
+	}
+},
+{
+  "action" : "create",
+  "output" : "hdfs:///var/bda/xdf-srux/cre2.json",
+	"xdf-root" : "hdfs:///data/bda",
+	"category" : "DataSet",
+	"id" : "dataset::102",
+	
+	"source" : {
+
+    	"userData" : {
+			
+					"createdBy" : "S.Volkov",
+					"description" : "datapod",
+					"tags" : [ "Zero", "AA", "Tag0", "Tag1" ]
+					
+			},
+			
+			"dataLake" : { 
+			
+				"name" : "DS2", 
+				"type" : "fs", 
+				"catalog" : "svolkov", 
+				"format"  : "parquet", 
+				"mode"    : "replace", 
+				"numberOfFiles" : 20 
+				
+			}, 
+	   
+			"transformations" : [ "transformation::spark-sql::2" ]
+	}
+	
+},
+{
+  "action" : "create",
+  "output" : "hdfs:///var/bda/xdf-srux/req5r.json",
+	"xdf-root" : "hdfs:///data/bda",
+	"category" : "DataSet",
+	"id" : "dataset::103",
+	
+	"source" : {
+
+    	"userData" : {
+			
+					"createdBy" : "A.Sorokin",
+					"description" : "datasegment",
+					"tags" : [ "SQL", "AA", "Tag0", "Tag1" ]
+					
+			},
+			
+			"dataLake" : { 
+			
+				"name" : "DS3", 
+				"type" : "fs", 
+				"catalog" : "asorokin", 
+				"format"  : "parquet", 
+				"mode"    : "replace", 
+				"numberOfFiles" : 20 
+				
+			}, 
+	   
+			"transformations" : [ "transformation::spark-sql::2" ]
+	}
+	
+}
+]

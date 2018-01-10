@@ -1,9 +1,21 @@
 declare function require(string): string;
 
-import { MatDialog, MatIconRegistry } from '@angular/material';
+import { MatIconRegistry } from '@angular/material';
 import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.component';
+import { Inject, OnInit } from '@angular/core';
+import { UIRouter } from '@uirouter/angular';
+
+import * as forEach from 'lodash/forEach';
+import * as find from 'lodash/find';
+import * as map from 'lodash/map';
+
+import { ObserveService } from '../../services/observe.service';
 import { MenuService } from '../../../../common/services/menu.service';
+import { HeaderProgressService } from '../../../../common/services/header-progress.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
+
+import { Dashboard } from '../../models/dashboard.interface';
+
 
 const template = require('./observe-page.component.html');
 require('./observe-page.component.scss');
@@ -19,31 +31,34 @@ import { Component } from '@angular/core';
   template: template
 })
 export class ObservePageComponent {
-  constructor(public dialog: MatDialog,
+  constructor(
     private iconRegistry: MatIconRegistry,
     private analyze: AnalyzeService,
-    private menu: MenuService
+    private menu: MenuService,
+    private observe: ObserveService,
+    private headerProgress: HeaderProgressService,
+    private router: UIRouter,
+    @Inject('$componentHandler') private $componentHandler
   ) {
-    // this.$componentHandler = $componentHandler;
-    // this.MenuService = MenuService;
     this.iconRegistry.setDefaultFontSetClass('icomoon');
-    this.menu.getMenu('ANALYZE').then(data => {
-      this.analyze.updateMenu(data);
-    });
   }
 
-  createDashboard() {
-    this.dialog.open(CreateDashboardComponent, {
-      panelClass: 'full-screen-dialog'
-    });
+
+  ngOnInit() {
+    this.headerProgress.show();
+
+    /* Needed to get the analyze service working correctly */
+    this.menu.getMenu('ANALYZE')
+      .then(data => {
+        this.analyze.updateMenu(data);
+      });
+
+    this.observe.reloadMenu().subscribe((menu) => {
+      this.headerProgress.hide();
+      this.observe.updateSidebar(menu);
+      this.observe.redirectToFirstDash(menu);
+    }, () => {
+      this.headerProgress.hide();
+    })
   }
-
-  // $onInit() {
-  //   const leftSideNav = this.$componentHandler.get('left-side-nav')[0];
-
-  //   this.MenuService.getMenu('OBSERVE')
-  //     .then(data => {
-  //       leftSideNav.update(data, 'OBSERVE');
-  //     });
-  // }
 };

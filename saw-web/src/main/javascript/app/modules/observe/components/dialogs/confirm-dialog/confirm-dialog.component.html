@@ -1,0 +1,14 @@
+<div mat-dialog-title>
+  <span [textContent]="title"></span>
+</div>
+<div mat-dialog-content>
+  <span [textContent]="message"></span>
+</div>
+<div mat-dialog-actions style="flex-direction: row-reverse">
+  <button mat-button [color]="actionColor"
+  (click)="confirm()"
+  [textContent]="actionButton"></button>
+  <button mat-button (click)="closeDashboard()">
+    Cancel
+  </button>
+</div>

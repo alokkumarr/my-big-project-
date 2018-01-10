@@ -219,7 +219,7 @@ object QueryBuilder extends {
         val value = subProperty("model", "value")
         if (operator == "btw") {
           val otherValue = subProperty("model", "otherValue")
-          "BETWEEN %s AND %s".format(value, otherValue)
+          "BETWEEN %s AND %s".format(otherValue,value)
         } else {
           val operatorSql = operator match {
             case "gt" => ">"

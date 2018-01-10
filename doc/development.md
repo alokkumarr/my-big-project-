@@ -13,7 +13,9 @@ To prepare for building the project, execute the following steps:
 
 3. Install [Docker] (for integration tests and local deployment)
 
-4. Configure Docker to allocate at least 8 GB memory and the maximum
+4. Install [PlantUML] (for rendering external documentation)
+
+5. Configure Docker to allocate at least 8 GB memory and the maximum
    number of CPUs for containers
 
 Because of the Docker memory requirements mentioned above, the
@@ -28,6 +30,7 @@ in the [Mac setup instructions].  Additionally there are [Windows
 setup instructions].
 
 [Docker]: https://www.docker.com/community-edition
+[PlantUML]: http://plantuml.com/
 [Mac setup instructions]: development-mac.md
 [Windows setup instructions]: development-windows.md
 
@@ -82,7 +85,21 @@ containers can be removed by executing the following command:
 
         $ docker rm -f saw saw-dist
 
-# Running SAW Web in development mode using local SAW deployment
+# Running system tests using local deployment
+
+All system tests are run automatically as part of `mvn verify`.
+However, as each such invocation will involve building the entire
+package and starting a new container, it can take minutes to complete.
+To iterate faster on specific system tests against an existing local
+deployment, run the following command:
+
+        mvn -pl saw-dist test-compile failsafe:integration-test
+
+The above command will immediately start executing system tests
+against an existing local SAW deployment.  Therefore it is possible to
+edit system tests, run them and get feedback in less than a minute.
+
+# Running SAW Web in development mode using local deployment
 
 When doing front-end development developers typically run the SAW Web
 application using NPM commands out of the `saw-web` source code
@@ -148,6 +165,20 @@ field mapping].
 [JSON data types]: https://tools.ietf.org/html/rfc7159#section-3
 [Elasticsearch data types]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/mapping-types.html
 [Elasticsearch dynamic field mapping]: https://www.elastic.co/guide/en/elasticsearch/reference/5.2/dynamic-field-mapping.html
+
+# Rendering documentation
+
+Documentation in the [saw-dist/src/main/asciidoc] directory is
+automatically rendered as part of the project build process.  To
+render the documentation without running other parts of the project
+build, execute the following command:
+
+        $ mvn -pl saw-dist asciidoctor:process-asciidoc -Dasciidoctor.backend=html
+
+The output can be inspected in the `saw-dist/target/generated-docs`
+directory.
+
+[saw-dist/src/main/asciidoc]: saw-dist/src/main/asciidoc
 
 # Continuous integration
 

@@ -18,6 +18,14 @@ touch $marker
 
 # Create database users
 mysql -u root < $dir/init.sql
+password=$(< /etc/bda/saw-security-db-password)
+create_user="CREATE USER 'saw_security'@'localhost'"
+mysql -u root -e "$create_user IDENTIFIED BY '$password'"
+mysql -u root -e "GRANT ALL ON saw_security.* TO 'saw_security'@'localhost'"
+
+# Set root password
+password=$(< /etc/bda/mariadb-root-password)
+mysql -u root -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('$password')"
 
 # Populate database
 python $dir/Initial_Setup.py --vars

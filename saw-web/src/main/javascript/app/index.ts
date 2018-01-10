@@ -7,8 +7,10 @@ import '../../../../assets/additional-icons.css';
 
 import 'zone.js';
 import 'reflect-metadata';
-import { NgModule, LOCALE_ID } from '@angular/core';
+import { NgModule, LOCALE_ID, Injector } from '@angular/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
+import { UrlService } from '@uirouter/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
@@ -37,6 +39,7 @@ angular
     AlertsModule,
     AdminModule
   ])
+  .config(['$urlServiceProvider', ($urlService: UrlService) => $urlService.deferIntercept()])
   .config(routesConfig)
   .config(themeConfig)
   .config(i18nConfig)
@@ -59,7 +62,11 @@ angular
     FlexLayoutModule
   ],
   exports: [FlexLayoutModule],
-  providers: [{provide: LOCALE_ID, useValue: 'en'}]
+  providers: [
+    {provide: LOCALE_ID, useValue: 'en'},
+    UIRouterUpgradeModule,
+    ObserveUpgradeModule
+  ]
 })
 export class NewAppModule {
   constructor() { }
@@ -71,7 +78,13 @@ export const platformRefPromise = platformBrowserDynamic().bootstrapModule(NewAp
 
 platformRefPromise.then(platformRef => {
   const upgrade = platformRef.injector.get(UpgradeModule) as UpgradeModule;
+  const injector: Injector = platformRef.injector;
   upgrade.bootstrap(document.documentElement, [AppModule]);
+
+  // Instruct UIRouter to listen to URL changes
+  const url: UrlService = injector.get(UrlService);
+  url.listen();
+  url.sync();
 
   /* Workaround to fix performance - Turns off propagation of changes from
      angular to angularjs. Remove this once upgradation of components start.

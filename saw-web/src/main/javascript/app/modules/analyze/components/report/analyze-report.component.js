@@ -8,11 +8,13 @@ import * as map from 'lodash/map';
 import * as keys from 'lodash/keys';
 import * as forEach from 'lodash/forEach';
 import * as clone from 'lodash/clone';
+import * as reduce from 'lodash/reduce';
 import * as sortBy from 'lodash/sortBy';
 import * as filter from 'lodash/filter';
 import * as assign from 'lodash/assign';
 import * as uniqBy from 'lodash/uniqBy';
 
+import {FieldModel} from '../../../../common/components/jsPlumb/models/fieldModel';
 import * as template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
 import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
@@ -253,6 +255,7 @@ export const AnalyzeReportComponent = {
           field.displayName = itemB.displayName;
           field.alias = itemB.aliasName;
           field.type = itemB.type;
+          field.format = itemB.format;
           field.checked = itemB.checked;
           field.visibleIndex = itemB.visibleIndex;
           field.isHidden = Boolean(itemB.hide);
@@ -335,6 +338,7 @@ export const AnalyzeReportComponent = {
             displayName: field.meta.displayName,
             table: table.name,
             aliasName: field.alias,
+            format: field.format,
             type: field.meta.type,
             hide: field.isHidden,
             joinEligible: field.meta.joinEligible,
@@ -404,16 +408,29 @@ export const AnalyzeReportComponent = {
 
     getColumns(columnNames = []) {
       const fields = fpFlatMap(table => table.fields, this.canvas.model.tables);
+      let table = null;
 
-      const columns = uniqBy(
-        fpFilter(field => columnNames.indexOf(field.name) >= 0, fields),
+      const columns = reduce(fields, (col, field) => {
+        table = table || field.table;
+        const index = columnNames.indexOf(field.name);
+        if (index >= 0) {
+          col.splice(index, 1, field);
+        }
+        return col;
+      }, columnNames);
+
+      return uniqBy(
+        map(columns, col => {
+          if (angular.isString(col)) {
+            const customColumn = new FieldModel(table, col);
+            customColumn.checked = true;
+            return customColumn;
+          }
+          col.checked = true;
+          return col;
+        }),
         column => column.name
       );
-
-      return map(columns, col => {
-        col.checked = true;
-        return col;
-      });
     }
 
     onSaveQuery(analysis) {
@@ -480,6 +497,11 @@ export const AnalyzeReportComponent = {
     reloadPreviewGrid(refresh = false) {
       if (refresh) {
         this.startDraftMode();
+      }
+
+      if (this.states.sqlMode === this.QUERY_MODE) {
+        this.applyDataToGrid(this.columns, [], [], this.gridData);
+        return;
       }
 
       const doReload = () => {

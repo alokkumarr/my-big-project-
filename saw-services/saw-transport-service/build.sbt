@@ -41,12 +41,17 @@ libraryDependencies += "org.json4s" %% "json4s-jackson" % "3.3.0"
 libraryDependencies += "org.apache.hbase" % "hbase-client" % "1.1.1-mapr-1602"   
 libraryDependencies += "org.apache.hbase" % "hbase-common" % "1.1.1-mapr-1602"
 libraryDependencies += "org.apache.hadoop" % "hadoop-common" % "2.7.0-mapr-1607"
+libraryDependencies += "com.mapr.streams" % "mapr-streams" % "5.2.0-mapr"
+libraryDependencies += "org.apache.kafka" % "kafka-clients" % "0.9.0.0-mapr-1607"
+libraryDependencies += "org.apache.spark" % "spark-core_2.11" % "2.1.0"
+libraryDependencies += "org.apache.spark" % "spark-sql_2.11" % "2.1.0"
 
 libraryDependencies += "org.asynchttpclient" % "async-http-client" % "2.0.0"
 libraryDependencies += "org.apache.httpcomponents" % "httpclient" % "4.5.2"
 libraryDependencies += "org.apache.httpcomponents" % "httpasyncclient" % "4.1.1"
 libraryDependencies += "org.apache.httpcomponents" % "httpcore" % "4.4.5"
 libraryDependencies += "commons-httpclient" % "commons-httpclient" % "3.1"
+libraryDependencies += "org.threeten" % "threeten-extra" % "1.2"
 
 libraryDependencies += "com.typesafe.play" %% "filters-helpers" % "2.5.10"
 

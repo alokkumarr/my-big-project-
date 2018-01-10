@@ -7,9 +7,13 @@ server:
   address: localhost
   port: 9500
   context-path: ''
+  maxHttpHeaderSize: 65536
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
-
+metastore:
+    base:  hdfs:///main
+    
+  
 
        

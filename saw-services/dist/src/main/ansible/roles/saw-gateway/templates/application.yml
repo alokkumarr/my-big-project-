@@ -12,7 +12,7 @@ server:
   maxHttpHeaderSize: 65536
   compression:
     enabled: true
-    mime-types: text/html,text/css,application/javascript,application/json      
+    mime-types: text/html,text/css,application/javascript,application/json
 
 
 analysis:
@@ -35,10 +35,10 @@ export:
         host: http://localhost:9400
 observe:
     service:
-        host: http://localhost:9500       
+        host: http://localhost:9500
 
 api:
-    gateway:
+  gateway:
         endpoints:
         -   location: ${metadata.service.host}
             method: POST
@@ -56,14 +56,20 @@ api:
             method: GET
             path: '/api/analyses.*'
         -   location: ${export.service.host}
-            method : GET
-            path : '[/]export.*'
-        -   location: ${observe.service.host}
-            method : GET
-            path : '[/]observe.*'
+            method: GET
+            path: '[/]export.*'
         -   location: ${observe.service.host}
             method: POST
-            path: '[/]observe*'
-            
+            path: '[/]observe.*'
+        -   location: ${observe.service.host}
+            method: GET
+            path: '[/]observe.*'
+        -   location: ${observe.service.host}
+            method: PUT
+            path: '[/]observe.*'
+        -   location: ${observe.service.host}
+            method: DELETE
+            path: '[/]observe.*'
+
 logging:
   config: /opt/bda/saw-gateway-service/conf/logback.xml

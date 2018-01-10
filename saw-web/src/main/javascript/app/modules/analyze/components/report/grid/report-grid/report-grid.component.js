@@ -79,6 +79,16 @@ export const ReportGridComponent = {
       if (e.target === 'header') {
         e.items = [];
 
+        if (['number', 'timestamp', 'date', 'string-date'].includes(e.column.dataType)) {
+          e.items.push({
+            text: 'Format Data',
+            icon: 'grid-menu-item icon-filter',
+            onItemClick: () => {
+              this.formatColumn(e.column);
+            }
+          });
+        }
+
         e.items.push({
           text: 'Rename',
           icon: 'grid-menu-item icon-edit',
@@ -154,7 +164,7 @@ export const ReportGridComponent = {
         const columns = this.prepareGridColumns(this.columns);
         forEach(columns, column => {
           if (column.dataType === 'date') {
-            column.dataType = 'string';
+            column.dataType = 'string-date';
           }
         });
         this._gridInstance.option('columns', columns);
@@ -163,6 +173,9 @@ export const ReportGridComponent = {
 
     prepareGridColumns(columns) {
       return map(columns, column => {
+        if (column.type === 'timestamp') {
+          column.type = 'date';
+        }
         const field = {
           caption: column.getDisplayName(),
           dataField: column.name,
@@ -170,18 +183,58 @@ export const ReportGridComponent = {
           visibleIndex: column.visibleIndex,
           allowSorting: false,
           alignment: 'left',
-          width: COLUMN_WIDTH
+          width: COLUMN_WIDTH,
+          format: column.format
         };
-        if (DATE_TYPES.includes(column.type)) {
-          field.format = {
-            type: 'shortDate'
-          };
+
+        if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
+          field.format = 'shortDate';
         }
-        if (NUMBER_TYPES.includes(column.type)) {
+
+        if (NUMBER_TYPES.includes(column.type) && isUndefined(column.format)) {
           field.format = {
             type: 'fixedPoint',
+            comma: false,
             precision: 2
           };
+          field.customizeText = (data => {
+            const stringList = data.valueText.split(',');
+            let finalString = '';
+            forEach(stringList, value => {
+              finalString = finalString.concat(value);
+            });
+            return finalString;
+          });
+        }
+        if (NUMBER_TYPES.includes(column.type) && !isUndefined(column.format)) {
+          if (!isUndefined(column.format.currency)) {
+            field.customizeText = (data => {
+              if (!column.format.comma) {
+                const stringList = data.valueText.split(',');
+                let finalString = '';
+                forEach(stringList, value => {
+                  finalString = finalString.concat(value);
+                });
+                data.valueText = finalString;
+              }
+              if (!isUndefined(column.format.currencySymbol) && !isEmpty(data.valueText)) {
+                return column.format.currencySymbol + ' ' + data.valueText;
+              }
+              return data.valueText;
+            });
+          } else {
+            field.customizeText = (data => {
+              if (!column.format.comma) {
+                const stringList = data.valueText.split(',');
+                let finalString = '';
+                forEach(stringList, value => {
+                  finalString = finalString.concat(value);
+                });
+                data.valueText = finalString;
+              }
+              return data.valueText;
+            });
+          }
         }
         return field;
       });
@@ -229,12 +282,22 @@ export const ReportGridComponent = {
       forEach(data, row => {
         forEach(keys, key => {
           const date = moment.tz(row[key], formats, true, BACKEND_TIMEZONE);
-          if (date.isValid()) {
+          if (date.isValid() && ['date', 'string-date', 'timestamp'].includes(this.checkColumndatatype(this.columns, key))) {
             row[key] = date.toDate();
           }
         });
       });
       return data;
+    }
+
+    checkColumndatatype(columnList, columnName) {
+      let datatype = '';
+      forEach(columnList, column => {
+        if (!isEmpty(column.meta) && column.meta.columnName === columnName) {
+          datatype = column.meta.type;
+        }
+      });
+      return datatype;
     }
 
     refreshGrid() {
@@ -254,6 +317,74 @@ export const ReportGridComponent = {
       return find(columns, column => {
         return column.dataField === columnName;
       });
+    }
+
+    formatColumn(gridColumn) {
+      this.openFormatModal(gridColumn).then(newFormat => {
+        if (this._gridInstance) {
+          const columns = this._gridInstance.option('columns');
+          const column = this.getColumnByName(newFormat.column);
+          let typeValue = '';
+          let separator = false;
+          if (column) {
+            if (['date', 'string-date', 'timestamp'].includes(newFormat.type)) {
+              column.dataType = 'date';
+              column.format = newFormat.dateFormat;
+            } else {
+              if (newFormat.commaSeparator) {
+                typeValue = 'fixedpoint';
+                separator = true;
+              } else {
+                typeValue = 'fixedpoint';
+                separator = false;
+              }
+              if (newFormat.currencyFlag) {
+                column.format = {
+                  type: typeValue,
+                  comma: separator,
+                  precision: newFormat.numberDecimal,
+                  currency: newFormat.currencyCode,
+                  currencySymbol: newFormat.currencySymbol
+                };
+                column.customizeText = (source => {
+                  if (!column.format.comma) {
+                    const stringList = source.valueText.split(',');
+                    let finalString = '';
+                    forEach(stringList, value => {
+                      finalString = finalString.concat(value);
+                    });
+                    source.valueText = finalString;
+                  }
+                  if (!isUndefined(column.format.currencySymbol) && !isEmpty(source.valueText)) {
+                    return column.format.currencySymbol + ' ' + source.valueText;
+                  }
+                  return source.valueText;
+                });
+              } else {
+                column.format = {
+                  type: typeValue,
+                  comma: separator,
+                  precision: newFormat.numberDecimal
+                };
+                column.customizeText = (source => {
+                  if (!column.format.comma) {
+                    const stringList = source.valueText.split(',');
+                    let finalString = '';
+                    forEach(stringList, value => {
+                      finalString += value;
+                    });
+                    source.valueText = finalString;
+                  }
+                  return source.valueText;
+                });
+              }
+            }
+          }
+          this._gridInstance.option('columns', columns);
+        }
+        this.reportGridContainer.formatColumn(gridColumn.dataField, gridColumn.dataType, newFormat);
+      });
+
     }
 
     renameColumn(gridColumn) {
@@ -309,6 +440,19 @@ export const ReportGridComponent = {
       return this._$mdDialog
         .show({
           template: '<report-rename-dialog></report-rename-dialog>',
+          fullscreen: false,
+          multiple: true,
+          clickOutsideToClose: true
+        });
+    }
+
+    openFormatModal(model) {
+      return this._$mdDialog
+        .show({
+          controller: scope => {
+            scope.model = model;
+          },
+          template: '<report-format-dialog model-data=model> </report-format-dialog>',
           fullscreen: false,
           multiple: true,
           clickOutsideToClose: true

@@ -1,0 +1,37 @@
+<div md-dialog-title>
+  <span>
+    Save Dashboard
+  </span>
+  <mat-progress-bar [mode]="'indeterminate'" *ngIf="showProgress"></mat-progress-bar>
+</div>
+<div md-dialog-content>
+  <form class="save-dashboard-form">
+    <mat-form-field class="full-form-field">
+      <input matInput name="dashboardName" placeholder="Dashboard Name"
+        [(ngModel)]="dashboard.name" required />
+    </mat-form-field>
+    <mat-form-field class="full-form-field">
+      <textarea matInput matTextareaAutosize [matAutosizeMaxRows]="6"
+        name="dashboardDesc" placeholder="Description"
+        [(ngModel)]="dashboard.description">
+      </textarea>
+    </mat-form-field>
+
+    <mat-select required name="dashboardCat" placeholder="Category" [(ngModel)]="dashboard.categoryId">
+      <mat-optgroup *ngFor="let category of categories" [label]="category.name">
+        <mat-option *ngFor="let subCategory of category.children" [value]="subCategory.id.toString()">
+          {{ subCategory.name }}
+        </mat-option>
+      </mat-optgroup>
+    </mat-select>
+  </form>
+</div>
+<div mat-dialog-actions>
+  <button mat-raised-button color="primary" (click)="saveDashboard()"
+    [disabled]="!isValid(dashboard)">
+    Save
+  </button>
+  <button mat-button color="primary" (click)="closeDashboard()">
+    Cancel
+  </button>
+</div>

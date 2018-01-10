@@ -51,6 +51,7 @@ import {NumberFilterComponent} from './components/filter/filters/number-filter.c
 import {DateFilterComponent} from './components/filter/filters/date-filter.component';
 import {FilterChipsComponent} from './components/filter/chips/filter-chips.component';
 import {AnalyzeFilterRowComponent} from './components/filter/row/analyze-filter-row.component';
+import {ReportFormatDialogComponent} from './components/report/grid/report-format-dialog/report-format-dialog.component';
 import {AnalyzeFilterModalComponent} from './components/filter/modal/analyze-filter-modal.component';
 import {ReportRenameDialogComponent} from './components/report/grid/report-rename-dialog/report-rename-dialog.component';
 import {AnalyzeSaveDialogComponent} from './components/save-dialog/analyze-save-dialog.component';
@@ -113,6 +114,7 @@ angular.module(AnalyzeModule, [
   .component('reportGridNode', ReportGridNodeComponent)
   .component('reportGrid', ReportGridComponent)
   .component('reportRenameDialog', ReportRenameDialogComponent)
+  .component('reportFormatDialog', ReportFormatDialogComponent)
   .component('analyzePage', AnalyzePageComponent)
   .component('analyzeView', AnalyzeViewComponent)
   .component('analyzeCardsView', AnalyzeCardsViewComponent)

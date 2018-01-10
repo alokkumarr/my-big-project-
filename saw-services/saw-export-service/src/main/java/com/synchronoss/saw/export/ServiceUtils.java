@@ -8,17 +8,29 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import com.github.fge.jsonschema.main.JsonValidator;
+import com.synchronoss.saw.export.generate.ExportBean;
+import com.synchronoss.saw.export.model.Ticket;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 
 @Component
 public class ServiceUtils {
   public final String SCHEMA_FILENAME = "payload-schema.json";
+  private static final Logger logger = LoggerFactory.getLogger(ServiceUtils.class);
+
 
   public ObjectMapper getMapper() {
     ObjectMapper objectMapper = new ObjectMapper();
@@ -62,6 +74,65 @@ public class ServiceUtils {
     return report.isSuccess();
   }
 
-  
-  
+  /**
+   * To Do
+   * @return
+   */
+  public String getDefaultJwtToken()
+  {
+    /* create default jwt token to request saw-transport-service restAPI for scheduled analysis to dispatch the data */
+
+    Ticket ticket = new Ticket();
+    ticket.setUserId("1");
+    ticket.setRoleType("admin");
+    ticket.setUserFullName("system");
+    ticket.setDataSecurityKey(new ArrayList<>());
+
+    return Jwts.builder().setSubject("sawadmin@synchronoss.com").claim("ticket", ticket).setIssuedAt(new Date())
+            .signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact();
+  }
+
+  public String prepareMailBody(ExportBean exportBean, String body)
+  {
+    logger.debug("prepare mail body starts here :"+body );
+    if(body.contains(MailBodyResolver.ANALYSIS_NAME))
+    {
+     body = body.replaceAll("\\"+MailBodyResolver.ANALYSIS_NAME,exportBean.getReportName());
+    }
+    if(body.contains(MailBodyResolver.ANALYSIS_DESCRIPTION))
+    {
+      body= body.replaceAll("\\"+MailBodyResolver.ANALYSIS_DESCRIPTION,exportBean.getReportDesc());
+    }
+    if(body.contains(MailBodyResolver.PUBLISH_TIME))
+    {
+      body= body.replaceAll("\\"+MailBodyResolver.PUBLISH_TIME,exportBean.getPublishDate());
+    }
+    if(body.contains(MailBodyResolver.CREATED_BY))
+    {
+      body= body.replaceAll("\\"+MailBodyResolver.CREATED_BY,exportBean.getCreatedBy());
+    }
+    logger.debug("prepare mail body ends here :" + this.getClass().getName() +": " +body);
+  return body;
+  }
+
+  public class MailBodyResolver {
+    public static final String ANALYSIS_NAME="$analysis_name";
+    public static final String ANALYSIS_DESCRIPTION="$analysis_description";
+    public static final String PUBLISH_TIME="$publish_time";
+    public static final String CREATED_BY="$created_by";
+  }
+
+  public boolean deleteFile(String sourceFile, boolean isDeleteSourceFile) throws IOException {
+    logger.debug(" Requested file to deleted  :" + this.getClass().getName() +":" + sourceFile);
+    File file = new File(sourceFile);
+    if (!file.exists())
+      return false;
+
+    if (isDeleteSourceFile) {
+      file.delete();
+      // delete the parent directory since this is temporarily created for particular execution.
+      file.getParentFile().delete();
+    }
+    return true;
+  }
 }

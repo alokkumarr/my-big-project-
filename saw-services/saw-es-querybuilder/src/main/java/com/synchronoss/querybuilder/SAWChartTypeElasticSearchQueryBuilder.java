@@ -37,6 +37,8 @@ class SAWChartTypeElasticSearchQueryBuilder {
 
   SearchSourceBuilder searchSourceBuilder;
 
+  final static String dateformat="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
+
   public SAWChartTypeElasticSearchQueryBuilder(String jsonString) {
     super();
     this.jsonString = jsonString;
@@ -114,12 +116,18 @@ class SAWChartTypeElasticSearchQueryBuilder {
             {
               DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
               RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+              if(item.getType().value().equals(Type.DATE.value())) {
+                rangeQueryBuilder.format(dateformat);
+              }
               rangeQueryBuilder.lte(dynamicConvertor.getLte());
               rangeQueryBuilder.gte(dynamicConvertor.getGte());
               builder.add(rangeQueryBuilder);
             }
             else {
               RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+              if(item.getType().value().equals(Type.DATE.value())) {
+                rangeQueryBuilder.format(dateformat);
+              }
               rangeQueryBuilder.lte(item.getModel().getLte());
               rangeQueryBuilder.gte(item.getModel().getGte());
               builder.add(rangeQueryBuilder);
@@ -147,12 +155,18 @@ class SAWChartTypeElasticSearchQueryBuilder {
             {
               DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
               RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+              if(item.getType().value().equals(Type.DATE.value())) {
+                rangeQueryBuilder.format(dateformat);
+              }
               rangeQueryBuilder.lte(dynamicConvertor.getLte());
               rangeQueryBuilder.gte(dynamicConvertor.getGte());
               builder.add(rangeQueryBuilder);
             }
             else {
               RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+              if(item.getType().value().equals(Type.DATE.value())) {
+                rangeQueryBuilder.format(dateformat);
+              }
               rangeQueryBuilder.lte(item.getModel().getLte());
               rangeQueryBuilder.gte(item.getModel().getGte());
               builder.add(rangeQueryBuilder);

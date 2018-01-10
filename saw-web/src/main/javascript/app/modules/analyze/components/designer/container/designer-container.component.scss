@@ -2,11 +2,13 @@
 
 designer-container {
   background-color: white;
+  max-height: 100vh;
+  max-width: 100vw;
   display: grid;
   grid-template:
-    "header header" minmax(60px, 7vh)
+    "header header" 7vh
     "data-settings content" 93vh
-    / 1fr 75vw;
+    / 25vw 75vw;
 
   .designer__header {
     grid-area: header;
@@ -25,7 +27,6 @@ designer-container {
   }
 
   .designer__main {
-    grid-area: content;
     padding: 10px;
   }
 }

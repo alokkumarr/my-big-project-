@@ -153,6 +153,19 @@ class ReportExecutorQueue(val executorType: String) {
     } catch {
       case e: Exception =>
         log.error("Error while executing analysis " + analysisId, e)
+    } finally {
+      markExecutionCompleted(resultId)
+    }
+  }
+
+  private def markExecutionCompleted(resultId: String) {
+    val path = "/main/saw-transport-executor-result-" + resultId
+    try {
+      val os = HFileOperations.writeToFile(path)
+      os.close
+    } catch {
+      case e: Exception =>
+        log.error("Error while writing marker file: " + path, e)
     }
   }
 }

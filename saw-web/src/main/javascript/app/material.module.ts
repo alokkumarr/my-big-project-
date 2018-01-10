@@ -15,11 +15,11 @@ import {
   MatCheckboxModule,
   MatMenuModule,
   MatTooltipModule,
-  MatDatepickerModule
+  MatDatepickerModule,
+  MatInputModule
 } from '@angular/material';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
-import {MatInputModule} from '@angular/material/input'
 import {MatCardModule} from '@angular/material/card';
 import {MatMomentDateModule} from '@angular/material-moment-adapter';
 

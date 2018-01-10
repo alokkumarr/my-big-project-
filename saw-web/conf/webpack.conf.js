@@ -189,7 +189,7 @@ module.exports = function (env) {
   }
 
   if (isProduction) {
-    const commonVendorKeys = ['angular', 'angular-material', 'jquery', 'angular-ui-router', 'angular-translate', '@angular/material', '@angular/core'];
+    const commonVendorKeys = ['angular', 'angular-material', 'jquery', '@uirouter/angular-hybrid', 'angular-translate', '@angular/material', '@angular/core'];
     const pkg = require(webpackHelper.root('package.json'));
 
     const appChunks = ['commonVendor', 'app'];
@@ -235,6 +235,9 @@ module.exports = function (env) {
     conf.plugins.push(new CopyWebpackPlugin([{
       from: webpackHelper.root('assets/i18n'),
       to: webpackHelper.root('dist/assets/i18n')
+    }, {
+      from: webpackHelper.root('src/main/javascript/HELP_SAW_User_Guide'),
+      to: webpackHelper.root('dist'),
     }]));
   }
 
