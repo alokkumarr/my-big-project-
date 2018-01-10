@@ -195,7 +195,7 @@
                   <healthy>true</healthy>
                   <!-- Increase timeout to allow application
                        deployment to finish -->
-                  <time>600000</time>
+                  <time>1200000</time>
                 </wait>  
               </run>
             </image>
@@ -223,7 +223,7 @@
                        that MapR is up and running -->
                   <healthy>true</healthy>
                   <!-- Increase timeout to allow MapR to start -->
-                  <time>600000</time>
+                  <time>1200000</time>
                 </wait>
               </run>
             </image>
