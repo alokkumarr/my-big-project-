@@ -291,7 +291,8 @@ export class ChartService {
     const isHighStock = type.substring(0, 2) === 'ts';
 
     const fieldsArray = compact([fields.x, ...fields.y, fields.z, fields.g]);
-    if (!isHighStock) {         // check if Highstock timeseries(ts) or Highchart
+    if (!isHighStock) {
+      // check if Highstock timeseries(ts) or Highchart
       const dateFields = filter(fieldsArray, ({type}) => DATE_TYPES.includes(type));
       this.formatDatesIfNeeded(parsedData, dateFields);
     }

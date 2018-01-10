@@ -90,8 +90,6 @@ export function PivotService() {
     }
     return area;
   }
-
-
   function formatDates(data, fields) {
     const formattedFields = map(fields, field => {
       if (DATE_TYPES.includes(field.type) &&
@@ -128,11 +126,11 @@ export function PivotService() {
     return {formattedData, formattedFields};
   }
 
-   /** Map the tree level to the columnName of the field
-   * Example:
-   * row_field_1: 0 -> SOURCE_OS
-   * row_field_2: 1 -> SOURCE_MANUFACTURER
-   * column_field_1: 2 -> TARGET_OS
+  /** Map the tree level to the columnName of the field
+     * Example:
+     * row_field_1: 0 -> SOURCE_OS
+     * row_field_2: 1 -> SOURCE_MANUFACTURER
+     * column_field_1: 2 -> TARGET_OS
    */
   function getNodeFieldMap(sqlBuilder) {
     const rowFieldMap = map(sqlBuilder.rowFields, 'columnName');

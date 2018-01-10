@@ -64,8 +64,8 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
     return AnalyzeService.publishAnalysis(analysis, execute).then(updatedAnalysis => {
       $rootScope.showProgress = false;
       toastMessage.info(execute ?
-                                'Analysis has been published.' :
-                                'Analysis schedule changes have been updated.');
+        'Analysis has been published.' :
+        'Analysis schedule changes have been updated.');
       return updatedAnalysis;
     }, () => {
       $rootScope.showProgress = false;
@@ -99,8 +99,8 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
 
   function openDeleteModal(analysis) {
     const confirm = $mdDialog.confirm()
-          .title('Are you sure you want to delete this analysis?')
-          .textContent('Any published analyses will also be deleted.')
+      .title('Are you sure you want to delete this analysis?')
+      .textContent('Any published analyses will also be deleted.')
       .ok('Delete')
       .cancel('Cancel');
 
