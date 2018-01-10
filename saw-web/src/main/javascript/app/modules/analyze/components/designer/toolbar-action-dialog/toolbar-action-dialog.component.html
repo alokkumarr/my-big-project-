@@ -14,9 +14,7 @@
   </designer-sort>
   <designer-filter-container *ngSwitchCase="'filter'"
                   (filtersChange)="onFiltersChange($event)"
-                  (booleanCriteriaChange)="onBooleanCriteriaChange($event)"
                   [filters]="data.filters"
-                  [booleanCriteria]="data.booleanCriteria"
                   [artifacts]="data.artifacts">
   </designer-filter-container>
   <designer-description *ngSwitchCase="'description'"
@@ -30,29 +28,46 @@
   </designer-save>
 </div>
 <div class="dialog__actions"
-     fxLayout="row"
+     fxLayout="column"
      fxLayoutAlign="start center">
-  <div [ngSwitch]="data.action">
-      <button *ngSwitchCase="'sort'"
-              (click)="onOk()"
-              mat-raised-button color="primary" i18n>
-        Apply Sort
-      </button>
-      <button *ngSwitchCase="'filter'"
-              (click)="onOk()"
-              mat-raised-button color="primary" i18n>
-        Apply Filters
-      </button>
-      <button *ngSwitchCase="'description'"
-              (click)="onOk()"
-              mat-raised-button color="primary" i18n>
-        Save Description
-      </button>
-      <button *ngSwitchCase="'save'"
-              (click)="save()"
-              mat-raised-button color="primary" i18n>
-        Save
-      </button>
+
+  <div *ngIf="data.action === 'filter'" fxLayout="row" fxLayoutAlign="start center">
+    <mat-button-toggle-group (change)="onBooleanCriteriaChange($event.value)"
+                              [value]="data.booleanCriteria">
+      <mat-button-toggle value="AND" i18n>
+        All
+      </mat-button-toggle>
+      <mat-button-toggle value="OR" i18n>
+        Any
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+    <span style="padding-left: 10px;" i18n>of the filters are true</span>
   </div>
-  <button mat-button i18n (click)="onBack()">Cancel</button>
+
+  <div fxLayout="row"
+       fxLayoutAlign="start center">
+    <div [ngSwitch]="data.action">
+        <button *ngSwitchCase="'sort'"
+                (click)="onOk()"
+                mat-raised-button color="primary" i18n>
+          Apply Sort
+        </button>
+        <button *ngSwitchCase="'filter'"
+                (click)="onOk()"
+                mat-raised-button color="primary" i18n>
+          Apply Filters
+        </button>
+        <button *ngSwitchCase="'description'"
+                (click)="onOk()"
+                mat-raised-button color="primary" i18n>
+          Save Description
+        </button>
+        <button *ngSwitchCase="'save'"
+                (click)="save()"
+                mat-raised-button color="primary" i18n>
+          Save
+        </button>
+    </div>
+    <button mat-button i18n (click)="onBack()">Cancel</button>
+  </div>
 </div>

@@ -14,15 +14,3 @@
               (click)="addFilter(artifact.artifactName)"></mat-icon>
   </button>
 </div>
-<div fxLayout="row" fxLayoutAlign="start center">
-  <mat-button-toggle-group (change)="onBooleanCriteriaChange($event.value)"
-                           [value]="booleanCriteria">
-    <mat-button-toggle value="AND" i18n>
-      All
-    </mat-button-toggle>
-    <mat-button-toggle value="OR" i18n>
-      Any
-    </mat-button-toggle>
-  </mat-button-toggle-group>
-  <span style="padding-left: 10px;" i18n>of the filters are true</span>
-</div>

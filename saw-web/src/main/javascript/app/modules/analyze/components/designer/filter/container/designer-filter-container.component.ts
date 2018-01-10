@@ -29,8 +29,6 @@ require('./designer-filter-container.component.scss');
 })
 export class DesignerFilterContainerComponent {
   @Output() public filtersChange: EventEmitter<Filter[]> = new EventEmitter();
-  @Output() public booleanCriteriaChange: EventEmitter<string> = new EventEmitter();
-  @Input() public booleanCriteria: string;
   @Input() public artifacts: Artifact[];
   @Input() public filters: Filter[];
 
@@ -83,7 +81,4 @@ export class DesignerFilterContainerComponent {
     return artifact.artifactName;
   }
 
-  onBooleanCriteriaChange(booleanCriteria) {
-    this.booleanCriteriaChange.emit(booleanCriteria);
-  }
 }
