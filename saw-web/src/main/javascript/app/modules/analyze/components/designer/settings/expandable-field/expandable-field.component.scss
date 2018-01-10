@@ -27,4 +27,20 @@ expandable-field {
   .expandable-field__remove-icon {
     color: red;
   }
+
+  .expandable-field__option-button {
+    width: auto;
+
+    & > .mat-button-wrapper {
+      width: auto;
+
+      & > .mat-icon {
+        width: auto;
+
+        &::before {
+          width: auto;
+        }
+      }
+    }
+  }
 }

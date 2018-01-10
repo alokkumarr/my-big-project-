@@ -8,7 +8,11 @@ import {
   ArtifactColumn,
   AnalysisType
 }  from '../../types';
-import { TYPE_ICONS_OBJ } from '../../../../consts';
+import {
+  TYPE_ICONS_OBJ,
+  AGGREGATE_TYPES,
+  AGGREGATE_TYPES_OBJ
+} from '../../../../consts';
 
 const template = require('./expandable-field.component.html');
 require('./expandable-field.component.scss');
@@ -25,8 +29,15 @@ export class ExpandableFieldComponent {
 
   public isExpanded = false;
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
+  public AGGREGATE_TYPES = AGGREGATE_TYPES;
+  public AGGREGATE_TYPES_OBJ = AGGREGATE_TYPES_OBJ;
 
   toggleExpansion() {
     this.isExpanded = !this.isExpanded;
+  }
+
+  onAggregateChange(value) {
+    this.artifactColumn.aggregate = value;
+    this.change.emit(this.artifactColumn);
   }
 }

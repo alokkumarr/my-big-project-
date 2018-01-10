@@ -29,9 +29,12 @@
 </div>
 <div class="dialog__actions"
      fxLayout="column"
-     fxLayoutAlign="start center">
+     fxLayoutAlign="start start">
 
-  <div *ngIf="data.action === 'filter'" fxLayout="row" fxLayoutAlign="start center">
+  <div *ngIf="data.action === 'filter'"
+       fxLayout="row"
+       fxLayoutAlign="start center"
+       style="margin-bottom: 10px;">
     <mat-button-toggle-group (change)="onBooleanCriteriaChange($event.value)"
                               [value]="data.booleanCriteria">
       <mat-button-toggle value="AND" i18n>

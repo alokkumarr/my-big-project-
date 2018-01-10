@@ -40,11 +40,6 @@ export class ExpandDetailPivotComponent {
     this.change.emit(this.artifactColumn);
   }
 
-  onAggregateChange(value) {
-    this.artifactColumn.aggregate = value;
-    this.change.emit(this.artifactColumn);
-  }
-
   onDateIntervalChange(value) {
     this.artifactColumn.dateInterval = value;
     this.change.emit(this.artifactColumn);

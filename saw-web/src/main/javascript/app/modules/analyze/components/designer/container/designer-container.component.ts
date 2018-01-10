@@ -145,6 +145,7 @@ export class DesignerContainerComponent {
         } else {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
           this.data = this.parseData(data.data, this.analysis.sqlBuilder);
+          console.log('data', JSON.stringify(this.data));
         }
       }, err => {
         this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;

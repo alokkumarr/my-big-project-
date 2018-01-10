@@ -6,17 +6,6 @@
              [value]="artifactColumn.aliasName || ''"/>
   </mat-form-field>
 
-  <mat-form-field *ngIf="hasAggregate">
-    <mat-select placeholder="Aggregate"
-                (selectionChange)="onAggregateChange($event.value)"
-                [value]="artifactColumn.aggregate">
-      <mat-option *ngFor="let aggregate of AGGREGATE_TYPES"
-                  [value]="aggregate.value">
-        {{ aggregate.label }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-
   <mat-form-field *ngIf="hasDateInterval">
     <mat-select placeholder="Group interval"
                 (selectionChange)="onDateIntervalChange($event.value)"
