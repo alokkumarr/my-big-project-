@@ -75,9 +75,9 @@ export class DesignerContainerComponent {
       this.initNewAnalysis();
       break;
     case 'edit':
-      this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
+      this.initExistingAnalysis();
+      this.requestData();
       break;
-
     default:
       break;
     }
@@ -133,6 +133,13 @@ export class DesignerContainerComponent {
         unset(this.analysis, 'supports');
         unset(this.analysis, 'categoryId');
       });
+  }
+
+  initExistingAnalysis() {
+    this.firstArtifactColumns = this.getFirstArtifactColumns();
+    this.filters = this.analysis.sqlBuilder.filters;
+    this.sorts = this.analysis.sqlBuilder.sorts;
+    this.booleanCriteria = this.analysis.sqlBuilder.booleanCriteria;
   }
 
   requestData() {

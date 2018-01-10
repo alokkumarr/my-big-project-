@@ -101,16 +101,8 @@ export const AnalyzeNewComponent = {
         };
         break;
       case 'table:pivot':
-        tpl = `<analyze-pivot model="model" mode="${mode}"></analyze-pivot>`;
-        model = {
-          type: AnalyseTypes.Pivot,
-          name: 'Untitled Analysis',
-          description: '',
-          categoryId: this.subCategory,
-          semanticId,
-          scheduled: null
-        };
-        break;
+        this.openUpgradedModal();
+        return;
       case 'chart:column':
       case 'chart:bar':
       case 'chart:line':

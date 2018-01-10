@@ -3,7 +3,7 @@ import * as clone from 'lodash/clone';
 
 import {AnalyseTypes} from '../../consts';
 
-export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toastMessage, FilterService, $log) {
+export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toastMessage, FilterService, $log, AnalyzeDialogService) {
   'ngInject';
   return {
     execute,
@@ -91,7 +91,7 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
       openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
       break;
     case AnalyseTypes.Pivot:
-      openModal(`<analyze-pivot model="model" mode="${mode}"></analyze-pivot>`);
+      AnalyzeDialogService.openEditAdnalysisDialog(analysis);
       break;
     default:
     }
