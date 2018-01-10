@@ -196,8 +196,7 @@ export const AnalyzeExecutedDetailComponent = {
             }
             const csvWithDisplayNames = this.replaceCSVHeader(csv, fields);
             this._fileService.exportCSV(csvWithDisplayNames, this.analysis.name);
-          }, exportOptions
-        );
+          }, exportOptions);
         });
       }
     }
