@@ -191,8 +191,13 @@
 									<file>src/main/resources/logback.xml</file>
 								</entry>
 								<entry>
+									<name>/opt/bda/saw-proxy-service/conf/proxy-scehma.json</name>
+									<file>src/main/resources/schema/proxy-scehma.json</file>
+								</entry>
+								<entry>
 									<name>/opt/bda/saw-proxy-service/conf/application.yml</name>
 									<file>src/main/resources/application.yml</file>
+									
 								</entry>
 							</entries>
 							<signature>

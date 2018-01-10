@@ -1,156 +1,544 @@
+
 package com.synchronoss.saw.storage.proxy.model;
 
-import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({"_id","entityId", "categoryId", "name", "description","createdBy","updatedBy","createdAt","updatedAt", "options", "tiles", "filters"})
-public class StorageProxy implements Serializable {
-  
-  private static final long serialVersionUID = 7077848381430952958L;
-  
-  @JsonProperty("_id")
-  private String _id;
-  @JsonProperty("entityId")
-  private String entityId;
-  @JsonProperty("categoryId")
-  private String categoryId;
-  @JsonProperty("name")
-  private String name;
-  @JsonProperty("createdBy")
-  private String createdBy;
-  @JsonProperty("updatedBy")
-  private String updatedBy;
-  @JsonProperty("createdAt")
-  private String createdAt;
-  @JsonProperty("updatedAt")
-  private String updatedAt;
-  @JsonProperty("description")
-  private String description;
-  @JsonProperty("options")
-  private List<Object> options = null;
-  @JsonProperty("tiles")
-  private List<Object> tiles = null;
-  @JsonProperty("filters")
-  private List<Object> filters = null;
+@JsonPropertyOrder({
+  "storage",
+  "action",
+  "query",
+  "requestBy",
+  "requestedTime",
+  "productCode",
+  "moduleName",
+  "resultFormat"
+})
+public class StorageProxy {
 
-  
-  @JsonProperty("_id")
-  public String get_id() {
-    return _id;
-  }
-  
-  @JsonProperty("_id")
-  public void set_id(String _id) {
-    this._id = _id;
-  }
+    /**
+     * The Storage Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("storage")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private StorageProxy.Storage storage = StorageProxy.Storage.fromValue("ES");
+    /**
+     * The Storage Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("action")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private StorageProxy.Action action = StorageProxy.Action.fromValue("search");
+    @JsonProperty("query")
+    private String query;
+    /**
+     * It holds the user requested by
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("requestBy")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String requestBy = "admin@synchronoss.com";
+    /**
+     * It holds the objectType
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("objectType")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String objectType;
+    /**
+     * It holds the indexName
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("indexName")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String indexName;
+    /**
+     * It holds the tableName
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("tableName")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String tableName;
+    /**
+     * It holds the objectName
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("objectName")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String objectName;
+    /**
+     * It holds the user requested time
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("requestedTime")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String requestedTime;
+    /**
+     * The Productcode Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("productCode")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String productCode;
+    /**
+     * The Modulename Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("moduleName")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String moduleName;
+    @JsonProperty("dataSecurityKey")
+    private List<Object> dataSecurityKey = null;
+    /**
+     * The Resultformat Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("resultFormat")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private StorageProxy.ResultFormat resultFormat = StorageProxy.ResultFormat.fromValue("json");
+    @JsonProperty("data")
+    private List<Object> data = null;
+    @JsonIgnore
+    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-  @JsonProperty("entityId")
-  public String getEntityId() {
-    return entityId;
-  }
+    /**
+     * The Storage Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("storage")
+    public StorageProxy.Storage getStorage() {
+        return storage;
+    }
 
-  @JsonProperty("entityId")
-  public void setEntityId(String entityId) {
-    this.entityId = entityId;
-  }
+    /**
+     * The Storage Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("storage")
+    public void setStorage(StorageProxy.Storage storage) {
+        this.storage = storage;
+    }
 
-  @JsonProperty("categoryId")
-  public String getCategoryId() {
-    return categoryId;
-  }
+    /**
+     * The Storage Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("action")
+    public StorageProxy.Action getAction() {
+        return action;
+    }
 
-  @JsonProperty("categoryId")
-  public void setCategoryId(String categoryId) {
-    this.categoryId = categoryId;
-  }
+    /**
+     * The Storage Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("action")
+    public void setAction(StorageProxy.Action action) {
+        this.action = action;
+    }
 
-  @JsonProperty("name")
-  public String getName() {
-    return name;
-  }
+    @JsonProperty("query")
+    public String getQuery() {
+        return query;
+    }
 
-  @JsonProperty("name")
-  public void setName(String name) {
-    this.name = name;
-  }
+    @JsonProperty("query")
+    public void setQuery(String query) {
+        this.query = query;
+    }
 
-  @JsonProperty("description")
-  public String getDescription() {
-    return description;
-  }
+    /**
+     * It holds the user requested by
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("requestBy")
+    public String getRequestBy() {
+        return requestBy;
+    }
 
-  @JsonProperty("description")
-  public void setDescription(String description) {
-    this.description = description;
-  }
-  
-  @JsonProperty("createdBy")
-  public String getCreatedBy() {
-    return createdBy;
-  }
-  @JsonProperty("createdBy")
-  public void setCreatedBy(String createdBy) {
-    this.createdBy = createdBy;
-  }
-  @JsonProperty("updatedBy")
-  public String getUpdatedBy() {
-    return updatedBy;
-  }
-  @JsonProperty("updatedBy")
-  public void setUpdatedBy(String updatedBy) {
-    this.updatedBy = updatedBy;
-  }
-  @JsonProperty("createdAt")
-  public String getCreatedAt() {
-    return createdAt;
-  }
-  @JsonProperty("createdAt")
-  public void setCreatedAt(String createdAt) {
-    this.createdAt = createdAt;
-  }
-  @JsonProperty("updatedAt")
-  public String getUpdatedAt() {
-    return updatedAt;
-  }
-  @JsonProperty("updatedAt")
-  public void setUpdatedAt(String updatedAt) {
-    this.updatedAt = updatedAt;
-  }
+    /**
+     * It holds the user requested by
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("requestBy")
+    public void setRequestBy(String requestBy) {
+        this.requestBy = requestBy;
+    }
 
-  @JsonProperty("options")
-  public List<Object> getOptions() {
-    return options;
-  }
+    /**
+     * It holds the objectType
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("objectType")
+    public String getObjectType() {
+        return objectType;
+    }
 
-  @JsonProperty("options")
-  public void setOptions(List<Object> options) {
-    this.options = options;
-  }
+    /**
+     * It holds the objectType
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("objectType")
+    public void setObjectType(String objectType) {
+        this.objectType = objectType;
+    }
 
-  @JsonProperty("tiles")
-  public List<Object> getTiles() {
-    return tiles;
-  }
+    /**
+     * It holds the indexName
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("indexName")
+    public String getIndexName() {
+        return indexName;
+    }
 
-  @JsonProperty("tiles")
-  public void setTiles(List<Object> tiles) {
-    this.tiles = tiles;
-  }
+    /**
+     * It holds the indexName
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("indexName")
+    public void setIndexName(String indexName) {
+        this.indexName = indexName;
+    }
 
-  @JsonProperty("filters")
-  public List<Object> getFilters() {
-    return filters;
-  }
+    /**
+     * It holds the tableName
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("tableName")
+    public String getTableName() {
+        return tableName;
+    }
 
-  @JsonProperty("filters")
-  public void setFilters(List<Object> filters) {
-    this.filters = filters;
-  }
+    /**
+     * It holds the tableName
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("tableName")
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
 
+    /**
+     * It holds the objectName
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("objectName")
+    public String getObjectName() {
+        return objectName;
+    }
+
+    /**
+     * It holds the objectName
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("objectName")
+    public void setObjectName(String objectName) {
+        this.objectName = objectName;
+    }
+
+    /**
+     * It holds the user requested time
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("requestedTime")
+    public String getRequestedTime() {
+        return requestedTime;
+    }
+
+    /**
+     * It holds the user requested time
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("requestedTime")
+    public void setRequestedTime(String requestedTime) {
+        this.requestedTime = requestedTime;
+    }
+
+    /**
+     * The Productcode Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("productCode")
+    public String getProductCode() {
+        return productCode;
+    }
+
+    /**
+     * The Productcode Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("productCode")
+    public void setProductCode(String productCode) {
+        this.productCode = productCode;
+    }
+
+    /**
+     * The Modulename Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("moduleName")
+    public String getModuleName() {
+        return moduleName;
+    }
+
+    /**
+     * The Modulename Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("moduleName")
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
+    }
+
+    @JsonProperty("dataSecurityKey")
+    public List<Object> getDataSecurityKey() {
+        return dataSecurityKey;
+    }
+
+    @JsonProperty("dataSecurityKey")
+    public void setDataSecurityKey(List<Object> dataSecurityKey) {
+        this.dataSecurityKey = dataSecurityKey;
+    }
+
+    /**
+     * The Resultformat Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("resultFormat")
+    public StorageProxy.ResultFormat getResultFormat() {
+        return resultFormat;
+    }
+
+    /**
+     * The Resultformat Schema
+     * <p>
+     * An explanation about the purpose of this instance.
+     * 
+     */
+    @JsonProperty("resultFormat")
+    public void setResultFormat(StorageProxy.ResultFormat resultFormat) {
+        this.resultFormat = resultFormat;
+    }
+
+    @JsonProperty("data")
+    public List<Object> getData() {
+        return data;
+    }
+
+    @JsonProperty("data")
+    public void setData(List<Object> data) {
+        this.data = data;
+    }
+
+    @JsonAnyGetter
+    public Map<String, Object> getAdditionalProperties() {
+        return this.additionalProperties;
+    }
+
+    @JsonAnySetter
+    public void setAdditionalProperty(String name, Object value) {
+        this.additionalProperties.put(name, value);
+    }
+
+    public enum Action {
+
+        SEARCH("search"),
+        AGGREGATE("aggregate"),
+        VALIDATE("validate"),
+        CREATE("create"),
+        DELETE("delete"),
+        UPDATE("update"),
+        SNCRPIVOT("sncrpivot"),
+        COUNT("count");
+        private final String value;
+        private final static Map<String, StorageProxy.Action> CONSTANTS = new HashMap<String, StorageProxy.Action>();
+
+        static {
+            for (StorageProxy.Action c: values()) {
+                CONSTANTS.put(c.value, c);
+            }
+        }
+
+        private Action(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
+
+        @JsonValue
+        public String value() {
+            return this.value;
+        }
+
+        @JsonCreator
+        public static StorageProxy.Action fromValue(String value) {
+            StorageProxy.Action constant = CONSTANTS.get(value);
+            if (constant == null) {
+                throw new IllegalArgumentException(value);
+            } else {
+                return constant;
+            }
+        }
+
+    }
+
+    public enum ResultFormat {
+
+        TABULAR("tabular"),
+        JSON("json");
+        private final String value;
+        private final static Map<String, StorageProxy.ResultFormat> CONSTANTS = new HashMap<String, StorageProxy.ResultFormat>();
+
+        static {
+            for (StorageProxy.ResultFormat c: values()) {
+                CONSTANTS.put(c.value, c);
+            }
+        }
+
+        private ResultFormat(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
+
+        @JsonValue
+        public String value() {
+            return this.value;
+        }
+
+        @JsonCreator
+        public static StorageProxy.ResultFormat fromValue(String value) {
+            StorageProxy.ResultFormat constant = CONSTANTS.get(value);
+            if (constant == null) {
+                throw new IllegalArgumentException(value);
+            } else {
+                return constant;
+            }
+        }
+
+    }
+
+    public enum Storage {
+
+        ES("ES"),
+        DL("DL"),
+        RDMS("RDMS");
+        private final String value;
+        private final static Map<String, StorageProxy.Storage> CONSTANTS = new HashMap<String, StorageProxy.Storage>();
+
+        static {
+            for (StorageProxy.Storage c: values()) {
+                CONSTANTS.put(c.value, c);
+            }
+        }
+
+        private Storage(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
+
+        @JsonValue
+        public String value() {
+            return this.value;
+        }
+
+        @JsonCreator
+        public static StorageProxy.Storage fromValue(String value) {
+            StorageProxy.Storage constant = CONSTANTS.get(value);
+            if (constant == null) {
+                throw new IllegalArgumentException(value);
+            } else {
+                return constant;
+            }
+        }
+
+    }
 
 }
