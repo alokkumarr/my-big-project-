@@ -23,7 +23,7 @@ export const AnalyzeExecutedDetailComponent = {
   styles: [style],
   controller: class AnalyzeExecutedDetailController extends AbstractComponentController {
     constructor($injector, AnalyzeService, $state, $rootScope, JwtService, $mdDialog, fileService,
-                $window, toastMessage, FilterService, AnalyzeActionsService, $scope, $q, $translate) {
+      $window, toastMessage, FilterService, AnalyzeActionsService, $scope, $q, $translate) {
       'ngInject';
       super($injector);
 
