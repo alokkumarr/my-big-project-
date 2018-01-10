@@ -1,0 +1,127 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://synchronoss.com/proxy.json",
+  "type": "array",
+  "items": {
+    "id": "http://synchronoss.com/proxy.json/items",
+    "type": "object",
+    "properties": {
+      "storage": {
+        "id": "http://synchronoss.com/proxy.json/items/properties/storage",
+        "type": "string",
+        "title": "The Storage Schema",
+        "description": "An explanation about the purpose of this instance.",
+        "default": "ES",
+        "enum": [
+          "ES","DL","RDMS"
+        ]
+        
+     },
+      "action": {
+        "id": "http://synchronoss.com/proxy.json/items/properties/action",
+        "type": "string",
+        "title": "The Storage Schema",
+        "description": "An explanation about the purpose of this instance.",
+        "default": "search",
+        "enum": [
+          "search","validate","count", "create", "delete", "update", "aggregate", "sncrpivot"
+        ]
+      },
+      "query": {
+        "id": "http://synchronoss.com/proxy.json/items/properties/query",
+        "type": "string",
+        "title": "It holds the query",
+        "description": "An explanation about the purpose of this instance."
+      },
+      "requestBy": {
+        "id": "http://synchronoss.com/proxy.json/items/properties/requestBy",
+        "type": "string",
+        "title": "It holds the user requested by",
+        "description": "An explanation about the purpose of this instance.",
+        "default": "admin@synchronoss.com"
+        
+      },
+      "objectType": {
+        "id": "http://synchronoss.com/proxy.json/items/properties/objectType",
+        "type": "string",
+        "title": "It holds the objectType",
+        "description": "An explanation about the purpose of this instance."
+      },
+      "indexName": {
+        "id": "http://synchronoss.com/proxy.json/items/properties/indexName",
+        "type": "string",
+        "title": "It holds the indexName",
+        "description": "An explanation about the purpose of this instance."
+      },
+      "tableName": {
+        "id": "http://synchronoss.com/proxy.json/items/properties/tableName",
+        "type": "string",
+        "title": "It holds the tableName",
+        "description": "An explanation about the purpose of this instance."
+      },
+      "objectName": {
+        "id": "http://synchronoss.com/proxy.json/items/properties/objectName",
+        "type": "string",
+        "title": "It holds the objectName",
+        "description": "An explanation about the purpose of this instance."
+      },
+      "requestedTime": {
+        "id": "http://synchronoss.com/proxy.json/items/properties/requestedTime",
+        "type": "string",
+        "title": "It holds the user requested time",
+        "description": "An explanation about the purpose of this instance."
+      },
+      "productCode": {
+        "id": "http://synchronoss.com/proxy.json/items/properties/productCode",
+        "type": "string",
+        "title": "The Productcode Schema",
+        "description": "An explanation about the purpose of this instance."
+      },
+      "moduleName": {
+        "id": "http://synchronoss.com/proxy.json/items/properties/moduleName",
+        "type": "string",
+        "title": "The Modulename Schema",
+        "description": "An explanation about the purpose of this instance."
+      },
+      "dataSecurityKey": {
+        "id": "http://synchronoss.com/proxy.json/items/properties/dataSecurityKey",
+        "type": "array",
+        "items": {
+          "title": "Empty Object",
+          "description": "Accepts anything iff it's valid JSON."
+        }
+      },
+      "resultFormat": {
+        "id": "http://synchronoss.com/proxy.json/items/properties/resultFormat",
+        "type": "string",
+        "title": "The Resultformat Schema",
+        "description": "An explanation about the purpose of this instance.",
+        "default": "json",
+        "enum": [
+          "tabular", "json"
+        ]
+      },
+     "data": {
+        "id": "http://synchronoss.com/proxy.json/items/properties/data",
+        "type": "array",
+        "items": {
+          "title": "Empty Object",
+          "description": "Accepts anything iff it's valid JSON."
+        }
+      }   
+    },
+    "required":[  
+      "storage",
+      "action",
+      "query",
+       "requestBy",
+      "requestedTime",
+      "productCode",
+      "moduleName",
+      "resultFormat"
+    ]
+ 
+    
+}
+}

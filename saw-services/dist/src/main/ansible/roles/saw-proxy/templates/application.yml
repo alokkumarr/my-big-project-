@@ -11,8 +11,12 @@ server:
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
-metastore:
-    base:  hdfs:///main
-
+schema:
+    file: /opt/bda/saw-proxy-service/conf/proxy-schema.json
+application:
+    async:
+        core-pool-size: 10
+        max-pool-size: 50
+        queue-capacity: 10000
 logging:
   config: /opt/bda/saw-proxy-service/conf/logback.xml

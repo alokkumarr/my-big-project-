@@ -1,5 +1,6 @@
 package com.synchronoss.saw.storage.proxy;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,39 +62,43 @@ public class StorageProxyUtils {
     return new ClassPathResource(filename);
   }
 
-  public Boolean jsonSchemaValidate(String jsonDataString, String filename)
+  public static Boolean jsonSchemaValidate(StorageProxyNode proxy, String path)
       throws IOException, ProcessingException {
-    final JsonNode data = JsonLoader.fromString(jsonDataString);
-    final JsonNode schema = JsonLoader.fromURL(this.getClassPathResources(filename).getURL());
-    final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
+    // Validating JSON against schema
+    Boolean result = true;
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
     JsonValidator validator = factory.getValidator();
+    final JsonNode data = JsonLoader.fromString(objectMapper.writeValueAsString(proxy.getProxy()));
+    final JsonNode schema = JsonLoader.fromFile(new File(path));
     ProcessingReport report = validator.validate(schema, data);
-    return report.isSuccess();
-  }
+    if (report.isSuccess() == false) {
+      result = false;
+      throw new ProcessingException(report.toString());
+    }
+    return result;
+ }
   
-  public static StorageProxy getObserveNode (String json, String node) throws JsonProcessingException, IOException {
+  public static StorageProxyNode getProxyNode (String json, String node) throws JsonProcessingException, IOException {
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     JsonNode objectNode = objectMapper.readTree(json);
     JsonNode contentNode = objectNode.get(node);
-    JsonNode observeNode = contentNode.get("observe").get(0);
-    String jsonObserve = "{ \"observe\" :" + observeNode.toString() + "}";
-    JsonNode observeNodeIndependent = objectMapper.readTree(jsonObserve);
-    StorageProxyNode observeTreeNode = objectMapper.treeToValue(observeNodeIndependent, StorageProxyNode.class);
-    StorageProxy observeTree = observeTreeNode.getObserve();
-    return observeTree; 
+    JsonNode proxyNode = contentNode.get("proxy");
+    String jsonProxy = "{ \"proxy\" :" + proxyNode.toString() + "}";
+    JsonNode proxyNodeIndependent = objectMapper.readTree(jsonProxy);
+    StorageProxyNode proxyTreeNode = objectMapper.treeToValue(proxyNodeIndependent, StorageProxyNode.class);
+    return proxyTreeNode; 
   }
   
-  public static StorageProxyResponse prepareResponse(StorageProxy node, String message){
+  public static StorageProxyResponse prepareResponse(List<StorageProxy> node, String message){
     StorageProxyResponse createresponse = new StorageProxyResponse();
     createresponse.setMessage(message);
-    createresponse.setId(node.get_id());
-    createresponse.setId(node.getEntityId());
     Content content = new Content();
-    List<StorageProxy> listOfObserve = new ArrayList<>();
-    listOfObserve.add(node);
-    content.setObserve(listOfObserve);
+    content.setProxy(node);
     createresponse.setContents(content);
     return createresponse;
   }

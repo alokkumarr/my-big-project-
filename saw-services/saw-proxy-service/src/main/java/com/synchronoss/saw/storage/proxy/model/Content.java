@@ -16,18 +16,20 @@ public class Content implements Serializable {
    * 
    */
   private static final long serialVersionUID = 1L;
-  @JsonProperty("observe")
-  private List<StorageProxy> observe = null;
+  @JsonProperty("proxy")
+  private List<StorageProxy> proxy = null;
  
   
-  @JsonProperty("observe")
-  public List<StorageProxy> getObserve() {
-  return observe;
+  @JsonProperty("proxy")
+  public List<StorageProxy> getProxy() {
+  return proxy;
   }
 
-  @JsonProperty("observe")
-  public void setObserve(List<StorageProxy> observe) {
-  this.observe = observe;
+  @JsonProperty("proxy")
+  public void setProxy(List<StorageProxy> proxy) {
+  this.proxy = proxy;
   }
+  
+  
 
 }

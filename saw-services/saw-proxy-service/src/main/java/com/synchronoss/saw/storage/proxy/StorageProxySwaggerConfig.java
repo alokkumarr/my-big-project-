@@ -16,7 +16,7 @@ public class StorageProxySwaggerConfig {
     public Docket api() { 
         return new Docket(DocumentationType.SWAGGER_2)  
           .select()                                  
-          .apis(RequestHandlerSelectors.basePackage("com.synchronoss.saw.observe.controller"))              
+          .apis(RequestHandlerSelectors.basePackage("com.synchronoss.saw.storage.proxy.controller"))              
           .paths(PathSelectors.any())                          
           .build();         
     }

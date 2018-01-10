@@ -11,9 +11,12 @@ server:
   compression:
     enabled: true
     mime-types: text/html,text/css,application/javascript,application/json
-metastore:
-    base:  hdfs:///main
-    
-  
+application:
+    async:
+        core-pool-size: 10
+        max-pool-size: 50
+        queue-capacity: 10000
+schema:
+   file: /Users/Shared/WORK/saw/saw-services/saw-proxy-service/src/main/resources/schema/proxy-scehma.json 
 
        
