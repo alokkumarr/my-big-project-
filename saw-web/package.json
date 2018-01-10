@@ -66,7 +66,8 @@
     "zone.js": "0.8.17"
   },
   "devDependencies": {
-    "@types/jasmine": "2.5.54",
+    "@types/chai": "^4.1.0",
+    "@types/mocha": "^2.2.46",
     "angular-tslint-rules": "1.0.4",
     "async": "2.1.5",
     "autoprefixer": "6.7.2",
@@ -100,8 +101,6 @@
     "htmlhint-loader": "1.1.1",
     "husky": "0.13.1",
     "image-webpack-loader": "3.2.0",
-    "jasmine-data-provider": "^2.2.0",
-    "jasmine-spec-reporter": "4.1.1",
     "json-loader": "0.5.4",
     "karma": "1.4.1",
     "karma-chai": "0.1.0",
