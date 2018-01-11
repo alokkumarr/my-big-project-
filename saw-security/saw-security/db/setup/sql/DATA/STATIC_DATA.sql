@@ -7,6 +7,7 @@ Entry needs to be made here in case of new version of migartion release ***/
 INSERT INTO schema_version VALUES ('1', '1', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW() , '0', '1') ;
 INSERT INTO schema_version VALUES ('2', '2', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 INSERT INTO schema_version VALUES ('3', '3', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
+INSERT INTO schema_version VALUES ('4', '4', '<< Flyway Baseline >>', 'BASELINE', '<< Flyway Baseline >>', NULL, 'system', NOW(), '0', '1') ;
 
 /**************************************** Initial Schema_version DML script Ends here  *******************************************/
 INSERT INTO `PRODUCTS` (`PRODUCT_SYS_ID`,`PRODUCT_NAME`,`PRODUCT_CODE`,`PRODUCT_DESC`,`ACTIVE_STATUS_IND`,`CREATED_DATE`,`CREATED_BY`,`INACTIVATED_DATE`,`INACTIVATED_BY`,`MODIFIED_DATE`,`MODIFIED_BY`) VALUES (1,'MCT Insights','MCTI000001','MCT Insights',1,'2017-05-23 06:51:34','admin','','','','');
