@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "scripts": {
+    "webdriver-manager": "webdriver-manager update --standalone false --chrome false",
+    "protractor": "p() { protractor $* ../saw-web/conf/protractor.conf.js; rv=$?; test $rv -ne 0 -a $rv -ne 1 && exit $rv || exit 0; }; p"
+  },
+  "devDependencies": {
+    "protractor": "5.2.2",
+    "jasmine-reporters": "2.3.0"
+  }
+}

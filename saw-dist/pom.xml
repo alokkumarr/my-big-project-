@@ -195,7 +195,7 @@
                   <healthy>true</healthy>
                   <!-- Increase timeout to allow application
                        deployment to finish -->
-                  <time>600000</time>
+                  <time>1200000</time>
                 </wait>  
               </run>
             </image>
@@ -223,7 +223,7 @@
                        that MapR is up and running -->
                   <healthy>true</healthy>
                   <!-- Increase timeout to allow MapR to start -->
-                  <time>600000</time>
+                  <time>1200000</time>
                 </wait>
               </run>
             </image>
@@ -244,6 +244,54 @@
             <goals>
               <goal>stop</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.github.eirslett</groupId>
+        <artifactId>frontend-maven-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+          <execution>
+            <id>install-node-and-npm</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
+            <configuration>
+              <nodeVersion>v6.9.1</nodeVersion>
+              <npmVersion>3.10.9</npmVersion>
+            </configuration>
+          </execution>
+          <execution>
+            <id>npm-install</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>install</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>npm-run-webdriver-manager</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run webdriver-manager</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>npm-run-protractor</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run protractor -- --params.saw.docker.port=${saw.docker.port}</arguments>
+            </configuration>
           </execution>
         </executions>
       </plugin>

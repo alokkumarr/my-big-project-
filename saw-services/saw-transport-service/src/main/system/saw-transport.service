@@ -8,7 +8,7 @@ User=mapr
 Restart=on-failure
 # Read environment variables from optional file, for example to set
 # JAVA_OPTS during development
-EnvironmentFile=/etc/saw-transport-service-env
+EnvironmentFile=/etc/bda/saw-transport-service-env
 
 [Install]
 WantedBy=default.target
