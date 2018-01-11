@@ -159,7 +159,7 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
      with this */
   subscribeToRequester() {
     if (this.requester) {
-      this.requester.subscribe((req = {}) => {
+      this.requester.subscribe((req: any = {}) => {
         switch(req.action) {
         case 'add':
           this.dashboard.push(req.data);
