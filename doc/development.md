@@ -13,9 +13,11 @@ To prepare for building the project, execute the following steps:
 
 3. Install [Docker] (for integration tests and local deployment)
 
-4. Install [PlantUML] (for rendering external documentation)
+4. Install [Firefox] (for end-to-end tests)
 
-5. Configure Docker to allocate at least 8 GB memory and the maximum
+5. Install [PlantUML] (for rendering external documentation)
+
+6. Configure Docker to allocate at least 8 GB memory and the maximum
    number of CPUs for containers
 
 Because of the Docker memory requirements mentioned above, the
@@ -30,6 +32,7 @@ in the [Mac setup instructions].  Additionally there are [Windows
 setup instructions].
 
 [Docker]: https://www.docker.com/community-edition
+[Firefox]: https://getfirefox.com/
 [PlantUML]: http://plantuml.com/
 [Mac setup instructions]: development-mac.md
 [Windows setup instructions]: development-windows.md
