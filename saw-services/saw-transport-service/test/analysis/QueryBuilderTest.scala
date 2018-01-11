@@ -66,7 +66,7 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     it("with string filter should have a WHERE clause with condition") {
       query(artifactT)(filters("AND", filterString(
         "string", "t", "a", "abc", "def"))
-      ) must be ("SELECT t.a, t.b FROM t WHERE [upper(t.a) IN ('ABC', 'DEF]')")
+      ) must be ("SELECT t.a, t.b FROM t WHERE upper(t.a) IN ('ABC', 'DEF]')")
     }
     it("with date between filter should have a WHERE clause with BETWEEN") {
       query(artifactT)(filters("AND", filterDate(
