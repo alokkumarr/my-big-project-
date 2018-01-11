@@ -192,7 +192,7 @@
                   </span>
                 </md-button>
                 <md-menu-content width="4">
-                  <md-menu-item ng-repeat="type in $ctrl.TSCOMBO_TYPES">
+                  <md-menu-item ng-repeat="type in $ctrl.TSCOMBO_TYPES | uniqueFilter:'label'">
                     <md-button ng-click="$ctrl.onSelectTSComboType(y, type)"
                                 style="font-size: 14px;">
                         <md-icon md-font-icon="{{::type.icon}}"></md-icon>
