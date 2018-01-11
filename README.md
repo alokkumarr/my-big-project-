@@ -12,6 +12,12 @@ of [Frequently Asked Questions](doc/faq.md) describes commonly
 occuring problems and solutions to them.  Documentation in
 the [doc](doc) directory is internal and intended for developers.
 
+Follow the [SAW project standards] when developing new features and
+making changes.  Additionally see the shared [project standards].
+
+[project standards]: https://confluence.synchronoss.net:8443/display/BDA/Project+Standards
+[SAW project standards]: https://confluence.synchronoss.net:8443/display/BDA/SAW+Project+Standards
+
 # Documentation
 
 The [SAW Operations Guide] describes administration tasks such as
