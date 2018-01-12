@@ -1,5 +1,5 @@
 <div fxLayout="row" fxLayoutAlign="space-between center">
-  <mat-form-field>
+  <mat-form-field e2e="filter-to-datepicker">
     <input matInput
            (dateChange)="modelChange($event.value, 'gte')"
            [matDatepicker]="gte"
@@ -13,7 +13,7 @@
                     disabled="false">
     </mat-datepicker>
   </mat-form-field>
-  <mat-form-field>
+  <mat-form-fielde2e="filter-from-datepicker">
     <input matInput
            (dateChange)="modelChange($event.value, 'lte')"
            [matDatepicker]="lte"

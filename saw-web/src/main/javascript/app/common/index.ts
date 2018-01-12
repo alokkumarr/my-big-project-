@@ -38,6 +38,7 @@ import {CommonDirectiveModule} from './directives';
 // import from login module
 import {AuthServiceFactory} from '../../login/services/auth.service';
 import {PivotGridComponent} from './components/pivot-grid/pivot-grid.component';
+import {E2eDirective} from './directives/e2e.directive';
 import {UserService} from '../../login/services/user.service';
 import {JwtService} from '../../login/services/jwt.service';
 
@@ -85,7 +86,8 @@ angular
     DxPivotGridModule
   ],
   declarations: [
-    PivotGridComponent
+    PivotGridComponent,
+    E2eDirective
   ],
   entryComponents: [
     PivotGridComponent
@@ -93,7 +95,8 @@ angular
   exports: [
     DndModule,
     PivotGridComponent,
-    DxPivotGridComponent
+    DxPivotGridComponent,
+    E2eDirective
   ]
 })
 export class CommonModuleTs {}

@@ -43,6 +43,7 @@
           </mat-icon>
         </div>
         <button mat-icon-button
+                [e2e]="'designer-add-btn-' + (artifactColumn.aliasName || artifactColumn.displayName)"
                 (click)="addToGroupIfPossible(artifactColumn)">
           <mat-icon fontIcon="icon-plus"></mat-icon>
         </button>

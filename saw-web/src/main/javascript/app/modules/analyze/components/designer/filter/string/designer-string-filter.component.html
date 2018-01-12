@@ -8,6 +8,7 @@
     <input [matChipInputFor]="chipList"
            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
            matChipInputAddOnBlur="true"
-           (matChipInputTokenEnd)="add($event)" />
+           (matChipInputTokenEnd)="add($event)"
+           e2e="filter-string-input"/>
   </mat-chip-list>
 </mat-form-field>

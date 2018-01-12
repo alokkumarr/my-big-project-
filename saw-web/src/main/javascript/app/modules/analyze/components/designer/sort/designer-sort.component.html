@@ -18,7 +18,8 @@
             {{field.aliasName || field.displayName}}
         </span>
         <button mat-icon-button
-                (click)="addSort(field)">
+                (click)="addSort(field)"
+                [e2e]="'sort-add-btn-' + (field.aliasName || field.displayName)">
           <mat-icon fontIcon="icon-plus">
           </mat-icon>
         </button>
@@ -52,7 +53,8 @@
             [dndContainer]="sorts"
             class="sort-field"
             fxLayout="row"
-            fxLayoutAlign="space-between center">
+            fxLayoutAlign="space-between center"
+            [e2e]="'sort-field-' + (field.aliasName || field.displayName)">
         {{nameMap[sort.columnName]}}
 
         <div fxLayout="row"
@@ -62,30 +64,36 @@
             <mat-button-toggle-group *ngSwitchCase="'string'"
                                      (change)="onSortOrderChange(sort, $event.value)"
                                      [value]="sort.order">
-              <mat-button-toggle value="asc">
+              <mat-button-toggle value="asc"
+                                 [e2e]="sort-asc">
                 A<mat-icon fontIcon="icon-arrow-left"></mat-icon>Z
               </mat-button-toggle>
-              <mat-button-toggle value="desc">
+              <mat-button-toggle value="desc"
+                                 [e2e]="sort-desc">
                 Z<mat-icon fontIcon="icon-arrow-left"></mat-icon>A
               </mat-button-toggle>
             </mat-button-toggle-group>
             <mat-button-toggle-group *ngSwitchCase="'number'"
                                      (change)="onSortOrderChange(sort, $event.value)"
                                      [value]="sort.order">
-              <mat-button-toggle value="asc">
+              <mat-button-toggle value="asc"
+                                 [e2e]="sort-asc">
                 1<mat-icon fontIcon="icon-arrow-left"></mat-icon>9
               </mat-button-toggle>
-              <mat-button-toggle value="desc">
+              <mat-button-toggle value="desc"
+                                 [e2e]="sort-desc">
                 9<mat-icon fontIcon="icon-arrow-left"></mat-icon>1
               </mat-button-toggle>
             </mat-button-toggle-group>
             <mat-button-toggle-group *ngSwitchCase="'date'"
                                      (change)="onSortOrderChange(sort, $event.value)"
                                      [value]="sort.order">
-              <mat-button-toggle value="asc">
+              <mat-button-toggle value="asc"
+                                 [e2e]="sort-asc">
                 Jan<mat-icon fontIcon="icon-arrow-left"></mat-icon>Dec
               </mat-button-toggle>
-              <mat-button-toggle value="desc">
+              <mat-button-toggle value="desc"
+                                 [e2e]="sort-desc">
                 Dec<mat-icon fontIcon="icon-arrow-left"></mat-icon>Jan
               </mat-button-toggle>
             </mat-button-toggle-group>
@@ -93,7 +101,8 @@
 
           <div class="sorted-field__remove-button__container">
             <button mat-icon-button
-                    (click)="removeSort(sort)">
+                    (click)="removeSort(sort)"
+                    [e2e]="sort-remove-btn">
               <mat-icon fontIcon="icon-close"
                         class="sorted-field__remove-button__icon">
               </mat-icon>

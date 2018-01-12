@@ -17,6 +17,8 @@
                       [artifactColumn]="artifactColumn"
                       [analysisType]="groupAdapter.type"
                       (removeRequest)="onRemoveField(artifactColumn)"
-                      class="settings__list-item"></expandable-field>
+                      class="settings__list-item"
+                      [e2e]="'designer-expandable-field-' + (artifactColumn.aliasName || artifactColumn.displayName)">
+    </expandable-field>
   </div>
 </div>

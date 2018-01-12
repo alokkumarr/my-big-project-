@@ -6,9 +6,11 @@
     <mat-form-field>
       <mat-select placeholder="Column"
                   (selectionChange)="onArtifactColumnSelected($event.value)"
-                  [value]="filter.columnName">
+                  [value]="filter.columnName"
+                  e2e="filter-select">
         <mat-option *ngFor="let artifactColumn of artifactColumns"
-                    [value]="artifactColumn.columnName">
+                    [value]="artifactColumn.columnName"
+                    [e2e]="'filter-select-option-' + (artifactColumn.aliasName || artifactColumn.displayName)">
           {{ artifactColumn.aliasName || artifactColumn.displayName }}
         </mat-option>
       </mat-select>

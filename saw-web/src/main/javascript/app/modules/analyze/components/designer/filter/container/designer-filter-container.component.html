@@ -6,10 +6,12 @@
     <designer-filter-row *ngFor="let filter of groupedFilters[artifact.artifactName];let i = index; trackBy: index"
                          (removeRequest)="removeFilter(i, artifact.artifactName)"
                          [filter]="filter"
-                         [artifactColumns]="artifact.columns">
+                         [artifactColumns]="artifact.columns"
+                         e2e="filter-row">
     </designer-filter-row>
   </div>
-  <button mat-icon-button>
+  <button mat-icon-button
+          [e2e]="'filter-add-btn-' + artifact.artifactName">
     <mat-icon fontIcon="icon-plus"
               (click)="addFilter(artifact.artifactName)"></mat-icon>
   </button>
