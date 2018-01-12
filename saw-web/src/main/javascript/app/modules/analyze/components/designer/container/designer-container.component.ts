@@ -11,6 +11,7 @@ import * as get from 'lodash/get';
 import * as forEach from 'lodash/forEach';
 import * as map from 'lodash/map';
 import * as find from 'lodash/find';
+import * as isPlainObject from 'lodash/isPlainObject';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpReduce from 'lodash/fp/reduce';
 import * as fpFilter from 'lodash/fp/filter';
@@ -22,6 +23,7 @@ import {
   Analysis,
   AnalysisType,
   SqlBuilder,
+  SqlBuilderPivot,
   ArtifactColumns,
   DesignerToolbarAciton,
   Sort,
@@ -147,7 +149,7 @@ export class DesignerContainerComponent {
     this.updateAnalysis();
     this._designerService.getDataForAnalysis(this.analysis)
       .then((data: any) => {
-        if (this.isDataEmpty(data.data, this.analysis.type)) {
+        if (this.isDataEmpty(data.data, this.analysis.type, this.analysis.sqlBuilder)) {
           this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
         } else {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
@@ -159,7 +161,11 @@ export class DesignerContainerComponent {
   }
 
   parseData(data, sqlBuilder) {
-    return this._designerService.parseData(data, sqlBuilder);
+    const parsedData = this._designerService.parseData(data, sqlBuilder);
+    if (isPlainObject(parsedData)) {
+      return [parsedData];
+    }
+    return parsedData;
   }
 
   getSqlBuilder(): SqlBuilder {
@@ -176,14 +182,23 @@ export class DesignerContainerComponent {
     }
   }
 
-  isDataEmpty(data, type: AnalysisType) {
+  isDataEmpty(data, type: AnalysisType, sqlBuilder: SqlBuilder) {
     switch (type) {
     case 'pivot':
+      let isDataEmpty = false;
       if (data.row_level_1) {
-        return isEmpty(get(data ,'row_level_1.buckets'));
+        isDataEmpty = isEmpty(get(data ,'row_level_1.buckets'));
+      } else if (data.column_level_1) {
+        isDataEmpty = isEmpty(get(data ,'column_level_1.buckets'));
+      } else {
+        forEach((<SqlBuilderPivot>sqlBuilder).dataFields, ({columnName}) => {
+          isDataEmpty = isEmpty(get(data , columnName));
+          if (isDataEmpty) {
+            return false;
+          }
+        });
       }
-      return isEmpty(get(data ,'column_level_1.buckets'));
-
+      return isDataEmpty;
     case 'chart':
       // TODO verify if the object returned is empty
     case 'report':

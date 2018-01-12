@@ -20,7 +20,10 @@
       <mat-icon class="non-ideal-state__icon" fontIcon="icon-pivot"></mat-icon>
   </div>
 
-  <div *ngSwitchCase="DesignerStates.SELECTION_WAITING_FOR_DATA">
+  <div *ngSwitchCase="DesignerStates.SELECTION_WAITING_FOR_DATA"
+       fxLayout="column"
+       fxLayoutAlign="space-between center"
+       class="non-ideal-state__container">
     <mat-icon class="non-ideal-state__icon" fontIcon="icon-pivot"></mat-icon>
   </div>
 

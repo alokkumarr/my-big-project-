@@ -29,6 +29,7 @@ export {
   AnalysisStarter,
   AnalysisType,
   SqlBuilder,
+  SqlBuilderPivot,
   Sort,
   Filter,
   FilterModel,
