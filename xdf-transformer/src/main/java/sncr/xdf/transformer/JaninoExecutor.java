@@ -1,15 +1,22 @@
 package sncr.xdf.transformer;
 
+import com.sun.rowset.internal.Row;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.broadcast.Broadcast;
+import org.apache.spark.util.AccumulatorV2;
 import org.codehaus.commons.compiler.CompilerFactoryFactory;
 import org.codehaus.commons.compiler.IScriptEvaluator;
+import scala.Tuple2;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by srya0001 on 12/21/2017.
  */
-public class TransformerExecutor {
+public class JaninoExecutor {
 
     private static  Class thrownExceptions[] =
             {
@@ -18,7 +25,11 @@ public class TransformerExecutor {
                     Exception.class
             };
 
-//    private static final Logger logger = Logger.getLogger(TransformerExecutor.class);
+
+    private AccumulatorV2<Integer, Integer> successfulRows;
+    private AccumulatorV2<Integer, Integer> failedRows;
+
+//    private static final Logger logger = Logger.getLogger(JaninoExecutor.class);
 
     private static final String strScript =
             "System.out.println(\"In-Row descriptor\");\n" +
@@ -55,10 +66,7 @@ public class TransformerExecutor {
             System.exit(0);
         }
 
-        TransformerExecutor exec = new TransformerExecutor();
         try {
-            String scriptName = args[0];
-//            String strScript = HFileOperations.readFile(scriptName);
 
             String[] inParamName = args[1].split(",");
             String[] inParamType = args[2].split(",");
@@ -151,6 +159,17 @@ public class TransformerExecutor {
             throw new Exception(m);
         }
     }
+
+
+
+    public void execute(){
+
+
+
+    }
+
+
+
 
 
 }

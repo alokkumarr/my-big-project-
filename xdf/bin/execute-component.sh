@@ -20,7 +20,8 @@ declare -A COMP_MC=(
     [sql]=sncr.xdf.sql.SQLComponent
     [spark-sql]=sncr.xdf.sql.SQLComponent
     [zero]=sncr.xdf.component.ZeroComponent
-    [parser]=sncr.xdf.parser
+    [parser]=sncr.xdf.parser.Parser
+		[transformer]=sncr.xdf.transformer.TransformerComponent
     )
 
 function usage()
