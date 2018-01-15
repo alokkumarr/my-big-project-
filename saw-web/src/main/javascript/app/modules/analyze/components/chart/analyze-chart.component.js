@@ -7,7 +7,6 @@ import * as get from 'lodash/get';
 import * as isEmpty from 'lodash/isEmpty';
 import * as assign from 'lodash/assign';
 import * as map from 'lodash/map';
-import * as values from 'lodash/values';
 import * as clone from 'lodash/clone';
 import * as set from 'lodash/set';
 import * as orderBy from 'lodash/orderBy';
@@ -64,17 +63,7 @@ export const AnalyzeChartComponent = {
       this.sortFields = [];
       this.sorts = [];
       // Initializing DD values for legend based on chart type.
-      const initialLegendPosition = this.model.chartType === 'combo' ? 'top' : this.model.chartType.substring(0, 2) === 'ts' ? 'bottom' : 'right';
-      const initialLegendLayout = (this.model.chartType === 'combo' || this.model.chartType.substring(0, 2) === 'ts') ? 'horizontal' : 'vertical';
-
-      this.legend = {
-        align: get(this.model, 'legend.align', initialLegendPosition),
-        layout: get(this.model, 'legend.layout', initialLegendLayout),
-        options: {
-          align: values(this._ChartService.LEGEND_POSITIONING),
-          layout: values(this._ChartService.LAYOUT_POSITIONS)
-        }
-      };
+      this.legend = this._ChartService.initLegend(this.model);
       this.chartHgt = {
         height: 500
       };
