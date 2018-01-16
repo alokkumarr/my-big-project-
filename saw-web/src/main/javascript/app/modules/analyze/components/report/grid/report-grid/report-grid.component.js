@@ -6,12 +6,11 @@ import * as forEach from 'lodash/forEach';
 import * as remove from 'lodash/remove';
 import * as isUndefined from 'lodash/isUndefined';
 import * as $ from 'jquery';
-import * as moment from 'moment';
 import 'moment-timezone';
 
 import * as template from './report-grid.component.html';
 import style from './report-grid.component.scss';
-import {NUMBER_TYPES, DATE_TYPES, BACKEND_TIMEZONE} from '../../../../consts';
+import {NUMBER_TYPES, DATE_TYPES} from '../../../../consts';
 
 // const MIN_ROWS_TO_SHOW = 5;
 const COLUMN_WIDTH = 175;

@@ -2,9 +2,7 @@ import * as groupBy from 'lodash/groupBy';
 import * as map from 'lodash/map';
 import * as omit from 'lodash/fp/omit';
 import * as forEach from 'lodash/forEach';
-import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
-import * as moment from 'moment';
 import * as isUndefined from 'lodash/isUndefined';
 
 import * as template from './report-grid-display-container.component.html';

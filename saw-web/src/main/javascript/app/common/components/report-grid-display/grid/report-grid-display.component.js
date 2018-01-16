@@ -5,7 +5,6 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as keys from 'lodash/keys';
 import * as fpGet from 'lodash/fp/get';
 import * as reduce from 'lodash/reduce';
-import * as moment from 'moment';
 
 import {FieldModel} from '../../jsPlumb/models/fieldModel';
 import DataSource from 'devextreme/data/data_source';
@@ -13,7 +12,7 @@ import 'moment-timezone';
 
 import * as template from './report-grid-display.component.html';
 
-import {NUMBER_TYPES, DATE_TYPES, BACKEND_TIMEZONE} from '../../../consts.js';
+import {NUMBER_TYPES, DATE_TYPES} from '../../../consts.js';
 
 const COLUMN_WIDTH = 175;
 const DEFAULT_PAGE_SIZE = 10;
@@ -88,7 +87,7 @@ export const ReportGridDisplayComponent = {
         load: options => {
           return this.source({options})
             .then(({data, count}) => {
-              return {data: data, totalCount: count};
+              return {data, totalCount: count};
             });
         }
       });
