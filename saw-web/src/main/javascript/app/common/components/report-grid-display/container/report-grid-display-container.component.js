@@ -46,26 +46,25 @@ export const ReportGridDisplayContainerComponent = {
 
     $onChanges() {
       if (!isUndefined(this.data)) {
-        const sourceData = this.data;
-        this.groupedData = this.groupData(this.formatDates(sourceData), this.groups);
+        this.groupedData = this.groupData(this.data, this.groups);
       }
     }
 
-    formatDates(data) {
-      const ks = keys(data[0] || {});
-      const formats = [
-        moment.ISO_8601,
-        'MM/DD/YYYY  :)  HH*mm*ss'
-      ];
-      forEach(data, data => {
-        forEach(ks, key => {
-          if (moment(data[key], formats, true).isValid()) {
-            data[key] = moment(data[key]).format('MM/DD/YYYY');
-          }
-        });
-      });
-      return data;
-    }
+    // formatDates(data) {
+    //   const ks = keys(data[0] || {});
+    //   const formats = [
+    //     moment.ISO_8601,
+    //     'MM/DD/YYYY  :)  HH*mm*ss'
+    //   ];
+    //   forEach(data, data => {
+    //     forEach(ks, key => {
+    //       if (moment(data[key], formats, true).isValid()) {
+    //         data[key] = moment(data[key]).format('MM/DD/YYYY');
+    //       }
+    //     });
+    //   });
+    //   return data;
+    // }
 
     getGroupLabels(groups, columns) {
       return map(groups, group => {
