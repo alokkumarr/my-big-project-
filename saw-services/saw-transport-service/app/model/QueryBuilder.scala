@@ -219,7 +219,7 @@ object QueryBuilder extends {
         val value = subProperty("model", "value")
         if (operator == "btw") {
           val otherValue = subProperty("model", "otherValue")
-          "BETWEEN %s AND %s".format(value, otherValue)
+          "BETWEEN %s AND %s".format(otherValue,value)
         } else {
           val operatorSql = operator match {
             case "gt" => ">"
@@ -237,7 +237,7 @@ object QueryBuilder extends {
          val modelValues = ((filter \ "model" \ "modelValues") match {
            case array: JArray => array.arr
            case obj => unexpectedElement(obj, "array", "modelValues")
-         }).map(_.extract[String])
+         }).map(_.extract[String].toUpperCase())
         "IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
       }
       case "date" | "timestamp" => {
@@ -257,7 +257,11 @@ object QueryBuilder extends {
       }
       case obj: String => throw ClientException("Unknown filter type: " + obj)
     }
-    "%s.%s %s".format(property("tableName"), property("columnName"), condition)
+    if(property("type")=="string") {
+      "upper(%s.%s) %s".format(property("tableName"), property("columnName"), condition)
+    } else {
+      "%s.%s %s".format(property("tableName"), property("columnName"), condition)
+    }
   }
 
   private def buildGroupBy(

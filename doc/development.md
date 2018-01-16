@@ -13,9 +13,11 @@ To prepare for building the project, execute the following steps:
 
 3. Install [Docker] (for integration tests and local deployment)
 
-4. Install [PlantUML] (for rendering external documentation)
+4. Install [Firefox] (for end-to-end tests)
 
-5. Configure Docker to allocate at least 8 GB memory and the maximum
+5. Install [PlantUML] (for rendering external documentation)
+
+6. Configure Docker to allocate at least 8 GB memory and the maximum
    number of CPUs for containers
 
 Because of the Docker memory requirements mentioned above, the
@@ -30,6 +32,7 @@ in the [Mac setup instructions].  Additionally there are [Windows
 setup instructions].
 
 [Docker]: https://www.docker.com/community-edition
+[Firefox]: https://getfirefox.com/
 [PlantUML]: http://plantuml.com/
 [Mac setup instructions]: development-mac.md
 [Windows setup instructions]: development-windows.md
@@ -195,31 +198,37 @@ environment using the related [Bamboo deployment project].
 
 To make a release of the project, execute the following steps:
 
-1. Tag the revision in version control and push the tag to the central
+1. Find the Git revision to be used for the release.  This will
+   typically be `origin/master` after all required pull requests have
+   been merged and your local repository has been updated to include
+   the latest merges.
+
+2. Tag the revision using Git and push the tag to the central
    repository:
 
         $ git tag -a -m "Version 1.0.0" v1.0.0 <commit>
         $ git push --tags
 
    Note: The placeholder `<commit>` refers to the revision that has
-   been selected as the release (for example `origin/master` after all
-   required pull requests have been merged).
+   been selected for the release.
 
-2. Start a customized build of the [project] on the continuous
+3. Start a customized build of the [project] on the continuous
    integration server using the newly created release tag (click the
    "Run" dropdown menu and select "Run customized..." and enter the
    release tag, for example `v1.0.0`, in the Revision field).
    
-3. After starting the build, go to the Build result summary page and
-   add the label "release" (to prevent it from being expired by the
-   continuous integration server).
+4. After starting the build, go to the Build result summary page and
+   add the label "release" (which ensures it will be available for
+   download indefinitely, instead of eventually being expired and
+   deleted by the continuous integration server).
    
-4. When the build finishes successfully, send a link to the artifacts
-   page to those that need the release package (for example operations
-   that are going to use it for upgrading SAW environments)
+5. When the build finishes successfully, announce it by publishing a
+   link to the artifacts page in the project Slack channel.  Also add
+   the link to the corresponding [release notes] in Confluence.
 
 If additional fixes are needed after tagging, just repeat the same
 process above but increase the patch component of the version (for
 example 1.0.1, 1.0.2 and so on).
 
 [project]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW
+[release notes]: https://confluence.synchronoss.net:8443/display/BDA/SAW+Releases+Documentation

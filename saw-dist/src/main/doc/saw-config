@@ -35,8 +35,10 @@ saw_zookeeper_quorum=localhost
 #
 # Transport Service Executor configuration
 #
-#saw_transport_executor_regular_count=2
-#saw_transport_executor_fast_count=2
+#saw_executor_memory_regular=8G
+#saw_executor_memory_fast=2G
+#saw_executor_cores_regular=8
+#saw_executor_cores_fast=2
 
 #
 # Elasticsearch configuration
