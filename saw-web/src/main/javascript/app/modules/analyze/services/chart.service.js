@@ -29,6 +29,7 @@ import * as findIndex from 'lodash/findIndex';
 import * as mapValues from 'lodash/mapValues';
 import * as sortBy from 'lodash/sortBy';
 import * as moment from 'moment';
+import * as values from 'lodash/values';
 import * as toString from 'lodash/toString';
 import * as replace from 'lodash/replace';
 
@@ -135,6 +136,20 @@ export class ChartService {
       break;
     }
     return analysis;
+  }
+
+  initLegend(analysis) {
+    const initialLegendPosition = analysis.chartType === 'combo' ? 'top' : analysis.chartType.substring(0, 2) === 'ts' ? 'bottom' : 'right';
+    const initialLegendLayout = (analysis.chartType === 'combo' || analysis.chartType.substring(0, 2) === 'ts') ? 'horizontal' : 'vertical';
+
+    return {
+      align: get(analysis, 'legend.align', initialLegendPosition),
+      layout: get(analysis, 'legend.layout', initialLegendLayout),
+      options: {
+        align: values(this.LEGEND_POSITIONING),
+        layout: values(this.LAYOUT_POSITIONS)
+      }
+    };
   }
 
   /* Returns default chart config for various chart types */
