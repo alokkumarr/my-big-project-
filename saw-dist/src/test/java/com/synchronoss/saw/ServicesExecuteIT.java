@@ -175,13 +175,13 @@ public class ServicesExecuteIT {
                 String name = column.get("name").asText();
                 String area = null;
                 String dataType = null;
-                if (name.equals("Country")) {
+                if (name.equals("string.keyword")) {
                     area = "row";
                     dataType = "string";
-                } else if (name.equals("Product")) {
+                } else if (name.equals("date")) {
                     area = "column";
-                    dataType = "string";
-                } else if (name.equals("Units")) {
+                    dataType = "date";
+                } else if (name.equals("integer")) {
                     area = "data";
                     dataType = "number";
                     column.put("aggregate", "sum");
