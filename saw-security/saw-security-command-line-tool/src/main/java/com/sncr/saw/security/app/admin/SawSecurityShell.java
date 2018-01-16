@@ -81,11 +81,16 @@ class SawSecurityShell {
         logger.info("Created Admin user with ID: " + createdAdminUserSysId);
 
         // At the very end add just one privilege for admin user by admin user
+//        Long createdPrivilegeSysId = createPrivilegeForAdminUser(
+//            Long.parseLong(created_cust_prod_id),
+//            Long.parseLong(cust_prod_mod_linkage_ids.get(1)),
+//            Long.parseLong(cust_prod_mod_feature_linkage_ids.get(1)),
+//            createdAdminRoleSysId);
         Long createdPrivilegeSysId = createPrivilegeForAdminUser(
             Long.parseLong(created_cust_prod_id),
-            Long.parseLong(cust_prod_mod_linkage_ids.get(1)),
-            Long.parseLong(cust_prod_mod_feature_linkage_ids.get(1)),
-            1L);
+            0L,
+            0L,
+            createdAdminRoleSysId);
         logger.info("Generated Privilege ID for Admin user: " + createdPrivilegeSysId);
 
       } else {
