@@ -6,7 +6,9 @@ If you are on a Mac the required tools can be installed using
         $ brew tap caskroom/versions
         $ brew cask install java8
         $ brew cask install docker
+        $ brew cask install firefox
         $ brew install maven
+        $ brew install plantutml
 
 After installing the above on a Mac, open the Docker application to
 install the command line tools and launch the Docker daemon:

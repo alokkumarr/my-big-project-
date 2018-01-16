@@ -4,16 +4,16 @@ const EC = protractor.ExpectedConditions;
 module.exports = {
   waitFor: {
     elementToBeClickable: element => {
-      return browser.wait(EC.elementToBeClickable(element), 10000);
+      return browser.wait(EC.elementToBeClickable(element), 600000, "Element \"" + element.locator() + "\" is not clickable");
     },
     elementToBeVisible: element => {
-      return browser.wait(EC.visibilityOf(element), 10000);
+      return browser.wait(EC.visibilityOf(element), 600000, "Element \"" + element.locator() + "\" is not visible");
     },
     elementToBePresent: element => {
-      return browser.wait(EC.presenceOf(element), 10000);
+      return browser.wait(EC.presenceOf(element), 600000, "Element \"" + element.locator() + "\" is not present");
     },
     elementToBeClickableAndClick: element => {
-      browser.wait(EC.elementToBeClickable(element), 10000);
+      browser.wait(EC.elementToBeClickable(element), 600000, "Element \"" + element.locator() + "\" is not clickable");
       element.click();
     },
     // Possible options: /analyze/ , /login/
@@ -22,7 +22,7 @@ module.exports = {
         return browser.driver.getCurrentUrl().then(url => {
           return pageName.test(url);
         });
-      }, 10000);
+      }, 600000);
     },
     cardsCountToUpdate: (cards, count) => {
       browser.wait(() => {
@@ -31,7 +31,7 @@ module.exports = {
             return text === (count - 1);
           });
         });
-      }, 10000);
+      }, 600000);
     }
   },
   find: {

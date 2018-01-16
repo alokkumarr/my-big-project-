@@ -44,7 +44,7 @@ export const AnalyzeNewComponent = {
             find(supportedMethodCategory.children, ({type}) => type === method.type ||
               method.type === 'chart:pie' ||
               method.type === 'chart:combo' ||
-              method.type === 'chart:area') :
+              method.type === 'chart:area' || method.type === 'chart:tsspline' || method.type === 'chart:tsPane') :
             false;
           set(method, 'disabled', !isSupported);
         });
@@ -93,6 +93,8 @@ export const AnalyzeNewComponent = {
       case 'chart:bubble':
       case 'chart:area':
       case 'chart:combo':
+      case 'chart:tsspline':
+      case 'chart:tsPane':
         type = this.selectedAnalysisMethod.split(':')[1];
         tpl = `<analyze-chart model="model" mode="${mode}"></analyze-chart>`;
         model = {

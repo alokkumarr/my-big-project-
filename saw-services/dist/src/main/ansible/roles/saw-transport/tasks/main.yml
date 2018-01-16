@@ -12,7 +12,7 @@
     - restart saw-transport-executor-regular
     - restart saw-transport-executor-fast
 - name: Create Transport Service environment file
-  file: path=/etc/saw-transport-service-env state=touch
+  file: path=/etc/bda/saw-transport-service-env state=touch
 - name: Enable SAW Transport Service
   systemd: name=saw-transport enabled=true daemon_reload=true
 - name: Enable SAW Transport Service Executor (regular)

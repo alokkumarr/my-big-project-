@@ -144,14 +144,19 @@ export const ReportGridDisplayComponent = {
     checkColumndatatype(columnList, columnName) {
       let datatype = '';
       forEach(columnList, column => {
-        if (column.columnName === columnName) {
+        if (!isEmpty(column) && column.columnName === columnName) {
           datatype = column.type;
         }
       });
       return datatype;
     }
     _getDxColumns(columns = [], data = []) {
-      const allColumns = this.fillColumns(columns, data);
+      let allColumns = [];
+      if (isEmpty(data)) {
+        allColumns = columns;
+      } else {
+        allColumns = this.fillColumns(columns, data);
+      }
       return map(allColumns, column => {
         if (column.type === 'timestamp' || column.type === 'string-date') {
           column.type = 'date';

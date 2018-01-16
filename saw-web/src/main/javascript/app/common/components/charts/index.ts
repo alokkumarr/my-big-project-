@@ -7,6 +7,7 @@ require('highcharts/highcharts-more')(Highcharts);
 require('highcharts/modules/exporting')(Highcharts);
 require('highcharts/modules/no-data-to-display')(Highcharts);
 require('highcharts/modules/offline-exporting')(Highcharts);
+require('highcharts/modules/drag-panes')(Highstock);
 
 import {ChartComponent} from './chart.component';
 import {businessTransactionVolumeService} from './business-transaction-volume.service';

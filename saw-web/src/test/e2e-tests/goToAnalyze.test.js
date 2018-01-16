@@ -1,9 +1,11 @@
 const protractor = require('protractor');
-const login = require('../javascript/pages/common/login.po.js');
-const analyze = require('../javascript/pages/common/analyzePage.po.js');
+const login = require('../javascript/pages/loginPage.po.js');
+const analyze = require('../javascript/pages/analyzePage.po.js');
 const ec = protractor.ExpectedConditions;
 
 describe('should go to Analyze page after landing on home page', () => {
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 600000;
+
   afterAll(function() {
     browser.executeScript('window.sessionStorage.clear();');
     browser.executeScript('window.localStorage.clear();');

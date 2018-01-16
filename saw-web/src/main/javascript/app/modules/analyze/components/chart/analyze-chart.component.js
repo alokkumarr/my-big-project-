@@ -7,7 +7,6 @@ import * as get from 'lodash/get';
 import * as isEmpty from 'lodash/isEmpty';
 import * as assign from 'lodash/assign';
 import * as map from 'lodash/map';
-import * as values from 'lodash/values';
 import * as clone from 'lodash/clone';
 import * as set from 'lodash/set';
 import * as orderBy from 'lodash/orderBy';
@@ -23,7 +22,7 @@ import * as template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
 import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
-import {ENTRY_MODES, NUMBER_TYPES, COMBO_TYPES, COMBO_TYPES_OBJ, CHART_TYPES_OBJ} from '../../consts';
+import {ENTRY_MODES, NUMBER_TYPES, COMBO_TYPES, COMBO_TYPES_OBJ, TSCOMBO_TYPES, TSCOMBO_TYPES_OBJ, CHART_TYPES_OBJ} from '../../consts';
 
 const INVERTING_OPTIONS = [{
   label: 'TOOLTIP_INVERTED',
@@ -58,33 +57,33 @@ export const AnalyzeChartComponent = {
       this.INVERTING_OPTIONS = INVERTING_OPTIONS;
       this.COMBO_TYPES = COMBO_TYPES;
       this.COMBO_TYPES_OBJ = COMBO_TYPES_OBJ;
+      this.TSCOMBO_TYPES = TSCOMBO_TYPES;
+      this.TSCOMBO_TYPES_OBJ = TSCOMBO_TYPES_OBJ;
       this.CHART_TYPES_OBJ = CHART_TYPES_OBJ;
       this.sortFields = [];
       this.sorts = [];
-
-      this.legend = {
-        align: get(this.model, 'legend.align'),
-        layout: get(this.model, 'legend.layout'),
-        options: {
-          align: values(this._ChartService.LEGEND_POSITIONING),
-          layout: values(this._ChartService.LAYOUT_POSITIONS)
-        }
+      // Initializing DD values for legend based on chart type.
+      this.legend = this._ChartService.initLegend(this.model);
+      this.chartHgt = {
+        height: 500
       };
 
       this.updateChart = new BehaviorSubject({});
+      this.isStockChart = this.model.chartType.substring(0, 2) === 'ts';
       this.settings = null;
       this.gridData = this.filteredGridData = [];
       this.labels = {
         tempY: '', tempX: '', y: '', x: ''
       };
 
-      this.chartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {legend: this.legend});
+      this.chartOptions = this._ChartService.getChartConfigFor(this.model.chartType, {chart: this.chartHgt, legend: this.legend});
 
       this.isInverted = false;
       this.chartViewOptions = ChartService.getViewOptionsFor(this.model.chartType);
       this.comboableCharts = ['column', 'bar', 'line', 'area', 'combo'];
+      this.comboableTSCharts = ['tsspline', 'tsPane'];
       this.invertableCharts = [...this.comboableCharts, 'stack'];
-      this.multyYCharts = this.invertableCharts;
+      this.multyYCharts = [...this.invertableCharts, ...this.comboableTSCharts];
 
       this.designerStates = {
         noSelection: 'no-selection',
@@ -155,6 +154,10 @@ export const AnalyzeChartComponent = {
 
     onSelectComboType(attributeColumn, comboType) {
       attributeColumn.comboType = comboType.value;
+    }
+
+    onSelectTSComboType(attributeColumn, comboType) {
+      attributeColumn.comboType = comboType.label;
     }
 
     toggleChartInversion() {
@@ -367,6 +370,7 @@ export const AnalyzeChartComponent = {
       set(payload, 'xAxis', {title: this.labels.x});
       set(payload, 'yAxis', {title: this.labels.y});
       set(payload, 'isInverted', this.isInverted);
+      set(payload, 'isStockChart', this.isStockChart);
       set(payload, 'legend', {
         align: this.legend.align,
         layout: this.legend.layout

@@ -88,6 +88,7 @@ object DLConfiguration {
     setIfPathExists(sparkConf, "spark.driver.blockManager.port", cfg, "driver.blockManager.port")
     sparkConf.set ("spark.sql.inMemoryColumnarStorage.compressed", "true")
     sparkConf.set ("spark.sql.inMemoryColumnarStorage.batchSize", String.valueOf (rowLimit) )
+    sparkConf.set ("spark.sql.caseSensitive", "false")
     /* Disable the UI to avoid port collision with multiple executors */
     sparkConf.set("spark.ui.enabled", "false")
     ctx = SparkContext.getOrCreate(sparkConf)

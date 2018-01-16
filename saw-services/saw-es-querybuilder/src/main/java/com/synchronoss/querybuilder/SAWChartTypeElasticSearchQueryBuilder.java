@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
@@ -36,6 +38,8 @@ class SAWChartTypeElasticSearchQueryBuilder {
   String dataSecurityString;
 
   SearchSourceBuilder searchSourceBuilder;
+
+  final static String dateformat="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
 
   public SAWChartTypeElasticSearchQueryBuilder(String jsonString) {
     super();
@@ -114,21 +118,32 @@ class SAWChartTypeElasticSearchQueryBuilder {
             {
               DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
               RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+              if(item.getType().value().equals(Type.DATE.value())) {
+                rangeQueryBuilder.format(dateformat);
+              }
               rangeQueryBuilder.lte(dynamicConvertor.getLte());
               rangeQueryBuilder.gte(dynamicConvertor.getGte());
               builder.add(rangeQueryBuilder);
             }
             else {
               RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+              if(item.getType().value().equals(Type.DATE.value())) {
+                rangeQueryBuilder.format(dateformat);
+              }
               rangeQueryBuilder.lte(item.getModel().getLte());
               rangeQueryBuilder.gte(item.getModel().getGte());
               builder.add(rangeQueryBuilder);
             }
           }
           if (item.getType().value().equals(Type.STRING.value())) {
-            TermsQueryBuilder termsQueryBuilder =
-                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-            builder.add(termsQueryBuilder);
+            BoolQueryBuilder qb = QueryBuilders.boolQuery();
+            for (Object s : item.getModel().getModelValues()) {
+              MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(), s);
+              matchQueryBuilder.analyzer("standard");
+              matchQueryBuilder.fuzzyTranspositions(false);
+              qb.should(matchQueryBuilder);
+            }
+            builder.add(qb);
           }
           if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item
               .getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
@@ -147,21 +162,32 @@ class SAWChartTypeElasticSearchQueryBuilder {
             {
               DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
               RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+              if(item.getType().value().equals(Type.DATE.value())) {
+                rangeQueryBuilder.format(dateformat);
+              }
               rangeQueryBuilder.lte(dynamicConvertor.getLte());
               rangeQueryBuilder.gte(dynamicConvertor.getGte());
               builder.add(rangeQueryBuilder);
             }
             else {
               RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+              if(item.getType().value().equals(Type.DATE.value())) {
+                rangeQueryBuilder.format(dateformat);
+              }
               rangeQueryBuilder.lte(item.getModel().getLte());
               rangeQueryBuilder.gte(item.getModel().getGte());
               builder.add(rangeQueryBuilder);
             }
           }
           if (item.getType().value().equals(Type.STRING.value())) {
-            TermsQueryBuilder termsQueryBuilder =
-                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-            builder.add(termsQueryBuilder);
+            BoolQueryBuilder qb = QueryBuilders.boolQuery();
+            for (Object s : item.getModel().getModelValues()) {
+              MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(), s);
+              matchQueryBuilder.analyzer("standard");
+              matchQueryBuilder.fuzzyTranspositions(false);
+              qb.should(matchQueryBuilder);
+            }
+            builder.add(qb);
           }
           if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item
               .getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))

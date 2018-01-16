@@ -1,0 +1,7 @@
+[SAW Security Service]
+
+database "MariaDB" {
+    ["SAW Security database"]
+}
+
+[SAW Security Service] .> ["SAW Security database"]

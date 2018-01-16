@@ -52,6 +52,14 @@
     &.m-chart-stack {
       background-image: url('~img/charts/chart-stack.png');
     }
+
+    &.m-chart-tsspline {
+      background-image: url('~img/charts/timeseries-chart.png');
+    }
+
+    &.m-chart-tsPane {
+      background-image: url('~img/charts/timeseries-chart.png');
+    }
   }
 
   md-card-title {

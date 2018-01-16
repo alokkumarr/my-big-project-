@@ -28,6 +28,7 @@ h1
 	color: #00c9e8;
 	font-size: 18pt;
 	font-weight: normal;
+	mc-auto-number-offset: 1em;
 }
 
 h2
@@ -41,7 +42,8 @@ h2
 	mc-hyphenate: never;
 	color: #176bce;
 	font-size: 13pt;
-	font-weight: normal;
+	mc-auto-number-offset: 1em;
+	font-weight: bold;
 }
 
 h3
@@ -55,8 +57,9 @@ h3
 	mc-hyphenate: never;
 	color: #914191;
 	font-size: 13pt;
-	font-weight: normal;
 	text-transform: uppercase;
+	font-weight: bold;
+	mc-auto-number-offset: 1em;
 }
 
 h4
@@ -71,6 +74,7 @@ h4
 	mc-hyphenate: never;
 	color: #000000;
 	font-size: 9pt;
+	mc-auto-number-offset: 1em;
 }
 
 h5

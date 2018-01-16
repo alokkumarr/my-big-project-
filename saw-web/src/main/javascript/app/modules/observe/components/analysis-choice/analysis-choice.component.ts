@@ -43,10 +43,15 @@ export class AnalysisChoiceComponent {
   onCategoryUpdated() {
     this.selection.subCategory = null;
     this.selection.analysis = null;
-    this.subCategories = map(
+    const subCategories = map(
       get(find(this.categories, category => this.selection.category === category.id), 'data.productModuleSubFeatures'),
       subCategory => ({ id: subCategory.prodModFeatureID, name: subCategory.prodModFeatureName, data: subCategory })
-    )
+    );
+
+    /* Only allow subcategories which have access to execute operation */
+    this.subCategories = filter(subCategories, subCategory =>
+      this.jwt.hasPrivilege('EXECUTE', {subCategoryId: subCategory.id})
+    );
   }
 
   onSubCategoryUpdated() {

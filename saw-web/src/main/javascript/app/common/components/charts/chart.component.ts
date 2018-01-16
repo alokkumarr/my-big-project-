@@ -6,13 +6,15 @@ import {
  } from '@angular/core';
 
 import * as Highcharts from 'highcharts/highcharts';
+import * as Highstock from 'highcharts/highstock';    // Had to import both highstocks & highcharts api since highstocks not supporting bubble chart.
 import * as defaultsDeep from 'lodash/defaultsDeep';
 import * as forEach from 'lodash/forEach';
 import * as filter from 'lodash/filter';
 import * as set from 'lodash/set';
 import * as get from 'lodash/get';
+import * as clone from 'lodash/clone';
 import * as isArray from 'lodash/isArray';
-import {globalChartOptions, chartOptions} from './default-chart-options';
+import {globalChartOptions, chartOptions, stockChartOptions} from './default-chart-options';
 import * as isUndefined from 'lodash/isUndefined';
 
 export const UPDATE_PATHS = {
@@ -27,12 +29,17 @@ export const UPDATE_PATHS = {
 export class ChartComponent {
   @Input() updater: any;
   @Input() options: any;
+  @Input() isStockChart: boolean;
   @ViewChild('container') container: ElementRef;
 
-  private highcharts = Highcharts;
+  private highcharts: any = Highcharts;
+  private highstocks: any = Highstock;
   private chart: any = null;
+  private stockChart: any = null;
   private config: any = {};
+  private stockConfig: any = {};
   private subscription: any;
+  private clonedConfig: any = {};
 
   constructor() {
     this.highcharts.setOptions(globalChartOptions);
@@ -40,7 +47,12 @@ export class ChartComponent {
 
   ngAfterViewInit() {
     this.config = defaultsDeep(this.options, chartOptions);
-    this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
+    this.stockConfig = defaultsDeep(this.options, stockChartOptions);
+    if (this.isStockChart) {
+      this.chart = this.highstocks.stockChart(this.container.nativeElement, this.stockConfig);
+    } else {
+      this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
+    }
     // if we have an updater$ observable, subscribe to it
     if (this.updater) {
       this.subscription = this.updater.subscribe({
@@ -61,11 +73,23 @@ export class ChartComponent {
 
       // Not using chart.update due to a bug with navigation
       // update and bar styles.
-      this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
+      if (this.isStockChart) {
+        set(this.config, 'xAxis.0.title.text', get(this.config, 'xAxis.title.text')); // Highstocks adding a default xAxis settings objects with title & categories. So have to populate them inorder the title to display.
+        set(this.config, 'xAxis.0.categories', get(this.config, 'xAxis.categories'));
+
+        // Fix --- Highstocks API manipulating external config object, setting series and categories data to NULL
+        // https://forum.highcharts.com/highstock-usage/creating-a-chart-manipulates-external-options-object-t15255/#p81794
+        this.clonedConfig = clone(this.config);
+        this.chart = this.highstocks.stockChart(this.container.nativeElement, this.config);
+        this.config = clone(this.clonedConfig);
+        this.clonedConfig = {};
+      } else {
+        this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
+      }
       if (!isUndefined(this.config.xAxis)) {
         this.config.xAxis.categories = [];
       }
-      
+
       const pieNegatives = this.pieHasNegatives();
       if (pieNegatives.all) {
         // do nothing

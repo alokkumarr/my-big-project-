@@ -78,13 +78,36 @@ export const COMBO_TYPES = [{
 }, {
   label: 'area',
   value: 'area',
-  icon: 'icon-vert-bar-chart'
+  icon: 'icon-area-chart'
 }];
 
 export const COMBO_TYPES_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
 )(COMBO_TYPES);
+
+export const TSCOMBO_TYPES = [{
+  label: 'line',
+  value: 'tsspline',
+  icon: 'icon-line-chart'
+}, {
+  label: 'column',
+  value: 'tscolumn',
+  icon: 'icon-vert-bar-chart'
+}, {
+  label: 'area',
+  value: 'tsareaspline',
+  icon: 'icon-area-chart'
+}, {
+  label: 'line',
+  value: 'tsPane',
+  icon: 'icon-line-chart'
+}];
+
+export const TSCOMBO_TYPES_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(TSCOMBO_TYPES);
 
 export const ANALYSIS_METHODS = [
   {
@@ -151,6 +174,16 @@ export const ANALYSIS_METHODS = [
         label: 'Pie Chart',
         icon: {font: 'icon-pie-chart'},
         type: 'chart:pie'
+      },
+      {
+        label: 'Time series chart',
+        icon: {font: 'icon-timeseries-chart'},
+        type: 'chart:tsspline'
+      },
+      {
+        label: 'Time series multi pane',
+        icon: {font: 'icon-timeseries-chart'},
+        type: 'chart:tsPane'
       }
     ]
   }
