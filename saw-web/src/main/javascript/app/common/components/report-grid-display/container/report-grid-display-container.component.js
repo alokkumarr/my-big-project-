@@ -47,7 +47,7 @@ export const ReportGridDisplayContainerComponent = {
         this.groupedData = this.groupData(this.data, this.groups);
       }
     }
-    
+
     getGroupLabels(groups, columns) {
       return map(groups, group => {
         const targetColumns = find(columns, column => column.columnName === group.columnName) || {};
