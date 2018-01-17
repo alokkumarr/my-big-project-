@@ -83,7 +83,7 @@ export const AnalyzeChartComponent = {
       this.comboableCharts = ['column', 'bar', 'line', 'area', 'combo'];
       this.comboableTSCharts = ['tsspline', 'tsPane'];
       this.invertableCharts = [...this.comboableCharts, 'stack'];
-      this.multyYCharts = [...this.invertableCharts, ...this.comboableTSCharts];
+      this.multyYCharts = [...this.invertableCharts, ...this.comboableTSCharts, 'scatter'];
 
       this.designerStates = {
         noSelection: 'no-selection',
