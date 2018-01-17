@@ -1,4 +1,9 @@
-<textarea [(ngModel)]="model.query"></textarea>
+<ace-editor #editor
+  [(text)]="model.query"
+  [options]="editorOptions"
+  theme="eclipse"
+  mode="sql">
+</ace-editor>
 <div class="query-actions">
   <button md-raised-button color="primary" (click)="submitQuery()">
     Submit

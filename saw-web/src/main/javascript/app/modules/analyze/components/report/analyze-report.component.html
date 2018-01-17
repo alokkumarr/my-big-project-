@@ -80,6 +80,7 @@
           <div class="ard_canvas-query"
                ng-show="$ctrl.states.sqlMode === $ctrl.QUERY_MODE">
             <analyze-report-query [model]="$ctrl.model"
+                                  [artifacts]="$ctrl.artifacts"
                                   (on-save)="$ctrl.onSaveQuery($event)">
             </analyze-report-query>
           </div>

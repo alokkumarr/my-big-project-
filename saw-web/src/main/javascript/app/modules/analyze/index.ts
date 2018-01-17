@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms'
 
 import { MaterialModule } from '../../material.module';
+import { AceEditorModule } from 'ng2-ace-editor';
 
 import { routesConfig } from './routes';
 import { i18nConfig } from './i18n';
@@ -127,7 +128,8 @@ const components = [
 @NgModule({
   imports: [
     MaterialModule,
-    FormsModule
+    FormsModule,
+    AceEditorModule
   ],
   exports: [],
   declarations: components,
