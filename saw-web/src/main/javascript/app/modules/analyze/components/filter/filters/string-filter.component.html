@@ -1,3 +1,10 @@
+<md-input-container>
+	<md-select ng-model="$ctrl.tempModel.preset" ng-change="$ctrl.onPresetSelected()">
+		<md-option ng-repeat="preset in $ctrl.presets" ng-value="preset.value">
+			{{preset.label}}
+		</md-option>
+	</md-select>
+</md-input-container>
 <md-chips ng-model="$ctrl.keywords.modelValues"
           required
           md-on-add="$ctrl.onChange({model: $ctrl.keywords})"
