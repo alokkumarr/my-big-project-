@@ -47,23 +47,7 @@ export const ReportGridDisplayContainerComponent = {
         this.groupedData = this.groupData(this.data, this.groups);
       }
     }
-
-    // formatDates(data) {
-    //   const ks = keys(data[0] || {});
-    //   const formats = [
-    //     moment.ISO_8601,
-    //     'MM/DD/YYYY  :)  HH*mm*ss'
-    //   ];
-    //   forEach(data, data => {
-    //     forEach(ks, key => {
-    //       if (moment(data[key], formats, true).isValid()) {
-    //         data[key] = moment(data[key]).format('MM/DD/YYYY');
-    //       }
-    //     });
-    //   });
-    //   return data;
-    // }
-
+    
     getGroupLabels(groups, columns) {
       return map(groups, group => {
         const targetColumns = find(columns, column => column.columnName === group.columnName) || {};

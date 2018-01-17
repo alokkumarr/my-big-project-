@@ -37,6 +37,10 @@ provided in the environment:
 
 . Install and configure MapR client on the SAW target host
 
+. Install and configure MapR client on the SAW target host
+
+. Configure SAW server to use UTC timezone in all places where date and timezones are involved.
+
 Please note that the target hosts must be allocated exclusively for
 SAW use.  The underlying infrastructure up to the operating system
 level are expected to be managed externally, while SAW fully manages
