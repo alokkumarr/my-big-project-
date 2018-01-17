@@ -178,9 +178,6 @@ public class ServicesExecuteIT {
                 if (name.equals("string.keyword")) {
                     area = "row";
                     dataType = "string";
-                } else if (name.equals("date")) {
-                    area = "column";
-                    dataType = "date";
                 } else if (name.equals("integer")) {
                     area = "data";
                     dataType = "number";
