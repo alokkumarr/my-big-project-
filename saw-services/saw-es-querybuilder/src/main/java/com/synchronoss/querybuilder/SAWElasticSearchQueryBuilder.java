@@ -24,12 +24,16 @@ public class SAWElasticSearchQueryBuilder {
     try {
       //assert (type.find(type) == null);
       //assert (jsonString == null || jsonString.equals(""));
+      if (type.equals(EntityType.ESREPORT)) {
+        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString).buildDataQuery();
+      } else {
+        query =
+                type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString)
+                        .buildQuery() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString).buildQuery();
+        }
+      }catch(IllegalStateException | IOException | NullPointerException exception){
+        throw new IllegalArgumentException(exception.getMessage());
 
-      query =
-          type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString)
-              .buildQuery() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString).buildQuery();
-    } catch (IllegalStateException | IOException | NullPointerException exception) {
-      throw new IllegalArgumentException(exception.getMessage());
     }
     return query;
   }
@@ -47,11 +51,14 @@ public class SAWElasticSearchQueryBuilder {
       throws IllegalArgumentException {
     SearchSourceBuilder query = null;
     try {
+      if (type.equals(EntityType.ESREPORT)) {
+        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString).getSearchSourceBuilder();
+      } else {
       query =
           type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString)
               .getSearchSourceBuilder() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString)
               .getSearchSourceBuilder();
-    } catch (IllegalStateException | IOException | ProcessingException exception) {
+    }} catch (IllegalStateException | IOException | ProcessingException exception) {
       throw new IllegalArgumentException("Type not supported :" + exception.getMessage());
     }
     return query;
@@ -70,11 +77,14 @@ public class SAWElasticSearchQueryBuilder {
       throws IllegalArgumentException {
     SearchSourceBuilder query = null;
     try {
+      if (type.equals(EntityType.ESREPORT)) {
+        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString).getSearchSourceBuilder();
+      } else {
       query =
           type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString,dataSecurityKey)
               .getSearchSourceBuilder() : new SAWPivotTypeElasticSearchQueryBuilder(jsonString, dataSecurityKey)
               .getSearchSourceBuilder();
-    } catch (IllegalStateException | IOException | ProcessingException exception) {
+    }} catch (IllegalStateException | IOException | ProcessingException exception) {
       throw new IllegalArgumentException("Type not supported :" + exception.getMessage());
     }
     return query;

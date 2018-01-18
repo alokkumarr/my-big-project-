@@ -273,5 +273,48 @@ public class QueryBuilderUtil {
       }
       return builder;
     }
+	public static List<QueryBuilder> numericFilterReport (com.synchronoss.querybuilder.model.report.Filter item, List<QueryBuilder> builder)
+	{
+
+		if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
+			RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+			rangeQueryBuilder.lte(item.getModel().getValue());
+			rangeQueryBuilder.gte(item.getModel().getOtherValue());
+			builder.add(rangeQueryBuilder);
+		}
+		if (item.getModel().getOperator().value().equals(Operator.GT.value())) {
+			RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+			rangeQueryBuilder.gt(item.getModel().getValue());
+			builder.add(rangeQueryBuilder);
+		}
+		if (item.getModel().getOperator().value().equals(Operator.GTE.value())) {
+			RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+			rangeQueryBuilder.gte(item.getModel().getValue());
+			builder.add(rangeQueryBuilder);
+		}
+		if (item.getModel().getOperator().value().equals(Operator.LT.value())) {
+
+			RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+			rangeQueryBuilder.lt(item.getModel().getValue());
+			builder.add(rangeQueryBuilder);
+		}
+		if (item.getModel().getOperator().value().equals(Operator.LTE.value())) {
+			RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
+			rangeQueryBuilder.lte(item.getModel().getValue());
+			builder.add(rangeQueryBuilder);
+		}
+		if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
+			TermQueryBuilder termQueryBuilder =
+					new TermQueryBuilder(item.getColumnName(), item.getModel().getValue());
+			builder.add(termQueryBuilder);
+		}
+		if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
+			BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
+			boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
+					.getValue()));
+			builder.add(boolQueryBuilderIn);
+		}
+		return builder;
+	}
 	
 }

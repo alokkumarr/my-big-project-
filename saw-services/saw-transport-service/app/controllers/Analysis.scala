@@ -470,6 +470,27 @@ class Analysis extends BaseController {
       
       return myArray
     }
+
+    if ( typeInfo.equals("esReport") )
+    {
+      var data : String= null
+      if (dataSecurityKeyStr!=null) {
+        m_log.trace("dataSecurityKeyStr dataset inside pivot block: {}", dataSecurityKeyStr);
+        data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(
+          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.ESREPORT, json, dataSecurityKeyStr), json);
+      }
+      else {
+        data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(
+          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.ESREPORT, json), json);
+      }
+
+      val finishedTS = System.currentTimeMillis;
+      val myArray = parse(data);
+      m_log.trace("pivot dataset: {}", myArray)
+
+
+      return myArray
+    }
     if ( typeInfo.equals("chart") ){
       var data : String = null
       if (dataSecurityKeyStr!=null) {

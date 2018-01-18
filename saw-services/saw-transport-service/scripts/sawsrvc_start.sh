@@ -154,6 +154,7 @@ declare -r java_args=$( echo \
     -Djava.library.path=/opt/mapr/lib \
     -Dschema.pivot=/opt/saw/service/schema/pivot_querybuilder_schema.json \
     -Dschema.chart=/opt/saw/service/schema/chart_querybuilder_schema.json \
+    -Dschema.report=/opt/saw/service/schema/report_querybuilder_schema.json \
     -Dhadoop.home.dir=/opt/mapr/hadoop/hadoop-2.7.0
     )
 vlog java_args: $java_args
