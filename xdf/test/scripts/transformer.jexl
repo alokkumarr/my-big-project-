@@ -1,0 +1,5 @@
+//Test JEXL script
+
+$F1 = 0
+$F2 = $strVal
+

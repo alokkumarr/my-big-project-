@@ -86,15 +86,13 @@ public class SQLComponent extends Component implements WithMovableResult , WithS
 
         Sql sparkSQLProps = compConf.getSql();
         if (sparkSQLProps == null) {
-            throw new XDFException(XDFException.ErrorCodes.NoSparkSQLDescriptor);
+            throw new XDFException(XDFException.ErrorCodes.NoComponentDescriptor, "sql");
         }
         if (sparkSQLProps.getScript() == null || sparkSQLProps.getScript().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError);
-//                    "Incorrect configuration: Spark SQL does not have SQL script name."));
+            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Spark SQL does not have SQL script name.");
         }
         if (sparkSQLProps.getScriptLocation() == null || sparkSQLProps.getScriptLocation().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError);
-//                    "Incorrect configuration: Spark SQL descriptor does not have SQL script location."));
+            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Spark SQL descriptor does not have SQL script location.");
         }
         return compConf;
     }

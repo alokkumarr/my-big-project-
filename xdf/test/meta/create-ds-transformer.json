@@ -1,0 +1,27 @@
+{
+  "action" : "create",
+  "output" : "hdfs:///var/bda/xdf-srux/transformer-ds-test.json",
+	"xdf-root" : "hdfs:///data/bda",
+	"category" : "DataSet",
+	"id" : "xda-ux-sr-comp-dev::TRTEST01",
+	"source" : {
+    	"userData" : {
+					"createdBy" : "S.Ryabov",
+					"description" : "Input dataset to test Transformer component",
+					"category" : "test",
+					"subCategory" : "transformer"
+			},
+			"system" : { 
+			  "physicalLocation":"hdfs:///data/bda/xda-ux-sr-comp-dev/dl/fs/dinp/TRTEST01/data",
+				"name" : "TRTEST01", 
+				"type" : "fs", 
+				"project" : "xda-ux-sr-comp-dev",
+				"catalog" : "dinp", 
+				"format"  : "parquet", 
+				"mode"    : "replace", 
+				"numberOfFiles" : 1
+			}, 
+			"transformations" : [ ]
+	}
+	
+}

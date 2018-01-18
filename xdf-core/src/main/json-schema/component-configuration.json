@@ -254,9 +254,57 @@
         }
       }
     },
-    "partitioner" : {
-      "description": "Partition maker specific properties",
-      "properties": {}
+    "transformer" : {
+      "description": "Transformer specific properties",
+      "properties": {
+        "script" : {
+          "description" : "script sile name name",
+          "type" : "string"
+        },
+        "scriptLocation" : {
+          "description" : "Location containing Jexl/Janino script, special value: 'inline' means scripts field itself is base64 encoded Java (Janino-compatible) script or Jexl script",
+          "type" : "string"
+        },
+        "scriptEngine": {
+          "type": "object",
+          "description": "Script engine: Jexl/Janino",
+          "default": "janino",
+          "enum": [
+            "jexl",
+            "janino"
+          ]
+        },
+        "scriptingLevel": {
+          "type": "string",
+          "description": "Scripting level: high or low, the parameter is used only for Janino, it will be ignored for Jexl engine",
+          "default": "high",
+          "enum": [
+            "high",
+            "low"
+          ]
+        },
+        "inputDataSet" : {
+          "description" : "Name of input dataset",
+          "type" : "string"
+        },
+        "outputDataSet" : {
+          "description" : "Name of output dataset",
+          "type" : "string"
+        },
+        "rejectedDataSet" : {
+          "description" : "Name of dataset containing rejected records",
+          "type" : "string"
+        },
+        "referenceData" : {
+          "type" : "array",
+          "description" : "List of reference datasets",
+          "minItems" : 0,
+          "uniqueItems" : true,
+          "items" : {
+            "type" : "string"
+          }
+        }
+      }
     },
     "es-loader" : {
       "description": "ES Loader specific properties",

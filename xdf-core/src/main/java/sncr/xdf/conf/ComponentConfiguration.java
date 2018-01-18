@@ -33,6 +33,13 @@ public class ComponentConfiguration {
     @Expose
     private List<Output> outputs = new ArrayList<Output>();
     /**
+     * Project/Application name (ID)
+     * 
+     */
+    @SerializedName("project")
+    @Expose
+    private String project;
+    /**
      * System parameters specific for component execution
      * 
      */
@@ -61,12 +68,12 @@ public class ComponentConfiguration {
     @Expose
     private Sql sql;
     /**
-     * Partition maker specific properties
+     * Transformer specific properties
      * 
      */
-    @SerializedName("partitioner")
+    @SerializedName("transformer")
     @Expose
-    private Object partitioner;
+    private Transformer transformer;
     /**
      * ES Loader specific properties
      * 
@@ -123,24 +130,26 @@ public class ComponentConfiguration {
      * @param dbLoader
      * @param inputs
      * @param converter
+     * @param transformer
+     * @param project
      * @param scd2
      * @param sql
      * @param zero
      * @param parser
      * @param analyzer
-     * @param partitioner
      * @param esLoader
      * @param esReader
      * @param parameters
      */
-    public ComponentConfiguration(List<Input> inputs, List<Output> outputs, List<Parameter> parameters, Parser parser, Scd2 scd2, Sql sql, Object partitioner, Object esLoader, Object esReader, Object converter, Object dbLoader, Analyzer analyzer, Object zero) {
+    public ComponentConfiguration(List<Input> inputs, List<Output> outputs, String project, List<Parameter> parameters, Parser parser, Scd2 scd2, Sql sql, Transformer transformer, Object esLoader, Object esReader, Object converter, Object dbLoader, Analyzer analyzer, Object zero) {
         this.inputs = inputs;
         this.outputs = outputs;
+        this.project = project;
         this.parameters = parameters;
         this.parser = parser;
         this.scd2 = scd2;
         this.sql = sql;
-        this.partitioner = partitioner;
+        this.transformer = transformer;
         this.esLoader = esLoader;
         this.esReader = esReader;
         this.converter = converter;
@@ -196,6 +205,31 @@ public class ComponentConfiguration {
 
     public ComponentConfiguration withOutputs(List<Output> outputs) {
         this.outputs = outputs;
+        return this;
+    }
+
+    /**
+     * Project/Application name (ID)
+     * 
+     * @return
+     *     The project
+     */
+    public String getProject() {
+        return project;
+    }
+
+    /**
+     * Project/Application name (ID)
+     * 
+     * @param project
+     *     The project
+     */
+    public void setProject(String project) {
+        this.project = project;
+    }
+
+    public ComponentConfiguration withProject(String project) {
+        this.project = project;
         return this;
     }
 
@@ -300,27 +334,27 @@ public class ComponentConfiguration {
     }
 
     /**
-     * Partition maker specific properties
+     * Transformer specific properties
      * 
      * @return
-     *     The partitioner
+     *     The transformer
      */
-    public Object getPartitioner() {
-        return partitioner;
+    public Transformer getTransformer() {
+        return transformer;
     }
 
     /**
-     * Partition maker specific properties
+     * Transformer specific properties
      * 
-     * @param partitioner
-     *     The partitioner
+     * @param transformer
+     *     The transformer
      */
-    public void setPartitioner(Object partitioner) {
-        this.partitioner = partitioner;
+    public void setTransformer(Transformer transformer) {
+        this.transformer = transformer;
     }
 
-    public ComponentConfiguration withPartitioner(Object partitioner) {
-        this.partitioner = partitioner;
+    public ComponentConfiguration withTransformer(Transformer transformer) {
+        this.transformer = transformer;
         return this;
     }
 
@@ -481,7 +515,7 @@ public class ComponentConfiguration {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(inputs).append(outputs).append(parameters).append(parser).append(scd2).append(sql).append(partitioner).append(esLoader).append(esReader).append(converter).append(dbLoader).append(analyzer).append(zero).toHashCode();
+        return new HashCodeBuilder().append(inputs).append(outputs).append(project).append(parameters).append(parser).append(scd2).append(sql).append(transformer).append(esLoader).append(esReader).append(converter).append(dbLoader).append(analyzer).append(zero).toHashCode();
     }
 
     @Override
@@ -493,7 +527,7 @@ public class ComponentConfiguration {
             return false;
         }
         ComponentConfiguration rhs = ((ComponentConfiguration) other);
-        return new EqualsBuilder().append(inputs, rhs.inputs).append(outputs, rhs.outputs).append(parameters, rhs.parameters).append(parser, rhs.parser).append(scd2, rhs.scd2).append(sql, rhs.sql).append(partitioner, rhs.partitioner).append(esLoader, rhs.esLoader).append(esReader, rhs.esReader).append(converter, rhs.converter).append(dbLoader, rhs.dbLoader).append(analyzer, rhs.analyzer).append(zero, rhs.zero).isEquals();
+        return new EqualsBuilder().append(inputs, rhs.inputs).append(outputs, rhs.outputs).append(project, rhs.project).append(parameters, rhs.parameters).append(parser, rhs.parser).append(scd2, rhs.scd2).append(sql, rhs.sql).append(transformer, rhs.transformer).append(esLoader, rhs.esLoader).append(esReader, rhs.esReader).append(converter, rhs.converter).append(dbLoader, rhs.dbLoader).append(analyzer, rhs.analyzer).append(zero, rhs.zero).isEquals();
     }
 
 }

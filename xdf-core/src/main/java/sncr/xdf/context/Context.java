@@ -95,7 +95,6 @@ public class Context {
                 .append(" Object: ").append(p.getDataSet())
                 .append(" Name: ").append(p.getName())
                 .append(" Format: ").append(p.getFormat())
-                .append(" File mask: ").append(p.getFileMask())
                 .append(" Mode: ").append(p.getMode())
                 .append("\n");});
         return s.toString();
