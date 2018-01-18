@@ -15,7 +15,7 @@ public class TransformSimpleRecord implements FlatMapFunction<Iterator<ConsumerR
         List<String> ret = new ArrayList<>();
         while (in.hasNext()) {
             String src = in.next().value();
-            if (!src.isEmpty()) {
+            if (src!= null && !src.isEmpty()) {
                 ret.add(src);
             }
         }

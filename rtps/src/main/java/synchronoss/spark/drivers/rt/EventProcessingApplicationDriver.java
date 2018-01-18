@@ -37,6 +37,7 @@ public class EventProcessingApplicationDriver extends RealTimeApplicationDriver 
     public static final String DM_GENERIC = "generic";
     public static final String DM_COUNTLY = "countly";
     public static final String DM_SIMPLE = "simple";
+    public static final String DM_SIMPLE_JSON = "simple-json";
 
     public static void main(String[] args){
         EventProcessingApplicationDriver driver = new EventProcessingApplicationDriver();

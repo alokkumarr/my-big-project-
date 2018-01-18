@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
 import static synchronoss.spark.drivers.rt.EventProcessingApplicationDriver.DM_COUNTLY;
 import static synchronoss.spark.drivers.rt.EventProcessingApplicationDriver.DM_GENERIC;
 import static synchronoss.spark.drivers.rt.EventProcessingApplicationDriver.DM_SIMPLE;
+import static synchronoss.spark.drivers.rt.EventProcessingApplicationDriver.DM_SIMPLE_JSON;
 
 /**
  * Created by asor0002 on 5/19/2017.
@@ -128,6 +129,13 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
                     ProcessSimpleRecords(in, tm);
                     break;
                 }
+                case DM_SIMPLE_JSON : {
+                    ProcessSimpleJsonRecords(in, tm);
+                    break;
+                }
+                default:
+                    logger.error("Invalid data model configured : " + dataModel.toLowerCase());
+                    break;
             }
         } //<-- if(!in.isEmpty())...
 
@@ -163,6 +171,15 @@ public class ProcessRecords implements VoidFunction2<JavaRDD<ConsumerRecord<Stri
 
     private void ProcessSimpleRecords(JavaRDD<ConsumerRecord<String, String>> in, Time tm){
         JavaRDD<String> stringRdd = in.mapPartitions(new TransformSimpleRecord());
+        SaveSimpleBatch(stringRdd, tm);
+    }
+
+    private void ProcessSimpleJsonRecords(JavaRDD<ConsumerRecord<String, String>> in, Time tm){
+        JavaRDD<String> stringRdd = in.mapPartitions(new TransformSimpleJsonRecord());
+        SaveSimpleBatch(stringRdd, tm);
+    }
+
+    private void SaveSimpleBatch(JavaRDD<String> stringRdd, Time tm){
         if(basePath != null && !basePath.isEmpty()) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-HHmmss");
             Date batchDt = new Date(tm.milliseconds());
