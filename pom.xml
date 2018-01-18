@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <!-- THIS -->
+  <groupId>com.synchronoss.bda</groupId>
+  <artifactId>meta</artifactId>
+  <version>1.0.0_dev</version>
+  <!-- -->
+  <packaging>pom</packaging>
+  <properties>
+    <!--
+      This will define application name,
+      included in rpm file name,
+      XDF directory name on the target box
+    -->
+    <prod.name>metadata-lib</prod.name>
+    <!--
+      Default value here,
+      desired value can be specified outside with -Dprod.release=RRR
+    -->
+    <prod.release>0_g0000_wip</prod.release>
+    <!-- use prod.release property -->
+    <project.release>${prod.release}</project.release>
+    <!-- Versions  -->
+    <jdk.version>1.8</jdk.version>
+    <scala.version>2.11</scala.version>
+    <date4j.version>1.5.1</date4j.version>
+    <build.number.plugin>1.1</build.number.plugin>
+    <enforcer.version>1.3.1</enforcer.version>
+    <maven.assembly.version>2.4</maven.assembly.version>
+    <maven.jar.version>2.4</maven.jar.version>
+    <maven.compile.version>2.3.2</maven.compile.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <jackson.databind>2.4.1.3</jackson.databind>
+    <jackson.core>2.4.1.1</jackson.core>
+    <jackson.annotation>2.4.0</jackson.annotation>
+    <http.version>4.3.4</http.version>
+    <log4j.version>2.3</log4j.version>
+    <slfj.version>1.7.6</slfj.version>
+    <ezmorph.version>0.8.1</ezmorph.version>
+    <amazon.s3>1.0</amazon.s3>
+    <kyro>3.0.0</kyro>
+    <common.lang>2.6</common.lang>
+    <json.vesion>20080701</json.vesion>
+    <joda.version>2.9.4</joda.version>
+    <commons-collections.version>3.2.1</commons-collections.version>
+    <mapr.core.version>5.2.0</mapr.core.version>
+    <mapr.hadoop.client.version>2.7.0-mapr-1607</mapr.hadoop.client.version>
+    <gson.version>2.2.4</gson.version>
+    <!-- XDF package -->
+    <!-- RPM properties -->
+    <rpm.name>bda-${prod.name}</rpm.name>
+    <rpm.version>${project.version}</rpm.version>
+    <rpm.release>${project.release}</rpm.release>
+    <!-- XDF application -->
+    <app.name>${prod.name}</app.name>
+    <app.version>${rpm.version}</app.version>
+    <app.release>${rpm.release}</app.release>
+    <app.nameVer>${app.name}-${app.version}</app.nameVer>
+    <!-- Directories on the target box -->
+    <app.optParDir>/dfs/opt/bda</app.optParDir>
+    <!-- Application 'home' directory -->
+    <app.optDir>${app.optParDir}/${app.name}/${app.nameVer}</app.optDir>
+    <app.varDir>/dfs/var/bda/${app.name}</app.varDir>
+    <app.user>mapr</app.user>
+    <app.group>mapr</app.group>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <s-value>provided</s-value>
+  </properties>
+  <!--dependencyManagement-->
+  <dependencies>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>${scala.version}.4</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>${common.lang}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.esotericsoftware</groupId>
+      <artifactId>kryo</artifactId>
+      <version>${kyro}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.mapr.hadoop</groupId>
+      <artifactId>maprfs</artifactId>
+      <version>${mapr.core.version}-mapr</version>
+      <scope>${s-value}</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>${json.vesion}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-common</artifactId>
+      <version>${mapr.hadoop.client.version}</version>
+      <scope>${s-value}</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-hdfs</artifactId>
+      <version>${mapr.hadoop.client.version}</version>
+      <scope>${s-value}</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-mapreduce-client-core</artifactId>
+      <version>${mapr.hadoop.client.version}</version>
+      <scope>${s-value}</scope>
+    </dependency>
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>2.9.4</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/log4j/log4j -->
+    <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.17</version>
+        <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>${commons-collections.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-cli</groupId>
+      <artifactId>commons-cli</artifactId>
+      <version>1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>${gson.version}</version>
+    </dependency>
+  </dependencies>
+  <!--/dependencyManagement-->
+  <repositories>
+    <repository>
+      <id>mapr-releases</id>
+<!--      <url>http://repository.mapr.com/maven/</url> -->
+      <url>http://repository.mapr.com/nexus/content/repositories/mapr-public</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <id>typesafe-releases</id>
+      <url>http://repo.typesafe.com/typesafe/releases/</url>
+    </repository>
+    <repository>
+      <id>sonatype-releases</id>
+      <url>https://oss.sonatype.org/content/repositories/releases</url>
+    </repository>
+    <repository>
+      <id>sonatype-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+    <repository>
+      <id>eaio.com</id>
+      <url>http://eaio.com/maven2</url>
+    </repository>
+    <repository>
+      <id>jsqlparser-snapshots</id>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <url>https://oss.sonatype.org/content/groups/public/</url>
+    </repository>
+  </repositories>
+  <modules>
+    <module>core</module>
+    <module>meta-api</module>
+    <module>meta-rpm</module>
+  </modules>
+  <build>
+    <defaultGoal>package</defaultGoal>
+  </build>
+	<distributionManagement>
+		<repository>
+			<id>sncr-libs-releases</id>
+			<name>SNCR Repository</name>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/libs-releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>sncr-libs-snapshots</id>
+			<name>SNCR Snapshot Repository</name>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/libs-snapshots</url>
+		</snapshotRepository>
+		<site>
+			<id>sncr-libs-releases</id>
+			<url>dav:http://mavenrepo.synchronoss.net:8081/nexus/content/sites/sites/components/sncr-gateway</url>
+		</site>
+	</distributionManagement>		
+</project>

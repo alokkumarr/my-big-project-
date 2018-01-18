@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.synchronoss.bda</groupId>
+    <artifactId>meta</artifactId>
+    <version>1.0.0_dev</version>
+  </parent>
+  <artifactId>meta-api</artifactId>
+  <dependencies>
+    <dependency>
+      <groupId>com.mapr.db</groupId>
+      <artifactId>maprdb</artifactId>
+      <version>5.2.0-mapr</version>
+      <scope>${s-value}</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.synchronoss.bda</groupId>
+      <artifactId>core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+	<distributionManagement>
+		<repository>
+			<id>sncr-libs-releases</id>
+			<name>SNCR Repository</name>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/libs-releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>sncr-libs-snapshots</id>
+			<name>SNCR Snapshot Repository</name>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/libs-snapshots</url>
+		</snapshotRepository>
+		<site>
+			<id>sncr-libs-releases</id>
+			<url>dav:http://mavenrepo.synchronoss.net:8081/nexus/content/sites/sites/components/sncr-gateway</url>
+		</site>
+	</distributionManagement>	
+</project>
