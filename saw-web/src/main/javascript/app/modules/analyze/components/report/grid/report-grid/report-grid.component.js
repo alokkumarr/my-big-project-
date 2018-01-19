@@ -185,7 +185,6 @@ export const ReportGridComponent = {
           field.format = 'shortDate';
         }
 
-
         if (NUMBER_TYPES.includes(column.type) && isUndefined(column.format)) {
           field.format = {
             type: 'fixedPoint',

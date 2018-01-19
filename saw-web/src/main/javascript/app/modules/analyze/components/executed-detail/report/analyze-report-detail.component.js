@@ -2,7 +2,6 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as map from 'lodash/map';
 import * as flatMap from 'lodash/flatMap';
 import * as filter from 'lodash/filter';
-import * as keys from 'lodash/keys';
 
 import * as template from './analyze-report-detail.component.html';
 
