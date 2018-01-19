@@ -149,7 +149,7 @@ export const ReportGridDisplayComponent = {
         };
 
         if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
-          field.format = 'shortDate';
+          field.format = 'yyyy/MM/dd';
         }
 
         if (NUMBER_TYPES.includes(column.type) && isUndefined(column.format)) {

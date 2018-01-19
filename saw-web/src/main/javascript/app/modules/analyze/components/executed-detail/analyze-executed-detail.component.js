@@ -213,7 +213,7 @@ export const AnalyzeExecutedDetailComponent = {
       forEach(data, data => {
         forEach(ks, key => {
           if (moment(data[key], formats, true).isValid()) {
-            data[key] = moment(data[key]).format('MM/DD/YYYY');
+            data[key] = moment(data[key]).format('YYYY/MM/DD');
           }
         });
       });
