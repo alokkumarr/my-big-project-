@@ -45,7 +45,22 @@ export const StringFilterComponent = {
     }
 
     $onInit() {
-      this.keywords = this.model || {modelValues: []};
+      this.model = this.model || {};
+      this.tempModel = {};
+    }
+
+    onPresetSelected() {
+      this.tempModel.value = null;
+      this.onChange({model: {preset: this.tempModel.preset}});
+    }
+
+    onModelChange() {
+      this.updatedDate = this.model || {
+        value: ''
+      };
+      this.updatedDate.value = this.tempModel.value;
+      this.updatedDate.preset = this.tempModel.preset;
+      this.onChange({model: this.updatedDate});
     }
   }
 };
