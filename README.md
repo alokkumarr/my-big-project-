@@ -32,4 +32,4 @@ integration server's latest [build artifacts].
 
 [SAW Operations Guide]: saw-dist/src/main/asciidoc/saw-operations/index.adoc
 [SAW Design Guide]: saw-dist/src/main/asciidoc/saw-design/index.adoc
-[documentation artifacts]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW/latest/artifact/shared/Documentation/index.html
+[build artifacts]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW/latest/artifact/shared/Documentation/index.html
