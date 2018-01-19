@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public enum EntityType {
 
-	CHART("chart"), PIVOT("pivot");
+	CHART("chart"), PIVOT("pivot"), ESREPORT("esReport");
 
 	private String s;
 

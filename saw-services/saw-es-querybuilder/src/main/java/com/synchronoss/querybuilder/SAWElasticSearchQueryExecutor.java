@@ -86,6 +86,20 @@ public class SAWElasticSearchQueryExecutor {
   }
 
   /**
+   *
+   * @param searchSourceBuilder
+   * @param jsonString
+   * @return
+   * @throws JsonProcessingException
+   * @throws IOException
+   */
+  public static String executeReturnDataAsString(SearchSourceBuilder searchSourceBuilder, String jsonString) throws JsonProcessingException, IOException {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    return SAWElasticTransportService.executeReturnDataAsString(searchSourceBuilder.toString(), jsonString, "some", "system", "analyze");
+  }
+
+  /**
    * 
    * @param searchSourceBuilder
    * @param jsonString
