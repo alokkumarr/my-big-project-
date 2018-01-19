@@ -14,7 +14,7 @@ import org.apache.spark.sql.types.StructType;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.util.LongAccumulator;
 import scala.Tuple2;
-import sncr.xdf.datasets.conf.DataSetProperties;
+import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.transformer.system.StructAccumulator;
 
 import java.io.IOException;

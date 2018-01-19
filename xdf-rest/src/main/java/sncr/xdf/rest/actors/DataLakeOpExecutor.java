@@ -7,10 +7,10 @@ import akka.cluster.Cluster;
 import akka.cluster.ClusterEvent;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import sncr.xdf.metastore.DataSetStore;
+import sncr.bda.metastore.DataSetStore;
 import sncr.xdf.rest.messages.dl.Document;
-import sncr.xdf.services.DLMetadata;
-import sncr.xdf.base.MetadataBase;
+import sncr.bda.services.DLMetadata;
+import sncr.bda.base.MetadataBase;
 import sncr.xdf.rest.messages.CleanRequest;
 import sncr.xdf.rest.messages.Init;
 import sncr.xdf.rest.messages.StatusUpdate;
@@ -173,7 +173,7 @@ public class DataLakeOpExecutor extends AbstractActor{
                 }
 //Working with MD
                 case MetadataBase.DS_DL_SETS: {
-                    List<String> list = mdstore.getListOfDS(r);
+                    List<String> list = mdstore.getListOfDS(r.project, r.dataSource, r.catalog, r.category, r.subCategory);
                     l = new ListOf(r.listOf, r.project, r.dataSource, r.catalog, r.category, r.subCategory, list);
                     break;
                 }
@@ -191,7 +191,7 @@ public class DataLakeOpExecutor extends AbstractActor{
         try {
             switch (r.jsMDEntityType) {
                 case MetadataBase.DS_DL_SET: {
-                    String doc = mdstore.readDataSet(r);
+                    String doc = mdstore.readDataSet(r.project, r.name);
                     documentOf = new Document(r.jsMDEntityType, r.project, doc );
                     break;
                 }

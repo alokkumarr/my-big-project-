@@ -9,7 +9,7 @@ import com.typesafe.config.Config;
 import sncr.xdf.rest.actors.MainPreviewCoordinator;
 import sncr.xdf.rest.messages.Init;
 import sncr.xdf.rest.messages.preview.Preview;
-import sncr.xdf.base.MetadataBase;
+import sncr.bda.base.MetadataBase;
 
 import static akka.http.javadsl.server.PathMatchers.segment;
 import static sncr.xdf.rest.AskHelper.ask;

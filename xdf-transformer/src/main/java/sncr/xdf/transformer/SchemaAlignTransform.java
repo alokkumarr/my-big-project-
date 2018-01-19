@@ -2,12 +2,10 @@ package sncr.xdf.transformer;
 
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
 import org.apache.spark.sql.types.StructType;
-import sncr.xdf.transformer.jexl.JexlScriptException;
 
-import java.util.*;
+import java.util.Arrays;
 
 /**
  * Created by srya0001 on 1/8/2018.

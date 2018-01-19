@@ -10,6 +10,7 @@ import org.apache.parquet.hadoop.Footer;
 import org.apache.parquet.hadoop.ParquetFileReader;
 import org.apache.parquet.hadoop.metadata.BlockMetaData;
 import scala.Tuple4;
+import sncr.bda.core.file.HFileOperations;
 
 import java.io.File;
 import java.io.IOException;

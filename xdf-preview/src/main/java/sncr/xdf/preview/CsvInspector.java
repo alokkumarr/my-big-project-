@@ -12,7 +12,7 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import sncr.xdf.core.file.HFileOperations;
+import sncr.bda.core.file.HFileOperations;
 
 import java.io.BufferedWriter;
 import java.io.File;

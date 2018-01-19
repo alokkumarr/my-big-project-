@@ -3,9 +3,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>bda</groupId>
-    <artifactId>xdf-nextgen</artifactId>
-    <version>1.0.0_dev</version>
+		<groupId>com.synchronoss.bda</groupId>
+		<artifactId>xdf-nextgen</artifactId>
+		<version>1.0.0_dev</version>
   </parent>
 
   <artifactId>xdf-preview</artifactId>
@@ -20,12 +20,12 @@
   <dependencies>
     <!-- XDF -->
     <dependency>
-      <groupId>bda</groupId>
+      <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>bda</groupId>
+      <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-data-profiler</artifactId>
       <version>${project.version}</version>
     </dependency>

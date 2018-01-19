@@ -4,9 +4,9 @@ import net.sf.jsqlparser.statement.Statement;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.context.Context;
-import sncr.xdf.core.file.HFileOperations;
 
 import java.io.IOException;
 import java.sql.Timestamp;

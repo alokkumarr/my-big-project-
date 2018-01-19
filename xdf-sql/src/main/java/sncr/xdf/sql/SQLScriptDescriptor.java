@@ -8,8 +8,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.context.Context;
-import sncr.xdf.conf.Parameter;
-import sncr.xdf.datasets.conf.DataSetProperties;
+import sncr.bda.conf.Parameter;
+import sncr.bda.datasets.conf.DataSetProperties;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,7 +70,7 @@ public class SQLScriptDescriptor {
     // - /root/project/system/ctx/<>.jparm files by Batch ID
     private Map<String,String> extractSQLParameters(List<Parameter> parameters) {
         Map<String, String> sqlParams = new HashMap<>();
-        for (sncr.xdf.conf.Parameter param : parameters) {
+        for (sncr.bda.conf.Parameter param : parameters) {
             logger.debug("Process parameter: " + param.getName() + " value: " + param.getValue());
             if ((param.getValue() == null || param.getValue().isEmpty())) {
                 logger.error("Cannot set parameter: " + param.getName() + " value is Empty or null, skip it");

@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>bda</groupId>
+    <groupId>com.synchronoss.bda</groupId>
     <artifactId>xdf-nextgen</artifactId>
     <version>1.0.0_dev</version>
   </parent>
@@ -19,32 +19,32 @@
   <dependencies>
     <!-- XDF -->
     <dependency>
-      <groupId>bda</groupId>
+      <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>bda</groupId>
+      <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-preview</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>bda</groupId>
+      <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-sql</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>bda</groupId>
+      <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-data-profiler</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>bda</groupId>
+      <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-parser</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>bda</groupId>
+      <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-transformer</artifactId>
       <version>${project.version}</version>
     </dependency>

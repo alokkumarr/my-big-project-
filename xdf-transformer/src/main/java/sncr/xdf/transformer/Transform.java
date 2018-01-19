@@ -3,16 +3,11 @@ package sncr.xdf.transformer;
 import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.Script;
 import org.apache.log4j.Logger;
-import org.apache.parquet.schema.MessageType;
-import org.apache.spark.Accumulator;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
@@ -22,7 +17,6 @@ import sncr.xdf.transformer.jexl.XdfObjectContext;
 import sncr.xdf.transformer.system.StructAccumulator;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**

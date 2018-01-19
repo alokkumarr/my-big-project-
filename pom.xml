@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <!-- THIS -->
-  <groupId>bda</groupId>
+  <groupId>com.synchronoss.bda</groupId>
   <artifactId>xdf-nextgen</artifactId>
   <version>1.0.0_dev</version>
   <!-- -->
@@ -105,39 +105,6 @@
       <version>${spark-version}</version>
       <scope>${s-value}</scope>
     </dependency>
-<!--
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>${guava.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${jackson.databind}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.core}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-      <version>${jackson.annotation}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.darwinsys</groupId>
-      <artifactId>hirondelle-date4j</artifactId>
-      <version>${date4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>net.sf.opencsv</groupId>
-      <artifactId>opencsv</artifactId>
-      <version>${opencsv.version}</version>
-    </dependency>
--->
-
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
@@ -278,6 +245,16 @@
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
+		
+<!-- BDA Internal dependencies START -->		
+    <dependency>
+			<groupId>com.synchronoss.bda</groupId>
+      <artifactId>meta-api</artifactId>
+      <version>1.0.0_dev</version>
+    </dependency>
+<!-- BDA Internal dependencies END -->		
+
+		
   </dependencies>
   <!--/dependencyManagement-->
   <repositories>
@@ -318,7 +295,7 @@
   </repositories>
   <modules>
     <module>xdf-core</module>
-    <module>xdf-meta</module>
+<!--    <module>xdf-meta</module> -->
     <module>xdf-component</module>
     <module>xdf-data-profiler</module>
     <module>xdf-transformer</module>

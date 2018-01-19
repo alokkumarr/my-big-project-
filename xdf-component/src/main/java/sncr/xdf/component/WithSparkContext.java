@@ -18,7 +18,7 @@ public interface WithSparkContext {
         ctx.sparkConf = new SparkConf().setAppName(ctx.componentName + "::" + ctx.applicationID + "::" + ctx.batchID );
 
         /// Overwrite configuration with parameters from component
-        List<sncr.xdf.conf.Parameter> componentSysParams = ctx.componentConfiguration.getParameters();
+        List<sncr.bda.conf.Parameter> componentSysParams = ctx.componentConfiguration.getParameters();
 
         //TODO: We must have default parameters
         if(componentSysParams != null && componentSysParams.size() > 0) {

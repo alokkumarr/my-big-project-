@@ -1,12 +1,9 @@
 package sncr.xdf.rest.actors;
 
 import akka.actor.ActorRef;
-import akka.actor.Deploy;
 import akka.actor.Props;
-import akka.cluster.ClusterEvent;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import akka.remote.RemoteScope;
 import sncr.xdf.rest.messages.CleanRequest;
 import sncr.xdf.rest.messages.NewRequest;
 import sncr.xdf.rest.messages.StatusUpdate;

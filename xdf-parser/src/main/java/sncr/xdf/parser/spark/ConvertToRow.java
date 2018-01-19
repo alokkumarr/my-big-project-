@@ -1,7 +1,8 @@
 package sncr.xdf.parser.spark;
 
 import com.univocity.parsers.common.processor.NoopRowProcessor;
-import com.univocity.parsers.common.processor.core.NoopProcessor;
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.Row;
@@ -9,14 +10,9 @@ import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
-
-import com.univocity.parsers.csv.CsvParser;
-import com.univocity.parsers.csv.CsvParserSettings;
 import org.apache.spark.util.LongAccumulator;
-import sncr.xdf.parser.Parser;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 public class ConvertToRow implements Function<String, Row> {

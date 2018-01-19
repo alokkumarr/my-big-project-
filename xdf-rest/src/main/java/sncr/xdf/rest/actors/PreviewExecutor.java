@@ -12,8 +12,8 @@ import sncr.xdf.rest.messages.ActorMessage;
 import sncr.xdf.rest.messages.CleanRequest;
 import sncr.xdf.rest.messages.Init;
 import sncr.xdf.rest.messages.preview.Preview;
-import sncr.xdf.services.DLMetadata;
-import sncr.xdf.base.MetadataBase;
+import sncr.bda.services.DLMetadata;
+import sncr.bda.base.MetadataBase;
 
 public class PreviewExecutor extends AbstractActor {
 
