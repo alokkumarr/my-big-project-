@@ -189,18 +189,18 @@
   </build>
 	<distributionManagement>
 		<repository>
-			<id>sncr-libs-releases</id>
+			<id>client-releases</id>
 			<name>SNCR Repository</name>
-			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/libs-releases</url>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases</url>
 		</repository>
 		<snapshotRepository>
-			<id>sncr-libs-snapshots</id>
+			<id>client-snapshots</id>
 			<name>SNCR Snapshot Repository</name>
-			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/libs-snapshots</url>
+			<url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-snapshots</url>
 		</snapshotRepository>
 		<site>
 			<id>sncr-libs-releases</id>
 			<url>dav:http://mavenrepo.synchronoss.net:8081/nexus/content/sites/sites/components/sncr-gateway</url>
 		</site>
-	</distributionManagement>		
+	</distributionManagement>	
 </project>

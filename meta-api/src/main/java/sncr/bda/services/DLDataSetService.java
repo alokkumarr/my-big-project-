@@ -6,7 +6,7 @@ import com.google.gson.*;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import sncr.bda.base.MetadataBase;
-import sncr.bda.exceptions.XDFException;
+import sncr.bda.exceptions.BDAException;
 import sncr.bda.conf.Metadata;
 import sncr.bda.conf.Output;
 import sncr.bda.context.ContextMetadata;
@@ -117,7 +117,7 @@ public class DLDataSetService {
                         os.close();
                     }
                 } catch (Exception e) {
-                    throw new XDFException(XDFException.ErrorCodes.CouldNotCreateDSMeta, e);
+                    throw new BDAException(BDAException.ErrorCodes.CouldNotCreateDSMeta, e);
                 }
 
             }

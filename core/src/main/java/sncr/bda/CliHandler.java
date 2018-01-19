@@ -2,7 +2,7 @@ package sncr.bda;
 
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
-import sncr.bda.exceptions.XDFException;
+import sncr.bda.exceptions.BDAException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -61,7 +61,7 @@ public class CliHandler {
                 parameters.put(OPTIONS.values()[i].name(), cl.getOptionValue(OPTIONS.values()[i].name()));
             }
             else{
-                throw new XDFException(XDFException.ErrorCodes.IncorrectCall);
+                throw new BDAException(BDAException.ErrorCodes.IncorrectCall);
             }
         }
         return parameters;

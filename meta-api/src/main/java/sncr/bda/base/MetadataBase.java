@@ -75,7 +75,7 @@ public abstract class MetadataBase {
             }
         }
         if (!HFileOperations.exists(dlRoot)){
-            throw new XDFException(XDFException.ErrorCodes.NonExistingDataRoot, dlRoot);
+            throw new BDAException(BDAException.ErrorCodes.NonExistingDataRoot, dlRoot);
         }
 */
         return dlRoot;
