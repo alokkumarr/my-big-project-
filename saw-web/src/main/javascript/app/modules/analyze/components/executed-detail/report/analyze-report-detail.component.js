@@ -25,26 +25,10 @@ export const AnalyzeReportDetailComponent = {
       this.columns = this._getColumns(this.analysis);
     }
 
-    _getColumns(analysis, data = []) {
-      /* If report was using designer mode, find checked columns */
-      if (!analysis.edit) {
-        return flatMap(analysis.artifacts, table => {
-          return filter(table.columns, column => column.checked);
-        });
-      }
-
-      /* If report was using sql mode, we don't really have any info
-         about columns. Keys from individual data nodes are used as
-         column names */
-      if (data.length > 0) {
-        return map(keys(data[0]), col => ({
-          label: col,
-          columnName: col,
-          type: 'string'
-        }));
-      }
-
-      return this.columns;
+    _getColumns(analysis) {
+      return flatMap(analysis.artifacts, table => {
+        return filter(table.columns, column => column.checked);
+      });
     }
 
     loadData(options) {

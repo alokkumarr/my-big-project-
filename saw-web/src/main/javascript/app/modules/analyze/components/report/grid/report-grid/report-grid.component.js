@@ -161,11 +161,6 @@ export const ReportGridComponent = {
       this.columns = columns;
       if (this._gridInstance) {
         const columns = this.prepareGridColumns(this.columns);
-        forEach(columns, column => {
-          if (column.dataType === 'date') {
-            column.dataType = 'string-date';
-          }
-        });
         this._gridInstance.option('columns', columns);
       }
     }
@@ -189,6 +184,7 @@ export const ReportGridComponent = {
         if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
           field.format = 'shortDate';
         }
+
 
         if (NUMBER_TYPES.includes(column.type) && isUndefined(column.format)) {
           field.format = {
