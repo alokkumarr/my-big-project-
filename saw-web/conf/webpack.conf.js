@@ -18,6 +18,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const HappyPack = require('happypack');
 
 const WebpackBuildVersion = require('./webpack.version').WebpackBuildVersion;
 const gitDescription = require('./webpack.version').gitDescription;
@@ -51,7 +53,7 @@ module.exports = function (env) {
     devtool: isDevelopment ? 'source-map' : false,
 
     resolve: {
-      extensions: [".ts", ".js"],
+      extensions: ['.ts', '.js'],
       modules: [MODULE_DIR, webpackHelper.root('src/main/javascript')],
       alias: {
         fonts: webpackHelper.root('assets/fonts'),
@@ -75,8 +77,8 @@ module.exports = function (env) {
           loader: 'tslint-loader',
           options: {
             fix: false,
-            "useCache": true,
-            "transpileOnly": true,
+            useCache: true,
+            transpileOnly: true,
             typeCheck: false, // tslint-loader is way too slow with this enabled. Use pre-push hook for typechecking
             tsConfigFile: webpackHelper.root('tsconfig.json'),
             configFile: isDevelopment ?
@@ -91,22 +93,9 @@ module.exports = function (env) {
         },
         // loaders
         {
-          test: /\.json$/,
-          loader: 'json-loader'
-        },
-        {
           test: /\.[jt]s$/,
           exclude: /node_modules/,
-          loaders: ['ng-annotate-loader', {
-            loader: 'awesome-typescript-loader',
-            options: {
-              configFile: webpackHelper.root('conf/tsconfig.json')
-            }
-          }]
-        },
-        {
-          test: /\.html$/,
-          loader: 'html-loader'
+          use: 'happypack/loader?id=ts'
         },
         {
           test: /\.(css|scss)$/,
@@ -123,6 +112,14 @@ module.exports = function (env) {
               'postcss-loader'
             ]
           })
+        },
+        {
+          test: /\.json$/,
+          loader: 'json-loader'
+        },
+        {
+          test: /\.html$/,
+          loader: 'html-loader'
         },
         {
           test: /\.(eot|woff|woff2|ttf)$/,
@@ -151,6 +148,25 @@ module.exports = function (env) {
         options: {
           postcss: [autoprefixer]
         }
+      }),
+      new HappyPack({
+        id: 'ts',
+        threads: 4,
+        loaders: ['ng-annotate-loader', {
+          loader: 'ts-loader',
+          options: {
+            happyPackMode: true,
+            transpileOnly: true,
+            configFile: webpackHelper.root('conf/tsconfig.json')
+          }
+        }]
+      }),
+      new ForkTsCheckerWebpackPlugin({
+        checkSyntacticErrors: true,
+        tsconfig: webpackHelper.root('conf/tsconfig.json'),
+        tslint: isDevelopment ?
+        webpackHelper.root('conf/tslint-dev.json') :
+        webpackHelper.root('conf/tslint-prod.json')
       }),
       new StyleLintPlugin({
         configFile: webpackHelper.root('.stylelintrc')
@@ -237,7 +253,7 @@ module.exports = function (env) {
       to: webpackHelper.root('dist/assets/i18n')
     }, {
       from: webpackHelper.root('src/main/javascript/HELP_SAW_User_Guide'),
-      to: webpackHelper.root('dist'),
+      to: webpackHelper.root('dist')
     }]));
   }
 

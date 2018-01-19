@@ -32,8 +32,8 @@ module.exports = {
     // but that is not viable for angular dependency injection
     'max-params': ['error', 20],
     'no-warning-comments': [0],
-    "indent": [2, 2, {"SwitchCase": 0}],
-    "capitalized-comments": [0],
-    "prefer-promise-reject-errors": [0]
+    'indent': [2, 2, {'SwitchCase': 0}],
+    'capitalized-comments': [0],
+    'prefer-promise-reject-errors': [0]
   }
 };

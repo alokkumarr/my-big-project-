@@ -10,7 +10,7 @@ module.exports = function (env) {
 
   const conf = {
     resolve: {
-      extensions: [".ts", ".js"],
+      extensions: ['.ts', '.js'],
       modules: [
         MODULE_DIR,
         webpackHelper.root('src/main/javascript')
@@ -46,7 +46,7 @@ module.exports = function (env) {
           test: /\.[jt]s$/,
           exclude: /node_modules/,
           loaders: ['ng-annotate-loader', {
-            loader: 'awesome-typescript-loader',
+            loader: 'ts-loader',
             options: {
               configFile: webpackHelper.root('conf/tsconfig.json'),
               entryFileIsJs: true
