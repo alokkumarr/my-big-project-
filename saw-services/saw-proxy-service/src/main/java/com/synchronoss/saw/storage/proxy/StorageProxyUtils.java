@@ -3,8 +3,12 @@ package com.synchronoss.saw.storage.proxy;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -29,6 +33,7 @@ import com.synchronoss.saw.storage.proxy.model.StorageProxyResponse;
 @Component
 public class StorageProxyUtils {
   public final String SCHEMA_FILENAME = "payload-schema.json";
+  public final static String COMMA = ",";
 
   public ObjectMapper getMapper() {
     ObjectMapper objectMapper = new ObjectMapper();
@@ -102,5 +107,35 @@ public class StorageProxyUtils {
     createresponse.setContents(content);
     return createresponse;
   }
+  
+  
+  private static Set<String> collectHeaders(List<Map<String, Object>> flatJson) {
+    Set<String> headers = new LinkedHashSet<String>();
+    for (Map<String, Object> map : flatJson) {
+        headers.addAll(map.keySet());
+    }
+    return headers;
+}
+  
+  private static String getSeperatedColumns(Set<String> headers, Map<String, Object> map, String separator) {
+    List<Object> items = new ArrayList<Object>();
+    for (String header : headers) {
+        Object value = map.get(header) == null ? "" : map.get(header); 
+        items.add(value);
+    }
+
+    return StringUtils.join(items.toArray(), separator);
+}
+  
+  public static String getTabularFormat(List<Map<String, Object>> flatJson, String separator) {
+    Set<String> headers = collectHeaders(flatJson);
+    String csvString = StringUtils.join(headers.toArray(), separator) + "\n";
+
+    for (Map<String, Object> map : flatJson) {
+        csvString = csvString + getSeperatedColumns(headers, map, separator) + "\n";
+    }
+
+    return csvString;
+}
   
 }
