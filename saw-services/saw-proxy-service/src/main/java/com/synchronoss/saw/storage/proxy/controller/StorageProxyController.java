@@ -108,6 +108,9 @@ public class StorageProxyController {
             } catch (ProcessingException e) {
               logger.error("Exception generated while validating incoming json against schema.", e);
               proxyResponseData= StorageProxyUtils.prepareResponse(proxyNode.getProxy(), e.getCause().toString());
+            }catch (Exception e) {
+              logger.error("Exception generated while processing incoming json.", e);
+              proxyResponseData= StorageProxyUtils.prepareResponse(proxyNode.getProxy(), e.getCause().toString());
             }
         return proxyResponseData;
          })
@@ -154,14 +157,17 @@ public class StorageProxyController {
      proxyNode = StorageProxyUtils.getProxyNode(objectMapper.writeValueAsString(requestBody), "contents");
      logger.trace("Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(proxyNode));
      responseObjectFuture= proxyService.execute(proxyNode);
-    } catch (IOException e) {
+    } catch (IOException e){
       throw new JSONProcessingSAWException("expected missing on the request body");
-    } catch (ReadEntitySAWException ex) {
+    } catch (ReadEntitySAWException ex){
       throw new ReadEntitySAWException("Problem on the storage while reading data from storage");
-    } catch (ProcessingException e) {
+    } catch (ProcessingException e){
       logger.error("Exception generated while validating incoming json against schema.", e);
       responseObjectFuture= StorageProxyUtils.prepareResponse(proxyNode.getProxy(), e.getCause().toString());
-    } 
+    }catch (Exception e) {
+      logger.error("Exception generated while processing incoming json.", e);
+      responseObjectFuture= StorageProxyUtils.prepareResponse(proxyNode.getProxy(), e.getCause().toString());
+    }
    logger.trace("response data {}", objectMapper.writeValueAsString(responseObjectFuture));
    return responseObjectFuture;
   }  

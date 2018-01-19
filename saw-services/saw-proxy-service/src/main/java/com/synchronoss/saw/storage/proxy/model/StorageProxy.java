@@ -47,6 +47,39 @@ public class StorageProxy {
     private StorageProxy.Action action = StorageProxy.Action.fromValue("search");
     @JsonProperty("query")
     private String query;
+    
+    @JsonProperty("statusMessage")
+    private String statusMessage;
+
+    /**
+    * It holds the query
+    * <p>
+    * An explanation about the purpose of this instance.
+    * 
+    */
+    @JsonProperty("entityId")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String entityId;
+    /**
+    * It holds the query
+    * <p>
+    * An explanation about the purpose of this instance.
+    * 
+    */
+    @JsonProperty("pageNum")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private Integer pageNum = 0;
+    /**
+    * It holds the query
+    * <p>
+    * An explanation about the purpose of this instance.
+    * 
+    */
+    @JsonProperty("pageSize")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private Integer pageSize= 25;
+
+    
     /**
      * It holds the user requested by
      * <p>
@@ -135,6 +168,10 @@ public class StorageProxy {
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+    @JsonProperty("sqlBuilder")
+    private SqlBuilder sqlBuilder;
+
+    
     /**
      * The Storage Schema
      * <p>
@@ -353,6 +390,14 @@ public class StorageProxy {
     public String getModuleName() {
         return moduleName;
     }
+    @JsonProperty("statusMessage")
+    public String getStatusMessage() {
+      return statusMessage;
+    }
+    @JsonProperty("statusMessage")
+    public void setStatusMessage(String statusMessage) {
+      this.statusMessage = statusMessage;
+    }
 
     /**
      * The Modulename Schema
@@ -416,12 +461,89 @@ public class StorageProxy {
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
+    
+    /**
+    * It holds the query
+    * <p>
+    * An explanation about the purpose of this instance.
+    * 
+    */
+    @JsonProperty("entityId")
+    public String getEntityId() {
+    return entityId;
+    }
+
+    /**
+    * It holds the query
+    * <p>
+    * An explanation about the purpose of this instance.
+    * 
+    */
+    @JsonProperty("entityId")
+    public void setEntityId(String entityId) {
+    this.entityId = entityId;
+    }
+
+    /**
+    * It holds the query
+    * <p>
+    * An explanation about the purpose of this instance.
+    * 
+    */
+    @JsonProperty("pageNum")
+    public Integer getPageNum() {
+    return pageNum;
+    }
+
+    /**
+    * It holds the query
+    * <p>
+    * An explanation about the purpose of this instance.
+    * 
+    */
+    @JsonProperty("pageNum")
+    public void setPageNum(Integer pageNum) {
+    this.pageNum = pageNum;
+    }
+
+    /**
+    * It holds the query
+    * <p>
+    * An explanation about the purpose of this instance.
+    * 
+    */
+    @JsonProperty("pageSize")
+    public Integer getPageSize() {
+    return pageSize;
+    }
+
+    /**
+    * It holds the query
+    * <p>
+    * An explanation about the purpose of this instance.
+    * 
+    */
+    @JsonProperty("pageSize")
+    public void setPageSize(Integer pageSize) {
+    this.pageSize = pageSize;
+    }
+    
+    @JsonProperty("sqlBuilder")
+    public SqlBuilder getSqlBuilder() {
+      return sqlBuilder;
+    }
+    @JsonProperty("sqlBuilder")
+    public void setSqlBuilder(SqlBuilder sqlBuilder) {
+      this.sqlBuilder = sqlBuilder;
+    }
+
+
+
 
     public enum Action {
 
         SEARCH("search"),
         AGGREGATE("aggregate"),
-        VALIDATE("validate"),
         CREATE("create"),
         DELETE("delete"),
         UPDATE("update"),
