@@ -108,15 +108,6 @@
                     <include>xdf_activate.sh</include>
                   </includes>
                 </source>
-                <!-- xdf-meta -->
-                <source>
-                  <location>../xdf-meta/bin</location>
-                  <includes>
-                    <include>create-metadata.sh</include>
-                    <include>xdf-mdcli.sh</include>
-                  </includes>
-                </source>
-                <!-- xdf-rest -->
                 <source>
                   <location>../xdf-rest/bin</location>
                   <includes>
