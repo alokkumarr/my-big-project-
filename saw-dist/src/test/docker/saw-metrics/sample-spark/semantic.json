@@ -10,7 +10,7 @@
         "type": "semantic",
         "module": "ANALYZE",
         "metric": "sample-spark",
-        "metricName": "Sample (report)",
+        "metricName": "Sample (report) - new",
         "customerCode": "SYNCHRONOSS",
         "disabled": "false",
         "checked": "false",
@@ -32,42 +32,62 @@
             "artifactName": "SALES",
             "columns": [
               {
-                "name": "Country",
-                "columnName": "country",
-                "displayName": "Country",
+                "name": "string",
+                "type": "string",
+                "columnName": "string",
+                "displayName": "String",
                 "aliasName": "",
                 "table": "sales",
-                "type": "string",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
-                "name": "Product",
-                "columnName": "product",
-                "displayName": "Product",
-                "aliasName": "",
-                "table": "sales",
-                "type": "string",
                 "joinEligible": true,
                 "filterEligible": true
               },
               {
-                "name": "Units",
-                "columnName": "units",
-                "displayName": "Units",
+                "name": "long",
+                "type": "long",
+                "columnName": "long",
+                "displayName": "Long",
                 "aliasName": "",
-                "table": "sales",
-                "type": "integer",
+                "table": "sample",
                 "joinEligible": false,
                 "filterEligible": true
               },
               {
-                "name": "Date",
+                "name": "float",
+                "type": "float",
+                "columnName": "float",
+                "displayName": "Float",
+                "aliasName": "",
+                "table": "sales",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "date",
+                "type": "date",
                 "columnName": "date",
                 "displayName": "Date",
                 "aliasName": "",
                 "table": "sales",
-                "type": "date",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "integer",
+                "type": "integer",
+                "columnName": "integer",
+                "displayName": "Integer",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "double",
+                "type": "double",
+                "columnName": "double",
+                "displayName": "Double",
+                "aliasName": "",
+                "table": "sales",
                 "joinEligible": false,
                 "filterEligible": true
               }
@@ -77,22 +97,62 @@
             "artifactName": "PRODUCT",
             "columns": [
               {
-                "name": "Product",
-                "columnName": "product",
-                "displayName": "Product",
+                "name": "string_2",
+                "type": "string",
+                "columnName": "string_2",
+                "displayName": "String_2",
                 "aliasName": "",
                 "table": "product",
-                "type": "string",
                 "joinEligible": true,
                 "filterEligible": true
               },
               {
-                "name": "Description",
-                "columnName": "description",
-                "displayName": "Description",
+                "name": "long_2",
+                "type": "long",
+                "columnName": "long_2",
+                "displayName": "Long_2",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "float_2",
+                "type": "float",
+                "columnName": "float_2",
+                "displayName": "Float_2",
                 "aliasName": "",
                 "table": "product",
-                "type": "string",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "date_2",
+                "type": "date",
+                "columnName": "date_2",
+                "displayName": "Date_2",
+                "aliasName": "",
+                "table": "product",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "integer_2",
+                "type": "integer",
+                "columnName": "integer_2",
+                "displayName": "Integer_2",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "double_2",
+                "type": "double",
+                "columnName": "double_2",
+                "displayName": "Double_2",
+                "aliasName": "",
+                "table": "sales",
                 "joinEligible": false,
                 "filterEligible": true
               }

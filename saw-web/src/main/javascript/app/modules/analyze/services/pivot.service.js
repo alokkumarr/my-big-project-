@@ -16,6 +16,7 @@ import * as fpOmit from 'lodash/fp/omit';
 import * as invert from 'lodash/invert';
 import * as concat from 'lodash/concat';
 import * as clone from 'lodash/clone';
+import * as isPlainObject from 'lodash/isPlainObject';
 import * as fpMapValues from 'lodash/fp/mapValues';
 import * as fpPick from 'lodash/fp/pick';
 import * as moment from 'moment';
@@ -104,7 +105,12 @@ export function PivotService() {
   function parseData(data, sqlBuilder) {
     const nodeFieldMap = getNodeFieldMap(sqlBuilder);
 
-    return parseNode(data, {}, nodeFieldMap, 0);
+    const parsedData = parseNode(data, {}, nodeFieldMap, 0);
+
+    if (isPlainObject(parsedData)) {
+      return [parsedData];
+    }
+    return parsedData;
   }
 
   function getColumnName(fieldMap, level) {

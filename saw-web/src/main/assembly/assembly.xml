@@ -17,7 +17,7 @@
       <directory>${project.build.directory}</directory>
       <includes>
         <include>saw-web-*.rpm</include>
-      </includes>
+  </includes>
       <outputDirectory>rpms</outputDirectory>
     </fileSet>
   </fileSets>

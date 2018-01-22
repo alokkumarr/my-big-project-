@@ -13,9 +13,9 @@
       <useAllReactorProjects>true</useAllReactorProjects>
       <includeSubModules>false</includeSubModules>
       <includes>
-        <include>com.sncr:saw-security</include>
         <include>com.synchronoss.saw:saw-services-dist</include>
         <include>com.synchronoss:bda-saw</include>
+        <include>com.sncr:saw-security-parent</include>
       </includes>
       <binaries>
         <attachmentClassifier>bin</attachmentClassifier>
@@ -40,6 +40,18 @@
     <fileSet>
       <directory>${project.parent.basedir}/ext/modules</directory>
       <outputDirectory>modules</outputDirectory>
+    </fileSet>
+    <!-- following 2 filesets are hacks, modify it later -->
+    <fileSet>
+      <directory>../saw-security/saw-security-command-line-tool/target</directory>
+      <outputDirectory>modules/saw-security/rpms</outputDirectory>
+      <includes>
+        <include>saw-security-*.rpm</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>../saw-security/saw-security/src/main/ansible</directory>
+      <outputDirectory>modules/saw-security/ansible</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>
