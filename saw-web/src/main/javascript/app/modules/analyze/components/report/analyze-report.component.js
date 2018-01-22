@@ -162,6 +162,14 @@ export const AnalyzeReportComponent = {
       }
     }
 
+    /**
+     * Returns whether query mode is supported.
+     * Example: Query is not supported for elasticsearch reports.
+     */
+    supportsQuery() {
+      return this.model.type === AnalyseTypes.Report;
+    }
+
     initCanvas(canvas) {
       this.canvas = canvas;
 
