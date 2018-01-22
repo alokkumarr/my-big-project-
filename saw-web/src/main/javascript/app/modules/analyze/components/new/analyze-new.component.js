@@ -55,7 +55,7 @@ export const AnalyzeNewComponent = {
     }
 
     setAvailableAnalysisMethods(methods, supportedMethods) {
-      this.addEsReportSupport(supportedMethods); // this should not be running in production
+      // this.addEsReportSupport(supportedMethods); // this should not be running in production
 
       forEach(methods, methodCategory => {
         const supportedMethodCategory = find(supportedMethods, ({category}) => category === methodCategory.category);

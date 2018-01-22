@@ -289,7 +289,8 @@ export const AnalyzeReportComponent = {
         }
       });
 
-      forEach(this.model.sqlBuilder.orderByColumns, itemB => {
+      const sorts = this.model.sqlBuilder.orderByColumns || this.model.sqlBuilder.sorts;
+      forEach(sorts, itemB => {
         model.addSort({
           table: itemB.tableName,
           field: itemB.columnName,
