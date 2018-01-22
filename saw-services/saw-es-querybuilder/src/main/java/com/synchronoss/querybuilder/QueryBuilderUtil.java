@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
@@ -19,6 +21,10 @@ import com.synchronoss.querybuilder.model.chart.Filter;
 import com.synchronoss.querybuilder.model.chart.NodeField;
 import com.synchronoss.querybuilder.model.pivot.ColumnField;
 import com.synchronoss.querybuilder.model.pivot.Model.Operator;
+import org.elasticsearch.search.aggregations.metrics.sum.Sum;
+import org.elasticsearch.search.aggregations.metrics.sum.SumAggregationBuilder;
+import org.elasticsearch.search.aggregations.pipeline.PipelineAggregatorBuilders;
+import org.elasticsearch.search.aggregations.pipeline.bucketscript.BucketScriptPipelineAggregationBuilder;
 
 public class QueryBuilderUtil {
 	
@@ -35,7 +41,7 @@ public class QueryBuilderUtil {
       formats.put("MMMMdYYYY,h:mm:ssa", "hour");
       dateFormats = Collections.unmodifiableMap(formats);
   }
-	
+
 	public static AggregationBuilder aggregationBuilder (com.synchronoss.querybuilder.model.pivot.ColumnField columnField, 
 	     String aggregationName)
 
@@ -91,12 +97,12 @@ public class QueryBuilderUtil {
     	 DateHistogramInterval histogramInterval = null; 
     	    switch (groupInterval)
     	    {
-    	    case "month" : histogramInterval =  DateHistogramInterval.MONTH; break;
-    	    case "day" : histogramInterval =  DateHistogramInterval.DAY; break;
-    	    case "year" : histogramInterval =  DateHistogramInterval.YEAR; break;
-    	    case "quarter" : histogramInterval =  DateHistogramInterval.QUARTER; break;
-    	    case "hour" : histogramInterval =  DateHistogramInterval.HOUR;break;
-    	    case "week" : histogramInterval =  DateHistogramInterval.WEEK;break;
+						case "month" : histogramInterval =  DateHistogramInterval.MONTH; break;
+						case "day" : histogramInterval =  DateHistogramInterval.DAY; break;
+						case "year" : histogramInterval =  DateHistogramInterval.YEAR; break;
+						case "quarter" : histogramInterval =  DateHistogramInterval.QUARTER; break;
+						case "hour" : histogramInterval =  DateHistogramInterval.HOUR;break;
+						case "week" : histogramInterval =  DateHistogramInterval.WEEK;break;
     	    }
     	    return histogramInterval;
      }	
@@ -107,11 +113,12 @@ public class QueryBuilderUtil {
  		AggregationBuilder aggregationBuilder = null;
  			switch (data.getAggregate().value())
  			{
- 			case "sum" : aggregationBuilder = AggregationBuilders.sum(data.getName()).field(data.getColumnName()); break;
- 			case "avg" : aggregationBuilder = AggregationBuilders.avg(data.getName()).field(data.getColumnName()); break;
- 			case "min" : aggregationBuilder = AggregationBuilders.min(data.getName()).field(data.getColumnName()); break;
- 			case "max" : aggregationBuilder = AggregationBuilders.max(data.getName()).field(data.getColumnName()); break;
- 			case "count" : aggregationBuilder = AggregationBuilders.count(data.getName()).field(data.getColumnName()); break;
+				case "sum" : aggregationBuilder = AggregationBuilders.sum(data.getName()).field(data.getColumnName()); break;
+				case "avg" : aggregationBuilder = AggregationBuilders.avg(data.getName()).field(data.getColumnName()); break;
+				case "min" : aggregationBuilder = AggregationBuilders.min(data.getName()).field(data.getColumnName()); break;
+				case "max" : aggregationBuilder = AggregationBuilders.max(data.getName()).field(data.getColumnName()); break;
+				case "count" : aggregationBuilder = AggregationBuilders.count(data.getName()).field(data.getColumnName()); break;
+				case "percentage" : aggregationBuilder = AggregationBuilders.terms(data.getName()).field(data.getColumnName()); break;
  			}
  		
  		return aggregationBuilder;
@@ -127,7 +134,7 @@ public class QueryBuilderUtil {
             case "avg" : aggregationBuilder = AggregationBuilders.avg(data.getName()).field(data.getColumnName()); break;
             case "min" : aggregationBuilder = AggregationBuilders.min(data.getName()).field(data.getColumnName()); break;
             case "max" : aggregationBuilder = AggregationBuilders.max(data.getName()).field(data.getColumnName()); break;
-            case "count" : aggregationBuilder = AggregationBuilders.count(data.getName()).field(data.getColumnName()); break;
+            case "percentage" : aggregationBuilder = AggregationBuilders.terms(data.getName()).field(data.getColumnName()); break;
             }
         
         return aggregationBuilder;
