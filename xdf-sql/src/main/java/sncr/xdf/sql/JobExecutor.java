@@ -95,7 +95,6 @@ public class JobExecutor {
                             logger.error("Could not execute SQL statement: " + i );
                             return -1L;
                         }
-//                        availableDataframes = executor.getAvailableDataFrames();
                         report.add(descriptor);
 
                     } catch (Exception e) {
@@ -105,9 +104,8 @@ public class JobExecutor {
                         HFileOperations.deleteEnt(tempDir);
                         return -1L;
                     }
-
-
                 }
+
                 //TODO:: Debug, test and comment the DROP Table functionality
                 else if (descriptor.statementType  == SQLScriptDescriptor.StatementType.DROP_TABLE) {
                     //TODO:: XDF-1013 implementation

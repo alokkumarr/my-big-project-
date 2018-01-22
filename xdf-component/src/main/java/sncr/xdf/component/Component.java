@@ -43,6 +43,11 @@ public abstract class Component {
     protected ArrayList<WithMovableResult.MoveDataDescriptor> resultDataDesc;
     protected Map<String, Map<String, String>> inputDataSets = null;
     protected Map<String, Map<String, String>> outputDataSets = null;
+
+    protected Map<String, Map<String, String>> inputs = null;
+    protected Map<String, Map<String, String>> outputs = null;
+
+
     protected WithDataSetService.DataSetServiceAux dsaux;
     private Map<String, JsonElement> mdOutputDSMap;
     private Map<String, JsonElement> mdInputDSMap;
@@ -88,6 +93,7 @@ public abstract class Component {
                 if (ctx.componentConfiguration.getInputs() != null &&
                         ctx.componentConfiguration.getInputs().size() > 0) {
                     inputDataSets = mddl.resolveDataObjects(dsaux);
+                    inputs = mddl.resolveDataParameters(dsaux);
                     mdInputDSMap = md.loadExistingDataSets(ctx, inputDataSets);
                     mdInputDSMap.forEach((id, ids) -> {
                         try {
@@ -104,7 +110,8 @@ public abstract class Component {
 
                 if (ctx.componentConfiguration.getOutputs() != null &&
                         ctx.componentConfiguration.getOutputs().size() > 0) {
-                    outputDataSets = mddl.buildPathForOutputDataObjects(dsaux);
+                    outputDataSets = mddl.buildPathForOutputDataSets(dsaux);
+                    outputs = mddl.buildPathForOutputs(dsaux);
                 }
 
                 mdOutputDSMap = new HashMap<>();

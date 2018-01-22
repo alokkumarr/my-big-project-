@@ -27,7 +27,7 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>bda</groupId>
+      <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-rest</artifactId>
       <version>${project.version}</version>
     </dependency>
