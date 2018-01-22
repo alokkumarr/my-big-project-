@@ -2,6 +2,8 @@ import * as forEach from 'lodash/forEach';
 import * as floor from 'lodash/floor';
 import * as startCase from 'lodash/startCase';
 import * as set from 'lodash/set';
+import * as isEmpty from 'lodash/isEmpty';
+import * as has from 'lodash/has';
 import * as reduce from 'lodash/reduce';
 import * as trim from 'lodash/trim';
 import * as fpSortBy from 'lodash/fp/sortBy';
@@ -133,6 +135,14 @@ export class AnalyzeService {
       .then(fpSortBy([obj => -obj.finished]));
   }
 
+  forcePagination(data, options = {}) {
+    if (isEmpty(data) || !(has(options, 'skip') || has(options, 'take'))) {
+      return data;
+    }
+
+    return data.slice(options.skip, options.skip + options.take);
+  }
+
   getExecutionData(analysisId, executionId, options = {}) {
     options.skip = options.skip || 0;
     options.take = options.take || 10;
@@ -141,8 +151,8 @@ export class AnalyzeService {
       `${this.url}/analysis/${analysisId}/executions/${executionId}/data?page=${page}&pageSize=${options.take}&analysisType=${options.analysisType}`
     ).then(resp => {
       const data = fpGet(`data.data`, resp);
-      const count = fpGet(`data.totalRows`, resp);
-      return {data, count};
+      const count = fpGet(`data.totalRows`, resp) || data.length;
+      return {data: options.forcePaginate ? this.forcePagination(data, options) : data, count};
     });
   }
 

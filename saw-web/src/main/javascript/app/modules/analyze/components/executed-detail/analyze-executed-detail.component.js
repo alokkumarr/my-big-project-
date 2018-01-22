@@ -12,7 +12,7 @@ import * as slice from 'lodash/slice';
 import {json2csv} from 'json-2-csv';
 import * as keys from 'lodash/keys';
 
-import {Events} from '../../consts';
+import {Events, AnalyseTypes} from '../../consts';
 
 import * as template from './analyze-executed-detail.component.html';
 import style from './analyze-executed-detail.component.scss';
@@ -212,6 +212,14 @@ export const AnalyzeExecutedDetailComponent = {
     loadExecutionData(options = {}) {
       if (this._executionId) {
         options.analysisType = this.analysis.type;
+
+        /* Currently pagination is not supported from backend for es reports.
+         * Enforce that from front-end for consistent user experience.
+         */
+        if (this.analysis.type === AnalyseTypes.ESReport) {
+          options.forcePaginate = true;
+        }
+
         return this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId, options)
           .then(({data, count}) => {
             this.requester.next({data});

@@ -19,7 +19,7 @@ import * as template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
 import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
-import {ENTRY_MODES} from '../../consts';
+import {ENTRY_MODES, AnalyseTypes} from '../../consts';
 
 const DEBOUNCE_INTERVAL = 500; // milliseconds
 
@@ -327,7 +327,7 @@ export const AnalyzeReportComponent = {
         }
       };
 
-      if (this.model.type === 'esReport') {
+      if (this.model.type === AnalyseTypes.ESReport) {
         result.sqlBuilder.sorts = [];
         result.sqlBuilder.dataFields = [];
 
