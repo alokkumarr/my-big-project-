@@ -15,15 +15,15 @@ import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
+import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.component.Component;
 import sncr.xdf.component.WithDataSetService;
 import sncr.xdf.component.WithMovableResult;
 import sncr.xdf.component.WithSparkContext;
-import sncr.xdf.conf.ComponentConfiguration;
-import sncr.xdf.conf.Field;
+import sncr.bda.conf.ComponentConfiguration;
+import sncr.bda.conf.Field;
 import sncr.xdf.core.file.DLDataSetOperations;
-import sncr.xdf.core.file.HFileOperations;
-import sncr.xdf.datasets.conf.DataSetProperties;
+import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.parser.spark.ConvertToRow;
 import sncr.xdf.parser.spark.HeaderFilter;
@@ -144,7 +144,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
     public static ComponentConfiguration analyzeAndValidate(String config) throws Exception {
 
         ComponentConfiguration compConf = Component.analyzeAndValidate(config);
-        sncr.xdf.conf.Parser parserProps = compConf.getParser();
+        sncr.bda.conf.Parser parserProps = compConf.getParser();
         if (parserProps == null) {
             throw new XDFException( XDFException.ErrorCodes.InvalidConfFile);
         }

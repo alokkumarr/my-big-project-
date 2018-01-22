@@ -2,18 +2,15 @@ package sncr.xdf.transformer;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
-import org.codehaus.commons.compiler.CompilerFactoryFactory;
-import org.codehaus.commons.compiler.IScriptEvaluator;
+import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.component.Component;
 import sncr.xdf.component.WithDataSetService;
 import sncr.xdf.component.WithMovableResult;
 import sncr.xdf.component.WithSparkContext;
-import sncr.xdf.conf.ComponentConfiguration;
-import sncr.xdf.conf.Transformer;
-import sncr.xdf.core.file.HFileOperations;
-import sncr.xdf.datasets.conf.DataSetProperties;
+import sncr.bda.conf.ComponentConfiguration;
+import sncr.bda.conf.Transformer;
+import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.exceptions.XDFException;
 
 import java.io.FileNotFoundException;

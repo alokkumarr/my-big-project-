@@ -1,6 +1,5 @@
 package sncr.xdf.sql;
 
-import org.apache.log4j.Logger;
 import sncr.xdf.component.WithMovableResult;
 
 /**

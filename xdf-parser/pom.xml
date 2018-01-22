@@ -4,21 +4,22 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>bda</groupId>
-    <artifactId>xdf-nextgen</artifactId>
-    <version>1.0.0_dev</version>
+		<groupId>com.synchronoss.bda</groupId>
+		<artifactId>xdf-nextgen</artifactId>
+		<version>1.0.0_dev</version>
   </parent>
+
 
   <artifactId>xdf-parser</artifactId>
 
   <dependencies>
     <dependency>
-      <groupId>bda</groupId>
+      <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-component</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>bda</groupId>
+      <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-preview</artifactId>
       <version>${project.version}</version>
     </dependency>

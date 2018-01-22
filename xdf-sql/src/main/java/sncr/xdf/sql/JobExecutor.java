@@ -4,9 +4,9 @@ import net.sf.jsqlparser.statement.Statement;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.exceptions.XDFException;
 import sncr.xdf.context.Context;
-import sncr.xdf.core.file.HFileOperations;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -95,7 +95,6 @@ public class JobExecutor {
                             logger.error("Could not execute SQL statement: " + i );
                             return -1L;
                         }
-//                        availableDataframes = executor.getAvailableDataFrames();
                         report.add(descriptor);
 
                     } catch (Exception e) {
@@ -105,9 +104,8 @@ public class JobExecutor {
                         HFileOperations.deleteEnt(tempDir);
                         return -1L;
                     }
-
-
                 }
+
                 //TODO:: Debug, test and comment the DROP Table functionality
                 else if (descriptor.statementType  == SQLScriptDescriptor.StatementType.DROP_TABLE) {
                     //TODO:: XDF-1013 implementation

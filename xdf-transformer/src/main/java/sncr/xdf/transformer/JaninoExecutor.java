@@ -1,17 +1,11 @@
 package sncr.xdf.transformer;
 
-import com.sun.rowset.internal.Row;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.util.AccumulatorV2;
 import org.codehaus.commons.compiler.CompilerFactoryFactory;
 import org.codehaus.commons.compiler.IScriptEvaluator;
-import scala.Tuple2;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by srya0001 on 12/21/2017.

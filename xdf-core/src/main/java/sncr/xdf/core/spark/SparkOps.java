@@ -14,8 +14,8 @@ public class SparkOps {
     private static final Logger logger = Logger.getLogger(SparkOps.class);
 
     public static void setSparkConfig(SparkConf sparkConf,
-                                      List<sncr.xdf.conf.Parameter> sysParams) {
-        for (sncr.xdf.conf.Parameter param : sysParams) {
+                                      List<sncr.bda.conf.Parameter> sysParams) {
+        for (sncr.bda.conf.Parameter param : sysParams) {
             logger.debug("Process parameter: " + param.getName() + " value: " + param.getValue());
             if ((param.getValue() == null || param.getValue().isEmpty())) {
                 logger.error("Cannot set parameter: " + param.getName() + " value is Empty or null, skip it");

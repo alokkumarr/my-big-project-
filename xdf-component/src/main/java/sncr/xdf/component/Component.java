@@ -6,19 +6,19 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
-import sncr.xdf.conf.Parameter;
-import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.CliHandler;
-import sncr.xdf.ConfigLoader;
-import sncr.xdf.conf.ComponentConfiguration;
 import sncr.xdf.context.Context;
-import sncr.xdf.core.file.HFileOperations;
-import sncr.xdf.datasets.conf.DataSetProperties;
-import sncr.xdf.metastore.ProjectStore;
-import sncr.xdf.services.AuditLogService;
-import sncr.xdf.services.DLDataSetService;
-import sncr.xdf.base.MetadataBase;
-import sncr.xdf.services.TransformationService;
+import sncr.bda.conf.Parameter;
+import sncr.xdf.exceptions.XDFException;
+import sncr.bda.CliHandler;
+import sncr.bda.ConfigLoader;
+import sncr.bda.conf.ComponentConfiguration;
+import sncr.bda.core.file.HFileOperations;
+import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.bda.metastore.ProjectStore;
+import sncr.bda.services.AuditLogService;
+import sncr.bda.services.DLDataSetService;
+import sncr.bda.base.MetadataBase;
+import sncr.bda.services.TransformationService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +43,11 @@ public abstract class Component {
     protected ArrayList<WithMovableResult.MoveDataDescriptor> resultDataDesc;
     protected Map<String, Map<String, String>> inputDataSets = null;
     protected Map<String, Map<String, String>> outputDataSets = null;
+
+    protected Map<String, Map<String, String>> inputs = null;
+    protected Map<String, Map<String, String>> outputs = null;
+
+
     protected WithDataSetService.DataSetServiceAux dsaux;
     private Map<String, JsonElement> mdOutputDSMap;
     private Map<String, JsonElement> mdInputDSMap;
@@ -88,6 +93,7 @@ public abstract class Component {
                 if (ctx.componentConfiguration.getInputs() != null &&
                         ctx.componentConfiguration.getInputs().size() > 0) {
                     inputDataSets = mddl.resolveDataObjects(dsaux);
+                    inputs = mddl.resolveDataParameters(dsaux);
                     mdInputDSMap = md.loadExistingDataSets(ctx, inputDataSets);
                     mdInputDSMap.forEach((id, ids) -> {
                         try {
@@ -104,7 +110,8 @@ public abstract class Component {
 
                 if (ctx.componentConfiguration.getOutputs() != null &&
                         ctx.componentConfiguration.getOutputs().size() > 0) {
-                    outputDataSets = mddl.buildPathForOutputDataObjects(dsaux);
+                    outputDataSets = mddl.buildPathForOutputDataSets(dsaux);
+                    outputs = mddl.buildPathForOutputs(dsaux);
                 }
 
                 mdOutputDSMap = new HashMap<>();

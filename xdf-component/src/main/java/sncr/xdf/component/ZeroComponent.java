@@ -1,9 +1,9 @@
 package sncr.xdf.component;
 
 import org.apache.log4j.Logger;
+import sncr.bda.conf.ComponentConfiguration;
+import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.conf.ComponentConfiguration;
-import sncr.xdf.datasets.conf.DataSetProperties;
 
 import java.util.Map;
 

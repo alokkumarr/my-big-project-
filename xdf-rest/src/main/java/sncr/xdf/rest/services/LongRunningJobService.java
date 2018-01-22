@@ -10,9 +10,6 @@ import sncr.xdf.rest.messages.Init;
 import sncr.xdf.rest.messages.NewRequest;
 import sncr.xdf.rest.messages.StatusUpdate;
 
-import static akka.http.javadsl.server.PathMatchers.segment;
-import static sncr.xdf.rest.AskHelper.ask;
-
 public class LongRunningJobService extends Service {
 
     private static final String ACTOR_NAME = "ljc";

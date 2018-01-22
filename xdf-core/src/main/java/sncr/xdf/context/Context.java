@@ -5,7 +5,8 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SparkSession;
-import sncr.xdf.conf.ComponentConfiguration;
+import sncr.bda.context.ContextMetadata;
+import sncr.bda.conf.ComponentConfiguration;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -24,46 +25,23 @@ import java.text.SimpleDateFormat;
  * The context should be used as execution scope of all components
  *
  */
-public class Context {
+public class Context extends ContextMetadata {
 
     private static final Logger logger = Logger.getLogger(Context.class);
 
-    static final String DATE_FMT = "yyyyMMdd-HHmmss";
-    static final SimpleDateFormat format = new SimpleDateFormat(DATE_FMT);
-    public String finishedTs;
-    static final String defaultFsScheme = "hdfs";
-    public final String applicationID;
-    public final String user = "A_user";
-    public final String transformationName = "A_transformation";
-
-
-    public ComponentConfiguration componentConfiguration;
-    public String batchID;
     public FileContext fc;
     public FileSystem fs = null;
 
     public SparkSession sparkSession = null;
     public SparkConf sparkConf;
 
-    public String startTs;
-    public String componentName;
-
-    {
-        this.startTs = new SimpleDateFormat("yyyyMMdd-HHmmss")
-                .format(new Timestamp(new java.util.Date().getTime()));
-    }
-
     public Context(String componentName,
                    String batchId,
                    String appId,
                    ComponentConfiguration compConf) throws Exception {
+        super(componentName, batchId, appId, compConf);
 
-        this.componentName = componentName;
-        this.batchID = batchId;
-        this.applicationID = appId;
-        this.componentConfiguration = compConf;
-//TODO:: Add project
-//        this.componentConfiguration.set
+
     }
 
     @Override
@@ -110,7 +88,4 @@ public class Context {
         if (sparkSession != null) sparkSession.stop();
     }
 
-    public void setFinishTS() {
-        finishedTs = format.format(new Timestamp(new java.util.Date().getTime()));
-    }
 }

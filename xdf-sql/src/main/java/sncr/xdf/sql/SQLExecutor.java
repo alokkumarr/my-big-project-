@@ -3,11 +3,11 @@ package sncr.xdf.sql;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.exceptions.XDFException;
 import scala.Tuple4;
 import sncr.xdf.context.Context;
 import sncr.xdf.core.file.DLDataSetOperations;
-import sncr.xdf.core.file.HFileOperations;
 
 import java.io.Serializable;
 import java.util.Map;

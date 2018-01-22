@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>bda</groupId>
-    <artifactId>xdf-nextgen</artifactId>
-    <version>1.0.0_dev</version>
+		<groupId>com.synchronoss.bda</groupId>
+		<artifactId>xdf-nextgen</artifactId>
+		<version>1.0.0_dev</version>
   </parent>
 
   <!-- use app.name from parent pom -->
   <!--artifactId>${app.name}</artifactId-->
-  <artifactId>xdf-rpm</artifactId>
+  <artifactId>rpm</artifactId>
 
   <packaging>pom</packaging>
   <!--name>xdf</name-->
@@ -27,7 +27,7 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>bda</groupId>
+      <groupId>com.synchronoss.bda</groupId>
       <artifactId>xdf-rest</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -108,15 +108,6 @@
                     <include>xdf_activate.sh</include>
                   </includes>
                 </source>
-                <!-- xdf-meta -->
-                <source>
-                  <location>../xdf-meta/bin</location>
-                  <includes>
-                    <include>create-metadata.sh</include>
-                    <include>xdf-mdcli.sh</include>
-                  </includes>
-                </source>
-                <!-- xdf-rest -->
                 <source>
                   <location>../xdf-rest/bin</location>
                   <includes>

@@ -1,7 +1,6 @@
 package sncr.xdf.rest.actors;
 
 import akka.actor.AbstractActor;
-import akka.actor.ActorLogging;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.cluster.Cluster;
@@ -12,7 +11,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import sncr.xdf.component.Component;
 import sncr.xdf.component.ZeroComponent;
-import sncr.xdf.dataprofiler.DataProfilerComponent;
 import sncr.xdf.parser.Parser;
 import sncr.xdf.rest.messages.CleanRequest;
 import sncr.xdf.rest.messages.Init;

@@ -8,7 +8,7 @@ import org.apache.spark.util.LongAccumulator;
 import sncr.xdf.component.Component;
 import sncr.xdf.component.WithDataSetService;
 import sncr.xdf.component.WithSparkContext;
-import sncr.xdf.datasets.conf.DataSetProperties;
+import sncr.bda.datasets.conf.DataSetProperties;
 
 import java.util.Map;
 

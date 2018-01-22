@@ -3,15 +3,15 @@ package sncr.xdf.component;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import sncr.bda.base.MetadataBase;
+import sncr.bda.conf.Input;
+import sncr.bda.conf.Output;
+import sncr.bda.core.file.HFileOperations;
+import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.bda.services.DLDataSetService;
 import sncr.xdf.context.Context;
-import sncr.xdf.conf.Input;
-import sncr.xdf.conf.Output;
 import sncr.xdf.core.file.DLDataSetOperations;
-import sncr.xdf.core.file.HFileOperations;
-import sncr.xdf.datasets.conf.DataSetProperties;
 import sncr.xdf.exceptions.XDFException;
-import sncr.xdf.services.DLDataSetService;
-import sncr.xdf.base.MetadataBase;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -104,47 +104,6 @@ public interface WithDataSetService {
 
     }
 
-    default Map<String, Map<String,String>> buildPathForOutputDataObjects(DataSetServiceAux aux){
-        Map<String, Map<String,String>> resMap = new HashMap();
-        for( Output output: aux.ctx.componentConfiguration.getOutputs()){
-            Map<String, String> res_output = new HashMap<String, String>();
-
-            String dataSource = (output.getDataSource() != null) ? output.getDataSource().toString(): MetadataBase.PREDEF_DATA_SOURCE;
-            String catalog = (output.getCatalog() != null)? output.getCatalog():  MetadataBase.DEFAULT_CATALOG;
-            String format = (output.getFormat() != null) ? output.getFormat().toString() : DLDataSetOperations.FORMAT_PARQUET;
-            String mode = (output.getMode() != null) ? output.getMode().toString() : DLDataSetOperations.MODE_APPEND;
-
-
-            StringBuilder sb = new StringBuilder(aux.md.getRoot());
-              sb.append(Path.SEPARATOR + aux.ctx.applicationID)
-                .append(Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR)
-                .append(Path.SEPARATOR + dataSource)
-                .append(Path.SEPARATOR + catalog)
-                .append(Path.SEPARATOR + output.getDataSet())
-                .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
-
-            DataSetServiceAux.logger.debug(String.format("Resolve object %s in location: %s", output.getDataSet(), sb.toString()));
-            res_output.put(DataSetProperties.PhysicalLocation.name(), sb.toString());
-            res_output.put(DataSetProperties.Name.name(), output.getDataSet());
-            String ds = dataSource;
-            String nof = (output.getNumberOfFiles() != null)? String.valueOf(output.getNumberOfFiles()):"1";
-            res_output.put(DataSetProperties.Type.name(), ds);
-            res_output.put(DataSetProperties.Catalog.name(), catalog);
-            res_output.put(DataSetProperties.Format.name(), format);
-            res_output.put(DataSetProperties.NumberOfFiles.name(), nof);
-            res_output.put(DataSetProperties.Mode.name(), mode);
-            boolean exists = false;
-            try {
-                exists = HFileOperations.exists(sb.toString());
-            } catch (Exception e) {
-                DataSetServiceAux.logger.warn("Could not check output data object: " + output.getDataSet());
-            }
-            res_output.put(DataSetProperties.Exists.name(), String.valueOf(exists));
-            resMap.put(output.getDataSet(), res_output);
-        }
-        return resMap;
-    }
-
     default String generateTempLocation(DataSetServiceAux aux, String tempDS, String tempCatalog) {
         StringBuilder sb = new StringBuilder(aux.md.getRoot());
         sb.append(Path.SEPARATOR + aux.ctx.applicationID)
@@ -157,6 +116,14 @@ public interface WithDataSetService {
         return sb.toString();
     }
 
+    default Map<String,Map<String,String>> buildPathForOutputs(DataSetServiceAux dsaux){
+        return dsaux.buildDataSetMap(DSMapKey.parameter);
+    }
+
+    default Map<String, Map<String,String>> buildPathForOutputDataSets(DataSetServiceAux aux){
+        return aux.buildDataSetMap(DSMapKey.dataset);
+    }
+
     class DataSetServiceAux {
         private static final Logger logger = Logger.getLogger(WithDataSetService.class);
         Context ctx;
@@ -165,8 +132,61 @@ public interface WithDataSetService {
         public DataSetServiceAux(Context c, DLDataSetService m){
             ctx = c; md = m;
         }
+
+        private Map<String, Map<String,String>> buildDataSetMap( DSMapKey ktype)
+        {
+            Map<String, Map<String,String>> resMap = new HashMap();
+            for( Output output: this.ctx.componentConfiguration.getOutputs()){
+                Map<String, String> res_output = new HashMap<String, String>();
+
+                String dataSource = (output.getDataSource() != null) ? output.getDataSource().toString(): MetadataBase.PREDEF_DATA_SOURCE;
+                String catalog = (output.getCatalog() != null)? output.getCatalog():  MetadataBase.DEFAULT_CATALOG;
+                String format = (output.getFormat() != null) ? output.getFormat().toString() : DLDataSetOperations.FORMAT_PARQUET;
+                String mode = (output.getMode() != null) ? output.getMode().toString() : DLDataSetOperations.MODE_APPEND;
+
+
+                StringBuilder sb = new StringBuilder(this.md.getRoot());
+                sb.append(Path.SEPARATOR + this.ctx.applicationID)
+                        .append(Path.SEPARATOR + MetadataBase.PREDEF_DL_DIR)
+                        .append(Path.SEPARATOR + dataSource)
+                        .append(Path.SEPARATOR + catalog)
+                        .append(Path.SEPARATOR + output.getDataSet())
+                        .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
+
+                DataSetServiceAux.logger.debug(String.format("Resolve object %s in location: %s", output.getDataSet(), sb.toString()));
+                res_output.put(DataSetProperties.PhysicalLocation.name(), sb.toString());
+                res_output.put(DataSetProperties.Name.name(), output.getDataSet());
+                String ds = dataSource;
+                String nof = (output.getNumberOfFiles() != null)? String.valueOf(output.getNumberOfFiles()):"1";
+                res_output.put(DataSetProperties.Type.name(), ds);
+                res_output.put(DataSetProperties.Catalog.name(), catalog);
+                res_output.put(DataSetProperties.Format.name(), format);
+                res_output.put(DataSetProperties.NumberOfFiles.name(), nof);
+                res_output.put(DataSetProperties.Mode.name(), mode);
+                boolean exists = false;
+                try {
+                    exists = HFileOperations.exists(sb.toString());
+                } catch (Exception e) {
+                    DataSetServiceAux.logger.warn("Could not check output data object: " + output.getDataSet());
+                }
+                res_output.put(DataSetProperties.Exists.name(), String.valueOf(exists));
+
+                switch (ktype) {
+                    case parameter:
+                        resMap.put(output.getName(), res_output); break;
+                    case dataset:
+                        resMap.put(output.getDataSet(), res_output); break;
+                }
+            }
+            return resMap;
+        }
+
     }
 
+    enum DSMapKey{
+        parameter,
+        dataset
+    };
 
 }
 
