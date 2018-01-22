@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.synchronoss.bda</groupId>
     <artifactId>meta</artifactId>
-    <version>1.0.0_dev</version>
+    <version>1.0.0</version>
   </parent>
 
   <!-- use app.name from parent pom -->
