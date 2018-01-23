@@ -42,6 +42,7 @@ export class DesignerPivotComponent {
   @Input('data') set setData(data) {
     this.data = this.preProcessData(data);
   };
+  @Input() sorts: any[];
   @Input() designerState: DesignerStates;
 
   public artifactColumns: ArtifactColumns;

@@ -54,7 +54,7 @@
             class="sort-field"
             fxLayout="row"
             fxLayoutAlign="space-between center"
-            [e2e]="'sort-field-' + (field.aliasName || field.displayName)">
+            [e2e]="'sort-field-' + nameMap[sort.columnName]">
         {{nameMap[sort.columnName]}}
 
         <div fxLayout="row"

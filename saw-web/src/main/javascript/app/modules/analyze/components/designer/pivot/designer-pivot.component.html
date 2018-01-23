@@ -39,6 +39,7 @@
   <pivot-grid *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA"
               [fields]="artifactColumns | artifactColumns2PivotFields"
               [data]="data"
+              [sorts]="sorts"
               [updater]="updater"
               mode="designer">
   </pivot-grid>

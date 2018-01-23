@@ -44,7 +44,7 @@ export const AnalyzePivotDetailComponent = {
       this.dataSource = new PivotGridDataSource({store: formattedData, fields: formattedFields});
       this.pivotGridUpdater.next({
         dataSource: this.dataSource,
-        sorts: this.sorts
+        sorts: this.analysis.sqlBuilder.sorts
       });
     }
 

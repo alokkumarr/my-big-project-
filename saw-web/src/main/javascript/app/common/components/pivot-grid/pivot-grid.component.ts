@@ -7,7 +7,9 @@ import {
 import * as forEach from 'lodash/forEach';
 import * as isArray from 'lodash/isArray';
 import * as get from 'lodash/get';
+import * as isEmpty from 'lodash/isEmpty';
 import {Subject} from 'rxjs/Subject';
+import {Sort} from '../../../modules/analyze/models/sort.model'
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 
 require('./pivot-grid.component.scss');
@@ -30,6 +32,7 @@ export class PivotGridComponent {
   @Input() mode: string | 'designer';
   @Input() fields: any[];
   @Input() data: any[];
+  @Input() sorts: Sort[];
   @Output() onContentReady: EventEmitter<any> = new EventEmitter();
   public pivotGridOptions : any;
   rowHeaderLayout = 'tree';
@@ -84,12 +87,19 @@ export class PivotGridComponent {
   ngOnChanges(changes) {
     const data = get(changes, 'data.currentValue');
     const fields = get(changes, 'fields.currentValue');
+    const sorts = get(changes, 'sorts.currentValue');
     if (isArray(data) || isArray(fields)) {
       const dataSource = new PivotGridDataSource({
         store: data || [],
         fields: fields || []
       });
       this.updateDataSource(dataSource);
+    }
+
+    if (sorts) {
+      this.delayIfNeeded(() => {
+        this.updateSorts(sorts);
+      });
     }
   }
 
@@ -110,16 +120,15 @@ export class PivotGridComponent {
   }
 
   updateDataSource(dataSource) {
-    if (this._gridInstance) {
+    this.delayIfNeeded(() => {
       this._gridInstance.option('dataSource', dataSource);
-    } else {
-      setTimeout(() => {
-        this._gridInstance.option('dataSource', dataSource);
-      }, 100);
-    }
+    });
   }
 
-  updateSorts(sorts) {
+  updateSorts(sorts: Sort[]) {
+    if (isEmpty(sorts)) {
+      return;
+    }
     const pivotGridDataSource = this._gridInstance.getDataSource();
 
     // reset other sorts
@@ -131,16 +140,24 @@ export class PivotGridComponent {
       }
     });
 
-    forEach(sorts, sort => {
+    forEach(sorts, (sort: Sort) => {
       // remove the suffix from the sort fields name, that is added by elastic search
       // there is a bug that breaks pivotgrid when the name conains a .
-      const dataField = sort.field.type === 'string' ?
-        sort.field.dataField.split('.')[0] :
-        sort.field.dataField;
+      const dataField = sort.type === 'string' ?
+        sort.columnName.split('.')[0] :
+        sort.columnName;
       pivotGridDataSource.field(dataField, {
         sortOrder: sort.order
       });
     });
     pivotGridDataSource.load();
+  }
+
+  delayIfNeeded(fn) {
+    if (this._gridInstance) {
+      fn();
+    } else {
+      setTimeout(() => fn(), 100);
+    }
   }
 }
