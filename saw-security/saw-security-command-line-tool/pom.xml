@@ -1,0 +1,356 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>1.5.2.RELEASE</version>
+    <relativePath></relativePath>
+  </parent>
+  <properties>
+    <start-class>com.sncr.saw.security.app.SpringAdminApp</start-class>
+
+    <!-- to be specified in command line -->
+    <prod.release>0</prod.release>
+    <project.release>${prod.release}</project.release>
+
+    <rpm.version>${revision.nodash}</rpm.version>
+
+    <!--
+        Release version number cannot be removed optionally.
+        Solution for this will be rename the rpm once obtained from build
+    -->
+    <rpm.release>${project.release}</rpm.release>
+    <app.name>saw-security</app.name> <!-- ${project.artifactId} -->
+    <app.version>${rpm.version}</app.version>
+    <app.release>${rpm.release}</app.release>
+    <app.nameVer>${app.name}-${app.version}</app.nameVer>
+
+    <!-- Directories -->
+    <app.optParDir>/opt/bda</app.optParDir>
+    <app.optDir>${app.optParDir}/${app.nameVer}</app.optDir>
+    <app.varDir>/var/bda/${app.name}</app.varDir>
+    <app.etcDir>/etc/bda</app.etcDir>
+
+    <app.user>saw</app.user>
+    <app.group>saw</app.group>
+  </properties>
+  <modelVersion>4.0.0</modelVersion>
+  <packaging>jar</packaging>
+
+  <groupId>com.sncr</groupId>
+  <artifactId>saw-security-command-line-tool</artifactId>
+  <version>${revision}</version>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>1.5.2.RELEASE</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.shell</groupId>
+      <artifactId>spring-shell-starter</artifactId>
+      <version>2.0.0.M2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sncr</groupId>
+      <artifactId>saw-security</artifactId>
+      <version>${revision}</version>
+      <classifier>classes</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+      <version>4.2.0</version>
+    </dependency>
+    <!--<dependency>-->
+    <!--<groupId>commons-collections</groupId>-->
+    <!--<artifactId>commons-collections</artifactId>-->
+    <!--</dependency>-->
+  </dependencies>
+  <repositories>
+    <repository>
+      <id>spring-milestones</id>
+      <name>Spring Milestones</name>
+      <url>https://repo.spring.io/libs-milestone</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>1.5.2.RELEASE</version>
+        <configuration>
+          <fork>true</fork>
+          <mainClass>${start-class}</mainClass>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>de.dentrassi.maven</groupId>
+        <artifactId>rpm</artifactId>
+        <version>0.10.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>rpm</goal>
+            </goals>
+            <configuration>
+              <packageName>saw-security</packageName>
+              <version>${revision.nodash}</version>
+              <skipSigning>true</skipSigning>
+              <rulesets>
+                <ruleset>
+                  <id>default</id>
+                  <rules>
+                    <rule>
+                      <user>saw</user>
+                      <group>saw</group>
+                      <mode>0444</mode>
+                    </rule>
+                    <rule>
+                      <when>
+                        <type>directory</type>
+                      </when>
+                      <mode>0755</mode>
+                    </rule>
+                    <rule>
+                      <when>
+                        <prefix>${app.optDir}/bin/</prefix>
+                      </when>
+                      <mode>0555</mode>
+                    </rule>
+                    <rule>
+                      <when>
+                        <prefix>${app.optDir}/db/setup/init</prefix>
+                      </when>
+                      <mode>0755</mode>
+                    </rule>
+                    <rule>
+                      <when>
+                        <prefix>${app.optDir}/db/setup/init.sql</prefix>
+                      </when>
+                      <mode>0444</mode>
+                    </rule>
+                  </rules>
+                </ruleset>
+              </rulesets>
+              <entries>
+                <entry>
+                  <name>${app.optParDir}/${app.name}</name>
+                  <linkTo>${app.nameVer}</linkTo>
+                  <user>saw</user>
+                  <group>saw</group>
+                </entry>
+                <entry>
+                  <name>${app.optDir}</name>
+                  <directory>true</directory>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.etcDir}</name>
+                  <directory>true</directory>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.varDir}</name>
+                  <directory>true</directory>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.varDir}/run</name>
+                  <directory>true</directory>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/bin</name>
+                  <directory>true</directory>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/bin/appl_info</name>
+                  <file>../saw-security/bin/appl_info</file>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/bin/ccode.sh</name>
+                  <file>../saw-security/bin/ccode.sh</file>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/bin/conf_init</name>
+                  <file>../saw-security/bin/conf_init</file>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/bin/mk_conf.sh</name>
+                  <file>../saw-security/bin/mk_conf.sh</file>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/bin/saw-security-runner.sh</name>
+                  <file>../saw-security/bin/saw-security-runner.sh</file>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/bin/saw-security.sh</name>
+                  <file>../saw-security/bin/saw-security.sh</file>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/bin/customer_onboard.sh</name>
+                  <file>../saw-security/bin/customer_onboard.sh</file>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/conf</name>
+                  <directory>true</directory>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/conf/logback.xml</name>
+                  <file>../saw-security/conf/logback.xml</file>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/conf/templates</name>
+                  <directory>true</directory>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/conf/templates</name>
+                  <collect>
+                    <from>../saw-security/conf/templates</from>
+                  </collect>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/lib</name>
+                  <directory>true</directory>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/lib/saw-security-${revision}.war</name>
+                  <file>../saw-security/target/saw-security-${revision}.war</file>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/lib/saw-security-${revision}-classes.jar</name>
+                  <file>../saw-security/target/saw-security-${revision}-classes.jar</file>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/lib/saw-security-command-line-tool-${revision}.jar</name>
+                  <file>target/saw-security-command-line-tool-${revision}.jar</file>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/db</name>
+                  <directory>true</directory>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>${app.optDir}/db</name>
+                  <collect>
+                    <from>../saw-security/db</from>
+                  </collect>
+                  <ruleset>default</ruleset>
+                </entry>
+                <entry>
+                  <name>/usr/lib/systemd/system/saw-security.service</name>
+                  <file>../saw-security/src/main/system/saw-security.service</file>
+                  <ruleset>default</ruleset>
+                </entry>
+              </entries>
+              <beforeInstallation>
+                echo pre-install started: ${app.nameVer}
+                echo check saw:saw user exists
+                getent group ${app.group} || {
+                echo error: no such group: ${app.group}
+                # groupadd -g 5100 saw
+                exit 1
+                }
+                getent passwd ${app.user} || {
+                echo error: no such user: ${app.user}
+                # useradd -g 5100 -u 5100 saw
+                exit 1
+                }
+
+                echo check /etc/bda/${app.name}.vars can be read
+                ( &lt;/etc/bda/${app.name}.vars ) || exit 1
+
+                echo check Python module with "'import MySQLdb'"
+                ( python -c 'import MySQLdb' ) || exit 1
+
+                echo pre-install completed: ${app.nameVer}
+              </beforeInstallation>
+              <afterInstallation>
+                echo pre-remove starting: ${app.nameVer}
+                echo remove files in log/, run/ subdirs in ${app.varDir}
+                ( set -x
+                rm -f ${app.varDir}/{log,run}/*
+                )
+                echo remove python compiled files
+                ( set -x
+                rm -f ${app.optDir}/db/*.pyc ${app.optDir}/db/*/*.pyc
+                )
+                echo remove files generated from templates
+                ( set -x
+                rm -f ${app.optDir}/conf/{application.properties,bootstrap.yml}
+                )
+                echo pre-remove completed: ${app.nameVer}
+              </afterInstallation>
+              <requires>
+                <require>java-1.8.0-openjdk-headless &gt;= 1.8.0</require>
+                <require>MySQL-python &gt;= 1.2.5</require>
+              </requires>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+
+
+</project>
