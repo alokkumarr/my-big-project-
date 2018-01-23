@@ -2,6 +2,7 @@ declare const ace: any;
 import {
   Component,
   OnDestroy,
+  AfterViewInit,
   Input,
   Output,
   Inject,
@@ -30,7 +31,7 @@ const WARN_DIALOG = {
   selector: 'analyze-report-query',
   template
 })
-export class AnalyzeReportQueryComponent implements OnDestroy {
+export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
   @Input() model: any;
   @Output() onSave = new EventEmitter<any>();
 
@@ -41,6 +42,8 @@ export class AnalyzeReportQueryComponent implements OnDestroy {
     displayIndentGuides: true,
     enableBasicAutocompletion: true,
     enableLiveAutocompletion: true,
+    wrap: 'free',
+    wrapBehavioursEnabled: true,
     fontSize: 16
   };
   private langTools = ace.acequire('ace/ext/language_tools');
@@ -49,6 +52,12 @@ export class AnalyzeReportQueryComponent implements OnDestroy {
   constructor(
     @Inject('$mdDialog') private _$mdDialog: any
   ) { }
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      this.editor.getEditor().resize();
+    }, 100);
+  }
 
   /* Before exiting, reset ace completers to default.
      This removes any custom completers added to ace. */
