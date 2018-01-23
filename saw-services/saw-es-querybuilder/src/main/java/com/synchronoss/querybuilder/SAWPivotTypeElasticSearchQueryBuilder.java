@@ -133,10 +133,11 @@ public String getJsonString() {
         }
         if (item.getType().value().equals(Type.STRING.value())) {
 
-          for (Object s : item.getModel().getModelValues()) {
-            MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(), s);
+          for (Object s : item.getModel().getModelValues()
+              ) {
+            MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
+                s);
             matchQueryBuilder.analyzer("standard");
-            matchQueryBuilder.fuzzyTranspositions(false);
             builder.add(matchQueryBuilder);
           }
         }
@@ -175,10 +176,11 @@ public String getJsonString() {
         }
         if (item.getType().value().equals(Type.STRING.value())) {
 
-          for (Object s : item.getModel().getModelValues()) {
-            MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(), s);
+          for (Object s : item.getModel().getModelValues()
+              ) {
+            MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
+                s);
             matchQueryBuilder.analyzer("standard");
-            matchQueryBuilder.fuzzyTranspositions(false);
             builder.add(matchQueryBuilder);
           }
         }
