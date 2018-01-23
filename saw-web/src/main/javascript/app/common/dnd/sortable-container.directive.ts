@@ -4,7 +4,8 @@ import {
   Output,
   Input,
   HostListener,
-  HostBinding
+  HostBinding,
+  ElementRef
 } from '@angular/core';
 
 import {
@@ -17,6 +18,7 @@ import {
 } from './utils';
 import { dndClasses } from './consts';
 import {DragnDropService} from './dnd.service';
+import { concat } from 'rxjs/observable/concat';
 
 @Directive({
   selector: '[dndSortableContainer]'
@@ -37,7 +39,8 @@ export class DndSortableContainerDirective {
   private _placeholderPlace: any;
 
   constructor(
-    private _dragDropService: DragnDropService
+    private _dragDropService: DragnDropService,
+    private _elemRef: ElementRef
   ) {}
 
   @HostListener('dragenter', ['$event'])
@@ -52,7 +55,9 @@ export class DndSortableContainerDirective {
         allowDropFn: this.dndAllowDropFn
       });
 
-      if (this._isDropAllowed) {
+      const elem = this._elemRef.nativeElement;
+
+      if (this._isDropAllowed && event.target === elem) {
         this.addPlaceholder(event.target, 'inside');
         this._newSortableIndex = 0;
       }
@@ -125,8 +130,9 @@ export class DndSortableContainerDirective {
   }
 
   addPlaceholder(element, where: 'before' | 'after' | 'inside') {
-    const targetElem = event.target;
     this._insertionPlaceholder = this._dragDropService.getElement();
+    if (where === 'inside') {
+    }
     switch (where) {
     case 'inside':
       element.append(this._insertionPlaceholder);
