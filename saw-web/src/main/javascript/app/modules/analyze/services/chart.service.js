@@ -29,8 +29,10 @@ import * as findIndex from 'lodash/findIndex';
 import * as mapValues from 'lodash/mapValues';
 import * as sortBy from 'lodash/sortBy';
 import * as moment from 'moment';
+import * as values from 'lodash/values';
 import * as toString from 'lodash/toString';
 import * as replace from 'lodash/replace';
+import * as isUndefined from 'lodash/isUndefined';
 
 import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS} from '../consts';
 
@@ -135,6 +137,20 @@ export class ChartService {
       break;
     }
     return analysis;
+  }
+
+  initLegend(analysis) {
+    const initialLegendPosition = analysis.chartType === 'combo' ? 'top' : analysis.chartType.substring(0, 2) === 'ts' ? 'bottom' : 'right';
+    const initialLegendLayout = (analysis.chartType === 'combo' || analysis.chartType.substring(0, 2) === 'ts') ? 'horizontal' : 'vertical';
+
+    return {
+      align: get(analysis, 'legend.align', initialLegendPosition),
+      layout: get(analysis, 'legend.layout', initialLegendLayout),
+      options: {
+        align: values(this.LEGEND_POSITIONING),
+        layout: values(this.LAYOUT_POSITIONS)
+      }
+    };
   }
 
   /* Returns default chart config for various chart types */
@@ -647,7 +663,7 @@ export class ChartService {
     return changes;
   }
 
-  getYAxesChanges(type, fields) {
+  getYAxesChanges(type, fields, opts) {
     const panes = fields.length;
     const labelHeight = 15;
     if (type !== 'tsPane') {
@@ -656,7 +672,10 @@ export class ChartService {
         fpToPairs,
         fpMap(([, fields]) => {
           const titleText = map(fields, field => {
-            return field.alias || `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${field.displayName}`;
+            if (!isUndefined(field.alias)) {
+              return field.alias || `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${field.displayName}`;
+            }
+            return opts.labels.y || `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${field.displayName}`;
           }).join('<br/>');
           const isSingleField = fields.length === 1;
           return {
@@ -728,15 +747,15 @@ export class ChartService {
 
   getBarChangeConfig(type, settings, fields, gridData, opts) {
     const labels = {
-      x: get(fields, 'x.alias', get(fields, 'x.displayName', ''))
+      x: get(fields, 'x.alias') || get(opts, 'labels.x') || get(fields, 'x.displayName', '')
     };
 
     const changes = [{
       path: 'xAxis.title.text',
-      data: (opts.labels && opts.labels.x) || labels.x
+      data: labels.x || (opts.labels && opts.labels.x)
     }];
 
-    const yAxesChanges = this.getYAxesChanges(type, fields.y);
+    const yAxesChanges = this.getYAxesChanges(type, fields.y, opts);
 
     changes.push({
       path: 'yAxis',
@@ -790,11 +809,11 @@ export class ChartService {
 
     return concat(
       changes,
-      this.addTooltipsAndLegend(fields, type)
+      this.addTooltipsAndLegend(fields, type, opts)
     );
   }
 
-  addTooltipsAndLegend(fields, type) {
+  addTooltipsAndLegend(fields, type, opts) {
     const changes = [];
 
     if (!this.getViewOptionsFor(type).customTooltip) {
@@ -811,17 +830,17 @@ export class ChartService {
       'point.key' : xIsNumber ?
         'point.x:,.2f' : 'point.x';
     const xAxisString = `<tr>
-      <th>${fields.x.displayName}:</th>
+      <th>${fields.x.alias || get(opts, 'labels.x', '') || fields.x.displayName}:</th>
       <td>{${xStringValue}}</td>
     </tr>`;
 
     const yIsSingle = fields.y.length === 1;
     const yAxisString = `<tr>
-      <th>{series.name}:</th>
+      <th>${fields.y.alias || get(opts, 'labels.y', '') || '{series.name}'}:</th>
       <td>{point.y:,.2f}</td>
     </tr>`;
     const zAxisString = fields.z ?
-      `<tr><th>${fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>` :
+      `<tr><th>${fields.z.alias || get(opts, 'labels.z', '') || fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>` :
       '';
     const groupString = fields.g ?
       `<tr><th>Group:</th><td>{point.g}</td></tr>` :

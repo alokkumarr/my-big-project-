@@ -237,7 +237,7 @@ object QueryBuilder extends {
          val modelValues = ((filter \ "model" \ "modelValues") match {
            case array: JArray => array.arr
            case obj => unexpectedElement(obj, "array", "modelValues")
-         }).map(_.extract[String])
+         }).map(_.extract[String].toUpperCase())
         "IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
       }
       case "date" | "timestamp" => {
@@ -257,7 +257,11 @@ object QueryBuilder extends {
       }
       case obj: String => throw ClientException("Unknown filter type: " + obj)
     }
-    "%s.%s %s".format(property("tableName"), property("columnName"), condition)
+    if(property("type")=="string") {
+      "upper(%s.%s) %s".format(property("tableName"), property("columnName"), condition)
+    } else {
+      "%s.%s %s".format(property("tableName"), property("columnName"), condition)
+    }
   }
 
   private def buildGroupBy(

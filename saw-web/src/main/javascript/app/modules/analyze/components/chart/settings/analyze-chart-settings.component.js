@@ -93,6 +93,7 @@ export const AnalyzeChartSettingsComponent = {
       } else {
         this.selected.y = find(this.settings.yaxis, attr => attr.checked === 'y');
       }
+
       this.selected.x = find(this.settings.xaxis, attr => attr.checked === 'x');
       this.selected.g = find(this.settings.groupBy, attr => attr.checked === 'g');
       this.selected.z = find(this.settings.zaxis, attr => attr.checked === 'z');
