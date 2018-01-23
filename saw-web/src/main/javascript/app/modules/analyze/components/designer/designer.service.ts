@@ -87,11 +87,8 @@ export class DesignerService {
       )
     );
 
-    const canAcceptNonNumberType = (groupAdapter: IDEsignerSettingGroupAdapter) => (
-      ({type}: ArtifactColumnPivot) => (
-        areLessThenMaxFields(groupAdapter.artifactColumns) &&
-        !NUMBER_TYPES.includes(type)
-      )
+    const canAcceptAnyType = (groupAdapter: IDEsignerSettingGroupAdapter) => (
+      () => areLessThenMaxFields(groupAdapter.artifactColumns)
     );
 
     const applyDataFieldDefaults = artifactColumn => {
@@ -120,7 +117,7 @@ export class DesignerService {
       type: 'pivot',
       marker: 'row',
       artifactColumns: [],
-      canAcceptArtifactColumn: canAcceptNonNumberType,
+      canAcceptArtifactColumn: canAcceptAnyType,
       transform(artifactColumn: ArtifactColumnPivot) {
         artifactColumn.area = 'row';
         artifactColumn.checked = true;
@@ -133,7 +130,7 @@ export class DesignerService {
       type: 'pivot',
       marker: 'column',
       artifactColumns: [],
-      canAcceptArtifactColumn: canAcceptNonNumberType,
+      canAcceptArtifactColumn: canAcceptAnyType,
       transform(artifactColumn: ArtifactColumnPivot) {
         artifactColumn.area = 'column';
         artifactColumn.checked = true;

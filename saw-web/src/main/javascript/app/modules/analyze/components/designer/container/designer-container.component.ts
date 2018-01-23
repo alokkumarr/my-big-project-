@@ -92,6 +92,7 @@ export class DesignerContainerComponent {
         .afterClosed().subscribe((result: IToolbarActionResult) => {
           if (result) {
             this.sorts = result.sorts;
+            this.onSettingsChange();
           }
         });
       break;
@@ -101,6 +102,7 @@ export class DesignerContainerComponent {
           if (result) {
             this.filters = result.filters;
             this.booleanCriteria = result.booleanCriteria;
+            this.onSettingsChange();
           }
         });
       break;
@@ -176,7 +178,7 @@ export class DesignerContainerComponent {
 
     return {
       booleanCriteria: 'AND',
-      filters: [],
+      filters: this.filters,
       sorts: this.sorts,
       ...partialSqlBuilder
     }

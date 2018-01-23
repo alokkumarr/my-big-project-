@@ -22,6 +22,7 @@ require('./designer-filter-row.component.scss');
 })
 export class DesignerFilterRowComponent {
   @Output() public removeRequest: EventEmitter<null> = new EventEmitter();
+  @Output() public filterChange: EventEmitter<null> = new EventEmitter();
   @Input() public artifactColumns: ArtifactColumns;
   @Input() public filter: Filter;
 
@@ -32,6 +33,7 @@ export class DesignerFilterRowComponent {
     this.filter.columnName = target.columnName;
     this.filter.type = target.type;
     this.filter.model = null;
+    this.filterChange.emit();
   }
 
   onFilterModelChange(filterModel: FilterModel) {

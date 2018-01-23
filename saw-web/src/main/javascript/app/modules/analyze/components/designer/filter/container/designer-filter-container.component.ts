@@ -42,6 +42,10 @@ export class DesignerFilterContainerComponent {
     }
   }
 
+  onFilterChange() {
+    this.onFiltersChange();
+  }
+
   addFilter(tableName, initialAdd = false) {
     const newFilter: Filter = {
       type: null,
