@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
@@ -132,14 +131,9 @@ public String getJsonString() {
           }
         }
         if (item.getType().value().equals(Type.STRING.value())) {
-
-          for (Object s : item.getModel().getModelValues()
-              ) {
-            MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
-                s);
-            matchQueryBuilder.analyzer("standard");
-            builder.add(matchQueryBuilder);
-          }
+          TermsQueryBuilder termsQueryBuilder =
+              new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+          builder.add(termsQueryBuilder);
         }
         
         if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item
@@ -175,14 +169,9 @@ public String getJsonString() {
           }
         }
         if (item.getType().value().equals(Type.STRING.value())) {
-
-          for (Object s : item.getModel().getModelValues()
-              ) {
-            MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
-                s);
-            matchQueryBuilder.analyzer("standard");
-            builder.add(matchQueryBuilder);
-          }
+          TermsQueryBuilder termsQueryBuilder =
+              new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+          builder.add(termsQueryBuilder);
         }
         if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item
             .getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))
