@@ -10,7 +10,7 @@
         "type": "semantic",
         "module": "ANALYZE",
         "metric": "sample-elasticsearch",
-        "metricName": "Sample (pivot/chart)",
+        "metricName": "Sample (pivot/chart) - new",
         "customerCode": "SYNCHRONOSS",
         "disabled": "false",
         "checked": "false",
@@ -74,30 +74,30 @@
             "artifactName": "SAMPLE",
             "columns": [
               {
-                "name": "country.keyword",
+                "name": "string.keyword",
                 "type": "string",
-                "columnName": "country.keyword",
-                "displayName": "Country",
+                "columnName": "string.keyword",
+                "displayName": "String",
                 "aliasName": "",
                 "table": "sample",
                 "joinEligible": false,
                 "filterEligible": true
               },
               {
-                "name": "product.keyword",
-                "type": "string",
-                "columnName": "product.keyword",
-                "displayName": "Product",
-                "aliasName": "",
-                "table": "sample",
-                "joinEligible": false,
-                "filterEligible": true
-              },
-              {
-                "name": "units",
+                "name": "long",
                 "type": "long",
-                "columnName": "units",
-                "displayName": "Units",
+                "columnName": "long",
+                "displayName": "Long",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "float",
+                "type": "float",
+                "columnName": "float",
+                "displayName": "Float",
                 "aliasName": "",
                 "table": "sample",
                 "joinEligible": false,
@@ -110,6 +110,26 @@
                 "displayName": "Date",
                 "aliasName": "",
                 "table": "sample",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "integer",
+                "type": "integer",
+                "columnName": "integer",
+                "displayName": "Integer",
+                "aliasName": "",
+                "table": "sample",
+                "joinEligible": false,
+                "filterEligible": true
+              },
+              {
+                "name": "double",
+                "type": "double",
+                "columnName": "double",
+                "displayName": "Double",
+                "aliasName": "",
+                "table": "sales",
                 "joinEligible": false,
                 "filterEligible": true
               }
