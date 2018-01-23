@@ -54,7 +54,7 @@ module.exports = () => {
       alias: {
         fonts: webpackHelper.root('assets/fonts'),
         img: webpackHelper.root('assets/img'),
-        api: webpackHelper.root('src/main/mock/api'),
+        api: webpackHelper.root('src/main/mock/api')
       }
     },
 

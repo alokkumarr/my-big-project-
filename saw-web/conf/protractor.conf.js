@@ -25,9 +25,9 @@ exports.config = {
         'disable-extensions',
         'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
-        "--headless",
-        "--disable-gpu",
-        "--window-size=2880,1800"
+        '--headless',
+        '--disable-gpu',
+        '--window-size=2880,1800'
       ]
     },
     'moz:firefoxOptions': {
