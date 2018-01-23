@@ -14,6 +14,7 @@ export const StringFilterComponent = {
       'ngInject';
       this.isEmpty = isEmpty;
       const semicolon = 186;
+      this.displayChips = false;
       this.separatorKeys = [$mdConstant.KEY_CODE.ENTER, $mdConstant.KEY_CODE.COMMA, semicolon];
       this.presets = [{
         value: 'EQ',
@@ -45,11 +46,17 @@ export const StringFilterComponent = {
     }
 
     $onInit() {
+      this.keywords = this.model || {modelValues: []};
       this.model = this.model || {};
       this.tempModel = {};
     }
 
     onPresetSelected() {
+      if (this.tempModel.preset === 'IsIn' || this.tempModel.preset === 'IsNotIn') {
+        this.displayChips = true;
+      } else {
+        this.displayChips = false;
+      }
       this.tempModel.value = null;
       this.onChange({model: {preset: this.tempModel.preset}});
     }
