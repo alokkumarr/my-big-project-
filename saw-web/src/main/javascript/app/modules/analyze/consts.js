@@ -182,7 +182,7 @@ export const ANALYSIS_METHODS = [
       },
       {
         label: 'Time series multi pane',
-        icon: {font: 'icon-timeseries-chart'},
+        icon: {font: 'icon-Candlestick-icon'},
         type: 'chart:tsPane'
       }
     ]
