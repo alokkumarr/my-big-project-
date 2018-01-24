@@ -9,7 +9,7 @@ const homePage = require('../../javascript/pages/homePage.po');
 const executedAnalysisPage = require('../../javascript/pages/savedAlaysisPage.po');
 const using = require('jasmine-data-provider');
 
-describe('create and delete charts: createAndDeleteCharts.test.js', () => {
+describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   const defaultCategory = 'AT Privileges Category DO NOT TOUCH';
   const categoryName = 'AT Analysis Category DO NOT TOUCH';
   const subCategoryName = 'AT Creating Analysis DO NOT TOUCH';
@@ -42,8 +42,13 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
     'Bubble Chart by user': {user: 'userOne', chartType: 'chart:bubble'}
   };
 
+  beforeAll(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
+  });
+
   beforeEach(function (done) {
     setTimeout(function () {
+      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, 1000)
@@ -51,6 +56,7 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
+      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
     }, 1000)
@@ -62,7 +68,7 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
   });
 
   using(dataProvider, function (data, description) {
-    it('should create ' + description, () => {
+    it('should create and delete ' + description, () => {
       if (data.chartType === 'chart:bubble') {
         metric = 'PTT Subscr Detail';
         yAxisName = 'Call Billed Unit';
@@ -127,12 +133,8 @@ describe('create and delete charts: createAndDeleteCharts.test.js', () => {
       analyzePage.main.getCardTypeByName(chartName).then(actualChartType =>
         expect(actualChartType).toEqual(data.chartType,
           "Chart type on Analyze Page expected to be " + data.chartType + ", but was " + actualChartType));
-    });
 
-    it('should delete ' + description, () => {
-      login.loginAs(data.user);
-      navigateToSubCategory();
-
+      //Delete created chart
       const main = analyzePage.main;
       const cards = main.getAnalysisCards(chartName);
       cards.count().then(count => {

@@ -1,13 +1,11 @@
-const login = require('../javascript/pages/loginPage.po.js');
-const sidenav = require('../javascript/pages/components/sidenav.co.js');
-const analyze = require('../javascript/pages/analyzePage.po.js');
+const loginPage = require('../javascript/pages/loginPage.po.js');
+const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const protractor = require('protractor');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 const {hasClass} = require('../javascript/helpers/utils');
 
-describe('create a new pivot type analysis', () => {
-  let categoryName;
-  const pivotDesigner = analyze.designerDialog.pivot;
+describe('Create pivot type analysis: createPivot.test.js', () => {
+  const pivotDesigner = analyzePage.designerDialog.pivot;
   const pivotName = `e2e pivot${(new Date()).toString()}`;
   const pivotDescription = 'e2e pivot description';
   const dataField = 'Available MB';
@@ -17,51 +15,45 @@ describe('create a new pivot type analysis', () => {
   const metric = 'MCT TMO Session ES';
   const method = 'table:pivot';
 
-  afterAll(function() {
+  beforeAll(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
+  });
+
+  beforeEach(function (done) {
+    setTimeout(function () {
+      browser.waitForAngular();
+      expect(browser.getCurrentUrl()).toContain('/login');
+      done();
+    }, 1000)
+  });
+
+  afterEach(function (done) {
+    setTimeout(function () {
+      browser.waitForAngular();
+      analyzePage.main.doAccountAction('logout');
+      done();
+    }, 1000)
+  });
+
+  afterAll(function () {
     browser.executeScript('window.sessionStorage.clear();');
     browser.executeScript('window.localStorage.clear();');
   });
 
-  it('login as admin', () => {
-    browser.waitForAngular();
-    expect(browser.getCurrentUrl()).toContain('/login');
-    login.loginAs('admin');
-  });
+  it('Should apply filter to Pivot', () => {
+    loginPage.loginAs('admin');
+    commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
+    analyzePage.analysisElems.cardView.click();
 
-  //Obsolete. Now menu opens automatically with first category expanded
-  /* it('should open the sidenav menu and go to first category', () => {
-    sidenav.menuBtn.click();
-    sidenav.publicCategoriesToggle.click();
-    categoryName = sidenav.firstPublicCategory.getText();
-    sidenav.firstPublicCategory.click();
-    expect(analyze.main.categoryTitle.getText()).toEqual(categoryName);
-  }); */
-
-  it('should display list view by default', () => {
-    categoryName = sidenav.firstPublicCategory.getText();
-    analyze.validateListView();
-  });
-
-  it('should switch to card view', () => {
-    commonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
-    analyze.analysisElems.cardView.click();
-  });
-
-  it('should open the new Analysis dialog', () => {
-    analyze.analysisElems.addAnalysisBtn.click();
-    analyze.validateNewAnalyze();
-  });
-
-  it('should select pivot type and proceed', () => {
-    const newDialog = analyze.newDialog;
+    // Create Pivot
+    analyzePage.analysisElems.addAnalysisBtn.click();
+    const newDialog = analyzePage.newDialog;
     newDialog.getMetric(metric).click();
     newDialog.getMethod(method).click();
     newDialog.createBtn.click();
-    expect(pivotDesigner.title.isPresent()).toBe(true);
-  });
 
-  it('should apply filters', () => {
-    const filters = analyze.filtersDialog;
+    // Apply filters
+    const filters = analyzePage.filtersDialog;
     const filterAC = filters.getFilterAutocomplete(0);
     const stringFilterInput = filters.getStringFilterInput(0);
     const fieldName = columnField;
@@ -74,9 +66,8 @@ describe('create a new pivot type analysis', () => {
 
     commonFunctions.waitFor.elementToBePresent(filterName);
     expect(filterName.isPresent()).toBe(true);
-  });
 
-  it('should select row, column and data fields and refresh data', () => {
+    // Should select row, column and data fields and refresh data
     const refreshBtn = pivotDesigner.refreshBtn;
 
     pivotDesigner.getPivotFieldCheckbox(dataField).click();
@@ -92,35 +83,28 @@ describe('create a new pivot type analysis', () => {
     const doesDataNeedRefreshing = hasClass(refreshBtn, 'btn-primary');
     expect(doesDataNeedRefreshing).toBeTruthy();
     refreshBtn.click();
-  });
 
-  it('should attempt to save the report', () => {
-    const save = analyze.saveDialog;
-    const designer = analyze.designerDialog;
+    //Save report
+    const save = analyzePage.saveDialog;
+    const designer = analyzePage.designerDialog;
     commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
     designer.saveBtn.click();
 
     expect(designer.saveDialog).toBeTruthy();
-    expect(save.selectedCategory.getText()).toEqual(categoryName);
 
     save.nameInput.clear().sendKeys(pivotName);
     save.descriptionInput.clear().sendKeys(pivotDescription);
     save.saveBtn.click();
-    commonFunctions.waitFor.elementToBePresent(analyze.main.getCardTitle(pivotName))
-      .then(() => expect(analyze.main.getCardTitle(pivotName).isPresent()).toBe(true));
-  });
+    commonFunctions.waitFor.elementToBePresent(analyzePage.main.getCardTitle(pivotName))
+      .then(() => expect(analyzePage.main.getCardTitle(pivotName).isPresent()).toBe(true));
 
-  it('should delete the created analysis', () => {
-    const main = analyze.main;
+    // Delete Pivot
+    const main = analyzePage.main;
     main.getAnalysisCards(pivotName).count()
       .then(count => {
         main.doAnalysisAction(pivotName, 'delete');
         main.confirmDeleteBtn.click();
         expect(main.getAnalysisCards(pivotName).count()).toBe(count - 1);
       });
-  });
-
-  it('should log out', () => {
-    analyze.main.doAccountAction('logout');
   });
 });

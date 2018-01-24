@@ -2,8 +2,7 @@
   Created by Alex
  */
 
-const login = require('../javascript/pages/loginPage.po.js');
-const analyze = require('../javascript/pages/analyzePage.po.js');
+const loginPage = require('../javascript/pages/loginPage.po.js');
 const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const homePage = require('../javascript/pages/homePage.po.js');
 const executedAnalysis = require('../javascript/pages/savedAlaysisPage.po');
@@ -19,7 +18,8 @@ const using = require('jasmine-data-provider');
 //TODO add case for making multiple privileges inactive
 //TODO add case for adding new privilege
 describe('Privileges tests: privileges.test.js', () => {
-  const dataProvider = {
+  const dataProvider =  {
+    //TODO change user hardcode name to users object
     'All privileges for user': {
       user: 'userOne',
       subCategory: "All DO NOT TOUCH",
@@ -33,7 +33,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: true,
       delete: true
     },
-    'Create privileges for user': {
+    'Create privilege for user': {
       user: 'userOne',
       subCategory: "Create DO NOT TOUCH",
       cardOptions: false,
@@ -46,7 +46,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Edit privileges for user': {
+    'Edit privilege for user': {
       user: 'userOne',
       subCategory: "Edit DO NOT TOUCH",
       cardOptions: true,
@@ -59,7 +59,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Fork privileges for user': {
+    'Fork privilege for user': {
       user: 'userOne',
       subCategory: "Fork DO NOT TOUCH",
       cardOptions: false,
@@ -72,7 +72,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Publish privileges for user': {
+    'Publish privilege for user': {
       user: 'userOne',
       subCategory: "Publish DO NOT TOUCH",
       cardOptions: true,
@@ -85,7 +85,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Execute privileges for user': {
+    'Execute privilege for user': {
       user: 'userOne',
       subCategory: "Execute DO NOT TOUCH",
       cardOptions: true,
@@ -98,7 +98,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Export privileges for user': {
+    'Export privilege for user': {
       user: 'userOne',
       subCategory: "Export DO NOT TOUCH",
       cardOptions: false,
@@ -111,7 +111,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: true,
       delete: false
     },
-    'Delete privileges for user': {
+    'Delete privilege for user': {
       user: 'userOne',
       subCategory: "Delete DO NOT TOUCH",
       cardOptions: true,
@@ -124,7 +124,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: true
     },
-    'View privileges for user': {
+    'View privilege for user': {
       user: 'userOne',
       subCategory: "View DO NOT TOUCH",
       cardOptions: false,
@@ -163,7 +163,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: true,
       delete: true
     },
-    'Create privileges for admin': {
+    'Create privilege for admin': {
       user: 'admin',
       subCategory: "Create DO NOT TOUCH",
       cardOptions: false,
@@ -176,7 +176,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Edit privileges for admin': {
+    'Edit privilege for admin': {
       user: 'admin',
       subCategory: "Edit DO NOT TOUCH",
       cardOptions: true,
@@ -189,7 +189,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Fork privileges for admin': {
+    'Fork privilege for admin': {
       user: 'admin',
       subCategory: "Fork DO NOT TOUCH",
       cardOptions: false,
@@ -202,7 +202,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Publish privileges for admin': {
+    'Publish privilege for admin': {
       user: 'admin',
       subCategory: "Publish DO NOT TOUCH",
       cardOptions: true,
@@ -215,7 +215,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Execute privileges for admin': {
+    'Execute privilege for admin': {
       user: 'admin',
       subCategory: "Execute DO NOT TOUCH",
       cardOptions: true,
@@ -228,7 +228,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: false
     },
-    'Export privileges for admin': {
+    'Export privilege for admin': {
       user: 'admin',
       subCategory: "Export DO NOT TOUCH",
       cardOptions: false,
@@ -241,7 +241,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: true,
       delete: false
     },
-    'Delete privileges for admin': {
+    'Delete privilege for admin': {
       user: 'admin',
       subCategory: "Delete DO NOT TOUCH",
       cardOptions: true,
@@ -254,7 +254,7 @@ describe('Privileges tests: privileges.test.js', () => {
       export: false,
       delete: true
     },
-    'View privileges for admin': {
+    'View privilege for admin': {
       user: 'admin',
       subCategory: "View DO NOT TOUCH",
       cardOptions: false,
@@ -282,9 +282,13 @@ describe('Privileges tests: privileges.test.js', () => {
     },
   };
 
+  beforeAll(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
+  });
 
   beforeEach(function (done) {
     setTimeout(function () {
+      browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
     }, 1000)
@@ -292,6 +296,7 @@ describe('Privileges tests: privileges.test.js', () => {
 
   afterEach(function (done) {
     setTimeout(function () {
+      browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
     }, 1000)
@@ -304,7 +309,7 @@ describe('Privileges tests: privileges.test.js', () => {
 
   using(dataProvider, function (data, description) {
     it('should check ' + description, () => {
-        login.loginAs(data.user);
+        loginPage.loginAs(data.user);
         navigateToDefaultSubCategory();
 
         // Validate presence of Create Button
@@ -314,24 +319,24 @@ describe('Privileges tests: privileges.test.js', () => {
         }));
 
         // Go to Card View
-        commonFunctions.waitFor.elementToBeClickableAndClick(analyze.analysisElems.cardView);
+        commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
 
         // Validate presence of menu on card
-        element(analyze.analysisElems.cardMenuButton.isDisplayed().then(function (isVisible) {
+        element(analyzePage.analysisElems.cardMenuButton.isDisplayed().then(function (isVisible) {
           expect(isVisible).toBe(data.cardOptions,
             "Options on card expected to be " + data.cardOptions + " on Analyze Page, but was " + !data.cardOptions);
         }));
 
         // Validate presence on menu items in card menu
         if (data.cardOptions) {
-          analyze.main.getAnalysisActionOptions(analyze.main.firstCard).then(options => {
+          analyzePage.main.getAnalysisActionOptions(analyzePage.main.firstCard).then(options => {
             let analysisOptions = options;
             expect(options.isPresent()).toBe(true, "Options on card expected to be present on Analyze Page, but weren't");
 
             //should check privileges on card
             expect(isOptionPresent(analysisOptions, "edit")).toBe(data.edit,
               "Edit button expected to be " + data.edit + " on Analyze Page, but was " + !data.edit);
-            expect(analyze.main.getForkBtn(analyze.main.firstCard).isDisplayed()).toBe(data.fork,
+            expect(analyzePage.main.getForkBtn(analyzePage.main.firstCard).isDisplayed()).toBe(data.fork,
               "Fork button expected to be " + data.fork + " on Analyze Page, but was " + !data.fork);
             expect(isOptionPresent(analysisOptions, 'publish')).toBe(data.publish,
               "Publish button expected to be " + data.publish + " on Analyze Page, but was " + !data.publish);
@@ -348,7 +353,7 @@ describe('Privileges tests: privileges.test.js', () => {
         }
 
         // Go to executed analysis page
-        analyze.main.firstCardTitle.click();
+        analyzePage.main.firstCardTitle.click();
         const condition = ec.urlContains('/executed');
         browser
           .wait(() => condition, 1000)
@@ -392,7 +397,7 @@ describe('Privileges tests: privileges.test.js', () => {
     );
 
     function isOptionPresent(options, optionName) {
-      const option = analyze.main.getAnalysisOption(options, optionName);
+      const option = analyzePage.main.getAnalysisOption(options, optionName);
       return option.isPresent();
     }
 
