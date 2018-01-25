@@ -194,7 +194,9 @@ public class Model {
         LTE("LTE"),
         EQ("EQ"),
         NEQ("NEQ"),
-        BTW("BTW");
+        BTW("BTW"),
+        SW("SW"),
+        EW("EW");
         private final String value;
         private final static Map<String, Model.Operator> CONSTANTS = new HashMap<String, Model.Operator>();
 
