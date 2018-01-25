@@ -1,8 +1,8 @@
 <div layout="row">
   <md-input-container md-no-float>
-    <md-select ng-model="$ctrl.tempModel.preset" ng-change="$ctrl.onPresetSelected()" style="width: 130px">
-      <md-option ng-repeat="preset in $ctrl.presets" ng-value="preset.value">
-        {{preset.label}}
+    <md-select ng-model="$ctrl.tempModel.operator" ng-change="$ctrl.onPresetSelected()" style="width: 130px">
+      <md-option ng-repeat="operator in $ctrl.presets" ng-value="operator.value">
+        {{operator.label}}
       </md-option>
     </md-select>
   </md-input-container>

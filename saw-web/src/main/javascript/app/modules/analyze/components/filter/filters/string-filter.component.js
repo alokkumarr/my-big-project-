@@ -35,12 +35,12 @@ export const StringFilterComponent = {
         value: 'SW',
         keyword: 'STARTS_WITH'
       }, {
-        value: 'LQ',
+        value: 'EW',
         keyword: 'ENDS_WITH'
       }];
       $translate(map(this.presets, 'keyword')).then(translations => {
-        forEach(this.presets, preset => {
-          preset.label = translations[preset.keyword];
+        forEach(this.presets, operator => {
+          operator.label = translations[operator.keyword];
         });
       });
     }
@@ -52,13 +52,13 @@ export const StringFilterComponent = {
     }
 
     onPresetSelected() {
-      if (this.tempModel.preset === 'IsIn' || this.tempModel.preset === 'IsNotIn') {
+      if (this.tempModel.operator === 'IsIn' || this.tempModel.operator === 'IsNotIn') {
         this.displayChips = true;
       } else {
         this.displayChips = false;
       }
       this.tempModel.value = null;
-      this.onChange({model: {preset: this.tempModel.preset}});
+      this.onChange({model: {operator: this.tempModel.operator}});
     }
 
     onModelChange() {
@@ -66,7 +66,7 @@ export const StringFilterComponent = {
         value: ''
       };
       this.updatedDate.value = this.tempModel.value;
-      this.updatedDate.preset = this.tempModel.preset;
+      this.updatedDate.operator = this.tempModel.operator;
       this.onChange({model: this.updatedDate});
     }
   }
