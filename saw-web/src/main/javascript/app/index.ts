@@ -14,19 +14,19 @@ import { BrowserModule } from '@angular/platform-browser';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
-import {routesConfig} from './routes';
-import {themeConfig} from './theme';
-import {i18nConfig} from './i18n';
-import {config} from './config';
-import {interceptor} from './http-interceptor';
-import {runConfig} from './run';
+import { routesConfig } from './routes';
+import { themeConfig } from './theme';
+import { i18nConfig } from './i18n';
+import { config } from './config';
+import { interceptor } from './http-interceptor';
+import { runConfig } from './run';
 
-import {ObserveModule, ObserveUpgradeModule} from './modules/observe/index';
-import {AnalyzeModule} from './modules/analyze';
-import {AlertsModule} from './modules/alerts';
-import {AdminModule} from './modules/admin';
+import { ObserveModule, ObserveUpgradeModule } from './modules/observe/index';
+import { AnalyzeModule, AnalyzeUpgradeModule } from './modules/analyze';
+import { AlertsModule } from './modules/alerts';
+import { AdminModule } from './modules/admin';
 
-import {LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent} from './layout';
+import { LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent } from './layout';
 
 export const AppModule = 'app';
 
@@ -55,7 +55,8 @@ angular
     BrowserModule,
     UpgradeModule,
     UIRouterUpgradeModule,
-    ObserveUpgradeModule
+    ObserveUpgradeModule,
+    AnalyzeUpgradeModule
   ]
 })
 export class NewAppModule {

@@ -57,3 +57,14 @@ export const sidenavProvider = {
   useFactory: sidenavFactory,
   deps: ['$injector']
 };
+
+/* Dialog Service */
+export function $mdDialogFactory(i: any) {
+  return i.get('$mdDialog');
+}
+
+export const $mdDialogProvider = {
+  provide: '$mdDialog',
+  useFactory: $mdDialogFactory,
+  deps: ['$injector']
+};
