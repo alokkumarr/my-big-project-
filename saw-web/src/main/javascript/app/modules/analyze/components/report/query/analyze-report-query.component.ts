@@ -1,4 +1,6 @@
+declare const require: any;
 declare const ace: any;
+
 import {
   Component,
   OnDestroy,
@@ -55,6 +57,7 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
 
   ngAfterViewInit() {
     setTimeout(() => {
+      this.editor.getEditor().focus();
       this.editor.getEditor().resize();
     }, 100);
   }
@@ -151,7 +154,6 @@ export class AnalyzeReportQueryComponent implements OnDestroy, AfterViewInit {
 
   doSubmit() {
     this.model.edit = true;
-    this.model.queryManual = this.model.query;
     this.onSave.emit(this.model);
   }
 
