@@ -40,6 +40,7 @@ export const AnalyzeReportComponent = {
       this._FilterService = FilterService;
       this._reloadTimer = null;
       this._modelLoaded = null;
+      this.artifacts = null;
 
       this._modelPromise = new Promise(resolve => {
         this._modelLoaded = resolve;
@@ -78,9 +79,12 @@ export const AnalyzeReportComponent = {
       }
 
       if (this.mode === ENTRY_MODES.EDIT) {
+        this.artifacts = this.model.artifacts;
         this._modelLoaded(true);
       } else {
         this._AnalyzeService.createAnalysis(this.model.semanticId, 'report').then(analysis => {
+
+          this.artifacts = analysis.artifacts;
           this.model = assign(this.model, {
             id: analysis.id,
             metric: analysis.metric,
