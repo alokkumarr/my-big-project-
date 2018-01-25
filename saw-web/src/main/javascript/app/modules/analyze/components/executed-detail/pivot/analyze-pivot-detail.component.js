@@ -1,5 +1,6 @@
 import 'devextreme/ui/pivot_grid';
 import * as isEmpty from 'lodash/isEmpty';
+import * as isPlainObject from 'lodash/isPlainObject';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 
@@ -37,7 +38,7 @@ export const AnalyzePivotDetailComponent = {
     }
 
     updatePivot() {
-      this.deNormalizedData = this._PivotService.parseData(this.normalizedData, this.analysis.sqlBuilder);
+      this.deNormalizedData = this.parseData(this.normalizedData, this.analysis.sqlBuilder);
       this.dataSource.store = this.deNormalizedData;
       const parsedFields = this._PivotService.trimSuffixFromPivotFields(this.fields);
       const {formattedFields, formattedData} = this._PivotService.formatDates(this.deNormalizedData, parsedFields);
@@ -46,6 +47,14 @@ export const AnalyzePivotDetailComponent = {
         dataSource: this.dataSource,
         sorts: this.analysis.sqlBuilder.sorts
       });
+    }
+
+    parseData(data, sqlBuilder) {
+      const parsedData = this._PivotService.parseData(data, sqlBuilder);
+      if (isPlainObject(parsedData)) {
+        return [parsedData];
+      }
+      return parsedData;
     }
 
     request({data, exportAnalysis}) {

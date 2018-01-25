@@ -193,6 +193,7 @@ export class DesignerContainerComponent {
       } else if (data.column_level_1) {
         isDataEmpty = isEmpty(get(data ,'column_level_1.buckets'));
       } else {
+        // when no row or column fields are selected
         forEach((<SqlBuilderPivot>sqlBuilder).dataFields, ({columnName}) => {
           isDataEmpty = isEmpty(get(data , columnName));
           if (isDataEmpty) {
