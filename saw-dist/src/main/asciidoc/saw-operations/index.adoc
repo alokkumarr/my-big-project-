@@ -225,3 +225,113 @@ NOTE: If any metrics contains more than one data object as analysis
 for report then DSK attribute should be configured with
 `dataObjectName.columnName`.  Example: For EXAMPLE_TABLE data object,
 the DSK attribute name should be EXAMPLE_TABLE.ID.
+
+
+== Onboarding customer
+
+We can utilise customer_onboard.sh script in order to execute the command with current environment setup.
+
+    cd /opt/bda/saw-security/bin/
+    bash customer_onboard.sh
+
+Features of spring boot shell:
+
+. Type in "help" and it will show you all the available commands
+
+. Tab based auto completion is supported.
+
+
+    shell:>help
+    AVAILABLE COMMANDS
+    Built-In Commands
+            clear: Clear the shell screen.
+            exit, quit: Exit the shell.
+            help: Display help about available commands.
+            script: Read and execute commands from a file.
+            stacktrace: Display the full stacktrace of the last error.
+    Saw Security Shell
+            onboard-customer: Onboard the customer
+    shell:>
+
+
+Once you are inside the shell, type in onboard-customer and it will start the process of creating customer and related products/components in the system.
+
+In below example, it starts with showing you which products are present in system and asks for basic customer information.
+
+
+    shell:>onboard-customer
+    Customer information:
+    1
+    {PRODUCT_ID=1, PRODUCT_NAME=MCT Insights}
+    {PRODUCT_ID=2, PRODUCT_NAME=SnT Insighjts}
+    {PRODUCT_ID=3, PRODUCT_NAME=Smart Care Insights}
+    {PRODUCT_ID=4, PRODUCT_NAME=SAW Demo}
+    {PRODUCT_ID=5, PRODUCT_NAME=Channel Insights}
+    ====== CUSTOMERS INFORMATION ======
+    Enter CUSTOMER_CODE: (UNIQUE CODE TO IDENTIFY your company / division) temp
+    Enter COMPANY NAME: temp
+    Enter COMPANY BUSINESS: temp
+    Enter PRODUCT ID from above for default landing page: 4
+    Enter DOMAIN_NAME: abc.com
+    Generated CUSTOMER_SYS_ID: 2
+    2018-01-03 10:09:43.676  INFO 6307 --- [           main] c.s.s.s.app.admin.SawSecurityShell       : Created user with ID: 2
+
+
+In this case the generated customer_sys_id is 16. It continues to show product information as we need to associate these products with customers, in my case I chose 4 which is for saw demo.
+
+    {PRODUCT_ID=1, PRODUCT_NAME=MCT Insights}
+    {PRODUCT_ID=2, PRODUCT_NAME=SnT Insighjts}
+    {PRODUCT_ID=3, PRODUCT_NAME=Smart Care Insights}
+    {PRODUCT_ID=4, PRODUCT_NAME=SAW Demo}
+    {PRODUCT_ID=5, PRODUCT_NAME=Channel Insights}
+    ====== CUSTOMER_PRODUCTS TABLE ======
+    Enter PRODUCT_SYS_ID: 4
+    class org.springframework.jdbc.support.GeneratedKeyHolder
+    2
+    Generated CUST_PROD_SYS_ID: 2
+    2018-01-03 12:42:32.522  INFO 6307 --- [           main] c.s.s.s.app.admin.SawSecurityShell       : Created CUST_PROD entry with ID: 2
+
+In this example the generated customer product linkage ID is 11. It continues with displaying modules of all products, sicne we chose saw demo i.e. 4 in previous case. It makes sense to select modules of that product only. i.e. in this case either 4, 7 or 8.
+
+    {MODULE_ID=1, PRODUCT_NAME=MCT Insights, MODULE_NAME=OBSERVE}
+    {MODULE_ID=2, PRODUCT_NAME=SnT Insighjts, MODULE_NAME=OBSERVE}
+    {MODULE_ID=3, PRODUCT_NAME=Smart Care Insights, MODULE_NAME=OBSERVE}
+    {MODULE_ID=4, PRODUCT_NAME=SAW Demo, MODULE_NAME=ANALYZE}
+    {MODULE_ID=5, PRODUCT_NAME=Channel Insights, MODULE_NAME=OBSERVE}
+    {MODULE_ID=6, PRODUCT_NAME=MCT Insights, MODULE_NAME=ANALYZE}
+    {MODULE_ID=7, PRODUCT_NAME=SAW Demo, MODULE_NAME=ALERT}
+    {MODULE_ID=8, PRODUCT_NAME=SAW Demo, MODULE_NAME=OBSERVE}
+    ====== CUSTOMER PRODUCT MODULES ======
+    Enter MODULE_ID (from above shown values):
+    4
+    Enter more? (yes/no): yes
+    Enter MODULE_ID (from above shown values):
+    7
+    Enter more? (yes/no): yes
+    Enter MODULE_ID (from above shown values):
+    8
+    Enter more? (yes/no): no
+
+It continues with displaying that it's creating the relationships and admin role in background followed by creating admin user for the customer.
+
+
+    ====== ASSOCIATING DEFAULT FEATURES ======
+    ====== CREATING ADMIN ROLE ======
+    2018-01-03 12:42:50.059  INFO 6307 --- [           main] c.s.s.s.app.admin.SawSecurityShell       : Created Admin Role for above customer with ID: 5
+    ====== USERS TABLE for ADMIN USER ======
+    Enter MASTER_LOGIN:
+    temp@abc.com
+     Enter EMAIL: temp@abc.com
+    Enter PASSWORD: pleasechangepassword
+    Enter FIRST_NAME:
+    temp
+    Enter MIDDLE_NAME:
+    temp_mn
+    Enter LAST_NAME:
+    temp_ln
+    Generated User ID for current user is: 5
+    2018-01-03 12:43:28.084  INFO 6307 --- [           main] c.s.s.s.app.admin.SawSecurityShell       : Created Admin user with ID: 5
+    ====== CREATING PRIVILEGES FOR ADMIN ======
+    2018-01-03 12:43:28.110  INFO 6307 --- [           main] c.s.s.s.app.admin.SawSecurityShell       : Generated Privilege ID for Admin user: 43
+    shell:>
+    shell:>
