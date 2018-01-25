@@ -1,5 +1,6 @@
 <ace-editor #editor
   [(text)]="model.query"
+  (textChanged)="queryUpdated($event)"
   [options]="editorOptions"
   theme="eclipse"
   mode="sql">
