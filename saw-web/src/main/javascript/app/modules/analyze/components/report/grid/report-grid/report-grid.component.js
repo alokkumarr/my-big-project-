@@ -182,7 +182,7 @@ export const ReportGridComponent = {
         };
 
         if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
-          field.format = 'yyyy/MM/dd';
+          field.format = 'yyyy-MM-dd';
         }
 
         if (NUMBER_TYPES.includes(column.type) && isUndefined(column.format)) {
