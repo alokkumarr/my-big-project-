@@ -68,6 +68,7 @@ export class ToolbarActionDialogComponent {
       break;
     case 'filter':
       result.filters = this.data.filters;
+      result.booleanCriteria = this.data.booleanCriteria;
       break;
     case 'description':
       result.description = this.data.description;

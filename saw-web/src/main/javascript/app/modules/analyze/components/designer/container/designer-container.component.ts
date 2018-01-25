@@ -177,7 +177,7 @@ export class DesignerContainerComponent {
     )
 
     return {
-      booleanCriteria: 'AND',
+      booleanCriteria: this.booleanCriteria,
       filters: this.filters,
       sorts: this.sorts,
       ...partialSqlBuilder
