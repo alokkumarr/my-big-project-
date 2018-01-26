@@ -55,7 +55,7 @@ exports.config = {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000000;
     jasmine.getEnv().defaultTimeoutInterval = 10000000; //another option if above doesn't work
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000000;
-    browser.manage().timeouts().pageLoadTimeout(600000);
+    browser.manage().timeouts().pageLoadTimeout(60000);
     browser.manage().timeouts().implicitlyWait(10000);
     let jasmineReporters = require('jasmine-reporters');
     let junitReporter = new jasmineReporters.JUnitXmlReporter({
