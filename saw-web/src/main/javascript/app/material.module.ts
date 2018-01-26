@@ -16,7 +16,8 @@ import {
   MatMenuModule,
   MatTooltipModule,
   MatDatepickerModule,
-  MatInputModule
+  MatInputModule,
+  MatToolbarModule
 } from '@angular/material';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
@@ -46,7 +47,8 @@ import '../../../../themes/_angular_next.scss';
     MatInputModule,
     MatCardModule,
     MatDatepickerModule,
-    MatMomentDateModule
+    MatMomentDateModule,
+    MatToolbarModule
   ],
   providers: [MatIconRegistry],
   exports: [
@@ -67,7 +69,8 @@ import '../../../../themes/_angular_next.scss';
     MatInputModule,
     MatCardModule,
     MatDatepickerModule,
-    MatMomentDateModule
+    MatMomentDateModule,
+    MatToolbarModule
   ]
 })
 export class MaterialModule {}

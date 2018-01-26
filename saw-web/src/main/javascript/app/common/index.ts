@@ -27,6 +27,7 @@ import 'devextreme/integration/angular';
 
 import { NgModule } from '@angular/core';
 import { DndModule } from './dnd';
+import { MaterialModule } from '../material.module';
 import {DxPivotGridModule, DxPivotGridComponent} from 'devextreme-angular';
 import EventEmitter from './utils/eventEmitter';
 import ComponentHandler from './utils/componentHandler';
@@ -38,9 +39,16 @@ import {CommonDirectiveModule} from './directives';
 // import from login module
 import {AuthServiceFactory} from '../../login/services/auth.service';
 import {PivotGridComponent} from './components/pivot-grid/pivot-grid.component';
+import {ErrorDetailComponent} from './components/error-detail';
 import {E2eDirective} from './directives/e2e.directive';
 import {UserService} from '../../login/services/user.service';
 import {JwtService} from '../../login/services/jwt.service';
+import {ErrorDetailService} from './services/error-detail.service';
+import {ErrorDetailDialogService} from './services/error-detail-dialog.service';
+import { ClickToCopyDirective } from './directives/clickToCopy.directive';
+import {
+  toastProvider
+} from './services/ajs-common-providers';
 
 import AppConfig from '../../../../../appConfig';
 
@@ -82,21 +90,32 @@ angular
 
 @NgModule({
   imports: [
+    MaterialModule,
     DndModule,
     DxPivotGridModule
   ],
   declarations: [
     PivotGridComponent,
+    ClickToCopyDirective,
+    ErrorDetailComponent,
     E2eDirective
   ],
   entryComponents: [
-    PivotGridComponent
+    PivotGridComponent,
+    ErrorDetailComponent
   ],
   exports: [
     DndModule,
     PivotGridComponent,
     DxPivotGridComponent,
+    ClickToCopyDirective,
+    ErrorDetailComponent,
     E2eDirective
+  ],
+  providers: [
+    ErrorDetailService,
+    ErrorDetailDialogService,
+    toastProvider
   ]
 })
 export class CommonModuleTs {}

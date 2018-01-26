@@ -1,18 +1,12 @@
+import { Injectable } from '@angular/core';
 import * as get from 'lodash/get';
 import * as truncate from 'lodash/truncate';
-import * as angular from 'angular';
 
 const ERROR_TITLE_LENGTH = 50;
 
-export function errorDetailService() {
-  'ngInject';
-
-  return {
-    getTitle,
-    getDetail
-  };
-
-  function getTitle(error, defaultMessage = 'Error') {
+@Injectable()
+export class ErrorDetailService {
+  getTitle(error, defaultMessage = 'Error') {
     const title = get(error, 'data.error.message') ||
           get(error, 'data.message', '');
     return title ? truncate(title, {
@@ -20,7 +14,7 @@ export function errorDetailService() {
     }) : defaultMessage;
   }
 
-  function getDetail(error) {
-    return angular.toJson(error);
+  getDetail(error) {
+    return JSON.stringify(error);
   }
 }
