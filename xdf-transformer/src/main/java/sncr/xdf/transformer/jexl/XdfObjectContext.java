@@ -149,7 +149,7 @@ public class XdfObjectContext extends ObjectContext<Row> {
             } else {
                 if (name.charAt(0) == internalFieldPrefix) {
                     String nativeName = name.substring(1);
-                    int fIndex = Arrays.binarySearch(schema.fieldNames(), nativeName);
+                    int fIndex = findField(schema.fieldNames(), nativeName);
                     if (fIndex >= 0) {
                         updateSchema(nativeName, value, fIndex);
                     } else {
@@ -177,6 +177,13 @@ public class XdfObjectContext extends ObjectContext<Row> {
         } catch (Exception e) {
             throw new JexlScriptException("Exception: Setting value of : " + name.toUpperCase() + ":" + e.getMessage(), e);
         }
+    }
+
+    private int findField(String[] a, String k) {
+        for (int i = 0; i < a.length; i++) {
+            if (a[i].equalsIgnoreCase(k)) return i;
+        }
+        return -1;
     }
 
     /**

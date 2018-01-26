@@ -2,7 +2,7 @@
 "inputs" :
 [
 				{
-					"name"    : "TRTEST01",
+					"name"    : "input",
 					"dataSet" : "TRTEST01",
 					"catalog" : "dinp",
 					"format"  : "parquet"
@@ -11,7 +11,7 @@
 "outputs" :
 [
 	{
-		"name"    : "TRTEST01DATA",
+		"name"    : "output",
 		"dataSet" : "TRTEST01_RES",
 		"catalog" : "dout",
 		"format"  : "parquet",
@@ -25,7 +25,7 @@
 		}
 	},
 	{
-		"name"    : "TRTEST01REJ",
+		"name"    : "rejected",
 		"dataSet" : "TRTEST01_REJECTED",
 		"catalog" : "dout",
 		"format"  : "json",
@@ -52,9 +52,6 @@
 "transformer" : {
 		"scriptLocation" : "file:///dfs/opt/bda/apps/xda-ux-sr-comp-dev-1.0.0_dev/scripts",
 		"script" : "transformer.jexl",
-		"inputDataSet" :  "TRTEST01",
-		"outputDataSet" :  "TRTEST01_RES", 
-		"rejectedDataSet" :  "TRTEST01_REJECTED",
 		"scriptEngine" :  "jexl"
 }
 }

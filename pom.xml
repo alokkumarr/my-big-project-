@@ -93,6 +93,7 @@
       <version>${spark-version}</version>
       <scope>${s-value}</scope>
     </dependency>
+
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-streaming_${scala.version}</artifactId>
@@ -246,7 +247,12 @@
       <scope>test</scope>
     </dependency>
 		
-<!-- BDA Internal dependencies START -->		
+<!-- BDA Internal dependencies START -->
+    <dependency>
+      <groupId>com.synchronoss.bda</groupId>
+      <artifactId>core</artifactId>
+      <version>1.0.0_dev</version>
+    </dependency>
     <dependency>
 			<groupId>com.synchronoss.bda</groupId>
       <artifactId>meta-api</artifactId>

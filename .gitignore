@@ -5,7 +5,10 @@ log/
 wrk/
 target/
 _*/
+.DS_Store/
 
+
+*@*
 # ignore all files ending with ~
 *~
 _*

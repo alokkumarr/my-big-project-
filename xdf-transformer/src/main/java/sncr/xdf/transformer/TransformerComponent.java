@@ -3,6 +3,8 @@ package sncr.xdf.transformer;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
+import sncr.bda.conf.Input;
+import sncr.bda.conf.Output;
 import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.component.Component;
 import sncr.xdf.component.WithDataSetService;
@@ -33,8 +35,6 @@ public class TransformerComponent extends Component implements WithMovableResult
 
     private static final Logger logger = Logger.getLogger(TransformerComponent.class);
     private String tempLocation;
-    private String outDataSet;
-    private String rejectedDataSet;
 
     {
         componentName = "transformer";
@@ -82,19 +82,13 @@ public class TransformerComponent extends Component implements WithMovableResult
                 }
             }
             logger.debug("Script to execute:\n" +  script);
-            String inputDS = ctx.componentConfiguration.getTransformer().getInputDataSet();
-            String[] refDataSets = ctx.componentConfiguration.getTransformer().getReferenceData().toArray(new String[0]);
 
-
-            outDataSet = ctx.componentConfiguration.getTransformer().getOutputDataSet();
-            rejectedDataSet = ctx.componentConfiguration.getTransformer().getRejectedDataSet();
-            logger.debug(String.format("Configuration parameters => input DS: %s, output DS: %s, rejected DS: %s ", inputDS, outDataSet, rejectedDataSet));
 
 //2. Read input datasets
 //TODO:: Some of datasets may be regarded as reference data, add reference data as Json array to Transformer configuration.
 
             Map<String, Dataset> dsMap = new HashMap();
-            for ( Map.Entry<String, Map<String, String>> entry : inputDataSets.entrySet()) {
+            for ( Map.Entry<String, Map<String, String>> entry : inputs.entrySet()) {
                 Map<String, String> desc = entry.getValue();
                 String loc = desc.get(DataSetProperties.PhysicalLocation.name());
                 String format = desc.get(DataSetProperties.Format.name());
@@ -118,12 +112,10 @@ public class TransformerComponent extends Component implements WithMovableResult
                 JexlExecutor jexlExecutor =
                         new JexlExecutor(ctx.sparkSession,
                                         script,
-                                        inputDS,
-                                        refDataSets,
-                                        outDataSet,
-                                        rejectedDataSet,
                                         tempLocation,
-                                        outputDataSets);
+                                        0,
+                                        inputs,
+                                        outputs);
                 jexlExecutor.execute(dsMap);
             }
             else if (engine == Transformer.ScriptEngine.JANINO){
@@ -151,8 +143,8 @@ public class TransformerComponent extends Component implements WithMovableResult
     protected int Move(){
 
         List<Map<String, String>> dss = new ArrayList<>();
-        dss.add(outputDataSets.get(outDataSet));
-        dss.add(outputDataSets.get(rejectedDataSet));
+        dss.add(outputs.get(RequiredNamedParameters.Output.toString()));
+        dss.add(outputs.get(RequiredNamedParameters.Rejected.toString()));
         for ( Map<String, String> ads : dss) {
             String name = ads.get(DataSetProperties.Name.name());
             String src = tempLocation + Path.SEPARATOR + name;
@@ -183,9 +175,27 @@ public class TransformerComponent extends Component implements WithMovableResult
         if (transformerCfg.getScriptLocation() == null || transformerCfg.getScriptLocation().isEmpty()) {
             throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Transformer descriptor does not have script location.");
         }
-        if (transformerCfg.getInputDataSet() == null || transformerCfg.getInputDataSet().isEmpty()) {
-            throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: Transformer descriptor does not define input dataset.");
+
+        boolean valid = false;
+        for( Input inpK: compConf.getInputs()){
+            if (inpK.getName() != null && inpK.getName().equalsIgnoreCase(RequiredNamedParameters.Input.toString())){
+                valid = true; break;
+            }
         }
+
+        if (!valid) throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: dataset parameter with name 'input' does not exist .");
+
+        valid = false;
+        boolean rvalid = false;
+        for( Output outK: compConf.getOutputs()) {
+            if (outK.getName() != null && outK.getName().equalsIgnoreCase(RequiredNamedParameters.Output.toString())) {
+                valid = true;
+            } else if (outK.getName() != null && outK.getName().equalsIgnoreCase(RequiredNamedParameters.Rejected.toString())) {
+                rvalid = true;
+            }
+        }
+        if (!valid || !rvalid) throw new XDFException(XDFException.ErrorCodes.ConfigError, "Incorrect configuration: dataset parameter with name 'output/rejecteds' does not exist .");
+
         return compConf;
     }
 
@@ -196,4 +206,8 @@ public class TransformerComponent extends Component implements WithMovableResult
 
 
 
+
+
 }
+
+

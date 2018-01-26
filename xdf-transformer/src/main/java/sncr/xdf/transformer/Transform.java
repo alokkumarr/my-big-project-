@@ -31,6 +31,7 @@ public class Transform implements Function<Row, Row> {
     private final StructAccumulator structAccumulator;
     private final String bcFistRefDataSet;
     private final StructType schema;
+    private final int threshold;
 
     private Map<String, Broadcast<Dataset>> mapRefData = null;
     private Map<String, Object> extFunctions;
@@ -45,6 +46,7 @@ public class Transform implements Function<Row, Row> {
                      LongAccumulator successTransformationsCount,
                      LongAccumulator failedTransformationsCount,
                      StructAccumulator structAccumulator,
+                     int threshold,
                      String  bcFistRefDataSet)
             throws Exception {
         script = scr;
@@ -54,12 +56,16 @@ public class Transform implements Function<Row, Row> {
         this.failedTransformationsCount = failedTransformationsCount;
         this.structAccumulator = structAccumulator;
         this.mapRefData = mapRefData;
+        this.threshold = threshold;
         //fieldToIdxMapping = XdfObjectContext.PrepareFieldMapping(objectSchema);
         this.bcFistRefDataSet = bcFistRefDataSet;
     }
 
-    public Row call(Row arg0) {
+    public Row call(Row arg0) throws Exception {
         Row return_value;
+        if ( threshold != 0 && failedTransformationsCount.value() > threshold)
+            throw new Exception(String.format("Number of invalid records [%d] exceeds threshold value [%d]", failedTransformationsCount.value(), threshold));
+
         try {
             if (jexlEngine == null) {
                 // Initialize
