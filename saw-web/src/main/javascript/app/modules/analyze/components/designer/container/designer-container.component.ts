@@ -8,6 +8,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as filter from 'lodash/filter';
 import * as unset from 'lodash/unset';
 import * as get from 'lodash/get';
+import * as isNumber from 'lodash/isNumber';
 import * as forEach from 'lodash/forEach';
 import * as map from 'lodash/map';
 import * as find from 'lodash/find';
@@ -77,7 +78,7 @@ export class DesignerContainerComponent {
       break;
     case 'edit':
       this.initExistingAnalysis();
-      this.requestData();
+      this.requestDataIfPossible();
       break;
     default:
       break;
@@ -106,7 +107,6 @@ export class DesignerContainerComponent {
         });
       break;
     case 'preview':
-      this.updateAnalysis();
       this._analyzeDialogService.openPreviewDialog(this.analysis);
       break;
     case 'description':
@@ -145,9 +145,17 @@ export class DesignerContainerComponent {
     this.booleanCriteria = this.analysis.sqlBuilder.booleanCriteria;
   }
 
+  requestDataIfPossible() {
+    this.updateAnalysis();
+    if (this.canRequestData()) {
+      this.requestData();
+    } else {
+      this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+    }
+  }
+
   requestData() {
     this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
-    this.updateAnalysis();
     this._designerService.getDataForAnalysis(this.analysis)
       .then((data: any) => {
         if (this.isDataEmpty(data.data, this.analysis.type, this.analysis.sqlBuilder)) {
@@ -203,26 +211,20 @@ export class DesignerContainerComponent {
   onSettingsChange() {
     this.firstArtifactColumns = this.getFirstArtifactColumns();
     this.cleanSorts();
-    if (this.canRequestData()) {
-      this.requestData();
-    } else {
-      this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
-    }
+    this.requestDataIfPossible()
   }
 
   canRequestData() {
     // there has to be at least 1 data field, to make a request
-    const nrOfDataFields = fpPipe(
-      fpFilter('checked'),
-      fpReduce((accumulator, {type}) => {
-        if (NUMBER_TYPES.includes(type)) {
-          return accumulator + 1;
-        }
-        return accumulator;
-      }, 0)
-    )(this.firstArtifactColumns);
+    switch (this.analysis.type) {
+    case 'pivot':
+      const length = get(this.analysis, 'sqlBuilder.dataFields.length');
+      return isNumber(length) ? length > 0 : false;
+    case 'chart':
+    case 'report':
+      return false;
+    }
 
-    return nrOfDataFields > 0
   }
 
   getFirstArtifactColumns() {
