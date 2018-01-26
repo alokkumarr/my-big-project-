@@ -11,7 +11,6 @@ import * as get from 'lodash/get';
 import * as forEach from 'lodash/forEach';
 import * as map from 'lodash/map';
 import * as find from 'lodash/find';
-import * as isPlainObject from 'lodash/isPlainObject';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpReduce from 'lodash/fp/reduce';
 import * as fpFilter from 'lodash/fp/filter';
@@ -155,19 +154,11 @@ export class DesignerContainerComponent {
           this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
         } else {
           this.designerState = DesignerStates.SELECTION_WITH_DATA;
-          this.data = this.parseData(data.data, this.analysis.sqlBuilder);
+          this.data = this._designerService.parseData(data.data, this.analysis.sqlBuilder);
         }
       }, err => {
         this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
       });
-  }
-
-  parseData(data, sqlBuilder) {
-    const parsedData = this._designerService.parseData(data, sqlBuilder);
-    if (isPlainObject(parsedData)) {
-      return [parsedData];
-    }
-    return parsedData;
   }
 
   getSqlBuilder(): SqlBuilder {

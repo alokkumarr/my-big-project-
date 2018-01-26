@@ -4,13 +4,38 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-import * as forEach from 'lodash/forEach';
 import * as isArray from 'lodash/isArray';
 import * as get from 'lodash/get';
+import * as map from 'lodash/map';
 import * as isEmpty from 'lodash/isEmpty';
+import * as forEach from 'lodash/forEach';
+import * as clone from 'lodash/clone';
+import * as split from 'lodash/split';
+import * as isPlainObject from 'lodash/isPlainObject';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpPick from 'lodash/fp/pick';
+import * as fpMap from 'lodash/fp/map';
+import * as fpFilter from 'lodash/fp/filter';
+import * as fpForEach from 'lodash/fp/forEach';
+import * as fpMapKeys from 'lodash/fp/mapKeys';
+import * as moment from 'moment';
 import {Subject} from 'rxjs/Subject';
 import {Sort} from '../../../modules/analyze/models/sort.model'
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
+import {
+  ArtifactColumnPivot
+} from '../../../modules/analyze/models/artifact-column.model';
+import {
+  DATE_TYPES,
+  NUMBER_TYPES,
+  DATE_INTERVALS_OBJ
+} from '../../../modules/analyze/consts';
+
+const ARTIFACT_COLUMN_2_PIVOT_FIELD = {
+  displayName: 'caption',
+  columnName: 'dataField',
+  aggregate: 'summaryType'
+};
 
 require('./pivot-grid.component.scss');
 const template = require('./pivot-grid.component.html');
@@ -30,10 +55,29 @@ export interface IPivotGridUpdate {
 export class PivotGridComponent {
   @Input() updater: Subject<IPivotGridUpdate>;
   @Input() mode: string | 'designer';
-  @Input() fields: any[];
-  @Input() data: any[];
-  @Input() sorts: Sort[];
+  @Input('sorts') set setSorts(sorts: Sort[]) {
+    if (sorts) {
+      this.delayIfNeeded(() => {
+        this.updateSorts(sorts);
+      });
+    }
+  };
+  @Input('data') set setData(data: any[]) {
+    this.data = this.preProcessData(data);
+    this.setPivotData();
+  };
+  @Input('artifactColumns') set setArtifactColumns(artifactColumns: ArtifactColumnPivot[]) {
+    this.artifactColumns = fpPipe(
+      fpFilter('checked'),
+      this.preProcessArtifactColumns(),
+      this.artifactColumn2PivotField()
+    )(artifactColumns);
+    this.setPivotData();
+  };
   @Output() onContentReady: EventEmitter<any> = new EventEmitter();
+  public fields: any[];
+  public data: any[];
+  public artifactColumns: ArtifactColumnPivot[];
   public pivotGridOptions : any;
   rowHeaderLayout = 'tree';
   allowSortingBySummary = false
@@ -84,22 +128,13 @@ export class PivotGridComponent {
     this._preExportState = null;
   }
 
-  ngOnChanges(changes) {
-    const data = get(changes, 'data.currentValue');
-    const fields = get(changes, 'fields.currentValue');
-    const sorts = get(changes, 'sorts.currentValue');
-    if (isArray(data) || isArray(fields)) {
+  setPivotData() {
+    if (isArray(this.data) && isArray(this.artifactColumns)) {
       const dataSource = new PivotGridDataSource({
-        store: data || [],
-        fields: fields || []
+        store: this.data || [],
+        fields: this.artifactColumns || []
       });
       this.updateDataSource(dataSource);
-    }
-
-    if (sorts) {
-      this.delayIfNeeded(() => {
-        this.updateSorts(sorts);
-      });
     }
   }
 
@@ -159,5 +194,81 @@ export class PivotGridComponent {
     } else {
       setTimeout(() => fn(), 100);
     }
+  }
+
+  preProcessArtifactColumns() {
+    return fpMap((column: ArtifactColumnPivot) => {
+      // manually format dates for day quarter and month dateIntervals
+      if (DATE_TYPES.includes(column.type)) {
+        const cloned = clone(column);
+        if (['day', 'quarter', 'month'].includes(column.dateInterval)) {
+          cloned.type = 'string';
+        } else {
+          cloned.groupInterval = cloned.dateInterval;
+        }
+        return cloned;
+      }
+      return column;
+    });
+  }
+
+  preProcessData(data) {
+    if (isPlainObject(data)) {
+      data = [data];
+    }
+    const processedData = this.formatDates(data, this.artifactColumns);
+    return processedData;
+  }
+
+  formatDates(data, fields: ArtifactColumnPivot[]) {
+    if (isEmpty(this.artifactColumns)) {
+      return data;
+    }
+
+    const formattedData = map(data, dataPoint => {
+
+      const clonedDataPoint = clone(dataPoint);
+      fpPipe(
+        fpFilter(({type}) => DATE_TYPES.includes(type)),
+        fpForEach(({columnName, dateInterval}) => {
+          const format = DATE_INTERVALS_OBJ[dateInterval].format;
+          clonedDataPoint[columnName] = moment.utc(dataPoint[columnName]).format(format);
+          if (dateInterval === 'quarter') {
+            const parts = split(clonedDataPoint[columnName], '-');
+            clonedDataPoint[columnName] = `${parts[0]}-Q${parts[1]}`;
+          }
+        })
+      )(this.artifactColumns);
+      return clonedDataPoint;
+    });
+    return formattedData;
+  }
+
+  artifactColumn2PivotField(): any {
+    return fpPipe(
+      fpMap((artifactColumn) => {
+        const cloned = clone(artifactColumn);
+
+        if (NUMBER_TYPES.includes(cloned.type)) {
+          cloned.dataType = 'number';
+          cloned.format = {
+            type: 'fixedPoint',
+            precision: 2
+          };
+        } else {
+          cloned.dataType = cloned.type;
+        }
+
+        if (cloned.type === 'string') {
+          cloned.columnName = split(cloned.columnName, '.')[0];
+        }
+
+        return cloned;
+      }),
+      fpMap(fpMapKeys(key => {
+        const newKey = ARTIFACT_COLUMN_2_PIVOT_FIELD[key];
+        return newKey || key;
+      }))
+    );
   }
 }

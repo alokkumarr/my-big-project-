@@ -12,7 +12,7 @@
 
 <div class="preview-container">
   <pivot-grid *ngIf="previewData"
-              [fields]="artifactColumns | artifactColumns2PivotFields"
+              [artifactColumns]="artifactColumns"
               [sorts]="data.analysis.sqlBuilder.sorts"
               [data]="previewData"
               mode="preview">
