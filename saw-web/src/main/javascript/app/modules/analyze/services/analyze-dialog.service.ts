@@ -5,6 +5,7 @@ import {
   AnalysisDialogData,
   AnalysisStarter,
   Analysis,
+  DesignerMode,
   Sort,
   Filter,
   IToolbarActionData,
@@ -28,10 +29,10 @@ export class AnalyzeDialogService {
     return this.openAnalysisDialog(data);
   }
 
-  openEditAdnalysisDialog(analysis: Analysis) {
+  openEditAdnalysisDialog(analysis: Analysis, mode: DesignerMode = 'edit') {
     const data: AnalysisDialogData = {
       analysis,
-      designerMode: 'edit'
+      designerMode: mode
     };
     return this.openAnalysisDialog(data);
   }

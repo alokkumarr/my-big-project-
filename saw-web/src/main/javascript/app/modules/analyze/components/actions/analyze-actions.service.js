@@ -91,7 +91,7 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
       openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
       break;
     case AnalyseTypes.Pivot:
-      AnalyzeDialogService.openEditAdnalysisDialog(analysis);
+      AnalyzeDialogService.openEditAdnalysisDialog(analysis, mode);
       break;
     default:
     }

@@ -80,9 +80,70 @@ export class DesignerContainerComponent {
       this.initExistingAnalysis();
       this.requestDataIfPossible();
       break;
+    case 'fork':
+      this.forkAnalysis().then(() => {
+        this.initExistingAnalysis();
+        this.requestDataIfPossible();
+      });
     default:
       break;
     }
+  }
+
+  initNewAnalysis() {
+    const {type, semanticId} = this.analysisStarter;
+    this._designerService.createAnalysis(semanticId, type)
+      .then((newAnalysis: Analysis) => {
+        this.analysis = {...this.analysisStarter, ...newAnalysis};
+        unset(this.analysis, 'supports');
+        unset(this.analysis, 'categoryId');
+      });
+  }
+
+  initExistingAnalysis() {
+    this.firstArtifactColumns = this.getFirstArtifactColumns();
+    this.filters = this.analysis.sqlBuilder.filters;
+    this.sorts = this.analysis.sqlBuilder.sorts;
+    this.booleanCriteria = this.analysis.sqlBuilder.booleanCriteria;
+  }
+
+  forkAnalysis() {
+    const {type, semanticId} = this.analysis;
+    return this._designerService.createAnalysis(semanticId, type)
+      .then((newAnalysis: Analysis) => {
+        this.analysis = {...this.analysis, ...{
+          id: newAnalysis.id,
+          metric: newAnalysis.metric,
+          createdTimestamp: newAnalysis.createdTimestamp,
+          userId: newAnalysis.userId,
+          userFullName: newAnalysis.userFullName,
+          metricName: newAnalysis.metricName
+        }};
+      });
+  }
+
+  requestDataIfPossible() {
+    this.updateAnalysis();
+    if (this.canRequestData()) {
+      this.requestData();
+    } else {
+      this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
+    }
+  }
+
+  requestData() {
+    this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
+    this._designerService.getDataForAnalysis(this.analysis)
+      .then((data: any) => {
+        if (this.isDataEmpty(data.data, this.analysis.type, this.analysis.sqlBuilder)) {
+          this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
+        } else {
+          this.designerState = DesignerStates.SELECTION_WITH_DATA;
+          this.data = this._designerService.parseData(data.data, this.analysis.sqlBuilder);
+        }
+      }, err => {
+        this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
+      });
   }
 
   onToolbarAction(action: DesignerToolbarAciton) {
@@ -126,47 +187,6 @@ export class DesignerContainerComponent {
       });
       break;
     }
-  }
-
-  initNewAnalysis() {
-    const {type, semanticId} = this.analysisStarter;
-    this._designerService.createAnalysis(semanticId, type)
-      .then((newAnalysis: Analysis) => {
-        this.analysis = {...this.analysisStarter, ...newAnalysis};
-        unset(this.analysis, 'supports');
-        unset(this.analysis, 'categoryId');
-      });
-  }
-
-  initExistingAnalysis() {
-    this.firstArtifactColumns = this.getFirstArtifactColumns();
-    this.filters = this.analysis.sqlBuilder.filters;
-    this.sorts = this.analysis.sqlBuilder.sorts;
-    this.booleanCriteria = this.analysis.sqlBuilder.booleanCriteria;
-  }
-
-  requestDataIfPossible() {
-    this.updateAnalysis();
-    if (this.canRequestData()) {
-      this.requestData();
-    } else {
-      this.designerState = DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA;
-    }
-  }
-
-  requestData() {
-    this.designerState = DesignerStates.SELECTION_WAITING_FOR_DATA;
-    this._designerService.getDataForAnalysis(this.analysis)
-      .then((data: any) => {
-        if (this.isDataEmpty(data.data, this.analysis.type, this.analysis.sqlBuilder)) {
-          this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
-        } else {
-          this.designerState = DesignerStates.SELECTION_WITH_DATA;
-          this.data = this._designerService.parseData(data.data, this.analysis.sqlBuilder);
-        }
-      }, err => {
-        this.designerState = DesignerStates.SELECTION_WITH_NO_DATA;
-      });
   }
 
   getSqlBuilder(): SqlBuilder {
