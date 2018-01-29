@@ -56,11 +56,6 @@
 			<artifactId>jolokia-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.jayway.jsonpath</groupId>
-			<artifactId>json-path</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.github.fge</groupId>
 			<artifactId>json-schema-validator</artifactId>
 			<version>${json.validate}</version>
@@ -118,12 +113,37 @@
 			<artifactId>guava</artifactId>
 			<version>19.0</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.elasticsearch.client</groupId>
-			<artifactId>transport</artifactId>
+			<artifactId>rest</artifactId>
 			<version>5.4.0</version>
 		</dependency>
+		
+		<dependency>
+		    <groupId>org.apache.lucene</groupId>
+		    <artifactId>lucene-test-framework</artifactId>
+		    <version>6.4.0</version>
+		    <scope>test</scope>
+		</dependency>
 
+		<dependency>
+		    <groupId>org.elasticsearch.test</groupId>
+		    <artifactId>framework</artifactId>
+		    <version>5.4.0</version>
+		    <scope>test</scope>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.jayway.jsonpath</groupId>
+		    <artifactId>json-path</artifactId>
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.jayway.jsonpath</groupId>
+		    <artifactId>json-path-assert</artifactId>
+		</dependency>
+	
 		<!-- APACHE COMMONS LANG -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>

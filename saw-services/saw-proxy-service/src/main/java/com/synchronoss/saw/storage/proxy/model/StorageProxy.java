@@ -18,7 +18,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @JsonPropertyOrder({
   "storage",
   "action",
-  "query",
   "requestBy",
   "requestedTime",
   "productCode",
@@ -134,6 +133,16 @@ public class StorageProxy {
     @JsonProperty("requestedTime")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
     private String requestedTime;
+
+    @JsonProperty("responseTime")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private String responseTime;
+    
+    @JsonProperty("dataColumnHeader")
+    @JsonPropertyDescription("An explanation about the purpose of this instance.")
+    private Object dataColumnHeader;
+
+    
     /**
      * The Productcode Schema
      * <p>
@@ -536,6 +545,23 @@ public class StorageProxy {
     public void setSqlBuilder(SqlBuilder sqlBuilder) {
       this.sqlBuilder = sqlBuilder;
     }
+    @JsonProperty("responseTime")
+    public String getResponseTime() {
+      return responseTime;
+    }
+    @JsonProperty("responseTime")
+    public void setResponseTime(String responseTime) {
+      this.responseTime = responseTime;
+    }
+
+    @JsonProperty("dataColumnHeader")
+    public Object getDataColumnHeader() {
+      return dataColumnHeader;
+    }
+    @JsonProperty("dataColumnHeader")
+    public void setDataColumnHeader(Object dataColumnHeader) {
+      this.dataColumnHeader = dataColumnHeader;
+    }
 
 
 
@@ -546,7 +572,6 @@ public class StorageProxy {
         AGGREGATE("aggregate"),
         CREATE("create"),
         DELETE("delete"),
-        UPDATE("update"),
         SNCRPIVOT("sncrpivot"),
         COUNT("count");
         private final String value;

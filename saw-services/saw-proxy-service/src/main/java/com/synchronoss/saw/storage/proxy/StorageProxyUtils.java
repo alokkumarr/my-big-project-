@@ -7,6 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ClassPathResource;
@@ -127,15 +128,24 @@ public class StorageProxyUtils {
     return StringUtils.join(items.toArray(), separator);
 }
   
-  public static String getTabularFormat(List<Map<String, Object>> flatJson, String separator) {
+  public static List<Object> getTabularFormat(List<Map<String, Object>> flatJson, String separator) {
+    List<Object> data = new ArrayList<>();
     Set<String> headers = collectHeaders(flatJson);
-    String csvString = StringUtils.join(headers.toArray(), separator) + "\n";
-
+    String csvString = StringUtils.join(headers.toArray(), separator);
+    data.add(csvString);
     for (Map<String, Object> map : flatJson) {
-        csvString = csvString + getSeperatedColumns(headers, map, separator) + "\n";
+        csvString = getSeperatedColumns(headers, map, separator);
+        data.add(csvString);
     }
-
-    return csvString;
+    return data;
 }
+  
+  public static Set<String> collectOrderedHeaders(List<Map<String, Object>> flatJson) {
+    Set<String> headers = new TreeSet<String>();
+    for (Map<String, Object> map : flatJson) {
+        headers.addAll(map.keySet());
+    }
+    return headers;
+}  
   
 }
