@@ -80,7 +80,7 @@ public class ComponentConfiguration {
      */
     @SerializedName("es-loader")
     @Expose
-    private Object esLoader;
+    private ESLoader esLoader;
     /**
      * ES Reader specific properties
      * 
@@ -141,7 +141,9 @@ public class ComponentConfiguration {
      * @param esReader
      * @param parameters
      */
-    public ComponentConfiguration(List<Input> inputs, List<Output> outputs, String project, List<Parameter> parameters, Parser parser, Scd2 scd2, Sql sql, Transformer transformer, Object esLoader, Object esReader, Object converter, Object dbLoader, Analyzer analyzer, Object zero) {
+    public ComponentConfiguration(List<Input> inputs, List<Output> outputs, String project, List<Parameter> parameters,
+                                  Parser parser, Scd2 scd2, Sql sql, Transformer transformer, ESLoader esLoader,
+                                  Object esReader, Object converter, Object dbLoader, Analyzer analyzer, Object zero) {
         this.inputs = inputs;
         this.outputs = outputs;
         this.project = project;
@@ -364,7 +366,7 @@ public class ComponentConfiguration {
      * @return
      *     The esLoader
      */
-    public Object getEsLoader() {
+    public ESLoader getEsLoader() {
         return esLoader;
     }
 
@@ -374,11 +376,11 @@ public class ComponentConfiguration {
      * @param esLoader
      *     The es-loader
      */
-    public void setEsLoader(Object esLoader) {
+    public void setEsLoader(ESLoader esLoader) {
         this.esLoader = esLoader;
     }
 
-    public ComponentConfiguration withEsLoader(Object esLoader) {
+    public ComponentConfiguration withEsLoader(ESLoader esLoader) {
         this.esLoader = esLoader;
         return this;
     }
@@ -515,7 +517,22 @@ public class ComponentConfiguration {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(inputs).append(outputs).append(project).append(parameters).append(parser).append(scd2).append(sql).append(transformer).append(esLoader).append(esReader).append(converter).append(dbLoader).append(analyzer).append(zero).toHashCode();
+        return new HashCodeBuilder()
+                .append(inputs)
+                .append(outputs)
+                .append(project)
+                .append(parameters)
+                .append(parser)
+                .append(scd2)
+                .append(sql)
+                .append(transformer)
+                .append(esLoader)
+                .append(esReader)
+                .append(converter)
+                .append(dbLoader)
+                .append(analyzer)
+                .append(zero)
+                .toHashCode();
     }
 
     @Override
@@ -527,7 +544,22 @@ public class ComponentConfiguration {
             return false;
         }
         ComponentConfiguration rhs = ((ComponentConfiguration) other);
-        return new EqualsBuilder().append(inputs, rhs.inputs).append(outputs, rhs.outputs).append(project, rhs.project).append(parameters, rhs.parameters).append(parser, rhs.parser).append(scd2, rhs.scd2).append(sql, rhs.sql).append(transformer, rhs.transformer).append(esLoader, rhs.esLoader).append(esReader, rhs.esReader).append(converter, rhs.converter).append(dbLoader, rhs.dbLoader).append(analyzer, rhs.analyzer).append(zero, rhs.zero).isEquals();
+        return new EqualsBuilder()
+                .append(inputs, rhs.inputs)
+                .append(outputs, rhs.outputs)
+                .append(project, rhs.project)
+                .append(parameters, rhs.parameters)
+                .append(parser, rhs.parser)
+                .append(scd2, rhs.scd2)
+                .append(sql, rhs.sql)
+                .append(transformer, rhs.transformer)
+                .append(esLoader, rhs.esLoader)
+                .append(esReader, rhs.esReader)
+                .append(converter, rhs.converter)
+                .append(dbLoader, rhs.dbLoader)
+                .append(analyzer, rhs.analyzer)
+                .append(zero, rhs.zero)
+                .isEquals();
     }
 
 }

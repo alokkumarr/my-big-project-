@@ -308,7 +308,79 @@
     },
     "es-loader" : {
       "description": "ES Loader specific properties",
-      "properties": {}
+      "properties": {
+        "destinationIndexName": {
+          "description": "Index to which the data has to be loaded",
+          "type": "string"
+        },
+        "indexMappingfile": {
+          "description": "Name of the file with index mapping (definition), optional",
+          "type": "string",
+          //default: "" // TODO: Verify if required
+          "required": false
+        },
+        "documentIDField": {
+          "description": "", //TODO: Fill this detail
+          "type": "string",
+          "required": false
+        },
+        "filterString": { //TODO: Is this field required?
+          "description": "Used to filter data from the given dataset using conditional statements (E.g.: col1='STR1' AND length > 10)",
+          "type": "string",
+          "required": false
+        },
+        "inputFormat": {
+          "description": "Format of the input file. E.g.: json, parquet",
+          "type": "string",
+          "required": false,
+          "default": "parquet"
+        },
+        "aliases": {
+          "description": "List of aliases and coresponding loading modes",
+          "type": "array",
+          "items" : {
+            "description" : "Object contains alias name and loading mode",
+            "type" : "object",
+            "properties" : {
+              "aliasName" : {
+                "description" : "Name of alias",
+                "type" : "string"
+              },
+              "mode" : {
+                "default" : "append",
+                "description" : "Mode of output",
+                "enum" : [ "replace", "append" ]
+              }
+            },
+            "required" : [ "aliasName", "mode" ]
+          }
+        },
+        "esNodes": {
+          "description": "Comma separated list of host names or IP addresses",
+          "type": "string"
+        },
+        "esClusterName": {
+          "description": "Name of the ElasticSearch cluster. By default, the cluster name will be elasticsearch",
+          "type": "string"
+        },
+        "esPort": {
+          "description": "Connecting port for ElasticSearch server",
+          "type": "integer",
+          "default": 9100
+        },
+        "esMappingId": {
+          "description": "Key column in the dataset to which the record in ES will be matched",
+          "type": "string"
+        },
+        "esUser": {
+          "description": "User name for ElasticSearch",
+          "type": "string"
+        },
+        "esPass": {
+          "description": "Password for the username mentioned for the ElasticSearch",
+          "type": "string"
+        }
+      }
     },
     "es-reader" : {
       "description": "ES Reader specific properties",
