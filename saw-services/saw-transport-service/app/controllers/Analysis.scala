@@ -470,6 +470,83 @@ class Analysis extends BaseController {
       
       return myArray
     }
+
+    if ( typeInfo.equals("esReport") )
+    {
+      var data : String= null
+      if (dataSecurityKeyStr!=null) {
+        m_log.trace("dataSecurityKeyStr dataset inside pivot block: {}", dataSecurityKeyStr);
+        data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(
+          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.ESREPORT, json, dataSecurityKeyStr), json);
+      }
+      else {
+        data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(
+          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.ESREPORT, json), json);
+      }
+
+      val finishedTS = System.currentTimeMillis;
+      val myArray = parse(data);
+      m_log.trace("pivot dataset: {}", myArray)
+
+      var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
+      // The below block is for execution result to store
+      if (data !=null){
+        var nodeExists = false
+        try {
+          m_log debug s"Remove result: " + analysisResultNodeID
+          resultNode = AnalysisResult(analysisId, analysisResultNodeID)
+          nodeExists = true
+        }
+        catch {
+          case e: Exception => m_log debug("Tried to load node: {}", e.toString)
+        }
+        if (nodeExists) resultNode.delete
+
+        schema  = JObject(JField("schema", JString("Does not need int")))
+        descriptor = new JObject(List(
+          JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+          JField("id", JString(analysisId)),
+          JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+          JField("execution_result", JString("success")),
+          JField("type", JString("pivot")),
+          JField("execution_result", JString("success")),
+          JField("execution_finish_ts", JLong(finishedTS)),
+          JField("exec-code", JInt(0)),
+          JField("execution_start_ts", JString(timestamp))
+        ))
+        m_log debug s"Create result: with content: ${compact(render(descriptor))}"
+      }
+      else
+      {
+        val errorMsg = "There is no result for query criteria";
+        descriptor = new JObject(List(
+          JField("name", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+          JField("id", JString(analysisId)),
+          JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
+          JField("execution_result", JString("failed")),
+          JField("execution_finish_ts", JLong(-1L)),
+          JField("type", JString("pivot")),
+          JField("exec-code", JInt(1)),
+          JField("execution_start_ts", JString(timestamp)),
+          JField("error_message", JString(errorMsg))
+        ))
+      }
+
+      var descriptorPrintable: JValue = null
+      resultNode = new AnalysisResult(analysisId, descriptor, analysisResultNodeID)
+      if (data !=null)
+      {
+        resultNode.addObject("data", myArray, schema);
+        val (res, msg) = resultNode.create;
+        m_log debug s"Analysis result creation: $res ==> $msg"
+      }
+      else
+      {
+        descriptorPrintable = descriptor
+      }
+
+      return myArray
+    }
     if ( typeInfo.equals("chart") ){
       var data : String = null
       if (dataSecurityKeyStr!=null) {

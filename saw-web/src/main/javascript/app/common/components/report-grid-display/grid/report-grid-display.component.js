@@ -140,7 +140,7 @@ export const ReportGridDisplayComponent = {
         }
         const field = {
           alignment: 'left',
-          caption: column.alias || column.displayName || column.name,
+          caption: column.aliasName || column.alias || column.displayName || column.name,
           format: column.format,
           dataField: column.columnName || column.name,
           visibleIndex: column.visibleIndex,

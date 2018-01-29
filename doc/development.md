@@ -117,7 +117,7 @@ occurrence of `apiUrl`:
 When deploying SAW locally, it is possible to edit datasets and have
 changes immediately reflected in analysis executions.  This can be
 useful for exploring how different SAW features behave with varying
-data. 
+data.
 
 ## Editing report datasets
 
@@ -216,12 +216,12 @@ To make a release of the project, execute the following steps:
    integration server using the newly created release tag (click the
    "Run" dropdown menu and select "Run customized..." and enter the
    release tag, for example `v1.0.0`, in the Revision field).
-   
+
 4. After starting the build, go to the Build result summary page and
    add the label "release" (which ensures it will be available for
    download indefinitely, instead of eventually being expired and
    deleted by the continuous integration server).
-   
+
 5. When the build finishes successfully, announce it by publishing a
    link to the artifacts page in the project Slack channel.  Also add
    the link to the corresponding [release notes] in Confluence.
@@ -232,3 +232,18 @@ example 1.0.1, 1.0.2 and so on).
 
 [project]: https://bamboo.synchronoss.net:8443/browse/BDA-BDASAW
 [release notes]: https://confluence.synchronoss.net:8443/display/BDA/SAW+Releases+Documentation
+
+
+# Troubleshooting
+
+1. To completely reset a docker environment, first delete all containers.
+   Containers can be viewed by running `docker ps`. Further, to delete a
+   container, run `docker container rm {container-id}`.
+   Next, delete all the images. To get a list of images, run `docker images`.
+   To delete an image, run `docker rmi {image-id}`.
+
+2. If you get an error that a container already exists, copy the
+   container id from the error message. Next, remove the container by
+   running `docker container rm {container-id}`. You may need to do this
+   more than once. Keep deleting the container and restarting the mvn command
+   to start docker until you can get a clean start.
