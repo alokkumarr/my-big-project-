@@ -55,12 +55,12 @@ export class DesignerNumberFilterComponent {
   }
 
   onValueChange(value) {
-    this.filterModel.value = value;
+    this.filterModel.value = parseFloat(value);
     this.onFilterModelChange();
   }
 
   onOtherValueChange(value) {
-    this.filterModel.otherValue = value;
+    this.filterModel.otherValue = parseFloat(value);
     this.onFilterModelChange();
   }
 
