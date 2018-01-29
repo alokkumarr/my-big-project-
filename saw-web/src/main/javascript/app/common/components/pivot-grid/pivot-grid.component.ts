@@ -58,8 +58,9 @@ export class PivotGridComponent {
   @Input('sorts') set setSorts(sorts: Sort[]) {
     if (sorts) {
       this.delayIfNeeded(() => {
-        this.updateSorts(sorts);
+        this.updateSorts(sorts, null);
       });
+      this._sorts = sorts;
     }
   };
   @Input('data') set setData(data: any[]) {
@@ -77,6 +78,7 @@ export class PivotGridComponent {
   @Output() onContentReady: EventEmitter<any> = new EventEmitter();
   public fields: any[];
   public data: any[];
+  public _sorts: Array<Sort> = [];
   public artifactColumns: ArtifactColumnPivot[];
   public pivotGridOptions : any;
   rowHeaderLayout = 'tree';
@@ -134,6 +136,9 @@ export class PivotGridComponent {
         store: this.data || [],
         fields: this.artifactColumns || []
       });
+
+      /* Try to apply existing sorts (if any) to the new data source */
+      this.updateSorts(this._sorts, dataSource);
       this.updateDataSource(dataSource);
     }
   }
@@ -141,7 +146,7 @@ export class PivotGridComponent {
   update(update: IPivotGridUpdate) {
     /* eslint-disable no-unused-expressions */
     update.dataSource && this.updateDataSource(update.dataSource);
-    update.sorts && this.updateSorts(update.sorts);
+    update.sorts && this.updateSorts(update.sorts, null);
     update.export && this.exportToExcel();
     /* eslint-disable no-unused-expressions */
   }
@@ -160,16 +165,18 @@ export class PivotGridComponent {
     });
   }
 
-  updateSorts(sorts: Sort[]) {
+  updateSorts(sorts: Sort[], source) {
     if (isEmpty(sorts)) {
       return;
     }
-    const pivotGridDataSource = this._gridInstance.getDataSource();
+
+    let dataSource = source || this._gridInstance.getDataSource();
+    let load = !source;
 
     // reset other sorts
-    forEach(pivotGridDataSource.fields(), field => {
+    forEach(dataSource.fields(), field => {
       if (field.sortOrder) {
-        pivotGridDataSource.field(field.dataField, {
+        dataSource.field(field.dataField, {
           sortOrder: null
         });
       }
@@ -181,11 +188,12 @@ export class PivotGridComponent {
       const dataField = sort.type === 'string' ?
         sort.columnName.split('.')[0] :
         sort.columnName;
-      pivotGridDataSource.field(dataField, {
+      dataSource.field(dataField, {
         sortOrder: sort.order
       });
     });
-    pivotGridDataSource.load();
+
+    load && dataSource.load();
   }
 
   delayIfNeeded(fn) {
