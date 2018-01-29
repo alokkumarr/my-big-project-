@@ -144,7 +144,7 @@
                     },
                     "value":{
                       "id":"/properties/filters/model/properties/value",
-                      "type":"string"
+                      "type":"integer"
                     },
                     "otherValue":{
                       "id":"/properties/filters/model/properties/otherValue",
