@@ -35,7 +35,9 @@ provided in the environment:
   memory and CentOS 7 as the operating system.  The host should be
   dedicated to SAW and not run other applications.
 
-. Install and configure MapR client on the SAW target host
+. Install and configure MapR client on the SAW target host.
+
+. Configure SAW server to use UTC timezone in all places where date and timezones are involved.
 
 Please note that the target hosts must be allocated exclusively for
 SAW use.  The underlying infrastructure up to the operating system

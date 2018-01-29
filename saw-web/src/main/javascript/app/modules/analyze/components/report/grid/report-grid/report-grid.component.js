@@ -6,12 +6,11 @@ import * as forEach from 'lodash/forEach';
 import * as remove from 'lodash/remove';
 import * as isUndefined from 'lodash/isUndefined';
 import * as $ from 'jquery';
-import * as moment from 'moment';
 import 'moment-timezone';
 
 import * as template from './report-grid.component.html';
 import style from './report-grid.component.scss';
-import {NUMBER_TYPES, DATE_TYPES, BACKEND_TIMEZONE} from '../../../../consts';
+import {NUMBER_TYPES, DATE_TYPES} from '../../../../consts';
 
 // const MIN_ROWS_TO_SHOW = 5;
 const COLUMN_WIDTH = 175;
@@ -162,11 +161,6 @@ export const ReportGridComponent = {
       this.columns = columns;
       if (this._gridInstance) {
         const columns = this.prepareGridColumns(this.columns);
-        forEach(columns, column => {
-          if (column.dataType === 'date') {
-            column.dataType = 'string-date';
-          }
-        });
         this._gridInstance.option('columns', columns);
       }
     }
@@ -188,7 +182,7 @@ export const ReportGridComponent = {
         };
 
         if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
-          field.format = 'shortDate';
+          field.format = 'yyyy-MM-dd';
         }
 
         if (NUMBER_TYPES.includes(column.type) && isUndefined(column.format)) {
@@ -263,31 +257,8 @@ export const ReportGridComponent = {
 
     onSourceUpdate() {
       if (this._gridInstance) {
-        const sourceData = this.source;
-        this._gridInstance.option('dataSource', this.formatDates(sourceData));
+        this._gridInstance.option('dataSource', this.source);
       }
-    }
-
-    formatDates(data) {
-      if (isEmpty(data)) {
-        return data;
-      }
-      const keys = Object.keys(data[0]);
-      const formats = [
-        moment.ISO_8601,
-        'YYYY-MM-DD hh:mm:ss',
-        'YYYY-MM-DD',
-        'MM/DD/YYYY  :)  HH*mm*ss'
-      ];
-      forEach(data, row => {
-        forEach(keys, key => {
-          const date = moment.tz(row[key], formats, true, BACKEND_TIMEZONE);
-          if (date.isValid() && ['date', 'string-date', 'timestamp'].includes(this.checkColumndatatype(this.columns, key))) {
-            row[key] = date.toDate();
-          }
-        });
-      });
-      return data;
     }
 
     checkColumndatatype(columnList, columnName) {
