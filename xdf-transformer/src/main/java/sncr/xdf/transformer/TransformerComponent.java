@@ -3,15 +3,14 @@ package sncr.xdf.transformer;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
-import sncr.bda.conf.Input;
-import sncr.bda.conf.Output;
+import org.apache.spark.sql.types.*;
+import org.apache.spark.sql.types.Metadata;
+import sncr.bda.conf.*;
 import sncr.bda.core.file.HFileOperations;
 import sncr.xdf.component.Component;
 import sncr.xdf.component.WithDataSetService;
 import sncr.xdf.component.WithMovableResult;
 import sncr.xdf.component.WithSparkContext;
-import sncr.bda.conf.ComponentConfiguration;
-import sncr.bda.conf.Transformer;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.exceptions.XDFException;
 
@@ -105,26 +104,49 @@ public class TransformerComponent extends Component implements WithMovableResult
                 }
                 dsMap.put(entry.getKey(), ds);
             }
-//3. Based of configuration run Jexl or Janino engine.
             Transformer.ScriptEngine engine = ctx.componentConfiguration.getTransformer().getScriptEngine();
-            if (engine == Transformer.ScriptEngine.JEXL){
+            Set<OutputSchema> ou = ctx.componentConfiguration.getTransformer().getOutputSchema();
+            if (ou != null && ou.size() > 0){
 
-                JexlExecutor jexlExecutor =
-                        new JexlExecutor(ctx.sparkSession,
-                                        script,
-                                        tempLocation,
-                                        0,
-                                        inputs,
-                                        outputs);
-                jexlExecutor.execute(dsMap);
-            }
-            else if (engine == Transformer.ScriptEngine.JANINO){
+                StructType st = createSchema(ou);
 
+                //3. Based of configuration run Jexl or Janino engine.
+                if (engine == Transformer.ScriptEngine.JEXL) {
+                    JexlExecutorWithSchema jexlExecutorWithSchema  =
+                            new JexlExecutorWithSchema(ctx.sparkSession,
+                                    script,
+                                    st,
+                                    tempLocation,
+                                    0,
+                                    inputs,
+                                    outputs);
+                    jexlExecutorWithSchema.execute(dsMap);
+                } else if (engine == Transformer.ScriptEngine.JANINO) {
+
+                } else {
+                    error = "Unsupported transformation engine: " + engine;
+                    logger.error(error);
+                    return -1;
+                }
             }
-            else{
-                error = "Unsupported transformation engine: " + engine;
-                logger.error(error);
-                return -1;
+            else {
+                //3. Based of configuration run Jexl or Janino engine.
+                if (engine == Transformer.ScriptEngine.JEXL) {
+                    JexlExecutor jexlExecutor =
+                            new JexlExecutor(ctx.sparkSession,
+                                    script,
+                                    tempLocation,
+                                    0,
+                                    inputs,
+                                    outputs);
+                    jexlExecutor.execute(dsMap);
+                } else if (engine == Transformer.ScriptEngine.JANINO) {
+
+                } else {
+                    error = "Unsupported transformation engine: " + engine;
+                    logger.error(error);
+                    return -1;
+                }
             }
         }
         catch(Exception e){
@@ -133,6 +155,46 @@ public class TransformerComponent extends Component implements WithMovableResult
             return -1;
         }
         return 0;
+    }
+
+    private StructType createSchema(Set<OutputSchema> outputSchema) throws Exception {
+
+        StructType st = new StructType();
+        StructField[] sf = new StructField[outputSchema.size()+3];
+        OutputSchema[] osa = outputSchema.toArray(new OutputSchema[0]);
+        for (int i = 0; i < osa.length; i++) {
+            logger.debug(String.format("Field %s, index: %d, type: %s",osa[i].getName(), i, getType(osa[i].getType(), osa[i].getFormat()) ));
+           sf[i] = new StructField(osa[i].getName(), getType(osa[i].getType(), osa[i].getFormat()), true, Metadata.empty());
+           st = st.add(sf[i]);
+        }
+        st = st.add( new StructField(RECORD_COUNTER, DataTypes.LongType, true, Metadata.empty()));
+        st = st.add( new StructField(TRANSFORMATION_RESULT, DataTypes.IntegerType, true, Metadata.empty()));
+        st = st.add( new StructField(TRANSFORMATION_ERRMSG, DataTypes.StringType, true, Metadata.empty()));
+        logger.debug("Output schema: " + st.prettyJson() );
+        return st;
+    }
+
+
+    private DataType getType(String tp, String frmt) throws Exception {
+        DataType dt = null;
+        if (tp == null)
+            dt = DataTypes.NullType;
+        else if (tp.equalsIgnoreCase("string"))
+            dt = DataTypes.StringType;
+        else if (tp.equalsIgnoreCase("float") || tp.equalsIgnoreCase("double"))
+            dt = DataTypes.DoubleType;
+        else if (tp.equalsIgnoreCase("short") || tp.equalsIgnoreCase("int") || tp.equalsIgnoreCase("integer"))
+            dt = DataTypes.IntegerType;
+        else if (tp.equalsIgnoreCase("long"))
+            dt = DataTypes.LongType;
+        else if (tp.equalsIgnoreCase("timestamp"))
+            dt = DataTypes.TimestampType;
+        else if (tp.equalsIgnoreCase("boolean"))
+            dt = DataTypes.BooleanType;
+        else{
+            throw new Exception("Unsupported data type: " + tp );
+        }
+        return dt;
     }
 
     protected int Archive(){

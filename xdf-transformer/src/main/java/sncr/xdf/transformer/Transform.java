@@ -41,7 +41,7 @@ public class Transform implements Function<Row, Row> {
 
     public Transform(SparkSession ss,
                      String scr,
-                     StructType inSchema,
+                         StructType inSchema,
                      Map<String, Broadcast<Dataset>> mapRefData,
                      LongAccumulator successTransformationsCount,
                      LongAccumulator failedTransformationsCount,
@@ -89,12 +89,10 @@ public class Transform implements Function<Row, Row> {
                 jexlEngine.setFunctions(extFunctions);
             }
             XdfObjectContext sc1 = new XdfObjectContext( jexlEngine, schema, arg0);
-            System.out.println("Before script execution: ");
             jexlScript.execute(sc1);
             if(sc1.isSuccess()) {
                 successTransformationsCount.add(1);
                 // Transformation finished - create resulting Tuple
-                System.out.println("Script successfully executed -- updated schema");
                 return_value = sc1.createNewRow(0, null, successTransformationsCount.value());
                 //TODO::Update Struct Accumulator
                 Map<String, StructField> newSchema = sc1.getNewOutputSchema();
@@ -103,7 +101,6 @@ public class Transform implements Function<Row, Row> {
                 // Error flag has been set inside the JEXL transformation
                 // Mark record with error state
                 failedTransformationsCount.add(1);
-                System.out.println("Record has been invalidated inside the JEXL script -- before creating row." );
                 return_value = sc1.createNewRow(-3, "Record has been invalidated inside the JEXL script", failedTransformationsCount.value());
                 Map<String, StructField> newSchema = sc1.getNewOutputSchema();
                 newSchema.forEach((k, v) -> structAccumulator.add(new Tuple2<>(k, v)));
@@ -116,6 +113,10 @@ public class Transform implements Function<Row, Row> {
             rv._2().forEach((k, v) -> structAccumulator.add(new Tuple2<>(k, v)));
             return_value = rv._1();
         }
+        if (threshold > 0 && threshold < failedTransformationsCount.value()){
+            throw new RuntimeException("# of failed records exceeded given threshold, cancel processing");
+        }
+
         return return_value;
     }
 

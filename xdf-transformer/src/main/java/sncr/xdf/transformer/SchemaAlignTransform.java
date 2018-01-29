@@ -24,16 +24,15 @@ public class SchemaAlignTransform implements Function<Row, Row> {
         String[] unified_schema = schema.fieldNames();
         StructType row_schema = r1.schema();
 
-
-        for(int fc = 0;  fc < row_schema.fields().length; fc++ )
-            System.out.println(String.format("In row field: %s, value %s ", row_schema.fields()[fc].toString(), ((r1.get(fc) != null)?r1.get(fc).toString():"null")));
+//        for(int fc = 0;  fc < row_schema.fields().length; fc++ )
+//            System.out.println(String.format("In row field: %s, value %s ", row_schema.fields()[fc].toString(), ((r1.get(fc) != null)?r1.get(fc).toString():"null")));
 
         Object[] newRowValues = new Object[schema.length()];
         for( int i = 0; i < unified_schema.length; i++) {
             int fIndex = findField(row_schema.fieldNames(), unified_schema[i]);
 
-            System.out.println(String.format(
-                    "Incoming row index: %d, uni schema index: %d, field: %s", fIndex, i, unified_schema[i]));
+//            System.out.println(String.format(
+//                    "Incoming row index: %d, uni schema index: %d, field: %s", fIndex, i, unified_schema[i]));
 
             //Field is found
             if (fIndex >= 0) {
@@ -73,8 +72,8 @@ public class SchemaAlignTransform implements Function<Row, Row> {
                             throw new Exception("Unsupported data type: " + unifiedSchemaType);
                     }
                 }
-                System.out.println(String.format(
-                        "set value %s for field: %s and field type: %s", ((value != null)?value.toString():"null"), unified_schema[i], unifiedSchemaType));
+//                System.out.println(String.format(
+//                        "set value %s for field: %s and field type: %s", ((value != null)?value.toString():"null"), unified_schema[i], unifiedSchemaType));
 
                 newRowValues[i]= value;
             }

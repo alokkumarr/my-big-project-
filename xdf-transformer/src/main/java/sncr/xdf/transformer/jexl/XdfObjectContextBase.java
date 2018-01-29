@@ -8,61 +8,43 @@ import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.ObjectContext;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema;
 import org.apache.spark.sql.types.*;
 import scala.Tuple2;
 
 import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import static sncr.xdf.transformer.TransformerComponent.*;
 
-public class XdfObjectContext extends ObjectContext<Row> {
+abstract public class XdfObjectContextBase extends ObjectContext<Row> {
 
-    private static final Logger logger = Logger.getLogger(XdfObjectContext.class);
+    private static final Logger logger = Logger.getLogger(XdfObjectContextBase.class);
 
 
     public final static char internalFieldPrefix = '$';
-    private StructType schema;
+    protected StructType schema;
 
-    private Row record;
-    private Map<String, Object> targetRow;
-    private Map<String, StructField> targetRowTypes;
-    private Map<String, Object> localVars;
+    protected Row record;
+    protected Map<String, Object> targetRow;
+    protected Map<String, StructField> targetRowTypes;
+    protected Map<String, Object> localVars;
     // Contains Field Name --> Field Number mapping
 
-    private boolean __SUCCESS__ = true;
-    private final static String __SUCCESS___NAME  = "$__SUCCESS__";
+    protected boolean __SUCCESS__ = true;
+    protected final static String __SUCCESS___NAME  = "$__SUCCESS__";
 
     //TODO:: Output schema???
-    public XdfObjectContext(JexlEngine engine, StructType inSchema, Row record) throws Exception {
+    public XdfObjectContextBase(JexlEngine engine, StructType inSchema, Row record) throws Exception {
         super(engine, record);
+        this.schema = inSchema;
         if(record != null) {
-            this.schema = inSchema;
+            //Initialize record -- targetRow with values from input Row
             targetRow = new HashMap<>();
             targetRowTypes = new HashMap<>();
             this.record = record;
             this.localVars = new HashMap<>();
-            String[] fieldNames = schema.fieldNames();
-            for (int i = 0; i < fieldNames.length; i++) {
-                targetRowTypes.put(fieldNames[i], schema.fields()[i]);
-                if (this.record.get(i) != null) {
-                    Object value = getValue(fieldNames[i], i);
-                    if (value != null)
-                        targetRow.put(fieldNames[i], value);
-                }
-            }
-/*
-            StringBuilder sb = new StringBuilder();
-            String[] fs = targetRow.keySet().toArray(new String[0]);
-            for (int j = 0; j < fs.length; j++) {
-                sb.append( ", " + j + " = " +  fs[j].toString());
-            }
-            System.out.println("Initialized fields from in record: " + sb.toString());
-*/
         } else {
             throw new Exception("Can't process NULL data record");
         }
@@ -86,16 +68,17 @@ public class XdfObjectContext extends ObjectContext<Row> {
 
                     StringBuilder sb = new StringBuilder();
                     String[] fs = targetRow.keySet().toArray(new String[0]);
+ /*
                     for (int j = 0; j < fs.length; j++) {
                         sb.append( ", " + j + " = " +  fs[j].toString());
                     }
                     System.out.println("Getting value from " + nativeName + " fields: " + sb.toString());
-
+*/
                     if ((!nativeName.isEmpty()) && (targetRowTypes != null) && (targetRowTypes.containsKey(nativeName))) {
                         if ( targetRow != null && targetRow.containsKey(nativeName) ) {
                             retval = targetRow.get(nativeName);
                         } // else retval = null;
-                } else {
+                    } else {
                         throw new JexlScriptException("Field not found " + nativeName);
                     }
                 } else {
@@ -134,95 +117,17 @@ public class XdfObjectContext extends ObjectContext<Row> {
         return retval;
     }
 
-    @Override
-    public void set(String name, Object value) {
-        try {
-            if (record == null) throw new JexlScriptException("Input record is null");
-            if(name.equals(__SUCCESS___NAME)) {
-                if (value instanceof Boolean) {
-                    __SUCCESS__ = (Boolean) value;
-                } else if (value instanceof String){
-                    __SUCCESS__ = Boolean.parseBoolean((String) value);
-                } else if(value instanceof Integer) {
-                    __SUCCESS__ = ((Integer) value) == 0;
-                }
-            } else {
-                if (name.charAt(0) == internalFieldPrefix) {
-                    String nativeName = name.substring(1);
-                    int fIndex = findField(schema.fieldNames(), nativeName);
-                    if (fIndex >= 0) {
-                        updateSchema(nativeName, value, fIndex);
-                    } else {
-                        //New field -> add it to Schema
-                        updateSchema(nativeName, value, -1);
-                    }
-                    if(value != null)
-                        if (value instanceof String
-                                || value instanceof Integer
-                                || value instanceof Long
-                                || value instanceof Short
-                                || value instanceof Float
-                                || value instanceof Double
-                                || value instanceof Timestamp
-                                || value instanceof Boolean) {
-                            targetRow.put(nativeName, value);
-                        } else {
-                            // Exception
-                            throw new JexlScriptException("Unsupported object type : " + value.getClass().toString());
-                        }
-                }else {
-                    localVars.put(name, value);
-                }
-            }
-        } catch (Exception e) {
-            throw new JexlScriptException("Exception: Setting value of : " + name.toUpperCase() + ":" + e.getMessage(), e);
-        }
-    }
+    public abstract void set(String name, Object value);
 
-    private int findField(String[] a, String k) {
+    protected static int findField(String[] a, String k) {
         for (int i = 0; i < a.length; i++) {
             if (a[i].equalsIgnoreCase(k)) return i;
         }
         return -1;
     }
 
-    /**
-     * The method updates schema baed on the following:
-     *  - New field was received - add it to map
-     *  - Known field value is changed from Null to something, NullType will br replaced with new type
-     *  - It also checks if field type has been changed (new value assigned in script and passed to class )
-     *     - if such case has been detected - throw IllegalArgumentException exception
-     * @param nativeName
-     * @param value
-     * @param fIndex
-     * @throws Exception
-     */
-    private void updateSchema(String nativeName, Object value, int fIndex) throws Exception {
-        if ( targetRowTypes.containsKey(nativeName) ) {
-            StructField sf = targetRowTypes.get(nativeName);
-            //Get value from script with the same data type - ignore it, except if that was NullType
-            if (sf.dataType() == DataTypes.NullType && value != null){
-                targetRowTypes.put(nativeName, getType(nativeName, value, fIndex));
-            }
-            //If we have field in type map and coming value is not the same type from set of supported
-            // types - throw an exception.
-            if (!(
-                (sf.dataType() == DataTypes.StringType && value instanceof String) ||
-                (sf.dataType() == DataTypes.LongType && value instanceof Long) ||
-                (sf.dataType() == DataTypes.IntegerType && ( value instanceof Integer || value instanceof Short)) ||
-                (sf.dataType() == DataTypes.TimestampType && value instanceof Timestamp) ||
-                (sf.dataType() == DataTypes.DoubleType && ( value instanceof Double || value instanceof Float)) ||
-                (sf.dataType() == DataTypes.BooleanType && value instanceof Boolean))
-                )
-            {
-                throw new IllegalArgumentException("Row cannot contain one field with two different data types");
-            }
-        }else
-            targetRowTypes.put(nativeName, getType(nativeName, value, fIndex) );
 
-    }
-
-    private StructField getType(String name, Object value, int fIndex) throws Exception {
+    protected StructField getType(String name, Object value, int fIndex) throws Exception {
         StructField sf ;
         if ( fIndex < 0 ){
             DataType dt = null;
@@ -253,7 +158,7 @@ public class XdfObjectContext extends ObjectContext<Row> {
     }
 
     //TODO:: Make sure typeName returns such values
-    private Object getValue(String fieldName, int i) {
+    protected Object getValue(String fieldName, int i) {
         String type = schema.apply(fieldName).dataType().toString();
         switch (type) {
             case "BooleanType": return this.record.getBoolean(i);
@@ -298,8 +203,7 @@ public class XdfObjectContext extends ObjectContext<Row> {
         int i = 0;
 
         for(String fn: targetRowTypes.keySet()) {
-//            System.out.println(String.format("Process field: %s, index: %d, data type: %s", fn, i, targetRowTypes.get(fn).toString()));
-//            fieldArray[i++] = new StructField(fn, targetRowTypes.get(fn), true, null);
+
             fieldArray[i] = targetRowTypes.get(fn);
             fieldNames[i] = fn;
             if (targetRow.containsKey(fn)) {
@@ -326,9 +230,7 @@ public class XdfObjectContext extends ObjectContext<Row> {
         targetRowTypes.clear();
         for (int j = 0; j < fieldArray.length; j++) {
             targetRowTypes.put(fieldNames[j], fieldArray[j]);
-//            sb.append( ", " + j + " = " +  ((fieldArray[j] != null)?fieldArray[j].toString():"n/a"));
         }
-//        System.out.println("Initialized struct fields: " + sb.toString());
 
         //Create new schema
         StructType new_schema = DataTypes.createStructType(fieldArray);
@@ -412,7 +314,7 @@ public class XdfObjectContext extends ObjectContext<Row> {
         return rv;
     }
 
-    private static Object getValue(Row row, String fieldName, int i) {
+    protected static Object getValue(Row row, String fieldName, int i) {
         String type = row.schema().apply(fieldName).dataType().toString();
         switch (type) {
             case "BooleanType": return row.getBoolean(i);

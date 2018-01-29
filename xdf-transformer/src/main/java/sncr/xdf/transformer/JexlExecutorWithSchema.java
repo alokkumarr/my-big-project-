@@ -30,15 +30,14 @@ import static sncr.xdf.transformer.TransformerComponent.TRANSFORMATION_RESULT;
 /**
  * Created by srya0001 on 12/21/2017.
  */
-public class JexlExecutor {
+public class JexlExecutorWithSchema {
 
-    private static final Logger logger = Logger.getLogger(JexlExecutor.class);
+    private static final Logger logger = Logger.getLogger(JexlExecutorWithSchema.class);
     private Set<String>  refDataSets;
     private String       inDataSet;
     private String       outDataSet;
     private String       rejectedDataSet;
     private Map<String, Map<String, String>> outputDataSetsDesc;
-    private StructAccumulator structAccumulator;
     private String tempLoc;
     private JavaSparkContext jsc;
     private SparkSession session_ctx;
@@ -49,12 +48,13 @@ public class JexlExecutor {
     private int threshold = 0;
 
 
-    public JexlExecutor(SparkSession ctx,
-                        String script,
-                        String tLoc,
-                        int thr,
-                        Map<String, Map<String, String>> inputs,
-                        Map<String, Map<String, String>> outputs){
+    public JexlExecutorWithSchema(SparkSession ctx,
+                                  String script,
+                                  StructType st,
+                                  String tLoc,
+                                  int thr,
+                                  Map<String, Map<String, String>> inputs,
+                                  Map<String, Map<String, String>> outputs){
         this.script = script;
         session_ctx = ctx;
         threshold = thr;
@@ -82,8 +82,7 @@ public class JexlExecutor {
         tempLoc = tLoc;
         this.successTransformationsCount = ctx.sparkContext().longAccumulator("success");
         this.failedTransformationsCount = ctx.sparkContext().longAccumulator("failed");
-        this.structAccumulator = new StructAccumulator();
-        ctx.sparkContext().register(structAccumulator, "Struct");
+        this.schema = st;
     }
 
 
@@ -93,13 +92,12 @@ public class JexlExecutor {
     )  throws Exception {
         String bcFirstRefDataset = (refDataSets != null && refDataSets.size() > 0)?refDataSets.toArray(new String[0])[0]:"";
         JavaRDD rdd = dataRdd.map(
-                new Transform( session_ctx,
+                new TransformWithSchema( session_ctx,
                         script,
                         schema,
                         referenceData,
                            successTransformationsCount,
                            failedTransformationsCount,
-                           structAccumulator,
                            threshold,
                            bcFirstRefDataset)).cache();
         return rdd;
@@ -109,13 +107,6 @@ public class JexlExecutor {
 
         Dataset ds = dsMap.get(inDataSet);
 
-        logger.debug("Initialize structAccumulator: " );
-        schema = ds.schema();
-        String[] fNames = ds.schema().fieldNames();
-        for (int i = 0; i < fNames.length; i++) {
-            structAccumulator.add(new Tuple2<>(fNames[i], ds.schema().apply(i)));
-            logger.trace("Field: " + fNames[i] + " Type: " + ds.schema().apply(i).toString());
-        }
 
         logger.trace("Load reference data: " );
         Map<String, Broadcast<Dataset>> mapOfRefData = new HashMap<>();
@@ -126,27 +117,21 @@ public class JexlExecutor {
         }
 
         JavaRDD transformationResult = transformation(ds.toJavaRDD(), mapOfRefData);
-        transformationResult.count();
-
-
-//        logger.trace("First pass completed: " + transformationResult.count() + " first row/object: " + transformationResult.first().toString());
-        logger.trace("Create new schema[" + structAccumulator.value().size() + "]: " + String.join(", ", structAccumulator.value().keySet()));
-
-        StructType newSchema = constructSchema(structAccumulator.value());
+        Long c = transformationResult.count();
 
         // Using structAccumulator do second pass to align schema
-        Dataset<Row> alignedDF = schemaRealignment(transformationResult, newSchema);
-        alignedDF.count();
-        alignedDF.schema().prettyJson();
+        Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
+        //df.schema().prettyJson();
 
-        logger.trace("Second pass completed: " + alignedDF.count() + " Schema: " + alignedDF.schema().prettyJson());
-
+        logger.trace("Transformation completed: " + df.count() + " Schema: " + df.schema().prettyJson());
 
         //TODO:: Should we drop RECORD_COUNT as well???
-        Column trRes = alignedDF.col(TRANSFORMATION_RESULT);
-        Dataset<Row> outputResult = alignedDF.filter( trRes.equalTo(0)).drop(trRes).drop(alignedDF.col(TRANSFORMATION_ERRMSG));
-        Dataset<Row> rejectedRecords = alignedDF.filter( trRes.lt(0));
+        Column trRes = df.col(TRANSFORMATION_RESULT);
+        Dataset<Row> outputResult = df.select("*").where(trRes.equalTo(0)); //.drop(trRes).drop(alignedDF.col(TRANSFORMATION_ERRMSG));
+        Dataset<Row> rejectedRecords = df.select("*").where(trRes.lt(0));
 
+//        Dataset<Row> outputResult = df.filter( trRes.equalTo(0)).drop(trRes).drop(df.col(TRANSFORMATION_ERRMSG));
+//        Dataset<Row> rejectedRecords = df.filter( trRes.lt(0));
 
 
         logger.debug("Final DS: " + outputResult.count() + " Schema: " + outputResult.schema().prettyJson());
@@ -158,27 +143,9 @@ public class JexlExecutor {
 
     }
 
-    private StructType constructSchema(Map<String, StructField> accValues) {
-        HashSet<StructField> sf_set = new HashSet();
-        accValues.values().forEach (sf_set::add);
-        return new StructType(sf_set.toArray(new StructField[0]));
-    }
-
-    private Dataset<Row>  schemaRealignment(JavaRDD<Row> rdd, StructType newSchema) {
-        JavaRDD<Row> alignedRDD = rdd.map(new SchemaAlignTransform( newSchema)).persist(StorageLevel.MEMORY_AND_DISK());
-        return session_ctx.createDataFrame(alignedRDD, newSchema).toDF();
-    }
-
-
 
     //    private void writeResults(JavaPairRDD outputResult, String resType) throws IOException {
     private void writeResults(Dataset<Row> outputResult, String resType, String location) throws IOException {
-
-/*
-        org.apache.hadoop.conf.Configuration jobConf = new org.apache.hadoop.conf.Configuration();
-        Job job = Job.getInstance(jobConf);
-        CustomParquetOutputFormat.setCompression(job, CompressionCodecName.SNAPPY);
-*/
 
         Map<String, String> outputDS = outputDataSetsDesc.get(resType);
         String name = outputDS.get(DataSetProperties.Name.name());
@@ -189,19 +156,11 @@ public class JexlExecutor {
         switch (format.toLowerCase()) {
             case "parquet" :
                 outputResult.write().parquet(loc);
-/*
-                outputResult.saveAsNewAPIHadoopFile(loc,
-                        NullWritable.class,
-                        Group.class,
-                        CustomParquetOutputFormat.class,
-                        job.getConfiguration());
-*/
                 break;
             case "csv" :
                 outputResult.write().csv(loc);
             case "json" :
                 outputResult.write().json(loc);
-//                outputResult.saveAsTextFile(loc);
                 break;
         }
     }

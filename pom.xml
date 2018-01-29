@@ -251,12 +251,12 @@
     <dependency>
       <groupId>com.synchronoss.bda</groupId>
       <artifactId>core</artifactId>
-      <version>1.0.0_dev</version>
+      <version>1.0.1_dev</version>
     </dependency>
     <dependency>
-			<groupId>com.synchronoss.bda</groupId>
+      <groupId>com.synchronoss.bda</groupId>
       <artifactId>meta-api</artifactId>
-      <version>1.0.0_dev</version>
+      <version>1.0.1_dev</version>
     </dependency>
 <!-- BDA Internal dependencies END -->		
 
