@@ -20,16 +20,16 @@ export const StringFilterComponent = {
         value: 'EQ',
         keyword: 'EQUALS'
       }, {
-        value: 'NE',
+        value: 'NEQ',
         keyword: 'NOT_EQUAL'
       }, {
-        value: 'IsIn',
+        value: 'ISIN',
         keyword: 'IS_IN'
       }, {
-        value: 'IsNotIn',
+        value: 'ISNOTIN',
         keyword: 'IS_NOT_IN'
       }, {
-        value: 'Contains',
+        value: 'CONTAINS',
         keyword: 'CONTAINS'
       }, {
         value: 'SW',
@@ -65,7 +65,7 @@ export const StringFilterComponent = {
       this.updatedDate = this.model || {
         value: ''
       };
-      this.updatedDate.value = this.tempModel.value;
+      this.updatedDate.stringValue = this.tempModel.value;
       this.updatedDate.operator = this.tempModel.operator;
       this.onChange({model: this.updatedDate});
     }
