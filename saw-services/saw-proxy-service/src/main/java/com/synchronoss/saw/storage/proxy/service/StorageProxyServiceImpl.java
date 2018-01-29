@@ -1,16 +1,17 @@
 package com.synchronoss.saw.storage.proxy.service;
 
+
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.elasticsearch.action.admin.indices.validate.query.ValidateQueryResponse;
-import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.update.UpdateResponse;
-import org.elasticsearch.common.ValidationException;
-import org.elasticsearch.search.SearchHit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,10 @@ import com.synchronoss.saw.storage.proxy.model.StorageProxy.Action;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy.ResultFormat;
 import com.synchronoss.saw.storage.proxy.model.StorageProxyNode;
 import com.synchronoss.saw.storage.proxy.model.StorageProxyResponse;
+import com.synchronoss.saw.storage.proxy.model.response.CountESResponse;
+import com.synchronoss.saw.storage.proxy.model.response.CreateAndDeleteESResponse;
+import com.synchronoss.saw.storage.proxy.model.response.Hit;
+import com.synchronoss.saw.storage.proxy.model.response.SearchESResponse;
 
 @Service
 public class StorageProxyServiceImpl implements StorageProxyService {
@@ -32,6 +37,9 @@ public class StorageProxyServiceImpl implements StorageProxyService {
   
   @Value("${schema.file}")
   private String schemaFile;
+  
+  private String dateFormat="yyyy-mm-dd hh:mm:ss";
+  private String QUERY_REG_EX = ".*?(size|from).*?(\\d+).*?(from|size).*?(\\d+)";
   
   @Autowired
   private StorageConnectorService storageConnectorService;
@@ -51,41 +59,36 @@ public class StorageProxyServiceImpl implements StorageProxyService {
         switch (storageType){
           case "ES" :  
             String action = storageProxy.getAction().value();         
-            if (action.equals(Action.CREATE.value()) || action.equals(Action.UPDATE.value()) || action.equals(Action.DELETE.value()) 
+            if (action.equals(Action.CREATE.value()) || action.equals(Action.DELETE.value()) 
                 || action.equals(Action.SNCRPIVOT.value()) || action.equals(Action.COUNT.value()) || action.equals(Action.SEARCH.value())){
-                        ValidateQueryResponse validateResponse= (ValidateQueryResponse) storageConnectorService.validateQuery(storageProxy.getQuery(), storageProxy);
-                        if (validateResponse.isValid()){
-                          if (action.equals(Action.CREATE.value()) || action.equals(Action.UPDATE.value()) || action.equals(Action.DELETE.value()) 
-                               || action.equals(Action.COUNT.value())){
-                                Preconditions.checkArgument(storageProxy.getResultFormat().value().equals(ResultFormat.TABULAR.value()), "The result format for above operations cannot be in tabular format");
+                        
+                        
+                          if (action.equals(Action.CREATE.value()) || action.equals(Action.DELETE.value()) || action.equals(Action.COUNT.value())){
+                                Preconditions.checkArgument(!(storageProxy.getResultFormat().value().equals(ResultFormat.TABULAR.value())), "The result format for above operations cannot be in tabular format");
                                 storageProxy.setResultFormat(ResultFormat.JSON);
                                 switch (action) {
                                   case "create" : 
-                                                IndexResponse indexResponse =(IndexResponse) storageConnectorService.indexDocument(storageProxy.getQuery(), storageProxy);
-                                                storageProxy.setStatusMessage("created with an id :" + indexResponse.getId());
+                                    CreateAndDeleteESResponse createResponse =(CreateAndDeleteESResponse) storageConnectorService.createDocument(storageProxy.getQuery(), storageProxy);
+                                                storageProxy.setStatusMessage("created with an id :" + createResponse.getId());
                                                 List<Object> indexData = new ArrayList<>();
-                                                indexData.add(indexResponse.getShardInfo().toString());
+                                                indexData.add(createResponse);
+                                                storageProxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
                                                 storageProxy.setData(indexData);
                                                 break;
-                                  case "update" : 
-                                                UpdateResponse updateResponse =(UpdateResponse) storageConnectorService.updateDocument(storageProxy.getEntityId(), storageProxy);
-                                                storageProxy.setStatusMessage("updated with an id :" + updateResponse.getId());
-                                                List<Object> updateData = new ArrayList<>();
-                                                updateData.add(updateResponse.getShardInfo().toString());
-                                                storageProxy.setData(updateData);
-                                                break;
                                   case "count" : 
-                                                Long countResponse =(Long) storageConnectorService.countDocument(storageProxy.getQuery(), storageProxy);
-                                                storageProxy.setStatusMessage("Total number of documents are :" + countResponse.longValue());
+                                                CountESResponse countResponse =(CountESResponse) storageConnectorService.countDocument(storageProxy.getQuery(), storageProxy);
+                                                storageProxy.setStatusMessage("Total number of documents are :" + countResponse.getCount());
                                                 List<Object> countData = new ArrayList<>();
-                                                countData.add("{ \"count\":" + countResponse.longValue() +"}");
+                                                countData.add(countResponse);
+                                                storageProxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
                                                 storageProxy.setData(countData);
                                                 break;
                                   case "delete" : 
-                                                DeleteResponse deleteResponse =(DeleteResponse) storageConnectorService.deleteDocument(storageProxy.getEntityId(), storageProxy);
+                                                CreateAndDeleteESResponse deleteResponse =(CreateAndDeleteESResponse) storageConnectorService.deleteDocumentById(storageProxy.getEntityId(), storageProxy);
                                                 storageProxy.setStatusMessage("deleted with an id :" + deleteResponse.getId());
                                                 List<Object> deleteData = new ArrayList<>();
-                                                deleteData.add(deleteResponse.getShardInfo().toString());
+                                                deleteData.add(deleteResponse);
+                                                storageProxy.setResponseTime(new SimpleDateFormat(dateFormat).format(new Date()));
                                                 storageProxy.setData(deleteData);
                                                 break;
                                 } 
@@ -93,47 +96,79 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                           else {
                             switch (action){
                               case "sncrpivot" : 
-                                               Preconditions.checkArgument(storageProxy.getSqlBuilder()!=null, "To process action type sncrpivot, sqlBuilder is mandatory");     
-                                               storageProxy.setPageSize(0);
-                                               storageProxy.setPageNum(0);
-                                               SearchResponse sncrPivotResponse =(SearchResponse) storageConnectorService.searchDocuments(storageProxy.getQuery(), storageProxy);
-                                               logger.debug("Data from Aggregation" +sncrPivotResponse.getAggregations().toString());
+                                               if (storageProxy.getSqlBuilder()!=null){
+                                                   storageProxy.setPageSize(0);
+                                                   storageProxy.setPageNum(0);
+                                                   SearchESResponse<?> sncrPivotResponse =(SearchESResponse<?>) storageConnectorService.searchDocuments(storageProxy.getQuery(), storageProxy);
+                                                   logger.debug("Data from Aggregation" +sncrPivotResponse.getAggregations().toString());
+                                               } else {
+                                                 storageProxy.setStatusMessage("To process the action type of sncrpivot, sqlBuilder is mandatory");
+                                               }
+                                               
                                                break;
                               case "search" : 
-                                              SearchResponse searchResponse =(SearchResponse) storageConnectorService.searchDocuments(storageProxy.getQuery(), storageProxy);
-                                              long actualCount = searchResponse.getHits()!=null? searchResponse.getHits().getTotalHits() : 0;
+                                              Preconditions.checkArgument(storageProxy.getQuery()!=null, "Query cannot be null.");
+                                              String query = storageProxy.getQuery();
+                                              if(query.contains("size") && query.contains("from")){
+                                                Pattern p = Pattern.compile(QUERY_REG_EX, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                                                Matcher m = p.matcher(query);
+                                                if (m.find())
+                                                {
+                                                    String fromSize_1=m.group(1).trim();
+                                                    String fromSize_1_Num=m.group(2);
+                                                    String fromSize_2_Num=m.group(4);
+                                                    if (fromSize_1.equals("size")){
+                                                      storageProxy.setPageSize(Integer.parseInt(fromSize_1_Num));
+                                                      storageProxy.setPageNum(Integer.parseInt(fromSize_2_Num)); 
+                                                      }
+                                                    else{
+                                                      storageProxy.setPageSize(Integer.parseInt(fromSize_2_Num));
+                                                      storageProxy.setPageNum(Integer.parseInt(fromSize_1_Num)); 
+                                                    }
+                                                } // parsing of size & from
+                                              if(storageProxy.getPageSize()<= 50000){ 
+                                              SearchESResponse<?> searchResponse =(SearchESResponse<?>) storageConnectorService.searchDocuments(storageProxy.getQuery(), storageProxy);
+                                              long actualCount = searchResponse.getHits()!=null? searchResponse.getHits().getTotal() : 0;
                                               if (actualCount >0){
                                               storageProxy.setStatusMessage("Number of documents found for provided query :" + actualCount);
-                                              SearchHit [] hits = searchResponse.getHits().getHits();
+                                              List<Hit<?>> hits = searchResponse.getHits().getHits();
                                               List<Object> data = new ArrayList<>();
                                               if (storageProxy.getResultFormat().value().equals(ResultFormat.JSON.value())){
-                                                 for (SearchHit hit : hits){
+                                                 for (Hit<?> hit : hits){
                                                  data.add(hit.getSource());
                                                 }
                                                 storageProxy.setData(data);
                                               } // this block only for JSON format
                                               else{
                                                 List<Map<String,Object>> dataHits = new ArrayList<>();
-                                                for (SearchHit hit : hits){
+                                                for (Hit<?> hit : hits){
                                                   dataHits.add(hit.getSource());
                                                  }
-                                               data.add(StorageProxyUtils.getTabularFormat(dataHits, StorageProxyUtils.COMMA)); 
+                                               List<Object> tabularData = StorageProxyUtils.getTabularFormat(dataHits, StorageProxyUtils.COMMA); 
+                                               for (Object obj : tabularData){
+                                                 data.add(obj);
+                                               }   
                                               } // this block only for Tabular format
                                               storageProxy.setData(data);
                                               }
                                               else {
-                                                storageProxy.setStatusMessage("There are no documents available with the provided ");
+                                                storageProxy.setStatusMessage("There are no documents available with the provided");
+                                              }
+                                              } // end of check for the size 50000
+                                              else {
+                                                storageProxy.setStatusMessage("The size cannot be greater than 50000");
+                                              }
+                                              }
+                                              else{
+                                                storageProxy.setStatusMessage("Please provide size & from parameter in query.");
+                                                storageProxy.setPageSize(0);
+                                                storageProxy.setPageNum(0);
                                               }
                                               break;
                                           }
                             // TODO: Execute Query or perform 'search' & 'sncrpivot' prepare response based on the specification (either JSON or Tabular) 
                             // TODO: Convert data either into tabular or JSON
                           }
-                        } // end of if block for validation of query which needs to be executed
-                        else {
-                          storageProxy.setStatusMessage("Provided Query is not valid due to : " +validateResponse.getQueryExplanation().toString());
-                          throw new ValidationException();
-                        }
             } // end of action operation  if block
             else {
               storageProxy.setStatusMessage("This "+action+" is not yet supported by StorageType :" + storageType);

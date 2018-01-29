@@ -158,8 +158,10 @@ public class StorageProxyController {
      logger.trace("Storage Proxy sync request object : {} ", objectMapper.writeValueAsString(proxyNode));
      responseObjectFuture= proxyService.execute(proxyNode);
     } catch (IOException e){
+      logger.error("expected missing on the request body.", e);
       throw new JSONProcessingSAWException("expected missing on the request body");
     } catch (ReadEntitySAWException ex){
+      logger.error("Problem on the storage while reading data from storage.", ex);
       throw new ReadEntitySAWException("Problem on the storage while reading data from storage");
     } catch (ProcessingException e){
       logger.error("Exception generated while validating incoming json against schema.", e);
