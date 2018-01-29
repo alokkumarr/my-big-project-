@@ -13,7 +13,7 @@ import {
 
 const template = require('./designer-date-filter.component.html');
 
-const DATE_FORMAT = 'DD-MM-YYYY';
+const DATE_FORMAT = 'YYYY-MM-DD';
 
 export const MY_FORMATS = {
   parse: {
@@ -42,7 +42,8 @@ export class DesignerDateFilterComponent {
 
   public tempModel = {
     gte: null,
-    lte: null
+    lte: null,
+    preset: 'NA'
   }
 
   ngOnInit() {
@@ -50,8 +51,9 @@ export class DesignerDateFilterComponent {
       this.filterModel = {};
     } else {
       this.tempModel = {
-        gte: moment(this.filterModel.lte),
-        lte: moment(this.filterModel.gte)
+        gte: moment(this.filterModel.gte),
+        lte: moment(this.filterModel.lte),
+        preset: 'NA'
       }
     }
   }
@@ -61,5 +63,4 @@ export class DesignerDateFilterComponent {
     this.filterModel[prop] = value.format(DATE_FORMAT);
     this.filterModelChange.emit(this.filterModel);
   }
-
 }
