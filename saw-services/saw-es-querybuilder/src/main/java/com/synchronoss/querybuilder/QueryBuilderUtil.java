@@ -231,6 +231,52 @@ public class QueryBuilderUtil {
 	    }
 	    return builder;
 	  }
+
+	public static List<QueryBuilder> stringFilterChart (Filter item, List<QueryBuilder> builder)
+	{
+		if (item.getModel().getOperator().value().equals(Operator.EQ.value()) ||
+				item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
+			TermsQueryBuilder termsQueryBuilder =
+					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+			builder.add(termsQueryBuilder);
+		}
+
+		if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
+				item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
+			QueryBuilder qeuryBuilder =
+					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+			BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+			boolQueryBuilder.mustNot(qeuryBuilder);
+			builder.add(boolQueryBuilder);
+		}
+
+		// assuming that it will be only one string for wildcard search
+		if (item.getModel().getOperator().value().equals(Operator.SW.value())) {
+			MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
+					item.getModel().getStringValue() + "*");
+			builder.add(matchQueryBuilder);
+		}
+
+		// assuming that it will be only one string for wildcard search
+		if (item.getModel().getOperator().value().equals(Operator.EW.value())) {
+			MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
+					"*"+item.getModel().getStringValue());
+			builder.add(matchQueryBuilder);
+		}
+
+		if (item.getModel().getOperator().value().equals(Operator.CONTAINS.value())) {
+			MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
+					"*"+item.getModel().getStringValue()+"*");
+			builder.add(matchQueryBuilder);
+		}
+//		if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
+//			BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
+//			boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
+//					.getValue()));
+//			builder.add(boolQueryBuilderIn);
+//		}
+		return builder;
+	}
 	
 
 	public static List<QueryBuilder> numericFilterPivot (com.synchronoss.querybuilder.model.pivot.Filter item, List<QueryBuilder> builder)
@@ -279,23 +325,39 @@ public class QueryBuilderUtil {
 
 	public static List<QueryBuilder> stringFilterPivot (com.synchronoss.querybuilder.model.pivot.Filter item, List<QueryBuilder> builder)
 	{
-		if (item.getModel().getOperator().value().equals(Operator.EQ.value())) {
+		if (item.getModel().getOperator().value().equals(Operator.EQ.value()) ||
+				item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
 			TermsQueryBuilder termsQueryBuilder =
 					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
 			builder.add(termsQueryBuilder);
 		}
 
+		if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
+				item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
+			QueryBuilder qeuryBuilder =
+					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+			BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+			boolQueryBuilder.mustNot(qeuryBuilder);
+			builder.add(boolQueryBuilder);
+		}
+
 		// assuming that it will be only one string for wildcard search
 		if (item.getModel().getOperator().value().equals(Operator.SW.value())) {
 			MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
-					item.getModel().getValue()+"*");
+					item.getModel().getStringValue() + "*");
 			builder.add(matchQueryBuilder);
 		}
 
 		// assuming that it will be only one string for wildcard search
 		if (item.getModel().getOperator().value().equals(Operator.EW.value())) {
 			MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
-					"*"+item.getModel().getValue());
+					"*"+item.getModel().getStringValue());
+			builder.add(matchQueryBuilder);
+		}
+
+		if (item.getModel().getOperator().value().equals(Operator.CONTAINS.value())) {
+			MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
+					"*"+item.getModel().getStringValue()+"*");
 			builder.add(matchQueryBuilder);
 		}
 //		if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {

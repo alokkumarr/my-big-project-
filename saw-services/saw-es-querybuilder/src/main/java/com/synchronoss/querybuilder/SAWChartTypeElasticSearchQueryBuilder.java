@@ -172,10 +172,9 @@ class SAWChartTypeElasticSearchQueryBuilder {
               builder.add(rangeQueryBuilder);
             }
           }
+          // make the query based on the filter given
           if (item.getType().value().equals(Type.STRING.value())) {
-            TermsQueryBuilder termsQueryBuilder =
-                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-            builder.add(termsQueryBuilder);
+            builder = QueryBuilderUtil.stringFilterChart(item, builder);
           }
           if ((item.getType().value().toLowerCase().equals(Type.DOUBLE.value().toLowerCase()) || item
               .getType().value().toLowerCase().equals(Type.INT.value().toLowerCase()))

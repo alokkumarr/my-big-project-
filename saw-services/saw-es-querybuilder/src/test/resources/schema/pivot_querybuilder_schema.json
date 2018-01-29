@@ -132,18 +132,27 @@
                         "LTE",
                         "EQ",
                         "NEQ",
-                        "BTW"
+                        "BTW",
+                        "SW",
+                        "EW",
+                        "CONTAINS",
+                        "ISIN",
+                        "ISNOTIN"
                       ],
                       "id":"/properties/filters/model/properties/booleanCriteria",
-                      "type":"string"
+                      "type":"integer"
                     },
                     "value":{
                       "id":"/properties/filters/model/properties/value",
-                      "type":"integer"
+                      "type":"string"
                     },
                     "otherValue":{
                       "id":"/properties/filters/model/properties/otherValue",
                       "type":"integer"
+                    },
+                    "stringValue":{
+                      "id":"/properties/filters/model/properties/stringValue",
+                      "type":"string"
                     },
                     "gte":{
                       "id":"/properties/filters/model/properties/gte",
