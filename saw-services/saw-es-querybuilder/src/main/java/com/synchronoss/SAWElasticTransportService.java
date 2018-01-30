@@ -3,6 +3,7 @@ package com.synchronoss;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -68,6 +69,43 @@ public class SAWElasticTransportService {
      return finalResponse.get("aggregations").toString();
   }
 
+  private static List<String> executeEsReport(String query, String jsonString, String dsk, String username,
+                                String moduleName) throws JsonProcessingException, IOException, NullPointerException{
+    String url = System.getProperty("url");
+    JsonNode repository = BuilderUtil.getRepositoryNodeTree(jsonString, "esRepository");
+    String indexName = repository.get("indexName").asText();
+    String type = repository.get("type").textValue();
+    OkHttpClient client = new OkHttpClient();
+    MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    ESProxy esProxy = new ESProxy();
+    esProxy.setStorageType("ES");
+    esProxy.setIndexName(indexName);
+    esProxy.setObjectType(type);
+    esProxy.setVerb("_search");
+    esProxy.setQuery(query);
+    esProxy.setModuleName(moduleName);
+    esProxy.setDsk(dsk);
+    esProxy.setUsername(username);
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    mapper.disable(SerializationFeature.INDENT_OUTPUT);
+    RequestBody body = RequestBody.create(JSON, mapper.writeValueAsBytes(esProxy));
+    Request req = new Request.Builder().post(body).url(url).build();
+    logger.trace("Elasticsearch request: {}", req);
+    Response response = client.newCall(req).execute();
+    logger.trace("Elasticsearch response: {}", response);
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    String responseString = response.body().string();
+    logger.trace("responseStringdfd" +responseString);
+    JsonNode esResponse = objectMapper.readTree(responseString);
+    if (esResponse.get("data") == null)
+    {
+      throw new NullPointerException("Data is not available based on provided query criteria");
+    }
+      return  buildReportData(esResponse.get("data"));
+  }
+
 
   /**
    *
@@ -112,16 +150,16 @@ public class SAWElasticTransportService {
     return arr;
   }
 
-  private static String buildReportData(JsonNode jsonNode)
+  private static List<String> buildReportData(JsonNode jsonNode)
   {
     Iterator<JsonNode> recordIterator = jsonNode.get(HITS).get(HITS).iterator();
-    ArrayList<String> data = new ArrayList<>();
+    List<String> data = new ArrayList<>();
     while(recordIterator.hasNext())
     {
        JsonNode source = recordIterator.next();
       data.add(source.get(_SOURCE).toString());
     }
-    return data.toString();
+    return data;
   }
 
 }

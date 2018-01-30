@@ -51,11 +51,8 @@ public class SAWReportTypeElasticSearchQueryBuilder {
      * @throws ProcessingException
      */
 
-    public String buildDataQuery() throws IOException, ProcessingException {
+    public String buildDataQuery(Integer size) throws IOException, ProcessingException {
         SqlBuilder sqlBuilderNode = BuilderUtil.getNodeTreeReport(getJsonString(), "sqlBuilder");
-        /** TO DO: (Temporary check-in for size variable) next iterator size value will be implemented
-         * with UI parameter */
-        int size = 1000;
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.size(size);
         if (sqlBuilderNode.getSorts() == null && sqlBuilderNode.getFilters() == null) {
@@ -119,14 +116,9 @@ public class SAWReportTypeElasticSearchQueryBuilder {
                         }
                     }
                     if (item.getType().value().equals(Filter.Type.STRING.value())) {
-                        BoolQueryBuilder qb = QueryBuilders.boolQuery();
-                        for (Object s : item.getModel().getModelValues()) {
-                            MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(), s);
-                            matchQueryBuilder.analyzer("standard");
-                            matchQueryBuilder.fuzzyTranspositions(false);
-                            qb.should(matchQueryBuilder);
-                        }
-                        builder.add(qb);
+                        TermsQueryBuilder termsQueryBuilder =
+                                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+                        builder.add(termsQueryBuilder);
                     }
 
                     if ((item.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase()) || item
@@ -163,14 +155,9 @@ public class SAWReportTypeElasticSearchQueryBuilder {
                         }
                     }
                     if (item.getType().value().equals(Filter.Type.STRING.value())) {
-                        BoolQueryBuilder qb = QueryBuilders.boolQuery();
-                        for (Object s : item.getModel().getModelValues()) {
-                            MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(), s);
-                            matchQueryBuilder.analyzer("standard");
-                            matchQueryBuilder.fuzzyTranspositions(false);
-                            qb.should(matchQueryBuilder);
-                        }
-                        builder.add(qb);
+                        TermsQueryBuilder termsQueryBuilder =
+                                new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+                        builder.add(termsQueryBuilder);
                     }
                     if ((item.getType().value().toLowerCase().equals(Filter.Type.DOUBLE.value().toLowerCase()) || item
                             .getType().value().toLowerCase().equals(Filter.Type.INT.value().toLowerCase()))
@@ -203,8 +190,8 @@ public class SAWReportTypeElasticSearchQueryBuilder {
         return searchSourceBuilder.toString();
     }
 
-    public SearchSourceBuilder getSearchSourceBuilder() throws IOException, ProcessingException {
-        buildDataQuery();
+    public SearchSourceBuilder getSearchSourceBuilder(Integer size) throws IOException, ProcessingException {
+        buildDataQuery(size);
         return searchSourceBuilder;
     }
 
