@@ -42,7 +42,7 @@ export class DesignerFilterRowComponent {
 
   onRuntimeCheckboxToggle(filter: Filter, checked: boolean) {
     filter.isRuntimeFilter = checked;
-    filter.model = null;
+    delete filter.model;
   }
 
   remove() {
