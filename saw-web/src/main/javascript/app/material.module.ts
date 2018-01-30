@@ -1,3 +1,5 @@
+declare const require: any;
+
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
@@ -7,6 +9,7 @@ import {
   MatIconModule,
   MatDialogModule,
   MatFormFieldModule,
+  MatSidenavModule,
   MatProgressBarModule,
   MatChipsModule,
   MatInputModule
@@ -21,6 +24,7 @@ import '../../../../themes/_angular_next.scss';
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
+    MatSidenavModule,
     MatRadioModule,
     MatSelectModule,
     MatFormFieldModule,
@@ -33,6 +37,7 @@ import '../../../../themes/_angular_next.scss';
     MatIconModule,
     MatDialogModule,
     MatRadioModule,
+    MatSidenavModule,
     MatSelectModule,
     MatFormFieldModule,
     MatProgressBarModule,

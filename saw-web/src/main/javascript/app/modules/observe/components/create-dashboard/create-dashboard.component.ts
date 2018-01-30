@@ -1,6 +1,7 @@
 import { Component, Inject, ViewChild } from '@angular/core';
 import { UIRouter } from '@uirouter/angular';
-import { MdDialogRef, MD_DIALOG_DATA, MdDialog } from '@angular/material'; import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
+import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { MenuService } from '../../../../common/services/menu.service';
 import { ObserveService } from '../../services/observe.service';
@@ -60,12 +61,12 @@ export class CreateDashboardComponent {
   public requester = new BehaviorSubject({});
   public mode = 'create';
 
-  constructor(public dialogRef: MdDialogRef<CreateDashboardComponent>,
-    private dialog: MdDialog,
+  constructor(public dialogRef: MatDialogRef<CreateDashboardComponent>,
+    private dialog: MatDialog,
     private router: UIRouter,
     private menu: MenuService,
     private observe: ObserveService,
-    @Inject(MD_DIALOG_DATA) public dialogData: any
+    @Inject(MAT_DIALOG_DATA) public dialogData: any
   ) {
     this.dashboard = get(this.dialogData, 'dashboard');
     this.mode = get(this.dialogData, 'mode');

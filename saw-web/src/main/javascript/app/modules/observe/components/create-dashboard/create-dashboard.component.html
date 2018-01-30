@@ -1,6 +1,6 @@
-<div md-dialog-title>
-  <button md-icon-button (click)="exitCreator()">
-    <md-icon fontIcon="icon-arrow-left"></md-icon>
+<div mat-dialog-title>
+  <button mat-icon-button (click)="exitCreator()">
+    <mat-icon fontIcon="icon-arrow-left"></mat-icon>
   </button>
   <span>
     {{mode === 'create' ? 'Create new' : 'Edit'}} Dashboard
@@ -9,18 +9,18 @@
     <!-- <button md-button>
       Description
     </button> -->
-    <button md-raised-button color="primary" (click)="saveDashboard()" [disabled]="this.fillState === 'empty'">
+    <button mat-raised-button color="primary" (click)="saveDashboard()" [disabled]="this.fillState === 'empty'">
       Save
     </button>
   </div>
 </div>
-<div md-dialog-content>
+<div mat-dialog-content>
   <dashboard-grid [model]="dashboard"
   [requester]="requester"
   [mode]="mode"
   (getDashboard)="onDashboardChange($event)"></dashboard-grid>
 </div>
 <span [@hideHelp]="fillState" class="add-button-help">Add a new analysis to the dashboard</span>
-<button [@moveButton]="fillState" md-fab color="primary" class="add-analysis" (click)="chooseAnalysis()">
-  <md-icon fontIcon="icon-plus"></md-icon>
+<button [@moveButton]="fillState" mat-fab color="primary" class="add-analysis" (click)="chooseAnalysis()">
+  <mat-icon fontIcon="icon-plus"></mat-icon>
 </button>

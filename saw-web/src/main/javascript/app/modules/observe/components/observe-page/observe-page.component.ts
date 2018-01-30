@@ -1,7 +1,7 @@
 declare function require(string): string;
 
 import { Inject, OnInit } from '@angular/core';
-import { MdIconRegistry } from '@angular/material';
+import { MatIconRegistry } from '@angular/material';
 import { UIRouter } from '@uirouter/angular';
 
 import * as forEach from 'lodash/forEach';
@@ -32,7 +32,7 @@ import { Component } from '@angular/core';
 export class ObservePageComponent implements OnInit {
 
   constructor(
-    private iconRegistry: MdIconRegistry,
+    private iconRegistry: MatIconRegistry,
     private analyze: AnalyzeService,
     private menu: MenuService,
     private observe: ObserveService,
@@ -40,7 +40,7 @@ export class ObservePageComponent implements OnInit {
     private router: UIRouter,
     @Inject('$componentHandler') private $componentHandler
   ) {
-    this.iconRegistry.setDefaultFontSetClass('icomoon');
+    // this.iconRegistry.setDefaultFontSetClass('icomoon');
   }
 
 

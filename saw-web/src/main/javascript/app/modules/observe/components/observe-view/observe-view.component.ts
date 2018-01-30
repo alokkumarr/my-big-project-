@@ -1,6 +1,6 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 
-import { MdDialog } from '@angular/material';
+import { MatDialog, MatSidenav } from '@angular/material';
 import { Transition } from '@uirouter/angular';
 import { Dashboard } from '../../models/dashboard.interface';
 
@@ -21,14 +21,16 @@ export class ObserveViewComponent implements OnInit {
   private dashboardId: string;
   private subCategoryId: string;
   private dashboard: Dashboard;
+  private sidenavOpened = false;
   private privileges = {
     create: false,
     delete: false,
     edit: false
   };
+  @ViewChild(MatSidenav) sidenav;
 
   constructor(
-    public dialog: MdDialog,
+    public dialog: MatDialog,
     private observe: ObserveService,
     private headerProgress: HeaderProgressService,
     private jwt: JwtService,
@@ -41,6 +43,7 @@ export class ObserveViewComponent implements OnInit {
   }
 
   ngOnInit() {
+    window['mysidenav'] = this.sidenav;
     if (this.dashboardId) {
       this.loadDashboard();
     }
@@ -96,6 +99,9 @@ export class ObserveViewComponent implements OnInit {
         mode: 'create'
       }
     });
+  }
+
+  openGlobalFilters(): void {
   }
 
   loadDashboard(): void {
