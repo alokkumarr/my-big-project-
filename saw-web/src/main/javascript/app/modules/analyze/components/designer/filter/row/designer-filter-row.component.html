@@ -2,7 +2,9 @@
      fxLayoutAlign="space-between center"
      [ngSwitch]="TYPE_MAP[filter.type]">
   <div fxLayout="row"
-       fxLayoutAlign="space-between center">
+       fxFlex="grow"
+       class="filter__data__space"
+       fxLayoutAlign="start">
     <mat-form-field>
       <mat-select placeholder="Column"
                   (selectionChange)="onArtifactColumnSelected($event.value)"
@@ -33,6 +35,7 @@
   </div>
 
   <div fxLayout="row"
+       class="filter__action__space"
        fxLayoutAlign="space-between center">
     <mat-checkbox [checked]="filter.isRuntimeFilter"
                   (change)="onRuntimeCheckboxToggle(filter, $event.checked)"

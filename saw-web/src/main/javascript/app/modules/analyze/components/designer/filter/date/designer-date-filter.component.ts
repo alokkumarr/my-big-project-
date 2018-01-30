@@ -10,6 +10,7 @@ import {MAT_DATE_FORMATS} from '@angular/material/core';
 import {
   FilterModel
 } from '../../types';
+import {CUSTOM_DATE_PRESET_VALUE, DATE_PRESETS} from '../../../../consts';
 
 const template = require('./designer-date-filter.component.html');
 
@@ -39,23 +40,40 @@ export class DesignerDateFilterComponent {
   @Input() public filterModel: FilterModel;
 
   date = new FormControl({value: moment(), disabled: true});
+  datePreset = new FormControl({value: null, disabled: false})
+  showDateFields = false;
+  presets = DATE_PRESETS;
 
   public tempModel = {
     gte: null,
     lte: null,
-    preset: 'NA'
+    preset: CUSTOM_DATE_PRESET_VALUE
   }
 
   ngOnInit() {
     if (!this.filterModel) {
       this.filterModel = {};
     } else {
+      this.datePreset.setValue(this.filterModel.preset || CUSTOM_DATE_PRESET_VALUE);
       this.tempModel = {
         gte: moment(this.filterModel.gte),
         lte: moment(this.filterModel.lte),
-        preset: 'NA'
+        preset: this.filterModel.preset || CUSTOM_DATE_PRESET_VALUE
       }
     }
+
+    this.showDateFields = this.filterModel.preset === CUSTOM_DATE_PRESET_VALUE;
+  }
+
+  onPresetChange(change) {
+    this.filterModel.preset = change.value;
+    if (change.value !== CUSTOM_DATE_PRESET_VALUE) {
+      delete this.filterModel.gte;
+      delete this.filterModel.lte;
+    }
+
+    this.showDateFields = change.value === CUSTOM_DATE_PRESET_VALUE;
+    this.filterModelChange.emit(this.filterModel);
   }
 
   modelChange(value, prop: 'lte' | 'gte') {
