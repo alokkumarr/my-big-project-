@@ -10,14 +10,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.elasticsearch.action.search.SearchResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.synchronoss.saw.storage.proxy.StorageProxyUtils;
 import com.synchronoss.saw.storage.proxy.model.StorageProxy;
@@ -97,14 +97,67 @@ public class StorageProxyServiceImpl implements StorageProxyService {
                             switch (action){
                               case "sncrpivot" : 
                                                if (storageProxy.getSqlBuilder()!=null){
+                                                 Preconditions.checkArgument(storageProxy.getQuery()!=null, "Query cannot be null.");  
+                                                 String query = storageProxy.getQuery();
+                                                 int size =0;
                                                    storageProxy.setPageSize(0);
                                                    storageProxy.setPageNum(0);
+                                                   if(storageProxy.getQuery().contains("size") && !query.contains("from")){
+                                                     Pattern p = Pattern.compile(QUERY_REG_EX, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                                                     Matcher m = p.matcher(query);
+                                                     if (m.find())
+                                                     {
+                                                         String fromSize_1=m.group(1).trim();
+                                                         String fromSize_1_Num=m.group(2);
+                                                         String fromSize_2_Num=m.group(4);
+                                                         if (fromSize_1.equals("size")){
+                                                           size = Integer.parseInt(fromSize_1_Num);
+                                                           }
+                                                         else{
+                                                           size = Integer.parseInt(fromSize_2_Num);
+                                                         }
+                                                     } // parsing of size & from
+                                                   if (size ==0){ 
                                                    SearchESResponse<?> sncrPivotResponse =(SearchESResponse<?>) storageConnectorService.searchDocuments(storageProxy.getQuery(), storageProxy);
-                                                   logger.debug("Data from Aggregation" +sncrPivotResponse.getAggregations().toString());
-                                               } else {
-                                                 storageProxy.setStatusMessage("To process the action type of sncrpivot, sqlBuilder is mandatory");
-                                               }
-                                               
+                                                   if (storageProxy.getResultFormat().value().equals(ResultFormat.JSON.value())){
+                                                       logger.debug("Data from Aggregation :" +sncrPivotResponse.getAggregations());
+                                                           ObjectMapper mapperObj = new ObjectMapper();
+                                                           String jsonString = mapperObj.writeValueAsString(sncrPivotResponse.getAggregations());
+                                                           JsonNode objectNode = mapperObj.readTree("{ \"data\":"+jsonString + "}");
+                                                           PivotSNCRFlattener pivotSNCRFlattener = new PivotSNCRFlattener(storageProxy.getSqlBuilder());
+                                                           List<Object> flatData= pivotSNCRFlattener.parseData(objectNode);
+                                                           storageProxy.setData(flatData);
+                                                           storageProxy.setStatusMessage("Data has been retrieved & has been flattened.");
+                                                        logger.debug("Data from Aggregation converted into Flat Data " +flatData);
+                                                   }else{
+                                                     logger.debug("Data from Aggregation :" +sncrPivotResponse.getAggregations());
+                                                       ObjectMapper mapperObj = new ObjectMapper();
+                                                       String jsonString = mapperObj.writeValueAsString(sncrPivotResponse.getAggregations());
+                                                       JsonNode objectNode = mapperObj.readTree("{ \"data\":"+jsonString + "}");
+                                                       PivotSNCRFlattener pivotSNCRFlattener = new PivotSNCRFlattener(storageProxy.getSqlBuilder());
+                                                       List<Map<String, Object>> flatData= pivotSNCRFlattener.parseDataMap(objectNode);
+                                                       List<Object> data = new ArrayList<>();
+                                                       List<Object> tabularData = StorageProxyUtils.getTabularFormat(flatData, StorageProxyUtils.COMMA); 
+                                                       for (Object obj : tabularData){
+                                                         data.add(obj);
+                                                       }
+                                                       storageProxy.setData(data);
+                                                       storageProxy.setStatusMessage("Data has been retrieved & has been flattened.");
+                                                     logger.debug("Data from Aggregation into JSON Format " +sncrPivotResponse.getAggregations()); 
+                                                       }
+                                                   }
+                                                  else {
+                                                    storageProxy.setStatusMessage("size cannot be greater or less than zero.");
+                                                  }
+                                                  }
+                                                  else {
+                                                    storageProxy.setStatusMessage("Please provide size with value 'size=0' & it shall not conti 'from' parameter in query.");
+                                                    storageProxy.setPageSize(0);
+                                                    storageProxy.setPageNum(0);
+                                                  }
+                                                } else {
+                                                  storageProxy.setStatusMessage("To process the action type of sncrpivot, sqlBuilder is mandatory");
+                                                }
                                                break;
                               case "search" : 
                                               Preconditions.checkArgument(storageProxy.getQuery()!=null, "Query cannot be null.");

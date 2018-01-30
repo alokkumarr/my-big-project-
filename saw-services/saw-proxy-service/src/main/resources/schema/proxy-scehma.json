@@ -1,148 +1,197 @@
 {
-  "definitions": {},
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "id": "http://synchronoss.com/proxy.json",
-  "type": "array",
-  "items": {
-    "id": "http://synchronoss.com/proxy.json/items",
-    "type": "object",
-    "properties": {
-      "storage": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/storage",
-        "type": "string",
-        "title": "The Storage Schema",
-        "description": "An explanation about the purpose of this instance.",
-        "default": "ES",
-        "enum": [
-          "ES","DL","RDMS"
-        ]
-        
-     },
-      "action": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/action",
-        "type": "string",
-        "title": "The Storage Schema",
-        "description": "An explanation about the purpose of this instance.",
-        "default": "search",
-        "enum": [
-          "search","validate","count", "create", "delete", "update", "aggregate", "sncrpivot"
-        ]
-      },
-      "query": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/query",
-        "type": "string",
-        "title": "It holds the query",
-        "description": "An explanation about the purpose of this instance."
-      },
-      "entityId": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/entityId",
-        "type": "string",
-        "title": "It holds the query",
-        "description": "An explanation about the purpose of this instance."
-      },
-      "pageNum": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/pageNum",
-        "type": "number",
-        "minimum": 0,
-        "title": "It holds the query",
-        "description": "An explanation about the purpose of this instance."
-      },
- 
-      "pageSize": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/pageSize",
-        "type": "integer",
-        "title": "It holds the query",
-        "minimum": 0,
-  		"maximum": 10000,
-        "description": "An explanation about the purpose of this instance."
-      },
-      
-      "statusMessage": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/statusMessage",
-        "type": "string",
-        "title": "It holds the statusMessage",
-        "description": "An explanation about the purpose of this instance."
-      },
-      
-      "requestBy": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/requestBy",
-        "type": "string",
-        "title": "It holds the user requested by",
-        "description": "An explanation about the purpose of this instance.",
-        "default": "admin@synchronoss.com"
-        
-      },
-      "objectType": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/objectType",
-        "type": "string",
-        "title": "It holds the objectType",
-        "description": "An explanation about the purpose of this instance."
-      },
-      "indexName": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/indexName",
-        "type": "string",
-        "title": "It holds the indexName",
-        "description": "An explanation about the purpose of this instance."
-      },
-      "tableName": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/tableName",
-        "type": "string",
-        "title": "It holds the tableName",
-        "description": "An explanation about the purpose of this instance."
-      },
-      "objectName": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/objectName",
-        "type": "string",
-        "title": "It holds the objectName",
-        "description": "An explanation about the purpose of this instance."
-      },
-      "requestedTime": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/requestedTime",
-        "type": "string",
-        "title": "It holds the user requested time",
-        "description": "An explanation about the purpose of this instance."
-      },
-      "productCode": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/productCode",
-        "type": "string",
-        "title": "The Productcode Schema",
-        "description": "An explanation about the purpose of this instance."
-      },
-      "moduleName": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/moduleName",
-        "type": "string",
-        "title": "The Modulename Schema",
-        "description": "An explanation about the purpose of this instance."
-      },
-      "dataSecurityKey": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/dataSecurityKey",
-        "type": "array",
-        "items": {
-          "title": "Empty Object",
-          "description": "Accepts anything iff it's valid JSON."
-        }
-      },
-      "resultFormat": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/resultFormat",
-        "type": "string",
-        "title": "The Resultformat Schema",
-        "description": "An explanation about the purpose of this instance.",
-        "default": "json",
-        "enum": [
-          "tabular", "json"
-        ]
-      },
-     "data": {
-        "id": "http://synchronoss.com/proxy.json/items/properties/data",
-        "type": "array",
-        "items": {
-          "title": "Empty Object",
-          "description": "Accepts anything iff it's valid JSON."
-        }
-      },
-      "sqlBuilder":{  
+   "definitions":{
+
+   },
+   "$schema":"http://json-schema.org/draft-04/schema#",
+   "id":"http://synchronoss.com/proxy.json",
+   "type":"array",
+   "items":{
+      "id":"http://synchronoss.com/proxy.json/items",
+      "type":"object",
+      "properties":{
+         "storage":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/storage",
+            "type":"string",
+            "title":"The Storage Schema",
+            "description":"An explanation about the purpose of this instance.",
+            "default":"ES",
+            "enum":[
+               "ES",
+               "DL",
+               "RDMS"
+            ]
+         },
+         "action":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/action",
+            "type":"string",
+            "title":"The Storage Schema",
+            "description":"An explanation about the purpose of this instance.",
+            "default":"search",
+            "enum":[
+               "search",
+               "validate",
+               "count",
+               "create",
+               "delete",
+               "update",
+               "aggregate",
+               "sncrpivot"
+            ]
+         },
+         "query":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/query",
+            "type":"string",
+            "title":"It holds the query",
+            "description":"An explanation about the purpose of this instance."
+         },
+         "entityId":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/entityId",
+            "type":"string",
+            "title":"It holds the query",
+            "description":"An explanation about the purpose of this instance."
+         },
+         "pageNum":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/pageNum",
+            "type":"number",
+            "minimum":0,
+            "title":"It holds the query",
+            "description":"An explanation about the purpose of this instance."
+         },
+         "pageSize":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/pageSize",
+            "type":"integer",
+            "title":"It holds the query",
+            "minimum":0,
+            "maximum":10000,
+            "description":"An explanation about the purpose of this instance."
+         },
+         "statusMessage":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/statusMessage",
+            "type":"string",
+            "title":"It holds the statusMessage",
+            "description":"An explanation about the purpose of this instance."
+         },
+         "requestBy":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/requestBy",
+            "type":"string",
+            "title":"It holds the user requested by",
+            "description":"An explanation about the purpose of this instance.",
+            "default":"admin@synchronoss.com"
+         },
+         "objectType":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/objectType",
+            "type":"string",
+            "title":"It holds the objectType",
+            "description":"An explanation about the purpose of this instance."
+         },
+         "indexName":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/indexName",
+            "type":"string",
+            "title":"It holds the indexName",
+            "description":"An explanation about the purpose of this instance."
+         },
+         "tableName":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/tableName",
+            "type":"string",
+            "title":"It holds the tableName",
+            "description":"An explanation about the purpose of this instance."
+         },
+         "objectName":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/objectName",
+            "type":"string",
+            "title":"It holds the objectName",
+            "description":"An explanation about the purpose of this instance."
+         },
+         "requestedTime":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/requestedTime",
+            "type":"string",
+            "title":"It holds the user requested time",
+            "description":"An explanation about the purpose of this instance."
+         },
+         "productCode":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/productCode",
+            "type":"string",
+            "title":"The Productcode Schema",
+            "description":"An explanation about the purpose of this instance."
+         },
+         "moduleName":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/moduleName",
+            "type":"string",
+            "title":"The Modulename Schema",
+            "description":"An explanation about the purpose of this instance."
+         },
+         "dataSecurityKey":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/dataSecurityKey",
+            "type":"array",
+            "items":{
+               "title":"Empty Object",
+               "description":"Accepts anything iff it's valid JSON."
+            }
+         },
+         "resultFormat":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/resultFormat",
+            "type":"string",
+            "title":"The Resultformat Schema",
+            "description":"An explanation about the purpose of this instance.",
+            "default":"json",
+            "enum":[
+               "tabular",
+               "json"
+            ]
+         },
+         "data":{
+            "id":"http://synchronoss.com/proxy.json/items/properties/data",
+            "type":"array",
+            "items":{
+               "title":"Empty Object",
+               "description":"Accepts anything iff it's valid JSON."
+            }
+         },
+         "sqlBuilder":{  
          "id":"/properties/sqlBuilder",
          "properties":{  
+            "columnFields":{  
+               "id":"/properties/sqlBuilder/properties/columnFields",
+               "items":{  
+                  "id":"/properties/sqlBuilder/properties/columnFields/items",
+                  "properties":{  
+                     "columnName":{  
+                        "id":"/properties/sqlBuilder/properties/columnFields/items/properties/columnName",
+                        "type":"string"
+                     },
+                     "groupInterval":{  
+                        "enum":[  
+                           "year",
+                           "month",
+                           "day",
+                           "quarter",
+                           "hour",
+                           "week"
+                        ],
+                        "id":"/properties/sqlBuilder/properties/columnFields/items/properties/groupInterval",
+                        "type":"string"
+                     },
+                     "type":{  
+                        "enum":[  
+                           "date",
+                           "timestamp",
+                           "long",
+                           "double",
+                           "integer",
+                           "string",
+                           "float"
+                        ],
+                        "id":"/properties/sqlBuilder/properties/columnFields/items/properties/type",
+                        "type":"string"
+                     }
+                  },
+                  "required":[  
+                     "columnName",
+                     "type"
+                  ]
+               },
+               "type":"array"
+            },
             "dataFields":{  
                "id":"/properties/sqlBuilder/properties/dataFields",
                "items":{  
@@ -173,9 +222,9 @@
                            "timestamp",
                            "long",
                            "double",
-                           "float",
                            "integer",
-                           "string"
+                           "string",
+                           "float"
                         ],
                         "id":"/properties/sqlBuilder/properties/dataFields/items/properties/type",
                         "type":"string"
@@ -186,17 +235,16 @@
                      "columnName",
                      "type",
                      "name"
-                  ],
-                  "type":"object"
+                  ]
                },
                "type":"array"
             },
             "booleanCriteria":{  
                "enum":[  
-                  "AND",
-                  "OR"
+                  "OR",
+                  "AND"
                ],
-               "id":"/properties/filters/model/properties/booleanCriteria",
+               "id":"/properties/filters/items/properties/booleanCriteria",
                "type":"string"
             },
             "filters":{  
@@ -218,6 +266,14 @@
                      },
                      "model":{  
                         "properties":{  
+                           "booleanCriteria":{  
+                              "enum":[  
+                                 "AND",
+                                 "OR"
+                              ],
+                              "id":"/properties/filters/model/properties/booleanCriteria",
+                              "type":"string"
+                           },
                            "operator":{  
                               "enum":[  
                                  "GT",
@@ -293,7 +349,49 @@
                         "id":"/properties/filters/items/properties/type",
                         "type":"string"
                      }
+                  }
+               },
+               "type":"array"
+            },
+            "rowFields":{  
+               "id":"/properties/sqlBuilder/properties/rowFields",
+               "items":{  
+                  "id":"/properties/sqlBuilder/properties/rowFields/items",
+                  "properties":{  
+                     "columnName":{  
+                        "id":"/properties/sqlBuilder/properties/rowFields/items/properties/columnName",
+                        "type":"string"
+                     },
+                     "groupInterval":{  
+                        "enum":[  
+                           "year",
+                           "month",
+                           "day",
+                           "quarter",
+                           "hour",
+                           "week"
+                        ],
+                        "id":"/properties/sqlBuilder/properties/rowFields/items/properties/groupInterval",
+                        "type":"string"
+                     },
+                     "type":{  
+                        "enum":[  
+                           "date",
+                           "timestamp",
+                           "long",
+                           "double",
+                           "integer",
+                           "string",
+                           "float"
+                        ],
+                        "id":"/properties/sqlBuilder/properties/rowFields/items/properties/type",
+                        "type":"string"
+                     }
                   },
+                  "required":[  
+                     "columnName",
+                     "type"
+                  ],
                   "type":"object"
                },
                "type":"array"
@@ -333,59 +431,7 @@
                      "columnName",
                      "type",
                      "order"
-                  ],
-                  "type":"object"
-               },
-               "type":"array"
-            },
-            "nodeFields":{  
-               "id":"/properties/sqlBuilder/properties/axesFields/items",
-               "items":{  
-                  "id":"/properties/sqlBuilder/properties/axesFields/items",
-                  "properties":{  
-                     "columnName":{  
-                        "id":"/properties/sqlBuilder/properties/sort/items/properties/columnName",
-                        "type":"string"
-                     },
-                     "type":{  
-                        "enum":[  
-                           "date",
-                           "timestamp",
-                           "long",
-                           "double",
-                           "integer",
-                           "string",
-                           "float"
-                        ],
-                        "id":"/properties/sqlBuilder/groupBy/properties/type",
-                        "type":"string"
-                     },
-                     "tableName":{  
-                        "id":"/properties/sqlBuilder/groupBy/properties/tableName",
-                        "type":"string"
-                     },
-                     "name":{  
-                        "id":"/properties/sqlBuilder/groupBy/properties/name",
-                        "type":"string"
-                     },
-                     "groupInterval":{  
-                        "enum":[  
-                           "year",
-                           "month",
-                           "day",
-                           "quarter",
-                           "hour",
-                           "week"
-                        ],
-                        "id":"/properties/sqlBuilder/properties/columnFields/items/properties/groupInterval",
-                        "type":"string"
-                     }
-                  },
-                  "required":[  
-                     "type",
-                     "columnName"
-                  ],
-                  "type":"object"
+                  ]
                },
                "type":"array"
             }
@@ -393,21 +439,18 @@
          "required":[  
             "sorts",
             "filters",
-            "dataFields",
-            "nodeFields"
+            "dataFields"
          ]
-      }   
-    },
-    "required":[  
-      "storage",
-      "action",
-      "requestBy",
-      "requestedTime",
-      "productCode",
-      "moduleName",
-      "resultFormat"
-    ]
- 
-    
-}
+      }
+      },
+      "required":[
+         "storage",
+         "action",
+         "requestBy",
+         "requestedTime",
+         "productCode",
+         "moduleName",
+         "resultFormat"
+      ]
+   }
 }

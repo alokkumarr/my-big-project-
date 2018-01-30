@@ -89,6 +89,38 @@ public class PivotSNCRFlattener {
         }
         return flatStructure;
     }
+    
+  public List<Map<String, Object>> jsonNodeParserMapValues(JsonNode jsonNode, Map<String, String> dataObj,
+      List<Map<String, Object>> flatStructure, String[] pivotFields, int level) {
+    
+    Map<String, Object> flatValues = new LinkedHashMap<>();
+    JsonNode childNode = jsonNode;
+    if (childNode.get(KEY) != null) {
+      String columnName = getColumnNames(pivotFields, level);
+      if (childNode.get(KEY_AS_STRING) != null)
+        dataObj.put(columnName, childNode.get(KEY_AS_STRING).textValue());
+      else
+        dataObj.put(columnName, childNode.get(KEY).textValue());
+    }
+    String childNodeName = childNodeName(childNode);
+
+    if (childNodeName != null && childNode.get(childNodeName) != null) {
+      JsonNode jsonNode1 = childNode.get(childNodeName).get(BUCKETS);
+      Iterator<JsonNode> iterable1 = jsonNode1.iterator();
+      while (iterable1.hasNext()) {
+        JsonNode jsonNode2 = iterable1.next();
+        jsonNodeParserMapValues(jsonNode2, dataObj, flatStructure, pivotFields, level + 1);
+      }
+    } else {
+      flatValues.putAll(dataObj);
+      for (DataField dataField : builder.getDataFields()) {
+        String columnName = dataField.getColumnName();
+        flatValues.put(columnName, String.valueOf(childNode.get(columnName).get(VALUE)));
+      }
+      flatStructure.add(flatValues);
+    }
+    return flatStructure;
+  }
 
     /**
      *  ES response parsing as JSON Node.
@@ -102,6 +134,16 @@ public class PivotSNCRFlattener {
         Map<String,String> dataObj= new LinkedHashMap<>();
         List<Object> flatStructure = new ArrayList<>();
         flatStructure = jsonNodeParser(jsonNode1,dataObj,flatStructure,pivotFields,0);
+        logger.debug(this.getClass().getName() + " parseData ends here");
+        return flatStructure;
+    }
+    public List<Map<String,Object>> parseDataMap(JsonNode jsonNode)
+    {
+        logger.debug(this.getClass().getName() + " parseData starts here");
+        JsonNode jsonNode1 = jsonNode.get(DATA);
+        Map<String,String> dataObj= new LinkedHashMap<>();
+        List<Map<String,Object>> flatStructure = new ArrayList<>();
+        flatStructure = jsonNodeParserMapValues(jsonNode1,dataObj,flatStructure,pivotFields,0);
         logger.debug(this.getClass().getName() + " parseData ends here");
         return flatStructure;
     }
