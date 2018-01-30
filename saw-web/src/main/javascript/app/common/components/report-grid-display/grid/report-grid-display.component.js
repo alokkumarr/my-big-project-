@@ -5,7 +5,6 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as keys from 'lodash/keys';
 import * as fpGet from 'lodash/fp/get';
 import * as reduce from 'lodash/reduce';
-import * as moment from 'moment';
 
 import {FieldModel} from '../../jsPlumb/models/fieldModel';
 import DataSource from 'devextreme/data/data_source';
@@ -13,7 +12,7 @@ import 'moment-timezone';
 
 import * as template from './report-grid-display.component.html';
 
-import {NUMBER_TYPES, DATE_TYPES, BACKEND_TIMEZONE} from '../../../consts.js';
+import {NUMBER_TYPES, DATE_TYPES} from '../../../consts.js';
 
 const COLUMN_WIDTH = 175;
 const DEFAULT_PAGE_SIZE = 10;
@@ -88,33 +87,11 @@ export const ReportGridDisplayComponent = {
         load: options => {
           return this.source({options})
             .then(({data, count}) => {
-              return {data: this.formatDates(data), totalCount: count};
+              return {data, totalCount: count};
             });
         }
       });
       return store;
-    }
-
-    formatDates(data) {
-      if (isEmpty(data)) {
-        return data;
-      }
-      const ks = keys(data[0] || {});
-      const formats = [
-        moment.ISO_8601,
-        'YYYY-MM-DD hh:mm:ss',
-        'YYYY-MM-DD',
-        'MM/DD/YYYY  :)  HH*mm*ss'
-      ];
-      forEach(data, row => {
-        forEach(ks, key => {
-          const date = moment.tz(row[key], formats, true, BACKEND_TIMEZONE);
-          if (date.isValid() && ['date', 'string-date', 'timestamp'].includes(this.checkColumndatatype(this.columns, key))) {
-            row[key] = date.toDate();
-          }
-        });
-      });
-      return data;
     }
 
     fillColumns(fields, data = []) {
@@ -172,7 +149,7 @@ export const ReportGridDisplayComponent = {
         };
 
         if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
-          field.format = 'shortDate';
+          field.format = 'yyyy-MM-dd';
         }
 
         if (NUMBER_TYPES.includes(column.type) && isUndefined(column.format)) {
