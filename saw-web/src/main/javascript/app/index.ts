@@ -5,13 +5,13 @@ import 'angular-material/angular-material.css';
 import 'fonts/icomoon.css';
 import '../../../../assets/additional-icons.css';
 
-import 'zone.js';
+import 'zone.js/dist/zone';
 import 'reflect-metadata';
 import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
 import { UrlService } from '@uirouter/core';
-import { NgModule, Injector } from '@angular/core';
+import { NgModule, Injector, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { UpgradeModule } from '@angular/upgrade/static';
+import { UpgradeModule, downgradeModule } from '@angular/upgrade/static';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { routesConfig } from './routes';
@@ -28,28 +28,6 @@ import { AdminModule } from './modules/admin';
 
 import { LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent } from './layout';
 
-export const AppModule = 'app';
-
-angular
-  .module(AppModule, [
-    ObserveModule,
-    AnalyzeModule,
-    AlertsModule,
-    AdminModule
-  ])
-  .config(['$urlServiceProvider', ($urlService: UrlService) => $urlService.deferIntercept()])
-  .config(routesConfig)
-  .config(themeConfig)
-  .config(i18nConfig)
-  .config(config)
-  .config(interceptor)
-  .run(runConfig)
-  .component('layoutHeader', LayoutHeaderComponent)
-  .component('layoutContent', LayoutContentComponent)
-  .component('layoutFooter', LayoutFooterComponent);
-
-// angular.bootstrap(document, [AppModule]);
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -65,22 +43,37 @@ export class NewAppModule {
   }
 }
 
-export const platformRefPromise = platformBrowserDynamic().bootstrapModule(NewAppModule);
+const ng2BootstrapFn = (extraProviders: StaticProvider[]) => {
+  return platformBrowserDynamic(extraProviders).bootstrapModule(NewAppModule).then(platformRef => {
+    const injector: Injector = platformRef.injector;
 
-platformRefPromise.then(platformRef => {
-  const upgrade = platformRef.injector.get(UpgradeModule) as UpgradeModule;
-  const injector: Injector = platformRef.injector;
-  upgrade.bootstrap(document.documentElement, [AppModule]);
+    // Instruct UIRouter to listen to URL changes
+    const url: UrlService = injector.get(UrlService);
+    url.listen();
+    url.sync();
+    return platformRef;
+  });
+}
 
-  // Instruct UIRouter to listen to URL changes
-  const url: UrlService = injector.get(UrlService);
-  url.listen();
-  url.sync();
+// This AngularJS module represents the AngularJS pieces of the application.
+export const AppModule = 'app';
 
-  /* Workaround to fix performance - Turns off propagation of changes from
-     angular to angularjs. Remove this once upgradation of components start.
-     */
-  setTimeout(() => {
-    upgrade.ngZone.onMicrotaskEmpty.observers.splice(1, 1);
-  }, 100);
-});
+angular
+  .module(AppModule, [
+    downgradeModule(ng2BootstrapFn),
+    ObserveModule,
+    AnalyzeModule,
+    AlertsModule,
+    AdminModule
+  ])
+  .config(routesConfig)
+  .config(themeConfig)
+  .config(i18nConfig)
+  .config(config)
+  .config(interceptor)
+  .run(runConfig)
+  .component('layoutHeader', LayoutHeaderComponent)
+  .component('layoutContent', LayoutContentComponent)
+  .component('layoutFooter', LayoutFooterComponent);
+
+angular.bootstrap(document, [AppModule]);
