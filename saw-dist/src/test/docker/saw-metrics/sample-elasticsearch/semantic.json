@@ -23,6 +23,11 @@
                 "label": "Pivot",
                 "icon": "icon-pivot",
                 "type": "table:pivot"
+              },
+              {
+                "label": "Report",
+                "icon": "icon-report",
+                "type": "table:esReport"
               }
             ]
           },
