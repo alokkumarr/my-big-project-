@@ -10,10 +10,14 @@ import {
   MatDialogModule,
   MatFormFieldModule,
   MatSidenavModule,
+  MatDatepickerModule,
+  MatExpansionModule,
   MatProgressBarModule,
   MatChipsModule,
   MatInputModule
 } from '@angular/material';
+
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
 import '../../../../themes/_angular_next.scss';
@@ -27,6 +31,9 @@ import '../../../../themes/_angular_next.scss';
     MatSidenavModule,
     MatRadioModule,
     MatSelectModule,
+    MatExpansionModule,
+    MatMomentDateModule,
+    MatDatepickerModule,
     MatFormFieldModule,
     MatProgressBarModule,
     MatChipsModule,
@@ -38,7 +45,10 @@ import '../../../../themes/_angular_next.scss';
     MatDialogModule,
     MatRadioModule,
     MatSidenavModule,
+    MatExpansionModule,
     MatSelectModule,
+    MatMomentDateModule,
+    MatDatepickerModule,
     MatFormFieldModule,
     MatProgressBarModule,
     MatChipsModule,

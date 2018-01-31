@@ -1,0 +1,21 @@
+global-filter {
+  background-color: whitesmoke;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 400px;
+  padding: 10px;
+
+  .filter-header-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-bottom: 15px;
+  }
+
+  .mat-expansion-panel-header {
+    color: #464646;
+    font-weight: bold;
+  }
+}

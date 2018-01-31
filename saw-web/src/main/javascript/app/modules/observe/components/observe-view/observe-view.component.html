@@ -1,26 +1,35 @@
-<div class="page-header-toolbar">
-  <h2>{{(dashboard ? dashboard.name : '') || 'Observe'}}</h2>
-  <div class="page-header-actions">
-    <button mat-button
-    color="warn"
-    *ngIf="dashboard && privileges.delete"
-    (click)="confirmDelete()">Delete</button>
+<mat-sidenav-container class="filter-container" [autosize]="false">
+  <mat-sidenav #filterSidenav mode="over" [opened]="false" position="end">
+    <global-filter></global-filter>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <div class="page-header-toolbar">
+      <h2>{{(dashboard ? dashboard.name : '') || 'Observe'}}</h2>
+      <div class="page-header-actions">
+        <button mat-button
+        color="warn"
+        *ngIf="dashboard && privileges.delete"
+        (click)="confirmDelete()">Delete</button>
 
-    <button mat-button
-    *ngIf="dashboard && privileges.edit"
-    (click)="editDashboard()">Edit</button>
+        <button mat-button
+        *ngIf="dashboard && privileges.edit"
+        (click)="editDashboard()">Edit</button>
 
-    <button mat-button
-    *ngIf="dashboard"
-    (click)="filterSidenav.toggle()">Filter</button>
+        <button mat-button
+        *ngIf="dashboard"
+        (click)="filterSidenav.toggle()">Filter</button>
 
-    <button mat-raised-button
-    color="primary"
-    (click)="createDashboard()">+ DASHBOARD</button>
-  </div>
-</div>
+        <button mat-raised-button
+        color="primary"
+        (click)="createDashboard()">+ DASHBOARD</button>
+      </div>
+    </div>
 
-<div class="page-content">
-  <dashboard-grid [model]="dashboard" mode="view" *ngIf="dashboard"></dashboard-grid>
-  <span *ngIf="!dashboard">No dashboards available.</span>
-</div>
+    <div class="page-content">
+      <dashboard-grid [model]="dashboard" mode="view" *ngIf="dashboard"></dashboard-grid>
+      <span *ngIf="!dashboard">No dashboards available.</span>
+    </div>
+  </mat-sidenav-content>
+
+</mat-sidenav-container>
+

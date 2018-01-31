@@ -1,0 +1,26 @@
+<mat-expansion-panel expanded="true">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      Transfer Date
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+
+  <mat-form-field>
+    <input matInput
+      [matDatepicker]="frompicker"
+      placeholder="From"
+      disabled />
+    <mat-datepicker-toggle matSuffix [for]="frompicker"></mat-datepicker-toggle>
+    <mat-datepicker #frompicker disabled="false"></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field>
+    <input matInput
+      [matDatepicker]="topicker"
+      placeholder="To"
+      disabled />
+    <mat-datepicker-toggle matSuffix [for]="topicker"></mat-datepicker-toggle>
+    <mat-datepicker #topicker disabled="false"></mat-datepicker>
+  </mat-form-field>
+
+</mat-expansion-panel>

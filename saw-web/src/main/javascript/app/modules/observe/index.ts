@@ -42,6 +42,10 @@ import { AnalysisChoiceComponent } from './components/analysis-choice/analysis-c
 import { SaveDashboardComponent } from './components/save-dashboard/save-dashboard.component';
 import { ConfirmDialogComponent } from './components/dialogs/confirm-dialog/confirm-dialog.component';
 import { CreateDashboardComponent } from './components/create-dashboard/create-dashboard.component';
+import {
+  GlobalFilterComponent,
+  GlobalDateFilterComponent
+} from './components/global-filter';
 import { FilterSidenavComponent } from './components/filter-sidenav/filter-sidenav.component';
 import { CheckboxFilterComponent } from './components/checkbox-filter/checkbox-filter.component';
 import { PriceRangeFilterComponent } from './components/price-range-filter/price-range-filter.component';
@@ -56,19 +60,14 @@ angular.module(ObserveModule, [
   CommonModule
 ])
   .config(routesConfig)
-  .config(i18nConfig)
-  .factory('ObserveService', ObserveService)
-  .component('filterSidenav', FilterSidenavComponent)
-  .component('checkboxFilter', CheckboxFilterComponent)
-  .component('priceRangeFilter', PriceRangeFilterComponent)
-  .component('radioFilter', RadioFilterComponent)
-  .component('timeRangeFilter', TimeRangeFilterComponent)
-  .component('filterGroup', FilterGroupComponent);
+  .config(i18nConfig);
 
 const components = [
   ObservePageComponent,
   ObserveViewComponent,
   DashboardGridComponent,
+  GlobalFilterComponent,
+  GlobalDateFilterComponent,
   CreateDashboardComponent,
   AnalysisChoiceComponent,
   ObserveChartComponent,

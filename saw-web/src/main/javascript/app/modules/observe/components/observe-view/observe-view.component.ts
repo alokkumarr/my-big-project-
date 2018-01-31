@@ -43,7 +43,6 @@ export class ObserveViewComponent implements OnInit {
   }
 
   ngOnInit() {
-    window['mysidenav'] = this.sidenav;
     if (this.dashboardId) {
       this.loadDashboard();
     }
