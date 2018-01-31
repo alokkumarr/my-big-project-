@@ -10,8 +10,8 @@ describe('Create report type analysis: createReport.test.js', () => {
   const tables = [{
     name: 'MCT_DN_SESSION_SUMMARY',
     fields: [
-      'Source OS',
       'Available (MB)',
+      'Source OS',
       'Source Model'
     ]
   }/*, {
@@ -31,7 +31,11 @@ describe('Create report type analysis: createReport.test.js', () => {
   const method = 'table:report';
 
   beforeAll(function () {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
+    // This test may take some time
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
+
+    // Waiting for results may take some time
+    browser.manage().timeouts().implicitlyWait(30000);
   });
 
   beforeEach(function (done) {
@@ -68,6 +72,12 @@ describe('Create report type analysis: createReport.test.js', () => {
     newDialog.getMethod(method).click();
     newDialog.createBtn.click();
 
+    browser.waitForAngularEnabled(false);
+    /*element(by.xpath(`//md-checkbox/div/span[text()='Source OS']/ancestor::*[contains(@e2e, 'MCT_DN_SESSION_SUMMARY')]`)).click();
+    element(by.xpath(`//md-checkbox/div/span[text()='Available (MB)']/ancestor::*[contains(@e2e, 'MCT_DN_SESSION_SUMMARY')]`)).click();
+    element(by.xpath(`//md-checkbox/div/span[text()='Source Model']/ancestor::*[contains(@e2e, 'MCT_DN_SESSION_SUMMARY')]`)).click();
+    browser.waitForAngularEnabled(true);*/
+
     // Select fields and refresh
     tables.forEach(table => {
       table.fields.forEach(field => {
@@ -100,7 +110,6 @@ describe('Create report type analysis: createReport.test.js', () => {
     const fieldName = tables[0].fields[0];
 
     commonFunctions.waitFor.elementToBeClickable(reportDesigner.openFiltersBtn);
-    // browser.sleep(100000);
     reportDesigner.openFiltersBtn.click();
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
     stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
@@ -114,7 +123,6 @@ describe('Create report type analysis: createReport.test.js', () => {
     const save = analyzePage.saveDialog;
     const designer = analyzePage.designerDialog;
     commonFunctions.waitFor.elementToBeClickable(designer.saveBtn);
-    // browser.actions().mouseMove(designer.saveBtn).click();
     designer.saveBtn.click();
 
     commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);

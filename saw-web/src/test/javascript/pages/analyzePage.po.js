@@ -120,6 +120,7 @@ const doSelectPivotGroupInterval = (name, groupInterval) => {
 
 const getReportField = (tableName, fieldName) => element(by.css(`[e2e="js-plumb-field-${tableName}:${fieldName}"]`));
 const getReportFieldCheckbox = (tableName, fieldName) => getReportField(tableName, fieldName).element(by.css('md-checkbox'));
+//const getReportFieldCheckbox = (tableName, fieldName) => element(by.xpath(`//md-checkbox/div/span[text()='${fieldName}']/ancestor::*[contains(@e2e, '${tableName}')]`));
 const getReportFieldEndPoint = (tableName, fieldName, side) => {
   const endpoints = getReportField(tableName, fieldName).all(by.css('js-plumb-endpoint'));
   switch (side) {

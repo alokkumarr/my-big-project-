@@ -16,7 +16,7 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
   const method = 'table:pivot';
 
   beforeAll(function () {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
   });
 
   beforeEach(function (done) {
