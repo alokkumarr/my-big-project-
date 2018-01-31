@@ -289,7 +289,7 @@ class Analysis extends BaseController {
     if ( typeInfo.equals("report") ){
     val query = (analysis \ "queryManual") match {
       case JNothing => QueryBuilder.build(analysis,false,DSK)
-      case obj: JString => ""
+      case obj: JString => obj.extract[String]
       case obj => unexpectedElement("string", obj)
     }
     val queryJson: JObject = ("query", JString(query)) ~
