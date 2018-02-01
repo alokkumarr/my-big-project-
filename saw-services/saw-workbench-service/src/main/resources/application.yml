@@ -1,0 +1,23 @@
+info:
+  component: Synchronoss Workbench Service
+spring:
+  application:
+    name: saw-workbench-service
+server:
+  address: localhost
+  port: 9700
+  context-path: ''
+  maxHttpHeaderSize: 65536
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json
+application:
+    async:
+        core-pool-size: 10
+        max-pool-size: 50
+        queue-capacity: 10000
+
+workbench:
+        project-key: "project2"
+        project-path: "/mapr/data" 
+        project-root: "hdfs:///data/bda"      
