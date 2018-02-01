@@ -46,6 +46,7 @@ import {
   GlobalFilterComponent,
   GlobalDateFilterComponent
 } from './components/global-filter';
+import { GlobalFilterService } from './services/global-filter.service';
 import { FilterSidenavComponent } from './components/filter-sidenav/filter-sidenav.component';
 import { CheckboxFilterComponent } from './components/checkbox-filter/checkbox-filter.component';
 import { PriceRangeFilterComponent } from './components/price-range-filter/price-range-filter.component';
@@ -84,6 +85,7 @@ const components = [
     { provide: HTTP_INTERCEPTORS, useClass: AddTokenInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: HandleErrorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: RefreshTokenInterceptor, multi: true },
+    GlobalFilterService,
     ObserveService,
     jwtServiceProvider,
     userServiceProvider,

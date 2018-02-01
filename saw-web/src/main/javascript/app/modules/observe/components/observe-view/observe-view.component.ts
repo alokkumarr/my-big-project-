@@ -6,6 +6,7 @@ import { Dashboard } from '../../models/dashboard.interface';
 
 import { ConfirmDialogComponent } from '../dialogs/confirm-dialog/confirm-dialog.component';
 import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.component';
+import { GlobalFilterService } from '../../services/global-filter.service';
 import { ObserveService } from '../../services/observe.service';
 import { JwtService } from '../../../../../login/services/jwt.service';
 import { HeaderProgressService } from '../../../../common/services/header-progress.service';
@@ -32,6 +33,7 @@ export class ObserveViewComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     private observe: ObserveService,
+    private filters: GlobalFilterService,
     private headerProgress: HeaderProgressService,
     private jwt: JwtService,
     private transition: Transition
@@ -45,6 +47,7 @@ export class ObserveViewComponent implements OnInit {
   ngOnInit() {
     if (this.dashboardId) {
       this.loadDashboard();
+      this.filters.initialise();
     }
   }
 

@@ -18,6 +18,7 @@ import * as map from 'lodash/map';
 import * as forEach from 'lodash/forEach';
 
 import { Dashboard } from '../../models/dashboard.interface';
+import { GlobalFilterService } from '../../services/global-filter.service';
 import { SideNavService } from '../../../../common/services/sidenav.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
@@ -52,7 +53,10 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
   private sidenavEventSubscription: Subscription;
   public initialised = false;
 
-  constructor(private analyze: AnalyzeService, private sidenav: SideNavService) { }
+  constructor(
+    private analyze: AnalyzeService,
+    private filters: GlobalFilterService,
+    private sidenav: SideNavService) { }
 
   ngOnInit() {
     this.subscribeToRequester();
@@ -138,6 +142,14 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
     forEach(this.dashboard, this.refreshTile.bind(this));
   }
 
+  addGlobalFilters(analysis) {
+    if(this.mode === DASHBOARD_MODES.VIEW) {
+      const filters = get(analysis, 'sqlBuilder.filters', []);
+
+      this.filters.addFilter(map(filters, flt => ({...flt, ...{semanticId: analysis.semanticId}})));
+    }
+  }
+
   initialiseDashboard() {
     if (!this.model || this.initialised) {
       return;
@@ -146,6 +158,7 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
     forEach(get(this.model, 'tiles', []), tile => {
       this.analyze.readAnalysis(tile.id).then(data => {
         tile.analysis = data;
+        this.addGlobalFilters(data);
         tile.updater = new BehaviorSubject({});
         this.dashboard.push(tile);
         this.getDashboard.emit({changed: true, dashboard: this.model});
