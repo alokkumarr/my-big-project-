@@ -112,6 +112,7 @@ public class TransformerComponent extends Component implements WithMovableResult
 
                 //3. Based of configuration run Jexl or Janino engine.
                 if (engine == Transformer.ScriptEngine.JEXL) {
+                    logger.debug("Execute JEXL script: " + engine );
                     JexlExecutorWithSchema jexlExecutorWithSchema  =
                             new JexlExecutorWithSchema(ctx.sparkSession,
                                     script,
@@ -122,7 +123,27 @@ public class TransformerComponent extends Component implements WithMovableResult
                                     outputs);
                     jexlExecutorWithSchema.execute(dsMap);
                 } else if (engine == Transformer.ScriptEngine.JANINO) {
+                    logger.debug("Execute JANINO script: " + engine );
 
+                    String preamble = "";
+                    if ( ctx.componentConfiguration.getTransformer().getScriptPreamble() != null &&
+                         ! ctx.componentConfiguration.getTransformer().getScriptPreamble().isEmpty())
+                        preamble = HFileOperations.readFile(ctx.componentConfiguration.getTransformer().getScriptPreamble());
+
+
+                    logger.trace( "Read script preamble: " + preamble);
+                    script = preamble + script;
+
+                    String[] odi = ctx.componentConfiguration.getTransformer().getAdditionalImports().toArray(new String[0]);
+                     JaninoExecutor janinoExecutor =
+                             new JaninoExecutor(ctx.sparkSession,
+                             script,
+                             st,
+                              tempLocation,
+                             0,
+                             inputs,
+                             outputs);
+                    janinoExecutor.execute(dsMap, odi);
                 } else {
                     error = "Unsupported transformation engine: " + engine;
                     logger.error(error);
@@ -141,7 +162,9 @@ public class TransformerComponent extends Component implements WithMovableResult
                                     outputs);
                     jexlExecutor.execute(dsMap);
                 } else if (engine == Transformer.ScriptEngine.JANINO) {
-
+                    error = "Transformation with Janino engine requires Output schema, dynamic schema mode is not supported";
+                    logger.error(error);
+                    return -1;
                 } else {
                     error = "Unsupported transformation engine: " + engine;
                     logger.error(error);

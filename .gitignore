@@ -1,4 +1,6 @@
 # ignore directories
+
+
 out/
 lib/
 log/
@@ -22,6 +24,7 @@ _*
 .yum
 .bash_history
 .last*
+.DS_Store
 
 *.iml
 pom.xml.versionsBackup

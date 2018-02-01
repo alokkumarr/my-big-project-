@@ -87,7 +87,7 @@ public class TransformWithSchema implements Function<Row, Row> {
                 jexlEngine.setFunctions(extFunctions);
             }
             XdfObjectContextWithStaticSchema sc1 = new XdfObjectContextWithStaticSchema( jexlEngine, schema, arg0);
-            jexlScript.execute(sc1);
+                jexlScript.execute(sc1);
             if(sc1.isSuccess()) {
                 successTransformationsCount.add(1);
                 // Transformation finished - create resulting Tuple

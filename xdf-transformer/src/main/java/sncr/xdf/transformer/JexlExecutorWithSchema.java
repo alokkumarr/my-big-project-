@@ -30,63 +30,16 @@ import static sncr.xdf.transformer.TransformerComponent.TRANSFORMATION_RESULT;
 /**
  * Created by srya0001 on 12/21/2017.
  */
-public class JexlExecutorWithSchema {
+public class JexlExecutorWithSchema extends Executor{
 
     private static final Logger logger = Logger.getLogger(JexlExecutorWithSchema.class);
-    private Set<String>  refDataSets;
-    private String       inDataSet;
-    private String       outDataSet;
-    private String       rejectedDataSet;
-    private Map<String, Map<String, String>> outputDataSetsDesc;
-    private String tempLoc;
-    private JavaSparkContext jsc;
-    private SparkSession session_ctx;
-    private String script;
-    private StructType schema;
-    private LongAccumulator successTransformationsCount = null;
-    private LongAccumulator failedTransformationsCount = null;
-    private int threshold = 0;
 
-
-    public JexlExecutorWithSchema(SparkSession ctx,
-                                  String script,
-                                  StructType st,
-                                  String tLoc,
-                                  int thr,
-                                  Map<String, Map<String, String>> inputs,
-                                  Map<String, Map<String, String>> outputs){
-        this.script = script;
-        session_ctx = ctx;
-        threshold = thr;
-        refDataSets = new HashSet<>();
-        jsc = new JavaSparkContext(ctx.sparkContext());
-        for( String inpK: inputs.keySet()){
-            if (inpK.equalsIgnoreCase(RequiredNamedParameters.Input.toString())){
-                inDataSet = inpK;
-            }
-            else{
-                refDataSets.add(inpK);
-            }
-        }
-
-        for( String outK: outputs.keySet()){
-            if (outK.equalsIgnoreCase(RequiredNamedParameters.Output.toString())){
-                outDataSet = outK;
-            }
-            else if(outK.equalsIgnoreCase(RequiredNamedParameters.Rejected.toString())){
-                rejectedDataSet = outK;
-            }
-        }
-
-        this.outputDataSetsDesc = outputs;
-        tempLoc = tLoc;
-        this.successTransformationsCount = ctx.sparkContext().longAccumulator("success");
-        this.failedTransformationsCount = ctx.sparkContext().longAccumulator("failed");
-        this.schema = st;
+    public JexlExecutorWithSchema(SparkSession ctx, String script, StructType st, String tLoc, int thr, Map<String, Map<String, String>> inputs, Map<String, Map<String, String>> outputs) {
+        super(ctx, script, st, tLoc, thr, inputs, outputs);
     }
 
 
-    private JavaRDD     transformation(
+    protected JavaRDD     transformation(
             JavaRDD dataRdd,
             Map<String, Broadcast<Dataset>> referenceData
     )  throws Exception {
@@ -106,7 +59,6 @@ public class JexlExecutorWithSchema {
     public void execute(Map<String, Dataset> dsMap) throws Exception {
 
         Dataset ds = dsMap.get(inDataSet);
-
 
         logger.trace("Load reference data: " );
         Map<String, Broadcast<Dataset>> mapOfRefData = new HashMap<>();
@@ -130,8 +82,6 @@ public class JexlExecutorWithSchema {
         Dataset<Row> outputResult = df.select("*").where(trRes.equalTo(0)); //.drop(trRes).drop(alignedDF.col(TRANSFORMATION_ERRMSG));
         Dataset<Row> rejectedRecords = df.select("*").where(trRes.lt(0));
 
-//        Dataset<Row> outputResult = df.filter( trRes.equalTo(0)).drop(trRes).drop(df.col(TRANSFORMATION_ERRMSG));
-//        Dataset<Row> rejectedRecords = df.filter( trRes.lt(0));
 
 
         logger.debug("Final DS: " + outputResult.count() + " Schema: " + outputResult.schema().prettyJson());
@@ -143,26 +93,5 @@ public class JexlExecutorWithSchema {
 
     }
 
-
-    //    private void writeResults(JavaPairRDD outputResult, String resType) throws IOException {
-    private void writeResults(Dataset<Row> outputResult, String resType, String location) throws IOException {
-
-        Map<String, String> outputDS = outputDataSetsDesc.get(resType);
-        String name = outputDS.get(DataSetProperties.Name.name());
-        String loc = location + Path.SEPARATOR + name;
-        String format = outputDS.get(DataSetProperties.Format.name());
-        logger.debug("Write result to location: " + loc + " in format: " + format);
-
-        switch (format.toLowerCase()) {
-            case "parquet" :
-                outputResult.write().parquet(loc);
-                break;
-            case "csv" :
-                outputResult.write().csv(loc);
-            case "json" :
-                outputResult.write().json(loc);
-                break;
-        }
-    }
 
 }

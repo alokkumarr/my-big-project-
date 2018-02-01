@@ -119,7 +119,7 @@ abstract public class XdfObjectContextBase extends ObjectContext<Row> {
 
     public abstract void set(String name, Object value);
 
-    protected static int findField(String[] a, String k) {
+    public static int findField(String[] a, String k) {
         for (int i = 0; i < a.length; i++) {
             if (a[i].equalsIgnoreCase(k)) return i;
         }
@@ -158,29 +158,29 @@ abstract public class XdfObjectContextBase extends ObjectContext<Row> {
     }
 
     //TODO:: Make sure typeName returns such values
-    protected Object getValue(String fieldName, int i) {
-        String type = schema.apply(fieldName).dataType().toString();
-        switch (type) {
-            case "BooleanType": return this.record.getBoolean(i);
-            case "IntegerType":
-            case "ShortType":
-                return this.record.getInt(i);
-            case "LongType":
-                return this.record.getLong(i);
-            case "DoubleType":
-            case "FloatType":
-                return this.record.getDouble(i);
-            case "StringType":
-                return this.record.getString(i);
-            case "TimestampType":
-                return this.record.getTimestamp(i);
-            case "NullType":
-                break;
-            default:
-                throw new JexlScriptException("Unsupported data type: " + type);
+        protected Object getValue(String fieldName, int i) {
+            String type = schema.apply(fieldName).dataType().toString();
+            switch (type) {
+                case "BooleanType": return this.record.getBoolean(i);
+                case "IntegerType":
+                case "ShortType":
+                    return this.record.getInt(i);
+                case "LongType":
+                    return this.record.getLong(i);
+                case "DoubleType":
+                case "FloatType":
+                    return this.record.getDouble(i);
+                case "StringType":
+                    return this.record.getString(i);
+                case "TimestampType":
+                    return this.record.getTimestamp(i);
+                case "NullType":
+                    break;
+                default:
+                    throw new JexlScriptException("Unsupported data type: " + type);
+            }
+            return null;
         }
-        return null;
-    }
 
 
     /**

@@ -143,7 +143,7 @@ public class XdfObjectContextWithStaticSchema extends XdfObjectContextBase {
      * @return
      */
     @Override
-    public Row createNewRow(int errorCode, String errMessage, Long rowCounter) {
+    public Row  createNewRow(int errorCode, String errMessage, Long rowCounter) {
         Object[] newRowVals = new Object[targetRowTypes.size()];
 
         for (int i = 0; i < schema.length()-3 ; i++)
