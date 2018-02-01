@@ -145,6 +145,7 @@
 		<module>saw-scheduler-service</module>
 		<module>saw-gateway-service</module>
 		<module>saw-export-service</module>
+		<module>saw-workbench-service</module>
 		<module>saw-observe-service</module>
 		<module>saw-json-store-api</module>
 		<module>dist</module>

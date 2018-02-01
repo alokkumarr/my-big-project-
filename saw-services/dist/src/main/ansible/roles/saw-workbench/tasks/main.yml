@@ -1,0 +1,11 @@
+- name: Install SAW Workbench Service package
+  yum: name="{{ item }}" state=present
+  with_fileglob: ["../rpms/saw-workbench-*.rpm"]
+  notify:
+    - restart saw-workbench
+- name: Install SAW Workbench Service configuration file
+  template: src=application.yml dest=/opt/bda/saw-workbench-service/conf
+  notify:
+    - restart saw-workbench
+- name: Enable SAW Workbench Service
+  systemd: name=saw-workbench enabled=true

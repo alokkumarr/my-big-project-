@@ -1,0 +1,11 @@
+[Unit]
+Description=SAW Workbench
+
+[Service]
+ExecStart=/bin/sh -c "exec java -jar /opt/bda/saw-workbench-service/saw-workbench.jar --spring.config.location=/opt/bda/saw-workbench-service/conf/application.yml"
+SyslogIdentifier=saw-workbench
+User=mapr
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

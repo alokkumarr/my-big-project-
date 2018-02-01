@@ -33,6 +33,9 @@ security:
 export:
     service:
         host: http://localhost:9400
+workbench:
+    service:
+        host: http://localhost:9700
 observe:
     service:
         host: http://localhost:9500
@@ -70,6 +73,11 @@ api:
         -   location: ${observe.service.host}
             method: DELETE
             path: '[/]observe.*'
-
+        -   location: ${workbench.service.host}
+            method: POST
+            path: '[/]internal/workbench.*'
+        -   location: ${workbench.service.host}
+            method: GET
+            path: '[/]internal/workbench.*'
 logging:
   config: /opt/bda/saw-gateway-service/conf/logback.xml
