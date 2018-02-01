@@ -1,4 +1,5 @@
 import * as get from 'lodash/get';
+import * as has from 'lodash/has';
 import * as padStart from 'lodash/padStart';
 import * as find from 'lodash/find';
 import * as flatMap from 'lodash/flatMap';
@@ -36,11 +37,11 @@ export class JwtService {
     return this._$window.localStorage[this._AppConfig.login.jwtKey];
   }
 
-  getCategories() {
+  getCategories(moduleName = 'ANALYZE') {
     const token = this.getTokenObj();
     const analyzeModule = find(
       get(token, 'ticket.products[0].productModules'),
-      mod => mod.productModName === 'ANALYZE'
+      mod => mod.productModName === moduleName
     );
 
     return get(analyzeModule, 'prodModFeature', []) || [];
@@ -64,6 +65,9 @@ export class JwtService {
   }
 
   parseJWT(jwt) {
+    if (!jwt) {
+      return null;
+    }
     const base64Url = jwt.split('.')[1];
     const base64 = base64Url.replace('-', '+').replace('_', '/');
     return angular.fromJson(this._$window.atob(base64));
@@ -134,7 +138,8 @@ export class JwtService {
      @opts should have either categoryId or subCategoryId field set.
      */
   hasPrivilege(name, opts) {
-    if (!PRIVILEGE_INDEX[name]) {
+    /* eslint-disable */
+    if (!has(PRIVILEGE_INDEX, name)) {
       throw new Error(`Privilige ${name} is not supported!`);
     }
     opts.module = opts.module || 'ANALYZE';
@@ -145,18 +150,7 @@ export class JwtService {
       module => module.productModName === opts.module
     ) || [];
 
-    let code = 0; // No privilege
-
-    if (opts.categoryId) {
-      const category = find(module.prodModFeature, feature => feature.prodModFeatureID.toString() === opts.categoryId.toString()) || {};
-      code = category.privilegeCode || 0;
-    }
-
-    if (opts.subCategoryId) {
-      const subCategories = flatMap(module.prodModFeature, feature => feature.productModuleSubFeatures);
-      const subCategory = find(subCategories, subFeature => subFeature.prodModFeatureID.toString() === opts.subCategoryId.toString()) || {};
-      code = subCategory.privilegeCode || 0;
-    }
+    const code = this.getCode(opts, module);
 
     switch (name) {
     case 'ACCESS':
@@ -170,20 +164,42 @@ export class JwtService {
     case 'FORK':
       return this._isSet(code, PRIVILEGE_INDEX.FORK);
     case 'EDIT':
-      return this._isSet(code, PRIVILEGE_INDEX.EDIT) &&
+      return this._isSet(code, PRIVILEGE_INDEX.EDIT) ||
         (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
     case 'EXPORT':
       return this._isSet(code, PRIVILEGE_INDEX.EXPORT);
     case 'DELETE':
-      return this._isSet(code, PRIVILEGE_INDEX.DELETE) &&
+      return this._isSet(code, PRIVILEGE_INDEX.DELETE) ||
         (this.isOwner(token, opts.creatorId) || this.isAdmin(token));
     default:
       return false;
     }
+    /* eslint-enable */
   }
-}
 
-export function JwtServiceFactory($window, AppConfig) {
-  'ngInject';
-  return new JwtService($window, AppConfig);
+  getCode(opts, module) {
+
+    if (opts.subCategoryId) {
+      const subCategories = flatMap(
+        module.prodModFeature,
+        feature => feature.productModuleSubFeatures);
+      const subCategory = find(
+        subCategories,
+        subFeature => subFeature.prodModFeatureID.toString() === opts.subCategoryId.toString()
+      ) || {};
+
+      return subCategory.privilegeCode || 0;
+    }
+
+    if (opts.categoryId) {
+      const category = find(
+        module.prodModFeature,
+        feature => feature.prodModFeatureID.toString() === opts.categoryId.toString()
+      ) || {};
+
+      return category.privilegeCode || 0;
+    }
+    // No privilege
+    return 0;
+  }
 }

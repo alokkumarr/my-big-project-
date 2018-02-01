@@ -6,7 +6,7 @@ import * as template from './analyze-new.component.html';
 import style from './analyze-new.component.scss';
 import emptyTemplate from './analyze-new-empty.html';
 
-import {AnalyseTypes, ENTRY_MODES, ANALYSIS_METHODS} from '../../consts';
+import {AnalyseTypes, ENTRY_MODES, ANALYSIS_METHODS, Events} from '../../consts';
 
 export const AnalyzeNewComponent = {
   template,
@@ -16,13 +16,14 @@ export const AnalyzeNewComponent = {
   },
   styles: [style],
   controller: class AnalyzeNewController {
-    constructor($scope, $mdDialog, AnalyzeService, AnalyzeDialogService) {
+    constructor($scope, $mdDialog, AnalyzeService, AnalyzeDialogService, $eventEmitter) {
       'ngInject';
       this._$scope = $scope;
       this._$mdDialog = $mdDialog;
       this._AnalyzeService = AnalyzeService;
       this.methods = ANALYSIS_METHODS;
       this._AnalyzeDialogService = AnalyzeDialogService;
+      this._$eventEmitter = $eventEmitter;
     }
 
     $onInit() {
@@ -45,7 +46,7 @@ export const AnalyzeNewComponent = {
             find(supportedMethodCategory.children, ({type}) => type === method.type ||
               method.type === 'chart:pie' ||
               method.type === 'chart:combo' ||
-              method.type === 'chart:area') :
+              method.type === 'chart:area' || method.type === 'chart:tsspline') :
             false;
           set(method, 'disabled', !isSupported);
         });
@@ -69,7 +70,13 @@ export const AnalyzeNewComponent = {
         description: '',
         scheduled: null
       };
-      this._AnalyzeDialogService.openNewAnalysisDialog(model);
+      this._AnalyzeDialogService.openNewAnalysisDialog(model)
+        .afterClosed().subscribe(successfullySaved => {
+          if (successfullySaved) {
+            this.$dialog.hide(successfullySaved);
+            this._$eventEmitter.emit(Events.AnalysesRefresh);
+          }
+        });
     }
 
     createAnalysis() {
@@ -94,16 +101,8 @@ export const AnalyzeNewComponent = {
         };
         break;
       case 'table:pivot':
-        tpl = `<analyze-pivot model="model" mode="${mode}"></analyze-pivot>`;
-        model = {
-          type: AnalyseTypes.Pivot,
-          name: 'Untitled Analysis',
-          description: '',
-          categoryId: this.subCategory,
-          semanticId,
-          scheduled: null
-        };
-        break;
+        this.openUpgradedModal();
+        return;
       case 'chart:column':
       case 'chart:bar':
       case 'chart:line':
@@ -114,6 +113,7 @@ export const AnalyzeNewComponent = {
       case 'chart:bubble':
       case 'chart:area':
       case 'chart:combo':
+      case 'chart:tsspline':
         type = this.selectedAnalysisMethod.split(':')[1];
         tpl = `<analyze-chart model="model" mode="${mode}"></analyze-chart>`;
         model = {
@@ -146,6 +146,7 @@ export const AnalyzeNewComponent = {
       }).then(successfullySaved => {
         if (successfullySaved) {
           this.$dialog.hide(successfullySaved);
+          this._$eventEmitter.emit(Events.AnalysesRefresh);
         }
       });
     }

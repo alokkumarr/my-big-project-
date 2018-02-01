@@ -1,0 +1,19 @@
+<div *ngFor="let artifact of artifacts; trackBy: index">
+  <div class="filter__table-name">
+    {{artifact.artifactName}}
+  </div>
+  <div class="filter__list">
+    <designer-filter-row *ngFor="let filter of groupedFilters[artifact.artifactName];let i = index; trackBy: index"
+                         (removeRequest)="removeFilter(i, artifact.artifactName)"
+                         (filterChange)="onFilterChange()"
+                         [filter]="filter"
+                         [artifactColumns]="artifact.columns"
+                         e2e="filter-row">
+    </designer-filter-row>
+  </div>
+  <button mat-icon-button
+          [e2e]="'filter-add-btn-' + artifact.artifactName">
+    <mat-icon fontIcon="icon-plus"
+              (click)="addFilter(artifact.artifactName)"></mat-icon>
+  </button>
+</div>

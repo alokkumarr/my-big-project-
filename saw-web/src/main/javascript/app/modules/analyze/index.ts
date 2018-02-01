@@ -5,6 +5,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule as CommonModuleAngular4 } from '@angular/common';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import {MaterialModule} from '../../material.module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import {routesConfig} from './routes';
 import {i18nConfig} from './i18n';
@@ -67,13 +68,23 @@ import {
   DesignerHeaderComponent,
   DesignerToolbarComponent,
   DesignerPivotComponent,
-  // DesignerSettingsComponent,
-  // DesignerSettingsGroupComponent,
-  OldDesignerSettingsComponent,
+  DesignerSettingsSingleComponent,
+  DesignerSettingsGroupComponent,
+  ExpandableFieldComponent,
+  ExpandDetailPivotComponent,
+  ToolbarActionDialogComponent,
+  DesignerSortComponent,
+  DesignerDescriptionComponent,
+  DesignerSaveComponent,
+  DesignerFilterContainerComponent,
+  DesignerFilterRowComponent,
+  DesignerStringFilterComponent,
+  DesignerDateFilterComponent,
+  DesignerNumberFilterComponent,
+  DesignerPreviewDialogComponent,
   DesignerService,
   ArtifactColumnFilterPipe,
-  ArtifactColumns2PivotFieldsPipe,
-  PivotAreaFilterPipe
+  ArtifactColumns2PivotFieldsPipe
 } from './components/designer';
 import {
   analyzeServiceProvider
@@ -141,7 +152,9 @@ angular.module(AnalyzeModule, [
     CommonModuleAngular4,
     CommonModuleTs,
     MaterialModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   declarations: [
     DesignerDialogComponent,
@@ -149,11 +162,21 @@ angular.module(AnalyzeModule, [
     DesignerHeaderComponent,
     DesignerToolbarComponent,
     DesignerPivotComponent,
-    // DesignerSettingsComponent,
-    // DesignerSettingsGroupComponent,
-    OldDesignerSettingsComponent,
+    DesignerSettingsSingleComponent,
+    DesignerSettingsGroupComponent,
+    ExpandableFieldComponent,
+    ExpandDetailPivotComponent,
+    ToolbarActionDialogComponent,
+    DesignerSortComponent,
+    DesignerDescriptionComponent,
+    DesignerSaveComponent,
+    DesignerFilterContainerComponent,
+    DesignerFilterRowComponent,
+    DesignerStringFilterComponent,
+    DesignerDateFilterComponent,
+    DesignerNumberFilterComponent,
+    DesignerPreviewDialogComponent,
     ArtifactColumnFilterPipe,
-    PivotAreaFilterPipe,
     ArtifactColumns2PivotFieldsPipe
   ],
   entryComponents: [
@@ -162,9 +185,20 @@ angular.module(AnalyzeModule, [
     DesignerHeaderComponent,
     DesignerToolbarComponent,
     DesignerPivotComponent,
-    OldDesignerSettingsComponent
-    // DesignerSettingsComponent,
-    // DesignerSettingsGroupComponent
+    ExpandableFieldComponent,
+    ExpandDetailPivotComponent,
+    DesignerSettingsSingleComponent,
+    DesignerSettingsGroupComponent,
+    ToolbarActionDialogComponent,
+    DesignerSortComponent,
+    DesignerDescriptionComponent,
+    DesignerSaveComponent,
+    DesignerFilterContainerComponent,
+    DesignerFilterRowComponent,
+    DesignerStringFilterComponent,
+    DesignerDateFilterComponent,
+    DesignerNumberFilterComponent,
+    DesignerPreviewDialogComponent
   ],
   providers: [
     AnalyzeDialogService,

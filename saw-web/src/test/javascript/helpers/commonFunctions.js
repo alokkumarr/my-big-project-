@@ -4,13 +4,17 @@ const EC = protractor.ExpectedConditions;
 module.exports = {
   waitFor: {
     elementToBeClickable: element => {
-      return browser.wait(EC.elementToBeClickable(element), 10000);
+      return browser.wait(EC.elementToBeClickable(element), 10000, "Element \"" + element.locator() + "\" is not clickable");
     },
     elementToBeVisible: element => {
-      return browser.wait(EC.visibilityOf(element), 10000);
+      return browser.wait(EC.visibilityOf(element), 10000, "Element \"" + element.locator() + "\" is not visible");
     },
     elementToBePresent: element => {
-      return browser.wait(EC.presenceOf(element), 10000);
+      return browser.wait(EC.presenceOf(element), 10000, "Element \"" + element.locator() + "\" is not present");
+    },
+    elementToBeClickableAndClick: element => {
+      browser.wait(EC.elementToBeClickable(element), 10000, "Element \"" + element.locator() + "\" is not clickable");
+      element.click();
     },
     // Possible options: /analyze/ , /login/
     pageToBeReady: pageName => {
@@ -34,5 +38,9 @@ module.exports = {
     parent: element => {
       return element.element(by.xpath(`parent::*`));
     }
+  },
+  dismissDropdownMenu: () => {
+    element(by.css('md-backdrop')).click();
+    expect(element(by.css('md-backdrop')).isPresent()).toBe(false);
   }
 };

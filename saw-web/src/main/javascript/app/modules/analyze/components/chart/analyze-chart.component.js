@@ -23,7 +23,7 @@ import * as template from './analyze-chart.component.html';
 import style from './analyze-chart.component.scss';
 import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
-import {ENTRY_MODES, NUMBER_TYPES, COMBO_TYPES, COMBO_TYPES_OBJ, CHART_TYPES_OBJ} from '../../consts';
+import {ENTRY_MODES, NUMBER_TYPES, COMBO_TYPES, COMBO_TYPES_OBJ, TSCOMBO_TYPES, TSCOMBO_TYPES_OBJ, CHART_TYPES_OBJ} from '../../consts';
 
 const INVERTING_OPTIONS = [{
   label: 'TOOLTIP_INVERTED',
@@ -44,7 +44,7 @@ export const AnalyzeChartComponent = {
   },
   controller: class AnalyzeChartController extends AbstractDesignerComponentController {
     constructor($componentHandler, $timeout, AnalyzeService, SortService,
-                ChartService, FilterService, $mdSidenav, $translate, toastMessage, $injector) {
+      ChartService, FilterService, $mdSidenav, $translate, toastMessage, $injector) {
       'ngInject';
       super($injector);
       this._FilterService = FilterService;
@@ -58,6 +58,8 @@ export const AnalyzeChartComponent = {
       this.INVERTING_OPTIONS = INVERTING_OPTIONS;
       this.COMBO_TYPES = COMBO_TYPES;
       this.COMBO_TYPES_OBJ = COMBO_TYPES_OBJ;
+      this.TSCOMBO_TYPES = TSCOMBO_TYPES;
+      this.TSCOMBO_TYPES_OBJ = TSCOMBO_TYPES_OBJ;
       this.CHART_TYPES_OBJ = CHART_TYPES_OBJ;
       this.sortFields = [];
       this.sorts = [];
@@ -72,8 +74,10 @@ export const AnalyzeChartComponent = {
       };
 
       this.updateChart = new BehaviorSubject({});
+      this.isStockChart = this.model.chartType.substring(0, 2) === 'ts';
       this.settings = null;
-      this.gridData = this.filteredGridData = [];
+      this.gridData = [];
+      this.filteredGridData = [];
       this.labels = {
         tempY: '', tempX: '', y: '', x: ''
       };
@@ -83,8 +87,9 @@ export const AnalyzeChartComponent = {
       this.isInverted = false;
       this.chartViewOptions = ChartService.getViewOptionsFor(this.model.chartType);
       this.comboableCharts = ['column', 'bar', 'line', 'area', 'combo'];
+      this.comboableTSCharts = ['tsspline'];
       this.invertableCharts = [...this.comboableCharts, 'stack'];
-      this.multyYCharts = this.invertableCharts;
+      this.multyYCharts = [...this.invertableCharts, ...this.comboableTSCharts];
 
       this.designerStates = {
         noSelection: 'no-selection',
@@ -140,8 +145,11 @@ export const AnalyzeChartComponent = {
         return;
       }
 
-      this.labels.tempX = this.labels.x = get(this.model, 'xAxis.title', null);
-      this.labels.tempY = this.labels.y = get(this.model, 'yAxis.title', null);
+      this.labels.x = get(this.model, 'xAxis.title', null);
+      this.labels.tempX = this.labels.x;
+
+      this.labels.y = get(this.model, 'yAxis.title', null);
+      this.labels.tempY = this.labels.y;
       this.filters = map(
         get(this.model, 'sqlBuilder.filters', []),
         this._FilterService.backend2FrontendFilter(this.model.artifacts)
@@ -155,6 +163,10 @@ export const AnalyzeChartComponent = {
 
     onSelectComboType(attributeColumn, comboType) {
       attributeColumn.comboType = comboType.value;
+    }
+
+    onSelectTSComboType(attributeColumn, comboType) {
+      attributeColumn.comboType = comboType.label;
     }
 
     toggleChartInversion() {
@@ -216,7 +228,8 @@ export const AnalyzeChartComponent = {
       const payload = this.generatePayload(this.model);
       return this._AnalyzeService.getDataBySettings(payload).then(({data}) => {
         const parsedData = this._ChartService.parseData(data, payload.sqlBuilder);
-        this.gridData = this.filteredGridData = parsedData || this.filteredGridData;
+        this.gridData = parsedData || this.filteredGridData;
+        this.filteredGridData = this.gridData;
         this.gotData(this.gridData);
         this.analysisSynched();
         this.endProgress();
@@ -367,6 +380,7 @@ export const AnalyzeChartComponent = {
       set(payload, 'xAxis', {title: this.labels.x});
       set(payload, 'yAxis', {title: this.labels.y});
       set(payload, 'isInverted', this.isInverted);
+      set(payload, 'isStockChart', this.isStockChart);
       set(payload, 'legend', {
         align: this.legend.align,
         layout: this.legend.layout

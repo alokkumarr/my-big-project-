@@ -10,6 +10,8 @@ import * as keys from 'lodash/keys';
 import * as find from 'lodash/find';
 import * as concat from 'lodash/concat';
 import * as flatMap from 'lodash/flatMap';
+import * as take from 'lodash/take';
+import * as takeRight from 'lodash/takeRight';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as fpOmit from 'lodash/fp/omit';
 import * as fpMapValues from 'lodash/fp/mapValues';
@@ -28,8 +30,13 @@ import {
 } from './types';
 import {
   NUMBER_TYPES,
-  DATE_TYPES
+  DATE_TYPES,
+  DEFAULT_AGGREGATE_TYPE,
+  DEFAULT_DATE_INTERVAL
 } from '../../consts';
+import { MAX_LENGTH_VALIDATOR } from '@angular/forms/src/directives/validators';
+
+const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
 
 @Injectable()
 export class DesignerService {
@@ -43,48 +50,94 @@ export class DesignerService {
     return this._analyzeService.getDataBySettings(analysis);
   }
 
+  getDataForAnalysisPreview(analysis) {
+    return this._analyzeService.previewExecution(analysis);
+  }
+
+  getCategories(privilege) {
+    return this._analyzeService.getCategories(privilege);
+  }
+
+  saveAnalysis(analysis) {
+    return this._analyzeService.saveReport(analysis);
+  }
+
   public getPivotGroupAdapters(artifactColumns): IDEsignerSettingGroupAdapter[] {
 
     const pivotReverseTransform = (artifactColumn: ArtifactColumnPivot) => {
       artifactColumn.area = null;
+      artifactColumn.areaIndex = null;
+      artifactColumn.checked = false;
     }
 
-    const pivotGroupAdapters =  [{
+    const onReorder = (artifactColumns: ArtifactColumns) => {
+      forEach(artifactColumns, (column, index) => {
+        column.areaIndex = index;
+      });
+    }
+
+    const areLessThenMaxFields = (artifactColumns: ArtifactColumns): boolean => {
+      return artifactColumns.length < MAX_POSSIBLE_FIELDS_OF_SAME_AREA;
+    };
+
+    const canAcceptNumberType = (groupAdapter: IDEsignerSettingGroupAdapter) => (
+      ({type}: ArtifactColumnPivot) => (
+        areLessThenMaxFields(groupAdapter.artifactColumns) &&
+        NUMBER_TYPES.includes(type)
+      )
+    );
+
+    const canAcceptAnyType = (groupAdapter: IDEsignerSettingGroupAdapter) => (
+      () => areLessThenMaxFields(groupAdapter.artifactColumns)
+    );
+
+    const applyDataFieldDefaults = artifactColumn => {
+      artifactColumn.aggregate = DEFAULT_AGGREGATE_TYPE.value;
+    }
+
+    const applyNonDatafieldDefaults = artifactColumn => {
+      artifactColumn.dateInterval = DEFAULT_DATE_INTERVAL.value;
+    }
+
+    const pivotGroupAdapters: Array<IDEsignerSettingGroupAdapter> =  [{
       title: 'Data',
+      type: 'pivot',
       marker: 'data',
       artifactColumns: [],
-      canAcceptArtifactColumn(artifactColumn: ArtifactColumnPivot) {
-        return NUMBER_TYPES.includes(artifactColumn.type);
-      },
+      canAcceptArtifactColumn: canAcceptNumberType,
       transform(artifactColumn: ArtifactColumnPivot) {
         artifactColumn.area = 'data';
         artifactColumn.checked = true;
+        applyDataFieldDefaults(artifactColumn);
       },
-      reverseTransform: pivotReverseTransform
+      reverseTransform: pivotReverseTransform,
+      onReorder
     }, {
       title: 'Row',
+      type: 'pivot',
       marker: 'row',
       artifactColumns: [],
-      canAcceptArtifactColumn(artifactColumn: ArtifactColumnPivot) {
-        return !NUMBER_TYPES.includes(artifactColumn.type);
-      },
+      canAcceptArtifactColumn: canAcceptAnyType,
       transform(artifactColumn: ArtifactColumnPivot) {
         artifactColumn.area = 'row';
         artifactColumn.checked = true;
+        applyNonDatafieldDefaults(artifactColumn);
       },
-      reverseTransform: pivotReverseTransform
+      reverseTransform: pivotReverseTransform,
+      onReorder
     }, {
       title: 'Column',
+      type: 'pivot',
       marker: 'column',
       artifactColumns: [],
-      canAcceptArtifactColumn(artifactColumn: ArtifactColumnPivot) {
-        return !NUMBER_TYPES.includes(artifactColumn.type);
-      },
+      canAcceptArtifactColumn: canAcceptAnyType,
       transform(artifactColumn: ArtifactColumnPivot) {
         artifactColumn.area = 'column';
         artifactColumn.checked = true;
+        applyNonDatafieldDefaults(artifactColumn);
       },
-      reverseTransform: pivotReverseTransform
+      reverseTransform: pivotReverseTransform,
+      onReorder
     }];
 
     this._distributeArtifactColumnsIntoGroups(
@@ -108,7 +161,7 @@ export class DesignerService {
     const groupByProps = {
       chart: 'checked',
       pivot: 'area'
-    }
+    };
     fpPipe(
       fpFilter('checked'),
       fpGroupBy(groupByProps[analysisType]),
@@ -122,16 +175,15 @@ export class DesignerService {
     return pivotGroupAdapters;
   }
 
-  addArtifactColumnIntoGroup(
+  addArtifactColumnIntoAGroup(
     artifactColumn: ArtifactColumn,
-    pivotGroupAdapters: IDEsignerSettingGroupAdapter[]): boolean {
-
+    groupAdapters: IDEsignerSettingGroupAdapter[]
+  ): boolean {
     let addedSuccessfully = false;
 
-    forEach(pivotGroupAdapters, (adapter: IDEsignerSettingGroupAdapter) => {
-      if (adapter.canAcceptArtifactColumn(artifactColumn)) {
-        adapter.transform(artifactColumn);
-        adapter.artifactColumns = [...adapter.artifactColumns, artifactColumn];
+    forEach(groupAdapters, (adapter: IDEsignerSettingGroupAdapter) => {
+      if (adapter.canAcceptArtifactColumn(adapter)(artifactColumn)) {
+        this.addArtifactColumnIntoGroup(artifactColumn, adapter, 0);
         addedSuccessfully = true;
         return false;
       }
@@ -139,11 +191,31 @@ export class DesignerService {
     return addedSuccessfully;
   }
 
+  addArtifactColumnIntoGroup(
+    artifactColumn: ArtifactColumn,
+    adapter: IDEsignerSettingGroupAdapter,
+    index: number
+  ) {
+    const array = adapter.artifactColumns;
+    adapter.transform(artifactColumn);
+
+    const firstN = take(array, index);
+    const lastN = takeRight(array, array.length - index);
+    adapter.artifactColumns = [
+      ...firstN,
+      artifactColumn,
+      ...lastN
+    ];
+    adapter.onReorder(adapter.artifactColumns);
+  }
+
   removeArtifactColumnFromGroup(
     artifactColumn: ArtifactColumn,
-    pivotGroupAdapter: IDEsignerSettingGroupAdapter) {
-    pivotGroupAdapter.reverseTransform(artifactColumn);
-    remove(pivotGroupAdapter.artifactColumns, ({columnName}) => artifactColumn.columnName === columnName);
+    adapter: IDEsignerSettingGroupAdapter
+  ) {
+    adapter.reverseTransform(artifactColumn);
+    remove(adapter.artifactColumns, ({columnName}) => artifactColumn.columnName === columnName);
+    adapter.onReorder(adapter.artifactColumns);
   }
 
   getPartialSqlBuilder(artifactColumns: ArtifactColumns, type: AnalysisType) {

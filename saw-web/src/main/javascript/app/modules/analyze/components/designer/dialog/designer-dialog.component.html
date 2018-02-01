@@ -1,3 +1,6 @@
 <designer-container [analysisStarter]="data.analysisStarter"
+                    [analysis]="data.analysis"
                     [designerMode]="data.designerMode"
-                    (onBack)="onBack()"></designer-container>
+                    (onBack)="onBack()"
+                    (onSave)="onSave($event)">
+</designer-container>

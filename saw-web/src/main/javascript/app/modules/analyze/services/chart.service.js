@@ -16,6 +16,7 @@ import * as fpOmit from 'lodash/fp/omit';
 import * as fpToPairs from 'lodash/fp/toPairs';
 import * as fpMap from 'lodash/fp/map';
 import * as fpMapValues from 'lodash/fp/mapValues';
+import * as fpInvert from 'lodash/fp/invert';
 import * as fpFlatMap from 'lodash/fp/flatMap';
 import * as fpSortBy from 'lodash/fp/sortBy';
 import * as fpOrderBy from 'lodash/fp/orderBy';
@@ -23,10 +24,13 @@ import * as reduce from 'lodash/reduce';
 import * as concat from 'lodash/concat';
 import * as compact from 'lodash/compact';
 import * as fpGroupBy from 'lodash/fp/groupBy';
+import * as fpUniq from 'lodash/fp/uniq';
+import * as findIndex from 'lodash/findIndex';
 import * as mapValues from 'lodash/mapValues';
 import * as sortBy from 'lodash/sortBy';
 import * as moment from 'moment';
 import * as toString from 'lodash/toString';
+import * as replace from 'lodash/replace';
 
 import {NUMBER_TYPES, DATE_TYPES, AGGREGATE_TYPES_OBJ, CHART_COLORS} from '../consts';
 
@@ -161,13 +165,13 @@ export class ChartService {
       },
       series: [{
         name: 'Series 1',
-        data: [0, 0, 0, 0, 0]
+        data: []
       }],
       yAxis: {
         title: {x: -15}
       },
       xAxis: {
-        categories: ['A', 'B', 'C', 'D', 'E'],
+        categories: [],
         title: {y: 15}
       }
     };
@@ -225,6 +229,7 @@ export class ChartService {
     case 'spline':
     case 'stack':
     case 'scatter':
+    case 'tsspline':
     default:
       return config;
     }
@@ -268,7 +273,7 @@ export class ChartService {
 
   parseLeaf(node, dataObj) {
     const dataFields = fpPipe(
-      fpOmit(['doc_count', 'key']),
+      fpOmit(['doc_count', 'key', 'key_as_string']),
       fpMapValues('value')
     )(node);
 
@@ -278,16 +283,19 @@ export class ChartService {
     );
   }
 
-  splitToSeriesAndCategories(parsedData, fields, {sorts}) {
+  splitToSeriesAndCategories(parsedData, fields, {sorts}, type) {
     let series = [];
     const categories = {};
     const areMultipleYAxes = fields.y.length > 1;
     const isGrouped = fields.g;
+    const isHighStock = type.substring(0, 2) === 'ts';
 
     const fieldsArray = compact([fields.x, ...fields.y, fields.z, fields.g]);
-    const dateFields = filter(fieldsArray, ({type}) => DATE_TYPES.includes(type));
-    this.formatDatesIfNeeded(parsedData, dateFields);
-
+    if (!isHighStock) {
+      // check if Highstock timeseries(ts) or Highchart
+      const dateFields = filter(fieldsArray, ({type}) => DATE_TYPES.includes(type));
+      this.formatDatesIfNeeded(parsedData, dateFields);
+    }
     if (areMultipleYAxes) {
       series = this.splitSeriesByYAxes(parsedData, fields);
     } else if (isGrouped) {
@@ -295,7 +303,7 @@ export class ChartService {
     } else {
       const axesFieldNameMap = this.getAxesFieldNameMap(fields);
       const yField = fields.y[0];
-      series = [this.getSerie(yField, 0)];
+      series = [this.getSerie(yField, 0, fields.y)];
       series[0].data = map(parsedData,
         dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])
       );
@@ -335,7 +343,11 @@ export class ChartService {
         const dataPoint = clone(point);
         forEach(dataPoint, (v, k) => {
           if (this.isCategoryAxis(fields, k)) {
-            dataPoint[k] = indexOf(categories[k], v);
+            if (!isHighStock) {
+              dataPoint[k] = indexOf(categories[k], v);
+            } else {
+              dataPoint[k] = v;
+            }
           }
         });
         return dataPoint;
@@ -359,6 +371,8 @@ export class ChartService {
       return 'spline';
     case 'area':
       return 'areaspline';
+    case 'tsspline':
+      return 'spline';
     default:
       return type;
 
@@ -371,7 +385,8 @@ export class ChartService {
     }
 
     if (DATE_TYPES.includes(field.type)) {
-      return moment(value, field.dateFormat);
+      const momentDateFormat = this.getMomentDateFormat(field.dateFormat);
+      return moment(value, momentDateFormat);
     }
 
     return value;
@@ -381,22 +396,36 @@ export class ChartService {
     if (!isEmpty(dateFields)) {
       forEach(parsedData, dataPoint => {
         forEach(dateFields, ({columnName, dateFormat}) => {
-          dataPoint[columnName] = moment(dataPoint[columnName]).format(dateFormat);
+          const momentDateFormat = this.getMomentDateFormat(dateFormat);
+          dataPoint[columnName] = moment.utc(dataPoint[columnName]).format(momentDateFormat);
         });
       });
     }
   }
 
-  getSerie({alias, displayName, comboType, aggregate}, index) {
+  getSerie({alias, displayName, comboType, aggregate}, index, fields) {
+    const comboGroups = fpPipe(
+      fpMap('comboType'),
+      fpUniq,
+      fpInvert,
+      fpMapValues(parseInt)
+    )(fields);
+
     const splinifiedChartType = this.splinifyChartType(comboType);
     const zIndex = this.getZIndex(comboType);
     return {
       name: alias || `${AGGREGATE_TYPES_OBJ[aggregate].label} ${displayName}`,
       type: splinifiedChartType,
-      yAxis: index,
+      yAxis: comboGroups[comboType],
       zIndex,
       data: []
     };
+  }
+
+  getMomentDateFormat(dateFormat) {
+    // the backend and moment.js require different date formats for days of month
+    // the backend represents it with "d", and momentjs with "Do"
+    return replace(dateFormat, 'd', 'Do');
   }
 
   getZIndex(type) {
@@ -431,7 +460,12 @@ export class ChartService {
 
   splitSeriesByGroup(parsedData, fields) {
     const axesFieldNameMap = this.getAxesFieldNameMap(fields);
-    const comboType = fields.y[0].comboType;
+    let comboType = fields.y[0].comboType;
+    if (angular.isDefined(comboType)) {
+      if (comboType.substring(0, 2) === 'ts') {
+        comboType = comboType.slice(2);
+      }
+    }
 
     return fpPipe(
       fpMap(dataPoint => mapValues(axesFieldNameMap, val => dataPoint[val])),
@@ -442,12 +476,12 @@ export class ChartService {
   }
 
   /**
-   * get the map from colmnNames to the axes, or group
+   * Get the map from colmnNames to the axes, or group
    * Ex
    * y -> AVAILABLE_MB
    */
   getAxesFieldNameMap(fields, exclude) {
-    // y axis ommitted because it is added in splitSeriesByYAxes
+    // Y axis ommitted because it is added in splitSeriesByYAxes
     const y = exclude === 'y' ? [] : fields.y;
     const fieldsArray = compact([fields.x, ...y, fields.z, fields.g]);
     return reduce(fieldsArray, (accumulator, field) => {
@@ -468,7 +502,7 @@ export class ChartService {
   isCategoryAxis(fields, key) {
     const dataType = get(fields, `${key}.type`);
     const isAxis = key !== 'g';
-    // strings should be represented as categories in the chart
+    // Strings should be represented as categories in the chart
     /* eslint-disable angular/typecheck-string */
     const isCategoryAxis = isAxis &&
       (dataType === 'string' || dataType === 'String' || DATE_TYPES.includes(dataType));
@@ -583,7 +617,7 @@ export class ChartService {
     const labelOptions = get(opts, 'labelOptions', {enabled: true, value: 'percentage'});
 
     if (!isEmpty(gridData)) {
-      const {series, categories} = this.splitToSeriesAndCategories(gridData, fields, opts);
+      const {series, categories} = this.splitToSeriesAndCategories(gridData, fields, opts, type);
       const {chartSeries} = this.customizeSeriesForChartType(series, type, categories, fields, opts);
 
       forEach(chartSeries, seriesData => {
@@ -610,6 +644,47 @@ export class ChartService {
     return changes;
   }
 
+  getYAxesChanges(fields) {
+    const labelHeight = 15;
+    const changes = fpPipe(
+      fpGroupBy('comboType'),
+      fpToPairs,
+      fpMap(([, fields]) => {
+        const titleText = map(fields, field => {
+          return field.alias || `${AGGREGATE_TYPES_OBJ[field.aggregate].label} ${field.displayName}`;
+        }).join('<br/>');
+        const isSingleField = fields.length === 1;
+        return {
+          gridLineWidth: 0,
+          opposite: true,
+          columnName: isSingleField ? fields[0].columnName : null,
+          title: {
+            useHtml: true,
+            margin: labelHeight * fields.length,
+            text: titleText,
+            style: isSingleField
+          },
+          labels: {
+            style: isSingleField
+          }
+        };
+      })
+    )(fields);
+
+    forEach(changes, (change, changeIndex) => {
+      if (changeIndex === 0) {
+        change.opposite = false;
+      }
+      if (change.columnName) {
+        const fieldIndex = findIndex(fields, ({columnName}) => columnName === change.columnName);
+        const style = {color: CHART_COLORS[fieldIndex]};
+        change.title.style = change.title.style ? style : null;
+        change.labels.style = change.labels.style ? style : null;
+      }
+    });
+    return changes;
+  }
+
   getBarChangeConfig(type, settings, fields, gridData, opts) {
     const labels = {
       x: get(fields, 'x.alias', get(fields, 'x.displayName', ''))
@@ -620,27 +695,15 @@ export class ChartService {
       data: (opts.labels && opts.labels.x) || labels.x
     }];
 
+    const yAxesChanges = this.getYAxesChanges(fields.y);
+
     changes.push({
       path: 'yAxis',
-      data: map(fields.y, (y, k) => ({
-        gridLineWidth: 0,
-        opposite: k > 0,
-        title: {
-          text: y.alias || `${AGGREGATE_TYPES_OBJ[y.aggregate].label} ${y.displayName}`,
-          style: fields.y.length <= 1 ? null : {
-            color: CHART_COLORS[k]
-          }
-        },
-        labels: {
-          style: fields.y.length <= 1 ? null : {
-            color: CHART_COLORS[k]
-          }
-        }
-      }))
+      data: yAxesChanges
     });
 
     if (!isEmpty(gridData)) {
-      const {series, categories} = this.splitToSeriesAndCategories(gridData, fields, opts);
+      const {series, categories} = this.splitToSeriesAndCategories(gridData, fields, opts, type);
       changes.push({
         path: 'series',
         data: series
@@ -677,6 +740,7 @@ export class ChartService {
     case 'stack':
     case 'scatter':
     case 'bubble':
+    case 'tsspline':
     default:
       changes = this.getBarChangeConfig(type, settings, fields, gridData, opts);
       break;
@@ -703,7 +767,7 @@ export class ChartService {
     // date -> just show the date
     const xStringValue = xIsString ?
       'point.key' : xIsNumber ?
-        'point.x:.2f' : 'point.x';
+        'point.x:,.2f' : 'point.x';
     const xAxisString = `<tr>
       <th>${fields.x.displayName}:</th>
       <td>{${xStringValue}}</td>
@@ -712,16 +776,16 @@ export class ChartService {
     const yIsSingle = fields.y.length === 1;
     const yAxisString = `<tr>
       <th>{series.name}:</th>
-      <td>{point.y:.2f}</td>
+      <td>{point.y:,.2f}</td>
     </tr>`;
     const zAxisString = fields.z ?
-    `<tr><th>${fields.z.displayName}:</th><td>{point.z:.2f}</td></tr>` :
-    '';
+      `<tr><th>${fields.z.displayName}:</th><td>{point.z:,.2f}</td></tr>` :
+      '';
     const groupString = fields.g ?
-    `<tr><th>Group:</th><td>{point.g}</td></tr>` :
-    '';
+      `<tr><th>Group:</th><td>{point.g}</td></tr>` :
+      '';
 
-    const tooltipObj = {
+    let tooltipObj = {
       useHTML: true,
       headerFormat: `<table> ${xIsString ? xAxisString : ''}`,
       pointFormat: `${xIsNumber ? xAxisString : ''}
@@ -731,6 +795,20 @@ export class ChartService {
       footerFormat: '</table>',
       followPointer: true
     };
+
+    if (type.substring(0, 2) === 'ts') {
+      tooltipObj = {
+        enabled: true,
+        useHTML: true,
+        valueDecimals: 3,
+        split: true,
+        shared: false,
+        pointFormat: `</table> ${yAxisString}
+          ${zAxisString}`,
+        footerFormat: '</table>',
+        followPointer: true
+      };
+    }
 
     changes.push({
       path: 'tooltip',
@@ -760,6 +838,13 @@ export class ChartService {
     ));
   }
 
+  filterDateTypes(attributes) {
+    return filter(attributes, attr => (
+      attr.columnName &&
+      DATE_TYPES.includes(attr.type)
+    ));
+  }
+
   fillSettings(artifacts, model) {
     /* Flatten the artifacts into a single array and sort them */
     const attributes = fpPipe(
@@ -775,7 +860,7 @@ export class ChartService {
     let settingsObj;
     let zaxis;
     const yaxis = this.filterNumberTypes(attributes);
-    const xaxis = attributes;
+    let xaxis = attributes;
     const groupBy = this.filterNonNumberTypes(attributes);
 
     switch (model.chartType) {
@@ -785,6 +870,14 @@ export class ChartService {
         xaxis,
         yaxis,
         zaxis,
+        groupBy
+      };
+      break;
+    case 'tsspline':
+      xaxis = this.filterDateTypes(attributes);
+      settingsObj = {
+        xaxis,
+        yaxis,
         groupBy
       };
       break;

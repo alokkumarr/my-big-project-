@@ -1,3 +1,5 @@
+@import "themes/base/colors";
+
 .analyze-report-publish {
   md-dialog-content {
     width: 550px;
@@ -31,5 +33,26 @@
 
   .end-criteria-radio {
     line-height: 32px;
+  }
+
+  md-chips.md-triton-theme .md-chips .md-chip-input-container input {
+    width: 250px;
+  }
+
+  .errorTextMsg {
+    color: $secondary-red;
+  }
+
+  .errorMsg {
+    color: $primary-white;
+    background-color: $secondary-orange;
+    border-radius: 14px;
+    float: left;
+    height: 26px;
+    width: 24px;
+    text-align: center;
+    font-size: larger;
+    margin-top: 3px;
+    margin-right: 2px;
   }
 }

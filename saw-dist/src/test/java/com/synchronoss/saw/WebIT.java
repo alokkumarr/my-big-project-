@@ -32,7 +32,7 @@ public class WebIT {
     @Test
     public void testWebRoot() {
         given(spec).accept("text/html")
-            .when().get("/")
+            .when().get("/web/")
             .then().statusCode(200).body(
                 "html.head.script", containsString("document.write"));
     }

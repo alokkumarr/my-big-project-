@@ -60,7 +60,7 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
     }
     it("with long between filter should have a WHERE clause with BETWEEN") {
       query(artifactT)(filters("AND", filterBinary(
-        "long", "t", "a", "btw", "1", "2"))
+        "long", "t", "a", "btw", "2", "1"))
       ) must be ("SELECT t.a, t.b FROM t WHERE t.a BETWEEN 1 AND 2")
     }
     it("with string filter should have a WHERE clause with condition") {
@@ -209,7 +209,7 @@ class QueryBuilderTest extends FunSpec with MustMatchers {
   private def filterDate(filterType: String, tableName: String,
     columnName: String, lte: String, gte: String): JObject = {
     filterCommon(filterType, tableName, columnName, null).merge(
-      ("model", ("lte", lte) ~ ("gte", gte) ~ ("preset","")): JObject)
+      ("model", ("lte", lte) ~ ("gte", gte) ~ ("preset","NA")): JObject)
   }
 
   

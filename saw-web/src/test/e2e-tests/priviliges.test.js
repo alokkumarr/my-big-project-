@@ -1,251 +1,405 @@
-const login = require('../javascript/pages/common/login.po.js');
-const header = require('../javascript/pages/components/header.co.js');
-const analyze = require('../javascript/pages/common/analyze.po.js');
-const executedAnalysis = require('../javascript/pages/common/executedAlaysis.po');
+/*
+  Created by Alex
+ */
+
+const login = require('../javascript/pages/loginPage.po.js');
+const analyze = require('../javascript/pages/analyzePage.po.js');
+const analyzePage = require('../javascript/pages/analyzePage.po.js');
+const homePage = require('../javascript/pages/homePage.po.js');
+const executedAnalysis = require('../javascript/pages/savedAlaysisPage.po');
 const protractor = require('protractor');
 const ec = protractor.ExpectedConditions;
-const CommonFunctions = require('../javascript/helpers/commonFunctions');
+const commonFunctions = require('../javascript/helpers/commonFunctions');
+const using = require('jasmine-data-provider');
 
-function isOptionPresent(options, optionName) {
-  const option = analyze.main.getAnalysisOption(options, optionName);
-  return option.isPresent();
-}
+//TODO add case for No Privileges
+//TODO add case for changing privileges
+//TODO add case for changing multiple privileges
+//TODO add case for making privilege inactive
+//TODO add case for making multiple privileges inactive
+//TODO add case for adding new privilege
+describe('Privileges tests: privileges.test.js', () => {
+  const dataProvider = {
+    'All privileges for user': {
+      user: 'userOne',
+      subCategory: "All DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: true,
+      create: true,
+      edit: true,
+      fork: true,
+      publish: true,
+      execute: true,
+      export: true,
+      delete: true
+    },
+    'Create privileges for user': {
+      user: 'userOne',
+      subCategory: "Create DO NOT TOUCH",
+      cardOptions: false,
+      viewOptions: false,
+      create: true,
+      edit: false,
+      fork: false,
+      publish: false,
+      execute: false,
+      export: false,
+      delete: false
+    },
+    'Edit privileges for user': {
+      user: 'userOne',
+      subCategory: "Edit DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: false,
+      create: false,
+      edit: true,
+      fork: false,
+      publish: false,
+      execute: false,
+      export: false,
+      delete: false
+    },
+    'Fork privileges for user': {
+      user: 'userOne',
+      subCategory: "Fork DO NOT TOUCH",
+      cardOptions: false,
+      viewOptions: false,
+      create: false,
+      edit: false,
+      fork: true,
+      publish: false,
+      execute: false,
+      export: false,
+      delete: false
+    },
+    'Publish privileges for user': {
+      user: 'userOne',
+      subCategory: "Publish DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: false,
+      create: false,
+      edit: false,
+      fork: false,
+      publish: true,
+      execute: false,
+      export: false,
+      delete: false
+    },
+    'Execute privileges for user': {
+      user: 'userOne',
+      subCategory: "Execute DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: true,
+      create: false,
+      edit: false,
+      fork: false,
+      publish: false,
+      execute: true,
+      export: false,
+      delete: false
+    },
+    'Export privileges for user': {
+      user: 'userOne',
+      subCategory: "Export DO NOT TOUCH",
+      cardOptions: false,
+      viewOptions: true,
+      create: false,
+      edit: false,
+      fork: false,
+      publish: false,
+      execute: false,
+      export: true,
+      delete: false
+    },
+    'Delete privileges for user': {
+      user: 'userOne',
+      subCategory: "Delete DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: true,
+      create: false,
+      edit: false,
+      fork: false,
+      publish: false,
+      execute: false,
+      export: false,
+      delete: true
+    },
+    'View privileges for user': {
+      user: 'userOne',
+      subCategory: "View DO NOT TOUCH",
+      cardOptions: false,
+      viewOptions: false,
+      create: false,
+      edit: false,
+      fork: false,
+      publish: false,
+      execute: false,
+      export: false,
+      delete: false
+    },
+    'Multiple privileges for user': {
+      user: 'userOne',
+      subCategory: "Multiple DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: false,
+      create: true,
+      edit: false,
+      fork: true,
+      publish: true,
+      execute: false,
+      export: false,
+      delete: false
+    },
+    'All privileges for admin': {
+      user: 'admin',
+      subCategory: "All DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: true,
+      create: true,
+      edit: true,
+      fork: true,
+      publish: true,
+      execute: true,
+      export: true,
+      delete: true
+    },
+    'Create privileges for admin': {
+      user: 'admin',
+      subCategory: "Create DO NOT TOUCH",
+      cardOptions: false,
+      viewOptions: false,
+      create: true,
+      edit: false,
+      fork: false,
+      publish: false,
+      execute: false,
+      export: false,
+      delete: false
+    },
+    'Edit privileges for admin': {
+      user: 'admin',
+      subCategory: "Edit DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: false,
+      create: false,
+      edit: true,
+      fork: false,
+      publish: false,
+      execute: false,
+      export: false,
+      delete: false
+    },
+    'Fork privileges for admin': {
+      user: 'admin',
+      subCategory: "Fork DO NOT TOUCH",
+      cardOptions: false,
+      viewOptions: false,
+      create: false,
+      edit: false,
+      fork: true,
+      publish: false,
+      execute: false,
+      export: false,
+      delete: false
+    },
+    'Publish privileges for admin': {
+      user: 'admin',
+      subCategory: "Publish DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: false,
+      create: false,
+      edit: false,
+      fork: false,
+      publish: true,
+      execute: false,
+      export: false,
+      delete: false
+    },
+    'Execute privileges for admin': {
+      user: 'admin',
+      subCategory: "Execute DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: true,
+      create: false,
+      edit: false,
+      fork: false,
+      publish: false,
+      execute: true,
+      export: false,
+      delete: false
+    },
+    'Export privileges for admin': {
+      user: 'admin',
+      subCategory: "Export DO NOT TOUCH",
+      cardOptions: false,
+      viewOptions: true,
+      create: false,
+      edit: false,
+      fork: false,
+      publish: false,
+      execute: false,
+      export: true,
+      delete: false
+    },
+    'Delete privileges for admin': {
+      user: 'admin',
+      subCategory: "Delete DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: true,
+      create: false,
+      edit: false,
+      fork: false,
+      publish: false,
+      execute: false,
+      export: false,
+      delete: true
+    },
+    'View privileges for admin': {
+      user: 'admin',
+      subCategory: "View DO NOT TOUCH",
+      cardOptions: false,
+      viewOptions: false,
+      create: false,
+      edit: false,
+      fork: false,
+      publish: false,
+      execute: false,
+      export: false,
+      delete: false
+    },
+    'Multiple privileges for admin': {
+      user: 'admin',
+      subCategory: "Multiple DO NOT TOUCH",
+      cardOptions: true,
+      viewOptions: false,
+      create: true,
+      edit: false,
+      fork: true,
+      publish: true,
+      execute: false,
+      export: false,
+      delete: false
+    },
+  };
 
-describe('Privileges', () => {
 
-  afterAll(function() {
+  beforeEach(function (done) {
+    setTimeout(function () {
+      expect(browser.getCurrentUrl()).toContain('/login');
+      done();
+    }, 1000)
+  });
+
+  afterEach(function (done) {
+    setTimeout(function () {
+      analyzePage.main.doAccountAction('logout');
+      done();
+    }, 1000)
+  });
+
+  afterAll(function () {
     browser.executeScript('window.sessionStorage.clear();');
     browser.executeScript('window.localStorage.clear();');
   });
 
-  describe('for Admin', () => {
-    it('should land on login page', () => {
-      browser.sleep(2000);
-      expect(browser.getCurrentUrl()).toContain('/login');
-    });
+  using(dataProvider, function (data, description) {
+    it('should check ' + description, () => {
+        login.loginAs(data.user);
+        navigateToDefaultSubCategory();
 
-    it('login as admin', () => {
-      login.loginAs('admin');
-    });
+        // Validate presence of Create Button
+        element(analyzePage.analysisElems.addAnalysisBtn.isDisplayed().then(function (isVisible) {
+          expect(isVisible).toBe(data.create,
+            "Create button expected to be " + data.create + " on Analyze Page, but was " + !data.create);
+        }));
 
-    it('should be successfully logged in', () => {
-      browser.sleep(2000);
-      expect(header.headerElements.companyLogo.isPresent()).toBe(true);
-    });
+        // Go to Card View
+        commonFunctions.waitFor.elementToBeClickableAndClick(analyze.analysisElems.cardView);
 
-    let analysisOptions;
-    it('actions menu exists', () => {
-      CommonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
-      analyze.analysisElems.cardView.click();
-      analyze.main.getAnalysisActionOptions(analyze.main.firstCard).then(options => {
-        analysisOptions = options;
-        expect(options.isPresent()).toBe(true);
-      });
-    });
+        // Validate presence of menu on card
+        element(analyze.analysisElems.cardMenuButton.isDisplayed().then(function (isVisible) {
+          expect(isVisible).toBe(data.cardOptions,
+            "Options on card expected to be " + data.cardOptions + " on Analyze Page, but was " + !data.cardOptions);
+        }));
 
-    it('has fork privilege', () => {
-      expect(analyze.main.getForkBtn(analyze.main.firstCard).isDisplayed()).toBe(true);
-    });
+        // Validate presence on menu items in card menu
+        if (data.cardOptions) {
+          analyze.main.getAnalysisActionOptions(analyze.main.firstCard).then(options => {
+            let analysisOptions = options;
+            expect(options.isPresent()).toBe(true, "Options on card expected to be present on Analyze Page, but weren't");
 
-    it('has execute privilege on card', () => {
-      expect(isOptionPresent(analysisOptions, 'execute')).toBe(true);
-    });
+            //should check privileges on card
+            expect(isOptionPresent(analysisOptions, "edit")).toBe(data.edit,
+              "Edit button expected to be " + data.edit + " on Analyze Page, but was " + !data.edit);
+            expect(analyze.main.getForkBtn(analyze.main.firstCard).isDisplayed()).toBe(data.fork,
+              "Fork button expected to be " + data.fork + " on Analyze Page, but was " + !data.fork);
+            expect(isOptionPresent(analysisOptions, 'publish')).toBe(data.publish,
+              "Publish button expected to be " + data.publish + " on Analyze Page, but was " + !data.publish);
+            expect(isOptionPresent(analysisOptions, 'execute')).toBe(data.execute,
+              "Execute button expected to be " + data.execute + " on Analyze Page, but was " + !data.execute);
+            expect(isOptionPresent(analysisOptions, 'delete')).toBe(data.delete,
+              "Delete button expected to be " + data.delete + " on Analyze Page, but was " + !data.delete);
+          });
 
-    it('has edit privilege on card', () => {
-      expect(isOptionPresent(analysisOptions, 'edit')).toBe(true);
-    });
+          // Navigate back, close the opened actions menu
+          //browser.sleep(1000);
+          element(by.css('md-backdrop')).click();
+          expect(element(by.css('md-backdrop')).isPresent()).toBe(false);
+        }
 
-    it('has publish privilege on card', () => {
-      expect(isOptionPresent(analysisOptions, 'publish')).toBe(true);
-    });
+        // Go to executed analysis page
+        analyze.main.firstCardTitle.click();
+        const condition = ec.urlContains('/executed');
+        browser
+          .wait(() => condition, 1000)
+          .then(() => expect(browser.getCurrentUrl()).toContain('/executed'));
 
-    it('has delete privilege on card', () => {
-      expect(isOptionPresent(analysisOptions, 'delete')).toBe(true);
-      browser.sleep(1000);
-    });
+        // Validate buttons in view mode of analysis
+        expect(executedAnalysis.editBtn.isDisplayed()).toBe(data.edit,
+          "Edit privilege expected to be " + data.edit + " in view mode, but was " + !data.edit);
+        expect(executedAnalysis.forkBtn.isDisplayed()).toBe(data.fork,
+          "Fork button expected to be " + data.fork + " in view mode, but was " + !data.fork);
+        expect(executedAnalysis.publishBtn.isDisplayed()).toBe(data.publish,
+          "Publish button expected to be " + data.publish + " in view mode, but was" + !data.publish);
 
-    it('should close the menu', () => {
-      // close the opened actions menu
-      element(by.css('md-backdrop')).click();
-      expect(element(by.css('md-backdrop')).isPresent()).toBe(false);
-    });
+        // Validate menu in analysis
+        element(executedAnalysis.actionsMenuBtn.isDisplayed().then(function (isVisible) {
+          expect(isVisible).toBe(data.viewOptions,
+            "Options menu button expected to be " + data.viewOptions + " in view mode, but was " + !data.viewOptions);
+        }));
 
-    it('go to executed analysis page', () => {
-      analyze.main.firstCardTitle.click();
-      const condition = ec.urlContains('/executed');
-      browser
-        .wait(() => condition, 1000)
-        .then(() => expect(browser.getCurrentUrl()).toContain('/executed'));
-    });
+        // Validate menu items under menu button
+        if (data.viewOptions === true) {
 
-    it('should have publish privilege', () => {
-      expect(executedAnalysis.publishBtn.isDisplayed()).toBe(true);
-    });
+          executedAnalysis.actionsMenuBtn.click();
 
-    it('should have fork privilege', () => {
-      expect(executedAnalysis.forkBtn.isDisplayed()).toBe(true);
-    });
+          element(executedAnalysis.executeMenuOption.isPresent().then(function (isVisible) {
+            expect(isVisible).toBe(data.execute,
+              "Execute button expected to be " + data.execute + " in view mode, but was" + !data.execute);
+          }));
 
-    it('should have edit privilege', () => {
-      expect(executedAnalysis.editBtn.isDisplayed()).toBe(true);
-    });
+          element(executedAnalysis.exportMenuOption.isPresent().then(function (isVisible) {
+            expect(isVisible).toBe(data.export,
+              "Export button expected to be " + data.export + " in view mode, but was" + !data.export);
+          }));
 
-    it('should log out', () => {
-      analyze.main.doAccountAction('logout');
-    });
-  });
+          element(executedAnalysis.deleteMenuOption.isPresent().then(function (isVisible) {
+            expect(isVisible).toBe(data.delete,
+              "Delete button expected to be " + data.delete + " in view mode, but was" + !data.delete);
+          }));
+        }
+      }
+    );
 
-  describe('for Analyst', () => {
-    it('should land on login page', () => {
-      browser.sleep(2000);
-      expect(browser.getCurrentUrl()).toContain('/login');
-    });
+    function isOptionPresent(options, optionName) {
+      const option = analyze.main.getAnalysisOption(options, optionName);
+      return option.isPresent();
+    }
 
-    it('login as analyst', () => {
-      login.loginAs('analyst');
-    });
-
-    it('should be successfully logged in', () => {
-      browser.sleep(2000);
-      expect(header.headerElements.companyLogo.isPresent()).toBe(true);
-    });
-
-    let analysisOptions;
-    it('actions menu exists', () => {
-      CommonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
-      analyze.analysisElems.cardView.click();
-      analyze.main.getAnalysisActionOptions(analyze.main.firstCard).then(options => {
-        analysisOptions = options;
-        expect(options.isPresent()).toBe(true);
-      });
-    });
-
-    it('has fork privilege', () => {
-      expect(analyze.main.getForkBtn(analyze.main.firstCard).isDisplayed()).toBe(true);
-    });
-
-    it('has execute privilege on card', () => {
-      expect(isOptionPresent(analysisOptions, 'execute')).toBe(true);
-    });
-
-    it('has no edit privilege on card', () => {
-      expect(isOptionPresent(analysisOptions, 'edit')).toBe(false);
-    });
-
-    it('has publish privilege on card', () => {
-      expect(isOptionPresent(analysisOptions, 'publish')).toBe(true);
-    });
-
-    it('has no delete privilege on card', () => {
-      expect(isOptionPresent(analysisOptions, 'delete')).toBe(false);
-      browser.sleep(1000);
-    });
-
-    it('should close the menu', () => {
-      // close the opened actions menu
-      element(by.css('md-backdrop')).click();
-      expect(element(by.css('md-backdrop')).isPresent()).toBe(false);
-    });
-
-    it('go to executed analysis page', () => {
-      analyze.main.firstCardTitle.click();
-      const condition = ec.urlContains('/executed');
-      browser
-        .wait(() => condition, 1000)
-        .then(() => expect(browser.getCurrentUrl()).toContain('/executed'));
-    });
-
-    it('should have publish privilege', () => {
-      expect(executedAnalysis.publishBtn.isDisplayed()).toBe(true);
-    });
-
-    it('should have fork privilege', () => {
-      expect(executedAnalysis.forkBtn.isDisplayed()).toBe(true);
-    });
-
-    it('should have edit privilege', () => {
-      expect(executedAnalysis.editBtn.isDisplayed()).toBe(false);
-    });
-
-    it('should log out', () => {
-      analyze.main.doAccountAction('logout');
-    });
-  });
-
-  describe('for Reviewer', () => {
-    it('should land on login page', () => {
-      browser.sleep(2000);
-      expect(browser.getCurrentUrl()).toContain('/login');
-    });
-
-    it('login as reviewer', () => {
-      login.loginAs('reviewer');
-    });
-
-    it('should be successfully logged in', () => {
-      browser.sleep(2000);
-      expect(header.headerElements.companyLogo.isPresent()).toBe(true);
-    });
-
-    let analysisOptions;
-    it('actions menu exists', () => {
-      CommonFunctions.waitFor.elementToBeClickable(analyze.analysisElems.cardView);
-      analyze.analysisElems.cardView.click();
-      analyze.main.getAnalysisActionOptions(analyze.main.firstCard).then(options => {
-        analysisOptions = options;
-        expect(options.isPresent()).toBe(true);
-      });
-    });
-
-    it('has no fork privilege', () => {
-      expect(analyze.main.getForkBtn(analyze.main.firstCard).isDisplayed()).toBe(false);
-    });
-
-    it('has execute privilege on card', () => {
-      expect(isOptionPresent(analysisOptions, 'execute')).toBe(true);
-    });
-
-    it('has no edit privilege on card', () => {
-      expect(isOptionPresent(analysisOptions, 'edit')).toBe(false);
-    });
-
-    it('has publish privilege on card', () => {
-      expect(isOptionPresent(analysisOptions, 'publish')).toBe(true);
-    });
-
-    it('has no delete privilege on card', () => {
-      expect(isOptionPresent(analysisOptions, 'delete')).toBe(false);
-      browser.sleep(1000);
-    });
-
-    it('should close the menu', () => {
-      // close the opened actions menu
-      element(by.css('md-backdrop')).click();
-      expect(element(by.css('md-backdrop')).isPresent()).toBe(false);
-    });
-
-    it('go to executed analysis page', () => {
-      analyze.main.firstCardTitle.click();
-      const condition = ec.urlContains('/executed');
-      browser
-        .wait(() => condition, 1000)
-        .then(() => expect(browser.getCurrentUrl()).toContain('/executed'));
-    });
-
-    it('should have publish privilege', () => {
-      expect(executedAnalysis.publishBtn.isDisplayed()).toBe(true);
-    });
-
-    it('should have fork privilege', () => {
-      expect(executedAnalysis.forkBtn.isDisplayed()).toBe(false);
-    });
-
-    it('should have edit privilege', () => {
-      expect(executedAnalysis.editBtn.isDisplayed()).toBe(false);
-    });
-
-    it('should log out', () => {
-      analyze.main.doAccountAction('logout');
-    });
+    // Navigates to specific category where analysis view should happen
+    const navigateToDefaultSubCategory = () => {
+      const subCategory = homePage.subCategory(data.subCategory);
+      commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
+    };
   });
 });

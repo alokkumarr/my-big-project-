@@ -1,9 +1,10 @@
 import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as fpPipe from 'lodash/fp/pipe';
 import * as map from 'lodash/map';
+import * as reduce from 'lodash/reduce';
 import * as fpMapValues from 'lodash/fp/mapValues';
 
-import {NUMBER_TYPES, DATE_TYPES, CHART_COLORS} from '../../common/consts.js';
+import {NUMBER_TYPES, DATE_TYPES, CHART_COLORS, BACKEND_TIMEZONE} from '../../common/consts.js';
 
 export const Events = {
   AnalysesRefresh: 'Analyses:Refresh'
@@ -23,7 +24,30 @@ export const ENTRY_MODES = {
 
 export const LAST_ANALYSES_CATEGORY_ID = 'lastAnalysesListId';
 
-export {NUMBER_TYPES, DATE_TYPES, CHART_COLORS};
+export {NUMBER_TYPES, DATE_TYPES, CHART_COLORS, BACKEND_TIMEZONE};
+
+export const TYPE_MAP = reduce([
+  ...map(NUMBER_TYPES, type => ({type, generalType: 'number'})),
+  ...map(DATE_TYPES, type => ({type, generalType: 'date'})),
+  {type: 'string', generalType: 'string'}
+], (typeMap, {type, generalType}) => {
+  typeMap[type] = generalType;
+  return typeMap;
+}, {});
+
+export const TYPE_ICONS = [{
+  icon: 'icon-number-type',
+  label: 'Number',
+  value: 'number'
+}, {
+  icon: 'icon-string-type',
+  label: 'String',
+  value: 'string'
+}, {
+  icon: 'icon-calendar',
+  label: 'Date',
+  value: 'date'
+}];
 
 export const TYPE_ICONS_OBJ = fpPipe(
   fpGroupBy('type'),
@@ -88,13 +112,32 @@ export const COMBO_TYPES = [{
 }, {
   label: 'area',
   value: 'area',
-  icon: 'icon-vert-bar-chart'
+  icon: 'icon-area-chart'
 }];
 
 export const COMBO_TYPES_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
 )(COMBO_TYPES);
+
+export const TSCOMBO_TYPES = [{
+  label: 'line',
+  value: 'tsspline',
+  icon: 'icon-line-chart'
+}, {
+  label: 'column',
+  value: 'tscolumn',
+  icon: 'icon-vert-bar-chart'
+}, {
+  label: 'area',
+  value: 'tsareaspline',
+  icon: 'icon-area-chart'
+}];
+
+export const TSCOMBO_TYPES_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(TSCOMBO_TYPES);
 
 export const ANALYSIS_METHODS = [
   {
@@ -161,6 +204,11 @@ export const ANALYSIS_METHODS = [
         label: 'Pie Chart',
         icon: {font: 'icon-pie-chart'},
         type: 'chart:pie'
+      },
+      {
+        label: 'Timeseries Chart',
+        icon: {font: 'icon-timeseries-chart'},
+        type: 'chart:tsspline'
       }
     ]
   }
@@ -217,3 +265,46 @@ export const DATE_INTERVALS_OBJ = fpPipe(
   fpGroupBy('value'),
   fpMapValues(v => v[0])
 )(DATE_INTERVALS);
+
+export const CUSTOM_DATE_PRESET_VALUE = 'NA';
+export const DATE_PRESETS = [{
+  value: 'TW',
+  keyword: 'THIS_WEEK',
+  label: 'This Week'
+}, {
+  value: 'MTD',
+  keyword: 'MONTH_TO_DATE',
+  label: 'MTD (Month to Date)'
+}, {
+  value: 'YTD',
+  keyword: 'YEAR_TO_DATE',
+  label: 'YTD (Year to Date)'
+}, {
+  value: 'LW',
+  keyword: 'LAST_WEEK',
+  label: 'Last Week'
+}, {
+  value: 'LTW',
+  keyword: 'LAST_2_WEEKS',
+  label: 'Last 2 Weeks'
+}, {
+  value: 'LM',
+  keyword: 'LAST_MONTH',
+  label: 'Last Month'
+}, {
+  value: 'LQ',
+  keyword: 'LAST_QUARTER',
+  label: 'Last Quarter'
+}, {
+  value: 'LTM',
+  keyword: 'LAST_3_MONTHS',
+  label: 'Last 3 Months'
+}, {
+  value: 'LSM',
+  keyword: 'LAST_6_MONTHS',
+  label: 'Last 6 Months'
+}, {
+  value: CUSTOM_DATE_PRESET_VALUE,
+  keyword: 'CUSTOM',
+  label: 'Custom'
+}];

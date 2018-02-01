@@ -11,10 +11,10 @@ import {AGGREGATE_TYPES, DEFAULT_AGGREGATE_TYPE,
   AGGREGATE_TYPES_OBJ, NUMBER_TYPES, DATE_TYPES} from '../../../consts';
 
 const DATE_FORMATS = [{
-  value: 'MMMM Do YYYY, h:mm:ss a',
+  value: 'MMMM d YYYY, h:mm:ss a',
   label: 'September 1st 2017, 1:28:31 pm'
 }, {
-  value: 'MMM Do YYYY',
+  value: 'MMM d YYYY',
   label: ' Sep 1st 2017'
 }, {
   value: 'MMM YYYY',
@@ -22,6 +22,9 @@ const DATE_FORMATS = [{
 }, {
   value: 'MM YYYY',
   label: '09 2017'
+}, {
+  value: 'YYYY',
+  label: '2017'
 }];
 
 const DEFAULT_DATE_FORMAT = DATE_FORMATS[1];
@@ -57,7 +60,7 @@ export const AnalyzeChartSettingsComponent = {
     }
 
     $onInit() {
-      this.multipleYAxes.enabled = this.chartType !== 'bubble' && this.chartType !== 'pie';
+      this.multipleYAxes.enabled = !['bubble', 'pie', 'stack'].includes(this.chartType);
       this._clearWatcher = this._$scope.$watch(() => this.settings, newVal => {
         if (newVal) {
           this.markSelected();
@@ -134,7 +137,7 @@ export const AnalyzeChartSettingsComponent = {
           target.aggregate = DEFAULT_AGGREGATE_TYPE.value;
         }
         if (!selectedAttr.comboType) {
-          if (['line', 'column', 'area'].includes(this.chartType)) {
+          if (['line', 'column', 'area', 'tsspline'].includes(this.chartType)) {
             target.comboType = this.chartType;
           }
           if (['combo', 'bar'].includes(this.chartType)) {

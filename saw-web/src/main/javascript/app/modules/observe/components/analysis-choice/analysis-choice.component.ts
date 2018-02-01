@@ -3,7 +3,7 @@ import * as map from 'lodash/map';
 import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 import { Component } from '@angular/core';
-import { MdDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material';
 import { JwtService } from '../../../../../login/services/jwt.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 
@@ -28,7 +28,7 @@ export class AnalysisChoiceComponent {
   public subCategories = [];
   public analyses = [];
 
-  constructor(public dialogRef: MdDialogRef<AnalysisChoiceComponent>,
+  constructor(public dialogRef: MatDialogRef<AnalysisChoiceComponent>,
     public jwt: JwtService,
     public analyze: AnalyzeService
   ) {}
@@ -43,10 +43,15 @@ export class AnalysisChoiceComponent {
   onCategoryUpdated() {
     this.selection.subCategory = null;
     this.selection.analysis = null;
-    this.subCategories = map(
+    const subCategories = map(
       get(find(this.categories, category => this.selection.category === category.id), 'data.productModuleSubFeatures'),
       subCategory => ({ id: subCategory.prodModFeatureID, name: subCategory.prodModFeatureName, data: subCategory })
-    )
+    );
+
+    /* Only allow subcategories which have access to execute operation */
+    this.subCategories = filter(subCategories, subCategory =>
+      this.jwt.hasPrivilege('EXECUTE', {subCategoryId: subCategory.id})
+    );
   }
 
   onSubCategoryUpdated() {

@@ -1,8 +1,4 @@
-import {
-  ArtifactColumn,
-  ArtifactColumnPivot,
-  ArtifactColumnChart
-} from '../../models/artifact-column.model';
+
 import {
   SqlBuilder,
   SqlBuilderPivot
@@ -11,7 +7,18 @@ import {
   DesignerMode,
   AnalysisStarter,
   Analysis,
-  AnalysisType
+  AnalysisType,
+  Sort,
+  Filter,
+  FilterModel,
+  ArtifactColumnPivot,
+  ArtifactColumnChart,
+  ArtifactColumn,
+  ArtifactColumns,
+  IToolbarActionData,
+  DesignerToolbarAciton,
+  IToolbarActionResult,
+  Artifact
 } from '../../types';
 
 export {
@@ -21,15 +28,23 @@ export {
   DesignerMode,
   AnalysisStarter,
   AnalysisType,
-  SqlBuilder
+  SqlBuilder,
+  SqlBuilderPivot,
+  Sort,
+  Filter,
+  FilterModel,
+  Artifact,
+  ArtifactColumn,
+  ArtifactColumns,
+  IToolbarActionData,
+  DesignerToolbarAciton,
+  IToolbarActionResult
 };
 
-export type ArtifactColumns = ArtifactColumnPivot[] | ArtifactColumnChart[];
-export type ArtifactColumn = ArtifactColumnPivot | ArtifactColumnChart;
 
 export type ArtifactColumnFilter = {
   keyword: string,
-  type: '' | 'number' | 'date' | 'string';
+  types: ('number' | 'date' | 'string')[];
 };
 
 export type PivotArea = 'data' | 'row' | 'column';
@@ -37,8 +52,15 @@ export type PivotArea = 'data' | 'row' | 'column';
 export interface IDEsignerSettingGroupAdapter {
   title: string;
   marker: string;
-  artifactColumns: Array<ArtifactColumn>;
-  canAcceptArtifactColumn: (artifactColumn: ArtifactColumn) => boolean;
+  type: AnalysisType;
+  artifactColumns: ArtifactColumns;
+  canAcceptArtifactColumn: (groupAdapter: IDEsignerSettingGroupAdapter) =>
+    (artifactColumn: ArtifactColumn) => boolean;
+  // a callback to possibly transform the artifactColumn added to a group
   transform: (artifactColumn: ArtifactColumn) => void;
-  reverseTransform: (ArtifactColumn: ArtifactColumn) => void;
+  // a callback to undo any transformations done to the element
+  reverseTransform: (artifactColumn: ArtifactColumn) => void;
+  // a callback to change soomething when the indexes change in artifactColumns
+  onReorder: (artifactColumns: ArtifactColumns) => void;
 }
+

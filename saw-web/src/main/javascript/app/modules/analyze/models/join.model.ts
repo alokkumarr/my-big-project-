@@ -1,6 +1,6 @@
-import JoinCriterion from './join-criterion.model';
+import { JoinCriterion } from './join-criterion.model';
 
-export default interface Join {
+export interface Join {
   criteria: JoinCriterion[];
   type:     string;
 }

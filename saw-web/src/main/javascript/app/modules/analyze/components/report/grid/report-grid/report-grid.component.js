@@ -1,14 +1,17 @@
 import * as assign from 'lodash/assign';
 import * as map from 'lodash/map';
+import * as isEmpty from 'lodash/isEmpty';
 import * as find from 'lodash/find';
 import * as forEach from 'lodash/forEach';
 import * as remove from 'lodash/remove';
 import * as isUndefined from 'lodash/isUndefined';
 import * as $ from 'jquery';
+import * as moment from 'moment';
+import 'moment-timezone';
 
 import * as template from './report-grid.component.html';
 import style from './report-grid.component.scss';
-import {NUMBER_TYPES} from '../../../../consts';
+import {NUMBER_TYPES, DATE_TYPES, BACKEND_TIMEZONE} from '../../../../consts';
 
 // const MIN_ROWS_TO_SHOW = 5;
 const COLUMN_WIDTH = 175;
@@ -36,7 +39,6 @@ export const ReportGridComponent = {
 
     $onInit() {
       this.reportGridNode.setGridComponent(this);
-
       this.settings = assign(this.settings, {
         gridConfig: this._dxDataGridService.mergeWithDefaultConfig({
           onInitialized: this.onGridInitialized.bind(this),
@@ -158,9 +160,14 @@ export const ReportGridComponent = {
 
     updateColumns(columns) {
       this.columns = columns;
-
       if (this._gridInstance) {
-        this._gridInstance.option('columns', this.prepareGridColumns(this.columns));
+        const columns = this.prepareGridColumns(this.columns);
+        forEach(columns, column => {
+          if (column.dataType === 'date') {
+            column.dataType = 'string-date';
+          }
+        });
+        this._gridInstance.option('columns', columns);
       }
     }
 
@@ -179,20 +186,53 @@ export const ReportGridComponent = {
           width: COLUMN_WIDTH,
           format: column.format
         };
-        if (!isUndefined(NUMBER_TYPES.includes(column.type)) && isUndefined(column.format)) {
+
+        if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
+          field.format = 'shortDate';
+        }
+
+        if (NUMBER_TYPES.includes(column.type) && isUndefined(column.format)) {
           field.format = {
             type: 'fixedPoint',
+            comma: false,
             precision: 2
           };
+          field.customizeText = (data => {
+            const stringList = data.valueText.split(',');
+            let finalString = '';
+            forEach(stringList, value => {
+              finalString = finalString.concat(value);
+            });
+            return finalString;
+          });
         }
-        if (!isUndefined(NUMBER_TYPES.includes(column.type)) && !isUndefined(column.format)) {
+        if (NUMBER_TYPES.includes(column.type) && !isUndefined(column.format)) {
           if (!isUndefined(column.format.currency)) {
             field.customizeText = (data => {
-              if (!isUndefined(column.format.currencySymbol)) {
-                return data.valueText + ' ' + column.format.currencySymbol;
-              } else {
-                return data.valueText;
+              if (!column.format.comma) {
+                const stringList = data.valueText.split(',');
+                let finalString = '';
+                forEach(stringList, value => {
+                  finalString = finalString.concat(value);
+                });
+                data.valueText = finalString;
               }
+              if (!isUndefined(column.format.currencySymbol) && !isEmpty(data.valueText)) {
+                return column.format.currencySymbol + ' ' + data.valueText;
+              }
+              return data.valueText;
+            });
+          } else {
+            field.customizeText = (data => {
+              if (!column.format.comma) {
+                const stringList = data.valueText.split(',');
+                let finalString = '';
+                forEach(stringList, value => {
+                  finalString = finalString.concat(value);
+                });
+                data.valueText = finalString;
+              }
+              return data.valueText;
             });
           }
         }
@@ -223,8 +263,41 @@ export const ReportGridComponent = {
 
     onSourceUpdate() {
       if (this._gridInstance) {
-        this._gridInstance.option('dataSource', this.source);
+        const sourceData = this.source;
+        this._gridInstance.option('dataSource', this.formatDates(sourceData));
       }
+    }
+
+    formatDates(data) {
+      if (isEmpty(data)) {
+        return data;
+      }
+      const keys = Object.keys(data[0]);
+      const formats = [
+        moment.ISO_8601,
+        'YYYY-MM-DD hh:mm:ss',
+        'YYYY-MM-DD',
+        'MM/DD/YYYY  :)  HH*mm*ss'
+      ];
+      forEach(data, row => {
+        forEach(keys, key => {
+          const date = moment.tz(row[key], formats, true, BACKEND_TIMEZONE);
+          if (date.isValid() && ['date', 'string-date', 'timestamp'].includes(this.checkColumndatatype(this.columns, key))) {
+            row[key] = date.toDate();
+          }
+        });
+      });
+      return data;
+    }
+
+    checkColumndatatype(columnList, columnName) {
+      let datatype = '';
+      forEach(columnList, column => {
+        if (!isEmpty(column.meta) && column.meta.columnName === columnName) {
+          datatype = column.meta.type;
+        }
+      });
+      return datatype;
     }
 
     refreshGrid() {
@@ -252,36 +325,58 @@ export const ReportGridComponent = {
           const columns = this._gridInstance.option('columns');
           const column = this.getColumnByName(newFormat.column);
           let typeValue = '';
+          let separator = false;
           if (column) {
-            if (newFormat.type === 'date' || newFormat.type === 'timestamp') {
+            if (['date', 'string-date', 'timestamp'].includes(newFormat.type)) {
               column.dataType = 'date';
               column.format = newFormat.dateFormat;
             } else {
               if (newFormat.commaSeparator) {
                 typeValue = 'fixedpoint';
+                separator = true;
               } else {
-                typeValue = 'decimal';
+                typeValue = 'fixedpoint';
+                separator = false;
               }
               if (newFormat.currencyFlag) {
                 column.format = {
                   type: typeValue,
+                  comma: separator,
                   precision: newFormat.numberDecimal,
                   currency: newFormat.currencyCode,
                   currencySymbol: newFormat.currencySymbol
                 };
                 column.customizeText = (source => {
-                  if (!isUndefined(column.format.currencySymbol)) {
-                    return source.valueText + ' ' + column.format.currencySymbol;
-                  } else {
-                    return source.valueText;
+                  if (!column.format.comma) {
+                    const stringList = source.valueText.split(',');
+                    let finalString = '';
+                    forEach(stringList, value => {
+                      finalString = finalString.concat(value);
+                    });
+                    source.valueText = finalString;
                   }
+                  if (!isUndefined(column.format.currencySymbol) && !isEmpty(source.valueText)) {
+                    return column.format.currencySymbol + ' ' + source.valueText;
+                  }
+                  return source.valueText;
                 });
               } else {
                 column.format = {
                   type: typeValue,
+                  comma: separator,
                   precision: newFormat.numberDecimal
                 };
-                column.customizeText = undefined;
+                column.customizeText = (source => {
+                  if (!column.format.comma) {
+                    const stringList = source.valueText.split(',');
+                    let finalString = '';
+                    forEach(stringList, value => {
+                      finalString += value;
+                    });
+                    source.valueText = finalString;
+                  }
+                  return source.valueText;
+                });
               }
             }
           }

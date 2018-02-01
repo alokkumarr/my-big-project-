@@ -9,19 +9,26 @@ import {
   MatFormFieldModule,
   MatProgressBarModule,
   MatChipsModule,
-  NoConflictStyleCompatibilityMode,
+  // NoConflictStyleCompatibilityMode,
   MatIconRegistry,
   MatListModule,
   MatCheckboxModule,
   MatMenuModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatDatepickerModule,
+  MatInputModule,
+  MatToolbarModule
 } from '@angular/material';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import {MatCardModule} from '@angular/material/card';
+import {MatMomentDateModule} from '@angular/material-moment-adapter';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
 import '../../../../themes/_angular_next.scss';
 @NgModule({
   imports: [
-    NoConflictStyleCompatibilityMode,
+    // NoConflictStyleCompatibilityMode,
     BrowserAnimationsModule,
     MatButtonModule,
     MatIconModule,
@@ -34,7 +41,14 @@ import '../../../../themes/_angular_next.scss';
     MatListModule,
     MatCheckboxModule,
     MatMenuModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatExpansionModule,
+    MatButtonToggleModule,
+    MatInputModule,
+    MatCardModule,
+    MatDatepickerModule,
+    MatMomentDateModule,
+    MatToolbarModule
   ],
   providers: [MatIconRegistry],
   exports: [
@@ -49,7 +63,14 @@ import '../../../../themes/_angular_next.scss';
     MatListModule,
     MatCheckboxModule,
     MatMenuModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatExpansionModule,
+    MatButtonToggleModule,
+    MatInputModule,
+    MatCardModule,
+    MatDatepickerModule,
+    MatMomentDateModule,
+    MatToolbarModule
   ]
 })
 export class MaterialModule {}

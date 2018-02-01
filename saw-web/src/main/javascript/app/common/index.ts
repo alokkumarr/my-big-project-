@@ -1,5 +1,6 @@
+import 'jquery';
 import * as angular from 'angular';
-import 'angular-ui-router';
+import '@uirouter/angular-hybrid';
 
 import 'angular-material';
 
@@ -13,11 +14,20 @@ import 'ng-idle';
 
 import 'mottle';
 
+import 'devextreme/dist/css/dx.common.css';
+import 'devextreme/dist/css/dx.light.css';
+
+import 'devextreme/localization';
+
+import 'devextreme/localization/messages/en.json';
+
 import 'devextreme/ui/data_grid';
+import 'devextreme/integration/jquery';
 import 'devextreme/integration/angular';
 
 import { NgModule } from '@angular/core';
 import { DndModule } from './dnd';
+import { MaterialModule } from '../material.module';
 import {DxPivotGridModule, DxPivotGridComponent} from 'devextreme-angular';
 import EventEmitter from './utils/eventEmitter';
 import ComponentHandler from './utils/componentHandler';
@@ -28,9 +38,17 @@ import {CommonFilterModule} from './filters';
 import {CommonDirectiveModule} from './directives';
 // import from login module
 import {AuthServiceFactory} from '../../login/services/auth.service';
-import {UserServiceFactory} from '../../login/services/user.service';
-import {JwtServiceFactory} from '../../login/services/jwt.service';
 import {PivotGridComponent} from './components/pivot-grid/pivot-grid.component';
+import {ErrorDetailComponent} from './components/error-detail';
+import {E2eDirective} from './directives/e2e.directive';
+import {UserService} from '../../login/services/user.service';
+import {JwtService} from '../../login/services/jwt.service';
+import {ErrorDetailService} from './services/error-detail.service';
+import {ErrorDetailDialogService} from './services/error-detail-dialog.service';
+import { ClickToCopyDirective } from './directives/clickToCopy.directive';
+import {
+  toastProvider
+} from './services/ajs-common-providers';
 
 import AppConfig from '../../../../../appConfig';
 
@@ -38,6 +56,7 @@ export const CommonModule = 'CommonModule';
 
 const moduleDependencies = [
   'ui.router',
+  'ui.router.upgrade',
   'LocalStorageModule',
   'ngSanitize',
   'ngMaterial',
@@ -66,24 +85,37 @@ angular
     return new ComponentHandler();
   })
   .factory('AuthService', AuthServiceFactory)
-  .factory('UserService', UserServiceFactory)
-  .factory('JwtService', JwtServiceFactory);
+  .service('UserService', UserService)
+  .service('JwtService', JwtService);
 
 @NgModule({
   imports: [
+    MaterialModule,
     DndModule,
     DxPivotGridModule
   ],
   declarations: [
-    PivotGridComponent
+    PivotGridComponent,
+    ClickToCopyDirective,
+    ErrorDetailComponent,
+    E2eDirective
   ],
   entryComponents: [
-    PivotGridComponent
+    PivotGridComponent,
+    ErrorDetailComponent
   ],
   exports: [
     DndModule,
     PivotGridComponent,
-    DxPivotGridComponent
+    DxPivotGridComponent,
+    ClickToCopyDirective,
+    ErrorDetailComponent,
+    E2eDirective
+  ],
+  providers: [
+    ErrorDetailService,
+    ErrorDetailDialogService,
+    toastProvider
   ]
 })
 export class CommonModuleTs {}

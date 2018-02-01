@@ -5,6 +5,8 @@ import {
   EventEmitter
 } from '@angular/core';
 
+import { DesignerToolbarAciton } from '../types';
+
 const template = require('./designer-toolbar.component.html');
 require('./designer-toolbar.component.scss');
 
@@ -13,7 +15,7 @@ require('./designer-toolbar.component.scss');
   template
 })
 export class DesignerToolbarComponent {
-  @Input() isDataOutOfSynch: boolean;
-  @Output() refreshData: EventEmitter<null> = new EventEmitter();
+  @Output() requestAction: EventEmitter<DesignerToolbarAciton> = new EventEmitter();
+
 
 }

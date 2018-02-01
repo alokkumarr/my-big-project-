@@ -1,0 +1,24 @@
+<div fxLayout="row" fxLayoutAlign="space-between center">
+  <mat-form-field>
+    <input matInput type="number"
+            (input)="onValueChange($event.target.value)"
+            [value]="filterModel.value"/>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-select placeholder="Operator"
+                e2e="filter-number-select"
+                (selectionChange)="onOperatorChange($event.value)"
+                [value]="filterModel.operator">
+      <mat-option *ngFor="let operator of OPERATORS"
+                  [value]="operator.value"
+                  [e2e]="'filter-number-option-' + operator.label">
+        {{ operator.label }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field *ngIf="filterModel.operator === 'BTW'">
+    <input matInput type="number"
+            (input)="onOtherValueChange($event.target.value)"
+            [value]="filterModel.otherValue"/>
+  </mat-form-field>
+</div>

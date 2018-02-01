@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +39,17 @@ public class DataExportController {
     responseObjectFuture = exportService.dataToBeExportedAsync(executionId, request,analysisId);
     return responseObjectFuture;
   }
- 
-  
-  
+
+  @RequestMapping(value = "/{analysisId}/executions/{executionId}/dispatch/{type}", method = RequestMethod.POST)
+  @ResponseStatus(HttpStatus.OK)
+  public void dispatchAnalyses(@PathVariable("executionId") String executionId, @PathVariable("analysisId") String analysisId,
+                                @PathVariable("type") String analysisType,
+                                RequestEntity request, HttpServletResponse response){
+    logger.debug("executionId in dispatch {}", executionId);
+    if (analysisType.equalsIgnoreCase("report"))
+      exportService.reportToBeDispatchedAsync(executionId, request,analysisId);
+    else if(analysisType.equalsIgnoreCase("pivot"))
+      exportService.pivotToBeDispatchedAsync(executionId, request,analysisId);
+  }
+
 }

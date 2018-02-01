@@ -1,7 +1,16 @@
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import * as get from 'lodash/get';
+import * as fpPick from 'lodash/fp/pick';
+import * as fpPipe from 'lodash/fp/pipe';
+import * as fpFilter from 'lodash/fp/filter';
+import * as fpMap from 'lodash/fp/map';
+import * as map from 'lodash/map';
+import * as flatMap from 'lodash/flatMap';
+import * as replace from 'lodash/replace';
+import * as indexOf from 'lodash/indexOf';
+import * as slice from 'lodash/slice';
+import {json2csv} from 'json-2-csv';
 import * as keys from 'lodash/keys';
-import * as json2csv from 'json2csv';
 
 import {Events} from '../../consts';
 
@@ -14,11 +23,12 @@ export const AnalyzeExecutedDetailComponent = {
   styles: [style],
   controller: class AnalyzeExecutedDetailController extends AbstractComponentController {
     constructor($injector, AnalyzeService, $state, $rootScope, JwtService, $mdDialog, fileService,
-                $window, toastMessage, FilterService, AnalyzeActionsService, $scope, $q) {
+      $window, toastMessage, FilterService, AnalyzeActionsService, $scope, $q, $translate) {
       'ngInject';
       super($injector);
 
       this._AnalyzeService = AnalyzeService;
+      this._$translate = $translate;
       this._fileService = fileService;
       this._AnalyzeActionsService = AnalyzeActionsService;
       this._$state = $state;
@@ -131,8 +141,30 @@ export const AnalyzeExecutedDetailComponent = {
         subCategoryId: this.analysis.categoryId
       });
       this.canUserEdit = this._JwtService.hasPrivilege('EDIT', {
-        subCategoryId: this.analysis.categoryId
+        subCategoryId: this.analysis.categoryId,
+        creatorId: this.analysis.userId
       });
+    }
+
+    getCheckedFieldsForExport(analysis, data) {
+      /* If report was using designer mode, find checked columns */
+      if (!analysis.edit) {
+        return flatMap(this.analysis.artifacts, artifact => fpPipe(
+          fpFilter('checked'),
+          fpMap(fpPick(['columnName', 'aliasName', 'displayName']))
+        )(artifact.columns));
+      }
+      /* If report was using sql mode, we don't really have any info
+         about columns. Keys from individual data nodes are used as
+         column names */
+      if (data.length > 0) {
+        return map(keys(data[0]), col => ({
+          label: col,
+          columnName: col,
+          displayName: col,
+          type: 'string'
+        }));
+      }
     }
 
     exportData() {
@@ -144,10 +176,36 @@ export const AnalyzeExecutedDetailComponent = {
         const analysisId = this.analysis.id;
         const executionId = this._executionId || this.analyses[0].id;
         this._AnalyzeActionsService.exportAnalysis(analysisId, executionId).then(data => {
-          const csv = json2csv({data, fields: keys(data[0])});
-          this._fileService.exportCSV(csv);
+          const fields = this.getCheckedFieldsForExport(this.analysis, data);
+          const keys = map(fields, 'columnName');
+          const exportOptions = {
+            trimHeaderFields: false,
+            emptyFieldValue: '',
+            checkSchemaDifferences: false,
+            delimiter: {
+              wrap: '"',
+              eol: '\r\n'
+            },
+            keys
+          };
+          json2csv(data, (err, csv) => {
+            if (err) {
+              this._$translate('ERROR_EXPORT_FAILED').then(translation => {
+                this._toastMessage.error(translation);
+              });
+            }
+            const csvWithDisplayNames = this.replaceCSVHeader(csv, fields);
+            this._fileService.exportCSV(csvWithDisplayNames, this.analysis.name);
+          }, exportOptions);
         });
       }
+    }
+
+    replaceCSVHeader(csv, fields) {
+      const firstNewLine = indexOf(csv, '\n');
+      const firstRow = slice(csv, 0, firstNewLine).join('');
+      const displayNames = map(fields, ({aliasName, displayName}) => aliasName || displayName).join(',');
+      return replace(csv, firstRow, displayNames);
     }
 
     loadExecutionData(options = {}) {

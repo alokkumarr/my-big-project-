@@ -109,13 +109,14 @@ export const AnalyzePivotComponent = {
           this.analysisUnSynched();
           this.startDraftMode();
           this.artifacts = this.getSortedArtifacts(this.model.artifacts);
+          this.sortFields = this.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
           this.loadPivotData();
         });
     }
 
     initExistingSettings() {
       this.filters = map(this.model.sqlBuilder.filters,
-                         this._FilterService.backend2FrontendFilter(this.artifacts));
+        this._FilterService.backend2FrontendFilter(this.artifacts));
       this.sortFields = this.getArtifactColumns2SortFieldMapper()(this.model.artifacts[0].columns);
       this.sorts = this._SortService.mapBackend2FrontendSort(this.model.sqlBuilder.sorts, this.sortFields);
     }

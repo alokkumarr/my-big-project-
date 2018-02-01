@@ -1,4 +1,5 @@
 {
+  "HELP": "Help",
   "ACCOUNT": "Account",
   "ADMIN":"Admin",
   "AFTER": "After",
@@ -94,5 +95,6 @@
   "TOOLTIP_INVERTED": "Inverted",
   "TOOLTIP_NOT_INVERTED": "Not Inverted",
 
+  "ERROR_EXPORT_FAILED": "There was an error while exporting, please try again witha different dataset.",
   "ERROR_OOPS_SERVER": "Oops, it looks like something went wrong with the server, if you see this message regularly, please contact customer support."
 }

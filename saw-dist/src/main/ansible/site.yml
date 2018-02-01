@@ -5,9 +5,9 @@
   become: true
   roles:
     - saw-host
-- include: modules/saw-security/ansible/site.yml
-- include: modules/saw-services/ansible/site.yml
-- include: modules/saw-web/ansible/site.yml
+- import_playbook: modules/saw-security/ansible/site.yml
+- import_playbook: modules/saw-services/ansible/site.yml
+- import_playbook: modules/saw-web/ansible/site.yml
 - name: SAW Proxy
   hosts: saw-proxy
   become: true

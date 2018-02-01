@@ -1,32 +1,26 @@
-<div md-dialog-title>
-  <button md-icon-button (click)="exitCreator()">
-    <md-icon fontIcon="icon-arrow-left"></md-icon>
+<div mat-dialog-title>
+  <button mat-icon-button (click)="exitCreator()">
+    <mat-icon fontIcon="icon-arrow-left"></mat-icon>
   </button>
   <span>
-    Create New Dashboard
+    {{mode === 'create' ? 'Create new' : 'Edit'}} Dashboard
   </span>
   <div class="title-actions">
-    <button md-button>
+    <!-- <button md-button>
       Description
-    </button>
-    <button md-raised-button color="primary">
+    </button> -->
+    <button md-raised-button color="primary" (click)="saveDashboard()" [disabled]="this.fillState === 'empty'">
       Save
     </button>
   </div>
 </div>
 <div md-dialog-content>
-  <gridster [options]="options" #gridster>
-    <gridster-item [item]="item" *ngFor="let item of dashboard">
-      <!-- <span class="analysis-title">{{item.analysis.name}}</span> -->
-      <button md-icon-button (click)="removeTile(item)">
-        <md-icon fontIcon="icon-close"></md-icon>
-      </button>
-      <observe-chart *ngIf="item.analysis.type === 'chart'"
-      class="analysis-container" [analysis]="item.analysis" [updater]="item.updater"></observe-chart>
-    </gridster-item>
-  </gridster>
+  <dashboard-grid [model]="dashboard"
+  [requester]="requester"
+  [mode]="mode"
+  (getDashboard)="onDashboardChange($event)"></dashboard-grid>
 </div>
 <span [@hideHelp]="fillState" class="add-button-help">Add a new analysis to the dashboard</span>
-<button [@moveButton]="fillState" md-fab color="primary" class="add-analysis" (click)="chooseAnalysis()">
-  <md-icon fontIcon="icon-plus"></md-icon>
+<button [@moveButton]="fillState" mat-fab color="primary" class="add-analysis" (click)="chooseAnalysis()">
+  <mat-icon fontIcon="icon-plus"></mat-icon>
 </button>

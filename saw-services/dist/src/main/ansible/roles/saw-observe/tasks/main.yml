@@ -1,0 +1,11 @@
+- name: Install SAW Observe Service package
+  yum: name="{{ item }}" state=present
+  with_fileglob: ["../rpms/saw-observe-*.rpm"]
+  notify:
+    - restart saw-observe
+- name: Install SAW Observe Service configuration file
+  template: src=application.yml dest=/opt/bda/saw-observe-service/conf
+  notify:
+    - restart saw-observe
+- name: Enable SAW Observe Service
+  systemd: name=saw-observe enabled=true

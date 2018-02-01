@@ -241,6 +241,7 @@ export const ReportGridContainerComponent = {
         if (value.name === columnName) {
           switch (format.type) {
           case 'date':
+          case 'string-date':
             value.type = 'date';
             value.format = format.dateFormat;
             break;
@@ -251,7 +252,8 @@ export const ReportGridContainerComponent = {
           case 'number':
             value.format = {
               precision: 0,
-              type: 'decimal',
+              type: 'fixedPoint',
+              comma: undefined,
               currency: undefined,
               currencySymbol: undefined
             };
@@ -259,9 +261,9 @@ export const ReportGridContainerComponent = {
               value.format.precision = format.numberDecimal;
             }
             if (format.commaSeparator) {
-              value.format.type = 'fixedPoint';
+              value.format.comma = true;
             } else {
-              value.format.type = 'decimal';
+              value.format.comma = false;
             }
             if (format.currencyFlag) {
               value.format.currency = format.currencyCode;
@@ -286,7 +288,6 @@ export const ReportGridContainerComponent = {
     }
 
     viewMore() {
-      return;
     }
   }
 };

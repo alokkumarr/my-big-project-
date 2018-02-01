@@ -1,22 +1,24 @@
 <div>
-  <span class ="settings__group__list-item__name">
+  <span class ="settings__group__title">
       {{groupAdapter.title}}
   </span>
   <div *ngIf="artifactColumns"
-       [dndSortableContainer]="sortableContainerOptions"
-       [dndCollection]="artifactColumns"
-       (dndOnDrop)="onDrop($event)"
-       class="settings__group__list">
-    <div *ngFor="let artifactColumn of artifactColumns; let i = index; trackBy: index"
-         [dndSortable]="artifactColumn"
-         [dndSortableIndex]="i"
-         class="settings__list-item">
-      <span class="settings__list-item__name">
-        {{ artifactColumn.alias || artifactColumn.displayName }}
-      </span>
-      <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
-                class="settings__list-item__icon">
-      </mat-icon>
-    </div>
+       class="settings__group__list"
+       dndSortableContainer
+       [dndContainer]="groupAdapter"
+       [dndAllowDropFn]="allowDropFn"
+       [dndAddToCallback]="addToCallback">
+    <expandable-field *ngFor="let artifactColumn of artifactColumns; let i = index; trackBy: trackByFn"
+                      [dndSortable]="artifactColumn"
+                      [dndSortableIndex]="i"
+                      [dndRemoveFromCallback]="removeFromCallback"
+                      [dndContainer]="groupAdapter"
+                      (change)="onFieldPropChange()"
+                      [artifactColumn]="artifactColumn"
+                      [analysisType]="groupAdapter.type"
+                      (removeRequest)="onRemoveField(artifactColumn)"
+                      class="settings__list-item"
+                      [e2e]="'designer-expandable-field-' + (artifactColumn.aliasName || artifactColumn.displayName)">
+    </expandable-field>
   </div>
 </div>

@@ -5,10 +5,12 @@ import {
   EventEmitter
 } from '@angular/core';
 import {
+  ArtifactColumn,
   ArtifactColumns,
   IDEsignerSettingGroupAdapter
 }  from '../../types';
 import { TYPE_ICONS_OBJ } from '../../../../consts';
+import { DesignerService } from '../../designer.service';
 
 const template = require('./designer-settings-group.component.html');
 require('./designer-settings-group.component.scss');
@@ -17,23 +19,50 @@ require('./designer-settings-group.component.scss');
   selector: 'designer-settings-group',
   template
 })
-export default class DesignerSettingsGroupComponent {
-  // @Output() public onSettingsChange: EventEmitter<ArtifactColumns[]> = new EventEmitter();
+export class DesignerSettingsGroupComponent {
+  @Output() public fieldsChange: EventEmitter<null> = new EventEmitter();
+  @Output() public fieldPropChange: EventEmitter<null> = new EventEmitter();
+  @Output() public removeField: EventEmitter<ArtifactColumn> = new EventEmitter();
   @Input() public artifactColumns :ArtifactColumns;
   @Input() public groupAdapter :IDEsignerSettingGroupAdapter;
 
-  public sortableContainerOptions = {};
+  public dndSortableContainerObj = {};
+  public allowDropFn;
+
   public TYPE_ICONS_OBJ = TYPE_ICONS_OBJ;
 
-  ngOnInit() {
-    this.sortableContainerOptions = {
-      allowDropFn: this.groupAdapter.canAcceptArtifactColumn
-    }
+  public removeFromCallback = (payload, index, container) => {
+    this._designerService.removeArtifactColumnFromGroup(
+      payload,
+      container
+    );
+    this.fieldsChange.emit();
   }
 
-  onDrop(artifactColumn) {
-    // verify if acceptable
-    // add new Artifactcolumn
-    this.groupAdapter.transform(artifactColumn);
+  public addToCallback = (payload, index, container) => {
+    this._designerService.addArtifactColumnIntoGroup(
+      payload,
+      container,
+      index
+    );
+    this.fieldsChange.emit();
+  }
+
+  constructor(private _designerService: DesignerService) {}
+
+  ngOnInit() {
+    this.allowDropFn = this.groupAdapter.canAcceptArtifactColumn(this.groupAdapter)
+  }
+
+  onFieldPropChange() {
+    this.fieldPropChange.emit();
+  }
+
+  onRemoveField(artifactColumn: ArtifactColumn) {
+    this.removeField.emit(artifactColumn);
+  }
+
+  trackByFn(_, artifactColumn: ArtifactColumn) {
+    return artifactColumn.columnName;
   }
 }

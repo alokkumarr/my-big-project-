@@ -1,4 +1,4 @@
-export default interface JoinCriterion {
+export interface JoinCriterion {
   side:       string;
   columnName: string;
   tableName:  string;

@@ -1,0 +1,2 @@
+- name: restart saw-observe
+  systemd: name=saw-observe state=restarted daemon_reload=true

@@ -1,14 +1,19 @@
+@import "themes/base/colors";
+
 designer-container {
   background-color: white;
+  max-height: 100vh;
+  max-width: 100vw;
   display: grid;
   grid-template:
-    "header header" 6vh
-    "data-settings toolbar" 6vh
-    "data-settings content" 88vh
-    / 350px 1fr;
+    "header header" 7vh
+    "data-settings content" 93vh
+    / 25vw 75vw;
 
   .designer__header {
     grid-area: header;
+    border-bottom: 1px solid $primary-grey-g1;
+    margin: 0 10px;
   }
 
   .designer__toolbar {
@@ -17,9 +22,11 @@ designer-container {
 
   .designer__data-settings {
     grid-area: data-settings;
+    border-right: 1px solid $primary-grey-g1;
+    margin: 10px 0;
   }
 
   .designer__main {
-    grid-area: content;
+    padding: 10px;
   }
 }

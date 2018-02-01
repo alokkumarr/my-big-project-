@@ -103,7 +103,9 @@
            >
         <chart [updater]="$ctrl.updateChart"
                ng-if="$ctrl.designerState === $ctrl.designerStates.hasData"
-               [options]="$ctrl.chartOptions"></chart>
+               e2e="{{'chart-type:' + $ctrl.model.chartType}}"
+               [options]="$ctrl.chartOptions"
+               [is-stock-chart]="$ctrl.isStockChart"></chart>
       </div>
       <md-card class="chart-container-card" ng-show="$ctrl.xAndYSelected()">
         <md-card-content layout="column">
@@ -172,6 +174,34 @@
                   </md-menu-item>
                 </md-menu-content>
               </md-menu>
+              <!-- Condition for Timeseries charts -->
+              <md-menu flex="30" ng-if="$ctrl.comboableTSCharts.includes($ctrl.model.chartType)">
+                <md-button class="md-icon-button"
+                            ng-click="$mdMenu.open($event)">
+                  <span ng-if="$ctrl.comboableTSCharts.includes(y.comboType)">
+                      <md-icon md-menu-origin
+                      style="display: inline;"
+                      md-font-icon="{{$ctrl.TSCOMBO_TYPES_OBJ[y.comboType].icon}}"></md-icon>
+                      {{$ctrl.TSCOMBO_TYPES_OBJ[y.comboType].label}}
+                  </span>
+                  <span ng-if="$ctrl.comboableCharts.includes(y.comboType)">
+                      <md-icon md-menu-origin
+                      style="display: inline;"
+                      md-font-icon="{{$ctrl.COMBO_TYPES_OBJ[y.comboType].icon}}"></md-icon>
+                      {{$ctrl.COMBO_TYPES_OBJ[y.comboType].label}}
+                  </span>
+                </md-button>
+                <md-menu-content width="4">
+                  <md-menu-item ng-repeat="type in $ctrl.TSCOMBO_TYPES">
+                    <md-button ng-click="$ctrl.onSelectTSComboType(y, type)"
+                                style="font-size: 14px;">
+                        <md-icon md-font-icon="{{::type.icon}}"></md-icon>
+                        {{type.label}}
+                    </md-button>
+                  </md-menu-item>
+                </md-menu-content>
+              </md-menu> 
+              <!-- END -->
             </div>
             <div layout="row"
                  layout-align="start center"

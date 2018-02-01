@@ -1,5 +1,6 @@
 const webpackHelper = require('./webpack.helper');
 
+const replace = require('lodash/replace');
 const fs = require('fs');
 const async = require('async');
 const git = require('git-rev');
@@ -59,7 +60,7 @@ exports.gitDescription = () => {
     data = data.toString();
     const version = data.match(/git\.commit\.id\.describe=(.*)/);
     return (version && version.length > 1 ?
-      version[1] :
+      replace(version[1], '-dirty', '') :
       JSON.stringify(version)
     );
   } catch (err) {

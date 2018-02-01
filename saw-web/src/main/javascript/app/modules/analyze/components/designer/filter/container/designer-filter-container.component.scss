@@ -1,0 +1,16 @@
+@import "themes/base/colors";
+
+designer-filter-container {
+  width: 800px;
+  min-height: 300px;
+  display: block;
+
+  .filter__table-name {
+    color: $primary-grey-g2;
+    margin-bottom: 10px;
+  }
+
+  .filter__list {
+    padding-left: 10px;
+  }
+}

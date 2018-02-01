@@ -6,14 +6,24 @@ import {
   DesignerPivotComponent,
   ArtifactColumns2PivotFieldsPipe
 } from './pivot';
-// import {
-//   DesignerSettingsComponent,
-//   DesignerSettingsGroupComponent
-// } from './settings';
 import {
-  OldDesignerSettingsComponent,
-  PivotAreaFilterPipe
-} from './old-settings';
+  DesignerSettingsSingleComponent,
+  DesignerSettingsGroupComponent,
+  ExpandableFieldComponent,
+  ExpandDetailPivotComponent
+} from './settings';
+import { DesignerSortComponent } from './sort';
+import {
+  DesignerFilterContainerComponent,
+  DesignerFilterRowComponent,
+  DesignerStringFilterComponent,
+  DesignerDateFilterComponent,
+  DesignerNumberFilterComponent
+} from './filter';
+import { DesignerSaveComponent } from './save';
+import { DesignerDescriptionComponent } from './description';
+import { DesignerPreviewDialogComponent } from './preview-dialog';
+import { ToolbarActionDialogComponent } from './toolbar-action-dialog';
 import { DesignerService } from './designer.service';
 import { ArtifactColumnFilterPipe } from './artifact-column-filter.pipe';
 
@@ -23,11 +33,21 @@ export {
   DesignerHeaderComponent,
   DesignerToolbarComponent,
   DesignerPivotComponent,
-  // DesignerSettingsComponent,
-  // DesignerSettingsGroupComponent,
-  OldDesignerSettingsComponent,
+  DesignerSettingsSingleComponent,
+  DesignerSettingsGroupComponent,
+  ExpandableFieldComponent,
+  ExpandDetailPivotComponent,
+  ToolbarActionDialogComponent,
+  DesignerSortComponent,
+  DesignerDescriptionComponent,
+  DesignerSaveComponent,
+  DesignerFilterContainerComponent,
+  DesignerFilterRowComponent,
+  DesignerStringFilterComponent,
+  DesignerDateFilterComponent,
+  DesignerNumberFilterComponent,
+  DesignerPreviewDialogComponent,
   DesignerService,
   ArtifactColumnFilterPipe,
-  ArtifactColumns2PivotFieldsPipe,
-  PivotAreaFilterPipe
+  ArtifactColumns2PivotFieldsPipe
 };

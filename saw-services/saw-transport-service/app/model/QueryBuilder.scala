@@ -219,7 +219,7 @@ object QueryBuilder extends {
         val value = subProperty("model", "value")
         if (operator == "btw") {
           val otherValue = subProperty("model", "otherValue")
-          "BETWEEN %s AND %s".format(value, otherValue)
+          "BETWEEN %s AND %s".format(otherValue,value)
         } else {
           val operatorSql = operator match {
             case "gt" => ">"
@@ -244,7 +244,7 @@ object QueryBuilder extends {
         var lte :String = null
         var gte : String = null
         val preset = subProperty("model", "preset")
-        if (preset !=null && !preset.equals("")){
+        if (preset !=null && !preset.equals("NA")){
           lte = TransportUtils.dynamicDecipher(preset).getLte();
           gte = TransportUtils.dynamicDecipher(preset).getGte();
         }
