@@ -18,6 +18,7 @@ export const ReportGridDisplayContainerComponent = {
   bindings: {
     data: '<',
     source: '&',
+    showChecked: '<', // only show the checked columns. Discards extra columns present in data
     columns: '<',
     groups: '<'
   },
