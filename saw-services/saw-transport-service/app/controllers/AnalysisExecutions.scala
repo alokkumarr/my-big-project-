@@ -2,15 +2,16 @@ package controllers
 
 import java.{util, _}
 import java.text.SimpleDateFormat
-import java.util._
+
 
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
 import model.PaginateDataSet
 import org.json4s.JsonAST.{JArray, JObject, JString, JValue}
 import org.json4s.JsonDSL._
+import org.json4s.native.JsonMethods.parse
 import play.libs.Json
 import play.mvc.{Http, Result, Results}
-import sncr.datalake.{DLConfiguration}
+import sncr.datalake.DLConfiguration
 import sncr.metadata.analysis.AnalysisResult
 import sncr.metadata.engine.MDObjectStruct
 
@@ -86,12 +87,31 @@ class AnalysisExecutions extends BaseController {
       }
       else {
         val anares = AnalysisResult(analysisId, executionId)
+        val results = new java.util.ArrayList[java.util.Map[String, (String, Object)]]
         val desc = anares.getCachedData(MDObjectStruct.key_Definition.toString)
         val d_type = (desc.asInstanceOf[JValue] \ "type").extractOpt[String];
         if (d_type.isDefined) {
 
-          if (d_type.get == "chart" || d_type.get == "pivot") {
+          if (d_type.get == "chart" || d_type.get == "pivot" ) {
             ("data", execution.loadESExecutionData(anares))
+          }
+          else if ( d_type.get=="esReport") {
+            val data = execution.loadESExecutionData(anares)
+              .extract[scala.List[Map[String, Any]]]
+              .foreach(row => {
+             val resultsRow = new java.util.HashMap[String, (String, Object)]
+                row.keys.foreach(key => {
+                  row.get(key).foreach(value => resultsRow.put(key, ("unknown", value.asInstanceOf[AnyRef])))
+                })
+                results.add(resultsRow)
+              }
+          )
+            pagingData = analysisController.processReportResult(results)
+            PaginateDataSet.INSTANCE.putCache(executionId, results)
+            pagingData = analysisController.processReportResult(PaginateDataSet.INSTANCE.paginate(pageSize, page, executionId))
+            totalRows = PaginateDataSet.INSTANCE.sizeOfData()
+            m_log.trace("totalRows {}", totalRows)
+            ("data", pagingData) ~ ("totalRows",totalRows)
           }
           else throw new Exception("Unsupported data format")
         }

@@ -354,7 +354,7 @@ object AnalysisNodeExecutionHelper{
       return null
     }
     val onlyKey = od.keysIterator.next()
-    if (d_type.get == "chart" || d_type.get == "pivot") {
+    if (d_type.get == "chart" || d_type.get == "pivot" || d_type.get == "esReport") {
         val onlyKey = od.keysIterator.next()
         val rawdata = anres.getObject(onlyKey)
 

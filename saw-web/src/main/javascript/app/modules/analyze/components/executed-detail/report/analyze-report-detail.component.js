@@ -1,5 +1,6 @@
 import * as isEmpty from 'lodash/isEmpty';
 import * as map from 'lodash/map';
+import * as get from 'lodash/get';
 import * as flatMap from 'lodash/flatMap';
 
 import * as template from './analyze-report-detail.component.html';
@@ -21,6 +22,7 @@ export const AnalyzeReportDetailComponent = {
     $onInit() {
       this.filters = map(this.analysis.sqlBuilder.filters, this._FilterService.backend2FrontendFilter(this.analysis.artifacts));
       this.columns = this._getColumns(this.analysis);
+      this.showChecked = !(get(this.analysis, 'queryManual'));
     }
 
     _getColumns(analysis) {

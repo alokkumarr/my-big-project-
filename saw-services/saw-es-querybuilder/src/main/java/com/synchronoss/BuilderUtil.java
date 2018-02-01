@@ -89,6 +89,33 @@ public class BuilderUtil
         com.synchronoss.querybuilder.model.chart.SqlBuilder sqlBuilderNode = sqlBuilderNodeChart.getSqlBuilder();
         return sqlBuilderNode;
     }
+
+    public static com.synchronoss.querybuilder.model.report.SqlBuilder getNodeTreeReport(String jsonString, String node)
+            throws IOException, ProcessingException
+    {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+        JsonNode objectNode = objectMapper.readTree(jsonString);
+        JsonNode sqlNode = objectNode.get(node);
+        // schema validation block starts here
+        String json = "{ \"sqlBuilder\" :" + sqlNode.toString() + "}";
+        JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
+        JsonValidator validator = factory.getValidator();
+        String chart = System.getProperty("schema.report");
+        if (chart == null){throw new NullPointerException("schema.chart property is not set.");}
+        final JsonNode data = JsonLoader.fromString(json);
+        final JsonNode schema = JsonLoader.fromFile(new File(chart));
+        ProcessingReport report = validator.validate(schema, data);
+        if (report.isSuccess() == false) {
+            throw new ProcessingException(report.toString());
+        }
+        // schema validation block ends here
+        JsonNode objectNode1 = objectMapper.readTree(json);
+        com.synchronoss.querybuilder.model.report.SqlBuilderReport sqlBuilderNodeReport =
+                objectMapper.treeToValue(objectNode1, com.synchronoss.querybuilder.model.report.SqlBuilderReport.class);
+        com.synchronoss.querybuilder.model.report.SqlBuilder sqlBuilderNode = sqlBuilderNodeReport.getSqlBuilder();
+        return sqlBuilderNode;
+    }
 	
 	public static JsonNode getRepositoryNodeTree (String jsonString, String node) throws JsonProcessingException, IOException
 	

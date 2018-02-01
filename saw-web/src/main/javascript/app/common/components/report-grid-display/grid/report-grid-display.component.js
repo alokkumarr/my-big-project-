@@ -23,6 +23,7 @@ export const ReportGridDisplayComponent = {
   bindings: {
     data: '<',
     columns: '<',
+    showChecked: '<', // only show the checked columns. Discards extra columns present in data
     source: '&'
   },
   controller: class ReportGridDisplayController {
@@ -115,7 +116,7 @@ export const ReportGridDisplayComponent = {
 
       const columns = reduce(fields, (col, field) => {
         table = table || field.table;
-        const index = columnNames.indexOf(field.columnName);
+        const index = columnNames.indexOf(field.columnName || field.name);
         if (index >= 0) {
           col.splice(index, 1, field);
         }
@@ -145,7 +146,7 @@ export const ReportGridDisplayComponent = {
 
     _getDxColumns(columns = [], data = []) {
       let allColumns = [];
-      if (isEmpty(data)) {
+      if (isEmpty(data) || this.showChecked) {
         allColumns = filter(columns, column => column.checked);
       } else {
         allColumns = this.fillColumns(columns, data);
@@ -156,7 +157,7 @@ export const ReportGridDisplayComponent = {
         }
         const field = {
           alignment: 'left',
-          caption: column.alias || column.displayName || column.name,
+          caption: column.aliasName || column.alias || column.displayName || column.name,
           format: column.format,
           dataField: column.columnName || column.name,
           visibleIndex: column.visibleIndex,
