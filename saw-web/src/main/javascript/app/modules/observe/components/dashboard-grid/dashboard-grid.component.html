@@ -5,6 +5,10 @@
       <md-icon fontIcon="icon-close"></md-icon>
     </button>
     <observe-chart *ngIf="item.analysis.type === 'chart'"
-    class="analysis-container" [analysis]="item.analysis" [updater]="item.updater"></observe-chart>
+      class="analysis-container"
+      [item]="item"
+      (onRefresh)="refreshTile($event)"
+      [analysis]="item.analysis"
+      [updater]="item.updater"></observe-chart>
   </gridster-item>
 </gridster>
