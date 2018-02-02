@@ -1,0 +1,31 @@
+//Test Janino script
+// Available in-parameters and out descriptor  
+// inRowDescriptor, ROW, outRowDescriptor
+// script must return Map<String, Object>, 
+// which is essentially new record as result of transformation of current record
+// Also, there are two additional fields in outRowDescriptor:
+// - _script_result  - return code from script:
+//       == 0 - success
+//       > 0  - success + instruction for transformer to populate output fields with values from
+//                the same input field, if such exists
+//       < 0   - fatal error - all fields will be null, transformer will reject such record         
+// - _script_msg
+//
+
+import java.lang.Integer;
+import java.lang.String;
+import java.util.HashMap;
+import java.util.Map;
+	
+// Preamble
+Map<String, Object> result = new HashMap();
+
+for( String ok: outRowDescriptor.keySet()){
+    if ( inRowDescriptor.containsKey(ok) && 
+         outRowDescriptor.get(ok) == inRowDescriptor.get(ok) &&
+         ROW.containsKey(ok) ) {
+    	result.put(ok, ROW.get(ok));
+    }
+}
+result.put("_script_result", 0);
+result.put("_script_msg", "success");

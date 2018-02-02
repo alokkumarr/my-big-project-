@@ -2,116 +2,97 @@ package sncr.xdf.transformer.jexl;
 
 import org.apache.log4j.Logger;
 import org.apache.spark.broadcast.Broadcast;
+import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import scala.Tuple2;
 
 import java.util.*;
+
+import static sncr.xdf.transformer.TransformerComponent.TRANSFORMATION_RESULT;
 
 public class DataScanner {
 
 //	private final StructType schema;
-	public Broadcast<Dataset> referenceData = null;
-	public List<Row> records =null;
+	public Map<String,  Broadcast<Dataset<Row>>> referenceData = null;
     private static final Logger logger = Logger.getLogger(DataScanner.class);
 
 
 	//private String KEYWORD = "null";
 	private final String COMMA = ",";
-	
-	public DataScanner(Broadcast<Dataset> brdcastReferenceData) throws Exception {
+
+	//TODO:: Come up with descriptor for ref data
+	// JEXL lookup :  ref:lookup('dataset', 'filter=?', field_A or List<Fields>>???
+	public DataScanner(Map<String, Broadcast<Dataset<Row>>> brdcastReferenceData) throws Exception {
 		this.referenceData = brdcastReferenceData;
-/*
-		if (referenceData!=null && !referenceData.isEmpty()) {
-			Row row = (Row) (referenceData.entrySet().toArray())[0];
-			schema = row.schema();
-		}
-		else{
-			throw new Exception("Cannot create data scanner from empty reference dataset");
-		}
-*/
 	}
 
 	public String[][] lookup(String groupKey, String filterKey) {
-/*
-		List<Row> filterbyGroupKey = referenceData.get(groupKey);
-		if(filterbyGroupKey == null) {
+
+		if(referenceData.containsKey(groupKey)) {
 			return null;
 		}
+		if (filterKey == null || filterKey.isEmpty())
+			return null;
 
-		logger.debug("filterbyGroupKey :" + filterbyGroupKey.toString() + " Filter: " + filterKey);
-		Map<Integer, String> decodedKeys = decodeFilterKey(filterKey);
 
-		int fields[] = new int[decodedKeys.size()];
-		List<String[]>list = new ArrayList<String[]>();
+		Dataset<Row> refDataset = referenceData.get(groupKey).getValue();
+		Dataset<Row> work = refDataset;
 
-		Iterator<Integer> it = decodedKeys.keySet().iterator();
+		Tuple2<Map<String, String> , Map<Integer, String>> allDecodedKeys = decodeFilterKey(filterKey);
+		for(Integer inx: allDecodedKeys._2().keySet()){
+			String fName = refDataset.schema().fieldNames()[inx];
+			Column c1 = refDataset.col(fName);
+			work = work.where(c1.equalTo(allDecodedKeys._2().get(inx)));
+		}
 
-		String valueData = "";
-		for (int i = 0; i < schema.fieldNames().length; i++) {
-			String fName = schema.fieldNames()[i];
-			if (decodedKeys.containsKey(fName)){
-				valueData +=
+		for (int i = 0; i < refDataset.schema().fieldNames().length; i++) {
+			String fName = refDataset.schema().fieldNames()[i];
+			Column c1;
+			if (allDecodedKeys._1().containsKey(fName)){
+				c1 = refDataset.col(fName);
+				work = work.where(c1.equalTo(allDecodedKeys._1().get(fName)));
 			}
 		}
 
-		int count = 0;
-		while (it.hasNext()) {
-			int key = it.next();
-			fields[count++] = key;
-			valueData += decodedKeys.get(key);
-		}
-
-		Key receivedKey = new Key(valueData);
-		for (Row row : filterbyGroupKey)
-		{
-			if (receivedKey.equals(extractKey)) {
-				//System.out.println("receivedKey :"+ receivedKey);
-				//System.out.println("toStringArray(row):"+ row.toString());
-				list.add(toStringArray(row));
+		 List<Row>  rows = work.collectAsList();
+		String[][] rowsAsStringArray = new String[rows.size()][0];
+		int len = work.schema().fields().length;
+		for (int i = 0; i < rows.size(); i++) {
+			for ( int j = 0; j < len; j++) {
+				if (rows.get(i).get(j) == null)
+					rowsAsStringArray[i][j] = "";
+				else
+					rowsAsStringArray[i][j] = String.valueOf(rows.get(i).get(j));
 			}
 		}
-		if(list.size() ==0){
-			list.add(null);
-		}
-		return list.toArray(new String[list.size()][]);
-*/
-return null;
+
+		return rowsAsStringArray;
 	}
 	
-	private String[] toStringArray(Row record)
-	{
-		String recordsIndex[] = null;
-/*
-		if (record != null)
-		{
 
-		int fields = record.getFields().length;
-		recordsIndex = new String [fields];
-		for (int i =0; i< fields ; i++)
-		{
-			recordsIndex[i] = new String(record.getField(i),Charset.forName("UTF-8"));
-		}
-		}
-*/
-		return recordsIndex;
-	}
 
-	private Map<Integer, String> decodeFilterKey(String filterKey) {
-		Map<Integer, String> decodedMap = new HashMap<Integer, String>();
+	private Tuple2<Map<String, String>, Map<Integer, String>> decodeFilterKey(String filterKey) {
+		Map<String, String> decodedMapWithNames = new HashMap<>();
+		Map<Integer, String> decodedMapWithIndex = new HashMap<>();
+
 		if (filterKey != null)
 		{
-			//filterKey = filterKey.replaceAll("\\s+", "");
 			String splitKeys[] = filterKey.split(COMMA);
 			String key = null;
 			for (int i = 0; i < splitKeys.length; i++) {
 				key = splitKeys[i];
 				if(key.contains("=")) {
 					int kInx = (key.trim().substring(0, 2).equals("$K"))?(Integer.parseInt(key.substring(2).trim())):0;
-					if (kInx > 0)decodedMap.put(kInx,key.substring(key.indexOf("=") + 1).trim());
+					if (kInx == 0) {
+						String kfName = key.substring(0, key.indexOf("="));
+						decodedMapWithNames.put(kfName,key.substring(key.indexOf("=") + 1).trim());
+					}else if (kInx > 0)
+						decodedMapWithIndex.put(kInx,key.substring(key.indexOf("=") + 1).trim());
 				}
 			}
 		}
-		return decodedMap;
+		return new Tuple2<>(decodedMapWithNames, decodedMapWithIndex);
 	}
 
 }

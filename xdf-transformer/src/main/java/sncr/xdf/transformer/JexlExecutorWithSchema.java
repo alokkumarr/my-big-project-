@@ -9,56 +9,67 @@ import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
-import org.apache.spark.util.AccumulatorV2;
+import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.util.LongAccumulator;
-import org.codehaus.commons.compiler.CompilerFactoryFactory;
-import org.codehaus.commons.compiler.IScriptEvaluator;
+import scala.Tuple2;
+import sncr.bda.conf.Reference;
 import sncr.bda.datasets.conf.DataSetProperties;
+import sncr.xdf.transformer.system.StructAccumulator;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import static sncr.xdf.transformer.TransformerComponent.TRANSFORMATION_ERRMSG;
 import static sncr.xdf.transformer.TransformerComponent.TRANSFORMATION_RESULT;
+
 
 /**
  * Created by srya0001 on 12/21/2017.
  */
-public class JaninoExecutor extends Executor{
+public class JexlExecutorWithSchema extends Executor{
 
+    private static final Logger logger = Logger.getLogger(JexlExecutorWithSchema.class);
 
-    public static String PREDEFINED_SCRIPT_RESULT_KEY = "_script_result";
-    public static String PREDEFINED_SCRIPT_MESSAGE = "_script_msg";
-
-    private static final Logger logger = Logger.getLogger(JaninoExecutor.class);
-
-    public JaninoExecutor(SparkSession ctx, String script, StructType st, String tLoc, int thr, Map<String, Map<String, String>> inputs, Map<String, Map<String, String>> outputs) {
+    public JexlExecutorWithSchema(SparkSession ctx, String script, StructType st, String tLoc, int thr, Reference[] refDataArr, Map<String, Map<String, String>> inputs, Map<String, Map<String, String>> outputs) {
         super(ctx, script, st, tLoc, thr, inputs, outputs);
     }
 
 
-    protected JavaRDD transformation(JavaRDD dataRDD, String[] odi) throws Exception {
-
-        JavaRDD rdd = dataRDD.map(
-                new JaninoTransform( session_ctx,
+    protected JavaRDD     transformation(
+            JavaRDD dataRdd,
+            Map<String, Broadcast<Dataset<Row>>> referenceData
+    )  throws Exception {
+        String bcFirstRefDataset = (refDataSets != null && refDataSets.size() > 0)?refDataSets.toArray(new String[0])[0]:"";
+        JavaRDD rdd = dataRdd.map(
+                new TransformWithSchema( session_ctx,
                         script,
                         schema,
-                        successTransformationsCount,
-                        failedTransformationsCount,
-                        threshold, odi)).cache();
+                        referenceData,
+                           successTransformationsCount,
+                           failedTransformationsCount,
+                           threshold)).cache();
         return rdd;
     }
 
-
-    public void execute(Map<String, Dataset> dsMap, String[]  odi) throws Exception {
+    public void execute(Map<String, Dataset> dsMap) throws Exception {
 
         Dataset ds = dsMap.get(inDataSet);
 
-        JavaRDD transformationResult = transformation(ds.toJavaRDD(), odi);
+        logger.trace("Load reference data: " );
+        Map<String, Broadcast<Dataset<Row>>> mapOfRefData = new HashMap<>();
+        if (refDataSets != null && refDataSets.size() > 0) {
+            for (String refDataSetName: refDataSets) {
+                mapOfRefData.put(refDataSetName, jsc.broadcast(dsMap.get(refDataSetName)));
+            }
+        }
+
+        JavaRDD transformationResult = transformation(ds.toJavaRDD(), mapOfRefData);
         Long c = transformationResult.count();
-        logger.debug("Intermediate result, transformation count  = " + c);
 
         // Using structAccumulator do second pass to align schema
         Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
@@ -81,5 +92,6 @@ public class JaninoExecutor extends Executor{
         writeResults(rejectedRecords, rejectedDataSet, tempLoc);
 
     }
+
 
 }

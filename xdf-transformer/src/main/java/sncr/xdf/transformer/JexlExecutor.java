@@ -14,6 +14,7 @@ import org.apache.spark.sql.types.StructType;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.util.LongAccumulator;
 import scala.Tuple2;
+import sncr.bda.conf.Reference;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.transformer.system.StructAccumulator;
 
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static sncr.xdf.transformer.TransformerComponent.TRANSFORMATION_ERRMSG;
 import static sncr.xdf.transformer.TransformerComponent.TRANSFORMATION_RESULT;
@@ -32,37 +34,57 @@ import static sncr.xdf.transformer.TransformerComponent.TRANSFORMATION_RESULT;
 public class JexlExecutor {
 
     private static final Logger logger = Logger.getLogger(JexlExecutor.class);
-    private final String[] refDataSets;
-    private final String inDataSet;
-    private final String outDataSet;
-    private final String rejectedDataSet;
-    private final Map<String, Map<String, String>> outputDataSetsDesc;
-    private final StructAccumulator structAccumulator;
-    private final String tempLoc;
+    private Set<String>  refDataSets;
+    private String       inDataSet;
+    private String       outDataSet;
+    private String       rejectedDataSet;
+    private Map<String, Map<String, String>> outputDataSetsDesc;
+    private StructAccumulator structAccumulator;
+    private String tempLoc;
     private JavaSparkContext jsc;
     private SparkSession session_ctx;
     private String script;
     private StructType schema;
     private LongAccumulator successTransformationsCount = null;
     private LongAccumulator failedTransformationsCount = null;
+    private int threshold = 0;
 
 
     public JexlExecutor(SparkSession ctx,
                         String script,
-                        String inputDataSet,
-                        String[] refDataSets,
-                        String outDataSet,
-                        String rejectedDataSet,
                         String tLoc,
-                        Map<String, Map<String, String>> outputDataSets){
+                        int thr,
+                        Reference[] refDataArr,
+                        Map<String, Map<String, String>> inputs,
+                        Map<String, Map<String, String>> outputs
+                        )  {
         this.script = script;
         session_ctx = ctx;
+        threshold = thr;
+        refDataSets = new HashSet<>();
         jsc = new JavaSparkContext(ctx.sparkContext());
-        this.refDataSets = refDataSets;
-        inDataSet = inputDataSet;
-        this.outDataSet = outDataSet;
-        this.rejectedDataSet = rejectedDataSet;
-        this.outputDataSetsDesc = outputDataSets;
+        for( String inpK: inputs.keySet()){
+            if (inpK.equalsIgnoreCase(RequiredNamedParameters.Input.toString())){
+                inDataSet = inpK;
+            }
+            else{
+                if (isParameterInRef(refDataArr, inpK)) {
+                    refDataSets.add(inpK);
+                }
+
+            }
+        }
+
+        for( String outK: outputs.keySet()){
+            if (outK.equalsIgnoreCase(RequiredNamedParameters.Output.toString())){
+                outDataSet = outK;
+            }
+            else if(outK.equalsIgnoreCase(RequiredNamedParameters.Rejected.toString())){
+                rejectedDataSet = outK;
+            }
+        }
+
+        this.outputDataSetsDesc = outputs;
         tempLoc = tLoc;
         this.successTransformationsCount = ctx.sparkContext().longAccumulator("success");
         this.failedTransformationsCount = ctx.sparkContext().longAccumulator("failed");
@@ -70,12 +92,15 @@ public class JexlExecutor {
         ctx.sparkContext().register(structAccumulator, "Struct");
     }
 
+    private boolean isParameterInRef(Reference[] refDataArr, String inpK) {
+            return false;
+    }
+
 
     private JavaRDD     transformation(
             JavaRDD dataRdd,
-            Map<String, Broadcast<Dataset>> referenceData
+            Map<String, Broadcast<Dataset<Row>>> referenceData
     )  throws Exception {
-        String bcFirstRefDataset = (refDataSets != null && refDataSets.length > 0)?refDataSets[0]:"";
         JavaRDD rdd = dataRdd.map(
                 new Transform( session_ctx,
                         script,
@@ -84,7 +109,7 @@ public class JexlExecutor {
                            successTransformationsCount,
                            failedTransformationsCount,
                            structAccumulator,
-                           bcFirstRefDataset)).cache();
+                           threshold)).cache();
         return rdd;
     }
 
@@ -101,15 +126,16 @@ public class JexlExecutor {
         }
 
         logger.trace("Load reference data: " );
-        Map<String, Broadcast<Dataset>> mapOfRefData = new HashMap<>();
-        if (refDataSets != null && refDataSets.length > 0) {
-            for (int i = 0; i < refDataSets.length; i++) {
-                mapOfRefData.put(refDataSets[i], jsc.broadcast(dsMap.get(refDataSets[i])));
+        Map<String, Broadcast<Dataset<Row>>> mapOfRefData = new HashMap<>();
+        if (refDataSets != null && refDataSets.size() > 0) {
+            for (String refDataSetName: refDataSets) {
+                mapOfRefData.put(refDataSetName, jsc.broadcast(dsMap.get(refDataSetName)));
             }
         }
 
         JavaRDD transformationResult = transformation(ds.toJavaRDD(), mapOfRefData);
         transformationResult.count();
+
 
 //        logger.trace("First pass completed: " + transformationResult.count() + " first row/object: " + transformationResult.first().toString());
         logger.trace("Create new schema[" + structAccumulator.value().size() + "]: " + String.join(", ", structAccumulator.value().keySet()));
@@ -118,16 +144,18 @@ public class JexlExecutor {
 
         // Using structAccumulator do second pass to align schema
         Dataset<Row> alignedDF = schemaRealignment(transformationResult, newSchema);
-        alignedDF.count();
-        alignedDF.schema().prettyJson();
+        Long c_adf = alignedDF.count();
+        String jschema = alignedDF.schema().prettyJson();
 
-        logger.trace("Second pass completed: " + alignedDF.count() + " Schema: " + alignedDF.schema().prettyJson());
+        logger.trace("Second pass completed: " + c_adf + " Schema: " + jschema);
 
 
         //TODO:: Should we drop RECORD_COUNT as well???
         Column trRes = alignedDF.col(TRANSFORMATION_RESULT);
         Dataset<Row> outputResult = alignedDF.filter( trRes.equalTo(0)).drop(trRes).drop(alignedDF.col(TRANSFORMATION_ERRMSG));
         Dataset<Row> rejectedRecords = alignedDF.filter( trRes.lt(0));
+
+
 
         logger.debug("Final DS: " + outputResult.count() + " Schema: " + outputResult.schema().prettyJson());
         logger.debug("Rejected DS: " + rejectedRecords.count() + " Schema: " + rejectedRecords.schema().prettyJson());

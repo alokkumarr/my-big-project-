@@ -12,7 +12,7 @@
 [
 	{
 		"name"    : "output",
-		"dataSet" : "TRTEST01_RES",
+		"dataSet" : "TRTEST03_JJS",
 		"catalog" : "dout",
 		"format"  : "parquet",
 		"mode"    : "replace",
@@ -26,7 +26,7 @@
 	},
 	{
 		"name"    : "rejected",
-		"dataSet" : "TRTEST01_REJECTED",
+		"dataSet" : "TRTEST03_REJ2",
 		"catalog" : "dout",
 		"format"  : "json",
 		"mode"    : "replace",
@@ -51,7 +51,16 @@
 ],
 "transformer" : {
 		"scriptLocation" : "file:///dfs/opt/bda/apps/xda-ux-sr-comp-dev-1.0.0_dev/scripts",
-		"script" : "transformer.jexl",
-		"scriptEngine" :  "jexl"
+		"script" : "transformer.jjs",
+		"scriptEngine" :  "janino",
+		"scriptPreamble" : "file:///dfs/opt/bda/apps/xda-ux-sr-comp-dev-1.0.0_dev/scripts/preamble.jjs",
+		"outputSchema" : [
+				{ "name" : "intVal", "type" = "integer" },
+				{ "name" : "doubleVal", "type" = "double" },
+				{ "name" : "strVal", "type" = "string" },
+				{ "name" : "F1", "type" = "integer" },
+				{ "name" : "F2", "type" = "string" }
+		]
+		
 }
 }
