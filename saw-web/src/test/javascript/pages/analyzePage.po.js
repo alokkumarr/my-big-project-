@@ -52,7 +52,8 @@ const doAnalysisAction = (name, action) => {
     const actionButton = element(by.id(id))
       .element(by.css(`button[e2e="actions-menu-selector-${action}"]`));
     commonFunctions.waitFor.elementToBeVisible(actionButton);
-    actionButton.click();
+    commonFunctions.waitFor.elementToBeClickableAndClick(actionButton);
+    // actionButton.click();
   });
 };
 
@@ -85,9 +86,14 @@ const getFilterRow = index => element.all(by.css('analyze-filter-row')).get(inde
 const getFilterAutocomplete = index => getFilterRow(index)
   .element(by.css('md-autocomplete[e2e="filter-row"] > md-autocomplete-wrap > input'));
 
+// If filter value type is String
 const getStringFilterInput = index => getFilterRow(index)
   .element(by.css('string-filter'))
   .element(by.css('input[aria-label="Chips input."]'));
+
+// If filter value type is Number
+const getNumberFilterInput = index => getFilterRow(index)
+  .element(by.xpath("//input[@ng-model='$ctrl.tempModel.value']"));
 
 const getAppliedFilter = name => element(by.css('filter-chips'))
   .element(by.cssContainingText('md-chip-template > span', name));
@@ -206,6 +212,7 @@ module.exports = {
   filtersDialog: {
     getFilterAutocomplete,
     getStringFilterInput,
+    getNumberFilterInput,
     applyBtn: element(by.css('button[e2e="apply-filter-btn"]')),
     getAppliedFilter
   },

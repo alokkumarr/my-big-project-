@@ -15,6 +15,7 @@ const implicitlyWait = 10000;
 
 /**
  * Default time to wait in ms before a test fails
+ * Fixes error: jasmine default timeout interval
  */
 const defaultTimeoutInterval = 10000;
 
@@ -22,7 +23,6 @@ const defaultTimeoutInterval = 10000;
  * Fixes error: Timed out waiting for asynchronous Angular tasks to finish after n seconds
  */
 //const allScriptsTimeout = 30000;
-
 
 exports.config = {
   //allScriptsTimeout: allScriptsTimeout,
@@ -36,7 +36,7 @@ exports.config = {
         'disable-extensions',
         'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
-        //'--headless',
+        '--headless',
         '--disable-gpu',
         '--window-size=2880,1800'
       ]
@@ -52,17 +52,17 @@ exports.config = {
   },
   suites: {
     charts: [
-      /*webpackHelper.root('src/test/e2e-tests/charts/applyFiltersToCharts.js'),
+      webpackHelper.root('src/test/e2e-tests/charts/applyFiltersToCharts.js'),
       webpackHelper.root('src/test/e2e-tests/charts/createAndDeleteCharts.test.js'),
-      webpackHelper.root('src/test/e2e-tests/charts/previewForCharts.test.js')*/
+      webpackHelper.root('src/test/e2e-tests/charts/previewForCharts.test.js')
     ],
     root: [
-      /*webpackHelper.root('src/test/e2e-tests/analyze.test.js'),
-      webpackHelper.root('src/test/e2e-tests/createPivot.test.js'),*/
+      webpackHelper.root('src/test/e2e-tests/analyze.test.js'),
+      webpackHelper.root('src/test/e2e-tests/createPivot.test.js'),
       webpackHelper.root('src/test/e2e-tests/createReport.test.js'),
       //webpackHelper.root('src/test/e2e-tests/debug.test.js') // for testing purposes
-      /* webpackHelper.root('src/test/e2e-tests/login.test.js'),
-       webpackHelper.root('src/test/e2e-tests/priviliges.test.js'),*/
+      webpackHelper.root('src/test/e2e-tests/login.test.js'),
+      webpackHelper.root('src/test/e2e-tests/priviliges.test.js'),
     ]
   },
 

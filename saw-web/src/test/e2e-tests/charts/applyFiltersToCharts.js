@@ -4,7 +4,7 @@ const protractor = require('protractor');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const {hasClass} = require('../../javascript/helpers/utils');
 
-describe('Apply filters to charts: applyFiltersToCharts.js', () => {
+describe('Apply filters to chart: applyFiltersToCharts.js', () => {
   const chartDesigner = analyzePage.designerDialog.chart;
   const xAxisName = 'Source Manufacturer';
   const yAxisName = 'Available MB';

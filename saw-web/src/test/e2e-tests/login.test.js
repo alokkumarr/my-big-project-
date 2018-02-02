@@ -13,7 +13,7 @@ describe('Login Tests: login.test.js', () => {
   };
 
   beforeAll(function () {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
+    //jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
   });
 
   beforeEach(function (done) {

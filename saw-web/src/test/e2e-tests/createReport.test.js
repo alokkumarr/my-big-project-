@@ -31,8 +31,8 @@ describe('Create report type analysis: createReport.test.js', () => {
   const method = 'table:report';
 
   beforeAll(function () {
-    // This test may take some time
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
+    // This test may take some time. Such timeout fixes jasmine DEFAULT_TIMEOUT_INTERVAL interval error
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000000;
 
     // Waiting for results may take some time
     browser.manage().timeouts().implicitlyWait(30000);
@@ -106,12 +106,13 @@ describe('Create report type analysis: createReport.test.js', () => {
     // Should apply filters
     const filters = analyzePage.filtersDialog;
     const filterAC = filters.getFilterAutocomplete(0);
-    const stringFilterInput = filters.getStringFilterInput(0);
+    const stringFilterInput = filters.getNumberFilterInput(0);
     const fieldName = tables[0].fields[0];
 
     commonFunctions.waitFor.elementToBeClickable(reportDesigner.openFiltersBtn);
     reportDesigner.openFiltersBtn.click();
     filterAC.sendKeys(fieldName, protractor.Key.DOWN, protractor.Key.ENTER);
+    stringFilterInput.sendKeys("123");
     stringFilterInput.sendKeys(filterValue, protractor.Key.TAB);
     filters.applyBtn.click();
 
@@ -139,10 +140,12 @@ describe('Create report type analysis: createReport.test.js', () => {
 
     // Delete
     const main = analyzePage.main;
+    const cards = main.getAnalysisCards(reportName);
     main.getAnalysisCards(reportName).count()
       .then(count => {
         main.doAnalysisAction(reportName, 'delete');
         main.confirmDeleteBtn.click();
+        commonFunctions.waitFor.cardsCountToUpdate(cards, count);
         expect(main.getAnalysisCards(reportName).count()).toBe(count - 1);
       });
   });
