@@ -84,7 +84,6 @@ public class TransformerComponent extends Component implements WithMovableResult
 
 
 //2. Read input datasets
-//TODO:: Some of datasets may be regarded as reference data, add reference data as Json array to Transformer configuration.
 
             Map<String, Dataset> dsMap = new HashMap();
             for ( Map.Entry<String, Map<String, String>> entry : inputs.entrySet()) {
@@ -104,6 +103,9 @@ public class TransformerComponent extends Component implements WithMovableResult
                 }
                 dsMap.put(entry.getKey(), ds);
             }
+
+            Set<Reference> refdata = ctx.componentConfiguration.getTransformer().getReferences();
+            Reference[] refDataArr = refdata.toArray(new Reference[0]);
             Transformer.ScriptEngine engine = ctx.componentConfiguration.getTransformer().getScriptEngine();
             Set<OutputSchema> ou = ctx.componentConfiguration.getTransformer().getOutputSchema();
             if (ou != null && ou.size() > 0){
@@ -119,6 +121,7 @@ public class TransformerComponent extends Component implements WithMovableResult
                                     st,
                                     tempLocation,
                                     0,
+                                    refDataArr,
                                     inputs,
                                     outputs);
                     jexlExecutorWithSchema.execute(dsMap);
@@ -158,6 +161,7 @@ public class TransformerComponent extends Component implements WithMovableResult
                                     script,
                                     tempLocation,
                                     0,
+                                    refDataArr,
                                     inputs,
                                     outputs);
                     jexlExecutor.execute(dsMap);
@@ -186,8 +190,8 @@ public class TransformerComponent extends Component implements WithMovableResult
         StructField[] sf = new StructField[outputSchema.size()+3];
         OutputSchema[] osa = outputSchema.toArray(new OutputSchema[0]);
         for (int i = 0; i < osa.length; i++) {
-            logger.debug(String.format("Field %s, index: %d, type: %s",osa[i].getName(), i, getType(osa[i].getType(), osa[i].getFormat()) ));
-           sf[i] = new StructField(osa[i].getName(), getType(osa[i].getType(), osa[i].getFormat()), true, Metadata.empty());
+            logger.debug(String.format("Field %s, index: %d, type: %s",osa[i].getName(), i, getType(osa[i].getType()) ));
+           sf[i] = new StructField(osa[i].getName(), getType(osa[i].getType()), true, Metadata.empty());
            st = st.add(sf[i]);
         }
         st = st.add( new StructField(RECORD_COUNTER, DataTypes.LongType, true, Metadata.empty()));
@@ -198,7 +202,7 @@ public class TransformerComponent extends Component implements WithMovableResult
     }
 
 
-    private DataType getType(String tp, String frmt) throws Exception {
+    private DataType getType(String tp) throws Exception {
         DataType dt = null;
         if (tp == null)
             dt = DataTypes.NullType;

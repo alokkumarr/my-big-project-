@@ -29,11 +29,10 @@ public class TransformWithSchema implements Function<Row, Row> {
     private final SparkSession sparkSession;
     private final LongAccumulator successTransformationsCount;
     private final LongAccumulator failedTransformationsCount;
-    private final String bcFistRefDataSet;
     private final StructType schema;
     private final int threshold;
 
-    private Map<String, Broadcast<Dataset>> mapRefData = null;
+    private Map<String, Broadcast<Dataset<Row>>> mapRefData = null;
     private Map<String, Object> extFunctions;
     private JexlEngine jexlEngine = null;
     private String script;
@@ -42,11 +41,10 @@ public class TransformWithSchema implements Function<Row, Row> {
     public TransformWithSchema(SparkSession ss,
                                String scr,
                                StructType inSchema,
-                               Map<String, Broadcast<Dataset>> mapRefData,
+                               Map<String, Broadcast<Dataset<Row>>> mapRefData,
                                LongAccumulator successTransformationsCount,
                                LongAccumulator failedTransformationsCount,
-                               int threshold,
-                               String  bcFistRefDataSet)
+                               int threshold)
             throws Exception {
         script = scr;
         schema = inSchema;
@@ -55,7 +53,7 @@ public class TransformWithSchema implements Function<Row, Row> {
         this.failedTransformationsCount = failedTransformationsCount;
         this.mapRefData = mapRefData;
         this.threshold = threshold;
-        this.bcFistRefDataSet = bcFistRefDataSet;
+
     }
 
     public Row call(Row arg0) throws Exception {
@@ -76,14 +74,10 @@ public class TransformWithSchema implements Function<Row, Row> {
                 jexlEngine.setLenient(true);
     //        jexlEngine.setFunctions(extFunctions);
                 jexlScript = jexlEngine.createScript(script);
-    //Create N (N = length of mapRefData ) DataScanners with name of map key (as mentioned in configuration)
-    //The first one make 'ref' as a duplicate for backward compatibility
                 if (this.mapRefData != null && !this.mapRefData.isEmpty()) {
-                    extFunctions.put("ref", new sncr.xdf.transformer.jexl.DataScanner(this.mapRefData.get(bcFistRefDataSet)));
-                    for (String refDataKey : this.mapRefData.keySet()) {
-                        extFunctions.put(refDataKey, new sncr.xdf.transformer.jexl.DataScanner(this.mapRefData.get(refDataKey)));
-                    }
+                       extFunctions.put("ref", new sncr.xdf.transformer.jexl.DataScanner(this.mapRefData));
                 }
+
                 jexlEngine.setFunctions(extFunctions);
             }
             XdfObjectContextWithStaticSchema sc1 = new XdfObjectContextWithStaticSchema( jexlEngine, schema, arg0);

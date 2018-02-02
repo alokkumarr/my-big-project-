@@ -14,6 +14,7 @@ import org.apache.spark.sql.types.StructType;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.util.LongAccumulator;
 import scala.Tuple2;
+import sncr.bda.conf.Reference;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.transformer.system.StructAccumulator;
 
@@ -34,14 +35,14 @@ public class JexlExecutorWithSchema extends Executor{
 
     private static final Logger logger = Logger.getLogger(JexlExecutorWithSchema.class);
 
-    public JexlExecutorWithSchema(SparkSession ctx, String script, StructType st, String tLoc, int thr, Map<String, Map<String, String>> inputs, Map<String, Map<String, String>> outputs) {
+    public JexlExecutorWithSchema(SparkSession ctx, String script, StructType st, String tLoc, int thr, Reference[] refDataArr, Map<String, Map<String, String>> inputs, Map<String, Map<String, String>> outputs) {
         super(ctx, script, st, tLoc, thr, inputs, outputs);
     }
 
 
     protected JavaRDD     transformation(
             JavaRDD dataRdd,
-            Map<String, Broadcast<Dataset>> referenceData
+            Map<String, Broadcast<Dataset<Row>>> referenceData
     )  throws Exception {
         String bcFirstRefDataset = (refDataSets != null && refDataSets.size() > 0)?refDataSets.toArray(new String[0])[0]:"";
         JavaRDD rdd = dataRdd.map(
@@ -51,8 +52,7 @@ public class JexlExecutorWithSchema extends Executor{
                         referenceData,
                            successTransformationsCount,
                            failedTransformationsCount,
-                           threshold,
-                           bcFirstRefDataset)).cache();
+                           threshold)).cache();
         return rdd;
     }
 
@@ -61,7 +61,7 @@ public class JexlExecutorWithSchema extends Executor{
         Dataset ds = dsMap.get(inDataSet);
 
         logger.trace("Load reference data: " );
-        Map<String, Broadcast<Dataset>> mapOfRefData = new HashMap<>();
+        Map<String, Broadcast<Dataset<Row>>> mapOfRefData = new HashMap<>();
         if (refDataSets != null && refDataSets.size() > 0) {
             for (String refDataSetName: refDataSets) {
                 mapOfRefData.put(refDataSetName, jsc.broadcast(dsMap.get(refDataSetName)));

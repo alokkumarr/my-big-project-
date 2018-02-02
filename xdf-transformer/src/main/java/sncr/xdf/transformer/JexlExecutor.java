@@ -14,6 +14,7 @@ import org.apache.spark.sql.types.StructType;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.util.LongAccumulator;
 import scala.Tuple2;
+import sncr.bda.conf.Reference;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.transformer.system.StructAccumulator;
 
@@ -53,8 +54,10 @@ public class JexlExecutor {
                         String script,
                         String tLoc,
                         int thr,
+                        Reference[] refDataArr,
                         Map<String, Map<String, String>> inputs,
-                        Map<String, Map<String, String>> outputs){
+                        Map<String, Map<String, String>> outputs
+                        )  {
         this.script = script;
         session_ctx = ctx;
         threshold = thr;
@@ -65,7 +68,10 @@ public class JexlExecutor {
                 inDataSet = inpK;
             }
             else{
-                refDataSets.add(inpK);
+                if (isParameterInRef(refDataArr, inpK)) {
+                    refDataSets.add(inpK);
+                }
+
             }
         }
 
@@ -86,12 +92,15 @@ public class JexlExecutor {
         ctx.sparkContext().register(structAccumulator, "Struct");
     }
 
+    private boolean isParameterInRef(Reference[] refDataArr, String inpK) {
+            return false;
+    }
+
 
     private JavaRDD     transformation(
             JavaRDD dataRdd,
-            Map<String, Broadcast<Dataset>> referenceData
+            Map<String, Broadcast<Dataset<Row>>> referenceData
     )  throws Exception {
-        String bcFirstRefDataset = (refDataSets != null && refDataSets.size() > 0)?refDataSets.toArray(new String[0])[0]:"";
         JavaRDD rdd = dataRdd.map(
                 new Transform( session_ctx,
                         script,
@@ -100,8 +109,7 @@ public class JexlExecutor {
                            successTransformationsCount,
                            failedTransformationsCount,
                            structAccumulator,
-                           threshold,
-                           bcFirstRefDataset)).cache();
+                           threshold)).cache();
         return rdd;
     }
 
@@ -118,7 +126,7 @@ public class JexlExecutor {
         }
 
         logger.trace("Load reference data: " );
-        Map<String, Broadcast<Dataset>> mapOfRefData = new HashMap<>();
+        Map<String, Broadcast<Dataset<Row>>> mapOfRefData = new HashMap<>();
         if (refDataSets != null && refDataSets.size() > 0) {
             for (String refDataSetName: refDataSets) {
                 mapOfRefData.put(refDataSetName, jsc.broadcast(dsMap.get(refDataSetName)));
@@ -136,10 +144,10 @@ public class JexlExecutor {
 
         // Using structAccumulator do second pass to align schema
         Dataset<Row> alignedDF = schemaRealignment(transformationResult, newSchema);
-        alignedDF.count();
-        alignedDF.schema().prettyJson();
+        Long c_adf = alignedDF.count();
+        String jschema = alignedDF.schema().prettyJson();
 
-        logger.trace("Second pass completed: " + alignedDF.count() + " Schema: " + alignedDF.schema().prettyJson());
+        logger.trace("Second pass completed: " + c_adf + " Schema: " + jschema);
 
 
         //TODO:: Should we drop RECORD_COUNT as well???

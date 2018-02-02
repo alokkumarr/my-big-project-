@@ -58,7 +58,7 @@ public class JaninoExecutor extends Executor{
 
         JavaRDD transformationResult = transformation(ds.toJavaRDD(), odi);
         Long c = transformationResult.count();
-        logger.debug("Intermediate result, transformation count = " + c);
+        logger.debug("Intermediate result, transformation count  = " + c);
 
         // Using structAccumulator do second pass to align schema
         Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
