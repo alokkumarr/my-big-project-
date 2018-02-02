@@ -1,8 +1,8 @@
 <div fxLayout="row" fxLayoutAlign="space-between center">
-  <mat-form-field>
+  <mat-form-field *ngIf="filterModel.operator === 'BTW'">
     <input matInput type="number"
-            (input)="onValueChange($event.target.value)"
-            [value]="filterModel.value"/>
+            (input)="onOtherValueChange($event.target.value)"
+            [value]="filterModel.otherValue"/>
   </mat-form-field>
   <mat-form-field>
     <mat-select placeholder="Operator"
@@ -16,9 +16,9 @@
       </mat-option>
     </mat-select>
   </mat-form-field>
-  <mat-form-field *ngIf="filterModel.operator === 'BTW'">
+  <mat-form-field>
     <input matInput type="number"
-            (input)="onOtherValueChange($event.target.value)"
-            [value]="filterModel.otherValue"/>
+            (input)="onValueChange($event.target.value)"
+            [value]="filterModel.value"/>
   </mat-form-field>
 </div>
