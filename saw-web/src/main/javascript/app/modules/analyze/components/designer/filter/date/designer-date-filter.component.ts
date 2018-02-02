@@ -50,7 +50,7 @@ export class DesignerDateFilterComponent {
     preset: CUSTOM_DATE_PRESET_VALUE
   }
 
-  ngOnInit() {
+  init() {
     if (!this.filterModel) {
       this.filterModel = {};
     } else {
@@ -62,7 +62,15 @@ export class DesignerDateFilterComponent {
       }
     }
 
-    this.showDateFields = this.filterModel.preset === CUSTOM_DATE_PRESET_VALUE;
+    this.showDateFields = (this.tempModel || this.filterModel).preset === CUSTOM_DATE_PRESET_VALUE;
+  }
+
+  ngOnInit() {
+    this.init();
+  }
+
+  ngOnChanges() {
+    this.init();
   }
 
   onPresetChange(change) {

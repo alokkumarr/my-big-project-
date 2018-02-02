@@ -44,10 +44,18 @@ export class DesignerNumberFilterComponent {
 
   public OPERATORS = OPERATORS;
 
-  ngOnInit() {
+  init() {
     if (!this.filterModel) {
       this.filterModel = {};
     }
+  }
+
+  ngOnInit() {
+    this.init();
+  }
+
+  ngOnChanges() {
+    this.init();
   }
 
   onFilterModelChange() {

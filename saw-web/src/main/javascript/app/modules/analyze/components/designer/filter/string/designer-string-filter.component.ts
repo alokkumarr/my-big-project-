@@ -25,12 +25,20 @@ export class DesignerStringFilterComponent {
 
   public separatorKeysCodes = [ENTER, COMMA, SEMICOLON];
 
-  ngOnInit() {
+  init() {
     if (!this.filterModel) {
       this.filterModel = {
         modelValues: []
       };
     }
+  }
+
+  ngOnInit() {
+    this.init();
+  }
+
+  ngOnChanges() {
+    this.init();
   }
 
   onFilterModelChange() {

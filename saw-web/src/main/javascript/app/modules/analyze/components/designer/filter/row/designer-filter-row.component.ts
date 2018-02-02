@@ -35,7 +35,7 @@ export class DesignerFilterRowComponent {
     if (this.filter.isRuntimeFilter) {
       delete this.filter.model;
     } else {
-      this.filter.model = {};
+      this.filter.model = null;
     }
     this.filterChange.emit();
   }
