@@ -32,7 +32,11 @@ export class DesignerFilterRowComponent {
     const target: ArtifactColumn = find(this.artifactColumns, column => column.columnName === columnName);
     this.filter.columnName = target.columnName;
     this.filter.type = target.type;
-    this.filter.model = null;
+    if (this.filter.isRuntimeFilter) {
+      delete this.filter.model;
+    } else {
+      this.filter.model = {};
+    }
     this.filterChange.emit();
   }
 
