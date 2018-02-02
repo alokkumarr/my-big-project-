@@ -11,6 +11,8 @@ import * as indexOf from 'lodash/indexOf';
 import * as slice from 'lodash/slice';
 import {json2csv} from 'json-2-csv';
 import * as keys from 'lodash/keys';
+import * as moment from 'moment';
+import * as forEach from 'lodash/forEach';
 
 import {Events} from '../../consts';
 
@@ -188,7 +190,7 @@ export const AnalyzeExecutedDetailComponent = {
             },
             keys
           };
-          json2csv(data, (err, csv) => {
+          json2csv(this.formatDates(data), (err, csv) => {
             if (err) {
               this._$translate('ERROR_EXPORT_FAILED').then(translation => {
                 this._toastMessage.error(translation);
@@ -202,6 +204,22 @@ export const AnalyzeExecutedDetailComponent = {
       }
     }
 
+    formatDates(data) {
+      const ks = keys(data[0] || {});
+      const formats = [
+        moment.ISO_8601,
+        'MM/DD/YYYY  :)  HH*mm*ss'
+      ];
+      forEach(data, data => {
+        forEach(ks, key => {
+          if (moment(data[key], formats, true).isValid()) {
+            data[key] = moment(data[key]).format('YYYY-MM-DD');
+          }
+        });
+      });
+      return data;
+    }
+
     replaceCSVHeader(csv, fields) {
       const firstNewLine = indexOf(csv, '\n');
       const firstRow = slice(csv, 0, firstNewLine).join('');
@@ -212,6 +230,7 @@ export const AnalyzeExecutedDetailComponent = {
     loadExecutionData(options = {}) {
       if (this._executionId) {
         options.analysisType = this.analysis.type;
+
         return this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId, options)
           .then(({data, count}) => {
             this.requester.next({data});

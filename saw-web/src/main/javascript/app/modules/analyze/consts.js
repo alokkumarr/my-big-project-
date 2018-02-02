@@ -10,6 +10,7 @@ export const Events = {
 
 export const AnalyseTypes = {
   Report: 'report',
+  ESReport: 'esReport',
   Chart: 'chart',
   Pivot: 'pivot'
 };
@@ -117,7 +118,8 @@ export const ANALYSIS_METHODS = [
       {
         label: 'Report',
         icon: {font: 'icon-report'},
-        type: 'table:report'
+        type: 'table:report',
+        supportedTypes: ['table:report', 'table:esReport']
       },
       {
         label: 'Pivot',
@@ -182,7 +184,7 @@ export const ANALYSIS_METHODS = [
       },
       {
         label: 'Time series multi pane',
-        icon: {font: 'icon-timeseries-chart'},
+        icon: {font: 'icon-Candlestick-icon'},
         type: 'chart:tsPane'
       }
     ]

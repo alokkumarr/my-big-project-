@@ -12,6 +12,7 @@
 
       <report-grid-display-node
       columns="$ctrl.columns"
+      show-checked="$ctrl.showChecked"
       settings="$ctrl.settings"
       source="$ctrl.loadData(options)"
       data="node.data">
@@ -23,6 +24,7 @@
        ng-if="$ctrl.settings.layoutMode === $ctrl.LAYOUT_MODE.DETAIL"
        class="grid-container">
     <report-grid-display columns="$ctrl.columns"
+                         show-checked="$ctrl.showChecked"
                          source="$ctrl.loadData(options)"
                          data="$ctrl.data">
     </report-grid-display>

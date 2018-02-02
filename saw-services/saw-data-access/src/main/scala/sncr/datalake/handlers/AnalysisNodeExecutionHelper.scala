@@ -69,7 +69,7 @@ class AnalysisNodeExecutionHelper(val an : AnalysisNode, sqlRuntime: String, cac
   val metricName = (definition \ "metricName").extractOrElse[String]("")
   val analysisKey = "AN_" + System.currentTimeMillis()
 
-  val sql = if (sqlManual != "") sqlManual else if (sqlRuntime != null) sqlRuntime else sqlDefinition
+  val sql = if (sqlRuntime != null) sqlRuntime  else if (sqlManual != "") sqlManual else sqlDefinition
 
 // ----------- SAW-880 -------------------------------
 //TODO:: Modify it, see SAW-880, item 11
@@ -354,7 +354,7 @@ object AnalysisNodeExecutionHelper{
       return null
     }
     val onlyKey = od.keysIterator.next()
-    if (d_type.get == "chart" || d_type.get == "pivot") {
+    if (d_type.get == "chart" || d_type.get == "pivot" || d_type.get == "esReport") {
         val onlyKey = od.keysIterator.next()
         val rawdata = anres.getObject(onlyKey)
 
