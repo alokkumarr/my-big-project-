@@ -263,6 +263,10 @@ export class PivotGridComponent {
             type: 'fixedPoint',
             precision: 2
           };
+          /* We're aggregating values in backend. Aggregating it again using
+             pivot's aggregate function will lead to bad data. Always keep this
+             on sum */
+          cloned.aggregate = 'sum';
         } else {
           cloned.dataType = cloned.type;
         }
