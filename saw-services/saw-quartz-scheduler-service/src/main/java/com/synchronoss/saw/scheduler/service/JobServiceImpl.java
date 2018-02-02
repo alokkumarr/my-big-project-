@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-
 @Service
 public class JobServiceImpl implements JobService{
 
@@ -27,10 +26,12 @@ public class JobServiceImpl implements JobService{
 	@Autowired
 	private ApplicationContext context;
 
-
-
 	/**
 	 * Schedule a job by jobName at given date.
+     * @param jobName
+     * @param jobClass
+     * @param date
+     * @return
 	 */
 	@Override
 	public boolean scheduleOneTimeJob(String jobName, Class<? extends QuartzJobBean> jobClass, Date date) {
@@ -59,7 +60,13 @@ public class JobServiceImpl implements JobService{
 	
 	/**
 	 * Schedule a job by jobName at given date.
+     * @param jobName
+     * @param jobClass
+     * @param date
+     * @param cronExpression
+     * @return
 	 */
+
 	@Override
 	public boolean scheduleCronJob(String jobName, Class<? extends QuartzJobBean> jobClass, Date date, String cronExpression) {
 		logger.info("Request received to scheduleJob");
@@ -87,7 +94,11 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Update one time scheduled job.
+     * @param jobName
+     * @param date
+     * @return
 	 */
+
 	@Override
 	public boolean updateOneTimeJob(String jobName, Date date) {
         logger.info("Request received for updating one time job.");
@@ -110,6 +121,10 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Update scheduled cron job.
+     * @param jobName
+     * @param date
+     * @param cronExpression
+     * @return
 	 */
 	@Override
 	public boolean updateCronJob(String jobName, Date date, String cronExpression) {
@@ -134,6 +149,8 @@ public class JobServiceImpl implements JobService{
 	/**
 	 * Remove the indicated Trigger from the scheduler. 
 	 * If the related job does not have any other triggers, and the job is not durable, then the job will also be deleted.
+     * @param jobName
+     * @return
 	 */
 	@Override
 	public boolean unScheduleJob(String jobName) {
@@ -142,7 +159,7 @@ public class JobServiceImpl implements JobService{
 		String jobKey = jobName;
 
 		TriggerKey tkey = new TriggerKey(jobKey);
-		System.out.println("Parameters received for unscheduling job : tkey :"+jobKey);
+		logger.debug("Parameters received for unscheduling job : tkey :"+jobKey);
 		try {
 			boolean status = schedulerFactoryBean.getScheduler().unscheduleJob(tkey);
 			logger.debug("Trigger associated with jobKey :"+jobKey+ " unscheduled with status :"+status);
@@ -155,7 +172,10 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Delete the identified Job from the Scheduler - and any associated Triggers.
+     * @param jobName
+     * @return
 	 */
+
 	@Override
 	public boolean deleteJob(String jobName) {
 		logger.info("Request received for deleting job.");
@@ -178,6 +198,8 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Pause a job
+     * @param jobName
+     * @return
 	 */
 	@Override
 	public boolean pauseJob(String jobName) {
@@ -200,6 +222,8 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Resume paused job
+     * @param jobName
+     * @return
 	 */
 	@Override
 	public boolean resumeJob(String jobName) {
@@ -222,6 +246,8 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Start a job now
+     * @param jobName
+     * @return
 	 */
 	@Override
 	public boolean startJobNow(String jobName) {
@@ -238,13 +264,14 @@ public class JobServiceImpl implements JobService{
 			return true;
 		} catch (SchedulerException e) {
             logger.error("SchedulerException while starting job now with key :"+jobKey+ " message :"+e.getMessage());
-			e.printStackTrace();
 			return false;
 		}		
 	}
 
 	/**
 	 * Check if job is already running
+     * @param jobName
+     * @return
 	 */
 	@Override
 	public boolean isJobRunning(String jobName) {
@@ -275,6 +302,7 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Get all jobs
+     * @return
 	 */
 	@Override
 	public List<Map<String, Object>> getAllJobs() {
@@ -334,6 +362,8 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Check job exist with given name
+     * @param jobName
+     * @return
 	 */
 	@Override
 	public boolean isJobWithNamePresent(String jobName) {
@@ -352,6 +382,8 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Get the current state of job
+     * @param jobName
+     * @return
 	 */
 	public String getJobState(String jobName) {
         logger.info("JobServiceImpl.getJobState()");
@@ -391,6 +423,8 @@ public class JobServiceImpl implements JobService{
 
 	/**
 	 * Stop a job
+     * @param jobName
+     * @return
 	 */
 	@Override
 	public boolean stopJob(String jobName) {
@@ -406,7 +440,6 @@ public class JobServiceImpl implements JobService{
 
 		} catch (SchedulerException e) {
             logger.error("SchedulerException while stopping job. error message :"+e.getMessage());
-			e.printStackTrace();
 		}
 		return false;
 	}
