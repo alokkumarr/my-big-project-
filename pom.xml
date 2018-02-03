@@ -4,7 +4,7 @@
   <!-- THIS -->
   <groupId>com.synchronoss.bda</groupId>
   <artifactId>xdf-nextgen</artifactId>
-  <version>1.0.0_dev</version>
+  <version>1.0.1-SNAPSHOT</version>
   <!-- -->
   <packaging>pom</packaging>
   <properties>
@@ -308,8 +308,6 @@
     <module>xdf-sql</module>
     <module>xdf-preview</module>
     <module>xdf-parser</module>
-    <module>xdf-rest</module>
-    <!-- -->
     <module>xdf</module>
   </modules>
   <build>
