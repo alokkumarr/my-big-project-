@@ -25,9 +25,15 @@ public class DataScanner {
 	// JEXL lookup :  ref:lookup('dataset', 'filter=?', field_A or List<Fields>>???
 	public DataScanner(Map<String, Broadcast<Dataset<Row>>> brdcastReferenceData) throws Exception {
 		this.referenceData = brdcastReferenceData;
+		for(String refK : brdcastReferenceData.keySet()){
+			System.out.printf("Ref DS: %s, Size: %d\n", refK, referenceData.get(refK).getValue().count());
+		}
 	}
 
 	public String[][] lookup(String groupKey, String filterKey) {
+
+		System.out.printf("Group key: %s, Filter: %s, \n", groupKey, filterKey);
+
 
 		if(referenceData.containsKey(groupKey)) {
 			return null;
@@ -40,16 +46,22 @@ public class DataScanner {
 		Dataset<Row> work = refDataset;
 
 		Tuple2<Map<String, String> , Map<Integer, String>> allDecodedKeys = decodeFilterKey(filterKey);
+
 		for(Integer inx: allDecodedKeys._2().keySet()){
 			String fName = refDataset.schema().fieldNames()[inx];
+			System.out.printf("Process key: %s, Inx: %d\n", fName, inx);
 			Column c1 = refDataset.col(fName);
 			work = work.where(c1.equalTo(allDecodedKeys._2().get(inx)));
 		}
 
+		System.out.println("Do actual lookup" );
 		for (int i = 0; i < refDataset.schema().fieldNames().length; i++) {
 			String fName = refDataset.schema().fieldNames()[i];
+            System.out.println("Ref. dataset field: "  + fName);
+
 			Column c1;
 			if (allDecodedKeys._1().containsKey(fName)){
+				System.out.printf("Process key: %s, filter value: %s\n", fName, allDecodedKeys._1().get(fName));
 				c1 = refDataset.col(fName);
 				work = work.where(c1.equalTo(allDecodedKeys._1().get(fName)));
 			}
@@ -91,6 +103,11 @@ public class DataScanner {
 						decodedMapWithIndex.put(kInx,key.substring(key.indexOf("=") + 1).trim());
 				}
 			}
+		}
+
+		System.out.println("Filter decoding result: ");
+		for (String k:decodedMapWithNames.keySet()){
+			System.out.printf("K: %s, V: %s\n", k, decodedMapWithNames.get(k));
 		}
 		return new Tuple2<>(decodedMapWithNames, decodedMapWithIndex);
 	}

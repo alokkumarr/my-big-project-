@@ -75,8 +75,6 @@ public class Transform implements Function<Row, Row> {
                 extFunctions.put("extFunctions", new DataManipulationUtil());
                 logger.debug("Jexl script: " + script);
                 jexlEngine.setLenient(true);
-                jexlEngine.setFunctions(extFunctions);
-                jexlScript = jexlEngine.createScript(script);
     //Create N (N = length of mapRefData ) DataScanners with name of map key (as mentioned in configuration)
     //The first one make 'ref' as a duplicate for backward compatibility
                 if (this.mapRefData != null && !this.mapRefData.isEmpty()) {
@@ -84,6 +82,11 @@ public class Transform implements Function<Row, Row> {
                 }
                 jexlEngine.setFunctions(extFunctions);
             }
+
+            for ( String k: jexlEngine.getFunctions().keySet()) System.out.println("Fk: " + k + " v: " + jexlEngine.getFunctions().get(k));
+
+            jexlScript = jexlEngine.createScript(script);
+
             XdfObjectContext sc1 = new XdfObjectContext( jexlEngine, schema, arg0);
             jexlScript.execute(sc1);
             if(sc1.isSuccess()) {

@@ -5,7 +5,6 @@
 #   dl.root
 #   http.port
 #==> bin/xdf_info
-#==> conf/xdf-rest.conf
 
 #
 # Activate application: generate bin/xdf_info

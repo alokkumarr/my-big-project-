@@ -35,7 +35,7 @@ public class JexlExecutorWithSchema extends Executor{
 
     private static final Logger logger = Logger.getLogger(JexlExecutorWithSchema.class);
 
-    public JexlExecutorWithSchema(SparkSession ctx, String script, StructType st, String tLoc, int thr, Reference[] refDataArr, Map<String, Map<String, String>> inputs, Map<String, Map<String, String>> outputs) {
+    public JexlExecutorWithSchema(SparkSession ctx, String script, StructType st, String tLoc, int thr, Map<String, Map<String, String>> inputs, Map<String, Map<String, String>> outputs) {
         super(ctx, script, st, tLoc, thr, inputs, outputs);
     }
 

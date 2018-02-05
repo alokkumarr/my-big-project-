@@ -54,7 +54,6 @@ public class JexlExecutor {
                         String script,
                         String tLoc,
                         int thr,
-                        Reference[] refDataArr,
                         Map<String, Map<String, String>> inputs,
                         Map<String, Map<String, String>> outputs
                         )  {
@@ -68,7 +67,7 @@ public class JexlExecutor {
                 inDataSet = inpK;
             }
             else{
-                if (isParameterInRef(refDataArr, inpK)) {
+                if (inpK.indexOf("ref") >= 0) {
                     refDataSets.add(inpK);
                 }
 
@@ -92,9 +91,6 @@ public class JexlExecutor {
         ctx.sparkContext().register(structAccumulator, "Struct");
     }
 
-    private boolean isParameterInRef(Reference[] refDataArr, String inpK) {
-            return false;
-    }
 
 
     private JavaRDD     transformation(
@@ -182,12 +178,6 @@ public class JexlExecutor {
     //    private void writeResults(JavaPairRDD outputResult, String resType) throws IOException {
     private void writeResults(Dataset<Row> outputResult, String resType, String location) throws IOException {
 
-/*
-        org.apache.hadoop.conf.Configuration jobConf = new org.apache.hadoop.conf.Configuration();
-        Job job = Job.getInstance(jobConf);
-        CustomParquetOutputFormat.setCompression(job, CompressionCodecName.SNAPPY);
-*/
-
         Map<String, String> outputDS = outputDataSetsDesc.get(resType);
         String name = outputDS.get(DataSetProperties.Name.name());
         String loc = location + Path.SEPARATOR + name;
@@ -197,19 +187,11 @@ public class JexlExecutor {
         switch (format.toLowerCase()) {
             case "parquet" :
                 outputResult.write().parquet(loc);
-/*
-                outputResult.saveAsNewAPIHadoopFile(loc,
-                        NullWritable.class,
-                        Group.class,
-                        CustomParquetOutputFormat.class,
-                        job.getConfiguration());
-*/
                 break;
             case "csv" :
                 outputResult.write().csv(loc);
             case "json" :
                 outputResult.write().json(loc);
-//                outputResult.saveAsTextFile(loc);
                 break;
         }
     }

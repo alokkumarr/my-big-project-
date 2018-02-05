@@ -16,6 +16,46 @@
   <properties>
 
   </properties>
+
+  <dependencies>
+  <dependency>
+    <groupId>com.synchronoss.bda</groupId>
+    <artifactId>xdf-core</artifactId>
+    <version>${project.version}</version>
+  </dependency>
+  <dependency>
+    <groupId>com.synchronoss.bda</groupId>
+    <artifactId>xdf-parser</artifactId>
+    <version>${project.version}</version>
+  </dependency>
+    <dependency>
+      <groupId>com.synchronoss.bda</groupId>
+      <artifactId>xdf-data-profiler</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.synchronoss.bda</groupId>
+      <artifactId>xdf-transformer</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.synchronoss.bda</groupId>
+      <artifactId>xdf-preview</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.synchronoss.bda</groupId>
+      <artifactId>xdf-transformer</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.synchronoss.bda</groupId>
+      <artifactId>xdf-sql</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+
    <build>
     <plugins>
       <plugin>
@@ -127,6 +167,8 @@
                     <include>mk_conf.sh</include>
                     <include>mk_csv.sh</include>
                     <include>xdf_activate.sh</include>
+                    <include>xdf-mdcli.sh</include>
+                    <include>create-metadata.sh</include>
                   </includes>
                 </source>
               </sources>

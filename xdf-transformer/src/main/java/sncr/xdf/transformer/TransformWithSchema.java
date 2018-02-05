@@ -72,14 +72,17 @@ public class TransformWithSchema implements Function<Row, Row> {
                 extFunctions.put("extFunctions", new DataManipulationUtil());
                 logger.debug("Jexl script: " + script);
                 jexlEngine.setLenient(true);
-    //        jexlEngine.setFunctions(extFunctions);
-                jexlScript = jexlEngine.createScript(script);
                 if (this.mapRefData != null && !this.mapRefData.isEmpty()) {
                        extFunctions.put("ref", new sncr.xdf.transformer.jexl.DataScanner(this.mapRefData));
                 }
-
                 jexlEngine.setFunctions(extFunctions);
+                jexlScript = jexlEngine.createScript(script);
+
             }
+
+            for ( String k: jexlEngine.getFunctions().keySet()) System.out.println("Fk: " + k + " v: " + jexlEngine.getFunctions().get(k));
+
+
             XdfObjectContextWithStaticSchema sc1 = new XdfObjectContextWithStaticSchema( jexlEngine, schema, arg0);
                 jexlScript.execute(sc1);
             if(sc1.isSuccess()) {
