@@ -63,16 +63,16 @@ export class PivotGridComponent {
       this._sorts = sorts;
     }
   };
-  @Input('data') set setData(data: any[]) {
-    this.data = this.preProcessData(data);
-    this.setPivotData();
-  };
   @Input('artifactColumns') set setArtifactColumns(artifactColumns: ArtifactColumnPivot[]) {
     this.artifactColumns = fpPipe(
       fpFilter('checked'),
       this.preProcessArtifactColumns(),
       this.artifactColumn2PivotField()
     )(artifactColumns);
+    this.setPivotData();
+  };
+  @Input('data') set setData(data: any[]) {
+    this.data = this.preProcessData(data);
     this.setPivotData();
   };
   @Output() onContentReady: EventEmitter<any> = new EventEmitter();
@@ -211,6 +211,7 @@ export class PivotGridComponent {
         const cloned = clone(column);
         if (['day', 'quarter', 'month'].includes(column.dateInterval)) {
           cloned.type = 'string';
+          cloned.checktype = 'date';
         } else {
           cloned.groupInterval = cloned.dateInterval;
         }
@@ -232,18 +233,17 @@ export class PivotGridComponent {
     if (isEmpty(this.artifactColumns)) {
       return data;
     }
-
     const formattedData = map(data, dataPoint => {
 
       const clonedDataPoint = clone(dataPoint);
       fpPipe(
-        fpFilter(({type}) => DATE_TYPES.includes(type)),
-        fpForEach(({columnName, dateInterval}) => {
+        fpFilter(({checktype}) => DATE_TYPES.includes(checktype)),
+        fpForEach(({name, dateInterval}) => {
           const format = DATE_INTERVALS_OBJ[dateInterval].format;
-          clonedDataPoint[columnName] = moment.utc(dataPoint[columnName]).format(format);
+          clonedDataPoint[name] = moment.utc(dataPoint[name]).format(format);
           if (dateInterval === 'quarter') {
-            const parts = split(clonedDataPoint[columnName], '-');
-            clonedDataPoint[columnName] = `${parts[0]}-Q${parts[1]}`;
+            const parts = split(clonedDataPoint[name], '-');
+            clonedDataPoint[name] = `${parts[0]}-Q${parts[1]}`;
           }
         })
       )(this.artifactColumns);
