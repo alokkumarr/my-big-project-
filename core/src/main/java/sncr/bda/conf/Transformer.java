@@ -63,13 +63,6 @@ public class Transformer {
     @Expose
     private Integer threshold = 0;
     /**
-     * List of reference data.
-     * 
-     */
-    @SerializedName("references")
-    @Expose
-    private Set<Reference> references = new LinkedHashSet<Reference>();
-    /**
      * List of output fields: field name, field type.
      * 
      */
@@ -87,7 +80,6 @@ public class Transformer {
     /**
      * 
      * @param scriptLocation
-     * @param references
      * @param outputSchema
      * @param scriptPreamble
      * @param scriptEngine
@@ -95,14 +87,13 @@ public class Transformer {
      * @param additionalImports
      * @param script
      */
-    public Transformer(String script, String scriptLocation, String scriptPreamble, Transformer.ScriptEngine scriptEngine, Set<String> additionalImports, Integer threshold, Set<Reference> references, Set<OutputSchema> outputSchema) {
+    public Transformer(String script, String scriptLocation, String scriptPreamble, Transformer.ScriptEngine scriptEngine, Set<String> additionalImports, Integer threshold, Set<OutputSchema> outputSchema) {
         this.script = script;
         this.scriptLocation = scriptLocation;
         this.scriptPreamble = scriptPreamble;
         this.scriptEngine = scriptEngine;
         this.additionalImports = additionalImports;
         this.threshold = threshold;
-        this.references = references;
         this.outputSchema = outputSchema;
     }
 
@@ -257,31 +248,6 @@ public class Transformer {
     }
 
     /**
-     * List of reference data.
-     * 
-     * @return
-     *     The references
-     */
-    public Set<Reference> getReferences() {
-        return references;
-    }
-
-    /**
-     * List of reference data.
-     * 
-     * @param references
-     *     The references
-     */
-    public void setReferences(Set<Reference> references) {
-        this.references = references;
-    }
-
-    public Transformer withReferences(Set<Reference> references) {
-        this.references = references;
-        return this;
-    }
-
-    /**
      * List of output fields: field name, field type.
      * 
      * @return
@@ -313,7 +279,7 @@ public class Transformer {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(script).append(scriptLocation).append(scriptPreamble).append(scriptEngine).append(additionalImports).append(threshold).append(references).append(outputSchema).toHashCode();
+        return new HashCodeBuilder().append(script).append(scriptLocation).append(scriptPreamble).append(scriptEngine).append(additionalImports).append(threshold).append(outputSchema).toHashCode();
     }
 
     @Override
@@ -325,7 +291,7 @@ public class Transformer {
             return false;
         }
         Transformer rhs = ((Transformer) other);
-        return new EqualsBuilder().append(script, rhs.script).append(scriptLocation, rhs.scriptLocation).append(scriptPreamble, rhs.scriptPreamble).append(scriptEngine, rhs.scriptEngine).append(additionalImports, rhs.additionalImports).append(threshold, rhs.threshold).append(references, rhs.references).append(outputSchema, rhs.outputSchema).isEquals();
+        return new EqualsBuilder().append(script, rhs.script).append(scriptLocation, rhs.scriptLocation).append(scriptPreamble, rhs.scriptPreamble).append(scriptEngine, rhs.scriptEngine).append(additionalImports, rhs.additionalImports).append(threshold, rhs.threshold).append(outputSchema, rhs.outputSchema).isEquals();
     }
 
     @Generated("org.jsonschema2pojo")

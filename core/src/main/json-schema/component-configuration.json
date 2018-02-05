@@ -292,26 +292,6 @@
           "description": "If # of failed records exceeds this threshold, processing will be cancelled",
           "default": 0
         },
-        "references" : {
-          "type": "array",
-          "description": "List of reference data.",
-          "minItems": 0,
-          "uniqueItems": true,
-          "items": {
-            "type": "object",
-            "properties": {
-              "dataSet": {
-                "type": "string"
-              },
-              "refKey": {
-                "type": "string"
-              },
-              "dataKey": {
-                "type": "string"
-              }
-            }
-          }
-        },
         "outputSchema" : {
           "type": "array",
           "description": "List of output fields: field name, field type.",
