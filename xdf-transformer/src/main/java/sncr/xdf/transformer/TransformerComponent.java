@@ -103,9 +103,6 @@ public class TransformerComponent extends Component implements WithMovableResult
                 }
                 dsMap.put(entry.getKey(), ds);
             }
-
-            Set<Reference> refdata = ctx.componentConfiguration.getTransformer().getReferences();
-            Reference[] refDataArr = refdata.toArray(new Reference[0]);
             Transformer.ScriptEngine engine = ctx.componentConfiguration.getTransformer().getScriptEngine();
             Set<OutputSchema> ou = ctx.componentConfiguration.getTransformer().getOutputSchema();
             if (ou != null && ou.size() > 0){
@@ -121,7 +118,6 @@ public class TransformerComponent extends Component implements WithMovableResult
                                     st,
                                     tempLocation,
                                     0,
-                                    refDataArr,
                                     inputs,
                                     outputs);
                     jexlExecutorWithSchema.execute(dsMap);
@@ -161,7 +157,6 @@ public class TransformerComponent extends Component implements WithMovableResult
                                     script,
                                     tempLocation,
                                     0,
-                                    refDataArr,
                                     inputs,
                                     outputs);
                     jexlExecutor.execute(dsMap);

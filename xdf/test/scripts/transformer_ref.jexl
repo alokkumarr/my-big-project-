@@ -9,5 +9,9 @@ else{
   $F2 = 'Null value';
 }
 
+var rec = ref:lookup('ref1','$key1=1');
+
+$RI1 = rec.0;
+//$RS2 = $RR.0;
 
 
