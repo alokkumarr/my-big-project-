@@ -2,6 +2,7 @@
   <button mat-button>Cancel</button>
   <button mat-raised-button color="primary">Apply Filters</button>
 </div>
-<div *ngFor="let gFilter of globalFilters">
-  <g-date-filter *ngIf="gFilter.type === 'date'" [filter]="gFilter"></g-date-filter>
+<div *ngFor="let gFilter of globalFilters" [ngSwitch]="gFilter.uiType">
+  <g-date-filter *ngSwitchCase="'date'" [filter]="gFilter"></g-date-filter>
+  <g-number-filter *ngSwitchCase="'number'" [filter]="gFilter"></g-number-filter>
 </div>

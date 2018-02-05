@@ -44,7 +44,8 @@ import { ConfirmDialogComponent } from './components/dialogs/confirm-dialog/conf
 import { CreateDashboardComponent } from './components/create-dashboard/create-dashboard.component';
 import {
   GlobalFilterComponent,
-  GlobalDateFilterComponent
+  GlobalDateFilterComponent,
+  GlobalNumberFilterComponent
 } from './components/global-filter';
 import { GlobalFilterService } from './services/global-filter.service';
 import { FilterSidenavComponent } from './components/filter-sidenav/filter-sidenav.component';
@@ -68,6 +69,7 @@ const components = [
   ObserveViewComponent,
   DashboardGridComponent,
   GlobalFilterComponent,
+  GlobalNumberFilterComponent,
   GlobalDateFilterComponent,
   CreateDashboardComponent,
   AnalysisChoiceComponent,

@@ -1,3 +1,7 @@
+@import "../../../../../../../../themes/base/colors";
+
+$range-handle-dimension: 20px;
+
 global-filter {
   background-color: whitesmoke;
   box-sizing: border-box;
@@ -12,6 +16,36 @@ global-filter {
     flex-direction: row;
     justify-content: space-between;
     padding-bottom: 15px;
+  }
+
+  nouislider {
+    width: calc(100% - #{$range-handle-dimension});
+  }
+
+  .noUi-target.noUi-horizontal {
+    border: none;
+    box-shadow: none;
+    height: 5px;
+
+    .noUi-connect {
+      background-color: $primary-blue-b2;
+    }
+
+    .noUi-origin {
+      top: -2px;
+
+      .noUi-handle {
+        outline: none;
+        width: $range-handle-dimension;
+        height: $range-handle-dimension;
+        border-radius: 50%;
+
+        &::before,
+        &::after {
+          display: none;
+        }
+      }
+    }
   }
 
   .mat-expansion-panel-header {

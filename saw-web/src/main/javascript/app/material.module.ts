@@ -2,6 +2,7 @@ declare const require: any;
 
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NouisliderModule } from 'ng2-nouislider';
 import {
   MatButtonModule,
   MatRadioModule,
@@ -20,6 +21,8 @@ import {
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
+require('nouislider/distribute/nouislider.min.css');
+
 import '../../../../themes/_angular_next.scss';
 
 @NgModule({
@@ -37,7 +40,8 @@ import '../../../../themes/_angular_next.scss';
     MatFormFieldModule,
     MatProgressBarModule,
     MatChipsModule,
-    MatInputModule
+    MatInputModule,
+    NouisliderModule
   ],
   exports: [
     MatButtonModule,
@@ -52,7 +56,8 @@ import '../../../../themes/_angular_next.scss';
     MatFormFieldModule,
     MatProgressBarModule,
     MatChipsModule,
-    MatInputModule
+    MatInputModule,
+    NouisliderModule
   ]
 })
 export class MaterialModule {}
