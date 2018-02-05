@@ -7,10 +7,12 @@ import java.util.Map;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.PrefixQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
+import org.elasticsearch.index.query.WildcardQueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
@@ -325,40 +327,57 @@ public class QueryBuilderUtil {
 
 	public static List<QueryBuilder> stringFilterPivot (com.synchronoss.querybuilder.model.pivot.Filter item, List<QueryBuilder> builder)
 	{
-		if (item.getModel().getOperator().value().equals(Operator.EQ.value()) ||
-				item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
+		// EQ
+		if(item.getModel().getOperator().value().equals(Operator.EQ.value())) {
 			TermsQueryBuilder termsQueryBuilder =
-					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+					new TermsQueryBuilder(item.getColumnName(), item.getModel().getStringValue());
 			builder.add(termsQueryBuilder);
 		}
 
-		if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
-				item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
+		// NEQ
+		if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
 			QueryBuilder qeuryBuilder =
-					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+					new TermsQueryBuilder(item.getColumnName(), item.getModel().getStringValue());
 			BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
 			boolQueryBuilder.mustNot(qeuryBuilder);
 			builder.add(boolQueryBuilder);
 		}
 
-		// assuming that it will be only one string for wildcard search
+//		if (item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
+//			TermsQueryBuilder termsQueryBuilder =
+//					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+//			builder.add(termsQueryBuilder);
+//		}
+//
+//		if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
+//				item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
+//			QueryBuilder qeuryBuilder =
+//					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+//			BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+//			boolQueryBuilder.mustNot(qeuryBuilder);
+//			builder.add(boolQueryBuilder);
+//		}
+
+		// prefix query builder - not analyzed
 		if (item.getModel().getOperator().value().equals(Operator.SW.value())) {
-			MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
-					item.getModel().getStringValue() + "*");
-			builder.add(matchQueryBuilder);
+			PrefixQueryBuilder pqb = new PrefixQueryBuilder(item.getColumnName(),
+					item.getModel().getStringValue());
+			builder.add(pqb);
 		}
 
-		// assuming that it will be only one string for wildcard search
+		// using wildcard as there's no suffix query type provided by
+		// elasticsearch
 		if (item.getModel().getOperator().value().equals(Operator.EW.value())) {
-			MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
+			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
 					"*"+item.getModel().getStringValue());
-			builder.add(matchQueryBuilder);
+			builder.add(wqb);
 		}
 
+		// same for contains clause - not analyzed query
 		if (item.getModel().getOperator().value().equals(Operator.CONTAINS.value())) {
-			MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
-					"*"+item.getModel().getStringValue()+"*");
-			builder.add(matchQueryBuilder);
+			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
+					"*" + item.getModel().getStringValue()+"*");
+			builder.add(wqb);
 		}
 //		if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
 //			BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();

@@ -140,11 +140,11 @@
                         "ISNOTIN"
                       ],
                       "id":"/properties/filters/model/properties/booleanCriteria",
-                      "type":"integer"
+                      "type":["integer", "string"]
                     },
                     "value":{
                       "id":"/properties/filters/model/properties/value",
-                      "type":"integer"
+                      "type":["integer", "string"]
                     },
                     "otherValue":{
                       "id":"/properties/filters/model/properties/otherValue",
