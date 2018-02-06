@@ -165,6 +165,7 @@ angular.module(AnalyzeModule, [
     ReactiveFormsModule
   ],
   declarations: [
+    AnalyzeReportQueryComponent,
     DesignerDialogComponent,
     DesignerContainerComponent,
     DesignerHeaderComponent,
@@ -188,6 +189,7 @@ angular.module(AnalyzeModule, [
     ArtifactColumns2PivotFieldsPipe
   ],
   entryComponents: [
+    AnalyzeReportQueryComponent,
     DesignerDialogComponent,
     DesignerContainerComponent,
     DesignerHeaderComponent,
