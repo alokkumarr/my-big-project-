@@ -305,21 +305,4 @@ echo PreRemove done: ${app.nameVer}
     </plugins>
   </build>
 
-  <distributionManagement>
-    <repository>
-      <id>client-releases</id>
-      <name>SNCR Repository</name>
-      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-releases</url>
-    </repository>
-    <snapshotRepository>
-      <id>client-snapshots</id>
-      <name>SNCR Snapshot Repository</name>
-      <url>http://mavenrepo.synchronoss.net:8081/nexus/content/repositories/client-snapshots</url>
-    </snapshotRepository>
-    <site>
-      <id>sncr-libs-releases</id>
-      <url>dav:http://mavenrepo.synchronoss.net:8081/nexus/content/sites/sites/components/sncr-gateway</url>
-    </site>
-  </distributionManagement>
-  
 </project>
