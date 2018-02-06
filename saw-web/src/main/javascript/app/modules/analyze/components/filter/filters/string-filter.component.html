@@ -1,18 +1,18 @@
 <div layout="row">
   <md-input-container md-no-float>
-    <md-select ng-model="$ctrl.tempModel.operator" ng-change="$ctrl.onPresetSelected()" style="width: 130px">
+    <md-select ng-model="$ctrl.keywords.operator" ng-change="$ctrl.onPresetSelected()" style="width: 130px">
       <md-option ng-repeat="operator in $ctrl.presets" ng-value="operator.value">
         {{operator.label}}
       </md-option>
     </md-select>
   </md-input-container>
-  <div layout="row" layout-align="center" ng-if="!$ctrl.displayChips" flex>
+  <div layout="row" layout-align="center" ng-if="$ctrl.keywords.operator === 'EQ' || $ctrl.keywords.operator === 'NEQ' || $ctrl.keywords.operator === 'CONTAINS' || $ctrl.keywords.operator === 'SW' || $ctrl.keywords.operator === 'EW'" flex>
     <md-input-container >
       <input ng-model="$ctrl.tempModel.value" md-placeholder="Enter Value" ng-change="$ctrl.onModelChange()"/>
     </md-input-container>
   </div>
 </div>
-<md-chips ng-if="$ctrl.displayChips"
+<md-chips ng-if="$ctrl.keywords.operator === 'ISIN' || $ctrl.keywords.operator === 'ISNOTIN'"
           ng-model="$ctrl.keywords.modelValues"
           required
           md-on-add="$ctrl.onChange({model: $ctrl.keywords})"

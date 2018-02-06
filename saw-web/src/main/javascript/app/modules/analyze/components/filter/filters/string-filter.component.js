@@ -49,25 +49,17 @@ export const StringFilterComponent = {
       this.keywords = this.model || {modelValues: []};
       this.model = this.model || {};
       this.tempModel = {};
+      this.tempModel.value = this.keywords.modelValues[0];
     }
 
     onPresetSelected() {
-      if (this.tempModel.operator === 'IsIn' || this.tempModel.operator === 'IsNotIn') {
-        this.displayChips = true;
-      } else {
-        this.displayChips = false;
-      }
       this.tempModel.value = null;
-      this.onChange({model: {operator: this.tempModel.operator}});
+      this.keywords.modelValues = [];
     }
 
     onModelChange() {
-      this.updatedDate = this.model || {
-        value: ''
-      };
-      this.updatedDate.stringValue = this.tempModel.value;
-      this.updatedDate.operator = this.tempModel.operator;
-      this.onChange({model: this.updatedDate});
+      this.keywords.modelValues.push(this.tempModel.value);
+      this.onChange({model: this.keywords});
     }
   }
 };
