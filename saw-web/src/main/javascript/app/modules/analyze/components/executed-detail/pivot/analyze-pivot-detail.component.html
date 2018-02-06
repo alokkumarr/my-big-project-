@@ -23,7 +23,10 @@
     </div>
 
     <div layout="column" layout-align="space-between center">
-      <pivot-grid updater="$ctrl.pivotGridUpdater"></pivot-grid>
+      <pivot-grid [updater]="$ctrl.pivotGridUpdater"
+                  [artifact-columns]="$ctrl.analysis.artifacts[0].columns"
+                  [data]="$ctrl.data"
+                  [sorts]="$ctrl.analysis.sqlBuilder.sorts"></pivot-grid>
     </div>
   </md-card-content>
 </md-card>

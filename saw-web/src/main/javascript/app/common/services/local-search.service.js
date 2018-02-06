@@ -56,8 +56,8 @@ export function LocalSearchService($q) {
     };
 
     const searchConfig = searchCriteria.field ?
-          filter(fieldConfig, config => config.keyword.toUpperCase() === searchCriteria.field.toUpperCase()) :
-          fieldConfig;
+      filter(fieldConfig, config => config.keyword.toUpperCase() === searchCriteria.field.toUpperCase()) :
+      fieldConfig;
 
     if (!searchConfig || searchConfig.length === 0) {
       return $q.reject(new Error(`"${searchCriteria.field}" column does not exist.`));
@@ -66,8 +66,8 @@ export function LocalSearchService($q) {
     const result = filter(data, row => {
       return some(searchConfig, config => {
         const rowValue = angular.isFunction(config.accessor) ?
-              config.accessor(row[config.fieldName]) :
-              row[config.fieldName];
+          config.accessor(row[config.fieldName]) :
+          row[config.fieldName];
         return searchCriteria.exact ?
           matchFull(rowValue) :
           matchIn(rowValue);

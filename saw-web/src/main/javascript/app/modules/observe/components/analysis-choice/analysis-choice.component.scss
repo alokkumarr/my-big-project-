@@ -3,7 +3,7 @@ analysis-choice {
     display: flex;
     flex-direction: column;
 
-    md-select {
+    mat-form-field {
       min-width: 20vw;
     }
   }

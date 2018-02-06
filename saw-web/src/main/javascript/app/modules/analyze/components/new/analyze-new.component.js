@@ -7,7 +7,7 @@ import * as template from './analyze-new.component.html';
 import style from './analyze-new.component.scss';
 import emptyTemplate from './analyze-new-empty.html';
 
-import {AnalyseTypes, ENTRY_MODES, ANALYSIS_METHODS} from '../../consts';
+import {AnalyseTypes, ENTRY_MODES, ANALYSIS_METHODS, Events} from '../../consts';
 
 export const AnalyzeNewComponent = {
   template,
@@ -17,12 +17,14 @@ export const AnalyzeNewComponent = {
   },
   styles: [style],
   controller: class AnalyzeNewController {
-    constructor($scope, $mdDialog, AnalyzeService) {
+    constructor($scope, $mdDialog, AnalyzeService, AnalyzeDialogService, $eventEmitter) {
       'ngInject';
       this._$scope = $scope;
       this._$mdDialog = $mdDialog;
       this._AnalyzeService = AnalyzeService;
       this.methods = ANALYSIS_METHODS;
+      this._AnalyzeDialogService = AnalyzeDialogService;
+      this._$eventEmitter = $eventEmitter;
     }
 
     $onInit() {
@@ -74,6 +76,32 @@ export const AnalyzeNewComponent = {
       });
     }
 
+    openUpgradedModal() {
+      const semanticId = this.selectedMetric.id;
+      const metricName = this.selectedMetric.metricName;
+      const method = this.selectedAnalysisMethod.split(':');
+      const isChartType = method[0] === 'chart';
+      const type = isChartType ? method[0] : method[1];
+      const chartType = isChartType ? method[1] : null;
+      const model = {
+        type,
+        chartType,
+        categoryId: this.subCategory,
+        semanticId,
+        metricName,
+        name: 'Untitled Analysis',
+        description: '',
+        scheduled: null
+      };
+      this._AnalyzeDialogService.openNewAnalysisDialog(model)
+        .afterClosed().subscribe(successfullySaved => {
+          if (successfullySaved) {
+            this.$dialog.hide(successfullySaved);
+            this._$eventEmitter.emit(Events.AnalysesRefresh);
+          }
+        });
+    }
+
     isOfType(method, inputType) {
       const referenceType = method.supportedTypes || method.type;
 
@@ -112,16 +140,8 @@ export const AnalyzeNewComponent = {
         break;
       /* eslint-enable no-fallthrough */
       case 'table:pivot':
-        tpl = `<analyze-pivot model="model" mode="${mode}"></analyze-pivot>`;
-        model = {
-          type: AnalyseTypes.Pivot,
-          name: 'Untitled Analysis',
-          description: '',
-          categoryId: this.subCategory,
-          semanticId,
-          scheduled: null
-        };
-        break;
+        this.openUpgradedModal();
+        return;
       case 'chart:column':
       case 'chart:bar':
       case 'chart:line':
@@ -166,6 +186,7 @@ export const AnalyzeNewComponent = {
       }).then(successfullySaved => {
         if (successfullySaved) {
           this.$dialog.hide(successfullySaved);
+          this._$eventEmitter.emit(Events.AnalysesRefresh);
         }
       });
     }

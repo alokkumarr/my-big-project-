@@ -4,7 +4,7 @@ import * as find from 'lodash/find';
 import * as template from './analyze-save-dialog.component.html';
 import style from './analyze-save-dialog.component.scss';
 
-import {Events, PRIVILEGES} from '../../consts';
+import {PRIVILEGES} from '../../consts';
 
 export const AnalyzeSaveDialogComponent = {
   template,
@@ -14,11 +14,10 @@ export const AnalyzeSaveDialogComponent = {
     onSave: '&'
   },
   controller: class AnalyzeSaveDialogController {
-    constructor($mdDialog, $timeout, $eventEmitter, AnalyzeService) {
+    constructor($mdDialog, $timeout, AnalyzeService) {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this._$timeout = $timeout;
-      this._$eventEmitter = $eventEmitter;
       this._AnalyzeService = AnalyzeService;
 
       this.dataHolder = [];
@@ -59,9 +58,6 @@ export const AnalyzeSaveDialogComponent = {
             this.onSave({
               $data: payload
             });
-
-            this._$eventEmitter.emit(Events.AnalysesRefresh, payload);
-
             // if saved successfully
             this.$dialog.hide(true);
             // use this.$dialog.cancel(); on error

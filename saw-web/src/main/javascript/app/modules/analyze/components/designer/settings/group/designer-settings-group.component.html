@@ -1,0 +1,24 @@
+<div>
+  <span class ="settings__group__title">
+      {{groupAdapter.title}}
+  </span>
+  <div *ngIf="artifactColumns"
+       class="settings__group__list"
+       dndSortableContainer
+       [dndContainer]="groupAdapter"
+       [dndAllowDropFn]="allowDropFn"
+       [dndAddToCallback]="addToCallback">
+    <expandable-field *ngFor="let artifactColumn of artifactColumns; let i = index; trackBy: trackByFn"
+                      [dndSortable]="artifactColumn"
+                      [dndSortableIndex]="i"
+                      [dndRemoveFromCallback]="removeFromCallback"
+                      [dndContainer]="groupAdapter"
+                      (change)="onFieldPropChange()"
+                      [artifactColumn]="artifactColumn"
+                      [analysisType]="groupAdapter.type"
+                      (removeRequest)="onRemoveField(artifactColumn)"
+                      class="settings__list-item"
+                      [e2e]="'designer-expandable-field-' + (artifactColumn.aliasName || artifactColumn.displayName)">
+    </expandable-field>
+  </div>
+</div>

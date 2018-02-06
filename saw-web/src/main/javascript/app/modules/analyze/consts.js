@@ -1,5 +1,7 @@
 import * as fpGroupBy from 'lodash/fp/groupBy';
 import * as fpPipe from 'lodash/fp/pipe';
+import * as map from 'lodash/map';
+import * as reduce from 'lodash/reduce';
 import * as fpMapValues from 'lodash/fp/mapValues';
 
 import {NUMBER_TYPES, DATE_TYPES, CHART_COLORS, BACKEND_TIMEZONE} from '../../common/consts.js';
@@ -24,6 +26,38 @@ export const ENTRY_MODES = {
 export const LAST_ANALYSES_CATEGORY_ID = 'lastAnalysesListId';
 
 export {NUMBER_TYPES, DATE_TYPES, CHART_COLORS, BACKEND_TIMEZONE};
+
+export const TYPE_MAP = reduce([
+  ...map(NUMBER_TYPES, type => ({type, generalType: 'number'})),
+  ...map(DATE_TYPES, type => ({type, generalType: 'date'})),
+  {type: 'string', generalType: 'string'}
+], (typeMap, {type, generalType}) => {
+  typeMap[type] = generalType;
+  return typeMap;
+}, {});
+
+export const TYPE_ICONS = [{
+  icon: 'icon-number-type',
+  label: 'Number',
+  value: 'number'
+}, {
+  icon: 'icon-string-type',
+  label: 'String',
+  value: 'string'
+}, {
+  icon: 'icon-calendar',
+  label: 'Date',
+  value: 'date'
+}];
+
+export const TYPE_ICONS_OBJ = fpPipe(
+  fpGroupBy('type'),
+  fpMapValues(v => v[0])
+)([
+  ...map(NUMBER_TYPES, type => ({type, icon: 'icon-number-type'})),
+  ...map(DATE_TYPES, type => ({type, icon: 'icon-calendar'})),
+  {type: 'string', icon: 'icon-string-type'}
+]);
 
 export const MAX_POSSIBLE_FIELDS_OF_SAME_AREA = 5;
 
@@ -195,3 +229,93 @@ export const CHART_TYPES_OBJ = fpPipe(
   fpGroupBy('type'),
   fpMapValues(v => v[0])
 )(ANALYSIS_METHODS[1].children);
+
+export const AREA_TYPES = [{
+  label: 'Row',
+  value: 'row',
+  icon: 'icon-row'
+}, {
+  label: 'Column',
+  value: 'column',
+  icon: 'icon-column'
+}, {
+  label: 'Data',
+  value: 'data',
+  icon: 'icon-data'
+}];
+
+export const DEFAULT_AREA_TYPE = AREA_TYPES[0];
+export const AREA_TYPES_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(AREA_TYPES);
+
+export const DATE_INTERVALS = [{
+  label: 'All',
+  value: undefined
+}, {
+  label: 'Year',
+  value: 'year'
+}, {
+  label: 'Quarter',
+  value: 'quarter',
+  format: 'YYYY-Q'
+}, {
+  label: 'Month',
+  value: 'month',
+  format: 'YYYY-MM'
+}, {
+  label: 'Date',
+  value: 'day',
+  format: 'YYYY-MM-DD'
+}];
+
+export const DEFAULT_DATE_INTERVAL = DATE_INTERVALS[4];
+
+export const DATE_INTERVALS_OBJ = fpPipe(
+  fpGroupBy('value'),
+  fpMapValues(v => v[0])
+)(DATE_INTERVALS);
+
+export const CUSTOM_DATE_PRESET_VALUE = 'NA';
+export const DATE_PRESETS = [{
+  value: 'TW',
+  keyword: 'THIS_WEEK',
+  label: 'This Week'
+}, {
+  value: 'MTD',
+  keyword: 'MONTH_TO_DATE',
+  label: 'MTD (Month to Date)'
+}, {
+  value: 'YTD',
+  keyword: 'YEAR_TO_DATE',
+  label: 'YTD (Year to Date)'
+}, {
+  value: 'LW',
+  keyword: 'LAST_WEEK',
+  label: 'Last Week'
+}, {
+  value: 'LTW',
+  keyword: 'LAST_2_WEEKS',
+  label: 'Last 2 Weeks'
+}, {
+  value: 'LM',
+  keyword: 'LAST_MONTH',
+  label: 'Last Month'
+}, {
+  value: 'LQ',
+  keyword: 'LAST_QUARTER',
+  label: 'Last Quarter'
+}, {
+  value: 'LTM',
+  keyword: 'LAST_3_MONTHS',
+  label: 'Last 3 Months'
+}, {
+  value: 'LSM',
+  keyword: 'LAST_6_MONTHS',
+  label: 'Last 6 Months'
+}, {
+  value: CUSTOM_DATE_PRESET_VALUE,
+  keyword: 'CUSTOM',
+  label: 'Custom'
+}];
