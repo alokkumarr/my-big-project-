@@ -22,10 +22,10 @@ const defaultTimeoutInterval = 10000;
 /**
  * Fixes error: Timed out waiting for asynchronous Angular tasks to finish after n seconds
  */
-//const allScriptsTimeout = 30000;
+const allScriptsTimeout = 30000;
 
 exports.config = {
-  //allScriptsTimeout: allScriptsTimeout,
+  allScriptsTimeout: allScriptsTimeout,
   framework: 'jasmine2',
   seleniumAddress: 'http://localhost:4444/wd/hub',
   directConnect: true,
@@ -52,14 +52,14 @@ exports.config = {
   },
   suites: {
     charts: [
-      webpackHelper.root('src/test/e2e-tests/charts/applyFiltersToCharts.js'),
+      /*webpackHelper.root('src/test/e2e-tests/charts/applyFiltersToCharts.js'),
       webpackHelper.root('src/test/e2e-tests/charts/createAndDeleteCharts.test.js'),
-      webpackHelper.root('src/test/e2e-tests/charts/previewForCharts.test.js')
+      webpackHelper.root('src/test/e2e-tests/charts/previewForCharts.test.js')*/
     ],
     root: [
-      webpackHelper.root('src/test/e2e-tests/analyze.test.js'),
+      /*webpackHelper.root('src/test/e2e-tests/analyze.test.js'),
       webpackHelper.root('src/test/e2e-tests/createPivot.test.js'),
-      webpackHelper.root('src/test/e2e-tests/createReport.test.js'),
+      webpackHelper.root('src/test/e2e-tests/createReport.test.js'),*/
       //webpackHelper.root('src/test/e2e-tests/debug.test.js') // for testing purposes
       webpackHelper.root('src/test/e2e-tests/login.test.js'),
       webpackHelper.root('src/test/e2e-tests/priviliges.test.js'),
