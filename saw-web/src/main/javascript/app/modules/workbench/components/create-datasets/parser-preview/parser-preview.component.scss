@@ -1,0 +1,39 @@
+@import "themes/base/colors";
+
+parser-preview {
+  width: 100%;
+
+  mat-tab-group {
+    max-width: 100%;
+  }
+
+  .mat-tab-label-active {
+    color: $primary-blue-b2;
+  }
+
+  .mat-tab-body-wrapper {
+    height: 100%;
+  }
+
+  .fieldType {
+    border-color: #C4C4C4;
+    border-radius: 3px;
+    font-size: 11px;
+    color: rgba(0, 0, 0, 0.69);
+  }
+
+  .formatEditIcon {
+    height: 0;
+    width: 0;
+    font-size: 16px;
+  }
+
+  .fTypeGroup {
+    margin-top: -10px;
+    z-index: 99;
+  }
+
+  .mat-form-field-infix {
+    padding: 0 !important;
+  }
+}

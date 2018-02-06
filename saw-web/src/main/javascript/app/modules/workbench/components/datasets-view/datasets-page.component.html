@@ -1,0 +1,50 @@
+<div class="dataSets-view" fxLayout="column" fxLayoutWrap fxFlex>
+  <mat-toolbar class="toolbar-white">
+    <div class="md-toolbar-tools">
+      <div fxFlex="50" fxLayout="row">
+        <div class="mat-title">Data Sets</div>
+        &nbsp;
+        <!-- <search-box placeholder="Search Data Sets"
+                    ng-model="$ctrl.states.searchTerm"
+                    on-change="$ctrl.applySearchFilter()" delay="1000"></search-box> -->
+      </div>
+      <div fxFlex="20" fxLayout="row">
+        <div class="dataSets-view_switch-view">
+          <mat-radio-group [(ngModel)]="viewState" (ngModelChange)="onViewChange()">
+            <mat-radio-button [value]="LIST_VIEW">
+              <mat-icon fontIcon="icon-Table-view">
+                <span matTooltip="List View"></span>
+              </mat-icon>
+            </mat-radio-button>
+
+            <mat-radio-button [value]="CARD_VIEW">
+              <mat-icon fontIcon="icon-card-view">
+                <span matTooltip="Card View"></span>
+              </mat-icon>
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+      </div>
+
+      <div fxFlex="30" class="dataSets-view_action-panel" fxLayout="row" fxLayoutAlign="end center">
+        <button mat-button mat-raised-button mat-primary color="primary" (click)="addDataSet()">
+          + Data Set
+        </button>
+      </div>
+    </div>
+  </mat-toolbar>
+
+  <div id="datasets-container" fxLayout="column" [ngSwitch]="viewState" style="background-color: whitesmoke; overflow: auto;">
+
+    <!-- LIST VIEW -->
+
+    <div class="dataSets-view_sets-list" *ngSwitchCase="'list'">
+      <datasets-grid-page [updater]="updater" [searchTerm]="states.searchTermValue"></datasets-grid-page>
+    </div>
+
+    <!-- CARD VIEW -->
+    <div fxFlex *ngSwitchCase="'card'">
+      <datasets-card-page fxLayout="row" fxLayoutAlign="start start" fxLayoutWrap [updater]="updater" [searchTerm]="states.searchTermValue"></datasets-card-page>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,39 @@
+<div class="dataSets-cardView" fxLayout="row" fxLayoutAlign="start start" fxLayoutWrap>
+  <div fxFlex.gt-md="25" fxFlex.md="33" fxFlex.lt-md="50" fxFlex.lt-sm="100" *ngFor="let sets of dataSets">
+    <mat-card class="datasets-card">
+      <mat-card-header>
+        <div class="mat-title" fxFlex="70" fxFlex.gt-md="80" fxFlex.md="80" [innerHTML]="sets.set"></div>
+        <div fxFlex="30" fxFlex.gt-md="20" fxFlex.md="20" class="src-img {{sets.src}}"></div>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content class="mat-body-1">
+        <div class="margin-btm-9" fxLayout="row" fxLayoutWrap>
+          <div fxFlex="70" class="mat-body-1">No.Of Data Pods:
+            <span [innerHTML]="sets.meta.numFiles"></span>
+          </div>
+          <div class="mat-caption" fxLayoutAlign="end end" fxFlex="30">Size: {{sets.meta.size}}</div>
+        </div>
+        <div class="descr margin-btm-9">
+          <div>Description:
+            <span [innerHTML]="sets.meta.descr"></span>
+          </div>
+        </div>
+        <div class="margin-btm-9" fxLayout="row" fxLayoutWrap>
+          <div fxFlex="35" fxLayout="column" fxLayoutAlign="start start">Added By:
+            <span [innerHTML]="sets.meta.addedBy"></span>
+          </div>
+          <div fxFlex="65
+                    " fxLayout="column" fxLayoutAlign="center end">Last Updated By:
+            <div fxLayout="row" style="align-items: baseline;">
+              <span [innerHTML]="sets.meta.updatedBy"></span> @
+              <span class="mat-caption" [innerHTML]="sets.meta.lastUpdated | date : 'short'"></span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  <div class="dataSets-view_no-results" *ngIf="searchTerm && !cardsData.length">
+    <span translate="NO_MATCHING_RESULTS"></span>
+  </div>
+</div>

@@ -11,7 +11,6 @@ import {
   MatFormFieldModule,
   MatProgressBarModule,
   MatChipsModule,
-  // NoConflictStyleCompatibilityMode,
   MatIconRegistry,
   MatListModule,
   MatCheckboxModule,
@@ -19,24 +18,30 @@ import {
   MatTooltipModule,
   MatDatepickerModule,
   MatInputModule,
-  MatToolbarModule
+  MatToolbarModule,
+  MatCardModule,
+  MatGridListModule,
+  MatStepperModule,
+  MatSliderModule,
+  MatSlideToggleModule,
+  MatTabsModule,
+  MatDividerModule,
+  MatExpansionModule,
+  MatButtonToggleModule
 } from '@angular/material';
-import {MatExpansionModule} from '@angular/material/expansion';
-import {MatButtonToggleModule} from '@angular/material/button-toggle';
-import {MatCardModule} from '@angular/material/card';
-import {MatMomentDateModule} from '@angular/material-moment-adapter';
+
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
 import '../../../../themes/_angular_next.scss';
 @NgModule({
   imports: [
-    // NoConflictStyleCompatibilityMode,
     BrowserAnimationsModule,
     MatButtonModule,
-    MatIconModule,
-    MatDialogModule,
     MatRadioModule,
     MatSelectModule,
+    MatIconModule,
+    MatDialogModule,
     MatFormFieldModule,
     MatProgressBarModule,
     MatChipsModule,
@@ -44,21 +49,27 @@ import '../../../../themes/_angular_next.scss';
     MatCheckboxModule,
     MatMenuModule,
     MatTooltipModule,
+    MatDatepickerModule,
+    MatInputModule,
+    MatToolbarModule,
+    MatCardModule,
+    MatGridListModule,
+    MatStepperModule,
+    MatDividerModule,
+    MatSliderModule,
+    MatSlideToggleModule,
+    MatTabsModule,
     MatExpansionModule,
     MatButtonToggleModule,
-    MatInputModule,
-    MatCardModule,
-    MatDatepickerModule,
-    MatMomentDateModule,
-    MatToolbarModule
+    MatMomentDateModule
   ],
   providers: [MatIconRegistry],
   exports: [
     MatButtonModule,
-    MatIconModule,
-    MatDialogModule,
     MatRadioModule,
     MatSelectModule,
+    MatIconModule,
+    MatDialogModule,
     MatFormFieldModule,
     MatProgressBarModule,
     MatChipsModule,
@@ -66,13 +77,19 @@ import '../../../../themes/_angular_next.scss';
     MatCheckboxModule,
     MatMenuModule,
     MatTooltipModule,
+    MatDatepickerModule,
+    MatInputModule,
+    MatToolbarModule,
+    MatCardModule,
+    MatGridListModule,
+    MatStepperModule,
+    MatDividerModule,
+    MatSliderModule,
+    MatSlideToggleModule,
+    MatTabsModule,
     MatExpansionModule,
     MatButtonToggleModule,
-    MatInputModule,
-    MatCardModule,
-    MatDatepickerModule,
-    MatMomentDateModule,
-    MatToolbarModule
+    MatMomentDateModule
   ]
 })
-export class MaterialModule {}
+export class MaterialModule { }

@@ -1,0 +1,107 @@
+@import "themes/base/colors";
+
+datasets-card-page {
+  width: 100%;
+}
+
+.dataSets-cardView {
+  .md-subhead {
+    color: #0096D5;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .btn-card2 {
+    background-color: #636363 !important;
+    color: #FFF !important;
+    padding: 2px 15px;
+  }
+}
+
+.branded-column-name {
+  color: $primary-blue-b2;
+  font-weight: 600;
+}
+
+.datasets-card {
+  transition: box-shadow 0.5s;
+  border-radius: 5px !important;
+  padding: 3px !important;
+  margin: 7px;
+
+  &:hover {
+    box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2), 0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  .mat-title {
+    margin: 0 !important;
+  }
+
+  mat-card-header {
+    padding: 6px;
+    color: $primary-blue-b2;
+    font-weight: normal;
+  }
+
+  .src-img {
+    height: 18px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+
+    &.fs {
+      background-image: url('../../../../../../../../../assets/svg/mapr.svg');
+    }
+
+    &.es {
+      background-image: url('../../../../../../../../../assets/svg/elastic.svg');
+    }
+  }
+
+  mat-card-content {
+    padding: 16px;
+    font-size: 14px;
+  }
+
+  span {
+    word-wrap: break-word;
+  }
+
+  .descr {
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    line-height: 16px;
+    max-height: 32px;
+    min-height: 32px;
+    -webkit-line-clamp: 2; /* number of lines to show */
+    -webkit-box-orient: vertical;
+  }
+
+  &_quick-view {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #FFF;
+    text-transform: capitalize;
+    cursor: pointer;
+    opacity: 0;
+    height: 35px;
+    padding: 0;
+    transition: background-color 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    vertical-align: middle;
+  }
+
+  .datasets-card_quick-view:hover {
+    background-color: rgba(0, 0, 0, 0.9) !important;
+  }
+}
+
+.fs {
+  background-image: url('../../../../../../../../../assets/svg/mapr.svg');
+  background-color: #C8102E;
+}
+
+.es {
+  background-image: url('../../../../../../../../../assets/svg/elastic.svg');
+}
+
