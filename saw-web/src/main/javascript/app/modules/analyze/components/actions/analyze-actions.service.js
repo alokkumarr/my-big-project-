@@ -84,6 +84,7 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
     };
 
     switch (analysis.type) {
+    case AnalyseTypes.ESReport:
     case AnalyseTypes.Report:
       openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
       break;

@@ -1,3 +1,5 @@
+import * as get from 'lodash/get';
+
 import * as template from './analyze-report-preview.component.html';
 import style from './analyze-report-preview.component.scss';
 
@@ -20,6 +22,7 @@ export const AnalyzeReportPreviewComponent = {
 
     $onInit() {
       // this._$timeout(() => this.reloadPreviewGrid());
+      this.showChecked = !get(this.model, 'report.queryManual');
     }
 
     cancel() {
