@@ -236,15 +236,53 @@ public class QueryBuilderUtil {
 
 	public static List<QueryBuilder> stringFilterChart (Filter item, List<QueryBuilder> builder)
 	{
-		if (item.getModel().getOperator().value().equals(Operator.EQ.value()) ||
-				item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
+		// EQ
+		if(item.getModel().getOperator().value().equals(Operator.EQ.value())) {
+			TermsQueryBuilder termsQueryBuilder =
+					new TermsQueryBuilder(item.getColumnName(), item.getModel().getStringValue());
+			builder.add(termsQueryBuilder);
+		}
+
+		// NEQ
+		if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
+			QueryBuilder qeuryBuilder =
+					new TermsQueryBuilder(item.getColumnName(), item.getModel().getStringValue());
+			BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+			boolQueryBuilder.mustNot(qeuryBuilder);
+			builder.add(boolQueryBuilder);
+		}
+
+
+		// prefix query builder - not analyzed
+		if (item.getModel().getOperator().value().equals(Operator.SW.value())) {
+			PrefixQueryBuilder pqb = new PrefixQueryBuilder(item.getColumnName(),
+					item.getModel().getStringValue());
+			builder.add(pqb);
+		}
+
+		// using wildcard as there's no suffix query type provided by
+		// elasticsearch
+		if (item.getModel().getOperator().value().equals(Operator.EW.value())) {
+			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
+					"*"+item.getModel().getStringValue());
+			builder.add(wqb);
+		}
+
+		// same for contains clause - not analyzed query
+		if (item.getModel().getOperator().value().equals(Operator.CONTAINS.value())) {
+			WildcardQueryBuilder wqb = new WildcardQueryBuilder(item.getColumnName(),
+					"*" + item.getModel().getStringValue()+"*");
+			builder.add(wqb);
+		}
+
+
+		if (item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
 			TermsQueryBuilder termsQueryBuilder =
 					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
 			builder.add(termsQueryBuilder);
 		}
 
-		if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
-				item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
+		if (item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
 			QueryBuilder qeuryBuilder =
 					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
 			BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
@@ -252,31 +290,6 @@ public class QueryBuilderUtil {
 			builder.add(boolQueryBuilder);
 		}
 
-		// assuming that it will be only one string for wildcard search
-		if (item.getModel().getOperator().value().equals(Operator.SW.value())) {
-			MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
-					item.getModel().getStringValue() + "*");
-			builder.add(matchQueryBuilder);
-		}
-
-		// assuming that it will be only one string for wildcard search
-		if (item.getModel().getOperator().value().equals(Operator.EW.value())) {
-			MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
-					"*"+item.getModel().getStringValue());
-			builder.add(matchQueryBuilder);
-		}
-
-		if (item.getModel().getOperator().value().equals(Operator.CONTAINS.value())) {
-			MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(item.getColumnName(),
-					"*"+item.getModel().getStringValue()+"*");
-			builder.add(matchQueryBuilder);
-		}
-//		if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
-//			BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
-//			boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
-//					.getValue()));
-//			builder.add(boolQueryBuilderIn);
-//		}
 		return builder;
 	}
 	
@@ -343,20 +356,6 @@ public class QueryBuilderUtil {
 			builder.add(boolQueryBuilder);
 		}
 
-//		if (item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
-//			TermsQueryBuilder termsQueryBuilder =
-//					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-//			builder.add(termsQueryBuilder);
-//		}
-//
-//		if (item.getModel().getOperator().value().equals(Operator.NEQ.value()) ||
-//				item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
-//			QueryBuilder qeuryBuilder =
-//					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
-//			BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-//			boolQueryBuilder.mustNot(qeuryBuilder);
-//			builder.add(boolQueryBuilder);
-//		}
 
 		// prefix query builder - not analyzed
 		if (item.getModel().getOperator().value().equals(Operator.SW.value())) {
@@ -379,12 +378,22 @@ public class QueryBuilderUtil {
 					"*" + item.getModel().getStringValue()+"*");
 			builder.add(wqb);
 		}
-//		if (item.getModel().getOperator().value().equals(Operator.NEQ.value())) {
-//			BoolQueryBuilder boolQueryBuilderIn = new BoolQueryBuilder();
-//			boolQueryBuilderIn.mustNot(new TermQueryBuilder(item.getColumnName(), item.getModel()
-//					.getValue()));
-//			builder.add(boolQueryBuilderIn);
-//		}
+
+
+		if (item.getModel().getOperator().value().equals(Operator.ISIN.value())) {
+			TermsQueryBuilder termsQueryBuilder =
+					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+			builder.add(termsQueryBuilder);
+		}
+
+		if (item.getModel().getOperator().value().equals(Operator.ISNOTIN.value())) {
+			QueryBuilder qeuryBuilder =
+					new TermsQueryBuilder(item.getColumnName(), item.getModel().getModelValues());
+			BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
+			boolQueryBuilder.mustNot(qeuryBuilder);
+			builder.add(boolQueryBuilder);
+		}
+
 		return builder;
 	}
 }
