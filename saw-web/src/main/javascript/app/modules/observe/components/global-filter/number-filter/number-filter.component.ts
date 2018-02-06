@@ -22,5 +22,9 @@ export class GlobalNumberFilterComponent implements OnInit {
 
     this.value = [this.min, this.max];
   }
+
+  onSliderChange(data) {
+    this.value = data;
+  }
 }
 

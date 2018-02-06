@@ -4,6 +4,10 @@
   </mat-expansion-panel-header>
 
 
-  <nouislider [connect]="true" [min]="min" [max]="max" [(ngModel)]="value"></nouislider>
+  <nouislider [connect]="true"
+    [min]="min"
+    [max]="max"
+    [ngModel]="value"
+    (ngModelChange)="onSliderChange($event)"></nouislider>
 
 </mat-expansion-panel>
