@@ -39,6 +39,7 @@ export class AnalyzeDialogService {
 
   openAnalysisDialog(data: AnalysisDialogData) {
     return this.dialog.open(DesignerDialogComponent, {
+      panelClass: 'designer-dialog',
       width: '100vw',
       maxWidth: '100vw',
       height: '100vh',

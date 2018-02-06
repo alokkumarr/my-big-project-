@@ -6,15 +6,15 @@
     {{mode === 'create' ? 'Create new' : 'Edit'}} Dashboard
   </span>
   <div class="title-actions">
-    <!-- <button md-button>
+    <!-- <button mat-button>
       Description
     </button> -->
-    <button md-raised-button color="primary" (click)="saveDashboard()" [disabled]="this.fillState === 'empty'">
+    <button mat-raised-button color="primary" (click)="saveDashboard()" [disabled]="this.fillState === 'empty'">
       Save
     </button>
   </div>
 </div>
-<div md-dialog-content>
+<div mat-dialog-content>
   <dashboard-grid [model]="dashboard"
   [requester]="requester"
   [mode]="mode"

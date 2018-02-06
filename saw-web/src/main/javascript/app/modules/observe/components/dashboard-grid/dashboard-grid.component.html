@@ -1,7 +1,7 @@
 <gridster [options]="options" #gridster class="dashboard-gridster">
   <gridster-item [item]="item" *ngFor="let item of dashboard">
     <!-- <span class="analysis-title">{{item.analysis.name}}</span> -->
-    <button md-icon-button (click)="removeTile(item)" *ngIf="!isViewMode()">
+    <button mat-icon-button (click)="removeTile(item)" *ngIf="!isViewMode()">
       <mat-icon fontIcon="icon-close"></mat-icon>
     </button>
     <observe-chart *ngIf="item.analysis.type === 'chart'"

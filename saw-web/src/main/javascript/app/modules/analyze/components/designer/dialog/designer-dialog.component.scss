@@ -1,6 +1,6 @@
-mat-dialog-container.mat-dialog-container {
-  max-width: 100vw !important;
-  max-height: 100vh !important;
-  padding: 0;
-  overflow: hidden;
+.designer-dialog {
+  mat-dialog-container.mat-dialog-container {
+    padding: 0;
+    overflow: hidden;
+  }
 }
