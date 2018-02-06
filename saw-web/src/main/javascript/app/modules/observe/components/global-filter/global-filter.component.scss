@@ -18,6 +18,27 @@ global-filter {
     padding-bottom: 15px;
   }
 
+  .full-width {
+    width: 100%;
+  }
+
+  .mat-chip-list-wrapper {
+    width: 460px;
+
+    mat-chip {
+      margin-top: 5px;
+    }
+  }
+
+  mat-icon.remove-filter-chip {
+    text-align: right;
+
+    &::before {
+      font-size: 10px;
+      vertical-align: middle;
+    }
+  }
+
   nouislider {
     width: calc(100% - #{$range-handle-dimension});
   }

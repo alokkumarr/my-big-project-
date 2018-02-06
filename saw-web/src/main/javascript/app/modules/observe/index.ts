@@ -4,7 +4,7 @@ import { NgModule } from '@angular/core';
 import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CommonModule as AngularCommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GridsterModule } from 'angular-gridster2';
 
 import { routesConfig } from './routes';
@@ -45,7 +45,8 @@ import { CreateDashboardComponent } from './components/create-dashboard/create-d
 import {
   GlobalFilterComponent,
   GlobalDateFilterComponent,
-  GlobalNumberFilterComponent
+  GlobalNumberFilterComponent,
+  GlobalStringFilterComponent
 } from './components/global-filter';
 import { GlobalFilterService } from './services/global-filter.service';
 import { FilterSidenavComponent } from './components/filter-sidenav/filter-sidenav.component';
@@ -71,6 +72,7 @@ const components = [
   GlobalFilterComponent,
   GlobalNumberFilterComponent,
   GlobalDateFilterComponent,
+  GlobalStringFilterComponent,
   CreateDashboardComponent,
   AnalysisChoiceComponent,
   ObserveChartComponent,
@@ -80,7 +82,15 @@ const components = [
 ];
 
 @NgModule({
-  imports: [ AngularCommonModule, FormsModule, MaterialModule, GridsterModule, HttpClientModule, UIRouterUpgradeModule ],
+  imports: [
+    AngularCommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MaterialModule,
+    GridsterModule,
+    HttpClientModule,
+    UIRouterUpgradeModule
+  ],
   declarations: components,
   entryComponents: components,
   providers: [

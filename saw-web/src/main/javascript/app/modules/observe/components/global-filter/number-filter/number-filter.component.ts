@@ -22,9 +22,5 @@ export class GlobalNumberFilterComponent implements OnInit {
 
     this.value = [this.min, this.max];
   }
-
-  onValueChange(change) {
-    this.value = change.value;
-  }
 }
 
