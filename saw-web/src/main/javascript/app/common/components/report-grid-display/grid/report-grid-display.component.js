@@ -9,7 +9,6 @@ import * as reduce from 'lodash/reduce';
 
 import {FieldModel} from '../../jsPlumb/models/fieldModel';
 import DataSource from 'devextreme/data/data_source';
-import * as moment from 'moment-timezone';
 
 import * as template from './report-grid-display.component.html';
 

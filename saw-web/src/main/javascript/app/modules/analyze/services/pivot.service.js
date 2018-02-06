@@ -92,7 +92,7 @@ export function PivotService() {
     return area;
   }
 
-   /** Map the tree level to the columnName of the field
+  /** Map the tree level to the columnName of the field
    * Example:
    * row_field_1: 0 -> SOURCE_OS
    * row_field_2: 1 -> SOURCE_MANUFACTURER
