@@ -1,0 +1,11 @@
+<form [formGroup]="form" (ngSubmit)="submit(form)">
+    <mat-dialog-content>
+      <mat-form-field>
+        <input matInput formControlName="dateformat" placeholder="{{placeholder}}" />
+      </mat-form-field>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+      <button mat-button type="submit">OK</button>
+      <button mat-button type="button" style="color: #E5524C;" mat-dialog-close>Cancel</button>
+    </mat-dialog-actions>
+  </form>

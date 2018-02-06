@@ -2,20 +2,18 @@ import * as filter from 'lodash/filter';
 import * as some from 'lodash/some';
 import * as trim from 'lodash/trim';
 
-export function LocalSearchService($q) {
-  'ngInject';
-
-  return {
-    parseSearchTerm,
-    doSearch
-  };
+export class LocalSearchService {
+  constructor($q) {
+    'ngInject';
+    this._$q = $q;
+  }
 
   /* @searchTerm looks something like column:value
      Column is optional
      If value is enclosed within quotes like column:"value",
      the exact flag is set
      */
-  function parseSearchTerm(searchTerm = '') {
+  parseSearchTerm(searchTerm = '') {
     const searchText = searchTerm.split(':');
     const result = searchText.length > 1 ?
       {field: trim(searchText[0]), fullTerm: trim(searchText.slice(1).join(':'))} :
@@ -34,9 +32,9 @@ export function LocalSearchService($q) {
        fieldName: actual property name in any row in the @data array
        accessor: (optional) use for getting properties that are nested or require some modification
     */
-  function doSearch(searchCriteria, data = [], fieldConfig = []) {
+  doSearch(searchCriteria, data = [], fieldConfig = []) {
     if (!searchCriteria.trimmedTerm) {
-      return $q.resolve(data);
+      return this._$q.resolve(data);
     }
 
     const term = searchCriteria.trimmedTerm.toUpperCase();
@@ -60,7 +58,7 @@ export function LocalSearchService($q) {
       fieldConfig;
 
     if (!searchConfig || searchConfig.length === 0) {
-      return $q.reject(new Error(`"${searchCriteria.field}" column does not exist.`));
+      return this._$q.reject(new Error(`"${searchCriteria.field}" column does not exist.`));
     }
 
     const result = filter(data, row => {
@@ -74,6 +72,6 @@ export function LocalSearchService($q) {
       });
     });
 
-    return $q.resolve(result);
+    return this._$q.resolve(result);
   }
 }

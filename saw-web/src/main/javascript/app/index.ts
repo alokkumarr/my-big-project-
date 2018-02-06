@@ -27,6 +27,7 @@ import { CommonModuleTs } from './common';
 import { AnalyzeModule, AnalyzeModuleTs } from './modules/analyze';
 import { AlertsModule } from './modules/alerts';
 import { AdminModule } from './modules/admin';
+import {WorkbenchModule, WorkbenchUpgradeModule} from './modules/workbench';
 
 import { LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent } from './layout';
 
@@ -37,7 +38,8 @@ angular
     ObserveModule,
     AnalyzeModule,
     AlertsModule,
-    AdminModule
+    AdminModule,
+    WorkbenchModule
   ])
   .config(['$urlServiceProvider', ($urlService: UrlService) => $urlService.deferIntercept()])
   .config(routesConfig)
@@ -60,7 +62,8 @@ angular
     CommonModuleTs,
     AnalyzeModuleTs,
     ObserveUpgradeModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    WorkbenchUpgradeModule
   ],
   exports: [FlexLayoutModule],
   providers: [
