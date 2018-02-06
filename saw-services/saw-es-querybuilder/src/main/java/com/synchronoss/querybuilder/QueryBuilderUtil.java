@@ -295,8 +295,6 @@ public class QueryBuilderUtil {
 	
 
 	public static List<QueryBuilder> numericFilterPivot (com.synchronoss.querybuilder.model.pivot.Filter item, List<QueryBuilder> builder)
-<<<<<<< HEAD
-=======
     {
      
       if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
@@ -340,7 +338,6 @@ public class QueryBuilderUtil {
       return builder;
     }
 	public static List<QueryBuilder> numericFilterReport (com.synchronoss.querybuilder.model.report.Filter item, List<QueryBuilder> builder)
->>>>>>> origin/master
 	{
 
 		if (item.getModel().getOperator().value().equals(Operator.BTW.value())) {
