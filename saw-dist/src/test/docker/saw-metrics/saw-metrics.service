@@ -12,6 +12,7 @@ After=default.target
 Type=oneshot
 ExecStart=/root/saw-metrics/sample-elasticsearch/load-metric
 ExecStart=/root/saw-metrics/sample-spark/load-metric
+ExecStart=/root/saw-metrics/sample-csv/load
 SyslogIdentifier=saw-metrics
 
 [Install]

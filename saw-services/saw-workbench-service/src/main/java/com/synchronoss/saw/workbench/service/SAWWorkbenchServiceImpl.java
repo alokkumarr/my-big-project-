@@ -25,6 +25,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mapr.db.MapRDB;
 import com.synchronoss.saw.inspect.SAWDelimitedInspector;
 import com.synchronoss.saw.inspect.SAWDelimitedReader;
 import com.synchronoss.saw.workbench.AsyncConfiguration;
@@ -35,6 +36,7 @@ import com.synchronoss.saw.workbench.model.Project.ResultFormat;
 
 import sncr.bda.core.file.HFileOperations;
 import sncr.bda.metastore.DataSetStore;
+import sncr.bda.metastore.ProjectStore;
 import sncr.bda.services.DLMetadata;
 
 @Service
@@ -42,6 +44,11 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   
   private static final Logger logger = LoggerFactory.getLogger(SAWWorkbenchServiceImpl.class);
   
+  private static final String[] METADATA_TABLES = {
+      "auditlog", "datapods", "datasegments", "datasets", "projects",
+      "transformations"
+  };
+
   @Value("${workbench.project-key}")
   @NotNull
   private String defaultProjectId;
@@ -79,6 +86,11 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
           HFileOperations.createDir(defaultProjectRoot + defaultProjectPath);
         }
       }
+      String projectData = defaultProjectRoot + "/" + defaultProjectId +
+          "/dl/fs/data/test/data";
+      if (!HFileOperations.exists(projectData)) {
+          HFileOperations.createDir(projectData);
+      }
     } else {
       File directory = new File(defaultProjectRoot);
       if (!directory.exists()) {
@@ -94,6 +106,28 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     this.mdt = new DLMetadata(defaultProjectRoot);
     this.mdtStore = new DataSetStore(basePath);}
     this.tmpDir = System.getProperty("java.io.tmpdir");
+
+    /* Initialize metadata tables */
+    HFileOperations.createDir(defaultProjectRoot + "/metadata");
+    for (String table : METADATA_TABLES) {
+        createMetadataTable(table);
+    }
+    /* Initialize default project */
+    ProjectStore ps = new ProjectStore(defaultProjectRoot);
+    try {
+        ps.readProjectData(defaultProjectId);
+    } catch (Exception e) {
+        logger.info("Creating default project: {}", defaultProjectId);
+        ps.createProjectRecord(defaultProjectId, "{}");
+    }
+  }
+
+  private void createMetadataTable(String table) {
+    String path = defaultProjectRoot + "/metadata/" + table;
+    if(!MapRDB.tableExists(path)) {
+        logger.info("Creating metadata table: {}" + path);
+        MapRDB.createTable(path);
+    }
   }
 
   @Override

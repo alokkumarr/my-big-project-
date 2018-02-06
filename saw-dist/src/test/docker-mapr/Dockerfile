@@ -54,6 +54,10 @@ RUN sed -i -e '/^spark.master$/d' \
 # Workaround: Livy won't start due to root owning the logs directory,
 # so change the owner to the "mapr" user
 RUN chown mapr:mapr /opt/mapr/hue-livy/hue-livy-3.12.0/logs
+# Workaround: The Workbench JAR exceeds the default maximum upload
+# file size of Livy, so increase it.
+RUN echo "livy.file.upload.max.size = 500000000" \
+    >> /opt/mapr/hue-livy/hue-livy-3.12.0/conf/livy.conf
 
 # Add MapR container initialization script
 COPY saw-mapr-init /root/

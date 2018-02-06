@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# Load sample CSV file (for Workbench)
+#
+set -eu
+
+dir=$(dirname $0)
+
+# Load common metrics functions
+. $dir/../lib/common.sh
+
+datalake=$datalake_home/sample-csv
+
+init_datalake() {
+    $sudo_mapr hadoop fs -mkdir -p $datalake
+}
+
+load_data() {
+    echo "Loading sample CSV data"
+    $sudo_mapr $hadoop_put $dir/test.csv $datalake
+}
+
+wait_maprfs
+init_datalake
+load_data

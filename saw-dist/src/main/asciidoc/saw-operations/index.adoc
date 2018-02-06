@@ -22,6 +22,10 @@ provided in the environment:
 . Install and configure Apache Spark version 2.1 from the MapR
   Ecosystem Pack on the MapR cluster
 
+. Install and configure Apache Livy from the MapR Ecosystem Pack on
+  the MapR cluster, and set `livy.file.upload.max.size = 500000000` in
+  `livy.conf`
+
 . Provision a MapR user in the MapR cluster (with user ID 500)
 
 . Provision a mail relay host
@@ -90,6 +94,13 @@ for relevant operations.
 To upgrade an existing installation, follow the same steps as for
 installing an entirely new environment.  The deploy command will
 detect an already existing installation and upgrade it.
+
+==== Upgrading to SAW 2.5
+
+Before upgrading, install and configure Apache Livy from the MapR
+Ecosystem Pack as described in the updated <<Prerequisites>>.  Also
+add the `saw_workbench_livy_uri` parameter to the SAW environment
+configuration (`saw-config`).
 
 === Interfaces
 

@@ -165,6 +165,34 @@
 			<artifactId>maprdb</artifactId>
 			<version>${mapr.db.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.bda</groupId>
+			<artifactId>xdf</artifactId>
+			<version>1.0.1-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-sql_2.11</artifactId>
+			<version>2.1.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+			</exclusions>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.cloudera.livy</groupId>
+			<artifactId>livy-client-http</artifactId>
+			<version>0.3.0</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -235,7 +263,28 @@
 						with the Maven Failsafe plug-in not finding classes (https://github.com/spring-projects/spring-boot/issues/6254),
 						so use a separate classifier until Maven Failsafe upgraded to 2.19.2. -->
 					<classifier>exec</classifier>
+					<!-- The Spring Boot Maven plug-in includes also dependencies with "provided" scope by default.  Exclude
+						Spark and Scala to reduce artifact size. -->
+					<excludeGroupIds>org.apache.spark,org.scala-lang</excludeGroupIds>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>create-bundle</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>de.dentrassi.maven</groupId>
@@ -256,6 +305,10 @@
 								<entry>
 									<name>/opt/bda/saw-workbench-service/saw-workbench.jar</name>
 									<file>target/saw-workbench-service-${revision}-exec.jar</file>
+								</entry>
+								<entry>
+									<name>/opt/bda/saw-workbench-service/saw-workbench-spark.jar</name>
+									<file>target/saw-workbench-service-${revision}-jar-with-dependencies.jar</file>
 								</entry>
 								<entry>
 									<name>/usr/lib/systemd/system/saw-workbench.service</name>

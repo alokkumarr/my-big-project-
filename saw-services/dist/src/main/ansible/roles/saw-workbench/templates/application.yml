@@ -23,5 +23,6 @@ workbench:
         project-path: "{{ saw_workbench_project_path | default('/raw') }}"
         project-root: "{{ saw_workbench_project_root | default('maprfs:///data/bda/datalake') }}"
         preview-limit: {{ saw_workbench_preview_limit | default('10000') }}
+        livy-uri: "{{ saw_workbench_livy_uri | default('http://localhost:8998') }}"
 metastore:
     base:  hdfs:///main        
