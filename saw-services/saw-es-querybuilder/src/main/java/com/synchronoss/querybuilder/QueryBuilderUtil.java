@@ -381,6 +381,8 @@ public class QueryBuilderUtil {
 		return builder;
 	}
 
+	// ToDo: unify the EQ and ISIN logic
+	// ToDo: unify the NEQ and ISNOTIN logic
 	public static List<QueryBuilder> stringFilterPivot (com.synchronoss.querybuilder.model.pivot.Filter item, List<QueryBuilder> builder)
 	{
 		// EQ
