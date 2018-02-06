@@ -16,6 +16,9 @@
   },
   "exclude": [
     "node_modules",
+    "fonts",
+    "coverage",
+    "target",
     "**/*.spec.ts",
     "src/test",
     "src/main/javascript/middlelayer",

@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Component, Input, Output, EventEmitter} from '@angular/core';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription } from 'rxjs/Subscription';
 import { ChartService } from '../../../analyze/services/chart.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 import { SortService } from '../../../analyze/services/sort.service';
@@ -28,9 +29,12 @@ const template = require('./observe-chart.component.html');
 })
 export class ObserveChartComponent {
   @Input() analysis: any;
+  @Input() item: any;
   @Input('updater') requester: BehaviorSubject<Array<any>>;
+  @Output() onRefresh = new EventEmitter<any>();
 
   private chartUpdater = new BehaviorSubject([]);
+  private requesterSubscription: Subscription;
   public legend: any;
   public chartOptions: any;;
   public settings: any;
@@ -47,20 +51,22 @@ export class ObserveChartComponent {
   ) { }
 
   ngOnInit() {
+    this.legend = this.chartService.initLegend(this.analysis);
+
     this.chartOptions = this.chartService.getChartConfigFor(this.analysis.chartType, { legend: this.legend });
     this.isStockChart = isUndefined(this.analysis.isStockChart) ? false : this.analysis.isStockChart;
     this.subscribeToRequester();
   }
 
   ngOnDestroy() {
-    this.requester.unsubscribe();
+    this.requesterSubscription.unsubscribe();
   }
 
   /* Accept changes from parent component and pass those on to chart.
      Having separate requester and chartUpdater allows transforming
      changes coming from parent before passing them on. */
   subscribeToRequester() {
-    this.requester.subscribe(data => {
+    this.requesterSubscription = this.requester.subscribe(data => {
       let changes = this.getChangeConfig(this.settings, this.gridData, this.labels);
       changes = changes.concat(data);
       this.chartUpdater.next(changes);
@@ -96,6 +102,7 @@ export class ObserveChartComponent {
     this.onRefreshData().then(data => {
       this.gridData = data;
       this.reloadChart(this.settings, this.gridData, this.labels);
+      this.item && this.onRefresh.emit(this.item);
     });
   }
 

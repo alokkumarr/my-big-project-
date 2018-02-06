@@ -16,6 +16,7 @@ import * as fpOmit from 'lodash/fp/omit';
 import * as invert from 'lodash/invert';
 import * as concat from 'lodash/concat';
 import * as clone from 'lodash/clone';
+import * as isPlainObject from 'lodash/isPlainObject';
 import * as fpMapValues from 'lodash/fp/mapValues';
 import * as fpPick from 'lodash/fp/pick';
 import * as moment from 'moment';
@@ -90,6 +91,42 @@ export function PivotService() {
     }
     return area;
   }
+
+   /** Map the tree level to the columnName of the field
+   * Example:
+   * row_field_1: 0 -> SOURCE_OS
+   * row_field_2: 1 -> SOURCE_MANUFACTURER
+   * column_field_1: 2 -> TARGET_OS
+   */
+  function getNodeFieldMap(sqlBuilder) {
+    const rowFieldMap = map(sqlBuilder.rowFields, 'columnName');
+    const columnFieldMap = map(sqlBuilder.columnFields, 'columnName');
+
+    return concat(rowFieldMap, columnFieldMap);
+  }
+
+  function parseData(data, sqlBuilder) {
+    const nodeFieldMap = getNodeFieldMap(sqlBuilder);
+
+    const parsedData = parseNode(data, {}, nodeFieldMap, 0);
+
+    if (isPlainObject(parsedData)) {
+      return [parsedData];
+    }
+    return parsedData;
+  }
+
+  function getColumnName(fieldMap, level) {
+    // take out the .keyword form the columnName
+    // if there is one
+    const columnName = fieldMap[level - 1];
+    const split = columnName.split('.');
+    if (split[1]) {
+      return split[0];
+    }
+    return columnName;
+  }
+
   function formatDates(data, fields) {
     const formattedFields = map(fields, field => {
       if (DATE_TYPES.includes(field.type) &&
@@ -124,36 +161,6 @@ export function PivotService() {
     });
 
     return {formattedData, formattedFields};
-  }
-
-  /** Map the tree level to the columnName of the field
-     * Example:
-     * row_field_1: 0 -> SOURCE_OS
-     * row_field_2: 1 -> SOURCE_MANUFACTURER
-     * column_field_1: 2 -> TARGET_OS
-   */
-  function getNodeFieldMap(sqlBuilder) {
-    const rowFieldMap = map(sqlBuilder.rowFields, 'columnName');
-    const columnFieldMap = map(sqlBuilder.columnFields, 'columnName');
-
-    return concat(rowFieldMap, columnFieldMap);
-  }
-
-  function parseData(data, sqlBuilder) {
-    const nodeFieldMap = getNodeFieldMap(sqlBuilder);
-
-    return parseNode(data, {}, nodeFieldMap, 0);
-  }
-
-  function getColumnName(fieldMap, level) {
-    // take out the .keyword form the columnName
-    // if there is one
-    const columnName = fieldMap[level - 1];
-    const split = columnName.split('.');
-    if (split[1]) {
-      return split[0];
-    }
-    return columnName;
   }
 
   function parseNode(node, dataObj, nodeFieldMap, level) {

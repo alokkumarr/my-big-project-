@@ -43,6 +43,7 @@
           <div>
             <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.DESIGNER_MODE}"
                        class="mode-selector"
+                       ng-if="$ctrl.supportsQuery()"
                        ng-disabled="$ctrl.states.disable.designer || $ctrl.model.edit"
                        ng-click="$ctrl.setSqlMode($ctrl.DESIGNER_MODE)">
               <md-icon md-font-icon="icon-designer-mode"></md-icon>
@@ -51,6 +52,7 @@
 
             <md-button ng-class="{'m-active': $ctrl.states.sqlMode === $ctrl.QUERY_MODE}"
                        class="mode-selector"
+                       ng-if="$ctrl.supportsQuery()"
                        ng-click="$ctrl.setSqlMode($ctrl.QUERY_MODE)">
               <md-icon md-font-icon="icon-query-mode"></md-icon>
               <span translate="QUERY"></span>
@@ -79,8 +81,9 @@
 
           <div class="ard_canvas-query"
                ng-show="$ctrl.states.sqlMode === $ctrl.QUERY_MODE">
-            <analyze-report-query model="$ctrl.model"
-                                  on-save="$ctrl.onSaveQuery(analysis)">
+            <analyze-report-query [model]="$ctrl.model"
+                                  [artifacts]="$ctrl.artifacts"
+                                  (on-save)="$ctrl.onSaveQuery($event)">
             </analyze-report-query>
           </div>
         </div>

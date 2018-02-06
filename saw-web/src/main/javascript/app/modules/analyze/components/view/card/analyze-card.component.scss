@@ -9,6 +9,10 @@
       background-image: url('~img/charts/report.png');
     }
 
+    &.m-esReport {
+      background-image: url('~img/charts/report.png');
+    }
+
     &.m-pivot {
       background-image: url('~img/charts/pivot.png');
     }
@@ -55,6 +59,10 @@
 
     &.m-chart-tsspline {
       background-image: url('~img/charts/timeseries-chart.png');
+    }
+
+    &.m-chart-tsPane {
+      background-image: url('~img/charts/timeseries-multi-chart.png');
     }
   }
 

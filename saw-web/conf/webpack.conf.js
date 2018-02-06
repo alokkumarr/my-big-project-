@@ -98,6 +98,10 @@ module.exports = function (env) {
           use: 'happypack/loader?id=ts'
         },
         {
+          test: /\.html$/,
+          loader: 'html-loader'
+        },
+        {
           test: /\.(css|scss)$/,
           loader: ExtractTextPlugin.extract({
             fallback: 'style-loader',

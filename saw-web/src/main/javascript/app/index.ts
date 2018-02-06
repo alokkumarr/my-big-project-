@@ -15,20 +15,20 @@ import { BrowserModule } from '@angular/platform-browser';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
-import {routesConfig} from './routes';
-import {themeConfig} from './theme';
-import {i18nConfig} from './i18n';
-import {config} from './config';
-import {interceptor} from './http-interceptor';
-import {runConfig} from './run';
+import { routesConfig } from './routes';
+import { themeConfig } from './theme';
+import { i18nConfig } from './i18n';
+import { config } from './config';
+import { interceptor } from './http-interceptor';
+import { runConfig } from './run';
 
-import {ObserveModule, ObserveUpgradeModule} from './modules/observe/index';
-import {CommonModuleTs} from './common';
-import {AnalyzeModule, AnalyzeModuleTs} from './modules/analyze/index';
-import {AlertsModule} from './modules/alerts';
-import {AdminModule} from './modules/admin';
+import { ObserveModule, ObserveUpgradeModule } from './modules/observe';
+import { CommonModuleTs } from './common';
+import { AnalyzeModule, AnalyzeModuleTs } from './modules/analyze';
+import { AlertsModule } from './modules/alerts';
+import { AdminModule } from './modules/admin';
 
-import {LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent} from './layout';
+import { LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent } from './layout';
 
 export const AppModule = 'app';
 
@@ -56,6 +56,7 @@ angular
   imports: [
     BrowserModule,
     UpgradeModule,
+    UIRouterUpgradeModule,
     CommonModuleTs,
     AnalyzeModuleTs,
     ObserveUpgradeModule,
@@ -63,9 +64,7 @@ angular
   ],
   exports: [FlexLayoutModule],
   providers: [
-    {provide: LOCALE_ID, useValue: 'en'},
-    UIRouterUpgradeModule,
-    ObserveUpgradeModule
+    {provide: LOCALE_ID, useValue: 'en'}
   ]
 })
 export class NewAppModule {

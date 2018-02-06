@@ -236,7 +236,12 @@ class DLSession(val sessionName: String = "SAW-SQL-Executor") {
     val df = df1.coalesce(1)
     format match {
       case "parquet" => df.write.parquet(location); (ProcessingResult.Success.id, "Data have been successfully saved as parquet file")
-      case "json" => df.write.json(location); (ProcessingResult.Success.id, "Data have been successfully saved as json file")
+      case "json" =>
+        /** Workaround : Spark ignores the null values fields while writing Datasets into JSON files.
+          * convert the null values into default values for corresponding data type
+          * (For example : String as "", int/double as 0 and 0.0 etc.) to preserve column with null values. */
+        val dfWithDefaultValue = df.na.fill("").na.fill(0)
+        dfWithDefaultValue.write.json(location); (ProcessingResult.Success.id, "Data have been successfully saved as json file")
       case _ =>  (ProcessingResult.Success.id,  ErrorCodes.UnsupportedFormat + ": " + format )
     }
   }

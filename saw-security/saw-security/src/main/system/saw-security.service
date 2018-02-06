@@ -1,0 +1,10 @@
+[Unit]
+Description=SAW Security
+
+[Service]
+ExecStart=/opt/bda/saw-security/bin/saw-security.sh start --fg
+SyslogIdentifier=saw-security
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

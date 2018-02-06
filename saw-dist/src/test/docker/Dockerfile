@@ -86,6 +86,10 @@ RUN systemctl enable saw-metrics
 # Workaround: Set execute bit for Windows users
 RUN chmod a+x /root/saw-metrics/sample-*/load-metric
 
+# Forward container system logs to Docker logs
+COPY saw-logger/saw-logger.service /etc/systemd/system/
+RUN systemctl enable saw-logger
+
 # Add systemd journal gateway for browsing logs
 RUN yum -y -q --nogpgcheck install systemd-journal-gateway
 RUN systemctl enable systemd-journal-gatewayd.socket

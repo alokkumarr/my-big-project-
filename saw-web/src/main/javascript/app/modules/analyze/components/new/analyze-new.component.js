@@ -1,6 +1,7 @@
 import * as set from 'lodash/set';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
+import * as isArray from 'lodash/isArray';
 
 import * as template from './analyze-new.component.html';
 import style from './analyze-new.component.scss';
@@ -37,16 +38,38 @@ export const AnalyzeNewComponent = {
       this.selectedAnalysisMethod = '';
     }
 
+    /**
+     * Temporary method to force add esReport support for development
+     * Should be not be used in production
+     */
+    addEsReportSupport(methods) {
+      const tables = find(methods, method => method.category === 'table');
+      if (!tables) {
+        return;
+      }
+
+      tables.children = tables.children || [];
+      tables.children.push({
+        icon: 'icon-report',
+        label: 'Report',
+        type: 'table:esReport'
+      });
+    }
+
     setAvailableAnalysisMethods(methods, supportedMethods) {
+      // this.addEsReportSupport(supportedMethods); // this should not be running in production
+
       forEach(methods, methodCategory => {
         const supportedMethodCategory = find(supportedMethods, ({category}) => category === methodCategory.category);
 
         forEach(methodCategory.children, method => {
           const isSupported = supportedMethodCategory ?
-            find(supportedMethodCategory.children, ({type}) => type === method.type ||
-              method.type === 'chart:pie' ||
-              method.type === 'chart:combo' ||
-              method.type === 'chart:area' || method.type === 'chart:tsspline') :
+            find(supportedMethodCategory.children, ({type}) => this.isOfType(method, type) ||
+              this.isOfType(method, 'chart:pie') ||
+              this.isOfType(method, 'chart:combo') ||
+              this.isOfType(method, 'chart:area') ||
+              this.isOfType(method, 'chart:tsspline') ||
+              this.isOfType(method, 'chart:tsPane')) :
             false;
           set(method, 'disabled', !isSupported);
         });
@@ -79,6 +102,18 @@ export const AnalyzeNewComponent = {
         });
     }
 
+    isOfType(method, inputType) {
+      const referenceType = method.supportedTypes || method.type;
+
+      if (isArray(referenceType)) {
+        const match = find(referenceType, type => type === inputType);
+        method.type = match || method.type;
+        return Boolean(match);
+      }
+
+      return referenceType === inputType;
+    }
+
     createAnalysis() {
       let tpl;
       let model;
@@ -88,10 +123,13 @@ export const AnalyzeNewComponent = {
       const mode = ENTRY_MODES.NEW;
 
       switch (this.selectedAnalysisMethod) {
+      /* eslint-disable no-fallthrough */
+      case 'table:esReport':
+        type = AnalyseTypes.ESReport;
       case 'table:report':
         tpl = `<analyze-report model="model" mode="${mode}"></analyze-report>`;
         model = {
-          type: AnalyseTypes.Report,
+          type: type || AnalyseTypes.Report,
           name: 'Untitled Analysis',
           description: '',
           categoryId: this.subCategory,
@@ -100,6 +138,7 @@ export const AnalyzeNewComponent = {
           scheduled: null
         };
         break;
+      /* eslint-enable no-fallthrough */
       case 'table:pivot':
         this.openUpgradedModal();
         return;
@@ -114,6 +153,7 @@ export const AnalyzeNewComponent = {
       case 'chart:area':
       case 'chart:combo':
       case 'chart:tsspline':
+      case 'chart:tsPane':
         type = this.selectedAnalysisMethod.split(':')[1];
         tpl = `<analyze-chart model="model" mode="${mode}"></analyze-chart>`;
         model = {

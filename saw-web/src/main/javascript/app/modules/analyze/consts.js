@@ -12,6 +12,7 @@ export const Events = {
 
 export const AnalyseTypes = {
   Report: 'report',
+  ESReport: 'esReport',
   Chart: 'chart',
   Pivot: 'pivot'
 };
@@ -132,6 +133,10 @@ export const TSCOMBO_TYPES = [{
   label: 'area',
   value: 'tsareaspline',
   icon: 'icon-area-chart'
+}, {
+  label: 'line',
+  value: 'tsPane',
+  icon: 'icon-line-chart'
 }];
 
 export const TSCOMBO_TYPES_OBJ = fpPipe(
@@ -147,7 +152,8 @@ export const ANALYSIS_METHODS = [
       {
         label: 'Report',
         icon: {font: 'icon-report'},
-        type: 'table:report'
+        type: 'table:report',
+        supportedTypes: ['table:report', 'table:esReport']
       },
       {
         label: 'Pivot',
@@ -206,9 +212,14 @@ export const ANALYSIS_METHODS = [
         type: 'chart:pie'
       },
       {
-        label: 'Timeseries Chart',
+        label: 'Time series chart',
         icon: {font: 'icon-timeseries-chart'},
         type: 'chart:tsspline'
+      },
+      {
+        label: 'Time series multi pane',
+        icon: {font: 'icon-Candlestick-icon'},
+        type: 'chart:tsPane'
       }
     ]
   }

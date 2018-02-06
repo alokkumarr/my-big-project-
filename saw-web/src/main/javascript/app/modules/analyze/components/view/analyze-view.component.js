@@ -84,7 +84,7 @@ export const AnalyzeViewComponent = {
     }
 
     goToAnalysis(analysis) {
-      this._$state.go('analyze.publishedDetail', {analysisId: analysis.id, analysis});
+      this._$state.go('analyze.executedDetail', {analysisId: analysis.id, analysis});
     }
 
     goToLastPublishedAnalysis(analysis) {

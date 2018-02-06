@@ -1,7 +1,12 @@
-<textarea ng-model="$ctrl.model.query"></textarea>
-<div layout="row" layout-align="end center">
-  <md-button class="btn-primary"
-             ng-click="$ctrl.submitQuery()">
-    <span translate="SUBMIT"></span>
-  </md-button>
+<ace-editor #editor
+  [(text)]="model.query"
+  (textChanged)="queryUpdated($event)"
+  [options]="editorOptions"
+  theme="eclipse"
+  mode="sql">
+</ace-editor>
+<div class="query-actions">
+  <button md-raised-button color="primary" (click)="submitQuery()">
+    Submit
+  </button>
 </div>

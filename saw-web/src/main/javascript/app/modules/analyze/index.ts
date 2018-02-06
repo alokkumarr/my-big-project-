@@ -1,11 +1,12 @@
 import * as angular from 'angular';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {downgradeInjectable, downgradeComponent} from '@angular/upgrade/static';
+import {NgModule} from '@angular/core';
+import {CommonModule as CommonModuleAngular4} from '@angular/common';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
-import { NgModule } from '@angular/core';
-import { CommonModule as CommonModuleAngular4 } from '@angular/common';
-import { FlexLayoutModule } from '@angular/flex-layout';
+import {FlexLayoutModule} from '@angular/flex-layout';
 import {MaterialModule} from '../../material.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {AceEditorModule} from 'ng2-ace-editor';
 
 import {routesConfig} from './routes';
 import {i18nConfig} from './i18n';
@@ -18,7 +19,10 @@ import {PivotService} from './services/pivot.service';
 import {ChartService} from './services/chart.service';
 import {SortService} from './services/sort.service';
 
+import {$mdDialogProvider} from '../../common/services/ajs-common-providers';
+
 import {pivotAreaTypeFilter} from './filters/pivot-area-type.filter';
+import {uniqueFilter} from './filters/unique.filter';
 
 import {AnalyzePageComponent} from './components/page/analyze-page.component';
 import {AggregateChooserComponent} from './components/aggregate-chooser/aggregate-chooser.component';
@@ -130,7 +134,10 @@ angular.module(AnalyzeModule, [
   .component('analyzePivotPreview', AnalyzePivotPreviewComponent)
   .component('analyzePivot', AnalyzePivotComponent)
   .component('analyzeReport', AnalyzeReportComponent)
-  .component('analyzeReportQuery', AnalyzeReportQueryComponent)
+  .directive(
+    'analyzeReportQuery',
+    downgradeComponent({component: AnalyzeReportQueryComponent}) as angular.IDirectiveFactory
+  )
   .component('analyzeDialog', AnalyzeDialogComponent)
   .component('analyzeSortDialog', AnalyzeSortDialogComponent)
   .component('stringFilter', StringFilterComponent)
@@ -153,6 +160,7 @@ angular.module(AnalyzeModule, [
     CommonModuleTs,
     MaterialModule,
     FlexLayoutModule,
+    AceEditorModule,
     FormsModule,
     ReactiveFormsModule
   ],
@@ -201,6 +209,7 @@ angular.module(AnalyzeModule, [
     DesignerPreviewDialogComponent
   ],
   providers: [
+    $mdDialogProvider,
     AnalyzeDialogService,
     analyzeServiceProvider,
     DesignerService

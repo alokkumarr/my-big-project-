@@ -24,6 +24,7 @@
     <div layout="column" layout-align="space-between center">
       <report-grid-display-container data="$ctrl.gridData"
                             columns="$ctrl.columns"
+                            show-checked="$ctrl.showChecked"
                             source="$ctrl.loadData(options)"
                             groups="$ctrl.analysis.groupByColumns">
       </report-grid-display-container>
