@@ -42,7 +42,8 @@ export const UsersViewComponent = {
       this.UsersManagementService.getActiveUsersList(this.resp.ticket.custID).then(admin => {
         this.admin = admin;
         if (this.admin.valid) {
-          this._usersCache = this.userList = this.admin.users;
+          this.userList = this.admin.users;
+          this._usersCache = this.admin.users;
           this._$rootScope.showProgress = false;
         } else {
           this._$rootScope.showProgress = false;
@@ -72,7 +73,8 @@ export const UsersViewComponent = {
             controller: scope => {
               scope.roles = this.response.roles;
               scope.onSaveAction = users => {
-                this._usersCache = this.userList = users;
+                this.userList = users;
+                this._usersCache = users;
                 this.applySearchFilter();
               };
             },
@@ -113,7 +115,8 @@ export const UsersViewComponent = {
       }).then(data => {
         if (data.valid) {
           this._$rootScope.showProgress = false;
-          this._usersCache = this.userList = data.users;
+          this.userList = data.users;
+          this._usersCache = data.users;
           this.applySearchFilter();
           this._$mdToast.show({
             template: '<md-toast><span> User is successfully deleted </md-toast>',
@@ -144,7 +147,8 @@ export const UsersViewComponent = {
               scope.roles = this.response.roles;
               scope.user = editUser;
               scope.onUpdateAction = users => {
-                this._usersCache = this.userList = users;
+                this.userList = users;
+                this._usersCache = users;
                 this.applySearchFilter();
               };
             },

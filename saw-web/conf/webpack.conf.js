@@ -77,6 +77,8 @@ module.exports = function (env) {
           loader: 'tslint-loader',
           options: {
             fix: false,
+            useCache: true,
+            transpileOnly: true,
             typeCheck: false, // tslint-loader is way too slow with this enabled. Use pre-push hook for typechecking
             tsConfigFile: webpackHelper.root('tsconfig.json'),
             configFile: isDevelopment ?
@@ -91,17 +93,9 @@ module.exports = function (env) {
         },
         // loaders
         {
-          test: /\.json$/,
-          loader: 'json-loader'
-        },
-        {
           test: /\.[jt]s$/,
           exclude: /node_modules/,
           use: 'happypack/loader?id=ts'
-        },
-        {
-          test: /\.html$/,
-          loader: 'html-loader'
         },
         {
           test: /\.(css|scss)$/,
@@ -118,6 +112,14 @@ module.exports = function (env) {
               'postcss-loader'
             ]
           })
+        },
+        {
+          test: /\.json$/,
+          loader: 'json-loader'
+        },
+        {
+          test: /\.html$/,
+          loader: 'html-loader'
         },
         {
           test: /\.(eot|woff|woff2|ttf)$/,

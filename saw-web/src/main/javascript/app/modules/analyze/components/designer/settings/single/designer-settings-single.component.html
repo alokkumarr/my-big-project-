@@ -1,0 +1,63 @@
+<div class="settings__container">
+
+  <div class="settings__filters"
+       fxLayout="row"
+       fxLayoutAlign="space-between center">
+    <mat-form-field>
+      <input matInput type="text"
+              placeholder="Filter"
+              (input)="onTextFilterChange($event.target.value)"
+              [value]="filterObj.keyword"/>
+      <button mat-button *ngIf="filterObj.keyword"
+              matSuffix mat-icon-button
+              aria-label="Clear"
+              (click)="onTextFilterChange('')">
+        <mat-icon fontIcon="icon-close"></mat-icon>
+      </button>
+    </mat-form-field>
+    <mat-button-toggle-group multiple>
+      <mat-button-toggle *ngFor="let typeIcon of TYPE_ICONS; trackBy: index"
+                         (change)="onTypeFilterChange($event)"
+                         [value]="typeIcon.value"
+                         [checked]="filterObj.types.includes(typeIcon.value)">
+        <mat-icon [fontIcon]="typeIcon.icon"></mat-icon>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  <div class="settings__unselected-fields"
+       dndSortableContainer
+       dndZone="designer-setting-zone">
+    <div *ngIf="unselectedArtifactColumns">
+      <div *ngFor="let artifactColumn of (unselectedArtifactColumns | artifactColumnFilter:filterObj); trackBy: index"
+           [dndSortable]="artifactColumn"
+           class="settings__list-item"
+           fxLayout="row"
+           fxLayoutAlign="space-between center">
+        <div class="settings__list-item__name"
+             fxLayout="row"
+             fxLayoutAlign="space-between center">
+          {{ artifactColumn.aliasName || artifactColumn.displayName }}
+          <mat-icon [fontIcon]="TYPE_ICONS_OBJ[artifactColumn.type].icon"
+                    class="settings__list-item__icon">
+          </mat-icon>
+        </div>
+        <button mat-icon-button
+                [e2e]="'designer-add-btn-' + (artifactColumn.aliasName || artifactColumn.displayName)"
+                (click)="addToGroupIfPossible(artifactColumn)">
+          <mat-icon fontIcon="icon-plus"></mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings__selected-fields">
+    <designer-settings-group *ngFor="let groupAdapter of groupAdapters; trackBy: index"
+                             (fieldsChange)="onFieldsChange()"
+                             (fieldPropChange)="onFieldPropChange()"
+                             (removeField)="removeFromGroup($event, groupAdapter)"
+                             [groupAdapter]="groupAdapter"
+                             [artifactColumns]="groupAdapter.artifactColumns">
+    </designer-settings-group>
+  </div>
+</div>

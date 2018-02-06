@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter} from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { ChartService } from '../../../analyze/services/chart.service';
@@ -29,7 +29,9 @@ const template = require('./observe-chart.component.html');
 })
 export class ObserveChartComponent {
   @Input() analysis: any;
+  @Input() item: any;
   @Input('updater') requester: BehaviorSubject<Array<any>>;
+  @Output() onRefresh = new EventEmitter<any>();
 
   private chartUpdater = new BehaviorSubject([]);
   private requesterSubscription: Subscription;
@@ -100,6 +102,7 @@ export class ObserveChartComponent {
     this.onRefreshData().then(data => {
       this.gridData = data;
       this.reloadChart(this.settings, this.gridData, this.labels);
+      this.item && this.onRefresh.emit(this.item);
     });
   }
 

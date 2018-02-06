@@ -13,6 +13,13 @@
     font-weight: bold;
   }
 
+  md-checkbox {
+    //margin-bottom: 8px;
+    .md-label {
+      display: block !important;
+    }
+  }
+
   .md-subheader {
     .md-subheader-inner {
       padding: 0;
@@ -42,13 +49,6 @@
 
     .md-no-style {
       padding: 0 0 0 33px;
-    }
-  }
-
-  md-checkbox {
-    //margin-bottom: 8px;
-    .md-label {
-      display: block !important;
     }
   }
 

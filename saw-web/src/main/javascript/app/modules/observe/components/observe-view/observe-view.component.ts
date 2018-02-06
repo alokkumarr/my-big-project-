@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 
-import { MdDialog } from '@angular/material';
+import { MatDialog } from '@angular/material';
 import { Transition } from '@uirouter/angular';
 import { Dashboard } from '../../models/dashboard.interface';
 
@@ -28,7 +28,7 @@ export class ObserveViewComponent implements OnInit {
   };
 
   constructor(
-    public dialog: MdDialog,
+    public dialog: MatDialog,
     private observe: ObserveService,
     private headerProgress: HeaderProgressService,
     private jwt: JwtService,
@@ -85,7 +85,8 @@ export class ObserveViewComponent implements OnInit {
       data: {
         dashboard: this.dashboard,
         mode: 'edit'
-      }
+      },
+      maxWidth: '100%'
     });
   }
 
@@ -94,7 +95,8 @@ export class ObserveViewComponent implements OnInit {
       panelClass: 'full-screen-dialog',
       data: {
         mode: 'create'
-      }
+      },
+      maxWidth: '100%'
     });
   }
 

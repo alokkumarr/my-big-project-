@@ -1,4 +1,5 @@
 import * as angular from 'angular';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 import {AccordionMenu, AccordionMenuLink} from './accordionMenu';
 import {BadgeComponent} from './badge';
@@ -11,7 +12,7 @@ import {
   JSPlumbJoinDialog
 } from './jsPlumb';
 import {PanelComponent} from './panel';
-import {ErrorDetailComponent} from './error-detail/error-detail.component';
+import {ErrorDetailComponent} from './error-detail';
 import {SearchBoxComponent} from './search-box/search-box.component';
 import {CollapserComponent} from './collapser/collapser.component';
 import {RangeSliderComponent} from './range-slider/range-slider.component';
@@ -35,7 +36,7 @@ angular
   .component('binaryOption', BinaryOptionComponent)
   .component('choiceGroup', ChoiceGroupComponent)
   .component('collapser', CollapserComponent)
-  .component('errorDetail', ErrorDetailComponent)
+  .component('errorDetail', downgradeComponent({component: ErrorDetailComponent}))
   .component('jsPlumbCanvas', JSPlumbCanvas)
   .component('jsPlumbConnector', JSPlumbConnector)
   .component('jsPlumbEndpoint', JSPlumbEndpoint)
@@ -47,7 +48,7 @@ angular
   .component('rangeSlider', RangeSliderComponent)
   .component('searchBox', SearchBoxComponent)
   .component('sidenav', SidenavComponent)
-  .component('pivotGrid', PivotGridComponent)
+  .directive('pivotGrid', downgradeComponent({component: PivotGridComponent}))
   .component('reportGridDisplay', ReportGridDisplayComponent)
   .component('reportGridDisplayNode', ReportGridDisplayNodeComponent)
   .component('reportGridDisplayContainer', ReportGridDisplayContainerComponent)

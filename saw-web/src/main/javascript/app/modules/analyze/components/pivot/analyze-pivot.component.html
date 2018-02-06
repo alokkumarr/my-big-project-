@@ -83,9 +83,9 @@
                         on-clear-all-filters="$ctrl.onClearAllFilters()"
                         on-filter-removed="$ctrl.onFilterRemoved(index)">
           </filter-chips>
-          <pivot-grid updater="$ctrl.pivotGridUpdater"
+          <pivot-grid [updater]="$ctrl.pivotGridUpdater"
                       mode="designer"
-                      on-content-ready="$ctrl.onPivotContentReady(fields)"></pivot-grid>
+                      (on-content-ready)="$ctrl.onPivotContentReady(fields)"></pivot-grid>
         </md-card-content>
       </md-card>
     </div>

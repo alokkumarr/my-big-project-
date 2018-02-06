@@ -288,7 +288,6 @@ export const ReportGridContainerComponent = {
     }
 
     viewMore() {
-      return;
     }
   }
 };

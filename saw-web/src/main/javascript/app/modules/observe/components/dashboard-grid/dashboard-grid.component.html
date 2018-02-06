@@ -1,10 +1,14 @@
 <gridster [options]="options" #gridster class="dashboard-gridster">
   <gridster-item [item]="item" *ngFor="let item of dashboard">
     <!-- <span class="analysis-title">{{item.analysis.name}}</span> -->
-    <button md-icon-button (click)="removeTile(item)" *ngIf="!isViewMode()">
-      <md-icon fontIcon="icon-close"></md-icon>
+    <button mat-icon-button (click)="removeTile(item)" *ngIf="!isViewMode()">
+      <mat-icon fontIcon="icon-close"></mat-icon>
     </button>
     <observe-chart *ngIf="item.analysis.type === 'chart'"
-    class="analysis-container" [analysis]="item.analysis" [updater]="item.updater"></observe-chart>
+      class="analysis-container"
+      [item]="item"
+      (onRefresh)="refreshTile($event)"
+      [analysis]="item.analysis"
+      [updater]="item.updater"></observe-chart>
   </gridster-item>
 </gridster>

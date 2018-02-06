@@ -43,7 +43,7 @@ export const AnalyzeChartComponent = {
   },
   controller: class AnalyzeChartController extends AbstractDesignerComponentController {
     constructor($componentHandler, $timeout, AnalyzeService, SortService,
-                ChartService, FilterService, $mdSidenav, $translate, toastMessage, $injector) {
+      ChartService, FilterService, $mdSidenav, $translate, toastMessage, $injector) {
       'ngInject';
       super($injector);
       this._FilterService = FilterService;
@@ -71,7 +71,8 @@ export const AnalyzeChartComponent = {
       this.updateChart = new BehaviorSubject({});
       this.isStockChart = this.model.chartType.substring(0, 2) === 'ts';
       this.settings = null;
-      this.gridData = this.filteredGridData = [];
+      this.gridData = [];
+      this.filteredGridData = [];
       this.labels = {
         tempY: '', tempX: '', y: '', x: ''
       };
@@ -139,8 +140,11 @@ export const AnalyzeChartComponent = {
         return;
       }
 
-      this.labels.tempX = this.labels.x = get(this.model, 'xAxis.title', null);
-      this.labels.tempY = this.labels.y = get(this.model, 'yAxis.title', null);
+      this.labels.x = get(this.model, 'xAxis.title', null);
+      this.labels.tempX = this.labels.x;
+
+      this.labels.y = get(this.model, 'yAxis.title', null);
+      this.labels.tempY = this.labels.y;
       this.filters = map(
         get(this.model, 'sqlBuilder.filters', []),
         this._FilterService.backend2FrontendFilter(this.model.artifacts)
@@ -219,7 +223,8 @@ export const AnalyzeChartComponent = {
       const payload = this.generatePayload(this.model);
       return this._AnalyzeService.getDataBySettings(payload).then(({data}) => {
         const parsedData = this._ChartService.parseData(data, payload.sqlBuilder);
-        this.gridData = this.filteredGridData = parsedData || this.filteredGridData;
+        this.gridData = parsedData || this.filteredGridData;
+        this.filteredGridData = this.gridData;
         this.gotData(this.gridData);
         this.analysisSynched();
         this.endProgress();

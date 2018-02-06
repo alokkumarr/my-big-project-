@@ -21,7 +21,7 @@ export const AnalyzeViewComponent = {
   styles: [style],
   controller: class AnalyzeViewController extends AbstractComponentController {
     constructor($injector, $compile, AnalyzeService, $state, $mdDialog, JwtService,
-                toastMessage, $rootScope, localStorageService, FilterService, LocalSearchService) {
+      toastMessage, $rootScope, localStorageService, FilterService, LocalSearchService) {
       'ngInject';
       super($injector);
 
@@ -84,7 +84,7 @@ export const AnalyzeViewComponent = {
     }
 
     goToAnalysis(analysis) {
-      this._$state.go('analyze.publishedDetail', {analysisId: analysis.id, analysis});
+      this._$state.go('analyze.executedDetail', {analysisId: analysis.id, analysis});
     }
 
     goToLastPublishedAnalysis(analysis) {
@@ -96,7 +96,8 @@ export const AnalyzeViewComponent = {
       return this._AnalyzeService.getAnalysesFor(this.$state.params.id, {
         filter: this.states.searchTerm
       }).then(analyses => {
-        this._analysisCache = this.analyses = analyses;
+        this._analysisCache = analyses;
+        this.analyses = analyses;
         this.updater.next({analyses});
         this._$rootScope.showProgress = false;
       }).catch(() => {
