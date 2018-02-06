@@ -90,10 +90,10 @@ export class DndSortableDirective {
   }
 
   @HostListener('dragend', ['$event'])
-  onDragEnd(event: DragEvent) {
+  onDragEnd(event: Event) { // Using Event. DragEvent doesn't exist in safari and fails unit tests
     this._isDragged = false;
     const {data} = this._dragDropService.getPayload();
-    const isDropSuccessful = event.dataTransfer.dropEffect !== 'none';
+    const isDropSuccessful = event['dataTransfer'].dropEffect !== 'none';
     const sortableDragEndObj: ISortableDragEndEvent = {
       isDropSuccessful,
       payload: data,

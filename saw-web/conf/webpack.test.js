@@ -48,8 +48,7 @@ module.exports = function (env) {
           loaders: ['ng-annotate-loader', {
             loader: 'ts-loader',
             options: {
-              configFile: webpackHelper.root('conf/tsconfig.json'),
-              entryFileIsJs: true
+              configFile: webpackHelper.root('conf/tsconfig.json')
             }
           }]
         },
