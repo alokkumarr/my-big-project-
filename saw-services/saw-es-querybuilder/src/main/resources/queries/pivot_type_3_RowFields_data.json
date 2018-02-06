@@ -267,6 +267,7 @@
             "columnName":"SOURCE_OS",
             "isRuntimeFilter":false,
             "model":{
+               "operator": "ISIN",
                "modelValues":[
                   "android"
                ]
