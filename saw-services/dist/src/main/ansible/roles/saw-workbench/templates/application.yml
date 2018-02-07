@@ -19,5 +19,7 @@ application:
 logging:
   config: /opt/bda/saw-workbench-service/conf/logback.xml
 workbench:
-        project-key: "project"
-        project-path: "/data"
+        project-key: "{{ saw_workbench_project_key | default('project2') }}"
+        project-path: "{{ saw_workbench_project_path | default('/raw') }}"
+        project-root: "{{ saw_workbench_project_path | default('hdfs://data/bda') }}"
+        preview-limit: {{ saw_workbench_preview_limit | default('10000') }}

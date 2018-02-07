@@ -1,0 +1,7 @@
+{
+  "action" : "read",
+  "output" : "hdfs:///var/bda/xdf-srux/read_req2r.json",
+	"xdf-root" : "hdfs:///data/bda",
+	"category" : "DataSet",
+	"id" : "dataset::test2::meta"
+}

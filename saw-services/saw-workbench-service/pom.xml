@@ -23,7 +23,8 @@
 		<java.version>1.8</java.version>
 		<jackson-coreutils>1.8</jackson-coreutils>
 		<json-core>1.2.5</json-core>
-		<metadata.api>1.0.0_dev</metadata.api>
+		<metadata.api>1.0.1-SNAPSHOT</metadata.api>
+		<mapr.db.version>5.2.0-mapr</mapr.db.version>
 	</properties>
 
 	<dependencies>
@@ -132,6 +133,7 @@
 			<version>3.7</version>
 		</dependency>
 
+
 		<!-- APACHE COMMONS IO -->
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -142,6 +144,26 @@
 			<groupId>com.synchronoss.bda</groupId>
 			<artifactId>meta-api</artifactId>
 			<version>${metadata.api}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.saw</groupId>
+			<artifactId>saw-date-extract-api</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.univocity</groupId>
+			<artifactId>univocity-parsers</artifactId>
+			<version>2.5.9</version>
+		</dependency>
+		<dependency>
+			<groupId>com.synchronoss.saw</groupId>
+			<artifactId>saw-inspect-data-api</artifactId>
+			<version>${revision}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.mapr.db</groupId>
+			<artifactId>maprdb</artifactId>
+			<version>${mapr.db.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -234,5 +256,10 @@
 			<id>synchronoss</id>
 			<url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
 		</repository>
+		<repository>
+			<id>synchronoss-snapshots</id>
+			<url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/snapshots-only/</url>
+		</repository>
+		
 	</repositories>
 </project>

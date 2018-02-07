@@ -6,9 +6,11 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,9 +24,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.base.Preconditions;
 import com.synchronoss.saw.workbench.AsyncConfiguration;
 import com.synchronoss.saw.workbench.exceptions.ReadEntitySAWException;
+import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
+import com.synchronoss.saw.workbench.service.SAWWorkbenchService;
 
 /**
  * @author spau0004
@@ -41,7 +46,15 @@ public class SAWWorkBenchInternalAddRAWDataController {
   private String defaultProjectId;
 
   @Value("${workbench.project-path}")
+  @NotNull
   private String defaultProjectPath;
+  
+  @Value("${workbench.project-root}")
+  @NotNull
+  private String defaultProjectRoot;
+  
+ @Autowired
+ private SAWWorkbenchService sawWorkbenchService;
   
    /**
    * @return {@link Project}
@@ -54,18 +67,17 @@ public class SAWWorkBenchInternalAddRAWDataController {
       logger.debug("Retrieve Default Project");
       List<Project> projects = new ArrayList<Project>();
       Project project = new Project();
-      project.setPath(defaultProjectPath);
+      project.setPath(defaultProjectRoot + defaultProjectPath);
       project.setProjectId(defaultProjectId);
       projects.add(project);
       return projects;
     }
-
   @RequestMapping(value = "raw/default", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
     public Project retrieveProject() throws JsonProcessingException {
       logger.debug("Retrieve Default Project");
       Project project = new Project();
-      project.setPath(defaultProjectPath);
+      project.setPath(defaultProjectRoot + defaultProjectPath);
       project.setProjectId(defaultProjectId);
       return project;
     }
@@ -136,24 +148,37 @@ public class SAWWorkBenchInternalAddRAWDataController {
     return project;
   } 
 
-  
-  
-  @RequestMapping(value = "{projectId}/raw/directory/preview", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @RequestMapping(value = "{projectId}/raw/directory/preview", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public Project previewRawDatafromProjectDirectoybyId(@PathVariable(name = "projectId", required = true) String projectId, 
-      @PathVariable(name = "path", required = true) String relativePath, HttpServletRequest request, HttpServletResponse response) throws JsonProcessingException {
-    logger.debug("Retrieve project details By Id ", projectId);
-    Project project = new Project();
+      @RequestBody Project project) throws JsonProcessingException {
+    logger.debug("Retrieve project details By Id {} ", projectId);
+    Preconditions.checkNotNull(project.getPath(), "To preview a file path attribute cannot be null");
+    Project responseProject = null;
+    try {
+      responseProject = sawWorkbenchService.previewFromProjectDirectoybyId(project);
+    } catch (Exception e) {
+      logger.error("Exception occured while previewing the raw data", e);
+      throw new ReadEntitySAWException("Exception occured while previewing the raw data", e);
+    }
     project.setProjectId(projectId);
-    project.setPath(relativePath);
-    return project;
+    return responseProject;
   } 
 
   @RequestMapping(value = "{projectId}/raw/directory/inspect", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.CREATED)
-  public Project inspectRawDatafromProjectDirectoybyId(@RequestBody Project project) throws JsonProcessingException {
-    logger.debug("Retrieve project details By Id ", project.getProjectId());
-    return project;
+  @ResponseStatus(HttpStatus.OK)
+  public Inspect inspectRawDatafromProjectDirectoybyId(@PathVariable(name = "projectId", required = true) String projectId, 
+      @RequestBody Inspect inspect) throws JsonProcessingException {
+    logger.debug("Retrieve project details By Id {} ", projectId);
+    Preconditions.checkNotNull(inspect.getFile(), "To preview a file attribute cannot be null");
+    Inspect responseInspect = null;
+    try {
+      responseInspect = sawWorkbenchService.inspectFromProjectDirectoybyId(inspect);
+    } catch (Exception e) {
+      logger.error("Exception occured while inspecting the raw data", e);
+      throw new ReadEntitySAWException("Exception occured while inspecting the raw data", e);
+    }
+    return responseInspect;
   } 
   
   /**
