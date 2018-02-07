@@ -12,7 +12,7 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
 import { UrlService } from '@uirouter/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { UpgradeModule, downgradeModule } from '@angular/upgrade/static';
+import { UpgradeModule, downgradeModule, downgradeComponent } from '@angular/upgrade/static';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { routesConfig } from './routes';
@@ -29,6 +29,7 @@ import { AlertsModule } from './modules/alerts';
 import { AdminModule } from './modules/admin';
 
 import { LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent } from './layout';
+import { ServiceBootstrapComponent } from './service-bootstrap.component';
 
 @NgModule({
   imports: [
@@ -43,7 +44,9 @@ import { LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent } 
   exports: [FlexLayoutModule],
   providers: [
     {provide: LOCALE_ID, useValue: 'en'}
-  ]
+  ],
+  declarations: [ServiceBootstrapComponent],
+  entryComponents: [ServiceBootstrapComponent]
 })
 export class NewAppModule {
   constructor() { }
@@ -80,6 +83,10 @@ angular
   .config(config)
   .config(interceptor)
   .run(runConfig)
+  .directive(
+    'serviceBootstrap',
+    downgradeComponent({ component: ServiceBootstrapComponent }) as angular.IDirectiveFactory
+  )
   .component('layoutHeader', LayoutHeaderComponent)
   .component('layoutContent', LayoutContentComponent)
   .component('layoutFooter', LayoutFooterComponent);
