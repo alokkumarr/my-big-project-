@@ -19,7 +19,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
     "preset",
     "value",
     "otherValue",
-    "stringValue",
     "gte",
     "lte",
     "format",
@@ -35,8 +34,6 @@ public class Model {
     private Integer value;
     @JsonProperty("otherValue")
     private Integer otherValue;
-    @JsonProperty("stringValue")
-    private String stringValue;
     @JsonProperty("gte")
     private String gte;
     @JsonProperty("lte")
@@ -84,16 +81,6 @@ public class Model {
     @JsonProperty("otherValue")
     public void setOtherValue(Integer otherValue) {
         this.otherValue = otherValue;
-    }
-
-    @JsonProperty("stringValue")
-    public String getStringValue() {
-        return stringValue;
-    }
-
-    @JsonProperty("stringValue")
-    public void setStringValue(String stringValue) {
-        this.stringValue = stringValue;
     }
 
     @JsonProperty("gte")
