@@ -112,7 +112,7 @@ exports.config = {
       webpackHelper.root(testDir + '/e2e-tests/createPivot.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/createReport.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),*/
-    ],
+    ]
   } : {
     /**
      * Suites for test run invoked from Protractor directly on local saw-web front-end development server
@@ -127,10 +127,10 @@ exports.config = {
       webpackHelper.root(testDir + '/e2e-tests/createPivot.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/createReport.test.js'),*/
       //webpackHelper.root(testDir + '/e2e-tests/debug.test.js') // for testing purposes
-      webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
+      webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js')
     ],
     authentication: [
-      webpackHelper.root(testDir + '/e2e-tests/login.test.js'),
+      webpackHelper.root(testDir + '/e2e-tests/login.test.js')
     ]
   },
   onPrepare() {
