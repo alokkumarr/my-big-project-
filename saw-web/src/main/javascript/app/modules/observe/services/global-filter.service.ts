@@ -38,18 +38,20 @@ export class GlobalFilterService {
   }
 
   /* Store updated filter values in a new array */
-  updateFilter(filt) {
+  updateFilter({data, valid}) {
     const id = findIndex(this.updatedFilters, f => (
-      f.semanticId === filt.semanticId &&
-      f.columnName === filt.columnName &&
-      f.tableName === filt.tableName
+      f.semanticId === data.semanticId &&
+      f.columnName === data.columnName &&
+      f.tableName === data.tableName
     ));
 
     /* Push or replace existing filter */
-    if (id >= 0) {
-      this.updatedFilters.splice(id, 1, filt);
+    if (id >= 0 && !valid) {
+      this.updatedFilters.splice(id, 1);
+    } else if (id >= 0) {
+      this.updatedFilters.splice(id, 1, data);
     } else {
-      this.updatedFilters.push(filt);
+      valid && this.updatedFilters.push(data);
     }
   }
 }

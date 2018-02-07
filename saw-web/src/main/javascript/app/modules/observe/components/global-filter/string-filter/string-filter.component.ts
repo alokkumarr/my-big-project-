@@ -62,14 +62,15 @@ export class GlobalStringFilterComponent implements OnInit {
   }
 
   filterChanged() {
-    this.onModelChange.emit({
+    const payload = {
       ...this._filter,
       ...{
         model: {
           modelValues: this.value
         }
       }
-    });
+    };
+    this.onModelChange.emit({data: payload, valid: this.value && this.value.length});
   }
 }
 

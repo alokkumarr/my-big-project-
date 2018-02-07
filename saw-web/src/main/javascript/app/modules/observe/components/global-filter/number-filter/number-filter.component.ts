@@ -27,7 +27,7 @@ export class GlobalNumberFilterComponent implements OnInit {
 
   onSliderChange(data) {
     this.value = data;
-    this.onModelChange.emit({
+    const payload = {
       ...this._filter,
       ...{
         model: {
@@ -36,7 +36,9 @@ export class GlobalNumberFilterComponent implements OnInit {
           operator: 'BTW'
         }
       }
-    })
+    };
+
+    this.onModelChange.emit({data: payload, valid: true});
   }
 }
 

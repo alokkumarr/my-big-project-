@@ -159,20 +159,30 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
     }
   }
 
-  onApplyGlobalFilters(gFilters) {
+  /**
+   * Merges the globalfilters with existing analysis filters.
+   * Creates a new analysis object and keeps the origAnalysis intact.
+   * This is required so that we can apply original filters on
+   * removing global filters.
+   *
+   * @param {any} filterGroup Filters grouped by semantic id
+   * @memberof DashboardGridComponent
+   */
+  onApplyGlobalFilters(filterGroup) {
     this.dashboard.forEach((tile, id) => {
-      if (!gFilters[tile.analysis.semanticId]) {
-        return;
-      }
+      const gFilters = filterGroup[tile.analysis.semanticId] || [];
 
-      tile.analysis.sqlBuilder.filters = unionWith(
-        gFilters[tile.analysis.semanticId],
-        tile.analysis.sqlBuilder.filters,
+      const filters = unionWith(
+        gFilters,
+        tile.origAnalysis.sqlBuilder.filters,
         (gFilt, filt) => (
           gFilt.tableName === filt.tableName &&
           gFilt.columnName === filt.columnName
         )
       );
+
+      const sqlBuilder = {...tile.origAnalysis.sqlBuilder, ...{filters}};
+      tile.analysis = {...tile.origAnalysis, ...{sqlBuilder}};
 
       this.dashboard.splice(id, 1, {...tile});
     });
@@ -186,6 +196,7 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
     forEach(get(this.model, 'tiles', []), tile => {
       this.analyze.readAnalysis(tile.id).then(data => {
         tile.analysis = data;
+        tile.origAnalysis = data;
         this.addGlobalFilters(data);
         tile.updater = new BehaviorSubject({});
         this.dashboard.push(tile);

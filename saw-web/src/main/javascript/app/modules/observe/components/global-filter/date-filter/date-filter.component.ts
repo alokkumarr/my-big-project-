@@ -28,12 +28,17 @@ export class GlobalDateFilterComponent implements OnInit {
 
   onDateChange(field, data) {
     this.value[field] = data.value;
-    this.onModelChange.emit({...this._filter, ...{
-      model: {
-        preset: 'NA',
-        lte: this.value.lte.format('YYYY-MM-DD'),
-        gte: this.value.gte.format('YYYY-MM-DD')
+    const payload = {
+      ...this._filter,
+      ...{
+        model: {
+          preset: 'NA',
+          lte: this.value.lte.format('YYYY-MM-DD'),
+          gte: this.value.gte.format('YYYY-MM-DD')
+        }
       }
-    }})
+    };
+
+    this.onModelChange.emit({data: payload, valid: this.value.lte && this.value.gte});
   }
 }
