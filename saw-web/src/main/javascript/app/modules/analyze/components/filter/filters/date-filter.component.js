@@ -2,7 +2,7 @@ import * as map from 'lodash/map';
 import * as forEach from 'lodash/forEach';
 import * as template from './date-filter.component.html';
 
-export const CUSTOM_DATE_PRESET_VALUE = 'NA';
+import {CUSTOM_DATE_PRESET_VALUE, DATE_PRESETS} from '../../../consts';
 
 export const DateFilterComponent = {
   template,
@@ -14,37 +14,7 @@ export const DateFilterComponent = {
     constructor($filter, $translate) {
       this._$filter = $filter;
       this.CUSTOM_DATE_PRESET_VALUE = CUSTOM_DATE_PRESET_VALUE;
-      this.presets = [{
-        value: 'TW',
-        keyword: 'THIS_WEEK'
-      }, {
-        value: 'MTD',
-        keyword: 'MONTH_TO_DATE'
-      }, {
-        value: 'YTD',
-        keyword: 'YEAR_TO_DATE'
-      }, {
-        value: 'LW',
-        keyword: 'LAST_WEEK'
-      }, {
-        value: 'LTW',
-        keyword: 'LAST_2_WEEKS'
-      }, {
-        value: 'LM',
-        keyword: 'LAST_MONTH'
-      }, {
-        value: 'LQ',
-        keyword: 'LAST_QUARTER'
-      }, {
-        value: 'LTM',
-        keyword: 'LAST_3_MONTHS'
-      }, {
-        value: 'LSM',
-        keyword: 'LAST_6_MONTHS'
-      }, {
-        value: CUSTOM_DATE_PRESET_VALUE,
-        keyword: 'CUSTOM'
-      }];
+      this.presets = DATE_PRESETS;
       $translate(map(this.presets, 'keyword')).then(translations => {
         forEach(this.presets, preset => {
           preset.label = translations[preset.keyword];

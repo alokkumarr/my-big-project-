@@ -3,7 +3,7 @@ import * as clone from 'lodash/clone';
 
 import {AnalyseTypes} from '../../consts';
 
-export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toastMessage, FilterService, $log) {
+export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toastMessage, FilterService, $log, AnalyzeDialogService) {
   'ngInject';
   return {
     execute,
@@ -64,8 +64,8 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
     return AnalyzeService.publishAnalysis(analysis, execute).then(updatedAnalysis => {
       $rootScope.showProgress = false;
       toastMessage.info(execute ?
-                                'Analysis has been published.' :
-                                'Analysis schedule changes have been updated.');
+        'Analysis has been published.' :
+        'Analysis schedule changes have been updated.');
       return updatedAnalysis;
     }, () => {
       $rootScope.showProgress = false;
@@ -84,6 +84,7 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
     };
 
     switch (analysis.type) {
+    case AnalyseTypes.ESReport:
     case AnalyseTypes.Report:
       openModal(`<analyze-report model="model" mode="${mode}"></analyze-report>`);
       break;
@@ -91,7 +92,7 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
       openModal(`<analyze-chart model="model" mode="${mode}"></analyze-chart>`);
       break;
     case AnalyseTypes.Pivot:
-      openModal(`<analyze-pivot model="model" mode="${mode}"></analyze-pivot>`);
+      AnalyzeDialogService.openEditAdnalysisDialog(analysis, mode);
       break;
     default:
     }
@@ -99,8 +100,8 @@ export function AnalyzeActionsService($mdDialog, $rootScope, AnalyzeService, toa
 
   function openDeleteModal(analysis) {
     const confirm = $mdDialog.confirm()
-          .title('Are you sure you want to delete this analysis?')
-          .textContent('Any published analyses will also be deleted.')
+      .title('Are you sure you want to delete this analysis?')
+      .textContent('Any published analyses will also be deleted.')
       .ok('Delete')
       .cancel('Cancel');
 

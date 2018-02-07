@@ -1,3 +1,5 @@
+declare const require: any;
+
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
@@ -9,35 +11,85 @@ import {
   MatFormFieldModule,
   MatProgressBarModule,
   MatChipsModule,
-  MatInputModule
+  MatIconRegistry,
+  MatListModule,
+  MatCheckboxModule,
+  MatMenuModule,
+  MatTooltipModule,
+  MatDatepickerModule,
+  MatInputModule,
+  MatToolbarModule,
+  MatCardModule,
+  MatGridListModule,
+  MatStepperModule,
+  MatSliderModule,
+  MatSlideToggleModule,
+  MatTabsModule,
+  MatDividerModule,
+  MatExpansionModule,
+  MatButtonToggleModule
 } from '@angular/material';
+
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
 import '../../../../themes/_angular_next.scss';
-
 @NgModule({
   imports: [
     BrowserAnimationsModule,
     MatButtonModule,
-    MatIconModule,
-    MatDialogModule,
     MatRadioModule,
     MatSelectModule,
+    MatIconModule,
+    MatDialogModule,
     MatFormFieldModule,
     MatProgressBarModule,
     MatChipsModule,
-    MatInputModule
+    MatListModule,
+    MatCheckboxModule,
+    MatMenuModule,
+    MatTooltipModule,
+    MatDatepickerModule,
+    MatInputModule,
+    MatToolbarModule,
+    MatCardModule,
+    MatGridListModule,
+    MatStepperModule,
+    MatDividerModule,
+    MatSliderModule,
+    MatSlideToggleModule,
+    MatTabsModule,
+    MatExpansionModule,
+    MatButtonToggleModule,
+    MatMomentDateModule
   ],
+  providers: [MatIconRegistry],
   exports: [
     MatButtonModule,
-    MatIconModule,
-    MatDialogModule,
     MatRadioModule,
     MatSelectModule,
+    MatIconModule,
+    MatDialogModule,
     MatFormFieldModule,
     MatProgressBarModule,
     MatChipsModule,
-    MatInputModule
+    MatListModule,
+    MatCheckboxModule,
+    MatMenuModule,
+    MatTooltipModule,
+    MatDatepickerModule,
+    MatInputModule,
+    MatToolbarModule,
+    MatCardModule,
+    MatGridListModule,
+    MatStepperModule,
+    MatDividerModule,
+    MatSliderModule,
+    MatSlideToggleModule,
+    MatTabsModule,
+    MatExpansionModule,
+    MatButtonToggleModule,
+    MatMomentDateModule
   ]
 })
-export class MaterialModule {}
+export class MaterialModule { }

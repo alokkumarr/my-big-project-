@@ -34,7 +34,7 @@ class SAWPivotTypeElasticSearchQueryBuilder {
   String dataSecurityString;
   SearchSourceBuilder searchSourceBuilder;
 
-  final static String dateformat="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
+  private final static String DATE_FORMAT="yyyy-MM-dd HH:mm:ss||yyyy-MM-dd";
 
   public SAWPivotTypeElasticSearchQueryBuilder(String jsonString) {
     super();
@@ -114,7 +114,7 @@ public String getJsonString() {
             DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
             if(item.getType().value().equals(Type.DATE.value())) {
-              rangeQueryBuilder.format(dateformat);
+              rangeQueryBuilder.format(DATE_FORMAT);
             }
             rangeQueryBuilder.lte(dynamicConvertor.getLte());
             rangeQueryBuilder.gte(dynamicConvertor.getGte());
@@ -123,7 +123,7 @@ public String getJsonString() {
           else {
             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
             if(item.getType().value().equals(Type.DATE.value())) {
-              rangeQueryBuilder.format(dateformat);
+              rangeQueryBuilder.format(DATE_FORMAT);
             }
             rangeQueryBuilder.lte(item.getModel().getLte());
             rangeQueryBuilder.gte(item.getModel().getGte());
@@ -152,7 +152,7 @@ public String getJsonString() {
             DynamicConvertor dynamicConvertor = BuilderUtil.dynamicDecipher(item.getModel().getPreset().value());
             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
             if(item.getType().value().equals(Type.DATE.value())) {
-              rangeQueryBuilder.format(dateformat);
+              rangeQueryBuilder.format(DATE_FORMAT);
             }
             rangeQueryBuilder.lte(dynamicConvertor.getLte());
             rangeQueryBuilder.gte(dynamicConvertor.getGte());
@@ -161,7 +161,7 @@ public String getJsonString() {
           else {
             RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(item.getColumnName());
             if(item.getType().value().equals(Type.DATE.value())) {
-              rangeQueryBuilder.format(dateformat);
+              rangeQueryBuilder.format(DATE_FORMAT);
             }
             rangeQueryBuilder.lte(item.getModel().getLte());
             rangeQueryBuilder.gte(item.getModel().getGte());

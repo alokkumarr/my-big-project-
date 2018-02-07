@@ -1,14 +1,14 @@
-<div md-dialog-title>
+<div mat-dialog-title>
   <span [textContent]="title"></span>
 </div>
-<div md-dialog-content>
+<div mat-dialog-content>
   <span [textContent]="message"></span>
 </div>
-<div md-dialog-actions style="flex-direction: row-reverse">
-  <button md-button [color]="actionColor"
+<div mat-dialog-actions style="flex-direction: row-reverse">
+  <button mat-button [color]="actionColor"
   (click)="confirm()"
   [textContent]="actionButton"></button>
-  <button md-button (click)="closeDashboard()">
+  <button mat-button (click)="closeDashboard()">
     Cancel
   </button>
 </div>

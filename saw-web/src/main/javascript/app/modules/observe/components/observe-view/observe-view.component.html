@@ -1,16 +1,16 @@
 <div class="page-header-toolbar">
   <h2>{{(dashboard ? dashboard.name : '') || 'Observe'}}</h2>
   <div class="page-header-actions">
-    <button md-button
+    <button mat-button
     color="warn"
     *ngIf="dashboard && privileges.delete"
     (click)="confirmDelete()">Delete</button>
 
-    <button md-button
+    <button mat-button
     *ngIf="dashboard && privileges.edit"
     (click)="editDashboard()">Edit</button>
 
-    <button md-raised-button
+    <button mat-raised-button
     color="primary"
     (click)="createDashboard()">+ DASHBOARD</button>
   </div>

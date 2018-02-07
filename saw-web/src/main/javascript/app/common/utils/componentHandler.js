@@ -11,7 +11,8 @@ export default class ComponentHandler {
       let coll = this._instances[key];
 
       if (!coll) {
-        coll = this._instances[key] = [];
+        coll = [];
+        this._instances[key] = coll;
       }
 
       coll.push(instance);

@@ -1,0 +1,93 @@
+@import "themes/base/colors";
+
+dataset-details {
+  width: 100%;
+
+  .data-details {
+    background-color: whitesmoke;
+    padding: 3px;
+  }
+
+  .toolbar-spacer {
+    flex: 1 1 auto;
+  }
+
+  .margin-9 {
+    margin: 3px 3px 0 0;
+    padding-bottom: 0;
+  }
+
+  .borderPrimary {
+    border-top-color: $primary-blue-b2;
+    border-top-width: 1.6px;
+  }
+
+  .whiteFrame {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+    background-color: white;
+  }
+
+  .file-icon {
+    color: #00B18D;
+  }
+
+  .mat-card {
+    padding: 0 !important;
+  }
+
+  .margin20 {
+    margin: 3px;
+    width: 100%;
+  }
+
+  .input-section {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    height: 9vh;
+  }
+
+  .headerGradient {
+    padding: 8px 15px;
+    background-color: white;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+  }
+
+  .headerText {
+    margin: 9px !important;
+    font-size: 16px !important;
+  }
+
+  .form-div {
+    padding: 1% 9% 0;
+  }
+
+  .list-margin1 {
+    margin-top: 1%;
+  }
+
+  .list-header {
+    padding: 9px;
+    background-color: #1A89D4;
+    font-size: 16px;
+    border-radius: 3px 12px 0 0;
+    color: white;
+  }
+
+  .list-items {
+    background-color: white;
+    border-radius: 0 3px 3px;
+    border: #1A89D4 0.5px dotted;
+
+    &:hover {
+      box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2), 0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(0, 0, 0, 0.12) !important;
+      cursor: pointer;
+    }
+  }
+
+  .preview-icon {
+    font-size: 18px;
+    color: #1A89D4;
+  }
+}

@@ -21,8 +21,11 @@ import * as fpMapValues from 'lodash/fp/mapValues';
 import * as fpPick from 'lodash/fp/pick';
 import * as moment from 'moment';
 
-import {NUMBER_TYPES, DATE_TYPES} from '../consts';
-import {DATE_INTERVALS_OBJ} from '../components/pivot/settings/analyze-pivot-settings.component';
+import {
+  NUMBER_TYPES,
+  DATE_TYPES,
+  DATE_INTERVALS_OBJ
+} from '../consts';
 
 const FRONT_2_BACK_PIVOT_FIELD_PAIRS = {
   caption: 'displayName',
@@ -89,7 +92,7 @@ export function PivotService() {
     return area;
   }
 
-   /** Map the tree level to the columnName of the field
+  /** Map the tree level to the columnName of the field
    * Example:
    * row_field_1: 0 -> SOURCE_OS
    * row_field_2: 1 -> SOURCE_MANUFACTURER

@@ -1,0 +1,74 @@
+@import "themes/base/colors";
+
+designer-settings-single {
+  .settings__container {
+    overflow: hidden;
+    background-color: white;
+    display: grid;
+    padding: 0 10px;
+    height: 100%;
+    grid-template:
+      "filters" 60px
+      "unselected-fields" 1fr
+      "selected-fields" 1fr
+      / 100%;
+  }
+
+  .settings__filters {
+    .mat-input-wrapper.mat-form-field-wrapper {
+      padding-bottom: 0;
+      margin-right: 10px;
+
+      .mat-input-underline.mat-form-field-underline {
+        top: 90%;
+      }
+    }
+
+    .mat-form-field-infix {
+      border: 0;
+    }
+  }
+
+  .settings__unselected-fields {
+    grid-area: unselected-fields;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .settings__selected-fields {
+    grid-area: selected-fields;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-top: 1px solid $primary-grey-g1;
+    margin-top: 10px;
+  }
+
+  .settings__list-item {
+    cursor: move;
+    margin-top: 3px;
+    padding: 5px;
+    min-width: max-content;
+    border: solid 1px $primary-grey-g1;
+    border-radius: 2px;
+
+    button.mat-icon-button {
+      line-height: 24px;
+      height: 26px;
+      width: auto;
+    }
+
+    .settings__list-item__name {
+      max-width: 230px;
+      font-weight: 600;
+      color: $primary-grey-g4;
+      white-space: normal;
+      word-wrap: normal;
+      word-break: break-word;
+    }
+
+    .settings__list-item__icon {
+      margin-left: 10px;
+      color: $primary-grey-g3;
+    }
+  }
+}

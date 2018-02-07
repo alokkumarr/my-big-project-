@@ -1,0 +1,24 @@
+@import "themes/base/colors";
+
+toolbar-action-dialog {
+  display: block;
+  padding: 10px;
+
+  .dialog__header {
+    padding: 10px;
+    border-bottom: 1px solid $primary-grey-g2;
+
+    strong {
+      font-size: 20px;
+    }
+  }
+
+  .dialog__content {
+    padding: 20px 10px;
+  }
+
+  .dialog__actions {
+    padding-top: 10px;
+    border-top: 1px solid $primary-grey-g2;
+  }
+}

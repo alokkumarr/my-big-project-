@@ -48,6 +48,7 @@ saw_elasticsearch_host=localhost
 saw_elasticsearch_port=9200
 saw_elasticsearch_username=elastic
 saw_elasticsearch_password=elastic
+saw_elasticsearch_data_store_limit=10000
 
 #
 # Outgoing email configuration
