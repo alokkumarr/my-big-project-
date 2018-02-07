@@ -60,7 +60,6 @@ export class DesignerSettingsGroupComponent {
   }
 
   onRemoveField(artifactColumn: ArtifactColumn) {
-    console.log(artifactColumn);
     artifactColumn.aliasName = '';
     this.removeField.emit(artifactColumn);
   }
