@@ -1,7 +1,7 @@
 const login = require('../../javascript/pages/loginPage.po.js');
 const analyzePage = require('../../javascript/pages/analyzePage.po.js');
 const protractor = require('protractor');
-const protractorConf = require('/conf/protractor.conf');
+const protractorConf = require('../../../../conf/protractor.conf');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const {hasClass} = require('../../javascript/helpers/utils');
 
@@ -15,7 +15,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
   const method = 'chart:column';
 
   beforeAll(function () {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.extendedDefaultTimeoutInterval;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
   });
 
   beforeEach(function (done) {
@@ -23,7 +23,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
       browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, protractorConf.fluentWait)
+    }, protractorConf.timeouts.fluentWait)
   });
 
   afterEach(function (done) {
@@ -31,7 +31,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
       browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
-    }, protractorConf.fluentWait)
+    }, protractorConf.timeouts.fluentWait)
   });
 
   afterAll(function () {

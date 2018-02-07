@@ -1,7 +1,7 @@
 const loginPage = require('../javascript/pages/loginPage.po.js');
 const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const protractor = require('protractor');
-const protractorConf = require('/conf/protractor.conf');
+const protractorConf = require('../../../conf/protractor.conf');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 
 describe('Create report type analysis: createReport.test.js', () => {
@@ -33,24 +33,24 @@ describe('Create report type analysis: createReport.test.js', () => {
 
   beforeAll(function () {
     // This test may take some time. Such timeout fixes jasmine DEFAULT_TIMEOUT_INTERVAL interval error
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.extendedDefaultTimeoutInterval;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
 
     // Waiting for results may take some time
-    browser.manage().timeouts().implicitlyWait(protractorConf.extendedImplicitlyWait);
+    browser.manage().timeouts().implicitlyWait(protractorConf.timeouts.extendedImplicitlyWait);
   });
 
   beforeEach(function (done) {
     setTimeout(function () {
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, protractorConf.fluentWait)
+    }, protractorConf.timeouts.fluentWait)
   });
 
   afterEach(function (done) {
     setTimeout(function () {
       analyzePage.main.doAccountAction('logout');
       done();
-    }, protractorConf.fluentWait)
+    }, protractorConf.timeouts.fluentWait)
   });
 
   afterAll(function () {

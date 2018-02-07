@@ -52,10 +52,10 @@ const testDir = '../saw-web/src/test';
  */
 const protractorPath = 'target/protractor-reports';
 
-module.exports = {
-  fluentWait: fluentWait,
-  extendedDefaultTimeoutInterval: extendedDefaultTimeoutInterval,
-  extendedImplicitlyWait: extendedImplicitlyWait
+exports.timeouts = {
+    fluentWait: fluentWait,
+    extendedDefaultTimeoutInterval: extendedDefaultTimeoutInterval,
+    extendedImplicitlyWait: extendedImplicitlyWait
 };
 
 exports.config = {

@@ -25,7 +25,7 @@ describe('should go to Analyze page after landing on home page', () => {
 
     // wait for the app to automatically navigate to the default page
     browser
-      .wait(() => alreadyOnAnalyzePage, protractorConf.fluentWait)
+      .wait(() => alreadyOnAnalyzePage, protractorConf.timeouts.fluentWait)
       .then(() => expect(browser.getCurrentUrl()).toContain('/analyze'));
   });
 

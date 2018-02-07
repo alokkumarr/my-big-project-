@@ -1,7 +1,7 @@
 const loginPage = require('../javascript/pages/loginPage.po.js');
 const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const protractor = require('protractor');
-const protractorConf = require('/conf/protractor.conf');
+const protractorConf = require('../../../conf/protractor.conf');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 const {hasClass} = require('../javascript/helpers/utils');
 
@@ -17,7 +17,7 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
   const method = 'table:pivot';
 
   beforeAll(function () {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.extendedDefaultTimeoutInterval;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
   });
 
   beforeEach(function (done) {
@@ -25,7 +25,7 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
       browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, protractorConf.fluentWait)
+    }, protractorConf.timeouts.fluentWait)
   });
 
   afterEach(function (done) {
@@ -33,7 +33,7 @@ describe('Create pivot type analysis: createPivot.test.js', () => {
       browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
-    }, protractorConf.fluentWait)
+    }, protractorConf.timeouts.fluentWait)
   });
 
   afterAll(function () {

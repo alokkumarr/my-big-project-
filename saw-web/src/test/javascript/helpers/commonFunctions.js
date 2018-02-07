@@ -1,8 +1,8 @@
 const protractor = require('protractor');
 const EC = protractor.ExpectedConditions;
-const protractorConf = require('/conf/protractor.conf');
+const protractorConf = require('../../../../conf/protractor.conf');
 
-const fluentWait = protractorConf.fluentWait;
+const fluentWait = protractorConf.timeouts.fluentWait;
 
 module.exports = {
   waitFor: {
