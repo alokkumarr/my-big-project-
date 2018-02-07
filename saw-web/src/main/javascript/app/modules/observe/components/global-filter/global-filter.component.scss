@@ -18,6 +18,15 @@ global-filter {
     padding-bottom: 15px;
   }
 
+  .filter-content {
+    flex-grow: 1;
+  }
+
+  .filter-footer-actions {
+    display: flex;
+    justify-content: space-around;
+  }
+
   .full-width {
     width: 100%;
   }

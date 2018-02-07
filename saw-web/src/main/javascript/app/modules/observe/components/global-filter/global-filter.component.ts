@@ -87,4 +87,8 @@ export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   onCancel() {
     this.onApplyFilter.emit(false);
   }
+
+  onClearFilters() {
+    this.onApplyFilter.emit({});
+  }
 }

@@ -2,19 +2,26 @@
   <button mat-button (click)="onCancel()">Cancel</button>
   <button mat-raised-button color="primary" (click)="onApply()">Apply Filters</button>
 </div>
-<div *ngFor="let gFilter of globalFilters" [ngSwitch]="gFilter.uiType">
-  <g-date-filter
-    *ngSwitchCase="'date'"
-    [filter]="gFilter"
-    (onModelChange)="onFilterUpdate($event)"></g-date-filter>
 
-  <g-number-filter
-    *ngSwitchCase="'number'"
-    [filter]="gFilter"
-    (onModelChange)="onFilterUpdate($event)"></g-number-filter>
+<div class="filter-content">
+  <div *ngFor="let gFilter of globalFilters" [ngSwitch]="gFilter.uiType">
+    <g-date-filter
+      *ngSwitchCase="'date'"
+      [filter]="gFilter"
+      (onModelChange)="onFilterUpdate($event)"></g-date-filter>
 
-  <g-string-filter
-    *ngSwitchCase="'string'"
-    [filter]="gFilter"
-    (onModelChange)="onFilterUpdate($event)"></g-string-filter>
+    <g-number-filter
+      *ngSwitchCase="'number'"
+      [filter]="gFilter"
+      (onModelChange)="onFilterUpdate($event)"></g-number-filter>
+
+    <g-string-filter
+      *ngSwitchCase="'string'"
+      [filter]="gFilter"
+      (onModelChange)="onFilterUpdate($event)"></g-string-filter>
+  </div>
+</div>
+
+<div class="filter-footer-actions">
+  <button mat-button (click)="onClearFilters()">Clear All Filters</button>
 </div>
