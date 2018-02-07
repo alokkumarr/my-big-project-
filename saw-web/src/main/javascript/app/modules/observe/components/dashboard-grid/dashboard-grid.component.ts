@@ -15,6 +15,7 @@ import { Subscription } from 'rxjs/Subscription';
 
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
+import * as unionWith from 'lodash/unionWith';
 import * as forEach from 'lodash/forEach';
 
 import { Dashboard } from '../../models/dashboard.interface';
@@ -51,6 +52,7 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
   public options: GridsterConfig;
   public dashboard: Array<GridsterItem> = [];
   private sidenavEventSubscription: Subscription;
+  private globalFiltersSubscription: Subscription;
   public initialised = false;
 
   constructor(
@@ -77,6 +79,8 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
         enabled: !this.isViewMode()
       }
     };
+
+    window['mydashboard'] = this;
   }
 
   ngAfterViewChecked() {
@@ -89,6 +93,7 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
 
   ngOnDestroy() {
     this.sidenavEventSubscription.unsubscribe();
+    this.globalFiltersSubscription.unsubscribe();
   }
 
   onGridInit() {
@@ -99,6 +104,10 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
       setTimeout(_ => {
         this.refreshAllTiles();
       }, 500);
+    });
+
+    this.globalFiltersSubscription = this.filters.onApplyFilter.subscribe(data => {
+      this.onApplyGlobalFilters(data);
     });
   }
 
@@ -148,6 +157,25 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
 
       this.filters.addFilter(map(filters, flt => ({...flt, ...{semanticId: analysis.semanticId}})));
     }
+  }
+
+  onApplyGlobalFilters(gFilters) {
+    this.dashboard.forEach((tile, id) => {
+      if (!gFilters[tile.analysis.semanticId]) {
+        return;
+      }
+
+      tile.analysis.sqlBuilder.filters = unionWith(
+        gFilters[tile.analysis.semanticId],
+        tile.analysis.sqlBuilder.filters,
+        (gFilt, filt) => (
+          gFilt.tableName === filt.tableName &&
+          gFilt.columnName === filt.columnName
+        )
+      );
+
+      this.dashboard.splice(id, 1, {...tile});
+    });
   }
 
   initialiseDashboard() {

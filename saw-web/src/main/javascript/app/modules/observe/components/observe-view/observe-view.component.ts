@@ -103,12 +103,24 @@ export class ObserveViewComponent implements OnInit {
     });
   }
 
+  /**
+   * Pushes a new event to global filter service which
+   * individual analyses are listening to. This triggers
+   * updates in those analyses.
+   *
+   * Closes the sidebar.
+   *
+   * @param {any} globalFilters
+   * @returns {void}
+   * @memberof ObserveViewComponent
+   */
   onApplyGlobalFilter(globalFilters): void {
     if (!globalFilters) {
       this.sidenav.close();
       return;
     }
 
+    this.filters.onApplyFilter.next(globalFilters);
     this.sidenav.close();
   }
 

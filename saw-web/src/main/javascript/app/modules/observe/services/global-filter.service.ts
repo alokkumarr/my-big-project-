@@ -12,6 +12,7 @@ export class GlobalFilterService {
   private rawFilters = [];
   private updatedFilters = [];
   public onFilterChange = new Subject();
+  public onApplyFilter = new Subject();
 
   constructor() { }
 
@@ -27,6 +28,7 @@ export class GlobalFilterService {
 
   addFilter(filt) {
     this.rawFilters = this.rawFilters.concat(filt);
+    // TODO: Only allow unique filters to be added to this
     // find(this.filters, f => f.columnName === filt.columnName);
     this.onFilterChange.next(filt);
   }
