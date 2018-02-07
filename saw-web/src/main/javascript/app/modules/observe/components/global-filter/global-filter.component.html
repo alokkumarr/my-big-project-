@@ -1,9 +1,20 @@
 <div class="filter-header-actions">
-  <button mat-button>Cancel</button>
-  <button mat-raised-button color="primary">Apply Filters</button>
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onApply()">Apply Filters</button>
 </div>
 <div *ngFor="let gFilter of globalFilters" [ngSwitch]="gFilter.uiType">
-  <g-date-filter *ngSwitchCase="'date'" [filter]="gFilter"></g-date-filter>
-  <g-number-filter *ngSwitchCase="'number'" [filter]="gFilter"></g-number-filter>
-  <g-string-filter *ngSwitchCase="'string'" [filter]="gFilter"></g-string-filter>
+  <g-date-filter
+    *ngSwitchCase="'date'"
+    [filter]="gFilter"
+    (onModelChange)="onFilterUpdate($event)"></g-date-filter>
+
+  <g-number-filter
+    *ngSwitchCase="'number'"
+    [filter]="gFilter"
+    (onModelChange)="onFilterUpdate($event)"></g-number-filter>
+
+  <g-string-filter
+    *ngSwitchCase="'string'"
+    [filter]="gFilter"
+    (onModelChange)="onFilterUpdate($event)"></g-string-filter>
 </div>

@@ -5,7 +5,9 @@
 
   <mat-form-field>
     <input matInput
+      [value]="value.gte"
       [matDatepicker]="frompicker"
+      (dateInput)="onDateChange('gte', $event)"
       placeholder="From"
       disabled />
     <mat-datepicker-toggle matSuffix [for]="frompicker"></mat-datepicker-toggle>
@@ -14,7 +16,9 @@
 
   <mat-form-field>
     <input matInput
+      [value]="value.lte"
       [matDatepicker]="topicker"
+      (dateInput)="onDateChange('lte', $event)"
       placeholder="To"
       disabled />
     <mat-datepicker-toggle matSuffix [for]="topicker"></mat-datepicker-toggle>

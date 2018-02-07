@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 const template = require('./number-filter.component.html');
 
@@ -8,6 +8,8 @@ const template = require('./number-filter.component.html');
 })
 
 export class GlobalNumberFilterComponent implements OnInit {
+  @Output() onModelChange = new EventEmitter();
+
   private _filter;
   private max = 100;
   private min = 1;
@@ -25,6 +27,16 @@ export class GlobalNumberFilterComponent implements OnInit {
 
   onSliderChange(data) {
     this.value = data;
+    this.onModelChange.emit({
+      ...this._filter,
+      ...{
+        model: {
+          value: this.value[1],
+          otherValue: this.value[0],
+          operator: 'BTW'
+        }
+      }
+    })
   }
 }
 

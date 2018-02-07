@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 import { Observable } from 'rxjs/Observable';
@@ -13,6 +13,8 @@ const template = require('./string-filter.component.html');
 })
 
 export class GlobalStringFilterComponent implements OnInit {
+  @Output() onModelChange = new EventEmitter();
+
   filterCtrl: FormControl;
   private _filter;
   private value: Array<string>;
@@ -42,6 +44,7 @@ export class GlobalStringFilterComponent implements OnInit {
     if (evt.keyCode === 13) { // on pressing 'Enter'
       this.value.push(this.filterCtrl.value);
       this.filterCtrl.setValue('');
+      this.filterChanged();
     }
   }
 
@@ -54,7 +57,19 @@ export class GlobalStringFilterComponent implements OnInit {
     const id = this.value.indexOf(str);
     if (id >= 0) {
       this.value.splice(id, 1);
+      this.filterChanged();
     }
+  }
+
+  filterChanged() {
+    this.onModelChange.emit({
+      ...this._filter,
+      ...{
+        model: {
+          modelValues: this.value
+        }
+      }
+    });
   }
 }
 

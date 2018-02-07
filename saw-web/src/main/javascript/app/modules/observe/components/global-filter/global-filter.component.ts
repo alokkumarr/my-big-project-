@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { Subscription } from 'rxjs/Subscription'
 
@@ -16,6 +16,8 @@ require('./global-filter.component.scss');
 })
 
 export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
+  @Output() onApplyFilter = new EventEmitter();
+
   private globalFilters = [];
   private filterChangeSubscription: Subscription;
 
@@ -24,7 +26,7 @@ export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   ) { }
 
   ngAfterViewInit() {
-    this.globalFilters = this.filters.globalFilters;
+    this.globalFilters = this.filters.rawGlobalFilters;
     this.filterChangeSubscription =  this.filters.onFilterChange
       .subscribe(this.onFilterChange.bind(this))
   }
@@ -66,11 +68,23 @@ export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
     }
   }
 
+  onFilterUpdate(data) {
+    this.filters.updateFilter(data);
+  }
+
   ngOnDestroy() {
     this.filterChangeSubscription.unsubscribe();
   }
 
   stringify(data) {
     return JSON.stringify(data, null, 2);
+  }
+
+  onApply() {
+    this.onApplyFilter.emit(this.filters.globalFilters);
+  }
+
+  onCancel() {
+    this.onApplyFilter.emit(false);
   }
 }

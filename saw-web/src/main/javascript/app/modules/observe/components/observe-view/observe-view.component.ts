@@ -28,7 +28,7 @@ export class ObserveViewComponent implements OnInit {
     delete: false,
     edit: false
   };
-  @ViewChild(MatSidenav) sidenav;
+  @ViewChild('filterSidenav') sidenav: MatSidenav;
 
   constructor(
     public dialog: MatDialog,
@@ -103,7 +103,13 @@ export class ObserveViewComponent implements OnInit {
     });
   }
 
-  openGlobalFilters(): void {
+  onApplyGlobalFilter(globalFilters): void {
+    if (!globalFilters) {
+      this.sidenav.close();
+      return;
+    }
+
+    this.sidenav.close();
   }
 
   loadDashboard(): void {
