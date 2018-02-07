@@ -9,6 +9,7 @@ const previewPage = require('../../javascript/pages/previewPage.po');
 const commonFunctions = require('../../javascript/helpers/commonFunctions');
 const homePage = require('../../javascript/pages/homePage.po');
 const using = require('jasmine-data-provider');
+const protractorConf = require('/conf/protractor.conf');
 
 describe('Verify preview for charts: previewForCharts.test.js', () => {
   const defaultCategory = 'AT Privileges Category DO NOT TOUCH';
@@ -42,7 +43,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
   };
 
   beforeAll(function () {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.extendedDefaultTimeoutInterval;
   });
 
   beforeEach(function (done) {
@@ -50,7 +51,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, 1000)
+    }, protractorConf.fluentWait)
   });
 
   afterEach(function (done) {
@@ -58,7 +59,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
-    }, 1000)
+    }, protractorConf.fluentWait)
   });
 
   afterAll(function () {

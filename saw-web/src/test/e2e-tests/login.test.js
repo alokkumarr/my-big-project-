@@ -3,6 +3,7 @@ const header = require('../javascript/pages/components/header.co.js');
 const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const users = require('../javascript/data/users.js');
 const using = require('jasmine-data-provider');
+const protractorConf = require('/conf/protractor.conf');
 
 describe('Login Tests: login.test.js', () => {
 
@@ -12,15 +13,11 @@ describe('Login Tests: login.test.js', () => {
     'user': {user: users.userOne.loginId},
   };
 
-  beforeAll(function () {
-    //jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
-  });
-
   beforeEach(function (done) {
     setTimeout(function () {
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, 1000)
+    }, protractorConf.fluentWait)
   });
 
   afterEach(function (done) {
@@ -28,7 +25,7 @@ describe('Login Tests: login.test.js', () => {
       browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
-    }, 1000)
+    }, protractorConf.fluentWait)
   });
 
   afterAll(function () {

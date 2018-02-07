@@ -1,19 +1,22 @@
 const protractor = require('protractor');
 const EC = protractor.ExpectedConditions;
+const protractorConf = require('/conf/protractor.conf');
+
+const fluentWait = protractorConf.fluentWait;
 
 module.exports = {
   waitFor: {
     elementToBeClickable: element => {
-      return browser.wait(EC.elementToBeClickable(element), 10000, "Element \"" + element.locator() + "\" is not clickable");
+      return browser.wait(EC.elementToBeClickable(element), fluentWait, "Element \"" + element.locator() + "\" is not clickable");
     },
     elementToBeVisible: element => {
-      return browser.wait(EC.visibilityOf(element), 10000, "Element \"" + element.locator() + "\" is not visible");
+      return browser.wait(EC.visibilityOf(element), fluentWait, "Element \"" + element.locator() + "\" is not visible");
     },
     elementToBePresent: element => {
-      return browser.wait(EC.presenceOf(element), 10000, "Element \"" + element.locator() + "\" is not present");
+      return browser.wait(EC.presenceOf(element), fluentWait, "Element \"" + element.locator() + "\" is not present");
     },
     elementToBeClickableAndClick: element => {
-      browser.wait(EC.elementToBeClickable(element), 10000, "Element \"" + element.locator() + "\" is not clickable");
+      browser.wait(EC.elementToBeClickable(element), fluentWait, "Element \"" + element.locator() + "\" is not clickable");
       element.click();
     },
     // Possible options: /analyze/ , /login/
@@ -22,7 +25,7 @@ module.exports = {
         return browser.driver.getCurrentUrl().then(url => {
           return pageName.test(url);
         });
-      }, 10000);
+      }, fluentWait);
     },
     cardsCountToUpdate: (cards, count) => {
       browser.wait(() => {
@@ -31,7 +34,7 @@ module.exports = {
             return text === (count - 1);
           });
         });
-      }, 10000);
+      }, fluentWait);
     }
   },
   find: {

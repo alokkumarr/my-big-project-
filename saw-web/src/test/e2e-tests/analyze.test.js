@@ -7,6 +7,7 @@ const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const users = require('../javascript/data/users.js');
 const using = require('jasmine-data-provider');
 const ec = protractor.ExpectedConditions;
+const protractorConf = require('/conf/protractor.conf');
 
 describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
@@ -17,7 +18,7 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
   };
 
   beforeAll(function () {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.extendedDefaultTimeoutInterval;
   });
 
   beforeEach(function (done) {
@@ -25,7 +26,7 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
       browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, 1000)
+    }, protractorConf.fluentWait)
   });
 
   afterEach(function (done) {
@@ -33,7 +34,7 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
       browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
-    }, 1000)
+    }, protractorConf.fluentWait)
   });
 
     using(userDataProvider, function (data, description) {
@@ -51,7 +52,7 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
       // wait for the app to automatically navigate to the default page
       browser
-        .wait(() => alreadyOnAnalyzePage, 1000)
+        .wait(() => alreadyOnAnalyzePage, protractorConf.fluentWait)
         .then(() => expect(browser.getCurrentUrl()).toContain('/analyze'));
     });
   });

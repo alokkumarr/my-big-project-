@@ -10,6 +10,7 @@ const protractor = require('protractor');
 const ec = protractor.ExpectedConditions;
 const commonFunctions = require('../javascript/helpers/commonFunctions');
 const using = require('jasmine-data-provider');
+const protractorConf = require('/conf/protractor.conf');
 
 //TODO add case for No Privileges
 //TODO add case for changing privileges
@@ -283,7 +284,7 @@ describe('Privileges tests: privileges.test.js', () => {
   };
 
   beforeAll(function () {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = 6000000;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.extendedDefaultTimeoutInterval;
   });
 
   beforeEach(function (done) {
@@ -291,7 +292,7 @@ describe('Privileges tests: privileges.test.js', () => {
       browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, 1000)
+    }, protractorConf.fluentWait)
   });
 
   afterEach(function (done) {
@@ -299,7 +300,7 @@ describe('Privileges tests: privileges.test.js', () => {
       browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
-    }, 1000)
+    }, protractorConf.fluentWait)
   });
 
   afterAll(function () {
@@ -356,7 +357,7 @@ describe('Privileges tests: privileges.test.js', () => {
         analyzePage.main.firstCardTitle.click();
         const condition = ec.urlContains('/executed');
         browser
-          .wait(() => condition, 1000)
+          .wait(() => condition, protractorConf.fluentWait)
           .then(() => expect(browser.getCurrentUrl()).toContain('/executed'));
 
         // Validate buttons in view mode of analysis
