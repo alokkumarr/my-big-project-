@@ -145,6 +145,7 @@ export class PivotGridComponent {
   }
 
   update(update: IPivotGridUpdate) {
+    console.log("update");
     /* eslint-disable no-unused-expressions */
     update.dataSource && this.updateDataSource(update.dataSource);
     update.sorts && this.updateSorts(update.sorts, null);
@@ -274,6 +275,10 @@ export class PivotGridComponent {
 
         if (cloned.type === 'string') {
           cloned.columnName = split(cloned.columnName, '.')[0];
+        }
+
+        if (cloned.aliasName != '') {
+          cloned.displayName = cloned.aliasName;
         }
 
         return cloned;
