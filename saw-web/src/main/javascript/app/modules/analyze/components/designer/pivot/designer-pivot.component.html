@@ -1,0 +1,46 @@
+<div [ngSwitch]="designerState" style="height: 100%; width: 100%;">
+
+  <div *ngSwitchCase="DesignerStates.NO_SELECTION"
+        fxLayout="column"
+        fxLayoutAlign="space-between center"
+        class="non-ideal-state__container">
+    <span i18n class="non-ideal-state__message">
+      Add some fields to visualize, by dragging, or using the add button
+    </span>
+    <mat-icon class="non-ideal-state__icon" fontIcon="icon-pivot"></mat-icon>
+  </div>
+
+  <div *ngSwitchCase="DesignerStates.SELECTION_OUT_OF_SYNCH_WITH_DATA"
+       fxLayout="column"
+       fxLayoutAlign="space-between center"
+       class="non-ideal-state__container">
+      <span class="non-ideal-state__message" i18n>
+        At least one data field needs to be selected
+      </span>
+      <mat-icon class="non-ideal-state__icon" fontIcon="icon-pivot"></mat-icon>
+  </div>
+
+  <div *ngSwitchCase="DesignerStates.SELECTION_WAITING_FOR_DATA"
+       fxLayout="column"
+       fxLayoutAlign="space-between center"
+       class="non-ideal-state__container">
+    <mat-icon class="non-ideal-state__icon" fontIcon="icon-pivot"></mat-icon>
+  </div>
+
+  <div *ngSwitchCase="DesignerStates.SELECTION_WITH_NO_DATA"
+       fxLayout="column"
+       fxLayoutAlign="space-between center"
+       class="non-ideal-state__container">
+    <span class="non-ideal-state__message" i18n>
+      There is no data for the fields selected
+    </span>
+  </div>
+
+  <pivot-grid *ngSwitchCase="DesignerStates.SELECTION_WITH_DATA"
+              [artifactColumns]="artifactColumns"
+              [data]="data"
+              [sorts]="sorts"
+              [updater]="updater"
+              mode="designer">
+  </pivot-grid>
+</div>

@@ -1,7 +1,8 @@
 declare function require(string): string;
 
-import { Inject, OnInit } from '@angular/core';
 import { MatIconRegistry } from '@angular/material';
+import { CreateDashboardComponent } from '../create-dashboard/create-dashboard.component';
+import { Inject, OnInit } from '@angular/core';
 import { UIRouter } from '@uirouter/angular';
 
 import * as forEach from 'lodash/forEach';
@@ -29,8 +30,7 @@ import { Component } from '@angular/core';
   styles: [],
   template: template
 })
-export class ObservePageComponent implements OnInit {
-
+export class ObservePageComponent {
   constructor(
     private iconRegistry: MatIconRegistry,
     private analyze: AnalyzeService,

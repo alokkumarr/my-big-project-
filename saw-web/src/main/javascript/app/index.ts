@@ -7,9 +7,10 @@ import '../../../../assets/additional-icons.css';
 
 import 'zone.js/dist/zone';
 import 'reflect-metadata';
+import { NgModule, StaticProvider, LOCALE_ID, Injector } from '@angular/core';
+import { FlexLayoutModule } from '@angular/flex-layout';
 import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
 import { UrlService } from '@uirouter/core';
-import { NgModule, Injector, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { UpgradeModule, downgradeModule } from '@angular/upgrade/static';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
@@ -21,8 +22,9 @@ import { config } from './config';
 import { interceptor } from './http-interceptor';
 import { runConfig } from './run';
 
-import { ObserveModule, ObserveUpgradeModule } from './modules/observe/index';
-import { AnalyzeModule, AnalyzeUpgradeModule } from './modules/analyze';
+import { ObserveModule, ObserveUpgradeModule } from './modules/observe';
+import { CommonModuleTs } from './common';
+import { AnalyzeModule, AnalyzeModuleTs } from './modules/analyze';
 import { AlertsModule } from './modules/alerts';
 import { AdminModule } from './modules/admin';
 
@@ -33,8 +35,14 @@ import { LayoutHeaderComponent, LayoutContentComponent, LayoutFooterComponent } 
     BrowserModule,
     UpgradeModule,
     UIRouterUpgradeModule,
+    CommonModuleTs,
+    AnalyzeModuleTs,
     ObserveUpgradeModule,
-    AnalyzeUpgradeModule
+    FlexLayoutModule
+  ],
+  exports: [FlexLayoutModule],
+  providers: [
+    {provide: LOCALE_ID, useValue: 'en'}
   ]
 })
 export class NewAppModule {

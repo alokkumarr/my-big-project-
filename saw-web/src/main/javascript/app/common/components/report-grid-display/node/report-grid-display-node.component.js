@@ -9,6 +9,7 @@ export const ReportGridDisplayNodeComponent = {
   bindings: {
     columns: '<',
     data: '<',
+    showChecked: '<', // only show the checked columns. Discards extra columns present in data
     source: '&',
     settings: '<'
   },

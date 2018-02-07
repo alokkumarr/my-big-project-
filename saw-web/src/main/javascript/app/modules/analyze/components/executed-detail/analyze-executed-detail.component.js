@@ -25,7 +25,7 @@ export const AnalyzeExecutedDetailComponent = {
   styles: [style],
   controller: class AnalyzeExecutedDetailController extends AbstractComponentController {
     constructor($injector, AnalyzeService, $state, $rootScope, JwtService, $mdDialog, fileService,
-                $window, toastMessage, FilterService, AnalyzeActionsService, $scope, $q, $translate) {
+      $window, toastMessage, FilterService, AnalyzeActionsService, $scope, $q, $translate) {
       'ngInject';
       super($injector);
 
@@ -198,8 +198,7 @@ export const AnalyzeExecutedDetailComponent = {
             }
             const csvWithDisplayNames = this.replaceCSVHeader(csv, fields);
             this._fileService.exportCSV(csvWithDisplayNames, this.analysis.name);
-          }, exportOptions
-        );
+          }, exportOptions);
         });
       }
     }
@@ -230,6 +229,7 @@ export const AnalyzeExecutedDetailComponent = {
     loadExecutionData(options = {}) {
       if (this._executionId) {
         options.analysisType = this.analysis.type;
+
         return this._AnalyzeService.getExecutionData(this.analysis.id, this._executionId, options)
           .then(({data, count}) => {
             this.requester.next({data});

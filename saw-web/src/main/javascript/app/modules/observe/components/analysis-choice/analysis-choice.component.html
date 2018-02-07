@@ -4,22 +4,28 @@
 </div>
 
 <div mat-dialog-content>
-  <mat-select placeholder="Category" [(ngModel)]="selection.category" (change)="onCategoryUpdated()">
-    <mat-option *ngFor="let category of categories" [value]="category.id">
-      {{ category.name }}
-    </mat-option>
-  </mat-select>
-  <mat-select placeholder="Sub Category" [(ngModel)]="selection.subCategory" (change)="onSubCategoryUpdated()">
-    <mat-option *ngFor="let subCategory of subCategories" [value]="subCategory.id">
-      {{ subCategory.name }}
-    </mat-option>
-  </mat-select>
-  <mat-select placeholder="Analysis" [(ngModel)]="selection.analysis">
-    <mat-option *ngFor="let analysis of analyses" [value]="analysis.id">
-      {{ analysis.name }}
-      <mat-chip color="primary">{{analysis.type}}</mat-chip>
-    </mat-option>
-  </mat-select>
+  <mat-form-field>
+    <mat-select placeholder="Category" [(ngModel)]="selection.category" (change)="onCategoryUpdated()">
+      <mat-option *ngFor="let category of categories" [value]="category.id">
+        {{ category.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-select placeholder="Sub Category" [(ngModel)]="selection.subCategory" (change)="onSubCategoryUpdated()">
+      <mat-option *ngFor="let subCategory of subCategories" [value]="subCategory.id">
+        {{ subCategory.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-select placeholder="Analysis" [(ngModel)]="selection.analysis">
+      <mat-option *ngFor="let analysis of analyses" [value]="analysis.id">
+        {{ analysis.name }}
+        <mat-chip color="primary">{{analysis.type}}</mat-chip>
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
 </div>
 
 <div class="layout-row" mat-dialog-actions>

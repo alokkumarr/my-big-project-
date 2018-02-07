@@ -19,7 +19,7 @@ import * as template from './analyze-report.component.html';
 import style from './analyze-report.component.scss';
 import AbstractDesignerComponentController from '../analyze-abstract-designer-component';
 import {DEFAULT_BOOLEAN_CRITERIA} from '../../services/filter.service';
-import {ENTRY_MODES} from '../../consts';
+import {ENTRY_MODES, AnalyseTypes} from '../../consts';
 
 const DEBOUNCE_INTERVAL = 500; // milliseconds
 
@@ -82,8 +82,7 @@ export const AnalyzeReportComponent = {
         this.artifacts = this.model.artifacts;
         this._modelLoaded(true);
       } else {
-        this._AnalyzeService.createAnalysis(this.model.semanticId, 'report').then(analysis => {
-
+        this._AnalyzeService.createAnalysis(this.model.semanticId, this.model.type).then(analysis => {
           this.artifacts = analysis.artifacts;
           this.model = assign(this.model, {
             id: analysis.id,
@@ -93,6 +92,10 @@ export const AnalyzeReportComponent = {
             userFullName: analysis.userFullName,
             metricName: analysis.metricName
           });
+
+          if (analysis.esRepository) {
+            this.model.esRepository = analysis.esRepository;
+          }
 
           if (this.mode !== ENTRY_MODES.FORK) {
             this.model = defaultsDeep(this.model, {
@@ -160,6 +163,14 @@ export const AnalyzeReportComponent = {
           this.reloadPreviewGrid();
         }, 500);
       }
+    }
+
+    /**
+     * Returns whether query mode is supported.
+     * Example: Query is not supported for elasticsearch reports.
+     */
+    supportsQuery() {
+      return this.model.type === AnalyseTypes.Report;
     }
 
     initCanvas(canvas) {
@@ -289,7 +300,8 @@ export const AnalyzeReportComponent = {
         }
       });
 
-      forEach(this.model.sqlBuilder.orderByColumns, itemB => {
+      const sorts = this.model.sqlBuilder.orderByColumns || this.model.sqlBuilder.sorts;
+      forEach(sorts, itemB => {
         model.addSort({
           table: itemB.tableName,
           field: itemB.columnName,
@@ -326,6 +338,13 @@ export const AnalyzeReportComponent = {
         }
       };
 
+      if (this.model.type === AnalyseTypes.ESReport) {
+        result.sqlBuilder.sorts = [];
+        result.sqlBuilder.dataFields = [];
+
+        delete result.sqlBuilder.orderByColumns;
+      }
+
       forEach(model.tables, table => {
         const tableArtifact = {
           artifactName: table.name,
@@ -352,6 +371,13 @@ export const AnalyzeReportComponent = {
           };
 
           tableArtifact.columns.push(fieldArtifact);
+
+          if (result.sqlBuilder.dataFields && fieldArtifact.checked) {
+            result.sqlBuilder.dataFields.push({
+              columnName: fieldArtifact.columnName,
+              type: fieldArtifact.type
+            });
+          }
         });
 
         const joins = filter(model.joins, join => {
@@ -386,11 +412,12 @@ export const AnalyzeReportComponent = {
         forEach(sorts, sort => {
           const sortArtifact = {
             tableName: tableArtifact.artifactName,
+            type: sort.field.type,
             columnName: sort.field.name,
             order: sort.order
           };
 
-          result.sqlBuilder.orderByColumns.push(sortArtifact);
+          (result.sqlBuilder.sorts || result.sqlBuilder.orderByColumns).push(sortArtifact);
         });
 
         const groups = filter(model.groups, group => {

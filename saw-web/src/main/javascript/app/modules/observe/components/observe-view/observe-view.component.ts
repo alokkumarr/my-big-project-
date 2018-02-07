@@ -1,3 +1,5 @@
+declare const require: any;
+
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 
 import { MatDialog, MatSidenav } from '@angular/material';
@@ -90,7 +92,8 @@ export class ObserveViewComponent implements OnInit {
       data: {
         dashboard: this.dashboard,
         mode: 'edit'
-      }
+      },
+      maxWidth: '100%'
     });
   }
 
@@ -99,7 +102,8 @@ export class ObserveViewComponent implements OnInit {
       panelClass: 'full-screen-dialog',
       data: {
         mode: 'create'
-      }
+      },
+      maxWidth: '100%'
     });
   }
 

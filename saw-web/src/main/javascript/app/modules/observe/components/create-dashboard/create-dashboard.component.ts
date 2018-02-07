@@ -1,6 +1,8 @@
+declare const require: any;
+
 import { Component, Inject, ViewChild } from '@angular/core';
-import { UIRouter } from '@uirouter/angular';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
+import { UIRouter } from '@uirouter/angular';
 import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { MenuService } from '../../../../common/services/menu.service';

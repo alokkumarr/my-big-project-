@@ -1,0 +1,56 @@
+<div fxLayout="row"
+     fxLayoutAlign="space-between"
+     class="header__container">
+  <div fxLayout="row" fxLayoutAlign="start center">
+    <button mat-button (click)="onBack.emit()">
+      <mat-icon fontIcon="icon-arrow-left"></mat-icon>
+    </button>
+    <div fxLayout="column"
+         fxLayoutAlign="start"
+         *ngIf="analysis">
+      <div class="header__name">
+        <strong class="e2e-pivot-title">
+          {{analysis.name}}
+        </strong>
+        <label i18n *ngIf="isInDraftMode">Draft</label>
+      </div>
+      <div class="header__description">
+        <mat-icon fontIcon="icon-report"></mat-icon>
+        <span>{{analysis.metricName}}</span>
+      </div>
+    </div>
+  </div>
+
+  <div  fxLayout="row"
+        fxLayoutAlign="space-between center">
+    <button mat-button
+            (click)="requestAction.emit('description')">
+      <mat-icon fontIcon="icon-description"></mat-icon>
+      <ng-container i18n>Description</ng-container>
+    </button>
+    <button mat-button
+            (click)="requestAction.emit('preview')"
+            [disabled]="designerState !== DesignerStates.SELECTION_WITH_DATA">
+      <mat-icon fontIcon="icon-full-screen"></mat-icon>
+      <ng-container i18n>Preview</ng-container>
+    </button>
+    <button mat-button
+            (click)="requestAction.emit('sort')">
+      <mat-icon fontIcon="icon-sort"></mat-icon>
+      <ng-container i18n>Sort</ng-container>
+    </button>
+    <button mat-button
+            (click)="requestAction.emit('filter')">
+      <mat-icon fontIcon="icon-filter"></mat-icon>
+      <ng-container i18n>Filter</ng-container>
+    </button>
+    <button mat-raised-button
+            e2e="designer-save-btn"
+            color="primary"
+            (click)="requestAction.emit('save')">
+      <ng-container i18n>Save</ng-container>
+    </button>
+  </div>
+</div>
+<mat-progress-bar *ngIf="designerState === DesignerStates.SELECTION_WAITING_FOR_DATA" mode="indeterminate"></mat-progress-bar>
+

@@ -13,21 +13,29 @@ import {
   MatFormFieldModule,
   MatSidenavModule,
   MatDatepickerModule,
-  MatExpansionModule,
   MatProgressBarModule,
   MatChipsModule,
-  MatInputModule
+  // NoConflictStyleCompatibilityMode,
+  MatIconRegistry,
+  MatListModule,
+  MatCheckboxModule,
+  MatMenuModule,
+  MatTooltipModule,
+  MatInputModule,
+  MatToolbarModule
 } from '@angular/material';
-
-import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import {MatCardModule} from '@angular/material/card';
+import {MatMomentDateModule} from '@angular/material-moment-adapter';
 
 require('@angular/material/prebuilt-themes/indigo-pink.css');
 require('nouislider/distribute/nouislider.min.css');
 
 import '../../../../themes/_angular_next.scss';
-
 @NgModule({
   imports: [
+    // NoConflictStyleCompatibilityMode,
     BrowserAnimationsModule,
     MatButtonModule,
     MatIconModule,
@@ -42,9 +50,20 @@ import '../../../../themes/_angular_next.scss';
     MatFormFieldModule,
     MatProgressBarModule,
     MatChipsModule,
+    NouisliderModule,
+    MatListModule,
+    MatCheckboxModule,
+    MatMenuModule,
+    MatTooltipModule,
+    MatExpansionModule,
+    MatButtonToggleModule,
     MatInputModule,
-    NouisliderModule
+    MatCardModule,
+    MatDatepickerModule,
+    MatMomentDateModule,
+    MatToolbarModule
   ],
+  providers: [MatIconRegistry],
   exports: [
     MatButtonModule,
     MatIconModule,
@@ -59,8 +78,18 @@ import '../../../../themes/_angular_next.scss';
     MatFormFieldModule,
     MatProgressBarModule,
     MatChipsModule,
+    NouisliderModule,
+    MatListModule,
+    MatCheckboxModule,
+    MatMenuModule,
+    MatTooltipModule,
+    MatExpansionModule,
+    MatButtonToggleModule,
     MatInputModule,
-    NouisliderModule
+    MatCardModule,
+    MatDatepickerModule,
+    MatMomentDateModule,
+    MatToolbarModule
   ]
 })
 export class MaterialModule {}
