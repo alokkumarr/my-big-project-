@@ -13,53 +13,82 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
 "file",
-"lineSeparator",
-"delimiter",
-"quoteChar",
-"quoteEscapeChar",
-"hederSize",
-"fieldNamesLine",
-"dateFormats",
-"rowsToInspect",
-"sampleSize",
-"delimiterType",
-"header",
-"description"
 })
 public class Inspect {
 
 @JsonProperty("file")
 private String file;
 @JsonProperty("lineSeparator")
-private String lineSeparator;
+private String lineSeparator ="\n";
 @JsonProperty("delimiter")
-private String delimiter;
+private String delimiter = ",";
 @JsonProperty("quoteChar")
-private String quoteChar;
+private String quoteChar = "'";
 @JsonProperty("quoteEscapeChar")
-private String quoteEscapeChar;
-@JsonProperty("hederSize")
-private Integer hederSize;
+private String quoteEscapeChar = "\\";
+@JsonProperty("headerSize")
+private Integer headerSize = 1;
 @JsonProperty("fieldNamesLine")
-private Integer fieldNamesLine;
+private Integer fieldNamesLine = 1;
 @JsonProperty("dateFormats")
 private List<String> dateFormats = null;
 @JsonProperty("rowsToInspect")
-private Integer rowsToInspect;
+private Integer rowsToInspect = 10000;
 @JsonProperty("sampleSize")
 private Integer sampleSize;
 @JsonProperty("delimiterType")
-private String delimiterType;
-@JsonProperty("header")
-private String header;
+private String delimiterType = "delimited";
 @JsonProperty("description")
-private String description;
+private String description = "It's delimited file inspecting to verify & understand the content of file";
+@JsonProperty("fields")
+private List<Object> fields;
+@JsonProperty("info")
+private Object info;
+@JsonProperty("samplesParsed")
+private List<Object> samplesParsed;
+@JsonProperty("samples")
+private List<Object> samples;
 @JsonIgnore
 private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+
+
+@JsonProperty("samplesParsed")
+public List<Object> getSamplesParsed() {
+  return samplesParsed;
+}
+@JsonProperty("samplesParsed")
+public void setSamplesParsed(List<Object> samplesParsed) {
+  this.samplesParsed = samplesParsed;
+}
+@JsonProperty("samples")
+public List<Object> getSamples() {
+  return samples;
+}
+@JsonProperty("samples")
+public void setSamples(List<Object> samples) {
+  this.samples = samples;
+}
 @JsonProperty("file")
 public String getFile() {
 return file;
+}
+@JsonProperty("info")
+public Object getInfo() {
+  return info;
+}
+@JsonProperty("info")
+public void setInfo(Object info) {
+  this.info = info;
+}
+@JsonProperty("fields")
+public List<Object> getFields() {
+  return fields;
+}
+
+@JsonProperty("fields")
+public void setFields(List<Object> fields) {
+  this.fields = fields;
 }
 
 @JsonProperty("file")
@@ -107,14 +136,14 @@ public void setQuoteEscapeChar(String quoteEscapeChar) {
 this.quoteEscapeChar = quoteEscapeChar;
 }
 
-@JsonProperty("hederSize")
-public Integer getHederSize() {
-return hederSize;
+@JsonProperty("headerSize")
+public Integer getHeaderSize() {
+return headerSize;
 }
 
-@JsonProperty("hederSize")
-public void setHederSize(Integer hederSize) {
-this.hederSize = hederSize;
+@JsonProperty("headerSize")
+public void setHeaderSize(Integer headerSize) {
+this.headerSize = headerSize;
 }
 
 @JsonProperty("fieldNamesLine")
@@ -165,16 +194,6 @@ return delimiterType;
 @JsonProperty("delimiterType")
 public void setDelimiterType(String delimiterType) {
 this.delimiterType = delimiterType;
-}
-
-@JsonProperty("header")
-public String getHeader() {
-return header;
-}
-
-@JsonProperty("header")
-public void setHeader(String header) {
-this.header = header;
 }
 
 @JsonProperty("description")

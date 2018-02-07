@@ -57,7 +57,7 @@ public class Project {
      */
     @JsonProperty("resultFormat")
     @JsonPropertyDescription("An explanation about the purpose of this instance.")
-    private Project.ResultFormat resultFormat = Project.ResultFormat.fromValue("json");
+    private Project.ResultFormat resultFormat = null;
     @JsonProperty("data")
     private List<Object> data = null;
     @JsonIgnore
