@@ -58,6 +58,7 @@ export const StringFilterComponent = {
     }
 
     onModelChange() {
+      this.keywords.modelValues = [];
       this.keywords.modelValues.push(this.tempModel.value);
       this.onChange({model: this.keywords});
     }
