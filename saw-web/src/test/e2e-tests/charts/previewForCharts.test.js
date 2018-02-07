@@ -51,7 +51,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, protractorConf.timeouts.fluentWait)
+    }, protractorConf.timeouts.pageResolveTimeout)
   });
 
   afterEach(function (done) {
@@ -59,7 +59,7 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
-    }, protractorConf.timeouts.fluentWait)
+    }, protractorConf.timeouts.pageResolveTimeout)
   });
 
   afterAll(function () {

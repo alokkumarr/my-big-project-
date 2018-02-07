@@ -292,7 +292,7 @@ describe('Privileges tests: privileges.test.js', () => {
       browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, protractorConf.timeouts.fluentWait)
+    }, protractorConf.timeouts.pageResolveTimeout)
   });
 
   afterEach(function (done) {
@@ -300,7 +300,7 @@ describe('Privileges tests: privileges.test.js', () => {
       browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
-    }, protractorConf.timeouts.fluentWait)
+    }, protractorConf.timeouts.pageResolveTimeout)
   });
 
   afterAll(function () {
@@ -357,7 +357,7 @@ describe('Privileges tests: privileges.test.js', () => {
         analyzePage.main.firstCardTitle.click();
         const condition = ec.urlContains('/executed');
         browser
-          .wait(() => condition, protractorConf.timeouts.fluentWait)
+          .wait(() => condition, protractorConf.timeouts.pageResolveTimeout)
           .then(() => expect(browser.getCurrentUrl()).toContain('/executed'));
 
         // Validate buttons in view mode of analysis

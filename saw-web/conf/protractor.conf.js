@@ -36,9 +36,15 @@ const defaultTimeoutInterval = webpackHelper.distRun() ? 600000 : 10000;
 const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 1800000 : 300000;
 
 /**
- * Fixes error: Timed out waiting for asynchronous Angular tasks to finish after n seconds
+ * Fixes error: Timed out waiting for asynchronous Angular tasks to finish after n seconds;
+ * If fluentWait is happening more than this timeout it will throw an error like "element is not clickable"
  */
-const allScriptsTimeout = 30000;
+const allScriptsTimeout = 60000;
+
+/**
+ * Waits ms after page is loaded
+ */
+const pageResolveTimeout = 1000;
 
 /**
  * Note: Prefix with "../saw-web" because end-to-end tests are invoked
@@ -53,9 +59,10 @@ const testDir = '../saw-web/src/test';
 const protractorPath = 'target/protractor-reports';
 
 exports.timeouts = {
-    fluentWait: fluentWait,
-    extendedDefaultTimeoutInterval: extendedDefaultTimeoutInterval,
-    extendedImplicitlyWait: extendedImplicitlyWait
+  fluentWait: fluentWait,
+  extendedDefaultTimeoutInterval: extendedDefaultTimeoutInterval,
+  extendedImplicitlyWait: extendedImplicitlyWait,
+  pageResolveTimeout: pageResolveTimeout
 };
 
 exports.config = {
@@ -105,21 +112,20 @@ exports.config = {
       webpackHelper.root(testDir + '/e2e-tests/createPivot.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/createReport.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),*/
-      //webpackHelper.root(testDir + '/e2e-tests/debug.test.js') // for testing purposes
     ],
   } : {
     /**
      * Suites for test run invoked from Protractor directly on local saw-web front-end development server
      */
     charts: [
-      webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
+      /*webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
       webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
+      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')*/
     ],
     root: [
-      webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
+      /*webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/createPivot.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/createReport.test.js'),
+      webpackHelper.root(testDir + '/e2e-tests/createReport.test.js'),*/
       //webpackHelper.root(testDir + '/e2e-tests/debug.test.js') // for testing purposes
       webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
     ],
@@ -158,7 +164,6 @@ exports.config = {
       return browser.driver.getCurrentUrl().then(url => {
         return /login/.test(url);
       });
-    }, fluentWait);
+    }, pageResolveTimeout);
   }
-}
-;
+};

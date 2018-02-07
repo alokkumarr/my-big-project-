@@ -43,7 +43,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   };
 
   beforeAll(function () {
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.extendedDefaultTimeoutInterval;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
   });
 
   beforeEach(function (done) {
@@ -51,7 +51,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, protractorConf.timeouts.fluentWait)
+    }, protractorConf.timeouts.pageResolveTimeout)
   });
 
   afterEach(function (done) {
@@ -59,7 +59,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
-    }, protractorConf.timeouts.fluentWait)
+    }, protractorConf.timeouts.pageResolveTimeout)
   });
 
   afterAll(function () {

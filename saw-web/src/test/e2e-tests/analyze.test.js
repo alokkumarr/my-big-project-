@@ -26,7 +26,7 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
       browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, protractorConf.timeouts.fluentWait)
+    }, protractorConf.timeouts.pageResolveTimeout)
   });
 
   afterEach(function (done) {
@@ -34,7 +34,7 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
       browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
-    }, protractorConf.timeouts.fluentWait)
+    }, protractorConf.timeouts.pageResolveTimeout)
   });
 
     using(userDataProvider, function (data, description) {
@@ -52,7 +52,7 @@ describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 
       // wait for the app to automatically navigate to the default page
       browser
-        .wait(() => alreadyOnAnalyzePage, protractorConf.timeouts.fluentWait)
+        .wait(() => alreadyOnAnalyzePage, protractorConf.timeouts.pageResolveTimeout)
         .then(() => expect(browser.getCurrentUrl()).toContain('/analyze'));
     });
   });

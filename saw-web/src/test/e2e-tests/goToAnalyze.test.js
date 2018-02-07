@@ -5,7 +5,7 @@ const ec = protractor.ExpectedConditions;
 const protractorConf = require('/conf/protractor.conf');
 
 describe('should go to Analyze page after landing on home page', () => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.extendedDefaultTimeoutInterval;
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
 
   afterAll(function() {
     browser.executeScript('window.sessionStorage.clear();');
@@ -25,7 +25,7 @@ describe('should go to Analyze page after landing on home page', () => {
 
     // wait for the app to automatically navigate to the default page
     browser
-      .wait(() => alreadyOnAnalyzePage, protractorConf.timeouts.fluentWait)
+      .wait(() => alreadyOnAnalyzePage, protractorConf.timeouts.pageResolveTimeout)
       .then(() => expect(browser.getCurrentUrl()).toContain('/analyze'));
   });
 
