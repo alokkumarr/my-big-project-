@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { UIRouter } from '@uirouter/angular';
 
+import 'rxjs/add/operator/map';
+
 import * as fpGet from 'lodash/fp/get';
 import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';

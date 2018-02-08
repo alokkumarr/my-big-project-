@@ -1,18 +1,16 @@
-<md-dialog class="error-detail-dialog">
-  <md-toolbar>
-    <div class="md-toolbar-tools">
-      <h2 ng-bind="::$ctrl.errorMessage"></h2>
-      <span flex></span>
+<mat-toolbar>
+  <mat-toolbar-row>
+    <h2>{{errorMessage}}</h2>
+    <span style="flex: 1 1 auto;"></span>
+    <button mat-icon-button
+            (click)="cancel()">
+      <mat-icon fontIcon="icon-close"></mat-icon>
+    </button>
+  </mat-toolbar-row>
+</mat-toolbar>
 
-      <md-button class="md-icon-button"
-                 ng-click="$ctrl.cancel()">
-        <md-icon md-font-icon="icon-close"></md-icon>
-      </md-button>
-    </div>
-  </md-toolbar>
-  <md-dialog-content>
-    <div class="error-detail-container">
-      <code ng-bind="::$ctrl.errorBody" click-to-copy> </code>
-    </div>
-  </md-dialog-content>
-</md-dialog>
+<div class="error-detail-dialog-content">
+  <div class="error-detail-container">
+    <code click-to-copy>{{errorBody}}</code>
+  </div>
+</div>

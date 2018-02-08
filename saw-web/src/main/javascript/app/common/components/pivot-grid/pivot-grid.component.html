@@ -1,1 +1,20 @@
-<div dx-pivot-grid="$ctrl.pivotGridOptions"></div>
+<dx-pivot-grid id="pivot-grid"
+               [rowHeaderLayout]="rowHeaderLayout"
+               [allowSortingBySummary]="allowSortingBySummary"
+               [showBorders]="showBorders"
+               [allowSorting]="allowSorting"
+               [allowFiltering]="allowFiltering"
+               [allowExpandAll]="allowExpandAll"
+               [fieldChooser]="fieldChooser"
+               (onInitialized)="onInitialized($event)"
+               (onContentReady)="onPivotContentReady()"
+               (onExported)="onExported($event)"
+>
+  <dxo-field-panel [visible]="true"
+                   [showColumnFields]="showColumnFields"
+                   [showRowFields]="showRowFields"
+                   [showDataFields]="showDataFields"
+                   [showFilterFields]="showFilterFields"
+                   [allowFieldDragging]="allowFieldDragging">
+  </dxo-field-panel>
+</dx-pivot-grid>

@@ -1,0 +1,10 @@
+<mat-form-field>
+  <textarea matInput
+            (input)="onDescriptionChange($event.target.value)"
+            [value]="description"
+            placeholder="Description"
+            matTextareaAutosize
+            matAutosizeMinRows="2"
+            matAutosizeMaxRows="10">
+  </textarea>
+</mat-form-field>

@@ -2,10 +2,12 @@
   "extends": "./tslint-prod.json",
   "rules": {
     "no-console": 0,
-    "no-debugger": 0
+    "no-debugger": 0,
+    "no-unused-variable": false
   },
   "jsRules": {
     "no-console": 0,
-    "no-debugger": 0
+    "no-debugger": 0,
+    "no-unused-variable": false
   }
 }

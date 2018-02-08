@@ -1,7 +1,13 @@
 @import "themes/base/colors";
 
-.error-detail-dialog {
-  md-dialog-content {
+error-detail {
+  label {
+    display: block;
+    font-size: 1.5em;
+    font-weight: bold;
+  }
+
+  .error-detail-dialog-content {
     padding: 0 24px 20px;
 
     .error-detail-container {

@@ -1,0 +1,19 @@
+<designer-header class="designer__header"
+                 [analysis]="analysis"
+                 [isInDraftMode]="isInDraftMode"
+                 [designerState]="designerState"
+                 (onBack)="onBack.emit()"
+                 (requestAction)="onToolbarAction($event)">
+</designer-header>
+
+<designer-settings-single class="designer__data-settings"
+                   (settingsChange)="onSettingsChange()"
+                   [artifactColumns]="analysis ? analysis.artifacts[0].columns : []">
+</designer-settings-single>
+
+<designer-pivot class="designer__main"
+                [data]="data"
+                [sorts]="sorts"
+                [artifactColumns]="firstArtifactColumns"
+                [designerState]="designerState">
+</designer-pivot>

@@ -37,7 +37,8 @@ export const RolesViewComponent = {
       this.RolesManagementService.getActiveRolesList(this.custID).then(admin => {
         this.admin = admin;
         if (this.admin.valid) {
-          this._rolesCache = this.rolesList = this.admin.roles;
+          this.rolesList = this.admin.roles;
+          this._rolesCache = this.admin.roles;
           this._$rootScope.showProgress = false;
         } else {
           this._$rootScope.showProgress = false;
@@ -66,7 +67,8 @@ export const RolesViewComponent = {
             controller: scope => {
               scope.roleTypes = this.response.roles;
               scope.onSaveAction = roles => {
-                this._rolesCache = this.rolesList = roles;
+                this.rolesList = roles;
+                this._rolesCache = roles;
                 this.applySearchFilter();
               };
             },
@@ -106,7 +108,8 @@ export const RolesViewComponent = {
       }).then(data => {
         if (data.valid) {
           this._$rootScope.showProgress = false;
-          this._rolesCache = this.rolesList = data.roles;
+          this.rolesList = data.roles;
+          this._rolesCache = data.roles;
           this.applySearchFilter();
           this._$mdToast.show({
             template: '<md-toast><span> Role is successfully deleted </md-toast>',
@@ -137,7 +140,8 @@ export const RolesViewComponent = {
               scope.roles = this.response.roles;
               scope.role = editRole;
               scope.onUpdateAction = roles => {
-                this._rolesCache = this.rolesList = roles;
+                this.rolesList = roles;
+                this._rolesCache = roles;
                 this.applySearchFilter();
               };
             },

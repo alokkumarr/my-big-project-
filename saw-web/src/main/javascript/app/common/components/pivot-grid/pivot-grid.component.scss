@@ -1,6 +1,11 @@
 @import "themes/base/colors";
 
 pivot-grid {
+  height: 100%;
+  width: 100%;
+  display: block;
+  overflow: auto;
+
   .dx-pivotgrid.dx-row-lines .dx-pivotgrid-area tbody > tr:not(:last-child):not(.dx-expand-border) + tr:not(.dx-expand-border) > td:not(.dx-total):not(.dx-grandtotal) {
     border-top: none;
   }
