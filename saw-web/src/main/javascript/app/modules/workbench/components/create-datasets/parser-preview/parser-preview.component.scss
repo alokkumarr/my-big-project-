@@ -23,17 +23,23 @@ parser-preview {
   }
 
   .formatEditIcon {
-    height: 0;
-    width: 0;
-    font-size: 16px;
+    font-size: 18px;
+    padding-top: 7px;
   }
 
   .fTypeGroup {
-    margin-top: -10px;
+    margin-top: -17px;
+    padding-bottom: 0.3px;
     z-index: 99;
   }
 
   .mat-form-field-infix {
     padding: 0 !important;
+  }
+
+  .errorInfoIcon {
+    font-size: 22px;
+    padding-top: 2px;
+    color: $primary-red;
   }
 }

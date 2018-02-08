@@ -2,8 +2,10 @@
   <div fxFlex.gt-md="25" fxFlex.md="33" fxFlex.lt-md="50" fxFlex.lt-sm="100" *ngFor="let sets of dataSets">
     <mat-card class="datasets-card">
       <mat-card-header>
-        <div class="mat-title" fxFlex="70" fxFlex.gt-md="80" fxFlex.md="80" [innerHTML]="sets.set"></div>
-        <div fxFlex="30" fxFlex.gt-md="20" fxFlex.md="20" class="src-img {{sets.src}}"></div>
+          <div mat-card-avatar class="src-img {{sets.src}}"></div>
+          <!-- <mat-card-title [innerHTML]="sets.set"></mat-card-title> -->
+        <div class="dataset-name" fxFlex [innerHTML]="sets.set"></div>
+        <mat-icon style="color:rgba(0, 0, 0, 0.54);">more_vert</mat-icon>
       </mat-card-header>
       <mat-divider></mat-divider>
       <mat-card-content class="mat-body-1">

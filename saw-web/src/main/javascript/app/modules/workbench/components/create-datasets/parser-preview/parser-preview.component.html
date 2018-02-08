@@ -8,14 +8,17 @@
               <input matInput [(ngModel)]="fieldInfo[data.columnIndex].name" class="fieldName" type="text" required />
             </mat-form-field>
             <div fxLayout="row" class="fTypeGroup">
-              <select  (change)="checkDate($event)" id="{{ data.columnIndex }}" class="fieldType" [(ngModel)]="fieldInfo[data.columnIndex].type">
-                <option value="string">STRING</option>
-                <option value="long">LONG</option>
-                <option value="date">DATE</option>
-                <option value="boolean">BOOLEAN</option>
-                <option value="double">DOUBLE</option>
-              </select>
-              <mat-icon  class="formatEditIcon" id="edit_{{ data.columnIndex }}" (click)="openDateFormatDialog($event)" [style.visibility]="fieldInfo[data.columnIndex].type === 'date' ? 'visible' : 'hidden'">mode_edit</mat-icon>
+              <div fxFlex>
+                <select (change)="checkDate($event)" id="{{ data.columnIndex }}" class="fieldType" [(ngModel)]="fieldInfo[data.columnIndex].type">
+                  <option value="string">STRING</option>
+                  <option value="long">LONG</option>
+                  <option value="date">DATE</option>
+                  <option value="boolean">BOOLEAN</option>
+                  <option value="double">DOUBLE</option>
+                </select>
+                <mat-icon class="formatEditIcon" id="edit_{{ data.columnIndex }}" (click)="openDateFormatDialog($event)" [style.visibility]="fieldInfo[data.columnIndex].type === 'date' ? 'visible' : 'hidden'">mode_edit</mat-icon>
+              </div>
+              <mat-icon class="errorInfoIcon" [style.visibility]="errorInfoVisibility(data.columnIndex)">info_outline</mat-icon>
             </div>
           </div>
         </div>

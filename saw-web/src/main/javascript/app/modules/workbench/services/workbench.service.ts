@@ -20,6 +20,7 @@ import APP_CONFIG from '../../../../../../../appConfig';
 @Injectable()
 export class WorkbenchService {
   private api = fpGet('api.url', APP_CONFIG);
+  private wbAPI = `${this.api}/internal/workbench/projects`;
   private apiWB = fpGet('wbAPI.url', APP_CONFIG);
 
   constructor(private http: HttpClient,
@@ -50,17 +51,16 @@ export class WorkbenchService {
 
   /** GET raw preview from the server */
   getRawPreviewData(projectName: string, path: string): Observable<any> {
-    let Params = new HttpParams();
-    Params = Params.append('prj', projectName);
-    Params = Params.append('cat', path);
-    return this.http.get(`${this.apiWB}/dl/rawpreview`, { params: Params })
+    const endpoint = `${this.wbAPI}/${projectName}/raw/preview`;
+    const payload = {path}
+    return this.http.post(endpoint, payload)
       .pipe(
       catchError(this.handleError('data', RAW_SAMPLE)));
   }
 
    /** GET parsed preview from the server */
   getParsedPreviewData(projectName: string, previewConfig): Observable<any> {
-    const endpoint = `${this.apiWB}/preview/raw/inspect?prj=${projectName}`;
+    const endpoint = `${this.wbAPI}/${projectName}/raw/directory/inspect`;
     return this.http.post(endpoint, previewConfig)
       .pipe(
       catchError(this.handleError('data', parser_preview)));

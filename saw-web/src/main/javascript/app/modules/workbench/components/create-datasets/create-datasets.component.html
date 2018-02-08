@@ -73,9 +73,13 @@
                   <mat-form-field class="margin20">
                     <input matInput placeholder="Dataset Name" name="datasetName" formControlName="nameControl" required />
                     <mat-error *ngIf="nameFormGroup.controls.nameControl.hasError('required')">
-                        Dataset Name is
+                      Dataset Name is
                       <strong>required</strong>
                     </mat-error>
+                    <mat-error *ngIf="nameFormGroup.controls.nameControl.hasError('required')">
+                        Dataset Name is
+                        <strong>required</strong>
+                      </mat-error>
                   </mat-form-field>
                   <div class="margin20">
                     <mat-radio-group labelPosition="before" [(ngModel)]="parserConf.outputs[0].mode" [ngModelOptions]="{standalone: true}">
@@ -92,19 +96,21 @@
                   <mat-form-field class="margin20">
                     <input matInput placeholder="Description" name="description" formControlName="descControl" required />
                     <mat-error *ngIf="nameFormGroup.controls.descControl.hasError('required')">
-                        Dataset description is
+                      Dataset description is
                       <strong>required</strong>
                     </mat-error>
                   </mat-form-field>
                 </section>
                 <section class="input-section">
                   <mat-form-field class="margin20">
-                    <input matInput placeholder="Spark Master" name="sparkMaster" [(ngModel)]="parserConf.parameters[0].value" [ngModelOptions]="{standalone: true}"
-                      required />
+                    <mat-select placeholder="SPARK_MASTER" [(value)]="parserConf.parameters[0].value">
+                      <mat-option value="yarn">Yarn</mat-option>
+                      <mat-option value="standard" disabled>Standard</mat-option>
+                    </mat-select>
                   </mat-form-field>
                   <div class="margin20">
-                    <span fxFlex="20">Spark Executor Instances</span>
-                    <mat-slider matInput fxFlex name="sparkInstances" class="margin20" max="12" min="2" step="2" thumb-label="true" tick-interval="auto"
+                    <span fxFlex="20">Spark Instances</span>
+                    <mat-slider matInput fxFlex name="sparkInstances" class="margin20" max="12" min="2" step="1" thumb-label="true" tick-interval="1"
                       [(ngModel)]="parserConf.parameters[1].value" [ngModelOptions]="{standalone: true}">
                     </mat-slider>
                     <span>{{parserConf.parameters[1].value}}</span>

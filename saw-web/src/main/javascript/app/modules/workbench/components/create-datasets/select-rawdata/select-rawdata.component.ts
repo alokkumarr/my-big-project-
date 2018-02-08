@@ -1,3 +1,5 @@
+declare function require(string): string;
+
 import { Component, Input, OnInit, ViewChild, AfterViewInit, EventEmitter, Output } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material';
@@ -108,6 +110,7 @@ export class SelectRawdataComponent implements OnInit {
     this.workBench.getTreeData(this.userProject, path).subscribe(data => {
       const filteredDataFiles = data.filter(d => d.d === false);
       this.reloadDataGrid(filteredDataFiles);
+      this.clearSelected();
     });
   }
 
@@ -213,7 +216,7 @@ export class SelectRawdataComponent implements OnInit {
       const dialogRef = this.dialog.open(RawpreviewDialogComponent, {
         data: {
           title: title,
-          rawData: data.samplesRaw
+          rawData: data.data
         }
       });
     });

@@ -137,19 +137,19 @@ datasets-grid-page {
     color: #FFF !important;
     padding: 2px 15px;
   }
-}
 
-.branded-column-name {
-  color: $primary-blue-b2;
-  font-weight: 600;
-}
+  .branded-column-name {
+    color: $primary-blue-b2;
+    font-weight: 600;
+  }
 
-.fs {
-  background-image: url('../../../../../../../../../assets/svg/mapr.svg');
-  background-color: #C8102E;
-}
+  .fs {
+    background-image: url('../../../../../../../../../assets/img/maprE.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
 
-.es {
-  background-image: url('../../../../../../../../../assets/svg/elastic.svg');
+  .es {
+    background-image: url('../../../../../../../../../assets/svg/elastic.svg');
+  }
 }
-

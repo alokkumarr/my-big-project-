@@ -27,7 +27,8 @@ import {
   MatTabsModule,
   MatDividerModule,
   MatExpansionModule,
-  MatButtonToggleModule
+  MatButtonToggleModule,
+  MatSnackBarModule
 } from '@angular/material';
 
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
@@ -61,7 +62,8 @@ import '../../../../themes/_angular_next.scss';
     MatTabsModule,
     MatExpansionModule,
     MatButtonToggleModule,
-    MatMomentDateModule
+    MatMomentDateModule,
+    MatSnackBarModule
   ],
   providers: [MatIconRegistry],
   exports: [
@@ -89,7 +91,8 @@ import '../../../../themes/_angular_next.scss';
     MatTabsModule,
     MatExpansionModule,
     MatButtonToggleModule,
-    MatMomentDateModule
+    MatMomentDateModule,
+    MatSnackBarModule
   ]
 })
 export class MaterialModule { }
