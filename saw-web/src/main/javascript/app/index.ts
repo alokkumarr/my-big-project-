@@ -14,6 +14,7 @@ import { UrlService } from '@uirouter/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { UpgradeModule } from '@angular/upgrade/static';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import 'hammerjs';
 
 import { routesConfig } from './routes';
 import { themeConfig } from './theme';

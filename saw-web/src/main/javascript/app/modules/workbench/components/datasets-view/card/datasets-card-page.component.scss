@@ -39,18 +39,21 @@ datasets-card-page {
 
   mat-card-header {
     padding: 6px;
-    color: $primary-blue-b2;
-    font-weight: normal;
+
+    .dataset-name {
+      color: $primary-blue-b2;
+      font-weight: 300;
+      font-size: 18px;
+    }
   }
 
   .src-img {
-    height: 18px;
     background-size: contain;
     background-repeat: no-repeat;
-    background-position: center;
+    width: 30px;
 
     &.fs {
-      background-image: url('../../../../../../../../../assets/svg/mapr.svg');
+      background-image: url('../../../../../../../../../assets/img/maprE.png');
     }
 
     &.es {
@@ -94,14 +97,5 @@ datasets-card-page {
   .datasets-card_quick-view:hover {
     background-color: rgba(0, 0, 0, 0.9) !important;
   }
-}
-
-.fs {
-  background-image: url('../../../../../../../../../assets/svg/mapr.svg');
-  background-color: #C8102E;
-}
-
-.es {
-  background-image: url('../../../../../../../../../assets/svg/elastic.svg');
 }
 

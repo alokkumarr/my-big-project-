@@ -1,6 +1,7 @@
 import * as angular from 'angular';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { downgradeComponent } from '@angular/upgrade/static';
+import { UIRouterUpgradeModule } from '@uirouter/angular-hybrid';
 
 import { NgModule } from '@angular/core';
 import { CommonModule as AngularCommonModule } from '@angular/common';
@@ -8,14 +9,13 @@ import { MaterialModule } from '../../material.module';
 import { FlexLayoutModule } from '@angular/flex-layout'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DxDataGridModule, DxTemplateModule } from 'devextreme-angular';
-import { DxTreeViewModule } from 'devextreme-angular';
 import { TreeModule } from 'angular-tree-component';
 
 import { routesConfig } from './routes';
 import { i18nConfig } from './i18n';
 
-import { AnalyzeService } from '../analyze/services/analyze.service';
 import { WorkbenchService } from './services/workbench.service';
+import { analyzeServiceProvider } from '../analyze/services/ajs-analyze-providers';
 import {
   menuServiceProvider,
   componentHandlerProvider,
@@ -45,14 +45,10 @@ angular.module(WorkbenchModule, [
   CommonModule
 ])
   .config(routesConfig)
-  .config(i18nConfig)
-  .factory('WorkbenchService', downgradeInjectable(WorkbenchService) as Function)
-  .service('AnalyzeService', AnalyzeService)
-  .directive('datasetsPage',
-  downgradeComponent({ component: DatasetsComponent }) as angular.IDirectiveFactory)
-  .component('workbenchPage', WorkbenchPageComponent);
+  .config(i18nConfig);
 
 const components = [
+  WorkbenchPageComponent,
   DatasetsComponent,
   DatasetsCardPageComponent,
   DatasetsGridPageComponent,
@@ -65,12 +61,13 @@ const components = [
 ];
 
 @NgModule({
-  imports: [AngularCommonModule, FormsModule, MaterialModule, ReactiveFormsModule, DxDataGridModule, DxTemplateModule, FlexLayoutModule, DxTreeViewModule, TreeModule],
+  imports: [AngularCommonModule, FormsModule, MaterialModule, ReactiveFormsModule, UIRouterUpgradeModule, DxDataGridModule, DxTemplateModule, FlexLayoutModule, TreeModule],
   declarations: components,
   entryComponents: components,
   providers: [
     WorkbenchService,
     menuServiceProvider,
+    analyzeServiceProvider,
     componentHandlerProvider,
     headerProgressProvider,
     toastProvider,

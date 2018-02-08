@@ -5,15 +5,18 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import * as get from 'lodash/get';
 
 const template = require('./dateformat-dialog.component.html');
+require('./dateformat-dialog.component.scss');
 
 @Component({
   selector: 'dateformat-dialog',
-  template
+  template,
+  styles: []
 })
 
 export class DateformatDialogComponent {
   form: FormGroup;
   private placeholder = '';
+  private formatArr = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -23,9 +26,13 @@ export class DateformatDialogComponent {
     if (get(data, 'placeholder')) {
       this.placeholder = data.placeholder;
     }
+    
   }
 
   ngOnInit() {
+    if (get(this.data, 'formatArr')) {
+      this.formatArr = this.data.formatArr;
+    }
     this.form = this.formBuilder.group({
       dateformat: this.data ? this.data.format : ''
     })

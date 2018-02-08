@@ -45,8 +45,8 @@ export class CreateDatasetsComponent implements OnInit {
     this.csvConfig = cloneDeep(CSV_CONFIG); 
     this.parserConf = cloneDeep(PARSER_CONFIG);
     this.nameFormGroup = new FormGroup({
-      nameControl: new FormControl('', Validators.required),
-      descControl: new FormControl('', Validators.required)
+      nameControl: new FormControl('', [Validators.required, Validators.minLength(3), Validators.maxLength(12)]),
+      descControl: new FormControl('', [Validators.required, Validators.minLength(5), Validators.maxLength(36)])
     });
   }
   
@@ -98,6 +98,5 @@ export class CreateDatasetsComponent implements OnInit {
   }
 
   triggerParser() {
-    
   }
 }

@@ -95,8 +95,8 @@
           <mat-divider></mat-divider>
           <section class="input-section">
             <span fxFlex="20">Rows To Inspect</span>
-            <mat-slider fxFlex placeholder="Rows To Inspect" name="rowsToInspect" class="margin20" max="10000" min="1000" step="3000"
-              thumb-label="true" tick-interval="auto" [(ngModel)]="previewConfig.csvInspector.rowsToInspect" [ngModelOptions]="{standalone: true}">
+            <mat-slider fxFlex placeholder="Rows To Inspect" name="rowsToInspect" class="margin20" max="10000" min="1000" step="500"
+              thumb-label="true" tick-interval="500" [(ngModel)]="previewConfig.csvInspector.rowsToInspect" [ngModelOptions]="{standalone: true}">
             </mat-slider>
             <span>{{previewConfig.csvInspector.rowsToInspect}}</span>
           </section>

@@ -10,8 +10,9 @@ import * as forEach from 'lodash/forEach';
 import * as replace from 'lodash/replace';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as assign from 'lodash/assign';
+import * as size from 'lodash/size';
 
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 import { DxDataGridComponent } from 'devextreme-angular';
 
 import { dxDataGridService } from '../../../../../common/services/dxDataGrid.service';
@@ -39,7 +40,8 @@ export class ParserPreviewComponent implements OnInit {
 
   constructor(
     private dxDataGrid: dxDataGridService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    public snackBar: MatSnackBar
   ) { }
 
   @Output() parserConfig: EventEmitter<any> = new EventEmitter<any>();
@@ -48,7 +50,7 @@ export class ParserPreviewComponent implements OnInit {
 
   ngOnInit() {
     this.previewgridConfig = this.getPreviewGridConfig();
-    this.myHeight = window.screen.availHeight - 287;
+    this.myHeight = window.screen.availHeight - 281;
     this.updaterSubscribtion = this.previewObj.subscribe(data => {
       this.onUpdate(data)
     });
@@ -60,9 +62,9 @@ export class ParserPreviewComponent implements OnInit {
 
   onUpdate(data) {
     if (data.samplesParsed) {
-      this.parserData = cloneDeep(data.parser);
+      this.parserData = cloneDeep(data);
       const parsedData = data.samplesParsed;
-      this.fieldInfo = cloneDeep(data.parser.fields);
+      this.fieldInfo = cloneDeep(data.fields);
       this.dataGrid.instance.beginCustomLoading('Loading...');
       setTimeout(() => {
         this.reloadDataGrid(parsedData);
@@ -75,7 +77,8 @@ export class ParserPreviewComponent implements OnInit {
   }
 
   onResize(event) {
-    this.myHeight = window.screen.availHeight - 287;
+    this.myHeight = window.screen.availHeight - 281;
+    this.dataGrid.instance.refresh();
   }
 
   getPreviewGridConfig() {
@@ -144,17 +147,24 @@ export class ParserPreviewComponent implements OnInit {
 
   openDateFormatDialog(event) {
     let index: number;
+    let dateformat = '';
+    let formatArr = [];
     if (event.type === 'click') {
       index = replace(event.target.id, 'edit_', '');
     } else {
       index = event.srcElement.id;
     }
-    const dateformat = get(this.fieldInfo[index], 'format');
+    if (size(this.fieldInfo[index].format) > 1) {
+      formatArr = this.fieldInfo[index].format;
+    } else {
+      dateformat = get(this.fieldInfo[index], 'format');
+    }
     const dateDialogRef = this.dialog.open(DateformatDialogComponent, {
       hasBackdrop: false,
       data: {
         placeholder: 'Enter date format',
-        format: dateformat ? dateformat : ''
+        format: dateformat,
+        formatArr: formatArr 
       }
     });
 
@@ -167,11 +177,12 @@ export class ParserPreviewComponent implements OnInit {
         } else {
           index = event.srcElement.id;
         }
+        const editIcon = angular.element(document.getElementById(`edit_${index}`));
         if (format === '') {
           event.srcElement.value = get(this.parserData.fields[index], 'type');
+          editIcon.css('visibility', 'hidden');
         } else {
           set(this.fieldInfo[index], 'format', format);
-          const editIcon = angular.element(document.getElementById(`edit_${index}`));
           editIcon.css('visibility', 'visible');
         }
       });
@@ -180,5 +191,12 @@ export class ParserPreviewComponent implements OnInit {
   toAdd() {
     const config = assign(this.parserData, { fields: this.fieldInfo });
     this.parserConfig.emit(config);
+  }
+
+  errorInfoVisibility(index) {
+    if (size(this.fieldInfo[index].format) > 1) {
+      return 'visible';
+    } 
+    return 'hidden';
   }
 }

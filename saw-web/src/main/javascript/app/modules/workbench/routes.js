@@ -1,3 +1,5 @@
+import {WorkbenchPageComponent} from './components/workbench-page/workbench-page.component';
+import {DatasetsComponent} from './components/datasets-view/datasets-page.component';
 
 export function routesConfig($stateProvider) {
   'ngInject';
@@ -6,11 +8,11 @@ export function routesConfig($stateProvider) {
     {
       name: 'workbench',
       url: '/workbench',
-      component: 'workbenchPage'
+      component: WorkbenchPageComponent
     }, {
       name: 'workbench.datasets',
       url: '/datasets',
-      component: 'datasetsPage'
+      component: DatasetsComponent
     }
   ];
 
