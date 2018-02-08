@@ -2,27 +2,28 @@ package sncr.xdf.transformer;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.util.LongAccumulator;
+import scala.Tuple2;
+import sncr.bda.core.file.HFileOperations;
 import sncr.bda.datasets.conf.DataSetProperties;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
+import static sncr.xdf.transformer.TransformerComponent.RECORD_COUNTER;
+import static sncr.xdf.transformer.TransformerComponent.TRANSFORMATION_ERRMSG;
 import static sncr.xdf.transformer.TransformerComponent.TRANSFORMATION_RESULT;
 
 public abstract class Executor {
 
-    protected final StructType schema;
+    protected StructType schema;
     protected final String script;
     protected final SparkSession session_ctx;
     protected final String tempLoc;
@@ -35,6 +36,10 @@ public abstract class Executor {
     protected String rejectedDataSet;
     protected String outDataSet;
     protected String inDataSet;
+    protected Map<String, Broadcast<List<Row>>> refData;
+    protected Map<String, Broadcast<List<Tuple2<String, String>>>> refDataDescriptor;
+    protected Dataset<Row> outputResult;
+    protected Dataset<Row> rejectedRecords;
 
     private static final Logger logger = Logger.getLogger(Executor.class);
 
@@ -73,15 +78,19 @@ public abstract class Executor {
         this.successTransformationsCount = ctx.sparkContext().longAccumulator("success");
         this.failedTransformationsCount = ctx.sparkContext().longAccumulator("failed");
         this.schema = st;
+        refData = new HashMap<>();
+        refDataDescriptor = new HashMap<>();
     }
 
-    protected void writeResults(Dataset<Row> outputResult, String resType, String location) throws IOException {
+    protected void writeResults(Dataset<Row> outputResult, String resType, String location) throws Exception {
 
         Map<String, String> outputDS = outputDataSetsDesc.get(resType);
         String name = outputDS.get(DataSetProperties.Name.name());
         String loc = location + Path.SEPARATOR + name;
         String format = outputDS.get(DataSetProperties.Format.name());
-        logger.debug("Write result to location: " + loc + " in format: " + format);
+        logger.debug("Write result to location: " + loc + " in format: " + format + ". if dataset already exists - remove it first");
+
+        if (HFileOperations.exists(loc)) HFileOperations.deleteEnt(loc);
 
         switch (format.toLowerCase()) {
             case "parquet" :
@@ -95,5 +104,47 @@ public abstract class Executor {
         }
     }
 
+    public abstract void execute(Map<String, Dataset> dsMap) throws Exception;
+
+
+    protected void prepareRefData(Map<String, Dataset> dsMap){
+
+        if (refDataSets != null && refDataSets.size() > 0) {
+            for (String refDataSetName: refDataSets) {
+                logger.debug("Load reference data: " + refDataSetName);
+                Dataset ds = dsMap.get(refDataSetName);
+                StructField[] ds_schema = ds.schema().fields();
+                List<Tuple2<String, String>> list = new ArrayList<>();
+                for (int i = 0; i < ds_schema.length; i++) {
+                    list.add( new Tuple2(ds_schema[i].name(), ds_schema[i].dataType().toString()));
+                }
+                Broadcast<List<Row>> rows = jsc.broadcast(ds.collectAsList());
+                refData.put(refDataSetName, rows);
+                Broadcast<List<Tuple2<String, String>>> blist = jsc.broadcast(list);
+                refDataDescriptor.put(refDataSetName, blist);
+            }
+        }
+
+    }
+
+    protected void createFinalDS(Dataset<Row> ds) throws Exception {
+        ds.schema();
+        Column trRes = ds.col(TRANSFORMATION_RESULT);
+        Column trMsg = ds.col(TRANSFORMATION_ERRMSG);
+        Column trRC = ds.col(RECORD_COUNTER);
+        outputResult = ds.filter( trRes.equalTo(0))
+                .drop(trRes)
+                .drop(trMsg)
+                .drop(trRC);
+        if (rejectedDataSet != null && !rejectedDataSet.isEmpty())
+            rejectedRecords = ds.filter( trRes.lt(0));
+
+        logger.debug("Final DS: " + outputResult.count() + " Schema: " + outputResult.schema().prettyJson());
+        logger.debug("Rejected DS: " + rejectedRecords.count() + " Schema: " + rejectedRecords.schema().prettyJson());
+        logger.trace("Save results to temporary location: " );
+        writeResults(outputResult, outDataSet, tempLoc);
+        writeResults(rejectedRecords, rejectedDataSet, tempLoc);
+
+    }
 
 }

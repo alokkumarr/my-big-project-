@@ -33,13 +33,22 @@ public class JaninoExecutor extends Executor{
     public static String PREDEFINED_SCRIPT_MESSAGE = "_script_msg";
 
     private static final Logger logger = Logger.getLogger(JaninoExecutor.class);
+    private final String[] odi;
 
-    public JaninoExecutor(SparkSession ctx, String script, StructType st, String tLoc, int thr, Map<String, Map<String, String>> inputs, Map<String, Map<String, String>> outputs) {
+    public JaninoExecutor(SparkSession ctx,
+                          String script,
+                          StructType st,
+                          String tLoc,
+                          int thr,
+                          Map<String, Map<String, String>> inputs,
+                          Map<String, Map<String, String>> outputs,
+                          String[]  odi) {
         super(ctx, script, st, tLoc, thr, inputs, outputs);
+        this.odi = odi;
     }
 
 
-    protected JavaRDD transformation(JavaRDD dataRDD, String[] odi) throws Exception {
+    protected JavaRDD transformation(JavaRDD dataRDD) throws Exception {
 
         JavaRDD rdd = dataRDD.map(
                 new JaninoTransform( session_ctx,
@@ -52,34 +61,17 @@ public class JaninoExecutor extends Executor{
     }
 
 
-    public void execute(Map<String, Dataset> dsMap, String[]  odi) throws Exception {
+    public void execute(Map<String, Dataset> dsMap) throws Exception {
 
         Dataset ds = dsMap.get(inDataSet);
-
-        JavaRDD transformationResult = transformation(ds.toJavaRDD(), odi);
-        Long c = transformationResult.count();
-        logger.debug("Intermediate result, transformation count  = " + c);
-
+        JavaRDD transformationResult = transformation(ds.toJavaRDD()).cache();
+        //Long c = transformationResult.count();
+        //logger.trace("Intermediate result, transformation count  = " + c);
         // Using structAccumulator do second pass to align schema
         Dataset<Row> df = session_ctx.createDataFrame(transformationResult, schema).toDF();
         //df.schema().prettyJson();
-
-        logger.trace("Transformation completed: " + df.count() + " Schema: " + df.schema().prettyJson());
-
-        //TODO:: Should we drop RECORD_COUNT as well???
-        Column trRes = df.col(TRANSFORMATION_RESULT);
-        Dataset<Row> outputResult = df.select("*").where(trRes.equalTo(0)); //.drop(trRes).drop(alignedDF.col(TRANSFORMATION_ERRMSG));
-        Dataset<Row> rejectedRecords = df.select("*").where(trRes.lt(0));
-
-
-
-        logger.debug("Final DS: " + outputResult.count() + " Schema: " + outputResult.schema().prettyJson());
-        logger.debug("Rejected DS: " + rejectedRecords.count() + " Schema: " + rejectedRecords.schema().prettyJson());
-
-        logger.trace("Save results to temporary location: " );
-        writeResults(outputResult, outDataSet, tempLoc);
-        writeResults(rejectedRecords, rejectedDataSet, tempLoc);
-
+//        logger.trace("Transformation completed: " + df.count() + " Schema: " + df.schema().prettyJson());
+        createFinalDS(df.cache());
     }
 
 }

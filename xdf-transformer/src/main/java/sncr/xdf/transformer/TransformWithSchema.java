@@ -18,6 +18,7 @@ import sncr.xdf.transformer.jexl.XdfObjectContextWithStaticSchema;
 import sncr.xdf.transformer.system.StructAccumulator;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,32 +27,33 @@ import java.util.Map;
 public class TransformWithSchema implements Function<Row, Row> {
 
     private static final Logger logger = Logger.getLogger(TransformWithSchema.class);
-    private final SparkSession sparkSession;
+
     private final LongAccumulator successTransformationsCount;
     private final LongAccumulator failedTransformationsCount;
     private final StructType schema;
     private final int threshold;
+    private final Map<String, Broadcast<List<Tuple2<String, String>>>> refDataDescriptor;
+    private Map<String, Broadcast<List<Row>>> mapRefData = null;
 
-    private Map<String, Broadcast<Dataset<Row>>> mapRefData = null;
     private Map<String, Object> extFunctions;
     private JexlEngine jexlEngine = null;
     private String script;
     private Script jexlScript;
 
-    public TransformWithSchema(SparkSession ss,
-                               String scr,
+    public TransformWithSchema(String scr,
                                StructType inSchema,
-                               Map<String, Broadcast<Dataset<Row>>> mapRefData,
+                               Map<String, Broadcast<List<Row>>> mapRefData,
+                               Map<String, Broadcast<List<Tuple2<String, String>>>> refDataDescriptor,
                                LongAccumulator successTransformationsCount,
                                LongAccumulator failedTransformationsCount,
                                int threshold)
-            throws Exception {
+    {
         script = scr;
         schema = inSchema;
-        sparkSession = ss;
         this.successTransformationsCount = successTransformationsCount;
         this.failedTransformationsCount = failedTransformationsCount;
         this.mapRefData = mapRefData;
+        this.refDataDescriptor = refDataDescriptor;
         this.threshold = threshold;
 
     }
@@ -73,7 +75,7 @@ public class TransformWithSchema implements Function<Row, Row> {
                 logger.debug("Jexl script: " + script);
                 jexlEngine.setLenient(true);
                 if (this.mapRefData != null && !this.mapRefData.isEmpty()) {
-                       extFunctions.put("ref", new sncr.xdf.transformer.jexl.DataScanner(this.mapRefData));
+                       extFunctions.put("ref", new sncr.xdf.transformer.jexl.DataScanner(mapRefData, refDataDescriptor));
                 }
                 jexlEngine.setFunctions(extFunctions);
                 jexlScript = jexlEngine.createScript(script);
