@@ -15,7 +15,8 @@ export const mdButtonGroupComponent = {
       this.mouseActive = false;
       this.activeElement = null;
       this.$mdTheming(this.$element);
-      this.$element.addClass('_md');     // private md component indicator for styling
+      this.$element.addClass('_md');
+      // private md component indicator for styling
       this.$element
         .attr({
           role: 'group',
@@ -64,7 +65,7 @@ export const mdButtonGroupComponent = {
       return doesMatch;
     }
 
-        // IE doesn't support Element.matches
+    // IE doesn't support Element.matches
     matchesSelector(doc, selector, element) {
       const all = doc.querySelectorAll(selector);
 

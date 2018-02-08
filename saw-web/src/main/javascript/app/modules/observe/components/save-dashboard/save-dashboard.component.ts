@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { ObserveService } from '../../services/observe.service';
 import { MenuService } from '../../../../common/services/menu.service';
 import { JwtService } from '../../../../../login/services/jwt.service';
@@ -23,8 +23,8 @@ export class SaveDashboardComponent implements OnInit {
   public categories = [];
   public showProgress = false;
 
-  constructor(private dialogRef: MdDialogRef<SaveDashboardComponent>,
-    @Inject(MD_DIALOG_DATA) private data: any,
+  constructor(private dialogRef: MatDialogRef<SaveDashboardComponent>,
+    @Inject(MAT_DIALOG_DATA) private data: any,
     private menu: MenuService,
     private observe: ObserveService,
     private jwt: JwtService

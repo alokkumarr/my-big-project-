@@ -22,11 +22,6 @@ choice-group {
       border-bottom-right-radius: 3px;
     }
 
-    &.selected {
-      background-color: #DEE4EA;
-      color: #596574;
-    }
-
     [disabled] {
       background-color: transparent;
       color: rgba(#596574, 0.7);
@@ -43,7 +38,7 @@ choice-group {
 
     &.selected {
       background-color: #1A89D4;
-      color: #FFF;
+      color: rgb(255, 255, 255);
 
       md-icon {
         color: #FFF;

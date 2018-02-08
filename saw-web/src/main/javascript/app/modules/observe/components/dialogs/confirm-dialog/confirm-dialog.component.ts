@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MdDialogRef, MD_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import * as get from 'lodash/get';
 
@@ -17,8 +17,8 @@ export class ConfirmDialogComponent implements OnInit {
   private actionColor = 'primary';
 
   constructor(
-    private dialogRef: MdDialogRef<ConfirmDialogComponent>,
-    @Inject(MD_DIALOG_DATA) private params: any
+    private dialogRef: MatDialogRef<ConfirmDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) private params: any
   ) {
     if (get(params, 'message')) {
       this.message = params.message;

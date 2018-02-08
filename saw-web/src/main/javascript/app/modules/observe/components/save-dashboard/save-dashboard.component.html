@@ -1,37 +1,37 @@
-<div md-dialog-title>
+<div mat-dialog-title>
   <span>
     Save Dashboard
   </span>
-  <md-progress-bar [mode]="'indeterminate'" *ngIf="showProgress"></md-progress-bar>
+  <mat-progress-bar [mode]="'indeterminate'" *ngIf="showProgress"></mat-progress-bar>
 </div>
-<div md-dialog-content>
+<div mat-dialog-content>
   <form class="save-dashboard-form">
-    <md-form-field class="full-form-field">
-      <input mdInput name="dashboardName" placeholder="Dashboard Name"
+    <mat-form-field class="full-form-field">
+      <input matInput name="dashboardName" placeholder="Dashboard Name"
         [(ngModel)]="dashboard.name" required />
-    </md-form-field>
-    <md-form-field class="full-form-field">
-      <textarea mdInput mdTextareaAutosize [mdAutosizeMaxRows]="6"
+    </mat-form-field>
+    <mat-form-field class="full-form-field">
+      <textarea matInput matTextareaAutosize [matAutosizeMaxRows]="6"
         name="dashboardDesc" placeholder="Description"
         [(ngModel)]="dashboard.description">
       </textarea>
-    </md-form-field>
+    </mat-form-field>
 
-    <md-select required name="dashboardCat" placeholder="Category" [(ngModel)]="dashboard.categoryId">
-      <md-optgroup *ngFor="let category of categories" [label]="category.name">
-        <md-option *ngFor="let subCategory of category.children" [value]="subCategory.id.toString()">
+    <mat-select required name="dashboardCat" placeholder="Category" [(ngModel)]="dashboard.categoryId">
+      <mat-optgroup *ngFor="let category of categories" [label]="category.name">
+        <mat-option *ngFor="let subCategory of category.children" [value]="subCategory.id.toString()">
           {{ subCategory.name }}
-        </md-option>
-      </md-optgroup>
-    </md-select>
+        </mat-option>
+      </mat-optgroup>
+    </mat-select>
   </form>
 </div>
-<div md-dialog-actions>
-  <button md-raised-button color="primary" (click)="saveDashboard()"
+<div mat-dialog-actions>
+  <button mat-raised-button color="primary" (click)="saveDashboard()"
     [disabled]="!isValid(dashboard)">
     Save
   </button>
-  <button md-button color="primary" (click)="closeDashboard()">
+  <button mat-button color="primary" (click)="closeDashboard()">
     Cancel
   </button>
 </div>
