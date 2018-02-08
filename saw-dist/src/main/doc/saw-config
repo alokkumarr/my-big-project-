@@ -14,6 +14,7 @@ localhost
 [saw-services]
 localhost
 
+
 [saw-services:vars]
 #
 # MapR configuration
@@ -60,6 +61,18 @@ saw_email_username=
 saw_email_password=
 saw_email_from=noreply@example.com
 
+#
+# Path by project
+# replace project key with meaningful name for customer & project
+# replace project path with the accessible by customer like for mct customers only
+# replace project root with appropriate mapr or hdfs root directory
+# replace project preview limit by default set it to 10000
+#
+saw_workbench_project_key=project2
+saw_workbench_project_path=/raw
+saw_workbench_project_root=maprfs:///data/bda
+saw_workbench_preview_limit=10000
+
 [saw-security]
 localhost
 
@@ -71,16 +84,3 @@ saw_security_email_protocol=smtp
 saw_security_email_host=localhost
 saw_security_email_port=25
 saw_security_email_from=noreply@example.com
-
-[saw-workbench]
-#
-# Path by project
-# replace project key with meaningful name for customer & project
-# replace project path with the accessible by customer like for mct customers only
-# replace project root with appropriate mapr or hdfs root directory
-# replace project preview limit by default set it to 10000
-#
-saw_workbench_project_key=project2
-saw_workbench_project_path=/raw
-saw_workbench_project_root=hdfs://data/bda
-saw_workbench_preview_limit=10000

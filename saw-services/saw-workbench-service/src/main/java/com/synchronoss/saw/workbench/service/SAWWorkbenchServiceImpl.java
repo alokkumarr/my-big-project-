@@ -40,15 +40,17 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
   @NotNull
   private String defaultPreviewLimit;
   
-  private String prefix = "hdfs";
+  private String prefix = "maprfs";
   
   @PostConstruct
   private void init() throws Exception {
     if (defaultProjectRoot.startsWith(prefix)) {
       if (!HFileOperations.exists(defaultProjectRoot)) {
+        logger.trace("Path {}", defaultProjectRoot + defaultProjectPath);
         HFileOperations.createDir(defaultProjectRoot);
-        if (!HFileOperations.exists(defaultProjectRoot + Path.SEPARATOR + defaultProjectPath)) {
-          HFileOperations.createDir(defaultProjectRoot + Path.SEPARATOR + defaultProjectPath);
+        if (!HFileOperations.exists(defaultProjectRoot + defaultProjectPath)) {
+          logger.trace("Path {}", defaultProjectRoot + defaultProjectPath);
+          HFileOperations.createDir(defaultProjectRoot + defaultProjectPath);
         }
       }
     } else {
