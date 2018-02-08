@@ -219,7 +219,7 @@
 							<goal>rpm</goal>
 						</goals>
 						<configuration>
-							<packageName>saw-workbench-service</packageName>
+							<packageName>saw-workbench</packageName>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-workbench-service</name>
