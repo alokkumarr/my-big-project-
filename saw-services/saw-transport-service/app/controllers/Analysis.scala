@@ -28,7 +28,8 @@ import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 
 import executor.ReportExecutorQueue
-import sncr.metadata.engine.{Fields, MetadataDictionary}
+import sncr.metadata.engine.{Fields, MDObjectStruct, MetadataDictionary}
+import sncr.saw.common.config.SAWServiceConfig
 
 class Analysis extends BaseController {
   val executorRunner = new ExecutionTaskHandler(1);
@@ -289,7 +290,7 @@ class Analysis extends BaseController {
     if ( typeInfo.equals("report") ){
     val query = (analysis \ "queryManual") match {
       case JNothing => QueryBuilder.build(analysis,false,DSK)
-      case obj: JString => ""
+      case obj: JString => obj.extract[String]
       case obj => unexpectedElement("string", obj)
     }
     val queryJson: JObject = ("query", JString(query)) ~
@@ -471,13 +472,15 @@ class Analysis extends BaseController {
       return myArray
     }
 
-    if ( typeInfo.equals("esReport") )
+    if ( typeInfo.equals("esReport"))
     {
       var data : String= null
+      val rowLimit :java.lang.Integer =if (SAWServiceConfig.es_conf.hasPath("inline-es-report-data-store-limit-rows"))
+        new Integer(SAWServiceConfig.es_conf.getInt("inline-es-report-data-store-limit-rows")) else new java.lang.Integer(10000)
       if (dataSecurityKeyStr!=null) {
-        m_log.trace("dataSecurityKeyStr dataset inside pivot block: {}", dataSecurityKeyStr);
+        m_log.trace("dataSecurityKeyStr dataset inside esReport block: {}", dataSecurityKeyStr)
         data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(
-          new SAWElasticSearchQueryBuilder().getSearchSourceBuilder(EntityType.ESREPORT, json, dataSecurityKeyStr), json);
+          new SAWElasticSearchQueryBuilder(rowLimit).getSearchSourceBuilder(EntityType.ESREPORT, json, dataSecurityKeyStr), json);
       }
       else {
         data = SAWElasticSearchQueryExecutor.executeReturnDataAsString(
@@ -486,7 +489,7 @@ class Analysis extends BaseController {
 
       val finishedTS = System.currentTimeMillis;
       val myArray = parse(data);
-      m_log.trace("pivot dataset: {}", myArray)
+      m_log.trace("esReport dataset: {}", myArray)
 
       var analysisResultNodeID: String = analysisId + "::" + System.nanoTime();
       // The below block is for execution result to store
@@ -508,7 +511,7 @@ class Analysis extends BaseController {
           JField("id", JString(analysisId)),
           JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
           JField("execution_result", JString("success")),
-          JField("type", JString("pivot")),
+          JField("type", JString("esReport")),
           JField("execution_result", JString("success")),
           JField("execution_finish_ts", JLong(finishedTS)),
           JField("exec-code", JInt(0)),
@@ -525,7 +528,7 @@ class Analysis extends BaseController {
           JField("analysisName", JString(analysisName.getOrElse(Fields.UNDEF_VALUE.toString))),
           JField("execution_result", JString("failed")),
           JField("execution_finish_ts", JLong(-1L)),
-          JField("type", JString("pivot")),
+          JField("type", JString("esReport")),
           JField("exec-code", JInt(1)),
           JField("execution_start_ts", JString(timestamp)),
           JField("error_message", JString(errorMsg))
@@ -545,7 +548,7 @@ class Analysis extends BaseController {
         descriptorPrintable = descriptor
       }
 
-      return myArray
+      return getESReportData(analysisResultNodeID,start,limit,typeInfo,myArray)
     }
     if ( typeInfo.equals("chart") ){
       var data : String = null
@@ -730,5 +733,27 @@ class Analysis extends BaseController {
       case obj: JObject => obj
       case obj => throw new RuntimeException("Unsupported type: " + obj)
     }) ~ (name, value)
+  }
+
+  private def getESReportData(executionId: String, page: Int,pageSize: Int, analysisType: String,data: JValue): JValue = {
+    if ( analysisType.equalsIgnoreCase("esReport")) {
+      var pagingData: JValue = null
+      val results = new java.util.ArrayList[java.util.Map[String, (String, Object)]]
+      data.extract[scala.List[Map[String, Any]]]
+        .foreach(row => {
+          val resultsRow = new java.util.HashMap[String, (String, Object)]
+          row.keys.foreach(key => {
+            row.get(key).foreach(value => resultsRow.put(key, ("unknown", value.asInstanceOf[AnyRef])))
+          })
+          results.add(resultsRow)
+        })
+      pagingData = processReportResult(results)
+      PaginateDataSet.INSTANCE.putCache(executionId, results)
+      pagingData = processReportResult(PaginateDataSet.INSTANCE.paginate(pageSize, page, executionId))
+      totalRows = PaginateDataSet.INSTANCE.sizeOfData()
+      m_log.trace("totalRows {}", totalRows)
+      pagingData
+    }
+    else throw new Exception("Unsupported data format")
   }
 }

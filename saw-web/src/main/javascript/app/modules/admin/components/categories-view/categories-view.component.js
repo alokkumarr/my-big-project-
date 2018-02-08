@@ -39,7 +39,8 @@ export const CategoriesViewComponent = {
       this.CategoriesManagementService.getActiveCategoriesList(this.custID).then(admin => {
         this.admin = admin;
         if (this.admin.valid) {
-          this._categoriesCache = this.categoriesList = this.admin.categories;
+          this.categoriesList = this.admin.categories;
+          this._categoriesCache = this.admin.categories;
           this._$rootScope.showProgress = false;
         } else {
           this._$rootScope.showProgress = false;
@@ -61,7 +62,8 @@ export const CategoriesViewComponent = {
       this.showDialog({
         controller: scope => {
           scope.onSaveAction = categories => {
-            this._categoriesCache = this.categoriesList = categories;
+            this.categoriesList = categories;
+            this._categoriesCache = categories;
             this.applySearchFilter();
           };
         },
@@ -76,7 +78,8 @@ export const CategoriesViewComponent = {
         controller: scope => {
           scope.category = editCategory;
           scope.onUpdateAction = categories => {
-            this._categoriesCache = this.categoriesList = categories;
+            this.categoriesList = categories;
+            this._categoriesCache = categories;
             this.applySearchFilter();
           };
         },
@@ -91,7 +94,8 @@ export const CategoriesViewComponent = {
         controller: scope => {
           scope.category = deleteCategory;
           scope.onDeleteAction = categories => {
-            this._categoriesCache = this.categoriesList = categories;
+            this.categoriesList = categories;
+            this._categoriesCache = categories;
             this.applySearchFilter();
           };
           scope.executeSearchFilter = flag => {

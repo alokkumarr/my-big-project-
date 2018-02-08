@@ -167,9 +167,9 @@ export class FilterService {
     });
   }
 
-/**
- * reduce the array of evaluated filters and their booleanCriteria( AND | OR )
- */
+  /**
+   * reduce the array of evaluated filters and their booleanCriteria( AND | OR )
+  */
   getEvaluatedFilterReducer() {
     return (evaluatedFilters => {
       // we need to know the first elements booleanCriteria to get the identity element

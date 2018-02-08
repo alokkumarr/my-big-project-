@@ -9,16 +9,29 @@
     "emitDecoratorMetadata": true,
     "lib" : ["es2015", "es2015.iterable", "dom", "es6", "es2017"],
     "allowJs": true,
-    "types": ["angular", "highcharts"]
+    "types": [
+      "highcharts",
+      "angular",
+      "jquery",
+      "rx"
+    ]
+
+    // needed for no-unused variable rule in vscode editor to work
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true
   },
   "exclude": [
     "node_modules",
+    "fonts",
+    "coverage",
+    "target",
     "**/*.spec.ts",
     "src/test",
     "src/main/javascript/middlelayer",
     "src/main/javascript/styleguide",
     "src/main/javascript/HELP_SAW_User_Guide",
     "conf",
-    "dist"
+    "dist",
+    "target"
   ]
 }

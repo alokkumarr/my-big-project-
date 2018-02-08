@@ -8,7 +8,22 @@ import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 
 public class SAWElasticSearchQueryBuilder {
 
-  
+  /**
+   * Initialize elastic search query result size
+   */
+  Integer size =10000;
+  public SAWElasticSearchQueryBuilder(Integer size)
+  {
+    this.size=size;
+  }
+
+  /**
+   *
+   */
+  public SAWElasticSearchQueryBuilder()
+  {
+
+  }
   /**
    * This method will generate the Elastic Search Query based<br/>
    * on the {@link EntityType}
@@ -25,7 +40,7 @@ public class SAWElasticSearchQueryBuilder {
       //assert (type.find(type) == null);
       //assert (jsonString == null || jsonString.equals(""));
       if (type.equals(EntityType.ESREPORT)) {
-        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString).buildDataQuery();
+        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString).buildDataQuery(size);
       } else {
         query =
                 type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString)
@@ -52,7 +67,7 @@ public class SAWElasticSearchQueryBuilder {
     SearchSourceBuilder query = null;
     try {
       if (type.equals(EntityType.ESREPORT)) {
-        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString).getSearchSourceBuilder();
+        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString).getSearchSourceBuilder(size);
       } else {
       query =
           type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString)
@@ -78,7 +93,7 @@ public class SAWElasticSearchQueryBuilder {
     SearchSourceBuilder query = null;
     try {
       if (type.equals(EntityType.ESREPORT)) {
-        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString).getSearchSourceBuilder();
+        query = new SAWReportTypeElasticSearchQueryBuilder(jsonString).getSearchSourceBuilder(size);
       } else {
       query =
           type.equals(EntityType.CHART) ? new SAWChartTypeElasticSearchQueryBuilder(jsonString,dataSecurityKey)

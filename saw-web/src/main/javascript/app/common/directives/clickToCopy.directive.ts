@@ -1,3 +1,34 @@
+import {
+  Directive,
+  HostListener,
+  ElementRef,
+  Inject
+} from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { ToastService } from '../services/toastMessage.service';
+
+@Directive({
+  selector: '[click-to-copy]'
+})
+export class ClickToCopyDirective {
+
+  constructor(
+    private _toastMessage: ToastService,
+    private _elemRef: ElementRef,
+    @Inject(DOCUMENT) private _doc: any
+  ) {}
+
+  @HostListener('click', ['$event'])
+  onClick() {
+    const elem = this._elemRef.nativeElement;
+    const elemText = elem.value || elem.textContent
+    const status = copyTextToClipboard(this._doc, elemText);
+    /* eslint-disable */
+    status && this._toastMessage.info('Success', 'Error details copied to clipboard');
+    /* eslint-enable */
+  }
+}
+
 function copyTextToClipboard($document, text) {
   /* Thanks https://stackoverflow.com/a/30810322/1825727 */
 
@@ -40,25 +71,3 @@ function copyTextToClipboard($document, text) {
   $document.body.removeChild(textArea);
   return status;
 }
-
-class ClickToCopyDirective {
-
-  controller($scope, $element, $document, toastMessage) {
-    'ngInject';
-
-    this.onClick = () => {
-      const status = copyTextToClipboard($document[0], $element[0].value || $element[0].textContent);
-      /* eslint-disable */
-      status && toastMessage.info('Error details copied to clipboard');
-      /* eslint-enable */
-    };
-
-    $element.css('cursor', 'pointer');
-    $element.on('click', this.onClick);
-
-    $scope.$on('$destroy', () => $element.off('click', this.onClick));
-  }
-
-}
-
-export default () => new ClickToCopyDirective();

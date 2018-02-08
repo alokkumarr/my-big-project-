@@ -1,0 +1,46 @@
+@import "themes/base/colors";
+
+expandable-field {
+  display: block;
+  cursor: move;
+
+  .mat-form-field-wrapper {
+    padding-bottom: 15px;
+  }
+
+  .expandable-field__name {
+    font-weight: 600;
+    max-width: 160px;
+    white-space: normal;
+    word-wrap: normal;
+    word-break: break-word;
+    color: $primary-grey-g4;
+    margin-left: 5px;
+  }
+
+  .expandable-field__icon {
+    margin-left: 10px;
+    width: 30px;
+    color: $primary-grey-g3;
+  }
+
+  .expandable-field__remove-icon {
+    color: red;
+  }
+
+  .expandable-field__option-button {
+    width: auto;
+
+    & > .mat-button-wrapper {
+      width: auto;
+
+      & > .mat-icon {
+        width: auto;
+
+        &::before {
+          width: auto;
+        }
+      }
+    }
+  }
+}

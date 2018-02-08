@@ -1,0 +1,115 @@
+<div fxLayout="row" fxLayoutAlign="space-between stretch">
+  <div>
+    <strong i18n
+            class="sort-fields-title">
+      Available fields
+    </strong>
+    <div class="available-fields"
+          dndSortableContainer
+          dndZone="available-fields-container">
+      <div *ngFor="let field of availableFields; trackBy: trackByFn"
+            [dndSortable]="field"
+            [dndRemoveFromCallback]="removeFromAvailableFields"
+            [dndContainer]="sorts"
+            fxLayout="row"
+            fxLayoutAlign="space-between center"
+            class="sort-field">
+        <span class="sort-field__name">
+            {{field.aliasName || field.displayName}}
+        </span>
+        <button mat-icon-button
+                (click)="addSort(field)"
+                [e2e]="'sort-add-btn-' + (field.aliasName || field.displayName)">
+          <mat-icon fontIcon="icon-plus">
+          </mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="sort-divider"></div>
+  <div [ngSwitch]="sorts.length > 0"
+       class="sorted-fields-container">
+    <strong i18n
+            class="sort-fields-title">
+      Sorted fields
+    </strong>
+    <div *ngSwitchCase="false"
+          fxLayout="column"
+          fxLayoutAlign="start center">
+      <span class="non-ideal-state__message" i18n>
+          Add some fields to sort by, by dragging, or using the add button
+        </span>
+        <mat-icon class="non-ideal-state__icon" fontIcon="icon-sort"></mat-icon>
+    </div>
+    <div *ngSwitchCase="true"
+         class="sorted-fields"
+         dndSortableContainer
+         [dndContainer]="sorts"
+         [dndAddToCallback]="addToSortedFields">
+      <div *ngFor="let sort of sorts; let i = index; trackBy: trackByFn"
+            [dndSortable]="sort"
+            [dndSortableIndex]="i"
+            [dndRemoveFromCallback]="removeFromSortedFields"
+            [dndContainer]="sorts"
+            class="sort-field"
+            fxLayout="row"
+            fxLayoutAlign="space-between center"
+            [e2e]="'sort-field-' + nameMap[sort.columnName]">
+        {{nameMap[sort.columnName]}}
+
+        <div fxLayout="row"
+              fxLayoutAlign="space-between center">
+
+          <div [ngSwitch]="TYPE_MAP[sort.type]">
+            <mat-button-toggle-group *ngSwitchCase="'string'"
+                                     (change)="onSortOrderChange(sort, $event.value)"
+                                     [value]="sort.order">
+              <mat-button-toggle value="asc"
+                                 [e2e]="sort-asc">
+                A<mat-icon fontIcon="icon-arrow-left"></mat-icon>Z
+              </mat-button-toggle>
+              <mat-button-toggle value="desc"
+                                 [e2e]="sort-desc">
+                Z<mat-icon fontIcon="icon-arrow-left"></mat-icon>A
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+            <mat-button-toggle-group *ngSwitchCase="'number'"
+                                     (change)="onSortOrderChange(sort, $event.value)"
+                                     [value]="sort.order">
+              <mat-button-toggle value="asc"
+                                 [e2e]="sort-asc">
+                1<mat-icon fontIcon="icon-arrow-left"></mat-icon>9
+              </mat-button-toggle>
+              <mat-button-toggle value="desc"
+                                 [e2e]="sort-desc">
+                9<mat-icon fontIcon="icon-arrow-left"></mat-icon>1
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+            <mat-button-toggle-group *ngSwitchCase="'date'"
+                                     (change)="onSortOrderChange(sort, $event.value)"
+                                     [value]="sort.order">
+              <mat-button-toggle value="asc"
+                                 [e2e]="sort-asc">
+                Jan<mat-icon fontIcon="icon-arrow-left"></mat-icon>Dec
+              </mat-button-toggle>
+              <mat-button-toggle value="desc"
+                                 [e2e]="sort-desc">
+                Dec<mat-icon fontIcon="icon-arrow-left"></mat-icon>Jan
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+
+          <div class="sorted-field__remove-button__container">
+            <button mat-icon-button
+                    (click)="removeSort(sort)"
+                    [e2e]="sort-remove-btn">
+              <mat-icon fontIcon="icon-close"
+                        class="sorted-field__remove-button__icon">
+              </mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

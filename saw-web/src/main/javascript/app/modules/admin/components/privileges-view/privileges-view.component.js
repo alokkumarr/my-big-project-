@@ -40,7 +40,8 @@ export const PrivilegesViewComponent = {
       this.PrivilegesManagementService.getActivePrivilegesList(this.custID).then(admin => {
         this.admin = admin;
         if (this.admin.valid) {
-          this._privilegesCache = this.privilegeList = this.admin.privileges;
+          this.privilegeList = this.admin.privileges;
+          this._privilegesCache = this.admin.privileges;
           this.states.searchTerm = this._$state.params.role ? `role:"${this._$state.params.role}"` : '';
           /* eslint-disable */
           this.states.searchTerm && this.applySearchFilter();
@@ -67,7 +68,8 @@ export const PrivilegesViewComponent = {
       this.showDialog({
         controller: scope => {
           scope.onSaveAction = privileges => {
-            this._privilegesCache = this.privilegeList = privileges;
+            this.privilegeList = privileges;
+            this._privilegesCache = privileges;
             this.applySearchFilter();
           };
         },
@@ -95,7 +97,8 @@ export const PrivilegesViewComponent = {
       }).then(data => {
         if (data.valid) {
           this._$rootScope.showProgress = false;
-          this._privilegesCache = this.privilegeList = data.privileges;
+          this.privilegeList = data.privileges;
+          this._privilegesCache = data.privileges;
           this.applySearchFilter();
           this._$mdToast.show({
             template: '<md-toast><span> Privilege is successfully deleted </md-toast>',
@@ -122,7 +125,8 @@ export const PrivilegesViewComponent = {
         controller: scope => {
           scope.privilege = editPrivilege;
           scope.onUpdateAction = privileges => {
-            this._privilegesCache = this.privilegeList = privileges;
+            this.privilegeList = privileges;
+            this._privilegesCache = privileges;
             this.applySearchFilter();
           };
         },
