@@ -67,7 +67,10 @@ exports.timeouts = {
 exports.config = {
   allScriptsTimeout: allScriptsTimeout,
   framework: 'jasmine2',
-  seleniumAddress: 'http://localhost:4444/wd/hub',
+  seleniumAddress: webpackHelper.distRun() ? undefined : 'http://localhost:4444/wd/hub', //try solution for fixing
+                                                                                         // ECONNREFUSED connect
+                                                                                         // ECONNREFUSED 127.0.0.1:4444
+  //seleniumAddress: 'http://localhost:4444/wd/hub', for local only
   directConnect: !webpackHelper.distRun(), // if local then true if dist then false
   capabilities: {
     //browserName: 'chrome',
