@@ -4,6 +4,7 @@ import * as forEach from 'lodash/forEach';
 import * as map from 'lodash/map';
 import * as clone from 'lodash/clone';
 import * as unset from 'lodash/unset';
+import * as isUndefined from 'lodash/isUndefined';
 
 import * as template from './analyze-chart-settings.component.html';
 import style from './analyze-chart-settings.component.scss';
@@ -39,7 +40,7 @@ export const AnalyzeChartSettingsComponent = {
     chartType: '<'
   },
   controller: class AnalyzeChartSettingsController {
-    constructor(AnalyzeService, FilterService, $mdSidenav, $scope) {
+    constructor(AnalyzeService, FilterService, $mdSidenav, $scope, toastMessage, $translate) {
       'ngInject';
 
       this.AGGREGATE_TYPES = AGGREGATE_TYPES;
@@ -47,6 +48,8 @@ export const AnalyzeChartSettingsComponent = {
       this.DEFAULT_AGGREGATE_TYPE = DEFAULT_AGGREGATE_TYPE;
       this.DATE_TYPES = DATE_TYPES;
       this.DATE_FORMATS = DATE_FORMATS;
+      this._toastMessage = toastMessage;
+      this._$translate = $translate;
 
       this._FilterService = FilterService;
       this._AnalyzeService = AnalyzeService;
@@ -57,6 +60,8 @@ export const AnalyzeChartSettingsComponent = {
         enabled: false,
         fields: []
       };
+      this.metricCount = 0;
+      this.disableGroupBy = false;
     }
 
     $onInit() {
@@ -131,6 +136,7 @@ export const AnalyzeChartSettingsComponent = {
     setCheckBoxSelection(axisOptions, selectedAttr) {
       const target = find(axisOptions, ({columnName}) => columnName === selectedAttr.columnName);
       if (selectedAttr.checked === true) {
+        this.metricCount++;
         target.checked = 'y';
         // when selecting an axis set a default aggregate type
         if (!selectedAttr.aggregate) {
@@ -151,12 +157,19 @@ export const AnalyzeChartSettingsComponent = {
           }
         }
       } else {
+        this.metricCount--;
         target.checked = false;
         // when deselecting an attribute, unset the aggregate type
         if (selectedAttr.aggregate) {
           unset(selectedAttr, 'aggregate');
           unset(target, 'aggregate');
         }
+      }
+      if (this.metricCount > 1) {
+        this.disableGroupBy = true;
+        this.onDisableGroupBy();
+      } else {
+        this.disableGroupBy = false;
       }
     }
 
@@ -171,6 +184,28 @@ export const AnalyzeChartSettingsComponent = {
     onSelectDateFormat(dateFormat, attr) {
       attr.dateFormat = dateFormat.value;
       this.onChange({settings: this.settings});
+    }
+
+    onDisableGroupBy() {
+      if (this.selected.g !== null && !isUndefined(this.selected.g)) {
+        this.selected.g.checked = false;
+        this.selected.g = null;
+        this.inputChanged(this.settings.groupBy, this.selected.g, 'g');
+        this._$translate('DISABLE_GROUP_BY').then(message => {
+          this._toastMessage.error(message);
+        });
+      }
+    }
+
+    onLoadSavedChart() {
+      forEach(this.settings.yaxis, yAxis => {
+        if (yAxis.checked === 'y') {
+          this.metricCount++;
+        }
+      });
+      if (this.metricCount > 1) {
+        this.disableGroupBy = true;
+      }
     }
   }
 };
