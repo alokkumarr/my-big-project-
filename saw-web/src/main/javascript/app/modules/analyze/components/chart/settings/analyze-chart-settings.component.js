@@ -65,11 +65,15 @@ export const AnalyzeChartSettingsComponent = {
     }
 
     $onInit() {
+      this.metricCount = 0;
       this.multipleYAxes.enabled = !['bubble', 'pie', 'stack'].includes(this.chartType);
       this._clearWatcher = this._$scope.$watch(() => this.settings, newVal => {
         if (newVal) {
           this.markSelected();
           this._clearWatcher();
+          if (this.settings !== null) {
+            this.onLoadSavedChart();
+          }
         }
       });
       this.groupRemovalAction = {
@@ -98,7 +102,6 @@ export const AnalyzeChartSettingsComponent = {
       } else {
         this.selected.y = find(this.settings.yaxis, attr => attr.checked === 'y');
       }
-
       this.selected.x = find(this.settings.xaxis, attr => attr.checked === 'x');
       this.selected.g = find(this.settings.groupBy, attr => attr.checked === 'g');
       this.selected.z = find(this.settings.zaxis, attr => attr.checked === 'z');
