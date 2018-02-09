@@ -142,14 +142,14 @@
 							<goal>rpm</goal>
 						</goals>
 						<configuration>
-							<packageName>saw-export</packageName>
+							<packageName>saw-quartz-scheduler</packageName>
 							<entries>
 								<entry>
 									<name>/opt/bda/saw-quartz-scheduler-service</name>
 									<directory>true</directory>
 								</entry>
 								<entry>
-									<name>/opt/bda/saw-export-service/saw-export.jar</name>
+									<name>/opt/bda/saw-quartz-scheduler-service/saw-quartz-scheduler.jar</name>
 									<file>target/saw-quartz-scheduler-service-${revision}-exec.jar</file>
 								</entry>
 								<entry>
