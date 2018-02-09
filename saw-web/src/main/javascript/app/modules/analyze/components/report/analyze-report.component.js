@@ -344,6 +344,7 @@ export const AnalyzeReportComponent = {
 
         delete result.sqlBuilder.orderByColumns;
       }
+      result.sqlBuilder.dataFields = [];
 
       forEach(model.tables, table => {
         const tableArtifact = {
@@ -372,11 +373,20 @@ export const AnalyzeReportComponent = {
 
           tableArtifact.columns.push(fieldArtifact);
 
-          if (result.sqlBuilder.dataFields && fieldArtifact.checked) {
-            result.sqlBuilder.dataFields.push({
-              columnName: fieldArtifact.columnName,
-              type: fieldArtifact.type
-            });
+          if (result.sqlBuilder.dataFields && fieldArtifact.checked && field.aggregate ) {
+            if (field.aggregate) {
+              result.sqlBuilder.dataFields.push({
+                columnName: fieldArtifact.columnName,
+                type: fieldArtifact.type,
+                name: field.meta.columnName,
+                aggregate: field.aggregate
+              });
+            } else {
+              result.sqlBuilder.dataFields.push({
+                columnName: fieldArtifact.columnName,
+                type: fieldArtifact.type
+              });
+            }
           }
         });
 
