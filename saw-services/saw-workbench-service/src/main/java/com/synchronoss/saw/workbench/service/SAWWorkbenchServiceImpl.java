@@ -1,23 +1,30 @@
 package com.synchronoss.saw.workbench.service;
 
 import java.io.File;
-import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
-import org.apache.commons.io.FilenameUtils;
+
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synchronoss.saw.inspect.SAWDelimitedInspector;
 import com.synchronoss.saw.inspect.SAWDelimitedReader;
 import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
+import com.synchronoss.saw.workbench.model.Project.ResultFormat;
 import sncr.bda.core.file.HFileOperations;
+import sncr.bda.services.DLMetadata;
 
 @Service
 public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
@@ -67,14 +74,60 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
 
   @Override
   public Project readDirectoriesByProjectId(Project project) throws Exception {
-    
-    return null;
+    logger.trace("Reading data from {}" + project.getPath());
+    DLMetadata mdt = new DLMetadata(defaultProjectRoot);
+    List<String> directories = mdt.getListOfStagedFiles(defaultProjectPath, null);
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    project.setResultFormat(ResultFormat.JSON);
+    List<Object> data = new ArrayList<>();
+    for (String directory : directories) {
+      JsonNode node = objectMapper.readTree(directory);
+      data.add(node);
+    }
+    project.setData(data);
+    logger.trace("response structure {}", objectMapper.writeValueAsString(project));
+    return project;
   }
 
   @Override
+  public Project readSubDirectoriesByProjectId(Project project) throws Exception {
+    logger.trace("Reading data from {}" + project.getPath());
+    DLMetadata mdt = new DLMetadata(defaultProjectRoot);
+    List<String> directories = mdt.getListOfStagedFiles(defaultProjectPath, project.getPath());
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    project.setResultFormat(ResultFormat.JSON);
+    List<Object> data = new ArrayList<>();
+    for (String directory : directories) {
+      JsonNode node = objectMapper.readTree(directory);
+      data.add(node);
+    }
+    project.setData(data);
+    logger.trace("response structure {}", objectMapper.writeValueAsString(project));
+    return project;
+  }
+  
+  
+  @Override
   public Project createDirectoryProjectId(Project project) throws Exception {
-    
-    return null;
+    logger.trace("Creating the data directory {}", project.getPath());
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    project.setResultFormat(ResultFormat.JSON);
+    Project readProject = null;
+    if (!HFileOperations.exists(defaultProjectRoot + defaultProjectPath + project.getPath())) {
+      logger.trace("Path {}", defaultProjectRoot + defaultProjectPath + project.getPath());
+      HFileOperations.createDir(defaultProjectRoot + defaultProjectPath + project.getPath());
+      readProject = readSubDirectoriesByProjectId(project);
+      project.setData(readProject.getData());
+    }
+    project.setStatusMessage(project.getPath() + "has been created successfully.");
+    logger.trace("response structure {}", objectMapper.writeValueAsString(project));
+    return project;
   }
 
   @Override
@@ -149,24 +202,15 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     }
     logger.trace("response structure {}", objectMapper.writeValueAsString(inspect));
     return inspect; }
-  
-  public static void main(String[] args) {
-    String path = "/Users/spau0004/Desktop/*.csv";
-    File file = new File(path);
-    System.out.println(file.isDirectory());
-    System.out.println(file.isFile());
-    System.out.println(file.getAbsolutePath());
-    String extension = FilenameUtils.getExtension(path);
-    String basePath = FilenameUtils.getFullPathNoEndSeparator(path);
-    System.out.println(extension);
-    System.out.println(basePath);
-    File dir = new File(basePath);
-    final FilenameFilter filter = new FilenameFilter() {
-      @Override
-      public boolean accept(File dir, String name) {
-          return name.endsWith(extension);
-      }
-  };
-  System.out.println(dir.listFiles(filter)[0].getAbsolutePath());
+ 
+  public static void main(String[] args) throws JsonProcessingException, IOException {
+    String json = "{\"name\":\"normal.csv\",\"size\":254743,\"d\":false,\"cat\":\"root\"}";
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
+    objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
+    JsonNode node = objectMapper.readTree(json);
+    System.out.println(node);
+    
   }
+  
 }

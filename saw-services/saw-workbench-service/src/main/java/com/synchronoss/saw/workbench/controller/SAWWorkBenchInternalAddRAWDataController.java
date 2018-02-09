@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
 import com.synchronoss.saw.workbench.AsyncConfiguration;
+import com.synchronoss.saw.workbench.exceptions.CreateEntitySAWException;
 import com.synchronoss.saw.workbench.exceptions.ReadEntitySAWException;
 import com.synchronoss.saw.workbench.model.Inspect;
 import com.synchronoss.saw.workbench.model.Project;
@@ -75,7 +75,7 @@ public class SAWWorkBenchInternalAddRAWDataController {
   @RequestMapping(value = "raw/default", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
     public Project retrieveProject() throws JsonProcessingException {
-      logger.debug("Retrieve Default Project");
+      logger.debug("Retrieve Default Project {}" + defaultProjectRoot);
       Project project = new Project();
       project.setPath(defaultProjectRoot + defaultProjectPath);
       project.setProjectId(defaultProjectId);
@@ -91,10 +91,16 @@ public class SAWWorkBenchInternalAddRAWDataController {
    */
   @RequestMapping(value = "{projectId}/raw", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public Project retrieveProjectDirectoriesDetailsById(@PathVariable(name = "projectId", required = true) String projectId, HttpServletRequest request, HttpServletResponse response) throws JsonProcessingException {
-    logger.debug("Retrieve project details By Id ", projectId);
+  public Project retrieveProjectDirectoriesDetailsById(@PathVariable(name = "projectId", required = true) String projectId) throws JsonProcessingException {
+    logger.debug("Retrieve project details By Id {}", projectId);
     Project project = new Project();
     project.setProjectId(projectId);
+    try {
+      project = sawWorkbenchService.readDirectoriesByProjectId(project);
+    } catch (Exception e) {
+      logger.error("Exception occured while reading the raw data directories", e);
+      throw new ReadEntitySAWException("Exception occured while reading the raw data directories", e);
+    }
     return project;
   }  
 
@@ -107,14 +113,18 @@ public class SAWWorkBenchInternalAddRAWDataController {
    * @return
    * @throws JsonProcessingException
    */
-  @RequestMapping(value = "{projectId}/raw/directory", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @RequestMapping(value = "{projectId}/raw/directory", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
   public Project retrieveProjectDirectoriesDetailsByIdAndDirectoryPath(@PathVariable(name = "projectId", required = true) String projectId, 
-      @RequestParam(name = "path", required = true) String relativePath, HttpServletRequest request, HttpServletResponse response) throws JsonProcessingException {
-    logger.debug("Retrieve project details By Id ", projectId);
-    Project project = new Project();
+      @RequestBody Project project) throws JsonProcessingException {
+    logger.debug("Retrieve project details By Id {}", projectId);
     project.setProjectId(projectId);
-    project.setPath(relativePath);
+    try {
+      project = sawWorkbenchService.readSubDirectoriesByProjectId(project);
+    } catch (Exception e) {
+      logger.error("Exception occured while reading the raw data directories", e);
+      throw new ReadEntitySAWException("Exception occured while reading the raw data directories", e);
+    }
     return project;
   }  
 
@@ -128,8 +138,15 @@ public class SAWWorkBenchInternalAddRAWDataController {
    */
   @RequestMapping(value = "{projectId}/raw/directory/create", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.CREATED)
-  public Project createProjectDirectoryDetailsByIdAndDirectoryPath(@RequestBody Project project) throws JsonProcessingException {
-    logger.debug("Retrieve project details By Id ", project.getProjectId());
+  public Project createProjectDirectoryDetailsByIdAndDirectoryPath(@PathVariable(name = "projectId", required = true) String projectId,@RequestBody Project project) throws JsonProcessingException {
+    logger.debug("creating directory details By Id ", project.getProjectId());
+      project.setProjectId(projectId);
+      try {
+        project = sawWorkbenchService.createDirectoryProjectId(project);
+      } catch (Exception e) {
+        logger.error("Exception occured while creating data directory", e);
+        throw new CreateEntitySAWException("Exception occured while creating the raw data directory", e);
+    }
     return project;
   } 
   

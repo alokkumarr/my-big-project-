@@ -10,4 +10,5 @@ public interface SAWWorkbenchService {
   public Project uploadFilesDirectoryProjectId(Project project)throws Exception;
   public Project previewFromProjectDirectoybyId(Project project)throws Exception;
   public Inspect inspectFromProjectDirectoybyId(Inspect inspect)throws Exception;
+  public Project readSubDirectoriesByProjectId(Project project) throws Exception;
 }
