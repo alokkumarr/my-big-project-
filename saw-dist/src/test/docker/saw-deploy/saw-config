@@ -49,7 +49,7 @@ saw_elasticsearch_data_store_limit=10000
 #
 saw_workbench_project_key=project2
 saw_workbench_project_path=/raw
-saw_workbench_project_root=maprfs:///apps
+saw_workbench_project_root=maprfs:///apps/sncr
 saw_workbench_preview_limit=10000
 
 
