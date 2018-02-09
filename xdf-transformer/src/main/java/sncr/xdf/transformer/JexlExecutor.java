@@ -7,6 +7,8 @@ import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
 import org.apache.spark.sql.types.StructField;
 import org.apache.spark.sql.types.StructType;
 import org.apache.spark.storage.StorageLevel;
@@ -68,14 +70,19 @@ public class JexlExecutor extends Executor{
         logger.debug("Initialize structAccumulator: " );
         schema = ds.schema();
         String[] fNames = ds.schema().fieldNames();
+        //TODO:: Add 3 transformation result fields into Accumulator
         for (int i = 0; i < fNames.length; i++) {
             structAccumulator.add(new Tuple2<>(fNames[i], ds.schema().apply(i)));
-            logger.trace("Field: " + fNames[i] + " Type: " + ds.schema().apply(i).toString());
+            logger.debug("Field: " + fNames[i] + " Type: " + ds.schema().apply(i).toString());
         }
+        structAccumulator.add(new Tuple2<>(RECORD_COUNTER, new StructField(RECORD_COUNTER, DataTypes.LongType, true, Metadata.empty())));
+        structAccumulator.add(new Tuple2<>(TRANSFORMATION_RESULT,  new StructField(TRANSFORMATION_RESULT, DataTypes.IntegerType, true, Metadata.empty())));
+        structAccumulator.add(new Tuple2<>(TRANSFORMATION_ERRMSG, new StructField(TRANSFORMATION_ERRMSG, DataTypes.StringType, true, Metadata.empty())));
+
         prepareRefData(dsMap);
         JavaRDD transformationResult = transformation(ds.toJavaRDD(), refData, refDataDescriptor).cache();
-        //Long firstPassTrRes = transformationResult.count();
-        //logger.debug("First pass completed: " + firstPassTrRes);
+        Long firstPassTrRes = transformationResult.count();
+        logger.trace("First pass completed: " + firstPassTrRes );
         //logger.trace("Create new schema[" + structAccumulator.value().size() + "]: " + String.join(", ", structAccumulator.value().keySet()));
         StructType newSchema = constructSchema(structAccumulator.value());
         // Using structAccumulator do second pass to align schema
@@ -95,6 +102,7 @@ public class JexlExecutor extends Executor{
     }
 
     private Dataset<Row>  schemaRealignment(JavaRDD<Row> rdd, StructType newSchema) {
+        logger.trace("New schema: " + newSchema.prettyJson());
         JavaRDD<Row> alignedRDD = rdd.map(new SchemaAlignTransform( newSchema)).persist(StorageLevel.MEMORY_AND_DISK());
         return session_ctx.createDataFrame(alignedRDD, newSchema).toDF().cache();
     }

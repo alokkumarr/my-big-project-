@@ -139,9 +139,9 @@ public abstract class Executor {
         if (rejectedDataSet != null && !rejectedDataSet.isEmpty())
             rejectedRecords = ds.filter( trRes.lt(0));
 
-        logger.debug("Final DS: " + outputResult.count() + " Schema: " + outputResult.schema().prettyJson());
-        logger.debug("Rejected DS: " + rejectedRecords.count() + " Schema: " + rejectedRecords.schema().prettyJson());
-        logger.trace("Save results to temporary location: " );
+        logger.trace("Final DS: " + outputResult.count() + " Schema: " + outputResult.schema().prettyJson());
+        logger.trace("Rejected DS: " + rejectedRecords.count() + " Schema: " + rejectedRecords.schema().prettyJson());
+
         writeResults(outputResult, outDataSet, tempLoc);
         writeResults(rejectedRecords, rejectedDataSet, tempLoc);
 

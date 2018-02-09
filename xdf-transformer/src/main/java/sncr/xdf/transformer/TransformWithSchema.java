@@ -82,9 +82,6 @@ public class TransformWithSchema implements Function<Row, Row> {
 
             }
 
-            for ( String k: jexlEngine.getFunctions().keySet()) System.out.println("Fk: " + k + " v: " + jexlEngine.getFunctions().get(k));
-
-
             XdfObjectContextWithStaticSchema sc1 = new XdfObjectContextWithStaticSchema( jexlEngine, schema, arg0);
                 jexlScript.execute(sc1);
             if(sc1.isSuccess()) {

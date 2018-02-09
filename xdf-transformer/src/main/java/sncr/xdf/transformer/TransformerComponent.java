@@ -81,7 +81,7 @@ public class TransformerComponent extends Component implements WithMovableResult
                     throw new XDFException(XDFException.ErrorCodes.ConfigError, e, "Path to Jexl/Janino script is not correct: " + pathToSQLScript);
                 }
             }
-            logger.debug("Script to execute:\n" +  script);
+            logger.trace("Script to execute:\n" +  script);
 
 
 //2. Read input datasets
