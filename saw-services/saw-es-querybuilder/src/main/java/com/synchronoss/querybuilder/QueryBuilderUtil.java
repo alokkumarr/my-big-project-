@@ -117,6 +117,22 @@ public class QueryBuilderUtil {
  		return aggregationBuilder;
  	}
 
+	public static AggregationBuilder aggregationBuilderDataFieldReport(com.synchronoss.querybuilder.model.report.DataField data)
+
+	{
+		AggregationBuilder aggregationBuilder = null;
+		switch (data.getAggregate().value())
+		{
+			case "sum" : aggregationBuilder = AggregationBuilders.sum(data.getName()).field(data.getColumnName()); break;
+			case "avg" : aggregationBuilder = AggregationBuilders.avg(data.getName()).field(data.getColumnName()); break;
+			case "min" : aggregationBuilder = AggregationBuilders.min(data.getName()).field(data.getColumnName()); break;
+			case "max" : aggregationBuilder = AggregationBuilders.max(data.getName()).field(data.getColumnName()); break;
+			case "count" : aggregationBuilder = AggregationBuilders.count(data.getName()).field(data.getColumnName()); break;
+		}
+
+		return aggregationBuilder;
+	}
+
     public static AggregationBuilder aggregationBuilderDataFieldChart(com.synchronoss.querybuilder.model.chart.DataField data)
 
     {
