@@ -39,6 +39,7 @@ saw_elasticsearch_port=8200
 saw_elasticsearch_username=
 saw_elasticsearch_password=
 saw_elasticsearch_data_store_limit=10000
+saw_executor_result_wait_time=300
 
 [saw-security]
 localhost ansible_connection=local
