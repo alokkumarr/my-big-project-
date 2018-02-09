@@ -42,3 +42,7 @@ a {
 .highlight {
   background-color: $highlight-bg-color;
 }
+
+button, select, html, textarea, input {
+  font-family: $font-source-sans-pro !important;
+}
