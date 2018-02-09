@@ -241,10 +241,10 @@ export const AnalyzeReportComponent = {
 
       forEach(this.model.sqlBuilder.dataFields, aggregates => {
         forEach(data[0].columns, column => {
-          if (aggregates.columnName == column.columnName) {
+          if (aggregates.columnName === column.columnName) {
             column.aggregate = aggregates.aggregate;
           }
-        })
+        });
       });
 
       /* eslint-disable camelcase */
@@ -384,7 +384,7 @@ export const AnalyzeReportComponent = {
 
           tableArtifact.columns.push(fieldArtifact);
 
-          if (result.sqlBuilder.dataFields && fieldArtifact.checked && field.aggregate ) {
+          if (result.sqlBuilder.dataFields && fieldArtifact.checked && field.aggregate ){
             if (field.aggregate) {
               result.sqlBuilder.dataFields.push({
                 columnName: fieldArtifact.columnName,

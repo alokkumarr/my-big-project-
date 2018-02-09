@@ -85,10 +85,8 @@ export const JSPlumbTable = {
       } else {
         this.AGGREGATE_TYPES = AGGREGATE_TYPES;
       }
-      if (NUMBER_TYPES.includes(field.type) || field.type == 'string') {
+      if (NUMBER_TYPES.includes(field.type) || field.type === 'string') {
         return true;
-      } else {
-        return false;
       }
     }
 
