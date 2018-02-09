@@ -384,7 +384,7 @@ export const AnalyzeReportComponent = {
 
           tableArtifact.columns.push(fieldArtifact);
 
-          if (result.sqlBuilder.dataFields && fieldArtifact.checked && field.aggregate ){
+          if (result.sqlBuilder.dataFields && fieldArtifact.checked && field.aggregate) {
             if (field.aggregate) {
               result.sqlBuilder.dataFields.push({
                 columnName: fieldArtifact.columnName,
