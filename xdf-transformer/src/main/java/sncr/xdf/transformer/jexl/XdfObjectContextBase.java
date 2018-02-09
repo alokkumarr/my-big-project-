@@ -204,10 +204,20 @@ abstract public class XdfObjectContextBase extends ObjectContext<Row> {
 
         for(String fn: targetRowTypes.keySet()) {
 
-            fieldArray[i] = targetRowTypes.get(fn);
+            StructField sf = targetRowTypes.get(fn);
+
+            boolean wasNullType = sf.dataType() == DataTypes.NullType;
+            if (wasNullType) {
+                sf = new StructField(fn, DataTypes.StringType, true, Metadata.empty());
+            }
+
+            fieldArray[i] = sf;
             fieldNames[i] = fn;
             if (targetRow.containsKey(fn)) {
-                newRowVals[i] = targetRow.get(fn);
+                if (!wasNullType)
+                    newRowVals[i] = targetRow.get(fn);
+                else
+                    newRowVals[i] = String.valueOf(targetRow.get(fn));
             }
             else {
                 newRowVals[i] = null;

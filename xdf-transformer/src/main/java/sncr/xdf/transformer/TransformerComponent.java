@@ -1,5 +1,6 @@
 package sncr.xdf.transformer;
 
+import akka.event.Logging;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
@@ -80,7 +81,7 @@ public class TransformerComponent extends Component implements WithMovableResult
                     throw new XDFException(XDFException.ErrorCodes.ConfigError, e, "Path to Jexl/Janino script is not correct: " + pathToSQLScript);
                 }
             }
-            logger.debug("Script to execute:\n" +  script);
+            logger.trace("Script to execute:\n" +  script);
 
 
 //2. Read input datasets
@@ -101,6 +102,7 @@ public class TransformerComponent extends Component implements WithMovableResult
                         logger.error(error);
                         return -1;
                 }
+                logger.debug("Added to DS map: " + entry.getKey());
                 dsMap.put(entry.getKey(), ds);
             }
             Transformer.ScriptEngine engine = ctx.componentConfiguration.getTransformer().getScriptEngine();
@@ -113,13 +115,7 @@ public class TransformerComponent extends Component implements WithMovableResult
                 if (engine == Transformer.ScriptEngine.JEXL) {
                     logger.debug("Execute JEXL script: " + engine );
                     JexlExecutorWithSchema jexlExecutorWithSchema  =
-                            new JexlExecutorWithSchema(ctx.sparkSession,
-                                    script,
-                                    st,
-                                    tempLocation,
-                                    0,
-                                    inputs,
-                                    outputs);
+                            new JexlExecutorWithSchema(ctx.sparkSession, script, st, tempLocation,0, inputs, outputs);
                     jexlExecutorWithSchema.execute(dsMap);
                 } else if (engine == Transformer.ScriptEngine.JANINO) {
                     logger.debug("Execute JANINO script: " + engine );
@@ -135,14 +131,8 @@ public class TransformerComponent extends Component implements WithMovableResult
 
                     String[] odi = ctx.componentConfiguration.getTransformer().getAdditionalImports().toArray(new String[0]);
                      JaninoExecutor janinoExecutor =
-                             new JaninoExecutor(ctx.sparkSession,
-                             script,
-                             st,
-                              tempLocation,
-                             0,
-                             inputs,
-                             outputs);
-                    janinoExecutor.execute(dsMap, odi);
+                         new JaninoExecutor(ctx.sparkSession, script, st, tempLocation,0, inputs, outputs, odi);
+                    janinoExecutor.execute(dsMap);
                 } else {
                     error = "Unsupported transformation engine: " + engine;
                     logger.error(error);
@@ -153,12 +143,7 @@ public class TransformerComponent extends Component implements WithMovableResult
                 //3. Based of configuration run Jexl or Janino engine.
                 if (engine == Transformer.ScriptEngine.JEXL) {
                     JexlExecutor jexlExecutor =
-                            new JexlExecutor(ctx.sparkSession,
-                                    script,
-                                    tempLocation,
-                                    0,
-                                    inputs,
-                                    outputs);
+                            new JexlExecutor(ctx.sparkSession, script, tempLocation, 0, inputs, outputs);
                     jexlExecutor.execute(dsMap);
                 } else if (engine == Transformer.ScriptEngine.JANINO) {
                     error = "Transformation with Janino engine requires Output schema, dynamic schema mode is not supported";

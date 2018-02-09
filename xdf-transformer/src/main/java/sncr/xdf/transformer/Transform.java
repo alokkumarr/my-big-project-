@@ -17,6 +17,7 @@ import sncr.xdf.transformer.jexl.XdfObjectContext;
 import sncr.xdf.transformer.system.StructAccumulator;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,7 +26,6 @@ import java.util.Map;
 public class Transform implements Function<Row, Row> {
 
     private static final Logger logger = Logger.getLogger(Transform.class);
-    private final SparkSession sparkSession;
     private final LongAccumulator successTransformationsCount;
     private final LongAccumulator failedTransformationsCount;
     private final StructAccumulator structAccumulator;
@@ -33,30 +33,30 @@ public class Transform implements Function<Row, Row> {
     private final StructType schema;
     private final int threshold;
 
-    private Map<String, Broadcast<Dataset<Row>>> mapRefData = null;
+    private Map<String, Broadcast<List<Row>>> mapRefData = null;
+    private final Map<String, Broadcast<List<Tuple2<String, String>>>> refDataDescriptor;
     private Map<String, Object> extFunctions;
     private JexlEngine jexlEngine = null;
     private String script;
     private Script jexlScript;
 
-    public Transform(SparkSession ss,
-                     String scr,
-                         StructType inSchema,
-                     Map<String, Broadcast<Dataset<Row>>> mapRefData,
+    public Transform(String scr,
+                     StructType inSchema,
+                     Map<String, Broadcast<List<Row>>> mapRefData,
+                     Map<String, Broadcast<List<Tuple2<String, String>>>> refDataDescriptor,
                      LongAccumulator successTransformationsCount,
                      LongAccumulator failedTransformationsCount,
                      StructAccumulator structAccumulator,
                      int threshold)
-            throws Exception {
+    {
         script = scr;
         schema = inSchema;
-        sparkSession = ss;
+        this.refDataDescriptor = refDataDescriptor;
         this.successTransformationsCount = successTransformationsCount;
         this.failedTransformationsCount = failedTransformationsCount;
         this.structAccumulator = structAccumulator;
         this.mapRefData = mapRefData;
         this.threshold = threshold;
-        //fieldToIdxMapping = XdfObjectContext.PrepareFieldMapping(objectSchema);
 
     }
 
@@ -78,12 +78,12 @@ public class Transform implements Function<Row, Row> {
     //Create N (N = length of mapRefData ) DataScanners with name of map key (as mentioned in configuration)
     //The first one make 'ref' as a duplicate for backward compatibility
                 if (this.mapRefData != null && !this.mapRefData.isEmpty()) {
-                    extFunctions.put("ref", new sncr.xdf.transformer.jexl.DataScanner(this.mapRefData));
+                    extFunctions.put("ref", new sncr.xdf.transformer.jexl.DataScanner(mapRefData, refDataDescriptor));
                 }
                 jexlEngine.setFunctions(extFunctions);
             }
 
-            for ( String k: jexlEngine.getFunctions().keySet()) System.out.println("Fk: " + k + " v: " + jexlEngine.getFunctions().get(k));
+            //for ( String k: jexlEngine.getFunctions().keySet()) System.out.println("Fk: " + k + " v: " + jexlEngine.getFunctions().get(k));
 
             jexlScript = jexlEngine.createScript(script);
 

@@ -108,7 +108,7 @@ public class XdfObjectContextWithStaticSchema extends XdfObjectContextBase {
      * @param fIndex
      * @throws Exception
      */
-    private void validateSchema(String nativeName, Object value, int fIndex) throws Exception {
+    private void validateSchema(String nativeName, Object value, int fIndex) {
         if ( targetRowTypes.containsKey(nativeName) ) {
             StructField sf = targetRowTypes.get(nativeName);
             //Get value from script with the same data type - ignore it, except if that was NullType
@@ -117,6 +117,7 @@ public class XdfObjectContextWithStaticSchema extends XdfObjectContextBase {
             }
             //If we have field in type map and coming value is not the same type from set of supported
             // types - throw an exception.
+  //          System.out.printf("Field: %s, Schema type: %s, actual type: %s \n", nativeName, sf.dataType().toString(), value.getClass().getName());
             if (!(
                 (sf.dataType() == DataTypes.StringType && value instanceof String) ||
                     (sf.dataType() == DataTypes.LongType && value instanceof Long) ||
