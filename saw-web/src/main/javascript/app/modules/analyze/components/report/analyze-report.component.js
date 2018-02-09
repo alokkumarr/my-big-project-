@@ -355,7 +355,6 @@ export const AnalyzeReportComponent = {
 
         delete result.sqlBuilder.orderByColumns;
       }
-      //result.sqlBuilder.dataFields = [];
 
       forEach(model.tables, table => {
         const tableArtifact = {
