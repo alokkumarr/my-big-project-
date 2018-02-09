@@ -239,6 +239,14 @@ export const AnalyzeReportComponent = {
 
       model.clear();
 
+      forEach(this.model.sqlBuilder.dataFields, aggregates => {
+        forEach(data[0].columns, column => {
+          if (aggregates.columnName == column.columnName) {
+            column.aggregate = aggregates.aggregate;
+          }
+        })
+      });
+
       /* eslint-disable camelcase */
       forEach(data, itemA => {
         forEach(itemA.columns, column => {
@@ -267,6 +275,9 @@ export const AnalyzeReportComponent = {
           const field = table.addField(itemB.columnName);
 
           field.setMeta(itemB);
+          if (itemB.aggregate) {
+            field.aggregate = itemB.aggregate;
+          }
           field.displayName = itemB.displayName;
           field.alias = itemB.aliasName;
           field.type = itemB.type;
@@ -379,7 +390,7 @@ export const AnalyzeReportComponent = {
                 columnName: fieldArtifact.columnName,
                 type: fieldArtifact.type,
                 name: field.meta.columnName,
-                aggregate: field.aggregate
+                aggregate: field.meta.aggregate
               });
             } else {
               result.sqlBuilder.dataFields.push({
