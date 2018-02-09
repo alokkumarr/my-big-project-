@@ -39,7 +39,7 @@ const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 1800000 : 30000
  * Fixes error: Timed out waiting for asynchronous Angular tasks to finish after n seconds;
  * If fluentWait is happening more than this timeout it will throw an error like "element is not clickable"
  */
-const allScriptsTimeout = 60000;
+const allScriptsTimeout = webpackHelper.distRun() ? 600000 : 60000;
 
 /**
  * Waits ms after page is loaded
@@ -65,13 +65,14 @@ exports.timeouts = {
 };
 
 exports.config = {
-  allScriptsTimeout: allScriptsTimeout,
   framework: 'jasmine2',
-  seleniumAddress: webpackHelper.distRun() ? undefined : 'http://localhost:4444/wd/hub', //try solution for fixing
+  //seleniumAddress: webpackHelper.distRun() ? undefined : 'http://localhost:4444/wd/hub', //try solution for fixing
                                                                                          // ECONNREFUSED connect
                                                                                          // ECONNREFUSED 127.0.0.1:4444
-  //seleniumAddress: 'http://localhost:4444/wd/hub', for local only
-  directConnect: !webpackHelper.distRun(), // if local then true if dist then false
+  seleniumAddress: 'http://localhost:4444/wd/hub',
+  getPageTimeout: 500000,
+  allScriptsTimeout: allScriptsTimeout,
+  directConnect: true,
   capabilities: {
     //browserName: 'chrome',
     browserName: webpackHelper.distRun() ? 'firefox' : 'chrome', //debug purposes
