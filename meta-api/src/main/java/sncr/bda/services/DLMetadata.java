@@ -1,17 +1,28 @@
 package sncr.bda.services;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
-import sncr.bda.base.MetadataBase;
 
-import java.net.URI;
-import java.util.ArrayList;
+import sncr.bda.base.MetadataBase;
 
 /**
  * Created by srya0001 on 10/26/2017.
+ */
+/**
+ * @author spau0004
+ *
  */
 public class DLMetadata extends MetadataBase {
 
@@ -196,72 +207,73 @@ public class DLMetadata extends MetadataBase {
     }
 
     public ArrayList<String> getListOfStagedFiles(String rqProject, String subDir) throws Exception {
-
+        logger.trace("Getting the list of directories & folder for specified directory in the cluster for the project" + rqProject);
         if (rqProject == null) {
-            throw new Exception("Project is not specified");
+            throw new Exception("Project is not specified.");
         }
-
-        Path stagingRoot = new Path(dlRoot + Path.SEPARATOR + rqProject + Path.SEPARATOR_CHAR + PREDEF_RAW_DIR);
-
+        Path stagingRoot = new Path(dlRoot + Path.SEPARATOR + rqProject);
         Path requestRoot;
-
         if(subDir != null && !subDir.isEmpty()){
             requestRoot = new Path(stagingRoot + Path.SEPARATOR + subDir);
         } else {
             requestRoot = stagingRoot;
         }
-
-        URI relativeParentPath = stagingRoot.toUri().relativize(requestRoot.getParent().toUri());
         URI relativeSelfPath = stagingRoot.toUri().relativize(requestRoot.toUri());
-
         String strRelativeSelfPath = "" + relativeSelfPath;
         if(strRelativeSelfPath.isEmpty()){
             strRelativeSelfPath = "root";
         }
-
-        //logger.info("\n===> Staging " + stagingRoot);
-        //logger.info("\n===> Requested list of files from " + requestRoot);
-        //logger.info("\n===> Relative path (self)" + relativeSelfPath);
-        //logger.info("\n===> Relative path (parent)" + relativeParentPath);
-
+        logger.trace("Staging " + stagingRoot);
+        logger.trace("Requested list of files from " + requestRoot);
+        logger.trace("Relative path (self)" + relativeSelfPath);
         ArrayList<String> list = new ArrayList<>();
-
         Path p = new Path(requestRoot + Path.SEPARATOR + "*");
-
-        // Parent - lloks like Akhilesh doesn't need this -- commented
-        /*String record2 = "{"
-                        + "\"name\":\"..\", "
-                        + "\"d\":" + 1 + ", "
-                        + "\"cat\":\"" + (requestRoot.equals(stagingRoot) ?  "" : relativeParentPath) + "\""
-                        + "}";
-        list.add(record2);
-
-        String record3 = "{"
-                         + "\"name\":\".\", "
-                         + "\"d\":" + 1 + ", "
-                         + "\"cat\":\"" + relativeSelfPath + "\""
-                         + "}";
-        list.add(record3);
-*/
         FileStatus[] plist = fs.globStatus(p);
         for (FileStatus f : plist) {
             Boolean isDir = f.isDirectory();
             String name = f.getPath().getName();
+            boolean countOfFiles = listAllFilePath(f.getPath(), fs).size()>0?true:false;
             Long size = f.getLen();
             f.getModificationTime();
             String record = "{"
                             + "\"name\":\"" + name + "\", "
                             + "\"size\":" + size + ", "
-                            + "\"d\":" + isDir + ", "
-                            + "\"cat\":\"" + strRelativeSelfPath + "\""
+                            + "\"isDirectory\":" + isDir + ", "
+                            + "\"path\":\"" + strRelativeSelfPath + "\""
+                            + "\"subDirectories\":\"" + countOfFiles  + "\""
                             + "}";
             list.add(record);
-            //logger.info("===> entry " + record);
         }
-
-
+        logger.trace("Getting the list of directories & folder for specified directory in the cluster." + list);
         return list;
     }
+   
+    /**
+     * This method is used to get the list of sub directories
+     * @param hdfsFilePath
+     * @param fs
+     * @return List<String>
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    private List<String> listAllFilePath(Path hdfsFilePath, FileSystem fs)
+        throws FileNotFoundException, IOException {
+          List<String> filePathList = new ArrayList<String>();
+          Queue<Path> fileQueue = new LinkedList<Path>();
+          fileQueue.add(hdfsFilePath);
+          while (!fileQueue.isEmpty()) {
+            Path filePath = fileQueue.remove();
+            if (fs.isDirectory(filePath)) {
+              filePathList.add(filePath.toString());
+            } else {
+              FileStatus[] fileStatus = fs.listStatus(filePath);
+              for (FileStatus fileStat : fileStatus) {
+                fileQueue.add(fileStat.getPath());
+              }
+            }
+          }
+          return filePathList;
+        }
 
     public void createProject(String project) throws Exception {
         // Create project directory
