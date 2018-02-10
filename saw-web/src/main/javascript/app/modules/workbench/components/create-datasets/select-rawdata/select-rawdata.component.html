@@ -8,7 +8,7 @@
       <button for="fileUpload" mat-icon-button color="primary" (click)="fileUpload.click()" [style.height.px]="36">
         <mat-icon>file_upload</mat-icon>
       </button>
-      <input fxHide type="file" #fileUpload (change)="fileInput($event)" multiple accept=".csv, .txt" />
+      <input fxHide type="file" #fileUpload (change)="fileInput($event)" multiple accept=".csv, text/plain" />
       <button mat-icon-button color="primary" [style.height.px]="36" (click)="createFolder()">
         <mat-icon>create_new_folder</mat-icon>
       </button>

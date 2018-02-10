@@ -18,7 +18,7 @@
                 </select>
                 <mat-icon class="formatEditIcon" id="edit_{{ data.columnIndex }}" (click)="openDateFormatDialog($event)" [style.visibility]="fieldInfo[data.columnIndex].type === 'date' ? 'visible' : 'hidden'">mode_edit</mat-icon>
               </div>
-              <mat-icon class="errorInfoIcon" [style.visibility]="errorInfoVisibility(data.columnIndex)">info_outline</mat-icon>
+              <mat-icon class="errorInfoIcon" *ngIf="fieldInfo[data.columnIndex].format?.length > 1">info_outline</mat-icon>
             </div>
           </div>
         </div>

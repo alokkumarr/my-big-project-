@@ -1,3 +1,5 @@
+declare function require(string): string;
+
 import { Component, Input, OnInit, EventEmitter, Output, AfterViewInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
@@ -92,7 +94,7 @@ export class DatasetDetailsComponent implements OnInit {
       const dialogRef = this.dialog.open(RawpreviewDialogComponent, {
         data: {
           title: fileDetails.name,
-          rawData: data.samplesRaw
+          rawData: data.data
         }
       });
     });
