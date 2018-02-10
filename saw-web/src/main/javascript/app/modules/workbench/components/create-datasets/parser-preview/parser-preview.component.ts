@@ -1,3 +1,5 @@
+declare function require(string): string;
+
 import * as angular from 'angular';
 import { Component, Input, OnInit, Inject, ViewChild, AfterViewInit, EventEmitter, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -10,7 +12,7 @@ import * as forEach from 'lodash/forEach';
 import * as replace from 'lodash/replace';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as assign from 'lodash/assign';
-import * as size from 'lodash/size';
+import * as has from 'lodash/has';
 
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { DxDataGridComponent } from 'devextreme-angular';
@@ -139,12 +141,13 @@ export class ParserPreviewComponent implements OnInit {
     } else {
       const formatEdit = event.currentTarget.nextElementSibling;
       formatEdit.style.visibility = 'hidden';
-      if (this.fieldInfo[event.srcElement.id].format) {
-        set(this.fieldInfo[event.srcElement.id], 'format', '');
+      const index = event.srcElement.id;
+      if (has(this.parserData.fields[index], 'format')) {
+        set(this.fieldInfo[index], 'format', get(this.parserData.fields[index], 'format'));
       }
     }
   }
-
+  /*set the user provided date format for the Field. If the format is empty revert back the field type to original. */
   openDateFormatDialog(event) {
     let index: number;
     let dateformat = '';
@@ -154,17 +157,19 @@ export class ParserPreviewComponent implements OnInit {
     } else {
       index = event.srcElement.id;
     }
-    if (size(this.fieldInfo[index].format) > 1) {
-      formatArr = this.fieldInfo[index].format;
-    } else {
-      dateformat = get(this.fieldInfo[index], 'format');
+    if (has(this.fieldInfo[index], 'format')) {
+      if (this.fieldInfo[index].format.length > 1) {
+        formatArr = this.fieldInfo[index].format;
+      } else {
+        dateformat = get(this.fieldInfo[index], 'format[0]');
+      }
     }
     const dateDialogRef = this.dialog.open(DateformatDialogComponent, {
       hasBackdrop: false,
       data: {
         placeholder: 'Enter date format',
         format: dateformat,
-        formatArr: formatArr 
+        formatArr: formatArr
       }
     });
 
@@ -178,11 +183,20 @@ export class ParserPreviewComponent implements OnInit {
           index = event.srcElement.id;
         }
         const editIcon = angular.element(document.getElementById(`edit_${index}`));
-        if (format === '') {
+        if (format === '' && has(this.parserData.fields[index], 'format')) {
+          if (this.parserData.fields[index].format.length === 0 || this.parserData.fields[index].format.length > 1) {
+            event.srcElement.value = get(this.parserData.fields[index], 'type');
+            editIcon.css('visibility', 'hidden');
+          } else if (this.parserData.fields[index].format.length === 1) {
+            set(this.fieldInfo[index], 'format[0]', get(this.parserData.fields[index], 'format[0]'));
+            editIcon.css('visibility', 'visible');
+          }
+
+        } else if (format === '' && !has(this.parserData.fields[index], 'format')) {
           event.srcElement.value = get(this.parserData.fields[index], 'type');
           editIcon.css('visibility', 'hidden');
-        } else {
-          set(this.fieldInfo[index], 'format', format);
+        } else if (format !== '') {
+          set(this.fieldInfo[index], 'format', [format]);
           editIcon.css('visibility', 'visible');
         }
       });
@@ -194,9 +208,9 @@ export class ParserPreviewComponent implements OnInit {
   }
 
   errorInfoVisibility(index) {
-    if (size(this.fieldInfo[index].format) > 1) {
+    if (get(this.fieldInfo[index], 'format').length > 1) {
       return 'visible';
-    } 
+    }
     return 'hidden';
   }
 }

@@ -110,7 +110,7 @@
                   </mat-form-field>
                   <div class="margin20">
                     <span fxFlex="20">Spark Instances</span>
-                    <mat-slider matInput fxFlex name="sparkInstances" class="margin20" max="12" min="2" step="1" thumb-label="true" tick-interval="1"
+                    <mat-slider matInput fxFlex name="sparkInstances" class="margin20" max="10" min="2" step="1" thumb-label="true" tick-interval="1"
                       [(ngModel)]="parserConf.parameters[1].value" [ngModelOptions]="{standalone: true}">
                     </mat-slider>
                     <span>{{parserConf.parameters[1].value}}</span>

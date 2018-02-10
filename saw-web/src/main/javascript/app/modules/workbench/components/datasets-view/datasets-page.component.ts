@@ -1,3 +1,5 @@
+declare function require(string): string;
+
 import { Component, Input, OnInit, Inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material';

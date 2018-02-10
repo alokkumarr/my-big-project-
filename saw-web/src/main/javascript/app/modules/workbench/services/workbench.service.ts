@@ -34,7 +34,7 @@ export class WorkbenchService {
     Params = Params.append('prj', projectName);
     return this.http.get(`${this.apiWB}/dl/sets`, { params: Params })
       .pipe(
-      catchError(this.handleError('data', DATASETS)));
+        catchError(this.handleError('data', DATASETS)));
   }
 
   /** GET Staging area tree list */
@@ -46,24 +46,24 @@ export class WorkbenchService {
     }
     return this.http.get(`${this.apiWB}/dl/raw`, { params: Params })
       .pipe(
-      catchError(this.handleError('data', TREE_VIEW_Data)));
+        catchError(this.handleError('data', TREE_VIEW_Data)));
   }
 
   /** GET raw preview from the server */
   getRawPreviewData(projectName: string, path: string): Observable<any> {
     const endpoint = `${this.wbAPI}/${projectName}/raw/preview`;
-    const payload = {path}
+    const payload = { path }
     return this.http.post(endpoint, payload)
       .pipe(
-      catchError(this.handleError('data', RAW_SAMPLE)));
+        catchError(this.handleError('data', RAW_SAMPLE)));
   }
 
-   /** GET parsed preview from the server */
+  /** GET parsed preview from the server */
   getParsedPreviewData(projectName: string, previewConfig): Observable<any> {
     const endpoint = `${this.wbAPI}/${projectName}/raw/directory/inspect`;
     return this.http.post(endpoint, previewConfig)
       .pipe(
-      catchError(this.handleError('data', parser_preview)));
+        catchError(this.handleError('data', parser_preview)));
   }
 
   /** File mask search */
@@ -105,18 +105,44 @@ export class WorkbenchService {
     return str === suffix;
   }
 
-  uploadFile(fileToUpload: File, projectName: string, path: string): Observable<any> {
+  uploadFile(filesToUpload: FileList, projectName: string, path: string): Observable<any> {
     const endpoint = `${this.apiWB}/dl/upload/raw?prj=${projectName}&cat=${path}`;
     const formData: FormData = new FormData();
-    formData.append('file', fileToUpload);
+    forEach(filesToUpload, file => {
+      formData.append('file', file);
+    });
     return this.http.post(endpoint, formData);
   }
 
-  createFolder(projectName: string, path: string): Observable<any> { 
+  validateMaxSize(fileList: FileList) {
+    let size = 0;
+    let maxSize = 26214400;
+    forEach(fileList, file => {
+      size += file.size;
+    });
+    if (size > maxSize) {
+      return false;
+    }
+    return true;
+  }
+
+  validateFileTypes(fileList: FileList) {
+    let isValid = true;
+    forEach(fileList, file => {
+      const fileName = file.name;
+      const ext = fileName.substring(fileName.lastIndexOf('.') + 1);
+      if (ext.toLowerCase() !== 'csv' && ext.toLowerCase() !== 'txt') {
+        isValid = false;
+      }
+    });
+    return isValid;
+  }
+
+  createFolder(projectName: string, path: string): Observable<any> {
     const endpoint = `${this.apiWB}/dl/create/raw?prj=${projectName}&cat=${path}`;
     return this.http.post(endpoint, {})
       .pipe(
-      catchError(this.handleError('data', {})));
+        catchError(this.handleError('data', {})));
   }
 
 

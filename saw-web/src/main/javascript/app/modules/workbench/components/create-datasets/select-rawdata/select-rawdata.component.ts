@@ -1,6 +1,6 @@
 declare function require(string): string;
 
-import { Component, Input, OnInit, ViewChild, AfterViewInit, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material';
 import { debounceTime } from 'rxjs/operators';
@@ -8,6 +8,7 @@ import { debounceTime } from 'rxjs/operators';
 import { TreeNode, ITreeOptions } from 'angular-tree-component';
 import { DxDataGridComponent } from 'devextreme-angular';
 import { dxDataGridService } from '../../../../../common/services/dxDataGrid.service';
+import { ToastService } from '../../../../../common/services/toastMessage.service'
 
 import { DateformatDialogComponent } from '../dateformat-dialog/dateformat-dialog.component'
 import { RawpreviewDialogComponent } from '../rawpreview-dialog/rawpreview-dialog.component'
@@ -40,7 +41,8 @@ export class SelectRawdataComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     private dxDataGrid: dxDataGridService,
-    private workBench: WorkbenchService
+    private workBench: WorkbenchService,
+    private notify: ToastService
   ) { }
 
   @ViewChild(DxDataGridComponent) dataGrid: DxDataGridComponent;
@@ -51,10 +53,7 @@ export class SelectRawdataComponent implements OnInit {
     this.gridConfig = this.getGridConfig();
     this.treeConfig = this.getTreeConfig();
     this.myHeight = window.screen.availHeight - 345;
-    this.maskHelper = `Follow one of the following formats for selection.
-                       1.file1.csv -- To select single file.
-                       2. file* -- Select all files starting with specified characters.
-                       3. *.csv -- To select all files of given type(csv/parquet/txt).`
+    this.maskHelper = 'INFO_TEXT';
 
   }
 
@@ -223,11 +222,17 @@ export class SelectRawdataComponent implements OnInit {
   }
 
   fileInput(event) {
-    let fileToUpload = event.srcElement.files[0];
-    const path = this.currentPath === null ? '/' : this.currentPath;
-    this.workBench.uploadFile(fileToUpload, this.userProject, path).subscribe(data => {
+    let filesToUpload = event.srcElement.files;
+    const validSize = this.workBench.validateMaxSize(filesToUpload);
+    const validType = this.workBench.validateFileTypes(filesToUpload);
+    if (validSize && validType) {
+      const path = this.currentPath === null ? '/' : this.currentPath;
+      this.workBench.uploadFile(filesToUpload, this.userProject, path).subscribe(data => {
 
-    });
+      });
+    } else {
+      this.notify.warn('Only ".csv" or ".txt" extension files are supported', 'Unsupported file type');
+    }
   }
 
   createFolder() {
@@ -248,7 +253,6 @@ export class SelectRawdataComponent implements OnInit {
             this.tree.treeModel.update();
           });
         }
-
       });
   }
 }
