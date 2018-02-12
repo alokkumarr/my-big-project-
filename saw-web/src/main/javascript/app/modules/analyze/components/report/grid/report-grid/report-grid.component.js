@@ -97,14 +97,6 @@ export const ReportGridComponent = {
         });
 
         e.items.push({
-          text: `Group by ${e.column.caption}`,
-          icon: 'grid-menu-item icon-group-by-column',
-          onItemClick: () => {
-            this.groupByColumn(e.column);
-          }
-        });
-
-        e.items.push({
           text: `Hide ${e.column.caption}`,
           icon: 'grid-menu-item icon-eye-disabled',
           onItemClick: () => {
