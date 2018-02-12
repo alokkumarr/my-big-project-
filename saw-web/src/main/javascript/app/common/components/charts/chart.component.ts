@@ -64,12 +64,28 @@ export class ChartComponent {
     }
   }
 
+  /**
+   * Enables exporting features for the chart.
+   *
+   * @param {any} config
+   * @memberof ChartComponent
+   */
   enableExporting(config) {
     set(config, 'exporting', {
       enabled: true,
       allowHTML: true,
       fallbackToExportServer: false
     });
+  }
+
+  /**
+   * Sets the name of download file as chart title.
+   *
+   * @param {any} config
+   * @memberof ChartComponent
+   */
+  addExportName(config) {
+    set(config, 'exporting.filename', get(config, 'title.text') || 'chart');
   }
 
   onOptionsChartUpdate(updates) {
@@ -91,10 +107,12 @@ export class ChartComponent {
         // Fix --- Highstocks API manipulating external config object, setting series and categories data to NULL
         // https://forum.highcharts.com/highstock-usage/creating-a-chart-manipulates-external-options-object-t15255/#p81794
         this.clonedConfig = clone(this.config);
+        this.addExportName(this.config);
         this.chart = this.highstocks.stockChart(this.container.nativeElement, this.config);
         this.config = clone(this.clonedConfig);
         this.clonedConfig = {};
       } else {
+        this.addExportName(this.config);
         this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
       }
       if (!isUndefined(this.config.xAxis)) {
