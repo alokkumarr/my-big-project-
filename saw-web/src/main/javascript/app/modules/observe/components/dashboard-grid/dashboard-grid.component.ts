@@ -1,3 +1,5 @@
+declare const require: any;
+
 import {
   Component,
   Input,
@@ -53,6 +55,7 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
   public dashboard: Array<GridsterItem> = [];
   private sidenavEventSubscription: Subscription;
   private globalFiltersSubscription: Subscription;
+  private requesterSubscription: Subscription;
   public initialised = false;
 
   constructor(
@@ -79,8 +82,6 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
         enabled: !this.isViewMode()
       }
     };
-
-    window['mydashboard'] = this;
   }
 
   ngAfterViewChecked() {
@@ -92,23 +93,26 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
   }
 
   ngOnDestroy() {
-    this.sidenavEventSubscription.unsubscribe();
-    this.globalFiltersSubscription.unsubscribe();
+    this.requesterSubscription && this.requesterSubscription.unsubscribe();
+    this.sidenavEventSubscription && this.sidenavEventSubscription.unsubscribe();
+    this.globalFiltersSubscription && this.globalFiltersSubscription.unsubscribe();
   }
 
   onGridInit() {
-    this.sidenavEventSubscription = this.sidenav.sidenavEvent.subscribe(val => {
-      setTimeout(_ => {
-        this.gridster.resize();
+    if (this.mode === DASHBOARD_MODES.VIEW) {
+      this.sidenavEventSubscription = this.sidenav.sidenavEvent.subscribe(val => {
+        setTimeout(_ => {
+          this.gridster.resize();
+        });
+        setTimeout(_ => {
+          this.refreshAllTiles();
+        }, 500);
       });
-      setTimeout(_ => {
-        this.refreshAllTiles();
-      }, 500);
-    });
 
-    this.globalFiltersSubscription = this.filters.onApplyFilter.subscribe(data => {
-      this.onApplyGlobalFilters(data);
-    });
+      this.globalFiltersSubscription = this.filters.onApplyFilter.subscribe(data => {
+        this.onApplyGlobalFilters(data);
+      });
+    }
   }
 
   isViewMode() {
@@ -211,7 +215,7 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
      with this */
   subscribeToRequester() {
     if (this.requester) {
-      this.requester.subscribe((req: any = {}) => {
+      this.requesterSubscription = this.requester.subscribe((req: any = {}) => {
         switch(req.action) {
         case 'add':
           this.dashboard.push(req.data);
@@ -219,6 +223,7 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
           break;
         case 'get':
           this.getDashboard.emit({save: true, dashboard: this.prepareDashboard()});
+          break;
         default:
           this.getDashboard.emit({dashboard: this.prepareDashboard()});
         }
