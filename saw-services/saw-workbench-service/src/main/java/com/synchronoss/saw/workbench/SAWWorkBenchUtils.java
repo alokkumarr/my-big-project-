@@ -1,5 +1,10 @@
 package com.synchronoss.saw.workbench;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -90,6 +95,25 @@ public class SAWWorkBenchUtils {
         headers.addAll(map.keySet());
     }
     return headers;
-}  
+}
+  
+  public static void copyFileUsingFileChannels(File source, File dest) throws IOException {
+    FileChannel inputChannel = null;
+    FileChannel outputChannel = null;
+    FileInputStream fileInputStream = null;
+    FileOutputStream fileOutputStream = null;
+    try {
+      fileInputStream = new FileInputStream(source);
+      fileOutputStream = new FileOutputStream(dest);
+      inputChannel = fileInputStream.getChannel();
+      outputChannel = fileOutputStream.getChannel();
+      outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
+    } finally {
+      inputChannel.close();
+      outputChannel.close();
+      fileInputStream.close();
+      fileOutputStream.close();
+    }
+  }
   
 }

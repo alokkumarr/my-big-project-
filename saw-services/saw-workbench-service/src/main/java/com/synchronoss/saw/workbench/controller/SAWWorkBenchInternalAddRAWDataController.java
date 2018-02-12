@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
@@ -19,8 +17,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
@@ -52,6 +52,9 @@ public class SAWWorkBenchInternalAddRAWDataController {
   @Value("${workbench.project-root}")
   @NotNull
   private String defaultProjectRoot;
+  
+  private long sizeInMBLimit = 25 * 1024 * 1024; // 10 MB
+;
   
  @Autowired
  private SAWWorkbenchService sawWorkbenchService;
@@ -159,10 +162,34 @@ public class SAWWorkBenchInternalAddRAWDataController {
    * @throws JsonProcessingException
    */
   @RequestMapping(value = "{projectId}/raw/directory/upload/files", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.CREATED)
-  public Project uploadFilesToProjectDirectoryByIdAndInDirectoryPath(@RequestBody Project project) throws JsonProcessingException {
-    logger.debug("Retrieve project details By Id ", project.getProjectId());
-    return project;
+  @ResponseStatus(HttpStatus.OK)
+  public Project uploadFilesToProjectDirectoryByIdAndInDirectoryPath(@PathVariable(name = "projectId", required = true) String projectId, @RequestBody Project project, @RequestParam("files") MultipartFile[] uploadfiles) 
+      throws JsonProcessingException {
+    logger.debug("Retrieve project details By Id ", projectId);
+    Preconditions.checkNotNull(project.getPath(), "To upload files path attribute cannot be null");
+    Project responseProject = null;
+    if (uploadfiles!=null && uploadfiles.length==0){
+          project.setStatusMessage("please select a file!" + HttpStatus.OK);
+      return project;
+    }
+    long size = 0;
+    for (MultipartFile uploadfile : uploadfiles){
+      size = size + uploadfile.getSize();
+    }
+    size = size/ (1024*1024);
+    if (size > sizeInMBLimit){
+      project.setStatusMessage("files limit exceeds:"+ size);
+      return project;
+    }
+    try {
+      responseProject = sawWorkbenchService.uploadFilesDirectoryProjectId(project, uploadfiles);
+      responseProject.setStatusMessage("Files are successfully uploaded - "+ HttpStatus.OK);
+    } catch (Exception e) {
+      logger.error("Exception occured while uploading files in the raw data directory", e);
+      throw new CreateEntitySAWException("Exception occured while uploading files in the raw data directory", e);
+    } 
+    project.setProjectId(projectId);
+    return responseProject;
   } 
 
   @RequestMapping(value = "{projectId}/raw/directory/preview", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -208,32 +235,32 @@ public class SAWWorkBenchInternalAddRAWDataController {
    * @return
    */
   @Async(AsyncConfiguration.TASK_EXECUTOR_CONTROLLER)
-  @RequestMapping(value = "/projects/{projectId}/raw/async", method = RequestMethod.GET, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @RequestMapping(value = "{projectId}/raw/directory/upload/files/async", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public CompletableFuture<Project> retrieveStorageDataAsync(@PathVariable(name = "projectId", required = true) String projectId, HttpServletRequest request, HttpServletResponse response) {
+  public CompletableFuture<Project> retrieveStorageDataAsync(@PathVariable(name = "projectId", required = true) String projectId, @RequestBody Project project, @RequestParam("files") MultipartFile[] uploadfiles) {
     CompletableFuture<Project> responseObjectFuture = null;
    try {
+     project.setProjectId(projectId);
      responseObjectFuture= CompletableFuture.
          supplyAsync(() -> {
           Project proxyResponseData = null; 
             try {
-              //proxyResponseData = proxyService.execute(proxyNode);
+              proxyResponseData = sawWorkbenchService.uploadFilesDirectoryProjectIdAsync(project,uploadfiles);
             }catch (Exception e) {
-              logger.error("Exception generated while processing incoming json.", e);
-              //proxyResponseData= SAWWorkBenchUtils.prepareResponse(proxyNode.getProxy(), e.getCause().toString());
-            }
-        return proxyResponseData;
+              logger.error("Exception occured while uploading files in the raw data directory", e);
+              throw new CreateEntitySAWException("Exception occured while uploading files in the raw data directory", e);}
+              return proxyResponseData;
          })
          .handle((res, ex) -> {
            if(ex != null) {
-               logger.error("While retrieving data there is an exception.", ex);
-               res.setStatusMessage(ex.getCause().toString());
-               return res;
+             logger.error("Exception occured while uploading files in the raw data directory", ex);
+             res.setStatusMessage(ex.getCause().toString());
+             return res;
            }
            return res;
        });
-    }  catch (ReadEntitySAWException ex) {
-      throw new ReadEntitySAWException("Problem on the storage while reading data from storage");
+    }  catch (Exception ex) {
+      throw new CreateEntitySAWException("Exception occured while uploading files in the raw data directory");
     } 
    return responseObjectFuture;
   }
