@@ -308,6 +308,7 @@ export class AnalyzeService {
       forEach(data, row => {
         forEach(row, (value, key) => {
           key = this.getColumnName(key);
+          data[key] = value;
         });
       });
       return {analysis, data, count};
