@@ -158,9 +158,10 @@ public class SAWElasticTransportService {
            node = mapper.valueToTree(data);
       }
       catch (ProcessingException e) {
+        logger.error("Exception occurred while building aggregation report data." + e.getMessage());
       }
       catch (IOException e) {
-          e.printStackTrace();
+         logger.error("Exception occurred while building aggregation report data." + e.getMessage());
       }
       return node.toString();
   }

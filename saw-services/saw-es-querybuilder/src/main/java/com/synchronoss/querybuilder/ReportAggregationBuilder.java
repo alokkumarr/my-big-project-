@@ -9,7 +9,8 @@ import java.util.List;
 
 public class ReportAggregationBuilder {
 
-    private static String GROUP_BY_FIELD = "group_by_field";
+    private final static String GROUP_BY_FIELD = "group_by_field";
+    private final static String DATA_FIELDS = "data_fields";
     private Integer querySize;
 
     public ReportAggregationBuilder(Integer querySize) {
@@ -68,6 +69,18 @@ public class ReportAggregationBuilder {
        return aggregateFields;
    }
 
+   public AggregationBuilder reportAggregationBuilder(List<DataField> dataFields, List<DataField> aggregateFields)
+    {
+        // if only aggregation fields are there.
+        AggregationBuilder aggregationBuilder = AggregationBuilders.global(DATA_FIELDS);;
+        if (aggregateFields.size() == dataFields.size()) {
+        for (DataField dataField1 : aggregateFields) {
+            aggregationBuilder.subAggregation(QueryBuilderUtil.aggregationBuilderDataFieldReport(
+                    dataField1));
+        }
+    }
+    return aggregationBuilder;
+    }
 }
 
 
