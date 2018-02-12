@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as has from 'lodash/has';
+import * as forEach from 'lodash/forEach';
 import * as find from 'lodash/find';
 import * as findIndex from 'lodash/findIndex';
 import * as groupBy from 'lodash/groupBy';
@@ -26,18 +27,42 @@ export class GlobalFilterService {
     return this.rawFilters;
   }
 
-  addFilter(filt) {
-    this.rawFilters = this.rawFilters.concat(filt);
-    // TODO: Only allow unique filters to be added to this
-    // find(this.filters, f => f.columnName === filt.columnName);
-    this.onFilterChange.next(filt);
-  }
-
   get globalFilters() {
     return groupBy(this.updatedFilters, 'semanticId');
   }
 
-  /* Store updated filter values in a new array */
+  /**
+   * Merges the existing raw filters with input array of filters.
+   * Only adds filters which aren't already present.
+   *
+   * @param {Array<any>} filt
+   * @memberof GlobalFilterService
+   */
+  addFilter(filt: Array<any>) {
+    const validFilter = [];
+    forEach(filt, f => {
+      const exists = findIndex(this.rawFilters, rf => (
+        rf.semanticId === f.semanticId &&
+        rf.columnName === f.columnName &&
+        rf.tableName === f.tableName
+      ));
+
+      if (!(exists >= 0)) {
+        this.rawFilters.push(f);
+        validFilter.push(f);
+      }
+    })
+    if (validFilter.length) {
+      this.onFilterChange.next(validFilter);
+    }
+  }
+
+  /**
+   * Store updated filter values in a new array
+   *
+   * @param {any} {data, valid}
+   * @memberof GlobalFilterService
+   */
   updateFilter({data, valid}) {
     const id = findIndex(this.updatedFilters, f => (
       f.semanticId === data.semanticId &&
