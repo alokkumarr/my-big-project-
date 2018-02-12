@@ -9,7 +9,7 @@ const previewPage = require('../../javascript/pages/previewPage.po');
 const commonFunctions = require('../../javascript/helpers/commonFunctions');
 const homePage = require('../../javascript/pages/homePage.po');
 const using = require('jasmine-data-provider');
-const protractorConf = require('../../../../conf/protractor.conf');
+const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 
 describe('Verify preview for charts: previewForCharts.test.js', () => {
   const defaultCategory = 'AT Privileges Category DO NOT TOUCH';

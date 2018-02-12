@@ -1,7 +1,7 @@
 const loginPage = require('../javascript/pages/loginPage.po.js');
 const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const protractor = require('protractor');
-const protractorConf = require('../../../conf/protractor.conf');
+const protractorConf = require('../../../../saw-web/conf/protractor.conf');
 const commonFunctions = require('../javascript/helpers/commonFunctions.js');
 
 describe('Create report type analysis: createReport.test.js', () => {

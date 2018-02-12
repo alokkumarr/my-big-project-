@@ -3,7 +3,7 @@ const header = require('../javascript/pages/components/header.co.js');
 const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const users = require('../javascript/data/users.js');
 const using = require('jasmine-data-provider');
-const protractorConf = require('../../../conf/protractor.conf');
+const protractorConf = require('../../../../saw-web/conf/protractor.conf');
 
 describe('Login Tests: login.test.js', () => {
 

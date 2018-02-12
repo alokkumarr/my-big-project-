@@ -7,7 +7,7 @@ const analyzePage = require('../javascript/pages/analyzePage.po.js');
 const users = require('../javascript/data/users.js');
 const using = require('jasmine-data-provider');
 const ec = protractor.ExpectedConditions;
-const protractorConf = require('../../../conf/protractor.conf');
+const protractorConf = require('../../../../saw-web/conf/protractor.conf');
 
 describe('Verify basic functionality on Analyze page: analyze.test.js', () => {
 

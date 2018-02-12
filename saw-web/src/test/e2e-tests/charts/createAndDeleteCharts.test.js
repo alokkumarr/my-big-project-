@@ -6,7 +6,7 @@ const login = require('../../javascript/pages/loginPage.po.js');
 const analyzePage = require('../../javascript/pages/analyzePage.po.js');
 const commonFunctions = require('../../javascript/helpers/commonFunctions.js');
 const homePage = require('../../javascript/pages/homePage.po');
-const protractorConf = require('../../../../conf/protractor.conf');
+const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const using = require('jasmine-data-provider');
 
 describe('Create and delete charts: createAndDeleteCharts.test.js', () => {

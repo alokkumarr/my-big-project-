@@ -10,7 +10,7 @@ const protractor = require('protractor');
 const ec = protractor.ExpectedConditions;
 const commonFunctions = require('../javascript/helpers/commonFunctions');
 const using = require('jasmine-data-provider');
-const protractorConf = require('../../../conf/protractor.conf');
+const protractorConf = require('../../../../saw-web/conf/protractor.conf');
 
 //TODO add case for No Privileges
 //TODO add case for changing privileges
