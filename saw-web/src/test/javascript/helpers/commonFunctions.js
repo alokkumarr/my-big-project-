@@ -1,6 +1,6 @@
 const protractor = require('protractor');
 const EC = protractor.ExpectedConditions;
-const protractorConf = require('../../../../conf/protractor.conf');
+const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 
 const fluentWait = protractorConf.timeouts.fluentWait;
 

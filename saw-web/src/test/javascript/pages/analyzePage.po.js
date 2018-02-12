@@ -1,6 +1,6 @@
 const {doMdSelectOption, getMdSelectOptions} = require('../helpers/utils');
 const commonFunctions = require('../helpers/commonFunctions.js');
-const protractorConf = require('../../../../conf/protractor.conf');
+const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
 const getCards = name => element.all(by.css('md-card[e2e="analysis-card"]')).filter(elem => {
   return elem.element(by.cssContainingText('a[e2e="analysis-name"]', name));
 });

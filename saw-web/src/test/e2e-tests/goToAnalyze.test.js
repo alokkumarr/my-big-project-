@@ -2,7 +2,7 @@ const protractor = require('protractor');
 const login = require('../javascript/pages/loginPage.po.js');
 const analyze = require('../javascript/pages/analyzePage.po.js');
 const ec = protractor.ExpectedConditions;
-const protractorConf = require('/conf/protractor.conf');
+const protractorConf = require('../../../../saw-web/conf/protractor.conf');
 
 describe('should go to Analyze page after landing on home page', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = protractorConf.timeouts.extendedDefaultTimeoutInterval;
