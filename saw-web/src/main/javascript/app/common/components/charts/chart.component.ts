@@ -30,6 +30,7 @@ export class ChartComponent {
   @Input() updater: any;
   @Input() options: any;
   @Input() isStockChart: boolean;
+  @Input() enableExport: boolean;
   @ViewChild('container') container: ElementRef;
 
   private highcharts: any = Highcharts;
@@ -48,6 +49,8 @@ export class ChartComponent {
   ngAfterViewInit() {
     this.config = defaultsDeep(this.options, chartOptions);
     this.stockConfig = defaultsDeep(this.options, stockChartOptions);
+    this.enableExport && this.enableExporting(this.config);
+    this.enableExport && this.enableExporting(this.stockConfig);
     if (this.isStockChart) {
       this.chart = this.highstocks.stockChart(this.container.nativeElement, this.stockConfig);
     } else {
@@ -59,6 +62,14 @@ export class ChartComponent {
         next: this.onOptionsChartUpdate.bind(this)
       });
     }
+  }
+
+  enableExporting(config) {
+    set(config, 'exporting', {
+      enabled: true,
+      allowHTML: true,
+      fallbackToExportServer: false
+    });
   }
 
   onOptionsChartUpdate(updates) {
