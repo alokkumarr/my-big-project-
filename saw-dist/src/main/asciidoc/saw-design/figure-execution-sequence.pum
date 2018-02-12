@@ -3,14 +3,14 @@
 Client -> "SAW Security Service": Authentication request
 "SAW Security Service" --> Client: Authentication response
 
-== Execution ==
+== Workbench ==
 
-Client -> "SAW Gateway Service": Execution request
-"SAW Gateway Service" -> "SAW Execution Service": Execution request
+Client -> "SAW Gateway Service": Workbench request
+"SAW Gateway Service" -> "SAW Workbench Service": Workbench request
 
-"SAW Execution Service" -> "Apache Spark": Execute Spark SQL
-"Apache Spark" -> "MapR-FS": Write results
-"MapR-FS" --> "SAW Execution Service": Read results
+"SAW Workbench Service" -> "XDF nextgen API": Access MapRDB
+"Execute MapRDB API" -> "MapR-FS": Write results
+"MapR-FS" --> "SAW Workbench Service": Read results
 
 "SAW Execution Service" --> "SAW Gateway Service": Execution response
 "SAW Gateway Service" --> Client: Execution response
