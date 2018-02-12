@@ -22,7 +22,7 @@
     <md-menu ng-if="field.checked && $ctrl.checkType(field)">
       <md-button aria-label="TOOLTIP_AGGREGATE_TYPE"
                  class="md-icon-button"
-                 e2e="pivot-aggregate-menu-btn"
+                 e2e="report-aggregate-menu-btn"
                  ng-click="$ctrl.openMenu($mdMenu, $event)">
         <md-icon ng-if="!field.aggregate" md-menu-origin
                  md-font-icon="icon-more"></md-icon>
@@ -33,7 +33,7 @@
       <md-menu-content width="4">
         <md-menu-item ng-repeat="aggregateType in $ctrl.AGGREGATE_TYPES track by aggregateType.value">
           <md-button ng-click="$ctrl.onSelectAggregateType(aggregateType, field)"
-                     e2e="pivot-aggregate-selector-{{aggregateType.value}}"
+                     e2e="report-aggregate-selector-{{aggregateType.value}}"
                      style="font-size: 14px;">
             <md-icon md-font-icon="{{::aggregateType.icon}}"
                      style="font-size: 14px;"
@@ -45,7 +45,7 @@
     </md-menu>
     <md-button ng-if="field.aggregate && field.checked" aria-label="TOOLTIP_AGGREGATE_TYPE"
                class="md-icon-button"
-               e2e="pivot-aggregate-menu-btn"
+               e2e="report-aggregate-menu-btn"
                ng-click="$ctrl.clearAggegate(field)">
       <md-icon md-menu-origin
                md-font-icon="icon-close"></md-icon>
