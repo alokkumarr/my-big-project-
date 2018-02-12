@@ -3,7 +3,9 @@ package sncr.bda.services;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -359,14 +361,11 @@ public class DLMetadata extends MetadataBase {
     public String  getStagingDirectory(String project){
         return dlRoot + Path.SEPARATOR + project + Path.SEPARATOR + PREDEF_RAW_DIR;
     }
-    public int moveToRaw(String project, String absoluteFilePath, String directory, String asName) throws Exception {
+    public int moveToRaw(String projectPath, String absoluteFilePath, String directory, String asName) throws Exception {
 
         // Build full path to directory
         Path rawPath = new Path(dlRoot
-                + Path.SEPARATOR + project
-                + Path.SEPARATOR + PREDEF_RAW_DIR
-                + ((directory != null && !directory.isEmpty()) ? (Path.SEPARATOR + directory) : "")
-        );
+                + Path.SEPARATOR + projectPath);
 
         // Create staging directory if necessary
         if(!fs.exists(rawPath)){
@@ -377,6 +376,11 @@ public class DLMetadata extends MetadataBase {
         if(asName != null) {
             // Yes, we have file to upload
             Path filePath = new Path(rawPath + Path.SEPARATOR + asName);
+            if(fs.exists(filePath)){
+              String fileDate = new SimpleDateFormat("mmss").format(new Date());
+              asName = asName.substring(0, asName.indexOf('.')) +"_"+fileDate + asName.substring(asName.indexOf('.'), asName.length());
+              filePath = new Path(rawPath + Path.SEPARATOR + asName);
+            }
             Path localPath = new Path("file://" + absoluteFilePath);
             fs.copyFromLocalFile(true, localPath, filePath);
         }
