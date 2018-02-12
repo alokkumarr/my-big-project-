@@ -3,6 +3,10 @@ info:
 spring:
   application:
     name: saw-workbench-service
+  http:
+    multipart:
+      max-request-size: 25MB
+      max-file-size: 25MB
 server:
   address: localhost
   port: 9700
@@ -21,4 +25,4 @@ workbench:
         project-key: "project2"
         project-path: "/Desktop" 
         project-root: "/Users/spau0004"
-        preview-limit: 10000              
+        preview-limit: 10000
