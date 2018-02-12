@@ -178,6 +178,9 @@ public class ServicesExecuteIT {
                 if (name.equals("string.keyword")) {
                     area = "row";
                     dataType = "string";
+                } else if (name.equals("date")) {
+                    area = "column";
+                    dataType = "date";
                 } else if (name.equals("integer")) {
                     area = "data";
                     dataType = "number";
@@ -219,17 +222,18 @@ public class ServicesExecuteIT {
         ArrayNode rowFields = sqlBuilder.putArray("rowFields");
         ObjectNode rowField = rowFields.addObject();
         rowField.put("type", "string");
-        rowField.put("columnName", "country.keyword");
+        rowField.put("columnName", "string.keyword");
         ArrayNode columnFields = sqlBuilder.putArray("columnFields");
         ObjectNode columnField = columnFields.addObject();
-        columnField.put("type", "string");
-        columnField.put("columnName", "product.keyword");
+        columnField.put("type", "date");
+        columnField.put("columnName", "date");
+        columnField.put("dateInterval", "day");
         ArrayNode dataFields = sqlBuilder.putArray("dataFields");
         ObjectNode dataField = dataFields.addObject();
-        dataField.put("type", "long");
-        dataField.put("columnName", "units");
+        dataField.put("type", "integer");
+        dataField.put("columnName", "integer");
         dataField.put("aggregate", "sum");
-        dataField.put("name", "units");
+        dataField.put("name", "integer");
         return sqlBuilder;
     }
 
@@ -266,8 +270,8 @@ public class ServicesExecuteIT {
             .header("Authorization", "Bearer " + token)
             .body(json)
             .when().post("/services/analysis")
-            .then().assertThat().statusCode(200);
-//            .body(buckets + ".find { it.key == 'string 1' }.doc_count", equalTo(1));
+            .then().assertThat().statusCode(200)
+            .body(buckets + ".find { it.key == 'string 1' }.doc_count", equalTo(1));
     }
 
     private String listSingleExecution(String token, String analysisId)
