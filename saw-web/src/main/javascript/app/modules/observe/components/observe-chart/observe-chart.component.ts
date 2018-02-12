@@ -1,10 +1,13 @@
-import { Component, Input, Output, EventEmitter} from '@angular/core';
+declare const require: any;
+
+import { Component, Input, Output, EventEmitter, ViewChild} from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import { ChartService } from '../../../analyze/services/chart.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
 import { SortService } from '../../../analyze/services/sort.service';
 import { FilterService } from '../../../analyze/services/filter.service';
+import { ChartComponent } from '../../../../common/components/charts/chart.component';
 import * as isUndefined from 'lodash/isUndefined';
 import * as get from 'lodash/get';
 import * as set from 'lodash/set';
@@ -32,6 +35,7 @@ export class ObserveChartComponent {
   @Input() item: any;
   @Input('updater') requester: BehaviorSubject<Array<any>>;
   @Output() onRefresh = new EventEmitter<any>();
+  @ViewChild(ChartComponent) chartComponent: ChartComponent;
 
   private chartUpdater = new BehaviorSubject([]);
   private requesterSubscription: Subscription;

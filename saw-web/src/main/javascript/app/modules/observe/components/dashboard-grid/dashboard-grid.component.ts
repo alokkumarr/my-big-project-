@@ -1,8 +1,12 @@
+declare const require: any;
+
 import {
   Component,
   Input,
   Output,
   ViewChild,
+  ViewChildren,
+  QueryList,
   EventEmitter,
   AfterViewChecked,
   OnInit,
@@ -17,6 +21,7 @@ import * as get from 'lodash/get';
 import * as map from 'lodash/map';
 import * as forEach from 'lodash/forEach';
 
+import { ObserveChartComponent } from '../observe-chart/observe-chart.component';
 import { Dashboard } from '../../models/dashboard.interface';
 import { SideNavService } from '../../../../common/services/sidenav.service';
 import { AnalyzeService } from '../../../analyze/services/analyze.service';
@@ -38,6 +43,7 @@ export const DASHBOARD_MODES = {
 })
 export class DashboardGridComponent implements OnInit, OnChanges, AfterViewChecked, OnDestroy {
   @ViewChild('gridster') gridster: GridsterComponent;
+  @ViewChildren(ObserveChartComponent) charts: QueryList<ObserveChartComponent>;
 
   @Input() model: Dashboard;
   @Input() requester: BehaviorSubject<any>;
