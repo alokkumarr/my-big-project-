@@ -1,6 +1,7 @@
 const {doMdSelectOption, getMdSelectOptions} = require('../helpers/utils');
 const commonFunctions = require('../helpers/commonFunctions.js');
 const protractorConf = require('../../../../../saw-web/conf/protractor.conf');
+const webpackHelper = require('../../../../conf/webpack.helper');
 const getCards = name => element.all(by.css('md-card[e2e="analysis-card"]')).filter(elem => {
   return elem.element(by.cssContainingText('a[e2e="analysis-name"]', name));
 });
@@ -156,7 +157,7 @@ const doAccountAction = action => {
 };
 
 function navigateToHome() {
-  browser.driver.get('http://localhost:3000/');
+  browser.driver.get(webpackHelper.sawWebUrl());
   return browser.driver.wait(() => {
     return browser.driver.getCurrentUrl().then(url => {
       return /analyze/.test(url);
