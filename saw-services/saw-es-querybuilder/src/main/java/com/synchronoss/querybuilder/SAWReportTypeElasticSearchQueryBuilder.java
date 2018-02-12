@@ -183,6 +183,7 @@ public class SAWReportTypeElasticSearchQueryBuilder {
                 sqlBuilderNode.getDataFields();
         ReportAggregationBuilder reportAggregationBuilder = new ReportAggregationBuilder(size);
         List<DataField> aggregationFields = reportAggregationBuilder.getAggregationField(dataFields);
+        AggregationBuilder finalAggregationBuilder =null;
         // Generated Query
         if (aggregationFields.size()==0)
         {
@@ -192,8 +193,15 @@ public class SAWReportTypeElasticSearchQueryBuilder {
         }
         else {
             AggregationBuilder aggregationBuilder = null;
-            AggregationBuilder finalAggregationBuilder = reportAggregationBuilder.reportAggregationBuilder(
-                    dataFields,aggregationFields,0,0,aggregationBuilder);
+            if (dataFields.size()==aggregationFields.size())
+            {
+                finalAggregationBuilder=  reportAggregationBuilder.reportAggregationBuilder(dataFields
+                ,aggregationFields);
+            }
+            else {
+                finalAggregationBuilder = reportAggregationBuilder.reportAggregationBuilder(
+                        dataFields, aggregationFields, 0, 0, aggregationBuilder);
+            }
             // set the size zero for aggregation query .
             searchSourceBuilder.size(0);
             searchSourceBuilder.aggregation(finalAggregationBuilder);

@@ -10,7 +10,7 @@ import java.util.*;
 public class ESReportAggregationParser {
 
     private static String GROUP_BY_FIELD = "group_by_field";
-    public final static String DATA = "data";
+    private final static String DATA_FIELDS = "data_fields";
     private final static String KEY = "key";
     private final static String KEY_AS_STRING ="key_as_string";
     private final static String BUCKETS = "buckets";
@@ -86,6 +86,17 @@ public class ESReportAggregationParser {
                 JsonNode jsonNode2 = iterable1.next();
                 jsonNodeParser(jsonNode2,dataObj,flatStructure,level+1);
             }
+        }
+        // if result contains only aggregated fields.
+        else if (groupByFields.length==0 && childNode !=null)
+        {
+            Map<String,String> flatValues = new LinkedHashMap<>();
+            JsonNode childNode1 = childNode.get(DATA_FIELDS);
+            for (DataField dataField : aggregationFields){
+                String columnName = dataField.getName();
+                flatValues.put(columnName, String.valueOf(childNode1.get(columnName).get(VALUE)));
+            }
+            flatStructure.add(flatValues);
         }
         else
         {
