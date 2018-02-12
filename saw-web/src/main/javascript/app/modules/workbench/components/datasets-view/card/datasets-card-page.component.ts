@@ -1,3 +1,5 @@
+declare function require(string): string;
+
 import { Component, Input, OnInit, Inject } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
