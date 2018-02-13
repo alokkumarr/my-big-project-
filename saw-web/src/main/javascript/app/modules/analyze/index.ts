@@ -3,6 +3,7 @@ import {downgradeInjectable, downgradeComponent} from '@angular/upgrade/static';
 import {NgModule} from '@angular/core';
 import {CommonModule as CommonModuleAngular4} from '@angular/common';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { CronEditorModule } from "cron-editor/cron-editor";
 
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {MaterialModule} from '../../material.module';
@@ -63,6 +64,7 @@ import {AnalyzePublishDialogComponent} from './components/publish-dialog/analyze
 import {AnalyzeChartComponent} from './components/chart/analyze-chart.component';
 import {AnalyzeChartSettingsComponent} from './components/chart/settings/analyze-chart-settings.component';
 import {AnalyzeChartPreviewComponent} from './components/chart/preview/analyze-chart-preview.component';
+import { CronJobSchedularComponent } from './components/cron-job-schedular/cron-job-schedular.component';
 import {CommonModule} from '../../common';
 
 import {CommonModuleTs} from '../../common';
@@ -88,7 +90,8 @@ import {
   DesignerPreviewDialogComponent,
   DesignerService,
   ArtifactColumnFilterPipe,
-  ArtifactColumns2PivotFieldsPipe
+  ArtifactColumns2PivotFieldsPipe,
+  CronJobSchedularComponent
 } from './components/designer';
 import {
   analyzeServiceProvider
@@ -138,6 +141,10 @@ angular.module(AnalyzeModule, [
     'analyzeReportQuery',
     downgradeComponent({component: AnalyzeReportQueryComponent}) as angular.IDirectiveFactory
   )
+  .directive(
+    'cronJobSchedular',
+    downgradeComponent({component: CronJobSchedularComponent}) as angular.IDirectiveFactory
+  )
   .component('analyzeDialog', AnalyzeDialogComponent)
   .component('analyzeSortDialog', AnalyzeSortDialogComponent)
   .component('stringFilter', StringFilterComponent)
@@ -162,7 +169,8 @@ angular.module(AnalyzeModule, [
     FlexLayoutModule,
     AceEditorModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CronEditorModule
   ],
   declarations: [
     AnalyzeReportQueryComponent,
@@ -186,7 +194,8 @@ angular.module(AnalyzeModule, [
     DesignerNumberFilterComponent,
     DesignerPreviewDialogComponent,
     ArtifactColumnFilterPipe,
-    ArtifactColumns2PivotFieldsPipe
+    ArtifactColumns2PivotFieldsPipe,
+    CronJobSchedularComponent
   ],
   entryComponents: [
     AnalyzeReportQueryComponent,
@@ -208,7 +217,8 @@ angular.module(AnalyzeModule, [
     DesignerStringFilterComponent,
     DesignerDateFilterComponent,
     DesignerNumberFilterComponent,
-    DesignerPreviewDialogComponent
+    DesignerPreviewDialogComponent,
+    CronJobSchedularComponent
   ],
   providers: [
     $mdDialogProvider,
