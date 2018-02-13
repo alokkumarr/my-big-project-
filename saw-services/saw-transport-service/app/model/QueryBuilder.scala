@@ -155,6 +155,7 @@ object QueryBuilder extends {
        query_logger.trace("Runtime parameter value : {}", runtime);
       !(filter \ "isRuntimeFilter").extract[Boolean] || runtime
     }).map(buildWhereFilterElement)
+    print("PAWAN_Filters: "+ filters)
     if (filters.isEmpty) {
       ""
     } else {
@@ -182,6 +183,7 @@ object QueryBuilder extends {
       query_logger.trace("Runtime parameter value : {}", runtime);
       !(filter \ "isRuntimeFilter").extract[Boolean] || runtime
     }).map(buildWhereFilterElement)
+    print("PAWAN_FILTER_2:"+filters)
     if (filters.isEmpty) {
       if(DSK!=null && DSK.nonEmpty){
         finalFilter = "WHERE " + TransportUtils.buildDSK(DSK)
@@ -234,11 +236,22 @@ object QueryBuilder extends {
         }
       }
       case "string" => {
+        val operator = subProperty("model", "operator").toLowerCase
          val modelValues = ((filter \ "model" \ "modelValues") match {
            case array: JArray => array.arr
            case obj => unexpectedElement(obj, "array", "modelValues")
          }).map(_.extract[String].toUpperCase())
-        "IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
+        val stringWhereClause = operator match {
+          case "eq" => "IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
+          case "isin" => "IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
+          case "neq" => "NOT IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
+          case "isnotin" => "NOT IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
+          // ToDo: fix these three operators and remove logging once front end is fixed.
+          case "sw" => "like '" + modelValues(0) + "*'"
+          case "ew" => "like '*" + modelValues(0) + "'"
+          case "contains" => "like '*" + modelValues(0) + "*'"
+        }
+        stringWhereClause
       }
       case "date" | "timestamp" => {
         var lte :String = null
