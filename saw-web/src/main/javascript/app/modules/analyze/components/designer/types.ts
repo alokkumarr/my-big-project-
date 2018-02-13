@@ -2,7 +2,7 @@
 import {
   SqlBuilder,
   SqlBuilderPivot
-} from '../../models/sql-builder.model';
+} from '../../models';
 import {
   DesignerMode,
   AnalysisStarter,

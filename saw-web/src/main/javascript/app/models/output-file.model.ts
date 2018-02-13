@@ -1,4 +1,4 @@
-export default interface OutputFile {
+export interface OutputFile {
   outputFileName: string;
   outputFormat:   string;
 }

@@ -17,6 +17,8 @@ require('./data-format-dialog.component.scss');
 export class DataFormatDialogComponent {
 
   public currencyCodes = currencyCodes;
+  public sampleNumber = 1000.33333;
+  public sample: string
 
   constructor(
     private _dialogRef: MatDialogRef<DataFormatDialogComponent>,
@@ -46,5 +48,9 @@ export class DataFormatDialogComponent {
 
   onCurrencyCodeChange(code) {
     this.data.format.currencyCode = code;
+  }
+
+  makeSample() {
+
   }
 }
