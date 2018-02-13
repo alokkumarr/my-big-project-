@@ -80,6 +80,8 @@
     <profile>
       <id>docker-saw-machine</id>
       <properties>
+        <!-- Bind to all interfaces so that environment can be
+             accessed remotely -->
         <saw.docker.ip>0.0.0.0</saw.docker.ip>
       </properties>
     </profile>
