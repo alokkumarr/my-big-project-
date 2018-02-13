@@ -15,13 +15,10 @@ function hasClass(element, cls) {
  * and then chooses an option from the menu based in the optionSelector
  */
 function doMdSelectOption({parentElem, btnSelector, optionSelector}) {
-  const btn = parentElem.element(by.css(btnSelector));
-  commonFunctions.waitFor.elementToBeClickable(btn);
-  btn.click();
-  btn.getAttribute('aria-owns').then(id => {
-    const elem = element(by.id(id)).element(by.css(optionSelector));
-    commonFunctions.waitFor.elementToBeClickable(elem);
-    elem.click();
+  // Cannot declare element before wait because of: element is not clickable error.
+  commonFunctions.waitFor.elementToBeClickableAndClick(parentElem.element(by.css(btnSelector)));
+  parentElem.element(by.css(btnSelector)).getAttribute('aria-owns').then(id => {
+    commonFunctions.waitFor.elementToBeClickableAndClick(element(by.id(id)).element(by.css(optionSelector)));
   });
 }
 
