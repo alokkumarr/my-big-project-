@@ -1,4 +1,7 @@
-export default interface Format {
-  precision: number;
-  type:      string;
+export interface Format {
+  precision:      number;
+  type:           string;
+  comma:          boolean;
+  currency:       string;
+  currencySymbol: string;
 }

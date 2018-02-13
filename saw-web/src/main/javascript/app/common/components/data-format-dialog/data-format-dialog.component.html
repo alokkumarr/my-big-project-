@@ -1,0 +1,58 @@
+<header class="dialog__header">
+  <strong i18n>Format</strong>
+</header>
+<div class="dialog__content"
+     fxLayout="column">
+  <mat-slide-toggle i18n
+                    color="primary"
+                    (change)="onCommaSeparatorChange($event.checked)"
+                    [checked]="data.format.commaSeparator">
+    Show Comma Separators
+  </mat-slide-toggle>
+
+  <div class="dialog__content__currency"
+       fxLayout="row"
+       fxLayoutAlign="space-between center">
+    <mat-slide-toggle i18n
+                      color="primary"
+                      (change)="onCurrencyFlagChange($event.checked)"
+                      [checked]="data.format.currencyFlag">
+      Show as Currency
+    </mat-slide-toggle>
+
+    <mat-form-field *ngIf="data.format.currencyFlag">
+      <mat-select placeholder="Currency Code"
+                  (selectionChange)="onCurrencyCodeChange($event.value)"
+                  [value]="data.format.currencyCode">
+        <mat-option *ngFor="let currencyCode of currencyCodes; trackBy: index"
+                    [value]="currencyCode.code">
+          {{ currencyCode.code }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <mat-form-field>
+    <input matInput
+           type="number"
+           placeholder="Decimals"
+           [value]="data.format.numberDecimal"/>
+  </mat-form-field>
+
+  <mat-form-field>
+      <input matInput
+             type="number"
+             disabled
+             [value]="this.sample"/>
+    </mat-form-field>
+</div>
+<div class="dialog__actions">
+  <div fxLayout="row"
+       fxLayoutAlign="start center">
+    <button (click)="format()"
+            mat-raised-button color="primary" i18n>
+      Format
+    </button>
+    <button mat-button i18n (click)="onBack()">Cancel</button>
+  </div>
+</div>

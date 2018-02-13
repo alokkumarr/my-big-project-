@@ -15,6 +15,7 @@ import {
 import { DesignerDialogComponent } from '../components/designer/dialog';
 import { ToolbarActionDialogComponent } from '../components/designer/toolbar-action-dialog';
 import { DesignerPreviewDialogComponent } from '../components/designer/preview-dialog';
+import { DataFormatDialogComponent } from '../../../common/components/data-format-dialog';
 
 
 @Injectable()
@@ -96,6 +97,16 @@ export class AnalyzeDialogService {
       height: 'auto',
       data
     } as MatDialogConfig);
+  }
+
+  openFormatDialog(format) {
+    return this.dialog.open(DataFormatDialogComponent, {
+      width: 'auto',
+      height: 'auto',
+      data: {
+        format
+      }
+    } as MatDialogConfig)
   }
 
   openSaveDialog(analysis: Analysis) {

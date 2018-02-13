@@ -14,6 +14,7 @@ import {
   DATE_INTERVALS,
   DATE_TYPES
 } from '../../../../../consts';
+import { AnalyzeDialogService } from '../../../../../services/analyze-dialog.service'
 
 const template = require('./expand-detail-pivot.component.html');
 
@@ -28,11 +29,15 @@ export class ExpandDetailPivotComponent {
 
   public AGGREGATE_TYPES = AGGREGATE_TYPES;
   public DATE_INTERVALS = DATE_INTERVALS;
-  public hasAggregate: boolean = false;
+  public isDataField: boolean = false;
   public hasDateInterval: boolean = false;
 
+  constructor(
+    private _analyzeDialogService: AnalyzeDialogService
+  ) {}
+
   ngOnInit() {
-    this.hasAggregate = this.artifactColumn.area === 'data';
+    this.isDataField = this.artifactColumn.area === 'data';
     this.hasDateInterval = DATE_TYPES.includes(this.artifactColumn.type);
   }
 
@@ -44,5 +49,9 @@ export class ExpandDetailPivotComponent {
   onDateIntervalChange(value) {
     this.artifactColumn.dateInterval = value;
     this.change.emit(this.artifactColumn);
+  }
+
+  openFormatDialog() {
+    this._analyzeDialogService.openFormatDialog(this.artifactColumn.format);
   }
 }
