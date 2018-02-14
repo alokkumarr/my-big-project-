@@ -55,6 +55,7 @@ global-filter {
   .noUi-target.noUi-horizontal {
     border: none;
     box-shadow: none;
+    background-color: $primary-grey-g1;
     height: 5px;
 
     .noUi-connect {

@@ -3,24 +3,35 @@
     <mat-panel-title [textContent]="_filter.columnName"></mat-panel-title>
   </mat-expansion-panel-header>
 
-  <mat-form-field>
+  <mat-form-field e2e="filter-date-preset">
+    <mat-select placeholder="Select a preset"
+      [value]="model.preset"
+      (selectionChange)="onPresetChange($event)">
+      <mat-option *ngFor="let preset of presets"
+        [value]="preset.value"
+        [textContent]="preset.label">
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field *ngIf="showDateFields">
     <input matInput
-      [value]="value.gte"
+      [value]="model.gte"
       [matDatepicker]="frompicker"
       (dateInput)="onDateChange('gte', $event)"
-      placeholder="From"
-      disabled />
+      (click)="frompicker.open()"
+      placeholder="From" />
     <mat-datepicker-toggle matSuffix [for]="frompicker"></mat-datepicker-toggle>
     <mat-datepicker #frompicker disabled="false"></mat-datepicker>
   </mat-form-field>
 
-  <mat-form-field>
+  <mat-form-field *ngIf="showDateFields">
     <input matInput
-      [value]="value.lte"
+      [value]="model.lte"
       [matDatepicker]="topicker"
       (dateInput)="onDateChange('lte', $event)"
-      placeholder="To"
-      disabled />
+      (click)="topicker.open()"
+      placeholder="To" />
     <mat-datepicker-toggle matSuffix [for]="topicker"></mat-datepicker-toggle>
     <mat-datepicker #topicker disabled="false"></mat-datepicker>
   </mat-form-field>
