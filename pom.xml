@@ -197,7 +197,7 @@
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
         <version>1.2.17</version>
-        <scope>provided</scope>
+        <scope>${s-value}</scope>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -250,7 +250,7 @@
     <dependency>
 			<groupId>com.synchronoss.bda</groupId>
       <artifactId>meta-api</artifactId>
-      <version>1.0.0_dev</version>
+      <version>1.0.1_dev</version>
     </dependency>
 <!-- BDA Internal dependencies END -->		
 
@@ -296,6 +296,7 @@
   <modules>
     <module>xdf-core</module>
 <!--    <module>xdf-meta</module> -->
+    <module>dataset-utils</module>
     <module>xdf-component</module>
     <module>xdf-data-profiler</module>
     <module>xdf-transformer</module>
@@ -303,6 +304,7 @@
     <module>xdf-preview</module>
     <module>xdf-parser</module>
     <module>xdf-rest</module>
+    <module>xdf-esloader</module>
     <!-- -->
     <module>xdf</module>
   </modules>

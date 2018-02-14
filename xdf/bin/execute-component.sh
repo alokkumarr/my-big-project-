@@ -19,10 +19,11 @@ SPARK_HOME=/opt/mapr/spark/spark-current
 declare -A COMP_MC=(
     [sql]=sncr.xdf.sql.SQLComponent
     [spark-sql]=sncr.xdf.sql.SQLComponent
+    [es-loader]=sncr.xdf.esloader.ESLoaderComponent
     [zero]=sncr.xdf.component.ZeroComponent
     [parser]=sncr.xdf.parser.Parser
-		[transformer]=sncr.xdf.transformer.TransformerComponent
-    )
+	[transformer]=sncr.xdf.transformer.TransformerComponent
+)
 
 function usage()
 {
@@ -43,6 +44,7 @@ usage: $0
   Components: ${!COMP_MC[*]}
      spark-sql  - XDF Spark SQL Component
      parser     - XDF Parser
+     es-loader  - XDF ElasticSearch Loader
      zero       - XDF Zero component
 
 Example:

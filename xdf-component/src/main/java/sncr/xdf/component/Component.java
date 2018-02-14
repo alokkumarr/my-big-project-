@@ -61,12 +61,16 @@ public abstract class Component {
     public int Run(){
 
         int ret = processMetadata();
+        logger.debug("Process Metadata Return code = " + ret);
         if ( ret == 0) {
             ret = Execute();
+            logger.debug("Execute Return code = " + ret);
             if (ret == 0) {
                 ret = Move();
+                logger.debug("Move Return code = " + ret);
                 if (ret == 0) {
                     ret = Archive();
+                    logger.debug("Archive Return code = " + ret);
                     if (ret == 0) {
                     } else {
                     }
@@ -92,7 +96,11 @@ public abstract class Component {
                 WithDataSetService mddl = (WithDataSetService) this;
                 if (ctx.componentConfiguration.getInputs() != null &&
                         ctx.componentConfiguration.getInputs().size() > 0) {
+
+                    logger.trace("Resolving dataobjects");
                     inputDataSets = mddl.resolveDataObjects(dsaux);
+                    logger.debug("Datasets = " + inputDataSets);
+
                     inputs = mddl.resolveDataParameters(dsaux);
                     mdInputDSMap = md.loadExistingDataSets(ctx, inputDataSets);
                     mdInputDSMap.forEach((id, ids) -> {

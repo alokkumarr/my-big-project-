@@ -52,7 +52,8 @@ public interface WithDataSetService {
      */
     default Map<String, Map<String, String>> resolveDataObjects(DataSetServiceAux aux) throws Exception {
         Map<String, Map<String, String>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
-        for (Input in: aux.ctx.componentConfiguration.getInputs()) retval.put(in.getDataSet(), resolveDataObject(aux, in));
+        for (Input in: aux.ctx.componentConfiguration.getInputs())
+            retval.put(in.getDataSet(), resolveDataObject(aux, in));
         return retval;
     }
 
@@ -80,7 +81,9 @@ public interface WithDataSetService {
                 sb
                 .append(Path.SEPARATOR + in.getDataSet())
                 .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
+
         DataSetServiceAux.logger.debug(String.format("Resolve object %s in location: %s", in.getDataSet(), sb.toString()));
+
         if (!HFileOperations.exists(sb.toString())){
             //TODO:: Should we return Map with 'Exists::no' instead of throwing exception
             throw new XDFException(XDFException.ErrorCodes.InputDataObjectNotFound, in.getDataSet());
