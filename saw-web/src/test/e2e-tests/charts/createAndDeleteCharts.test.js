@@ -1,5 +1,5 @@
 /*
-  Created by Alex
+ Created by Alex
  */
 
 const login = require('../../javascript/pages/loginPage.po.js');
@@ -100,7 +100,11 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       }
       chartDesigner.getXRadio(xAxisName).click();
       commonFunctions.waitFor.elementToBeClickableAndClick(y);
-      chartDesigner.getGroupRadio(groupName).click();
+
+      //If combo chart then do not check group by
+      if (data.chartType !== 'chart:combo') {
+        chartDesigner.getGroupRadio(groupName).click();
+      }
 
       //If Combo then add one more field
       if (data.chartType === 'chart:combo') {

@@ -39,7 +39,7 @@ const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 1800000 : 30000
  * Fixes error: Timed out waiting for asynchronous Angular tasks to finish after n seconds;
  * If fluentWait is happening more than this timeout it will throw an error like "element is not clickable"
  */
-const allScriptsTimeout = webpackHelper.distRun() ? 600000 : 120000;
+const allScriptsTimeout = webpackHelper.distRun() ? 600000 : 200000;
 
 /**
  * Waits ms after page is loaded
@@ -70,7 +70,7 @@ exports.config = {
   // ECONNREFUSED connect
   // ECONNREFUSED 127.0.0.1:4444
   seleniumAddress: 'http://localhost:4444/wd/hub',
-  getPageTimeout: 500000,
+  getPageTimeout: pageLoadTimeout,
   allScriptsTimeout: allScriptsTimeout,
   directConnect: true,
   capabilities: {
@@ -107,12 +107,12 @@ exports.config = {
      * working on fixing the rest.
      */
     authentication: [
-      webpackHelper.root(testDir + '/e2e-tests/goToAnalyze.test.js')
+      webpackHelper.root(testDir + '/e2e-tests/login.test.js')
     ],
     charts: [
-      webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
-      webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
+      /*webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
+       webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
+       webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')*/
     ],
     root: [
       /*webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
@@ -125,20 +125,20 @@ exports.config = {
      * Suites for test run invoked from Protractor directly on local saw-web front-end development server
      */
     charts: [
-      webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
-      webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
+      //webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
+      //webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
+      //webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
     ],
     root: [
-      webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/createReport.test.js'),
+      /*webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
+       webpackHelper.root(testDir + '/e2e-tests/createReport.test.js'),*/
       webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js')
       //Disabled because have not been adopted to new pivot design. Will be adjusted in separate task SAW-2038
       //webpackHelper.root(testDir + '/e2e-tests/createPivot.test.js')
       //webpackHelper.root(testDir + '/e2e-tests/debug.test.js') // for testing purposes
     ],
     authentication: [
-      webpackHelper.root(testDir + '/e2e-tests/login.test.js')
+      //webpackHelper.root(testDir + '/e2e-tests/login.test.js')
     ]
   },
   onPrepare() {

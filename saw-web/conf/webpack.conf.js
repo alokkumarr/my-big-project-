@@ -32,7 +32,7 @@ module.exports = function (env) {
   const enableMock = true;
 
   const MODULE_DIR = 'node_modules';
-  const BUILD_DIR = 'dist/'
+  const BUILD_DIR = 'dist/';
 
   /**
    * Webpack configuration
@@ -194,7 +194,7 @@ module.exports = function (env) {
     }));
 
     conf.devServer = {
-      port: 3000,
+      port: 3001,
       host: 'localhost',
       historyApiFallback: true,
       watchOptions: {
