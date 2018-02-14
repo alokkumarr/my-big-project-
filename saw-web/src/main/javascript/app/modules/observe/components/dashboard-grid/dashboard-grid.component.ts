@@ -52,6 +52,7 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
   @Output() getDashboard = new EventEmitter();
 
   public fillState = 'empty';
+  public enableChartDownload: boolean;
   public columns = 4;
   public options: GridsterConfig;
   public dashboard: Array<GridsterItem> = [];
@@ -79,6 +80,8 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
         enabled: !this.isViewMode()
       }
     };
+
+    this.enableChartDownload = this.isViewMode();
   }
 
   ngAfterViewChecked() {

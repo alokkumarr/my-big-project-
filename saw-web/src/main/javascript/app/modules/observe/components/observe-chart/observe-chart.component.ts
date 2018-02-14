@@ -33,6 +33,7 @@ const template = require('./observe-chart.component.html');
 export class ObserveChartComponent {
   @Input() analysis: any;
   @Input() item: any;
+  @Input() enableChartDownload: boolean;
   @Input('updater') requester: BehaviorSubject<Array<any>>;
   @Output() onRefresh = new EventEmitter<any>();
   @ViewChild(ChartComponent) chartComponent: ChartComponent;
