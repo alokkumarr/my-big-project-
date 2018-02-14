@@ -1,3 +1,5 @@
+declare const require: any;
+
 import { Component, AfterViewInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { Subscription } from 'rxjs/Subscription'
@@ -26,7 +28,7 @@ export class GlobalFilterComponent implements AfterViewInit, OnDestroy {
   ) { }
 
   ngAfterViewInit() {
-    this.globalFilters = this.filters.rawGlobalFilters;
+    this.globalFilters = [];
     this.filterChangeSubscription =  this.filters.onFilterChange
       .subscribe(this.onFilterChange.bind(this))
   }

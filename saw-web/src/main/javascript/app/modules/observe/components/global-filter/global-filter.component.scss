@@ -82,9 +82,18 @@ global-filter {
   .mat-expansion-panel-header {
     color: #464646;
     font-weight: bold;
+
+    .mat-content {
+      flex-direction: column;
+    }
+
+    .mat-expansion-panel-header-description {
+      font-weight: normal;
+      font-size: 12px;
+    }
   }
 
-  .mat-expansion-panel-body {
+  .panel-body {
     display: flex;
     flex-direction: column;
   }

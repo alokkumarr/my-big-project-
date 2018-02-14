@@ -1,14 +1,6 @@
-<mat-expansion-panel expanded="true">
-  <mat-expansion-panel-header>
-    <mat-panel-title [textContent]="_filter.columnName"></mat-panel-title>
-  </mat-expansion-panel-header>
-
-
-  <nouislider [connect]="true"
-    [min]="min"
-    [max]="max"
-    [step]="1"
-    [ngModel]="value"
-    (ngModelChange)="onSliderChange($event)"></nouislider>
-
-</mat-expansion-panel>
+<nouislider [connect]="true"
+  [min]="min"
+  [max]="max"
+  [step]="1"
+  [ngModel]="value"
+  (ngModelChange)="onSliderChange($event)"></nouislider>

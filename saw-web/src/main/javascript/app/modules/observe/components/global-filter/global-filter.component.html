@@ -4,22 +4,31 @@
 </div>
 
 <div class="filter-content">
-  <div *ngFor="let gFilter of globalFilters" [ngSwitch]="gFilter.uiType">
+  <mat-expansion-panel expanded="true" *ngFor="let gFilter of globalFilters" [ngSwitch]="gFilter.uiType">
+    <mat-expansion-panel-header>
+      <mat-panel-title [textContent]="gFilter.columnName"></mat-panel-title>
+
+      <mat-panel-description [textContent]="gFilter.tableName"></mat-panel-description>
+    </mat-expansion-panel-header>
+
     <g-date-filter
+      class="panel-body"
       *ngSwitchCase="'date'"
       [filter]="gFilter"
       (onModelChange)="onFilterUpdate($event)"></g-date-filter>
 
     <g-number-filter
+      class="panel-body"
       *ngSwitchCase="'number'"
       [filter]="gFilter"
       (onModelChange)="onFilterUpdate($event)"></g-number-filter>
 
     <g-string-filter
+      class="panel-body"
       *ngSwitchCase="'string'"
       [filter]="gFilter"
       (onModelChange)="onFilterUpdate($event)"></g-string-filter>
-  </div>
+  </mat-expansion-panel>
 </div>
 
 <div class="filter-footer-actions">
