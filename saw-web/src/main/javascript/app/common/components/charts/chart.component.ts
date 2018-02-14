@@ -86,8 +86,6 @@ export class ChartComponent {
    */
   addExportConfig(config) {
     set(config, 'exporting.filename', get(config, 'title.text') || 'chart');
-    set(config, 'exporting.sourceWidth', this.chart.chartWidth);
-    set(config, 'exporting.sourceHeight', this.chart.chartHeight);
     set(config, 'exporting.chartOptions', {
       legend: {
         navigation: {
@@ -95,6 +93,28 @@ export class ChartComponent {
         }
       }
     });
+  }
+
+  /**
+   * Adds the size of chart to export config. There's a timeout because we
+   * want to calculate the chart size after it has been drawn, not before it.
+   *
+   * @param {any} config
+   * @memberof ChartComponent
+   */
+  addExportSize(config) {
+    setTimeout(() => {
+      set(config, 'exporting.sourceWidth', this.chart.chartWidth);
+      set(config, 'exporting.sourceHeight', this.chart.chartHeight);
+
+      this.chart.update({
+        exporting: {
+          sourceHeight: this.chart.chartHeight,
+          sourceWidth: this.chart.chartWidth
+        }
+      }, false);
+
+    }, 100);
   }
 
   onOptionsChartUpdate(updates) {
@@ -119,10 +139,12 @@ export class ChartComponent {
         this.addExportConfig(this.config);
         this.chart = this.highstocks.stockChart(this.container.nativeElement, this.config);
         this.config = clone(this.clonedConfig);
+        this.addExportSize(this.config);
         this.clonedConfig = {};
       } else {
         this.addExportConfig(this.config);
         this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
+        this.addExportSize(this.config);
       }
       if (!isUndefined(this.config.xAxis)) {
         this.config.xAxis.categories = [];
