@@ -1,6 +1,7 @@
 package sncr.bda;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import sncr.bda.conf.ComponentConfiguration;
 
@@ -11,6 +12,7 @@ import static org.junit.Assert.*;
 /**
  * Created by skbm0001 on 24/1/2018.
  */
+@Ignore
 public class ConfigLoaderTest {
     String configuration;
     String configFile;

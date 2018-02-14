@@ -316,27 +316,20 @@
         "indexMappingfile": {
           "description": "Name of the file with index mapping (definition), optional",
           "type": "string",
-          //default: "" // TODO: Verify if required
           "required": false
         },
         "documentIDField": {
-          "description": "", //TODO: Fill this detail
+          "description": "",
           "type": "string",
           "required": false
         },
-        "filterString": { //TODO: Is this field required?
+        "filterString": {
           "description": "Used to filter data from the given dataset using conditional statements (E.g.: col1='STR1' AND length > 10)",
           "type": "string",
           "required": false
         },
-        "inputFormat": {
-          "description": "Format of the input file. E.g.: json, parquet",
-          "type": "string",
-          "required": false,
-          "default": "parquet"
-        },
         "aliases": {
-          "description": "List of aliases and coresponding loading modes",
+          "description": "List of aliases and corresponding loading modes",
           "type": "array",
           "items" : {
             "description" : "Object contains alias name and loading mode",
@@ -365,8 +358,7 @@
         },
         "esPort": {
           "description": "Connecting port for ElasticSearch server",
-          "type": "integer",
-          "default": 9100
+          "type": "integer"
         },
         "esMappingId": {
           "description": "Key column in the dataset to which the record in ES will be matched",

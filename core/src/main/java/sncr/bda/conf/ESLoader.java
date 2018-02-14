@@ -14,7 +14,6 @@ import javax.annotation.Generated;
  * ES Loader specific properties
  *
  */
-@Generated("org.jsonschema2pojo")
 public class ESLoader {
 
     /**
@@ -46,14 +45,7 @@ public class ESLoader {
     @Expose
     private String filterString;
     /**
-     * Format of the input file. E.g.: json, parquet
-     *
-     */
-    @SerializedName("inputFormat")
-    @Expose
-    private String inputFormat = "parquet";
-    /**
-     * List of aliases and coresponding loading modes
+     * List of aliases and corresponding loading modes
      *
      */
     @SerializedName("aliases")
@@ -79,7 +71,7 @@ public class ESLoader {
      */
     @SerializedName("esPort")
     @Expose
-    private int esPort = 9100;
+    private int esPort;
     /**
      * Key column in the dataset to which the record in ES will be matched
      *
@@ -117,20 +109,18 @@ public class ESLoader {
      * @param esUser
      * @param esNodes
      * @param esPort
-     * @param inputFormat
      * @param documentIDField
      * @param filterString
      * @param indexMappingfile
      * @param aliases
      * @param esMappingId
      */
-    public ESLoader(String destinationIndexName, String indexMappingfile, String documentIDField, String filterString, String inputFormat, List<Alias> aliases, String esNodes, String esClusterName, int esPort, String esMappingId, String esUser, String esPass) {
+    public ESLoader(String destinationIndexName, String indexMappingfile, String documentIDField, String filterString, List<Alias> aliases, String esNodes, String esClusterName, int esPort, String esMappingId, String esUser, String esPass) {
         super();
         this.destinationIndexName = destinationIndexName;
         this.indexMappingfile = indexMappingfile;
         this.documentIDField = documentIDField;
         this.filterString = filterString;
-        this.inputFormat = inputFormat;
         this.aliases = aliases;
         this.esNodes = esNodes;
         this.esClusterName = esClusterName;
@@ -205,23 +195,7 @@ public class ESLoader {
     }
 
     /**
-     * Format of the input file. E.g.: json, parquet
-     *
-     */
-    public String getInputFormat() {
-        return inputFormat;
-    }
-
-    /**
-     * Format of the input file. E.g.: json, parquet
-     *
-     */
-    public void setInputFormat(String inputFormat) {
-        this.inputFormat = inputFormat;
-    }
-
-    /**
-     * List of aliases and coresponding loading modes
+     * List of aliases and corresponding loading modes
      *
      */
     public List<Alias> getAliases() {
@@ -229,7 +203,7 @@ public class ESLoader {
     }
 
     /**
-     * List of aliases and coresponding loading modes
+     * List of aliases and corresponding loading modes
      *
      */
     public void setAliases(List<Alias> aliases) {
@@ -334,12 +308,36 @@ public class ESLoader {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("destinationIndexName", destinationIndexName).append("indexMappingfile", indexMappingfile).append("documentIDField", documentIDField).append("filterString", filterString).append("inputFormat", inputFormat).append("aliases", aliases).append("esNodes", esNodes).append("esClusterName", esClusterName).append("esPort", esPort).append("esMappingId", esMappingId).append("esUser", esUser).append("esPass", esPass).toString();
+        return new ToStringBuilder(this)
+                .append("destinationIndexName", destinationIndexName)
+                .append("indexMappingfile", indexMappingfile)
+                .append("documentIDField", documentIDField)
+                .append("filterString", filterString)
+                .append("aliases", aliases)
+                .append("esNodes", esNodes)
+                .append("esClusterName", esClusterName)
+                .append("esPort", esPort)
+                .append("esMappingId", esMappingId)
+                .append("esUser", esUser)
+                .append("esPass", esPass)
+                .toString();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(esPass).append(esUser).append(esPort).append(filterString).append(aliases).append(esMappingId).append(esClusterName).append(destinationIndexName).append(esNodes).append(inputFormat).append(documentIDField).append(indexMappingfile).toHashCode();
+        return new HashCodeBuilder()
+                .append(esClusterName)
+                .append(destinationIndexName)
+                .append(esPass)
+                .append(esUser)
+                .append(esNodes)
+                .append(esPort)
+                .append(documentIDField)
+                .append(filterString)
+                .append(indexMappingfile)
+                .append(aliases)
+                .append(esMappingId)
+                .toHashCode();
     }
 
     @Override
@@ -351,7 +349,18 @@ public class ESLoader {
             return false;
         }
         ESLoader rhs = ((ESLoader) other);
-        return new EqualsBuilder().append(esPass, rhs.esPass).append(esUser, rhs.esUser).append(esPort, rhs.esPort).append(filterString, rhs.filterString).append(aliases, rhs.aliases).append(esMappingId, rhs.esMappingId).append(esClusterName, rhs.esClusterName).append(destinationIndexName, rhs.destinationIndexName).append(esNodes, rhs.esNodes).append(inputFormat, rhs.inputFormat).append(documentIDField, rhs.documentIDField).append(indexMappingfile, rhs.indexMappingfile).isEquals();
+        return new EqualsBuilder()
+                .append(esClusterName, rhs.esClusterName)
+                .append(destinationIndexName, rhs.destinationIndexName)
+                .append(esPass, rhs.esPass)
+                .append(esUser, rhs.esUser)
+                .append(esNodes, rhs.esNodes)
+                .append(esPort, rhs.esPort)
+                .append(documentIDField, rhs.documentIDField)
+                .append(filterString, rhs.filterString)
+                .append(indexMappingfile, rhs.indexMappingfile)
+                .append(aliases, rhs.aliases)
+                .append(esMappingId, rhs.esMappingId).isEquals();
     }
 
 }

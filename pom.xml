@@ -66,7 +66,7 @@
     <app.user>mapr</app.user>
     <app.group>mapr</app.group>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <s-value>provided</s-value>
+    <s-value>compile</s-value>
   </properties>
   <!--dependencyManagement-->
   <dependencies>
