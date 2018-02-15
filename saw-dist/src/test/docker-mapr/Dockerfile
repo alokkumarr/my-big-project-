@@ -5,7 +5,12 @@ FROM maprtech/mapr-1base:5.2.0
 RUN sed -i -e '/tsflags=nodocs/d' /etc/yum.conf
 
 # Install system utilities
-RUN yum -y -q --nogpgcheck install lsof smem
+# Workaround: Docker image builds occasionally fail with a "failure:
+# smem-1.4-1.el6.noarch.rpm from epel: [Errno 256] No more mirrors to
+# try" error.  Possibly the MapR base image has outdated Yum mirror
+# information.  So disable installing these packages by default for
+# now, as they are anyway optional.
+#RUN yum -y -q --nogpgcheck install lsof smem
 
 #
 # Install Spark

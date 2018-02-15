@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @JsonPropertyOrder({
     "columnName",
     "isRuntimeFilter",
+    "isGlobalFilter",
     "model",
     "tableName",
     "type"
@@ -26,6 +27,9 @@ public class Filter {
     private String columnName;
     @JsonProperty("isRuntimeFilter")
     private Filter.IsRuntimeFilter isRuntimeFilter;
+    // Ideally
+    @JsonProperty("isGlobalFilter")
+    private Filter.IsGlobalFilter isGlobalFilter;
     @JsonProperty("model")
     private Model model;
     @JsonProperty("tableName")
@@ -53,6 +57,17 @@ public class Filter {
     @JsonProperty("isRuntimeFilter")
     public void setIsRuntimeFilter(Filter.IsRuntimeFilter isRuntimeFilter) {
         this.isRuntimeFilter = isRuntimeFilter;
+    }
+
+    @JsonProperty("isGlobalFilter")
+    public void setIsGlobalFilter(IsGlobalFilter isGlobalFilter)
+    {
+        this.isGlobalFilter = isGlobalFilter;
+    }
+    @JsonProperty("isGlobalFilter")
+    public IsGlobalFilter getIsGloblFilter()
+    {
+        return isGlobalFilter;
     }
 
     @JsonProperty("model")
@@ -120,6 +135,40 @@ public class Filter {
         @JsonCreator
         public static Filter.IsRuntimeFilter fromValue(Boolean value) {
             Filter.IsRuntimeFilter constant = CONSTANTS.get(value);
+            if (constant == null) {
+                throw new IllegalArgumentException((value +""));
+            } else {
+                return constant;
+            }
+        }
+
+    }
+
+    public enum IsGlobalFilter {
+
+        FALSE(false),
+        TRUE(true);
+        private final Boolean value;
+        private final static Map<Boolean, Filter.IsGlobalFilter> CONSTANTS = new HashMap<>();
+
+        static {
+            for (Filter.IsGlobalFilter c: values()) {
+                CONSTANTS.put(c.value, c);
+            }
+        }
+
+        private IsGlobalFilter(Boolean value) {
+            this.value = value;
+        }
+
+        @JsonValue
+        public Boolean value() {
+            return this.value;
+        }
+
+        @JsonCreator
+        public static Filter.IsGlobalFilter fromValue(Boolean value) {
+            Filter.IsGlobalFilter constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException((value +""));
             } else {
