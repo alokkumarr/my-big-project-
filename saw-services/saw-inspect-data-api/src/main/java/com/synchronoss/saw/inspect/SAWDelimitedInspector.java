@@ -170,9 +170,15 @@ public class SAWDelimitedInspector {
   }
 
   private Reader getReader(String path) throws Exception {
-    File file = new File(path);
-    InputStream inputStream = new FileInputStream(file);
-    return new InputStreamReader(inputStream, "UTF-8");
+    InputStream inputStream = null;
+    if (!this.localFileSystem) {
+      inputStream = HFileOperations.readFileToInputStream(path);
+      return new InputStreamReader(inputStream, "UTF-8");
+    } else {
+      File file = new File(path);
+      inputStream = new FileInputStream(file);
+      return new InputStreamReader(inputStream, "UTF-8");
+    }
   }
 
   public String toJson() {

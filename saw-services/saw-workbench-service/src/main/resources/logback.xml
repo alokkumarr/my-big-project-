@@ -14,5 +14,7 @@
 
     <logger name="com.synchronoss.saw" level='trace'>
     </logger>
+    <logger name="sncr.bda.services" level='trace'>
+    </logger>
     
 </configuration>

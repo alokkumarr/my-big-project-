@@ -7,7 +7,7 @@ import com.synchronoss.saw.workbench.model.Project;
 
 public interface SAWWorkbenchService {
   
-  public Project readDirectoriesByProjectId(Project project) throws Exception;
+  public Project readDirectoriesByProjectId(Project project, String relativePath) throws Exception;
   public Project createDirectoryProjectId(Project project)throws Exception;
   public Project uploadFilesDirectoryProjectId(Project project, MultipartFile[] uploadfiles)throws Exception;
   public Project uploadFilesDirectoryProjectIdAsync(Project project, MultipartFile[] uploadfiles)throws Exception;

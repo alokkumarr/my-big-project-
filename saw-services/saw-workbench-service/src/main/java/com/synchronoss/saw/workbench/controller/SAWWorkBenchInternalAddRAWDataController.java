@@ -99,7 +99,7 @@ public class SAWWorkBenchInternalAddRAWDataController {
     Project project = new Project();
     project.setProjectId(projectId);
     try {
-      project = sawWorkbenchService.readDirectoriesByProjectId(project);
+      project = sawWorkbenchService.readDirectoriesByProjectId(project, defaultProjectPath + project.getPath());
     } catch (Exception e) {
       logger.error("Exception occured while reading the raw data directories", e);
       throw new ReadEntitySAWException("Exception occured while reading the raw data directories", e);
@@ -163,13 +163,16 @@ public class SAWWorkBenchInternalAddRAWDataController {
    */
   @RequestMapping(value = "{projectId}/raw/directory/upload/files", method = RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)
-  public Project uploadFilesToProjectDirectoryByIdAndInDirectoryPath(@PathVariable(name = "projectId", required = true) String projectId, @RequestBody Project project, @RequestParam("files") MultipartFile[] uploadfiles) 
+  public Project uploadFilesToProjectDirectoryByIdAndInDirectoryPath(@PathVariable(name = "projectId", required = true) String projectId, 
+      @RequestParam("files") MultipartFile[] uploadfiles, @RequestParam("path")  String filePath) 
       throws JsonProcessingException {
     logger.debug("Retrieve project details By Id ", projectId);
-    Preconditions.checkNotNull(project.getPath(), "To upload files path attribute cannot be null");
+    Preconditions.checkNotNull(filePath, "To upload files path attribute cannot be null");
+    Project project = new Project();
+    project.setPath(filePath);
     Project responseProject = null;
     if (uploadfiles!=null && uploadfiles.length==0){
-          project.setStatusMessage("please select a file!" + HttpStatus.OK);
+          project.setStatusMessage("please select a file! " + HttpStatus.OK);
       return project;
     }
     long size = 0;
@@ -178,7 +181,7 @@ public class SAWWorkBenchInternalAddRAWDataController {
     }
     size = size/ (1024*1024);
     if (size > sizeInMBLimit){
-      project.setStatusMessage("files limit exceeds:"+ size);
+      project.setStatusMessage("files limit exceeds: "+ size);
       return project;
     }
     try {
