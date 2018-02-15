@@ -57,7 +57,7 @@ public class DLMetadata extends MetadataBase {
         // Have to check if project Exists
         Path projectPath = new Path(dlRoot + Path.SEPARATOR + project);
         if(!fs.exists(projectPath)){
-            throw new Exception("Project " + project + " doesn't Exists.");
+            throw new Exception("ProjectService " + project + " doesn't Exists.");
         }
 
         // Set default data source and catalog
@@ -87,7 +87,7 @@ public class DLMetadata extends MetadataBase {
         if (rqProject != null) {
             strPath.append(rqProject).append(Path.SEPARATOR_CHAR).append( PREDEF_DL_DIR + Path.SEPARATOR + "*");
         } else {
-            throw new Exception("Project is not specified");
+            throw new Exception("ProjectService is not specified");
         }
 
         ArrayList<String> list = new ArrayList<>();
@@ -114,7 +114,7 @@ public class DLMetadata extends MetadataBase {
         if (rqProject != null) {
             strPath.append(rqProject).append(Path.SEPARATOR_CHAR).append(PREDEF_DL_DIR).append(Path.SEPARATOR_CHAR);
         } else {
-            throw new Exception("Project is not specified");
+            throw new Exception("ProjectService is not specified");
         }
         if (rqSource == null || rqSource.isEmpty()) {
             strPath.append(DEFAULT_DATA_SOURCE).append(Path.SEPARATOR_CHAR);
@@ -149,7 +149,7 @@ public class DLMetadata extends MetadataBase {
         if (rqProject != null) {
             strPath.append(rqProject).append(Path.SEPARATOR_CHAR).append(PREDEF_DL_DIR).append(Path.SEPARATOR_CHAR);
         } else {
-            throw new Exception("Project is not specified");
+            throw new Exception("ProjectService is not specified");
         }
         if (rqSource != null && !rqSource.isEmpty()) {
             strPath.append(rqSource).append(Path.SEPARATOR_CHAR);
@@ -211,7 +211,7 @@ public class DLMetadata extends MetadataBase {
     public ArrayList<String> getListOfStagedFiles(String rqProject, String subDir) throws Exception {
         logger.trace("Getting the list of directories & folder for specified directory in the cluster for the project" + rqProject);
         if (rqProject == null) {
-            throw new Exception("Project is not specified.");
+            throw new Exception("ProjectService is not specified.");
         }
         Path stagingRoot = new Path(dlRoot + Path.SEPARATOR + rqProject);
         Path requestRoot;
@@ -304,7 +304,7 @@ public class DLMetadata extends MetadataBase {
     public void deleteDataSet(String project, String source, String catalog, String setName) throws Exception {
         Path projectPath = new Path(dlRoot + Path.SEPARATOR + project);
         if(!fs.exists(projectPath)){
-            throw new Exception("Project " + project + " doesn't Exists.");
+            throw new Exception("ProjectService " + project + " doesn't Exists.");
         }
 
         // Set default data source and catalog
@@ -326,7 +326,7 @@ public class DLMetadata extends MetadataBase {
         // Have to check if project Exists
         Path projectPath = new Path(dlRoot + Path.SEPARATOR + project);
         if(!fs.exists(projectPath)){
-            throw new Exception("Project " + project + " doesn't Exists.");
+            throw new Exception("ProjectService " + project + " doesn't Exists.");
         }
 
         // Set default data source and catalog

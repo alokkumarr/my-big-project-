@@ -1,4 +1,4 @@
-package sncr.bda.metastore;
+package sncr.bda.admin;
 
 import com.google.gson.*;
 import com.mapr.db.MapRDB;
@@ -9,6 +9,9 @@ import org.ojai.store.QueryCondition;
 import sncr.bda.base.MetadataStore;
 import sncr.bda.base.WithSearchInMetastore;
 import sncr.bda.core.file.HFileOperations;
+import sncr.bda.metastore.DataSetStore;
+import sncr.bda.metastore.ProjectStore;
+import sncr.bda.metastore.TransformationStore;
 import sncr.bda.services.DLMetadata;
 
 import java.io.FileNotFoundException;
@@ -19,27 +22,27 @@ import java.util.Map;
 /**
  * Created by srya0001 on 12/1/2017.
  */
-public class ProjectStore extends MetadataStore implements WithSearchInMetastore{
+public class ProjectAdmin extends ProjectStore{
 
-    private static final Logger logger = Logger.getLogger(ProjectStore.class);
-    private static String TABLE_NAME = "projects";
+    private static final Logger logger = Logger.getLogger(ProjectAdmin.class);
+    private final DLMetadata dlMd;
     public static final String PLP = "projectLevelParameters";
-    protected JsonParser jsonParser;
 
-    public ProjectStore(String altRoot) throws Exception {
-        super(TABLE_NAME, altRoot);
-        jsonParser = new JsonParser();
+    public ProjectAdmin(String altRoot) throws Exception {
+        super(altRoot);
+        dlMd = new DLMetadata(altRoot);
+
     }
 
-    public void createProjectRecord(String name, String src) throws Exception {
+    public void createProject(String name, String src) throws Exception {
         if (name == null || name.isEmpty())
             throw new IllegalArgumentException("Project name cannot be null or empty");
-         JsonElement je0 = jsonParser.parse(src);
-         create(name, je0);
+        JsonElement je0 = jsonParser.parse(src);
+        create(name, je0);
+        dlMd.createProject(name);
     }
 
-
-    public void createProjectRecord(String name, String desc, Map<String, String> p) throws Exception {
+    public void createProject(String name, String desc, Map<String, String> p) throws Exception {
         if (name == null || name.isEmpty())
             throw new IllegalArgumentException("Project name cannot be null or empty");
         JsonObject jo = new JsonObject();
@@ -52,17 +55,17 @@ public class ProjectStore extends MetadataStore implements WithSearchInMetastore
         }
         jo.add(PLP, plp);
         create(name, jo);
+        dlMd.createProject(name);
     }
 
-    public void createProjectRecord(String name, String desc, JsonArray p) throws Exception {
+    public void createProject(String name, JsonElement el) throws Exception {
         if (name == null || name.isEmpty())
             throw new IllegalArgumentException("Project name cannot be null or empty");
-        JsonObject jo = new JsonObject();
-        jo.add("description", new JsonPrimitive((desc == null || desc.isEmpty())?"no description":desc));
-        jo.add(PLP, p);
-        create(name, jo);
+        create(name, el);
+        dlMd.createProject(name);
     }
 
+    @Override
     public JsonElement readProjectData(String name) throws Exception {
         if (name == null || name.isEmpty())
             throw new IllegalArgumentException("Project name cannot be null or empty");
@@ -72,18 +75,57 @@ public class ProjectStore extends MetadataStore implements WithSearchInMetastore
         return toJsonElement(prj);
     }
 
+    public void cleanupProject(String name) throws Exception {
 
-    public void updateProjectRecord(String name, String src) throws Exception {
-        if (name == null || name.isEmpty())
-            throw new IllegalArgumentException("Project name cannot be null or empty");
         Document prj = table.findById(name);
         if (prj == null)
-            throw new Exception("Project with name: " + name + " not found");
-        JsonElement je = jsonParser.parse(src);
-        update(name, je);
+            throw new Exception("ProjectService with name: " + name + " not found");
+
+        QueryCondition qc = MapRDB.newCondition();
+        qc.is("system.project", QueryCondition.Op.EQUAL, name).build();
+        String dsTablename = getRoot() + Path.SEPARATOR + METASTORE + Path.SEPARATOR + DataSetStore.TABLE_NAME;
+        DataSetStore dss = new DataSetStore(getRoot());
+        List<Document> datasets = searchAsList(dsTablename, qc);
+        logger.debug("Found # datasets: " + datasets.size());
+        datasets.forEach( d -> {
+            String id = d.getIdString();
+            try {
+                JsonElement dset = dss.read(id);
+                JsonObject jo = dset.getAsJsonObject();
+                JsonPrimitive pl = jo.getAsJsonObject("system").getAsJsonPrimitive("physicalLocation");
+                logger.trace("Process dataset: " + id + " DS descriptor: " + jo.toString() + " physical location = " + ((pl != null)? pl.toString():"n/a"));
+                if (pl != null) {
+                    String normPL = pl.toString().replace("\"", "");
+                    normPL = normPL.substring(0, normPL.length() - PREDEF_DATA_DIR.length());
+                    HFileOperations.deleteEnt(normPL);
+                }
+                dss.delete(id);
+            } catch (Exception e) {
+                logger.error("Could not remove datasets from Metadata Store: " + id, e);
+            }}
+        );
+
+        qc = MapRDB.newCondition();
+        qc.is("project", QueryCondition.Op.EQUAL, name).build();
+        String trTablename = getRoot() + Path.SEPARATOR + METASTORE + Path.SEPARATOR + TransformationStore.TABLE_NAME;
+        TransformationStore ts = new TransformationStore(getRoot());
+        List<Document> transformations = searchAsList(trTablename, qc);
+        transformations.forEach( d -> {
+            String id = String.valueOf(d.getId());
+            try {
+                ts.delete(id);
+            } catch (Exception e) {
+                logger.error("Could not remove transformation from Metadata Store: " + id, e);
+            }}
+        );
+        prj.delete(PLP);
+        table.flush();
     }
 
-    /*
+    public void updateProject(String name, JsonElement newDesc) throws Exception {
+        update(name, newDesc);
+    }
+
     public void updateProject(String name, JsonArray plpJA) throws Exception {
         HashMap<String, String> nParams = new HashMap<>();
         plpJA.forEach( el -> {
@@ -96,10 +138,10 @@ public class ProjectStore extends MetadataStore implements WithSearchInMetastore
             }
         });
         updateProject(name, nParams);
-    }
-*/
 
-    public void updateProjectRecord(String name, Map<String, String> newParameters) throws Exception {
+    }
+
+    public void updateProject(String name, Map<String, String> newParameters) throws Exception {
         Document prj = table.findById(name);
         if (prj == null)
              throw new Exception("ProjectService with name: " + name + " not found");
@@ -152,6 +194,12 @@ public class ProjectStore extends MetadataStore implements WithSearchInMetastore
         table.flush();
     }
 
+    public void deleteProject(String name) throws Exception {
+        cleanupProject(name);
+        table.delete(name);
+        table.flush();
+        HFileOperations.deleteEnt(getRoot() + Path.SEPARATOR + name);
+    }
 
     public static void main(String args[]){
         try {
@@ -167,7 +215,7 @@ public class ProjectStore extends MetadataStore implements WithSearchInMetastore
             if (args.length == 4) propFile = args[3];
 
             System.out.println(String.format("Create project with name: %s and description: %s", prjName, prjDesc));
-            ProjectStore ps = new ProjectStore(root);
+            ProjectAdmin ps = new ProjectAdmin(root);
 /*
             if (propFile == null)
                 //ps.createProject(prjName, prjDesc);
@@ -185,7 +233,7 @@ public class ProjectStore extends MetadataStore implements WithSearchInMetastore
             JsonElement readDoc = ps.readProjectData(prjName);
             System.out.println("Converted to document: \n\n" + readDoc.toString() + "\n");
 
-
+            ps.cleanupProject(prjName);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
