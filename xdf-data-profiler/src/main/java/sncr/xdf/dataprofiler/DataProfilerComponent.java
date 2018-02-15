@@ -63,7 +63,7 @@ public class DataProfilerComponent extends Component implements WithSparkContext
             // Resolve physical PhysicalLocation
             if (ctx.componentConfiguration.getInputs() != null &&
                     !ctx.componentConfiguration.getInputs().isEmpty())
-                inputDataSets = resolveDataParameters(dsaux);
+                inputDataSets = resolveDataParametersWithInput(dsaux);
 
             // Run component logic here
             // ...
