@@ -17,15 +17,20 @@
     </mat-select>
   </mat-form-field>
 
-  <mat-form-field *ngIf="isDataField">
-    <input matInput type="text"
-          placeholder="Format"
-          disabled
-          [value]="'100,00.33'"/>
-  </mat-form-field>
-  <button mat-icon-button
-          (click)="openFormatDialog()">
-    <mat-icon fontIcon="icon-filter"></mat-icon>
-  </button>
+  <div *ngIf="isDataField"
+       fxLayout="row"
+       fxLayoutAlign="start center">
+    <mat-form-field>
+      <input matInput
+             type="text"
+             placeholder="Format"
+             disabled
+             [value]="sample"/>
+    </mat-form-field>
+    <button mat-icon-button
+            (click)="openFormatDialog()">
+      <mat-icon fontIcon="icon-filter"></mat-icon>
+    </button>
+  </div>
 </div>
 

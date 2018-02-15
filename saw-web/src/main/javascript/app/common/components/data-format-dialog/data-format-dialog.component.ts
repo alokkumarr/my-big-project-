@@ -4,11 +4,19 @@ import {
   Input,
   Inject
 } from '@angular/core';
-import * as currencyCodes from 'currency-codes/data.js';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import * as currencyCodes from 'currency-codes/data.js';
+import * as getCurrencySymbol from 'currency-symbol-map/currency-symbol-map.js';
+import * as isNumber from 'lodash/isNumber';
+
+import { Format } from '../../../models'
+import { formatNumber } from '../../../common/utils/numberFormatter';
 
 const template = require('./data-format-dialog.component.html');
 require('./data-format-dialog.component.scss');
+
+const DEFAULT_CURRENCY = 'USD';
+const SAMPLE_NUMBER = 1000.33333;
 
 @Component({
   selector: 'data-format-dialog',
@@ -16,41 +24,53 @@ require('./data-format-dialog.component.scss');
 })
 export class DataFormatDialogComponent {
 
+  public format: Format = {};
   public currencyCodes = currencyCodes;
-  public sampleNumber = 1000.33333;
   public sample: string
+  public isNumber = isNumber;
 
   constructor(
     private _dialogRef: MatDialogRef<DataFormatDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {format: any}
+    @Inject(MAT_DIALOG_DATA) public data: {format: Format}
   ) {}
 
   ngOnInit() {
-    if (!this.data.format) {
-      this.data.format = {};
-    }
+    this.format = this.data.format || {};
+    this.changeSample();
   }
 
   close() {
     this._dialogRef.close();
   }
-  format() {
-    this._dialogRef.close(this.data.format);
+
+  applyFormat() {
+    this._dialogRef.close(this.format);
   }
 
   onCommaSeparatorChange(checked) {
-    this.data.format.commaSeparator = checked;
+    this.format.comma = checked;
+    this.changeSample();
   }
 
   onCurrencyFlagChange(checked) {
-    this.data.format.currencyFlag = checked;
+    const format = this.format;
+    format.currency = checked ? DEFAULT_CURRENCY : null;
+    format.currencySymbol= getCurrencySymbol(format.currency);
+    this.changeSample();
   }
 
   onCurrencyCodeChange(code) {
-    this.data.format.currencyCode = code;
+    this.format.currency = code;
+    this.format.currencySymbol= getCurrencySymbol(code);
+    this.changeSample();
   }
 
-  makeSample() {
+  onPrecisionChange(precision) {
+    this.format.precision = precision;
+    this.changeSample();
+  }
 
+  changeSample() {
+    this.sample = formatNumber(SAMPLE_NUMBER, this.format);
   }
 }

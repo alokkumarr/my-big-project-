@@ -6,7 +6,7 @@
   <mat-slide-toggle i18n
                     color="primary"
                     (change)="onCommaSeparatorChange($event.checked)"
-                    [checked]="data.format.commaSeparator">
+                    [checked]="format.comma">
     Show Comma Separators
   </mat-slide-toggle>
 
@@ -16,14 +16,14 @@
     <mat-slide-toggle i18n
                       color="primary"
                       (change)="onCurrencyFlagChange($event.checked)"
-                      [checked]="data.format.currencyFlag">
+                      [checked]="format.currency">
       Show as Currency
     </mat-slide-toggle>
 
-    <mat-form-field *ngIf="data.format.currencyFlag">
+    <mat-form-field *ngIf="format.currency">
       <mat-select placeholder="Currency Code"
                   (selectionChange)="onCurrencyCodeChange($event.value)"
-                  [value]="data.format.currencyCode">
+                  [value]="format.currency">
         <mat-option *ngFor="let currencyCode of currencyCodes; trackBy: index"
                     [value]="currencyCode.code">
           {{ currencyCode.code }}
@@ -32,27 +32,36 @@
     </mat-form-field>
   </div>
 
-  <mat-form-field>
-    <input matInput
-           type="number"
-           placeholder="Decimals"
-           [value]="data.format.numberDecimal"/>
-  </mat-form-field>
+  <div fxLayout="column">
+    <div>
+      <mat-form-field>
+        <input matInput
+               type="number"
+               max="99"
+               min="0"
+               placeholder="Decimal Precision"
+               (input)="onPrecisionChange($event.data)"
+               [value]="isNumber(format.precision) ? format.precision : ''"/>
+      </mat-form-field>
+    </div>
 
-  <mat-form-field>
-      <input matInput
-             type="number"
-             disabled
-             [value]="this.sample"/>
-    </mat-form-field>
+    <div>
+      <mat-form-field>
+        <input matInput
+               type="text"
+               disabled
+               [value]="sample"/>
+      </mat-form-field>
+    </div>
+  </div>
 </div>
 <div class="dialog__actions">
   <div fxLayout="row"
        fxLayoutAlign="start center">
-    <button (click)="format()"
+    <button (click)="applyFormat()"
             mat-raised-button color="primary" i18n>
       Format
     </button>
-    <button mat-button i18n (click)="onBack()">Cancel</button>
+    <button mat-button i18n (click)="close()">Cancel</button>
   </div>
 </div>

@@ -21,16 +21,18 @@ import * as fpForEach from 'lodash/fp/forEach';
 import * as fpMapKeys from 'lodash/fp/mapKeys';
 import * as moment from 'moment';
 import {Subject} from 'rxjs/Subject';
-import {Sort} from '../../../modules/analyze/models/sort.model'
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 import {
-  ArtifactColumnPivot
-} from '../../../modules/analyze/models/artifact-column.model';
+  ArtifactColumnPivot,
+  Sort,
+  Format
+} from '../../../modules/analyze/models';
 import {
   DATE_TYPES,
   NUMBER_TYPES,
   DATE_INTERVALS_OBJ
 } from '../../../modules/analyze/consts';
+import { getFormatter } from '../../utils/numberFormatter';
 
 const ARTIFACT_COLUMN_2_PIVOT_FIELD = {
   displayName: 'caption',
@@ -261,8 +263,7 @@ export class PivotGridComponent {
         if (NUMBER_TYPES.includes(cloned.type)) {
           cloned.dataType = 'number';
           cloned.format = {
-            type: 'fixedPoint',
-            precision: 2
+            formatter: getFormatter(artifactColumn.format)
           };
           /* We're aggregating values in backend. Aggregating it again using
              pivot's aggregate function will lead to bad data. Always keep this
