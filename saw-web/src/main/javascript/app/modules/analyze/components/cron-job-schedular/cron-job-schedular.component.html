@@ -1,1 +1,104 @@
-Cron Job Schedular Template
+<div class="tab">
+  <button class="tablinks" (click)="openSchedule(event, 'daily')">Daily</button>
+  <button class="tablinks" (click)="openSchedule(event, 'weeklybasis')">Weekly</button>
+  <button class="tablinks" (click)="openSchedule(event, 'monthly')">Monthly</button>
+  <button class="tablinks" (click)="openSchedule(event, 'yearly')">Yearly</button>
+</div>
+
+<div *ngIf="scheduleType == 'daily'" [ngClass]="{'scheduleType': selectedItem == 'daily'}" class="tabcontent">
+  <mat-radio-group>
+    <mat-radio-button class="everyDay" [value]="everyDay" (click)="regenerateCron()">Every </mat-radio-button>
+    <mat-select placeholder="Days">
+      <mat-option *ngFor="let day of days" [value]="day">
+        {{day}}
+      </mat-option>
+    </mat-select><br/>
+    Day(s) at
+    <cron-date-picker [model]="model"></cron-date-picker><br/><br/><br/>
+    <mat-radio-button class="everyWeek" [value]="everyWeek" (click)="regenerateCron()">Every week day (Monday through Friday) at</mat-radio-button><br/>
+    <cron-date-picker></cron-date-picker>
+  </mat-radio-group>
+</div>
+
+<div *ngIf="scheduleType == 'weeklybasis'" [ngClass]="{'active': scheduleType == 'weeklybasis'}" class="tabcontent">
+  <input type="checkbox" /> Monday
+  <input type="checkbox" /> Tuesday
+  <input type="checkbox" /> Wednesday
+  <input type="checkbox" /> Thrusday
+  <input type="checkbox" /> Friday
+  <input type="checkbox" /> Saturday
+  <input type="checkbox" /> Sunday
+  <br/>
+  Start Time
+  <cron-date-picker></cron-date-picker><br/><br/>
+</div>
+
+<div *ngIf="scheduleType == 'monthly'" [ngClass]="{'active': scheduleType == 'monthly'}" class="tabcontent">
+  <mat-radio-group>
+    <mat-radio-button class="everyDay" value="1">On the </mat-radio-button>
+    <mat-select placeholder="Day">
+      <mat-option *ngFor="let day of days" [value]="day">
+        {{day}}
+      </mat-option>
+    </mat-select> st Day of every 
+    <mat-select placeholder="Days">
+      <mat-option *ngFor="let month of months" [value]="month">
+        {{month}}
+      </mat-option>
+    </mat-select>month(s) at <br/>
+    <cron-date-picker></cron-date-picker><br/><br/><br/>
+
+    <mat-radio-button class="everyWeek" value="2">On the</mat-radio-button>
+    <mat-select placeholder="Weeks">
+      <mat-option *ngFor="let week of weeks" [value]="week">
+        {{week}}
+      </mat-option>
+    </mat-select>
+    <mat-select placeholder="Day">
+      <mat-option *ngFor="let dayString of dayStrings" [value]="dayString">
+        {{dayString}}
+      </mat-option>
+    </mat-select>of every
+    <mat-select placeholder="Month">
+      <mat-option *ngFor="let month of months" [value]="month">
+        {{month}}
+      </mat-option>
+    </mat-select>month(s) at <br/>
+    <cron-date-picker></cron-date-picker>
+  </mat-radio-group>
+</div>
+
+<div *ngIf="scheduleType == 'yearly'" [ngClass]="{'active': scheduleType == 'yearly'}" class="tabcontent">
+  <mat-radio-group>
+    <mat-radio-button class="everyDay" value="1">Every </mat-radio-button>
+    <mat-select placeholder="Month">
+      <mat-option *ngFor="let monthString of monthStrings" [value]="monthString">
+        {{monthString}}
+      </mat-option>
+    </mat-select> on the  
+    <mat-select placeholder="Days">
+      <mat-option *ngFor="let day of days" [value]="day">
+        {{day}}
+      </mat-option>
+    </mat-select>st Day at <br/>
+    <cron-date-picker></cron-date-picker><br/><br/><br/>
+
+    <mat-radio-button class="everyWeek" value="2">On the</mat-radio-button>
+    <mat-select placeholder="Weeks">
+      <mat-option *ngFor="let week of weeks" [value]="week">
+        {{week}}
+      </mat-option>
+    </mat-select>
+    <mat-select placeholder="Day">
+      <mat-option *ngFor="let dayString of dayStrings" [value]="dayString">
+      {{dayString}}
+      </mat-option>
+    </mat-select>of 
+    <mat-select placeholder="Month">
+      <mat-option *ngFor="let monthString of monthStrings" [value]="monthString">
+        {{monthString}}
+      </mat-option>
+    </mat-select>at <br/>
+    <cron-date-picker></cron-date-picker>
+  </mat-radio-group>
+</div>

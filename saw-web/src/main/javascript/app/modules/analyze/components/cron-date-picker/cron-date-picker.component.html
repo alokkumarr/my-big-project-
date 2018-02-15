@@ -1,0 +1,23 @@
+<mat-select style="border-bottom-style: none;" class="md-select-value" placeholder="Hours">
+  <mat-option *ngFor="let hour of selectOptions.hours" [value]="hour">
+    {{hour}}
+  </mat-option>
+</mat-select>
+
+<mat-select style="border-bottom-style: none;" class="md-select-value"  placeholder="Minutes">
+  <mat-option *ngFor="let minute of selectOptions.minutes" [value]="minute">
+    {{minute}}
+  </mat-option>
+</mat-select>
+
+<mat-select style="border-bottom-style: none;" class="md-select-value"  placeholder="Seconds">
+  <mat-option *ngFor="let second of selectOptions.seconds" [value]="second">
+    {{second}}
+  </mat-option>
+</mat-select>
+
+<mat-select style="border-bottom-style: none;" class="md-select-value"  placeholder="Meridiem">
+  <mat-option *ngFor="let hourType of selectOptions.hourTypes" [value]="hourType">
+  {{hourType}}
+  </mat-option>
+</mat-select>

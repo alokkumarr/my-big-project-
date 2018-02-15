@@ -3,7 +3,6 @@ import {downgradeInjectable, downgradeComponent} from '@angular/upgrade/static';
 import {NgModule} from '@angular/core';
 import {CommonModule as CommonModuleAngular4} from '@angular/common';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import { CronEditorModule } from "cron-editor/cron-editor";
 
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {MaterialModule} from '../../material.module';
@@ -65,6 +64,7 @@ import {AnalyzeChartComponent} from './components/chart/analyze-chart.component'
 import {AnalyzeChartSettingsComponent} from './components/chart/settings/analyze-chart-settings.component';
 import {AnalyzeChartPreviewComponent} from './components/chart/preview/analyze-chart-preview.component';
 import { CronJobSchedularComponent } from './components/cron-job-schedular/cron-job-schedular.component';
+import { CronDatePickerComponent } from './components/cron-date-picker/cron-date-picker.component';
 import {CommonModule} from '../../common';
 
 import {CommonModuleTs} from '../../common';
@@ -91,7 +91,8 @@ import {
   DesignerService,
   ArtifactColumnFilterPipe,
   ArtifactColumns2PivotFieldsPipe,
-  CronJobSchedularComponent
+  CronJobSchedularComponent,
+  CronDatePickerComponent
 } from './components/designer';
 import {
   analyzeServiceProvider
@@ -169,8 +170,7 @@ angular.module(AnalyzeModule, [
     FlexLayoutModule,
     AceEditorModule,
     FormsModule,
-    ReactiveFormsModule,
-    CronEditorModule
+    ReactiveFormsModule
   ],
   declarations: [
     AnalyzeReportQueryComponent,
@@ -195,7 +195,8 @@ angular.module(AnalyzeModule, [
     DesignerPreviewDialogComponent,
     ArtifactColumnFilterPipe,
     ArtifactColumns2PivotFieldsPipe,
-    CronJobSchedularComponent
+    CronJobSchedularComponent,
+    CronDatePickerComponent
   ],
   entryComponents: [
     AnalyzeReportQueryComponent,
@@ -218,7 +219,8 @@ angular.module(AnalyzeModule, [
     DesignerDateFilterComponent,
     DesignerNumberFilterComponent,
     DesignerPreviewDialogComponent,
-    CronJobSchedularComponent
+    CronJobSchedularComponent,
+    CronDatePickerComponent
   ],
   providers: [
     $mdDialogProvider,

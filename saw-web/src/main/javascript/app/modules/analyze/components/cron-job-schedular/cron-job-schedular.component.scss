@@ -1,0 +1,46 @@
+.mat-select-value {
+  width: 90% !important;
+  padding: 8px 15px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.mat-select {
+  position: relative !important;
+  width: 17% !important;
+  margin-left: 10px;
+}
+
+.tab {
+  overflow: hidden;
+  border: 1px solid #CCC;
+  background-color: #F1F1F1;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 5px 10px;
+  transition: 0.3s;
+  font-size: 16px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #DDD;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #CCC;
+}
+
+/* Style the tab content */
+.tabcontent {
+  padding: 6px 12px;
+  border: 1px solid #CCC;
+  border-top: none;
+}
