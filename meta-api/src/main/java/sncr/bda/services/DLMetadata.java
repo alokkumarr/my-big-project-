@@ -208,12 +208,12 @@ public class DLMetadata extends MetadataBase {
         return list;
     }
 
-    public ArrayList<String> getListOfStagedFiles(String rqProject, String subDir) throws Exception {
-        logger.trace("Getting the list of directories & folder for specified directory in the cluster for the project" + rqProject);
+    public ArrayList<String> getListOfStagedFiles(String rqProject, String subDir, String relativePath) throws Exception {
+        logger.trace("getListOfStagedFiles : Getting the list of directories & folder for specified directory in the cluster for the project : " + rqProject);
         if (rqProject == null) {
             throw new Exception("Project is not specified.");
         }
-        Path stagingRoot = new Path(dlRoot + Path.SEPARATOR + rqProject);
+        Path stagingRoot = new Path(rqProject);
         Path requestRoot;
         if(subDir != null && !subDir.isEmpty()){
             requestRoot = new Path(stagingRoot + Path.SEPARATOR + subDir);
@@ -223,25 +223,28 @@ public class DLMetadata extends MetadataBase {
         URI relativeSelfPath = stagingRoot.toUri().relativize(requestRoot.toUri());
         String strRelativeSelfPath = "" + relativeSelfPath;
         if(strRelativeSelfPath.isEmpty()){
-            strRelativeSelfPath = "root";
+            strRelativeSelfPath = rqProject;
         }
         logger.trace("Staging " + stagingRoot);
         logger.trace("Requested list of files from " + requestRoot);
-        logger.trace("Relative path (self)" + relativeSelfPath);
+        logger.trace("Relative path (self) " + relativeSelfPath);
         ArrayList<String> list = new ArrayList<>();
         Path p = new Path(requestRoot + Path.SEPARATOR + "*");
+        logger.trace("getListOfStagedFiles : Getting the list of directories & files from the path : " + p.toUri().toString());
         FileStatus[] plist = fs.globStatus(p);
         for (FileStatus f : plist) {
             Boolean isDir = f.isDirectory();
             String name = f.getPath().getName();
+            logger.trace("getListOfStagedFiles : FileStatus[] : " + name);
             boolean countOfFiles = listAllFilePath(f.getPath(), fs).size()>0?true:false;
+            logger.trace("getListOfStagedFiles : FileStatus[]:countOfFiles : " + name);
             Long size = f.getLen();
             f.getModificationTime();
             String record = "{"
                             + "\"name\":\"" + name + "\", "
                             + "\"size\":" + size + ", "
                             + "\"isDirectory\":" + isDir + ", "
-                            + "\"path\":\"" + strRelativeSelfPath + "\""
+                            + "\"path\":\"" + relativePath + "\", "
                             + "\"subDirectories\":\"" + countOfFiles  + "\""
                             + "}";
             list.add(record);
@@ -263,17 +266,16 @@ public class DLMetadata extends MetadataBase {
           List<String> filePathList = new ArrayList<String>();
           Queue<Path> fileQueue = new LinkedList<Path>();
           fileQueue.add(hdfsFilePath);
+          logger.trace("fileQueue.add : " + hdfsFilePath);
           while (!fileQueue.isEmpty()) {
             Path filePath = fileQueue.remove();
             if (fs.isDirectory(filePath)) {
+              logger.trace("listAllFilePath fs.isDirectory : " + filePath.toUri().toString());
               filePathList.add(filePath.toString());
-            } else {
-              FileStatus[] fileStatus = fs.listStatus(filePath);
-              for (FileStatus fileStat : fileStatus) {
-                fileQueue.add(fileStat.getPath());
-              }
-            }
+              logger.trace("filePathList.add : " + filePath.toUri().toString());
+            } 
           }
+          logger.trace("listAllFilePath filePathList : " + filePathList);
           return filePathList;
         }
 
