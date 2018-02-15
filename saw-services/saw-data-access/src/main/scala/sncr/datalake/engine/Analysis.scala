@@ -8,6 +8,7 @@ import java.util.concurrent.{ExecutorService, Executors, Future}
 import com.mapr.org.apache.hadoop.hbase.util.Bytes
 import files.HFileOperations;
 import org.slf4j.{Logger, LoggerFactory}
+import sncr.datalake.DLConfiguration
 import sncr.datalake.TimeLogger._
 import sncr.datalake.engine.ExecutionType.ExecutionType
 import sncr.metadata.analysis.{AnalysisNode, AnalysisResult}
@@ -44,7 +45,7 @@ class Analysis(val analysisId : String) {
     /* Send execution request to queue */
     queue(analysisId, resultId, sqlRuntime)
     /* Wait for analysis result node to appear */
-    waitForResult(resultId)
+    waitForResult(resultId,DLConfiguration.waitTime)
     /* Return analysis execution instance for compatibility with existing
      * interface */
     new AnalysisExecution(an, execType, resultId)
