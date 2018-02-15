@@ -1,52 +1,64 @@
+<!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" type="text/css" href="style.css"/>
     <title>Synchronoss Analytics Workbench</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+    <script src="links.js"></script>
   </head>
   <body>
     <h1>Synchronoss Analytics Workbench</h1>
     <table>
       <tbody>
         <tr>
-          <td><a href="http://localhost/web/">SAW Web</a></td>
+          <td><a href="" path="/web/">SAW Web</a></td>
           <td>SAW user interface</td>
         </tr>
         <tr>
-          <td><a href="http://localhost/services/">SAW Services</a></td>
+          <td><a href="" path="/services/">SAW Services</a></td>
           <td>SAW Services REST API</td>
         </tr>
         <tr>
-          <td><a href="http://localhost/security/">SAW Security</a></td>
+          <td><a href="" path="/security/">SAW Security</a></td>
           <td>SAW Security REST API</td>
         </tr>
       </tbody>
       <tbody>
         <tr>
-          <td><a href="https://localhost:18443/">MapR console</a></td>
+          <td><a href="" port="18443" protocol="https">MapR console</a></td>
           <td>MapR Control System (credentials: mapr/mapr)</td>
         </tr>
         <tr>
-          <td><a href="http://localhost:18080/">Spark master console</a></td>
+          <td><a href="" port="18088">YARN resource console</a></td>
+          <td>YARN resource manager console</td>
+        </tr>
+        <tr>
+          <td><a href="" port="18042">YARN node console</a></td>
+          <td>YARN node manager console</td>
+        </tr>
+        <tr>
+          <td><a href="" port="18080">Spark master console</a></td>
           <td>Spark standalone cluster master</td>
         </tr>
         <tr>
-          <td><a href="http://localhost:18081/">Spark worker console</a></td>
+          <td><a href="" port="18081">Spark worker console</a></td>
           <td>Spark standalone cluster worker</td>
         </tr>
-      </tbody>
-      <tbody>
         <tr>
-          <td><a href="http://localhost:15601/">Kibana console</a></td>
+          <td><a href="" port="18998">Livy console</a></td>
+          <td>Spark job REST API</td>
+        </tr>
+        <tr>
+          <td><a href="" port="15601">Kibana console</a></td>
           <td>Explore Elasticsearch data</td>
         </tr>
       </tbody>
       <tbody>
         <tr>
-          <td><a href="http://localhost:19531/">System logs</a></td>
+          <td><a href="" port="19531">System logs</a></td>
           <td>Apply filter to show SAW back-end services</td>
         </tr>
         <tr>
-          <td><a href="http://localhost:19531/entries">System logs</a></td>
+          <td><a href="" port="19531" path="/entries">System logs</a></td>
           <td>All system logs on single page</td>
         </tr>
     </table>
