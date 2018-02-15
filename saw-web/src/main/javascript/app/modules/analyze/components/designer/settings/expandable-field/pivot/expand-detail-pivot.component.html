@@ -20,11 +20,12 @@
   <div *ngIf="isDataField"
        fxLayout="row"
        fxLayoutAlign="start center">
-    <mat-form-field>
+    <mat-form-field (click)="openFormatDialog()">
       <input matInput
              type="text"
              placeholder="Format"
              disabled
+             style="cursor: pointer;"
              [value]="sample"/>
     </mat-form-field>
     <button mat-icon-button

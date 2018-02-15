@@ -33,7 +33,7 @@
   </div>
 
   <div fxLayout="column">
-    <div>
+    <div *ngIf="isFloat">
       <mat-form-field>
         <input matInput
                type="number"
@@ -41,13 +41,14 @@
                min="0"
                placeholder="Decimal Precision"
                (input)="onPrecisionChange($event.data)"
-               [value]="isNumber(format.precision) ? format.precision : ''"/>
+               [value]="format.precision"/>
       </mat-form-field>
     </div>
 
     <div>
       <mat-form-field>
         <input matInput
+               placeholder="Format"
                type="text"
                disabled
                [value]="sample"/>

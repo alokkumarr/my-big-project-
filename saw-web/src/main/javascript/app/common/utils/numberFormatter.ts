@@ -67,3 +67,16 @@ export function applyCurrencyIfNeeded(format, numberString) {
   }
   return numberString;
 }
+
+export function isFormatted(format: Format) {
+  if (format.comma) {
+    return true;
+  }
+  if (format.currency) {
+    return true;
+  }
+  if (format.precision) {
+    return true;
+  }
+  return false;
+}

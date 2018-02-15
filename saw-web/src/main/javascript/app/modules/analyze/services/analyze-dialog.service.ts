@@ -10,7 +10,8 @@ import {
   Filter,
   IToolbarActionData,
   ArtifactColumns,
-  Artifact
+  Artifact,
+  Format
 } from '../types';
 import { DesignerDialogComponent } from '../components/designer/dialog';
 import { ToolbarActionDialogComponent } from '../components/designer/toolbar-action-dialog';
@@ -99,12 +100,13 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openFormatDialog(format) {
+  openFormatDialog(format: Format, type) {
     return this.dialog.open(DataFormatDialogComponent, {
       width: 'auto',
       height: 'auto',
       data: {
-        format
+        format,
+        type
       }
     } as MatDialogConfig)
   }
