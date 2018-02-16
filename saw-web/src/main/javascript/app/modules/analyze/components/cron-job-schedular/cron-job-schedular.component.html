@@ -1,8 +1,8 @@
 <div class="tab">
-  <button class="tablinks" (click)="openSchedule(event, 'daily')">Daily</button>
-  <button class="tablinks" (click)="openSchedule(event, 'weeklybasis')">Weekly</button>
-  <button class="tablinks" (click)="openSchedule(event, 'monthly')">Monthly</button>
-  <button class="tablinks" (click)="openSchedule(event, 'yearly')">Yearly</button>
+  <button class="tablinks" (click)="openSchedule(event, 'daily')" [ngClass]="{'active': scheduleType == 'daily'}">Daily</button>
+  <button class="tablinks" (click)="openSchedule(event, 'weeklybasis')" [ngClass]="{'active': scheduleType == 'weeklybasis'}">Weekly</button>
+  <button class="tablinks" (click)="openSchedule(event, 'monthly')" [ngClass]="{'active': scheduleType == 'monthly'}">Monthly</button>
+  <button class="tablinks" (click)="openSchedule(event, 'yearly')" [ngClass]="{'active': scheduleType == 'yearly'}">Yearly</button>
 </div>
 
 <div *ngIf="scheduleType == 'daily'" [ngClass]="{'scheduleType': selectedItem == 'daily'}" class="tabcontent">
@@ -41,7 +41,7 @@
         {{day}}
       </mat-option>
     </mat-select> st Day of every 
-    <mat-select placeholder="Days" [(ngModel)]="monthly.specificMonth" (selectionChange)="regenerateCron()">
+    <mat-select placeholder="Month" [(ngModel)]="monthly.specificMonth" (selectionChange)="regenerateCron()">
       <mat-option *ngFor="let month of months" [value]="month">
         {{month}}
       </mat-option>
