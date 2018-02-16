@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import sncr.xdf.context.Context;
 import sncr.bda.conf.Parameter;
@@ -92,8 +93,13 @@ public abstract class Component {
                 WithDataSetService mddl = (WithDataSetService) this;
                 if (ctx.componentConfiguration.getInputs() != null &&
                         ctx.componentConfiguration.getInputs().size() > 0) {
-                    inputDataSets = mddl.resolveDataObjects(dsaux);
-                    inputs = mddl.resolveDataParameters(dsaux);
+                    logger.info("Extracting meta data");
+                    inputDataSets = mddl.resolveDataObjectsWithMetadata(dsaux);
+                    inputs = mddl.resolveDataParametersWithMetaData(dsaux);
+
+                    logger.debug("Input datasets = " + inputDataSets);
+                    logger.debug("Inputs = " + inputs);
+
                     mdInputDSMap = md.loadExistingDataSets(ctx, inputDataSets);
                     mdInputDSMap.forEach((id, ids) -> {
                         try {
@@ -197,13 +203,14 @@ public abstract class Component {
             return Init(configAsStr, appId, batchId, xdfDataRootSys);
         } catch(ParseException e){
             error = "Could not parse CMD line: " +  e.getMessage();
-            logger.error(e);
+            logger.error(ExceptionUtils.getStackTrace(e));
             return -1;
         } catch(XDFException e){
+            logger.error(ExceptionUtils.getStackTrace(e));
             return -1;
         } catch (Exception e) {
             error = "Exception at component initialization " +  e.getMessage();
-            logger.error( e);
+            logger.error(ExceptionUtils.getStackTrace(e));
             return -1;
         }
     }
@@ -234,8 +241,11 @@ public abstract class Component {
             return -1;
         }
 
+        logger.debug("Getting project metadata");
         ProjectStore prjStore = new ProjectStore(xdfDataRootSys);
         JsonElement prj = prjStore.readProjectData(appId);
+        logger.debug("Project metadata for " + appId + " is " + prj);
+
         JsonObject prjJo = prj.getAsJsonObject();
         JsonElement plp;
         List<Parameter> oldList = cfg.getParameters();

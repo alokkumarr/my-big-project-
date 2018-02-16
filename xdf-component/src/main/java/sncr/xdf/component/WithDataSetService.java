@@ -1,8 +1,12 @@
 package sncr.xdf.component;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.log4j.Logger;
+import org.json4s.jackson.Json;
 import sncr.bda.base.MetadataBase;
 import sncr.bda.conf.Input;
 import sncr.bda.conf.Output;
@@ -13,6 +17,8 @@ import sncr.xdf.context.Context;
 import sncr.xdf.core.file.DLDataSetOperations;
 import sncr.xdf.exceptions.XDFException;
 
+import javax.xml.crypto.Data;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,11 +39,21 @@ public interface WithDataSetService {
      * - indicates if it is Empty
      * - indicates if it is Exists
      * The method uses Input[n].Name attribute not Input[n].Object attribute.
-     * Use resolveDataObject to get Map with Data Object (Object names) as keys.
+     * Use resolveDataObjectWithInput to get Map with Data Object (Object names) as keys.
      */
-    default Map<String, Map<String, String>> resolveDataParameters(DataSetServiceAux aux) throws Exception {
+    default Map<String, Map<String, String>> resolveDataParametersWithInput(DataSetServiceAux aux) throws Exception {
         Map<String, Map<String, String>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
-        for (Input in: aux.ctx.componentConfiguration.getInputs()) retval.put(in.getName(), resolveDataObject(aux, in));
+        for (Input in: aux.ctx.componentConfiguration.getInputs()) retval.put(in.getName(), resolveDataObjectWithInput(aux, in));
+        return retval;
+    }
+
+    default Map<String, Map<String, String>> resolveDataParametersWithMetaData(DataSetServiceAux aux) throws Exception {
+        Map<String, Map<String, String>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
+        String project = aux.ctx.applicationID;
+        for (Input in: aux.ctx.componentConfiguration.getInputs()) {
+            retval.put(in.getName(), resolveDataObjectWithMetaData(aux, project, in.getName()));
+        }
+
         return retval;
     }
 
@@ -50,9 +66,21 @@ public interface WithDataSetService {
      * - indicates if it is Empty
      * - indicates if it is Exists ???
      */
-    default Map<String, Map<String, String>> resolveDataObjects(DataSetServiceAux aux) throws Exception {
+    default Map<String, Map<String, String>> resolveDataObjectsWithInput(DataSetServiceAux aux) throws Exception {
         Map<String, Map<String, String>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
-        for (Input in: aux.ctx.componentConfiguration.getInputs()) retval.put(in.getDataSet(), resolveDataObject(aux, in));
+        for (Input in: aux.ctx.componentConfiguration.getInputs())
+            retval.put(in.getDataSet(), resolveDataObjectWithInput(aux, in));
+        return retval;
+    }
+
+    default Map<String, Map<String, String>> resolveDataObjectsWithMetadata(DataSetServiceAux aux) throws Exception {
+        Map<String, Map<String, String>> retval = new HashMap<>(aux.ctx.componentConfiguration.getInputs().size());
+
+        String project = aux.ctx.applicationID;
+
+        for (Input in: aux.ctx.componentConfiguration.getInputs())
+            retval.put(in.getDataSet(), resolveDataObjectWithMetaData(aux, project,  in.getDataSet()));
+
         return retval;
     }
 
@@ -65,7 +93,7 @@ public interface WithDataSetService {
      * - indicates if it is Empty
      * - indicates if it is Exists ???
      */
-    default Map<String, String> resolveDataObject(DataSetServiceAux aux, Input in) throws Exception {
+    default Map<String, String> resolveDataObjectWithInput(DataSetServiceAux aux, Input in) throws Exception {
         String ds = ((in.getDatasource() != null)? in.getDatasource(): MetadataBase.DEFAULT_DATA_SOURCE);
         String prj = ((in.getProject() != null && !in.getProject().isEmpty())?
                 Path.SEPARATOR + in.getProject():
@@ -77,8 +105,8 @@ public interface WithDataSetService {
 
         if (in.getCatalog() != null && !in.getCatalog().isEmpty())
                 sb.append(Path.SEPARATOR + in.getCatalog());
-                sb
-                .append(Path.SEPARATOR + in.getDataSet())
+
+        sb.append(Path.SEPARATOR + in.getDataSet())
                 .append(Path.SEPARATOR + MetadataBase.PREDEF_DATA_DIR);
         DataSetServiceAux.logger.debug(String.format("Resolve object %s in location: %s", in.getDataSet(), sb.toString()));
         if (!HFileOperations.exists(sb.toString())){
@@ -102,6 +130,113 @@ public interface WithDataSetService {
             return res;
         }
 
+    }
+
+    default Map<String, String> resolveDataObjectWithMetaData(DataSetServiceAux aux, String projectName, String dataset) {
+        Map<String, String> metaDataMap = new HashMap<>();
+        DLDataSetService md = aux.md;
+
+        String datasetId = projectName + "::" + dataset;
+        try {
+            JsonElement element = md.getDSStore().read(datasetId);
+
+            if (element != null) {
+                if (((JsonObject)element).has(DataSetProperties.System.toString())) {
+                    JsonObject system = ((JsonObject)element).get(DataSetProperties.System.toString()).getAsJsonObject();
+
+                    String dataLakeRoot = aux.md.getRoot();
+
+                    String projectId = (system.has(DataSetProperties.Project.toString()))?
+                            system.get(DataSetProperties.Project.toString()).getAsString() : projectName;
+
+                    String dlDir = MetadataBase.PREDEF_DL_DIR;
+
+                    String dataSource = system.has(DataSetProperties.Type.toString()) ?
+                            system.get(DataSetProperties.Type.toString()).getAsString() : MetadataBase.DEFAULT_DATA_SOURCE;
+
+                    String catalog = system.has(DataSetProperties.Catalog.toString()) ?
+                            system.get(DataSetProperties.Catalog.toString()).getAsString() : "";
+
+                    String datasetName = system.has(DataSetProperties.Name.toString()) ?
+                            system.get(DataSetProperties.Name.toString()).getAsString() : dataset;
+
+                    String dataDir = MetadataBase.PREDEF_DATA_DIR;
+                    String format = system.has(DataSetProperties.Format.toString()) ?
+                            system.get(DataSetProperties.Format.toString()).getAsString() : null;
+
+                    //TODO: Not working
+//                    String location = Paths.get(dataLakeRoot, projectId, dlDir, dataSource, catalog, datasetName, dataDir).toString();
+
+                    String location = dataLakeRoot + Path.SEPARATOR + projectId + Path.SEPARATOR + dlDir
+                            + Path.SEPARATOR + dataSource + Path.SEPARATOR + catalog
+                            + Path.SEPARATOR + datasetName + Path.SEPARATOR + dataDir;
+
+                    DataSetServiceAux.logger.debug("Dataset location = " + location);
+
+                    if (!HFileOperations.exists(location)){
+                        //TODO:: Should we return Map with 'Exists::no' instead of throwing exception
+                        throw new XDFException(XDFException.ErrorCodes.InputDataObjectNotFound, dataset);
+                    }
+                    else{
+                        FileStatus[] fst = HFileOperations.getFilesStatus(location);
+                        boolean doEmpty = (fst == null && fst.length == 0);
+                        Map<String, String> res = new HashMap();
+                        res.put(DataSetProperties.PhysicalLocation.name(), location);
+                        res.put(DataSetProperties.Name.name(), datasetName);
+                        if (catalog != null && !catalog.isEmpty())
+                            res.put(DataSetProperties.Catalog.name(), catalog);
+                        res.put(DataSetProperties.Type.name(), dataSource);
+                        //TODO:: Get actual format reading data descriptor
+                        res.put(DataSetProperties.Format.name(), format);
+
+                        res.put(DataSetProperties.Exists.name(), String.valueOf(true));
+                        res.put(DataSetProperties.Empty.name(), String.valueOf(doEmpty));
+
+
+                        DataSetServiceAux.logger.debug("Result Map = " + res);
+                        return res;
+                    }
+
+                }
+                else {
+                    throw new XDFException(XDFException.ErrorCodes.InputDataObjectNotFound, dataset);
+                }
+            } else {
+                throw new XDFException(XDFException.ErrorCodes.InputDataObjectNotFound, dataset);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            DataSetServiceAux.logger.error(ExceptionUtils.getStackTrace(e));
+        }
+
+        return metaDataMap;
+    }
+
+    default Map<String, String> createDatasetMap(String physicalLocation, String datasetName, String catalog,
+                                                 boolean doEmpty, String dataSource, Input.Format format) {
+        Map<String, String> res = new HashMap();
+        res.put(DataSetProperties.PhysicalLocation.name(), physicalLocation);
+        res.put(DataSetProperties.Name.name(), datasetName);
+        if (catalog != null && !catalog.isEmpty())
+            res.put(DataSetProperties.Catalog.name(), catalog);
+        res.put(DataSetProperties.Type.name(), dataSource);
+        res.put(DataSetProperties.Format.name(), format.name());
+
+        res.put(DataSetProperties.Exists.name(), String.valueOf(true));
+        res.put(DataSetProperties.Empty.name(), String.valueOf(doEmpty));
+        return res;
+    }
+
+    default String getInfo(JsonElement metaData) {
+        JsonObject system = ((JsonObject)metaData).get(DataSetProperties.System.name()).getAsJsonObject();
+
+        String project = system.get(DataSetProperties.Project.toString()).getAsString();
+        String type = system.get(DataSetProperties.Type.toString()).getAsString();
+        String dataSetName = system.get(DataSetProperties.Name.toString()).getAsString();
+        String catalog = system.get(DataSetProperties.Catalog.toString()).getAsString();
+
+
+        return "";
     }
 
     default String generateTempLocation(DataSetServiceAux aux, String tempDS, String tempCatalog) {
