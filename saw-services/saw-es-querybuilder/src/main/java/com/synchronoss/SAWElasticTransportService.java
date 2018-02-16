@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.gson.Gson;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -205,7 +206,8 @@ public class SAWElasticTransportService {
         GlobalFilterResultParser globalFilterResultParser = new GlobalFilterResultParser(globalFilter);
         JsonNode jsonNode1 = jsonNode.get("global_filter_values");
        Map<String , Object> result = globalFilterResultParser.jsonNodeParser(jsonNode1);
-       result.put("esRepository",globalFilter.getEsRepository().toString());
-        return result.toString();
+       result.put("esRepository",globalFilter.getEsRepository());
+        Gson gson = new Gson();
+        return gson.toJson(result);
     }
 }
