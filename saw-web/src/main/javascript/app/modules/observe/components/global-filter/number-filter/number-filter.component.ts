@@ -34,8 +34,8 @@ export class GlobalNumberFilterComponent implements OnInit {
 
   loadMinMax() {
     this.observe.getModelValues(this._filter).subscribe(data => {
-      this.min = get(data, `${this._filter.columnName}_min.value`, this.min);
-      this.max = get(data, `${this._filter.columnName}_max.value`, this.max);
+      this.min = parseFloat(get(data, `_min`, this.min));
+      this.max = parseFloat(get(data, `_max`, this.max));
       this.value = [this.min, this.max];
       this.onSliderChange(this.value);
     });

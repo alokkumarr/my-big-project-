@@ -20,6 +20,13 @@
 
         <md-checkbox class="md-secondary"
                      ng-hide="::$ctrl.isRuntime"
+                     ng-model="filter.isGlobalFilter"
+                     ng-change="$ctrl.onGlobalToggle(filter)">
+          <span translate="GLOBAL_FILTER"></span>
+        </md-checkbox>
+
+        <md-checkbox class="md-secondary"
+                     ng-hide="::$ctrl.isRuntime"
                      ng-disabled="!filter.column.filterEligible"
                      ng-model="filter.isRuntimeFilter"
                      ng-change="$ctrl.onRuntimeToggle(filter)">

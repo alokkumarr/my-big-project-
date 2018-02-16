@@ -1,9 +1,12 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
+import { MatAutocompleteTrigger } from '@angular/material/autocomplete'
 import { FormControl } from '@angular/forms';
 
 import { Observable } from 'rxjs/Observable';
 import { startWith } from 'rxjs/operators/startWith';
 import { map } from 'rxjs/operators/map';
+
+import { ObserveService } from '../../../services/observe.service';
 
 const template = require('./string-filter.component.html');
 
@@ -14,17 +17,16 @@ const template = require('./string-filter.component.html');
 
 export class GlobalStringFilterComponent implements OnInit {
   @Output() onModelChange = new EventEmitter();
+  @ViewChild(MatAutocompleteTrigger) trigger: MatAutocompleteTrigger;
 
   filterCtrl: FormControl;
   private _filter;
   private value: Array<string>;
-  private suggestions = [
-    'Text 1',
-    'Text 2',
-    'Text 3'
-  ];
+  private suggestions = [];
   private filteredSuggestions: Observable<any[]>;
-  constructor() {
+  constructor(
+    private observe: ObserveService
+  ) {
     this.filterCtrl = new FormControl();
     this.filteredSuggestions = this.filterCtrl.valueChanges.pipe(
       startWith(''),
@@ -32,11 +34,13 @@ export class GlobalStringFilterComponent implements OnInit {
     );
   }
 
-  ngOnInit() { }
+  ngOnInit() {
+  }
 
   @Input() set filter(data) {
     this._filter = data;
 
+    this.loadSuggestions();
     this.value = [];
   }
 
@@ -46,6 +50,12 @@ export class GlobalStringFilterComponent implements OnInit {
       this.filterCtrl.setValue('');
       this.filterChanged();
     }
+  }
+
+  loadSuggestions() {
+    this.observe.getModelValues(this._filter).subscribe((data: Array<string>) => {
+      this.suggestions = data;
+    });
   }
 
   filterSuggestions(str: string) {

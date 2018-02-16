@@ -77,7 +77,7 @@ export class ObserveService {
       }]
     };
 
-    return this.http.post(`${this.api}/filters` , payload).map(fpGet('global_filter_values'));
+    return this.http.post(`${this.api}/filters` , payload).map(fpGet(filter.columnName));
   }
 
   reloadMenu() {
