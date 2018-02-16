@@ -71,7 +71,7 @@ public class EsRepository {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("storageType", storageType).append("indexName", indexName).append("type", type).append("additionalProperties", additionalProperties).toString();
+        return new ToStringBuilder(this).append("storageType", storageType).append("indexName", indexName).append("type", type).toString();
     }
 
     @Override
