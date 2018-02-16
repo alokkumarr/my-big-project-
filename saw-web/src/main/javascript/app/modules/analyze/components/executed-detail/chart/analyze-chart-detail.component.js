@@ -68,17 +68,18 @@ export const AnalyzeChartDetailComponent = {
           map(this.sorts, 'order')
         );
       }
-      const changes = this._ChartService.dataToChangeConfig(
+
+      let changes = this._ChartService.dataToChangeConfig(
         this.analysis.chartType,
         this.settings,
         this.filteredData,
         {labels: this.labels, labelOptions: this.analysis.labelOptions, sorts: this.sorts}
       );
 
-      changes.push({
-        path: 'chart.inverted',
-        data: this.analysis.isInverted
-      });
+      changes = changes.concat([
+        {path: 'title.text', data: this.analysis.name},
+        {path: 'chart.inverted', data: this.analysis.isInverted}
+      ]);
 
       this.chartUpdater.next(changes);
     }

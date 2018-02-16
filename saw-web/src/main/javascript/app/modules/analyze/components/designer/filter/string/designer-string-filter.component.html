@@ -1,4 +1,22 @@
-<mat-form-field>
+<div fxLayout="row" fxLayoutAlign="space-between center">
+  <mat-form-field>
+    <mat-select placeholder="OPERATOR"
+                e2e="filter-number-select"
+                (selectionChange)="onPresetSelected($event.value)"
+                [value]="filterModel.operator">
+      <mat-option *ngFor="let OPERATOR of OPERATORS"
+                  [value]="OPERATOR.value"
+                  [e2e]="'filter-number-option-' + OPERATOR.label">
+        {{ OPERATOR.label }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field *ngIf="filterModel.operator === 'EQ' || filterModel.operator === 'NEQ' || filterModel.operator === 'CONTAINS' || filterModel.operator === 'SW' || filterModel.operator === 'EW'">
+    <input matInput (input)="onValueChange($event.target.value)"
+            [value]="tempValue"/>
+  </mat-form-field>
+</div>
+<mat-form-field *ngIf="filterModel.operator === 'ISIN' || filterModel.operator === 'ISNOTIN'">
   <mat-chip-list #chipList>
     <mat-chip *ngFor="let value of filterModel.modelValues; let i = index; trackBy: index"
              [removable]="true" (remove)="remove(i)">
