@@ -16,7 +16,7 @@ import java.util.*;
         private final static String BUCKETS = "buckets";
         private final static String VALUE = "value";
         private final static String _MIN = "_min";
-        private final static String _MAX = "_MAX";
+        private final static String _MAX = "_max";
 
         private GlobalFilter globalFilter;
 
@@ -83,7 +83,7 @@ import java.util.*;
                 // This is used to parse range value
                     Map<String,String> rangeValue = new HashMap<>();
                     JsonNode fieldMinValue = jsonNode.get(filter.getColumnName()+_MIN);
-                    JsonNode fieldMaxValue = jsonNode.get(filter.getColumnName()+_MIN);
+                    JsonNode fieldMaxValue = jsonNode.get(filter.getColumnName()+_MAX);
                     rangeValue.put(_MIN,String.valueOf(fieldMinValue.get(VALUE)));
                     rangeValue.put(_MAX,String.valueOf(fieldMaxValue.get(VALUE)));
                     dataObj.put(filter.getColumnName(),rangeValue);
