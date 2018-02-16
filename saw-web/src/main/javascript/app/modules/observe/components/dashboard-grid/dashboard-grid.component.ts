@@ -6,7 +6,7 @@ import {
   Output,
   ViewChild,
   EventEmitter,
-  AfterViewChecked,
+  AfterViewInit,
   OnInit,
   OnChanges,
   OnDestroy
@@ -40,7 +40,7 @@ export const DASHBOARD_MODES = {
   selector: 'dashboard-grid',
   template
 })
-export class DashboardGridComponent implements OnInit, OnChanges, AfterViewChecked, OnDestroy {
+export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @ViewChild('gridster') gridster: GridsterComponent;
 
   @Input() model: Dashboard;
@@ -84,8 +84,8 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewCheck
     };
   }
 
-  ngAfterViewChecked() {
-    setTimeout(_ => this.initialiseDashboard());
+  ngAfterViewInit() {
+    setTimeout(_ => this.initialiseDashboard(), 100);
   }
 
   ngOnChanges() {

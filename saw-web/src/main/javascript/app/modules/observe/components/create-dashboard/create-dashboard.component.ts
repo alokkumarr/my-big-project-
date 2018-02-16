@@ -1,6 +1,6 @@
 declare const require: any;
 
-import { Component, Inject, ViewChild, ChangeDetectionStrategy} from '@angular/core';
+import { Component, Inject, ViewChild } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialog } from '@angular/material';
 import { UIRouter } from '@uirouter/angular';
 import { SaveDashboardComponent } from '../save-dashboard/save-dashboard.component';
@@ -32,7 +32,6 @@ const MARGIN_BETWEEN_TILES = 10;
 @Component({
   selector: 'create-dashboard',
   template,
-  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('moveButton', [
       state('empty', style({
