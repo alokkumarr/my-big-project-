@@ -171,10 +171,17 @@ field mapping].
 
 # Rendering documentation
 
-Documentation in the [saw-dist/src/main/asciidoc] directory is
-automatically rendered as part of the project build process.  To
-render the documentation without running other parts of the project
-build, execute the following command:
+Documentation that describes the SAW implementation and design is
+stored in version control together with the source code (not in
+Confluence).  This is required for a number of reasons, including to
+ensure that the documentation accurately reflects the implementation
+taking into account different versions and branches of the product.
+
+The documentation source files are located in the
+[saw-dist/src/main/asciidoc] directory and are automatically rendered
+as part of the project build process.  To render the documentation
+without running other parts of the project build, execute the
+following command:
 
         $ mvn -pl saw-dist asciidoctor:process-asciidoc -Dasciidoctor.backend=html
 

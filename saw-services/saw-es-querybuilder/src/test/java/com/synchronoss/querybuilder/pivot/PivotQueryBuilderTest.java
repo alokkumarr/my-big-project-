@@ -95,7 +95,8 @@ public class PivotQueryBuilderTest {
     .setQuery(sawElasticSearchQueryBuilder.getSearchSourceBuilder(EntityType.PIVOT, jsonString).query()).execute().actionGet();
     Assert.assertTrue(response.status().equals(RestStatus.OK));
   }
-  
+
+  // ISIN query
   @Test
   public void queryWith3RowFields() {
     ClassLoader classLoader = getClass().getClassLoader();
