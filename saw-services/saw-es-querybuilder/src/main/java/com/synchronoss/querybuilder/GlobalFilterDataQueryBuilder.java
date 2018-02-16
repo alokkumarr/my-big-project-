@@ -79,6 +79,7 @@ public class GlobalFilterDataQueryBuilder {
             searchSourceBuilder.query(boolQueryBuilder);
             globalFilterExecutionObject.setEsRepository(globalFilter.getEsRepository());
             globalFilterExecutionObject.setSearchSourceBuilder(searchSourceBuilder);
+            globalFilterExecutionObject.setGlobalFilter(globalFilter);
             executionObjectList.add(globalFilterExecutionObject);
         }
         return executionObjectList;

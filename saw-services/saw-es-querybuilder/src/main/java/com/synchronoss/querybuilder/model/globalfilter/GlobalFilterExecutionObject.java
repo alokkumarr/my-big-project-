@@ -15,6 +15,11 @@ public class GlobalFilterExecutionObject {
     private SearchSourceBuilder searchSourceBuilder;
 
     /**
+     *
+     */
+    private GlobalFilter globalFilter;
+
+    /**
      * Gets esRepository
      *
      * @return value of esRepository
@@ -44,5 +49,21 @@ public class GlobalFilterExecutionObject {
      */
     public void setSearchSourceBuilder(SearchSourceBuilder searchSourceBuilder) {
         this.searchSourceBuilder = searchSourceBuilder;
+    }
+
+    /**
+     * Gets globalFilter
+     *
+     * @return value of globalFilter
+     */
+    public GlobalFilter getGlobalFilter() {
+        return globalFilter;
+    }
+
+    /**
+     * Sets globalFilter
+     */
+    public void setGlobalFilter(GlobalFilter globalFilter) {
+        this.globalFilter = globalFilter;
     }
 }

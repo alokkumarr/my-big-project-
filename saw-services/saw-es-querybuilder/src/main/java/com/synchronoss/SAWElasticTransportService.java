@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -17,6 +18,7 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
+import com.synchronoss.querybuilder.model.globalfilter.GlobalFilter;
 import com.synchronoss.querybuilder.model.globalfilter.GlobalFilterExecutionObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -196,6 +198,14 @@ public class SAWElasticTransportService {
             throw new NullPointerException("Data is not available based on provided query criteria");
         }
         JsonNode finalResponse = objectMapper.readTree(esResponse.get("data").toString());
-       return finalResponse.get("aggregations").toString();
+        return buildGlobalFilterData(finalResponse.get("aggregations"),executionObject.getGlobalFilter());
+    }
+    private static String buildGlobalFilterData(JsonNode jsonNode, GlobalFilter globalFilter)
+    {
+        GlobalFilterResultParser globalFilterResultParser = new GlobalFilterResultParser(globalFilter);
+        JsonNode jsonNode1 = jsonNode.get("global_filter_values");
+       Map<String , Object> result = globalFilterResultParser.jsonNodeParser(jsonNode1);
+       result.put("esRepository",globalFilter.getEsRepository().toString());
+        return result.toString();
     }
 }
