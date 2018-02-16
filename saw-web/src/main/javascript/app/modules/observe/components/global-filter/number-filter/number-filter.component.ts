@@ -1,4 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { ObserveService } from '../../../services/observe.service';
+
+import * as get from 'lodash/get';
 
 const template = require('./number-filter.component.html');
 
@@ -15,14 +18,27 @@ export class GlobalNumberFilterComponent implements OnInit {
   private min = 1;
   private step = 1;
   private value: Array<number>;
-  constructor() { }
+  private config = {
+    tooltips: true
+  };
+  constructor(private observe: ObserveService) { }
 
   ngOnInit() { }
 
   @Input() set filter(data) {
     this._filter = data;
 
+    this.loadMinMax();
     this.value = [this.min, this.max];
+  }
+
+  loadMinMax() {
+    this.observe.getModelValues(this._filter).subscribe(data => {
+      this.min = get(data, `${this._filter.columnName}_min.value`, this.min);
+      this.max = get(data, `${this._filter.columnName}_max.value`, this.max);
+      this.value = [this.min, this.max];
+      this.onSliderChange(this.value);
+    });
   }
 
   onSliderChange(data) {

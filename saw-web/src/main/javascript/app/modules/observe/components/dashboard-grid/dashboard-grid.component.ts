@@ -159,7 +159,10 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
     if(this.mode === DASHBOARD_MODES.VIEW) {
       const filters = get(analysis, 'sqlBuilder.filters', []);
 
-      this.filters.addFilter(map(filters, flt => ({...flt, ...{semanticId: analysis.semanticId}})));
+      this.filters.addFilter(map(filters, flt => ({...flt, ...{
+        semanticId: analysis.semanticId,
+        esRepository: analysis.esRepository
+      }})));
     }
   }
 

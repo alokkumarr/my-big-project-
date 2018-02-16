@@ -48,6 +48,10 @@ global-filter {
     }
   }
 
+  g-number-filter {
+    padding: 30px 0 0;
+  }
+
   nouislider {
     width: calc(100% - #{$range-handle-dimension});
   }

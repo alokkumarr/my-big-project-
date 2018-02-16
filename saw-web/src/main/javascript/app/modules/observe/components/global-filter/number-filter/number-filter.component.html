@@ -2,5 +2,6 @@
   [min]="min"
   [max]="max"
   [step]="1"
-  [ngModel]="value"
+  [(ngModel)]="value"
+  [config]="config"
   (ngModelChange)="onSliderChange($event)"></nouislider>
