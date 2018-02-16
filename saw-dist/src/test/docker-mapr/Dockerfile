@@ -11,6 +11,12 @@ RUN sed -i -e '/tsflags=nodocs/d' /etc/yum.conf
 # information.  So disable installing these packages by default for
 # now, as they are anyway optional.
 #RUN yum -y -q --nogpgcheck install lsof smem
+RUN yum -y -q --nogpgcheck install sudo
+
+#
+# Install YARN
+#
+RUN yum -y -q install mapr-resourcemanager mapr-nodemanager
 
 #
 # Install Spark
@@ -37,6 +43,18 @@ RUN sed -i -e '/^export SPARK_MASTER_[A-Z]*=localhost$/d' \
     -e 's/export SPARK_WORKER_MEMORY=16g/export SPARK_WORKER_MEMORY=1g/' \
     /opt/mapr/spark/spark-current/conf/spark-env.sh
 
+#
+# Install Livy
+#
+RUN yum -y -q install mapr-hue-livy
+RUN echo "livy.spark.master = yarn" \
+    >> /opt/mapr/hue-livy/hue-livy-3.12.0/conf/livy.conf
+RUN sed -i -e '/^spark.master$/d' \
+    /opt/mapr/hue-livy/hue-livy-3.12.0/conf/spark-blacklist.conf
+# Workaround: Livy won't start due to root owning the logs directory,
+# so change the owner to the "mapr" user
+RUN chown mapr:mapr /opt/mapr/hue-livy/hue-livy-3.12.0/logs
+
 # Add MapR container initialization script
 COPY saw-mapr-init /root/
 RUN sed -i -e 's,while true,/root/saw-mapr-init\nwhile true,' \
@@ -56,4 +74,4 @@ RUN sed -i -e 's/20G/10G/' -e '2imkdir -p /mapr-data' \
     -e 's,/opt/mapr/docker.disk,/mapr-data/docker.disk,g' /usr/bin/init-script
 
 # Add health check to be used by Docker Maven plug-in
-HEALTHCHECK --interval=5s CMD test -e /saw-mapr-init-done && hadoop fs -ls /
+HEALTHCHECK --interval=5s CMD test -e /saw-mapr-init-done
