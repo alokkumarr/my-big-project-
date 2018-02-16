@@ -14,19 +14,57 @@ export class CronJobSchedularComponent {
   public state: any;
   public model: any;
   @Input() public model: any;
+  @Input() public cronexp: any;
 
   ngOnInit() {
-  	this.model = {
+    console.log(this.cronexp);
+  	this.dailyTypeDay = {
+  	  hour: '',
+  	  minute: '',
+  	  second: '',
+  	  hourType: ''
+  	};
+  	this.dailyTypeWeek = {
+  	  hour: '',
+  	  minute: '',
+  	  second: '',
+  	  hourType: ''
+  	};
+  	this.weeklybasisDate = {
   	  hour: '',
   	  minute: '',
   	  second: '',
   	  hourType: ''
   	}
+  	this.specificDayMonth = {
+  	  hour: '',
+  	  minute: '',
+  	  second: '',
+  	  hourType: '' 
+  	}
+  	this.specificWeekDayMonth = {
+  	  hour: '',
+  	  minute: '',
+  	  second: '',
+  	  hourType: ''
+  	}
+  	this.specificMonthDayYear = {
+  	  hour: '',
+  	  minute: '',
+  	  second: '',
+  	  hourType: ''
+  	}
+  	this.specificMonthWeekYear = {
+  	  hour: '',
+  	  minute: '',
+  	  second: '',
+  	  hourType: ''
+  	}
+  	this.model = {}
   	this.daily = {};
   	this.weekly = {};
   	this.monthly = {};
   	this.yearly = {};
-  	this.scheduleType = 'daily';
     this.days = this.range(0, 31);
     this.months = this.range(1,12);
     this.weeks = [{
@@ -93,11 +131,16 @@ export class CronJobSchedularComponent {
     return Array.apply(undefined, Array(length)).map((_, i) => i + start);
   }
 
+  resetData() {
+    this.ngOnInit();
+  }
+
   openSchedule(event, scheduleType) {
+    this.resetData();
   	this.scheduleType = scheduleType;
   }
 
-  onDateChange() {    
+  onDateChange() {
     this.regenerateCron();
   }
 
@@ -106,15 +149,14 @@ export class CronJobSchedularComponent {
   }
 
   regenerateCron() {
-    console.log(this.yearly.yearlyType);
     switch (this.scheduleType) {
     case 'daily':
       switch (this.daily.dailyType) {
       case 'everyDay':
-        this.cronExp = `${this.model.second} ${this.model.minute} ${this.hourToCron(this.model.hour, this.model.hourType)} 1/${this.daily.days} * ? *`;
+        this.cronexp = `${this.dailyTypeDay.second} ${this.dailyTypeDay.minute} ${this.hourToCron(this.dailyTypeDay.hour, this.dailyTypeDay.hourType)} 1/${this.daily.days} * ? *`;
         break;
       case 'everyWeek':
-        this.cronExp = `${this.model.second} ${this.model.minute} ${this.hourToCron(this.model.hour, this.model.hourType)} ? * MON-FRI *`;
+        this.cronexp = `${this.dailyTypeWeek.second} ${this.dailyTypeWeek.minute} ${this.hourToCron(this.dailyTypeWeek.hour, this.dailyTypeWeek.hourType)} ? * MON-FRI *`;
         break;
       default:
         throw 'Invalid cron daily subtab selection';
@@ -124,16 +166,15 @@ export class CronJobSchedularComponent {
       const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
           .reduce((acc, day) => this.weekly[day] ? acc.concat([day]) : acc, [])
           .join(',');
-      this.cronExp = `${this.model.second} ${this.model.minute} ${this.hourToCron(this.model.hour, this.model.hourType)} ? * ${days} *`;
-      console.log(days);
+      this.cronexp = `${this.weeklybasisDate.second} ${this.weeklybasisDate.minute} ${this.hourToCron(this.weeklybasisDate.hour, this.weeklybasisDate.hourType)} ? * ${days} *`;
       break;
     case 'monthly':
       switch (this.monthly.monthlyType) {
       case 'specificDay':
-        this.cronExp = `${this.model.second} ${this.model.minute} ${this.hourToCron(this.model.hour, this.model.hourType)} ${this.monthly.specificDay} 1/${this.monthly.specificMonth} ? *`;
+        this.cronexp = `${this.specificDayMonth.second} ${this.specificDayMonth.minute} ${this.hourToCron(this.specificDayMonth.hour, this.specificDayMonth.hourType)} ${this.monthly.specificDay} 1/${this.monthly.specificMonth} ? *`;
         break;
       case 'specificWeekDay':
-        this.cronExp = `${this.model.second} ${this.model.minute} ${this.hourToCron(this.model.hour, this.model.hourType)} ? 1/${this.monthly.specificWeekDayMonthWeek} ${this.monthly.specificWeekDayDay}${this.monthly.specificWeekDayMonth} *`;
+        this.cronexp = `${this.specificWeekDayMonth.second} ${this.specificWeekDayMonth.minute} ${this.hourToCron(this.specificWeekDayMonth.hour, this.specificWeekDayMonth.hourType)} ? 1/${this.monthly.specificWeekDayMonthWeek} ${this.monthly.specificWeekDayDay}${this.monthly.specificWeekDayMonth} *`;
         break;
       default:
         throw 'Invalid cron monthly subtab selection';
@@ -142,10 +183,10 @@ export class CronJobSchedularComponent {
     case 'yearly':
       switch (this.yearly.yearlyType) {
       case 'specificMonthDay':
-        this.cronExp = `${this.model.second} ${this.model.minute} ${this.hourToCron(this.model.hour, this.model.hourType)} ${this.yearly.specificMonthDayDay} ${this.yearly.specificMonthDayMonth} ? *`;
+        this.cronexp = `${this.specificMonthDayYear.second} ${this.specificMonthDayYear.minute} ${this.hourToCron(this.specificMonthDayYear.hour, this.specificMonthDayYear.hourType)} ${this.yearly.specificMonthDayDay} ${this.yearly.specificMonthDayMonth} ? *`;
         break;
       case 'specificMonthWeek':
-        this.cronExp = `${this.model.second} ${this.model.minute} ${this.hourToCron(this.model.hour, this.model.hourType)} ? ${this.yearly.specificMonthWeekMonth} ${this.yearly.specificMonthWeekDay}${this.yearly.specificMonthWeekMonthWeek} *`;
+        this.cronexp = `${this.specificMonthWeekYear.second} ${this.specificMonthWeekYear.minute} ${this.hourToCron(this.specificMonthWeekYear.hour, this.specificMonthWeekYear.hourType)} ? ${this.yearly.specificMonthWeekMonth} ${this.yearly.specificMonthWeekDay}${this.yearly.specificMonthWeekMonthWeek} *`;
         break;
       default:
         throw 'Invalid cron yearly subtab selection';
@@ -154,7 +195,7 @@ export class CronJobSchedularComponent {
     default:
       console.log('wrong selection');
     }
-    console.log(this.cronExp);
+    console.log(this.cronexp);
   }
 }
 

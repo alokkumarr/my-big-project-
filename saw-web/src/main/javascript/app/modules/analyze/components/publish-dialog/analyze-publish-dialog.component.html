@@ -27,12 +27,10 @@
           <span translate="SET_SCHEDULE_LABEL"></span>
         </md-checkbox>
       </div>
-      <cron-job-schedular> 
-
-      </cron-job-schedular>
 
       <div ng-show="$ctrl.hasSchedule" class="schedule-container" layout="column">
-        <div layout="row" class="form-container">
+        <cron-job-schedular cronexp="$ctrl.cronexp"></cron-job-schedular>
+        <!-- <div layout="row" class="form-container">
 
           <label translate="REPEAT_EVERY" flex="20"></label>
 
@@ -49,9 +47,9 @@
                        ng-value="repeatInterval">
             </md-option>
           </md-select>
-        </div>
+        </div> -->
 
-        <div ng-if="$ctrl.repeatInterval === $ctrl.repeatIntervals[1]" class="form-container" layout="row">
+        <!-- <div ng-if="$ctrl.repeatInterval === $ctrl.repeatIntervals[1]" class="form-container" layout="row">
           <label translate="REPEAT_ON" flex="20"></label>
           <div class="days-of-week-checkboxes" flex="80">
             <md-checkbox ng-repeat="day in $ctrl.repeatOnDaysOfWeek track by day.keyword"
@@ -60,7 +58,7 @@
               <span ng-bind="day.keyword | translate | truncate:2"></span>
             </md-checkbox>
           </div>
-        </div>
+        </div> -->
 
         <div class="form-container" layout="column">
           <label translate="EMAIL_TO_COPY"></label>
