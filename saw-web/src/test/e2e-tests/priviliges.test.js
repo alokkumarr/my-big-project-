@@ -366,7 +366,7 @@ describe('Privileges tests: privileges.test.js', () => {
         expect(executedAnalysis.forkBtn.isDisplayed()).toBe(data.fork,
           "Fork button expected to be " + data.fork + " in view mode, but was " + !data.fork);
         expect(executedAnalysis.publishBtn.isDisplayed()).toBe(data.publish,
-          "Publish button expected to be " + data.publish + " in view mode, but was" + !data.publish);
+          "Publish button expected to be " + data.publish + " in view mode, but was " + !data.publish);
 
         // Validate menu in analysis
         element(executedAnalysis.actionsMenuBtn.isDisplayed().then(function (isVisible) {
@@ -377,21 +377,21 @@ describe('Privileges tests: privileges.test.js', () => {
         // Validate menu items under menu button
         if (data.viewOptions === true) {
 
-          executedAnalysis.actionsMenuBtn.click();
+          commonFunctions.waitFor.elementToBeClickableAndClick(executedAnalysis.actionsMenuBtn);
 
           element(executedAnalysis.executeMenuOption.isPresent().then(function (isVisible) {
             expect(isVisible).toBe(data.execute,
-              "Execute button expected to be " + data.execute + " in view mode, but was" + !data.execute);
+              "Execute button expected to be " + data.execute + " in view mode, but was " + !data.execute);
           }));
 
           element(executedAnalysis.exportMenuOption.isPresent().then(function (isVisible) {
             expect(isVisible).toBe(data.export,
-              "Export button expected to be " + data.export + " in view mode, but was" + !data.export);
+              "Export button expected to be " + data.export + " in view mode, but was " + !data.export);
           }));
 
           element(executedAnalysis.deleteMenuOption.isPresent().then(function (isVisible) {
             expect(isVisible).toBe(data.delete,
-              "Delete button expected to be " + data.delete + " in view mode, but was" + !data.delete);
+              "Delete button expected to be " + data.delete + " in view mode, but was " + !data.delete);
           }));
         }
       }
@@ -404,8 +404,7 @@ describe('Privileges tests: privileges.test.js', () => {
 
     // Navigates to specific category where analysis view should happen
     const navigateToDefaultSubCategory = () => {
-      const subCategory = homePage.subCategory(data.subCategory);
-      commonFunctions.waitFor.elementToBeClickableAndClick(subCategory);
+      commonFunctions.waitFor.elementToBeClickableAndClick(homePage.subCategory(data.subCategory));
     };
   });
 });

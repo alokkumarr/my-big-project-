@@ -33,13 +33,13 @@ const fluentWait = webpackHelper.distRun() ? 600000 : 10000;
  */
 const defaultTimeoutInterval = webpackHelper.distRun() ? 600000 : 10000;
 // = 30 | 5 min. Sometimes test can execute for a long time
-const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 1800000 : 300000;
+const extendedDefaultTimeoutInterval = webpackHelper.distRun() ? 1800000 : 600000;
 
 /**
  * Fixes error: Timed out waiting for asynchronous Angular tasks to finish after n seconds;
  * If fluentWait is happening more than this timeout it will throw an error like "element is not clickable"
  */
-const allScriptsTimeout = webpackHelper.distRun() ? 600000 : 200000;
+const allScriptsTimeout = webpackHelper.distRun() ? 600000 : 600000;
 
 /**
  * Waits ms after page is loaded
@@ -138,7 +138,7 @@ exports.config = {
       //webpackHelper.root(testDir + '/e2e-tests/debug.test.js') // for testing purposes
     ],
     authentication: [
-      webpackHelper.root(testDir + '/e2e-tests/login.test.js')
+      //webpackHelper.root(testDir + '/e2e-tests/login.test.js')
     ]
   },
   onPrepare() {

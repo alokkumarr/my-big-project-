@@ -19,6 +19,11 @@ module.exports = {
       browser.wait(EC.elementToBeClickable(element), fluentWait, "Element \"" + element.locator() + "\" is not clickable");
       element.click();
     },
+    //Eliminates error: is not clickable at point
+    elementToBeClickableAndClickByMouseMove: element => {
+      browser.wait(EC.elementToBeClickable(element), fluentWait, "Element \"" + element.locator() + "\" is not clickable");
+      browser.actions().mouseMove(element).click().perform();
+    },
     // Possible options: /analyze/ , /login/
     pageToBeReady: pageName => {
       return browser.driver.wait(() => {

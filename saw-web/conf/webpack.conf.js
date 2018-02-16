@@ -194,7 +194,7 @@ module.exports = function (env) {
     }));
 
     conf.devServer = {
-      port: 3000,
+      port: 3001,
       host: 'localhost',
       historyApiFallback: true,
       watchOptions: {
