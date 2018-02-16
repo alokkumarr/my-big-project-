@@ -75,7 +75,7 @@ export class ExpandDetailPivotComponent {
   }
 
   openFormatDialog() {
-    this._analyzeDialogService.openFormatDialog(this.artifactColumn.format, this.artifactColumn.type)
+    this._analyzeDialogService.openDataFormatDialog(this.artifactColumn.format, this.artifactColumn.type)
       .afterClosed().subscribe(format => this.onFormatChange(format));
   }
 

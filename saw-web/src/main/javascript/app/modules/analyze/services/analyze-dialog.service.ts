@@ -100,7 +100,7 @@ export class AnalyzeDialogService {
     } as MatDialogConfig);
   }
 
-  openFormatDialog(format: Format, type) {
+  openDataFormatDialog(format: Format, type) {
     return this.dialog.open(DataFormatDialogComponent, {
       width: 'auto',
       height: 'auto',

@@ -84,9 +84,9 @@ export class DataFormatDialogComponent {
     // if there is no symbol for the code, just return the code
     const symbol = getCurrencySymbol(code);
     if (trim(symbol)) {
-      return code;
+      return symbol;
     }
-    return symbol;
+    return code;
   }
 
   onPrecisionChange(precision) {

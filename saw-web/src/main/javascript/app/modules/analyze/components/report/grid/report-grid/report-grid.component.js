@@ -10,11 +10,12 @@ import 'moment-timezone';
 
 import * as template from './report-grid.component.html';
 import style from './report-grid.component.scss';
-import {NUMBER_TYPES, DATE_TYPES} from '../../../../consts';
-import { getFormatter } from '../../utils/numberFormatter';
+import {NUMBER_TYPES, DATE_TYPES, FLOAT_TYPES} from '../../../../consts';
+import {getFormatter} from '../../../../../../common/utils/numberFormatter';
 
 // const MIN_ROWS_TO_SHOW = 5;
 const COLUMN_WIDTH = 175;
+const DEFAULT_PRECISION = 2;
 
 export const ReportGridComponent = {
   template,
@@ -169,30 +170,32 @@ export const ReportGridComponent = {
 
     prepareGridColumns(columns) {
       return map(columns, column => {
+        const isNumberType = NUMBER_TYPES.includes(column.type);
         if (column.type === 'timestamp') {
           column.type = 'date';
+        }
+        if (FLOAT_TYPES.includes(column.type)) {
+          if (!column.format) {
+            column.format = {};
+          }
+          if (!column.format.precision) {
+            column.format.precision = DEFAULT_PRECISION;
+          }
         }
         const field = {
           caption: column.getDisplayName(),
           dataField: column.name,
           dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
+          type: column.type,
           visibleIndex: column.visibleIndex,
           allowSorting: false,
           alignment: 'left',
           width: COLUMN_WIDTH,
-          format: column.format
+          format: isNumberType ? {formatter: getFormatter(column.format)} : column.format
         };
 
         if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
           field.format = 'yyyy-MM-dd';
-        }
-
-        if (NUMBER_TYPES.includes(column.type) && isUndefined(column.format)) {
-          field.format = {
-            type: 'fixedPoint',
-            comma: false,
-            precision: 2
-          };
         }
         return field;
       });
@@ -255,7 +258,6 @@ export const ReportGridComponent = {
     }
 
     formatColumn(gridColumn) {
-      console.log('gridColumn', gridColumn);
       switch (gridColumn.dataType) {
       case 'number':
         this.formatNumberColumn(gridColumn);
@@ -279,14 +281,14 @@ export const ReportGridComponent = {
     }
 
     formatNumberColumn(gridColumn) {
-
-      this._AnalyzeDialogService.openFormatDialog(gridColumn.format)
+      const column = find(this.columns, ({name}) => name === gridColumn.dataField);
+      this._AnalyzeDialogService.openDataFormatDialog(column.format, column.type)
         .afterClosed().subscribe(format => {
           if (format) {
             if (this._gridInstance) {
-              this._gridInstance.columnOption(gridColumn.dataField, 'format', format);
+              this._gridInstance.columnOption(column.name, 'format', {formatter: getFormatter(format)});
             }
-            this.reportGridContainer.formatColumn(gridColumn.dataField, format);
+            this.reportGridContainer.formatColumn(column.name, format);
           }
         });
     }
