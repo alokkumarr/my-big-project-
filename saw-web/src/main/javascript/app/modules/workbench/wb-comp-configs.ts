@@ -40,4 +40,4 @@ export const PARSER_CONFIG = {
   }]
 };
 
-export const STAGING_TREE = [{ 'name': 'Staging', 'size': 0, 'd': true, 'cat': '' }];
+export const STAGING_TREE = [{ 'name': 'Staging', 'size': 0, 'isDirectory': true, 'path': 'root' }];

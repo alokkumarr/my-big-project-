@@ -1,0 +1,19 @@
+sql-script {
+  height: 100%;
+  width: 100%;
+
+  textarea {
+    margin-bottom: 10px;
+  }
+
+  .ace_editor {
+    width: 100%;
+    height: 90% !important;
+    margin-bottom: 10px;
+  }
+
+  .query-actions {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+}

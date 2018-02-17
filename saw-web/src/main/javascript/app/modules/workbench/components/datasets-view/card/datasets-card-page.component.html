@@ -5,12 +5,13 @@
           <div mat-card-avatar class="src-img {{sets.src}}"></div>
           <!-- <mat-card-title [innerHTML]="sets.set"></mat-card-title> -->
         <div class="dataset-name" fxFlex [innerHTML]="sets.set"></div>
-        <mat-icon style="color:rgba(0, 0, 0, 0.54);">more_vert</mat-icon>
+        <!-- <mat-icon fontIcon="icon-query-mode" (click)="openSQLEditor()"  style="color:rgba(0, 0, 0, 0.54);cursor:pointer;"></mat-icon> -->
+        <dataset-actions [id]="sets.set"></dataset-actions>
       </mat-card-header>
       <mat-divider></mat-divider>
       <mat-card-content class="mat-body-1">
         <div class="margin-btm-9" fxLayout="row" fxLayoutWrap>
-          <div fxFlex="70" class="mat-body-1">No.Of Data Pods:
+          <div fxFlex="70" class="mat-body-1">Data Pods:
             <span [innerHTML]="sets.meta.numFiles"></span>
           </div>
           <div class="mat-caption" fxLayoutAlign="end end" fxFlex="30">Size: {{sets.meta.size}}</div>
@@ -21,11 +22,11 @@
           </div>
         </div>
         <div class="margin-btm-9" fxLayout="row" fxLayoutWrap>
-          <div fxFlex="35" fxLayout="column" fxLayoutAlign="start start">Added By:
+          <div fxFlex="35" fxLayout="column" fxLayoutAlign="start start">Added by:
             <span [innerHTML]="sets.meta.addedBy"></span>
           </div>
           <div fxFlex="65
-                    " fxLayout="column" fxLayoutAlign="center end">Last Updated By:
+                    " fxLayout="column" fxLayoutAlign="center end">Last updated by:
             <div fxLayout="row" style="align-items: baseline;">
               <span [innerHTML]="sets.meta.updatedBy"></span> @
               <span class="mat-caption" [innerHTML]="sets.meta.lastUpdated | date : 'short'"></span>

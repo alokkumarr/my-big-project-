@@ -69,7 +69,7 @@ export class DatasetsGridPageComponent implements OnInit {
       caption: 'Size',
       dataField: 'meta.size',
       dataType: 'number',
-      width: '10%'
+      width: '8%'
     }, {
       dataField: 'meta.addedBy',
       caption: 'Added By',
@@ -85,7 +85,7 @@ export class DatasetsGridPageComponent implements OnInit {
     }, {
       dataField: 'meta.numFiles',
       caption: 'Data Pods',
-      width: '6%',
+      width: '5%',
       dataType: 'number'
     }, {
       dataField: 'meta.lastUpdated',
@@ -99,8 +99,12 @@ export class DatasetsGridPageComponent implements OnInit {
       dataField: 'src',
       caption: 'Data Source',
       cellTemplate: 'dsTypeTemplate',
-      alignment: 'right',
-      width: '9%'
+      width: '7%'
+    }, {
+      dataField: 'src',
+      caption: 'Actions',
+      cellTemplate: 'actionsCellTemplate',
+      width: '5%'
     }];
 
     return this.dxDataGrid.mergeWithDefaultConfig ({
@@ -129,11 +133,6 @@ export class DatasetsGridPageComponent implements OnInit {
       hoverStateEnabled: true,
       // onInitialized: this.onGridInitialized.bind(this),
       onSelectionChanged: selectedItems => {
-        if (selectedItems.currentSelectedRowKeys[0].info.lastProfilerMsg && selectedItems.currentSelectedRowKeys[0].info.lastProfilerMsg === 'Available') {
-          const selectedObject = selectedItems.selectedRowsData[0];
-        } else {
-          return;
-        }
       }
     });
   }

@@ -1,0 +1,13 @@
+<button mat-icon-button class="triggerbtn" [matMenuTriggerFor]="menu">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="openSQLEditor()">
+      <mat-icon fontIcon="icon-query-mode"></mat-icon>
+      <span>Execute SQL</span>
+    </button>
+    <button mat-menu-item disabled>
+      <mat-icon>delete</mat-icon>
+      <span>delete</span>
+    </button>
+  </mat-menu>

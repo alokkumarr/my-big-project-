@@ -571,3 +571,141 @@ export const parser_preview = {
   ]
 };
 
+export const ARTIFACT_SAMPLE = {
+  'artifacts': [
+    {
+      'artifactName': 'MCT_DN_SESSION_SUMMARY',
+      'columns': [
+        {
+          'name': 'TRANSFER_DATE ',
+          'type': 'date'
+        },
+        {
+          'name': 'TRANSFER_DATE_ID',
+          'type': 'integer'
+        },
+        {
+          'name': 'TRANSFER_MONTH_ID',
+          'type': 'integer'
+        },
+        {
+          'name': 'OPCO',
+          'type': 'string'
+        },
+        {
+          'name': 'SESSION_ID',
+          'type': 'string'
+        },
+        {
+          'name': 'SESSION_STATUS',
+          'type': 'string'
+        },
+        {
+          'name': 'SESSION_COUNT',
+          'type': 'long'
+        },
+        {
+          'name': 'QUARATINE_CODE',
+          'type': 'string'
+        },
+        {
+          'name': 'TARGET_OS',
+          'type': 'string'
+        },
+        {
+          'name': 'TARGET_OS_VERSION',
+          'type': 'string'
+        },
+        {
+          'name': 'TARGET_APP_VERSION',
+          'type': 'string'
+        },
+        {
+          'name': 'TARGET_INTERNALVERSION',
+          'type': 'string'
+        },
+        {
+          'name': 'TARGET_MANUFACTURER',
+          'type': 'string'
+        },
+        {
+          'name': 'TARGET_MODEL',
+          'type': 'string'
+        },
+        {
+          'name': 'IN_STORE_TRANSFER',
+          'type': 'string'
+        },
+        {
+          'name': 'SSID',
+          'type': 'string'
+        },
+        {
+          'name': 'MSISDN',
+          'type': 'string'
+        },
+        {
+          'name': 'IMEI',
+          'type': 'string'
+        },
+        {
+          'name': 'ICCID',
+          'type': 'string'
+        },
+        {
+          'name': 'IMSI',
+          'type': 'string'
+        },
+        {
+          'name': 'AVAILABLE_ITEMS',
+          'type': 'long'
+        },
+        {
+          'name': 'AVAILABLE_BYTES',
+          'type': 'double'
+        },
+        {
+          'name': 'AVAILABLE_MB',
+          'type': 'long'
+        },
+        {
+          'name': 'TRANSFER_ITEMS',
+          'type': 'long'
+        },
+        {
+          'name': 'TRANSFER_BYTES',
+          'type': 'double'
+        },
+        {
+          'name': 'TRANSFER_MB',
+          'type': 'double'
+        },
+        {
+          'name': 'SELECTED_BYTES',
+          'type': 'long'
+        },
+        {
+          'name': 'SESSION_SELECTED_MB ',
+          'type': 'double'
+        },
+        {
+          'name': 'SELECTED_ITEMS',
+          'type': 'long'
+        },
+        {
+          'name': 'FAILED_ITEMS',
+          'type': 'long'
+        },
+        {
+          'name': 'FAILED_BYTES',
+          'type': 'long'
+        },
+        {
+          'name': 'FAILED_MB',
+          'type': 'double'
+        }
+      ]
+    }
+  ]
+};
+

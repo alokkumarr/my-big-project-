@@ -34,7 +34,8 @@ export class CreateDatasetsComponent implements OnInit {
   private myHeight: Number;
   public nameFormGroup: FormGroup;
 
-  constructor(public dialogRef: MatDialogRef<CreateDatasetsComponent>,
+  constructor(
+    public dialogRef: MatDialogRef<CreateDatasetsComponent>,
     private dialog: MatDialog,
     private workBench: WorkbenchService,
     private formBuilder: FormBuilder

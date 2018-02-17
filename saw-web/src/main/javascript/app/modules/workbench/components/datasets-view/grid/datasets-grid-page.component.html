@@ -12,5 +12,8 @@
     <div *dxTemplate="let data of 'timecreatedCellTemplate'">
       <span class="clickable" [innerHTML]="data.value | date : 'MM/dd/yy @ HH:mm'"></span>
     </div>
+    <div *dxTemplate="let data of 'actionsCellTemplate'">
+        <mat-icon fontIcon="icon-query-mode"  style="color:rgba(0, 0, 0, 0.54);cursor:pointer;"></mat-icon>
+      </div>
   </dx-data-grid>
 </div>

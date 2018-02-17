@@ -1,0 +1,41 @@
+<div class="executor-container">
+  <div mat-dialog-title class="title-elem">
+    <div>
+      <mat-icon fontIcon="icon-query-mode" style="vertical-align:bottom;"></mat-icon>
+      <span class="view-title">SQL_EXECUTOR </span>
+    </div>
+    <span fxFlex></span>
+    <button mat-icon-button mat-dialog-close class="xBtn">
+      <mat-icon style="color: #E5524C;" fontIcon="icon-close"></mat-icon>
+    </button>
+  </div>
+  <mat-progress-bar *ngIf="showProgress" mode="query"></mat-progress-bar>
+  <mat-divider></mat-divider>
+  <div mat-dialog-content class="exec-body">
+    <div class="top-pane">
+      <dx-data-grid class="gridContainer" fxFlex="30">
+        <div *dxTemplate="let data of 'dobjTemplate'">
+          <div fxLayout="row">
+            <mat-icon class="file-icon">insert_drive_file</mat-icon>
+            <div>{{data.value}}</div>
+          </div>
+        </div>
+        <div *dxTemplate="let data of 'sizeTemplate'">
+          <span [innerHTML]="data.value"></span>
+        </div>
+        <div *dxTemplate="let data of 'dateTemplate'">
+          <span [innerHTML]="data.value | date : 'short'"></span>
+        </div>
+        <div *dxTemplate="let data of 'actionsTemplate'">
+          <div fxLayout="row" fxLayoutAlign="center center">
+            <span class="preview-icon" matTooltip="Preview File" (click)="previewDialog(data.value)">
+              <mat-icon>visibility</mat-icon>
+            </span>
+          </div>
+        </div>
+      </dx-data-grid>
+      <sql-script [artifacts]="artifacts" (on-save)="onSaveQuery($event)">
+      </sql-script>
+    </div>
+  </div>
+</div>
