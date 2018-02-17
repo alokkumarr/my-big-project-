@@ -10,6 +10,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,14 +81,16 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
       }
     }
     if (defaultProjectRoot.startsWith(prefix)) {
+     logger.trace("Initializing defaultProjectRoot {}", defaultProjectRoot); 
     this.mdt = new DLMetadata(defaultProjectRoot);}
     this.tmpDir = System.getProperty("java.io.tmpdir");
   }
 
   @Override
-  public Project readDirectoriesByProjectId(Project project) throws Exception {
-    logger.trace("Reading data from {}" + project.getPath());
-    List<String> directories = this.mdt.getListOfStagedFiles(defaultProjectPath, null);
+  public Project readDirectoriesByProjectId(Project project, String relativePath) throws Exception {
+    logger.trace("readDirectoriesByProjectId : Reading data from the root {}",  this.mdt.getRoot());
+    logger.trace("readDirectoriesByProjectId :Reading data from {} " , project.getPath());
+    List<String> directories = this.mdt.getListOfStagedFiles(project.getPath(), null, relativePath);
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
@@ -104,14 +107,16 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
 
   @Override
   public Project readSubDirectoriesByProjectId(Project project) throws Exception {
-    logger.trace("Reading data from {}" + project.getPath());
-    List<String> directories = this.mdt.getListOfStagedFiles(defaultProjectPath, project.getPath());
+    logger.trace("readSubDirectoriesByProjectId : Reading data from the root {}",  this.mdt.getRoot());
+    logger.trace("readSubDirectoriesByProjectId:  Reading data from {}",  defaultProjectPath + project.getPath());
+    List<String> directories = this.mdt.getListOfStagedFiles(defaultProjectRoot + defaultProjectPath, project.getPath(), project.getPath());
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     project.setResultFormat(ResultFormat.JSON);
     List<Object> data = new ArrayList<>();
     for (String directory : directories) {
+      logger.trace("Reading data in readSubDirectoriesByProjectId {}" + directory);
       JsonNode node = objectMapper.readTree(directory);
       data.add(node);
     }
@@ -128,14 +133,21 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
     objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
     project.setResultFormat(ResultFormat.JSON);
-    Project readProject = null;
+    Project readProject = new Project();
+    String holdTempPathValue = project.getPath();
     if (!HFileOperations.exists(defaultProjectRoot + defaultProjectPath + project.getPath())) {
       logger.trace("Path {}", defaultProjectRoot + defaultProjectPath + project.getPath());
       HFileOperations.createDir(defaultProjectRoot + defaultProjectPath + project.getPath());
-      readProject = readSubDirectoriesByProjectId(project);
+      String pathForSubdirectory = FilenameUtils.getFullPathNoEndSeparator(defaultProjectRoot + defaultProjectPath + project.getPath());
+      logger.trace("After creating folder before reading in createDirectoryProjectId {}", objectMapper.writeValueAsString(project));
+      logger.trace("pathForSubdirectory {}", pathForSubdirectory);
+      project.setPath(pathForSubdirectory);
+      readProject = readDirectoriesByProjectId(project, holdTempPathValue);
+      logger.trace("After creating folder after reading in createDirectoryProjectId {}", objectMapper.writeValueAsString(readProject));
       project.setData(readProject.getData());
     }
-    project.setStatusMessage(project.getPath() + "has been created successfully.");
+    project.setPath(holdTempPathValue);
+    project.setStatusMessage(project.getPath() + " has been created successfully.");
     logger.trace("response structure {}", objectMapper.writeValueAsString(project));
     return project;
   }
@@ -274,6 +286,7 @@ public class SAWWorkbenchServiceImpl implements SAWWorkbenchService {
     System.out.println(node);
     System.out.println(System.getProperty("java.io.tmpdir"));
     System.out.println("data.csv".substring("data.csv".indexOf('.'), "data.csv".length()));
+    System.out.println(FilenameUtils.getFullPathNoEndSeparator("/User"));
     
   }
 }

@@ -73,7 +73,7 @@ public class SAWDelimitedReader {
 
   private String getFilePath(String path) throws Exception {
     String filePath = null;
-    if (!localFileSystem) {
+    if (!this.localFileSystem) {
       FileSystem fs = HFileOperations.getFileSystem();
       if (fs != null)
         try {
@@ -125,9 +125,15 @@ public class SAWDelimitedReader {
   }
 
   private Reader getReader(String path) throws Exception {
-    File file = new File(path);
-    InputStream inputStream = new FileInputStream(file);
-    return new InputStreamReader(inputStream, "UTF-8");
+    InputStream inputStream = null;
+    if (!this.localFileSystem) {
+      inputStream = HFileOperations.readFileToInputStream(path);
+      return new InputStreamReader(inputStream, "UTF-8");
+    } else {
+      File file = new File(path);
+      inputStream = new FileInputStream(file);
+      return new InputStreamReader(inputStream, "UTF-8");
+    }
   }
 
   public String toJson() {

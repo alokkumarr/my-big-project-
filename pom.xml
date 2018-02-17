@@ -34,7 +34,7 @@
           <artifactId>maven-assembly-plugin</artifactId>
           <version>3.1.0</version>
         </plugin>
-        <plugin> 
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
           <version>2.20.1</version>
@@ -47,6 +47,10 @@
       <id>synchronoss</id>
       <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/releases-only</url>
     </repository>
+  <repository>
+    <id>synchronoss-snapshots</id>
+    <url>http://maven-us.synchronoss.net:8081/nexus/content/repositories/snapshots-only</url>
+  </repository>
   </repositories>
   <profiles>
     <!-- Profile that uses the preset container name "saw" and binds
