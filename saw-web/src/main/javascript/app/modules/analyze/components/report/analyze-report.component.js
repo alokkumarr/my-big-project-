@@ -501,6 +501,25 @@ export const AnalyzeReportComponent = {
         });
     }
 
+    checkColumnName(columns) {
+      forEach(columns, field => {
+        field.name = this.getColumnName(field.name);
+        field.meta.name = this.getColumnName(field.meta.name);
+        field.meta.columnName = this.getColumnName(field.meta.columnName);
+      });
+      return columns;
+    }
+
+    getColumnName(columnName) {
+      // take out the .keyword form the columnName
+      // if there is one
+      const split = columnName.split('.');
+      if (split[1]) {
+        return split[0];
+      }
+      return columnName;
+    }
+
     onRefreshData() {
       this.startProgress();
       this.model = assign(this.model, this.generatePayload());
@@ -521,6 +540,7 @@ export const AnalyzeReportComponent = {
           this.gridData = data;
           this.gridDataTotalCount = count;
           this.model.query = analysis.queryManual || analysis.query;
+          this.columns = this.checkColumnName(this.columns);
           this.applyDataToGrid(this.columns, sorts, groups, this.gridData);
           this.analysisSynched();
           this.endProgress();

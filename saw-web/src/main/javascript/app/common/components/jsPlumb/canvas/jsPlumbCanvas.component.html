@@ -1,6 +1,6 @@
 <js-plumb-table class="jsp-table"
                 ng-repeat="table in $ctrl.model.tables track by $index"
-                model="table"></js-plumb-table>
+                model="table" did-analysis-change="$ctrl.didAnalysisChange"></js-plumb-table>
 
 <js-plumb-connector ng-repeat="join in $ctrl.model.joins"
                     model="join"

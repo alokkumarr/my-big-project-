@@ -8,7 +8,8 @@ export const JSPlumbTable = {
   template,
   styles: [style],
   bindings: {
-    model: '<'
+    model: '<',
+    didAnalysisChange: '='
   },
   controller: class JSPlumbTableCtrl {
     constructor($scope, $element, $timeout) {
@@ -91,6 +92,7 @@ export const JSPlumbTable = {
     }
 
     onSelectAggregateType(aggregateType, field) {
+      this.didAnalysisChange = true;
       field.aggregate = aggregateType.value;
       field.meta.aggregate = aggregateType.value;
     }
