@@ -16,8 +16,8 @@ export class CronDatePickerComponent implements OnInit {
 
   ngOnInit() {
     this.selectOptions = {
-      minutes: this.range(0, 59),
-      seconds: this.range(0, 59),
+      minutes: this.range(1, 59),
+      seconds: this.range(1, 59),
       hourTypes: ['AM', 'PM']
     };
     this.selectOptions.hours = this.use24HourTime ? this.range(0, 23) : this.range(0, 12);

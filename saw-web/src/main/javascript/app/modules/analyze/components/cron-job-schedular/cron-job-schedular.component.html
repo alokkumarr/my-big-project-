@@ -15,7 +15,7 @@
     </mat-select><br/>
     Day(s) at
     <cron-date-picker [model]="dailyTypeDay" (onDateChange)="onDateChange($event)"></cron-date-picker><br/><br/><br/>
-    <mat-radio-button class="everyWeek" value="everyWeek" (click)="resetData();">Every week day (Monday through Friday) at</mat-radio-button><br/>
+    <mat-radio-button class="everyWeek" value="everyWeek" (click)="resetData();">Every weekday (Monday through Friday) at</mat-radio-button><br/>
     <cron-date-picker [model]="dailyTypeWeek" (onDateChange)="onDateChange($event)"></cron-date-picker>
   </mat-radio-group>
 </div>

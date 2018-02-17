@@ -10,12 +10,6 @@
   </mat-option>
 </mat-select>
 
-<mat-select style="border-bottom-style: none;" class="md-select-value"  placeholder="Seconds" [(ngModel)]="model.second" (selectionChange)="triggerChange()">
-  <mat-option *ngFor="let second of selectOptions.seconds" [value]="second">
-    {{second}}
-  </mat-option>
-</mat-select>
-
 <mat-select style="border-bottom-style: none;" class="md-select-value"  placeholder="Meridiem" [(ngModel)]="model.hourType" (selectionChange)="triggerChange()">
   <mat-option *ngFor="let hourType of selectOptions.hourTypes" [value]="hourType">
   {{hourType}}

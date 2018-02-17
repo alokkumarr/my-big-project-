@@ -64,7 +64,7 @@ export class CronJobSchedularComponent {
   	this.weekly = {};
   	this.monthly = {};
   	this.yearly = {};
-    this.days = this.range(0, 31);
+    this.days = this.range(1, 31);
     this.months = this.range(1,12);
     this.weeks = [{
       value:'#1',
@@ -152,10 +152,10 @@ export class CronJobSchedularComponent {
     case 'daily':
       switch (this.daily.dailyType) {
       case 'everyDay':
-        this.cronexp = `${this.dailyTypeDay.second} ${this.dailyTypeDay.minute} ${this.hourToCron(this.dailyTypeDay.hour, this.dailyTypeDay.hourType)} 1/${this.daily.days} * ? *`;
+        this.cronexp = `0 ${this.dailyTypeDay.minute} ${this.hourToCron(this.dailyTypeDay.hour, this.dailyTypeDay.hourType)} 1/${this.daily.days} * ? *`;
         break;
       case 'everyWeek':
-        this.cronexp = `${this.dailyTypeWeek.second} ${this.dailyTypeWeek.minute} ${this.hourToCron(this.dailyTypeWeek.hour, this.dailyTypeWeek.hourType)} ? * MON-FRI *`;
+        this.cronexp = `0 ${this.dailyTypeWeek.minute} ${this.hourToCron(this.dailyTypeWeek.hour, this.dailyTypeWeek.hourType)} ? * MON-FRI *`;
         break;
       default:
         throw 'Invalid cron daily subtab selection';
@@ -165,15 +165,15 @@ export class CronJobSchedularComponent {
       const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
           .reduce((acc, day) => this.weekly[day] ? acc.concat([day]) : acc, [])
           .join(',');
-      this.cronexp = `${this.weeklybasisDate.second} ${this.weeklybasisDate.minute} ${this.hourToCron(this.weeklybasisDate.hour, this.weeklybasisDate.hourType)} ? * ${days} *`;
+      this.cronexp = `0 ${this.weeklybasisDate.minute} ${this.hourToCron(this.weeklybasisDate.hour, this.weeklybasisDate.hourType)} ? * ${days} *`;
       break;
     case 'monthly':
       switch (this.monthly.monthlyType) {
       case 'specificDay':
-        this.cronexp = `${this.specificDayMonth.second} ${this.specificDayMonth.minute} ${this.hourToCron(this.specificDayMonth.hour, this.specificDayMonth.hourType)} ${this.monthly.specificDay} 1/${this.monthly.specificMonth} ? *`;
+        this.cronexp = `0 ${this.specificDayMonth.minute} ${this.hourToCron(this.specificDayMonth.hour, this.specificDayMonth.hourType)} ${this.monthly.specificDay} 1/${this.monthly.specificMonth} ? *`;
         break;
       case 'specificWeekDay':
-        this.cronexp = `${this.specificWeekDayMonth.second} ${this.specificWeekDayMonth.minute} ${this.hourToCron(this.specificWeekDayMonth.hour, this.specificWeekDayMonth.hourType)} ? 1/${this.monthly.specificWeekDayMonthWeek} ${this.monthly.specificWeekDayDay}${this.monthly.specificWeekDayMonth} *`;
+        this.cronexp = `0 ${this.specificWeekDayMonth.minute} ${this.hourToCron(this.specificWeekDayMonth.hour, this.specificWeekDayMonth.hourType)} ? 1/${this.monthly.specificWeekDayMonthWeek} ${this.monthly.specificWeekDayDay}${this.monthly.specificWeekDayMonth} *`;
         break;
       default:
         throw 'Invalid cron monthly subtab selection';
@@ -182,10 +182,10 @@ export class CronJobSchedularComponent {
     case 'yearly':
       switch (this.yearly.yearlyType) {
       case 'specificMonthDay':
-        this.cronexp = `${this.specificMonthDayYear.second} ${this.specificMonthDayYear.minute} ${this.hourToCron(this.specificMonthDayYear.hour, this.specificMonthDayYear.hourType)} ${this.yearly.specificMonthDayDay} ${this.yearly.specificMonthDayMonth} ? *`;
+        this.cronexp = `0 ${this.specificMonthDayYear.minute} ${this.hourToCron(this.specificMonthDayYear.hour, this.specificMonthDayYear.hourType)} ${this.yearly.specificMonthDayDay} ${this.yearly.specificMonthDayMonth} ? *`;
         break;
       case 'specificMonthWeek':
-        this.cronexp = `${this.specificMonthWeekYear.second} ${this.specificMonthWeekYear.minute} ${this.hourToCron(this.specificMonthWeekYear.hour, this.specificMonthWeekYear.hourType)} ? ${this.yearly.specificMonthWeekMonth} ${this.yearly.specificMonthWeekDay}${this.yearly.specificMonthWeekMonthWeek} *`;
+        this.cronexp = `0 ${this.specificMonthWeekYear.minute} ${this.hourToCron(this.specificMonthWeekYear.hour, this.specificMonthWeekYear.hourType)} ? ${this.yearly.specificMonthWeekMonth} ${this.yearly.specificMonthWeekDay}${this.yearly.specificMonthWeekMonthWeek} *`;
         break;
       default:
         throw 'Invalid cron yearly subtab selection';
