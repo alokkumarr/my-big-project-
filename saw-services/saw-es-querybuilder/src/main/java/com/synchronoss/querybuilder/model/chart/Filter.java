@@ -27,7 +27,6 @@ public class Filter {
     private String columnName;
     @JsonProperty("isRuntimeFilter")
     private Filter.IsRuntimeFilter isRuntimeFilter;
-    // Ideally
     @JsonProperty("isGlobalFilter")
     private Filter.IsGlobalFilter isGlobalFilter;
     @JsonProperty("model")

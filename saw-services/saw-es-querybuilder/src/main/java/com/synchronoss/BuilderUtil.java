@@ -97,21 +97,6 @@ public class BuilderUtil
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.enable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY);
         JsonNode objectNode = objectMapper.readTree(jsonString);
-        JsonNode sqlNode = objectNode.get(node);
-        // schema validation block starts here
-       // String json = "{ \"sqlBuilder\" :" + sqlNode.toString() + "}";
-      /**  JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
-        JsonValidator validator = factory.getValidator();
-        String globalFilter = System.getProperty("schema.globalFilter");
-        if (globalFilter == null){throw new NullPointerException("schema.globalFilter property is not set.");}
-        final JsonNode data = JsonLoader.fromString(json);
-        final JsonNode schema = JsonLoader.fromFile(new File(globalFilter));
-        ProcessingReport report = validator.validate(schema, data);
-        if (report.isSuccess() == false) {
-            throw new ProcessingException(report.toString());
-        } **/
-        // schema validation block ends here
-      //  JsonNode objectNode = objectMapper.readTree(node);
         GlobalFilters globalFilters =
                 objectMapper.treeToValue(objectNode, GlobalFilters.class);
        return globalFilters;
@@ -267,4 +252,5 @@ public class BuilderUtil
 
     return dynamicConvertor;
   }
+
  }

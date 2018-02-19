@@ -22,6 +22,7 @@ class GlobalFilter extends BaseController {
     if (ticket== None) throw new ClientException(
         "Valid JWT not found in Authorization header")
     val jsonString: String = compact(render(json));
+    m_log info("fetch global filter result")
     val executionList :util.List[GlobalFilterExecutionObject] =
       new SAWElasticSearchQueryBuilder().getsearchSourceBuilder(jsonString)
     var data : String= null;
@@ -31,7 +32,7 @@ class GlobalFilter extends BaseController {
       {
         val obj: GlobalFilterExecutionObject = iterator.next()
         data= SAWElasticSearchQueryExecutor.executeReturnDataAsString(obj)
-        print(data)
+        m_log debug (data)
         val myArray = parse(data);
         if(result==JNothing)
           result=myArray

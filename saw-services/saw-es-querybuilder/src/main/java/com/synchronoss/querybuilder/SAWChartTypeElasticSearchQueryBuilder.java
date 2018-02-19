@@ -108,8 +108,8 @@ class SAWChartTypeElasticSearchQueryBuilder {
     	      }
       }
       for (com.synchronoss.querybuilder.model.chart.Filter item : filters) {
-        System.out.println(item.toString());
-        if (!item.getIsRuntimeFilter().value() && !item.getIsGloblFilter().value()) {
+        if (!item.getIsRuntimeFilter().value() && item.getIsGloblFilter()!=null
+                && !item.getIsGloblFilter().value()) {
           if (item.getType().value().equals(Type.DATE.value())
               || item.getType().value().equals(Type.TIMESTAMP.value())) 
           {
