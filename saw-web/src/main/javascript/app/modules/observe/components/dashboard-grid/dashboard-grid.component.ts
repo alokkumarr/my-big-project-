@@ -5,6 +5,8 @@ import {
   Input,
   Output,
   ViewChild,
+  ViewChildren,
+  QueryList,
   EventEmitter,
   AfterViewInit,
   OnInit,
@@ -21,6 +23,7 @@ import * as filter from 'lodash/filter';
 import * as unionWith from 'lodash/unionWith';
 import * as forEach from 'lodash/forEach';
 
+import { ObserveChartComponent } from '../observe-chart/observe-chart.component';
 import { Dashboard } from '../../models/dashboard.interface';
 import { GlobalFilterService } from '../../services/global-filter.service';
 import { SideNavService } from '../../../../common/services/sidenav.service';
@@ -43,6 +46,7 @@ export const DASHBOARD_MODES = {
 })
 export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
   @ViewChild('gridster') gridster: GridsterComponent;
+  @ViewChildren(ObserveChartComponent) charts: QueryList<ObserveChartComponent>;
 
   @Input() model: Dashboard;
   @Input() requester: BehaviorSubject<any>;
@@ -51,6 +55,7 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
   @Output() getDashboard = new EventEmitter();
 
   public fillState = 'empty';
+  public enableChartDownload: boolean;
   public columns = 4;
   public options: GridsterConfig;
   public dashboard: Array<GridsterItem> = [];
@@ -83,6 +88,8 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
         enabled: !this.isViewMode()
       }
     };
+
+    this.enableChartDownload = this.isViewMode();
   }
 
   ngAfterViewInit() {
