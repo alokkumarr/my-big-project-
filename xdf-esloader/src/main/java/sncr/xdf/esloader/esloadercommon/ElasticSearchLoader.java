@@ -95,11 +95,7 @@ public class ElasticSearchLoader {
 
         // In case of partitioned data, each partition will be loaded separately
         // TBD: load separate partitions into separate ES indexes representing partitions
-        //TODO: Verify this
         Map<String, String> locationList = getLocationList(objectName, essm);
-//        Map<String, String> locationList = new HashMap<String, String>(){{
-//            put(objectName,"myindex/type");
-//        }};
 
         // Check if all indexes exists and try to create them (based on configuration)
         // And add them to exception list for future use

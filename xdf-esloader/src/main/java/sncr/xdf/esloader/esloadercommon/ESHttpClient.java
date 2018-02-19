@@ -40,7 +40,6 @@ public class ESHttpClient {
         String user = config.getEsUser();
         String pwd = config.getEsPassword();
 
-        //TODO: Default port is 9100 or 9200?
         int port = config.getEsPort() == 0 ? 9200 : config.getEsPort();
 
         this.host = this.host + ":" + port;
