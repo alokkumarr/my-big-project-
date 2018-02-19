@@ -24,6 +24,7 @@ export const AnalyzeFilterModalComponent = {
   template,
   styles: [style],
   bindings: {
+    type: '<',
     filters: '<',
     artifacts: '<',
     isRuntime: '<?runtime',

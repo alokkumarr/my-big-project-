@@ -19,6 +19,7 @@
         </analyze-filter-row>
 
         <md-checkbox class="md-secondary"
+                     ng-if="$ctrl.type === 'chart'"
                      ng-hide="::$ctrl.isRuntime"
                      ng-model="filter.isGlobalFilter"
                      ng-change="$ctrl.onGlobalToggle(filter)">

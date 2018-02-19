@@ -17,6 +17,7 @@ import { Subscription } from 'rxjs/Subscription';
 
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
+import * as filter from 'lodash/filter';
 import * as unionWith from 'lodash/unionWith';
 import * as forEach from 'lodash/forEach';
 
@@ -159,10 +160,16 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
     if(this.mode === DASHBOARD_MODES.VIEW) {
       const filters = get(analysis, 'sqlBuilder.filters', []);
 
-      this.filters.addFilter(map(filters, flt => ({...flt, ...{
-        semanticId: analysis.semanticId,
-        esRepository: analysis.esRepository
-      }})));
+      this.filters.addFilter(filter(
+        map(filters, flt => ({
+          ...flt,
+          ...{
+            semanticId: analysis.semanticId,
+            esRepository: analysis.esRepository
+          }
+        })),
+        f => f.isGlobalFilter
+      ));
     }
   }
 
