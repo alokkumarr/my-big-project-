@@ -240,7 +240,7 @@ object QueryBuilder extends {
            case obj => unexpectedElement(obj, "array", "modelValues")
          }).map(_.extract[String].toUpperCase())
         val stringWhereClause = operator match {
-          case "eq" => "= " + modelValues.map("'" + _ + "'").mkString(", ")
+          case "eq" => "= " + modelValues(0)
           case "isin" => "IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
           case "neq" => "<> " + modelValues(0)
           case "isnotin" => "NOT IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
