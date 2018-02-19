@@ -242,8 +242,8 @@ object QueryBuilder extends {
         val stringWhereClause = operator match {
           case "eq" => "= " + modelValues.map("'" + _ + "'").mkString(", ")
           case "isin" => "IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
-          case "neq" => "NOT IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
-          case "isnotin" => "<>" + modelValues.map("'" + _ + "'").mkString(", ")
+          case "neq" => "<>" + modelValues.map("'" + _ + "'").mkString(", ")
+          case "isnotin" => "NOT IN (" + modelValues.map("'" + _ + "'").mkString(", ") + ")"
           case "sw" => "like '" + modelValues(0) + "%'"
           case "ew" => "like '%" + modelValues(0) + "'"
           case "contains" => "like '%" + modelValues(0) + "%'"
