@@ -32,6 +32,23 @@ export class GlobalFilterService {
   }
 
   /**
+   * Returns display name for a column from a list of columns
+   *
+   * @param {Array<any>} artifacts
+   * @param {string} columnName
+   * @param {string} tableName
+   * @returns
+   * @memberof GlobalFilterService
+   */
+  getDisplayNameFor(artifacts: Array<any>, columnName: string, tableName: string) {
+    const col = find(artifacts, column =>
+      column.columnName === columnName &&
+      (column.table || column.tableName) === tableName
+    );
+    return col ? (col.aliasName || col.displayName || col.columnName) : columnName;
+  }
+
+  /**
    * Merges the existing raw filters with input array of filters.
    * Only adds filters which aren't already present.
    *

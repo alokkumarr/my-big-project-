@@ -6,7 +6,7 @@
 <div class="filter-content">
   <mat-expansion-panel expanded="true" *ngFor="let gFilter of globalFilters" [ngSwitch]="gFilter.uiType">
     <mat-expansion-panel-header>
-      <mat-panel-title [textContent]="gFilter.columnName"></mat-panel-title>
+      <mat-panel-title [textContent]="gFilter.displayName"></mat-panel-title>
 
       <mat-panel-description [textContent]="gFilter.tableName"></mat-panel-description>
     </mat-expansion-panel-header>

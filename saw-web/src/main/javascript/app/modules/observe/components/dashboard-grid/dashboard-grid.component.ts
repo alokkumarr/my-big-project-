@@ -19,8 +19,10 @@ import { Subscription } from 'rxjs/Subscription';
 
 import * as get from 'lodash/get';
 import * as map from 'lodash/map';
+import * as find from 'lodash/find';
 import * as filter from 'lodash/filter';
 import * as unionWith from 'lodash/unionWith';
+import * as flatMap from 'lodash/flatMap';
 import * as forEach from 'lodash/forEach';
 
 import { ObserveChartComponent } from '../observe-chart/observe-chart.component';
@@ -165,18 +167,21 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
 
   addGlobalFilters(analysis) {
     if(this.mode === DASHBOARD_MODES.VIEW) {
+      const columns = flatMap(analysis.artifacts, table => table.columns);
+
       const filters = get(analysis, 'sqlBuilder.filters', []);
 
-      this.filters.addFilter(filter(
+      this.filters.addFilter(
         map(filters, flt => ({
           ...flt,
           ...{
             semanticId: analysis.semanticId,
-            esRepository: analysis.esRepository
+            esRepository: analysis.esRepository,
+            displayName: this.filters.getDisplayNameFor(columns, flt.columnName, flt.tableName)
           }
-        })),
-        f => f.isGlobalFilter
-      ));
+        }))
+        // f => f.isGlobalFilter
+      );
     }
   }
 
