@@ -1,3 +1,5 @@
+declare const require: any;
+
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 import { MatAutocompleteTrigger } from '@angular/material/autocomplete'
 import { FormControl } from '@angular/forms';
@@ -55,6 +57,8 @@ export class GlobalStringFilterComponent implements OnInit {
   loadSuggestions() {
     this.observe.getModelValues(this._filter).subscribe((data: Array<string>) => {
       this.suggestions = data;
+
+      this.filterCtrl.reset();
     });
   }
 

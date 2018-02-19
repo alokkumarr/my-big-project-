@@ -1,3 +1,5 @@
+declare const require: any;
+
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { ObserveService } from '../../../services/observe.service';
 
@@ -9,7 +11,6 @@ const template = require('./number-filter.component.html');
   selector: 'g-number-filter',
   template
 })
-
 export class GlobalNumberFilterComponent implements OnInit {
   @Output() onModelChange = new EventEmitter();
 
@@ -23,7 +24,9 @@ export class GlobalNumberFilterComponent implements OnInit {
   };
   constructor(private observe: ObserveService) { }
 
-  ngOnInit() { }
+  ngOnInit() {
+    window['mynumber'] = this;
+  }
 
   @Input() set filter(data) {
     this._filter = data;
@@ -36,8 +39,15 @@ export class GlobalNumberFilterComponent implements OnInit {
     this.observe.getModelValues(this._filter).subscribe(data => {
       this.min = parseFloat(get(data, `_min`, this.min));
       this.max = parseFloat(get(data, `_max`, this.max));
-      this.value = [this.min, this.max];
-      this.onSliderChange(this.value);
+
+      /* Give time for changes to min/max to propagate properly. The
+        nouislider library uses a settimeout to update changes in min/max.
+        https://github.com/tb/ng2-nouislider/blob/master/src/nouislider.ts#L154
+      */
+      setTimeout(() => {
+        this.value = [this.min, this.max];
+        this.onSliderChange(this.value);
+      }, 10);
     });
   }
 
