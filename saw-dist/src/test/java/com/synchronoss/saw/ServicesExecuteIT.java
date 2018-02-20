@@ -42,6 +42,7 @@ import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
 public class ServicesExecuteIT {
     private RequestSpecification spec;
     private ObjectMapper mapper;
+    private String token;
     private String ssoToken;
 
     @BeforeClass
@@ -59,11 +60,14 @@ public class ServicesExecuteIT {
         new JUnitRestDocumentation();
 
     @Before
-    public void setUp() {
+    public void setUp() throws JsonProcessingException {
         this.spec = new RequestSpecBuilder()
             .addFilter(documentationConfiguration(restDocumentation)).build();
         mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        /* Token is required for all the test cases.
+         Initialize the token before test case run.  */
+        token = authenticate();
     }
 
     @Test
@@ -86,9 +90,10 @@ public class ServicesExecuteIT {
     }
 
     @Test
-    public void ssoAuthentication()
+    public void testSSOAuthentication()
     {
-         Response response = given(spec)
+         Response response = given(spec).filter(document("sso-authentication",
+                 preprocessResponse(prettyPrint())))
             .when().get("/security/authentication?jwt=" +ssoToken)
             .then().assertThat().statusCode(200)
             .extract().response();

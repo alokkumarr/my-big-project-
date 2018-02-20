@@ -28,8 +28,8 @@ include::{snippets}/list-metrics/http-response.adoc[]
 
 The HTTP request:
 
-include::{snippets}/ssoAuthentication/http-request.adoc[]
+include::{snippets}/sso-authentication/http-request.adoc[]
 
 The HTTP response:
 
-include::{snippets}/ssoAuthentication/http-response.adoc[]
+include::{snippets}/sso-authentication/http-response.adoc[]
