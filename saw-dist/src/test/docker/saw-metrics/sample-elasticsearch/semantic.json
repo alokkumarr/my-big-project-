@@ -76,7 +76,7 @@
         },
         "artifacts": [
           {
-            "artifactName": "SAMPLE",
+            "artifactName": "sample",
             "columns": [
               {
                 "name": "string.keyword",
