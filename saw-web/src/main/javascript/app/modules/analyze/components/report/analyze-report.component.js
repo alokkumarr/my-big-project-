@@ -384,16 +384,21 @@ export const AnalyzeReportComponent = {
           tableArtifact.columns.push(fieldArtifact);
 
           if (result.sqlBuilder.dataFields && fieldArtifact.checked) {
+            if (field.type == 'string') {
+              const columnString = `${fieldArtifact.columnName}.keyword`;
+            } else {
+              const columnString = fieldArtifact.columnName;
+            }
             if (field.aggregate) {
               result.sqlBuilder.dataFields.push({
-                columnName: fieldArtifact.columnName,
+                columnName: columnString,
                 type: fieldArtifact.type,
                 name: field.meta.columnName,
                 aggregate: field.meta.aggregate
               });
             } else {
               result.sqlBuilder.dataFields.push({
-                columnName: fieldArtifact.columnName,
+                columnName: columnString,
                 type: fieldArtifact.type
               });
             }
