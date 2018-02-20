@@ -105,6 +105,7 @@ angular.module(AnalyzeModule, [
   .config(routesConfig)
   .config(i18nConfig)
   .filter('pivotAreaTypeFilter', pivotAreaTypeFilter)
+  .filter('uniqueFilter', uniqueFilter)
   .service('FilterService', FilterService)
   .service('AnalyzeService', AnalyzeService)
   .factory('PivotService', PivotService)

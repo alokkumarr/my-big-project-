@@ -48,10 +48,11 @@ Currently SAW only supports deploying to a single target host.
 
 === Configuring
 
-Each SAW environment requires its own configuration.  A sample
-configuration has been provided in the `config` file, which defaults
-to installing on `localhost`.  At a minimum, copy this sample file and
-change the `localhost` entries to the SAW target host.
+Each SAW environment requires its own SAW environment configuration
+file.  A sample configuration is provided inside the SAW release
+package in the `saw-config` file, which defaults to installing SAW on
+`localhost`.  At a minimum, copy this sample file and change the
+`localhost` entries to the SAW target host.
 
 The sample configuration defaults to installing all available modules:
 SAW Web, SAW Services and SAW Security.  To install only a subset of

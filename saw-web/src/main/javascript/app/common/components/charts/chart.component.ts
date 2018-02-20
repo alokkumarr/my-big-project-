@@ -30,6 +30,7 @@ export class ChartComponent {
   @Input() updater: any;
   @Input() options: any;
   @Input() isStockChart: boolean;
+  @Input() enableExport: boolean;
   @ViewChild('container') container: ElementRef;
 
   private highcharts: any = Highcharts;
@@ -48,6 +49,8 @@ export class ChartComponent {
   ngAfterViewInit() {
     this.config = defaultsDeep(this.options, chartOptions);
     this.stockConfig = defaultsDeep(this.options, stockChartOptions);
+    this.enableExport && this.enableExporting(this.config);
+    this.enableExport && this.enableExporting(this.stockConfig);
     if (this.isStockChart) {
       this.chart = this.highstocks.stockChart(this.container.nativeElement, this.stockConfig);
     } else {
@@ -59,6 +62,59 @@ export class ChartComponent {
         next: this.onOptionsChartUpdate.bind(this)
       });
     }
+  }
+
+  /**
+   * Enables exporting features for the chart.
+   *
+   * @param {any} config
+   * @memberof ChartComponent
+   */
+  enableExporting(config) {
+    set(config, 'exporting', {
+      enabled: true,
+      allowHTML: false,
+      fallbackToExportServer: false
+    });
+  }
+
+  /**
+   * Sets the name of download file as chart title.
+   *
+   * @param {any} config
+   * @memberof ChartComponent
+   */
+  addExportConfig(config) {
+    set(config, 'exporting.filename', get(config, 'title.text') || 'chart');
+    set(config, 'exporting.chartOptions', {
+      legend: {
+        navigation: {
+          enabled: false
+        }
+      }
+    });
+  }
+
+  /**
+   * Adds the size of chart to export config. There's a timeout because we
+   * want to calculate the chart size after it has been drawn, not before it.
+   *
+   * @param {any} config
+   * @memberof ChartComponent
+   */
+  addExportSize(config) {
+    setTimeout(() => {
+      set(config, 'exporting.sourceWidth', this.chart.chartWidth);
+      set(config, 'exporting.sourceHeight', this.chart.chartHeight);
+
+      this.chart.update({
+        exporting: {
+          sourceHeight: this.chart.chartHeight,
+          sourceWidth: this.chart.chartWidth
+        }
+      }, false);
+
+    }, 100);
   }
 
   onOptionsChartUpdate(updates) {
@@ -80,11 +136,15 @@ export class ChartComponent {
         // Fix --- Highstocks API manipulating external config object, setting series and categories data to NULL
         // https://forum.highcharts.com/highstock-usage/creating-a-chart-manipulates-external-options-object-t15255/#p81794
         this.clonedConfig = clone(this.config);
+        this.addExportConfig(this.config);
         this.chart = this.highstocks.stockChart(this.container.nativeElement, this.config);
         this.config = clone(this.clonedConfig);
+        this.addExportSize(this.config);
         this.clonedConfig = {};
       } else {
+        this.addExportConfig(this.config);
         this.chart = this.highcharts.chart(this.container.nativeElement, this.config);
+        this.addExportSize(this.config);
       }
       if (!isUndefined(this.config.xAxis)) {
         this.config.xAxis.categories = [];
