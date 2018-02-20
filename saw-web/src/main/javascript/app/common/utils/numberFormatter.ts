@@ -1,5 +1,6 @@
 import * as fpPipe from 'lodash/fp/pipe';
 import * as split from 'lodash/split';
+import * as startsWith from 'lodash/startsWith';
 import * as replace from 'lodash/replace';
 import * as join from 'lodash/join';
 
@@ -63,7 +64,11 @@ export function applyCurrencyIfNeeded(format, numberString) {
   } = format;
 
   if (currency && currencySymbol) {
-    return join([currencySymbol, numberString], ' ');
+    // If it's a negative number, remove the negative sign
+    // and place it before currency.
+    return startsWith(numberString, '-') ?
+      join(['-', currencySymbol, numberString.slice(1)], '') :
+      join([currencySymbol, numberString], '');
   }
   return numberString;
 }
