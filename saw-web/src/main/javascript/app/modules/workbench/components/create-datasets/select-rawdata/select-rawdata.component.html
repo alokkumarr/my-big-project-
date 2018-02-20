@@ -1,4 +1,4 @@
-<div class="select-view" fxLayout="row" fxLayoutGap="9px" fxFill (window:resize)="onResize($event)">
+<div class="select-view" fxLayout="row" fxLayoutGap="9px" (window:resize)="onResize($event)">
   <mat-card class="margin-9" style="padding:0px;" fxFlex="75" fxFlex.gt-md="75" fxFlex.md="75">
     <mat-card-header class="headerGradient">
         <div mat-card-avatar class="staging-image"></div>
@@ -6,20 +6,20 @@
 
       <span class="toolbar-spacer"></span>
       <button for="fileUpload" mat-icon-button color="primary" (click)="fileUpload.click()" [style.height.px]="36">
-        <mat-icon>file_upload</mat-icon>
+        <mat-icon fontIcon="icon-upload"></mat-icon>
       </button>
       <input fxHide type="file" #fileUpload (change)="fileInput($event)" multiple accept=".csv, text/plain" />
       <button mat-icon-button color="primary" [style.height.px]="36" (click)="createFolder()">
-        <mat-icon>create_new_folder</mat-icon>
+        <mat-icon fontIcon="icon-new-folder"></mat-icon>
       </button>
     </mat-card-header>
-    <mat-card-content [style.height.px]="myHeight">
+    <mat-card-content>
       <div fxLayout="row" [style.height.%]="100">
         <div fxFlex="30">
           <div class="tree">
             <tree-root #tree [nodes]="treeNodes" [options]="treeOptions">
               <ng-template #treeNodeTemplate let-node let-index="index">
-                <mat-icon (click)="openFolder(node)" class="tree-icon">folder</mat-icon>
+                <mat-icon (click)="openFolder(node)" class="tree-icon" fontIcon="icon-folder-solid"></mat-icon>
                 <span (click)="openFolder(node)" style="vertical-align: top;">{{ node.data.name }}</span>
               </ng-template>
             </tree-root>
@@ -28,13 +28,13 @@
         <div fxFlex="70" fxLayout="column">
           <mat-form-field floatLabel="never" id="infoForMask">
             <input matInput placeholder="Enter file mask" [(ngModel)]="fileMask" [formControl]="fileMaskControl" required />
-            <mat-icon matSuffix  matTooltip="{{maskHelper}}">info_outline</mat-icon>
+            <mat-icon matSuffix fontIcon="icon-info" matTooltip="{{maskHelper}}"></mat-icon>
           </mat-form-field>
           <div>
             <dx-data-grid id="gridContainer">
               <div *dxTemplate="let data of 'dobjTemplate'">
                 <div fxLayout="row">
-                  <mat-icon class="file-icon">insert_drive_file</mat-icon>
+                  <mat-icon class="file-icon" fontIcon="icon-messages-solid"></mat-icon>
                   <div>{{data.value}}</div>
                 </div>
               </div>
@@ -47,7 +47,7 @@
               <div *dxTemplate="let data of 'actionsTemplate'">
                 <div fxLayout="row" fxLayoutAlign="center center">
                   <span class="preview-icon" matTooltip="Preview File" (click)="previewDialog(data.value)">
-                    <mat-icon>visibility</mat-icon>
+                    <mat-icon fontIcon="icon-show"></mat-icon>
                   </span>
                 </div>
               </div>
@@ -63,7 +63,7 @@
         <mat-card-title class="headerText">Selected Files</mat-card-title>
       <span class="toolbar-spacer"></span>
       <button mat-icon-button [style.height.px]="36" matTooltip="Clear All Selected" class="xBtn" (click)="clearSelected()">
-        <mat-icon>clear_all</mat-icon>
+        <mat-icon fontIcon="icon-clear-all"></mat-icon>
       </button>
     </mat-card-header>
     <mat-card-content [style.height.px]="myHeight">

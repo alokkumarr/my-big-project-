@@ -101,7 +101,7 @@ export class DatasetsGridPageComponent implements OnInit {
       cellTemplate: 'dsTypeTemplate',
       width: '7%'
     }, {
-      dataField: 'src',
+      dataField: 'set',
       caption: 'Actions',
       cellTemplate: 'actionsCellTemplate',
       width: '5%'

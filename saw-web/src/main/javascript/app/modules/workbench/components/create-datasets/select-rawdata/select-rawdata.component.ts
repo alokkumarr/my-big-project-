@@ -267,7 +267,7 @@ export class SelectRawdataComponent implements OnInit {
           const path = this.currentPath === '/' ? `/${name}` : `${this.currentPath}/${name}`;
           this.workBench.createFolder(this.userProject, path).subscribe(data => {
             const currentNode = this.tree.treeModel.getNodeById(this.nodeID);
-            currentNode.data.children.push(data.data[0]);
+            currentNode.data.children = data.data;
             this.tree.treeModel.update();
           });
         }

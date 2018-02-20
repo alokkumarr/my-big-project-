@@ -4,6 +4,10 @@
 select-rawdata {
   width: 100%;
 
+  .select-view {
+    height: 93%;
+  }
+
   .border-right-style {
     border-right-style: inset;
     background-color: white;

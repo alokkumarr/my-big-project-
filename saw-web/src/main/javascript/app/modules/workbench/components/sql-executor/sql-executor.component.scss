@@ -29,6 +29,11 @@ sql-executor {
   }
 
   .top-pane {
-    height: 50%;
+    height: 30%;
+    overflow: scroll;
+  }
+
+  .exec-btn-icon {
+    font-size: 24px;
   }
 }

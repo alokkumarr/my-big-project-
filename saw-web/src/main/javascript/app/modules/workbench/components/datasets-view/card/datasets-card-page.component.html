@@ -3,9 +3,7 @@
     <mat-card class="datasets-card">
       <mat-card-header>
           <div mat-card-avatar class="src-img {{sets.src}}"></div>
-          <!-- <mat-card-title [innerHTML]="sets.set"></mat-card-title> -->
         <div class="dataset-name" fxFlex [innerHTML]="sets.set"></div>
-        <!-- <mat-icon fontIcon="icon-query-mode" (click)="openSQLEditor()"  style="color:rgba(0, 0, 0, 0.54);cursor:pointer;"></mat-icon> -->
         <dataset-actions [id]="sets.set"></dataset-actions>
       </mat-card-header>
       <mat-divider></mat-divider>

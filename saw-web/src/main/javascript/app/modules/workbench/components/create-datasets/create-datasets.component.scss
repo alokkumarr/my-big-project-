@@ -18,6 +18,11 @@ create-datasets {
 
   .mat-horizontal-content-container {
     padding: 0 !important;
+    height: 90%;
+  }
+
+  .mat-horizontal-stepper-content {
+    height: 100%;
   }
 
   .mat-stepper-horizontal {

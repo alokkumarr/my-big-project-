@@ -16,7 +16,7 @@
         <div fxFlex></div>
         <button mat-button mat-raised-button mat-primary color="primary" matStepperNext class="stepperBtn">
           <span>Next</span>
-          <mat-icon>arrow_forward</mat-icon>
+          <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>
       </div>
     </mat-step>
@@ -24,13 +24,13 @@
       <dataset-details [selFiles]="selectedFiles" [previewConfig]="csvConfig" (onDetailsFilled)="markDetailsDone($event)"></dataset-details>
       <div>
         <button mat-button mat-raised-button mat-primary color="secondary" matStepperPrevious class="stepperBtn">
-          <mat-icon>arrow_back</mat-icon>
+          <mat-icon fontIcon="icon-back"></mat-icon>
           <span>Previous</span>
         </button>
         <div fxFlex></div>
         <button mat-button mat-raised-button mat-primary color="primary" matStepperNext class="stepperBtn">
           <span>Next</span>
-          <mat-icon>arrow_forward</mat-icon>
+          <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>
       </div>
     </mat-step>
@@ -38,13 +38,13 @@
       <parser-preview [previewObj]="parsedPreview" #previewComponent (parserConfig)="getParserConfig($event)"></parser-preview>
       <div>
         <button mat-button mat-raised-button mat-primary color="secondary" matStepperPrevious class="stepperBtn">
-          <mat-icon>arrow_back</mat-icon>
+          <mat-icon fontIcon="icon-back"></mat-icon>
           <span>Previous</span>
         </button>
         <div fxFlex></div>
         <button mat-button mat-raised-button mat-primary color="primary" matStepperNext class="stepperBtn">
           <span>Next</span>
-          <mat-icon>arrow_forward</mat-icon>
+          <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>
       </div>
     </mat-step>
@@ -56,7 +56,7 @@
             <mat-list-item class="list-items" *ngFor="let file of selectedFiles; index as i" (click)="previewDialog(file)">
               <p mat-line>{{i + 1}}. &ensp; {{ file.name }}</p>
               <div class="icon-div">
-                <mat-icon mat-list-icon class="preview-icon">visibility</mat-icon>
+                <mat-icon mat-list-icon class="preview-icon" fontIcon="icon-show"></mat-icon>
               </div>
               <mat-divider></mat-divider>
             </mat-list-item>
@@ -123,13 +123,13 @@
       </div>
       <div>
         <button mat-button mat-raised-button mat-primary color="secondary" matStepperPrevious class="stepperBtn">
-          <mat-icon>arrow_back</mat-icon>
+          <mat-icon fontIcon="icon-back"></mat-icon>
           <span>Previous</span>
         </button>
         <div fxFlex></div>
         <button mat-button mat-raised-button mat-primary color="primary" matStepperNext (click)="triggerParser()" class="stepperBtn">
           <span>ADD</span>
-          <mat-icon>arrow_forward</mat-icon>
+          <mat-icon fontIcon="icon-right-arrow"></mat-icon>
         </button>
       </div>
     </mat-step>

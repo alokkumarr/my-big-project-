@@ -16,7 +16,7 @@ import * as isEmpty from 'lodash/isEmpty';
 import * as cloneDeep from 'lodash/cloneDeep';
 import * as map from 'lodash/map';
 
-import 'brace/theme/eclipse';
+import 'brace/theme/sqlserver';
 import 'brace/ext/language_tools';
 import 'brace/mode/sql';
 import { AceEditorComponent } from 'ng2-ace-editor';
@@ -35,6 +35,7 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
   @ViewChild('editor') editor: AceEditorComponent;
 
   private _artifacts: Array<any>;
+  private query: string;
   
   private editorOptions = {
     displayIndentGuides: true,
@@ -135,7 +136,7 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
   }
 
   queryUpdated(query) {
-    this.model.queryManual = this.model.query;
+    this.model.queryManual = this.query;
   }
 
   doSubmit() {
