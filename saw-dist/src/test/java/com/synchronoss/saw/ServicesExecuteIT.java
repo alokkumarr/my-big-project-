@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -41,6 +42,7 @@ import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
 public class ServicesExecuteIT {
     private RequestSpecification spec;
     private ObjectMapper mapper;
+    private String ssoToken;
 
     @BeforeClass
     public static void setUpClass() {
@@ -83,6 +85,18 @@ public class ServicesExecuteIT {
         assertThat(data.size(), equalTo(0));
     }
 
+    @Test
+    public void testSSOAuthentication()
+    {
+         Response response = request(ssoToken)
+            .when().get("/security/authentication?jwt=" +ssoToken)
+            .then().assertThat().statusCode(200)
+            .extract().response();
+        assertNotNull("Valid access Token not found, Authentication failed ",response.path("aToken"));
+        assertNotNull("Valid refresh Token not found, Authentication failed",response.path("rToken"));
+
+    }
+
     private static final String TEST_USERNAME = "sawadmin@synchronoss.com";
     private static final String TEST_PASSWORD = "Sawsyncnewuser1!";
 
@@ -104,6 +118,7 @@ public class ServicesExecuteIT {
             .then().assertThat().statusCode(200)
             .body("aToken", startsWith(""))
             .extract().response();
+        ssoToken= response.path("rToken");
         return response.path("aToken");
     }
 
@@ -274,8 +289,7 @@ public class ServicesExecuteIT {
             .body(buckets + ".find { it.key == 'string 1' }.doc_count", equalTo(1));
     }
 
-    private String listSingleExecution(String token, String analysisId)
-        throws JsonProcessingException {
+    private String listSingleExecution(String token, String analysisId) {
         Response response = request(token)
             .when().get("/services/analysis/" + analysisId + "/executions")
             .then().assertThat().statusCode(200)
@@ -285,8 +299,7 @@ public class ServicesExecuteIT {
     }
 
     private List<Map<String, String>> getExecution(
-        String token, String analysisId, String executionId)
-        throws JsonProcessingException {
+        String token, String analysisId, String executionId) {
         String path = "/services/analysis/" + analysisId + "/executions/"
             + executionId + "/data";
         return request(token).when().get(path)

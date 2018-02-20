@@ -6,6 +6,8 @@ package com.sncr.saw.security.app.controller;
 import com.google.gson.Gson;
 import com.sncr.saw.security.app.properties.NSSOProperties;
 import com.sncr.saw.security.app.repository.UserRepository;
+import com.sncr.saw.security.app.sso.SSORequestHandler;
+import com.sncr.saw.security.app.sso.SSOResponse;
 import com.sncr.saw.security.common.bean.ChangePasswordDetails;
 import com.sncr.saw.security.common.bean.CustProdModule;
 import com.sncr.saw.security.common.bean.CustomerProductSubModule;
@@ -45,11 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.mail.Message;
 import javax.mail.internet.AddressException;
@@ -57,6 +55,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Iterator;
@@ -77,6 +77,9 @@ public class SecurityController {
 	private UserRepository userRepository;
 	@Autowired
 	private NSSOProperties nSSOProperties;
+
+	@Autowired
+	SSORequestHandler ssoRequestHandler;
 
 	@RequestMapping(value = "/doAuthenticate", method = RequestMethod.POST)
 	public LoginResponse doAuthenticate(@RequestBody LoginDetails loginDetails) {
@@ -129,6 +132,16 @@ public class SecurityController {
 		return new LoginResponse(Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", ticket)
 				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact(),Jwts.builder().setSubject(loginDetails.getMasterLoginId()).claim("ticket", rToken)
 				.setIssuedAt(new Date()).signWith(SignatureAlgorithm.HS256, "sncrsaw2").compact());
+	}
+
+	/**
+	 *
+	 * @param token
+	 * @return
+	 */
+	@RequestMapping(value = "/authentication", method = RequestMethod.GET)
+	public SSOResponse SSOAuthentication(@RequestParam("jwt") String token , HttpServletRequest request, HttpServletResponse response) {
+       return ssoRequestHandler.processSSORequest(token);
 	}
 	
 	@RequestMapping(value = "/getNewAccessToken", method = RequestMethod.POST)
