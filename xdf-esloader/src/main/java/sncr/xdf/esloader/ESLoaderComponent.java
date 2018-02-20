@@ -24,7 +24,7 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
     private static final Logger logger = Logger.getLogger(ESLoaderComponent.class);
 
     //TODO: Remove this
-    public static final String ESLOADER_DATASET = "ESDATASET";
+    public static String ESLOADER_DATASET;
 
     private Map<String, String> esDataset;
     private String dataSetName;
@@ -53,6 +53,10 @@ public class ESLoaderComponent extends Component implements WithSparkContext, Wi
         int retVal = 0;
         try {
             ESLoader esLoaderConfig = this.ctx.componentConfiguration.getEsLoader();
+
+            if (this.inputDataSets != null && !this.inputDataSets.isEmpty()) {
+                ESLOADER_DATASET = this.inputDataSets.keySet().iterator().next();
+            }
 
             esDataset = this.inputDataSets.get(ESLOADER_DATASET);
             logger.debug("ES Dataset = " + esDataset);
