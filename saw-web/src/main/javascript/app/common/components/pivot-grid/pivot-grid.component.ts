@@ -21,6 +21,7 @@ import * as fpForEach from 'lodash/fp/forEach';
 import * as fpMapKeys from 'lodash/fp/mapKeys';
 import * as moment from 'moment';
 import {Subject} from 'rxjs/Subject';
+import { DEFAULT_PRECISION } from '../data-format-dialog/data-format-dialog.component';
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
 import {
   ArtifactColumnPivot,
@@ -263,7 +264,7 @@ export class PivotGridComponent {
         if (NUMBER_TYPES.includes(cloned.type)) {
           cloned.dataType = 'number';
           cloned.format = {
-            formatter: getFormatter(artifactColumn.format)
+            formatter: getFormatter(artifactColumn.format || {precision: DEFAULT_PRECISION})
           };
           /* We're aggregating values in backend. Aggregating it again using
              pivot's aggregate function will lead to bad data. Always keep this
