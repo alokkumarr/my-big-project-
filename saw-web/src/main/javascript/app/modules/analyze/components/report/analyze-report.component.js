@@ -338,7 +338,7 @@ export const AnalyzeReportComponent = {
     generatePayload() {
       /* eslint-disable camelcase */
       const model = this.canvas.model;
-      const columnString = '';
+      let columnString = '';
       const result = {
         artifacts: [],
         groupByColumns: [],
