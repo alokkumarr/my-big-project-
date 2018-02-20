@@ -24,3 +24,12 @@ The HTTP response:
 
 include::{snippets}/list-metrics/http-response.adoc[]
 
+== SSO Authentication using jwt token
+
+The HTTP request:
+
+include::{snippets}/ssoAuthentication/http-request.adoc[]
+
+The HTTP response:
+
+include::{snippets}/ssoAuthentication/http-response.adoc[]

@@ -86,15 +86,15 @@ public class ServicesExecuteIT {
     }
 
     @Test
-    public void testSSOAuthentication()
+    public String ssoAuthentication()
     {
-         Response response = request(ssoToken)
+         Response response = given(spec)
             .when().get("/security/authentication?jwt=" +ssoToken)
             .then().assertThat().statusCode(200)
             .extract().response();
         assertNotNull("Valid access Token not found, Authentication failed ",response.path("aToken"));
         assertNotNull("Valid refresh Token not found, Authentication failed",response.path("rToken"));
-
+        return response.asString();
     }
 
     private static final String TEST_USERNAME = "sawadmin@synchronoss.com";
