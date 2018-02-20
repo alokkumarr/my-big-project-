@@ -224,6 +224,7 @@ class Analysis extends BaseController {
                   case obj: JString => obj.extract[String]
                   case obj => unexpectedElement("string", obj)
                 }
+              m_log.info("RUNTIME_QUERY_RUNTIME"+queryRuntime)
               }}
             case _ => {}
           }
@@ -293,6 +294,7 @@ class Analysis extends BaseController {
       case obj: JString => obj.extract[String]
       case obj => unexpectedElement("string", obj)
     }
+      m_log.info("REPORT_QUERY:"+query)
     val queryJson: JObject = ("query", JString(query)) ~
     ("outputFile",
       ("outputFormat", "json") ~ ("outputFileName", "test.json"))
