@@ -48,7 +48,7 @@ export class DataFormatDialogComponent {
   ngOnInit() {
     this.format = this.data.format || {};
     this.isFloat = FLOAT_TYPES.includes(this.data.type);
-    if (this.isFloat && !has(this.format.precision)) {
+    if (this.isFloat && !has(this.format, 'precision')) {
       this.format.precision = DEFAULT_PRECISION;
     }
     this.changeSample();

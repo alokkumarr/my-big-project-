@@ -40,8 +40,8 @@
                max="99"
                min="0"
                placeholder="Decimal Precision"
-               (input)="onPrecisionChange($event.data)"
-               [value]="format.precision"/>
+               (ngModelChange)="onPrecisionChange($event)"
+               [ngModel]="format.precision"/>
       </mat-form-field>
     </div>
 

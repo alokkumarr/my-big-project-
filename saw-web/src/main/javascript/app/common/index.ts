@@ -26,6 +26,7 @@ import 'devextreme/integration/jquery';
 import 'devextreme/integration/angular';
 
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { DndModule } from './dnd';
 import { MaterialModule } from '../material.module';
 import {CommonModule as CommonModuleAngular4} from '@angular/common';
@@ -96,6 +97,7 @@ angular
   imports: [
     CommonModuleAngular4,
     BrowserModule,
+    FormsModule,
     MaterialModule,
     DndModule,
     DxPivotGridModule
