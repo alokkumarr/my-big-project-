@@ -338,6 +338,7 @@ export const AnalyzeReportComponent = {
     generatePayload() {
       /* eslint-disable camelcase */
       const model = this.canvas.model;
+      const columnString = '';
       const result = {
         artifacts: [],
         groupByColumns: [],
@@ -384,10 +385,9 @@ export const AnalyzeReportComponent = {
           tableArtifact.columns.push(fieldArtifact);
 
           if (result.sqlBuilder.dataFields && fieldArtifact.checked) {
-            if (field.type == 'string') {
-              const columnString = `${fieldArtifact.columnName}.keyword`;
-            } else {
-              const columnString = fieldArtifact.columnName;
+            columnString = fieldArtifact.columnName;
+            if (field.type === 'string') {
+              columnString = `${fieldArtifact.columnName}.keyword`;
             }
             if (field.aggregate) {
               result.sqlBuilder.dataFields.push({
