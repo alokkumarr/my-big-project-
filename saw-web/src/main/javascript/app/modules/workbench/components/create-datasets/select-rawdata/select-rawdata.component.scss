@@ -5,7 +5,7 @@ select-rawdata {
   width: 100%;
 
   .select-view {
-    height: 93%;
+    height: calc(100% - 43px);
   }
 
   .border-right-style {
@@ -48,8 +48,8 @@ select-rawdata {
     padding-right: 18px;
 
     mat-icon {
-      color: #1A89D4;
-      font-size: 22px;
+      color: $primary-blue-b2;
+      font-size: 19px;
     }
 
     .mat-form-field-wrapper {
@@ -68,7 +68,7 @@ select-rawdata {
 
   .selectCard {
     padding: 0;
-    background-color: whitesmoke;
+    background-color: #F5F9FC;
   }
 
   .whiteFrame {
@@ -111,5 +111,13 @@ select-rawdata {
 
   .xBtn {
     color: #E5524C;
+  }
+
+  .staging-content {
+    height: calc(100% - 55px);
+  }
+
+  .mat-icon-button {
+    height: 36px !important;
   }
 }

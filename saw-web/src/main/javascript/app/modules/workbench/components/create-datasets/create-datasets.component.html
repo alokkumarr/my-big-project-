@@ -10,6 +10,12 @@
 </div>
 <mat-dialog-content>
   <mat-horizontal-stepper fxFill linear="true" (selectionChange)="stepChanged($event)">
+      <ng-template matStepperIcon="edit">
+          <mat-icon fontIcon="icon-checkmark"></mat-icon>
+        </ng-template>
+        <!-- <ng-template matStepperIcon="done">
+            <mat-icon fontIcon="icon-checkmark"></mat-icon>
+        </ng-template> -->
     <mat-step [completed]="selectFullfilled" label="SELECT">
       <select-rawdata (onSelectFullfilled)="markSelectDone($event)"></select-rawdata>
       <div>
@@ -23,7 +29,7 @@
     <mat-step [completed]="detailsFilled" label="DETAILS">
       <dataset-details [selFiles]="selectedFiles" [previewConfig]="csvConfig" (onDetailsFilled)="markDetailsDone($event)"></dataset-details>
       <div>
-        <button mat-button mat-raised-button mat-primary color="secondary" matStepperPrevious class="stepperBtn">
+        <button mat-button mat-raised-button mat-primary color="secondary" matStepperPrevious class="stepperBtn previous Outline">
           <mat-icon fontIcon="icon-back"></mat-icon>
           <span>Previous</span>
         </button>
@@ -37,7 +43,7 @@
     <mat-step label="PREVIEW">
       <parser-preview [previewObj]="parsedPreview" #previewComponent (parserConfig)="getParserConfig($event)"></parser-preview>
       <div>
-        <button mat-button mat-raised-button mat-primary color="secondary" matStepperPrevious class="stepperBtn">
+        <button mat-button mat-raised-button mat-primary matStepperPrevious class="stepperBtn previous Outline">
           <mat-icon fontIcon="icon-back"></mat-icon>
           <span>Previous</span>
         </button>
@@ -49,7 +55,7 @@
       </div>
     </mat-step>
     <mat-step label="ADD_DATASET" [stepControl]="nameFormGroup">
-      <div fxLayout.gt-sm="row" fxLayoutGap="20px" (window:resize)="onResize($event)" class="data-details">
+      <div fxLayout.gt-sm="row" fxLayoutGap="20px" class="data-details">
         <div fxFlex="35" fxShow fxHide.xs="true" class="list-margin1">
           <span class="list-header">Selected Files</span>
           <mat-list>
@@ -66,20 +72,16 @@
           <mat-card-header class="headerGradient">
             <mat-card-title class="headerText">NAME_DATASET</mat-card-title>
           </mat-card-header>
-          <mat-card-content [style.height.px]="myHeight">
+          <mat-card-content >
             <div class="form-div">
               <form novalidate [formGroup]="nameFormGroup">
                 <section class="input-section">
                   <mat-form-field class="margin20">
-                    <input matInput placeholder="Dataset Name" name="datasetName" formControlName="nameControl" required />
+                    <input matInput placeholder="Dataset Name" name="datasetName" formControlName="nameControl" maxlength="18" required />
                     <mat-error *ngIf="nameFormGroup.controls.nameControl.hasError('required')">
                       Dataset Name is
                       <strong>required</strong>
                     </mat-error>
-                    <mat-error *ngIf="nameFormGroup.controls.nameControl.hasError('required')">
-                        Dataset Name is
-                        <strong>required</strong>
-                      </mat-error>
                   </mat-form-field>
                   <div class="margin20">
                     <mat-radio-group labelPosition="before" [(ngModel)]="parserConf.outputs[0].mode" [ngModelOptions]="{standalone: true}">
@@ -94,7 +96,7 @@
                 </section>
                 <section class="input-section">
                   <mat-form-field class="margin20">
-                    <input matInput placeholder="Description" name="description" formControlName="descControl" required />
+                    <input matInput placeholder="Description" name="description" formControlName="descControl" maxlength="50" required />
                     <mat-error *ngIf="nameFormGroup.controls.descControl.hasError('required')">
                       Dataset description is
                       <strong>required</strong>
@@ -122,7 +124,7 @@
         </mat-card>
       </div>
       <div>
-        <button mat-button mat-raised-button mat-primary color="secondary" matStepperPrevious class="stepperBtn">
+        <button mat-button mat-raised-button mat-primary color="secondary" matStepperPrevious class="stepperBtn previous Outline">
           <mat-icon fontIcon="icon-back"></mat-icon>
           <span>Previous</span>
         </button>

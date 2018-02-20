@@ -1,11 +1,11 @@
-<div fxLayout.gt-sm="row" fxLayoutGap="20px" (window:resize)="onResize($event)" class="data-details">
+<div fxLayout.gt-sm="row" fxLayoutGap="20px" class="data-details">
   <div fxFlex="35" fxShow fxHide.xs="true" class="list-margin1">
     <span class="list-header">Selected Files</span>
     <mat-list>
       <mat-list-item class="list-items" *ngFor="let file of selFiles; index as i" (click)="previewDialog(file)">
         <p mat-line>{{i + 1}}. &ensp; {{ file.name }}</p>
         <div class="icon-div">
-          <mat-icon mat-list-icon class="preview-icon">visibility</mat-icon>
+            <mat-icon fontIcon="icon-show" mat-list-icon class="preview-icon"></mat-icon>
         </div>
         <mat-divider></mat-divider>
       </mat-list-item>
@@ -15,18 +15,18 @@
     <mat-card-header class="headerGradient">
       <mat-card-title class="headerText">Details</mat-card-title>
     </mat-card-header>
-    <mat-card-content [style.height.px]="myHeight">
+    <mat-card-content>
       <div class="form-div">
         <form #datasetDetails novalidate [formGroup]="detailsFormGroup" autocomplete="off">
           <section class="input-section">
             <mat-form-field class="margin20">
-              <mat-select placeholder="Data format type?" [(value)]="previewConfig.csvInspector.delimiterType">
+              <mat-select placeholder="Data format type?" [(value)]="previewConfig.delimiterType">
                 <mat-option value="delimited">Delimited</mat-option>
                 <mat-option value="parquet" disabled>Parquet</mat-option>
               </mat-select>
             </mat-form-field>
             <mat-form-field class="margin20">
-              <mat-select placeholder="Header row present?" [(value)]="previewConfig.csvInspector.header">
+              <mat-select placeholder="Header row present?" [(value)]="previewConfig.header">
                 <mat-option value="yes">Yes</mat-option>
                 <mat-option value="no">No</mat-option>
               </mat-select>
@@ -83,9 +83,9 @@
           <section class="input-section">
             <mat-form-field class="margin20">
               <mat-chip-list #chipList>
-                <mat-chip *ngFor="let format of previewConfig.csvInspector.dateFormats" [selectable]="selectable" removable="true" (remove)="removeFormat(format)">
+                <mat-chip *ngFor="let format of previewConfig.dateFormats" [selectable]="selectable" removable="true" (remove)="removeFormat(format)">
                   {{format}}
-                  <mat-icon matChipRemove>cancel</mat-icon>
+                  <mat-icon fontIcon="icon-remove" matChipRemove></mat-icon>
                 </mat-chip>
                 <input placeholder="Date Formats" [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes" matChipInputAddOnBlur="true"
                   (matChipInputTokenEnd)="addFormat($event)" />
@@ -94,19 +94,19 @@
           </section>
           <mat-divider></mat-divider>
           <section class="input-section">
-            <span fxFlex="20">Rows To Inspect</span>
-            <mat-slider fxFlex placeholder="Rows To Inspect" name="rowsToInspect" class="margin20" max="10000" min="1000" step="500"
-              thumb-label="true" tick-interval="500" [(ngModel)]="previewConfig.csvInspector.rowsToInspect" [ngModelOptions]="{standalone: true}">
+            <span fxFlex="20">Sample Size</span>
+            <mat-slider fxFlex placeholder="Rows To Inspect" name="rowsToInspect" class="margin20" max="10000" min="10" step="100"
+              thumb-label="true" tick-interval="500" [(ngModel)]="previewConfig.rowsToInspect" [ngModelOptions]="{standalone: true}">
             </mat-slider>
-            <span>{{previewConfig.csvInspector.rowsToInspect}}</span>
+            <span>{{previewConfig.rowsToInspect}}</span>
           </section>
-          <section class="input-section">
+          <!-- <section class="input-section">
             <span fxFlex="20">Sample Size</span>
             <mat-slider fxFlex placeholder="Sample Size" name="sampleSize" class="margin20" max="200" min="10" step="10" thumb-label="true"
-              tick-interval="auto" [(ngModel)]="previewConfig.csvInspector.sampleSize" [ngModelOptions]="{standalone: true}">
+              tick-interval="auto" [(ngModel)]="previewConfig.sampleSize" [ngModelOptions]="{standalone: true}">
             </mat-slider>
-            <span>{{previewConfig.csvInspector.sampleSize}}</span>
-          </section>
+            <span>{{previewConfig.sampleSize}}</span>
+          </section> -->
         </form>
       </div>
     </mat-card-content>

@@ -114,7 +114,7 @@ export class SelectRawdataComponent implements OnInit {
     this.currentPath = path;
     this.nodeID = node.id;
     this.workBench.getStagingData(this.userProject, path).subscribe(data => {
-      const filteredDataFiles = data.filter(d => d.isDirectory === false);
+      const filteredDataFiles = data.data.filter(d => d.isDirectory === false);
       this.reloadDataGrid(filteredDataFiles);
       this.clearSelected();
     });

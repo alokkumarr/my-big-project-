@@ -4,6 +4,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 import * as get from 'lodash/get';
+import * as take from 'lodash/take';
 
 const template = require('./rawpreview-dialog.component.html');
 
@@ -21,7 +22,7 @@ export class RawpreviewDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) private params: any
   ) {
     if (get(params, 'rawData')) {
-      this.message = params.rawData;
+      this.message = take(params.rawData, 50);
     }
 
     if (get(params, 'title')) {

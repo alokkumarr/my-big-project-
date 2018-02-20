@@ -5,15 +5,15 @@
       <mat-card-title class="headerText">Staging Area</mat-card-title>
 
       <span class="toolbar-spacer"></span>
-      <button for="fileUpload" mat-icon-button color="primary" (click)="fileUpload.click()" [style.height.px]="36">
+      <button for="fileUpload" mat-icon-button color="primary" (click)="fileUpload.click()">
         <mat-icon fontIcon="icon-upload"></mat-icon>
       </button>
       <input fxHide type="file" #fileUpload (change)="fileInput($event)" multiple accept=".csv, text/plain" />
-      <button mat-icon-button color="primary" [style.height.px]="36" (click)="createFolder()">
+      <button mat-icon-button color="primary" (click)="createFolder()">
         <mat-icon fontIcon="icon-new-folder"></mat-icon>
       </button>
     </mat-card-header>
-    <mat-card-content>
+    <mat-card-content class="staging-content">
       <div fxLayout="row" [style.height.%]="100">
         <div fxFlex="30">
           <div class="tree">
@@ -34,7 +34,7 @@
             <dx-data-grid id="gridContainer">
               <div *dxTemplate="let data of 'dobjTemplate'">
                 <div fxLayout="row">
-                  <mat-icon class="file-icon" fontIcon="icon-messages-solid"></mat-icon>
+                  <mat-icon class="file-icon" fontIcon="icon-file-solid"></mat-icon>
                   <div>{{data.value}}</div>
                 </div>
               </div>
@@ -62,11 +62,11 @@
     <mat-card-header class="headerGradient">
         <mat-card-title class="headerText">Selected Files</mat-card-title>
       <span class="toolbar-spacer"></span>
-      <button mat-icon-button [style.height.px]="36" matTooltip="Clear All Selected" class="xBtn" (click)="clearSelected()">
+      <button mat-icon-button  matTooltip="Clear All Selected" class="xBtn" (click)="clearSelected()">
         <mat-icon fontIcon="icon-clear-all"></mat-icon>
       </button>
     </mat-card-header>
-    <mat-card-content [style.height.px]="myHeight">
+    <mat-card-content>
       <mat-list role="list" style="padding-top:0px;">
         <mat-list-item class="whiteFrame" role="listitem" *ngFor="let file of selFiles; index as i">
           <div class="mat-body-2">{{i + 1}}. &ensp; {{ file.name }}</div>

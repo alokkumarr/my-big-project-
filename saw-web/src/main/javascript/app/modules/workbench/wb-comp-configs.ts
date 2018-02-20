@@ -1,18 +1,15 @@
 export const CSV_CONFIG = {
-  csvInspector: {
-    file: '',
-    lineSeparator: '\n',
-    delimiter: '',
-    quoteChar: '\"',
-    quoteEscapeChar: '\\',
-    hederSize: 1,
-    fieldNamesLine: 1,
-    dateFormats: ['yyyy-MM-dd HH:mm:ss', 'MM/dd/yyyy HH:mm:ss', 'yyyy-MM-dd'],
-    rowsToInspect: 3333,
-    sampleSize: 33,
-    delimiterType: 'delimited',
-    header: 'yes'
-  }
+  file: '',
+  lineSeparator: '\n',
+  delimiter: ',',
+  quoteChar: '\"',
+  quoteEscapeChar: '\\',
+  headerSize: 1,
+  fieldNamesLine: 1,
+  dateFormats: [],
+  rowsToInspect: 3333,
+  delimiterType: 'delimited',
+  header: 'yes'
 };
 
 export const PARSER_CONFIG = {

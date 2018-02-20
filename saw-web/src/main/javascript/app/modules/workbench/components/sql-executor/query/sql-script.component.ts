@@ -136,7 +136,6 @@ export class SqlScriptComponent implements OnDestroy, AfterViewInit {
   }
 
   queryUpdated(query) {
-    this.model.queryManual = this.query;
   }
 
   doSubmit() {

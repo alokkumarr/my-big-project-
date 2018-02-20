@@ -42,4 +42,12 @@ parser-preview {
     padding-top: 2px;
     color: $primary-red;
   }
+
+  .preview-container {
+    height: calc(100% - 52px);
+  }
+
+  .raw-content {
+    padding: 20px;
+  }
 }

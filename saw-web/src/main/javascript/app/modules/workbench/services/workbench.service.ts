@@ -54,7 +54,7 @@ export class WorkbenchService {
 
   /** GET raw preview from the server */
   getRawPreviewData(projectName: string, path: string): Observable<any> {
-    const endpoint = `${this.wbAPI}/${projectName}/raw/preview`;
+    const endpoint = `${this.wbAPI}/${projectName}/raw/directory/preview`;
     return this.http.post(endpoint, {path})
       .pipe(
         catchError(this.handleError('data', RAW_SAMPLE)));
