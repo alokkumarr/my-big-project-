@@ -7,6 +7,10 @@ export function routesConfig($stateProvider, $urlRouterProvider) {
   const states = [{
     name: 'root',
     url: '/'
+  }, {
+    // Dummy route to serve as auth endpoint
+    name: 'authenticate',
+    url: '/authenticate'
   }];
 
   states.forEach(state => {
