@@ -1,13 +1,14 @@
 .mat-select-value {
   width: 90% !important;
   padding: 8px 15px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 .mat-select {
   position: relative !important;
   width: 18% !important;
   margin-left: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  margin-bottom: 10px;
 }
 
 .tab {
@@ -42,4 +43,9 @@
   padding: 6px 12px;
   border: 1px solid #CCC;
   border-top: none;
+}
+
+.checkbox {
+  text-align: center;
+  margin: 0 5px 15px 42px;
 }

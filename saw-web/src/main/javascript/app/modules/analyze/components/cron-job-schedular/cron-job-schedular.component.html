@@ -21,13 +21,13 @@
 </div>
 
 <div *ngIf="scheduleType == 'weeklybasis'" [ngClass]="{'active': scheduleType == 'weeklybasis'}" class="tabcontent">
-  <input type="checkbox" [(ngModel)]="weekly.MON" (click)="regenerateCron()" /> Monday
-  <input type="checkbox" [(ngModel)]="weekly.TUE" (click)="regenerateCron()" /> Tuesday
-  <input type="checkbox" [(ngModel)]="weekly.WED" (click)="regenerateCron()" /> Wednesday
-  <input type="checkbox" [(ngModel)]="weekly.THU" (click)="regenerateCron()" /> Thrusday
-  <input type="checkbox" [(ngModel)]="weekly.FRI" (click)="regenerateCron()" /> Friday
-  <input type="checkbox" [(ngModel)]="weekly.SAT" (click)="regenerateCron()" /> Saturday
-  <input type="checkbox" [(ngModel)]="weekly.SUN" (click)="regenerateCron()" /> Sunday
+  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.MON" (click)="regenerateCron()" /> Monday
+  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.TUE" (click)="regenerateCron()" /> Tuesday
+  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.WED" (click)="regenerateCron()" /> Wednesday
+  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.THU" (click)="regenerateCron()" /> Thrusday
+  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.FRI" (click)="regenerateCron()" /> Friday
+  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.SAT" (click)="regenerateCron()" /> Saturday
+  <input class="checkbox" type="checkbox" [(ngModel)]="weekly.SUN" (click)="regenerateCron()" /> Sunday
   <br/>
   Start Time
   <cron-date-picker [model]="weeklybasisDate" (onDateChange)="onDateChange($event)"></cron-date-picker><br/><br/>
@@ -38,7 +38,7 @@
     <mat-radio-button class="everyDay" value="specificDay" (click)="resetData();">On the </mat-radio-button>
     <mat-select placeholder="Day" [(ngModel)]="monthly.specificDay" (selectionChange)="regenerateCron()">
       <mat-option *ngFor="let day of days" [value]="day">
-        {{day}}
+        {{getDaySuffix(day)}}
       </mat-option>
     </mat-select> st Day of every 
     <mat-select placeholder="Month" [(ngModel)]="monthly.specificMonth" (selectionChange)="regenerateCron()">
@@ -78,7 +78,7 @@
     </mat-select> on the  
     <mat-select placeholder="Days" [(ngModel)]="yearly.specificMonthDayDay" (selectionChange)="regenerateCron()">
       <mat-option *ngFor="let day of days" [value]="day">
-        {{day}}
+        {{getDaySuffix(day)}}
       </mat-option>
     </mat-select>st Day at <br/>
     <cron-date-picker [model]="specificMonthDayYear" (onDateChange)="onDateChange($event)"></cron-date-picker><br/><br/><br/>

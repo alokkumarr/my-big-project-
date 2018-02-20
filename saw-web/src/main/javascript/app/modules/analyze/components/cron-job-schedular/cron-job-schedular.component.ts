@@ -1,6 +1,8 @@
 declare const require: any;
 
-import { Component, Inject, Input, EventEmitter } from '@angular/core';
+import { Component, Inject, Input, EventEmitter, Output } from '@angular/core';
+import cronstrue from 'cronstrue';
+
 const template = require('./cron-job-schedular.component.html');
 require('./cron-job-schedular.component.scss');
 
@@ -15,6 +17,7 @@ export class CronJobSchedularComponent {
   public model: any;
   @Input() public model: any;
   @Input() public cronexp: any;
+  @Output() public cronexp: any;
 
   ngOnInit() {
   	this.dailyTypeDay = {
@@ -123,6 +126,11 @@ export class CronJobSchedularComponent {
       value:'12',
       label:'December'
     }];
+    this.scheduleType = 'daily';
+    console.log(this.cronexp);
+    console.log(cronstrue.toString('0 3 4 1/5 * ? *'));
+    console.log(cronstrue.toString('0 7 5 ? * MON-FRI *'));
+    console.log(cronstrue.toString(' 0 7 5 ? * MON,TUE,WED,THU,FRI *'));
   }
 
   private range(start: number, end: number): number[] {
@@ -145,6 +153,18 @@ export class CronJobSchedularComponent {
 
   hourToCron(hour, hourType) {
     return hourType === 'AM' ? (hour === 12 ? 0 : hour) : (hour === 12 ? 12 : hour + 12);
+  }
+
+  getDaySuffix(num) {
+    const array = ('' + num).split('').reverse();
+    if (array[1] != '1') { // Number is in the teens
+      switch (array[0]) {
+      case '1': return `${num}st`;
+      case '2': return `${num}nd`;
+      case '3': return `${num}rd`;
+      }
+    }
+    return `${num}th`;
   }
 
   regenerateCron() {

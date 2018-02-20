@@ -1,16 +1,16 @@
-<mat-select style="border-bottom-style: none;" class="md-select-value" placeholder="Hours" [(ngModel)]="model.hour" (selectionChange)="triggerChange()">
+<mat-select class="md-select-value" placeholder="Hours" [(ngModel)]="model.hour" (selectionChange)="triggerChange()">
   <mat-option *ngFor="let hour of selectOptions.hours" [value]="hour">
     {{hour}}
   </mat-option>
 </mat-select>
 
-<mat-select style="border-bottom-style: none;" class="md-select-value"  placeholder="Minutes" [(ngModel)]="model.minute" (selectionChange)="triggerChange()">
+<mat-select class="md-select-value"  placeholder="Minutes" [(ngModel)]="model.minute" (selectionChange)="triggerChange()">
   <mat-option *ngFor="let minute of selectOptions.minutes" [value]="minute">
     {{minute}}
   </mat-option>
 </mat-select>
 
-<mat-select style="border-bottom-style: none;" class="md-select-value" [(ngModel)]="model.hourType" (selectionChange)="triggerChange()">
+<mat-select class="md-select-value" [(ngModel)]="model.hourType" (selectionChange)="triggerChange()">
   <mat-option *ngFor="let hourType of selectOptions.hourTypes" [value]="hourType">
   {{hourType}}
   </mat-option>

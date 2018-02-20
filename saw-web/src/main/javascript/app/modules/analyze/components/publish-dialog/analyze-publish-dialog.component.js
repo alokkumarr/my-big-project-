@@ -37,7 +37,7 @@ export const AnalyzePublishDialogComponent = {
       this.dataHolder = [];
       this.dateFormat = 'mm/dd/yyyy';
       this.hasSchedule = false;
-      this.cronexp = 'ewwededwecwec';
+      this.cronexp = '';
       this.regexOfEmail = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/;
       const semicolon = 186;
       this.separatorKeys = [$mdConstant.KEY_CODE.ENTER, $mdConstant.KEY_CODE.COMMA, semicolon];
@@ -134,6 +134,7 @@ export const AnalyzePublishDialogComponent = {
     }
 
     publish() {
+      console.log(this.cronexp);
       if (!this.validateEmails(this.emails)) {
         this.emailValidateFlag = true;
         return;

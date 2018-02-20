@@ -29,7 +29,7 @@
       </div>
 
       <div ng-show="$ctrl.hasSchedule" class="schedule-container" layout="column">
-        <cron-job-schedular cronexp="$ctrl.cronexp"></cron-job-schedular>
+        <cron-job-schedular [cronexp]="$ctrl.cronexp"></cron-job-schedular>
         <!-- <div layout="row" class="form-container">
 
           <label translate="REPEAT_EVERY" flex="20"></label>
