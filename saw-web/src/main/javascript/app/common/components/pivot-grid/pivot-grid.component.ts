@@ -20,6 +20,7 @@ import * as fpFilter from 'lodash/fp/filter';
 import * as fpForEach from 'lodash/fp/forEach';
 import * as fpMapKeys from 'lodash/fp/mapKeys';
 import * as moment from 'moment';
+import * as isUndefined from 'lodash/isUndefined';
 import {Subject} from 'rxjs/Subject';
 import {Sort} from '../../../modules/analyze/models/sort.model'
 import PivotGridDataSource from 'devextreme/ui/pivot_grid/data_source';
@@ -274,6 +275,10 @@ export class PivotGridComponent {
 
         if (cloned.type === 'string') {
           cloned.columnName = split(cloned.columnName, '.')[0];
+        }
+        
+        if (!isUndefined(cloned.aliasName) && cloned.aliasName != '') {
+          cloned.displayName = cloned.aliasName;
         }
 
         return cloned;

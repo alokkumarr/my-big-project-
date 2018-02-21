@@ -35,6 +35,10 @@ dashboard-grid {
           div {
             height: 100%;
           }
+
+          .highcharts-contextmenu {
+            height: auto;
+          }
         }
       }
     }
