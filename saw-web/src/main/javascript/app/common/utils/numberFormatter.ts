@@ -1,4 +1,5 @@
 import * as fpPipe from 'lodash/fp/pipe';
+import * as isFinite from 'lodash/isFinite';
 import * as split from 'lodash/split';
 import * as startsWith from 'lodash/startsWith';
 import * as replace from 'lodash/replace';
@@ -27,7 +28,7 @@ export function getFormatter(format: Format) {
 
 export function applyPrecisionIfNeeded(format, number) {
   const precision = format.precision;
-  if (precision) {
+  if (isFinite(precision)) {
     return Number(number).toFixed(precision);
   }
   return number.toString();
@@ -80,7 +81,7 @@ export function isFormatted(format: Format) {
   if (format.currency) {
     return true;
   }
-  if (format.precision) {
+  if (isFinite(format.precision)) {
     return true;
   }
   return false;
