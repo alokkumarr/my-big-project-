@@ -171,7 +171,7 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
 
       const filters = get(analysis, 'sqlBuilder.filters', []);
 
-      this.filters.addFilter(
+      this.filters.addFilter(filter(
         map(filters, flt => ({
           ...flt,
           ...{
@@ -179,9 +179,9 @@ export class DashboardGridComponent implements OnInit, OnChanges, AfterViewInit,
             esRepository: analysis.esRepository,
             displayName: this.filters.getDisplayNameFor(columns, flt.columnName, flt.tableName)
           }
-        }))
-        // f => f.isGlobalFilter
-      );
+        })),
+        f => f.isGlobalFilter
+      ));
     }
   }
 
