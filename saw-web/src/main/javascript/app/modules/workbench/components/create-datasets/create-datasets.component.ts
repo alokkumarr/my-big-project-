@@ -86,6 +86,8 @@ export class CreateDatasetsComponent implements OnInit {
     const path = `${fileDetails.path}/${fileDetails.name}`;
     this.workBench.getRawPreviewData(this.userProject, path).subscribe(data => {
       const dialogRef = this.dialog.open(RawpreviewDialogComponent, {
+        minHeight: 500,
+        minWidth: 600,
         data: {
           title: fileDetails.name,
           rawData: data.data

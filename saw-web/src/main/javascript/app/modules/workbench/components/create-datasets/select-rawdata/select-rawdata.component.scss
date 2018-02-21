@@ -97,16 +97,18 @@ select-rawdata {
 
   .file-icon {
     color: #00B18D;
+    font-size: 18px;
   }
 
   .tree {
     padding: 25px 0 0 9px;
-    height: 95%;
+    border-right-style: inset;
   }
 
   .preview-icon {
     font-size: 18px;
-    color: #1A89D4;
+    cursor: pointer;
+    color: $primary-blue-b2;
   }
 
   .xBtn {

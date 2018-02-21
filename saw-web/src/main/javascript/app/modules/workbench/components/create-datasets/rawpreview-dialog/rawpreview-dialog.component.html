@@ -5,11 +5,11 @@
     <mat-icon style="color: #E5524C;" fontIcon="icon-close"></mat-icon>
   </button>
 </div>
-<div mat-dialog-content>
-  <span [textContent]="message"></span>
-  <!-- <div *ngFor="let line of message">
+<div mat-dialog-content style="background-color: #F5F9FC;">
+  <!-- <span [textContent]="message"></span> -->
+  <div *ngFor="let line of message">
     <span [textContent]="line"></span>
-  </div> -->
+  </div>
 </div>
 <div mat-dialog-actions style="flex-direction: row-reverse">
   <button style="color: #E5524C;" mat-button mat-raised-button (click)="closeDashboard()">

@@ -50,7 +50,7 @@
           </section>
           <section class="input-section">
             <mat-form-field class="margin20">
-              <input matInput placeholder="Field names Line" name="fieldNamesLine" formControlName="fieldNamesLineControl" required />
+              <input matInput placeholder="Field names Line" name="fieldNamesLine" formControlName="fieldNamesLineControl" />
               <mat-error *ngIf="detailsFormGroup.controls.fieldNamesLineControl.hasError('required')">
                 Field names Line is
                 <strong>required</strong>
@@ -66,14 +66,14 @@
           </section>
           <section class="input-section">
             <mat-form-field class="margin20">
-              <input matInput placeholder="Quote Character" name="quoteChar" formControlName="quoteCharControl" required />
+              <input matInput placeholder="Quote Character" name="quoteChar" formControlName="quoteCharControl" />
               <mat-error *ngIf="detailsFormGroup.controls.quoteCharControl.hasError('required')">
                 Quote Character is
                 <strong>required</strong>
               </mat-error>
             </mat-form-field>
             <mat-form-field class="margin20">
-              <input matInput placeholder="Escape Character" name="escapeChar" formControlName="escapeCharControl" required />
+              <input matInput placeholder="Escape Character" name="escapeChar" formControlName="escapeCharControl" />
               <mat-error *ngIf="detailsFormGroup.controls.escapeCharControl.hasError('required')">
                 Quote Character is
                 <strong>required</strong>

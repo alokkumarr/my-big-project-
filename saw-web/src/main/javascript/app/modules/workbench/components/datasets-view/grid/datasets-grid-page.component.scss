@@ -6,6 +6,15 @@ datasets-grid-page {
   md-dialog {
     max-width: 75% !important;
   }
+
+  .src-img {
+    height: 20px;
+    width: 46px;
+    margin-right: 5%;
+    float: right;
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
 }
 
 .toast-primary {

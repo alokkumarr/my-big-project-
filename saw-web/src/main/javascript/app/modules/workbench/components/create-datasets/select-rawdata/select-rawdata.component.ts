@@ -4,6 +4,8 @@ import { Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, OnDe
 import { FormControl, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material';
 import { debounceTime } from 'rxjs/operators';
+import * as trim from 'lodash/trim';
+import * as uniq from 'lodash/uniq';
 
 import { TreeNode, ITreeOptions } from 'angular-tree-component';
 import { DxDataGridComponent } from 'devextreme-angular';
@@ -29,7 +31,6 @@ export class SelectRawdataComponent implements OnInit {
   private userProject: string = 'project2';
   private treeNodes: Array<any> = STAGING_TREE;
   private treeOptions: ITreeOptions;
-  private myHeight: number;
   private maskHelper: any;
   private gridConfig: Array<any>;
   private selFiles: Array<any> = [];
@@ -53,7 +54,6 @@ export class SelectRawdataComponent implements OnInit {
   ngOnInit() {
     this.gridConfig = this.getGridConfig();
     this.treeConfig = this.getTreeConfig();
-    this.myHeight = window.screen.availHeight - 345;
     this.maskHelper = 'INFO_TEXT';
 
   }
@@ -70,10 +70,6 @@ export class SelectRawdataComponent implements OnInit {
 
   ngOnDestroy() {
     this.treeNodes = [];
-  }
-
-  onResize(event) {
-    this.myHeight = window.screen.availHeight - 345;
   }
 
   getPageData() {
@@ -220,6 +216,8 @@ export class SelectRawdataComponent implements OnInit {
     const path = `${this.currentPath}/${title}`;
     this.workBench.getRawPreviewData(this.userProject, path).subscribe(data => {
       const dialogRef = this.dialog.open(RawpreviewDialogComponent, {
+        minHeight: 500,
+        minWidth: 600,
         data: {
           title: title,
           rawData: data.data
@@ -249,6 +247,7 @@ export class SelectRawdataComponent implements OnInit {
   }
   /**
    * Opens dialog to input folder name. Once closed returns the filename entered.
+   * Gets the children of the directory from service output and push only the newly added child to parent.
    * 
    * @memberof SelectRawdataComponent
    */
@@ -263,11 +262,17 @@ export class SelectRawdataComponent implements OnInit {
     dateDialogRef
       .afterClosed()
       .subscribe(name => {
-        if (name !== '') {
+        if (trim(name) !== '' && name != 'null') {
           const path = this.currentPath === '/' ? `/${name}` : `${this.currentPath}/${name}`;
           this.workBench.createFolder(this.userProject, path).subscribe(data => {
             const currentNode = this.tree.treeModel.getNodeById(this.nodeID);
-            currentNode.data.children = data.data;
+            const currChilds = currentNode.data.children;
+            var uniqueResults = data.data.filter(obj => {
+              return !currChilds.some(obj2 => {
+                return obj.name == obj2.name;
+              });
+            });
+            currentNode.data.children.push(uniqueResults[0]);
             this.tree.treeModel.update();
           });
         }

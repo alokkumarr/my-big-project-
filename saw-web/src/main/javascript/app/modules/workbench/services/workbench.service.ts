@@ -30,18 +30,10 @@ export class WorkbenchService {
 
   /** GET datasets from the server */
   getDatasets(projectName: string): Observable<any> {
-    let Params = new HttpParams();
-    Params = Params.append('prj', projectName);
-    return this.http.get(`${this.apiWB}/dl/sets`, { params: Params })
+    const endpoint = `${this.wbAPI}/${projectName}/datasets`;
+    return this.http.post(endpoint, {})
       .pipe(
         catchError(this.handleError('data', DATASETS)));
-  }
-
-  /** GET Staging area tree list */
-  getProjects(): Observable<any> {
-    return this.http.get(`${this.wbAPI}/list`)
-      .pipe(
-        catchError(this.handleError('data', TREE_VIEW_Data)));
   }
 
   /** GET Staging area tree list */

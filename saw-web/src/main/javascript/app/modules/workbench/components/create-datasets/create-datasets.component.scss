@@ -55,12 +55,6 @@ create-datasets {
   }
 
   .Outline {
-    width: 123px;
-    font-style: normal;
-    font-stretch: normal;
-    line-height: normal;
-    letter-spacing: normal;
-    text-align: center;
     color: $primary-blue-b2;
   }
 
@@ -139,5 +133,9 @@ create-datasets {
 
   .data-details {
     height: calc(100% - 53px);
+  }
+
+  .top-margin {
+    margin-top: 3px;
   }
 }

@@ -1,11 +1,11 @@
 export const CSV_CONFIG = {
   file: '',
-  lineSeparator: '\n',
+  lineSeparator: '\\n',
   delimiter: ',',
-  quoteChar: '\"',
+  quoteChar: '',
   quoteEscapeChar: '\\',
   headerSize: 1,
-  fieldNamesLine: 1,
+  fieldNamesLine: '',
   dateFormats: [],
   rowsToInspect: 3333,
   delimiterType: 'delimited',
@@ -18,10 +18,10 @@ export const PARSER_CONFIG = {
     file: '',
     lineSeparator: '\\n',
     delimiter: ',',
-    quoteChar: '\"',
+    quoteChar: '',
     quoteEscape: '\\',
     headerSize: 1,
-    fieldNameLine: 0
+    fieldNameLine: ''
   },
   outputs: [{
     dataSet: '',

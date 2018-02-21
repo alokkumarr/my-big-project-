@@ -40,10 +40,10 @@ export class DatasetDetailsComponent implements OnInit {
     this.detailsFormGroup = new FormGroup({
       fieldSeperatorControl: new FormControl('', Validators.required),
       hederSizeControl: new FormControl('1', Validators.required),
-      fieldNamesLineControl: new FormControl('1', Validators.required),
-      lineSeperatorControl: new FormControl('\n', Validators.required),
-      quoteCharControl: new FormControl('"', Validators.required),
-      escapeCharControl: new FormControl('\\', Validators.required)
+      fieldNamesLineControl: new FormControl('0'),
+      lineSeperatorControl: new FormControl('\\n', Validators.required),
+      quoteCharControl: new FormControl(''),
+      escapeCharControl: new FormControl('')
     });
     this.subcribeToFormChanges();
   }
@@ -86,6 +86,8 @@ export class DatasetDetailsComponent implements OnInit {
     const path = `${fileDetails.path}/${fileDetails.name}`;
     this.workBench.getRawPreviewData(this.userProject, path).subscribe(data => {
       const dialogRef = this.dialog.open(RawpreviewDialogComponent, {
+        minHeight: 500,
+        minWidth: 600,
         data: {
           title: fileDetails.name,
           rawData: data.data
@@ -99,9 +101,9 @@ export class DatasetDetailsComponent implements OnInit {
       this.previewConfig.delimiter = data.fieldSeperatorControl;
       this.previewConfig.fieldNamesLine = data.fieldNamesLineControl;
       this.previewConfig.headerSize = data.hederSizeControl;
-      this.previewConfig.lineSeparator = data.lineSeperatorControl;
+      this.previewConfig.lineSeparator = data.lineSeperatorControl === '\\n' ? '\n' : data.lineSeperatorControl;
       this.previewConfig.quoteEscapeChar = data.escapeCharControl;
-      this.previewConfig.quoteChar = data.quoteCharControl
+      this.previewConfig.quoteChar = data.quoteCharControl === '' ? '"' : data.quoteCharControl;
       this.onDetailsFilled.emit({ detailsFilled: true, details: this.previewConfig });
     }
   }

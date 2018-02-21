@@ -1,7 +1,7 @@
-<div class="select-view" fxLayout="row" fxLayoutGap="9px" (window:resize)="onResize($event)">
+<div class="select-view" fxLayout="row" fxLayoutGap="9px">
   <mat-card class="margin-9" style="padding:0px;" fxFlex="75" fxFlex.gt-md="75" fxFlex.md="75">
     <mat-card-header class="headerGradient">
-        <div mat-card-avatar class="staging-image"></div>
+      <div mat-card-avatar class="staging-image"></div>
       <mat-card-title class="headerText">Staging Area</mat-card-title>
 
       <span class="toolbar-spacer"></span>
@@ -15,15 +15,13 @@
     </mat-card-header>
     <mat-card-content class="staging-content">
       <div fxLayout="row" [style.height.%]="100">
-        <div fxFlex="30">
-          <div class="tree">
-            <tree-root #tree [nodes]="treeNodes" [options]="treeOptions">
-              <ng-template #treeNodeTemplate let-node let-index="index">
-                <mat-icon (click)="openFolder(node)" class="tree-icon" fontIcon="icon-folder-solid"></mat-icon>
-                <span (click)="openFolder(node)" style="vertical-align: top;">{{ node.data.name }}</span>
-              </ng-template>
-            </tree-root>
-          </div>
+        <div class="tree" fxFlex="30">
+          <tree-root #tree [nodes]="treeNodes" [options]="treeOptions">
+            <ng-template #treeNodeTemplate let-node let-index="index">
+              <mat-icon (click)="openFolder(node)" class="tree-icon" fontIcon="icon-folder-solid"></mat-icon>
+              <span (click)="openFolder(node)" style="vertical-align: top;">{{ node.data.name }}</span>
+            </ng-template>
+          </tree-root>
         </div>
         <div fxFlex="70" fxLayout="column">
           <mat-form-field floatLabel="never" id="infoForMask">
@@ -60,9 +58,9 @@
 
   <mat-card class="margin-9 selectCard" fxFlex="25" fxFlex.gt-md="25" fxFlex.md="25">
     <mat-card-header class="headerGradient">
-        <mat-card-title class="headerText">Selected Files</mat-card-title>
+      <mat-card-title class="headerText">Selected Files</mat-card-title>
       <span class="toolbar-spacer"></span>
-      <button mat-icon-button  matTooltip="Clear All Selected" class="xBtn" (click)="clearSelected()">
+      <button mat-icon-button matTooltip="Clear All Selected" class="xBtn" (click)="clearSelected()">
         <mat-icon fontIcon="icon-clear-all"></mat-icon>
       </button>
     </mat-card-header>
