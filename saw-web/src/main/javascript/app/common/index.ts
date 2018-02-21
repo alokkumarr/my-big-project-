@@ -32,6 +32,7 @@ import {DxPivotGridModule, DxPivotGridComponent} from 'devextreme-angular';
 import EventEmitter from './utils/eventEmitter';
 import ComponentHandler from './utils/componentHandler';
 
+import { ChartService } from './components/charts/chart.service';
 import {CommonServiceModule} from './services';
 import {CommonComponentModule} from './components';
 import {CommonFilterModule} from './filters';
@@ -115,7 +116,8 @@ angular
   providers: [
     ErrorDetailService,
     ErrorDetailDialogService,
-    toastProvider
+    toastProvider,
+    ChartService
   ]
 })
 export class CommonModuleTs {}

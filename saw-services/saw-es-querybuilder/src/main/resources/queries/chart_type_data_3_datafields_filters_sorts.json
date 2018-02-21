@@ -278,7 +278,10 @@
            "type" : "string",
            "operator" : "EQ",
            "tableName" : "MCT_CONTENT_SUMMARY",
-           "model" : {"modelValues" : ["IOS"]}
+           "model" : {
+             "operator": "ISIN",
+             "modelValues" : ["IOS"]
+           }
          }
           ],
           "dataFields": [
