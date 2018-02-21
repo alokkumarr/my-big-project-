@@ -31,6 +31,7 @@ import {
 import {
   DATE_TYPES,
   NUMBER_TYPES,
+  FLOAT_TYPES,
   DATE_INTERVALS_OBJ
 } from '../../../modules/analyze/consts';
 import { getFormatter } from '../../utils/numberFormatter';
@@ -264,7 +265,9 @@ export class PivotGridComponent {
         if (NUMBER_TYPES.includes(cloned.type)) {
           cloned.dataType = 'number';
           cloned.format = {
-            formatter: getFormatter(artifactColumn.format || {precision: DEFAULT_PRECISION})
+            formatter: getFormatter(artifactColumn.format || (
+              FLOAT_TYPES.includes(cloned.type) ? {precision: DEFAULT_PRECISION} : {precision: 0}
+            ))
           };
           /* We're aggregating values in backend. Aggregating it again using
              pivot's aggregate function will lead to bad data. Always keep this
