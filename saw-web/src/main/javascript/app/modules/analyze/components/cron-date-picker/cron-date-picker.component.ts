@@ -28,7 +28,7 @@ export class CronDatePickerComponent implements OnInit {
   }
 
   triggerChange() {
-    this.onDateChange.emit();   
+    this.onDateChange.emit(); 
   }
 
   private range(start: number, end: number): number[] {

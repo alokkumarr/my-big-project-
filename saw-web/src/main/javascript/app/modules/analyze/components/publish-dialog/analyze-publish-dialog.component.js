@@ -75,7 +75,11 @@ export const AnalyzePublishDialogComponent = {
     }
 
     $onInit() {
-      this.cronexp = 'ewwededwecwec';
+      this.crondetails = {
+        cronexp: '0 7 16 1/4 * ? *',
+        activeTab: 'daily',
+        activeRadio: 'everyDay'
+      }
       this.populateSchedule();
       this._AnalyzeService.getCategories(PRIVILEGES.PUBLISH)
         .then(response => {
@@ -133,15 +137,20 @@ export const AnalyzePublishDialogComponent = {
       this._$mdDialog.cancel();
     }
 
+    onCronChange(cronexpression) {
+      console.log(cronexpression);
+      this.cronexp = cronexpression;
+    }
+
     publish() {
       console.log(this.cronexp);
-      if (!this.validateEmails(this.emails)) {
-        this.emailValidateFlag = true;
-        return;
-      }
-      const {payload, execute} = this.generateSchedulePayload();
-      const promise = this.onPublish({model: payload, execute});
-      this._$mdDialog.hide(promise);
+      // if (!this.validateEmails(this.emails)) {
+      //   this.emailValidateFlag = true;
+      //   return;
+      // }
+      // const {payload, execute} = this.generateSchedulePayload();
+      // const promise = this.onPublish({model: payload, execute});
+      // this._$mdDialog.hide(promise);
     }
 
     validateEmails(emails) {

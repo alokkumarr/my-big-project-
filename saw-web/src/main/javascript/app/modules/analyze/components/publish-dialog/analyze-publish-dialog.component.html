@@ -29,10 +29,10 @@
       </div>
 
       <div ng-show="$ctrl.hasSchedule" class="schedule-container" layout="column">
-        <cron-job-schedular [cronexp]="$ctrl.cronexp"></cron-job-schedular>
+        <cron-job-schedular [crondetails]="$ctrl.crondetails" (on-cron-changed)="$ctrl.onCronChange(cronexpression)"></cron-job-schedular>
         <!-- <div layout="row" class="form-container">
 
-          <label translate="REPEAT_EVERY" flex="20"></label>
+          <label translate="REPEAT_EVERY" flex="20"></label>on-cron-changed="$ctrl.onCronChange($event)"
 
           <md-select ng-model="::$ctrl.repeatOrdinal" flex="20">
             <md-option ng-repeat="repeatOrdinal in $ctrl.repeatOrdinals"
