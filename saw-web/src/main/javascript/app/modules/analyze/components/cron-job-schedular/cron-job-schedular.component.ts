@@ -235,6 +235,59 @@ export class CronJobSchedularComponent {
     console.log("inside load data");
     console.log(this.crondetails);
     console.log(cronstrue.toString(this.crondetails.cronexp));
+    this.scheduleType = this.crondetails.activeTab;
+    switch (this.scheduleType) {
+    case 'daily':
+      switch (this.crondetails.activeRadio) {
+      case 'everyDay':
+        this.daily.dailyType = this.crondetails.activeRadio;
+        let parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(" ");
+        console.log(parseCronValue[4]);
+        this.daily.days = parseInt(parseCronValue[4]);
+        let fetchTime = parseCronValue[1].split(":");
+        let meridium = parseCronValue[2].split(",")
+        this.dailyTypeDay = {
+          hour: fetchTime[0],
+          minute: fetchTime[1],
+          hourType: meridium[0]
+        };
+        break;
+      // case 'everyWeek':
+        
+      //   break;
+      // default:
+      //   throw 'Invalid cron daily subtab selection';
+      }
+      break;
+    // case 'weeklybasis':
+      
+    //   break;
+    // case 'monthly':
+    //   switch (this.monthly.monthlyType) {
+      
+    //     break;
+    //   case 'specificWeekDay':
+        
+    //     break;
+    //   default:
+    //     throw 'Invalid cron monthly subtab selection';
+    //   }
+    //   break;
+    // case 'yearly':
+    //   switch (this.yearly.yearlyType) {
+    //   case 'specificMonthDay':
+        
+    //     break;
+    //   case 'specificMonthWeek':
+        
+    //     break;
+    //   default:
+    //     throw 'Invalid cron yearly subtab selection';
+    //   }
+    //   break;
+    default:
+      console.log('wrong selection');
+    }
   }
 }
 
