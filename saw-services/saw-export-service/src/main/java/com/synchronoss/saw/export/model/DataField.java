@@ -141,8 +141,7 @@ public class DataField {
         SUM("sum"),
         MIN("min"),
         MAX("max"),
-        COUNT("count"),
-        PERCENTAGE("percentage");
+        COUNT("count");
         private final String value;
         private final static Map<String, Aggregate> CONSTANTS = new HashMap<String, Aggregate>();
 
