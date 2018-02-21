@@ -19,7 +19,7 @@ export function runConfig($q, $rootScope, $state, $location, $window, JwtService
   $transitions.onStart({}, trans => {
 
     const transitionPromise = $q.defer();
-    const loginToken = $location.search().jwtToken;
+    const loginToken = $location.search().jwt;
     if (loginToken) {
       UserService.exchangeLoginToken(loginToken).then(data => {
         if (data) {
