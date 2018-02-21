@@ -27,6 +27,6 @@ module.exports = {
       var port = browser.params.saw.docker.port;
       return 'http://localhost:' + port + '/web/';
     }
-    return 'http://localhost:3001/';
+    return 'http://localhost:3000/';
   }
 };
