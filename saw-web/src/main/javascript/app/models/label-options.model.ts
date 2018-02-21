@@ -1,4 +1,4 @@
-export default interface LabelOptions {
+export interface LabelOptions {
   enabled: boolean;
   value:   string;
 }

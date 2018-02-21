@@ -12,6 +12,7 @@ import {
 }  from '../../types';
 import { TYPE_ICONS_OBJ } from '../../../../consts';
 import { DesignerService } from '../../designer.service';
+import { FieldChangeEvent } from '../single';
 
 const template = require('./designer-settings-group.component.html');
 require('./designer-settings-group.component.scss');
@@ -22,7 +23,7 @@ require('./designer-settings-group.component.scss');
 })
 export class DesignerSettingsGroupComponent {
   @Output() public fieldsChange: EventEmitter<null> = new EventEmitter();
-  @Output() public fieldPropChange: EventEmitter<null> = new EventEmitter();
+  @Output() public fieldPropChange: EventEmitter<FieldChangeEvent> = new EventEmitter();
   @Output() public removeField: EventEmitter<ArtifactColumn> = new EventEmitter();
   @Input() public artifactColumns :ArtifactColumns;
   @Input() public groupAdapter :IDEsignerSettingGroupAdapter;
@@ -53,10 +54,6 @@ export class DesignerSettingsGroupComponent {
 
   ngOnInit() {
     this.allowDropFn = this.groupAdapter.canAcceptArtifactColumn(this.groupAdapter)
-  }
-
-  onFieldPropChange() {
-    this.fieldPropChange.emit();
   }
 
   onRemoveField(artifactColumn: ArtifactColumn) {

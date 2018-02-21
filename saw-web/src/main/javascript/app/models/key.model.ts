@@ -1,4 +1,4 @@
-export default interface Key {
+export interface Key {
   customerCode: string;
   categoryId:   string;
   module:       string;
