@@ -3,6 +3,7 @@ declare const require: any;
 import { Component, Inject, Input, EventEmitter, Output } from '@angular/core';
 import * as isUndefined from 'lodash/isUndefined';
 import cronstrue from 'cronstrue';
+import * as forEach from 'lodash/forEach';
 
 const template = require('./cron-job-schedular.component.html');
 require('./cron-job-schedular.component.scss');
@@ -72,59 +73,59 @@ export class CronJobSchedularComponent {
     this.months = this.range(1,12);
     this.weeks = [{
       value:'#1',
-      label:'First'
+      label:'first'
     },{
       value:'#2',
-      label:'Second'
+      label:'second'
     },{
       value:'#3',
-      label:'Third'
+      label:'third'
     },{
       value:'#4',
-      label:'Fourth'
+      label:'fourth'
     },{
       value:'#5',
-      label:'Fifth'
+      label:'fifth'
     },{
       value:'L',
-      label:'LAST'
+      label:'last'
     }];
     this.dayStrings = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
     this.monthStrings = [{
-      value:'1',
+      value: 1,
       label:'January'
     },{
-      value:'2',
+      value: 2,
       label:'Febuary'
     },{
-      value:'3',
+      value: 3,
       label:'March'
     },{
-      value:'4',
+      value: 4,
       label:'April'
     },{
-      value:'5',
+      value: 5,
       label:'May'
     },{
-      value:'6',
+      value: 6,
       label:'June'
     },{
-      value:'7',
+      value: 7,
       label:'July'
     },{
-      value:'8',
+      value: 8,
       label:'August'
     },{
-      value:'9',
+      value: 9,
       label:'September'
     },{
-      value:'10',
+      value: 10,
       label:'October'
     },{
-      value:'11',
+      value: 11,
       label:'November'
     },{
-      value:'12',
+      value: 12,
       label:'December'
     }];
     if (this.crondetails.activeTab === '' || isUndefined(this.crondetails.activeTab)) {
@@ -145,6 +146,7 @@ export class CronJobSchedularComponent {
 
   openSchedule(event, scheduleType) {
     this.resetData();
+    this.crondetails = {};
   	this.scheduleType = scheduleType;
   }
 
@@ -174,9 +176,19 @@ export class CronJobSchedularComponent {
       switch (this.daily.dailyType) {
       case 'everyDay':
         this.CronExpression = `0 ${this.dailyTypeDay.minute} ${this.hourToCron(this.dailyTypeDay.hour, this.dailyTypeDay.hourType)} 1/${this.daily.days} * ? *`;
+        this.crondetails = {
+          cronexp: this.CronExpression,
+          activeTab: this.scheduleType,
+          activeRadio: this.daily.dailyType
+        }
         break;
       case 'everyWeek':
         this.CronExpression = `0 ${this.dailyTypeWeek.minute} ${this.hourToCron(this.dailyTypeWeek.hour, this.dailyTypeWeek.hourType)} ? * MON-FRI *`;
+        this.crondetails = {
+          cronexp: this.CronExpression,
+          activeTab: this.scheduleType,
+          activeRadio: this.daily.dailyType
+        }
         break;
       default:
         throw 'Invalid cron daily subtab selection';
@@ -187,14 +199,29 @@ export class CronJobSchedularComponent {
           .reduce((acc, day) => this.weekly[day] ? acc.concat([day]) : acc, [])
           .join(',');
       this.CronExpression = `0 ${this.weeklybasisDate.minute} ${this.hourToCron(this.weeklybasisDate.hour, this.weeklybasisDate.hourType)} ? * ${days} *`;
+      this.crondetails = {
+        cronexp: this.CronExpression,
+        activeTab: this.scheduleType,
+        activeRadio: ''
+      }
       break;
     case 'monthly':
       switch (this.monthly.monthlyType) {
       case 'specificDay':
         this.CronExpression = `0 ${this.specificDayMonth.minute} ${this.hourToCron(this.specificDayMonth.hour, this.specificDayMonth.hourType)} ${this.monthly.specificDay} 1/${this.monthly.specificMonth} ? *`;
+        this.crondetails = {
+          cronexp: this.CronExpression,
+          activeTab: this.scheduleType,
+          activeRadio: this.monthly.monthlyType
+        }
         break;
       case 'specificWeekDay':
         this.CronExpression = `0 ${this.specificWeekDayMonth.minute} ${this.hourToCron(this.specificWeekDayMonth.hour, this.specificWeekDayMonth.hourType)} ? 1/${this.monthly.specificWeekDayMonthWeek} ${this.monthly.specificWeekDayDay}${this.monthly.specificWeekDayMonth} *`;
+        this.crondetails = {
+          cronexp: this.CronExpression,
+          activeTab: this.scheduleType,
+          activeRadio: this.monthly.monthlyType
+        }
         break;
       default:
         throw 'Invalid cron monthly subtab selection';
@@ -204,9 +231,19 @@ export class CronJobSchedularComponent {
       switch (this.yearly.yearlyType) {
       case 'specificMonthDay':
         this.CronExpression = `0 ${this.specificMonthDayYear.minute} ${this.hourToCron(this.specificMonthDayYear.hour, this.specificMonthDayYear.hourType)} ${this.yearly.specificMonthDayDay} ${this.yearly.specificMonthDayMonth} ? *`;
+        this.crondetails = {
+          cronexp: this.CronExpression,
+          activeTab: this.scheduleType,
+          activeRadio: this.yearly.yearlyType
+        }
         break;
       case 'specificMonthWeek':
         this.CronExpression = `0 ${this.specificMonthWeekYear.minute} ${this.hourToCron(this.specificMonthWeekYear.hour, this.specificMonthWeekYear.hourType)} ? ${this.yearly.specificMonthWeekMonth} ${this.yearly.specificMonthWeekDay}${this.yearly.specificMonthWeekMonthWeek} *`;
+        this.crondetails = {
+          cronexp: this.CronExpression,
+          activeTab: this.scheduleType,
+          activeRadio: this.yearly.yearlyType
+        }
         break;
       default:
         throw 'Invalid cron yearly subtab selection';
@@ -216,13 +253,13 @@ export class CronJobSchedularComponent {
       console.log('wrong selection');
     }
     if (this.isValid(this.CronExpression)) {
-      console.log(this.CronExpression);
+      console.log(this.crondetails);
       this.onCronChange();
     }
   }
 
   onCronChange() {
-    this.onCronChanged.emit(this.CronExpression);
+    this.onCronChanged.emit(this.crondetails);
   }
 
   isValid(expression) {
@@ -232,59 +269,133 @@ export class CronJobSchedularComponent {
   }
 
   loadData() {
-    console.log("inside load data");
-    console.log(this.crondetails);
-    console.log(cronstrue.toString(this.crondetails.cronexp));
     this.scheduleType = this.crondetails.activeTab;
     switch (this.scheduleType) {
     case 'daily':
       switch (this.crondetails.activeRadio) {
       case 'everyDay':
         this.daily.dailyType = this.crondetails.activeRadio;
-        let parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(" ");
-        console.log(parseCronValue[4]);
+        let parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(' ');
         this.daily.days = parseInt(parseCronValue[4]);
-        let fetchTime = parseCronValue[1].split(":");
-        let meridium = parseCronValue[2].split(",")
+        let fetchTime = parseCronValue[1].split(':');
+        let meridium = parseCronValue[2].split(',')
         this.dailyTypeDay = {
           hour: fetchTime[0],
           minute: fetchTime[1],
           hourType: meridium[0]
         };
         break;
-      // case 'everyWeek':
-        
-      //   break;
-      // default:
-      //   throw 'Invalid cron daily subtab selection';
+      case 'everyWeek':
+        this.daily.dailyType = this.crondetails.activeRadio;
+        let parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(' ');
+        let fetchTime = parseCronValue[1].split(':');
+        let meridium = parseCronValue[2].split(',')
+        this.dailyTypeWeek = {
+          hour: fetchTime[0],
+          minute: fetchTime[1],
+          hourType: meridium[0]
+        };
+        break;
+      default:
+        throw 'Invalid cron daily subtab selection';
       }
       break;
-    // case 'weeklybasis':
-      
-    //   break;
-    // case 'monthly':
-    //   switch (this.monthly.monthlyType) {
-      
-    //     break;
-    //   case 'specificWeekDay':
-        
-    //     break;
-    //   default:
-    //     throw 'Invalid cron monthly subtab selection';
-    //   }
-    //   break;
-    // case 'yearly':
-    //   switch (this.yearly.yearlyType) {
-    //   case 'specificMonthDay':
-        
-    //     break;
-    //   case 'specificMonthWeek':
-        
-    //     break;
-    //   default:
-    //     throw 'Invalid cron yearly subtab selection';
-    //   }
-    //   break;
+    case 'weeklybasis':
+      let parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(' ');
+      let fetchTime = parseCronValue[1].split(':');
+      let meridium = parseCronValue[2].split(',')
+      this.weeklybasisDate = {
+        hour: fetchTime[0],
+        minute: fetchTime[1],
+        hourType: meridium[0]
+      };
+      break;
+    case 'monthly':
+      switch (this.crondetails.activeRadio) {
+      case 'specificDay':
+        this.monthly.monthlyType = this.crondetails.activeRadio;
+        let parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(' ');
+        this.monthly.specificDay = parseInt(parseCronValue[5]);
+        this.monthly.specificMonth = parseInt(parseCronValue[10]);
+        let fetchTime = parseCronValue[1].split(':');
+        let meridium = parseCronValue[2].split(',')
+        this.specificDayMonth = {
+          hour: fetchTime[0],
+          minute: fetchTime[1],
+          hourType: meridium[0]
+        };
+        break;
+      case 'specificWeekDay':
+        this.monthly.monthlyType = this.crondetails.activeRadio;
+        let parseCronValue = [];
+        parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(' ');
+        forEach(this.weeks, week => {
+          if (week.label === parseCronValue[5]) {
+            this.monthly.specificWeekDayMonth = week.value;
+          }
+        });
+        this.monthly.specificWeekDayDay = parseCronValue[6].substr(0, 3).toUpperCase();
+        this.monthly.specificWeekDayMonthWeek = parseInt(parseCronValue[11]);
+        if (isNaN(parseInt(parseCronValue[11]))) {
+          this.monthly.specificWeekDayMonthWeek = 1;
+        }
+        let fetchTime = [];
+        fetchTime = parseCronValue[1].split(':');
+        let meridium = [];
+        meridium = parseCronValue[2].split(',');
+        this.specificWeekDayMonth = {
+          hour: fetchTime[0],
+          minute: fetchTime[1],
+          hourType: meridium[0]
+        };
+        break;
+      default:
+        throw 'Invalid cron monthly subtab selection';
+      }
+      break;
+    case 'yearly':
+      switch (this.crondetails.activeRadio) {
+      case 'specificMonthDay':
+        this.yearly.yearlyType = this.crondetails.activeRadio;
+        let parseCronValue = [];
+        parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(' ');
+        let fetchTime = [];
+        fetchTime = parseCronValue[1].split(':');
+        let meridium = [];
+        meridium = parseCronValue[2].split(',');
+        this.specificMonthDayYear = {
+          hour: fetchTime[0],
+          minute: fetchTime[1],
+          hourType: meridium[0]
+        };
+        this.yearly.specificMonthDayMonth = new Date(Date.parse(parseCronValue[11] +" 1, 2018")).getMonth() + 1;
+        this.yearly.specificMonthDayDay = parseInt(parseCronValue[5]);
+        break;
+      case 'specificMonthWeek':
+        this.yearly.yearlyType = this.crondetails.activeRadio;
+        let parseCronValue = [];
+        parseCronValue = cronstrue.toString(this.crondetails.cronexp).split(' ');
+        let fetchTime = [];
+        fetchTime = parseCronValue[1].split(':');
+        let meridium = [];
+        meridium = parseCronValue[2].split(',');
+        this.specificMonthWeekYear = {
+          hour: fetchTime[0],
+          minute: fetchTime[1],
+          hourType: meridium[0]
+        };
+        forEach(this.weeks, week => {
+          if (week.label === parseCronValue[5]) {
+            this.yearly.specificMonthWeekMonthWeek = week.value;
+          }
+        });
+        this.yearly.specificMonthWeekDay = parseCronValue[6].substr(0, 3).toUpperCase();
+        this.yearly.specificMonthWeekMonth = new Date(Date.parse(parseCronValue[12] +" 1, 2018")).getMonth() + 1;
+        break;
+      default:
+        throw 'Invalid cron yearly subtab selection';
+      }
+      break;
     default:
       console.log('wrong selection');
     }

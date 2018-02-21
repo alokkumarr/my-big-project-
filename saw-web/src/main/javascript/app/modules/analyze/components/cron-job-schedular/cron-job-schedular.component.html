@@ -40,12 +40,12 @@
       <mat-option *ngFor="let day of days" [value]="day">
         {{getDaySuffix(day)}}
       </mat-option>
-    </mat-select>Day of every 
+    </mat-select> Day of every 
     <mat-select placeholder="Month" [(ngModel)]="monthly.specificMonth" (selectionChange)="regenerateCron()">
       <mat-option *ngFor="let month of months" [value]="month">
         {{month}}
       </mat-option>
-    </mat-select>month(s) at <br/>
+    </mat-select> month(s) at <br/>
     <cron-date-picker [model]="specificDayMonth" (onDateChange)="onDateChange($event)"></cron-date-picker><br/><br/><br/>
 
     <mat-radio-button class="everyWeek" value="specificWeekDay" (click)="resetData();">On the</mat-radio-button>
@@ -58,12 +58,12 @@
       <mat-option *ngFor="let dayString of dayStrings" [value]="dayString">
         {{dayString}}
       </mat-option>
-    </mat-select>of every
+    </mat-select> of every
     <mat-select placeholder="Month" [(ngModel)]="monthly.specificWeekDayMonthWeek" (selectionChange)="regenerateCron()">
       <mat-option *ngFor="let month of months" [value]="month">
         {{month}}
       </mat-option>
-    </mat-select>month(s) at <br/>
+    </mat-select> month(s) at <br/>
     <cron-date-picker [model]="specificWeekDayMonth" (onDateChange)="onDateChange($event)"></cron-date-picker>
   </mat-radio-group>
 </div>

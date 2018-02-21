@@ -76,9 +76,9 @@ export const AnalyzePublishDialogComponent = {
 
     $onInit() {
       this.crondetails = {
-        cronexp: '0 7 16 1/4 * ? *',
-        activeTab: 'daily',
-        activeRadio: 'everyDay'
+        cronexp: '0 0 3 ? 4 MON#4 *',
+        activeTab: 'yearly',
+        activeRadio: 'specificMonthWeek'
       }
       this.populateSchedule();
       this._AnalyzeService.getCategories(PRIVILEGES.PUBLISH)
