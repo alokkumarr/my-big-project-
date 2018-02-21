@@ -23,7 +23,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
       browser.waitForAngular();
       expect(browser.getCurrentUrl()).toContain('/login');
       done();
-    }, protractorConf.timeouts.pageResolveTimeout)
+    }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterEach(function (done) {
@@ -31,7 +31,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
       browser.waitForAngular();
       analyzePage.main.doAccountAction('logout');
       done();
-    }, protractorConf.timeouts.pageResolveTimeout)
+    }, protractorConf.timeouts.pageResolveTimeout);
   });
 
   afterAll(function () {
@@ -43,8 +43,7 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     login.loginAs('admin');
 
     // Switch to Card view
-    commonFunctions.waitFor.elementToBeClickable(analyzePage.analysisElems.cardView);
-    analyzePage.analysisElems.cardView.click();
+    commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.cardView);
 
     // Add analysis
     analyzePage.analysisElems.addAnalysisBtn.click();
@@ -58,10 +57,9 @@ describe('Apply filters to chart: applyFiltersToCharts.js', () => {
     const x = chartDesigner.getXRadio(xAxisName);
     const y = chartDesigner.getYCheckBox(yAxisName);
     const g = chartDesigner.getGroupRadio(groupName);
-    x.click();
-    commonFunctions.waitFor.elementToBeClickable(y);
-    y.click();
-    g.click();
+    commonFunctions.waitFor.elementToBeClickableAndClick(x);
+    commonFunctions.waitFor.elementToBeClickableAndClick(y);
+    commonFunctions.waitFor.elementToBeClickableAndClick(g);
     expect(hasClass(x, 'md-checked')).toBeTruthy();
     expect(hasClass(y, 'md-checked')).toBeTruthy();
     expect(hasClass(g, 'md-checked')).toBeTruthy();

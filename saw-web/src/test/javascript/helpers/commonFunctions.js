@@ -15,9 +15,14 @@ module.exports = {
     elementToBePresent: element => {
       return browser.wait(EC.presenceOf(element), fluentWait, "Element \"" + element.locator() + "\" is not present");
     },
+    //Disabled because can't catch overlay by other element
+    /*elementToBeClickableAndClick: element => {
+     browser.wait(EC.elementToBeClickable(element), fluentWait, "Element \"" + element.locator() + "\" is not clickable");
+     },*/
+    //Eliminates error: is not clickable at point
     elementToBeClickableAndClick: element => {
-      browser.wait(EC.elementToBeClickable(element), fluentWait, "Element \"" + element.locator() + "\" is not clickable");
-      element.click();
+      let count = 0;
+      click(element, count);
     },
     //Eliminates error: is not clickable at point
     elementToBeClickableAndClickByMouseMove: element => {
@@ -52,3 +57,21 @@ module.exports = {
     expect(element(by.css('md-backdrop')).isPresent()).toBe(false);
   }
 };
+
+function click(element, i) {
+  element.click().then(
+    function () {
+    }, function (err) {
+      if (err) {
+        console.log("Element '" + element.locator() + "' is not clickable. Retrying. Tempts done: " + (i + 1));
+        i++;
+        browser.sleep(1000);
+        if (i < protractorConf.timeouts.tempts) {
+          click(element, i);
+        } else {
+          throw new Error("Element '" + element.locator() + "' is not clickable after " +
+            protractorConf.timeouts.tempts + " tries. Error: " + err);
+        }
+      }
+    });
+}

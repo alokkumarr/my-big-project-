@@ -57,18 +57,21 @@ const testDir = '../saw-web/src/test';
  */
 const protractorPath = 'target/protractor-reports';
 
+/**
+ * Amount of attempts to retry doing action on element
+ */
+const tempts = 10;
+
 exports.timeouts = {
   fluentWait: fluentWait,
   extendedDefaultTimeoutInterval: extendedDefaultTimeoutInterval,
   extendedImplicitlyWait: extendedImplicitlyWait,
-  pageResolveTimeout: pageResolveTimeout
+  pageResolveTimeout: pageResolveTimeout,
+  tempts: tempts
 };
 
 exports.config = {
   framework: 'jasmine2',
-  //seleniumAddress: webpackHelper.distRun() ? undefined : 'http://localhost:4444/wd/hub', //try solution for fixing
-  // ECONNREFUSED connect
-  // ECONNREFUSED 127.0.0.1:4444
   seleniumAddress: 'http://localhost:4444/wd/hub',
   getPageTimeout: pageLoadTimeout,
   allScriptsTimeout: allScriptsTimeout,
@@ -81,7 +84,7 @@ exports.config = {
         'disable-extensions',
         'disable-web-security',
         '--start-fullscreen', // enable for Mac OS
-        '--headless',
+        //'--headless',
         '--disable-gpu',
         '--window-size=2880,1800'
       ]
@@ -124,21 +127,21 @@ exports.config = {
     /**
      * Suites for test run invoked from Protractor directly on local saw-web front-end development server
      */
+    root: [
+      webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js'),
+      webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
+      webpackHelper.root(testDir + '/e2e-tests/createReport.test.js')
+      //Disabled because have not been adopted to new pivot design. Will be adjusted in separate task SAW-2038
+      //webpackHelper.root(testDir + '/e2e-tests/createPivot.test.js')
+      //webpackHelper.root(testDir + '/e2e-tests/debug.test.js') // for testing purposes
+    ],
     charts: [
       webpackHelper.root(testDir + '/e2e-tests/charts/applyFiltersToCharts.js'),
       webpackHelper.root(testDir + '/e2e-tests/charts/createAndDeleteCharts.test.js'),
       webpackHelper.root(testDir + '/e2e-tests/charts/previewForCharts.test.js')
     ],
-    root: [
-      webpackHelper.root(testDir + '/e2e-tests/analyze.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/createReport.test.js'),
-      webpackHelper.root(testDir + '/e2e-tests/priviliges.test.js')
-      //Disabled because have not been adopted to new pivot design. Will be adjusted in separate task SAW-2038
-      //webpackHelper.root(testDir + '/e2e-tests/createPivot.test.js')
-      //webpackHelper.root(testDir + '/e2e-tests/debug.test.js') // for testing purposes
-    ],
     authentication: [
-      //webpackHelper.root(testDir + '/e2e-tests/login.test.js')
+      webpackHelper.root(testDir + '/e2e-tests/login.test.js')
     ]
   },
   onPrepare() {

@@ -348,7 +348,6 @@ describe('Privileges tests: privileges.test.js', () => {
           });
 
           // Navigate back, close the opened actions menu
-          //browser.sleep(1000);
           element(by.css('md-backdrop')).click();
           expect(element(by.css('md-backdrop')).isPresent()).toBe(false);
         }

@@ -80,11 +80,11 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       navigateToSubCategory();
 
       //Create analysis
-      analyzePage.analysisElems.addAnalysisBtn.click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.addAnalysisBtn);
       const newDialog = analyzePage.newDialog;
-      newDialog.getMetric(metric).click();
-      newDialog.getMethod(data.chartType).click();
-      newDialog.createBtn.click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(newDialog.getMetric(metric));
+      commonFunctions.waitFor.elementToBeClickableAndClick(newDialog.getMethod(data.chartType));
+      commonFunctions.waitFor.elementToBeClickableAndClick(newDialog.createBtn);
 
       //Select fields
       if (data.chartType === 'chart:bubble') {       // if chart is bubble then select Y radio instead of checkbox
@@ -98,12 +98,12 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       } else {
         y = chartDesigner.getYCheckBox(yAxisName);    // for the rest of the cases - select Y checkbox
       }
-      chartDesigner.getXRadio(xAxisName).click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.getXRadio(xAxisName));
       commonFunctions.waitFor.elementToBeClickableAndClick(y);
 
       //If combo chart then do not check group by
       if (data.chartType !== 'chart:combo') {
-        chartDesigner.getGroupRadio(groupName).click();
+        commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.getGroupRadio(groupName));
       }
 
       //If Combo then add one more field
@@ -113,7 +113,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       }
 
       //Refresh
-      chartDesigner.refreshBtn.click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(chartDesigner.refreshBtn);
 
       //Save
       const save = analyzePage.saveDialog;
@@ -123,7 +123,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       commonFunctions.waitFor.elementToBeVisible(designer.saveDialog);
       save.nameInput.clear().sendKeys(chartName);
       save.descriptionInput.clear().sendKeys(chartDescription);
-      save.saveBtn.click();
+      commonFunctions.waitFor.elementToBeClickableAndClick(save.saveBtn);
       const createdAnalysis = analyzePage.main.getCardTitle(chartName);
 
       //Change to Card View
@@ -155,7 +155,8 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
     // Navigates to specific category where analysis creation should happen
     const navigateToSubCategory = () => {
       //Collapse default category
-      homePage.expandedCategory(defaultCategory).click();
+
+      commonFunctions.waitFor.elementToBeClickableAndClick(homePage.expandedCategory(defaultCategory));
 
       //Navigate to Category/Sub-category
       const collapsedCategory = homePage.collapsedCategory(categoryName);
