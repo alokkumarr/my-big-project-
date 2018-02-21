@@ -15,16 +15,15 @@ module.exports = {
     elementToBePresent: element => {
       return browser.wait(EC.presenceOf(element), fluentWait, "Element \"" + element.locator() + "\" is not present");
     },
-    //Disabled because can't catch overlay by other element
-    /*elementToBeClickableAndClick: element => {
+    elementToBeEnabledAndVisible: element => {
      browser.wait(EC.elementToBeClickable(element), fluentWait, "Element \"" + element.locator() + "\" is not clickable");
-     },*/
+     },
     //Eliminates error: is not clickable at point
     elementToBeClickableAndClick: element => {
       let count = 0;
       click(element, count);
     },
-    //Eliminates error: is not clickable at point
+    //Deprecated. Should eliminate error: is not clickable at point - but does not work
     elementToBeClickableAndClickByMouseMove: element => {
       browser.wait(EC.elementToBeClickable(element), fluentWait, "Element \"" + element.locator() + "\" is not clickable");
       browser.actions().mouseMove(element).click().perform();

@@ -82,8 +82,13 @@ describe('Verify preview for charts: previewForCharts.test.js', () => {
       //Create analysis
       commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.addAnalysisBtn);
       const newDialog = analyzePage.newDialog;
+      commonFunctions.waitFor.elementToBeEnabledAndVisible(newDialog.getMetric(metric));
       commonFunctions.waitFor.elementToBeClickableAndClick(newDialog.getMetric(metric));
+
+      commonFunctions.waitFor.elementToBeEnabledAndVisible(newDialog.getMethod(data.chartType));
       commonFunctions.waitFor.elementToBeClickableAndClick(newDialog.getMethod(data.chartType));
+
+      commonFunctions.waitFor.elementToBeEnabledAndVisible(newDialog.createBtn);
       commonFunctions.waitFor.elementToBeClickableAndClick(newDialog.createBtn);
 
       //Select fields

@@ -15,7 +15,7 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
   const subCategoryName = 'AT Creating Analysis DO NOT TOUCH';
   const chartDesigner = analyzePage.designerDialog.chart;
   const chartName = `e2e chart ${(new Date()).toString()}`;
-  const chartDescription = 'e2e test chart description';
+  const chartDescription = 'descr';
   let xAxisName = 'Source Manufacturer';
   let yAxisName = 'Available MB';
   const yAxisName2 = 'Available Items';
@@ -82,8 +82,14 @@ describe('Create and delete charts: createAndDeleteCharts.test.js', () => {
       //Create analysis
       commonFunctions.waitFor.elementToBeClickableAndClick(analyzePage.analysisElems.addAnalysisBtn);
       const newDialog = analyzePage.newDialog;
+      browser.sleep(1000);
+      commonFunctions.waitFor.elementToBeEnabledAndVisible(newDialog.getMetric(metric));
       commonFunctions.waitFor.elementToBeClickableAndClick(newDialog.getMetric(metric));
+
+      commonFunctions.waitFor.elementToBeEnabledAndVisible(newDialog.getMethod(data.chartType));
       commonFunctions.waitFor.elementToBeClickableAndClick(newDialog.getMethod(data.chartType));
+
+      commonFunctions.waitFor.elementToBeEnabledAndVisible(newDialog.createBtn);
       commonFunctions.waitFor.elementToBeClickableAndClick(newDialog.createBtn);
 
       //Select fields
