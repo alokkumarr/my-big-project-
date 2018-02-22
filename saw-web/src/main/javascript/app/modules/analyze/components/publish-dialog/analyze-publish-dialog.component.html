@@ -30,35 +30,6 @@
 
       <div ng-show="$ctrl.hasSchedule" class="schedule-container" layout="column">
         <cron-job-schedular [crondetails]="$ctrl.crondetails" (on-cron-changed)="$ctrl.onCronChanged($event)"></cron-job-schedular>
-        <!-- <div layout="row" class="form-container">
-
-          <label translate="REPEAT_EVERY" flex="20"></label>on-cron-changed="$ctrl.onCronChange($event)"
-
-          <md-select ng-model="::$ctrl.repeatOrdinal" flex="20">
-            <md-option ng-repeat="repeatOrdinal in $ctrl.repeatOrdinals"
-                       ng-bind="::repeatOrdinal | translate"
-                       ng-value="repeatOrdinal">
-            </md-option>
-          </md-select>
-
-          <md-select ng-model="::$ctrl.repeatInterval" flex="30" style="padding-left: 24px;">
-            <md-option ng-repeat="repeatInterval in $ctrl.repeatIntervals"
-                       ng-bind="::repeatInterval | translate"
-                       ng-value="repeatInterval">
-            </md-option>
-          </md-select>
-        </div> -->
-
-        <!-- <div ng-if="$ctrl.repeatInterval === $ctrl.repeatIntervals[1]" class="form-container" layout="row">
-          <label translate="REPEAT_ON" flex="20"></label>
-          <div class="days-of-week-checkboxes" flex="80">
-            <md-checkbox ng-repeat="day in $ctrl.repeatOnDaysOfWeek track by day.keyword"
-                         ng-checked="day.checked"
-                         ng-click="day.checked = !day.checked">
-              <span ng-bind="day.keyword | translate | truncate:2"></span>
-            </md-checkbox>
-          </div>
-        </div> -->
 
         <div class="form-container" layout="column">
           <label translate="EMAIL_TO_COPY"></label>
@@ -78,63 +49,6 @@
           </md-input-container>
           <span ng-if="$ctrl.emailValidateFlag" class="errorTextMsg" translate="EMAIL_ERROR_MSG"></span>
         </div>
-
-        <!--
-        <div class="form-container" layout="row">
-
-          <label translate="STARTS_ON" flex="20"></label>
-
-          <div class="input-container" md-no-float>
-            <md-datepicker ng-model="$ctrl.startsOnDate"></md-datepicker>
-          </div>
-        </div>
-
-        <div class="form-container" layout="row">
-
-          <label translate="ENDS" flex="20"></label>
-
-          <md-radio-group ng-model="$ctrl.endCriterion">
-
-            <div class="end-criteria-radio">
-              <md-radio-button ng-value="::$ctrl.endCriteria.never.keyword">
-                <span translate="{{::$ctrl.endCriteria.never.keyword}}"></span>
-              </md-radio-button>
-            </div>
-
-            <div class="end-criteria-radio" layout="row">
-
-              <md-radio-button ng-value="$ctrl.endCriteria.after.keyword" flex="30">
-                <span translate="{{::$ctrl.endCriteria.after.keyword}}"></span>
-              </md-radio-button>
-
-              <div class="input-container" flex="20">
-                <input ng-model="$ctrl.endCriteria.after.occurenceCount"
-                       type="number" flex="100"
-                       ng-disabled="$ctrl.endCriterion !== $ctrl.endCriteria.after.keyword"/>
-              </div>
-
-              <span translate="OCCURENCES" flex="50" style="padding-left: 6px;"></span>
-
-            </div>
-
-            <div class="end-criteria-radio" layout="row">
-
-              <md-radio-button ng-value="$ctrl.endCriteria.on.keyword" flex="30">
-                <span translate="{{::$ctrl.endCriteria.on.keyword}}"></span>
-              </md-radio-button>
-
-              <div class="input-container" flex="70">
-                <md-datepicker ng-disabled="$ctrl.endCriterion !== $ctrl.endCriteria.on.keyword"
-                               ng-model="$ctrl.on.endDate">
-                </md-datepicker>
-              </div>
-
-            </div>
-
-          </md-radio-group>
-
-        </div>
-        -->
 
       </div>
 
