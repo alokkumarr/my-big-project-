@@ -72,7 +72,6 @@ public class ServicesExecuteIT {
 
     @Test
     public void testExecuteAnalysis() throws JsonProcessingException {
-        String token = authenticate();
         String metricId = listMetrics(token);
         ObjectNode analysis = createAnalysis(token, metricId);
         String analysisId = analysis.get("id").asText();
@@ -92,7 +91,9 @@ public class ServicesExecuteIT {
     @Test
     public void testSSOAuthentication()
     {
-         Response response = given(spec).filter(document("sso-authentication",
+         Response response = given(spec)
+                 .header("Cache-Control", "no-store").
+                 filter(document("sso-authentication",
                  preprocessResponse(prettyPrint())))
             .when().get("/security/authentication?jwt=" +ssoToken)
             .then().assertThat().statusCode(200)

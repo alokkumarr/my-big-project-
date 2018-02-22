@@ -141,6 +141,7 @@ public class SecurityController {
 	 */
 	@RequestMapping(value = "/authentication", method = RequestMethod.GET)
 	public SSOResponse SSOAuthentication(@RequestParam("jwt") String token , HttpServletRequest request, HttpServletResponse response) {
+        response.setHeader("Cache-Control","private");
        return ssoRequestHandler.processSSORequest(token);
 	}
 	
