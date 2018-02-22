@@ -524,7 +524,7 @@ export const AnalyzeReportComponent = {
         if (split[1]) {
           return split[0];
         }
-        return columnName;  
+        return columnName;
       }
     }
 
