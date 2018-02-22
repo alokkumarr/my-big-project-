@@ -26,8 +26,8 @@ public class JobExecutor {
 
     private Context ctx;
 
-    Map<String, Map<String, String>> inputDOs;
-    Map<String, Map<String, String>> outputDOs;
+    Map<String, Map<String, Object>> inputDOs;
+    Map<String, Map<String, Object>> outputDOs;
 
     private Map<String, Dataset<Row>> availableDataframes = new HashMap<>();
     private String now;
@@ -39,8 +39,8 @@ public class JobExecutor {
 
 
     public JobExecutor(Context ctx,
-                       Map<String, Map<String, String>> inputDOLocations,
-                       Map<String, Map<String, String>> outputDOLocations) throws XDFException
+                       Map<String, Map<String, Object>> inputDOLocations,
+                       Map<String, Map<String, Object>> outputDOLocations) throws XDFException
     {
         this.ctx = ctx;
         report = new ArrayList<>();

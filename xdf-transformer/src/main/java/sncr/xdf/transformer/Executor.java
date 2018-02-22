@@ -30,7 +30,7 @@ public abstract class Executor {
     protected final int threshold;
     protected final HashSet<String> refDataSets;
     protected final JavaSparkContext jsc;
-    protected final Map<String, Map<String, String>> outputDataSetsDesc;
+    protected final Map<String, Map<String, Object>> outputDataSetsDesc;
     protected final LongAccumulator successTransformationsCount;
     protected final LongAccumulator failedTransformationsCount;
     protected String rejectedDataSet;
@@ -48,8 +48,8 @@ public abstract class Executor {
                           StructType st,
                           String tLoc,
                           int thr,
-                          Map<String, Map<String, String>> inputs,
-                          Map<String, Map<String, String>> outputs){
+                          Map<String, Map<String, Object>> inputs,
+                          Map<String, Map<String, Object>> outputs){
         this.script = script;
         session_ctx = ctx;
         threshold = thr;
@@ -82,12 +82,14 @@ public abstract class Executor {
         refDataDescriptor = new HashMap<>();
     }
 
+
+    //TODO:: Replace with XDFDataWriter
     protected void writeResults(Dataset<Row> outputResult, String resType, String location) throws Exception {
 
-        Map<String, String> outputDS = outputDataSetsDesc.get(resType);
-        String name = outputDS.get(DataSetProperties.Name.name());
+        Map<String, Object> outputDS = outputDataSetsDesc.get(resType);
+        String name = (String) outputDS.get(DataSetProperties.Name.name());
         String loc = location + Path.SEPARATOR + name;
-        String format = outputDS.get(DataSetProperties.Format.name());
+        String format = (String) outputDS.get(DataSetProperties.Format.name());
         logger.debug("Write result to location: " + loc + " in format: " + format + ". if dataset already exists - remove it first");
 
         if (HFileOperations.exists(loc)) HFileOperations.deleteEnt(loc);
@@ -98,6 +100,7 @@ public abstract class Executor {
                 break;
             case "csv" :
                 outputResult.write().csv(loc);
+                break;
             case "json" :
                 outputResult.write().json(loc);
                 break;

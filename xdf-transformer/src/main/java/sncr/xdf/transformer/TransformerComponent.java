@@ -15,6 +15,7 @@ import sncr.xdf.component.WithSparkContext;
 import sncr.bda.datasets.conf.DataSetProperties;
 import sncr.xdf.exceptions.XDFException;
 
+import javax.xml.crypto.Data;
 import java.io.FileNotFoundException;
 import java.util.*;
 
@@ -87,10 +88,10 @@ public class TransformerComponent extends Component implements WithMovableResult
 //2. Read input datasets
 
             Map<String, Dataset> dsMap = new HashMap();
-            for ( Map.Entry<String, Map<String, String>> entry : inputs.entrySet()) {
-                Map<String, String> desc = entry.getValue();
-                String loc = desc.get(DataSetProperties.PhysicalLocation.name());
-                String format = desc.get(DataSetProperties.Format.name());
+            for ( Map.Entry<String, Map<String, Object>> entry : inputs.entrySet()) {
+                Map<String, Object> desc = entry.getValue();
+                String loc = (String) desc.get(DataSetProperties.PhysicalLocation.name());
+                String format = (String) desc.get(DataSetProperties.Format.name());
                 Dataset ds = null;
                 switch (format.toLowerCase()) {
                     case "json":
@@ -211,16 +212,18 @@ public class TransformerComponent extends Component implements WithMovableResult
     @Override
     protected int Move(){
 
-        List<Map<String, String>> dss = new ArrayList<>();
+        List<Map<String, Object>> dss = new ArrayList<>();
         dss.add(outputs.get(RequiredNamedParameters.Output.toString()));
         dss.add(outputs.get(RequiredNamedParameters.Rejected.toString()));
-        for ( Map<String, String> ads : dss) {
-            String name = ads.get(DataSetProperties.Name.name());
+        for ( Map<String, Object> ads : dss) {
+            String name = (String) ads.get(DataSetProperties.Name.name());
             String src = tempLocation + Path.SEPARATOR + name;
-            String dest = ads.get(DataSetProperties.PhysicalLocation.name());
-            String mode = ads.get(DataSetProperties.Mode.name());
-            String format = ads.get(DataSetProperties.Format.name());
-            MoveDataDescriptor desc = new MoveDataDescriptor(src, dest, name, mode, format);
+            String dest = (String) ads.get(DataSetProperties.PhysicalLocation.name());
+            String mode = (String) ads.get(DataSetProperties.Mode.name());
+            String format = (String) ads.get(DataSetProperties.Format.name());
+            List<String> kl = (List<String>) ads.get(DataSetProperties.Keys.name());
+
+            MoveDataDescriptor desc = new MoveDataDescriptor(src, dest, name, mode, format, kl);
             resultDataDesc.add(desc);
             logger.debug(String.format("DataSet %s will be moved to %s", name, dest));
         }

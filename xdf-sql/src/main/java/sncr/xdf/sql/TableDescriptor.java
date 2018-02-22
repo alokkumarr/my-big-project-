@@ -17,6 +17,7 @@ public class TableDescriptor {
     public List<Integer> asReference = new ArrayList<>();
     public String mode;
     public int numberOfFiles = 1;
+    public List<String> keys;
 
     public String getLocation() {
         return location;

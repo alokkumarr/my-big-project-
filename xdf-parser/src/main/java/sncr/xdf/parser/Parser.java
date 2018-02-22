@@ -185,7 +185,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
         scala.collection.Seq<Column> scalaList=
             scala.collection.JavaConversions.asScalaBuffer(createFieldList(ctx.componentConfiguration.getParser().getFields())).toList();
         df.select(scalaList).where(df.col("__REJ_FLAG").equalTo(0)).write().parquet(tempDir);
-        resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, DLDataSetOperations.FORMAT_PARQUET));
+        resultDataDesc.add(new MoveDataDescriptor(tempDir, outputDataSetLocation, outputDataSetName, mode, DLDataSetOperations.FORMAT_PARQUET, null));
 
         return 0;
     }
@@ -198,7 +198,7 @@ public class Parser extends Component implements WithMovableResult, WithSparkCon
             if (file.isFile()) {
                 String tempPath = tempDir + Path.SEPARATOR + file.getPath().getName();
                 if (parseSingleFile(file.getPath(), new Path(tempPath)) == 0) {
-                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, DLDataSetOperations.FORMAT_PARQUET));
+                    resultDataDesc.add(new MoveDataDescriptor(tempPath, outputDataSetLocation, outputDataSetName, mode, DLDataSetOperations.FORMAT_PARQUET, null));
                 }
             }
         }

@@ -36,8 +36,8 @@ public class JexlExecutor extends Executor{
                         String script,
                         String tLoc,
                         int thr,
-                        Map<String, Map<String, String>> inputs,
-                        Map<String, Map<String, String>> outputs
+                        Map<String, Map<String, Object>> inputs,
+                        Map<String, Map<String, Object>> outputs
                         )  {
         super(ctx,script,null,tLoc,thr,inputs,outputs);
         this.structAccumulator = new StructAccumulator();

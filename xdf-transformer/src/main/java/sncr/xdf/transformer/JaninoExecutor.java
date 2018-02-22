@@ -40,8 +40,8 @@ public class JaninoExecutor extends Executor{
                           StructType st,
                           String tLoc,
                           int thr,
-                          Map<String, Map<String, String>> inputs,
-                          Map<String, Map<String, String>> outputs,
+                          Map<String, Map<String, Object>> inputs,
+                          Map<String, Map<String, Object>> outputs,
                           String[]  odi) {
         super(ctx, script, st, tLoc, thr, inputs, outputs);
         this.odi = odi;

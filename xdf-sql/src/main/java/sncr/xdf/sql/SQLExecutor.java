@@ -4,12 +4,14 @@ import org.apache.log4j.Logger;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import sncr.bda.core.file.HFileOperations;
+import sncr.xdf.component.XDFDataWriter;
 import sncr.xdf.exceptions.XDFException;
 import scala.Tuple4;
 import sncr.xdf.context.Context;
 import sncr.xdf.core.file.DLDataSetOperations;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 
@@ -83,7 +85,8 @@ public class SQLExecutor implements Serializable {
 
                     logger.debug("Load data from: " + location  + ", registered table name: " + tn );
 
-                    Tuple4<String, String, Integer, DLDataSetOperations.PARTITION_STRUCTURE> loc_desc =
+                    //TODO:: Add support to read from Drill partition, but do not add support to write into Drill partitions
+                    Tuple4<String, List<String>, Integer, DLDataSetOperations.PARTITION_STRUCTURE> loc_desc =
                             DLDataSetOperations.getPartitioningInfo(location);
 
                     if (loc_desc == null)
@@ -96,7 +99,6 @@ public class SQLExecutor implements Serializable {
                     switch ( tb.format )
                     {
                         case "parquet" :
-                        case "PARQUET" :
                             try{
                                 df = ctx.sparkSession.read().load(loc_desc._1());
                                 loaded = true;
@@ -107,7 +109,6 @@ public class SQLExecutor implements Serializable {
                             break;
 
                         case "json" :
-                        case "JSON" :
                             try{
                                 df = ctx.sparkSession.read().json(loc_desc._1());
                                 loaded = true;
@@ -141,23 +142,9 @@ public class SQLExecutor implements Serializable {
                 descriptor.executionTime =  (int) ((exet-lt)/1000);
 
                 logger.trace(" ==> Executed SQL: " +  descriptor.SQL + "\n ==> Target temp. file: " + descriptor.targetTransactionalLocation);
-                switch (descriptor.tableDescriptor.format){
-                    case "PARQUET":
-                    case "parquet":
-                        finalResult.write().parquet(descriptor.targetTransactionalLocation);
-                        break;
-                    case "json" :
-                    case "JSON" :
-                        finalResult.write().json(descriptor.targetTransactionalLocation);
-                        break;
-                    case "csv" :
-                    case "CSV" :
-                        finalResult.write().saveAsTable(descriptor.targetTransactionalLocation);
-                        break;
-                    default:
-                        finalResult.write().parquet(descriptor.targetTransactionalLocation);
-                        break;
-                }
+
+                XDFDataWriter xdfWriter = new XDFDataWriter(descriptor.targetTableFormat, descriptor.tableDescriptor.numberOfFiles, descriptor.tableDescriptor.keys);
+                xdfWriter.write( finalResult, descriptor.targetTransactionalLocation);
 
                 long wt = System.currentTimeMillis();
                 descriptor.writeTime = (int) ((wt - exet) / 1000);

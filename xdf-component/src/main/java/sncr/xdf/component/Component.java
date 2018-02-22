@@ -42,11 +42,11 @@ public abstract class Component {
 
     protected String componentName = "unnamed";
     protected ArrayList<WithMovableResult.MoveDataDescriptor> resultDataDesc;
-    protected Map<String, Map<String, String>> inputDataSets = null;
-    protected Map<String, Map<String, String>> outputDataSets = null;
+    protected Map<String, Map<String, Object>> inputDataSets = null;
+    protected Map<String, Map<String, Object>> outputDataSets = null;
 
-    protected Map<String, Map<String, String>> inputs = null;
-    protected Map<String, Map<String, String>> outputs = null;
+    protected Map<String, Map<String, Object>> inputs = null;
+    protected Map<String, Map<String, Object>> outputs = null;
 
 
     protected WithDataSetService.DataSetServiceAux dsaux;
@@ -61,7 +61,7 @@ public abstract class Component {
 
     public int Run(){
 
-        int ret = processMetadata();
+        int ret = initializeDataSets();
         if ( ret == 0) {
             ret = Execute();
             if (ret == 0) {
@@ -85,7 +85,7 @@ public abstract class Component {
         return ret;
     }
 
-    protected int processMetadata() {
+    protected int initializeDataSets() {
         try {
             transformationID = transformationMD.readOrCreateTransformation(ctx);
             if (this instanceof WithDataSetService) {
@@ -94,8 +94,8 @@ public abstract class Component {
                 if (ctx.componentConfiguration.getInputs() != null &&
                         ctx.componentConfiguration.getInputs().size() > 0) {
                     logger.info("Extracting meta data");
-                    inputDataSets = mddl.resolveDataObjectsWithMetadata(dsaux);
-                    inputs = mddl.resolveDataParametersWithMetaData(dsaux);
+                    inputDataSets = mddl.discoverInputDataSetsWithMetadata(dsaux);
+                    inputs = mddl.discoverDataParametersWithMetaData(dsaux);
 
                     logger.debug("Input datasets = " + inputDataSets);
                     logger.debug("Inputs = " + inputs);
@@ -125,7 +125,10 @@ public abstract class Component {
                 ctx.componentConfiguration.getOutputs().forEach(o ->
                 {
                     logger.debug("Add output object to data object repository: " + o.getDataSet());
-                    JsonElement ds = md.readOrCreateDataSet(ctx, outputDataSets.get(o.getDataSet()), o.getMetadata());
+
+                    mddl.discoverAndvalidateOutputDataSet(outputDataSets.get(o.getDataSet()));
+
+                    JsonElement ds = md.readOrCreateDataSet(ctx, outputDataSets.get(o.getDataSet()));
                     if (ds == null) {
                         error = "Could not create metadata for output dataset: " + o.getDataSet();
                         logger.error(error);
@@ -152,14 +155,13 @@ public abstract class Component {
                         return;
                     }
 
-                    md.addDataSetToDLFSMeta(outputDataSets.get(o.getDataSet()), o);
                 });
                 if (rc[0] != 0) return rc[0];
             }
             return 0;
 
         } catch (Exception e) {
-            error = "component initialization (input-resolving/output-preparation) exception: " + e.getMessage();
+            error = "component initialization (input-discovery/output-preparation) exception: " + e.getMessage();
             logger.error(error);
             return -1;
         }
@@ -280,6 +282,7 @@ public abstract class Component {
         if (this instanceof WithMovableResult) {
             resultDataDesc = new ArrayList<>();
         }
+
 
         try {
             md = new DLDataSetService(xdfDataRootSys);
