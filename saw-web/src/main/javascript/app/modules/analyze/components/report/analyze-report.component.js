@@ -13,6 +13,7 @@ import * as sortBy from 'lodash/sortBy';
 import * as filter from 'lodash/filter';
 import * as assign from 'lodash/assign';
 import * as uniqBy from 'lodash/uniqBy';
+import * as isUndefined from 'lodash/isUndefined';
 
 import {FieldModel} from '../../../../common/components/jsPlumb/models/fieldModel';
 import * as template from './analyze-report.component.html';
@@ -518,11 +519,13 @@ export const AnalyzeReportComponent = {
     getColumnName(columnName) {
       // take out the .keyword form the columnName
       // if there is one
-      const split = columnName.split('.');
-      if (split[1]) {
-        return split[0];
+      if (!isUndefined(columnName)) {
+        const split = columnName.split('.');
+        if (split[1]) {
+          return split[0];
+        }
+        return columnName;  
       }
-      return columnName;
     }
 
     onRefreshData() {
