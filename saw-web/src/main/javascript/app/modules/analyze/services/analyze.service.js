@@ -1,11 +1,8 @@
 import * as forEach from 'lodash/forEach';
 import * as floor from 'lodash/floor';
-import * as startCase from 'lodash/startCase';
 import * as set from 'lodash/set';
 import * as isEmpty from 'lodash/isEmpty';
 import * as has from 'lodash/has';
-import * as reduce from 'lodash/reduce';
-import * as trim from 'lodash/trim';
 import * as fpSortBy from 'lodash/fp/sortBy';
 import * as fpGet from 'lodash/fp/get';
 import * as find from 'lodash/find';
@@ -25,13 +22,6 @@ const EXECUTION_STATES = {
 };
 
 const MODULE_NAME = 'ANALYZE';
-
-const SCHEDULE_B2F_DICTIONARY = {
-  weekly: 'weeks',
-  daily: 'days'
-};
-
-const SCHEDULE_DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
 export class AnalyzeService {
   constructor($http, $q, AppConfig, JwtService, toastMessage, $translate) {

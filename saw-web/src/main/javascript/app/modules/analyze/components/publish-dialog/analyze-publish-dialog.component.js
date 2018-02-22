@@ -1,7 +1,6 @@
 import * as map from 'lodash/map';
 import * as get from 'lodash/get';
 import * as forEach from 'lodash/forEach';
-import * as reduce from 'lodash/reduce';
 import * as find from 'lodash/find';
 import * as isEmpty from 'lodash/isEmpty';
 import * as first from 'lodash/first';
@@ -10,11 +9,6 @@ import * as template from './analyze-publish-dialog.component.html';
 import style from './analyze-publish-dialog.component.scss';
 
 import {PRIVILEGES} from '../../consts';
-
-const F2B_DICTIONARY = {
-  WEEKS: 'weekly',
-  DAYS: 'daily'
-};
 
 const B2F_DICTIONARY = {
   weekly: 'WEEKS',
@@ -40,7 +34,6 @@ export const AnalyzePublishDialogComponent = {
       this.cronexp = '';
       this.regexOfEmail = /^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/;
       const semicolon = 186;
-      console.log(this.model);
       this.separatorKeys = [$mdConstant.KEY_CODE.ENTER, $mdConstant.KEY_CODE.COMMA, semicolon];
       if (this.model.isScheduled === 'true') {
         this.emails = get(this.model.schedule, 'emails') || [];
@@ -76,12 +69,12 @@ export const AnalyzePublishDialogComponent = {
     }
 
     $onInit() {
-      //REMINDER: Replace this with API response once BackEnd development is complete.
+      //  REMINDER: Replace this with API response once BackEnd development is complete.
       this.crondetails = {
         cronexp: '0 8 9 9 1/8 ? *',
         activeTab: 'monthly',
         activeRadio: 'specificDay'
-      }
+      };
       this.populateSchedule();
       this._AnalyzeService.getCategories(PRIVILEGES.PUBLISH)
         .then(response => {
@@ -113,7 +106,6 @@ export const AnalyzePublishDialogComponent = {
         emails: this.emails,
         cronDetials: this.cronexp
       };
-      console.log(this.model.schedule);
       return {execute: true, payload: this.model};
     }
 
@@ -144,7 +136,6 @@ export const AnalyzePublishDialogComponent = {
         emails: this.emails,
         cronDetials: this.cronexp
       };
-      console.log(this.model.schedule);
       const {payload, execute} = this.generateSchedulePayload();
       const promise = this.onPublish({model: payload, execute});
       this._$mdDialog.hide(promise);
