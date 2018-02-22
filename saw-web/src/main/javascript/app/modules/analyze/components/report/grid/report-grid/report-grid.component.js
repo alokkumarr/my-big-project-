@@ -10,10 +10,12 @@ import 'moment-timezone';
 
 import * as template from './report-grid.component.html';
 import style from './report-grid.component.scss';
-import {NUMBER_TYPES, DATE_TYPES} from '../../../../consts';
+import {NUMBER_TYPES, DATE_TYPES, FLOAT_TYPES} from '../../../../consts';
+import {getFormatter} from '../../../../../../common/utils/numberFormatter';
 
 // const MIN_ROWS_TO_SHOW = 5;
 const COLUMN_WIDTH = 175;
+const DEFAULT_PRECISION = 2;
 
 export const ReportGridComponent = {
   template,
@@ -25,11 +27,12 @@ export const ReportGridComponent = {
     gridIdentifier: '@'
   },
   controller: class ReportGridController {
-    constructor($mdDialog, dxDataGridService, $timeout) {
+    constructor($mdDialog, dxDataGridService, $timeout, AnalyzeDialogService) {
       'ngInject';
       this._$mdDialog = $mdDialog;
       this._dxDataGridService = dxDataGridService;
       this._$timeout = $timeout;
+      this._AnalyzeDialogService = AnalyzeDialogService;
 
       this.settings = {};
       this.columns = [];
@@ -159,68 +162,32 @@ export const ReportGridComponent = {
 
     prepareGridColumns(columns) {
       return map(columns, column => {
+        const isNumberType = NUMBER_TYPES.includes(column.type);
         if (column.type === 'timestamp') {
           column.type = 'date';
+        }
+        if (FLOAT_TYPES.includes(column.type)) {
+          if (!column.format) {
+            column.format = {};
+          }
+          if (!column.format.precision) {
+            column.format.precision = DEFAULT_PRECISION;
+          }
         }
         const field = {
           caption: column.getDisplayName(),
           dataField: column.name,
           dataType: NUMBER_TYPES.includes(column.type) ? 'number' : column.type,
+          type: column.type,
           visibleIndex: column.visibleIndex,
           allowSorting: false,
           alignment: 'left',
           width: COLUMN_WIDTH,
-          format: column.format
+          format: isNumberType ? {formatter: getFormatter(column.format)} : column.format
         };
 
         if (DATE_TYPES.includes(column.type) && isUndefined(column.format)) {
           field.format = 'yyyy-MM-dd';
-        }
-
-        if (NUMBER_TYPES.includes(column.type) && isUndefined(column.format)) {
-          field.format = {
-            type: 'fixedPoint',
-            comma: false,
-            precision: 2
-          };
-          field.customizeText = (data => {
-            const stringList = data.valueText.split(',');
-            let finalString = '';
-            forEach(stringList, value => {
-              finalString = finalString.concat(value);
-            });
-            return finalString;
-          });
-        }
-        if (NUMBER_TYPES.includes(column.type) && !isUndefined(column.format)) {
-          if (!isUndefined(column.format.currency)) {
-            field.customizeText = (data => {
-              if (!column.format.comma) {
-                const stringList = data.valueText.split(',');
-                let finalString = '';
-                forEach(stringList, value => {
-                  finalString = finalString.concat(value);
-                });
-                data.valueText = finalString;
-              }
-              if (!isUndefined(column.format.currencySymbol) && !isEmpty(data.valueText)) {
-                return column.format.currencySymbol + ' ' + data.valueText;
-              }
-              return data.valueText;
-            });
-          } else {
-            field.customizeText = (data => {
-              if (!column.format.comma) {
-                const stringList = data.valueText.split(',');
-                let finalString = '';
-                forEach(stringList, value => {
-                  finalString = finalString.concat(value);
-                });
-                data.valueText = finalString;
-              }
-              return data.valueText;
-            });
-          }
         }
         return field;
       });
@@ -283,71 +250,39 @@ export const ReportGridComponent = {
     }
 
     formatColumn(gridColumn) {
+      switch (gridColumn.dataType) {
+      case 'number':
+        this.formatNumberColumn(gridColumn);
+        break;
+      case 'date':
+      case 'string-date':
+      case 'timestamp':
+        this.formatDateColumn(gridColumn);
+        break;
+      default:
+      }
+    }
+
+    formatDateColumn(gridColumn) {
       this.openFormatModal(gridColumn).then(newFormat => {
         if (this._gridInstance) {
-          const columns = this._gridInstance.option('columns');
-          const column = this.getColumnByName(newFormat.column);
-          let typeValue = '';
-          let separator = false;
-          if (column) {
-            if (['date', 'string-date', 'timestamp'].includes(newFormat.type)) {
-              column.dataType = 'date';
-              column.format = newFormat.dateFormat;
-            } else {
-              if (newFormat.commaSeparator) {
-                typeValue = 'fixedpoint';
-                separator = true;
-              } else {
-                typeValue = 'fixedpoint';
-                separator = false;
-              }
-              if (newFormat.currencyFlag) {
-                column.format = {
-                  type: typeValue,
-                  comma: separator,
-                  precision: newFormat.numberDecimal,
-                  currency: newFormat.currencyCode,
-                  currencySymbol: newFormat.currencySymbol
-                };
-                column.customizeText = (source => {
-                  if (!column.format.comma) {
-                    const stringList = source.valueText.split(',');
-                    let finalString = '';
-                    forEach(stringList, value => {
-                      finalString = finalString.concat(value);
-                    });
-                    source.valueText = finalString;
-                  }
-                  if (!isUndefined(column.format.currencySymbol) && !isEmpty(source.valueText)) {
-                    return column.format.currencySymbol + ' ' + source.valueText;
-                  }
-                  return source.valueText;
-                });
-              } else {
-                column.format = {
-                  type: typeValue,
-                  comma: separator,
-                  precision: newFormat.numberDecimal
-                };
-                column.customizeText = (source => {
-                  if (!column.format.comma) {
-                    const stringList = source.valueText.split(',');
-                    let finalString = '';
-                    forEach(stringList, value => {
-                      finalString += value;
-                    });
-                    source.valueText = finalString;
-                  }
-                  return source.valueText;
-                });
-              }
-            }
-          }
-          this._gridInstance.option('columns', columns);
+          this._gridInstance.columnOption(gridColumn.dataField, 'format', newFormat.dateFormat);
         }
-        this.reportGridContainer.formatColumn(gridColumn.dataField, gridColumn.dataType, newFormat);
+        this.reportGridContainer.formatColumn(gridColumn.dataField, newFormat.dateFormat);
       });
+    }
 
+    formatNumberColumn(gridColumn) {
+      const column = find(this.columns, ({name}) => name === gridColumn.dataField);
+      this._AnalyzeDialogService.openDataFormatDialog(column.format, column.type)
+        .afterClosed().subscribe(format => {
+          if (format) {
+            if (this._gridInstance) {
+              this._gridInstance.columnOption(column.name, 'format', {formatter: getFormatter(format)});
+            }
+            this.reportGridContainer.formatColumn(column.name, format);
+          }
+        });
     }
 
     renameColumn(gridColumn) {

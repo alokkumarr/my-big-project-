@@ -3,6 +3,9 @@ import * as fpPipe from 'lodash/fp/pipe';
 import * as fpMapValues from 'lodash/fp/mapValues';
 
 export const NUMBER_TYPES = ['int', 'integer', 'double', 'long', 'float'];
+export const INT_TYPES = ['int', 'integer'];
+export const FLOAT_TYPES = ['double', 'long', 'float'];
+export const NUMBER_TYPES = [...INT_TYPES, ...FLOAT_TYPES];
 export const DATE_TYPES = ['timestamp', 'date'];
 
 export const BACKEND_TIMEZONE = 'America/New_York';

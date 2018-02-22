@@ -87,5 +87,13 @@
   "CUSTOM": "Custom",
   "EMAIL_ERROR_MSG": "Invalid Email-Id Found: Please provide valid Email-Id's in list",
   "DISABLE_GROUP_BY": "Group By disabled due to selection of Multiple Metrics",
-  "TOOLTIP_CLEARAGGREGATE_TYPE": "Clear Aggregation"
+  "TOOLTIP_CLEARAGGREGATE_TYPE": "Clear Aggregation",
+  "EQUALS":"Equals",
+  "NOT_EQUAL":"Not Equal",
+  "IS_IN":"Is In",
+  "IS_NOT_IN":"Is Not In",
+  "CONTAINS":"Contains",
+  "STARTS_WITH":"Starts With",
+  "ENDS_WITH":"Ends With",
+  "DISABLE_GROUP_BY": "Group By disabled due to selection of Multiple Metrics"
 }
