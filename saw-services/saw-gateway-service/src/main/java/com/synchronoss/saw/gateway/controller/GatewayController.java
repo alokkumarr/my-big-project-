@@ -188,7 +188,7 @@ public class GatewayController {
     else {
     	responseEntity = new ResponseEntity<>("Token is not present & it is invalid request", makeResponseHeadersInvalid(), HttpStatus.UNAUTHORIZED);
     }
-    logger.info("Response {}", proxiedResponse.getStatusLine().getStatusCode());
+    logger.info("Response {}", responseEntity.getStatusCode());
     return responseEntity;
   }
 
